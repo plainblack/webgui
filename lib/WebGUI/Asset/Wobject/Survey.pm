@@ -305,7 +305,7 @@ sub getIndexerParams {
 					and asset.endDate > $now",
                         fieldsToIndex => ["question",
                                           'select answer from Survey_answer where Survey_questionId = \'$data{Survey_questionId}\'' ],
-                        contentType => 'assetDetail',
+                        contentType => 'content',
                         url => 'WebGUI::URL::gateway($data{url})',
                         headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
                         bodyShortcut => '$textToIndex'

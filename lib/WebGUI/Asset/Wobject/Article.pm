@@ -94,6 +94,37 @@ sub getIcon {
 	return $session{config}{extrasURL}.'/assets/article.gif';
 }
 
+#-------------------------------------------------------------------
+sub getIndexerParams {
+        my $self = shift;
+        my $now = shift;
+        return {
+                Article => {
+                        sql => "select Article.assetId,
+					Article.linkTitle,
+					Article.linkURL,
+					asset.title,
+					asset.menuTitle,
+					asset.url,
+					asset.className,
+					asset.ownerUserId,
+					asset.groupIdView,
+					asset.synopsis,
+					wobject.description
+				from asset, Article
+				left join wobject on wobject.assetId = asset.assetId
+				where asset.assetId = Article.assetId
+                                        and asset.startDate < $now
+                                        and asset.endDate > $now",
+                        fieldsToIndex => ["linkTitle" ,"linkURL","title","menuTitle","url","synopsis","description" ],
+                        contentType => 'content',
+                        url => 'WebGUI::URL::gateway($data{url})',
+                        headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
+                        bodyShortcut => 'select description from wobject where assetId = \'$data{assetId}\'',
+                }
+
+        };
+}
 
 #-------------------------------------------------------------------
 sub getName {

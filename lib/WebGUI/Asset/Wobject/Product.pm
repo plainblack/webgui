@@ -287,7 +287,7 @@ sub getIndexerParams {
                                         and asset.endDate > $now",
                         fieldsToIndex => ["image1", "image2", "image3", "brochure", "manual", "warranty", "price", 
                                           "productNumber", "benefit", "feature", "name", "value", "units"],
-                        contentType => 'assetDetail',
+                        contentType => 'content',
                         url => 'WebGUI::URL::gateway($data{url})',
                         headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
                         bodyShortcut => 'select synopsis from asset where assetId = \'$data{asssetId}\'',

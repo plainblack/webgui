@@ -268,7 +268,7 @@ sub getIndexerParams {
 					and asset.startDate < $now
 					and asset.endDate > $now",
                         fieldsToIndex => ["label", "subtext", "possibleValues"],
-                        contentType => 'assetDetail',
+                        contentType => 'content',
                         url => 'WebGUI::URL::gateway($data{url})',
                         headerShortcut => 'select label from DataForm_field where DataForm_fieldId = \'$data{fid}\'',
                         bodyShortcut => 'select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'$data{fid}\'',
