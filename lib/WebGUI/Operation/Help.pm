@@ -26,11 +26,21 @@ sub www_viewHelp {
         my ($output, %help, @data, $sth, %seeAlso, $namespace);
 	$namespace = $session{form}{namespace} || "WebGUI";
 	tie %help, 'Tie::CPHash';
-	%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid} and namespace='$namespace' and language='$session{user}{language}'");
+	%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid} and namespace='$namespace' and 
+		language='$session{user}{language}'");
+	if ($help{action} eq "") {
+		%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid} and namespace='$namespace' and language='English'");
+	}
         $output = '<h1>'.WebGUI::International::get(93).': '.$help{action}.' '.$help{object}.'</h1>';
 	$output .= $help{body};
 	$output .= '<p><b>'.WebGUI::International::get(94).':';
-        $sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where object='$help{object}' and action<>'$help{action}' and language='$session{user}{language}' order by action");
+        $sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where object='$help{object}' 
+		and action<>'$help{action}' and language='$session{user}{language}' order by action");
+        unless ($sth->rows) {
+                $sth->finish;
+        	$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where object='$help{object}' 
+			and action<>'$help{action}' and language='English' order by action");
+        }
         while (@data = $sth->array) {
                 $output .= ' <a href="'.WebGUI::URL::page('op=viewHelp&hid='.$data[0].'&namespace='.$data[3])
 			.'">'.$data[1].' '.$data[2].'</a>,';
@@ -38,7 +48,12 @@ sub www_viewHelp {
         $sth->finish;
         $sth = WebGUI::SQL->read("select helpId, namespace from helpSeeAlso where seeAlsoId in ($help{seeAlso})");
         while (@data = $sth->array) {
-		%seeAlso = WebGUI::SQL->quickHash("select helpId,namespace,action,object from help where helpId='$data[0]' and namespace='$data[1]' and language='$session{user}{language}'");
+		%seeAlso = WebGUI::SQL->quickHash("select helpId,namespace,action,object from help where helpId='$data[0]' 
+			and namespace='$data[1]' and language='$session{user}{language}'");
+		if ($seeAlso{helpId} eq "") {
+			%seeAlso = WebGUI::SQL->quickHash("select helpId,namespace,action,object from help where helpId='$data[0]' 
+			and namespace='$data[1]' and language='English'");
+		}
                 $output .= ' <a href="'.
 			WebGUI::URL::page('op=viewHelp&hid='.$seeAlso{helpId}.'&namespace='.$seeAlso{namespace})
 			.'">'.$seeAlso{action}.' '.$seeAlso{object}.'</a>,';
@@ -54,6 +69,10 @@ sub www_viewHelpIndex {
 	$output = '<h1>'.WebGUI::International::get(95).'</h1>';
 	$output .= '<table width="100%"><tr><td valign="top"><b>'.WebGUI::International::get(96).'</b><p>';
 	$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where language='$session{user}{language}' order by action,object");
+	unless ($sth->rows) {
+		$sth->finish;
+		$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where language='English' order by action,object");
+	}
 	while (@data = $sth->array) {
 		if ($data[1] ne $previous) {
 			$output .= '<p><b>'.$data[1].'</b><br>';
@@ -65,6 +84,10 @@ sub www_viewHelpIndex {
 	$sth->finish;
 	$output .= '</td><td valign="top"><b>'.WebGUI::International::get(97).'</b><p>';
         $sth = WebGUI::SQL->read("select helpId, object, action, namespace from help where language='$session{user}{language}' order by object,action");
+        unless ($sth->rows) {
+                $sth->finish;
+        	$sth = WebGUI::SQL->read("select helpId, object, action, namespace from help where language='English' order by object,action");
+        }
         while (@data = $sth->array) {
                 if ($data[1] ne $previous) {
                         $output .= '<p><b>'.$data[1].'</b><br>';
