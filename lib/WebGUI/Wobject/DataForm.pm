@@ -33,7 +33,7 @@ our @ISA = qw(WebGUI::Wobject);
 sub _createField {
 	my $data = $_[0];
 	my %param;
-	$param{name} = WebGUI::URL::urlize($data->{name});
+	$param{name} = $data->{name};
 	$param{name} = "field_".$data->{sequenceNumber} if ($param{name} eq ""); # Empty fieldname not allowed
 	$session{form}{$param{name}} =~ s/\^.*?\;//gs ; # remove macro's from user input
 	$param{value} = $data->{value};
@@ -103,11 +103,66 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub getTemplateVars {
+sub getListTemplateVars {
+	my $self = shift;
+	my $var = shift;
+	my @fieldLoop;
+	$var->{"back.url"} = WebGUI::URL::page();
+	$var->{"back.label"} = WebGUI::International::get(18,$self->get("namespace"));
+	my $a = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
+		where wobjectId=".$self->get("wobjectId")." order by sequenceNumber");
+	while (my $field = $a->hashRef) {
+		push(@fieldLoop,{
+			"field.name"=>$field->{name},
+			"field.id"=>$field->{DataForm_fieldId},
+			"field.label"=>$field->{label},
+			"field.isMailField"=>$field->{isMailField},
+			"field.type"=>$field->{type},
+			});
+	}
+	$a->finish;
+	$var->{field_loop} = \@fieldLoop;
+	my @recordLoop;
+	my $a = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
+		where wobjectId=".$self->get("wobjectId")." order by submissionDate desc");
+	while (my $record = $a->hashRef) {
+		my @dataLoop;
+		my $b = WebGUI::SQL->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
+			on a.name=b.name where a.DataForm_entryId=".$record->{DataForm_entryId}."
+			order by b.sequenceNumber");
+		while (my $data = $b->hashRef) {
+			push(@dataLoop,{
+				"record.data.name"=>$data->{name},
+				"record.data.label"=>$data->{label},
+				"record.data.value"=>$data->{value},
+				"record.data.isMailField"=>$data->{isMailField}
+				});
+		}
+		$b->finish;
+		push(@recordLoop,{
+			"record.ipAddress"=>$record->{ipAddress},
+			"record.edit.url"=>WebGUI::URL::page("func=view&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId")),
+			"record.username"=>$record->{username},
+			"record.userId"=>$record->{userId},
+			"record.submissionDate.epoch"=>$record->{submissionDate},
+			"record.submissionDate.human"=>WebGUI::DateTime::epochToHuman($record->{submissionDate}),
+			"record.entryId"=>$record->{DataForm_entryId},
+			"record.data_loop"=>\@dataLoop
+			});
+	}
+	$a->finish;
+	$var->{record_loop} = \@recordLoop;
+	return $var;
+}
+
+#-------------------------------------------------------------------
+sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{canEdit} = (WebGUI::Privilege::canEditPage());
+	$var->{"entryList.url"} = WebGUI::URL::page('func=view&entryId=list&wid='.$self->get("wobjectId"));
+	$var->{"entryList.label"} = WebGUI::International::get(86,$self->get("namespace"));
 	$var->{"export.tab.url"} = WebGUI::URL::page('func=exportTab&wid='.$self->get("wobjectId"));
 	$var->{"export.tab.label"} = WebGUI::International::get(84,$self->get("namespace"));
 	$var->{"back.url"} = WebGUI::URL::page();
@@ -138,22 +193,23 @@ sub getTemplateVars {
 	tie %data, 'Tie::CPHash';
 	my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where order by a.sequenceNumber");
 	while (%data = $sth->hash) {
-		my $formValue = $session{form}{WebGUI::URL::urlize($data{name})};
+		my $formValue = $session{form}{$data{name}};
 		if (defined $formValue) {
 			$data{value} = $formValue;
 		} elsif (not exists $data{value}) {
 			$data{value} = $data{defaultValue};
 		}
+		my $hidden = (($data{status} eq "hidden" || ($data{isMailField} && !$self->get("mailData"))) && !$session{var}{adminOn});
 		push(@fields,{
 			"field.form" => _createField(\%data),
 			"field.name" => $data{name},
 			"field.value" => $data{value},
 			"field.label" => $data{label},
 			"field.isMailField" => $data{isMailField},
-			"field.isRequired" => ($data{status} eq "required"),
-			"field.isHidden" => ($data{status} eq "hidden" && !$session{var}{adminOn}),
-			"field.isDisplayed" => ($data{status} eq "displayed"),
-			"field.isEditable" => ($data{status} eq "editable"),
+			"field.isHidden" => $hidden,
+			"field.isDisplayed" => ($data{status} eq "displayed" && !$hidden),
+			"field.isEditable" => ($data{status} eq "editable" && !$hidden),
+			"field.isRequired" => ($data{status} eq "required" && !$hidden),
 			"field.subtext" => $data{subtext},
 			"field.controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{isMailField})
 			});
@@ -184,6 +240,9 @@ sub new {
 				},
 			acknowlegementTemplateId=>{
 				defaultValue=>3,
+				},
+			listTemplateId=>{
+				defaultValue=>1,
 				},
 			mailData=>{
 				defaultValue=>0
@@ -279,6 +338,13 @@ sub www_edit {
                 -value=>$_[0]->getValue("acknowlegementTemplateId"),
                 -namespace=>$_[0]->get("namespace"),
                 -label=>WebGUI::International::get(81,$_[0]->get("namespace")),
+                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
+                );
+        $layout->template(
+                -name=>"listTemplateId",
+                -value=>$_[0]->getValue("listTemplateId"),
+                -namespace=>$_[0]->get("namespace")."/List",
+                -label=>WebGUI::International::get(87,$_[0]->get("namespace")),
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
 	my $properties = WebGUI::HTMLForm->new;
@@ -461,7 +527,7 @@ sub www_editFieldSave {
 	$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$session{form}{fid},
 		width=>$session{form}{width},
-		name=>$session{form}{name},
+		name=>WebGUI::URL::urlize($session{form}{name}),
 		label=>$session{form}{label},
 		status=>$session{form}{status},
 		type=>$session{form}{type},
@@ -481,10 +547,23 @@ sub www_editFieldSave {
 sub www_exportTab {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	$session{header}{filename} = WebGUI::URL::urlize($_[0]->get("title")).".tab";
-	$session{header}{mimetype} = "text/tab";
-	return WebGUI::SQL->quickTab("select a.label, a.name, b.value, c.ipAddress, c.username, c.submissionDate, c.DataForm_entryId
-		from DataForm_field a left join DataForm_entryData b on a.name=b.name left join DataForm_entry c on
-		b.DataForm_entryId=c.DataForm_entryId where c.wobjectId=".$_[0]->get("wobjectId")." order by c.DataForm_entryId, a.sequenceNumber");
+	$session{header}{mimetype} = "text/plain";
+	my @fields = WebGUI::SQL->buildArray("select name from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+	my $select = "select a.DataForm_entryId as entryId, a.ipAddress, a.username, a.userId, a.submissionDate";
+	my $from = " from DataForm_entry a";
+	my $join;
+	my $where = " where a.wobjectId=".$_[0]->get("wobjectId");
+	my $orderBy = " order by a.DataForm_entryId";
+	my $columnCounter = "b";
+	foreach my $field (@fields) {
+		my $extension = "";
+		$extension = "mail_" if (isIn($field, qw(to from cc bcc subject)));
+		$select .= ", ".$columnCounter.".value as ".$extension.$field;
+		$join .= " left join DataForm_entryData ".$columnCounter." on a.DataForm_entryId=".$columnCounter.".DataForm_entryId and "
+			.$columnCounter.".name=".quote($field);
+		$columnCounter++;
+	}
+	return WebGUI::SQL->quickTab($select.$from.$join.$where.$orderBy);
 }
 
 #-------------------------------------------------------------------
@@ -517,7 +596,7 @@ sub www_process {
 	my $sth = WebGUI::SQL->read("select DataForm_fieldId,name,status,type,defaultValue,isMailField from DataForm_field 
 		where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%row = $sth->hash) {
-		my $value = WebGUI::FormProcessor::process(WebGUI::URL::urlize($row{name}),$row{type},$row{defaultValue});
+		my $value = WebGUI::FormProcessor::process($row{name},$row{type},$row{defaultValue});
 		if ($row{status} eq "required" || $row{status} eq "editable") {
 			$value = WebGUI::Macro::filter($value);
 		}
@@ -542,13 +621,13 @@ sub www_process {
 	}
 	$sth->finish;
 	$var->{error_loop} = \@errors;
-	$var = $_[0]->getTemplateVars($var);
+	$var = $_[0]->getRecordTemplateVars($var);
 	if ($hadErrors && !$updating) {
 		WebGUI::SQL->write("delete from DataForm_entryData where DataForm_entryId=".$entryId);
 		$_[0]->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
 		$_[0]->www_view($var);
 	} else {
-		$_[0]->sendEmail($var) unless ($updating);
+		$_[0]->sendEmail($var) if ($_[0]->get("mailData") && !$updating);
 		return $_[0]->processTemplate($_[0]->get("acknowlegementTemplateId"),$var);
 	}
 }
@@ -557,7 +636,10 @@ sub www_process {
 sub www_view {
 	my $var;
 	$var->{entryId} = $session{form}{entryId};
-	$var = $_[1] || $_[0]->getTemplateVars($var);
+	if ($var->{entryId} eq "list" && WebGUI::Privilege::canEditPage()) {
+		return $_[0]->processTemplate($_[0]->get("listTemplateId"),$_[0]->getListTemplateVars,"DataForm/List");
+	}
+	$var = $_[1] || $_[0]->getRecordTemplateVars($var);
 	return $_[0]->processTemplate($_[0]->get("templateId"),$var);
 }
 

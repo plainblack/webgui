@@ -471,7 +471,7 @@ sub fieldType {
 		} elsif ($type eq "radioList") {
         		$hash{radioList} = WebGUI::International::get(942);
 		} elsif ($type eq "checkList") {
-        		$hash{checkboxList} = WebGUI::International::get(941);
+        		$hash{checkList} = WebGUI::International::get(941);
 		} elsif ($type eq "zipcode") {
 			$hash{zipcode} = WebGUI::International::get(944);
 		} elsif ($type eq "checkbox") {

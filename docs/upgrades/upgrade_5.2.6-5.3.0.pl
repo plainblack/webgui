@@ -6,6 +6,7 @@ use Parse::PlainConfig;
 use strict;
 use WebGUI::International;
 use WebGUI::SQL;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 
@@ -147,6 +148,14 @@ $sth->finish;
 foreach my $query (@sql) {
         WebGUI::SQL->write($query);
 }
+my $sth = WebGUI::SQL->read("select DataForm_fieldId,name,wobjectId from DataForm_fieldId");
+while (my @data = $sth->array) {
+	my $newname = WebGUI::URL::urlize($data[1]);
+	WebGUI::SQL->write("update DataForm_field set name=".quote($newname)." where DataForm_fieldId=".$data[0]);
+	WebGUI::SQL->write("update DataForm_entryData set name=".quote($newname)." where wobjectId=".$data[2]." and name=".quote($data[1]));
+}
+$sth->finish;
+
 
 print "\tSetting up new global template structure.\n" unless ($quiet);
 
