@@ -42,18 +42,17 @@ GetOptions(
 	'help'=>\$help
 );
 
-#if ($help || $configFile eq '' || $pageId eq '' ) {
 if ($help || $configFile eq '' ) {
 	print <<STOP;
 
 
-Usage: perl $0 --configfile=<webguiConfig> --pageId=<pageNumber>
+Usage: perl $0 --configFile=<webguiConfig>
 
 	--configFile    WebGUI config file (with no path info).
 
-	--pageId        Set the page to be generated.
-	
 Options:
+
+	--pageId        Set the page to be generated.
 
         --help		Displays this message.
 
