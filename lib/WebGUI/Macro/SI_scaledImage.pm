@@ -15,6 +15,7 @@ use WebGUI::Collateral;
 use WebGUI::Macro;
 use WebGUI::ErrorHandler;
 use WebGUI::Session;
+use WebGUI::Utility;
 
 # test for Image::Magick
 
@@ -59,7 +60,7 @@ sub process {
         }
 
         if ($width || $height) {
-          $url = GuideGuide::scaleImage(
+          $url = scaleImage(
             collateral => $collateral,
             width => $width,
             height => $height
