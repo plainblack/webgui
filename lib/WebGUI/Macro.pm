@@ -47,15 +47,6 @@ These functions are available from this package:
 #-------------------------------------------------------------------
 # Returns a complex regular expression for matching macro patterns.
 sub _nestedMacro {
-   # Regular expression for matching balanced parenthesis
-   my $parenthesis = qr /\(                      # Start with '(',
-                      (?:                     # Followed by
-                      (?>[^()]+)              # Non-parenthesis
-                      |(??{ $parenthesis })   # Or a balanced parenthesis block
-                      )*                      # zero or more times
-                      \)/x;                  # Ending with ')'
-
-   # Regular expression for matching balanced macros
    my $nestedMacro = qr /\^                     # Start with carat
                        ([^\^;()]+)            # And one or more none-macro characters -tagged-
                        ((?:                   # Followed by
@@ -69,6 +60,17 @@ sub _nestedMacro {
 
 
 
+#-------------------------------------------------------------------
+# Returns a regular expression for matching balanced parenthesis patterns.
+sub _parenthesis {
+   my $parenthesis = qr /\(                      # Start with '(',
+                      (?:                     # Followed by
+                      (?>[^()]+)              # Non-parenthesis
+                      |(??{ $parenthesis })   # Or a balanced parenthesis block
+                      )*                      # zero or more times
+                      \)/x;                  # Ending with ')'
+   return $parenthesis;
+}
 #-------------------------------------------------------------------
 
 =head2 filter ( html )
@@ -87,6 +89,7 @@ The segment to be filtered.
 
 sub filter {
 	my $content = shift;
+	my $parenthesis = _parenthesis();
         my $nestedMacro = _nestedMacro();
         while ($content =~ /($nestedMacro)/gs) {
 		$content =~ s/\Q$1//gs;
@@ -164,6 +167,7 @@ A string of HTML to be processed.
 
 sub process {
    	my $content = shift;
+	my $parenthesis = _parenthesis();
    	my $nestedMacro = _nestedMacro();
    	while ($content =~ /($nestedMacro)/gs) {
       		my ($macro, $searchString, $params) = ($1, $2, $3);
@@ -175,6 +179,12 @@ sub process {
 		}
 		if ($session{config}{macros}{$searchString} ne "") {
       			my $cmd = "WebGUI::Macro::".$session{config}{macros}{$searchString}."::process";
+			open(DEBUG, ">> /tmp/macro");
+			print DEBUG "-------------------\n";
+			print DEBUG "searchString: $searchString\n";
+			print DEBUG "params: $params\n";
+			print DEBUG "macro: $macro\n\n";
+			close(DEBUG);
 			my $result = eval{&$cmd($params)};
 			if ($@) {
 				WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
