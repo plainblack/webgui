@@ -1118,11 +1118,11 @@ sub move{
 	return 0 if (isIn($self->get('pageId'), map {$_->{pageId}} $newMother->ancestors));
 
 	# Make sure a page is not moved to itself.
-	return 0 if ($self->get('pageId') == $newMother->get("pageId"));
+	return 0 if ($self->get('pageId') eq $newMother->get("pageId"));
 
 	# Make sure a page is not moved to it's own mother
-	return 0 if ($self->get('parentId') == $newMother->get('pageId'));
-	
+	return 0 if ($self->get('parentId') eq $newMother->get('pageId'));
+
 	$parentId = $self->get("parentId");
 	
 	# We move to the right of the children of $newMother.
