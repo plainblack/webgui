@@ -25,6 +25,7 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Wobject;
+use WebGUI::User;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -243,7 +244,7 @@ sub www_moveForumDown {
         $_[0]->moveCollateralDown("MessageBoard_forums","forumId",$session{form}{forumId});
         return "";
 }
-                                                                                                                                                             
+
 #-------------------------------------------------------------------
 sub www_moveForumUp {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
@@ -302,6 +303,7 @@ sub www_view {
 				'forum.lastPost.subject' => $lastPost->get("subject"),
 				'forum.lastPost.user.id' => $lastPost->get("userId"),
 				'forum.lastPost.user.name' => $lastPost->get("username"),
+				'forum.lastPost.user.alias' => WebGUI::User->new($lastPost->get("userId"))->profileField("alias");
 				'forum.lastPost.user.profile' => WebGUI::Forum::UI::formatUserProfileURL($lastPost->get("userId")),
 				'forum.lastPost.user.isVisitor' => ($lastPost->get("userId") == 1),
 				'forum.user.canView' => $forum->canView,
