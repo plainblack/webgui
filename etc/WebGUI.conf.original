@@ -28,6 +28,8 @@ macros = a => a_account, \
 	AdminBar => AdminBar, \
 	AdminText => AdminText, \
 	AdminToggle => AdminToggle, \
+	AOIHits => AOIHits, \
+	AOIRank => AOIRank, \
 	@ => At_username, \
 	\\ => Backslash_pageUrl, \
 	c => c_companyName, \
