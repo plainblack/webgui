@@ -83,7 +83,7 @@ sub as_HTML {
    my $tablewidth = $self->width();
    $tablewidth =~ m/^(\d+)(\%?)$/; my $cellwidth = (int($1/7))||'14'; if ($2) { $cellwidth .= '%'; }
    my $header = $self->header();
-   my $mondayisfirstday = $self->mondayisfirstday();
+   $mondayisfirstday = $self->mondayisfirstday();
    my $cellalignment = $self->cellalignment();
    my $vcellalignment = $self->vcellalignment();
    my $contentfontsize = $self->contentfontsize();
