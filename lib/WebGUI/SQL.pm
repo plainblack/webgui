@@ -357,7 +357,7 @@ sub quickArray {
 
 =cut
 
-sub quickTab {
+sub quickCSV {
         my ($sth, $output, @data);
         $sth = WebGUI::SQL->new($_[1],$_[2]);
         $output = join(",",$sth->getColumnNames)."\n";
