@@ -161,13 +161,13 @@ sub getNextThread {
 
 #-------------------------------------------------------------------
 
-=head getPost ( postId ) 
+=head2 getPost ( postId ) 
 
 Returns a post object.
 
 =over
 
-=item
+=item postId
 
 The unique id of the post object you wish to retrieve.
 
@@ -443,7 +443,7 @@ sub setStatusDeleted {
                                                                                                                                                              
 #-------------------------------------------------------------------
 
-=head setStatusDenied ( )
+=head2 setStatusDenied ( )
 
 Sets the status of this thread to denied.
 
@@ -456,7 +456,7 @@ sub setStatusDenied {
                                                                                                                                                              
 #-------------------------------------------------------------------
 
-=head setStatusPending ( )
+=head2 setStatusPending ( )
 
 Sets the status of this thread to pending.
 
