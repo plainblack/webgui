@@ -136,12 +136,11 @@ sub www_editGroupSave {
 
 #-------------------------------------------------------------------
 sub www_listGroups {
-        my ($output, $p, $sth, @data, @row, $i);
+        my ($output, $p, $sth, @data, @row, $i, $userCount);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output = helpIcon(10);
 		$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editGroup&gid=new').'">'.WebGUI::International::get(90).'</a></div>';
-                $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $sth = WebGUI::SQL->read("select groupId,groupName,description from groups 
 			where groupId<>1 and groupId<>2 and groupId<>7 order by groupName");
                 while (@data = $sth->array) {
@@ -150,12 +149,18 @@ sub www_listGroups {
 				.editIcon('op=editGroup&gid='.$data[0])
 				.'</td>';
                         $row[$i] .= '<td valign="top" class="tableData">'.$data[1].'</td>';
-                        $row[$i] .= '<td valign="top" class="tableData">'.$data[2].'</td></tr>';
+                        $row[$i] .= '<td valign="top" class="tableData">'.$data[2].'</td>';
+			($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=$data[0]");
+                        $row[$i] .= '<td valign="top" class="tableData">'.$userCount.'</td></tr>';
+                        $row[$i] .= '</tr>';
                         $i++;
                 }
 		$sth->finish;
                 $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listGroups'),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+		$output .= '<tr><td></td><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
+			.WebGUI::International::get(85).'</td><td class="tableHeader">'
+			.WebGUI::International::get(748).'</td></tr>';
                 $output .= $p->getPage($session{form}{pn});
                 $output .= '</table>';
                 $output .= $p->getBarTraditional($session{form}{pn});
