@@ -15,7 +15,7 @@ package WebGUI::International;
 =cut
 
 
-use strict;
+use strict qw(vars subs);
 use WebGUI::Session;
 
 
@@ -33,12 +33,14 @@ This package provides an interface to the internationalization system.
  $string = WebGUI::International::get($internationalId,$namespace);
  $hashRef = WebGUI::International::getLanguage($lang);
  $hashRef = WebGUI::International::getLanguages();
+ $url = WebGUI::International::makeUrlCompliant($url);
 
 This package can also be used in object-oriented (OO) style.
 
  use WebGUI::International;
  my $i = WebGUI::International->new($namespace);
- $i->get($internationalId);
+ $string = $i->get($internationalId);
+ $url = $i->makeUrlCompliant($url);
 
 =head1 METHODS
 
@@ -148,6 +150,42 @@ sub getLanguages {
 		}
 	}
         return $hashRef;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 makeUrlCompliant ( url [ , language ] )
+
+Manipulates a URL to make sure it will work on the internet. It removes things like non-latin characters, etc.
+
+=head3 url
+
+The URL to manipulate.
+
+=head3 languageId
+
+Specify a default language. Defaults to user preference.
+
+=cut
+
+sub makeUrlCompliant {
+        my ($language, $url);
+	if (ref($_[0]) eq "WebGUI::International") {
+		$url = $_[1];
+		$language = $_[2] || $_[0]->{_language} || $session{user}{language} || "English";
+	} else {
+		$url = $_[0];
+		$language = $_[1] || $session{user}{language} || "English";
+	}
+	my $cmd = "WebGUI::i18n::".$language;
+	my $load = "use ".$cmd;
+	eval($load);
+	WebGUI::ErrorHandler::warn($cmd." failed to compile because ".$@) if ($@);
+	$cmd = $cmd."::makeUrlCompliant";
+	my $output = eval{&$cmd($url)};	
+	WebGUI::ErrorHandler::warn("Couldn't execute ".$cmd." because ".$@) if ($@);
+	return $output;
 }
 
 

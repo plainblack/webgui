@@ -18,6 +18,7 @@ package WebGUI::URL;
 use strict;
 use URI;
 use URI::Escape;
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Utility;
 
@@ -217,7 +218,7 @@ sub getSiteURL {
 
 =head2 makeCompliant ( string )
 
-Returns a string that has made into a WebGUI compliant URL.
+Returns a string that has made into a WebGUI compliant URL based upon the language being submitted.
 
 =head3 string
 
@@ -226,17 +227,8 @@ The string to make compliant. This is usually a page title or a filename.
 =cut 
 
 sub makeCompliant {
-        my ($value);
-	$value = $_[0];
-        $value =~ s/\s+$//;            		#removes trailing whitespace
-        $value =~ s/^\s+//;            		#removes leading whitespace
-	$value =~ s/^\\//;			#removes leading slash
-        $value =~ s/ /_/g;              	#replaces whitespace with underscores
-        $value =~ s/\.$//;             		#removes trailing period
-        $value =~ s/[^A-Za-z0-9\-\.\_\/]//g; 	#removes all funky characters
-	$value =~ s/^\///;			#removes a preceeding /
-	$value =~ s/\/\//\//g;                  #removes double /
-        return $value;
+	my $url = shift;
+	return WebGUI::International::makeUrlCompliant($url);
 }
 
 #-------------------------------------------------------------------
