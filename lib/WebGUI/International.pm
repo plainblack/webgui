@@ -93,7 +93,7 @@ sub get {
 		if ($output eq "" && $language ne 1) {
 			$output = get($_[0],$namespace,1);
 		}
-		$cache->set($language."_".$namespace."_".$_[0], $output) if ($useCache);
+		$cache->set($language."_".$namespace."_".$_[0], $output, $session{config}{cacheInternational}) if ($useCache);
 	}
 	return $output;
 }
