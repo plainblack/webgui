@@ -197,7 +197,6 @@ sub cut {
 	
 	# Place page in clipboard (pageId 2)
 	$clipboard = WebGUI::Page->getPage(2);
-	$self->get("pageId");
 
 	if ($self->move($clipboard)) {
 		$self->set({
@@ -230,6 +229,39 @@ sub deCache {
 	my $cache = WebGUI::Cache->new;
 	my $pageId = $_[0] || $session{page}{pageId};
 	$cache->deleteByRegex("m/^page_".$pageId."_\\d+\$/");
+}
+
+#-------------------------------------------------------------------
+=head2 delete
+
+Deletes this Page object from the tree and places it in the trash. To physically remove
+pages from the tree and the database you should use the purge method.
+
+This function overloads the delete inherited from WebGUI::Persistent::Tree. This is done 
+because 'delete' is the right name for the functionality within WebGUI and because the 
+delete of WG::P::Tree is not very useful: it only works on one page and causes pages with 
+'zombie' parents.
+
+=back
+
+=cut
+sub delete {
+	my ($self, $trash, $parentId);
+	$self = shift;
+	$parentId = $self->get("parentId");
+	
+	# Place page in trash (pageId 3)
+	$trash = WebGUI::Page->getPage(3);
+
+	if ($self->move($trash)) {
+		$self->set({
+			bufferUserId	=> $session{user}{userId},
+			bufferDate	=> time,
+			bufferPrevId	=> $parentId,
+		});
+	}
+
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -440,12 +472,15 @@ The id of the page requested.
 
 =cut
 sub getPage {
-	my ($serializer, $cache, $pageLookup, $node, $self, $class, $pageId, $tree);
-	($class, $pageId) = @_;
-	$pageId ||= $session{page}{pageId};
+	my ($cache, $pageLookup, $node, $self, $pageId, $tree);
+	($self, $pageId) = @_;
 
-	WebGUI::ErrorHandler::fatalError("Illegal pageId: '$pageId'") unless ($pageId =~ /^-?\d+$/);
+	unless (defined $pageId) {
+		$pageId = $session{page}{pageId};
+	}
 	
+	WebGUI::ErrorHandler::fatalError("Illegal pageId: '$pageId'") unless ($pageId =~ /^-?\d+$/);
+
 	# Only fetch from cache if cache is enabled in the config file
 	if ($session{config}{usePageCache}) {
 		# Fetch the correct pagetree from cache
@@ -500,8 +535,7 @@ The page under which the current page should be moved. This should be an WebGUI:
 =cut
 sub  move{
 	my ($self, $clipboard, $parentId, $newSequenceNumber, @newSisters, $newMother);
-	$self = shift;
-	$newMother = shift;
+	($self,	$newMother) = @_;
 
 	# Avoid cyclic pages. Not doing this will allow people to freeze your computer, by generating infinite loops.
 	return 0 if (isIn($self->get("pageId"), map {$_->get("pageId")} $newMother->ancestors));
@@ -550,8 +584,7 @@ The page under which the current page should be pasted. This should be an WebGUI
 =cut
 sub paste{
 	my ($self, $newMother);
-	$self = shift;
-	$newMother = shift;
+	($self, $newMother) = @_;
 	return $self if ($self->get("pageId") == $newMother->get("pageId"));
 	return WebGUI::ErrorHandler::fatalError("You cannot paste a page that's not on the clipboard.") unless ($self->get("parentId") == 2);
 	
@@ -565,6 +598,34 @@ sub paste{
 	}
 
 	return $self;
+}
+
+#-------------------------------------------------------------------
+=head2 purge
+
+This purges this object from the tree and the database.
+
+=back
+
+=cut
+sub purge {
+	my ($self, $currentPage, @pagesToPurge);
+	$self = shift;
+	
+	# Never ever modify the tree hierarchy in a walk_down...
+	$self->walk_down({
+		callback => sub {
+			$currentPage = shift;
+			push(@pagesToPurge, $currentPage);
+		}
+	});
+
+	# ... do it afterwards.
+	foreach $currentPage (@pagesToPurge) {
+		$currentPage->SUPER::delete;
+	}
+
+	return "";
 }
 
 #-------------------------------------------------------------------
@@ -586,10 +647,16 @@ sub recachePageTree {
 
 	# Fetch the complete forrest, which is actually all the pagetrees connected by a dummy root. 
 	$forrest = WebGUI::Page->getTree();
+
+	# Cache complete forrest. 
+	$cache = WebGUI::Cache->new('root-0','PageTree-'.$session{config}{configFile});
+	$cache->setDataStructure($forrest->{0});
+	$pageLookup{0} = 0;
 	
 	@pageRoots = $forrest->{0}->daughters;
 	$serializer = Data::Serializer->new(serializer => 'Storable');
 
+	# Cache per tree.
 	foreach $currentTree (@pageRoots) {
 		# Disconnect the tree from the dummy root.
 		$currentTree->unlink_from_mother;
