@@ -7,7 +7,7 @@ package WebGUI::Session;
 # (docs/license.txt) that came with this distribution before using
 # this software.
 #-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
+# http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
 use CGI;
@@ -33,48 +33,48 @@ sub _generateSessionId {
 
 #-------------------------------------------------------------------
 sub _getPageInfo {
-        my (%page, $pageId, $pageName);
+	my (%page, $pageId, $pageName);
 	tie %page, 'Tie::CPHash';
 	($pageId) = $_[0];
 	if ($pageId eq "") {
-        	$pageName = lc($ENV{PATH_INFO});
-        	$pageName =~ s/\///;
+		$pageName = lc($ENV{PATH_INFO});
+		$pageName =~ s/\///g;
 		$pageName =~ s/\'//;
 		$pageName =~ s/\"//;
-        	if ($pageName ne "") {
-                	($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'",$_[1]);
-                	if ($pageId eq "") {
-                        	$pageId = $_[2];
+		if ($pageName ne "") {
+			($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'",$_[1]);
+			if ($pageId eq "") {
+				$pageId = $_[2];
 				if($ENV{"MOD_PERL"}) {
-                                       my $r = Apache->request;
-                                       if(defined($r)) {
-                                               $r->custom_response(404, $session{page}{url} );
-                                               $r->status(404);
-                                       }
-                                } else {
+					my $r = Apache->request;
+					if(defined($r)) {
+						$r->custom_response(404, $session{page}{url} );
+						$r->status(404);
+					}
+				} else {
 					$session{header}{status} = '404';
 				}
-                	}
-        	} else {
-                	$pageId = $session{setting}{defaultPage};
-        	}
+			}
+		} else {
+			$pageId = $session{setting}{defaultPage};
+		}
 	}
 	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'",$_[1]);
 	$page{url} = $_[3]."/".$page{urlizedTitle};
-        return \%page;
+	return \%page;
 }
 
 #-------------------------------------------------------------------
 sub _getSessionVars {
-        my (%vars, $uid, $encryptedPassword);
+	my (%vars, $uid, $encryptedPassword);
 	tie %vars, 'Tie::CPHash';
-        if ($_[0] ne "") {
-        	%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'", $_[1]);
+	if ($_[0] ne "") {
+		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'", $_[1]);
 		if ($vars{sessionId} ne "") {
 			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', expires=".(time()+$_[2])." where sessionId='$_[0]'",$_[1]);
 		}
 	}
-        return \%vars;
+	return \%vars;
 }
 
 #-------------------------------------------------------------------
@@ -108,45 +108,45 @@ sub _getUserInfo {
 sub _loadMacros {
 	my ($slash, $namespace, $cmd, @files, $file, $dir);
 	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-        $dir = $slash."lib".$slash."WebGUI".$slash."Macro";
-        opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
-        @files = readdir(DIR);
-        foreach $file (@files) {
-                if ($file =~ /(.*?)\.pm$/) {
+	$dir = $slash."lib".$slash."WebGUI".$slash."Macro";
+	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
+	@files = readdir(DIR);
+	foreach $file (@files) {
+		if ($file =~ /(.*?)\.pm$/) {
 			$namespace = $1;
-                        $cmd = "use WebGUI::Macro::".$1;
-                        eval($cmd);
-                	WebGUI::ErrorHandler::fatalError("Macro failed to compile: $namespace.") if($@);
+			$cmd = "use WebGUI::Macro::".$1;
+			eval($cmd);
+			WebGUI::ErrorHandler::fatalError("Macro failed to compile: $namespace.") if($@);
 			$session{macro}{$namespace} = $namespace;
-                }
-        }
-        closedir(DIR);
+		}
+	}
+	closedir(DIR);
 }
 
 #-------------------------------------------------------------------
 sub _loadWobjects {
-        my ($dir, @files, $slash, $file, $cmd, $namespace);
+	my ($dir, @files, $slash, $file, $cmd, $namespace);
 	$slash = ($^O =~ /Win/i) ? "\\" : "/";
-        $dir = $slash."lib".$slash."WebGUI".$slash."Wobject";
-        opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
-        @files = readdir(DIR);
-        foreach $file (@files) {
-                if ($file =~ /(.*?)\.pm$/) {
-                        $namespace = $1;
-                        $cmd = "use WebGUI::Wobject::".$namespace;
-                        eval($cmd);
-                	WebGUI::ErrorHandler::fatalError("Wobject failed to compile: $namespace.") if($@);
+	$dir = $slash."lib".$slash."WebGUI".$slash."Wobject";
+	opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
+	@files = readdir(DIR);
+	foreach $file (@files) {
+		if ($file =~ /(.*?)\.pm$/) {
+			$namespace = $1;
+			$cmd = "use WebGUI::Wobject::".$namespace;
+			eval($cmd);
+			WebGUI::ErrorHandler::fatalError("Wobject failed to compile: $namespace.") if($@);
 			$cmd = "\$WebGUI::Wobject::".$namespace."::name";
 			$session{wobject}{$namespace} = eval($cmd);
-                	WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace.") if($@);
-                }
-        }
-        closedir(DIR);
+			WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace.") if($@);
+		}
+	}
+	closedir(DIR);
 }
 
 #-------------------------------------------------------------------
 sub close {
-        $session{'dbh'}->disconnect();
+	$session{'dbh'}->disconnect();
 	undef %session;
 }
 
@@ -160,7 +160,7 @@ sub end {
 
 #-------------------------------------------------------------------
 sub httpHeader {
-        return $session{cgi}->header( 
+	return $session{cgi}->header( 
 		-cookie => $session{header}{cookie}, 
 		-status => $session{header}{status} 
 		);
@@ -168,83 +168,83 @@ sub httpHeader {
 
 #-------------------------------------------------------------------
 sub httpRedirect {
-        return $session{cgi}->redirect($_[0]);
+	return $session{cgi}->redirect($_[0]);
 }
 
 #-------------------------------------------------------------------
 sub open {
-        my ($key, $config);
+	my ($key, $config);
 	###----------------------------
 	### config variables
 	$session{config}{webguiRoot} = $_[0];
 	$session{config}{configFile} = $_[1] || "WebGUI.conf";
-        $config = new Data::Config $session{config}{webguiRoot}.'/etc/'.$session{config}{configFile};
-        foreach ($config->param) {
-                $session{config}{$_} = $config->param($_);
-        }
-        if( defined( $session{config}{scripturl} ) ) {
-                # get rid of leading "/" if present.
-                $session{config}{scripturl} =~ s/^\///;
-        } else {
-                # default to the "real" path to script.
-                $session{config}{scripturl} = $ENV{SCRIPT_NAME};
-        }
+	$config = new Data::Config $session{config}{webguiRoot}.'/etc/'.$session{config}{configFile};
+	foreach ($config->param) {
+		$session{config}{$_} = $config->param($_);
+	}
+	if( defined( $session{config}{scripturl} ) ) {
+		# get rid of leading "/" if present.
+		$session{config}{scripturl} =~ s/^\///;
+	} else {
+		# default to the "real" path to script.
+		$session{config}{scripturl} = $ENV{SCRIPT_NAME};
+	}
 	###----------------------------
 	### default database handler object
-        $session{dbh} = DBI->connect($session{config}{dsn},$session{config}{dbuser},$session{config}{dbpass},{ RaiseError=>0,AutoCommit=>1 });
+	$session{dbh} = DBI->connect($session{config}{dsn},$session{config}{dbuser},$session{config}{dbpass},{ RaiseError=>0,AutoCommit=>1 });
 	if ( $session{config}{dsn} =~ /Oracle/ ) { # Set Oracle specific attributes
 		$session{dbh}->{LongReadLen} = 512 * 1024;
- 		$session{dbh}->{LongTruncOk} = 1;
- 	}
+		$session{dbh}->{LongTruncOk} = 1;
+	}
 	###----------------------------
 	### global system settings (from settings table)
-        $session{setting} = WebGUI::SQL->buildHashRef("select name,value from settings");
+	$session{setting} = WebGUI::SQL->buildHashRef("select name,value from settings");
 	###----------------------------
 	### CGI object
-        $session{cgi} = CGI->new();
+	$session{cgi} = CGI->new();
 	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
-        ###----------------------------
-        ### evironment variables from web server
-        $session{env} = \%ENV;
+	###----------------------------
+	### evironment variables from web server
+	$session{env} = \%ENV;
 	###----------------------------
 	### form variables
-        foreach ($session{cgi}->param) {
-                $session{form}{$_} = $session{cgi}->param($_);
-        }
+	foreach ($session{cgi}->param) {
+		$session{form}{$_} = $session{cgi}->param($_);
+	}
 	###----------------------------
 	### cookies
-        foreach ($session{cgi}->cookie) {
-                $session{cookie}{$_} = $session{cgi}->cookie($_);
-        }
+	foreach ($session{cgi}->cookie) {
+		$session{cookie}{$_} = $session{cgi}->cookie($_);
+	}
 	###----------------------------
 	### session variables (from userSession table)
 	$session{var} = _getSessionVars($session{cookie}{wgSession},$session{dbh},$session{setting}{sessionTimeout});
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
-        $session{user} = _getUserInfo($session{var}{userId},$session{dbh});
+	$session{user} = _getUserInfo($session{var}{userId},$session{dbh});
 	###----------------------------
 	### current page's properties (from page table)
 	$session{page} = _getPageInfo("",$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
 	###----------------------------
 	### loading plugins
-        _loadWobjects();
+	_loadWobjects();
 	_loadMacros();
 }
 
 #-------------------------------------------------------------------
 sub refreshPageInfo {
-        my ($pageId);
+	my ($pageId);
 	if ($_[0] == 0) {
 		$pageId = 1;
 	} else {
 		$pageId = $_[0];
 	}
-        $session{page} = _getPageInfo($pageId,$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
+	$session{page} = _getPageInfo($pageId,$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
 }
 
 #-------------------------------------------------------------------
 sub refreshSessionVars {
-        $session{var} = _getSessionVars($_[0],$session{dbh},$session{setting}{sessionTimeout});
+	$session{var} = _getSessionVars($_[0],$session{dbh},$session{setting}{sessionTimeout});
 	refreshUserInfo($session{var}{userId});
 }
 
@@ -255,7 +255,7 @@ sub refreshUserInfo {
 
 #-------------------------------------------------------------------
 sub setCookie {
-	$session{header}{cookie} = $session{cgi}->cookie(-name=>$_[0], -value=>$_[1], -expires=>'+10y', -path=>'/');	
+	push @{$session{header}{cookie}}, $session{cgi}->cookie(-name=>$_[0], -value=>$_[1], -expires=>'+10y', -path=>'/');
 }
 
 #-------------------------------------------------------------------
