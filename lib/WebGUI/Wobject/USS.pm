@@ -268,7 +268,7 @@ sub www_editSubmissionSave {
 		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
 		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 if ($session{form}{sid} eq "new") {
-			$hash{username} = $session{form}{visitorName} || $session{user}{username};
+			$hash{username} = $session{form}{visitorName} || $session{user}{alias};
 			$hash{userId} = $session{user}{userId};
 			$hash{USS_submissionId} = "new";
 			if ($session{setting}{useKarma}) {
