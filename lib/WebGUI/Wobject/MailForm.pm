@@ -12,6 +12,7 @@ package WebGUI::Wobject::MailForm;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -412,7 +413,7 @@ sub _fieldAdminIcons {
 sub _textSelectRow {
 	my ($self, $textName, $textLabel, $textValue, $textMaxLength, $selectName, $selectOptions, $selectValue) = @_;
 	my $output;
-	$textValue = WebGUI::HTMLForm::_fixQuotes($textValue);
+	$textValue = WebGUI::Form::_fixQuotes($textValue);
 	my $textSize = $session{setting}{textBoxSize};
 	$output = '<input type="text" name="'.$textName.'" value="'.$textValue.'" size="'.
 		$textSize.'" maxlength="'.$textMaxLength.'">';

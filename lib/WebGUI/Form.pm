@@ -77,6 +77,13 @@ sub _fixQuotes {
 }
 
 #-------------------------------------------------------------------
+sub _fixSpecialCharacters {
+	my $value = shift;
+	$value =~ s/\&/\&amp\;/g;
+	return $value;
+}
+
+#-------------------------------------------------------------------
 
 =head2 checkbox ( hashRef )
 
@@ -633,8 +640,6 @@ sub hiddenList {
 sub HTMLArea {
         my ($output, $value);
         $output = '<script language="JavaScript">function fixChars(element) {element.value = element.value.replace(/~V/mg,"-");}</script>';
-        $value =~ s/\</\&lt\;/g;
-        $value =~ s/\>/\&gt\;/g;
 	if ($session{setting}{richEditor} eq "edit-on-pro") {
 		$output .= '<script language="JavaScript">
 			var formObj;
@@ -659,7 +664,7 @@ sub HTMLArea {
 	               } </script>';
 	}
         $output .= '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'.
-        	WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
+        	WebGUI::International::get(171).'" style="font-size: 8pt;">'."<br>\n";
 	$output .= textarea({
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
@@ -1121,6 +1126,7 @@ sub template {
 sub text {
         my ($size, $maxLength, $value);
 	$value = _fixQuotes($_[0]->{value});
+        $value = _fixSpecialCharacters($value);
         $maxLength = $_[0]->{maxlength} || 255;
         $size = $_[0]->{size} || $session{setting}{textBoxSize} || 30;
         return '<input type="text" name="'.$_[0]->{name}.'" value="'.$value.'" size="'.
@@ -1167,12 +1173,15 @@ sub text {
 =cut
 
 sub textarea {
-        my ($columns, $rows, $wrap);
+        my ($columns, $value, $rows, $wrap);
 	$wrap = $_[0]->{virtual} || "virtual";
 	$rows = $_[0]->{rows} || $session{setting}{textAreaRows} || 5;
 	$columns = $_[0]->{columns} || $session{setting}{textAreaCols} || 50;
+	$value = _fixSpecialCharacters($_[0]->{value});
+	$value =~ s/\</\&lt\;/g;
+        $value =~ s/\>/\&gt\;/g;
         return '<textarea name="'.$_[0]->{name}.'" cols="'.$columns.'" rows="'.$rows.'" wrap="'.
-		$wrap.'" '.$_[0]->{extras}.'>'.$_[0]->{value}.'</textarea>';
+		$wrap.'" '.$_[0]->{extras}.'>'.$value.'</textarea>';
 }
 
 #-------------------------------------------------------------------
