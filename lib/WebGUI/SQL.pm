@@ -394,6 +394,8 @@ sub quickHash {
         $sth->finish;
 	if (defined $data) {
         	return %{$data};
+	} else {
+		return ();
 	}
 }
 
@@ -422,7 +424,9 @@ sub quickHashRef {
         $sth->finish;
         if (defined $data) {
                 return $data;
-        }
+        } else {
+		return {};
+	}
 }
 
 #-------------------------------------------------------------------
