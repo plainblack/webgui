@@ -26,14 +26,14 @@ You can find syndicated content at the following locations:
 
 <p>
 
-To create an aggregate RSS feed, include a list of space separated urls instead of a single url.  For an aggregate feed, the system will display an equal number of headlines from each source, sorted by the date the system first received the story.<p>
+To create an aggregate RSS feed, include a list of space separated URLs instead of a single URL.  For an aggregate feed, the system will display an equal number of headlines from each source, sorted by the date the system first received the story.<p>
 
 <b>Template</b><br>
 Select a template for this content.
 <p><b>Maximum Headlines</b><br>
 Enter the maximum number of headlines that should be displayed.  For an aggregate feed, the system will display an equal number of headlines from each source, even if doing so requires displaying more than the requested maximum number of headlines.  Set to zero to allow any number of headlines.
 <p>|,
-		lastUpdated => 1047855741
+		lastUpdated => 1101774469
 	},
 
 	'61' => {
