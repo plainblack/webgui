@@ -526,6 +526,15 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
                 lastUpdated =>1092748557,
                 context => q|asset property|
         },
+	'asset list title' => {
+		 lastUpdated => 1112220921,
+		 message => q|Asset, List of Available|
+	       },
+
+	'asset list body' => {
+		 lastUpdated => 1112291919,
+		 message => q|These Assets are available for use at your site:<p>|
+	       },
 };
 
 1;

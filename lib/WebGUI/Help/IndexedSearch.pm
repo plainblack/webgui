@@ -1,7 +1,7 @@
 package WebGUI::Help::IndexedSearch;
 
 our $HELP = {
-	'search add/edit' => {
+	'indexed search add/edit' => {
 		title => '26',
 		body => '27',
 		related => [
@@ -10,12 +10,12 @@ our $HELP = {
 				namespace => 'Wobject'
 			},
 			{
-				tag => 'search template',
+				tag => 'indexed search template',
 				namespace => 'IndexedSearch'
 			}
 		]
 	},
-	'search template' => {
+	'indexed search template' => {
 		title => '29',
 		body => '28',
 		related => [
@@ -24,7 +24,7 @@ our $HELP = {
 				namespace => 'Wobject'
 			},
 			{
-				tag => 'search add/edit',
+				tag => 'indexed search add/edit',
 				namespace => 'IndexedSearch'
 			}
 		]

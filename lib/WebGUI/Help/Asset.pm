@@ -1,5 +1,7 @@
 package WebGUI::Help::Asset;
 
+use WebGUI::Session;
+
 our $HELP = {
 
         'asset macros' => {
@@ -56,6 +58,22 @@ our $HELP = {
                         },
                 ],
         },
+
+	'asset list' => {
+		title => 'asset list title',
+		body => 'asset list body',
+		related => [ map {
+				 my ($namespace) = /::(\w+)$/;
+				 my $tag = $namespace;
+				 $tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
+				 $tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
+				 $tag = lc $tag;
+				 { tag => "$tag add/edit",
+				   namespace => $namespace }
+			     }
+		             @{ $session{config}{assets} }, @{ $session{config}{assetContainers} }
+			   ],
+	},
 
 };
 

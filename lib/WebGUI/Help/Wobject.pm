@@ -34,50 +34,6 @@ our $HELP = {
 				namespace => 'Asset'
 			},
 			{
-				tag => 'article add/edit',
-				namespace => 'Article'
-			},
-			{
-				tag => 'events calendar add/edit',
-				namespace => 'EventsCalendar'
-			},
-			{
-				tag => 'http proxy add/edit',
-				namespace => 'HttpProxy'
-			},
-			{
-				tag => 'data form add/edit',
-				namespace => 'DataForm'
-			},
-			{
-				tag => 'message board add/edit',
-				namespace => 'MessageBoard'
-			},
-			{
-				tag => 'metadata manage',
-				namespace => 'Asset'
-			},
-			{
-				tag => 'poll add/edit',
-				namespace => 'Poll'
-			},
-			{
-				tag => 'product add/edit',
-				namespace => 'Product'
-			},
-			{
-				tag => 'sql report add/edit',
-				namespace => 'SQLReport'
-			},
-			{
-				tag => 'survey add/edit',
-				namespace => 'Survey'
-			},
-			{
-				tag => 'syndicated content add/edit',
-				namespace => 'SyndicatedContent'
-			},
-			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
 			}

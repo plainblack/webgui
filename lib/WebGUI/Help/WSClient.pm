@@ -1,7 +1,7 @@
 package WebGUI::Help::WSClient;
 
 our $HELP = {
-	'web services client add/edit' => {
+	'ws client add/edit' => {
 		title => '61',
 		body => '71',
 		related => [
@@ -15,7 +15,7 @@ our $HELP = {
 			}
 		]
 	},
-	'web services client template' => {
+	'ws client template' => {
 		title => '72',
 		body => '73',
 		related => [
