@@ -38,6 +38,9 @@
  - Fixed a sequence ordering problem with the USS.
  - Added internationalized URL handling.
  - Moved site icon and fav icon directly into style templates.
+ - Removed all the upgrades prior to 5.5.0. If you need to upgrade from an
+   older version, you'll need to upgrade to 5.5.x first, and then upgrade
+   to 6.x.
 
 
 6.2.8
