@@ -27,14 +27,7 @@ sub apply {
 	$groupId = $self->{_properties}{subscriptionGroup};
 
 	# Make user part of the right group
-	if (WebGUI::Grouping::isInGroup($groupId, $userId)) {
-#		$expirationDate = WebGUI::Grouping::userGroupExpireDate($userId, $groupId) + $self->{_properties}{duration};
-		$expirationDate = WebGUI::Grouping::userGroupExpireDate($userId, $groupId) + _getDuration($self->{_properties}{duration});
-			
-		WebGUI::Grouping::userGroupExpireDate($userId, $groupId, $expirationDate);
-	} else {
-		WebGUI::Grouping::addUsersToGroups([$userId], [$groupId], _getDuration($self->{_properties}{duration}));
-	}
+	WebGUI::Grouping::addUsersToGroups([$userId], [$groupId], _getDuration($self->{_properties}{duration}));
 
 	# Add karma
 	WebGUI::User->new($userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});
