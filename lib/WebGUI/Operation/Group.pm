@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
+use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -31,7 +32,7 @@ use WebGUI::Utility;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_manageUsersInGroup &www_deleteGroup &www_deleteGroupConfirm &www_editGroup 
 	&www_editGroupSave &www_listGroups &www_emailGroup &www_emailGroupSend &www_manageGroupsInGroup
-	&www_addGroupsToGroupSave &www_deleteGroupGrouping);
+	&www_addGroupsToGroupSave &www_deleteGroupGrouping &www_autoAddToGroup &www_autoDeleteFromGroup);
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -58,6 +59,26 @@ sub www_addGroupsToGroupSave {
         @groups = $session{cgi}->param('groups');
 	WebGUI::Grouping::addGroupsToGroups(\@groups,[$session{form}{gid}]);
         return www_manageGroupsInGroup();
+}
+
+#-------------------------------------------------------------------
+sub www_autoAddToGroup {
+        return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1);
+	my $group = WebGUI::Group->new($session{form}{groupId});
+	if ($group->autoAdd) {
+		WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$session{form}{groupId}]);
+	}
+	return "";
+}
+
+#-------------------------------------------------------------------
+sub www_autoDeleteFromGroup {
+        return WebGUI::Privilege::insufficient() unless ($session{user}{userId} != 1);
+	my $group = WebGUI::Group->new($session{form}{groupId});
+	if ($group->autoDelete) {
+		WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$session{form}{groupId}]);
+	}
+	return "";
 }
 
 #-------------------------------------------------------------------
@@ -146,6 +167,16 @@ sub www_editGroup {
 		-value=>$g->scratchFilter,
 		-label=>WebGUI::International::get(945)
 		);
+	$f->yesNo(
+		-name=>"autoAdd",
+		-value=>$g->autoAdd,
+		-label=>WebGUI::International::get(974)
+		);
+	$f->yesNo(
+		-name=>"autoDelete",
+		-value=>$g->autoDelete,
+		-label=>WebGUI::International::get(975)
+		);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);
@@ -157,14 +188,16 @@ sub www_editGroupSave {
 	my $g = WebGUI::Group->new($session{form}{gid});
 	$g->description($session{form}{description});
 	$g->name($session{form}{groupName});
-	$g->expireOffset(WebGUI::DateTime::intervalToSeconds($session{form}{expireOffset_interval},$session{form}{expireOffset_units}));
+	$g->expireOffset(WebGUI::FormProcessor::interval("expireOffset"));
 	$g->karmaThreshold($session{form}{karmaThreshold});
 	$g->ipFilter($session{form}{ipFilter});
 	$g->scratchFilter($session{form}{scratchFilter});
-	$g->expireNotify($session{form}{expireNotify});
+	$g->expireNotify(WebGUI::FormProcessor::yesNo("expireNotify"));
 	$g->expireNotifyOffset($session{form}{expireNotifyOffset});
 	$g->expireNotifyMessage($session{form}{expireNotifyMessage});
 	$g->deleteOffset($session{form}{deleteOffset});
+	$g->autoAdd(WebGUI::FormProcessor::yesNo("autoAdd"));
+	$g->autoDelete(WebGUI::FormProcessor::yesNo("autoDelete"));
         return www_listGroups();
 }
 

@@ -33,7 +33,10 @@ This package provides an object-oriented way of managing WebGUI groups and group
 
  use WebGUI::Group;
  $g = WebGUI::Group->new(3); or  $g = WebGUI::User->new("new");
+ $g = WebGUI::Group->find("Registered Users");
 
+ $integer =    	$g->autoAdd;
+ $integer =    	$g->autoDelete;
  $epoch =     	$g->dateCreated;
  $integer =	$g->deleteOffset(14);
  $text =       	$g->description("Those really smart dudes.");
@@ -86,6 +89,64 @@ An array reference containing the list of group ids to add to this group.
 sub addGroups {
 	WebGUI::Grouping::addGroupsToGroups($_[1],[$_[0]->{_groupId}]);
 }
+
+#-------------------------------------------------------------------
+
+=head2 autoAdd ( [ value ] )
+
+Returns an boolean stating whether users can add themselves to this group.
+
+=over
+
+=item value
+
+If specified, the autoAdd is set to this value.
+
+=back
+
+=cut
+
+sub autoAdd {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"autoAdd"} = $value;
+                WebGUI::SQL->write("update groups set autoAdd=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"autoAdd"};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 autoDelete ( [ value ] )
+
+Returns an boolean stating whether users can delete themselves from this group.
+
+=over
+
+=item value
+
+If specified, the autoDelete is set to this value.
+
+=back
+
+=cut
+
+sub autoDelete {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+                $class->{_group}{"autoDelete"} = $value;
+                WebGUI::SQL->write("update groups set autoDelete=".quote($value).",
+                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+        }
+        return $class->{_group}{"autoDelete"};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -307,6 +368,28 @@ sub expireOffset {
                         lastUpdated=".time()." where groupId=$class->{_groupId}");
         }
         return $class->{_group}{"expireOffset"};
+}
+
+
+#-------------------------------------------------------------------
+
+=head find ( name )
+
+An alternative to the constructor "new", use find as a constructor by name rather than id.
+
+=over
+
+=item name
+
+The name of the group you wish to instanciate.
+
+=back
+
+=cut
+
+sub find {
+	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($_[1]));
+	return WebGUI::Group->new($groupId);
 }
 
 
