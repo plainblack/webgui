@@ -945,6 +945,11 @@ This option is only available when adding an Events Calendar, not editing one.
 		lastUpdated => 1031514049
 	},
 
+	'january' => {
+		message => q|January|,
+		lastUpdated => 1109701304,
+	},
+
 };
 
 1;
