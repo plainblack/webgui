@@ -52,7 +52,7 @@ sub _getPageInfo {
 	}
 	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'",$_[1]);
 	$page{url} = $_[3]."/".$page{urlizedTitle};
-        return %page;
+        return \%page;
 }
 
 #-------------------------------------------------------------------
@@ -65,7 +65,7 @@ sub _getSessionVars {
 			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', expires=".(time()+$_[2])." where sessionId='$_[0]'",$_[1]);
 		}
 	}
-        return %vars;
+        return \%vars;
 }
 
 #-------------------------------------------------------------------
@@ -79,7 +79,29 @@ sub _getUserInfo {
 	}
 	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName and userProfileData.userId=$user{userId}", $_[1]);
 	%user = (%user, %profile);
-	return %user;
+	return \%user;
+}
+
+#-------------------------------------------------------------------
+sub _loadWobjects {
+        my ($dir, @files, $file, $cmd, $namespace);
+        if ($^O =~ /Win/i) {
+                $dir = "\\lib\\WebGUI\\Wobject";
+        } else {
+                $dir = "/lib/WebGUI/Wobject";
+        }
+        opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
+        @files = readdir(DIR);
+        foreach $file (@files) {
+                if ($file =~ /(.*?)\.pm$/) {
+                        $namespace = $1;
+                        $cmd = "use WebGUI::Wobject::".$namespace;
+                        eval($cmd);
+			$cmd = "\$WebGUI::Wobject::".$namespace."::name";
+			$session{wobject}{$namespace} = eval($cmd);
+                }
+        }
+        closedir(DIR);
 }
 
 #-------------------------------------------------------------------
@@ -111,83 +133,83 @@ sub httpRedirect {
 
 #-------------------------------------------------------------------
 sub open {
-        my ($key, %CONFIG, %VARS, %PAGE, %FORM, $query, %COOKIES, $config, %USER, %SETTINGS, $dbh);
-	tie %USER, 'Tie::CPHash';
-	tie %VARS, 'Tie::CPHash';
-	tie %PAGE, 'Tie::CPHash';
-	$CONFIG{webguiRoot} = $_[0];
-	$CONFIG{configFile} = $_[1] || "WebGUI.conf";
-        $config = new Data::Config $CONFIG{webguiRoot}.'/etc/'.$CONFIG{configFile};
+        my ($key, $config);
+	###----------------------------
+	### config variables
+	$session{config}{webguiRoot} = $_[0];
+	$session{config}{configFile} = $_[1] || "WebGUI.conf";
+        $config = new Data::Config $session{config}{webguiRoot}.'/etc/'.$session{config}{configFile};
         foreach ($config->param) {
-                $CONFIG{$_} = $config->param($_);
+                $session{config}{$_} = $config->param($_);
         }
-        if( defined( $CONFIG{scripturl} ) ) {
+        if( defined( $session{config}{scripturl} ) ) {
                 # get rid of leading "/" if present.
-                $CONFIG{scripturl} =~ s/^\///;
+                $session{config}{scripturl} =~ s/^\///;
         } else {
                 # default to the "real" path to script.
-                $CONFIG{scripturl} = $ENV{SCRIPT_NAME};
+                $session{config}{scripturl} = $ENV{SCRIPT_NAME};
         }
-        $dbh = DBI->connect($CONFIG{dsn}, $CONFIG{dbuser}, $CONFIG{dbpass}, { RaiseError => 0, AutoCommit => 1 });
-	if ( $CONFIG{dsn} =~ /Oracle/ ) { # Set Oracle specific attributes
-		$dbh->{LongReadLen} = 512 * 1024;
- 		$dbh->{LongTruncOk} = 1;
- 	} 
-        $query = CGI->new();
-        foreach ($query->param) {
-                $FORM{$_} = $query->param($_);
+	###----------------------------
+	### default database handler object
+        $session{dbh} = DBI->connect($session{config}{dsn},$session{config}{dbuser},$session{config}{dbpass},{ RaiseError=>0,AutoCommit=>1 });
+	if ( $session{config}{dsn} =~ /Oracle/ ) { # Set Oracle specific attributes
+		$session{dbh}->{LongReadLen} = 512 * 1024;
+ 		$session{dbh}->{LongTruncOk} = 1;
+ 	}
+	###----------------------------
+	### global system settings (from settings table)
+        $session{setting} = WebGUI::SQL->buildHashRef("select name,value from settings");
+	###----------------------------
+	### CGI object
+        $session{cgi} = CGI->new();
+	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
+        ###----------------------------
+        ### evironment variables from web server
+        $session{env} = \%ENV;
+	###----------------------------
+	### form variables
+        foreach ($session{cgi}->param) {
+                $session{form}{$_} = $session{cgi}->param($_);
         }
-        foreach ($query->cookie) {
-                $COOKIES{$_} = $query->cookie($_);
+	###----------------------------
+	### cookies
+        foreach ($session{cgi}->cookie) {
+                $session{cookie}{$_} = $session{cgi}->cookie($_);
         }
-        %SETTINGS = WebGUI::SQL->buildHash("select name,value from settings",$dbh);
-	%VARS = _getSessionVars($COOKIES{wgSession},$dbh,$SETTINGS{sessionTimeout});
-        %USER = _getUserInfo($VARS{userId},$dbh);
-	$CGI::POST_MAX=1024 * $SETTINGS{maxAttachmentSize};
-	%PAGE = _getPageInfo("",$dbh,$SETTINGS{notFoundPage},$CONFIG{scripturl});
-        %session = (
-                env => \%ENV,					# environment variables from the web server
-                config=> \%CONFIG,				# variables loaded from the config file
-                user => \%USER,					# the user's account information
-		var => \%VARS,					# session specific variables
-                form => \%FORM,					# variables passed in from a form
-                cookie => \%COOKIES,				# variables passed in via cookie
-                setting => \%SETTINGS,				# variables set by the administrator
-                cgi => $query,					# interface to the CGI environment
-                page => \%PAGE,					# variables related to the current page 
-                dbh => $dbh,					# interface to the default WebGUI database
-		header => $session{header}			# HTTP header modifiers
-        );
+	###----------------------------
+	### session variables (from userSession table)
+	$session{var} = _getSessionVars($session{cookie}{wgSession},$session{dbh},$session{setting}{sessionTimeout});
+	###----------------------------
+	### current user's account and profile information (from users and userProfileData tables)
+        $session{user} = _getUserInfo($session{var}{userId},$session{dbh});
+	###----------------------------
+	### current page's properties (from page table)
+	$session{page} = _getPageInfo("",$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
+	###----------------------------
+	### loading plugins
+        _loadWobjects();
 }
 
 #-------------------------------------------------------------------
 sub refreshPageInfo {
-        my (%PAGE, $pageId);
-	tie %PAGE, 'Tie::CPHash';
+        my ($pageId);
 	if ($_[0] == 0) {
 		$pageId = 1;
 	} else {
 		$pageId = $_[0];
 	}
-        %PAGE = _getPageInfo($pageId,$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
-        $session{page} = \%PAGE;
+        $session{page} = _getPageInfo($pageId,$session{dbh},$session{setting}{notFoundPage},$session{config}{scripturl});
 }
 
 #-------------------------------------------------------------------
 sub refreshSessionVars {
-        my (%VARS);
-	tie %VARS, 'Tie::CPHash';
-        %VARS = _getSessionVars($_[0],$session{dbh},$session{setting}{sessionTimeout});
-        $session{var} = \%VARS;
+        $session{var} = _getSessionVars($_[0],$session{dbh},$session{setting}{sessionTimeout});
 	refreshUserInfo($session{var}{userId});
 }
 
 #-------------------------------------------------------------------
 sub refreshUserInfo {
-	my (%USER);
-	tie %USER, 'Tie::CPHash';
-	%USER = _getUserInfo($_[0],$session{dbh});
-	$session{user} = \%USER;
+	$session{user} = _getUserInfo($_[0],$session{dbh});
 }
 
 #-------------------------------------------------------------------
