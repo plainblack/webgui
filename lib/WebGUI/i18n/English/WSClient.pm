@@ -27,41 +27,45 @@ our $I18N = {
 <b>SOAP URI/WSDL</b><br>
 From the SOAP::Lite man page, "URIs are just identifiers. They may look like URLs, but they are not guaranteed to point to anywhere and shouldn't be used as such pointers.  URIs assume to be unique within the space of all XML documents, so consider them as unique identifiers and nothing else."  If you specify a URI, you probably also need a proxy below.  Alternatively, you can specify a WSDL file in place of a URI.  This file refers to a real location at which a SOAP service description can be downloaded and used. For our purposes, the file must end in ".wsdl" to be properly recognized.  If you use a WSDL file, you probably don't need to specify a proxy.<p></p>
 
-<b>SOAP Proxy</b><br>
+<b>^International(3,"WSClient");</b><br>
 The SOAP proxy is the full name of the server and/or script that is listening for SOAP calls.  For example:
 <code>http://mydomain.com/cgi-bin/soaplistener.pl</code><p></p>
 
-<b>SOAP Method/Call</b><br>
+<b>^International(4,"WSClient");</b><br>
 The SOAP method is the name of the function to be invoked by the SOAP server. Include any extra parameters in the SOAP Call Parameters field below.<p></p>
 
-<b>SOAP Call Parameters</b><br>
+<b>^International(16,"WSClient");</b><br>
+If <i>soapHttpHeaderOverride</i> is set in the WebGUI configuration file, then this
+property allows you to override the default MIME type for this page.
+
+<b>^International(5,"WSClient");</b><br>
 If your SOAP call requires any additional parameters, include them here as a valid Perl hash, array or scalar.  For example: <code>'userid' => '12', companyid => '&#94;FormParam("companyid");  Whether you need to use scalar, hash or array is entirely dependent on what your SOAP service expects as input.  Likewise, what you get back is entirely dependent on what the service deems to return.'</code>.<p></p>
 
-<b>Execute by default?</b><br>
+<b>^International(11,"WSClient");</b><br>
 Leave this set to yes unless your page is calling itself with additional parameters.  You will probably know if/when you need to turn off default execution.  To force execution when it has been disabled by default, pass a form variable "targetWobjects" specifying the name of the SOAP call to force execution.  If current cached results already exist for this wobject they will be returned regardless.  If you don't want <i>any</i> results returned no matter what, see the Tricks section below.<p></p>
 
-<b>Template</b><br>
+<b>^International(913,"WebGUI");</b><br>
 Choose a layout for this SOAP client.<p></p>
 
-<b>Preprocess macros on query?</b><br>
+<b>^International(8,"WSClient");</b><br>
 If you're using WebGUI macros in your query you'll want to check this box.<p></p>
 
-<b>Pagination After</b><br>
+<b>^International(13,"WSClient");</b><br>
 How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?<p></p>
 
-<b>Pagination Variable</b><br>
+<b>^International(14,"WSClient");</b><br>
 Because a SOAP call can return complex data structures, you'll need to specify which named variable is to be paginated.  If none is specified, no pagination will occur.<p></p>
 
-<b>Debug?</b><br>
+<b>^International(9,"WSClient");</b><br>
 If you want to display debugging and error messages on the page, check this box.<p></p>
 
-<b>Decode UTF8?</b><br />
+<b>^International(15,"WSClient");</b><br />
 This option will only display if you have Data::Structure::Util installed.  SOAP calls return UTF8 strings even if they may not have UTF8 characters within them.  This converts UTF8 characters to that there aren't collisions with any character sets specified in the page header.  Decoding is turned off by default, but try turning it on if you see goofy gibberish, especially with the display of copyright symbols and the like.<p></p>
 
-<b>Cache</b><br />
+<b>^International(28,"WSClient");</b><br />
 By default, SOAP calls are cached uniquely for each user session.  By selecting "Global" call returns can be shared between users.<p></p>
 
-<b>Cache expires</b><br />
+<b>^International(27,"WSClient");</b><br />
 Number of seconds a SOAP return will be cached.  Set to 1 to essentially skip caching.<p></p>
 
 A few other tricks...
@@ -69,7 +73,7 @@ A few other tricks...
 <li>If you want to process a SOAP call (for example, one that sets or updates a value on the remote SOAP server) but then redirect to a completely different page, add a form input parameter <code>redirectURL</code>.  The value of redirectURL can be any valid URI understood by a web browser.</li>
 <li>To trigger a SOAP wobject that has "Execute by default?" turned off, pass a form input param of targetWobjects=<i>call</i> where call is the SOAP method.</li>
 <li>To completely ignore a SOAP wobject, including any possible cached returns, pass a form input param of disableWobjects=<i>call</i> where call is the SOAP method.</li></ul>|,
-		lastUpdated => 1101795671,
+		lastUpdated => 1111124163,
 	},
 
 	'26' => {
@@ -183,13 +187,21 @@ A few other tricks...
 	},
 
 	'73' => {
-		message => q|This is the list of
-template variables available for Web Services Client
-templates.<p></p><b>results</b><br />This loop contains all the results from
+		message => q|This is the list of template variables available for Web Services Client templates.
+
+<p><b>disableWobject</b><br />
+If the page was called with a form param of disableWobjects, this variable will
+be set to true.
+
+<p><b>results</b><br />
+This loop contains all the results from
 the SOAP call.  Within the loop, you may access specific data elements by the
 names set for them by the SOAP server (i.e. perhaps "localTime" for a time query).  In addition, there are a number of special template variables:
 
-<blockquote><b>numResults</b><br />Number of rows found by the client, if an array was returned.<p></p>
+<blockquote>
+
+<b>numResults</b><br />
+Number of rows found by the client, if an array was returned.<p></p>
 
 <b>firstPage</b><br />Link to first page in a paginated set.<p></p>
 
@@ -206,7 +218,7 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 <b>numberOfPages</b><br />Number of pages in a paginated set.<p></p>
 
 <b>pageNumber</b><br />Current page number in a paginated set.</blockquote>|,
-		lastUpdated => 1072812143
+		lastUpdated => 1111122637
 	},
 
 	'24' => {
