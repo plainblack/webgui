@@ -507,6 +507,9 @@ sub www_recoverPassword {
 #-------------------------------------------------------------------
 sub www_recoverPasswordFinish {
 	my ($sth, $username, $encryptedPassword, $userId, $password, $flag, $message, $output);
+	if ($session{form}{email} eq "") {
+		return '<ul><li>'.WebGUI::International::get(743).'</li></ul>'.www_recoverPassword() 
+	}
 	$sth = WebGUI::SQL->read("select users.username, users.userId from users, userProfileData 
 		where users.userId=userProfileData.userId and userProfileData.fieldName='email' 
 		and fieldData=".quote($session{form}{email}));
