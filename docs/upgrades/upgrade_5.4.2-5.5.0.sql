@@ -83,7 +83,9 @@ create table forumSubscription (
 );
 
 
-
+alter table groups add column databaseLinkId int not null default 0;
+alter table groups add column dbCacheTimeout int not null default 3600;
+alter table groups add column dbQuery text;
 
 
 
