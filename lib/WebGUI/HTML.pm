@@ -156,19 +156,20 @@ The content type to use as formatting. Valid types are 'html', 'text', 'code', a
 sub format {
 	my ($content, $contentType) = @_;
 	$contentType = 'mixed' unless ($contentType);
-	if ($contentType eq "mixed") {
-                unless ($content =~ /\<div/ig || $content =~ /\<br/ig || $content =~ /\<p/ig) {
-                        $content =~ s/\n/\<br \/\>/g;
-                }
-        } elsif ($contentType eq "text") {
-                $content =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
-                $content =~ s/\n/\<br \/\>/g;
-        } elsif ($contentType eq "code") {
+	if ($contentType eq "text" || $contentType eq "code") {
                 $content =~ s/&/&amp;/g;
                 $content =~ s/\</&lt;/g;
                 $content =~ s/\>/&gt;/g;
                 $content =~ s/\n/\<br \/\>/g;
                 $content =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
+	}
+	if ($contentType eq "mixed") {
+                unless ($content =~ /\<div/ig || $content =~ /\<br/ig || $content =~ /\<p/ig) {
+                        $content =~ s/\n/\<br \/\>/g;
+                }
+        } elsif ($contentType eq "text") {
+                $content =~ s/  / &nbsp;/g;
+        } elsif ($contentType eq "code") {
                 $content =~ s/ /&nbsp;/g;
                 $content = '<div style="font-family: monospace;">'.$content.'</div>';
         }

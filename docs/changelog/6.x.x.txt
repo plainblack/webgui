@@ -1,3 +1,8 @@
+6.2.4
+ - Changed text processor to convert HTML tags into text rather than
+   discarding them.
+
+
 6.2.3
  - Changed to new POD format.
  - Fixed GUID related bugs in search indexer and passive profiling.
