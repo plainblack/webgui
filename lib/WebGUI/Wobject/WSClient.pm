@@ -273,7 +273,7 @@ sub www_view {
                                                                                 
       WebGUI::ErrorHandler::warn("disabling soap call $call");
       $var{'disableWobject'} = 1;
-      return $self[0]->processTemplate($self[0]->get("templateId"),\%var);
+      return $self->processTemplate($self->get("templateId"),\%var);
    }
 
    # advanced use, if you want to pass SOAP results to a single, particular
