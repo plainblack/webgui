@@ -8,11 +8,6 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# Yeah if you're looking at this code you're probably thinking to
-# yourself, "What a #$@*ing mess!" That's what we think too. But
-# if you know Perl well enough to know that this sucks, then you
-# probably don't need to use this script because you know how to
-# install Perl modules and such.
 
 our $webguiRoot;
 
@@ -29,244 +24,66 @@ print "\nWebGUI is checking your system environment:\n\n";
 my ($os, $prereq, $dbi, $dbDrivers);
 $prereq = 1;
 
-if ($^O =~ /Win/) {
-	$os = "Windowsish";
-} else {
-	$os = "Linuxish";
-}
+printTest("Operating System");
+printResult(getOs());
 
-print "Operating System ......................... ".$os."\n";
-print "WebGUI Root .............................. ".$webguiRoot."\n";
+printTest("WebGUI Root");
+printResult($webguiRoot);
+
 
 ###################################
 # Checking Perl
 ###################################
 
-print "Perl Interpreter ......................... ";
+printTest("Perl Interpreter");
 if ($] >= 5.006) {
-	print "OK\n";
+	printResult("OK");
 } else {
-	print "Please upgrade to 5.6 or later!\n";
-	print "Test environment exiting, cannot continue without Perl 5.6.\n";
-	exit;
+	failAndExit("Please upgrade to 5.6 or later! Cannot continue without Perl 5.6 or higher.");
 }
 
-print "LWP module ............................... ";
-if (eval { require LWP }) {
-        print "OK\n";
+checkModule("LWP",5.80);
+checkModule("HTTP::Request",1.40);
+checkModule("HTTP::Headers",1.61);
+checkModule("Digest::MD5",2.20);
+checkModule("DBI",1.40);
+checkModule("DBD::mysql",2.1021);
+checkModule("HTML::Parser",3.36);
+checkModule("Archive::Tar",1.05);
+checkModule("IO::Zlib",1.01);
+checkModule("Compress::Zlib",1.34);
+checkModule("Net::SMTP",2.24);
+checkModule("Cache::Cache",1.02);
+checkModule("Tie::IxHash",1.21);
+checkModule("Tie::CPHash",1.001);
+checkModule("XML::Simple",2.09);
+checkModule("SOAP::Lite",0.60);
+checkModule("Time::HiRes",1.38);
+checkModule("Image::Magick",5.47,1);
+checkModule("Net::LDAP",0.25);
+checkModule("Date::Manip",5.42);
+checkModule("HTML::Highlight",0.20);
+checkModule("HTML::TagFilter",0.07);
+checkModule("HTML::Template",2.6);
+checkModule("Parse::PlainConfig",1.1);
+checkModule("Parse::RecDescent",1.94);
+checkModule("HTTP::BrowserDetect",0.97);
+checkModule("Text::Balanced",1.95);
+checkModule("XML::RSSLite",0.11);
+checkModule("DBIx::FullTextSearch",0.73);
+
+###################################
+# Checking WebGUI
+###################################
+
+printTest("WebGUI modules");
+if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
+        printResult("OK");
 } else {
-	if ($< == 0 && $os eq "Linuxish") {
-        	print "Attempting to install...\n";
-		CPAN::Shell->install("LWP");
-	} else {
-        	print "Please install.\n";
-		$prereq = 0;
-	}
+        failAndExit("Not Found. Perhaps you're running this script from the wrong place.");
 }
 
-print "HTTP::Request module ..................... ";
-if (eval { require HTTP::Request }) {
-        print "OK\n";
-} else {
-        print "Please install LWP.\n";
-	$prereq = 0;
-}
-
-print "HTTP::Headers module ..................... ";
-if (eval { require HTTP::Headers }) {
-        print "OK\n";
-} else {
-        print "Please install LWP.\n";
-	$prereq = 0;
-}
-
-print "Digest::MD5 module ....................... ";
-if (eval { require Digest::MD5 }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-        	print "Attempting to install...\n";
-                CPAN::Shell->install("Digest::MD5");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-my $dbi;
-
-print "DBI module ............................... ";
-if (eval { require DBI }) {
-	print "OK\n";
-	$dbi = 1;
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-        	print "Attempting to install...\n";
-                CPAN::Shell->install("DBI");
-		eval {require DBI};
-		$dbi = 1;
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-		$dbi = 0;
-        }
-}
-
-print "Avalable database drivers ................ ";
-if ($dbi) {
-	print join(", ",DBI->available_drivers);
-	$dbDrivers = join(", ",DBI->available_drivers);
-} else {
-	print "None";
-	$prereq = 0;
-}
-print "\n";
-
-print "HTML::Parser module ...................... ";
-if (eval { require HTML::Parser }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("HTML::Parser");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Archive::Tar module ...................... ";
-if (eval { require Archive::Tar }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("Archive::Tar");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "IO::Zlib module .......................... ";
-if (eval { require IO::Zlib }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("IO::Zlib");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Compress::Zlib module .................... ";
-if (eval { require Compress::Zlib }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("Compress::Zlib");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Net::SMTP module ......................... ";
-if (eval { require Net::SMTP }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("Net::SMTP");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Cache::Cache module ...................... ";
-if (eval { require Cache::Cache }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("Cache::Cache");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "SOAP::Lite module ........................ ";
-if (eval { require SOAP::Lite }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("SOAP::Lite");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "XML::Simple module ....................... ";
-if (eval { require XML::Simple }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("XML::Simple");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Time::HiRes module ....................... ";
-if (eval { require Time::HiRes }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("Time::HiRes");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Image::Magick module ..................... ";
-if (eval { require Image::Magick }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
-	$prereq = 0;
-}
-
-# this is here to insure they installed correctly.
-
-if ($prereq) {
-	print "WebGUI modules ........................... ";
-	if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
-	        print "OK\n";
-	} else {
-	        print "Not Found. Perhaps you're running this script in the wrong place.\n";
-		$prereq = 0;
-	}
-} else {
-	print "Cannot continue without prerequisites.\n";
-	exit;
-}
-
-unless ($prereq) {
-	print "Cannot continue without WebGUI files.\n";
-	exit;
-}
-
+printTest("Locating WebGUI configs");
 my (@files, $file, $dir, $error);
 if ($os eq "Windowsish") {
 	$dir = $webguiRoot."\\etc\\";
@@ -274,111 +91,211 @@ if ($os eq "Windowsish") {
 	$dir = $webguiRoot."/etc/";
 }
 opendir (DIR,$dir) or $error = "Can't open etc (".$dir.") directory!";
-if ($error ne "") {
-	print $error."\nCannot continue.\n";
-	exit;
-} else {
+if (opendir(DIR,$dir)) {
+	printResult("OK");
         @files = readdir(DIR);
         foreach $file (@files) {
-                if ($file =~ /(.*?)\.conf$/ && $file ne "some_other_site.conf") {
-			
+                if ($file =~ /(.*?)\.conf$/) {
+			my $prereq = 1;
 			###################################
 			# Checking Config File
 			###################################
-
-			print "\nFound config file ........................ ".$file."\n";
-			print "Verifying file ........................... ";
+			printTest("Found config file");
+			printResult($file);
+			printTest("Verifying file");
 			my ($config);
 			$config = Parse::PlainConfig->new('DELIM' => '=',
                 		'FILE' => $dir.$file,
                 		'PURGE' => 1);
 			unless (defined $config) {
-				print "Couldn't open the config file.";
+				printResult("Couldn't open the config file.");
 				$prereq = 0;
 			} elsif ($config->get('dsn') !~ /\DBI\:\w+\:\w+/) {
-				print "DSN is improperly formatted.";
+				printResult("DSN is improperly formatted.");
 				$prereq = 0;
 			} else {
-				print "OK\n";
+				printResult("OK");
 			}
 
-			unless ($prereq) {
-        			print " Skipping this configuration.\n";
-				$prereq = 1;
-			} else {
-
+			if ($prereq) {
 				###################################
 				# Checking uploads folder
 				###################################
 
-				print "Uploads folder ........................... ";
+				printTest("Uploads folder");
                         	if (opendir(DIR,$config->get('uploadsPath'))) {
-					print "OK\n";
+					printResult("OK");
 					closedir(DIR);
 				} else {
-					print "Appears to be missing!\n";
+					printResult("Appears to be missing!");
 				}
-
-                                ###################################
-                                # Checking for database driver 
-                                ###################################
-
-                                print "Database driver .......................... ";
-				my (@driver);
-				@driver = split(/:/,$config->get('dsn'));
-                                if ($dbDrivers =~ m/$driver[1]/) {
-                                        print "OK\n";
-                                } else {
-                                        print "Not installed!\n";
-                                }
 
 				###################################
 				# Checking database
 				###################################
 
-				print "Database connection ...................... ";
+				printTest("Database connection");
 				my ($dbh, $test);
 				unless (eval {$dbh = DBI->connect($config->get('dsn'),$config->get('dbuser'),$config->get('dbpass'))}) {
-					print "Can't connect with info provided!\n";
+					printResult("Can't connect with info provided!");
 				} else {
-					print "OK\n";
+					printResult("OK");
 					$dbh->disconnect();
 				}
 			}
-
+			print "\n";	
                 }
         }
         closedir(DIR);
+} else {
+	failAndExit($error);
 }
 
 
 ###################################
 # Checking Version
 ###################################
-
-print "\nLatest version ........................... ";
-my ($header, $userAgent, $request, $response, $version, $referer);
-$userAgent = new LWP::UserAgent;
-$userAgent->agent("WebGUI-Check/2.0");
-$userAgent->timeout(30);
-$header = new HTTP::Headers;
-$referer = "http://webgui.cli.getversion/".`hostname`;
-chomp $referer;
-$header->referer($referer);
-$request = new HTTP::Request (GET => "http://www.plainblack.com/downloads/latest-version.txt", $header);
-$response = $userAgent->request($request);
-$version = $response->content;
-chomp $version;
-if ($response->is_error) {
-	print "Couldn't connect to Plain Black Software. Check your connection and try again.\n";
-} elsif ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
-	print $version." OK\n";
+my $version = getLatestWebguiVersion();
+printTest("Your version");
+if ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
+	printResult("OK");
 } else {
-	print "You are using ".$WebGUI::VERSION."-".$WebGUI::STATUS." and ".$version." is available.\n";
+	printResult("You are using ".$WebGUI::VERSION."-".$WebGUI::STATUS." and ".$version." is available.");
 }
 
 
 print "\nTesting complete!\n\n";
 
+
+
+#----------------------------------------
+sub checkModule {
+        my $module = shift;
+	my $version = shift || 0;
+	my $skipInstall = shift;
+        my $afterinstall = shift;
+        unless (defined $afterinstall) { $afterinstall = 0; }
+        printTest("Checking for module $module");
+        my $statement = "require ".$module.";";
+        if (eval($statement)) {
+		$statement = '$'.$module."::VERSION";
+		if (my $currentVersion = eval($statement)) {
+			printResult("OK");
+		} else {
+                	printResult("Outdated - Current: ".$currentVersion." / Required: ".$version);
+			return if $skipInstall;
+			if (isRoot()) {
+                		my $installThisModule = prompt ("The perl module $module is outdated, do you want to upgrade it now?", "y", "y", "n");
+                		if ($installThisModule eq "y") {
+                        		installModule($module);
+                        		checkModule($module,$version,$skipInstall,1);
+                		} else {
+                        		failAndExit("Aborting test due to user input!");
+                		}
+			} else {
+				failAndExit("Aborting test, not all modules available, and you're not root so I can't install them.");
+			}
+		}
+        } elsif ($afterinstall == 1) {
+                failAndExit("Install of $module failed!");
+        } else {
+                printResult("Not Installed");
+		return if $skipInstall;
+		if (isRoot()) {
+                	my $installThisModule = prompt ("The perl module $module is not installed, do you want to install it now?", "y", "y", "n");
+                	if ($installThisModule eq "y") {
+                        	installModule($module);
+                        	checkModule($module,$version,$skipInstall,1);
+                	} else {
+                        	failAndExit("Aborting test due to user input!");
+                	}
+		} else {
+			failAndExit("Aborting test, not all modules available, and you're not root so I can't install them.");
+		}
+        }
+}
+
+#----------------------------------------
+sub failAndExit {
+        my $exitmessage = shift;
+        print $exitmessage."\n\n";
+        exit;
+}
+
+#----------------------------------------
+sub getLatestWebguiVersion {
+        printTest("Getting current WebGUI version");
+        my $currentversionUserAgent = new LWP::UserAgent;
+	$currentversionUserAgent->agent("WebGUI-Check/2.1");
+        $currentversionUserAgent->timeout(30);
+        my $header = new HTTP::Headers;
+        my $referer = "http://".`hostname`."/webgui-cli-version";
+        chomp $referer;
+        $header->referer($referer);
+        my $currentversionRequest = new HTTP::Request (GET => "http://www.plainblack.com/downloads/latest-version.txt", $header);
+        my $currentversionResponse = $currentversionUserAgent->request($currentversionRequest);
+        my $version = $currentversionResponse->content;
+        chomp $version;
+        if ($currentversionResponse->is_error || $version eq "") {
+                printResult("Failed! Continuing without it.");
+        } else {
+                printResult("OK");
+        }
+        return $version;
+}
+
+#----------------------------------------
+sub getOs {
+	if ($^O =~ /^Win/) {
+		return "Windowsish";
+	}
+	return "Linuxish";
+}
+
+#----------------------------------------
+sub installModule {
+        my $module = shift;
+        print "Attempting to install ".$module."...\n";
+        CPAN::Shell->install($module);
+}
+
+#----------------------------------------
+sub isIn {
+        my $key = shift;
+        $_ eq $key and return 1 for @_;
+        return 0;
+}
+
+#----------------------------------------
+sub isRoot {
+	return ($< == 0 && getOs() eq "Linuxish");	
+}
+
+#----------------------------------------
+sub printTest {
+        my $test = shift;
+        print sprintf("%-45s", $test.": ");
+}
+
+#----------------------------------------
+sub printResult {
+        my $result = shift;
+        print "$result\n";
+}
+
+#----------------------------------------
+sub prompt {
+        my $question = shift;
+        my $default = shift;
+        my @answers = @_; # the rest are answers
+        print "\n".$question." ";
+        print "{".join("|",@answers)."} " if ($#answers > 0);
+        print "[".$default."] " if (defined $default);
+        my $answer = <STDIN>;
+        chomp $answer;
+        $answer = $default if ($answer eq "");
+        $answer = prompt($question,$default,@answers) if (($#answers > 0 && !(isIn($answer,@answers))) || $answer eq "");
+        return $answer;
+}
 
 

@@ -7,6 +7,31 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.6.0
+--------------------------------------------------------------------
+ * Perl modules that used to be shipped with WebGUI are now required
+	to be installed on your system manually. You can optionally
+	just use the WebGUI runtime environment to save yourself
+	the hassle of downloading all of them. You can also install
+	them using testEnvironment.pl --install-modules
+	The new modules you'll need to install are:
+
+	Net::LDAP
+	Date::Manip
+	DBIx::FullTextSearch
+	HTML::Highlight
+	HTML::TagFilter
+	HTML::Template
+	Parse::PlainConfig	
+	HTTP::BrowserDetect
+	Parse::RecDescent
+	Text::Balanced
+	Tie::IxHash
+	Tie::CPHash
+	XML::RSSLite
+	XML::Simple
+
+
 6.5.0
 --------------------------------------------------------------------
  * The International Macro must be enabled in all WebGUI configuration

@@ -12,40 +12,12 @@ QnD INSTALL INSTRUCTIONS:
 
 1. Install Perl 5.6.x or greater. (5.8.x recommended)
 
-2. Install the following Perl modules:
+2. Install Apache with mod_perl and set up your config. See Ruling WebGUI
+   for information specific to Apache 1.3 vs 2.0. Apache 2 recommended.
 
-   LWP
-   DBI
-   DBD::mysql
-   Time::HiRes
-   Archive::Tar
-   Compress::Zlib
-   IO::Zlib
-   Digest::MD5
-   HTML::Parser 
-   SOAP::Lite
-   Cache::Cache 
-   Image::Magick
-   Parse::PlainConfig
-   Tie::IxHash
-   Tie::CPHash
-   XML::RSSLite
-   Text::Balanced
-   Parse::RecDescent
-   Bundle::Net::LDAP
-   HTTP::BrowserDetect
-   HTML::Template
-   HTML::TagFilter
-   HTML::Highlight
-   HTML::CalendarMonthSimple
-   Date::Manip
-   Data::Config
-   Convert::ASN1
+3. Install MySQL 3.23 or greater. MySQL 4.1 recommended.
 
-3. Install Apache with mod_perl and set up your config. See Ruling WebGUI
-   for information specific to Apache 1.3 vs 2.0.
-
-4. Install MySQL.
+4. Install Image Magick.
 
 5. Extract WebGUI into your webroot.
 
@@ -59,8 +31,9 @@ QnD INSTALL INSTRUCTIONS:
 
 7. Edit "etc/WebGUI.conf" to match your DB settings and log directory.
 
-8. Run the following command from your WebGUI/sbin directory to determine
-   whether you've configured your system correctly.
+8. Run the following command from your WebGUI/sbin directory to install
+   the required perl modules and determine whether you've configured 
+   your system correctly.
 
    perl testEnvironment.pl
 
