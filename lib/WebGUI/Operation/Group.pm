@@ -86,7 +86,7 @@ sub doGroupSearch {
         }
 	$keyword = quote($keyword);
 	my $sql = "select groupId,groupName,description from groups where isEditable=1 and (groupName like $keyword or description like $keyword) 
-		and groupId not in (".join(",",@{$groupFilter}).") order by groupName";
+		and groupId not in (".quoteAndJoin($groupFilter).") order by groupName";
 	if ($returnPaginator) {
                 my $p = WebGUI::Paginator->new(WebGUI::URL::page($op));
                 $p->setDataByQuery($sql);
@@ -186,7 +186,7 @@ sub www_autoDeleteFromGroup {
 sub www_deleteGroup {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{gid} < 26);
+        return WebGUI::Privilege::vitalComponent() if ($session{form}{gid} < 26 && $session{form}{gid} > 0);
         $output .= helpIcon("group delete");
 	$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(86).'<p>';
@@ -200,7 +200,7 @@ sub www_deleteGroup {
 #-------------------------------------------------------------------
 sub www_deleteGroupConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        return WebGUI::Privilege::vitalComponent() if ($session{form}{gid} < 26);
+        return WebGUI::Privilege::vitalComponent() if ($session{form}{gid} < 26 && $session{form}{gid} > 0);
 	my $g = WebGUI::Group->new($session{form}{gid});
 	$g->delete;
         return www_listGroups();
@@ -356,7 +356,7 @@ sub www_emailGroupSend {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($sth, $email);
 	$sth = WebGUI::SQL->read("select b.fieldData from groupings a left join userProfileData b 
-		on a.userId=b.userId and b.fieldName='email' where a.groupId=$session{form}{gid}");
+		on a.userId=b.userId and b.fieldName='email' where a.groupId=".quote($session{form}{gid}));
 	while (($email) = $sth->array) {
 		if ($email ne "") {
 			WebGUI::Mail::send($email,$session{form}{subject},$session{form}{message},'',$session{form}{from});
@@ -380,7 +380,7 @@ sub www_listGroups {
 		.WebGUI::International::get(748).'</td></tr>';
 	my $p = doGroupSearch("op=listGroups",1);
 	foreach my $row (@{$p->getPageData}) {
-		my ($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".$row->{groupId});
+		my ($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($row->{groupId}));
 		$output .= '
 		<tr>
 			<td valign="top" class="tableData"><a href="'.WebGUI::URL::page("op=editGroup&gid=".$row->{groupId}).'">'.$row->{groupName}.'</a></td>
@@ -408,7 +408,7 @@ sub www_listGroups2 {
                 $row[$i] .= '<td valign="top" class="tableData"><a href="'
 			.WebGUI::URL::page('op=editGroup&gid='.$data[0]).'">'.$data[1].'</td>';
                 $row[$i] .= '<td valign="top" class="tableData">'.$data[2].'</td>';
-		($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=$data[0]");
+		($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($data[0]));
                 $row[$i] .= '<td valign="top" class="tableData">'.$userCount.'</td></tr>';
                 $row[$i] .= '</tr>';
                 $i++;
@@ -431,16 +431,16 @@ sub www_listGroupsSecondary {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(11));
         my ($output, $p, $sth, @data, @row, $i, $userCount);
 	$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
-	my @editableGroups = WebGUI::SQL->buildArray("select groupId from groupings where userId=$session{user}{userId} and groupAdmin=1");
+	my @editableGroups = WebGUI::SQL->buildArray("select groupId from groupings where userId=".quote($session{user}{userId})." and groupAdmin=1");
 	push (@editableGroups,0);
         $sth = WebGUI::SQL->read("select groupId,groupName,description from groups 
-		where groupId in (".join(",",@editableGroups).") order by groupName");
+		where groupId in (".quoteAndJoin(\@editableGroups).") order by groupName");
         while (@data = $sth->array) {
                 $row[$i] = '<tr>';
                 $row[$i] .= '<td valign="top" class="tableData"><a href="'
 			.WebGUI::URL::page('op=manageUsersInGroupSecondary&gid='.$data[0]).'">'.$data[1].'</td>';
                 $row[$i] .= '<td valign="top" class="tableData">'.$data[2].'</td>';
-		($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=$data[0]");
+		($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($data[0]));
                 $row[$i] .= '<td valign="top" class="tableData">'.$userCount.'</td></tr>';
                 $row[$i] .= '</tr>';
                 $i++;
@@ -482,7 +482,7 @@ sub www_manageGroupsInGroup {
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup&gid='.$session{form}{gid}));
 	$p->setDataByQuery("select a.groupName as name,a.groupId as id from groups a 
 		left join groupGroupings b on a.groupId=b.groupId 
-		where b.inGroup=$session{form}{gid} order by a.groupName");
+		where b.inGroup=".quote($session{form}{gid})." order by a.groupName");
 	$groups = $p->getPageData;
 	foreach $group (@$groups) {
 		$output .= '<tr><td>'
@@ -518,7 +518,7 @@ sub www_manageUsersInGroup {
                 <td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
 	my $p = WebGUI::Paginator->new("op=manageUsersInGroup&gid=".$session{form}{gid});
         $p->setDataByQuery("select users.username,users.userId,groupings.expireDate
-                from groupings,users where groupings.groupId=$session{form}{gid} and groupings.userId=users.userId
+                from groupings,users where groupings.groupId=".quote($session{form}{gid})." and groupings.userId=users.userId
                 order by users.username");
 	foreach my $row (@{$p->getPageData}) {
                 $output .= '<tr><td>'
@@ -575,7 +575,7 @@ sub www_manageUsersInGroupSecondary {
 	my $existingUsers = WebGUI::Grouping::getUsersInGroup($session{form}{gid});
 	push(@{$existingUsers},"1");
 	push(@{$existingUsers},"3");
-	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where status='Active' and userId not in (".join(",",@{$existingUsers}).") order by username");
+	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where status='Active' and userId not in (".quoteAndJoin($existingUsers).") order by username");
 	$f->selectList(
 		-name=>"users",
 		-label=>WebGUI::International::get(976),
@@ -589,7 +589,7 @@ sub www_manageUsersInGroupSecondary {
                 <td class="tableHeader">'.WebGUI::International::get(50).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
         $sth = WebGUI::SQL->read("select users.username,users.userId,groupings.expireDate
-                from groupings,users where groupings.groupId=$session{form}{gid} and groupings.userId=users.userId
+                from groupings,users where groupings.groupId=".quote($session{form}{gid})." and groupings.userId=users.userId
                 order by users.username");
         while (%hash = $sth->hash) {
                 $output .= '<tr><td>'

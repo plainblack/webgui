@@ -887,7 +887,7 @@ sub group {
 	tie %hash, 'Tie::IxHash';
 	my $exclude = $_[0]->{excludeGroups};
 	if ($$exclude[0] ne "") {
-		$where = "and groupId not in (".join(",",@$exclude).")";
+		$where = "and groupId not in (".quoteAndJoin($exclude).")";
 	}
  	%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where showInForms=1 $where order by groupName");
 	return selectList({

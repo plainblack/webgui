@@ -1426,7 +1426,7 @@ sub www_edit {
 		if (WebGUI::Grouping::isInGroup(3)) {
 	   		my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
 		   	push (@$contentManagers, $session{user}{userId});
-		   	$clause = "userId in (".join(",",@$contentManagers).")";
+		   	$clause = "userId in (".quoteAndJoin($contentManagers).")";
 	    	} else {
 		   	$clause = "userId=".quote($self->getValue("ownerId"));
 	    	}

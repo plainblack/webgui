@@ -17,6 +17,7 @@ package WebGUI::Group;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Id;
 use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -67,9 +68,9 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-        my $groupId = getNextId("groupId");
+        my $groupId = WebGUI::Id::generate();
         WebGUI::SQL->write("insert into groups (groupId,dateCreated,expireOffset,karmaThreshold) values 
-		($groupId,".time().",314496000,1000000000)");
+		(".quote($groupId).",".time().",314496000,1000000000)");
 	WebGUI::Grouping::addGroupsToGroups([3],[$groupId]);
         return $groupId;
 }
@@ -117,7 +118,7 @@ sub autoAdd {
         if (defined $value) {
                 $class->{_group}{"autoAdd"} = $value;
                 WebGUI::SQL->write("update groups set autoAdd=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"autoAdd"};
 }
@@ -146,7 +147,7 @@ sub autoDelete {
         if (defined $value) {
                 $class->{_group}{"autoDelete"} = $value;
                 WebGUI::SQL->write("update groups set autoDelete=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"autoDelete"};
 }
@@ -174,9 +175,9 @@ Deletes this group and all references to it.
 =cut
 
 sub delete {
-        WebGUI::SQL->write("delete from groups where groupId=".$_[0]->{_groupId});
-        WebGUI::SQL->write("delete from groupings where groupId=".$_[0]->{_groupId});
-        WebGUI::SQL->write("delete from groupGroupings where inGroup=".$_[0]->{_groupId}." or groupId=".$_[0]->{_groupId});
+        WebGUI::SQL->write("delete from groups where groupId=".quote($_[0]->{_groupId}));
+        WebGUI::SQL->write("delete from groupings where groupId=".quote($_[0]->{_groupId}));
+        WebGUI::SQL->write("delete from groupGroupings where inGroup=".quote($_[0]->{_groupId})." or groupId=".quote($_[0]->{_groupId}));
 }
 
 #-------------------------------------------------------------------
@@ -223,7 +224,7 @@ sub deleteOffset {
         if (defined $value) {
                 $class->{_group}{"deleteOffset"} = $value;
                 WebGUI::SQL->write("update groups set deleteOffset=$value,
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"deleteOffset"};
 }
@@ -252,7 +253,7 @@ sub description {
         if (defined $value) {
                 $class->{_group}{"description"} = $value;
                 WebGUI::SQL->write("update groups set description=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"description"};
 }
@@ -281,7 +282,7 @@ sub expireNotify {
         if (defined $value) {
                 $class->{_group}{"expireNotify"} = $value;
                 WebGUI::SQL->write("update groups set expireNotify=$value,
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"expireNotify"};
 }
@@ -310,7 +311,7 @@ sub expireNotifyMessage {
         if (defined $value) {
                 $class->{_group}{"expireNotifyMessage"} = $value;
                 WebGUI::SQL->write("update groups set expireNotifyMessage=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"expireNotifyMessage"};
 }
@@ -340,7 +341,7 @@ sub expireNotifyOffset {
         if (defined $value) {
                 $class->{_group}{"expireNotifyOffset"} = $value;
                 WebGUI::SQL->write("update groups set expireNotifyOffset=$value,
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"expireNotifyOffset"};
 }
@@ -369,7 +370,7 @@ sub expireOffset {
         if (defined $value) {
                 $class->{_group}{"expireOffset"} = $value;
                 WebGUI::SQL->write("update groups set expireOffset=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"expireOffset"};
 }
@@ -433,7 +434,7 @@ sub karmaThreshold {
         if (defined $value) {
                 $class->{_group}{"karmaThreshold"} = $value;
                 WebGUI::SQL->write("update groups set karmaThreshold=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"karmaThreshold"};
 }
@@ -462,7 +463,7 @@ sub ipFilter {
         if (defined $value) {
                 $class->{_group}{"ipFilter"} = $value;
                 WebGUI::SQL->write("update groups set ipFilter=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"ipFilter"};
 }
@@ -491,7 +492,7 @@ sub isEditable {
         if (defined $value) {
                 $class->{_group}{"isEditable"} = $value;
                 WebGUI::SQL->write("update groups set isEditable=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"isEditable"};
 }
@@ -533,7 +534,7 @@ sub name {
         if (defined $value) {
                 $class->{_group}{"groupName"} = $value;
                 WebGUI::SQL->write("update groups set groupName=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"groupName"};
 }
@@ -571,7 +572,7 @@ sub new {
 		$group{databaseLinkId} = 0;
 		$group{dbCacheTimeout} = 3600;
 	} else {
-        	%group = WebGUI::SQL->quickHash("select * from groups where groupId='$groupId'");
+        	%group = WebGUI::SQL->quickHash("select * from groups where groupId=".quote($groupId));
 	}
         bless {_groupId => $groupId, _group => \%group }, $class;
 }
@@ -599,7 +600,7 @@ sub scratchFilter {
         if (defined $value) {
                 $class->{_group}{"scratchFilter"} = $value;
                 WebGUI::SQL->write("update groups set scratchFilter=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"scratchFilter"};
 }
@@ -627,7 +628,7 @@ sub showInForms {
         if (defined $value) {
                 $class->{_group}{"showInForms"} = $value;
                 WebGUI::SQL->write("update groups set showInForms=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"showInForms"};
 }
@@ -635,7 +636,7 @@ sub showInForms {
 
 #-------------------------------------------------------------------
 
-=head2 lastUpdated ( )
+=head2 dbQuery ( )
 
 =head2 dbQuery ( [ value ] )
 
@@ -658,7 +659,7 @@ sub dbQuery {
         if (defined $value) {
                 $class->{_group}{"dbQuery"} = $value;
                 WebGUI::SQL->write("update groups set dbQuery=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"dbQuery"};
 }
@@ -686,7 +687,7 @@ sub databaseLinkId {
         if (defined $value) {
                 $class->{_group}{"databaseLinkId"} = $value;
                 WebGUI::SQL->write("update groups set databaseLinkId=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"databaseLinkId"};
 }
@@ -714,7 +715,7 @@ sub dbCacheTimeout {
         if (defined $value) {
                 $class->{_group}{"dbCacheTimeout"} = $value;
                 WebGUI::SQL->write("update groups set dbCacheTimeout=".quote($value).",
-                        lastUpdated=".time()." where groupId=$class->{_groupId}");
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
         }
         return $class->{_group}{"dbCacheTimeout"};
 }

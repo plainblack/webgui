@@ -76,10 +76,10 @@ sub addGroupsToGroups {
 	foreach my $gid (@{$_[0]}) {
 		foreach my $toGid (@{$_[1]}) {
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupGroupings 
-				where groupId=$gid and inGroup=$toGid");
+				where groupId=".quote($gid)." and inGroup=".quote($toGid));
 			my $recursive = isIn($toGid, @{getGroupsInGroup($gid,1)});
 			unless ($isIn || $recursive) {
-				WebGUI::SQL->write("insert into groupGroupings (groupId,inGroup) values ($gid,$toGid)");
+				WebGUI::SQL->write("insert into groupGroupings (groupId,inGroup) values (".quote($gid).",".quote($toGid).")");
 			}
 		}
 	}
@@ -116,13 +116,13 @@ sub addUsersToGroups {
 		if ($_[2]) {
 			$expireOffset = $_[2];
 		} else { 
-        		($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=$gid");
+        		($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=".quote($gid));
 		}
 		foreach my $uid (@{$_[0]}) {
-			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=$gid and userId=$uid");
+			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($gid)." and userId=".quote($uid));
 			unless ($isIn) {
                 		WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) 
-					values ($gid, $uid, ".(WebGUI::DateTime::time()+$expireOffset).")");
+					values (".quote($gid).", ".quote($uid).", ".(WebGUI::DateTime::time()+$expireOffset).")");
 			}
 		}
         }
@@ -151,7 +151,7 @@ An array reference containing the list of group ids to delete from.
 sub deleteGroupsFromGroups {
         foreach my $gid (@{$_[0]}) {
 		foreach my $fromGid (@{$_[1]}) {
-        		WebGUI::SQL->write("delete from groupGroupings where groupId=$gid and inGroup=".$fromGid);
+        		WebGUI::SQL->write("delete from groupGroupings where groupId=".quote($gid)." and inGroup=".quote($fromGid));
 		}
         }
 }
@@ -180,7 +180,7 @@ An array reference containing a list of groups.
 sub deleteUsersFromGroups {
         foreach my $gid (@{$_[1]}) {
 		foreach my $uid (@{$_[0]}) {
-                	WebGUI::SQL->write("delete from groupings where groupId=$gid and userId=$uid");
+                	WebGUI::SQL->write("delete from groupings where groupId=".quote($gid)." and userId=".quote($uid));
 		}
         }
 }
@@ -203,7 +203,7 @@ A unique identifier for the group.
 =cut
 
 sub getGroupsForGroup {
-	return WebGUI::SQL->buildArrayRef("select inGroup from groupGroupings where groupId=$_[0]");
+	return WebGUI::SQL->buildArrayRef("select inGroup from groupGroupings where groupId=".quote($_[0]));
 }
 
 
@@ -236,7 +236,7 @@ sub getGroupsForUser {
         } elsif (exists $session{gotGroupsForUser}{$userId}) {
 		return $session{gotGroupsForUser}{$userId};
         } else {
-                my @groups = WebGUI::SQL->buildArray("select groupId from groupings where userId=$userId $clause");
+                my @groups = WebGUI::SQL->buildArray("select groupId from groupings where userId=".quote($userId)." $clause");
 		foreach my $gid (@groups) {
 			$session{isInGroup}{$userId}{$gid} = 1;
 		}
@@ -276,7 +276,7 @@ sub getGroupsInGroup {
 	} elsif (exists $session{gotGroupsInGroup}{recursive}{$groupId}) {
 		return $session{gotGroupsInGroup}{direct}{$groupId};
 	}
-        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$groupId");
+        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=".quote($groupId));
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
@@ -317,11 +317,11 @@ A boolean value to determine whether the method should return the users directly
 =cut
 
 sub getUsersInGroup {
-	my $clause = "groupId=$_[0]";
+	my $clause = "groupId=".quote($_[0]);
 	if ($_[1]) {
 		my $groups = getGroupsInGroup($_[0],1);
 		if ($#$groups >= 0) {
-			$clause .= " or groupId in (".join(",",@$groups).")";
+			$clause .= " or groupId in (".quoteAndJoin($groups).")";
 		}
 	}
        	return WebGUI::SQL->buildArrayRef("select userId from groupings where $clause");
@@ -376,7 +376,7 @@ sub isInGroup {
 	}
         ### Get data for auxillary checks.
         tie %group, 'Tie::CPHash';
-        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout from groups where groupId='$gid'");
+        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout from groups where groupId=".quote($gid));
         ### Check IP Address
         if ($group{ipFilter} ne "") {
                 $group{ipFilter} =~ s/\t//g;
@@ -413,7 +413,7 @@ sub isInGroup {
                 if ($uid == $session{user}{userId}) {
                         $karma = $session{user}{karma};
                 } else {
-                        ($karma) = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
+                        ($karma) = WebGUI::SQL->quickHash("select karma from users where userId=".quote($uid));
                 }
                 if ($karma >= $group{karmaThreshold}) {
                         $session{isInGroup}{$uid}{$gid} = 1;
@@ -497,10 +497,10 @@ If specified the admin flag will be set to this value.
 
 sub userGroupAdmin {
 	if ($_[2] ne "") {
-		WebGUI::SQL->write("update groupings set groupAdmin=$_[2] where groupId=$_[1] and userId=$_[0]");
+		WebGUI::SQL->write("update groupings set groupAdmin=".quote($_[2])." where groupId=".quote($_[1])." and userId=".quote($_[0]));
 		return $_[2];
 	} else {
-		my ($admin) = WebGUI::SQL->quickArray("select groupAdmin from groupings where groupId=$_[1] and userId=$_[0]");
+		my ($admin) = WebGUI::SQL->quickArray("select groupAdmin from groupings where groupId=".quote($_[1])." and userId=".quote($_[0]));
 		return $admin;
 	}
 }	
@@ -531,11 +531,10 @@ If specified the expire date will be set to this value.
 
 sub userGroupExpireDate {
 	if ($_[2]) {
-		WebGUI::SQL->write("update groupings set expireDate=$_[2] where groupId=$_[1] and userId=$_[0]");
+		WebGUI::SQL->write("update groupings set expireDate=".quote($_[2])." where groupId=".quote($_[1])." and userId=".quote($_[0]));
 		return $_[2];
 	} else {
-		my ($expireDate) = WebGUI::SQL->quickArray("select expireDate from groupings 
-			where groupId=$_[1] and userId=$_[0]");
+		my ($expireDate) = WebGUI::SQL->quickArray("select expireDate from groupings where groupId=".quote($_[1])." and userId=".quote($_[0]));
 		return $expireDate;
 	}
 }	

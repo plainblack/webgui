@@ -23,7 +23,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&quote &getNextId);
+our @EXPORT = qw(&quote &getNextId &quoteAndJoin);
 
 =head1 NAME
 
@@ -670,9 +670,41 @@ The database handler. Defaults to the WebGUI database handler.
 =cut
 
 sub quote {
-        my $value = shift; #had to add this here cuz Tie::CPHash variables cause problems otherwise.
+        my $value = shift; 
 	my $dbh = shift || _getDefaultDb();
         return $dbh->quote($value);
+}
+
+#-------------------------------------------------------------------
+
+=head2 quoteAndJoin ( arrayRef [ , dbh ] ) 
+
+Returns a comma seperated string quoted and ready for insert/select into/from the database.  This is typically used for a statement like "select * from someTable where field in (".quoteAndJoin(\@strings).")".
+
+NOTE: This is not a regular method, but is an exported subroutine.
+
+=over
+
+=item arrayRef 
+
+An array reference containing strings to be quoted.
+
+=item dbh
+
+The database handler. Defaults to the WebGUI database handler.
+
+=back
+
+=cut
+
+sub quoteAndJoin {
+        my $arrayRef = shift;
+	my $dbh = shift || _getDefaultDb();
+	my @newArray;
+	foreach my $value (@$arrayRef) {
+ 		push(@newArray,$dbh->quote($value));
+	}
+	return join(",",@newArray);
 }
 
 
