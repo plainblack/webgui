@@ -57,7 +57,7 @@ User interface package for forums.
  $scalar = WebGUI::Forum::UI::formatPostTime($epoch);
  $url = WebGUI::Forum::UI::formatPreviousThreadURL($callback, $postId);
  $url = WebGUI::Forum::UI::formatRatePostURL($callback, $postId, $rating);
- $url = WebGUI::Forum::UI::formatReplyPostURL($callback, $postId);
+ $url = WebGUI::Forum::UI::formatReplyPostURL($callback, $postId, $forumId);
  $scalar = WebGUI::Forum::UI::formatStatus($status);
  $scalar = WebGUI::Forum::UI::formatSubject($subject);
  $url = WebGUI::Forum::UI::formatThreadLayoutURL($callback, $postId, $layout);
@@ -495,7 +495,7 @@ sub formatRatePostURL {
 
 #-------------------------------------------------------------------
 
-=head2 formatReplyPostURL ( callback, postId [ , withQuote ] )
+=head2 formatReplyPostURL ( callback, postId, forumId [ , withQuote ] )
 
 Formats the url to reply to a post.
 
@@ -509,6 +509,10 @@ The url to get back tot he calling object.
 
 The unique id for the post.
 
+=item forumId
+
+The unique id for the forum.
+
 =item withQuote 
 
 If specified the reply with automatically quote the parent post.
@@ -518,8 +522,8 @@ If specified the reply with automatically quote the parent post.
 =cut
 
 sub formatReplyPostURL {
-	my $url = WebGUI::URL::append($_[0],"forumOp=post&amp;parentId=".$_[1]);
-	$url = WebGUI::URL::append($url,"withQuote=1") if ($_[2]);
+	my $url = WebGUI::URL::append($_[0],"forumOp=post&amp;parentId=".$_[1]."&amp;forumId=".$_[2]);
+	$url = WebGUI::URL::append($url,"withQuote=1") if ($_[3]);
 	return $url;
 }
 
@@ -1237,8 +1241,8 @@ sub getPostTemplateVars {
 	$var->{'post.rate.url.5'} = formatRatePostURL($callback,$post->get("forumPostId"),5);
 	$var->{'post.hasRated'} = $post->hasRated;
 	$var->{'post.reply.label'} = WebGUI::International::get(577);
-	$var->{'post.reply.url'} = formatReplyPostURL($callback,$post->get("forumPostId"));
-	$var->{'post.reply.withquote.url'} = formatReplyPostURL($callback,$post->get("forumPostId"),1);
+	$var->{'post.reply.url'} = formatReplyPostURL($callback,$post->get("forumPostId"),$forum->get("forumId"));
+	$var->{'post.reply.withquote.url'} = formatReplyPostURL($callback,$post->get("forumPostId"),$forum->get("forumId"),1);
 	$var->{'post.edit.label'} = WebGUI::International::get(575);
 	$var->{'post.edit.url'} = formatEditPostURL($callback,$post->get("forumPostId"));
 	$var->{'post.delete.label'} = WebGUI::International::get(576);
@@ -1796,8 +1800,12 @@ sub www_post {
 			name=>'parentId',
 			value=>$reply->get("forumPostId")
 			});
-		$message = "[quote]".$reply->get("message")."[/quote]" if ($session{form}{withQuote});
 		$forum = $reply->getThread->getForum;
+		$var->{'form.begin'} .= WebGUI::Form::hidden({
+			name=>'forumId',
+			value=>$forum->get("forumId")
+			});
+		$message = "[quote]".$reply->get("message")."[/quote]" if ($session{form}{withQuote});
 		$var = getPostTemplateVars($reply, $reply->getThread, $forum, $caller, $var);
 
 		$subject = $reply->get("subject");

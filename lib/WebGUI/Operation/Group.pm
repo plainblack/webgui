@@ -447,7 +447,8 @@ sub www_manageUsersInGroupSecondary {
         return WebGUI::Privilege::adminOnly() unless _hasSecondaryPrivilege($session{form}{gid});
         my ($output, $sth, %hash);
         tie %hash, 'Tie::CPHash';
-        $output = '<h1>'.WebGUI::International::get(88).'</h1>';
+	my $group = WebGUI::Group->new($session{form}{gid});
+        $output = '<h1>'.WebGUI::International::get(88).' '.$group->name.'</h1>';
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden("gid",$session{form}{gid});
 	$f->hidden("op","addUsersToGroupSecondarySave");

@@ -4,6 +4,10 @@
  - ^t; now starts in current root rather then in site root.
  - Bugfix [ 867047 ] cannot delete Redirect URL. Thanks to Klaus Hertle.
  - Bugfix [ 864535 ] Secondary admin adds user to group
+ - Bugfix [ 864537 ] Secondary admin adds user to group #2
+ - Bugfix [ 859199 ] Login problem
+ - Bugfix [ 852930 ] Pieces of Collateral Statistic always zero. Thanks to ajaman.
+ - Bugfix [ 854124 ] Can't reply to discussion message for USS submission.
 
 
 5.5.3
