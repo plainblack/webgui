@@ -858,7 +858,7 @@ The default value for this form element.
 =cut
 
 sub hidden {
-        return '<input type="hidden" name="'.$_[0]->{name}.'" value="'._fixQuotes($_[0]->{value}).'">'."\n";
+        return '<input type="hidden" name="'.$_[0]->{name}.'" value="'._fixQuotes(_fixSpecialCharacters($_[0]->{value})).'">'."\n";
 }
 
 

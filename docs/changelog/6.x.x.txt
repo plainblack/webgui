@@ -10,6 +10,10 @@
  - bugfix [ 1031411 ] FileCache Problem since V6.2.x
  - Fixed a problem with HTTP codes being spewed into the page content on codes
    other than 200.
+ - bugfix [ 1029485 ] Forum interpreting text as HTML, double interpreting
+   HTML
+
+
 
 6.2.3
  - Changed to new POD format.
