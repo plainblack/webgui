@@ -92,9 +92,12 @@ sub send {
 	#footer
 	$message .= "\n".WebGUI::Macro::process($session{setting}{mailFooter});
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
-		open(MAIL,'| '.$session{setting}{smtpServer}.' -t -oi') or WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
-		print MAIL $message;
-		close(MAIL);
+		if (open(MAIL,"| $session{setting}{smtpServer} -t -oi")) {
+			print MAIL $message;
+			close(MAIL) or WebGUI::ErrorHandler::warn("Couldn't close connection to mail server: ".$session{setting}{smtpServer});
+		} else {
+			WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
+		}
 	} else {
         	$smtp = Net::SMTP->new($session{setting}{smtpServer}); # connect to an SMTP server
         	if (defined $smtp) {
