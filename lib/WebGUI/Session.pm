@@ -75,7 +75,7 @@ sub _setupPageInfo {
 	($pageId) = $_[0];
 	if ($pageId eq "") {
 		$pageName = lc($ENV{PATH_INFO});
-		#$pageName =~ s/\///g;
+		$pageName =~ s/\/$//;
 		$pageName =~ s/\///;
 		$pageName =~ s/\'//;
 		$pageName =~ s/\"//;

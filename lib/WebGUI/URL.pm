@@ -234,7 +234,7 @@ sub unescape {
 
 =head2 urlize ( string )
 
-Same as makeCompliant except that it also lower-cases the string.  This is mainly meant for WebGUI page URLs.
+Returns a url that is safe for WebGUI pages.
 
 =over
 
@@ -250,6 +250,7 @@ sub urlize {
 	my ($value);
         $value = lc($_[0]);		#lower cases whole string
 	$value = makeCompliant($value);
+	$value =~ s/\/$//;
         return $value;
 }
 
