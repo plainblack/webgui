@@ -267,7 +267,7 @@ The unique identifier of the post being added.
 
 sub incrementReplies {
         my ($self, $lastPostDate, $lastPostId) = @_;
-        WebGUI::SQL->write("update forum set replies=replies+1, lastPostId=$lastPostId, lastPostDate=$lastPostDate where forumId=".quote($self->get("forumId")));
+        WebGUI::SQL->write("update forum set replies=replies+1, lastPostId=".quote($lastPostId).", lastPostDate=$lastPostDate where forumId=".quote($self->get("forumId")));
 }
                                                                                                                                                              
 #-------------------------------------------------------------------
