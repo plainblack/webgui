@@ -256,7 +256,7 @@ sub open {
 	if ($session{env}{MOD_PERL}) {
                 my $r = Apache->request;
                 if(defined($r)) {
-			$r->connection->user($session{user}{username});
+			$r->user($session{user}{username}); 
 		}
 	}
 	###----------------------------
