@@ -142,7 +142,7 @@ A form that will set when the post stops being available.
 <p>
 
 |,
-		lastUpdated => 1111388442,
+		lastUpdated => 1111692741,
 	},
 
 	'post template variables title' => {
