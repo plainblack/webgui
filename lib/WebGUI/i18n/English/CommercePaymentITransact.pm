@@ -148,7 +148,7 @@ See the information toward the bottom of this page to set up your merchant accou
 
 <p>
 <b>Step 3: Get An SSL Certificate</b><br />
-<a target="_blank" href=""></a>
+<a target="_blank" href="http://www.completessl.com/plainblack">Get an SSL Certificate from CompleteSSL.</a>
 </p>
 
 <p>
