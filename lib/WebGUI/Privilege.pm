@@ -36,15 +36,21 @@ sub adminOnly {
 
 #-------------------------------------------------------------------
 sub canEditPage {
-	my ($isContentManager);
+	my ($isContentManager,%page);
+	tie %page, 'Tie::CPHash';
+	if ($_[0] ne "") {
+		%page = WebGUI::SQL->quickHash("select * from page where pageId=$_[0]");
+	} else {
+		%page = %{$session{page}};
+	}
 	$isContentManager = isInGroup(4);
-	if ($session{page}{worldEdit} && $isContentManager) {
+	if ($page{worldEdit} && $isContentManager) {
 		return 1;
-	} elsif ($session{user}{userId} eq $session{page}{ownerId} && $session{page}{ownerEdit} && $isContentManager) {
+	} elsif ($session{user}{userId} eq $page{ownerId} && $page{ownerEdit} && $isContentManager) {
 		return 1;
 	} elsif (isInGroup(3)) {
 		return 1;
-	} elsif (isInGroup($session{page}{groupId}) && $session{page}{groupEdit} && $isContentManager) {
+	} elsif (isInGroup($page{groupId}) && $page{groupEdit} && $isContentManager) {
 		return 1;
 	} else {
 		return 0;

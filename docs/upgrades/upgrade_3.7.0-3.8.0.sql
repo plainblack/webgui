@@ -84,6 +84,11 @@ delete from international where internationalId=2 and namespace='Article';
 delete from international where internationalId=5 and namespace='Article';
 update international set message='(Select \"Yes\" only if you aren\'t adding &lt;br&gt; manually.)' where internationalId='11' and namespace='Article' and language='English';
 
+
+update international set message='Select \"Yes\" to change all the pages under this page to this style.' where internationalId='106' and namespace='WebGUI' and language='English';
+update international set message='Select \"Yes\" to change the privileges of all pages under this page to these privileges.' where internationalId='116' and namespace='WebGUI' and language='English';
+INSERT INTO international VALUES (500,'WebGUI','English','Page ID');
+delete from international where internationalId=98 and namespace='WebGUI';
 delete from international where internationalId=1 and namespace='MessageBoard';
 delete from international where internationalId=1 and namespace='SiteMap';
 delete from international where internationalId=2 and namespace='Article';

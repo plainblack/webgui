@@ -12,18 +12,18 @@ package WebGUI::Operation::Page;
 
 use Exporter;
 use strict;
-use WebGUI::Form;
+use WebGUI::HTMLForm;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown &www_addPage &www_addPageSave &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage &www_editPageSave &www_pastePage);
+our @EXPORT = qw(&www_viewPageTree &www_movePageUp &www_movePageDown &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage &www_editPageSave &www_pastePage);
 
 #-------------------------------------------------------------------
 sub _recursivelyChangePrivileges {
@@ -85,67 +85,6 @@ sub _traversePageTree {
 }
 
 #-------------------------------------------------------------------
-sub www_addPage {
-	my ($output, @array, %hash);
-	tie %hash, "Tie::IxHash";
-	if (WebGUI::Privilege::canEditPage()) {
-		$output = helpLink(1);
-		$output .= '<h1>'.WebGUI::International::get(98).'</h1>';
-		$output .= formHeader();
-		$output .= WebGUI::Form::hidden("op","addPageSave");
-		if ($session{form}{root}) {
-			$output .= WebGUI::Form::hidden("root","1");
-		}
-		$output .= '<table>';
-		$output .= tableFormRow(WebGUI::International::get(99),
-			WebGUI::Form::text("title",20,128,$session{form}{title}));
-		$output .= tableFormRow(WebGUI::International::get(411),
-			WebGUI::Form::text("menuTitle",20,128,$session{form}{menuTitle}));
-		%hash = sortHash(WebGUI::Template::getList());
-		$array[0] = "Default";
-		$output .= '<script language="JavaScript"> function updateTemplateImage(template) { document.template.src = "'.$session{setting}{lib}.'/templates/"+template+".gif"; } </script>';
-		$output .= tableFormRow(WebGUI::International::get(356),WebGUI::Form::selectList("template",\%hash, \@array, 1, 0, "updateTemplateImage(this.form.template.value)").'<br><img src="'.$session{setting}{lib}.'/templates/Default.gif" name="template">');
-		$output .= tableFormRow(WebGUI::International::get(412),
-			WebGUI::Form::textArea("synopsis",$session{form}{synopsis}));
-		$output .= tableFormRow(WebGUI::International::get(100),
-			WebGUI::Form::textArea("metaTags",$session{form}{metaTags}));
-                $output .= tableFormRow(WebGUI::International::get(307),WebGUI::Form::checkbox("defaultMetaTags",1,1));
-		$output .= formSave();
-		$output .= '</table></form>';	
-		return $output;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_addPageSave {
-	my ($urlizedTitle, $nextSeq, $parentId, $menuTitle);
-	if (WebGUI::Privilege::canEditPage()) {
-		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$session{page}{pageId}");
-		$nextSeq += 1;
-		if ($session{form}{title} eq "") {
-			$session{form}{title} = "no title";
-		}
-		if ($session{form}{root}) {
-			$parentId = 0;
-		} else {
-			$parentId = $session{page}{pageId};
-		}
-		if ($session{form}{menuTitle} eq "") {
-			$menuTitle = $session{form}{title};
-		} else {
-			$menuTitle = $session{form}{menuTitle};
-		}
-		$urlizedTitle = WebGUI::URL::makeUnique(WebGUI::URL::urlize($menuTitle));
-		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $parentId, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle', '$session{form}{defaultMetaTags}', '$session{form}{template}', ".quote($menuTitle).", ".quote($session{form}{synopsis}).")");
-		return "";
-	} else {
-		return WebGUI::Privilege::insufficient();
-	}
-}
-
-#-------------------------------------------------------------------
 sub www_cutPage {
         if ($session{page}{pageId} < 26) {
                 return WebGUI::Privilege::vitalComponent();
@@ -165,7 +104,7 @@ sub www_deletePage {
 	if ($session{page}{pageId} < 26) {
 		return WebGUI::Privilege::vitalComponent();
 	} elsif (WebGUI::Privilege::canEditPage()) {
-		$output .= helpLink(3);
+		$output .= helpIcon(3);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
 		$output .= WebGUI::International::get(101).'<p>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deletePageConfirm').
@@ -194,68 +133,59 @@ sub www_deletePageConfirm {
 
 #-------------------------------------------------------------------
 sub www_editPage {
-        my ($output, %yesNo, %hash, @array);
+        my ($f, $output, %hash, %page);
 	tie %hash, "Tie::IxHash";
-        if (WebGUI::Privilege::canEditPage()) {
-		%yesNo = ("0"=>"No", "1"=>"Yes");
-                $output = helpLink(1);
+        if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
+		$f = WebGUI::HTMLForm->new;
+		if ($session{form}{npp} ne "") {
+			%page = WebGUI::SQL->quickHash("select * from page where pageId=$session{form}{npp}");
+			$page{templatePosition} = 'A';
+			$page{pageId} = "new";
+			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
+			$page{parentId} = $session{form}{npp};
+			$page{ownerEdit} = 1;
+			$page{ownerView} = 1;
+		} else {
+			%page = %{$session{page}};
+		}
+                $output = helpIcon(1);
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
-		$output .= formHeader();
-                $output .= WebGUI::Form::hidden("op","editPageSave");
-                $output .= '<table>';
-		$output .= '<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>';
-                $output .= tableFormRow(WebGUI::International::get(99),
-			WebGUI::Form::text("title",20,128,$session{page}{title}));
-                $output .= tableFormRow(WebGUI::International::get(411),
-                        WebGUI::Form::text("menuTitle",20,128,$session{page}{menuTitle}));
-                $output .= tableFormRow(WebGUI::International::get(104),
-			WebGUI::Form::text("urlizedTitle",20,128,$session{page}{urlizedTitle}));
+		$f->hidden("pageId",$page{pageId});
+		$f->hidden("parentId",$page{parentId});
+		$f->hidden("op","editPageSave");
+		$f->raw('<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>');
+		$f->readOnly($page{pageId},WebGUI::International::get(500));
+                $f->text("title",WebGUI::International::get(99),$page{title});
+		$f->text("menuTitle",WebGUI::International::get(411),$page{menuTitle});
+                $f->text("urlizedTitle",WebGUI::International::get(104),$page{urlizedTitle});
 		%hash = sortHash(WebGUI::Template::getList());
-                $array[0] = $session{page}{template};
-                $output .= '<script language="JavaScript"> function updateTemplateImage(template) { document.template.src = "'.$session{setting}{lib}.'/templates/"+template+".gif"; } </script>';
-                $output .= tableFormRow(WebGUI::International::get(356),
-			WebGUI::Form::selectList("template",\%hash,\@array,1,0,"updateTemplateImage(this.form.template.value)").'<br><img src="'.$session{setting}{lib}.'/templates/'.$session{page}{template}.'.gif" name="template">');
-                $output .= tableFormRow(WebGUI::International::get(412),WebGUI::Form::textArea("synopsis",$session{page}{synopsis}));
-                $output .= tableFormRow(WebGUI::International::get(100),WebGUI::Form::textArea("metaTags",$session{page}{metaTags}));
-                $output .= tableFormRow(WebGUI::International::get(307),WebGUI::Form::checkbox("defaultMetaTags",1,$session{page}{defaultMetaTags}));
-		$output .= '<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>';
+		$f->select("template",\%hash,WebGUI::International::get(356),[$page{templatePosition}],'','',
+			'onChange="updateTemplateImage(template.value)"',
+                	'<script language="JavaScript"> function updateTemplateImage(template) { document.template.src = "'.$session{setting}{lib}.'/templates/"+template+".gif"; } </script><br><img src="'.$session{setting}{lib}.'/templates/'.$session{page}{template}.'.gif" name="template">');
+		$f->textarea("synopsis",WebGUI::International::get(412),$page{synopsis});
+		$f->textarea("metatags",WebGUI::International::get(100),$page{metaTags});
+                $f->yesNo("defaultMetaTags",WebGUI::International::get(307),$page{defaultMetaTags});
+		$f->raw('<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>');
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
-		$array[0] = $session{page}{styleId};
-                $output .= tableFormRow(WebGUI::International::get(105),
-			WebGUI::Form::selectList("styleId",\%hash,\@array).
-			' <span class="formSubtext"><a href="'.WebGUI::URL::page('op=listStyles').
-			'">'.WebGUI::International::get(6).'</a></span>');
-                $output .= tableFormRow("",WebGUI::Form::checkbox("recurseStyle","yes").' <span class="formSubtext">'.WebGUI::International::get(106).'</span>');
-		$output .= '<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>';
-		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings where groupings.groupId=4 and groupings.userId=users.userId order by users.username");
-		$array[0] = $session{page}{ownerId};
-                $output .= tableFormRow(WebGUI::International::get(108),
-			WebGUI::Form::selectList("ownerId",\%hash,\@array).
-			' <span class="formSubtext"><a href="'.WebGUI::URL::page('op=listUsers').'">'.
-			WebGUI::International::get(7).'</a></span>');
-		$array[0] = $session{page}{ownerView};
-                $output .= tableFormRow(WebGUI::International::get(109),
-			WebGUI::Form::selectList("ownerView",\%yesNo,\@array));
-		$array[0] = $session{page}{ownerEdit};
-                $output .= tableFormRow(WebGUI::International::get(110),
-			WebGUI::Form::selectList("ownerEdit",\%yesNo,\@array));
-		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName");
-		$array[0] = $session{page}{groupId};
-                $output .= tableFormRow(WebGUI::International::get(111),
-			WebGUI::Form::selectList("groupId",\%hash,\@array).
-			' <span class="formSubtext"><a href="'.WebGUI::URL::page('op=listGroups').'">'.
-			WebGUI::International::get(5).'</a></span>');
-		$array[0] = $session{page}{groupView};
-                $output .= tableFormRow(WebGUI::International::get(112),WebGUI::Form::selectList("groupView",\%yesNo,\@array));
-		$array[0] = $session{page}{groupEdit};
-                $output .= tableFormRow(WebGUI::International::get(113),WebGUI::Form::selectList("groupEdit",\%yesNo,\@array));
-		$array[0] = $session{page}{worldView};
-                $output .= tableFormRow(WebGUI::International::get(114),WebGUI::Form::selectList("worldView",\%yesNo,\@array));
-		$array[0] = $session{page}{worldEdit};
-                $output .= tableFormRow(WebGUI::International::get(115),WebGUI::Form::selectList("worldEdit",\%yesNo,\@array));
-                $output .= tableFormRow("",WebGUI::Form::checkbox("recursePrivs","yes").' <span class="formSubtext">'.WebGUI::International::get(116).'</span>');
-                $output .= formSave();
-                $output .= '</table></form>';
+                $f->select("styleId",\%hash,WebGUI::International::get(105),[$page{styleId}],'','','',
+			' &nbsp; <a href="'.WebGUI::URL::page('op=listStyles').'">'.WebGUI::International::get(6).'</a>');
+                $f->yesNo("recurseStyle",'','','',' &nbsp; '.WebGUI::International::get(106));
+		$f->raw('<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>');
+		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings 
+			where groupings.groupId=4 and groupings.userId=users.userId order by users.username");
+		$f->select("ownerId",\%hash,WebGUI::International::get(108),[$page{ownerId}],'','','',
+			' &nbsp; <a href="'.WebGUI::URL::page('op=listUsers').'">'.WebGUI::International::get(7).'</a>');
+		$f->yesNo("ownerView",WebGUI::International::get(109),$page{ownerView});
+                $f->yesNo("ownerEdit",WebGUI::International::get(110),$page{ownerEdit});
+		$f->group("groupId",WebGUI::International::get(111),[$page{groupId}],'','','',
+			' &nbsp; <a href="'.WebGUI::URL::page('op=listGroups').'">'.WebGUI::International::get(5).'</a>');
+		$f->yesNo("groupView",WebGUI::International::get(112),$page{groupView});
+                $f->yesNo("groupEdit",WebGUI::International::get(113),$page{groupEdit});
+                $f->yesNo("worldView",WebGUI::International::get(114),$page{worldView});
+                $f->yesNo("worldEdit",WebGUI::International::get(115),$page{worldEdit});
+                $f->yesNo("recursePrivs",'','','',' &nbsp; '.WebGUI::International::get(116));
+		$f->submit;
+		$output .= $f->print;
                 return $output;
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -264,23 +194,45 @@ sub www_editPage {
 
 #-------------------------------------------------------------------
 sub www_editPageSave {
-        my (%parent, $urlizedTitle, $test);
-        if (WebGUI::Privilege::canEditPage()) {
-                if ($session{form}{title} eq "") {
-                        $session{form}{title} = "no title";
-                }
-		$urlizedTitle = WebGUI::URL::makeUnique(
-                        WebGUI::URL::urlize($session{form}{urlizedTitle}),
-                        $session{page}{pageId}
-                        );
-                WebGUI::SQL->write("update page set title=".quote($session{form}{title}).", styleId=$session{form}{styleId}, ownerId=$session{form}{ownerId}, ownerView=$session{form}{ownerView}, ownerEdit=$session{form}{ownerEdit}, groupId='$session{form}{groupId}', groupView=$session{form}{groupView}, groupEdit=$session{form}{groupEdit}, worldView=$session{form}{worldView}, worldEdit=$session{form}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle', defaultMetaTags='$session{form}{defaultMetaTags}', template='$session{form}{template}', menuTitle=".quote($session{form}{menuTitle}).", synopsis=".quote($session{form}{synopsis})." where pageId=$session{page}{pageId}");
-		if ($session{form}{recurseStyle} eq "yes") {
-			_recursivelyChangeStyle($session{page}{pageId});
+        my ($nextSeq, $pageId);
+	if ($session{form}{pageId} eq "new") {
+		$pageId = $session{form}{parentId};
+	} else {
+		$pageId = $session{form}{pageId};
+	}
+        if (WebGUI::Privilege::canEditPage($pageId)) {
+		if ($session{form}{pageId} eq "new") {
+			($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where pageId=$session{page}{parentId}");
+                	$nextSeq += 1;
+			$session{form}{pageId} = getNextId("pageId");
+			WebGUI::SQL->write("insert into page (pageId,sequenceNumber,parentId) 
+				values ($session{form}{pageId},$nextSeq,$session{form}{parentId})");
 		}
-		if ($session{form}{recursePrivs} eq "yes") {
-			_recursivelyChangePrivileges($session{page}{pageId});
-		}
-		WebGUI::Session::refreshPageInfo($session{page}{pageId});
+                $session{form}{title} = "no title" if ($session{form}{title} eq "");
+                $session{form}{menuTitle} = $session{form}{title} if ($session{form}{menuTitle} eq "");
+                $session{form}{urlizedTitle} = $session{form}{menuTitle} if ($session{form}{urlizedTitle} eq "");
+		$session{form}{urlizedTitle} = WebGUI::URL::makeUnique(WebGUI::URL::urlize($session{form}{urlizedTitle}),$session{form}{pageId});
+                WebGUI::SQL->write("update page set 
+			title=".quote($session{form}{title}).", 
+			styleId=$session{form}{styleId}, 
+			ownerId=$session{form}{ownerId}, 
+			ownerView=$session{form}{ownerView}, 
+			ownerEdit=$session{form}{ownerEdit}, 
+			groupId='$session{form}{groupId}', 
+			groupView=$session{form}{groupView}, 
+			groupEdit=$session{form}{groupEdit}, 
+			worldView=$session{form}{worldView}, 
+			worldEdit=$session{form}{worldEdit},
+			metaTags=".quote($session{form}{metaTags}).", 
+			urlizedTitle='$session{form}{urlizedTitle}', 
+			defaultMetaTags='$session{form}{defaultMetaTags}', 
+			template='$session{form}{template}', 
+			menuTitle=".quote($session{form}{menuTitle}).", 
+			synopsis=".quote($session{form}{synopsis})." 
+			where pageId=$session{form}{pageId}");
+		_recursivelyChangeStyle($session{page}{pageId}) if ($session{form}{recurseStyle});
+		_recursivelyChangePrivileges($session{page}{pageId}) if ($session{form}{recursePrivs});
+		WebGUI::Session::refreshPageInfo($session{page}{pageId}) if ($session{form}{pageId} == $session{page}{pageId});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

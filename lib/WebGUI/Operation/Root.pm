@@ -32,7 +32,7 @@ sub www_listRoots {
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output = helpLink(28);
 		$output .= '<h1>'.WebGUI::International::get(408).'</h1>';
-		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=addPage&root=1').
+		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editPage&npp=0').
 			'">'.WebGUI::International::get(409).'</a></div>';
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
                 $sth = WebGUI::SQL->read("select * from page where title<>'Reserved' and parentId=0 order by title");

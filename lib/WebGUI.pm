@@ -35,7 +35,7 @@ sub _displayAdminBar {
 	tie %hash2, "Tie::IxHash";
   #--content adder
 	$hash{WebGUI::URL::page()} = WebGUI::International::get(1);
-	$hash{WebGUI::URL::page('op=addPage')} = WebGUI::International::get(2);
+	$hash{WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId})} = WebGUI::International::get(2);
 	$hash{WebGUI::URL::page('op=selectPackageToDeploy')} = WebGUI::International::get(376);
 	foreach $key (keys %{$session{wobject}}) {
 		$hash2{WebGUI::URL::page('func=edit&wid=new&namespace='.$key)} = $session{wobject}{$key};
