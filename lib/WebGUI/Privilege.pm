@@ -264,20 +264,20 @@ sub isInGroup {
 	$uid = $session{user}{userId} if ($uid eq "");
 
 
-	#The several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
-#        if ($gid == 7) {
-#                return 1;
-#        }
-#	if ($gid == 1) {
-#		if ($uid == 1) {
-#			return 1;
-#		} else {
-#			return 0;
-#		}
-#	}
-#	if ($gid==2 && $uid != 1) {
-#		return 1;
-#	}
+	### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
+        if ($gid == 7) {
+                return 1;
+        }
+	if ($gid == 1) {
+		if ($uid == 1) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	if ($gid==2 && $uid != 1) {
+		return 1;
+	}
 
 
 
