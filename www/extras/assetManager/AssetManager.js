@@ -212,7 +212,6 @@ function AssetManager_remove() {
 
 function AssetManager_getSelectedAssetIds() {
 	var assetIds = "";
-	alert(this.display.overObjects.length);
 	for (i=0;i<this.display.overObjects.length;i++) {
 		assetIds += "&assetId=" + this.display.overObjects[i].assetId;
 	}

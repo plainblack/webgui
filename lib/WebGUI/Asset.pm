@@ -768,7 +768,7 @@ sub www_copyList {
 			$newAsset->cut;
 		}
 	}
-	return $self->manageAssets();
+	return $self->www_manageAssets();
 }
 
 sub www_cut {
@@ -787,7 +787,7 @@ sub www_cutList {
 			$asset->cut;
 		}
 	}
-	return $self->manageAssets();
+	return $self->www_manageAssets();
 }
 
 sub www_delete {
@@ -806,7 +806,7 @@ sub www_deleteList {
 			$asset->trash;
 		}
 	}
-	return $self->manageAssets();
+	return $self->www_manageAssets();
 }
 
 sub www_demote {
@@ -906,8 +906,7 @@ sub www_manageAssets {
 	$output .= "labels['properties'] = 'Properties';\n";
 	$output .= "labels['editTree'] = 'Edit Tree';\n";
 	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);  manager.renderAssets();\n</script>\n";
-	$output .= '<div style="font-size: 18px;">
-    <div class="adminConsoleSpacer">
+	$output .= ' <div class="adminConsoleSpacer">
             &nbsp;
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1083).'</b><br />';
@@ -936,8 +935,7 @@ sub www_manageAssets {
 	$output .= '
     <div class="adminConsoleSpacer">
             &nbsp;
-        </div>
-		</div>
+        </div> 
 		';
 	return $self->getAdminConsole->render($output);
 }
@@ -956,7 +954,7 @@ sub www_pasteList {
 	foreach my $clipId ($session{cgi}->param("assetId")) {
 		$self->paste($clipId);
 	}
-	return $self->manageAssets();
+	return $self->www_manageAssets();
 }
 
 sub www_promote {
