@@ -215,7 +215,7 @@ sub discussionProperties {
 		-unitsValue=>$units,
 		-uiLevel=>7
 		);
-        if ($session{setting}{useKarma} && $session{user}{uiLevel} <= 7) {
+        if ($session{setting}{useKarma} && $session{user}{uiLevel} >= 7) {
                 $f->integer("karmaPerPost",WebGUI::International::get(541),$_[0]->get("karmaPerPost"));
         } else {
                 $f->hidden("karmaPerPost",$_[0]->get("karmaPerPost"));
