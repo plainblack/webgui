@@ -318,12 +318,13 @@ sub www_view {
 	$p = WebGUI::Paginator->new($url,[],$numResults);
 	$p->setDataByQuery($sql);
 	$files = $p->getPageData;
+	my $canEditWobject = (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")) || WebGUI::Privilege::canEditPage());
 	foreach $file (@$files) {
 		$file1 = WebGUI::Attachment->new($file->{downloadFile},$_[0]->get("wobjectId"),$file->{FileManager_fileId});
 		$file2 = WebGUI::Attachment->new($file->{alternateVersion1},$_[0]->get("wobjectId"),$file->{FileManager_fileId});
 		$file3 = WebGUI::Attachment->new($file->{alternateVersion2},$_[0]->get("wobjectId"),$file->{FileManager_fileId});
 		push (@fileloop,{
-			"file.canView"=>WebGUI::Privilege::isInGroup($file->{groupToView}),
+			"file.canView"=>(WebGUI::Privilege::isInGroup($file->{groupToView}) || $canEditWobject),
 			"file.controls"=>deleteIcon('func=deleteDownload&wid='.$_[0]->get("wobjectId")
 				.'&did='.$file->{FileManager_fileId}).editIcon('func=editDownload&wid='.$_[0]->get("wobjectId")
 				.'&did='.$file->{FileManager_fileId}).moveUpIcon('func=moveDownloadUp&wid='
