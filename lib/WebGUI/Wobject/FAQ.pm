@@ -42,6 +42,7 @@ sub duplicate {
         my ($w, %data, $newQuestionId, $sth);
 	tie %data, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
+	$w = WebGUI::Wobject::FAQ->new({wobjectId=>$w,namespace=>$namespace});
 	$w->set({
 		topOn=>$_[0]->get("topOn"),
 		tocOn=>$_[0]->get("tocOn"),
@@ -50,7 +51,7 @@ sub duplicate {
         $sth = WebGUI::SQL->read("select * from FAQ_question where wobjectId=".$_[0]->get("wobjectId"));
         while (%data = $sth->hash) {
                 $newQuestionId = getNextId("questionId");
-                WebGUI::SQL->write("insert into FAQ_question values ($w, $newQuestionId, "
+                WebGUI::SQL->write("insert into FAQ_question values (".$w->get("wobjectId").", $newQuestionId, "
 			.quote($data{question}).", ".quote($data{answer}).", $data{sequenceNumber})");
         }
         $sth->finish;
