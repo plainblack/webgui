@@ -146,7 +146,7 @@ sub www_manageMetaData {
 	my $output;
 	my $fields = WebGUI::MetaData::getMetaDataFields();
 	foreach my $fieldId (keys %{$fields}) {
-		$output .= deleteIcon("op=deleteMetaDataField&fid=".$fieldId);
+		$output .= deleteIcon("op=deleteMetaDataFieldConfirm&fid=".$fieldId,'',WebGUI::International::get('deleteConfirm','MetaData'));
 		$output .= editIcon("op=editMetaDataField&fid=".$fieldId);
 		$output .= "<b>".$fields->{$fieldId}{fieldName}."</b><br>";
 	}	
