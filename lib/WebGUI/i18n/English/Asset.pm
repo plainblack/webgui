@@ -280,6 +280,18 @@ The URL where the user will be redirected.
 		lastUpdated => 1106762088
 	},
 
+	'upload files' => {
+		message => q|Upload Files|,
+		context => q|label for File Pile asset form|,
+		lastUpdated => 1107387247,
+	},
+
+	'add pile' => {
+		message => q|Add a Pile of Files|,
+		context => q|label for File Pile Admin Console|,
+		lastUpdated => 1107387324,
+	},
+
 	'thumbnail size' => {
 		message => q|Thumbnail Size|,
 		context => q|label for Image asset form|,
