@@ -14,7 +14,7 @@ create table forum (
   moderatePosts int not null default 0,
   groupToModerate int not null default 0,
   attachmentsPerPost int not null default 0,
-  allowHTML int not null default 1,
+  allowRichEdit int not null default 1,
   allowReplacements int not null default 1
 );
 
@@ -34,7 +34,6 @@ create table forumPost (
   message text,
   dateOfPost int,
   views int,
-  locked int,
   status varchar(30) not null default 'approved',
   contentType varchar(30) not null default 'some html'
 );
@@ -52,7 +51,8 @@ create table forumThread (
   views int not null,
   replies int not null,
   lastPostId int not null,
-  locked int not null,
+  lastPostDate int not null,
+  isLocked int not null,
   isSticky int not null
 );
 

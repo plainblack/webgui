@@ -277,6 +277,39 @@ sub getNextId {
         return $id;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getRow ( table, key, keyValue [, dbh ] )
+
+Returns a row of data as a hash reference from the specified table.
+
+=over
+
+=item table
+
+The name of the table to retrieve the row of data from.
+
+=item key
+
+The name of the column to use as the retrieve key. Should be a primary or unique key in the table.
+
+=item keyValue
+
+The value to search for in the key column.
+
+=item dbh
+
+A database handler to use. Defaults to the WebGUI database handler.
+
+=back
+
+=cut
+
+sub getRow {
+        my ($self, $table, $key, $keyValue, $dbh) = @_;
+        my $row = WebGUI::SQL->quickHashRef("select * from $table where ".$key."=".quote($keyValue), $dbh);
+        return $row;
+}
 
 #-------------------------------------------------------------------
 
@@ -569,6 +602,51 @@ Returns the number of rows in a statement handler created by the "read" method.
 
 sub rows {
         return $_[0]->{_sth}->rows;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setRow ( table, key, data [, dbh ] )
+
+Inserts/updates a row of data into the database. Returns the value of the key.
+
+=over
+
+=item table
+
+The name of the table to use.
+
+=item key
+
+The name of the primary key of the table.
+
+=item data
+
+A hash reference containing column names and values to be set.
+
+=item dbh
+
+A database handler to use. Defaults to the WebGUI database handler.
+
+=back
+
+=cut
+
+sub setRow {
+        my ($self, $table, $keyColumn, $data, $dbh) = @_;
+        if ($data->{$keyColumn} eq "new") {
+                $data->{$keyColumn} = WebGUI::SQL->getNextId($keyColumn);
+                WebGUI::SQL->write("insert into $table ($keyColumn) values ($data->{$keyColumn})", $dbh);
+        }
+        my (@pairs);
+        foreach my $key (keys %{$data}) {
+                unless ($key eq $keyColumn) {
+                        push(@pairs, $key.'='.quote($data->{$key}));
+                }
+        }
+        WebGUI::SQL->write("update $table set ".join(", ", @pairs), $dbh);
+	return $data->{$keyColumn};
 }
 
 
