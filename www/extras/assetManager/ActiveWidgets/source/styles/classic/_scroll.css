@@ -1,0 +1,110 @@
+/*****************************************************************
+
+	ActiveWidgets Grid 1.0.0 (Free Edition).
+	Copyright (C) 2004 ActiveWidgets Ltd. All Rights Reserved. 
+	More information at http://www.activewidgets.com/
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*****************************************************************/
+
+.active-scroll-data {
+	position: absolute;
+	overflow: hidden;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	padding: 18px 0px 0px 28px;
+	z-index: 1;
+}
+
+.active-scroll-top {
+	position: absolute;
+	overflow: hidden;
+	white-space: nowrap;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 18px;
+	padding: 0px 20px 0px 28px;
+	z-index: 2;
+}
+
+.active-scroll-left {
+	position: absolute;
+	overflow: hidden;
+	top: 0px;
+	left: 0px;
+	width: 28px;
+	height: 100%;
+	padding: 18px 0px 20px 0px;
+	text-align: center;
+	z-index: 2;
+}
+
+.active-scroll-corner {
+	position: absolute;
+	overflow: hidden;
+	top: 0px;
+	left: 0px;
+	width: 28px;
+	height: 18px;
+	z-index: 3;
+}
+
+.active-scroll-corner.khtml {
+	width: 26px;
+	height: 16px;
+}
+
+.active-scroll-bars {
+	position: absolute;
+	overflow: auto;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	z-index: 4;
+}
+
+.active-scroll-space {
+	width: 0px; /* adjusted after printout/resize */
+	height: 0px;
+}
+
+.active-scroll-fill {
+	display: inline;
+	height: 100%;
+}
+
+.active-scroll-fill.gecko {
+	display: -moz-inline-box;
+}
+
+.active-scroll-fill.khtml {
+	float: left;
+	width: 1000px;
+	margin-right: -1000px;
+	height: 16px;
+}
+
+
+.active-scroll-data.gecko,
+.active-scroll-top.gecko,
+.active-scroll-left.gecko {
+	overflow: -moz-scrollbars-none;
+}

@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>ActiveWidgets Tutorial</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Linking grid to a javascript array.
+    </h1>
+    <p>
+        In a more realistic example the grid data is stored in a two-dimensional
+        javascript array. Instead of providing a static text to the grid -
+        you should supply the function, which just returns an array element
+        for a given row and column indices.
+    </p>
+    <pre>obj.setProperty("data/text", function(i,j){return myData[i][j]});</pre>
+    <p>
+    	Example:
+    </p>
+    <textarea id="grid4" wrap="off" style="HEIGHT:300px" target="height:100px">
+
+  var myData = [
+    ["MSFT","Microsoft Corporation", "314,571.156", "32,187.000", "55000"],
+    ["ORCL", "Oracle Corporation", "62,615.266", "9,519.000", "40650"],
+    ["SAP", "SAP AG (ADR)", "40,986.328", "8,296.420", "28961"],
+    ["CA", "Computer Associates Inter", "15,606.335", "3,164.000", "16000"],
+    ["ERTS", "Electronic Arts Inc.", "14,490.895", "2,503.727", "4000"]
+  ];
+
+  var obj = new Active.Controls.Grid;
+
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 5);
+  obj.setProperty("data/text", function(i,j){return myData[i][j]});
+
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid4");</script>
+
+    <p>
+        <a href="data-textfile.htm">Loading data from a text file &gt;&gt;</a>
+    </p>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

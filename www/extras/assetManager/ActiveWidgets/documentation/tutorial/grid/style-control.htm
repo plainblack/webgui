@@ -1,0 +1,56 @@
+<html>
+<head>
+    <title>ActiveWidgets :: DHTML Grid :: Changing the font, background and borders of the grid.</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Changing the font, background and borders of the grid.
+    </h1>
+    <p>
+		You can modify visual parameters of the grid using .active-controls-grid CSS selector.
+    </p>
+    <pre>&lt;style&gt;
+  .active-controls-grid {
+      color: blue;
+      background: buttonface;
+      font-size: 8pt;
+      font-family: monospace;
+      border: 3px double black;
+  }
+&lt;/style&gt;</pre>
+    <p>
+		Here is the javascript way of doing the same:
+    </p>
+    <textarea id="grid1" wrap="off" style="HEIGHT:230px" target="height:100px">
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 5);
+  obj.setProperty("data/text", "some text...");
+
+  obj.setStyle("color", "blue");
+  obj.setStyle("background", "buttonface");
+  obj.setStyle("font-size", "8pt");
+  obj.setStyle("font-family", "monospace");
+  obj.setStyle("border", "3px double black");
+
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+
+    <p>
+        <a href="style.htm">Back to Visual Style</a>
+    </p>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

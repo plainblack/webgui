@@ -1,0 +1,42 @@
+/*****************************************************************
+
+	ActiveWidgets Grid 1.0.0 (Free Edition).
+	Copyright (C) 2004 ActiveWidgets Ltd. All Rights Reserved. 
+	More information at http://www.activewidgets.com/
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*****************************************************************/
+
+.active-image-txt {background: url(icons.png)  -20px 50% }
+.active-image-htm {background: url(icons.png)  -40px 50% }
+.active-image-xls {background: url(icons.png)  -60px 50% }
+.active-image-doc {background: url(icons.png)  -80px 50% }
+.active-image-pdf {background: url(icons.png) -100px 50% }
+.active-image-xml {background: url(icons.png) -120px 50% }
+.active-image-msi {background: url(icons.png) -140px 50% }
+.active-image-chm {background: url(icons.png) -160px 50% }
+
+.active-box-image	{background-repeat: no-repeat}
+
+.active-image-loading {
+	position: relative;
+	top: 20px;
+	left: 0px;
+	width: 107px;
+	height: 13px;
+	margin-right: -107px;
+	background: url(loading.gif) no-repeat;
+}

@@ -1,0 +1,259 @@
+<html>
+<head>
+    <title>ActiveWidgets Grid :: dhtml grid, javascript tables, .net datagrid, asp controls, php widgets</title>
+    <meta content="ActiveWidgets is a cross-browser client-side web GUI framework" name="description" />
+    <link href="../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../common/site.js"></script>
+</head>
+<body class="single">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Home &gt;&gt; Examples &gt;&gt;
+    </div>
+    <h2>Grid widget example
+    </h2>
+    <p>
+        Here is step-by-step guide on how to include the grid widget on your page. Let's look
+        first at the end result:
+    </p>
+    <iframe src="../examples/grid/basic.htm" frameborder="0" width="525" height="250">
+    </iframe>
+    <h2>Include ActiveWidgets files
+    </h2>
+    <p>
+        The first step is to include a reference to the ActiveWidgets files into the &lt;head&gt;
+        section of your page. You need to include two files: a javascript library file and
+        a stylesheet file. The compressed files are located in the /runtime directory. Here
+        is how it looks:
+    </p>
+    <xmp>
+    <link href="../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css"  />
+    <script src="../runtime/lib/grid.js"></script>
+    </xmp>
+    <h2>Create widget
+    </h2>
+    <p>
+        To insert a full-featured grid into the page we would need to generate a large number
+        of HTML tags and merge them with our data. All that will be done by the ActiveWidgets grid
+        object. We just need to put a &lt;script&gt; block at the desired position; create <kbd>new</kbd> Active.Controls.Grid
+        object and write this object back to the page using <kbd>document.write()</kbd> function.
+    </p>
+    <xmp>	<script>
+		var obj = new Active.Controls.Grid;
+		document.write(obj);
+	</script>
+    </xmp>
+    <h2>How it works
+    </h2>
+    <p>
+        The last line in the script above is in fact equivalent to calling <kbd>toString()</kbd> method
+        of the grid object. Each ActiveWidgets object implements <kbd>toString()</kbd> method to
+        produce the HTML markup, i.e. visual representation of the object inside HTML document.
+        The HTML tags produced by the grid <kbd>toString()</kbd> method and written to the
+        page by <kbd>document.write()</kbd> may look like this:
+    </p>
+    <xmp style="OVERFLOW: auto; WIDTH: 100%; HEIGHT: 180px">
+    <div id="grid" class="active-controls-grid " oncontextmenu="return false" onselectstart="return false">
+        <div id="grid.layout/data" class="active-scroll-data ">
+            <div id="grid.data.item:0" class="active-templates-row active-list-item " onclick="dispatch(event, this)">
+                <div id="grid.data.item:0.item:0" class="active-templates-text active-list-item active-column-0 active-row-cell " onclick="dispatch(event, this)">
+                    MSFT
+                </div>
+                <div id="grid.data.item:0.item:1" class="active-templates-text active-list-item active-column-1 active-row-cell " onclick="dispatch(event, this)">
+                    Microsoft Corporation
+                </div>
+                <div id="grid.data.item:0.item:2" class="active-templates-text active-list-item active-column-2 active-row-cell " onclick="dispatch(event, this)">
+                    314,571.156
+                </div>
+                <div id="grid.data.item:0.item:3" class="active-templates-text active-list-item active-column-3 active-row-cell " onclick="dispatch(event, this)">
+                    32,187.000
+                </div>
+                <div id="grid.data.item:0.item:4" class="active-templates-text active-list-item active-column-4 active-row-cell " onclick="dispatch(event, this)">
+                    55000
+                </div>
+            </div>
+            <div id="grid.data.item:1" class="active-templates-row active-list-item " onclick="dispatch(event, this)">
+                <div id="grid.data.item:1.item:0" class="active-templates-text active-list-item active-column-0 active-row-cell " onclick="dispatch(event, this)">
+                    ORCL
+                </div>
+                <div id="grid.data.item:1.item:1" class="active-templates-text active-list-item active-column-1 active-row-cell " onclick="dispatch(event, this)">
+                    Oracle Corporation
+                </div>
+                <div id="grid.data.item:1.item:2" class="active-templates-text active-list-item active-column-2 active-row-cell " onclick="dispatch(event, this)">
+                    62,615.266
+                </div>
+                <div id="grid.data.item:1.item:3" class="active-templates-text active-list-item active-column-3 active-row-cell " onclick="dispatch(event, this)">
+                    9,519.000
+                </div>
+                <div id="grid.data.item:1.item:4" class="active-templates-text active-list-item active-column-4 active-row-cell " onclick="dispatch(event, this)">
+                    40650
+                </div>
+            </div>
+            ...
+        </div>
+    </div>
+    </xmp>
+    <h2>Data binding
+    </h2>
+    <p>
+        In this first simple example we'll take the data for our grid from the two-dimensional
+        javascript array.
+    </p>
+    <xmp><script>
+	var myData = [
+		["MSFT","Microsoft Corporation", "314,571.156", "32,187.000", "55000"],
+		["ORCL", "Oracle Corporation", "62,615.266", "9,519.000", "40650"],
+		["SAP", "SAP AG (ADR)", "40,986.328", "8,296.420", "28961"],
+		["CA", "Computer Associates Inter", "15,606.335", "3,164.000", "16000"],
+		["ERTS", "Electronic Arts Inc.", "14,490.895", "2,503.727", "4000"],
+		["SFTBF", "Softbank Corp. (ADR)", "14,485.840", ".000", "6865"],
+		["VRTS", "Veritas Software Corp.", "14,444.272", "1,578.658", "5647"],
+		["SYMC", "Symantec Corporation", "9,932.483", "1,482.029", "4300"],
+		["INFY", "Infosys Technologies Ltd.", "9,763.851", "830.748", "15400"],
+		...
+	];
+</script>
+    </xmp>
+    <p>
+        As a minimum we should supply a number of rows/columns and a function providing the
+        data text for a given cell.
+    </p>
+    <xmp><script>
+	obj.setRowCount(20);
+	obj.setColumnCount(5);
+	obj.setDataText(function(i, j){return myData[i][j]});
+</script>
+    </xmp>
+    <p>
+        You are not limited just to javascript arrays - the same approach could be used for
+        XML web services and other data sources.
+    </p>
+    <h2>Formatting
+    </h2>
+    <p>
+        Let's start with column headings. Again, we just need to supply a function, which
+        will provide heading text for each column.
+    </p>
+    <xmp><script>
+	var myColumns = ["Ticker", "Company Name", "Market Cap.", "$ Sales", "Employees"];
+	obj.setColumnText(function(i){return myColumns[i]});
+</script>
+    </xmp>
+    <p>
+        Then we can change the width and the appearance of each column using the standard
+        CSS attributes.
+    </p>
+    <xmp><style>
+	.active-column-0 {width:  80px;}
+	.active-column-1 {width: 200px; background-color: threedlightshadow;}
+	.active-column-2 {text-align: right;}
+	.active-column-3 {text-align: right;}
+	.active-column-4 {text-align: right;}
+</style>
+    </xmp>
+    <h2>User actions
+    </h2>
+    <p>
+        The grid object translates DHTML keyboard and mouse events to higher level 'actions',
+        like 'deleteRow' instead of 'keydown' + 'del' key. The action call provides action
+        source as an argument. In the example below we are sending the cell text to the browser
+        status bar:
+    </p>
+    <xmp><script>
+	obj.setAction("click", function(src){window.status = src.getProperty("item/text")});
+</script>
+    </xmp>
+    <h2>Page source
+    </h2>
+    <p>
+        The actual HTML source of the grid example looks like this:
+    </p>
+    <xmp style="OVERFLOW: auto; WIDTH: 100%; HEIGHT: 320px">
+    <html>
+    <head>
+        <style> body, html {margin:0px; padding: 0px; overflow: hidden;} </style>
+        <!-- ActiveWidgets stylesheet and scripts -->
+	    <link href="../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css"  />
+	    <script src="../runtime/lib/grid.js"></script>
+        <!-- grid format -->
+        <style>
+		.active-controls-grid {height: 100%; font: menu;}
+		.active-column-0 {width:  80px;}
+		.active-column-1 {width: 200px; background-color: threedlightshadow;}
+		.active-column-2 {text-align: right;}
+		.active-column-3 {text-align: right;}
+		.active-column-4 {text-align: right;}
+	</style>
+        <!-- grid data -->
+        <script>
+		var myData = [
+			["MSFT","Microsoft Corporation", "314,571.156", "32,187.000", "55000"],
+			["ORCL", "Oracle Corporation", "62,615.266", "9,519.000", "40650"],
+			["SAP", "SAP AG (ADR)", "40,986.328", "8,296.420", "28961"],
+			["CA", "Computer Associates Inter", "15,606.335", "3,164.000", "16000"],
+			["ERTS", "Electronic Arts Inc.", "14,490.895", "2,503.727", "4000"],
+			["SFTBF", "Softbank Corp. (ADR)", "14,485.840", ".000", "6865"],
+			["VRTS", "Veritas Software Corp.", "14,444.272", "1,578.658", "5647"],
+			["SYMC", "Symantec Corporation", "9,932.483", "1,482.029", "4300"],
+			["INFY", "Infosys Technologies Ltd.", "9,763.851", "830.748", "15400"],
+			["INTU", "Intuit Inc.", "9,702.477", "1,650.743", "6700"],
+			["ADBE", "Adobe Systems Incorporate", "9,533.050", "1,230.817", "3341"],
+			["PSFT", "PeopleSoft, Inc.", "8,246.467", "1,941.167", "8180"],
+			["SEBL", "Siebel Systems, Inc.", "5,434.649", "1,417.952", "5909"],
+			["BEAS", "BEA Systems, Inc.", "5,111.813", "965.694", "3063"],
+			["SNPS", "Synopsys, Inc.", "4,482.535", "1,169.786", "4254"],
+			["CHKP", "Check Point Software Tech", "4,396.853", "424.769", "1203"],
+			["MERQ", "Mercury Interactive Corp.", "4,325.488", "444.063", "1822"],
+			["DOX", "Amdocs Limited", "4,288.017", "1,427.088", "9400"],
+			["CTXS", "Citrix Systems, Inc.", "3,946.485", "554.222", "1670"],
+			["KNM", "Konami Corporation (ADR)", "3,710.784", ".000", "4313"]
+		];
+
+		var myColumns = [
+			"Ticker", "Company Name", "Market Cap.", "$ Sales", "Employees"
+		];
+	</script>
+    </head>
+    <body>
+        <script>
+
+	//	create ActiveWidgets Grid javascript object
+	var obj = new Active.Controls.Grid;
+
+	//	set number of rows/columns
+	obj.setRowCount(20);
+	obj.setColumnCount(5);
+
+	//	provide cells and headers text
+	obj.setDataText(function(i, j){return myData[i][j]});
+	obj.setColumnText(function(i){return myColumns[i]});
+
+	//	set click action handler
+	obj.setAction("click", function(src){window.status = src.getProperty("item/text")});
+
+	//	write grid html to the page
+	document.write(obj);
+
+	</script>
+    </body>
+    </html>
+    </xmp>
+    <h2><a name="download">Download</a>
+    </h2>
+    <ul>
+        <li>
+            <a href="http://sourceforge.net/project/showfiles.php?group_id=90231" target="_blank">Grid
+            widget source files from SourceForge</a>
+        </li>
+    </ul>
+    <h2>Another example
+    </h2>
+    <p>
+        One more example - using images and tooltips:
+    </p>
+    <iframe src="../examples/grid/images.htm" frameborder="0" width="525" height="150">
+    </iframe>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

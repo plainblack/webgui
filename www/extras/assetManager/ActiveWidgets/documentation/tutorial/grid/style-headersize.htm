@@ -1,0 +1,60 @@
+<html>
+<head>
+    <title>ActiveWidgets :: DHTML Grid :: Changing the row/column headers width and height.</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Changing the row/column headers width and height.
+    </h1>
+    <p>
+		To change the row header width it is necessary to modify style settings
+		for all four parts of the grid. Here is the example how to set a row header width to 100px:
+    </p>
+    <pre>&lt;style&gt;
+  .active-scroll-left, .active-scroll-corner {width: 100px}
+  .active-scroll-top, .active-scroll-data {padding-left: 100px}
+&lt;/style&gt;</pre>
+    <p>
+		Changing the column header height is very similar:
+    </p>
+    <pre>&lt;style&gt;
+  .active-scroll-top, .active-scroll-corner {height: 25px}
+  .active-scroll-left, .active-scroll-data {padding-top: 25px}
+&lt;/style&gt;</pre>
+    <p>
+		You can do the same thing in javascript using the methods of the grid object:
+    </p>
+    <pre>obj.setColumnHeaderHeight("25px");
+obj.setRowHeaderWidth("100px");</pre>
+    <p>
+    	Example:
+    </p>
+    <textarea id="grid1" wrap="off" style="HEIGHT:185px" target="height:100px">
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 5);
+
+  obj.setColumnHeaderHeight("25px");
+  obj.setRowHeaderWidth("100px");
+
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+
+    <p>
+        <a href="style.htm">Back to Visual Style</a>
+    </p>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<html>
+<head>
+    <title>ActiveWidgets :: DHTML Grid :: Applying styles to the multiple grids on one page.</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Applying styles to the multiple grids on one page.
+    </h1>
+    <p>
+		If you have more than one grid on the same page - you can apply
+		different styles to the grids using CSS ID selector.
+    </p>
+    <pre>&lt;style&gt;
+  #grid1 {height: 200px;}
+  #grid2 {height: 100px;}
+
+  #grid1 .active-column-0 {width: 200px;}
+  #grid2 .active-column-0 {width: 150px;}
+
+  #grid1 .active-column-1 {background-color: threedlightshadow;}
+  #grid2 .active-column-1 {background-color: infobackground;}
+
+  .active-column-2 {text-align: right;}
+  .active-column-3 {text-align: right;}
+  .active-column-4 {text-align: right;}
+&lt;/style&gt;</pre>
+    <p>
+		In this example there are two grids on the page, which are assigned
+		the 'grid1' and 'grid2' IDs using setId(id) function.
+    </p>
+    <pre>var obj1 = new Active.Controls.Grid;
+obj1.setId("grid1");
+...
+
+var obj2 = new Active.Controls.Grid;
+obj2.setId("grid2");
+...</pre>
+    <p>
+		See full example in /examples/grid/two grids on one page.htm
+    </p>
+
+    <textarea id="grid1" wrap="off" style="HEIGHT:280px" target="height:100px">
+
+  var obj1 = new Active.Controls.Grid;
+  obj1.setId("grid1");
+  obj1.setRowCount(15);
+  obj1.setColumnCount(5);
+  obj1.setDataText(function(i, j){return data1[i][j]});
+  obj1.setColumnText(function(i){return columns1[i]});
+  document.write(obj1);
+
+  var obj2 = new Active.Controls.Grid;
+  obj2.setId("grid2");
+  obj2.setRowCount(5);
+  obj2.setColumnCount(5);
+  obj2.setDataText(function(i, j){return data2[i][j]});
+  obj2.setColumnText(function(i){return columns2[i]});
+  document.write(obj2);
+</textarea>
+
+    <p>
+        <a href="style.htm">Back to Visual Style</a>
+    </p>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

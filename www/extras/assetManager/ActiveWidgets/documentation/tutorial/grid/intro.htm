@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>ActiveWidgets Tutorial</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>Creating a grid
+    </h1>
+    <p>
+        Adding an ActiveWidgets grid to the page is very simple. First, create an instance of Active.Controls.Grid
+        class.
+    </p>
+    <pre>var obj = new Active.Controls.Grid;</pre>
+    <p>
+        Then specify a number of columns and number of rows.
+    </p>
+    <pre>obj.setProperty("column/count", 5);
+obj.setProperty("row/count", 10);</pre>
+    <p>
+        Provide some data to be displayed inside the&nbsp;cells.&nbsp;
+    </p>
+    <pre>obj.setProperty("data/text", "some text");</pre>
+    <p>
+        And finally write the HTML to the page.
+    </p>
+    <pre>document.write(obj);</pre>
+    <p>
+        Here is the complete script:
+    </p>
+    <textarea id="grid2" style="HEIGHT: 120px" target="height:100px">
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 5);
+  obj.setProperty("data/text", "some text");
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid2");</script>
+    <p>
+        Obviously having the same&nbsp;text in each cell&nbsp;doesn't make much sense.&nbsp;
+        Next section describes how to link the grid to the data source.
+    </p>
+    <p>
+        <a href="data.htm">Data Binding &gt;&gt;</a>
+    </p>
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+
+</body>
+</html>

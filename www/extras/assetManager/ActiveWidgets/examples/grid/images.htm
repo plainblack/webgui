@@ -1,0 +1,56 @@
+<html>
+<head>
+	<title>ActiveWidgets Grid :: Examples</title>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden;} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/xp/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+	<!-- grid format -->
+	<style>
+		.active-controls-grid {height: 100%; font: menu;}
+		.active-column-0 {width: 200px;}
+		.active-column-1 {width: 80px; text-align: right;}
+		.active-column-2 {width: 150px;}
+		.active-column-3 {width: 120px;}
+		.active-box-image {height: 16px;} /* for firefox 0.8 */
+	</style>
+
+	<!-- grid data -->
+	<script src="../data/files.js"></script>
+</head>
+<body>
+	<script>
+
+	//	create ActiveWidgets Grid javascript object
+	var obj = new Active.Controls.Grid;
+
+	//	set the first column template to image+text
+	obj.setColumnTemplate(new Active.Templates.Image, 0);
+
+	//	set number of rows/columns
+	obj.setRowProperty("count", 9);
+	obj.setColumnProperty("count", 4);
+
+	//	provide cells and headers text
+	obj.setDataProperty("text", function(i, j){return myData[i][j]});
+	obj.setDataProperty("image", function(i, j){return myData[i][4]});
+
+	//	provide column headers
+	obj.setColumnProperty("texts" , ["Name", "Size", "Type", "Date Modified"]);
+
+	//	set column/row headers width/height
+	obj.setColumnHeaderHeight("20px");
+	obj.setRowHeaderWidth("0px");
+
+	//	add tooltips to the first column template and data model
+	obj.getColumnTemplate(0).setAttribute("title", function(){return this.getItemProperty("tooltip")});
+	obj.defineDataProperty("tooltip", function(i, j){return "Type: " + myData[i][2] + "\nDate Modified: " + myData[i][3]  + "\nSize: " + myData[i][1]});
+
+	//	write grid html to the page
+	document.write(obj);
+
+	</script>
+</body>
+</html>

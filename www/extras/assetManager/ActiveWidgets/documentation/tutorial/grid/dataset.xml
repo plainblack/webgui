@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<DataSet xmlns="http://tempuri.org/">
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="Table">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="ticker" type="xs:string" minOccurs="0" />
+                <xs:element name="name" type="xs:string" minOccurs="0" />
+                <xs:element name="mktcap" type="xs:double" minOccurs="0" />
+                <xs:element name="sales" type="xs:double" minOccurs="0" />
+                <xs:element name="employees" type="xs:double" minOccurs="0" />
+                <xs:element name="timestamp" type="xs:dateTime" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <diffgr:diffgram xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:diffgr="urn:schemas-microsoft-com:xml-diffgram-v1">
+    <NewDataSet xmlns="">
+      <Table diffgr:id="Table1" msdata:rowOrder="0">
+        <ticker>MSFT</ticker>
+        <name>Microsoft Corporation</name>
+        <mktcap>314571.16</mktcap>
+        <sales>32187</sales>
+        <employees>55000</employees>
+        <timestamp>2003-11-27T00:00:00.0000000+01:00</timestamp>
+      </Table>
+      <Table diffgr:id="Table2" msdata:rowOrder="1">
+        <ticker>ORCL</ticker>
+        <name>Oracle Corporation</name>
+        <mktcap>62615.27</mktcap>
+        <sales>9519</sales>
+        <employees>40650</employees>
+        <timestamp>2003-11-27T00:00:00.0000000+01:00</timestamp>
+      </Table>
+      <Table diffgr:id="Table3" msdata:rowOrder="2">
+        <ticker>SAP</ticker>
+        <name>SAP AG (ADR)</name>
+        <mktcap>40986.33</mktcap>
+        <sales>8296.42</sales>
+        <employees>28961</employees>
+        <timestamp>2003-11-27T00:00:00.0000000+01:00</timestamp>
+      </Table>
+      <Table diffgr:id="Table4" msdata:rowOrder="3">
+        <ticker>CA</ticker>
+        <name>Computer Associates Inter</name>
+        <mktcap>15606.34</mktcap>
+        <sales>3164</sales>
+        <employees>16000</employees>
+        <timestamp>2003-11-27T00:00:00.0000000+01:00</timestamp>
+      </Table>
+      <Table diffgr:id="Table5" msdata:rowOrder="4">
+        <ticker>ERTS</ticker>
+        <name>Electronic Arts Inc.</name>
+        <mktcap>14490.9</mktcap>
+        <sales>2503.73</sales>
+        <employees>4000</employees>
+        <timestamp>2003-11-27T00:00:00.0000000+01:00</timestamp>
+      </Table>
+    </NewDataSet>
+  </diffgr:diffgram>
+</DataSet>

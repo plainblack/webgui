@@ -1,0 +1,30 @@
+<html>
+<head>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden; font: menu;} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+</head>
+<body>
+	<script>
+
+	var symbols = [	"MSFT","ORCL","SAP","CA","ERTS","TIBX","VRTS","SYMC","INFY","INTU",
+					"ADBE","PSFT","SEBL","BEAS","SNPS","CHKP","MERQ","DOX","CTXS","KNM"];
+
+	var data = new Active.XML.Table;
+	data.setURL("http://www.xignite.com/xQuotes.asmx/GetQuotes");
+	data.setParameter("Symbol", symbols);
+	data.setNamespace("xi", "http://www.xignite.com/services/");
+	data.setColumns(["xi:Symbol", "xi:Name", "xi:Last", "xi:Change", "xi:Volume"]);
+	data.request();
+
+	var obj = new Active.Controls.Grid;
+	obj.setDataModel(data);
+	obj.setColumnProperty("texts", ["Ticker", "Company", "Last", "Change", "Volume"]);
+	document.write(obj);
+
+	</script>
+</body>
+</html>

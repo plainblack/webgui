@@ -1,0 +1,75 @@
+<html>
+<head>
+    <title>ActiveWidgets :: DHTML Grid :: Adding gridlines.</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Adding gridlines.
+    </h1>
+    <p>
+		To display the gridlines add the following rules to the stylesheet:
+    </p>
+    <pre>&lt;style&gt;
+    .active-grid-row {border-bottom: 1px dotted red;}
+    .active-grid-column {border-right: 1px solid black;}
+&lt;/style&gt;</pre>
+    <p>
+		You can do the same thing in a script if you assign CSS rules directly to
+		the row and/or column templates.
+    </p>
+    <p>
+    	First of all you need to create a new row template.
+    </p>
+    <pre>var row = new Active.Templates.Row;</pre>
+    <p>
+    	Then assign a proper CSS formatting rule to the new template.
+    </p>
+    <pre>row.setStyle("border-bottom", "1px dotted red");</pre>
+    <p>
+    	And finally tell the grid object to use your new template.
+    </p>
+    <pre>obj.setTemplate("row", row);</pre>
+    <p>
+    	Same for the column templates.
+    </p>
+    <pre>var column = new Active.Templates.Text;
+column.setStyle("border-right", "1px solid black");
+obj.setTemplate("column", column);</pre>
+    <p>
+    	Here is working example:
+    </p>
+
+    <textarea id="grid1" wrap="off" style="HEIGHT:250px" target="height:100px">
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 5);
+
+  var row = new Active.Templates.Row;
+  row.setStyle("border-bottom", "1px dotted red");
+  obj.setTemplate("row", row);
+
+  var column = new Active.Templates.Text;
+  column.setStyle("border-right", "1px solid black");
+  obj.setTemplate("column", column);
+
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+
+    <p>
+        <a href="style.htm">Back to Visual Style</a>
+    </p>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<html>
+<head>
+    <title>ActiveWidgets Tutorial</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+<script>document.write(window.$header)</script>
+
+<div class="image-home">
+</div>
+<div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt;
+</div>
+<h1>HTML attributes
+</h1>
+<p>
+	Function <code>setAttribute(name, value)</code> allows assigning the value of the HTML attribute.
+</p>
+
+<textarea id="script1" style="height:120px" target="height:25px">
+
+ var obj = new Active.HTML.INPUT;
+ obj.setAttribute("type", "text");
+ obj.setAttribute("value", "static text");
+ obj.setAttribute("title", "tooltip");
+ document.write(obj);
+</textarea>
+
+<script>if(window.site) site.example("script1");</script>
+
+<p>
+	The attribute can be either a static value or a function.
+	The function will be evaluated each time the object is written to the page
+	or when the <code>refresh()</code> method is called.
+</p>
+
+<textarea id="script2" style="height:100px" target="height:25px">
+
+ var obj = new Active.HTML.INPUT;
+ obj.setAttribute("value", function(){return new Date()});
+ document.write(obj);
+</textarea>
+
+<script>if(window.site) site.example("script2");</script>
+
+<h3>
+	See also:
+</h3>
+<p>
+	<a href="../../reference/active.system.html/getattribute.htm"><i>getAttribute(name)</i></a><br>
+	<a href="../../reference/active.system.html/setattribute.htm"><i>setAttribute(name, value)</i></a><br>
+</p>
+
+<script>document.write(window.$column)</script>
+<script>document.write(window.$tutorial)</script>
+<script>document.write(window.$footer)</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<html>
+<head>
+    <title>ActiveWidgets Tutorial</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Loading XML data.
+    </h1>
+    <p>
+        Lets look how to load simple XML data into the grid.
+    </p>
+    <p>
+    	Here is the XML:
+    </p>
+	<iframe src="simple.txt" style="HEIGHT:200px"></iframe>
+    <p>
+    	To load and transform XML data you need an XML table model.
+    </p>
+    <pre>var table = new Active.XML.Table;</pre>
+    <p>
+    	Assign a URL of the XML file.
+    </p>
+    <pre>table.setProperty("URL", "simple.xml");</pre>
+    <p>
+    	By default the model looks at the documentElement as the data root.
+    	Then all child elements of the root are treated as rows and
+    	the child elements of each 	row node become the table cells.
+    	Exactly as this simple example looks like.
+    </p>
+    <p>
+    	Just load the file.
+    </p>
+    <pre>table.request();</pre>
+    <p>
+    	After the grid object is created
+    </p>
+    <pre>var obj = new Active.Controls.Grid;
+obj.setProperty("column/count", 5);</pre>
+    <p>
+    	it is assigned our new external data model.
+    </p>
+    <pre>obj.setModel("data", table);</pre>
+
+    <p>
+    	Don't forget to write the grid HTML to the page as usual.
+    </p>
+    <pre>document.write(obj);</pre>
+
+    <p>
+    	Full script:
+    </p>
+    <textarea id="grid1" wrap="off" style="HEIGHT:200px" target="height:300px">
+
+  var table = new Active.XML.Table;
+  table.setURL("simple.xml");
+  table.request();
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setModel("data", table);
+
+  document.write(obj);
+
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<html>
+<head>
+	<title>ActiveWidgets Grid :: Examples</title>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden;} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+	<!-- grid format -->
+	<style>
+		.active-controls-grid {height: 100%; font: menu;}
+
+		.active-column-0 {width: 80px;}
+		.active-column-1 {width: 80px; text-align: right; background-color: threedlightshadow;}
+		.active-column-2 {text-align: right;}
+		.active-column-3 {text-align: right;}
+		.active-column-4 {text-align: right;}
+		.active-column-5 {text-align: right;}
+		.active-column-6 {text-align: right;}
+		.active-column-7 {text-align: right;}
+		.active-column-8 {text-align: right;}
+
+		.active-grid-column {border-right: 1px solid threedshadow;}
+		.active-grid-row {border-bottom: 1px solid threedlightshadow;}
+	</style>
+</head>
+<body>
+	<script>
+
+	//	create ActiveWidgets data model - text-based table
+	var table = new Active.Text.Table;
+
+	//	Yahoo provides 15min delayed stock quotes in CSV format
+	var url = "http://finance.yahoo.com/d/quotes.csv?s=" +
+			  "MSFT,ORCL,SAP,CA,ERTS,SFTBF,VRTS,SYMC,INFY,INTU,ADBE,PSFT,SEBL,BEAS,SNPS,CHKP,MERQ,DOX,CTXS,KNM" +
+			  "&f=sl1d1t1c1ohgv&e=.csv";
+
+	//	set data URL
+	table.setURL(url);
+
+	//	start asyncronous data retrieval
+	table.request();
+
+	//	define column labels
+	var columnNames = ["Ticker", "Last", "Date", "Time", "Change", "Close", "Open", "High", "Volume"];
+	var columnOrder = [0, 1, 4, 8, 3, 2, 5, 6, 7];
+
+	//	create ActiveWidgets Grid javascript object
+	var obj = new Active.Controls.Grid;
+
+	//	provide column labels
+	obj.setColumnProperty("texts", columnNames);
+	obj.setColumnProperty("values", columnOrder);
+
+	//	provide external model as a grid data source
+	obj.setDataModel(table);
+
+	//	write grid html to the page
+	document.write(obj);
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<ArrayOfCompany xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://tempuri.org/">
+  <company>
+    <ticker>MSFT</ticker>
+    <name>Microsoft Corporation</name>
+    <marketcap>314571.156</marketcap>
+    <sales>32187</sales>
+    <employees>55000</employees>
+    <timestamp>2003-11-30T22:50:20.5945552+01:00</timestamp>
+  </company>
+  <company>
+    <ticker>ORCL</ticker>
+    <name>Oracle Corporation</name>
+    <marketcap>62615.27</marketcap>
+    <sales>9519</sales>
+    <employees>40650</employees>
+    <timestamp>2003-11-30T22:50:20.5945552+01:00</timestamp>
+  </company>
+  <company>
+    <ticker>SAP</ticker>
+    <name>SAP AG (ADR)</name>
+    <marketcap>40986.33</marketcap>
+    <sales>8296.42</sales>
+    <employees>28961</employees>
+    <timestamp>2003-11-30T22:50:20.5945552+01:00</timestamp>
+  </company>
+  <company>
+    <ticker>CA</ticker>
+    <name>Computer Associates Inter</name>
+    <marketcap>15606.34</marketcap>
+    <sales>3164</sales>
+    <employees>16000</employees>
+    <timestamp>2003-11-30T22:50:20.5945552+01:00</timestamp>
+  </company>
+  <company>
+    <ticker>ERTS</ticker>
+    <name>Electronic Arts Inc.</name>
+    <marketcap>14490.9</marketcap>
+    <sales>2503.73</sales>
+    <employees>4000</employees>
+    <timestamp>2003-11-30T22:50:20.5945552+01:00</timestamp>
+  </company>
+</ArrayOfCompany>

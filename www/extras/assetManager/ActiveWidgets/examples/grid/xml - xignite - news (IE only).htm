@@ -1,0 +1,38 @@
+<html>
+<head>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden; font: menu;} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+	<style>
+		.active-column-0 {width: 400px}
+	</style>
+
+</head>
+<body>
+	<script>
+
+	var date = new Active.Formats.Date;
+	date.setTextFormat("[ddd, d mmm]");
+
+	var data = new Active.XML.Table;
+	data.setURL("http://www.xignite.com/xWorldNews.asmx/GetTopStories");
+	data.setParameter("CriteriaType", "Region");
+	data.setParameter("CategoryName", "West Europe");
+	data.setParameter("StoryCount", 20);
+	data.setNamespace("xi", "http://www.xignite.com/services/");
+	data.setRows("//xi:Abstract");
+	data.setColumns(["xi:Title", "xi:Source", "xi:City", "xi:Language", "xi:InsertDate"]);
+	data.setFormat(date, 4);
+	data.request();
+
+	var obj = new Active.Controls.Grid;
+	obj.setDataModel(data);
+	obj.setColumnProperty("texts", ["Title", "Source", "City", "Language", "Date"]);
+	document.write(obj);
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<html>
+<head>
+	<title>ActiveWidgets Grid :: Examples</title>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden; font:menu} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+</head>
+<body>
+	<script>
+
+	//	create ActiveWidgets Grid javascript object
+	var obj = new Active.Controls.Grid;
+
+	//	set data
+	obj.setRowProperty("count", 5);
+	obj.setColumnProperty("count", 5);
+	obj.setDataProperty("text", function(i, j){return i + "." + j});
+
+	//	set column header tooltip
+	obj.setColumnProperty("tooltip", function(i){return "Tooltip for column " + i});
+
+	//	write grid html to the page
+	document.write(obj);
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<html>
+<head>
+    <title>ActiveWidgets :: DHTML Grid :: Mouseover effects.</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>Mouseover effects.
+    </h1>
+    <p>
+Mouseover effects require special handling to be fast enough.
+There are two global functions available just for this purpose (see /lib/system/html.js):
+    </p>
+    <p>
+function mouseover(element, name){...}<br>
+function mouseout(element, name){...}
+    </p>
+    <p>
+The first one adds a CSS class selector 'name' to the HTML element, the second removes it.
+    </p>
+    <p>
+To create mouseover effect you need first to define a CSS class:
+    </p>
+    <pre>&lt;style&gt;
+  .active-row-highlight {background-color: threedshadow}
+  .active-row-highlight .active-row-cell {background-color: threedshadow}
+&lt;/style&gt;</pre>
+    <p>
+        and add the following script
+    </p>
+    <pre>var row = new Active.Templates.Row;
+row.setEvent("onmouseover", "mouseover(this, 'active-row-highlight')");
+row.setEvent("onmouseout", "mouseout(this, 'active-row-highlight')");
+obj.setTemplate("row", row);</pre>
+    <p>
+	This is slightly different from normal syntax - where you supply a function as an event handler.
+	Here instead of a function you provide a string
+	which is simply assigned to HTML element "onmouseover" property and is evaluated on mouseover event.
+	</p>
+    <p>
+        Here is the complete script:
+    </p>
+    <textarea id="grid1" style="HEIGHT: 200px" target="height:180px">
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 10);
+  obj.setProperty("data/text", "some text");
+
+  var row = new Active.Templates.Row;
+  row.setEvent("onmouseover", "mouseover(this, 'active-row-highlight')");
+  row.setEvent("onmouseout", "mouseout(this, 'active-row-highlight')");
+  obj.setTemplate("row", row);
+
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+    <p>
+    </p>
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+
+</body>
+</html>

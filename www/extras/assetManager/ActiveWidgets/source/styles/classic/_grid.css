@@ -1,0 +1,145 @@
+/*****************************************************************
+
+	ActiveWidgets Grid 1.0.0 (Free Edition).
+	Copyright (C) 2004 ActiveWidgets Ltd. All Rights Reserved. 
+	More information at http://www.activewidgets.com/
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*****************************************************************/
+
+.active-controls-grid {
+	position: relative; /* this makes absolute positioning work in NS */
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	cursor: default;
+	-moz-user-focus: normal;
+	-moz-user-select: none; /* breaks resize capture */
+}
+
+.active-controls-grid.khtml {
+	width: auto;
+	height: 400px; /* ??? */
+}
+
+.active-templates-header {
+	display: inline;
+	width: 100px;
+	height: 100%;
+}
+
+.active-header-pressed {
+	border-color: threeddarkshadow threedhighlight threedhighlight threeddarkshadow;
+}
+
+.active-header-pressed .active-box-item {
+	position: relative;
+	left: 1px;
+	top: 1px;
+	border-color: threedface;
+}
+
+.active-templates-header.gecko {
+	display: -moz-inline-box;
+}
+
+.active-templates-header.khtml {
+	float: left;
+	height: 16px;
+}
+
+
+.active-templates-row {
+	overflow-y: hidden;
+	white-space: nowrap;
+	width: 100%;
+	height: 18px;
+	-moz-user-select: none;
+/*	border-bottom: 1px solid threedlightshadow; */
+}
+
+.active-templates-row.khtml {
+	margin-bottom: -1px;
+}
+
+.active-row-cell {
+	display: inline;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: 100px;
+	height: 100%;
+	padding: 0px 5px;
+/*	border-right: 1px solid threedshadow; */
+	line-height: 17px;
+}
+
+.active-row-cell.gecko {
+	display: -moz-inline-box;
+}
+
+.active-row-cell.khtml {
+	float: left;
+	padding: 0px 0px 0px 1px;
+	height: 18px;
+}
+
+
+.active-selection-true, .active-selection-true .active-row-cell {
+	color: highlighttext!important;
+	background-color: highlight!important;
+}
+
+.active-column-0  {z-index: 99}
+.active-column-1  {z-index: 98}
+.active-column-2  {z-index: 97}
+.active-column-3  {z-index: 96}
+.active-column-4  {z-index: 95}
+.active-column-5  {z-index: 94}
+.active-column-6  {z-index: 93}
+.active-column-7  {z-index: 92}
+.active-column-8  {z-index: 91}
+.active-column-9  {z-index: 90}
+.active-column-10 {z-index: 89}
+.active-column-11 {z-index: 88}
+.active-column-12 {z-index: 87}
+.active-column-13 {z-index: 86}
+.active-column-14 {z-index: 85}
+.active-column-15 {z-index: 84}
+.active-column-16 {z-index: 83}
+.active-column-17 {z-index: 82}
+.active-column-18 {z-index: 81}
+.active-column-19 {z-index: 80}
+
+.active-templates-text, .active-templates-image {
+	-moz-binding: url(gecko.xml#box);
+}
+
+.active-gecko-box {
+	-moz-box-flex: 1;
+	overflow: hidden; /* doesn't hide line/font overflow */
+	/* overflow: -moz-scrollbars-none; works OK but slow */
+	height: 100%;
+	width: 100%;
+}
+
+.active-scroll-left .active-box-normal.khtml {
+	width: auto;
+	height: 16px;
+}
+
+.active-templates-status, .active-templates-error {
+	padding: 5px;
+}

@@ -1,0 +1,63 @@
+<html>
+<head>
+    <title>ActiveWidgets :: DHTML Grid :: Changing the column width and visual style.</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Changing the column width and visual style.
+    </h1>
+    <p>
+		You can apply the CSS rules to a particular column using the .active-column-n selector,
+		where n is a datasource index of your column.
+    </p>
+    <pre>&lt;style&gt;
+    .active-column-1 {
+    	width: 200px;
+    	color: #000099;
+    	background: #ffffcc;
+    	text-align: right;
+    	font-weight: bold;
+    }
+&lt;/style&gt;</pre>
+    <p>
+		CSS rules apply both to column cells and column header.
+    </p>
+    <p>
+		Same thing in javascript (cells only):
+    </p>
+
+    <textarea id="grid1" wrap="off" style="HEIGHT:260px" target="height:100px">
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 5);
+  obj.setProperty("data/text", "some text...");
+
+  var column = new Active.Templates.Text;
+  column.setStyle("color", "#000099");
+  column.setStyle("background", "#ffffcc");
+  column.setStyle("text-align", "right");
+  column.setStyle("font-weight", "bold");
+
+  obj.setTemplate("column", column, 1);
+
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+
+    <p>
+        <a href="style.htm">Back to Visual Style</a>
+    </p>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

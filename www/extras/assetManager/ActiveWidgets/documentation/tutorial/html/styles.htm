@@ -1,0 +1,59 @@
+<html>
+<head>
+    <title>ActiveWidgets Tutorial</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+<script>document.write(window.$header)</script>
+
+<div class="image-home">
+</div>
+<div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt;
+</div>
+<h1>HTML styles (CSS attributes)
+</h1>
+<p>
+	Function <code>setStyle(name, value)</code> allows assigning the value of the CSS attribute (style).
+</p>
+
+<textarea id="script1" style="height:135px" target="height:25px">
+
+ var obj = new Active.HTML.DIV;
+ obj.setStyle("width", "300px");
+ obj.setStyle("height", "2em");
+ obj.setStyle("border", "2px outset");
+ obj.setStyle("background-color", "buttonface");
+ document.write(obj);
+</textarea>
+
+<script>if(window.site) site.example("script1");</script>
+
+<p>
+	The style can be either a static value or a function.
+	The function will be evaluated each time the object is written to the page
+	or when the <code>refresh()</code> method is called.
+</p>
+
+<textarea id="script2" style="height:90px" target="height:25px">
+
+ var obj = new Active.HTML.INPUT;
+ obj.setStyle("width", function(){return 100 + 200});
+ document.write(obj);
+</textarea>
+
+<script>if(window.site) site.example("script2");</script>
+
+<h3>
+	See also:
+</h3>
+<p>
+	<a href="../../reference/active.system.html/getstyle.htm"><i>getStyle(name)</i></a><br>
+	<a href="../../reference/active.system.html/setstyle.htm"><i>setStyle(name, value)</i></a><br>
+</p>
+
+<script>document.write(window.$column)</script>
+<script>document.write(window.$tutorial)</script>
+<script>document.write(window.$footer)</script>
+</body>
+</html>

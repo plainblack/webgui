@@ -1,0 +1,60 @@
+<html>
+<head>
+    <title>ActiveWidgets Tutorial</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Controlling data selection.
+    </h1>
+    <p>
+		Grid has built-in selection model, which supports single and multiple rows selection mode.
+		You can specify if multiple selection is allowed in 'selection/multiple' property:
+    </p>
+    <pre>obj.setProperty("selection/multiple", true);</pre>
+    <p>
+		The index of the last selected row is stored in 'selection/index' property:
+    </p>
+    <pre>var index = obj.getProperty("selection/index");</pre>
+    <p>
+		While 'selection/values' property returns an array of all selected rows:
+    </p>
+    <pre>var array = obj.getProperty("selection/values");</pre>
+    <p>
+		Grid calls 'selectionChanged' action so you can attach an action handler to process selection event.
+    </p>
+    <pre>obj.setAction("selectionChanged", myFunction);</pre>
+    <p>
+		Multiple selection is activated if the Ctrl key is pressed during mouse clicks.
+    </p>
+    <textarea id="grid1" wrap="off" style="HEIGHT:300px" target="height:200px">
+
+  var obj = new Active.Controls.Grid;
+  obj.setProperty("column/count", 5);
+  obj.setProperty("row/count", 20);
+  obj.setProperty("data/text", "some text");
+  obj.setProperty("selection/multiple", true);
+
+  var message = function(){
+    window.status = "Grid selection:" +
+    " latest=" + this.getProperty("selection/index") +
+    " full list=" + this.getProperty("selection/values") +
+    " (press Ctrl- to select multiple rows)."
+  }
+
+  obj.setAction("selectionChanged", message);
+  document.write(obj);
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

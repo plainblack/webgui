@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<bindings id="activeui"
+	xmlns="http://www.mozilla.org/xbl"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<binding id="box">
+		<content>
+			<html:div class="active-gecko-box">
+				<children/>
+			</html:div>
+		</content>
+	</binding>
+	<binding id="item">
+		<content>
+			<html:div class="active-gecko-item">
+				<children/>
+			</html:div>
+		</content>
+	</binding>
+	<binding id="resize">
+		<implementation>
+			<constructor>
+				var self = this;
+				this._resize = function(event){self.onresize(event)};
+				window.addEventListener("resize", this._resize, false);
+				this.onresize({type:"resize"});
+			</constructor>
+			<destructor>
+				window.removeEventListener("resize", this._resize, false);
+				this._resize = null;
+			</destructor>
+		</implementation>
+	</binding>
+	<binding id="mouse">
+		<implementation>
+			<constructor>
+				var self = this;
+				this._mouseenter = function(event){
+					if (!self.getAttribute("onmouseenter")) {return}
+					(new Function(self.getAttribute("onmouseenter"))).call(self, event);
+				};
+				this._mouseleave = function(event){
+					if (!self.getAttribute("onmouseleave")) {return}
+					(new Function(self.getAttribute("onmouseleave"))).call(self, event);
+				};
+				this.addEventListener("mouseover", this._mouseenter, false);
+				this.addEventListener("mouseout", this._mouseleave, false);
+			</constructor>
+			<destructor>
+				this.removeEventListener("mouseover", this._mouseenter, false);
+				this.removeEventListener("mouseout", this._mouseleave, false);
+				this._mouseenter = null;
+				this._mouseleave = null;
+			</destructor>
+		</implementation>
+	</binding>
+</bindings>

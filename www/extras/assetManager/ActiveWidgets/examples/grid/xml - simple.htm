@@ -1,0 +1,53 @@
+<html>
+<head>
+	<title>ActiveWidgets Grid :: Examples</title>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden;} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+	<!-- grid format -->
+	<style>
+		.active-controls-grid {height: 100%; font: menu;}
+
+		.active-column-0 {width:  80px;}
+		.active-column-1 {width: 200px; background-color: threedlightshadow;}
+		.active-column-2 {text-align: right;}
+		.active-column-3 {text-align: right;}
+		.active-column-4 {text-align: right;}
+
+		.active-grid-column {border-right: 1px solid threedshadow;}
+		.active-grid-row {border-bottom: 1px solid threedlightshadow;}
+	</style>
+</head>
+<body>
+	<script>
+
+	//	create ActiveWidgets data model - XML-based table
+	var table = new Active.XML.Table;
+
+	//	provide data URL
+	table.setURL("../data/companies-simple.xml");
+
+	//	start asyncronous data retrieval
+	table.request();
+
+	//	define column labels
+	var columns = ["Ticker", "Company Name", "Market Cap.", "$ Sales", "Employees"];
+
+	//	create ActiveWidgets Grid javascript object
+	var obj = new Active.Controls.Grid;
+
+	//	provide column labels
+	obj.setColumnProperty("texts", columns);
+
+	//	provide external model as a grid data source
+	obj.setDataModel(table);
+
+	//	write grid html to the page
+	document.write(obj);
+
+	</script>
+</body>
+</html>

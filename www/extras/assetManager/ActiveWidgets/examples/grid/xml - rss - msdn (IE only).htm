@@ -1,0 +1,36 @@
+<html>
+<head>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden; font: menu;} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+	<style>
+		.active-column-0 {width: 400px}
+		.active-column-1 {text-align: right}
+	</style>
+
+</head>
+<body>
+	<script>
+
+	var string = new Active.Formats.String;
+	var date   = new Active.Formats.Date;
+	date.setTextFormat("d mmm");
+	date.setDataFormat("RFC822");
+
+	var data = new Active.XML.Table;
+	data.setURL("http://msdn.microsoft.com/rss.xml");
+	data.setRows("//item");
+	data.setFormats([string, date]);
+	data.request();
+
+	var obj = new Active.Controls.Grid;
+	obj.setDataModel(data);
+	obj.setColumnProperty("texts", ["Title", "Date"]);
+	document.write(obj);
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<html>
+<title>ActiveWidgets Reference :: Active.System.HTML</title>
+<script src="../../../common/site.js"></script>
+<link href="../../../common/site.css" rel="stylesheet" type="text/css" ></link>
+<body class="reference">
+<script>document.write(window.$header)</script>
+<div class="image-home"></div>
+<div class="location">:: Documentation &gt;&gt; Reference &gt;&gt;</div>
+<h1>Active.System.HTML</h1><p>Generic base class for building and manipulating HTML markup.</p>
+<p>Objects, which  have visual representation, are most likely
+subclasses of this generic HTML class. It provides a set of
+functions to define attributes, inline styles, stylesheet
+selectors, DOM events and inner HTML content either as static
+properties or calls to the object’s methods. Direct or implicit
+call to ‘toString’ method returns properly formatted HTML
+markup string, which can be used in document.write() call or
+assigned to the page innerHTML property.</p>
+<p>The two-way linking between original javascript object and
+it’s DOM counterpart is maintained through the use of unique ID for
+each object. This allows forwarding DOM events back to the
+proper javascript master object and, if necessary, updating
+the correct piece of HTML on the page.</p>
+<h2>Constructor Syntax</h2>
+<p><i>var obj = new Active.System.HTML;</i></p>
+<h2>Class Hierarchy</h2>
+<table style='font-size:0.9em!important'><tr><td style='padding:0px'><div style='padding:0px 50px 0px 0px;'><i>Parent Classes:</i><br /><a href="../active.system.object/index.htm">Active.System.Object</a>
+<div style='padding-left:20px'><a href="../active.system.html/index.htm">Active.System.HTML</a>
+<div style='padding-left:20px'></div></div></div>
+</td><td style='border-left:1px dotted threedshadow'><div style='padding-left:50px'><i>Derived Classes:</i><br /><a href="../active.system.template/index.htm">Active.System.Template</a><br />
+<a href="../active.html.div/index.htm">Active.HTML.DIV</a><br />
+<a href="../active.html.span/index.htm">Active.HTML.SPAN</a><br />
+<a href="../active.html.img/index.htm">Active.HTML.IMG</a><br />
+<a href="../active.html.input/index.htm">Active.HTML.INPUT</a><br />
+<a href="../active.html.button/index.htm">Active.HTML.BUTTON</a><br />
+<a href="../active.html.textarea/index.htm">Active.HTML.TEXTAREA</a><br />
+<a href="../active.html.table/index.htm">Active.HTML.TABLE</a><br />
+<a href="../active.html.tr/index.htm">Active.HTML.TR</a><br />
+<a href="../active.html.td/index.htm">Active.HTML.TD</a><br />
+</div>
+</td></tr></table><h2>Public Methods</h2>
+<p><table class="summary">
+<tr><td class="name"><a href="element.htm">element</a></td><td>Returns a reference to the HTML element.</td></tr>
+<tr><td class="name"><a href="getattribute.htm">getAttribute</a></td><td>Returns HTML attribute.</td></tr>
+<tr><td class="name"><a href="getclass.htm">getClass</a></td><td>Returns CSS selector.</td></tr>
+<tr><td class="name"><a href="getcontent.htm">getContent</a></td><td>Returns static HTML content.</td></tr>
+<tr><td class="name"><a href="getevent.htm">getEvent</a></td><td>Returns HTML event handler.</td></tr>
+<tr><td class="name"><a href="getid.htm">getId</a></td><td>Returns unique ID for the object.</td></tr>
+<tr><td class="name"><a href="getstyle.htm">getStyle</a></td><td>Returns inline CSS attribute.</td></tr>
+<tr><td class="name"><a href="gettag.htm">getTag</a></td><td>Returns HTML tag for the object.</td></tr>
+<tr><td class="name"><a href="init.htm">init</a></td><td>Initializes the object.</td></tr>
+<tr><td class="name"><a href="refresh.htm">refresh</a></td><td>Updates HTML on the page.</td></tr>
+<tr><td class="name"><a href="refreshclasses.htm">refreshClasses</a></td><td>Updates CSS selectors string for an element.</td></tr>
+<tr><td class="name"><a href="setattribute.htm">setAttribute</a></td><td>Sets HTML attribute.</td></tr>
+<tr><td class="name"><a href="setclass.htm">setClass</a></td><td>Sets CSS selector.</td></tr>
+<tr><td class="name"><a href="setcontent.htm">setContent</a></td><td>Sets static HTML content.</td></tr>
+<tr><td class="name"><a href="setevent.htm">setEvent</a></td><td>Sets HTML event handler.</td></tr>
+<tr><td class="name"><a href="setid.htm">setId</a></td><td>Sets ID string for an element.</td></tr>
+<tr><td class="name"><a href="setstyle.htm">setStyle</a></td><td>Sets inline CSS attribute.</td></tr>
+<tr><td class="name"><a href="settag.htm">setTag</a></td><td>Sets HTML tag for the object.</td></tr>
+<tr><td class="name"><a href="tostring.htm">toString</a></td><td>Returns HTML markup string for the object.</td></tr>
+</table></p>
+<script>document.write(window.$column)</script>
+<script>document.write(window.$reference)</script>
+<script>document.write(window.$footer)</script>
+</body>
+</html>

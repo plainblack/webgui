@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>ActiveWidgets Tutorial</title>
+    <link href="../../../common/site.css" type="text/css" rel="stylesheet" />
+    <script src="../../../common/site.js"></script>
+</head>
+<body class="tutorial">
+    <script>document.write(window.$header)</script>
+    <div class="image-home">
+    </div>
+    <div class="location">:: Documentation &gt;&gt; Tutorial &gt;&gt; Grid &gt;&gt;
+    </div>
+    <h1>
+    	Number formatting.
+    </h1>
+    <p>
+		It is quite common that you need to store data in one format and display it in another.
+		This is where data formatting classes may help.
+    </p>
+    <p>
+		First you need to create an instance of the formatting object.
+    </p>
+    <pre>var format = new Active.Formats.Number;</pre>
+    <p>
+		Then configure it - set proper format patterns.
+    </p>
+    <pre>format.setTextFormat("USD #,###.###");</pre>
+    <p>
+		Now you can call one of the transformation methods.
+    </p>
+    <pre>var text = format.dataToText(data);</pre>
+    <p>
+    	Example:
+    </p>
+    <textarea id="grid1" wrap="off" style="HEIGHT:185px" target="height:50px">
+
+  var data = 1234567.89;
+
+  var format = new Active.Formats.Number;
+  format.setTextFormat("USD #,###.###");
+
+  var text = format.dataToText(data);
+
+  document.write("data = ", data, "<br>");
+  document.write("text = ", text, "<br>");
+</textarea>
+    <script>if(window.site) site.example("grid1");</script>
+
+    <p>
+        <a href="formats.htm">Back to formats</a>
+    </p>
+
+    <script>document.write(window.$column)</script>
+    <script>document.write(window.$tutorial)</script>
+    <script>document.write(window.$footer)</script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<html>
+<head>
+	<title>ActiveWidgets Grid :: Examples</title>
+	<style> body, html {margin:0px; padding: 0px; overflow: hidden;} </style>
+
+	<!-- ActiveWidgets stylesheet and scripts -->
+	<link href="../../runtime/styles/classic/grid.css" rel="stylesheet" type="text/css" ></link>
+	<script src="../../runtime/lib/grid.js"></script>
+
+	<!-- grid format -->
+	<style>
+		.active-controls-grid {height: 100%; font: menu;}
+
+		.active-column-0 {width:  80px;}
+		.active-column-1 {width: 200px; background-color: threedlightshadow;}
+		.active-column-2 {text-align: right;}
+		.active-column-3 {text-align: right;}
+		.active-column-4 {text-align: right;}
+
+		.active-grid-column {border-right: 1px solid threedshadow;}
+		.active-grid-row {border-bottom: 1px solid threedlightshadow;}
+	</style>
+</head>
+<body>
+	<xml id="xmlDataIsland">
+		<companies>
+			<company>
+				<ticker>MSFT</ticker>
+				<name>Microsoft Corporation</name>
+				<mktcap>314,571.156</mktcap>
+				<sales>32,187.000</sales>
+				<employees>55000</employees>
+			</company>
+			<company>
+				<ticker>ORCL</ticker>
+				<name>Oracle Corporation</name>
+				<mktcap>62,615.266</mktcap>
+				<sales>9,519.000</sales>
+				<employees>40650</employees>
+			</company>
+			<company>
+				<ticker>SAP</ticker>
+				<name>SAP AG (ADR)</name>
+				<mktcap>40,986.328</mktcap>
+				<sales>8,296.420</sales>
+				<employees>28961</employees>
+			</company>
+			<company>
+				<ticker>CA</ticker>
+				<name>Computer Associates Inter</name>
+				<mktcap>15,606.335</mktcap>
+				<sales>3,164.000</sales>
+				<employees>16000</employees>
+			</company>
+			<company>
+				<ticker>ERTS</ticker>
+				<name>Electronic Arts Inc.</name>
+				<mktcap>14,490.895</mktcap>
+				<sales>2,503.727</sales>
+				<employees>4000</employees>
+			</company>
+			<company>
+				<ticker>SFTBF</ticker>
+				<name>Softbank Corp. (ADR)</name>
+				<mktcap>14,485.840</mktcap>
+				<sales>.000</sales>
+				<employees>6865</employees>
+			</company>
+			<company>
+				<ticker>VRTS</ticker>
+				<name>Veritas Software Corp.</name>
+				<mktcap>14,444.272</mktcap>
+				<sales>1,578.658</sales>
+				<employees>5647</employees>
+			</company>
+			<company>
+				<ticker>SYMC</ticker>
+				<name>Symantec Corporation</name>
+				<mktcap>9,932.483</mktcap>
+				<sales>1,482.029</sales>
+				<employees>4300</employees>
+			</company>
+			<company>
+				<ticker>INFY</ticker>
+				<name>Infosys Technologies Ltd.</name>
+				<mktcap>9,763.851</mktcap>
+				<sales>830.748</sales>
+				<employees>15400</employees>
+			</company>
+			<company>
+				<ticker>INTU</ticker>
+				<name>Intuit Inc.</name>
+				<mktcap>9,702.477</mktcap>
+				<sales>1,650.743</sales>
+				<employees>6700</employees>
+			</company>
+			<company>
+				<ticker>ADBE</ticker>
+				<name>Adobe Systems Incorporate</name>
+				<mktcap>9,533.050</mktcap>
+				<sales>1,230.817</sales>
+				<employees>3341</employees>
+			</company>
+			<company>
+				<ticker>PSFT</ticker>
+				<name>PeopleSoft, Inc.</name>
+				<mktcap>8,246.467</mktcap>
+				<sales>1,941.167</sales>
+				<employees>8180</employees>
+			</company>
+			<company>
+				<ticker>SEBL</ticker>
+				<name>Siebel Systems, Inc.</name>
+				<mktcap>5,434.649</mktcap>
+				<sales>1,417.952</sales>
+				<employees>5909</employees>
+			</company>
+			<company>
+				<ticker>BEAS</ticker>
+				<name>BEA Systems, Inc.</name>
+				<mktcap>5,111.813</mktcap>
+				<sales>965.694</sales>
+				<employees>3063</employees>
+			</company>
+			<company>
+				<ticker>SNPS</ticker>
+				<name>Synopsys, Inc.</name>
+				<mktcap>4,482.535</mktcap>
+				<sales>1,169.786</sales>
+				<employees>4254</employees>
+			</company>
+			<company>
+				<ticker>CHKP</ticker>
+				<name>Check Point Software Tech</name>
+				<mktcap>4,396.853</mktcap>
+				<sales>424.769</sales>
+				<employees>1203</employees>
+			</company>
+			<company>
+				<ticker>MERQ</ticker>
+				<name>Mercury Interactive Corp.</name>
+				<mktcap>4,325.488</mktcap>
+				<sales>444.063</sales>
+				<employees>1822</employees>
+			</company>
+			<company>
+				<ticker>DOX</ticker>
+				<name>Amdocs Limited</name>
+				<mktcap>4,288.017</mktcap>
+				<sales>1,427.088</sales>
+				<employees>9400</employees>
+			</company>
+			<company>
+				<ticker>CTXS</ticker>
+				<name>Citrix Systems, Inc.</name>
+				<mktcap>3,946.485</mktcap>
+				<sales>554.222</sales>
+				<employees>1670</employees>
+			</company>
+			<company>
+				<ticker>KNM</ticker>
+				<name>Konami Corporation (ADR)</name>
+				<mktcap>3,710.784</mktcap>
+				<sales>.000</sales>
+				<employees>4313</employees>
+			</company>
+		</companies>
+	</xml>
+	<script>
+
+	//	create ActiveWidgets data model - XML-based table
+	var table = new Active.XML.Table;
+
+	//  get reference to the xml data island node
+	var xml, node = document.getElementById("xmlDataIsland");
+
+	//	IE
+	if (window.ActiveXObject) {
+		xml = node;
+	}
+	//	Mozilla
+	else {
+		xml = document.implementation.createDocument("","", null);
+		xml.appendChild(node.selectSingleNode("*"));
+	}
+
+	//	provide data XML
+	table.setXML(xml);
+
+	//	define column labels
+	var columns = ["Ticker", "Company Name", "Market Cap.", "$ Sales", "Employees"];
+
+	//	create ActiveWidgets Grid javascript object
+	var obj = new Active.Controls.Grid;
+
+	//	provide column labels
+	obj.setColumnProperty("texts", columns);
+
+	//	provide external model as a grid data source
+	obj.setDataModel(table);
+
+	//	write grid html to the page
+	document.write(obj);
+
+	</script>
+</body>
+</html>
