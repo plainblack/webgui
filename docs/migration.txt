@@ -1,0 +1,45 @@
+WebGUI 6.x Plugin Migration Guide
+---------------------------------
+
+This document is provided by the WebGUI 6.x development team in order to help
+you migrate your WebGUI 5.x plugins to the new API's.
+
+CONTENTS
+
+  I. Wobject Migration
+ II. Macro Migration
+III. Authentication Migration
+ IV. Scheduler Migration
+  V. System Changes Affecting Migration
+
+
+
+I. Wobject Migration
+--------------------
+There have currently been no changes to the Wobject API.
+
+
+
+II. Macro Migration
+-------------------
+There have currently been no changes to the macro API.
+
+
+
+III. Authentication Migration
+-----------------------------
+There have currently been no changes to the authentication API.
+
+
+
+IV. Scheduler Migration
+-----------------------
+There have currently been no changes to the scheduler API.
+
+
+
+V. System Changes Affecting Migration
+-------------------------------------
+There have currently been no changes to the system that would affect any normal
+use of the API's by plugins.
+
