@@ -257,44 +257,40 @@ sub getIndexerParams {
 	my $now = shift;
 	return {
 		Product => {
-                        sql => "select Product.wobjectId as wid,
-                                        Product.image1 as image1,
-                                        Product.image2 as image2,
-                                        Product.image3 as image3,
-                                        Product.brochure as brochure,
-                                        Product.manual as manual,
-                                        Product.warranty as warranty,
-                                        Product.price as price,
-                                        Product.productNumber as productNumber,
-                                        Product_benefit.benefit as benefit,
-                                        Product_feature.feature as feature,
-                                        Product_specification.name as name,
-                                        Product_specification.value as value,
-                                        Product_specification.units as units,
-                                        wobject.namespace as namespace,
-                                        wobject.addedBy as ownerId,
-                                        page.urlizedTitle as urlizedTitle,
-                                        page.languageId as languageId,
-                                        page.pageId as pageId,
-                                        page.groupIdView as page_groupIdView,
-                                        wobject.groupIdView as wobject_groupIdView,
-                                        7 as wobject_special_groupIdView
-                                        from Product, wobject, page
-                                        left join Product_benefit on Product_benefit.wobjectId=Product.wobjectId
-                                        left join Product_feature on Product_feature.wobjectId=Product.wobjectId
-                                        left join Product_specification on Product_specification.wobjectId=Product.wobjectId
-                                        where Product.wobjectId = wobject.wobjectId
-                                        and wobject.pageId = page.pageId
-                                        and wobject.startDate < $now 
-                                        and wobject.endDate > $now
-                                        and page.startDate < $now
-                                        and page.endDate > $now",
+                        sql => "select Product.assetId,
+					Product.image1,
+					Product.image2,
+					Product.image3,
+					Product.brochure,
+					Product.manual,
+					Product.warranty,
+					Product.price,
+					Product.productNumber,
+					Product_benefit.benefit,
+					Product_feature.feature,
+					Product_specification.name,
+					Product_specification.value,
+					Product_specification.units,
+					asset.ownerUserId as ownerId,
+					asset.url,
+					asset.groupIdView,
+					asset.title,
+					asset.menuTitle,
+					asset.className,
+					asset.synopsis
+				from Product, asset
+					left join Product_benefit on Product_benefit.assetId=Product.assetId
+					left join Product_feature on Product_feature.assetId=Product.assetId
+					left join Product_specification on Product_specification.assetId=Product.assetId
+				where Product.assetId = asset.assetId 
+                                        and asset.startDate < $now
+                                        and asset.endDate > $now",
                         fieldsToIndex => ["image1", "image2", "image3", "brochure", "manual", "warranty", "price", 
                                           "productNumber", "benefit", "feature", "name", "value", "units"],
-                        contentType => 'wobjectDetail',
-                        url => 'WebGUI::URL::append($data{urlizedTitle}, "func=view&wid=$data{wid}")',
-                        headerShortcut => 'select title from wobject where wobjectId = \'$data{wid}\'',
-                        bodyShortcut => 'select description from wobject where wobjectId = \'$data{wid}\'',
+                        contentType => 'assetDetail',
+                        url => 'WebGUI::URL::gateway($data{url})',
+                        headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
+                        bodyShortcut => 'select synopsis from asset where assetId = \'$data{asssetId}\'',
                 }
 	};
 }
