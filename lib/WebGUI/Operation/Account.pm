@@ -440,7 +440,7 @@ sub www_login {
                 $auth = $ldap->bind(dn=>$u->connectDN, password=>$session{form}{identifier});
                 if ($auth->code == 48 || $auth->code == 49) {
 			$error = WebGUI::International::get(68);
-			WebGUI::ErrorHandler::warn("Invalid login for user account: ".$session{form}{username});
+			WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
                 	_logLogin($uid,"invalid username/password");
 		} elsif ($auth->code > 0) {
 			$error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured.';
@@ -456,7 +456,7 @@ sub www_login {
 			$success = 1;
 		} else {
 			$error = WebGUI::International::get(68);
-			WebGUI::ErrorHandler::warn("Invalid login for user account: ".$session{form}{username});
+			WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 			_logLogin($uid,"invalid username/password");
 		}
 	}

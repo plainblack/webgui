@@ -96,6 +96,17 @@ sub fatalError {
 }
 
 #-------------------------------------------------------------------
+sub security {
+        my ($log, $data);
+        $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for audit.");
+        $data = localtime(time)." ".$0." SECURITY: ".$session{user}{username}." (".$session{user}{userId}
+		.") connecting from ".$session{env}{REMOTE_ADDR}." attempted to ".$_[0]."\n";
+        print $log $data;
+        $session{debug}{security} .= $data."<p>";
+        $log->close;
+}
+
+#-------------------------------------------------------------------
 sub warn {
         my ($log);
         $log = FileHandle->new(">>".$session{config}{logfile}) or fatalError("Can't open log file for warning.");

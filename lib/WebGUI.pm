@@ -31,55 +31,64 @@ sub page {
 		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash, $canEdit);
 	WebGUI::Session::open($_[0],$_[1]);
 	if (exists $session{form}{op}) {
-		$cmd = "WebGUI::Operation::www_".$session{form}{op};
-		$operationOutput = eval($cmd);
-		WebGUI::ErrorHandler::warn("Non-existent operation called: $session{form}{op}.") if($@);
+		if ($session{form}{op} =~ /^[A-Za-z]+$/) {
+			$cmd = "WebGUI::Operation::www_".$session{form}{op};
+			$operationOutput = eval($cmd);
+			WebGUI::ErrorHandler::security("call a non-existent operation: $session{form}{op}.") if($@);
+		} else {
+			WebGUI::ErrorHandler::security("execute an invalid operation: ".$session{form}{op});
+		}
 	}
 	if (exists $session{form}{func} && exists $session{form}{wid}) {
-		if ($session{form}{wid} eq "new") {
-			$wobject = {wobjectId=>"new",namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};
-		} else {
-			$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId=".$session{form}{wid});	
-			if (${$wobject}{namespace} eq "") {
-				WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or "
-					."corrupt, but was requested "
-					."by $session{user}{username} [$session{user}{userId}].");
-				$wobject = ();
+		if ($session{form}{func} =~ /^[A-Za-z]+$/) {
+			if ($session{form}{wid} eq "new") {
+				$wobject = {wobjectId=>"new",namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};
 			} else {
-				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} 
-					where wobjectId=${$wobject}{wobjectId}");
-                        	tie %hash, 'Tie::CPHash';
-                        	%hash = (%{$wobject},%{$extra});
-                         	$wobject = \%hash;
-			}
-		}
-		if ($wobject) {
-                        if (${$wobject}{pageId} != $session{page}{pageId}) {
-                                ($proxyWobjectId) = WebGUI::SQL->quickArray("select wobject.wobjectId from wobject,WobjectProxy 
-                                        where wobject.wobjectId=WobjectProxy.wobjectId 
-					and wobject.pageId=".$session{page}{pageId}."
-                                        and WobjectProxy.proxiedWobjectId=".${$wobject}{wobjectId});
-                                ${$wobject}{_WobjectProxy} = $proxyWobjectId;
-                        } 
-			unless (${$wobject}{pageId} == $session{page}{pageId} || ${$wobject}{pageId} == 2 || ${$wobject}{_WobjectProxy} ne "") {
-				$wobjectOutput .= WebGUI::International::get(417);
-				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}
-					."] attempted to access wobject ["
-					.$session{form}{wid}."] on page '".$session{page}{title}."' ["
-					.$session{page}{pageId}."].");
-			} else {
-				if (WebGUI::Privilege::canViewPage()) {
-					$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-					$w = eval{$cmd->new($wobject)};
-					WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
-					$cmd = "www_".$session{form}{func};
-					$wobjectOutput = eval{$w->$cmd};
-					WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wobject: ${$wobject}{namespace} / $session{form}{func}. Root Cause: ".$@) if($@);
+				$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId="
+					.$session{form}{wid});	
+				if (${$wobject}{namespace} eq "") {
+					WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or "
+						."corrupt, but was requested "
+						."by $session{user}{username} [$session{user}{userId}].");
+					$wobject = ();
 				} else {
-					$wobjectOutput = WebGUI::Privilege::noAccess();
+					$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} 
+						where wobjectId=${$wobject}{wobjectId}");
+                        		tie %hash, 'Tie::CPHash';
+                        		%hash = (%{$wobject},%{$extra});
+                         		$wobject = \%hash;
 				}
 			}
-		}
+			if ($wobject) {
+                        	if (${$wobject}{pageId} != $session{page}{pageId}) {
+                                	($proxyWobjectId) = WebGUI::SQL->quickArray("select wobject.wobjectId from 
+						wobject,WobjectProxy 
+                                        	where wobject.wobjectId=WobjectProxy.wobjectId 
+						and wobject.pageId=".$session{page}{pageId}."
+                                        	and WobjectProxy.proxiedWobjectId=".${$wobject}{wobjectId});
+                                	${$wobject}{_WobjectProxy} = $proxyWobjectId;
+                        	} 
+				unless (${$wobject}{pageId} == $session{page}{pageId} || ${$wobject}{pageId} == 2 || ${$wobject}{_WobjectProxy} ne "") {
+					$wobjectOutput .= WebGUI::International::get(417);
+					WebGUI::ErrorHandler::security("access wobject [".$session{form}{wid}."] on page '"
+						.$session{page}{title}."' [".$session{page}{pageId}."].");
+				} else {
+					if (WebGUI::Privilege::canViewPage()) {
+						$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+						$w = eval{$cmd->new($wobject)};
+						WebGUI::ErrorHandler::fatalError("Couldn't instanciate wobject: ${$wobject}{namespace}. Root Cause: ".$@) if($@);
+						$cmd = "www_".$session{form}{func};
+						$wobjectOutput = eval{$w->$cmd};
+						WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace} / $session{form}{func}. Root cause: ".$@) if($@);
+					} else {
+						$wobjectOutput = WebGUI::Privilege::noAccess();
+					}
+				}
+			}
+                } else {
+                        WebGUI::ErrorHandler::security("execute an invalid function on wobject "
+				.$session{form}{wid}.": ".$session{form}{func});
+                }
 	}
 	if ($session{header}{mimetype} ne "text/html") {
 		$httpHeader = WebGUI::Session::httpHeader();
@@ -145,7 +154,7 @@ sub page {
 					$contentHash{${$wobject}{templatePosition}} .= '<div class="wobject'.${$wobject}{namespace}.'" id="wobjectId'.${$wobject}{wobjectId}.'">';
 					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>';
 					$contentHash{${$wobject}{templatePosition}} .= eval{$w->www_view};
-					WebGUI::ErrorHandler::fatalError("No view method in wobject: ${$wobject}{namespace}. Root cause: ".$@) if($@);
+					WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 					$contentHash{${$wobject}{templatePosition}} .= "</div>\n\n";
 				}
 			}
@@ -158,6 +167,7 @@ sub page {
 	}
         if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3))) {
 		$debug = '<div style="background-color: #ffdddd;color: #000000;">'.$session{debug}{warning}.'</div>';
+		$debug .= '<div style="background-color: #800000;color: #ffffff;">'.$session{debug}{security}.'</div>';
 		$debug .= '<div style="background-color: #ffffdd;color: #000000;">'.$session{debug}{audit}.'</div>';
                 $debug .= '<table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
                 while (my ($section, $hash) = each %session) {
