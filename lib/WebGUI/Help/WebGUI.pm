@@ -113,6 +113,10 @@ our $HELP = {
 		body => '632',
 		related => [
 			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+			{
 				tag => 'article add/edit',
 				namespace => 'Article'
 			},
@@ -385,6 +389,10 @@ our $HELP = {
 		title => '669',
 		body => '624',
 		related => [
+			{
+				tag => 'asset macros',
+				namespace => 'Asset'
+			},
 			{
 				tag => 'navigation macros',
 				namespace => 'WebGUI'
