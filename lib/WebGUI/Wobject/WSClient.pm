@@ -281,7 +281,11 @@ sub www_view {
       . " cache_key=$cache_key md5_hex($call, $param_str)");
    $cache = WebGUI::Cache->new($cache_key,
       WebGUI::International::get(4, $self->get('namespace')));
-   @result = Storable::thaw($cache->get);
+
+   # passing a form param WSClient_skipCache lets us ignore even good caches
+   if (!$session{'form'}{'WSClient_skipCache'}) {
+      @result = Storable::thaw($cache->get);
+   }
    
    # prep SOAP unless we found cached data
    if (!$result[0]) {
