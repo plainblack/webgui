@@ -41,7 +41,7 @@ sub _reversePageTree {
 			}
 			$output .= '</a><br>';
                 	if ($_[1] == $data[0] && $_[2] ne "") {
-        			$output .= '<table cellpadding=0 cellspacing=0 border=0 class="verticalMenu"><tr><td>&nbsp;&nbsp;&nbsp;</td><td>'.$_[2].'</td></tr></table>';
+        			$output .= '<table cellpadding=0 cellspacing=0 border=0 class="verticalMenu"><tr><td class="verticalMenu">&nbsp;&nbsp;&nbsp;</td><td class="verticalMenu">'.$_[2].'</td></tr></table>';
                 	}
 		}
         }
