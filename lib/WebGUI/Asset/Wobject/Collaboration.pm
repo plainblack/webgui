@@ -158,6 +158,13 @@ sub appendTemplateLabels {
 }
 
 #-------------------------------------------------------------------
+sub canEdit {
+        my $self = shift;
+        return ((($session{form}{func} eq "add" || ($session{form}{assetId} eq "new" && $session{form}{func} eq "editSave" && $session{form}{class} eq "WebGUI::Asset::Post::Thread")) && $self->canPost) || # account for new posts
+                $self->SUPER::canEdit());
+}
+
+#-------------------------------------------------------------------
 sub canModerate {
 	my $self = shift;
 	return WebGUI::Grouping::isInGroup($self->get("moderateGroupId")) || $self->canEdit;
@@ -286,7 +293,7 @@ sub definition {
 				},
 			allowRichEdit =>{
 				fieldType=>"yesNo",
-				defaultValue=>1
+				defaultValue=>0
 				},
 			attachmentsPerPost =>{
 				fieldType=>"integer",

@@ -2377,14 +2377,14 @@ Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset
 
 sub www_editSave {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $object;
 	if ($session{form}{assetId} eq "new") {
-		$object = $self->addChild({className=>$session{form}{class}});	
-		$object->{_parent} = $self;
-	} else {
-		$object = $self;
-	}
+                $object = $self->addChild({className=>$session{form}{class}});
+                $object->{_parent} = $self;
+        } else {
+                $object = $self;
+        }
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
 	return $self->www_manageAssets if ($session{form}{proceed} eq "manageAssets" && $session{form}{assetId} eq "new");

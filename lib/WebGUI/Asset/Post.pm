@@ -41,7 +41,8 @@ our @ISA = qw(WebGUI::Asset);
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-	return ($session{form}{func} eq "add" && $self->getThread->getParent->canPost) || 
+	return (($session{form}{func} eq "add" || ($session{form}{assetId} eq "new" && $session{form}{func} eq "editSave" && $session{form}{class} eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
+
 		($self->isPoster && $self->getThread->getParent->get("editTimeout") > (WebGUI::DateTime::time() - $self->get("dateUpdated"))) ||
 		$self->getThread->getParent->canModerate;
 
@@ -621,7 +622,8 @@ sub processPropertiesFromFormPost {
 			ownerUserId => $session{user}{userId},
 			groupIdView => $self->getThread->getParent->get("groupIdView"),
 			groupIdEdit => $self->getThread->getParent->get("groupIdEdit"),
-			isHidden => 1
+			isHidden => 1,
+			dateSubmitted=>time()
 			);
 		if ($self->getThread->getParent->canModerate) {
         		$self->getThread->lock if ($session{form}{'lock'});

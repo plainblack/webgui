@@ -195,7 +195,7 @@ sub getEditForm {
 		   );
 
 	   # Add a "Add another query" button
-	   if ($nr < 5	and ($self->get("dbQuery".($nr+1)) eq "" || ($_[0]->get("dbQuery".($nr)) eq "" and $_[0]->get("dbQuery".($nr+1)) ne ""))) {
+	   if ($nr < 5	and ($self->get("dbQuery".($nr+1)) eq "" || ($self->get("dbQuery".($nr)) eq "" and $self->get("dbQuery".($nr+1)) ne ""))) {
 	           $tabform->getTab("properties")->button(
         	           -value=>WebGUI::International::get('Add another query',"SQLReport"),
                 	   -extras=>'onClick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
@@ -204,7 +204,7 @@ sub getEditForm {
 	   }
 
 	   # Make empty query blocks invisible
-           if ($nr > 1 && ($self->get("dbQuery".$nr) eq "" || $_[0]->get("dbQuery".($nr-1)) eq "")) {
+           if ($nr > 1 && ($self->get("dbQuery".$nr) eq "" || $self->get("dbQuery".($nr-1)) eq "")) {
 		$tabform->getTab("properties")->raw(qq|
                         <script language="javascript">
                                 toggleQuery('$nr');

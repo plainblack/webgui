@@ -546,7 +546,7 @@ sub view {
         $var->{'user.isModerator'} = $self->getParent->canModerate;
         $var->{'user.canPost'} = $self->getParent->canPost;
         $var->{'user.canReply'} = $self->canReply;
-        $var->{'repliesAllowed'} = $self->getParent->("allowReplies");
+        $var->{'repliesAllowed'} = $self->getParent->get("allowReplies");
 
         $var->{'layout.nested.url'} = $self->getLayoutUrl("nested");
         $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");
@@ -573,7 +573,8 @@ sub view {
 		left join Thread on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=asset.assetId
 		where asset.lineage like ".quote($self->get("lineage").'%')
-		."	and (
+		."	and asset.state='published'
+			and (
 				Post.status in ('approved','archived')";
 	$sql .= "		or Post.status='pending'" if ($self->getParent->canModerate);
 	$sql .= "		or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
