@@ -104,7 +104,7 @@ sub generate {
 
 	# Disable printing of HTTP Header if requested.
 	if($self->get('noHttpHeader')) {
-		$session{page}{noHttpHeader} = 1;
+		WebGUI::HTTP::setNoHeader(1);
 	}
 
 	# Set alternate Site URL

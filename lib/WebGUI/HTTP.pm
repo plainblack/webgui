@@ -33,7 +33,8 @@ use WebGUI::HTTP;
  $header = WebGUI::HTTP::getHeader();
  WebGUI::HTTP::setRedirect($url);
  WebGUI::HTTP::setCookie($name,$value);
-
+ WebGUI::HTTP::setNoHeader($bool);
+ 
 =head1 METHODS
 
 These subroutines are available from this package:
@@ -51,7 +52,7 @@ Generates an HTTP header.
 =cut
 
 sub getHeader {
-	return undef if ($session{page}{noHttpHeader});	
+	return undef if ($session{http}{noHeader});	
 	my $header;
 	unless (exists $session{http}{location}) {
 		unless ($session{http}{charset}) {
@@ -195,6 +196,26 @@ sub setMimeType {
 	$session{http}{mimetype} = shift;
 }
 
+#-------------------------------------------------------------------
+
+=head2 setNoHeader ( boolean )
+
+Disables the printing of a HTTP header. Useful in situations when content is not
+returned to a browser (export to disk for example).
+
+=over
+
+=item boolean 
+
+Any value other than 0 will disable header printing.
+
+=back
+
+=cut
+
+sub setNoHeader {
+        $session{http}{noHeader} = shift;
+}
 
 #-------------------------------------------------------------------
 

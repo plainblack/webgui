@@ -234,6 +234,7 @@ sub process {
 		unless (-f $file->getPath) {
 	                WebGUI::ErrorHandler::warn("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
         	        $params{scalarref} = \$template;
+			delete $params{filename};
         	}
 	}
 	return _execute(\%params,$vars);
