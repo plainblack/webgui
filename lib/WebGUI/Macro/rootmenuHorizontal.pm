@@ -12,7 +12,6 @@ package WebGUI::Macro::rootmenuHorizontal;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Macro::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;

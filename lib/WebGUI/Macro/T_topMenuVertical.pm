@@ -12,20 +12,21 @@ package WebGUI::Macro::T_topMenuVertical;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Macro::Shared;
+use WebGUI::Navigation;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @param);
+        my ($temp, @param, $tree);
         @param = WebGUI::Macro::getParams($_[0]);
         $temp = '<span class="verticalMenu">';
         if ($param[0] ne "") {
-        	$temp .= traversePageTree(1,0,$param[0]);
+                $tree = WebGUI::Navigation::tree(1,$param[0]);
         } else {
-        	$temp .= traversePageTree(1,0,1);
+                $tree = WebGUI::Navigation::tree(1,1);
         }
+        $temp .= WebGUI::Navigation::drawVertical($tree);
         $temp .= '</span>';
-	return $temp;
+        return $temp;
 }
 
 #-------------------------------------------------------------------

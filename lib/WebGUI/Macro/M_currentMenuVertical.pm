@@ -12,19 +12,20 @@ package WebGUI::Macro::M_currentMenuVertical;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Macro::Shared;
+use WebGUI::Navigation;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($output, $temp, @param);
+        my ($tree, $temp, @param);
         @param = WebGUI::Macro::getParams($_[0]);
         $temp = '<span class="verticalMenu">';
         if ($param[0] ne "") {
-        	$temp .= traversePageTree($session{page}{pageId},0,$param[0]);
+        	$tree = WebGUI::Navigation::tree($session{page}{pageId},$param[0]);
         } else {
-        	$temp .= traversePageTree($session{page}{pageId},0,1);
+        	$tree = WebGUI::Navigation::tree($session{page}{pageId},1);
         }
+	$temp .= WebGUI::Navigation::drawVertical($tree);
         $temp .= '</span>';
 	return $temp;
 }

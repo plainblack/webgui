@@ -12,19 +12,20 @@ package WebGUI::Macro::P_previousMenuVertical;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Macro::Shared;
+use WebGUI::Navigation;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @param);
+        my ($temp, @param, $tree);
         @param = WebGUI::Macro::getParams($_[0]);
         $temp = '<span class="verticalMenu">';
         if ($param[0] ne "") {
-        	$temp .= traversePageTree($session{page}{parentId},0,$param[0]);
+        	$tree = WebGUI::Navigation::tree($session{page}{parentId},$param[0]);
         } else {
-                $temp .= traversePageTree($session{page}{parentId},0,1);
+                $tree = WebGUI::Navigation::tree($session{page}{parentId},1);
         }
+	$temp .= WebGUI::Navigation::drawVertical($tree);
         $temp .= '</span>';
 	return $temp;
 }

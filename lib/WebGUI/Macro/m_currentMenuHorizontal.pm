@@ -12,35 +12,16 @@ package WebGUI::Macro::m_currentMenuHorizontal;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Privilege;
+use WebGUI::Navigation;
 use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @data, $sth, $first, @param, $delimeter);
+        my ($temp, @param, $tree);
         @param = WebGUI::Macro::getParams($_[0]);
-        if ($param[0] eq "") {
-                $delimeter = " &middot; ";
-        } else {
-                $delimeter = " ".$param[0]." ";
-        }
+	$tree = WebGUI::Navigation::tree($session{page}{pageId},1);
         $temp = '<span class="horizontalMenu">';
-        $first = 1;
-        $sth = WebGUI::SQL->read("select menuTitle,urlizedTitle,pageId from page where parentId=$session{page}{pageId} order by sequenceNumber");
-        while (@data = $sth->array) {
-        	if (WebGUI::Privilege::canViewPage($data[2])) {
-                	if ($first) {
-                        	$first = 0;
-                        } else {
-                        	$temp .= $delimeter;
-                        }
-                        $temp .= '<a class="horizontalMenu" href="'.WebGUI::URL::gateway($data[1]).
-				'">'.$data[0].'</a>';
-                }
-        }
-        $sth->finish;
+	$temp .= WebGUI::Navigation::drawHorizontal($tree,$param[0]);
         $temp .= '</span>';
 	return $temp;
 }

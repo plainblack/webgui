@@ -12,42 +12,17 @@ package WebGUI::Macro::s_specificMenuHorizontal;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Macro::Shared;
-use WebGUI::Privilege;
+use WebGUI::Navigation;
 use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @data, $pageTitle, $parentId, $sth, $first, @param, $delimeter);
+        my ($temp, $tree, $parentId, @param);
 	@param = WebGUI::Macro::getParams($_[0]);
-	if ($param[1] eq "") {
-                $delimeter = " &middot; ";
-        } else {
-                $delimeter = " ".$param[1]." ";
-        }
         $temp = '<span class="horizontalMenu">';
-        $first = 1;
         ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$param[0]'");
-        $sth = WebGUI::SQL->read("select menuTitle,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber");
-        while (@data = $sth->array) {
-        	if (WebGUI::Privilege::canViewPage($data[2])) {
-                	if ($first) {
-                        	$first = 0;
-                        } else {
-                                $temp .= $delimeter;
-                        }
-                        $temp .= '<a class="horizontalMenu" href="'.WebGUI::URL::gateway($data[1]).'">';
-                        if ($session{page}{pageId} == $data[2]) {
-                                $temp .= '<span class="selectedMenuItem">'.$data[0].'</span>';
-                        } else {
-                                $temp .= $data[0];
-                        }
-                        $temp .= '</a>';
-                }
-        }
-        $sth->finish;
+	$tree = WebGUI::Navigation::tree($parentId,1);
+	$temp .= WebGUI::Navigation::drawHorizontal($tree,$param[1]);
         $temp .= '</span>';
 	return $temp;
 }

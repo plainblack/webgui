@@ -12,24 +12,25 @@ package WebGUI::Macro::S_specificMenuVertical;
 
 use strict;
 use WebGUI::Macro;
-use WebGUI::Macro::Shared;
-use WebGUI::Privilege;
+use WebGUI::Navigation;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _replacement {
-        my ($temp, @param, @data);
+        my ($temp, @param, $pageId, $tree);
         @param = WebGUI::Macro::getParams($_[0]);
-        if ($param[1] eq "") {
-        	$param[1] = 0;
+        ($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$param[0]'");
+        if (defined $pageId) {
+        	$temp = '<span class="verticalMenu">';
+		if ($param[1] ne "") {
+			$tree = WebGUI::Navigation::tree($pageId,$param[1]);
+		} else {
+			$tree = WebGUI::Navigation::tree($pageId,1);
+		}
+		$temp .= WebGUI::Navigation::drawVertical($tree);
+        	$temp .= '</span>';
         }
-        @data = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$param[0]'");
-        $temp = '<span class="verticalMenu">';
-        if (defined $data[0] && WebGUI::Privilege::canViewPage($data[0])) {
-        	$temp .= traversePageTree($data[0],1,$param[1]);
-        }
-        $temp .= '</span>';
 	return $temp;
 }
 
