@@ -2,7 +2,8 @@ WebGUI 6.x Plugin Migration Guide
 ---------------------------------
 
 This document is provided by the WebGUI 6.x development team in order to help
-you migrate your WebGUI 5.x plugins to the new API's.
+you migrate your WebGUI 5.x plugins to the new API's. If you are not a WebGUI
+developer then this file won't make a lot of sense.
 
 CONTENTS
 
@@ -168,6 +169,16 @@ See WebGUI::Id for more information.
 
 We've switched to a new Plain Old Documentation (POD) format. See Ruling
 WebGUI for details.
+
+
+5.11 Internationalization and URLs
+
+In 6.3 we moved URL compliance to the language file. We did this because the
+non-latin characterset languages were having trouble with WebGUI generated
+URLs. So now they can write in their own handlers to deal with WebGUI
+generated URLs. If your language uses a latin character set, you can just copy
+the makeUrlCompliant subroutine from lib/WebGUI/i18n/English.pm into your
+language file.
 
 
 

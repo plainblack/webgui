@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.3.0
+--------------------------------------------------------------------
+ * If you're using languages other than English, you'll need to get
+	new versions of those language files before upgrading. The
+	language file format has a new requirement.
+
+
 6.2.8
 --------------------------------------------------------------------
  * Due to a bug in the theme system, if you created any themes in any

@@ -31,6 +31,7 @@
  - Fixed a redirect loop problem.
  - Fixed a user profile vulnerability.
  - Fixed a sequence ordering problem with the USS.
+ - Added internationalized URL handling.
 
 
 6.2.8
