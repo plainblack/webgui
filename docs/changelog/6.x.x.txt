@@ -72,5 +72,8 @@ webgui.
  - The Events Calendar is now 100% template driven.
  - The Events Calendar now allows for more than one drawn calendar per page.
    Choose with your pagination options.
+ - Added options for developers for an empty style
+   $session{page}{useEmptyStyle} and added settings to the template table to
+   to allow templates to be hidden from forms and/or management.
 
 

@@ -51,6 +51,12 @@ $sth->finish;
 WebGUI::SQL->write("delete from incrementer where incrementerId='styleId'");
 WebGUI::SQL->write("delete from settings where name='docTypeDec'");
 WebGUI::SQL->write("drop table style");
+WebGUI::SQL->write("alter table template add column isEditable int not null default 1");
+WebGUI::SQL->write("alter table template add column showInForms int not null default 1");
+WebGUI::SQL->write("update template set showInForms=0 where namespace='style' and templateId=10");
+WebGUI::SQL->write("update template set isEditable=0, showInForms=0 where namespace='style' and templateId in (1,2,4,5)");
+WebGUI::SQL->write("insert into template (templateId, name, template, namespace, isEditable, showInForms) values (6,'Empty','<tmpl_var body.content>','style',0,0)");
+
 my @templateManagers = WebGUI::SQL->buildArray("select userId from groupings where groupId=8");
 my $clause;
 if ($#templateManagers > 0) {
