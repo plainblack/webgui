@@ -208,6 +208,16 @@ The URL where the user will be redirected.
 		context => 'Help text for redirects'
 	},
 
+	'current file' => {
+		message => q|Current file|,
+		lastUpdated => 1106609809
+	},
+
+	'new file' => {
+		message => q|New file to upload|,
+		lastUpdated => 1106609855
+	},
+
 	'errorEmptyField' => {
 		message => q|<p><b>Error: Field name may not be empty.</b></p>|,
 		lastUpdated => 1089039511
