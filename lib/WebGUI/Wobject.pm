@@ -412,9 +412,10 @@ The name of the property to retrieve the value for.
 =cut
 
 sub getValue {
+	my $currentValue = $_[0]->get($_[1]);
 	if (exists $session{form}{$_[1]}) {
 		return $session{form}{$_[1]};
-	} elsif (defined $_[0]->get($_[1])) {
+	} elsif (defined $currentValue) {
 		return $_[0]->get($_[1]);
 	} else {
 		return $_[0]->getDefaultValue($_[1]);

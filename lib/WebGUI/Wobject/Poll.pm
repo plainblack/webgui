@@ -72,7 +72,8 @@ sub new {
 				}, 
 			question=>{}, 
 			randomizeAnswers=>{
-				defaultValue=>1
+				defaultValue=>1,
+				fieldType=>"yesNo"
 				},
 			a1=>{}, 
 			a2=>{}, 
@@ -107,7 +108,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($i, $active, $voteGroup, $graphWidth, $answers, $randomizeAnswers);
+        my ($i, $answers);
 	for ($i=1; $i<=20; $i++) {
                 if ($_[0]->get('a'.$i) =~ /\C/) {
                         $answers .= $_[0]->getValue("a".$i)."\n";
@@ -154,7 +155,7 @@ sub www_edit {
 	$layout->yesNo(
 		-name=>"randomizeAnswers",
 		-label=>WebGUI::International::get(72,$_[0]->get("namespace")),
-		-value=>$randomizeAnswers
+		-value=>$_[0]->getValue("randomizeAnswers")
 		);
 	my $output = $_[0]->SUPER::www_edit(
 		-layout=>$layout->printRowsOnly,
