@@ -1302,13 +1302,17 @@ sub www_editSave {
 	my %set;
 	foreach my $key (keys %{$_[0]->{_wobjectProperties}}) {
 		if (exists $session{form}{$key}) {
-			$set{$key} = _validateField($key,$_[0]->{_wobjectProperties}{$key}{fieldType}) || $_[0]->{_wobjectProperties}{$key}{defaultValue};
+			$set{$key} = _validateField($key,$_[0]->{_wobjectProperties}{$key}{fieldType});
+		} else {
+			$set{$key} = $_[0]->{_wobjectProperties}{$key}{defaultValue};
 		}
 	}
 	$set{title} = $session{form}{title} || $_[0]->name;
 	foreach my $key (keys %{$_[0]->{_extendedProperties}}) {
 		if (exists $session{form}{$key}) {	
-			$set{$key} = _validateField($key,$_[0]->{_extendedProperties}{$key}{fieldType}) || $_[0]->{_extendedProperties}{$key}{defaultValue};
+			$set{$key} = _validateField($key,$_[0]->{_extendedProperties}{$key}{fieldType});
+		} else {
+			$set{$key} = $_[0]->{_extendedProperties}{$key}{defaultValue};
 		}
 	}
 	%set = (%set, %{$_[1]});
