@@ -521,6 +521,7 @@ sub getSetting {
 }
 
 #-------------------------------------------------------------------
+
 =head2 init ( )
 
 Initialization function for these auth routines.  Default is a superclass function called displayLogin.
@@ -575,6 +576,7 @@ sub login {
 }
 
 #-------------------------------------------------------------------
+
 =head2 logout ( )
 
 Superclass method that performs standard logout routines.

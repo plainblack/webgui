@@ -215,7 +215,7 @@ Returns a select list and a text field. If the text box is filled out it will ha
 
 =item name
 
- The name field for this form element.
+The name field for this form element.
 
 =item options
 
