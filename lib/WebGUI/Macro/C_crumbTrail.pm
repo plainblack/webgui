@@ -42,7 +42,7 @@ sub process {
                 $delimeter = " ".$param[0]." ";
         }
         $temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId},$delimeter).
-		'<a href="'.WebGUI::URL::page().'">'.$session{page}{menuTitle}.'</a></span>';
+		'<a class="crumbTrail" href="'.WebGUI::URL::page().'">'.$session{page}{menuTitle}.'</a></span>';
 	return $temp;
 }
 
