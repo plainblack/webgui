@@ -100,9 +100,9 @@ foreach $config (keys %config) {
 		print "\n".$config{$config}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n";
 		print "\tBacking up $config{$config}{db} ($upgrade{$upgrade}{from}).\n";
 		mkdir($backupDir."/db/".$config{$config}{db});
-		system($mysqldump." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass}." --add-drop-table ".$config{$config}{db}." > ".$backupDir."/db/".$config{$config}{db}."/".$upgrade{$upgrade}{from}.".sql");
+		system($mysqldump." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass}." --add-drop-table --databases ".$config{$config}{db}." > ".$backupDir."/db/".$config{$config}{db}."/".$upgrade{$upgrade}{from}.".sql");
 		print "\tUpgrading to $upgrade{$upgrade}{to}.\n";
-		system($mysql." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass}." --add-drop-table ".$config{$config}{db}." < ".$upgrade{$upgrade}{sql});
+		system($mysql." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass}." --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql});
 		$config{$config}{version} = $upgrade{$upgrade}{to};
 	}
 }

@@ -464,7 +464,6 @@ sub showReplyTree {
 				'</td><td class="tableHeader">'.WebGUI::International::get(245).'</td></tr>';
 			@data = WebGUI::SQL->quickArray("select messageId,subject,username,dateOfPost,userId,status
 				from discussion where messageId=$message{rid}");
-                	$data[1] = WebGUI::HTML::filter($data[1],'all');
                 	$html .= '<tr';
                 	if ($session{form}{mid} eq $message{rid}) {
                         	$html .= ' class="highlight"';

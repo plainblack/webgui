@@ -1249,7 +1249,7 @@ sub www_showMessage {
         ($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where wobjectId=".$_[0]->get("wobjectId"));
         $session{form}{mid} = $session{form}{mid} || $defaultMid || 0;
         $output = WebGUI::Discussion::showMessage($_[1],$_[0]);
-        $output .= WebGUI::Discussion::showThreads();
+        $output .= WebGUI::Discussion::showReplyTree();
         return $output;
 }
 
