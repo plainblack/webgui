@@ -62,7 +62,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into SQLReport set widgetId=$widgetId, convertCarriageReturns='$session{form}{convertCarriageReturns}', template=".quote($session{form}{template}).", dBquery=".quote($session{form}{dbQuery}).", DSN=".quote($session{form}{DSN}).", username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier}),$session{dbh});
+		WebGUI::SQL->write("insert into SQLReport values($widgetId, ".quote($session{form}{template}).", ".quote($session{form}{dbQuery}).", ".quote($session{form}{DSN}).", ".quote($session{form}{username}).", ".quote($session{form}{identifier}).", '$session{form}{convertCarriageReturns}')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

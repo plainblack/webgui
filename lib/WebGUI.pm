@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "1.1.0";
+our $VERSION = "1.2.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -129,7 +129,6 @@ sub page {
 	} elsif ($functionOutput ne "") {
 		$content = $functionOutput;
 	} else {
-		#if (WebGUI::Privilege::canViewPage($session{page}{pageId})) {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {
                         	$content .= '<a href="'.$session{page}{url}.'?op=editPage"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?op=cutPage"><img src="'.$session{setting}{lib}.'/cut.gif" border=0></a><a href="'.$session{page}{url}.'?op=deletePage"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=movePageUp"><img src="'.$session{setting}{lib}.'/leftArrow.gif" border=0></a><a href="'.$session{page}{url}.'?op=movePageDown"><img src="'.$session{setting}{lib}.'/rightArrow.gif" border=0></a>';

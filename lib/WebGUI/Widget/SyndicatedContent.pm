@@ -55,7 +55,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into SyndicatedContent set widgetId=$widgetId, rssUrl=".quote($session{form}{rssUrl}).", content='Not yet fetched.'",$session{dbh});
+		WebGUI::SQL->write("insert into SyndicatedContent values ($widgetId, ".quote($session{form}{rssUrl}).", 'Not yet fetched.', '".time()."')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

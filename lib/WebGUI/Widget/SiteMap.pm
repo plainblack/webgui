@@ -72,7 +72,7 @@ sub www_addSave {
 	my ($widgetId, $displayTitle, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into SiteMap set widgetId=$widgetId, startAtThisLevel='$session{form}{startAtThisLevel}', showOnlyThisLevel='$session{form}{showOnlyThisLevel}'",$session{dbh});
+		WebGUI::SQL->write("insert into SiteMap values ($widgetId, '$session{form}{startAtThisLevel}', '$session{form}{showOnlyThisLevel}')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

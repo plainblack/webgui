@@ -23,14 +23,17 @@ sub getStyle {
 		$footer = '</body></html>'; 
 	} else {
 		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}",$session{dbh});
-		$header = '<html>
-			<!-- WebGUI '.$session{wg}{version}.' -->
+		$header = '<!-- WebGUI '.$WebGUI::VERSION.' -->
+			<html>
 			<head>
-			<title>'.$session{page}{title}.'</title>'.$style{styleSheet}.$session{page}{metaTags}.'
+			<title>'.$session{page}{title}.'</title>
+			'.$style{styleSheet}.'
+			'.$session{page}{metaTags}.'
 			<script language="JavaScript" src="'.$session{setting}{lib}.'/WebGUI.js"></script>
 			</head>
 			'.$style{header};
-		$footer = $style{footer}.'</html>';
+		$footer = $style{footer}.'
+			</html>';
 		$header = WebGUI::Macro::process($header);
 		$footer = WebGUI::Macro::process($footer);
 	}

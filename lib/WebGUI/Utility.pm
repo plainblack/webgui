@@ -18,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&getNextId &saveAttachment &humanToMysqlDate &round &urlizeTitle &quote);
+our @EXPORT = qw(&getNextId &saveAttachment &round &urlizeTitle &quote);
 
 #-------------------------------------------------------------------
 sub getNextId {
@@ -26,12 +26,6 @@ sub getNextId {
 	($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'",$session{dbh});
 	WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'",$session{dbh});
         return $id;
-}
-
-#-------------------------------------------------------------------
-sub humanToMysqlDate {
- 	my ($month, $day, $year) = split(/\//,$_[0]);
-	return $year.'-'.$month.'-'.$day.' 00:00:00';
 }
 
 #-------------------------------------------------------------------

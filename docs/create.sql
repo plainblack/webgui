@@ -10,8 +10,8 @@
 
 CREATE TABLE Article (
   widgetId int(11) default NULL,
-  startDate datetime default NULL,
-  endDate datetime default NULL,
+  startDate int(11) default NULL,
+  endDate int(11) default NULL,
   body text,
   image varchar(255) default NULL,
   linkTitle varchar(255) default NULL,
@@ -157,7 +157,7 @@ CREATE TABLE SyndicatedContent (
   widgetId int(11) NOT NULL default '0',
   rssUrl text,
   content text,
-  lastFetched datetime NOT NULL default '0000-00-00 00:00:00',
+  lastFetched int(11) default NULL,
   PRIMARY KEY  (widgetId)
 ) TYPE=MyISAM;
 
@@ -184,23 +184,6 @@ CREATE TABLE UserSubmission (
 
 
 #
-# Table structure for table 'dict'
-#
-
-CREATE TABLE dict (
-  url_id int(11) NOT NULL default '0',
-  word varchar(32) NOT NULL default '',
-  intag int(11) NOT NULL default '0',
-  KEY url_id (url_id),
-  KEY word_url (word)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'dict'
-#
-
-
-#
 # Table structure for table 'event'
 #
 
@@ -209,8 +192,8 @@ CREATE TABLE event (
   widgetId int(11) default NULL,
   name varchar(255) default NULL,
   description text,
-  startDate datetime default NULL,
-  endDate datetime default NULL,
+  startDate int(11) default NULL,
+  endDate int(11) default NULL,
   PRIMARY KEY  (eventId)
 ) TYPE=MyISAM;
 
@@ -419,7 +402,7 @@ CREATE TABLE message (
   username varchar(30) default NULL,
   subject varchar(255) default NULL,
   message text,
-  dateOfPost datetime default NULL,
+  dateOfPost int(11) default NULL,
   PRIMARY KEY  (messageId)
 ) TYPE=MyISAM;
 
@@ -497,27 +480,13 @@ CREATE TABLE pollAnswer (
 
 
 #
-# Table structure for table 'robots'
-#
-
-CREATE TABLE robots (
-  hostinfo varchar(127) NOT NULL default '',
-  path varchar(127) NOT NULL default ''
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'robots'
-#
-
-
-#
 # Table structure for table 'session'
 #
 
 CREATE TABLE session (
   sessionId varchar(60) NOT NULL default '',
-  expires datetime default NULL,
-  lastPageView datetime default NULL,
+  expires int(11) default NULL,
+  lastPageView int(11) default NULL,
   adminOn int(11) NOT NULL default '0',
   lastIP varchar(50) default NULL,
   PRIMARY KEY  (sessionId)
@@ -527,7 +496,6 @@ CREATE TABLE session (
 # Dumping data for table 'session'
 #
 
-INSERT INTO session VALUES ('3|yJFcoK2pMVyHw','2001-09-16 03:09:06','2001-09-15 19:22:26',1,'10.0.0.20');
 
 #
 # Table structure for table 'settings'
@@ -557,583 +525,6 @@ INSERT INTO settings VALUES ('ldapId','shortname');
 INSERT INTO settings VALUES ('ldapIdName','LDAP Shortname');
 INSERT INTO settings VALUES ('ldapPasswordName','LDAP Password');
 INSERT INTO settings VALUES ('authMethod','WebGUI');
-
-#
-# Table structure for table 'stopword'
-#
-
-CREATE TABLE stopword (
-  word char(32) NOT NULL default '',
-  lang char(2) NOT NULL default '',
-  PRIMARY KEY  (word,lang)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'stopword'
-#
-
-INSERT INTO stopword VALUES ('a','en');
-INSERT INTO stopword VALUES ('about','en');
-INSERT INTO stopword VALUES ('above','en');
-INSERT INTO stopword VALUES ('abst','en');
-INSERT INTO stopword VALUES ('accordance','en');
-INSERT INTO stopword VALUES ('according','en');
-INSERT INTO stopword VALUES ('accordingly','en');
-INSERT INTO stopword VALUES ('across','en');
-INSERT INTO stopword VALUES ('act','en');
-INSERT INTO stopword VALUES ('actually','en');
-INSERT INTO stopword VALUES ('added','en');
-INSERT INTO stopword VALUES ('adj','en');
-INSERT INTO stopword VALUES ('adopted','en');
-INSERT INTO stopword VALUES ('affected','en');
-INSERT INTO stopword VALUES ('affecting','en');
-INSERT INTO stopword VALUES ('affects','en');
-INSERT INTO stopword VALUES ('after','en');
-INSERT INTO stopword VALUES ('afterwards','en');
-INSERT INTO stopword VALUES ('again','en');
-INSERT INTO stopword VALUES ('against','en');
-INSERT INTO stopword VALUES ('ah','en');
-INSERT INTO stopword VALUES ('all','en');
-INSERT INTO stopword VALUES ('almost','en');
-INSERT INTO stopword VALUES ('alone','en');
-INSERT INTO stopword VALUES ('along','en');
-INSERT INTO stopword VALUES ('already','en');
-INSERT INTO stopword VALUES ('also','en');
-INSERT INTO stopword VALUES ('although','en');
-INSERT INTO stopword VALUES ('always','en');
-INSERT INTO stopword VALUES ('am','en');
-INSERT INTO stopword VALUES ('among','en');
-INSERT INTO stopword VALUES ('amongst','en');
-INSERT INTO stopword VALUES ('an','en');
-INSERT INTO stopword VALUES ('and','en');
-INSERT INTO stopword VALUES ('announce','en');
-INSERT INTO stopword VALUES ('another','en');
-INSERT INTO stopword VALUES ('any','en');
-INSERT INTO stopword VALUES ('anyhow','en');
-INSERT INTO stopword VALUES ('anymore','en');
-INSERT INTO stopword VALUES ('anyone','en');
-INSERT INTO stopword VALUES ('anything','en');
-INSERT INTO stopword VALUES ('anywhere','en');
-INSERT INTO stopword VALUES ('apparently','en');
-INSERT INTO stopword VALUES ('approximately','en');
-INSERT INTO stopword VALUES ('are','en');
-INSERT INTO stopword VALUES ('aren','en');
-INSERT INTO stopword VALUES ('arent','en');
-INSERT INTO stopword VALUES ('arise','en');
-INSERT INTO stopword VALUES ('around','en');
-INSERT INTO stopword VALUES ('as','en');
-INSERT INTO stopword VALUES ('aside','en');
-INSERT INTO stopword VALUES ('at','en');
-INSERT INTO stopword VALUES ('auth','en');
-INSERT INTO stopword VALUES ('available','en');
-INSERT INTO stopword VALUES ('away','en');
-INSERT INTO stopword VALUES ('b','en');
-INSERT INTO stopword VALUES ('back','en');
-INSERT INTO stopword VALUES ('be','en');
-INSERT INTO stopword VALUES ('became','en');
-INSERT INTO stopword VALUES ('because','en');
-INSERT INTO stopword VALUES ('become','en');
-INSERT INTO stopword VALUES ('becomes','en');
-INSERT INTO stopword VALUES ('becoming','en');
-INSERT INTO stopword VALUES ('been','en');
-INSERT INTO stopword VALUES ('before','en');
-INSERT INTO stopword VALUES ('beforehand','en');
-INSERT INTO stopword VALUES ('begin','en');
-INSERT INTO stopword VALUES ('beginning','en');
-INSERT INTO stopword VALUES ('beginnings','en');
-INSERT INTO stopword VALUES ('begins','en');
-INSERT INTO stopword VALUES ('behind','en');
-INSERT INTO stopword VALUES ('being','en');
-INSERT INTO stopword VALUES ('below','en');
-INSERT INTO stopword VALUES ('beside','en');
-INSERT INTO stopword VALUES ('besides','en');
-INSERT INTO stopword VALUES ('between','en');
-INSERT INTO stopword VALUES ('beyond','en');
-INSERT INTO stopword VALUES ('billion','en');
-INSERT INTO stopword VALUES ('biol','en');
-INSERT INTO stopword VALUES ('both','en');
-INSERT INTO stopword VALUES ('briefly','en');
-INSERT INTO stopword VALUES ('but','en');
-INSERT INTO stopword VALUES ('by','en');
-INSERT INTO stopword VALUES ('c','en');
-INSERT INTO stopword VALUES ('ca','en');
-INSERT INTO stopword VALUES ('came','en');
-INSERT INTO stopword VALUES ('can','en');
-INSERT INTO stopword VALUES ('cannot','en');
-INSERT INTO stopword VALUES ('cant','en');
-INSERT INTO stopword VALUES ('certain','en');
-INSERT INTO stopword VALUES ('certainly','en');
-INSERT INTO stopword VALUES ('co','en');
-INSERT INTO stopword VALUES ('co.','en');
-INSERT INTO stopword VALUES ('come','en');
-INSERT INTO stopword VALUES ('contains','en');
-INSERT INTO stopword VALUES ('could','en');
-INSERT INTO stopword VALUES ('couldnt','en');
-INSERT INTO stopword VALUES ('d','en');
-INSERT INTO stopword VALUES ('date','en');
-INSERT INTO stopword VALUES ('did','en');
-INSERT INTO stopword VALUES ('didnt','en');
-INSERT INTO stopword VALUES ('different','en');
-INSERT INTO stopword VALUES ('do','en');
-INSERT INTO stopword VALUES ('does','en');
-INSERT INTO stopword VALUES ('doesnt','en');
-INSERT INTO stopword VALUES ('doing','en');
-INSERT INTO stopword VALUES ('done','en');
-INSERT INTO stopword VALUES ('dont','en');
-INSERT INTO stopword VALUES ('down','en');
-INSERT INTO stopword VALUES ('due','en');
-INSERT INTO stopword VALUES ('during','en');
-INSERT INTO stopword VALUES ('e','en');
-INSERT INTO stopword VALUES ('each','en');
-INSERT INTO stopword VALUES ('ed','en');
-INSERT INTO stopword VALUES ('effect','en');
-INSERT INTO stopword VALUES ('eg','en');
-INSERT INTO stopword VALUES ('eight','en');
-INSERT INTO stopword VALUES ('eighty','en');
-INSERT INTO stopword VALUES ('either','en');
-INSERT INTO stopword VALUES ('else','en');
-INSERT INTO stopword VALUES ('elsewhere','en');
-INSERT INTO stopword VALUES ('end','en');
-INSERT INTO stopword VALUES ('ending','en');
-INSERT INTO stopword VALUES ('enough','en');
-INSERT INTO stopword VALUES ('especially','en');
-INSERT INTO stopword VALUES ('et-al','en');
-INSERT INTO stopword VALUES ('etc','en');
-INSERT INTO stopword VALUES ('even','en');
-INSERT INTO stopword VALUES ('ever','en');
-INSERT INTO stopword VALUES ('every','en');
-INSERT INTO stopword VALUES ('everyone','en');
-INSERT INTO stopword VALUES ('everything','en');
-INSERT INTO stopword VALUES ('everywhere','en');
-INSERT INTO stopword VALUES ('except','en');
-INSERT INTO stopword VALUES ('f','en');
-INSERT INTO stopword VALUES ('far','en');
-INSERT INTO stopword VALUES ('few','en');
-INSERT INTO stopword VALUES ('ff','en');
-INSERT INTO stopword VALUES ('first','en');
-INSERT INTO stopword VALUES ('five','en');
-INSERT INTO stopword VALUES ('fix','en');
-INSERT INTO stopword VALUES ('followed','en');
-INSERT INTO stopword VALUES ('following','en');
-INSERT INTO stopword VALUES ('for','en');
-INSERT INTO stopword VALUES ('former','en');
-INSERT INTO stopword VALUES ('formerly','en');
-INSERT INTO stopword VALUES ('found','en');
-INSERT INTO stopword VALUES ('from','en');
-INSERT INTO stopword VALUES ('further','en');
-INSERT INTO stopword VALUES ('g','en');
-INSERT INTO stopword VALUES ('gave','en');
-INSERT INTO stopword VALUES ('get','en');
-INSERT INTO stopword VALUES ('gets','en');
-INSERT INTO stopword VALUES ('give','en');
-INSERT INTO stopword VALUES ('given','en');
-INSERT INTO stopword VALUES ('giving','en');
-INSERT INTO stopword VALUES ('go','en');
-INSERT INTO stopword VALUES ('goes','en');
-INSERT INTO stopword VALUES ('gone','en');
-INSERT INTO stopword VALUES ('got','en');
-INSERT INTO stopword VALUES ('h','en');
-INSERT INTO stopword VALUES ('had','en');
-INSERT INTO stopword VALUES ('hardly','en');
-INSERT INTO stopword VALUES ('has','en');
-INSERT INTO stopword VALUES ('hasnt','en');
-INSERT INTO stopword VALUES ('have','en');
-INSERT INTO stopword VALUES ('havent','en');
-INSERT INTO stopword VALUES ('having','en');
-INSERT INTO stopword VALUES ('he','en');
-INSERT INTO stopword VALUES ('hed','en');
-INSERT INTO stopword VALUES ('hence','en');
-INSERT INTO stopword VALUES ('her','en');
-INSERT INTO stopword VALUES ('here','en');
-INSERT INTO stopword VALUES ('hereafter','en');
-INSERT INTO stopword VALUES ('hereby','en');
-INSERT INTO stopword VALUES ('herein','en');
-INSERT INTO stopword VALUES ('heres','en');
-INSERT INTO stopword VALUES ('hereupon','en');
-INSERT INTO stopword VALUES ('hers','en');
-INSERT INTO stopword VALUES ('herself','en');
-INSERT INTO stopword VALUES ('hes','en');
-INSERT INTO stopword VALUES ('hid','en');
-INSERT INTO stopword VALUES ('him','en');
-INSERT INTO stopword VALUES ('himself','en');
-INSERT INTO stopword VALUES ('his','en');
-INSERT INTO stopword VALUES ('home','en');
-INSERT INTO stopword VALUES ('how','en');
-INSERT INTO stopword VALUES ('however','en');
-INSERT INTO stopword VALUES ('hundred','en');
-INSERT INTO stopword VALUES ('i','en');
-INSERT INTO stopword VALUES ('id','en');
-INSERT INTO stopword VALUES ('ie','en');
-INSERT INTO stopword VALUES ('if','en');
-INSERT INTO stopword VALUES ('ill','en');
-INSERT INTO stopword VALUES ('im','en');
-INSERT INTO stopword VALUES ('immediately','en');
-INSERT INTO stopword VALUES ('importance','en');
-INSERT INTO stopword VALUES ('important','en');
-INSERT INTO stopword VALUES ('in','en');
-INSERT INTO stopword VALUES ('inc','en');
-INSERT INTO stopword VALUES ('inc.','en');
-INSERT INTO stopword VALUES ('indeed','en');
-INSERT INTO stopword VALUES ('index','en');
-INSERT INTO stopword VALUES ('information','en');
-INSERT INTO stopword VALUES ('instead','en');
-INSERT INTO stopword VALUES ('into','en');
-INSERT INTO stopword VALUES ('invention','en');
-INSERT INTO stopword VALUES ('is','en');
-INSERT INTO stopword VALUES ('isnt','en');
-INSERT INTO stopword VALUES ('it','en');
-INSERT INTO stopword VALUES ('its','en');
-INSERT INTO stopword VALUES ('itself','en');
-INSERT INTO stopword VALUES ('ive','en');
-INSERT INTO stopword VALUES ('j','en');
-INSERT INTO stopword VALUES ('just','en');
-INSERT INTO stopword VALUES ('k','en');
-INSERT INTO stopword VALUES ('keep','en');
-INSERT INTO stopword VALUES ('kept','en');
-INSERT INTO stopword VALUES ('keys','en');
-INSERT INTO stopword VALUES ('kg','en');
-INSERT INTO stopword VALUES ('km','en');
-INSERT INTO stopword VALUES ('l','en');
-INSERT INTO stopword VALUES ('largely','en');
-INSERT INTO stopword VALUES ('last','en');
-INSERT INTO stopword VALUES ('later','en');
-INSERT INTO stopword VALUES ('latter','en');
-INSERT INTO stopword VALUES ('latterly','en');
-INSERT INTO stopword VALUES ('least','en');
-INSERT INTO stopword VALUES ('let','en');
-INSERT INTO stopword VALUES ('lets','en');
-INSERT INTO stopword VALUES ('like','en');
-INSERT INTO stopword VALUES ('likely','en');
-INSERT INTO stopword VALUES ('line','en');
-INSERT INTO stopword VALUES ('ll','en');
-INSERT INTO stopword VALUES ('ltd','en');
-INSERT INTO stopword VALUES ('m','en');
-INSERT INTO stopword VALUES ('made','en');
-INSERT INTO stopword VALUES ('mainly','en');
-INSERT INTO stopword VALUES ('make','en');
-INSERT INTO stopword VALUES ('makes','en');
-INSERT INTO stopword VALUES ('many','en');
-INSERT INTO stopword VALUES ('may','en');
-INSERT INTO stopword VALUES ('maybe','en');
-INSERT INTO stopword VALUES ('me','en');
-INSERT INTO stopword VALUES ('means','en');
-INSERT INTO stopword VALUES ('meantime','en');
-INSERT INTO stopword VALUES ('meanwhile','en');
-INSERT INTO stopword VALUES ('mg','en');
-INSERT INTO stopword VALUES ('might','en');
-INSERT INTO stopword VALUES ('million','en');
-INSERT INTO stopword VALUES ('miss','en');
-INSERT INTO stopword VALUES ('ml','en');
-INSERT INTO stopword VALUES ('more','en');
-INSERT INTO stopword VALUES ('moreover','en');
-INSERT INTO stopword VALUES ('most','en');
-INSERT INTO stopword VALUES ('mostly','en');
-INSERT INTO stopword VALUES ('mr','en');
-INSERT INTO stopword VALUES ('mrs','en');
-INSERT INTO stopword VALUES ('much','en');
-INSERT INTO stopword VALUES ('mug','en');
-INSERT INTO stopword VALUES ('must','en');
-INSERT INTO stopword VALUES ('my','en');
-INSERT INTO stopword VALUES ('myself','en');
-INSERT INTO stopword VALUES ('n','en');
-INSERT INTO stopword VALUES ('na','en');
-INSERT INTO stopword VALUES ('namely','en');
-INSERT INTO stopword VALUES ('nay','en');
-INSERT INTO stopword VALUES ('near','en');
-INSERT INTO stopword VALUES ('nearly','en');
-INSERT INTO stopword VALUES ('necessarily','en');
-INSERT INTO stopword VALUES ('neither','en');
-INSERT INTO stopword VALUES ('never','en');
-INSERT INTO stopword VALUES ('nevertheless','en');
-INSERT INTO stopword VALUES ('new','en');
-INSERT INTO stopword VALUES ('next','en');
-INSERT INTO stopword VALUES ('nine','en');
-INSERT INTO stopword VALUES ('ninety','en');
-INSERT INTO stopword VALUES ('no','en');
-INSERT INTO stopword VALUES ('nobody','en');
-INSERT INTO stopword VALUES ('none','en');
-INSERT INTO stopword VALUES ('nonetheless','en');
-INSERT INTO stopword VALUES ('noone','en');
-INSERT INTO stopword VALUES ('nor','en');
-INSERT INTO stopword VALUES ('normally','en');
-INSERT INTO stopword VALUES ('nos','en');
-INSERT INTO stopword VALUES ('not','en');
-INSERT INTO stopword VALUES ('noted','en');
-INSERT INTO stopword VALUES ('nothing','en');
-INSERT INTO stopword VALUES ('now','en');
-INSERT INTO stopword VALUES ('nowhere','en');
-INSERT INTO stopword VALUES ('o','en');
-INSERT INTO stopword VALUES ('obtain','en');
-INSERT INTO stopword VALUES ('obtained','en');
-INSERT INTO stopword VALUES ('of','en');
-INSERT INTO stopword VALUES ('off','en');
-INSERT INTO stopword VALUES ('often','en');
-INSERT INTO stopword VALUES ('oh','en');
-INSERT INTO stopword VALUES ('omitted','en');
-INSERT INTO stopword VALUES ('on','en');
-INSERT INTO stopword VALUES ('once','en');
-INSERT INTO stopword VALUES ('one','en');
-INSERT INTO stopword VALUES ('ones','en');
-INSERT INTO stopword VALUES ('only','en');
-INSERT INTO stopword VALUES ('onto','en');
-INSERT INTO stopword VALUES ('or','en');
-INSERT INTO stopword VALUES ('ord','en');
-INSERT INTO stopword VALUES ('other','en');
-INSERT INTO stopword VALUES ('others','en');
-INSERT INTO stopword VALUES ('otherwise','en');
-INSERT INTO stopword VALUES ('ought','en');
-INSERT INTO stopword VALUES ('our','en');
-INSERT INTO stopword VALUES ('ours','en');
-INSERT INTO stopword VALUES ('ourselves','en');
-INSERT INTO stopword VALUES ('out','en');
-INSERT INTO stopword VALUES ('over','en');
-INSERT INTO stopword VALUES ('overall','en');
-INSERT INTO stopword VALUES ('owing','en');
-INSERT INTO stopword VALUES ('own','en');
-INSERT INTO stopword VALUES ('p','en');
-INSERT INTO stopword VALUES ('page','en');
-INSERT INTO stopword VALUES ('pages','en');
-INSERT INTO stopword VALUES ('part','en');
-INSERT INTO stopword VALUES ('particularly','en');
-INSERT INTO stopword VALUES ('past','en');
-INSERT INTO stopword VALUES ('per','en');
-INSERT INTO stopword VALUES ('perhaps','en');
-INSERT INTO stopword VALUES ('please','en');
-INSERT INTO stopword VALUES ('poorly','en');
-INSERT INTO stopword VALUES ('possible','en');
-INSERT INTO stopword VALUES ('possibly','en');
-INSERT INTO stopword VALUES ('potentially','en');
-INSERT INTO stopword VALUES ('pp','en');
-INSERT INTO stopword VALUES ('predominantly','en');
-INSERT INTO stopword VALUES ('present','en');
-INSERT INTO stopword VALUES ('previously','en');
-INSERT INTO stopword VALUES ('primarily','en');
-INSERT INTO stopword VALUES ('probably','en');
-INSERT INTO stopword VALUES ('promptly','en');
-INSERT INTO stopword VALUES ('proud','en');
-INSERT INTO stopword VALUES ('put','en');
-INSERT INTO stopword VALUES ('q','en');
-INSERT INTO stopword VALUES ('quickly','en');
-INSERT INTO stopword VALUES ('quite','en');
-INSERT INTO stopword VALUES ('r','en');
-INSERT INTO stopword VALUES ('ran','en');
-INSERT INTO stopword VALUES ('rather','en');
-INSERT INTO stopword VALUES ('re','en');
-INSERT INTO stopword VALUES ('readily','en');
-INSERT INTO stopword VALUES ('really','en');
-INSERT INTO stopword VALUES ('recent','en');
-INSERT INTO stopword VALUES ('recently','en');
-INSERT INTO stopword VALUES ('ref','en');
-INSERT INTO stopword VALUES ('refs','en');
-INSERT INTO stopword VALUES ('regardless','en');
-INSERT INTO stopword VALUES ('related','en');
-INSERT INTO stopword VALUES ('relatively','en');
-INSERT INTO stopword VALUES ('research','en');
-INSERT INTO stopword VALUES ('respectively','en');
-INSERT INTO stopword VALUES ('resulted','en');
-INSERT INTO stopword VALUES ('resulting','en');
-INSERT INTO stopword VALUES ('results','en');
-INSERT INTO stopword VALUES ('run','en');
-INSERT INTO stopword VALUES ('s','en');
-INSERT INTO stopword VALUES ('said','en');
-INSERT INTO stopword VALUES ('same','en');
-INSERT INTO stopword VALUES ('say','en');
-INSERT INTO stopword VALUES ('sec','en');
-INSERT INTO stopword VALUES ('section','en');
-INSERT INTO stopword VALUES ('seem','en');
-INSERT INTO stopword VALUES ('seemed','en');
-INSERT INTO stopword VALUES ('seeming','en');
-INSERT INTO stopword VALUES ('seems','en');
-INSERT INTO stopword VALUES ('seen','en');
-INSERT INTO stopword VALUES ('seven','en');
-INSERT INTO stopword VALUES ('several','en');
-INSERT INTO stopword VALUES ('shall','en');
-INSERT INTO stopword VALUES ('she','en');
-INSERT INTO stopword VALUES ('shed','en');
-INSERT INTO stopword VALUES ('shell','en');
-INSERT INTO stopword VALUES ('shes','en');
-INSERT INTO stopword VALUES ('should','en');
-INSERT INTO stopword VALUES ('shouldnt','en');
-INSERT INTO stopword VALUES ('show','en');
-INSERT INTO stopword VALUES ('showed','en');
-INSERT INTO stopword VALUES ('shown','en');
-INSERT INTO stopword VALUES ('showns','en');
-INSERT INTO stopword VALUES ('shows','en');
-INSERT INTO stopword VALUES ('significant','en');
-INSERT INTO stopword VALUES ('significantly','en');
-INSERT INTO stopword VALUES ('similar','en');
-INSERT INTO stopword VALUES ('similarly','en');
-INSERT INTO stopword VALUES ('since','en');
-INSERT INTO stopword VALUES ('six','en');
-INSERT INTO stopword VALUES ('slightly','en');
-INSERT INTO stopword VALUES ('so','en');
-INSERT INTO stopword VALUES ('some','en');
-INSERT INTO stopword VALUES ('somehow','en');
-INSERT INTO stopword VALUES ('someone','en');
-INSERT INTO stopword VALUES ('somethan','en');
-INSERT INTO stopword VALUES ('something','en');
-INSERT INTO stopword VALUES ('sometime','en');
-INSERT INTO stopword VALUES ('sometimes','en');
-INSERT INTO stopword VALUES ('somewhat','en');
-INSERT INTO stopword VALUES ('somewhere','en');
-INSERT INTO stopword VALUES ('soon','en');
-INSERT INTO stopword VALUES ('specifically','en');
-INSERT INTO stopword VALUES ('state','en');
-INSERT INTO stopword VALUES ('states','en');
-INSERT INTO stopword VALUES ('still','en');
-INSERT INTO stopword VALUES ('stop','en');
-INSERT INTO stopword VALUES ('strongly','en');
-INSERT INTO stopword VALUES ('substantially','en');
-INSERT INTO stopword VALUES ('successfully','en');
-INSERT INTO stopword VALUES ('such','en');
-INSERT INTO stopword VALUES ('sufficiently','en');
-INSERT INTO stopword VALUES ('suggest','en');
-INSERT INTO stopword VALUES ('t','en');
-INSERT INTO stopword VALUES ('taking','en');
-INSERT INTO stopword VALUES ('than','en');
-INSERT INTO stopword VALUES ('that','en');
-INSERT INTO stopword VALUES ('thatll','en');
-INSERT INTO stopword VALUES ('thats','en');
-INSERT INTO stopword VALUES ('thatve','en');
-INSERT INTO stopword VALUES ('the','en');
-INSERT INTO stopword VALUES ('their','en');
-INSERT INTO stopword VALUES ('theirs','en');
-INSERT INTO stopword VALUES ('them','en');
-INSERT INTO stopword VALUES ('themselves','en');
-INSERT INTO stopword VALUES ('then','en');
-INSERT INTO stopword VALUES ('thence','en');
-INSERT INTO stopword VALUES ('there','en');
-INSERT INTO stopword VALUES ('thereafter','en');
-INSERT INTO stopword VALUES ('thereby','en');
-INSERT INTO stopword VALUES ('thered','en');
-INSERT INTO stopword VALUES ('therefore','en');
-INSERT INTO stopword VALUES ('therein','en');
-INSERT INTO stopword VALUES ('therell','en');
-INSERT INTO stopword VALUES ('thereof','en');
-INSERT INTO stopword VALUES ('therere','en');
-INSERT INTO stopword VALUES ('theres','en');
-INSERT INTO stopword VALUES ('thereto','en');
-INSERT INTO stopword VALUES ('thereupon','en');
-INSERT INTO stopword VALUES ('thereve','en');
-INSERT INTO stopword VALUES ('these','en');
-INSERT INTO stopword VALUES ('they','en');
-INSERT INTO stopword VALUES ('theyd','en');
-INSERT INTO stopword VALUES ('theyll','en');
-INSERT INTO stopword VALUES ('theyre','en');
-INSERT INTO stopword VALUES ('theyve','en');
-INSERT INTO stopword VALUES ('this','en');
-INSERT INTO stopword VALUES ('those','en');
-INSERT INTO stopword VALUES ('thou','en');
-INSERT INTO stopword VALUES ('though','en');
-INSERT INTO stopword VALUES ('thoughh','en');
-INSERT INTO stopword VALUES ('thousand','en');
-INSERT INTO stopword VALUES ('throug','en');
-INSERT INTO stopword VALUES ('through','en');
-INSERT INTO stopword VALUES ('throughout','en');
-INSERT INTO stopword VALUES ('thru','en');
-INSERT INTO stopword VALUES ('thus','en');
-INSERT INTO stopword VALUES ('til','en');
-INSERT INTO stopword VALUES ('tip','en');
-INSERT INTO stopword VALUES ('to','en');
-INSERT INTO stopword VALUES ('together','en');
-INSERT INTO stopword VALUES ('too','en');
-INSERT INTO stopword VALUES ('toward','en');
-INSERT INTO stopword VALUES ('towards','en');
-INSERT INTO stopword VALUES ('trillion','en');
-INSERT INTO stopword VALUES ('try','en');
-INSERT INTO stopword VALUES ('two','en');
-INSERT INTO stopword VALUES ('u','en');
-INSERT INTO stopword VALUES ('under','en');
-INSERT INTO stopword VALUES ('unless','en');
-INSERT INTO stopword VALUES ('unlike','en');
-INSERT INTO stopword VALUES ('unlikely','en');
-INSERT INTO stopword VALUES ('until','en');
-INSERT INTO stopword VALUES ('unto','en');
-INSERT INTO stopword VALUES ('up','en');
-INSERT INTO stopword VALUES ('upon','en');
-INSERT INTO stopword VALUES ('ups','en');
-INSERT INTO stopword VALUES ('us','en');
-INSERT INTO stopword VALUES ('use','en');
-INSERT INTO stopword VALUES ('used','en');
-INSERT INTO stopword VALUES ('usefully','en');
-INSERT INTO stopword VALUES ('usefulness','en');
-INSERT INTO stopword VALUES ('using','en');
-INSERT INTO stopword VALUES ('usually','en');
-INSERT INTO stopword VALUES ('v','en');
-INSERT INTO stopword VALUES ('various','en');
-INSERT INTO stopword VALUES ('ve','en');
-INSERT INTO stopword VALUES ('very','en');
-INSERT INTO stopword VALUES ('via','en');
-INSERT INTO stopword VALUES ('vol','en');
-INSERT INTO stopword VALUES ('vols','en');
-INSERT INTO stopword VALUES ('vs','en');
-INSERT INTO stopword VALUES ('w','en');
-INSERT INTO stopword VALUES ('was','en');
-INSERT INTO stopword VALUES ('wasnt','en');
-INSERT INTO stopword VALUES ('way','en');
-INSERT INTO stopword VALUES ('we','en');
-INSERT INTO stopword VALUES ('web','en');
-INSERT INTO stopword VALUES ('wed','en');
-INSERT INTO stopword VALUES ('well','en');
-INSERT INTO stopword VALUES ('were','en');
-INSERT INTO stopword VALUES ('werent','en');
-INSERT INTO stopword VALUES ('weve','en');
-INSERT INTO stopword VALUES ('what','en');
-INSERT INTO stopword VALUES ('whatever','en');
-INSERT INTO stopword VALUES ('whatll','en');
-INSERT INTO stopword VALUES ('whats','en');
-INSERT INTO stopword VALUES ('whatve','en');
-INSERT INTO stopword VALUES ('when','en');
-INSERT INTO stopword VALUES ('whence','en');
-INSERT INTO stopword VALUES ('whenever','en');
-INSERT INTO stopword VALUES ('where','en');
-INSERT INTO stopword VALUES ('whereafter','en');
-INSERT INTO stopword VALUES ('whereas','en');
-INSERT INTO stopword VALUES ('whereby','en');
-INSERT INTO stopword VALUES ('wherein','en');
-INSERT INTO stopword VALUES ('wheres','en');
-INSERT INTO stopword VALUES ('whereupon','en');
-INSERT INTO stopword VALUES ('wherever','en');
-INSERT INTO stopword VALUES ('whether','en');
-INSERT INTO stopword VALUES ('which','en');
-INSERT INTO stopword VALUES ('while','en');
-INSERT INTO stopword VALUES ('whim','en');
-INSERT INTO stopword VALUES ('whither','en');
-INSERT INTO stopword VALUES ('who','en');
-INSERT INTO stopword VALUES ('whod','en');
-INSERT INTO stopword VALUES ('whoever','en');
-INSERT INTO stopword VALUES ('whole','en');
-INSERT INTO stopword VALUES ('wholl','en');
-INSERT INTO stopword VALUES ('whom','en');
-INSERT INTO stopword VALUES ('whomever','en');
-INSERT INTO stopword VALUES ('whos','en');
-INSERT INTO stopword VALUES ('whose','en');
-INSERT INTO stopword VALUES ('why','en');
-INSERT INTO stopword VALUES ('widely','en');
-INSERT INTO stopword VALUES ('will','en');
-INSERT INTO stopword VALUES ('with','en');
-INSERT INTO stopword VALUES ('within','en');
-INSERT INTO stopword VALUES ('without','en');
-INSERT INTO stopword VALUES ('wont','en');
-INSERT INTO stopword VALUES ('words','en');
-INSERT INTO stopword VALUES ('world','en');
-INSERT INTO stopword VALUES ('would','en');
-INSERT INTO stopword VALUES ('wouldnt','en');
-INSERT INTO stopword VALUES ('www','en');
-INSERT INTO stopword VALUES ('x','en');
-INSERT INTO stopword VALUES ('y','en');
-INSERT INTO stopword VALUES ('yes','en');
-INSERT INTO stopword VALUES ('yet','en');
-INSERT INTO stopword VALUES ('you','en');
-INSERT INTO stopword VALUES ('youd','en');
-INSERT INTO stopword VALUES ('youll','en');
-INSERT INTO stopword VALUES ('your','en');
-INSERT INTO stopword VALUES ('youre','en');
-INSERT INTO stopword VALUES ('yours','en');
-INSERT INTO stopword VALUES ('yourself','en');
-INSERT INTO stopword VALUES ('yourselves','en');
-INSERT INTO stopword VALUES ('youve','en');
-INSERT INTO stopword VALUES ('z','en');
 
 #
 # Table structure for table 'style'
@@ -1186,7 +577,7 @@ CREATE TABLE submission (
   widgetId int(11) default NULL,
   submissionId int(11) NOT NULL default '0',
   title varchar(30) default NULL,
-  dateSubmitted datetime default NULL,
+  dateSubmitted int(11) default NULL,
   username varchar(30) default NULL,
   userId int(11) default NULL,
   content text,
@@ -1203,43 +594,10 @@ CREATE TABLE submission (
 
 
 #
-# Table structure for table 'url'
+# Table structure for table 'users'
 #
 
-CREATE TABLE url (
-  rec_id int(11) NOT NULL auto_increment,
-  status int(11) NOT NULL default '0',
-  url varchar(128) NOT NULL default '',
-  content_type varchar(48) NOT NULL default '',
-  title varchar(128) NOT NULL default '',
-  txt varchar(255) NOT NULL default '',
-  docsize int(11) NOT NULL default '0',
-  last_index_time int(11) NOT NULL default '0',
-  next_index_time int(11) NOT NULL default '0',
-  last_mod_time int(11) NOT NULL default '0',
-  referrer int(11) NOT NULL default '0',
-  tag varchar(11) NOT NULL default '0',
-  hops int(11) NOT NULL default '0',
-  category varchar(11) NOT NULL default '',
-  keywords varchar(255) NOT NULL default '',
-  description varchar(100) NOT NULL default '',
-  crc32 int(11) NOT NULL default '0',
-  lang char(2) NOT NULL default '',
-  PRIMARY KEY  (rec_id),
-  UNIQUE KEY url (url),
-  KEY key_crc (crc32)
-) TYPE=MyISAM;
-
-#
-# Dumping data for table 'url'
-#
-
-
-#
-# Table structure for table 'user'
-#
-
-CREATE TABLE user (
+CREATE TABLE users (
   userId int(11) NOT NULL default '0',
   username varchar(35) default NULL,
   identifier varchar(35) default NULL,
@@ -1252,34 +610,34 @@ CREATE TABLE user (
 ) TYPE=MyISAM;
 
 #
-# Dumping data for table 'user'
+# Dumping data for table 'users'
 #
 
-INSERT INTO user VALUES (1,'Visitor','No Login','','','WebGUI',NULL,NULL);
-INSERT INTO user VALUES (2,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','','','WebGUI',NULL,NULL);
-INSERT INTO user VALUES (4,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (5,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (6,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (7,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (8,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (9,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (10,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (11,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (12,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (13,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (14,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (15,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (16,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (17,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (18,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (19,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (20,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (21,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (22,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (23,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (24,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
-INSERT INTO user VALUES (25,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (1,'Visitor','No Login','','','WebGUI',NULL,NULL);
+INSERT INTO users VALUES (2,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (3,'Admin','RvlMjeFPs2aAhQdo/xt/Kg','','','WebGUI',NULL,NULL);
+INSERT INTO users VALUES (4,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (5,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (6,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (7,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (8,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (9,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (10,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (11,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (12,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (13,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (14,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (15,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (16,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (17,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (18,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (19,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (20,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (21,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (22,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (23,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (24,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
+INSERT INTO users VALUES (25,'Reserved','No Login',NULL,NULL,'WebGUI',NULL,NULL);
 
 #
 # Table structure for table 'widget'
@@ -1294,9 +652,9 @@ CREATE TABLE widget (
   displayTitle int(11) NOT NULL default '1',
   description text,
   processMacros int(11) NOT NULL default '0',
-  dateAdded datetime default NULL,
+  dateAdded int(11) default NULL,
   addedBy int(11) default NULL,
-  lastEdited datetime default NULL,
+  lastEdited int(11) default NULL,
   editedBy int(11) default NULL,
   PRIMARY KEY  (widgetId)
 ) TYPE=MyISAM;

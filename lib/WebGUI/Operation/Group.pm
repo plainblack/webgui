@@ -43,7 +43,7 @@ sub www_addGroup {
 sub www_addGroupSave {
         my ($output);
         if ($session{var}{sessionId}) {
-                WebGUI::SQL->write("insert into groups set groupId=".getNextId("groupId").", groupName=".quote($session{form}{groupName}).", description=".quote($session{form}{description}),$session{dbh});
+                WebGUI::SQL->write("insert into groups values (".getNextId("groupId").", ".quote($session{form}{groupName}).", ".quote($session{form}{description}).")",$session{dbh});
                 $output = www_listGroups();
         } else {
                 $output = WebGUI::Privilege::insufficient();
@@ -89,7 +89,7 @@ sub www_editGroup {
                 $output .= '<tr><td class="formDescription" valign="top">Description</td><td>'.WebGUI::Form::textArea("description",$group{description}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '<tr><td class="formDescription" valign="top">Users In Group</td><td valign="top">';
-		$sth = WebGUI::SQL->read("select user.username from user,groupings where groupings.groupId=$session{form}{gid} and groupings.userId=user.userId order by user.username",$session{dbh});
+		$sth = WebGUI::SQL->read("select users.username from users,groupings where groupings.groupId=$session{form}{gid} and groupings.userId=users.userId order by users.username",$session{dbh});
 		while (($user) = $sth->array) {
 			$output .= $user."<br>";
 		}

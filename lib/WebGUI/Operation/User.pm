@@ -53,15 +53,14 @@ sub www_addUser {
 
 #-------------------------------------------------------------------
 sub www_addUserSave {
-        my ($output, @groups, $uid, $gid, $encryptedPassword, $passwordStatement);
+        my ($output, @groups, $uid, $gid, $encryptedPassword);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
-                $passwordStatement = ', identifier='.quote($encryptedPassword);
 		$uid = getNextId("userId");
-                WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).$passwordStatement.", authMethod=".quote($session{form}{authMethod}).", ldapURL=".quote($session{form}{ldapURL}).", connectDN=".quote($session{form}{connectDN}).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
+                WebGUI::SQL->write("insert into users values ($uid, ".quote($session{form}{username}).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{form}{icq}).", ".quote($session{form}{authMethod}).", ".quote($session{form}{ldapURL}).", ".quote($session{form}{connectDN}).")",$session{dbh});
                 @groups = $session{cgi}->param('groups');
                 foreach $gid (@groups) {
-                        WebGUI::SQL->write("insert into groupings set groupId=$gid, userId=$uid",$session{dbh});
+                        WebGUI::SQL->write("insert into groupings values ($gid, $uid)",$session{dbh});
                 }
                 $output = www_listUsers();
         } else {
@@ -87,7 +86,7 @@ sub www_deleteUser {
 #-------------------------------------------------------------------
 sub www_deleteUserConfirm {
         if (WebGUI::Privilege::isInGroup(3) && $session{form}{uid} > 25) {
-                WebGUI::SQL->write("delete from user where userId=$session{form}{uid}",$session{dbh});
+                WebGUI::SQL->write("delete from users where userId=$session{form}{uid}",$session{dbh});
                 WebGUI::SQL->write("delete from groupings where userId=$session{form}{uid}",$session{dbh});
                 return www_listUsers();
         } else {
@@ -99,7 +98,7 @@ sub www_deleteUserConfirm {
 sub www_editUser {
         my ($output, %user, %hash, @array);
         if (WebGUI::Privilege::isInGroup(3)) {
-		%user = WebGUI::SQL->quickHash("select * from user where userId=$session{form}{uid}",$session{dbh});
+		%user = WebGUI::SQL->quickHash("select * from users where userId=$session{form}{uid}",$session{dbh});
                 $output .= '<a href="'.$session{page}{url}.'?op=viewHelp&hid=6"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit User</h1> <form method="post" action="'.$session{page}{url}.'"> ';
                 $output .= WebGUI::Form::hidden("op","editUserSave");
                 $output .= WebGUI::Form::hidden("uid",$session{form}{uid});
@@ -134,11 +133,11 @@ sub www_editUserSave {
                         $passwordStatement = ', identifier='.quote($encryptedPassword);
                 }
                 $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-                WebGUI::SQL->write("update user set username=".quote($session{form}{username}).$passwordStatement.", authMethod=".quote($session{form}{authMethod}).", ldapURL=".quote($session{form}{ldapURL}).", connectDN=".quote($session{form}{connectDN}).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq})." where userId=".$session{form}{uid},$session{dbh});
+                WebGUI::SQL->write("update users set username=".quote($session{form}{username}).$passwordStatement.", authMethod=".quote($session{form}{authMethod}).", ldapURL=".quote($session{form}{ldapURL}).", connectDN=".quote($session{form}{connectDN}).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq})." where userId=".$session{form}{uid},$session{dbh});
 		WebGUI::SQL->write("delete from groupings where userId=$session{form}{uid}",$session{dbh});
 		@groups = $session{cgi}->param('groups');
 		foreach $gid (@groups) {
-			WebGUI::SQL->write("insert into groupings set groupId=$gid, userId=$session{form}{uid}",$session{dbh});
+			WebGUI::SQL->write("insert into groupings values ($gid, $session{form}{uid})",$session{dbh});
 		}
 		return www_listUsers();
         } else {
@@ -154,7 +153,7 @@ sub www_listUsers {
 		$output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=8"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Users</h1>';
 		$output .= '<div align="center"><a href="'.$session{page}{url}.'?op=addUser">Add a new user.</a></div>';
 		$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-		$sth = WebGUI::SQL->read("select userId,username,email from user where username<>'Reserved' order by username",$session{dbh});
+		$sth = WebGUI::SQL->read("select userId,username,email from users where username<>'Reserved' order by username",$session{dbh});
 		while (@data = $sth->array) {
 			$row[$i] = '<tr><td><a href="'.$session{page}{url}.'?op=deleteUser&uid='.$data[0].'"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=editUser&uid='.$data[0].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a></td>';
 			#$row[$i] .= '<td><a href="'.$session{page}{url}.'?op=viewUserProfile&uid='.$data[0].'">'.$data[1].'</a></td>';

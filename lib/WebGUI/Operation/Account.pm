@@ -37,7 +37,7 @@ sub _hasBadPassword {
 #-------------------------------------------------------------------
 sub _hasBadUsername {
 	my ($otherUser);
-	($otherUser) = WebGUI::SQL->quickArray("select username from user where lcase(username)=lcase('$_[0]')",$session{dbh});
+	($otherUser) = WebGUI::SQL->quickArray("select username from users where lcase(username)=lcase('$_[0]')",$session{dbh});
 	if (($otherUser ne "" && $otherUser ne $session{user}{username}) || $_[0] eq "") {
 		return 1;
 	} else {
@@ -104,7 +104,7 @@ sub www_deactivateAccount {
 #-------------------------------------------------------------------
 sub www_deactivateAccountConfirm {
         if ($session{user}{userId} != 1) {
-                WebGUI::SQL->write("delete from user where userId=$session{user}{userId}",$session{dbh});
+                WebGUI::SQL->write("delete from users where userId=$session{user}{userId}",$session{dbh});
                 WebGUI::SQL->write("delete from groupings where userId=$session{user}{userId}",$session{dbh});
 	        WebGUI::Session::end($session{var}{sessionId});
         	_login(1,"null");
@@ -169,7 +169,7 @@ sub www_displayLogin {
 #-------------------------------------------------------------------
 sub www_login {
 	my ($uri, $port, $ldap, %args, $auth, $error, $uid,$pass,$authMethod, $ldapURL, $connectDN, $success);
-	($uid,$pass,$authMethod, $ldapURL, $connectDN) = WebGUI::SQL->quickArray("select userId,identifier,authMethod,ldapURL,connectDN from user where username=".quote($session{form}{username}),$session{dbh});
+	($uid,$pass,$authMethod, $ldapURL, $connectDN) = WebGUI::SQL->quickArray("select userId,identifier,authMethod,ldapURL,connectDN from users where username=".quote($session{form}{username}),$session{dbh});
 	if ($authMethod eq "LDAP") {
                 $uri = URI->new($ldapURL);
                 if ($uri->port < 1) {
@@ -232,13 +232,13 @@ sub www_recoverPassword {
 #-------------------------------------------------------------------
 sub www_recoverPasswordFinish {
 	my ($sth, $username, $encryptedPassword, $userId, $password, $flag, $message, $output);
-	$sth = WebGUI::SQL->read("select username, userId from user where email=".quote($session{form}{email}),$session{dbh});
+	$sth = WebGUI::SQL->read("select username, userId from users where email=".quote($session{form}{email}),$session{dbh});
 	while (($username,$userId) = $sth->array) {
 	        foreach (0,1,2,3,4,5) {
         	        $password .= chr(ord('A') + randint(32));
         	}
         	$encryptedPassword = Digest::MD5::md5_base64($password);
-		WebGUI::SQL->write("update user set identifier='$encryptedPassword' where userId='$userId'",$session{dbh});
+		WebGUI::SQL->write("update users set identifier='$encryptedPassword' where userId='$userId'",$session{dbh});
 		$flag = 1;
 		$message = 'Someone (probably you) requested your account information be sent. Your password has been reset. The following information represents your new account information:\nUser: '.$username.'\nPass: '.$password.'\n';
 		WebGUI::Mail::send($session{form}{email},"Account Information",$message);	
@@ -288,8 +288,8 @@ sub www_saveAccount {
 	if ($error eq "") {
 		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
 		$uid = getNextId("userId");
-		WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).", identifier=".quote($encryptedPassword).", authMethod=".quote($session{setting}{authMethod}).", ldapURL=".quote($session{setting}{ldapURL}).", connectDN=".quote($connectDN).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
-		WebGUI::SQL->write("insert into groupings set groupId=2,userId=$uid",$session{dbh});
+		WebGUI::SQL->write("insert into users values ($uid, ".quote($session{form}{username}).", ".quote($encryptedPassword).", ".quote($session{form}{email}).", ".quote($session{form}{icq}).", ".quote($session{setting}{authMethod}).", ".quote($session{setting}{ldapURL}).", ".quote($connectDN).")",$session{dbh});
+		WebGUI::SQL->write("insert into groupings values (2,$uid)",$session{dbh});
 		_login($uid,$encryptedPassword);
 		$output .= 'Account created successfully!<p>';
 		$output .= www_displayAccount();
@@ -315,7 +315,7 @@ sub www_updateAccount {
 		}
         	if ($error eq "") {
                 	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-                	WebGUI::SQL->write("update user set username=".quote($session{form}{username}).$passwordStatement.", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq})." where userId=".$session{user}{userId},$session{dbh});
+                	WebGUI::SQL->write("update users set username=".quote($session{form}{username}).$passwordStatement.", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq})." where userId=".$session{user}{userId},$session{dbh});
 			if ($passwordStatement ne "") {
                 		_login($session{user}{userId},$encryptedPassword);
 			}

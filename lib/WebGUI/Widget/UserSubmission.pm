@@ -11,6 +11,7 @@ package WebGUI::Widget::UserSubmission;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -60,7 +61,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into UserSubmission set widgetId=$widgetId, groupToContribute=$session{form}{groupToContribute}, submissionsPerPage=$session{form}{submissionsPerPage}, defaultStatus='$session{form}{defaultStatus}'",$session{dbh});
+		WebGUI::SQL->write("insert into UserSubmission values ($widgetId, $session{form}{groupToContribute}, '$session{form}{submissionsPerPage}', '$session{form}{defaultStatus}')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -85,9 +86,9 @@ sub www_addSubmission {
                 $output .= '</table></form>';
                 $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
                 $output .= '<tr><td class="tableHeader">Edit/Delete</td><td class="tableHeader">Title</td><td class="tableHeader">Date Submitted</td><td class="tableHeader">Status</td></tr>';
-                $sth = WebGUI::SQL->read("select title,submissionId,date_format(dateSubmitted,'%c/%e/%Y'),status from submission where widgetId='$session{form}{wid}' and userId=$session{user}{userId} order by dateSubmitted desc",$session{dbh});
+                $sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,status from submission where widgetId='$session{form}{wid}' and userId=$session{user}{userId} order by dateSubmitted desc",$session{dbh});
                 while (@submission = $sth->array) {
-                        $output .= '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=editSubmission&wid='.$session{form}{wid}.'&sid='.$submission[1].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&sid='.$submission[1].'&func=deleteSubmission"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.$submission[2].'</td><td class="tableData">'.$submission[3].'</td></tr>';
+                        $output .= '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=editSubmission&wid='.$session{form}{wid}.'&sid='.$submission[1].'"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&sid='.$submission[1].'&func=deleteSubmission"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a></td><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$session{form}{wid}.'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.epochToHuman($submission[2],"%M/%D/%y").'</td><td class="tableData">'.$submission[3].'</td></tr>';
                 }
                 $sth->finish;
                 $output .= '</table>';
@@ -110,7 +111,7 @@ sub www_addSubmissionSave {
 		} else {
 			$title = "Untitled";
 		}
-                WebGUI::SQL->write("insert into submission set widgetId=$session{form}{wid}, submissionId=$submissionId, convertCarriageReturns='$session{form}{convertCarriageReturns}', title=".quote($title).", username=".quote($session{user}{username}).", status='$status', dateSubmitted=now(), userId='$session{user}{userId}', content=".quote($session{form}{content}).", image=".quote($image).", attachment=".quote($attachment),$session{dbh});
+                WebGUI::SQL->write("insert into submission values ($session{form}{wid}, $submissionId, ".quote($title).", ".time().", ".quote($session{user}{username}).", '$session{user}{userId}', ".quote($session{form}{content}).", ".quote($image).", ".quote($attachment).", '$status', '$session{form}{convertCarriageReturns}')",$session{dbh});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -275,9 +276,9 @@ sub www_view {
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
 		}
-		$sth = WebGUI::SQL->read("select title,submissionId,date_format(dateSubmitted,'%c/%e/%Y'),username,userId from submission where widgetId='$widgetId' and status='Approved' order by dateSubmitted desc",$session{dbh});
+		$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId from submission where widgetId='$widgetId' and status='Approved' order by dateSubmitted desc",$session{dbh});
 		while (@submission = $sth->array) {
-			$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$widgetId.'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.$submission[2].'</td><td class="tableData">'.$submission[3].'</td></tr>';
+			$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?wid='.$widgetId.'&func=viewSubmission&sid='.$submission[1].'">'.$submission[0].'</a></td><td class="tableData">'.epochToHuman($submission[2],"%M/%D/%y").'</td><td class="tableData">'.$submission[3].'</td></tr>';
 			$i++;
 		}
 		$sth->finish;

@@ -97,7 +97,7 @@ sub www_addQuestionSave {
         if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from faqQuestion where widgetId=$session{form}{wid}",$session{dbh});
                 $questionId = getNextId("questionId");
-                WebGUI::SQL->write("insert into faqQuestion set widgetId=$session{form}{wid}, questionId=$questionId, sequenceNumber='$nextSeq', question=".quote($session{form}{question}).", answer=".quote($session{form}{answer}),$session{dbh});
+                WebGUI::SQL->write("insert into faqQuestion values ($session{form}{wid}, $questionId, ".quote($session{form}{question}).", ".quote($session{form}{answer}).", '$nextSeq')",$session{dbh});
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -120,7 +120,7 @@ sub www_deleteQuestion {
 sub www_deleteQuestionConfirm {
         my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		WebGUI::SQL->write("delete from faqQuestions where questionId=$session{form}{qid}",$session{dbh});
+		WebGUI::SQL->write("delete from faqQuestion where questionId=$session{form}{qid}",$session{dbh});
 		_reorderQuestions($session{form}{wid});
                 return www_edit();
         } else {

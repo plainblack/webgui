@@ -11,6 +11,7 @@ package WebGUI::Widget::EventsCalendar;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -65,7 +66,7 @@ sub www_addSave {
 sub www_addEvent {
         my ($output, $today);
         if (WebGUI::Privilege::canEditPage()) {
-		($today) = WebGUI::SQL->quickArray("select date_format(date_add(now(), interval 1 day),'%m/%d/%Y')",$session{dbh});
+		($today) = epochToSet(time());
                 $output = '<h1>Add Event</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","addEventSave");
@@ -88,7 +89,7 @@ sub www_addEventSave {
         my ($eventId);
         if (WebGUI::Privilege::canEditPage()) {
                 $eventId = getNextId("eventId");
-                WebGUI::SQL->write("insert into event set widgetId=$session{form}{wid}, eventId=$eventId, name=".quote($session{form}{name}).", description=".quote($session{form}{description}).", startDate='".humanToMysqlDate($session{form}{startDate})."', endDate='".humanToMysqlDate($session{form}{endDate})."'",$session{dbh});
+                WebGUI::SQL->write("insert into event values ($eventId, $session{form}{wid}, ".quote($session{form}{name}).", ".quote($session{form}{description}).", '".setToEpoch($session{form}{startDate})."', '".setToEpoch($session{form}{endDate})."')",$session{dbh});
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -161,7 +162,7 @@ sub www_editSave {
 sub www_editEvent {
         my ($output, %event);
         if (WebGUI::Privilege::canEditPage()) {
-                %event = WebGUI::SQL->quickHash("select name, description, date_format(startDate,'%m/%d/%Y') as start, date_format(endDate,'%m/%d/%Y') as end from event where eventId='$session{form}{eid}'",$session{dbh});
+                %event = WebGUI::SQL->quickHash("select * from event where eventId='$session{form}{eid}'",$session{dbh});
                 $output = '<h1>Edit Event</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("eid",$session{form}{eid});
@@ -170,8 +171,8 @@ sub www_editEvent {
                 $output .= '<tr><td class="formDescription">Name</td><td>'.WebGUI::Form::text("name",20,30,$event{name}).'</td></tr>'
 ;
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$event{description},50,10,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,$event{start},1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,$event{end},1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet($event{startDate}),1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,epochToSet($event{endDate}),1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -185,7 +186,7 @@ sub www_editEvent {
 sub www_editEventSave {
         my ($eventId);
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update event set name=".quote($session{form}{name}).", description=".quote($session{form}{description}).", startDate='".humanToMysqlDate($session{form}{startDate})."', endDate='".humanToMysqlDate($session{form}{endDate})."' where eventId=$session{form}{eid}",$session{dbh});
+                WebGUI::SQL->write("update event set name=".quote($session{form}{name}).", description=".quote($session{form}{description}).", startDate='".setToEpoch($session{form}{startDate})."', endDate='".setToEpoch($session{form}{endDate})."' where eventId=$session{form}{eid}",$session{dbh});
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -204,13 +205,13 @@ sub www_view {
 		if ($data{description} ne "") {
 			$output .= $data{description}.'<p>';
 		}
-		$sth = WebGUI::SQL->read("select name, description, date_format(startDate,'%M'), date_format(startDate,'%e'), date_format(startDate,'%Y'), date_format(endDate,'%e') from event where widgetId='$widgetId' and to_days(startDate)>(to_days(now())-1) order by startDate",$session{dbh});
+		$sth = WebGUI::SQL->read("select name, description, startDate, endDate from event where widgetId='$widgetId' and startDate>".(time()-86400)." order by startDate",$session{dbh});
 		while (@event = $sth->array) {
-			$output .= "<b>$event[2] $event[3]";
-			if ($event[3] ne $event[5]) {
-				$output .= "-$event[5]";
+			$output .= "<b>".epochToHuman($event[2],"%c")." ".epochToHuman($event[2],"%D");
+			if (epochToHuman($event[2],"%D") ne epochToHuman($event[3],"%D")) {
+				$output .= "-".epochToHuman($event[3],"%D");
 			}
-			$output .= ", $event[4]</b>";
+			$output .= ", ".epochToHuman($event[2],"%y")."</b>";
 			$output .= "<hr size=1>";
 			$output .= '<span class="eventTitle">'.$event[0].'</span>';
 			if ($event[1] ne "") {

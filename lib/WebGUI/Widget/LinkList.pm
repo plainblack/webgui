@@ -74,9 +74,8 @@ sub www_addSave {
 
 #-------------------------------------------------------------------
 sub www_addLink {
-        my ($output, $today);
+        my ($output);
         if (WebGUI::Privilege::canEditPage()) {
-		($today) = WebGUI::SQL->quickArray("select date_format(date_add(now(), interval 1 day),'%m/%d/%Y')",$session{dbh});
                 $output = '<h1>Add Link</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","addLinkSave");
@@ -99,7 +98,7 @@ sub www_addLinkSave {
         if (WebGUI::Privilege::canEditPage()) {
 		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from link where widgetId=$session{form}{wid}",$session{dbh});
                 $linkId = getNextId("linkId");
-                WebGUI::SQL->write("insert into link set widgetId=$session{form}{wid}, linkId=$linkId, name=".quote($session{form}{name}).", sequenceNumber='$nextSeq', url=".quote($session{form}{url}).", description=".quote($session{form}{description}),$session{dbh});
+                WebGUI::SQL->write("insert into link values ($session{form}{wid}, $linkId, ".quote($session{form}{name}).", ".quote($session{form}{url}).", ".quote($session{form}{description}).", '$nextSeq')",$session{dbh});
                 return www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -54,7 +54,7 @@ sub www_addSave {
 	my ($widgetId, $displayTitle, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into ExtraColumn set widgetId=$widgetId, spacer='$session{form}{spacer}', width='$session{form}{width}', class=".quote($session{form}{class}),$session{dbh});
+		WebGUI::SQL->write("insert into ExtraColumn values ($widgetId, '$session{form}{spacer}', '$session{form}{width}', ".quote($session{form}{class}).")",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

@@ -37,13 +37,13 @@ sub create {
 	my ($widgetId, $nextSeq);
 	$widgetId = getNextId("widgetId");
 	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from widget where pageId=$session{page}{pageId}",$session{dbh});
-        WebGUI::SQL->write("insert into widget set widgetId=$widgetId, pageId=$session{page}{pageId}, widgetType='$session{form}{widget}', processMacros='$session{form}{processMacros}', title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", dateAdded=now(), addedBy='$session{user}{userId}', sequenceNumber='$nextSeq'",$session{dbh});
+        WebGUI::SQL->write("insert into widget values ($widgetId, $session{page}{pageId}, '$session{form}{widget}', '$nextSeq', ".quote($session{form}{title}).", '$session{form}{displayTitle}', ".quote($session{form}{description}).", '$session{form}{processMacros}', ".time().", '$session{user}{userId}', 0, 0)",$session{dbh});
 	return $widgetId;
 }
 
 #-------------------------------------------------------------------
 sub update {
-	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=now(), editedBy='$session{user}{userId}' where widgetId=$session{form}{wid}",$session{dbh});
+	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=".time().", editedBy='$session{user}{userId}' where widgetId=$session{form}{wid}",$session{dbh});
 }
 
 #-------------------------------------------------------------------

@@ -11,6 +11,7 @@ package WebGUI::Widget::MessageBoard;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -20,7 +21,7 @@ use WebGUI::Widget;
 #-------------------------------------------------------------------
 sub _getBoardProperties {
         my (%board);
-	%board = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, widget.description, MessageBoard.groupToPost, MessageBoard.messagesPerPage, MessageBoard.editTimeout from widget left join MessageBoard on (widget.widgetId=MessageBoard.widgetId) where widget.widgetId=$_[0]",$session{dbh});
+	%board = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, widget.description, MessageBoard.groupToPost, MessageBoard.messagesPerPage, MessageBoard.editTimeout from widget, MessageBoard where widget.widgetId=MessageBoard.widgetId and widget.widgetId=$_[0]",$session{dbh});
         return %board;
 }
 
@@ -30,13 +31,13 @@ sub _traverseReplyTree {
 	for ($i=0;$i<=$_[1];$i++) {
 		$depth .= "&nbsp;&nbsp;";
 	}
-	$sth = WebGUI::SQL->read("select messageId,substring(subject,1,30),username,date_format(dateOfPost,'%c/%e %l:%i%p') from message where pid=$_[0] order by messageId", $session{dbh});
+	$sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost from message where pid=$_[0] order by messageId", $session{dbh});
 	while (@data = $sth->array) {
 		$html .= '<tr';
 		if ($session{form}{mid} eq $data[0]) {
 			$html .= ' class="highlight"';
 		}
-		$html .= '><td class="tableData">'.$depth.'<a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'">'.$data[1].'</a></td><td class="tableData">'.$data[2].'</td><td class="tableData">'.$data[3].'</td></tr>';
+		$html .= '><td class="tableData">'.$depth.'<a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'">'.substr($data[1],0,30).'</a></td><td class="tableData">'.$data[2].'</td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").'</td></tr>';
 		$html .= _traverseReplyTree($data[0],$_[1]+1);
 	}
 	$sth->finish;
@@ -85,7 +86,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into MessageBoard set widgetId=$widgetId, groupToPost=$session{form}{groupToPost}, messagesPerPage=$session{form}{messagesPerPage}, editTimeout=$session{form}{editTimeout}",$session{dbh});
+		WebGUI::SQL->write("insert into MessageBoard values ($widgetId, $session{form}{groupToPost}, '$session{form}{messagesPerPage}', '$session{form}{editTimeout}')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -209,8 +210,7 @@ sub www_postNewMessageSave {
         		$session{form}{subject} .= ' (eom)';
                 }
 		$mid = getNextId("messageId");
-		WebGUI::SQL->write("insert into message set messageId=$mid, userId=$session{user}{userId}, username=".quote($session{user}{username}).", subject=".quote($session{form}{subject}).", message=".quote($session{form}{message}).", widgetId=$session{form}{wid}, pid=0, dateOfPost=now()",$session{dbh});
-		WebGUI::SQL->write("update message set rid=$mid where messageId=$mid",$session{dbh});
+		WebGUI::SQL->write("insert into message values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", dateOfPost=".time().")",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -257,7 +257,7 @@ sub www_postReplySave {
                 }
 		$mid = getNextId("messageId");
 		($rid) = WebGUI::SQL->quickArray("select rid from message where messageId=$session{form}{mid}",$session{dbh});
-		WebGUI::SQL->write("insert into message set messageId=$mid, userId=$session{user}{userId}, username=".quote($session{user}{username}).", subject=".quote($session{form}{subject}).", message=".quote($session{form}{message}).", rid=$rid, widgetId=$session{form}{wid}, pid=$session{form}{mid}, dateOfPost=now()", $session{dbh});
+		WebGUI::SQL->write("insert into message values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", dateOfPost=".time().")", $session{dbh});
 		return www_showMessage();
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -304,12 +304,12 @@ sub www_showMessage {
 	}	
 	$html .= '</div><table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	$html .= '<tr><td class="tableHeader">Subject</td><td class="tableHeader">Author</td><td class="tableHeader">Date</td></tr>';
-	@data = WebGUI::SQL->quickArray("select messageId,substring(subject,1,30),username,date_format(dateOfPost,'%c/%e %l:%i%p') from message where messageId=$message{rid}",$session{dbh});
+	@data = WebGUI::SQL->quickArray("select messageId,subject,username,dateOfPost from message where messageId=$message{rid}",$session{dbh});
 	$html .= '<tr';
 	if ($session{form}{mid} eq $message{rid}) {
 		$html .= ' class="highlight"';
 	}
-	$html .= '><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$message{widgetId}.'">'.$data[1].'</a></td><td class="tableData">'.$data[2].'</td><td class="tableData">'.$data[3].'</td></tr>';
+	$html .= '><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$message{widgetId}.'">'.substr($data[1],0,30).'</a></td><td class="tableData">'.$data[2].'</td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").'</td></tr>';
 	$html .= _traverseReplyTree($message{rid},1);
 	$html .= "</table>";
 	return $html;
@@ -330,9 +330,9 @@ sub www_view {
 	$html .= '</td><td align="right" valign="bottom" class="boardMenu"><a href="'.$session{page}{url}.'?func=postNewMessage&wid='.$_[0].'">Post New Message</a></td></tr></table>';
 	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
 	$html .= '<tr><td class="tableHeader">Subject</td><td class="tableHeader">Author</td><td class="tableHeader">Thread Started</td><td class="tableHeader">Replies</td><td class="tableHeader">Last Reply</td></tr>';
-	$sth = WebGUI::SQL->read("select messageId,substring(subject,1,30),count(messageId)-1,username,date_format(dateOfPost,'%c/%e %l:%i%p'),date_format(max(dateOfPost),'%c/%e %l:%i%p'),max(messageId) from message where widgetId=$_[0] group by rid order by messageId desc", $session{dbh});
+	$sth = WebGUI::SQL->read("select messageId,subject,count(messageId)-1,username,dateOfPost,max(dateOfPost),max(messageId) from message where widgetId=$_[0] group by rid order by messageId desc", $session{dbh});
 	while (@data = $sth->array) {
-		$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.$data[1].'</a></td><td class="tableData">'.$data[3].'</td><td class="tableData">'.$data[4].'</td><td class="tableData">'.$data[2].'</td><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[6].'&wid='.$_[0].'">'.$data[5].'</a></td></tr>';
+		$row[$i] = '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.substr($data[1],0,30).'</a></td><td class="tableData">'.$data[3].'</td><td class="tableData">'.epochToHuman($data[4],"%M/%D %H:%n%p").'</td><td class="tableData">'.$data[2].'</td><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[6].'&wid='.$_[0].'">'.epochToHuman($data[5],"%M/%D %H:%n%p").'</a></td></tr>';
        		$i++;
         }
         if ($session{form}{pn} < 1) {

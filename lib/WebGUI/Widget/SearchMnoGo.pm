@@ -96,7 +96,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into SearchMnoGo set widgetId=$widgetId, DSN=".quote($session{form}{DSN}).", username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier}),$session{dbh});
+		WebGUI::SQL->write("insert into SearchMnoGo values ($widgetId, ".quote($session{form}{DSN}).", ".quote($session{form}{username}).", ".quote($session{form}{identifier}).")",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();

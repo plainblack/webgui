@@ -119,7 +119,7 @@ sub www_addSave {
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
 		@answer = split("\n",$session{form}{answers});	
-		WebGUI::SQL->write("insert into Poll set widgetId=$widgetId, active='$session{form}{active}', voteGroup='$session{form}{voteGroup}', graphWidth='$session{form}{graphWidth}', question=".quote($session{form}{question}).", a1=".quote($answer[0]).", a2=".quote($answer[1]).", a3=".quote($answer[2]).", a4=".quote($answer[3]).", a5=".quote($answer[4]).", a6=".quote($answer[5]).", a7=".quote($answer[6]).", a8=".quote($answer[7]).", a9=".quote($answer[8]).", a10=".quote($answer[9]).", a11=".quote($answer[10]).", a12=".quote($answer[11]).", a13=".quote($answer[12]).", a14=".quote($answer[13]).", a15=".quote($answer[14]).", a16=".quote($answer[15]).", a17=".quote($answer[16]).", a18=".quote($answer[17]).", a19=".quote($answer[18]).", a20=".quote($answer[19])."",$session{dbh});
+		WebGUI::SQL->write("insert into Poll values ($widgetId, '$session{form}{active}', '$session{form}{graphWidth}', '$session{form}{voteGroup}', ".quote($session{form}{question}).", ".quote($answer[0]).", ".quote($answer[1]).", ".quote($answer[2]).", ".quote($answer[3]).", ".quote($answer[4]).", ".quote($answer[5]).", ".quote($answer[6]).", ".quote($answer[7]).", ".quote($answer[8]).", ".quote($answer[9]).", ".quote($answer[10]).", ".quote($answer[11]).", ".quote($answer[12]).", ".quote($answer[13]).", ".quote($answer[14]).", ".quote($answer[15]).", ".quote($answer[16]).", ".quote($answer[17]).", ".quote($answer[18]).", ".quote($answer[19]).")",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -174,10 +174,7 @@ sub www_view {
 	if ($data{active} eq "0") {
 		$output = _viewResults($_[0]);
 	} elsif (WebGUI::Privilege::isInGroup($data{voteGroup},$session{user}{userId})) {
-		($hasVoted) = WebGUI::SQL->quickArray("select count(*) from pollAnswer where (userId=$session{user}{userId} or (userId=1 and ipAddress<>'$session{env}{REMOTE_ADDR}')) and widgetId=$_[0]",$session{dbh});
-		unless (WebGUI::Privilege::isInGroup($data{voteGroup},$session{user}{userId})) {
-			$hasVoted = 1;
-		}
+		($hasVoted) = WebGUI::SQL->quickArray("select count(*) from pollAnswer where widgetId=$_[0] and ((userId=$session{user}{userId} and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))",$session{dbh});
 		if ($hasVoted) {
 			$output = _viewResults($_[0]);
 		} else {
@@ -194,7 +191,7 @@ sub www_vote {
 	my ($voteGroup);
 	($voteGroup) = WebGUI::SQL->quickArray("select voteGroup from Poll where widgetId='$session{form}{wid}'",$session{dbh});
         if (WebGUI::Privilege::isInGroup($voteGroup,$session{user}{userId})) {
-        	WebGUI::SQL->write("insert into pollAnswer set widgetId=$session{form}{wid}, userId=$session{user}{userId}, answer='$session{form}{answer}', ipAddress='$session{env}{REMOTE_ADDR}'",$session{dbh});
+        	WebGUI::SQL->write("insert into pollAnswer values ($session{form}{wid}, '$session{form}{answer}', $session{user}{userId}, '$session{env}{REMOTE_ADDR}')",$session{dbh});
 	}
 	return "";
 }

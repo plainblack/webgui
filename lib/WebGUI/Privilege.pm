@@ -63,7 +63,7 @@ sub isInGroup {
 	if ($uid eq "") {
 		$uid = $session{user}{userId};
 	}
-	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' && userId='$uid'",$session{dbh});
+	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid'",$session{dbh});
 	if ($result < 1 && $gid == 1) { 	# registered users can 
 		$result = isInGroup(2, $uid); 	# do anything visitors
 	}					# can do

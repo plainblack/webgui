@@ -80,7 +80,7 @@ sub www_addPageSave {
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'",$session{dbh})) {
 			$urlizedTitle .= 2;
 		}
-		WebGUI::SQL->write("insert into page set pageId=".getNextId("pageId").", parentId=$session{page}{pageId}, title=".quote($session{form}{title}).", styleId=$session{page}{styleId}, sequenceNumber='$nextSeq', ownerId=$session{user}{userId}, ownerView=$session{page}{ownerView}, ownerEdit=$session{page}{ownerEdit}, groupId='$session{page}{groupId}', groupView=$session{page}{groupView}, groupEdit=$session{page}{groupEdit}, worldView=$session{page}{worldView}, worldEdit=$session{page}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle'",$session{dbh});
+		WebGUI::SQL->write("insert into page values (".getNextId("pageId").", $session{page}{pageId}, ".quote($session{form}{title}).", $session{page}{styleId}, $session{user}{userId}, $session{page}{ownerView}, $session{page}{ownerEdit}, $session{page}{groupId}, $session{page}{groupView}, $session{page}{groupEdit}, $session{page}{worldView}, $session{page}{worldEdit}, '$nextSeq', ".quote($session{form}{metaTags}).", '$urlizedTitle')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -140,7 +140,7 @@ sub www_editPage {
 		$array[0] = $session{page}{styleId};
                 $output .= '<tr><td class="formDescription">Style</td><td>'.WebGUI::Form::selectList("styleId",\%hash,\@array).' '.WebGUI::Form::checkbox("recurseStyle","yes").' <span class="formSubtext">Check to give this style to all sub-pages.</span></td></tr>';
                 $output .= '<tr><td class="formDescription">Page URL</td><td>'.WebGUI::Form::text("urlizedTitle",20,30,$session{page}{urlizedTitle}).'</td></tr>';
-		%hash = WebGUI::SQL->buildHash("select user.userId,user.username from user,groupings where groupings.groupId=4 and groupings.userId=user.userId order by user.username",$session{dbh});
+		%hash = WebGUI::SQL->buildHash("select users.userId,users.username from users,groupings where groupings.groupId=4 and groupings.userId=users.userId order by users.username",$session{dbh});
 		$array[0] = $session{page}{ownerId};
                 $output .= '<tr><td class="formDescription">Owner</td><td>'.WebGUI::Form::selectList("ownerId",\%hash,\@array).' '.WebGUI::Form::checkbox("recursePrivs","yes").' <span class="formSubtext">Check to give these privileges to all sub-pages.</span></td></tr>';
 		$array[0] = $session{page}{ownerView};

@@ -11,6 +11,7 @@ package WebGUI::Widget::Article;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::DateTime;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -40,8 +41,8 @@ sub www_add {
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Article').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,'01/01/2000',1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,'01/01/2100',1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet(time()),1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,'01/01/2037',1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Body</td><td>'.WebGUI::Form::textArea("body",'',50,10,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Image</td><td>'.WebGUI::Form::file("image").'</td></tr>';
                 $output .= '<tr><td class="formDescription">Link Title</td><td>'.WebGUI::Form::text("linkTitle",20,30).'</td></tr>';
@@ -64,7 +65,7 @@ sub www_addSave {
 		$widgetId = create();
 		$image = saveAttachment("image",$widgetId);
 		$attachment = saveAttachment("attachment",$widgetId);
-		WebGUI::SQL->write("insert into Article set widgetId=$widgetId, startDate='".humanToMysqlDate($session{form}{startDate})."', endDate='".humanToMysqlDate($session{form}{endDate})."', convertCarriageReturns='$session{form}{convertCarriageReturns}', body=".quote($session{form}{body}).", image=".quote($image).", linkTitle=".quote($session{form}{linkTitle}).", linkURL=".quote($session{form}{linkURL}).", attachment=".quote($attachment),$session{dbh});
+		WebGUI::SQL->write("insert into Article values ($widgetId, '".setToEpoch($session{form}{startDate})."', '".setToEpoch($session{form}{endDate})."', ".quote($session{form}{body}).", ".quote($image).", ".quote($session{form}{linkTitle}).", ".quote($session{form}{linkURL}).", ".quote($attachment).", '$session{form}{convertCarriageReturns}')",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -95,7 +96,7 @@ sub www_deleteImage {
 sub www_edit {
         my ($output, %article);
         if (WebGUI::Privilege::canEditPage()) {
-		%article = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, date_format(Article.startDate,'%m/%d/%Y') as start, date_format(Article.endDate,'%m/%d/%Y') as end, Article.body, Article.image, Article.linkTitle, Article.linkURL, Article.attachment, widget.processMacros, Article.convertCarriageReturns from widget left join Article on (widget.widgetId=Article.widgetId) where widget.widgetId=$session{form}{wid}",$session{dbh});
+		%article = WebGUI::SQL->quickHash("select * from widget,Article where widget.widgetId=Article.widgetId and widget.widgetId=$session{form}{wid}",$session{dbh});
                 $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=24"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Article</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
@@ -103,8 +104,8 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$article{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$article{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros","1",$article{processMacros}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,$article{start},1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,$article{end},1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet($article{startDate}),1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">End Date</td><td>'.WebGUI::Form::text("endDate",20,30,epochToSet($article{endDate}),1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Body</td><td>'.WebGUI::Form::textArea("body",$article{body},50,10,1).'</td></tr>';
 		if ($article{image} ne "") {
                 	$output .= '<tr><td class="formDescription">Image</td><td><a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'">Delete Image</a></td></tr>';
@@ -140,7 +141,7 @@ sub www_editSave {
 		if ($attachment ne "") {
                         $attachment = ', attachment='.quote($attachment);
                 }
-                WebGUI::SQL->write("update Article set startDate='".humanToMysqlDate($session{form}{startDate})."', endDate='".humanToMysqlDate($session{form}{endDate})."', convertCarriageReturns='$session{form}{convertCarriageReturns}', body=".quote($session{form}{body}).", linkTitle=".quote($session{form}{linkTitle}).", linkURL=".quote($session{form}{linkURL}).$attachment.$image." where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update Article set startDate='".setToEpoch($session{form}{startDate})."', endDate='".setToEpoch($session{form}{endDate})."', convertCarriageReturns='$session{form}{convertCarriageReturns}', body=".quote($session{form}{body}).", linkTitle=".quote($session{form}{linkTitle}).", linkURL=".quote($session{form}{linkURL}).$attachment.$image." where widgetId=$session{form}{wid}",$session{dbh});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -151,7 +152,7 @@ sub www_editSave {
 sub www_view {
 	my (%data, @test, $output, $widgetId);
 	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, widget.processMacros, Article.body, Article.image, Article.linkTitle, Article.linkURL, Article.attachment, Article.convertCarriageReturns from widget,Article where widget.widgetId='$widgetId' and widget.WidgetId=Article.widgetId and Article.startDate<now() and Article.endDate>now()",$session{dbh});
+	%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle, widget.processMacros, Article.body, Article.image, Article.linkTitle, Article.linkURL, Article.attachment, Article.convertCarriageReturns from widget,Article where widget.widgetId='$widgetId' and widget.WidgetId=Article.widgetId and Article.startDate<".time()." and Article.endDate>".time()."",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
 			$output = "<h1>".$data{title}."</h1>";

@@ -28,7 +28,7 @@ $dbh->disconnect();
 
 #-------------------------------------------------------------------
 sub deleteExpiredSessions {
-	WebGUI::SQL->write("delete from session where expires<now()",$dbh);
+	WebGUI::SQL->write("delete from session where expires<".time(),$dbh);
 }
 
 #-------------------------------------------------------------------
@@ -97,11 +97,11 @@ sub updateSyndicatedContent {
 		$rss = getRSS($data[1]);
 		$html = generateHTML($rss);
 		if ($html ne "") {
-			WebGUI::SQL->write("update SyndicatedContent set content=".$dbh->quote($html).", lastFetched=now() where widgetId=$data[0]",$dbh);
+			WebGUI::SQL->write("update SyndicatedContent set content=".$dbh->quote($html).", lastFetched=".time()." where widgetId=$data[0]",$dbh);
 		} elsif (substr($data[2],6) ne "Unable" && substr($data[2],7) ne "Not yet") {
 			# then just leave the existing content in place
 		} else {
-			WebGUI::SQL->write("update SyndicatedContent set content='Unable to fetch content. Perhaps the RSS is improperly formated.', lastFetched=now() where widgetId=$data[0]",$dbh);
+			WebGUI::SQL->write("update SyndicatedContent set content='Unable to fetch content. Perhaps the RSS is improperly formated.', lastFetched=".time()." where widgetId=$data[0]",$dbh);
 		}
 	}
 	$sth->finish;

@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------
 
 BEGIN {
-        unshift (@INC, "./lib/");
+        unshift (@INC, "./lib");
 }
 
 use strict;
@@ -35,6 +35,10 @@ if (eval { require DBI }) {
 	print "Please install.\n";
 }
 
+print "Database drivers:\t";
+print join(", ",DBI->available_drivers);
+print "\n";
+
 print "LWP module:\t\t";
 if (eval { require LWP }) {
         print "OK\n";
@@ -44,13 +48,6 @@ if (eval { require LWP }) {
 
 print "Tie::IxHash module:\t";
 if (eval { require Tie::IxHash }) {
-        print "OK\n";
-} else {
-        print "Please install.\n";
-}
-
-print "Mysql module:\t\t";
-if (eval { require Mysql }) {
         print "OK\n";
 } else {
         print "Please install.\n";
@@ -79,7 +76,8 @@ if (eval { require Net::LDAP }) {
 
 # this is here to insure they installed correctly.
 print "WebGUI modules:\t\t";
-if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
+#if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
+if (eval { require WebGUI::SQL }) {
         print "OK\n";
 } else {
         print "Please install.\n";
@@ -119,8 +117,7 @@ unless (defined $config) {
 
 print "Database connection:\t";
 my ($dbh, $test);
-$dbh = DBI->connect($config->param('dsn'), $config->param('dbuser'), $config->param('dbpass'));
-unless (defined $dbh) {
+unless (eval { $dbh = DBI->connect($config->param('dsn'), $config->param('dbuser'), $config->param('dbpass')) }) {
 	print "Can't connect with info provided.\n";
 } else {
 	print "OK\n";
@@ -154,7 +151,9 @@ $request = new HTTP::Request (GET => "http://www.plainblack.com/downloads/latest
 $response = $userAgent->request($request);
 $version = $response->content;
 chomp $version;
-if ($version eq  $WebGUI::VERSION) {
+if ($response->is_error) {
+	print "Couldn't connect to Plain Black Software. Check your connection and try again.\n";
+} elsif ($version eq $WebGUI::VERSION) {
 	print "OK\n";
 } else {
 	print "There is a newer version of WebGUI available.\n";

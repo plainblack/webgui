@@ -48,7 +48,7 @@ sub _getSessionVars {
         if ($_[0] ne "") {
         	%vars = WebGUI::SQL->quickHash("select * from session where sessionId='$_[0]'", $_[1]);
 		if ($vars{sessionId} ne "") {
-			WebGUI::SQL->write("update session set lastPageView=now(), lastIP='$ENV{REMOTE_ADDR}', expires=date_add(now(),interval $_[2] second) where sessionId='$_[0]'",$_[1]);
+			WebGUI::SQL->write("update session set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', expires=".(time()+$_[2])." where sessionId='$_[0]'",$_[1]);
 		}
 	}
         return %vars;
@@ -62,9 +62,9 @@ sub _getUserInfo {
 	} else {
 		$uid = 1;
 	}
-	%user = WebGUI::SQL->quickHash("select * from user where userId='$uid'", $_[1]);
+	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $_[1]);
 	if ($user{userId} eq "") {
-		%user = _getUserInfo(1,$_[1]);
+		%user = _getUserInfo("1|none",$_[1]);
 	}
 	return %user;
 }
@@ -157,9 +157,9 @@ sub setCookie {
 sub start {
 	my (%user, $uid, $encryptedPassword);
         ($uid, $encryptedPassword) = split(/\|/,$_[0]);
-	%user = WebGUI::SQL->quickHash("select * from user where userId='$uid'", $session{dbh});
+	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'", $session{dbh});
         if (crypt($user{identifier},"yJ") eq $encryptedPassword) {
-		WebGUI::SQL->write("insert into session set sessionId='$_[0]', expires=date_add(now(),interval $session{setting}{sessionTimeout} second)",$session{dbh});
+		WebGUI::SQL->write("insert into session values ('$_[0]', ".(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}')",$session{dbh});
 		refreshSessionVars($_[0]);
 		return 1;
         } else {
