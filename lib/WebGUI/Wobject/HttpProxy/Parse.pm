@@ -105,6 +105,10 @@ sub start {
 	}
   	$self->output("<$tag");
   	for (keys %$attr) {
+		if ($_ eq '/') {
+		   $self->output('/');
+		   next;
+		}
     		$self->output(" $_=\"");
     		my $val = $attr->{$_};
     		if ((lc($tag) eq "input" || lc($tag) eq "textarea" || lc($tag) eq "select") 
