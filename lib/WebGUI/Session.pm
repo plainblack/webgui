@@ -79,7 +79,7 @@ sub _getUserInfo {
 	}
 	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 		from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
-		and userProfileData.userId=$user{userId}", $_[1]);
+		and userProfileData.userId='$user{userId}'", $_[1]);
 	%user = (%user, %profile);
 	%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4", $_[1]);
 	foreach $key (keys %default) {
