@@ -39,14 +39,15 @@ sub _traversePageTree {
                 $sth = WebGUI::SQL->read("select urlizedTitle, title, pageId, synopsis from page 
 			where parentId='$parent' order by sequenceNumber");
                 while ($data = $sth->hashRef) {
-                        if (WebGUI::Privilege::canViewPage($data->{pageId})) {
+                        if (($data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Privilege::canViewPage($data->{pageId})) {
 				push(@pages,{ 
                                 	"page.indent" => $indentString,
 					"page.url" => WebGUI::URL::gateway($data->{urlizedTitle}),
 					"page.id" => $data->{pageId},
 					"page.title" => $data->{title},
 					"page.menuTitle" => $data->{menuTitle},
-					"page.synopsis" => $data->{synopsis}
+					"page.synopsis" => $data->{synopsis},
+					"page.isRoot" => ($parent == 0)
 					});
                                 push(@pages,@{_traversePageTree($data->{pageId},($currentDepth+1),$depth,$indent)});
                         }
@@ -78,6 +79,9 @@ sub set {
 sub www_edit {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
         my ($output, $f, $indent);
+	my $startLevel = $_[0]->get("startAtThisLevel") || 1;
+	my $options = WebGUI::SQL->buildHashRef("select pageId,title from page where parentId=0 
+		and (pageId=1 or pageId>999) order by title");
 	$indent = $_[0]->get("indent") || 5;
         $output = helpIcon(1,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(5,$namespace).'</h1>';
@@ -88,7 +92,16 @@ sub www_edit {
                 -namespace=>$namespace,
                 -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
                 );
-        $f->yesNo("startAtThisLevel",WebGUI::International::get(3,$namespace),$_[0]->get("startAtThisLevel"));
+        $f->select(
+		-name=>"startAtThisLevel",
+		-label=>WebGUI::International::get(3,$namespace),
+		-value=>[$startLevel],
+		-options=>{
+               	 	0=>WebGUI::International::get(75,$namespace),
+                	$session{page}{pageId}=>WebGUI::International::get(74,$namespace),
+                	%{$options}
+                	}
+		);
         $f->integer("depth",WebGUI::International::get(4,$namespace),$_[0]->get("depth"));
 	$f->integer("indent",WebGUI::International::get(6,$namespace),$indent);
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
@@ -109,13 +122,8 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_view {
-        my (%var, $parent);
-	if ($_[0]->get("startAtThisLevel")) {
-		$parent = $session{page}{pageId};
-	} else {
-		$parent = 1;
-	}
-	$var{page_loop} = _traversePageTree($parent,0,$_[0]->get("depth"),$_[0]->get("indent"));
+        my (%var);
+	$var{page_loop} = _traversePageTree($_[0]->get("startAtThisLevel"),0,$_[0]->get("depth"),$_[0]->get("indent"));
 	return $_[0]->processMacros($_[0]->processTemplate($_[0]->get("templateId"),\%var));
 }
 

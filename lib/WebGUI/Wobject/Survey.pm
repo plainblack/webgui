@@ -348,7 +348,7 @@ sub www_editAnswerSave {
                 $session{form}{qid} = "new";
 	} elsif ($session{form}{proceed} eq "addAnswer") {
 		$session{form}{aid} = "new";
-		$_[0]->www_editAnswer();
+		return $_[0]->www_editAnswer();
 	} elsif ($session{form}{proceed} eq "backToPage") {
 		return "";
         }
