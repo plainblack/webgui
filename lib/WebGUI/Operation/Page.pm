@@ -208,6 +208,7 @@ sub www_deletePageConfirm {
 sub www_editPage {
         my ($f, $endDate, $output, $subtext, $childCount, %hash, %page);
 	tie %hash, "Tie::IxHash";
+	tie %page, "Tie::CPHash";
         if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
 		$f = WebGUI::HTMLForm->new;
 		if ($session{form}{npp} ne "") {

@@ -399,7 +399,7 @@ sub www_login {
                 _logLogin($uid,"success");
 		return "";
 	} else {
-		_logLogin($uid, $success);
+		_logLogin($uid, "failure");
 		WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 		return "<h1>".WebGUI::International::get(70)."</h1>".$success.www_displayLogin();
 	}

@@ -690,7 +690,7 @@ sub www_viewGradebook {
 	$output = '<h1>'.WebGUI::International::get(71,$namespace).'</h1>';
 	$p = WebGUI::Paginator->new('func=viewGradebook&wid='.$_[0]->get("wobjectId"));
 	$p->setDataByQuery("select userId,username,ipAddress from Survey_response 
-		group by userId,ipAddress order by username,ipAddress");
+		group by userId,username,ipAddress order by username,ipAddress");
 	$users = $p->getPageData;
 	my ($questionCount) = WebGUI::SQL->quickArray("select count(*) from Survey_question
         	where Survey_id=".$_[0]->get("Survey_id"));
