@@ -4,7 +4,7 @@ use strict;
 #use WebGUI::SQL;
 use WebGUI::Subscription;
 
-#our @ISA = qw(WebGUI::Commerce::Item);
+our @ISA = qw(WebGUI::Commerce::Item);
 
 #-------------------------------------------------------------------
 sub description {
