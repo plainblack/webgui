@@ -1883,7 +1883,7 @@ The LDAP Identity is the unique identifier in the LDAP server that the user will
 <br><br>
 
 <b>LDAP Identity Name</b><br>
-The label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</i></b><i>. So you could enter that label here for consitency.
+The label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</i>. So you could enter that label here for consitency.
 <br><br>
 
 <b>LDAP Password Name</b><br>
@@ -1891,7 +1891,7 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 <p>
 
 |,
-		lastUpdated => 1076700672
+		lastUpdated => 1098327046
 	},
 
 	'773' => {
@@ -6330,24 +6330,24 @@ Macros always begin with a caret (&#94;) and follow with at least one other char
 	},
 
 	'613' => {
-		message => q|Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
-</i></p><p><i>
+		message => q|<p>Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
+</p>
 
-<b>Admin</b><br>
+<p><i><b>Admin</b></i><br>
 Admin is exactly what you'd expect. It is a user with unlimited rights in the WebGUI environment. If it can be done, this user has the rights to do it.
-</i></p><p><i>
+</p>
 
-<b>Visitor</b><br>
+<p><i><b>Visitor</b></i><br>
 Visitor is exactly the opposite of Admin. Visitor has no rights what-so-ever. By default any user who is not logged in is seen as the user Visitor.
-</i></p><p><i>
+</p>
 
-<b>Add a new user.</b><br>
+<p><i><b>Add a new user.</b></i><br>
 Click on this to go to the add user screen.
-</i></p><p><i>
+</p>
 
-<b>Search</b><br>
-You can search users based on username and email address. You can do partial searches too if you like.|,
-		lastUpdated => 1031514049
+<p><i><b>Search</b></i><br>
+You can search users based on username and email address. You can do partial searches too if you like.</p>|,
+		lastUpdated => 1098327134
 	},
 
 	'1043' => {
