@@ -148,7 +148,7 @@ These methods are available from this class:
 =cut
 #-------------------------------------------------------------------
 
-=head2 addChild ( properties )
+=head2 addChild ( properties [, id ] )
 
 Adds a child asset to a parent. Creates a new AssetID for child. Makes the parent know that it has children. Adds a new asset to the asset table. Returns the newly created Asset.
 
@@ -156,12 +156,16 @@ Adds a child asset to a parent. Creates a new AssetID for child. Makes the paren
 
 A hash reference containing a list of properties to associate with the child. The only used property value is "className"
 
+=head3 id
+
+A unique 22 character ID.  By default WebGUI will generate this and you should almost never specify it. This is mainly here for developers that want to include default templates in their plug-ins.
+
 =cut
 
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
-	my $id = WebGUI::Id::generate();
+	my $id = WebGUI::Id::generate() || shift;
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	WebGUI::SQL->beginTransaction;
@@ -1064,6 +1068,18 @@ Returns the assetId of an Asset.
 sub getId {
 	my $self = shift;
 	return $self->get("assetId");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getImportNode ()
+
+Returns the import node asset object. This is where developers will templates, files, etc to the asset tree that have no other obvious attachment point.
+
+=cut
+
+sub getImportNode {
+	return WebGUI::Asset->newByDynamicClass("PBasset000000000000002");
 }
 
 #-------------------------------------------------------------------

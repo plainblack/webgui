@@ -99,7 +99,7 @@ foreach my $namespace (@allWobjects) {
 	}
 	$sth->finish;
 }
-walkTree('0','PBasset000000000000001','000001','1');
+walkTree('0','PBasset000000000000001','000001','2');
 print "\t\tMaking second round of table structure changes\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace is not null");
 while (my ($namespace) = $sth->array) {
@@ -168,14 +168,15 @@ WebGUI::SQL->write("alter table USS_submission drop column image");
 WebGUI::SQL->write("alter table USS_submission drop column attachment");
 
 
+# start migrating non-wobject stuff into assets
 my %migration;
-
+WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, printableStyleTemplateId) values ('PBasset000000000000002','1','3')");
+WebGUI::SQL->write("insert into Folder (assetId, templateId) values ('PBasset000000000000002','PBtmpl0000000000000078')");
 
 
 
 print "\tConverting navigation system to asset tree\n" unless ($quiet);
-my ($navRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where length(lineage)=12 order by lineage desc limit 1");
-$navRootLineage = sprintf("%012d",($navRootLineage+1));
+my $navRootLineage = getNextLineage('PBasset000000000000002');
 my $navRootId = WebGUI::SQL->setRow("asset","assetId",{
 	assetId=>"new",
 	isHidden=>1,
@@ -185,10 +186,10 @@ my $navRootId = WebGUI::SQL->setRow("asset","assetId",{
 	ownerUserId=>"3",
 	groupIdView=>"4",
 	groupIdEdit=>"4",
-	parentId=>"PBasset000000000000001",
+	parentId=>"PBasset000000000000002",
 	lineage=>$navRootLineage,
 	lastUpdated=>time(),
-	className=>"WebGUI::Asset::Wobject::Navigation",
+	className=>"WebGUI::Asset::Wobject::Folder",
 	state=>"published"
 	});
 WebGUI::SQL->setRow("wobject","assetId",{
@@ -196,14 +197,9 @@ WebGUI::SQL->setRow("wobject","assetId",{
 	styleTemplateId=>"1",
 	printableStyleTemplateId=>"3"
 	},undef,$navRootId);
-WebGUI::SQL->setRow("Navigation","assetId",{
+WebGUI::SQL->setRow("Folder","assetId",{
 	assetId=>$navRootId,
-	startType=>"relativeToCurrentUrl",
-	templateId=>"1",
-	startPoint=>"0",
-	endPoint=>"55",
-	assetsToInclude=>"descendants",
-	showHiddenPages=>1
+	templateId=>"PBtmpl0000000000000078"
 	},undef,$navRootId);
 my %macroCache;
 my $navRankCounter = 1;
@@ -335,8 +331,7 @@ $sth->finish;
 
 
 print "\tConverting collateral manager items into assets\n" unless ($quiet);
-my ($collateralRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where length(lineage)=12 order by lineage desc limit 1");
-$collateralRootLineage = sprintf("%012d",($collateralRootLineage+1));
+my $collateralRootLineage = getNextLineage('PBasset000000000000002');
 my $collateralRootId = WebGUI::SQL->setRow("asset","assetId",{
 	assetId=>"new",
 	isHidden=>1,
@@ -346,10 +341,10 @@ my $collateralRootId = WebGUI::SQL->setRow("asset","assetId",{
 	ownerUserId=>"3",
 	groupIdView=>"4",
 	groupIdEdit=>"4",
-	parentId=>"PBasset000000000000001",
+	parentId=>"PBasset000000000000002",
 	lineage=>$collateralRootLineage,
 	lastUpdated=>time(),
-	className=>"WebGUI::Asset::Wobject::Navigation",
+	className=>"WebGUI::Asset::Wobject::Folder",
 	state=>"published"
 	});
 WebGUI::SQL->setRow("wobject","assetId",{
@@ -359,12 +354,7 @@ WebGUI::SQL->setRow("wobject","assetId",{
 	},undef,$collateralRootId);
 WebGUI::SQL->setRow("Navigation","assetId",{
 	assetId=>$collateralRootId,
-	startType=>"relativeToCurrentUrl",
-	templateId=>"1",
-	startPoint=>"0",
-	endPoint=>"55",
-	assetsToInclude=>"descendants",
-	showHiddenPages=>1
+	templateId=>"PBtmpl0000000000000078"
 	},undef,$collateralRootId);
 my %folderCache = ('0'=>$collateralRootId);
 my %folderNameCache;
@@ -459,8 +449,7 @@ WebGUI::SQL->write("drop table collateral");
 print "\tConverting template system to asset tree\n" unless ($quiet);
 WebGUI::SQL->write("update template set namespace='Layout' where namespace='page'");
 WebGUI::SQL->write("alter table template add column assetId varchar(22) not null");
-my ($tempRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where length(lineage)=12 order by lineage desc limit 1");
-$tempRootLineage = sprintf("%012d",($tempRootLineage+1));
+my $tempRootLineage = sprintf("%018d",($collateralRootLineage+1));
 my $tempRootId = WebGUI::SQL->setRow("asset","assetId",{
 	assetId=>"new",
 	isHidden=>1,
@@ -470,10 +459,10 @@ my $tempRootId = WebGUI::SQL->setRow("asset","assetId",{
 	ownerUserId=>"3",
 	groupIdView=>"4",
 	groupIdEdit=>"4",
-	parentId=>"PBasset000000000000001",
+	parentId=>"PBasset000000000000002",
 	lineage=>$tempRootLineage,
 	lastUpdated=>time(),
-	className=>"WebGUI::Asset::Wobject::Navigation",
+	className=>"WebGUI::Asset::Wobject::Folder",
 	state=>"published"
 	});
 WebGUI::SQL->setRow("wobject","assetId",{
@@ -481,14 +470,9 @@ WebGUI::SQL->setRow("wobject","assetId",{
 	styleTemplateId=>"1",
 	printableStyleTemplateId=>"3"
 	},undef,$tempRootId);
-WebGUI::SQL->setRow("Navigation","assetId",{
+WebGUI::SQL->setRow("Folder","assetId",{
 	assetId=>$tempRootId,
-	templateId=>"1",
-	startType=>"relativeToCurrentUrl",
-	startPoint=>"0",
-	endPoint=>"55",
-	assetsToInclude=>"descendants",
-	showHiddenPages=>1
+	templateId=>"PBtmpl0000000000000078"
 	},undef,$tempRootId);
 my $tempRankCounter = 1;
 my %templateCache;
@@ -1070,6 +1054,15 @@ sub copyFile {
         binmode($b);
         cp($a,$b);
 	return $id;
+}
+
+sub getNextLineage {
+	my $assetId = shift;
+	my ($startLineage) = WebGUI::SQL->quickArray("select lineage from asset where parentId='".$assetId."' order by lineage desc limit 1");
+	$startLineage = '000001000001000000' unless ($startLineage);
+	my $rank = substr($startLineage,12,6);
+	my $parentLineage = substr($startLineage,0,12);
+	return $parentLineage.sprintf("%06d",($rank+1));
 }
 
 sub getFileSize {
