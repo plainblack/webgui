@@ -19,10 +19,19 @@ use WebGUI::Session;
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
         if (my $collateral = WebGUI::Collateral->find($param[0])) {
-                return '<a href="' . $collateral->getURL .
-                        '"><img src="' . $collateral->getIcon .
-                        '" align="middle" border="0" /> ' .
-                        $collateral->get("name") . '</a>';
+
+                # include default icon unless a second param
+                if ( ! $param[1] ) {
+                        return '<a href="' . $collateral->getURL .
+                                '"><img src="' . $collateral->getIcon .
+                                '" align="middle" border="0" /> ' .
+                                $collateral->get("name") . '</a>';
+
+                # second param was flag, so no accompanying image
+                } else {
+                        return '<a href="' . $collateral->getURL .
+                                '">' . $collateral->get("name") . '</a>';
+                }
         } else {
                 return undef;
         }
