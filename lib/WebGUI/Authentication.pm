@@ -147,9 +147,7 @@ sub deleteParams {
 
 =item authMethod
 
- Optionally specify the authentication method. Defaults
- to the user's current authentication method. If the user does not have
- an authentication method, then it defaults to the system-wide
+ Optionally specify the authentication method. Defaults to the system-wide
  authentication method.
 
 =cut
@@ -157,12 +155,6 @@ sub deleteParams {
 sub getParams {
 	my $uid = shift;
 	my $authMethod = shift;
-	if ($uid != $session{user}{userId} && $authMethod eq "") {
-		my $u = WebGUI::User->new($uid);
-		$authMethod = $u->authMethod;
-	} else {
-		$authMethod = $session{user}{authMethod};
-	}
 	$authMethod = $session{setting}{authMethod} if ($authMethod eq "");
 	return WebGUI::SQL->buildHashRef("select fieldName, fieldData from authentication 
 		where userId=$uid and authMethod='$authMethod'");
