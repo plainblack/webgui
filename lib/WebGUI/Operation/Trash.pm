@@ -37,7 +37,7 @@ sub _purgeUserTrash {
         #WebGUI::ErrorHandler::audit("emptying user trash");
 
         # Delete wobjects
-        $b = WebGUI::SQL->read("select * from wobject where pageId=3 and bufferUserId=" . quote($userId));
+        $b = WebGUI::SQL->read("select * from wobject where pageId='3' and bufferUserId=" . quote($userId));
         while ($base = $b->hashRef) {
                 $extended = WebGUI::SQL->quickHashRef("select * from ".$base->{namespace}."
                         where wobjectId=".quote($base->{wobjectId}));
@@ -141,7 +141,7 @@ sub www_cutTrashItem {
 								."where wobjectId=" .quote($session{form}{wid}));
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
 		}
-		WebGUI::SQL->write("update wobject set pageId=2, "
+		WebGUI::SQL->write("update wobject set pageId='2', "
 				."bufferUserId=". quote($session{user}{userId}) .", "
 				."bufferDate=". time() .", "
 				."bufferPrevId=3 "
@@ -346,10 +346,10 @@ sub www_manageTrash {
 	# Generate list of wobjects in clipboard
 	if ($allUsers) {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
-			. "from wobject where pageId=3 order by bufferDate");
+			. "from wobject where pageId='3' order by bufferDate");
 	} else {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
-			. "from wobject where pageId=3 and bufferUserId="
+			. "from wobject where pageId='3' and bufferUserId="
 			. quote($session{user}{userId}) ." order by bufferDate");
 	}
         while (@data = $sth->array) {
