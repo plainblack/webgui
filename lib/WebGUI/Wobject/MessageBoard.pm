@@ -261,7 +261,7 @@ sub www_view {
 	my $caller;
 	my $sth = WebGUI::SQL->read("select * from MessageBoard_forums where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
 	while (my $forumMeta = $sth->hashRef) {
-		my $callback = WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")."&forumId=".$forumMeta->{forumId});
+		my $callback = WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId"));
 		if ($session{form}{forumOp}) { 
 			if ($session{form}{forumId} == $forumMeta->{forumId}) {
 				$caller = {
