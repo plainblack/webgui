@@ -498,7 +498,10 @@ sub www_listUsers {
                 <td class="tableHeader">'.WebGUI::International::get(50).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(56).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(453).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(454).'</td></tr>';
+                <td class="tableHeader">'.WebGUI::International::get(454).'</td>
+                <td class="tableHeader">'.WebGUI::International::get(429).'</td>
+                <td class="tableHeader">'.WebGUI::International::get(434).'</td>
+		</tr>';
 	if ($session{scratch}{userSearchStatus}) {
 		$selectedStatus = "status='".$session{scratch}{userSearchStatus}."'";
 	} else {
@@ -523,6 +526,18 @@ sub www_listUsers {
 		$output .= '<td class="tableData">'.$data->{email}.'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{dateCreated},"%z").'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{lastUpdated},"%z").'</td>';
+		my ($lastLoginStatus, $lastLogin) = WebGUI::SQL->quickArray("select status,timeStamp from userLoginLog where 
+                        userId='$data->{userId}' order by timeStamp DESC");
+                if ($lastLogin) {
+                        $output .= '<td class="tableData">'.epochToHuman($lastLogin).'</td>';
+                } else {
+                        $output .= '<td class="tableData"> - </td>';
+                }
+                if ($lastLoginStatus) {
+                        $output .= '<td class="tableData">'.$lastLoginStatus.'</td>';
+                } else {
+                        $output .= '<td class="tableData"> - </td>';
+                }
 		$output .= '</tr>';
 	}
         $output .= '</table>';
