@@ -95,7 +95,7 @@ the values you wish to appear, one per line.</p>
 
         'metadata manage body' => {
                 message => q|
-<p>The content profiling system in WebGUI (also known as the meta data system) allows you to identify content. Metadata is
+<p>The content profiling system in WebGUI (also known as the metadata system) allows you to identify content. Metadata is
 information about the content, and is defined in terms of property-value pairs.</p>
 <p>Examples of metadata:</p>
 <ul>
@@ -103,55 +103,37 @@ information about the content, and is defined in terms of property-value pairs.<
   <li>adult content: no</li>
   <li>source: newspaper</li>
 </ul>
-<p>In the example <b>source: newspaper</b> is <i>source</i> the <i>property</i>
-and <i>newspaper</i> the <i>value</i>.</p>
+<p>In the example <b>source: newspaper</b>, this metadata has a <i>property</i> named
+<i>source</i> with a <i>value</i> of <i>newspaper</i>.</p>
 <p>Metadata properties are defined globally, while Metadata values are set for
 each wobject under the tab &quot;Metadata&quot; in the wobject properties.</p>
-<p>Before you can use metadata, you'll have to switch the &quot;Enable Metadata
-?&quot; setting to Yes.</p>
+<p>Before you can use metadata in WebGUI, you'll have to switch the &quot;Enable Metadata
+?&quot; setting to Yes in the Manage Settings menu.</p>
 <p>Usage of metadata:</p>
 <ul>
   <li><b>Passive Profiling</b><br>
     When passive profiling is switched on, every wobject viewed by a user will
-    be logged.&nbsp;<br>
-    The WebGUI scheduler summarizes the profiling information on a regular
-    basis.&nbsp;<br>
-    The metadata is used to generate the summary. This is basically content
+    be logged.  The WebGUI scheduler summarizes the profiling information on a regular
+    basis.
+    This is basically content
     ranking based upon the user's Areas of Interest (AOI).<br>
     By default the summarizer runs once a day. However you can change that by
-    setting: <b>passiveProfileInterval = &lt;number of seconds&gt; </b>in the
+    setting: <b>passiveProfileInterval = &lt;number of seconds&gt;</b> in the
     WebGUI config file. <br>
   </li>
-</ul>
-<ul>
-  <li><b>Areas of Interest Ranking<br>
-    </b>Metadata in combination with passive profiling produces AOI (Areas of
+  <li><b>Areas of Interest Ranking</b><br>
+    Metadata in combination with passive profiling produces AOI (Areas of
     Interest) information. You can retrieve the value of a metadata property
-    with the ^AOIRank macro:<br>
-    <br>
-    ^AOIRank(contenttype); <br>
-    This would return the highest ranked contenttype for this user, such as
-    &quot;sport&quot;.<br>
-    <br>
-    ^AOIRank(contenttype,2);<br>
-    This would return the second highest ranked contenttype for this user.<br>
-    <br>
-    You can also retrieve the number of hits a particular AOI has gotten:<br>
-    <br>
-    ^AOIHits(contenttype,sport); <br>
-    This would return 99 is this user has looked at content that was tagged
-    &quot;contenttype = sport&quot; 99 times. </li>
-</ul>
-<ul>
+    with the &#94;AOIRank(); and &#AOIHits(); macros.
   <li><b>Show content based upon criteria<br>
     </b>The Wobject Proxy allows you to select content based upon criteria like:<br>
     contenttype = sport AND source != newspaper<br>
     <br>
     You can use the AOI macro's described above in the criteria, so you can
     present content based upon the users Areas of Interest. Example:<br>
-    type = ^AOIRank(contenttype);</li>
+    type = &#94;AOIRank(contenttype);</li>
 </ul>|,
-                lastUpdated => 1099039511,
+                lastUpdated => 1099517844
                 context => q|Metadata help|
         },
 
