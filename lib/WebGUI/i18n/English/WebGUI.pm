@@ -2817,6 +2817,15 @@ To programmers conditions are nothing new, but to designers they can often be co
 <i>Example:</i> &lt;tmpl_if isTrue&gt; It was true!&lt;tmpl_else&gt; It was false! &lt;/tmpl_if&gt;
 <p/>
 
+<p>Truth or falsehood is determined by the following rules:
+<ul>
+<li><p>Variables not used in this template are false.</p></li>
+<li><p>Variables which are undefined are false.</p></li>
+<li><p>Variables which are empty are false.</p></li>
+<li><p>Variables which are equal to zero are false.</p></li>
+<li><p>All other variables are true.</p></li>
+</ul></p>
+
 <b>Loops</b><br/>
 Loops iterate over a list of data output for each pass in the loop. Loops are slightly more complicated to use than plain variables, but are considerably more powerful.
 <p/>
@@ -2860,7 +2869,7 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 </pre>
 
 <p/>|,
-		lastUpdated =>1102704289,
+		lastUpdated =>1106608811,
 	},
 
 	'354' => {
