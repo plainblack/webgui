@@ -73,6 +73,47 @@ sub _getNextSequenceNumber {
 
 #-------------------------------------------------------------------
 
+=head2 confirm ( message, yesURL, [ , noURL, vitalComparison ] )
+
+=item message
+
+ A string containing the message to prompt the user for this action.
+
+=item yesURL
+
+ A URL to the web method to execute if the user confirms the action.
+
+=item noURL
+
+ A URL to the web method to execute if the user denies the action.
+ Defaults back to the current page.
+
+=item vitalComparison
+
+ A comparison expression to be used when checking whether the action
+ should be allowed to continue. Typically this is used when the
+ action is a delete of some sort.
+
+=cut
+
+sub confirm {
+        my ($output, $noURL);
+        if ($_[4]) {
+                return WebGUI::Privilege::vitalComponent();
+        } elsif (WebGUI::Privilege::canEditPage()) {
+		$noURL = $_[3] || WebGUI::URL::page();
+                $output = '<h1>'.WebGUI::International::get(42).'</h1>';
+                $output .= $_[1].'<p>';
+                $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44).'</a>';
+                $output .= ' &nbsp; <a href="'.$noURL.'">'.WebGUI::International::get(45).'</a></div>';
+                return $output;
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
 =head2 description ( )
 
  Returns this instance's description if it exists.
@@ -207,6 +248,92 @@ sub inDateRange {
 	} else {
 		return 0;
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 moveCollateralDown ( tableName, idName, id )
+
+ Moves a collateral data item down one position. This assumes that the
+ collateral data table has a column called "wobjectId" that identifies
+ the wobject, and a column called "sequenceNumber" that determines
+ the position of the data item.
+
+=item tableName
+
+ A string indicating the table that contains the collateral data.
+
+=item idName
+
+ A string indicating the name of the column that uniquely identifies
+ this collateral data item.
+
+=item id
+
+ An integer that uniquely identifies this collateral data item.
+
+=cut
+
+### NOTE: There is a redundant use of wobjectId in some of these statements on purpose to support
+### two different types of collateral data.
+
+sub moveCollateralDown {
+        my ($id, $seq);
+        if (WebGUI::Privilege::canEditPage()) {
+                ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+                ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
+			." and sequenceNumber=$seq+1 group by wobjectId");
+                if ($id ne "") {
+                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
+                }
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head2 moveCollateralUp ( tableName, idName, id )
+
+ Moves a collateral data item up one position. This assumes that the
+ collateral data table has a column called "wobjectId" that identifies
+ the wobject, and a column called "sequenceNumber" that determines
+ the position of the data item.
+
+=item tableName
+
+ A string indicating the table that contains the collateral data.
+
+=item idName
+
+ A string indicating the name of the column that uniquely identifies
+ this collateral data item.
+
+=item id
+
+ An integer that uniquely identifies this collateral data item.
+
+=cut
+
+### NOTE: There is a redundant use of wobjectId in some of these statements on purpose to support
+### two different types of collateral data.
+
+sub moveCollateralUp {
+        my ($id, $seq);
+        if (WebGUI::Privilege::canEditPage()) {
+                ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $_[1] where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+                ($id) = WebGUI::SQL->quickArray("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")
+			." and sequenceNumber=$seq-1 group by wobjectId");
+                if ($id ne "") {
+                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber-1 where $_[2]=$_[3] and wobjectId=".$_[0]->get("wobjectId"));
+                        WebGUI::SQL->write("update $_[1] set sequenceNumber=sequenceNumber+1 where $_[2]=$id and wobjectId=".$_[0]->get("wobjectId"));
+                }
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -588,6 +715,23 @@ sub www_paste {
         } else {
                 return WebGUI::Privilege::insufficient();
         }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+ The default display mechanism for any wobject. This web method MUST
+ be overridden.
+
+=cut
+
+sub www_view {
+	my ($output);
+	$output = $_[0]->displayTitle;
+	$output .= $_[0]->description;
+	$output = $_[0]->processMacros($output);
+	return $output;
 }
 
 1;
