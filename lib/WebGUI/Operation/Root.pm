@@ -39,7 +39,7 @@ sub www_listRoots {
         $sth = WebGUI::SQL->read("select * from page where title<>'Reserved' and parentId='0' order by title");
         while (%data = $sth->hash) {
                 $row[$i] = '<tr><td valign="top" class="tableData">'
-			.deleteIcon('op=deletePage',$data{urlizedTitle})
+			.deleteIcon('op=deletePageConfirm',$data{urlizedTitle},WebGUI::International::get(101))
 			.editIcon('op=editPage',$data{urlizedTitle})
 			.cutIcon('op=cutPage',$data{urlizedTitle})
 			.'</td>';

@@ -1165,28 +1165,6 @@ sub www_cut {
 
 #-------------------------------------------------------------------
 
-=head2 www_delete ( )
-
-Prompts a user to confirm whether they wish to delete this instance.
-
-=cut
-
-sub www_delete {
-	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-        my $output = WebGUI::International::get(43);
-	$output .= '<p>';
-        $output .= '<div align="center"><a href="'.WebGUI::URL::page('func=deleteConfirm&wid='. $self->get("wobjectId")).'">';
-	$output .= WebGUI::International::get(44); 
-	$output .= '</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">';
-	$output .= WebGUI::International::get(45);
-	$output .= '</a></div>';
-        return $self->adminConsole($output,'42',"wobject delete","WebGUI");
-}
-
-#-------------------------------------------------------------------
-
 =head2  www_deleteConfirm ( )
 
 Moves this instance to the trash.
