@@ -20,7 +20,6 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 
-
 #-------------------------------------------------------------------
 sub _notify {
 	my ($u, $message, $subject);
@@ -53,7 +52,7 @@ sub addEntry {
 	$url = $_[4];
 	$status = $_[5];
 	if ($groupId ne "") {
-		@users = WebGUI::SQL->quickArray("select userId from groupings where groupId=$groupId");
+		@users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
 	}
 	@users = ($userId,@users);
 	foreach $user (@users) {
@@ -82,9 +81,9 @@ sub addInternationalizedEntry {
         %message = WebGUI::SQL->buildHash("select languageId,message from international where internationalId=$internationalId and namespace='$namespace'");
         %subject = WebGUI::SQL->buildHash("select languageId,message from international where internationalId=523 and namespace='WebGUI'");
         if ($groupId ne "") {
-                @users = WebGUI::SQL->quickArray("select userId from groupings where groupId=$groupId");
+                @users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
         }
-        @users = ($userId,@users);
+	@users = ($userId,@users);
         foreach $user (@users) {
                 $u = WebGUI::User->new($user);
                 if ($u->userId ne "") {
