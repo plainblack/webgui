@@ -625,7 +625,7 @@ sub www_process {
 					where DataForm_entryId=$entryId and DataForm_fieldId=".quote($row{DataForm_fieldId}));
 				$updating = 1;
 			} else {
-				WebGUI::SQL->write("insert into DataForm_entryData (DataForm_entryId,wobjectId,name,value) values
+				WebGUI::SQL->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,wobjectId,value) values
 					($entryId, $row{DataForm_fieldId}, ".$_[0]->get("wobjectId").", ".quote($value).")");
 			}
 		}
