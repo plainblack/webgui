@@ -79,14 +79,24 @@ sub fatalError {
 	} else {
 		print '<h3>Session Variables</h3><table bgcolor="#ffffff" style="color: #000000; font-size: 10pt; font-family: helvetica;">';
         	while (my ($section, $hash) = each %session) {
-        		while (my ($key, $value) = each %$hash) {
-                		if (ref $value eq 'ARRAY') {
-                        		$value = '['.join(', ',@$value).']';
-                       	 	} elsif (ref $value eq 'HASH') {
-                                	$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
-                        	}
-                        	print '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
-                	}
+			if (ref $hash eq 'HASH') {
+                                while (my ($key, $value) = each %$hash) {
+                                        if (ref $value eq 'ARRAY') {
+                                                $value = '['.join(', ',@$value).']';
+                                        } elsif (ref $value eq 'HASH') {
+                                                $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+                                        }
+                                        unless (lc($key) eq "password" || lc($key) eq "identifier") {
+                                                print '<tr><td align="right"><b>'.$section.'.'.$key.':</b></td><td>'.$value.'</td>';
+                                        }
+                                }
+                        } elsif (ref $hash eq 'ARRAY') {
+                                my $i = 1;
+                                foreach (@$hash) {
+                                        $debug .= '<tr><td align="right"><b>'.$section.'.'.$i.':</b></td><td>'.$_.'</td>';
+                                        $i++;
+                                }
+                        }
                 	print '<tr height=10><td>&nbsp;</td><td>&nbsp</td></tr>';
         	}
         	print '</table>';
