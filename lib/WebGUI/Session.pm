@@ -17,6 +17,7 @@ package WebGUI::Session;
 
 use CGI;
 use Data::Config;
+use Date::Calc;
 use DBI;
 use Exporter;
 use strict;
@@ -110,8 +111,8 @@ sub _setupSessionVars {
 		if ($vars{sessionId} ne "") {
 			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
                 		where sessionId=".quote($_[0]));
-			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', 
-				expires=".(time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
+			WebGUI::SQL->write("update userSession set lastPageView="._time().", lastIP='$ENV{REMOTE_ADDR}', 
+				expires=".(_time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
 		} else {
 			start(1,$_[0]);
                 }
@@ -154,6 +155,12 @@ sub _setupUserInfo {
        		}
 	}
 }
+
+#-------------------------------------------------------------------
+sub _time {
+	return Date::Calc::Date_to_Time(Date::Calc::Today_and_Now());
+}
+
 
 #-------------------------------------------------------------------
 sub _loadAuthentication {
@@ -636,9 +643,9 @@ Session id will be generated if not specified. In almost every case you should l
 
 sub start {
 	my ($sessionId);
-	$sessionId = $_[1] || crypt((time()*rand(1000)),rand(99));
+	$sessionId = $_[1] || crypt((_time()*rand(1000)),rand(99));
 	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-		(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
+		(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
 	setCookie("wgSession",$sessionId);
 	refreshSessionVars($sessionId);
 }
