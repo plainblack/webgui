@@ -150,7 +150,7 @@ sub _loadAuthentication {
 #-------------------------------------------------------------------
 sub _loadMacros {
 	my ($namespace, $cmd, @files, $file, $dir, $exclude);
-	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Authentication";
+	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Macro";
 	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
@@ -172,7 +172,7 @@ sub _loadMacros {
 #-------------------------------------------------------------------
 sub _loadWobjects {
 	my ($dir, @files, $file, $cmd, $namespace, $exclude);
-	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Authentication";
+	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Wobject";
 	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
