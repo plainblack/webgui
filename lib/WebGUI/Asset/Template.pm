@@ -312,7 +312,7 @@ sub processRaw {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	return $self->get("template");
+	return $self->getParent->view;
 }
 
 

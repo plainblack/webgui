@@ -1,6 +1,7 @@
 assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::File, \
 	WebGUI::Asset::Snippet, \
+	WebGUI::Asset::Template, \
 	WebGUI::Asset::Redirect, \
 	WebGUI::Asset::Wobject::Collaboration, \
 	WebGUI::Asset::Wobject::IndexedSearch, \

@@ -385,6 +385,7 @@ while (my $data = $sth->hashRef) {
 		$newNav{startPoint} = 1;
 		$newNav{assetsToInclude} = "pedigree";
 	}
+	$newAsset{assetSize} = length(join("",%newAsset).join("",%newNav).join("",%newWobject));
 	WebGUI::SQL->setRow("asset","assetId",\%newAsset,undef,$newNav{assetId});
 	WebGUI::SQL->setRow("wobject","assetId",\%newWobject,undef,$newNav{assetId});
 	WebGUI::SQL->setRow("Navigation","assetId",\%newNav,undef,$newNav{assetId});
@@ -1390,6 +1391,7 @@ while (my $data = $sth->hashRef) {
 	$newAsset{groupIdView} = "7";
 	$newAsset{groupIdEdit} = "4";
 	$newAsset{className} = 'WebGUI::Asset::Template';
+	$newAsset{assetSize} = length($data->{template});
 	$newAsset{state} = 'published';
 	$newAsset{lastUpdated} = time();
 	$newAsset{parentId} = $tempRootId;
@@ -1641,6 +1643,69 @@ $conf->write;
 
 
 print "\tSetting user function style\n" unless ($quiet);
+
+my $failsafestyle = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+                <title>^Page("title"); - WebGUI</title>
+				<tmpl_var head.tags>
+                <style type="text/css">
+			.menu {
+				position: absolute;
+				top: 50px;
+				left: 5px;
+                                z-index: 10;
+				font-family: georgia, verdana, helvetica, arial, sans-serif;
+                                color: white;
+				font-size: 11px;
+				}
+			.content {
+				position: absolute;
+				top: 50px;
+				left: 195px;
+                                z-index: 10;
+                                font-family: georgia, verdana, helvetica, arial, sans-serif;
+                                color: white;
+				font-size: 13px;
+                                }
+                        .header {
+				position: absolute;
+				left: 5px;
+				top: 5px;
+                                z-index: 10;
+                                font-size: 30px;
+                                font-family: georgia, verdana, helvetica, arial, sans-serif;
+                                color: white;
+                                }
+			.background {
+				position: absolute; 
+				top: 0; 
+				left: 0; 
+				width: 100%; 
+				height: 100%; 
+				z-index: 5;
+				border: 0px;
+				}
+			body {
+				background-color: #6974DE;
+				}
+				</style>
+        </head>
+        <body>	
+			^AdminBar;
+			<div class="header">^PageTitle;</div>
+			<div class="menu">^AssetProxy(flexMenu);</div>
+			<div class="content"><tmpl_var body.content>
+			<hr />
+			^LoginToggle; &nbsp; ^a(^@;); &nbsp; ^AdminToggle;
+			</div>
+			<img src="<tmpl_var session.config.extrasURL>/background.jpg" border="0" class="background" />
+		</body>
+</html>
+';
+
+WebGUI::SQL->write("update template set template=".quote($failsafestyle)." where assetId='PBtmpl0000000000000060'");
 my ($defaultPageId) = WebGUI::SQL->quickArray("select value from settings where name='defaultPage'");
 my ($styleId) = WebGUI::SQL->quickArray("select styleTemplateId from wobject where assetId=".quote($defaultPageId));
 WebGUI::SQL->write("insert into settings (name,value) values ('userFunctionStyleId',".quote($styleId).")");
@@ -1750,8 +1815,8 @@ sub walkTree {
 			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}||"Untitled").",
 			".quote($page->{menuTitle}||"Untitled").", ".quote($pageUrl).", ".quote($page->{startDate}).", ".quote($page->{endDate}).",
 			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}||'3').",
-			".quote($page->{groupIdView}||'7').", ".quote($page->{groupIdEdit}.'3').", ".quote($page->{encryptPage}).",
-			".length($page->{title}.$page->{menuTitle}.$page->{synopsis}.$page->{urlizedTitle}).", ".quote($page->{metaTags}).")");
+			".quote($page->{groupIdView}||'7').", ".quote($page->{groupIdEdit}||'3').", ".quote($page->{encryptPage}).",
+			".length(join("",%{$page})).", ".quote($page->{metaTags}).")");
 		if ($page->{redirectURL} ne "") {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {
@@ -1785,7 +1850,7 @@ sub walkTree {
 				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($wobject->{title}||'Untitled').",
 				".quote($wobject->{title}||'Untitled').", ".quote($wobjectUrl).", ".quote($wobject->{startDate}).", ".quote($wobject->{endDate}).",
 				1, ".quote($ownerId||'3').", ".quote($groupIdView||'7').", ".quote($groupIdEdit||'3').", ".quote($page->{encryptPage}).",
-				".length($wobject->{title}.$wobject->{description}).")");
+				".length(join("",%{$wobject})).")");
 			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId).", styleTemplateId=".quote($page->{styleId}||'1').",
 				printableStyleTemplateId=".quote($page->{printableStyleId}||'1').", cacheTimeout=".quote($page->{cacheTimeout})
 				.", cacheTimeoutVisitor=".quote($page->{cacheTimeoutVisitor})." where wobjectId=".quote($wobject->{wobjectId}));
