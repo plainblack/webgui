@@ -38,6 +38,7 @@ This package provides an interface for managing WebGUI user and group groupings.
  $arrayRef = WebGUI::Grouping::getGroupsForUser($userId);
  $arrayRef = WebGUI::Grouping::getGroupsInGroup($groupId);
  $arrayRef = WebGUI::Grouping::getUsersInGroup($groupId);
+ $yesNo = WebGUI::Grouping::userGroupAdmin($userId,$groupId);
  $epoch = WebGUI::Grouping::userGroupExpireDate($userId,$groupId);
 
 =head1 METHODS
@@ -294,6 +295,40 @@ sub getUsersInGroup {
 }
 
 
+
+#-------------------------------------------------------------------
+
+=head2 userGroupAdmin ( userId, groupId [, value ] )
+
+Returns a 1 or 0 depending upon whether the user is a sub-admin for this group.
+
+=over
+
+=item userId
+
+An integer that is the unique identifier for a user.
+
+=item groupId
+
+An integer that is the unique identifier for a group.
+
+=item value
+
+If specified the admin flag will be set to this value.
+
+=back
+
+=cut
+
+sub userGroupAdmin {
+	if ($_[2]) {
+		WebGUI::SQL->write("update groupings set groupAdmin=$_[2] where groupId=$_[1] and userId=$_[0]");
+		return $_[2];
+	} else {
+		my ($admin) = WebGUI::SQL->quickArray("select groupAdmin from groupings where groupId=$_[1] and userId=$_[0]");
+		return $admin;
+	}
+}	
 
 #-------------------------------------------------------------------
 

@@ -37,7 +37,7 @@ our @EXPORT = qw(&www_viewMessageLogMessage &www_viewThreadSubscriptions &www_vi
 sub _accountOptions {
 	my ($output);
 	$output = '<div class="accountOptions"><ul>';
-	if (WebGUI::Privilege::isInGroup(4) || WebGUI::Privilege::isInGroup(5) || WebGUI::Privilege::isInGroup(6) || WebGUI::Privilege::isInGroup(8)) {
+	if (WebGUI::Privilege::isInGroup(4) || WebGUI::Privilege::isInGroup(5) || WebGUI::Privilege::isInGroup(6) || WebGUI::Privilege::isInGroup(8) || WebGUI::Privilege::isInGroup(9) || WebGUI::Privilege::isInGroup(10) || WebGUI::Privilege::isInGroup(11)) {
 		if ($session{var}{adminOn}) {
 			$output .= '<li><a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.
 				WebGUI::International::get(12).'</a>';
@@ -99,6 +99,7 @@ sub _validateProfileData {
         $a->finish;
 	return (\%data, $error);
 }
+
 
 #-------------------------------------------------------------------
 sub www_createAccount {

@@ -105,12 +105,18 @@ sub process {
 			WebGUI::URL::page('op=listGroups')=>WebGUI::International::get(5), 
 			WebGUI::URL::page('op=manageSettings')=>WebGUI::International::get(4), 
 			WebGUI::URL::page('op=listUsers')=>WebGUI::International::get(7),
-			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
 			WebGUI::URL::page('op=viewStatistics')=>WebGUI::International::get(144)
 		);
-	}
+	} elsif (WebGUI::Privilege::isInGroup(11)) {
+                %hash = (
+			WebGUI::URL::page('op=listGroupsSecondary')=>WebGUI::International::get(5), 
+			WebGUI::URL::page('op=addUserSecondary')=>WebGUI::International::get(169),
+                        %hash
+                );
+        }
 	if (WebGUI::Privilege::isInGroup(4)) {
         	%hash = ( 
+			WebGUI::URL::page('op=listRoots')=>WebGUI::International::get(410),
 			'http://validator.w3.org/check?uri=http%3A%2F%2F'.$session{env}{SERVER_NAME}.
 				WebGUI::URL::page()=>WebGUI::International::get(399),
 			WebGUI::URL::page('op=manageClipboard')=>WebGUI::International::get(949),
