@@ -728,6 +728,7 @@ sub www_unsubscribe {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
+	my $postId = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
 	my $cache;
 	my $output;
@@ -742,7 +743,7 @@ sub www_view {
 		not $session{var}{adminOn}
 	);
 	if ($useCache) {
-               	$cache = WebGUI::Cache->new("cspost_".$self->getId."_".$session{user}{userId});
+               	$cache = WebGUI::Cache->new("cspost_".($postId||$self->getId)."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_".$session{form}{pn});
            	$output = $cache->get;
 	}
 	unless ($output) {

@@ -51,6 +51,14 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	return $session{config}{extrasURL}.'/assets/small/messageBoard.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/messageBoard.gif';
+}
+
+#-------------------------------------------------------------------
 sub getName {
         return WebGUI::International::get(2,"MessageBoard");
 }

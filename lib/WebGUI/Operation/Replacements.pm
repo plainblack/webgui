@@ -89,11 +89,15 @@ sub www_editReplacementSave {
 sub www_listReplacements {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output = '<table>';
-	my $sth = WebGUI::SQL->read("select replacementId,searchFor from replacements order by searchFor");
+	$output .= '<tr><td></td><td class="tableHeader">'.WebGUI::International::get(1050).'</td><td class="tableHeader">'.WebGUI::International::get(1051).'</td></tr>';
+	my $sth = WebGUI::SQL->read("select replacementId,searchFor,replaceWith from replacements order by searchFor");
 	while (my $data = $sth->hashRef) {
 		$output .= '<tr><td>'.deleteIcon("op=deleteReplacement&amp;replacementId=".$data->{replacementId})
 			.editIcon("op=editReplacement&amp;replacementId=".$data->{replacementId}).'</td>';
-		$output .= '<td class="tableData">'.$data->{searchFor}.'</td></tr>';
+		$data->{replaceWith} =~ s/\&/\&amp\;/g;
+		$data->{replaceWith} =~ s/\</\&lt\;/g;
+        	$data->{replaceWith} =~ s/\>/\&gt\;/g;
+		$output .= '<td class="tableData">'.$data->{searchFor}.'</td><td class="tableData">'.$data->{replaceWith}.'</td></tr>';
 	}
 	$sth->finish;
 	$output .= '</table>';

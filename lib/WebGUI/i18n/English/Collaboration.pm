@@ -406,7 +406,7 @@ our $I18N = {
 		lastUpdated => 1109698614,
 	},
 
-	'preview' => {
+	'use preview' => {
 		message => q|Use preview?|,
 		lastUpdated => 1109698614,
 	},

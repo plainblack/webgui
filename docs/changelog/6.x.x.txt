@@ -1,3 +1,23 @@
+6.5.2
+ - Fixed a caching bug in the collaboration system that wouldn't allow you to
+   view other posts if you were in threaded mode.
+ - fix [ 1160969 ] 6.5.x plainblack.com - Second edit of Post fails
+ - fix [ 1161571 ] 6.5.0, pagination on view forum always returns page 1
+ - fix [ 1163780 ] Pagination not working for Thread in Nested view
+ - fix [ 1163761 ] session from 10.0.0.2 in create.sql
+ - fix [ 1160971 ] 6.5.x - Use Preview setting ignored in collaboration
+   systems
+ - fix [ 1159395 ] Rating causes Problem with request
+ - fix [ 1150169 ] archive posts
+ - fix [ 1149830 ] Collaboration System privileges not correct
+ - fix [ 1157197 ] content filters shows only word to be replaced
+ - fix [ 1088201 ] Deleted discussion thread negatively offsets reply count
+ - fix [ 1162056 ] No default template for Data Form with no tabs
+ - fix [ 1029170 ] Forum: Sorting thread by date
+ - Fixed a sort by last reply crash bug.
+ - fix [ 1160947 ] Make page printable does not work
+
+
 6.5.1
  - Fixed a bug in the lineage tree that caused funky ranks to be created when
    pasting assets.

@@ -629,8 +629,6 @@ sub processPropertiesFromFormPost {
 		}
 		%data = (
 			ownerUserId => $session{user}{userId},
-			groupIdView => $self->getThread->getParent->get("groupIdView"),
-			groupIdEdit => $self->getThread->getParent->get("groupIdEdit"),
 			isHidden => 1,
 			dateSubmitted=>time()
 			);
@@ -638,7 +636,11 @@ sub processPropertiesFromFormPost {
         		$self->getThread->lock if ($session{form}{'lock'});
         		$self->getThread->stick if ($session{form}{stick});
 		}
+	} else {
+		$data{ownerUserId} = $session{form}{userId};
 	}
+	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
+	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
 	$data{startDate} = $self->getThread->getParent->get("startDate") unless ($session{form}{startDate});
 	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($session{form}{endDate});
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
@@ -832,14 +834,13 @@ sub www_edit {
 				value=>$session{form}{class}
 				});
         	$var{'isNewPost'} = 1;
+		$content = $session{form}{content};
+		$title = $session{form}{title};
 		if ($session{form}{class} eq "WebGUI::Asset::Post") { # new reply
 			$self->{_thread} = $self->getParent->getThread;
 			return WebGUI::Privilege::insufficient() unless ($self->getThread->canReply);
 			$var{isReply} = 1;
-			if ($session{form}{content} || $session{form}{title}) {
-				$content = $session{form}{content};
-				$title = $session{form}{title};
-			} else {
+			unless ($session{form}{content} || $session{form}{title}) {
                 		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($session{form}{withQuote});
                 		$title = $self->getParent->get("title");
                 		$title = "Re: ".$title unless ($title =~ /^Re:/);
@@ -873,6 +874,10 @@ sub www_edit {
 			.WebGUI::Form::hidden({
                 		name=>"func",
 				value=>"edit"
+				})
+			.WebGUI::Form::hidden({
+				name=>"userId",
+				value=>$self->getValue("ownerUserId")
 				});
 		$var{isEdit} = 1;
 		$content = $self->getValue("content");
@@ -993,7 +998,7 @@ sub www_view {
 	my $self = shift;
 	$self->markRead;
 	$self->incrementViews;
-	return $self->getThread->www_view;
+	return $self->getThread->www_view($self->getId);
 }
 
 

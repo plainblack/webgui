@@ -2733,8 +2733,6 @@ CREATE TABLE userLoginLog (
 --
 
 
-INSERT INTO userLoginLog VALUES ('3','success',1109989498,'10.0.0.2','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.6) Gecko/20050225 Firefox/1.0.1');
-INSERT INTO userLoginLog VALUES ('3','success',1109989768,'10.0.0.2','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.6) Gecko/20050225 Firefox/1.0.1');
 
 --
 -- Table structure for table `userProfileCategory`
@@ -2869,11 +2867,6 @@ CREATE TABLE userSession (
 --
 
 
-INSERT INTO userSession VALUES ('82WNZSBtGILYo',1109992028,1109988428,0,'66.196.91.102','1');
-INSERT INTO userSession VALUES ('19y/YcYUDLoHw',1109991892,1109988292,0,'68.142.251.125','1');
-INSERT INTO userSession VALUES ('24jJHPg295S56',1109990899,1109987299,0,'68.142.250.47','1');
-INSERT INTO userSession VALUES ('32eqpqD/QNpew',1109993461,1109989861,0,'10.0.0.2','3');
-INSERT INTO userSession VALUES ('68RJ6HMaKCbp6',1110383374,1110379774,0,'','1');
 
 --
 -- Table structure for table `userSessionScratch`

@@ -1,3 +1,4 @@
 insert into webguiVersion values ('6.5.2','upgrade',unix_timestamp());
-
-
+update template set template = '<a name=\"<tmpl_var assetId>\"></a> <h1><tmpl_var newheader></h1>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n\r\n<tmpl_if user.isVisitor>\r\n	<tr><td><tmpl_var visitorName.label></td><td><tmpl_var visitorName.form></td></tr>\r\n</tmpl_if>\r\n\r\n<tr><td><tmpl_var subject.label></td><td><tmpl_var title.form></td></tr>\r\n<tr><td><tmpl_var message.label></td><td><tmpl_var content.form></td></tr>\r\n\r\n<tmpl_if newisNewMessage>\r\n	<tmpl_unless user.isVisitor>\r\n		<tr><td><tmpl_var subscribe.label></td><td><tmpl_var subscribe.form></td></tr>\r\n	</tmpl_unless>\r\n	<tmpl_if user.isModerator>\r\n		<tr><td><tmpl_var lock.label></td><td><tmpl_var lock.form></td></tr>\r\n		<tr><td><tmpl_var sticky.label></td><td><tmpl_var sticky.form></td></tr>\r\n	</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tr><td><tmpl_var contentType.label></td><td><tmpl_var contentType.form></td></tr>\r\n<tr><td></td><td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td></tr>\r\n\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<p>\r\n<tmpl_var full>\r\n</p>' where assetId='PBtmpl0000000000000029';
+update asset set endDate=32472169200 where endDate=9223372036854775807;
+alter table asset change endDate endDate bigint(20) not null default 32472169200;

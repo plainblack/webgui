@@ -109,8 +109,8 @@ sub process {
 	my %var;
 	$var{'body.content'} = shift;
 	my $templateId = shift;
-	if ($session{page}{makePrintable}) {
-		$templateId = $session{page}{printableStyleId};
+	if ($session{page}{makePrintable} && exists $session{asset}) {
+		$templateId = $session{asset}->get("printableStyleTemplateId");
 	} elsif ($session{scratch}{personalStyleId} ne "") {
 		$templateId = $session{scratch}{personalStyleId};
 	} elsif ($session{page}{useEmptyStyle}) {

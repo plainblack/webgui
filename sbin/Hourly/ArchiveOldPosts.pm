@@ -12,21 +12,23 @@ package Hourly::ArchiveOldPosts;
 
 
 use strict;
+use WebGUI::Asset::Post;
 use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	return ""; # disabled for the time being
 	my $epoch = WebGUI::DateTime::time();
-	my $a = WebGUI::SQL->read("select assetId,archiveAfter,masterForumId from forum");
-	while (my $forum = $a->hashRef) {
-		my $archiveDate = $epoch - $forum->{archiveAfter};
-		my $b = WebGUI::SQL->read("select forumThreadId from forumThread where forumId=".quote($forum->{forumId})." and lastPostDate<$archiveDate");
-		while (my ($threadId) = $b->array) {
-			WebGUI::SQL->write("update forumPost set status='archived' where status='approved' and forumThreadId=".quote($threadId));
-			WebGUI::SQL->write("update forumThread set status='archived' where status='approved' and forumThreadId=".quote($threadId));
+	my $a = WebGUI::SQL->read("select asset.lineage,Collaboration.archiveAfter from Collaboration left join asset on Collaboration.assetId=asset.assetId");
+	while (my ($lineage, $archiveAfter) = $a->array) {
+		my $archiveDate = $epoch - $archiveAfter;
+		my $sql = "select * from Post left join asset on Post.assetId=asset.assetId left join Thread on Thread.assetId=Post.assetId
+			where Post.dateUpdated<$archiveDate and Post.status='approved' and asset.lineage like ".quote($lineage."%");
+		my $b = WebGUI::SQL->read($sql);
+		while (my $properties = $b->hashRef) {
+			my $post = WebGUI::Asset::Post->newByPropertyHashRef($properties);
+			$post->setStatusArchived;
 		}
 		$b->finish;
 	}

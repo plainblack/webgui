@@ -530,7 +530,7 @@ sub getEditForm {
 		);
         $tabform->getTab("properties")->yesNo(
 		-name=>"usePreview",
-		-label=>WebGUI::International::get('preview', 'Collaboration'),
+		-label=>WebGUI::International::get('use preview', 'Collaboration'),
 		-value=>$self->getValue("usePreview")
 		);
         $tabform->getTab("security")->yesNo(
@@ -737,9 +737,10 @@ Calculates the rating of this forum from its threads and stores the new value in
 sub recalculateRating {
         my $self = shift;
         my ($count) = WebGUI::SQL->quickArray("select count(*) from Thread left join asset on Thread.assetId=asset.assetId 
-		where asset.parentId=".quote($self->getId)." and Thread.rating>0");
+		left join Post on Thread.assetId=Post.assetId where asset.parentId=".quote($self->getId)." and Post.rating>0");
         $count = $count || 1;
-        my ($sum) = WebGUI::SQL->quickArray("select sum(Thread.rating) from Thread left join asset on Thread.assetId=asset.assetId where asset.parentId=".quote($self->getId)." and Thread.rating>0");
+        my ($sum) = WebGUI::SQL->quickArray("select sum(Post.rating) from Thread left join asset on Thread.assetId=asset.assetId 
+		left join Post on Thread.assetId=Post.assetId where asset.parentId=".quote($self->getId)." and Post.rating>0");
         my $average = round($sum/$count);
         $self->update({rating=>$average});
 }
@@ -835,12 +836,16 @@ sub view {
 		$constraints .= " or Post.status='pending'"; 
 	}
 	$constraints .= ")";
+	my $sortBy = $self->getValue("sortBy");
+	if ($sortBy eq "lastreply") {
+		$sortBy = "Thread.lastPostDate";
+	}
 	my $sql = "select * 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=asset.assetId 
 		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
-		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder");
+		order by ".$sortBy." ".$self->getValue("sortOrder");
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);
