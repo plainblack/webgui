@@ -155,14 +155,15 @@ sub process {
       			my $cmd = "WebGUI::Macro::".$session{config}{macros}{$searchString};
 			my $load = "use ".$cmd;
 			eval($load);
-			WebGUI::ErrorHandler::warn("Macro failed to compile: $cmd.".$@) if($@);
+			WebGUI::ErrorHandler::error("Macro failed to compile: $cmd.".$@) if($@);
       			$cmd = $cmd."::process";
 			my $result = eval{&$cmd($params)};
 			if ($@) {
-				WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
+				WebGUI::ErrorHandler::error("Processing failed on macro: $macro: ".$@);
 			} else {
 				if ($result =~ /\Q$macro/) {
                                         $result = "Endless macro loop detected. Stopping recursion.";
+					WebGUI::ErrorHandler::warn($macro." : ".$result)
                                 }
 				$content =~ s/\Q$macro/$result/ges;
 			}

@@ -93,7 +93,7 @@ Returns the next row of data as an array.
 =cut
 
 sub array {
-        return $_[0]->{_sth}->fetchrow_array() or WebGUI::ErrorHandler::fatalError("Couldn't fetch array. ".$_[0]->{_sth}->errstr);
+        return $_[0]->{_sth}->fetchrow_array() or WebGUI::ErrorHandler::fatal("Couldn't fetch array. ".$_[0]->{_sth}->errstr);
 }
 
 
@@ -279,7 +279,7 @@ sub execute {
 	my $self = shift;
 	my $placeholders = shift || [];
 	my $sql = $self->{_sql};
-	$self->{_sth}->execute(@{$placeholders}) or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: $sql  Root cause: ". DBI->errstr);
+	$self->{_sth}->execute(@{$placeholders}) or WebGUI::ErrorHandler::fatal("Couldn't execute prepared statement: $sql  Root cause: ". DBI->errstr);
 }
 
 

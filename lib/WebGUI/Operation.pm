@@ -56,11 +56,11 @@ sub execute {
 		# Load the module
 		$cmd = 'use '.$operation->{$op};
 		eval ($cmd);
-		WebGUI::ErrorHandler::fatalError("Couldn't compile operation: ".$operation->{$op}.". Root cause: ".$@) if ($@);
+		WebGUI::ErrorHandler::error("Couldn't compile operation: ".$operation->{$op}.". Root cause: ".$@) if ($@);
 		# Call the method
 		$cmd = $operation->{$op} . '::www_'.$op;
 		$output = eval($cmd);
-		WebGUI::ErrorHandler::fatalError("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
+		WebGUI::ErrorHandler::error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
 	} else {
                         WebGUI::ErrorHandler::security("execute an invalid operation: ".$op);
 	}

@@ -354,7 +354,7 @@ sub view {
       # the solution is to normalize all params to another table
       eval "\$arr_ref = [$param_str];";
       eval { @params = @$arr_ref; };
-      WebGUI::ErrorHandler::warn(WebGUI::International::get(22, "WSClient")) if $@ && $self->get('debugMode');
+      WebGUI::ErrorHandler::debug(WebGUI::International::get(22, "WSClient")) if $@ && $self->get('debugMode');
 
       if ($self->get('execute_by_default') || grep /^$call$/,
          @targetWobjects) {
@@ -363,12 +363,12 @@ sub view {
          # valid looking uri, but I haven't hunted for the relevant RFC yet
          if ($self->get("uri") =~ m!.+/.+!) {
 
-            WebGUI::ErrorHandler::warn('uri=' . $self->get("uri"))
+            WebGUI::ErrorHandler::debug('uri=' . $self->get("uri"))
                if $self->get('debugMode');
             $soap = $self->_instantiate_soap;
 
          } else {
-            WebGUI::ErrorHandler::warn(WebGUI::International::get(23, "WSClient")) if $self->get('debugMode');
+            WebGUI::ErrorHandler::debug(WebGUI::International::get(23, "WSClient")) if $self->get('debugMode');
          }
       }
    }
@@ -383,14 +383,14 @@ sub view {
             # otherwise)".  That "not stated otherwise" bit is important.
             my $return = $soap->$call(@params);
          
-            WebGUI::ErrorHandler::warn("$call(" . (join ',', @params) . ')')
+            WebGUI::ErrorHandler::debug("$call(" . (join ',', @params) . ')')
                if $self->get('debugMode');
 
             # The possible return types I've come across include a SOAP object,
             # a hash reference, a blessed object or a simple scalar.  Each type
             # requires different handling (woohoo!) before being passed to the
             # template system
-            WebGUI::ErrorHandler::warn(WebGUI::International::get(24, "WSClient") .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
+            WebGUI::ErrorHandler::debug(WebGUI::International::get(24, "WSClient") .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
 
             # SOAP object
             if ((ref $return) =~ /SOAP/i) {
@@ -423,9 +423,9 @@ sub view {
 
          # did the soap call fault?
          if ($@) {
-            WebGUI::ErrorHandler::warn($@) if $self->get('debugMode');
+            WebGUI::ErrorHandler::debug($@) if $self->get('debugMode');
             $var{'soapError'} = $@;
-            WebGUI::ErrorHandler::warn(WebGUI::International::get(25, "WSClient") . $var{'soapError'})
+            WebGUI::ErrorHandler::debug(WebGUI::International::get(25, "WSClient") . $var{'soapError'})
                if $self->get('debugMode');
          }
 
@@ -434,7 +434,7 @@ sub view {
          WebGUI::ErrorHandler::warn("Using cached data");
       }
 
-        WebGUI::ErrorHandler::warn(Dumper(@result)) if     
+        WebGUI::ErrorHandler::debug(Dumper(@result)) if     
            $self->get('debugMode');
 
       # Do we need to decode utf8 data?  Will only decode if modules were
@@ -508,7 +508,7 @@ sub view {
 
 
    } else {
-      WebGUI::ErrorHandler::warn(WebGUI::International::get(26, "WSClient") . $@) if $self->get('debugMode');
+      WebGUI::ErrorHandler::debug(WebGUI::International::get(26, "WSClient") . $@) if $self->get('debugMode');
    }
 
    # did they request a funky http header?
@@ -540,7 +540,7 @@ sub _instantiate_soap {
    # we don't use fault handling with wsdls becuase they seem to behave 
    # differently.  Not sure if that is by design.
      if ( ($self->get("uri") =~ m/\.wsdl\s*$/i) || ($self->get("uri") =~ m/\.\w*\?wsdl\s*$/i) ) {
-      WebGUI::ErrorHandler::warn('wsdl=' . $self->get('uri'))
+      WebGUI::ErrorHandler::debug('wsdl=' . $self->get('uri'))
          if $self->get('debugMode');
 
       # instantiate SOAP service
@@ -548,7 +548,7 @@ sub _instantiate_soap {
                                                                                 
    # standard uri namespace
    } else {
-      WebGUI::ErrorHandler::warn('uri=' . $self->get('uri'))
+      WebGUI::ErrorHandler::debug('uri=' . $self->get('uri'))
          if $self->get('debugMode');
 
       # instantiate SOAP service, with fault handling
@@ -562,7 +562,7 @@ sub _instantiate_soap {
       # proxy the call if requested
       if ($self->get("proxy") && $soap) {
 
-         WebGUI::ErrorHandler::warn('proxy=' . $self->get('proxy'))
+         WebGUI::ErrorHandler::debug('proxy=' . $self->get('proxy'))
             if $self->get('debugMode');
          $soap->proxy($self->get('proxy'),
             options => {compress_threshold => 10000});

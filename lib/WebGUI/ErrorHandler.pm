@@ -18,7 +18,9 @@ use FileHandle;
 use Log::Log4perl;
 use strict;
 use WebGUI::Session;
+use Log::Log4perl;
 
+$Log::Log4perl::caller_depth++;
 
 =head1 NAME 
 
@@ -26,7 +28,7 @@ Package WebGUI::ErrorHandler
 
 =head1 DESCRIPTION
 
-This package provides simple but effective error handling and logging for WebGUI.
+This package provides simple but effective error handling, debugging,  and logging for WebGUI.
 
 =head1 SYNOPSIS
 
@@ -46,7 +48,6 @@ This package provides simple but effective error handling and logging for WebGUI
  WebGUI::ErrorHandler::showAudit();
  WebGUI::ErrorHandler::showDebug();
  WebGUI::ErrorHandler::showSecurity();
- WebGUI::ErrorHandler::showSessionVars();
  WebGUI::ErrorHandler::showStackTrace();
  WebGUI::ErrorHandler::showWarnings();
 
@@ -65,7 +66,7 @@ These functions are available from this package:
 
 =head2 audit ( message )
 
-Inserts an AUDIT type message into the WebGUI log.
+A convenience function that wraps info() and includes the current username and user ID in addition to the message being logged.
 
 =head3 message
 
@@ -74,22 +75,67 @@ Whatever message you wish to insert into the log.
 =cut
 
 sub audit {
-        my $data = stamp("AUDIT").$WebGUI::Session::session{user}{username}
-		." (".$WebGUI::Session::session{user}{userId}.") ".$_[0]."\n";
-        writeLog($data);
-        $WebGUI::Session::session{debug}{audit} .= $data;
+	my $message = shift;
+	$Log::Log4perl::caller_depth++;
+        info($WebGUI::Session::session{user}{username}." (".$WebGUI::Session::session{user}{userId}.") ".$message);
+	$Log::Log4perl::caller_depth--;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 fatalError ( )
+=head2 debug ( message )
 
-Outputs an error message to the user and logs an error. Should only be called if the system cannot recover from an error, or if it would be unsafe to attempt to recover from an error (like compile errors or database errors).
+Adds a DEBUG type message to the log. These events should be things that are only used for diagnostic purposes.
+
+=head3 message
+
+The message you wish to add to the log.
 
 =cut
 
-sub fatalError {
+sub debug {
+	my $message = shift;
+	my $logger = getLogger();
+	$logger->debug($message);
+        $WebGUI::Session::session{debug}{'debug'} .= $message;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 error ( message )
+
+Adds a ERROR type message to the log. These events should be things that are errors that are not fatal. For instance, a non-compiling plug-in or erroneous user input.
+
+=head3 message
+
+The message you wish to add to the log.
+
+=cut
+
+sub error {
+	my $message = shift;
+	my $logger = getLogger();
+	$logger->error($message);
+	$logger->debug("Stack trace for ERROR ".$message."\n".getStackTrace());
+        $WebGUI::Session::session{debug}{'error'} .= $message;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 fatal ( )
+
+Adds a FATAL type message to the log, outputs an error message to the user, and forces a close on the session. This should only be called if the system cannot recover from an error, or it would be unsafe to recover from an error like database connectivity problems.
+
+=cut
+
+sub fatal {
+	my $message = shift;
+	my $logger = getLogger();
+	$logger->fatal($message);
+	$logger->debug("Stack trace for FATAL ".$message."\n".getStackTrace());
         my $cgi;
 	if (exists $WebGUI::Session::session{cgi}) {
 		$cgi = $WebGUI::Session::session{cgi};
@@ -98,10 +144,6 @@ sub fatalError {
 		$cgi = CGI->new;
 	}
 	print $cgi->header;
-	my $toLog = stamp("FATAL").$_[0]."\n";
-	$toLog .= getStackTrace();
-	$toLog .= getSessionVars();
-        writeLog($toLog);
         unless ($WebGUI::Session::session{setting}{showDebug}) {
 		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.                
 		print "<h1>Problem With Request</h1>                        
@@ -111,9 +153,8 @@ sub fatalError {
                 print '<br>'.$WebGUI::Session::session{setting}{companyEmail};
                 print '<br>'.$WebGUI::Session::session{setting}{companyURL};
         } else {
-	        print "<h1>WebGUI Fatal Error</h1>Something unexpected happened that caused this system to fault.<p>"; 
-		print $_[0]."<p>";
-		print showStackTrace();
+	        print "<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n"; 
+		print "<p>".$message."</p>\n";
 		print showDebug();
 	}
 	WebGUI::Session::close();
@@ -123,27 +164,15 @@ sub fatalError {
 
 #-------------------------------------------------------------------
 
-=head2 getAudit ( )
+=head2 getLogger ( )
 
-Returns a text formatted message containing the audit messages.
-
-=cut
-
-sub getAudit {
-        return $WebGUI::Session::session{debug}{audit};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getSecurity ( )
-
-Returns a text formatted message containing the security messages.
+Returns a reference to the logger.
 
 =cut
 
-sub getSecurity {
-        return $WebGUI::Session::session{debug}{security};
+sub getLogger {
+	Log::Log4perl::init_once($WebGUI::Session::session{config}{webguiRoot}.$WebGUI::Session::session{os}{slash}.'etc'.$WebGUI::Session::session{os}{slash}."log.conf");
+	return Log::Log4perl->get_logger($WebGUI::Session::session{config}{configFile});
 }
 
 
@@ -204,9 +233,9 @@ sub getStackTrace {
 
 #-------------------------------------------------------------------
 
-=head2 getWarnings ( )
+=head2 getWarn ( )
 
-Returns a text formatted message containing the warnings.
+Returns a text formatted message containing the WARN messages.
 
 =cut
 
@@ -217,9 +246,29 @@ sub getWarnings {
 
 #-------------------------------------------------------------------
 
+=head2 info ( message )
+
+Adds an INFO  type message to the log. This should be used for informational or status types of messages, such as audit information and FYIs.
+
+=head3 message
+
+The message you wish to add to the log.
+
+=cut
+
+sub info {
+	my $message = shift;
+	my $logger = getLogger();
+	$logger->info($message);
+        $WebGUI::Session::session{debug}{'info'} .= $message;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 security ( message )
 
-Adds a SECURITY type message to the log.
+A convenience function that wraps warn() and includes the current username, user ID, and IP address in addition to the message being logged.
 
 =head3 message
 
@@ -228,26 +277,11 @@ The message you wish to add to the log.
 =cut
 
 sub security {
-        my $data = stamp("SECURITY").$WebGUI::Session::session{user}{username}
-		." (".$WebGUI::Session::session{user}{userId}
-		.") connecting from ".$WebGUI::Session::session{env}{REMOTE_ADDR}." attempted to ".$_[0]."\n";
-        writeLog($data);
-        $WebGUI::Session::session{debug}{security} .= $data;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 showAudit ( )
-
-Returns an HTML formatted message with the audit messages for display during debug operations.
-
-=cut
-
-sub showAudit {
-	my $audit = getAudit();
-	$audit =~  s/\n/\<br\>\n/g;
-	return '<div style="background-color: #ffffdd;color: #000000;">'.$audit.'</div>';
+	my $message = shift;
+	$Log::Log4perl::caller_depth++;
+        warn($WebGUI::Session::session{user}{username}." (".$WebGUI::Session::session{user}{userId}.") connecting from "
+		.$WebGUI::Session::session{env}{REMOTE_ADDR}." attempted to ".$message);
+	$Log::Log4perl::caller_depth--;
 }
 
 
@@ -255,100 +289,36 @@ sub showAudit {
 
 =head2 showDebug ( )
 
-Creates an HTML formatted string containing the most common debug information.
+Creates an HTML formatted string 
 
 =cut
 
 sub showDebug {
-        return showWarnings()
-		.showSecurity()
-		.showAudit()
-		.showSessionVars();
+	my $text = $WebGUI::Session::session{debug}{'error'};
+	$text =~  s/\n/\<br \/\>\n/g;
+	my $output = '<div style="background-color: #800000;color: #ffffff;">'.$text."</div>\n";
+	$text = $WebGUI::Session::session{debug}{'warn'};
+	$text =~  s/\n/\<br \/\>\n/g;
+	$output .= '<div style="background-color: #ffdddd;color: #000000;">'.$text."</div>\n";
+	$text = $WebGUI::Session::session{debug}{'info'};
+	$text =~  s/\n/\<br \/\>\n/g;
+	$output .= '<div style="background-color: #ffffdd;color: #000000;">'.$text."</div>\n";
+	$text = $WebGUI::Session::session{debug}{'debug'};
+	$text =~  s/\n/\<br \/\>\n/g;
+	$output .= '<div style="background-color: #dddddd;color: #000000;">'.$text."</div>\n";
+	$text = getSessionVars();
+	$text =~  s/\n/\<br \/\>\n/g;
+	$output .= '<div style="background-color: #ffffff;color: #000000;">'.$text."</div>\n";
+	return $output;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 showSecurity ( )
-
-Returns an HTML formatted message with the security messages for display during debug operations.
-
-=cut
-
-sub showSecurity {
-	my $security = getSecurity();
-	$security =~  s/\n/\<br\>\n/g;
-	return '<div style="background-color: #800000;color: #ffffff;">'.$security.'</div>';
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 showSessionVars ( )
-
-Returns an HTML formatted list of the session variables for display during debug operations.
-
-=cut
-
-sub showSessionVars {
-	my $data = getSessionVars();
-	$data =~ s/\n/\<br\>\n/g;
-	return '<div style="background-color: #ffffff; color: #000000; font-size: 10pt; font-family: helvetica;">'.$data.'</div>';
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 showStackTrace ( )
-
-Returns an HTML formatted message for displaying the stack trace during debug operations.
-
-=cut
-
-sub showStackTrace {
-	my $st = getStackTrace();
-	$st =~ s/\n/\<br\>\n/g;
-	return $st;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 showWarnings ( )
-
-Returns HTML formatted warnings for display during debug operations.
-
-=cut
-
-sub showWarnings {
-	my $warning = getWarnings();
-	$warning =~  s/\n/\<br\>\n/g;
-	return '<div style="background-color: #ffdddd;color: #000000;">'.$warning.'</div>';
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 stamp ( type )
-
-Generates a stamp to be added to the log file. Use this in conjunction with your message for writeLog().
-
-=head3 type
-
-The type of message this is. You may use whatever type you wish. WebGUI currently uses AUDIT, WARNING, FATAL, and SECURITY.
-
-=cut
-
-sub stamp {
-        return localtime(time)." ".$0." ".$_[0].": ";
-}
 
 
 #-------------------------------------------------------------------
 
 =head2 warn ( message )
 
-Adds a WARNING type message to the log.
+Adds a WARN type message to the log. These events should be things that are potentially severe, but not errors, such as security attempts or ineffiency problems.
 
 =head3 message
 
@@ -357,35 +327,10 @@ The message you wish to add to the log.
 =cut
 
 sub warn {
-        my $data = stamp("WARNING").$_[0]."\n";
-	writeLog($data);	
-        $WebGUI::Session::session{debug}{warning} .= $data;
-}
-
-#-------------------------------------------------------------------
-
-=head2 writeLog ( message )
-
-Writes a message to the log.
-
-=head3 message
-
-The message you wish to write to the log.
-
-=cut
-
-sub writeLog {
-        if (my $log = FileHandle->new(">>".$WebGUI::Session::session{config}{logfile})) {
-		print $log "\n".$_[0];
-		printf $log '%s:%d (sub %s) ',(caller(2))[1,2,3];
-		$log->close;
-	} else {
-		use CGI;
-                my $cgi = CGI->new;
-		print STDOUT $cgi->header(). "Can't open log file: ".$WebGUI::Session::session{config}{logfile}." Check your WebGUI configuration file to set the path of the log file, and check to be sure the web server has the privileges to write to the log file.";;
-		WebGUI::Session::close();
-		exit;
-	}
+	my $message = shift;
+	my $logger = getLogger();
+	$logger->warn($message);
+        $WebGUI::Session::session{debug}{'warn'} .= $message;
 }
 
 

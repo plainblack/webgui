@@ -68,7 +68,7 @@ sub www_viewHelpIndex {
 	tie %helpIndex, "Tie::IxHash";
 	my $i;
         my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Help";
-        opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open Help directory!");
+        opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
         my @files = readdir(DIR);
         closedir(DIR);
         foreach my $file (@files) {
@@ -85,7 +85,7 @@ sub www_viewHelpIndex {
 					$i++;
 				}
                         } else {
-                                WebGUI::ErrorHandler::warn("Help failed to compile: $namespace. ".$@);
+                                WebGUI::ErrorHandler::error("Help failed to compile: $namespace. ".$@);
                         }
                 }
         }

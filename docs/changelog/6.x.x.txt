@@ -5,6 +5,7 @@
    the rest of WebGUI
  - fix [ 1173101 ] Template in ^LoginToggle();
  - Added a page to the help docs which tells you what Assets are enabled for this site.
+ - Added a new Error Handling / Logging mechanism.
 
 
 6.5.5

@@ -215,7 +215,7 @@ Returns the gatewayId of the transaction. You must override this method.
 =cut
 
 sub gatewayId {
-	return WebGUI::ErrorHandler::fatalError("You must override the gatewayId method in your Payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the gatewayId method in your Payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -253,7 +253,7 @@ Returns the error code of the last submission.
 =cut
 
 sub errorCode {
-	return WebGUI::ErrorHandler::fatalError("You must override thie errorCode method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override thie errorCode method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -292,7 +292,7 @@ Returns the (display) name of the plugin. You must override this method.
 =cut
 
 sub name {
-	return WebGUI::ErrorHandler::fatalError("You must override the name method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the name method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -363,7 +363,7 @@ Returns the result code of the transaction. You must override this method.
 =cut
 
 sub resultCode {
-	return WebGUI::ErrorHandler::fatalError("You must override the resultCode method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the resultCode method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -375,7 +375,7 @@ Returns the result message of the transaction. You must override this method.
 =cut
 
 sub resultMessage {
-	return WebGUI::ErrorHandler::fatalError("You must override the resultMessage method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the resultMessage method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -450,7 +450,7 @@ You must override this method.
 =cut
 
 sub supports {
-	return WebGUI::ErrorHandler::fatalError("You must override the supports method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the supports method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -462,7 +462,7 @@ A boolean indicating whether the payment has been finished or not. You must over
 =cut
 
 sub transactionCompleted {
-	return WebGUI::ErrorHandler::fatalError("You must override the transactionCompleted method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the transactionCompleted method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -474,7 +474,7 @@ Returns an error message if a transaction error has occurred. You must override 
 =cut
 
 sub transactionError {
-	return WebGUI::ErrorHandler::fatalError("You must override the transactionError method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the transactionError method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -486,7 +486,7 @@ A boolean indicating whether the payment is pending or not. You must override th
 =cut
 
 sub transactionPending {
-	return WebGUI::ErrorHandler::fatalError("You must override the transactionPending method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the transactionPending method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -500,7 +500,7 @@ undef. You must override this method.
 =cut
 
 sub validateFormData {
-	return WebGUI::ErrorHandler::fatalError("You must override the validateFormData method in the payment plugin.");
+	return WebGUI::ErrorHandler::fatal("You must override the validateFormData method in the payment plugin.");
 }
 
 1;

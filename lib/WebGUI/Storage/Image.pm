@@ -94,17 +94,17 @@ sub generateThumbnail {
 	my $filename = shift;
 	my $thumbnailSize = shift || $session{setting}{thumbnailSize};
 	unless (defined $filename) {
-		WebGUI::ErrorHandler::warn("Can't generate a thumbnail when you haven't specified a file.");
+		WebGUI::ErrorHandler::error("Can't generate a thumbnail when you haven't specified a file.");
 		return 0;
 	}
 	unless ($self->isImage($filename)) {
-		WebGUI::ErrorHandler::warn("Can't generate a thumbnail for something that's not an image.");
+		WebGUI::ErrorHandler::error("Can't generate a thumbnail for something that's not an image.");
 		return 0;
 	}
         my $image = Image::Magick->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
-		WebGUI::ErrorHandler::warn("Couldn't read image for thumbnail creation: ".$error);
+		WebGUI::ErrorHandler::error("Couldn't read image for thumbnail creation: ".$error);
 		return 0;
 	}
         my ($x, $y) = $image->Get('width','height');
@@ -116,7 +116,7 @@ sub generateThumbnail {
         }
         $error = $image->Write($self->getPath.$session{os}{slash}.'thumb-'.$filename);
 	if ($error) {
-		WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error);
+		WebGUI::ErrorHandler::error("Couldn't create thumbnail: ".$error);
 		return 0;
 	}
 	return 1;
@@ -159,17 +159,17 @@ sub getSizeInPixels {
 	my $self = shift;
 	my $filename = shift;
 	unless (defined $filename) {
-		WebGUI::ErrorHandler::warn("Can't check the size when you haven't specified a file.");
+		WebGUI::ErrorHandler::error("Can't check the size when you haven't specified a file.");
 		return 0;
 	}
 	unless ($self->isImage($filename)) {
-		WebGUI::ErrorHandler::warn("Can't check the size of something that's not an image.");
+		WebGUI::ErrorHandler::error("Can't check the size of something that's not an image.");
 		return 0;
 	}
         my $image = Image::Magick->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
-		WebGUI::ErrorHandler::warn("Couldn't read image to check the size of it: ".$error);
+		WebGUI::ErrorHandler::error("Couldn't read image to check the size of it: ".$error);
 		return 0;
 	}
         return $image->Get('width','height');
@@ -239,21 +239,21 @@ sub resize {
 	my $width = shift;
 	my $height = shift;
 	unless (defined $filename) {
-		WebGUI::ErrorHandler::warn("Can't resize when you haven't specified a file.");
+		WebGUI::ErrorHandler::error("Can't resize when you haven't specified a file.");
 		return 0;
 	}
 	unless ($self->isImage($filename)) {
-		WebGUI::ErrorHandler::warn("Can't resize something that's not an image.");
+		WebGUI::ErrorHandler::error("Can't resize something that's not an image.");
 		return 0;
 	}
 	unless ($width || $height) {
-		WebGUI::ErrorHandler::warn("Can't resize with no resizing parameters.");
+		WebGUI::ErrorHandler::error("Can't resize with no resizing parameters.");
 		return 0;
 	}
         my $image = Image::Magick->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
-		WebGUI::ErrorHandler::warn("Couldn't read image for resizing: ".$error);
+		WebGUI::ErrorHandler::error("Couldn't read image for resizing: ".$error);
 		return 0;
 	}
         my ($x, $y) = $image->Get('width','height');
@@ -265,7 +265,7 @@ sub resize {
         $image->Scale(width=>$width, height=>$height);
         $error = $image->Write($self->getPath($filename));
 	if ($error) {
-		WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error);
+		WebGUI::ErrorHandler::error("Couldn't create thumbnail: ".$error);
 		return 0;
 	}
 	return 1;

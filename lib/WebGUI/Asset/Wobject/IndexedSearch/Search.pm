@@ -125,7 +125,7 @@ sub create {
 	}		
 	$self->{_fts} = DBIx::FullTextSearch->create($self->getDbh, $self->getIndexName, %options);
 	if (not defined $self->{_fts}) {
-		WebGUI::ErrorHandler::fatalError("IndexedSearch: Unable to create index.\n$DBIx::FullTextSearch::errstr");
+		WebGUI::ErrorHandler::error("IndexedSearch: Unable to create index.\n$DBIx::FullTextSearch::errstr");
 		return undef;
 	}
 	$self->{_docId} = 1;
@@ -473,7 +473,7 @@ sub open {
 	my ($self) = @_;
 	$self->{_fts} = DBIx::FullTextSearch->open($self->getDbh, $self->getIndexName);
 	if (not defined $self->{_fts}) {
-		WebGUI::ErrorHandler::fatalError("IndexedSearch: Unable to open index.\n$DBIx::FullTextSearch::errstr");
+		WebGUI::ErrorHandler::error("IndexedSearch: Unable to open index.\n$DBIx::FullTextSearch::errstr");
 		return undef;
 	}
 	($self->{_docId}) = WebGUI::SQL->quickArray("select max(docId) from IndexedSearch_docInfo where indexName = ".quote($self->getIndexName)); 

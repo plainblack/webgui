@@ -1,0 +1,6 @@
+log4perl.logger = DEBUG, mainlog 
+log4perl.appender.mainlog = Log::Log4perl::Appender::File
+log4perl.appender.mainlog.filename = /var/log/webguitest.log 
+log4perl.appender.mainlog.layout = PatternLayout
+log4perl.appender.mainlog.layout.ConversionPattern = %d - %p - %c - %M[%L] - %m%n
+

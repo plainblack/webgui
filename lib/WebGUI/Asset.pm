@@ -692,17 +692,17 @@ sub getAssetAdderLinks {
 		my $load = "use ".$class;
 		eval ($load);
 		if ($@) {
-			WebGUI::ErrorHandler::warn("Couldn't compile ".$class." because ".$@);
+			WebGUI::ErrorHandler::error("Couldn't compile ".$class." because ".$@);
 		} else {
 			my $uiLevel = eval{$class->getUiLevel()};
 			if ($@) {
-				WebGUI::ErrorHandler::warn("Couldn't get UI level of ".$class." because ".$@);
+				WebGUI::ErrorHandler::error("Couldn't get UI level of ".$class." because ".$@);
 			} else {
 				next if ($uiLevel > $session{user}{uiLevel});
 			}
 			my $label = eval{$class->getName()};
 			if ($@) {
-				WebGUI::ErrorHandler::warn("Couldn't get the name of ".$class." because ".$@);
+				WebGUI::ErrorHandler::error("Couldn't get the name of ".$class." because ".$@);
 			} else {
 				my $url = $self->getUrl("func=add&class=".$class);
 				$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
@@ -1297,7 +1297,7 @@ sub getLineage {
 		my $className = $rules->{joinClass};
 		my $cmd = "use ".$className;
 		eval ($cmd);
-		WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+		WebGUI::ErrorHandler::fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
 		foreach my $definition (@{$className->definition}) {
 			unless ($definition->{tableName} eq "asset") {
 				my $tableName = $definition->{tableName};
@@ -1760,14 +1760,14 @@ sub newByDynamicClass {
 	}
         if ($className eq "") {
         	WebGUI::HTTP::setStatus('404',"Page Not Found");
-		WebGUI::ErrorHandler::fatalError("The page not found page doesn't exist.") if ($assetId eq $session{setting}{notFoundPage});
+		WebGUI::ErrorHandler::fatal("The page not found page doesn't exist.") if ($assetId eq $session{setting}{notFoundPage});
                 return WebGUI::Asset->newByDynamicClass($session{setting}{notFoundPage});
         }
 	my $cmd = "use ".$className;
         eval ($cmd);
-        WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+        WebGUI::ErrorHandler::fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
         my $assetObject = eval{$className->new($assetId,$overrideProperties)};
-        WebGUI::ErrorHandler::fatalError("Couldn't create asset instance for ".$assetId.". Root cause: ".$@) if ($@);
+        WebGUI::ErrorHandler::fatal("Couldn't create asset instance for ".$assetId.". Root cause: ".$@) if ($@);
 	return $assetObject;
 }
 
@@ -1815,7 +1815,7 @@ sub newByPropertyHashRef {
 	my $className = $properties->{className};
 	my $cmd = "use ".$className;
         eval ($cmd);
-        WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+        WebGUI::ErrorHandler::fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
 	bless {_properties => $properties}, $className;
 }
 
@@ -1966,7 +1966,7 @@ sub processTemplate {
 	if (defined $template) {
 		return $template->process(\%vars);
 	} else {
-		WebGUI::ErrorHandler::warn("Can't instanciate template $templateId for asset ".$self->getId);
+		WebGUI::ErrorHandler::error("Can't instanciate template $templateId for asset ".$self->getId);
 		return "Error: Can't instanciate template ".$templateId;
 	}
 }

@@ -77,7 +77,7 @@ sub _execute {
 		$t->param("webgui.status"=>$WebGUI::STATUS);
 		return $t->output;
 	} else {
-		WebGUI::ErrorHandler::warn("Error in template. ".$@);
+		WebGUI::ErrorHandler::error("Error in template. ".$@);
 		return WebGUI::International::get('template error', 'Template').$@;
 	}
 }
@@ -250,11 +250,11 @@ sub process {
         if ($session{config}{templateCacheType} =~ /file/) {
                 eval { mkpath($fileCacheDir) };
                 if($@) {
-                        WebGUI::ErrorHandler::warn("Could not create dir $fileCacheDir: $@\nTemplate file caching disabled");
+                        WebGUI::ErrorHandler::error("Could not create dir $fileCacheDir: $@\nTemplate file caching disabled");
 			$error++;
 		}
 		if(not -w $fileCacheDir) {
-			WebGUI::ErrorHandler::warn("Directory $fileCacheDir is not writable. Template file caching is disabled");
+			WebGUI::ErrorHandler::error("Directory $fileCacheDir is not writable. Template file caching is disabled");
 			$error++;
 		}
 	}
@@ -274,7 +274,7 @@ sub process {
 	unless (-e $file->getPath) {
 		$file->saveFromScalar($self->get("template"));
 		unless (-e $file->getPath) {
-	                WebGUI::ErrorHandler::warn("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
+	                WebGUI::ErrorHandler::error("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
         	        $params{scalarref} = \$template;
 			delete $params{filename};
         	}

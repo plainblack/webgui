@@ -60,7 +60,7 @@ sub cancelRecurringPayment {
 #			print "FIRST PAGE SUCCESS!\n";
 #			print "(".$response->base.")\n";
 		} else {
-			WebGUI::ErrorHandler::fatalError(
+			WebGUI::ErrorHandler::fatal(
 				'Connection Error while trying to cancel transaction '.$recurring->{transaction}->transactionId." \n".
 				"Could not reach login page.\n".
 				"(".$response->base.")\n".
@@ -83,7 +83,7 @@ sub cancelRecurringPayment {
 #			print "CANCELATION PAGE SUCCESS!\n";
 #			print "(".$response->base.")\n";
 		} else {
-			WebGUI::ErrorHandler::fatalError(
+			WebGUI::ErrorHandler::fatal(
 				'Connection Error while trying to cancel transaction '.$recurring->{transaction}->transactionId." \n".
 				"(".$response->base.")\n".
 				$response->status_line. "\n");

@@ -69,7 +69,7 @@ sub _isValidLDAPUser {
                    WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP.ldapId'});
                 } elsif ($auth->code > 0) {
                    $error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
-           		   WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
+           		   WebGUI::ErrorHandler::error("LDAP error: ".$ldapStatusCode{$auth->code});
                 }
                 $ldap->unbind;
         	} else {
@@ -78,11 +78,11 @@ sub _isValidLDAPUser {
             }
 	 } else {
 	     $error = WebGUI::International::get(2,'AuthLDAP');
-		 WebGUI::ErrorHandler::warn("Couldn't bind to LDAP server: ".$session{setting}{ldapURL});
+		 WebGUI::ErrorHandler::error("Couldn't bind to LDAP server: ".$session{setting}{ldapURL});
 	 }
   } else {
      $error = WebGUI::International::get(2,'AuthLDAP');
-	 WebGUI::ErrorHandler::warn("Couldn't create LDAP object: ".$uri->host);
+	 WebGUI::ErrorHandler::error("Couldn't create LDAP object: ".$uri->host);
   }
   $self->error($error);
   return $error eq "";
@@ -153,12 +153,12 @@ sub authenticate {
 		  $error .= WebGUI::International::get(68);
 	   }elsif($auth->code > 0){
 	      $error .= 'LDAP error "'.$ldapStatusCode{$auth->code}.'" occured.'.WebGUI::International::get(69);
-		  WebGUI::ErrorHandler::warn("LDAP error: ".$ldapStatusCode{$auth->code});
+		  WebGUI::ErrorHandler::error("LDAP error: ".$ldapStatusCode{$auth->code});
 	   }
 	   $ldap->unbind;
 	}else{
 	   $error .= WebGUI::International::get(13,'AuthLDAP');
-	   WebGUI::ErrorHandler::warn("Could not process this LDAP URL: ".$userData->{ldapUrl});
+	   WebGUI::ErrorHandler::error("Could not process this LDAP URL: ".$userData->{ldapUrl});
 	}
 	if($error ne ""){
 	   $self->error($error);

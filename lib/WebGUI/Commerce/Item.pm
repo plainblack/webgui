@@ -43,7 +43,7 @@ This returns the description of the item. This must be implemented by an item pl
 =cut
 
 sub description {
-	return WebGUI::ErrorHandler::fatalError('The description method of WebGUI::Commerce::Item must be overridden.');
+	return WebGUI::ErrorHandler::fatal('The description method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------
@@ -83,7 +83,7 @@ by an item plugin.
 =cut
 
 sub id {
-	return WebGUI::ErrorHandler::fatalError('The id method of WebGUI::Commerce::Item must be overridden.');
+	return WebGUI::ErrorHandler::fatal('The id method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------
@@ -108,7 +108,7 @@ Returns the name of the item. This must be implemented by an item plugin.
 =cut
 
 sub name {
-	return WebGUI::ErrorHandler::fatalError('The name method of WebGUI::Commerce::Item must be overridden.');
+	return WebGUI::ErrorHandler::fatal('The name method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------

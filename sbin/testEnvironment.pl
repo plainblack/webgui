@@ -60,6 +60,7 @@ checkModule("XML::Simple",2.09);
 checkModule("SOAP::Lite",0.60);
 checkModule("Time::HiRes",1.38);
 checkModule("Image::Magick",5.47,1);
+checkModule("Log::Log4perl",0.51);
 checkModule("Net::LDAP",0.25);
 checkModule("Date::Manip",5.42);
 checkModule("HTML::Highlight",0.20);

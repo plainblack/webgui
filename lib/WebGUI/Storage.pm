@@ -93,7 +93,7 @@ sub _addError {
 	my $self = shift;
 	my $errorMessage = shift;
 	push(@{$self->{_errors}},$errorMessage);
-	WebGUI::ErrorHandler::warn($errorMessage);
+	WebGUI::ErrorHandler::error($errorMessage);
 }
 
 
@@ -148,7 +148,7 @@ sub addFileFromFilesystem {
                 }
                 $filename = WebGUI::URL::makeCompliant($filename);
                 if (-d $pathToFile) {
-                        WebGUI::ErrorHandler::warn($pathToFile." is a directory, not a file.");
+                        WebGUI::ErrorHandler::error($pathToFile." is a directory, not a file.");
                 } else {
                         $a = FileHandle->new($pathToFile,"r");
                         if (defined $a) {
