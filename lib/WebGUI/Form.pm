@@ -38,6 +38,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
 
  use WebGUI::Form;
 
+ $html = WebGUI::Form::button({value=>"Click me!", extras=>qq|onclick="alert('Aaaaggggghhh!!!')"|});
  $html = WebGUI::Form::checkbox({name=>"whichOne", value=>"red"});
  $html = WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
  $html = WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
@@ -108,6 +109,31 @@ sub _fixTags {
 	return $value;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 button ( hashRef )
+
+Returns a button. Use it in combination with scripting code to make the button perform an action.
+
+=head3 value
+
+The button text for this submit button. Defaults to "save".
+
+=head3 extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onClick="alert(\'You've just pushed me !\')"'
+
+=cut
+
+sub button {
+        my ($label, $extras, $subtext, $class, $output, $name, $value);
+        $value = $_[0]->{value} || WebGUI::International::get(62);
+        $value = _fixQuotes($value);
+        return '<input type="button" value="'.$value.'" '.$_[0]->{extras}.'>';
+}
 
 #-------------------------------------------------------------------
 
@@ -1327,7 +1353,8 @@ sub submit {
         $value = $_[0]->{value} || WebGUI::International::get(62);
         $value = _fixQuotes($value);
 	$wait = WebGUI::International::get(452);
-        return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$_[0]->{extras}.'>';
+	return '<input type="submit" value="'.$value.'" onClick="this.value=\''.$wait.'\'" '.$_[0]->{extras}.'>';
+
 }
 
 #-------------------------------------------------------------------

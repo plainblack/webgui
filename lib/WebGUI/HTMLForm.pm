@@ -38,6 +38,10 @@ Package that makes HTML forms typed data and significantly reduces the code need
  use WebGUI::HTMLForm;
  $f = WebGUI::HTMLForm->new;
 
+ $f->button(
+	-value=>"Click me!",
+	-extras=>qq|onClick="alert('Aaaaaaaggggghh!!!!')"|
+	);
  $f->checkbox(
 	-name=>"whichOne",
 	-label=>"Is red your favorite?",
@@ -176,6 +180,8 @@ $f->dynamicField(text,
 	-label=>"Office Zip Code"
 	);
 
+ $f->trClass("class");		# Sets a Table Row class
+
  $f->print;
  $f->printRowsOnly;
 
@@ -197,7 +203,9 @@ sub _subtext {
 #-------------------------------------------------------------------
 sub _tableFormRow {
 	unless ($_[0]->{_noTable}) {
-        	return '<tr><td class="formDescription" valign="top">'.$_[1].'</td><td class="tableData">'.$_[2]."</td></tr>\n";
+		my $class = $_[0]->{_class};
+		$class = qq| class="$class" | if($class);
+        	return '<tr'.$class.'><td class="formDescription" valign="top">'.$_[1].'</td><td class="tableData">'.$_[2]."</td></tr>\n";
 	} else {
 		return $_[2];
 	}
@@ -210,6 +218,45 @@ sub _uiLevelChecksOut {
 	} else {
 		return 0;
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 button ( value [ label, extras, subtext ] )
+
+Adds a button row to this form. Use it in combination with scripting code to make the button perform an action.
+
+=head3 value
+
+The button text for this button. Defaults to "save".
+
+=head3 label
+
+The left column label for this form row.
+
+=head3 extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onClick="alert(\'Hello there!\')"'
+
+=head3 subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=cut
+
+sub button {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($value, $label, $extras, $subtext) = rearrange([qw(value label extras subtext)], @p);
+        $output = WebGUI::Form::button({
+                "value"=>$value,
+                "extras"=>$extras
+                });
+        $output .= _subtext($subtext);
+        $output = $self->_tableFormRow($label,$output);
+        $self->{_data} .= $output;
 }
 
 #-------------------------------------------------------------------
@@ -2120,6 +2167,20 @@ sub timeField {
         $self->{_data} .= $output;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 trClass ( )
+
+Sets a CSS class for the Table Row. By default the class is undefined.
+
+=cut
+
+sub trClass {
+	my $self = shift;
+	my $class = shift;
+	$self->{_class} = $class;
+}
 
 #-------------------------------------------------------------------
 

@@ -10,7 +10,8 @@
  - Lots of GUID changes in Perl and SQL code, including:
    bugfix [1053187]
  - Bugfix [ 1055396 ] Template switching issue (Len Kranendonk)
-
+ - WebGUI Operations are now dynamically loaded (Len Kranendonk) 
+ - Added <input type="button"> button to Form.pm / HTMLForm.pm (Len Kranendonk)
 
 6.2.7
  - Expanded upon the help for URL extensions.
