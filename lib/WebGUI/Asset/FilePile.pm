@@ -131,11 +131,10 @@ sub edit {
        		-uiLevel=>6
        		);
 	$tabform->getTab("properties")->readOnly(
-		-label=>WebGUI::International::get("upload files", "Asset");
+		-label=>WebGUI::International::get("upload files", "Asset"),
 		-value=>$self->getUploadControl
 		);
-	return $self->getAdminConsole->render($tabform->print, 
-	                                      WebGUI::International::get("add pile", "Asset");
+	return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("add pile", "Asset"));
 }
 
 #-------------------------------------------------------------------
