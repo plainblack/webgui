@@ -1371,14 +1371,16 @@ sub notifySubscribers {
 	my %lang;
 	foreach my $userId (keys %subscribers) {
 		my $u = WebGUI::User->new($userId);
-		unless (exists $lang{$u->profileField("language")}) {
+		if ($lang{$u->profileField("language")}{message} eq "") {
 			$lang{$u->profileField("language")}{var} = {
-				'notify.subscription.message' => WebGUI::International::get(875,$u->profileField("language"))
+				'notify.subscription.message' => WebGUI::International::get(875,"WebGUI",$u->profileField("language"))
 				};
 			$lang{$u->profileField("language")}{var} = getPostTemplateVars($post, $thread, $forum, $caller, $lang{$u->profileField("language")}{var});
-			$lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,$u->profileField("language"));
-       			$lang{$u->profileField("language")}{message} = WebGUI::Template::process(WebGUI::Template::get($forum->get("notificationTemplateId"),"Forum/Notification"), 
-				$lang{$u->profileField("language")}{var});
+			$lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"WebGUI",$u->profileField("language"));
+       			$lang{$u->profileField("language")}{message} = WebGUI::Template::process(
+				WebGUI::Template::get($forum->get("notificationTemplateId"),"Forum/Notification"), 
+				$lang{$u->profileField("language")}{var}
+				);
 		}
                	WebGUI::MessageLog::addEntry($userId,"",$lang{$u->profileField("language")}{subject},$lang{$u->profileField("language")}{message});
 	}

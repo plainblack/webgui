@@ -13,6 +13,7 @@
  - Fixed bug [ 844961 ] DataForm: no deleting
  - Bugfix [ 822324 ]: From field not working in DataForm when mailing to group
  - Fixed typos in importCollateral.pl
+ - Fixed bug [ 845046 ] Forum notification - no int. message at all
 
 
 5.5.1
