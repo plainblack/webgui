@@ -153,8 +153,11 @@ sub www_editProfileCategory {
 
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
-	my ($categoryId, $sequenceNumber);
+	my ($categoryId, $sequenceNumber, $test);
         if (WebGUI::Privilege::isInGroup(3)) {
+		$session{form}{categoryName} = 'Unamed' if ($session{form}{categoryName} eq "" || $session{form}{categoryName} eq "''");
+		$test = eval($session{form}{categoryName});
+		$session{form}{categoryName} = "'".$session{form}{categoryName}."'" if ($test eq "");
 		if ($session{form}{cid} eq "new") {
 			$categoryId = getNextId("profileCategoryId");
 			($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
@@ -165,6 +168,7 @@ sub www_editProfileCategorySave {
 				profileCategoryId=$session{form}{cid}");
 		}
 		return www_editProfileSettings();
+		return $test;
         } else {
                 return WebGUI::Privilege::adminOnly();
         }
@@ -187,8 +191,8 @@ sub www_editProfileField {
                 	$f->text("fid",WebGUI::International::get(470));
 		}
 		$f->text("fieldLabel",WebGUI::International::get(472),$data{fieldLabel});
-		$f->checkbox("visible",WebGUI::International::get(473),$data{visible});
-		$f->checkbox("required",WebGUI::International::get(474),$data{required});
+		$f->yesNo("visible",WebGUI::International::get(473),$data{visible});
+		$f->yesNo("required",WebGUI::International::get(474),$data{required});
 		tie %hash, 'Tie::IxHash';
 		%hash = (	'text'=>WebGUI::International::get(475), 
 				'textarea'=>WebGUI::International::get(476), 
@@ -199,8 +203,7 @@ sub www_editProfileField {
 				'phone'=>WebGUI::International::get(481),
 				'integer'=>WebGUI::International::get(482),
 				'yesNo'=>WebGUI::International::get(483),
-				'select'=>WebGUI::International::get(484),
-				'checkbox'=>WebGUI::International::get(485)
+				'select'=>WebGUI::International::get(484)
 			);
 		$f->select("dataType",\%hash,WebGUI::International::get(486),[$data{dataType}]);
 		$f->textarea("dataValues",WebGUI::International::get(487),$data{dataValues});
@@ -221,8 +224,11 @@ sub www_editProfileField {
 
 #-------------------------------------------------------------------
 sub www_editProfileFieldSave {
-	my ($sequenceNumber, $fieldName);
+	my ($sequenceNumber, $fieldName, $test);
         if (WebGUI::Privilege::isInGroup(3)) {
+                $session{form}{fieldLabel} = 'Unamed' if ($session{form}{fieldLabel} eq "" || $session{form}{fieldLabel} eq "''");
+                $test = eval($session{form}{fieldLabel});
+                $session{form}{fieldLabel} = "'".$session{form}{fieldLabel}."'" if ($test eq "");
 		if ($session{form}{new}) {
 			($fieldName) = WebGUI::SQL->quickArray("select count(*) from userProfileField 
 				where fieldName=".quote($session{form}{fid}));
