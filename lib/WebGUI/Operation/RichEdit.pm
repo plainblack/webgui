@@ -14,25 +14,42 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::HTMLForm;
 use WebGUI::Session;
+use WebGUI::Style;
 
 #-------------------------------------------------------------------
 
 sub www_richEditPageTree {
-	my $f = WebGUI::HTMLForm->new(-action=>"#");
+	my $f = WebGUI::HTMLForm->new(-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
 		-name=>"url",
 		-label=>"URL",
 		-extras=>'id="url"'
 		);
-	$f->yesNo(
-		-name=>"newWindow",
-		-label=>"Open in new window?"
+	$f->selectList(
+		-name=>"target",
+		-label=>"Target",
+		-options=>{"_self"=>"Open link in same window.","_blank"=>"Open link in new window."},
+		-extras=>'id="target"'
 		);
 	$f->button(
 		-value=>"Done",
-		-extras=>'onclick="window.opener.blah()"'
+		-extras=>'onclick="createLink()"'
 		);
-	my $output = $f->print.'<hr>';
+	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
+	my $output = '<fieldset><legend>Insert A Link</legend>
+		<fieldset><legend>Link Settings</legend>'.$f->print.'</fieldset>
+	<script language="javascript">
+function createLink() {
+    if (window.opener) {        
+        if (document.getElementById("url").value == "") {
+           alert("You must enter a link url");
+           document.getElementById("url").focus();
+        }
+window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url").value,document.getElementById("target").value);
+     window.close();
+    }
+}
+</script><fieldset><legend>Pages</legend> ';
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
@@ -42,10 +59,10 @@ sub www_richEditPageTree {
 	$output .= '<p>'.join(" &gt; ", @crumb)."</p>\n";
 	my $children = $base->getLineage(["children"],{returnQuickReadObjects=>1});
 	foreach my $child (@{$children}) {
-		$output .= '<a href="'.$child->getUrl("op=richEditPageTree").'">(&bull;)</a> <a href="#" onclick="document.getElementById(\'url\').value=\''.$child->getUrl.'\'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+		$output .= '<a href="#" onclick="document.getElementById(\'url\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
-	return $output;
+	return $output.'</fieldset></fieldset>';
 }
 
 
