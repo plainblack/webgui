@@ -9760,6 +9760,7 @@ INSERT INTO international VALUES (851,'WebGUI',3,'Bewerk dit sjabloon.',10399896
 INSERT INTO international VALUES (848,'WebGUI',3,'Er zit een syntax fout in dit sjabloon. Corrigeer dit a.u.b.',1039989596);
 INSERT INTO international VALUES (75,'SiteMap',3,'Alle roots',1039989564);
 INSERT INTO international VALUES (74,'SiteMap',3,'Deze pagina',1039989549);
+INSERT INTO international VALUES (856,'WebGUI',1,'You have no account properties to edit at this time.',1040340432);
 
 --
 -- Table structure for table 'karmaLog'
@@ -10250,7 +10251,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('4.9.4','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('4.9.5','initial install',unix_timestamp());
 
 --
 -- Table structure for table 'wobject'
