@@ -16,10 +16,10 @@ package WebGUI::Session;
 
 
 use CGI;
-use Data::Config;
 use Date::Calc;
 use DBI;
 use Exporter;
+use Parse::PlainConfig;
 use strict;
 use Tie::CPHash;
 use WebGUI::ErrorHandler;
@@ -391,30 +391,12 @@ sub open {
 	### config variables
 	$session{config}{webguiRoot} = $_[0];
 	$session{config}{configFile} = $_[1] || "WebGUI.conf";
-
-	# Below is a patch which allow you to configure WebGUI with
-	# environmentvariables in stead of using WebGUI.conf. To enable this
-	# set a env var called wgConfigureByEnvironment to 'YES'. The var
-	# names are those of WebGUI.conf prepended with 'wg'. 
-	# 
-	# NOTE: This is an undocumented an experimental feature. It seems to
-	# work with apache/linux on multiple virtual hosts. For things like
-	# runHourly.pm you STILL need WebGUI.conf!
-
-        if ($ENV{wgConfigureByEnvironment} eq 'YES') {
-                foreach (keys(%ENV)) {
-                        if ($_ =~ /^wg(.+)$/) {
-                                $session{config}{$1} = $ENV{'wg'.$1};
-                        }
-                }
-        } else {
-                $config = new Data::Config
-		$session{config}{webguiRoot}.'/etc/'.$session{config}{configFile};
-                foreach ($config->param) {
-                        $session{config}{$_} = $config->param($_);
-                }
+	$config = Parse::PlainConfig->new('DELIM' => '=', 
+		'FILE' => $session{config}{webguiRoot}.'/etc/'.$session{config}{configFile}, 
+		'PURGE' => 1);
+        foreach ($config->directives) {
+                $session{config}{$_} = $config->get($_);
         }
-
 	if( defined( $session{config}{scripturl} ) ) {
 		# get rid of leading "/" if present.
 		$session{config}{scripturl} =~ s/^\///;
