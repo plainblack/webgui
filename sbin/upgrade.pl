@@ -137,7 +137,7 @@ opendir(DIR,$dir) or die "Couldn't open $dir\n";
 @files = readdir(DIR);
 closedir(DIR);
 foreach $file (@files) {
-	if ($file =~ /upgrade_(\d+\.\d+.\d+)-(\d+\.\d+\.\d+)\.(\w+)/) {
+	if ($file =~ /upgrade_(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)\.(\w+)/) {
 		if (checkVersion($1)) {
 			if ($3 eq "sql") {
 				print "\tFound upgrade script from $1 to $2.\n" unless ($quiet);
