@@ -615,8 +615,9 @@ sub www_process {
 	my $sth = WebGUI::SQL->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
 		where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%row = $sth->hash) {
-		my $value = WebGUI::FormProcessor::process($row{name},$row{type},$row{defaultValue});
+		my $value = $row{defaultValue};
 		if ($row{status} eq "required" || $row{status} eq "editable") {
+			$value = WebGUI::FormProcessor::process($row{name},$row{type},$row{defaultValue});
 			$value = WebGUI::Macro::filter($value);
 		}
 		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
