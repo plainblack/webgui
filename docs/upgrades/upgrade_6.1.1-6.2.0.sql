@@ -53,3 +53,6 @@ alter table WobjectProxy add proxyByCriteria int default 0;
 alter table WobjectProxy add resolveMultiples varchar(30) default "mostRecent";
 alter table WobjectProxy add proxyCriteria text default NULL;
 
+alter table IndexedSearch add column (forceSearchRoots smallint(1) default 1);
+alter table DataForm_field add column (vertical smallint(1) default 1);
+alter table DataForm_field add column (extras varchar(128));

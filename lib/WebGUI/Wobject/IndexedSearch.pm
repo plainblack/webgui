@@ -16,6 +16,7 @@ use WebGUI::Wobject;
 use Tie::IxHash;
 use WebGUI::Utility;
 use WebGUI::Paginator;
+use WebGUI::Page;
 
 our @ISA = qw(WebGUI::Wobject);
 
@@ -37,9 +38,13 @@ sub new {
                                 defaultValue=>'default'
                                 },
                         searchRoot=>{
-                                fieldType=>'selectList',
+                                fieldType=>'checkList',
                                 defaultValue=>'any'
                                 },
+			forceSearchRoots=>{
+				fieldType=>'yesNo',
+				defaultValue=>1
+				},
                         users=>{
                                 fieldType=>'selectList',
                                 defaultValue=>'any'
@@ -140,7 +145,11 @@ sub www_edit {
 						-multiple=>1,
 						-vertical=>1,
 				);
-
+	$properties->yesNo(
+					-name=>'forceSearchRoots',
+						-label=>WebGUI::International::get('edit-forceSearchRoots-label',$self->get("namespace")),
+						-value=>$self->getValue("forceSearchRoots")
+				);
 	# Content of specific user
 	$properties->selectList (	-name=>'users',
 						-options=>$self->_getUsers(),
@@ -220,26 +229,6 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
-sub www_editSave {
-	# default editSave overruled to build & save the pageList for faster retrieval.
-	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	$self->SUPER::www_editSave();
-	my (%pages, $pageList);
-	my $searchRoot = $self->get("searchRoot");
-	if ($searchRoot =~ /any/i) {
-		$pageList = 'any';
-	} else {
-		foreach my $pageId (split(/\n+/,$searchRoot)) {
-			%pages = (%pages, _getSearchablePages($pageId), $pageId => defined);
-		}
-		$pageList = join(" , ", keys %pages);
-	}
-	WebGUI::SQL->write("update IndexedSearch set pageList = ".quote($pageList)." where wobjectId = ".$self->get("wobjectId"));
-	return '';
-}
-
-#-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
@@ -263,17 +252,18 @@ sub www_view {
 	$var{submit} = WebGUI::Form::submit({value=>WebGUI::International::get(16, $self->get("namespace"))});
 	$var{"int.search"} = WebGUI::International::get(16,$self->get("namespace"));
 	$var{wid} = $self->get("wobjectId");
-      $var{numberOfResults} = '0';
-      $var{"select_".$self->getValue("paginateAfter")} = "selected";
+	$var{numberOfResults} = '0';
+	$var{"select_".$self->getValue("paginateAfter")} = "selected";
 
 	# Do the search
 	my $startTime = ($hasTimeHiRes) ? Time::HiRes::time() : time();
-      my $filter = $self->_buildFilter;
-      my $search = WebGUI::Wobject::IndexedSearch::Search->new($self->getValue('indexName'));
-      $search->open;
-      my $results = $search->search($var{query},$filter);
-      $var{duration} = (($hasTimeHiRes) ? Time::HiRes::time() : time()) - $startTime;
-      $var{duration} = sprintf("%.3f", $var{duration}) if $hasTimeHiRes; # Duration rounded to 3 decimal places
+	my $filter = $self->_buildFilter;
+
+	my $search = WebGUI::Wobject::IndexedSearch::Search->new($self->getValue('indexName'));
+	$search->open;
+	my $results = $search->search($var{query},$filter);
+	$var{duration} = (($hasTimeHiRes) ? Time::HiRes::time() : time()) - $startTime;
+	$var{duration} = sprintf("%.3f", $var{duration}) if $hasTimeHiRes; # Duration rounded to 3 decimal places
 
 	# Let's see if the search returned any results
 	if (defined ($results)) {
@@ -379,11 +369,73 @@ sub www_view {
 		}
 		push(@{$var{languages}}, { value => $_, name => $languages->{$_}, selected => $selected });
 	}
-
+ 
+	# Create a loop with searchable page roots
+	my $rootData;
+	my @roots = split(/\n/, $self->get('searchRoot'));
+	my %checked = map {$_=>1} $session{cgi}->param("searchRoot");
+	if (isIn('any', @roots)) {
+		foreach $rootData (WebGUI::Page->getAnonymousRoot->daughters) {
+			push (@{$var{searchRoots}}, {
+				value           => $rootData->{'pageId'},
+				menuTitle       => $rootData->{'menuTitle'},
+				title           => $rootData->{'title'},
+				urlizedTitle    => $rootData->{'urlizedTitle'},
+				checked		=> $checked{$rootData->{'pageId'}},
+			});
+			$var{"rootPage.".$rootData->{'urlizedTitle'}.".id"} = $rootData->{'pageId'};
+			$var{"rootPage.".$rootData->{'urlizedTitle'}.".checked"} = $checked{$rootData->{'pageId'}};
+		}
+	} else {
+		foreach (@roots) {
+			$rootData = WebGUI::Page->new($_);
+			push (@{$var{searchRoots}}, {
+				value 		=> $rootData->get('pageId'),
+				menuTitle 	=> $rootData->get('menuTitle'),
+				title		=> $rootData->get('title'),
+				urlizedTitle	=> $rootData->get('urlizedTitle'),
+				checked         => $checked{$rootData->get('pageId')},
+			});
+			$var{"rootPage.".$rootData->get('urlizedTitle').".id"} = $rootData->get('pageId');
+			$var{"rootPage.".$rootData->get('urlizedTitle').".checked"} = $checked{$rootData->get('pageId')};
+		}
+	}
+	$var{"anyRootPage.checked"} = $checked{'any'};
 	# close the search
 	$search->close; 
 
 	return $self->processTemplate($self->get("templateId"),\%var);
+}
+
+#-------------------------------------------------------------------
+sub _buildPageList {
+	my ($self, @userSpecifiedRoots, @roots, @allowedRoots, $pageId, @pages);
+	$self = shift;
+
+	@userSpecifiedRoots = $session{cgi}->param("searchRoot");
+	
+	if ((scalar(@userSpecifiedRoots) == 0)
+		|| ($self->getValue("forceSearchRoots"))
+		|| (isIn('any', @userSpecifiedRoots))
+	) {
+		@roots = split(/\n+/i, $self->get("searchRoot"));
+	} else { 
+		@allowedRoots = split(/\n+/, $self->get("searchRoot"));
+		
+		foreach (@userSpecifiedRoots) {
+			push (@roots, $_) if (isIn($_, @allowedRoots));
+		}
+	}
+		
+	foreach $pageId (@roots) {
+		WebGUI::Page->new($pageId)->traversePreOrder(
+			sub {
+				push(@pages, $_[0]->get('pageId'));
+			}
+		);	
+	}
+
+	return [ @pages ];
 }
 
 #-------------------------------------------------------------------
@@ -392,8 +444,8 @@ sub _buildFilter {
 	my %filter = ();
 	
 	# pages
-	if($self->getValue('pageList') ne 'any') {
-		$filter{pageId} = [ split(/\n+/, $self->getValue('pageList')) ];
+	if($self->get('searchRoot') !~ /any/i) {
+		$filter{pageId} = $self->_buildPageList;
 	}
 
 	# languages

@@ -300,11 +300,15 @@ WebGUI's administrative controls for this field.
 
 </blockquote>
 
+<b>field.noloop.<i>fieldName</i>.<i>property</i></b><br>
+Except from within the <b>field_loop</b> it's also possible to access all formfields directly. To accomplish this you should use these variables. Call them with field.noloop.<i>fieldName</i>.<i>property</i>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <tmpl_var field.noloop.name.form> anywhere in your template. If you want to know if the field is required use field.noloop.name.isRequired.
+<p>
+
 <b>form.send</b><br>
 A form button with the word "send" printed on it.
 <p>
 
-<b>form.save/b><br>
+<b>form.save</b><br>
 A form button with the word "save" printed on it.
 <p>
 
@@ -313,7 +317,7 @@ The end of the form.
 <p>
 
 *Only available if the user has already submitted the form.|,
-		lastUpdated => 1053948922
+		lastUpdated => 1090575731
 	},
 
 	'72' => {
@@ -349,6 +353,14 @@ Set the number of characters wide this field will be.
 Set the number of characters tall this field will be. Only used on textarea and HTMLArea.
 <p>
 
+<b>Align vertical</b><br>
+This property controls wheter radio- and checklists are layouted horizontally or vertically.
+<p>
+
+<b>Extras</b><br>
+Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.
+<p>
+
 <b>Possible Values</b><br>
 This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.
 <p>
@@ -358,7 +370,7 @@ Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" 
 <p>
 
 |,
-		lastUpdated => 1053855075
+		lastUpdated => 1090575731
 	},
 
 	'80' => {
@@ -590,6 +602,21 @@ A conditional indicating whether this field exists for the mail subsystem of the
 	'90' => {
 		message => q|Delete this entry.|,
 		lastUpdated => 1057208065
+	},
+
+	'editField-vertical-label' => {
+		message => q|Align vertical|,
+		lastUpdated => 1090575731
+	},
+
+	'editField-vertical-subtext' => {
+		message => q|This property only affects radio- and checklists.|,
+		lastUpdated => 1090575731
+	},
+
+	'editField-extras-label' => {
+		message => q|Extras|,
+		lastUpdated => 1090575731
 	},
 
 };

@@ -62,6 +62,16 @@ refine their search.</P>
 option.<BR><BR><STRONG>value<BR></STRONG>The value of the 
 option.<BR><BR><STRONG>selected<BR></STRONG>A conditional indicating whether 
 this option is selected or not.</P></BLOCKQUOTE>
+<P dir=ltr><B>searchRoots</B><BR>A loop containing the available roots to search through.
+<BLOCKQUOTE dir=ltr><P dir=ltr>
+<b>title</b><br>The title of the pageroot.<br><br>
+<b>urlizedTitle</b><br>The urlizedTitle of the pageroot.<br><br>
+<b>menuTitle</b><br>The menu title of the pageroot.<br><br>
+<b>value</b><br>The value you should pass as a form param.<br><br>
+<b>checked</b><br>True if this pageroot is selected.<br><br>
+</p></blockquote>
+<p dir=ltr><b>rootPage.<i>urlizedTitle</i>.id</b><br>This is a direct link to the value property of the rootpage identified with <i>urlizedTitle</i> that is also given by the value property of the <B>searchRoots</B> loop.</p>
+<p dir=ltr><b>rootPage.<i>urlizedTitle</i>.checked</b><br>This is a direct link to the checked property of the rootpage identified with <i>urlizedTitle</i> that is also given by the checked property of the <B>searchRoots</B> loop.</p>
 <P><B>firstPage</B><BR>A link to the first page in the paginator. 
 <P><B>lastPage</B><BR>A link to the last page in the paginator. 
 <P><B>nextPage</B><BR>A link to the next page forward in the paginator. 
@@ -73,7 +83,7 @@ one page in the paginator.
 the first page. 
 <P><B>isLastPage</B><BR>A conditional indicating whether the visitor is viewing 
 the last page.</P>|,
-		lastUpdated => 1070202325
+		lastUpdated => 1090580644
 	},
 
 	'2' => {
@@ -235,6 +245,7 @@ system<BR><EM>Page:</EM><STRONG> </STRONG>Page title and
 synopsis<BR><EM>Profile:</EM> User Profiles<BR><EM>Wobject: </EM>Wobject Title 
 and Description<BR><EM>Wobject details: </EM>All other wobject data. For example 
 FAQ question, Calendar item, etc.</P></BLOCKQUOTE>
+<P dir=ltr align=left><b>Force users to use selected roots</b><br>Enabling this option will cause the search to be over all of the selected page roots regardless of what the user entered via the search form.</b></p> 
 <P dir=ltr align=left><STRONG>Template<BR></STRONG>Select a template to layout 
 your Search. The different templates have different functionality.</P>
 <P dir=ltr align=left><STRONG>Paginate after<BR></STRONG>The number of results 
@@ -247,7 +258,12 @@ no preview.</P>
 highlight the search results in the preview you'll want to check this box.</P>
 <P dir=ltr align=left><STRONG>Highlight color n<BR></STRONG>The colors that are 
 used to highlight the corresponding words in the query.&nbsp;</P>|,
-		lastUpdated => 1070195783
+		lastUpdated => 1090580644
+	},
+
+	'edit-forceSearchRoots-label' => {
+		message => q|Force users to use the selected roots|,
+		lastUpdated => 1090580644
 	},
 
 };

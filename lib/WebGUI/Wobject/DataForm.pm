@@ -44,7 +44,9 @@ sub _createField {
 	$param{size} = $data->{width};
 	$param{rows} = $data->{rows} || 5;
 	$param{columns} = $data->{width};
-	$param{vertical} = 1;
+	$param{vertical} = $data->{vertical};
+	$param{extras} = $data->{extras};
+		
 	if ($data->{type} eq "checkbox") {
 		$param{value} = ($data->{defaultValue} =~ /checked/i) ? 1 : "";
 	}
@@ -261,7 +263,7 @@ sub getRecordTemplateVars {
 		.WebGUI::Form::hidden({name=>"wid",value=>$self->get("wobjectId")})
 		.WebGUI::Form::hidden({name=>"func",value=>"process"});
 	my @tabs;
-	my $select = "select a.name, a.DataForm_fieldId, a.DataForm_tabId,a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows";
+	my $select = "select a.name, a.DataForm_fieldId, a.DataForm_tabId,a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows, a.extras, a.vertical";
 	my $join;
 	my $where = "where a.wobjectId=".$self->get("wobjectId");
 	if ($var->{entryId}) {
@@ -298,7 +300,7 @@ sub getRecordTemplateVars {
 			my $value = $data{value};
 			$value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
 			$value = WebGUI::DateTime::epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
-			push(@fields,{
+			push(@fields, {
 				"tab.field.form" => _createField(\%data),
 				"tab.field.name" => $data{name},
 				"tab.field.tid" => $data{DataForm_tabId},
@@ -313,7 +315,7 @@ sub getRecordTemplateVars {
 			});
 		}
 		$sth->finish;
-		push(@tabs,{
+		push(@tabs, {
 			"tab.start" => '<div id="tabcontent'.$tab{sequenceNumber}.'" class="tabBody">',
 			"tab.end" =>'</div>',
 			"tab.sequence" => $tab{sequenceNumber},
@@ -321,7 +323,7 @@ sub getRecordTemplateVars {
 			"tab.tid" => $tab{DataForm_tabId},
 			"tab.subtext" => $tab{subtext},
 			"tab.controls" => $self->_tabAdminIcons($tab{DataForm_tabId}),
-			"tab.field_loop" => \@fields
+			"tab.field_loop" => \@fields,
 		});
 	}
 	
@@ -340,19 +342,24 @@ sub getRecordTemplateVars {
 		my $value = $data{value};
 		$value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
 		$value = WebGUI::DateTime::epochToHuman($value) if ($data{type} eq "dateTime");
-		push(@fields,{
-			"field.form" => _createField(\%data),
-			"field.name" => $data{name},
-			"field.tid" => $data{DataForm_tabId},
-			"field.value" => $value,
-			"field.label" => $data{label},
-			"field.isMailField" => $data{isMailField},
-			"field.isHidden" => $hidden,
-			"field.isDisplayed" => ($data{status} eq "visible" && !$hidden),
-			"field.isRequired" => ($data{status} eq "required" && !$hidden),
-			"field.subtext" => $data{subtext},
-			"field.controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
-		});
+		my %fieldProperties = (
+			"form" => _createField(\%data),
+			"name" => $data{name},
+			"tid" => $data{DataForm_tabId},
+			"inTab".$data{DataForm_tabId} => 1,
+			"value" => $value,
+			"label" => $data{label},
+			"isMailField" => $data{isMailField},
+			"isHidden" => $hidden,
+			"isDisplayed" => ($data{status} eq "visible" && !$hidden),
+			"isRequired" => ($data{status} eq "required" && !$hidden),
+			"subtext" => $data{subtext},
+			"controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
+		);
+		push(@fields, { map {("field.".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
+		foreach (keys(%fieldProperties)) {
+			$var->{"field.noloop.".$data{name}.".$_"} = $fieldProperties{$_};
+		}
 	}
 	$sth->finish;
 	$var->{field_loop} = \@fields;
@@ -360,7 +367,7 @@ sub getRecordTemplateVars {
 	$var->{tab_loop} = \@tabs;
 	$var->{"form.send"} = WebGUI::Form::submit({value=>WebGUI::International::get(73, $self->get("namespace"))});
 	$var->{"form.save"} = WebGUI::Form::submit();
-	$var->{"form.end"} = WebGUI::Form::formFooter();	
+	$var->{"form.end"} = WebGUI::Form::formFooter();
 	return $var;
 }
 
@@ -670,6 +677,17 @@ sub www_editField {
 		-label=>WebGUI::International::get(27, $_[0]->get("namespace")),
 		-subtext=>WebGUI::International::get(28, $_[0]->get("namespace")),
 		);
+	$f->yesNo(
+		-name=>"vertical",
+		-value=>$field{vertical},
+		-label=>WebGUI::International::get('editField-vertical-label', $_[0]->get("namespace")),
+		-subtext=>WebGUI::International::get('editField-vertical-subtext', $_[0]->get("namespace"))
+		);
+	$f->text(
+		-name=>"extras",
+		-value=>$field{extras},
+		-label=>WebGUI::International::get('editField-extras-label', $_[0]->get("namespace"))
+		);
         $f->textarea(
 		-name=>"possibleValues",
 		-label=>WebGUI::International::get(24,$_[0]->get("namespace")),
@@ -715,7 +733,9 @@ sub www_editFieldSave {
 		possibleValues=>$session{form}{possibleValues},
 		defaultValue=>$session{form}{defaultValue},
 		subtext=>$session{form}{subtext},
-		rows=>$session{form}{rows}
+		rows=>$session{form}{rows},
+		vertical=>$session{form}{vertical},
+		extras=>$session{form}{extras},
 		}, "1","1", "DataForm_tabId",$session{form}{tid});
 	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId", "DataForm_tabId",$session{form}{tid}) if ($session{form}{fid} ne "new");
         if ($session{form}{proceed} eq "addField") {
