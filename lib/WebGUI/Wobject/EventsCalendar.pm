@@ -390,7 +390,7 @@ sub www_editEventSave {
 	if ($session{form}{eid} eq "new") {
 		$session{form}{name} = $session{form}{name} || "unnamed";
 		$session{form}{eid} = getNextId("EventsCalendar_eventId");
-               	$until = setToEpoch($session{form}{until});
+               	$until = WebGUI::FormProcessor::date($session{form}{until});
 		$until = $endDate[0] unless ($until >= $endDate[0]);
                	$eventId[0] = getNextId("EventsCalendar_eventId");
 		$session{form}{interval} = 1 if ($session{form}{interval} < 1);
