@@ -108,19 +108,34 @@ sub insufficient {
 
 #-------------------------------------------------------------------
 sub isInGroup {
-	my ($gid, $uid, $result);
+	my ($gid, $uid, @data, %group, %user);
 	($gid, $uid) = @_;
 	if ($uid eq "") {
 		$uid = $session{user}{userId};
 	}
+	### The "Everyone" group automatically returns true.
 	if ($gid == 7) {
-		return 1;		# If the "Everyone" group is specified then return true regardless of the user.
+		return 1;	
 	}
-	($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
-        if ($result < 1 && $gid != 3) {         # admins can
-                $result = isInGroup(3, $uid);   # do anything any 
-        }                                       # user can do
-	return $result;
+        ### Lookup the actual grouping.
+	@data = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
+	if ($data[0] > 0) {
+		return 1;
+	}
+        ### Get data for auxillary checks.
+	tie %group, 'Tie::CPHash';
+	%group = WebGUI::SQL->quickHash("select karmaThreshold from groups where groupId='$gid'");
+	tie %user, 'Tie::CPHash';
+	%user = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
+        ### Check karma levels.
+	if ($user{karma} >= $group{karmaThreshold}) {
+		return 1;
+	}
+	### Admins can do anything!
+        if ($gid != 3) {                        
+                return isInGroup(3, $uid);       
+        }                                       
+	return 0;
 }
 
 #-------------------------------------------------------------------
