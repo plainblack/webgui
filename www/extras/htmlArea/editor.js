@@ -42,7 +42,7 @@ this.toolbar = [
     ['fontsize'],
 //    ['fontstyle'],
 //    ['linebreak'],
-    ['find','separator'],
+    ['undo','redo','find','separator'],
     ['bold','italic','underline','separator'],
     ['strikethrough','subscript','superscript','separator'],
     ['justifyleft','justifycenter','justifyright','separator'],
@@ -85,6 +85,8 @@ this.fontstyles = [     // make sure these exist in the header of page the conte
 
 this.btnList = {
     // buttonName:    commandID,               title,                onclick,                   image,             
+    "undo":           ['Undo',                 'Undo Ctrl+z',        'editor_action(this.id)',  'ed_undo.gif'],
+    "redo":           ['Redo',                 'Redo Ctrl+y',        'editor_action(this.id)',  'ed_redo.gif'],
     "find":	      ['Find',	     	       'Find',	             'editor_action(this.id)',  'ed_find.gif'],
     "smileys":        ['Smileys',              'Insert Smiley',      'editor_action(this.id)',  'ed_smiley.gif'],
     "bold":           ['Bold',                 'Bold',               'editor_action(this.id)',  'ed_format_bold.gif'],
@@ -530,7 +532,7 @@ function editor_event(objname,runDelay) {
     }, 333);  // 1/3 second
 
 
-  editor_updateOutput(objname);
+//  editor_updateOutput(objname);
   editor_updateToolbar(objname);
 
 }
