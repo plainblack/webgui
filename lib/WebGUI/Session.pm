@@ -135,10 +135,10 @@ sub _loadWobjects {
 			$namespace = $1;
 			$cmd = "use WebGUI::Wobject::".$namespace;
 			eval($cmd);
-			WebGUI::ErrorHandler::fatalError("Wobject failed to compile: $namespace.") if($@);
+			WebGUI::ErrorHandler::fatalError("Wobject failed to compile: $namespace. ".$@) if($@);
 			$cmd = "\$WebGUI::Wobject::".$namespace."::name";
 			$session{wobject}{$namespace} = eval($cmd);
-			WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace.") if($@);
+			WebGUI::ErrorHandler::fatalError("No name method in wobject: $namespace. ".$@) if($@);
 		}
 	}
 	closedir(DIR);

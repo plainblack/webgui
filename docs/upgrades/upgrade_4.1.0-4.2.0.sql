@@ -802,3 +802,85 @@ insert into international values (604,'WebGUI',1,'Object');
 
 
 
+CREATE TABLE MailForm (
+  wobjectId int(11) NOT NULL default '0',
+  width int(11) NOT NULL default '0',
+  fromField text,
+  fromStatus char(1) default '0',
+  toField text,
+  toStatus char(1) default '0',
+  ccField text,
+  ccStatus char(1) default '0',
+  bccField text,
+  bccStatus char(1) default '0',
+  subjectField text,
+  subjectStatus char(1) default '0',
+  acknowledgement text,
+  storeEntries char(1) default NULL
+) TYPE=MyISAM;
+
+CREATE TABLE MailForm_field (
+  wobjectId int(11) NOT NULL default '0',
+  mailFieldId int(11) NOT NULL default '0',
+  sequenceNumber int(11) NOT NULL default '0',
+  name varchar(255) NOT NULL default '',
+  status char(1) NOT NULL default '0',
+  type varchar(30) NOT NULL default '',
+  possibleValues text,
+  defaultValue text,
+  PRIMARY KEY  (mailFieldId)
+) TYPE=MyISAM;
+
+CREATE TABLE MailForm_entry (
+  entryId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
+  userId int(11) default NULL,
+  username varchar(255) default NULL,
+  ipAddress varchar(255) default NULL,
+  submissionDate int(11) NOT NULL default '0',
+  PRIMARY KEY  (entryId)
+) TYPE=MyISAM;
+
+CREATE TABLE MailForm_entry_data (
+  entryId int(11) NOT NULL default '0',
+  wobjectId int(11) NOT NULL default '0',
+  sequenceNumber int(11) NOT NULL default '0',
+  name varchar(255) NOT NULL default '',
+  value text
+) TYPE=MyISAM;
+
+INSERT INTO incrementer VALUES ('mailFieldId', 1000);
+INSERT INTO incrementer VALUES ('mailEntryId', 1000);
+
+INSERT INTO international VALUES (1, 'MailForm', 1, 'Mail Form');
+INSERT INTO international VALUES (2, 'MailForm', 1, 'Your email subject here');
+INSERT INTO international VALUES (3, 'MailForm', 1, 'Thank you for your feedback!');
+INSERT INTO international VALUES (4, 'MailForm', 1, 'Hidden');
+INSERT INTO international VALUES (5, 'MailForm', 1, 'Displayed');
+INSERT INTO international VALUES (6, 'MailForm', 1, 'Modifiable');
+INSERT INTO international VALUES (7, 'MailForm', 1, 'Edit Mail Form');
+INSERT INTO international VALUES (8, 'MailForm', 1, 'Width');
+INSERT INTO international VALUES (9, 'MailForm', 1, 'Add Field');
+INSERT INTO international VALUES (10, 'MailForm', 1, 'From');
+INSERT INTO international VALUES (11, 'MailForm', 1, 'To (email, username, or group name)');
+INSERT INTO international VALUES (12, 'MailForm', 1, 'Cc');
+INSERT INTO international VALUES (13, 'MailForm', 1, 'Bcc');
+INSERT INTO international VALUES (14, 'MailForm', 1, 'Subject');
+INSERT INTO international VALUES (15, 'MailForm', 1, 'Proceed to add more fields?');
+INSERT INTO international VALUES (16, 'MailForm', 1, 'Acknowledgement');
+INSERT INTO international VALUES (17, 'MailForm', 1, 'Mail Sent');
+INSERT INTO international VALUES (18, 'MailForm', 1, 'Go back!');
+INSERT INTO international VALUES (19, 'MailForm', 1, 'Are you certain that you want to delete this field?');
+INSERT INTO international VALUES (20, 'MailForm', 1, 'Edit Field');
+INSERT INTO international VALUES (21, 'MailForm', 1, 'Field Name');
+INSERT INTO international VALUES (22, 'MailForm', 1, 'Status');
+INSERT INTO international VALUES (23, 'MailForm', 1, 'Type');
+INSERT INTO international VALUES (24, 'MailForm', 1, 'Possible Values (Drop-Down Box only)');
+INSERT INTO international VALUES (25, 'MailForm', 1, 'Default Value (optional)');
+INSERT INTO international VALUES (26, 'MailForm', 1, 'Store Entries?');
+
+INSERT INTO help VALUES (1, 'MailForm', 1, 'Add/Edit', 'Mail Form', 'This wobject creates a simple form that will email an email address when it is filled out.\r\n<br><br>\r\n\r\n<b>Width</b><br>\r\nThe width of all fields in the form.  The default value is 45.\r\n<p>\r\n\r\n<b>From, To, Cc, Bcc, Subject</b><br>\r\nThese fields control how the email will look when sent, and who it is sent to.  You can give your site visitors the ability to modify some or all of these fields, but typically the only fields you will want the user to be able to modify are From and Subject.  Use the drop-down options by each field to choose whether or not the user can see or modify that field.<br>\r\n<br>\r\nYou may also choose to enter a WebGUI username or group in the To field, and the email will be sent to the corresponding user or group.\r\n<p>\r\n\r\n<b>Acknowledgement</b><br>\r\nThis message will be displayed to the user after they click "Send".\r\n<p>\r\n\r\n<b>Store Entries?</b><br>\r\nIf set to yes, when your mail form is submitted the entries will be saved to the database for later viewing.  The tool to view these entries is not yet available, but when it is you will be able to view all entries from your form in a centralized location.\r\n<p>\r\n\r\n<b>Proceed to add more fields?</b><br>\r\nLeave this checked if you want to add additional fields to your form directly after creating it.', '13,1,2,3,4,5');
+INSERT INTO help VALUES (2, 'MailForm', 1, 'Add/Edit', 'Mail Form Fields', 'You may add as many additional fields to your Mail Form as you like.\r\n<br><br>\r\n\r\n<b>Field Name</b><br>\r\nThe name of this field.  It must be unique among all of the other fields on your form.\r\n<p>\r\n\r\n<b>Status</b><br>\r\nHidden fields will not be visible to the user, but will be sent in the email.<br>\r\nDisplayed fields can be seen by the user but not modified.<br>\r\nModifiable fields can be filled in by the user.<br>\r\nIf you choose Hidden or Displayed, be sure to fill in a Default Value.\r\n<p>\r\n\r\n<b>Type</b><br>\r\nChoose the type of form element for this field.  The following field types are supported:<br>\r\nURL: A textbox that will auto-format URL\'s entered.<br>\r\nTextbox: A standard textbox.<br>\r\nDate: A textbox field with a popup window to select a date.<br>\r\nYes/No: A set of yes/no radio buttons.<br>\r\nEmail Address: A textbox that requires the user to enter a valid email address.<br>\r\nTextarea: A simple textarea.<br>\r\nCheckbox: A single checkbox.<br>\r\nDrop-Down Box: A drop-down box. Use the Possible Values field to enter each option to be displayed in the box.  Enter one option per line.\r\n<p>\r\n\r\n<b>Possible Values</b><br>\r\nThis field is only used for the Drop-Down Box type.  Enter the values you wish to appear in your drop-down box, one per line.\r\n<p>\r\n\r\n<b>Default Value (optional)</b><br>\r\nEnter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".\r\nFor Checkbox fields, enter "checked" to check the box.\r\n<p>\r\n\r\n<b>Proceed to add more fields?</b><br>\r\nLeave this checked if you want to add additional fields to your form directly after creating this field.', '14');
+
+INSERT INTO helpSeeAlso VALUES (13, 2, 'MailForm');
+INSERT INTO helpSeeAlso VALUES (14, 1, 'MailForm');
