@@ -7118,6 +7118,24 @@ Following a guide like the above will help you get good ranking on search engine
 		lastUpdated => 1056151382
 	},
 
+	'starts with' => {
+		message => q|Starts With|,
+		lastUpdated => 1089039511,
+		context => 'A phrase or word begins with this.'
+	},
+
+	'contains' => {
+		message => q|Contains|,
+		lastUpdated => 1089039511,
+		context => 'A phrase or word contains this.'
+	},
+
+	'ends with' => {
+		message => q|Ends With|,
+		lastUpdated => 1089039511,
+		context => q|A phrase or word ends with this.|
+	}
+
 };
 
 1;

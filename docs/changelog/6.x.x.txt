@@ -50,6 +50,8 @@
  - Added prepared statement handlers to WebGUI::SQL.
  - Added transaction handlers to WebGUI::SQL.
  - Added additional debugging to WebGUI::SQL.
+ - Added a better user search mechanism, which works well even with 100,000
+   users.
 
 
 6.0.3

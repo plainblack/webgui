@@ -140,6 +140,11 @@ gen61i18nfrom60data.pl
 We also made the International API object oriented. The old procedural version
 is still intact as well. See WebGUI::International for API changes.
 
+As a developer you can convert your translations (including English) and your
+help files using a script we provide. You can find the script here:
+
+http://www.plainblack.com/translations?wid=1552&func=viewSubmission&sid=1213
+
 5.8 WebGUI::Session Changes
 
 In 6.1 we changed the session API to remove functions that didn't really

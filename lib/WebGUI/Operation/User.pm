@@ -468,8 +468,8 @@ sub www_listUsers {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
 	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
-	my ($output, $data, $f, $rows, $p, $search, %status, $selectedStatus);
-	$output = helpIcon(8);
+	my ($data, $rows, $p, %status, $selectedStatus);
+	my $output = helpIcon(8);
 	$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 	$output .= '<div align="center">';
 	tie %status, 'Tie::IxHash';
@@ -479,10 +479,27 @@ sub www_listUsers {
 		Deactivated	=> WebGUI::International::get(818),
 		Selfdestructed	=> WebGUI::International::get(819)
 	);
-	$f = WebGUI::HTMLForm->new(1);
+	my $f = WebGUI::HTMLForm->new(1);
 	$f->hidden("op","listUsers");
-	$f->text("keyword",'',$session{scratch}{userSearchKeyword});
-	$f->select(
+	$f->hidden(
+		-name=>"doit",
+		-value=>1
+		);
+	$f->selectList(
+		-name=>"modifier",
+		-value=>([$session{form}{modifier}] || ["contains"]),
+		-options=>{
+			startsWith=>WebGUI::International::get("starts with"),
+			contains=>WebGUI::International::get("contains"),
+			endsWith=>WebGUI::International::get("ends with")
+			}
+		);
+	$f->text(
+		-name=>"keyword",
+		-value=>$session{scratch}{userSearchKeyword},
+		-size=>15
+		);
+	$f->selectList(
 		-name	=> "status",
 		-value	=> [$session{form}{status} || "users.status like '%'"],
 		-options=> \%status
@@ -490,6 +507,7 @@ sub www_listUsers {
 	$f->submit(WebGUI::International::get(170));
 	$output .= $f->print;
 	$output .= '</div>';
+	return _submenu($output) unless ($session{form}{doit});
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
         $output .= '<tr>
                 <td class="tableHeader">'.WebGUI::International::get(816).'</td>
@@ -505,16 +523,18 @@ sub www_listUsers {
 	} else {
 		$selectedStatus = "status like '%'";
 	}
-	if ($session{scratch}{userSearchKeyword} ne "") {
-		$search = " and (users.username like ".quote("%".$session{scratch}{userSearchKeyword}."%")
-			." or email.fieldData like ".quote("%".$session{scratch}{userSearchKeyword}."%").")";
+	my $keyword = $session{scratch}{userSearchKeyword};
+	if ($session{form}{modifier} eq "startsWith") {
+		$keyword .= "%";
+	} elsif ($session{form}{modifier} eq "contains") {
+		$keyword = "%".$keyword."%";
+	} else {
+		$keyword = "%".$keyword;
 	}
         $p = WebGUI::Paginator->new(WebGUI::URL::page("op=listUsers"));
 	$p->setDataByQuery("select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
-		email.fieldData as email
-		from users left join userProfileData email on users.userId=email.userId and
-		email.fieldName='email'
-		where $selectedStatus $search order by users.username");
+		email.fieldData as email from users left join userProfileData email on users.userId=email.userId and email.fieldName='email'
+		where $selectedStatus  and (users.username like ".quote($keyword)." or email.fieldData like ".quote($keyword).")  order by users.username");
 	$rows = $p->getPageData;
 	foreach $data (@$rows) {
 		$output .= '<tr class="tableData">';
