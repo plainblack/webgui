@@ -54,6 +54,20 @@ sub _processOperations {
 }
 
 #-------------------------------------------------------------------
+sub _upgrading {
+	my $webguiRoot = shift;
+        my $output = WebGUI::HTTP::getHeader();
+	open(FILE,"<".$webguiRoot."/docs/maintenance.html");
+	while (<FILE>) {
+		$output .= $_;
+	}
+	close(FILE);
+	WebGUI::Session::close();
+	return $output;
+}
+
+
+#-------------------------------------------------------------------
 sub page {
 	my $webguiRoot = shift;
 	my $configFile = shift;
@@ -61,6 +75,7 @@ sub page {
 	my $assetUrl = shift;
 	my $fastcgi = shift;
 	WebGUI::Session::open($webguiRoot,$configFile,$fastcgi) unless ($useExistingSession);
+	return _upgrading($webguiRoot) if ($session{setting}{specialState} eq "upgrading");
 	my $output = _processOperations();
 	if ($output eq "") {
 		my $asset = WebGUI::Asset->newByUrl($assetUrl);

@@ -6,6 +6,8 @@
  - Converted site maps to navigation assets.
  - Converted file managers to layout assets with file and image assets
    attached.
+ - Added a new upgrade mechanism that will display a maintenence message
+   during upgrades. No need to set up anything special for this any longer.
  - Added AssetProxy macro, which replaces the Navigation, I, Snippet, and File
    macros.
  - Added Folder asset type.

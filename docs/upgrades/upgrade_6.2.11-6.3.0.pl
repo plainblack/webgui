@@ -171,17 +171,6 @@ walkTree('0','PBasset000000000000001','000001','2');
 mapProductCollateral();
 
 print "\t\tMaking second round of table structure changes\n" unless ($quiet);
-foreach my $namespace (@allWobjects) {
-	if (isIn($namespace, @wobjects)) {
-		WebGUI::SQL->write("alter table ".$namespace." drop column wobjectId");
-		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
-	} elsif (isIn($namespace, qw(Navigation Layout))) {
-		# do nothing
-	} else {
-		WebGUI::SQL->write("alter table ".$namespace." drop primary key");
-		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
-	}
-}
 WebGUI::SQL->write("alter table WobjectProxy add column shortcutToAssetId varchar(22) not null");
 my $sth = WebGUI::SQL->read("select proxiedWobjectId from WobjectProxy");
 while (my ($wobjectId) = $sth->array) {
@@ -189,6 +178,21 @@ while (my ($wobjectId) = $sth->array) {
 	WebGUI::SQL->write("update WobjectProxy set shortcutToAssetId=".quote($assetId)." where wobjectId=".quote($wobjectId));
 }
 $sth->finish;
+foreach my $namespace (@allWobjects) {
+	if (isIn($namespace, qw(SiteMap USS FileManager))) {
+		# do nothing because these are going away
+	} elsif (isIn($namespace, @wobjects)) {
+		WebGUI::SQL->write("delete from ".$namespace." where assetId is null or assetId = ''"); # protect ourselves from crap
+		WebGUI::SQL->write("alter table ".$namespace." drop column wobjectId");
+		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
+	} elsif (isIn($namespace, qw(Navigation Layout Collaboration Folder))) {
+		# do nothing because these are new
+	} else {
+		WebGUI::SQL->write("delete from ".$namespace." where assetId is null or assetId = ''"); # protect ourselves from crap
+		WebGUI::SQL->write("alter table ".$namespace." drop primary key");
+		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
+	}
+}
 WebGUI::SQL->write("alter table WobjectProxy drop proxiedWobjectId");
 WebGUI::SQL->write("alter table WobjectProxy change proxiedTemplateId overrideTemplateId varchar(22) not null");
 WebGUI::SQL->write("alter table WobjectProxy change proxyByCriteria shortcutByCriteria int not null");
@@ -1598,12 +1602,12 @@ sub walkTree {
 				WebGUI::SQL->write("update wobject set namespace='Collaboration' where wobjectId=".quote($wobject->{wobjectId}));
 				print "\t\t\tMigrating submissions for USS ".$wobject->{wobjectId}."\n" unless ($quiet);
 				my $ussId = $namespace->{USS_id};
-				my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($ussId));
 				my $usssubrank = 1;
 				my $collabReplyCounter;
 				my $collabViewCounter;
 				my $collabThreadCounter;
 				my %oldestForumPost;
+				my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($ussId));
 				while (my $submission = $sth->hashRef) {
 					$collabThreadCounter++;
 					$collabViewCounter += $submission->{views};
@@ -1662,9 +1666,9 @@ sub walkTree {
 						subscriptionGroupId=>$threadSubscriptionGroup->groupId
 						}, undef, $id);
 					my %oldestThreadPost;
-					my $posts = WebGUI::SQL->read("select forumPost.* from forumPost left join forumThread on forumPost.forumThreadId=forumThread.forumThreadId where forumId=".quote($submission->{forumId}));
 					my $postRank = 1;
 					my $threadReplyCounter;
+					my $posts = WebGUI::SQL->read("select forumPost.* from forumPost left join forumThread on forumPost.forumThreadId=forumThread.forumThreadId where forumId=".quote($submission->{forumId}));
 					while (my $post = $posts->hashRef) {
 						$collabViewCounter += $post->{views};
 						$threadReplyCounter++;
@@ -1738,6 +1742,7 @@ sub walkTree {
 				WebGUI::SQL->write("update WobjectProxy set description=".quote($wobject->{description})." where
 					assetId=".quote($wobjectId));
 			} elsif ($wobject->{namespace} eq "MessageBoard") {
+				print "\t\t\tMigrating Message Board forums\n" unless ($quiet);
 				my $forums = WebGUI::SQL->read("select forumId, title, description from MessageBoard_forums where wobjectId=".quote($wobject->{wobjectId})." order by sequenceNumber");
 				my $i = 1;
 				while (my ($fid, $title, $desc) = $forums->array) {
@@ -1921,9 +1926,14 @@ sub migrateForum {
 	my $ratingprep = WebGUI::SQL->prepare("insert into Post_rating (assetId, userId, ipAddress, dateOfRating, rating) values (?,?,?,?,?)");
 	print "\t\t\t\t\t Migrating threads for forum $originalId\n";
 	my $threads = WebGUI::SQL->read("select * from forumThread left join forumPost on forumThread.rootPostId=forumPost.forumPostId where
-		forumThread.forumId=".quote($originalId));
+		forumThread.forumId=".quote($originalId)." and forumPost.status<>'deleted'");
 	my $threadRank = 1;
-	while (my ($thread) = $threads->hashRef) {
+	if ($threads->errorCode>0) {
+		print "\t\t\t\tWARNING: There was a problem migrating the threads for $originalId\n";
+		return;
+	}
+	while (($threads->errorCode < 1) && (my ($thread) = $threads->hashRef)) {
+		next if ($thread->{forumThreadId} eq "");
 		print "\t\t\t\t\t\t Migrating thread ".$thread->{forumThreadId}."\n";
 		my $threadLineage = $lineage.sprintf("%06d",$threadRank);
 		my $threadId = WebGUI::SQL->setRow("asset","assetId",{
@@ -1979,9 +1989,14 @@ sub migrateForum {
 		# we're going to give up hierarchy during the upgrade for the sake of simplicity
 		print "\t\t\t\t\t\t Migrating posts for thread ".$thread->{forumThreadId}."\n";
 		my %oldestThreadPost;
-		my $posts = WebGUI::SQL->read("select * from forumPost where forumThreadId=".quote($thread->{forumThreadId})." and parentId<>''");
+		my $posts = WebGUI::SQL->read("select * from forumPost where forumThreadId=".quote($thread->{forumThreadId})." and parentId<>'' and forumPost.status<>'deleted'");
 		my $postRank = 1;
+		if ($posts->errorCode>0) {
+			print "\t\t\t\tWARNING: There was a problem migrating the posts for ".$thread->{forumThreadId}."\n";
+			next;
+		}
 		while (my $post = $posts->hashRef) {
+			next if ($thread->{forumPostId} eq "");
 			print "\t\t\t\t\t\t\t Migrating post ".$post->{forumPostId}."\n";
 			my $postId = WebGUI::SQL->setRow("asset","assetId",{
 				assetId=>"new",
@@ -2026,6 +2041,7 @@ sub migrateForum {
 			$postRank++;
 		}
 		$posts->finish;
+		print "\t\t\t\t\t\t\t Setting oldest post for thread ".$thread->{forumThreadId}."\n";
 		WebGUI::SQL->setRow("Thread","assetId",{
 			assetId=>$threadId,
 			lastPostId=>$oldestThreadPost{id},
@@ -2037,8 +2053,10 @@ sub migrateForum {
 		}
 		$threadRank++;
 	}
+	print "\t\t\t\t WARNING: Couldn't finish processing threads for $originalId because something nasty occured in the database." if ($threads->errorCode > 0);
 	$threads->finish;
 	$ratingprep->finish;
+	print "\t\t\t\t\t\t Setting oldest post for forum ".$originalId."\n";
 	WebGUI::SQL->setRow("Collaboration","assetId",{
 		assetId=>$newId,
 		lastPostId=>$oldestForumPost{id},
@@ -2049,6 +2067,9 @@ sub migrateForum {
 sub fixUrl {
 	my $id = shift;
         my $url = shift;
+	if (length($url) > 250) {
+		$url = substr($url,220);
+	}
 	$url = WebGUI::Id::generate() unless (defined $url);
         $url = WebGUI::URL::urlize($url);
         my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($id)." and url=".quote($url));

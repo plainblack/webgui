@@ -171,8 +171,12 @@ foreach my $file (@files) {
 			my $dbh = DBI->connect($config{$file}{dsn},$config{$file}{dbuser},$config{$file}{dbpass});
 			($config{$file}{version}) = WebGUI::SQL->quickArray("select webguiVersion from webguiVersion 
 				order by dateApplied desc, webguiVersion desc limit 1",$dbh);
+			unless ($history) {
+				print "\tPreparing site for upgrade.\n" unless ($quiet);
+				$dbh->do("replace into settings (name,value) values ('specialState','upgrading')") unless ($history);
+				rmtree($config->get("uploadsPath").$slash."temp");
+			}
 			$dbh->disconnect;
-			rmtree($config->get("uploadsPath").$slash."temp");
 		} else {
 			delete $config{$file};
 			print "\tSkipping non-MySQL database.\n" unless ($quiet);
@@ -206,7 +210,7 @@ opendir(DIR,$upgradesPath) or die "Couldn't open $upgradesPath\n";
 my @files = readdir(DIR);
 closedir(DIR);
 foreach my $file (@files) {
-	if ($file =~ /upgrade_(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)\.(\w+)/) {
+	if ($file =~ /^upgrade_(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)\.(pl|sql)$/) {
 		if (checkVersion($1)) {
 			if ($3 eq "sql") {
 				print "\tFound upgrade script from $1 to $2.\n" unless ($quiet);
@@ -270,6 +274,17 @@ foreach my $config (keys %config) {
 		$config{$config}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
 	}
+	print "\tSetting site upgrade completed..." unless ($quiet);
+	my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
+	$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
+	$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
+	$cmd .= " --database=".$config{$config}{db}." -e \"delete from settings where name='upgrading'\"";
+	unless (system($cmd)) {
+		print "OK\n" unless ($quiet);
+	} else {
+               	print "Failed!\n" unless ($quiet);
+		fatalError();
+        }
 }
 
 if ($notRun) {

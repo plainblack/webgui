@@ -9,6 +9,13 @@ save you many hours of grief.
 
 6.3.0
 --------------------------------------------------------------------
+ * This upgrade process will run for a very long time and output a
+	lot of debug information which will be useful if something
+	goes wrong. You may wish to pipe the debug info to a log
+	file like this:
+	
+	perl upgrade.pl --yourcommandlineoptions > /tmp/upgrade.log
+
  * If you're using languages other than English, you'll need to get
 	new versions of those language files before upgrading. The
 	language file format has a new requirement. Also, the

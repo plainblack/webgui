@@ -327,6 +327,7 @@ sub open {
 		$CGI::POST_MAX=-1;
 		$session{cgi} = CGI->new();
         }
+	return if ($session{setting}{specialState} eq "upgrading");
 	###----------------------------
 	### evironment variables from web server
 	$session{env} = \%ENV;

@@ -84,6 +84,11 @@ if (opendir (CONFDIR,$confdir)) {
 			print "\nProcessing ".$file.":\n" if ($verbose);
 			my $startTime = time();
 			WebGUI::Session::open($webguiRoot,$file);
+			if ($session{setting}{specialState} eq "upgrading") {
+				print "\nSkipping because this site is undergoing an upgrade.\n" if ($verbose);
+				WebGUI::Session::close();
+				next;
+			}
 			WebGUI::Session::refreshUserInfo(3,$session{dbh});
 			foreach $namespace (keys %plugins) {
 				my $taskTime = time();
