@@ -177,7 +177,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->getAdminConsole->setHelp("article add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Article"));
 }

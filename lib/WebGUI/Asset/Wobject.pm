@@ -434,6 +434,15 @@ sub processMacros {
 }
 
 #-------------------------------------------------------------------
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	my $output = $self->SUPER::processPropertiesFromFormPost;
+	WebGUI::MetaData::metaDataSave($self->getId);
+}
+
+
+
+#-------------------------------------------------------------------
 
 =head2 processTemplate ( vars, namespace [ , templateId ] ) 
 
@@ -648,25 +657,6 @@ sub www_createShortcut {
 		});
         return "";
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 www_editSave ( )
-
-Saves the default properties of any/all wobjects.
-
-B<NOTE:> This method should only need to be extended if you need to do some special validation that you can't achieve via filters.
-
-=cut
-
-sub www_editSave {
-	my $self = shift;
-	my $output = $self->SUPER::www_editSave();
-	WebGUI::MetaData::metaDataSave($self->getId);
-	return $output;
-}
-
 
 
 

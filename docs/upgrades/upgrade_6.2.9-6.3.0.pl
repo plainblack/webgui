@@ -82,6 +82,10 @@ WebGUI::SQL->write("alter table wobject add cacheTimeout int not null default 60
 WebGUI::SQL->write("alter table wobject add cacheTimeoutVisitor int not null default 3600");
 WebGUI::SQL->write("alter table wobject drop primary key");
 WebGUI::SQL->write("alter table Poll_answer add column assetId varchar(22)");
+WebGUI::SQL->write("alter table DataForm_entry add column assetId varchar(22)");
+WebGUI::SQL->write("alter table DataForm_entryData add column assetId varchar(22)");
+WebGUI::SQL->write("alter table DataForm_field add column assetId varchar(22)");
+WebGUI::SQL->write("alter table DataForm_tab add column assetId varchar(22)");
 # next 2 lines are for sitemap to nav migration
 WebGUI::SQL->write("alter table Navigation rename tempoldnav");
 WebGUI::SQL->write("create table Navigation (assetId varchar(22) not null primary key, assetsToInclude text, startType varchar(35), startPoint varchar(255), endPoint varchar(35), showSystemPages int not null default 0, showHiddenPages int not null default 0, showUnprivilegedPages int not null default 0)");
@@ -144,6 +148,10 @@ WebGUI::SQL->write("delete from template where namespace in ('SiteMap')");
 WebGUI::SQL->write("alter table Article drop column image");
 WebGUI::SQL->write("alter table Article drop column attachment");
 WebGUI::SQL->write("alter table Poll_answer drop column wobjectId");
+WebGUI::SQL->write("alter table DataForm_entry drop column wobjectId");
+WebGUI::SQL->write("alter table DataForm_entryData drop column wobjectId");
+WebGUI::SQL->write("alter table DataForm_field drop column wobjectId");
+WebGUI::SQL->write("alter table DataForm_tab drop column wobjectId");
 
 my %migration;
 
@@ -764,9 +772,11 @@ sub walkTree {
 				# migrate submission images
 			} elsif ($wobject->{namespace} eq "MessageBoard") {
 				# migrate forums
-			} elsif ($wobject->{namespace} eq "Poll") {
-				print "\t\t\tMigrating poll answers\n" unless ($quiet);
-				WebGUI::SQL->write("update Poll_answer set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
+			} elsif (isIn($wobject->{namespace}, qw(DataForm Poll))) {
+				print "\t\t\tMigrating wobject collateral data\n" unless ($quiet);
+				foreach my $table (qw(DataForm_entry DataForm_entryData DataForm_field DataForm_tab Poll_answer)) {
+					WebGUI::SQL->write("update $table set assetId=".quote($wobjectId)." where wobjectId=".quote($wobject->{wobjectId}));
+				}
 			}
 			$rank++;
 		}

@@ -96,6 +96,8 @@ The following tips should also help make your migration easer:
 	lib/WebGUI/Asset/File.pm or lib/WebGUI/Asset/File/Image.pm the same
 	way that the Article wobject does.
 
+	1.2.14 The parameters for the wobject processTemplate() method have changed.
+
 
 2. Macro Migration
 -------------------

@@ -58,6 +58,8 @@ use Parse::PlainConfig ();
 use Date::Manip ();
 use Tie::CPHash ();
 use Tie::IxHash ();
+# use XML::RSSLite ();
+use XML::Simple ();
 
 #----------------------------------------
 # WebGUI modules.
@@ -105,6 +107,7 @@ use WebGUI::Utility ();
 
 # help
 use WebGUI::Help::Article ();
+use WebGUI::Help::Asset ();
 use WebGUI::Help::AuthLDAP ();
 use WebGUI::Help::AuthSMB ();
 use WebGUI::Help::AuthWebGUI ();
@@ -126,6 +129,7 @@ use WebGUI::Help::WSClient ();
 # i18n
 use WebGUI::i18n::English ();
 use WebGUI::i18n::English::Article ();
+use WebGUI::i18n::English::Asset ();
 #use WebGUI::i18n::English::AuthLDAP ();
 #use WebGUI::i18n::English::AuthSMB ();
 use WebGUI::i18n::English::AuthWebGUI ();

@@ -541,7 +541,7 @@ sub www_denySubmission {
 
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->getAdminConsole->setHelp("user submission system add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("18","USS"));
 }

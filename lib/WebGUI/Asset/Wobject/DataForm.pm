@@ -26,7 +26,6 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
-use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
@@ -85,23 +84,27 @@ sub _createField {
 
 #-------------------------------------------------------------------
 sub _fieldAdminIcons {
-	my $fid = $_[1];
-	my $tid = $_[2];
+	my $self = shift;
+	my $fid = shift;
+	my $tid = shift;
+	my $cantDelete = shift;
 	my $output;
-	$output = deleteIcon('func=deleteFieldConfirm&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid,'',WebGUI::International::get(19,$_[0]->get("namespace"))) unless ($_[3]);
-	$output .= editIcon('func=editField&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid)
-		.moveUpIcon('func=moveFieldUp&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid)
-		.moveDownIcon('func=moveFieldDown&wid='.$_[0]->get("wobjectId").'&fid='.$fid.'&tid='.$tid);
+	$output = deleteIcon('func=deleteFieldConfirm&fid='.$fid.'&tid='.$tid,$self->get("url"),WebGUI::International::get(19,"DataForm")) unless ($cantDelete);
+	$output .= editIcon('func=editField&fid='.$fid.'&tid='.$tid,$self->get("url"))
+		.moveUpIcon('func=moveFieldUp&fid='.$fid.'&tid='.$tid,$self->get("url"))
+		.moveDownIcon('func=moveFieldDown&fid='.$fid.'&tid='.$tid,$self->get("url"));
 	return $output;
 }
 #-------------------------------------------------------------------
 sub _tabAdminIcons {
-	my $tid = $_[1];
+	my $self = shift;
+	my $tid = shift;
+	my $cantDelete = shift;
 	my $output;
-	$output = deleteIcon('func=deleteTabConfirm&wid='.$_[0]->get("wobjectId").'&tid='.$tid,'',WebGUI::International::get(100,$_[0]->get("namespace"))) unless ($_[2]);
-	$output .= editIcon('func=editTab&wid='.$_[0]->get("wobjectId").'&tid='.$tid)
-		.moveLeftIcon('func=moveTabLeft&wid='.$_[0]->get("wobjectId").'&tid='.$tid)
-		.moveRightIcon('func=moveTabRight&wid='.$_[0]->get("wobjectId").'&tid='.$tid);
+	$output = deleteIcon('func=deleteTabConfirm&tid='.$tid,$self->get("url"),WebGUI::International::get(100,"DataForm")) unless ($cantDelete);
+	$output .= editIcon('func=editTab&tid='.$tid,$self->get("url"))
+		.moveLeftIcon('func=moveTabLeft&tid='.$tid,$self->get("url"))
+		.moveRightIcon('func=moveTabRight&tid='.$tid,$self->get("url"));
 	return $output;
 }
 
@@ -114,38 +117,118 @@ sub _tonull {
 
 #-------------------------------------------------------------------
 sub _createTabInit {
-	my $wid = $_[0];
-	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where wobjectId=".quote($wid));
+	my $id = shift;
+	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where assetId=".quote($id));
 	my $output = '<script type="text/javascript"> var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
 	return $output;
 }
 
 #-------------------------------------------------------------------
+sub definition {
+	my $class = shift;
+        my $definition = shift;
+        push(@{$definition}, {
+                tableName=>'DataForm',
+                className=>'WebGUI::Asset::Wobject::DataForm',
+                properties=>{
+			acknowledgement=>{
+				fieldType=>"textarea",
+				defaultValue=>undef
+				},
+			emailTemplateId=>{
+				fieldType=>"template",
+				defaultValue=>undef
+				},
+			acknowlegementTemplateId=>{
+				defaultValue=>undef,
+				fieldType=>"template"
+				},
+			listTemplateId=>{
+				defaultValue=>undef,
+				fieldType=>"template"
+				},
+			mailData=>{
+				defaultValue=>0,
+				fieldType=>"yesNo"
+				}
+			}
+		});
+        return $class->SUPER::definition($definition);
+}
+
+#-------------------------------------------------------------------
 sub duplicate {
-       my ($w, %dataField, %dataTab, $sthField, $sthTab, $newTabId);
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate;
+       my (%dataField, %dataTab, $sthField, $sthTab, $newTabId);
        tie %dataTab, 'Tie::CPHash';
        tie %dataField, 'Tie::CPHash';
-       $w = $_[0]->SUPER::duplicate($_[1]);
-       $w = WebGUI::Wobject::DataForm->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-       $sthTab = WebGUI::SQL->read("select * from DataForm_tab where wobjectId=".quote($_[0]->get("wobjectId")));
+       $sthTab = WebGUI::SQL->read("select * from DataForm_tab where assetId=".quote($self->getId));
        while (%dataTab = $sthTab->hash) {
-               $sthField = WebGUI::SQL->read("select * from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId"))." AND DataForm_tabId=".quote($dataTab{DataForm_tabId}));
+               $sthField = WebGUI::SQL->read("select * from DataForm_field where assetId=".quote($self->getId)." AND DataForm_tabId=".quote($dataTab{DataForm_tabId}));
                $dataTab{DataForm_tabId} = "new";
-               $newTabId = $w->setCollateral("DataForm_tab","DataForm_tabId",\%dataTab);
+               $newTabId = $newAsset->setCollateral("DataForm_tab","DataForm_tabId",\%dataTab);
                while (%dataField = $sthField->hash) {
                        $dataField{DataForm_fieldId} = "new";
                        $dataField{DataForm_tabId} = $newTabId;
-                       $w->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
+                       $newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
                }
                $sthField->finish;
        }
-       $sthField = WebGUI::SQL->read("select * from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId"))." AND DataForm_tabId='0'");
+       $sthField = WebGUI::SQL->read("select * from DataForm_field where assetId=".quote($self->getId)." AND DataForm_tabId='0'");
        while (%dataField = $sthField->hash) {
                $dataField{DataForm_fieldId} = "new";
-               $w->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
+               $newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
        }
        $sthField->finish;
        $sthTab->finish;
+}
+
+#-------------------------------------------------------------------
+sub getEditForm {
+	my $self = shift;
+	my $tabform = $self->SUPER::getEditForm;
+        $tabform->getTab("display")->template(
+                -name=>"emailTemplateId",
+                -value=>$self->getValue("emailTemplateId"),
+                -namespace=>"DataForm",
+                -label=>WebGUI::International::get(80,"DataForm"),
+                -afterEdit=>'func=edit'
+                );
+        $tabform->getTab("display")->template(
+                -name=>"acknowlegementTemplateId",
+                -value=>$self->getValue("acknowlegementTemplateId"),
+                -namespace=>"DataForm",
+                -label=>WebGUI::International::get(81,"DataForm"),
+                -afterEdit=>'func=edit'
+                );
+        $tabform->getTab("display")->template(
+                -name=>"listTemplateId",
+                -value=>$self->getValue("listTemplateId"),
+                -namespace=>"DataForm/List",
+                -label=>WebGUI::International::get(87,"DataForm"),
+                -afterEdit=>'func=edit'
+                );
+	$tabform->getTab("properties")->HTMLArea(
+		-name=>"acknowledgement",
+		-label=>WebGUI::International::get(16, "DataForm"),
+		-value=>($self->get("acknowledgement") || WebGUI::International::get(3, "DataForm"))
+		);
+	$tabform->getTab("properties")->yesNo(
+		-name=>"mailData",
+		-label=>WebGUI::International::get(74,"DataForm"),
+		-value=>$self->getValue("mailData")
+		);
+	if ($self->getId eq "new" && $session{form}{proceed} ne "manageAssets") {
+        	$self->getTab("properties")->whatNext(
+			-options=>{
+				addField=>WebGUI::International::get(76,"DataForm"),
+				backToPage=>WebGUI::International::get(745)
+				},
+			-value=>"editField"
+			);
+	}
+	return $tabform;
 }
 
 #-------------------------------------------------------------------
@@ -219,10 +302,10 @@ sub getListTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	my @fieldLoop;
-	$var->{"back.url"} = WebGUI::URL::page();
-	$var->{"back.label"} = WebGUI::International::get(18,$self->get("namespace"));
+	$var->{"back.url"} = $self->getUrl;
+	$var->{"back.label"} = WebGUI::International::get(18,"DataForm");
 	my $a = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
-		where wobjectId=".quote($self->get("wobjectId"))." order by sequenceNumber");
+		where assetId=".quote($self->getId)." order by sequenceNumber");
 	while (my $field = $a->hashRef) {
 		push(@fieldLoop,{
 			"field.name"=>$field->{name},
@@ -236,7 +319,7 @@ sub getListTemplateVars {
 	$var->{field_loop} = \@fieldLoop;
 	my @recordLoop;
 	my $a = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
-		where wobjectId=".quote($self->get("wobjectId"))." order by submissionDate desc");
+		where assetId=".quote($self->getId)." order by submissionDate desc");
 	while (my $record = $a->hashRef) {
 		my @dataLoop;
 		my $b = WebGUI::SQL->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
@@ -253,10 +336,10 @@ sub getListTemplateVars {
 		$b->finish;
 		push(@recordLoop,{
 			"record.ipAddress"=>$record->{ipAddress},
-			"record.edit.url"=>WebGUI::URL::page("func=view&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId")),
-			"record.edit.icon"=>editIcon("func=view&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId")),
-			"record.delete.url"=>WebGUI::URL::page("func=deleteEntry&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId")),
-			"record.delete.icon"=>deleteIcon("func=deleteEntry&entryId=".$record->{DataForm_entryId}."&wid=".$self->get("wobjectId"),'',WebGUI::International::get('Delete entry confirmation',$self->get('namespace'))),
+			"record.edit.url"=>$self->getUrl("func=view&entryId=".$record->{DataForm_entryId}),
+			"record.edit.icon"=>editIcon("func=view&entryId=".$record->{DataForm_entryId}),
+			"record.delete.url"=>$self->getUrl("func=deleteEntry&entryId=".$record->{DataForm_entryId}),
+			"record.delete.icon"=>deleteIcon("func=deleteEntry&entryId=".$record->{DataForm_entryId},'',WebGUI::International::get('Delete entry confirmation',"DataForm")),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},
@@ -276,27 +359,26 @@ sub getRecordTemplateVars {
 	my $var = shift;
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{canEdit} = ($self->canEdit);
-	$var->{"entryList.url"} = WebGUI::URL::page('func=view&entryId=list&wid='.$self->get("wobjectId"));
-	$var->{"entryList.label"} = WebGUI::International::get(86,$self->get("namespace"));
-	$var->{"export.tab.url"} = WebGUI::URL::page('func=exportTab&wid='.$self->get("wobjectId"));
-	$var->{"export.tab.label"} = WebGUI::International::get(84,$self->get("namespace"));
-	$var->{"delete.url"} = WebGUI::URL::page('func=deleteEntry&wid='.$self->get("wobjectId").'&entryId='.$var->{entryId});
-	$var->{"delete.label"} = WebGUI::International::get(90,$self->get("namespace"));
-	$var->{"back.url"} = WebGUI::URL::page();
-	$var->{"back.label"} = WebGUI::International::get(18,$self->get("namespace"));
-	$var->{"addField.url"} = WebGUI::URL::page('func=editField&wid='.$self->get("wobjectId"));
-	$var->{"addField.label"} = WebGUI::International::get(76,$self->get("namespace"));
+	$var->{"entryList.url"} = $self->getUrl('func=view&entryId=list');
+	$var->{"entryList.label"} = WebGUI::International::get(86,"DataForm");
+	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
+	$var->{"export.tab.label"} = WebGUI::International::get(84,"DataForm");
+	$var->{"delete.url"} = $self->getUrl('func=deleteEntry&entryId='.$var->{entryId});
+	$var->{"delete.label"} = WebGUI::International::get(90,"DataForm");
+	$var->{"back.url"} = $self->getUrl;
+	$var->{"back.label"} = WebGUI::International::get(18,"DataForm");
+	$var->{"addField.url"} = $self->getUrl('func=editField');
+	$var->{"addField.label"} = WebGUI::International::get(76,"DataForm");
 	# add Tab label, url, header and init
-	$var->{"addTab.label"}=  WebGUI::International::get(105,$self->get("namespace"));;
-	$var->{"addTab.url"}= WebGUI::URL::page('func=editTab&wid='.$self->get("wobjectId"));
-	$var->{"tab.init"}= _createTabInit($self->get("wobjectId"));
-	$var->{"form.start"} = WebGUI::Form::formHeader()
-		.WebGUI::Form::hidden({name=>"wid",value=>$self->get("wobjectId")})
+	$var->{"addTab.label"}=  WebGUI::International::get(105,"DataForm");;
+	$var->{"addTab.url"}= $self->getUrl('func=editTab');
+	$var->{"tab.init"}= _createTabInit($self->getId);
+	$var->{"form.start"} = WebGUI::Form::formHeader({action=>$self->getUrl})
 		.WebGUI::Form::hidden({name=>"func",value=>"process"});
 	my @tabs;
 	my $select = "select a.name, a.DataForm_fieldId, a.DataForm_tabId,a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows, a.extras, a.vertical";
 	my $join;
-	my $where = "where a.wobjectId=".quote($self->get("wobjectId"));
+	my $where = "where a.assetId=".quote($self->getId);
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden({name=>"entryId",value=>$var->{entryId}});
 		my $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
@@ -305,7 +387,7 @@ sub getRecordTemplateVars {
 		$var->{userId} = $entry->{userId};
 		$var->{date} = WebGUI::DateTime::epochToHuman($entry->{submissionDate});
 		$var->{epoch} = $entry->{submissionDate};
-		$var->{"edit.URL"} = WebGUI::URL::page('func=view&wid='.$self->get("wobjectId").'&entryId='.$var->{entryId});
+		$var->{"edit.URL"} = $self->getUrl('func=view&entryId='.$var->{entryId});
 		$where .= " and b.DataForm_entryId=".quote($var->{entryId});
 		$join = "left join DataForm_entryData as b on a.DataForm_fieldId=b.DataForm_fieldId";
 		$select .= ", b.value";
@@ -314,7 +396,7 @@ sub getRecordTemplateVars {
 	tie %data, 'Tie::CPHash';
 	my %tab;
 	tie %tab, 'Tie::CPHash';
-	my $tabsth = WebGUI::SQL->read("select * from DataForm_tab where wobjectId=".quote($self->get("wobjectId"))." order by sequenceNumber");
+	my $tabsth = WebGUI::SQL->read("select * from DataForm_tab where assetId=".quote($self->getId)." order by sequenceNumber");
 	while (%tab = $tabsth->hash) {
 		my @fields;
 		my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where and a.DataForm_tabId=".quote($tab{DataForm_tabId})." order by a.sequenceNumber");
@@ -396,63 +478,92 @@ sub getRecordTemplateVars {
 	$var->{field_loop} = \@fields;
 	$tabsth->finish;
 	$var->{tab_loop} = \@tabs;
-	$var->{"form.send"} = WebGUI::Form::submit({value=>WebGUI::International::get(73, $self->get("namespace"))});
+	$var->{"form.send"} = WebGUI::Form::submit({value=>WebGUI::International::get(73, "DataForm")});
 	$var->{"form.save"} = WebGUI::Form::submit();
 	$var->{"form.end"} = WebGUI::Form::formFooter();
 	return $var;
 }
 
 #-------------------------------------------------------------------
-sub name {
-        return WebGUI::International::get(1,$_[0]->get("namespace"));
+sub getName {
+        return WebGUI::International::get(1,"DataForm");
 }
 
 #-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-        my $definition = shift;
-        push(@{$definition}, {
-                tableName=>'DataForm',
-                className=>'WebGUI::Asset::Wobject::DataForm',
-                properties=>{
-			acknowledgement=>{
-				fieldType=>"textarea",
-				defaultValue=>undef
-				},
-			emailTemplateId=>{
-				fieldType=>"template",
-				defaultValue=>undef
-				},
-			acknowlegementTemplateId=>{
-				defaultValue=>undef,
-				fieldType=>"template"
-				},
-			listTemplateId=>{
-				defaultValue=>undef,
-				fieldType=>"template"
-				},
-			mailData=>{
-				defaultValue=>0,
-				fieldType=>"yesNo"
-				}
-			}
-		});
-        return $class->SUPER::definition($definition);
+sub getUiLevel {
+        return 5;
+}
+
+#-------------------------------------------------------------------
+sub processPropertiesFromFormPost {	
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+	if ($session{form}{assetId} eq "new") {
+		$self->setCollateral("DataForm_field","DataForm_fieldId",{
+			DataForm_fieldId=>"new",
+			name=>"from",
+			label=>WebGUI::International::get(10,"DataForm"),
+			status=>"editable",
+			isMailField=>1,
+			width=>0,
+			type=>"email"
+			});
+		$self->setCollateral("DataForm_field","DataForm_fieldId",{
+			DataForm_fieldId=>"new",
+			name=>"to",
+			label=>WebGUI::International::get(11,"DataForm"),
+			status=>"hidden",
+			isMailField=>1,
+			width=>0,
+			type=>"email",
+			defaultValue=>$session{setting}{companyEmail}
+			});
+		$self->setCollateral("DataForm_field","DataForm_fieldId",{
+			DataForm_fieldId=>"new",
+			name=>"cc",
+			label=>WebGUI::International::get(12,"DataForm"),
+			status=>"hidden",
+			isMailField=>1,
+			width=>0,
+			type=>"email"
+			});
+		$self->setCollateral("DataForm_field","DataForm_fieldId",{
+			DataForm_fieldId=>"new",
+			name=>"bcc",
+			label=>WebGUI::International::get(13,"DataForm"),
+			status=>"hidden",
+			isMailField=>1,
+			width=>0,
+			type=>"email"
+			});
+		$self->setCollateral("DataForm_field","DataForm_fieldId",{
+			DataForm_fieldId=>"new",
+			name=>"subject",
+			label=>WebGUI::International::get(14,"DataForm"),
+			status=>"editable",
+			isMailField=>1,
+			width=>0,
+			type=>"text",
+			defaultValue=>WebGUI::International::get(2,"DataForm")
+			});
+	}
 }
 
 #-------------------------------------------------------------------
 sub purge {
-    	WebGUI::SQL->write("delete from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId")));
-    	WebGUI::SQL->write("delete from DataForm_entry where wobjectId=".quote($_[0]->get("wobjectId")));
-    	WebGUI::SQL->write("delete from DataForm_entryData where wobjectId=".quote($_[0]->get("wobjectId")));
-	WebGUI::SQL->write("delete from DataForm_tab where wobjectId=".quote($_[0]->get("wobjectId")));
-    	$_[0]->SUPER::purge();
+	my $self = shift;
+    	WebGUI::SQL->write("delete from DataForm_field where assetId=".quote($self->getId));
+    	WebGUI::SQL->write("delete from DataForm_entry where assetId=".quote($self->getId));
+    	WebGUI::SQL->write("delete from DataForm_entryData where assetId=".quote($self->getId));
+	WebGUI::SQL->write("delete from DataForm_tab where assetId=".quote($self->getId));
+    	$self->SUPER::purge();
 }
 
 #-------------------------------------------------------------------
 sub sendEmail {
-	my $var = $_[1];
-	my $message = WebGUI::Macro::process($_[0]->processTemplate($_[0]->get("emailTemplateId"),$var));
+	my $self = shift;
+	my $var = shift;
+	my $message = WebGUI::Macro::process($self->processTemplate($var,"DataForm",$self->get("emailTemplateId")));
 	my ($to, $subject, $from, $bcc, $cc);
 	foreach my $row (@{$var->{field_loop}}) {
 		if ($row->{"field.name"} eq "to") {
@@ -477,7 +588,7 @@ sub sendEmail {
                         ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($to));
                 }
                 unless ($userId || $groupId) {
-                        WebGUI::ErrorHandler::warn($_[0]->get("wobjectId").": Unable to send message, no user or group found.");
+                        WebGUI::ErrorHandler::warn($self->getId.": Unable to send message, no user or group found.");
                 } else {
                         WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message, "", "", $from);
 			if ($cc) {
@@ -490,270 +601,181 @@ sub sendEmail {
         }
 }
 
+
 #-------------------------------------------------------------------
-sub uiLevel {
-        return 5;
+sub view {
+	my $self = shift;
+	my $passedVars = shift;
+	my $var;
+	$var->{entryId} = $session{form}{entryId} if ($self->canEdit);
+	if ($var->{entryId} eq "list" && $self->canEdit) {
+		return $self->processTemplate($self->getListTemplateVars,"DataForm/List",$self->get("listTemplateId"));
+	}
+	# add Tab StyleSheet and JavaScript
+	WebGUI::Style::setLink($session{config}{extrasURL}.'/tabs/tabs.css', {"type"=>"text/css"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js', {"language"=>"JavaScript"});
+	$var = $passedVars || $self->getRecordTemplateVars($var);
+	return $self->processTemplate($var,"DataForm",$self->get("templateId"));
 }
 
-sub view {
-	return "DataForm";
-}
 
 #-------------------------------------------------------------------
 sub www_deleteEntry {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
         my $entryId = $session{form}{entryId};
-    	WebGUI::SQL->write("delete from DataForm_entry where DataForm_entryId=".quote($entryId));
+	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
         $session{form}{entryId} = 'list';
-        return $_[0]->www_view();
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->deleteCollateral("DataForm_field","DataForm_fieldId",$session{form}{fid});
-	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId");
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->deleteCollateral("DataForm_field","DataForm_fieldId",$session{form}{fid});
+	$self->reorderCollateral("DataForm_field","DataForm_fieldId");
        	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteTabConfirm {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->deleteCollateral("DataForm_tab","DataForm_tabId",$session{form}{tid});
-	$_[0]->deleteCollateral("DataForm_field","DataForm_tabId",$session{form}{tid});
-	$_[0]->reorderCollateral("DataForm_tab","DataForm_tabId");
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->deleteCollateral("DataForm_tab","DataForm_tabId",$session{form}{tid});
+	$self->deleteCollateral("DataForm_field","DataForm_tabId",$session{form}{tid});
+	$self->reorderCollateral("DataForm_tab","DataForm_tabId");
        	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
-	my $layout = WebGUI::HTMLForm->new;
-        $layout->template(
-                -name=>"emailTemplateId",
-                -value=>$_[0]->getValue("emailTemplateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(80,$_[0]->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
-        $layout->template(
-                -name=>"acknowlegementTemplateId",
-                -value=>$_[0]->getValue("acknowlegementTemplateId"),
-                -namespace=>$_[0]->get("namespace"),
-                -label=>WebGUI::International::get(81,$_[0]->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
-        $layout->template(
-                -name=>"listTemplateId",
-                -value=>$_[0]->getValue("listTemplateId"),
-                -namespace=>$_[0]->get("namespace")."/List",
-                -label=>WebGUI::International::get(87,$_[0]->get("namespace")),
-                -afterEdit=>'func=edit&wid='.$_[0]->get("wobjectId")
-                );
-	my $properties = WebGUI::HTMLForm->new;
-	$properties->HTMLArea(
-		-name=>"acknowledgement",
-		-label=>WebGUI::International::get(16, $_[0]->get("namespace")),
-		-value=>($_[0]->get("acknowledgement") || WebGUI::International::get(3, $_[0]->get("namespace")))
-		);
-	$properties->yesNo(
-		-name=>"mailData",
-		-label=>WebGUI::International::get(74,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("mailData")
-		);
-	if ($_[0]->get("wobjectId") eq "new") {
-        	$properties->whatNext(
-			-options=>{
-				addField=>WebGUI::International::get(76,$_[0]->get("namespace")),
-				backToPage=>WebGUI::International::get(745)
-				},
-			-value=>"addField"
-			);
-	}
-	return $_[0]->SUPER::www_edit(
-		-properties=>$properties->printRowsOnly,
-		-layout=>$layout->printRowsOnly,
-		-helpId=>"data form add/edit",
-		-headingId=>7
-		);
-}
-
-#-------------------------------------------------------------------
-sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->SUPER::www_editSave();
-	if ($session{form}{wid} eq "new") {
-		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			name=>"from",
-			label=>WebGUI::International::get(10,$_[0]->get("namespace")),
-			status=>"editable",
-			isMailField=>1,
-			width=>0,
-			type=>"email"
-			});
-		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			name=>"to",
-			label=>WebGUI::International::get(11,$_[0]->get("namespace")),
-			status=>"hidden",
-			isMailField=>1,
-			width=>0,
-			type=>"email",
-			defaultValue=>$session{setting}{companyEmail}
-			});
-		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			name=>"cc",
-			label=>WebGUI::International::get(12,$_[0]->get("namespace")),
-			status=>"hidden",
-			isMailField=>1,
-			width=>0,
-			type=>"email"
-			});
-		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			name=>"bcc",
-			label=>WebGUI::International::get(13,$_[0]->get("namespace")),
-			status=>"hidden",
-			isMailField=>1,
-			width=>0,
-			type=>"email"
-			});
-		$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			name=>"subject",
-			label=>WebGUI::International::get(14,$_[0]->get("namespace")),
-			status=>"editable",
-			isMailField=>1,
-			width=>0,
-			type=>"text",
-			defaultValue=>WebGUI::International::get(2,$_[0]->get("namespace"))
-			});
-	}
-        if ($session{form}{proceed} eq "addField") {
-            	return $_[0]->www_editField();
-        }
-       	return "";
+        my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->getAdminConsole->setHelp("data form add/edit");
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("7","DataForm"));
 }
 
 #-------------------------------------------------------------------
 sub www_editField {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
     	my (%field, $f, %fieldStatus,$tab);
     	tie %field, 'Tie::CPHash';
     	tie %fieldStatus, 'Tie::IxHash';
-
 	%fieldStatus = ( 
-		"hidden" => WebGUI::International::get(4, $_[0]->get("namespace")),
-		"visible" => WebGUI::International::get(5, $_[0]->get("namespace")),
-		"editable" => WebGUI::International::get(6, $_[0]->get("namespace")),
-		"required" => WebGUI::International::get(75, $_[0]->get("namespace")) 
+		"hidden" => WebGUI::International::get(4, "DataForm"),
+		"visible" => WebGUI::International::get(5, "DataForm"),
+		"editable" => WebGUI::International::get(6, "DataForm"),
+		"required" => WebGUI::International::get(75, "DataForm") 
 		);
         $session{form}{fid} = "new" if ($session{form}{fid} eq "");
 	unless ($session{form}{fid} eq "new") {	
         	%field = WebGUI::SQL->quickHash("select * from DataForm_field where DataForm_fieldId=".quote($session{form}{fid}));
 	}
-	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where wobjectId=".quote($_[0]->get("wobjectId")));
-	$tab->{0} = $_[0]->i18n("no tab");
-        $f = WebGUI::HTMLForm->new;
-        $f->hidden("wid",$_[0]->get("wobjectId"));
+	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".quote($self->getId));
+	$tab->{0} = WebGUI::International::get("no tab","DataForm");
+        $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden("fid",$session{form}{fid});
         $f->hidden("func","editFieldSave");
 	$f->text(
                 -name=>"label",
-                -label=>WebGUI::International::get(77,$_[0]->get("namespace")),
+                -label=>WebGUI::International::get(77,"DataForm"),
                 -value=>$field{label}
                 );
         $f->text(
 		-name=>"name",
-		-label=>WebGUI::International::get(21,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(21,"DataForm"),
 		-value=>$field{name}
 		);
 	if($field{sequenceNumber} && ! $field{isMailField}) {
 		$f->integer(
 			-name=>"position",
-			-label=>WebGUI::International::get('Field Position',$_[0]->get("namespace")),
+			-label=>WebGUI::International::get('Field Position',"DataForm"),
 			-value=>$field{sequenceNumber}
 		);	
 	}
-	$f->select(
+	$f->selectList(
 		-name=>"tid",
 		-options=>$tab,
-		-label=>WebGUI::International::get(104,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(104,"DataForm"),
 		-value=>[ $field{DataForm_tabId}] || [0]
 		); 
         $f->text(
                 -name=>"subtext",
                 -value=>$field{subtext},
-                -label=>WebGUI::International::get(79,$_[0]->get("namespace")),
+                -label=>WebGUI::International::get(79,"DataForm"),
                 );
-        $f->select(
+        $f->selectList(
 		-name=>"status",
 		-options=>\%fieldStatus,
-		-label=>WebGUI::International::get(22,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(22,"DataForm"),
 		-value=>[ $field{status} ||= "editable" ]
 		); 
 	$f->fieldType(
 		-name=>"type",
-		-label=>WebGUI::International::get(23,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(23,"DataForm"),
 		-value=>[$field{type} ||= "text"]
 		);
 	$f->integer(
 		-name=>"width",
-		-label=>WebGUI::International::get(8, $_[0]->get("namespace")),
+		-label=>WebGUI::International::get(8,"DataForm"),
 		-value=>($field{width} || 0)
 		);
 	$f->integer(
                 -name=>"rows",
 		-value=>$field{rows} || 0,
-		-label=>WebGUI::International::get(27, $_[0]->get("namespace")),
-		-subtext=>WebGUI::International::get(28, $_[0]->get("namespace")),
+		-label=>WebGUI::International::get(27,"DataForm"),
+		-subtext=>WebGUI::International::get(28,"DataForm"),
 		);
 	$f->yesNo(
 		-name=>"vertical",
 		-value=>$field{vertical},
-		-label=>WebGUI::International::get('editField-vertical-label', $_[0]->get("namespace")),
-		-subtext=>WebGUI::International::get('editField-vertical-subtext', $_[0]->get("namespace"))
+		-label=>WebGUI::International::get('editField-vertical-label', "DataForm"),
+		-subtext=>WebGUI::International::get('editField-vertical-subtext', "DataForm")
 		);
 	$f->text(
 		-name=>"extras",
 		-value=>$field{extras},
-		-label=>WebGUI::International::get('editField-extras-label', $_[0]->get("namespace"))
+		-label=>WebGUI::International::get('editField-extras-label', "DataForm")
 		);
         $f->textarea(
 		-name=>"possibleValues",
-		-label=>WebGUI::International::get(24,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(24,"DataForm"),
 		-value=>$field{possibleValues},
-		-subtext=>'<br>'.WebGUI::International::get(85,$_[0]->get("namespace"))
+		-subtext=>'<br>'.WebGUI::International::get(85,"DataForm")
 		);
         $f->textarea(
 		-name=>"defaultValue",
-		-label=>WebGUI::International::get(25,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(25,"DataForm"),
 		-value=>$field{defaultValue},
-		-subtext=>'<br>'.WebGUI::International::get(85,$_[0]->get("namespace"))
+		-subtext=>'<br>'.WebGUI::International::get(85,"DataForm")
 		);
-	if ($session{form}{fid} eq "new") {
+	if ($session{form}{fid} eq "new" && $session{form}{proceed} ne "manageAssets") {
         	$f->whatNext(
 			-options=>{
-				addField=>WebGUI::International::get(76,$_[0]->get("namespace")),
+				addField=>WebGUI::International::get(76,"DataForm"),
 				backToPage=>WebGUI::International::get(745)
 				},
 			-value=>"addField"
 			);
 	}
         $f->submit;
-        return $_[0]->adminConsole($f->print,'20',"data form fields add/edit");
+	my $ac = $self->getAdminConsole;
+	$ac->setHelp("data form fields add/edit","DataForm");
+        return $ac->render($f->print,WebGUI::International::get('20',"DataForm"));
 }
 
 #-------------------------------------------------------------------
 sub www_editFieldSave {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$session{form}{tid} = "0" if ($session{form}{tid} eq "");
 	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
         $session{form}{name} =~ s/\-//g;
         $session{form}{name} =~ s/\///g;
-	$_[0]->setCollateral("DataForm_field","DataForm_fieldId",{
+	$self->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$session{form}{fid},
 		width=>$session{form}{width},
 		name=>$session{form}{name},
@@ -772,43 +794,42 @@ sub www_editFieldSave {
 		WebGUI::SQL->write("update DataForm_field set sequenceNumber=".quote($session{form}{position}).
 					" where DataForm_fieldId=".quote($session{form}{fid}));
 	}
-	$_[0]->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
+	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
         if ($session{form}{proceed} eq "addField") {
             	$session{form}{fid} = "new";
-            	return $_[0]->www_editField();
+            	return $self->www_editField();
         }
         return "";
 }
 
 #-------------------------------------------------------------------
 sub www_editTab {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
     	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
-
         $session{form}{tid} = "new" if ($session{form}{tid} eq "");
 	unless ($session{form}{tid} eq "new") {	
         	%tab = WebGUI::SQL->quickHash("select * from DataForm_tab where DataForm_tabId=".quote($session{form}{tid}));
 	}
-        $f = WebGUI::HTMLForm->new;
-        $f->hidden("wid",$_[0]->get("wobjectId"));
+        $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden("tid",$session{form}{tid});
         $f->hidden("func","editTabSave");
 	$f->text(
                 -name=>"label",
-		-label=>WebGUI::International::get(101,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(101,"DataForm"),
                 -value=>$tab{label}
                 );
         $f->textarea(
 		-name=>"subtext",
-		-label=>WebGUI::International::get(102,$_[0]->get("namespace")),
+		-label=>WebGUI::International::get(102,"DataForm"),
 		-value=>$tab{subtext},
 		-subtext=>""
 		);
 	if ($session{form}{tid} eq "new") {
         	$f->whatNext(
 			-options=>{
-				addTab=>WebGUI::International::get(103,$_[0]->get("namespace")),
+				addTab=>WebGUI::International::get(103,"DataForm"),
 
 				backToPage=>WebGUI::International::get(745)
 				},
@@ -816,37 +837,41 @@ sub www_editTab {
 			);
 	}
         $f->submit;
-        return $_[0]->adminConsole($f->print,'20',"data form fields add/edit");
+	my $ac = $self->getAdminConsole;
+	$ac->setHelp("data form fields add/edit","DataForm");
+        return $ac->render($f->print,WebGUI::International::get('20',"DataForm"));
 }
 
 #-------------------------------------------------------------------
 sub www_editTabSave {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
         $session{form}{name} =~ s/\-//g;
         $session{form}{name} =~ s/\///g;
-	$_[0]->setCollateral("DataForm_tab","DataForm_tabId",{
+	$self->setCollateral("DataForm_tab","DataForm_tabId",{
 		DataForm_tabId=>$session{form}{tid},
 		label=>$session{form}{label},
 		subtext=>$session{form}{subtext}
 		});
         if ($session{form}{proceed} eq "addTab") {
             	$session{form}{tid} = "new";
-            	return $_[0]->www_editTab();
+            	return $self->www_editTab();
         }
         return "";
 }
 
 #-------------------------------------------------------------------
 sub www_exportTab {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	WebGUI::HTTP::setFilename(WebGUI::URL::urlize($_[0]->get("title")).".tab","text/plain");
-	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	WebGUI::HTTP::setFilename($self->get("url").".tab","text/plain");
+	my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where assetId=".quote($self->getId)." order by sequenceNumber");
 	my $select = "select a.DataForm_entryId as entryId, a.ipAddress, a.username, a.userId, a.submissionDate";
 	my $from = " from DataForm_entry a";
 	my $join;
-	my $where = " where a.wobjectId=".quote($_[0]->get("wobjectId"));
+	my $where = " where a.assetId=".quote($self->getId);
 	my $orderBy = " order by a.DataForm_entryId";
 	my $columnCounter = "b";
 	foreach my $fieldId (keys %fields) {
@@ -862,37 +887,42 @@ sub www_exportTab {
 
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveTabRight {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->moveCollateralDown("DataForm_tab","DataForm_tabId",$session{form}{tid});
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->moveCollateralDown("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveTabLeft {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->moveCollateralUp("DataForm_tab","DataForm_tabId",$session{form}{tid});
+	my $self = shift;
+	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
+	$self->moveCollateralUp("DataForm_tab","DataForm_tabId",$session{form}{tid});
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_process {
-	my $entryId = $_[0]->setCollateral("DataForm_entry","DataForm_entryId",{
+	my $self = shift;
+	my $entryId = $self->setCollateral("DataForm_entry","DataForm_entryId",{
 		DataForm_entryId=>$session{form}{entryId},
-                wobjectId=>$_[0]->get("wobjectId"),
+                assetId=>$self->getId,
                 userId=>$session{user}{userId},
                 username=>$session{user}{username},
                 ipAddress=>$session{env}{REMOTE_ADDR},
@@ -902,7 +932,7 @@ sub www_process {
 	$var->{entryId} = $entryId;
 	tie %row, "Tie::CPHash";
 	my $sth = WebGUI::SQL->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
-		where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
+		where assetId=".quote($self->getId)." order by sequenceNumber");
 	while (%row = $sth->hash) {
 		my $value = $row{defaultValue};
 		if ($row{status} eq "required" || $row{status} eq "editable") {
@@ -911,7 +941,7 @@ sub www_process {
 		}
 		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
 			push (@errors,{
-				"error.message"=>$row{label}." ".WebGUI::International::get(29,$_[0]->get("namespace")).".",
+				"error.message"=>$row{label}." ".WebGUI::International::get(29,"DataForm").".",
 				});
 			$hadErrors = 1;
 			delete $var->{entryId};
@@ -927,39 +957,23 @@ sub www_process {
 					where DataForm_entryId=".quote($entryId)." and DataForm_fieldId=".quote($row{DataForm_fieldId}));
 				$updating = 1;
 			} else {
-				WebGUI::SQL->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,wobjectId,value) values
-					(".quote($entryId).", ".quote($row{DataForm_fieldId}).", ".quote($_[0]->get("wobjectId")).", ".quote($value).")");
+				WebGUI::SQL->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,assetId,value) values
+					(".quote($entryId).", ".quote($row{DataForm_fieldId}).", ".quote($self->getId).", ".quote($value).")");
 			}
 		}
 	}
 	$sth->finish;
 	$var->{error_loop} = \@errors;
-	$var = $_[0]->getRecordTemplateVars($var);
+	$var = $self->getRecordTemplateVars($var);
 	if ($hadErrors && !$updating) {
 		WebGUI::SQL->write("delete from DataForm_entryData where DataForm_entryId=".quote($entryId));
-		$_[0]->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
-		$_[0]->www_view($var);
+		$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
+		$self->www_view($var);
 	} else {
-		$_[0]->sendEmail($var) if ($_[0]->get("mailData") && !$updating);
-		return $_[0]->processTemplate($_[0]->get("acknowlegementTemplateId"),$var);
+		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
+		return WebGUI::Style::process($self->processTemplate($var,"DataForm",$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId"));
 	}
 }
-
-#-------------------------------------------------------------------
-sub www_view {
-	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
-	my $var;
-	$var->{entryId} = $session{form}{entryId} if ($_[0]->canEdit);
-	if ($var->{entryId} eq "list" && $_[0]->canEdit) {
-		return $_[0]->processTemplate($_[0]->get("listTemplateId"),$_[0]->getListTemplateVars,"DataForm/List");
-	}
-	# add Tab StyleSheet and JavaScript
-	WebGUI::Style::setLink('/extras/tabs/tabs.css', {"type"=>"text/css"});
-	WebGUI::Style::setScript('/extras/tabs/tabs.js', {"language"=>"JavaScript"});
-	$var = $_[1] || $_[0]->getRecordTemplateVars($var);
-	return $_[0]->processTemplate($_[0]->get("templateId"),$var);
-}
-
 
 1;
 

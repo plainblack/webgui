@@ -48,7 +48,7 @@ function Asset_setRank(rank) {
 //-------------------------------
 //url + ?||& + func=edit
 function Asset_edit() {
-	location.href = "http://" + manager.tools.getHostName(location.href) + manager.tools.addParamDelimiter(this.url) + "func=edit&afterEdit=assetManager";		
+	location.href = "http://" + manager.tools.getHostName(location.href) + manager.tools.addParamDelimiter(this.url) + "func=edit&proceed=manageAssets";		
 }
 
 //Edit the properties of an asset (edit)

@@ -636,10 +636,10 @@ sub getEditForm {
 			value=>$session{form}{class}
 			});
 	}
-	if ($session{form}{afterEdit}) {
+	if ($session{form}{proceed}) {
 		$tabform->hidden({
-			name=>"afterEdit",
-			value=>$session{form}{afterEdit}
+			name=>"proceed",
+			value=>$session{form}{proceed}
 			});
 	}
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
@@ -1668,8 +1668,11 @@ sub www_editSave {
 	}
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
-	return $self->www_manageAssets if ($session{form}{afterEdit} eq "assetManager" && $session{form}{assetId} eq "new");
-	return $object->getParent->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
+	return $self->www_manageAssets if ($session{form}{proceed} eq "manageAssets" && $session{form}{assetId} eq "new");
+	if (exists $session{form}{proceed}) {
+		my $method = "www_".$session{form}{proceed};
+		return $object->getParent->$method();
+	}
 	return $object->www_view;
 }
 
@@ -1907,7 +1910,7 @@ sub www_manageAssets {
             &nbsp;
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;"><b>'.WebGUI::International::get(1083).'</b><br />';
-	foreach my $link (@{$self->getAssetAdderLinks("afterEdit=assetManager")}) {
+	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
 	}
 	$output .= '</div>'; 

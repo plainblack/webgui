@@ -62,10 +62,10 @@ sub edit {
 		name=>"class",
 		value=>"WebGUI::Asset::FilePile"
 		});
-	if ($session{form}{afterEdit}) {
+	if ($session{form}{proceed}) {
 		$tabform->hidden({
-			name=>"afterEdit",
-			value=>$session{form}{afterEdit}
+			name=>"proceed",
+			value=>$session{form}{proceed}
 			});
 	}
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
@@ -185,7 +185,7 @@ sub editSave {
 		$newAsset->generateThumbnail if ($class eq "WebGUI::Asset::File::Image");
 	}
 	$tempStorage->delete;
-	return $parent->www_manageAssets if ($session{form}{afterEdit} eq "assetManager");
+	return $parent->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
 	return $parent->www_view;
 }
 
