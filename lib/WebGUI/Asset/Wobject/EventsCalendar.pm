@@ -211,7 +211,7 @@ sub getUiLevel {
 sub view {
 	
 	#  All of this really needs to be redone like the old 
-	#  EventsCalendar... except this time using getLineageWhere to 
+	#  EventsCalendar... except this time using getLineage to 
 	#  filter instead of doing all sorts of pruning.  Also, caching
 	#  needs to be re-enabled.  Also, see the note below at line
 	#  407 - each dayloop event array needs to be sorted by startTime.
@@ -231,9 +231,10 @@ sub view {
 	$calMonthStart = int($calMonthStart);
 	my $calMonthEnd = $session{form}{calMonthEnd} || ($calMonthStart + $monthRangeLength - 1);
 	$calMonthEnd = int($calMonthEnd);
-	$calMonthStart = 1 if (($calMonthStart < 1) || ($calMonthStart > 72));
-	$calMonthEnd = 1 if (($calMonthEnd < 1) || ($calMonthEnd > 72));
+	$calMonthEnd =  ($calMonthStart + 72) if ($calMonthStart < $calMonthEnd - 72);
 	$calMonthEnd = $calMonthStart if ($calMonthEnd < $calMonthStart);
+	#used for pagination
+	$monthRangeLength = $calMonthEnd - $calMonthStart + 1;
 
 	my ( $junk, $sameDate, $p, @list, $date, $flag, %previous, $maxDate, $minDate);  
 	my $monthloop;
@@ -324,10 +325,10 @@ sub view {
 				# only display events for this person's Personal Calendar, if it's so set.
 	#			next unless (($calType != 1) || ($event->isMyEvent()));
 				my $eventLength = WebGUI::DateTime::getDaysInInterval($eventStartDate,$eventEndDate);
-				my ($startYear, $startMonth, $startDay, $startDate, $startTime) = split " ", 
-					WebGUI::DateTime::epochToHuman($eventStartDate, "%y %c %D %z %Z");
-				my ($endYear, $endMonth, $endDay, $endDate, $endTime) = split " ", 
-					WebGUI::DateTime::epochToHuman($eventEndDate, "%y %c %D %z %Z");
+				my ($startYear, $startMonth, $startDay, $startDate, $startTime, $startAmPm, $startDayOfWeek) = split " ", 
+					WebGUI::DateTime::epochToHuman($eventStartDate, "%y %c %D %z %Z %w");
+				my ($endYear, $endMonth, $endDay, $endDate, $endTime, $endAmPm, $endDayOfWeek) = split " ", 
+					WebGUI::DateTime::epochToHuman($eventEndDate, "%y %c %D %z %Z %w");
 				my $eventCycleStart = 0;
 				# Fast-Forward Event Cycle to this month (for events spanning multiple months)
 				$eventCycleStart = (WebGUI::DateTime::getDaysInInterval($eventStartDate,$monthStart) - 1) if ($eventStartDate < $monthStart);
@@ -352,17 +353,19 @@ sub view {
 							description=>$event->getValue("description"),
 							name=>$event->getValue("title"),
 							'start.date.human'=>$startDate,
-							'start.time.human'=>$startTime,
+							'start.time.human'=>$startTime." ".$startAmPm,
 							'start.date.epoch'=>$eventStartDate,
 							'start.year'=>$startYear,
 							'start.month'=>$startMonth,
 							'start.day'=>$startDay,
+							'start.day.dayOfWeek'=>$startDayOfWeek,
 							'end.date.human'=>$endDate,
-							'end.time.human'=>$endTime,
+							'end.time.human'=>$endTime." ".$endAmPm,
 							'end.date.epoch'=>$eventEndDate,
 							'end.year'=>$endYear,
 							'end.month'=>$endMonth,
 							'end.day'=>$endDay,
+							'end.day.dayOfWeek'=>$endDayOfWeek,
 							'startEndYearMatch'=>($startYear eq $endYear),
 							'startEndMonthMatch'=>($startMonth eq $endMonth),
 							'startEndDayMatch'=>($startDay eq $endDay),
@@ -379,8 +382,8 @@ sub view {
 
 				$previous{start} = $startYear."-".$startMonth."-".$startDay;
 				$previous{end} = $endYear."-".$endMonth."-".$endDay;
-			} elsif (ref $event eq "WebGUI::Asset::Relation") {
-				print "\n";
+#			} elsif (ref $event eq "WebGUI::Asset::Relation") {
+#				print "\n";
 			}
 		}
 		if (($startsNow || ($startMonth eq "first")) && ($calHasEvent == 0)) {
@@ -456,6 +459,40 @@ sub view {
 	$var{'thursday.label.short'} = substr(WebGUI::DateTime::getDayName(4),0,1);
 	$var{'friday.label.short'} = substr(WebGUI::DateTime::getDayName(5),0,1);
 	$var{'saturday.label.short'} = substr(WebGUI::DateTime::getDayName(6),0,1);
+	# Create pagination variables.
+	$var{'pagination.pageCount.isMultiple'} = 1 if (($calMonthStart > 1) || ($maxDate > WebGUI::DateTime::addToDate($minDate,0,($monthRangeLength-1),0)));
+	my $prevCalMonthStart = $calMonthStart - $monthRangeLength;
+	my $nextCalMonthStart = $calMonthStart + $monthRangeLength;
+	my $prevCalMonthEnd = $calMonthEnd - $monthRangeLength;
+	my $nextCalMonthEnd = $calMonthEnd + $monthRangeLength;
+	my $monthLabel;
+	if ($monthRangeLength == 1) {
+		$monthLabel = WebGUI::International::get(560,"EventsCalendar");
+	} else {
+		$monthLabel = WebGUI::International::get(561,"EventsCalendar");
+	}
+	$var{'pagination.previousPage'} = '<form method="POST" style="inline;" action="'.
+		$self->getUrl.'?calMonthStart='.$calMonthStart.
+		'"><a href="'.$self->getUrl.
+		'?calMonthStart='.$prevCalMonthStart.'&calMonthEnd='.$prevCalMonthEnd.'">'.
+		WebGUI::International::get(558,"EventsCalendar")." ".$monthRangeLength." ".
+		$monthLabel.'</a>';
+	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.
+		'?calMonthStart='.$nextCalMonthStart.'&calMonthEnd='.$nextCalMonthEnd.'">'.
+		WebGUI::International::get(559,"EventsCalendar")." ".$monthRangeLength." ".
+		$monthLabel.'</a></form>';
+	$var{'pagination.pageList.upTo20'} = '<select size="1" name="calMonthEnd">
+		<option value="'.($calMonthStart).'">1 '.WebGUI::International::get(560,"EventsCalendar").'</option>
+		<option value="'.(1+$calMonthStart).'">2 '.WebGUI::International::get(561,"EventsCalendar").'</option>
+		<option value="'.(2+$calMonthStart).'">3 '.WebGUI::International::get(561,"EventsCalendar").'</option>
+		<option value="'.(3+$calMonthStart).'">4 '.WebGUI::International::get(561,"EventsCalendar").'</option>
+		<option value="'.(5+$calMonthStart).'">6 '.WebGUI::International::get(561,"EventsCalendar").'</option>
+		<option value="'.(8+$calMonthStart).'">9 '.WebGUI::International::get(561,"EventsCalendar").'</option>
+		<option value="'.(11+$calMonthStart).'">12 '.WebGUI::International::get(561,"EventsCalendar").'</option>
+		<input type="submit" value="Go" name="Go">';
+	
+	
+	
 	#use Data::Dumper; return '<pre>'.Dumper(\%var).'</pre>';
 	my $vars = \%var;
 	return $self->processTemplate($vars,$self->get("templateId"));
