@@ -19,13 +19,24 @@ our $I18N = {
 The URL to the icon for the brochure.
 <p/>
 
-
 <b>brochure.url</b><br/>
 The URL to download the brochure.
 <p/>
 
 <b>brochure.label</b><br/>
 The translated label for the brochure URL.
+<p/>
+
+<b>manual.icon</b><br/>
+The URL to the icon for the manual.
+<p/>
+
+<b>manual.url</b><br/>
+The URL to download the manual.
+<p/>
+
+<b>manual.label</b><br/>
+The translated label for the manual URL.
 <p/>
 
 <b>warranty.icon</b><br/>
@@ -176,19 +187,25 @@ The URL to add a related product to this product.
 The translated label for the add related product link.
 <p/>
 
+<b>relatedproduct.loop</b><br/>
+This loop contains all of the products related to this product.
+<p/>
+
+<blockquote>
 <b>relatedproduct.url</b><br/>
-The URL to the linked product.
+The URL to the related product.
 <p/>
 
 <b>relatedproduct.title</b><br/>
-The title of the linked product.
+The title of the related product.
 <p/>
 
 <b>relatedproduct.controls</b><br/>
 The WebGUI management controls for this related product.
 <p/>
+</blockquote>
 |,
-		lastUpdated => 1038864092
+		lastUpdated => 1102661764,
 	},
 
 	'21' => {
