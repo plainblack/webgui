@@ -17,10 +17,11 @@ use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Page;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Page;
+use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Utility;
 
@@ -207,14 +208,29 @@ sub www_deletePageConfirm {
                 return WebGUI::Privilege::insufficient();
         }
 }
-
+use WebGUI::TabForm;
 #-------------------------------------------------------------------
 sub www_editPage {
         my ($f, $endDate, $output, $subtext, $childCount, %hash, %page);
 	tie %hash, "Tie::IxHash";
 	tie %page, "Tie::CPHash";
         if (WebGUI::Privilege::canEditPage($session{form}{npp})) {
-		$f = WebGUI::HTMLForm->new;
+	        my %tabs;
+        	tie %tabs, 'Tie::IxHash';
+	        %tabs = (
+        	        properties=>{
+                	        name=>WebGUI::International::get(103)
+	                        },
+        	        style=>{
+                	        name=>WebGUI::International::get(105),
+	                        uiLevel=>5
+        	                },
+                	privileges=>{
+                        	name=>WebGUI::International::get(107),
+	                        uiLevel=>6
+        	                }
+                	);
+		$f = WebGUI::TabForm->new(\%tabs);
 		if ($session{form}{npp} ne "") {
 			my $buildFromPage = $session{form}{npp};
 			if ($buildFromPage == 0) {
@@ -231,73 +247,64 @@ sub www_editPage {
 			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
 		}
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
-                $output = helpIcon(1);
+                #$output = helpIcon(1);
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
 		$f->hidden("pageId",$page{pageId});
 		$f->hidden("parentId",$page{parentId});
 		$f->hidden("op","editPageSave");
-		$f->submit if ($page{pageId} ne "new");
-		$f->raw(
-			-value=>'<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>',
-			-uiLevel=>5
-			);
-		$f->readOnly(
+		$f->getTab("properties")->readOnly(
 			-value=>$page{pageId},
 			-label=>WebGUI::International::get(500),
 			-uiLevel=>3
 			);
-                $f->text("title",WebGUI::International::get(99),$page{title});
-		$f->text(
+                $f->getTab("properties")->text("title",WebGUI::International::get(99),$page{title});
+		$f->getTab("properties")->text(
 			-name=>"menuTitle",
 			-label=>WebGUI::International::get(411),
 			-value=>$page{menuTitle},
 			-uiLevel=>1
 			);
-		$f->yesNo(
+		$f->getTab("properties")->yesNo(
 			-name=>"hideFromNavigation",
 			-value=>$page{hideFromNavigation},
 			-label=>WebGUI::International::get(886),
 			-uiLevel=>6
 			);
-                $f->text(
+                $f->getTab("properties")->text(
 			-name=>"urlizedTitle",
 			-label=>WebGUI::International::get(104),
 			-value=>$page{urlizedTitle},
 			-uiLevel=>3
 			);
-		$f->select(
+		$f->getTab("properties")->select(
 			-name=>"languageId",
 			-label=>WebGUI::International::get(304),
 			-value=>[$page{languageId}],
 			-uiLevel=>1,
 			-options=>WebGUI::International::getLanguages()
 			);
-                $f->url(
+                $f->getTab("properties")->url(
 			-name=>"redirectURL",
 			-label=>WebGUI::International::get(715),
 			-value=>$page{redirectURL},
 			-uiLevel=>9
 			);
-		$f->textarea(
+		$f->getTab("properties")->textarea(
 			-name=>"synopsis",
 			-label=>WebGUI::International::get(412),
 			-value=>$page{synopsis},
 			-uiLevel=>3
 			);
-		$f->textarea(
+		$f->getTab("properties")->textarea(
 			-name=>"metaTags",
 			-label=>WebGUI::International::get(100),
 			-value=>$page{metaTags},
 			-uiLevel=>7
 			);
-                $f->yesNo(
+                $f->getTab("properties")->yesNo(
 			-name=>"defaultMetaTags",
 			-label=>WebGUI::International::get(307),
 			-value=>$page{defaultMetaTags},
-			-uiLevel=>5
-			);
-		$f->raw(
-			-value=>'<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>',
 			-uiLevel=>5
 			);
 		%hash = WebGUI::SQL->buildHash("select styleId,name from style where name<>'Reserved' order by name");
@@ -307,7 +314,7 @@ sub www_editPage {
 		} else {
 			$subtext = "";
 		}
-                $f->select(
+                $f->getTab("style")->select(
 			-name=>"styleId",
 			-options=>\%hash,
 			-label=>WebGUI::International::get(105),
@@ -316,28 +323,24 @@ sub www_editPage {
 			-uiLevel=>5
 			);
 		if ($childCount) {
-                	$f->yesNo(
+                	$f->getTab("style")->yesNo(
 				-name=>"recurseStyle",
 				-subtext=>' &nbsp; '.WebGUI::International::get(106),
 				-uiLevel=>9
 				);
 		}
-                $f->readOnly(
+                $f->getTab("style")->readOnly(
                         -value=>_selectPositions($page{templateId}),
                         -label=>WebGUI::International::get(356),
                         -uiLevel=>5
                         );
-		$f->raw(
-			-value=>'<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(107).'</b></td></tr>',
-			-uiLevel=>6
-			);
-        	$f->date(
+        	$f->getTab("privileges")->date(
 			-name=>"startDate",
 			-label=>WebGUI::International::get(497),
 			-value=>$page{startDate},
 			-uiLevel=>6
 			);
-        	$f->date(
+        	$f->getTab("privileges")->date(
 			-name=>"endDate",
 			-label=>WebGUI::International::get(498),
 			-value=>$page{endDate},
@@ -357,7 +360,7 @@ sub www_editPage {
 			$clause = "userId=$page{ownerId}";
                 }
 		my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-		$f->select(
+		$f->getTab("privileges")->select(
 			-name=>"ownerId",
 			-options=>$users,
 			-label=>WebGUI::International::get(108),
@@ -371,14 +374,14 @@ sub www_editPage {
 		} else {
 			$subtext = "";
 		}
-		$f->group(
+		$f->getTab("privileges")->group(
 			-name=>"groupIdView",
 			-label=>WebGUI::International::get(872),
 			-value=>[$page{groupIdView}],
 			-subtext=>$subtext,
 			-uiLevel=>6
 			);
-                $f->group(
+                $f->getTab("privileges")->group(
                         -name=>"groupIdEdit",
                         -label=>WebGUI::International::get(871),
                         -value=>[$page{groupIdEdit}],
@@ -387,18 +390,14 @@ sub www_editPage {
                         -uiLevel=>6
                         );
 		if ($childCount) {
-                	$f->yesNo(
+                	$f->getTab("privileges")->yesNo(
 				-name=>"recursePrivs",
 				-subtext=>' &nbsp; '.WebGUI::International::get(116),
 				-uiLevel=>9
 				);
 		}
-		$f->raw(
-                        -value=>'<tr><td colspan=2><hr size=1/></td></tr>',
-                        -uiLevel=>5
-                        );
 		if ($page{pageId} eq "new") {
-                	$f->whatNext(
+                	$f->getTab("properties")->whatNext(
                         	-options=>{
                                 	gotoNewPage=>WebGUI::International::get(823),
                                	 	backToPage=>WebGUI::International::get(847)
@@ -407,7 +406,6 @@ sub www_editPage {
 				-uiLevel=>1
                         	);
         	}
-		$f->submit;
 		$output .= $f->print;
                 return $output;
         } else {
