@@ -32,3 +32,4 @@
  - Added per page printable styles.
  - Wobject privileges are available per page rather than site-wide.
  - Templatized the Rich Editor support. Tnx to Len Kranendonk
+ - Fixed a problem in the forum that showed up under Postgres.
