@@ -664,7 +664,8 @@ sub set {
 			".$_[0]->{_property}{sequenceNumber}.",
 			".$_[0]->{_property}{pageId}."
 			)");
-		WebGUI::SQL->write("insert into ".$_[0]->{_property}{namespace}." (wobjectId) values (".$_[0]->{_property}{wobjectId}.")");
+		WebGUI::SQL->write("insert into ".$_[0]->{_property}{namespace}." (wobjectId) 
+			values (".$_[0]->{_property}{wobjectId}.")");
 	}
 	$_[0]->{_property}{lastEdited} = time();
 	$_[0]->{_property}{editedBy} = $session{user}{userId};
@@ -684,9 +685,10 @@ sub set {
 		where wobjectId=".$_[0]->{_property}{wobjectId};
 	WebGUI::SQL->write($sql);
 	if (@update) {
-        	WebGUI::SQL->write("update ".$_[0]->{_property}{namespace}." set ".join(",",@update)." where wobjectId=".$_[0]->{_property}{wobjectId});
+        	WebGUI::SQL->write("update ".$_[0]->{_property}{namespace}." set ".join(",",@update)." 
+			where wobjectId=".$_[0]->{_property}{wobjectId});
 	}
-	WebGUI::ErrorHandler::audit("edited Wobject ".$_[0]->{_property}{wobjectId});
+	WebGUI::ErrorHandler::audit("edited Wobject ".$_[0]->{_property}{wobjectId});	
 }
 
 

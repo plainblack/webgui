@@ -16,6 +16,8 @@ save you many hours of grief.
 
  * All Link Lists have been reset to the default template.
 
+ * All Site Maps have been reset to the default template.
+
 
 4.8.0
 --------------------------------------------------------------------
