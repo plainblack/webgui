@@ -679,8 +679,8 @@ sub www_view {
 	$i = 0;
 	my $imageURL;
 	foreach $row (@$page) {
-                $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
 		$page->[$i]->{content} = WebGUI::HTML::filter($page->[$i]->{content},$_[0]->get("filterContent"));
+                $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
 		$page->[$i]->{content} = WebGUI::HTML::format($page->[$i]->{content},$page->[$i]->{contentType});
                 @content = split(/\^\-\;/,$page->[$i]->{content});
                 if ($page->[$i]->{image} ne "") {
