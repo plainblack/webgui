@@ -224,7 +224,7 @@ sub build {
 	my $method = $self->_methods()->{$self->{_method}}{method};
 
 	my $cache = WebGUI::Cache->new($self->{_identifier}.'-'.$session{page}{pageId}, "Navigation-".$session{config}{configFile});
-	my $cacheContent = $cache->get;
+	my $cacheContent = $cache->get unless $session{var}{adminOn}; 
 
 	my (@page_loop, $lastPage, %unfolded);
 	tie %unfolded, "Tie::IxHash";
@@ -234,8 +234,8 @@ sub build {
         foreach my $property (@interestingPageProperties) {
         	$var->{'page.current.'.$property} = $currentPage->get($property);
         }
-	unless (defined $cacheContent && 
-			! $session{url}{siteURL}) {	# Never use cache if an alternate site url is specified.
+	unless (defined $cacheContent &&
+		! $session{url}{siteURL}) {	# Never use cache if an alternate site url is specified.
 		# The loop was not cached
 		my @pages = eval $method;
 		if ($@) {
@@ -289,8 +289,8 @@ sub build {
 				# Check showSystemPages
 				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
 	
-				# Deal with hidden pages
-				next if($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages});
+				# Deal with hidden pages, don't ever hide pages if admin mode is on
+				next if(($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages}) && (! $session{var}{adminOn}));
 
 				# Put page properties in $pageData hashref
 				foreach my $property (@interestingPageProperties) {
@@ -347,7 +347,7 @@ sub build {
 		}
 
 		# We had a cache miss, so let's put the data in cache
-		$cache->set(\@page_loop, 3600*24);
+		$cache->set(\@page_loop, 3600*24) unless $session{var}{adminOn};
 	} else {
 		# We had a cache hit
 		@page_loop = @{$cacheContent};
