@@ -28,7 +28,6 @@ use WebGUI::Session;
 use WebGUI::Style;
 use WebGUI::SQL;
 use WebGUI::Utility;
-#use WebGUI::Asset::Wobject::WobjectProxy;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -557,33 +556,6 @@ sub setCollateral {
 
 
 
-
-#-------------------------------------------------------------------
-
-=head2 www_createShortcut ( )
-
-Creates a shortcut (using the wobject proxy) of this wobject on the clipboard.
-
-B<NOTE:> Should never need to be overridden or extended.
-
-=cut
-
-sub www_createShortcut {
-	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	my $w = WebGUI::Wobject::WobjectProxy->new({wobjectId=>"new",namespace=>"WobjectProxy"});
-	$w->update({
-		pageId=>'2',
-		templatePosition=>1,
-		title=>$self->getValue("title"),
-		proxiedNamespace=>$self->get("namespace"),
-		proxiedWobjectId=>$self->get("wobjectId"),
-	    	bufferUserId=>$session{user}{userId},
-		bufferDate=>WebGUI::DateTime::time(),
-		bufferPrevId=>$session{page}{pageId}
-		});
-        return "";
-}
 
 
 

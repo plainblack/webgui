@@ -154,7 +154,7 @@ Adds a child asset to a parent. Creates a new AssetID for child. Makes the paren
 
 =head3 properties
 
-A hash reference containing a list of properties to associate with the child. The only used property value is "className"
+A hash reference containing a list of properties to associate with the child. The only required property value is "className"
 
 =head3 id
 
@@ -165,14 +165,14 @@ A unique 22 character ID.  By default WebGUI will generate this and you should a
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
-	my $id = WebGUI::Id::generate() || shift;
+	my $id = shift || WebGUI::Id::generate();
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, state, className, url, startDate, endDate) 
+	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, state, className, url, startDate, endDate, ownerUserId, groupIdEdit, groupIdView) 
 		values (".quote($id).",".quote($self->getId).", ".quote($lineage).", 
 		'published', ".quote($properties->{className}).", ".quote($id).",
-		997995720, 9223372036854775807)");
+		997995720, 9223372036854775807,'3','3','7')");
 	my $tempAsset = WebGUI::Asset->newByDynamicClass("new",$properties->{className});
 	foreach my $definition (@{$tempAsset->definition}) {
 		unless ($definition->{tableName} eq "asset") {
@@ -1425,7 +1425,7 @@ sub getToolbar {
             	.copyIcon('func=copy',$self->get("url"));
               #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
               #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
-        $toolbar .= shortcutIcon('func=createShortcut') unless ($self->get("className") =~ /Shortcut/);
+        $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
 	return $toolbar;
 }
 
@@ -1800,12 +1800,12 @@ sub processTemplate {
 		%{$self->{_properties}},
 		%{$var}
 		);
-	if (defined $self->get("_WobjectProxy")) {
-		$vars{isShortcut} = 1;
-		my ($originalPageURL) = WebGUI::SQL->quickArray("select url from asset where assetId=".quote($self->getId),WebGUI::SQL->getSlave);
-		$vars{originalURL} = WebGUI::URL::gateway($originalPageURL."#".$self->getId);
+	my $template = WebGUI::Asset::Template->new($templateId);
+	if (defined $template) {
+		return $template->process(\%vars);
+	} else {
+		return "Error: Can't instanciate template ".$templateId;
 	}
-	return WebGUI::Asset::Template->new($templateId)->process(\%vars);
 }
 
 #-------------------------------------------------------------------
@@ -2079,8 +2079,8 @@ sub updateHistory {
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (
 		".quote($self->getId).", ".quote($userId).", ".quote($action).", ".$dateStamp.")");
-	$self->update({lastUpdated=>$dateStamp,lastUpdatedBy=>$userId});
 	WebGUI::SQL->commit;
+	$self->update({lastUpdated=>$dateStamp,lastUpdatedBy=>$userId});
 }
 
 #-------------------------------------------------------------------
@@ -2167,9 +2167,16 @@ sub www_copyList {
 
 sub www_createShortcut () {
 	my $self = shift;
-	$self->addChild({
-		className=>$self->get("className"),
+	my $child = $self->addChild({
+		className=>'WebGUI::Asset::Shortcut',
+		shortcutToAssetId=>$self->getId,
+		title=>$self->get("title"),
+		menuTitle=>$self->get("menuTitle"),
+		url=>$self->get("title"),
+		templateId=>'PBtmpl0000000000000140'
 		});
+	$child->cut;
+	return $self->getContainer->www_view;
 }
 
 #-------------------------------------------------------------------

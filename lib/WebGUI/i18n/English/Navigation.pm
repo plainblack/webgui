@@ -27,6 +27,11 @@ our $I18N = {
 		context => q|Title of the navigation manager in the admin console.|
 	},
 
+	'22' => {
+		message => q|Edit Navigation|,
+		lastUpdated => 1078208044
+	},
+
 	'1098' => {
 		message => q|Navigation, Add/Edit|,
 		lastUpdated => 1078208044

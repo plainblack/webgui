@@ -25,8 +25,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-                tableName=>'FileAsset',
-                className=>'WebGUI::Asset::File',
+                tableName=>'Shortcut',
+                className=>'WebGUI::Asset::Shortcut',
                 properties=>{
                         shortcutToAssetId=>{
 				fieldType=>"hidden",
@@ -63,6 +63,10 @@ sub definition {
 			shortcutCriteria=>{
 				fieldType=>"textarea",
 				defaultValue=>"",
+				},
+			templateId=>{
+				fieldType=>"template",
+				defaultValue=>"PBtmpl0000000000000140"
 				}
                         }
                 });
@@ -75,7 +79,11 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	my $originalTemplate = WebGUI::Asset::Template->new(self->getShortcut->get("templateId"));
+	my $originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
+	$tabform->getTab("display")->template(
+		-value=>$self->getValue("templateId"),
+		-namespace=>"Shortcut"
+		);
 	$tabform->getTab("display")->template(
 		-name=>"overrideTemplateId",
 		-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
@@ -145,8 +153,8 @@ sub getEditForm {
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/template.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/template.gif';
+	return $session{config}{extrasURL}.'/assets/small/shortcut.gif' if ($small);
+	return $session{config}{extrasURL}.'/assets/shortcut.gif';
 }
 
 #-------------------------------------------------------------------
@@ -312,7 +320,13 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	return $self->getShortcut->view;
+	my %var = (
+		isShortcut => 1,
+		'shortcut.content' => $self->getShortcut->view,
+		'shortcut.label' => 'Shortcut',
+		originalURL => $self->getShortcut->getUrl
+		);
+	return $self->processTemplate(\%var,$self->getValue("templateId"));
 }
 
 

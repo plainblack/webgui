@@ -136,7 +136,7 @@ WebGUI::SQL->write("alter table WobjectProxy add column shortcutToAssetId varcha
 my $sth = WebGUI::SQL->read("select proxiedWobjectId from WobjectProxy");
 while (my ($wobjectId) = $sth->array) {
 	my ($assetId) = WebGUI::SQL->quickArray("select assetId from wobject where wobjectId=".quote($wobjectId));
-	WebGUI::SQL->write("update WobjectProxy set assetId=".quote($assetId)." where wobjectId=".quote($wobjectId));
+	WebGUI::SQL->write("update WobjectProxy set shortcutToAssetId=".quote($assetId)." where wobjectId=".quote($wobjectId));
 }
 $sth->finish;
 WebGUI::SQL->write("alter table WobjectProxy drop proxiedWobjectId");
@@ -144,7 +144,7 @@ WebGUI::SQL->write("alter table WobjectProxy change proxiedTemplateId overrideTe
 WebGUI::SQL->write("alter table WobjectProxy change proxyByCriteria shortcutByCriteria int not null");
 WebGUI::SQL->write("alter table WobjectProxy change proxyCriteria shortcutCriteria text not null");
 WebGUI::SQL->write("alter table WobjectProxy rename Shortcut");
-WebGUI::SQL->write("update asset set className='WebGUI::Asset::Shortcut' where className='WebGUI::Asset::Wobject::WobjectShortcut'");
+WebGUI::SQL->write("update asset set className='WebGUI::Asset::Shortcut' where className='WebGUI::Asset::Wobject::WobjectProxy'");
 WebGUI::SQL->write("alter table wobject drop column wobjectId");
 WebGUI::SQL->write("alter table wobject add primary key (assetId)");
 WebGUI::SQL->write("alter table wobject drop column templateId");
@@ -595,7 +595,33 @@ while (my ($assetId, $namespace, $tid) = $sth->array) {
 }
 $sth->finish;
 WebGUI::SQL->write("alter table Shortcut drop column proxiedNamespace");
-
+WebGUI::SQL->write("alter table Shortcut change templateId templateId varchar(22) not null");
+WebGUI::SQL->write("update Shortcut set templateId='PBtmpl0000000000000140'");
+use WebGUI::Asset;
+my $import = WebGUI::Asset->getImportNode;
+my $newTemplate = $import->addChild({
+		className=>'WebGUI::Asset::Template',
+		namespace=>'Shortcut',
+		title=>'Default Shortcut',
+		menuTitle=>'Default Shortcut',
+		template=>'
+<a name="<tmpl_var assetId>"></a>
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+	<div style="width: 100%; border: 1px groove black;">
+		<div style="width: 100%; background-image: url(<tmpl_var session.config.extrasURL>/opaque.gif);">
+			<div style="text-align: center; font-weight: bold;"><a href="<tmpl_var originalURL>"><tmpl_var shortcut.label></a></div>
+		</div>
+</tmpl_if>	
+<tmpl_var shortcut.content>
+<tmpl_if session.var.adminOn>
+		<div style="width: 100%; background-image: url(<tmpl_var session.config.extrasURL>/opaque.gif);">
+			<div style="text-align: center; font-weight: bold;"><a href="<tmpl_var originalURL>"><tmpl_var shortcut.label></a></div>
+		</div>
+	</div>
+</tmpl_if>	
+		'
+		},'PBtmpl0000000000000140');
 
 
 
@@ -924,7 +950,7 @@ sub walkTree {
 					where pageId=".quote($namespace->{startAtThisLevel}));
 				WebGUI::SQL->setRow("Navigation","assetId",{
 					assetId=>$wobjectId,
-					endPoint=>$namespace->{depth},
+					endPoint=>$namespace->{depth}||55,
 					startPoint=>$starturl,
 					startType=>"specificUrl",
 					templateId=>"1",
