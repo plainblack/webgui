@@ -866,5 +866,18 @@ INSERT INTO help VALUES (2, 'MailForm', 1, 'Add/Edit', 'Mail Form Fields', 'You 
 INSERT INTO helpSeeAlso VALUES (13, 2, 'MailForm');
 INSERT INTO helpSeeAlso VALUES (14, 1, 'MailForm');
 alter table karmaLog add column dateModified int not null default 1026097656;
+delete from international where internationalId=373;
+insert into international values (605,'WebGUI',1,'Add Groups');
+
+
+
+
+
+
+
+
+
+
+
 
 

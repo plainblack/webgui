@@ -27,7 +27,7 @@ use WebGUI::User;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_editUserGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
+our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_addUserToGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
 
 #-------------------------------------------------------------------
 sub _subMenu {
@@ -50,7 +50,7 @@ sub _subMenu {
 
 #-------------------------------------------------------------------
 sub www_addUser {
-        my ($output, %hash, $f);
+        my (@array, $output, $groups, %hash, $f);
 	tie %hash, 'Tie::IxHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= helpIcon(5);
@@ -62,11 +62,16 @@ sub www_addUser {
                 $f->hidden("op","addUserSave");
                 $f->text("username",WebGUI::International::get(50),$session{form}{username});
                	$f->password("identifier",WebGUI::International::get(51));
+               	$f->email("email",WebGUI::International::get(56));
 		%hash = ('WebGUI'=>'WebGUI', 'LDAP'=>'LDAP');
                	$f->select("authMethod",\%hash,WebGUI::International::get(164),[$session{setting}{authMethod}]);
                 $f->url("ldapURL",WebGUI::International::get(165),$session{setting}{ldapURL});
                 $f->text("connectDN",WebGUI::International::get(166),$session{form}{connectDN});
-                $f->group("groups",WebGUI::International::get(89),[],5,1);
+                push(@array,1); #visitors
+                push(@array,2); #registered users
+                push(@array,7); #everyone
+                $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).")");
+                $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
 		$f->submit;
 		$output .= $f->print;
         } else {
@@ -79,8 +84,7 @@ sub www_addUser {
 sub www_addUserSave {
         my ($output, @groups, $uid, $u, $gid, $encryptedPassword, $expireAfter);
         if (WebGUI::Privilege::isInGroup(3)) {
-		($uid) = WebGUI::SQL->quickArray("select userId from users where username=".
-			quote($session{form}{username}));
+		($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
 		unless ($uid) {
                 	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
 			$u = WebGUI::User->new("new");
@@ -91,6 +95,7 @@ sub www_addUserSave {
 			$u->authMethod($session{form}{authMethod});
                 	@groups = $session{cgi}->param('groups');
 			$u->addToGroups(\@groups);
+			$u->profileField("email",$session{form}{email});
 			$session{form}{uid}=$u->userId;
                 	$output = www_editUser();
 		} else {
@@ -100,6 +105,19 @@ sub www_addUserSave {
                 $output = WebGUI::Privilege::adminOnly();
         }
         return $output;
+}
+
+#-------------------------------------------------------------------
+sub www_addUserToGroupSave {
+        my (@groups, $u);
+        if (WebGUI::Privilege::isInGroup(3)) {
+                @groups = $session{cgi}->param('groups');
+		$u = WebGUI::User->new($session{form}{uid});
+		$u->addToGroups(\@groups);
+                return www_editUserGroup();
+        } else {
+                return WebGUI::Privilege::adminOnly();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -251,19 +269,22 @@ sub www_editUserSave {
 
 #-------------------------------------------------------------------
 sub www_editUserGroup {
-	my ($output, $f, @array, $sth, %hash);
+	my ($output, $f, $groups, @array, $sth, %hash);
 	tie %hash, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= '<h1>'.WebGUI::International::get(372).'</h1>';
 		$f = WebGUI::HTMLForm->new;
-                $f->hidden("op","editUserGroupSave");
+                $f->hidden("op","addUserToGroupSave");
                 $f->hidden("uid",$session{form}{uid});
                 @array = WebGUI::SQL->buildArray("select groupId from groupings where userId=$session{form}{uid}");
-                $f->group("groups",WebGUI::International::get(89),\@array,8,1);
+                push(@array,1); #visitors
+                push(@array,2); #registered users
+                push(@array,7); #everyone
+                $groups = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where groupId not in (".join(",",@array).")");
+                $f->select("groups",$groups,WebGUI::International::get(605),[],5,1);
                 $f->submit;
-                $f->readOnly(WebGUI::International::get(373));
 		$output .= $f->print;
-                $output .= '<table><tr><td class="tableHeader">'.WebGUI::International::get(89).
+                $output .= '<p><table><tr><td class="tableHeader">'.WebGUI::International::get(89).
 			'</td><td class="tableHeader">'.WebGUI::International::get(84).
 			'</td><td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
                 $sth = WebGUI::SQL->read("select groups.groupId,groups.groupName,groupings.expireDate 
@@ -286,22 +307,6 @@ sub www_editUserGroup {
                 return WebGUI::Privilege::adminOnly();
         }
 	return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_editUserGroupSave {
-        my (@groups, $gid, $expireAfter);
-        if (WebGUI::Privilege::isInGroup(3)) {
-                WebGUI::SQL->write("delete from groupings where userId=$session{form}{uid}");
-                @groups = $session{cgi}->param('groups');
-                foreach $gid (@groups) {
-			($expireAfter) = WebGUI::SQL->quickArray("select expireAfter from groups where groupId=$gid");
-                        WebGUI::SQL->write("insert into groupings values ($gid, $session{form}{uid}, ".(time()+$expireAfter).")");
-                }
-                return www_editUserGroup();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
 }
 
 #-------------------------------------------------------------------
