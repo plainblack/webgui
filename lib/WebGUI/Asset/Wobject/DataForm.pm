@@ -232,7 +232,7 @@ sub getEditForm {
         	$self->getTab("properties")->whatNext(
 			-options=>{
 				addField=>WebGUI::International::get(76,"DataForm"),
-				backToPage=>WebGUI::International::get(745)
+				backToPage=>WebGUI::International::get(745,"DataForm")
 				},
 			-value=>"editField"
 			);
@@ -750,7 +750,7 @@ sub www_editField {
         	$f->whatNext(
 			-options=>{
 				addField=>WebGUI::International::get(76,"DataForm"),
-				backToPage=>WebGUI::International::get(745)
+				backToPage=>WebGUI::International::get(745,"DataForm")
 				},
 			-value=>"addField"
 			);
@@ -826,7 +826,7 @@ sub www_editTab {
 			-options=>{
 				addTab=>WebGUI::International::get(103,"DataForm"),
 
-				backToPage=>WebGUI::International::get(745)
+				backToPage=>WebGUI::International::get(745,"DataForm")
 				},
 			-value=>"addTab"
 			);

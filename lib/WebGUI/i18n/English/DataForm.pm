@@ -616,21 +616,25 @@ A conditional indicating whether this field exists for the mail subsystem of the
 
 	'5' => {
 		message => q|Displayed|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
 	},
 	'no tab' =>{
 		message =>q|No Tab|,
 		lastUpdated=>1095701013,
-		context=>q|Tells the user that there is no tab to set the field to.|
+		context=>q|Tells the user that there is no tab to set the field to.|,
 		},
 	'Field Position' => {
 		message =>q|Field Position|,
-		lastUpdated=>1095701013
+		lastUpdated=>1095701013,
 	},
 	'Delete entry confirmation' => {
                 message => q|Are you certain that you wish to delete this data entry?|,
-                lastUpdated => 1095701013 
+                lastUpdated => 1095701013,
         },
+        '745' => {
+		 message => q|Go back to the page.|,
+		 lastUpdated => 1035872437,
+        }
 
 };
 
