@@ -139,7 +139,7 @@ sub www_deleteGrouping {
         if (WebGUI::Privilege::isInGroup(3)) {
 		$u = WebGUI::User->new($session{form}{uid});
 		$u->deleteFromGroups([$session{form}{gid}]);
-                return www_editUser();
+                return www_editUserGroup();
         } else {
                 return WebGUI::Privilege::adminOnly();
         }
