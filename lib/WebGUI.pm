@@ -49,24 +49,29 @@ sub page {
 	}
 	if (exists $session{form}{func} && exists $session{form}{wid}) {
 		if ($session{form}{wid} eq "new") {
-			$wobject = {wobjectId=>$session{form}{wid},namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};
+			$wobject = {wobjectId=>"new",namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};
 		} else {
 			$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$session{form}{wid});	
-			$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
-                        tie %hash, 'Tie::CPHash';
-                        %hash = (%{$wobject},%{$extra});
-                        $wobject = \%hash;
+			unless (${$wobject}{namespace} eq "") {
+				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
+                        	tie %hash, 'Tie::CPHash';
+                        	%hash = (%{$wobject},%{$extra});
+                        	$wobject = \%hash;
+				if (${$wobject}{pageId} != $session{page}{pageId} && ${$wobject}{pageId} != 2) {
+                        		$wobjectOutput = WebGUI::International::get(417);
+                        		WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access wobject [".$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
+                		} else {
+                        		$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
+                        		$w = $cmd->new($wobject);
+                        		$cmd = "www_".$session{form}{func};
+                        		$wobjectOutput = $w->$cmd;
+                		}
+                		# $wobjectOutput = WebGUI::International::get(381); # bad error
+			} else {
+				WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or corrupt, but was requested by $session{user}{username} [$session{user}{userId}].");
+				$wobject = ();
+			}
 		}
-		if (${$wobject}{pageId} != $session{page}{pageId} && ${$wobject}{pageId} != 2) {
-			$wobjectOutput = WebGUI::International::get(417);
-			WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access wobject [".$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
-		} else {
-			$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
-			$w = $cmd->new($wobject);
-			$cmd = "www_".$session{form}{func};
-                       	$wobjectOutput = $w->$cmd;
-		}
-                # $wobjectOutput = WebGUI::International::get(381); # bad error
 	}
 	if ($operationOutput ne "") {
 		$contentHash{0} = $operationOutput;
