@@ -46,11 +46,11 @@ A conditional that is true if the user is adding a new thread.
 <p>
 
 <b>sticky.form</b><br>
-A yes/no button to set the thread to be sticky.
+A yes/no button to set the thread to be sticky, so that it stays at the top of the forum listing.
 <p>
 
 <b>lock.form</b><br>
-A yes/no button to lock the thread.
+A yes/no button to lock the thread, so that no posts can be added or edited.
 <p>
 
 <b>isEdit</b><br>
