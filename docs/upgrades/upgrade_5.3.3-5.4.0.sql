@@ -11,7 +11,6 @@ CREATE TABLE databaseLink (
   identifier varchar(255) default NULL,
   PRIMARY KEY  (databaseLinkId)
 ) TYPE=MyISAM;
-insert into databaseLinks (databaseLinkId,title,DSN) values (1,'WebGUI','DBI:mysql:WebGUI');
 insert into incrementer values ('databaseLinkId',1000);
 alter table SQLReport add databaseLinkId int(11);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (12,1,'HttpProxy','Rewrite urls ?',1055908341);
