@@ -52,7 +52,7 @@ sub getType {
         my ($extension);
         $extension = $_[0];
         $extension =~ s/.*\.(.*?)$/$1/;
-        return $extension;
+        return lc($extension);
 }
 
 #-----------------------------------------
