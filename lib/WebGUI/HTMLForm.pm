@@ -292,7 +292,7 @@ sub combo {
 
 #-------------------------------------------------------------------
 
-=head2 date ( name [ label, value, extras, subtext, size ] )
+=head2 date ( name [ label, value, extras, subtext, size, noDate ] )
 
  Adds a date row to this form.
 
@@ -326,10 +326,15 @@ sub combo {
  The number of characters wide this form element should be. There
  should be no reason for anyone to specify this.
 
+=item noDate
+
+ By default a date is placed in the "value" field. Set this to "1"
+ to turn off the default date.
+
 =cut
 
 sub date {
-        my ($subtext, $class, $output, $name, $label, $extras, $size, $value);
+        my ($subtext, $noDate, $class, $output, $name, $label, $extras, $size, $value);
         $class = shift;
         $name = shift;
         $label = shift;
@@ -338,6 +343,8 @@ sub date {
         $extras = shift;
 	$subtext = shift;
         $size = shift || 10;
+	$noDate = shift;
+	$value = "" if ($noDate);
         $output = '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="10" '.$extras.'>';
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
@@ -823,7 +830,7 @@ sub interval {
 
 #-------------------------------------------------------------------
 
-=head2 new ( [ noTable, action, method, extras, enctype ] )
+=head2 new ( [ noTable, action, method, extras, enctype, tableExtras ] )
 
  Constructor.
 
@@ -855,18 +862,28 @@ sub interval {
  The ecapsulation type for this form. This defaults to
  "multipart/form-data" and should probably never be changed.
 
+=item tableExtras
+
+ If you want to add anything special to the form's table like 
+ a name or stylesheet information, you'd add it in here as
+ follows:
+
+   'name="myForm" class="formTable"'
+
+
 =cut
 
 sub new {
-        my ($header, $footer, $noTable, $enctype, $class, $method, $action, $extras);
+        my ($tableExtras, $header, $footer, $noTable, $enctype, $class, $method, $action, $extras);
         $class = shift;
 	$noTable = shift || 0;
         $action = shift || WebGUI::URL::page();
         $method = shift || "POST";
         $extras = shift;
 	$enctype = shift || "multipart/form-data";
+	$tableExtras = shift;
 	$header = '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$extras.'>';
-	$header .= '<table>' unless ($noTable);
+	$header .= '<table '.$tableExtras.'>' unless ($noTable);
 	$footer = '</table>' unless ($noTable);
 	$footer .= '</form>';
         bless {_noTable => $noTable, _header => $header, _footer => $footer, _data => ''}, $class;
