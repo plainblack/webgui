@@ -112,10 +112,10 @@ In order to be sure that the ordering of the answers in the poll does not bias y
 <p>
 
 <b>Reset votes.</b><br>
-Reset the votes on this Poll.
+Reset the votes on this Poll.  This option is only available when editing an existing Poll.
 <br><br>
 |,
-		lastUpdated => 1050183732
+		lastUpdated => 1102229887,
 	},
 
 	'3' => {
