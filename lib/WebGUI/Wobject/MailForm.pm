@@ -10,41 +10,6 @@ package WebGUI::Wobject::MailForm;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-#-----------------------------------------------------------------------
-#
-# Name:        	MailForm.pm
-# Revision:		$Id$
-# Category:    	WebGUI Wobject
-# Authors:     	Andy Grundman <andy@kahncentral.net>,
-#				Christophe Marcant <christophe@marcant.org>
-#				
-# TODO/Wishlist (in no particular order):
-# 1) Support for radio/checkbox groups when added to HTMLForm.pm -andy
-#
-# 2) Add an option for a "secure" form, where the results of a submission are stored
-# in the database and the "To" address is only sent a link back into WebGUI to view
-# the results.  This should be toggleable and default off because it's a hassle for
-# most users.  I could see this feature being used for quick-and-dirty credit card
-# forms where the form and view are all done on an SSL server and credit card
-# info is never sent via email. -andy
-# 
-# 3) Add another option to each field to let it be required and force people to fill
-# it out before being able to click send. -andy
-#
-# 4) Build viewer for stored form submissions.
-#
-# History:
-# 7/07/02	andy		2.10	Better implementation for inclusion in WebGUI tree
-#								Support for unlimited number of additional fields
-#								Support for most form elements
-#								Uses MessageLog.pm for notification of users/groups
-#								Internationalization, Help (English only of course)
-# 6/12/02	andy		2.01	Fixed save bug
-# 6/11/02	andy		2.00	Initial port to Wobject API
-# 3/28/02   christophe  1.00 	Initial 1.0B public release
-#
-#-----------------------------------------------------------------------
-
 use strict;
 use Tie::CPHash;
 use WebGUI::HTMLForm;
