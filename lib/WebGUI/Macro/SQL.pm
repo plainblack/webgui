@@ -18,6 +18,7 @@ use WebGUI::SQL;
 sub _replacement {
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = WebGUI::Macro::getParams(shift);
+	$format = '^0;' if ($format eq "");
 	my $result = eval {
 		my $sth = WebGUI::SQL->new($statement,$session{dbh});
 		while (@data = $sth->array) {
