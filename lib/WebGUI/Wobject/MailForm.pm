@@ -369,8 +369,16 @@ sub www_view {
 	
 	$sth = WebGUI::SQL->read("select * from MailForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%data = $sth->hash) {
+		# process macros on default values
+		$data{defaultValue} = $_[0]->processMacros($data{defaultValue});
 		if ($data{status} == 1) {
 			# hidden field, don't show on form for security reasons
+			$row = "";
+			# but show for admins
+			if ($session{var}{adminOn}) {
+				$row = "<tr><td class='formDescription' valign='middle'>\u".$data{name}." (hidden)&nbsp;</td><td class='tableData' valign='middle'>".$data{defaultValue};
+				$row .= $_[0]->_fieldAdminIcons($data{mailFieldId});
+			}
 		} elsif ($data{status} == 2) {
 			# read-only field
 			$row = "<tr><td class='formDescription' valign='middle'>\u".$data{name}."&nbsp;</td><td class='tableData' valign='middle'>".$data{defaultValue};
@@ -450,7 +458,7 @@ sub _createField {
 			my %selectOptions;
 			# add an empty option if no default value is provided
 			foreach (split(/\n/, $data->{possibleValues})) {
-				$selectOptions{$_} = $_;
+				$selectOptions{$_} = $_[0]->processMacros($_);
 			}
 			$f->select($name, \%selectOptions, $data->{name}, [ $data->{defaultValue} ], "", "", "", "");
 			last SWITCH;
@@ -518,7 +526,7 @@ sub www_send {
 	$sth = WebGUI::SQL->read("select * from MailForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%data = $sth->hash) {
 		my $urlizedName = WebGUI::URL::urlize($data{name});
-		my $value = $session{form}{$urlizedName} || $data{defaultValue};
+		my $value = $session{form}{$urlizedName} || $_[0]->processMacros($data{defaultValue});
 		# fix value for special types
 		if ($data{type} eq "yesNo") {
 			$value = ($value == 1) ? "yes" : "no";
