@@ -544,10 +544,8 @@ sub fieldType {
 	my (%hash, $output, $type);
  	tie %hash, 'Tie::IxHash';
 	# NOTE: What you are about to see is bad code. Do not attempt this
-	# without adult supervision. =) It was done this way because a huge
-	# if/elsif construct executes much more quickly than a bunch of
-	# unnecessary database hits.
-	my @types = qw(dateTime time zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList);
+	# without adult supervision. =) 
+	my @types = qw(dateTime time float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList);
 	$_[0]->{types} = \@types unless ($_[0]->{types});
 	foreach $type (@{$_[0]->{types}}) {
 		if ($type eq "text") {
@@ -564,6 +562,8 @@ sub fieldType {
         		$hash{url} = WebGUI::International::get(478);
 		} elsif ($type eq "date") {
         		$hash{date} = WebGUI::International::get(479);
+		} elsif ($type eq "float") {
+        		$hash{float} = WebGUI::International::get("float");
 		} elsif ($type eq "email") {
         		$hash{email} = WebGUI::International::get(480);
 		} elsif ($type eq "phone") {

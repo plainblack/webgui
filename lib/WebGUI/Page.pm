@@ -964,10 +964,13 @@ The page id of the page you're creating a URL for.
 =cut
 
 sub makeUnique {
-        my ($url, $test, $pageId);
-        $url = $_[0] || "_1";
-        $pageId = $_[1] || "new";
-        while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$url' and pageId<>'$pageId'")) {
+        my $url = $_[0] || "_1";
+        my $pageId = $_[1] || "new";
+	my $where = "where urlizedTitle=".quote($url);
+	unless ($pageId eq "new") {
+		$where .= " and pageId<>".$pageId;
+	}
+        while (my ($test) = WebGUI::SQL->quickArray("select urlizedTitle from page ".$where)) {
                 if ($url =~ /(.*)(\d+$)/) {
                         $url = $1.($2+1);
                 } elsif ($test ne "") {

@@ -7134,6 +7134,12 @@ Following a guide like the above will help you get good ranking on search engine
 		message => q|Ends With|,
 		lastUpdated => 1089039511,
 		context => q|A phrase or word ends with this.|
+	},
+
+	'float' => {
+		message => q|Decimal|,
+		lastUpdated => 1089039511,
+		context => q|A label that tells the user that this field uses a floating point number, aka a Decimal number, aka a Real number.|
 	}
 
 };
