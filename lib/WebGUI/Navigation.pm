@@ -228,19 +228,18 @@ sub build {
 
 	my (@page_loop, $lastPage, %unfolded);
 	tie %unfolded, "Tie::IxHash";
+
+        # Store current page properties in template var
+        my $currentPage = WebGUI::Page->getPage();
+        foreach my $property (@interestingPageProperties) {
+        	$var->{'page.current.'.$property} = $currentPage->get($property);
+        }
 	unless (defined $cacheContent && ! $session{var}{altSiteURL}) {
 		# The loop was not cached
 		my @pages = eval $method;
 		if ($@) {
 			WebGUI::ErrorHandler::warn("Error in WebGUI::Navigation::build while trying to execute $method".$@);
 		}
-
-		# Store current page properties in template var
-		my $currentPage = WebGUI::Page->getPage();
-		foreach my $property (@interestingPageProperties) {
-			$var->{'page.current.'.$property} = $currentPage->get($property);
-		}
-
 		if (@pages) {
 			my $startPageDepth = ($p->ancestors);
 			my $maxDepth = $startPageDepth + $self->{_depth};

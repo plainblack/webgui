@@ -26,6 +26,7 @@
  - Added Export Page functionality.
  - bugfix: Loginbox didn't support encrypt login.
  - Bugfix: [ 1000205 ] Password Recovery Doesn't Work
+ - Bugfix: [ 1003594 ] Fixed Navigation Cacheing bug
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
