@@ -268,7 +268,7 @@ sub date {
 	$value = epochToSet($value);
         $extras = shift;
 	$subtext = shift;
-        $size = shift || $session{setting}{textBoxSize} || 30;
+        $size = shift || 10;
         $output = '<input type="text" name="'.$name.'" value="'.$value.'" size="'.
                 $size.'" maxlength="10" '.$extras.'>';
 	$output .= '<input type="button" style="font-size: 8pt;" onClick="window.dateField = this.form.'.
@@ -644,7 +644,7 @@ sub integer {
         $maxLength = shift || 11;
         $extras = shift;
         $subtext = shift;
-        $size = shift || $session{setting}{textBoxSize} || 30;
+        $size = shift || 11;
         $output = '<script language="JavaScript">function doNumCheck(field) {
 		var valid = "0123456789"
 		var ok = "yes";

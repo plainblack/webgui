@@ -175,8 +175,8 @@ sub www_edit {
 		$output .= '<h1>'.WebGUI::International::get(12,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 %hash = (list => WebGUI::International::get(17,$namespace),
-                        calendarMonth => WebGUI::International::get(18,$namespace),
-			calendarMonthSmall => WebGUI::International::get(74,$namespace));
+                        calendarMonth => WebGUI::International::get(18,$namespace));
+		#	calendarMonthSmall => WebGUI::International::get(74,$namespace));
 		$f->select("calendarLayout",\%hash,WebGUI::International::get(16,$namespace),[$_[0]->get("calendarLayout")]);
 		$f->integer("paginateAfter",WebGUI::International::get(19,$namespace),$paginateAfter);
 		$f->yesNo("proceed",WebGUI::International::get(21,$namespace),$proceed);
@@ -214,12 +214,15 @@ sub www_editEvent {
         if (WebGUI::Privilege::canEditPage()) {
 		if ($session{form}{eid} eq "new") {
         		%recursEvery = ('never'=>WebGUI::International::get(4,$namespace),
-                		'day'=>WebGUI::International::get(5,$namespace),
-                		'week'=>WebGUI::International::get(6,$namespace)
+                		'day'=>WebGUI::International::get(700),
+                		'week'=>WebGUI::International::get(701),
+                		'month'=>WebGUI::International::get(702),
+                		'year'=>WebGUI::International::get(703)
                 		);
 			$event{endDate} = $event{endDate};
 			$f = WebGUI::HTMLForm->new(1);
 			$f->raw('<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,$namespace).'</td><td class="tableData">');
+			$f->integer("interval","",1,"","","",3);
 			$f->select("recursEvery",\%recursEvery);
 			$f->raw(' '.WebGUI::International::get(9,$namespace).' ');
 			$f->date("until");
@@ -263,23 +266,27 @@ sub www_editEventSave {
                 	$endDate[0] = setToEpoch($session{form}{endDate});
                 	$until = setToEpoch($session{form}{until});
                 	$eventId[0] = getNextId("eventId");
+			$session{form}{interval} = 1 if ($session{form}{interval} < 1);
                 	if ($session{form}{recursEvery} eq "never") {
                         	$recurringEventId = 0;
-                	} elsif ($session{form}{recursEvery} eq "day") {
+                	} else {
                         	$recurringEventId = getNextId("recurringEventId");
                         	while ($startDate[$i] < $until) {
                                 	$i++;
                                 	$eventId[$i] = getNextId("eventId");
-                                	$startDate[$i] = $startDate[0] + (86400 * $i);
-                                	$endDate[$i] = $endDate[0] + (86400 * $i);
-                        	}
-                	} elsif ($session{form}{recursEvery} eq "week") {
-                        	$recurringEventId = getNextId("recurringEventId");
-                        	while ($startDate[$i] < $until) {
-                                	$i++;
-                                	$eventId[$i] = getNextId("eventId");
-                                	$startDate[$i] = $startDate[0] + (604800 * $i);
-                                	$endDate[$i] = $endDate[0] + (604800 * $i);
+					if ($session{form}{recursEvery} eq "day") {
+                                		$startDate[$i] = addToDate($startDate[0],0,0,($i*$session{form}{interval}));
+                                		$endDate[$i] = addToDate($endDate[0],0,0,($i*$session{form}{interval}));
+					} elsif ($session{form}{recursEvery} eq "week") {
+                                		$startDate[$i] = addToDate($startDate[0],0,0,(7*$i*$session{form}{interval}));
+                                		$endDate[$i] = addToDate($endDate[0],0,0,(7*$i*$session{form}{interval}));
+                                        } elsif ($session{form}{recursEvery} eq "month") {
+                                                $startDate[$i] = addToDate($startDate[0],0,($i*$session{form}{interval}),0);
+                                                $endDate[$i] = addToDate($endDate[0],0,($i*$session{form}{interval}),0);
+                                        } elsif ($session{form}{recursEvery} eq "year") {
+                                                $startDate[$i] = addToDate($startDate[0],($i*$session{form}{interval}),0,0);
+                                                $endDate[$i] = addToDate($endDate[0],($i*$session{form}{interval}),0,0);
+					}
                         	}
                 	}
                 	$i = 0;
