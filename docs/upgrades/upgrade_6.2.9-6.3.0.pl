@@ -773,12 +773,13 @@ sub walkTree {
 			$className = 'WebGUI::Asset::Redirect';
 		}
 		WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
-			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage, assetSize ) values (".quote($pageId).",
+			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit, encryptPage, assetSize,
+			extraHeadTags ) values (".quote($pageId).",
 			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}).",
 			".quote($page->{menuTitle}).", ".quote($pageUrl).", ".quote($page->{startDate}).", ".quote($page->{endDate}).",
 			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}).",
 			".quote($page->{groupIdView}).", ".quote($page->{groupIdEdit}).", ".quote($page->{encryptPage}).",
-			".length($page->{title}.$page->{menuTitle}.$page->{synopsis}.$page->{urlizedTitle}).")");
+			".length($page->{title}.$page->{menuTitle}.$page->{synopsis}.$page->{urlizedTitle}).", ".quote($page->{metaTags}).")");
 		if ($page->{redirectURL} ne "") {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {

@@ -291,6 +291,10 @@ sub definition {
                                         fieldType=>'textarea',
                                         defaultValue=>undef
                                         },
+                                extraHeadTags=>{
+                                        fieldType=>'textarea',
+                                        defaultValue=>undef
+                                        },
                                 url=>{
                                         fieldType=>'text',
                                         defaultValue=>undef,
@@ -740,12 +744,6 @@ sub getEditForm {
                 -value=>$self->get("url"),
                 -uiLevel=>3
                 );
-        $tabform->getTab("properties")->textarea(
-                -name=>"synopsis",
-                -label=>WebGUI::International::get(412),
-                -value=>$self->get("synopsis"),
-                -uiLevel=>3
-                );
 	$tabform->addTab("display",WebGUI::International::get(105),5);
 	$tabform->getTab("display")->yesNo(
                 -name=>"isHidden",
@@ -814,7 +812,20 @@ sub getEditForm {
                -excludeGroups=>[1,7],
                -uiLevel=>6
                );
-	$tabform->getTab("properties")->yesNo(
+	$tabform->addTab("meta","Meta",3);
+        $tabform->getTab("meta")->textarea(
+                -name=>"synopsis",
+                -label=>WebGUI::International::get(412),
+                -value=>$self->get("synopsis"),
+                -uiLevel=>3
+                );
+        $tabform->getTab("meta")->textarea(
+                -name=>"extraHeadTags",
+                -label=>"Extra Head Tags",
+                -value=>$self->get("extraHeadTags"),
+                -uiLevel=>5
+                );
+	$tabform->getTab("meta")->yesNo(
 		-name=>"isPackage",
 		-label=>"Make available as package?",
 		-value=>$self->getValue("isPackage"),

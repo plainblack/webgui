@@ -115,7 +115,7 @@ sub getEditForm {
                 -label=>WebGUI::International::get(5,"HttpProxy"),
                 -value=>$self->getValue("followExternal")
                 );
-        $tabform->getTab("properties")->yesNo(
+        $tabform->getTab("security")->yesNo(
                 -name=>"followRedirect",
                 -label=>WebGUI::International::get(8,"HttpProxy"),
                 -value=>$self->getValue("followRedirect")

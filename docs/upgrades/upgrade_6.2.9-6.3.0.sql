@@ -66,6 +66,7 @@ create table asset (
 	lastUpdated bigint not null default 0,
 	lastUpdatedBy varchar(22),
 	isPackage int not null default 0,
+	extraHeadTags text,
 	unique index (lineage asc),
 	unique index (url),
 	index (parentId)
