@@ -27,6 +27,7 @@ use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::Page;
 use WebGUI::URL;
+use WebGUI::PassiveProfiling;
 
 
 #-------------------------------------------------------------------	
@@ -138,7 +139,8 @@ sub _processOperations {
 
 #-------------------------------------------------------------------
 sub page {
-	WebGUI::Session::open($_[0],$_[1]);
+	my $useExistingSession = $_[2];
+	WebGUI::Session::open($_[0],$_[1]) unless ($useExistingSession);
         my $useCache = ($session{form}{op} eq "" && $session{form}{wid} eq "" && $session{form}{makePrintable} eq "" 
 		&& (($session{page}{cacheTimeout} > 10 && $session{user}{userId} !=1) || ($session{page}{cacheTimeoutVisitor} > 10 && $session{user}{userId} == 1)) 
 		&& not $session{var}{adminOn});
@@ -157,6 +159,7 @@ sub page {
 	}
 	if ($output ne "") {
 		# using cache
+		WebGUI::PassiveProfiling::addPage();	# add wobjects on page to passive profile log
 	} elsif (WebGUI::HTTP::getMimeType() ne "text/html") {
 		$output = $operationOutput.$wobjectOutput;
 	} elsif ($operationOutput ne "") {
@@ -174,7 +177,7 @@ sub page {
 		$cache->set($output, $ttl) if ($useCache);
 	}
 	my $httpHeader = WebGUI::HTTP::getHeader();
-	WebGUI::Session::close();
+	WebGUI::Session::close() unless ($useExistingSession);
 	return $httpHeader.$output;
 }
 
