@@ -546,6 +546,7 @@ sub view {
         $var->{'user.isModerator'} = $self->getParent->canModerate;
         $var->{'user.canPost'} = $self->getParent->canPost;
         $var->{'user.canReply'} = $self->canReply;
+        $var->{'repliesAllowed'} = $self->getParent->("allowReplies");
 
         $var->{'layout.nested.url'} = $self->getLayoutUrl("nested");
         $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");

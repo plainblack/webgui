@@ -968,7 +968,7 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	} elsif ($namespace eq "USS/Submission") {
 		$newNamespace = "Collaboration/Thread";
 		if ($template =~ /attachment\.box/ixsg) {
-			my $box = '<div><a href="<tmpl_var attachment.url>"><img src="<tmpl_var attachment.icon>" border="0" alt="<tmpl_var attachment.name>"> <tmpl_var attachment.name></a></div>';
+			my $box = '<tmpl_if attachment.name><div><a href="<tmpl_var attachment.url>"><img src="<tmpl_var attachment.icon>" border="0" alt="<tmpl_var attachment.name>"> <tmpl_var attachment.name></a></div></tmpl_if>';
 			$template =~ s/\<tmpl_var\s+attachment\.box\>/$box/ixsg;
 		}
 	}
@@ -1014,7 +1014,7 @@ while (my ($id, $template, $namespace) = $sth->array) {
 	$template =~ s/back\.url/collaboration.url/ixsg;
 	$template =~ s/submissions_loop/post_loop/ixsg;
 	$template = '<a name="<tmpl_var assetId>"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if>'.$template;
-	my $replies = '<tmpl_if user.canReply>
+	my $replies = '<tmpl_if repliesAllowed>
 <style>
 	.postBorder {
 		border: 1px solid #cccccc;
@@ -1508,21 +1508,25 @@ my $newTemplate = $import->addChild({
 
 
 print "\tReplacing some old macros with new ones\n" unless ($quiet);
+print "\t\tReplacing macros in templates\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select assetId, template from template");
 while (my ($id, $template) = $sth->array) {
 	WebGUI::SQL->write("update template set template=".quote(replaceMacros($template))." where assetId=".quote($id));
 }
 $sth->finish;
+print "\t\tReplacing macros in wobject descriptions\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select assetId, description from wobject");
 while (my ($id, $desc) = $sth->array) {
 	WebGUI::SQL->write("update wobject set description=".quote(replaceMacros($desc))." where assetId=".quote($id));
 }
 $sth->finish;
+print "\t\tReplacing macros in user submissions and forum posts (can take a long time)\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select assetId, content from Post");
 while (my ($id, $desc) = $sth->array) {
 	WebGUI::SQL->write("update Post set content=".quote(replaceMacros($desc))." where assetId=".quote($id));
 }
 $sth->finish;
+print "\t\tReplacing macros in snippets\n" unless ($quiet);
 my $sth = WebGUI::SQL->read("select assetId, snippet from snippet");
 while (my ($id, $snip) = $sth->array) {
 	WebGUI::SQL->write("update snippet set snippet=".quote(replaceMacros($snip))." where assetId=".quote($id));
