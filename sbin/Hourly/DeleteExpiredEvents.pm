@@ -15,12 +15,16 @@ use strict;
 use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Asset::Event;
 
 #-----------------------------------------
 sub process {
 	if ($session{config}{DeleteExpiredEvents_offset} ne "") {
-		WebGUI::SQL->write("delete from EventsCalendar_event where endDate < "
-			.(time()-(86400*$session{config}{DeleteExpiredEvents_offset})));
+		my $sth = WebGUI::SQL->read("select assetId from EventsCalendar_event where eventEndDate < ".(time()-(86400*$session{config}{DeleteExpiredEvents_offset})));
+		while (my ($id) = $sth->array) {
+			WebGUI::Asset::Event->new($id)->purge;
+		}
+		$sth->finish;
 	}
 }
 

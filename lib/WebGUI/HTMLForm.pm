@@ -2172,7 +2172,7 @@ sub template {
 				$returnUrl = "&proceed=goBackToPage&returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);
 			}
                 	$buttons = editIcon("func=edit".$returnUrl,$template->get("url"));
-        		$buttons .= manageIcon("",$template->getParent->get("url"));
+        		$buttons .= manageIcon("func=manageAssets",$template->getParent->get("url"));
 		}
         	$output = WebGUI::Form::template({
                 	"name"=>$name,

@@ -356,6 +356,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub _drawQueryBuilder {
+	my $self = shift;
 	# Initialize operators
 	my @textFields = qw|text yesNo selectList radioList|;
 	my %operator;
@@ -373,7 +374,7 @@ sub _drawQueryBuilder {
 			};
 
 	# Get the fields and count them	
-	my $fields = WebGUI::Asset::getMetaDataFields();
+	my $fields = $self->getMetaDataFields();
 	my $fieldCount = scalar(keys %$fields);
 	
 	unless ($fieldCount) {	# No fields found....
@@ -428,12 +429,13 @@ sub _drawQueryBuilder {
 	|;
 
 	# Here starts the field loop
+	my $i = 1;
 	foreach my $field (keys %$fields) {
 		my $fieldLabel = $fields->{$field}{fieldName};
 		my $fieldType = $fields->{$field}{fieldType} || "text";
 
 		# The operator select field
-		my $opFieldName = "op_field".$fields->{$field}{fieldId};
+		my $opFieldName = "op_field".$i;
 		my $opField = WebGUI::Form::selectList({
 						name=>$opFieldName,
 						uiLevel=>5,
@@ -441,7 +443,7 @@ sub _drawQueryBuilder {
 						extras=>'class="qbselect"'
 					});	
 		# The value select field
-		my $valFieldName = "val_field".$fields->{$field}{fieldId};
+		my $valFieldName = "val_field".$i;
 		my $valueField = WebGUI::Form::dynamicField($fieldType, {
                                                 name=>$valFieldName,
                                                 uiLevel=>5,
@@ -474,6 +476,7 @@ sub _drawQueryBuilder {
 				<input class="qbButton" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
 			  </tr>
 			|;
+		$i++;
 	}
 	# Close the table
 	$output .= "</table>";

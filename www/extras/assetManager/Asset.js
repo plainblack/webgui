@@ -221,9 +221,10 @@ function Asset_mouseDown(e) {
     if (e.button==2) {
 	    //this is a hack to get the context menu stuff to work right in IE
    	 	if (!dom) {
-     	    e.cancelBubble = true;
+     	      e.cancelBubble = true;
         	e.returnValue = false;
-    	}
+    	      EventManager_documentMouseDown(e);
+	}
     }    
 
     return false;

@@ -381,6 +381,10 @@ sub definition {
 					fieldType=>'hidden',
 					defaultValue=>0
 					},
+				encryptPage=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
 				isPackage=>{
 					fieldType=>'yesNo',
 					defaultValue=>0
@@ -416,7 +420,6 @@ The fieldId to be deleted.
 
 sub deleteMetaDataField {
 	my $fieldId = shift;
-	return unless ($fieldId =~ /^\d+$/ || length($fieldId) == 22);
 	WebGUI::SQL->beginTransaction;
         WebGUI::SQL->write("delete from metaData_properties where fieldId = ".quote($fieldId));
         WebGUI::SQL->write("delete from metaData_values where fieldId = ".quote($fieldId));
@@ -1910,7 +1913,7 @@ sub processPropertiesFromFormPost {
 	}
 	$self->update(\%data);
 	foreach my $form (keys %{$session{form}}) {
-		if ($form =~ /^metadata_(\d+)$/) {
+		if ($form =~ /^metadata_(.*)$/) {
 			my $fieldId = $1; 
 			my ($exists) = WebGUI::SQL->quickArray("select count(*) from metaData_values
 							where assetId = ".quote($self->getId)."

@@ -1,6 +1,16 @@
 package WebGUI::i18n::English::CommercePaymentITransact;
 
 our $I18N = {
+	'phone' => {
+                message => q|Telephone Number|,
+                lastUpdated => 0,
+                context => q|Form label in the checkout form of the iTransact module.|
+        },
+        'country' => {
+                message => q|Country|,
+                lastUpdated => 0,
+                context => q|Form label in the checkout form of the iTransact module.|
+        },
 	'firstName' => {
 		message => q|First name|,
 		lastUpdated => 0,
