@@ -222,11 +222,12 @@ sub www_editTheme {
 		my @queries = (
 			"select style.name as name, themeComponent.themeComponentId as componentId, 'style' as componentType
 				from themeComponent, style 
-				where style.styleId=themeComponent.id and themeComponent.type='style' order by name",
+				where style.styleId=themeComponent.id and themeComponent.type='style' 
+				and themeComponent.themeId=$session{form}{themeId} order by name",
 			"select collateral.name as name, themeComponent.themeComponentId as componentId,
 				collateral.collateralType as componentType from themeComponent, collateral 
 				where collateral.collateralId=themeComponent.id and themeComponent.type=collateral.collateralType
-				order by name"
+				and themeComponent.themeId=$session{form}{themeId} order by name"
 			);
 		foreach my $query (@queries) {
 			my $sth = WebGUI::SQL->read($query);
@@ -496,11 +497,12 @@ sub www_viewTheme {
         my @queries = (
                         "select style.name as name, themeComponent.themeComponentId as componentId, 'style' as componentType
                                 from themeComponent, style
-                                where style.styleId=themeComponent.id and themeComponent.type='style' order by name",
+                                where style.styleId=themeComponent.id and themeComponent.type='style'
+				and themeComponent.themeId=$session{form}{themeId} order by name",
                         "select collateral.name as name, themeComponent.themeComponentId as componentId,
                                 collateral.collateralType as componentType from themeComponent, collateral
                                 where collateral.collateralId=themeComponent.id and themeComponent.type=collateral.collateralType
-                                order by name"
+                                and themeComponent.themeId=$session{form}{themeId} order by name"
                         );
                 foreach my $query (@queries) {
                         my $sth = WebGUI::SQL->read($query);
