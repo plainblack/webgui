@@ -54,12 +54,14 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  canEdit
  canView
  cascadeLineage
+ checkExportPath
  cut
  definition
  deleteMetaDataField
  demote
  DESTROY
  duplicate
+ exportAsHtml
  fixUrl
  formatRank
  get
@@ -125,6 +127,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  www_editTreeSave (NYI)
  www_emptyClipboard
  www_emptyTrash
+ www_export
  www_manageAssets
  www_manageClipboard
  www_manageMetaData
@@ -255,6 +258,13 @@ sub cascadeLineage {
 
 
 #-------------------------------------------------------------------
+
+=head2 checkExportPath ( )
+
+Returns a descriptive error message (HTML) if the export path is not writable, does not exist, or is not specified in the per-domain WebGUI config file.
+
+=cut
+
 sub checkExportPath {
 	my $error;
 	if(defined $session{config}{exportPath}) {
@@ -264,7 +274,7 @@ sub checkExportPath {
 						Make sure that the webserver has permissions to write to that directory';
 			}
 		} else {
-			$error .= 'Error: The export path '.$session{config}{exportPath}.' does not exists.';
+			$error .= 'Error: The export path '.$session{config}{exportPath}.' does not exist.';
 		}
 	} else {
 		$error.= 'Error: The export path is not configured. Please set the exportPath variable in the WebGUI config file';
@@ -2076,7 +2086,7 @@ sub www_copy {
 
 =head2 www_copyList ( )
 
-Duplicates self, cuts (moves to clipboard) the duplicate newAsset, repeats for other assets in a list, then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
+Copies to clipboard assets in a list, then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
 =cut
 
@@ -2198,7 +2208,7 @@ sub www_demote {
 
 =head2 www_deployPackage ( ) 
 
-
+Returns "". Deploys a Package. If canEdit is Fales, renders an insufficient Privilege page. 
 
 =cut
 
@@ -2222,7 +2232,7 @@ sub www_deployPackage {
 
 =head2 www_edit ( )
 
-Renders an AdminConsole EditForm, unless insufficient privileges.
+Renders an AdminConsole EditForm, unless canEdit returns False.
 
 =cut
 
@@ -2236,7 +2246,7 @@ sub www_edit {
 
 =head2 www_editSave ( )
 
-Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().
+Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().  Will return an insufficient Privilege if canEdit returns False.
 
 =cut
 
@@ -2264,7 +2274,7 @@ sub www_editSave {
 
 =head2 www_editMetaDataField ( )
 
-Returns a rendered page to edit MetaData
+Returns a rendered page to edit MetaData.  Will return an insufficient Privilege if not InGroup(4).
 
 =cut
 
@@ -2302,7 +2312,7 @@ sub www_editMetaDataField {
 
 =head2 www_editMetaDataFieldSave ( )
 
-
+Verifies that MetaData fields aren't duplicated or blank, assigns default values, and returns the www_manageMetaData() method. Will return an insufficient Privilege if not InGroup(4).
 
 =cut
 
@@ -2353,7 +2363,7 @@ sub www_editMetaDataFieldSave {
 
 =head2 www_editTree ( )
 
-
+Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insufficient Privilege page. 
 
 =cut
 
@@ -2514,7 +2524,7 @@ sub www_editTree {
 
 =head2 www_editTreeSave ( )
 
-
+Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets method. If canEdit returns False, returns an insufficient privilege page.
 
 =cut
 
@@ -2571,7 +2581,7 @@ sub www_editTreeSave {
 
 =head2 www_emptyClipboard ( )
 
-
+Moves assets in clipboard to trash. Returns www_manageClipboard() when finished. If isInGroup(4) returns False, insufficient privilege is rendered.
 
 =cut
 
@@ -2590,7 +2600,7 @@ sub www_emptyClipboard {
 
 =head2 www_emptyTrash ( )
 
-
+Calls the purgeTree() method to delete all items in Trash. Returns the www_manageTrash() method. If isInGroup(4) returns false, renders insufficient privilege page.
 
 =cut
 
@@ -2748,7 +2758,7 @@ sub www_exportGenerate {
 
 =head2 www_manageAssets ( )
 
-
+Main page to manage assets. Renders an AdminConsole with a list of assets. If canEdit returns False, renders an insufficient privilege page.
 
 =cut
 
@@ -2794,7 +2804,7 @@ sub www_manageAssets {
 
 =head2 www_manageClipboard ( )
 
-
+Returns an AdminConsole to deal with assets in the Clipboard. If isInGroup(12) is False, renders an insufficient privilege page.
 
 =cut
 
@@ -2826,7 +2836,7 @@ sub www_manageClipboard {
 
 =head2 www_manageMetaData ( )
 
-
+Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, renders an insufficient privilege page.
 
 =cut
 
@@ -2849,7 +2859,7 @@ sub www_manageMetaData {
 
 =head2 www_manageTrash ( )
 
-
+Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is False, renders an insufficient privilege page.
 
 =cut
 
@@ -2882,7 +2892,7 @@ sub www_manageTrash {
 
 =head2 www_paste ( )
 
-
+Returns "". Pastes an asset. If canEdit is False, returns an insufficient privileges page.
 
 =cut
 
@@ -2897,7 +2907,7 @@ sub www_paste {
 
 =head2 www_pasteList ( )
 
-
+Returns a www_manageAssets() method. Pastes a selection of assets. If canEdit is False, returns an insufficient privileges page.
 
 =cut
 
@@ -2914,7 +2924,7 @@ sub www_pasteList {
 
 =head2 www_promote ( )
 
-
+Returns "". Promotes self. If canEdit is False, returns an insufficient privileges page.
 
 =cut
 
@@ -2930,7 +2940,7 @@ sub www_promote {
 
 =head2 www_setParent ( )
 
-
+Returns a www_manageAssets() method. Sets a new parent via the results of a form. If canEdit is False, returns an insufficient privileges page.
 
 =cut
 
@@ -2947,7 +2957,7 @@ sub www_setParent {
 
 =head2 www_setRank ( )
 
-
+Returns a www_manageAssets() method. Sets a new rank via the results of a form. If canEdit is False, returns an insufficient privileges page.
 
 =cut
 
@@ -2963,7 +2973,7 @@ sub www_setRank {
 
 =head2 www_view ( )
 
-
+Returns a fixed English message "No view has been implemented for this asset." If canView is False, returns WebGUI::Privilege::noAccess().
 
 =cut
 
