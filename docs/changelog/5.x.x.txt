@@ -5,6 +5,7 @@
    post.
  - Bugfix [ 847198 ] no final newline when data form errors display
  - Bugfix [ 699010 ] Need Approval option to Discussions like in USS
+ - Bugfix [ 847808 ] Signature not displayed in forum
 
 
 5.5.2

@@ -1832,6 +1832,7 @@ sub www_post {
 			name=>'subscribe',
 			value=>$defaultSubscribeValue
 			});
+		$message .= "\n\n".$session{user}{signature};
 	}
 	if ($var->{'newpost.isEdit'}) {
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
