@@ -21,7 +21,7 @@ use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon &moveUpIcon &moveDownIcon
-	&wobjectIcon &pageIcon &moveTopIcon &moveBottomIcon &viewIcon);
+	&moveRightIcon &moveLeftIcon &wobjectIcon &pageIcon &moveTopIcon &moveBottomIcon &viewIcon);
 
 =head1 NAME
 
@@ -41,6 +41,8 @@ A package for generating user interface buttons. The subroutines found herein do
  $html = helpIcon(1,"MyNamespace");
  $html = moveBottomIcon('op=something');
  $html = moveDownIcon('op=something');
+ $html = moveLeftIcon('op=something');
+ $html = moveRightIcon('op=something');
  $html = moveTopIcon('op=something');
  $html = moveUpIcon('op=something');
  $html = pageIcon();
@@ -246,6 +248,62 @@ sub moveDownIcon {
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/moveDown.gif" align="middle" border="0" alt="Move Down" title="Move Down" /></a>';
+        return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 moveLeftIcon ( urlParameters [, pageURL ] )
+
+Generates a button with a left arrow printed on it.
+
+=over
+
+=item urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=item pageURL
+
+The URL to any page. Defaults to the current page.
+
+=back
+
+=cut
+
+sub moveLeftIcon {
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/moveLeft.gif" align="middle" border="0" alt="Move Left" title="Move Left" /></a>';
+        return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 moveRightIcon ( urlParameters [, pageURL ] )
+
+Generates a button with a right arrow printed on it.
+
+=over
+
+=item urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=item pageURL
+
+The URL to any page. Defaults to the current page.
+
+=back
+
+=cut
+
+sub moveRightIcon {
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{page}{urlizedTitle};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/moveRight.gif" align="middle" border="0" alt="Move Right" title="Move Right" /></a>';
         return $output;
 }
 

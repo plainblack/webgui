@@ -23,8 +23,9 @@ use WebGUI::HTMLForm;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Template;
+use WebGUI::Persistent::Tree;
 
-
+our @ISA = qw(WebGUI::Persistent::Tree);
 
 =head1 NAME
 
@@ -50,10 +51,44 @@ These functions are available from this package:
 
 =cut
 
-
 #-------------------------------------------------------------------
+
 sub _newPositionFormat {
 	return "<tmpl_var page.position".($_[0]+1).">";
+}
+
+#-------------------------------------------------------------------
+
+sub classSettings {
+     return {
+          properties => {
+               pageId          => { key => 1 },
+               parentId        => { defaultValue => 0 },
+               title           => { quote => 1 },
+               styleId         => { defaultValue => 0 },
+               ownerId         => { defaultValue => 0 },
+               sequenceNumber  => { defaultValue => 1 },
+               metaTags        => { quote => 1 },
+               urlizedTitle    => { quote => 1 },
+               defaultMetaTags => { defaultValue => 0 },
+               menuTitle    => { quote => 1 },
+               synopsis     => { quote => 1 },
+               templateId   => { defaultValue => 1 },
+               startDate    => { defaultValue => 946710000 },
+               endDate      => { defaultValue => 2082783600 },
+               redirectURL  => { quote => 1 },
+               userDefined1 => { quote => 1 },
+               userDefined2 => { quote => 1 },
+               userDefined3 => { quote => 1 },
+               userDefined4 => { quote => 1 },
+               userDefined5 => { quote => 1 },
+               languageId   => { defaultValue => 1 },
+               groupIdView  => { defaultValue => 3 },
+               groupIdEdit  => { defaultValue => 3 },
+               hideFromNavigation => { defaultValue => 0 },
+          },
+          useDummyRoot => 1
+     }
 }
 
 #-------------------------------------------------------------------
@@ -201,6 +236,9 @@ sub makeUnique {
         return $url;
 }
 
+#-------------------------------------------------------------------
+
+sub table { 'page' }
 
 1;
 

@@ -20,6 +20,7 @@ eval " use Image::Magick; "; $hasImageMagick=0 if $@;
 use Exporter;
 use strict;
 use WebGUI::Collateral;
+use WebGUI::CollateralFolder;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -96,12 +97,12 @@ sub www_deleteCollateralFolder {
 sub www_deleteCollateralFolderConfirm {
         return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
 	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
-	my ($parent) = WebGUI::SQL->quickArray("select parentId from collateralFolder 
-		where collateralFolderId=".$session{scratch}{collateralFolderId});
-	WebGUI::SQL->write("update collateral set collateralFolderId=$parent 
-		where collateralFolderId=$session{scratch}{collateralFolderId}");
-        WebGUI::SQL->write("delete from collateralFolder where collateralFolderId=".$session{scratch}{collateralFolderId});
-	WebGUI::Session::setScratch("collateralFolderId",$parent);
+        my $folders = WebGUI::CollateralFolder->getTree({-minimumFields => 1});
+        if (my $deadFolder = $folders->{$session{scratch}{collateralFolderId}}) {
+          my $parentId = $deadFolder->get("parentId");
+          $deadFolder->recursiveDelete();
+          WebGUI::Session::setScratch("collateralFolderId",$parentId);
+        }
         return www_listCollateral();
 }
 

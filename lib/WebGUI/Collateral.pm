@@ -176,11 +176,64 @@ sub new {
 	} elsif ($collateralId > 0) {
 		$properties = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$collateralId);
 	}
-	my $self = WebGUI::Attachment->new($properties->{filename},"images",$properties->{collateralId});
-	$self->{_properties} = $properties;
-	bless $self, $class;
+        return $class->_new($properties);
 }
 
+#-------------------------------------------------------------------
+
+# Reuse this code for multiNew
+sub _new {
+     my ($class,$properties) = @_;
+     return undef unless $properties;
+     my $self = WebGUI::Attachment->new($properties->{filename},"images",$properties->{collateralId});
+     $self->{_properties} = $properties;
+     bless $self, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 multiDelete ( @collateraIds )
+
+Deletes the nodes and database entries for a list of collateral items.
+
+=cut
+
+sub multiDelete {
+     my ($class,@ids) = @_;
+     return undef unless @ids;
+
+     my @collateral = $class->multiNew(@ids);
+     foreach my $obj (@collateral) {
+          $obj->deleteNode();
+     }
+
+     my $clause = "collateralId in (".join(',',@ids).")";
+     WebGUI::SQL->write("delete from collateral where $clause");
+}
+
+#-------------------------------------------------------------------
+
+=head2 multiNew ( @collateralIds )
+
+Returns a list of WebGUI::Collateral objects.
+
+=cut
+
+sub multiNew {
+     my ($class,@collateralIds) = @_;
+     return () unless @collaterlIds;
+
+     my (@objs);
+
+     my $clause = "collateralId in (".join(',',@collateralIds).")";
+     my $sth = WebGUI::SQL->read("select * from collateral where $clause");
+
+     while (my $hash = $sth->hashRef()) {
+          push @objs,$class->_new($hash);
+     }
+
+     return @objs;
+}
 
 #-------------------------------------------------------------------
 

@@ -48,9 +48,10 @@ use HTML::CalendarMonthSimple ();
 #use HTML::TagFilter (); # commented because it is causing problems with attachments
 use Net::LDAP ();
 use Parse::PlainConfig ();
+#use Authen::Smb (); #uncomment when using this type of authentication.
 use Tie::CPHash ();
 use Tie::IxHash ();
-
+use Tree::DAG_Node ();
 
 #----------------------------------------
 # WebGUI modules.
@@ -60,6 +61,7 @@ use WebGUI::Attachment ();
 use WebGUI::Authentication ();
 use WebGUI::Cache ();
 use WebGUI::Collateral ();
+use WebGUI::CollateralFolder ();
 use WebGUI::DateTime ();
 #use WebGUI::Discussion (); # compile problems when this is included
 use WebGUI::ErrorHandler ();
@@ -76,6 +78,13 @@ use WebGUI::Mail ();
 use WebGUI::MessageLog ();
 use WebGUI::Navigation ();
 use WebGUI::Node ();
+use WebGUI::Persistent ();
+use WebGUI::Persistent::Query ();
+use WebGUI::Persistent::Tree ();
+use WebGUI::Persistent::Query::Delete ();
+use WebGUI::Persistent::Query::Insert ();
+use WebGUI::Persistent::Query::Select ();
+use WebGUI::Persistent::Query::Update ();
 use WebGUI::Operation ();
 use WebGUI::Operation::Account ();
 use WebGUI::Operation::Admin ();
