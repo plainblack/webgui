@@ -141,7 +141,6 @@ sub www_editContentSettings {
                 $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
                 $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
                 $f->select("richEditor",\%editor,WebGUI::International::get(496),[$session{setting}{richEditor}]);
-                $f->group("groupToManageImages",'Group To Manage Images',[$session{setting}{groupToManageImages}]);
                 $f->submit;
                 $output .= $f->print;
         } else {
