@@ -1,3 +1,7 @@
+6.5.5
+ - Fixed a bug in the collaboration system that caused replies to fail.
+
+
 6.5.4 
  - fix [ 1160953 ] JavaScript Errors in admin console - IE
  - Fixed a drag and drop problem.
@@ -22,6 +26,7 @@
  - fix [ 1167720 ] Folder::view() subfolder_loop - missing.. [mwilson]
  - fix [ 1169379 ] eventscalendar wobjects have wrong scope after upgrade
  - fix [ 1168812 ] navigation sometimes fails to use correct... [mwilson]
+
 
 6.5.3
  - Sorted templates into folders named after their respective namespaces

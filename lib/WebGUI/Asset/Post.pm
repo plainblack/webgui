@@ -826,7 +826,7 @@ sub www_deny {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
-	my %var = %{$self->getTemplateVars};
+	my %var;
 	my $content;
 	my $title;
 	if ($session{form}{func} eq "add") { # new post
@@ -988,6 +988,7 @@ sub www_edit {
 		name  => 'endDate',
 		value => $endDate
 		});
+	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }
 
