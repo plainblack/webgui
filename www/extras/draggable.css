@@ -1,0 +1,48 @@
+div.dragable:hover {
+	border: 1px dashed #aaaaaa;
+}
+.dragable{
+  	position: relative;
+	border: 1px dotted #cccccc; 
+}
+.dragTrigger{
+  position: absolute;
+  cursor: move;
+  right: 0px;
+  top: 0px;
+}
+.dragging{
+  position: relative;
+  cursor: hand;
+  z-index: 2000; 
+}
+.draggedOverTop{
+  position: relative;
+  border: 1px dotted #aaaaaa;
+  border-top: 8px #aaaaaa dotted;
+}
+.draggedOverBottom {
+  position: relative;
+  border: 1px dotted #aaaaaa;
+  border-bottom: 8px #aaaaaa dotted;
+}
+.hidden{
+  display: none;
+}
+.blank {
+  position: relative;
+  cursor: hand;
+  background-color: white;
+}
+.blankOver {
+  position: relative;
+  cursor: hand;
+  background-color: black;
+}
+.empty {
+  position: relative;
+  padding: 25px;
+  width: 50px;
+  height: 100px;
+}
+
