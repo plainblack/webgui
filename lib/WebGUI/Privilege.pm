@@ -242,7 +242,17 @@ sub isInGroup {
 	}
         ### Get data for auxillary checks.
 	tie %group, 'Tie::CPHash';
-	%group = WebGUI::SQL->quickHash("select karmaThreshold from groups where groupId='$gid'");
+	%group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter from groups where groupId='$gid'");
+	### Check IP Address
+	if ($group{ipFilter} ne "") {
+		my @ips = split(";",$group{ipFilter});
+		foreach my $ip (@ips) {
+			if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
+				$session{isInGroup}{$gid} = 1;
+				return 1;
+			}
+		}
+	}
         ### Check karma levels.
 	if ($session{setting}{useKarma}) {
 		tie %user, 'Tie::CPHash';

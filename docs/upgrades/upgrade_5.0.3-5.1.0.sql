@@ -15,5 +15,7 @@ delete from international where languageId=2 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (819,2,'WebGUI','kann selbst deaktivieren', 1043422108);
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=836;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (836,2,'WebGUI','Schnipsel sind Text-Elemente, die mehrfach auf Ihrer Seite genutzt werden k?nnen. Dinge wie Java-Scripts, Style Sheets, Flash Animationen oder einfach nur Slogans sind Beispiele hierf?r. Das beste daran ist, dass Sie ?nderungen, die zum Beispiel in einem Slogan oder Werbespruch durchgef?hrt werden m?ssen, an zentraler Stelle ?ndern k?nnen.<br><br>\r\n<b>Name</b><br>Vergeben Sie einen eindeutigen Namen, damit Sie das Schnipsel sp?ter schnell wiederfinden k?nnen.<br><br>\r\n<b>In welches Verzeichnis</b><br>In welchen Ordner m?chten Sie das Schnipsel speichern<br><br>\r\n<b>Schnipsel</b><br>Geben Sie hier den Text ein oder noch einfacher: kopieren Sie den ben?tigten Text oder auch JavaScript-Code ?ber die Zwischenablage ein.', 1043421646);
+alter table groups add column ipFilter varchar(255);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (857,1,'WebGUI','IP Address', 1043878310);
 
 

@@ -116,6 +116,11 @@ sub www_editGroup {
 	} else {
                	$f->hidden("karmaThreshold",$group{karmaThreshold});
 	}
+	$f->text(
+		-name=>"ipFilter",
+		-value=>$group{ipFilter},
+		-label=>WebGUI::International::get(857)
+		);
 	$f->submit;
 	$output .= $f->print;
         return _submenu($output);
@@ -132,7 +137,8 @@ sub www_editGroupSave {
 		description=".quote($session{form}{description}).", 
 		expireAfter='".WebGUI::DateTime::intervalToSeconds($session{form}{expireAfter_interval},
 		$session{form}{expireAfter_units})."',
-		karmaThreshold='$session{form}{karmaThreshold}'
+		karmaThreshold='$session{form}{karmaThreshold}',
+		ipFilter=".quote($session{form}{ipFilter})."
 		where groupId=".$session{form}{gid});
         return www_listGroups();
 }
