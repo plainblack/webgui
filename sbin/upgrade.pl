@@ -139,12 +139,13 @@ closedir(DIR);
 foreach $file (@files) {
 	if ($file =~ /upgrade_(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)\.(\w+)/) {
 		if (checkVersion($1)) {
+			$upgrade{$1}{dir} = $dir;
 			if ($3 eq "sql") {
 				print "\tFound upgrade script from $1 to $2.\n" unless ($quiet);
 				$upgrade{$1}{sql} = $dir.$file;
 			} elsif ($3 eq "pl") {
 				print "\tFound upgrade executable from $1 to $2.\n" unless ($quiet);
-				$upgrade{$1}{pl} = $dir.$file;
+				$upgrade{$1}{pl} = $file;
 			}
 			$upgrade{$1}{from} = $1;
 			$upgrade{$1}{to} = $2;
@@ -223,6 +224,13 @@ foreach $config (keys %config) {
 		} else {
                 	print "Failed!\n" unless ($quiet);
                 }
+		if ($upgrade{$upgrade}{pl} ne "") {
+			my $cmd = "cd ../docs/upgrades;perl ".$upgrade{$upgrade}{pl}." --configFile=".$config;
+			$cmd .= " --quiet" if ($quiet);
+			if (system($cmd)) {
+				print "\tProcessing upgrade executable failed!\n";
+			}
+		}
 		$config{$config}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
 	}
