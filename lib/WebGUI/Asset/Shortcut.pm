@@ -361,15 +361,15 @@ sub _drawQueryBuilder {
 	my %operator;
 	foreach (@textFields) {
 		$operator{$_} = {
-				"=" => WebGUI::International::get("is",$_[0]->get("namespace")),
-				"!=" => WebGUI::International::get("isnt",$_[0]->get("namespace"))
+				"=" => WebGUI::International::get("is","Shortcut"),
+				"!=" => WebGUI::International::get("isnt","Shortcut")
 			};
 	}
 	$operator{integer} = {
-				"=" => WebGUI::International::get("equal to",$_[0]->get("namespace")),
-                                "!=" => WebGUI::International::get("not equal to",$_[0]->get("namespace")),
-				"<" => WebGUI::International::get("less than",$_[0]->get("namespace")),
-				">" => WebGUI::International::get("greater than",$_[0]->get("namespace"))
+				"=" => WebGUI::International::get("equal to","Shortcut"),
+                                "!=" => WebGUI::International::get("not equal to","Shortcut"),
+				"<" => WebGUI::International::get("less than","Shortcut"),
+				">" => WebGUI::International::get("greater than","Shortcut")
 			};
 
 	# Get the fields and count them	
@@ -391,8 +391,8 @@ sub _drawQueryBuilder {
 	my $conjunctionField = WebGUI::Form::selectList({
 					name=>"conjunction",
 					options=>{
-						"AND" => WebGUI::International::get("AND",$_[0]->get("namespace")),
-						"OR" => WebGUI::International::get("OR",$_[0]->get("namespace"))},
+						"AND" => WebGUI::International::get("AND","Shortcut"),
+						"OR" => WebGUI::International::get("OR","Shortcut")},
 					value=>["OR"],
 					extras=>'class="qbselect"',
 				});
