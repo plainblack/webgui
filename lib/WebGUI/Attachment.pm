@@ -62,7 +62,7 @@ sub _createThumbnail {
         if (isIn($_[0]->getType, qw(jpg jpeg gif png tif tiff bmp))) {
 		$image = Image::Magick->new;
 		$error = $image->Read($_[0]->getPath);
-		WebGUI::ErrorHandler::warning($error) if $error;
+		WebGUI::ErrorHandler::warn($error) if $error;
 		($x, $y) = $image->Get('width','height');
 		$n = $_[1] || $session{setting}{thumbnailSize};
 		$r = $x>$y ? $x / $n : $y / $n;

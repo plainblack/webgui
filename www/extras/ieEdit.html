@@ -314,11 +314,21 @@ g_state.RestoreSelection()
 setFocus()
 return true
 }
+
+
+
 function _initEditor() {
 g_state = new _CState()
 window.onresize = _setSize
 var sz = ""
-sz += ""+ "<STYLE>"+	".DataBound{border:1 solid #999999;margin:1;font-family:Courier;background:#F1F1F1}\n"+	".textMode {border-top: 1px black solid;font: 10pt courier}\n.NOBORDER TD {border:1px gray solid}"+	"BODY {border: 1px white solid;border-top: none;}"+ "</STYLE>"+ "<BODY ONCONTEXTMENU=\"return false\">"+	"<DIV>"+window.opener.formObj.value+"</DIV>"+ "</BODY>"
+sz += ""+ "<STYLE>"+	".DataBound{border:1 solid #999999;margin:1;font-family:Courier;background:#F1F1F1}\n"+	".textMode {border-top: 1px black solid;font: 10pt courier}\n.NOBORDER TD {border:1px gray solid}"+	"BODY {border: 1px white solid;border-top: none;}"+ "</STYLE>"+ "<BODY ONCONTEXTMENU=\"return false\">";
+var txt = window.opener.formObj.value;
+if(txt.match(/^\s*<div/i) == null){
+   sz +="<DIV>"+txt+"</DIV>";
+}else{
+   sz += txt;
+}
+sz += "</BODY>"
 _CPopup_Init()
 idEditbox.document.designMode = "on"
 idEditbox.document.open("text/html","replace")
@@ -330,6 +340,13 @@ idEditbox.document.onmousedown = _Editor_ClickHandler
 idEditbox.document.ondblclick = _Editor_DblClickHandler
 setTimeout("_pageReady()",0)
 }
+
+
+
+
+
+
+
 function _Editor_MoveSelection(bDir) {
 var tr = idEditbox.document.body.createTextRange()
 tr.collapse(bDir)

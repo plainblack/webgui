@@ -113,10 +113,10 @@ sub www_addSave {
 			quote($session{form}{DSN}).", ".
 			quote($session{form}{username}).", ".
 			quote($session{form}{identifier}).", ".
-			quote($session{form}{convertCarriageReturns}).", ".
-			quote($session{form}{paginateAfter}).", ".
-			quote($session{form}{preprocessMacros}).", ".
-			quote($session{form}{debugMode}).
+			"'$session{form}{convertCarriageReturns}', ".
+			"'$session{form}{paginateAfter}', ".
+			"'$session{form}{preprocessMacros}', ".
+			"'$session{form}{debugMode}'".
 			")");
 		return "";
 	} else {
@@ -192,13 +192,13 @@ sub www_editSave {
 		update();
                 WebGUI::SQL->write("update SQLReport set template=".quote($session{form}{template}).
 			", dbQuery=".quote($session{form}{dbQuery}).
-			", convertCarriageReturns=".quote($session{form}{convertCarriageReturns}).
+			", convertCarriageReturns='$session{form}{convertCarriageReturns}'".
 			", DSN=".quote($session{form}{DSN}).
 			", username=".quote($session{form}{username}).
 			", identifier=".quote($session{form}{identifier}).
-			", paginateAfter=".quote($session{form}{paginateAfter}).
-			", preprocessMacros=".quote($session{form}{preprocessMacros}).
-			", debugMode=".quote($session{form}{debugMode}).
+			", paginateAfter='$session{form}{paginateAfter}'".
+			", preprocessMacros='$session{form}{preprocessMacros}'".
+			", debugMode='$session{form}{debugMode}'".
 			" where widgetId=$session{form}{wid}");
                 return "";
         } else {
@@ -209,7 +209,7 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_view {
 	my (@row, $i, $p, $ouch, %data, $output, $sth, $dbh, @result, 
-		@template, $temp, $col);
+		@template, $temp, $col, $errorMessage);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	if (%data) {
@@ -230,53 +230,57 @@ sub www_view {
 			WebGUI::ErrorHandler::warn("SQLReport [$_[0]] The DSN specified is of an improper format.");
         	}
 		if (defined $dbh) {
-			if ($data{dbQuery} =~ /select/i) {
+			if ($data{dbQuery} =~ /select/i || $data{dbQuery} =~ /show/i || $data{dbQuery} =~ /describe/i) {
 				$sth = WebGUI::SQL->unconditionalRead($data{dbQuery},$dbh);
-			} else {
-				$output .= WebGUI::International::get(10,$namespace).'<p>' if ($data{debugMode});
-				WebGUI::ErrorHandler::warn("SQLReport [$_[0]] The SQL query is improperly formatted.");
-			}
-			unless ($sth->array) {
-                                $output .= WebGUI::International::get(11,$namespace).'<p>' if ($data{debugMode});
-                                WebGUI::ErrorHandler::warn("There was a problem with the query.");
-			} else {
-				if ($data{template} ne "") {
-					@template = split(/\^\-\;/,$data{template});
+				unless ($sth->errorCode < 1) {
+					$errorMessage = $sth->errorMessage;
+                                	$output .= WebGUI::International::get(11,$namespace).' : '.
+						$errorMessage.'<p>' if ($data{debugMode});
+                                	WebGUI::ErrorHandler::warn("There was a problem with the query: ".
+						$errorMessage);
 				} else {
-					$i = 0;
-					$template[0] = '<table width="100%"><tr>';
-					$template[1] = '<tr>';
-					foreach $col ($sth->getColumnNames) {
-						$template[0] .= '<td class="tableHeader">'.$col.'</td>';
-						$template[1] .= '<td class="tableData">^'.$i.';</td>';
+					if ($data{template} ne "") {
+						@template = split(/\^\-\;/,$data{template});
+					} else {
+						$i = 0;
+						$template[0] = '<table width="100%"><tr>';
+						$template[1] = '<tr>';
+						foreach $col ($sth->getColumnNames) {
+							$template[0] .= '<td class="tableHeader">'.$col.'</td>';
+							$template[1] .= '<td class="tableData">^'.$i.';</td>';
+							$i++;
+						}
+						$template[0] .= '</tr>';
+						$template[1] .= '</tr>';
+						$template[2] = '</table>';
+						$i = 0;
+					}
+					$output .= $template[0];
+					while (@result = $sth->array) {
+						$temp = $template[1];
+						$temp =~ s/\^(\d*)\;/$result[$1]/g;
+						if ($data{convertCarriageReturns}) {
+							$temp =~ s/\n/\<br\>/g;
+						}
+						$row[$i] = $temp;	
 						$i++;
 					}
-					$template[0] .= '</tr>';
-					$template[1] .= '</tr>';
-					$template[2] = '</table>';
-					$i = 0;
-				}
-				$output .= $template[0];
-				while (@result = $sth->array) {
-					$temp = $template[1];
-					$temp =~ s/\^(\d*)\;/$result[$1]/g;
-					if ($data{convertCarriageReturns}) {
-						$temp =~ s/\n/\<br\>/g;
+                        		if ($sth->rows < 1) {
+	                			$output .= $template[2];
+        	                       		$output .= WebGUI::International::get(18,$namespace).'<p>';
+                	        	} else {
+                				$p = WebGUI::Paginator->new(WebGUI::URL::page(),
+							\@row,$data{paginateAfter});
+                				$output .= $p->getPage($session{form}{pn});
+    	        	    			$output .= $template[2];
+        	        			$output .= $p->getBar($session{form}{pn});
 					}
-					$row[$i] = $temp;	
-					$i++;
+					$sth->finish;
 				}
-                        	if ($sth->rows < 1) {
-	                		$output .= $template[2];
-        	                       	$output .= WebGUI::International::get(18,$namespace).'<p>';
-                	        } else {
-                			$p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$data{paginateAfter});
-                			$output .= $p->getPage($session{form}{pn});
-    	        	    		$output .= $template[2];
-        	        		$output .= $p->getBar($session{form}{pn});
-				}
-				$sth->finish;
-			}
+                        } else {
+                                $output .= WebGUI::International::get(10,$namespace).'<p>' if ($data{debugMode});
+                                WebGUI::ErrorHandler::warn("SQLReport [$_[0]] The SQL query is improperly formatted.");
+                        }
 			$dbh->disconnect();
 		} else {
 			$output .= WebGUI::International::get(12,$namespace).'<p>' if ($data{debugMode});

@@ -19,13 +19,16 @@ use WebGUI::Session;
 sub _replacement {
         my (@param, $temp);
         @param = WebGUI::Macro::getParams($1);
-        $temp = '<a class="homeLink" href="'.WebGUI::URL::gateway('home').'">';
-        if ($param[0] ne "") {
-		$temp .= $param[0];
-        } else {
-        	$temp .= WebGUI::International::get(47);
-        }
-        $temp .= '</a>';
+	$temp = WebGUI::URL::gateway('home');
+	if ($param[0] ne "linkonly") {
+        	$temp = '<a class="homeLink" href="'.$temp.'">';
+        	if ($param[0] ne "") {
+			$temp .= $param[0];
+        	} else {
+        		$temp .= WebGUI::International::get(47);
+        	}
+        	$temp .= '</a>';
+	}
 	return $temp;
 }
 

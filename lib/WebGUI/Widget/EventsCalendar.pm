@@ -30,6 +30,7 @@ use WebGUI::Widget;
 #-------------------------------------------------------------------
 sub _calendarLayout {
 	my ($thisMonth, $calendar, $message, $start, $end, $sth, %event, $nextDate); 
+	tie %event, 'Tie::CPHash';
         $thisMonth = epochToHuman($_[1],"%M %y");
         $calendar = new HTML::CalendarMonthSimple('year'=>epochToHuman($_[1],"%y"),'month'=>epochToHuman($_[1],"%M"));
         $calendar->width("100%");
@@ -391,7 +392,10 @@ sub www_view {
 		($minDate) = WebGUI::SQL->quickArray("select min(startDate) from EventsCalendar_event where widgetId=$_[0]");
 		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where widgetId=$_[0]");	
 		($junk, $maxDate) = WebGUI::DateTime::monthStartEnd($maxDate);
-		
+		unless ($minDate && $maxDate) {
+			$minDate = time();
+			$maxDate = time()+86400;
+		}
 		if ($data{calendarLayout} eq "calendar") {
 			$nextDate = $minDate;
 			while ($nextDate <= $maxDate) {

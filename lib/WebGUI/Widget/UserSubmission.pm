@@ -150,6 +150,7 @@ sub www_addSubmission {
 #-------------------------------------------------------------------
 sub www_addSubmissionSave {
         my ($title, $submissionId, $image, $attachment, %userSubmission);
+	tie %userSubmission, 'Tie::CPHash';
 	%userSubmission = getProperties($namespace,$session{form}{wid});
         if (WebGUI::Privilege::isInGroup($userSubmission{groupToContribute},$session{user}{userId})) {
                 $submissionId = getNextId("submissionId");
@@ -181,7 +182,9 @@ sub www_addSubmissionSave {
 
 #-------------------------------------------------------------------
 sub www_approveSubmission {
-	my (%userSubmission, %submission);
+	my (%submission, %userSubmission);
+	tie %submission, 'Tie::CPHash';
+	tie %userSubmission, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
 		%userSubmission = getProperties($namespace,$session{form}{wid});;
@@ -262,6 +265,8 @@ sub www_deleteSubmissionConfirm {
 #-------------------------------------------------------------------
 sub www_denySubmission {
 	my (%submission, %userSubmission);
+	tie %submission, 'Tie::CPHash';
+	tie %userSubmission, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
                 %userSubmission = getProperties($namespace,$session{form}{wid});
@@ -471,7 +476,7 @@ sub www_viewSubmission {
 	$output .= '</td</tr><tr><td class="tableData">';
   #---content
 	if ($submission{image} ne "") {
-		$file = WebGUI::Attachment->new($submission{filename},$session{form}{wid},$session{form}{sid});
+		$file = WebGUI::Attachment->new($submission{image},$session{form}{wid},$session{form}{sid});
 		$output .= '<img src="'.$file->getURL.'" hspace=3 align="right">';
 	}
 	if ($submission{convertCarriageReturns}) {

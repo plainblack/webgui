@@ -37,7 +37,7 @@ sub traversePageTree {
                 $depth .= "&nbsp;&nbsp;&nbsp;";
         }
 	if ($_[1] < $toLevel) {
-        	$sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber");
+        	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId from page where parentId='$_[0]' order by sequenceNumber");
         	while (@data = $sth->array) {
                 	if (WebGUI::Privilege::canViewPage($data[2])) {
                         	$output .= $depth.'<a class="verticalMenu" href="'.

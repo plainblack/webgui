@@ -20,13 +20,16 @@ use WebGUI::URL;
 sub _replacement {
 	my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
-        $temp = '<a class="myAccountLink" href="'.WebGUI::URL::page('op=displayAccount').'">';
-        if ($param[0] ne "") {
-        	$temp .= $param[0];
-        } else {
-                $temp .= WebGUI::International::get(46);
-        }
-        $temp .= '</a>';
+	$temp = WebGUI::URL::page('op=displayAccount');
+	if ($param[0] ne "linkonly") {
+        	$temp = '<a class="myAccountLink" href="'.$temp.'">';
+        	if ($param[0] ne "") {
+        		$temp .= $param[0];
+        	} else {
+                	$temp .= WebGUI::International::get(46);
+        	}
+        	$temp .= '</a>';
+	}
 	return $temp;
 }
 

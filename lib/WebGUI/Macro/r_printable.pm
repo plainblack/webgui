@@ -22,13 +22,15 @@ sub _replacement {
         my ($temp, @param);
         @param = WebGUI::Macro::getParams($_[0]);
         $temp = WebGUI::URL::append($session{env}{REQUEST_URI},'makePrintable=1');
-        $temp = '<a class="makePrintableLink" href="'.$temp.'">';
-        if ($param[0] ne "") {
-        	$temp .= $param[0];
-        } else {
-                $temp .= WebGUI::International::get(53);
-        }
-        $temp .= '</a>';
+	if ($param[0] ne "linkonly") {
+        	$temp = '<a class="makePrintableLink" href="'.$temp.'">';
+        	if ($param[0] ne "") {
+        		$temp .= $param[0];
+        	} else {
+                	$temp .= WebGUI::International::get(53);
+        	}
+        	$temp .= '</a>';
+	}
 	return $temp;
 }
 

@@ -123,7 +123,9 @@ sub getMessage {
 	my (%message);
         tie %message, 'Tie::CPHash';
         %message = WebGUI::SQL->quickHash("select * from discussion where messageId='$_[0]'");
-	$message{message} =~ s/\n/\<br\>/g;
+	unless ($message{message} =~ /\<div\>/ig || $message{message} =~ /\<br\>/ig || $message{message} =~ /\<p\>/ig) {
+		$message{message} =~ s/\n/\<br\>/g;
+	}
 	return %message;
 }
 

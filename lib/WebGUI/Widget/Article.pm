@@ -16,6 +16,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Attachment;
 use WebGUI::DateTime;
+use WebGUI::Discussion;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
@@ -24,6 +25,31 @@ use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Widget;
+
+#-------------------------------------------------------------------
+sub _showReplies {
+        my ($sth, @data, $html, %board);
+        tie %board, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        $html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
+        $html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td><td class="tableHeader">'.WebGUI::International::get(22,$namespace).'</td><td class="tableHeader">'.WebGUI::International::get(23,$namespace).'</td></tr>';
+        $sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion where widgetId=$session{form}{wid} and pid=0 order by messageId desc");
+        while (@data = $sth->array) {
+                $html .= '<tr';
+		if ($data[0] == $session{form}{mid}) {
+			$html .= ' class="highlight"';
+		}
+		$html .= '><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.
+                                $data[0].'&wid='.$session{form}{wid}).'">'.substr($data[1],0,30).
+                                '</a></td><td class="tableData"><a href="'.
+                                WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].
+                                '</a></td><td class="tableData">'.epochToHuman($data[3],"%M/%D %H:%n%p").
+                                '</td></tr>';
+                $html .= WebGUI::Discussion::traverseReplyTree($data[0],1);
+        }
+        $html .= '</table>';
+        return $html;
+}
 
 #-------------------------------------------------------------------
 sub duplicate {
@@ -40,12 +66,14 @@ sub duplicate {
 	WebGUI::SQL->write("insert into Article values ($newWidgetId, $data{startDate}, $data{endDate}, ".
 		quote($data{body}).", ".quote($data{image}).", ".quote($data{linkTitle}).", ".
 		quote($data{linkURL}).", ".quote($data{attachment}).", '$data{convertCarriageReturns}', ".
-		quote($data{alignImage}).")");
+		quote($data{alignImage}).", $data{allowDiscussion}, $data{groupToPost}, $data{groupToModerate}, $data{editTimeout})");
+	WebGUI::Discussion::duplicate($_[0],$newWidgetId);
 }
 
 #-------------------------------------------------------------------
 sub purge {
 	purgeWidget($_[0],$_[1],$namespace);
+	WebGUI::Discussion::purgeWidget($_[0],$_[1]);
 }
 
 #-------------------------------------------------------------------
@@ -85,6 +113,14 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("linkURL",20,2048));
                 $output .= tableFormRow(WebGUI::International::get(9,$namespace),WebGUI::Form::file("attachment"));
 		$output .= tableFormRow(WebGUI::International::get(10,$namespace),WebGUI::Form::checkbox("convertCarriageReturns",1).' <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
+                $output .= tableFormRow(WebGUI::International::get(18,$namespace),
+			WebGUI::Form::checkbox("allowDiscussion",1));
+                $output .= tableFormRow(WebGUI::International::get(19,$namespace),
+                        WebGUI::Form::groupList("groupToPost",2));
+                $output .= tableFormRow(WebGUI::International::get(20,$namespace),
+                        WebGUI::Form::groupList("groupToModerate",4));
+                $output .= tableFormRow(WebGUI::International::get(21,$namespace),
+			WebGUI::Form::text("editTimeout",20,3,1));
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
@@ -115,7 +151,12 @@ sub www_addSave {
 			quote($session{form}{linkURL}).", ".
 			quote($attachment->getFilename).
 			", '$session{form}{convertCarriageReturns}', ".
-			quote($session{form}{alignImage}).")");
+			quote($session{form}{alignImage}).", ".
+			"'$session{form}{allowDiscussion}', ".
+			"'$session{form}{groupToPost}', ".
+			"'$session{form}{groupToModerate}', ".
+			"'$session{form}{editTimeout}' ".
+			")");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -147,6 +188,36 @@ sub www_deleteImage {
         if (WebGUI::Privilege::canEditPage()) {
                 WebGUI::SQL->write("update Article set image='' where widgetId=$session{form}{wid}");
                 return www_edit();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_deleteMessage {
+        my (%board, %message);
+        tie %board, 'Tie::CPHash';
+        tie %message, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        %message = WebGUI::Discussion::getMessage($session{form}{mid});
+        if ((time()-$message{dateOfPost}) < 3600*$board{editTimeout} && $message{userId} eq $session{user}{userId} ||
+                WebGUI::Privilege::isInGroup($board{groupToModerate})) {
+                return WebGUI::Discussion::deleteMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_deleteMessageConfirm {
+        my (%board,%message);
+        tie %board, 'Tie::CPHash';
+        tie %message, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        %message = WebGUI::Discussion::getMessage($session{form}{mid});
+        if ((time()-$message{dateOfPost}) < 3600*$board{editTimeout} && $message{userId} eq $session{user}{userId} ||
+                WebGUI::Privilege::isInGroup($board{groupToModerate})) {
+                return WebGUI::Discussion::deleteMessageConfirm();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -211,6 +282,14 @@ sub www_edit {
 		$output .= tableFormRow(WebGUI::International::get(10,$namespace),
 			WebGUI::Form::checkbox("convertCarriageReturns",1,$data{convertCarriageReturns}).
 			' <span style="font-size: 8pt;">'.WebGUI::International::get(11,$namespace).'</span>');
+                $output .= tableFormRow(WebGUI::International::get(18,$namespace),
+                        WebGUI::Form::checkbox("allowDiscussion","1",$data{allowDiscussion}));
+                $output .= tableFormRow(WebGUI::International::get(19,$namespace),
+                        WebGUI::Form::groupList("groupToPost",$data{groupToPost}));
+                $output .= tableFormRow(WebGUI::International::get(20,$namespace),
+                        WebGUI::Form::groupList("groupToModerate",$data{groupToModerate}));
+                $output .= tableFormRow(WebGUI::International::get(22,$namespace),
+                        WebGUI::Form::text("editTimeout",20,2,$data{editTimeout}));
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
@@ -240,7 +319,10 @@ sub www_editSave {
 			"', convertCarriageReturns='$session{form}{convertCarriageReturns}', body=".
 			quote($session{form}{body}).", linkTitle=".
 			quote($session{form}{linkTitle}).", linkURL=".
-			quote($session{form}{linkURL}).$sqlAdd.
+			quote($session{form}{linkURL}).", allowDiscussion='$session{form}{allowDiscussion}',".
+			"groupToModerate='$session{form}{groupToModerate}', groupToPost='$session{form}{groupToPost}'".
+			", editTimeout='$session{form}{editTimeout}'".
+			$sqlAdd.
 			" where widgetId=$session{form}{wid}");
                 return "";
         } else {
@@ -249,8 +331,128 @@ sub www_editSave {
 }
 
 #-------------------------------------------------------------------
+sub www_editMessage {
+        my (%board,%message);
+        tie %board, 'Tie::CPHash';
+        tie %message, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        %message = WebGUI::Discussion::getMessage($session{form}{mid});
+        if ((time()-$message{dateOfPost}) < 3600*$board{editTimeout} && $message{userId} eq $session{user}{userId} ||
+                WebGUI::Privilege::isInGroup($board{groupToModerate})) {
+                return WebGUI::Discussion::editMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_editMessageSave {
+        my (%board,%message);
+        tie %board, 'Tie::CPHash';
+        tie %message, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        %message = WebGUI::Discussion::getMessage($session{form}{mid});
+        if ((time()-$message{dateOfPost}) < 3600*$board{editTimeout} && $message{userId} eq $session{user}{userId} ||
+                WebGUI::Privilege::isInGroup($board{groupToModerate})) {
+                WebGUI::Discussion::editMessageSave();
+                return www_showMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_postNewMessage {
+        my (%board);
+        tie %board, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
+                return WebGUI::Discussion::postNewMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_postNewMessageSave {
+        my (%board);
+        tie %board, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
+                return WebGUI::Discussion::postNewMessageSave();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_postReply {
+        my (%board);
+        tie %board, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
+                return WebGUI::Discussion::postReply();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_postReplySave {
+        my (%board);
+        tie %board, 'Tie::CPHash';
+        %board = getProperties($namespace,$session{form}{wid});
+        if (WebGUI::Privilege::isInGroup($board{groupToPost},$session{user}{userId})) {
+                WebGUI::Discussion::postReplySave();
+                return www_showMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_showMessage {
+        my (@data, $html, %board, %message, $defaultMid);
+        tie %message, 'Tie::CPHash';
+        tie %board, 'Tie::CPHash';
+	($defaultMid) = WebGUI::SQL->quickArray("select min(messageId) from discussion where widgetId=$session{form}{wid}");
+	$session{form}{mid} = $defaultMid if ($session{form}{mid} eq "");
+        %message = WebGUI::Discussion::getMessage($session{form}{mid});
+        %board = getProperties($namespace,$session{form}{wid});
+        if ($message{messageId}) {
+                $html .= '<h1>'.$message{subject}.'</h1>';
+                $html .= '<table width="100%" cellpadding=3 cellspacing=1 border=0><tr><td class="tableHeader">';
+                $html .= '<b>'.WebGUI::International::get(22,$namespace).'</b> <a href="'.
+                        WebGUI::URL::page('op=viewProfile&uid='.$message{userId}).'">'.$message{username}.'</a><br>';
+                $html .= "<b>".WebGUI::International::get(23,$namespace)."</b> ".
+                        epochToHuman($message{dateOfPost},"%w, %c %D, %y at %H:%n%p")."<br>";
+                $html .= '</td>';
+                $html .= '<td rowspan=2 valign="top" class="tableMenu" nowrap>';
+                $html .= '<a href="'.WebGUI::URL::page('func=postReply&mid='.$session{form}{mid}.
+                        '&wid='.$session{form}{wid})
+                        .'">'.WebGUI::International::get(24,$namespace).'</a><br>';
+                if ((time()-$message{dateOfPost}) < 3600*$board{editTimeout} &&
+                        $message{userId} eq $session{user}{userId} ||
+                        WebGUI::Privilege::isInGroup($board{groupToModerate})) {
+                        $html .= '<a href="'.WebGUI::URL::page('func=editMessage&mid='.$session{form}{mid}.
+                                '&wid='.$session{form}{wid}).'">'.WebGUI::International::get(25,$namespace).'</a><br>';
+                        $html .= '<a href="'.WebGUI::URL::page('func=deleteMessage&mid='.$session{form}{mid}.
+                                '&wid='.$session{form}{wid}).'">'.WebGUI::International::get(26,$namespace).'</a><br>';
+                }
+                $html .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(27,$namespace).'</a><br>';
+                $html .= '</tr><tr><td class="tableData">';
+                $html .= $message{message};
+                $html .= '</td></tr></table>';
+		$html .= _showReplies();
+        } else {
+                $html = WebGUI::International::get(402);
+        }
+        return $html;
+}
+
+#-------------------------------------------------------------------
 sub www_view {
-	my (%data, @test, $output, $image);
+	my (%data, @test, $output, $image, $replies);
 	tie %data, 'Tie::CPHash';
 	%data = getProperties($namespace,$_[0]);
 	if ($data{startDate}<time() && $data{endDate}>time()) {
@@ -281,8 +483,19 @@ sub www_view {
 			$output .= attachmentBox($data{attachment},$_[0]);
 		}
 	}
-	if ($data{processMacros} == 1) {
+	if ($data{processMacros}) {
 		$output = WebGUI::Macro::process($output);
+	}
+	if ($data{allowDiscussion}) {
+		($replies) = WebGUI::SQL->quickArray("select count(*) from discussion where widgetId=$_[0]");
+		$output .= '<p><table width="100%" cellspacing="2" cellpadding="1" border="0">';
+		$output .= '<tr><td align="center" width="50%" class="tableMenu"><a href="'.
+			WebGUI::URL::page('func=showMessage&wid='.$_[0]).'">'.
+			WebGUI::International::get(28,$namespace).' ('.$replies.')</a></td>';
+		$output .= '<td align="center" width="50%" class="tableMenu"><a href="'.
+                	WebGUI::URL::page('func=postNewMessage&wid='.$_[0]).'">'.
+                	WebGUI::International::get(24,$namespace).'</a></td></tr>';
+		$output .= '</table>';
 	}
 	return $output;
 }

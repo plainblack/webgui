@@ -31,20 +31,23 @@ sub _traversePageTree {
         } else {
                 $toLevel = 99;
         }
-        for ($i=1;$i<=$_[1]*$_[3];$i++) {
+        for ($i=1;$i<=($_[1]*$_[3]);$i++) {
                 $depth .= "&nbsp;";
         }
 	for ($i=1;$i<=$_[5];$i++) {
 		$lineSpacing .= "<br>";
 	}
         if ($_[1] < $toLevel) {
-                $sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber");
+                $sth = WebGUI::SQL->read("select urlizedTitle, title, pageId, synopsis from page where parentId='$_[0]' order by sequenceNumber");
                 while (@data = $sth->array) {
                         if (WebGUI::Privilege::canViewPage($data[2])) {
                                 $output .= $depth.$_[4].' <a href="'.WebGUI::URL::gateway($data[0])
 					.'">'.$data[1].'</a>';
+				if ($data[3] ne "" && $_[6]) {
+					$output .= ' - '.$data[3];
+				}
 				$output .= $lineSpacing;
-                                $output .= _traversePageTree($data[2],$_[1]+1,$_[2],$_[3],$_[4],$_[5]);
+                                $output .= _traversePageTree($data[2],($_[1]+1),$_[2],$_[3],$_[4],$_[5],$_[6]);
                         }
                 }
                 $sth->finish;
@@ -59,7 +62,7 @@ sub duplicate {
         %data = getProperties($namespace,$_[0]);
 	$pageId = $_[1] || $data{pageId};
         $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},$data{description},$data{processMacros},$data{templatePosition});
-	WebGUI::SQL->write("insert into SiteMap values ($newWidgetId, '$data{startAtThisLevel}', '$data{depth}', '$data{indent}', ".quote($data{bullet}).", '$data{lineSpacing}')");
+	WebGUI::SQL->write("insert into SiteMap values ($newWidgetId, '$data{startAtThisLevel}', '$data{depth}', '$data{indent}', ".quote($data{bullet}).", '$data{lineSpacing}', '$data{displaySynopsis}')");
 }
 
 #-------------------------------------------------------------------
@@ -87,13 +90,19 @@ sub www_add {
                 $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,1));
                 $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1));
 		%hash = WebGUI::Widget::getPositions();
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash));
                 $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",'',50,5,1));
-                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("startAtThisLevel",1,1));
+                $output .= tableFormRow(WebGUI::International::get(9,$namespace),
+			WebGUI::Form::checkbox("displaySynopsis",1,1));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),
+			WebGUI::Form::checkbox("startAtThisLevel",1,1));
                 $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("depth",20,2,0));
                 $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("indent",20,2,5));
-                $output .= tableFormRow(WebGUI::International::get(7,$namespace),WebGUI::Form::text("bullet",20,30,'&middot;'));
-                $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("lineSpacing",20,1,1));
+                $output .= tableFormRow(WebGUI::International::get(7,$namespace),
+			WebGUI::Form::text("bullet",20,30,'&middot;'));
+                $output .= tableFormRow(WebGUI::International::get(8,$namespace),
+			WebGUI::Form::text("lineSpacing",20,1,1));
                 $output .= formSave();
                 $output .= '</table></form>';
                 return $output;
@@ -108,7 +117,7 @@ sub www_addSave {
 	my ($widgetId, $displayTitle, $image, $attachment);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create($session{page}{pageId},$session{form}{widget},$session{form}{title},$session{form}{displayTitle},$session{form}{description},$session{form}{processMacros},$session{form}{templatePosition});
-		WebGUI::SQL->write("insert into SiteMap values ($widgetId, '$session{form}{startAtThisLevel}', '$session{form}{depth}', '$session{form}{indent}', ".quote($session{form}{bullet}).", '$session{form}{lineSpacing}')");
+		WebGUI::SQL->write("insert into SiteMap values ($widgetId, '$session{form}{startAtThisLevel}', '$session{form}{depth}', '$session{form}{indent}', ".quote($session{form}{bullet}).", '$session{form}{lineSpacing}', '$session{form}{displaySynopsis})");
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -138,18 +147,30 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= tableFormRow(WebGUI::International::get(99),WebGUI::Form::text("title",20,128,$data{title}));
-                $output .= tableFormRow(WebGUI::International::get(174),WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
-                $output .= tableFormRow(WebGUI::International::get(175),WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
+                $output .= tableFormRow(WebGUI::International::get(99),
+			WebGUI::Form::text("title",20,128,$data{title}));
+                $output .= tableFormRow(WebGUI::International::get(174),
+			WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}));
+                $output .= tableFormRow(WebGUI::International::get(175),
+			WebGUI::Form::checkbox("processMacros",1,$data{processMacros}));
 		%hash = WebGUI::Widget::getPositions();
                 $array[0] = $data{templatePosition};
-                $output .= tableFormRow(WebGUI::International::get(363),WebGUI::Form::selectList("templatePosition",\%hash,\@array));
-                $output .= tableFormRow(WebGUI::International::get(85),WebGUI::Form::textArea("description",$data{description},50,5,1));
-                $output .= tableFormRow(WebGUI::International::get(3,$namespace),WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}));
-                $output .= tableFormRow(WebGUI::International::get(4,$namespace),WebGUI::Form::text("depth",20,2,$data{depth}));
-                $output .= tableFormRow(WebGUI::International::get(6,$namespace),WebGUI::Form::text("indent",20,2,$data{indent}));
-                $output .= tableFormRow(WebGUI::International::get(7,$namespace),WebGUI::Form::text("bullet",20,30,$data{bullet}));
-                $output .= tableFormRow(WebGUI::International::get(8,$namespace),WebGUI::Form::text("lineSpacing",20,1,$data{lineSpacing}));
+                $output .= tableFormRow(WebGUI::International::get(363),
+			WebGUI::Form::selectList("templatePosition",\%hash,\@array));
+                $output .= tableFormRow(WebGUI::International::get(85),
+			WebGUI::Form::textArea("description",$data{description},50,5,1));
+                $output .= tableFormRow(WebGUI::International::get(9,$namespace),
+                        WebGUI::Form::checkbox("displaySynopsis",1,$data{displaySynopsis}));
+                $output .= tableFormRow(WebGUI::International::get(3,$namespace),
+			WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}));
+                $output .= tableFormRow(WebGUI::International::get(4,$namespace),
+			WebGUI::Form::text("depth",20,2,$data{depth}));
+                $output .= tableFormRow(WebGUI::International::get(6,$namespace),
+			WebGUI::Form::text("indent",20,2,$data{indent}));
+                $output .= tableFormRow(WebGUI::International::get(7,$namespace),
+			WebGUI::Form::text("bullet",20,30,$data{bullet}));
+                $output .= tableFormRow(WebGUI::International::get(8,$namespace),
+			WebGUI::Form::text("lineSpacing",20,1,$data{lineSpacing}));
 		$output .= formSave();
                 $output .= '</table></form>';
                 return $output;
@@ -184,7 +205,7 @@ sub www_view {
 		} else {
 			$parent = 1;
 		}
-		$output .= _traversePageTree($parent,0,$data{depth},$data{indent},$data{bullet},$data{lineSpacing});
+		$output .= _traversePageTree($parent,0,$data{depth},$data{indent},$data{bullet},$data{lineSpacing},$data{displaySynopsis});
 		if ($data{processMacros}) {
 			$output = WebGUI::Macro::process($output);
 		}

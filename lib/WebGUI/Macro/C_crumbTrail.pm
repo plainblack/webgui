@@ -21,13 +21,13 @@ use WebGUI::URL;
 sub _recurseCrumbTrail {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=$_[0]");
+        %data = WebGUI::SQL->quickHash("select pageId,parentId,menuTitle,urlizedTitle from page where pageId=$_[0]");
         if ($data{pageId} > 1) {
                 $output .= _recurseCrumbTrail($data{parentId},$_[1]);
         }
         if ($data{title} ne "") {
 		$output .= '<a class="crumbTrail" href="'.WebGUI::URL::gateway($data{urlizedTitle})
-			.'">'.$data{title}.'</a>'.$_[1];
+			.'">'.$data{menuTitle}.'</a>'.$_[1];
         }
         return $output;
 }

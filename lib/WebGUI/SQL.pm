@@ -144,6 +144,32 @@ sub buildHash {
 
 #-------------------------------------------------------------------
 
+=head2 errorCode {
+
+ Returns an error code for the current handler.
+
+=cut
+
+sub errorCode {
+        return $_[0]->{_sth}->err;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 errorMessage {
+
+ Returns a text error message for the current handler.
+
+=cut
+
+sub errorMessage {
+        return $_[0]->{_sth}->errstr;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 finish ( )
 
  Ends a query after calling the "new" or "read" methods.

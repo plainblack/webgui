@@ -30,7 +30,7 @@ sub _replacement {
         $temp = '<span class="horizontalMenu">';
         $first = 1;
         ($parentId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='$param[0]'");
-        $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber");
+        $sth = WebGUI::SQL->read("select menuTitle,urlizedTitle,pageId from page where parentId='$parentId' order by sequenceNumber");
         while (@data = $sth->array) {
         	if (WebGUI::Privilege::canViewPage($data[2])) {
                 	if ($first) {
