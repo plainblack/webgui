@@ -493,16 +493,16 @@ while (my $data = $sth->hashRef) {
 }
 $sth->finish;
 my $lastCollateralFolderId = 'nolastid';
-my ($parentId, $baseLineage, $rank);
+my ($parentId, $baseLineage);
 my $sth = WebGUI::SQL->read("select * from collateral order by collateralFolderId");
 while (my $data = $sth->hashRef) {
 	print "\t\tConverting collateral item ".$data->{collateralId}." for folder ".$data->{collateralFolderId}."\n" unless ($quiet);
 	unless ($lastCollateralFolderId eq $data->{collateralFolderId}) {
-		$rank = 1;
 		my $id = $data->{collateralFolderId};
 		$id = "0" unless (defined $id);
 		$baseLineage = $folderCache{$id}{lineage};
 		$parentId = $folderCache{$id}{id};
+		$lastCollateralFolderId = $id;
 	}
 	my $class;
 	my $collateralId = WebGUI::Id::generate();
@@ -531,11 +531,11 @@ while (my $data = $sth->hashRef) {
 	$macroCache{$data->{name}} = $macroCache{$data->{collateralId}} = $url;
 	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, 
 		url, ownerUserId, groupIdView, groupIdEdit, assetSize, lastUpdated) values (".
-		quote($collateralId).", ".quote($parentId).", ".quote($baseLineage.sprintf("%06d",$rank)).", 
+		quote($collateralId).", ".quote($parentId).", ".quote($baseLineage.sprintf("%06d",$collateralRankCounter)).", 
 		'".$class."','published',".quote($data->{name}).", ".
 		quote($data->{name}).", ".quote($url).", ".quote($data->{userId}).", 
 		'7', '4', ".quote($fileSize).",".quote($data->{dateUploaded}).")");
-	$rank++;
+	$collateralRankCounter++;
 }
 WebGUI::SQL->write("drop table collateralFolder");
 WebGUI::SQL->write("drop table collateral");
@@ -1071,7 +1071,7 @@ $sth->finish;
 WebGUI::SQL->write("alter table template drop primary key");
 WebGUI::SQL->write("alter table template drop column templateId");
 WebGUI::SQL->write("alter table template drop column name");
-WebGUI::SQL->write("delete from  where assetId is null or assetId = ''"); # protect ourselves from crap
+WebGUI::SQL->write("delete from template  where assetId is null or assetId = ''"); # protect ourselves from crap
 WebGUI::SQL->write("alter table template add primary key (assetId)");
 my @wobjectTypes = qw(Article Poll Survey WSClient DataForm Layout EventsCalendar Navigation HttpProxy IndexedSearch MessageBoard Product SQLReport SyndicatedContent Shortcut);
 my @allWobjectTypes = (@wobjectTypes,@otherWobjects);
