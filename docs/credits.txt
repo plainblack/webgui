@@ -12,7 +12,10 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Richard Clark
                                      Doug Collinge
                                      Flavio Curti
-                                     Frank Dillon
+                                     Jeff Depons / Web Den Interactive
+                                     Frank Dillon / Web Den Interactive
+                                     Junying Du / Web Den Interactive
+                                     Greg Fast / Web Den Interactive
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
                                      Koen de Jonge / ProcoliX
@@ -21,6 +24,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Tavis Parker / ParkerOne Consulting
                                      Daniel Quinlan
                                      Jeff Szpak / Plain Black LLC
+                                     Sean Tu / Web Den Interactive
 
 Contributing Translators.............Andreas Ljunggren
                                      Joeri de Bruin / ProcoliX
