@@ -276,7 +276,7 @@ sub www_editCollateralSave {
 			".quote($session{form}{collateralType}).")");
 	} elsif ($collateral->{thumbnailSize} != $thumbnailSize) {
 		$file = WebGUI::Attachment->new($collateral->{filename},"images", $session{form}{cid});
-		WebGUI::Attachment::_createThumbnail($file, $thumbnailSize);
+		$file->createThumbnail($thumbnailSize);
 	}
        	$file = WebGUI::Attachment->new("","images",$session{form}{cid});
        	$file->save("filename", $thumbnailSize);
