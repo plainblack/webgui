@@ -7,6 +7,35 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+5.2.0
+--------------------------------------------------------------------
+ * You'll need to add a section to the style sheet of each one of
+	your styles so that the new tabs system in WebGUI looks
+	the way it should. For most people the following should do
+	quite nicely:
+
+	.tab {
+  		border: 1px solid black;
+   		background-color: #eeeeee;
+	}
+	.tabBody {
+	   	border: 1px solid black;
+   		border-top: 1px solid black;
+   		border-left: 1px solid black;
+   		background-color: #dddddd; 
+	}
+	div.tabs {
+    		line-height: 15px;
+    		font-size: 14px;
+	}
+	.tabHover {
+   		background-color: #cccccc;
+	}
+	.tabActive { 
+   		background-color: #dddddd; 
+	}
+
+
 
 5.1.0
 --------------------------------------------------------------------

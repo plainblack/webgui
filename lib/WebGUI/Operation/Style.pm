@@ -84,7 +84,64 @@ sub www_editStyle {
 	tie %style, 'Tie::CPHash';
 	if ($session{form}{sid} eq "new") {
 		$style{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>";
-		$style{styleSheet} = "<style>\n\n</style>";
+		$style{styleSheet} = '
+<style>
+.content{
+  font-family: helvetica, arial;
+  font-size: 10pt;
+}
+.adminBar {
+  background-color: #dddddd;
+  font-family: helvetica, arial;
+}
+.tableMenu {
+  background-color: #dddddd;
+  font-size: 8pt;
+  font-family: Helvetica, Arial;
+}
+.tableMenu a {
+  text-decoration: none;
+}
+.tableHeader {
+  background-color: #dddddd;
+  font-size: 10pt;
+  font-family: Helvetica, Arial;
+}
+.tableData {
+  font-size: 10pt;
+  font-family: Helvetica, Arial;
+}
+.pollColor {
+  background-color: #cccccc;
+  border: thin solid #aaaaaa;
+}
+.pagination {
+  font-family: helvetica, arial;
+  font-size: 8pt;
+  text-align: center;
+}
+.tab {
+  border: 1px solid black;
+   background-color: #eeeeee;
+}
+.tabBody {
+   border: 1px solid black;
+   border-top: 1px solid black;
+   border-left: 1px solid black;
+   background-color: #dddddd; 
+}
+div.tabs {
+    line-height: 15px;
+    font-size: 14px;
+}
+.tabHover {
+   background-color: #cccccc;
+}
+.tabActive { 
+   background-color: #dddddd; 
+}
+</style>
+		';
 	} else {
                	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
 	}

@@ -219,14 +219,14 @@ sub www_editPage {
         	tie %tabs, 'Tie::IxHash';
 	        %tabs = (
         	        properties=>{
-                	        name=>WebGUI::International::get(103)
+                	        label=>WebGUI::International::get(103)
 	                        },
         	        style=>{
-                	        name=>WebGUI::International::get(105),
+                	        label=>WebGUI::International::get(105),
 	                        uiLevel=>5
         	                },
                 	privileges=>{
-                        	name=>WebGUI::International::get(107),
+                        	label=>WebGUI::International::get(107),
 	                        uiLevel=>6
         	                }
                 	);
