@@ -8,12 +8,14 @@ WebGUI Core..........................JT Smith / Plain Black Software
 
 Contributing Developers..............Peter Beardsley / Appropriate Solutions, Inc.
                                      Richard Caelius
+                                     Doug Collinge
                                      Flavio Curti
                                      Frank Dillon
                                      Koen de Jonge
                                      Christophe Marcant
 
-Translation..........................Joeri de Bruin
+Translation..........................Andreas Ljunggren
+                                     Joeri de Bruin
                                      Jose Caneira
                                      Mattias Kunkel / WERU AG
                                      Ricardo Markiewicz
