@@ -10,6 +10,7 @@ WebGUI Core..........................JT Smith / Plain Black
 Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Leendert Bottelberghs
                                      Richard Caelius / 100 World
+                                     Irving Carrion
                                      Richard Clark
                                      Doug Collinge
                                      Flavio Curti
@@ -21,13 +22,13 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Greg Fast / WDI
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
-                                     Irving Carrion
                                      Chris Jackson
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / ProcoliX
                                      Christian Kocourek
                                      John W. Krahn
                                      Len Kranendonk
+                                     Colin Kuskie
                                      Christophe Marcant
                                      Tony Mountifield
                                      Tavis Parker / ParkerOne Consulting

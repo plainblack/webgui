@@ -14,23 +14,25 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, $temp);
-        @param = WebGUI::Macro::getParams($_[0]);
-	$temp = WebGUI::URL::page('op=displayAccount');
-	if ($param[0] ne "linkonly") {
-        	$temp = '<a class="myAccountLink" href="'.$temp.'">';
-        	if ($param[0] ne "") {
-        		$temp .= $param[0];
-        	} else {
-                	$temp .= WebGUI::International::get(46);
-        	}
-        	$temp .= '</a>';
-	}
-	return $temp;
+       my %var;
+         my  @param = WebGUI::Macro::getParams($_[0]);
+       $var{'account.url'} = WebGUI::URL::page('op=displayAccount');
+         my $templateId = 1;  ##Set default template in the namespace
+       $var{'account.text'} = WebGUI::International::get(46);
+       if    (@param == 1) {
+               $var{'account.text'} = $param[0] if $param[0];
+        }
+       elsif (@param == 2) {
+               $var{'account.text'} = $param[0] if $param[0];
+		$templateId = WebGUI::Template::getIdByName($param[1],"Macro/a_account");
+               $templateId = 1 if $templateId == 0;
+       }
+         return WebGUI::Template::process($templateId,"Macro/a_account",\%var);
 }
 
 

@@ -15,22 +15,40 @@ use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-       my ($temp, @param, $turnOn, $turnOff);
-       if (WebGUI::Grouping::isInGroup(12)) {
-               @param = WebGUI::Macro::getParams($_[0]);
-               if ($session{var}{adminOn}) {
-                       $turnOff = $param[1] || WebGUI::International::get(517);
-                       $temp = '<a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.$turnOff.'</a>';
-               } else {
-                       $turnOn = $param[0] || WebGUI::International::get(516);
-                       $temp = '<a href="'.WebGUI::URL::page('op=switchOnAdmin').'">'.$turnOn.'</a>';
-               }
-       }
-       return $temp;
+         if (WebGUI::Grouping::isInGroup(12)) {
+        	my %var;
+                 my @param = WebGUI::Macro::getParams($_[0]);
+              my $templateId = 1;  ##Set default template in the namespace
+              ##1 param means use my template with default text
+              my ($turnOff, $turnOn) = (WebGUI::International::get(517),WebGUI::International::get(516));
+              if (@param == 1) {
+			$templateId = WebGUI::Template::getIdByName($param[0],"Macro/AdminToggle");
+              }
+              ##2 params means use my text with the default template
+              elsif (@param == 2) {
+                      ($turnOff, $turnOn) = @param;
+              }
+              ##3 or more params means use my text and template, other args ignored
+              elsif (@param >= 3) {
+                      ($turnOff, $turnOn) = @param[1,2];
+			$templateId = WebGUI::Template::getIdByName($param[0],"Macro/AdminToggle");
+              }
+                 if ($session{var}{adminOn}) {
+                      $var{'toggle.url'} = WebGUI::URL::page('op=switchOffAdmin');
+                      $var{'toggle.text'} = $turnOff;
+                 } else {
+                      $var{'toggle.url'} = WebGUI::URL::page('op=switchOnAdmin');
+                      $var{'toggle.text'} = $turnOn;
+                 }
+              $templateId = 1 if $templateId == 0;
+                return WebGUI::Template::process($templateId,"Macro/AdminToggle",\%var);
+	}
+       return "";
 }
 
 1;

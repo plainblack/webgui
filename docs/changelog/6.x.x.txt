@@ -66,7 +66,8 @@
    the master database. This will have no effect on single database users, but
    can add a tremendous amount of scalability on large WebGUI sites that use
    database replication.
-
+ - Templated the EditableToggle, a, and AdminToggle macros. Thanks to Colin
+   Kuskie.
 
 6.0.3
  - Fixed a recursive style change bug.

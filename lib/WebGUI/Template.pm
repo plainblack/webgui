@@ -38,6 +38,7 @@ This package contains utility methods for WebGUI's template system.
  use WebGUI::Template;
  $hashRef = WebGUI::Template::get($templateId, $namespace);
  $hashRef = WebGUI::Template::getList($namespace);
+ $templateId = WebGUI::Template::getIdByName($name,$namespace);
  $html = WebGUI::Template::process($templateId, $namespace, $vars);
  $templateId = WebGUI::Template::set(\%data);
 
@@ -132,6 +133,35 @@ sub getList {
 	my $namespace = $_[0] || "page";
 	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." and showInForms=1 order by name",WebGUI::SQL->getSlave);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 getIdByName ( name, namespace ) {
+
+Returns a template ID by looking up the name for it.
+
+=over
+
+=item name
+
+The name to look up.
+
+=item namespace
+
+The namespace to focus on when searching.
+
+=back
+
+=cut
+
+sub getIdByName {
+	my $name = shift;
+	my $namespace = shift;
+	my ($templateId) = WebGUI::SQL->quickArray("select templateId from template where namespace=".quote($namespace)." and name=".quote($name),WebGUI::SQL->getSlave);
+	return $templateId;
+}
+
 
 
 #-------------------------------------------------------------------
