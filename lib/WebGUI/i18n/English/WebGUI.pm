@@ -2127,16 +2127,16 @@ The the content on the current page.
 Tags that WebGUI automatically generates for you so that caching works the way it should, search engines can find you better, and other useful automated functionality. This should go in the &lt;head&gt; &lt;/head&gt; section of your style.
 
 <p>
-In addition to the above tags all of the session variables are made available to you just like any other template. We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
+We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
 <p>
 
 &lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
 
 <p>
-Following a guide like the above will help you get good ranking on search engines.
+That particular example will help you get good ranking on search engines.
 
 |,
-		lastUpdated => 1101775312,
+		lastUpdated => 1102702313,
 	},
 
 	'860' => {
@@ -2907,11 +2907,18 @@ http://www.mysite.com/thisPage#94
 	},
 
 	'826' => {
-		message => q|WebGUI has a powerful templating language built to give you maximum control over the layout of your content. The following is a list of the template language syntax.
+		message => q|WebGUI has a powerful templating language built to give you maximum control over the layout of your content.
 <p/><b>NOTES:</b><br/>
 Both the template language and template variables are case-insensitive.
 <p/>
-Please note that the words <i>foo</i> and <i>bar</i> are used below as placeholders for the actual variable names that you'll use. They are not part of the template language.
+<b>Session Variables</b><br/>
+In addition to any variables defined in a given template, of the session variables are made available to you with this syntax:
+<p>
+
+&lt;tmpl_var session.<i>section</i>.<i>variable</i>&gt;
+
+<p/>
+In the examples below, please note that the words <i>foo</i> and <i>bar</i> are used as placeholders for the actual variable names that you'll use. They are not part of the template language.
 
 <p/>
 <b>Variables</b><br/>
@@ -2979,7 +2986,7 @@ Loops come with special condition variables of their own. They are __FIRST__, __
 </pre>
 
 <p/>|,
-		lastUpdated =>1095829149 
+		lastUpdated =>1102704289,
 	},
 
 	'354' => {
