@@ -301,12 +301,13 @@ sub www_editUserGroupSave {
 
 #-------------------------------------------------------------------
 sub www_editUserProfile {
-        my ($output, $f, $a, %data, $method, $values, $category, $label, $default, $previousCategory);
+        my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         if (WebGUI::Privilege::isInGroup(3)) {
                 $output .= '<h1>'.WebGUI::International::get(455).'</h1>';
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editUserProfileSave");
                 $f->hidden("uid",$session{form}{uid});
+		%user = WebGUI::SQL->buildHash("select fieldName,fieldData from userProfileData where userId=$session{form}{uid}");
                 $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
                         where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
                         order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
@@ -331,7 +332,7 @@ sub www_editUserProfile {
                                 $f->select($data{fieldName},$values,$label,$default);
                         } else {
                                 $default = $session{form}{$data{fieldName}}
-                                        || $session{user}{$data{fieldName}}
+                                        || $user{$data{fieldName}}
                                         || eval $data{dataDefault};
                                 $f->$method($data{fieldName},$label,$default);
                         }
