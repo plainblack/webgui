@@ -94,9 +94,6 @@ sub new {
             fieldType     => 'text',
             defaultValue  => $session{'config'}{'soapproxy'},
          },
-         templateId       => {
-            defaultValue  => 1,
-         },
          uri              => {
             fieldType     => 'text',
             defaultValue  => $session{'config'}{'soapuri'}

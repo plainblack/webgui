@@ -95,6 +95,9 @@
  - Fixed a bug in the HTMLArea image manager that would not allow users to
    upload files if the gateway script was not at /index.pl
  - bugfix [1008283]. Add new user not working for secondary admin (Leendert Bottelberghs).
+ - bugfix [ 1014337 ] WSClient->new error: templateId field missing in
+   database
+ - bugfix [ 991782 ] More Fault Tolerent upgrade_5.9.9-6.0.0.pl
 
 
 
