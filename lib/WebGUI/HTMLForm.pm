@@ -487,6 +487,81 @@ sub contentType {
         }
         $self->{_data} .= $output;
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 date (  [name , value, label, afterEdit, extras, uiLevel ] )
+
+Adds a database link select list to the form.
+
+=over
+
+=item name
+
+The name of this form element.
+
+=item value
+
+The default value for this form element.
+
+=item label
+
+The left column label for this form row. Defaults to "Database Link".
+
+=item afterEdit
+
+A URL that will be acted upon after editing a database link. Typically there is a link next to the select list that reads "Edit this database link" and this is the URL to go to after editing is complete.
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "5".
+
+=back
+
+=cut
+
+sub databaseLink {
+        my ($output, $subtext);
+        my ($self, @p) = @_;
+        my ($name, $value, $label, $afterEdit, $extras, $uiLevel) = 
+		rearrange([qw(name value label afterEdit extras uiLevel)], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+		$label = $label || WebGUI::International::get(1075);
+		if (WebGUI::Privilege::isInGroup(3)) {
+			#disabled until we can resolve the "new" wobject problem
+        		#if ($afterEdit) {
+                	#	$subtext = '<a href="'.WebGUI::URL::page("op=editDatabaseLink&lid=".$value
+			#		."&afterEdit="
+                        #		.WebGUI::URL::escape($afterEdit)).'">'.WebGUI::International::get(0).'</a> / ';
+        		#}
+        		$subtext .= '<a href="'.WebGUI::URL::page("op=listDatabaseLinks").'">'
+				.WebGUI::International::get(981).'</a>';
+		}
+        	$output = WebGUI::Form::databaseLink({
+                	"name"=>$name,
+                	"value"=>$value,
+                	"extras"=>$extras
+                	});
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+                        "name"=>$name,
+                        "value"=>$value
+                        });
+        }
+        $self->{_data} .= $output;
+}
+
+
+
 #-------------------------------------------------------------------
 
 =head2 date ( name [ label, value, extras, subtext, size, noDate, uiLevel ] )

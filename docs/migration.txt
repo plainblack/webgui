@@ -67,4 +67,8 @@ WebGUI::Form::dateTime() and WebGUI::HTMLForm->dateTime() no longer have
 because there is only one field to represent both the date and the time,
 unlike before.
 
+5.2 Database Links
+
+The database links API was changed in 6.0. The getHash function was removed and
+replaced with a getList function that returns a hash reference.
 

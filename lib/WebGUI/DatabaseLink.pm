@@ -17,6 +17,7 @@ package WebGUI::DatabaseLink;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -31,7 +32,7 @@ This package contains utility methods for WebGUI's database link system.
 =head1 SYNOPSIS
 
  use WebGUI::DatabaseLink;
- %links = WebGUI::DatabaseLink::getHash();
+ $hashRef = WebGUI::DatabaseLink::getList();
  %databaseLink = WebGUI::DatabaseLink::get($databaseLinkId);
  %using = WebGUI::Databaselink::whatIsUsing($databaseLinkId);
  
@@ -46,15 +47,17 @@ These subroutines are available from this package:
 =cut
 
 #-------------------------------------------------------------------
-=head2 getHash ( )
+=head2 getList ( )
 
-Returns a hash containing all database links.  The format is:
+Returns a hash reference  containing all database links.  The format is:
 	databaseLinkId => title
 
 =cut
 
-sub getHash {
-		return WebGUI::SQL->buildHash("select databaseLinkId, title from databaseLink order by title");
+sub getList {
+	my $list = WebGUI::SQL->buildHashRef("select databaseLinkId, title from databaseLink order by title");
+	$list->{'0'} = WebGUI::International::get(1076);
+	return $list;
 }
 
 #-------------------------------------------------------------------
@@ -127,7 +130,7 @@ sub disconnect {
 	$class = shift;
 	$value = shift;
 	if (defined $class->{_dbh}) {
-		$class->{_dbh}->disconnect() unless ($class->{_databaseLink}{DSN} eq $session{config}{dsn});
+		$class->{_dbh}->disconnect() unless ($class->{_databaseLink}{databaseLinkId} == 0);
 	}
 }
 
@@ -151,7 +154,7 @@ sub dbh {
 	$dsn = $class->{_databaseLink}{DSN};
 	$username = $class->{_databaseLink}{username};
 	$identifier = $class->{_databaseLink}{identifier};
-	if ($dsn eq $session{config}{dsn}) {
+	if ($class->{databaseLinkId} == 0) {
 		$class->{_dbh} = $session{dbh};
 		return $session{dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
@@ -191,7 +194,17 @@ sub new {
     $class = shift;
 	$databaseLinkId = shift;
 	unless ($databaseLinkId eq "") {
-		%databaseLink = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId='$databaseLinkId'");
+		if ($databaseLinkId == 0) {
+			%databaseLink = (
+				databaseLinkId=>0,
+				DSN=>$session{config}{dsn},
+				username=>$session{config}{dbuser},
+				identifier=>$session{config}{dpass},
+				title=>"WebGUI Database"
+				);
+		} else {
+			%databaseLink = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId='$databaseLinkId'");
+		}
 	}
 	bless {_databaseLinkId => $databaseLinkId, _databaseLink => \%databaseLink }, $class;
 }

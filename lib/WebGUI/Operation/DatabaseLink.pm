@@ -126,6 +126,8 @@ sub www_listDatabaseLinks {
         $output = helpIcon(68);
 	$output .= '<h1>'.WebGUI::International::get(996).'</h1>';
         $sth = WebGUI::SQL->read("select * from databaseLink order by title");
+	$row[$i] = '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';
+	$i++;
         while (%data = $sth->hash) {
                 $row[$i] = '<tr><td valign="top" class="tableData">'
 			.deleteIcon('op=deleteDatabaseLink&dlid='.$data{databaseLinkId})

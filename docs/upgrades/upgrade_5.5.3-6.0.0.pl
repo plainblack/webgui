@@ -324,6 +324,98 @@ WebGUI::SQL->write("delete from incrementer where incrementerId='LinkList_linkId
 
 
 #--------------------------------------------
+print "\tUpdating SQL Reports.\n" unless ($quiet);
+my %dblink;
+$dblink{$session{config}{dsn}} = (
+		id=>0,
+		user=>$session{config}{dbuser}
+		);
+my $sth = WebGUI::SQL->read("select DSN, databaseLinkId, username, identifier, wobjectId from SQLReport");
+while (my $data = $sth->hashRef) {
+	my $id = undef;
+	next if ($data->{databaseLinkId} > 0);
+	foreach my $dsn (keys %dblink) {
+		if ($dsn eq $data->{dsn} && $dblink{$dsn}{user} eq $data->{username}) {
+			$id = $dblink{$dsn}{id};
+			last;
+		}
+	}
+	unless (defined $id) {
+		$id = getNextId("databaseLinkId");
+		my $title = $data->{username}.'@'.$data->{DSN};
+		WebGUI::SQL->write("insert into databaseLink (databaseLinkId, title, DSN, username, identifier) values ($id, ".quote($title).",
+			".quote($data->{DSN}).", ".quote($data->{username}).", ".quote($data->{identifier}).")");
+		$dblink{$data->{DSN}} = (
+				id=>$id,
+				user=>$data->{username}
+				);
+	}
+	WebGUI::SQL->write("update SQLReport set databaseLinkId=".$id." where wobjectId=".$data->{wobjectId});
+}
+$sth->finish;
+WebGUI::SQL->write("alter table SQLReport drop column DSN");
+WebGUI::SQL->write("alter table SQLReport drop column username");
+WebGUI::SQL->write("alter table SQLReport drop column identifier");
+use WebGUI::DatabaseLink;
+my $templateId;
+my $a = WebGUI::SQL->read("select a.databaseLinkId, a.dbQuery, a.template, a.wobjectId, b.title from SQLReport a
+	left join wobject b on a.wobjectId=b.wobjectId");
+while (my $data = $a->hashRef) {
+	my $db = WebGUI::DatabaseLink->new($data->{databaseLinkId});
+	if ($data->{template} ne "") {
+                ($templateId) = WebGUI::SQL->quickArray("select max(templateId) from template where namespace='SQLReport'");
+		if ($templateId > 999) {
+			$templateId++;
+		} else {
+			$templateId = 1000;
+		}
+		my $b = WebGUI::SQL->unconditionalRead($data->{dbQuery},$db->dbh);
+		my @template = split(/\^\-\;/,$data->{template});
+		my $final = '<tmpl_if displayTitle>
+    			<h1><tmpl_var title></h1>
+			</tmpl_if>
+
+			<tmpl_if description>
+			    <tmpl_var description><p />
+			</tmpl_if>
+
+			<tmpl_if debugMode>
+				<ul>
+				<tmpl_loop debug_loop>
+					<li><tmpl_var debug.output></li>
+				</tmpl_loop>
+				</ul>
+			</tmpl_if>
+			'.$template[0].'
+			<tmpl_loop rows_loop>	';
+		my $i;
+		foreach my $col ($b->getColumnNames) {
+			my $replacement = '<tmpl_var row.field.'.$col.'.value>';
+			$template[1] =~ s/\^$i\;/$replacement/g;
+			$i++;
+		}
+		$template[1] =~ s/\^rownum\;/\<tmpl_var row\.number\>/g;
+		$final .= $template[1].'
+			</tmpl_loop>
+			'.$template[2].'
+			<tmpl_if multiplePages>
+  			<div class="pagination">
+    				<tmpl_var previousPage>   <tmpl_var pageList>  <tmpl_var nextPage>
+  			</div>
+			</tmpl_if>';
+		WebGUI::SQL->write("insert into template (templateId, name, template, namespace) values ($templateId, 
+			".quote($data->{title}).",".quote($final).",'SQLReport')");
+	} else {
+		$templateId = 1;
+	}
+	WebGUI::SQL->write("insert into wobject set templateId=$templateId where wobjectId=".$data->{wobjectId});
+}
+$a->finish;
+WebGUI::SQL->write("alter table SQLReport drop column template");
+
+
+
+#--------------------------------------------
 print "\tUpdating config file.\n" unless ($quiet);
 my $pathToConfig = '../../etc/'.$configFile;
 my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig);

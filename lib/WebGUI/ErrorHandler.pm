@@ -250,7 +250,7 @@ Returns an HTML formatted message with the audit messages for display during deb
 
 sub showAudit {
 	my $audit = getAudit();
-	$audit =~  s/\n/\<br\>/g;
+	$audit =~  s/\n/\<br\>\n/g;
 	return '<div style="background-color: #ffffdd;color: #000000;">'.$audit.'</div>';
 }
 
@@ -281,7 +281,7 @@ Returns an HTML formatted message with the security messages for display during 
 
 sub showSecurity {
 	my $security = getSecurity();
-	$security =~  s/\n/\<br\>/g;
+	$security =~  s/\n/\<br\>\n/g;
 	return '<div style="background-color: #800000;color: #ffffff;">'.$security.'</div>';
 }
 
@@ -296,7 +296,7 @@ Returns an HTML formatted list of the session variables for display during debug
 
 sub showSessionVars {
 	my $data = getSessionVars();
-	$data =~ s/\n/\<br\>/g;
+	$data =~ s/\n/\<br\>\n/g;
 	return '<div style="background-color: #ffffff; color: #000000; font-size: 10pt; font-family: helvetica;">'.$data.'</div>';
 }
 
@@ -311,7 +311,7 @@ Returns an HTML formatted message for displaying the stack trace during debug op
 
 sub showStackTrace {
 	my $st = getStackTrace();
-	$st =~ s/\n/\<br\>/g;
+	$st =~ s/\n/\<br\>\n/g;
 	return $st;
 }
 
@@ -326,7 +326,7 @@ Returns HTML formatted warnings for display during debug operations.
 
 sub showWarnings {
 	my $warning = getWarnings();
-	$warning =~  s/\n/\<br\>/g;
+	$warning =~  s/\n/\<br\>\n/g;
 	return '<div style="background-color: #ffdddd;color: #000000;">'.$warning.'</div>';
 }
 

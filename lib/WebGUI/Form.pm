@@ -39,6 +39,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
  $html = WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
  $html = WebGUI::Form::contentType({name=>"contentType");
+ $html = WebGUI::Form::databaseLink();
  $html = WebGUI::Form::date({name=>"endDate", value=>$endDate});
  $html = WebGUI::Form::dateTime({name=>"begin", value=>$begin});
  $html = WebGUI::Form::email({name=>"emailAddress"});
@@ -319,6 +320,43 @@ sub contentType {
 		extras=>$_[0]->{extras}
 		});
 }
+
+
+#-------------------------------------------------------------------
+                                                                                                                                                             
+=head2 databaseLink ( hashRef )
+                                                                                                                                                             
+Returns a select list of database links.
+                                                                                                                                                             
+=over
+                                                                                                                                                             
+=item name
+                                                                                                                                                             
+The name field for this form element. Defaults to "databaseLinkId".
+                                                                                                                                                             
+=item value
+                                                                                                                                                             
+The unique identifier for the selected template. Defaults to "0", which is the WebGUI database.
+                                                                                                                                                             
+=back
+                                                                                                                                                             
+=cut
+                                                                                                                                                             
+sub databaseLink {
+        my $value = $_[0]->{value} || 1;
+        my $name = $_[0]->{name} || "databaseLinkId";
+        return selectList({
+                name=>$name,
+                options=>WebGUI::DatabaseLink::getList(),
+                value=>[$value]
+                });
+}
+                                                                                                                                                             
+
+
+
+
+
 #-------------------------------------------------------------------
 
 =head2 date ( hashRef )

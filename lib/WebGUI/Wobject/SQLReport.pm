@@ -46,13 +46,6 @@ sub new {
 			databaseLinkId=>{
 				defaultValue=>0
 			},
-			DSN=>{
-				defaultValue=>$session{config}{dsn}
-				},
-			username=>{
-				defaultValue=>$session{config}{dbuser}
-				},
-			identifier=>{},
 			convertCarriageReturns=>{
 				defaultValue=>0
 				}, 
@@ -100,34 +93,8 @@ sub www_edit {
 		-label=>WebGUI::International::get(3,$_[0]->get("namespace")),
 		-value=>$_[0]->getValue("template")
 		);
-	my %databaseLinkOptions;
-	tie %databaseLinkOptions, 'Tie::IxHash',
-		"0"=>WebGUI::International::get(19,$_[0]->get("namespace")),
-		WebGUI::DatabaseLink::getHash();		
-	$privileges->selectList(
-		-name=>"databaseLinkId",
-		-options=>\%databaseLinkOptions,
-		-label=>WebGUI::International::get(20,$_[0]->get("namespace")),
-		-value=>[$_[0]->getValue("databaseLinkId")],
-		-subtext=>(WebGUI::Privilege::isInGroup(3)) ? '<a href="'.WebGUI::URL::page("op=listDatabaseLinks").'">'.WebGUI::International::get(981).'</a>' : ""
-		);		
-	$privileges->readOnly(
-		-value=>WebGUI::International::get(21,$_[0]->get("namespace")),
-		);
-	$privileges->text(
-		-name=>"DSN",
-		-label=>WebGUI::International::get(5,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("DSN")
-		);
-	$privileges->text(
-		-name=>"username",
-		-label=>WebGUI::International::get(6,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("username")
-		);
-	$privileges->password(
-		-name=>"identifier",
-		-label=>WebGUI::International::get(7,$_[0]->get("namespace")),
-		-value=>$_[0]->getValue("identifier")
+	$privileges->databaseLink(
+		-value=>$_[0]->getValue("databaseLinkId")
 		);
 	$layout->integer(
 		-name=>"paginateAfter",
@@ -151,105 +118,85 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my ($dsn, $username, $identifier, $dbLink, $query, @row, $i, $rownum, $p, $ouch, $output, $sth, $dbh, @result, @template, $temp, $col, $errorMessage, $url);
+	my ($query, %var, @debug);
 	if ($_[0]->get("preprocessMacros")) {
 		$query = WebGUI::Macro::process($_[0]->get("dbQuery"));
 	} else {
 		$query = $_[0]->get("dbQuery");
 	}
-	$dsn = $_[0]->get("DSN");
-	$username = $_[0]->get("username");
-	$identifier = $_[0]->get("identifier");	
-	$output = $_[0]->displayTitle;
-        $output .= $_[0]->description;
-	$output .= WebGUI::International::get(17,$_[0]->get("namespace"))." ".$query."<p>" if ($_[0]->get("debugMode"));
-	
-	# connect to external database if used
-	if ($_[0]->get("databaseLinkId")) {
-		$dbLink = WebGUI::DatabaseLink->new($_[0]->get("databaseLinkId"));
-		$dbh = $dbLink->dbh;
-	} else {
-		if ($dsn eq $session{config}{dsn}) {
-			$dbh = $session{dbh};
-		} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
-			eval{$dbh = DBI->connect($dsn,$username,$identifier)};
-			if ($@) {
-				WebGUI::ErrorHandler::warn("SQL Report [".$_[0]->get("wobjectId")."] ".$@);
-				undef $dbh;
-			}
-		} else {
-			$output .= WebGUI::International::get(9,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
-			WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The DSN specified is of an improper format.");
-		}
-	}
+	push(@debug,{'debug.output'=>WebGUI::International::get(17,$_[0]->get("namespace")).$query});
+	my $dbLink = WebGUI::DatabaseLink->new($_[0]->get("databaseLinkId"));
+	my $dbh = $dbLink->dbh;
 	if (defined $dbh) {
 		if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
-			$sth = WebGUI::SQL->unconditionalRead($query,$dbh);
-			unless ($sth->errorCode < 1) {
-				$errorMessage = $sth->errorMessage;
-                               	$output .= WebGUI::International::get(11,$_[0]->get("namespace")).' : '.$errorMessage.'<p>' if ($_[0]->get("debugMode"));
-                               	WebGUI::ErrorHandler::warn("There was a problem with the query: ".$errorMessage);
+			my $url = WebGUI::URL::page('&wid='.$_[0]->get("wobjectId").'&func=view');
+			foreach (keys %{$session{form}}) {
+				unless ($_ eq "pn" || $_ eq "wid" || $_ eq "func") {
+					$url = WebGUI::URL::append($url, WebGUI::URL::escape($_)
+						.'='.WebGUI::URL::escape($session{form}{$_}));
+				}
+			}
+			my $p = WebGUI::Paginator->new($url,[],$_[0]->get("paginateAfter"));
+			my $error = $p->setDataByQuery($query,$dbh,1);
+			if ($error ne "") {
+                               	WebGUI::ErrorHandler::warn("There was a problem with the query: ".$error);
+				push(@debug,{'debug.output'=>WebGUI::International::get(11,$_[0]->get("namespace"))." ".$error});
 			} else {
-				if ($_[0]->get("template") ne "") {
-					@template = split(/\^\-\;/,$_[0]->get("template"));
-				} else {
-					$i = 0;
-					$template[0] = '<table width="100%"><tr>';
-					$template[1] = '<tr>';
-					foreach $col ($sth->getColumnNames) {
-						$template[0] .= '<td class="tableHeader">'.$col.'</td>';
-						$template[1] .= '<td class="tableData">^'.$i.';</td>';
-						$i++;
-					}
-					$template[0] .= '</tr>';
-					$template[1] .= '</tr>';
-					$template[2] = '</table>';
-					$i = 0;
-				}
-				$output .= $template[0];
-				while (@result = $sth->array) {
-					$temp = $template[1];
-					$temp =~ s/\^(\d*)\;/$result[$1]/g;	# Shouldn't this be \d+ ?
-					$rownum = $i + 1;
-					$temp =~ s/\^rownum\;/$rownum/g;
-					if ($_[0]->get("convertCarriageReturns")) {
-						$temp =~ s/\n/\<br\>/g;
-					}
-					$row[$i] = $temp;	
-					$i++;
-				}
-                       		if ($sth->rows < 1) {
-	               			$output .= $template[2];
-                               		$output .= WebGUI::International::get(18,$_[0]->get("namespace")).'<p>';
-               	        	} else {
-					$url = WebGUI::URL::page('&wid='.$_[0]->get("wobjectId").'&func=view');
-					foreach (keys %{$session{form}}) {
-						unless ($_ eq "pn" || $_ eq "wid" || $_ eq "func") {
-							$url = WebGUI::URL::append($url, WebGUI::URL::escape($_)
-								.'='.WebGUI::URL::escape($session{form}{$_}));
+				my $first = 1;
+				my @columns;
+				my @rows;
+				my $rownum = 1;
+				my $rowdata = $p->getPageData;
+				foreach my $data (@$rowdata) {
+					my %row;
+					my $colnum = 1;
+					my @fields;
+					foreach my $name (keys %{$data}) {
+						if ($first) {
+							push(@columns,{
+								'column.number'=>$colnum,
+								'column.name'=>$name
+								});	
 						}
+						push(@fields,{
+							'field.number'=>$colnum,
+							'field.name'=>$name,
+							'field.value'=>$data->{$name}
+							});
+						$colnum++;
+						$row{'row.field.'.$name.'.value'} = $data->{$name};
 					}
-               				$p = WebGUI::Paginator->new($url,\@row,$_[0]->get("paginateAfter"));
-               				$output .= $p->getPage($session{form}{pn});
-    	       	    			$output .= $template[2];
-                			$output .= $p->getBar($session{form}{pn});
+					$row{'row.number'} = $rownum;
+                                        $row{'row.field_loop'} = \@fields;
+					push(@rows,\%row);
+					$first = 0;
+					$rownum++;
 				}
-				$sth->finish;
+				$var{columns_loop} = \@columns;
+				$var{rows_loop} = \@rows;
+				$var{'rows.count'} = $p->getRowCount;
+				$var{'rows.count.isZero'} = ($p->getRowCount < 1);
+				$var{'rows.count.isZero.label'} = WebGUI::International::get(18,$_[0]->get("namespace"));
+				$var{firstPage} = $p->getFirstPageLink;
+        			$var{lastPage} = $p->getLastPageLink;
+        			$var{nextPage} = $p->getNextPageLink;
+        			$var{pageList} = $p->getPageLinks;
+        			$var{previousPage} = $p->getPreviousPageLink;
+        			$var{multiplePages} = ($p->getNumberOfPages > 1);
+        			$var{numberOfPages} = $p->getNumberOfPages;
+        			$var{pageNumber} = $p->getPageNumber;
 			}
                	} else {
-               		$output .= WebGUI::International::get(10,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
+			push(@debug,{'debug.output'=>WebGUI::International::get(10,$_[0]->get("namespace"))});
                         WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] The SQL query is improperly formatted.");
                 }
-		if ($dbLink) {
-			$dbLink->disconnect;
-		} else {
-			$dbh->disconnect() unless ($dsn eq $session{config}{dsn});
-		}
+		$dbLink->disconnect;
 	} else {
-		$output .= WebGUI::International::get(12,$_[0]->get("namespace")).'<p>' if ($_[0]->get("debugMode"));
+		push(@debug,{'debug.output'=>WebGUI::International::get(12,$_[0]->get("namespace"))});
 		WebGUI::ErrorHandler::warn("SQLReport [".$_[0]->get("wobjectId")."] Could not connect to database.");
 	}	
-	return $output;
+	$var{'debug_loop'} = \@debug;
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 

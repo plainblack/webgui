@@ -46,6 +46,7 @@ Package that paginates rows of arbitrary data for display on the web.
  $integer = $p->getPageNumber;
  $html = $p->getPageLinks;
  $html = $p->getPreviousPageLink;
+ $integer = $p->getRowCount;
 
 =head1 METHODS
 
@@ -421,6 +422,19 @@ sub getPreviousPageLink {
 
 #-------------------------------------------------------------------
 
+=head2 getRowCount ( )
+
+Returns a count of the total number of rows in the paginator.
+
+=cut
+
+sub getRowCount {
+	return $_[0]->{_totalRows};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( currentURL, rowArrayRef [, paginateAfter, pageNumber, formVar ] )
 
 Constructor.
@@ -459,12 +473,13 @@ sub new {
 	$rowsPerPage = $_[3] || 25;
 	$formVar = $_[5] || "pn";
 	$pn = $_[4] || $session{form}{$formVar} || 1;
-        bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef, _formVar => $formVar, _pn => $pn}, $class;
+	my $totalRows = $#{$rowRef};
+        bless {_url => $currentURL, _rpp => $rowsPerPage, _totalRows=>$totalRows , _rowRef => $rowRef, _formVar => $formVar, _pn => $pn}, $class;
 }
 
 #-------------------------------------------------------------------
 
-=head2 setDataByQuery ( query [, dbh ] )
+=head2 setDataByQuery ( query [, dbh, unconditional ] )
 
 Retrieves a data set from a database and replaces whatever data set was passed in through the constructor.
 
@@ -480,17 +495,27 @@ An SQL query that will retrieve a data set.
 
 A DBI-style database handler. Defaults to the WebGUI site handler.
 
+=item unconditional
+
+A boolean indicating that the query should be read unconditionally. Defaults to "0". If set to "1" and the unconditional read results in an error, the error will be returned by this method.
+
 =back
 
 =cut
 
 sub setDataByQuery {
-	my ($sth, $pageCount, $rowCount, $dbh, $sql, $self, @row, $data);
-	($self, $sql, $dbh) = @_;
+	my ($sth, $rowCount, @row);
+	my ($self, $sql, $dbh, $unconditional) = @_;
 	$dbh ||= $session{dbh};
-	$sth = WebGUI::SQL->read($sql);
-	$pageCount = 1;
-	while ($data = $sth->hashRef) {
+	if ($unconditional) {
+		$sth = WebGUI::SQL->unconditionalRead($sql,$dbh);
+		return $sth->errorMessage if ($sth->errorCode > 0);
+	} else {
+		$sth = WebGUI::SQL->read($sql,$dbh);
+	}
+	$self->{_totalRows} = $sth->rows;
+	my $pageCount = 1;
+	while (my $data = $sth->hashRef) {
 		$rowCount++;
 		if ($rowCount/$self->{_rpp} > $pageCount) {	
 			$pageCount++;
@@ -503,6 +528,7 @@ sub setDataByQuery {
 	}
 	$sth->finish;
 	$self->{_rowRef} = \@row;
+	return "";
 }
 
 1;
