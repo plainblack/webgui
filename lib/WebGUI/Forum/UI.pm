@@ -1657,7 +1657,7 @@ A hash reference containing information passed from the calling object.
 sub www_deletePostConfirm {
 	my ($caller) = @_;
 	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	return WebGUI::Privilege::insufficient() unless ($post->canEdit);
 	$post->setStatusDeleted;
        	return www_viewForum($caller,$post->getThread->get("forumId"));
 }

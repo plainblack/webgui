@@ -22,6 +22,8 @@
  - bugfix [ 887447 ] editing messages
  - Bugfix [ 893203 ] IO::Zlib not getting installed
  - Bugfix [ 893556 ] TabForm bug: uiLevels not working
+ - Bugfix [ 894855 ] users cannot delete from message board
+
 
 
 5.5.4
