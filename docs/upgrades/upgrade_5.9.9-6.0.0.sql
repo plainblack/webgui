@@ -681,4 +681,5 @@ INSERT INTO help VALUES (80,'WebGUI',1087,1088,'58,WebGUI;81,WebGUI;79,WebGUI;')
 INSERT INTO help VALUES (81,'WebGUI',1089,1090,'58,WebGUI;79,WebGUI;80,WebGUI;50,WebGUI;');
 INSERT INTO template VALUES (8,'Synopsis','<div class=\"synopsis\">\r\n<tmpl_loop page_loop>\r\n   <div class=\"synopsis_title\">\r\n      <a href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   </div>\r\n   <tmpl_if page.indent>\r\n      <div class=\"synopsis_sub\">\r\n         <tmpl_var page.synopsis>\r\n      </div>\r\n   <tmpl_else>\r\n      <div class=\"synopsis_summary\">\r\n         <tmpl_var page.synopsis>\r\n      </div>\r\n   </tmpl_if>\r\n</tmpl_loop>\r\n</div>','Navigation',1,1);
 INSERT INTO Navigation VALUES (18,'Synopsis',99,'self_and_descendants','current',-1,8,0,0,0,0);
+alter table forum add column groupToView int not null default 7;
 

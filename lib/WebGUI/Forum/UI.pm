@@ -917,6 +917,12 @@ sub forumProperties {
 			);
         }
         $f->group(
+                -name=>"groupToView",
+                -label=>WebGUI::International::get(872),
+                -value=>[$forum->get("groupToView")],
+                -uiLevel=>5
+                );
+        $f->group(
                 -name=>"groupToPost",
                 -label=>WebGUI::International::get(564),
                 -value=>[$forum->get("groupToPost")],
@@ -962,6 +968,7 @@ sub forumPropertiesSave {
 		filterPosts=>$session{form}{filterPosts},
 		postsPerPage=>$session{form}{postsPerPage},
 		karmaPerPost=>$session{form}{karmaPerPost},
+		groupToView=>$session{form}{groupToView},
 		groupToPost=>$session{form}{groupToPost},
 		moderatePosts=>$session{form}{moderatePosts},
 		groupToModerate=>$session{form}{groupToModerate}
@@ -2270,6 +2277,7 @@ sub www_viewForum {
 	WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
 	$forumId = $session{form}{forumId} unless ($forumId);
 	my $forum = WebGUI::Forum->new($forumId);
+	return WebGUI::Privilege::insufficient() unless ($forum->canView);
 	my $var = getForumTemplateVars($caller, $forum);
 	return WebGUI::Template::process(WebGUI::Template::get($forum->get("forumTemplateId"),"Forum"), $var); 
 }	
@@ -2299,6 +2307,7 @@ sub www_viewThread {
 	WebGUI::Session::setScratch("forumThreadLayout",$session{form}{layout});
 	$postId = $session{form}{forumPostId} unless ($postId);
         my $post = WebGUI::Forum::Post->new($postId);
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->canView);
 	my $var = getThreadTemplateVars($caller, $post);
 	if ($post->get("forumPostId") == $post->getThread->get("rootPostId") && !$post->canView) {
 		return www_viewForum($caller, $post->getThread->getForum->get("forumId"));

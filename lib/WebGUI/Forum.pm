@@ -37,6 +37,7 @@ Data management class for forums.
  $forum = WebGUI::Forum->new($forumId);
 
  $boolean = $forum->canPost;
+ $boolean = $forum->canView;
  $scalar = $forum->get($param);
  $obj = $forum->getThread($threadId);
  $boolean = $forum->isModerator;
@@ -79,7 +80,29 @@ Defaults to $session{user}{userId}. Specify a user ID to check privileges for.
 sub canPost {
         my ($self, $userId) = @_;
         $userId = $session{user}{userId} unless ($userId);
-        return WebGUI::Privilege::isInGroup($self->get("groupToPost"));
+        return (WebGUI::Privilege::isInGroup($self->get("groupToPost"),$userId) || $self->isModerator);
+}
+
+#-------------------------------------------------------------------
+
+=head2 canView ( [ userId ] )
+
+Returns a boolean whether the user has the privileges required to view the forum.
+
+=over
+
+=item userId
+
+Defaults to $session{user}{userId}. Specify a user ID to check privileges for.
+
+=back
+
+=cut
+
+sub canView {
+        my ($self, $userId) = @_;
+        $userId = $session{user}{userId} unless ($userId);
+        return (WebGUI::Privilege::isInGroup($self->get("groupToView"),$userId) || $self->canPost);
 }
 
 #-------------------------------------------------------------------

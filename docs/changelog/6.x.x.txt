@@ -93,5 +93,5 @@ webgui.
    the distribution. If you need those old upgrades you can still get them 
    from previous distributions or th 5.5 branch in CVS.
  - Added Job Listing templates to the USS.
-
+ - Added a view privileges setting to each forum.
 

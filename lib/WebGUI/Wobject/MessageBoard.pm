@@ -248,6 +248,7 @@ sub www_view {
 			}
 		} else {
 			my $forum = WebGUI::Forum->new($forumMeta->{forumId});
+			next unless ($forum->canView);
 			if ($count == 1) {
 				$var{'default.listing'} = WebGUI::Forum::UI::www_viewForum({
 					callback=>$callback,
