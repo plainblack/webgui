@@ -17,6 +17,7 @@ use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::FormProcessor;
 use WebGUI::Grouping;
+use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -206,7 +207,7 @@ sub www_editProfileSave {
     
 	$u = WebGUI::User->new($session{user}{userId});
     foreach $fieldName (keys %{$profile}) {
-       $u->profileField($fieldName,${$profile}{$fieldName});
+       $u->profileField($fieldName,WebGUI::HTML::filter(${$profile}{$fieldName},"javascript"));
 	}
 	return WebGUI::Operation::Auth::www_displayAccount();
 }

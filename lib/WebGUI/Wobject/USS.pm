@@ -61,6 +61,13 @@ sub _xml_encode {
 }
 
 #-------------------------------------------------------------------
+sub deleteAllCachedSubmissions {
+       my $self = shift;
+       my $cache = WebGUI::Cache->new("USS_submission_");
+       $cache->deleteByRegex(qr/USS_submission_/);
+}
+
+#-------------------------------------------------------------------
 sub deleteCachedSubmission {
 	my $self = shift;
 	my $submissionId = shift;
@@ -436,6 +443,12 @@ sub www_edit {
 		);
 }
 
+#-------------------------------------------------------------------
+sub www_editSave {
+        $_[0]->deleteAllCachedSubmissions;
+        $_[0]->SUPER::www_editSave()
+}
+                                                                                                                                                       
 
 #-------------------------------------------------------------------
 sub www_editSubmission {
@@ -709,6 +722,7 @@ sub www_editSubmissionSave {
 sub www_moveSubmissionDown {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("USS_submission","USS_submissionId",$session{form}{sid}, "USS_id", $_[0]->get("USS_id"));
+	$_[0]->deleteAllCachedSubmissions;
         return "";
 }
                                                                                                                                                              
@@ -716,6 +730,7 @@ sub www_moveSubmissionDown {
 sub www_moveSubmissionUp {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("USS_submission","USS_submissionId",$session{form}{sid}, "USS_id", $_[0]->get("USS_id"));
+	$_[0]->deleteAllCachedSubmissions;
         return "";
 }
 

@@ -1,5 +1,12 @@
 6.3.0
  - Added a new, more user-friendly administrative console.
+ - SQL Report now supports multiple queries. (Thanks to Brunswick New
+   Technologies for funding this development.)
+ - Removed the old rich editors and replaced them with Tiny MCE.
+ - Integrated Tiny MCE with image chooser. (Thanks to the US Dept. of State
+   for funding portions of this development.)
+ - Added a new page link chooser to the rich editor. (Thanks to the US Dept.
+   of State for funding portions of this development.)
  - Removed the admin style settings since their use has been replaced by the
    admin console.
  - bugfix [ 1045114 ] Columns randomly ordered in SQLReport (Len Kranendonk ,
@@ -22,6 +29,8 @@
  - bugfix [ 1022287 ] WYSIWYG-Editor Add new web link
  - bugfix [ 1055153 ] Turn Admin ON with SSL and IE.
  - Fixed a redirect loop problem.
+ - Fixed a user profile vulnerability.
+ - Fixed a sequence ordering problem with the USS.
 
 
 6.2.8
