@@ -16,8 +16,10 @@ package WebGUI::Grouping;
 
 use strict;
 use WebGUI::DateTime;
+use WebGUI::ErrorHandler;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -74,7 +76,8 @@ sub addGroupsToGroups {
 		foreach my $toGid (@{$_[1]}) {
 			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupGroupings 
 				where groupId=$gid and inGroup=$toGid");
-			unless ($isIn) {
+			my $recursive = isIn($toGid, @{getGroupsInGroup($gid,1)});
+			unless ($isIn || $recursive) {
 				WebGUI::SQL->write("insert into groupGroupings (groupId,inGroup) values ($gid,$toGid)");
 			}
 		}
@@ -256,9 +259,14 @@ A boolean value to determine whether the method should return the groups directl
 sub getGroupsInGroup {
        	my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$_[0]");
 	if ($_[1]) {
+		my $loopCount = $_[2]++ || 1;
+		if ($loopCount > 99) {
+			WebGUI::ErrorHandler::fatalError("Endless recursive loop detected while determinating".
+				" groups in group.\nRequested groupId: ".$_[0]."\nGroups in that group: ".join(",",@$groups));
+		}
 		my @groupsOfGroups = @$groups;
 		foreach my $group (@$groups) {
-			my $gog = getGroupsInGroup($group,1);
+			my $gog = getGroupsInGroup($group,1,$loopCount);
 			push(@groupsOfGroups, @$gog);
 		}
 		return \@groupsOfGroups;
