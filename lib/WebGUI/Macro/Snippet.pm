@@ -21,7 +21,7 @@ sub process {
 	my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
 	($temp) = WebGUI::SQL->quickArray("select parameters from collateral where name=".quote($param[0]));
-	return WebGUI::Macro::process($temp);
+	return $temp;
 }
 
 
