@@ -187,23 +187,45 @@ if (eval { require Date::Calc }) {
         }
 }
 
-print "Cache::FileCache module (optional*) ...... ";
-if (eval { require Cache::FileCache }) {
+print "Cache::Cache module ...................... ";
+if (eval { require Cache::Cache }) {
         print "OK\n";
 } else {
-        print "Not installed. Caching not possible.\n";
+	if ($< == 0 && $os eq "Linuxish") {
+                print "Attempting to install...\n";
+                CPAN::Shell->install("Cache::Cache");
+        } else {
+                print "Please install.\n";
+		$prereq = 0;
+        }
 }
 
-print <<STOP;
+print "SOAP::Lite module ........................ ";
+if (eval { require SOAP::Lite }) {
+        print "OK\n";
+} else {
+	if ($< == 0 && $os eq "Linuxish") {
+                print "Attempting to install...\n";
+                CPAN::Shell->install("SOAP::Lite");
+        } else {
+                print "Please install.\n";
+		$prereq = 0;
+        }
+}
 
-* Please note that Cache::FileCache is not
-  optional in all environments (such as Mac 
-  OS X). Also note, that Cache::FileCache
-  is not available for Windows style
-  environments due to limitations on those
-  systems.
+print "Data::Serializer module .................. ";
+if (eval { require Data::Serializer }) {
+        print "OK\n";
+} else {
+	if ($< == 0 && $os eq "Linuxish") {
+                print "Attempting to install...\n";
+                CPAN::Shell->install("Data::Serializer");
+        } else {
+                print "Please install.\n";
+		$prereq = 0;
+        }
+}
 
-STOP
 
 print "Image::Magick module (optional) .......... ";
 if (eval { require Image::Magick }) {

@@ -12,6 +12,11 @@ extrasPath = /data/WebGUI/www/extras
 uploadsURL = /uploads
 uploadsPath = /data/WebGUI/www/uploads
 
+useSharedInternationalCache = 1
+
+emailRecoveryLoggingEnabled = 1
+passwordChangeLoggingEnabled = 1
+
 authMethods = LDAP, WebGUI
 
 wobjects = Article, EventsCalendar, FileManager, HttpProxy, \

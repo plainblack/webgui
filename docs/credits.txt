@@ -82,8 +82,6 @@ Convert::ASN1........................Graham Barr
 
 Data::Config.........................Sébastien Aperghis-Tramoni
 
-HTML::CalendarMonthSimple............Gregor Mosheh
-
 HTML::TagFilter......................William Ross
 
 HTML::Template.......................Sam Tregar

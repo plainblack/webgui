@@ -77,8 +77,9 @@ webgui.
    to allow templates to be hidden from forms and/or management.
  - Added dTree menu to the navigation system 
    (Thanks to Geir Landro, http://www.destroydrop.com)
- - Added Cool Menus to the navigation system. (Thanks to Thomas Bratili,
+ - Added Cool Menus to the navigation system. (Thanks to Thomas Brattli,
    http://www.dhtmlcentral.com)
+ - Added a config file option for per-site International message caching.
 
 
 

@@ -500,6 +500,7 @@ push(@newWobjects,"WSClient");
 $conf->set("wobjects"=>\@newWobjects);
 $conf->set("emailRecoveryLoggingEnabled"=>1);
 $conf->set("passwordChangeLoggingEnabled"=>1);
+$conf->set("useSharedInternationalCache"=>1);
 $conf->write;
 
 

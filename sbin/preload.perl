@@ -17,7 +17,7 @@ use Apache::Registry (); # Uncomment this for use with mod_perl 1.0
 #----------------------------------------
 # System controlled Perl modules.
 #----------------------------------------
-eval "use Cache::FileCache ();"; # eval, may not be installed
+use Cache::FileCache ();
 use CGI (); CGI->compile(':all');
 use CGI::Carp ();
 use CGI::Util ();
@@ -29,6 +29,8 @@ use FileHandle ();
 use Net::SMTP ();
 use POSIX ();
 use URI::Escape ();
+use Data::Serializer ();
+use SOAP::Lite ();
 
 
 #----------------------------------------

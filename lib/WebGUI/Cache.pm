@@ -15,9 +15,7 @@ package WebGUI::Cache;
 =cut
 
 
-#Test to see if Cache::FileCache will load.
-my $hasCache=1;
-eval " use Cache::FileCache; "; $hasCache=0 if $@;
+use Cache::FileCache;
 
 use HTTP::Headers;
 use HTTP::Request;
@@ -32,7 +30,7 @@ Package WebGUI::Cache
 
 =head1 DESCRIPTION
 
-This package provides a means for WebGUI to cache data to the filesystem. Caching is only enabled, however, if Cache::Filecache is installed on the system.
+This package provides a means for WebGUI to cache data to the filesystem. 
 
 =head1 SYNOPSIS
 
@@ -45,11 +43,6 @@ These methods are available from this class:
 =cut
 
 
-#-------------------------------------------------------------------
-sub _canCache {
-	return ($hasCache);
-}
-
 
 
 #-------------------------------------------------------------------
@@ -61,11 +54,7 @@ Remove content from the filesystem cache.
 =cut
 
 sub delete {
-        if (_canCache()) {
-                $_[0]->{_cache}->remove($_[0]->{_key});
-        } else {
-                $_[0]->{_cache} = "";
-        }
+	$_[0]->{_cache}->remove($_[0]->{_key});
 }
 
 
@@ -86,16 +75,12 @@ A regular expression that will match keys in the current namespace. Example: m/^
 =cut
 
 sub deleteByRegex {
-        if (_canCache()) {
 		my @keys = $_[0]->{_cache}->get_keys();
 		foreach my $key (@keys) {
 			if ($key =~ $_[1]) {
                 		$_[0]->{_cache}->remove($key);
 			}
 		}
-        } else {
-                $_[0]->{_cache} = "";
-        }
 }
 
 #-------------------------------------------------------------------
@@ -107,11 +92,7 @@ Retrieve content from the filesystem cache.
 =cut
 
 sub get {
-        if (_canCache()) {
                 return $_[0]->{_cache}->get($_[0]->{_key});
-        } else {
-                return $_[0]->{_cache};
-        }
 }
 
 #-------------------------------------------------------------------
@@ -124,12 +105,8 @@ Retrieves an datastructure from the filesystem cache.
 
 sub getDataStructure {
 	my ($serializer);
-        if (_canCache()) {
 		$serializer = Data::Serializer->new(serializer	=> 'Storable');
                 return $serializer->deserialize($_[0]->{_cache}->get($_[0]->{_key}));
-        } else {
-                return $_[0]->{_cache};
-        }
 }
 
 #-------------------------------------------------------------------
@@ -157,7 +134,7 @@ sub new {
 	my $class = shift;
 	my $key = shift;
 	my $namespace = shift || $session{config}{configFile};
-	$cache = new Cache::FileCache({namespace=>$namespace, auto_purge_on_set=>1}) if (_canCache());
+	$cache = new Cache::FileCache({namespace=>$namespace, auto_purge_on_set=>1});
 	bless {_cache => $cache, _key => $key}, $class;
 }
 
@@ -184,11 +161,7 @@ The time to live for this content. This is the amount of time (in seconds) that 
 
 sub set {
 	my $ttl = $_[2] || 60;
-	if (_canCache()) {
 		$_[0]->{_cache}->set($_[0]->{_key},$_[1],$ttl);
-	} else {
-		$_[0]->{_cache} = $_[1];
-	}
 }
 
 #-------------------------------------------------------------------
@@ -217,12 +190,8 @@ in the cache. Defaults to "60".
 
 sub setDataStructure {
 	my $ttl = $_[2] || 60;
-	if (_canCache()) {
 		$serializer = Data::Serializer->new(serializer => 'Storable');
 		$_[0]->{_cache}->set($_[0]->{_key},$serializer->serialize($_[1]),$ttl);
-	} else {
-		$_[0]->{_cache} = $_[1];
-	}
 }
 
 #-------------------------------------------------------------------

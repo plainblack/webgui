@@ -80,7 +80,11 @@ sub get {
 	} else {
 		$namespace = "WebGUI";
 	}
-	$cache = WebGUI::Cache->new($language."_".$namespace."_".$_[0],"International");
+	my $cachetag = $session{config}{configFile}."-International";
+	if ($session{config}{useSharedInternationalCache}) {
+		$cachetag = "International";
+	}
+	$cache = WebGUI::Cache->new($language."_".$namespace."_".$_[0],$cachetag);
 	$output = $cache->get;
 	if (not defined $output) {
 		($output) = WebGUI::SQL->quickArray("select message from international 

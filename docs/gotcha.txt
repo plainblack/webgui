@@ -26,6 +26,7 @@ save you many hours of grief.
  * WebGUI now requires the following Perl modules to be installed:
 	Data::Serializer
 	SOAP::Lite
+	Cache::Cache (no longer optional)
 
    WARNING: Be sure you install these modules BEFORE you attempt to
 	upgrade or the upgrade will fail and you'll have a mess to
@@ -36,6 +37,7 @@ save you many hours of grief.
 	calendars. Your old templates will remain intact, however,
 	so that you can migrate them manually to the new template
 	variables.
+
  
 
 5.5.0
