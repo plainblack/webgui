@@ -12,28 +12,17 @@ package WebGUI::Asset::Wobject::USS;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::Attachment;
-use WebGUI::Cache;
 use WebGUI::DateTime;
-use WebGUI::Forum;
-use WebGUI::Forum::UI;
 use WebGUI::Grouping;
 use WebGUI::HTML;
-use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
-use WebGUI::Id;
 use WebGUI::International;
-use WebGUI::MessageLog;
-use WebGUI::Operation;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Style;
-use WebGUI::Template;
 use WebGUI::URL;
-use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 
@@ -124,43 +113,6 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-sub deleteAllCachedSubmissions {
-       my $self = shift;
-       my $cache = WebGUI::Cache->new("USS_submission_");
-       $cache->deleteByRegex(qr/USS_submission_/);
-}
-
-#-------------------------------------------------------------------
-sub deleteCachedSubmission {
-	my $self = shift;
-	my $submissionId = shift;
-	my $cache = WebGUI::Cache->new("USS_submission_".$submissionId);
-	$cache->delete;
-}
-
-
-#-------------------------------------------------------------------
-sub duplicate {
-	WebGUI::ErrorHandler::warn("USS wobjects cannot be duplicated until after 6.3.");
-	return "";
-        my %row;
-	tie %row, 'Tie::CPHash';
-	my $w = $_[0]->SUPER::duplicate($_[1],1);
-	$w = WebGUI::Wobject::USS->new({wobjectId=>$w});
-        my $sth = WebGUI::SQL->read("select * from USS_submission where USS_id=".quote($_[0]->get("USS_id")));
-        while (%row = $sth->hash) {
-                my $newSubmissionId = WebGUI::Id::generate();
-		my $file = WebGUI::Attachment->new($row{image},$_[0]->get("wobjectId"),$row{USS_submissionId});
-		$file->copy($w,$newSubmissionId);
-		$file = WebGUI::Attachment->new($row{attachment},$_[0]->get("wobjectId"),$row{USS_submissionId});
-		$file->copy($w,$newSubmissionId);
-		$row{USS_submissionId} = $newSubmissionId;
-		$w->setCollateral("USS_submission","USS_submissionId",\%row);
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->getEditForm;
@@ -171,30 +123,30 @@ sub getEditForm {
         $tabform->getTab("display")->template(
                 -name=>"submissionTemplateId",
                 -value=>$self->getValue("submissionTemplateId"),
-                -namespace=>$self->get("namespace")."/Submission",
-                -label=>WebGUI::International::get(73,$self->get("namespace")),
+                -namespace=>"USS"."/Submission",
+                -label=>WebGUI::International::get(73,"USS"),
                 -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
                 );
         $tabform->getTab("display")->template(
                 -name=>"submissionFormTemplateId",
                 -value=>$self->getValue("submissionFormTemplateId"),
-                -namespace=>$self->get("namespace")."/SubmissionForm",
-                -label=>WebGUI::International::get(87,$self->get("namespace")),
+                -namespace=>"USS"."/SubmissionForm",
+                -label=>WebGUI::International::get(87,"USS"),
                 -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
                 );
         $tabform->getTab("security")->group(
 		-name=>"groupToApprove",
-		-label=>WebGUI::International::get(1,$self->get("namespace")),
+		-label=>WebGUI::International::get(1,"USS"),
 		-value=>[$self->getValue("groupToApprove")]
 		);
         $tabform->getTab("security")->group(
 		-name=>"groupToContribute",
-		-label=>WebGUI::International::get(2,$self->get("namespace")),
+		-label=>WebGUI::International::get(2,"USS"),
 		-value=>[$self->getValue("groupToContribute")]
 		);
         $tabform->getTab("display")->integer(
 		-name=>"submissionsPerPage",
-		-label=>WebGUI::International::get(6,$self->get("namespace")),
+		-label=>WebGUI::International::get(6,"USS"),
 		-value=>$self->getValue("submissionsPerPage")
 		);
         $tabform->getTab("security")->selectList(
@@ -210,7 +162,7 @@ sub getEditForm {
         if ($session{setting}{useKarma}) {
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaPerSubmission",
-			-label=>WebGUI::International::get(30,$self->get("namespace")),
+			-label=>WebGUI::International::get(30,"USS"),
 			-value=>$self->getValue("karmaPerSubmission")
 			);
         } else {
@@ -223,21 +175,21 @@ sub getEditForm {
 		-name=>"sortBy",
 		-value=>[$self->getValue("sortBy")],
 		-options=>{
-			sequenceNumber=>WebGUI::International::get(88,$self->get("namespace")),
-			dateUpdated=>WebGUI::International::get(78,$self->get("namespace")),
-			dateSubmitted=>WebGUI::International::get(13,$self->get("namespace")),
-			title=>WebGUI::International::get(35,$self->get("namespace"))
+			sequenceNumber=>WebGUI::International::get(88,"USS"),
+			dateUpdated=>WebGUI::International::get(78,"USS"),
+			dateSubmitted=>WebGUI::International::get(13,"USS"),
+			title=>WebGUI::International::get(35,"USS")
 			},
-		-label=>WebGUI::International::get(79,$self->get("namespace"))
+		-label=>WebGUI::International::get(79,"USS")
 		);
 	$tabform->getTab("display")->selectList(
 		-name=>"sortOrder",
 		-value=>[$self->getValue("sortOrder")],
 		-options=>{
-			asc=>WebGUI::International::get(81,$self->get("namespace")),
-			desc=>WebGUI::International::get(82,$self->get("namespace"))
+			asc=>WebGUI::International::get(81,"USS"),
+			desc=>WebGUI::International::get(82,"USS")
 			},
-		-label=>WebGUI::International::get(80,$self->get("namespace"))
+		-label=>WebGUI::International::get(80,"USS")
 		);
 	return $tabform;
 }
@@ -333,39 +285,35 @@ sub processPropertiesFromFormPost {
         $self->deleteAllCachedSubmissions;
 }
                                                                                                                                                        
-#-------------------------------------------------------------------
-sub status {
-        if ($_[0] eq "Approved") {
-                return WebGUI::International::get(560);
-        } elsif ($_[0] eq "Denied") {
-                return WebGUI::International::get(561);
-        } elsif ($_[0] eq "Pending") {
-                return WebGUI::International::get(562);
-        }
-}
-
 
 #-------------------------------------------------------------------
 sub view {
-	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
-	my (%var, $row, $page, $p, $constraints, @submission, @content, $image, $i, $numResults, $thumbnail, $responses);
-	$numResults = $_[0]->get("submissionsPerPage");
-	$var{"readmore.label"} = WebGUI::International::get(46,$_[0]->get("namespace"));
-	$var{"responses.label"} = WebGUI::International::get(57,$_[0]->get("namespace"));
-	$var{canPost} = WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute"));
-        $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
-	$var{"post.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
-	$var{"addquestion.label"} = WebGUI::International::get(83,$_[0]->get("namespace"));
-	$var{"addlink.label"} = WebGUI::International::get(89,$_[0]->get("namespace"));
+	my $self = shift;
+	my $numResults = $self->get("submissionsPerPage");
+	my %var;
+	$var{"readmore.label"} = WebGUI::International::get(46,"USS");
+	$var{"responses.label"} = WebGUI::International::get(57,"USS");
+	$var{canPost} = WebGUI::Grouping::isInGroup($self->get("groupToContribute"));
+        $var{"post.url"} = $self->getUrl('func=add&class=WebGUI::Asset::Wobject::USS_submission');
+	$var{"post.label"} = WebGUI::International::get(20,"USS");
+	$var{"addquestion.label"} = WebGUI::International::get(83,"USS");
+	$var{"addlink.label"} = WebGUI::International::get(89,"USS");
         $var{"search.label"} = WebGUI::International::get(364);
-	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
-	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
-        $var{"rss.url"} = WebGUI::URL::page('func=viewRSS&wid='.$_[0]->get("wobjectId"),1);
-        $var{canModerate} = WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
+	$var{"search.Form"} = WebGUI::Search::form({func=>'view',search=>1});
+	$var{"search.url"} = WebGUI::Search::toggleURL("func=view");
+        $var{"rss.url"} = WebGUI::URL::page('func=viewRSS',1);
+        $var{canModerate} = WebGUI::Grouping::isInGroup($self->get("groupToApprove"),$session{user}{userId});
+	$var{"title.label"} = WebGUI::International::get(99);
+	$var{"thumbnail.label"} = WebGUI::International::get(52,"USS");
+	$var{"date.label"} = WebGUI::International::get(13,"USS");
+	$var{"date.updated.label"} = WebGUI::International::get(78,"USS");
+	$var{"by.label"} = WebGUI::International::get(21,"USS");
+	$var{"submission.edit.label"} = WebGUI::International::get(27,"USS");
 	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
+	my $constraints;
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
-       		$constraints = WebGUI::Search::buildConstraints([qw(USS_submission.username USS_submission.title USS_submission.content USS_submission.userDefined1 USS_submission.userDefined2 USS_submission.userDefined3 USS_submission.userDefined4 USS_submission.userDefined5)]);
+       		$constraints = WebGUI::Search::buildConstraints([qw(USS_submission.username asset.title wobject.description USS_submission.userDefined1 USS_submission.userDefined2 USS_submission.userDefined3 USS_submission.userDefined4 USS_submission.userDefined5)]);
 	}
 	if ($constraints ne "") {
         	$constraints = "USS_submission.status='Approved' and ".$constraints;
@@ -376,469 +324,76 @@ sub view {
 		}
 		$constraints .= ")";
 	}
-	$var{"title.label"} = WebGUI::International::get(99);
-	$var{"thumbnail.label"} = WebGUI::International::get(52,$_[0]->get("namespace"));
-	$var{"date.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));
-	$var{"date.updated.label"} = WebGUI::International::get(78,$_[0]->get("namespace"));
-	$var{"by.label"} = WebGUI::International::get(21,$_[0]->get("namespace"));
-	$var{"submission.edit.label"} = WebGUI::International::get(27,$_[0]->get("namespace"));
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),$numResults);
-	$p->setDataByQuery("select USS_submission.USS_submissionId, USS_submission.content, USS_submission.title, 
-		USS_submission.userId, USS_submission.status, USS_submission.image, USS_submission.dateSubmitted, 
-		USS_submission.dateUpdated, USS_submission.username, USS_submission.contentType, USS_submission.forumId, 
-		USS_submission.userDefined1, USS_submission.userDefined2, USS_submission.userDefined3, 
-		USS_submission.userDefined4, USS_submission.userDefined5, USS_submission.startDate, 
-		USS_submission.endDate, page.urlizedTitle 
-		from USS_submission left join page on USS_submission.pageId=page.pageId
-		where USS_submission.USS_id=".quote($_[0]->get("USS_Id"))." 
-		and $constraints order by USS_submission.".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
-	$page = $p->getPageData;
-	$i = 0;
+	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=view'),$numResults);
+	$p->setDataByQuery("select * from USS_submission left join asset on USS_submission.assetId=asset.assetId 
+		left join wobject on USS_submission.assetId=wobject.assetId 
+		where asset.parentId=".quote($self->getId)." and asset.className='WebGUI:Asset::Wobject::USS_submission' and $constraints 
+		order by USS_submission.".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
+	my $page = $p->getPageData;
+	my $i = 0;
 	my $imageURL = "";
-	foreach $row (@$page) {
-		my $cache = WebGUI::Cache->new("USS_submission_".$row->{USS_submissionId});
-		my $submission = $cache->get;
-		unless (defined $submission) {
-		$page->[$i]->{content} = WebGUI::HTML::filter($page->[$i]->{content},$_[0]->get("filterContent"));
-                $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
-		$page->[$i]->{content} = WebGUI::HTML::format($page->[$i]->{content},$page->[$i]->{contentType});
-                @content = split(/\^\-\;/,$page->[$i]->{content});
-                if ($page->[$i]->{image} ne "") {
-                        $image = WebGUI::Attachment->new($page->[$i]->{image},$_[0]->get("wobjectId"),$page->[$i]->{USS_submissionId});
-                        $thumbnail = $image->getThumbnail;
-			$imageURL = $image->getURL;
-                } else {
-                        $thumbnail = "";
-			$imageURL = "";
-                }
-		($responses) = WebGUI::SQL->quickArray("select count(*) from forumPost left join forumThread on
-			forumThread.forumThreadId=forumPost.forumThreadId where forumThread.forumId=".quote($row->{forumId}),WebGUI::SQL->getSlave);
-		my $quickurl = 'wid='.$_[0]->get("wobjectId").'&amp;sid='.$page->[$i]->{USS_submissionId}.'&amp;func=';
-		my $controls = deleteIcon($quickurl.'deleteSubmissionConfirm','',WebGUI::International::get(17,$_[0]->get("namespace")))
-			.editIcon($quickurl.'editSubmission');
-		if ($_[0]->get("sortBy") eq "sequenceNumber") {
-			if ($_[0]->get("sortOrder") eq "desc") {
-				$controls .= moveUpIcon($quickurl.'moveSubmissionDown')
-					.moveDownIcon($quickurl.'moveSubmissionUp');
+	foreach my $row (@$page) {
+		my $submission = WebGUI::Asset::Wobject::USS_submission->newByPropertyHashRef($row);
+		my $body = WebGUI::HTML::filter($submission->get("description"),$self->get("filterContent"));
+                $body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
+		$body = WebGUI::HTML::format($body,$submission->get("contentType"));
+                my @content = split(/\^\-\;/,$body);
+		my $controls = deleteIcon('func=delete',$submission->getUrl,WebGUI::International::get(17,"USS")).editIcon('func=edit',$submission->getUrl);
+		if ($self->get("sortBy") eq "sequenceNumber") {
+			if ($self->get("sortOrder") eq "desc") {
+				$controls .= moveUpIcon('func=demote',$submission->getUrl).moveDownIcon('func=promote',$submission->getUrl);
 			} else {
-				$controls .= moveUpIcon($quickurl.'moveSubmissionUp')
-					.moveDownIcon($quickurl.'moveSubmissionDown');
+				$controls .= moveUpIcon('func=promote',$submission->getUrl).moveDownIcon('func=demote',$submission->getUrl);
 			}
 		}
 		my $inDateRange;
-		if ($page->[$i]->{startDate} < WebGUI::DateTime::time() &&
-		    $page->[$i]->{endDate}   > WebGUI::DateTime::time())
-		{
-		  $inDateRange = 1;
+		if ($submission->get("startDate") < WebGUI::DateTime::time() && $submission->get("endDate") > WebGUI::DateTime::time()) {
+		  	$inDateRange = 1;
+		} else { 
+			$inDateRange = 0; 
 		}
-		else { $inDateRange = 0; }
-                $submission = {
-                        "submission.id"=>$page->[$i]->{USS_submissionId},
-                        "submission.url"=>WebGUI::URL::gateway($page->[$i]->{urlizedTitle}),
+                push(@{$var{submissions_loop}}, {
+                        "submission.id"=>$submission->getId,
+                        "submission.url"=>$submission->getUrl,
                         "submission.content"=>$content[0],
 			"submission.content.full"=>join("\n",@content),
-			"submission.responses"=>$responses,
-                        "submission.title"=>$page->[$i]->{title},
-                        "submission.userDefined1"=>$page->[$i]->{userDefined1},
-                        "submission.userDefined2"=>$page->[$i]->{userDefined2},
-                        "submission.userDefined3"=>$page->[$i]->{userDefined3},
-                        "submission.userDefined4"=>$page->[$i]->{userDefined4},
-                        "submission.userDefined5"=>$page->[$i]->{userDefined5},
-                        "submission.userId"=>$page->[$i]->{userId},
-                        "submission.username"=>$page->[$i]->{username},
-                        "submission.status"=>$page->[$i]->{status},
-                        "submission.thumbnail"=>$thumbnail,
-                        "submission.image"=>$imageURL,
-                        "submission.date"=>epochToHuman($page->[$i]->{dateSubmitted}),
-                        "submission.date.updated"=>epochToHuman($page->[$i]->{dateUpdated}),
-                        "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
-        		"submission.edit.url"=>WebGUI::URL::page($quickurl.'editSubmission'),
+			"submission.responses"=>$submission->getResponseCount,
+                        "submission.title"=>$submission->get("title"),
+                        "submission.userDefined1"=>$submission->get("userDefined1"),
+                        "submission.userDefined2"=>$submission->get("userDefined2"),
+                        "submission.userDefined3"=>$submission->get("userDefined3"),
+                        "submission.userDefined4"=>$submission->get("userDefined4"),
+                        "submission.userDefined5"=>$submission->get("userDefined5"),
+                        "submission.userId"=>$submission->get("userId"),
+                        "submission.username"=>$submission->get('username'),
+                        "submission.status"=>$submission->getStatus,
+                        "submission.thumbnail"=>$submission->getThumbnailUrl,
+                        "submission.image"=>$submission->getImageUrl,
+                        "submission.date"=>epochToHuman($submission->get("dateSubmitted")),
+                        "submission.date.updated"=>epochToHuman($submission->get("dateUpdated")),
+                        "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$submission->get("userId")),
+        		"submission.edit.url"=>$submission->getUrl("func=edit"),
                         "submission.secondColumn"=>(($i+1)%2==0),
                         "submission.thirdColumn"=>(($i+1)%3==0),
                         "submission.fourthColumn"=>(($i+1)%4==0),
                         "submission.fifthColumn"=>(($i+1)%5==0),
 			'submission.controls'=>$controls,
-			'submission.inDateRange'=>$inDateRange
-                        };
-		$cache->set($submission,3600);
-		}
-                $submission->{"submission.currentUser"}=($session{user}{userId} eq $submission->{"submission.userId"} && $session{user}{userId} != 1);
-		push(@submission,$submission);
+			'submission.inDateRange'=>$inDateRange,
+                	"submission.currentUser"=>($session{user}{userId} eq $submission->get("userId") && $session{user}{userId} ne "1")
+                        });
 		$i++;
 	}
-	$var{submissions_loop} = \@submission;
 	$p->appendTemplateVars(\%var);
-	return $_[0]->processTemplate(\%var,$_[0]->get("templateId"));
+	return $self->processTemplate(\%var,$self->get("templateId"));
 }
 
 #-------------------------------------------------------------------
-sub www_approveSubmission {
-	my $self = shift;
-	my (%submission);
-	tie %submission, 'Tie::CPHash';
-        if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
-		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-                WebGUI::SQL->write("update USS_submission set status='Approved' where USS_submissionId=".quote($session{form}{sid}));
-		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid},1),4,$self->get("namespace"));
-		WebGUI::MessageLog::completeEntry($session{form}{mlog});
-		$self->deleteCachedSubmission($session{form}{sid});
-                return WebGUI::Operation::www_viewMessageLog();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-
-#-------------------------------------------------------------------
-sub www_deleteFile {
-	my $self = shift;
-	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) {
-		$self->setCollateral("USS_submission","USS_submissionId",{
-			$session{form}{file}=>'',
-		 	USS_submissionId=>$session{form}{sid}
-			},0,0);
-		$self->deleteCachedSubmission($session{form}{sid});
-                return $self->www_editSubmission();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_deleteSubmissionConfirm {
-	my $self = shift;
-	my ($owner, $forumId, $pageId) = WebGUI::SQL->quickArray("select userId,forumId,pageId from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-        if ($owner eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) {
-		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from USS_submission where forumId=".quote($forumId));
-                unless ($inUseElsewhere > 1) {
-			my $forum = WebGUI::Forum->new($forumId);
-			$forum->purge;
-		}
-		my $page = WebGUI::Page->new($pageId);
-		$page->purge;
-		$self->deleteCachedSubmission($session{form}{sid});
-		$self->deleteCollateral("USS_submission","USS_submissionId",$session{form}{sid});
-		my $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
-		$file->deleteNode;
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_denySubmission {
-	my $self = shift;
-	my (%submission);
-	tie %submission, 'Tie::CPHash';
-        if (WebGUI::Grouping::isInGroup(4,$session{user}{userId}) || WebGUI::Grouping::isInGroup(3,$session{user}{userId})) {
-		%submission = WebGUI::SQL->quickHash("select * from USS_submission where USS_submissionId=".quote($session{form}{sid}));
-                WebGUI::SQL->write("update USS_submission set status='Denied' where USS_submissionId=".quote($session{form}{sid}));
-                WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
-			$session{form}{wid}.'&sid='.$session{form}{sid},1),5,$self->get("namespace"));
-                WebGUI::MessageLog::completeEntry($session{form}{mlog});
-		$self->deleteCachedSubmission($session{form}{sid});
-                return WebGUI::Operation::www_viewMessageLog();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-
 sub www_edit {
         my $self = shift;
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	$self->getAdminConsole->setHelp("user submission system add/edit");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("18","USS"));
 }
-
-
-#-------------------------------------------------------------------
-sub www_editSubmission {
-        my ($output, $submission, $f, @submission, $sth);
-        $submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
-	my %var;
-	if ($submission->{USS_submissionId} eq "new") {
-		$submission->{userId} = $session{user}{userId};
-		$submission->{contentType} = "mixed";
-		$var{'submission.isNew'} = 1;
-	}
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute")) 
-		|| $submission->{userId} eq $session{user}{userId} 
-		|| WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove")));
-	$var{'link.header.label'} = WebGUI::International::get(90,$_[0]->get("namespace"));
-	$var{'question.header.label'} = WebGUI::International::get(84,$_[0]->get("namespace"));
-        $var{'submission.header.label'} = WebGUI::International::get(19,$_[0]->get("namespace"));
-	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
-        $var{'visitorName.label'} = WebGUI::International::get(438);
-	$var{'visitorName.form'} = WebGUI::Form::text({
-		name=>"visitorName"
-		});
-        $var{'form.header'} = WebGUI::Form::formHeader()
-		.WebGUI::Form::hidden({
-			name=>"wid",
-			value=>$session{form}{wid}
-			})
-                .WebGUI::Form::hidden({
-			name=>"sid",
-			value=>$submission->{USS_submissionId}
-			})
-		.WebGUI::Form::hidden({
-                	name=>"func",
-			value=>"editSubmissionSave"
-			});
-        $var{'url.label'} = WebGUI::International::get(91,$_[0]->get("namespace"));
-        $var{'newWindow.label'} = WebGUI::International::get(92,$_[0]->get("namespace"));
-	$var{'userDefined1.form'} = WebGUI::Form::text({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined1.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined1.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined2.form'} = WebGUI::Form::text({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined2.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined2.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined3.form'} = WebGUI::Form::text({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined3.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined3.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined4.form'} = WebGUI::Form::text({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined4.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined4.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined5.form'} = WebGUI::Form::text({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined5.form.yesNo'} = WebGUI::Form::yesNo({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined5.form.textarea'} = WebGUI::Form::textarea({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined1.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined1",
-		value=>$submission->{userDefined1}
-		});
-	$var{'userDefined2.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined2",
-		value=>$submission->{userDefined2}
-		});
-	$var{'userDefined3.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined3",
-		value=>$submission->{userDefined3}
-		});
-	$var{'userDefined4.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined4",
-		value=>$submission->{userDefined4}
-		});
-	$var{'userDefined5.form.htmlarea'} = WebGUI::Form::HTMLArea({
-		name=>"userDefined5",
-		value=>$submission->{userDefined5}
-		});
-	$var{'userDefined1.value'} = $submission->{userDefined1};
-	$var{'userDefined2.value'} = $submission->{userDefined2};
-	$var{'userDefined3.value'} = $submission->{userDefined3};
-	$var{'userDefined4.value'} = $submission->{userDefined4};
-	$var{'userDefined5.value'} = $submission->{userDefined5};
-	$var{'question.label'} = WebGUI::International::get(85,$_[0]->get("namespace"));
-	$var{'title.label'} = WebGUI::International::get(35,$_[0]->get("namespace"));
-	$var{'title.form'} = WebGUI::Form::text({
-		name=>"title",
-		value=>$submission->{title}
-		});
-	$var{'title.form.textarea'} = WebGUI::Form::textarea({
-		name=>"title",
-		value=>$submission->{title}
-		});
-	$var{'title.value'} = $submission->{title};
-        $var{'body.label'} = WebGUI::International::get(31,$_[0]->get("namespace"));
-	$var{'answer.label'} = WebGUI::International::get(86,$_[0]->get("namespace"));
-        $var{'description.label'} = WebGUI::International::get(85);
-	$var{'body.value'} = $submission->{content};
-	$var{'body.form'} = WebGUI::Form::HTMLArea({
-		name=>"body",
-		value=>$submission->{content}
-		});
-	$var{'body.form.textarea'} = WebGUI::Form::textarea({
-		name=>"body",
-		value=>$submission->{content}
-		});
-	$var{'image.label'} = WebGUI::International::get(32,$_[0]->get("namespace"));
-        if ($submission->{image} ne "") {
-		$var{'image.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=image&amp;wid='.$session{form}{wid}
-			.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
-        } else {
-		$var{'image.form'} = WebGUI::Form::file({
-			name=>"image"
-			});
-        }
-	$var{'attachment.label'} = WebGUI::International::get(33,$_[0]->get("namespace"));
-        if ($submission->{attachment} ne "") {
-		$var{'attachment.form'} = '<a href="'.WebGUI::URL::page('func=deleteFile&amp;file=attachment&amp;wid='
-			.$session{form}{wid}.'&amp;sid='.$submission->{USS_submissionId}).'">'.WebGUI::International::get(391).'</a>';
-        } else {
-		$var{'attachment.form'} = WebGUI::Form::file({
-			name=>"attachment"
-			});
-        }
-	$var{'contentType.label'} = WebGUI::International::get(1007);
-        $var{'contentType.form'} = WebGUI::Form::contentType({
-                name=>'contentType',
-                value=>[$submission->{contentType}]
-                });
-	$var{'startDate.label'} = WebGUI::International::get(497);
-	$var{'endDate.label'} = WebGUI::International::get(498);
-	$var{'startDate.form'} = WebGUI::Form::dateTime({
-		name  => 'startDate',
-		value => ($submission->{startDate} || $_[0]->get("startDate"))
-		});
-	$var{'endDate.form'} = WebGUI::Form::dateTime({
-		name  => 'endDate',
-		value => ($submission->{endDate} || $_[0]->get("endDate"))
-		});
-	$var{'form.submit'} = WebGUI::Form::submit();
-	$var{'form.footer'} = WebGUI::Form::formFooter();
-	return $_[0]->processTemplate($_[0]->get("submissionFormTemplateId"),\%var,"USS/SubmissionForm");
-}
-
-#-------------------------------------------------------------------
-sub www_editSubmissionSave {
-	my ($submission, %hash, $file, $u);
-	$submission = $_[0]->getCollateral("USS_submission","USS_submissionId",$session{form}{sid});
-        if ($submission->{userId} eq $session{user}{userId} 
-		|| ($submission->{USS_submissionId} eq "new" 
-		&& WebGUI::Grouping::isInGroup($_[0]->get("groupToContribute"))) 
-		|| WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"))) {
-                if ($session{form}{sid} eq "new") {
-			my $parentPage = WebGUI::Page->new($_[0]->get("pageId"));
-                	my $newPage = $parentPage->add;
-			$hash{pageId} = $submission->{pageId} = $newPage->get("pageId");
-			my $forum = WebGUI::Forum->create({
-				masterForumId=>$_[0]->get("forumId"),
-				forumId=>"new"
-				});
-			$hash{forumId} = $forum->get("forumId");
-			$hash{USS_id} = $_[0]->get("USS_id");
-			$hash{username} = $session{form}{visitorName} || $session{user}{alias};
-			$hash{userId} = $session{user}{userId};
-			$hash{dateSubmitted} = WebGUI::DateTime::time();
-			$hash{USS_submissionId} = "new";
-			if ($session{setting}{useKarma}) {
-                        	$u = WebGUI::User->new($session{user}{userId});
-                        	$u->karma($_[0]->get("karmaPerSubmission"),$_[0]->get("namespace")." (".$_[0]->get("wobjectId")
-                                	."/".$session{form}{sid}.")","User submission.");
-			}
-			$session{form}{sid} = $_[0]->setCollateral("USS_submission","USS_submissionId",\%hash,1,0,"USS_id",$_[0]->get("USS_id"));
-        	        my %pageVars = %{$parentPage->get};
-                	delete $pageVars{pageId};
-	                delete $pageVars{nestedSetLeft};
-        	        delete $pageVars{nestedSetRight};
-               	 	delete $pageVars{depth};
-                	delete $pageVars{parentId};
-	                delete $pageVars{sequenceNumber};
-        	        $pageVars{hideFromNavigation} = 1;
-			$pageVars{isSystem} = 1;
-                	$pageVars{subroutine} = "viewSubmissionAsPage";
-                	$pageVars{subroutinePackage} = "WebGUI::Wobject::USS";
-                	$pageVars{subroutineParams} = "{wobjectId=>'".$_[0]->wid."',submissionId=>'".$session{form}{sid}."'}";
-                	$pageVars{urlizedTitle} .= "/".$_[0]->get("title")."/".$session{form}{title};
- 			$pageVars{urlizedTitle} .= ".".$session{setting}{urlExtension} unless ($pageVars{urlizedTitle} =~ /\./ && $session{setting}{urlExtension} ne "");
-                	$pageVars{urlizedTitle} = WebGUI::Page::makeUnique(WebGUI::URL::urlize($pageVars{urlizedTitle},-999));
-                	$newPage->set(\%pageVars);
-			%hash = ();
-                }
-                $hash{title} = WebGUI::HTML::filter($session{form}{title},'all') || WebGUI::International::get(16,$_[0]->get("namespace"));
-		$hash{USS_submissionId} = $session{form}{sid};
-		$hash{dateUpdated} = WebGUI::DateTime::time();
-		$hash{content} = $session{form}{body};
-		$hash{userDefined1} = $session{form}{userDefined1};
-		$hash{userDefined2} = $session{form}{userDefined2};
-		$hash{userDefined3} = $session{form}{userDefined3};
-		$hash{userDefined4} = $session{form}{userDefined4};
-		$hash{userDefined5} = $session{form}{userDefined5};
-		$hash{startDate} = WebGUI::DateTime::humanToEpoch($session{form}{startDate});
-		$hash{endDate} = WebGUI::DateTime::humanToEpoch($session{form}{endDate}); 
-		$hash{contentType} = $session{form}{contentType};
-                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
-		$file->save("image");
-		$hash{image} = $file->getFilename if ($file->getFilename ne "");
-                $file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
-		$file->save("attachment");
-		$hash{attachment} = $file->getFilename if ($file->getFilename ne "");
-		unless ($_[0]->get("defaultStatus") eq "Approved") {
-			unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove")) ) {
-				$hash{status} = $_[0]->get("defaultStatus");
-				WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
-					WebGUI::URL::page('func=viewSubmission&wid='.$_[0]->get("wobjectId").'&sid='.
-					$session{form}{sid},1),3,$_[0]->get("namespace"),'pending');
-			} else {
-				$hash{status} = "Approved";
-			}
-		}
-		my %pageVars;
-                $pageVars{title} = $pageVars{menuTitle} = $hash{title};
-		my $page = WebGUI::Page->new($submission->{pageId});
-               	$page->set(\%pageVars);
-		$_[0]->setCollateral("USS_submission", "USS_submissionId", \%hash, 1, 0, "USS_id", $_[0]->get("USS_id"));
-		$_[0]->deleteCachedSubmission($hash{USS_submissionId});
-                return $_[0]->www_viewSubmission();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_moveSubmissionDown {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $_[0]->moveCollateralDown("USS_submission","USS_submissionId",$session{form}{sid}, "USS_id", $_[0]->get("USS_id"));
-	$_[0]->deleteAllCachedSubmissions;
-        return "";
-}
-                                                                                                                                                             
-#-------------------------------------------------------------------
-sub www_moveSubmissionUp {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        $_[0]->moveCollateralUp("USS_submission","USS_submissionId",$session{form}{sid}, "USS_id", $_[0]->get("USS_id"));
-	$_[0]->deleteAllCachedSubmissions;
-        return "";
-}
-
 
 
 #-------------------------------------------------------------------
@@ -895,113 +450,6 @@ sub www_viewRSS {
 ~;
 	WebGUI::HTTP::setMimeType("text/xml");
         return $xml;
-}
-
-#-------------------------------------------------------------------
-sub www_viewSubmission {
-	my $self = shift;
-	my $submissionId = shift || $session{form}{sid};
-	$self->logView() if ($session{setting}{passiveProfilingEnabled});
-	return "" unless ($submissionId);
-	my ($file, @data, %var, $replies);
-	my $submission = $self->getCollateral("USS_submission","USS_submissionId",$submissionId);
-	return "" unless ($submission->{USS_submissionId});
-        return "" unless ($submission->{status} eq 'Approved' ||
-                ($submission->{userId} eq $session{user}{userId} && $session{user}{userId} != 1) ||
-                WebGUI::Grouping::isInGroup($self->getValue("groupToApprove")));
-	my $parentsPage = WebGUI::Page->new($self->get("pageId"));
-	my $callback = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),"func=viewSubmission&amp;wid=".$self->wid."&amp;sid=".$submission->{USS_submissionId});
-	if ($session{form}{forumOp} ne "" && $session{form}{forumOp} ne "viewForum") {	
-		return WebGUI::Forum::UI::forumOp({
-			callback=>$callback,
-			title=>$submission->{title},
-			forumId=>$submission->{forumId}
-			});
-	}
-	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=".quote($submissionId));
-	$var{title} = $submission->{title};
-	$var{content} = WebGUI::HTML::filter($submission->{content},$self->get("filterContent"));
-	$var{content} =~ s/\^\-\;//g;
-	$var{content} = WebGUI::HTML::format($var{content},$submission->{contentType});
-        $var{"user.label"} = WebGUI::International::get(21,$self->get("namespace"));
-	$var{"user.Profile"} = WebGUI::URL::page('op=viewProfile&uid='.$submission->{userId});
-	$var{"user.Id"} = $submission->{userId};
-	$var{"user.username"} = $submission->{username};
-	$var{"date.label"} = WebGUI::International::get(13,$self->get("namespace"));
-	$var{"date.epoch"} = $submission->{dateSubmitted};
-	$var{"date.human"} = epochToHuman($submission->{dateSubmitted});
-	$var{"date.updated.label"} = WebGUI::International::get(78,$self->get("namespace"));
-	$var{"date.updated.human"} = epochToHuman($submission->{dateUpdated});
-	$var{"date.updated.epoch"} = $submission->{dateUpdated};
-	$var{"status.label"} = WebGUI::International::get(14,$self->get("namespace"));
-	$var{"status.status"} = status($submission->{status});
-	$var{"views.label"} = WebGUI::International::get(514);
-	$var{"views.count"} = $submission->{views};
-        $var{canPost} = WebGUI::Grouping::isInGroup($self->get("groupToContribute"));
-        $var{"post.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=editSubmission&sid=new&wid='.$self->wid);
-        $var{"post.label"} = WebGUI::International::get(20,$self->get("namespace"));
-	@data = WebGUI::SQL->quickArray("select USS_submissionId from USS_submission 
-        	where USS_id=".quote($self->get("USS_id"))." and dateSubmitted<".quote($submission->{dateSubmitted})."
-		and (userId=".quote($submission->{userId})." or status='Approved') order by dateSubmitted desc",WebGUI::SQL->getSlave);
-        $var{"previous.more"} = ($data[0] ne "");
-	if ($var{"previous.more"}) {
-		my $previousSubmission = $self->getCollateral("USS_submission","USS_submissionId",$data[0]);
-		my $previousPage = WebGUI::Page->new($previousSubmission->{pageId});
-       		$var{"previous.url"} = WebGUI::URL::gateway($previousPage->get("urlizedTitle"));
-	}
-	$var{"previous.label"} = WebGUI::International::get(58,$self->get("namespace"));
-        @data = WebGUI::SQL->quickArray("select USS_submissionId from USS_submission 
-                where USS_id=".quote($submission->{USS_id})." and dateSubmitted>".quote($submission->{dateSubmitted})."
-		and (userId=".quote($submission->{userId})." or status='Approved') order by dateSubmitted asc",WebGUI::SQL->getSlave);
-        $var{"next.more"} = ($data[0] ne "");
-	if ($var{"next.more"}) {
-		my $nextSubmission = $self->getCollateral("USS_submission","USS_submissionId",$data[0]);
-		my $nextPage = WebGUI::Page->new($nextSubmission->{pageId});
-	        $var{"next.url"} = WebGUI::URL::gateway($nextPage->get("urlizedTitle"));
-	}
-	$var{"next.label"} = WebGUI::International::get(59,$self->get("namespace"));
-        $var{canEdit} = (($submission->{userId} eq $session{user}{userId} || WebGUI::Grouping::isInGroup($self->get("groupToApprove"))) && $session{user}{userId} != 1);
-        $var{"delete.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=deleteSubmissionConfirm&wid='.$self->wid.'&sid='.$submissionId);
-	$var{"delete.label"} = WebGUI::International::get(37,$self->get("namespace"));
-        $var{"edit.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=editSubmission&wid='.$self->wid.'&sid='.$submissionId);
-	$var{"edit.label"} = WebGUI::International::get(27,$self->get("namespace"));
-        $var{canChangeStatus} = WebGUI::Grouping::isInGroup($self->get("groupToApprove"),$session{user}{userId});
-        $var{"approve.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=approveSubmission&wid='.$self->wid.'&sid='.$submissionId.'&mlog='.$session{form}{mlog});
-	$var{"approve.label"} = WebGUI::International::get(572);
-        $var{"leave.url"} = WebGUI::URL::page('op=viewMessageLog');
-	$var{"leave.label"} = WebGUI::International::get(573);
-        $var{"deny.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"),'func=denySubmission&wid='.$self->wid.'&sid='.$submissionId.'&mlog='.$session{form}{mlog});
-	$var{"deny.label"} = WebGUI::International::get(574);
-	$var{"canReply"} = ($self->get("allowDiscussion"));
-	$var{"reply.url"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$submission->{forumId});
-	$var{"reply.label"} = WebGUI::International::get(47,$self->get("namespace"));
-	$var{"search.url"} = WebGUI::Search::toggleURL("",$parentsPage->get("urlizedTitle"));
-	$var{"search.label"} = WebGUI::International::get(364);
-        $var{"back.url"} = WebGUI::URL::gateway($parentsPage->get("urlizedTitle"));
-	$var{"back.label"} = WebGUI::International::get(28,$self->get("namespace"));
-	$var{'userDefined1.value'} = $submission->{userDefined1};
-	$var{'userDefined2.value'} = $submission->{userDefined2};
-	$var{'userDefined3.value'} = $submission->{userDefined3};
-	$var{'userDefined4.value'} = $submission->{userDefined4};
-	$var{'userDefined5.value'} = $submission->{userDefined5};
-	if ($submission->{image} ne "") {
-		$file = WebGUI::Attachment->new($submission->{image},$self->wid,$submissionId);
-		$var{"image.url"} = $file->getURL;
-		$var{"image.thumbnail"} = $file->getThumbnail;
-	}
-	if ($submission->{attachment} ne "") {
-		$file = WebGUI::Attachment->new($submission->{attachment},$self->wid,$submissionId);
-		$var{"attachment.box"} = $file->box;
-		$var{"attachment.url"} = $file->getURL;
-		$var{"attachment.icon"} = $file->getIcon;
-		$var{"attachment.name"} = $file->getFilename;
-        }	
-	if ($self->get("allowDiscussion")) {
-		$var{"replies"} = WebGUI::Forum::UI::www_viewForum(
-			{callback=>$callback,title=>$submission->{title},forumId=>$submission->{forumId}},
-			$submission->{forumId});
-	}
-	return $self->processTemplate($self->get("submissionTemplateId"),\%var,"USS/Submission");
 }
 
 
