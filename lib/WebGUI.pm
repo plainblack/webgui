@@ -22,10 +22,11 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::Template;
+use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub page {
-	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, 
+	my ($debug, %contentHash, $w, $cmd, $pageEdit, $wobject, $wobjectOutput, $extra, $originalWobject, $proxyWobjectId,
 		$sth, $httpHeader, $header, $footer, $content, $operationOutput, $adminBar, %hash);
 	WebGUI::Session::open($_[0],$_[1]);
 	if ($session{form}{debug}==1 && WebGUI::Privilege::isInGroup(3)) {
@@ -52,21 +53,27 @@ sub page {
 		if ($session{form}{wid} eq "new") {
 			$wobject = {wobjectId=>"new",namespace=>$session{form}{namespace},pageId=>$session{page}{pageId}};
 		} else {
-			$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$session{form}{wid});	
-			unless (${$wobject}{namespace} eq "") {
-				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
-				tie %hash, 'Tie::CPHash';
-				%hash = (%{$wobject},%{$extra});
-				$wobject = \%hash;
-			} else {
+			$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobjectId=".$session{form}{wid});	
+			if (${$wobject}{namespace} eq "") {
 				WebGUI::ErrorHandler::warn("Wobject [$session{form}{wid}] appears to be missing or corrupt, but was requested "
 					."by $session{user}{username} [$session{user}{userId}].");
 				$wobject = ();
+			} else {
+				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
+                        	tie %hash, 'Tie::CPHash';
+                        	%hash = (%{$wobject},%{$extra});
+                         	$wobject = \%hash;
 			}
 		}
 		if ($wobject) {
-			if (${$wobject}{pageId} != $session{page}{pageId} && ${$wobject}{pageId} != 2) {
-				$wobjectOutput = WebGUI::International::get(417);
+                        if (${$wobject}{pageId} != $session{page}{pageId}) {
+                                ($proxyWobjectId) = WebGUI::SQL->quickArray("select wobject.wobjectId from wobject,WobjectProxy 
+                                        where wobject.wobjectId=WobjectProxy.wobjectId and wobject.pageId=".$session{page}{pageId}."
+                                        and WobjectProxy.proxiedWobjectId=".${$wobject}{wobjectId});
+                                ${$wobject}{_WobjectProxy} = $proxyWobjectId;
+                        } 
+			unless (${$wobject}{pageId} == $session{page}{pageId} || ${$wobject}{pageId} == 2 || ${$wobject}{_WobjectProxy} ne "") {
+				$wobjectOutput .= WebGUI::International::get(417);
 				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access wobject ["
 					.$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
 			} else {
@@ -77,7 +84,6 @@ sub page {
 				$wobjectOutput = eval{$w->$cmd};
 				WebGUI::ErrorHandler::fatalError("Web method doesn't exist in wojbect: ${$wobject}{namespace} / $session{form}{func}.") if($@);
 			}
-			# $wobjectOutput = WebGUI::International::get(381); # bad error
 		}
 	}
 	if ($operationOutput ne "") {
@@ -112,6 +118,17 @@ sub page {
 						.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
 						.'<br>';
 				}
+                                if (${$wobject}{namespace} eq "WobjectProxy") {
+					$originalWobject = $wobject;
+                                        ($wobject) = WebGUI::SQL->quickArray("select proxiedWobjectId from WobjectProxy where wobjectId=".${$wobject}{wobjectId});
+                                        $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobject);
+					if (${$wobject}{namespace} eq "") {
+						$wobject = $originalWobject;
+					} else {
+						${$wobject}{templatePosition} = ${$originalWobject}{templatePosition};
+						${$wobject}{_WobjectProxy} = ${$originalWobject}{wobjectId};
+					}
+                                }
 				$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
 				tie %hash, 'Tie::CPHash';
 				%hash = (%{$wobject},%{$extra});

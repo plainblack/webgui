@@ -101,6 +101,13 @@ insert into international values (36,'Product','English','Add an accessory.');
 insert into international values (37,'Product','English','Add a related product.');
 insert into international values (581,'WebGUI','English','Add New Value');
 insert into international values (582,'WebGUI','English','Leave Blank');
+insert into international values (583,'WebGUI','English','Max Image Size');
+insert into settings values ('maxImageSize','100000');
+insert into international values (1,'WobjectProxy','English','Wobject To Proxy');
+insert into international values (2,'WobjectProxy','English','Edit Wobject Proxy');
+create table WobjectProxy (wobjectId int not null primary key, proxiedWobjectId int not null);
+insert into international values (3,'WobjectProxy','English','Wobject Proxy');
+insert into international values (4,'WobjectProxy','English','Wobject proxying failed. Perhaps the proxied wobject has been deleted.');
 
 
 

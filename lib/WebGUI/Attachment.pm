@@ -87,6 +87,24 @@ sub _createThumbnail {
 
 
 #-------------------------------------------------------------------
+sub _resizeImage {
+        my ($image, $error, $x, $y, $r, $n);
+        if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
+                $image = Image::Magick->new;
+                $error = $image->Read($_[0]->getPath);
+                WebGUI::ErrorHandler::warn("Couldn't read image for resizing: ".$error) if $error;
+                ($x, $y) = $image->Get('width','height');
+                $n = $_[1] || $session{setting}{maxImageSize};
+		if ($x > $n || $y > $n) {
+                	$r = $x>$y ? $x / $n : $y / $n;
+                	$image->Scale(width=>($x/$r),height=>($y/$r));
+                	$error = $image->Write($_[0]->getPath);
+                	WebGUI::ErrorHandler::warning("Couldn't resize image: ".$error) if $error;
+		}
+        }       
+}               
+
+#-------------------------------------------------------------------
 
 =head2 box ( )
 
@@ -396,7 +414,7 @@ sub rename {
 
 #-------------------------------------------------------------------
 
-=head2 save ( formVariableName [, thumbnailSize ] )
+=head2 save ( formVariableName [, thumbnailSize, imageSize ] )
 
  Grabs an attachment from a form POST and saves it to a node. It 
  then returns the filename of the attachment.
@@ -410,9 +428,16 @@ sub rename {
 
  If an image is being uploaded a thumbnail will be generated
  automatically. By default, WebGUI will create a thumbnail of the
- size specified in the attachment settings. You can override that
+ size specified in the file settings. You can override that
  size by specifying one here. Size is measured in pixels of the
  longest side.
+
+=item imageSize
+
+ If a web image (gif, png, jpg, jpeg) is being uploaded it will be
+ resized if it is larger than this value. By default images are
+ resized to stay within the contraints of the Max Image Size
+ setting in the file settings.
 
 =cut
 
@@ -440,6 +465,7 @@ sub save {
 			}
 			close($file);
 			_createThumbnail($_[0],$_[2]);
+			_resizeImage($_[0],$_[3]);
 		} else {
 			WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing due to error: ".$!);
 			$_[0]->{_filename} = "";

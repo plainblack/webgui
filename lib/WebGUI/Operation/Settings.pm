@@ -170,6 +170,7 @@ sub www_editFileSettings {
                 $f->hidden("op","editFileSettingsSave");
                 $f->text("lib",WebGUI::International::get(129),$session{setting}{lib});
                 $f->integer("maxAttachmentSize",WebGUI::International::get(130),$session{setting}{maxAttachmentSize});
+                $f->integer("maxImageSize",WebGUI::International::get(583),$session{setting}{maxImageSize});
                 $f->integer("thumbnailSize",WebGUI::International::get(406),$session{setting}{thumbnailSize});
                 $f->text("attachmentDirectoryWeb",WebGUI::International::get(131),$session{setting}{attachmentDirectoryWeb});
                 $f->text("attachmentDirectoryLocal",WebGUI::International::get(132),$session{setting}{attachmentDirectoryLocal});
@@ -185,6 +186,7 @@ sub www_editFileSettings {
 sub www_editFileSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
 		_saveSetting("lib");
+		_saveSetting("maxImageSize");
 		_saveSetting("maxAttachmentSize");
 		_saveSetting("thumbnailSize");
 		_saveSetting("attachmentDirectoryWeb");
