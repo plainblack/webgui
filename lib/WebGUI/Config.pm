@@ -138,6 +138,9 @@ sub readConfig {
         if (ref $data{authMethods} ne "ARRAY") {
                 $data{authMethods} = [$data{authMethods}];
         }
+	if (ref $data{wobjects} ne "ARRAY"){
+		$data{wobjects} = [$data{wobjects}];
+	}
         if( defined( $data{scripturl} ) ) {
                 # get rid of leading "/" if present.
                 $data{scripturl} =~ s/^\///;
