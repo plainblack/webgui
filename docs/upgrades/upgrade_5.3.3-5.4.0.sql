@@ -44,8 +44,8 @@ insert into international (internationalId, namespace, languageId, message, last
 insert into help (helpId, namespace, titleId, bodyId, seeAlso) VALUES ('68', 'WebGUI', '997', '1000', '69,WebGUI;70,WebGUI;1,SQLReport;');
 insert into help (helpId, namespace, titleId, bodyId, seeAlso) VALUES ('69', 'WebGUI', '998', '1001', '68,WebGUI;70,WebGUI;1,SQLReport;');
 insert into help (helpId, namespace, titleId, bodyId, seeAlso) VALUES ('70', 'WebGUI', '999', '1002', '68,WebGUI;69,WebGUI;1,SQLReport;');
-delete from international where languageId=1 and namespace='WebGUI' and internationalId=979;
-insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (979,1,'WebGUI','Wobject Privileges', 1056041703,'Would you like Wobject Privileges to be enabled?');
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=1003;
+insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1003,1,'WebGUI','Wobject privileges?', 1056041703,'Would you like Wobject Privileges to be enabled?');
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=116;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (116,1,'WebGUI','Select \"Yes\" to change the privileges of all pages and wobjects under this page to these privileges.', 1056054674,NULL);
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=632;
