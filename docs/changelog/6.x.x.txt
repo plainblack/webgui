@@ -83,5 +83,6 @@ webgui.
  - Added an override in the user profile for toolbar icon set.
  - Migrated the navigation items (Thanks to Leendert Bottelberghs, Len
    Kranendonk).
+ - Removed all old navigation macros. See gotcha's for details.
 
 

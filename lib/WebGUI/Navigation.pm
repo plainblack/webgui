@@ -51,15 +51,6 @@ A package used to generate navigation.
 				template=>'<tmpl_loop page_loop><tmpl_var page.title><br></tmpl_loop>'
 				);
  $html = $custom->build;
-
-=head1 OBSOLETE FUNCTIONS
-
- use WebGUI::Navigation;
-
- $pageTree = WebGUI::Navigation::tree($pageParentId,$depthToTraverse);
-
- $html = WebGUI::Navigation::drawHorizontal($tree);
- $html = WebGUI::Navigation::drawVertical($tree);
  
 =head1 METHODS
 
@@ -234,112 +225,6 @@ sub _toKeyValueHashRef {
         return \%keyValues;
 }
 
-#-------------------------------------------------------------------
-
-=head2 drawHorizontal ( tree [ , seperator, class ] )
-
-Draws a horizontal navigation system. Returns HTML.
-
-=over
-
-=item tree
-
-The hash reference created by the tree method in this package.
-
-=item seperator
-
-A string containing HTML to seperate each navigation item. Defaults to "&middot;".
-
-=item class
-
-A stylesheet class for each link in the navigation. Defaults to "horizontalMenu".
-
-=back
-
-=cut
-
-sub drawHorizontal {
-        my ($output, $i, $pageId, $first);
-        my ($tree, $seperator, $class) = @_;
-        $class = "horizontalMenu" unless ($class);
-	$seperator = $seperator || '&middot;';
-	$first = 1;
-        foreach $pageId (keys %{$tree}) {
-		if ($first) {
-			$first = 0;
-		} else {
-			$output .= ' '.$seperator.' ';
-		}
-                $output .= '<a class="'.$class.'"';
-		$output .= ' target="_blank"' if ($tree->{$pageId}{newWindow});
-		$output .= ' href="'.$tree->{$pageId}{url}.'">';
-		if ($pageId == $session{page}{pageId}) {
-                       $output .= '<span class="selectedMenuItem">'.$tree->{$pageId}{title}.'</span>';
-		} else {
-                       $output .= $tree->{$pageId}{title};
-               	}
-                $output .= '</a>';
-        }
-        return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 drawVertical ( tree [, bullet, class, spacing, indent ] )
-
-Draws a vertical navigation system. Returns HTML.
-
-=over
-
-=item tree
-
-The hash reference created by the tree method in this package.
-
-=item bullet
-
-A string containing HTML to generate a bullet that will be placed in front of each tree item. Defaults to none.
-
-=item class
-
-A stylesheet class for each link in the navigation. Defaults to "verticalMenu".
-
-=item spacing
-
-An integer with the linespacing for the navigation. Defaults to 1.
-
-=item indent
-
-An integer with the about of indenting to start with. Defaults to 0.
-
-=back
-
-=cut
-
-sub drawVertical {
-	my ($output, $i, $padding, $leading, $pageId);
-	my ($tree, $bullet, $class, $spacing, $indent) = @_;
-	$class = "verticalMenu" unless ($class);
-	$spacing = 1 unless ($spacing);
-        for ($i=1;$i<=$indent;$i++) {
-                $padding .= "&nbsp;&nbsp;&nbsp;";
-        }
-        for ($i=1;$i<=$spacing;$i++) {
-                $leading .= "<br />";
-        }
-	foreach $pageId (keys %{$tree}) {
-		$output .= $padding.$bullet.'<a class="'.$class.'"';
-		$output .= ' target="_blank"' if ($tree->{$pageId}{newWindow});
-		$output .= ' href="'.$tree->{$pageId}{url}.'">';
-                if ($pageId == $session{page}{pageId}) {
-                       $output .= '<span class="selectedMenuItem">'.$tree->{$pageId}{title}.'</span>';
-                } else {
-                       $output .= $tree->{$pageId}{title};
-                }
-		$output .= '</a>'.$leading;
-		$output .= drawVertical($tree->{$pageId}{sub}, $bullet, $class, $spacing, ($indent+1));
-	}
-        return $output;
-}
 
 #-------------------------------------------------------------------
 
@@ -582,68 +467,6 @@ sub view {
 	}
 }
 	
-#-------------------------------------------------------------------
-
-=head2 tree ( parentId [, toLevel ] )
-
-Generates and returns a hash reference containing a page tree with keys of "url", "title", "fullTitle", "synopsis", "newWindow" and "sub" with orignating keys of page ids.  The tree looks like this:
-
- root
-  |-pageId
-  |  |-url
-  |  |-title
-  |  |-fullTitle
-  |  |-synopsis
-  |  |-newWindow
-  |  `-sub (pageId)
-  |     |-url
-  |     |-title
-  |     |-fullTitle
-  |     |-synopsis
-  |     |-newWindow
-  |     `-sub (pageId)
-  |        `-etc
-  `-pageId
-     `-etc
-
-=over
-
-=item parentId
-
-The page id of where you'd like to start the tree.
-
-=item toLevel
-
-The depth the tree should be traversed. Defaults to "0". If set to "0" the entire tree will be traversed.
-
-=back
-
-=cut
-
-sub tree {
-        my ($sth, %data, %tree);
-	my ($parentId, $toLevel, $depth) = @_;
-        $toLevel = 99 if ($toLevel > 100 || $toLevel < 1);
-	tie %tree, 'Tie::IxHash';
-	tie %data, 'Tie::CPHash';
-       	if ($depth < $toLevel) {
-               	$sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis, hideFromNavigation, 
-			newWindow, title from page 
-			where parentId='$parentId' order by sequenceNumber");
-               	while (%data = $sth->hash) {
-                       	if (!($data{hideFromNavigation}) && WebGUI::Privilege::canViewPage($data{pageId})) {
-				$tree{$data{pageId}}{url} = WebGUI::URL::gateway($data{urlizedTitle}); 
-				$tree{$data{pageId}}{title} = $data{menuTitle}; 
-				$tree{$data{pageId}}{synopsis} = $data{synopsis}; 
-				$tree{$data{pageId}}{fullTitle} = $data{title};
-				$tree{$data{pageId}}{newWindow} = $data{newWindow};
-               	                $tree{$data{pageId}}{sub} = tree($data{pageId},$toLevel,($depth+1));
-                       	}
-                }
-       	        $sth->finish;
-       	}
-        return \%tree;
-}
 
 
 

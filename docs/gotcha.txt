@@ -38,6 +38,18 @@ save you many hours of grief.
 	so that you can migrate them manually to the new template
 	variables.
 
+ * The Synopsis macro no longer exists. If you were using it to
+	retrieve the current page's synopsis, then please use the
+	^Page("synopsis"); macro. If you were using it to build a
+	synopsis style navigation please use the new ^Navigation();
+	macro.
+
+ * The old navigation system has been entirely replaced. If you've
+	built or are using any navigation components that did not
+	come with WebGUI then you'll need to remove them and use
+	the new configurable navigation system. See migration.txt
+	for additional details.
+
  
 
 5.5.0

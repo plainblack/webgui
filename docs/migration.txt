@@ -26,9 +26,17 @@ There have currently been no changes to the Wobject API.
 2. Macro Migration
 -------------------
 
-2.1 Nothing Yet
+2.1 Navigation Macros
 
-There have currently been no changes to the macro API.
+As of WebGUI 6.0 there is no longer a need to develop custom navigation macros. WebGUI 
+has an entirely new navigation system that is 100% configurable and templated. The
+legacy navigation system has been removed. Any nav macros that you've written
+will need to be removed from the system. Then just create a navigation
+configuration to do what your old nav once did. 
+
+If you absolutely must write a navigation macro for some reason that our nav
+system does not accomodate you, then please check out the new API in
+WebGUI::Navigation.
 
 
 

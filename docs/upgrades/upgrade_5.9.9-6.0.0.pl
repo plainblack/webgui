@@ -491,7 +491,30 @@ my $macros = $conf->get("macros");
 delete $macros->{"\\"};
 $macros->{"\\\\"} = "Backslash_pageUrl";
 $macros->{"Navigation"} = "Navigation";
-$conf->set("macros"=>$macros);
+my %newMacros;
+foreach my $macro (keys %{$macros}) {
+	unless (
+		$macros->{$macro} eq "m_currentMenuHorizontal" 
+		|| $macros->{$macro} eq "M_currentMenuVertical" 
+		|| $macros->{$macro} eq "s_specificMenuHorizontal" 
+		|| $macros->{$macro} eq "S_specificMenuVertical" 
+		|| $macros->{$macro} eq "t_topMenuHorizontal" 
+		|| $macros->{$macro} eq "T_topMenuVertical" 
+		|| $macros->{$macro} eq "p_previousMenuHorizontal" 
+		|| $macros->{$macro} eq "P_previousMenuVertical" 
+		|| $macros->{$macro} eq "C_crumbTrail" 
+		|| $macros->{$macro} eq "FlexMenu" 
+		|| $macros->{$macro} eq "PreviousDropMenu" 
+		|| $macros->{$macro} eq "rootmenuHorizontal" 
+		|| $macros->{$macro} eq "RootTab" 
+		|| $macros->{$macro} eq "SpecificDropMenu" 
+		|| $macros->{$macro} eq "TopDropMenu" 
+		|| $macros->{$macro} eq "Synopsis" 
+		) {
+		$newMacros{$macro} = $macros->{$macro};
+	}
+}
+$conf->set("macros"=>\%newMacros);
 my $wobjects = $conf->get("wobjects");
 my @newWobjects;
 foreach my $wobject (@{$wobjects}) {
@@ -531,6 +554,22 @@ unlink("../../lib/WebGUI/Wobject/FAQ.pm");
 unlink("../../lib/WebGUI/Wobject/ExtraColumn.pm");
 unlink("../../lib/WebGUI/Authentication.pm");
 unlink("../../lib/WebGUI/Operation/Account.pm");
+unlink("../../lib/WebGUI/Macro/m_currentMenuHorizontal.pm");
+unlink("../../lib/WebGUI/Macro/M_currentMenuVertical.pm");
+unlink("../../lib/WebGUI/Macro/s_specificMenuHorizontal.pm");
+unlink("../../lib/WebGUI/Macro/S_specificMenuVertical.pm");
+unlink("../../lib/WebGUI/Macro/t_topMenuHorizontal.pm");
+unlink("../../lib/WebGUI/Macro/T_topMenuVertical.pm");
+unlink("../../lib/WebGUI/Macro/p_previousMenuHorizontal.pm");
+unlink("../../lib/WebGUI/Macro/P_previousMenuVertical.pm");
+unlink("../../lib/WebGUI/Macro/C_crumbTrail.pm");
+unlink("../../lib/WebGUI/Macro/FlexMenu.pm");
+unlink("../../lib/WebGUI/Macro/PreviousDropMenu.pm");
+unlink("../../lib/WebGUI/Macro/Synopsis.pm");
+unlink("../../lib/WebGUI/Macro/rootmenuHorizontal.pm");
+unlink("../../lib/WebGUI/Macro/RootTab.pm");
+unlink("../../lib/WebGUI/Macro/SpecificDropMenu.pm");
+unlink("../../lib/WebGUI/Macro/TopDropMenu.pm");
 rmtree("../../lib/WebGUI/Authentication");
 rmtree("../../www/extras/toolbar/default");
 
