@@ -711,6 +711,7 @@ sub www_view {
 	$var{"search.Form"} = WebGUI::Search::form({wid=>$_[0]->get("wobjectId"),func=>'view',search=>1});
 	$var{"search.url"} = WebGUI::Search::toggleURL("wid=".$_[0]->get("wobjectId")."&func=view");
         $var{"rss.url"} = WebGUI::URL::page('func=viewRSS&wid='.$_[0]->get("wobjectId"));
+        $var{canModerate} = WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
 	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	if ($session{scratch}{search}) {
                 $numResults = $session{scratch}{numResults};
@@ -719,9 +720,12 @@ sub www_view {
 	if ($constraints ne "") {
         	$constraints = "USS_submission.status='Approved' and ".$constraints;
 	} else {
-		$constraints = "(USS_submission.status='Approved' or (USS_submission.userId=".quote($session{user}{userId})." and USS_submission.userId<>1))";
+		$constraints = "(USS_submission.status='Approved' or (USS_submission.userId=".quote($session{user}{userId})." and USS_submission.userId<>1)";
+		if ($var{canModerate}) {
+			$constraints .= " or USS_submission.status='Pending'"; 
+		}
+		$constraints .= ")";
 	}
-        $var{canModerate} = WebGUI::Grouping::isInGroup($_[0]->get("groupToApprove"),$session{user}{userId});
 	$var{"title.label"} = WebGUI::International::get(99);
 	$var{"thumbnail.label"} = WebGUI::International::get(52,$_[0]->get("namespace"));
 	$var{"date.label"} = WebGUI::International::get(13,$_[0]->get("namespace"));

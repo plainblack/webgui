@@ -372,7 +372,7 @@ sub www_view {
 	tie %previous, 'Tie::CPHash';
 	if ($_[0]->get("startMonth") eq "first") {
 		my $query = "select min(startDate) from EventsCalendar_event";
-		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+		$query .= " where wobjectId=".quote($_[0]->get("wobjectId")) unless ($_[0]->get("isMaster"));
 		($minDate) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
 	} elsif ($_[0]->get("startMonth") eq "january") {
 		$minDate = WebGUI::DateTime::humanToEpoch(WebGUI::DateTime::epochToHuman("","%y")."-01-01 00:00:00");
@@ -384,7 +384,7 @@ sub www_view {
 	}
 	if ($_[0]->get("endMonth") eq "last") {
 		my $query = "select max(endDate) from EventsCalendar_event";
-		$query .= " where wobjectId=".$_[0]->get("wobjectId") unless ($_[0]->get("isMaster"));
+		$query .= " where wobjectId=".quote($_[0]->get("wobjectId")) unless ($_[0]->get("isMaster"));
 		($maxDate) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);	
 	} elsif ($_[0]->get("endMonth") eq "after12") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,1,0,0); 
@@ -395,9 +395,15 @@ sub www_view {
 	} elsif ($_[0]->get("endMonth") eq "after3") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0); 
 	}
+WebGUI::ErrorHandler::warn("Min:".$minDate);
+WebGUI::ErrorHandler::warn("Max:".$maxDate);
+
 	$maxDate = $maxDate || WebGUI::DateTime::time();
+WebGUI::ErrorHandler::warn("Max:".$maxDate);
 	($junk,$maxDate) = WebGUI::DateTime::dayStartEnd($maxDate);
+WebGUI::ErrorHandler::warn("Max:".$maxDate);
 	my $monthCount = WebGUI::DateTime::monthCount($minDate,$maxDate);
+WebGUI::ErrorHandler::warn("Count:".$monthCount);
 	unless ($session{form}{calPn}) {
 		$flag = 1;
 		if ($_[0]->get("defaultMonth") eq "current") {
@@ -414,7 +420,7 @@ sub www_view {
 	$var{"addevent.url"} = WebGUI::URL::page('func=editEvent&eid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	my @monthloop;
-	for (my $i=1;$i<=$monthCount;$i++) {
+	for (my $i=1;$i<$monthCount;$i++) {
 	#	if ($session{form}{calPn} == ($i)) {
 			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
 			my ($monthStart, $monthEnd) = WebGUI::DateTime::monthStartEnd($thisMonth);

@@ -107,7 +107,7 @@ sub addToDate {
 	$years 		= shift || 0;
 	$months 	= shift || 0;
 	$days	 	= shift || 0;
-	$newDate 	= DateCalc($date,"$years:$months:0:$days:0:0:0");
+	$newDate 	= DateCalc($date,"+$years:$months:0:$days:0:0:0");
 	return &dateToEpoch($newDate);
 }
 
@@ -141,7 +141,7 @@ sub addToTime {
 	$hours 		= shift || 0;
 	$mins	 	= shift || 0;
 	$secs	 	= shift || 0;
-	$newDate 	= DateCalc($date,"0:0:0:0:$hours:$mins:$secs");
+	$newDate 	= DateCalc($date,"+0:0:0:0:$hours:$mins:$secs");
 	return &dateToEpoch($newDate);
 }
 
@@ -204,7 +204,14 @@ An epoch date.
 
 sub epochToArray {
 	my $epoch = shift;
-	return &UnixDate(epochToDate($epoch),'%Y','%m','%d','%H','%M','%S');
+	my @date = &UnixDate(epochToDate($epoch),'%Y','%m','%d','%H','%M','%S');
+	$date[0] = $date[0]+0;
+	$date[1] = $date[1]+0;
+	$date[2] = $date[2]+0;
+	$date[3] = $date[3]+0;
+	$date[4] = $date[4]+0;
+	$date[5] = $date[5]+0;
+	return @date;
 }
 
 
@@ -618,8 +625,8 @@ sub monthCount {
 	my $end = &epochToDate(shift);
 	my $err;
 	my $delta = &DateCalc($start,$end,\$err,1);
-	return $delta;
-	return &Delta_Format($delta,0,'%Mh');
+	my $count = 1+&Delta_Format($delta,0,'%Mv')+&Delta_Format($delta,0,'%yv')*12;
+	return $count;
 }
 
 

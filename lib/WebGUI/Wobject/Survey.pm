@@ -829,14 +829,14 @@ sub www_moveAnswerUp {
 sub www_moveQuestionDown {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Survey_question","Survey_questionId",$session{form}{qid},"Survey_id");
-        return $_[0]->www_edit;
+        return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Survey_question","Survey_questionId",$session{form}{qid},"Survey_id");
-        return $_[0]->www_edit;
+        return ""; 
 }
 
 #-------------------------------------------------------------------

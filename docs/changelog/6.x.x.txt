@@ -13,6 +13,14 @@
    dir (Yary Hluchan)
  - bugfix [ 1027684 ] cp silent failure in Attatchment.pm (Yary Hluchan)
  - bugfix [ 1027681 ] Some warnings hard to track down (Yary Hluchan)
+ - bugfix [ 1027950 ] Collateral problem(s)
+ - bugfix [ 1028110 ] 6.2.2 PageTree doesn't format AND move buttons don't
+   work
+ - bugfix [ 1027687 ] Events List does not show events
+ - bugfix [ 1028054 ] 6.2.2 USS uploads do not show on list
+ - Fixed a problem with the dTree navigation template.
+ - bugfix [ 998249 ] Moving Survey Questions - Incorrect Redirection
+ - bugfix [ 1029170 ] Forum: Sorting thread by date
 
 
 6.2.2

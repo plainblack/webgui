@@ -192,7 +192,7 @@ sub _traversePageTree {
 
 	tie %wobject, 'Tie::CPHash';
         $spacer = '<img src="'.$session{config}{extrasURL}.'/spacer.gif" width=12>';
-	my $sth = WebGUI::SQL->read("select pageId,isSystem,urlizedTitle,title from page where parentId=".quote($parentId));
+	my $sth = WebGUI::SQL->read("select pageId,isSystem,urlizedTitle,title from page where parentId=".quote($parentId)." order by nestedSetLeft");
 	while (my ($pageId,$isSystem,$url,$title) = $sth->array) {
 		unless ($isSystem) {
 			$output .= $spacer x $initialDepth

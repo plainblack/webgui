@@ -1011,7 +1011,7 @@ sub getForumTemplateVars {
 	$var{'thread.sorted.'.$sortDir} = 1;
 	if ($session{scratch}{forumSortBy} eq "date") {
 		$var{'thread.sortedby.date'} = 1;
-		$query .= "rootPostId $sortDir";
+		$query .= "lastPostDate $sortDir";
 	} elsif ($session{scratch}{forumSortBy} eq "views") {
 		$var{'thread.sortedby.views'} = 1;
 		$query .= "views $sortDir";
