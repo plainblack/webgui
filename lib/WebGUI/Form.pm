@@ -1176,8 +1176,8 @@ sub template {
 
 sub text {
         my ($size, $maxLength, $value);
-	$value = _fixQuotes($_[0]->{value});
         $value = _fixSpecialCharacters($value);
+	$value = _fixQuotes($_[0]->{value});
         $maxLength = $_[0]->{maxlength} || 255;
         $size = $_[0]->{size} || $session{setting}{textBoxSize} || 30;
         return '<input type="text" name="'.$_[0]->{name}.'" value="'.$value.'" size="'.
