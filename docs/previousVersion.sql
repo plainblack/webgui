@@ -6220,7 +6220,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('4.6.0','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('4.6.1','initial install',unix_timestamp());
 
 --
 -- Table structure for table 'wobject'
