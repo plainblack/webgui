@@ -5,6 +5,7 @@
  - bugfix [ 1025671 ] Crash on manage page tree. (Leendert Bottelberghs)
  - bugfix [ 1025271 ] Cut page not working. (Leendert Bottelberghs)
  - bugfix [ 1024643 ] Unknown column error. (Leendert Bottelberghs)
+ - bugfix [ 1025120 ] Pagination in forum thread doesn't work. New default thread template. (Leendert Bottelberghs)
 
 
 6.2.1
