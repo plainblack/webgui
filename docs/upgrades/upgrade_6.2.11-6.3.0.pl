@@ -1812,6 +1812,7 @@ sub walkTree {
 
 sub migrateForum {
 	my $originalId = shift;
+	print "\t\t\t\t Migrating forum $originalId\n";
 	my $newParentId = shift;
 	my $newParentLineage = shift;
 	my $rank = shift;
@@ -1873,6 +1874,7 @@ sub migrateForum {
 		styleTemplateId=>$styleId,
 		printableStyleTemplateId=>$printId
 		},undef,$newId);
+	print "\t\t\t\t\t Migrating subscriptions for forum $originalId\n";
 	my $subscriptionGroup = WebGUI::Group->new("new");
 	$subscriptionGroup->description("The group to store subscriptions for the collaboration system $newId");
 	$subscriptionGroup->name($newId);
@@ -1917,10 +1919,12 @@ sub migrateForum {
 		},undef,$newId);
 	my %oldestForumPost;
 	my $ratingprep = WebGUI::SQL->prepare("insert into Post_rating (assetId, userId, ipAddress, dateOfRating, rating) values (?,?,?,?,?)");
+	print "\t\t\t\t\t Migrating threads for forum $originalId\n";
 	my $threads = WebGUI::SQL->read("select * from forumThread left join forumPost on forumThread.rootPostId=forumPost.forumPostId where
 		forumThread.forumId=".quote($originalId));
 	my $threadRank = 1;
 	while (my ($thread) = $threads->hashRef) {
+		print "\t\t\t\t\t\t Migrating thread ".$thread->{forumThreadId}."\n";
 		my $threadLineage = $lineage.sprintf("%06d",$threadRank);
 		my $threadId = WebGUI::SQL->setRow("asset","assetId",{
 			assetId=>"new",
@@ -1973,10 +1977,12 @@ sub migrateForum {
 			subscriptionGroupId=>$threadSubscriptionGroup->groupId
 			}, undef, $threadId);
 		# we're going to give up hierarchy during the upgrade for the sake of simplicity
+		print "\t\t\t\t\t\t Migrating posts for thread ".$thread->{forumThreadId}."\n";
 		my %oldestThreadPost;
 		my $posts = WebGUI::SQL->read("select * from forumPost where forumThreadId=".quote($thread->{forumThreadId})." and parentId<>''");
 		my $postRank = 1;
 		while (my $post = $posts->hashRef) {
+			print "\t\t\t\t\t\t\t Migrating post ".$post->{forumPostId}."\n";
 			my $postId = WebGUI::SQL->setRow("asset","assetId",{
 				assetId=>"new",
 				parentId=>$threadId,
@@ -2011,11 +2017,12 @@ sub migrateForum {
 				contentType=>$post->{contentType},
 				rating=>$post->{rating}
 				},undef,$postId);
-			my $sth = WebGUI::SQL->read("select userId,ipAddress,dateOfRating,rating from forumPostRating where forumPostId=".quote($post->{forumPostId}));
-			while (my ($uid,$ip,$date,$rating) = $sth->array) {
-				$ratingprep->execute($postId,$uid,$ip,$date,$rating);
+			print "\t\t\t\t\t\t\t\t Migrating ratings for post ".$post->{forumPostId}."\n";
+			my $ratings = WebGUI::SQL->read("select userId,ipAddress,dateOfRating,rating from forumPostRating where forumPostId=".quote($post->{forumPostId}));
+			while (my ($uid,$ip,$date,$rating) = $ratings->array) {
+				$ratingprep->execute([$postId,$uid,$ip,$date,$rating]);
 			}
-			$sth->finish;
+			$ratings->finish;
 			$postRank++;
 		}
 		$posts->finish;

@@ -279,7 +279,7 @@ sub execute {
 	my $self = shift;
 	my $placeholders = shift || [];
 	my $sql = $self->{_sql};
-	$self->{_sth}->execute(@$placeholders) or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: $sql  Root cause: ". DBI->errstr);
+	$self->{_sth}->execute(@{$placeholders}) or WebGUI::ErrorHandler::fatalError("Couldn't execute prepared statement: $sql  Root cause: ". DBI->errstr);
 }
 
 
