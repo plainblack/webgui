@@ -79,6 +79,7 @@ the Navigation Template to determine who can see them in the menu.</P>
 
 	'1097' => {
 		message => q| <P><STRONG>currentPage.menuTitle</STRONG><BR>The pageId of the base page.</P>
+<P><STRONG>currentPage.menuTitle</STRONG><BR>The menu title of the base page.</P>
 <P><STRONG>currentPage.title</STRONG><BR>The title of the base page.</P>
 <P><STRONG>currentPage.url</STRONG><BR>The URL of the base page.</P>
 <P><STRONG>currentPage.assetId</STRONG><BR>The assetId of the base page.</P>
@@ -87,6 +88,7 @@ the Navigation Template to determine who can see them in the menu.</P>
 <P><STRONG>currentPage.synopsis</STRONG><BR>The synopsis of the base page.</P>
 <P><STRONG>currentPage.newWindow</STRONG><BR>A conditional indicating whether the base page should be opened in a new window.</P>
 <P><STRONG>currentPage.hasChild</STRONG><BR>A conditional indicating whether the base page has daughters.</P>
+<P><STRONG>currentPage.isHome</STRONG><BR>A conditional indicating whether the base page is the default page for the site.</P>
 <P><STRONG>page_loop</STRONG><BR>A loop containing page information in nested, hierarchical order.</P>
 <P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different.  <STRONG>unfolded_page_loop</STRONG> returns it's pages in an unfolded manner; grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
 <p>Both <STRONG>page_loop</STRONG> and <STRONG>unfolded_page_loop</STRONG> have the following
@@ -100,10 +102,10 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.ownerUserId</STRONG><BR>The userId of the owner of this page.</P>
 <P dir=ltr><STRONG>page.synopsis</STRONG><BR>The synopsis of this page.</P>
 <P dir=ltr><STRONG>page.newWindow</STRONG><BR>A conditional indicating whether this page should be opened in a new window.</P>
-<P dir=ltr><STRONG>page.absDepth</STRONG><BR>The absolute depth of this page&nbsp;(relative to nameless root).</P>
+<P dir=ltr><STRONG>page.absDepth</STRONG><BR>The absolute depth of this page (relative to nameless root).</P>
 <P><STRONG>page.relDepth</STRONG><BR>The relative depth of this page (relative to starting point).</P>
-<P><STRONG>page.isHidden</STRONG><BR>A conditional indicating whether this page is a hidden page.</P>
 <P><STRONG>page.isSystem</STRONG><BR>A conditional indicating whether this page is a system page (Trash, Clipboard, etc).</P>
+<P><STRONG>page.isHidden</STRONG><BR>A conditional indicating whether this page is a hidden page.</P>
 <P><STRONG>page.isViewable</STRONG><BR>A conditional indicating whether the user has permission to view it.</P>
 <P><STRONG>page.indent</STRONG><BR>A variable containing the indent for the current page. The default indent is three spaces. Use the <STRONG>page.indent_loop</STRONG> if you need a more flexible indent.</P>
 <P><STRONG>page.indent_loop</STRONG><BR>A loop that runs <STRONG>page.relDepth</STRONG> times.</P>
@@ -111,16 +113,17 @@ loop variables:</p>
 <P><STRONG>indent</STRONG><BR>A number representing the loop count. </P></BLOCKQUOTE>
 <P dir=ltr><STRONG>page.isBranchRoot</STRONG><BR>A conditional indicating whether this page is a root page.</P>
 <P dir=ltr><STRONG>page.isTopOfBranch</STRONG><BR>A conditional indicating whether this page is a top page (daughter of root).</P>
-<P dir=ltr><STRONG>page.inBranchRoot</STRONG><BR>This conditional is true if this page is a descendant of the root page of the base page.</P>
-<P dir=ltr><STRONG>page.hasChild</STRONG><BR>A conditional indicating whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
-<P dir=ltr><STRONG>page.isCurrent</STRONG><BR>A conditional indicating whether this page is the base page.</P>
-<P dir=ltr><STRONG>page.isAncestor</STRONG><BR>A conditional indicating whether this page is an ancestor of the base page.</P>
-<P dir=ltr><STRONG>page.isDescendent</STRONG><BR>A conditional indicating whether this page is a descendant of the base page.</P>
 <P dir=ltr><STRONG>page.isChild</STRONG><BR>A conditional indicating whether this page is a daughter of the base page.</P>
 <P dir=ltr><STRONG>page.isParent</STRONG><BR>A conditional indicating whether this page is the mother of the base page.</P>
+<P dir=ltr><STRONG>page.isCurrent</STRONG><BR>A conditional indicating whether this page is the base page.</P>
+<P dir=ltr><STRONG>page.isDescendent</STRONG><BR>A conditional indicating whether this page is a descendant of the base page.</P>
+<P dir=ltr><STRONG>page.isAncestor</STRONG><BR>A conditional indicating whether this page is an ancestor of the base page.</P>
+<P dir=ltr><STRONG>page.inBranchRoot</STRONG><BR>This conditional is true if this page is a descendant of the root page of the base page.</P>
 <P dir=ltr><STRONG>page.isSibling</STRONG><BR>A conditional indicating whether this page is the sister of the base page.</P>
 <P dir=ltr><STRONG>page.inBranch</STRONG><BR>A conditional that is the logical OR of <STRONG>isAncestor</STRONG>, <STRONG>isSister</STRONG>, <STRONG>isBasepage</STRONG> and <STRONG>isDescendent</STRONG>.</P>
+<P dir=ltr><STRONG>page.hasChild</STRONG><BR>A conditional indicating whether this page has a daughter. In other words, it evaluates to true if this page is a mother.</P>
 <P dir=ltr><STRONG>page.parent.*</STRONG><BR>These variables will be undefined if the page is a root.</P>
+<P dir=ltr><STRONG>page.parent.menuTitle</STRONG><BR>The menu title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.parent.title</STRONG><BR>The title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.parent.url</STRONG><BR>The urlized title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.parent.assetId</STRONG><BR>The assetId of the mother of this page.</P>
@@ -137,7 +140,7 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1106872049,
+		lastUpdated => 1108598200,
 	},
 
 	'1094' => {
