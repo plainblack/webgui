@@ -175,6 +175,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 
  %% = % (percent) symbol.
  %c = The calendar month name.
+ %C = The calendar month name abbreviated to 3 characters and represented in English.
  %d = A two digit day.
  %D = A variable digit day.
  %h = A two digit hour (on a 12 hour clock).
@@ -184,10 +185,13 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
  %m = A two digit month.
  %M = A variable digit month.
  %n = A two digit minute.
+ %o = Offset from GMT represented as an integer.
+ %O = Offset from GMT represented in four digit form with a sign. Example: -0600
  %p = A lower-case am/pm.
  %P = An upper-case AM/PM.
  %s = A two digit second.
- %w = The name of the week. 
+ %w = Day of the week. 
+ %W = Day of the week abbreviated to 3 characters and represented in English. 
  %y = A four digit year.
  %Y = A two digit year. 
  %z = The current user's date format preference.
@@ -205,6 +209,12 @@ sub epochToHuman {
 	$temp = $temp+$offset;
 	my ($year,$month,$day,$hour,$min,$sec) = Date::Calc::Time_to_Date($temp);
 	$output = $_[1] || "%z %Z";
+  #---GMT Offsets
+	$temp = $session{user}{timeOffset}*100;
+	$temp = sprintf('%+05d',$temp);
+	$output =~ s/\%O/$temp/g;
+	$temp = $session{user}{timeOffset}+0;
+	$output =~ s/\%o/$temp/g;
   #---dealing with percent symbol
 	$output =~ s/\%\%/\%/g;
   #---date format preference
@@ -222,16 +232,24 @@ sub epochToHuman {
 	$output =~ s/\%m/$value/g;
 	$output =~ s/\%M/$month/g;
 	if ($output =~ /\%c/) {
-		my $monthName = getMonthName($month);
-		$output =~ s/\%c/$monthName/g;
+		$temp = getMonthName($month);
+		$output =~ s/\%c/$temp/g;
+	}
+	if ($output =~ /\%C/) {
+		$temp = substr(Date::Calc::Month_to_Text($month),0,3);
+		$output =~ s/\%C/$temp/g;
 	}
   #---day stuff
 	$value = sprintf("%02d",$day);
 	$output =~ s/\%d/$value/g;
 	$output =~ s/\%D/$day/g;
 	if ($output =~ /\%w/) {
-		my $dayName = getDayName(Date::Calc::Day_of_Week($year,$month,$day));
-		$output =~ s/\%w/$dayName/g;
+		$temp = getDayName(Date::Calc::Day_of_Week($year,$month,$day));
+		$output =~ s/\%w/$temp/g;
+	}
+	if ($output =~ /%W/) {
+		$temp = Date::Calc::Day_of_Week_Abbreviation(Date::Calc::Day_of_Week($year,$month,$day));
+		$output =~ s/\%W/$temp/g;
 	}
   #---hour stuff
 	$hour12 = $hour;

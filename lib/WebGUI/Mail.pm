@@ -16,6 +16,7 @@ package WebGUI::Mail;
 
 use Net::SMTP;
 use strict;
+use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::Macro;
 use WebGUI::Session;
@@ -86,6 +87,7 @@ sub send {
         $message .= "CC: $_[3]\n" if ($_[3]);
         $message .= "BCC: $_[5]\n" if ($_[5]);
         $message .= "Subject: ".$_[1]."\n";
+	$message .= "Date: ".WebGUI::DateTime::epochToHuman("","%W, %d %C %y %j:%n:%s %O")."\n";
         $message .= "\n";
 	$message = WebGUI::Macro::process($message);
         #body
