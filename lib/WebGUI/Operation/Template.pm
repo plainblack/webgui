@@ -30,7 +30,7 @@ our @EXPORT = qw(&www_copyTemplate &www_deleteTemplate &www_deleteTemplateConfir
 #-------------------------------------------------------------------
 sub www_copyTemplate {
 	my (%template);
-        if (WebGUI::Privilege::isInGroup(8)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid}");
                 WebGUI::SQL->write("insert into template (templateId,name,template) values (".getNextId("templateId").", 
 			".quote('Copy of '.$template{name}).", ".quote($template{template}).")");
@@ -45,7 +45,7 @@ sub www_deleteTemplate {
         my ($output);
         if ($session{form}{tid} < 1000 && $session{form}{tid} > 1000) {
 		return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup(8)) {
+        } elsif (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
                 $output .= helpIcon(35);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(502).'<p>';
@@ -65,7 +65,7 @@ sub www_deleteTemplateConfirm {
 	my ($a, $pageId);
         if ($session{form}{tid} < 1000 && $session{form}{tid} > 1000) {
 		return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup(8)) {
+        } elsif (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		$a = WebGUI::SQL->read("select * from page where templateId=".$session{form}{tid});
 		while (($pageId) = $a->array) {
 			WebGUI::SQL->write("update wobject set templatePosition=0 where pageId=$pageId");
@@ -83,7 +83,7 @@ sub www_deleteTemplateConfirm {
 sub www_editTemplate {
         my ($output, %template, $f);
 	tie %template, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup(8)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		if ($session{form}{tid} eq "new") {
 			$template{template} = "<table>\n <tr>\n  <td>\n\n^0;\n\n  </td>\n </tr>\n</table>\n";
 		} else {
@@ -107,7 +107,7 @@ sub www_editTemplate {
 
 #-------------------------------------------------------------------
 sub www_editTemplateSave {
-        if (WebGUI::Privilege::isInGroup(8)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
 		if ($session{form}{tid} eq "new") {
 			$session{form}{tid} = getNextId("templateId");
 			WebGUI::SQL->write("insert into template (templateId) values ($session{form}{tid})");
@@ -124,7 +124,7 @@ sub www_editTemplateSave {
 #-------------------------------------------------------------------
 sub www_listTemplates {
         my ($output, $sth, @data, @row, $i, $p);
-        if (WebGUI::Privilege::isInGroup(8)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
                 $output = helpIcon(33);
 		$output .= '<h1>'.WebGUI::International::get(506).'</h1>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editTemplate&tid=new').

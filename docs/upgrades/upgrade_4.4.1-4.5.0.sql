@@ -30,7 +30,6 @@ update wobject set editTimeout=editTimeout*3600;
 insert into international values (707,"WebGUI",1,"Show debugging?");
 insert into settings values ('showDebug',0);
 update settings set name='imageManagersGroup' where name='groupToManageImages';
-insert into settings values ('packageManagersGroup',6);
 insert into settings values ('styleManagersGroup',5);
 insert into settings values ('templateManagersGroup',8);
 delete from international where internationalId=414 and namespace='WebGUI';
@@ -38,11 +37,10 @@ delete from international where internationalId=415 and namespace='WebGUI';
 delete from international where internationalId=413 and namespace='WebGUI';
 insert into international values (710,'WebGUI',1,'Edit Privilege Settings');
 insert into international values (711,'WebGUI',1,'Image Managers Group');
-insert into international values (712,'WebGUI',1,'Package Managers Group');
 insert into international values (713,'WebGUI',1,'Style Managers Group');
 insert into international values (714,'WebGUI',1,'Template Managers Group');
 delete from settings where name='onCriticalError';
-
+update international set message='Add a new image group.' where internationalId=543 and namespace='WebGUI' and languageId=1;
 
 
 

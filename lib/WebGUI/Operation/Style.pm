@@ -29,7 +29,7 @@ our @EXPORT = qw(&www_copyStyle &www_deleteStyle &www_deleteStyleConfirm &www_ed
 #-------------------------------------------------------------------
 sub www_copyStyle {
 	my (%style);
-        if (WebGUI::Privilege::isInGroup(5)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
 		%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
                 WebGUI::SQL->write("insert into style (styleId,name,body,styleSheet) values (".getNextId("styleId").", 
 			".quote('Copy of '.$style{name}).", ".quote($style{body}).", ".quote($style{styleSheet}).")");
@@ -44,7 +44,7 @@ sub www_deleteStyle {
         my ($output);
         if ($session{form}{sid} < 26 && $session{form}{sid} > 0) {
 		return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup(5)) {
+        } elsif (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
                 $output .= helpIcon(4);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(155).'<p>';
@@ -63,7 +63,7 @@ sub www_deleteStyle {
 sub www_deleteStyleConfirm {
         if ($session{form}{sid} < 26 && $session{form}{sid} > 0) {
 		return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup(5)) {
+        } elsif (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
                 WebGUI::SQL->write("delete from style where styleId=".$session{form}{sid});
                 WebGUI::SQL->write("update page set styleId=2 where styleId=".$session{form}{sid});
                 return www_listStyles();
@@ -76,7 +76,7 @@ sub www_deleteStyleConfirm {
 sub www_editStyle {
         my ($output, %style, $f);
 	tie %style, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup(5)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
 		if ($session{form}{sid} eq "new") {
 			$style{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>";
 			$style{styleSheet} = "<style>\n\n</style>";
@@ -102,7 +102,7 @@ sub www_editStyle {
 
 #-------------------------------------------------------------------
 sub www_editStyleSave {
-        if (WebGUI::Privilege::isInGroup(5)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
 		if ($session{form}{sid} eq "new") {
 			$session{form}{sid} = getNextId("styleId");
 			WebGUI::SQL->write("insert into style (styleId) values ($session{form}{sid})");
@@ -119,7 +119,7 @@ sub www_editStyleSave {
 #-------------------------------------------------------------------
 sub www_listStyles {
         my ($output, $sth, @data, @row, $i, $p);
-        if (WebGUI::Privilege::isInGroup(5)) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
                 $output = helpIcon(9);
 		$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editStyle&sid=new').

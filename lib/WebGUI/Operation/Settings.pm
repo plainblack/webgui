@@ -239,7 +239,6 @@ sub www_editPrivilegeSettings {
                 $f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editPrivilegeSettingsSave");
                 $f->group("imageManagersGroup",WebGUI::International::get(711),[$session{setting}{imageManagersGroup}]);
-                $f->group("packageManagersGroup",WebGUI::International::get(712),[$session{setting}{packageManagersGroup}]);
                 $f->group("styleManagersGroup",WebGUI::International::get(713),[$session{setting}{styleManagersGroup}]);
                 $f->group("templateManagersGroup",WebGUI::International::get(714),[$session{setting}{templateManagersGroup}]);
                 $f->submit;
@@ -254,7 +253,6 @@ sub www_editPrivilegeSettings {
 sub www_editPrivilegeSettingsSave {
         if (WebGUI::Privilege::isInGroup(3)) {
                 _saveSetting("imageManagersGroup");
-                _saveSetting("packageManagersGroup");
                 _saveSetting("styleManagersGroup");
                 _saveSetting("templateManagersGroup");
                 return www_manageSettings();

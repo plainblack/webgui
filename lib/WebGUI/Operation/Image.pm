@@ -28,10 +28,11 @@ use WebGUI::Utility;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editImage &www_editImageSave &www_viewImage &www_deleteImage &www_deleteImageConfirm &www_listImages &www_deleteImageFile &www_editImageGroup &www_editImageGroupSave &www_viewImageGroup &www_deleteImageGroup &www_deleteImageGroupConfirm);
 
+
 #-------------------------------------------------------------------
 sub www_deleteImage {
         my ($output);
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
                 $output .= helpIcon(23);
                 $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(392).'<p>';
@@ -49,7 +50,7 @@ sub www_deleteImage {
 #-------------------------------------------------------------------
 sub www_deleteImageConfirm {
 	my ($image);
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
                 $image = WebGUI::Attachment->new("","images",$session{form}{iid});
 		$image->deleteNode;
                 WebGUI::SQL->write("delete from images where imageId=$session{form}{iid}");
@@ -61,7 +62,7 @@ sub www_deleteImageConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteImageFile {
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
                 WebGUI::SQL->write("update images set filename='' where imageId=$session{form}{iid}");
                 return www_editImage();
         } else {
@@ -73,7 +74,7 @@ sub www_deleteImageFile {
 sub www_editImage {
         my ($output, %data, $image, $f, $imageGroupId);
 	tie %data, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
 		if ($session{form}{iid} eq "new") {
 			$imageGroupId = $session{form}{gid};
 		} else {
@@ -110,7 +111,7 @@ sub www_editImage {
 #-------------------------------------------------------------------
 sub www_editImageSave {
         my ($file, $sqlAdd, $test);
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
 		if ($session{form}{iid} eq "new") {
 			$session{form}{iid} = getNextId("imageId");
 			WebGUI::SQL->write("insert into images (imageId) values ($session{form}{iid})");
@@ -141,10 +142,12 @@ sub www_editImageSave {
 
 #-------------------------------------------------------------------
 sub www_listImages {
-        my ($f, $output, $sth, %data, @row, $image, $p, $i, $search, $search_group, $imageGroupId, $isImageManager, $imageGroupParentId);
+        my ($f, $output, $sth, %data, @row, $image, $p, $i, $search, $search_group, 
+		$isAdmin, $imageGroupId, $isImageManager, $imageGroupParentId);
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(4)) {
-		$isImageManager = WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages});
+		$isImageManager = WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup});
+		$isAdmin = WebGUI::Privilege::isInGroup(3);
 		if($session{form}{gid} ne "") { 
 			$imageGroupId = $session{form}{gid};
 		} else {
@@ -218,7 +221,7 @@ sub www_listImages {
                 while (%data = $sth->hash) {
 			$image = WebGUI::Attachment->new($data{filename},"images",$data{imageId});
                         $row[$i] = '<tr class="tableData"><td>';
-			if ($isImageManager) {
+			if ($isAdmin || $session{user}{userId} == $data{userId}) {
 	                        $row[$i] .= deleteIcon('op=deleteImage&iid='.$data{imageId}.'&gid='.$data{imageGroupId});
                                 $row[$i] .= editIcon('op=editImage&iid='.$data{imageId}.'&gid='.$data{imageGroupId});
 			}
@@ -271,7 +274,7 @@ sub www_viewImage {
 #-------------------------------------------------------------------
 sub www_deleteImageGroup {
         my ($output);
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
                 $output .= helpIcon(23);
                 $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(544).'<p>';
@@ -290,7 +293,7 @@ sub www_deleteImageGroup {
 sub www_deleteImageGroupConfirm {
 	my ($image, %data);
 	tie %data, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
 		%data = WebGUI::SQL->quickHash("select parentId from imageGroup where imageGroupId=$session{form}{gid}");
 		WebGUI::SQL->write("update images set imageGroupId=$data{parentId} where imageGroupId=$session{form}{gid}");
 		WebGUI::SQL->write("update imageGroup set parentId=$data{parentId} where parentId=$session{form}{gid}");
@@ -307,7 +310,7 @@ sub www_editImageGroup {
         my ($output, %data, %parent_data, $image, $f);
 	tie %data, 'Tie::CPHash';
 	tie %parent_data, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
 		if ($session{form}{gid} eq "new") {
 		
 		} else {
@@ -335,7 +338,7 @@ sub www_editImageGroup {
 #-------------------------------------------------------------------
 sub www_editImageGroupSave {
         my ($test);
-        if (WebGUI::Privilege::isInGroup($session{setting}{groupToManageImages})) {
+        if (WebGUI::Privilege::isInGroup($session{setting}{imageManagersGroup})) {
 		if ($session{form}{gid} eq "new") {
 			$session{form}{gid} = getNextId("imageGroupId");
 			WebGUI::SQL->write("insert into imageGroup (imageGroupId) values ($session{form}{gid})");
