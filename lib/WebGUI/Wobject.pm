@@ -565,7 +565,7 @@ sub set {
 =cut
 
 sub setCollateral {
-	my ($key, $sql, $properties, $seq, $dbkeys, $dbvalues, $counter);
+	my ($key, $sql, $seq, $dbkeys, $dbvalues, $counter);
 	my ($class, $table, $keyName, $properties, $useSequence, $useWobjectId) = @_;
 	$counter = 0;
 	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
