@@ -18405,7 +18405,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('5.5.5','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('5.5.6','initial install',unix_timestamp());
 
 --
 -- Table structure for table `wobject`
