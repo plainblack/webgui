@@ -213,6 +213,8 @@ The user for the session to become.
 
 sub convertVisitorToUser {
 	WebGUI::SQL->write("update userSession set userId=$_[1] where sessionId=".quote($_[0]));
+	undef $session{isInGroup};		# decache some performance enhancers because we're
+	undef $session{gotGroupsForUser};       # user ids.
 	$session{var}{userId} = $_[1];
 	refreshUserInfo($_[1]);
 }

@@ -17,12 +17,14 @@ use WebGUI::DatabaseLink;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
+use WebGUI::Form;
 use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Mail;
 use WebGUI::Operation::Shared;
+use WebGUI::Operation::User;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -66,6 +68,75 @@ sub _submenu {
 	}
         return menuWrapper($_[0],\%menu);
 }
+
+
+#-------------------------------------------------------------------
+sub doGroupSearch {
+	my $op = shift;
+        my $returnPaginator = shift;
+        my $groupFilter = shift;
+        push(@{$groupFilter},0);
+        my $keyword = $session{scratch}{groupSearchKeyword};
+        if ($session{scratch}{groupSearchModifier} eq "startsWith") {
+                $keyword .= "%";
+        } elsif ($session{scratch}{groupSearchModifier} eq "contains") {
+                $keyword = "%".$keyword."%";
+        } else {
+                $keyword = "%".$keyword;
+        }
+	$keyword = quote($keyword);
+	my $sql = "select groupId,groupName,description from groups where isEditable=1 and (groupName like $keyword or description like $keyword) 
+		and groupId not in (".join(",",@{$groupFilter}).") order by groupName";
+	if ($returnPaginator) {
+                my $p = WebGUI::Paginator->new(WebGUI::URL::page($op));
+                $p->setDataByQuery($sql);
+                return $p;
+        } else {
+                my $sth = WebGUI::SQL->read($sql);
+                return $sth;
+        }
+}
+
+
+#-------------------------------------------------------------------
+sub getGroupSearchForm {
+	my $op = shift;
+	my $params = shift;
+	WebGUI::Session::setScratch("groupSearchKeyword",$session{form}{keyword});
+        WebGUI::Session::setScratch("groupSearchModifier",$session{form}{modifier});
+	my $output = '<div align="center">';
+	my $f = WebGUI::HTMLForm->new(1);
+	foreach my $key (keys %{$params}) {
+                $f->hidden(
+                        -name=>$key,
+                        -value=>$params->{$key}
+                        );
+        }  
+        $f->hidden("op",$op);
+        $f->hidden(
+                -name=>"doit",
+                -value=>1
+                );
+        $f->selectList(
+                -name=>"modifier",
+                -value=>([$session{scratch}{groupSearchModifier}] || ["contains"]),
+                -options=>{
+                        startsWith=>WebGUI::International::get("starts with"),
+                        contains=>WebGUI::International::get("contains"),
+                        endsWith=>WebGUI::International::get("ends with")
+                        }
+                );
+        $f->text(
+                -name=>"keyword",
+                -value=>$session{scratch}{groupSearchKeyword},
+                -size=>15
+                );
+        $f->submit(WebGUI::International::get(170));
+        $output .= $f->print;
+        $output .= '</div>';
+	return $output;
+}
+
 
 #-------------------------------------------------------------------
 sub www_addGroupsToGroupSave {
@@ -298,6 +369,35 @@ sub www_emailGroupSend {
 #-------------------------------------------------------------------
 sub www_listGroups {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	my $output = helpIcon("groups manage");
+	$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
+	$output .= getGroupSearchForm("listGroups");
+	my ($groupCount) = WebGUI::SQL->quickArray("select count(*) from groups");
+        return _submenu($output) unless ($session{form}{doit} || $groupCount<250);
+	$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
+		.WebGUI::International::get(85).'</td><td class="tableHeader">'
+		.WebGUI::International::get(748).'</td></tr>';
+	my $p = doGroupSearch("op=listGroups",1);
+	foreach my $row (@{$p->getPageData}) {
+		my ($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".$row->{groupId});
+		$output .= '
+		<tr>
+			<td valign="top" class="tableData"><a href="'.WebGUI::URL::page("op=editGroup&gid=".$row->{groupId}).'">'.$row->{groupName}.'</a></td>
+			<td valign="top" class="tableData">'.$row->{description}.'</td>
+			<td valign="top" class="tableData">'.$userCount.'</td>
+		</tr>
+			';	
+	}
+        $output .= '</table>';
+	$output .= $p->getBarTraditional;
+	return _submenu($output);	
+}
+
+
+#-------------------------------------------------------------------
+sub www_listGroups2 {
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $p, $sth, @data, @row, $i, $userCount);
         $output = helpIcon("groups manage");
 	$output .= '<h1>'.WebGUI::International::get(89).'</h1>';
@@ -398,41 +498,67 @@ sub www_manageGroupsInGroup {
 #-------------------------------------------------------------------
 sub www_manageUsersInGroup {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output, $sth, %hash);
-        tie %hash, 'Tie::CPHash';
-        $output = '<h1>'.WebGUI::International::get(88).'</h1>';
+        my $output = '<h1>'.WebGUI::International::get(88).'</h1>';
+	$output .= WebGUI::Form::formHeader()
+		.WebGUI::Form::hidden({
+			name=>"gid",
+			value=>$session{form}{gid}
+			})
+		.WebGUI::Form::hidden({
+			name=>"return",
+			value=>"manageUsersInGroup"
+			})
+		.WebGUI::Form::hidden({
+			name=>"op",
+			value=>"deleteGrouping"
+			});
+        $output .= '<table border="1" cellpadding="2" cellspacing="0"><tr><td class="tableHeader"><input type="image" src="'
+		.WebGUI::Icon::_getBaseURL().'delete.gif" border="0"></td>
+                <td class="tableHeader">'.WebGUI::International::get(50).'</td>
+                <td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
+	my $p = WebGUI::Paginator->new("op=manageUsersInGroup&gid=".$session{form}{gid});
+        $p->setDataByQuery("select users.username,users.userId,groupings.expireDate
+                from groupings,users where groupings.groupId=$session{form}{gid} and groupings.userId=users.userId
+                order by users.username");
+	foreach my $row (@{$p->getPageData}) {
+                $output .= '<tr><td>'
+			.WebGUI::Form::checkbox({
+				name=>"uid",
+				value=>$row->{userId}
+				})
+                        .deleteIcon('op=deleteGrouping&return=manageUsersInGroup&uid='.$row->{userId}.'&gid='.$session{form}{gid})
+                        .editIcon('op=editGrouping&uid='.$row->{userId}.'&gid='.$session{form}{gid})
+                        .'</td>';
+                $output .= '<td class="tableData"><a href="'.WebGUI::URL::page('op=editUser&uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';
+                $output .= '<td class="tableData">'.epochToHuman($row->{expireDate},"%z").'</td></tr>';
+        }
+        $output .= '</table></form>';
+	$output .= '<p><h1>'.WebGUI::International::get(976).'</h1>';
+	$output .= WebGUI::Operation::User::getUserSearchForm("manageUsersInGroup",{gid=>$session{form}{gid}});
+	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");
+	return _submenu($output) unless ($session{form}{doit} || $userCount < 250);
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden("gid",$session{form}{gid});
 	$f->hidden("op","addUsersToGroupSave");
 	my $existingUsers = WebGUI::Grouping::getUsersInGroup($session{form}{gid});
 	push(@{$existingUsers},"1");
-	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where status='Active' and userId not in (".join(",",@{$existingUsers}).") order by username");
+	my %users;
+	tie %users, "Tie::IxHash";
+	my $sth = WebGUI::Operation::User::doUserSearch("op=manageUsersInGroup&gid=".$session{form}{gid},0,$existingUsers);
+	while (my $data = $sth->hashRef) {
+		$users{$data->{userId}} = $data->{username};
+		$users{$data->{userId}} .= " (".$data->{email}.")" if ($data->{email});
+	}
+	$sth->finish;
 	$f->selectList(
 		-name=>"users",
 		-label=>WebGUI::International::get(976),
-		-options=>$users,
+		-options=>\%users,
 		-multiple=>1,
 		-size=>7
 		);
 	$f->submit;
 	$output .= $f->print;
-        $output .= '<table border="1" cellpadding="2" cellspacing="0"><tr><td class="tableHeader">&nbsp;</td>
-                <td class="tableHeader">'.WebGUI::International::get(50).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
-        $sth = WebGUI::SQL->read("select users.username,users.userId,groupings.expireDate
-                from groupings,users where groupings.groupId=$session{form}{gid} and groupings.userId=users.userId
-                order by users.username");
-        while (%hash = $sth->hash) {
-                $output .= '<tr><td>'
-                        .deleteIcon('op=deleteGrouping&return=manageUsersInGroup&uid='.$hash{userId}.'&gid='.$session{form}{gid})
-                        .editIcon('op=editGrouping&uid='.$hash{userId}.'&gid='.$session{form}{gid})
-                        .'</td>';
-                $output .= '<td class="tableData"><a href="'.WebGUI::URL::page('op=editUser&uid='.$hash{userId}).'">'
-                        .$hash{username}.'</a></td>';
-                $output .= '<td class="tableData">'.epochToHuman($hash{expireDate},"%z").'</td></tr>';
-        }
-        $sth->finish;
-        $output .= '</table>';
         return _submenu($output);
 }
 

@@ -37,6 +37,11 @@ This package contains utility methods for WebGUI's style system.
  $template = WebGUI::Style::getTemplate();
  $html = WebGUI::Style::process($content);
 
+ setLink($url,\%params);
+ setMeta(\%params);
+ setRawHeadTags($html);
+ setScript($url, \%params);
+
 =head1 SUBROUTINES 
 
 These subroutines are available from this package:

@@ -233,18 +233,14 @@ sub getGroupsForUser {
 	my $clause = "and expireDate>".time() if ($withoutExpired);
 	if ($userId eq "") {
                 return [];
-        } elsif ($session{gotGroupsForUser}{$userId} == 1) {
-		my @groups;
-		foreach my $gid (keys %{$session{isInGroup}{$userId}}) {
-			push(@groups,$gid);
-		}
-		return \@groups;
+        } elsif (exists $session{gotGroupsForUser}{$userId}) {
+		return $session{gotGroupsForUser}{$userId};
         } else {
                 my @groups = WebGUI::SQL->buildArray("select groupId from groupings where userId=$userId $clause");
 		foreach my $gid (@groups) {
 			$session{isInGroup}{$userId}{$gid} = 1;
 		}
-		$session{gotGroupsForUser}{$userId} = 1;
+		$session{gotGroupsForUser}{$userId} = \@groups;
 		return \@groups;
         }
 }
@@ -275,9 +271,12 @@ sub getGroupsInGroup {
         my $groupId = shift;
         my $isRecursive = shift;
         my $loopCount = shift;
-	my $groupsLookedUp = shift;
-	my $extraWhere = "and groupId not in (".join(",",@{$groupsLookedUp}).")" if (defined @{$groupsLookedUp});
-        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$groupId $extraWhere");
+	if ($isRecursive && exists $session{gotGroupsInGroup}{recursive}{$groupId}) {
+		return $session{gotGroupsInGroup}{recursive}{$groupId};
+	} elsif (exists $session{gotGroupsInGroup}{recursive}{$groupId}) {
+		return $session{gotGroupsInGroup}{direct}{$groupId};
+	}
+        my $groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=$groupId");
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
@@ -286,11 +285,13 @@ sub getGroupsInGroup {
                 }
                 my @groupsOfGroups = @$groups;
                 foreach my $group (@$groups) {
-                        my $gog = getGroupsInGroup($group,1,$loopCount,\@groupsOfGroups);
+                        my $gog = getGroupsInGroup($group,1,$loopCount);
                         push(@groupsOfGroups, @$gog);
                 }
+		$session{gotGroupsInGroup}{recursive}{$groupId} = \@groupsOfGroups;
                 return \@groupsOfGroups;
-        }
+	}
+	$session{gotGroupsInGroup}{direct}{$groupId} = $groups;
         return $groups;
 }
 

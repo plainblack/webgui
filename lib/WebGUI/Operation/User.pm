@@ -26,6 +26,7 @@ use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -60,13 +61,101 @@ sub _submenu {
 	return menuWrapper($_[0],\%menu); 
 }
 
+
+#-------------------------------------------------------------------
+sub doUserSearch {
+	my $op = shift;
+	my $returnPaginator = shift;
+	my $userFilter = shift;
+	push(@{$userFilter},0);
+	my $selectedStatus;
+	if ($session{scratch}{userSearchStatus}) {
+		$selectedStatus = "status='".$session{scratch}{userSearchStatus}."'";
+	} else {
+		$selectedStatus = "status like '%'";
+	}
+	my $keyword = $session{scratch}{userSearchKeyword};
+	if ($session{scratch}{userSearchModifier} eq "startsWith") {
+		$keyword .= "%";
+	} elsif ($session{scratch}{userSearchModifier} eq "contains") {
+		$keyword = "%".$keyword."%";
+	} else {
+		$keyword = "%".$keyword;
+	}
+	$keyword = quote($keyword);
+	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
+		email.fieldData as email from users left join userProfileData email on users.userId=email.userId and email.fieldName='email'
+		where $selectedStatus  and (users.username like ".$keyword." or email.fieldData like ".$keyword.") 
+		and users.userId not in (".join(",",@{$userFilter}).")  order by users.username";
+	if ($returnPaginator) {
+        	my $p = WebGUI::Paginator->new(WebGUI::URL::page($op));
+		$p->setDataByQuery($sql);
+		return $p;
+	} else {
+		my $sth = WebGUI::SQL->read($sql);
+		return $sth;
+	}
+}
+
+
+#-------------------------------------------------------------------
+sub getUserSearchForm {
+	my $op = shift;
+	my $params = shift;
+	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
+	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
+	WebGUI::Session::setScratch("userSearchModifier",$session{form}{modifier});
+	my $output = '<div align="center">';
+	my $f = WebGUI::HTMLForm->new(1);
+	$f->hidden("op",$op);
+	foreach my $key (keys %{$params}) {
+		$f->hidden(
+			-name=>$key,
+			-value=>$params->{$key}
+			);
+	}
+	$f->hidden(
+		-name=>"doit",
+		-value=>1
+		);
+	$f->selectList(
+		-name=>"modifier",
+		-value=>([$session{scratch}{userSearchModifier}] || ["contains"]),
+		-options=>{
+			startsWith=>WebGUI::International::get("starts with"),
+			contains=>WebGUI::International::get("contains"),
+			endsWith=>WebGUI::International::get("ends with")
+			}
+		);
+	$f->text(
+		-name=>"keyword",
+		-value=>$session{scratch}{userSearchKeyword},
+		-size=>15
+		);
+	$f->selectList(
+		-name	=> "status",
+		-value	=> [$session{scratch}{userSearchStatus} || "users.status like '%'"],
+		-options=> { 
+			""		=> WebGUI::International::get(821),
+			Active		=> WebGUI::International::get(817),
+			Deactivated	=> WebGUI::International::get(818),
+			Selfdestructed	=> WebGUI::International::get(819)
+			}
+	);
+	$f->submit(WebGUI::International::get(170));
+	$output .= $f->print;
+	$output .= '</div>';
+	return $output;
+}
+
+
 #-------------------------------------------------------------------
 sub www_addUser {
     my ($output, $f, $cmd, $html, %status);
     return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || WebGUI::Grouping::isInGroup(11));
     $output .= helpIcon("user add/edit");
 	$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
-	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
+	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {language=>"JavaScript"});
 	$output .= '<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>';
 			
 	if ($session{form}{op} eq "addUserSave") {
@@ -167,8 +256,12 @@ sub www_deleteGrouping {
 	if (($session{user}{userId} == $session{form}{uid} || $session{form}{uid} == 3) && $session{form}{gid} == 3) {
 		return WebGUI::Privilege::vitalComponent();
         }
-	my $u = WebGUI::User->new($session{form}{uid});
-	$u->deleteFromGroups([$session{form}{gid}]);
+        my @users = $session{cgi}->param('uid');
+	my @groups = $session{cgi}->param("gid");
+	foreach my $user (@users) {
+		my $u = WebGUI::User->new($user);
+		$u->deleteFromGroups(\@groups);
+	}
 	if ($session{form}{return} eq "manageUsersInGroup") {
 		return WebGUI::Operation::Group::www_manageUsersInGroup();
 	}
@@ -242,7 +335,7 @@ sub www_editUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $f, $u, $cmd, $html, %status);
 	$u = WebGUI::User->new($session{form}{uid});
-	$output .= WebGUI::Form::_javascriptFile("swapLayers.js");
+	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {language=>"JavaScript"});
 	$output .= '<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>';
     $output .= helpIcon("user add/edit");
 	$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
@@ -315,41 +408,64 @@ sub www_editUserSave {
 #-------------------------------------------------------------------
 sub www_editUserGroup {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($output, $f, $groups, $sth, %hash);
+	my %hash;
 	tie %hash, 'Tie::CPHash';
-        $output .= '<h1>'.WebGUI::International::get(372).'</h1>';
-	$f = WebGUI::HTMLForm->new;
+        my $output = '<h1>'.WebGUI::International::get(372).'</h1>';
+        $output .= WebGUI::Form::formHeader()
+                .WebGUI::Form::hidden({
+                        name=>"uid",
+                        value=>$session{form}{uid}
+                        })
+                .WebGUI::Form::hidden({
+                        name=>"op",
+                        value=>"deleteGrouping"
+                        });
+	$output .= '<table><tr><td class="tableHeader"><input type="image" src="'
+                .WebGUI::Icon::_getBaseURL().'delete.gif" border="0"></td><td class="tableHeader">'.WebGUI::International::get(84).
+		'</td><td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
+	my $p = WebGUI::Paginator->new("op=editUserGroups&uid=".$session{form}{uid});
+	$p->setDataByQuery("select groups.groupId,groups.groupName,groupings.expireDate 
+		from groupings,groups where groupings.groupId=groups.groupId and groupings.userId=$session{form}{uid} order by groups.groupName");
+	foreach my $row (@{$p->getPageData}) {
+                $output .= '<tr><td>'
+			.WebGUI::Form::checkbox({
+                                name=>"gid",
+                                value=>$row->{groupId}
+                                })
+			.deleteIcon('op=deleteGrouping&uid='.$session{form}{uid}.'&gid='.$row->{groupId})
+                        .editIcon('op=editGrouping&uid='.$session{form}{uid}.'&gid='.$row->{groupId})
+                        .'</td>';
+                $output .= '<td class="tableData">'.$row->{groupName}.'</td>';
+                $output .= '<td class="tableData">'.epochToHuman($row->{expireDate},"%z").'</td></tr>';
+        }
+        $output .= '</table></form>';
+        $output .= '<p><h1>'.WebGUI::International::get(605).'</h1>';
+	$output .= WebGUI::Operation::Group::getGroupSearchForm("editUserGroup",{uid=>$session{form}{uid}});
+	my ($groupCount) = WebGUI::SQL->quickArray("select count(*) from users");
+        return _submenu($output) unless ($session{form}{doit} || $groupCount < 250);
+	my $f = WebGUI::HTMLForm->new;
         $f->hidden("op","addUserToGroupSave");
         $f->hidden("uid",$session{form}{uid});
-        $groups = WebGUI::Grouping::getGroupsForUser($session{form}{uid});
-        push(@$groups,1); #visitors
-        push(@$groups,2); #registered users
-        push(@$groups,7); #everyone
-        $f->group(
+        my $existingGroups = WebGUI::Grouping::getGroupsForUser($session{form}{uid});
+        push(@$existingGroups,1); #visitors
+        push(@$existingGroups,2); #registered users
+        push(@$existingGroups,7); #everyone
+	my %groups;
+        tie %groups, "Tie::IxHash";
+        my $sth = WebGUI::Operation::Group::doGroupSearch("op=editUserGroup&uid=".$session{form}{uid},0,$existingGroups);
+        while (my $data = $sth->hashRef) {
+                $groups{$data->{groupId}} = $data->{groupName};
+        }
+        $sth->finish;
+        $f->selectList(
 		-name=>"groups",
-		-excludeGroups=>$groups,
 		-label=>WebGUI::International::get(605),
-		-size=>5,
-		-multiple=>1
+		-size=>7,
+		-multiple=>1,
+		-options=>\%groups
 		);
         $f->submit;
 	$output .= $f->print;
-        $output .= '<p><table><tr><td class="tableHeader">'.WebGUI::International::get(89).
-		'</td><td class="tableHeader">'.WebGUI::International::get(84).
-		'</td><td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
-        $sth = WebGUI::SQL->read("select groups.groupId,groups.groupName,groupings.expireDate 
-		from groupings,groups where groupings.groupId=groups.groupId and 
-		groupings.userId=$session{form}{uid} order by groups.groupName");
-        while (%hash = $sth->hash) {
-                $output .= '<tr><td>'
-			.deleteIcon('op=deleteGrouping&uid='.$session{form}{uid}.'&gid='.$hash{groupId})
-                        .editIcon('op=editGrouping&uid='.$session{form}{uid}.'&gid='.$hash{groupId})
-                        .'</td>';
-                $output .= '<td class="tableData">'.$hash{groupName}.'</td>';
-                $output .= '<td class="tableData">'.epochToHuman($hash{expireDate},"%z").'</td></tr>';
-        }
-        $sth->finish;
-        $output .= '</table>';
 	return _submenu($output);
 }
 
@@ -466,48 +582,18 @@ sub www_editUserProfileSave {
 #-------------------------------------------------------------------
 sub www_listUsers {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
-	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
-	my ($data, $rows, $p, %status, $selectedStatus);
+	my %status;
 	my $output = helpIcon("users manage");
 	$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
-	$output .= '<div align="center">';
+	$output .= getUserSearchForm("listUsers");
+	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");
+	return _submenu($output) unless ($session{form}{doit} || $userCount<250);
 	tie %status, 'Tie::IxHash';
 	%status = (
-		""		=> WebGUI::International::get(821),
 		Active		=> WebGUI::International::get(817),
 		Deactivated	=> WebGUI::International::get(818),
 		Selfdestructed	=> WebGUI::International::get(819)
 	);
-	my $f = WebGUI::HTMLForm->new(1);
-	$f->hidden("op","listUsers");
-	$f->hidden(
-		-name=>"doit",
-		-value=>1
-		);
-	$f->selectList(
-		-name=>"modifier",
-		-value=>([$session{form}{modifier}] || ["contains"]),
-		-options=>{
-			startsWith=>WebGUI::International::get("starts with"),
-			contains=>WebGUI::International::get("contains"),
-			endsWith=>WebGUI::International::get("ends with")
-			}
-		);
-	$f->text(
-		-name=>"keyword",
-		-value=>$session{scratch}{userSearchKeyword},
-		-size=>15
-		);
-	$f->selectList(
-		-name	=> "status",
-		-value	=> [$session{form}{status} || "users.status like '%'"],
-		-options=> \%status
-	);
-	$f->submit(WebGUI::International::get(170));
-	$output .= $f->print;
-	$output .= '</div>';
-	return _submenu($output) unless ($session{form}{doit});
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
         $output .= '<tr>
                 <td class="tableHeader">'.WebGUI::International::get(816).'</td>
@@ -518,25 +604,8 @@ sub www_listUsers {
                 <td class="tableHeader">'.WebGUI::International::get(429).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(434).'</td>
 		</tr>';
-	if ($session{scratch}{userSearchStatus}) {
-		$selectedStatus = "status='".$session{scratch}{userSearchStatus}."'";
-	} else {
-		$selectedStatus = "status like '%'";
-	}
-	my $keyword = $session{scratch}{userSearchKeyword};
-	if ($session{form}{modifier} eq "startsWith") {
-		$keyword .= "%";
-	} elsif ($session{form}{modifier} eq "contains") {
-		$keyword = "%".$keyword."%";
-	} else {
-		$keyword = "%".$keyword;
-	}
-        $p = WebGUI::Paginator->new(WebGUI::URL::page("op=listUsers"));
-	$p->setDataByQuery("select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
-		email.fieldData as email from users left join userProfileData email on users.userId=email.userId and email.fieldName='email'
-		where $selectedStatus  and (users.username like ".quote($keyword)." or email.fieldData like ".quote($keyword).")  order by users.username");
-	$rows = $p->getPageData;
-	foreach $data (@$rows) {
+	my $p = doUserSearch("listUsers",1);
+	foreach my $data (@{$p->getPageData}) {
 		$output .= '<tr class="tableData">';
 		$output .= '<td>'.$status{$data->{status}}.'</td>';
 		$output .= '<td><a href="'.WebGUI::URL::page('op=editUser&uid='.$data->{userId})
