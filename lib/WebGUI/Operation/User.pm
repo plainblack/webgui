@@ -227,7 +227,11 @@ sub www_editUser {
 		Deactivated	=>WebGUI::International::get(818),
 		Selfdestructed	=>WebGUI::International::get(819)
 		);
-	$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
+	if ($u->userId == $session{user}{userId}) {
+		$f->hidden("status",$u->status);
+	} else {
+		$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
+	}
        	$f->select("authMethod",$session{authentication},WebGUI::International::get(164),[$u->authMethod]);
 	foreach (keys %{$session{authentication}}) {
 		$f->raw(WebGUI::Authentication::adminForm($u->userId,$_));
