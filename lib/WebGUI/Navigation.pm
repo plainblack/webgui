@@ -135,7 +135,7 @@ sub drawVertical {
                 $padding .= "&nbsp;&nbsp;&nbsp;";
         }
         for ($i=1;$i<=$spacing;$i++) {
-                $leading .= "<br>";
+                $leading .= "<br />";
         }
 	foreach $pageId (keys %{$tree}) {
 		$output .= $padding.$bullet.'<a class="'.$class.'"';
