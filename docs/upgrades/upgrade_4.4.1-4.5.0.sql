@@ -41,6 +41,32 @@ insert into international values (713,'WebGUI',1,'Style Managers Group');
 insert into international values (714,'WebGUI',1,'Template Managers Group');
 delete from settings where name='onCriticalError';
 update international set message='Add a new image group.' where internationalId=543 and namespace='WebGUI' and languageId=1;
+insert into international values (48,'Product',1,'Are you certain you wish to delete this benefit? It cannot be recovered once it has been deleted.');
+insert into incrementer values ('productBenefitId',1000);
+insert into incrementer values ('productTemplateId',1000);
+create table Product_benefit (wobjectId int not null, productBenefitId int not null primary key, benefit varchar(255), sequenceNumber int not null);
+insert into international values (51,'Product',1,'Benefit');
+insert into international values (52,'Product',1,'Add another benefit?');
+insert into international values (53,'Product',1,'Edit Benefit');
+insert into international values (54,'Product',1,'Benefits');
+insert into international values (55,'Product',1,'Add a benefit.');
+insert into international values (56,'Product',1,'Add a product template.');
+insert into international values (57,'Product',1,'Are you certain you wish to delete this template and set all the products using it to the default template?');
+insert into international values (58,'Product',1,'Edit Product Template');
+insert into international values (59,'Product',1,'Name');
+insert into international values (60,'Product',1,'Template');
+alter table Product add column productTemplateId int not null default 1;
+insert into international values (61,'Product',1,'Product Template');
+create table Product_template (productTemplateId int not null primary key, name varchar(255), template text);
+
+
+
+
+
+
+
+
+
 
 
 
