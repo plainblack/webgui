@@ -14,6 +14,7 @@ use Exporter;
 use strict;
 use Tie::IxHash;
 use Tie::CPHash;
+use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
