@@ -221,7 +221,7 @@ Returns a list of WebGUI::Collateral objects.
 
 sub multiNew {
      my ($class,@collateralIds) = @_;
-     return () unless @collaterlIds;
+     return () unless @collateralIds;
 
      my (@objs);
 

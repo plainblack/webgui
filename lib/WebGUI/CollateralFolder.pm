@@ -70,7 +70,7 @@ sub recursiveDelete {
   # need the following line:
   # WebGUI::Collateral->multiDelete(collateralFolderId => \@ids);
 
-  my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralType='image' and collateralFolderId in (".join(',',@ids).")");
+  my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralFolderId in (".join(',',@ids).")");
   WebGUI::Collateral->multiDelete(@collateralIds);
 }
 
