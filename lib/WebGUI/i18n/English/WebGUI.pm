@@ -169,6 +169,10 @@ The email address for your company specified in the settings by your Administrat
 Returns the path to the WebGUI "extras" folder, which contains things like WebGUI icons.
 <p>
 
+<b>&#94;JavaScript();</b><br>
+This macro allows you to set a javascript in the head section of the page. Just pass in the URL to the javascript file.
+<p>
+
 <b>&#94;LastModified; or &#94;LastModified();</b><br>
 Displays the date that the current page was last modified based upon the wobjects on the page. The date is defaultly displayed based upon the user's date preferences. Optionally, it can take two parameters. The first is text to display before the date. The second is a date format string (see the D (date) macro for details.
 <p>
@@ -215,11 +219,9 @@ The translated label for the printable link, or the text that you supply to the 
 Returns the title of the root of the current page. For instance, the main root in WebGUI is the "Home" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.
 <p>
 
-<b>&#94;u; - Company URL</b><br>
-The URL for your company specified in the settings by your Administrator.
+<b>&#94;StyleSheet();</b><br>
+This macro allows you to set a cascading style sheet in the head section of the page. Just pass in the URL to the CSS file.
 <p>
-
-
 
 <b>&#94;Spacer();</b><br>
 Create a spacer in your layout. Great for creating blocks of color with divs and tables. It takes two parameters, width and height.
@@ -227,8 +229,17 @@ Create a spacer in your layout. Great for creating blocks of color with divs and
 <i>Example:</i> &#94;Spacer("100","50");
 <p>
 
+<b>&#94;RawHeadTags();</b><br>
+This macro allows you to set some arbitrary tags in the head section of the page. Just pass in the text.
+<p>
+
+<b>&#94;u; - Company URL</b><br>
+The URL for your company specified in the settings by your Administrator.
+<p>
+
+
 |,
-		lastUpdated => 1078243435
+		lastUpdated => 1094053549 
 	},
 
 	'634' => {

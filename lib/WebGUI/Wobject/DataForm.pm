@@ -116,16 +116,30 @@ sub _createTabInit {
 
 #-------------------------------------------------------------------
 sub duplicate {
-	my ($w, %data, $sth);
-	tie %data, 'Tie::CPHash';
-	$w = $_[0]->SUPER::duplicate($_[1]);
-	$w = WebGUI::Wobject::DataForm->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
-	$sth = WebGUI::SQL->read("select * from DataForm_field where wobjectId=".quote($_[0]->get("wobjectId")));
-    	while (%data = $sth->hash) {
-		$data{DataForm_fieldId} = "new";
-		$w->setCollateral("DataForm_field","DataForm_fieldId",\%data);
-    	}
-    	$sth->finish;	
+       my ($w, %dataField, %dataTab, $sthField, $sthTab, $newTabId);
+       tie %dataTab, 'Tie::CPHash';
+       tie %dataField, 'Tie::CPHash';
+       $w = $_[0]->SUPER::duplicate($_[1]);
+       $w = WebGUI::Wobject::DataForm->new({wobjectId=>$w,namespace=>$_[0]->get("namespace")});
+       $sthTab = WebGUI::SQL->read("select * from DataForm_tab where wobjectId=".$_[0]->get("wobjectId"));
+       while (%dataTab = $sthTab->hash) {
+               $sthField = WebGUI::SQL->read("select * from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." AND DataForm_tabId=".$dataTab{DataForm_tabId});
+               $dataTab{DataForm_tabId} = "new";
+               $newTabId = $w->setCollateral("DataForm_tab","DataForm_tabId",\%dataTab);
+               while (%dataField = $sthField->hash) {
+                       $dataField{DataForm_fieldId} = "new";
+                       $dataField{DataForm_tabId} = $newTabId;
+                       $w->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
+               }
+               $sthField->finish;
+       }
+       $sthField = WebGUI::SQL->read("select * from DataForm_field where wobjectId=".$_[0]->get("wobjectId")." AND DataForm_tabId=0");
+       while (%dataField = $sthField->hash) {
+               $dataField{DataForm_fieldId} = "new";
+               $w->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
+       }
+       $sthField->finish;
+       $sthTab->finish;
 }
 
 #-------------------------------------------------------------------

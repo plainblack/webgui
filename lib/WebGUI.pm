@@ -19,7 +19,6 @@ use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
 use WebGUI::HTTP;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Operation;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -40,7 +39,7 @@ sub _generatePage {
 			".quote($session{env}{HTTP_REFERER}).", ".$session{page}{pageId}.", 
 			".quote($session{page}{title}).", ".quote($session{form}{wid}).", ".quote($session{form}{func}).")");
 	}
-	my $output = WebGUI::Macro::process(WebGUI::Style::process($content));
+	my $output = WebGUI::Style::process($content);
         if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Grouping::isInGroup(3))) {
 		$output .= WebGUI::ErrorHandler::showDebug();
         }

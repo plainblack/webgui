@@ -18,6 +18,7 @@ package WebGUI::Style;
 use strict;
 use Tie::CPHash;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Template;
 use WebGUI::URL;
@@ -36,6 +37,7 @@ This package contains utility methods for WebGUI's style system.
  $template = WebGUI::Style::getTemplate();
  $html = WebGUI::Style::process($content);
 
+ $html = generateAdditionalHeadTags();
  setLink($url,\%params);
  setMeta(\%params);
  setRawHeadTags($html);
@@ -47,6 +49,44 @@ These subroutines are available from this package:
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 generateAdditionalHeadTags ( )
+
+Creates tags that were set using setLink, setMeta, setScript, and setRawHeadTags.
+
+=cut
+
+sub generateAdditionalHeadTags {
+	# generate additional raw tags
+	my $tags = $session{page}{head}{raw};
+        # generate additional link tags
+	foreach my $url (keys %{$session{page}{head}{link}}) {
+		$tags .= '<link href="'.$url.'"';
+		foreach my $name (keys %{$session{page}{head}{link}{$url}}) {
+			$tags .= ' '.$name.'="'.$session{page}{head}{link}{$url}{$name}.'"';
+		}
+		$tags .= ' />'."\n";
+	}
+	# generate additional javascript tags
+	foreach my $tag (@{$session{page}{head}{javascript}}) {
+		$tags .= '<script';
+		foreach my $name (keys %{$tag}) {
+			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
+		}
+		$tags .= '></script>'."\n";
+	}
+	# generate additional meta tags
+	foreach my $tag (@{$session{page}{head}{meta}}) {
+		$tags .= '<meta';
+		foreach my $name (keys %{$tag}) {
+			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
+		}
+		$tags .= ' />'."\n";
+	}
+	delete $session{page}{head};
+	return $tags;
+}
 
 #-------------------------------------------------------------------
 
@@ -110,7 +150,6 @@ sub process {
 		<meta http-equiv="Content-Type" content="text/html; charset='.WebGUI::International::getLanguage($session{page}{languageId},"charset").'" />
 		<link rel="icon" href="'.$session{setting}{siteicon}.'" type="image/'.$type.'" />
 		<link rel="SHORTCUT ICON" href="'.$session{setting}{favicon}.'" />
-		'.$session{page}{head}{raw}.'
                 <script>
                         function getWebguiProperty (propName) {
                                 var props = new Array();
@@ -120,30 +159,6 @@ sub process {
                         }
                 </script>
                 ';
-        # generate additional link tags
-	foreach my $url (keys %{$session{page}{head}{link}}) {
-		$var{'head.tags'} .= '<link href="'.$url.'"';
-		foreach my $name (keys %{$session{page}{head}{link}{$url}}) {
-			$var{'head.tags'} .= ' '.$name.'="'.$session{page}{head}{link}{$url}{$name}.'"';
-		}
-		$var{'head.tags'} .= ' />'."\n";
-	}
-	# generate additional javascript tags
-	foreach my $tag (@{$session{page}{head}{javascript}}) {
-		$var{'head.tags'} .= '<script';
-		foreach my $name (keys %{$tag}) {
-			$var{'head.tags'} .= ' '.$name.'="'.$tag->{$name}.'"';
-		}
-		$var{'head.tags'} .= '></script>'."\n";
-	}
-	# generate additional meta tags
-	foreach my $tag (@{$session{page}{head}{meta}}) {
-		$var{'head.tags'} .= '<meta';
-		foreach my $name (keys %{$tag}) {
-			$var{'head.tags'} .= ' '.$name.'="'.$tag->{$name}.'"';
-		}
-		$var{'head.tags'} .= ' />'."\n";
-	}
 	if ($session{var}{adminOn}) {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 		$var{'head.tags'} .= '
@@ -152,7 +167,14 @@ sub process {
                 	<meta http-equiv="Expires" content="0" />
 			';
         }
-	return WebGUI::Template::process($templateId,"style",\%var);
+	$var{'head.tags'} .= generateAdditionalHeadTags();
+	$var{'head.tags'} .= "\n<!-- macro head tags -->\n";
+	my $output = WebGUI::Template::process($templateId,"style",\%var);
+	$output = WebGUI::Macro::process($output);
+	my $macroHeadTags = generateAdditionalHeadTags();
+	$macroHeadTags = WebGUI::Macro::process($macroHeadTags);
+	$output =~ s/\<\!-- macro head tags --\>/$macroHeadTags/;
+	return $output;
 }	
 
 

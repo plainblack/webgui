@@ -52,6 +52,7 @@ macros = a => a_account, \
 	H => H_homeLink, \
 	i => i_imageNoTags, \
 	I => I_imageWithTags, \
+	JavaScript => JavaScript, \
 	L => L_loginBox, \
 	LastModified => LastModified, \
 	LoginToggle => LoginToggle, \
@@ -59,12 +60,14 @@ macros = a => a_account, \
 	PageTitle => PageTitle, \
 	RandomImage => RandomImage, \
 	RandomSnippet => RandomSnippet, \
+	RawHeadTags => RawHeadTags, \
 	RootTitle => RootTitle, \
 	r => r_printable, \
 	/ => Slash_gatewayUrl, \
 	Snippet => Snippet, \
 	Spacer => Spacer, \
 	SI => SI_scaledImage, \
+	StyleSheet => StyleSheet, \
 	ThumbnailLinker => ThumbnailLinker, \
 	Thumbnail => Thumbnail, \
 	u => u_companyUrl

@@ -87,7 +87,10 @@
  - RFE [ 718739 ]. USS Submission Start/End Dates (Thanks to Roy Johnson).
  - bugfix [ 1008039 ] When adding javascript to description, the script is
    doubled
-
+ - bugfix [ 1007970 ] Fixed: DataForm duplicate doesn't copy tabs (Harry Waye)
+ - Added JavaScript RawHeadTags, and StyleSheet macros.
+ - Changed navigation, page, macro, and rich editor templates to load more
+   quickly.
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
