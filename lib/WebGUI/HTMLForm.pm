@@ -949,7 +949,7 @@ sub fieldType {
         my ($output);
         my ($self, @p) = @_;
         my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name types label value size multiple extras subtext uiLevel, $defaultValue)], @p);
+                rearrange([qw(name types label value size multiple extras subtext uiLevel $defaultValue)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::fieldType({
                         "name"=>$name,
