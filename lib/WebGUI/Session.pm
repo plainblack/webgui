@@ -251,6 +251,10 @@ sub open {
 	### session variables (from userSession table)
 	$session{var} = _getSessionVars($session{cookie}{wgSession},$session{dbh},$session{setting}{sessionTimeout});
 	###----------------------------
+	### session scratch variables (from userSessionScratch table)
+	$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch 
+		where sessionId=".quote($session{var}{sessionId}));
+	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
 	$session{user} = _getUserInfo($session{var}{userId},$session{dbh});
 	if ($session{env}{MOD_PERL}) {
@@ -296,6 +300,26 @@ sub refreshUserInfo {
 #-------------------------------------------------------------------
 sub setCookie {
 	push @{$session{header}{cookie}}, $session{cgi}->cookie(-name=>$_[0], -value=>$_[1], -expires=>'+10y', -path=>'/');
+}
+
+#-------------------------------------------------------------------
+
+=head2 setScratch ( name, value )
+
+ Sets a scratch variable for this user session.
+
+=cut
+
+sub setScratch {
+	return "" unless ($session{var}{sessionId});
+	if ($session{scratch}{$_[0]}) {
+		WebGUI::SQL->write("update userSessionScratch set value=".quote($_[1])."
+			where sessionId=".quote($session{var}{sessionId})." and name=".quote($_[0]));
+	} else {
+		WebGUI::SQL->write("insert into userSessionScratch (sessionId,name,value) values 
+			(".quote($session{var}{sessionId}).", ".quote($_[0]).", ".quote($_[1]).")");
+	}
+	$session{scratch}{$_[0]} = $_[1];
 }
 
 #-------------------------------------------------------------------

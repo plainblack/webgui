@@ -16,6 +16,11 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
+	my $sth = WebGUI::SQL->read("select sessionId from userSession where expires<".time());
+	while (my ($sessionId) = $sth->array) {
+		WebGUI::SQL->write("delete from userSessionScratch where sessionId=".quote($sessionId));
+	}
+	$sth->finish;
 	WebGUI::SQL->write("delete from userSession where expires<".time());
 }
 
