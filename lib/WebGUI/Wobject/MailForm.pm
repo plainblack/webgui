@@ -270,34 +270,12 @@ sub www_editFieldSave {
 
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
-    my (@data, $thisSeq);
-    if (WebGUI::Privilege::canEditPage()) {
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from MailForm_field where mailFieldId=$session{form}{fid}");
-        @data = WebGUI::SQL->quickArray("select mailFieldId from MailForm_field where wobjectId=".$_[0]->get("wobjectId")." and sequenceNumber=$thisSeq+1 group by wobjectId");
-        if ($data[0] ne "") {
-            WebGUI::SQL->write("update MailForm_field set sequenceNumber=sequenceNumber+1 where mailFieldId=$session{form}{fid}");
-            WebGUI::SQL->write("update MailForm_field set sequenceNumber=sequenceNumber-1 where mailFieldId=$data[0]");
-        }
-        return "";
-    } else {
-        return WebGUI::Privilege::insufficient();
-    }
+	$_[0]->moveCollateralDown("MailForm_field","mailFieldId",$session{form}{fid});
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
-    my (@data, $thisSeq);
-    if (WebGUI::Privilege::canEditPage()) {
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from MailForm_field where mailFieldId=$session{form}{fid}");
-        @data = WebGUI::SQL->quickArray("select mailFieldId from MailForm_field where wobjectId=".$_[0]->get("wobjectId")." and sequenceNumber=$thisSeq-1 group by wobjectId");
-        if ($data[0] ne "") {
-            WebGUI::SQL->write("update MailForm_field set sequenceNumber=sequenceNumber-1 where mailFieldId=$session{form}{fid}");
-            WebGUI::SQL->write("update MailForm_field set sequenceNumber=sequenceNumber+1 where mailFieldId=$data[0]");
-        }
-        return "";
-    } else {
-        return WebGUI::Privilege::insufficient();
-    }
+	$_[0]->moveCollateralUp("MailForm_field","mailFieldId",$session{form}{fid});
 }
 
 #-------------------------------------------------------------------

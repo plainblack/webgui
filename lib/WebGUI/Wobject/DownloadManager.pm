@@ -311,34 +311,12 @@ sub www_editDownloadSave {
 
 #-------------------------------------------------------------------
 sub www_moveDownloadDown {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from DownloadManager_file where downloadId=$session{form}{did}");
-                @data = WebGUI::SQL->quickArray("select downloadId from DownloadManager_file where wobjectId=$session{form}{wid} and sequenceNumber=$thisSeq+1 group by wobjectId");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber+1 where downloadId=$session{form}{did}");
-                        WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber-1 where downloadId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->moveCollateralDown("DownloadManager_file","downloadId",$session{form}{did});
 }
 
 #-------------------------------------------------------------------
 sub www_moveDownloadUp {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from DownloadManager_file where downloadId=$session{form}{did}");
-                @data = WebGUI::SQL->quickArray("select downloadId from DownloadManager_file where wobjectId=$session{form}{wid} and sequenceNumber=$thisSeq-1 group by wobjectId");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber-1 where downloadId=$session{form}{did}");
-                        WebGUI::SQL->write("update DownloadManager_file set sequenceNumber=sequenceNumber+1 where downloadId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->moveCollateralUp("DownloadManager_file","downloadId",$session{form}{did});
 }
 
 #-------------------------------------------------------------------

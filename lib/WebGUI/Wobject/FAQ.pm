@@ -186,34 +186,12 @@ sub www_editQuestionSave {
 
 #-------------------------------------------------------------------
 sub www_moveQuestionDown {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from FAQ_question where questionId=$session{form}{qid}");
-                @data = WebGUI::SQL->quickArray("select questionId from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." and sequenceNumber=$thisSeq+1 group by wobjectId");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber+1 where questionId=$session{form}{qid}");
-                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber-1 where questionId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->moveCollateralDown("FAQ_question","questionId",$session{form}{qid});
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from FAQ_question where questionId=$session{form}{qid}");
-                @data = WebGUI::SQL->quickArray("select questionId from FAQ_question where wobjectId=".$_[0]->get("wobjectId")." and sequenceNumber=$thisSeq-1 group by wobjectId");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber-1 where questionId=$session{form}{qid}");
-                        WebGUI::SQL->write("update FAQ_question set sequenceNumber=sequenceNumber+1 where questionId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	$_[0]->moveCollateralUp("FAQ_question","questionId",$session{form}{qid});
 }
 
 #-------------------------------------------------------------------

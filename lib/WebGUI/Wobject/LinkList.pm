@@ -197,34 +197,12 @@ sub www_editLinkSave {
 
 #-------------------------------------------------------------------
 sub www_moveLinkDown {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from LinkList_link where linkId=$session{form}{lid}");
-                @data = WebGUI::SQL->quickArray("select linkId from LinkList_link where wobjectId=$session{form}{wid} and sequenceNumber=$thisSeq+1 group by wobjectId");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber+1 where linkId=$session{form}{lid}");
-                        WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber-1 where linkId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        $_[0]->moveCollateralDown("LinkList_link","linkId",$session{form}{lid});
 }
 
 #-------------------------------------------------------------------
 sub www_moveLinkUp {
-        my (@data, $thisSeq);
-        if (WebGUI::Privilege::canEditPage()) {
-                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from LinkList_link where linkId=$session{form}{lid}");
-                @data = WebGUI::SQL->quickArray("select linkId from LinkList_link where wobjectId=$session{form}{wid} and sequenceNumber=$thisSeq-1 group by wobjectId");
-                if ($data[0] ne "") {
-                        WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber-1 where linkId=$session{form}{lid}");
-                        WebGUI::SQL->write("update LinkList_link set sequenceNumber=sequenceNumber+1 where linkId=$data[0]");
-                }
-                return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+        $_[0]->moveCollateralUp("LinkList_link","linkId",$session{form}{lid});
 }
 
 #-------------------------------------------------------------------
