@@ -136,7 +136,7 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
        # $tabform->getTab("properties")->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.'" />');
-	if ($session{form}{func} eq "add") {
+	if ($self->getValue("namespace") eq "") {
 		my $namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
 			from template order by namespace");
 		$tabform->getTab("properties")->combo(
@@ -150,6 +150,10 @@ sub getEditForm {
 			-label=>WebGUI::International::get('namespace','Template'),
 			-value=>$self->getValue("namespace")
 			);	
+		$tabform->getTab("meta")->hidden(
+			-name=>"namespace",
+			-value=>$self->getValue("namespace")
+			);
 	}
 	$tabform->getTab("display")->yesNo(
 		-name=>"showInForms",
@@ -312,7 +316,11 @@ sub processRaw {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	return $self->getParent->view;
+	if (WebGUI::Session::isAdminOn()) {
+		return $self->getToolbar;
+	} else {
+		return "";
+	}
 }
 
 
@@ -324,6 +332,11 @@ sub www_edit {
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Template'));
 }
 
+#-------------------------------------------------------------------
+sub www_view {
+	my $self = shift;
+	return $self->getContainer->www_view;
+}
 
 
 

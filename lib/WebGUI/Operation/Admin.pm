@@ -14,7 +14,6 @@ use strict;
 use WebGUI::AdminConsole;
 use WebGUI::Grouping;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub www_adminConsole {
@@ -26,16 +25,14 @@ sub www_adminConsole {
 #-------------------------------------------------------------------
 sub www_switchOffAdmin {
 	return "" unless (WebGUI::Grouping::isInGroup(12));
-	WebGUI::SQL->write("update userSession set adminOn=0 where sessionId='$session{var}{sessionId}'");
-	WebGUI::Session::refreshSessionVars($session{var}{sessionId});
+	WebGUI::Session::switchAdminOff();
 	return "";
 }
 
 #-------------------------------------------------------------------
 sub www_switchOnAdmin {
 	return "" unless (WebGUI::Grouping::isInGroup(12));
-        WebGUI::SQL->write("update userSession set adminOn=1 where sessionId='$session{var}{sessionId}'");
-        WebGUI::Session::refreshSessionVars($session{var}{sessionId});
+	WebGUI::Session::switchAdminOn();
 	return "";
 }
 

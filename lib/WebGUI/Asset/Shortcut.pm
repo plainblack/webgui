@@ -338,7 +338,7 @@ sub view {
 	my %var = (
 		isShortcut => 1,
 		'shortcut.content' => $content,
-		'shortcut.label' => WebGUI::International::get('3',"Shortcut");
+		'shortcut.label' => WebGUI::International::get('3',"Shortcut"),
 		originalURL => $self->getShortcut->getUrl
 		);
 	return $self->processTemplate(\%var,$self->getValue("templateId"));

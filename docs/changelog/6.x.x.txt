@@ -4,6 +4,9 @@
    configure a custom admin username and password for better security.
  - Added some indicies to increase performance.
  - Added all sorts of caching to increase performance.
+ - Added asset type icons to the asset toolbar.
+ - Added isAdminOn(), switchOnAdmin(), and switchOffAdmin() to WebGUI::Session
+   to eliminate all of the previously cryptic means of doing those things.
  - Fixed resetting votes on Poll would crash it.
  - Fixed not being able to set display title and other yes no questions to no.
  - Fixed a bug where URLs would become unreachable when using SSL.
@@ -18,6 +21,12 @@
  - bugfix [ 1152826 ] WebGUI.conf.original in source is not complit
  - bugfix [ 1145984 ] <tmpl_var session.page.title> is still in Style
    Templates
+ - bugfix [ 1152948 ] Edit Layout changes settings to defaults
+ - bugfix [ 1151400 ] editSave on Template erases namespace
+ - bugfix [ 1154211 ] Error: Can't instanciate template on Add Article
+ - bugfix [ 1153518 ] re-edit forum post error
+ - bugfix [ 1152819 ] Error when edit fild in Admin console -> user profiling
+ - bugfix [ 1152047 ] Unable to create new account
 
 
 6.3.0

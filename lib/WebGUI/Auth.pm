@@ -34,6 +34,7 @@ use WebGUI::Asset::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
+use WebGUI::Operation::Profile;
 
 
 =head1 NAME

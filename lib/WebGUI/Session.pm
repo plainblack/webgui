@@ -275,6 +275,18 @@ sub getScratch {
 
 #-------------------------------------------------------------------
 
+=head2 isAdminOn  ( )
+
+Returns a boolean indicating whether admin mode is on or not.
+
+=cut
+
+sub isAdminOn {
+	return $session{var}{adminOn};	
+}
+
+#-------------------------------------------------------------------
+
 =head2 open ( webguiRoot, configFile [ , fastcgi ] )
 
 Opens a closed ( or new ) WebGUI session.
@@ -488,6 +500,32 @@ sub start {
                 );
 	refreshSessionVars($sessionId);
 	return $sessionId;
+}
+
+#-------------------------------------------------------------------
+
+=head2 switchAdminOff ( )
+
+Disables admin mode.
+
+=cut
+
+sub switchAdminOff {
+	WebGUI::SQL->write("update userSession set adminOn=0 where sessionId='$session{var}{sessionId}'");
+	refreshSessionVars($session{var}{sessionId});
+}
+
+#-------------------------------------------------------------------
+
+=head2 switchAdminOn ( )
+
+Enables admin mode.
+
+=cut
+
+sub switchAdminOn {
+	WebGUI::SQL->write("update userSession set adminOn=1 where sessionId='$session{var}{sessionId}'");
+	refreshSessionVars($session{var}{sessionId});
 }
 
 1;

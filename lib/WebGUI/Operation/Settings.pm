@@ -122,6 +122,18 @@ sub www_editSettings {
 		-label=>$i18n->get(465),
 		-value=>$session{setting}{textBoxSize}
 		);
+	$tabform->getTab("ui")->template(
+		-name=>"userFunctionStyleId",
+		-label=>"User Function Style",
+		-namespace=>"style",
+		-value=>$session{setting}{userFunctionStyleId}
+		);
+	$tabform->getTab("ui")->template(
+		-name=>"AdminConsoleTemplate",
+		-label=>"Admin Console Template",
+		-namespace=>"AdminConsole",
+		-value=>$session{setting}{AdminConsoleTemplate}
+		);
 # messaging settings
         $tabform->getTab("messaging")->text(
 		-name=>"smtpServer",
@@ -210,11 +222,6 @@ sub www_editSettings {
                 -value=>$session{setting}{passiveProfilingEnabled},
                 -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning","Asset").'\')" '
         );
-	$tabform->getTab("user")->yesNo(
-		-name=>"userFunctionStyleId",
-		-label=>"User Function Style",
-		-value=>$session{setting}{userFunctionStyleId}
-		);
 # auth settings 
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js",{language=>"Javascript"});
    	$tabform->getTab("auth")->raw('<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>');

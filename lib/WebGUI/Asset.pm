@@ -1500,7 +1500,7 @@ sub getToolbar {
               #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
               #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
-	return $toolbar;
+	return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
 }
 
 #-------------------------------------------------------------------

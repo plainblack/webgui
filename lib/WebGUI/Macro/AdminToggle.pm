@@ -25,7 +25,7 @@ sub process {
                  my ($turnOn,$turnOff,$templateName) = WebGUI::Macro::getParams($_[0]);
               $turnOn |= WebGUI::International::get(516);
               $turnOff |= WebGUI::International::get(517);
-                 if ($session{var}{adminOn}) {
+                 if (WebGUI::Session::isAdminOn()) {
                       $var{'toggle.url'} = WebGUI::URL::page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;
                  } else {
