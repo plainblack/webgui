@@ -27,12 +27,8 @@ our @EXPORT = qw(&www_cutTrashItem &www_deleteTrashItem &www_deleteTrashItemConf
 		&www_emptyTrash &www_emptyTrashConfirm &www_manageTrash);
 
 #-------------------------------------------------------------------
-sub _purgePage {
-}
-
-#-------------------------------------------------------------------
 sub _purgeUserTrash {
-        my (%properties, $base, $extended, $b, $wobjectId, $namespace, $w, $cmd, $userId, $bufferId, $a, $pageId);
+        my (%properties, $base, $extended, $b, $wobjectId, $namespace, $w, $cmd, $userId, $bufferId, $page, $currentPage, $currentWobjectPage);
         tie %properties, 'Tie::CPHash';
 
 	$userId = $session{user}{userId};
@@ -52,13 +48,16 @@ sub _purgeUserTrash {
         $b->finish;
 
         # Delete pages and all subpages
-        $a = WebGUI::SQL->read("select pageId from page where parentId=3 and bufferUserId=" . $userId);
-        while (($pageId) = $a->array) {
-                _recursePageTree($pageId);
-                _purgeWobjects($pageId);
-                WebGUI::SQL->write("delete from page where pageId=$pageId");
-        }
-        $a->finish;
+	$page = WebGUI::Page->getPage(3);
+	foreach $currentPage ($page->daughters) {
+		print "page: ".$currentPage->get('menuTitle')." - UID: ".$currentPage->get('bufferUserId')."\n\n\n<br>";
+		if ($currentPage->get('bufferUserId') == $userId) {
+			foreach $currentWobjectPage ($currentPage->self_and_descendants) {
+				_purgeWobjects($currentWobjectPage->get('pageId'));
+			}
+			$currentPage->purge;
+		}
+	}
 }
 
 #-------------------------------------------------------------------
@@ -139,19 +138,19 @@ sub www_cutTrashItem {
 				."where wobjectId=" .$session{form}{wid});
 		WebGUI::ErrorHandler::audit("moved wobject ". $session{form}{wid} ." from trash to clipboard");
 	} elsif ($session{form}{pageId} ne "") {
+		my $page = WebGUI::Page->getPage($session{form}{pageId});
+
 		if ( ($session{setting}{sharedTrash} ne "1") && (!(WebGUI::Privilege::isInGroup(3)) ) ) {
-			my ($bufferUserId) = WebGUI::SQL->quickArray("select bufferUserId from page "
-								."where pageId=" .$session{form}{pageId});
+			my ($bufferUserId) = $page->get("bufferUserId");
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
 		}
-		WebGUI::SQL->write("update page set parentId=2, "
-				."bufferUserId=". $session{user}{userId} .", "
-				."bufferDate=". time() .", "
-				."bufferPrevId=3 "
-				."where pageId=" .$session{form}{pageId});
+
+		$page->cut;
+
         	WebGUI::ErrorHandler::audit("moved page ". $session{form}{pageId} ." from trash to clipboard");
 	}
         WebGUI::Session::refreshPageInfo($session{page}{pageId});
+	
         return "";
 }
 
@@ -192,18 +191,19 @@ sub www_deleteTrashItemConfirm {
 		}
 		WebGUI::ErrorHandler::audit("purged wobject ". $session{form}{wid} ." from trash");
 	} elsif ($session{form}{pageId} ne "") {
-		if ( ($session{setting}{sharedTrash} eq "1") || (WebGUI::Privilege::isInGroup(3)) ) {
-			_recursePageTree($session{form}{pageId});
-			_purgeWobjects($session{form}{pageId});
-                	WebGUI::SQL->write("delete from page where pageId=" .$session{form}{pageId});
-		} else {
-			my ($bufferUserId) = WebGUI::SQL->quickArray("select bufferUserId from page "
-								."where pageId=" .$session{form}{pageId});
+		my $page = WebGUI::Page->getPage($session{form}{pageId});
+		
+		unless ( ($session{setting}{sharedTrash} eq "1") || (WebGUI::Privilege::isInGroup(3)) ) {
+			my ($bufferUserId) = $page->get("bufferUserId");
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
-			_recursePageTree($session{form}{pageId});
-			_purgeWobjects($session{form}{pageId});
-                	WebGUI::SQL->write("delete from page where pageId=" .$session{form}{pageId});
 		}
+		
+		foreach my $currentPage ($page->self_and_descendants) {
+			_purgeWobjects($currentPage->get("pageId"));
+		}
+
+		$page->purge;
+
         	WebGUI::ErrorHandler::audit("purged page ". $session{form}{pageId} ." from trash");
 	}
         WebGUI::Session::refreshPageInfo($session{page}{pageId});
@@ -233,7 +233,7 @@ sub www_emptyTrash {
 #-------------------------------------------------------------------
 sub www_emptyTrashConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
-	my ($allUsers);
+	my ($allUsers, $page, $currentPage, $currentWobjectPage);
 	if ($session{setting}{sharedTrash} eq "1") {
 		$allUsers = 1;
 	} elsif ($session{form}{systemTrash} eq "1") {
@@ -243,7 +243,13 @@ sub www_emptyTrashConfirm {
 		$allUsers = 0;
 	}
 	if ($allUsers eq "1") {
-		_recursePageTree(3);
+		$page = WebGUI::Page->getPage(3);
+		foreach $currentPage ($page->daughters) {
+			foreach $currentWobjectPage ($currentPage->self_and_descendants) {
+				_purgeWobjects($currentPage->get("pageId"));
+			}
+			$page->purge;
+		}
 		_purgeWobjects(3);
         	WebGUI::ErrorHandler::audit("emptied system trash");
 	} else {
