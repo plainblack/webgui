@@ -52,7 +52,7 @@ alter table UserSubmission add column editTimeout int not null default 1;
 alter table UserSubmission add column groupToPost int not null default 2;
 alter table UserSubmission add column groupToApprove int not null default 4;
 INSERT INTO international VALUES (39,'UserSubmission','English','Post a Reply');
-INSERT INTO international VALUES (40,'UserSubmission','English','Posted By');
+INSERT INTO international VALUES (40,'UserSubmission','English','Posted by');
 INSERT INTO international VALUES (41,'UserSubmission','English','Date');
 INSERT INTO international VALUES (42,'UserSubmission','English','Edit Response');
 INSERT INTO international VALUES (43,'UserSubmission','English','Delete Response');

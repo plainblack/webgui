@@ -85,11 +85,12 @@ sub cleanSegment {
 =cut
 
 sub filter {
-	my ($filter, $html);
-	if ($_[1] eq "all") {
+	my ($filter, $html, $type);
+	$type = $_[1] || $session{setting}{filterContributedHTML};
+	if ($type eq "all") {
 		$filter = HTML::TagFilter->new(allow=>{'none'},strip_comments=>1);
 		$html = $filter->filter($_[0]);
-	} elsif ($_[1] eq "none") {
+	} elsif ($type eq "none") {
 		$html = $_[0];
 	} else {
 		$filter = HTML::TagFilter->new; # defaultly strips almost everything

@@ -153,6 +153,8 @@ sub _weblogView {
                 where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
         while (%submission = $sth->hash) {
                 $submission{title} = WebGUI::HTML::filter($submission{title},'all');
+		$submission{content} = WebGUI::HTML::filter($submission{content});
+		($submission{content}) = split(/\^\-\;/,$submission{content});
 		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion 
 			where wobjectId=".$_[0]->get("wobjectId")." and subId=$submission{submissionId}");
 		$row[$i] = '<tr><td class="tableHeader">'.$submission{title};
@@ -172,7 +174,11 @@ sub _weblogView {
 			.' - '.epochToHuman($submission{dateSubmitted},"%z \@ %Z").'</b><br/>'
 			.$submission{content}.'<p/> (<a href="'.WebGUI::URL::page('func=viewSubmission&wid='
 			.$_[0]->get("wobjectId").'&sid='.$submission{submissionId}).'">'.WebGUI::International::get(46,$namespace)
-			.'</a> | '.$responses.' '.WebGUI::International::get(57,$namespace).')<p/></td></tr>';
+			.'</a>';
+		if ($_[0]->get("allowDiscussion")) {
+			$row[$i] .= ' | '.$responses.' '.WebGUI::International::get(57,$namespace)
+		}
+		$row[$i] .= ')<p/></td></tr>';
                 $i++;
         }
         $sth->finish;
@@ -613,6 +619,7 @@ sub www_viewSubmission {
 	%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
 	$submission{title} = WebGUI::HTML::filter($submission{title},'all');
 	$submission{content} = WebGUI::HTML::filter($submission{content},$session{setting}{filterContributedHTML});
+	$submission{content} =~ s/\^\-\;//g;
        	$output = "<h1>".$submission{title}."</h1>";
 	$output .= '<table width="100%" cellpadding=2 cellspacing=1 border=0>';
 	$output .= '<tr><td class="tableHeader">';
