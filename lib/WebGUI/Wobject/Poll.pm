@@ -31,7 +31,7 @@ our @ISA = qw(WebGUI::Wobject);
 #-------------------------------------------------------------------
 sub _hasVoted {
 	my ($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer 
-		where wobjectId=".$_[0]->get("wobjectId")." and ((userId=$session{user}{userId} 
+		where wobjectId=".quote($_[0]->get("wobjectId"))." and ((userId=".quote($session{user}{userId})." 
 		and userId<>1) or (userId=1 and ipAddress='$session{env}{REMOTE_ADDR}'))");
 	return $hasVoted;
 }
@@ -40,7 +40,7 @@ sub _hasVoted {
 sub duplicate {
         my ($w, $f, $sth, @row);
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $sth = WebGUI::SQL->read("select * from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from Poll_answer where wobjectId=".quote($_[0]->get("wobjectId")));
         while (@row = $sth->array) {
         	WebGUI::SQL->write("insert into Poll_answer values (".quote($w).", ".quote($row[1]).", ".quote($row[2]).", ".quote($row[3]).")");
         }
@@ -143,7 +143,7 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from Poll_answer where wobjectId=".$_[0]->get("wobjectId"));
+        WebGUI::SQL->write("delete from Poll_answer where wobjectId=".quote($_[0]->get("wobjectId")));
 	$_[0]->SUPER::purge();
 }
 
@@ -248,7 +248,7 @@ sub www_view {
 	}
 	$var{canVote} = $showPoll;
         my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where wobjectId="
-		.$_[0]->get("wobjectId"));
+		.quote($_[0]->get("wobjectId")));
 	$var{"responses.label"} = WebGUI::International::get(12,$_[0]->get("namespace"));
 	$var{"responses.total"} = $totalResponses;
 	$var{"form.start"} = WebGUI::Form::formHeader();
@@ -260,7 +260,7 @@ sub www_view {
         for (my $i=1; $i<=20; $i++) {
         	if ($_[0]->get('a'.$i) =~ /\C/) {
                         my ($tally) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where answer='a"
-				.$i."' and wobjectId=".$_[0]->get("wobjectId")." group by answer");
+				.$i."' and wobjectId=".quote($_[0]->get("wobjectId"))." group by answer");
                 	push(@answers,{
 				"answer.form"=>WebGUI::Form::radio({name=>"answer",value=>"a".$i}),
 				"answer.text"=>$_[0]->get('a'.$i),

@@ -41,7 +41,7 @@ sub _traversePageTree {
                 } else {
                         $orderBy = 'sequenceNumber';
                 }
-                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page where parentId='$parent' and hideFromNavigation = 0 order by $orderBy");
+                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page where parentId=".quote($parent)." and hideFromNavigation = 0 order by $orderBy");
                 while ($data = $sth->hashRef) {
                         if (($data->{pageId}<0 || $data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Page::canView($data->{pageId})) {
 				push(@pages,{ 

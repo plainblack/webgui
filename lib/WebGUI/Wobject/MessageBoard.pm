@@ -123,16 +123,16 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-        my $sth = WebGUI::SQL->read("select forumId from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
+        my $sth = WebGUI::SQL->read("select forumId from MessageBoard_forums where wobjectId=".quote($_[0]->get("wobjectId")));
         while (my ($forumId) = $sth->array) {
-		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from MessageBoard_forums where forumId=".$forumId);
+		my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from MessageBoard_forums where forumId=".quote($forumId));
                 unless ($inUseElsewhere > 1) {
                 	my $forum = WebGUI::Forum->new($forumId);
                 	$forum->purge;
 		}
         }	
         $sth->finish;
-	WebGUI::SQL->write("delete from MessageBoard_forums where wobjectId=".$_[0]->get("wobjectId"));
+	WebGUI::SQL->write("delete from MessageBoard_forums where wobjectId=".quote($_[0]->get("wobjectId")));
         $_[0]->SUPER::purge();
 }
 
@@ -146,12 +146,12 @@ sub www_deleteForum {
 #-------------------------------------------------------------------
 sub www_deleteForumConfirm {
  	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from MessageBoard_forums where forumId=".$session{form}{forumId});
+	my ($inUseElsewhere) = WebGUI::SQL->quickArray("select count(*) from MessageBoard_forums where forumId=".quote($session{form}{forumId}));
         unless ($inUseElsewhere > 1) {
 		my $forum = WebGUI::Forum->new($session{form}{forumId});
 		$forum->purge;
 	}
-	WebGUI::SQL->write("delete from MessageBoard_forums where forumId=".quote($session{form}{forumId})." and wobjectId=".$_[0]->get("wobjectId"));
+	WebGUI::SQL->write("delete from MessageBoard_forums where forumId=".quote($session{form}{forumId})." and wobjectId=".quote($_[0]->get("wobjectId")));
 	return "";
 }
 

@@ -45,7 +45,7 @@ sub duplicate {
         my ($file, $w, %row, $sth, $newDownloadId);
 	tie %row, 'Tie::CPHash';
         $w = $_[0]->SUPER::duplicate($_[1]);
-        $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".quote($_[0]->get("wobjectId")));
         while (%row = $sth->hash) {
                 $newDownloadId = WebGUI::Id::generate();
 		$file = WebGUI::Attachment->new($row{downloadFile},$_[0]->get("wobjectId"),$row{FileManager_fileId});
@@ -124,7 +124,7 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-	WebGUI::SQL->write("delete from FileManager_file where wobjectId=".$_[0]->get("wobjectId"));
+	WebGUI::SQL->write("delete from FileManager_file where wobjectId=".quote($_[0]->get("wobjectId")));
         $_[0]->SUPER::purge();
 }
 
@@ -164,7 +164,7 @@ sub www_download {
 	$_[0]->logView() if ($session{setting}{passiveProfilingEnabled});
 	my (%download, $file);
 	tie %download,'Tie::CPHash';
-	%download = WebGUI::SQL->quickHash("select * from FileManager_file where FileManager_fileId=$session{form}{did}");
+	%download = WebGUI::SQL->quickHash("select * from FileManager_file where FileManager_fileId=".quote($session{form}{did}));
 	if (WebGUI::Grouping::isInGroup($download{groupToView})) {
 		if ($session{form}{alternateVersion} == 1) {
                         $file = WebGUI::Attachment->new($download{alternateVersion1},
@@ -350,7 +350,7 @@ sub www_view {
 	$var{"search.label"} = WebGUI::International::get(364);
         $var{"addfile.url"} = WebGUI::URL::page('func=editDownload&did=new&wid='.$_[0]->get("wobjectId"));
         $var{"addfile.label"} = WebGUI::International::get(11,$_[0]->get("namespace"));
-	$sql = "select * from FileManager_file where wobjectId=".$_[0]->get("wobjectId")." ";
+	$sql = "select * from FileManager_file where wobjectId=".quote($_[0]->get("wobjectId"))." ";
 	if ($session{scratch}{search}) {
 		$numResults = $session{scratch}{numResults};
 		$constraints = WebGUI::Search::buildConstraints(

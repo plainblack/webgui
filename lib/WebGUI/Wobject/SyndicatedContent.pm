@@ -22,7 +22,6 @@ use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Wobject;
 use XML::RSSLite;
 use LWP::UserAgent;

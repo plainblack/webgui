@@ -119,7 +119,7 @@ sub www_edit {
 		-label=>WebGUI::International::get(10,$_[0]->get("namespace"))
 		);
 	my @data = WebGUI::SQL->quickArray("select page.urlizedTitle,wobject.title from wobject left join page on wobject.pageId=page.pageId
-		where wobject.wobjectId=".$_[0]->get("proxiedWobjectId"));
+		where wobject.wobjectId=".quote($_[0]->get("proxiedWobjectId")));
 	$properties->readOnly(
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
 		-value=>'<a href="'.WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a> ('.$_[0]->get("proxiedWobjectId").')'

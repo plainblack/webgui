@@ -184,7 +184,7 @@ sub getMenuVars {
 #-------------------------------------------------------------------
 sub getQuestionCount {
 	my $self = shift;
-	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".$self->get("Survey_id"));
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".quote($self->get("Survey_id")));
 	return ($count < $self->getValue("questionsPerResponse")) ? $count : $self->getValue("questionsPerResponse");
 }
 
@@ -216,7 +216,7 @@ sub getQuestionsLoop {
 sub getQuestionResponseCount {
 	my $self = shift;
 	my $responseId = shift;
-	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_responseId=".$responseId);
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_responseId=".quote($responseId));
 	return $count;
 }
 
@@ -234,7 +234,7 @@ sub getQuestionVars {
 		});
 	$var{'question.comment.label'} = WebGUI::International::get(51,$self->get("namespace"));
 	if ($question->{answerFieldType} eq "text") {
-		my ($answer) = WebGUI::SQL->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".$question->{Survey_questionId}); 
+		my ($answer) = WebGUI::SQL->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".quote($question->{Survey_questionId})); 
 		$var{'question.answer.field'} = WebGUI::Form::hidden({
 			name=>'answerId_'.$questionId,
 			value=>$answer
@@ -243,7 +243,7 @@ sub getQuestionVars {
 			name=>'textResponse_'.$questionId
 			});
 	} else {
-		my $answer = WebGUI::SQL->buildHashRef("select Survey_answerId,answer from Survey_answer where Survey_questionId=".$question->{Survey_questionId}." order by sequenceNumber");
+		my $answer = WebGUI::SQL->buildHashRef("select Survey_answerId,answer from Survey_answer where Survey_questionId=".quote($question->{Survey_questionId})." order by sequenceNumber");
 		if ($question->{randomizeAnswers}) {
 			$answer = randomizeHash($answer);
 		}
@@ -260,10 +260,10 @@ sub getQuestionVars {
 sub getRandomQuestionIds {
 	my $self = shift;
 	my $responseId = shift;
-	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$responseId);
-	my $where = " where Survey_id=".$self->get("Survey_id");
+	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".quote($responseId));
+	my $where = " where Survey_id=".quote($self->get("Survey_id"));
 	if ($#usedQuestionIds+1 > 0) {
-		$where .= " and Survey_questionId not in (".join(",",@usedQuestionIds).")";
+		$where .= " and Survey_questionId not in (".quoteAndJoin(\@usedQuestionIds).")";
 	}
 	my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question".$where);
 	randomizeArray(\@questions);
@@ -275,7 +275,7 @@ sub getResponseCount {
 	my $self = shift;
 	my $ipAddress = $self->getIp;
 	my $userId = $self->getUserId;
-	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_response where Survey_id=".$self->get("Survey_id")." and 
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey_response where Survey_id=".quote($self->get("Survey_id"))." and 
 		((userId<>1 and userId=".quote($userId).") or ( userId=1 and ipAddress=".quote($ipAddress)."))");
 	return $count;
 }
@@ -286,22 +286,22 @@ sub getResponseDrivenQuestionIds {
 	my $self = shift;
 	my $responseId = shift;
         my $previousResponse = WebGUI::SQL->quickHashRef("select Survey_questionId, Survey_answerId from Survey_questionResponse 
-		where Survey_responseId=$responseId order by dateOfResponse desc");
+		where Survey_responseId=".quote($responseId)." order by dateOfResponse desc");
 	my $questionId;
 	my @questions;
 	if ($previousResponse->{Survey_answerId}) {
 	        ($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_answer where 
-			Survey_answerId=".$previousResponse->{Survey_answerId});
+			Survey_answerId=".quote($previousResponse->{Survey_answerId}));
 	        unless ($questionId > 0) { 
 			($questionId) = WebGUI::SQL->quickArray("select gotoQuestion from Survey_question where 
-				Survey_questionId=".$previousResponse->{Survey_questionId});
+				Survey_questionId=".quote($previousResponse->{Survey_questionId}));
 		}
 		unless ($questionId > 0) { # terminate survey
 			$self->completeResponse($responseId);	
 			return ();
 		}
 	} else {
-		($questionId) = WebGUI::SQL->quickArray("select Survey_questionId from Survey_question where Survey_id=".$self->getValue("Survey_id")."
+		($questionId) = WebGUI::SQL->quickArray("select Survey_questionId from Survey_question where Survey_id=".quote($self->getValue("Survey_id"))."
 			order by sequenceNumber");
 	}
 	push(@questions,$questionId);
@@ -325,10 +325,10 @@ sub getResponseIdString {
 sub getSequentialQuestionIds {
 	my $self = shift;
 	my $responseId = shift;
-	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$responseId);
-	my $where = " where Survey_id=".$self->get("Survey_id");
+	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".quote($responseId));
+	my $where = " where Survey_id=".quote($self->get("Survey_id"));
 	if ($#usedQuestionIds+1 > 0) {
-		$where .= " and Survey_questionId not in (".join(",",@usedQuestionIds).")";
+		$where .= " and Survey_questionId not in (".quoteAndJoin(\@usedQuestionIds).")";
 	}
 	my @questions = WebGUI::SQL->buildArray("select Survey_questionId from Survey_question $where order by sequenceNumber");
 	return @questions;
@@ -396,11 +396,11 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey where Survey_id=".$_[0]->get("Survey_id"));
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey where Survey_id=".quote($_[0]->get("Survey_id")));
 	if ($count < 2) { ### Check for other wobjects using this survey.
-        	WebGUI::SQL->write("delete from Survey_question where Survey_id=".$_[0]->get("Survey_id"));
-        	WebGUI::SQL->write("delete from Survey_answer where Survey_id=".$_[0]->get("Survey_id"));
-        	WebGUI::SQL->write("delete from Survey_response where Survey_id=".$_[0]->get("Survey_id"));
+        	WebGUI::SQL->write("delete from Survey_question where Survey_id=".quote($_[0]->get("Survey_id")));
+        	WebGUI::SQL->write("delete from Survey_answer where Survey_id=".quote($_[0]->get("Survey_id")));
+        	WebGUI::SQL->write("delete from Survey_response where Survey_id=".quote($_[0]->get("Survey_id")));
 	}
         $_[0]->SUPER::purge();
 }
@@ -488,8 +488,8 @@ sub www_deleteAllResponses {
 #-------------------------------------------------------------------
 sub www_deleteAllResponsesConfirm {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        WebGUI::SQL->write("delete from Survey_response where Survey_id=".$_[0]->get("Survey_id")); 
-        WebGUI::SQL->write("delete from Survey_questionResponse where Survey_id=".$_[0]->get("Survey_id")); 
+        WebGUI::SQL->write("delete from Survey_response where Survey_id=".quote($_[0]->get("Survey_id"))); 
+        WebGUI::SQL->write("delete from Survey_questionResponse where Survey_id=".quote($_[0]->get("Survey_id"))); 
         return "";
 }
 
@@ -608,7 +608,7 @@ sub www_editAnswer {
 	}
 	if ($_[0]->get("questionOrder") eq "response") {
 		$question = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
-			from Survey_question where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
+			from Survey_question where Survey_id=".quote($_[0]->get("Survey_id"))." order by sequenceNumber");
 		$question = { ('-1' => WebGUI::International::get(82,$_[0]->get("namespace")),%$question) };
 		$f->select(
 			-name=>"gotoQuestion",
@@ -689,7 +689,7 @@ sub www_editQuestion {
 		);
 	if ($_[0]->get("questionOrder") eq "response") {
 		my $ql = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
-			from Survey_question where Survey_id=".$_[0]->get("Survey_id")." order by sequenceNumber");
+			from Survey_question where Survey_id=".quote($_[0]->get("Survey_id"))." order by sequenceNumber");
 		$ql = { ('-1' => WebGUI::International::get(82,$_[0]->get("namespace")),%$ql) };
 		$f->select(
 			-name=>"gotoQuestion",
@@ -721,7 +721,7 @@ sub www_editQuestion {
 		$output .= '<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=editAnswer&aid=new&qid='
 			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,$_[0]->get("namespace")).'</a><p>';
 		$sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
-			where Survey_questionId=".$question->{Survey_questionId}." order by sequenceNumber");
+			where Survey_questionId=".quote($question->{Survey_questionId})." order by sequenceNumber");
 		while (%data = $sth->hash) {
 			$output .= deleteIcon('func=deleteAnswer&wid='.$_[0]->get("wobjectId")
 					.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId})
@@ -784,7 +784,7 @@ sub www_editQuestionSave {
 sub www_exportAnswers {
         return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
 	WebGUI::HTTP::setFilename(WebGUI::URL::escape($_[0]->get("title")."_answers.tab"),"text/tab");
-        return WebGUI::SQL->quickTab("select * from Survey_answer where Survey_id=".$_[0]->get("Survey_id"));
+        return WebGUI::SQL->quickTab("select * from Survey_answer where Survey_id=".quote($_[0]->get("Survey_id")));
 }
 
 #-------------------------------------------------------------------
@@ -794,21 +794,21 @@ sub www_exportComposite {
 	return WebGUI::SQL->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
 		left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
 		left join Survey_question b on c.Survey_questionId=b.Survey_questionId 
-		where a.Survey_id=".$_[0]->get("Survey_id")." order by a.userId, a.ipAddress, b.sequenceNumber");
+		where a.Survey_id=".quote($_[0]->get("Survey_id"))." order by a.userId, a.ipAddress, b.sequenceNumber");
 }
 
 #-------------------------------------------------------------------
 sub www_exportQuestions {
         return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
 	WebGUI::HTTP::setFilename(WebGUI::URL::escape($_[0]->get("title")."_questions.tab"),"text/tab");
-        return WebGUI::SQL->quickTab("select * from Survey_question where Survey_id=".$_[0]->get("Survey_id"));
+        return WebGUI::SQL->quickTab("select * from Survey_question where Survey_id=".quote($_[0]->get("Survey_id")));
 }
 
 #-------------------------------------------------------------------
 sub www_exportResponses {
         return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
 	WebGUI::HTTP::setFilename(WebGUI::URL::escape($_[0]->get("title")."_responses.tab"),"text/tab");
-        return WebGUI::SQL->quickTab("select * from Survey_response where Survey_id=".$_[0]->get("Survey_id"));
+        return WebGUI::SQL->quickTab("select * from Survey_response where Survey_id=".quote($_[0]->get("Survey_id")));
 }
 
 #-------------------------------------------------------------------
@@ -850,9 +850,9 @@ sub www_respond {
 		if ($key =~ /answerId_(\d+)/) {
 			my $id = $1;
 			my ($previousResponse) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse
-				where Survey_answerId=".$session{form}{"answerId_".$id}." and Survey_responseId=".$session{scratch}{$varname});
+				where Survey_answerId=".quote($session{form}{"answerId_".$id})." and Survey_responseId=".quote($session{scratch}{$varname}));
 			next if ($previousResponse);
-			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{"answerId_".$id});
+			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",quote($session{form}{"answerId_".$id}));
 			my $response = $session{form}{"textResponse_".$id} || $answer->{answer};
 			WebGUI::SQL->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
 				".quote($answer->{Survey_answerId}).", ".quote($answer->{Survey_questionId}).", ".quote($session{scratch}{$varname}).", ".quote($answer->{Survey_id}).",
@@ -879,7 +879,7 @@ sub www_view {
 	$var->{'question.add.url'} = WebGUI::URL::page('wid='.$self->get("wobjectId").'&func=editQuestion&qid=new');
 	$var->{'question.add.label'} = WebGUI::International::get(30,$self->get("namespace"));
 	my @edit;
-	my $sth = WebGUI::SQL->read("select Survey_questionId,question from Survey_question where Survey_id=".$self->get("Survey_id")." order by sequenceNumber");
+	my $sth = WebGUI::SQL->read("select Survey_questionId,question from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	while (my %data = $sth->hash) {
 		push(@edit,{
 			'question.edit.controls'=>deleteIcon('func=deleteQuestion&wid='.$self->get("wobjectId").'&qid='.$data{Survey_questionId})
@@ -904,7 +904,7 @@ sub www_view {
 		if ($var->{'response.Id'}) {
 			$var->{'questions.soFar.count'} = $self->getQuestionResponseCount($var->{'response.Id'});
 			($var->{'questions.correct.count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse a, Survey_answer b where a.Survey_responseId="
-				.$var->{'response.Id'}." and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
+				.quote($var->{'response.Id'})." and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
 			if ($var->{'questions.soFar.count'} > 0) {
 				$var->{'questions.correct.percent'} = round(($var->{'questions.correct.count'}/$var->{'questions.soFar.count'})*100)
 			}
@@ -950,7 +950,7 @@ sub www_viewGradebook {
 	$p->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate from Survey_response 
 		where isComplete=1 and Survey_id=".$self->get("Survey_id")." order by username,ipAddress,startDate");
 	my $users = $p->getPageData;
-	($var->{'question.count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".$self->get("Survey_id"));
+	($var->{'question.count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".quote($self->get("Survey_id")));
 	if ($var->{'question.count'} > $self->get("questionsPerResponse")) {
 		$var->{'question.count'} = $self->get("questionsPerResponse");
 	}
@@ -960,7 +960,7 @@ sub www_viewGradebook {
 	my @responseloop;
 	foreach my $user (@$users) {
 		my ($correctCount) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse a left join
-                	Survey_answer b on a.Survey_answerId=b.Survey_answerId where a.Survey_responseId=".$user->{Survey_responseId}
+                	Survey_answer b on a.Survey_answerId=b.Survey_answerId where a.Survey_responseId=".quote($user->{Survey_responseId})
 			." and b.isCorrect=1");
 		push(@responseloop, {
 			'response.url'=>WebGUI::URL::page('func=viewIndividualSurvey&amp;wid='.$self->get("wobjectId")
@@ -1003,14 +1003,14 @@ sub www_viewIndividualSurvey {
 	$var->{'response.label'} = WebGUI::International::get(66,$self->get("namespace"));
 	$var->{'comment.label'} = WebGUI::International::get(57,$self->get("namespace"));
 	my $a = WebGUI::SQL->read("select Survey_questionId,question,answerFieldType from Survey_question 
-		where Survey_id=".$self->get("Survey_id")." order by sequenceNumber");
+		where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	my @questionloop;
 	while (my $qdata = $a->hashRef) {
 		my @aid;
 		my @answer;
 		if ($qdata->{answerFieldType} eq "radioList") {
 			my $sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
-				where Survey_questionId=".$qdata->{Survey_questionId}." and isCorrect=1 order by sequenceNumber");
+				where Survey_questionId=".quote($qdata->{Survey_questionId})." and isCorrect=1 order by sequenceNumber");
 			while (my $adata = $sth->hashRef) {
 				push(@aid,$adata->{Survey_answerId});
 				push(@answer,$adata->{answer});
@@ -1018,7 +1018,7 @@ sub www_viewIndividualSurvey {
 			$sth->finish;
 		}
 		my $rdata = WebGUI::SQL->quickHashRef("select Survey_answerId,response,comment from Survey_questionResponse 
-			where Survey_questionId=".$qdata->{Survey_questionId}." and Survey_responseId=".$session{form}{responseId});
+			where Survey_questionId=".quote($qdata->{Survey_questionId})." and Survey_responseId=".quote($session{form}{responseId}));
 		push(@questionloop,{
 			question => $qdata->{question},
 			'question.id'=>$qdata->{Survey_questionId},
@@ -1053,12 +1053,12 @@ sub www_viewStatisticalOverview {
 	$var->{'show.comments.label'} = WebGUI::International::get(56,$self->get("namespace"));
 	foreach my $question (@$questions) {
 		my @answerloop;
-		my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_questionId=".$question->{Survey_questionId});
+		my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_questionId=".quote($question->{Survey_questionId}));
 		if ($question->{answerFieldType} eq "radioList") {
 			my $sth = WebGUI::SQL->read("select Survey_answerId,answer,isCorrect from Survey_answer where
-				Survey_questionId=".$question->{Survey_questionId}." order by sequenceNumber");
+				Survey_questionId=".quote($question->{Survey_questionId})." order by sequenceNumber");
 			while (my $answer = $sth->hashRef) {
-				my ($numResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_answerId=".$answer->{Survey_answerId});
+				my ($numResponses) = WebGUI::SQL->quickArray("select count(*) from Survey_questionResponse where Survey_answerId=".quote($answer->{Survey_answerId}));
 				my $responsePercent;
 				if ($totalResponses) {
 					$responsePercent = round(($numResponses/$totalResponses)*100);
@@ -1066,7 +1066,7 @@ sub www_viewStatisticalOverview {
 					$responsePercent = 0;
 				}
 				my @commentloop;
-				my $sth2 = WebGUI::SQL->read("select comment from Survey_questionResponse where Survey_answerId=".$answer->{Survey_answerId});
+				my $sth2 = WebGUI::SQL->read("select comment from Survey_questionResponse where Survey_answerId=".quote($answer->{Survey_answerId}));
 				while (my ($comment) = $sth2->array) {
 					push(@commentloop,{
 						'answer.comment'=>$comment
@@ -1083,7 +1083,7 @@ sub www_viewStatisticalOverview {
 			}
 			$sth->finish;
 		} else {
-			my $sth = WebGUI::SQL->read("select response,comment from Survey_questionResponse where Survey_questionId=".$question->{Survey_questionId});
+			my $sth = WebGUI::SQL->read("select response,comment from Survey_questionResponse where Survey_questionId=".quote($question->{Survey_questionId}));
 			while (my $response = $sth->hashRef) {
 				push(@answerloop,{
 					'answer.response'=>$response->{response},

@@ -35,14 +35,14 @@ sub duplicate {
         my ($sth, $w, @row, $newEventId, $previousRecurringEventId);
 	$w = $_[0]->SUPER::duplicate($_[1]);
 	$sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId="
-		.$_[0]->get("wobjectId")." order by EventsCalendar_recurringId");
+		.quote($_[0]->get("wobjectId"))." order by EventsCalendar_recurringId");
 	while (@row = $sth->array) {
 		$newEventId = WebGUI::Id::generate();
 		if ($row[6] > 0 && $row[6] != $previousRecurringEventId) {
 			$row[6] = WebGUI::Id::generate();
 			$previousRecurringEventId = $row[6];
 		}
-               	WebGUI::SQL->write("insert into EventsCalendar_event values (".quote($newEventId).", ".$w.", ".
+               	WebGUI::SQL->write("insert into EventsCalendar_event values (".quote($newEventId).", ".quote($w).", ".
 			quote($row[2]).", ".quote($row[3]).", ".quote($row[4]).", ".quote($row[5]).", ".quote($row[6]).")");
 	}
 	$sth->finish;
@@ -259,13 +259,13 @@ sub www_editEvent {
 		$f = WebGUI::HTMLForm->new(1);
 		$f->raw('<tr><td class="formdescription" valign="top">'.WebGUI::International::get(8,$_[0]->get("namespace")).'</td><td class="tableData">');
 		$f->integer("interval","",1,"","","",3);
-		$f->select("recursEvery",\%recursEvery);
+		$f->selectList("recursEvery",\%recursEvery);
 		$f->raw(' '.WebGUI::International::get(9,$_[0]->get("namespace")).' ');
 		$f->date("until");
 		$f->raw("</td><tr>");
 		$special = $f->printRowsOnly;
 	} else {
-               	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId='$session{form}{eid}'");
+               	%event = WebGUI::SQL->quickHash("select * from EventsCalendar_event where EventsCalendar_eventId=".quote($session{form}{eid}));
 		$f = WebGUI::HTMLForm->new;
 		$f->hidden("until");
 		$special = $f->printRowsOnly;
@@ -282,14 +282,13 @@ sub www_editEvent {
 		-name=>"startDate",
 		-label=>WebGUI::International::get(14,$_[0]->get("namespace")),
 		-value=>$event{startDate},
-		-dateExtras=>'onBlur="this.form.endDate_date.value=this.form.startDate_date.value;this.form.until.value=this.form.startDate_date.value;"',
-		-timeExtras=>'onBlur="this.form.endDate_time.value=this.form.startDate_time.value"'
+		-extras=>'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"',
 		);
         $f->dateTime(
 		-name=>"endDate",
 		-label=>WebGUI::International::get(15,$_[0]->get("namespace")),
 		-value=>$event{endDate},
-		-dateExtras=>'onBlur="this.form.until.value=this.form.endDate_date.value;"'
+		-extras=>'onBlur="this.form.until.value=this.form.endDate.value;"'
 		);
 	$f->raw($special);
 	if ($session{form}{eid} eq "new") {
@@ -344,7 +343,7 @@ sub www_editEventSave {
                        	}
                	}
                	$i = 0;
-               	while ($eventId[$i] > 0) {
+               	while ($eventId[$i] ne "") {
                        	WebGUI::SQL->write("insert into EventsCalendar_event values (".quote($eventId[$i]).", 
 				".quote($_[0]->get("wobjectId")).", 
 				".quote($session{form}{name}).", 
@@ -422,7 +421,7 @@ sub www_view {
 			my @thisMonthDate = WebGUI::DateTime::epochToArray($thisMonth);
 			# get event information
 			my $query = "select * from EventsCalendar_event where ";
-			$query .= " wobjectId=".$_[0]->get("wobjectId")." and " unless ($_[0]->get("isMaster"));
+			$query .= " wobjectId=".quote($_[0]->get("wobjectId"))." and " unless ($_[0]->get("isMaster"));
 			$query .= " (endDate>=$monthStart and endDate<=$monthEnd) and (startDate>=$monthStart and startDate<=$monthEnd) order by startDate,endDate";
 			my %events;
 			my %previous;

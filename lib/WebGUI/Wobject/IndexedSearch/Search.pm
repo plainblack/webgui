@@ -66,7 +66,7 @@ These methods are available from this package:
 sub _recurseCrumbTrail {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select pageId,parentId,menuTitle,urlizedTitle from page where pageId=$_[0]");
+        %data = WebGUI::SQL->quickHash("select pageId,parentId,menuTitle,urlizedTitle from page where pageId=".quote($_[0]));
         if ($data{pageId} > 1) {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
@@ -189,7 +189,7 @@ A reference to an array of CSS color identificators.
 
 sub getDetails {
 	my ($self, $docIdList, %options) = @_;
-	my $docIds = join(',',@$docIdList);
+	my $docIds = quoteAndJoin($docIdList);
 	my (@searchDetails, %namespace);
 	foreach my $wobject (@{$session{config}{wobjects}}){
 		my $cmd = "WebGUI::Wobject::".$wobject;
@@ -443,6 +443,7 @@ of this document.
 sub indexDocument {
 	my ($self, $document) = @_;
 	$self->{_fts}->index_document($document->{docId} || $self->{_docId}, $document->{text});
+	my $docId = ($document->{docId} || $self->{_docId});
 	WebGUI::SQL->write("insert into IndexedSearch_docInfo (	docId, 
 										indexName,
 										pageId,
@@ -459,20 +460,20 @@ sub indexDocument {
 										ownerId,
 										dateIndexed  ) 
                                       values (	".
-							($document->{docId} || $self->{_docId}).", ". 
+							quote($docId).", ". 
 							quote($self->getIndexName).", ".
-							($document->{pageId} || 0).", ". 
-							($document->{wobjectId} || 0).", ". 
+							quote($document->{pageId} || 0).", ". 
+							quote($document->{wobjectId} || 0).", ". 
 							quote($document->{languageId}).", ".
 							quote($document->{namespace} || 'WebGUI')." , ".
 							quote($document->{location}).", ".
-							($document->{page_groupIdView} || 7).", ". 
-							($document->{wobject_groupIdView} || 7).", ".
-							($document->{wobject_special_groupIdView} || 7).", ".
+							quote($document->{page_groupIdView} || 7).", ". 
+							quote($document->{wobject_groupIdView} || 7).", ".
+							quote($document->{wobject_special_groupIdView} || 7).", ".
 							quote($document->{headerShortcut})." ,".
 							quote($document->{bodyShortcut})." ,".
 							quote($document->{contentType})." ,".
-							($document->{ownerId} || 3).",
+							quote($document->{ownerId} || 3).",
 							".WebGUI::DateTime::time()." )"
 				);
 	$self->{_docId}++;
@@ -655,8 +656,8 @@ sub search {
 	my $noFtsSearch = ($query =~ /^\s*\*\s*$/); # query = '*', no full text search
 	my @fts_docIds = $self->{_fts}->search($query) unless $noFtsSearch ;
 	if(@fts_docIds || $noFtsSearch) {
-		my $groups = join(',',@{$self->_getGroups});
-		my $docIds = join(',',@fts_docIds);
+		my $groups = quoteAndJoin($self->_getGroups);
+		my $docIds = quoteAndJoin(\@fts_docIds);
 		my $sql = "select docId from IndexedSearch_docInfo where indexName = ".quote($self->getIndexName);
 		$sql .= " and docId in ($docIds)" unless $noFtsSearch;
 		$sql .= " and page_groupIdView in ($groups)";
@@ -665,7 +666,7 @@ sub search {
 			$sql .= " and wobject_groupIdView in ($groups)";
 		}
 		foreach my $filterElement (keys %{$filter}) {
-			$sql .= " AND $filterElement in (".join(',', @{$filter->{$filterElement}}).")";
+			$sql .= " AND $filterElement in (".quoteAndJoin($filter->{$filterElement}).")";
 		}
 		# No trash or other garbage
 		$sql .= " AND (pageId > 999 or pageId < 0 or pageId = 1) ";

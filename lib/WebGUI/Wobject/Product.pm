@@ -42,31 +42,31 @@ sub duplicate {
         $file->copy($w->get("wobjectId"));
         $file = WebGUI::Attachment->new($_[0]->get("warranty"),$_[0]->get("wobjectId"));
         $file->copy($w->get("wobjectId"));
-        $sth = WebGUI::SQL->read("select * from Product_feature where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from Product_feature where wobjectId=".quote($_[0]->get("wobjectId")));
         while ($row = $sth->hashRef) {
 		$row->{"Product_featureId"} = "new";
 		$w->setCollateral("Product_feature","Product_featureId",$row);
         }
         $sth->finish;
-        $sth = WebGUI::SQL->read("select * from Product_benefit where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from Product_benefit where wobjectId=".quote($_[0]->get("wobjectId")));
         while ($row = $sth->hashRef) {
 		$row->{"Product_benefitId"} = "new";
                 $w->setCollateral("Product_benefit","Product_benefitId",$row);
         }
         $sth->finish;
-        $sth = WebGUI::SQL->read("select * from Product_specification where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from Product_specification where wobjectId=".quote($_[0]->get("wobjectId")));
         while ($row = $sth->hashRef) {
 		$row->{"Product_specificationId"} = "new";
                 $w->setCollateral("Product_specification","Product_specificationId",$row);
         }
         $sth->finish;
-        $sth = WebGUI::SQL->read("select * from Product_accessory where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from Product_accessory where wobjectId=".quote($_[0]->get("wobjectId")));
         while (%data = $sth->hash) {
                 WebGUI::SQL->write("insert into Product_accessory values (".quote($w->get("wobjectId")).", 
 			".quote($data{accessoryWobjectId}).", $data{sequenceNumber})");
         }
         $sth->finish;
-        $sth = WebGUI::SQL->read("select * from Product_related where wobjectId=".$_[0]->get("wobjectId"));
+        $sth = WebGUI::SQL->read("select * from Product_related where wobjectId=".quote($_[0]->get("wobjectId")));
         while (%data = $sth->hash) {
                 WebGUI::SQL->write("insert into Product_related values (".quote($w->get("wobjectId")).", 
 			".quote($data{relatedWobjectId}).", $data{sequenceNumber})");
@@ -151,13 +151,13 @@ sub new {
 
 #-------------------------------------------------------------------
 sub purge {
-        WebGUI::SQL->write("delete from Product_accessory where wobjectId=".$_[0]->get("wobjectId")." 
-		or accessoryWobjectId=".$_[0]->get("wobjectId"));
-        WebGUI::SQL->write("delete from Product_related where wobjectId=".$_[0]->get("wobjectId")."
-		or relatedWobjectId=".$_[0]->get("wobjectId"));
-        WebGUI::SQL->write("delete from Product_benefit where wobjectId=".$_[0]->get("wobjectId"));
-        WebGUI::SQL->write("delete from Product_feature where wobjectId=".$_[0]->get("wobjectId"));
-        WebGUI::SQL->write("delete from Product_specification where wobjectId=".$_[0]->get("wobjectId"));
+        WebGUI::SQL->write("delete from Product_accessory where wobjectId=".quote($_[0]->get("wobjectId"))." 
+		or accessoryWobjectId=".quote($_[0]->get("wobjectId")));
+        WebGUI::SQL->write("delete from Product_related where wobjectId=".quote($_[0]->get("wobjectId"))."
+		or relatedWobjectId=".quote($_[0]->get("wobjectId")));
+        WebGUI::SQL->write("delete from Product_benefit where wobjectId=".quote($_[0]->get("wobjectId")));
+        WebGUI::SQL->write("delete from Product_feature where wobjectId=".quote($_[0]->get("wobjectId")));
+        WebGUI::SQL->write("delete from Product_specification where wobjectId=".quote($_[0]->get("wobjectId")));
 	$_[0]->SUPER::purge();
 }
 
@@ -173,10 +173,10 @@ sub www_addAccessory {
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("func","addAccessorySave");
         @usedAccessories = WebGUI::SQL->quickArray("select accessoryWobjectId from Product_accessory
-                where wobjectId=".$session{form}{wid});
+                where wobjectId=".quote($session{form}{wid}));
         push(@usedAccessories,$session{form}{wid});
         $accessory = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
-                and wobjectId not in (".join(",",@usedAccessories).")");
+                and wobjectId not in (".quoteAndJoin(\@usedAccessories).")");
         $f->select("accessoryWobjectId",$accessory,WebGUI::International::get(17,$_[0]->get("namespace")));
         $f->yesNo("proceed",WebGUI::International::get(18,$_[0]->get("namespace")));
         $f->submit;
@@ -191,7 +191,7 @@ sub www_addAccessorySave {
         $session{page}{useAdminStyle} = 1;
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory
-                where wobjectId=".$_[0]->get("wobjectId"));
+                where wobjectId=".quote($_[0]->get("wobjectId")));
         WebGUI::SQL->write("insert into Product_accessory (wobjectId,accessoryWobjectId,sequenceNumber) values
                 (".quote($_[0]->get("wobjectId")).",".quote($session{form}{accessoryWobjectId}).",".($seq+1).")");
         if ($session{form}{proceed}) {
@@ -211,10 +211,10 @@ sub www_addRelated {
         $f->hidden("wid",$_[0]->get("wobjectId"));
         $f->hidden("func","addRelatedSave");
         @usedRelated = WebGUI::SQL->quickArray("select relatedWobjectId from Product_related
-                where wobjectId=".$session{form}{wid});
+                where wobjectId=".quote($session{form}{wid}));
         push(@usedRelated,$session{form}{wid});
         $related = WebGUI::SQL->buildHashRef("select wobjectId,title from wobject where namespace='Product'
-                and wobjectId not in (".join(",",@usedRelated).")");
+                and wobjectId not in (".quoteAndJoin(\@usedRelated).")");
         $f->select("relatedWobjectId",$related,WebGUI::International::get(20,$_[0]->get("namespace")));
         $f->yesNo("proceed",WebGUI::International::get(21,$_[0]->get("namespace")));
         $f->submit;
@@ -228,7 +228,7 @@ sub www_addRelatedSave {
 	return "" unless ($session{form}{relatedWobjectId});
         my ($seq);
         ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_related
-     		where wobjectId=".$_[0]->get("wobjectId"));
+     		where wobjectId=".quote($_[0]->get("wobjectId")));
         WebGUI::SQL->write("insert into Product_related (wobjectId,relatedWobjectId,sequenceNumber) values
                 (".quote($_[0]->get("wobjectId")).",".quote($session{form}{relatedWobjectId}).",".($seq+1).")");
         if ($session{form}{proceed}) {
@@ -250,7 +250,7 @@ sub www_deleteAccessory {
 #-------------------------------------------------------------------
 sub www_deleteAccessoryConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	WebGUI::SQL->write("delete from Product_accessory where wobjectId=".$_[0]->get("wobjectId")." and accessoryWobjectId=".quote($session{form}{aid}));
+	WebGUI::SQL->write("delete from Product_accessory where wobjectId=".quote($_[0]->get("wobjectId"))." and accessoryWobjectId=".quote($session{form}{aid}));
 	$_[0]->reorderCollateral("Product_accessory","accessoryWobjectId");
         return "";
 }
@@ -301,7 +301,7 @@ sub www_deleteRelated {
 #-------------------------------------------------------------------
 sub www_deleteRelatedConfirm {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-        WebGUI::SQL->write("delete from Product_related where wobjectId=".$_[0]->get("wobjectId")." and relatedWobjectId=".quote($session{form}{rid}));
+        WebGUI::SQL->write("delete from Product_related where wobjectId=".quote($_[0]->get("wobjectId"))." and relatedWobjectId=".quote($session{form}{rid}));
 	$_[0]->reorderCollateral("Product_related","relatedWobjectId");
         return "";
 }
@@ -609,7 +609,7 @@ sub www_view {
         $var{"addFeature.url"} = WebGUI::URL::page('func=editFeature&fid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addFeature.label"} = WebGUI::International::get(34,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select feature,Product_featureId from Product_feature where wobjectId="
-		.$_[0]->get("wobjectId")." order by sequenceNumber");
+		.quote($_[0]->get("wobjectId"))." order by sequenceNumber");
         while (%data = $sth->hash) {
                 $segment = deleteIcon('func=deleteFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
                         .editIcon('func=editFeature&wid='.$_[0]->get("wobjectId").'&fid='.$data{Product_featureId})
@@ -627,7 +627,7 @@ sub www_view {
         $var{"addBenefit.url"} = WebGUI::URL::page('func=editBenefit&fid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addBenefit.label"} = WebGUI::International::get(55,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select benefit,Product_benefitId from Product_benefit where wobjectId="
-		.$_[0]->get("wobjectId")." order by sequenceNumber");
+		.quote($_[0]->get("wobjectId"))." order by sequenceNumber");
         while (%data = $sth->hash) {
                 $segment = deleteIcon('func=deleteBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
                         .editIcon('func=editBenefit&wid='.$_[0]->get("wobjectId").'&bid='.$data{Product_benefitId})
@@ -645,7 +645,7 @@ sub www_view {
         $var{"addSpecification.url"} = WebGUI::URL::page('func=editSpecification&sid=new&wid='.$_[0]->get("wobjectId"));
 	$var{"addSpecification.label"} = WebGUI::International::get(35,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select name,value,units,Product_specificationId from Product_specification 
-		where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
+		where wobjectId=".quote($_[0]->get("wobjectId"))." order by sequenceNumber");
         while (%data = $sth->hash) {
                 $segment = deleteIcon('func=deleteSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
                         .editIcon('func=editSpecification&wid='.$_[0]->get("wobjectId").'&sid='.$data{Product_specificationId})
@@ -666,7 +666,7 @@ sub www_view {
 	$var{"addaccessory.label"} = WebGUI::International::get(36,$_[0]->get("namespace"));
         $sth = WebGUI::SQL->read("select wobject.title,page.urlizedTitle,Product_accessory.accessoryWobjectId 
 		from Product_accessory,wobject,page 
-		where Product_accessory.wobjectId=".$_[0]->get("wobjectId")." 
+		where Product_accessory.wobjectId=".quote($_[0]->get("wobjectId"))." 
 		and Product_accessory.accessoryWobjectId=wobject.wobjectId 
 		and wobject.pageId=page.pageId order by Product_accessory.sequenceNumber");
         while (%data = $sth->hash) {
@@ -687,7 +687,7 @@ sub www_view {
 	$var{"addrelatedproduct.label"} = WebGUI::International::get(37,$_[0]->get("namespace"));
 	$sth = WebGUI::SQL->read("select wobject.title,page.urlizedTitle,Product_related.relatedWobjectId 
 		from Product_related,wobject,page 
-		where Product_related.wobjectId=".$_[0]->get("wobjectId")." 
+		where Product_related.wobjectId=".quote($_[0]->get("wobjectId"))." 
 		and Product_related.relatedWobjectId=wobject.wobjectId 
 		and wobject.pageId=page.pageId order by Product_related.sequenceNumber");
         while (%data = $sth->hash) {
