@@ -56,7 +56,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
                          WebGUI::Asset->cascadeLineage(100001,100101110111);
  $html=                  WebGUI::Asset->checkExportPath();
                          WebGUI::Asset->cut();
- $arrRef=                WebGUI::Asset->definition(\@arr);
+ $arrayRef=              WebGUI::Asset->definition(\@arr);
                          WebGUI::Asset->deleteMetaDataField();
  $integer=               WebGUI::Asset->demote();
                          WebGUI::Asset->DESTROY();
@@ -66,11 +66,12 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  $string=                WebGUI::Asset->formatRank(1);
  $hashref=               WebGUI::Asset->get("title");
  $AdminConsoleObject=    WebGUI::Asset->getAdminConsole();
- getAssetAdderLinks
- getAssetManagerControl
- getAssetsInClipboard
- getAssetsInTrash
- getEditForm
+ $arrayRef=              WebGUI::Asset->getAssetAdderLinks($string, $boolean);
+ $JavaScript=            WebGUI::Asset->getAssetManagerControl(\%hashref, $string, $bool);
+ $arrayRef=              WebGUI::Asset->getAssetsInClipboard($boolean, $string);
+ $arrayRef=              WebGUI::Asset->getAssetsInTrash($boolean, $string);
+ $containerRef=          WebGUI::Asset->getContainer();
+ $tabform=               WebGUI::Asset->getEditForm();
  getFirstChild
  getIcon
  getId
@@ -645,7 +646,7 @@ sub getAdminConsole {
 
 =head2 getAssetAdderLinks ( [addToUrl, getContainerLinks] )
 
-Returns an array that contains a label (name of the class of Asset) and url (url link to function to add the class).
+Returns an arrayref that contains a label (name of the class of Asset) and url (url link to function to add the class).
 
 =head3 addToUrl
 
@@ -2111,7 +2112,7 @@ sub www_add {
 
 =head2 www_copy ( )
 
-Duplicates self, cuts duplicate, returns "" if canEdit. Otherwise returns an AdminConsole rendered as insufficient privilege.
+Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit. Otherwise returns an AdminConsole rendered as insufficient privilege.
 
 =cut
 
@@ -2234,7 +2235,7 @@ sub www_deleteMetaDataField {
 
 =head2 www_demote ( )
 
-Demotes self and returns "" if canEdit, otherwise renders an AdminConsole as insufficient privilege.
+Demotes self and returns www_view method of getContainer of self if canEdit, otherwise renders an AdminConsole as insufficient privilege.
 
 =cut
 
@@ -2973,7 +2974,7 @@ sub www_pasteList {
 
 =head2 www_promote ( )
 
-Returns "". Promotes self. If canEdit is False, returns an insufficient privileges page.
+Returns www_view method of getContainer of self. Promotes self. If canEdit is False, returns an insufficient privileges page.
 
 =cut
 
@@ -3023,7 +3024,7 @@ sub www_setRank {
 
 =head2 www_view ( )
 
-Returns a fixed English message "No view has been implemented for this asset." If canView is False, returns WebGUI::Privilege::noAccess().
+Returns "". If canView is False, returns WebGUI::Privilege::noAccess().
 
 =cut
 
