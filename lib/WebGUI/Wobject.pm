@@ -959,6 +959,10 @@ sub setCollateral {
 		WebGUI::ErrorHandler::audit("edited ".$table." ".$properties->{$keyName});
 	}
   	WebGUI::SQL->write($sql);
+	$_[0]->{_property}{lastEdited} = time();
+        $_[0]->{_property}{editedBy} = $session{user}{userId};
+	WebGUI::SQL->write("update wobject set lastEdited=".$_[0]->{_property}{lastEdited}
+		.", editedBy=".$_[0]->{_property}{editedBy}." where wobjectId=".$_[0]->get("wobjectId"));
 	$_[0]->reorderCollateral($table,$keyName,$setName,$setValue) if ($properties->{sequenceNumber} < 0);
 	return $properties->{$keyName};
 }
