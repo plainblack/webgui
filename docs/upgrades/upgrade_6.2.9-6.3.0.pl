@@ -66,7 +66,7 @@ sub walkTree {
 		WebGUI::SQL->write("alter table ".$namespace." add column assetId varchar(22) not null");
 	}
 	$sth->finish;
-	my $a = WebGUI::SQL->read("select * from page where subroutinePackage='WebGUI::Page' and parentId=".quote($oldParentId));
+	my $a = WebGUI::SQL->read("select * from page where subroutinePackage='WebGUI::Page' and parentId=".quote($oldParentId)." order by nestedSetLeft");
 	while (my $page = $a->hashRef) {
 		my $pageId = WebGUI::Id::generate();
 		my $pageLineage = $parentLineage.sprintf("%06d",$myRank);
@@ -76,7 +76,7 @@ sub walkTree {
 			$className = 'WebGUI::Asset::Redirect';
 		}
 		WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
-			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".quote($pageId).",
+			endDate, synopsis, newWindow, isHidden, ownerUserId, groupIdView, groupIdEdit ) values (".quote($pageId).",
 			".quote($newParentId).", ".quote($pageLineage).", ".quote($className).",'published',".quote($page->{title}).",
 			".quote($page->{menuTitle}).", ".quote($pageUrl).", ".quote($page->startDate).", ".quote($page->{endDate}).",
 			".quote($page->{synopsis}).", ".quote($page->{newWindow}).", ".quote($page->{hideFromNavigation}).", ".quote($page->{ownerId}).",
@@ -89,9 +89,10 @@ sub walkTree {
 				".quote($page->{printableStyleTemplateId}).")");
 		}
 		my $rank = 0;
-		my $b = WebGUI::SQL->read("select * from wobject where pageId=".quote($page->{pageId}));
+		my $b = WebGUI::SQL->read("select * from wobject where pageId=".quote($page->{pageId})." order by sequenceNumber");
 		while (my $wobject = $b->hashRef) {
 			$rank++;
+			my ($namespace) = WebGUI::SQL->quickHashRef("select * from ".$wobject->{namespace}." where wobjectId=".quote($wobject->{wobjectId}));
 			my $wobjectId = WebGUI::Id::generate();
 			my $wobjectLineage = $pageLineage.sprintf("%06d",$rank);
 			my $wobjectUrl = $pageUrl."/".$wobject->{title};
@@ -105,15 +106,32 @@ sub walkTree {
 			}
 			$className = 'WebGUI::Asset::Wobject::'.$wobject->{namespace};
 			WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, className, state, title, menuTitle, url, startDate, 
-				endDate, synopsis, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".quote($wobjectId).",
+				endDate, isHidden, ownerUserId, groupIdView, groupIdEdit) values (".quote($wobjectId).",
 				".quote($pageId).", ".quote($wobjectLineage).", ".quote($className).",'published',".quote($page->{title}).",
 				".quote($page->{title}).", ".quote($wobjectUrl).", ".quote($wobject->startDate).", ".quote($wobject->{endDate}).",
-				".quote($page->{synopsis}).", 1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).")");
+				1, ".quote($ownerId).", ".quote($groupIdView).", ".quote($groupIdEdit).")");
 			WebGUI::SQL->write("update wobject set assetId=".quote($wobjectId));
-			my $c = WebGUI::SQL->read("select * from ".$wobject->{namespace}." where wobjectId=".quote($wobject->{wobjectId}));
-			while (my $namespace = $c->hashRef) {
+			WebGUI::SQL->write("update ".$wobject->{namespace}." set assetId=".quote($wobjectId));
+			if ($namespace eq "Article") {
+				# migrate attachment to file asset
+				# migrate image to image asset
+				# migrate forums
+			} elsif ($namespace eq "SiteMap") {
+				# we're dumping sitemaps so do that here
+			} elsif ($namespace eq "FileManager") {
+				# we're dumping file manager's so do that here
+			} elsif ($namespace eq "Product") {
+				# migrate attachments to file assets
+				# migrate images to image assets
+			} elsif ($namespace eq "USS") {
+				# migrate master forum
+				# migrate submissions
+				# migrate submission forums
+				# migrate submission attachments
+				# migrate submission images
+			} elsif ($namespace eq "MessageBoard") {
+				# migrate forums
 			}
-			$c->finish;
 		}
 		$b->finish;
 		walkTree($page->{pageId},$pageId,$pageLineage,$rank+1);
@@ -132,11 +150,28 @@ sub walkTree {
 	WebGUI::SQL->write("alter table wobject drop column wobjectId");
 	WebGUI::SQL->write("alter table wobject add primary key (assetId)");
 	WebGUI::SQL->write("alter table wobject drop column namespace");
+	WebGUI::SQL->write("alter table wobject drop column pageId");
+	WebGUI::SQL->write("alter table wobject drop column sequenceNumber");
 	WebGUI::SQL->write("alter table wobject drop column title");
 	WebGUI::SQL->write("alter table wobject drop column ownerId");
 	WebGUI::SQL->write("alter table wobject drop column groupIdEdit");
 	WebGUI::SQL->write("alter table wobject drop column groupIdView");
+	WebGUI::SQL->write("alter table wobject drop column userDefined1");
+	WebGUI::SQL->write("alter table wobject drop column userDefined2");
+	WebGUI::SQL->write("alter table wobject drop column userDefined3");
+	WebGUI::SQL->write("alter table wobject drop column userDefined4");
+	WebGUI::SQL->write("alter table wobject drop column userDefined5");
+	WebGUI::SQL->write("alter table wobject drop column templatePosition");
+	WebGUI::SQL->write("alter table wobject drop column bufferUserId");
+	WebGUI::SQL->write("alter table wobject drop column bufferDate");
+	WebGUI::SQL->write("alter table wobject drop column bufferPrevId");
+	WebGUI::SQL->write("alter table wobject drop column forumId");
+	WebGUI::SQL->write("alter table wobject drop column startDate");
+	WebGUI::SQL->write("alter table wobject drop column endDate");
+	WebGUI::SQL->write("alter table wobject drop column allowDiscussion");
 	WebGUI::SQL->write("drop table page");
+	WebGUI::SQL->write("alter table Article drop column image");
+	WebGUI::SQL->write("alter table Article drop column attachment");
 }
 
 

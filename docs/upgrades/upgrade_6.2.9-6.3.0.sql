@@ -50,11 +50,11 @@ create table asset (
 	state varchar(35) not null,
 	className varchar(255) not null,
 	boundToId varchar(22),
-	title varchar(255),
-	menuTitle varchar(255),
+	title varchar(255) not null default 'untitled',
+	menuTitle varchar(255) not null default 'untitled',
 	url varchar(255) not null,
-	startDate bigint not null,
-	endDate bigint not null,
+	startDate bigint not null default 997995720,
+	endDate bigint not null default 9223372036854775807,
 	ownerUserId varchar(22) not null,
 	groupIdView varchar(22) not null,
 	groupIdEdit varchar(22) not null,
@@ -67,5 +67,24 @@ create table asset (
 	index (parentId)
 );
 
-insert into asset (assetId, parentId, lineage, state, className, title, menuTitle, url, startDate, endDate, isSystem, ownerUserId, groupIdView, groupIdEdit) values ('theroot', 'infinity', '000001','published','WebGUI::Asset','Root','Root','root',997995720,9223372036854775807,1,'3','3','3');
+insert into asset (assetId, parentId, lineage, state, className, title, menuTitle, url, isSystem, ownerUserId, groupIdView, groupIdEdit) values ('theroot', 'infinity', '000001','published','WebGUI::Asset','Root','Root','root',1,'3','3','3');
+
+create table assetHistory (
+	assetId varchar(22) not null,
+	userId varchar(22) not null,
+	dateStamp bigint not null default 0,
+	actionTaken varchar(255) not null
+);
+
+create table redirect (
+	assetId varchar(22) not null primary key,
+	redirectUrl text
+);
+
+create table layout (
+	assetId varchar(22) not null primary key, 
+	styleTemplateId varchar(22) not null, 
+	layoutTemplateId varchar(22) not null, 
+	printableStyleTemplateId varchar(22) not null
+);
 
