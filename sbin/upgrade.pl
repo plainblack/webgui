@@ -24,6 +24,7 @@ use strict;
 use WebGUI::SQL;
 
 my $help;
+my $history;
 my $override;
 my $quiet;
 my $mysql = "/usr/bin/mysql";
@@ -34,6 +35,7 @@ my $doit;
 
 GetOptions(
         'help'=>\$help,
+        'history'=>\$history,
         'override'=>\$override,
         'quiet'=>\$quiet,
 	'mysql=s'=>\$mysql,
@@ -56,6 +58,10 @@ Options:
 			created. Defaults to '/data/backups'.
 
         --help          Display this help message and exit.
+
+	--history	Displays the upgrade history for each of
+			your sites. Note that running with this
+			flag will NOT run the upgrade.
 
 	--mysql		The path to your mysql client executable.
 			Defaults to '/usr/bin/mysql'.
@@ -86,9 +92,13 @@ unless ($doit) {
 
 +--------------------------------------------------------------------+
 |                                                                    |
-|                         W  A  R  N  I  N  G                        |
+| For more information about this utility type:                      |
+|                                                                    |
+| perl upgrade.pl --help                                             |
 |                                                                    |
 +--------------------------------------------------------------------+
+|                                                                    |
+|                         W  A  R  N  I  N  G                        |
 |                                                                    |
 | There are no guarantees of any kind provided with this software.   |
 | This utility has been tested rigorously, and has performed without |
@@ -102,14 +112,9 @@ unless ($doit) {
 |                                                                    |
 +--------------------------------------------------------------------+
 |                                                                    |
-| For more information about this utility type:                      |
-|                                                                    |
-| perl upgrade.pl --help                                             |
-|                                                                    |
-+--------------------------------------------------------------------+
-|                                                                    |
 | You must include the command line argument "--doit" in your        |
-| command in order to bypass this message.                           |
+| command in order to bypass this message. The upgrade will not run  |
+| without the "--doit" flag.                                         |
 |                                                                    |
 +--------------------------------------------------------------------+
 
@@ -137,28 +142,6 @@ our $upgradesPath = $webguiRoot.$slash."docs".$slash."upgrades".$slash;
 our $configsPath = $webguiRoot.$slash."etc".$slash;
 our (%upgrade, %config);
 
-
-## Find upgrade files.
-
-print "\nLooking for upgrade files...\n" unless ($quiet);
-opendir(DIR,$upgradesPath) or die "Couldn't open $upgradesPath\n";
-my @files = readdir(DIR);
-closedir(DIR);
-foreach my $file (@files) {
-	if ($file =~ /upgrade_(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)\.(\w+)/) {
-		if (checkVersion($1)) {
-			if ($3 eq "sql") {
-				print "\tFound upgrade script from $1 to $2.\n" unless ($quiet);
-				$upgrade{$1}{sql} = $file;
-			} elsif ($3 eq "pl") {
-				print "\tFound upgrade executable from $1 to $2.\n" unless ($quiet);
-				$upgrade{$1}{pl} = $file;
-			}
-			$upgrade{$1}{from} = $1;
-			$upgrade{$1}{to} = $2;
-		}
-	}
-}
 
 ## Find site configs.
 
@@ -195,7 +178,46 @@ foreach my $file (@files) {
 	}
 }
 
+if ($history) {
+	print "\nDisplaying upgrade history for each site.\n";
+	require WebGUI::DateTime;
+	foreach my $file (keys %config) {
+		print "\n".$file."\n";
+		my $dbh = DBI->connect($config{$file}{dsn},$config{$file}{dbuser},$config{$file}{dbpass});
+		my $sth = WebGUI::SQL->read("select * from webguiVersion order by dateApplied asc, webguiVersion asc",$dbh);
+		while (my $data = $sth->hashRef) {
+			print "\t".sprintf("%-8s  %-15s  %-15s",
+				$data->{webguiVersion},
+				WebGUI::DateTime::epochToHuman($data->{dateApplied},"%y-%m-%d"),
+				$data->{versionType})."\n";
+		}
+		$sth->finish;
+		$dbh->disconnect;		
+	}
+	exit;
+}
 
+## Find upgrade files.
+
+print "\nLooking for upgrade files...\n" unless ($quiet);
+opendir(DIR,$upgradesPath) or die "Couldn't open $upgradesPath\n";
+my @files = readdir(DIR);
+closedir(DIR);
+foreach my $file (@files) {
+	if ($file =~ /upgrade_(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)\.(\w+)/) {
+		if (checkVersion($1)) {
+			if ($3 eq "sql") {
+				print "\tFound upgrade script from $1 to $2.\n" unless ($quiet);
+				$upgrade{$1}{sql} = $file;
+			} elsif ($3 eq "pl") {
+				print "\tFound upgrade executable from $1 to $2.\n" unless ($quiet);
+				$upgrade{$1}{pl} = $file;
+			}
+			$upgrade{$1}{from} = $1;
+			$upgrade{$1}{to} = $2;
+		}
+	}
+}
 
 print "\nREADY TO BEGIN UPGRADES\n" unless ($quiet);
 

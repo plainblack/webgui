@@ -1,3 +1,9 @@
+6.1.0
+ - Changed the output of upgrade.pl for better understanding.
+ - Added a --history option to upgrade.pl that displays the upgrade history
+   for each site.
+
+
 6.0.3
  - Fixed a recursive style change bug.
  - Bugfix [ 953593 ] perl -MWebGUI -e "" fails
