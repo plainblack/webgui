@@ -33,7 +33,8 @@ our @EXPORT = qw(&www_copyTemplate &www_deleteTemplate &www_deleteTemplateConfir
 sub _submenu {
         my (%menu);
         tie %menu, 'Tie::IxHash';
-        $menu{WebGUI::URL::page('op=editTemplate&sid=new')} = WebGUI::International::get(505);
+        $menu{WebGUI::URL::page('op=editTemplate&tid=new&namespace='.$session{form}{namespace})} = 
+		WebGUI::International::get(505);
         if (($session{form}{op} eq "editTemplate" && $session{form}{tid} ne "new") || $session{form}{op} eq "deleteTemplateConfirm") {
                 $menu{WebGUI::URL::page('op=editTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace})} = 
 			WebGUI::International::get(851);
@@ -132,7 +133,7 @@ sub www_editTemplate {
 		if ($session{form}{tid} eq "new") {
 			$namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
 				from template order by namespace");
-			$f->select("namespace",$namespaces,WebGUI::International::get(721));
+			$f->select("namespace",$namespaces,WebGUI::International::get(721),[$session{form}{namespace}]);
 		} else {
                 	$f->hidden("namespace",$session{form}{namespace});
 		}
