@@ -201,7 +201,14 @@ sub tar {
 	chdir $self->getPath;
 	my $temp = WebGUI::Node->new($node1,$node2);
 	$temp->create;
-	Archive::Tar->create_archive($temp->getPath.$session{os}{slash}.$filename,1,$_[0]->getFiles);
+	if ($Archive::Tar::VERSION eq '0.072') {
+		my $tar = Archive::Tar->new();
+		$tar->add_files($_[0]->getFiles);
+		$tar->write($temp->getPath.$session{os}{slash}.$filename,1);
+		
+	} else {
+		Archive::Tar->create_archive($temp->getPath.$session{os}{slash}.$filename,1,$_[0]->getFiles);
+	}
 }
 
 #-------------------------------------------------------------------

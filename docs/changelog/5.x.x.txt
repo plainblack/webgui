@@ -24,7 +24,8 @@
  - Fixed bug [ 839524 ] Editing forum settings defaults all template names
  - Fixed bug [ 841194 ] denied post security problem
  - Added a check for malicious mail headers
- 
+ - Fixed bug [ 820144 ] Theme problems under Win32
+
 
 5.5.0
  - Rewrote the discussion system and added many new features in the process.
