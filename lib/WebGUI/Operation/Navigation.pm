@@ -222,7 +222,7 @@ sub www_editNavigation {
 		-namespace=>'Navigation',
 	);
 	$output .= $f->print;
-	return $output;	
+	return _submenu($output);	
 }
 
 #-------------------------------------------------------------------
