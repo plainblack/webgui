@@ -93,6 +93,8 @@ Net::LDAP............................Graham Barr
 
 Parse::PlainConfig...................Arthur Corliss
 
+Text::Balanced.......................Damian Conway
+
 Tie::CPHash..........................Christopher J. Madsen
 
 Tie::IxHash..........................Gurusamy Sarathy
