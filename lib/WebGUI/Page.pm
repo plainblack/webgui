@@ -455,7 +455,7 @@ The page id of the page you're creating a URL for.
 
 sub makeUnique {
         my ($url, $test, $pageId);
-        $url = $_[0];
+        $url = $_[0] || "_1";
         $pageId = $_[1] || "new";
         while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$url' and pageId<>'$pageId'")) {
                 if ($url =~ /(.*)(\d+$)/) {

@@ -19,7 +19,9 @@
  - Bugfix [ 925586 ] HttpProxy ignores javascript in <HEAD> (thanks to
    Nicklous Roberts).
  - Added cacheTTL param to WSClient to tweak expiration of SOAP returns.
- 
+ - Bugfix [ 943298 ] Events Calendar recurrence error in WG6.0 (thanks to
+   Frank Dillon). 
+ - Bugfix [ 942865 ] urlizedTitle problem. (Thanks to tr0nd).
 
 
 6.0.1
