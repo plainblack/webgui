@@ -275,7 +275,7 @@ sub www_view {
 				'forum.lastPost.date' => WebGUI::Forum::UI::formatPostDate($lastPost->get("dateOfPost")),
 				'forum.lastPost.time' => WebGUI::Forum::UI::formatPostTime($lastPost->get("dateOfPost")),
 				'forum.lastPost.epoch' => $lastPost->get("dateOfPost"),
-				'forum.lastPost.subject' => WebGUI::Forum::UI::formatSubject($lastPost->get("subject")),
+				'forum.lastPost.subject' => $lastPost->get("subject"),
 				'forum.lastPost.user.id' => $lastPost->get("userId"),
 				'forum.lastPost.user.name' => $lastPost->get("username"),
 				'forum.lastPost.user.profile' => WebGUI::Forum::UI::formatUserProfileURL($lastPost->get("userId")),

@@ -51,6 +51,7 @@ User interface package for forums.
  $url = WebGUI::Forum::UI::formatForumSubscribeURL($callback, $forumId);
  $url = WebGUI::Forum::UI::formatForumUnsubscribeURL($callback, $forumId);
  $url = WebGUI::Forum::UI::formatForumURL($callback, $forumId);
+ $scalar = WebGUI::Forum::UI::formatMessage($post,$forum);
  $url = WebGUI::Forum::UI::formatNextThreadURL($callback, $postId);
  $url = WebGUI::Forum::UI::formatNewThreadURL($callback, $forumId);
  $scalar = WebGUI::Forum::UI::formatPostDate($epoch);
@@ -59,7 +60,6 @@ User interface package for forums.
  $url = WebGUI::Forum::UI::formatRatePostURL($callback, $postId, $rating);
  $url = WebGUI::Forum::UI::formatReplyPostURL($callback, $postId, $forumId);
  $scalar = WebGUI::Forum::UI::formatStatus($status);
- $scalar = WebGUI::Forum::UI::formatSubject($subject);
  $url = WebGUI::Forum::UI::formatThreadLayoutURL($callback, $postId, $layout);
  $url = WebGUI::Forum::UI::formatThreadLockURL($callback, $postId);
  $url = WebGUI::Forum::UI::formatThreadStickURL($callback, $postId);
@@ -130,7 +130,7 @@ The string to format.
 =cut
 
 sub chopSubject {
-	return substr(formatSubject($_[0]),0,30);
+	return substr($_[0],0,30);
 }
 
 #-------------------------------------------------------------------
@@ -353,6 +353,38 @@ sub formatForumURL {
 	return WebGUI::URL::append($_[0],"forumOp=viewForum&amp;forumId=".$_[1]);
 }
 
+
+#-------------------------------------------------------------------
+
+=head formatMessage ( post [, forum])
+
+Formats a post message for display.
+
+=over
+
+=item post
+
+The post object for this message.
+
+=item forum
+
+The forum object for this message. Defaults to post->getThread->getForum.
+
+=back
+
+=cut
+
+sub formatMessage {
+	my $post = shift;
+	my $forum = shift || $post->getThread->getForum;
+	my $msg = WebGUI::HTML::filter($post->get("message"),$forum->get("filterPosts"));
+        $msg = WebGUI::HTML::format($msg, $post->get("contentType"));
+        if ($forum->get("allowReplacements")) {
+                $msg = WebGUI::HTML::processReplacements($msg);
+        }
+	return $msg;
+}
+
 #-------------------------------------------------------------------
 
 =head2 formatNextThreadURL ( callback, postId )
@@ -555,25 +587,6 @@ sub formatStatus {
         }
 }
 
-#-------------------------------------------------------------------
-
-=head2 formatSubject ( subject )
-
-Formats the subject string (removing bad stuff like HTML).
-
-=over
-
-=item subject 
-
-The string to format.
-
-=back
-
-=cut
-
-sub formatSubject {
-	return WebGUI::HTML::filter($_[0],"all");
-}
 
 #-------------------------------------------------------------------
 
@@ -1194,11 +1207,7 @@ sub getPostTemplateVars {
 	$var->{'callback.label'} = WebGUI::International::get(1039);
 	$var->{'post.subject.label'} = WebGUI::International::get(229);
         $var->{'post.subject'} = WebGUI::HTML::filter($post->get("subject"),"none");
-        $var->{'post.message'} = WebGUI::HTML::filter($post->get("message"),$forum->get("filterPosts"));
-	$var->{'post.message'} = WebGUI::HTML::format($var->{'post.message'}, $post->get("contentType"));
-        if ($forum->get("allowReplacements")) {
-		$var->{'post.message'} = WebGUI::HTML::processReplacements($var->{'post.message'});
-        }
+	$var->{'post.message'} = formatMessage($post,$forum);
 	$var->{'user.canPost'} = $forum->canPost;
         $var->{'post.date.value'} = formatPostDate($post->get("dateOfPost"));
 	$var->{'post.date.label'} = WebGUI::International::get(245);
@@ -1901,11 +1910,15 @@ sub www_postSave {
 	my $forumId = $session{form}{forumId};
 	my $threadId = $session{form}{forumThreadId};
 	my $postId = $session{form}{forumPostId};
-	$session{form}{subject} = WebGUI::International::get(232) if ($session{form}{subject} eq "");
-	$session{form}{subject} .= ' '.WebGUI::International::get(233) if ($session{form}{message} eq "");
+	my $subject = $session{form}{subject};
+	$subject = WebGUI::International::get(232) if ($subject eq "");
+	$subject .= ' '.WebGUI::International::get(233) if ($session{form}{message} eq "");
+	if ( $subject ne "") { # subjects could never contain anything other than text
+                $subject = WebGUI::HTML::filter(WebGUI::HTML::processReplacements($subject),"all");
+	}
 	my %postData = (
 		message=>$session{form}{message},
-		subject=>formatSubject($session{form}{subject}),
+		subject=>$subject,
                 contentType=>$session{form}{contentType}
 		);
 	my %postDataNew = (
@@ -2085,7 +2098,7 @@ sub www_search {
 		my @post_loop;
 		foreach my $row (@{$p->getPageData}) {
 			push(@post_loop,{
-				'post.subject'=>formatSubject($row->{subject}),
+				'post.subject'=>$row->{subject},
 				'post.url'=>formatThreadURL($caller->{callback},$row->{forumPostId}),
 				'post.user.name'=>$row->{username},
 				'post.user.id'=>$row->{userId},
