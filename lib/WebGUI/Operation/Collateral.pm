@@ -90,7 +90,6 @@ sub www_deleteCollateralConfirm {
 sub www_deleteCollateralFile {
 	my $collateral = WebGUI::Collateral->new($session{form}{cid});
         return WebGUI::Privilege::insufficient unless ($collateral->get("userId") == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
-	my $collateral = WebGUI::Collateral->new($session{form}{cid});
 	$collateral->deleteFile;
 	return www_editCollateral($collateral);
 }
