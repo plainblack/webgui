@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<TITLE>edit-on Pro</TITLE>
+
+<SCRIPT language="JavaScript">
+	function functSet()
+	{
+		// Put the contents from the TEXTAREA field into the editor
+		//document.myEditor.setHTMLData(  "" , document.myForm.myTextArea.value );
+	}
+
+
+	function functGet()
+	{
+		// Get the contents of the editor and copy them into the TEXTAREA field
+		//document.myForm.myTextArea.value = document.myEditor.getHTMLData( "" );
+		window.blur();
+       	 	window.opener.focus();
+		window.opener.formObj.value = document.myEditor.getHTMLData( "" );
+        	window.close();
+	}
+
+	// This callback function is called after the applet has successfully initialized
+	function onEditorLoaded(editorapplet)
+	{
+
+		//editorapplet.setHTMLData("http://","<p>Some <b>bold</b> Text</p>");
+		editorapplet.setHTMLData("http://",window.opener.formObj.value);
+
+	};	
+
+	// This callback function is called after the applet has successfully finished loading HTML dat
+	function onDataLoaded(editorapplet)
+	{	
+
+		//editorapplet.insertHTMLData("http://","<p>Some more <b>bold</b> Text</p>");
+
+	};	
+
+
+</SCRIPT>
+
+</HEAD>
+<BODY bgcolor="#EEEEEE">
+<form>
+		<APPLET code="EditorApplet" codeBase="./eopro/" id="myEditor" name="myEditor" 
+		        archive="edit-on-pro-signed.jar,ssce.jar" width="700"  height="400" VIEWASTEXT MAYSCRIPT>
+			
+			<PARAM NAME="cabbase" VALUE="edit-on-pro-signed.cab,ssce.cab">
+
+			<PARAM NAME="locale" VALUE="en_US">			   <!-- Change this to change UI language e.g de_DE, fr_FR, es_ES -->
+			<PARAM NAME="help" VALUE="eophelp/en_US/help_en_US.htm">   <!-- This is relative to CODEBASE, can be changed according to UI language -->
+			<PARAM NAME="toolbarurl" VALUE="toolbar-sample.xml">       <!-- This is relative to CODEBASE -->
+
+			<PARAM NAME="spellcheckproperties" VALUE="sc-americanenglish.txt">  <!-- This is relative to CODEBASE -->
+
+
+		<!--	<PARAM NAME="imageroot" VALUE="http://localhost">  Optional - Set this to the reference base of relative image SRCs -->
+		<!--	<PARAM NAME="imageproxyurl" VALUE="/cgi-bin/imageproxy.cgi?">  Optional - Set this if you use an unsigned CAB/JAR and want to insert remote images-->
+
+			<PARAM NAME="sourceview" VALUE="true">
+			<PARAM NAME="sourceviewwordwrap" VALUE="true">
+
+			<PARAM NAME="startupscreenbackgroundcolor" value="#EEEEEE">
+
+			<PARAM NAME="defaultfontcolor" VALUE="black">
+			<PARAM NAME="defaultbackgroundcolor" VALUE="white">
+			<PARAM NAME="defaultlinkcolor" VALUE="blue">
+			<PARAM NAME="defaultfontsize" VALUE="10">
+			<PARAM NAME="defaultfontface" VALUE="Serif">
+
+			<PARAM NAME="bodyonly" VALUE="true">
+			<PARAM NAME="textmode" VALUE="false">
+			<PARAM NAME="xhtmlmode" VALUE="true">
+
+			<PARAM NAME="inserttext_html" VALUE="TRUE">
+
+
+			<PARAM NAME="gethtmldataurl" VALUE="">  <!-- Absolute URL or relative to DOCBASE -->
+			<PARAM NAME="sethtmldataurl" VALUE="">  <!-- Absolute URL or relative to DOCBASE -->
+				
+			<PARAM NAME="simpletable" VALUE="true">
+			<PARAM NAME="tableNBSPfill" VALUE="true">
+			<PARAM NAME="table_numrows" VALUE="3">
+			<PARAM NAME="table_numcols" VALUE="4">
+			<PARAM NAME="table_overallwidth" VALUE="100%">
+			<PARAM NAME="table_rowheight" VALUE="10">
+			<PARAM NAME="table_colwidth" VALUE="25%">
+
+			<PARAM NAME="ONEDITORLOADED" VALUE="onEditorLoaded">
+			<PARAM NAME="ONDATALOADED" VALUE="onDataLoaded">
+
+
+		</APPLET>
+
+<input type="button" value="Done Editing" onClick="functGet()"></form>
+</BODY>
+</HTML>
