@@ -175,7 +175,7 @@ sub _time {
 #-------------------------------------------------------------------
 sub _loadAuthentication {
 	foreach my $namespace (@{$session{config}{authMethods}}) {
-		my $cmd = "use WebGUI::Authentication::".$namespace;
+		my $cmd = "use WebGUI::Auth::".$namespace;
 		eval($cmd);
 		if ($@) {
 			WebGUI::ErrorHandler::warn("Authentication module failed to compile: $namespace. ".$@);
@@ -321,7 +321,6 @@ sub httpHeader {
 	}
 	return $session{cgi}->header( 
 		-type => $session{header}{mimetype}.'; charset='.$session{header}{charset},
-		-P3P => 'CP="CAO DSP COR CURa ADMa DEVa OUR IND PHY ONL UNI COM NAV INT DEM PRE"',
 		-cookie => $session{header}{cookie}, 
 		-status => $session{header}{status},
 		-attachment => $session{header}{filename}
