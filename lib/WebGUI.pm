@@ -97,17 +97,18 @@ sub page {
 			if ($session{var}{adminOn}) {
 				$pageEdit = "\n<br>"
 					.pageIcon()
+					.deleteIcon('op=deletePage')
 					.editIcon('op=editPage')
 					.moveUpIcon('op=movePageUp')
 					.moveDownIcon('op=movePageDown')
 					.cutIcon('op=cutPage')
-					.deleteIcon('op=deletePage')
 					."\n";
 			}	
 			$sth = WebGUI::SQL->read("select * from wobject where pageId=$session{page}{pageId} order by sequenceNumber, wobjectId");
 			while ($wobject = $sth->hashRef) {
 				if ($session{var}{adminOn}) {
 					$contentHash{${$wobject}{templatePosition}} .= "\n<hr>"
+						.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
 						.editIcon('func=edit&wid='.${$wobject}{wobjectId})
 						.moveUpIcon('func=moveUp&wid='.${$wobject}{wobjectId})
 						.moveDownIcon('func=moveDown&wid='.${$wobject}{wobjectId})
@@ -115,7 +116,6 @@ sub page {
 						.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
 						.copyIcon('func=copy&wid='.${$wobject}{wobjectId})
 						.cutIcon('func=cut&wid='.${$wobject}{wobjectId})
-						.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
 						.'<br>';
 				}
                                 if (${$wobject}{namespace} eq "WobjectProxy") {
