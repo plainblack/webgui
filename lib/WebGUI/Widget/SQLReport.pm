@@ -31,15 +31,16 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget","SQLReport");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'SQL Report').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'','','',1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Template</td><td>'.WebGUI::Form::textArea("template",'','','',1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Query</td><td>'.WebGUI::Form::textArea("dbQuery",'').'</td></tr>';
-                $output .= '<tr><td class="formDescription">DSN</td><td>'.WebGUI::Form::text("DSN",20,255,"DBI:mysql:").'</td></tr>';
-                $output .= '<tr><td class="formDescription">Database User</td><td>'.WebGUI::Form::text("username",20,255).'</td></tr>';
+                $output .= '<tr><td class="formDescription">DSN</td><td>'.WebGUI::Form::text("DSN",20,255,$session{config}{dsn}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Database User</td><td>'.WebGUI::Form::text("username",20,255,$session{config}{dbuser}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Database Password</td><td>'.WebGUI::Form::password("identifier",20,255).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Convert carriage returns?</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -54,7 +55,7 @@ sub www_addSave {
 	my ($widgetId);
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
-		WebGUI::SQL->write("insert into SQLReport set widgetId=$widgetId, template=".quote($session{form}{template}).", dBquery=".quote($session{form}{dbQuery}).", DSN=".quote($session{form}{DSN}).", username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier}),$session{dbh});
+		WebGUI::SQL->write("insert into SQLReport set widgetId=$widgetId, convertCarriageReturns='$session{form}{convertCarriageReturns}', template=".quote($session{form}{template}).", dBquery=".quote($session{form}{dbQuery}).", DSN=".quote($session{form}{DSN}).", username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier}),$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -79,6 +80,7 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">DSN</td><td>'.WebGUI::Form::text("DSN",20,255,$data{DSN}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Database User</td><td>'.WebGUI::Form::text("username",20,255,$data{username}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Database Password</td><td>'.WebGUI::Form::password("identifier",20,255,$data{identifier}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Convert carriage returns?</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1,$data{convertCarriageReturns}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -92,7 +94,7 @@ sub www_editSave {
         my ($widgetId, $displayTitle, $image, $attachment);
         if (WebGUI::Privilege::canEditPage()) {
 		update();
-                WebGUI::SQL->write("update SQLReport set template=".quote($session{form}{template}).", dbQuery=".quote($session{form}{dbQuery}).", DSN=".quote($session{form}{DSN}).", username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier})." where widgetId=$session{form}{wid}",$session{dbh});
+                WebGUI::SQL->write("update SQLReport set template=".quote($session{form}{template}).", dbQuery=".quote($session{form}{dbQuery}).", convertCarriageReturns='$session{form}{convertCarriageReturns}', DSN=".quote($session{form}{DSN}).", username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier})." where widgetId=$session{form}{wid}",$session{dbh});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -113,19 +115,27 @@ sub www_view {
                 }
 		@template = split(/\^\-/,$data{template});
 		$output .= $template[0];
-		$dbh = DBI->connect($data{DSN}, $data{username}, $data{identifier});
+	        if ($data{DSN} =~ /\DBI\:\w+\:\w+/) {
+        	        $dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
+       	 	} else {
+                	$output .= '<b>Error</b>: The DSN specified is of an improper format.<p>';
+        	}
 		if (defined $dbh) {
 			$sth = WebGUI::SQL->read($data{dbQuery},$dbh);
 			if (defined $sth) {
 				while (@result = $sth->array) {
 					$temp = $template[1];
 					$temp =~ s/\^(\d)/$result[$1]/g;
+					if ($data{convertCarriageReturns}) {
+						$temp =~ s/\n/\<br\>/g;
+					}
 					$output .= $temp;	
 				}
 				$sth->finish;
 			} else {
 				$output .= '<b>Error</b>: There was a problem with the query.';
 			}
+			$dbh->disconnect();
 		} else {
 			$output .= '<b>Error</b>: Could not connect to remote database.';
 		}	

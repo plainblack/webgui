@@ -31,7 +31,7 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget","UserSubmission");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'User Submission System').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1").'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'',50,5,1).'</td></tr>';
                 %hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
@@ -95,8 +95,8 @@ sub www_addSubmissionSave {
 	($status, $groupToContribute) = WebGUI::SQL->quickArray("select defaultStatus,groupToContribute from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
         if (WebGUI::Privilege::isInGroup($groupToContribute,$session{user}{userId})) {
                 $submissionId = getNextId("submissionId");
-                $image = saveAttachment("image",$session{form}{wid});
-                $attachment = saveAttachment("attachment",$session{form}{wid});
+                $image = saveAttachment("image",$session{form}{wid},$submissionId);
+                $attachment = saveAttachment("attachment",$session{form}{wid},$submissionId);
                 WebGUI::SQL->write("insert into submission set widgetId=$session{form}{wid}, submissionId=$submissionId, title=".quote($session{form}{title}).", username=".quote($session{user}{username}).", status='$status', dateSubmitted=now(), userId='$session{user}{userId}', content=".quote($session{form}{content}).", image=".quote($image).", attachment=".quote($attachment),$session{dbh});
                 return "";
         } else {
@@ -229,11 +229,11 @@ sub www_editSubmissionSave {
 	($owner) = WebGUI::SQL->quickArray("select userId from submission where submissionId=$session{form}{sid}",$session{dbh});
         if ($owner == $session{user}{userId}) {
 		($status) = WebGUI::SQL->quickArray("select defaultStatus from UserSubmission where widgetId=$session{form}{wid}",$session{dbh});
-                $image = saveAttachment("image",$session{form}{wid});
+                $image = saveAttachment("image",$session{form}{wid},$session{form}{sid});
 		if ($image ne "") {
 			$image = 'image='.quote($image).', ';
 		}
-                $attachment = saveAttachment("attachment",$session{form}{wid});
+                $attachment = saveAttachment("attachment",$session{form}{wid},$session{form}{sid});
                 if ($attachment ne "") {
                         $attachment = 'attachment='.quote($attachment).', ';
                 }
@@ -276,13 +276,13 @@ sub www_view {
 		$output .= '</table>';
         	$output .= '<div class="pagination">';
         	if ($pn > 0) {
-                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&wid='.$session{form}{wid}.'">&laquo;Previous Page</a>';
+                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn-1).'&wid='.$widgetId.'">&laquo;Previous Page</a>';
         	} else {
                 	$output .= '&laquo;Previous Page';
         	}
         	$output .= ' &middot; ';
         	if ($pn < round($#row/$data{submissionsPerPage})) {
-                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&wid='.$session{form}{wid}.'">Next Page&raquo;</a>';
+                	$output .= '<a href="'.$session{page}{url}.'?pn='.($pn+1).'&wid='.$widgetId.'">Next Page&raquo;</a>';
         	} else {
                 	$output .= 'Next Page&raquo;';
         	}
@@ -299,7 +299,7 @@ sub www_viewSubmission {
 	$output .= '<b>Submitted By:</b> '.$submission{username}.'<br>';
 	$output .= '<b>Date Submitted:</b> '.$submission{dateSubmitted}.'<p>';
 	if ($submission{image} ne "") {
-		$output .= '<img src="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$submission{image}.'" hspace=3 align="right">';
+		$output .= '<img src="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$session{form}{sid}.'/'.$submission{image}.'" hspace=3 align="right">';
 	}
 	if ($submission{status} eq "Pending" && (WebGUI::Privilege::isInGroup(3,$session{user}{userId}) || WebGUI::Privilege::isInGroup(4,$session{user}{userId}))) {
 		$output .= '<div align="center">';
@@ -310,7 +310,7 @@ sub www_viewSubmission {
         }	
 	$output .= $submission{content}.'<p>';
 	if ($submission{attachment} ne "") {
-               	$output .= '<p><a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$submission{attachment}.'"><img src="'.$session{setting}{lib}.'/attachment.gif" border=0 alt="Download Attachment"></a><p>';
+               	$output .= '<p><a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$session{form}{wid}.'/'.$session{form}{sid}.'/'.$submission{attachment}.'"><img src="'.$session{setting}{lib}.'/attachment.gif" border=0 alt="Download Attachment"></a><p>';
         }		
 	$output .= '<div align="center">';
 	if ($submission{userId} == $session{user}{userId}) {

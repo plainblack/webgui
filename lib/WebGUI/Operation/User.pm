@@ -50,7 +50,7 @@ sub www_addUser {
 sub www_addUserSave {
         my ($output, @groups, $uid, $gid, $encryptedPassword, $passwordStatement);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
+                $encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
                 $passwordStatement = ', identifier='.quote($encryptedPassword);
 		$uid = getNextId("userId");
                 WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).$passwordStatement.", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});

@@ -1,0 +1,54 @@
+[include pages/header.include]
+
+<table cellpadding=5 width=100%>
+<tr>
+	   
+    <td valign="TOP" background="/football/golddither1.gif"><font face="helvetica,arial"><b><center><font size="+3">League News</center></font>
+                         <li>The Draft will be held on Thursday Aug. 31 at Mike and Anita's house
+                         <li>We have new divisions again this year.  Those along with the new schedule will be posted on the site.
+                         <li>We will need to decide on whether we want 2 extra playoff teams this year before we start the draft
+                         <li>Remember to bring your $30 on draft night again.
+                         
+    </font></b></td>
+    <td background="/football/yellowdither1.gif" width=350>
+
+    <font face="helvetica,arial"><b><center><font size="+3">Standings</center></font>
+   
+[search-region arg="st=sql
+            fi=divisions
+            sq=select divid,divname from divisions order by divname
+            "]
+            [search-list]
+
+            <b><font face="helvetica,arial" size ="+2"><center>[item-param divname]</center></font></b>
+ [table-font face="helvetica,arial" size="+1"]
+ <table width=100% background=0>           
+    [sql type=list base="teams" query="select teamid,teamname,wins,losses,clincheddivision from teams where divid=[item-param divid]"]
+       <tr> <td><b>[sql-param teamname]</b></td> <td align="right"><b>[sql-param wins]-[sql-param losses]</b></td></tr>
+    
+    [/sql]            
+ </table>
+ [/table-font]
+            [/search-list]
+            
+[/search-region]
+	</td>
+    </tr>
+    </table>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+   
+
+
+
+
+[include pages/footer.include]

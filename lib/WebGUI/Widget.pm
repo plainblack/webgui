@@ -19,15 +19,15 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&update &www_moveUp &www_moveDown &www_delete &www_deleteConfirm &www_cut &create &www_paste);
+our @EXPORT = qw(&www_jumpDown &www_jumpUp &update &www_moveUp &www_moveDown &www_delete &www_deleteConfirm &www_cut &create &www_paste);
 
 #-------------------------------------------------------------------
 sub _reorderWidgets {
 	my ($sth, $i, $wid);
 	$sth = WebGUI::SQL->read("select widgetId from widget where pageId=$_[0] order by sequenceNumber",$session{dbh});
 	while (($wid) = $sth->array) {
-		WebGUI::SQL->write("update widget set sequenceNumber='$i' where widgetId=$wid",$session{dbh});
 		$i++;
+		WebGUI::SQL->write("update widget set sequenceNumber='$i' where widgetId=$wid",$session{dbh});
 	}
 	$sth->finish;
 }
@@ -82,6 +82,29 @@ sub www_deleteConfirm {
         }
 }
 
+#-------------------------------------------------------------------
+sub www_jumpDown {
+        my (@data, $thisSeq);
+        if (WebGUI::Privilege::canEditPage()) {
+                WebGUI::SQL->write("update widget set sequenceNumber=9999 where widgetId=$session{form}{wid}",$session{dbh});
+		_reorderWidgets($session{page}{pageId});
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_jumpUp {
+        my (@data, $thisSeq);
+        if (WebGUI::Privilege::canEditPage()) {
+                WebGUI::SQL->write("update widget set sequenceNumber=0 where widgetId=$session{form}{wid}",$session{dbh});
+                _reorderWidgets($session{page}{pageId});
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
 #-------------------------------------------------------------------
 sub www_moveDown {
 	my (@data, $thisSeq);

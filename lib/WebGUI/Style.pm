@@ -18,17 +18,22 @@ use WebGUI::SQL;
 #-------------------------------------------------------------------
 sub getStyle {
 	my ($header, $footer, @style, %style);
-	%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}",$session{dbh});
-	$header = '<html>
-		<head>
-		<title>'.$session{page}{title}.'</title>'.$style{styleSheet}.$session{page}{metaTags}.'
-		<script language="JavaScript" src="'.$session{setting}{lib}.'/WebGUI.js"></script>
-		</head>
-		<!-- WebGUI '.$session{wg}{version}.' -->
-		'.$style{header};
-	$footer = $style{footer};
-	$header = WebGUI::Macro::process($header);
-	$footer = WebGUI::Macro::process($footer);
+	if ($session{form}{makePrintable}) {
+		$header = '<html><!-- WebGUI '.$session{wg}{version}.' --><title>'.$session{page}{title}.'</title><body>';
+		$footer = '</body></html>'; 
+	} else {
+		%style = WebGUI::SQL->quickHash("select header,footer,styleSheet from style where styleId=$session{page}{styleId}",$session{dbh});
+		$header = '<html>
+			<!-- WebGUI '.$session{wg}{version}.' -->
+			<head>
+			<title>'.$session{page}{title}.'</title>'.$style{styleSheet}.$session{page}{metaTags}.'
+			<script language="JavaScript" src="'.$session{setting}{lib}.'/WebGUI.js"></script>
+			</head>
+			'.$style{header};
+		$footer = $style{footer}.'</html>';
+		$header = WebGUI::Macro::process($header);
+		$footer = WebGUI::Macro::process($footer);
+	}
 	return ($header, $footer);
 }
 

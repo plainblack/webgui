@@ -11,6 +11,7 @@ package WebGUI::Widget::EventsCalendar;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -26,12 +27,14 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Events Calendar</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=38"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Events Calendar</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","EventsCalendar");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1").'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Events Calendar').'</td></tr>';
+                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -113,13 +116,15 @@ sub www_deleteEventConfirm {
 sub www_edit {
         my ($output, %data, @event, $sth);
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Events Calendar</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=39"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Events Calendar</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 $output .= '<p><a href="'.$session{page}{url}.'?func=addEvent&wid='.$session{form}{wid}.'">Add New Event</a><p>';
@@ -185,10 +190,13 @@ sub www_editEventSave {
 sub www_view {
 	my (%data, @event, $output, $widgetId, $sth);
 	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle from widget where widget.widgetId='$widgetId'",$session{dbh});
+	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {
-		if ($data{displayTitle} == 1) {
+		if ($data{displayTitle}) {
 			$output = "<h2>".$data{title}."</h2>";
+		}
+		if ($data{description} ne "") {
+			$output .= $data{description}.'<p>';
 		}
 		$sth = WebGUI::SQL->read("select name, description, date_format(startDate,'%M'), date_format(startDate,'%e'), date_format(startDate,'%Y'), date_format(endDate,'%e') from event where widgetId='$widgetId' and startDate>now() order by startDate",$session{dbh});
 		while (@event = $sth->array) {
@@ -206,6 +214,9 @@ sub www_view {
 			$output .= '<p>';
 		}
 		$sth->finish;
+		if ($data{processMacros}) {
+			$output = WebGUI::Macro::process($output);
+		}
 	}
 	return $output;
 }

@@ -47,7 +47,7 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget","SiteMap");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Site Map').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Starting from this level?</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,1).'</td></tr>';

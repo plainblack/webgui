@@ -46,16 +46,21 @@ sub round {
 }
 
 #-------------------------------------------------------------------
-# eg: saveAttachment(formVarName,widgetId);
+# eg: saveAttachment(formVarName,widgetId,optionallySubmissionId);
 sub saveAttachment {
-	my ($file, $filename, $bytesread, $buffer, $urlizedFilename);
+	my ($file, $filename, $bytesread, $buffer, $urlizedFilename, $path);
 	$filename = $session{cgi}->upload($_[0]);
 	#$filename = $session{form}{$_[0]};
 	#$filename = $session{cgi}->param($_[0]);
 	if (defined $filename) {
 		$urlizedFilename = urlizeTitle($filename);
-		mkdir ($session{setting}{attachmentDirectoryLocal}."/".$_[1],0755);
-		$file = FileHandle->new(">".$session{setting}{attachmentDirectoryLocal}."/".$_[1]."/".$urlizedFilename);
+		$path = $session{setting}{attachmentDirectoryLocal}."/".$_[1]."/";
+		mkdir ($path,0755);
+		if ($_[2] ne "") {
+			$path = $path.$_[2].'/';
+			mkdir ($path,0755);
+		}
+		$file = FileHandle->new(">".$path.$urlizedFilename);
 		if (defined $file) {
 			while ($bytesread=read($filename,$buffer,1024)) {
         			print $file $buffer;

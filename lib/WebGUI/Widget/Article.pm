@@ -31,7 +31,7 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget","Article");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Article').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Start Date</td><td>'.WebGUI::Form::text("startDate",20,30,'01/01/2000',1).'</td></tr>';

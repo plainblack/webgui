@@ -23,7 +23,11 @@ sub _mnogoSearch {
 	my ($i, %match, $key, $sth, $dbh, $urlId, %data, $output, @keyword, $word, %result);
 	%data = @_;
 	@keyword = split(/ /,$session{form}{query});
-	$dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
+	if ($data{DSN} =~ /\DBI\:\w+\:\w+/) {
+		$dbh = DBI->connect($data{DSN},$data{username},$data{identifier});
+	} else {
+		$output .= '<b>Error</b>: The DSN specified is of an improper format.<p>';
+	}
 	if (defined $dbh) {
 		foreach $word (@keyword) {
 			$sth = WebGUI::SQL->read("select url_id from dict where soundex(word)=soundex(lcase('$word'))",$dbh);
@@ -33,7 +37,7 @@ sub _mnogoSearch {
 				}
 				$sth->finish;
 			} else {
-				$output .= '<b>Error</b>: There was a problem with the query.';
+				$output .= '<b>Error</b>: There was a problem with the query.<p>';
 			}
 		}
 		foreach $key (sort {$result{$b} <=> $result{$a}} keys %result) {
@@ -43,10 +47,10 @@ sub _mnogoSearch {
 			} 
 			$i++;	
 		}
+		$dbh->disconnect();
 	} else {
-		$output .= '<b>Error</b>: Could not connect to remote database.';
+		$output .= '<b>Error</b>: Could not connect to remote database.<p>';
 	}
-	$dbh->disconnect();
 	return $output;
 }
 
@@ -63,11 +67,11 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget","SearchMnoGo");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Search (MnoGo)').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'',50,5,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">DSN</td><td>'.WebGUI::Form::text("DSN",20,255).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Database User</td><td>'.WebGUI::Form::text("username",20,255).'</td></tr>';
+                $output .= '<tr><td class="formDescription">DSN</td><td>'.WebGUI::Form::text("DSN",20,255,$session{config}{dsn}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Database User</td><td>'.WebGUI::Form::text("username",20,255,$session{config}{dbuser}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Database Password</td><td>'.WebGUI::Form::password("identifier",20,255).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';

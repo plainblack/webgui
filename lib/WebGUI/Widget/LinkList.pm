@@ -11,6 +11,7 @@ package WebGUI::Widget::LinkList;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -37,12 +38,14 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Link List</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=34"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Link List</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","LinkList");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1").'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Link List').'</td></tr>';
+                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -125,13 +128,15 @@ sub www_deleteLinkConfirm {
 sub www_edit {
         my ($output, %data, @link, $sth);
         if (WebGUI::Privilege::canEditPage()) {
-		%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Link List</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+		%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId=$session{form}{wid}",$session{dbh});
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=35"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Link List</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Process macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 $output .= '<p><a href="'.$session{page}{url}.'?func=addLink&wid='.$session{form}{wid}.'">Add New Link</a><p>';
@@ -226,10 +231,13 @@ sub www_moveLinkUp {
 sub www_view {
 	my (%data, @link, $output, $widgetId, $sth);
 	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select widget.title, widget.displayTitle from widget where widget.widgetId='$widgetId'",$session{dbh});
+	%data = WebGUI::SQL->quickHash("select * from widget where widget.widgetId='$widgetId'",$session{dbh});
 	if (defined %data) {
-		if ($data{displayTitle} == 1) {
+		if ($data{displayTitle}) {
 			$output = "<h2>".$data{title}."</h2>";
+		}
+		if ($data{description} ne "") {
+			$output .= $data{description}.'<p>';
 		}
 		$sth = WebGUI::SQL->read("select name, url, description from link where widgetId='$widgetId' order by sequenceNumber",$session{dbh});
 		while (@link = $sth->array) {
@@ -240,6 +248,9 @@ sub www_view {
 			$output .= '<br>';
 		}
 		$sth->finish;
+                if ($data{processMacros}) {
+                        $output = WebGUI::Macro::process($output);
+                }
 	}
 	return $output;
 }

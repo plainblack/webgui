@@ -36,8 +36,8 @@ sub _traversePageTree {
 	} else {
 		$toLevel = 99;
 	}
-        for ($i=0;$i<=$_[1];$i++) {
-                $depth .= "&nbsp;&nbsp;";
+        for ($i=1;$i<=$_[1];$i++) {
+                $depth .= "&nbsp;&nbsp;&nbsp;";
         }
 	if ($_[1] < $toLevel) {
         	$sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber",$session{dbh});
@@ -102,17 +102,23 @@ sub process {
         }
   #---full menu (vertical)---
         if ($output =~ /\^f/) {
-        	$temp = _traversePageTree(1,0);
+                $temp = '<span class="verticalMenu">';
+        	$temp .= _traversePageTree(1,0);
+        	$temp .= '</span>';
                 $output =~ s/\^f/$temp/g;
 	}
   #---2 level menu (vertical)---
         if ($output =~ /\^F/) {
-        	$temp = _traversePageTree(1,0,2);
+                $temp = '<span class="verticalMenu">';
+        	$temp .= _traversePageTree(1,0,2);
+        	$temp .= '</span>';
                 $output =~ s/\^F/$temp/g;
         }
   #---3 level menu (vertical)---
         if ($output =~ /\^h/) {
-        	$temp = _traversePageTree(1,0,3);
+                $temp = '<span class="verticalMenu">';
+        	$temp .= _traversePageTree(1,0,3);
+        	$temp .= '</span>';
                 $output =~ s/\^h/$temp/g;
         }
   #---home link---
@@ -168,6 +174,49 @@ sub process {
         	$temp .= '</span>';
         	$output =~ s/\^m/$temp/g;
 	}
+  #---previous menu vertical---
+        if ($output =~ /\^P/) {
+                $temp = '<span class="verticalMenu">';
+                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber",$session{dbh});
+                while (@data = $sth->array) {
+                        if (WebGUI::Privilege::canViewPage($data[2])) {
+                                $temp .= '<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a><br>';
+                        }
+                }
+                $sth->finish;
+                $temp .= '</span>';
+                $output =~ s/\^P/$temp/g;
+        }
+  #---previous menu horizontal ---
+        if ($output =~ /\^p/) {
+                $temp = '<span class="horizontalMenu">';
+                $first = 1;
+                $sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{parentId} order by sequenceNumber",$session{dbh});
+                while (@data = $sth->array) {
+                        if (WebGUI::Privilege::canViewPage($data[2])) {
+                                if ($first) {
+                                        $first = 0;
+                                } else {
+                                        $temp .= " &middot; ";
+                                }
+                                $temp .= '<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a>';
+                        }
+                }
+                $sth->finish;
+                $temp .= '</span>';
+                $output =~ s/\^p/$temp/g;
+        }
+  #---remove style for printing link---
+        if ($output =~ /\^r/) {
+                $temp = $session{env}{REQUEST_URI};
+		if ($temp =~ /\?/) {
+			$temp .= '&makePrintable=1';
+		} else {
+			$temp .= '?makePrintable=1';
+		}
+		$temp = '<a href="'.$temp.'">Make Page Printable</a>';
+                $output =~ s/\^r/$temp/g;
+        }
   #---top menu vertical---
 	if ($output =~ /\^T/) {
 		$temp = '<span class="verticalMenu">';

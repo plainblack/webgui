@@ -94,7 +94,7 @@ sub httpRedirect {
 #-------------------------------------------------------------------
 sub open {
         my ($key, %WebGUI, %CONFIG, %VARS, %PAGE, %FORM, $query, %COOKIES, $config, %USER, %SETTINGS, $dbh);
-	%WebGUI = (version=>"0.11.0", date=>"2001-08-22");
+	%WebGUI = (version=>"0.12.0", date=>"2001-08-26");
         $config = new WebGUI::Config '../etc/WebGUI.conf';
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);
@@ -114,7 +114,7 @@ sub open {
 	%PAGE = _getPageInfo("",$dbh);
         %session = (
                 env => \%ENV,					# environment variables from the web server
-        #       config=> \%CONFIG,				# variables loaded from the config file
+                config=> \%CONFIG,				# variables loaded from the config file
                 user => \%USER,					# the user's account information
 		var => \%VARS,					# session specific variables
                 form => \%FORM,					# variables passed in from a form

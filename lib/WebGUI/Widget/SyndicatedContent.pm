@@ -27,11 +27,11 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add Syndicated Content</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=36"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add Syndicated Content</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","SyndicatedContent");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Syndicated Content').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display the title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'','','',1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">URL to RSS File</td><td>'.WebGUI::Form::text("rssUrl",20,2048).'</td></tr>';
@@ -61,7 +61,7 @@ sub www_edit {
         my ($output, %data);
         if (WebGUI::Privilege::canEditPage()) {
 		%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=$session{form}{wid}",$session{dbh});
-                $output = '<h1>Edit Syndicated Content</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=37"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Edit Syndicated Content</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
