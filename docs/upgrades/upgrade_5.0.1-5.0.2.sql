@@ -1812,6 +1812,9 @@ delete from international where languageId=21 and namespace='Article' and intern
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (73,21,'Article','При создании шаблона статьи доступны следующие переменные:<br>\r\n<b>attachment.box</b><br>\r\nДобавляет поле для добавления вложения файла.\r\n<br>\r\n<b>attachment.icon</b><br>\r\nДобавляет путь к иконке, соответствующей вкладываемому файлу.\r\n<br>\r\n<b>attachment.name</b><br>\r\nПоле для ввода имени вкладываемого файла.\r\n<br>\r\n<b>attachment.url</b><br>\r\nПуть к вкладываемому файлу (на локальном диске или сетевой путь).\r\n<br>\r\n<b>image.thumbnail</b><br>\r\nПуть к уменьшенному изображению для вкладываемого графического файла.\r\n<br>\r\n<b>image.url</b><br>\r\nПуть к вкладываемому графическому файлу (на локальном диске или сетевой путь).\r\n<br>\r\n<b>post.label</b><br>\r\nКомментарий к статье.\r\n<br>\r\n<b>post.URL</b><br>\r\nПуть к файлу, содержащему комментарий к статье.\r\n<br>\r\n<b>replies.count</b><br>\r\nЧисло комментариев добавленных к  статье.\r\n<br>\r\n<b>replies.label</b><br>\r\nТекст, который показывается в том случае, если разрешен просмотр комментариев.\r\n<br>\r\n<b>replies.url</b><br>\r\nURL для просмотра комментариев к статье. \r\n<br>', 1040902552);
 delete from international where languageId=21 and namespace='Article' and internationalId=72;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (72,21,'Article','Шаблон статьи', 1040901056);
+alter table wobject change templatePosition templatePosition int not null default 1;
+alter table wobject change startDate startDate int not null default 946710000;
+alter table wobject change endDate endDate int not null default 2114406000;
 
 
 
