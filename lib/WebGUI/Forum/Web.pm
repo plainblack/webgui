@@ -101,8 +101,7 @@ sub _getPostTemplateVars {
 	$var->{'post.status.label'} = WebGUI::International::get(553);
 	$var->{'post.isLocked'} = $thread->isLocked;
 	$var->{'post.isModerator'} = $forum->isModerator;
-	$var->{'post.canEdit'} = ($forum->isModerator || ($post->get("userId") == $session{user}{userId} 
-		&& $session{user}{userId} != 1 && $forum->get("editTimeout") < (WebGUI::DateTime::time()-$post->get("dateOfPost"))));
+	$var->{'post.canEdit'} = $post->canEdit($session{user}{userId});
 	$var->{'post.user.isVisitor'} = ($post->get("userId") == 1);
 	$var->{'post.user.label'} = WebGUI::International::get(244);
 	$var->{'post.user.name'} = $post->get("username");
@@ -202,9 +201,40 @@ sub viewForum {
 	return WebGUI::Template::process(WebGUI::Template::get(1,"Forum"), \%var); 
 }	
 
-sub www_deleteThread {
+sub www_approvePost {
 	my ($callback) = @_;
-	
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	$post->setStatusApproved;
+       	return www_viewThread($callback);
+}
+
+sub www_deletePost {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->canEdit);
+      	my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
+       	$output .= WebGUI::International::get(401).'<p>';
+       	$output .= '<div align="center"><a href="'.WebGUI::URL::append($callback,"forumOp=deletePostConfirm&amp;forumPostId="
+		.$session{form}{forumPostId}).'">'.WebGUI::International::get(44).'</a>';
+       	$output .= ' &nbsp; <a href="'.$callback.'">'.WebGUI::International::get(45).'</a></div>';
+       	return $output;
+}
+
+sub www_deletePostConfirm {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->isModerator);
+	$post->setStatusDeleted;
+       	return viewForum($callback,$post->getThread->get("forumId"));
+}
+
+sub www_denyPost {
+	my ($callback) = @_;
+	my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
+	return WebGUI::Privilege::insufficient() unless ($post->canEdit($session{user}{userId}));
+	$post->setStatusDenied;
+       	return www_viewThread($callback);
 }
 
 sub www_nextThread {

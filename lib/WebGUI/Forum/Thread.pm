@@ -82,6 +82,11 @@ sub isLocked {
 	return $self->get("isLocked");
 }
 
+sub incrementViews {
+        my ($self) = @_;
+        WebGUI::SQL->write("update forumThread set views=views+1 where forumThreadId=".$self->get("forumThreadId"));
+}
+                                                                                                                                                             
 sub isSticky {
 	my ($self) = @_;
 	return $self->get("isSticky");
@@ -100,11 +105,6 @@ sub lock {
 	$self->set({isLocked=>1});
 }
 
-sub stick {
-	my ($self) = @_;
-	$self->set({isSticky=>1});
-}
-
 sub new {
 	my ($class, $forumThreadId) = @_;
 	my $properties = WebGUI::SQL->getRow("forumThread","forumThreadId",$forumThreadId);
@@ -120,6 +120,31 @@ sub set {
 	$data->{forumThreadId} = $self->get("forumThreadId") unless ($data->{forumThreadId});
 	WebGUI::SQL->setRow("forumThread","forumThreadId",$data);
 	$self->{_properties} = $data;
+}
+
+sub setStatusApproved {
+        my ($self) = @_;
+        $self->set({status=>'approved'});
+}
+                                                                                                                                                             
+sub setStatusDeleted {
+        my ($self) = @_;
+        $self->set({status=>'deleted'});
+}
+                                                                                                                                                             
+sub setStatusDenied {
+        my ($self) = @_;
+        $self->set({status=>'denied'});
+}
+                                                                                                                                                             
+sub setStatusPending {
+        my ($self) = @_;
+        $self->set({status=>'pending'});
+}
+
+sub stick {
+	my ($self) = @_;
+	$self->set({isSticky=>1});
 }
 
 sub subscribe {

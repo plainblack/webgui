@@ -159,4 +159,5 @@ delete from international where languageId=1 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1018,1,'WebGUI','Start a new thread.', 1065279960,'Add a new line of discussion to a forum.');
 delete from international where languageId=1 and namespace='WebGUI' and internationalId=1020;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1020,1,'WebGUI','Rating', 1065280882,'How useful/interesting a user thinks another poster\'s post is.');
+alter table forumThread add column status varchar(30) not null default 'approved';
 

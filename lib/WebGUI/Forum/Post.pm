@@ -12,6 +12,13 @@ sub addView {
 	$self->getThread->addView;
 }
 
+sub canEdit {
+        my ($self, $userId) = @_;
+	$userId = $session{user}{userId} unless ($userId);
+        return ($self->getThread->getForum->isModerator || ($self->get("userId") == $userId && $userId != 1 
+		&& $self->getThread->getForum->get("editTimeout") < (WebGUI::DateTime::time() - $self->get("dateOfPost"))));
+}
+
 sub create {
 	my ($self, $data) = @_;
 	$data->{dateOfPost} = WebGUI::DateTime::time();
@@ -54,6 +61,7 @@ sub getThread {
 sub incrementViews {
 	my ($self) = @_;
 	WebGUI::SQL->write("update forumPost set views=views+1 where forumPostId=".$self->get("forumPostId"));
+	$self->getThread->incrementViews;
 }
 
 sub isMarkedRead {
@@ -89,16 +97,25 @@ sub set {
 sub setStatusApproved {
 	my ($self) = @_;
 	$self->set({status=>'approved'});
+	$self->getThread->setStatusApproved if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
+}
+
+sub setStatusDeleted {
+	my ($self) = @_;
+	$self->set({status=>'deleted'});
+	$self->getThread->setStatusDeleted if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
 }
 
 sub setStatusDenied {
 	my ($self) = @_;
 	$self->set({status=>'denied'});
+	$self->getThread->setStatusDenied if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
 }
 
 sub setStatusPending {
 	my ($self) = @_;
 	$self->set({status=>'pending'});
+	$self->getThread->setStatusPending if ($self->getThread->get("rootPostId") == $self->get("forumPostId"));
 }
 
 sub unmarkRead {
