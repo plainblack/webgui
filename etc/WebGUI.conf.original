@@ -68,6 +68,7 @@ macros=# => Hash_userId, \
         GroupText => GroupText, \
         H => H_homeLink, \
         I => I_imageWithTags, \
+        International => International, \
         JavaScript => JavaScript, \
         L => L_loginBox, \
         LastModified => LastModified, \
