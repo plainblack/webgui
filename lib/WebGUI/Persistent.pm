@@ -405,7 +405,7 @@ sub new {
           );
           my $query = $select->buildQuery();
           my $hash = WebGUI::SQL->quickHashRef($query);
-          return undef unless %$hash; 
+          return undef unless defined %$hash; 
           return bless {_property => $hash,_noSet => $noSet}, $class;
      }
 }
