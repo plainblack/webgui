@@ -75,6 +75,7 @@ alter table Product_benefit change productBenefitId Product_benefitId int not nu
 alter table Product_feature change productFeatureId Product_featureId int not null;
 alter table Product_specification change productSpecificationId Product_specificationId int not null;
 update wobject set templatePosition=templatePosition+1;
+alter table template add column namespace varchar(35) not null default 'Page';
 
 
 
