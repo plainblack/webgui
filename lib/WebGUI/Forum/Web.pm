@@ -31,10 +31,6 @@ sub _formatEditPostURL {
 	return WebGUI::URL::append($_[0],"forumOp=post&amp;forumPostId=".$_[1]);
 }
 
-sub _formatLeavePostPendingURL {
-	return WebGUI::URL::page("op=viewMessageLog");
-}
-
 sub _formatNextThreadURL {
 	return WebGUI::URL::append($_[0],"forumOp=nextThread&amp;forumThreadId=".$_[1]);
 }
@@ -105,6 +101,9 @@ sub _getPostTemplateVars {
 	$var->{'post.status.label'} = WebGUI::International::get(553);
 	$var->{'post.isLocked'} = $thread->isLocked;
 	$var->{'post.isModerator'} = $forum->isModerator;
+	$var->{'post.canEdit'} = ($forum->isModerator || ($post->get("userId") == $session{user}{userId} 
+		&& $session{user}{userId} != 1 && $forum->get("editTimeout") < (WebGUI::DateTime::time()-$post->get("dateOfPost"))));
+	$var->{'post.user.isVisitor'} = ($post->get("userId") == 1);
 	$var->{'post.user.label'} = WebGUI::International::get(238);
 	$var->{'post.user.name'} = $post->get("username");
 	$var->{'post.user.Id'} = $post->get("userId");
@@ -121,9 +120,6 @@ sub _getPostTemplateVars {
 	$var->{'post.approve.url'} = _formatApprovePostURL($callback,$post->get("forumPostId"));
 	$var->{'post.deny.label'} = WebGUI::International::get(574);
 	$var->{'post.deny.url'} = _formatDenyPostURL($callback,$post->get("forumPostId"));
-	$var->{'post.pending.label'} = WebGUI::International::get(573);
-	$var->{'post.pending.url'} = _formatLeavePostPendingURL();
-	$var->{'post.tools.label'} = WebGUI::International::get(0);
 	$var->{'post.full'} = WebGUI::Template::process(WebGUI::Template::get(1,"Forum/Post"), $var); 
 	return $var;
 }
@@ -135,7 +131,7 @@ sub _recurseThread {
 		push(@depth_loop,{depth=>$i});
 	}
 	my @post_loop;
-	push (@post_loop, _getPostTemplateVars($post, $thread, $forum, $callback, {'post.indent_loop'=>\@depth_loop}));
+	push (@post_loop, _getPostTemplateVars($post, $thread, $forum, $callback, {'post.indent_loop'=>\@depth_loop},'post.indent.depth'=>$depth));
 	my $replies = $post->getReplies;
 	foreach my $reply (@{$replies}) {
 		@post_loop = (@post_loop,@{_recurseThread($reply, $thread, $forum, $depth+1, $callback)});
@@ -178,6 +174,7 @@ sub viewForum {
 			'thread.root.user.profile'=>_formatUserProfileURL($root->get("userId")),
 			'thread.root.user.name'=>$root->get("username"),
 			'thread.root.user.id'=>$root->get("userId"),
+			'thread.root.user.isVisitor'=>($root->get("userId") == 1),
 			'thread.root.status'=>_formatStatus($root->get("status")),
 			'thread.last.subject'=>_chopSubject($last->get("subject")),
 			'thread.last.url'=>_formatThreadURL($callback,$last->get("forumPostId")),
@@ -187,6 +184,7 @@ sub viewForum {
 			'thread.last.user.profile'=>_formatUserProfileURL($last->get("userId")),
 			'thread.last.user.name'=>$last->get("username"),
 			'thread.last.user.id'=>$last->get("userId"),
+			'thread.last.user.isVisitor'=>($root->get("userId") == 1),
 			'thread.last.status'=>_formatStatus($last->get("status"))
 			});
 	}

@@ -141,5 +141,6 @@ update international set internationalId=1014, namespace='WebGUI' where internat
 update international set internationalId=1015, namespace='WebGUI' where internationalId='11' and namespace='MessageBoard';
 alter table users add column referringAffiliate int not null default 0;
 update users set referringAffiliate=1 where userId<>1;
+delete from international where namespace='WebGUI' and internationalId=573;
 
 
