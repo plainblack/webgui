@@ -244,7 +244,7 @@ sub createAccount {
 	$vars->{'create.form.submit'} = WebGUI::Form::submit({});
     $vars->{'create.form.footer'} = "</form>";
 	
-    $vars->{'create.options.accountExists'} = '<a href="'.WebGUI::URL::page('op=displayLogin').'">'.WebGUI::International::get(58).'</a>';
+    $vars->{'create.options.accountExists'} = '<a href="'.WebGUI::URL::page('op=auth&method=init').'">'.WebGUI::International::get(58).'</a>';
 
 	if ($self->getSetting("passwordRecovery")) {
 	   $vars->{'create.options.passwordRecovery'} = '<a href="'.WebGUI::URL::page('op=recoverPassword').'">'.WebGUI::International::get(59).'</a>';
@@ -648,7 +648,7 @@ sub new {
 	$self->{error} = "";
 	$self->{profile} = ();
 	$self->{warning} = "";
-	my @callable = ('init',@{$_[2]});
+	my @callable = ('init', @{$_[2]});
 	$self->{callable} = \@callable;
 	bless($self);
 	return $self;
@@ -708,7 +708,7 @@ sub recoverPassword {
    $vars->{'recover.form.submit'} = WebGUI::Form::submit({});
    $vars->{'recover.form.footer'} = "</form>";
    
-   $vars->{'recover.options.accountExists'} = '<a href="'.WebGUI::URL::page('op=displayLogin').'">'.WebGUI::International::get(73).'</a>';
+   $vars->{'recover.options.accountExists'} = '<a href="'.WebGUI::URL::page('op=auth&method=init').'">'.WebGUI::International::get(73).'</a>';
    if ($session{setting}{anonymousRegistration}) {
 	   $vars->{'recover.options.anonymousRegistration'} = '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(67).'</a>';
    }
