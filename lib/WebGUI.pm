@@ -165,6 +165,7 @@ sub page {
                 $debug .='</table>';
 	}
 	if ($session{header}{redirect} ne "") {
+		WebGUI::Session::close();
 		return $session{header}{redirect};
 	} else {
 		$httpHeader = WebGUI::Session::httpHeader();

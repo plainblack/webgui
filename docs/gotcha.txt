@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.6.0
+--------------------------------------------------------------------
+ * The runHourly scheduler has been updated to allow for more
+	types of automation. This update has caused an
+	incompatibility in old scheduler plug-ins. If you have not
+	installed any third-party scheduler plug-ins, then you have
+	nothing to worry about. However, if you do have some
+	scheduler plug-ins that didn't come with WebGUI, then please
+	contact the person or company that made it to get an
+	upgrade.
+
 4.3.0
 --------------------------------------------------------------------
  * The settings "extras", "uploadsURL", and "uploadsPath" have all 

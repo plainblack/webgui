@@ -11,11 +11,12 @@ package Hourly::DeleteExpiredSessions;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	WebGUI::SQL->write("delete from userSession where expires<".time(),$_[0]);
+	WebGUI::SQL->write("delete from userSession where expires<".time());
 }
 
 1;

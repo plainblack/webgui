@@ -19,6 +19,7 @@ BEGIN {
 use DBI;
 use strict qw(subs vars);
 use Data::Config;
+use WebGUI::Session;
 use WebGUI::Utility;
 
 
@@ -47,26 +48,17 @@ if (opendir (CONFDIR,$confdir)) {
         @files = readdir(CONFDIR);
         foreach $file (@files) {
                 if ($file =~ /(.*?)\.conf$/ && $file ne "some_other_site.conf") {
-                        my ($config);
-                        $config = new Data::Config $confdir.$file;
-                        unless ($config->param('dsn') eq "") {    
-				my $dbh;
-				unless (eval {$dbh = DBI->connect($config->param('dsn'),$config->param('dbuser'),$config->param('dbpass'))}) {
-                                        print "Can't connect to ".$config->param('dsn')." with info provided. Skipping.\n";
-                                } else {
-					foreach $namespace (keys %plugins) {
-						$exclude = $config->param('excludeHourly');
-						$exclude =~ s/ //g;
-						unless (isIn($namespace, split(/,/,$exclude))) {
-							$cmd = $plugins{$namespace};
-							&$cmd($dbh);
-						}
-					}
-                                        $dbh->disconnect();
-                                } 
-			} else {
-				print "$file has some problems. Skipping\n";
+			WebGUI::Session::open($webguiRoot,$file);
+			WebGUI::Session::refreshUserInfo(3,$session{dbh});
+			foreach $namespace (keys %plugins) {
+				$exclude = $session{config}{excludeHourly};
+				$exclude =~ s/ //g;
+				unless (isIn($namespace, split(/,/,$exclude))) {
+					$cmd = $plugins{$namespace};
+					&$cmd();
+				}
 			}
+			WebGUI::Session::close();
 		}
 	}
 	closedir(CONFDIR);
