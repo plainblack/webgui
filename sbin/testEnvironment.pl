@@ -135,32 +135,6 @@ if (eval { require HTML::Parser }) {
         }
 }
 
-print "Tie::IxHash module ....................... ";
-if (eval { require Tie::IxHash }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-        	print "Attempting to install...\n";
-                CPAN::Shell->install("Tie::IxHash");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Tie::CPHash module ....................... ";
-if (eval { require Tie::CPHash }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-        	print "Attempting to install...\n";
-                CPAN::Shell->install("Tie::CPHash");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
 print "Net::SMTP module ......................... ";
 if (eval { require Net::SMTP }) {
         print "OK\n";
@@ -168,19 +142,6 @@ if (eval { require Net::SMTP }) {
 	if ($< == 0 && $os eq "Linuxish") {
                 print "Attempting to install...\n";
                 CPAN::Shell->install("Net::SMTP");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
-print "Net::LDAP module ......................... ";
-if (eval { require Net::LDAP }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("Net::LDAP");
         } else {
                 print "Please install.\n";
 		$prereq = 0;
@@ -200,19 +161,6 @@ if (eval { require Date::Calc }) {
         }
 }
 
-print "HTML::CalendarMonthSimple module ......... ";
-if (eval { require HTML::CalendarMonthSimple }) {
-        print "OK\n";
-} else {
-	if ($< == 0 && $os eq "Linuxish") {
-                print "Attempting to install...\n";
-                CPAN::Shell->install("HTML::CalendarMonthSimple");
-        } else {
-                print "Please install.\n";
-		$prereq = 0;
-        }
-}
-
 print "Image::Magick module (optional) .......... ";
 if (eval { require Image::Magick }) {
         print "OK\n";
@@ -220,27 +168,18 @@ if (eval { require Image::Magick }) {
         print "Not installed. Thumbnailing will be disabled.\n";
 }
 
+print "Authen::Smb module (optional) ............ ";
+if (eval { require Authen::Smb }) {
+        print "OK\n";
+} else {
+        print "Not installed. You cannot use SMB authentication.\n";
+}
+
 # this is here to insure they installed correctly.
 
 if ($prereq) {
 	print "WebGUI modules ........................... ";
 	if (eval { require WebGUI } && eval { require WebGUI::SQL }) {
-	        print "OK\n";
-	} else {
-	        print "Not Found. Perhaps you're running this script in the wrong place.\n";
-		$prereq = 0;
-	}
-
-	print "Data::Config module ...................... ";
-	if (eval { require Data::Config }) {
-	        print "OK\n";
-	} else {
-	        print "Not Found. Perhaps you're running this script in the wrong place.\n";
-		$prereq = 0;
-	}
-
-	print "HTML::TagFilter module ................... ";
-	if (eval { require HTML::TagFilter }) {
 	        print "OK\n";
 	} else {
 	        print "Not Found. Perhaps you're running this script in the wrong place.\n";
