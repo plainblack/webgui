@@ -2924,9 +2924,9 @@ sub www_manageClipboard {
 		$limit = 1;
 	}
 	foreach my $assetData (@{$self->getAssetsInClipboard($limit)}) {
-		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},"ManageClipboard",$assetData->{className}));
+		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
-	return $ac->render($self->getAssetManagerControl(\@assets), $header);
+	return $ac->render($self->getAssetManagerControl(\@assets,"ManageClipboard"), $header);
 }
 
 #-------------------------------------------------------------------
