@@ -32,26 +32,6 @@ use WebGUI::Asset::USS_submission;
 our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
-# format the date according to rfc 822 (for RSS export)
-my @_months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-sub _get_rfc822_date {
-        my ($time) = @_;
-        my ($year, $mon, $mday, $hour, $min, $sec) = WebGUI::DateTime::localtime($time);
-        my $month = $_months[$mon - 1];
-        return sprintf("%02d %s %04d %02d:%02d:%02d GMT", 
-                       $mday, $month, $year, $hour, $min, $sec);
-}
-  
-#-------------------------------------------------------------------
-# encode a string to include in xml (for RSS export)
-sub _xml_encode {
-        $_[0] =~ s/&/&amp;/g;
-        $_[0] =~ s/</&lt;/g;
-        $_[0] =~ s/\]\]>/\]\]&gt;/g;
-        return $_[0];
-}
-
-#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
         my $definition = shift;

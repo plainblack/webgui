@@ -59,6 +59,16 @@ save you many hours of grief.
  * If you have any custom code, please check out docs/migration.txt as
 	there have been many changes to the API in this release.
 
+ * There are many new components in this release, and as a result many
+	tables. Here is a list of the new tables. Make sure you have no
+	plug-ins installed that conflict with this, or tables you've
+	created for your own uses: Collaboration, Post, Thread,
+	Post_rating, Post_read, Folder, FileAsset, ITransact_recurringStatus,
+	ImageAsset, Layout, Shortcut, asset, assetHistory, commerceSettings,
+	redirect, shoppingCart, snippet, subscription, subscriptionCode, 
+	subscriptionCodeBatch, subscriptionCodeSubscriptions, transaction,
+	transactionItem
+
 
 6.2.10
 --------------------------------------------------------------------

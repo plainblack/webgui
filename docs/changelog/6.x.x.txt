@@ -45,6 +45,7 @@
  - bugfix [ 991070 ] 5.5.4 Editor(s) replacing ^ symbol
  - bugfix [ 1022287 ] WYSIWYG-Editor Add new web link
  - bugfix [ 1055153 ] Turn Admin ON with SSL and IE.
+ - fix [ 1118753 ] GUID not displayed in 6.2.9 if it begins with "-".
  - RFE [ 1034549 ] Docu für Encrypt Pag
  - Added internationalized URL handling.
  - Moved site icon and fav icon directly into style templates.

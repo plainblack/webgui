@@ -177,7 +177,7 @@ sub identifier {
 
 #-------------------------------------------------------------------
 
-=head2 karma ( amount, source, description )
+=head2 karma ( [ amount, source, description ] )
 
 Returns the current level of karma this user has earned. 
 

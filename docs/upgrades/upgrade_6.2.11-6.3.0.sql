@@ -255,9 +255,7 @@ create table Collaboration (
   karmaPerPost int not null default 0,
   collaborationTemplateId varchar(22) not null,
   threadTemplateId varchar(22) not null,
-  postTemplateId varchar(22) not null,
   postFormTemplateId varchar(22) not null,
-  postPreviewTemplateId varchar(22) not null,
   searchTemplateId varchar(22) not null,
   notificationTemplateId varchar(22) not null,
   sortBy varchar(35) not null default 'dateUpdated',
@@ -278,19 +276,18 @@ create table Collaboration (
   archiveAfter int not null default 31536000,
   postsPerPage int not null default 10,
   threadsPerPage int not null default 30,
-  subscriptionGroupId varchar(22)
+  subscriptionGroupId varchar(22),
+  allowReplies int not null default 0
 );
 
 create table Thread (
   assetId varchar(22) not null primary key,
-  views int not null default 0,
   replies int not null default 0,
   lastPostId varchar(22) not null default 0,
   lastPostDate bigint,
   isLocked int not null default 0,
   isSticky int not null default 0,
-  status varchar(30) not null default 'approved',
-  rating int not null default 0
+  subscriptionGroupId varchar(22)
 );
 
 create table Post (
