@@ -52,6 +52,10 @@ Convert::ASN1........................Graham Barr
 
 Data::Config.........................Sébastien Aperghis-Tramoni
 
+DBIx::FullTextSearch.................T.J. Mather
+
+DBIx::Tree::NestedSet................Dan Collis Puro
+
 HTML::TagFilter......................William Ross
 
 HTML::Template.......................Sam Tregar
@@ -88,3 +92,4 @@ Cool Menus...........................Thomas Brattli
 
 dTree................................Geir Landro
 				     http://www.destroydrop.com
+

@@ -25,6 +25,7 @@ use WebGUI::MessageLog;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Style;
 use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Wobject;
@@ -897,8 +898,8 @@ sub www_view {
 		return $_[0]->processTemplate($_[0]->get("listTemplateId"),$_[0]->getListTemplateVars,"DataForm/List");
 	}
 	# add Tab StyleSheet and JavaScript
-	$session{page}{head}{link}{'/extras/tabs/tabs.css'}{type} = 'text/css';
-	$session{page}{head}{javascript}{'/extras/tabs/tabs.js'}{language} = 'JavaScript';
+	WebGUI::Style::setLink('/extras/tabs/tabs.css', {"type"=>"text/css"});
+	WebGUI::Style::setScript('/extras/tabs/tabs.js', {"language"=>"JavaScript"});
 	$var = $_[1] || $_[0]->getRecordTemplateVars($var);
 	return $_[0]->processTemplate($_[0]->get("templateId"),$var);
 }
