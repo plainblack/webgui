@@ -145,7 +145,7 @@ sub get {
 =cut
 
 sub inDateRange {
-	if ($_[0]->get("startDate") < time() && $_[0]->get("startDate") > time()) {
+	if ($_[0]->get("startDate") < time() && $_[0]->get("endDate") > time()) {
 		return 1;
 	} else {
 		return 0;

@@ -207,7 +207,10 @@ sub page {
 				$wobject = \%hash;
 				$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 				$w = $cmd->new($wobject);
-				$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>'.$w->www_view."<p>\n\n";
+				if ($w->inDateRange) {
+					$contentHash{${$wobject}{templatePosition}} .= '<a name="'.${$wobject}{wobjectId}.'"></a>'
+						.$w->www_view."<p>\n\n";
+				}
 			}
 			$sth->finish;
 			$cmd = "use WebGUI::Template::".$session{page}{template};
