@@ -65,7 +65,7 @@ WebGUI::SQL->write("insert into template (templateId, name, template, namespace,
 
 my @templateManagers = WebGUI::SQL->buildArray("select userId from groupings where groupId=8");
 my $clause;
-if ($#templateManagers > 0) {
+if ($#templateManagers > -1) {
 	$clause = "and userId not in (".join(",",@templateManagers).")";	
 }
 $sth = WebGUI::SQL->read("select userId,expireDate,groupAdmin from groupings where groupId=5 ".$clause);
