@@ -26,7 +26,7 @@ sub _replacement {
 sub process {
 	my ($output);
 	$output = $_[0];
-        $output =~ s/\^Env\((.*?)\)\;/_replacement($1)/ge;
+        $output =~ s/\^International\((.*?)\)\;/_replacement($1)/ge;
 	return $output;
 }
 
