@@ -913,9 +913,15 @@ sub forumProperties {
                 -uiLevel=>7
                 );
         $f->integer(
+		-name=>"threadsPerPage",
+		-label=>WebGUI::International::get('Forum, Threads Per Page'),
+		-value=>$forum->get("threadsPerPage")||30,
+		-uiLevel=>7
+		);
+        $f->integer(
 		-name=>"postsPerPage",
 		-label=>WebGUI::International::get(1042),
-		-value=>$forum->get("postsPerPage")||30,
+		-value=>$forum->get("postsPerPage")||10,
 		-uiLevel=>7
 		);
         if ($session{setting}{useKarma}) {
@@ -981,6 +987,7 @@ sub forumPropertiesSave {
 		allowRichEdit=>$session{form}{allowRichEdit},
 		allowReplacements=>$session{form}{allowReplacements},
 		filterPosts=>$session{form}{filterPosts},
+		threadsPerPage=>$session{form}{threadsPerPage},
 		postsPerPage=>$session{form}{postsPerPage},
 		karmaPerPost=>$session{form}{karmaPerPost},
 		groupToView=>$session{form}{groupToView},
@@ -1114,7 +1121,7 @@ sub getForumTemplateVars {
 	} else {
 		$query .= "lastPostDate desc";
 	}
-	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewForum&amp;forumId=".$forum->get("forumId")),$forum->get("postsPerPage"));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewForum&amp;forumId=".$forum->get("forumId")),$forum->get("threadsPerPage"));
 	$p->setDataByQuery($query);
 	$var{firstPage} = $p->getFirstPageLink;
         $var{lastPage} = $p->getLastPageLink;
@@ -1999,6 +2006,7 @@ sub www_postSave {
 		my $post = WebGUI::Forum::Post->create(\%postData);
 		setPostStatus($caller,$post);
 		WebGUI::HTTP::setRedirect(formatThreadURL($caller->{callback}, $post->get("forumPostId")));
+
 		return "Redirecting...";
 		#return www_viewThread($caller,$post->get("forumPostId"));
 	}
