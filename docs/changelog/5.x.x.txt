@@ -1,6 +1,6 @@
 5.5.6
- - [ 895067 ] Forum ID Missing In USS
-
+ - bugfix [ 895067 ] Forum ID Missing In USS
+ - bugfix [ 909688 ] USS forum post edit function not work
 
 
 5.5.5
