@@ -24,7 +24,7 @@ delete from international where namespace='EventsCalendar' and internationalId=1
 delete from international where namespace='EventsCalendar' and internationalId=11;
 insert into international values (75,'EventsCalendar',1,'Which do you wish to do?');
 insert into international values (76,'EventsCalendar',1,'Delete only this event.');
-insert into international values (77,'EventsCalendar',1,'Delete this event <b>and</b> all of its recurring events.');
+insert into international values (77,'EventsCalendar',1,'Delete this event <b>and</b> all of its recurrences.');
 insert into international values (78,'EventsCalendar',1,'Don\'t delete anything, I made a mistake.');
 
 

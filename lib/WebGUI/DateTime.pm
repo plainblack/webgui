@@ -20,39 +20,6 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSet &humanToEpoch &setToEpoch &monthStartEnd);
 
 #-------------------------------------------------------------------
-sub _getMonth { 
-	my %month = (
-	1=> 	WebGUI::International::get(15),
-	2=>	WebGUI::International::get(16),
-	3=>	WebGUI::International::get(17),
-	4=>	WebGUI::International::get(18),
-	5=>	WebGUI::International::get(19),
-	6=>	WebGUI::International::get(20),
-	7=>	WebGUI::International::get(21),
-	8=>	WebGUI::International::get(22),
-	9=>	WebGUI::International::get(23),
-	10=>	WebGUI::International::get(24),
-	11=>	WebGUI::International::get(25),
-	12=>	WebGUI::International::get(26)	
-	);
-	return %month;
-}
-
-#-------------------------------------------------------------------
-sub _getWeekday {
-	my %weekday = (
-		1=>	WebGUI::International::get(27),
-		2=>	WebGUI::International::get(28),
-		3=>	WebGUI::International::get(29),
-		4=>	WebGUI::International::get(30),
-		5=>	WebGUI::International::get(31),
-		6=>	WebGUI::International::get(32),
-		7=> 	WebGUI::International::get(33)
-		);
-	return %weekday;
-}
-
-#-------------------------------------------------------------------
 sub addToDate {
 	my ($year,$month,$day, $hour,$min,$sec, $newDate);
 	($year,$month,$day, $hour,$min,$sec) = Date::Calc::Time_to_Date($_[0]);
@@ -96,7 +63,7 @@ sub epochToHuman {
 	$output =~ s/\%m/$value/g;
 	$output =~ s/\%M/$date[1]/g;
 	if ($output =~ /\%c/) {
-		%month = _getMonth();
+		%month = getMonthName();
 		$output =~ s/\%c/$month{$date[1]}/g;
 	}
   #---day stuff
@@ -104,7 +71,7 @@ sub epochToHuman {
 	$output =~ s/\%d/$value/g;
 	$output =~ s/\%D/$date[2]/g;
 	if ($output =~ /\%w/) {
-		%weekday = _getWeekday();
+		%weekday = getDayName();
 		$output =~ s/\%w/$weekday{$date[6]}/g;
 	}
   #---hour stuff
@@ -140,6 +107,54 @@ sub epochToHuman {
 #-------------------------------------------------------------------
 sub epochToSet {
 	return epochToHuman($_[0],"%m/%d/%y");
+}
+
+#-------------------------------------------------------------------
+sub getMonthName {
+        if ($_[0] == 1) {
+                return WebGUI::International::get(15);
+        } elsif ($_[0] == 2) {
+                return WebGUI::International::get(16);
+        } elsif ($_[0] == 3) {
+                return WebGUI::International::get(17);
+        } elsif ($_[0] == 4) {
+                return WebGUI::International::get(18);
+        } elsif ($_[0] == 5) {
+                return WebGUI::International::get(19);
+        } elsif ($_[0] == 6) {
+                return WebGUI::International::get(20);
+        } elsif ($_[0] == 7) {
+                return WebGUI::International::get(21);
+        } elsif ($_[0] == 8) {
+                return WebGUI::International::get(22);
+        } elsif ($_[0] == 9) {
+                return WebGUI::International::get(23);
+        } elsif ($_[0] == 10) {
+                return WebGUI::International::get(24);
+        } elsif ($_[0] == 11) {
+                return WebGUI::International::get(25);
+        } elsif ($_[0] == 12) {
+                return WebGUI::International::get(26);
+        }
+}
+
+#-------------------------------------------------------------------
+sub getDayName {
+        if ($_[0] == 1) {
+                return WebGUI::International::get(27);
+        } elsif ($_[0] == 2) {
+                return WebGUI::International::get(28);
+        } elsif ($_[0] == 2) {
+                return WebGUI::International::get(29);
+        } elsif ($_[0] == 2) {
+                return WebGUI::International::get(30);
+        } elsif ($_[0] == 2) {
+                return WebGUI::International::get(31);
+        } elsif ($_[0] == 2) {
+                return WebGUI::International::get(32);
+        } elsif ($_[0] == 2) {
+                return WebGUI::International::get(33);
+        }
 }
 
 #-------------------------------------------------------------------

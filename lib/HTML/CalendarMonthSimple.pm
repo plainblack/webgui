@@ -3,7 +3,7 @@
 # Herein, the symbol $self is used to refer to the object that's being passed around.
 
 package HTML::CalendarMonthSimple;
-$HTML::CalendarMonthSimple::VERSION = "1.17";
+$HTML::CalendarMonthSimple::VERSION = "1.18";
 use strict;
 use Date::Calc;
 
@@ -29,7 +29,11 @@ sub new {
    $self->{'vcellalignment'}     = 'top';
    $self->{'weekdayheadersbig'}  = 1;
    $self->{'nowrap'}             = 0;
+
    $self->{'mondayisfirstday'}   = 0;
+   $self->{'weekdays'} = [qw/Monday Tuesday Wednesday Thursday Friday/];
+   $self->{'sunday'}   = "Sunday";
+   $self->{'saturday'} = "Saturday";
 
    # Set the default calendar header
    $self->{'header'} = sprintf("<center><font size=+2>%s %d</font></center>",
@@ -61,7 +65,7 @@ sub new {
 sub as_HTML {
    my $self = shift;
    my $html = '';
-   my(@days,$adjustedWeek,$sunday,$weeks,$WEEK,$DAY);
+   my(@days,$weeks,$adjustedWeek,$sunday,$mondayisfirstday,$WEEK,$DAY);
 
    # To make the grid even, pad the start of the series with 0s
    @days = (1 .. Date::Calc::Days_in_Month($self->year(),$self->month() ) );
@@ -79,6 +83,7 @@ sub as_HTML {
    my $tablewidth = $self->width();
    $tablewidth =~ m/^(\d+)(\%?)$/; my $cellwidth = (int($1/7))||'14'; if ($2) { $cellwidth .= '%'; }
    my $header = $self->header();
+   my $mondayisfirstday = $self->mondayisfirstday();
    my $cellalignment = $self->cellalignment();
    my $vcellalignment = $self->vcellalignment();
    my $contentfontsize = $self->contentfontsize();
@@ -105,18 +110,19 @@ sub as_HTML {
    my $sharpborders = $self->sharpborders() || 0;
    my $cellheight = $self->cellheight();
    my $cellclass = $self->cellclass();
+   my $tableclass = $self->tableclass();
    my $weekdaycellclass = $self->weekdaycellclass() || $self->cellclass();
    my $weekendcellclass = $self->weekendcellclass() || $self->cellclass();
    my $todaycellclass = $self->todaycellclass() || $self->cellclass();
    my $headerclass = $self->headerclass() || $self->cellclass();
    my $nowrap = $self->nowrap() || 0;
-   my $mondayisfirstday = $self->mondayisfirstday();
    # Get today's date, in case there's a todaycolor()
    my($todayyear,$todaymonth,$todaydate) = Date::Calc::Today();
 
    # the table declaration - sharpborders wraps the table inside a table cell
    if ($sharpborders) {
       $html .= "<table border=\"0\"";
+      $html .= " class=\"$tableclass\"" if $tableclass;
       $html .= " width=\"$tablewidth\"" if $tablewidth;
       $html .= " cellpadding=\"0\" cellspacing=\"0\">\n";
       $html .= "<tr valign=\"top\" align=\"left\">\n";
@@ -126,13 +132,14 @@ sub as_HTML {
       $html .= "<table border=\"0\" cellpadding=\"3\" cellspacing=\"1\" width=\"100%\">";
    }
    else {
-      $html .= "<table ";
-      $html .= "border=\"$border\"" if $border;
-      $html .= "width=\"$tablewidth\"" if $tablewidth;
-      $html .= "bgcolor=\"$bgcolor\"" if $bgcolor;
-      $html .= "bordercolor=\"$bordercolor\"" if $bordercolor;
-      $html .= "cellpadding=\"$cellpadding\"" if $cellpadding;
-      $html .= "cellspacing=\"$cellspacing\""  if $cellspacing;
+      $html .= "<table";
+      $html .= " class=\"$tableclass\"" if $tableclass;
+      $html .= " border=\"$border\"" if $border;
+      $html .= " width=\"$tablewidth\"" if $tablewidth;
+      $html .= " bgcolor=\"$bgcolor\"" if $bgcolor;
+      $html .= " bordercolor=\"$bordercolor\"" if $bordercolor;
+      $html .= " cellpadding=\"$cellpadding\"" if $cellpadding;
+      $html .= " cellspacing=\"$cellspacing\""  if $cellspacing;
       $html .= ">\n";
    }
    # the header
@@ -149,17 +156,18 @@ sub as_HTML {
    # the names of the days of the week
    if ($self->showweekdayheaders) {
       my $celltype = $self->weekdayheadersbig() ? "th" : "td";
+      my @weekdays = $self->weekdays();
       $html .= "<tr>\n";
       $sunday = "<$celltype";
-      $sunday.= " bgcolor=\"$weekendheadercolor\"" if $weekendheadercolor;
+      $sunday .= " bgcolor=\"$weekendheadercolor\"" if $weekendheadercolor;
       $sunday .= " class=\"$weekendcellclass\"" if $weekendcellclass;
       $sunday .= ">";
       $sunday .= "<font color=\"$weekendheadercontentcolor\">" if $weekendheadercontentcolor;
-      $sunday .= "Sunday";
+      $sunday .= $self->sunday();
       $sunday .= "</font>" if $weekendheadercontentcolor;
       $sunday .= "</$celltype>\n";
       $html .= $sunday unless ($mondayisfirstday);
-      foreach ("Monday","Tuesday","Wednesday","Thursday","Friday"){
+      foreach (@weekdays) { # draw the weekday headers
          $html .= "<$celltype";
          $html .= " bgcolor=\"$weekdayheadercolor\"" if $weekdayheadercolor;
          $html .= " class=\"$weekdaycellclass\"" if $weekdaycellclass;
@@ -174,7 +182,7 @@ sub as_HTML {
       $html .= " class=\"$weekendcellclass\"" if $weekendcellclass;
       $html .= ">";
       $html .= "<font color=\"$weekendheadercontentcolor\">" if $weekendheadercontentcolor;
-      $html .= "Saturday";
+      $html .= $self->saturday();
       $html .= "</font>" if $weekendheadercontentcolor;
       $html .= "</$celltype>\n";
       $html .= $sunday if ($mondayisfirstday);
@@ -185,11 +193,11 @@ sub as_HTML {
       $html .= "<TR>\n";
       foreach $DAY (eval{if ($mondayisfirstday) {1..6,0} else {0..6}}) {
          my($thiscontent,$thisday,$thisbgcolor,$thisbordercolor,$thiscontentcolor,$thiscellclass);
-	 if ($DAY == 0 && $mondayisfirstday) {
-		$adjustedWeek = $WEEK+1;
-	 } else {
-		$adjustedWeek = $WEEK;
-	 }
+         if ($DAY == 0 && $mondayisfirstday) {
+                $adjustedWeek = $WEEK+1;
+         } else {
+                $adjustedWeek = $WEEK;
+         }
          $thisday = $days[((7*$adjustedWeek)+$DAY)];
 
          # Get the cell content
@@ -212,7 +220,7 @@ sub as_HTML {
             # Content for "Wednesdays", etc.
             $thiscontent .= $self->getcontent(('sundays','mondays','tuesdays','wednesdays','thursdays','fridays','saturdays')[$DAY]);
             # Normalize if there's no content
-            $thiscontent .= '&nbsp;';
+            $thiscontent ||= '&nbsp;';
          }
 
          # Get the cell's coloration and CSS class
@@ -265,7 +273,26 @@ sub as_HTML {
 }
 
 
+sub sunday {
+   my $self = shift;
+   my $newvalue = shift;
+   $self->{'sunday'} = $newvalue if defined($newvalue);
+   return $self->{'sunday'};
+}
 
+sub saturday {
+   my $self = shift;
+   my $newvalue = shift;
+   $self->{'saturday'} = $newvalue if defined($newvalue);
+   return $self->{'saturday'};
+}
+
+sub weekdays {
+   my $self = shift;
+   my @days = @_;
+   $self->{'weekdays'} = \@days if (scalar(@days)==5);
+   return @{$self->{'weekdays'}};
+}
 
 sub getdatehref {
    my $self = shift;
@@ -314,6 +341,13 @@ sub headercolor {
    my $newvalue = shift;
    if (defined($newvalue)) { $self->{'headercolor'} = $newvalue; }
    return $self->{'headercolor'};
+}
+
+sub mondayisfirstday {
+   my $self = shift;
+   my $newvalue = shift;
+   if (defined ($newvalue)) { $self->{'mondayisfirstday'} = $newvalue; }
+   return $self->{'mondayisfirstday'}
 }
 
 sub bgcolor {
@@ -537,6 +571,8 @@ sub month {
 
 sub monthname {
    my $self = shift;
+   my $newvalue = shift;
+   if (defined($newvalue)) { $self->{'monthname'} = $newvalue; }
    return $self->{'monthname'};
 }
 
@@ -546,13 +582,6 @@ sub header {
    my $newvalue = shift;
    if (defined($newvalue)) { $self->{'header'} = $newvalue; }
    return $self->{'header'};
-}
-
-sub mondayisfirstday {
-   my $self = shift;
-   my $newvalue = shift;
-   if (defined ($newvalue)) { $self->{'mondayisfirstday'} = $newvalue; }
-   return $self->{'mondayisfirstday'}
 }
 
 sub nowrap {
@@ -581,6 +610,13 @@ sub cellclass {
     my $newvalue = shift;
     if (defined($newvalue)) { $self->{'cellclass'} = $newvalue; }
     return $self->{'cellclass'};
+}
+
+sub tableclass {
+    my $self = shift;
+    my $newvalue = shift;
+    if (defined($newvalue)) { $self->{'tableclass'} = $newvalue; }
+    return $self->{'tableclass'};
 }
 
 sub weekdaycellclass {
@@ -672,7 +708,7 @@ Naturally, new() returns a newly constructed calendar object. Recognized argumen
 
 =head1 month()
 
-=head1 monthname()
+=head1 monthname([STRING])
 
 These methods simply return the year/month of the calendar. monthname() returns the text name of the month, e.g. "December".
 
@@ -815,6 +851,7 @@ If the header is set to an empty string, then no header will be printed at all. 
    $cal->header("<center><font size=+2 color=red>$m $y</font></center>\n\n");
 
 
+
 =head1 bgcolor([STRING])
 
 =head1 weekdaycolor([STRING])
@@ -899,11 +936,13 @@ The date must be numeric; it cannot be a string such as "2wednesday"
 If set to 1, then calendar cells will have the NOWRAP attribute set, preventing their content from wrapping. If set to 0 (the default) then NOWRAP is not used and very long content may cause cells to become stretched out.
 
 
+
 =head1 sharpborders([1 or 0])
 
 If set to 1, this gives very crisp edges between the table cells. If set to 0 (the default) standard HTML cells are used. If neither value is specified, the current value is returned.
 
 FYI: To accomplish the crisp border, the entire calendar table is wrapped inside a table cell.
+
 
 
 =head1 cellheight([NUMBER])
@@ -915,6 +954,8 @@ If no value is given, the current value is returned.
 To un-specify a height, try specifying a height of 0 or undef.
 
 
+
+=head1 tableclass([STRING])
 
 =head1 cellclass([STRING])
 
@@ -929,7 +970,9 @@ To un-specify a height, try specifying a height of 0 or undef.
 =head1 headerclass([STRING])
 
 
-These specify which CSS class will be attributed to the calendar's cells. By default, no classes are specified or used.
+These specify which CSS class will be attributed to the calendar's table and the calendar's cells. By default, no classes are specified or used.
+
+tableclass() sets the CSS class for the calendar table.
 
 cellclass() is used for all calendar cells. weekdaycellclass(), weekendcellclass(), and todaycellclass() override the cellclass() for the corresponding types of cells. headerclass() is used for the calendar's header.
 
@@ -939,6 +982,29 @@ If no value is given, the current value is returned.
 
 To un-specify a class, try specifying an empty string, e.g. cellclass('')
 
+=head1 mondayisfirstday([0|1])
+
+ Defaults to '0'. If '0' the first day of the week will be Sunday (American Format), but if '1' the first day of the week will be  Monday (European Format).
+
+=head1 sunday([STRING])
+
+=head1 saturday([STRING])
+
+=head1 weekdays([MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY])
+
+These functions allow the days of the week to be "renamed", which is useful for displaying the weekday headers in another language.
+
+   # show the days of the week in Spanish
+   $cal->saturday('Sábado');
+   $cal->sunday('Domingo');
+   $cal->weekdays('Lunes','Martes','Miércoles','Jueves','Viernes');
+
+   # show the days of the week in German
+   $cal->saturday('Samstag');
+   $cal->sunday('Sonntag');
+   $cal->weekdays('Montag','Dienstag','Mittwoch','Donnerstag','Freitag');
+
+If no value is specified (or, for weekdays() if exactly 5 arguments aren't given) then the current value is returned.
 
 
 
@@ -978,6 +1044,8 @@ Changes in 1.16: Fixed a very stupid bug that made addcontent() and setcontent()
 
 Changes in 1.17: Corrected B<-w> warnings about uninitialized values in as_HTML().
 
+Changes in 1.18: Added methods: tableclass(), sunday(), saturday(), weekdays(). Now day names can be internationalized!
+
 
 
 =head1 AUTHORS, CREDITS, COPYRIGHTS
@@ -1006,7 +1074,9 @@ Bill Turner <b@brilliantcorners.org> supplied the headerclass() method and the r
 
 Bill Rhodes <wrhodes@27.org> provided the contentfontsize() method for version 1.14
 
-JT Smith <jt@plainblack.com> added the mondayisfirstday() method for truly international calendars.
+Alberto Simões <albie@alfarrabio.di.uminho.pt> provided the tableclass() function and the saturday(), sunday(), and weekdays() functions for version 1.18. Thanks, Alberto, I've been wanting this since the beginning!
+
+JT Smith <jt@plainblack.com> added the mondayisfirstday() method to allow for European formatted calendars, and extended monthname to complete the internationalization functionality.
 
 
 

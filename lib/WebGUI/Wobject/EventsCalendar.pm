@@ -41,6 +41,15 @@ sub _calendarLayout {
         $calendar->todaycellclass("tableHeader");
         $calendar->headerclass("tableHeader");
 	$calendar->mondayisfirstday($session{user}{firstDayOfWeek});
+	$calendar->sunday(WebGUI::International::get(27));
+        $calendar->weekdays(WebGUI::International::get(28),
+		WebGUI::International::get(29),
+		WebGUI::International::get(30),
+		WebGUI::International::get(31),
+		WebGUI::International::get(32));
+        $calendar->saturday(WebGUI::International::get(33));
+	$calendar->monthname(WebGUI::DateTime::getMonthName($calendar->month));
+	$calendar->header('<h2 align="center">'.$calendar->monthname.' '.$calendar->year.'</h2>');
         ($start,$end) = monthStartEnd($_[1]);
         $sth = WebGUI::SQL->read("select * from EventsCalendar_event where wobjectId=".$_[0]->get("wobjectId")." order by startDate,endDate");
         while (%event = $sth->hash) {
