@@ -43,6 +43,7 @@ sub _subMenu {
 		$output .= '<li><a href="'.WebGUI::URL::page("op=editUserKarma&uid=".$session{form}{uid}).'">'.WebGUI::International::get(555).'</a>';
 	}
 	$output .= '<li><a href="'.WebGUI::URL::page("op=listUsers").'">'.WebGUI::International::get(456).'</a>';
+	$output .= '<li><a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(493).'</a>';
 	$output .= '</td></tr></table>';
 	return $output;
 }

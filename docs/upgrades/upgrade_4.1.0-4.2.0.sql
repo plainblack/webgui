@@ -762,7 +762,27 @@ update help set language=5 where language='Português';
 update help set language=6 where language='Svenska';
 update help set language=7 where language='¼òÌåÖÐÎÄ';
 alter table help change language languageId int not null default 1;
-
+insert into international values (584,'WebGUI',1,'Add a new language.');
+insert into international values (585,'WebGUI',1,'Manage translations.');
+insert into international values (586,'WebGUI',1,'Languages');
+insert into international values (588,'WebGUI',1,'Are you certain you wish to submit this translation to Plain Black for inclusion in the default distribution? By clicking on the yes link you understand that you\'re giving Plain Black an unlimited license to use the translation in its software distributions.');
+insert into international values (587,'WebGUI',1,'Are you certain you wish to delete this language and all the help and international messages that go with it?');
+insert into international values (589,'WebGUI',1,'Edit Language');
+insert into international values (590,'WebGUI',1,'Language ID');
+insert into international values (591,'WebGUI',1,'Language');
+insert into international values (592,'WebGUI',1,'Character Set');
+insert into international values (593,'WebGUI',1,'Submit translation to Plain Black.');
+insert into international values (594,'WebGUI',1,'Translate international messages.');
+insert into international values (595,'WebGUI',1,'International Messages');
+insert into international values (596,'WebGUI',1,'MISSING');
+insert into international values (597,'WebGUI',1,'Edit International Message');
+insert into international values (598,'WebGUI',1,'Edit language.');
+insert into international values (599,'WebGUI',1,'Translate help.');
+insert into international values (600,'WebGUI',1,'Help ID');
+insert into international values (601,'WebGUI',1,'International ID');
+insert into international values (602,'WebGUI',1,'Edit Help');
+insert into international values (603,'WebGUI',1,'Action');
+insert into international values (604,'WebGUI',1,'Object');
 
 
 

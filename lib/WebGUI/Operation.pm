@@ -16,6 +16,7 @@ use WebGUI::Operation::Admin;
 use WebGUI::Operation::Group;
 use WebGUI::Operation::Help;
 use WebGUI::Operation::Image;
+use WebGUI::Operation::International;
 use WebGUI::Operation::Package;
 use WebGUI::Operation::Page;
 use WebGUI::Operation::ProfileSettings;
