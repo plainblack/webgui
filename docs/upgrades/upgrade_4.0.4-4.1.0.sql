@@ -42,4 +42,10 @@ INSERT INTO international VALUES (548,'WebGUI','English','Group name');
 INSERT INTO international VALUES (549,'WebGUI','English','Group description');
 INSERT INTO international VALUES (550,'WebGUI','English','View Image group');
 INSERT INTO international VALUES (382,'WebGUI','English','Edit Image');
+alter table messageLog add column subject varchar(255);
+alter table messageLog add column status varchar(30) default 'notice';
+INSERT INTO international VALUES (551,'WebGUI','English','Notice');
+INSERT INTO international VALUES (552,'WebGUI','English','Pending');
+INSERT INTO international VALUES (553,'WebGUI','English','Status');
+
 

@@ -265,7 +265,7 @@ sub www_approveSubmission {
         if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
                 WebGUI::SQL->write("update UserSubmission_submission set status='Approved' where submissionId=$session{form}{sid}");
-		WebGUI::MessageLog::addEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
+		WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),4,$namespace);
 		WebGUI::MessageLog::completeEntry($session{form}{mlog});
                 return WebGUI::Operation::www_viewMessageLog();
@@ -363,7 +363,7 @@ sub www_denySubmission {
         if (WebGUI::Privilege::isInGroup(4,$session{user}{userId}) || WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
 		%submission = WebGUI::SQL->quickHash("select * from UserSubmission_submission where submissionId=$session{form}{sid}");
                 WebGUI::SQL->write("update UserSubmission_submission set status='Denied' where submissionId=$session{form}{sid}");
-                WebGUI::MessageLog::addEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
+                WebGUI::MessageLog::addInternationalizedEntry($submission{userId},'',WebGUI::URL::page('func=viewSubmission&wid='.
 			$session{form}{wid}.'&sid='.$session{form}{sid}),5,$namespace);
                 WebGUI::MessageLog::completeEntry($session{form}{mlog});
                 return WebGUI::Operation::www_viewMessageLog();
@@ -520,9 +520,9 @@ sub www_editSubmissionSave {
 			status='".$_[0]->get("defaultStatus")."'
 			where submissionId=$session{form}{sid}");
 		if ($_[0]->get("defaultStatus") ne "Approved") {
-			WebGUI::MessageLog::addEntry('',$_[0]->get("groupToApprove"),
+			WebGUI::MessageLog::addInternationalizedEntry('',$_[0]->get("groupToApprove"),
 				WebGUI::URL::page('func=viewSubmission&wid='.$_[0]->get("wobjectId").'&sid='.
-				$session{form}{sid}),3,$namespace);
+				$session{form}{sid}),3,$namespace,'pending');
 		}
                 return $_[0]->www_viewSubmission();
         } else {

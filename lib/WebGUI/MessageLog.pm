@@ -12,88 +12,99 @@ package WebGUI::MessageLog;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
+use WebGUI::User;
+
 
 #-------------------------------------------------------------------
-sub _getUserInfo {
-        my (%default, $key, %user, %profile, $value);
-        tie %user, 'Tie::CPHash';
-        %user = WebGUI::SQL->quickHash("select * from users where userId='$_[0]'");
-        if ($user{userId} ne "") {
-        	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
-			from userProfileData, userProfileField 
-			where userProfileData.fieldName=userProfileField.fieldName and userProfileData.userId=$user{userId}");
-        	%user = (%user, %profile);
-        	%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
-        	foreach $key (keys %default) {
-                	if ($user{$key} eq "") {
-                        	$value = eval($default{$key});
-                        	if (ref $value eq "ARRAY") {
-                                	$user{$key} = $$value[0];
-                        	} else {
-                                	$user{$key} = $value;
-                        	}
-                	}
-        	}
-	}
-        return \%user;
+sub _notify {
+	my ($u, $message, $subject);
+	$u = $_[0];
+	$subject = $_[1];
+	$message = $_[2];
+        if ($u->profileField("INBOXNotifications") eq "email") {
+        	if ($u->profileField("email") ne "") {
+                	WebGUI::Mail::send($u->profileField("email"),$subject,$message);
+                }
+        } elsif ($u->profileField("INBOXNotifications") eq "emailToPager") {
+                if ($u->profileField("emailToPagerGateway") ne "") {
+                        WebGUI::Mail::send($u->profileField("emailToPagerGateway"),$subject,$message);
+                }
+        } elsif ($u->profileField("INBOXNotifications") eq "icq") {
+                if ($u->profileField("icq")) {
+                        WebGUI::Mail::send($u->profileField("icq").'@pager.icq.com',$subject,$message);
+                }
+        }
 }
 
 #-------------------------------------------------------------------
 sub addEntry {
-        my (@users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace);
+        my ($u, @users, $messageLogId, $sth, $userId, $groupId, $subject, $message, $url, $status, $user);
 	$messageLogId = getNextId("messageLogId");
-	$namespace = $_[4] || "WebGUI";
-	%message = WebGUI::SQL->buildHash("select language,message from international where internationalId=$_[3] and namespace='$namespace'");
-	%subject = WebGUI::SQL->buildHash("select language,message from international where internationalId=523 and namespace='WebGUI'");
-	if ($_[1] ne "") {
-		@users = WebGUI::SQL->quickArray("select userId from groupings where groupId=$_[1]");
+	$userId = $_[0];
+	$groupId = $_[1];
+	$subject = $_[2];
+	$message = $_[3];
+	$url = $_[4];
+	$status = $_[5];
+	if ($groupId ne "") {
+		@users = WebGUI::SQL->quickArray("select userId from groupings where groupId=$groupId");
 	}
-	@users = ($_[0],@users);
+	@users = ($userId,@users);
 	foreach $user (@users) {
-		$user = _getUserInfo($user);
-		if (${$user}{userId} ne "") {
-			WebGUI::SQL->write("insert into messageLog values ($messageLogId,".${$user}{userId}.",
-				".quote($message{${$user}{language}}).",".quote($_[2]).",".time().")");
-			$subject{${$user}{language}} = $subject{'English'} if ($subject{${$user}{language}} eq "");
-			$subject = $subject{${$user}{language}};
-			$message{${$user}{language}} = $message{'English'} if ($message{${$user}{language}} eq "");
-			$message = WebGUI::Macro::process($message{${$user}{language}});
-			if ($_[2] ne "") {
-				$message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$_[2],'mlog='.$messageLogId);
+		$u = WebGUI::User->new($user);
+		if ($u->userId ne "") {
+			WebGUI::SQL->write("insert into messageLog values ($messageLogId,".$u->userId.",
+				".quote($message).",".quote($url).",".time().",".quote($subject).", ".quote($status).")");
+			if ($url ne "") {
+				$message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$url,'mlog='.$messageLogId);
 			}
-			if (${$user}{INBOXNotifications} eq "email") {
-				if (${$user}{email} ne "") {
-					WebGUI::Mail::send(${$user}{email},$subject,$message);
-				}
-			} elsif (${$user}{INBOXNotifications} eq "emailToPager") {
-				if (${$user}{emailToPagerGateway} ne "") {
-					WebGUI::Mail::send(${$user}{emailToPagerGateway},$subject,$message);
-				}
-			} elsif (${$user}{INBOXNotifications} eq "icq") {
-				if (${$user}{icq}) {
-					WebGUI::Mail::send(${$user}{icq}.'@pager.icq.com',$subject,$message);
-				}
-			}
+			_notify($u,$subject,$message);
 		}
 	}
 }
 
 #-------------------------------------------------------------------
+sub addInternationalizedEntry {
+        my ($u, $userId, $url, $groupId, $internationalId, @users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace, $status);
+        $messageLogId = getNextId("messageLogId");
+	$userId = $_[0];
+	$groupId = $_[1];
+	$url = $_[2];
+	$internationalId = $_[3];
+        $namespace = $_[4] || "WebGUI";
+	$status = $_[5] || 'notice';
+        %message = WebGUI::SQL->buildHash("select language,message from international where internationalId=$internationalId and namespace='$namespace'");
+        %subject = WebGUI::SQL->buildHash("select language,message from international where internationalId=523 and namespace='WebGUI'");
+        if ($groupId ne "") {
+                @users = WebGUI::SQL->quickArray("select userId from groupings where groupId=$groupId");
+        }
+        @users = ($userId,@users);
+        foreach $user (@users) {
+                $u = WebGUI::User->new($user);
+                if ($u->userId ne "") {
+                        $subject{$u->profileField("language")} = $subject{'English'} if ($subject{$u->profileField("language")} eq "");
+                        $subject = $subject{$u->profileField("language")};
+                        $message{$u->profileField("language")} = $message{'English'} if ($message{$u->profileField("language")} eq "");
+                        $message = WebGUI::Macro::process($message{$u->profileField("language")});
+                        WebGUI::SQL->write("insert into messageLog values ($messageLogId,".$u->userId.",
+                                ".quote($message).",".quote($url).",".time().",".quote($message).",".quote($status).")");
+                        if ($url ne "") {
+                                $message .= "\n".WebGUI::URL::append('http://'.$session{env}{HTTP_HOST}.$url,'mlog='.$messageLogId);
+                        }
+			_notify($u,$subject,$message);
+                }
+        }
+}
+
+#-------------------------------------------------------------------
 sub completeEntry {
-	my ($sth, @data, $completeMessage);
-	$completeMessage = WebGUI::International::get(350);
-	# unfortunately had to loop through reading and writing because I couldn't
-        # find a concatination function that worked the same in all DB servers
-	$sth = WebGUI::SQL->read("select message,userId from messageLog where messageLogId='$_[0]'");
-	while (@data = $sth->array) {
-		WebGUI::SQL->write("update messageLog set message=".quote($completeMessage.": ".$data[0]).", dateOfEntry=".time()." where messageLogId='$_[0]' and userId=$data[1]");
-	}
-	$sth->finish;
+	WebGUI::SQL->write("update messageLog set status='completed', dateOfEntry=".time()." where messageLogId='$_[0]'");
 }
 
 
