@@ -1792,7 +1792,7 @@ sub www_post {
 	my $contentType = "mixed";
 	if ($var->{'newpost.isReply'}) {
 		my $reply = WebGUI::Forum::Post->new($session{form}{parentId});
-		return WebGUI::Privilege::insufficient unless ($reply->getThread->getForum->canPost);
+		return WebGUI::Privilege::insufficient() unless ($reply->getThread->getForum->canPost);
 		$var->{'form.begin'} .= WebGUI::Form::hidden({
 			name=>'parentId',
 			value=>$reply->get("forumPostId")
@@ -1825,7 +1825,7 @@ sub www_post {
 	}
 	if ($var->{'newpost.isNewMessage'}) {
 		$var->{'subscribe.label'} = WebGUI::International::get(873);
-		return WebGUI::Privilege::insufficient unless ($forum->canPost);
+		return WebGUI::Privilege::insufficient() unless ($forum->canPost);
 		if ($forum->isModerator) {
 			$var->{'lock.label'} = WebGUI::International::get(1012);
 			$var->{'lock.form'} = WebGUI::Form::yesNo({
@@ -1841,7 +1841,7 @@ sub www_post {
 	}
 	if ($var->{'newpost.isEdit'}) {
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-		return WebGUI::Privilege::insufficient unless ($post->getThread->getForum->canPost);
+		return WebGUI::Privilege::insufficient() unless ($post->getThread->getForum->canPost);
 		$subject = $post->get("subject");
 		$message = $post->get("message");
 		$forum = $post->getThread->getForum;
@@ -1929,7 +1929,7 @@ sub www_postSave {
 	if ($session{form}{parentId} > 0) { # reply
 		%postData = (%postData, %postDataNew);
 		my $parentPost = WebGUI::Forum::Post->new($session{form}{parentId});
-		return WebGUI::Privilege::insufficient unless ($parentPost->getThread->getForum->canPost);
+		return WebGUI::Privilege::insufficient() unless ($parentPost->getThread->getForum->canPost);
 		$parentPost->getThread->subscribe($session{user}{userId}) if ($session{form}{subscribe});
 		$parentPost->getThread->lock if ($session{form}{isLocked});
 		$postData{forumThreadId} = $parentPost->getThread->get("forumThreadId");
@@ -1942,7 +1942,7 @@ sub www_postSave {
 	}
 	if ($session{form}{forumPostId} > 0) { # edit
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
-		return WebGUI::Privilege::insufficient unless ($post->canEdit);
+		return WebGUI::Privilege::insufficient() unless ($post->canEdit);
 		if ($post->getThread->getForum->get("addEditStampToPosts")) {
 			$postData{message} .= "\n\n --- (".WebGUI::International::get(1029)." "
                         .WebGUI::DateTime::epochToHuman(WebGUI::DateTime::time())." ".WebGUI::International::get(1030)
@@ -1956,7 +1956,7 @@ sub www_postSave {
 	if ($forumId) { # new post
 		%postData = (%postData, %postDataNew);
 		my $forum = WebGUI::Forum->new($forumId);
-		return WebGUI::Privilege::insufficient unless ($forum->canPost);
+		return WebGUI::Privilege::insufficient() unless ($forum->canPost);
 		my $thread = WebGUI::Forum::Thread->create({
 			forumId=>$forumId,
 			isSticky=>$session{form}{isSticky},
