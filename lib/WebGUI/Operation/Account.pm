@@ -15,6 +15,7 @@ use strict qw(vars subs);
 use URI;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
+use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Macro;
@@ -88,12 +89,7 @@ sub _validateProfileData {
 	tie %field, 'Tie::CPHash';
         $a = WebGUI::SQL->read("select dataType,fieldName,fieldLabel,required from userProfileField");
         while (%field = $a->hash) {
-		if ($field{dataType} eq "date") {
-			$data{$field{fieldName}} = WebGUI::DateTime::setToEpoch($session{form}{$field{fieldName}});
-			$session{form}{$field{fieldName}} = $data{$field{fieldName}};
-		} elsif (exists $session{form}{$field{fieldName}}) {
-			$data{$field{fieldName}} = $session{form}{$field{fieldName}};
-		}
+		$data{$field{fieldName}} = WebGUI::FormProcessor::process($field{fieldName},$field{dataType});
 		if ($field{required} && $data{$field{fieldName}} eq "") {
 			$error .= '<li>';
 			$error .= eval $field{fieldLabel};
@@ -304,7 +300,7 @@ sub www_editProfile {
 			} else {
 				$subtext = "";
 			}
-                        if ($method eq "select") {
+                        if ($method eq "selectList") {
                         	# note: this big if statement doesn't look elegant, but doing regular
 				# ORs caused problems with the array reference.
 				if ($session{form}{$data{fieldName}}) {

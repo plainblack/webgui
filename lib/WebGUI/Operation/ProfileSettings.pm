@@ -197,19 +197,11 @@ sub www_editProfileField {
 		-label=>WebGUI::International::get(474,"WebGUI/Profile"),
 		-value=>$data{required}
 		);
-	tie %hash, 'Tie::IxHash';
-	%hash = (	'text'=>WebGUI::International::get(475), 
-			'textarea'=>WebGUI::International::get(476), 
-			'HTMLArea'=>WebGUI::International::get(477), 
-			'url'=>WebGUI::International::get(478), 
-			'date'=>WebGUI::International::get(479), 
-			'email'=>WebGUI::International::get(480),
-			'phone'=>WebGUI::International::get(481),
-			'integer'=>WebGUI::International::get(482),
-			'yesNo'=>WebGUI::International::get(483),
-			'select'=>WebGUI::International::get(484)
+	$f->fieldType(
+		-name=>"dataType",
+		-label=>WebGUI::International::get(486),
+		-value=>[$data{dataType} || "text"]
 		);
-	$f->select("dataType",\%hash,WebGUI::International::get(486),[$data{dataType}]);
 	$f->textarea("dataValues",WebGUI::International::get(487),$data{dataValues});
 	$f->textarea("dataDefault",WebGUI::International::get(488),$data{dataDefault});
 	tie %hash, 'Tie::CPHash';
