@@ -52,8 +52,9 @@ sub _accountOptions {
 		WebGUI::International::get(343).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
 	$output .= '<li><a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
+
 	$output .= '<li><a href="'.WebGUI::URL::page('op=deactivateAccount').'">'.
-		WebGUI::International::get(65).'</a>';
+		WebGUI::International::get(65).'</a>' if ($session{setting}{selfDeactivation});
 	$output .= '</ul></div>';
 	return $output;
 }
@@ -241,13 +242,15 @@ sub www_deactivateAccount {
                 $output = www_displayLogin();
         } elsif ($session{user}{userId} < 26) {
 		$output = WebGUI::Privilege::vitalComponent();
-        } else {
+        } elsif ($session{setting}{selfDeactivation}) {
                 $output = '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(60).'<p>';
                 $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deactivateAccountConfirm').'">'.
 			WebGUI::International::get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(45).'</a></div>';
-        }
+        } else {
+		$output = WebGUI::Privilege::adminOnly();
+	}
         return $output;
 }
 
@@ -256,7 +259,7 @@ sub www_deactivateAccountConfirm {
 	my ($u);
         if ($session{user}{userId} < 26) {
                 return WebGUI::Privilege::vitalComponent();
-        } elsif ($session{user}{userId} != 1) {
+        } elsif (($session{user}{userId} != 1) and $session{setting}{selfDeactivation}) {
 		$u = WebGUI::User->new($session{user}{userId});
 		$u->delete;
 	        WebGUI::Session::end($session{var}{sessionId});

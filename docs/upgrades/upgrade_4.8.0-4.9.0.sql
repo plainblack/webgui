@@ -30,4 +30,4 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into settings (name,value) values ('smbPDC','your PDC');
 insert into settings (name,value) values ('smbBDC','your BDC');
 insert into settings (name,value) values ('smbDomain','your NT Domain');
-
+insert into settings (name,value) values ('selfDeactivation',1);
