@@ -75,20 +75,22 @@ sub _traversePageTree {
         }
         $a = WebGUI::SQL->read("select * from page where (pageId<2 or pageId>25) and parentId='$_[0]' order by sequenceNumber");
         while (%page = $a->hash) {
-                $output .= $depth
-			.pageIcon()
-			.deleteIcon('op=deletePage',$page{urlizedTitle})
-			.editIcon('op=editPage',$page{urlizedTitle})
-			.' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
-		$b = WebGUI::SQL->read("select * from wobject where pageId=$page{pageId}");
-		while (%wobject = $b->hash) {
-                	$output .= $depth.$spacer
-				.wobjectIcon()
-				.deleteIcon('func=delete&wid='.$wobject{wobjectId},$page{urlizedTitle})
-				.editIcon('func=edit&wid='.$wobject{wobjectId},$page{urlizedTitle})
-				.' '. $wobject{title}.'<br>';
+		if (WebGUI::Privilege::canEditPage($page{pageId})) {
+                	$output .= $depth
+				.pageIcon()
+				.deleteIcon('op=deletePage',$page{urlizedTitle})
+				.editIcon('op=editPage',$page{urlizedTitle})
+				.' <a href="'.WebGUI::URL::gateway($page{urlizedTitle}).'">'.$page{title}.'</a><br>';
+			$b = WebGUI::SQL->read("select * from wobject where pageId=$page{pageId}");
+			while (%wobject = $b->hash) {
+                		$output .= $depth.$spacer
+					.wobjectIcon()
+					.deleteIcon('func=delete&wid='.$wobject{wobjectId},$page{urlizedTitle})
+					.editIcon('func=edit&wid='.$wobject{wobjectId},$page{urlizedTitle})
+					.' '. $wobject{title}.'<br>';
+			}
+			$b->finish;
 		}
-		$b->finish;
                 $output .= _traversePageTree($page{pageId},$_[1]+1);
         }
         $a->finish;

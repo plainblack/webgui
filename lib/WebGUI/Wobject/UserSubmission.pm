@@ -434,9 +434,7 @@ sub www_editSubmission {
 		$submission->{convertCarriageReturns} = 1;
 		$submission->{userId} = $session{user}{userId};
 	}
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) 
-	 || $submission->{userId} == $session{user}{userId} 
-	 || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) || $submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output = '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("wid",$session{form}{wid});
@@ -472,8 +470,7 @@ sub www_editSubmission {
 sub www_editSubmissionSave {
 	my ($sqlAdd,$submission,$image,$attachment,$title,$u);
 	$submission = $_[0]->getCollateral("UserSubmission_submission","submissionId",$session{form}{sid});
-        if ($submission->{owner} == $session{user}{userId} || ($submission->{submissionId} eq "new" 
-		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
+        if ($submission->{userId} == $session{user}{userId} || ($submission->{submissionId} eq "new" && WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
 		if ($submission->{submissionId} eq "new") {
 			$session{form}{sid} = getNextId("submissionId");
 			WebGUI::SQL->write("insert into UserSubmission_submission (wobjectId,submissionId,userId,username) 
