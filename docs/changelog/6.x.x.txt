@@ -41,6 +41,8 @@
  - Bugfix: [ 996592 ] Fixed Infinite loop in Page.pm makeUnique in 6.1.1
  - Converted all IDs to use global unique ids rather than incremented ids as
    they were in the past.
+ - BugFix: [ 999799 ] Fixed Package deletion/copy bug in 6.1.1
+ - BugFix: [ 997885 ] Root move left bug. 
 
 
 6.1.1
