@@ -296,6 +296,116 @@ our $I18N = {
 		lastUpdated => 1109696029,
 	},
 
+	'system template' => {
+		message => q|Collaboration System Template|,
+		lastUpdated => 1109698614,
+	},
+
+	'thread template' => {
+		message => q|Thread Template|,
+		lastUpdated => 1109698614,
+	},
+
+	'post template' => {
+		message => q|Post Form Template|,
+		lastUpdated => 1109698614,
+	},
+
+	'search template' => {
+		message => q|Search Template|,
+		lastUpdated => 1109698614,
+	},
+
+	'notification template' => {
+		message => q|Notification Template|,
+		lastUpdated => 1109698614,
+	},
+
+	'who moderates' => {
+		message => q|Who can moderate?|,
+		lastUpdated => 1109698614,
+	},
+
+	'who posts' => {
+		message => q|Who can post?|,
+		lastUpdated => 1109698614,
+	},
+
+	'threads/page' => {
+		message => q|Threads Per Page|,
+		lastUpdated => 1109698614,
+	},
+
+	'posts/page' => {
+		message => q|Posts Per Page|,
+		lastUpdated => 1109698614,
+	},
+
+	'karma/post' => {
+		message => q|Karma Per Post|,
+		lastUpdated => 1109698614,
+	},
+
+	'filter code' => {
+		message => q|Filter Code|,
+		lastUpdated => 1109698614,
+	},
+
+	'sort by' => {
+		message => q|Sort By|,
+		lastUpdated => 1109698614,
+	},
+
+	'sort order' => {
+		message => q|Sort Order|,
+		lastUpdated => 1109698614,
+	},
+
+	'archive after' => {
+		message => q|Archive After|,
+		lastUpdated => 1109698614,
+	},
+
+	'attachments/post' => {
+		message => q|Attachments Per Post|,
+		lastUpdated => 1109698614,
+	},
+
+	'edit timeout' => {
+		message => q|Edit Timeout|,
+		lastUpdated => 1109698614,
+	},
+
+	'allow replies' => {
+		message => q|Allow Replies|,
+		lastUpdated => 1109698614,
+	},
+
+	'edit stamp' => {
+		message => q|Add edit stamp to posts?|,
+		lastUpdated => 1109698614,
+	},
+
+	'rich edit' => {
+		message => q|Allow rich edit?|,
+		lastUpdated => 1109698614,
+	},
+
+	'content filter' => {
+		message => q|Use content filter?|,
+		lastUpdated => 1109698614,
+	},
+
+	'preview' => {
+		message => q|Use preview?|,
+		lastUpdated => 1109698614,
+	},
+
+	'moderate' => {
+		message => q|Moderate posts?|,
+		lastUpdated => 1109698614,
+	},
+
 };
 
 1;

@@ -376,57 +376,57 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('collaborationTemplateId'),
       		-namespace=>"Collaboration",
-		-label=>"Collaboration System Template",
+		-label=>WebGUI::International::get('system template', 'Collaboration'),
 		-name=>"collaborationTemplateId"
    		);
         $tabform->getTab("display")->template(
                 -name=>"threadTemplateId",
                 -value=>$self->getValue("threadTemplateId"),
                 -namespace=>"Collaboration/Thread",
-                -label=>"Thread Template"
+		-label=>WebGUI::International::get('thread template', 'Collaboration'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"postFormTemplateId",
                 -value=>$self->getValue("postFormTemplateId"),
                 -namespace=>"Collaboration/PostForm",
-                -label=>"Post Form Template"
+		-label=>WebGUI::International::get('post template', 'Collaboration'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"searchTemplateId",
                 -value=>$self->getValue("SearchTemplateId"),
                 -namespace=>"Collaboration/Search",
-                -label=>"Search Template"
+		-label=>WebGUI::International::get('search template', 'Collaboration'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"notificationTemplateId",
                 -value=>$self->getValue("notificationTemplateId"),
                 -namespace=>"Collaboration/Notification",
-                -label=>"Notification Template"
+		-label=>WebGUI::International::get('notification template', 'Collaboration'),
                 );
         $tabform->getTab("security")->group(
 		-name=>"moderateGroupId",
-		-label=>"Who can moderate?",
+		-label=>WebGUI::International::get('who moderates', 'Collaboration'),
 		-value=>[$self->getValue("moderateGroupId")]
 		);
         $tabform->getTab("security")->group(
 		-name=>"postGroupId",
-		-label=>"Who can post?",
+		-label=>WebGUI::International::get('who posts', 'Collaboration'),
 		-value=>[$self->getValue("postGroupId")]
 		);
         $tabform->getTab("display")->integer(
 		-name=>"threadsPerPage",
-		-label=>"Threads Per Page",
+		-label=>WebGUI::International::get('threads/page', 'Collaboration'),
 		-value=>$self->getValue("threadsPerPage")
 		);
         $tabform->getTab("display")->integer(
 		-name=>"postsPerPage",
-		-label=>"Posts Per Page",
+		-label=>WebGUI::International::get('posts/page', 'Collaboration'),
 		-value=>$self->getValue("postsPerPage")
 		);
         if ($session{setting}{useKarma}) {
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaPerPost",
-			-label=>"Karma Per Post",
+			-label=>WebGUI::International::get('karma/post', 'Collaboration'),
 			-value=>$self->getValue("karmaPerPost")
 			);
         } else {
@@ -435,7 +435,7 @@ sub getEditForm {
 	$tabform->getTab("security")->filterContent(
 		-value=>$self->getValue("filterCode"),
 		-name=>"filterCode",
-		-label=>"Filter Code"
+		-label=>WebGUI::International::get('filter code', 'Collaboration'),
 		);
 	$tabform->getTab("display")->selectList(
 		-name=>"sortBy",
@@ -451,7 +451,7 @@ sub getEditForm {
 			userDefined5=>"User Defined 5",
 			title=>"Title"
 			},
-		-label=>"Sort By"
+		-label=>WebGUI::International::get('sort by', 'Collaboration'),
 		);
 	$tabform->getTab("display")->selectList(
 		-name=>"sortOrder",
@@ -460,51 +460,51 @@ sub getEditForm {
 			asc=>"Ascending",
 			desc=>"Descending"
 			},
-		-label=>"Sort Order"
+		-label=>WebGUI::International::get('sort order', 'Collaboration'),
 		);
         $tabform->getTab("properties")->interval(
 		-name=>"archiveAfter",
-		-label=>"Archive After",
+		-label=>WebGUI::International::get('archive after', 'Collaboration'),
 		-value=>$self->getValue("archiveAfter")
 		);
         $tabform->getTab("properties")->integer(
 		-name=>"attachmentsPerPost",
-		-label=>"Attachments Per Post",
+		-label=>WebGUI::International::get('attachments/post', 'Collaboration'),
 		-value=>$self->getValue("attachmentsPerPost")
 		);
         $tabform->getTab("security")->interval(
 		-name=>"editTimeout",
-		-label=>"Edit Timeout",
+		-label=>WebGUI::International::get('edit timeout', 'Collaboration'),
 		-value=>$self->getValue("editTimeout")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"allowReplies",
-		-label=>"Allow replies?",
+		-label=>WebGUI::International::get('allow replies', 'Collaboration'),
 		-value=>$self->getValue("allowReplies")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"addEditStampToPosts",
-		-label=>"Add edit stamp to posts?",
+		-label=>WebGUI::International::get('edit stamp', 'Collaboration'),
 		-value=>$self->getValue("addEditStampToPosts")
 		);
         $tabform->getTab("display")->yesNo(
 		-name=>"allowRichEdit",
-		-label=>"Allow rich edit?",
+		-label=>WebGUI::International::get('rich edit', 'Collaboration'),
 		-value=>$self->getValue("allowRichEdit")
 		);
         $tabform->getTab("display")->yesNo(
 		-name=>"useContentFilter",
-		-label=>"Use content filter?",
+		-label=>WebGUI::International::get('content filter', 'Collaboration'),
 		-value=>$self->getValue("useContentFilter")
 		);
         $tabform->getTab("properties")->yesNo(
 		-name=>"usePreview",
-		-label=>"Use preview?",
+		-label=>WebGUI::International::get('preview', 'Collaboration'),
 		-value=>$self->getValue("usePreview")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"moderatePosts",
-		-label=>"Moderate posts?",
+		-label=>WebGUI::International::get('moderate', 'Collaboration'),
 		-value=>$self->getValue("moderatePosts")
 		);
 	return $tabform;
