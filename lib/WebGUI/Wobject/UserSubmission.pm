@@ -33,6 +33,10 @@ our @ISA = qw(WebGUI::Wobject);
 our $namespace = "UserSubmission";
 our $name = WebGUI::International::get(29,$namespace);
 
+our %submissionStatus =("Approved"=>WebGUI::International::get(7,$namespace),
+	"Denied"=>WebGUI::International::get(8,$namespace),
+	"Pending"=>WebGUI::International::get(9,$namespace));
+
 #-------------------------------------------------------------------
 sub _canEditMessage {
         my (%message);
@@ -89,6 +93,7 @@ sub duplicate {
 		allowDiscussion=>$_[0]->get("allowDiscussion"),
 		editTimeout=>$_[0]->get("editTimeout"),
 		groupToPost=>$_[0]->get("groupToPost"),
+		displayThumbnails=>$_[0]->get("displayThumbnails"),
 		groupToModerate=>$_[0]->get("groupToModerate")
 		});
         $sth = WebGUI::SQL->read("select * from UserSubmission_submission where wobjectId=".$_[0]->get("wobjectId"));
@@ -121,7 +126,7 @@ sub purge {
 #-------------------------------------------------------------------
 sub set {
         $_[0]->SUPER::set($_[1],[qw(submissionsPerPage groupToContribute groupToApprove defaultStatus groupToModerate 
-		groupToPost editTimeout allowDiscussion)]);
+		groupToPost displayThumbnails editTimeout allowDiscussion)]);
 }
 
 #-------------------------------------------------------------------
@@ -240,8 +245,7 @@ sub www_denySubmission {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($output, %hash, $f, $defaultStatus, $submissionsPerPage, $groupToApprove, $groupToModerate);
-	tie %hash, 'Tie::IxHash';
+        my ($output, $f, $defaultStatus, $submissionsPerPage, $groupToApprove, $groupToModerate);
 	$groupToApprove = $_[0]->get("groupToApprove") || 4;
 	$groupToModerate = $_[0]->get("groupToModerate") || 4;
 	$submissionsPerPage = $_[0]->get("submissionsPerPage") || 50;
@@ -253,10 +257,8 @@ sub www_edit {
                 $f->group("groupToApprove",WebGUI::International::get(1,$namespace),[$groupToApprove]);
                 $f->group("groupToContribute",WebGUI::International::get(2,$namespace),[$_[0]->get("groupToContribute")]);
                 $f->integer("submissionsPerPage",WebGUI::International::get(6,$namespace),$submissionsPerPage);
-                %hash = ("Approved"=>WebGUI::International::get(7,$namespace),
-			"Denied"=>WebGUI::International::get(8,$namespace),
-			"Pending"=>WebGUI::International::get(9,$namespace));
-                $f->select("defaultStatus",\%hash,WebGUI::International::get(10,$namespace),[$defaultStatus]);
+                $f->select("defaultStatus",\%submissionStatus,WebGUI::International::get(10,$namespace),[$defaultStatus]);
+		$f->yesNo("displayThumbnails",WebGUI::International::get(51,$namespace),$_[0]->get("displayThumbnails"));
 		$f->yesNo("allowDiscussion",WebGUI::International::get(48,$namespace),$_[0]->get("allowDiscussion"));
 		$f->integer("editTimeout",WebGUI::International::get(49,$namespace),$_[0]->get("editTimeout"));
 		$f->group("groupToPost",WebGUI::International::get(50,$namespace),[$_[0]->get("groupToPost")]);
@@ -280,7 +282,8 @@ sub www_editSave {
 			groupToModerate=>$session{form}{groupToModerate},
 			groupToPost=>$session{form}{groupToPost},
 			editTimeout=>$session{form}{editTimeout},
-			allowDiscussion=>$session{form}{allowDiscussion}
+			allowDiscussion=>$session{form}{allowDiscussion},
+			displayThumbnails=>$session{form}{displayThumbnails}
 			});
                 return "";
         } else {
@@ -458,9 +461,9 @@ sub www_showMessage {
 			'&sid='.$session{form}{sid}).'">'.WebGUI::International::get(45,$namespace).'</a><br>';
                 $html .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
                 $html .= '</tr><tr><td class="tableData">';
-                $html .= $message{message};
-                $html .= '</td></tr></table>';
+                $html .= $message{message}.'<p>';
                 $html .= _showReplies();
+                $html .= '</td></tr></table>';
         } else {
                 $html = WebGUI::International::get(402);
         }
@@ -469,19 +472,33 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (@submission, $output, $sth, @row, $i, $p);
+	my (%submission, $image, $output, $sth, @row, $i, $p);
 	$output = $_[0]->displayTitle;
         $output .= $_[0]->description;
 	$output = $_[0]->processMacros($output);
-	$sth = WebGUI::SQL->read("select title,submissionId,dateSubmitted,username,userId from UserSubmission_submission 
-		where wobjectId=".$_[0]->get("wobjectId")." and status='Approved' order by dateSubmitted desc");
-	while (@submission = $sth->array) {
-		$submission[0] = WebGUI::HTML::filter($submission[0],'all');
-		$row[$i] = '<tr><td class="tableData"><a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").
-			'&func=viewSubmission&sid='.$submission[1]).'">'.$submission[0].
-			'</a></td><td class="tableData">'.epochToHuman($submission[2],"%z").
+	$sth = WebGUI::SQL->read("select * from UserSubmission_submission 
+		where wobjectId=".$_[0]->get("wobjectId")." and (status='Approved' or userId=$session{user}{userId}) order by dateSubmitted desc");
+	while (%submission = $sth->hash) {
+		$submission{title} = WebGUI::HTML::filter($submission{title},'all');
+		$row[$i] = '<tr><td class="tableData">
+			<a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='.$submission{submissionId}).'">
+			'.$submission{title}.'</a>';
+		if ($submission{userId} == $session{user}{userId}) {
+			$row[$i] .= ' ('.$submissionStatus{$submission{status}}.')';
+		}
+		$row[$i] .= '</td>';
+		if ($_[0]->get("displayThumbnails")) {
+			if ($submission{image} ne "") {
+				$image = WebGUI::Attachment->new($submission{image},$_[0]->get("wobjectId"),$submission{submissionId});
+				$row[$i] .= '<td class="tableData"><a href="'.WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='
+					.$submission{submissionId}).'"><img src="'.$image->getThumbnail.'" border="0"></a></td>';
+			} else {
+				$row[$i] .= '<td class="tableData"></td>';
+			}
+		}
+		$row[$i] .= '<td class="tableData">'.epochToHuman($submission{dateSubmitted},"%z").
 			'</td><td class="tableData"><a href="'.WebGUI::URL::page('op=viewProfile&uid='.
-			$submission[4]).'">'.$submission[3].'</a></td></tr>';
+			$submission{userId}).'">'.$submission{username}.'</a></td></tr>';
 		$i++;
 	}
 	$sth->finish;
@@ -490,8 +507,11 @@ sub www_view {
 		$_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a></td></tr></table>';
         $p = WebGUI::Paginator->new(WebGUI::URL::page(),\@row,$_[0]->get("submissionsPerPage"));
 	$output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
-	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99).
-		'</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).
+	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(99);
+	if ($_[0]->get("displayThumbnails")) {
+		$output .= '<td class="tableHeader">'.WebGUI::International::get(52,$namespace).'</td>';
+	}
+	$output .= '</td><td class="tableHeader">'.WebGUI::International::get(13,$namespace).
 		'</td><td class="tableHeader">'.WebGUI::International::get(21,$namespace).'</td></tr>';
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
@@ -551,19 +571,10 @@ sub www_viewSubmission {
 		$file = WebGUI::Attachment->new($submission{attachment},$session{form}{wid},$session{form}{sid});
 		$output .= $file->box;
         }		
-	$output .= '</td></tr></table>';
         if ($_[0]->get("allowDiscussion")) {
-                ($replies) = WebGUI::SQL->quickArray("select count(*) from discussion 
-			where wobjectId=".$_[0]->get("wobjectId")." and subId=".$session{form}{sid});
-                $output .= '<p><table width="100%" cellspacing="2" cellpadding="1" border="0">';
-                $output .= '<tr><td align="center" width="50%" class="tableMenu"><a href="'.
-                        WebGUI::URL::page('func=showMessage&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid}).'">'.
-                        WebGUI::International::get(46,$namespace).' ('.$replies.')</a></td>';
-                $output .= '<td align="center" width="50%" class="tableMenu"><a href="'.
-                        WebGUI::URL::page('func=postNewMessage&wid='.$_[0]->get("wobjectId").'&sid='.$session{form}{sid}).'">'.
-                        WebGUI::International::get(47,$namespace).'</a></td></tr>';
-                $output .= '</table>';
+		$output .= _showReplies();
         }
+	$output .= '</td></tr></table>';
 	return $output;
 }
 

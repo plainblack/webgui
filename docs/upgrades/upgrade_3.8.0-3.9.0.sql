@@ -57,12 +57,15 @@ INSERT INTO international VALUES (41,'UserSubmission','English','Date');
 INSERT INTO international VALUES (42,'UserSubmission','English','Edit Response');
 INSERT INTO international VALUES (43,'UserSubmission','English','Delete Response');
 INSERT INTO international VALUES (45,'UserSubmission','English','Return to Submission');
-INSERT INTO international VALUES (46,'UserSubmission','English','View Responses');
+INSERT INTO international VALUES (46,'UserSubmission','English','Read more...');
 INSERT INTO international VALUES (47,'UserSubmission','English','Post a Response');
 INSERT INTO international VALUES (48,'UserSubmission','English','Allow discussion?');
 INSERT INTO international VALUES (49,'UserSubmission','English','Edit Timeout');
 INSERT INTO international VALUES (50,'UserSubmission','English','Group To Post');
 INSERT INTO international VALUES (44,'UserSubmission','English','Group To Moderate');
+INSERT INTO international VALUES (51,'UserSubmission','English','Display thumbnails?');
+alter table UserSubmission add column displayThumbnails int not null default 0;
+INSERT INTO international VALUES (52,'UserSubmission','English','Thumbnail');
 
 
 
