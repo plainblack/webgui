@@ -18,6 +18,7 @@ package WebGUI::MessageLog;
 use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Mail;
@@ -118,7 +119,7 @@ The addressee email address. Defaults to company email.
 
 sub addEntry {
         my ($u, @users, $messageLogId, $sth, $userId, $groupId, $subject, $message, $url, $status, $user, $from);
-	$messageLogId = getNextId("messageLogId");
+	$messageLogId = WebGUI::Id::generate();
 	$userId = $_[0];
 	$groupId = $_[1];
 	$subject = $_[2];
@@ -127,14 +128,14 @@ sub addEntry {
 	$status = $_[5];
 	$from = $_[6];
 	if ($groupId ne "") {
-		@users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
+		@users = WebGUI::SQL->buildArray("select userId from groupings where groupId=".quote($groupId));
 	}
 	@users = ($userId,@users) if ($userId ne "" && !isIn($userId, @users));
 	foreach $user (@users) {
 		$u = WebGUI::User->new($user);
 		if ($u->userId ne "") {
 			WebGUI::SQL->write("insert into messageLog (messageLogId, userId, message, url, dateOfEntry,
-				subject, status) values ($messageLogId,".$u->userId.",
+				subject, status) values (".quote($messageLogId).",".quote($u->userId).",
 				".quote($message).",".quote($url).",".time().",".quote($subject).", ".quote($status).")");
 			if ($url ne "") {
 				$message .= "\n".WebGUI::URL::append($url,'mlog='.$messageLogId);
@@ -186,17 +187,20 @@ Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
 
 sub addInternationalizedEntry {
         my ($u, $userId, $url, $groupId, $internationalId, @users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace, $status);
-        $messageLogId = getNextId("messageLogId");
+        $messageLogId = WebGUI::Id::generate();
 	$userId = $_[0];
 	$groupId = $_[1];
 	$url = $_[2];
 	$internationalId = $_[3];
         $namespace = $_[4] || "WebGUI";
 	$status = $_[5] || 'notice';
-        %message = WebGUI::SQL->buildHash("select languageId,message from international where internationalId=$internationalId and namespace='$namespace'");
-        %subject = WebGUI::SQL->buildHash("select languageId,message from international where internationalId=523 and namespace='WebGUI'");
+	my $languages = WebGUI::International::getLanguages();
+	foreach my $language (keys $languages) {
+		$message{$language} = WebGUI::International::get($internationalId,$namespace,$language);
+		$subject{$language} = WebGUI::International::get(523,"WebGUI",$language);
+	}
         if ($groupId ne "") {
-                @users = WebGUI::SQL->buildArray("select userId from groupings where groupId=$groupId");
+                @users = WebGUI::SQL->buildArray("select userId from groupings where groupId=".quote($groupId));
         }
 	@users = ($userId,@users) if ($userId ne "" && !isIn($userId, @users));
         foreach $user (@users) {
@@ -206,7 +210,7 @@ sub addInternationalizedEntry {
                         $subject = $subject{$u->profileField("language")};
                         $message{$u->profileField("language")} = $message{1} if ($message{$u->profileField("language")} eq "");
                         $message = WebGUI::Macro::process($message{$u->profileField("language")});
-                        WebGUI::SQL->write("insert into messageLog values ($messageLogId,".$u->userId.",
+                        WebGUI::SQL->write("insert into messageLog values (".quote($messageLogId).",".quote($u->userId).",
                                 ".quote($message).",".quote($url).",".time().",".quote($message).",".quote($status).")");
                         if ($url ne "") {
                                 $message .= "\n".WebGUI::URL::append($url,'mlog='.$messageLogId);
@@ -233,7 +237,7 @@ The id of the message to complete.
 =cut
 
 sub completeEntry {
-	WebGUI::SQL->write("update messageLog set status='completed', dateOfEntry=".time()." where messageLogId='$_[0]'");
+	WebGUI::SQL->write("update messageLog set status='completed', dateOfEntry=".time()." where messageLogId=".quote($_[0]));
 }
 
 
