@@ -638,7 +638,7 @@ sub hiddenList {
 =cut
 
 sub HTMLArea {
-        my ($output, $value);
+        my ($output, $rows, $columns);
         $output = '<script language="JavaScript">function fixChars(element) {element.value = element.value.replace(/~V/mg,"-");}</script>';
 	if ($session{setting}{richEditor} eq "edit-on-pro") {
 		$output .= '<script language="JavaScript">
@@ -649,30 +649,30 @@ sub HTMLArea {
 			}
 			</script>';
 	} else {
-	        $output .= '<script language="JavaScript">
-        	       var formObj;
-	               var extrasDir="'.$session{config}{extras}.'";
-        	       function openEditWindow(obj) {
-	               formObj = obj;
-        	       if (navigator.userAgent.substr(navigator.userAgent.indexOf("MSIE")+5,1)>=5)
-                	 window.open("'.$session{config}{extras}.'/ieEdit.html","editWindow","width=490,height=400,resizable=1");
-	               else
-        	         window.open("'.$session{config}{extras}.'/nonIeEdit.html","editWindow","width=500,height=410");
-	               }
-        	       function setContent(content) {
-                	 formObj.value = content;
-	               } </script>';
-	}
-        $output .= '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'.
-        	WebGUI::International::get(171).'" style="font-size: 8pt;">'."<br>\n";
-	$output .= textarea({
-		name=>$_[0]->{name},
-		value=>$_[0]->{value},
-		wrap=>$_[0]->{wrap},
-		columns=>$_[0]->{columns},
-		rows=>$_[0]->{rows},
-		extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')"'
-		});
+	 	$output .= '<script language="Javascript1.2" src="'.$session{config}{extras}.'/htmlArea/editor.js"></script>'."\n";
+                $output .= '<script>'."\n";
+                $output .= '_editor_url = "'.$session{config}{extras}.'/htmlArea/";'."\n";
+                $output .= '</script>'."\n";
+        }
+        if ($session{setting}{richEditor} ne "built-in") {
+           	$output .= '<input type="button" onClick="openEditWindow(this.form.'.$_[0]->{name}.')" value="'.
+                      WebGUI::International::get(171).'" style="font-size: 8pt;"><br>';
+        }
+	$rows = $_[0]->{rows} || ($session{setting}{textAreaRows}+7);
+	$columns = $_[0]->{rows} || ($session{setting}{textAreaCols}+5);
+        $output .= textarea({
+                name=>$_[0]->{name},
+                value=>$_[0]->{value},
+                wrap=>$_[0]->{wrap},
+                columns=>$columns,
+                rows=>$rows,
+                extras=>$_[0]->{extras}.' onBlur="fixChars(this.form.'.$_[0]->{name}.')"'
+                });
+        if ($session{setting}{richEditor} eq "built-in") {
+            	$output .= '<script language="Javascript1.2">'."\n";
+            	$output .= 'editor_generate("'.$_[0]->{name}.'");'."\n";
+            	$output .= '</script>'."\n";
+        }
 	return $output;	
 }
 

@@ -20,6 +20,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Andy Grundman
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / ProcoliX
+                                     Len Kranendonk
                                      Christophe Marcant
                                      Tavis Parker / ParkerOne Consulting
                                      Daniel Quinlan
@@ -45,7 +46,7 @@ to WebGUI, but who's work has made WebGUI possible:
 
 Perl.................................Larry Wall / O'Reilly
 
-IE Rich Edit.........................Brattli
+Rich Edit............................interactivetools.com
 
 Data::Config.........................Sébastien Aperghis-Tramoni
 

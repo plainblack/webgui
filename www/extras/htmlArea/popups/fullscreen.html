@@ -1,0 +1,96 @@
+<html STYLE="width: 640px; height: 480px; ">
+<head><title>Fullscreen Editor</title>
+<style type="text/css"> body {	margin: 0px; border: 0px; background-color: buttonface; } </style>
+
+<script>
+
+// if we pass the "window" object as a argument and then set opener to
+// equal that we can refer to dialogWindows and popupWindows the same way
+opener = window.dialogArguments;
+
+var _editor_url = "../";
+document.write('<scr'+'ipt src="' +_editor_url+ 'editor.js" language="Javascript1.2"></scr'+'ipt>');
+
+var objname        = location.search.substring(1,location.search.length);
+var config         = opener.document.all[objname].config;
+var editor_obj     = opener.document.all["_" +objname+  "_editor"];       // html editor object
+var parent_editdoc = editor_obj.contentWindow.document;                          // get iframe editor document object
+
+function _CloseOnEsc() {
+  if (event.keyCode == 27) {
+    update_parent();
+    window.close();
+    return;
+  }
+}
+
+/* ---------------------------------------------------------------------- *\
+  Function    : 
+  Description : 
+\* ---------------------------------------------------------------------- */
+
+function resize_editor() {  // resize editor to fix window
+  var editor          = document.all['_editor_editor'];
+
+  newWidth  = document.body.offsetWidth;
+  newHeight = document.body.offsetHeight - editor.offsetTop;
+
+  if (newWidth < 0) { newWidth = 0; }
+  if (newHeight < 0) { newHeight = 0; }
+
+  editor.style.width  = newWidth;
+  editor.style.height = newHeight;
+
+}
+
+
+/* ---------------------------------------------------------------------- *\
+  Function    : 
+  Description : 
+\* ---------------------------------------------------------------------- */
+
+function init() {
+
+
+
+  // change maximize button to minimize button
+  config.btnList["popupeditor"] = ['popupeditor', 'Minimize Editor', 'update_parent(); window.close();', 'fullscreen_minimize.gif'];
+  config.imgURL = "../images/";
+  
+  editor_generate('editor', config);
+
+  resize_editor();
+
+  // set default contents
+  popup_editdoc  = document.all['_editor_editor'].contentWindow.document;
+  popup_editdoc.body.innerHTML = parent_editdoc.body.innerHTML;
+
+  // continuously update parent editor window
+  window.setInterval(update_parent, 333);
+
+  // setup event handlers
+  document.body.onkeypress = _CloseOnEsc;
+  window.onresize = resize_editor;
+
+
+}
+
+/* ---------------------------------------------------------------------- *\
+  Function    : 
+  Description : 
+\* ---------------------------------------------------------------------- */
+
+function update_parent() {
+  parent_editdoc.body.innerHTML = popup_editdoc.body.innerHTML;
+}
+
+
+</script>
+</head>
+<body scroll="no" onload="init()" onunload="update_parent()">
+
+<div style="margin: 0 0 0 0; border-width: 1; border-style: solid; border-color: threedshadow threedhighlight threedhighlight threedshadow; "></div>
+
+<textarea name="editor" style="width:100%; height:300px"></textarea><br>
+
+</body></html>

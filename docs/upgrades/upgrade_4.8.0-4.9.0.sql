@@ -25,10 +25,9 @@ alter table discussion add column userDefined2 varchar(255);
 alter table discussion add column userDefined3 varchar(255);
 alter table discussion add column userDefined4 varchar(255);
 alter table discussion add column userDefined5 varchar(255);
-
---- SMB authentication module ----------------------------------------------
+delete from international where languageId=1 and namespace='WebGUI' and internationalId=495;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (495,1,'WebGUI','htmlArea (default)', 1038159820);
 insert into settings (name,value) values ('smbPDC','your PDC');
 insert into settings (name,value) values ('smbBDC','your BDC');
 insert into settings (name,value) values ('smbDomain','your NT Domain');
-----------------------------------------------------------------------------
 

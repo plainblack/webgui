@@ -1,0 +1,100 @@
+<html style="width:600px; Height: 50px;">
+ <head>
+  <title>Insert WebGUI macro</title>
+<script language="javascript">
+
+function returnSelected(in_values) {
+  var text = in_values;
+
+  window.returnValue = text;          // set return value
+  window.close();                     // close dialog
+}
+
+</script>
+</head>
+<body bgcolor="#D6D3CE" topmargin=15 leftmargin=0>
+<form name="macros" method=get onSubmit="Set(document.all.ColorHex.value); return false;">
+<div align=center>
+<select name="textPulldown" onchange="returnSelected(this.value)">
+<option value=''>Menus and navigation...</option>
+<option value='^FlexMenu;'>FlexMenu</option>
+<option value='^M;'>Current Menu (Vertical)</option>
+<option value='^m;'>Current Menu (Horizontal)</option>
+<option value='^P;'>Previous Menu (Vertical)</option>
+<option value='^p;'>Previous Menu (Horizontal)</option>
+<option value='^rootmenu;'>Root Menu (Horizontal)</option>
+<option value='^S("home",0);'>Specific SubMenu (Vertical)</option>
+<option value='^s("home");'>Specific SubMenu (Horizontal)</option>
+<option value='^Synopsis;'>Synopsis Menu</option>
+<option value='^T;'>Top Level Menu (Vertical)</option>
+<option value='^t;'>Top Level Menu (Horizontal)</option>
+<option value='^t;'>Top Level Menu (Horizontal)</option>
+<option value='^C;'>Crumb Trail</option>
+<option value='^H;'>Home Link</option>
+
+</select>
+
+<select onchange="returnSelected(this.value)">
+<option value=''>SQL...</option>
+<option value='^FormParam("phoneNumber");'>FormParam</option>
+<option value='^*(100);'>Random Number</option>
+<option value='^rownum;'>Row Number</option>
+<option value='SQL("select count(*) from users", "there are ^0; on this system.");'>SQL</option>
+<option value='^-;'>Begin/End looping</option>
+<option value='^0;'>Column 1</option>
+<option value='^1;'>Column 2</option>
+<option value='^2;'>Column 3</option>
+<option value='^3;'>Column 4</option>
+<option value='^4;'>Column 5</option>
+<option value='^5;'>Column 6</option>
+<option value='^6;'>Column 7</option>
+<option value='^7;'>Column 8</option>
+<option value='^8;'>Column 9</option>
+<option value='^9;'>Column 10</option>
+</select>
+<select onchange="returnSelected(this.value)">
+<option value=''>User/Group/Admin...</option>
+<option value='^a("Account Info");'>My Account Link</option>
+<option value='^AdminBar;'>AdminBar</option>
+<option value='^AdminText("You are in admin mode!");'>AdminText</option>
+<option value='^AdminToggle;'>AdminToggle</option>
+<option value='^GroupText("Visitors","You need an account to do anything cool on this site!");'>GroupText</option>
+<option value='^H("Go Home");'>Home Link</option>
+<option value='^L;'>Login Form</option>
+<option value='^LoginToggle;'>LoginToggle</option>
+<option value='^User("email");'>User Information</option>
+<option value='^@;'>Username</option>
+<option value='^#;'>User ID</option>
+</select>
+<select onchange="returnSelected(this.value)">
+<option value=''>Page/System/Info...</option>
+<option value='^c;'>Company Name</option>
+<option value='^D;'>Date</option>
+<option value='^e;'>Company Email Address</option>
+<option value='^Env("REMOTE_ADDR");'>Web Environment Variable</option>
+<option value='^Execute("/this/file.sh");'>Execute</option>
+<option value='^Extras;'>extras folder</option>
+<option value='^Include("/this/file.html");'>Include</option>
+<option value='^Page("urlizedTitle");'>Page Properties</option>
+<option value='^PageTitle;'>PageTitle</option>
+<option value='^r;'>Make Page Printable</option>
+<option value='^RootTitle;'>RootTitle</option>
+<option value='^*(100);'>Random Number</option>
+<option value='^u;'>Company URL</option>
+<option value='^URLEncode("Is this my string ?");'>URLEncode</option>
+<option value='^/;'>System URL</option>
+<option value='^\;'>Page URL</option>
+<option value='^?;'>Search Box</option>
+</select>
+
+<select onchange="returnSelected(this.value)">
+<option value=''>Images...</option>
+<option value='^I("imageName");'>Image Manager Image with Tag</option>
+<option value='^i("imageName");'>Image Manager Image Path</option>
+<option value='^Thumbnail("imageName");'>Thumbnail</option>
+<option value='^ThumbnailLinker("imageName");'>ThumbnailLinker</option>
+</select>
+
+</div>
+</form>
+</body></html>

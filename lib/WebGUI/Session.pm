@@ -355,7 +355,8 @@ sub refreshUserInfo {
 #-------------------------------------------------------------------
 sub setCookie {
         my $ttl = $_[2] || '+10y';
-        my $domain = $session{env}{SERVER_NAME} if ($session{env}{HTTP_USER_AGENT} =~ m/MSIE/i);
+        #my $domain = $session{env}{SERVER_NAME} if ($session{env}{HTTP_USER_AGENT} =~ m/MSIE/i);
+	my $domain;
         push @{$session{header}{cookie}}, $session{cgi}->cookie(
                 -name=>$_[0],
                 -value=>$_[1],
