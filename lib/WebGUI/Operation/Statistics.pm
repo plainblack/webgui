@@ -16,11 +16,11 @@ use HTTP::Headers;
 use LWP::UserAgent;
 use strict;
 use WebGUI::DateTime;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
@@ -118,7 +118,7 @@ sub www_viewStatistics {
 		$response = $userAgent->request($request);
 		$version = $response->content;
 		chomp $version;
-                $output .= helpLink(12);
+                $output .= helpIcon(12);
                 $output .= '<h1>'.WebGUI::International::get(437).'</h1>';
 		$output .= '<table>';
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(145).'</td><td class="tableData">'.$WebGUI::VERSION.' ('.WebGUI::International::get(349).': '.$version.')</td></tr>';

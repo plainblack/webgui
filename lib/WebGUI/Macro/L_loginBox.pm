@@ -11,7 +11,7 @@ package WebGUI::Macro::L_loginBox;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Form;
+use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Macro::Backslash_pageUrl;
 use WebGUI::Session;
@@ -24,7 +24,7 @@ sub _createURL {
 
 #-------------------------------------------------------------------
 sub _replacement {
-	my ($temp,$boxSize,@param,$text);
+	my ($temp,$boxSize,@param,$text,$f);
 	@param = WebGUI::Macro::getParams($_[0]);
         $temp = '<div class="loginBox">';
         if ($session{var}{sessionId}) {
@@ -46,17 +46,16 @@ sub _replacement {
 		}
 		if (index(lc($ENV{HTTP_USER_AGENT}),"msie") < 0) { 
 	   		$boxSize = int($boxSize=$boxSize*2/3);	
-		}
-        	$temp .= '<form method="post" action="'.WebGUI::URL::page().'"> ';
-                $temp .= WebGUI::Form::hidden("op","login").'<span class="formSubtext">';
-                $temp .= WebGUI::International::get(50);
-                $temp .= '<br></span>';
-                $temp .= WebGUI::Form::text("username",$boxSize,30).'<span class="formSubtext"><br>';
-                $temp .= WebGUI::International::get(51);
-                $temp .= '<br></span>';
-                $temp .= WebGUI::Form::password("identifier",$boxSize,30).'<span class="formSubtext"><br></span>';
-                $temp .= WebGUI::Form::submit(WebGUI::International::get(52));
-                $temp .= '</form>';
+		}	
+		$f = WebGUI::HTMLForm->new(1);
+		$f->hidden("op","login");
+		$f->raw('<span class="formSubtext">'.WebGUI::International::get(50).'<br></span>');
+                $f->text("username",'','','','','',$boxSize);
+		$f->raw('<span class="formSubtext"><br>'.WebGUI::International::get(51).'<br></span>');
+                $f->password("identifier",'','','','','',$boxSize);
+		$f->raw('<span class="formSubtext"><br></span>');
+		$f->submit(WebGUI::International::get(52));
+		$temp .= $f->print;
                 $temp .= '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(407).'</a>';
         }
         $temp .= '</div>';

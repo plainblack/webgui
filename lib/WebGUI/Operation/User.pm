@@ -16,11 +16,11 @@ use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
@@ -49,7 +49,7 @@ sub www_addUser {
         my ($output, %hash, $f);
 	tie %hash, 'Tie::IxHash';
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output .= helpLink(5);
+                $output .= helpIcon(5);
 		$output .= '<h1>'.WebGUI::International::get(163).'</h1>';
 		$f = WebGUI::HTMLForm->new;
 		if ($session{form}{op} eq "addUserSave") {
@@ -129,7 +129,7 @@ sub www_deleteUser {
         if ($session{form}{uid} < 26) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup(3)) {
-                $output .= helpLink(7);
+                $output .= helpIcon(7);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(167).'<p>';
                 $output .= '<div align="center"><a href="'.
@@ -196,7 +196,7 @@ sub www_editUser {
 	tie %data, 'Tie::IxHash';
         if (WebGUI::Privilege::isInGroup(3)) {
 		$u = WebGUI::User->new($session{form}{uid});
-                $output .= helpLink(5);
+                $output .= helpIcon(5);
 		$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editUserSave");
@@ -373,7 +373,7 @@ sub www_listUsers {
 	my ($output, $sth, %data, @row, $p, $i, $search);
 	tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
-		$output = helpLink(8);
+		$output = helpIcon(8);
 		$output .= '<h1>'.WebGUI::International::get(149).'</h1>';
 		$output .= '<table class="tableData" align="center" width="75%"><tr><td>';
 		$output .= '<a href="'.WebGUI::URL::page('op=addUser').'">'.WebGUI::International::get(169).'</a>';

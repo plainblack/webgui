@@ -12,9 +12,9 @@ package WebGUI::Operation::Package;
 
 use Exporter;
 use strict qw(vars subs);
+use WebGUI::Icon;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::URL;
 
@@ -59,7 +59,7 @@ sub www_selectPackageToDeploy {
         my ($output, %data, $sth, $flag);
         if (WebGUI::Privilege::canEditPage()) {
 		tie %data,'Tie::CPHash';
-                $output = helpLink(30);
+                $output = helpIcon(30);
 		$output .= '<h1>'.WebGUI::International::get(375).'</h1>';
 		$output .= '<ul>';
 		$sth = WebGUI::SQL->read("select * from page where parentId=5");

@@ -835,7 +835,6 @@ sub readOnly {
 }
 
 #-------------------------------------------------------------------
-# eg: select(name, valueListHashref, selectedArrayref, size, multipleSelection, onChange)
 
 =head2 select ( name, options [ label, value, size, multiple, extras, subtext ] )
 

@@ -13,15 +13,13 @@ package WebGUI::Operation::Root;
 use Exporter;
 use strict;
 use Tie::CPHash;
-use WebGUI::Form;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::URL;
-use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_listRoots);
@@ -30,7 +28,7 @@ our @EXPORT = qw(&www_listRoots);
 sub www_listRoots {
         my ($output, $p, $sth, %data, @row, $i);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output = helpLink(28);
+                $output = helpIcon(28);
 		$output .= '<h1>'.WebGUI::International::get(408).'</h1>';
 		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editPage&npp=0').
 			'">'.WebGUI::International::get(409).'</a></div>';

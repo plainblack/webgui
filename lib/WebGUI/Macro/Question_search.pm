@@ -11,20 +11,20 @@ package WebGUI::Macro::Question_search;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Form;
+use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($output, $temp);
+	my ($output, $temp, $f);
 	$output = $_[0];
-        $temp = '<form class="searchBox" method="post" action="'.WebGUI::URL::page().'">';
-        $temp .= WebGUI::Form::hidden("op","search");
-        $temp .= WebGUI::Form::text("keywords",10,100,$session{form}{keywords});
-        $temp .= WebGUI::Form::submit(WebGUI::International::get(364));
-        $temp .= '</form>';
+	$f = WebGUI::HTMLForm->new(1);
+        $f->hidden("op","search");
+        $f->text("keywords",'',$session{form}{keywords});
+        $f->submit(WebGUI::International::get(364));
+	$temp = $f->print;
         $output =~ s/\^\?\;/$temp/g;
 	return $output;
 }

@@ -12,6 +12,7 @@ package WebGUI::Operation::Search;
 
 use Exporter;
 use strict;
+use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Session;
@@ -23,12 +24,12 @@ our @EXPORT = qw(&www_search);
 
 #-------------------------------------------------------------------
 sub www_search {
-        my ($p, $output, %page, @keyword, $pageId, $term, %result, $sth, @row, $i);
-	$output = '<form method="post" enctype="multipart/form-data" action="'.WebGUI::URL::page().'">';
-	$output .= WebGUI::Form::hidden("op","search");
-	$output .= WebGUI::Form::text("keywords",40,100,$session{form}{keywords});
-	$output .= WebGUI::Form::submit(WebGUI::International::get(364));
-	$output .= '</form>';
+        my ($f, $p, $output, %page, @keyword, $pageId, $term, %result, $sth, @row, $i);
+	$f = WebGUI::HTMLForm->new(1);
+	$f->hidden("op","search");
+	$f->text("keywords",'',$session{form}{keywords});
+	$f->submit(WebGUI::International::get(364));
+	$output = $f->print;
 	if ($session{form}{keywords} ne "") {
 		@keyword = split(" ",$session{form}{keywords});
 		foreach $term (@keyword) {
@@ -68,6 +69,7 @@ sub www_search {
 			$output .= WebGUI::International::get(365).'<p><ol>';
 			$output .= $p->getPage($session{form}{pn});
 			$output .= '</ol>'.$p->getBarTraditional($session{form}{pn});
+			$output .= $f->print;
 		} else {
 			$output .= WebGUI::International::get(366);
 		}

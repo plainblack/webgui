@@ -12,9 +12,9 @@ package WebGUI::Operation::Trash;
 
 use Exporter;
 use strict qw(vars subs);
+use WebGUI::Icon;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Shortcut;
 use WebGUI::SQL;
 use WebGUI::URL;
 
@@ -49,7 +49,7 @@ sub _recursePageTree {
 sub www_purgeTrash {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                $output = helpLink(46);
+                $output = helpIcon(46);
 		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(162).'<p>';
                 $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=purgeTrashConfirm').

@@ -12,6 +12,7 @@ package WebGUI::Macro::AdminBar;
 
 use strict;
 use Tie::IxHash;
+use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -21,7 +22,7 @@ use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _replacement {
-	my (%hash2, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $key);
+	my (%hash2, $f, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $key);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
   #--content adder
@@ -33,7 +34,9 @@ sub _replacement {
 	}
 	%hash2 = sortHash(%hash2);
 	%hash = (%hash, %hash2);
-	$contentSelect = WebGUI::Form::selectList("contentSelect",\%hash,"","","","goContent()");
+        $f = WebGUI::HTMLForm->new(1);
+        $f->select("contentSelect",\%hash,'',[],'','','onChange="goContent()"');
+        $contentSelect = $f->printRowsOnly;
   #--clipboard paster
 	%hash2 = ();
 	$hash2{WebGUI::URL::page()} = WebGUI::International::get(3);
@@ -45,7 +48,9 @@ sub _replacement {
         foreach $key (keys %hash) {
                 $hash2{WebGUI::URL::page('func=paste&wid='.$key)} = $hash{$key};
         }
-        $clipboardSelect = WebGUI::Form::selectList("clipboardSelect",\%hash2,"","","","goClipboard()");
+        $f = WebGUI::HTMLForm->new(1);
+        $f->select("clipboardSelect",\%hash2,'',[],'','','onChange="goClipboard()"');
+        $clipboardSelect = $f->printRowsOnly;
    #--admin functions
 	%hash = ();
 	if (WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
@@ -95,7 +100,9 @@ sub _replacement {
 		WebGUI::URL::page('op=switchOffAdmin')=>WebGUI::International::get(12),
 		%hash
 	);
-        $adminSelect = WebGUI::Form::selectList("adminSelect",\%hash,"","","","goAdmin()");
+	$f = WebGUI::HTMLForm->new(1);
+	$f->select("adminSelect",\%hash,'',[],'','','onChange="goAdmin()"');
+	$adminSelect = $f->printRowsOnly;
   #--output admin bar
 	$output = '
 	<div class="adminBar"><table class="adminBar" width="100%" cellpadding="3" cellspacing="0" border="0"><tr>
