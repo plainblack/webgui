@@ -9,6 +9,7 @@
  - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
    www_viewForum to handle postings that start a new thread.
  - Bugfix [ 909579 ] possible package problem 5.5.4
+ - Bugfix [ 918136 ] upgrade to 5.5.5 sql inserts wrong version number
 
 
 
