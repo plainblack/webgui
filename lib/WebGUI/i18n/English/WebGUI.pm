@@ -2382,8 +2382,8 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 
 	'842' => {
 		message => q|<P>These macros are used to create navigation on the site. </P>
-<P><B>^H; or ^H(); - Home Link</B><BR>A link to the home page of this site. In addition you can change the link text by creating a macro like this <B>^H("Go Home");</B>. 
-<P><B>NOTES:</B> You can also use the special case ^H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. And you can specify a second parameter that with the name of a template in the Macro/H_homeLink namespace that will override the default template. The following variables are available for use in the template:</P>
+<P><B>&#94;H; or &#94;H(); - Home Link</B><BR>A link to the home page of this site. In addition you can change the link text by creating a macro like this <B>&#94;H("Go Home");</B>. 
+<P><B>NOTES:</B> You can also use the special case &#94;H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. And you can specify a second parameter that with the name of a template in the Macro/H_homeLink namespace that will override the default template. The following variables are available for use in the template:</P>
 <p/>
 <b>homeLink.url</b><br/>
 The URL to the home page.
@@ -2391,29 +2391,29 @@ The URL to the home page.
 <b>homeLink.text</b><br/>
 The translated label for the link to the home page or the text that you supply to the macro.
 <p/>
-<P><B>^/; - System URL</B><BR>The URL to the gateway script (example: <I>/index.pl/</I>). 
-<P><B>^PageUrl; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
-<P><STRONG>^Navigation(crumbTrail);<BR></STRONG>A dynamically generated crumb trail to the current page.
+<P><B>&#94;/; - System URL</B><BR>The URL to the gateway script (example: <I>/index.pl/</I>). 
+<P><B>&#94;PageUrl; - Page URL</B><BR>The URL to the current page (example: <I>/index.pl/pagename</I>). 
+<P><STRONG>&#94;Navigation(crumbTrail);<BR></STRONG>A dynamically generated crumb trail to the current page.
 <P><B>NOTE:</B> The .crumbTrail style sheet class is tied to this macro. </P>
-<P><STRONG>^Navigation(FlexMenu);</STRONG><BR>This menu macro creates a top-level menu that expands as the user selects each menu item. </P>
-<P><STRONG>^Navigation(currentMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the current level. By default it tracks 1 level deep. </P>
-<P><STRONG>^Navigation(currentMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the current level.</P>
-<P><STRONG>^Navigation(PreviousDropMenu);</STRONG><BR>Create a drop down menu containing the sub-pages at the previous level in the page tree. </P>
-<P><STRONG>^Navigation(previousMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the previous level. By default it will show only the first level. </P>
-<P><STRONG>^Navigation(previousMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the previous level. </P>
-<P><STRONG>^Navigation(rootmenu);</STRONG><BR>Creates a horizontal menu of the various roots on your system (except for the WebGUI system roots).</P>
-<P><STRONG>^Navigation(SpecificDropMenu);</STRONG><BR>Create a drop down menu starting at a specific point in your navigation tree. The default start page is "home". </P>
-<P><STRONG>^Navigation(SpecificSubMenuVertical);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
-<P><STRONG>^Navigation(SpecificSubMenuHorizontal);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
-<P><STRONG>^Navigation(TopLevelMenuVertical);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page). By default it will show only the first level. </P>
-<P><STRONG>^Navigation(TopLevelMenuHorizontal);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page).</P>
-<P><STRONG>^Navigation(RootTab);</STRONG><BR>Create a tab navigation system from the roots on your site (except WebGUI's system roots) similar to the tabs used in the tab forms (editing wobjects or pages). </P>
+<P><STRONG>&#94;Navigation(FlexMenu);</STRONG><BR>This menu macro creates a top-level menu that expands as the user selects each menu item. </P>
+<P><STRONG>&#94;Navigation(currentMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the current level. By default it tracks 1 level deep. </P>
+<P><STRONG>&#94;Navigation(currentMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the current level.</P>
+<P><STRONG>&#94;Navigation(PreviousDropMenu);</STRONG><BR>Create a drop down menu containing the sub-pages at the previous level in the page tree. </P>
+<P><STRONG>&#94;Navigation(previousMenuVertical);</STRONG><BR>A vertical menu containing the sub-pages at the previous level. By default it will show only the first level. </P>
+<P><STRONG>&#94;Navigation(previousMenuHorizontal);</STRONG><BR>A horizontal menu containing the sub-pages at the previous level. </P>
+<P><STRONG>&#94;Navigation(rootmenu);</STRONG><BR>Creates a horizontal menu of the various roots on your system (except for the WebGUI system roots).</P>
+<P><STRONG>&#94;Navigation(SpecificDropMenu);</STRONG><BR>Create a drop down menu starting at a specific point in your navigation tree. The default start page is "home". </P>
+<P><STRONG>&#94;Navigation(SpecificSubMenuVertical);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
+<P><STRONG>&#94;Navigation(SpecificSubMenuHorizontal);</STRONG><BR>Allows you to get the submenu of any page, starting with the page you specified. The default start page is "home" and it will show the first level. </P>
+<P><STRONG>&#94;Navigation(TopLevelMenuVertical);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page). By default it will show only the first level. </P>
+<P><STRONG>&#94;Navigation(TopLevelMenuHorizontal);</STRONG><BR>A vertical menu containing the main pages of the site (aka the sub-pages from the home page).</P>
+<P><STRONG>&#94;Navigation(RootTab);</STRONG><BR>Create a tab navigation system from the roots on your site (except WebGUI's system roots) similar to the tabs used in the tab forms (editing wobjects or pages). </P>
 <P><STRONG>NOTE:</STRONG> Has two special style sheet classes: .rootTabOn and .rootTabOff}. 
-<P><I>Example:</I><BR>&lt;style&gt; .rootTabOn { line-height: 17px; font-size: 16px; spacing: 3px; border: 1px solid black; border-bottom-width: 0px; background-color: #333333; z-index: 10000; padding: 3px 9px 5px 9px; color: white; } .rootTabOn A, .rootTabOn A:visited { color: white; font-weight: bold; text-decoration: none; } .rootTabOff { line-height: 15px; font-size: 14px; border: 1px solid black; border-bottom-width: 0px; background-color: #c8c8c8; z-index: 1000; padding: 2px 9px 2px 9px; } .rootTabOff A, .rootTabOff A:visited { color: black; text-decoration: underline; } .rootTabOff A:hover { font-weight: bold; } &lt;/style&gt; ^RootTab; </P>
-<P><STRONG>^Navigation(TopDropMenu);</STRONG><BR>Create a drop down menu of your top level navigation. </P>
-<P><STRONG>^Navigation(dtree);</STRONG><BR>Create a dynamic tree menu.</P>
-<P><STRONG>^Navigation(coolmenu);</STRONG><BR>Create a DHTML driven menu. </P>
-<P><STRONG>^Navigation(Synopsis);</STRONG><BR>This macro allows you to get the submenu of a page along with the synopsis of each link. </P>
+<P><I>Example:</I><BR>&lt;style&gt; .rootTabOn { line-height: 17px; font-size: 16px; spacing: 3px; border: 1px solid black; border-bottom-width: 0px; background-color: #333333; z-index: 10000; padding: 3px 9px 5px 9px; color: white; } .rootTabOn A, .rootTabOn A:visited { color: white; font-weight: bold; text-decoration: none; } .rootTabOff { line-height: 15px; font-size: 14px; border: 1px solid black; border-bottom-width: 0px; background-color: #c8c8c8; z-index: 1000; padding: 2px 9px 2px 9px; } .rootTabOff A, .rootTabOff A:visited { color: black; text-decoration: underline; } .rootTabOff A:hover { font-weight: bold; } &lt;/style&gt; &#94;RootTab; </P>
+<P><STRONG>&#94;Navigation(TopDropMenu);</STRONG><BR>Create a drop down menu of your top level navigation. </P>
+<P><STRONG>&#94;Navigation(dtree);</STRONG><BR>Create a dynamic tree menu.</P>
+<P><STRONG>&#94;Navigation(coolmenu);</STRONG><BR>Create a DHTML driven menu. </P>
+<P><STRONG>&#94;Navigation(Synopsis);</STRONG><BR>This macro allows you to get the submenu of a page along with the synopsis of each link. </P>
 <P><STRONG>NOTES:</STRONG> The .synopsis_sub, .synopsis_summary, and .synopsis_title style sheet classes are tied to this macro. <BR></P>
 <P>It should be noted that many of these macros can also make use of these style sheet classes: </P>
 <P><B>.selectedMenuItem</B><BR>Use this class to highlight the current page in any of the menu macros. 
@@ -3372,7 +3372,7 @@ The headings of columns on things like message boards and user contributions.
 	},
 
 	'630' => {
-		message => q|WebGUI has a small, but sturdy real-time search engine built-in. If you wish to use the internal search engine, you can use the ^?; macro, or by adding <i>?op=search</i> to the end of any URL, or feel free to build your own form to access it.
+		message => q|WebGUI has a small, but sturdy real-time search engine built-in. If you wish to use the internal search engine, you can use the &#94;?; macro, or by adding <i>?op=search</i> to the end of any URL, or feel free to build your own form to access it.
 <p>
 Many people need a search engine to index their WebGUI site, plus many others. Or they have more advanced needs than what WebGUI's search engine allows. In those cases we recommend <a href="http://www.mnogosearch.org/">MnoGo Search</a> or <a href="http://www.htdig.org/">ht://Dig</a>.
 <p>
@@ -4250,10 +4250,10 @@ This can be used to retrieve information about the current page. For instance it
 <p>
 
 <b>&#94;SQL();</b><br>
-A one line SQL report. Sometimes you just need to pull something back from the database quickly. This macro is also useful in extending the SQL Report wobject. It uses the numeric macros (&#94;0; &#94;1; &#94;2; etc) to position data and can also use the ^&#94;rownum; macro just like the SQL Report wobject. Examples:<p>
+A one line SQL report. Sometimes you just need to pull something back from the database quickly. This macro is also useful in extending the SQL Report wobject. It uses the numeric macros (&#94;0; &#94;1; &#94;2; etc) to position data and can also use the &#94;&#94;rownum; macro just like the SQL Report wobject. Examples:<p>
  &#94;SQL("select count(*) from users","There are &#94;0; users on this system.");
 <p>
-&#94;SQL("select userId,username from users order by username","&lt;a href='^/;?op=viewProfile&uid=&#94;0;'&gt;^1;&lt;/a&gt;&lt;br&gt;");
+&#94;SQL("select userId,username from users order by username","&lt;a href='&#94;/;?op=viewProfile&uid=&#94;0;'&gt;&#94;1;&lt;/a&gt;&lt;br&gt;");
 <p>
 <b>&#94;URLEncode();</b><br>
 This macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It's syntax looks like this: &#94;URLEncode("Is this my string?");
@@ -4283,7 +4283,7 @@ A randomly generated number. This is often used on images (such as banner ads) t
 	},
 
 	'38' => {
-		message => q|You do not have sufficient privileges to perform this operation. Please ^a(log in with an account); that has sufficient privileges before attempting this operation.|,
+		message => q|You do not have sufficient privileges to perform this operation. Please &#94;a(log in with an account); that has sufficient privileges before attempting this operation.|,
 		lastUpdated => 1031514049
 	},
 
@@ -4524,7 +4524,7 @@ A general email address at your company. This is the address that all automated 
 The primary URL of your company. This will appear on all automated emails sent from the WebGUI system. It is also available via the Company URL style macro.
 
 
-		<B>Default Home Page</B><BR>Some really small sites don't have a home page, but instead like to use one of their internal pages like "About Us" or "Company Information" as their home page. For that reason, you can set the default page of your site to any page in the site. That page will be the one people go to if they type in just your URL http://www.mywebguisite.com, or if they click on the Home link generated by the ^H; navigation macro. 
+		<B>Default Home Page</B><BR>Some really small sites don't have a home page, but instead like to use one of their internal pages like "About Us" or "Company Information" as their home page. For that reason, you can set the default page of your site to any page in the site. That page will be the one people go to if they type in just your URL http://www.mywebguisite.com, or if they click on the Home link generated by the &#94;H; navigation macro. 
 
 <P><B>Not Found Page</B><BR>If a page that a user requests is not found in the system, the user can either be redirected to the home page or to an error page where they can attempt to find what they were looking for. You decide which is better for your users. 
 

@@ -35,7 +35,7 @@ The SOAP proxy is the full name of the server and/or script that is listening fo
 The SOAP method is the name of the function to be invoked by the SOAP server. Include any extra parameters in the SOAP Call Parameters field below.<p></p>
 
 <b>SOAP Call Parameters</b><br>
-If your SOAP call requires any additional parameters, include them here as a valid Perl hash, array or scalar.  For example: <code>'userid' => '12', companyid => '^FormParam("companyid");  Whether you need to use scalar, hash or array is entirely dependent on what your SOAP service expects as input.  Likewise, what you get back is entirely dependent on what the service deems to return.'</code>.<p></p>
+If your SOAP call requires any additional parameters, include them here as a valid Perl hash, array or scalar.  For example: <code>'userid' => '12', companyid => '&#94;FormParam("companyid");  Whether you need to use scalar, hash or array is entirely dependent on what your SOAP service expects as input.  Likewise, what you get back is entirely dependent on what the service deems to return.'</code>.<p></p>
 
 <b>Execute by default?</b><br>
 Leave this set to yes unless your page is calling itself with additional parameters.  You will probably know if/when you need to turn off default execution.  To force execution when it has been disabled by default, pass a form variable "targetWobjects" specifying the name of the SOAP call to force execution.  If current cached results already exist for this wobject they will be returned regardless.  If you don't want <i>any</i> results returned no matter what, see the Tricks section below.<p></p>

@@ -41,7 +41,7 @@ our $I18N = {
 		message => q|<P>Edit Navigation lets you add and edit what are essentially 'menu templates' -- they define which pages' Menu Names should be included in a menu, optionally based on where that menu appears.</P>
 <P>The Add/Edit Navigation form allows you to do choose the set of pages, and to choose which
 template is used to create the menu.</P>
-<P><B>Identifier</B><BR>This is the (unique) label you will later use to specify this Navigation definition in a ^Navigation(); macro.</P>
+<P><B>Identifier</B><BR>This is the (unique) label you will later use to specify this Navigation definition in a &#94;Navigation(); macro.</P>
 <P><B>Base Page<BR></B>This identifies the spot in the Page Tree where the macro should commence listing pages. The first three choices will create 'absolute' menus -- ones which will display the same pages no matter which page you use the macro from. </P>
 <P></P>
 <P>The next four create 'relative' menus -- ones in which the items which will be displayed depend on the location in the page tree of the page in which you use the macro.</P>

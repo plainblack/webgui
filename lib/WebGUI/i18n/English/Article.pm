@@ -10,7 +10,7 @@ our $I18N = {
 		message => q|<P>Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.  Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.
 <P>
 
-NOTE: You can create a multi-paged article by placing the separator macro (^-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
+NOTE: You can create a multi-paged article by placing the separator macro (&#94;-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
 
 <P><b>Template</b><br>
 Select a template from the list to layout your Wobject.  Each Wobject
@@ -32,7 +32,7 @@ If you added a link title, now add the URL (uniform resource locater) here.
 If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.
 
 |,
-		lastUpdated => 1109616401,
+		lastUpdated => 1109999943,
 	},
 
 	'7' => {
