@@ -175,6 +175,7 @@ sub www_manageMetaData {
 		-name=>"passiveProfilingEnabled",
                 -label=>WebGUI::International::get("Enable passive profiling ?", 'MetaData'),
                 -value=>$session{setting}{passiveProfilingEnabled},
+		-extras=>' onChange="alert(\''.WebGUI::International::get("Illegal Warning","MetaData").'\')" '
         );
 
 	$f->submit();

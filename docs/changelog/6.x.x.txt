@@ -1,3 +1,13 @@
+6.2.5
+ - Added missing upgrade file. This caused no harm to those that upgraded
+   without it.
+ - WebGUI::HTTP::setRedirect now also adds a meta redirect in case the web
+   server does not support 302 redirects, or the content is being cached out
+   to static files.
+ - Added a warning to the Passive Profiling feature that it may be illegal to
+   use that feature in some countries.
+
+
 6.2.4
  - Changed text processor to convert HTML tags into text rather than
    discarding them.
