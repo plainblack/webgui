@@ -745,10 +745,11 @@ NOTE: This method is meant to be extended by all sub-classes.
 =cut
 
 sub purge {
-	my ($node);
+	my WebGUI::Forum->new($_[0]->get("forumId"));
+	$forum->purge;
 	WebGUI::SQL->write("delete from ".$_[0]->get("namespace")." where wobjectId=".$_[0]->get("wobjectId"));
         WebGUI::SQL->write("delete from wobject where wobjectId=".$_[0]->get("wobjectId"));
-	$node = WebGUI::Node->new($_[0]->get("wobjectId"));
+	my $node = WebGUI::Node->new($_[0]->get("wobjectId"));
 	$node->delete;
 }
 

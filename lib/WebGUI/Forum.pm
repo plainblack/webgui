@@ -66,6 +66,27 @@ sub new {
 	bless {_properties=>$properties}, $self;
 }
 
+sub purge {
+	my ($self);
+	my $a = WebGUI::SQL->read("select * from forumThread where forumId=".$self->get("forumId"));
+	while (my ($threadId) = $a->array) {
+		my $b = WebGUI::SQL->read("select * from forumPost where forumThreadId=".$threadId);
+		while (my ($postId) = $b->array) {
+			WebGUI::SQL->write("delete from forumPostAttachment where forumPostId=".$postId);
+			WebGUI::SQL->write("delete from forumPostRating where forumPostId=".$postId);
+			WebGUI::SQL->write("delete from forumBookmark where forumPostId=".$postId);
+		}
+		$b->finish;
+		WebGUI::SQL->write("delete from forumThreadSubscription where forumThreadId=".$threadId);
+		WebGUI::SQL->write("delete from forumRead where forumThreadId=".$threadId);
+		WebGUI::SQL->write("delete from forumPost where forumThreadId=".$threadId);
+	}
+	$a->finish;
+	WebGUI::SQL->write("delete from forumSubscription where forumId=".$self->get("forumId"));
+	WebGUI::SQL->write("delete from forumThread where forumId=".$self->get("forumId"));
+	WebGUI::SQL->write("delete from forum where forumId=".$self->get("forumId"));
+}
+
 sub recalculateRating {
         my ($self) = @_;
         my ($count) = WebGUI::SQL->quickArray("select count(*) from forumThread where forumId=".$self->get("forumId")." and rating>0");
