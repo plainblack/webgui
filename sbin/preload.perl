@@ -88,6 +88,7 @@ use WebGUI::Persistent::Query::Update ();
 use WebGUI::Operation ();
 use WebGUI::Operation::Account ();
 use WebGUI::Operation::Admin ();
+use WebGUI::Operation::Clipboard ();
 use WebGUI::Operation::Collateral ();
 use WebGUI::Operation::Group ();
 use WebGUI::Operation::Help ();

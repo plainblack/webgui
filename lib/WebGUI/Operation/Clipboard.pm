@@ -123,7 +123,7 @@ sub www_deleteClipboardItemConfirm {
 sub www_emptyClipboard {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(4));
         my ($output);
-	my $output = helpIcon(67);
+	$output = helpIcon(67);
         $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(951).'<p>';
 	if ( ($session{setting}{sharedClipboard} ne "1") && (WebGUI::Privilege::isInGroup(3)) ) {
