@@ -79,7 +79,7 @@ sub www_edit {
         my ($output, $f);
         if (WebGUI::Privilege::canEditPage()) {
 		$output = helpIcon(1,$_[0]->get("namespace"));
-		$output .= '<h1>'.WebGUI::International::get(4,$namespace).'</h1>';
+		$output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
 		$f->url("linkURL",WebGUI::International::get(1,$_[0]->get("namespace")),$_[0]->get("linkURL"));
 		if ($_[0]->get("attachment") eq "") {
