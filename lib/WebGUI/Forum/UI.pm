@@ -1448,7 +1448,7 @@ sub recurseThread {
 	}
         return \@post_loop;
 }
-                                                                                                                                                             
+
 #-------------------------------------------------------------------
 
 =head2 setPostApproved ( caller, post )
@@ -1927,7 +1927,7 @@ sub www_postSave {
 		userId=>$session{user}{userId},
 		username=>($session{form}{visitorName} || $session{user}{alias})
 		);
-	if ($session{form}{parentId} > 0) { # reply
+	if ($session{form}{parentId} ne '') { # reply
 		%postData = (%postData, %postDataNew);
 		my $parentPost = WebGUI::Forum::Post->new($session{form}{parentId});
 		return WebGUI::Privilege::insufficient() unless ($parentPost->getThread->getForum->canPost);
@@ -1941,7 +1941,7 @@ sub www_postSave {
 		return "Redirecting...";
 		#return www_viewThread($caller,$post->get("forumPostId"));
 	}
-	if ($session{form}{forumPostId} > 0) { # edit
+	if ($session{form}{forumPostId} ne '') { # edit
 		my $post = WebGUI::Forum::Post->new($session{form}{forumPostId});
 		return WebGUI::Privilege::insufficient() unless ($post->canEdit);
 		if ($post->getThread->getForum->get("addEditStampToPosts")) {
