@@ -294,6 +294,7 @@ sub getResponseDrivenQuestionIds {
 				Survey_questionId=".$previousResponse->{Survey_questionId});
 		}
 		unless ($questionId > 0) { # terminate survey
+			$self->completeResponse($responseId);	
 			return ();
 		}
 	} else {
