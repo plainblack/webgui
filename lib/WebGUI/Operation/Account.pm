@@ -622,6 +622,9 @@ sub www_viewMessageLogMessage {
 			$output .= '</a>';
 		}
 		$output .= '<br>'.$data{message}.'<p>';
+		if ($data{url} ne "" && $data{status} eq 'pending') {
+                        $output .= '<a href="'.$data{url}.'">'.WebGUI::International::get(554).'</a> &middot; ';
+                }
 		$output .= '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a><p>';
                 $output .= _accountOptions();
         } else {
