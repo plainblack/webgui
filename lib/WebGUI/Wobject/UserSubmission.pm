@@ -232,15 +232,6 @@ sub set {
 }
 
 #-------------------------------------------------------------------
-sub www_approvePost {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                return WebGUI::Discussion::approvePost();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_approveSubmission {
 	my (%submission);
 	tie %submission, 'Tie::CPHash';
@@ -305,15 +296,6 @@ sub www_deleteSubmissionConfirm {
 		$file = WebGUI::Attachment->new("",$session{form}{wid},$session{form}{sid});
 		$file->deleteNode;
                 return "";
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_denyPost {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                return WebGUI::Discussion::denyPost();
         } else {
                 return WebGUI::Privilege::insufficient();
         }
@@ -478,35 +460,6 @@ sub www_editSubmissionSave {
 }
 
 #-------------------------------------------------------------------
-sub www_lockThread {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                WebGUI::Discussion::lockThread();
-		return $_[0]->www_showMessage;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_post {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
-                return WebGUI::Discussion::post();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_postSave {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
-                WebGUI::Discussion::postSave($_[0]);
-                return $_[0]->www_showMessage();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
 sub www_search {
 	if ($session{form}{sid} ne "") {
 		return WebGUI::Discussion::search();
@@ -574,16 +527,6 @@ sub www_showMessage {
 	$output = WebGUI::Discussion::showMessage($submenu,$_[0]);
         $output .= WebGUI::Discussion::showThreads();
         return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_unlockThread {
-        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
-                WebGUI::Discussion::unlockThread();
-		return $_[0]->www_showMessage;
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
 }
 
 #-------------------------------------------------------------------

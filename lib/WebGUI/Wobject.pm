@@ -617,6 +617,23 @@ sub setCollateral {
 
 #-------------------------------------------------------------------
 
+=head2 www_approvePost ( )
+
+ Sets the status flag on a discussion message to "approved".
+
+=cut
+
+sub www_approvePost {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                return WebGUI::Discussion::approvePost();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_copy ( )
 
  Copies this instance to the clipboard.
@@ -734,6 +751,22 @@ sub www_deleteMessageConfirm {
 
 #-------------------------------------------------------------------
 
+=head2 www_denyPost ( )
+
+ Sets the status flag on a discussion message to "denied".
+
+=cut
+
+sub www_denyPost {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                return WebGUI::Discussion::denyPost();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_edit ( formRows ) 
 
  Displays the common properties of any/all wobjects. 
@@ -812,6 +845,23 @@ sub www_editSave {
 		moderationType=>$session{form}{moderationType}
 	});
 	return "";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_lockThread ( )
+
+ Locks a discussion thread from the current message down.
+
+=cut
+
+sub www_lockThread {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                WebGUI::Discussion::lockThread();
+                return $_[0]->www_showMessage;
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -915,6 +965,56 @@ sub www_paste {
 		$nextSeq += 1;
 		$_[0]->set({sequenceNumber=>$nextSeq, pageId=>$session{page}{pageId}, templatePosition=>0});
                 return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_post ( )
+
+ Displays a discussion message post form.
+
+=cut
+
+sub www_post {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
+                return WebGUI::Discussion::post();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_post ( )
+
+ Saves a message post to a discussion.
+
+=cut 
+
+sub www_postSave {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToPost"))) {
+                WebGUI::Discussion::postSave($_[0]);
+                return $_[0]->www_showMessage();
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_unlockThread ( )
+
+ Unlocks a discussion thread from the current message on down.
+
+=cut
+
+sub www_unlockThread {
+        if (WebGUI::Privilege::isInGroup($_[0]->get("groupToModerate"))) {
+                WebGUI::Discussion::unlockThread();
+                return $_[0]->www_showMessage;
         } else {
                 return WebGUI::Privilege::insufficient();
         }
