@@ -33,14 +33,13 @@ sub _reversePageTree {
         $sth = WebGUI::SQL->read("select pageId,parentId,menuTitle,urlizedTitle from page where parentId=$_[0] order by sequenceNumber");
         while (@data = $sth->array) {
 		if (WebGUI::Privilege::canViewPage($data[0])) {
-			if ($_[1] == $data[0]) {
-				$output .= '<span class="selectedMenuItem">';
+                	$output .= '<a class="verticalMenu" href="'.WebGUI::URL::gateway($data[3]).'">';
+			if ($session{page}{pageId} == $data[0]) {
+				$output .= '<span class="selectedMenuItem">'.$data[2].'</span>';
+			} else {
+				$output .= $data[2];
 			}
-                	$output .= '<a class="verticalMenu" href="'.WebGUI::URL::gateway($data[3]).
-				'">'.$data[2].'</a><br>';
-			if ($_[1] == $data[0]) {
-				$output .= '</span>';
-			}
+			$output .= '</a><br>';
                 	if ($_[1] == $data[0] && $_[2] ne "") {
         			$output .= '<table cellpadding=0 cellspacing=0 border=0 class="verticalMenu"><tr><td>&nbsp;&nbsp;&nbsp;</td><td>'.$_[2].'</td></tr></table>';
                 	}
