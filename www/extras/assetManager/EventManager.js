@@ -38,7 +38,7 @@ function EventManager_assetDoubleClick(e) {
     var e=dom? e : event;
     var obj =dom? e.target : e.srcElement
    	
-   	AssetManager_getManager().getAsset(obj).edit();   	
+   	AssetManager_getManager().getAsset(obj).go();   	
 }
 
 function EventManager_assetRightClick(e) {
@@ -55,7 +55,7 @@ function EventManager_assetRightClick(e) {
    	var asset = manager.getAsset(obj);
        
     manager.display.contextMenu.owner = asset;
-    manager.displayContextMenu(e.clientX,e.clientY);
+    manager.displayContextMenu(e.clientX,e.clientY,asset);
     
     return false;
 } 

@@ -168,7 +168,7 @@ function Display_selectAsset(asset) {
 //    	debug(this.overObjects.length);
     	if (!this.controlKeyDown && !this.shiftKeyDown) {
     		for (i=0;i<this.overObjects.length;i++) {
-    			this.overObjects[i].div.style.backgroundColor="white";
+    			this.overObjects[i].div.className="am-grid-row";
     		}
    			this.overObjects=new Array();
     	}
@@ -176,7 +176,7 @@ function Display_selectAsset(asset) {
 
 		if (!this.isSelected(asset)) {	
 			this.overObjects[this.overObjects.length] = asset;    	
-   	    	asset.div.style.backgroundColor = "red";
+   	    	asset.div.className="am-grid-row-over";
 		}
 }
 
@@ -207,13 +207,16 @@ function Display_move(e){
 			}			
 					
 			if (this.overObjects[0] != this.focusObjects[0]) {
-			    var act = this.spy(this.dom? e.pageX: (e.clientX + document.body.scrollLeft),this.dom? e.pageY: (e.clientY + document.body.scrollTop));
+			    //var act = this.spy(this.dom? e.pageX: (e.clientX + document.body.scrollLeft),this.dom? e.pageY: (e.clientY + document.body.scrollTop));
+			    var act = this.spy(this.dom? e.pageX: (e.clientX + window.scrollX),this.dom? e.pageY: (e.clientY + window.scrollY));
 				document.getElementById("dragImage").style.display = "block";
-				document.getElementById("dragImage").style.top = this.dom? (e.clientY+ 15 + document.body.scrollTop) + "px" : (event.clientY + 15) + "px";
+//				document.getElementById("dragImage").style.top = this.dom? (e.clientY+ 15 + document.body.scrollTop) + "px" : (event.clientY + 15) + "px";
+				document.getElementById("dragImage").style.top = this.dom? (e.clientY+ 15 + window.scrollY) + "px" : (event.clientY + 15) + "px";
 
 //				debug(document.body.scrollTop);
 				//debug(window.scrollY);
-				document.getElementById("dragImage").style.left = this.dom? (e.clientX + 5 + document.body.scrollTop) + "px" : (event.clientX + 5) + "px";
+				//document.getElementById("dragImage").style.left = this.dom? (e.clientX + 5 + document.body.scrollTop) + "px" : (event.clientX + 5) + "px";
+				document.getElementById("dragImage").style.left = this.dom? (e.clientX + 5 + window.scrollX) + "px" : (event.clientX + 5) + "px";
 	        	
 	        }          
         }        

@@ -149,6 +149,7 @@ sub getEditForm {
 			-value=>'<img src="'.$storage->getUrl($self->get("filename")).'" alt="thumbnail" />'
 			);
 	}
+	return $tabform;
 }
 
 

@@ -20,6 +20,7 @@ use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::Session;
+use WebGUI::Style;
 
 
 =head1 NAME
@@ -214,11 +215,9 @@ Returns an HTML string with all the necessary components to draw the tab form.
 
 sub print {
 	my $self = shift;
-	my $output = '
-		<script src="'.$session{config}{extrasURL}.'/tabs/tabs.js" type="text/javascript"></script>
-		<link href="'.$self->{_css}.'" rel="stylesheet" rev="stylesheet" type="text/css">
-	';
-	$output .= $self->{_form};
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js',{type=>"text/javascript"});
+	WebGUI::Style::setLink($self->{_css},{rel=>"stylesheet", rev=>"stylesheet",type=>"text/css"});
+	my $output = $self->{_form};
 	$output .= $self->{_hidden};
 	my $i = 1;
 	my $tabs;

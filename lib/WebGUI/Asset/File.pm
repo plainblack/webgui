@@ -98,13 +98,14 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	if ($self->get("filename") ne "") {
-		my $storage = WebGUI::Storage->new($self->get("storageId"));
+		my $storage = WebGUI::Storage->get($self->get("storageId"));
 		
 	}
-        $tabform->getTab("properties")->url(
+        $tabform->getTab("properties")->file(
                	-name=>"file",
                	-label=>"File To Upload"
                	);
+	return $tabform;
 }
 
 
@@ -113,7 +114,7 @@ sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	if ($small) {
-		my $storage = WebGUI::Storage->new($self->get("storageId"));
+		my $storage = WebGUI::Storage->get($self->get("storageId"));
 		return $storage->getFileIconUrl($self->get("filename"));	
 	}
 	return $session{config}{extrasURL}.'/assets/file.gif';
@@ -144,14 +145,24 @@ sub purge {
 	my @old = split("\n",$self->get("olderVersions"));
 	foreach my $oldone (@old) {
 		my ($storageId, $filename) = split("|",$oldone);
-		my $storage = WebGUI::Storage->new($storageId);
+		my $storage = WebGUI::Storage->get($storageId);
 		$storage->delete;
 	}
-	my $storage = WebGUI::Storage->new($self->get("storageId"));
+	my $storage = WebGUI::Storage->get($self->get("storageId"));
 	$storage->delete;
 	return $self->SUPER::purge;
 }
 
+
+sub view {
+	my $self = shift;
+	if ($session{var}{adminOn}) {
+		return $self->www_edit;
+	}
+	my $storage = WebGUI::Storage->get($self->get("storageId"));
+	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
+	return "";
+}
 
 #-------------------------------------------------------------------
 
@@ -185,24 +196,11 @@ sub www_editSave {
 	return $output;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_view
-
-A web executable method that redirects the user to the specified page, or displays the edit interface when admin mode is enabled.
-
-=cut
-
-sub www_view {
-	my $self = shift;
-	if ($session{var}{adminOn}) {
-		return $self->www_edit;
-	}
-	my $storage = WebGUI::Storage->new($self->get("storageId"));
-	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
-	return "";
-}
+#sub www_view {
+#	my $self = shift;
+#	return WebGUI::Privilege::noAccess() unless $self->canView;
+#	return $self->view;
+#}
 
 
 1;

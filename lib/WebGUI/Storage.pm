@@ -458,7 +458,7 @@ sub getFileIconUrl {
 	if (-f $path) {
 		return $session{config}{extrasURL}."/fileIcons/".$extension.".gif";
 	}
-	return $session{config}{extrasURL}."/fileIcons/unkonwn.gif";
+	return $session{config}{extrasURL}."/fileIcons/unknown.gif";
 }
 
 

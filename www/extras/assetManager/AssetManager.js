@@ -42,7 +42,7 @@ function AssetManager_getManager() {
 function AssetManager_renderAssets() {
 
 
-	var gridStr = '<table border="1" id="am_grid" class="am-grid"><tbody id="am_grid_body"><tr id="am_grid.headers" class="am-grid-header">';
+	var gridStr = '<table border="0" cellspacing="0" id="am_grid" class="am-grid"><tbody id="am_grid_body"><tr id="am_grid.headers" class="am-grid-headers">';
 	var eventStr='';
 	var id = "";
 		
@@ -107,14 +107,14 @@ function AssetManager_renderAssets() {
 
 function AssetManager_buildCrumbTrail() {
 	var crumbtrail = document.getElementById("crumbtrail");
-	var contents = "<table><tr>";
+	var contents = '<table><tr>';
 	
 	var parentAssets = new Array();
 	
 	for (i=0;i<this.crumbtrail.length;i++) {
-		contents += '<td id="' + this.crumbtrail[i][0] + '" class="crumbtrail">' + this.crumbtrail[i][2] + '</td>';		
+		contents += '<td id="' + this.crumbtrail[i][0] + '" class="am-crumbtrail">' + this.crumbtrail[i][2] + '</td>';		
 		if (i != this.crumbtrail.length -1) {
-			contents += "<td>&nbsp;->&nbsp;</td>";
+			contents += "<td>&nbsp;/&nbsp;</td>";
 		}	
 	}
 	
@@ -155,28 +155,30 @@ function AssetManager_getAsset(obj) {
 	return obj.asset;   
 }
 
-function AssetManager_displayContextMenu(x,y) {
+function AssetManager_displayContextMenu(x,y,asset) {
 
     var arr = new Array();
     
     if (this.display.overObjects.length == 1) {
+    	arr[arr.length] = new ContextMenuItem(this.labels["go"],"javascript:manager.display.contextMenu.owner.go()");
+   	 	arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
 	    arr[arr.length] = new ContextMenuItem(this.labels["view"],"javascript:manager.display.contextMenu.owner.view()");
     	arr[arr.length] = new ContextMenuItem(this.labels["edit"],"javascript:manager.display.contextMenu.owner.edit()");
     }
     
-    arr[arr.length] = new ContextMenuItem(this.labels["delete"],"javascript:manager.remove()");        
-    arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
-    arr[arr.length] = new ContextMenuItem(this.labels["cut"],"javascript:AssetManager_getManager().cut()");        
-    arr[arr.length] = new ContextMenuItem(this.labels["copy"],"javascript:manager.copy()");
+	if (!asset.isParent) {
+		arr[arr.length] = new ContextMenuItem(this.labels["delete"],"javascript:manager.remove()");        
+   	 	arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
+    	arr[arr.length] = new ContextMenuItem(this.labels["cut"],"javascript:AssetManager_getManager().cut()");        
+    	arr[arr.length] = new ContextMenuItem(this.labels["copy"],"javascript:manager.copy()");
     
-    if (this.display.overObjects.length ==1) {
-	    arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
-	    arr[arr.length] = new ContextMenuItem(this.labels["editTree"],"javascript:manager.editTree()");        
-	    arr[arr.length] = new ContextMenuItem(this.labels["properties"],"javascript:manager.display.contextMenu.owner.displayProperties()");
-	}    
-//    alert("x = " + x + " y= " + y);
+    	if (this.display.overObjects.length ==1) {
+	    	arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
+	    	arr[arr.length] = new ContextMenuItem(this.labels["editTree"],"javascript:manager.editTree()");        
+		}    
+    }
     
-    manager.contextMenu.render(arr,x,y,this);    
+    manager.contextMenu.render(arr,x,y,asset);    
 }
 
 
@@ -240,11 +242,11 @@ function AssetManager_sortGrid(columnIndex) {
 	
 	if (colHeader.sortOrder==">") {
 		colHeader.sortOrder="<";
-		document.getElementById('am_grid.headers.' + columnIndex).innerHTML = this.columnHeadings[columnIndex] + " (up)";		
+		document.getElementById('am_grid.headers.' + columnIndex).innerHTML = this.columnHeadings[columnIndex] + ' <img src="/extras/assetManager/up.gif" />';		
 			
 	}else {
 		colHeader.sortOrder=">";
-		document.getElementById('am_grid.headers.' + columnIndex).innerHTML = this.columnHeadings[columnIndex] + "(down)";				
+		document.getElementById('am_grid.headers.' + columnIndex).innerHTML = this.columnHeadings[columnIndex] + ' <img src="/extras/assetManager/down.gif" />';				
 	}	
 	
 	
