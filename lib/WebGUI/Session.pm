@@ -348,6 +348,9 @@ sub open {
         foreach ($config->directives) {
                 $session{config}{$_} = $config->get($_);
         }
+	if (ref $session{config}{authMethods} ne "ARRAY") {
+		$session{config}{authMethods} = [$session{config}{authMethods}];
+	}
 	if( defined( $session{config}{scripturl} ) ) {
 		# get rid of leading "/" if present.
 		$session{config}{scripturl} =~ s/^\///;
