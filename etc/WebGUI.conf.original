@@ -15,7 +15,7 @@ uploadsPath = /data/WebGUI/www/uploads
 authMethods = LDAP, WebGUI
 
 wobjects = Article, EventsCalendar, ExtraColumn, FAQ, FileManager, HttpProxy, \
-	Item, LinkList, MailForm, MessageBoard, Poll, Product, SiteMap, \
+	Item, LinkList, DataForm, MessageBoard, Poll, Product, SiteMap, \
 	SQLReport, Survey, SyndicatedContent, USS, WobjectProxy
 
 macros = a => a_account, \
@@ -26,32 +26,42 @@ macros = a => a_account, \
 	\\ => Backslash_pageUrl, \
 	c => c_companyName, \
 	C => C_crumbTrail, \
+	CanEditText => CanEditText, \
 	D => D_date, \
 	e => e_companyEmail, \
+	EditableToggle => EditableToggle, \
 	Env => Env, \
 	Execute => Execute, \
 	Extras => Extras, \
 	File => File, \
 	FlexMenu => FlexMenu, \
 	FormParam => FormParam, \
+	GroupAdd => GroupAdd, \
+	GroupDelete => GroupDelete, \
 	GroupText => GroupText, \
 	# => Hash_userId, \
 	H => H_homeLink, \
 	i => i_imageNoTags, \
 	I => I_imageWithTags, \
+	If => If, \
 	Include => Include, \
 	International => International, \
 	L => L_loginBox, \
+	LastModified => LastModified, \
 	LoginToggle => LoginToggle, \
 	m => m_currentMenuHorizontal, \
 	M => M_currentMenuVertical, \
 	Page => Page, \
 	PageTitle => PageTitle, \
+	PreviousDropMenu => PreviousDropMenu, \
 	p => p_previousMenuHorizontal, \
 	P => P_previousMenuVertical, \
 	? => Question_search, \
 	Quote => Quote, \
 	rootmenu => rootmenuHorizontal, \
+	RandomImage => RandomImage, \
+	RandomSnippet => RandomSnippet, \
+	RootTab => RootTab, \
 	RootTitle => RootTitle, \
 	r => r_printable, \
 	/ => Slash_gatewayUrl, \
@@ -60,9 +70,13 @@ macros = a => a_account, \
 	SQL => SQL, \
 	s => s_specificMenuHorizontal, \
 	S => S_specificMenuVertical, \
+	Spacer => Spacer, \
+	SpecificDropMenu => SpecificDropMenu, \
+	SI => SI_scaledImage, \
 	Synopsis => Synopsis, \
 	ThumbnailLinker => ThumbnailLinker, \
 	Thumbnail => Thumbnail, \
+	TopDropMenu => TopDropMenu, \
 	t => t_topMenuHorizontal, \
 	T => T_topMenuVertical, \
 	u => u_companyUrl, \
@@ -79,6 +93,5 @@ searchAndReplace = \
         :D  => "<img src='/extras/smileys/smile04.gif' align='absMiddle' border='0'>", \
         :p  => "<img src='/extras/smileys/smile09.gif' align='absMiddle' border='0'>", \
         :O  => "<img src='/extras/smileys/smile11.gif' align='absMiddle' border='0'>", \
-        \
         WebGUI => "<a href='http://www.plainblack.com/webgui'>WebGUI</a>"
 
