@@ -101,7 +101,7 @@ sub www_edit {
 	$privileges->selectList(
 		-name=>"databaseLinkId",
 		-options=>{
-			""=>WebGUI::International::get(19,$_[0]->get("namespace")),
+			"0"=>WebGUI::International::get(19,$_[0]->get("namespace")),
 			WebGUI::DatabaseLink::getHash(),
 		},
 		-label=>WebGUI::International::get(20,$_[0]->get("namespace")),
