@@ -521,7 +521,8 @@ sub www_viewMessageLog {
                         $i++;
                 }
                 $sth->finish;
-                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewMessageLog'),\@row);
+                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewMessageLog'));
+		$p->setDataByArrayRef(\@row);
                 $output .= '<table width="100%" cellspacing=1 cellpadding=2 border=0>';
                 $output .= '<tr><td class="tableHeader">'.WebGUI::International::get(351).'</td>
 			<td class="tableHeader">'.WebGUI::International::get(553).'</td>

@@ -314,7 +314,8 @@ sub www_listGroups {
                 $i++;
         }
 	$sth->finish;
-        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listGroups'),\@row);
+        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listGroups'));
+	$p->setDataByArrayRef(\@row);
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
 		.WebGUI::International::get(85).'</td><td class="tableHeader">'
@@ -345,7 +346,8 @@ sub www_listGroupsSecondary {
                 $i++;
         }
 	$sth->finish;
-        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listGroupsSecondary'),\@row);
+        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listGroupsSecondary'));
+	$p->setDataByArrayRef(\@row);
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
 		.WebGUI::International::get(85).'</td><td class="tableHeader">'

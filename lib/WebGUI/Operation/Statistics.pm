@@ -64,7 +64,8 @@ sub www_viewActiveSessions {
                 $i++;
 	}
 	$sth->finish;
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewActiveSessions'),\@row);
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewActiveSessions'));
+	$p->setDataByArrayRef(\@row);
         $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
         $output .= '<tr class="tableHeader"><td>'.WebGUI::International::get(428).'</td>';
         $output .= '<td>'.WebGUI::International::get(435).'</td>';
@@ -95,7 +96,8 @@ sub www_viewLoginHistory {
 		$i++;
 	}
 	$sth->finish;
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewLoginHistory'),\@row);
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewLoginHistory'));
+	$p->setDataByArrayRef(\@row);
 	$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 	$output .= '<tr class="tableHeader"><td>'.WebGUI::International::get(428).'</td>';
 	$output .= '<td>'.WebGUI::International::get(434).'</td>';

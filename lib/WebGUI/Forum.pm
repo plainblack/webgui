@@ -16,7 +16,6 @@ package WebGUI::Forum;
                                                                                                                                                              
 use strict;
 use WebGUI::Forum::Thread;
-use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;

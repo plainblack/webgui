@@ -19,6 +19,7 @@ use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Operation::Shared;
 use WebGUI::Page;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -327,10 +328,11 @@ sub www_manageClipboard {
 	}
 	$output .= '</tr>';
 	if ($session{form}{systemClipboard} eq "1") {
-        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageClipboard&systemClipboard=1'),\@row);
+        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageClipboard&systemClipboard=1'));
 	} else {
-        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageClipboard'),\@row);
+        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageClipboard'));
 	}
+	$p->setDataByArrayRef(\@row);
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});

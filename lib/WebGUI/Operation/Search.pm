@@ -49,7 +49,8 @@ sub www_search {
                 $sth->finish;
         }
 	if ($row[0] ne "") {
-		$p = WebGUI::Paginator->new($url,\@row,$session{scratch}{numResults});
+		$p = WebGUI::Paginator->new($url,$session{scratch}{numResults});
+		$p->setDataByArrayRef(\@row);
 		$output .= '<p/>'.WebGUI::International::get(365).'<p><ul>';
 		$output .= $p->getPage($session{form}{pn});
 		$output .= '</ul>'.$p->getBarTraditional($session{form}{pn});

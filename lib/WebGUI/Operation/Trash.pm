@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Icon;
 use WebGUI::Operation::Shared;
+use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -399,10 +400,11 @@ sub www_manageTrash {
 	}
 	$output .= '</tr>';
 	if ($session{form}{systemTrash} eq "1") {
-        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageTrash&systemTrash=1'),\@row);
+        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageTrash&systemTrash=1'));
 	} else {
-        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageTrash'),\@row);
+        	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageTrash'));
 	}
+	$p->setDataByArrayRef(\@row);
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});

@@ -122,7 +122,7 @@ sub www_view {
 						.'='.WebGUI::URL::escape($session{form}{$_}));
 				}
 			}
-			my $p = WebGUI::Paginator->new($url,[],$_[0]->get("paginateAfter"));
+			my $p = WebGUI::Paginator->new($url,$_[0]->get("paginateAfter"));
 			my $error = $p->setDataByQuery($query,$dbh,1);
 			if ($error ne "") {
                                	WebGUI::ErrorHandler::warn("There was a problem with the query: ".$error);

@@ -352,7 +352,8 @@ sub www_listInternationalMessages {
 			.$list{$key}{id}."</td><td>".$list{$key}{message}."</td></tr>\n";
 		$i++;
         }
-        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}),\@row,100);
+        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listInternationalMessages&lid='.$session{form}{lid}),100);
+	$p->setDataByArrayRef(\@row);
         $output .= $p->getBarTraditional($session{form}{pn});
 	$output .= '<table style="font-size: 11px;" width="100%">';
 	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(434).'</td><td class="tableHeader">'.

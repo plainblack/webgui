@@ -414,7 +414,7 @@ sub www_listCollateral {
 	$constraints .= " and userId=$session{scratch}{collateralUser}" if ($session{scratch}{collateralUser});
 	$constraints .= " and collateralType=".quote($session{scratch}{collateralType}) if ($session{scratch}{collateralType});
 	$constraints .= " and name like ".quote('%'.$session{scratch}{keyword}.'%') if ($session{scratch}{keyword});
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listCollateral'),[],"",$session{scratch}{collateralPageNumber});
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listCollateral'),"",$session{scratch}{collateralPageNumber});
 	$p->setDataByQuery("select collateralId, name, filename, collateralType, dateUploaded, username, parameters 
 		from collateral where $constraints order by name");
 	$page = $p->getPageData;

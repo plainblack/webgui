@@ -22,7 +22,6 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::MessageLog;
-use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;

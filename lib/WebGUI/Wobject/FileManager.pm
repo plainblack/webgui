@@ -316,7 +316,7 @@ sub www_view {
 	$sort = $session{scratch}{$_[0]->get("namespace").".".$_[0]->get("wobjectId").".sort"} || "sequenceNumber";
 	$sortDirection = $session{scratch}{$_[0]->get("namespace").".".$_[0]->get("wobjectId").".sortDirection"} || "desc";
 	$sql .= " order by $sort $sortDirection";
-	$p = WebGUI::Paginator->new($url,[],$numResults);
+	$p = WebGUI::Paginator->new($url,$numResults);
 	$p->setDataByQuery($sql);
 	$files = $p->getPageData;
 	my $canEditWobject = (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")) || WebGUI::Privilege::canEditPage());

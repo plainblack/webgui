@@ -1092,7 +1092,7 @@ sub getForumTemplateVars {
 	} else {
 		$query .= "lastPostDate desc";
 	}
-	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewForum&amp;forumId=".$forum->get("forumId")),"",$forum->get("postsPerPage"));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::append($callback,"forumOp=viewForum&amp;forumId=".$forum->get("forumId")),$forum->get("postsPerPage"));
 	$p->setDataByQuery($query);
 	$var{firstPage} = $p->getFirstPageLink;
         $var{lastPage} = $p->getLastPageLink;
@@ -2073,8 +2073,7 @@ sub www_search {
 			on a.forumThreadId=b.forumThreadId where b.forumId=".$forum->get("forumId")." and 
 			(a.status='approved' or a.status='archived') and ".WebGUI::Search::buildConstraints([qw(a.subject a.username a.message)])
 			." order by a.dateOfPost desc";
-		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".$forum->get("forumId")),
-			"", $numResults);
+		my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".$forum->get("forumId")), $numResults);
 		$p->setDataByQuery($query);
 		my @post_loop;
 		foreach my $row (@{$p->getPageData}) {

@@ -51,7 +51,8 @@ sub www_listRoots {
                 $i++;
         }
 	$sth->finish;
-        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listRoots'),\@row);
+        $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listRoots'));
+	$p->setDataByArrayRef(\@row);
         $output .= '<table border=1 cellpadding=3 cellspacing=0 align="center">';
         $output .= $p->getPage;
         $output .= '</table>';

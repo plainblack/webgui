@@ -161,7 +161,8 @@ sub www_view {
 		$var{isLastPage} = 1;
 	} else {
 		my @pages = split(/\^\-\;/,$var{description});
-		my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view"),\@pages,1);
+		my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view"),1);
+		$p->setDataByArrayRef(\@pages);
 		$var{description} = $p->getPage;
 		$var{firstPage} = $p->getFirstPageLink;
         	$var{lastPage} = $p->getLastPageLink;

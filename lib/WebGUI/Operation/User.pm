@@ -31,7 +31,6 @@ use WebGUI::User;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-#&www_addUserSecondary &www_addUserSecondarySave
 our @EXPORT = qw(&www_editUserKarma &www_editUserKarmaSave &www_editUserGroup &www_editUserProfile &www_editUserProfileSave &www_addUserToGroupSave &www_deleteGrouping &www_editGrouping &www_editGroupingSave &www_becomeUser &www_addUser &www_addUserSave &www_deleteUser &www_deleteUserConfirm &www_editUser &www_editUserSave &www_listUsers);
 
 

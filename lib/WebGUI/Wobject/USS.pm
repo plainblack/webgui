@@ -580,7 +580,7 @@ sub www_view {
 	$var{"date.updated.label"} = WebGUI::International::get(78,$_[0]->get("namespace"));
 	$var{"by.label"} = WebGUI::International::get(21,$_[0]->get("namespace"));
 	$var{"submission.edit.label"} = WebGUI::International::get(27,$_[0]->get("namespace"));
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),[],$numResults);
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),$numResults);
 	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, dateUpdated, 
 		username, contentType, forumId, userDefined1, userDefined2, userDefined3, userDefined4, userDefined5 from USS_submission 
 		where USS_id=".$_[0]->get("USS_Id")." and $constraints order by ".$_[0]->getValue("sortBy")." ".$_[0]->getValue("sortOrder"));
