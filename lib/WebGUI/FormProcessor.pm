@@ -214,7 +214,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub email {
-	if ($session{form}{$_[0]} =~ /^([A-Z0-9]+[._]?){1,}[A-Z0-9]+\@(([A-Z0-9]+[-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
+	if ($session{form}{$_[0]} =~ /^([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\@(([A-Z0-9]+[-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
 		return $session{form}{$_[0]};
 	}
 	return undef;

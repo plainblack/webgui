@@ -16,6 +16,24 @@
  - Enhanced HTMLArea editor to include table editing. (Thanks to Irving Carrion.)
 
 
+5.4.4
+ - Updated Finnish translation. (Thanks to Markus Hynna.)
+ - Added Croatian translation. (Thanks to Gordon.)
+ - Updated Portuguese translation. (Thanks to Marcelo Ennes.)
+ - Updated Dutch translation. (Thanks to Leo Noordergraaf, ProcoliX, BNC Distribution, and Hugo Van der Kooij.)
+ - Updated German translation. (Thanks to Andreas Graf.)
+ - Added an association for PPS attachments.
+ - Readded wobject date range check that was accidentally removed.
+ - Fixed a bug that caused incompatibility in the HTML Area image manager with
+   Postgres. (Thanks to Jeremy Malcolm.)
+ - Fixed a leading whitespace bug with the SQL macro. 
+ - Usernames can now be 100 characters long.
+ - Page ordering wasn't always maintained when deploying packages, this is now
+   fixed. (Thanks to Y.H.Khoe.)
+ - Email address didn't validate when it contained a dash (-). (Thanks to
+   Fekke.)
+
+
 5.4.3
  - Fixed a bug where CM's could have deleted the entire collateral manager
    contents if they deleted an item, then hit their back button and deleted it

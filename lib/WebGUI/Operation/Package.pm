@@ -47,7 +47,7 @@ sub _recursePageTree {
 	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
 	_duplicateWobjects($_[0],$_[1]);
 	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$_[1]");
-	$a = WebGUI::SQL->read("select * from page where parentId=$_[0]");
+	$a = WebGUI::SQL->read("select * from page where parentId=$_[0] order by sequenceNumber");
 	while (%package = $a->hash) {
 		$newPageId = getNextId("pageId");
 		$sequenceNumber++;

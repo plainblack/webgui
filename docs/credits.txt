@@ -39,9 +39,11 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
 
 Contributing Translators.............AGOFER Ltda.
                                      Natalia Almazova
+                                     BNC Distribution
                                      Joeri de Bruin / ProcoliX
                                      Jose Caneira
                                      Junying Du / WDI
+                                     Marcelo Ennes / FIOCRUZ
                                      Andreas Graf
                                      Emiliano Grilli / Webopen
                                      Ehab Heikal
@@ -53,9 +55,12 @@ Contributing Translators.............AGOFER Ltda.
                                      Andreas Ljunggren
                                      Ricardo Markiewicz
                                      Ryan McCombs
+                                     Leo Noordergraaf
                                      orosor@yahoo.com.tw
                                      Paolo Pigati / Webopen
                                      Michael Ugilt
+                                     University of Zagreb, Croatia
+                                     Hugo Van der Kooij 
                                      Michael Westlund
                                      Zhou Xiaopeng
 

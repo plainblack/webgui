@@ -269,7 +269,7 @@ sub getIcon {
                 $icon .= "exe.gif";
         } elsif ($extension eq "mdb") {
                 $icon .= "mdb.gif";
-        } elsif ($extension eq "ppt") {
+	} elsif (isIn($extension, qw(ppt pps))) {
                 $icon .= "ppt.gif";
         } elsif (isIn($extension, qw(psd eps ai ps))) {
                 $icon .= "psd.gif";

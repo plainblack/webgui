@@ -551,7 +551,7 @@ sub www_htmlArealistCollateral {
 					"closed.gif", $indent, "", $delete);
         }
 	# Extend tree with images in current folder
-	$sth = WebGUI::SQL->read('select collateralId, name, filename from collateral where collateralType = "image" '.
+	$sth = WebGUI::SQL->read("select collateralId, name, filename from collateral where collateralType = 'image' ".
                                  "and collateralFolderId = $folderId");
 	while ($data = $sth->hashRef) {
 		$data->{filename} =~ /\.([^\.]+)$/; # Get extension
