@@ -52,7 +52,7 @@ sub _submenu {
         tie %menu, 'Tie::IxHash';
 	$menu{WebGUI::URL::page('op=editTheme&themeId=new')} = WebGUI::International::get(901);
 	$menu{WebGUI::URL::page('op=importTheme')} = WebGUI::International::get(924);
-	unless (isIn($session{form}{op}, qw(editTheme deleteThemeConfirm viewTheme listThemes)) || $session{form}{themeId} ne "new") {
+	unless (isIn($session{form}{op}, qw(deleteThemeConfirm viewTheme listThemes)) || $session{form}{themeId} eq "new") {
                 $menu{WebGUI::URL::page('op=editTheme&themeId='.$session{form}{themeId})} = WebGUI::International::get(919);
 		$menu{WebGUI::URL::page('op=deleteTheme&themeId='.$session{form}{themeId})} = WebGUI::International::get(918);
 		$menu{WebGUI::URL::page('op=exportTheme&themeId='.$session{form}{themeId})} = WebGUI::International::get(920);
@@ -313,7 +313,7 @@ sub www_exportTheme {
 	}
 	$sth->finish;
 	$propertyFile->saveFromHashref($theme);
-	my $packageName = WebGUI::URL::makeCompliant($theme->{name}).".theme";
+	my $packageName = WebGUI::URL::makeCompliant($theme->{name}).".theme.tar.gz";
 	$propertyFile->getNode->tar($packageName);
 	my $export = WebGUI::Attachment->new($packageName,"temp");
 	$session{header}{redirect} = WebGUI::Session::httpRedirect($export->getURL);
@@ -347,7 +347,7 @@ sub www_importThemeValidate {
 	$output .= '<h1>'.WebGUI::International::get(927).'</h1>';
 	my $a = WebGUI::Attachment->new("","temp");
 	my $filename = $a->save("themePackage");
-	return $output.WebGUI::International::get(935) unless ($filename =~ /\.theme$/);
+	return $output.WebGUI::International::get(935) unless ($filename =~ /\.theme.tar.gz$/);
 	my $subnode = time();
 	my $extracted = WebGUI::Node->new("temp",$subnode);
 	$extracted->untar($filename);
