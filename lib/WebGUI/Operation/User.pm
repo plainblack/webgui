@@ -198,9 +198,6 @@ sub www_editUser {
 		$u = WebGUI::User->new($session{form}{uid});
                 $output .= helpLink(5);
 		$output .= '<h1>'.WebGUI::International::get(168).'</h1>';
-                if ($session{form}{op} eq "editUserSave") {
-                        $output .= '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
-                }
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editUserSave");
                 $f->hidden("uid",$session{form}{uid});
@@ -229,21 +226,19 @@ sub www_editUserSave {
                 ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".
 			quote($session{form}{username}));
                 if ($uid == $session{form}{uid} || $uid < 1) {
+			$u = WebGUI::User->new($session{form}{uid});
                 	if ($session{form}{identifier} ne "password") {
                         	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier});
-                        	$passwordStatement = ', identifier='.quote($encryptedPassword);
+				$u->identifier($encryptedPassword);
                 	}
-                	$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
-			$u = WebGUI::User->new($session{form}{uid});
 			$u->username($session{form}{username});
-			$u->identifier($encryptedPassword);
 			$u->authMethod($session{form}{authMethod});
 			$u->connectDN($session{form}{connectDN});
 			$u->ldapURL($session{form}{ldapURL});
-			return www_listUsers();
 		} else {
-			return www_editUser();
+                        $error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
 		}
+		return $error.www_editUser();
         } else {
                 return WebGUI::Privilege::adminOnly();
         }
