@@ -1328,11 +1328,6 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1031514049
 	},
 
-	'752' => {
-		message => q|View this user's profile.|,
-		lastUpdated => 1036864965
-	},
-
 	'1012' => {
 		message => q|Lock this thread?|,
 		lastUpdated => 1060433963
@@ -5756,11 +5751,6 @@ Start typing! Or better yet, copy the snippet from some other electronic documen
 		lastUpdated => 1031514049
 	},
 
-	'459' => {
-		message => q|Edit this user's profile.|,
-		lastUpdated => 1031514049
-	},
-
 	'86' => {
 		message => q|Are you certain you wish to delete this group? Beware that deleting a group is permanent and will remove all privileges associated with this group.|,
 		lastUpdated => 1031514049
@@ -7251,6 +7241,17 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 		lastUpdated => 1098327046
 	},
 
+	'account' => {
+		message => q|Account|,
+		lastUpdated => 1098327046,
+		context => q|Tab label for the user's account in the user manager.|
+	},
+
+	'profile' => {
+		message => q|Profile|,
+		lastUpdated => 1098327046,
+		context => q|Tab label for the user's profile in the user manager.|
+	},
 
 };
 

@@ -27,6 +27,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
+use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -49,8 +50,6 @@ sub _submenu {
 			|| $session{form}{op} eq "deleteUserConfirm") {
 			$ac->addSubmenuItem(WebGUI::URL::page("op=editUser&uid=".$session{form}{uid}), WebGUI::International::get(457));
 			$ac->addSubmenuItem(WebGUI::URL::page("op=editUserGroup&uid=".$session{form}{uid}), WebGUI::International::get(458));
-			$ac->addSubmenuItem(WebGUI::URL::page("op=editUserProfile&uid=".$session{form}{uid}), WebGUI::International::get(459));
-			$ac->addSubmenuItem(WebGUI::URL::page('op=viewProfile&uid='.$session{form}{uid}), WebGUI::International::get(752));
 			$ac->addSubmenuItem(WebGUI::URL::page('op=becomeUser&uid='.$session{form}{uid}), WebGUI::International::get(751));
 			$ac->addSubmenuItem(WebGUI::URL::page('op=deleteUser&uid='.$session{form}{uid}), WebGUI::International::get(750));
 			if ($session{setting}{useKarma}) {
@@ -330,72 +329,131 @@ sub www_editGroupingSave {
 #-------------------------------------------------------------------
 sub www_editUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($output, $f, $u, $cmd, $html, %status);
-	$u = WebGUI::User->new($session{form}{uid});
+	my $i18n = WebGUI::International->new("WebGUI");
+	my %tabs;
+	tie %tabs, 'Tie::IxHash';
+	%tabs = (
+		"account"=> { label=>$i18n->get("account")},
+		"profile"=> { label=>$i18n->get("profile")},
+		);
+	my $tabform = WebGUI::TabForm->new(\%tabs);
+	my $u = WebGUI::User->new($session{form}{uid});
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {language=>"JavaScript"});
-	$output .= '<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>';
-	$f = WebGUI::HTMLForm->new;
-    $f->hidden("op","editUserSave");
-    $f->hidden("uid",$session{form}{uid});
-    $f->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
-	$f->readOnly($session{form}{uid},WebGUI::International::get(378));
-    $f->readOnly($u->karma,WebGUI::International::get(537)) if ($session{setting}{useKarma});
-    $f->readOnly(epochToHuman($u->dateCreated,"%z"),WebGUI::International::get(453));
-    $f->readOnly(epochToHuman($u->lastUpdated,"%z"),WebGUI::International::get(454));
-    $f->text("username",WebGUI::International::get(50),$u->username);
+	$tabform->getTab("account")->raw('<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>');
+    	$tabform->hidden({name=>"op",value=>"editUserSave"});
+    	$tabform->hidden({name=>"uid",value=>$session{form}{uid}});
+    	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
+	$tabform->getTab("account")->readOnly($session{form}{uid},$i18n->get(378));
+    	$tabform->getTab("account")->readOnly($u->karma,$i18n->get(537)) if ($session{setting}{useKarma});
+    	$tabform->getTab("account")->readOnly(epochToHuman($u->dateCreated,"%z"),$i18n->get(453));
+    	$tabform->getTab("account")->readOnly(epochToHuman($u->lastUpdated,"%z"),$i18n->get(454));
+    	$tabform->getTab("account")->text("username",$i18n->get(50),$u->username);
+	my %status;
 	tie %status, 'Tie::IxHash';
 	%status = (
-		Active		=>WebGUI::International::get(817),
-		Deactivated	=>WebGUI::International::get(818),
-		Selfdestructed	=>WebGUI::International::get(819)
+		Active		=>$i18n->get(817),
+		Deactivated	=>$i18n->get(818),
+		Selfdestructed	=>$i18n->get(819)
 		);
 	if ($u->userId == $session{user}{userId}) {
-		$f->hidden("status",$u->status);
+		$tabform->getTab("account")->hidden("status",$u->status);
 	} else {
-		$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
+		$tabform->getTab("account")->select("status",\%status,$i18n->get(816),[$u->status]);
 	}
-	
 	my $options;
 	foreach (@{$session{config}{authMethods}}) {
 		$options->{$_} = $_;
 	}
-	$f->select(
-	            -name=>"authMethod",
-				-options=>$options,
-				-label=>WebGUI::International::get(164),
-				-value=>[$u->authMethod],
-				-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
-			  );
+	$tabform->getTab("account")->select(
+	        -name=>"authMethod",
+		-options=>$options,
+		-label=>$i18n->get(164),
+		-value=>[$u->authMethod],
+		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
+		);
 	my $jscript = '<script language="JavaScript">';
 	foreach (@{$session{config}{authMethods}}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
-		$f->raw('<tr id="'.$_.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
+		$tabform->getTab("account")->raw('<tr id="'.$_.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
 		$jscript .= "document.getElementById(\"$_\").style.display='".(($_ eq $u->authMethod)?"":"none")."';";
 	}
 	$jscript .= "</script>";	    
-	$f->submit;
-	$output .= $f->print;
-	$output .= $jscript;
-	return _submenu($output,'168',"user add/edit");
+	$tabform->getTab("account")->raw($jscript);
+        my $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
+                where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
+                order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
+	my $previousCategory;
+        while(my %data = $a->hash) {
+              	my $category = eval $data{categoryName};
+                if ($category ne $previousCategory) {
+                      	$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
+                }
+                my $values = eval $data{dataValues};
+                my $method = $data{dataType};
+                my $label = eval $data{fieldLabel};
+		my $default;
+                if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
+                        my $orderedValues = {};
+                        tie %{$orderedValues}, 'Tie::IxHash';
+                        foreach my $ov (sort keys %{$values}) {
+                        	$orderedValues->{$ov} = $values->{$ov};
+                        }
+                        if ($session{form}{$data{fieldName}}) {
+                      		$default = [$session{form}{$data{fieldName}}];
+                        } elsif (defined $u->profileField($data{fieldName}) && (defined($values->{$u->profileField($data{fieldName})}))) {
+                                $default = [$u->profileField($data{fieldName})];
+                        } else {
+                                $default = eval $data{dataDefault};
+                        }
+                 	$tabform->getTab("profile")->$method(
+				-name=>$data{fieldName},
+				-options=>$orderedValues,
+				-label=>$label,
+				-value=>$default
+				);
+                } elsif ($method) {
+			if ($session{form}{$data{fieldName}}) {
+                        	$default = $session{form}{$data{fieldName}};
+                        } elsif (defined $u->profileField($data{fieldName})) {
+                                $default = $u->profileField($data{fieldName});
+                        } else {
+                                $default = eval $data{dataDefault};
+                        }
+                        $tabform->getTab("profile")->$method(
+				-name=>$data{fieldName},
+				-label=>$label,
+				-value=>$default
+				);
+                }
+                $previousCategory = $category;
+        }
+        $a->finish;
+	return _submenu($tabform->print,'168',"user add/edit");
 }
 
 #-------------------------------------------------------------------
 sub www_editUserSave {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-    my ($error, $uid, $u);
-	($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
-    
+	my ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
+	my $error;
 	if ($uid == $session{form}{uid} || $uid < 1) {
-	   $u = WebGUI::User->new($session{form}{uid});
-	   $u->username($session{form}{username});
-	   $u->authMethod($session{form}{authMethod});
-	   $u->status($session{form}{status});
-	   foreach (@{$session{config}{authMethods}}) {
-	      my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
-	      $authInstance->editUserFormSave;
-       }
+	   	my $u = WebGUI::User->new($session{form}{uid});
+	   	$u->username($session{form}{username});
+	   	$u->authMethod($session{form}{authMethod});
+	   	$u->status($session{form}{status});
+	   	foreach (@{$session{config}{authMethods}}) {
+	      		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
+	      		$authInstance->editUserFormSave;
+       		}	
+		my %field;
+      		tie %field, 'Tie::CPHash';
+      		my $a = WebGUI::SQL->read("select fieldName,dataType from userProfileField");
+      		while (%field = $a->hash) {
+               		$u->profileField($field{fieldName},WebGUI::FormProcessor::process($field{fieldName},$field{dataType}));
+       		}
+       		$a->finish;
 	} else {
-       $error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
+       		$error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
 	}
 	return $error.www_editUser();
 }
@@ -485,81 +543,6 @@ sub www_editUserKarmaSave {
         $u = WebGUI::User->new($session{form}{uid});
         $u->karma($session{form}{amount},$session{user}{username}." (".$session{user}{userId}.")",$session{form}{description});
         return www_editUser();
-}
-
-#-------------------------------------------------------------------
-sub www_editUserProfile {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
-	tie %data, 'Tie::CPHash';
-        $f = WebGUI::HTMLForm->new;
-        $f->hidden("op","editUserProfileSave");
-        $f->hidden("uid",$session{form}{uid});
-	%user = WebGUI::SQL->buildHash("select fieldName,fieldData from userProfileData where userId=".quote($session{form}{uid}));
-        $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
-                where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
-                order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
-        while(%data = $a->hash) {
-              	$category = eval $data{categoryName};
-                if ($category ne $previousCategory) {
-                      	$f->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
-                }
-                $values = eval $data{dataValues};
-                $method = $data{dataType};
-                $label = eval $data{fieldLabel};
-                if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
-                        my $orderedValues = {};
-                        tie %{$orderedValues}, 'Tie::IxHash';
-                        foreach my $ov (sort keys %{$values}) {
-                        	$orderedValues->{$ov} = $values->{$ov};
-                        }
-                        if ($session{form}{$data{fieldName}}) {
-                      		$default = [$session{form}{$data{fieldName}}];
-                        } elsif (exists $user{$data{fieldName}} && (defined($values->{$user{$data{fieldName}}}))) {
-                                $default = [$user{$data{fieldName}}];
-                        } else {
-                                $default = eval $data{dataDefault};
-                        }
-                 	$f->$method(
-				-name=>$data{fieldName},
-				-options=>$orderedValues,
-				-label=>$label,
-				-value=>$default
-				);
-                } elsif ($method) {
-			if ($session{form}{$data{fieldName}}) {
-                        	$default = $session{form}{$data{fieldName}};
-                        } elsif (exists $user{$data{fieldName}}) {
-                                $default = $user{$data{fieldName}};
-                        } else {
-                                $default = eval $data{dataDefault};
-                        }
-                        $f->$method(
-				-name=>$data{fieldName},
-				-label=>$label,
-				-value=>$default
-				);
-                }
-                $previousCategory = $category;
-        }
-        $a->finish;
-        $f->submit;
-        $output .= $f->print;
-	return _submenu($output,'455',"user profile edit");
-}
-
-#-------------------------------------------------------------------
-sub www_editUserProfileSave {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($a, %field, $u);
-      	tie %field, 'Tie::CPHash';
-        $u = WebGUI::User->new($session{form}{uid});
-      	$a = WebGUI::SQL->read("select fieldName,dataType from userProfileField");
-      	while (%field = $a->hash) {
-               	$u->profileField($field{fieldName},WebGUI::FormProcessor::process($field{fieldName},$field{dataType}));
-       	}
-       	$a->finish;
-        return www_editUserProfile();
 }
 
 #-------------------------------------------------------------------

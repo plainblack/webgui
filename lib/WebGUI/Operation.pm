@@ -231,8 +231,6 @@ sub getOperations {
           'editUserKarma' => 'WebGUI::Operation::User',
           'editUserKarmaSave' => 'WebGUI::Operation::User',
           'editUserGroup' => 'WebGUI::Operation::User',
-          'editUserProfile' => 'WebGUI::Operation::User',
-          'editUserProfileSave' => 'WebGUI::Operation::User',
           'addUserToGroupSave' => 'WebGUI::Operation::User',
           'deleteGrouping' => 'WebGUI::Operation::User',
           'editGrouping' => 'WebGUI::Operation::User',
