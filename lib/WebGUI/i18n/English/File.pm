@@ -22,6 +22,34 @@ If this Asset already contains a file, a link to the file with its associated ic
 		context => 'Describing file add/edit form specific fields',
 		lastUpdated => 1106762796,
 	},
+	'file template title' => {
+		message => q|File, Template|,
+        	lastUpdated => 1109287565,
+	},
+
+	'file template body' => {
+                message => q|<p>The following variables are available in File Templates:</p>
+
+<P><b>attachment.icon</b><br/>
+The icon which describes the type of file.
+
+<P><b>attachment.url</b><br/>
+The URL to the file.
+
+<P><b>attachment.name</b><br/>
+The name of the file.
+
+<P><b>attachment.size</b><br/>
+The size of the file.
+
+<P><b>attachment.type</b><br/>
+The type of the file (PDF, etc.)
+
+		|,
+		context => 'Describing the file template variables',
+		lastUpdated => 1109287834,
+	},
+
 
 	'current file' => {
 		message => q|Current file|,

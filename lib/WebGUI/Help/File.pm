@@ -10,6 +10,25 @@ our $HELP = {
 				tag => 'asset fields',
 				namespace => 'Asset'
 			},
+			{
+				tag => 'file template',
+				namespace => 'File'
+			},
+		]
+	},
+
+        'file template' => {
+		title => 'file template title',
+		body => 'file template body',
+		related => [
+			{
+				tag => 'file add/edit',
+				namespace => 'File'
+			},
+			{
+				tag => 'template language',
+				namespace => 'WebGUI'
+			},
 		]
 	},
 
