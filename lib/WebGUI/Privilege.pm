@@ -241,6 +241,7 @@ sub isInGroup {
 		$group{ipFilter} =~ s/\r//g;
 		$group{ipFilter} =~ s/\n//g;
 		$group{ipFilter} =~ s/\s//g;
+		$group{ipFilter} =~ s/\./\\\./g;
 		my @ips = split(";",$group{ipFilter});
 		foreach my $ip (@ips) {
 			if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
