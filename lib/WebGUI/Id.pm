@@ -20,7 +20,9 @@ use strict;
 use Time::HiRes qw( gettimeofday usleep );
 use WebGUI::Session;
 
-
+BEGIN {
+	srand;
+}
 
 
 =head1 NAME
@@ -55,7 +57,7 @@ This function generates a global unique id.
 
 sub generate {
   	my($s,$us)=gettimeofday();
-  	my($v)=sprintf("%06d%10d%06d%255s",$us,$s,$$,$WebGUI::Session::session{config}{defaultSiteName});
+  	my($v)=sprintf("%09d%06d%10d%06d%255s",rand(999999999),$us,$s,$$,$WebGUI::Session::session{config}{defaultSiteName});
 	my $id = Digest::MD5::md5_base64($v);
 	$id =~ s/\+/_/g;
 	$id =~ s/\//-/g;

@@ -1934,7 +1934,7 @@ INSERT INTO USS_submission VALUES ('6','Look Great',1076705448,'Admin','3','<img
 
 CREATE TABLE WSClient (
   wobjectId varchar(22) NOT NULL default '',
-  call text NOT NULL,
+  callMethod text,
   uri varchar(255) NOT NULL default '',
   proxy varchar(255) NOT NULL default '',
   preprocessMacros int(11) NOT NULL default '0',
@@ -3093,7 +3093,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('6.2.5','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('6.2.6','initial install',unix_timestamp());
 
 --
 -- Table structure for table `wobject`

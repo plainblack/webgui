@@ -44,9 +44,9 @@ sub _recursePageTree {
 	my ($a, %package, %newParent,$currentPage,$page);
 	tie %newParent, 'Tie::CPHash';
 	tie %package, 'Tie::CPHash';
-	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
+	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=".quote($_[1]));
 	_duplicateWobjects($_[0],$_[1]);
-	$a = WebGUI::SQL->read("select * from page where parentId=$_[0] order by sequenceNumber");
+	$a = WebGUI::SQL->read("select * from page where parentId=".quote($_[0])." order by sequenceNumber");
 	while (%package = $a->hash) {
 		$currentPage = WebGUI::Page->getPage($_[1]);
 		$page = $currentPage->add;

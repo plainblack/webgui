@@ -110,8 +110,8 @@ sub www_deleteClipboardItemConfirm {
                 		."bufferUserId=".quote($session{user}{userId}) .", "
                 		."bufferPrevId=2 "
                 		."where parentId=2 "
-                		."and pageId=".$session{form}{pageId} ." "
-                		."and bufferUserId=".$session{user}{userId}
+                		."and pageId=".quote($session{form}{pageId}) ." "
+                		."and bufferUserId=".quote($session{user}{userId})
 				);
 		}
         	WebGUI::ErrorHandler::audit("moved page ". $session{form}{pageId} ." from clipboard to trash");
@@ -152,29 +152,29 @@ sub www_emptyClipboardConfirm {
 		$allUsers = 0;
 	}
 	if ($allUsers eq "1") {
-        	WebGUI::SQL->write("update page set parentId=3, "
+        	WebGUI::SQL->write("update page set parentId='3', "
                 	."bufferDate=".time().", "
                 	."bufferUserId=".quote($session{user}{userId}) .", "
-                	."bufferPrevId=2 "
-                	."where parentId=2 ");
-        	WebGUI::SQL->write("update wobject set pageId=3, "
+                	."bufferPrevId='2' "
+                	."where parentId='2' ");
+        	WebGUI::SQL->write("update wobject set pageId='3', "
                 	."bufferDate=".time().", "
                 	."bufferUserId=".quote($session{user}{userId}) .", "
-                	."bufferPrevId=2 "
-                	."where pageId=2 ");
+                	."bufferPrevId='2' "
+                	."where pageId='2' ");
         	WebGUI::ErrorHandler::audit("emptied clipboard to trash");
 	} else {
-        	WebGUI::SQL->write("update page set parentId=3, "
+        	WebGUI::SQL->write("update page set parentId='3', "
                 	."bufferDate=".time().", "
                 	."bufferUserId=".quote($session{user}{userId}) .", "
-                	."bufferPrevId=2 "
-                	."where parentId=2 "
+                	."bufferPrevId='2' "
+                	."where parentId='2' "
                 	."and bufferUserId=".quote($session{user}{userId}));
-        	WebGUI::SQL->write("update wobject set pageId=3, "
+        	WebGUI::SQL->write("update wobject set pageId='3', "
                 	."bufferDate=".time().", "
                 	."bufferUserId=".quote($session{user}{userId}) .", "
-                	."bufferPrevId=2 "
-                	."where pageId=2 "
+                	."bufferPrevId='2' "
+                	."where pageId='2' "
                 	."and bufferUserId=".quote($session{user}{userId}));
         	WebGUI::ErrorHandler::audit("emptied user clipboard to trash");
 	}
@@ -205,10 +205,10 @@ sub www_manageClipboard {
 	# Generate list of pages in clipboard
 	if ($allUsers) {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
-			."from page where parentId=2 order by bufferDate");
+			."from page where parentId='2' order by bufferDate");
 	} else {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
-			."from page where parentId=2 and bufferUserId="
+			."from page where parentId='2' and bufferUserId="
 			. quote($session{user}{userId}) . " order by bufferDate");
 	}
         while (@data = $sth->array) {
@@ -257,10 +257,10 @@ sub www_manageClipboard {
 	# Generate list of wobjects in clipboard
 	if ($allUsers) {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
-			. "from wobject where pageId=2 order by bufferDate");
+			. "from wobject where pageId='2' order by bufferDate");
 	} else {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
-			. "from wobject where pageId=2 and bufferUserId="
+			. "from wobject where pageId='2' and bufferUserId="
 			. quote($session{user}{userId}) ." order by bufferDate");
 	}
         while (@data = $sth->array) {

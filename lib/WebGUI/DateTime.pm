@@ -756,7 +756,8 @@ Returns an epoch date for now.
 =cut
 
 sub time {
-	return dateToEpoch(&ParseDate("now"));
+	#return dateToEpoch(&ParseDate("now"));
+	return time;
 }
 
 #-------------------------------------------------------------------

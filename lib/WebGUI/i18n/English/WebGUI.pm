@@ -247,7 +247,7 @@ The URL for your company specified in the settings by your Administrator.
 
 <P><B>Not Found Page</B><BR>If a page that a user requests is not found in the system, the user can be redirected to the home page or to an error page where they can attempt to find what they were looking for. You decide which is better for your users. 
 
-<p><b>URL Extension</b><br />Add an extension such as "html", "php", or "asp" to each page URL. <p><b>NOTE:</b> Do NOT include the dot "." in this. So the field should look like "html" not ".html".
+<p><b>URL Extension</b><br />Add an extension such as "html", "php", or "asp" to each new page URL as it is created. <p><b>NOTE:</b> Do NOT include the dot "." in this. So the field should look like "html" not ".html".
 
 <P><B>Favicon</B><BR>An icon that appears on Internet Explorer short cuts such as your "Favorites". To learn more about Favicon <A href="http://msdn.microsoft.com/workshop/author/dhtml/howto/shortcuticon.asp">click here</A>. 
 
@@ -268,7 +268,7 @@ The URL for your company specified in the settings by your Administrator.
 <P><B>Text Box Size</B><BR>Some sites wish to control the size of the forms that WebGUI generates. With this setting you can specify how characters can be displayed at once in text boxes on the site. 
 
 |,
-		lastUpdated => 1094410006
+		lastUpdated => 1096822339 
 	},
 
 	'1021' => {

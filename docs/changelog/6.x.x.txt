@@ -1,3 +1,10 @@
+6.2.7
+ - Expanded upon the help for URL extensions.
+ - Added a workaround to a bug in Time::HiRes on windows.
+ - bugfix [ 1038289 ] Performance problems with 6.2 
+ - bugfix [ 1038837 ] Hashing issues (Paul Malabad)
+
+
 6.2.6
  - Fixed a GUID bug in the Site Map wobject.
  - Removed debugging from the events calendar that should have been removed

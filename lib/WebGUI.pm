@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "6.2.6";
+our $VERSION = "6.2.7";
 our $STATUS = "gamma";
 
 #-------------------------------------------------------------------
@@ -34,7 +34,7 @@ sub _generatePage {
 	my $content = shift;
 	if ($session{form}{op} eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new") {
 		WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
-			pageId, pageTitle, wobjectId, wobjectFunction) values (".time().",".$session{user}{userId}
+			pageId, pageTitle, wobjectId, wobjectFunction) values (".time().",".quote($session{user}{userId})
 			.",".quote($session{user}{username}).",
 			".quote($session{env}{REMOTE_ADDR}).", ".quote($session{env}{HTTP_USER_AGENT}).",
 			".quote($session{env}{HTTP_REFERER}).", ".quote($session{page}{pageId}).", 
