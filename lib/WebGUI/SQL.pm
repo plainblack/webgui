@@ -235,8 +235,8 @@ sub getColumnNames {
 
 sub getNextId {
         my ($id);
-        ($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'",$dbh);
-        WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'",$dbh);
+        ($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'",$_[1]);
+        WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'",$_[1]);
         return $id;
 }
 
