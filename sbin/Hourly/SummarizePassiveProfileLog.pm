@@ -22,13 +22,13 @@ use WebGUI::DateTime;
 sub process {
 	my $verbose = shift;
 	unless ($session{setting}{passiveProfilingEnabled}) {
-		print "Passive profiling is disabled...\n";
+		print " - Passive profiling is disabled." if ($verbose);
 		return;
 	}
 	my ($firstDate) = WebGUI::SQL->quickArray("select min(dateOfEntry) from passiveProfileLog");
 	my $interval = $session{config}{passiveProfileInterval} || 86400; 
         if (WebGUI::DateTime::time()-$firstDate < $interval) {
-                print " - Recently runned: Skipping...\n" if ($verbose);
+                print " - Recently summarized: Skipping" if ($verbose);
                 return "";
         }
 
