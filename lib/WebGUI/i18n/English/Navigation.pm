@@ -3,8 +3,8 @@ package WebGUI::i18n::English::Navigation;
 our $I18N = {
 	'add new' => {
 		message => q|Add new navigation.|,
-		lastUpdated => 1077777777,
-		context => q|A submenu item in admin console that allows the user to add a new nav config.|
+		lastUpdated => 1101774172,
+		context => q|A submenu item in admin console that allows the user to add a new navigation config.|
 	},
 
 	'33' => {
@@ -220,11 +220,11 @@ template is used to create the menu.</P>
 <P><B>Show Hidden Pages</B><BR>Should the menus include pages which are marked as Hidden? Similar to
 System Pages, if you want certain groups to be able to see Hidden Pages, then select Yes and use
 the Navigation Template to determine who can see them in the menu.</P>
-<P><B>Show Unpriviliged Pages</B><BR>Should the menus the macro creates include pages which the currently logged-in user does not have the privilige to view? </P>
+<P><B>Show Unprivileged Pages</B><BR>Should the menus the macro creates include pages which the currently logged-in user does not have the privilege to view? </P>
 <P><B>Template</B><BR>This menu permits you to select a template which is used to style the output created by the macro -- if you need the same collection of pages in multiple formats, you'll need to create multiple Navigation entries with (slightly) different names; the Copy Navigation button is useful for this.</P>
 <P><B>Reverse Output</B><BR>When this option is switched on, the menu will be in reverse order.</P>
 <P><B>Preview</B><BR>The Preview button allows you to view a navigation setup without actually saving it.</P>|,
-		lastUpdated => 1100586425,
+		lastUpdated => 1101774179,
 	},
 
 	'1096' => {
@@ -244,7 +244,7 @@ the Navigation Template to determine who can see them in the menu.</P>
 <P><STRONG>basepage.newWindow</STRONG><BR>A conditional indicating whether the base page should be opened in a new window.</P>
 <P><STRONG>basepage.encryptLogin</STRONG><BR>A conditional indicating whether the base page should be served over SSL.</P>
 <P><STRONG>basepage.hasDaughter</STRONG><BR>A conditional indicating whether the base page has daughters.</P>
-<P><STRONG>page_loop</STRONG><BR>A loop containing page information in nested, hierarchial order.</P>
+<P><STRONG>page_loop</STRONG><BR>A loop containing page information in nested, hierarchical order.</P>
 <P><STRONG>unfolded_page_loop</STRONG><BR>This loop contains the same data as <STRONG>page_loop</STRONG> but the order is different.  <STRONG>unfolded_page_loop</STRONG> returns it's pages in an unfolded manner; grouped by parent id. You'll probably need <STRONG>page_loop</STRONG>, but there are (CSS) menus that need <STRONG>unfolded_page_loop</STRONG> to work properly.</P>
 <p>Both <STRONG>page_loop</STRONG> and <STRONG>unfolded_page_loop</STRONG> have the following
 loop variables:</p>
@@ -274,11 +274,11 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A conditional indicating whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
 <P dir=ltr><STRONG>page.isBasepage</STRONG><BR>A conditional indicating whether this page is the base page.</P>
 <P dir=ltr><STRONG>page.isAncestor</STRONG><BR>A conditional indicating whether this page is an ancestor of the base page.</P>
-<P dir=ltr><STRONG>page.isDescendent</STRONG><BR>A conditional indicating whether this page is a descendent of the base page.</P>
+<P dir=ltr><STRONG>page.isDescendent</STRONG><BR>A conditional indicating whether this page is a descendant of the base page.</P>
 <P dir=ltr><STRONG>page.isDaughter</STRONG><BR>A conditional indicating whether this page is a daughter of the base page.</P>
 <P dir=ltr><STRONG>page.isMother</STRONG><BR>A conditional indicating whether this page is the mother of the base page.</P>
 <P dir=ltr><STRONG>page.isSister</STRONG><BR>A conditional indicating whether this page is the sister of the base page.</P>
-<P dir=ltr><STRONG>page.inBranch</STRONG><BR>A conditional that is the logical OR of <STRONG>isAncestor</STRONG>, <STRONG>isisSister</STRONG>, <STRONG>isBasepage</STRONG> and <STRONG>isDescendent</STRONG>.</P>
+<P dir=ltr><STRONG>page.inBranch</STRONG><BR>A conditional that is the logical OR of <STRONG>isAncestor</STRONG>, <STRONG>isSister</STRONG>, <STRONG>isBasepage</STRONG> and <STRONG>isDescendent</STRONG>.</P>
 <P dir=ltr><STRONG>page.mother.*</STRONG><BR>These variables will be undefined if the page is a root.</P>
 <P dir=ltr><STRONG>page.mother.title</STRONG><BR>The title of the mother of this page.</P>
 <P dir=ltr><STRONG>page.mother.urlizedTitle</STRONG><BR>The urlized title of the mother of this page.</P>
@@ -293,7 +293,7 @@ loop variables:</p>
 <P dir=ltr><STRONG>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</STRONG><BR>True if the <STRONG>page.depthDiff</STRONG> variable is N.</P>
 <P dir=ltr><STRONG>page.depthDiff_loop</STRONG><BR>A loop that runs <STRONG>page.depthDiff</STRONG> times. This loop contains no loop variables.</P></BLOCKQUOTE>
 <P dir=ltr>&nbsp;</P>|,
-		lastUpdated => 1097728363
+		lastUpdated => 1101774191
 	},
 
 	'1094' => {
@@ -302,7 +302,7 @@ loop variables:</p>
 	},
 
 	'1095' => {
-		message => q|<P>The general idea behind the navigation system is that instead of hardwiring all the various choices you might make into the code, the system manages a 'library' of these styles, just the way it does with Snippets, Images, Templates, Page Styles, and other types of reusable information.  You can create a new 'Navgation menu style', give it a name, and then use it anywhere on your site that you like.</P>
+		message => q|<P>The general idea behind the navigation system is that instead of hardwiring all the various choices you might make into the code, the system manages a 'library' of these styles, just the way it does with Snippets, Images, Templates, Page Styles, and other types of reusable information.  You can create a new 'Navigation menu style', give it a name, and then use it anywhere on your site that you like.</P>
 <P>The navigation system consists of two parts:</P>
 <OL>
 <LI>The <STRONG>&#94;Navigation();</STRONG> macro, which determines which files may be included in the menu and which template to use.</LI>
@@ -310,7 +310,7 @@ loop variables:</p>
 </OL>
 <P>To create a new menu for your site, place a <B>&#94;Navigation(myMenu);</B> macro into a style. An "edit myMenu" link will be displayed if "myMenu" is not defined. </P>
 <P>Note: In this example "myMenu" is used, but you can pick any name, as long as it is unique.</P>|,
-		lastUpdated => 1100587054
+		lastUpdated => 1101774239
 	},
 
 };
