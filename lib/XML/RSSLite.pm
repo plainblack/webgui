@@ -1,334 +1,299 @@
 #!/usr/bin/perl
 package XML::RSSLite;
 use strict;
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
-use Exporter;
-@ISA = ('Exporter');
-@EXPORT = qw/parseXML usableXML/;
-@EXPORT_OK = qw/parseXML usableXML 
-                isRSS    isRDF    isSN    isWL
-                xml_content_string xml_content_array/;
-$VERSION = '0.08';
+use vars qw($VERSION);
+
+$VERSION = 0.11;
+
+sub import{
+  no strict 'refs';
+  shift;
+  my $pkg = scalar caller();
+  *{"${pkg}::parseRSS"} = \&parseRSS;
+  *{"${pkg}::parseXML"} = \&parseXML if grep($_ eq 'parseXML', @_);
+}
 
 
-sub parseXML {
-  my ($rr, $cr) = @_;
+sub parseRSS {
+  my ($rr, $cref) = @_;
 
-  die "Parms to 'parse' must be refs to a hash and XML content!"
-    unless (ref($rr) and ref($cr));
+  die "$rr is not a hash reference"     unless ref($rr)   eq 'HASH';
+  die "$cref is not a scalar reference" unless ref($cref) eq 'SCALAR';
 
-  return unless $$cr; ## Gotta have some content to parse
+  # Gotta have some content to parse
+  return unless $$cref;
 
-  my $type = usableXML($cr) 
-    or die "Content must be RSS/RDF/ScriptingNews/Weblog XML " .
-           "(or something pretty close)";
-
-  preprocess($cr);
-
-  if ($type == 1  or  $type == 2) {
-    parseRSS($rr, $cr);
-  } elsif ($type == 3) {
-    parseSN($rr, $cr);
-  } elsif ($type == 4) {
-    parseWL($rr, $cr);
-  } else {
-    die "Screwed up XML type-checking somehow!";
+  preprocess($cref);
+  {
+    _parseRSS($rr, $cref), last if index(${$cref}, '<rss')+1;
+    _parseRDF($rr, $cref), last if index(${$cref}, '<rdf:RDF')+1;
+    _parseSN( $rr, $cref), last if index(${$cref}, '<scriptingnews')+1;
+    _parseWL( $rr, $cref), last if index(${$cref}, '<weblog')+1;
+    die "Content must be RSS|RDF|ScriptingNews|Weblog|reasonably close";
   }
-  
-  postprocess($rr);  
+  postprocess($rr);
 }
 
 sub preprocess {
-  my $cr = shift;
-
-  ##
-  ## Help create "well-formed" XML so parser doesn't puke by
-  ## 1. Making unix-style line endings
-  ## 2. Using &amp; for & (this screws up urls, but we fix it later)
-  ## 3. Removing objectionable characters
-  ##
-  $$cr =~ s|<(/*)rss\d+:(.*?)>|<$1$2>|g;
-  $$cr =~ s|<([^<> ]+)\s+(.+?)\s+/>|<$1 $2></$1>|g;
-  $$cr =~ s/[\012\015]{1,2}/\n/g;
-  $$cr =~ s/&(?!([a-zA-Z0-9]+|#\d+);)/&amp;/g;
-  $$cr =~ y/\~\[\n 0-9a-zA-Z_\!\@\#\$\%\^\&\*\(\)\-\+\=\:\;\"\'\<\>\,\.\/?\]/ /c;
-
-  ## Tidy up for debugging by starting open tags on new line
-# $content =~ s|(?!\n)<(?!/)|\n<|gs;
+  my $cref = shift;
+  $$cref =~ y/\r\n/\n/s;
+  $$cref =~ y{\n\t ~0-9\-+!@#$%^&*()_=a-zA-Z[]\\;':",./<>?}{ }cs;
+  #XXX $$cref =~ s/&(?!0[a-zA-Z0-9]+|#\d+);/amp/gs;
+  #XXX Do we wish to (re)allow escaped HTML?!
+  $$cref =~ s{(?:<|&lt;)/?(?:b|i|h\d|p|center|quote|strong)(?:>|&gt;)}{}gsi;
 }
+
+sub _parseRSS {
+  parseXML($_[0], $_[1], 'channel', 0); 
+  $_[0]->{'items'} = $_[0]->{'item'};
+}
+
+sub _parseRDF {
+  my ($rr, $cref) = @_;
+
+  $rr->{'items'} = [];
+  my $item; 
+
+  parseXML($_[0], $_[1], 'rdf:RDF', 0); 
+
+  # Alias RDF to RSS
+  if( exists($rr->{'item'}) ){
+    $rr->{'items'} = $rr->{'item'};
+  }
+  else{
+    my $li = $_[0]->{'rdf:li'} || $_[0]->{'rdf:Seq'}->{'rdf:li'};
+    foreach $item ( @{$li} ){
+      my %ia;
+      if (exists $item->{'dc:description'}) {
+	$ia{'description'} = $item->{'dc:description'};
+      }  
+      if (exists $item->{'dc:title'}) {
+	$ia{'title'} = $item->{'dc:title'};
+      }  
+      if (exists $item->{'dc:identifier'}) {
+	$ia{'link'} = delete($item->{'dc:identifier'});
+      }  
+      
+      push(@{$rr->{'items'}}, \%ia); 
+    }
+  }
+}
+
+sub _parseSN {
+  my ($rr, $cref) = @_;
+  
+  $rr->{'items'} = ();
+  my $item; 
+
+  parseXML($rr, $cref, 'channel', 0); 
+  
+  # Alias SN to RSS terms
+  foreach $item ( @{$_[0]->{'rdf:li'}} ){
+    my %ia;
+    if (exists $item->{'text'}) {
+      $ia{'description'} = $item->{'text'};
+    }  
+    if (exists $item->{'linetext'}) {
+      $ia{'title'} = $item->{'linetext'};
+    }  
+    if (exists $item->{'url'}) {
+      $ia{'link'} = $item->{'url'};
+    }  
+
+    push(@{$rr->{'items'}}, \%ia); 
+  }
+}
+
+
+sub _parseWL {
+  my ($rr, $cref) = @_;
+
+  $rr->{'items'} = ();
+  my $item; 
+
+  #XXX is this the right tag to parse for?
+  parseXML($rr, $cref, 'channel', 0); 
+  
+  # Alias WL to RSS
+  foreach $item ( @{$_[0]->{'rdf:li'}} ){
+    my %ia;
+    if (exists $item->{'url'}) {
+      $ia{'link'} = delete($item->{'url'});
+    }
+
+    push(@{$rr->{'items'}}, \%ia); 
+  }
+}
+
 
 sub postprocess {
   my $rr = shift;
 
-  $rr->{'link'} =~ s/&amp;/&/gi;
+  #XXX Not much to do, what about un-munging URL's in source, etc.?!
+  return unless defined($rr->{'items'});
+  $rr->{'items'} = [$rr->{'items'}] unless ref($rr->{'items'}) eq 'ARRAY';
 
-  if (defined($rr->{'items'})) {
-    my $i;
+  foreach my $i (@{$rr->{'items'}}) {
+    $i->{description} = $i->{description}->{'<>'} if ref($i->{description});
 
-    foreach $i (@{$rr->{'items'}}) {
-      $i->{'link'} = trim($i->{'link'});
-
-      # Put stuff into the right name if necessary
-      if (defined($i->{'url'}) and not $i->{'link'})             {
-        $i->{'link'} = $i->{'url'};
-      }
-
-      # Fix pre-process munging
-      $i->{'link'} =~ s/&amp;/&/gi;
-
+    # Put stuff into the right name if necessary
+    if( not $i->{'link'} ){
+      if( defined($i->{'url'}) ){
+	$i->{'link'} = delete($i->{'url'}); }
       # See if you can use misplaced url in title for empty links
-      if (not $i->{'link'}) {
-        if ($i->{'title'} =~ /^(?:ht)|ftp:/) {
-          $i->{'link'} = $i->{'title'};
-        } elsif ($i->{'title'} =~ /"((?:ht)|ftp.*?)"/) {
-          $i->{'link'} = $1;
-          $i->{'title'} =~ s/<.*?>//;
-        } else {
-          next;
-        }
+      elsif( exists($i->{'title'}) ){
+	# The next case would trap this, but try to short-circuit the gathering
+	if ($i->{'title'} =~ /^(?:ht)|ftp:/) {
+	  $i->{'link'} = $i->{'title'};
+	}
+	elsif ($i->{'title'} =~ /"((?:ht)|ftp.*?)"/) {
+	  $i->{'link'} = $1;
+	  $i->{'title'} =~ s/<.*?>//;
+	}
+	else {
+	  next;
+	}
       }
-
-      # Make sure you've got an http/ftp link
-      if ($i->{'link'} !~ m{^(http|ftp)://}i) {
-        ## Rip link out of anchor tag
-        $i->{'link'} =~ m{a\s+href=("|&quot;)?(.*?)("|>|&quot;|&gt;)?}i;
-        if ($2) {
-          $i->{'link'} = $2;
-
-        } elsif ($i->{'link'}  =~ m{[\.#/]}i  and
-                 $rr->{'link'} =~ m{^http://})            { 
-          ## Smells like a relative url
-          if (substr($i->{'link'}, 0, 1) ne '/') {
-            $i->{'link'} = '/' . $i->{'link'};
-          }
-          $i->{'link'} = $rr->{'link'} . $i->{'link'};
-
-        } else {
-          next;
-        }
-      }
-
-      #If we don't have a title, use the link
-      if (not $i->{'title'}) {
-	$i->{'title'} = $i->{'link'};
-      }
-      $i->{'link'} =~ s/ //g;
-    }
-  }
-}
-
-sub parseRSS {
-  my ($rr, $cr) = @_;
-  
-  my $channel = xml_content_string('channel', $cr);
-  $channel =~ s|<item.*?</item>||gis;
-  clean(\$channel);
-  
-  my $ca; 
-  my @channel_attrs = ($channel =~ m|(<.*?>.*?</.*?>)|gi);
-  foreach $ca (@channel_attrs) {
-    $ca =~ m|^<(.*?)>(.*?)</.*?>$|;
-    $rr->{$1} = trim($2);
-  }
-
-  $rr->{'items'} = ();
-  my $item; 
-  foreach $item (xml_content_array('item', $cr)) {
-    clean(\$item);
-    my @item_attrs = ($item =~ m|(<.*?>.*?</.*?>)|gi);
-    my $ia;
-    my %ia;
-    foreach $ia (@item_attrs) {
-      $ia =~ m|^<(.*?)>(.*?)</.*?>$|;
-      $ia{$1} = trim($2);
-    }
-    push(@{$rr->{'items'}}, \%ia); 
-#XXX test blanks here
-  }
-}
-
-sub parseSN {
-  my ($rr, $cr) = @_;
-  
-  my $channel = xml_content_string('header', $cr);
-  $channel =~ s|<item.*?</item>||gis;
-  clean(\$channel);
-  
-  my $ca; 
-  my @channel_attrs = ($channel =~ m|(<.*?>.*?</.*?>)|gi);
-  foreach $ca (@channel_attrs) {
-    $ca =~ m|^<(.*?)>(.*?)</.*?>$|;
-    $rr->{$1} = trim($2);
-  }
-
-##
-## Alias SN to RSS terms
-##
-  if (exists $rr->{'channelDescription'}) {
-    $rr->{'description'} = $rr->{'channelDescription'};
-  }  
-  if (exists $rr->{'channelTitle'}) {
-    $rr->{'title'} = $rr->{'channelTitle'};
-  }  
-  if (exists $rr->{'channelLink'}) {
-    $rr->{'link'} = $rr->{'channelLink'};
-  }  
-
-  $rr->{'items'} = ();
-  my $item; 
-  foreach $item (xml_content_array('item', $cr)) {
-    clean(\$item);
-    my @item_attrs = ($item =~ m|(<.*?>.*?</.*?>)|gi);
-    my $ia;
-    my %ia;
-    foreach $ia (@item_attrs) {
-      $ia =~ m|^<(.*?)>(.*?)</.*?>$|;
-      $ia{$1} = trim($2);
-    }
-
-    # Links are nested, kill prev {'link'} and rebuild attrs inside it
-    undef $ia{'link'};
-    my @linkitems = xml_content_array('link', \$item)
-      or next;
-
-    my $linkitem = $linkitems[0]; ## Usually first one is most relevant
-    @item_attrs = ($linkitem =~ m|(<.*?>.*?</.*?>)|gi);
-    foreach $ia (@item_attrs) {
-      $ia =~ m|^<(.*?)>(.*?)</.*?>$|;
-      $ia{$1} = trim($2);
     }
     
-    # Alias SN to RSS
-    if (exists $ia{'text'}) {
-      $ia{'description'} = $ia{'text'};
-    }  
-    if (exists $ia{'linetext'}) {
-      $ia{'title'} = $ia{'linetext'};
-    }  
-    if (exists $ia{'url'}) {
-      $ia{'link'} = $ia{'url'};
-    }  
-    push(@{$rr->{'items'}}, \%ia); 
-  }
-}
-
-
-sub parseWL {
-  my ($rr, $cr) = @_;
-  
-# my $channel = xml_content_string('header', $cr);
-# $channel =~ s|<item.*?</item>||gis;
-# clean(\$channel);
-  
-# my $ca; 
-# my @channel_attrs = ($channel =~ m|(<.*?>.*?</.*?>)|gi);
-# foreach $ca (@channel_attrs) {
-#   $ca =~ m|^<(.*?)>(.*?)</.*?>$|;
-#   $rr->{$1} = trim($2);
-# }
-
-##
-## Alias SN to RSS terms
-##
-# if (exists $rr->{'channelDescription'}) {
-#   $rr->{'description'} = $rr->{'channelDescription'};
-# }  
-# if (exists $rr->{'channelTitle'}) {
-#   $rr->{'title'} = $rr->{'channelTitle'};
-# }  
-# if (exists $rr->{'channelLink'}) {
-#   $rr->{'link'} = $rr->{'channelLink'};
-# }  
-
-  $rr->{'items'} = ();
-  my $item; 
-  foreach $item (xml_content_array('link', $cr)) {
-    clean(\$item);
-    my @item_attrs = ($item =~ m|(<.*?>.*?</.*?>)|gi);
-    my $ia;
-    my %ia;
-    foreach $ia (@item_attrs) {
-      $ia =~ m|^<(.*?)>(.*?)</.*?>$|;
-      $ia{$1} = trim($2);
+    # Make sure you've got an http/ftp link
+    if( exists( $i->{'link'}) && $i->{'link'} !~ m{^(http|ftp)://}i) {
+      ## Rip link out of anchor tag
+      $i->{'link'} =~ m{a\s+href=("|&quot;)?(.*?)("|>|&quot;|&gt;)?}i;
+      if( $2 ){
+	$i->{'link'} = $2;
+      }
+      elsif( $i->{'link'}  =~ m{[\.#/]}i and $rr->{'link'} =~ m{^http://} ){
+	## Smells like a relative url
+	if (substr($i->{'link'}, 0, 1) ne '/') {
+	  $i->{'link'} = '/' . $i->{'link'};
+	}
+	$i->{'link'} = $rr->{'link'} . $i->{'link'};
+      }
+      else {
+	next;
+      }
     }
-    # Alias WL to RSS
-    if (exists $ia{'url'}) {
-      $ia{'link'} = $ia{'url'};
-    }  
-
-    push(@{$rr->{'items'}}, \%ia); 
+    
+    #If we don't have a title, use the link
+    unless( defined($i->{'title'}) ){
+      $i->{'title'} = $i->{'link'};
+    }
+    
+    if( exists($i->{'link'}) ){
+#XXX      # Fix pre-process munging
+#      $i->{'link'} =~ s/&amp;/&/gi;
+      $i->{'link'} =~ s/ /%20/g;
+    }
   }
 }
 
-sub usableXML {
-  my $cref = shift;
-  my $content = $$cref; ## Don't change caller's content just for usability check
- 
-  preprocess(\$content);
+sub parseXML{
+  my($hash, $xml, $tag, $comments) = @_;
+  my($begin, $end, @comments);
+  local $_;
 
-  return 1 if isRSS(\$content);
-  return 2 if isRDF(\$content);
-  return 3 if isSN(\$content);
-  return 4 if isWL(\$content);
-
-  return 0;
-}
-
-sub isRSS {
-  my $cref = shift;
-  return scalar($$cref =~ /<rss.*>.*<\/rss>/is);
-}
-
-sub isRDF {
-  my $cref = shift;
-  return scalar($$cref =~ /<rdf:RDF.*>.*<\/rdf:RDF>/is);
-}
-
-sub isSN {
-  my $cref = shift;
-  return scalar($$cref =~ /<scriptingnews.*>.*<\/scriptingnews>/is);
-}
-
-sub isWL {
-  my $cref = shift;
-  return scalar($$cref =~ /<weblog.*>.*<\/weblog>/is);
-}
-
-sub xml_content_string {
-  my $tag = shift;
-  my $cref = shift;
-
-  $$cref =~ /<${tag}.*?>(.*)<\/${tag}>/is;
-  return $1;
-} 
-
-sub xml_content_array {
-  my $tag = shift;
-  my $cref = shift;
-  my $keeptags = shift;
-  $keeptags = 0 unless $keeptags;
-  my @result;
-
-  if ($keeptags) {
-    @result = ($$cref =~ /(<${tag}.*?>.*?<\/${tag}>)/gis);
-  } else {
-    @result = ($$cref =~ /<${tag}.*?>(.*?)<\/${tag}>/gis);
+  #Kill comments
+  while( ($begin =  index(${$xml}, '<!--')) > -1 &&
+	${$xml} =~ m%<!--.*?--(>)%sg ){
+    my $str = substr(${$xml}, $begin, pos(${$xml})-$begin, '');
+    
+    #Save them if requested
+    do{ unshift @comments, [$begin, substr($str, 4, length($str)-7)] }
+      if $comments;
   }
 
-  return @result;
+  _parseXML($hash, $xml, $tag);
+
+#  #XXX Context of comment is lost!
+#  #Expose comments if requested
+#  do{ push(@$comments, $_->[1]) for @comments } if ref($comments) eq 'ARRAY';
+  if( $comments ){
+    #Restore comments if requested
+    substr(${$xml}, $_->[0], 0, '<!--'.$_->[1].'-->') for @comments;
+
+    #Expose comments if requested
+    do{ push(@$comments, $_->[1]) for @comments } if ref($comments) eq 'ARRAY';
+  }
 }
 
-sub clean {
-  my $cref = shift;
+sub _parseXML{
+  my($hash, $xml, $tag, $index) = @_;
+  my($begin, $end);
 
-  $$cref =~ s{(\n|<p>|</p>|<b>|</b>|<i>|</i>|<h\d>|</h\d>|<strong>|</strong>|<center>|</center>|<quote>|</quote>)}{ }gsi;
-}
+  #Find topTag and set pos to start matching from there
+  ${$xml} =~ /<$tag(?:>|\s)/g;
+  ($begin, $end) = (0, pos(${$xml})||0);
 
-sub trim {
-  my $s = shift;
+  #Match either <foo></foo> or <bar />, optional attributes, stash tag name
+  while( ${$xml} =~ m%<([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>%sg ){	 
 
-  $s =~ s/^\s*(.*?)\s*$/$1/;
-  return $s;
+    #Save the tag name, we'll need it
+    $tag = $1 || $2;
+
+    #Save the new beginning and end
+    ($begin, $end) = ($end, pos(${$xml}));
+
+    #Get the bit we just matched.
+    my $str = substr(${$xml}, $begin, $end-$begin);
+    
+    #Extract the actual attributes and contents of the tag
+   $str =~ m%<\Q$tag\E\s*([^>]*?)?>(.*?)</\Q$tag\E>%s ||
+#XXX pointed out by hv
+#    $str =~ s%^.*?<$tag\s*([^>]*?)?>(.*?)</$tag>%<$tag>$2</$tag>%s ||
+      $str =~ m%<\Q$tag\E\s*([^>]*?)?\s*/>%;
+    my($attr, $content) = ($1, $2);
+
+    #Did we get attributes? clean them up and chuck them in a hash.
+    if( $attr ){
+      ($_, $attr) = ($attr, {});
+      $attr->{$1} = $3 while m/([^\s=]+)\s*=\s*(['"])(.*?)\2/g;
+    }
+
+    my $inhash;
+    #Recurse if contents has more tags, replace contents with reference we get
+    if( $content && index($content, '<') > -1 ){
+      _parseXML($inhash={}, \$str, $tag);
+      #Was there any data in the contents? We should extract that...
+      if( $str =~ />[^><]+</ ){
+	#The odd RE above shortcircuits unnecessary entry
+
+	#Clean whitespace between tags
+	#$str =~ s%(?<=>)?\s*(?=<)%%g; #XXX ~same speed, wacko warning
+	#$str =~ s%(>?)\s*<%$1<%g;
+#XXX    #$str =~ s%(?:^|(?<=>))\s*(?:(?=<)|\z)%%g
+
+	my $qr = qr{@{[join('|', keys %{$inhash})]}};
+	$content =~ s%<($qr)\s*(?:[^>]*?)?(?:/|>.*?</\1)>%%sg;
+
+	$inhash->{'<>'} = $content if $content =~ /\S/;
+      }
+    }
+
+    if( ref($inhash) ){
+      #We have attributes? Then we should merge them.
+      if( ref($attr) ){
+	for( keys %{$attr} ){
+	  $inhash->{$_} = exists($inhash->{$_})   ?
+	    (ref($inhash->{$_})  eq 'ARRAY'       ?
+	     [@{$inhash->{$_}}, $attr->{$_}]   :
+	     [  $inhash->{$_},  $attr->{$_}] ) : $attr->{$_};
+	}
+      }
+    }
+    elsif( ref($attr) ){
+      $inhash = $attr;
+    }
+    else{
+      #Otherwise save our content
+      $inhash = $content;
+    }
+    
+    $hash->{$tag} = exists($hash->{$tag}) ?
+      (ref($hash->{$tag})  eq 'ARRAY'     ?
+	[@{$hash->{$tag}}, $inhash]       :
+	[  $hash->{$tag},  $inhash]  )    : $inhash;
+  }
 }
 
 1;
@@ -338,7 +303,7 @@ __END__
 
 =head1 NAME
 
-XML::RSSLite - Perl extension for "relaxed" RSS parsing
+XML::RSSLite - lightweight, "relaxed" RSS (and XML-ish) parser
 
 =head1 SYNOPSIS
 
@@ -346,14 +311,14 @@ XML::RSSLite - Perl extension for "relaxed" RSS parsing
 
   . . .
 
-  parseXML(\%result, \$content);
+  parseRSS(\%result, \$content);
 
   print "=== Channel ===\n",
         "Title: $result{'title'}\n",
         "Desc:  $result{'description'}\n",
         "Link:  $result{'link'}\n\n";
 
-  foreach $item (@{$result{'items'}}) {
+  foreach $item (@{$result{'item'}}) {
   print "  --- Item ---\n",
         "  Title: $item->{'title'}\n",
         "  Desc:  $item->{'description'}\n",
@@ -369,7 +334,7 @@ old-fashioned Perl regular expressions. It stores the data in a simple
 hash structure, and "aliases" certain tags so that when done, you can
 count on having the minimal data necessary for re-constructing a valid
 RSS file. This means you get the basic title, description, and link for a
-channel and its items. Anything else present in the hash is a bonus :)
+channel and its items.
 
 This module extracts more usable links by parsing "scriptingNews" and
 "weblog" formats in addition to RDF & RSS. It also "sanitizes" the
@@ -397,16 +362,11 @@ output for best results. The munging includes:
 
 =over
 
-=item parseXML($outHashRef, $inScalarRef)
+=item parseRSS($outHashRef, $inScalarRef)
 
 I<$inScalarRef> is a reference to a scalar containing the document to be
 parsed, the contents will effectively be destroyed. I<$outHashRef> is a
 reference to the hash within which to store the parsed content.
-
-=item usableXML($inScalarRef)
-
-Test whether or not B<XML::RSSLite> understands the content of the referenced
-document.
 
 =back
 
@@ -414,43 +374,84 @@ document.
 
 =over
 
-=item isRDF($inScalarRef)
+=item parseXML(\%parsedTree, \$parseThis, 'topTag', $comments);
 
-Tests if a referenced document is RDF.
+=over
 
-=item isRSS($inScalarRef)
+=item parsedTree - required
 
-Tests if a referenced document is RSS.
+Reference to hash to store the parsed document within.
 
-=item isSN($inScalarRef)
+=item parseThis  - required
 
-Tests if a referenced document is scriptingNews.
+Reference to scalar containing the document to parse.
 
-=item isWL($inScalarRef)
+=item topTag     - optional
 
-Tests if a referenced document is weblog.
+Tag to consider the root node, leaving this undefined is not recommended.
+
+=item comments   - optional
+
+=over
+
+=item false will remove contents from parseThis
+
+=item true will not remove comments from parseThis
+
+=item array reference is true, comments are stored here
 
 =back
 
-=head1 BUGS
+=back
 
-Sometimes the title of an item will be missed,
-the condition will presist until additional items have been added
-to the document. As a stop gap, when this happens the item title
-is set equal to the item link.
+=head2 CAVEATS
 
-It may take awhile for the tuits to fix this to accumulate.
-feel free to submit a patch.
+This is not a conforming parser. It does not handle the following
+
+=over
+
+=item
+
+  <foo bar=">">
+
+=item
+
+  <foo><bar> <bar></bar> <bar></bar> </bar></foo>
+
+=item
+
+  <![CDATA[ ]]>
+
+=item
+
+  PI
+
+=back
+
+It's non-validating, without a DTD the following cannot be properly addressed
+
+=over
+
+=item entities
+
+=item namespaces
+
+This might be arriving in the next release.
+
+=back
+
+=back
 
 =head1 SEE ALSO
 
-perl(1), C<XML::RSS>
+perl(1), C<XML::RSS>, C<XML::SAX::PurePerl>,
+C<XML::Parser::Lite>, <XML::Parser>
 
 =head1 AUTHOR
 
 Jerrad Pierce <jpierce@cpan.org>.
 
-Scott Thomason <scott@industrial-linux.org>
+Scott Thomason <scott@thomasons.org>
 
 =head1 LICENSE
 
