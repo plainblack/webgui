@@ -16,8 +16,8 @@ use WebGUI::HTMLForm;
 use WebGUI::Form;
 use WebGUI::Session;
 use WebGUI::Utility;
-#use Authen::Smb;
-#use warnings;
+use Authen::Smb;
+use warnings;
 
 our @ISA = qw(WebGUI::Auth);
 
