@@ -5,4 +5,5 @@ logfile = /data/webgui.log
 extras = /extras
 uploadsURL = /uploads
 uploadsPath = /data/WebGUI/www/uploads
+#skipHourly = 
 #scripturl = /

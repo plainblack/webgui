@@ -486,8 +486,8 @@ sub param {
     
     ## get the value of the desired parameters
     for my $arg (@{$args->{'get'}}) {
-        carp("[$CLASS] Parameter '$arg' does not exist ") and next
-            if not exists $self->{'param'}{_case_($self, $arg)};
+        #carp("[$CLASS] Parameter '$arg' does not exist ") and 
+	next if not exists $self->{'param'}{_case_($self, $arg)};
         
         push @retlist, $self->{'param'}{_case_($self, $arg)}
     }
@@ -582,8 +582,8 @@ sub delete {
     my $self = shift;
     
     for my $param (@_) {
-        carp("[$CLASS] Parameter '$param' does not exist ") and next 
-            if not exists $self->{'param'}{_case_($self, $param)};
+        #carp("[$CLASS] Parameter '$param' does not exist ") and 
+	next if not exists $self->{'param'}{_case_($self, $param)};
         delete $self->{'param'}{_case_($self, $param)}
     }
 }

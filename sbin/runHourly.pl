@@ -19,9 +19,10 @@ BEGIN {
 use DBI;
 use strict qw(subs vars);
 use Data::Config;
+use WebGUI::Utility;
 
 
-my (@files, $cmd, $namespace, $i, $file, $slash, $confdir, @plugins, $plugin, $plugdir);
+my (@files, $cmd, $namespace, $file, $slash, $confdir, %plugins, $plugdir, $skip);
 $slash = ($^O =~ /Win/i) ? "\\" : "/";
 $confdir = $webguiRoot.$slash."etc".$slash;
 $plugdir = $webguiRoot.$slash."sbin".$slash."Hourly".$slash;
@@ -33,8 +34,7 @@ if (opendir (PLUGDIR,$plugdir)) {
                         $namespace = $1;
                         $cmd = "use Hourly::".$namespace;
                         eval($cmd);
-			$plugins[$i] = "Hourly::".$namespace."::process";
-			$i++;
+			$plugins{$namespace} = "Hourly::".$namespace."::process";
                 }
         }
         closedir(PLUGDIR);
@@ -54,8 +54,13 @@ if (opendir (CONFDIR,$confdir)) {
 				unless (eval {$dbh = DBI->connect($config->param('dsn'),$config->param('dbuser'),$config->param('dbpass'))}) {
                                         print "Can't connect to ".$config->param('dsn')." with info provided. Skipping.\n";
                                 } else {
-					foreach $plugin (@plugins) {
-						&$plugin($dbh);
+					foreach $namespace (keys %plugins) {
+						$skip = $config->param('skipHourly');
+						$skip =~ s/ //g;
+						unless (isIn($namespace, split(/,/,$skip))) {
+							$cmd = $plugins{$namespace};
+							&$cmd($dbh);
+						}
 					}
                                         $dbh->disconnect();
                                 } 
