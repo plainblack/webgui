@@ -264,6 +264,9 @@ sub www_view {
    if ($self->get('preprocessMacros')) {
       $call = WebGUI::Macro::process($self->get("callMethod"));
       $param_str = WebGUI::Macro::process($self->get("params"));
+    } else {
+       $call        = $self->get('callMethod');
+       $param_str   = $self->get('params');
    }
 
    # see if we can shortcircuit this whole process

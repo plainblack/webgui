@@ -59,8 +59,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-	my ($userId);
-	$userId = WebGUI::Id::generate();
+	my $userId = shift || WebGUI::Id::generate();
 	WebGUI::SQL->write("insert into users (userId,dateCreated) values (".quote($userId).",".time().")");
 	WebGUI::Grouping::addUsersToGroups([$userId],[2,7]);
         return $userId;
@@ -218,13 +217,17 @@ sub lastUpdated {
 
 #-------------------------------------------------------------------
 
-=head2 new ( userId )
+=head2 new ( userId [, overrideId ] )
 
 Constructor.
 
 =head3 userId 
 
-The userId of the user you're creating an object reference for. If left blank it will default to "1" (Visitor). If specified as "new" then a new user account will be created and assigned the next available userId.
+The userId of the user you're creating an object reference for. If left blank it will default to "1" (Visitor). If specified as "new" then a new user account will be created and assigned the next available userId. 
+
+=head3 overrideId
+
+A unique ID to use instead of the ID that WebGUI will generate for you. It must be absolutely unique and can be up to 22 alpha numeric characters long.
 
 =cut
 
@@ -233,7 +236,8 @@ sub new {
 	tie %user, 'Tie::CPHash';
         $class = shift;
         $userId = shift || 1;
-	$userId = _create() if ($userId eq "new");
+	my $overrideId = shift;
+        $userId = _create($overrideId) if ($userId eq "new");
 	%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($userId));
 	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 		from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 

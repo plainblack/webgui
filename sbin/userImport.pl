@@ -157,6 +157,9 @@ Special Cases:
 
 	-Blank lines will be ignored.
 
+	-If userId is specified for an import record, that userId
+        be used instead of generating one.
+
 STOP
 	exit;
 }
@@ -222,13 +225,16 @@ while(<FILE>) {
 
 		# process user
 		my ($duplicate) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($user{username}));
+		my ($duplicateId) = WebGUI::SQL->quickArray("select count(*) from users where userId=".quote($user{userId})) if $user{userId};
   		if ($user{username} eq "") {
     			print "Skipping line $lineNumber.\n" unless ($quiet);
 		} elsif ($duplicate) {
 			print "User $user{username} already exists. Skipping.\n" unless ($quiet);
+		} elsif ($duplicateId) {
+                        print "ID $user{userId} already exists. Skipping.\n" unless ($quiet);
 		} else {
     			print "Adding user $user{username}\n" unless ($quiet);
-			my $u = WebGUI::User->new("new");
+			my $u = WebGUI::User->new("new", $user{userId});
 			$u->username($user{username});
 			$u->authMethod($user{authMethod});
 			$u->status($user{status});
