@@ -133,7 +133,7 @@ sub cutIcon {
 
 #-------------------------------------------------------------------
 
-=head2 deleteIcon ( urlParameters [, pageURL ] )
+=head2 deleteIcon ( urlParameters [, pageURL, confirmText ] )
 
 Generates a button that represents a delete operation.
 
@@ -145,12 +145,22 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 The URL to any page. Defaults to the current page.
 
+=head3 confirmText 
+
+If defined, a confirm box will popup to ask the user if they want to delete.
+
 =cut
 
 sub deleteIcon {
-        my ($output, $pageURL);
+        my ($output, $pageURL, $confirmText);
+	$confirmText = $_[2];
+	if($confirmText) {
+		$confirmText = qq| onclick="return confirm('$confirmText')" |;
+	}
+	
         $pageURL = $_[1] || $session{page}{urlizedTitle};
-        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
+	
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'" '.$confirmText.'>';
 	$output .= '<img src="'._getBaseURL().'delete.gif" align="middle" border="0" alt="Delete" title="Delete" /></a>';
 	return $output;
 }
