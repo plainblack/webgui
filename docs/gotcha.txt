@@ -86,6 +86,17 @@ save you many hours of grief.
 	you'll need to start using groups of groups instead.
 
 
+5.0.0
+--------------------------------------------------------------------
+ * Some users reported a problem with the collateral system where
+	they lost images after the upgrade to 5.0.0. This was most
+	likely due to the gotcha mentioned in 4.9.2, but if you have
+	any doubts, you can move all your images to the root folder
+	of the collateral manager with this SQL query.
+
+	update collateral set collateralFolderId=0;
+
+
 4.9.4
 --------------------------------------------------------------------
  * The "extras" property in the config file has been renamed to
