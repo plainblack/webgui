@@ -130,7 +130,7 @@ sub www_view {
 	if ($_[0]->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>\n/g;
 	}
-	$var{"new.template"} = WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view")."&templateId=";
+	$var{"new.template"} = WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view")."&overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
 	$var{"description.first.100words"} = $var{"description.full"};
@@ -183,8 +183,8 @@ sub www_view {
         	$var{"post.label"} = WebGUI::International::get(24,$_[0]->get("namespace"));
 	}
 	my $templateId = $_[0]->getValue("templateId");
-        if ($session{form}{func} eq "editSave") {
-                $templateId = $_[0]->get("templateId");
+        if ($session{form}{overrideTemplateId} ne "") {
+                $templateId = $session{form}{overrideTemplateId};
         }
 	if ($session{form}{forumOp}) {
 		unless ($!= $_[0]->get("wobjectId")) {

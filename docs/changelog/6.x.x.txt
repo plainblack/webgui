@@ -25,6 +25,7 @@
    submissions.
  - Added some missing international entries that caused problems accessing
    some of the online help.
+ - Fixed a bug with Article override template.
 
 
 
