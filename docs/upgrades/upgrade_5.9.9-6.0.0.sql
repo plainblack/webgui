@@ -380,6 +380,7 @@ INSERT INTO help VALUES (2,'WSClient',72,73,'1,WSClient;51,WebGUI;');
 INSERT INTO international VALUES (1,'WSClient',1,'Web Services Client',1033575504,NULL);
 INSERT INTO international VALUES (2,'WSClient',1,'SOAP URI or WSDL',1033575504,NULL);
 INSERT INTO international VALUES (3,'WSClient',1,'SOAP Proxy',1033575504,NULL);
+INSERT INTO international VALUES (4,'WSClient',1,'SOAP Method/Call',1033575504,NULL);
 INSERT INTO international VALUES (5,'WSClient',1,'SOAP Call Parameters',1033575504,NULL);
 INSERT INTO international VALUES (8,'WSClient',1,'Preprocess macros on query?',1033575504,NULL);
 INSERT INTO international VALUES (9,'WSClient',1,'Debug?',1033575504,NULL);
