@@ -208,7 +208,7 @@ sub epochToHuman {
 	my ($offset, $temp, $hour12, $value, $output);
 	$offset = $session{user}{timeOffset} || 0;
 	$offset = $offset*3600;
-	$temp = int($_[0]) || time();
+	$temp = int($_[0]) || WebGUI::DateTime::time();
 	$temp = $temp+$offset;
 	my ($year,$month,$day,$hour,$min,$sec) = Date::Calc::Time_to_Date($temp);
 	$output = $_[1] || "%z %Z";
@@ -639,7 +639,7 @@ A string in the format of MM/DD/YYYY.
 =cut
 
 sub setToEpoch {
-	my @date = Date::Calc::Time_to_Date(time());
+	my @date = Date::Calc::Time_to_Date(WebGUI::DateTime::time());
  	my ($month, $day, $year) = split(/\//,$_[0]);
 	if (int($year) < 2038 && int($year) > 1969) {
 		$year = int($year);
