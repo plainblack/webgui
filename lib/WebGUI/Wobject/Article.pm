@@ -155,17 +155,16 @@ sub www_view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
+	my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view"),1);
 	if ($session{form}{makePrintable} || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
-		$var{isFirstPage} = 1;
-		$var{isLastPage} = 1;
+		$p->setDataByArrayRef([$var{description}]);
 	} else {
 		my @pages = split(/\^\-\;/,$var{description});
-		my $p = WebGUI::Paginator->new(WebGUI::URL::page("wid=".$_[0]->get("wobjectId")."&func=view"),1);
 		$p->setDataByArrayRef(\@pages);
 		$var{description} = $p->getPage;
-		$p->appendTemplateVars(\%var);
 	}
+	$p->appendTemplateVars(\%var);
 	if ($_[0]->get("attachment") ne "") {
 		$file = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
 		$var{"attachment.box"} = $file->box;

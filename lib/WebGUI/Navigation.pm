@@ -105,7 +105,7 @@ sub _levels {
                                                 my $p = WebGUI::Page->getPage;
                                                 my @ancestors = reverse $p->ancestors;
                                                 if(scalar(@ancestors) == 1) { # I am WebGUI root. I have one ancestor, which
-                                                        return $p             # is nameless root. Return myself
+                                                        return $p;             # is nameless root. Return myself
                                                 } elsif(scalar(@ancestors) > 1) { # I am a page under WebGUI root.
                                                         return $ancestors[1];     # 1st element of ancestors is WebGUI root
                                                 } else {
