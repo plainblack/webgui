@@ -158,7 +158,7 @@ sub www_view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
-	if ($session{form}{makePrintable}) {
+	if ($session{form}{makePrintable} || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$var{isFirstPage} = 1;
 		$var{isLastPage} = 1;
