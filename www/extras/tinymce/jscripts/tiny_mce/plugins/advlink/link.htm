@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
 <title>{$lang_insert_link_title}</title>
 <script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
@@ -33,6 +31,7 @@ if (url != null)
                 break;
             }
         }
+
         if (strOnClick!='') {
             for (var i=0; i<arrOnClick.length; i++) {
                 if (arrOnClick[i].indexOf('return false')!=-1) {
@@ -89,11 +88,19 @@ if (url != null)
 			html += ' onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');"';
 			html += ' onmouseout="tinyMCE.restoreClass(this);"';
 			html += ' onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');"';
-			html += ' onclick="javascript:tinyMCE.openFileBrowser(\'href\',document.forms[0].href.value,\'file\');"';
+			html += ' onclick="javascript:tinyMCE.openFileBrowser(\'href\',document.forms[0].href.value,\'file\',window);"';
 			html += ' width="20" height="18" border="0" title="' + tinyMCE.getLang('lang_browse') + '"';
 			html += ' class="mceButtonNormal" alt="' + tinyMCE.getLang('lang_browse') + '" />';
 
 			document.getElementById('browser').innerHTML = html;
+		}
+
+		// Auto select link in list
+		if (typeof(tinyMCELinkList) != "undefined" && tinyMCELinkList.length > 0) {
+			for (var i=0; i<formObj.link_list.length; i++) {
+				if (formObj.link_list.options[i].value == tinyMCE.getWindowArg('href'))
+					formObj.link_list.options[i].selected = true;
+			}
 		}
 
         window.focus();

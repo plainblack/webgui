@@ -39,8 +39,7 @@ if (url != null)
 		formObj.hspace.value = tinyMCE.getWindowArg('hspace');
 		formObj.width.value = tinyMCE.getWindowArg('width');
 		formObj.height.value = tinyMCE.getWindowArg('height');
-		formObj.height.value = tinyMCE.getWindowArg('height');
-		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
+		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
 
 		// Handle file browser
 		if (tinyMCE.getParam("file_browser_callback") != null) {
@@ -52,11 +51,19 @@ if (url != null)
 			html += ' onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');"';
 			html += ' onmouseout="tinyMCE.restoreClass(this);"';
 			html += ' onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');"';
-			html += ' onclick="javascript:tinyMCE.openFileBrowser(\'src\',document.forms[0].src.value,\'image\');"';
+			html += ' onclick="javascript:tinyMCE.openFileBrowser(\'src\',document.forms[0].src.value,\'image\',window);"';
 			html += ' width="20" height="18" border="0" title="' + tinyMCE.getLang('lang_browse') + '"';
 			html += ' class="mceButtonNormal" alt="' + tinyMCE.getLang('lang_browse') + '" />';
 
 			document.getElementById('browser').innerHTML = html;
+		}
+
+		// Auto select image in list
+		if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) {
+			for (var i=0; i<formObj.image_list.length; i++) {
+				if (formObj.image_list.options[i].value == tinyMCE.getWindowArg('src'))
+					formObj.image_list.options[i].selected = true;
+			}
 		}
 
 		window.focus();
@@ -64,6 +71,30 @@ if (url != null)
 
 	function cancelAction() {
 		top.close();
+	}
+
+	var preloadImg = new Image();
+
+	function resetImageData() {
+		var formObj = document.forms[0];
+		formObj.width.value = formObj.height.value = "";	
+	}
+
+	function updateImageData() {
+		var formObj = document.forms[0];
+
+		if (formObj.width.value == "")
+			formObj.width.value = preloadImg.width;
+
+		if (formObj.height.value == "")
+			formObj.height.value = preloadImg.height;
+	}
+
+	function getImageData() {
+		preloadImg = new Image();
+		tinyMCE.addEvent(preloadImg, "load", updateImageData);
+		tinyMCE.addEvent(preloadImg, "error", function () {var formObj = document.forms[0];formObj.width.value = formObj.height.value = "";});
+		preloadImg.src = tinyMCE.convertRelativeToAbsoluteURL(tinyMCE.settings['base_href'], document.forms[0].src.value);
 	}
 </script>
 </head>
@@ -77,9 +108,9 @@ if (url != null)
           </tr>
           <tr>
             <td>{$lang_insert_image_src}:</td>
-            <td>              <table border="0" cellspacing="0" cellpadding="0">
+            <td><table border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td><input name="src" type="text" id="src" value="" style="width: 200px"></td>
+                  <td><input name="src" type="text" id="src" value="" style="width: 200px" onchange="getImageData();"></td>
                   <td id="browser"></td>
                 </tr>
               </table></td>
@@ -90,7 +121,7 @@ if (url != null)
 				var html = "";
 
 				html += '<tr><td>{$lang_image_list}:</td>';
-				html += '<td><select name="image_list" style="width: 200px" onchange="this.form.src.value=this.options[this.selectedIndex].value;">';
+				html += '<td><select name="image_list" style="width: 200px" onchange="this.form.src.value=this.options[this.selectedIndex].value;resetImageData();getImageData();">';
 				html += '<option value="">---</option>';
 
 				for (var i=0; i<tinyMCEImageList.length; i++)

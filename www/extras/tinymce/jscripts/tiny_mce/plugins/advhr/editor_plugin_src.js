@@ -1,5 +1,5 @@
-/* Import theme specific language pack */
-tinyMCE.importPluginLanguagePack('advhr', 'en,de,sv,zh_cn,cs');
+/* Import plugin specific language pack */
+tinyMCE.importPluginLanguagePack('advhr', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr');
 
 function TinyMCE_advhr_getControlHTML(control_name) {
     switch (control_name) {
@@ -45,6 +45,9 @@ function TinyMCE_advhr_execCommand(editor_id, element, command, user_interface, 
 
 function TinyMCE_advhr_handleNodeChange(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
 	tinyMCE.switchClassSticky(editor_id + '_advhr', 'mceButtonNormal');
+
+	if (node == null)
+		return;
 
 	do {
 		if (node.nodeName.toLowerCase() == "hr")

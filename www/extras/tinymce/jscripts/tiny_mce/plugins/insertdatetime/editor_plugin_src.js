@@ -1,5 +1,5 @@
-/* Import theme specific language pack */
-tinyMCE.importPluginLanguagePack('insertdatetime', 'cs,el,en,fr_ca,it,ko,sv,zh_cn');
+/* Import plugin specific language pack */
+tinyMCE.importPluginLanguagePack('insertdatetime', 'cs,el,en,fr_ca,it,ko,sv,zh_cn,fa,fr,de');
 
 /**
  * Returns the HTML contents of the insertdate, inserttime controls.
@@ -45,6 +45,10 @@ function TinyMCE_insertdatetime_execCommand(editor_id, element, command, user_in
 		format = tinyMCE.regexpReplace(format, "%S", "" + addZeros(date.getSeconds(), 2));
 		format = tinyMCE.regexpReplace(format, "%I", "" + (date.getHours() < 12 ? (date.getHours()+1) : 24-date.getHours()));
 		format = tinyMCE.regexpReplace(format, "%p", "" + (date.getHours() < 12 ? "AM" : "PM"));
+		format = tinyMCE.regexpReplace(format, "%B", "" + tinyMCE.getLang("lang_inserttime_months_long")[date.getMonth()]);
+		format = tinyMCE.regexpReplace(format, "%b", "" + tinyMCE.getLang("lang_inserttime_months_short")[date.getMonth()]);
+		format = tinyMCE.regexpReplace(format, "%A", "" + tinyMCE.getLang("lang_inserttime_day_long")[date.getDay()]);
+		format = tinyMCE.regexpReplace(format, "%a", "" + tinyMCE.getLang("lang_inserttime_day_short")[date.getDay()]);
 		format = tinyMCE.regexpReplace(format, "%%", "%");
 
 		return format;

@@ -1,11 +1,11 @@
-// DE lang variables, Translated 2004 by Crazy Chrissi, Edited 2004 by Krokogras
+// DE lang variables 
 
 tinyMCELang['lang_table_desc'] = 'Neue Tabelle einf&uuml;gen / Tabelle bearbeiten';
-tinyMCELang['lang_table_insert_row_before_desc'] = 'Davor Zeile einf&uuml;gen';
-tinyMCELang['lang_table_insert_row_after_desc'] = 'Danach Zeile einf&uuml;gen';
+tinyMCELang['lang_table_insert_row_before_desc'] = 'Zeile davor einf&uuml;gen';
+tinyMCELang['lang_table_insert_row_after_desc'] = 'Zeile danach einf&uuml;gen';
 tinyMCELang['lang_table_delete_row_desc'] = 'Zeile l&ouml;schen';
-tinyMCELang['lang_table_insert_col_before_desc'] = 'Davor Spalte einf&uuml;gen';
-tinyMCELang['lang_table_insert_col_after_desc'] = 'Danach Spalte einf&uuml;gen';
+tinyMCELang['lang_table_insert_col_before_desc'] = 'Spalte davor einf&uuml;gen';
+tinyMCELang['lang_table_insert_col_after_desc'] = ' Spalte danach einf&uuml;gen';
 tinyMCELang['lang_table_delete_col_desc'] = 'Spalte l&ouml;schen';
 tinyMCELang['lang_insert_table_title'] = 'Tabelle Einf&uuml;gen/Bearbeiten';
 tinyMCELang['lang_insert_table_width'] = 'Breite';
@@ -21,10 +21,10 @@ tinyMCELang['lang_insert_table_align_left'] = 'Links';
 tinyMCELang['lang_insert_table_align_right'] = 'Rechts';
 tinyMCELang['lang_insert_table_align_middle'] = 'Zentriert';
 tinyMCELang['lang_insert_table_class'] = 'Klasse';
-tinyMCELang['lang_table_row_title'] = 'Table row properties';
-tinyMCELang['lang_table_cell_title'] = 'Table cell properties';
-tinyMCELang['lang_table_row_desc'] = 'Table row properties';
-tinyMCELang['lang_table_cell_desc'] = 'Table cell properties';
-tinyMCELang['lang_insert_table_valign'] = 'Vertical alignment';
-tinyMCELang['lang_insert_table_align_top'] = 'Top';
-tinyMCELang['lang_insert_table_align_bottom'] = 'Bottom';
+tinyMCELang['lang_table_row_title'] = 'Zeileneigenschaften';
+tinyMCELang['lang_table_cell_title'] = 'Zelleneigenschaften';
+tinyMCELang['lang_table_row_desc'] = 'Reiheneigenschaften';
+tinyMCELang['lang_table_cell_desc'] = 'Zelleneigenschaften';
+tinyMCELang['lang_insert_table_valign'] = 'Vertikale Ausrichtung';
+tinyMCELang['lang_insert_table_align_top'] = 'Oben';
+tinyMCELang['lang_insert_table_align_bottom'] = 'Unten';

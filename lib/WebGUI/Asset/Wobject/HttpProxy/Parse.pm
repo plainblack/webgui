@@ -130,7 +130,7 @@ sub start {
       			} else {
         			$val = URI::URL::url($val)->abs($self->{Url},1); # make absolute
       			}
-      			if ($val->scheme eq "http") {
+      			if ($val->scheme eq "http" || $val->scheme eq "https") {
         			if ($self->{rewriteUrls} && lc($tag) ne "iframe") { 
           				if (lc($tag) eq "form" && lc($_) eq "action") {  # Found FORM ACTION
 	    					$self->{FormActionIsDefined}=1;

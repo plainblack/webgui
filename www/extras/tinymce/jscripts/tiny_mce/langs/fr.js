@@ -1,5 +1,5 @@
 // FR lang variables by Pat Boens
-
+// Modify by Laurent Dran
 tinyMCELang['lang_bold_desc'] = 'Gras';
 tinyMCELang['lang_italic_desc'] = 'Italique';
 tinyMCELang['lang_underline_desc'] = 'Soulign&eacute;';
@@ -35,4 +35,4 @@ tinyMCELang['lang_help_desc'] = 'Aide';
 tinyMCELang['lang_bold_img'] = "bold.gif";
 tinyMCELang['lang_italic_img'] = "italic.gif";
 tinyMCELang['lang_underline_img'] = "underline.gif";
-tinyMCELang['lang_clipboard_msg'] = 'Copy/Cut/Paste is not available in Mozilla and Firefox.\nDo you want more information about this issue?';
+tinyMCELang['lang_clipboard_msg'] = 'Copier/Couper/Coller ne sont pas disponibles pour Mozilla et Firefox.\nVoulez vous plus d\'informatios à ce sujet?';

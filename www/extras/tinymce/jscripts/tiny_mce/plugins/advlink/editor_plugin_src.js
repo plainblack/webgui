@@ -1,5 +1,5 @@
-/* Import theme specific language pack */
-tinyMCE.importPluginLanguagePack('advlink', 'en,de,sv,zh_cn,cs');
+/* Import plugin specific language pack */
+tinyMCE.importPluginLanguagePack('advlink', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr');
 
 /**
  * Insert link template function.

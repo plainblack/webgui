@@ -1,5 +1,6 @@
 6.5.0
  - Added content prototypes.
+ - Updated TinyMCE to 1.43.
  - Fixed a bug in the Collaboration post where the post end date was set to
    the start date.
  - fix [ 1157202 ] users can add themselves to Admins group
@@ -8,6 +9,10 @@
  - fix [ 1158117 ] Help Index Unavailable from RWG
  - fix [ 1157453 ] Error on Edit Template / Save and Cancel
  - fix [ 1157434 ] [CVS 6.5]edit question controls have incorrect URL in Survey
+ - fix [ 1157418 ] "Display the title?" not shown in Layout tab
+ - fix [ 1157210 ] users added notification e-mail doesn't show correct url
+ - Fixed a bug that wouldn't allow the HTTP Proxy wobject to rewrite the URLs
+   of SSL enabled sites.
  - Using the International Macro in Help to simplify management and translation.
 
 

@@ -1,7 +1,7 @@
 // SE lang variables
 
 tinyMCELang['lang_searchreplace_search_desc'] = 'Sök';
-tinyMCELang['lang_searchreplace_searchnext_desc'] = 'Sög igen';
+tinyMCELang['lang_searchreplace_searchnext_desc'] = 'Sök igen';
 tinyMCELang['lang_searchreplace_replace_desc'] = 'Sök/Ersätt';
 tinyMCELang['lang_searchreplace_notfound'] = 'Sökningen är slutförd. Söksträngen kunde inte hittas.';
 tinyMCELang['lang_searchreplace_search_title'] = 'Sök';

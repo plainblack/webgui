@@ -12,7 +12,7 @@
 		}
 
 		document.forms[0].href.value = tinyMCE.getWindowArg('href');
-		document.forms[0].insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
+		document.forms[0].insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
 
 		window.focus();
 	}

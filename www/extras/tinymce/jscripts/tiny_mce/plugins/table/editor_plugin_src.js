@@ -1,25 +1,28 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('table', 'en,ar,cs,da,de,el,es,fi,fr_ca,hu,it,ja,ko,nl,no,pl,pt,sv,tw,zh_cn');
+tinyMCE.importPluginLanguagePack('table', 'en,ar,cs,da,de,el,es,fi,fr_ca,hu,it,ja,ko,nl,no,pl,pt,sv,tw,zh_cn,fr,de');
 
 /**
  * Returns the HTML contents of the table control.
  */
 function TinyMCE_table_getControlHTML(control_name) {
 	var controls = new Array(
-		['table', '', '{$lang_table_desc}', 'mceInsertTable', true],
-		['delete_col', '', '{$lang_table_delete_col_desc}', 'mceTableDeleteCol'],
-		['delete_row', '', '{$lang_table_delete_row_desc}', 'mceTableDeleteRow'],
-		['col_after', '', '{$lang_table_insert_col_after_desc}', 'mceTableInsertColAfter'],
-		['col_before', '', '{$lang_table_insert_col_before_desc}', 'mceTableInsertColBefore'],
-		['row_after', '', '{$lang_table_insert_row_after_desc}', 'mceTableInsertRowAfter'],
-		['row_before', '', '{$lang_table_insert_row_before_desc}', 'mceTableInsertRowBefore'],
-		['row_props', '', '{$lang_table_row_desc}', 'mceTableRowProps', true],
-		['cell_props', '', '{$lang_table_cell_desc}', 'mceTableCellProps', true]);
+		['table', 'table.gif', '{$lang_table_desc}', 'mceInsertTable', true],
+		['delete_col', 'table_delete_col.gif', '{$lang_table_delete_col_desc}', 'mceTableDeleteCol'],
+		['delete_row', 'table_delete_row.gif', '{$lang_table_delete_row_desc}', 'mceTableDeleteRow'],
+		['col_after', 'table_insert_col_after.gif', '{$lang_table_insert_col_after_desc}', 'mceTableInsertColAfter'],
+		['col_before', 'table_insert_col_before.gif', '{$lang_table_insert_col_before_desc}', 'mceTableInsertColBefore'],
+		['row_after', 'table_insert_row_after.gif', '{$lang_table_insert_row_after_desc}', 'mceTableInsertRowAfter'],
+		['row_before', 'table_insert_row_before.gif', '{$lang_table_insert_row_before_desc}', 'mceTableInsertRowBefore'],
+		['row_props', 'table_row_props.gif', '{$lang_table_row_desc}', 'mceTableRowProps', true],
+		['cell_props', 'table_cell_props.gif', '{$lang_table_cell_desc}', 'mceTableCellProps', true]);
 
 	// Render table control
 	for (var i=0; i<controls.length; i++) {
 		var but = controls[i];
 
+		if (but[0] == control_name && tinyMCE.isMSIE)
+			return '<img id="{$editor_id}_' + but[0] + '" src="{$pluginurl}/images/' + but[1] + '" title="' + but[2] + '" width="20" height="20" class="mceButtonDisabled" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'' + but[3] + '\', ' + (but.length > 4 ? but[4] : false) + (but.length > 5 ? ', \'' + but[5] + '\'' : '') + ')">';
+		else
 		if (but[0] == control_name)
 			return '<img id="{$editor_id}_' + but[0] + '" src="{$themeurl}/images/spacer.gif" style="background-image:url({$pluginurl}/images/buttons.gif); background-position: ' + (0-(i*20)) + 'px 0px" title="' + but[2] + '" width="20" height="20" class="mceButtonDisabled" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'' + but[3] + '\', ' + (but.length > 4 ? but[4] : false) + (but.length > 5 ? ', \'' + but[5] + '\'' : '') + ')">';
 	}

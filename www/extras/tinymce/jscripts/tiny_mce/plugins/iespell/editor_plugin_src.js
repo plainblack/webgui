@@ -1,5 +1,5 @@
-/* Import theme specific language pack */
-tinyMCE.importPluginLanguagePack('iespell', 'cs,el,en,fr_ca,it,ko,sv,zh_cn');
+/* Import plugin specific language pack */
+tinyMCE.importPluginLanguagePack('iespell', 'cs,el,en,fr_ca,it,ko,sv,zh_cn,fr,de');
 
 /**
  * Returns the HTML contents of the iespell control.

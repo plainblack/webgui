@@ -166,11 +166,13 @@ sub createAccount {
    $vars->{'create.message'} = $_[0] if ($_[0]);
 	my $storage = WebGUI::Storage::Image->createTemp;
 	my ($filename, $challenge) = $storage->addFileFromCaptcha;
-   	$vars->{'create.form.captcha'} = WebGUI::Form::text({"name"=>"authWebGUI.captcha", size=>6, maxlength=>6})
-		.WebGUI::Form::hidden({name=>"authWebGUI.captcha.validation", value=>Digest::MD5::md5_base64(lc($challenge))})
-		.'<img src="'.$storage->getUrl($filename).'" border="0" alt="captcha" align="middle" />';
-   	$vars->{'create.form.captcha.label'} = WebGUI::International::get("captcha label","AuthWebGUI");
 	$vars->{useCaptcha} = $session{setting}{webguiUseCaptcha};
+	if ($vars->{useCaptcha}) {
+   		$vars->{'create.form.captcha'} = WebGUI::Form::text({"name"=>"authWebGUI.captcha", size=>6, maxlength=>6})
+			.WebGUI::Form::hidden({name=>"authWebGUI.captcha.validation", value=>Digest::MD5::md5_base64(lc($challenge))})
+			.'<img src="'.$storage->getUrl($filename).'" border="0" alt="captcha" align="middle" />';
+   		$vars->{'create.form.captcha.label'} = WebGUI::International::get("captcha label","AuthWebGUI");
+	}
    $vars->{'create.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$session{form}{"authWebGUI.username"}});
    $vars->{'create.form.username.label'} = WebGUI::International::get(50);
    $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>$session{form}{"authWebGUI.identifier"}});

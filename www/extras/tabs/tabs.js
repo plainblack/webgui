@@ -18,7 +18,7 @@ function toggleTab(i){
                 document.getElementById('tab'+i).className = 'tab tabActive';
 	 	document.getElementById('tab'+i).onmouseover = '';
 	 	document.getElementById('tab'+i).onmouseout = '';
-		fixFckEditor();
+//		fixFckEditor();
         }
 }
 
@@ -38,20 +38,4 @@ function fixFckEditor() {
 	}
 }
 
-function fixFckEditor1 () {
-	for (i=0;i<document.forms.length; i++) {
-		for (j=0; j< document.forms[i].elements.length; j++) {
-			if (document.forms[i].elements[j].type == "textarea") {
-				if ( !document.all ) {
-					var oEditor = FCKeditorAPI.GetInstance( document.forms[i].elements[j].name ) ;
-					if ( oEditor.EditMode == FCK_EDITMODE_WYSIWYG ) {
-						oEditor.SwitchEditMode() ;
-					//	oEditor.SwitchEditMode() ;
-					} 
-				}
-				//alert("found a text area - value = " + document.forms[i].elements[j].value);
-			}
-		}
-	}
-}
 

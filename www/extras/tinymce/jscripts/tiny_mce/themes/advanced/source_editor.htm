@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
 <title>{$lang_theme_code_title}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -18,8 +16,8 @@
 
     // Fixes some charcode issues
     function fixContent(html) {
-        html = html.replace(new RegExp(/<(p|hr|table|tr|td|ol|ul|object|embed|li|blockquote)/gi),'\n<$1');
-        html = html.replace(new RegExp(/<\/(p|ol|ul|li|table|tr|td|blockquote|object)>/gi),'</$1>\n');
+        html = html.replace(new RegExp('<(p|hr|table|tr|td|ol|ul|object|embed|li|blockquote)', 'gi'),'\n<$1');
+        html = html.replace(new RegExp('<\/(p|ol|ul|li|table|tr|td|blockquote|object)>', 'gi'),'</$1>\n');
         html = tinyMCE.regexpReplace(html, '<br />','<br />\n','gi');
         html = tinyMCE.regexpReplace(html, '\n\n','\n','gi');
         return html;

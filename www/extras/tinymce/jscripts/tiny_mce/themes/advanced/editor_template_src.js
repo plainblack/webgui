@@ -53,7 +53,7 @@ function TinyMCE_advanced_getControlHTML(button_name) {
 		var but = TinyMCE_advanced_buttons[i];
 		if (but[0] == button_name) {
 			// Check for it in tilemap
-			for (var x=0; x<buttonTileMap.length; x++) {
+			for (var x=0; !tinyMCE.isMSIE && x<buttonTileMap.length; x++) {
 				if (buttonTileMap[x] == but[1])
 					return '<img id="{$editor_id}_' + but[0] + '" src="{$themeurl}/images/spacer.gif" style="background-image:url({$themeurl}/images/buttons.gif); background-position: ' + (0-(x*20)) + 'px 0px" title="' + but[2] + '" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'' + but[3] + '\', ' + (but.length > 4 ? but[4] : false) + (but.length > 5 ? ', \'' + but[5] + '\'' : '') + ')">';
 			}
@@ -239,8 +239,7 @@ function TinyMCE_advanced_getEditorTemplate(settings) {
   	var pathHTML = '{$lang_theme_path}: <span id="{$editor_id}_path">&nbsp;</span>';
 	var layoutManager = tinyMCE.getParam("theme_advanced_layout_manager", "SimpleLayout");
 
-	switch(layoutManager)
-	{
+	switch(layoutManager) {
 		case "SimpleLayout" : //the default TinyMCE Layout (for backwards compatibility)...
                 var toolbarHTML = "";
                 var toolbarLocation = tinyMCE.getParam("theme_advanced_toolbar_location", "bottom");
@@ -291,7 +290,7 @@ function TinyMCE_advanced_getEditorTemplate(settings) {
                     template['html'] += '<tr><td class="mceToolbarTop" align="' + toolbarAlign + '" height="1">' + toolbarHTML + '</td></tr>';
 
                 if (pathLocation == "top") {
-                    template['html'] += '<tr><td class="mcePathTop">' + pathHTML + '</td></tr>';
+                    template['html'] += '<tr><td class="mcePathTop" height="1">' + pathHTML + '</td></tr>';
 					deltaHeight -= 23;
 				}
 
@@ -306,7 +305,7 @@ function TinyMCE_advanced_getEditorTemplate(settings) {
                     template['html'] += '<tr><td class="mceToolbarBottom" align="' + toolbarAlign + '" height="1">' + toolbarHTML + '</td></tr>';
 
                 if (pathLocation == "bottom") {
-                    template['html'] += '<tr><td class="mcePathBottom">' + pathHTML + '</td></tr>';
+                    template['html'] += '<tr><td class="mcePathBottom" height="1">' + pathHTML + '</td></tr>';
 					deltaHeight -= 23;
 				}
 
@@ -340,7 +339,7 @@ function TinyMCE_advanced_getEditorTemplate(settings) {
 					else
 						deltaHeight-=2;
 
-                    template['html'] += '<tr><td class="' + pathClass + '">' + pathHTML + '</td></tr>';
+                    template['html'] += '<tr><td class="' + pathClass + '" height="1">' + pathHTML + '</td></tr>';
 					deltaHeight -= 22;
                 }
                 else //Render normal Container:
@@ -459,6 +458,10 @@ function TinyMCE_advanced_handleNodeChange(editor_id, node, undo_index, undo_lev
 		return elm.getAttribute(name) ? elm.getAttribute(name) : "";
 	}
 
+	// No node provided
+	if (node == null)
+		return;
+
 	// Update path
 	var pathElm = document.getElementById(editor_id + "_path");
 	if (pathElm) {
@@ -506,6 +509,13 @@ function TinyMCE_advanced_handleNodeChange(editor_id, node, undo_index, undo_lev
 			if (nodeName == "img" && getAttrib(path[i], 'name') == "mce_plugin_flash") {
 				nodeName = "flash";
 				nodeData = "";
+			}
+
+			if (getAttrib(path[i], 'name').indexOf("mce_") != 0) {
+				if (getAttrib(path[i], "className") != "")
+					nodeName += "." + getAttrib(path[i], "className");
+				else if (getAttrib(path[i], "class") != "")
+					nodeName += "." + getAttrib(path[i], "class");
 			}
 
 			if (tinyMCE.isMSIE)

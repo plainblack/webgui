@@ -18,7 +18,7 @@
 
 		formObj.src.value = tinyMCE.getWindowArg('src');
 		formObj.alt.value = tinyMCE.getWindowArg('alt');
-		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action')); 
+		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
 
 		window.focus();
 	}

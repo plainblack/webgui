@@ -1,5 +1,5 @@
-/* Import theme specific language pack */
-//tinyMCE.importPluginLanguagePack('zoom', 'en,sv,pt');
+/* Import plugin specific language pack */
+//tinyMCE.importPluginLanguagePack('zoom', 'en,sv,pt,fr_ca,fr,de');
 
 /**
  * Returns the HTML contents of the zoom control.

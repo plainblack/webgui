@@ -13,28 +13,23 @@
 }
 
 .mceButtonOver {
-	border-top: 1px solid buttonhighlight;
+/*	border-top: 1px solid buttonhighlight;
 	border-left: 1px solid buttonhighlight;
 	border-bottom: 1px solid buttonshadow;
-	border-right: 1px solid buttonshadow;
+	border-right: 1px solid buttonshadow;*/
+	border: 1px solid #0A246A;
 	cursor: arrow;
+	background-color: #B6BDD2;
 }
 
 .mceButtonDown {
-	border-bottom: 1px solid buttonhighlight;
+/*	border-bottom: 1px solid buttonhighlight;
 	border-right: 1px solid buttonhighlight;
 	border-top: 1px solid buttonshadow;
-	border-left: 1px solid buttonshadow;
+	border-left: 1px solid buttonshadow;*/
 	cursor: arrow;
-}
-
-.mceButtonSelected {
-	border-bottom: 1px solid;
-	border-right: 1px solid;
-	border-top: 1px solid;
-	border-left: 1px solid;
-	border-color: #C0C0BB;
-	cursor: arrow;
+	border: 1px solid #0A246A;
+	background-color: #8592B5;
 }
 
 .mceButtonDisabled {
