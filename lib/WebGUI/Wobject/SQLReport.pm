@@ -241,6 +241,7 @@ sub _parsePlaceholderParams {
 		} elsif ($param =~ /^query(\d):/) {
 			$param = $self->{_query}{$1}{rowData}{$'};
 		}
+		$param = WebGUI::Macro::process($param);
 		push(@placeholderParams, $param);
 	}
 	return \@placeholderParams;
