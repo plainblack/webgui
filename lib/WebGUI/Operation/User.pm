@@ -447,7 +447,7 @@ sub www_listUsers {
 			$i++;
 		}
 		$sth->finish;
-                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listUsers'),\@row);
+                $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listUsers&keyword='.$session{form}{keyword}),\@row);
                 $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 		$output .= '<tr><td class="tableHeader"></td>
 			<td class="tableHeader">'.WebGUI::International::get(50).'</td></tr>';
