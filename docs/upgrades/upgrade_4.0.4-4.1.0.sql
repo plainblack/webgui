@@ -47,5 +47,21 @@ alter table messageLog add column status varchar(30) default 'notice';
 INSERT INTO international VALUES (551,'WebGUI','English','Notice');
 INSERT INTO international VALUES (552,'WebGUI','English','Pending');
 INSERT INTO international VALUES (553,'WebGUI','English','Status');
+INSERT INTO international VALUES (554,'WebGUI','English','Take Action');
+INSERT INTO international VALUES (555,'WebGUI','English','Edit this user\'s karma.');
+INSERT INTO international VALUES (556,'WebGUI','English','Amount');
+INSERT INTO international VALUES (557,'WebGUI','English','Description');
+INSERT INTO international VALUES (558,'WebGUI','English','Edit User\'s Karma');
+
+
+
+
+
+
+
+
+
+
+
 
 
