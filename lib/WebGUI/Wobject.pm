@@ -606,7 +606,7 @@ sub setCollateral {
 		$sql .= " where $keyName='".$properties->{$keyName}."'";
 	}
   	WebGUI::SQL->write($sql);
-	WebGUI::ErrorHandler::audit("edited ".$keyName." ".$properties->{$keyName});
+	WebGUI::ErrorHandler::audit("edited ".$table." ".$properties->{$keyName});
 	return $properties->{$keyName};
 }
 
