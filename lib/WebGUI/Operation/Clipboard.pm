@@ -180,7 +180,7 @@ sub www_emptyClipboardConfirm {
         	WebGUI::ErrorHandler::audit("emptied user clipboard to trash");
 	}
         WebGUI::Session::refreshPageInfo($session{page}{pageId});
-        return "";
+        return www_manageClipboard();
 }
 
 #-------------------------------------------------------------------

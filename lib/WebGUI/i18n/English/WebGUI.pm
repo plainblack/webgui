@@ -1612,8 +1612,8 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	},
 
 	'965' => {
-		message => q|Manage System Trash|,
-		lastUpdated => 1052850265
+		message => q|System Trash|,
+		lastUpdated => 1099050265
 	},
 
 	'824' => {
@@ -5362,11 +5362,6 @@ The headings of columns on things like message boards and user contributions.
 
 |,
 		lastUpdated => 1070030223
-	},
-
-	'962' => {
-		message => q|Manage Trash|,
-		lastUpdated => 1052850265
 	},
 
 	'328' => {

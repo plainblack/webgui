@@ -12,10 +12,11 @@ package WebGUI::Operation::Trash;
 
 use strict qw(vars subs);
 use Tie::CPHash;
+use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::Icon;
-use WebGUI::Operation::Shared;
+use WebGUI::Page;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -111,19 +112,26 @@ sub _recursePageTree {
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page('op=manageTrash')} = WebGUI::International::get(10);
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title) if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help);
+        }
+        $ac->setAdminFunction("trash");
+	$ac->addSubmenuItem(WebGUI::URL::page('op=manageTrash'), WebGUI::International::get(10));
 	if ($session{form}{systemTrash} ne "1") {
-		$menu{WebGUI::URL::page('op=emptyTrash')} = WebGUI::International::get(11);
+		$ac->addSubmenuItem(WebGUI::URL::page('op=emptyTrash'), WebGUI::International::get(11));
 	}
 	if ( ($session{setting}{sharedTrash} ne "1") && (WebGUI::Grouping::isInGroup(3)) ) {
-		$menu{WebGUI::URL::page('op=manageTrash&systemTrash=1')} = WebGUI::International::get(964);
+		$ac->addSubmenuItem(WebGUI::URL::page('op=manageTrash&systemTrash=1'), WebGUI::International::get(964));
 		if ($session{form}{systemTrash} eq "1") {
-			$menu{WebGUI::URL::page('op=emptyTrash&systemTrash=1')} = WebGUI::International::get(967);
+			$ac->addSubmenuItem(WebGUI::URL::page('op=emptyTrash&systemTrash=1'), WebGUI::International::get(967));
 		}
 	}
-        return menuWrapper($_[0],\%menu);
+        return $ac->render($workarea, $title);
 }
 
 
@@ -168,7 +176,6 @@ sub www_deleteTrashItem {
 	} elsif ($session{form}{pageId} ne "") {
         	$output .= helpIcon("page delete");
 	}
-        $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(966).'<p>';
 	if ($session{form}{wid} ne "") {
         	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteTrashItemConfirm&wid='
@@ -179,7 +186,7 @@ sub www_deleteTrashItem {
 	}
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'
 		.WebGUI::International::get(45).'</a></div>';
-        return $output;
+        return _submenu($output,'42');
 }
 
 #-------------------------------------------------------------------
@@ -219,8 +226,6 @@ sub www_deleteTrashItemConfirm {
 sub www_emptyTrash {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my ($output);
-	$output = helpIcon("trash empty");
-        $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
         $output .= WebGUI::International::get(162).'<p>';
         $output .= WebGUI::International::get(651).'<p>';
 	if ($session{form}{systemTrash} eq "1") {
@@ -232,7 +237,7 @@ sub www_emptyTrash {
 	}
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'
                 .WebGUI::International::get(45).'</a></div>';
-        return $output;
+        return _submenu($output,'42',"trash empty");
 }
 
 #-------------------------------------------------------------------
@@ -263,7 +268,7 @@ sub www_emptyTrashConfirm {
         	WebGUI::ErrorHandler::audit("emptied user trash");
 	}
         WebGUI::Session::refreshPageInfo($session{page}{pageId});
-        return "";
+        return www_manageTrash();
 }
 
 #-------------------------------------------------------------------
@@ -271,19 +276,16 @@ sub www_manageTrash {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 
 	my ($sth, @data, @row, @sorted_row, $i, $p, $allUsers);
-	my $output = helpIcon("trash manage");
-
+	my ($title,$output);
 	# Add appropriate html page header
 	if ($session{setting}{sharedTrash} eq "1") {
 		$allUsers = 1;
-        	$output .= '<h1>'. WebGUI::International::get(962) .'</h1>';
 	} elsif ($session{form}{systemTrash} eq "1") {
 		return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 		$allUsers = 1;
-        	$output .= '<h1>'. WebGUI::International::get(965) .'</h1>';
+        	$title = '<h1>'. WebGUI::International::get(965) .'</h1>';
 	} else {
 		$allUsers = 0;
-        	$output .= '<h1>'. WebGUI::International::get(962) .'</h1>';
 	}
 
 	# Generate list of pages in trash
@@ -420,7 +422,7 @@ sub www_manageTrash {
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
-        return _submenu($output);
+        return _submenu($output,$title,"trash manage");
 }
 
 1;
