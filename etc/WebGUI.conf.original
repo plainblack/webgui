@@ -10,6 +10,8 @@ extrasPath = /data/WebGUI/www/extras
 uploadsURL = /uploads
 uploadsPath = /data/WebGUI/www/uploads
 
+authMethods = LDAP, WebGUI
+
 wobjects = Article, EventsCalendar, ExtraColumn, FAQ, FileManager, HttpProxy, \
 	Item, LinkList, MailForm, MessageBoard, Poll, Product, SiteMap, \
 	SQLReport, Survey, SyndicatedContent, USS, WobjectProxy

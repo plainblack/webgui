@@ -50,8 +50,11 @@ sub www_editUserSettings {
         $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
 	$f->yesNo("selfDeactivation",WebGUI::International::get(885),$session{setting}{selfDeactivation});
-        $f->select("authMethod",$session{authentication},WebGUI::International::get(119),[$session{setting}{authMethod}]);
-	foreach (keys %{$session{authentication}}) {
+	foreach (@{$session{config}{authMethods}}) {
+                $options->{$_} = $_;
+        }
+        $f->select("authMethod",$options,WebGUI::International::get(119),[$session{setting}{authMethod}]);
+	foreach (@{$session{config}{authMethods}}) {
 		$f->raw(WebGUI::Authentication::settingsForm($_));
  	}
 	$f->submit;

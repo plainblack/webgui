@@ -165,28 +165,13 @@ sub _time {
 
 #-------------------------------------------------------------------
 sub _loadAuthentication {
-	my ($dir, @files, $file, $cmd, $namespace, $exclude);
-	$dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Authentication";
-	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatalError("Can't open Authentication module directory!");
-	@files = readdir(DIR);
-	foreach $file (@files) {
-		if ($file =~ /(.*?)\.pm$/) {
-			$namespace = $1;
-			$cmd = "use WebGUI::Authentication::".$namespace;
-			eval($cmd);
-			unless ($@) {
-				$exclude = $session{config}{excludeAuthentication};
-                        	$exclude =~ s/ //g;
-				unless (isIn($namespace, split(/,/,$exclude))) {
-					$session{authentication}{$namespace} = $namespace;
-				}
-			} else {
-				WebGUI::ErrorHandler::warn("Authentication module failed to compile: $namespace. ".$@);
-				$session{authentication}{failed} .= "[".$namespace."] ";
-			}
+	foreach my $namespace (@{$session{config}{authMethods}}) {
+		my $cmd = "use WebGUI::Authentication::".$namespace;
+		eval($cmd);
+		if ($@) {
+			WebGUI::ErrorHandler::warn("Authentication module failed to compile: $namespace. ".$@);
 		}
 	}
-	closedir(DIR);
 }
 
 #-------------------------------------------------------------------

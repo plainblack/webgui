@@ -82,8 +82,12 @@ sub www_addUser {
 		-size=>5,
 		-multiple=>1
 		);
-	$f->select("authMethod",$session{authentication},WebGUI::International::get(164),[$session{setting}{authMethod}]);
-	foreach (keys %{$session{authentication}}) {
+	my $options;
+	foreach (@{$session{config}{authMethods}}) {
+		$options->{$_} = $_;
+	}
+	$f->select("authMethod",$options,WebGUI::International::get(164),[$session{setting}{authMethod}]);
+	foreach (@{$session{config}{authMethods}}) {
 		$f->raw(WebGUI::Authentication::adminForm(0,$_));
 	}
 	$f->submit;
@@ -101,7 +105,7 @@ sub www_addUserSave {
 		$u = WebGUI::User->new("new");
 		$session{form}{uid}=$u->userId;
 		$u->username($session{form}{username});
-		foreach (keys %{$session{authentication}}) {
+		foreach (@{$session{config}{authMethods}}) {
 			WebGUI::Authentication::adminFormSave($u->userId,$_);
 	 	}
 		$u->status($session{form}{status});
@@ -232,8 +236,12 @@ sub www_editUser {
 	} else {
 		$f->select("status",\%status,WebGUI::International::get(816),[$u->status]);
 	}
-       	$f->select("authMethod",$session{authentication},WebGUI::International::get(164),[$u->authMethod]);
-	foreach (keys %{$session{authentication}}) {
+	my $options;
+        foreach (@{$session{config}{authMethods}}) {
+                $options->{$_} = $_;
+        }       	
+	$f->select("authMethod",$options,WebGUI::International::get(164),[$u->authMethod]);
+	foreach (@{$session{config}{authMethods}}) {
 		$f->raw(WebGUI::Authentication::adminForm($u->userId,$_));
  	}
         $f->submit;
@@ -251,7 +259,7 @@ sub www_editUserSave {
 		$u->username($session{form}{username});
 		$u->authMethod($session{form}{authMethod});
 		$u->status($session{form}{status});
-		foreach (keys %{$session{authentication}}) {
+		foreach (@{$session{config}{authMethods}}) {
 			WebGUI::Authentication::adminFormSave($u->userId,$_);
 	 	}
 	} else {

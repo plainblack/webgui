@@ -79,16 +79,15 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_addInternationalMessage {
-	my ($output,$f,$namespace);
+	my ($output,$f);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
 	$output = '<h1>Add English Message</h1>';
-	$namespace = $session{wobject};
-	$namespace->{WebGUI} = 'WebGUI';
-	$namespace = {%{$namespace}, map {'Auth/'.$_ => 'Authentication: '.$session{authentication}->{$_}} keys(%{$session{authentication}})};
 	$f = WebGUI::HTMLForm->new();
 	$f->hidden("lid",1);
 	$f->hidden("op","addInternationalMessageSave");
-	$f->select("namespace",$namespace,"Namespace",['WebGUI']);
+	$f->combo("namespace",
+		WebGUI::SQL->buildHashRef("select namespace,namespace from international where language=1 order by namespace")
+		,"Namespace",['WebGUI']);
 	$f->textarea("message","Message");
 	$f->submit;
 	$output .= $f->print;
