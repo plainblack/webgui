@@ -726,7 +726,8 @@ sub www_exportPageGenerate {
 			$path = $session{config}{exportPath} . $session{os}{slash} . $path;
 			eval { mkpath($path) };
 			if($@) {
-				print "Couldn't create $path: $@";
+				print "Couldn't create $path because $@ <br />\n";
+				print "This most likely means that you have a page with the same name as folder that you're trying to create.<br />\n";
 				return;
 			}
 		} 
@@ -741,9 +742,15 @@ sub www_exportPageGenerate {
 					);
 		# Open file
                 $file = $session{config}{exportPath} . $session{os}{slash} . $page->{urlizedTitle};
-                open(FILE, "> $file") || die "Can't open $file: $!";
-		print FILE $e->generate;
-		close(FILE);
+                eval { open(FILE, "> $file") or die "$!" };
+		if ($@) {
+			print "Couldn't open $file because $@ <br />\n";
+			print "This most likely means that you have created a page with the same name as an existing folder. <br />\n";
+			return;
+		} else {
+			print FILE $e->generate;
+			close(FILE);
+		}
 
 		print "DONE<br/>";
 	}

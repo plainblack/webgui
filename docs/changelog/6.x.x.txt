@@ -9,6 +9,10 @@
  - Fixed a problem where hidden form tags were not escaping macros properly.
  - Fixed an XHTML problem with hidden form tags.
  - Bugfix [ 1033561 ] HTMLArea 3 not working (Len Kranendonk)
+ - Fixed a paste page problem.
+ - Fixed a problem with the new export mechanism where it would just stop and
+   not report an error if it ran into a problem with creating folders and
+   files.
 
 
 6.2.4
