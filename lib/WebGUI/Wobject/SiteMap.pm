@@ -49,8 +49,8 @@ sub _traversePageTree {
 					"page.title" => $data->{title},
 					"page.menuTitle" => $data->{menuTitle},
 					"page.synopsis" => $data->{synopsis},
-					"page.isRoot" => ($parent == 0),
-					"page.isTop" => ($currentDepth == 0 || ($currentDepth == 1 && $parent == 0))
+					"page.isRoot" => ($parent eq '0'),
+					"page.isTop" => ($currentDepth == 0 || ($currentDepth == 1 && $parent eq '0'))
 					});
                                 push(@pages,@{_traversePageTree($data->{pageId},($currentDepth+1),$depth,$indent,$alphabetic)});
                         }
@@ -95,8 +95,8 @@ sub new {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	my $options = WebGUI::SQL->buildHashRef("select pageId,title from page where parentId=0 
-		and (pageId=1 or pageId>999) order by title");
+	my $options = WebGUI::SQL->buildHashRef("select pageId,title from page where parentId='0' 
+		and (pageId='1' or pageId>'999') order by title");
         my $layout = WebGUI::HTMLForm->new;
         my $properties = WebGUI::HTMLForm->new;
         $properties->select(
