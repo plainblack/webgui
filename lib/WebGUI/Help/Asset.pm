@@ -1,12 +1,6 @@
 package WebGUI::Help::Asset;
 
 our $HELP = {
-	'asset fields' => {
-		title => 'asset fields title',
-		body => 'asset fields body',
-		related => [
-		]
-	},
 
         'asset macros' => {
 		title => 'asset macros title',
@@ -16,6 +10,13 @@ our $HELP = {
 				tag => 'macros using',
 				namespace => 'WebGUI'
 			},
+		]
+	},
+
+	'asset fields' => {
+		title => 'asset fields title',
+		body => 'asset fields body',
+		related => [
 		]
 	},
 

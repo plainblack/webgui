@@ -120,14 +120,14 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('current file', 'Asset'),
+			-label=>WebGUI::International::get('current file', 'File'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
 			);
 		
 	}
         $tabform->getTab("properties")->file(
                	-name=>"file",
-		-label=>WebGUI::International::get('new file', 'Asset'),
+		-label=>WebGUI::International::get('new file', 'File'),
                	);
 	return $tabform;
 }
