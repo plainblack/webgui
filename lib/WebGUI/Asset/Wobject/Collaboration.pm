@@ -27,77 +27,143 @@ use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
-use WebGUI::Asset::USS_submission;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
+
+#-------------------------------------------------------------------
+sub appendPostListTemplateVars {
+	my $self = shift;
+	my $var = shift;
+	my $sql = shift;
+	my $p = shift;
+	$p->setDataByQuery($sql);
+	my $page = $p->getPageData;
+	my $i = 0;
+	foreach my $row (@$page) {
+		my $post = WebGUI::Asset::Wobject::Forum->newByPropertyHashRef($row);
+		$post->{_parent} = $self; # caching parent for efficiency 
+		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("ur"));
+		if ($self->get("sortBy") eq "lineage") {
+			if ($self->get("sortOrder") eq "desc") {
+				$controls .= moveUpIcon('func=demote',$post->get("url")).moveDownIcon('func=promote',$post->get("url"));
+			} else {
+				$controls .= moveUpIcon('func=promote',$post->get("url")).moveDownIcon('func=demote',$post->get("url"));
+			}
+		}
+		my $inDateRange;
+		if ($post->get("startDate") < WebGUI::DateTime::time() && $post->get("endDate") > WebGUI::DateTime::time()) {
+		  	$inDateRange = 1;
+		} else { 
+			$inDateRange = 0; 
+		}
+		my @rating_loop;
+		for (my $i=0;$i<=$post->get("rating");$i++) {
+			push(@rating_loop,{'rating_loop.count'=>$i});
+		}
+                push(@{$var->{post_loop}}, {
+			%{$post->get},
+                        "id"=>$post->getId,
+                        "url"=>$post->getUrl,
+			rating_loop=>\@rating_loop,
+			"content"=>$self->formatContent,
+                        "status"=>$post->getStatus,
+                      #  "thumbnail"=>$submission->getThumbnailUrl,
+                       # "submission.image"=>$submission->getImageUrl,
+                        "dateSubmitted.human"=>epochToHuman($post->get("dateSubmitted"),"%z"),
+                        "dateUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%z"),
+                        "timeSubmitted.human"=>epochToHuman($post->get("dateSubmitted"),"%Z"),
+                        "timeUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%Z"),
+                        "userProfile.url"=>$post->getUserProfileUrl,
+                        "user.isVisitor"=>$post->get("ownerUserId") eq "1",
+        		"edit.url"=>$post->getEditUrl,
+			'controls'=>$controls,
+			'inDateRange'=>$inDateRange,
+                        "isSecond"=>(($i+1)%2==0),
+                        "isThird"=>(($i+1)%3==0),
+                        "isFourth"=>(($i+1)%4==0),
+                        "isFifth"=>(($i+1)%5==0),
+                	"currentUserIsPoster"=>$post->isPoster
+                        });
+		$i++;
+	}
+	$p->appendTemplateVars($var);
+}
 
 #-------------------------------------------------------------------
 sub appendTemplateLabels {
 	my $self = shift;
 	my $var = shift;
 	my $i18n = WebGUI::International->new("Collaboration");
-	$var->{'question.label'} = WebGUI::International::get(85,"USS");
-	$var->{'title.label'} = WebGUI::International::get(35,"USS");
-	$var->{'link.header.label'} = WebGUI::International::get(90,"USS");
-        $var->{'visitorName.label'} = WebGUI::International::get(438);
-	$var->{'question.header.label'} = WebGUI::International::get(84,"USS");
-        $var->{'submission.header.label'} = WebGUI::International::get(19,"USS");
-        $var->{'body.label'} = WebGUI::International::get(31,"USS");
-	$var->{'answer.label'} = WebGUI::International::get(86,"USS");
-        $var->{'description.label'} = WebGUI::International::get(85);
-	$var->{'contentType.label'} = WebGUI::International::get(1007);
-	$var->{'startDate.label'} = WebGUI::International::get(497);
-	$var->{'endDate.label'} = WebGUI::International::get(498);
-        $var->{'url.label'} = WebGUI::International::get(91,"USS");
-        $var->{'newWindow.label'} = WebGUI::International::get(92,"USS");
-        $var->{'newpost.header'} = WebGUI::International::get(1064);
-        $var->{'sticky.label'} = WebGUI::International::get(1013);
-        $var->{'subscribe.label'} = WebGUI::International::get(873);
-        $var->{'lock.label'} = WebGUI::International::get(1012);
-        $var->{'message.label'} = WebGUI::International::get(230);
-        $var->{'subject.label'} = WebGUI::International::get(229);
-	$var->{'image.label'} = WebGUI::International::get(32,"USS");
-	$var->{'attachment.label'} = WebGUI::International::get(33,"USS");
-        $var->{"user.label"} = "User";
-	$var->{"title.label"} = "Title";
-	$var->{"subject.label"} = "Subject";
-	$var->{"status.label"} = "Status";
-	$var->{"date.label"} = "Date";
+	$var->{"add.label"} = "Add";
+	$var->{"addlink.label"} = "Add a link.";
+	$var->{"addquestion.label"} = "Add a question.";
+        $var->{'all.label'} = "All Words";
+        $var->{'atleastone.label'} = "At Least One";
 	$var->{"approve.label"} = "Approve";
+	$var->{'answer.label'} = "Answer";
+	$var->{'attachment.label'} = "Attachment";
+	$var->{"by.label"} = "By";
+        $var->{'body.label'} = "Body";
+	$var->{"back.label"} = "Back";
+	$var->{'contentType.label'} = "Content Type";
+	$var->{"date.label"} = "Date";
 	$var->{"delete.label"} = "Delete";
+        $var->{'description.label'} = "Description";
 	$var->{"deny.label"} = "Deny";
 	$var->{"edit.label"} = "Edit";
-	$var->{"reply.label"} = "Reply";
-	$var->{"views.label"} = "Views";
+	$var->{'endDate.label'} = "End Date";
+        $var->{'exactphrase.label'} = "Exact Phrase";
+	$var->{"flat.label"} = "Flat";
+	$var->{'image.label'} = "Image";
+	$var->{'link.header.label'} = "Edit Link";
+	$var->{"lock.label"} = "Lock";
+	$var->{"layout.label"} = "Layout";
+        $var->{'message.header.label'} = "Edit Message";
+        $var->{'message.label'} = "Message";
+	$var->{"next.label"} = "Next";
+        $var->{'newWindow.label'} = "Open in new window?";
+	$var->{"nested.label"} = "Nested";
+	$var->{"previous.label"} = "Previous";
+	$var->{"post.label"} = "Add a post.";
+	$var->{'question.label'} = "Question";
+	$var->{'question.header.label'} = "Edit Question";
 	$var->{"rating.label"} = "Rating";
 	$var->{"rate.label"} = "Rate";
-	$var->{"layout.label"} = "Layout";
-	$var->{"nested.label"} = "Nested";
-	$var->{"threaded.label"} = "Threaded";
-	$var->{"flat.label"} = "Flat";
-	$var->{"lock.label"} = "Lock";
-	$var->{"unlock.label"} = "Unlock";
-	$var->{"stick.label"} = "Make Sticky";
-	$var->{"unstick.label"} = "Unstick";
+	$var->{"reply.label"} = "Reply";
+	$var->{"readmore.label"} = "Read More";
+	$var->{"responses.label"} = "Responses";
+        $var->{'results.label'} = "Results";
+        $var->{"search.label"} = "Search";
+        $var->{'subject.label'} = "Subject";
 	$var->{"subscribe.label"} = "Subscribe";
+        $var->{'submission.header.label'} = "Edit Submission";
+	$var->{'startDate.label'} = "Start Date";
+	$var->{"stick.label"} = "Make Sticky";
+	$var->{"subject.label"} = "Subject";
+	$var->{"status.label"} = "Status";
+	$var->{"thumbnail.label"} = "Thumbnail";
+	$var->{"title.label"} = "Title";
+	$var->{"threaded.label"} = "Threaded";
+	$var->{"unlock.label"} = "Unlock";
+	$var->{"unstick.label"} = "Unstick";
 	$var->{"unsubscribe.label"} = "Unsubscribe";
-	$var->{"previous.label"} = "Previous";
-	$var->{"next.label"} = "Next";
-	$var->{"next.label"} = "Search";
-	$var->{"back.label"} = "Back";
-	$var->{"add.label"} = "Add";
+        $var->{'url.label'} = "URL";
+        $var->{"user.label"} = "User";
+	$var->{"views.label"} = "Views";
+        $var->{'visitorName.label'} = "Visitor Name";
+        $var->{'without.label'} = "Without";
 }
 
 #-------------------------------------------------------------------
 sub canModerate {
-	my $shift;
+	my $self = shift;
 	return WebGUI::Grouping::isInGroup($self->get("moderateGroupId")) || $self->canEdit;
 }
 
 #-------------------------------------------------------------------
 sub canPost {
-	my $shift;
+	my $self = shift;
 	return WebGUI::Grouping::isInGroup($self->get("postGroupId")) || $self->canModerate;
 }
 
@@ -110,7 +176,7 @@ sub canSubscribe {
 
 #-------------------------------------------------------------------
 sub canView {
-	my $shift;
+	my $self = shift;
 	return $self->SUPER::canView || $self->canPost;
 }
 
@@ -373,7 +439,7 @@ sub getEditForm {
 		-name=>"sortOrder",
 		-value=>[$self->getValue("sortOrder")],
 		-options=>{
-			asc=>"Ascending"
+			asc=>"Ascending",
 			desc=>"Descending"
 			},
 		-label=>"Sort Order"
@@ -698,24 +764,18 @@ sub view {
                 }
                 WebGUI::Session::setScratch($scratchSortDir, $sortDir);
         }
-	my $numResults = $self->get("threadsPerPage");
 	my %var;
-	$var{"readmore.label"} = "Read More";
-	$var{"responses.label"} = "Responses";
-	$var{"post.label"} = "Add a post.";
-	$var{"addquestion.label"} = "Add a question.";
-	$var{"addlink.label"} = "Add a link.";
-        $var{"search.label"} = "Search";
-	$var{"title.label"} = WebGUI::International::get(99);
-	$var{"thumbnail.label"} = WebGUI::International::get(52,"USS");
-	$var{"date.label"} = WebGUI::International::get(13,"USS");
-	$var{"date.updated.label"} = WebGUI::International::get(78,"USS");
-	$var{"by.label"} = WebGUI::International::get(21,"USS");
-	$var{"submission.edit.label"} = WebGUI::International::get(27,"USS");
-	$var{canPost} = $self->canPost;
+	$var{'user.canPost'} = $self->canPost;
         $var{"post.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
-        $var{canModerate} = $self->canModerate;
+        $var{'user.isModerator'} = $self->canModerate;
+        $var{'user.isVisitor'} = ($session{user}{userId} eq '1');
+	$var{'user.isSubscribed'} = $self->isSubscribed;
+	$var{'sortby.date.url'} = $self->getSortByUrl("date");
+	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastreply");
+	$var{'sortby.views.url'} = $self->getSortByUrl("views");
+	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
+	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
 	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	#$var{"search.Form"} = WebGUI::Search::form({func=>'view',search=>1});
 	#$var{"search.url"} = WebGUI::Search::toggleURL("func=view");
@@ -733,66 +793,14 @@ sub view {
 		}
 		$constraints .= ")";
 	#}
-	my $p = WebGUI::Paginator->new($self->getUrl,$numResults);
 	my $sql = "select * 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=asset.assetId 
 		where Thread.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder");
-	$p->setDataByQuery($sql);
-	my $page = $p->getPageData;
-	my $i = 0;
-	my $imageURL = "";
-	foreach my $row (@$page) {
-		my $post = WebGUI::Asset::Post->newByPropertyHashRef($row);
-		$post->{_parent} = $self; # caching parent for efficiency 
-		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("ur"));
-		if ($self->get("sortBy") eq "lineage") {
-			if ($self->get("sortOrder") eq "desc") {
-				$controls .= moveUpIcon('func=demote',$post->get("url")).moveDownIcon('func=promote',$post->get("url"));
-			} else {
-				$controls .= moveUpIcon('func=promote',$post->get("url")).moveDownIcon('func=demote',$post->get("url"));
-			}
-		}
-		my $inDateRange;
-		if ($post->get("startDate") < WebGUI::DateTime::time() && $post->get("endDate") > WebGUI::DateTime::time()) {
-		  	$inDateRange = 1;
-		} else { 
-			$inDateRange = 0; 
-		}
-                push(@{$var{submissions_loop}}, {
-                        "id"=>$post->getId,
-                        "url"=>$post->getUrl,
-                        "synopsis"=>$post->get("synopsis"),
-			"content"=>$self->formatContent,
-			"reply.count"=>$post->get("replies"),
-                        "title"=>$post->get("title"),
-                        "userDefined1"=>$post->get("userDefined1"),
-                        "userDefined2"=>$post->get("userDefined2"),
-                        "userDefined3"=>$post->get("userDefined3"),
-                        "userDefined4"=>$post->get("userDefined4"),
-                        "userDefined5"=>$post->get("userDefined5"),
-                        "userId"=>$post->get("userId"),
-                        "username"=>$post->get('username'),
-                        "status"=>$self->status($post->get("status")),
-                      #  "thumbnail"=>$submission->getThumbnailUrl,
-                       # "submission.image"=>$submission->getImageUrl,
-                        "date.submitted"=>epochToHuman($post->get("dateSubmitted")),
-                        "date.updated"=>epochToHuman($post->get("dateUpdated")),
-                        "userProfile.url"=>$post->getUserProfileUrl,
-        		"edit.url"=>$post->getEditUrl,
-			'controls'=>$controls,
-			'inDateRange'=>$inDateRange,
-                        "isSecond"=>(($i+1)%2==0),
-                        "isThird"=>(($i+1)%3==0),
-                        "isFourth"=>(($i+1)%4==0),
-                        "isFifth"=>(($i+1)%5==0),
-                	"currentUserIsPoster"=>$post->isPoster
-                        });
-		$i++;
-	}
-	$p->appendTemplateVars(\%var);
+	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
+	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	return $self->processTemplate(\%var,$self->get("collaborationTemplateId"));
 }
 
@@ -820,41 +828,33 @@ sub www_search {
         WebGUI::Session::setScratch($self->getId."_without",$session{form}{without});
         WebGUI::Session::setScratch($self->getId."_numResults",$session{form}{numResults});
         my %var;
-        $var{'callback.label'} = WebGUI::International::get(1039);
-        $var{'form.begin'} = WebGUI::Form::formHeader({action=>$self->getUrl});
-        $var{'form.begin'} .= WebGUI::Form::hidden({ name=>"forumOp", value=>"search" });
-        $var{'form.begin'} .= WebGUI::Form::hidden({ name=>"doit", value=>1 });
-        $var{'form.begin'} .= WebGUI::Form::hidden({ name=>"forumId", value=>$session{form}{forumId} });
-        $var{'search.label'} = WebGUI::International::get(364);
-        $var{'all.label'} = WebGUI::International::get(530);
+        $var{'form.begin'} = WebGUI::Form::formHeader({action=>$self->getUrl})
+         	.WebGUI::Form::hidden({ name=>"func", value=>"search" })
+        	.WebGUI::Form::hidden({ name=>"doit", value=>1 });
         $var{'all.form'} = WebGUI::Form::text({
                 name=>'all',
-                value=>$session{scratch}{all},
+                value=>$session{scratch}{$self->getId."_all"},
                 size=>($session{setting}{textBoxSize}-5)
                 });
-        $var{'exactphrase.label'} = WebGUI::International::get(531);
         $var{'exactphrase.form'} = WebGUI::Form::text({
                 name=>'exactPhrase',
-                value=>$session{scratch}{exactPhrase},
+                value=>$session{scratch}{$self->getId."_exactPhrase"},
                 size=>($session{setting}{textBoxSize}-5)
                 });
-        $var{'atleastone.label'} = WebGUI::International::get(532);
         $var{'atleastone.form'} = WebGUI::Form::text({
                 name=>'atLeastOne',
-                value=>$session{scratch}{atLeastOne},
+                value=>$session{scratch}{$self->getId."_atLeastOne"},
                 size=>($session{setting}{textBoxSize}-5)
                 });
-        $var{'without.label'} = WebGUI::International::get(533);
         $var{'without.form'} = WebGUI::Form::text({
                 name=>'without',
-                value=>$session{scratch}{without},
+                value=>$session{scratch}{$self->getId."_without"},
                 size=>($session{setting}{textBoxSize}-5)
                 });
-        $var{'results.label'} = WebGUI::International::get(529);
         my %results;
         tie %results, 'Tie::IxHash';
         %results = (10=>'10', 25=>'25', 50=>'50', 100=>'100');
-        my $numResults = $session{scratch}{numResults} || 25;
+        my $numResults = $session{scratch}{$self->getId."_numResults"} || $self->get("threadsPerPage");
         $var{'results.form'} = WebGUI::Form::selectList({
                 name=>"numResults",
                 options=>\%results,
@@ -862,43 +862,86 @@ sub www_search {
                 });
         $var{'form.search'} = WebGUI::Form::submit({value=>WebGUI::International::get(170)});
         $var{'form.end'} = WebGUI::Form::formFooter();
-        $var{'thread.list.url'} = formatForumURL($caller->{callback},$forum->get("forumId"));
-        $var{'thread.list.label'} = WebGUI::International::get(1019);
+        $var{'back.url'} = $self->getUrl;
         $var{doit} = $session{form}{doit};
         if ($session{form}{doit}) {
-                $var{'post.subject.label'} = WebGUI::International::get(229);
-                $var{'post.date.label'} = WebGUI::International::get(245);
-                $var{'post.user.label'} = WebGUI::International::get(244);
-                my $constraints = WebGUI::Search::buildConstraints([qw(a.subject a.username a.message)]);
-                my $query = "select a.forumPostId, a.subject, a.userId, a.username, a.dateOfPost from forumPost a left join forumThread b
-                        on a.forumThreadId=b.forumThreadId where b.forumId=".quote($forum->get("forumId"))." and
-                        (a.status='approved' or a.status='archived') and $constraints order by a.dateOfPost desc";
-                my $p = WebGUI::Paginator->new(WebGUI::URL::append($caller->{callback},"forumOp=search&amp;doit=1&amp;forumId=".quote($forum->get("forumId"))), $numResults);
-                $p->setDataByQuery($query) if $constraints;
-                my @post_loop;
-                foreach my $row (@{$p->getPageData}) {
-                        push(@post_loop,{
-                                'post.subject'=>$row->{subject},
-                                'post.url'=>formatThreadURL($caller->{callback},$row->{forumPostId}),
-                                'post.user.name'=>$row->{username},
-                                'post.user.id'=>$row->{userId},
-                                'post.user.profile'=>formatUserProfileURL($row->{userId}),
-                                'post.epoch'=>$row->{dateOfPost},
-                                'post.date'=>formatPostDate($row->{dateOfPost}),
-                                'post.time'=>formatPostTime($row->{dateOfPost})
-                                });
-                }
-                $var{post_loop} = \@post_loop;
-                $var{firstPage} = $p->getFirstPageLink;
-                $var{lastPage} = $p->getLastPageLink;
-                $var{nextPage} = $p->getNextPageLink;
-                $var{pageList} = $p->getPageLinks;
-                $var{previousPage} = $p->getPreviousPageLink;
-                $var{multiplePages} = ($p->getNumberOfPages > 1);
-                $var{numberOfPages} = $p->getNumberOfPages;
-                $var{pageNumber} = $p->getPageNumber;
+                my @fieldsToSearch = qw(asset.title asset.synopsis Post.content Post.username Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5);
+		my $all;
+		if ($session{scratch}{$self->getId."_all"} ne "") {
+			$session{scratch}{$self->getId."_all"} =~ s/,/ /g;
+			$session{scratch}{$self->getId."_all"} =~ s/\s+/ /g;
+			my @words = split(/ /,$session{scratch}{$self->getId."_all"});
+			foreach my $word (@words) {
+				$all .= " and " if ($all ne "");
+				$all .= "(";
+				my $allSub;
+				foreach my $field (@fieldsToSearch) {
+					$allSub .= " or " if ($allSub ne "");
+					$allSub .= " $field like ".quote("%".$word."%");
+				}
+				$all .= $allSub;
+				$allSub = "";
+				$all .= ")";
+			}
+		}
+		my $exactPhrase;
+	        if ($session{scratch}{$self->getId."_exactPhrase"} ne "") {
+			foreach my $field (@fieldsToSearch) {
+				$exactPhrase .= " or " if ($exactPhrase ne "");
+       		         	$exactPhrase .= " $field like ".quote("%".$session{scratch}{$self->getId."_exactPhrase"}."%");
+			}
+     	  	}
+		my $atLeastOne;
+        	if ($session{scratch}{$self->getId."_atLeastOne"} ne "") {
+	                $session{scratch}{$self->getId."_atLeastOne"} =~ s/,/ /g;
+       	         	$session{scratch}{$self->getId."_atLeastOne"} =~ s/\s+/ /g;
+                	my @words = split(/ /,$session{scratch}{$self->getId."_atLeastOne"});
+                	foreach my $word (@words) {
+				foreach my $field (@fieldsToSearch) {
+                        		$atLeastOne .= " or " if ($atLeastOne ne "");
+                        		$atLeastOne .= " $field like ".quote("%".$word."%");
+				}
+                	}
+        	}
+		my $without;
+        	if ($session{scratch}{$self->getId."_without"} ne "") {
+                	$session{scratch}{$self->getId."_without"} =~ s/,/ /g;
+                	$session{scratch}{$self->getId."_without"} =~ s/\s+/ /g;
+                	my @words = split(/ /,$session{scratch}{$self->getId."_without"});
+                	foreach my $word (@words) {
+				foreach my $field (@fieldsToSearch) {
+                        		$without .= " and " if ($without ne "");
+                        		$without .= " $field not like ".quote("%".$word."%");
+				}
+                	}
+        	}
+		# please note that the SQL generated here-in is not for the feint of heart, mind, or stomach
+		# this is for trained professionals only and should not be attempted at home
+		my $sql = "select *
+			from asset
+			left join Post on Post.assetId=asset.assetId
+			left join Thread on Thread.assetId=asset.assetId
+			where (asset.className='WebGUI::Asset::Post' or asset.className='WebGUI::Asset::Post::Thread')
+				and asset.lineage  like ".quote($self->get("lineage").'%')."
+				and asset.assetId<>".quote($self->getId)."
+				and (
+					Post.status in ('approved','archived')";
+		$sql .= "		or Post.status='pending'" if ($self->canModerate);
+		$sql .= "		or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
+					)
+				and ";
+		$sql .= "($all) " if ($all ne "");
+		$sql .= " and " if ($sql ne "" && $exactPhrase ne "");
+		$sql .= " ($exactPhrase) " if ($exactPhrase ne "");
+		$sql .= " and " if ($sql ne "" && $atLeastOne ne "");
+		$sql .= " ($atLeastOne) " if ($atLeastOne ne "");
+		$sql .= " and " if ($sql ne "" && $without ne "");
+		$sql .= " ($without) " if ($without ne "");
+		$sql .= " order by Post.dateSubmitted desc";
+		my $p = WebGUI::Paginator->new($self->getUrl("func=search&doit=1"),$numResults);
+		$self->appendPostListTemplateVars(\%var, $sql, $p);
         }
-        return WebGUI::Template::process($forum->get("searchTemplateId"),"Forum/Search", \%var);
+        return  $self->processStyle($self->processTemplate(\%var, $self->get("searchTemplateId")));
 }
 
 #-------------------------------------------------------------------
@@ -990,7 +1033,7 @@ sub www_viewRSS {
 </item>
 ~;
 		$i++;
-		last if ($i == $$self->get("threadsPerPage");
+		last if ($i == $self->get("threadsPerPage"));
         }
 
         $xml .=qq~
@@ -1005,221 +1048,5 @@ sub www_viewRSS {
 
 1;
 
-package WebGUI::Search;
-
-=head1 LEGAL
-
- -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2005 Plain Black Corporation.
- -------------------------------------------------------------------
-  Please read the legal notices (docs/legal.txt) and the license
-  (docs/license.txt) that came with this distribution before using
-  this software.
- -------------------------------------------------------------------
-  http://www.plainblack.com                     info@plainblack.com
- -------------------------------------------------------------------
-
-=cut
-
-
-use strict;
-use Tie::IxHash;
-use WebGUI::HTMLForm;
-use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::SQL;
-
-
-=head1 NAME
-
-Package WebGUI::Search
-
-=head1 DESCRIPTION
-
-A package built to take the hassle out of creating advanced search functionality in WebGUI applications.
-
-=head1 SYNOPSIS
-
- use WebGUI::Search;
- $sql = WebGUI::Search::buildConstraints(\@fields);
- $html = WebGUI::Search::form(\%hidden);
-
-=head1 METHODS
-
-These methods are available from this package:
-
-=cut
-
-
-#-------------------------------------------------------------------
-
-=head2 buildConstraints ( fieldList ) { [ all, atLeastOne, exactPhrase, without ] }
-
-Generates and returns the constraints to an SQL where clause based upon input from the user.
-
-=head3 fieldList
-
-An array reference that contains a list of the fields (table columns) to be considered when searching.
-
-=head3 all
-
-A form param with a comma or space separated list of key words to search for in the fields of the fieldList. All the words listed here must be found to be true.
-
-=head3 atLeastOne
-
-A form param with a comma or space separated list of key words to search for in the fields of the fieldList. Any of the words may match in any of the fields for this to be true.
-
-=head3 exactPhrase
-
-A form param with a phrase to search for in the fields of the fieldList. The exact phrase must be found in one of the fields to be true.
-
-=head3 without
-
-A form param with a comma or space separated list of key words to search for in the fields of the fieldList. None of the words may be found in any of the fields for this to be true.
-
-=cut
-
-sub buildConstraints {
-	my ($field, $all, $allSub, $exactPhrase, $atLeastOne, $without, @words, $word, $sql);
-	if ($session{scratch}{all} ne "") {
-		$session{scratch}{all} =~ s/,/ /g;
-		$session{scratch}{all} =~ s/\s+/ /g;
-		@words = split(/ /,$session{scratch}{all});
-		foreach $word (@words) {
-			$all .= " and " if ($all ne "");
-			$all .= "(";
-			foreach $field (@{$_[0]}) {
-				$allSub .= " or " if ($allSub ne "");
-				$allSub .= " $field like ".quote("%".$word."%");
-			}
-			$all .= $allSub;
-			$allSub = "";
-			$all .= ")";
-		}
-	}
-        if ($session{scratch}{exactPhrase} ne "") {
-		foreach $field (@{$_[0]}) {
-			$exactPhrase .= " or " if ($exactPhrase ne "");
-                	$exactPhrase .= " $field like ".quote("%".$session{scratch}{exactPhrase}."%");
-		}
-        }
-        if ($session{scratch}{atLeastOne} ne "") {
-                $session{scratch}{atLeastOne} =~ s/,/ /g;
-                $session{scratch}{atLeastOne} =~ s/\s+/ /g;
-                @words = split(/ /,$session{scratch}{atLeastOne});
-                foreach $word (@words) {
-			foreach $field (@{$_[0]}) {
-                        	$atLeastOne .= " or " if ($atLeastOne ne "");
-                        	$atLeastOne .= " $field like ".quote("%".$word."%");
-			}
-                }
-        }
-        if ($session{scratch}{without} ne "") {
-                $session{scratch}{without} =~ s/,/ /g;
-                $session{scratch}{without} =~ s/\s+/ /g;
-                @words = split(/ /,$session{scratch}{without});
-                foreach $word (@words) {
-			foreach $field (@{$_[0]}) {
-                        	$without .= " and " if ($without ne "");
-                        	$without .= " $field not like ".quote("%".$word."%");
-			}
-                }
-        }
-	$sql = "($all) " if ($all ne "");
-	$sql .= " and " if ($sql ne "" && $exactPhrase ne "");
-	$sql .= " ($exactPhrase) " if ($exactPhrase ne "");
-	$sql .= " and " if ($sql ne "" && $atLeastOne ne "");
-	$sql .= " ($atLeastOne) " if ($atLeastOne ne "");
-	$sql .= " and " if ($sql ne "" && $without ne "");
-	$sql .= " ($without) " if ($without ne "");
-	return $sql;
-}
-
-#-------------------------------------------------------------------
-
-=head2 form ( hiddenFields ) { [ numResults ] }
-
-Generates and returns the advanced search form.
-
-=head3 hiddenFields
-
-A hash reference that contains any name/value pairs that should be included as hidden fields in the search form.
-
-=head3 numResults
-
-A form param that can optionally specify the number of results to display. Defaults to 25.
-
-=cut
-
-sub form {
-	WebGUI::Session::setScratch("all",$session{form}{all});
-	WebGUI::Session::setScratch("atLeastOne",$session{form}{atLeastOne});
-	WebGUI::Session::setScratch("exactPhrase",$session{form}{exactPhrase});
-	WebGUI::Session::setScratch("without",$session{form}{without});
-	WebGUI::Session::setScratch("numResults",$session{form}{numResults});
-        my ($key, $numResults, $output, $f, $resultsText, %results);
-        tie %results, 'Tie::IxHash';
-        $numResults = $session{scratch}{numResults} || 25;
-        $resultsText = WebGUI::International::get(529);
-        %results = (10=>'10 '.$resultsText, 25=>'25 '.$resultsText, 50=>'50 '.$resultsText, 100=>'100 '.$resultsText);
-        $f = WebGUI::HTMLForm->new(1);
-        foreach $key (keys %{$_[0]}) {
-                $f->hidden($key,${$_[0]}{$key});
-        }
-        $output = '<table width="100%" class="tableMenu"><tr><td align="right" width="15%">';
-        $output .= '<h1>'.WebGUI::International::get(364).'</h1>';
-        $output .= '</td>';
-        $f->raw('<td valign="top" width="70%" align="center">');
-        $f->raw('<table>');
-        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(530).'</td><td class="tableData">');
-        $f->text('all','',$session{scratch}{all},'','','',($session{setting}{textBoxSize}-5));
-        $f->raw('</td></tr>');
-        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(531).'</td><td class="tableData">');
-        $f->text('exactPhrase','',$session{scratch}{exactPhrase},'','','',($session{setting}{textBoxSize}-5));
-        $f->raw('</td></tr>');
-        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(532).'</td><td class="tableData">');
-        $f->text('atLeastOne','',$session{scratch}{atLeastOne},'','','',($session{setting}{textBoxSize}-5));
-        $f->raw('</td></td>');
-        $f->raw('<tr><td class="tableData">'.WebGUI::International::get(533).'</td><td class="tableData">');
-        $f->text('without','',$session{scratch}{without},'','','',($session{setting}{textBoxSize}-5));
-        $f->raw('</td></tr>');
-        $f->raw('</table>');
-        $f->raw('</td><td width="15%">');
-        $f->selectList("numResults",\%results,'',[$numResults]);
-        $f->raw('<p/>');
-        $f->submit(WebGUI::International::get(170));
-        $f->raw('</td>');
-        $output .= $f->print;
-        $output .= '</tr></table>';
-        return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 toggleURL ( [ pairs ] )
-
-Returns a URL that toggles the value "search" in the user's scratch
-variables on and off.
-
-=head3 pairs
-
-URL name value pairs (this=that&foo=bar) to be passed with this toggle.
-
-=cut
-
-sub toggleURL {
-	my $pairs = shift;
-	my $url = shift || $session{page}{urlizedTitle};
-	WebGUI::Session::setScratch("search",$session{form}{search});
-	if ($session{scratch}{search}) {
-		$url = WebGUI::URL::gateway($url,"search=0");
-	} else {
-		$url = WebGUI::URL::gateway($url,"search=1");
-	}
-	$url = WebGUI::URL::append($url,$pairs) if ($pairs);
-	return $url;
-}
-
-1;
 
 

@@ -266,7 +266,7 @@ sub getSubscribeUrl {
 
 #-------------------------------------------------------------------
 sub getThread {
-	return $self;
+	return shift;
 }
 
 #-------------------------------------------------------------------
@@ -564,7 +564,7 @@ sub view {
 	my $self = shift;
         $self->markRead;
         $self->incrementViews;
-        WebGUI::Session::setScratch("forumThreadLayout",$session{form}{layout});
+        WebGUI::Session::setScratch("discussionLayout",$session{form}{layout});
         my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
 
@@ -573,27 +573,27 @@ sub view {
         $var->{'user.canPost'} = $self->getParent->canPost;
         $var->{'user.canReply'} = $self->canReply;
 
-        $var->{'layout.nested.url'} = formatThreadLayoutURL($callback,$post->get("forumPostId"),"nested");
-        $var->{'layout.flat.url'} = formatThreadLayoutURL($callback,$post->get("forumPostId"),"flat");
-        $var->{'layout.threaded.url'} = formatThreadLayoutURL($callback,$post->get("forumPostId"),"threaded");
-        my $layout = $session{scratch}{forumThreadLayout} || $session{user}{discussionLayout};
+        $var->{'layout.nested.url'} = $self->getThreadLayoutUrl("nested");
+        $var->{'layout.flat.url'} = $self->getThreadLayoutUrl("flat");
+        $var->{'layout.threaded.url'} = $self->getThreadLayoutUrl("threaded");
+        my $layout = $session{scratch}{discussionLayout} || $session{user}{discussionLayout};
         $var->{'layout.isFlat'} = ($layout eq "flat");
         $var->{'layout.isNested'} = ($layout eq "nested");
         $var->{'layout.isThreaded'} = ($layout eq "threaded" || !($var->{'thread.layout.isNested'} || $var->{'thread.layout.isFlat'}));
 
-        $var->{'user.isSubscribed'} = $thread->isSubscribed;
-        $var->{'subscribe.url'} = formatThreadSubscribeURL($callback,$post->get("forumPostId"));
-        $var->{'unsubscribe.url'} = formatThreadUnsubscribeURL($callback,$post->get("forumPostId"));
+        $var->{'user.isSubscribed'} = $self->isSubscribed;
+        $var->{'subscribe.url'} = $self->getSubscribeUrl;
+        $var->{'unsubscribe.url'} = $self->getUnsubscribeUrl;
 
-        $var->{'isSticky'} = $thread->isSticky;
-        $var->{'stick.url'} = formatThreadStickURL($callback,$post->get("forumPostId"));
-        $var->{'unstick.url'} = formatThreadUnstickURL($callback,$post->get("forumPostId"));
+        $var->{'isSticky'} = $self->isSticky;
+        $var->{'stick.url'} = $self->getStickUrl;
+        $var->{'unstick.url'} = $self->getUnstickUrl;
 
-        $var->{'isLocked'} = $thread->isLocked;
-        $var->{'lock.url'} = formatThreadLockURL($callback,$post->get("forumPostId"));
-        $var->{'unlock.url'} = formatThreadUnlockURL($callback,$post->get("forumPostId"));
+        $var->{'isLocked'} = $self->isLocked;
+        $var->{'lock.url'} = $self->getLockUrl;
+        $var->{'unlock.url'} = $self->getUnlockUrl;
 
-        my $p = WebGUI::Paginator->new($self->getUrl),$self->getParent->get("postsPerPage"));
+        my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
 	my $sql = "select * from asset 
 		left join Post on Post.assetId=asset.assetId
 		left join Thread on Thread.assetId=asset.assetId
@@ -613,6 +613,7 @@ sub view {
 	$p->setDataByQuery($sql);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		my $reply = WebGUI::Asset::Post->newByPropertyHashRef($dataSet);
+		$reply->{_thread} = $self; # caching thread for better performance
 		my $replyVars = $reply->getTemplateVars;
 		$replyVars->{isCurrent} = $session{asset}->getId eq $reply->getId;
 		$replyVars->{depth} = $reply->getLineageLength - $self->getLineageLength - 1;

@@ -14,8 +14,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
-use WebGUI::Asset::Thread;
-use WebGUI::Asset::Wobject::Collaborate;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTML;
@@ -178,7 +176,7 @@ sub formatContent {
 	my $content = shift || $self->get("content");
 	my $contentType = shift || $self->get("contentType");	
         my $msg = WebGUI::HTML::filter($content,$self->getThread->getParent->get("filterCode"));
-        $msg = WebGUI::HTML::format($msg, $contentType));
+        $msg = WebGUI::HTML::format($msg, $contentType);
         if ($self->getThread->getParent->get("useContentFilter")) {
                 $msg = WebGUI::HTML::processReplacements($msg);
         }
@@ -323,13 +321,13 @@ sub getSynopsisAndContentFromFormPost {
 		$synopsis = WebGUI::HTML::filter($content[0],"none");
 	}
 	$body =~ s/\^\-\;/\n/;
-	return ($synopsis,$content);
+	return ($synopsis,$body);
 }
 
 #-------------------------------------------------------------------
 sub getTemplateVars {
 	my $self = shift;
-	my %var;
+	my %var = %{$self->get};
 	$var{"userId"} = $self->get("ownerUserId");
 
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
@@ -496,7 +494,7 @@ sub notifySubscribers {
                                 };
                         $lang{$u->profileField("language")}{var} = $self->getTemplateVars($lang{$u->profileField("language")}{var});
                         $lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"WebGUI",$u->profileField("language"));
-                        $lang{$u->profileField("language")}{message} = $self->processTemplate($lang{$u->profileField("language")}{var}, $self->getThread->getParent->get("notificationTemplateId"));,
+                        $lang{$u->profileField("language")}{message} = $self->processTemplate($lang{$u->profileField("language")}{var}, $self->getThread->getParent->get("notificationTemplateId"));
                 }
                 WebGUI::MessageLog::addEntry($userId,"",$lang{$u->profileField("language")}{subject},$lang{$u->profileField("language")}{message});
         }
@@ -574,7 +572,7 @@ Sets the post to approved and sends any necessary notifications.
 =cut
 
 sub setStatusApproved {
-	my $self
+	my $self = shift;
         $self->update({status=>'approved'});
         $self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if $self->isReply;
         unless ($self->isPoster) {
@@ -702,7 +700,7 @@ sub www_edit {
 			value=>$session{form}{class}
 			});
                 if ($self->getThread->getParent->canModerate) {
-                        $var->{'lock.form'} = WebGUI::Form::yesNo({
+                        $var{'lock.form'} = WebGUI::Form::yesNo({
                                 name=>'lock',
                                 value=>$session{form}{'lock'}
                                 });
@@ -754,7 +752,7 @@ sub www_edit {
 		onclick=>"this.value='Please wait...'; this.form.func.value='editSave'; this.form.submit();"
 		});
 	$var{'form.footer'} = WebGUI::Form::formFooter();
-	$var{usePreview} = $self->getThread->getParent->get("usePreview")) {
+	$var{usePreview} = $self->getThread->getParent->get("usePreview");
 	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
 	$var{'visitorName.form'} = WebGUI::Form::text({
 		name=>"visitorName",

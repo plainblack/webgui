@@ -1045,7 +1045,7 @@ sub getForumTemplateVars {
 		} else {
 			$last = WebGUI::Forum::Post->new($thread->{lastPostId});
 		}
-		my @rating_loop;
+		Yy @rating_loop;
 		for (my $i=0;$i<=$thread->{rating};$i++) {
 			push(@rating_loop,{'thread.rating_loop.count'=>$i});
 		}

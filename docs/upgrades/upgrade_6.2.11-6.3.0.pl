@@ -39,6 +39,7 @@ $forums->finish;
 my ($defaultThreadTemplate) = WebGUI::SQL->quickArray("select template from template where namespace='Forum/Thread' and templateId='1'");
 my ($defaultPostTemplate) = WebGUI::SQL->quickArray("select template from template where namespace='Forum/Post' and  templateId='1'");
 $defaultThreadTemplate =~ s/\<tmpl_var\s+post\.full\s*\>/$defaultPostTemplate/ixsg;
+$defaultThreadTemplate =~ '<p>^Navigation(crumbTrail);</p>'.$defaultThreadTemplate;
 WebGUI::SQL->write("update template set template=".quote($defaultThreadTemplate)." where namespace='Forum/Thread' and templateId='1'");
 WebGUI::SQL->write("delete from template where namespace='Forum/Post' or (namespace='Forum/Thread' and templateId<>'1')");
 foreach my $key (%threadTemplates) {
@@ -675,7 +676,91 @@ $sth->finish;
 
 
 
+print "\tMigrating forum templates to collaboration templates\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId,template,namespace from template where namespace in ('Forum','Forum/Thread','Forum/Notification', 'Forum/Search', 'Forum/PostForm')");
+while (my ($id, $template, $namespace) = $sth->array) {
+	if ($namespace eq "Forum") {
+		$namespace = "Collaboration";
+	} elsif ($namespace eq "Forum/PostForm") {
+		$namespace = "Collaboration/PostForm";
+	} elsif ($namespace eq "Forum/Notification") {
+		$namespace = "Collaboration/Notification";
+	} elsif ($namespace eq "Forum/Thread") {
+		$namespace = "Collaboration/Thread";
+	}
+	$template =~ s/\<tmpl_var\s+callback\.url\>//ixsg;
+	$template =~ s/\<tmpl_var\s+callback\.label\>//ixsg;
+	$template =~ s/\<tmpl_var\s+forum\.description\>//ixsg;
+	$template =~ s/\<tmpl_var\s+forum\.title\>//ixsg;
+	$template =~ s/forum\.search\./search./ixsg;
+	$template =~ s/forum\.subscribe\./subscribe./ixsg;
+	$template =~ s/forum\.unsubscribe\./unsubscribe./ixsg;
+	$template =~ s/thread\.new\.url/add.url/ixsg;
+	$template =~ s/thread\.new\.label/add.label/ixsg;
+	$template =~ s/thread\.sortby\./sortby./ixsg;
+	$template =~ s/thread\.date\./date./ixsg;
+	$template =~ s/thread\.user\./user./ixsg;
+	$template =~ s/thread\.views\./views./ixsg;
+	$template =~ s/thread\.replies./replies./ixsg;
+	$template =~ s/thread\.rating\./rating./ixsg;
+	$template =~ s/thread\.last\./lastReply./ixsg;
+	$template =~ s/thread\.sorted\./sorted./ixsg;
+	$template =~ s/thread\.sortedBy\./sortedBy./ixsg;
+	$template =~ s/thread\.views/views/ixsg;
+	$template =~ s/thread\.replies/replies/ixsg;
+	$template =~ s/thread\.rating/rating/ixsg;
+	$template =~ s/thread\.rating_loop/rating_loop/ixsg;
+	$template =~ s/thread\.isSticky/isSticky/ixsg;
+	$template =~ s/thread\.isLocked/isLocked/ixsg;
+	$template =~ s/thread\.root\.subject/title/ixsg;
+	$template =~ s/thread\.root\.url/url/ixsg;
+	$template =~ s/thread\.root\.epoch/dateSubmitted/ixsg;
+	$template =~ s/thread\.root\.url/url/ixsg;
+	$template =~ s/thread\.root\.date/dateSubmitted.human/ixsg;
+	$template =~ s/thread\.root\.time/timeSubmitted.human/ixsg;
+	$template =~ s/thread\.root\.user\.profile/userProfile.url/ixsg;
+	$template =~ s/thread\.root\.user\.alias/username/ixsg;
+	$template =~ s/thread\.root\.user\.name/username/ixsg;
+	$template =~ s/thread\.root\.user\.id/ownerUserId/ixsg;
+	$template =~ s/thread\.root\.user\.isVisitor/user.isVisitor/ixsg;
+	$template =~ s/thread\.root\.user\.status/status/ixsg;
+	$template =~ s/thread\.last\.url/last.url/ixsg;
+	$template =~ s/thread\.last\.subject/last.title/ixsg;
+	$template =~ s/thread\.last\.epoch/last.dateSubmitted/ixsg;
+	$template =~ s/thread\.last\.date/last.dateSubmitted.human/ixsg;
+	$template =~ s/thread\.last\.time/last.timeSubmitted.human/ixsg;
+	$template =~ s/thread\.last\.user.profile/last.userProfile.url/ixsg;
+	$template =~ s/thread\.last\.user.name/last.username/ixsg;
+	$template =~ s/thread\.last\.user.id/last.ownerUserId/ixsg;
+	$template =~ s/thread\.last\.user.isVisitor/last.user.isVisitor/ixsg;
+	$template =~ s/thread\.last\.status/last.status/ixsg;
+	$template =~ s/firstPage/pagination.firstPage/ixsg;
+	$template =~ s/lastPage/pagination.lastPage/ixsg;
+	$template =~ s/nextPage/pagination.nextPage/ixsg;
+	$template =~ s/previousPage/pagination.previousPage/ixsg;
+	$template =~ s/pageList/pagination.pageList.upTo10/ixsg;
+	$template =~ s/multiplePages/pagination.pageCount.isMultiple/ixsg;
+	$template =~ s/numberOfPages/pagination.pageCount/ixsg;
+	$template =~ s/pageNumber/pagination.pageNumber/ixsg;
+	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
+}
+$sth->finish;
 
+
+print "\tMigrating USS templates to collaboration templates\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId,template,namespace from template where namespace in ('USS','USS/Submission','USS/SubmissionForm')");
+while (my ($id, $template, $namespace) = $sth->array) {
+	if ($namespace eq "USS") {
+		$namespace = "Collaboration";
+	} elsif ($namespace eq "USS/SubmissionForm") {
+		$namespace = "Collaboration/PostForm";
+	} elsif ($namespace eq "USS/Submission") {
+		$namespace = "Collaboration/Thread";
+	}
+	# fill in stuff here
+	WebGUI::SQL->write("update template set template=".quote($template).", namespace=".quote($namespace)." where assetId=".quote($id)); 
+}
+$sth->finish;
 
 
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
@@ -760,7 +845,6 @@ $conf->set("assets"=>[
 		'WebGUI::Asset::Wobject::Poll',
 		'WebGUI::Asset::Wobject::Article',
 		'WebGUI::Asset::Wobject::DataForm',
-		'WebGUI::Asset::Wobject::USS',
 		'WebGUI::Asset::Wobject::SyndicatedContent',
 		'WebGUI::Asset::Wobject::WSClient',
 		'WebGUI::Asset::Wobject::HttpProxy',
