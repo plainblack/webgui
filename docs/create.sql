@@ -132,7 +132,7 @@ CREATE TABLE LinkList (
 CREATE TABLE LinkList_link (
   widgetId int(11) default NULL,
   linkId int(11) NOT NULL default '0',
-  name varchar(30) default NULL,
+  name varchar(128) default NULL,
   url text,
   description text,
   sequenceNumber int(11) NOT NULL default '0',
@@ -293,7 +293,7 @@ CREATE TABLE UserSubmission (
 CREATE TABLE UserSubmission_submission (
   widgetId int(11) default NULL,
   submissionId int(11) NOT NULL default '0',
-  title varchar(30) default NULL,
+  title varchar(128) default NULL,
   dateSubmitted int(11) default NULL,
   username varchar(30) default NULL,
   userId int(11) default NULL,
@@ -1329,6 +1329,7 @@ INSERT INTO settings VALUES ('profileExtraContact','1');
 INSERT INTO settings VALUES ('profileMisc','1');
 INSERT INTO settings VALUES ('profileHome','0');
 INSERT INTO settings VALUES ('profileWork','0');
+INSERT INTO settings VALUES ('VERSION','2.3.2');
 
 #
 # Table structure for table 'style'

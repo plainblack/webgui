@@ -58,7 +58,7 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,'Site Map').'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,128,'Site Map').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Process Macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
@@ -95,7 +95,7 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Title</td><td>'.WebGUI::Form::text("title",20,128,$data{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Display title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Process Macros?</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';

@@ -46,7 +46,7 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'User Submission System').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,'User Submission System').'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'',50,5,1).'</td></tr>';
@@ -87,7 +87,7 @@ sub www_addSubmission {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","addSubmissionSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(178).'</td><td>'.WebGUI::Form::textArea("content",'',50,10,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(179).'</td><td>'.WebGUI::Form::file("image").'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(182).'</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
@@ -191,7 +191,7 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$data{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$data{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$data{processMacros}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
@@ -234,7 +234,7 @@ sub www_editSubmission {
                 $output .= WebGUI::Form::hidden("sid",$session{form}{sid});
                 $output .= WebGUI::Form::hidden("func","editSubmissionSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$submission{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$submission{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(178).'</td><td>'.WebGUI::Form::textArea("content",$submission{content},50,10).'</td></tr>';
                 if ($submission{image} ne "") {
                         $output .= '<tr><td class="formDescription">'.WebGUI::International::get(179).'</td><td><a href="'.$session{page}{url}.'?func=deleteImage&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}.'">'.WebGUI::International::get(186).'</a></td></tr>';

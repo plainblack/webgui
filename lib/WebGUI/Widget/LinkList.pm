@@ -55,13 +55,13 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Link List').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,'Link List').'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description").'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(1,$namespace).'</td><td>'.WebGUI::Form::text("indent",20,2,0).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(2,$namespace).'</td><td>'.WebGUI::Form::text("lineSpacing",20,1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(4,$namespace).'</td><td>'.WebGUI::Form::text("lineSpacing",20,1,'&middot;').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(4,$namespace).'</td><td>'.WebGUI::Form::text("bullet",20,255,'&middot;').'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -92,7 +92,7 @@ sub www_addLink {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","addLinkSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("name",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("name",20,128).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(216).'</td><td>'.WebGUI::Form::text("url",20,1024).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(3,$namespace).'</td><td>'.WebGUI::Form::checkbox("newWindow",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",'',50,10).'</td></tr>';
@@ -156,7 +156,7 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$data{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$data{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,$data{processMacros}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
@@ -202,7 +202,7 @@ sub www_editLink {
                 $output .= WebGUI::Form::hidden("lid",$session{form}{lid});
                 $output .= WebGUI::Form::hidden("func","editLinkSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("name",20,30,$link{name}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("name",20,128,$link{name}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(216).'</td><td>'.WebGUI::Form::text("url",20,2048,$link{url}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(3,$namespace).'</td><td>'.WebGUI::Form::checkbox("newWindow",1,$link{newWindow}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(85).'</td><td>'.WebGUI::Form::textArea("description",$link{description},50,10).'</td></tr>';
@@ -276,10 +276,10 @@ sub www_view {
                 for ($i=0;$i<$data{lineSpacing};$i++) {
                         $lineSpacing .= "<br>";
                 }
-		$sth = WebGUI::SQL->read("select name, url, description from LinkList_link where widgetId='$widgetId' order by sequenceNumber",$session{dbh});
+		$sth = WebGUI::SQL->read("select name, url, description, newWindow from LinkList_link where widgetId='$widgetId' order by sequenceNumber",$session{dbh});
 		while (@link = $sth->array) {
 			$output .= $indent.$data{bullet}.'<b><a href="'.$link[1].'"';
-			if ($data{newWindow}) {
+			if ($link[3]) {
 				$output .= ' target="_blank"';
 			}
 			$output .= '>'.$link[0].'</a></b>';

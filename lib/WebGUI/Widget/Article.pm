@@ -44,14 +44,14 @@ sub www_add {
                 $output .= WebGUI::Form::hidden("widget",$namespace);
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,'Article').'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,'Article').'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros",1,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet(time()),1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(177).'</td><td>'.WebGUI::Form::text("endDate",20,30,'01/01/2037',1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(178).'</td><td>'.WebGUI::Form::textArea("body",'',50,10,1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(179).'</td><td>'.WebGUI::Form::file("image").'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(180).'</td><td>'.WebGUI::Form::text("linkTitle",20,30).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(180).'</td><td>'.WebGUI::Form::text("linkTitle",20,128).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(181).'</td><td>'.WebGUI::Form::text("linkURL",20,2048).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(182).'</td><td>'.WebGUI::Form::file("attachment").'</td></tr>';
 		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(183).'</td><td>'.WebGUI::Form::checkbox("convertCarriageReturns",1).' <span style="font-size: 8pt;">'.WebGUI::International::get(184).'</span></td></tr>';
@@ -110,7 +110,7 @@ sub www_edit {
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("func","editSave");
                 $output .= '<table>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$article{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$article{title}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(174).'</td><td>'.WebGUI::Form::checkbox("displayTitle","1",$article{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(175).'</td><td>'.WebGUI::Form::checkbox("processMacros","1",$article{processMacros}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(176).'</td><td>'.WebGUI::Form::text("startDate",20,30,epochToSet($article{startDate}),1).'</td></tr>';
@@ -121,7 +121,7 @@ sub www_edit {
 		} else {
                 	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(179).'</td><td>'.WebGUI::Form::file("image").'</td></tr>';
 		}
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(180).'</td><td>'.WebGUI::Form::text("linkTitle",20,30,$article{linkTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(180).'</td><td>'.WebGUI::Form::text("linkTitle",20,128,$article{linkTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(181).'</td><td>'.WebGUI::Form::text("linkURL",20,2048,$article{linkURL}).'</td></tr>';
 		if ($article{attachment} ne "") {
                 	$output .= '<tr><td class="formDescription">'.WebGUI::International::get(182).'</td><td><a href="'.$session{page}{url}.'?func=deleteAttachment&wid='.$session{form}{wid}.'">'.WebGUI::International::get(186).'</a></td></tr>';

@@ -64,7 +64,7 @@ sub www_addPage {
 		$output .= '<form method="post" action="'.$session{page}{url}.'">';
 		$output .= WebGUI::Form::hidden("op","addPageSave");
 		$output .= '<table>';
-		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$session{form}{title}).'</td></tr>';
+		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$session{form}{title}).'</td></tr>';
 		$output .= '<tr><td class="formDescription">'.WebGUI::International::get(100).'</td><td>'.WebGUI::Form::textArea("metaTags",$session{form}{metaTags}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(307).'</td><td>'.WebGUI::Form::checkbox("defaultMetaTags",1,1).'</td></tr>';
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
@@ -148,8 +148,8 @@ sub www_editPage {
                 $output .= WebGUI::Form::hidden("op","editPageSave");
                 $output .= '<table>';
 		$output .= '<tr><td colspan=2><b>'.WebGUI::International::get(103).'</b></td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,30,$session{page}{title}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(104).'</td><td>'.WebGUI::Form::text("urlizedTitle",20,30,$session{page}{urlizedTitle}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(99).'</td><td>'.WebGUI::Form::text("title",20,128,$session{page}{title}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">'.WebGUI::International::get(104).'</td><td>'.WebGUI::Form::text("urlizedTitle",20,128,$session{page}{urlizedTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(100).'</td><td>'.WebGUI::Form::textArea("metaTags",$session{page}{metaTags}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">'.WebGUI::International::get(307).'</td><td>'.WebGUI::Form::checkbox("defaultMetaTags",1,$session{page}{defaultMetaTags}).'</td></tr>';
 		$output .= '<tr><td colspan=2><hr size=1><b>'.WebGUI::International::get(105).'</b></td></tr>';
