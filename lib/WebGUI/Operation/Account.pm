@@ -360,12 +360,23 @@ sub www_editProfile {
 					} else {
 						$default = eval $data{dataDefault};
 					}
-                                        $f->select($data{fieldName},$values,$label,$default,'','','',$subtext);
+                                        $f->select(
+						-name=>$data{fieldName},
+						-options=>$values,
+						-label=>$label,
+						-value=>$default,
+						-subtext=>$subtext
+						);
                                 } else {
                                         $default = $session{form}{$data{fieldName}}
                                                 || $session{user}{$data{fieldName}}
                                                 || eval $data{dataDefault};
-                                        $f->$method($data{fieldName},$label,$default,'','',$subtext);
+                                        $f->$method(
+						-name=>$data{fieldName},
+						-label=>$label,
+						-value=>$default,
+						-subtext=>$subtext
+						);
                                 }
                                 $previousCategory = $category;
                         }

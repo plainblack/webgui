@@ -869,7 +869,7 @@ sub password {
 
 sub phone {
         my ($maxLength);
-        $maxLength = shift || 30;
+        $maxLength = $_[0]->{maxLength} || 30;
 	return text({
 		name=>$_[0]->{name},
 		maxlength=>$maxLength,

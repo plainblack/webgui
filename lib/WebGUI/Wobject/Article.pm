@@ -116,6 +116,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+#	return WebGUI::International::get(815).$_[0]->www_edit if ($session{cgi}->cgi_error eq "413 POST too large");
         my ($image, $attachment, %property);
 	$_[0]->SUPER::www_editSave() if ($_[0]->get("wobjectId") eq "new");
         $image = WebGUI::Attachment->new("",$_[0]->get("wobjectId"));
@@ -130,7 +131,7 @@ sub www_editSave {
 	$property{linkURL} = $session{form}{linkURL};
 	$property{allowDiscussion} = $session{form}{allowDiscussion};
 	$_[0]->SUPER::www_editSave(\%property);
-        return "";
+       	return "";
 }
 
 #-------------------------------------------------------------------

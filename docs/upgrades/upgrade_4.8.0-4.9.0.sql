@@ -8,6 +8,8 @@ alter table users drop column ldapURL;
 alter table users drop column connectDN;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (814,1,'WebGUI','Back to styles.', 1038022043);
 alter table collateral change parameters parameters text;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (815,1,'WebGUI','The file you tried to upload is too large.', 1038023800);
+
 
 
 
