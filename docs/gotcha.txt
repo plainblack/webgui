@@ -7,6 +7,16 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+4.9.2
+--------------------------------------------------------------------
+ * If you upgraded to any of the previous betas before the release
+	of 4.9.2 then you will need to execute the following SQL
+	command on each of your databases. If you went straight from
+	a previous stable release (4.6.9 or before) to 4.9.2 (or
+	after), then please disregard this message.
+
+	update imageGroup set parentId=parentId+999 where imageGroupId>0;
+
 4.9.0
 --------------------------------------------------------------------
  * If you created any templates using the previous two beta versions

@@ -57,6 +57,7 @@ update incrementer set nextValue=nextValue+999 where incrementerId='messageId';
 update messageLog set messageLogId=messageLogId+999;
 update incrementer set nextValue=nextValue+999 where incrementerId='messageLogId';
 update incrementer set nextValue=nextValue+999 where incrementerId='imageGroupId';
+update imageGroup set parentId=parentId+999 where imageGroupId>0;
 update imageGroup set imageGroupId=imageGroupId+999 where imageGroupId>0;
 update images set imageGroupId=imageGroupId+999 where imageGroupId>0;
 update incrementer set incrementerId='MailForm_fieldId' where incrementerId='mailFieldId';
