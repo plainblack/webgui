@@ -1,5 +1,7 @@
 6.5.5
  - Fixed a bug in the collaboration system that caused replies to fail.
+ - Fixed an inefficency in the asset system that caused a lot of extra work on
+   the server when pasting.
 
 
 6.5.4 

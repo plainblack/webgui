@@ -254,18 +254,20 @@ If not present, asset's existing lineage is used.
 =cut
 
 sub cascadeLineage {
-	my $self = shift;
-	my $newLineage = shift;
-	my $oldLineage = shift || $self->get("lineage");
-	WebGUI::Cache->new($self->getId)->deleteByRegex(/^asset_/);
-	WebGUI::Cache->new($self->getId)->deleteByRegex(/^lineage_$oldLineage/);
-	WebGUI::SQL->write("update asset set 
-		lineage=concat(".quote($newLineage).",substring(lineage from ".(length($oldLineage)+1).")), 
-		lastUpdatedBy=".quote($session{user}{userId}).", 
-		lastUpdated=".time()." 
-		where lineage like ".quote($oldLineage.'%'));
+        my $self = shift;
+        my $newLineage = shift;
+        my $oldLineage = shift || $self->get("lineage");
+	my $now = time();
+        my $prepared = WebGUI::SQL->prepare("update asset set lineage=?, lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=$now where assetId=?");
+	my $descendants = WebGUI::SQL->read("select assetId,lineage from asset where lineage like ".quote($oldLineage.'%'));
+	while (my ($assetId, $lineage) = $descendants->array) {
+		WebGUI::Cache->new("asset_".$assetId)->delete;
+		WebGUI::Cache->new("lineage_".$lineage)->delete;
+		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
+		$prepared->execute([$fixedLineage,$assetId]);
+	}
+	$descendants->finish;
 }
-
 
 
 #-------------------------------------------------------------------
