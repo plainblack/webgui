@@ -16,13 +16,14 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions, In
                                      Christophe Marcant
                                      Daniel Quinlan
 
-Translation..........................Andreas Ljunggren
+Contributing Translators.............Andreas Ljunggren
                                      Joeri de Bruin
                                      Jose Caneira
                                      Mattias Kunkel / WERU AG
                                      Ricardo Markiewicz
                                      Ryan McCombs
                                      Michael Ugilt
+                                     Zhou Xiaopeng
 
 Perl.................................Larry Wall / O'Reilly
 

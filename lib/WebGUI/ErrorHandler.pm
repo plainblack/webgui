@@ -19,11 +19,12 @@ sub fatalError {
 	if (exists $session{cgi}) {
 		$cgi = $session{cgi};
 		$friendly = 1 if ($session{setting}{onCriticalError} eq "friendly");
+		print WebGUI::Session::header();
 	} else {
 		use CGI;
 		$cgi = CGI->new;
+		print $cgi->header;
 	}
-	print $cgi->header;
 	if (exists $session{config}{logfile}) {
 		$logfile = $session{config}{logfile};
 	} else {

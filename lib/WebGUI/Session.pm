@@ -160,7 +160,11 @@ sub end {
 
 #-------------------------------------------------------------------
 sub httpHeader {
+	my ($charset);
+	($charset) = WebGUI::SQL->quickArray("select characterSet from language where languageId=".$session{user}{language});
+	$charset = "ISO-8859-1" if ($charset eq "");
 	return $session{cgi}->header( 
+		-type => 'text/html; charset='.$charset,
 		-cookie => $session{header}{cookie}, 
 		-status => $session{header}{status} 
 		);

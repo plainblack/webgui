@@ -37,7 +37,7 @@ use WebGUI::URL;
  $karma = 		$u->karma;
  $lastUpdated = 	$u->lastUpdated;
  $ldapURL = 		$u->ldapURL("ldap://ldap.mycompany.com:389/o=MyCompany");
- $languagePreference = 	$u->profileField("language","English");
+ $languagePreference = 	$u->profileField("language",1);
  $username = 		$u->username("jonboy");
 
  $u->addToGroups(\@arr);

@@ -27,19 +27,19 @@ sub www_viewHelp {
 	$namespace = $session{form}{namespace} || "WebGUI";
 	tie %help, 'Tie::CPHash';
 	%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid} and namespace='$namespace' and 
-		language='$session{user}{language}'");
+		languageId='$session{user}{language}'");
 	if ($help{action} eq "") {
-		%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid} and namespace='$namespace' and language='English'");
+		%help = WebGUI::SQL->quickHash("select * from help where helpId=$session{form}{hid} and namespace='$namespace' and languageId=1");
 	}
         $output = '<h1>'.WebGUI::International::get(93).': '.$help{action}.' '.$help{object}.'</h1>';
 	$output .= $help{body};
 	$output .= '<p><b>'.WebGUI::International::get(94).':';
         $sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where object='$help{object}' 
-		and action<>'$help{action}' and language='$session{user}{language}' order by action");
+		and action<>'$help{action}' and languageId='$session{user}{language}' order by action");
         unless ($sth->rows) {
                 $sth->finish;
         	$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where object='$help{object}' 
-			and action<>'$help{action}' and language='English' order by action");
+			and action<>'$help{action}' and languageId=1 order by action");
         }
         while (@data = $sth->array) {
                 $output .= ' <a href="'.WebGUI::URL::page('op=viewHelp&hid='.$data[0].'&namespace='.$data[3])
@@ -49,10 +49,10 @@ sub www_viewHelp {
         $sth = WebGUI::SQL->read("select helpId, namespace from helpSeeAlso where seeAlsoId in ($help{seeAlso})");
         while (@data = $sth->array) {
 		%seeAlso = WebGUI::SQL->quickHash("select helpId,namespace,action,object from help where helpId='$data[0]' 
-			and namespace='$data[1]' and language='$session{user}{language}'");
+			and namespace='$data[1]' and languageId='$session{user}{language}'");
 		if ($seeAlso{helpId} eq "") {
 			%seeAlso = WebGUI::SQL->quickHash("select helpId,namespace,action,object from help where helpId='$data[0]' 
-			and namespace='$data[1]' and language='English'");
+			and namespace='$data[1]' and languageId=1");
 		}
                 $output .= ' <a href="'.
 			WebGUI::URL::page('op=viewHelp&hid='.$seeAlso{helpId}.'&namespace='.$seeAlso{namespace})
@@ -68,10 +68,10 @@ sub www_viewHelpIndex {
 	my ($sth, @data, $output, $previous);
 	$output = '<h1>'.WebGUI::International::get(95).'</h1>';
 	$output .= '<table width="100%"><tr><td valign="top"><b>'.WebGUI::International::get(96).'</b><p>';
-	$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where language='$session{user}{language}' order by action,object");
+	$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where languageId='$session{user}{language}' order by action,object");
 	unless ($sth->rows) {
 		$sth->finish;
-		$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where language='English' order by action,object");
+		$sth = WebGUI::SQL->read("select helpId, action, object, namespace from help where languageId=1 order by action,object");
 	}
 	while (@data = $sth->array) {
 		if ($data[1] ne $previous) {
@@ -83,10 +83,10 @@ sub www_viewHelpIndex {
 	}
 	$sth->finish;
 	$output .= '</td><td valign="top"><b>'.WebGUI::International::get(97).'</b><p>';
-        $sth = WebGUI::SQL->read("select helpId, object, action, namespace from help where language='$session{user}{language}' order by object,action");
+        $sth = WebGUI::SQL->read("select helpId, object, action, namespace from help where languageId='$session{user}{language}' order by object,action");
         unless ($sth->rows) {
                 $sth->finish;
-        	$sth = WebGUI::SQL->read("select helpId, object, action, namespace from help where language='English' order by object,action");
+        	$sth = WebGUI::SQL->read("select helpId, object, action, namespace from help where languageId=1 order by object,action");
         }
         while (@data = $sth->array) {
                 if ($data[1] ne $previous) {

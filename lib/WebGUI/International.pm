@@ -24,7 +24,7 @@ sub get {
 	} elsif ($session{user}{language} ne "") {
 		$language = $session{user}{language};
 	} else {
-		$language = "English";
+		$language = 1;
 	}
 	if ($_[1] ne "") {
 		$namespace = $_[1];
@@ -34,9 +34,9 @@ sub get {
 	if (defined $international{$language}{$_[0]}) { 		# a little caching never hurts =)
 		$output = $international{$language}{$_[0]};
 	} else {
-		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and namespace='$namespace' and language='$language'");
-		if ($output eq "" && $language ne "English") {
-			$output = get($_[0],$namespace,"English");
+		($output) = WebGUI::SQL->quickArray("select message from international where internationalId=$_[0] and namespace='$namespace' and languageId='$language'");
+		if ($output eq "" && $language ne 1) {
+			$output = get($_[0],$namespace,1);
 		}
 	}
 	return $output;
@@ -44,14 +44,9 @@ sub get {
 
 #-------------------------------------------------------------------
 sub getLanguages {
-        my ($sth, %hash, @data);
-        tie %hash, "Tie::IxHash";
-        $sth = WebGUI::SQL->read("select distinct(language) from international");
-        while (@data = $sth->array) {
-                $hash{$data[0]} = $data[0];
-        }
-        $sth->finish;
-        return \%hash;
+        my ($hashRef);
+        $hashRef = WebGUI::SQL->buildHashRef("select languageId,language from language");
+        return $hashRef;
 }
 
 1;
