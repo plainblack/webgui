@@ -202,6 +202,24 @@ sub getAdminFunction {
 			op=>"viewActiveSessions",
 			group=>"3"
 		},
+		"commerce"=>{
+			title=>{
+				id=>"commerce settings",
+				namespace=>"Commerce"
+			},
+			icon=>"commerce.gif",
+			op=>"editCommerceSettings",
+			group=>"3"
+		},
+		"subscriptions"=>{
+			title=>{
+				id=>"manage subscriptions",
+				namespace=>"Subscription"
+			},
+			icon=>"subscriptions.gif",
+			op=>"listSubscriptions",
+			group=>"3"
+		},
 	};
 	if ($id) {
 		return $self->_formatFunction($functions->{$id});

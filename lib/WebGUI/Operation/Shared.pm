@@ -34,25 +34,29 @@ our @EXPORT = qw(&menuWrapper);
 	    push(@array,\%hash);
 	}
 	unless ($session{form}{op} eq "displayAccount"){
-	   my %hash;
-	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=displayAccount').'">'.WebGUI::International::get(342).'</a>';
-	   push(@array,\%hash);
+		my %hash;
+		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=displayAccount').'">'.WebGUI::International::get(342).'</a>';
+		push(@array,\%hash);
 	}
 	unless ($session{form}{op} eq "editProfile"){
-	   my %hash;
-	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=editProfile').'">'.WebGUI::International::get(341).'</a>';
-	   push(@array,\%hash);
+		my %hash;
+		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=editProfile').'">'.WebGUI::International::get(341).'</a>';
+		push(@array,\%hash);
 	}
 	unless ($session{form}{op} eq "viewProfile"){
-	   my %hash;
-	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$session{user}{userId}).'">'.WebGUI::International::get(343).'</a>';
-	   push(@array,\%hash);
-    }
-	unless ($session{form}{op} eq "viewMessageLog"){
-	   my %hash;
-	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
-       push(@array,\%hash);
+		my %hash;
+		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewProfile&uid='.$session{user}{userId}).'">'.WebGUI::International::get(343).'</a>';
+		push(@array,\%hash);
 	}
+	unless ($session{form}{op} eq "viewMessageLog"){
+		my %hash;
+		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
+		push(@array,\%hash);
+	}
+	unless ($session{form}{op} eq "redeemSubscriptionCode") {
+		push(@array, {'options.display' => '<a href="'.WebGUI::URL::page('op=redeemSubscriptionCode').'">'.WebGUI::International::get('redeem code', 'Subscription').'</a>'});
+	}
+		
 	my %logout;
 	$logout{'options.display'} = '<a href="'.WebGUI::URL::page('op=logout').'">'.WebGUI::International::get(64).'</a>'; 
 	push(@array,\%logout);
