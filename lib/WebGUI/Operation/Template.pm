@@ -91,7 +91,7 @@ sub www_editTemplate {
         my ($output, $namespaces, %template, $f);
 	tie %template, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
-		if ($session{form}{tid} eq "new") {
+		if ($session{form}{tid} eq "new" || $session{form}{tid} eq "") {
 			if ($session{form}{namespace} eq "Page") {
 				$template{template} = "<table>\n <tr>\n  <td>\n\n<tmpl_var page.position1>\n\n".
 					"</td>\n </tr>\n</table>\n";
