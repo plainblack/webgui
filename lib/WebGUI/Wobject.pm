@@ -263,6 +263,11 @@ sub duplicate {
 	tie %properties, 'Tie::CPHash';
 	%properties = %{$_[0]->get};
 	$properties{pageId} = $_[1] || 2;
+	$properties{sequenceNumber} = _getNextSequenceNumber($properties{pageId});
+	my $page = WebGUI::SQL->quickHashRef("select groupIdView,ownerId,groupIdEdit from page where pageId=".$properties{pageId});
+	$properties{ownerId} = $page->{ownerId};
+        $properties{groupIdView} = $page->{groupIdView};
+        $properties{groupIdEdit} = $page->{groupIdEdit};
 	if ($properties{pageId} == 2)  {
 		$properties{bufferUserId} = $session{user}{userId};
 		$properties{bufferDate} = time();

@@ -24,11 +24,8 @@ our @EXPORT = qw(&www_deployPackage &www_selectPackageToDeploy);
 
 #-------------------------------------------------------------------
 sub _duplicateWobjects {
-	my ($sth, $wobject, $cmd, %hash, $extra, $w, %properties, $page);
+	my ($sth, $wobject, $cmd, %hash, $extra, $w, %properties);
 	tie %properties, 'Tie::CPHash';
-	#-- Added by Frank Dillon.  Get page privilege information for the package
-	$page = WebGUI::SQL->quickHashRef("select ownerId,groupIdView,groupIdEdit from page where pageId=".quote($_[0]));
-	#-- End Changes
 	$sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0] order by sequenceNumber");
 	while ($wobject = $sth->hashRef) {
 		$extra = WebGUI::SQL->quickHashRef("select * from ${$wobject}{namespace} where wobjectId=${$wobject}{wobjectId}");
@@ -38,13 +35,6 @@ sub _duplicateWobjects {
 		$cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 		$w = $cmd->new($wobject);
 		$w->duplicate($_[1]);
-		#-- Added by Frank Dillon. Set privileges for newly duplicated wobjects
-		%properties=();
-		$properties{ownerId} = ${$page}{ownerId};
-		$properties{groupIdView} = ${$page}{groupIdView}; 
-		$properties{groupIdEdit} = ${$page}{groupIdEdit};
-		$w->set(\%properties);
-		#-- End Changes
 	}
 	$sth->finish;
 }
