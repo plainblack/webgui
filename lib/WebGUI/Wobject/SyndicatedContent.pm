@@ -213,6 +213,7 @@ sub _get_rss_data {
                 }
                 if (!($rss->{items} = _find_record($rss_lite, qr/^items?$/))) {
                         warn("unable to find item info for url $url");
+                        $rss->{items} = [];
                 }
                 
                 _strip_html($rss);
