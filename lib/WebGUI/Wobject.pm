@@ -233,6 +233,31 @@ sub get {
         }
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getCollateral ( tableName, keyName, keyValue ) 
+
+ Returns a hash reference containing a row of collateral data.
+
+=item tableName
+
+ The name of the table you wish to retrieve the data from.
+
+=item keyName
+
+ The name of the column that is the primary key in the table.
+
+=item keyValue
+
+ An integer containing the key value.
+
+=cut
+
+sub getCollateral {
+	return WebGUI::SQL->quickHashRef("select * from $_[1] where $_[2]=".quote($_[3]));
+}
+
 #-------------------------------------------------------------------
 
 =head2 inDateRange ( )
@@ -469,6 +494,85 @@ sub set {
         	WebGUI::SQL->write("update ".$_[0]->{_property}{namespace}." set ".join(",",@update)." where wobjectId=".$_[0]->{_property}{wobjectId});
 	}
 }
+
+
+#-----------------------------------------------------------------
+
+=head2 setCollateral ( tableName, keyName, properties [ , useSequenceNumber, wobjectId ] )
+
+ Performs and insert/update of collateral data for any wobject's
+ collateral data. Returns the primary key value for that row of
+ data.
+
+=item tableName
+
+ The name of the table to insert the data.
+
+=item keyName
+
+ The column name of the primary key in the table specified above.
+ This must also be an incrementerId in the incrementer table.
+
+=item properties
+
+ A hash reference containing the name/value pairs to be inserted
+ into the database where the name is the column name. Note that
+ the primary key should be specified in this list, and if it's value
+ is "new" or null a new row will be created.
+
+=item useSequenceNumber
+
+ If set to "1", a new sequenceNumber will be generated and inserted
+ into the row. Note that this means you must have a sequenceNumber
+ column in the table. Also note that this requires the presence of
+ the wobjectId column. Defaults to "1".
+
+=item useWobjectId
+
+ If set to "1", the current wobjectId will be inserted into the table
+ upon creation of a new row. Note that this means the table better
+ have a wobjectId column. Defaults to "1".
+
+=cut
+
+sub setCollateral {
+	my ($key, $sql, $properties, $seq, $dbkeys, $dbvalues, $counter);
+	my ($class, $table, $keyName, $properties, $useSequence, $useWobjectId) = @_;
+	$counter = 0;
+	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
+		$properties->{$keyName} = getNextId($keyName);
+		$sql = "insert into $table (";
+		$dbkeys = "";
+     		$dbvalues = "";
+		unless ($useSequence eq "0") {
+			($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from $table 
+                               	where wobjectId=".$_[0]->get("wobjectId"));
+			$properties->{sequenceNumber} = $seq+1;
+		} 
+		unless ($useWobjectId eq "0") {
+			$properties->{wobjectId} = $_[0]->get("wobjectId");
+		}
+		foreach $key (keys %{$properties}) {
+			if ($counter++ > 0) {
+				$dbkeys .= ',';
+				$dbvalues .= ',';
+			}
+			$dbkeys .= $key;
+			$dbvalues .= quote($properties->{$key});
+		}
+		$sql .= $dbkeys.') values ('.$dbvalues.')';
+	} else {
+		$sql = "update $table set ";
+		foreach $key (keys %{$properties}) {
+			$sql .= ',' if ($counter++ > 0);
+			$sql .= $key."=".quote($properties->{$key});
+		}
+		$sql .= " where $keyName='".$properties->{$keyName}."'";
+	}
+  	WebGUI::SQL->write($sql);
+	return $properties->{$keyName};
+}
+
 
 #-------------------------------------------------------------------
 

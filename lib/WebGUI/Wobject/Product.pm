@@ -444,10 +444,15 @@ sub www_deleteTemplateConfirm {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my ($f, $output, $proceed, %data, $sth, $templates);
+        my ($f, $output, $proceed, %data, $sth, $templates, $template);
         if (WebGUI::Privilege::canEditPage()) {
 		$output = helpIcon(1,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(6,$namespace).'</h1>';
+		if ($_[0]->get("wobjectId") eq "new") {
+			$template = 1;
+		} else {
+			$template = $_[0]->get("productTemplateId");
+		}
 		$f = WebGUI::HTMLForm->new;
 		$f->text("price",WebGUI::International::get(10,$namespace),$_[0]->get("price"));
 		$f->text("productNumber",WebGUI::International::get(11,$namespace),$_[0]->get("productNumber"));
@@ -458,7 +463,7 @@ sub www_edit {
 		$f->raw(_fileProperty("manual",14,$_[0]->get("manual")));
 		$f->raw(_fileProperty("warranty",15,$_[0]->get("warranty")));
 		$templates = WebGUI::SQL->buildHashRef("select productTemplateId,name from Product_template order by name");
-		$f->select("productTemplateId",$templates,WebGUI::International::get(61,$namespace),[$_[0]->get("productTemplateId")]);
+		$f->select("productTemplateId",$templates,WebGUI::International::get(61,$namespace),[$template]);
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
 		unless ($_[0]->get("wobjectId") eq "new") {
 			$output .= '<hr size="1" /><p>';
@@ -515,11 +520,9 @@ sub www_editSave {
 
 #-------------------------------------------------------------------
 sub www_editBenefit {
-        my ($output, %data, $f, $benefits);
-        tie %data, 'Tie::CPHash';
+        my ($output, $data, $f, $benefits);
         if (WebGUI::Privilege::canEditPage()) {
-                %data = WebGUI::SQL->quickHash("select * from Product_benefit where
-                        productBenefitId='$session{form}{bid}'");
+		$data = $_[0]->getCollateral("Product_benefit","productBenefitId",$session{form}{bid});
                 $output = helpIcon(6,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(53,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
@@ -528,7 +531,7 @@ sub www_editBenefit {
                 $f->hidden("bid",$session{form}{bid});
                 $f->hidden("func","editBenefitSave");
                 $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
-                $f->combo("benefit",$benefits,WebGUI::International::get(51,$namespace),[$data{benefits}]);
+                $f->combo("benefit",$benefits,WebGUI::International::get(51,$namespace),[$data->{benefits}]);
                 $f->yesNo("proceed",WebGUI::International::get(52,$namespace));
                 $f->submit;
                 $output .= $f->print;
@@ -541,18 +544,12 @@ sub www_editBenefit {
 
 #-------------------------------------------------------------------
 sub www_editBenefitSave {
-        my ($seq);
         if (WebGUI::Privilege::canEditPage()) {
-                if ($session{form}{bid} eq "new") {
-                        ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_benefit
-                                where wobjectId=".$_[0]->get("wobjectId"));
-                        $session{form}{bid} = getNextId("productBenefitId");
-                        WebGUI::SQL->write("insert into Product_benefit (wobjectId,productBenefitId,sequenceNumber) values
-                                (".$_[0]->get("wobjectId").",$session{form}{bid},".($seq+1).")");
-                }
                 $session{form}{benefit} = $session{form}{benefit_new} if ($session{form}{benefit_new} ne "");
-                WebGUI::SQL->write("update Product_benefit set benefit=".quote($session{form}{benefit})."
-                        where productBenefitId=$session{form}{bid}");
+		$_[0]->setCollateral("Product_benefit", "productBenefitId", {
+			productBenefitId => $session{form}{bid},
+			benefit => $session{form}{benefit}
+			});
                 if ($session{form}{proceed}) {
                         $session{form}{bid} = "new";
                         return $_[0]->www_editBenefit();
@@ -566,11 +563,9 @@ sub www_editBenefitSave {
 
 #-------------------------------------------------------------------
 sub www_editFeature {
-        my ($output, %data, $f, $features);
-        tie %data, 'Tie::CPHash';
+        my ($output, $data, $f, $features);
         if (WebGUI::Privilege::canEditPage()) {
-                %data = WebGUI::SQL->quickHash("select * from Product_feature where 
-                        productFeatureId='$session{form}{fid}'");
+		$data = $_[0]->getCollateral("Product_feature","productFeatureId",$session{form}{fid});
 		$output = helpIcon(2,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(22,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
@@ -579,7 +574,7 @@ sub www_editFeature {
                 $f->hidden("fid",$session{form}{fid});
                 $f->hidden("func","editFeatureSave");
 		$features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
-                $f->combo("feature",$features,WebGUI::International::get(23,$namespace),[$data{feature}]);
+                $f->combo("feature",$features,WebGUI::International::get(23,$namespace),[$data->{feature}]);
                 $f->yesNo("proceed",WebGUI::International::get(24,$namespace));
                 $f->submit;
                 $output .= $f->print;
@@ -592,18 +587,12 @@ sub www_editFeature {
 
 #-------------------------------------------------------------------
 sub www_editFeatureSave {
-        my ($seq);
         if (WebGUI::Privilege::canEditPage()) {
-                if ($session{form}{fid} eq "new") {
-                        ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_feature 
-				where wobjectId=".$_[0]->get("wobjectId"));
-                        $session{form}{fid} = getNextId("productFeatureId");
-                        WebGUI::SQL->write("insert into Product_feature (wobjectId,productFeatureId,sequenceNumber) values
-                                (".$_[0]->get("wobjectId").",$session{form}{fid},".($seq+1).")");
-                }
 		$session{form}{feature} = $session{form}{feature_new} if ($session{form}{feature_new} ne "");
-                WebGUI::SQL->write("update Product_feature set feature=".quote($session{form}{feature})."
-                        where productFeatureId=$session{form}{fid}");
+                $_[0]->setCollateral("Product_feature", "productFeatureId", {
+                        productFeatureId => $session{form}{fid},
+                        feature => $session{form}{feature}
+                        });
                 if ($session{form}{proceed}) {
                         $session{form}{fid} = "new";
                         return $_[0]->www_editFeature();
@@ -617,11 +606,9 @@ sub www_editFeatureSave {
 
 #-------------------------------------------------------------------
 sub www_editSpecification {
-        my ($output, %data, $f, $hashRef);
-        tie %data, 'Tie::CPHash';
+        my ($output, $data, $f, $hashRef);
         if (WebGUI::Privilege::canEditPage()) {
-                %data = WebGUI::SQL->quickHash("select * from Product_specification where 
-                        productSpecificationId='$session{form}{sid}'");
+		$data = $_[0]->getCollateral("Product_specification","productSpecificationId",$session{form}{sid});
 		$output = helpIcon(3,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(25,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
@@ -630,10 +617,10 @@ sub www_editSpecification {
                 $f->hidden("sid",$session{form}{sid});
                 $f->hidden("func","editSpecificationSave");
                 $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
-                $f->combo("name",$hashRef,WebGUI::International::get(26,$namespace),[$data{name}]);
-                $f->text("value",WebGUI::International::get(27,$namespace),$data{value});
+                $f->combo("name",$hashRef,WebGUI::International::get(26,$namespace),[$data->{name}]);
+                $f->text("value",WebGUI::International::get(27,$namespace),$data->{value});
                 $hashRef = WebGUI::SQL->buildHashRef("select units,units from Product_specification order by units");
-                $f->combo("units",$hashRef,WebGUI::International::get(29,$namespace),[$data{units}]);
+                $f->combo("units",$hashRef,WebGUI::International::get(29,$namespace),[$data->{units}]);
                 $f->yesNo("proceed",WebGUI::International::get(28,$namespace));
                 $f->submit;
                 $output .= $f->print;
@@ -646,20 +633,15 @@ sub www_editSpecification {
 
 #-------------------------------------------------------------------
 sub www_editSpecificationSave {
-        my ($seq);
         if (WebGUI::Privilege::canEditPage()) {
-                if ($session{form}{sid} eq "new") {
-                        ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_specification
-                                where wobjectId=".$_[0]->get("wobjectId"));
-                        $session{form}{sid} = getNextId("productSpecificationId");
-                        WebGUI::SQL->write("insert into Product_specification (wobjectId,productSpecificationId,sequenceNumber) values
-                                (".$_[0]->get("wobjectId").",$session{form}{sid},".($seq+1).")");
-                }
                 $session{form}{name} = $session{form}{name_new} if ($session{form}{name_new} ne "");
-                $session{form}{value} = $session{form}{value_new} if ($session{form}{value_new} ne "");
                 $session{form}{units} = $session{form}{units_new} if ($session{form}{units_new} ne "");
-                WebGUI::SQL->write("update Product_specification set name=".quote($session{form}{name}).",
-                        value=".quote($session{form}{value}).", units=".quote($session{form}{units})." where productSpecificationId=$session{form}{sid}");
+                $_[0]->setCollateral("Product_specification", "productSpecificationId", {
+                        productSpecificationId => $session{form}{sid},
+                        name => $session{form}{name},
+                        value => $session{form}{value},
+                        units => $session{form}{units}
+                        });
                 if ($session{form}{proceed}) {
                         $session{form}{sid} = "new";
                         return $_[0]->www_editSpecification();
@@ -673,10 +655,9 @@ sub www_editSpecificationSave {
 
 #-------------------------------------------------------------------
 sub www_editTemplate {
-        my ($output, %data, $f);
-        tie %data, 'Tie::CPHash';
+        my ($output, $data, $f);
         if (WebGUI::Privilege::canEditPage()) {
-                %data = WebGUI::SQL->quickHash("select * from Product_template where productTemplateId='$session{form}{tid}'");
+		$data = $_[0]->getCollateral("Product_template","productTemplateId",$session{form}{tid});
                 $output = helpIcon(7,$namespace);
                 $output .= '<h1>'.WebGUI::International::get(58,$namespace).'</h1>';
                 $f = WebGUI::HTMLForm->new;
@@ -684,8 +665,8 @@ sub www_editTemplate {
                 $session{form}{tid} = "new" if ($session{form}{tid} eq "");
                 $f->hidden("tid",$session{form}{tid});
                 $f->hidden("func","editTemplateSave");
-		$f->text("name",WebGUI::International::get(59,$namespace),$data{name});
-		$f->HTMLArea("template",WebGUI::International::get(60,$namespace),$data{template},'','','',($session{setting}{textAreaRows}+10));
+		$f->text("name",WebGUI::International::get(59,$namespace),$data->{name});
+		$f->HTMLArea("template",WebGUI::International::get(60,$namespace),$data->{template},'','','',($session{setting}{textAreaRows}+10));
                 $f->submit;
                 $output .= $f->print;
                 return $output;
@@ -698,12 +679,11 @@ sub www_editTemplate {
 #-------------------------------------------------------------------
 sub www_editTemplateSave {
         if (WebGUI::Privilege::canEditPage()) {
-                if ($session{form}{tid} eq "new") {
-                        $session{form}{tid} = getNextId("productTemplateId");
-                        WebGUI::SQL->write("insert into Product_template (productTemplateId) values ($session{form}{tid})");
-                }
-                WebGUI::SQL->write("update Product_template set name=".quote($session{form}{name}).",
-                        template=".quote($session{form}{template})." where productTemplateId=$session{form}{tid}");
+                $_[0]->setCollateral("Product_template", "productTemplateId", {
+                        productTemplateId => $session{form}{tid},
+                        name => $session{form}{name},
+                        template => $session{form}{template}
+                        }, 0, 0);
                 return $_[0]->www_edit();
         } else {
                 return WebGUI::Privilege::insufficient();
