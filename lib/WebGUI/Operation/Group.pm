@@ -447,14 +447,15 @@ sub www_manageUsersInGroupSecondary {
         return WebGUI::Privilege::adminOnly() unless _hasSecondaryPrivilege($session{form}{gid});
         my ($output, $sth, %hash);
         tie %hash, 'Tie::CPHash';
-        $output = '<h1>'.WebGUI::International::get(88).'</h1>';
+	my $group = WebGUI::Group->new($session{form}{gid});
+        $output = '<h1>'.WebGUI::International::get(88).' '.$group->name.'</h1>';
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden("gid",$session{form}{gid});
 	$f->hidden("op","addUsersToGroupSecondarySave");
 	my $existingUsers = WebGUI::Grouping::getUsersInGroup($session{form}{gid});
 	push(@{$existingUsers},"1");
 	push(@{$existingUsers},"3");
-	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where status='Active' and userId not in (".join(",",@{$existingUsers}).")");
+	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where status='Active' and userId not in (".join(",",@{$existingUsers}).") order by username");
 	$f->selectList(
 		-name=>"users",
 		-label=>WebGUI::International::get(976),

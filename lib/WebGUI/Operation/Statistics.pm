@@ -184,7 +184,7 @@ sub www_viewStatistics {
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(427).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from template where templateId>1000");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(792).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from collateral where collateralId>1000");
+	($data) = WebGUI::SQL->quickArray("select count(*) from collateral");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(793).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from userSession");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(146).':</td><td class="tableData">'.$data.'</td></tr>';
