@@ -30,6 +30,7 @@ Andreas Graf).
    of late.
  - Bugfix [ 915498 ] htmlArea - insert image WebGUI 6.0
  - Updated the dutch translation. (Thanks to Procolix)
+ - Added Style Help for Auth System
 
 
 6.0.0
