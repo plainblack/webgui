@@ -3,48 +3,48 @@ package WebGUI::i18n::English::CommercePaymentPayFlowPro;
 our $I18N = {
 	'name' => {
 		message => q|Name|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772168,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'address' => {
 		message => q|Address|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772170,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'city' => {
 		message => q|City|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772171,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'state' => {
 		message => q|State|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772173,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'zipcode' => {
 		message => q|Zipcode|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772174,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'email' => {
 		message => q|Email|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772176,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'cardNumber' => {
 		message => q|Credit card number|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772177,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'expiration date' => {
 		message => q|Expiration date|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772180,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	'cvv2' => {
 		message => q|Verification number (ie. CVV2)|,
-		lastUpdated => 0,
-		context => q|Form label in the chekout form of the PayFlowPro module.|
+		lastUpdated => 1101772182,
+		context => q|Form label in the checkout form of the PayFlowPro module.|
 	},
 	
 	'vendor' => {
