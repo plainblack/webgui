@@ -70,35 +70,6 @@ sub _isDuplicateUsername {
 
 #-------------------------------------------------------------------
 
-=head2 _isValidPassword (  )
-
-  Validates the password.
-
-=cut
-
-sub _isValidPassword {
-   my $self = shift;
-   my $password = shift;
-   my $confirm = shift;
-   my $error = "";
-   
-   if ($password ne $confirm) {
-      $error .= '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
-   }
-   if ($password eq "") {
-      $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
-   }
-   
-   if ($self->getSetting("passwordLength") && length($password) < $self->getSetting("passwordLength")){
-      $error .= '<li>'.WebGUI::International::get(7,'Auth/WebGUI')." ".$self->getSetting("passwordLength");
-   }
-   
-   $self->error($error);
-   return $error eq "";
-}
-
-#-------------------------------------------------------------------
-
 =head2 _isValidUsername ( username )
 
   Validates the username passed in.
@@ -232,11 +203,11 @@ sub createAccount {
 	my $method = $_[0];
 	my $vars = $_[1];
     my $template = $_[2] || 'Auth/'.$self->authMethod.'/Create';
-	$vars->{displayTitle} = '<h1>'.WebGUI::International::get(54).'</h1>';
+	$vars->{title} = WebGUI::International::get(54);
    	
-	$vars->{'create.form.header'} = "\n\n".WebGUI::Form::formHeader({});
-	$vars->{'create.form.hidden'} .= WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-    $vars->{'create.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
+	$vars->{'create.form.header'} = WebGUI::Form::formHeader({});
+	$vars->{'create.form.header'} .= WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
+    $vars->{'create.form.header'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
 	
 	#User Defined Options
     $vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields();
@@ -244,11 +215,9 @@ sub createAccount {
 	$vars->{'create.form.submit'} = WebGUI::Form::submit({});
     $vars->{'create.form.footer'} = "</form>";
 	
-    $vars->{'create.options.accountExists'} = '<a href="'.WebGUI::URL::page('op=auth&method=init').'">'.WebGUI::International::get(58).'</a>';
+    $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
+    $vars->{'login.label'} = WebGUI::International::get(58);
 
-	if ($self->getSetting("passwordRecovery")) {
-	   $vars->{'create.options.passwordRecovery'} = '<a href="'.WebGUI::URL::page('op=recoverPassword').'">'.WebGUI::International::get(59).'</a>';
-	}
 	return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
 }
 
@@ -328,14 +297,16 @@ sub createAccountSave {
 sub deactivateAccount {
    my $self = shift;
    my $method = $_[0];
-   my ($output);
    return WebGUI::Privilege::vitalComponent() if($self->userId < 26);
    return WebGUI::Privilege::adminOnly() if(!$session{setting}{selfDeactivation});
-   $output = '<h1>'.WebGUI::International::get(42).'</h1>';
-   $output .= WebGUI::International::get(60).'<p>';
-   $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=auth&method='.$method).'">'.WebGUI::International::get(44).'</a>';
-   $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(45).'</a></div>';
-   return $output;
+   my %var; 
+  	$var{title} = WebGUI::International::get(42);
+   	$var{question} =  WebGUI::International::get(60);
+   	$var{'yes.url'} = WebGUI::URL::page('op=auth&method='.$method);
+	$var{'yes.label'} = WebGUI::International::get(44);
+   	$var{'no.url'} = WebGUI::URL::page();
+	$var{'no.label'} = WebGUI::International::get(45);
+	return WebGUI::Template::process(WebGUI::Template::get(1,"prompt"), \%var);
 }
 
 #-------------------------------------------------------------------
@@ -395,11 +366,11 @@ sub displayAccount {
    my $vars = $_[1];
    my $template = $_[2] || 'Auth/'.$self->authMethod.'/Account';
    
-   $vars->{displayTitle} = '<h1>'.WebGUI::International::get(61).'</h1>';
+   $vars->{title} = WebGUI::International::get(61);
    
-   $vars->{'account.form.header'} = "\n\n".WebGUI::Form::formHeader({});
-   $vars->{'account.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-   $vars->{'account.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
+   $vars->{'account.form.header'} = WebGUI::Form::formHeader({});
+   $vars->{'account.form.header'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
+   $vars->{'account.form.header'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
    if($session{setting}{useKarma}){
       $vars->{'account.form.karma'} = $session{user}{karma};
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
@@ -445,8 +416,8 @@ sub displayLogin {
 	   WebGUI::Session::setScratch("redirectAfterLogin",$session{env}{REQUEST_URI});
 	}
 
-	$vars->{displayTitle} = '<h1>'.WebGUI::International::get(66).'</h1>';
-	$vars->{'login.form.header'} = "\n\n".WebGUI::Form::formHeader({});
+	$vars->{title} = WebGUI::International::get(66);
+	$vars->{'login.form.header'} = WebGUI::Form::formHeader({});
 	if ($session{setting}{encryptLogin}) {
        $vars->{'login.form.header'} =~ s/http:/https:/;
     }
@@ -459,12 +430,9 @@ sub displayLogin {
 	$vars->{'login.form.submit'} = WebGUI::Form::submit({"value"=>WebGUI::International::get(52)});
 	$vars->{'login.form.footer'} = "</form>";
 
-	if ($session{setting}{anonymousRegistration}) {
-	   $vars->{'login.options.anonymousRegistration'} = '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(67).'</a>';
-    }
-	if ($self->getSetting("passwordRecovery")) {
-	   $vars->{'login.options.passwordRecovery'} = '<a href="'.WebGUI::URL::page('op=recoverPassword').'">'.WebGUI::International::get(59).'</a>';
-	}
+	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
+	   $vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
+	   $vars->{'createAccount.label'} = WebGUI::International::get(67);
 	return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
 }
 
@@ -669,51 +637,6 @@ sub profile {
 }
 
 
-#-------------------------------------------------------------------
-=head2 recoverPassword ( method [,vars,template] )
-
-  Superclass method that performs general functionality for creating new accounts.
-
-=over
-
-=item method
-
-   Auth method that the form for recovering passwords should call
-   
-=item vars
-   
-   Array ref of template vars from subclass
-   
-=item template
-
-   Template that this class should use for display purposes
-
-=back
-  
-=cut
-
-sub recoverPassword {
-   my $self = shift;
-   my $method = $_[0];
-   my $vars = $_[1];
-   my $template = $_[2] || 'Auth/'.$self->authMethod.'/Recovery';
-      
-   $vars->{displayTitle} = '<h1>'.WebGUI::International::get(71).'</h1>';
-   
-   my $output = '<h1>'.WebGUI::International::get(71).'</h1>';
-   $vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader({});
-   $vars->{'recover.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-   $vars->{'recover.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
-   
-   $vars->{'recover.form.submit'} = WebGUI::Form::submit({});
-   $vars->{'recover.form.footer'} = "</form>";
-   
-   $vars->{'recover.options.accountExists'} = '<a href="'.WebGUI::URL::page('op=auth&method=init').'">'.WebGUI::International::get(73).'</a>';
-   if ($session{setting}{anonymousRegistration}) {
-	   $vars->{'recover.options.anonymousRegistration'} = '<a href="'.WebGUI::URL::page('op=createAccount').'">'.WebGUI::International::get(67).'</a>';
-   }
-   return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
-}
 
 #-------------------------------------------------------------------
 =head2 setCallable ( callableMethods )
@@ -814,17 +737,15 @@ sub username {
 
 #-------------------------------------------------------------------
 
-=head2 validUsernameAndPassword ( username,password,passwordConfirm )
+=head2 validUsername ( username )
 
-  Validates the a username and password.
+  Validates the a username.
 
 =cut
 
-sub validUsernameAndPassword {
+sub validUsername {
    my $self = shift;
    my $username = $_[0];
-   my $password = $_[1];
-   my $passwordConfirm = $_[2];
    my $error = "";
    
    if($self->_isDuplicateUsername($username)){
@@ -832,10 +753,6 @@ sub validUsernameAndPassword {
    }
    
    if(!$self->_isValidUsername($username)){
-      $error .= $self->error;
-   }
-   
-   if(!$self->_isValidPassword($password,$passwordConfirm)){
       $error .= $self->error;
    }
    

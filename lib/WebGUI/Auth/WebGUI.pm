@@ -25,6 +25,35 @@ our @ISA = qw(WebGUI::Auth);
 
 #-------------------------------------------------------------------
 
+=head2 _isValidPassword (  )
+
+  Validates the password.
+
+=cut
+
+sub _isValidPassword {
+   my $self = shift;
+   my $password = shift;
+   my $confirm = shift;
+   my $error = "";
+
+   if ($password ne $confirm) {
+      $error .= '<li>'.WebGUI::International::get(3,'Auth/WebGUI');
+   }
+   if ($password eq "") {
+      $error .= '<li>'.WebGUI::International::get(4,'Auth/WebGUI');
+   }
+
+   if ($self->getSetting("passwordLength") && length($password) < $self->getSetting("passwordLength")){
+      $error .= '<li>'.WebGUI::International::get(7,'Auth/WebGUI')." ".$self->getSetting("passwordLength");
+   }
+
+   $self->error($error);
+   return $error eq "";
+}
+
+#-------------------------------------------------------------------
+
 =head2 addUserForm ( )
 
   Creates user form elements specific to this Auth Method.
@@ -131,6 +160,9 @@ sub createAccount {
    $vars->{'create.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm","value"=>$session{form}{"authWebGUI.identifierConfirm"}});
    $vars->{'create.form.passwordConfirm.label'} = WebGUI::International::get(2,'Auth/WebGUI');
    $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$session{form}{confirm}});
+ 	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
+	   $vars->{'recoverPassword.url'} = WebGUI::URL::page('op=recoverPassword');
+	   $vars->{'recoverPassword.label'} = WebGUI::International::get(59);
    return $self->SUPER::createAccount("createAccountSave",$vars);
 }
 
@@ -144,7 +176,8 @@ sub createAccountSave {
    my $password = $session{form}{'authWebGUI.identifier'};
    my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
    
-   my $error = $self->error if(!$self->validUsernameAndPassword($username,$password,$passConfirm));
+   my $error = $self->error if(!$self->validUsername($username));
+   $error.= $self->error if(!$self->_isValidPassword($password,$passConfirm));
    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
    $error .= $temp;
    
@@ -215,6 +248,11 @@ sub displayLogin {
    my $vars;
    return $self->displayAccount($_[0]) if ($self->userId != 1);
    $vars->{'login.message'} = $_[0] if ($_[0]);
+   $vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
+           $vars->{'recoverPassword.url'} = WebGUI::URL::page('op=recoverPassword');
+           $vars->{'recoverPassword.label'} = WebGUI::International::get(59);
+
+
    return $self->SUPER::displayLogin("login",$vars);
 }
 
@@ -342,14 +380,28 @@ sub new {
 
 
 #-------------------------------------------------------------------
-sub recoverPassword {   
+sub recoverPassword {
    my $self = shift;
-   my $vars;
    return $self->displayLogin if($self->userId != 1);	
+   my $template = 'Auth/WebGUI/Recovery';
+   my $vars;
+   $vars->{title} = WebGUI::International::get(71);
+   $vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader({});
+   $vars->{'recover.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
+   $vars->{'recover.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>"recoverPasswordFinish"});
+
+   $vars->{'recover.form.submit'} = WebGUI::Form::submit({});
+   $vars->{'recover.form.footer'} = "</form>";
+    $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
+    $vars->{'login.label'} = WebGUI::International::get(58);
+
+	     $vars->{'anonymousRegistration.isAllowed'} = if ($session{setting}{anonymousRegistration});
+           $vars->{'createAccount.url'} = WebGUI::URL::page('op=createAccount');
+           $vars->{'createAccount.label'} = WebGUI::International::get(67);
    $vars->{'recover.message'} = $_[0] if ($_[0]);
    $vars->{'recover.form.email'} = WebGUI::Form::text({"name"=>"email"});
    $vars->{'recover.form.email.label'} = WebGUI::International::get(56);
-   return $self->SUPER::recoverPassword("recoverPasswordFinish",$vars);
+   return WebGUI::Template::process(WebGUI::Template::get(1,$template), $vars);
 }
 
 #-------------------------------------------------------------------
@@ -479,10 +531,6 @@ sub updateAccount {
    if($error){
       $display = $error;
    }
-   
-   #if(!$self->validUsernameAndPassword($username,$password,$passConfirm)){
-   #   $display = $self->error; #overwrite display
-   #}
    
    my $properties;
    my $u = $self->user;

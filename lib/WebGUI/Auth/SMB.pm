@@ -124,8 +124,7 @@ sub createAccountSave {
    }
    
    #Check that username is valid and not a duplicate in the system.
-   $error .= $self->error if($self->_isDuplicateUsername($username));
-   $error .= $self->error if(!$self->_isValidUsername($username));
+   $error .= $self->error if($self->validUsername($username));
    #Validate profile data.
    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
    $error .= $temp;
