@@ -564,9 +564,10 @@ sub purge {
 
 sub reorderCollateral {
         my ($sth, $i, $id);
+	$i = 0;
         $sth = WebGUI::SQL->read("select $_[2] from $_[1] where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
         while (($id) = $sth->array) {
-                WebGUI::SQL->write("update $_[1] set sequenceNumber='$i' where wobjectId=$_[0] and $_[2]=$id");
+                WebGUI::SQL->write("update $_[1] set sequenceNumber=$i where wobjectId=".$_[0]->get("wobjectId")." and $_[2]=$id");
                 $i++;
         }
         $sth->finish;
@@ -709,6 +710,7 @@ sub setCollateral {
 			$dbvalues .= quote($properties->{$key});
 		}
 		$sql .= $dbkeys.') values ('.$dbvalues.')';
+		WebGUI::ErrorHandler::audit("added ".$table." ".$properties->{$keyName});
 	} else {
 		$sql = "update $table set ";
 		foreach $key (keys %{$properties}) {
@@ -716,9 +718,9 @@ sub setCollateral {
 			$sql .= $key."=".quote($properties->{$key});
 		}
 		$sql .= " where $keyName='".$properties->{$keyName}."'";
+		WebGUI::ErrorHandler::audit("edited ".$table." ".$properties->{$keyName});
 	}
   	WebGUI::SQL->write($sql);
-	WebGUI::ErrorHandler::audit("edited ".$table." ".$properties->{$keyName});
 	return $properties->{$keyName};
 }
 
