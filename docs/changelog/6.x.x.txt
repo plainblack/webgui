@@ -94,7 +94,8 @@
  - upgrade.pl now deletes temporary files and template cache.
  - Fixed a bug in the HTMLArea image manager that would not allow users to
    upload files if the gateway script was not at /index.pl
- - Fixed a bug where trashed pages were still showing up in page tree.
+ - bugfix [1008283]. Add new user not working for secondary admin (Leendert Bottelberghs).
+
 
 
 6.1.1
