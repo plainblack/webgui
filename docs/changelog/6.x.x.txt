@@ -27,6 +27,8 @@
    will have no effect on clients/servers that can't support compression.
  - A small patch from Roy Johnson to deal with different types of WSDLs in the
    WSClient.
+ - Adding form param WSClient_skipCache when posting to WSClient wobject
+   allows us to ignore even good soap return caches (mostly for testing use)
  - Moved to a compiled internationalization and help system. At a cost of 3
    megabytes of RAM, it provides a boost in performance of over 35%. More
    importantly though, it cuts the number of database queries in half on an
