@@ -4,6 +4,7 @@
  - Added Text::Balanced to the distro.
  = Fixed bug [ 910145 ] htmlArea - insert image not working (Len Kranendonk /
 Andreas Graf).
+ - Bugfix 914825 / 912203: Bug in template system (LenK).
 
 6.0.0
 

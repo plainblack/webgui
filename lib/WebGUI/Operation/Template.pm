@@ -56,7 +56,7 @@ sub www_copyTemplate {
         if (WebGUI::Privilege::isInGroup(8)) {
 		%template = WebGUI::SQL->quickHash("select * from template where templateId=$session{form}{tid} and namespace=".quote($session{form}{namespace}));
                 WebGUI::SQL->write("insert into template (templateId,name,template,namespace) 
-			values (".getNextId("templateId").", 
+			values ("._getNextTemplateId($session{form}{namespace}).", 
 			".quote('Copy of '.$template{name}).", ".quote($template{template}).",
 			".quote($template{namespace}).")");
                 return www_listTemplates();
@@ -157,13 +157,7 @@ sub www_editTemplate {
 sub www_editTemplateSave {
         if (WebGUI::Privilege::isInGroup(8)) {
 		if ($session{form}{tid} eq "new") {
-			($session{form}{tid}) = WebGUI::SQL->quickArray("select max(templateId) 
-				from template where namespace=".quote($session{form}{namespace}));
-			if ($session{form}{tid} > 999) {
-				$session{form}{tid}++;
-			} else {
-				$session{form}{tid} = 1000;
-			}
+			$session{form}{tid} = _getNextTemplateId($session{form}{namespace});
 			WebGUI::SQL->write("insert into template (templateId,namespace) values 
 				($session{form}{tid}, ".quote($session{form}{namespace}).")");
 		}
@@ -214,6 +208,20 @@ sub www_listTemplates {
         }
 }
 
-
+sub _getNextTemplateId {
+	my $namespace = shift;
+	my $templateId;
+	my $query = "select max(templateId) from template";
+	if ($namespace) {
+		$query .= " where namespace = ".quote($namespace);
+	}
+	($templateId) = WebGUI::SQL->quickArray($query);
+	if ($templateId > 999) {
+		$templateId++;
+	} else {
+		$templateId = 1000;
+	}
+	return $templateId;
+}
 
 1;
