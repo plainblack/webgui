@@ -7,6 +7,7 @@
  - Added asset type icons to the asset toolbar.
  - Added isAdminOn(), switchOnAdmin(), and switchOffAdmin() to WebGUI::Session
    to eliminate all of the previously cryptic means of doing those things.
+ - Added a temporary file storage mechanism to WebGUI::Storage.
  - Fixed resetting votes on Poll would crash it.
  - Fixed not being able to set display title and other yes no questions to no.
  - Fixed a bug where URLs would become unreachable when using SSL.
@@ -31,6 +32,7 @@
  - bugfix [ 1150173 ] Error message when logging out
  - bugfix [ 1154247 ] Title and menuTitle set to 'untitled' if url is changed
  - bugfix [ 1150982 ] Subscribe to forum thread causes error
+ - bugfix [ 1151216 ] The Latest News is blank on demo.plainblack.com
 
 
 6.3.0
@@ -107,6 +109,8 @@
  - fix [ 1052801 ] wobjectproxy throws security error on editSubmission
  - fix [ 1028921 ] Cannot drag n drop proxy wobjects
  - fix [ 1003509 ] Admin mode breaks page layout with users not in Admin Group
+ - fix [ 1123666 ] Discussion - reply to thread not displaying in threaded
+   mode
  - Removed the page stats tracking function as it was killing people's sites.
    We recommend AWStats instead (www.awstats.org)
  - Added the ability to switch the style for user functions like profiles,

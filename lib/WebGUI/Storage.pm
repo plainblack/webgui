@@ -320,6 +320,23 @@ sub create {
 	$self->_makePath;
 	return $self; 
 }
+#-------------------------------------------------------------------
+
+=head2 createTemp ( )
+ 
+Creates a temporary storage location on the file system.
+
+=cut
+
+sub createTemp {
+	my $class = shift;
+	my $id = WebGUI::Id::generate();
+	$id =~ m/^(.{2})/;
+	my $self = {_id => $id, _part1 => 'temp', _part2 => $1};
+	bless $self, ref($class)||$class;
+	$self->_makePath;
+	return $self; 
+}
 
 #-------------------------------------------------------------------
 

@@ -1031,16 +1031,16 @@ sub www_viewRSS {
 ~;
 	my $sth = WebGUI::SQL->read("select * 
 		from Thread
-		left join asset on Thread.assetId=asset.parentId
+		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=asset.assetId 
 		where asset.parentId=".quote($self->getId)." and asset.state='published' 
 			and asset.className='WebGUI::Asset::Post::Thread' and Post.status='approved'
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $i = 1;
-        while (my $data = $sth->hashref) {
-		my $post = WebGUI::Asset::Post::Thread->newByPropertyHashRef($data);
+        while (my $data = $sth->hashRef) {
+		my $post = WebGUI::Asset::Wobject::Collaboration->newByPropertyHashRef($data);
 
-                my $encUrl = _xml_encode($post->getUrl);
+                my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
                 my $encTitle = _xml_encode($post->get("title"));
                 my $encPubDate = _xml_encode(_get_rfc822_date($post->get("dateUpdated")));
                 my $encDescription = _xml_encode($self->get("synopsis"));

@@ -2006,7 +2006,7 @@ CREATE TABLE SyndicatedContent (
 --
 
 
-INSERT INTO SyndicatedContent VALUES ('http://www.plainblack.com/news?wid=920&func=viewRSS',3,'fK-HMSboA3uu0c1KYkYspA','GNvjCFQWjY2AF2uf0aCM8Q');
+INSERT INTO SyndicatedContent VALUES ('http://www.plainblack.com/news/news?func=viewRSS',3,'fK-HMSboA3uu0c1KYkYspA','GNvjCFQWjY2AF2uf0aCM8Q');
 
 --
 -- Table structure for table `Thread`
