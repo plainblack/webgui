@@ -6,6 +6,7 @@
  - Added anonymous response option to Survey. (Thanks to Andy Grundman.)
  - Added the alphabetic? option to the SiteMap wobject. (Thanks to Hal Roberts.)
  - Changed the page hideFromNavigation option to hide the given page from site maps as well as from navigation menus. (Thanks to Hal Roberts.)
+ - Revamped SyndicatedContent to support aggregate feeds. (Thanks to Hal Roberts.)
  - Fixed a relative hyperlink bug in htmlArea (Thanks to Andreas Graf.)
  - Ordered the username list in the manageUsersInGroup operation (Thanks to
    Andreas Graf.)
