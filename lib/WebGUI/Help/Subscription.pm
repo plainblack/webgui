@@ -85,6 +85,7 @@ our $HELP = {
 				namespace => 'WebGUI'
 			},
 		]
+	},
 	
 };
 
