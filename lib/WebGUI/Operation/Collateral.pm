@@ -38,7 +38,8 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editCollateral &www_editCollateralSave &www_deleteCollateral 
 	&www_deleteCollateralConfirm &www_listCollateral 
 	&www_deleteCollateralFile &www_editCollateralFolder &www_editCollateralFolderSave &www_deleteCollateralFolder 
-	&www_deleteCollateralFolderConfirm &www_htmlArealistCollateral &www_htmlAreaviewCollateral &www_htmlAreaUpload
+	&www_deleteCollateralFolderConfirm &www_emptyCollateralFolder &www_emptyCollateralFolderConfirm
+	&www_htmlArealistCollateral &www_htmlAreaviewCollateral &www_htmlAreaUpload
 	&www_htmlAreaDelete &www_htmlAreaCreateFolder);
 
 #-------------------------------------------------------------------
@@ -54,6 +55,7 @@ sub _submenu {
 		$menu{WebGUI::URL::page('op=deleteCollateral&cid='.$session{form}{cid})} = WebGUI::International::get(765);
 	}
 	$menu{WebGUI::URL::page('op=editCollateralFolder')} = WebGUI::International::get(759);
+	$menu{WebGUI::URL::page('op=emptyCollateralFolder')} = WebGUI::International::get(980);
 	$menu{WebGUI::URL::page('op=deleteCollateralFolder')} = WebGUI::International::get(760);
 	$menu{WebGUI::URL::page('op=listCollateral')} = WebGUI::International::get(766);
 	return menuWrapper($_[0],\%menu);
@@ -105,6 +107,29 @@ sub www_deleteCollateralFolderConfirm {
           $deadFolder->recursiveDelete();
           WebGUI::Session::setScratch("collateralFolderId",$parentId);
         }
+        return www_listCollateral();
+}
+
+#-------------------------------------------------------------------
+sub www_emptyCollateralFolder {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
+        my $output = '<h1>'.WebGUI::International::get(42).'</h1>';
+	$output .= WebGUI::International::get(979).'<p/><div align="center">';
+        $output .= '<a href="'.WebGUI::URL::page('op=emptyCollateralFolderConfirm').'">'
+                .WebGUI::International::get(44).'</a>';
+        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;';
+        $output .= '<a href="'.WebGUI::URL::page('op=listCollateral').'">'.WebGUI::International::get(45).'</a>';
+	$output .= '</div>';
+        return _submenu($output);
+}
+
+#-------------------------------------------------------------------
+sub www_emptyCollateralFolderConfirm {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
+	return WebGUI::Privilege::vitalComponent() unless ($session{scratch}{collateralFolderId} > 999);
+	my @collateralIds = WebGUI::SQL->buildArray("select collateralId from collateral where collateralFolderId=".$session{scratch}{collateralFolderId});
+	WebGUI::Collateral->multiDelete(@collateralIds);
         return www_listCollateral();
 }
 
