@@ -39,13 +39,13 @@ sub www_editUserSettings {
                 $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editUserSettingsSave");
-                $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
                 $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
-                $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
                 $f->text("runOnRegistration",WebGUI::International::get(559),$session{setting}{runOnRegistration});
+                $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
 		$f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
                 $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
                 $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
+                $f->integer("sessionTimeout",WebGUI::International::get(142),$session{setting}{sessionTimeout});
                 $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
                 $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
                 $f->url("ldapURL",WebGUI::International::get(120),$session{setting}{ldapURL});
