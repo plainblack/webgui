@@ -33,7 +33,7 @@ If you wish to add a link to your article, enter the title of the link in this f
 <br><br>
 
 <b>Link URL</b><br>
-If you added a link title, now add the URL (uniform resource locator) here. 
+If you added a link title, now add the URL (uniform resource locater) here. 
 <br><br>
 <i>Example:</i> http://www.google.com
 
@@ -50,7 +50,7 @@ adding a discussion board to the page.
 
 
 |,
-		lastUpdated => 1098850076
+		lastUpdated => 1101771446
 	},
 
 	'7' => {
