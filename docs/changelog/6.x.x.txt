@@ -1,5 +1,6 @@
 6.2.2
-
+ - Made a dramatic performance enhancement to the page tree system by
+   restructuring an overused, and inefficent method.
 
 
 6.2.1

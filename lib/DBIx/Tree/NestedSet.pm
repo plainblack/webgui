@@ -573,27 +573,13 @@ sub get_self_and_children_flat{
 	# If they have changed the id name but still pass in the ID value in the id parameter, fix it.
 	$params{$id_name}=$params{id} 
     }
-    my $id_SQL;
+	my $id_SQL;
     if (defined $params{$id_name}) {
-	my ($left_value,$right_value)=$dbh->selectrow_array("select $left,$right from $table where $id_name=?",undef,($params{$id_name}));
-	$id_SQL="and (n1.$left between " . $dbh->quote($left_value)." and ".$dbh->quote($right_value).") ";
+	my ($left_value,$right_value,$depth_value)=$dbh->selectrow_array("select $left,$right,depth from $table where $id_name=?",undef,($params{$id_name}));
+	$id_SQL="where $left between " . $dbh->quote($left_value)." and ".$dbh->quote($right_value)." having level <=".($params{depth} + $depth_value+2);
     }
-    my $tree_structure=$dbh->selectall_arrayref("select count(n2.${id_name}) as level,n1.* from $table as n1, $table as n2 where (n1.$left between n2.$left and n2.$right) $id_SQL group by n1.${id_name} order by n1.$left",{Columns=>{}});
-    my $start_level=$tree_structure->[0]->{level};
-    if (defined $params{depth} && $tree_structure) {
-	#We wanna chop down the tree.
-	my @temp_tree;
-	if (defined $params{depth}) {
-	    foreach my $node (@$tree_structure) {
-		if ($node->{level} <= ($params{depth} + $start_level)) {
-		    push @temp_tree,$node;
-		}
-	    }
-	}
-	return \@temp_tree;
-    } else {
+    my $tree_structure=$dbh->selectall_arrayref("select depth+2 as level,$table.* from $table $id_SQL order by $left",{Columns=>{}});
 	return $tree_structure;
-    }
 }
 ########################################
 
