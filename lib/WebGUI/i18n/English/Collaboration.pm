@@ -81,6 +81,45 @@ our $I18N = {
 		lastUpdated => 1109618544,
 	},
 
+	'edit' => {
+		message => q|Edit|,
+		lastUpdated => 1109618544,
+	},
+
+	'endDate' => {
+		message => q|End Date|,
+		lastUpdated => 1109618544,
+	},
+
+	'exactPhrase' => {
+		message => q|Exact Phrase|,
+		lastUpdated => 1109618544,
+	},
+
+	'flatLayout' => {
+		message => q|Flat|,
+		lastUpdated => 1109618544,
+	},
+
+	'image' => {
+		message => q|Image|,
+		lastUpdated => 1109618544,
+	},
+
+	'lastReply' => {
+		message => q|Last Reply|,
+		lastUpdated => 1109618544,
+	},
+
+	'lock' => {
+		message => q|Lock|,
+		lastUpdated => 1109618544,
+	},
+
+	'layout' => {
+		message => q|Layout|,
+		lastUpdated => 1109618544,
+	},
 
 };
 
