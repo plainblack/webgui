@@ -72,7 +72,7 @@ sub duplicate {
                 WebGUI::SQL->write("insert into USS_submission values (".$w.", $newSubmissionId, ".
 			quote($row{title}).", $row{dateSubmitted}, ".quote($row{username}).", '$row{userId}', ".quote($row{content}).", ".
 			quote($row{image}).", ".quote($row{attachment}).", '$row{status}', '$row{convertCarriageReturns}', 
-			'$row{views}')");
+			'$row{views}', '$row{forumId}', '$row{dateUpdated}')");
         }
         $sth->finish;
 }
