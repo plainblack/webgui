@@ -58,10 +58,12 @@ sub randint {
 sub randomizeArray {
 	my ($array, $i, $j);
 	$array = shift;
-	for ($i = @$array; --$i; ) {
-		$j = int rand ($i+1);
-		next if $i == $j;
-		@$array[$i,$j] = @$array[$j,$i];
+	if ($#$array > 0) {
+		for ($i = @$array; --$i; ) {
+			$j = int rand ($i+1);
+			next if $i == $j;
+			@$array[$i,$j] = @$array[$j,$i];
+		}
 	}
 }
 

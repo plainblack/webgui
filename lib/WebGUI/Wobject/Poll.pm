@@ -134,7 +134,7 @@ sub www_edit {
 		$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
 		if ($_[0]->get("wobjectId") ne "new") {
 			$output .= '<p>';
-			$output .= '<a href="'.WebGUI::URL::page('func=resetVotes&wid='.$_[0]->get("wobjectId").'">')
+			$output .= '<a href="'.WebGUI::URL::page('func=resetVotes&wid='.$_[0]->get("wobjectId")).'">'
 				.WebGUI::International::get(10,$namespace).'</a>';
 		}
                 return $output;
