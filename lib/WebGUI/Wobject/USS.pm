@@ -102,7 +102,10 @@ sub www_approveSubmission {
 sub www_deleteFile {
 	my ($owner) = WebGUI::SQL->quickArray("select userId from USS_submission where USS_submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-		$_[0]->setCollateral("USS_submission","USS_submissionId",{$session{form}{file}=>''},0,0);
+		$_[0]->setCollateral("USS_submission","USS_submissionId",{
+			$session{form}{file}=>'',
+		 	USS_submissionId=>$session{form}{sid}
+			},0,0);
                 return $_[0]->www_editSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -302,8 +305,7 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%var, $row, $page, $p, $constraints, %data, $sth, @submission, @content, $image, $i, $url, $thumbnail, $responses);
-	tie %data, 'Tie::CPHash';
+	my (%var, $row, $page, $p, $constraints, @submission, @content, $image, $i, $url, $thumbnail, $responses);
 	$var{"label.readmore"} = WebGUI::International::get(46,$namespace);
 	$var{"label.responses"} = WebGUI::International::get(57,$namespace);
         $var{description} = $_[0]->processMacros($_[0]->get("description"));
@@ -328,55 +330,49 @@ sub www_view {
 	$var{"label.thumbnail"} = WebGUI::International::get(52,$namespace);
 	$var{"label.date"} = WebGUI::International::get(13,$namespace);
 	$var{"label.by"} = WebGUI::International::get(21,$namespace);
-	$sth = WebGUI::SQL->read("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username 
-		from USS_submission where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by dateSubmitted desc");
-        while (%data = $sth->hash) {
-		$i++;
-		$data{content} = WebGUI::HTML::filter($data{content},$session{setting}{filterContributedHTML});
-		$data{content} =~ s/\n/\^\-\;/ unless ($data{content} =~ m/\^\-\;/);
-		@content = split(/\^\-\;/,$data{content});
-		if ($data{image} ne "") {
-			$image = WebGUI::Attachment->new($data{image},$_[0]->get("wobjectId"),$data{USS_submissionId});
-			$thumbnail = $image->getThumbnail;
-		} else {
-			$thumbnail = "";
-		}
-		push (@submission,{
-			"submission.id"=>$data{USS_submissionId},
-			"submission.url"=>WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='.$data{USS_submissionId}),
-			"submission.content"=>$content[0],
-			"submission.title"=>$data{title},
-			"submission.userId"=>$data{userId},
-			"submission.status"=>$data{status},
-			"submission.thumbnail"=>$thumbnail,
-			"submission.date"=>$data{dateSubmitted},
-			"submission.currentUser"=>($session{user}{userId} == $data{userId}),
-			"submission.username"=>$data{username},
-			"submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$data{userId}),
-			"submission.secondColumn"=>($i%2==0),
-			"submission.thirdColumn"=>($i%3==0),
-			"submission.fourthColumn"=>($i%4==0),
-			"submission.fifthColumn"=>($i%5==0),
-			});
-	}
-	$sth->finish;
 	$url = WebGUI::URL::page('func=view&search='.$session{form}{search}.'&wid='.$_[0]->get("wobjectId")
         	.'&all='.WebGUI::URL::escape($session{form}{all})
                 .'&exactPhrase='.WebGUI::URL::escape($session{form}{exactPhrase}).'&atLeastOne='
                 .WebGUI::URL::escape($session{form}{atLeastOne}).'&numResults='.$session{form}{numResults}
                 .'&without='.WebGUI::URL::escape($session{form}{without}));
-	$p = WebGUI::Paginator->new($url, \@submission, $_[0]->get("submissionsPerPage"));
-	#post processing page data for greater speed
+	$p = WebGUI::Paginator->new($url, [], $_[0]->get("submissionsPerPage"));
+	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username
+		from USS_submission where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by dateSubmitted desc");
 	$page = $p->getPageData;
 	$i = 0;
 	foreach $row (@$page) {
-		$page->[$i]->{"submission.date"} = epochToHuman($row->{"submission.date"});
-		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion
-                        where wobjectId=".$_[0]->get("wobjectId")." and subId=".$row->{"submission.id"});
-		$page->[$i]->{"submission.responses"} = $responses;
+		$page->[$i]->{content} = WebGUI::HTML::filter($page->[$i]->{content},$session{setting}{filterContributedHTML});
+                $page->[$i]->{content} =~ s/\n/\^\-\;/ unless ($page->[$i]->{content} =~ m/\^\-\;/);
+                @content = split(/\^\-\;/,$page->[$i]->{content});
+                if ($page->[$i]->{image} ne "") {
+                        $image = WebGUI::Attachment->new($page->[$i]->{image},$_[0]->get("wobjectId"),$page->[$i]->{USS_submissionId});
+                        $thumbnail = $image->getThumbnail;
+                } else {
+                        $thumbnail = "";
+                }
+		($responses) = WebGUI::SQL->quickArray("select count(*) from discussion 
+			where wobjectId=".$_[0]->get("wobjectId")." and subId=".$row->{USS_submissionId});
+                push (@submission,{
+                        "submission.id"=>$page->[$i]->{USS_submissionId},
+                        "submission.url"=>WebGUI::URL::page('wid='.$_[0]->get("wobjectId").'&func=viewSubmission&sid='.$page->[$i]->{USS_submissionId}),
+                        "submission.content"=>$content[0],
+			"submission.responses"=>$responses,
+                        "submission.title"=>$page->[$i]->{title},
+                        "submission.userId"=>$page->[$i]->{userId},
+                        "submission.status"=>$page->[$i]->{status},
+                        "submission.thumbnail"=>$thumbnail,
+                        "submission.date"=>epochToHuman($row->{$page->[$i]->{dateSubmitted}}),
+                        "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId}),
+                        "submission.username"=>$page->[$i]->{username},
+                        "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
+                        "submission.secondColumn"=>($i%2==0),
+                        "submission.thirdColumn"=>($i%3==0),
+                        "submission.fourthColumn"=>($i%4==0),
+                        "submission.fifthColumn"=>($i%5==0),
+                        });
 		$i++;
 	}
-	$var{submissions_loop} = $page;
+	$var{submissions_loop} = \@submission;
 	$var{firstPage} = $p->getFirstPageLink;
 	$var{lastPage} = $p->getLastPageLink;
 	$var{nextPage} = $p->getNextPageLink;
