@@ -54,33 +54,6 @@ sub _canEditMessage {
 }
 
 #-------------------------------------------------------------------
-sub _showReplies {
-        my ($sth, @data, $html);
-        $html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
-        $html .= '<tr><td class="tableHeader">'.WebGUI::International::get(229).'</td>
-		<td class="tableHeader">'.WebGUI::International::get(40,$namespace).'</td>
-		<td class="tableHeader">'.WebGUI::International::get(41,$namespace).'</td></tr>';
-        $sth = WebGUI::SQL->read("select messageId,subject,username,dateOfPost,userId from discussion 
-		where wobjectId=$session{form}{wid} and subId=$session{form}{sid} and pid=0 order by messageId desc");
-        while (@data = $sth->array) {
-                $data[1] = WebGUI::HTML::filter($data[1],'all');
-                $html .= '<tr';
-                if ($data[0] == $session{form}{mid}) {
-                        $html .= ' class="highlight"';
-                }
-                $html .= '><td class="tableData"><a href="'.WebGUI::URL::page('func=showMessage&mid='.
-                                $data[0].'&wid='.$session{form}{wid}.'&sid='.$session{form}{sid}).'">'.substr($data[1],0,30).
-                                '</a></td><td class="tableData"><a href="'.
-                                WebGUI::URL::page('op=viewProfile&uid='.$data[4]).'">'.$data[2].
-                                '</a></td><td class="tableData">'.epochToHuman($data[3],"%z %Z").
-                                '</td></tr>';
-                $html .= WebGUI::Discussion::traverseReplyTree($data[0],1);
-        }
-        $html .= '</table>';
-        return $html;
-}
-
-#-------------------------------------------------------------------
 sub duplicate {
         my ($sth, $file, @row, $newSubmissionId, $w);
 	$w = $_[0]->SUPER::duplicate($_[1]);
@@ -462,7 +435,7 @@ sub www_showMessage {
                 $html .= '<a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(28,$namespace).'</a><br>';
                 $html .= '</tr><tr><td class="tableData">';
                 $html .= $message{message}.'<p>';
-                $html .= _showReplies();
+                $html .= WebGUI::Discussion::showThreads();
                 $html .= '</td></tr></table>';
         } else {
                 $html = WebGUI::International::get(402);
@@ -533,10 +506,10 @@ sub www_viewSubmission {
 	$output .= '<b>'.WebGUI::International::get(22,$namespace).'</b> <a href="'.
 		WebGUI::URL::page('op=viewProfile&uid='.$submission{userId}).'">'.$submission{username}.'</a><br>';
 	$output .= '<b>'.WebGUI::International::get(23,$namespace).'</b> '.epochToHuman($submission{dateSubmitted},"%z %Z")."<br>";
-	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.$submission{status};
+	$output .= '<b>'.WebGUI::International::get(14,$namespace).':</b> '.$submissionStatus{$submission{status}};
 	$output .= '</td><td rowspan="2" class="tableMenu" nowrap valign="top">';
   #---menu
-        if ($submission{userId} == $session{user}{userId}) {
+        if ($submission{userId} == $session{user}{userId} && WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output .= '<a href="'.WebGUI::URL::page('func=deleteSubmission&wid='.$session{form}{wid}.'&sid='.
 			$session{form}{sid}).'">'.WebGUI::International::get(37,$namespace).'</a><br>';
                 $output .= '<a href="'.WebGUI::URL::page('func=editSubmission&wid='.$session{form}{wid}.'&sid='.
@@ -572,7 +545,7 @@ sub www_viewSubmission {
 		$output .= $file->box;
         }		
         if ($_[0]->get("allowDiscussion")) {
-		$output .= _showReplies();
+		$output .= WebGUI::Discussion::showThreads();
         }
 	$output .= '</td></tr></table>';
 	return $output;
