@@ -53,6 +53,17 @@ These methods are available from this class:
 
 =cut
 
+#-------------------------------------------------------------------
+=head2 definition ( [definition] )
+
+Returns an array reference of definitions. Adds tableName, className, properties to array definition.
+
+=head3 definition
+
+An array of hashes to prepend to the list
+
+=cut
+
 sub definition {
         my $class = shift;
         my $definition = shift;
@@ -95,7 +106,7 @@ sub definition {
 
 =head2 deleteCollateral ( tableName, keyName, keyValue )
 
-Deletes a row of collateral data.
+Deletes a row of collateral data where keyName=keyValue.
 
 =head3 tableName
 
@@ -103,11 +114,11 @@ The name of the table you wish to delete the data from.
 
 =head3 keyName
 
-The name of the column that is the primary key in the table.
+The name of a column in the table. Is not checked for invalid input. 
 
 =head3 keyValue
 
-An integer containing the key value.
+Criteria (value) used to find the data to delete.
 
 =cut
 
@@ -123,7 +134,9 @@ sub deleteCollateral {
 
 #-------------------------------------------------------------------
 
-=head2 confirm ( message, yesURL, [ , noURL, vitalComparison ] )
+=head2 confirm ( message,yesURL [,noURL,vitalComparison] )
+
+Returns an HTML string that presents a link to confirm and a link to cancel an action, both Internationalized text. 
 
 =head3 message
 
@@ -167,11 +180,11 @@ The name of the table you wish to retrieve the data from.
 
 =head3 keyName
 
-The name of the column that is the primary key in the table.
+A name of a column in the table. Usually the primary key column.
 
 =head3 keyValue
 
-An integer containing the key value. If key value is equal to "new" or null, then an empty hashRef containing only keyName=>"new" will be returned to avoid strict errors.
+A string containing the key value. If key value is equal to "new" or null, then an empty hashRef containing only keyName=>"new" will be returned to avoid strict errors.
 
 =cut
 
@@ -379,8 +392,7 @@ sub moveCollateralUp {
 
 =head2 processMacros ( output )
 
- Decides whether or not macros should be processed and returns the
- appropriate output.
+ Decides whether or not macros should be processed and returns the appropriate output.
 
 =head3 output
 
@@ -397,6 +409,16 @@ sub processMacros {
 
 #-------------------------------------------------------------------
 
+=head2 processStyle (output)
+
+Returns output parsed under the current style.
+
+=head3 output
+
+An HTML blob to be parsed into the current style.
+
+=cut
+
 sub processStyle {
 	my $self = shift;
 	my $output = shift;
@@ -406,7 +428,7 @@ sub processStyle {
 
 #-------------------------------------------------------------------
 
-=head2 reorderCollateral ( tableName, keyName [ , setName, setValue ] )
+=head2 reorderCollateral ( tableName,keyName [,setName,setValue] )
 
 Resequences collateral data. Typically useful after deleting a collateral item to remove the gap created by the deletion.
 
@@ -446,7 +468,7 @@ sub reorderCollateral {
 
 #-----------------------------------------------------------------
 
-=head2 setCollateral ( tableName, keyName, properties [ , useSequenceNumber, useAssetId, setName, setValue ] )
+=head2 setCollateral ( tableName,keyName,properties [,useSequenceNumber,useAssetId,setName,setValue] )
 
 Performs and insert/update of collateral data for any wobject's collateral data. Returns the primary key value for that row of data.
 
@@ -568,6 +590,11 @@ sub www_createShortcut {
 
 #-------------------------------------------------------------------
 
+=head2 www_view ( )
+
+Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
+
+=cut
 sub www_view {
 	my $self = shift;
 	$self->logView();
