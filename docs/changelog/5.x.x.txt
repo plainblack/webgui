@@ -1,3 +1,7 @@
+5.5.7
+ - bugfix [ 935552 ] USS bug (w/ and w/o img mixed posts). 
+
+
 5.5.6
  - bugfix [ 895067 ] Forum ID Missing In USS
  - bugfix [ 909688 ] USS forum post edit function not work
