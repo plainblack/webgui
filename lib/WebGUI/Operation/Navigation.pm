@@ -31,7 +31,7 @@ use WebGUI::Privilege;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_listNavigation &www_editNavigation &www_editNavigationSave &www_copyNavigation
-		 &www_deleteNavigation www_deleteNavigationConfirm);
+		 &www_deleteNavigation www_deleteNavigationConfirm www_previewNavigation);
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -193,11 +193,6 @@ sub www_editNavigation {
                 -value=>[$session{form}{method} || $config->{method}]
                 );
 	$f->getTab("properties")->yesNo(
-                -name=>'reverse',
-                -label=>WebGUI::International::get(29,'Navigation'),
-                -value=>$session{form}{'reverse'} || $config->{'reverse'}
-        );
-	$f->getTab("properties")->yesNo(
 		-name=>'showSystemPages',
 		-label=>WebGUI::International::get(30,'Navigation'),
 		-value=>$session{form}{showSystemPages} || $config->{showSystemPages}
@@ -221,6 +216,19 @@ sub www_editNavigation {
 		-value=>$session{form}{templateId} || $config->{templateId},
 		-namespace=>'Navigation',
 	);
+        $f->getTab("layout")->yesNo(
+                -name=>'reverse',
+                -label=>WebGUI::International::get(29,'Navigation'),
+                -value=>$session{form}{'reverse'} || $config->{'reverse'}
+        );
+	my $previewButton = qq{
+                           <INPUT TYPE="button" VALUE="Preview" NAME="preview"
+                            OnClick="
+                                window.open('', 'navPreview', 'toolbar=no,width=400,height=300,status=no,location=no,scrollbars=yes,resizable=yes');
+                                this.form.op.value='previewNavigation';
+                                this.form.target = 'navPreview';
+                                this.form.submit()">};
+	$f->{_submit} = $previewButton." ".$f->{_submit};
 	$output .= $f->print;
 	return _submenu($output);	
 }
@@ -282,6 +290,23 @@ sub www_listNavigation {
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
         return _submenu($output);
+}
+
+sub www_previewNavigation {
+	$session{page}{useEmptyStyle} = 1;
+	$session{var}{adminOn} = 0;
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::isInGroup(3));
+	my $nav = WebGUI::Navigation->new(	depth=>$session{form}{depth},
+						method=>$session{form}{method},
+						startAt=>$session{form}{startAt},
+						stopAtLevel=>$session{form}{stopAtLevel},
+						templateId=>$session{form}{templateId},
+						showSystemPages=>$session{form}{showSystemPages},
+						showHiddenPages=>$session{form}{showHiddenPages},
+						showUnprivilegedPages=>$session{form}{showUnprivilegedPages},
+	                       			'reverse'=>$session{form}{'reverse'},
+                                );
+	return $nav->build;
 }
 
 1;
