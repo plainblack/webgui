@@ -147,19 +147,6 @@ sub getResponseCount {
 }
 
 #-------------------------------------------------------------------
-sub getStatus {
-	my $self = shift;
-	my $status = shift || $self->get("status");
-        if ($status eq "Approved") {
-                return WebGUI::International::get(560);
-        } elsif ($status eq "Denied") {
-                return WebGUI::International::get(561);
-        } elsif ($status eq "Pending") {
-                return WebGUI::International::get(562);
-        }
-}
-
-#-------------------------------------------------------------------
 sub getThumbnailUrl {
 	return '/thumbnail.jpg';
 }
@@ -215,7 +202,7 @@ sub view {
 	$var{"date.updated.human"} = epochToHuman($self->get("dateUpdated"));
 	$var{"date.updated.epoch"} = $self->get("dateUpdated");
 	$var{"status.label"} = WebGUI::International::get(14,"USS");
-	$var{"status.status"} = $self->getStatus;
+	$var{"status.status"} = $self->getParent->status($self->get("status"));
 	$var{"views.label"} = WebGUI::International::get(514);
 	$var{"views.count"} = $self->getResponseCount;
         $var{canPost} = $self->canContribute;

@@ -92,7 +92,7 @@ sub definition {
 				defaultValue=>0
 				},
 			filterContent=>{
-				fieldType=>"filter",
+				fieldType=>"filterContent",
 				defaultValue=>"javascript"
 				},
 			sortBy=>{
@@ -119,7 +119,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
-	my $tabform = $self->getEditForm;
+	my $tabform = $self->SUPER::getEditForm;
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"USS"
@@ -156,9 +156,9 @@ sub getEditForm {
         $tabform->getTab("security")->selectList(
 		-name=>"defaultStatus",
 		-options=>{
-			Approved=>status('Approved'),
-			Denied=>status('Denied'),
-			Pending=>status('Pending')
+			Approved=>$self->status('Approved'),
+			Denied=>$self->status('Denied'),
+			Pending=>$self->status('Pending')
 			},
 		-label=>WebGUI::International::get(563),
 		-value=>[$self->getValue("defaultStatus")]
@@ -282,13 +282,19 @@ sub getName {
         return WebGUI::International::get(29,"USS");
 }
 
+
 #-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
+sub status {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-        $self->deleteAllCachedSubmissions;
+	my $status = shift;
+        if ($status eq "Approved") {
+                return WebGUI::International::get(560);
+        } elsif ($status eq "Denied") {
+                return WebGUI::International::get(561);
+        } elsif ($status eq "Pending") {
+                return WebGUI::International::get(562);
+        }
 }
-                                                                                                                                                       
 
 #-------------------------------------------------------------------
 sub view {
@@ -368,7 +374,7 @@ sub view {
                         "submission.userDefined5"=>$submission->get("userDefined5"),
                         "submission.userId"=>$submission->get("userId"),
                         "submission.username"=>$submission->get('username'),
-                        "submission.status"=>$submission->getStatus,
+                        "submission.status"=>$self->status($submission->get("status")),
                         "submission.thumbnail"=>$submission->getThumbnailUrl,
                         "submission.image"=>$submission->getImageUrl,
                         "submission.date"=>epochToHuman($submission->get("dateSubmitted")),
