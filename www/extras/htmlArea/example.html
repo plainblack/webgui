@@ -16,30 +16,39 @@
 
 --></style>
 
-<script><!-- // load htmlArea files
-_editor_url = "./";
-document.write('<scr'+'ipt src="' +_editor_url+ 'editor.js" language="Javascript1.2"></scr'+'ipt>');
-//--></script>
+
+
+<script language="Javascript1.2"><!-- // load htmlarea
+_editor_url = "";                     // URL to htmlarea files
+var win_ie_ver = parseFloat(navigator.appVersion.split("MSIE")[1]);
+if (navigator.userAgent.indexOf('Mac')        >= 0) { win_ie_ver = 0; }
+if (navigator.userAgent.indexOf('Windows CE') >= 0) { win_ie_ver = 0; }
+if (navigator.userAgent.indexOf('Opera')      >= 0) { win_ie_ver = 0; }
+if (win_ie_ver >= 5.5) {
+  document.write('<scr' + 'ipt src="' +_editor_url+ 'editor.js"');
+  document.write(' language="Javascript1.2"></scr' + 'ipt>');  
+} else { document.write('<scr'+'ipt>function editor_generate() { return false; }</scr'+'ipt>'); }
+// --></script>
+
+
 
 </head>
 <body>
 <a name="top"></a>
 
-<form>
+<form method=POST action="">
 
 <div align=center>
-<span class="headline">htmlArea v2.00</span><br>
-<span class="headline2">Turn any &lt;textarea&gt; into a WYSIWYG editor<br><a href="http://www.interactivetools.com/" target="_blank">from your friends at interactivetools.com</a></span>
+<span class="headline">htmlArea v2.03</span><br>
+<span class="headline2">A free WYSIWYG editor replacement for &lt;textarea&gt; fields.<br><a href="http://www.interactivetools.com/" target="_blank">from your friends at interactivetools.com</a></span>
 <hr>
 </div>
-
-<!-- TOC -->
-
 
 
 <p>Sample textarea follows:</p>
 
-<textarea name="yourFieldNameHere" style="width:500; height:150">
+<textarea name="yourFieldNameHere" style="width:800; height:150">
+
   <p>Here is some sample text: <b>bold</b>, <i>italic</i>, <u>underline</u>. </p>
   <p align=center>Different fonts, sizes and colors (all in bold):</p>
   <p><b>
@@ -55,18 +64,18 @@ document.write('<scr'+'ipt src="' +_editor_url+ 'editor.js" language="Javascript
 </textarea><br>
 
 <b>Example "InsertHTML" links: </b> &nbsp;
-<a href="javascript:editor_insertHTML('yourFieldNameHere','<font style=\'background-color: yellow\'>','</font>');">Highlight selected text</a> -
+<a href="javascript:editor_insertHTML('yourFieldNameHere','<font style=\'background-color: yellow\'>','</font>',1);">Highlight selected text</a> -
 <a href="javascript:editor_insertHTML('yourFieldNameHere',':)');">Insert Smiley</a>
+<a href="javascript:alert(editor_getHTML('yourFieldNameHere'));">getHTML</a>
+<a href="javascript:editor_setHTML('yourFieldNameHere','<b>Hello World</b>!!');">setHTML</a>
 
-<script language="javascript1.2" defer>
+<script language="javascript1.2">
 editor_generate('yourFieldNameHere');
 </script>
 
 
-
 <p><hr>
 <p>Another textarea follows:  (This one has many more configuration defined in the source code)</p>
-
 
 
 <textarea name="yourFieldNameHere2" style="width:100%; height:200">
@@ -85,7 +94,8 @@ editor_generate('yourFieldNameHere');
   <p>Click on <a href="http://www.interactivetools.com/">this link</a> and then on the link button to the details ... OR ... select some text and click link to create a <b>new</b> link.</p>
 </textarea><br>
 
-<script language="javascript1.2" defer>
+
+<script language="javascript1.2">
 var config = new Object();    // create new config object
 
 config.width = "90%";
@@ -99,13 +109,12 @@ config.toolbar = [
     ['fontname'],
     ['fontsize'],
     ['fontstyle'],
-//    ['linebreak'],
+    ['linebreak'],
     ['bold','italic','underline','separator'],
 //  ['strikethrough','subscript','superscript','separator'],
     ['justifyleft','justifycenter','justifyright','separator'],
     ['OrderedList','UnOrderedList','Outdent','Indent','separator'],
     ['forecolor','backcolor','separator'],
-    ['custom1','custom2','custom3','separator'],
     ['HorizontalRule','Createlink','InsertImage','htmlmode','separator'],
     ['about','help','popupeditor'],
 ];
@@ -136,12 +145,15 @@ config.fontstyles = [   // make sure classNames are defined in the page the cont
   { name: "headline",     className: "headline",  classStyle: "font-family: arial black, arial; font-size: 28px; letter-spacing: -2px;" },
   { name: "arial red",    className: "headline2", classStyle: "font-family: arial black, arial; font-size: 12px; letter-spacing: -2px; color:red" },
   { name: "verdana blue", className: "headline4", classStyle: "font-family: verdana; font-size: 18px; letter-spacing: -2px; color:blue" }
-// leave classStyle blank if it's defined in your stylesheet (above), like this:
+
+// leave classStyle blank if it's defined in config.stylesheet (above), like this:
 //  { name: "verdana blue", className: "headline4", classStyle: "" }  
 ];
-//config.editor_insertHTML = [ { name: "test", "It's easy to add buttons that insert text!" } ];
-editor_generate('yourFieldNameHere2',config); // field, width, height
+
+editor_generate('yourFieldNameHere2',config);
 </script>
+
+
 
 
 </form>

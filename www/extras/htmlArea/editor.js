@@ -1,9 +1,9 @@
 //
-// htmlArea v2.00 - Copyright (c) 2002 interactivetools.com, inc.
-// A free WYSIWYG editor replacement for <textarea> fields.
+// htmlArea v2.02 - Copyright (c) 2002 interactivetools.com, inc.
+// This copyright notice MUST stay intact for use (see license.txt).
 //
-// For more information visit:
-// http://www.interactivetools.com/products/htmlarea/
+// A free WYSIWYG editor replacement for <textarea> fields.
+// For full source code and docs, visit http://www.interactivetools.com/
 //
 
 // write out styles for UI buttons
@@ -26,12 +26,16 @@ document.write('</style>\n');
 
 function editor_defaultConfig(objname) {
 
-this.version = "2.0"
+this.version = "2.02"
+
 this.width =  "auto";
 this.height = "auto";
 this.bodyStyle = 'background-color: #FFFFFF; font-family: "Verdana"; font-size: x-small;';
 this.imgURL = _editor_url + 'images/';
 this.debug  = 0;
+
+this.replaceNextlines = 0; // replace nextlines from spaces (on output)
+this.plaintextInput = 0;   // replace nextlines with breaks (on input)
 
 this.toolbar = [
     ['fontname'],
@@ -44,7 +48,8 @@ this.toolbar = [
     ['OrderedList','UnOrderedList','Outdent','Indent','separator'],
     ['forecolor','backcolor','separator'],
     ['HorizontalRule','Createlink','InsertImage','InsertTable','htmlmode','separator'],
-    ['Macros','separator'],
+	['Macros','separator'],
+
 //  ['custom1','custom2','custom3','separator'],
     ['popupeditor','about']];
 
@@ -100,11 +105,10 @@ this.btnList = {
     "htmlmode":       ['HtmlMode',             'View HTML Source',   'editor_setmode(\''+objname+'\')', 'ed_html.gif'],
     "popupeditor":    ['popupeditor',          'Enlarge Editor',     'editor_action(this.id)',  'fullscreen_maximize.gif'],
     "about":          ['about',                'About this editor',  'editor_about(\''+objname+'\')',  'ed_about.gif'],
-
     // Add custom buttons here:
     "custom1":           ['custom1',         'Purpose of button 1',  'editor_action(this.id)',  'ed_custom.gif'],
     "custom2":           ['custom2',         'Purpose of button 2',  'editor_action(this.id)',  'ed_custom.gif'],
-    "macros":            ['Macros',          'Insert a WebGUI Macro','editor_action(this.id)',  'macro.gif'],
+	"macros": ['Macros','Insert a WebGUI Macro','editor_action(this.id)','macro.gif'],
     "custom3":           ['custom3',         'Purpose of button 3',  'editor_action(this.id)',  'ed_custom.gif'],
    // end: custom buttons
 
@@ -125,21 +129,12 @@ this.btnList = {
 
 function editor_generate(objname,userConfig) {
 
-  // Check for IE 5.5+ on Windows
-  var Agent, VInfo, MSIE, Ver, Win32, Opera;
-  Agent = navigator.userAgent;
-  VInfo = Array();                              // version info
-  VInfo = Agent.split(";")
-  MSIE  = Agent.indexOf('MSIE') > 0;
-  Ver   = VInfo[1].substr(6,3);
-  Win32 = Agent.indexOf('Windows') > 0 && Agent.indexOf('Mac') < 0 && Agent.indexOf('Windows CE') < 0;
-  Opera = Agent.indexOf('Opera') > -1;
-  if (!MSIE || Opera || Ver < 5.5 || !Win32) { return; }
-
   // Default Settings
   var config = new editor_defaultConfig(objname);
-  for (var thisName in config) {
-    if (userConfig && userConfig[thisName]) { config[thisName] = userConfig[thisName]; }
+  if (userConfig) { 
+    for (var thisName in userConfig) {
+      if (userConfig[thisName]) { config[thisName] = userConfig[thisName]; }
+    }
   }
   document.all[objname].config = config;                  // store config settings
 
@@ -218,20 +213,16 @@ function editor_generate(objname,userConfig) {
       var btnObj = config.btnList[btnName];
       if (btnName == 'linebreak') { alert("htmlArea error: 'linebreak' must be in a subgroup by itself, not with other buttons.\n\nhtmlArea wysiwyg editor not created."); return; }
       if (!btnObj) { alert("htmlArea error: button '" +btnName+ "' not found in button list when creating the wysiwyg editor for '"+objname+"'.\nPlease make sure you entered the button name correctly.\n\nhtmlArea wysiwyg editor not created."); return; }
-      if (btnName == "about") { aboutEditor = 1; }
       var btnCmdID   = btnObj[0];
       var btnTitle   = btnObj[1];
       var btnOnClick = btnObj[2];
       var btnImage   = btnObj[3];
       toolbar += '<button title="' +btnTitle+ '" id="_' +objname+ '_' +btnCmdID+ '" class="btn" onClick="' +btnOnClick+ '" onmouseover="if(this.className==\'btn\'){this.className=\'btnOver\'}" onmouseout="if(this.className==\'btnOver\'){this.className=\'btn\'}" unselectable="on"><img src="' +config.imgURL + btnImage+ '" border=0 unselectable="on"></button>';
 
+
     } // end of button sub-group
     toolbar += tblClose;
   } // end of entire button set
-
-  // Note: we've worked very hard to bring you this editor for free.  Please don't remove the 'about this editor' button
-  if (!aboutEditor) { alert("htmlArea error: You must include the 'about' button in the list of editor toolbar buttons.\nIt's required by the license agreement for the wysiwyg editor, please don't remove it.\n\nhtmlArea wysiwyg editor not created."); return; }
-
 
   // build editor
 
@@ -246,6 +237,16 @@ function editor_generate(objname,userConfig) {
 
   //  hide original textarea and insert htmlarea after it
   if (!config.debug) { document.all[objname].style.display = "none"; }
+
+  if (config.plaintextInput) {     // replace nextlines with breaks
+    var contents = document.all[objname].value;
+    contents = contents.replace(/\r\n/g, '<br>');
+    contents = contents.replace(/\n/g, '<br>');
+    contents = contents.replace(/\r/g, '<br>');
+    document.all[objname].value = contents;
+  }
+
+  // insert wysiwyg
   document.all[objname].insertAdjacentHTML('afterEnd', editor)
 
   // convert htmlarea from textarea to wysiwyg editor
@@ -256,6 +257,8 @@ function editor_generate(objname,userConfig) {
     var r = document.forms[idx].attachEvent('onsubmit', function() { editor_filterOutput(objname); });
     if (!r) { alert("Error attaching event to form!"); }
   }
+
+return true;
 
 }
 
@@ -283,6 +286,14 @@ function editor_action(button_id) {
     return;
   }
 
+  // popup editor
+  if (cmdID == 'popupeditor') {
+    window.open(_editor_url + "popups/fullscreen.html?"+objname,
+                'FullScreen',
+                'toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,width=640,height=480');
+    return;
+  }
+
   // check editor mode (don't perform actions in textedit mode)
   if (editor_obj.tagName.toLowerCase() == 'textarea') { return; }
 
@@ -306,7 +317,7 @@ function editor_action(button_id) {
 
   // Custom2
   else if (cmdID == 'Macros') {  // insert some text from a popup window
-    var myTitle = "Insert WebGUI macro";
+    var myTitle = "Insert WebGUI Macro";
     var myText = showModalDialog(_editor_url + "popups/macros.html",
                                  myTitle,      // str or obj specified here can be read from dialog as "window.dialogArguments"
                                  "resizable: yes; help: no; status: no; scroll: no; ");
@@ -321,11 +332,6 @@ function editor_action(button_id) {
   //
   // END OF CUSTOM BUTTONS
   //
-
-  // popup editor
-  else if (cmdID == 'popupeditor') {
-    showModalDialog(_editor_url + "popups/fullscreen.html?"+objname, window, "resizable: yes; help: no; status: no; scroll: no; ");
-  }
 
   // FontName
   else if (cmdID == 'FontName' && val) {
@@ -418,6 +424,14 @@ function editor_event(objname,runDelay) {
       if (ord == 17) { return; }  // ignore ctrl key by itself
       if (ord == 18) { return; }  // ignore alt key by itself
 
+
+       // cancel ENTER key and insert <BR> instead
+//       if (ord == 13 && editEvent.type == 'keypress') {
+//         editEvent.returnValue = false;
+//         editor_insertHTML(objname, "<br>");
+//         return;
+//       }
+
       if (ctrlKey && (ord == 122 || ord == 90)) {     // catch ctrl-z (UNDO)
 //      TODO: Add our own undo/redo functionality
 //        editEvent.cancelBubble = true;
@@ -469,7 +483,7 @@ function editor_updateToolbar(objname,action) {
     for (var idxN in tbItems) {
       var cmdID = tbItems[idxN].toLowerCase();
       var tbObj = document.all["_" +objname+ "_" +tbItems[idxN]];
-      if (cmdID == "htmlmode" || cmdID == "about" || cmdID == "showhelp") { continue; } // don't change these buttons
+      if (cmdID == "htmlmode" || cmdID == "about" || cmdID == "showhelp" || cmdID == "popupeditor") { continue; } // don't change these buttons
       if (tbObj == null) { continue; }
       var isBtn = (tbObj.tagName.toLowerCase() == "button") ? true : false;
 
@@ -519,8 +533,13 @@ function editor_updateToolbar(objname,action) {
   var classname_obj = document.all["_" +objname+ "_FontStyle"];
   if (classname_obj) {
     var curRange = editdoc.selection.createRange();
-    var pElement = curRange.parentElement();
+
+    // check element and element parents for class names
+    var pElement;
+    if (curRange.length) { pElement = curRange[0]; }              // control tange
+    else                 { pElement = curRange.parentElement(); } // text range
     while (pElement && !pElement.className) { pElement = pElement.parentElement; }  // keep going up
+
     var thisClass = pElement ? pElement.className.toLowerCase() : "";
     if (!thisClass && classname_obj.value) { classname_obj.value = null; }
     else {
@@ -536,7 +555,7 @@ function editor_updateToolbar(objname,action) {
   }
 
   // update button states
-  var IDList = Array('Bold','Italic','Underline','JustifyLeft','JustifyCenter','JustifyRight','InsertOrderedList','InsertUnorderedList');
+  var IDList = Array('Bold','Italic','Underline','StrikeThrough','SubScript','SuperScript','JustifyLeft','JustifyCenter','JustifyRight','InsertOrderedList','InsertUnorderedList');
   for (i=0; i<IDList.length; i++) {
     var btnObj = document.all["_" +objname+ "_" +IDList[i]];
     if (btnObj == null) { continue; }
@@ -584,11 +603,17 @@ function editor_updateOutput(objname) {
 \* ---------------------------------------------------------------------- */
 
 function editor_filterOutput(objname) {
+  editor_updateOutput(objname);
   var contents = document.all[objname].value;
+  var config   = document.all[objname].config;
+
+  // ignore blank contents
+  if (contents.toLowerCase() == '<p>&nbsp;</p>') { contents = ""; }
 
   // filter tag - this code is run for each HTML tag matched
   var filterTag = function(tagBody,tagName,tagAttr) {
     tagName = tagName.toLowerCase();
+    var closingTag = (tagBody.match(/^<\//)) ? true : false;
 
     // fix placeholder URLS - remove absolute paths that IE adds
     if (tagName == 'img') { tagBody = tagBody.replace(/(src\s*=\s*.)[^*]*(\*\*\*)/, "$1$2"); }
@@ -596,17 +621,35 @@ function editor_filterOutput(objname) {
 
     // add additional tag filtering here
 
-
-
-
+    // convert to vbCode
+//    if      (tagName == 'b' || tagName == 'strong') {
+//      if (closingTag) { tagBody = "[/b]"; } else { tagBody = "[b]"; }
+//    }
+//    else if (tagName == 'i' || tagName == 'em') {
+//      if (closingTag) { tagBody = "[/i]"; } else { tagBody = "[i]"; }
+//    }
+//    else if (tagName == 'u') {
+//      if (closingTag) { tagBody = "[/u]"; } else { tagBody = "[u]"; }
+//    }
+//    else {
+//      tagBody = ""; // disallow all other tags!
+//    }
 
     return tagBody;
   };
 
   // match tags and call filterTag
   RegExp.lastIndex = 0;
-  var matchTag = /<\/?(\w+)((?:[^'">]*|'[^']*'|"[^"]*")*)>/g;   // this will match tags, but still doesn't handle container tags (textarea, comments, etc)
+    var matchTag = /<\/?(\w+)((?:[^'">]*|'[^']*'|"[^"]*")*)>/g;   // this will match tags, but still doesn't handle container tags (textarea, comments, etc)
+
   contents = contents.replace(matchTag, filterTag);
+
+  // remove nextlines from output (if requested)
+  if (config.replaceNextlines) { 
+    contents = contents.replace(/\r\n/g, ' ');
+    contents = contents.replace(/\n/g, ' ');
+    contents = contents.replace(/\r/g, ' ');
+  }
 
   // update output with filtered content
   document.all[objname].value = contents;
@@ -635,11 +678,14 @@ function editor_setmode(objname, mode) {
   var TextEdit   = '<textarea ID="_' +objname + '_editor" style="width:' +editor_obj.style.width+ '; height:' +editor_obj.style.height+ '; margin-top: -1px; margin-bottom: -1px;"></textarea>';
   var RichEdit   = '<iframe ID="_' +objname+ '_editor"    style="width:' +editor_obj.style.width+ '; height:' +editor_obj.style.height+ ';"></iframe>';
 
+ // src="' +_editor_url+ 'popups/blank.html"
+
   //
   // Switch to TEXTEDIT mode
   //
 
   if (mode == "textedit" || editor_obj.tagName.toLowerCase() == 'iframe') {
+    config.mode = "textedit";
     var editdoc = editor_obj.contentWindow.document;
     var contents = editdoc.body.createTextRange().htmlText;
     editor_obj.outerHTML = TextEdit;
@@ -650,6 +696,7 @@ function editor_setmode(objname, mode) {
     editor_updateToolbar(objname, "disable");  // disable toolbar items
 
     // set event handlers
+    editor_obj.onkeydown   = function() { editor_event(objname); }
     editor_obj.onkeypress  = function() { editor_event(objname); }
     editor_obj.onkeyup     = function() { editor_event(objname); }
     editor_obj.onmouseup   = function() { editor_event(objname); }
@@ -667,7 +714,7 @@ function editor_setmode(objname, mode) {
   //
 
   else {
-
+    config.mode = "wysiwyg";
     var contents = editor_obj.value;
     if (mode == 'init') { contents = document.all[objname].value; } // on init use original textarea content
 
@@ -704,6 +751,7 @@ function editor_setmode(objname, mode) {
 
     // write to editor window
     var editdoc = editor_obj.contentWindow.document;
+
     editdoc.open();
     editdoc.write(html);
     editdoc.close();
@@ -714,6 +762,7 @@ function editor_setmode(objname, mode) {
     editdoc.objname = objname;
 
     // set event handlers
+    editdoc.onkeydown      = function() { editor_event(objname); }
     editdoc.onkeypress     = function() { editor_event(objname); }
     editdoc.onkeyup        = function() { editor_event(objname); }
     editdoc.onmouseup      = function() { editor_event(objname); }
@@ -785,10 +834,10 @@ function editor_about(objname) {
 function _dec_to_rgb(value) {
   var hex_string = "";
   for (var hexpair = 0; hexpair < 3; hexpair++) {
-    var byte = value & 0xFF;            // get low byte
+    var myByte = value & 0xFF;            // get low byte
     value >>= 8;                        // drop low byte
-    var nybble2 = byte & 0x0F;          // get low nybble (4 bits)
-    var nybble1 = (byte >> 4) & 0x0F;   // get high nybble
+    var nybble2 = myByte & 0x0F;          // get low nybble (4 bits)
+    var nybble1 = (myByte >> 4) & 0x0F;   // get high nybble
     hex_string += nybble1.toString(16); // convert nybble to hex
     hex_string += nybble2.toString(16); // convert nybble to hex
   }
@@ -870,6 +919,48 @@ function editor_insertHTML(objname, str1,str2, reqSel) {
   sRange.collapse(false); // move to end of range
   sRange.select();        // re-select
 
+}
+
+/* ---------------------------------------------------------------------- *\
+  Function    : editor_getHTML
+  Description : return HTML contents of editor (in either wywisyg or html mode)
+  Usage       : var myHTML = editor_getHTML('objname');
+\* ---------------------------------------------------------------------- */
+
+function editor_getHTML(objname) {
+  var editor_obj = document.all["_" +objname + "_editor"];
+  var isTextarea = (editor_obj.tagName.toLowerCase() == 'textarea');
+
+  if (isTextarea) { return editor_obj.value; }
+  else            { return editor_obj.contentWindow.document.body.innerHTML; }
+}
+
+/* ---------------------------------------------------------------------- *\
+  Function    : editor_setHTML
+  Description : set HTML contents of editor (in either wywisyg or html mode)
+  Usage       : editor_setHTML('objname',"<b>html</b> <u>here</u>");
+\* ---------------------------------------------------------------------- */
+
+function editor_setHTML(objname, html) {
+  var editor_obj = document.all["_" +objname + "_editor"];
+  var isTextarea = (editor_obj.tagName.toLowerCase() == 'textarea');
+
+  if (isTextarea) { editor_obj.value = html; }
+  else            { editor_obj.contentWindow.document.body.innerHTML = html; }
+}
+
+/* ---------------------------------------------------------------------- *\
+  Function    : editor_appendHTML
+  Description : append HTML contents to editor (in either wywisyg or html mode)
+  Usage       : editor_appendHTML('objname',"<b>html</b> <u>here</u>");
+\* ---------------------------------------------------------------------- */
+
+function editor_appendHTML(objname, html) {
+  var editor_obj = document.all["_" +objname + "_editor"];
+  var isTextarea = (editor_obj.tagName.toLowerCase() == 'textarea');
+
+  if (isTextarea) { editor_obj.value += html; }
+  else            { editor_obj.contentWindow.document.body.innerHTML += html; }
 }
 
 /* ---------------------------------------------------------------- */

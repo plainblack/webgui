@@ -75,9 +75,9 @@ function btnOKClick() {
             + ' width="' +document.all.width.value + document.all.widthExt.value+ '"'
             + ' align="' +document.all.alignment.value+ '">\n';
 
-  for (var x=1; x<document.all.rows.value; x++) {
+  for (var x=0; x<document.all.rows.value; x++) {
     table += " <tr>\n";
-    for (var y=1; y<document.all.cols.value; y++) {
+    for (var y=0; y<document.all.cols.value; y++) {
       table += "  <td></td>\n";
     }
     table += " </tr>\n";
