@@ -326,6 +326,14 @@ The the base name for this form element. This form element actually returns two 
 
 The date and time. Pass as an epoch value. Defaults to today and now.
 
+=item dateExtras 
+
+Extra parameters to add to the date form element such as javascript or stylesheet information.
+
+=item timeExtras 
+
+Extra parameters to add to the time form element such as javascript or stylesheet information.
+
 =back
 
 =cut
@@ -333,11 +341,13 @@ The date and time. Pass as an epoch value. Defaults to today and now.
 sub dateTime {
 	my $output = date({
 		name=>$_[0]->{name}."_date",
-		value=>$_[0]->{value}
+		value=>$_[0]->{value},
+		extras=>$_[0]->{dateExtras}
 		});
 	$output .= time({
 		name=>$_[0]->{name}."_time",
-		value=>WebGUI::DateTime::getSecondsFromEpoch($_[0]->{value})
+		value=>WebGUI::DateTime::getSecondsFromEpoch($_[0]->{value}),
+		extras=>$_[0]->{timeExtras}
 		});
 	return $output;
 }

@@ -482,7 +482,7 @@ sub date {
 
 #-------------------------------------------------------------------
 
-=head2 dateTime ( name [ label, value, subtext, uiLevel ] )
+=head2 dateTime ( name [ label, value, subtext, uiLevel, dateExtras, timeExtras ] )
 
 Adds a date time row to this form.
 
@@ -508,6 +508,14 @@ Extra text to describe this form element or to provide special instructions.
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=item dateExtras 
+
+Extra parameters such as javascript or style sheet information that you wish to add to the date form element.
+
+=item timeExtras 
+
+Extra parameters such as javascript or style sheet information that you wish to add to the time form element.
+
 =back
 
 =cut
@@ -515,11 +523,14 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 sub dateTime {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $uiLevel) = rearrange([qw(name label value subtext uiLevel)], @p);
+        my ($name, $label, $value, $subtext, $uiLevel, $dateExtras, $timeExtras) = 
+		rearrange([qw(name label value subtext uiLevel dateExtras timeExtras)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::dateTime({
                         "name"=>$name,
-                        "value"=>$value
+                        "value"=>$value,
+			"dateExtras"=>$dateExtras,
+			"timeExtras"=>$timeExtras
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);

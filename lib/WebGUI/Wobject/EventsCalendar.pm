@@ -14,6 +14,7 @@ use strict;
 use HTML::CalendarMonthSimple;
 use Tie::CPHash;
 use WebGUI::DateTime;
+use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -336,13 +337,18 @@ sub www_editEvent {
         $f->hidden("func","editEventSave");
         $f->text("name",WebGUI::International::get(99),$event{name});
         $f->HTMLArea("description",WebGUI::International::get(85),$event{description});
-        $f->date("startDate",WebGUI::International::get(14,$_[0]->get("namespace")),$event{startDate},
-		'onBlur="this.form.endDate.value=this.form.startDate.value;this.form.until.value=this.form.startDate.value;"');
-        $f->date(
+        $f->dateTime(
+		-name=>"startDate",
+		-label=>WebGUI::International::get(14,$_[0]->get("namespace")),
+		-value=>$event{startDate},
+		-dateExtras=>'onBlur="this.form.endDate_date.value=this.form.startDate_date.value;this.form.until.value=this.form.startDate_date.value;"',
+		-timeExtras=>'onBlur="this.form.endDate_time.value=this.form.startDate_time.value"'
+		);
+        $f->dateTime(
 		-name=>"endDate",
 		-label=>WebGUI::International::get(15,$_[0]->get("namespace")),
 		-value=>$event{endDate},
-		-extras=>'onBlur="this.form.until.value=this.form.endDate.value;"'
+		-dateExtras=>'onBlur="this.form.until.value=this.form.endDate_date.value;"'
 		);
 	$f->raw($special);
 	if ($session{form}{eid} eq "new") {
@@ -363,9 +369,9 @@ sub www_editEvent {
 sub www_editEventSave {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my (@startDate, @endDate, $until, @eventId, $i, $recurringEventId);
-        $startDate[0] = setToEpoch($session{form}{startDate});
+        $startDate[0] = WebGUI::FormProcessor::dateTime("startDate");
 	$startDate[0] = time() unless ($startDate[0] > 0);
-        $endDate[0] = setToEpoch($session{form}{endDate});
+        $endDate[0] = WebGUI::FormProcessor::dateTime("endDate");
 	$endDate[0] = $startDate[0] unless ($endDate[0] >= $startDate[0]);
 	if ($session{form}{eid} eq "new") {
 		$session{form}{name} = $session{form}{name} || "unnamed";
