@@ -10,6 +10,7 @@ package WebGUI::Wobject::SyndicatedContent;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use HTML::Entities;
 use strict;
 use Tie::CPHash;
 use WebGUI::Cache;
@@ -85,6 +86,7 @@ sub www_view {
 	unless (defined $rssFile) {
 		$rssFile = $cache->setByHTTP($_[0]->get("rssUrl"),3600);
 	}
+	$rssFile =~ s#(<title>)(.*?)(</title>)#$1.encode_entities($2).$3#ges; 
 	eval{parseXML(\%rss, \$rssFile)};
 	if ($@) {
 		WebGUI::ErrorHandler::warn($_[0]->get("rssUrl")." ".$@);
