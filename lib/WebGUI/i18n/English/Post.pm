@@ -7,7 +7,7 @@ our $I18N = {
         },
 
 	'add/edit post template body' => {
-		message => q|The following variables are available in the template to add or edit Posts:
+		message => q|In addition to the common Post Template variables, the Add/Edit Post Template has these variables:
 <p>
 ! : This variable is required for the Data Form to function correctly.<p/>
 <p>
@@ -151,7 +151,8 @@ A form that will set when the post stops being available.
         },
 
 	'post template variables body' => {
-		message => q|The following variables are available in all Post templates:
+		message => q|The following variables are available in all Post templates.  Internationalized labels
+		for the action URLs (reply, delete, deny, etc.)  are provided in the set of Collaboration Template labels.
 <p>
 
 <b>userId</b><br>
@@ -231,6 +232,26 @@ URLs that are used to rate this post.  N goes from 1 to 5.
 A conditional that is true if the user has already rated this Post.
 <p>
 
+<b>image.url</b><br>
+The URL to the first image attached to the Post.
+<p>
+
+<b>image.thumbnail</b><br>
+A thumbnail for the image attached to the Post.
+<p>
+
+<b>attachment.name</b><br>
+The name of the first attachment found on the Post.
+<p>
+
+<b>attachment.url</b><br>
+The URL to download the first attachment attached to the Post.
+<p>
+
+<b>attachment.icon</b><br>
+An icon showing the file type of this attachment.
+<p>
+
 <b>attachment_loop</b><br>
 A loop containing all file and image attachments to this Post.
 <p>
@@ -257,30 +278,102 @@ A thumbnail of this attachment, if applicable.
 A conditional indicating whether this attachment is an image.
 <p>
 
-<b>image.url</b><br>
-The URL to the image.
-<p>
-
-<b>image.thumbnail</b><br>
-A thumbnail for the image.
-<p>
-
-<b>attachment.url</b><br>
-The URL to download the attachment.
-<p>
-
-<b>attachment.icon</b><br>
-An icon showing the file type of this attachment.
-<p>
-
-<b>attachment.name</b><br>
-The name of this attachment.
-<p>
-
 </blockquote>
 
+<b>storageId</b><br>
+The Asset ID of the storage node for the Post, where the attachments are kept.
+<p>
+
+<b>threadId</b><br>
+The ID of the thread that contains this Post.
+<p>
+
+<b>dateSubmitted</b><br>
+The date the Post was submitted, in epoch format.
+<p>
+
+<b>dateUpdated</b><br>
+The date the Post was last updated, in epoch format.
+<p>
+
+<b>username</b><br>
+The name of the user who last updated or submitted the Post.
+<p>
+
+<b>rating</b><br>
+Another name for <b>rating.value</b>
+<p>
+
+<b>views</b><br>
+The number of times that this post has been viewed.
+<p>
+
+<b>contentType</b><br>
+The type of content in the post, typically "code", "text", "HTML", "mixed".
+<p>
+
+<b>userDefined<i>N</i></b><br>
+The contents of the user defined properties, from 1 to 5.
+<p>
+
+<b>title</b><br>
+The title of the Post.
+<p>
+
+<b>menuTitle</b><br>
+The menu title of the Post, often used in navigation.
+<p>
+
+<b>synopsis</b><br>
+The synopsis of the Post.
+<p>
+
+<b>extraHeadTags</b><br>
+Extra tags that the user requested by added to the HTML header.
+<p>
+
+<b>groupIdEdit</b><br>
+The ID of the group with permission to edit this Post.
+<p>
+
+<b>groupIdView</b><br>
+The ID of the group with permission to view this Post.
+<p>
+
+<b>ownerUserId</b><br>
+An alias for <b>userId</b>.
+<p>
+
+<b>startDate</b><br>
+The date when the Post is first available, in epoch format.
+<p>
+
+<b>endDate</b><br>
+The date when the Post is stops being available, in epoch format.
+<p>
+
+<b>assetSize</b><br>
+The formatted size of this Post.
+<p>
+
+<b>isPackage</b><br>
+A conditional indicating whether this Post is a package.
+<p>
+
+<b>isPrototype</b><br>
+A conditional indicating whether this Post is a Content Prototype.
+<p>
+
+<b>isHidden</b><br>
+A conditional indicating whether this Post should be hidden from navigation.
+<p>
+
+<b>newWindow</b><br>
+A conditional indicating whether this Post should be opened in a new window.
+<p>
+
 |,
-		lastUpdated => 1111465141,
+		lastUpdated => 1111602134,
 	},
 
 	'approved' => {
@@ -309,7 +402,7 @@ The name of this attachment.
         },
 
 	'notification template body' => {
-		message => q|The following variables are available in the Notification Template:
+		message => q|In addition to the common Post Template variables, the Notification Template has these variables:
 <p>
 
 All variables from the Post Template Variables.

@@ -24,6 +24,10 @@ our $HELP = {
 				tag => 'template language',
 				namespace => 'Template'
 			},
+			{
+				tag => 'collaboration template labels',
+				namespace => 'Collaboration'
+			},
 		]
 	},
 
