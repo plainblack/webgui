@@ -246,7 +246,13 @@ sub build {
 	if ($@) {
 		WebGUI::ErrorHandler::warn("Error in WebGUI::Navigation::build while trying to execute $method".$@);
 	}
-	
+
+	# Store current page properties in template var
+	my $currentPage = WebGUI::Page->getPage();
+	foreach my $property (@interestingPageProperties) {
+		$var->{'page.current.'.$property} = $currentPage->get($property);
+	}
+
 	if (@pages) {
 		my $startPageDepth = ($p->ancestors);
 		my $maxDepth = $startPageDepth + $self->{_depth};
@@ -307,9 +313,9 @@ sub build {
 			$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
 			$pageData->{"page.hasDaughter"} = scalar($page->daughters);
 			$pageData->{"page.isMyDaughter"} = ($page->get('parentId') == 
-								WebGUI::Page->getPage()->get('pageId'));
+								$currentPage->get('pageId'));
 			$pageData->{"page.isMyMother"} = ($page->get('pageId') ==
-                                                                WebGUI::Page->getPage()->get('parentId'));
+                                                                $currentPage->get('parentId'));
 
 			# Some information about my mother
 			if(ref($page->mother)) {
@@ -328,11 +334,6 @@ sub build {
 				push(@{$var->{page_loop}}, $pageData);
 			}
 		}
-	}
-	# Store current page properties in template var
-	my $currentPage = WebGUI::Page->getPage();
-	foreach my $property (@interestingPageProperties) {
-		$var->{'page.current.'.$property} = $currentPage->get($property);
 	}
 
 	# Configure button
