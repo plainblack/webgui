@@ -453,10 +453,10 @@ sub www_deleteQuestion {
 sub www_deleteQuestionConfirm {
         return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditWobject($_[0]->get("wobjectId")));
 	WebGUI::SQL->write("delete from Survey_answer where Survey_questionId=".quote($session{form}{qid}));
-	WebGUI::SQL->write("delete from Survey_response where Survey_questionId=".quote($session{form}{qid}));
+	WebGUI::SQL->write("delete from Survey_questionResponse where Survey_questionId=".quote($session{form}{qid}));
         $_[0]->deleteCollateral("Survey_question","Survey_questionId",$session{form}{qid});
         $_[0]->reorderCollateral("Survey_question","Survey_questionId","Survey_id");
-        return $_[0]->www_edit;
+        return "";
 }
 
 #-------------------------------------------------------------------

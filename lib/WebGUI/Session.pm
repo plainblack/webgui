@@ -109,7 +109,7 @@ sub _setupSessionVars {
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
 		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'");
-		if ($vars{expires} < _time() || $vars{lastIP} ne $session{env}{REMOTE_ADDR}) {
+		if ($vars{expires} < _time() ) { #|| $vars{lastIP} ne $session{env}{REMOTE_ADDR}) { # had to remove for revolving ip proxies
 			%vars = ();
 			WebGUI::Session::end($_[0]);
 		}

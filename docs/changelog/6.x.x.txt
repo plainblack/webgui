@@ -15,6 +15,9 @@
  - Bugfix [ 949923 ] Collateral changes owner when editing
  - Bugfix [ 948050 ] Correct email address not accepted (fix)
  - Bugfix [ 938211 ] FIX: DeleteExpiredEvents.pm ignores offset
+ - Bugfix [ 951061 ] Login from AOL
+ - Bugfix [ 956219 ] can't delete survey question
+
 
 
 
