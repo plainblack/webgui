@@ -155,17 +155,17 @@ WebGUI::SQL->write("alter table DataForm_entry drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_entryData drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_field drop column wobjectId");
 WebGUI::SQL->write("alter table DataForm_tab drop column wobjectId");
-WebGUI::SQL->write("alter table alter table USS_submission drop column forumId");
-WebGUI::SQL->write("alter table alter table USS_submission drop column sequenceNumber");
-WebGUI::SQL->write("alter table alter table USS_submission drop column startDate");
-WebGUI::SQL->write("alter table alter table USS_submission drop column title");
-WebGUI::SQL->write("alter table alter table USS_submission drop column USS_id");
-WebGUI::SQL->write("alter table alter table USS_submission drop column endDate");
-WebGUI::SQL->write("alter table alter table USS_submission drop column USS_submissionId");
-WebGUI::SQL->write("alter table alter table USS_submission drop column pageId");
-WebGUI::SQL->write("alter table alter table USS_submission drop column content");
-WebGUI::SQL->write("alter table alter table USS_submission drop column image");
-WebGUI::SQL->write("alter table alter table USS_submission drop column attachment");
+WebGUI::SQL->write("alter table USS_submission drop column forumId");
+WebGUI::SQL->write("alter table USS_submission drop column sequenceNumber");
+WebGUI::SQL->write("alter table USS_submission drop column startDate");
+WebGUI::SQL->write("alter table USS_submission drop column title");
+WebGUI::SQL->write("alter table USS_submission drop column USS_id");
+WebGUI::SQL->write("alter table USS_submission drop column endDate");
+WebGUI::SQL->write("alter table USS_submission drop column USS_submissionId");
+WebGUI::SQL->write("alter table USS_submission drop column pageId");
+WebGUI::SQL->write("alter table USS_submission drop column content");
+WebGUI::SQL->write("alter table USS_submission drop column image");
+WebGUI::SQL->write("alter table USS_submission drop column attachment");
 
 
 my %migration;
