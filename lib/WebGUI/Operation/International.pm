@@ -36,13 +36,15 @@ sub _export {
         my ($sth, %data, $export);
         tie %data, 'Tie::CPHash';
         %data = WebGUI::SQL->quickHash("select * from language where languageId=".$_[0]);
-        $export = "#".$data{language}." translation export for WebGUI ".$WebGUI::VERSION.".\n\n";
+	$export = "#Exported from ".$session{setting}{companyName}." (http://".$session{env}{SERVER_NAME}.") by "
+		.$session{user}{username}." (".$session{user}{email}.")\n";
+        $export .= "#".$data{language}." translation export for WebGUI ".$WebGUI::VERSION.".\n\n";
         $export .= "#language\n\n";
         $export .= "delete from language where languageId=".$_[0].";\n";
         $export .= "insert into language (languageId,language,characterSet,toolbar) values ("
         	.$data{languageId}.", ".quote($data{language}).", ".quote($data{characterSet}).", "
 		.quote($data{toolbar}).");\n";
-        $export .= "\n#international\n\n";
+        $export .= "\n#international messages\n\n";
         $sth = WebGUI::SQL->read("select * from international where languageId=".$_[0]." order by lastUpdated desc");
         while (%data = $sth->hash) {
                 $export .= "delete from international where languageId=".$_[0]." and namespace="
