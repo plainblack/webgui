@@ -264,7 +264,7 @@ sub getEditForm {
 		$tabform->getTab('properties')->whatNext(
 			-options=>{
 				addQuestion=>WebGUI::International::get(28,'Survey'),
-				backToPage=>WebGUI::International::get(745)
+				backToPage=>WebGUI::International::get(745,'Survey')
 				},
 			-value=>"addQuestion"
 			);
@@ -727,7 +727,7 @@ sub www_editAnswer {
                         "addAnswer"=>WebGUI::International::get(24,'Survey'),
                         "addQuestion"=>WebGUI::International::get(28,'Survey'),
                         "editQuestion"=>WebGUI::International::get(75,'Survey'),
-                        "backToPage"=>WebGUI::International::get(745)
+                        "backToPage"=>WebGUI::International::get(745,'Survey')
                         );
                 $f->whatNext(
                         -options=>\%options,
@@ -737,7 +737,7 @@ sub www_editAnswer {
         $f->submit;
 
 #	$self->getAdminConsole->setHelp("survey add/edit");
-	return $self->getAdminConsole->render($f->print, WebGUI::International::get(18));
+	return $self->getAdminConsole->render($f->print, WebGUI::International::get(18,'Survey'));
 
 }
 
@@ -816,7 +816,7 @@ sub www_editQuestion {
                         "addFrequencyAnswer"		=> WebGUI::International::get(26,'Survey'),
                         "addOpinionAnswer"		=> WebGUI::International::get(27,'Survey'),
 			#"addQuestion"			=> WebGUI::International::get(28,'Survey'),
-                        "backToPage"			=> WebGUI::International::get(745)
+                        "backToPage"			=> WebGUI::International::get(745,'Survey')
 			);
         	$f->whatNext(
                 	-options=> \%options,
@@ -833,7 +833,7 @@ sub www_editQuestion {
 		while (%data = $sth->hash) {
 			$output .= 
 				deleteIcon('func=deleteAnswerConfirm&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, 
-					$self->getUrl,WebGUI::International::get(45)).
+					$self->getUrl,WebGUI::International::get(45,'Survey')).
                                 editIcon('func=editAnswer&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
                                 moveUpIcon('func=moveAnswerUp'.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
                                 moveDownIcon('func=moveAnswerDown&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
@@ -843,7 +843,7 @@ sub www_editQuestion {
 	}
 
 #	$self->getAdminConsole->setHelp("survey add/edit");
-	return $self->getAdminConsole->render($f->print, WebGUI::International::get(17));
+	return $self->getAdminConsole->render($f->print, WebGUI::International::get(17,'Survey'));
 
 }
 
