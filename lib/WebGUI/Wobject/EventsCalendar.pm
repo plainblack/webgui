@@ -445,8 +445,8 @@ sub www_view {
 	for ($i=0;$i<$monthCount;$i++) {
 		if ($session{form}{pn} == ($i+1)) {
 			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i),0);
-			$var{bigCalendar} = $_[0]->_drawBigCalendar($thisMonth);
-			$var{smallCalendar} = $_[0]->_drawSmallCalendar($thisMonth);
+			$var{"calendar.big"} = $_[0]->_drawBigCalendar($thisMonth);
+			$var{"calendar.small"} = $_[0]->_drawSmallCalendar($thisMonth);
 		}
 		$row[$i] = "page";
 	}
