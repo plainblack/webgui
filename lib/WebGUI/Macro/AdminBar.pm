@@ -23,9 +23,10 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub process {
 	return "" unless ($session{var}{adminOn});
-	my (%hash2, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $key);
+	my (%hash2, $miscSelect, $adminSelect, $clipboardSelect, %hash, $output, $contentSelect, $key, $a, %HoL, $query);
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
+	tie %HoL, "Tie::IxHash";
   #--content adder
 	$hash{WebGUI::URL::page('op=editPage&npp='.$session{page}{pageId})} = WebGUI::International::get(2);
 	if ($session{user}{uiLevel} >= 7) {
@@ -51,26 +52,43 @@ sub process {
   #--clipboard paster
 	%hash2 = ();
 	$hash2{WebGUI::URL::page()} = WebGUI::International::get(3);
-	# pages
+
+	# get wobjects and store in hash of arrays in order to integrate with pages and sort by buffer date
 	if ($session{setting}{sharedClipboard} eq "1") {
-		%hash = WebGUI::SQL->buildHash("select pageId, title from page where parentId=2 order by bufferDate desc");
+        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId=2 "
+			." order by bufferDate";
 	} else {
-		%hash = WebGUI::SQL->buildHash("select pageId, title from page where parentId=2 "
-					."and bufferUserId=". $session{user}{userId}. " order by bufferDate desc");
+        	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId=2 "
+			." and bufferUserId=$session{user}{userId} "
+			." order by bufferDate";
 	}
-	foreach $key (keys %hash) {
-		$hash2{WebGUI::URL::page('op=pastePage&pageId='.$key)} = $hash{$key};
+        $a = WebGUI::SQL->read($query);
+        while (%hash = $a->hash) {
+		$HoL{ $hash{bufferDate} } = [ WebGUI::URL::page('func=paste&wid='.$hash{wobjectId}) ,
+						$hash{title} . ' ('. $hash{namespace} .')' ];
 	}
-	# wobjects
+        $a->finish;
+
+	# get pages and store in hash of arrays in order to integrate with wobjects and sort by buffer date
 	if ($session{setting}{sharedClipboard} eq "1") {
-		%hash = WebGUI::SQL->buildHash("select wobjectId, title from wobject where pageId=2 order by bufferDate desc");
+		$query = "select bufferDate,pageId,title from page where parentId=2 order by bufferDate";
 	} else {
-		%hash = WebGUI::SQL->buildHash("select wobjectId, title from wobject where pageId=2 "
-					."and bufferUserId=". $session{user}{userId} ." order by bufferDate desc");
+		$query = "select bufferDate,pageId,title from page where parentId=2 "
+			." and bufferUserId=$session{user}{userId} "
+			." order by bufferDate";
 	}
-        foreach $key (keys %hash) {
-		$hash2{WebGUI::URL::page('func=paste&wid='.$key)} = $hash{$key};
-        }
+        $a = WebGUI::SQL->read($query);
+        while (%hash = $a->hash) {
+		$HoL{ $hash{bufferDate} } = [ WebGUI::URL::page('op=pastePage&pageId='.$hash{pageId}) ,
+						$hash{title} ." (". WebGUI::International::get(2) .")" ];
+	}
+        $a->finish;
+
+	# Reverse sort by bufferDate and and create hash from list values
+	foreach $key (reverse sort keys %HoL) {
+		$hash2{$HoL{$key}[0]} =  $HoL{$key}[1];
+	}
+
         $clipboardSelect = WebGUI::Form::selectList({
 		name=>"clipboardSelect",
 		options=>\%hash2,
