@@ -20,28 +20,6 @@ our $HELP = {
 		]
 	},
 
-        'redirect add/edit' => {
-		title => 'redirect add/edit title',
-		body => 'redirect add/edit body',
-		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-		]
-	},
-
-        'file add/edit' => {
-		title => 'file add/edit title',
-		body => 'file add/edit body',
-		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-		]
-	},
-
 	'metadata manage'=> {
 		title => 'content profiling',
 		body => 'metadata manage body',
@@ -78,6 +56,7 @@ our $HELP = {
                         },
                 ],
         },
+
 };
 
 1;
