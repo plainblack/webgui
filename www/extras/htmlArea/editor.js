@@ -332,7 +332,7 @@ function editor_action(button_id) {
   // Insert a smiley
   else if (cmdID == 'Smileys') {  // insert some text from a popup window
     var myTitle = "Insert a Smiley";
-    var myText = showModalDialog(_editor_url + "popups/insert_smiley.pl",
+    var myText = showModalDialog(_editor_url + "popups/insert_smiley.html",
                                  myTitle,      // str or obj specified here can be read from dialog as "window.dialogArguments"
                                  "resizable: yes; help: no; status: no; scroll: yes; ");
     if (myText) { editor_insertHTML(objname, myText); }
@@ -366,9 +366,11 @@ function editor_action(button_id) {
   }
   else if (cmdID == 'spell') {
 	if(typeof(spellEnabled) == 'undefined') alert('Unable to start MS Word for spell checking.\nActive X is not enabled for this site or MS Word is not available.');
+	else {
         editdoc.execCommand('copy');
-	if (editdoc.selection.createRange().text != "") {CheckDocument(); return true;}
-        else {alert('Nothing to spellcheck. Please select the text you want HTMLArea to check.\nTo avoid unexpected results, we recommend you to select complete paragraphs.');}
+	   if (editdoc.selection.createRange().text != "") {CheckDocument(); return true;}
+           else {alert('Nothing to spellcheck. Please select the text you want HTMLArea to check.\nTo avoid unexpected results, we recommend you to select complete paragraphs.');}
+	}
   }
 
   else if (cmdID == 'word') {
