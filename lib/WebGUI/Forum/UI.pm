@@ -1131,14 +1131,20 @@ sub getForumTemplateVars {
 		$query .= "status='approved'";
 	}
 	$query .= " order by isSticky desc, ";
+	my $sortDir = $session{scratch}{forumSortDir};
+	$var{'thread.sorted.'.$sortDir} = 1;
 	if ($session{scratch}{forumSortBy} eq "date") {
-		$query .= "rootPostId desc";
+		$var{'thread.sortedby.date'} = 1;
+		$query .= "rootPostId $sortDir";
 	} elsif ($session{scratch}{forumSortBy} eq "views") {
-		$query .= "views desc";
+		$var{'thread.sortedby.views'} = 1;
+		$query .= "views $sortDir";
 	} elsif ($session{scratch}{forumSortBy} eq "replies") {
-		$query .= "replies desc";
+		$var{'thread.sortedby.replies'} = 1;
+		$query .= "replies $sortDir";
 	} elsif ($session{scratch}{forumSortBy} eq "rating") {
-		$query .= "rating desc";
+		$var{'thread.sortedby.rating'} = 1;
+		$query .= "rating $sortDir";
 	} else {
 		$query .= "lastPostDate desc";
 	}
@@ -1483,7 +1489,7 @@ sub recurseThread {
         	push (@post_loop, getPostTemplateVars($post, $thread, $forum, $caller, {
                 	'post.indent_loop'=>\@depth_loop,
                 	'post.indent.depth'=>$depth,
-                	'post.isCurrent'=>($currentPost == $post->get("forumPostId"))
+                	'post.isCurrent'=>($currentPost eq $post->get("forumPostId"))
                 	}));
         	my $replies = $post->getReplies;
         	foreach my $reply (@{$replies}) {
@@ -1532,7 +1538,7 @@ sub getFlatThread {
 	foreach my $postId (@posts){
 		my $post = WebGUI::Forum::Post->new($postId);
 		push (@post_loop, getPostTemplateVars($post,$thread, $forum, $caller, {
-			'post.isCurrent'=>($currentPost == $post->get("forumPostId"))
+			'post.isCurrent'=>($currentPost eq $post->get("forumPostId"))
 			}));
 	}
 	return \@post_loop;
@@ -2448,14 +2454,21 @@ Specify a forumId and call this method directly, rather than over the web.
 
 sub www_viewForum {
 	my ($caller, $forumId) = @_;
-	# If POST, cause redirect, so new post is displayed using GET instead of POST
- #       if ($session{env}{REQUEST_METHOD} =~ /POST/i) { 
-  #              my $url= formatForumURL($caller->{callback}, $forumId); 
-#		WebGUI::HTTP::setRedirect($url);
- #               return "";
-  #      }
 	$forumId = $session{form}{forumId} unless ($forumId);
-	WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
+	
+	if($session{scratch}{forumSortBy} ne $session{form}{sortBy}){
+		WebGUI::Session::setScratch("forumSortBy",$session{form}{sortBy});
+		WebGUI::Session::setScratch("forumSortDir", "desc");
+	}else{
+		my $sortDir;
+		if($session{scratch}{forumSortDir} eq "asc"){
+			$sortDir = "desc";
+		}else{
+			$sortDir = "asc";
+		}
+		WebGUI::Session::setScratch("forumSortDir", $sortDir);
+	}
+
 	my $forum = WebGUI::Forum->new($forumId);
 	return WebGUI::Privilege::insufficient() unless ($forum->canView);
 	my $var = getForumTemplateVars($caller, $forum);
