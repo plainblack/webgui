@@ -92,6 +92,16 @@ sub www_editContentSettings {
         $f->select("defaultPage",$pages,WebGUI::International::get(527),[$session{setting}{defaultPage}]);
         $f->select("notFoundPage",$pages,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
         $f->text("docTypeDec",WebGUI::International::get(398),$session{setting}{docTypeDec});
+        $f->text(
+		-name=>"favicon",
+		-label=>WebGUI::International::get(897),
+		-value=>$session{setting}{favicon}
+		);
+	$f->text(
+                -name=>"siteicon",
+                -label=>WebGUI::International::get(898),
+                -value=>$session{setting}{siteicon}
+                );
         $f->integer("maxAttachmentSize",WebGUI::International::get(130),$session{setting}{maxAttachmentSize});
         $f->integer("maxImageSize",WebGUI::International::get(583),$session{setting}{maxImageSize});
         $f->integer("thumbnailSize",WebGUI::International::get(406),$session{setting}{thumbnailSize});
