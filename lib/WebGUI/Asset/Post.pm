@@ -29,6 +29,7 @@ use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Storage::Image;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -249,6 +250,21 @@ sub getIcon {
 }
 
 #-------------------------------------------------------------------
+sub getImageUrl {
+	my $self = shift;
+	return undef if ($self->get("storageId") eq "");
+	my $storage = $self->getStorageLocation;
+	my $url;
+	foreach my $filename (@{$storage->getFiles}) {
+		if ($storage->isImage($filename)) {
+			$url = $storage->getUrl($filename);
+			last;
+		}
+	}
+	return $url;
+}
+
+#-------------------------------------------------------------------
 sub getName {
         return "Post";
 }
@@ -316,6 +332,20 @@ sub getStatus {
 }
 
 #-------------------------------------------------------------------
+sub getStorageLocation {
+	my $self = shift;
+	unless (exists $self->{_storageLocation}) {
+		if ($self->get("storageId") eq "") {
+			$self->{_storageLocation} = WebGUI::Storage::Image->create;
+			$self->update({storageId=>$self->{_storageLocation}->getId});
+		} else {
+			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->get("storageId"));
+		}
+	}
+	return $self->{_storageLocation};
+}
+
+#-------------------------------------------------------------------
 sub getSynopsisAndContentFromFormPost {
 	my $self = shift;
 	my $synopsis = $session{form}{synopsis};
@@ -361,18 +391,30 @@ sub getTemplateVars {
         $var{'rate.url.4'} = $self->getRateUrl(4);
         $var{'rate.url.5'} = $self->getRateUrl(5);
         $var{'hasRated'} = $self->hasRated;
-#	if ($submission->{image} ne "") {
-#		$file = WebGUI::Attachment->new($submission->{image},$self->wid,$submissionId);
-#		$var{"image.url"} = $file->getURL;
-#		$var{"image.thumbnail"} = $file->getThumbnail;
-#	}
-#	if ($submission->{attachment} ne "") {
-#		$file = WebGUI::Attachment->new($submission->{attachment},$self->wid,$submissionId);
-#		$var{"attachment.box"} = $file->box;
-#		$var{"attachment.url"} = $file->getURL;
-#		$var{"attachment.icon"} = $file->getIcon;
-#		$var{"attachment.name"} = $file->getFilename;
- #       }	
+	my $gotImage;
+	my $gotAttachment;
+	unless ($self->get("storageId") eq "") {
+		my $storage = $self->getStorageLocation;
+		foreach my $filename (@{$storage->getFiles}) {
+			if (!$gotImage && $storage->isImage($filename)) {
+				$var{"image.url"} = $storage->getUrl($filename);
+				$var{"image.thumbnail"} = $storage->getThumbnailUrl($filename);
+				$gotImage = 1;
+			}
+			if (!$gotAttachment && !$storage->isImage($filename)) {
+				$var{"attachment.url"} = $storage->getUrl($filename);
+				$var{"attachment.icon"} = $storage->getFileIconUrl($filename);
+				$var{"attachment.name"} = $filename;
+       			}	
+			push(@{$var{"attachment_loop"}}, {
+				url=>$storage->getUrl($filename),
+				icon=>$storage->getFileIconUrl($filename),
+				filename=>$filename,
+				thumbnail=>$storage->getThumbnailUrl($filename),
+				isImage=>$storage->isImage($filename)
+				});
+		}
+	}
 	return \%var;
 }
 
@@ -385,13 +427,36 @@ sub getThread {
 	return $self->{_thread};	
 }
 
+#-------------------------------------------------------------------
+sub getThumbnailUrl {
+	my $self = shift;
+	return undef if ($self->get("storageId") eq "");
+	my $storage = $self->getStorageLocation;
+	my $url;
+	foreach my $filename (@{$storage->getFiles}) {
+		if ($storage->isImage($filename)) {
+			$url = $storage->getThumbnailUrl($filename);
+			last;
+		}
+	}
+	return $url;
+}
+
 
 #-------------------------------------------------------------------
 sub getUploadControl {
 	my $self = shift;
-	my $existingFiles = shift;
+	my $uploadControl;
+	if ($self->get("storageId")) {
+		my $i;
+		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
+			$uploadControl .= '<a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a><br />';	
+			$i++;
+		}
+		return $uploadControl unless ($i < $self->getThread->getParent->get("attachmentsPerPost"));
+	}
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
-	my $uploadControl = '<div id="fileUploadControl"> </div>
+	$uploadControl .= '<div id="fileUploadControl"> </div>
 		<script>
 		var images = new Array();
 		var fileLimit = '.$self->getThread->getParent->get("attachmentsPerPost").';
@@ -409,11 +474,6 @@ sub getUploadControl {
 	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images);
 	uploader.addRow();
 	</script>';
-	if ($self->get("storageId")) {
-		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
-			$uploadControl .= '<a href="'.$self->getStorageLocation->getFileUrl($filename).'">'.$filename.'</a><br />';	
-		}
-	}
 	return $uploadControl;
 }
 
@@ -579,6 +639,13 @@ sub processPropertiesFromFormPost {
         } else {
                 $self->setStatusApproved;
         }
+	my $storage = $self->getStorageLocation;
+	my $filename = $storage->addFileFromFormPost("file");
+	if (defined $filename) {
+		$self->setSize($storage->getFileSize($filename));
+		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
+		$storage->generateThumbnail($filename);
+	}
 	$session{form}{proceed} = "redirectToParent";
 }
                                                                                                                                                        

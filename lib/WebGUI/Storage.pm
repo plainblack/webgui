@@ -498,7 +498,7 @@ sub getFiles {
                 }
 		return \@list;
         }
-	return undef;
+	return [];
 }
 
 

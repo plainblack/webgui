@@ -5,6 +5,8 @@
 function FileUploadControl(workspaceId, imageArray) {
 
 	this.images = images;
+	this.fileLimit = fileLimit;
+	this.fileCount = 1;
 	this.dom=document.getElementById&&!document.all;
 	this.topLevelElement=this.dom? "HTML" : "BODY"
 	
@@ -104,6 +106,7 @@ function FileUploadControl_removeButtonClick(e) {
 	var control = FileUploadControl_getControl(firedobj);
 
 	control.removeRow(firedobj);
+	control.fileCount--;
 
 }
 
@@ -116,7 +119,10 @@ function FileUploadControl_valueChange(e) {
 	var control = FileUploadControl_getControl(firedobj);
 
 	if (control.tbody.childNodes[control.tbody.childNodes.length -1].childNodes[1].childNodes[0].value != "") {
-		control.addRow();
+		if (control.fileCount < control.fileLimit) {
+			control.addRow();
+			control.fileCount++;
+		}
 	}
 	
 	control.swapImage(firedobj);

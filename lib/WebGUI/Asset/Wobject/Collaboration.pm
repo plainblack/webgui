@@ -43,7 +43,7 @@ sub appendPostListTemplateVars {
 	foreach my $row (@$page) {
 		my $post = WebGUI::Asset::Wobject::Collaboration->newByPropertyHashRef($row);
 		$post->{_parent} = $self; # caching parent for efficiency 
-		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("ur"));
+		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("url"));
 		if ($self->get("sortBy") eq "lineage") {
 			if ($self->get("sortOrder") eq "desc") {
 				$controls .= moveUpIcon('func=demote',$post->get("url")).moveDownIcon('func=promote',$post->get("url"));
@@ -68,8 +68,8 @@ sub appendPostListTemplateVars {
 			rating_loop=>\@rating_loop,
 			"content"=>$post->formatContent,
                         "status"=>$post->getStatus,
-                      #  "thumbnail"=>$submission->getThumbnailUrl,
-                       # "submission.image"=>$submission->getImageUrl,
+                        "thumbnail"=>$post->getThumbnailUrl,
+                        "image.url"=>$post->getImageUrl,
                         "dateSubmitted.human"=>epochToHuman($post->get("dateSubmitted"),"%z"),
                         "dateUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%z"),
                         "timeSubmitted.human"=>epochToHuman($post->get("dateSubmitted"),"%Z"),
