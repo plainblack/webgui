@@ -36,6 +36,7 @@ use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::MetaData;
+use WebGUI::Wobject::WobjectProxy;
 
 =head1 NAME
 
