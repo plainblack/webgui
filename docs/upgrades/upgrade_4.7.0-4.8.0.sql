@@ -1,8 +1,7 @@
 insert into webguiVersion values ('4.8.0','upgrade',unix_timestamp());
 update incrementer set nextValue=100000 where incrementerId='messageId';
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (748,1,'WebGUI','User Count', 1036553016);
-
-
-
+INSERT INTO template VALUES (5,'Classifieds','<tmpl_var searchForm>\r\n\r\n<tmpl_if post>\r\n    <tmpl_var post> ·\r\n</tmpl_if>\r\n<tmpl_var search><p/>\r\n\r\n<table width=\"100%\" cellpadding=3 cellspacing=0 border=0>\r\n<tr>\r\n<tmpl_loop submissions_loop>\r\n\r\n<td valign=\"top\" class=\"tableData\" width=\"33%\" style=\"border: 1px dotted black; padding: 10px;\">\r\n  <h2><a href=\"<tmpl_var submission.url>\"><tmpl_var submission.title></a></h2>\r\n  <tmpl_if submission.currentUser>\r\n    (<tmpl_var submission.status>)\r\n  </tmpl_if>\r\n<br/>\r\n  <tmpl_if submission.thumbnail>\r\n       <a href=\"<tmpl_var submission.url>\"><img src=\"<tmpl_var submission.thumbnail>\" border=\"0\"/ align=\"right\"></a><br/>\r\n  </tmpl_if>\r\n<tmpl_var submission.content>\r\n</td>\r\n\r\n<tmpl_if submission.thirdColumn>\r\n  </tr><tr>\r\n</tmpl_if>\r\n\r\n</tmpl_loop>\r\n</tr>\r\n</table>\r\n\r\n<tmpl_if multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var previousPage>  · <tmpl_var pageList> · <tmpl_var nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','USS');
+INSERT INTO template VALUES (6,'Guest Book','<tmpl_if post>\r\n    <tmpl_var post><p>\r\n</tmpl_if>\r\n\r\n<tmpl_loop submissions_loop>\r\n\r\n<tmpl_if __odd__>\r\n<div class=\"highlight\">\r\n</tmpl_if>\r\n\r\n<b>On <tmpl_var submission.date> <a href=\"<tmpl_var submission.userProfile>\"><tmpl_var submission.username></a> from <a href=\"<tmpl_var submission.url>\">the <tmpl_var submission.title> department</a> wrote</b>, <i><tmpl_var submission.content></i>\r\n\r\n<tmpl_if __odd__>\r\n</div >\r\n</tmpl_if>\r\n\r\n<p/>\r\n\r\n</tmpl_loop>\r\n\r\n<tmpl_if multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var previousPage> · <tmpl_var nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','USS');
 
 
