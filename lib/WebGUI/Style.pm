@@ -26,7 +26,7 @@ sub getStyle {
 		@body = split(/\^\-\;/,$style{body});
 		$header = '<html><!-- WebGUI '.$session{wg}{version}.' -->'."\n";
 		$header .= '<head><title>'.$session{page}{title}.' - '.$session{setting}{companyName}.'</title>';
-		$header .= $style{styleSheet}.'</head>'.$style{header};
+		$header .= $style{styleSheet}.'</head>'.$body[0];
 	} else {
 		%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{page}{styleId}");
 		@body = split(/\^\-\;/,$style{body});
