@@ -186,14 +186,10 @@ sub www_listImages {
 		# do image groups
 		if($imageGroupId > 0) {  # show previous link
                 	$row[$i] = '<tr class="tableData">';
-                        $row[$i] .= '<td>&nbsp;</td>';
-			$row[$i] .= '<td><a href="'.WebGUI::URL::page('op=listImages&gid='.$imageGroupParentId)
+			$row[$i] .= '<td colspan="5"><a href="'.WebGUI::URL::page('op=listImages&gid='.$imageGroupParentId)
 				.'"><img src="'.$session{setting}{lib}.'/smallAttachment.gif" border="0"></a>'
 				.'&nbsp;<a href="'.WebGUI::URL::page('op=listImages&gid='.$imageGroupParentId)
 				.'">'.WebGUI::International::get(542).'</a></td>'; # FIXME folder icon
-                        $row[$i] .= '<td>&nbsp;</td>';
-                        $row[$i] .= '<td>&nbsp; </td>';
-                        $row[$i] .= '<td>&nbsp; </td>';
                         $row[$i] .= '</tr>';
                         $i++;
 		}
