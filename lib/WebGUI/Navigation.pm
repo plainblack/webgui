@@ -156,9 +156,11 @@ sub drawVertical {
   |-pageId
   |  |-url
   |  |-title
+  |  |-synopsis
   |  `-sub (pageId)
   |     |-url
   |     |-title
+  |     |-synopsis
   |     `-sub (pageId)
   |        `-etc
   `-pageId
@@ -182,12 +184,13 @@ sub tree {
 	my ($parentId, $toLevel, $depth) = @_;
         $toLevel = 99 if ($toLevel > 100 || $toLevel < 1);
         if ($depth < $toLevel) {
-                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId from page 
+                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis from page 
 			where parentId='$parentId' order by sequenceNumber");
                 while (%data = $sth->hash) {
                         if (WebGUI::Privilege::canViewPage($data{pageId})) {
 				$tree{$data{pageId}}{url} = WebGUI::URL::gateway($data{urlizedTitle}); 
 				$tree{$data{pageId}}{title} = $data{menuTitle}; 
+				$tree{$data{pageId}}{synopsis} = $data{synopsis}; 
                                 $tree{$data{pageId}}{sub} = tree($data{pageId},$toLevel,($depth+1));
                         }
                 }
