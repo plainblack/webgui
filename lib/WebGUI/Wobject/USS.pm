@@ -305,37 +305,32 @@ sub www_showMessage {
 
 #-------------------------------------------------------------------
 sub www_view {
-	my (%var, $row, $page, $p, $constraints, @submission, @content, $image, $i, $url, $thumbnail, $responses);
-	$var{"label.readmore"} = WebGUI::International::get(46,$namespace);
-	$var{"label.responses"} = WebGUI::International::get(57,$namespace);
+	my (%var, $row, $page, $p, $constraints, @submission, @content, $image, $i, $numResults, $thumbnail, $responses);
+	$numResults = $_[0]->get("submissionsPerPage");
+	$var{"readmore.label"} = WebGUI::International::get(46,$namespace);
+	$var{"responses.label"} = WebGUI::International::get(57,$namespace);
+	$var{title} = $_[0]->processMacros($_[0]->get("title"));
         $var{description} = $_[0]->processMacros($_[0]->get("description"));
-	if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) {
-                $var{post} = '<a href="'.WebGUI::URL::page('func=editSubmission&sid=new&wid='
-			.$_[0]->get("wobjectId")).'">'.WebGUI::International::get(20,$namespace).'</a>';
-        }
-	unless ($session{form}{search}) {
-		$url = 'func=view&search=1&wid='.$_[0]->get("wobjectId");
+	$var{canPost} = WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"));
+        $var{"post.url"} = WebGUI::URL::page('func=editSubmission&sid=new&wid='.$_[0]->get("wobjectId"));
+	$var{"post.label"} = WebGUI::International::get(20,$namespace);
+        $var{"search.label"} = WebGUI::International::get(364);
+	$var{"search.Form"} = WebGUI::Search::form({wid=>"$session{form}{wid}",func=>'view',search=>1});
+	$var{"search.url"} = WebGUI::Search::toggleURL();
+	if ($session{scratch}{search}) {
+                $numResults = $session{scratch}{numResults};
+       		$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);
 	}
-        $var{search} = '<a href="'.WebGUI::URL::page($url).'">'.WebGUI::International::get(364).'</a>';
-	if ($session{form}{search}) {
-		$var{searchForm} = WebGUI::Search::form({wid=>"$session{form}{wid}",func=>'view',search=>1});
-	}
-       	$constraints = WebGUI::Search::buildConstraints([qw(username title content)]);
 	if ($constraints ne "") {
         	$constraints = "status='Approved' and ".$constraints;
 	} else {
 		$constraints = "(status='Approved' or userId=$session{user}{userId})";
 	}
-	$var{"label.title"} = WebGUI::International::get(99);
-	$var{"label.thumbnail"} = WebGUI::International::get(52,$namespace);
-	$var{"label.date"} = WebGUI::International::get(13,$namespace);
-	$var{"label.by"} = WebGUI::International::get(21,$namespace);
-	$url = WebGUI::URL::page('func=view&search='.$session{form}{search}.'&wid='.$_[0]->get("wobjectId")
-        	.'&all='.WebGUI::URL::escape($session{form}{all})
-                .'&exactPhrase='.WebGUI::URL::escape($session{form}{exactPhrase}).'&atLeastOne='
-                .WebGUI::URL::escape($session{form}{atLeastOne}).'&numResults='.$session{form}{numResults}
-                .'&without='.WebGUI::URL::escape($session{form}{without}));
-	$p = WebGUI::Paginator->new($url, [], $_[0]->get("submissionsPerPage"));
+	$var{"title.label"} = WebGUI::International::get(99);
+	$var{"thumbnail.label"} = WebGUI::International::get(52,$namespace);
+	$var{"date.label"} = WebGUI::International::get(13,$namespace);
+	$var{"by.label"} = WebGUI::International::get(21,$namespace);
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('func=view&wid='.$_[0]->get("wobjectId")),[],$numResults);
 	$p->setDataByQuery("select USS_submissionId, content, title, userId, status, image, dateSubmitted, username
 		from USS_submission where wobjectId=".$_[0]->get("wobjectId")." and $constraints order by dateSubmitted desc");
 	$page = $p->getPageData;
@@ -365,10 +360,10 @@ sub www_view {
                         "submission.currentUser"=>($session{user}{userId} == $page->[$i]->{userId}),
                         "submission.username"=>$page->[$i]->{username},
                         "submission.userProfile"=>WebGUI::URL::page('op=viewProfile&uid='.$page->[$i]->{userId}),
-                        "submission.secondColumn"=>($i%2==0),
-                        "submission.thirdColumn"=>($i%3==0),
-                        "submission.fourthColumn"=>($i%4==0),
-                        "submission.fifthColumn"=>($i%5==0),
+                        "submission.secondColumn"=>(($i+1)%2==0),
+                        "submission.thirdColumn"=>(($i+1)%3==0),
+                        "submission.fourthColumn"=>(($i+1)%4==0),
+                        "submission.fifthColumn"=>(($i+1)%5==0),
                         });
 		$i++;
 	}
@@ -379,7 +374,7 @@ sub www_view {
 	$var{pageList} = $p->getPageLinks;
 	$var{previousPage} = $p->getPreviousPageLink;
 	$var{multiplePages} = ($p->getNumberOfPages > 1);
-	return $_[0]->processMacros($_[0]->displayTitle).$_[0]->processTemplate($_[0]->get("templateId"),\%var);
+	return $_[0]->processTemplate($_[0]->get("templateId"),\%var);
 }
 
 #-------------------------------------------------------------------

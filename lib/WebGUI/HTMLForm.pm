@@ -1527,7 +1527,7 @@ sub template {
         my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel) = 
 		rearrange([qw(name value label namespace afterEdit extras uiLevel)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
-		$label = $_[0]->{label} || WebGUI::International::get(356);
+		$label = $label || WebGUI::International::get(356);
 		if (WebGUI::Privilege::isInGroup($session{setting}{templateManagersGroup})) {
         		if ($afterEdit) {
                 		$subtext = '<a href="'.WebGUI::URL::page("op=editTemplate&tid=".$value."&namespace=".$namespace
