@@ -69,7 +69,7 @@ sub www_edit {
 	$f->yesNo("preprocessMacros",WebGUI::International::get(15,$namespace),$_[0]->get("preprocessMacros"));
         $f->yesNo("debugMode",WebGUI::International::get(16,$namespace),$_[0]->get("debugMode"));
 	$f->textarea("dbQuery",WebGUI::International::get(4,$namespace),$_[0]->get("dbQuery"));
-       	$f->HTMLArea("template",WebGUI::International::get(3,$namespace),$_[0]->get("template"));        
+       	$f->textarea("template",WebGUI::International::get(3,$namespace),$_[0]->get("template"));        
         $f->text("DSN",WebGUI::International::get(5,$namespace),$dsn);
 	$f->text("username",WebGUI::International::get(6,$namespace),$username);
 	$f->password("identifier",WebGUI::International::get(7,$namespace),$_[0]->get("identifier"));
