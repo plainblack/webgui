@@ -183,7 +183,8 @@ sub www_view {
 					$url = WebGUI::URL::page();
 					foreach (keys %{$session{form}}) {
 						unless ($_ eq "pn") {
-							$url = WebGUI::URL::append($url, WebGUI::URL::escape($_.'='.$session{form}{$_}));
+							$url = WebGUI::URL::append($url, WebGUI::URL::escape($_)
+								.'='.WebGUI::URL::escape($session{form}{$_}));
 						}
 					}
                				$p = WebGUI::Paginator->new($url,\@row,$_[0]->get("paginateAfter"));
