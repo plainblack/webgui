@@ -102,11 +102,6 @@ sub create {
 	$data->{forumPostId} = "new";
 	my $forumPostId = WebGUI::SQL->setRow("forumPost","forumPostId", $data);
 	$self = WebGUI::Forum::Post->new($forumPostId);
-	if ($self->getThread->getForum->get("moderatePosts")) {
-		$self->setStatusPending;
-	} else {
-		$self->setStatusApproved;
-	}
 	return $self;
 }
 
