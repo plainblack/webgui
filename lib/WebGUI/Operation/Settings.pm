@@ -12,6 +12,7 @@ package WebGUI::Operation::Settings;
 
 use Exporter;
 use strict qw(Vars Subs);
+use WebGUI::Authentication;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
@@ -38,10 +39,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_editUserSettings {
 	WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
-        my ($output, %authMethod, $f, $cmd, $html);
-
-	%authMethod = map {$_ => $_} @{$session{authentication}{available}};
-
+        my ($output, $f, $cmd, $html);
         $output .= helpIcon(2);
         $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
 	$f = WebGUI::HTMLForm->new;
@@ -53,7 +51,7 @@ sub www_editUserSettings {
         $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
         $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
         $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
-        $f->select("authMethod",\%authMethod,WebGUI::International::get(119),[$session{setting}{authMethod}]);
+        $f->select("authMethod",$session{authentication},WebGUI::International::get(119),[$session{setting}{authMethod}]);
         $f->yesNo("usernameBinding",WebGUI::International::get(306),$session{setting}{usernameBinding});
 	$f->yesNo("selfDeactivation","Allow users to deactivate their account",$session{setting}{selfDeactivation});
 	foreach (keys %{$session{authentication}}) {
