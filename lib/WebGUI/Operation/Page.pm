@@ -198,7 +198,7 @@ sub _traversePageTree {
 
 	tie %wobject, 'Tie::CPHash';
         $spacer = '<img src="'.$session{config}{extrasURL}.'/spacer.gif" width=12>';
-	my $sth = WebGUI::SQL->read("select pageId,isSystem,urlizedTitle,title from page where parentId=".$parentId);
+	my $sth = WebGUI::SQL->read("select pageId,isSystem,urlizedTitle,title from page where parentId=".quote($parentId));
 	while (my ($pageId,$isSystem,$url,$title) = $sth->array) {
 		unless ($isSystem) {
 			$output .= $spacer x $options->{_depth}
@@ -239,7 +239,7 @@ sub www_cutPage {
 	my ($page);
         if ($session{page}{isSystem}) {
                 return WebGUI::Privilege::vitalComponent();
-		
+
         } elsif (WebGUI::Page::canEdit()) {
 		$page = WebGUI::Page->getPage($session{page}{pageId});
 		my $parentId = $page->get("parentId") || 1;
