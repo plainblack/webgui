@@ -330,9 +330,8 @@ sub view {
 	}
 	my $p = WebGUI::Paginator->new($self->getUrl,$numResults);
 	my $sql = "select * from USS_submission left join asset on USS_submission.assetId=asset.assetId 
-		where asset.parentId=".quote($self->getId)." and asset.className='WebGUI::Asset::USS_submission' and $constraints 
+		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::USS_submission' and $constraints 
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder");
-WebGUI::ErrorHandler::warn($sql);
 	$p->setDataByQuery($sql);
 	my $page = $p->getPageData;
 	my $i = 0;
@@ -380,7 +379,7 @@ WebGUI::ErrorHandler::warn($sql);
                         "submission.thirdColumn"=>(($i+1)%3==0),
                         "submission.fourthColumn"=>(($i+1)%4==0),
                         "submission.fifthColumn"=>(($i+1)%5==0),
-			'submission.controls'=>$controls,
+			'submission.controls'=>$submission->getToolbar,
 			'submission.inDateRange'=>$inDateRange,
                 	"submission.currentUser"=>($session{user}{userId} eq $submission->get("userId") && $session{user}{userId} ne "1")
                         });

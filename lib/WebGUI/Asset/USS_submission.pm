@@ -94,26 +94,30 @@ sub definition {
 				defaultValue=>"mixed"
 				},
 			userDefined1 => {
-				fieldType=>"text",
+				fieldType=>"HTMLArea",
 				defaultValue=>undef
 				},
 			userDefined2 => {
-				fieldType=>"text",
+				fieldType=>"HTMLArea",
 				defaultValue=>undef
 				},
 			userDefined3 => {
-				fieldType=>"text",
+				fieldType=>"HTMLArea",
 				defaultValue=>undef
 				},
 			userDefined4 => {
-				fieldType=>"text",
+				fieldType=>"HTMLArea",
 				defaultValue=>undef
 				},
 			userDefined5 => {
-				fieldType=>"text",
+				fieldType=>"HTMLArea",
+				defaultValue=>undef
+				},
+			content => {
+				fieldType=>"HTMLArea",
 				defaultValue=>undef
 				}
-			}
+			},
 		});
         return $class->SUPER::definition($definition);
 }
@@ -144,7 +148,15 @@ sub getResponseCount {
 
 #-------------------------------------------------------------------
 sub getStatus {
-	return 'Approved';
+	my $self = shift;
+	my $status = shift;
+        if ($status eq "Approved") {
+                return WebGUI::International::get(560);
+        } elsif ($status eq "Denied") {
+                return WebGUI::International::get(561);
+        } elsif ($status eq "Pending") {
+                return WebGUI::International::get(562);
+        }
 }
 
 #-------------------------------------------------------------------
@@ -175,17 +187,6 @@ sub processPropertiesFromFormPost {
 	$self->update(\%data);
 }
                                                                                                                                                        
-#-------------------------------------------------------------------
-sub status {
-        if ($_[0] eq "Approved") {
-                return WebGUI::International::get(560);
-        } elsif ($_[0] eq "Denied") {
-                return WebGUI::International::get(561);
-        } elsif ($_[0] eq "Pending") {
-                return WebGUI::International::get(562);
-        }
-}
-
 
 #-------------------------------------------------------------------
 sub view {
@@ -211,7 +212,6 @@ sub view {
 	WebGUI::SQL->write("update USS_submission set views=views+1 where USS_submissionId=".quote($submissionId));
 	$var{title} = $submission->{title};
 	$var{content} = WebGUI::HTML::filter($submission->{content},$self->get("filterContent"));
-	$var{content} =~ s/\^\-\;//g;
 	$var{content} = WebGUI::HTML::format($var{content},$submission->{contentType});
         $var{"user.label"} = WebGUI::International::get(21,$self->get("namespace"));
 	$var{"user.Profile"} = WebGUI::URL::page('op=viewProfile&uid='.$submission->{userId});
@@ -390,11 +390,11 @@ sub www_edit {
         $var{'description.label'} = WebGUI::International::get(85);
 	$var{'body.value'} = $self->get("content"); 
 	$var{'body.form'} = WebGUI::Form::HTMLArea({
-		name=>"body",
+		name=>"content",
 		value=>$self->get("content")
 		});
 	$var{'body.form.textarea'} = WebGUI::Form::textarea({
-		name=>"body",
+		name=>"content",
 		value=>$self->get("content")
 		});
 #	$var{'image.label'} = WebGUI::International::get(32,"USS");
@@ -418,7 +418,7 @@ sub www_edit {
 	$var{'contentType.label'} = WebGUI::International::get(1007);
         $var{'contentType.form'} = WebGUI::Form::contentType({
                 name=>'contentType',
-                value=>[$self->get("contentType")] || ["mixed"]
+                value=>$self->get("contentType") || "mixed"
                 });
 	$var{'startDate.label'} = WebGUI::International::get(497);
 	$var{'endDate.label'} = WebGUI::International::get(498);
@@ -432,7 +432,7 @@ sub www_edit {
 		});
 	$var{'form.submit'} = WebGUI::Form::submit();
 	$var{'form.footer'} = WebGUI::Form::formFooter();
-	return $self->getParent->processStyle($self->processTemplate(\%var,$self->getParent->get("submissionFormTemplate")));
+	return $self->getParent->processStyle($self->processTemplate(\%var,$self->getParent->get("submissionFormTemplateId")));
 }
 
 #-------------------------------------------------------------------
