@@ -364,7 +364,7 @@ sub moveCollateralUp {
 	}
 	WebGUI::SQL->beginTransaction;
         my ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $table where $keyName=".quote($keyValue)." and $setName=".quote($setValue));
-        my ($id) = WebGUI::SQL->quickArray("select $table from $keyName where $setName=".quote($setValue)
+        my ($id) = WebGUI::SQL->quickArray("select $keyName from $table where $setName=".quote($setValue)
 		." and sequenceNumber=$seq-1");
         if ($id ne "") {
                 WebGUI::SQL->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".quote($keyValue)." and $setName="
