@@ -155,7 +155,7 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-sub duplcate {
+sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(shift);
 	my $sth = WebGUI::SQL->read("select * from Poll_answer where assetId=".quote($self->getId));
