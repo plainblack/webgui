@@ -711,6 +711,291 @@ If you leave this set at its default, then you will add a question directly afte
 		context=>q|This message is displayed when a user is trying to delete the last answer from a survey question.|	
 	},
 
+	'1087' => {
+		message => q|Gradebook Report Template|,
+		lastUpdated => 1078513217
+	},
+
+	'1088' => {
+		message => q|The following template variables are available in the survey's gradebook report:
+<p>
+
+<b>title</b><br>
+The default title of the report.
+<p>
+
+<b>question.count</b><br>
+The number of questions in the survey.
+<p>
+
+<b>response.user.label</b><br>
+The default label for response.user.name.
+<p>
+
+<b>response.count.label</b><br>
+The default label for response.count.correct.
+<p>
+
+<b>response.percent.label</b><br>
+The default label for response.percent.
+<p>
+
+<b>response_loop</b><br>
+A loop containing a list of responses.
+<p>
+
+<blockquote>
+
+<b>response.url</b><br>
+The URL to view this response.
+<p>
+
+<b>response.user.name</b><br>
+The username of the user that gave this response.
+<p>
+
+<b>response.count.correct</b><br>
+The total number of questions that this user got correct.
+<p>
+
+<b>response.percent</b><br>
+The percentage of correct questions.
+<p>
+
+</blockquote>|,
+		lastUpdated => 1078513217
+	},
+
+	'1089' => {
+		message => q|Survey Response Template|,
+		lastUpdated => 1078515839
+	},
+
+	'1090' => {
+		message => q|The following are the variables available to display the individual response.
+<p>
+
+<b>title</b><br>
+The default title for this report.
+<p>
+
+<b>delete.url</b><br>
+The URL to delete this response.
+<p>
+
+<b>delete.label</b><br>
+The default label for delete.url.
+<p>
+
+<b>start.date.label</b><br>
+The default label for start.date.human.
+<p>
+
+<b>start.date.epoch</b><br>
+The epoch representation of when the user started the survey response.
+<p>
+
+<b>start.date.human</b><br>
+The human representation of the date when the user started the response.
+<p>
+
+<b>start.time.human</b><br>
+The human representation of the time when the user started the response.
+<p>
+
+<b>end.date.label</b><br>
+The default label for end.date.human.
+<p>
+
+
+<b>end.date.epoch</b><br>
+The epoch representation of the date when the user completed this response.
+<p>
+
+<b>end.date.human</b><br>
+The human representation of the date when the user completed this response.
+<p>
+
+<b>end.time.human</b><br>
+The human representation of the time when the user completed this response.
+<p>
+
+<b>duration.label</b><br>
+The default label for the duration.
+<p>
+
+<b>duration.minutes</b><br>
+The number of minutes it took to complete the survey.
+<p>
+
+<b>duration.minutes.label</b><br>
+A label for "minutes".
+<p>
+
+
+<b>duration.seconds</b><br>
+The remainder seconds the duration.minutes calculations.
+<p>
+
+<b>duration.seconds.label</b><br>
+A label for "seconds".
+<p>
+
+
+<b>answer.label</b><br>
+The default label for question.answer.
+<p>
+
+
+<b>response.label</b><br>
+The default label for question.label.
+<p>
+
+<b>comment.label</b><br>
+The default label for question.comment.
+<p>
+
+<b>question_loop</b><br>
+A loop that includes the list of questions in this response.
+<p>
+
+<blockquote>
+
+<b>question</b><br>
+The question itself.
+<p>
+
+<b>question.id</b><br>
+The unique identifier for this question.
+<p>
+
+<b>question.isRadioList</b><br>
+A boolean indicating whether this question's answers are a radio list.
+<p>
+
+<b>question.response</b><br>
+The user's response to this question.
+<p>
+
+<b>question.comment</b><br>
+The user's comment on this question (if any).
+<p>
+
+<b>question.isCorrect</b><br>
+A boolean indicating whether the user got this question correct.
+<p>
+
+
+<b>question.answer</b><br>
+The correct answer for this question.
+<p>
+
+
+</blockquote>|,
+		lastUpdated => 1078515839
+	},
+
+	'1091' => {
+		message => q|Statistical Overview Report Template|,
+		lastUpdated => 1078517114
+	},
+
+	'1092' => {
+		message => q|The following are the variables available in this template:
+<p>
+
+<b>title</b><br>
+The default title for this report.
+<p>
+
+<b>answer.label</b><br>
+The default label for answer_loop.
+<p>
+
+<b>response.count.label</b><br>
+The default label for response.count.
+<p>
+
+<b>response.percent.label</b><br>
+The default label for response.percent.
+<p>
+
+<b>show.responses.label</b><br>
+The default label that will display responses.
+<p>
+
+<b>show.comments.label</b><br>
+The default label that will display comments.
+<p>
+
+<b>question_loop</b><br>
+A loop containing questions.
+<p>
+
+<blockquote>
+
+<b>question</b><br>
+The question itself.
+<p>
+
+<b>question.id</b><br>
+The unique identifier for this question.
+<p>
+
+<b>question.isRadioList</b><br>
+A boolean indicating whether the answer for this question is a radio list.
+<p>
+
+<b>question.response.total</b><br>
+The total number of responses for this answer.
+<p>
+
+<b>question.allowComment</b><br>
+A boolean indicating whether this question allows comments.
+<p>
+
+<b>answer_loop</b><br>
+A loop containing the answers and responses for this question.
+<p>
+<blockquote>
+
+<b>answer.isCorrect</b><br>
+A boolean indicating whether this answer is marked correct.
+<p>
+
+<b>answer</b><br>
+The answer itself.
+<p>
+
+<b>answer.response.count</b><br>
+The total number of responses given for this answer.
+<p>
+
+<b>answer.response.percent</b><br>
+The percent of responses to this question that went to this answer.
+<p>
+
+
+<b>comment_loop</b><br>
+A loop that contains all of the comments for this answer.
+<p>
+
+<blockquote>
+<b>answer.comment</b><br>
+A comment.
+<p>
+
+
+</blockquote>
+
+</blockquote>
+
+
+</blockquote>|,
+		lastUpdated => 1078517114
+	},
+
+
 };
 
 1;
