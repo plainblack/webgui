@@ -37,11 +37,14 @@ delete from widget where namespace='Item';
 alter table Item drop column description;
 alter table Item change widgetId wobjectId int not null;
 
-
 insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='FAQ';
 delete from widget where namespace='FAQ';
 alter table FAQ change widgetId wobjectId int not null;
 alter table FAQ_question change widgetId wobjectId int not null;
+
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='SiteMap';
+delete from widget where namespace='SiteMap';
+alter table SiteMap change widgetId wobjectId int not null;
 
 
 

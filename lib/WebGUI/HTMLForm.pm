@@ -553,7 +553,7 @@ sub integer {
         $class = shift;
         $name = shift;
         $label = shift;
-        $value = shift;
+        $value = shift || 0;
         $value = _fixQuotes($value);
         $maxLength = shift || 11;
         $extras = shift;

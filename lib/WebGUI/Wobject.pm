@@ -248,7 +248,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 set ( [ hashRef ] )
+=head2 set ( [ hashRef, arrayRef ] )
 
  Stores the values specified in hashRef to the database.
 
@@ -264,10 +264,16 @@ sub purge {
  title, displayTitle, description, processMacros,
  pageId, templatePosition, startDate, endDate, sequenceNumber
 
+=item arrayRef
+
+ An array reference containing a list of properties associated
+ with this Wobject class. The items in the list should marry
+ up to fields in the Wobject extention table for this class.
+
 =cut
 
 sub set {
-	my ($key, $sql);
+	my ($key, $sql, @update, $i);
 	if ($_[0]->{_property}{wobjectId} eq "new") {
 		$_[0]->{_property}{wobjectId} = getNextId("widgetId");
 		$_[0]->{_property}{pageId} = ${$_[1]}{pageId} || $session{page}{pageId};
@@ -294,11 +300,18 @@ sub set {
 		if (isIn($key, qw(title displayTitle description processMacros pageId templatePosition startDate endDate sequenceNumber))) {
         		$sql .= " ".$key."=".quote(${$_[1]}{$key}).",";
 		}
+                if (isIn($key, @{$_[2]})) {
+                        $update[$i] .= " ".$key."=".quote($_[1]->{$key});
+                        $i++;
+                }
 	}
 	$sql .= " lastEdited=".$_[0]->{_property}{lastEdited}.", 
 		editedBy=".$_[0]->{_property}{editedBy}." 
 		where wobjectId=".$_[0]->{_property}{wobjectId};
 	WebGUI::SQL->write($sql);
+	if (@update) {
+        	WebGUI::SQL->write("update ".$_[0]->{_property}{namespace}." set ".join(",",@update)." where wobjectId=".$_[0]->{_property}{wobjectId});
+	}
 }
 
 #-------------------------------------------------------------------

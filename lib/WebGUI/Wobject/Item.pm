@@ -34,7 +34,7 @@ sub duplicate {
 	$w = WebGUI::Wobject::Item->new({wobjectId=>$w,namespace=>$namespace});
 	$w->set({
 		linkURL=>$_[0]->get("linkURL"),
-		attachment=>$_[0]->get("attachment"),
+		attachment=>$_[0]->get("attachment")
 		});
 	$f = WebGUI::Attachment->new($_[0]->get("attachment"),$_[0]->get("wobjectId"));
 	$f->copy($w->get("wobjectId"));
@@ -51,15 +51,7 @@ sub new {
 
 #-------------------------------------------------------------------
 sub set {
-	my ($key, $sql, @update, $i);
-	$_[0]->SUPER::set($_[1]);
-        foreach $key (keys %{$_[1]}) {
-                if (isIn($key, qw(linkURL attachment))) {
-                        $update[$i] .= " ".$key."=".quote($_[1]->{$key});
-			$i++;
-                }
-        }
-	WebGUI::SQL->write("update Item set".join(",",@update)." where wobjectId=".$_[0]->get("wobjectId")) if (@update);
+	$_[0]->SUPER::set($_[1],[qw(linkURL attachment)]);
 }
 
 #-------------------------------------------------------------------
