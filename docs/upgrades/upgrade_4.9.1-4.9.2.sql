@@ -21,3 +21,5 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (3,1,'Auth/SMB','SMB Protocol Error (2)<br>Please contact your sysadmin.', 1039452769);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (2,1,'Auth/SMB','SMB Server Error (1)<br>Something went wrong accessing the domain controller. Perhaps the connection timed out. Please try again or contact your sysadmin.', 1039452744);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (1,1,'Auth/SMB','SMB Authentication Options', 1039451963);
+alter table EventsCalendar_event add index EventsCalendar1 (wobjectId,endDate,startDate);
+
