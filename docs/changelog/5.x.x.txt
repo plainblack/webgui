@@ -1,3 +1,8 @@
+5.5.6
+ - [ 895067 ] Forum ID Missing In USS
+
+
+
 5.5.5
  - Fixed a bug in AdminBar's clipboard code where a standard hash was
    used instead of a CPHash for database access.  (Thanks to Steve Simms.)

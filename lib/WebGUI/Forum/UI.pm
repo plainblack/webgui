@@ -1782,9 +1782,9 @@ sub www_post {
 	my ($subject, $message, $forum);
 	my $var;
 	$var->{'newpost.header'} = WebGUI::International::get(1064);
-	$var->{'newpost.isNewThread'} = ($session{form}{parentId} eq "");
 	$var->{'newpost.isReply'} = ($session{form}{parentId} ne "");
 	$var->{'newpost.isEdit'} = ($session{form}{forumPostId} ne "");
+	$var->{'newpost.isNewThread'} = ($session{form}{parentId} eq "" && !$var->{'newpost.isEdit'});
 	$var->{'user.isVisitor'} = ($session{user}{userId} == 1);
 	$var->{'newpost.isNewMessage'} = ($var->{'newpost.isNewThread'} || $var->{'newpost.isReply'});
 	$var->{'form.begin'} = WebGUI::Form::formHeader({
