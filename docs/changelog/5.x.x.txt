@@ -8,6 +8,8 @@
  - Fixed bug [ 843591 ] Fatal error while creating a new Message Board if
    there are no Forums yet.
  - Fixed bug [ 844196 ] Time formats
+ - Fixed a bug in the forum where new replies defaulted to always subscribing
+   the user to the thread.
 
 
 5.5.1

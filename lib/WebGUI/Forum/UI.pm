@@ -1773,7 +1773,7 @@ sub www_post {
 	my ($subject, $message, $forum);
 	my $var;
 	$var->{'newpost.header'} = WebGUI::International::get(1064);
-	$var->{'newpost.isNewThread'} = ($session{form}{forumId} ne "");
+	$var->{'newpost.isNewThread'} = ($session{form}{parentId} eq "");
 	$var->{'newpost.isReply'} = ($session{form}{parentId} ne "");
 	$var->{'newpost.isEdit'} = ($session{form}{forumPostId} ne "");
 	$var->{'user.isVisitor'} = ($session{user}{userId} == 1);
@@ -1803,7 +1803,6 @@ sub www_post {
 			value=>$session{form}{forumId}
 			});
 		$forum = WebGUI::Forum->new($session{form}{forumId});
-		return WebGUI::Privilege::insufficient unless ($forum->canPost);
 		if ($forum->isModerator) {
 			$var->{'sticky.label'} = WebGUI::International::get(1013);
 			$var->{'sticky.form'} = WebGUI::Form::yesNo({
@@ -1815,6 +1814,7 @@ sub www_post {
 	}
 	if ($var->{'newpost.isNewMessage'}) {
 		$var->{'subscribe.label'} = WebGUI::International::get(873);
+		return WebGUI::Privilege::insufficient unless ($forum->canPost);
 		if ($forum->isModerator) {
 			$var->{'lock.label'} = WebGUI::International::get(1012);
 			$var->{'lock.form'} = WebGUI::Form::yesNo({
