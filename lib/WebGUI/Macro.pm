@@ -46,33 +46,24 @@ These functions are available from this package:
 
 
 
-#-------------------------------------------------------------------
-# Returns a complex regular expression for matching macro patterns.
-sub _nestedMacro {
-   my $nestedMacro = qr /\^                     # Start with carat
-                       ([^\^;()]+)            # And one or more none-macro characters -tagged-
-                       ((?:                   # Followed by
-                       (??{ $parenthesis })   # a balanced parenthesis block
-                       |(?>[^\^;])            # Or not a carat or semicolon
-                       |(??{ $nestedMacro }) # Or a balanced carat-semicolon block
-                       )*)                    # zero or more times -tagged-
-                       ;/x;                   # End with  a semicolon.
-   return $nestedMacro;
-}
+our $nestedMacro = qr /(\^                     # Start with carat
+                     ([^\^;()]+)            # And one or more none-macro characters -tagged-
+                     ((?:                   # Followed by
+                     (??{ $parenthesis })   # a balanced parenthesis block
+                     |(?>[^\^;])            # Or not a carat or semicolon
+#                    |(??{ $nestedMacro }) # Or a balanced carat-semicolon block
+                     )*)                    # zero or more times -tagged-
+                     ;)/x;                   # End with  a semicolon.
 
 
 
-#-------------------------------------------------------------------
-# Returns a regular expression for matching balanced parenthesis patterns.
-sub _parenthesis {
-   my $parenthesis = qr /\(                      # Start with '(',
-                      (?:                     # Followed by
-                      (?>[^()]+)              # Non-parenthesis
-                      |(??{ $parenthesis })   # Or a balanced parenthesis block
-                      )*                      # zero or more times
-                      \)/x;                  # Ending with ')'
-   return $parenthesis;
-}
+our $parenthesis = qr /\(                      # Start with '(',
+                     (?:                     # Followed by
+                     (?>[^()]+)              # Non-parenthesis
+                     |(??{ $parenthesis })   # Or a balanced parenthesis block
+                     )*                      # zero or more times
+                     \)/x;                  # Ending with ')'
+
 #-------------------------------------------------------------------
 
 =head2 filter ( html )
@@ -91,8 +82,6 @@ The segment to be filtered.
 
 sub filter {
 	my $content = shift;
-	my $parenthesis = _parenthesis();
-        my $nestedMacro = _nestedMacro();
         while ($content =~ /($nestedMacro)/gs) {
 		$content =~ s/\Q$1//gs;
 	}
@@ -169,9 +158,7 @@ A string of HTML to be processed.
 
 sub process {
    	my $content = shift;
-	my $parenthesis = _parenthesis();
-   	my $nestedMacro = _nestedMacro();
-   	while ($content =~ /($nestedMacro)/gs) {
+   	while ($content =~ /$nestedMacro/gs) {
       		my ($macro, $searchString, $params) = ($1, $2, $3);
       		next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
       		next if ($searchString =~ /^\-$/); # don't process ^-;
