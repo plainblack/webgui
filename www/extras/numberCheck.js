@@ -1,5 +1,5 @@
 function doNumCheck(field) {
-	var valid = "0123456789"
+	var valid = "0123456789-";
         var ok = "yes";
         var temp;
         for (var i=0; i<field.value.length; i++) {
