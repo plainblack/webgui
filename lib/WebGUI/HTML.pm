@@ -59,6 +59,7 @@ use WebGUI::Session;
 sub cleanSegment {
 	my ($style, $value);
 	$value = $_[0];
+	$value =~ s/\r/\n/g;
 	$value =~ m/(\<style.*?\/style\>)/ixsg;
 	$style = $1;
 	$value =~ s/\A.*?\<body.*?\>(.*?)/$style$1/ixsg;
