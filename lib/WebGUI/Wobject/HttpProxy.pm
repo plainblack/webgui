@@ -166,7 +166,7 @@ sub www_view {
       }
 
       $header = new HTTP::Headers;
-	$header->referer($_[0]->get("proxiedURL")); # To get around referrer blocking
+	$header->referer($_[0]->get("proxiedUrl")); # To get around referrer blocking
 
       if($session{env}{REQUEST_METHOD}=~/GET/i 
          || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
