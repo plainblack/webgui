@@ -4647,9 +4647,9 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	},
 
 	'1086' => {
-		message => q|Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables. These are those:
+		message => q|Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables:
 
-<br /><br />
+<p>
 
 <b>pagination.firstPage</b><br>
 A link to the first page in the paginator.
@@ -4702,7 +4702,7 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 <p> 
 
 |,
-		lastUpdated => 1082370668
+		lastUpdated => 1102031794,
 	},
 
 	'701' => {
@@ -6491,9 +6491,9 @@ A randomly generated number. This is often used on images (such as banner ads) t
 	'Page, Export body' => {
                 message => q|
 <p>The Export Page function allows you to export WebGUI pages to static HTML
-files on disk. <br>
+files on disk.
 The &quot;exportPath&quot; variable in the WebGUI config file must be enabled
-for this function to work properly.</p>
+for this function to be available.</p>
 <p><b>Depth<br>
 </b>Sets the depth of the page tree to export. Use a depth of 0 to export only
 the current page. </p>
@@ -6509,7 +6509,7 @@ config file.</p>
 </b>Sets the Uploads URL. Defaults to the configured uploadsURL in the WebGUI
 config file.</p>
 				|,
-                lastUpdated => 1099870750,
+                lastUpdated => 1102031745,
                 context => q|Help body for Page Export operation|
         },
 	'Forum, Threads Per Page' => {
