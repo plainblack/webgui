@@ -361,7 +361,7 @@ sub getSynopsisAndContentFromFormPost {
 	unless ($synopsis) {
         	$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
        	 	my @content = split(/\^\-\;/,$body);
-		$synopsis = WebGUI::HTML::filter($content[0],"none");
+		$synopsis = WebGUI::HTML::filter($content[0],"all");
 	}
 	$body =~ s/\^\-\;/\n/;
 	return ($synopsis,$body);
@@ -403,6 +403,7 @@ sub getTemplateVars {
         $var{'hasRated'} = $self->hasRated;
 	my $gotImage;
 	my $gotAttachment;
+	@{$var{'attachment_loop'}} = ();
 	unless ($self->get("storageId") eq "") {
 		my $storage = $self->getStorageLocation;
 		foreach my $filename (@{$storage->getFiles}) {
@@ -663,7 +664,9 @@ sub processPropertiesFromFormPost {
 	if (defined $filename) {
 		$self->setSize($storage->getFileSize($filename));
 		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
-		$storage->generateThumbnail($filename);
+		foreach my $file (@{$storage->getFiles}) {
+			$storage->generateThumbnail($file);
+		}
 	}
 	$session{form}{proceed} = "redirectToParent";
 	# clear some cache
@@ -891,7 +894,7 @@ sub www_edit {
 		$title = $self->getValue("title");
 	}
 	if ($session{form}{title} || $session{form}{content} || $session{form}{synopsis}) {
-		$var{'preview.title'} = WebGUI::HTML::filter($session{form}{title},"none");
+		$var{'preview.title'} = WebGUI::HTML::filter($session{form}{title},"all");
 		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContentFromFormPost;
 		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$session{form}{contentType});
 	}
@@ -920,9 +923,15 @@ sub www_edit {
 			value=>$self->getValue("userDefined".$x)
 			});
 	}
+	$title = WebGUI::HTML::filter($title,"all");
+	$content = WebGUI::HTML::filter($content,"macros");
 	$var{'title.form'} = WebGUI::Form::text({
 		name=>"title",
 		value=>$title
+		});
+	$var{'synopsis.form'} = WebGUI::Form::textarea({
+		name=>"synopsis",
+		value=>WebGUI::HTML::filter($self->getValue("synopsis"),"all")
 		});
 	$var{'title.form.textarea'} = WebGUI::Form::textarea({
 		name=>"title",
