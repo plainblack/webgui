@@ -19,7 +19,7 @@ sub process {
         my ($temp, @param);
         @param = WebGUI::Macro::getParams($_[0]);
         if ($param[0] ne "") {
-        	$temp = round(rand()*$1);
+        	$temp = round(rand()*$param[0]);
         } else {
         	$temp = round(rand()*1000000000);
         }

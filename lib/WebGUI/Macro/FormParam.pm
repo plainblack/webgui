@@ -16,7 +16,7 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($1);
+	my @param = WebGUI::Macro::getParams($_[0]);
 	return $session{form}{$param[0]};
 }
 
