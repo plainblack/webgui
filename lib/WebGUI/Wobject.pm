@@ -567,15 +567,21 @@ This method should be overridden by all wobjects and should return an internatio
 =cut
 
 sub name {
-	my $cmd = "\$WebGUI::Wobject::".$_[0]->get("namespace")."::name";
-	my $name = eval($cmd);
-	if ($@) {
-		WebGUI::ErrorHandler::warn($_[0]->get("namespace")." does not appear to have any sort of name definition at all.");
-		return $_[0]->get("namespace");
+	my $namespace = $_[0]->get("namespace");
+	if ($namespace eq "") {
+		WebGUI::ErrorHandler::warn("No namespace available in this wobject instance.");
+		return "! Unknown Wobject !";
 	} else {
+		my $cmd = "\$WebGUI::Wobject::".$namespace."::name";
+		my $name = eval($cmd);
+		if ($name eq "") {
+			WebGUI::ErrorHandler::warn($namespace." does not appear to have any sort of name definition at all.");
+			return $namespace;
+		}
 		return $name;
 	}
-}
+} 
+
 
 #-------------------------------------------------------------------
 
@@ -620,7 +626,13 @@ NOTE: This is used to define the wobject and should only be passed in by a wobje
 
 sub new {
 	my ($self, @p) = @_;
-        my ($properties, $extendedProperties, $useDiscussion) = rearrange([qw(properties extendedProperties useDiscussion)], @p);
+ 	my ($properties, $extendedProperties, $useDiscussion);
+	if (ref $_[1] eq "HASH") {
+		$properties = $_[1]; # reverse compatibility prior to 5.2
+	} else {
+		($properties, $extendedProperties, $useDiscussion) = 
+			rearrange([qw(properties extendedProperties useDiscussion)], @p);
+	} 
 	$useDiscussion = 0 unless ($useDiscussion);
 	my $wobjectProperties = {
 		userDefined1=>{},
