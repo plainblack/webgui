@@ -1,5 +1,6 @@
 5.5.7
  - bugfix [ 935552 ] USS bug (w/ and w/o img mixed posts). 
+ - bugfix [ 926610 ] WebGUI::Wobject::Article
 
 
 5.5.6
