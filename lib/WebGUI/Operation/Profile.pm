@@ -96,12 +96,12 @@ sub getRequiredProfileFields {
 		  my $cmd = 'WebGUI::Form::'.$method.'({"name"=>$data->{fieldName},"value"=>$default})';
 		  $hash{'profile.formElement'} = eval($cmd);
 		  
-      }
-	  $hash{'profile.formElement.label'} = $label;
-	  push(@array,\%hash)
-   }
-   $a->finish;
-   return \@array;
+       }
+	   $hash{'profile.formElement.label'} = $label;
+	   push(@array,\%hash)
+    }
+    $a->finish;
+    return \@array;
 }
 
 #-------------------------------------------------------------------
@@ -154,71 +154,75 @@ sub validateProfileData {
    return (\%data, $error, $warning);
 }
 
-
 #-------------------------------------------------------------------
 sub www_editProfile {
-   my ($output, $f, $a, %data, $method, $values, $category, $label, $default, $previousCategory, $subtext);
+   my ($a, $data, $method, $values, $category, $label, $default, $previousCategory, $subtext, $vars, @profile, @array);
    return WebGUI::Operation::Auth::www_auth("init") if($session{user}{userId} == 1);
    
-   tie %data, 'Tie::CPHash';
-   $output .= '<h1>'.WebGUI::International::get(338).'</h1>';
-   $f = WebGUI::HTMLForm->new;
-   $f->hidden("op","editProfileSave");
-   $f->hidden("uid",$session{user}{userId});
+   $vars->{displayTitle} .= '<h1>'.WebGUI::International::get(338).'</h1>';
+   
+   $vars->{'profile.message'} = $_[0] if($_[0]);
+   $vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader({});
+   $vars->{'profile.form.footer'} = "</form>";
+   
+   $vars->{'profile.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"editProfileSave"});
+   $vars->{'profile.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session{user}{userId}});
+	
    $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
 		                   and userProfileCategory.editable=1 and userProfileField.editable=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
-      
-   while(%data = $a->hash) {
-      $category = eval $data{categoryName};
-      if ($category ne $previousCategory) {
-         $f->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
-      }
-      $values = eval $data{dataValues};
-      $method = $data{dataType};
-      $label = eval $data{fieldLabel};
-	  $subtext = "";
-	  if ($data{required}) {
-	     $subtext = "*";
-	  }
-      
-	  $default = eval $data{dataDefault};
-	  
-	  if ($method eq "selectList") {
-         # note: this big if statement doesn't look elegant, but doing regular ORs caused problems with the array reference.
-		 if ($session{form}{$data{fieldName}}) {
-			$default = [$session{form}{$data{fieldName}}];
-		 } elsif ($session{user}{$data{fieldName}}) {
-			$default = [$session{user}{$data{fieldName}}];
-		 }
-         
-		 $f->select(
-			        -name=>$data{fieldName},
-					-options=>$values,
-					-label=>$label,
-					-value=>$default,
-					-subtext=>$subtext
-		 );
-      } else {
-	     if ($session{form}{$data{fieldName}}) {
-		    $default = $session{form}{$data{fieldName}};
-		 } elsif (exists $session{user}{$data{fieldName}}) {
-		    $default = $session{user}{$data{fieldName}};
-		 }
-		 
-         $f->$method(
-			        -name=>$data{fieldName},
-					-label=>$label,
-					-value=>$default,
-					-subtext=>$subtext
-		 );
-      }
-      $previousCategory = $category;
-   }
-   $a->finish;
-   $f->submit;
-   $output .= $f->print;
-   $output .= accountOptions();
-   return $output;
+   my $counter = 0;
+   while($data = $a->hashRef) {
+       $counter++;
+	   my %hash = ();
+	   $category = eval $data->{categoryName};
+       $method = $data->{dataType};
+       $label = eval $data->{fieldLabel};
+	   $default = eval $data->{dataDefault};
+	   
+	   if ($method eq "selectList") {
+          $values = eval $data->{dataValues};
+		  # note: this big if statement doesn't look elegant, but doing regular ORs caused problems with the array reference.
+          if ($session{form}{$data->{fieldName}}) {
+             $default = [$session{form}{$data->{fieldName}}];
+	      } elsif ($session{user}{$data->{fieldName}}) {
+        	 $default = [$session{user}{$data->{fieldName}}];
+          } 
+          $hash{'profile.form.element'} = WebGUI::Form::selectList({
+                        "name"=>$data->{fieldName},
+                        "options"=>$values,
+                        "value"=>$default
+                        });
+	   } else {
+          if ($session{form}{$data->{fieldName}}) {
+             $default = $session{form}{$data->{fieldName}};
+          } elsif (exists $session{user}{$data->{fieldName}}) {
+             $default = $session{user}{$data->{fieldName}};
+	      }
+		  my $cmd = 'WebGUI::Form::'.$method.'({"name"=>$data->{fieldName},"value"=>$default})';
+		  $hash{'profile.form.element'} = eval($cmd);
+		  
+       }
+	   $hash{'profile.form.element.label'} = $label;
+	   if ($data->{required}) {
+	      $hash{'profile.form.element.subtext'} = "*";
+	   }
+	   if (($previousCategory && $category ne $previousCategory) || $counter eq $a->rows) {
+          my @temp = @profile;
+		  my $hashRef;
+		  $hashRef->{'profile.form.category'} = $previousCategory;
+		  $hashRef->{'profile.form.category.loop'} = \@temp;
+		  push(@array,$hashRef);
+		  @profile = ();
+	   }
+	   push(@profile,\%hash);
+	   $previousCategory = $category;
+    }
+    $a->finish;
+	
+	$vars->{'profile.form.elements'} = \@array;
+    $vars->{'profile.form.submit'} = WebGUI::Form::submit({});
+    $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
+	return WebGUI::Template::process(WebGUI::Template::get(1,'Operation/Profile/Edit'), $vars);
 }
 
 #-------------------------------------------------------------------
@@ -229,7 +233,7 @@ sub www_editProfileSave {
 	($profile, $error, $warning) = validateProfileData();
 	$error .= $warning;
     
-	return '<ul>'.$error.'</ul>'.www_editProfile() if($error ne "");
+	return www_editProfile('<ul>'.$error.'</ul>') if($error ne "");
     
 	$u = WebGUI::User->new($session{user}{userId});
     foreach $fieldName (keys %{$profile}) {
@@ -240,23 +244,24 @@ sub www_editProfileSave {
 
 #-------------------------------------------------------------------
 sub www_viewProfile {
-    my ($a, %data, $category, $label, $value, $previousCategory, $output, $u, %gender);
+    my ($a, %data, $category, $label, $value, $previousCategory, $u, %gender,$vars,@array);
 	%gender = ('neuter'=>WebGUI::International::get(403),'male'=>WebGUI::International::get(339),'female'=>WebGUI::International::get(340));
 	$u = WebGUI::User->new($session{form}{uid});
-    my $header = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
+    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
 	return WebGUI::Privilege::notMember() if($u->username eq "");
-	return $header.WebGUI::International::get(862) if($u->profileField("publicProfile") < 1);
+	return $vars->{displayTitle}.WebGUI::International::get(862) if($u->profileField("publicProfile") < 1);
 	return WebGUI::Privilege::insufficient() if(!WebGUI::Privilege::isInGroup(2));
-    $output = $header;
-    $output .= '<table>';
     $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
 		                    and userProfileCategory.visible=1 and userProfileField.visible=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
     while (%data = $a->hash) {
-       $category = eval $data{categoryName};
+	   $category = eval $data{categoryName};
        if ($category ne $previousCategory) {
-          $output .= '<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>';
+          my $header;
+		  $header->{'profile.category'} = $category;
+		  push(@array,$header);
        }
-       $label = eval $data{fieldLabel};
+	   
+	   $label = eval $data{fieldLabel};
 	   if ($data{dataValues}) {
 	      $value = eval $data{dataValues};
 		  $value = ${$value}{$u->profileField($data{fieldName})};
@@ -267,15 +272,19 @@ sub www_viewProfile {
           $value = WebGUI::DateTime::epochToHuman($value,"%z");
        }
 	   unless ($data{fieldName} eq "email" and $u->profileField("publicEmail") < 1) {
-		  $output .= '<tr><td class="tableHeader">'.$label.'</td><td class="tableData">'.$value.'</td></tr>';
+		  my $hash;
+		  $hash->{'profile.label'} = $label;
+		  $hash->{'profile.value'} = $value;
+		  push(@array,$hash);
 	   }
        $previousCategory = $category;
     }
+	$vars->{'profile.elements'} = \@array;
     $a->finish;
-    $output .= '</table>';
 	if ($session{user}{userId} == $session{form}{uid}) {
-       $output .= accountOptions();
+       $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
-	return $output;
-
+    return WebGUI::Template::process(WebGUI::Template::get(1,'Operation/Profile/View'), $vars);
 }
+
+1;
