@@ -6,7 +6,7 @@
  - Improved pasting performance.
  - fix [ 1157196 ] manage system clipboard wrong title
  - fix [ 1154150 ] No time in forum overview
-
+ - fix [ 1152434 ] Last Reply column is blank in a forum [mwilson]
 
 6.5.0
  - Added content prototypes.
