@@ -1,3 +1,6 @@
+5.5.4
+ - Bugfix [ 849210 ] Login Redirect should filter out the "logout" operation
+
 5.5.3
  - Lowercase file extension in importCollateral.pl while determinating file
    type.
