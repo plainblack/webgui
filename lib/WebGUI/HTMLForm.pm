@@ -754,7 +754,7 @@ sub interval {
 
 #-------------------------------------------------------------------
 
-=head2 new ( [ noTable, action, extras, method, enctype ] )
+=head2 new ( [ noTable, action, method, extras, enctype ] )
 
  Constructor.
 
@@ -768,6 +768,11 @@ sub interval {
  The Action URL for the form information to be submitted to. This
  defaults to the current page.
 
+=item method
+
+ The form's submission method. This defaults to "POST" and probably
+ shouldn't be changed.
+
 =item extras
 
  If you want to add anything special to your form like javascript
@@ -775,11 +780,6 @@ sub interval {
  follows:
 
    'name="myForm" onChange="myForm.submit()"'
-
-=item method
-
- The form's submission method. This defaults to "POST" and probably
- shouldn't be changed. 
 
 =item enctype 
 
