@@ -11,8 +11,12 @@ our $I18N = {
 
 <p>
 
-<b>URL</b><br>
+<b>URL to proxy</b><br>
 The starting URL for the proxy.
+<p>
+
+<b>Allow proxying of other domains?</b><br>
+If you proxy a site like Yahoo! that links to other domains, do you wish to allow the user to follow the links to those other domains, or should the proxy stop them as they try to leave the original site you specified?
 <p>
 
 <b>Follow redirects?</b><br>
@@ -23,8 +27,8 @@ Sometimes the URL to a page is actually a redirection to another page. Do you wi
 Switch this to No if you want to deep link an external page.
 <p>
 
-<b>Timeout</b><br>
-The amount of time (in seconds) that WebGUI should wait for a connection before giving up on an external page.
+<b>Template</b><br>
+Use this select list to choose a template to show the output of the proxied content.
 <p>
 
 <b>Remove style?</b><br>
@@ -35,6 +39,10 @@ Do you wish to remove the stylesheet from the proxied content in favor of the st
 Choose the level of HTML filtering you wish to apply to the proxied content.
 <p>
 
+<b>Timeout</b><br>
+The amount of time (in seconds) that WebGUI should wait for a connection before giving up on an external page.
+<p>
+
 <b>Search for</b><br>
 A search string used as starting point. Use this when you want to display only a part of the proxied content. Content before this point is not displayed
 <p>
@@ -42,14 +50,41 @@ A search string used as starting point. Use this when you want to display only a
 <b>Stop at</b><br>
 A search string used as ending point. Content after this point is not displayed.
 <p>
-<i>Note: The <b>Search for</b> and <b>Stop at</b> strings are included in the content. You can change this by editing the template for HttpProxy.</i>
+<i>Note: The <b>Search for</b> and <b>Stop at</b> strings are included in the content in the default template. You can change this by creating your own template.</i>
 <p>
 
-<b>Allow proxying of other domains?</b><br>
-If you proxy a site like Yahoo! that links to other domains, do you wish to allow the user to follow the links to those other domains, or should the proxy stop them as they try to leave the original site you specified?
-<p>
 |,
-		lastUpdated => 1101773206
+		lastUpdated => 1109715109,
+	},
+
+	'http proxy template title' => {
+		message => q|HTTP Proxy Template|,
+		lastUpdated => 1109714266,
+	},
+
+	'http proxy template body' => {
+		message => q|<p>The following variables are available in templates for HTTP Proxies:</p>
+<p><b>header</b><br>
+The header from the proxied URL.
+
+<p><b>content</b><br>
+The content from the proxied URL.  If the <b>Search for</b> or <b>Stop at</b> properties are used, then the content will not contain either of those.
+
+<p><b>search.for</b><br>
+The string used to start the content search.
+
+<p><b>stop.at</b><br>
+The string used to stop the content search.
+
+<p><b>content.leading</b><br>
+Any text before the <b>Search For</b> string.
+
+<p><b>content.trailing</b><br>
+Any text after the <b>Stop At</b> string.
+
+</p>
+|,
+		lastUpdated => 1109714266,
 	},
 
 	'3' => {
@@ -83,7 +118,7 @@ If you proxy a site like Yahoo! that links to other domains, do you wish to allo
 	},
 
 	'1' => {
-		message => q|URL|,
+		message => q|URL to proxy|,
 		lastUpdated => 1031510000
 	},
 

@@ -6,11 +6,35 @@ our $HELP = {
 		body => '11',
 		related => [
 			{
-				tag => 'wobjects using',
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+			{
+				tag => 'wobjects add/edit',
 				namespace => 'WebGUI'
-			}
+			},
+			{
+				tag => 'http proxy template',
+				namespace => 'HttpProxy'
+			},
 		]
 	},
+
+	'http proxy template' => {
+		title => 'http proxy template title',
+		body => 'http proxy template body',
+		related => [
+			{
+				tag => 'http proxy add/edit',
+				namespace => 'HttpProxy'
+			},
+			{
+				tag => 'template language',
+				namespace => 'Template'
+			},
+		]
+	},
+
 };
 
 1;
