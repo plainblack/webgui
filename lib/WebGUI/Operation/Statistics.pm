@@ -24,7 +24,8 @@ use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_viewStatistics &www_killSession &www_viewLoginHistory &www_viewActiveSessions);
+our @EXPORT = qw(&www_viewPageReport &www_viewStatistics &www_viewTrafficReport &www_killSession 
+	&www_viewLoginHistory &www_viewActiveSessions);
 
 #-------------------------------------------------------------------
 sub www_killSession {
@@ -104,6 +105,39 @@ sub www_viewLoginHistory {
 }
 
 #-------------------------------------------------------------------
+sub www_viewPageReport {
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Privilege::isInGroup(3));
+	my ($output, $count, $user, $data, $sth, $page, $pageId);
+	$sth = WebGUI::SQL->read("select pageTitle,pageId,userId,ipAddress,wobjectId from pageStatistics order by pageTitle,userId,ipAddress");
+	while ($data = $sth->hashRef) {
+		if ($data->{userId} == 1) {
+			$user = $data->{ipAddress};
+		} else {
+			$user = $data->{userId};
+		}
+		$page->{$data->{pageId}}{pageTitle} = $data->{pageTitle};
+		$page->{$data->{pageId}}{users}{$user}++;
+		$page->{$data->{pageId}}{views}++;
+		$page->{$data->{pageId}}{interact}++ if ($data->{wobjectId});
+	}
+	$sth->finish;
+	$output = '<h1>Page Statistics</h1>';
+	$output .= '<table><tr><td>Page Title</td><td>Page Views</td><td>Unique Visitors</td><td>Wobject Interactions</td></tr>';
+	foreach $pageId (keys %{$page}) {
+		$output .= '<tr><td>'.$page->{$pageId}{pageTitle}.'</td>';
+		$output .= '<td>'.$page->{$pageId}{views}.'</td>';
+		$count = 0;
+		foreach (keys %{$page->{$pageId}{users}}) {
+			$count++;
+		}
+		$output .= '<td>'.$count.'</td>';
+		$output .= '<td>'.$page->{$pageId}{interact}.'</td></tr>';
+	}
+	$output .= '</table>';
+	return $output;
+}
+
+#-------------------------------------------------------------------
 sub www_viewStatistics {
         my ($output, $data, $header, $userAgent, $request, $response, $version, $referer);
         if (WebGUI::Privilege::isInGroup(3)) {
@@ -143,7 +177,29 @@ sub www_viewStatistics {
         return $output;
 }
 
-
+#-------------------------------------------------------------------
+sub www_viewTrafficReport {
+	return WebGUI::Privilege::adminOnly() unless WebGUI::Privilege::isInGroup(3);
+	my ($output, $data);
+	$output = '<h1>Pages</h1>';
+	($data) = WebGUI::SQL->quickArray("select count(*) from pageStatistics where dateStamp>=".(time()-2592000));
+	$output .= "Last 30 days: ".$data."<br>";
+	($data) = WebGUI::SQL->quickArray("select count(*) from pageStatistics where dateStamp>=".(time()-604800));
+	$output .= "Last 7 days: ".$data."<br>";
+        ($data) = WebGUI::SQL->quickArray("select count(*) from pageStatistics where dateStamp>=".(time()-86400));
+        $output .= "Last 24 hours: ".$data."<br>";
+        $output .= '<h1>Visitors</h1>';
+        ($data) = WebGUI::SQL->quickArray("select count(*) from pageStatistics where dateStamp>=".(time()-2592000)
+		." group by ipAddress,userId");
+        $output .= "Last 30 days: ".$data."<br>";
+        ($data) = WebGUI::SQL->quickArray("select count(*) from pageStatistics where dateStamp>=".(time()-604800)
+		." group by ipAddress,userId");
+        $output .= "Last 7 days: ".$data."<br>";
+        ($data) = WebGUI::SQL->quickArray("select count(*) from pageStatistics where dateStamp>=".(time()-86400)
+		." group by ipAddress,userId");
+        $output .= "Last 24 hours: ".$data."<br>";
+	return $output;
+}
 
 1;
 

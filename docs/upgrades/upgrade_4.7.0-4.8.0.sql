@@ -27,5 +27,9 @@ pageTitle varchar(255)
 );
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (749,1,'WebGUI','Track page statistics?', 1036736182);
 insert into settings values ("trackPageStatistics",0);
+alter table pageStatistics add column wobjectId int;
+alter table pageStatistics add column function varchar(60);
+
+
 
 
