@@ -17,6 +17,7 @@ package WebGUI::Node;
 use File::Path;
 use POSIX;
 use strict;
+use WebGUI::ErrorHandler;
 use WebGUI::Session;
 
 =head1 NAME
@@ -56,9 +57,19 @@ use WebGUI::Session;
 =cut
 
 sub create {
-	mkdir($session{setting}{attachmentDirectoryLocal}.'/'.$_[0]->{_node1},0755);
+	my ($slash, $node);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+	$node = $session{setting}{attachmentDirectoryLocal}.$slash.$_[0]->{_node1};
+	mkdir($node);
+	unless ($! eq "File exists" || $! eq "") {
+		WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
+	}
         if ($_[0]->{_node2} ne "") {
-		mkdir($session{setting}{attachmentDirectoryLocal}.'/'.$_[0]->{_node1}.'/'.$_[0]->{_node2},0755);
+		$node = $session{setting}{attachmentDirectoryLocal}.$slash.$_[0]->{_node1}.$slash.$_[0]->{_node2};
+		mkdir($node);
+		unless ($! eq "File exists" || $! eq "") {
+                	WebGUI::ErrorHandler::warn("Couldn't create node: $node : $!");
+        	}
        	}	
 }
 
@@ -84,10 +95,11 @@ sub delete {
 =cut
 
 sub getPath {
-        my ($path);
-        $path = $session{setting}{attachmentDirectoryLocal}.'/'.$_[0]->{_node1};
+        my ($path,$slash);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+        $path = $session{setting}{attachmentDirectoryLocal}.$slash.$_[0]->{_node1};
         if ($_[0]->{_node2} ne "") {
-                $path .= '/'.$_[0]->{_node2};
+                $path .= $slash.$_[0]->{_node2};
         }
         return $path;
 }

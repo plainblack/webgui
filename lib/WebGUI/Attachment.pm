@@ -71,7 +71,7 @@ sub _createThumbnail {
         if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png tif tiff bmp))) {
 		$image = Image::Magick->new;
 		$error = $image->Read($_[0]->getPath);
-		WebGUI::ErrorHandler::warn($error) if $error;
+		WebGUI::ErrorHandler::warn("Couldn't read image for thumnail creation: ".$error) if $error;
 		($x, $y) = $image->Get('width','height');
 		$n = $_[1] || $session{setting}{thumbnailSize};
 		$r = $x>$y ? $x / $n : $y / $n;
@@ -81,7 +81,7 @@ sub _createThumbnail {
 		} else {
 			$error = $image->Write($_[0]->{_node}->getPath.'/thumb-'.$_[0]->getFilename);
 		}
-		WebGUI::ErrorHandler::warning($error) if $error;
+		WebGUI::ErrorHandler::warning("Couldn't create thumbnail: ".$error) if $error;
 	}
 }
 
@@ -133,7 +133,7 @@ sub copy {
 		$b = FileHandle->new(">".$newNode->getPath.'/'.$_[0]->getFilename);
 		if (defined $b) {
 			binmode($b); 
-       			cp($a,$b);
+       			cp($a,$b) or WebGUI::ErrorHandler::warn("Couldn't copy attachment: ".$newNode->getPath.'/'.$_[0]->getFilename." :".$!);
 			$b->close;
 		}
 		$a->close;
@@ -258,7 +258,9 @@ sub getIcon {
 =cut
 
 sub getPath {
-        return $_[0]->{_node}->getPath.'/'.$_[0]->getFilename;
+	my ($slash);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+        return $_[0]->{_node}->getPath.$slash.$_[0]->getFilename;
 }
 
 
@@ -271,8 +273,9 @@ sub getPath {
 =cut
 
 sub getSize {
-	my ($size);
-	my (@attributes) = stat($_[0]->{_node}->getPath.'/'.$_[0]->getFilename);
+	my ($size, $slash);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+	my (@attributes) = stat($_[0]->{_node}->getPath.$slash.$_[0]->getFilename);
 	if ($attributes[7] > 1048576) {
 		$size = round($attributes[7]/1048576);
 		$size .= 'mb';
@@ -298,10 +301,12 @@ sub getSize {
 =cut
 
 sub getThumbnail {
+	my ($slash);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
 	if ($hasImageMagick && isIn($_[0]->getType, qw(jpg jpeg gif png))) {
-        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename;
+        	return $_[0]->{_node}->getURL.$slash.'thumb-'.$_[0]->getFilename;
 	} elsif ($hasImageMagick && isIn($_[0]->getType, qw(tif tiff bmp))) {
-        	return $_[0]->{_node}->getURL.'/thumb-'.$_[0]->getFilename.'.png';
+        	return $_[0]->{_node}->getURL.$slash.'thumb-'.$_[0]->getFilename.'.png';
 	} else {
 		return "";
 	}
@@ -380,7 +385,9 @@ sub new {
 =cut
 
 sub rename {
-	rename $_[0]->getPath, $_[0]->{_node}->getPath.'/'.$_[1];
+	my ($slash);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+	rename $_[0]->getPath, $_[0]->{_node}->getPath.$slash.$_[1];
 	$_[0]->{_filename} = $_[1];
 }
 
@@ -432,7 +439,7 @@ sub save {
 			close($file);
 			_createThumbnail($_[0],$_[2]);
 		} else {
-			WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing.");
+			WebGUI::ErrorHandler::warn("Couldn't open file ".$_[0]->getPath." for writing due to error: ".$!);
 			$_[0]->{_filename} = "";
 			return "";
 		}

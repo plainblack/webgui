@@ -21,14 +21,10 @@ use strict qw(subs vars);
 use Data::Config;
 
 
-my (@files, $cmd, $namespace, $i, $file, $confdir, @plugins, $plugin, $plugdir);
-if ($^O =~ /Win/i) {
-        $confdir = $webguiRoot."\\etc\\";
-        $plugdir = $webguiRoot."\\sbin\\Hourly\\";
-} else {
-        $confdir = $webguiRoot."/etc/";
-        $plugdir = $webguiRoot."/sbin/Hourly/";
-}
+my (@files, $cmd, $namespace, $i, $file, $slash, $confdir, @plugins, $plugin, $plugdir);
+$slash = ($^O =~ /Win/i) ? "\\" : "/";
+$confdir = $webguiRoot.$slash."etc".$slash;
+$plugdir = $webguiRoot.$slash."sbin".$slash."Hourly".$slash;
 
 if (opendir (PLUGDIR,$plugdir)) {
 	@files = readdir(PLUGDIR);

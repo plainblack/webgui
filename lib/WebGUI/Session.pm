@@ -106,12 +106,9 @@ sub _getUserInfo {
 
 #-------------------------------------------------------------------
 sub _loadMacros {
-	my ($namespace, $cmd, @files, $file, $dir);
-        if ($^O =~ /Win/i) {
-                $dir = "\\lib\\WebGUI\\Macro";
-        } else {
-                $dir = "/lib/WebGUI/Macro";
-        }
+	my ($slash, $namespace, $cmd, @files, $file, $dir);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+        $dir = $slash."lib".$slash."WebGUI".$slash."Macro";
         opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
         @files = readdir(DIR);
         foreach $file (@files) {
@@ -128,12 +125,9 @@ sub _loadMacros {
 
 #-------------------------------------------------------------------
 sub _loadWobjects {
-        my ($dir, @files, $file, $cmd, $namespace);
-        if ($^O =~ /Win/i) {
-                $dir = "\\lib\\WebGUI\\Wobject";
-        } else {
-                $dir = "/lib/WebGUI/Wobject";
-        }
+        my ($dir, @files, $slash, $file, $cmd, $namespace);
+	$slash = ($^O =~ /Win/i) ? "\\" : "/";
+        $dir = $slash."lib".$slash."WebGUI".$slash."Wobject";
         opendir (DIR,$session{config}{webguiRoot}.$dir) or WebGUI::ErrorHandler::fatalError("Can't open wobject directory!");
         @files = readdir(DIR);
         foreach $file (@files) {
