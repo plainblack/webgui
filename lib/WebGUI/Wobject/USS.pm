@@ -217,6 +217,9 @@ sub www_editSubmission {
         if (WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute")) || $submission->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 $output = '<h1>'.WebGUI::International::get(19,$namespace).'</h1>';
 		$f = WebGUI::HTMLForm->new;
+		if ($session{user}{userId} == 1 && $submission->{USS_submissionId} eq "new") {
+                        $f->text("visitorName",WebGUI::International::get(438));
+                }
                 $f->hidden("wid",$session{form}{wid});
                 $f->hidden("sid",$submission->{USS_submissionId});
                 $f->hidden("func","editSubmissionSave");
@@ -255,7 +258,7 @@ sub www_editSubmissionSave {
 		&& WebGUI::Privilege::isInGroup($_[0]->get("groupToContribute"))) 
 		|| WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
                 if ($session{form}{sid} eq "new") {
-			$hash{username} = $session{user}{username};
+			$hash{username} = $session{form}{visitorName} || $session{user}{username};
 			$hash{userId} = $session{user}{userId};
 			$hash{USS_submissionId} = "new";
 			if ($session{setting}{useKarma}) {
