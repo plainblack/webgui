@@ -192,7 +192,8 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
-   	$tabform->getTab("display")->template(
+   	
+	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"DataForm"
    		);
@@ -236,6 +237,7 @@ sub getEditForm {
 			-value=>"editField"
 			);
 	}
+	
 	return $tabform;
 }
 
@@ -345,9 +347,9 @@ sub getListTemplateVars {
 		push(@recordLoop,{
 			"record.ipAddress"=>$record->{ipAddress},
 			"record.edit.url"=>$self->getUrl("func=view&entryId=".$record->{DataForm_entryId}),
-			"record.edit.icon"=>editIcon("func=view&entryId=".$record->{DataForm_entryId}),
+			"record.edit.icon"=>editIcon("func=view&entryId=".$record->{DataForm_entryId}, $self->getUrl),
 			"record.delete.url"=>$self->getUrl("func=deleteEntry&entryId=".$record->{DataForm_entryId}),
-			"record.delete.icon"=>deleteIcon("func=deleteEntry&entryId=".$record->{DataForm_entryId},'',WebGUI::International::get('Delete entry confirmation',"DataForm")),
+			"record.delete.icon"=>deleteIcon("func=deleteEntry&entryId=".$record->{DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"DataForm")),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},
