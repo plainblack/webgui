@@ -242,12 +242,14 @@ sub www_editPage {
 			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
 			$page{parentId} = $session{form}{npp};
 			$page{ownerId} = $session{user}{userId};
+			$page{hideFromNavigation} = 0;
 		} else {
 			%page = %{$session{page}};
 			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
+			$page{hideFromNavigation} = 0;
 		}
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
-                #$output = helpIcon(1);
+                $output = helpIcon(1);
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
 		$f->hidden({name=>"pageId",value=>$page{pageId}});
 		$f->hidden({name=>"parentId",value=>$page{parentId}});
