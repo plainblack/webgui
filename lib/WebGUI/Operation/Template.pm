@@ -12,12 +12,12 @@ package WebGUI::Operation::Template;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::AdminConsole;
 use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -28,22 +28,36 @@ use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-        $menu{WebGUI::URL::page('op=editTemplate&tid=new&namespace='.$session{form}{namespace})} = 
-		WebGUI::International::get(505);
-        if ($session{form}{op} eq "editTemplate" && ($session{form}{tid} ne "new" || $session{form}{op} ne "deleteTemplateConfirm")) {
-                $menu{WebGUI::URL::page('op=editTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace})} = 
-			WebGUI::International::get(851);
-                $menu{WebGUI::URL::page('op=copyTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace})} = 
-			WebGUI::International::get(852);
-                $menu{WebGUI::URL::page('op=deleteTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace})} = 
-			WebGUI::International::get(853);
-                $menu{WebGUI::URL::page('op=listTemplates&namespace='.$session{form}{namespace})} = 
-			WebGUI::International::get(854);
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title) if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help);
         }
-        $menu{WebGUI::URL::page('op=listTemplates')} = WebGUI::International::get(855);
-        return menuWrapper($_[0],\%menu);
+        $ac->setAdminFunction("templates");
+        $ac->addSubmenuItem(WebGUI::URL::page('op=editTemplate&tid=new&namespace='.$session{form}{namespace}), WebGUI::International::get(505));
+        if ($session{form}{op} eq "editTemplate" && ($session{form}{tid} ne "new" || $session{form}{op} ne "deleteTemplateConfirm")) {
+                $ac->addSubmenuItem(
+			WebGUI::URL::page('op=editTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace}),
+			WebGUI::International::get(851)
+			);
+                $ac->addSubmenuItem(
+			WebGUI::URL::page('op=copyTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace}), 
+			WebGUI::International::get(852)
+			);
+               	$ac->addSubmenuItem(
+			WebGUI::URL::page('op=deleteTemplate&tid='.$session{form}{tid}.'&namespace='.$session{form}{namespace}), 
+			WebGUI::International::get(853)
+			);
+                $ac->addSubmenuItem(
+			WebGUI::URL::page('op=listTemplates&namespace='.$session{form}{namespace}),
+			WebGUI::International::get(854)
+			);
+        }
+        $ac->addSubmenuItem(WebGUI::URL::page('op=listTemplates'), WebGUI::International::get(855));
+        return $ac->render($workarea, $title);
 }
 
 
@@ -64,10 +78,8 @@ sub www_copyTemplate {
 sub www_deleteTemplate {
         my ($output);
         if ($session{form}{tid} =~ /^\d+$/ && $session{form}{tid} < 1000 && $session{form}{tid} > 0) {
-		return WebGUI::Privilege::vitalComponent();
+		return _submenu(WebGUI::Privilege::vitalComponent());
         } elsif (WebGUI::Grouping::isInGroup(8)) {
-                $output .= helpIcon("template delete");
-		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
                 $output .= WebGUI::International::get(502).'<p>';
                 $output .= '<div align="center"><a href="'.
 			WebGUI::URL::page('op=deleteTemplateConfirm&tid='.$session{form}{tid}.'&namespace='
@@ -75,7 +87,7 @@ sub www_deleteTemplate {
 			.'">'.WebGUI::International::get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listTemplates&namespace='
 			.$session{form}{namespace}).'">'.WebGUI::International::get(45).'</a></div>';
-                return _submenu($output);
+                return _submenu($output,'42',"template delete");
         } else {
                 return WebGUI::Privilege::adminOnly();
         }
@@ -85,7 +97,7 @@ sub www_deleteTemplate {
 sub www_deleteTemplateConfirm {
 	my ($a, $pageId);
         if ($session{form}{tid} =~ /^\d+$/ && $session{form}{tid} < 1000 && $session{form}{tid} > 0) {
-		return WebGUI::Privilege::vitalComponent();
+		return _submenu(WebGUI::Privilege::vitalComponent());
         } elsif (WebGUI::Grouping::isInGroup(8)) {
 		if ($session{form}{namespace} eq "Page") {
 			$a = WebGUI::SQL->read("select * from page where templateId=".quote($session{form}{tid}));
@@ -105,7 +117,7 @@ sub www_deleteTemplateConfirm {
 
 #-------------------------------------------------------------------
 sub www_editTemplate {
-        my ($output, $namespaces, %template, $f);
+        my ($namespaces, %template, $f);
 	tie %template, 'Tie::CPHash';
         if (WebGUI::Grouping::isInGroup(8)) {
 		if ($session{form}{tid} eq "new" || $session{form}{tid} eq "") {
@@ -119,8 +131,6 @@ sub www_editTemplate {
                 	%template = WebGUI::SQL->quickHash("select * from template where templateId=".quote($session{form}{tid})." and
 				namespace=".quote($session{form}{namespace}));
 		}
-                $output .= helpIcon("template add/edit");
-		$output .= '<h1>'.WebGUI::International::get(507).'</h1>';
 		$f = WebGUI::HTMLForm->new;
                 $f->hidden("op","editTemplateSave");
 		$f->readOnly($session{form}{tid},WebGUI::International::get(503));
@@ -141,11 +151,10 @@ sub www_editTemplate {
 			-rows=>(5+$session{setting}{textAreaRows})
 			);
                 $f->submit;
-		$output .= $f->print;
+        	return _submenu($f->print,'507',"template add/edit");
         } else {
-                $output = WebGUI::Privilege::insufficient();
+                return WebGUI::Privilege::insufficient();
         }
-        return _submenu($output);
 }
 
 #-------------------------------------------------------------------
@@ -175,8 +184,6 @@ sub www_listTemplates {
         my ($output, $sth, @data, @row, $i, $p, $where);
         if (WebGUI::Grouping::isInGroup(8)) {
 		$where = "and namespace=".quote($session{form}{namespace}) if ($session{form}{namespace});
-                $output = helpIcon("templates manage");
-		$output .= '<h1>'.WebGUI::International::get(506).'</h1>';
                 $sth = WebGUI::SQL->read("select templateId,name,namespace from template where isEditable=1 $where order by namespace,name");
                 while (@data = $sth->array) {
                         $row[$i] = '<tr><td valign="top" class="tableData">'
@@ -195,7 +202,7 @@ sub www_listTemplates {
 		$output .= $p->getPage($session{form}{pn});
 		$output .= '</table>';
 		$output .= $p->getBarTraditional($session{form}{pn});
-                return _submenu($output);
+                return _submenu($output,'506',"templates manage");
         } else {
                 return WebGUI::Privilege::insufficient();
         }

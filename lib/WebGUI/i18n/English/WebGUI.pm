@@ -1591,11 +1591,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'506' => {
-		message => q|Manage Templates|,
-		lastUpdated => 1031514049
-	},
-
 	'116' => {
 		message => q|Select "Yes" to change the privileges of all pages and wobjects under this page to these privileges.|,
 		lastUpdated => 1056054674
