@@ -89,7 +89,7 @@ sub checkbox {
 
 #-------------------------------------------------------------------
 
-=head2 checkboxList ( name )
+=head2 checkList ( name )
 
 Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
 
@@ -103,7 +103,7 @@ The name of the form variable to retrieve.
 
 =cut
 
-sub checkboxList {
+sub checkList {
 	return selectList($_[0]);
 }
 
@@ -204,7 +204,7 @@ sub email {
 
 =head2 fieldType ( name )
 
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar. Defautls to "text".
+Returns a field type. Defaults to "text".
 
 =over 
 
@@ -217,7 +217,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub fieldType {
-	return (selectList($_[0]) || "text");
+	return ($session{form}{$_[0]} || "text");
 }
 
 

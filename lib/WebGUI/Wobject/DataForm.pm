@@ -44,19 +44,19 @@ sub _createField {
 	if ($data->{type} eq "checkbox") {
 		$param{value} = ($data->{defaultValue} =~ /checked/i) ? 1 : "";
 	}
-	if (isIn($data->{type},qw(selectList checkboxList))) {
+	if (isIn($data->{type},qw(selectList checkList))) {
 		my @defaultValues;
 		if ($session{form}{$param{name}}) {
                 	@defaultValues = $session{cgi}->param($param{name});
                 } else {
-                	foreach (split(/\n/, $data->{defaultValue})) {
+                	foreach (split(/\n/, $data->{value})) {
                         	s/\s+$//; # remove trailing spaces
                                 push(@defaultValues, $_);
                 	}
                 }
 		$param{value} = \@defaultValues;
 	}
-	if (isIn($data->{type},qw(selectList checkboxList radioList))) {
+	if (isIn($data->{type},qw(selectList checkList radioList))) {
 		delete $param{size};
 		my %options;
                 tie %options, 'Tie::IxHash';
@@ -431,12 +431,14 @@ sub www_editField {
         $f->textarea(
 		-name=>"possibleValues",
 		-label=>WebGUI::International::get(24,$_[0]->get("namespace")),
-		-value=>$field{possibleValues}
+		-value=>$field{possibleValues},
+		-subtext=>'<br>'.WebGUI::International::get(85,$_[0]->get("namespace"))
 		);
         $f->textarea(
 		-name=>"defaultValue",
 		-label=>WebGUI::International::get(25,$_[0]->get("namespace")),
-		-value=>$field{defaultValue}
+		-value=>$field{defaultValue},
+		-subtext=>'<br>'.WebGUI::International::get(85,$_[0]->get("namespace"))
 		);
 	if ($session{form}{fid} eq "new") {
         	$f->whatNext(

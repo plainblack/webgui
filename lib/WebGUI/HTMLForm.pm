@@ -621,7 +621,7 @@ sub email {
 
 #-------------------------------------------------------------------
 
-=head2 fieldType ( name, types [ label, value, size, multiple, extras, subtext, uiLevel ] )
+=head2 fieldType ( name, types [ label, value, size, extras, subtext, uiLevel ] )
 
 Adds a field type select list field to this form. This is primarily useful for building dynamic form builders.
 
@@ -641,15 +641,11 @@ The left column label for this form row.
 
 =item value
 
-The default value(s) for this form element. This should be passed as an array reference.
+The default value for this form element.
 
 =item size
 
 The number of characters tall this form element should be. Defaults to "1".
-
-=item multiple
-
-A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
 =item extras
 

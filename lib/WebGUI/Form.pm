@@ -418,15 +418,11 @@ An array reference of field types to be displayed. The field names are the names
 
 =item value
 
-The default value(s) for this form element. This should be passed as an array reference.
+The default value for this form element.
 
 =item size
 
 The number of characters tall this form element should be. Defaults to "1".
-
-=item multiple
-
-A boolean value for whether this select list should allow multiple selections. Defaults to "0".
 
 =item extras
 
@@ -445,7 +441,7 @@ sub fieldType {
 	# without adult supervision. =) It was done this way because a huge
 	# if/elsif construct executes much more quickly than a bunch of
 	# unnecessary database hits.
-	my @types = qw(dateTime time zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkboxList);
+	my @types = qw(dateTime time zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList);
 	$_[0]->{types} = \@types unless ($_[0]->{types});
 	foreach $type (@{$_[0]->{types}}) {
 		if ($type eq "text") {
@@ -474,7 +470,7 @@ sub fieldType {
         		$hash{selectList} = WebGUI::International::get(484);
 		} elsif ($type eq "radioList") {
         		$hash{radioList} = WebGUI::International::get(942);
-		} elsif ($type eq "checkboxList") {
+		} elsif ($type eq "checkList") {
         		$hash{checkboxList} = WebGUI::International::get(941);
 		} elsif ($type eq "zipcode") {
 			$hash{zipcode} = WebGUI::International::get(944);
@@ -482,11 +478,15 @@ sub fieldType {
         		$hash{checkbox} = WebGUI::International::get(943);
 		}
 	}
+	# This is a hack for reverse compatibility with a bug where this field used to allow an array ref.
+	my $value = $_[0]->{value};
+	unless ($value eq "ARRAY") {
+		$value = [$value];
+	}
 	return selectList({
 		options=>\%hash,
 		name=>$_[0]->{name},
 		value=>$_[0]->{value},
-		multiple=>$_[0]->{multiple},
 		extras=>$_[0]->{extras},
 		size=>$_[0]->{size}
 		});
