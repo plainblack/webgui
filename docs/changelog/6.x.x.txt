@@ -94,4 +94,6 @@ webgui.
    from previous distributions or th 5.5 branch in CVS.
  - Added Job Listing templates to the USS.
  - Added a view privileges setting to each forum.
+ - Bugfix [ 822805 ] Emptying trash can cause fatal error
+   (Thanks to Steve Simms.)
 
