@@ -210,9 +210,7 @@ sub insufficient {
 sub isInGroup {
 	my ($gid, $uid, @data, %group, %user);
 	($gid, $uid) = @_;
-	if ($uid eq "") {
-		$uid = $session{user}{userId};
-	}
+	$uid = $session{user}{userId} if ($uid eq "");
         ### The "Everyone" group automatically returns true.
         if ($gid == 7) {
                 return 1;
@@ -229,9 +227,18 @@ sub isInGroup {
 	if ($gid==2 && $uid != 1) {
 		return 1;
 	}
+	### Use session to cache multiple lookups of the same group.
+	if ($session{isInGroup}{$gid} || $session{isInGroup}{3}) {
+		return 1;
+	} elsif ($session{isInGroup}{$gid} eq "0") {
+		return 0;
+	} else {
+		$session{isInGroup}{$gid} = 0;
+	}
         ### Lookup the actual grouping.
 	@data = WebGUI::SQL->quickArray("select count(*) from groupings where groupId='$gid' and userId='$uid' and expireDate>".time());
 	if ($data[0] > 0 && $uid != 1) {
+		$session{isInGroup}{$gid} = 1;
 		return 1;
 	}
         ### Get data for auxillary checks.
@@ -242,12 +249,14 @@ sub isInGroup {
 		tie %user, 'Tie::CPHash';
 		%user = WebGUI::SQL->quickHash("select karma from users where userId='$uid'");
 		if ($user{karma} >= $group{karmaThreshold}) {
+			$session{isInGroup}{$gid} = 1;
 			return 1;
 		}
 	}
 	### Admins can do anything!
         if ($gid != 3) {                        
-                return isInGroup(3, $uid);       
+                $session{isInGroup}{3} = isInGroup(3, $uid);
+		return $session{isInGroup}{3};
         }                                       
 	return 0;
 }
