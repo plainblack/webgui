@@ -49,10 +49,10 @@ sub www_search {
                 $sth->finish;
         }
 	if ($row[0] ne "") {
-		$p = WebGUI::Paginator->new($url,\@row,$session{form}{numResults});
-		$output .= '<p/>'.WebGUI::International::get(365).'<p><ol>';
+		$p = WebGUI::Paginator->new($url,\@row,$session{scratch}{numResults});
+		$output .= '<p/>'.WebGUI::International::get(365).'<p><ul>';
 		$output .= $p->getPage($session{form}{pn});
-		$output .= '</ol>'.$p->getBarTraditional($session{form}{pn});
+		$output .= '</ul>'.$p->getBarTraditional($session{form}{pn});
 	} elsif ($session{form}{exactPhrase} ne "" || $session{form}{all} ne "" || $session{form}{without} ne "" || $session{form}{atLeastOne} ne "") {
 		$output .= '<p/>'.WebGUI::International::get(366).'<p/>';
 	}
