@@ -45,6 +45,9 @@ sub process {
 			name=>"op",
 			value=>"login"
 			});
+        if ($session{setting}{encryptLogin}) {
+                $var{'form.header'} =~ s/http:/https:/;
+        }
 	$var{'username.label'} = WebGUI::International::get(50);
 	$var{'username.form'} = WebGUI::Form::text({
 		name=>"username",
