@@ -28,6 +28,12 @@ save you many hours of grief.
 	structures directly, please be sure to alter them after
 	the upgrade.
 
+ * The Product template system has been merged into the system-wide
+	template system. If you have created any custom product
+	templates they templates will be lost during the upgrade
+	process. Be sure to copy them to a save place before 
+	upgrading.
+
 4.6.3
 --------------------------------------------------------------------
  * It has been reported that some people had a duplicate key error

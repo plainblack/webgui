@@ -929,7 +929,7 @@ INSERT INTO international VALUES (2,'WobjectProxy',11,' Õ—Ì— ÊÊ»ÃÌﬂ  »—Êﬂ”Ì',103
 INSERT INTO international VALUES (3,'WobjectProxy',11,'ÊÊ»ÃÌﬂ  »—Êﬂ”Ì',1031514049);
 INSERT INTO international VALUES (4,'WobjectProxy',11,'›‘·  ⁄„·Ì… ÷„ «·ÊÊ»Ãﬂ  ≈·Ï »—Êﬂ”Ì.  —»„« Ã—Ï Õ–› Â–« «·ÊÊ»ÃÌﬂ ',1031514049);
 INSERT INTO international VALUES (5,'WobjectProxy',11,'ÊÊ»ÃÌﬂ  »—Êﬂ”Ì° ≈÷«›…/ Õ—Ì—',1031514049);
-
+delete from incrementer where incrementerId='Product_templateId';
 
 
 
