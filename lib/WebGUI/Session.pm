@@ -76,13 +76,6 @@ tie %session, 'Tie::CPHash';
 
 
 #-------------------------------------------------------------------
-sub _generateSessionId {
-	my ($sessionId);
-	$sessionId = crypt((time()*rand(1000)),rand(99));
-	return $sessionId;
-}
-
-#-------------------------------------------------------------------
 sub _setupPageInfo {
 	my (%page, $pageId, $pageName);
 	tie %page, 'Tie::CPHash';
@@ -126,9 +119,9 @@ sub _setupSessionVars {
 			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
                 		where sessionId=".quote($_[0]));
 			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$ENV{REMOTE_ADDR}', 
-				expires=".(time()+$_[1])." where sessionId='$_[0]'");
+				expires=".(time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
 		} else {
-                        setCookie("wgSession",$session{cookie}{wgSession},"-10y");
+			start(1,$session{$_[0]});
                 }
 	}
 	$session{var} = \%vars;
@@ -446,7 +439,7 @@ sub open {
 	if ($session{cookie}{wgSession} eq "") {
 		start(1); #setting up a visitor session
 	} else {
-		_setupSessionVars($session{cookie}{wgSession},$session{setting}{sessionTimeout});
+		_setupSessionVars($session{cookie}{wgSession});
 	}
         ###----------------------------
         ### current page's properties (from page table)
@@ -502,7 +495,7 @@ sub refreshPageInfo {
 =cut
 
 sub refreshSessionVars {
-	_setupSessionVars($_[0],$session{setting}{sessionTimeout});
+	_setupSessionVars($_[0]);
 	refreshUserInfo($session{var}{userId});
 }
 
@@ -598,24 +591,24 @@ sub setScratch {
 
 #-------------------------------------------------------------------
 
-=head2 start ( userId )
+=head2 start ( userId [ , sessionId ] )
 
  Start a new user session.
 
-=item
+=item userId
 
  The user id of the user to create a session for.
+
+=item sessionId
+
+ Session id will be generated if not specified. In almost every case
+ you should let the system generate the session id.
 
 =cut
 
 sub start {
 	my ($sessionId);
-	if ($session{cookie}{wgSession} ne "") {  #fix for internet exploder cookie bug
-		$sessionId = $session{cookie}{wgSession};
-		end($sessionId);
-	} else {
-		$sessionId = _generateSessionId();
-	}
+	$sessionId = $_[1] || crypt((time()*rand(1000)),rand(99));
 	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
 		(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
 	setCookie("wgSession",$sessionId);
