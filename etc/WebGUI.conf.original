@@ -49,7 +49,6 @@ macros = a => a_account, \
 	LoginToggle => LoginToggle, \
 	Navigation => Navigation, \
 	PageTitle => PageTitle, \
-	? => Question_search, \
 	RandomImage => RandomImage, \
 	RandomSnippet => RandomSnippet, \
 	RootTitle => RootTitle, \
