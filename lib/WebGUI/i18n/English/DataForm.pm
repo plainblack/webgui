@@ -579,6 +579,20 @@ The IP Address of the user that submitted this record entry.
 The URL to edit this record.
 <p>
 
+<b>record.edit.icon</b><br>
+An icon that can be used in conjuction with <b>record.edit.url</b> to allow
+this record to be edited.
+<p>
+
+<b>record.delete.url</b><br>
+The URL to delete this record.
+<p>
+
+<b>record.delete.icon</b><br>
+An icon that can be used in conjuction with <b>record.delete.url</b> to allow
+this record to be deleted.
+<p>
+
 <b>record.username</b><br>
 The username of the person that submitted this record entry.
 <p>
@@ -620,7 +634,7 @@ A conditional indicating whether this field exists for the mail subsystem of the
 </blockquote>
 
 </blockquote>|,
-		lastUpdated => 1098856416
+		lastUpdated => 1111076507,
 	},
 
 	'24' => {
