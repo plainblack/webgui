@@ -817,6 +817,7 @@ CREATE TABLE WSClient (
   templateId int(11) NOT NULL default '1',
   decodeUtf8 tinyint(3) unsigned NOT NULL default '0',
   httpHeader varchar(50) default NULL,
+  cacheTTL smallint(5) unsigned NOT NULL default '60',
   PRIMARY KEY  (wobjectId)
 ) TYPE=MyISAM;
 

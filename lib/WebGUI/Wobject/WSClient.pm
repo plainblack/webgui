@@ -107,6 +107,10 @@ sub new {
          httpHeader       => {
             fieldType     => $httpHeaderFieldType,
          },
+         cacheTTL         => {
+            fieldType     => 'integer',
+            defaultValue  => 60,
+         },
       },
    );
    bless $self, $class;
@@ -204,6 +208,12 @@ sub www_edit {
          -value => $_[0]->get('decodeUtf8'),
       );
    }
+
+   $properties->text (
+      -name     => 'cacheTTL',
+      -label    => WebGUI::International::get(27, $_[0]->get('namespace')),
+      -value    => $_[0]->get('cacheTTL'),
+   );
 
    return $_[0]->SUPER::www_edit (
       -layout     => $layout->printRowsOnly,
@@ -333,7 +343,8 @@ sub www_view {
                @result = { 'result' => $return };
             }
 
-            $cache->set(Storable::freeze(@result));
+            $cache->set(Storable::freeze(@result),
+               $wobject[0]->get('cacheTTL'));
          };
 
          # did the soap call fault?
