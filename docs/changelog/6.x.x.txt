@@ -2,6 +2,9 @@
  - Changed to new POD format.
  - Fixed GUID related bugs in search indexer and passive profiling.
  - Fixed a bug in page tree where indenting wasn't working.
+ - bugfix [ 1028746 ] All pages shown as Roots & PageTree not working
+ - bugfix [ 1028561 ] Manage Users - Next Page Link Broken
+ - bugfix [ 1028494 ] Folder not shown in Manage Collateral
 
 
 6.2.2

@@ -457,7 +457,7 @@ sub www_listCollateral {
                         .'&nbsp;'.WebGUI::International::get(542).'</a></td></tr>';
 	}
 	$sth = WebGUI::SQL->read("select collateralFolderId, name, description from collateralFolder 
-		where parentId=".quote($folderId)." and collateralFolderId<>0 order by name");
+		where parentId=".quote($folderId)." order by name");
 	while ($data = $sth->hashRef) {
 		$output .= '<tr><td class="tableData"><a href="'.WebGUI::URL::page('op=listCollateral&fid='
 			.$data->{collateralFolderId}.'&pn=1')

@@ -50,7 +50,7 @@ sub classSettings {
   return {
     properties => {
       name               => { quote        => 1 },
-      parentId           => { defaultValue => 0 },
+      parentId           => { quote => 1 },
       collateralFolderId => { key          => 1 },
       description        => { quote        => 1 }
     },
