@@ -16,7 +16,9 @@
  - Bugfix [ 855682 ] USS rss feed shows unapproved items
  - Bugfix [ 855684 ] USS: no approvement check
  - Bugfix [ 826864 ] Endless recursion
-
+ - Bugfix [ 855968 ] search shows deleted messages
+ - Fixed a bug that wouldn't allow urls like ldap://some.server and
+   https://some.server to work in a url field
 
 5.5.3
  - Lowercase file extension in importCollateral.pl while determinating file
