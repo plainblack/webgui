@@ -126,12 +126,6 @@ sub process {
 			%hash
 		);
 	}
-        if (WebGUI::Privilege::isInGroup(5)) {
-                %hash = (
-			WebGUI::URL::page('op=listStyles')=>WebGUI::International::get(6), 
-			%hash
-                );
-        }
         if (WebGUI::Privilege::isInGroup(6)) {
                 %hash = (
 			WebGUI::URL::gateway('packages')=>WebGUI::International::get(374),

@@ -178,7 +178,7 @@ sub generate {
         return WebGUI::Privilege::noAccess() unless (WebGUI::Privilege::canViewPage());
 	my %var;
 	$var{'page.canEdit'} = WebGUI::Privilege::canEditPage();
-        $var{'page.toolbar'} = pageIcon()
+        $var{'page.controls'} = pageIcon()
        		.deleteIcon('op=deletePage')
 		.editIcon('op=editPage')
 		.moveUpIcon('op=movePageUp')
@@ -229,7 +229,7 @@ sub generate {
 		push(@{$var{'position'.$wobject->{templatePosition}.'_loop'}},{
                         'wobject.canView'=>WebGUI::Privilege::canViewWobject($wobject->{wobjectId}),
         		'wobject.canEdit'=>WebGUI::Privilege::canEditWobject($wobject->{wobjectId}),
-			'wobject.toolbar'=>$wobjectToolbar,
+			'wobject.controls'=>$wobjectToolbar,
 			'wobject.namespace'=>$wobject->{namespace},
 			'wobject.id'=>$wobject->{wobjectId},
 			'wobject.isInDateRange'=>$w->inDateRange,

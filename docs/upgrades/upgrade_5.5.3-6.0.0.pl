@@ -50,6 +50,19 @@ $sth->finish;
 WebGUI::SQL->write("delete from incrementer where incrementerId='styleId'");
 WebGUI::SQL->write("delete from settings where name='docTypeDec'");
 WebGUI::SQL->write("drop table style");
+my @templateManagers = WebGUI::SQL->buildArray("select userId from groupings where groupId=8");
+my $clause;
+if ($#templateManagers > 0) {
+	$clause = "and userId not in (".join(",",@templateManagers).")";	
+}
+$sth = WebGUI::SQL->read("select userId,expireDate,groupAdmin from groupings where groupId=5 ".$clause);
+while (my $user = $sth->hashRef) {
+	WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate,groupAdmin) values (8, ".$user->{userId}.", 
+		".$user->{expireDate}.", ".$user->{groupAdmin}.")");
+}
+$sth->finish;
+WebGUI::SQL->write("delete from groups where groupId=5");
+WebGUI::SQL->write("delete from groupings where groupId=5");
 
 
 #--------------------------------------------
@@ -67,7 +80,7 @@ while (my $template = $sth->hashRef) {
 		</style>
 		</tmpl_if>
 		<tmpl_if session.var.adminOn> <tmpl_if page.canEdit>
-			<tmpl_var page.toolbar>
+			<tmpl_var page.controls>
 		</tmpl_if> </tmpl_if>
 		'.$template->{template};
 	$template->{template} =~ s/\<tmpl_var page\.position(\d+)\>/_positionFormat6x($1)/eg; 
@@ -110,7 +123,7 @@ sub _positionFormat6x {
 			<tmpl_if wobject.canView> 
 				<div class="wobject"> <div class="wobject<tmpl_var wobject.namespace>" id="wobjectId<tmpl_var wobject.id>">
 				<tmpl_if session.var.adminOn> <tmpl_if wobject.canEdit>
-					<tmpl_var wobject.toolbar>
+					<tmpl_var wobject.controls>
 				</tmpl_if> </tmpl_if>
 				<tmpl_if wobject.isInDateRange>
                       			<a name="<tmpl_var wobject.id>"></a>
