@@ -69,7 +69,7 @@ sub _accountOptions {
 sub _checkForDuplicateUsername {
 	my $username = $_[0];
 	my ($otherUser) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($username));
-	if ($otherUser && $username ne $session{user}{username}) {
+	if ($otherUser) {
 		return '<li>'.WebGUI::International::get(77).' "'.$username.'too", "'.$username.'2", '
                 	.'"'.$username.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"';
 	} else {
@@ -185,6 +185,7 @@ sub www_createAccount {
 sub www_createAccountSave {
         my ($profile, $u, $username, $uri, $temp, $ldap, $port, %args, $search, $cmd, 
 		$connectDN, $auth, $output, $error, $uid,  $encryptedPassword, $fieldName);
+	return www_displayAccount() if ($session{user}{userId} != 1);
 	($username, $error) = WebGUI::Authentication::registrationFormValidate();
 	($profile, $temp) = _validateProfileData();
 	$error .= $temp;
