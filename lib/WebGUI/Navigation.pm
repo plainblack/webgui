@@ -305,6 +305,11 @@ sub build {
 				$pageData->{"page.inCurrentRoot"} = 
 					(($page->{'lft'} > $currentPage->get('lft')) && ($page->{'rgt'} < $currentPage->get('rgt'))) ||
 					(($page->{'lft'} < $currentPage->get('lft')) && ($page->{'rgt'} > $currentPage->get('rgt')));
+
+                                # Anchestor info
+                                foreach my $ancestor ($currentPage->ancestors) {
+                                        $pageData->{"page.isMyAncestor"} += ($ancestor->{'pageId'} == $page->{'pageId'});
+                                }
 				# Some information about my mother
 				
 				my $mother = WebGUI::Page->getPage($page->{parentId});

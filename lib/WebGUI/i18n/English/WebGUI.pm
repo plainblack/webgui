@@ -6988,6 +6988,7 @@ Following a guide like the above will help you get good ranking on search engine
 <P dir=ltr><STRONG>page.isTop</STRONG><BR>A condition indication whether this page is a top page (daughter of root).</P>
 <P dir=ltr><STRONG>page.inCurrentRoot</STRONG><BR>This condition is true if this page is a descendant of the root page of the current page</P>
 <P dir=ltr><STRONG>page.hasDaughter</STRONG><BR>A condition indication whether this page has a daughter. In other words: It evaluates to true if this page is a mother.</P>
+<P dir=ltr><STRONG>page.isMyAncestor</STRONG><BR>A condition indication whether this page is an ancestor of current page.</P>
 <P dir=ltr><STRONG>page.isMyDaughter</STRONG><BR>A condition indication whether this page is a daughter of current page.</P>
 <P dir=ltr><STRONG>page.isMyMother<BR></STRONG>A condition indication whether this page is the mother of current page.</P>
 <P dir=ltr><STRONG>page.mother.title<BR></STRONG>The title of the mother of this&nbsp;page.</P>
