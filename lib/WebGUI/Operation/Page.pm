@@ -249,9 +249,9 @@ sub www_editPage {
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
                 #$output = helpIcon(1);
 		$output .= '<h1>'.WebGUI::International::get(102).'</h1>';
-		$f->hidden("pageId",$page{pageId});
-		$f->hidden("parentId",$page{parentId});
-		$f->hidden("op","editPageSave");
+		$f->hidden({name=>"pageId",value=>$page{pageId}});
+		$f->hidden({name=>"parentId",value=>$page{parentId}});
+		$f->hidden({name=>"op",value=>"editPageSave"});
 		$f->getTab("properties")->readOnly(
 			-value=>$page{pageId},
 			-label=>WebGUI::International::get(500),

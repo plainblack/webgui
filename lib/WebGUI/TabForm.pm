@@ -46,7 +46,7 @@ Package that makes creating tab-based forms simple through an object-oriented AP
 		}
 	);
 
- $tabform = WebGUI::TabForm->new;
+ $tabform = WebGUI::TabForm->new(\%tabs);
 
  $tabform->hidden($name, $value);
  $tabform->submit(\%params);
@@ -67,24 +67,103 @@ These methods are available from this class:
 =cut
 
 
+#-------------------------------------------------------------------
+
+=head2 formHeader ( hashRef )
+
+Replaces the default form header with a new definition.
+
+NOTE: This uses the same syntax of the WebGUI::Form::formHeader() method.
+
+=cut
+
+sub formHeader {
+        $_[0]->{_form} = WebGUI::Form::formHeader($_[1]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getTab ( tabName )
+
+Returns a WebGUI::HTMLForm object based upon a tab name created in the constructor.
+
+=over
+
+=item tabName
+
+The name of the tab to return the form object for.
+
+=back
+
+=cut
+
 sub getTab {
 	return $_[0]->{_tab}{$_[1]}{form};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 hidden ( hashRef )
+
+Adds a hidden field to the form.
+
+NOTE: This uses the same syntax of the WebGUI::Form::hidden() method.
+
+=cut
+
 sub hidden {
-	$_[0]->{_form}->hidden($_[1],$_[2]);
+	$_[0]->{_hidden} .= WebGUI::Form::hidden($_[1]);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( tabHashRef )
+
+Constructor.
+
+=over
+
+=item tabHashRef
+
+A hash reference containing the definition of the tabs. It should be constructed like this:
+
+ use Tie::IxHash;
+ my %tabs;
+ tie %tabs, 'Tie::IxHash';
+ %tabs = (
+        cool=>{
+                label=>"Cool Tab",
+                uiLevel=>5
+                },
+        good=>{
+                label=>"Good Tab",
+                uiLevel=>8
+                }
+        );
+
+=back
+
+=cut
 
 sub new {
 	my ($class, $tabs) = @_;
-	my $form = WebGUI::HTMLForm->new(1);
 	foreach my $key (keys %{$tabs}) {
 		$tabs->{$key}{form} = WebGUI::HTMLForm->new;
 	}
-	bless {_submit=>WebGUI::Form::submit(),_form=>$form,_tab=>$tabs}, $class;
+	bless {	_submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>$tabs }, $class;
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 print ( )
+
+Returns an HTML string with all the necessary components to draw the tab form.
+
+=cut
 
 sub print {
 	my $output = '
@@ -95,6 +174,8 @@ sub print {
 		<script src="'.$session{config}{extrasURL}.'/tabs/tabs.js" type="text/javascript"></script>
 		<link href="'.$session{config}{extrasURL}.'/tabs/tabs.css" rel="stylesheet" rev="stylesheet" type="text/css">
 	';
+	$output .= $_[0]->{_form};
+	$output .= $_[0]->{_hidden};
 	my $i = 1;
 	my $tabs;
 	my $form;	
@@ -109,16 +190,28 @@ sub print {
 		$form .= '</table></div>';
 		$i++;
 	}
-	$_[0]->{_form}->raw('<div class="tabs">'.$tabs.$_[0]->{_submit}.'</div>');
-	$_[0]->{_form}->raw($form);
-	$output .= $_[0]->{_form}->print;
+	$output .= '<div class="tabs">'.$tabs.$_[0]->{_submit}.'</div>';
+	$output .= $form;
+	$output .= '</form>';
 	$output .= '<script>tabInit();</script>';
 	return $output;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 submit ( hashRef )
+
+Replaces the default submit button with a new definition.
+
+NOTE: This uses the same syntax of the WebGUI::Form::submit() method.
+
+=cut
+
 sub submit {
 	$_[0]->{_submit} = WebGUI::Form::submit($_[1]);
 }
+
 
 1;
 
