@@ -174,23 +174,11 @@ foreach my $file (@files) {
                 	'FILE' => $configsPath.$config{$file}{configFile},
                 	'PURGE' => 1);
 		$config{$file}{dsn} = $config->get('dsn');
-		my $temp = $config{$file}{dsn};
-		$temp =~ s/^DBI\:(.*)$/$1/;
-		$temp =~ s/(\w+)\:(.*)/$2/;
-		#$config{$file}{dsn} =~ /^DBI\:(\w+)\:(\w+)(\:(.*)|)$/;
-		if ($1 eq "mysql") {
-			if ($temp =~ /(\w+)\;host=(.*)/) {
-				$config{$file}{db} = $1;
-				$config{$file}{host} = $2;
-			} elsif ($temp =~ /(\w+)\;(.*)/) {
-				$config{$file}{db} = $1;
-				$config{$file}{host} = $2;
-			} elsif ($temp =~ /(\w+)\:(.*)/) {
-				$config{$file}{db} = $1;
-				$config{$file}{host} = $2;
-			} else {
-				$config{$file}{db} = $temp;
-			}
+		my $temp = _parseDSN($config{$file}{dsn}, ['database', 'host', 'port']);
+		if ($temp->{'driver'} eq "mysql") {
+			$config{$file}{db} = $temp->{'database'};
+			$config{$file}{host} = $temp->{'host'};
+			$config{$file}{port} = $temp->{'port'};
 			$config{$file}{dbuser} = $config->get('dbuser');
 			$config{$file}{dbpass} = $config->get('dbpass');
 			$config{$file}{mysqlCLI} = $config->get('mysqlCLI');
@@ -226,6 +214,7 @@ foreach my $config (keys %config) {
 			print "\tBacking up $config{$config}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
 			my $cmd = $dumpcmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
 			$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
+			$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
 			$cmd .= " --add-drop-table --databases ".$config{$config}{db}." > "
 				.$backupTo.$slash.$config{$config}{db}."_".$upgrade{$upgrade}{from}.".sql";
 			unless (system($cmd)) {
@@ -237,6 +226,7 @@ foreach my $config (keys %config) {
 		print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
 		my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
 		$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
+		$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
 		$cmd .= " --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
 		unless (system($cmd)) {
 			print "OK\n" unless ($quiet);
@@ -301,7 +291,47 @@ sub checkVersion {
 	}
 }
 
+#-----------------------------------------
+sub _parseDSN {
+    my($dsn, $args) = @_;
+    my($var, $val, $hash);
+    $hash = {};
 
+    if (!defined($dsn)) {
+        return;
+    }
 
+    $dsn =~ s/^dbi:(\w*?)(?:\((.*?)\))?://i
+                        or '' =~ /()/; # ensure $1 etc are empty if match fails
+    $hash->{driver} = $1;
 
+    while (length($dsn)) {
+        if ($dsn =~ /([^:;]*)[:;](.*)/) {
+            $val = $1;
+            $dsn = $2;
+        } else {
+            $val = $dsn;
+            $dsn = '';
+        }
+        if ($val =~ /([^=]*)=(.*)/) {
+            $var = $1;
+            $val = $2;
+            if ($var eq 'hostname'  ||  $var eq 'host') {
+                $hash->{'host'} = $val;
+            } elsif ($var eq 'db'  ||  $var eq 'dbname') {
+                $hash->{'database'} = $val;
+            } else {
+                $hash->{$var} = $val;
+            }
+        } else {
+            foreach $var (@$args) {
+                if (!defined($hash->{$var})) {
+                    $hash->{$var} = $val;
+                    last;
+                }
+            }
+        }
 
+     }
+     return $hash;
+}
