@@ -14,7 +14,6 @@ use strict;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Template;
 use WebGUI::URL;
 use WebGUI::Utility;

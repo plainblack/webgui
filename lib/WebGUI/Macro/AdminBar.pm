@@ -87,7 +87,7 @@ sub process {
 		$query = "select bufferDate,pageId,title from page where parentId=2 order by bufferDate";
 	} else {
 		$query = "select bufferDate,pageId,title from page where parentId=2 "
-			." and bufferUserId=$session{user}{userId} "
+			." and bufferUserId=".quote($session{user}{userId})
 			." order by bufferDate";
 	}
         $r = WebGUI::SQL->read($query);
@@ -105,7 +105,7 @@ sub process {
 			." order by bufferDate";
 	} else {
         	$query = "select bufferDate,wobjectId,title,namespace from wobject where pageId=2 "
-			." and bufferUserId=$session{user}{userId} "
+			." and bufferUserId=".quote($session{user}{userId})
 			." order by bufferDate";
 	}
         $r = WebGUI::SQL->read($query);

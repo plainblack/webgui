@@ -18,6 +18,7 @@ use strict;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
+use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -59,8 +60,8 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _create {
 	my ($userId);
-	$userId = getNextId("userId");
-	WebGUI::SQL->write("insert into users (userId,dateCreated) values ($userId,".time().")");
+	$userId = WebGUI::Id::generate();
+	WebGUI::SQL->write("insert into users (userId,dateCreated) values (".quote($userId).",".time().")");
 	WebGUI::Grouping::addUsersToGroups([$userId],[2,7]);
         return $userId;
 }
@@ -112,7 +113,7 @@ sub authMethod {
         if (defined $value) {
                 $class->{_user}{"authMethod"} = $value;
                 WebGUI::SQL->write("update users set authMethod=".quote($value).",
-			lastUpdated=".time()." where userId=$class->{_userId}");
+			lastUpdated=".time()." where userId=".quote($class->{_userId}));
         }
         return $class->{_user}{"authMethod"};
 }
@@ -139,14 +140,14 @@ Deletes this user.
 
 sub delete {
         my $class = shift;
-        WebGUI::SQL->write("delete from users where userId=".$class->{_userId});
-        WebGUI::SQL->write("delete from userProfileData where userId=".$class->{_userId});
+        WebGUI::SQL->write("delete from users where userId=".quote($class->{_userId}));
+        WebGUI::SQL->write("delete from userProfileData where userId=".quote($class->{_userId}));
 	WebGUI::Grouping::deleteUsersFromGroups([$class->{_userId}],WebGUI::Grouping::getGroupsForUser($class->{_userId}));
-	WebGUI::SQL->write("delete from messageLog where userId=".$class->{_userId});
+	WebGUI::SQL->write("delete from messageLog where userId=".quote($class->{_userId}));
 
 	my $authMethod = WebGUI::Operation::Auth::getInstance($class->authMethod,$class->{_userId});
 	$authMethod->deleteParams($class->{_userId});
-    my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=$class->{_userId}");
+    my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=".quote($class->{_userId}));
     while (my ($sid) = $sth->array) {
        WebGUI::Session::end($sid);
     }
@@ -182,7 +183,7 @@ sub identifier {
         if (defined $value) {
                 $class->{_user}{"identifier"} = $value;
                 WebGUI::SQL->write("update authentication set fieldData=".quote($value)."
-                        where userId=$class->{_userId} and authMethod='WebGUI' and fieldName='identifier'");
+                        where userId=".quote($class->{_userId})." and authMethod='WebGUI' and fieldName='identifier'");
         }
         return $class->{_user}{"identifier"};
 }
@@ -213,8 +214,8 @@ A description of why this user's karma was modified. For instance it could be "M
 
 sub karma {
 	if (defined $_[1] && defined $_[2] && defined $_[3]) {
-		WebGUI::SQL->write("update users set karma=karma+$_[1] where userId=".$_[0]->userId);
-        	WebGUI::SQL->write("insert into karmaLog values (".$_[0]->userId.",$_[1],".quote($_[2]).",".quote($_[3]).",".time().")");
+		WebGUI::SQL->write("update users set karma=karma+".quote($_[1])." where userId=".quote($_[0]->userId));
+        	WebGUI::SQL->write("insert into karmaLog values (".quote($_[0]->userId).",$_[1],".quote($_[2]).",".quote($_[3]).",".time().")");
 	}
         return $_[0]->{_user}{karma};
 }
@@ -253,10 +254,10 @@ sub new {
         $class = shift;
         $userId = shift || 1;
 	$userId = _create() if ($userId eq "new");
-	%user = WebGUI::SQL->quickHash("select * from users where userId='$userId'");
+	%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($userId));
 	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 		from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
-		userProfileData.userId='$user{userId}'");
+		userProfileData.userId=".quote($user{userId}));
         %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
         foreach $key (keys %default) {
         	if ($profile{$key} eq "") {
@@ -299,9 +300,9 @@ sub profileField {
 	$value = WebGUI::Macro::negate($value);	# Len Kranendonk - 20030701: fixed security hole
 	if (defined $value) {
 		$class->{_profile}{$fieldName} = $value;
-		WebGUI::SQL->write("delete from userProfileData where userId=$class->{_userId} and fieldName=".quote($fieldName));
-		WebGUI::SQL->write("insert into userProfileData values ($class->{_userId}, ".quote($fieldName).", ".quote($value).")");
-        	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".$class->{_userId});
+		WebGUI::SQL->write("delete from userProfileData where userId=".quote($class->{_userId})." and fieldName=".quote($fieldName));
+		WebGUI::SQL->write("insert into userProfileData values (".quote($class->{_userId}).", ".quote($fieldName).", ".quote($value).")");
+        	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".quote($class->{_userId}));
 	}
 	return $class->{_profile}{$fieldName};
 }
@@ -328,8 +329,8 @@ sub referringAffiliate {
         $value = shift;
         if (defined $value) {
                 $class->{_user}{"referringAffiliate"} = $value;
-                WebGUI::SQL->write("update users set referringAffiliate=".$value.",
-                        lastUpdated=".time()." where userId=$class->{_userId}");
+                WebGUI::SQL->write("update users set referringAffiliate=".quote($value).",
+                        lastUpdated=".time()." where userId=".quote($class->{_userId}));
         }
         return $class->{_user}{"referringAffiliate"};
 }
@@ -357,7 +358,7 @@ sub status {
         if (defined $value) {
                 $class->{_user}{"status"} = $value;
                 WebGUI::SQL->write("update users set status=".quote($value).",
-                        lastUpdated=".time()." where userId=$class->{_userId}");
+                        lastUpdated=".time()." where userId=".quote($class->{_userId}));
         }
         return $class->{_user}{"status"};
 }
@@ -385,7 +386,7 @@ sub username {
         if (defined $value) {
                 $class->{_user}{"username"} = $value;
                 WebGUI::SQL->write("update users set username=".quote($value).",
-                        lastUpdated=".time()." where userId=$class->{_userId}");
+                        lastUpdated=".time()." where userId=".quote($class->{_userId}));
         }
         return $class->{_user}{"username"};
 }

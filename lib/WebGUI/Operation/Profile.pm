@@ -98,7 +98,7 @@ sub getRequiredProfileFields {
 
 sub isDuplicateEmail {
 	my $email = shift;
-	my ($otherEmail) = WebGUI::SQL->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".quote($email)." and userId <> ".$session{user}{userId});
+	my ($otherEmail) = WebGUI::SQL->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".quote($email)." and userId <> ".quote($session{user}{userId}));
 	return ($otherEmail > 0);
 }
 

@@ -27,7 +27,7 @@ sub process {
 		$collateralFolderId = 0 unless ($collateralFolderId);
 	}
 	my @images = WebGUI::SQL->buildArray("select collateralId from collateral 
-		where collateralType='image' and collateralFolderId=".$collateralFolderId,WebGUI::SQL->getSlave);
+		where collateralType='image' and collateralFolderId=".quote($collateralFolderId),WebGUI::SQL->getSlave);
 	if (my $collateral = WebGUI::Collateral->new($images[rand($#images+1)])) {
 	        return '<img src="'.$collateral->getURL.'" '.$collateral->get("parameters").' />';
         } else {

@@ -24,6 +24,7 @@ use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -145,7 +146,7 @@ sub add {
 	my ($self, $page, $newPageId);
 	$self = shift;
 		
-	$newPageId = getNextId('pageId');
+	$newPageId = WebGUI::Id::generate();
 	$self->add_child_to_right(
 		id	=>$self->get('pageId'),
 		pageId	=>$newPageId,
@@ -154,7 +155,7 @@ sub add {
 		);
 	
 	# Fixup the 'id' column that has the wrong value.
-	WebGUI::SQL->write("update page set id=pageId where pageId=$newPageId");
+	WebGUI::SQL->write("update page set id=pageId where pageId=".quote($newPageId));
 
 	$self->recacheNavigation;
 
@@ -198,7 +199,7 @@ sub canEdit {
         my (%page);
         tie %page, 'Tie::CPHash';
         if ($pageId ne $session{page}{pageId}) {
-                %page = WebGUI::SQL->quickHash("select ownerId,groupIdEdit from page where pageId=$pageId");
+                %page = WebGUI::SQL->quickHash("select ownerId,groupIdEdit from page where pageId=".quote($pageId));
         } else {
                 %page = %{$session{page}};
         }
@@ -294,7 +295,7 @@ sub canView {
         if ($pageId eq $session{page}{pageId}) {
                 %page = %{$session{page}};
         } else {
-                %page = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from page where pageId=$pageId",WebGUI::SQL->getSlave);
+                %page = WebGUI::SQL->quickHash("select ownerId,groupIdView,startDate,endDate from page where pageId=".quote($pageId),WebGUI::SQL->getSlave);
         }
         if ($session{user}{userId} == $page{ownerId}) {
                 return 1;
@@ -501,7 +502,7 @@ sub generate {
 		.moveDownIcon('op=movePageDown')
 		.cutIcon('op=cutPage');
 	$var{'page.controls'} .= exportIcon('op=exportPage') if defined ($session{config}{exportPath});
-	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".$session{page}{pageId}." order by sequenceNumber, wobjectId",WebGUI::SQL->getSlave);
+	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".quote($session{page}{pageId})." order by sequenceNumber, wobjectId",WebGUI::SQL->getSlave);
         while (my $wobject = $sth->hashRef) {
 		my $wobjectToolbar = wobjectIcon()
          		.deleteIcon('func=delete&wid='.${$wobject}{wobjectId})
@@ -517,11 +518,11 @@ sub generate {
          	}
        		if (${$wobject}{namespace} eq "WobjectProxy") {
           		my $originalWobject = $wobject;
-      			my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".${$wobject}{wobjectId},WebGUI::SQL->getSlave);
+      			my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy where wobjectId=".quote(${$wobject}{wobjectId}),WebGUI::SQL->getSlave);
 			if($wobjectProxy->{proxyByCriteria}) {
 				$wobjectProxy->{proxiedWobjectId} = WebGUI::MetaData::getWobjectByCriteria($wobjectProxy) || $wobjectProxy->{proxiedWobjectId};
 			}
-	        	$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId},WebGUI::SQL->getSlave);
+	        	$wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".quote($wobjectProxy->{proxiedWobjectId}),WebGUI::SQL->getSlave);
            		if (${$wobject}{namespace} eq "") {
              			$wobject = $originalWobject;
          		} else {
@@ -583,7 +584,7 @@ sub generation {
 		from page as a, 
 		     page as b 
 		where a.depth = b.depth and 
-		      b.pageId = ".$self->get('pageId').
+		      b.pageId = ".quote($self->get('pageId')).
 		" order by nestedSetLeft");
 
 	while (%row = $sth->hash) {
@@ -981,7 +982,7 @@ sub leaves_under {
 		     page as b 
 		where (a.nestedSetLeft between b.nestedSetLeft and b.nestedSetRight) and
 		      (a.nestedSetRight = a.nestedSetLeft + 1)
-		      b.pageId = ".$self->get('pageId').
+		      b.pageId = ".quote($self->get('pageId')).
 		" order by nestedSetLeft");
 
 	while (%row = $sth->hash) {
@@ -1016,7 +1017,7 @@ sub makeUnique {
         my $pageId = $_[1] || "new";
 	my $where; 
 	unless ($pageId eq "new") {
-		$where .= " and pageId<>".$pageId;
+		$where .= " and pageId<>".quote($pageId);
 	}
         my ($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle=".quote($url).$where);
 	if ($test) {
@@ -1110,7 +1111,7 @@ sub move{
 	WebGUI::SQL->write($sql);
 
 	# Set the parentId to the right node.
-	WebGUI::SQL->write("update page set parentId=".$newMother->get('pageId')." where pageId=".$self->get('pageId'));
+	WebGUI::SQL->write("update page set parentId=".quote($newMother->get('pageId'))." where pageId=".quote($self->get('pageId')));
 
 	WebGUI::Page->recacheNavigation;
 	
@@ -1282,7 +1283,7 @@ sub new {
 		no_locking		=> 1
 		);
 	unless (ref($properties)) {
-		$properties = WebGUI::SQL->quickHashRef("select * from page where pageId=$_[1]");
+		$properties = WebGUI::SQL->quickHashRef("select * from page where pageId=".quote($_[1]));
 	}
 	
 	return undef unless (defined $properties->{pageId});
@@ -1440,7 +1441,7 @@ sub self_and_sisters {
 		from page as a, 
 		     page as b 
 		where a.parentId = b.parentId and 
-		      b.pageId = ".$self->get('pageId').
+		      b.pageId = ".quote($self->get('pageId')).
 		" order by nestedSetLeft");
 	while (%row = $sth->hash) {
 		push(@result, {(%row)});
@@ -1495,8 +1496,8 @@ sub sisters {
 		"select a.* 
 		from page as a, 
 		     page as b 
-		where a.pageId !=".$self->get('pageId')." and  
-		      a.parentId = b.parentId and b.pageId = ".$self->get('pageId').
+		where a.pageId !=".quote($self->get('pageId'))." and  
+		      a.parentId = b.parentId and b.pageId = ".quote($self->get('pageId')).
 		" order by nestedSetLeft");
 	while (%row = $sth->hash) {
 		push(@result, {(%row)});
@@ -1559,7 +1560,7 @@ sub setWithoutRecache {
 	$properties = $self->{_properties} unless ($properties);
 	
 	if (scalar(keys(%{$properties}))) {
-		WebGUI::SQL->write("update page set ".join(', ', map {"$_=".quote($properties->{$_})} keys %{$properties})." where pageId=".$self->get('pageId'));
+		WebGUI::SQL->write("update page set ".join(', ', map {"$_=".quote($properties->{$_})} keys %{$properties})." where pageId=".quote($self->get('pageId')));
 	}
 
 	return "";

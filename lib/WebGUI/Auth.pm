@@ -99,7 +99,8 @@ sub _isValidUsername {
 
 #-------------------------------------------------------------------
 sub _logLogin {
-   WebGUI::SQL->write("insert into userLoginLog values ('$_[0]','$_[1]',".time().",".quote($session{env}{REMOTE_ADDR}).",".quote($session{env}{HTTP_USER_AGENT}).")");
+   WebGUI::SQL->write("insert into userLoginLog values (".quote($_[0]).",".quote($_[1]).",".time().","
+	.quote($session{env}{REMOTE_ADDR}).",".quote($session{env}{HTTP_USER_AGENT}).")");
 }
 
 #-------------------------------------------------------------------
@@ -686,8 +687,8 @@ sub saveParams {
     my $self = shift;
 	my ($uid, $authMethod, $data) = @_;
 	foreach (keys %{$data}) {
-       WebGUI::SQL->write("delete from authentication where userId=$uid and authMethod=".quote($authMethod)." and fieldName=".quote($_));
-   	   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldData,fieldName) values ($uid,".quote($authMethod).",".quote($data->{$_}).",".quote($_).")");
+       WebGUI::SQL->write("delete from authentication where userId=".quote($uid)." and authMethod=".quote($authMethod)." and fieldName=".quote($_));
+   	   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldData,fieldName) values (".quote($uid).",".quote($authMethod).",".quote($data->{$_}).",".quote($_).")");
     }
 }
 

@@ -37,10 +37,10 @@ sub _purgeUserTrash {
         #WebGUI::ErrorHandler::audit("emptying user trash");
 
         # Delete wobjects
-        $b = WebGUI::SQL->read("select * from wobject where pageId=3 and bufferUserId=" . $userId);
+        $b = WebGUI::SQL->read("select * from wobject where pageId=3 and bufferUserId=" . quote($userId));
         while ($base = $b->hashRef) {
                 $extended = WebGUI::SQL->quickHashRef("select * from ".$base->{namespace}."
-                        where wobjectId=".$base->{wobjectId});
+                        where wobjectId=".quote($base->{wobjectId}));
                 %properties = (%{$base}, %{$extended});
                 $cmd = "WebGUI::Wobject::".$properties{namespace};
 		my $load = "use ".$cmd;
@@ -68,10 +68,10 @@ sub _purgeUserTrash {
 sub _purgeWobject {
 	my (%properties, $base, $extended, $b, $wobjectId, $namespace, $w, $cmd);
 	tie %properties, 'Tie::CPHash';
-	$b = WebGUI::SQL->read("select * from wobject where wobjectId=$_[0]");
+	$b = WebGUI::SQL->read("select * from wobject where wobjectId=".quote($_[0]));
         while ($base = $b->hashRef) {
 		$extended = WebGUI::SQL->quickHashRef("select * from ".$base->{namespace}." 
-			where wobjectId=".$base->{wobjectId});
+			where wobjectId=".quote($base->{wobjectId}));
 		%properties = (%{$base}, %{$extended});
         	$cmd = "WebGUI::Wobject::".$properties{namespace};
 		my $load = "use ".$cmd;
@@ -87,10 +87,10 @@ sub _purgeWobject {
 sub _purgeWobjects {
 	my (%properties, $base, $extended, $b, $wobjectId, $namespace, $w, $cmd);
 	tie %properties, 'Tie::CPHash';
-	$b = WebGUI::SQL->read("select * from wobject where pageId=$_[0]");
+	$b = WebGUI::SQL->read("select * from wobject where pageId=".quote($_[0]));
         while ($base = $b->hashRef) {
 		$extended = WebGUI::SQL->quickHashRef("select * from ".$base->{namespace}." 
-			where wobjectId=".$base->{wobjectId});
+			where wobjectId=".quote($base->{wobjectId}));
 		%properties = (%{$base}, %{$extended});
         	$cmd = "WebGUI::Wobject::".$properties{namespace};
 		my $load = "use ".$cmd;
@@ -105,11 +105,11 @@ sub _purgeWobjects {
 #-------------------------------------------------------------------
 sub _recursePageTree {
         my ($a, $pageId);
-        $a = WebGUI::SQL->read("select pageId from page where parentId=$_[0]");
+        $a = WebGUI::SQL->read("select pageId from page where parentId=".quote($_[0]));
         while (($pageId) = $a->array) {
                 _recursePageTree($pageId);
 		_purgeWobjects($pageId);
-                WebGUI::SQL->write("delete from page where pageId=$pageId");
+                WebGUI::SQL->write("delete from page where pageId=".quote($pageId));
         }
         $a->finish;
 }
@@ -138,14 +138,14 @@ sub www_cutTrashItem {
 	if ($session{form}{wid} ne "") {
 		if ( ($session{setting}{sharedTrash} ne "1") && (!(WebGUI::Grouping::isInGroup(3)) ) ) {
 			my ($bufferUserId) = WebGUI::SQL->quickArray("select bufferUserId from wobject "
-								."where wobjectId=" .$session{form}{wid});
+								."where wobjectId=" .quote($session{form}{wid}));
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
 		}
 		WebGUI::SQL->write("update wobject set pageId=2, "
-				."bufferUserId=". $session{user}{userId} .", "
+				."bufferUserId=". quote($session{user}{userId}) .", "
 				."bufferDate=". time() .", "
 				."bufferPrevId=3 "
-				."where wobjectId=" .$session{form}{wid});
+				."where wobjectId=" .quote($session{form}{wid}));
 		WebGUI::ErrorHandler::audit("moved wobject ". $session{form}{wid} ." from trash to clipboard");
 	} elsif ($session{form}{pageId} ne "") {
 		my $page = WebGUI::Page->getPage($session{form}{pageId});
@@ -195,7 +195,7 @@ sub www_deleteTrashItemConfirm {
 			_purgeWobject($session{form}{wid});
 		} else {
 			my ($bufferUserId) = WebGUI::SQL->quickArray("select bufferUserId from wobject "
-								."where wobjectId=" .$session{form}{wid});
+								."where wobjectId=" .quote($session{form}{wid}));
 			return WebGUI::Privilege::insufficient() unless ($bufferUserId eq $session{user}{userId});
 			_purgeWobject($session{form}{wid});
 		}
@@ -298,7 +298,7 @@ sub www_manageTrash {
 	} else {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
 			."from page where parentId=3 and bufferUserId="
-			. $session{user}{userId} . " order by bufferDate");
+			. quote($session{user}{userId}) . " order by bufferDate");
 	}
         while (@data = $sth->array) {
 		my ($pageId,$title,$urlizedTitle,$bufferUserId,$bufferDate,$bufferPrevId,$url,$htmlData);
@@ -309,7 +309,7 @@ sub www_manageTrash {
 
 		$bufferUserId = $data[3];
 		if ($bufferUserId ne "") {
-			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$bufferUserId);
+			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".quote($bufferUserId));
 			$bufferUserId = '<a href="' .WebGUI::URL::page('op=viewProfile&uid='.$bufferUserId) .'">'
 					.$bufferUsername .'</a>';
 		}
@@ -317,7 +317,7 @@ sub www_manageTrash {
 		$bufferPrevId = $data[5];
 		if ($bufferPrevId ne "") {
 			($bufferPrevId,$url) = WebGUI::SQL->quickArray("select title,urlizedTitle "
-									."from page where pageId=".$bufferPrevId);
+									."from page where pageId=".quote($bufferPrevId));
 			if ($url ne "") {
                 		$bufferPrevId = '<a href="'. WebGUI::URL::gateway($url) .'">' .$bufferPrevId .'</a>';
 			}
@@ -350,7 +350,7 @@ sub www_manageTrash {
 	} else {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
 			. "from wobject where pageId=3 and bufferUserId="
-			. $session{user}{userId} ." order by bufferDate");
+			. quote($session{user}{userId}) ." order by bufferDate");
 	}
         while (@data = $sth->array) {
 		my ($wobjectId,$namespace,$title,$bufferUserId,$bufferDate,$bufferPrevId,$url,$htmlData);
@@ -363,7 +363,7 @@ sub www_manageTrash {
 		$bufferPrevId = $data[5];
 		if ($bufferPrevId ne "") {
 			($bufferPrevId,$url) = WebGUI::SQL->quickArray("select title,urlizedTitle "
-									."from page where pageId=".$bufferPrevId);
+									."from page where pageId=".quote($bufferPrevId));
 			if ($url ne "") {
                 		$bufferPrevId = '<a href="'. WebGUI::URL::gateway($url) .'">' .$bufferPrevId .'</a>';
 			}
@@ -372,7 +372,7 @@ sub www_manageTrash {
 
 		$bufferUserId = $data[3];
 		if ($bufferUserId ne "") {
-			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$bufferUserId);
+			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".quote($bufferUserId));
 			$bufferUserId = '<a href="' .WebGUI::URL::page('op=viewProfile&uid='.$bufferUserId) .'">'
 					.$bufferUsername .'</a>';
 		}

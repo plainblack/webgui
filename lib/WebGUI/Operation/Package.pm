@@ -13,6 +13,7 @@ package WebGUI::Operation::Package;
 use Exporter;
 use strict qw(vars subs);
 use WebGUI::Icon;
+use WebGUI::Id;
 use WebGUI::Page;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -26,7 +27,7 @@ our @EXPORT = qw(&www_deployPackage );
 sub _duplicateWobjects {
 	my (%properties);
 	tie %properties, 'Tie::CPHash';
-	my $sth = WebGUI::SQL->read("select * from wobject where pageId=$_[0] order by sequenceNumber");
+	my $sth = WebGUI::SQL->read("select * from wobject where pageId=".quote($_[0])." order by sequenceNumber");
 	while (my $wobject = $sth->hashRef) {
 		my $cmd = "WebGUI::Wobject::".${$wobject}{namespace};
 		my $load = "use ".$cmd;
@@ -43,12 +44,12 @@ sub _recursePageTree {
 	my ($a, %package, %newParent, $newPageId, $sequenceNumber, $urlizedTitle);
 	tie %newParent, 'Tie::CPHash';
 	tie %package, 'Tie::CPHash';
-	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=$_[1]");
+	%newParent = WebGUI::SQL->quickHash("select * from page where pageId=".quote($_[1]));
 	_duplicateWobjects($_[0],$_[1]);
-	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=$_[1]");
-	$a = WebGUI::SQL->read("select * from page where parentId=$_[0] order by sequenceNumber");
+	($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from page where parentId=".quote($_[1]));
+	$a = WebGUI::SQL->read("select * from page where parentId=".quote($_[0])." order by sequenceNumber");
 	while (%package = $a->hash) {
-		$newPageId = getNextId("pageId");
+		$newPageId = WebGUI::Id::generate();
 		$sequenceNumber++;
 		$urlizedTitle = WebGUI::Page::makeUnique($package{urlizedTitle});
                 WebGUI::SQL->write("insert into page (
@@ -82,7 +83,7 @@ sub _recursePageTree {
 			wobjectPrivileges
 			) values (
 			$newPageId,
-			$_[1],
+			".quote($_[1]).",
 			".quote($package{title}).",
 			$newParent{styleId},
 			$session{user}{userId},
@@ -107,7 +108,7 @@ sub _recursePageTree {
 			$package{newWindow},
 			$package{cacheTimeout},
 			$package{cacheTimeoutVisitor},
-			$package{printableStyleId},
+			".quote($package{printableStyleId}).",
 			$package{wobjectPrivileges}
 			)");
 		_recursePageTree($package{pageId},$newPageId);

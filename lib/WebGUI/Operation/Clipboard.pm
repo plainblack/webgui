@@ -79,19 +79,19 @@ sub www_deleteClipboardItemConfirm {
 		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
 			WebGUI::SQL->write("update wobject set pageId=3, "
                 		."bufferDate=".time().", "
-                		."bufferUserId=".$session{user}{userId} .", "
+                		."bufferUserId=".quote($session{user}{userId}) .", "
                 		."bufferPrevId=2 "
 				."where pageId=2 "
-				."and wobjectId=" . $session{form}{wid}
+				."and wobjectId=" . quote($session{form}{wid})
 				);
 		} else {
 			WebGUI::SQL->write("update wobject set pageId=3, "
                 		."bufferDate=".time().", "
-                		."bufferUserId=".$session{user}{userId} .", "
+                		."bufferUserId=".quote($session{user}{userId}) .", "
                 		."bufferPrevId=2 "
 				."where pageId=2 "
-				."and wobjectId=" . $session{form}{wid} ." "
-                		."and bufferUserId=".$session{user}{userId}
+				."and wobjectId=" . quote($session{form}{wid}) ." "
+                		."and bufferUserId=".quote($session{user}{userId})
 				);
 		}
 		WebGUI::ErrorHandler::audit("moved wobject ". $session{form}{wid} ." from clipboard to trash");
@@ -99,15 +99,15 @@ sub www_deleteClipboardItemConfirm {
 		if ( ($session{setting}{sharedClipboard} eq "1") || (WebGUI::Grouping::isInGroup(3)) ) {
         		WebGUI::SQL->write("update page set parentId=3, "
                 		."bufferDate=".time().", "
-                		."bufferUserId=".$session{user}{userId} .", "
+                		."bufferUserId=".quote($session{user}{userId}) .", "
                 		."bufferPrevId=2 "
                 		."where parentId=2 "
-                		."and pageId=".$session{form}{pageId}
+                		."and pageId=".quote($session{form}{pageId})
 				);
 		} else {
         		WebGUI::SQL->write("update page set parentId=3, "
                 		."bufferDate=".time().", "
-                		."bufferUserId=".$session{user}{userId} .", "
+                		."bufferUserId=".quote($session{user}{userId}) .", "
                 		."bufferPrevId=2 "
                 		."where parentId=2 "
                 		."and pageId=".$session{form}{pageId} ." "
@@ -154,28 +154,28 @@ sub www_emptyClipboardConfirm {
 	if ($allUsers eq "1") {
         	WebGUI::SQL->write("update page set parentId=3, "
                 	."bufferDate=".time().", "
-                	."bufferUserId=".$session{user}{userId} .", "
+                	."bufferUserId=".quote($session{user}{userId}) .", "
                 	."bufferPrevId=2 "
                 	."where parentId=2 ");
         	WebGUI::SQL->write("update wobject set pageId=3, "
                 	."bufferDate=".time().", "
-                	."bufferUserId=".$session{user}{userId} .", "
+                	."bufferUserId=".quote($session{user}{userId}) .", "
                 	."bufferPrevId=2 "
                 	."where pageId=2 ");
         	WebGUI::ErrorHandler::audit("emptied clipboard to trash");
 	} else {
         	WebGUI::SQL->write("update page set parentId=3, "
                 	."bufferDate=".time().", "
-                	."bufferUserId=".$session{user}{userId} .", "
+                	."bufferUserId=".quote($session{user}{userId}) .", "
                 	."bufferPrevId=2 "
                 	."where parentId=2 "
-                	."and bufferUserId=".$session{user}{userId});
+                	."and bufferUserId=".quote($session{user}{userId}));
         	WebGUI::SQL->write("update wobject set pageId=3, "
                 	."bufferDate=".time().", "
-                	."bufferUserId=".$session{user}{userId} .", "
+                	."bufferUserId=".quote($session{user}{userId}) .", "
                 	."bufferPrevId=2 "
                 	."where pageId=2 "
-                	."and bufferUserId=".$session{user}{userId});
+                	."and bufferUserId=".quote($session{user}{userId}));
         	WebGUI::ErrorHandler::audit("emptied user clipboard to trash");
 	}
         WebGUI::Session::refreshPageInfo($session{page}{pageId});
@@ -209,7 +209,7 @@ sub www_manageClipboard {
 	} else {
 		$sth = WebGUI::SQL->read("select pageId,title,urlizedTitle,bufferUserId,bufferDate,bufferPrevId "
 			."from page where parentId=2 and bufferUserId="
-			. $session{user}{userId} . " order by bufferDate");
+			. quote($session{user}{userId}) . " order by bufferDate");
 	}
         while (@data = $sth->array) {
 		my ($pageId,$title,$urlizedTitle,$bufferUserId,$bufferDate,$bufferPrevId,$url,$htmlData);
@@ -220,7 +220,7 @@ sub www_manageClipboard {
 
 		$bufferUserId = $data[3];
 		if ($bufferUserId ne "") {
-			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$bufferUserId);
+			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".quote($bufferUserId));
 			$bufferUserId = '<a href="' .WebGUI::URL::page('op=viewProfile&uid='.$bufferUserId) .'">'
 					.$bufferUsername .'</a>';
 		}
@@ -228,7 +228,7 @@ sub www_manageClipboard {
 		$bufferPrevId = $data[5];
 		if ($bufferPrevId ne "") {
 			($bufferPrevId,$url) = WebGUI::SQL->quickArray("select title,urlizedTitle "
-									."from page where pageId=".$bufferPrevId);
+									."from page where pageId=".quote($bufferPrevId));
 			if ($url ne "") {
                 		$bufferPrevId = '<a href="'. WebGUI::URL::gateway($url) .'">' .$bufferPrevId .'</a>';
 			}
@@ -261,7 +261,7 @@ sub www_manageClipboard {
 	} else {
 		$sth = WebGUI::SQL->read("select wobjectId,namespace,title,bufferUserId,bufferDate,bufferPrevId "
 			. "from wobject where pageId=2 and bufferUserId="
-			. $session{user}{userId} ." order by bufferDate");
+			. quote($session{user}{userId}) ." order by bufferDate");
 	}
         while (@data = $sth->array) {
 		my ($wobjectId,$namespace,$title,$bufferUserId,$bufferDate,$bufferPrevId,$url,$htmlData);
@@ -274,7 +274,7 @@ sub www_manageClipboard {
 		$bufferPrevId = $data[5];
 		if ($bufferPrevId ne "") {
 			($bufferPrevId,$url) = WebGUI::SQL->quickArray("select title,urlizedTitle "
-									."from page where pageId=".$bufferPrevId);
+									."from page where pageId=".quote($bufferPrevId));
 			if ($url ne "") {
                 		$bufferPrevId = '<a href="'. WebGUI::URL::gateway($url) .'">' .$bufferPrevId .'</a>';
 			}
@@ -283,7 +283,7 @@ sub www_manageClipboard {
 
 		$bufferUserId = $data[3];
 		if ($bufferUserId ne "") {
-			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".$bufferUserId);
+			my ($bufferUsername) = WebGUI::SQL->quickArray("select username from users where userId=".quote($bufferUserId));
 			$bufferUserId = '<a href="' .WebGUI::URL::page('op=viewProfile&uid='.$bufferUserId) .'">'
 					.$bufferUsername .'</a>';
 		}

@@ -24,7 +24,7 @@ sub process {
         $format = '%z' if ($format eq "");
 	$output = "";
 
-        ($time) = WebGUI::SQL->quickArray("SELECT max(lastEdited) FROM wobject where pageId=$session{page}{pageId}",WebGUI::SQL->getSlave);
+        ($time) = WebGUI::SQL->quickArray("SELECT max(lastEdited) FROM wobject where pageId=".quote($session{page}{pageId}),WebGUI::SQL->getSlave);
         if ($time) {
 		$output = $label.epochToHuman($time,$format);
 	}

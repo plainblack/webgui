@@ -27,7 +27,7 @@ sub process {
                 $collateralFolderId = 0 unless ($collateralFolderId);
         }
 	my @snippets = WebGUI::SQL->buildArray("select collateralId from collateral 
-		where collateralType='snippet' and collateralFolderId=".$collateralFolderId,WebGUI::SQL->getSlave);
+		where collateralType='snippet' and collateralFolderId=".quote($collateralFolderId),WebGUI::SQL->getSlave);
 	if (my $collateral = WebGUI::Collateral->new($snippets[rand($#snippets+1)])) {
 	        return $collateral->get("parameters");
         } else {

@@ -215,7 +215,7 @@ sub _traversePageTree {
 					.moveRightIcon(sprintf('op=moveTreePageRight&pageId=%s',$currentPageId), $currentUrlizedTitle)
 					.editIcon('op=editPage', $currentUrlizedTitle)
 					.' <a href="'.WebGUI::URL::gateway($currentUrlizedTitle).'">'.$currentPage->get('title').'</a><br>';
-				$wobjects = WebGUI::SQL->read("select * from wobject where pageId=$currentPageId");
+				$wobjects = WebGUI::SQL->read("select * from wobject where pageId=".quote($currentPageId));
 				while (%wobject = $wobjects->hash) {
 					$output .= $spacer x $options->{_depth} . $spacer
 						.wobjectIcon()
@@ -338,7 +338,7 @@ sub www_editPage {
 			if ($buildFromPage == 0) {
 				$buildFromPage = $session{setting}{defaultPage};
 			}
-			%page = WebGUI::SQL->quickHash("select * from page where pageId=$buildFromPage");
+			%page = WebGUI::SQL->quickHash("select * from page where pageId=".quote($buildFromPage));
 			$page{templateId} = 1;
 			$page{pageId} = "new";
 			$page{title} = $page{menuTitle} = $page{urlizedTitle} = $page{synopsis} = '';
@@ -349,7 +349,7 @@ sub www_editPage {
                         $page{redirectURL} = "";
 		} else {
 			%page = %{$session{page}};
-			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=$page{pageId}");
+			($childCount) = WebGUI::SQL->quickArray("select count(*) from page where parentId=".quote($page{pageId}));
 		}
 		$page{endDate} = (addToDate(time(),10)) if ($page{endDate} < 0);
                 $output = helpIcon("page add/edit");
@@ -487,9 +487,9 @@ sub www_editPage {
 		if (WebGUI::Grouping::isInGroup(3)) {
 			my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
 			push (@$contentManagers, $session{user}{userId});
-			$clause = "userId in (".join(",",@$contentManagers).")";
+			$clause = "userId in (".quoteAndJoin($contentManagers).")";
 		} else {
-			$clause = "userId=$page{ownerId}";
+			$clause = "userId=".quote($page{ownerId});
                 }
 		my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
 		$f->getTab("privileges")->select(
@@ -598,7 +598,7 @@ sub www_editPageSave {
 		synopsis		=> $session{form}{synopsis}
 		});
 	unless ($session{form}{pageId} == 'new') {
-		WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=$session{form}{pageId} 
+		WebGUI::SQL->write("update wobject set templatePosition=1 where pageId=".quote($session{form}{pageId})." 
 			and templatePosition>".WebGUI::Page::countTemplatePositions($session{form}{templateId}));
 	}
 	_recursivelyChangeProperties($page) if ($session{form}{recursePrivs} || $session{form}{recurseStyle});

@@ -79,7 +79,7 @@ sub _setupPageInfo {
 		$pageName =~ s/\'//;
 		$pageName =~ s/\"//;
 		if ($pageName ne "") {
-			($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle='".$pageName."'");
+			($pageId) = WebGUI::SQL->quickArray("select pageId from page where urlizedTitle=".quote($pageName));
 			if ($pageId eq "") {
 				$pageId = $session{setting}{notFoundPage};
 				if($ENV{"MOD_PERL"}) {
@@ -96,7 +96,7 @@ sub _setupPageInfo {
 			$pageId = $session{setting}{defaultPage};
 		}
 	}
-	%page = WebGUI::SQL->quickHash("select * from page where pageId='".$pageId."'");
+	%page = WebGUI::SQL->quickHash("select * from page where pageId=".quote($pageId));
 	$session{page} = \%page;
 }
 
@@ -105,7 +105,7 @@ sub _setupSessionVars {
 	my (%vars, $uid, $encryptedPassword);
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
-		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId='$_[0]'");
+		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId=".quote($_[0]));
 		if ($vars{expires} < _time() ) { #|| $vars{lastIP} ne $session{env}{REMOTE_ADDR}) { # had to remove for revolving ip proxies
 			%vars = ();
 			WebGUI::Session::end($_[0]);
@@ -127,17 +127,16 @@ sub _setupUserInfo {
 	my (%default, $key, %user, $uid, %profile, $value);
 	tie %user, 'Tie::CPHash';
 	$uid = $_[0] || 1;
-	%user = WebGUI::SQL->quickHash("select * from users where userId='$uid'");
+	%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($uid));
 	if ($user{userId} eq "") {
 		_setupUserInfo("1");
 	} else {
 		%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
-			and userProfileData.userId='$user{userId}'");
+			and userProfileData.userId=".quote($user{userId}));
 		%user = (%user, %profile);
 		$user{language} = $session{page}{languageId} if ($user{userId} == 1 || $user{language} eq '');
-		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField 
-			where profileCategoryId=4");
+		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
 		foreach $key (keys %default) {
 			if ($user{$key} eq "") {
 				$value = eval($default{$key});
@@ -212,7 +211,7 @@ The user for the session to become.
 =cut
 
 sub convertVisitorToUser {
-	WebGUI::SQL->write("update userSession set userId=$_[1] where sessionId=".quote($_[0]));
+	WebGUI::SQL->write("update userSession set userId=".quote($_[1])." where sessionId=".quote($_[0]));
 	if ($session{setting}{passiveProfilingEnabled}) {
 		WebGUI::SQL->write("update passiveProfileLog set userId = ".quote($_[1])." where sessionId = ".quote($_[0]));
 	}	
@@ -285,8 +284,8 @@ The session to end.
 =cut
 
 sub end {
-	WebGUI::SQL->write("delete from userSession where sessionId='$_[0]'",$session{dbh});
-	WebGUI::SQL->write("delete from userSessionScratch where sessionId='$_[0]'",$session{dbh});
+	WebGUI::SQL->write("delete from userSession where sessionId=".quote($_[0]),$session{dbh});
+	WebGUI::SQL->write("delete from userSessionScratch where sessionId=".quote($_[0]),$session{dbh});
 	if ($_[0] eq $session{var}{sessionId}) {
 		delete $session{user};
 		delete $session{isInGroup};
@@ -538,10 +537,10 @@ sub start {
 	$sessionId = $_[1] || _uniqueSessionId();
 	if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
 		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{HTTP_X_FORWARDED_FOR}', $_[0])");
+			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{HTTP_X_FORWARDED_FOR}', ".quote($_[0]).")");
 	} else {
 		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', $_[0])");
+			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', ".quote($_[0]).")");
 	}
 	push @{$session{http}{cookie}}, $session{cgi}->cookie(
                 -name=>"wgSession",

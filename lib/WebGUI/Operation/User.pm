@@ -86,7 +86,7 @@ sub doUserSearch {
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
 		email.fieldData as email from users left join userProfileData email on users.userId=email.userId and email.fieldName='email'
 		where $selectedStatus  and (users.username like ".$keyword." or email.fieldData like ".$keyword.") 
-		and users.userId not in (".join(",",@{$userFilter}).")  order by users.username";
+		and users.userId not in (".quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
         	my $p = WebGUI::Paginator->new(WebGUI::URL::page($op));
 		$p->setDataByQuery($sql);
@@ -272,7 +272,7 @@ sub www_deleteGrouping {
 sub www_deleteUser {
         my ($output);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        if ($session{form}{uid} < 26) {
+        if ($session{form}{uid} == 1 || $session{form}{uid} == 3) {
 		return WebGUI::Privilege::vitalComponent();
         } else {
                 $output .= helpIcon("user delete");
@@ -290,7 +290,7 @@ sub www_deleteUser {
 sub www_deleteUserConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
-    if ($session{form}{uid} < 26) {
+        if ($session{form}{uid} == 1 || $session{form}{uid} == 3) {
 	   return WebGUI::Privilege::vitalComponent();
     } else {
 	   $u = WebGUI::User->new($session{form}{uid});
@@ -504,7 +504,7 @@ sub www_editUserProfile {
         $f = WebGUI::HTMLForm->new;
         $f->hidden("op","editUserProfileSave");
         $f->hidden("uid",$session{form}{uid});
-	%user = WebGUI::SQL->buildHash("select fieldName,fieldData from userProfileData where userId=$session{form}{uid}");
+	%user = WebGUI::SQL->buildHash("select fieldName,fieldData from userProfileData where userId=".quote($session{form}{uid}));
         $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
                 where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
                 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");

@@ -17,7 +17,6 @@ use WebGUI::HTMLForm;
 use WebGUI::Form;
 use WebGUI::Mail;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
 use URI;

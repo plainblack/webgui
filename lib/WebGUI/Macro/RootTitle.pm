@@ -21,7 +21,8 @@ use WebGUI::URL;
 sub process {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=".($_[0] || $session{page}{parentId}),WebGUI::SQL->getSlave);
+	my $pageid = $_[0] || $session{page}{parentId};
+        %data = WebGUI::SQL->quickHash("select pageId,parentId,title,urlizedTitle from page where pageId=".quote($pageId),WebGUI::SQL->getSlave);
 	if ($data{parentId} == 0) {
 		$output = $data{title} || $session{page}{title};
 	} else {
