@@ -154,10 +154,10 @@ sub www_edit {
 	if ($_[0]->get("wobjectId") eq "new") {
                 $f->whatNext(
                         -options=>{
-                                addQuestion=>WebGUI::International::get(74,$namespace),
+                                addFile=>WebGUI::International::get(74,$namespace),
                                 backToPage=>WebGUI::International::get(745)
                                 },
-                        -value=>"addQuestion"
+                        -value=>"addFile"
                         );
         }
 	$output .= $_[0]->SUPER::www_edit($f->printRowsOnly);
@@ -171,7 +171,8 @@ sub www_editSave {
 		paginateAfter=>$session{form}{paginateAfter},
 		templateId=>$session{form}{templateId}
 		});
-        if ($session{form}{proceed}) {
+        if ($session{form}{proceed} eq "addFile") {
+		$session{form}{did} = "new";
                 return $_[0]->www_editDownload();
         } else {
                 return "";
@@ -181,44 +182,47 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editDownload {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-        my ($output, %download, $f);
-        tie %download,'Tie::CPHash';
-	if ($session{form}{did} eq "") {
-		$session{form}{did} = "new";
-	} else {
-		%download = WebGUI::SQL->quickHash("select * from FileManager_file where FileManager_fileId='$session{form}{did}'");
-	}
+        my ($output, $file, $f);
+	$file = $_[0]->getCollateral("FileManager_file","FileManager_fileId",$session{form}{did});
         $output .= helpIcon(2,$namespace);
         $output .= '<h1>'.WebGUI::International::get(10,$namespace).'</h1>';
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("wid",$_[0]->get("wobjectId"));
-        $f->hidden("did",$session{form}{did});
+        $f->hidden("did",$file->{FileManager_fileId});
         $f->hidden("func","editDownloadSave");
-	$f->text("fileTitle",WebGUI::International::get(5,$namespace),$download{fileTitle});
-	if ($download{downloadFile} ne "") {
+	$f->text("fileTitle",WebGUI::International::get(5,$namespace),$file->{fileTitle});
+	if ($file->{downloadFile} ne "") {
 		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=downloadFile&wid='.
-			$session{form}{wid}.'&did='.$session{form}{did}).'">'.WebGUI::International::get(391).
+			$_[0]->get("wobjectId").'&did='.$file->{FileManager_fileId}).'">'.WebGUI::International::get(391).
 			'</a>',WebGUI::International::get(6,$namespace));
         } else {
 		$f->file("downloadFile",WebGUI::International::get(6,$namespace));
         }
-        if ($download{alternateVersion1} ne "") {
+        if ($file->{alternateVersion1} ne "") {
 		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion1&wid='.
-			$session{form}{wid}.'&did='.$session{form}{did}).'">'.
+			$_[0]->get("wobjectId").'&did='.$file->{FileManager_fileId}).'">'.
 			WebGUI::International::get(391).'</a>',WebGUI::International::get(17,$namespace));
         } else {
 		$f->file("alternateVersion1",WebGUI::International::get(17,$namespace));
         }
-        if ($download{alternateVersion2} ne "") {
+        if ($file->{alternateVersion2} ne "") {
 		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion1&wid='.
-		$session{form}{wid}.'&did='.$session{form}{did}).'">'.
+			$_[0]->get("wobjectId").'&did='.$file->{FileManager_fileId}).'">'.
 			WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$namespace));
         } else {
 		$f->file("alternateVersion2",WebGUI::International::get(18,$namespace));
         }
-        $f->text("briefSynopsis",WebGUI::International::get(8,$namespace),$download{briefSynopsis});
-        $f->group("groupToView",WebGUI::International::get(7,$namespace),[$download{groupToView}]);
-        $f->yesNo("proceed",WebGUI::International::get(22,$namespace));
+        $f->text("briefSynopsis",WebGUI::International::get(8,$namespace),$file->{briefSynopsis});
+        $f->group("groupToView",WebGUI::International::get(7,$namespace),[$file->{groupToView}]);
+	if ($file->{FileManager_fileId} eq "new") {
+                $f->whatNext(
+                        -options=>{
+                                addFile=>WebGUI::International::get(74,$namespace),
+                                backToPage=>WebGUI::International::get(745)
+                                },
+                        -value=>"addFile"
+                        );
+        }
 	$f->submit;
 	$output .= $f->print;
         return $output;
@@ -247,7 +251,7 @@ sub www_editDownloadSave {
 	$file->save("alternateVersion2");
 	$files{alternateVersion2} = $file->getFilename;
 	$_[0]->setCollateral("FileManager_file", "FileManager_fileId", \%files);
-        if ($session{form}{proceed}) {
+        if ($session{form}{proceed} eq "addFile") {
         	$session{form}{did} = "new";
         	return $_[0]->www_editDownload();
         } else {
