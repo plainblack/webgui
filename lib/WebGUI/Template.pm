@@ -95,7 +95,7 @@ sub process {
 				#$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
                       	}
                         unless (lc($key) eq "password" || lc($key) eq "identifier") {
-                        	$t->param($section.".".$key=>$value);
+                        	$t->param("session.".$section.".".$key=>$value);
                         }
                 }
         } 

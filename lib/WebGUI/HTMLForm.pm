@@ -56,6 +56,7 @@ use WebGUI::SQL;
  $f->text("firstName", "First Name");
  $f->textarea("emailMessage","Email Message");
  $f->url("homepage","Home Page");
+ $f->whatNext(\%options);
  $f->yesNo("happy","Are you happy?");
  $f->zipcode("workZip","Office Zip Code");
 
@@ -1775,7 +1776,7 @@ sub url {
 
 #-------------------------------------------------------------------
 
-=head2 whatNext ( hashRef ] )
+=head2 whatNext ( options [, value, name, label, subtext, uiLevel, extras ] )
 
  Adds a "What next?" select list to this form for use with chained 
  action forms in WebGUI.

@@ -35,8 +35,36 @@ delete from groups where groupId=9;
 delete from groupings where groupId=9;
 delete from groupGroupings where groupId=9;
 delete from groupGroupings where inGroup=9;
-
-
-
+alter table EventsCalendar add column startMonth varchar(35) not null default 'current';
+alter table EventsCalendar add column endMonth varchar(35) not null default 'after12';
+alter table EventsCalendar add column defaultMonth varchar(35) not null default 'current';
+alter table EventsCalendar add column templateId int not null default 1;
+alter table EventsCalendar add column eventTemplateId int not null default 1;
+update EventsCalendar set templateId=2 where calendarLayout <> 'calendarMonth';
+delete from international where namespace='EventsCalendar' and internationalId=17;
+delete from international where namespace='EventsCalendar' and internationalId=18;
+delete from international where namespace='EventsCalendar' and internationalId=74;
+delete from international where namespace='EventsCalendar' and internationalId=16;
+delete from international where namespace='EventsCalendar' and internationalId=21;
+delete from international where namespace='EventsCalendar' and internationalId=1;
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (91,1,'EventsCalendar','Add a new event.', 1038190852);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (82,1,'EventsCalendar','Current.', 1038190803);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (83,1,'EventsCalendar','First in the calendar.', 1038190781);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (85,1,'EventsCalendar','Last in the calendar.', 1038190764);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (90,1,'EventsCalendar','Default Month', 1038190708);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (89,1,'EventsCalendar','Show 3 months from start.', 1038190646);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (88,1,'EventsCalendar','Show 6 months from start.', 1038190632);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (87,1,'EventsCalendar','Show 9 months from start.', 1038190626);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (86,1,'EventsCalendar','Show 12 months from start.', 1038190601);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (84,1,'EventsCalendar','End Month', 1038190527);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (81,1,'EventsCalendar','Start Month', 1038190442);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (80,1,'EventsCalendar','Event Template', 1038190379);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (79,1,'EventsCalendar','Main Template', 1038190356);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (93,1,'EventsCalendar','Next Event', 1038202290);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (92,1,'EventsCalendar','Previous Event', 1038202281);
+INSERT INTO template VALUES (1,'Calendar Month (Big)','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p/>\r\n</tmpl_if>\r\n\r\n<tmpl_var bigCalendar>\r\n\r\n<tmpl_if calendar.multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var calendar.previousPage>  &middot; <tmpl_var calendar.pageList> &middot; <tmpl_var calendar.nextPage>\r\n  </div>\r\n</tmpl_if>','EventsCalendar');
+INSERT INTO template VALUES (2,'Events List','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p/>\r\n</tmpl_if>\r\n\r\n<tmpl_loop list_loop>\r\n   <tmpl_unless list.sameAsPrevious>\r\n        <b><tmpl_var list.date></b>\r\n   </tmpl_unless>\r\n  <blockquote>\r\n     <tmpl_if session.var.adminOn>\r\n         <tmpl_var list.controls>\r\n     </tmpl_if>\r\n     <i><tmpl_var list.title></i>\r\n     <tmpl_if list.description>\r\n       - <tmpl_var list.description>\r\n     </tmpl_if>\r\n     <p/>\r\n  </blockquote>\r\n</tmpl_loop>\r\n\r\n<tmpl_if list.multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var list.previousPage>  &middot; <tmpl_var list.nextPage>\r\n  </div>\r\n</tmpl_if>','EventsCalendar');
+INSERT INTO template VALUES (3,'Calendar Month (Small)','<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p/>\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p/>\r\n</tmpl_if>\r\n\r\n<tmpl_var smallCalendar>\r\n\r\n<tmpl_if calendar.multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var calendar.previousPage> &middot; <tmpl_var calendar.nextPage>\r\n  </div>\r\n</tmpl_if>','EventsCalendar');
+INSERT INTO template VALUES (1,'Default Event','<h1><tmpl_var title></h1>\r\n\r\n<table width=\"100%\" cellspacing=\"0\" cellpadding=\"5\" border=\"0\">\r\n<tr>\r\n<td valign=\"top\" class=\"tableHeader\" width=\"100%\">\r\n<b><tmpl_var start.label>:</b> <tmpl_var start.date><br>\r\n<b><tmpl_var end.label>:</b> <tmpl_var end.date><br>\r\n</td><td valign=\"top\" class=\"tableMenu\" nowrap=\"1\">\r\n\r\n<tmpl_if canEdit>\r\n     <a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a><br>\r\n     <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a><br>\r\n</tmpl_if>\r\n\r\n<tmpl_if previous.url>\r\n     <a href=\"<tmpl_var previous.url>\"><tmpl_var previous.label></a><br>\r\n</tmpl_if>\r\n\r\n<tmpl_if next.url>\r\n     <a href=\"<tmpl_var next.url>\"><tmpl_var next.label></a><br>\r\n</tmpl_if>\r\n\r\n</td></tr>\r\n</table>\r\n<tmpl_var description>','EventsCalendar/Event');
 
 

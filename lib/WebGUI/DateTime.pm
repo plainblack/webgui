@@ -400,6 +400,32 @@ sub localtime {
 }
 
 #-------------------------------------------------------------------
+=head2 monthCount ( startEpoch, endEpoch )
+
+ Returns the number of months between the start and end dates
+ (inclusive).
+
+=item startEpoch
+
+ An epoch datestamp corresponding to the first month.
+
+=item endEpoch
+
+ An epoch datestamp corresponding to the last month.
+
+=cut
+
+sub monthCount {
+	my ($start, $end) = @_;
+	my $count = 1;
+	while (addToDate($start,0,$count,0) < $end) {
+		$count++;
+	}
+	return $count;
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 monthStartEnd ( epoch )
 

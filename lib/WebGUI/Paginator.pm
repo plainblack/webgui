@@ -337,7 +337,7 @@ sub getPageData {
 =cut
 
 sub getPageNumber {
-        return $_[0]->{_pn} || 1;
+        return $_[0]->{_pn};
 }
 
 #-------------------------------------------------------------------
@@ -429,12 +429,12 @@ sub getPreviousPageLink {
 
 sub new {
         my ($class, $currentURL, $rowsPerPage, $rowRef, $formVar, $pageRef, $pn);
-	$class = shift;
-	$currentURL = shift;
-	$rowRef = shift;
-	$rowsPerPage = shift || 25;
-	$pn = shift || $session{form}{$formVar};
-	$formVar = shift || "pn";
+	$class = $_[0];
+	$currentURL = $_[1];
+	$rowRef = $_[2];
+	$rowsPerPage = $_[3] || 25;
+	$formVar = $_[5] || "pn";
+	$pn = $_[4] || $session{form}{$formVar} || 1;
         bless {_url => $currentURL, _rpp => $rowsPerPage, _rowRef => $rowRef, _formVar => $formVar, _pn => $pn}, $class;
 }
 
