@@ -88,7 +88,7 @@ sub buildTree {
      foreach my $obj (grep {$_} @$objs) {
           $nodes->{$obj->get($keyColumn)} = $obj;
           $obj->{daughters} ||= [];
-          next if ($obj->get('parentId') == $obj->get($keyColumn));
+          next if ($obj->get('parentId') eq $obj->get($keyColumn));
           push @{ $parentToChild{$obj->get('parentId')} }, $obj; 
      }
 

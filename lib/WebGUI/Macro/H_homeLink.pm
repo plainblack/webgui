@@ -20,7 +20,7 @@ use WebGUI::SQL;
 sub process {
         my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
-	if ($session{setting}{defaultPage} == $session{page}{pageId}) {
+	if ($session{setting}{defaultPage} eq $session{page}{pageId}) {
 		$temp = $session{page}{urlizedTitle};
 	} else {
 		($temp) = WebGUI::SQL->quickArray("select urlizedTitle from page where pageId=".quote($session{setting}{defaultPage}),WebGUI::SQL->getSlave);

@@ -155,7 +155,7 @@ sub www_view {
 	$cookiebox = $node->getPath.$session{os}{slash}.$cookiebox;
    	my $jar = HTTP::Cookies->new(File => $cookiebox, AutoSave => 1, Ignore_Discard => 1);
 
-   if($session{form}{wid} == $_[0]->get("wobjectId") && $session{form}{func}!~/editSave/i) {
+   if($session{form}{wid} eq $_[0]->get("wobjectId") && $session{form}{func}!~/editSave/i) {
       $proxiedUrl = $session{form}{FormAction} || $session{form}{proxiedUrl} || $_[0]->get("proxiedUrl") ;
    } else {
       $proxiedUrl = $_[0]->get("proxiedUrl");
@@ -194,7 +194,7 @@ sub www_view {
 
       if($session{env}{REQUEST_METHOD}=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
                                						# not posting the same data over and over again.
-         if($redirect == 0 && $session{form}{wid} == $_[0]->get("wobjectId")) {
+         if($redirect == 0 && $session{form}{wid} eq $_[0]->get("wobjectId")) {
             foreach my $input_name (keys %{$session{form}}) {
                next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
                $input_name =~ s/^HttpProxy_//;

@@ -1562,7 +1562,7 @@ sub traversePreOrder {
 	
 	@pages = $self->self_and_descendants;
 	# The 'ueber'-root contains no data so we do not want to return i!
-	shift @pages if ($pages[0]->{'pageId'} == 0);
+	shift @pages if ($pages[0]->{'pageId'} eq 0);
 	
 	foreach (@pages) {
 		$page = WebGUI::Page->new($_->{'pageId'});
