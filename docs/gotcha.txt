@@ -51,10 +51,18 @@ save you many hours of grief.
 	for additional details.
 
  * The old realtime search subsystem has been replaced with the new
-	indexed search wobject. As such we've removed the ^?; macro.
+	indexed search wobject. As such, we've removed the ^?; macro.
 	If you were using the ^?; macro then you'll need to set up
 	a search wobject to replace it.
  
+ * Themes that were created with 5.x versions of WebGUI will fail to
+	import into WebGUI 6.0. Sometime after the release of 6.0
+	(gamma) there will be a theme converter available on
+	plainblack.com to convert your old 5.x themes into 6.0
+	themes. If you've already imported a 5.x theme you have
+	nothing to worry about. All of the theme components will
+	automatically be converted to 6.0.
+
 
 5.5.0
 --------------------------------------------------------------------
