@@ -373,7 +373,7 @@ sub _drawQueryBuilder {
 			};
 
 	# Get the fields and count them	
-	my $fields = WebGUI::MetaData::getMetaDataFields();
+	my $fields = WebGUI::Asset::getMetaDataFields();
 	my $fieldCount = scalar(keys %$fields);
 	
 	unless ($fieldCount) {	# No fields found....
