@@ -36,7 +36,7 @@ sub _traversePageTree {
                 $indentString .= "&nbsp;";
         }
         if ($currentDepth < $depth) {
-                $sth = WebGUI::SQL->read("select urlizedTitle, title, pageId, synopsis from page 
+                $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, title, pageId, synopsis from page 
 			where parentId='$parent' order by sequenceNumber");
                 while ($data = $sth->hashRef) {
                         if (($data->{pageId}>999 || $data->{pageId}==1) && WebGUI::Privilege::canViewPage($data->{pageId})) {
