@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -27,123 +28,114 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_copyStyle &www_deleteStyle &www_deleteStyleConfirm &www_editStyle &www_editStyleSave &www_listStyles);
 
 #-------------------------------------------------------------------
+sub _submenu {
+        my (%menu);
+        tie %menu, 'Tie::IxHash';
+	$menu{WebGUI::URL::page('op=editStyle&sid=new')} = WebGUI::International::get(158);
+	if (($session{form}{op} eq "editStyle" && $session{form}{sid} ne "new") || $session{form}{op} eq "deleteStyle") {
+                $menu{WebGUI::URL::page('op=editStyle&sid='.$session{form}{sid})} = WebGUI::International::get(803);
+                $menu{WebGUI::URL::page('op=copyStyle&sid='.$session{form}{sid})} = WebGUI::International::get(804);
+		$menu{WebGUI::URL::page('op=deleteStyle&sid='.$session{form}{sid})} = WebGUI::International::get(805);
+	}
+        return menuWrapper($_[0],\%menu);
+}
+
+#-------------------------------------------------------------------
 sub www_copyStyle {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
 	my (%style);
-        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
-		%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
-                WebGUI::SQL->write("insert into style (styleId,name,body,styleSheet) values (".getNextId("styleId").", 
-			".quote('Copy of '.$style{name}).", ".quote($style{body}).", ".quote($style{styleSheet}).")");
-                return www_listStyles();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
+        WebGUI::SQL->write("insert into style (styleId,name,body,styleSheet) values (".getNextId("styleId").", 
+		".quote('Copy of '.$style{name}).", ".quote($style{body}).", ".quote($style{styleSheet}).")");
+        return _submenu(www_listStyles());
 }
 
 #-------------------------------------------------------------------
 sub www_deleteStyle {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+	return WebGUI::Privilege::vitalComponent() if ($session{form}{sid} < 1000 && $session{form}{sid} > 0);
         my ($output);
-        if ($session{form}{sid} < 26 && $session{form}{sid} > 0) {
-		return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
-                $output .= helpIcon(4);
-		$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
-                $output .= WebGUI::International::get(155).'<p>';
-                $output .= '<div align="center"><a href="'.
-			WebGUI::URL::page('op=deleteStyleConfirm&sid='.$session{form}{sid})
-			.'">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listStyles').
-			'">'.WebGUI::International::get(45).'</a></div>';
-                return $output;
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+        $output .= helpIcon(4);
+	$output .= '<h1>'.WebGUI::International::get(42).'</h1>';
+        $output .= WebGUI::International::get(155).'<p>';
+        $output .= '<div align="center"><a href="'.
+		WebGUI::URL::page('op=deleteStyleConfirm&sid='.$session{form}{sid})
+		.'">'.WebGUI::International::get(44).'</a>';
+        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listStyles').
+		'">'.WebGUI::International::get(45).'</a></div>';
+        return _submenu($output);
 }
 
 #-------------------------------------------------------------------
 sub www_deleteStyleConfirm {
-        if ($session{form}{sid} < 26 && $session{form}{sid} > 0) {
-		return WebGUI::Privilege::vitalComponent();
-        } elsif (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
-                WebGUI::SQL->write("delete from style where styleId=".$session{form}{sid});
-                WebGUI::SQL->write("update page set styleId=2 where styleId=".$session{form}{sid});
-                return www_listStyles();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+	return WebGUI::Privilege::vitalComponent() if ($session{form}{sid} < 1000 && $session{form}{sid} > 0);
+        WebGUI::SQL->write("delete from style where styleId=".$session{form}{sid});
+        WebGUI::SQL->write("update page set styleId=2 where styleId=".$session{form}{sid});
+        return www_listStyles();
 }
 
 #-------------------------------------------------------------------
 sub www_editStyle {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
         my ($output, %style, $f);
 	tie %style, 'Tie::CPHash';
-        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
-		if ($session{form}{sid} eq "new") {
-			$style{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>";
-			$style{styleSheet} = "<style>\n\n</style>";
-		} else {
-                	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
-		}
-                $output .= helpIcon(16);
-		$output .= '<h1>'.WebGUI::International::get(156).'</h1>';
-		$f = WebGUI::HTMLForm->new;
-                $f->hidden("op","editStyleSave");
-                $f->hidden("sid",$session{form}{sid});
-		$f->readOnly($session{form}{sid},WebGUI::International::get(380));
-                $f->text("name",WebGUI::International::get(151),$style{name});
-                $f->HTMLArea("body",WebGUI::International::get(501),$style{body},'','','',(5+$session{setting}{textAreaRows}));
-                $f->textarea("styleSheet",WebGUI::International::get(154),$style{styleSheet},'','','',(5+$session{setting}{textAreaRows}));
-                $f->submit;
-		$output .= $f->print;
-        } else {
-                $output = WebGUI::Privilege::adminOnly();
-        }
-        return $output;
+	if ($session{form}{sid} eq "new") {
+		$style{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>";
+		$style{styleSheet} = "<style>\n\n</style>";
+	} else {
+               	%style = WebGUI::SQL->quickHash("select * from style where styleId=$session{form}{sid}");
+	}
+        $output .= helpIcon(16);
+	$output .= '<h1>'.WebGUI::International::get(156).'</h1>';
+	$f = WebGUI::HTMLForm->new;
+        $f->hidden("op","editStyleSave");
+        $f->hidden("sid",$session{form}{sid});
+	$f->readOnly($session{form}{sid},WebGUI::International::get(380));
+        $f->text("name",WebGUI::International::get(151),$style{name});
+        $f->HTMLArea("body",WebGUI::International::get(501),$style{body},'','','',(5+$session{setting}{textAreaRows}));
+        $f->textarea("styleSheet",WebGUI::International::get(154),$style{styleSheet},'','','',(5+$session{setting}{textAreaRows}));
+        $f->submit;
+	$output .= $f->print;
+        return _submenu($output);
 }
 
 #-------------------------------------------------------------------
 sub www_editStyleSave {
-        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
-		if ($session{form}{sid} eq "new") {
-			$session{form}{sid} = getNextId("styleId");
-			WebGUI::SQL->write("insert into style (styleId) values ($session{form}{sid})");
-		}
-		$session{form}{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>" if ($session{form}{body} eq "");
-                WebGUI::SQL->write("update style set name=".quote($session{form}{name}).", body=".quote($session{form}{body}).",
-			styleSheet=".quote($session{form}{styleSheet})." where styleId=".$session{form}{sid});
-                return www_listStyles();
-        } else {
-                return WebGUI::Privilege::adminOnly();
-        }
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
+	if ($session{form}{sid} eq "new") {
+		$session{form}{sid} = getNextId("styleId");
+		WebGUI::SQL->write("insert into style (styleId) values ($session{form}{sid})");
+	}
+	$session{form}{body} = "^AdminBar;\n\n<body>\n\n^-;\n\n</body>" if ($session{form}{body} eq "");
+        WebGUI::SQL->write("update style set name=".quote($session{form}{name}).", body=".quote($session{form}{body}).",
+		styleSheet=".quote($session{form}{styleSheet})." where styleId=".$session{form}{sid});
+        return www_listStyles();
 }
 
 #-------------------------------------------------------------------
 sub www_listStyles {
+        return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup}));
         my ($output, $sth, @data, @row, $i, $p);
-        if (WebGUI::Privilege::isInGroup($session{setting}{styleManagersGroup})) {
-                $output = helpIcon(9);
-		$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
-		$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=editStyle&sid=new').
-			'">'.WebGUI::International::get(158).'</a><p/></div>';
-                $sth = WebGUI::SQL->read("select styleId,name from style order by name");
-                while (@data = $sth->array) {
-                        $row[$i] = '<tr><td valign="top" class="tableData">'
-				.deleteIcon('op=deleteStyle&sid='.$data[0])
-				.editIcon('op=editStyle&sid='.$data[0])
-				.copyIcon('op=copyStyle&sid='.$data[0])
-				.'</td>';
-                        $row[$i] .= '<td valign="top" class="tableData">'.$data[1].'</td></tr>';
-                        $i++;
-                }
-		$sth->finish;
-		$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listStyles'),\@row);
-                $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
-		$output .= $p->getPage($session{form}{pn});
-		$output .= '</table>';
-		$output .= $p->getBarTraditional($session{form}{pn});
-                return $output;
-        } else {
-                return WebGUI::Privilege::adminOnly();
+        $output = helpIcon(9);
+	$output .= '<h1>'.WebGUI::International::get(157).'</h1>';
+        $sth = WebGUI::SQL->read("select styleId,name from style order by name");
+        while (@data = $sth->array) {
+                $row[$i] = '<tr><td valign="top" class="tableData">'
+			.deleteIcon('op=deleteStyle&sid='.$data[0])
+			.editIcon('op=editStyle&sid='.$data[0])
+			.copyIcon('op=copyStyle&sid='.$data[0])
+			.'</td>';
+                $row[$i] .= '<td valign="top" class="tableData">'.$data[1].'</td></tr>';
+                $i++;
         }
+	$sth->finish;
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listStyles'),\@row);
+        $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+	$output .= $p->getPage($session{form}{pn});
+	$output .= '</table>';
+	$output .= $p->getBarTraditional($session{form}{pn});
+        return $output;
 }
 
 

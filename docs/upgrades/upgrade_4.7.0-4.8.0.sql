@@ -131,6 +131,9 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (794,1,'WebGUI','Packages', 1036971944);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (793,1,'WebGUI','Pieces of Collateral', 1036971785);
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (792,1,'WebGUI','Templates', 1036971696);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (805,1,'WebGUI','Delete this style.', 1037075787);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (804,1,'WebGUI','Copy this style.', 1037075775);
+insert into international (internationalId,languageId,namespace,message,lastUpdated) values (803,1,'WebGUI','Edit this style.', 1037075751);
 
 
 
