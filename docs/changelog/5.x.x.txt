@@ -25,6 +25,7 @@
  - Fixed bug [ 841194 ] denied post security problem
  - Added a check for malicious mail headers
  - Fixed bug [ 820144 ] Theme problems under Win32
+ - Fixed bug [ 834633 ] View Threaded subscriptions fails
 
 
 5.5.0
