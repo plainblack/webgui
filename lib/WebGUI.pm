@@ -250,7 +250,7 @@ sub page {
 		return $httpHeader.$operationOutput.$wobjectOutput;
 	} elsif ($operationOutput ne "") {
 		$positions->{"page.position1"} = $operationOutput;
-        } elsif ($session{page}{redirectURL}) {
+        } elsif ($session{page}{redirectURL} && !$session{var}{adminOn}) {
                 $httpHeader = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
                 WebGUI::Session::close();
                 return $httpHeader;
