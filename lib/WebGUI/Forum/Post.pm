@@ -286,7 +286,7 @@ Returns a boolean indicating whether this post is a reply or the root post in a 
 
 sub isReply {
 	my ($self) = @_;
-	if ($self->get("parentId") > 0) {
+	if ($self->get("parentId") ne "0") {
 		return 1;
 	} else {
 		return 0;
