@@ -1,3 +1,13 @@
+-- MySQL dump 8.23
+--
+-- Host: localhost    Database: dev
+---------------------------------------------------------
+-- Server version	3.23.58
+
+--
+-- Table structure for table `Article`
+--
+
 CREATE TABLE Article (
   wobjectId int(11) NOT NULL default '0',
   image varchar(255) default NULL,
@@ -16973,7 +16983,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('5.5.1','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('5.5.2','initial install',unix_timestamp());
 
 --
 -- Table structure for table `wobject`
