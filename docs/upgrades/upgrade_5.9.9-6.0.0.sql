@@ -443,3 +443,77 @@ delete from international where languageId=1 and namespace='WebGUI' and internat
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (1082,1,'WebGUI','Clipboard', 1076866475,'A label for the clipboard.');
 
 
+INSERT INTO template VALUES (2,'crumbTrail','<tmpl_if session.var.adminOn>\r\n<tmpl_var config.button>\r\n</tmpl_if>\r\n<span class=\"crumbTrail\">\r\n<tmpl_loop page_loop>\r\n<a class=\"crumbTrail\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &gt; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation');
+INSERT INTO template VALUES (1,'verticalMenu','<tmpl_if session.var.adminOn>\r\n<tmpl_var config.button><br>\r\n</tmpl_if>\r\n<span class=\"verticalMenu\">\r\n<tmpl_loop page_loop>\r\n<tmpl_var page.indent><a class=\"verticalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if> href=\"<tmpl_var page.url>\">\r\n   <tmpl_if page.isCurrent>\r\n      <span class=\"selectedMenuItem\"><tmpl_var page.menuTitle></span>\r\n   <tmpl_else><tmpl_var page.menuTitle></tmpl_if></a><br>\r\n</tmpl_loop>\r\n</span>','Navigation');
+INSERT INTO template VALUES (3,'horizontalMenu','<tmpl_if session.var.adminOn>\r\n<tmpl_var config.button>\r\n</tmpl_if>\r\n<span class=\"horizontalMenu\">\r\n<tmpl_loop page_loop>\r\n<a class=\"horizontalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation');
+INSERT INTO template VALUES (4,'DropMenu','<script language=\"JavaScript\" type=\"text/javascript\">\r\nfunction go(formObj){\r\n   if (formObj.chooser.options[formObj.chooser.selectedIndex].value != \"none\") {\r\n	location = formObj.chooser.options[formObj.chooser.selectedIndex].value\r\n   }\r\n}\r\n</script>\r\n<form>\r\n<tmpl_if session.var.adminOn>\r\n<tmpl_var config.button>\r\n</tmpl_if>\r\n<select name=\"chooser\" size=1 onChange=\"go(this.form)\">\r\n<option value=none>Where do you want to go?</option>\r\n<tmpl_loop page_loop>\r\n<option value=\"<tmpl_var page.url>\"><tmpl_loop page.indent_loop>&nbsp;&nbsp;</tmpl_loop>- <tmpl_var page.menuTitle></option>\r\n</tmpl_loop>\r\n</select>\r\n</form>','Navigation');
+INSERT INTO template VALUES (5,'Tabs','<tmpl_if session.var.adminOn>\r\n<tmpl_var config.button>\r\n</tmpl_if>\r\n<tmpl_loop page_loop>\r\n   <tmpl_if page.isCurrent>\r\n      <span class=\"rootTabOn\">\r\n   <tmpl_else>\r\n      <span class=\"rootTabOff\">\r\n   </tmpl_if>\r\n   <a <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if> href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   </span>\r\n</tmpl_loop>','Navigation');
+
+INSERT INTO incrementer VALUES ('navigationId',1000);
+
+CREATE TABLE Navigation (
+  navigationId int(11) NOT NULL default '0',
+  identifier varchar(30) NOT NULL default 'undefined',
+  depth int(11) NOT NULL default '99',
+  method varchar(35) NOT NULL default 'descendants',
+  startAt varchar(35) NOT NULL default 'current',
+  stopAtLevel int(11) NOT NULL default '-1',
+  templateId int(11) NOT NULL default '1',
+  showSystemPages int(11) NOT NULL default '0',
+  showHiddenPages int(11) NOT NULL default '0',
+  showUnprivilegedPages int(11) NOT NULL default '0',
+  reverse int(11) NOT NULL default '0',
+  PRIMARY KEY  (navigationId,identifier)
+) TYPE=MyISAM;
+
+INSERT INTO Navigation VALUES (1,'crumbTrail',99,'self_and_ancestors','current',-1,2,0,0,0,1);
+INSERT INTO Navigation VALUES (2,'FlexMenu',99,'pedigree','current',2,1,0,0,0,0);
+INSERT INTO Navigation VALUES (3,'currentMenuVertical',1,'descendants','current',-1,1,0,0,0,0);
+INSERT INTO Navigation VALUES (4,'currentMenuHorizontal',1,'descendants','current',-1,3,0,0,0,0);
+INSERT INTO Navigation VALUES (5,'PreviousDropMenu',99,'self_and_sisters','current',-1,4,0,0,0,0);
+INSERT INTO Navigation VALUES (6,'previousMenuVertical',1,'descendants','mother',-1,1,0,0,0,0);
+INSERT INTO Navigation VALUES (7,'previousMenuHorizontal',1,'descendants','mother',-1,3,0,0,0,0);
+INSERT INTO Navigation VALUES (8,'rootmenu',1,'daughters','root',-1,3,0,0,0,0);
+INSERT INTO Navigation VALUES (9,'SpecificDropMenu',3,'descendants','home',-1,4,0,0,0,0);
+INSERT INTO Navigation VALUES (10,'SpecificSubMenuVertical',3,'descendants','home',-1,1,0,0,0,0);
+INSERT INTO Navigation VALUES (11,'SpecificSubMenuHorizontal',1,'descendants','home',-1,3,0,0,0,0);
+INSERT INTO Navigation VALUES (1026,'TopDropMenu',0,'self_and_sisters','top',-1,4,0,0,0,0);
+INSERT INTO Navigation VALUES (12,'TopLevelMenuVertical',0,'self_and_sisters','top',-1,1,0,0,0,0);
+INSERT INTO Navigation VALUES (13,'TopLevelMenuHorizontal',0,'self_and_sisters','top',-1,3,0,0,0,0);
+INSERT INTO Navigation VALUES (14,'RootTab',99,'daughters','root',-1,5,0,0,0,0);
+INSERT INTO international VALUES (2,'Navigation',1,'root level (/home)',1077078325,'Option of \"Start traversing at\"');
+INSERT INTO international VALUES (19,'Navigation',1,'Copy this Navigation.',1077080062,'');
+INSERT INTO international VALUES (13,'Navigation',1,'childless descendants',1077079109,'Option on question \"return a loop with\".');
+INSERT INTO international VALUES (17,'Navigation',1,'pedigree',1077079481,'Option on question \"return a loop with\".');
+INSERT INTO international VALUES (16,'Navigation',1,'self and ancestors',1077079343,'Option on question \"return a loop with\".');
+INSERT INTO international VALUES (11,'Navigation',1,'descendants',1077078969,'Option on question \"return a loop with\"');
+INSERT INTO international VALUES (18,'Navigation',1,'Edit this Navigation.',1077079911,'');
+INSERT INTO international VALUES (3,'Navigation',1,'top level (/home/page)',1077078394,'Option of \"Start traversing at\"');
+INSERT INTO international VALUES (1,'Navigation',1,'nameless root',1077078206,'Option of \"Start traversing at\"');
+INSERT INTO international VALUES (12,'Navigation',1,'self and descendants',1077079020,'Option on question \"return a loop with\"');
+INSERT INTO international VALUES (14,'Navigation',1,'generation',1077079203,'Option on question \"return a loop with\".');
+INSERT INTO international VALUES (15,'Navigation',1,'ancestors',1077079273,'Option on question \"return a loop with\".');
+INSERT INTO international VALUES (35,'Navigation',1,'<font color=\"red\">Please specify an identifier. ie: ^Navigation(myMenu);</font>',1077081415,'');
+INSERT INTO international VALUES (8,'Navigation',1,'daughters',1077078773,'Option on question \"return a loop with\"');
+INSERT INTO international VALUES (4,'Navigation',1,'my grandmother\'s level (../../page)',1077078456,'Option of \"Start traversing at\"');
+INSERT INTO international VALUES (6,'Navigation',1,'my level (.)',1077078579,'Option of \"Start traversing at\"');
+INSERT INTO international VALUES (7,'Navigation',1,'my daughter\'s level (./page)',1077078687,'Option of \"Start traversing at\"');
+INSERT INTO international VALUES (10,'Navigation',1,'self and sisters',1077078879,'Option on question \"return a loop with\"');
+INSERT INTO international VALUES (5,'Navigation',1,'my mother\'s level (../page)',1077078526,'Option of \"Start traversing at\"');
+INSERT INTO international VALUES (34,'Navigation',1,'Manage Navigation',1077081304,'');
+INSERT INTO international VALUES (27,'Navigation',1,'Max depth',1077080669,'');
+INSERT INTO international VALUES (28,'Navigation',1,'Return a loop with',1077080706,'');
+INSERT INTO international VALUES (25,'Navigation',1,'Start traversing at',1077080583,'');
+INSERT INTO international VALUES (26,'Navigation',1,'Stop traversing when reaching level',1077080617,'');
+INSERT INTO international VALUES (21,'Navigation',1,'List all Navigation.',1077080151,'');
+INSERT INTO international VALUES (22,'Navigation',1,'Edit Navigation',1077080241,'');
+INSERT INTO international VALUES (32,'Navigation',1,'Show unprivileged pages',1077080845,'');
+INSERT INTO international VALUES (9,'Navigation',1,'sisters',1077078821,'Option on question \"return a loop with\"');
+INSERT INTO international VALUES (29,'Navigation',1,'Revert output',1077080738,'');
+INSERT INTO international VALUES (30,'Navigation',1,'Show system pages',1077080766,'');
+INSERT INTO international VALUES (23,'Navigation',1,'Navigation properties',1077080317,'');
+INSERT INTO international VALUES (24,'Navigation',1,'Identifier',1077080504,'');
+INSERT INTO international VALUES (33,'Navigation',1,'Error: This identifier is already in use. Please use an unique value.',1077081255,'');
+INSERT INTO international VALUES (20,'Navigation',1,'Delete this Navigation.',1077080098,'');
+INSERT INTO international VALUES (31,'Navigation',1,'Show hidden pages',1077080799,'');
+
