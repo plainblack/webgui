@@ -130,7 +130,7 @@ Deccrements this forum's reply counter.
 
 =cut
 
-sub incrementReplies {
+sub decrementReplies {
         my ($self) = @_;
         WebGUI::SQL->write("update forum set replies=replies-1 where forumId=".$self->get("forumId"));
 }
@@ -143,7 +143,7 @@ Decrements this forum's thread counter.
 
 =cut
 
-sub incrementReplies {
+sub decrementThreads {
         my ($self) = @_;
         WebGUI::SQL->write("update forum set threads=threads-1 where forumId=".$self->get("forumId"));
 }

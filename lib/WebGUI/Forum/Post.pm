@@ -100,7 +100,9 @@ The unique identifier to check privileges against. Defaults to the current user.
 sub canView {
         my ($self, $userId) = @_;
 	$userId = $session{user}{userId} unless ($userId);
-	if ($self->get("status") eq "deleted") {
+	if ($self->get("status") eq "approved" || $self->get("status") eq "archived") {
+		return 1;
+	} elsif ($self->get("status") eq "deleted") {
 		return 0;
 	} elsif ($self->get("status") eq "denied" && $userId == $self->get("userId")) {
 		return 1;
