@@ -156,7 +156,9 @@ sub getFileIconUrl {
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	if ($small) {
+	if ($small && ref($self) eq '') {
+		return $session{config}{extrasURL}.'/assets/small/file.gif';
+	} elsif ($small) {
 		return $self->getFileIconUrl;	
 	}
 	return $session{config}{extrasURL}.'/assets/file.gif';

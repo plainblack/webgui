@@ -706,7 +706,9 @@ sub getAssetAdderLinks {
 			} else {
 				my $url = $self->getUrl("func=add&class=".$class);
 				$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
-				$links{$label} = $url;
+				$links{$label}{url} = $url;
+				$links{$label}{icon} = $class->getIcon;
+				$links{$label}{'icon.small'} = $class->getIcon(1);
 			}
 		}
 	}
@@ -721,13 +723,17 @@ sub getAssetAdderLinks {
 		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
 		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
-		$links{$asset->get("title")} = $url;
+		$links{$asset->get("title")}{url} = $url;
+		$links{$asset->get("title")}{icon} = $asset->getIcon;
+		$links{$asset->get("title")}{'icon.small'} = $asset->getIcon(1);
 	}
 	my @sortedLinks;
 	foreach my $label (sort keys %links) {
 		push(@sortedLinks,{
 			label=>$label,
-			url=>$links{$label}
+			url=>$links{$label}{url},
+			icon=>$links{$label}{icon},
+			'icon.small'=>$links{$label}{'icon.small'}
 			});	
 	}
 	return \@sortedLinks;

@@ -77,6 +77,7 @@ sub _formatFunction {
 	return {
 		title=>WebGUI::International::get($function->{title}{id}, $function->{title}{namespace}),
 		icon=>$session{config}{extrasURL}."/adminConsole/".$function->{icon},
+		'icon.small'=>$session{config}{extrasURL}."/adminConsole/small/".$function->{icon},
 		url=>$url,
 		canUse=>WebGUI::Grouping::isInGroup($function->{group})
 	};

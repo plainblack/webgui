@@ -58,10 +58,13 @@ function Asset() {
 //---------Method Implementations -------------
 
 this.registerEvents = function() {		
-	this.div.ondblclick=Asset_doubleClick;	
-	this.div.onmousedown=Asset_mouseDown;	
-	this.div.oncontextmenu=Asset_rightClick;	
 
+    //if there is a div associated with the asset, register event handlers	
+    if (this.div) {
+		this.div.ondblclick=Asset_doubleClick;	
+		this.div.onmousedown=Asset_mouseDown;	
+		this.div.oncontextmenu=Asset_rightClick;	
+    }
 }
 
 //Moving to a new parent (move)

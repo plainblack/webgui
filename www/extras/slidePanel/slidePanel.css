@@ -1,0 +1,77 @@
+#slidePanelBar {
+	position:absolute;
+	font:bold 12px Verdana;
+	line-height:20px;
+}
+
+#slidePanelBarHandle {
+	z-index: 100000;
+	position: absolute;
+	top: 0px;
+	right: 3px;
+	line-height: 100px;
+}
+
+.panelButton {
+	width:300; 
+	text-align:center; 
+	font-family:arial; 
+	font-size:11px; 
+	cursor:hand; 
+	border-width:2; 
+	border-style:outset; 
+	border-color: #dddddd; 
+	background-color:#dddddd;
+	position:absolute; 
+	left:0;
+	top: 0;
+} 
+
+.panelButton A {
+	text-decoration: none;
+	color: black;
+}
+
+.scrollPanelUp {
+	position:absolute; 
+	top:40;
+	z-index: 100;
+}
+
+.scrollPanelDown {
+	position: absolute;
+	z-index: 100;
+}
+
+.slidePanel {
+	position:absolute;
+	background-color: #eeeeee;
+}
+
+.panel, .panelLinkHolder {
+	position:absolute; 
+	left:0;
+	background-color: #eeeeee;
+}
+
+.panelLinkOut {
+	position:absolute; 
+	overflow: hidden;
+	height: 20px;
+	cursor: hand;
+	left:0; 
+	border: 1px solid #eeeeee; 
+	font-size: 11px;
+	font-family: helvetica, arial, sans;
+}
+.panelLinkIn {
+	position:absolute; 
+	height: 20px;
+	overflow: hidden;
+	cursor: hand;
+	left:0; 
+	border: 1px solid orange;
+	font-size: 11px;
+	font-family: helvetica, arial, sans;
+}
+

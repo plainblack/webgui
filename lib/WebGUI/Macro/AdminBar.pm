@@ -37,33 +37,36 @@ sub process {
 	$var{'packages.canAdd'} = ($session{user}{uiLevel} >= 7);
 	$var{'packages.label'} = WebGUI::International::get(376);
 	$var{'contentTypes.label'} = WebGUI::International::get(1083);
-	$var{'addcontent.label'} = WebGUI::International::get(1);
 	$var{'clipboard.label'} = WebGUI::International::get(1082);
 	if (exists $session{asset}) {
 		foreach my $package (@{$session{asset}->getPackageList}) {
 			my $title = $package->{title};
 			$title =~ s/'//g; # stops it from breaking the javascript menus
+			my $asset = WebGUI::Asset->newByDynamicClass($package->{assetId},$package->{className});
                 	push(@{$var{'package_loop'}},{
-				'package.url'=>$session{asset}->getUrl("func=deployPackage&assetId=".$package->{assetId}),
-				'package.label'=>$title
+				'url'=>$session{asset}->getUrl("func=deployPackage&assetId=".$package->{assetId}),
+				'label'=>$title,
+				'icon.small'=>$asset->getIcon(1),
+				'icon'=>$asset->getIcon()
 				});
         	}
-		foreach my $link (@{$session{asset}->getAssetAdderLinks}) {
-                	push(@{$var{'contenttypes_loop'}},{'contenttype.url'=>$link->{url},'contenttype.label'=>$link->{label}});
-        	}
-		foreach my $link (@{$session{asset}->getAssetAdderLinks(undef,1)}) {
-                	push(@{$var{'container_loop'}},{'container.url'=>$link->{url},'container.label'=>$link->{label}});
-        	}
+		$var{contentTypes_loop} = $session{asset}->getAssetAdderLinks;
+		$var{container_loop} = $session{asset}->getAssetAdderLinks(undef,1);
 		foreach my $item (@{$session{asset}->getAssetsInClipboard(1)}) {
 			my $title = $item->{title};
 			$title =~ s/'//g; # stops it from breaking the javascript menus
+			my $asset = WebGUI::Asset->newByDynamicClass($item->{assetId},$item->{className});
 			push(@{$var{clipboard_loop}}, {
-				'clipboard.label'=>$title,
-				'clipboard.url'=>$session{asset}->getUrl("func=paste&assetId=".$item->{assetId})
+				'label'=>$title,
+				'url'=>$session{asset}->getUrl("func=paste&assetId=".$item->{assetId}),
+				'icon.small'=>$asset->getIcon(1),
+				'icon'=>$asset->getIcon()
 				});
 		}
-	}
+	} 
    #--admin functions
+	$var{adminConsole_loop} = WebGUI::AdminConsole->getAdminFunction;
+	return WebGUI::Asset::Template->new($templateId)->process(\%var);
 	%hash = (
 		'http://validator.w3.org/check?uri=referer'=>WebGUI::International::get(399),
 		);

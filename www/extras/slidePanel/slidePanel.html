@@ -1,0 +1,36 @@
+<html>
+<head>
+</head>
+<body>
+
+<script type="text/javascript">
+
+  var slider = new createSlidePanelBar('WebGUIAdminBar');
+  var panel;
+
+  panel = new createPanel('adminconsole','Admin Console');
+  panel.addLink('/extras/adminConsole/users.gif','Users',"/index.pl/home?op=add");
+  slider.addPanel(panel);
+
+  panel = new createPanel('clipboard','Clipboard');
+  slider.addPanel(panel);
+
+  panel = new createPanel('packages','Packages');
+  slider.addPanel(panel);
+
+  panel = new createPanel('prototypes','Prototypes');
+  slider.addPanel(panel);
+
+  panel = new createPanel('assets','New Content');
+  panel.addLink('/extras/assets/small/article.gif','Article',"/index.pl/home?op=add");
+  panel.addLink('/extras/assets/small/article.gif','Collaboration System',"/index.pl/home?op=add");
+  panel.addLink('/extras/assets/small/article.gif','Rediculously long tile for an asset',"/index.pl/home?op=add");
+  panel.addLink('/extras/assets/small/article.gif','Article',"/index.pl/home?op=add");
+  slider.addPanel(panel);
+  slider.draw();   
+
+
+</script>
+
+</body>
+</html>
