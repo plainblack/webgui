@@ -120,6 +120,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
+	$_[0] =~ s/^\///;
         my $url = getScriptURL().$_[0];
         if ($session{setting}{preventProxyCache} == 1) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
