@@ -309,8 +309,7 @@ sub www_view {
 		}
 		$f->raw($row);
 	}
-	
-	$f->submit("Send");
+	$f->submit(WebGUI::International::get(73, $namespace));
 	$output .= $f->print;
 	
 	return $_[0]->processMacros($output);	
