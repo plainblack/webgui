@@ -374,10 +374,6 @@ sub search {
 sub showMessage {
         my (@data, $html, %message, $sqlAdd);
         tie %message, 'Tie::CPHash';
-	if ($session{form}{mid} eq "") {
-		($session{form}{mid}) = WebGUI::SQL->quickArray("select min(messageId) from discussion 
-			where wobjectId=$session{form}{wid}");
-	}
 	if ($session{form}{sid}) {
 		$sqlAdd = " and subId=$session{form}{sid}";
 	}
