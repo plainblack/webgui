@@ -20,7 +20,9 @@ use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
+use WebGUI::Search;
 use WebGUI::Session;
+use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::Utility;
@@ -175,7 +177,7 @@ sub getEditForm {
 		-name=>"sortBy",
 		-value=>[$self->getValue("sortBy")],
 		-options=>{
-			sequenceNumber=>WebGUI::International::get(88,"USS"),
+			lineage=>WebGUI::International::get(88,"USS"),
 			dateUpdated=>WebGUI::International::get(78,"USS"),
 			dateSubmitted=>WebGUI::International::get(13,"USS"),
 			title=>WebGUI::International::get(35,"USS")
@@ -294,7 +296,7 @@ sub view {
 	$var{"readmore.label"} = WebGUI::International::get(46,"USS");
 	$var{"responses.label"} = WebGUI::International::get(57,"USS");
 	$var{canPost} = WebGUI::Grouping::isInGroup($self->get("groupToContribute"));
-        $var{"post.url"} = $self->getUrl('func=add&class=WebGUI::Asset::Wobject::USS_submission');
+        $var{"post.url"} = $self->getUrl('func=add&class=WebGUI::Asset::USS_submission');
 	$var{"post.label"} = WebGUI::International::get(20,"USS");
 	$var{"addquestion.label"} = WebGUI::International::get(83,"USS");
 	$var{"addlink.label"} = WebGUI::International::get(89,"USS");
@@ -326,20 +328,17 @@ sub view {
 	}
 	my $p = WebGUI::Paginator->new(WebGUI::URL::page('func=view'),$numResults);
 	$p->setDataByQuery("select * from USS_submission left join asset on USS_submission.assetId=asset.assetId 
-		left join wobject on USS_submission.assetId=wobject.assetId 
 		where asset.parentId=".quote($self->getId)." and asset.className='WebGUI:Asset::Wobject::USS_submission' and $constraints 
-		order by USS_submission.".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
+		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $page = $p->getPageData;
 	my $i = 0;
 	my $imageURL = "";
 	foreach my $row (@$page) {
 		my $submission = WebGUI::Asset::Wobject::USS_submission->newByPropertyHashRef($row);
 		my $body = WebGUI::HTML::filter($submission->get("description"),$self->get("filterContent"));
-                $body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
 		$body = WebGUI::HTML::format($body,$submission->get("contentType"));
-                my @content = split(/\^\-\;/,$body);
 		my $controls = deleteIcon('func=delete',$submission->getUrl,WebGUI::International::get(17,"USS")).editIcon('func=edit',$submission->getUrl);
-		if ($self->get("sortBy") eq "sequenceNumber") {
+		if ($self->get("sortBy") eq "lineage") {
 			if ($self->get("sortOrder") eq "desc") {
 				$controls .= moveUpIcon('func=demote',$submission->getUrl).moveDownIcon('func=promote',$submission->getUrl);
 			} else {
@@ -355,8 +354,8 @@ sub view {
                 push(@{$var{submissions_loop}}, {
                         "submission.id"=>$submission->getId,
                         "submission.url"=>$submission->getUrl,
-                        "submission.content"=>$content[0],
-			"submission.content.full"=>join("\n",@content),
+                        "submission.content"=>$submission->{synopsis},
+			"submission.content.full"=>$submission->{description},
 			"submission.responses"=>$submission->getResponseCount,
                         "submission.title"=>$submission->get("title"),
                         "submission.userDefined1"=>$submission->get("userDefined1"),

@@ -239,3 +239,4 @@ alter table IndexedSearch_docInfo change wobjectId assetId varchar(22);
 alter table IndexedSearch_docInfo drop page_groupIdView;
 alter table IndexedSearch_docInfo change wobject_special_groupIdView special_groupIdView varchar(22);
 alter table IndexedSearch_docInfo change wobject_groupIdView groupIdView varchar(22);
+update USS set sortBy='lineage' where sortBy='sequenceNumber';

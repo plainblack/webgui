@@ -135,7 +135,23 @@ sub getName {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-        $self->deleteAllCachedSubmissions;
+	my %data = (
+		ownerUserId => $session{user}{userId},
+		groupIdView => $self->getParent->get("groupIdView"),
+		groupIdEdit => $self->getParent->get("groupIdEdit")
+		);
+	$data{startDate} = $self->getParent->get("startDate") unless ($session{form}{startDate});
+	$data{endDate} = $self->getParent->get("endDate") unless ($session{form}{endDate});
+	unless ($session{form}{synopsis}) {
+		my $body = $session{form}{description};
+                $body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
+                my @content = split(/\^\-\;/,$body);
+		$content[0] = WebGUI::HTML::filter($content[0],"none");
+		$data{synopsis} = $content[0];
+		$body =~ s/\^\-\;/\n/;
+		$data{description} = $body;
+	}
+	$self->update(\%data);
 }
                                                                                                                                                        
 #-------------------------------------------------------------------
@@ -485,6 +501,12 @@ sub www_editSave {
 }
 
 
+#-------------------------------------------------------------------
+sub www_view {
+	my $self = shift;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->getParent->processStyle($self->view);
+}
 
 
 1;

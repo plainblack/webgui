@@ -604,8 +604,8 @@ sub www_view {
         my $useCache = (
 		$session{form}{op} eq "" && 
 		(
-			( $self->get("cacheTimeout") > 10 && $session{user}{userId} !=1) || 
-			( $self->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} == 1)
+			( $self->get("cacheTimeout") > 10 && $session{user}{userId} ne '1') || 
+			( $self->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} eq '1')
 		) && 
 		not $session{var}{adminOn}
 	);
@@ -614,16 +614,16 @@ sub www_view {
   #         	$output = $cache->get;
 #	}
 	unless ($output) {
-		$output = $self->view;
+		$output = $self->processStyle($self->view);
 		my $ttl;
-		if ($session{user}{userId} == 1) {
+		if ($session{user}{userId} eq '1') {
 			$ttl = $self->get("cacheTimeoutVisitor");
 		} else {
 			$ttl = $self->get("cacheTimeout");
 		}
 #		$cache->set($output, $ttl) if ($useCache && !WebGUI::HTTP::isRedirect());
 	}
-	return $self->processStyle($output);
+	return $output;
 }
 
 1;
