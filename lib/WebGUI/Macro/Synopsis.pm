@@ -24,7 +24,7 @@ sub traversePageTreeSynopsis {
 	if ($max_level && ($current_level >= $max_level)) {
 		return;
 	}
-	 $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis, hideFromNavigation from page where parentId='$parent_id' order by sequenceNum ber");
+	 $sth = WebGUI::SQL->read("select urlizedTitle, menuTitle, pageId, synopsis, hideFromNavigation from page where parentId='$parent_id' order by sequenceNumber");
 	while (my ($urltitle, $menutitle, $pageid, $synopsis, $hideFromNavigation) = $sth->array) {
 		if (!WebGUI::Privilege::canViewPage($pageid) or $hideFromNavigation) {
 			next;
