@@ -240,7 +240,7 @@ sub page {
 		$operationOutput = _processOperations();
         	$wobjectOutput = _processFunctions();
 	}
-	if ($operationOutput eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new") {
+	if ($operationOutput eq "" && $session{setting}{trackPageStatistics} && $session{form}{wid} ne "new" && $session{header}{mimetype} eq "text/html") {
 		WebGUI::SQL->write("insert into pageStatistics (dateStamp, userId, username, ipAddress, userAgent, referer,
 			pageId, pageTitle, wobjectId, wobjectFunction) values (".time().",".$session{user}{userId}
 			.",".quote($session{user}{username}).",
