@@ -1231,6 +1231,147 @@ sub getLineage {
 	return \@lineage;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getLineageWhere ( relatives,rules )
+
+Returns an array reference of lineages of relatives based upon rules.
+
+=head3 relatives
+
+An array reference of relatives to retrieve. Valid parameters are "siblings", "children", "ancestors", "self", "descendants", "pedigree"
+
+=head3 rules
+
+A hash reference comprising limits to relative listing.  Variables to rules include endingLineageLength, assetToPedigree, excludeClasses, returnQuickReadObjects, returnObjects, invertTree, includeOnlyClasses, joinClass, and whereClause.
+
+=cut
+
+sub getLineageWhere {
+	my $self = shift;
+	my $relatives = shift;
+	my $rules = shift;
+	my $lineage = $self->get("lineage");
+	my @whereModifiers;
+	# let's get those siblings
+	if (isIn("siblings",@{$relatives})) {
+		push(@whereModifiers, " (asset.parentId=".quote($self->get("parentId"))." and asset.assetId<>".quote($self->getId).")");
+	}
+	# ancestors too
+	my @specificFamilyMembers = ();
+	if (isIn("ancestors",@{$relatives})) {
+		my @familyTree = ($lineage =~ /(.{6})/g);
+                while (pop(@familyTree)) {
+                        push(@specificFamilyMembers,join("",@familyTree)) if (scalar(@familyTree));
+                }
+	}
+	# let's add ourself to the list
+	if (isIn("self",@{$relatives})) {
+		push(@specificFamilyMembers,$self->get("lineage"));
+	}
+	if (scalar(@specificFamilyMembers) > 0) {
+		push(@whereModifiers,"(asset.lineage in (".quoteAndJoin(\@specificFamilyMembers)."))");
+	}
+	# we need to include descendants
+	if (isIn("descendants",@{$relatives})) {
+		my $mod = "(asset.lineage like ".quote($lineage.'%')." and asset.lineage<>".quote($lineage); 
+		if (exists $rules->{endingLineageLength}) {
+			$mod .= " and length(asset.lineage) <= ".($rules->{endingLineageLength}*6);
+		}
+		$mod .= ")";
+		push(@whereModifiers,$mod);
+	}
+	# we need to include children
+	if (isIn("children",@{$relatives})) {
+		push(@whereModifiers,"(parentId=".quote($self->getId).")");
+	}
+	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
+	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
+		my @mods;
+		my $lineage = $rules->{assetToPedigree}->get("lineage");
+		my $length = $rules->{assetToPedigree}->getLineageLength;
+		for (my $i = $length; $i > 0; $i--) {
+			my $line = substr($lineage,0,$i*6);
+			push(@mods,"( asset.lineage like ".quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
+			last if ($self->getLineageLength == $i);
+		}
+		push(@whereModifiers, "(".join(" or ",@mods).")");
+	}
+	# formulate a where clause
+	my $where = "state='published'";
+	if (exists $rules->{excludeClasses}) { # deal with exclusions
+		my @set;
+		foreach my $className (@{$rules->{excludeClasses}}) {
+			push(@set,"asset.className <> ".quote($className));
+		}
+		$where .= ' and ('.join(" and ",@set).')';
+	}
+	if (exists $rules->{includeOnlyClasses}) {
+		$where .= ' and (asset.className in ('.quoteAndJoin($rules->{includeOnlyClasses}).'))';
+	}
+	$where .= " and ".join(" or ",@whereModifiers) if (scalar(@whereModifiers));
+	my $tables = "asset ";
+	if (exists $rules->{joinClass}) {
+		my $className = $rules->{joinClass};
+		my $cmd = "use ".$className;
+		eval ($cmd);
+		WebGUI::ErrorHandler::fatalError("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+		my $assetObject = eval{$className->new("new")};
+		WebGUI::ErrorHandler::fatalError("Couldn't create new asset for ".$className.". Root cause: ".$@) if ($@);
+		foreach my $definition (@{$assetObject->definition}) {
+			unless ($definition->{tableName} eq "asset") {
+				my $tableName = $definition->{tableName};
+				$tables .= ", $tableName ";
+				$where .= " and (asset.assetId = $tableName.assetId) "; 
+			}
+			last;
+		}
+	}
+	if (exists $rules->{whereClause}) {
+		$where .= ' and ('.$rules->{whereClause}.')';
+	}
+	# based upon all available criteria, let's get some assets
+	my $columns = "asset.assetId, asset.className, asset.parentId";
+	my $slavedb;
+	if ($rules->{returnQuickReadObjects}) {
+		$columns = "asset.*";
+		$slavedb = WebGUI::SQL->getSlave;
+	}
+	my $sortOrder = ($rules->{invertTree}) ? "desc" : "asc"; 
+	my $sql = "select $columns from $tables where $where order by lineage $sortOrder";
+	my @lineage;
+	my %relativeCache;
+	my $sth = WebGUI::SQL->read($sql, $slavedb);
+	while (my $properties = $sth->hashRef) {
+		# create whatever type of object was requested
+		my $asset;
+		if ($rules->{returnObjects}) {
+			if ($self->getId eq $properties->{assetId}) { # possibly save ourselves a hit to the database
+				$asset =  $self;
+			} else {
+				$asset = WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className});
+			}
+		} elsif ($rules->{returnQuickReadObjects}) {
+			$asset = WebGUI::Asset->newByPropertyHashRef($properties);
+		} else {
+			$asset = $properties->{assetId};
+		}
+		# since we have the relatives info now, why not cache it
+		if ($rules->{returnObjects} || $rules->{returnQuickReadObjects}) {
+			my $parent = $relativeCache{$properties->{parentId}};
+			$relativeCache{$properties->{assetId}} = $asset;
+			$asset->{_parent} = $parent;
+			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
+			$parent->{_lastChild} = $asset;
+		}
+		push(@lineage,$asset);
+	}
+	$sth->finish;
+	return \@lineage;
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 getLineageLength ( )
