@@ -107,7 +107,7 @@ sub www_editImage {
 
 #-------------------------------------------------------------------
 sub www_editImageSave {
-        my ($file, $sqlAdd);
+        my ($file, $sqlAdd, $test);
         if (WebGUI::Privilege::isInGroup(4)) {
 		if ($session{form}{iid} eq "new") {
 			$session{form}{iid} = getNextId("imageId");
@@ -118,6 +118,13 @@ sub www_editImageSave {
 		if ($file->getFilename) {
 			$sqlAdd = ", filename=".quote($file->getFilename);
 		}
+	        while (($test) = WebGUI::SQL->quickArray("select name from images where name='$session{form}{name}'")) {
+        	        if ($session{form}{name} =~ /(.*)(\d+$)/) {
+                	        $session{form}{name} = $1.($2+1);
+	                } elsif ($test ne "") {
+        	                $session{form}{name} .= "2";
+                	}
+        	}
 		WebGUI::SQL->write("update images set name=".quote($session{form}{name}).
                         $sqlAdd.", parameters=".quote($session{form}{parameters}).", userId=$session{user}{userId}, ".
                         " username=".quote($session{user}{username}).
