@@ -148,7 +148,7 @@ sub www_editHelpSave {
 			$session{form}{namespace} = $session{form}{namespace_new};
 		}
 		($session{form}{titleId}) = WebGUI::SQL->quickArray("select max(internationalId) from international
-			where namespace=".quote($session{form}{namespace}));
+			where namespace=".quote($session{form}{namespace})." and languageId=1");
 		$session{form}{titleId}++;
 		$session{form}{bodyId} = $session{form}{titleId}+1;
 		($session{form}{hid}) = WebGUI::SQL->quickArray("select max(helpId) from help 
