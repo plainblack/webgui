@@ -64,7 +64,7 @@ sub _submenu {
 	if ( $session{ form }{ lid } == 1 ) {
 		$menu{ WebGUI::URL::page( 'op=addInternationalMessage&lid=1' ) } = 'Add a new message.';
 	}
-	if ( $session{ form }{ lid } ne "new" && $session{ form }{ lid } ne '' ) {
+	if ( $session{ form }{ lid } ne 'new' && $session{ form }{ lid } ne '' ) {
 		$menu{ WebGUI::URL::page( 'op=listInternationalMessages&lid=' . $session{ form }{ lid } ) } =
 		WebGUI::International::get( 594 );
 		$menu{ WebGUI::URL::page( 'op=exportTranslation&lid=' . $session{ form }{ lid } ) } = WebGUI::International::get( 718 );
@@ -284,7 +284,7 @@ sub www_listInternationalMessages {
 
 	my @row;
 	for my $key ( sort keys %list ) {
-		my $status;
+		my $status = $ok;
 		if ( $list{ $key }{ status } eq 'updated' ) {
 			$status = $outOfDate;
 		}
@@ -293,9 +293,6 @@ sub www_listInternationalMessages {
 		}
 		elsif ( $list{ $key }{ status } eq 'deleted' ) {
 			$status = $deprecated;
-		}
-		else {
-			$status = $ok;
 		}
 		push @row, '<tr valign="top"><td nowrap="1">' . $status . '</td><td>'
 			. editIcon( 'op=editInternationalMessage&lid=' . $session{ form }{ lid }
