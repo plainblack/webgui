@@ -88,7 +88,9 @@ sub close {
 #-------------------------------------------------------------------
 sub end {
 	WebGUI::SQL->write("delete from userSession where sessionId='$_[0]'",$session{dbh});
-	refreshSessionVars();
+	if ($_[0] eq $session{var}{sessionId}) {
+		refreshSessionVars();
+	}
 }
 
 #-------------------------------------------------------------------

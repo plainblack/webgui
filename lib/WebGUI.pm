@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "3.6.0";
+our $VERSION = "3.6.1";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2002 Plain Black Software.
@@ -163,7 +163,7 @@ sub page {
 			($widgetType,$widgetPage) = WebGUI::SQL->quickArray("select namespace,pageId from widget where widgetId='$session{form}{wid}'");
 		}
                 if ($widgetType ne "") {
-			if ($widgetPage != $session{page}{pageId}) {
+			 if ($widgetPage != $session{page}{pageId} && $widgetPage != 2) {
 				$functionOutput = WebGUI::International::get(417);
 				WebGUI::ErrorHandler::warn($session{user}{username}." [".$session{user}{userId}."] attempted to access widget [".$session{form}{wid}."] on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
 			} else {

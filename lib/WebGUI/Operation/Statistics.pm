@@ -49,8 +49,7 @@ sub www_viewActiveSessions {
                         $row[$i] .= '<td>'.epochToHuman($data{expires},"%H:%n%p %M/%D/%y").'</td>';
                         $row[$i] .= '<td>'.epochToHuman($data{lastPageView},"%H:%n%p %M/%D/%y").'</td>';
                         $row[$i] .= '<td>'.$data{lastIP}.'</td>';
-			$row[$i] .= '<td align="center"><a href="'.WebGUI::URL::page("op=killSession&sid=$data{sessionId}").'">'.
-				'<img src="'.$session{setting}{lib}.'/delete.gif" border="0"</a></td></tr>';
+			$row[$i] .= '<td align="center"><a href="'.WebGUI::URL::page("op=killSession&sid=$data{sessionId}").'">'.'<img src="'.$session{setting}{lib}.'/delete.gif" border="0"></a></td></tr>';
                         $i++;
 		}
 		$sth->finish;

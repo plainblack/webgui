@@ -140,6 +140,9 @@ sub postNewMessage {
 	$html .= WebGUI::Form::hidden("func","postNewMessageSave");
 	$html .= WebGUI::Form::hidden("wid",$session{form}{wid});
 	$html .= WebGUI::Form::hidden("sid",$session{form}{sid});
+	if ($session{user}{userId} == 1) {
+		$html .= tableFormRow(WebGUI::International::get(438),WebGUI::Form::text("visitorName",30,35));
+	}
 	$html .= '<tr><td class="formDescription">'.WebGUI::International::get(229).'</td><td>'.WebGUI::Form::text("subject",30,255).'</td></tr>';
 	$html .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(230).'</td><td>'.WebGUI::Form::textArea("message",'',50,6,1).'</td></tr>';
         $html .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
@@ -149,15 +152,20 @@ sub postNewMessage {
 
 #-------------------------------------------------------------------
 sub postNewMessageSave {
-	my ($mid);
+	my ($mid, $visitor);
         if ($session{form}{subject} eq "") {
         	$session{form}{subject} = WebGUI::International::get(232);
         }
 	if ($session{form}{message} eq "") {
         	$session{form}{subject} .= ' '.WebGUI::International::get(233);
         }
+	if ($session{form}{visitorName} eq "") {
+		$visitor = $session{user}{username};
+	} else {
+		$visitor = $session{form}{visitorName};
+	}
 	$mid = getNextId("messageId");
-	WebGUI::SQL->write("insert into discussion values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
+	WebGUI::SQL->write("insert into discussion values ($mid, $mid, $session{form}{wid}, 0, $session{user}{userId}, ".quote($visitor).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
 	return "";
 }
 
@@ -172,6 +180,9 @@ sub postReply {
         $html .= WebGUI::Form::hidden("wid",$session{form}{wid});
         $html .= WebGUI::Form::hidden("sid",$session{form}{sid});
         $html .= WebGUI::Form::hidden("mid",$session{form}{mid});
+	if ($session{user}{userId} == 1) {
+		$html .= tableFormRow(WebGUI::International::get(438),WebGUI::Form::text("visitorName",30,35));
+	}
 	$html .= '<tr><td class="formDescription">'.WebGUI::International::get(229).'</td><td>'.WebGUI::Form::text("subject",30,255,$subject).'</td></tr>';
 	$html .= '<tr><td class="formDescription" valign="top">'.WebGUI::International::get(230).'</td><td>'.WebGUI::Form::textArea("message",'',50,6,1).'</td></tr>';
         $html .= '<tr><td></td><td>'.WebGUI::Form::submit(WebGUI::International::get(62)).'</td></tr>';
@@ -182,16 +193,21 @@ sub postReply {
 
 #-------------------------------------------------------------------
 sub postReplySave {
-	my ($rid, $mid);
+	my ($rid, $mid, $visitor);
         if ($session{form}{subject} eq "") {
         	$session{form}{subject} = WebGUI::International::get(232);
         }
  	if ($session{form}{message} eq "") {
                	$session{form}{subject} .= ' '.WebGUI::International::get(233);
         }
+        if ($session{form}{visitorName} eq "") {
+                $visitor = $session{user}{username};
+        } else {
+                $visitor = $session{form}{visitorName};
+        }
 	$mid = getNextId("messageId");
 	($rid) = WebGUI::SQL->quickArray("select rid from discussion where messageId=$session{form}{mid}");
-	WebGUI::SQL->write("insert into discussion values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($session{user}{username}).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
+	WebGUI::SQL->write("insert into discussion values ($mid, $rid, $session{form}{wid}, $session{form}{mid}, $session{user}{userId}, ".quote($visitor).", ".quote($session{form}{subject}).", ".quote($session{form}{message}).", ".time().", '$session{form}{sid}')");
 	return "";
 }
 
