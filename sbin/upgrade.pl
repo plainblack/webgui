@@ -294,18 +294,18 @@ STOP
 #-----------------------------------------
 # checkVersion($versionNumber)
 #-----------------------------------------
-# Version number must be 3.5.1 or greater
+# Version number must be 5.5.0 or greater
 # in order to be upgraded by this utility.
 #-----------------------------------------
 sub checkVersion {
 	$_[0] =~ /(\d+)\.(\d+)\.(\d+)/; 
-        if ($1 > 3) {
+        if ($1 > 5) {
         	return 1;
-        } elsif ($1 == 3) {
+        } elsif ($1 == 5) {
         	if ($2 > 5) {
                 	return 1;
                 } elsif ($2 == 5) {
-                	if ($3 > 0) {
+                	if ($3 >= 0) {
                         	return 1;
                         } else {
 				return 0;
