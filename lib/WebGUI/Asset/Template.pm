@@ -115,8 +115,8 @@ sub definition {
 					defaultValue=>1
 				},
 				namespace=>{
-					fieldType=>'hidden',
-					defaultValue=>undef
+					fieldType=>'combo',
+					defaultValue=>'style'
 					}
                         }
                 });
@@ -135,16 +135,21 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-        $tabform->getTab("properties")->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.'" />');
-	if ($session{form}{tid} eq "new") {
+       # $tabform->getTab("properties")->raw('<input type="hidden" name="op2" value="'.$session{form}{afterEdit}.'" />');
+	if ($session{form}{func} eq "add") {
 		my $namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
 			from template order by namespace");
-		$tabform->getTab("properties")->selectList(
+		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
 			-options=>$namespaces,
-			-label=>WebGUI::International::get(721),
-			-value=>[$session{form}{namespace}]
+			-label=>"Namespace",
+			-value=>[$session{form}{namespace}] 
 			);
+	} else {
+		$tabform->getTab("meta")->readOnly(
+			-label=>"Namespace",
+			-value=>$self->getValue("namespace")
+			);	
 	}
 	$tabform->getTab("display")->yesNo(
 		-name=>"showInForms",
@@ -304,6 +309,7 @@ sub processRaw {
 }
 
 
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	return $self->get("template");
@@ -319,14 +325,6 @@ sub www_edit {
 }
 
 
-sub www_view {
-	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
-	if ($session{var}{adminOn}) {
-		return $self->www_edit;
-	}
-	return $self->view;
-}
 
 
 1;

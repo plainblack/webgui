@@ -2245,6 +2245,7 @@ Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset
 
 sub www_editSave {
 	my $self = shift;
+WebGUI::ErrorHandler::warn("got here");
 	return $self->getAdminConsole->render(WebGUI::Privilege::insufficient()) unless $self->canEdit;
 	my $object;
 	if ($session{form}{assetId} eq "new") {
@@ -2973,7 +2974,7 @@ Returns a fixed English message "No view has been implemented for this asset." I
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
-	return "No view has been implemented for this asset.";
+	return $self->view;
 }
 
 
