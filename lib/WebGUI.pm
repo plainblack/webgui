@@ -67,20 +67,35 @@ sub _generatePage {
                                         .moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
                                         .moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
                                         .cutIcon('func=cut&wid='.${$wobject}{wobjectId})
-                                        .copyIcon('func=copy&wid='.${$wobject}{wobjectId})
-                                        .shortcutIcon('func=createShortcut&wid='.${$wobject}{wobjectId})
-                                        .'<br>';
+                                        .copyIcon('func=copy&wid='.${$wobject}{wobjectId});
+				if (${$wobject}{namespace} ne "WobjectProxy" && isIn("WobjectProxy",@{$session{config}{wobjects}})) {
+                                        $contentHash{"page.position".${$wobject}{templatePosition}} .= 
+						shortcutIcon('func=createShortcut&wid='.${$wobject}{wobjectId})
+				}
+                                $contentHash{"page.position".${$wobject}{templatePosition}} .= '<br>';
                         }
                         if (${$wobject}{namespace} eq "WobjectProxy") {
                                 $originalWobject = $wobject;
-                                ($wobject) = WebGUI::SQL->quickArray("select proxiedWobjectId from WobjectProxy 
+                                my ($wobjectProxy) = WebGUI::SQL->quickHashRef("select * from WobjectProxy 
 					where wobjectId=".${$wobject}{wobjectId});
-                                $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobject);
+                                $wobject = WebGUI::SQL->quickHashRef("select * from wobject where wobject.wobjectId=".$wobjectProxy->{proxiedWobjectId});
                                 if (${$wobject}{namespace} eq "") {
                                         $wobject = $originalWobject;
                                 } else {
                                         ${$wobject}{templatePosition} = ${$originalWobject}{templatePosition};
                                         ${$wobject}{_WobjectProxy} = ${$originalWobject}{wobjectId};
+					if ($wobjectProxy->{overrideTitle}) {
+						${$wobject}{title} = ${$originalWobject}{title};
+					}
+					if ($wobjectProxy->{overrideDisplayTitle}) {
+						${$wobject}{displayTitle} = ${$originalWobject}{displayTitle};
+					}
+					if ($wobjectProxy->{overrideDescription}) {
+						${$wobject}{description} = ${$originalWobject}{description};
+					}
+					if ($wobjectProxy->{overrideTemplate}) {
+						${$wobject}{templateId} = $wobjectProxy->{proxiedTemplateId};
+					}
                                 }
                         }
                         my $sql = "select * from ".$wobject->{namespace}." where wobjectId=".$wobject->{wobjectId};

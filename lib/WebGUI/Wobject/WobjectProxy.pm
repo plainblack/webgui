@@ -79,9 +79,17 @@ sub uiLevel {
 sub www_edit {
 	my $properties = WebGUI::HTMLForm->new;
         my $layout = WebGUI::HTMLForm->new;
+	$properties->hidden(
+		-name=>"proxiedNamespace",
+		-value=>$_[0]->get("proxiedNamespace")
+		);
+	$properties->hidden(
+		-name=>"proxiedWobjectId",
+		-value=>$_[0]->get("proxiedWobjectId")
+		);
 	$layout->template(
 		-name=>"proxiedTemplateId",
-		-value=>[$_[0]->getValue("proxiedTemplateId")],
+		-value=>$_[0]->getValue("proxiedTemplateId"),
 		-namespace=>$_[0]->get("proxiedNamespace")
 		);
 	$properties->yesNo(
@@ -96,19 +104,19 @@ sub www_edit {
 		);
 	$properties->yesNo(
 		-name=>"overrideDescription",
-		-value=>$_[0]->getValue("overrideTitle"),
+		-value=>$_[0]->getValue("overrideDescription"),
 		-label=>WebGUI::International::get(9,$_[0]->get("namespace"))
 		);
 	$layout->yesNo(
 		-name=>"overrideTemplate",
-		-value=>$_[0]->getValue("overrideTitle"),
+		-value=>$_[0]->getValue("overrideTemplate"),
 		-label=>WebGUI::International::get(10,$_[0]->get("namespace"))
 		);
-	my @data = WebGUI::SQL->read("select page.urlizedTitle,wobject.title from wobject left join page on wobject.pageId=page.pageId
+	my @data = WebGUI::SQL->quickArray("select page.urlizedTitle,wobject.title from wobject left join page on wobject.pageId=page.pageId
 		where wobject.wobjectId=".$_[0]->get("proxiedWobjectId"));
-	$properties->readonly(
+	$properties->readOnly(
 		-label=>WebGUI::International::get(1,$_[0]->get("namespace")),
-		-value=>'<a href="'.WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a>'
+		-value=>'<a href="'.WebGUI::URL::gateway($data[0]).'">'.$data[1].'</a> ('.$_[0]->get("proxiedWobjectId").')'
 		);
 	return $_[0]->SUPER::www_edit(
                 -properties=>$properties->printRowsOnly,

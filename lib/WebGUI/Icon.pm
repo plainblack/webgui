@@ -430,7 +430,7 @@ sub shortcutIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{page}{urlizedTitle};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/shortcut.gif" align="middle" border="0" alt="Shortcut" title="Shortcut" /></a>';
+        $output .= '<img src="'.$session{config}{extrasURL}.'/toolbar/'.$session{language}{toolbar}.'/shortcut.gif" align="middle" border="0" alt="Shortcut" title="Create Shortcut" /></a>';
         return $output;
 }
 

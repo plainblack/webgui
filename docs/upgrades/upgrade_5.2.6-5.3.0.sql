@@ -538,6 +538,7 @@ alter table WobjectProxy add column overrideTitle int not null default 0;
 alter table WobjectProxy add column overrideDescription int not null default 0;
 alter table WobjectProxy add column overrideTemplate int not null default 0;
 alter table WobjectProxy add column overrideDisplayTitle int not null default 0;
+alter table WobjectProxy add column proxiedTemplateId int not null default 1;
 
 delete from international where languageId=1 and namespace='WobjectProxy' and internationalId=10;
 insert into international (internationalId,languageId,namespace,message,lastUpdated,context) values (10,1,'WobjectProxy','Override template?', 1053183837,'Asking the user if s/he would like to use the template specified in the wobject proxy or the original template of the original wobject.');
