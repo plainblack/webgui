@@ -8,6 +8,7 @@
  - fix [ 1158117 ] Help Index Unavailable from RWG
  - fix [ 1157453 ] Error on Edit Template / Save and Cancel
  - fix [ 1157434 ] [CVS 6.5]edit question controls have incorrect URL in Survey
+ - Using the International Macro in Help to simplify management and translation.
 
 
 6.4.0

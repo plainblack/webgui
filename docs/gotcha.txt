@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.5.0
+--------------------------------------------------------------------
+ * The International Macro must be enabled in all WebGUI configuration
+   files for the Help to work correctly.
+
 6.4.0
 --------------------------------------------------------------------
  * Image Magick is no longer optional.
