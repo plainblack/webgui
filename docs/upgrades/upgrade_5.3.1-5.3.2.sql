@@ -190,6 +190,7 @@ insert into international (internationalId,languageId,namespace,message,lastUpda
 delete from international where languageId=2 and namespace='WebGUI' and internationalId=12;
 insert into international (internationalId,languageId,namespace,message,lastUpdated) values (12,2,'WebGUI','Editieren abschalten.', 1050568811);
 
+alter table DataForm_entryData drop primary key;
 alter table DataForm_entryData add primary key (DataForm_entryId,name);
 
 
