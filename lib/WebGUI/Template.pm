@@ -99,7 +99,7 @@ Defaults to "1". Specify the templateId of the template to retrieve.
 
 =item namespace
 
-Defaults to "Page". Specify the namespace of the template to retrieve.
+Defaults to "page". Specify the namespace of the template to retrieve.
 
 =back
 
@@ -107,7 +107,7 @@ Defaults to "Page". Specify the namespace of the template to retrieve.
 
 sub get {
 	my $templateId = shift || 1;
-	my $namespace = shift || "Page";
+	my $namespace = shift || "page";
         return WebGUI::SQL->quickHashRef("select * from template where templateId=".$templateId." and namespace=".quote($namespace));
 }
 
@@ -122,14 +122,14 @@ Returns a hash reference containing template ids and template names of all the t
 
 =item namespace
 
-Defaults to "Page". Specify the namespace to build the list for.
+Defaults to "page". Specify the namespace to build the list for.
 
 =back
 
 =cut
 
 sub getList {
-	my $namespace = $_[0] || "Page";
+	my $namespace = $_[0] || "page";
 	return WebGUI::SQL->buildHashRef("select templateId,name from template where namespace=".quote($namespace)." and showInForms=1 order by name");
 }
 
@@ -148,7 +148,7 @@ Defaults to "1". Specify the templateId of the template to retrieve.
 
 =item namespace
 
-Defaults to "Page". Specify the namespace of the template to retrieve.
+Defaults to "page". Specify the namespace of the template to retrieve.
 
 =item vars
 
@@ -160,7 +160,7 @@ A hash reference containing template variables and loops. Automatically includes
 
 sub process {
 	my $templateId = shift || 1;
-	my $namespace = shift || "Page";
+	my $namespace = shift || "page";
 	my $vars = shift;
 	my $file = _getTemplateFile($templateId,$namespace);
 	my %params = (

@@ -451,7 +451,7 @@ sub generate {
 		WebGUI::ErrorHandler::fatalError("Wobject runtime error: ${$wobject}{namespace}. Root cause: ".$@) if($@);
 	}
 	$sth->finish;
-	return WebGUI::Template::process($session{page}{templateId},"Page",\%var);
+	return WebGUI::Template::process($session{page}{templateId},"page",\%var);
 }
 
 
@@ -484,8 +484,9 @@ The id of the page template you wish to retrieve. Defaults to the current page's
 =cut
 
 sub getTemplate {
-	my $templateId = $_[0] || $session{page}{templateId};
-	return WebGUI::Template::get($templateId,"page");
+	my $templateId = shift || $session{page}{templateId};
+	my $template = WebGUI::Template::get($templateId,"page");
+	return $template->{template};
 }
 
 #-------------------------------------------------------------------
