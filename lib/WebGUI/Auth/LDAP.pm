@@ -126,9 +126,9 @@ sub addUserFormSave {
 sub authenticate {
 	my $self = shift;
 	my ($uri, $ldap, $auth, $result, $error);
-	return 0 if !$self->SUPER::authenticate();  #authenticate that the username entered actually exists and is active
+	return 0 if !$self->SUPER::authenticate($_[0]);  #authenticate that the username entered actually exists and is active
 	my $userId = $self->userId;
-   	my $identifier = $_[0];
+   	my $identifier = $_[1];
 	my $userData = $self->getParams;
 		
 	
@@ -331,7 +331,7 @@ sub editUserSettingsForm {
 #-------------------------------------------------------------------
 sub login {
    my $self = shift;
-   if(!$self->authenticate($session{form}{identifier})){
+   if(!$self->authenticate($session{form}{username},$session{form}{identifier})){
       WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 	  return $self->displayLogin("<h1>".WebGUI::International::get(70)."</h1>".$self->error);
    }

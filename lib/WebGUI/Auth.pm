@@ -164,7 +164,8 @@ sub addUserFormSave {
 
 sub authenticate {
    my $self = shift;
-   my $user = WebGUI::SQL->quickHashRef("select userId,authMethod,status from users where username=".quote($session{form}{username}));
+   my $username = shift;
+   my $user = WebGUI::SQL->quickHashRef("select userId,authMethod,status from users where username=".quote($username));
    my $uid = $user->{userId};
    #If userId does not exist or is not active, fail login
    if(!$uid){
@@ -242,7 +243,7 @@ sub createAccountSave {
       my $authInfo = "\n\n".WebGUI::International::get(50).": ".$username;
       $authInfo .= "\n".WebGUI::International::get(51).": ".$password if($password);
       $authInfo .= "\n\n";
-      WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),getSetting("welcomeMessage").$authInfo);
+      WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),$self->getSetting("welcomeMessage").$authInfo);
    }
    
    WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$userId);

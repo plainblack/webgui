@@ -101,7 +101,7 @@ sub www_viewMessageLogMessage {
                         $output .= '<a href="'.$data{url}.'">'.WebGUI::International::get(554).'</a> &middot; ';
                 }
 		$output .= '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a><p>';
-        $output .= WebGUI::Operation::Profile::_accountOptions();
+        $output .= WebGUI::Operation::Profile::accountOptions();
         } else {
                 $output = WebGUI::Privilege::insufficient();
         }
