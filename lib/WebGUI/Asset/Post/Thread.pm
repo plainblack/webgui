@@ -179,15 +179,18 @@ sub getNextThread {
         unless (exists $self->{_next}) {
 		$self->{_next} = WebGUI::Asset::Post->newByPropertyHashRef(
 			WebGUI::SQL->quickHashRef("
-				select asset.*,Post.* 
+				select * 
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join Post on Post.assetId=asset.assetId 
-				where Thread.parentId=".quote($self->get("parentId"))." 
+				where asset.parentId=".quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
 					and ".$self->getParent->getValue("sortBy").">".quote($self->get($self->getParent->getValue("sortBy")))." 
-					and (userId=".quote($self->get("ownerUserId"))." or Post.status='approved') 
+					and (
+						Post.status in ('approved','archived')
+						or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
+						)
 				order by ".$self->getParent->getValue("sortBy")." asc 
 				",WebGUI::SQL->getSlave)
 			);
@@ -209,18 +212,19 @@ sub getPreviousThread {
 	my $self = shift;
         unless (exists $self->{_previous}) {
 		$self->{_previous} = WebGUI::Asset::Post->newByPropertyHashRef(
-			WebGUI::SQL->quickHashRef("
-				select asset.*,Post.* 
+			WebGUI::SQL->quickHashRef(" select * 
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join Post on Post.assetId=asset.assetId 
-				where Thread.parentId=".quote($self->get("parentId"))." 
+				where asset.parentId=".quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
 					and ".$self->getParent->getValue("sortBy")."<".quote($self->get($self->getParent->getValue("sortBy")))." 
-					and (userId=".quote($self->get("ownerUserId"))." or Post.status='approved') 
-				order by ".$self->getParent->getValue("sortBy")." desc
-				",WebGUI::SQL->getSlave)
+					and (
+						Post.status in ('approved','archived')
+						or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
+						)
+				order by ".$self->getParent->getValue("sortBy")." desc ",WebGUI::SQL->getSlave)
 			);
 	};
 	return $self->{_previous};
@@ -569,13 +573,13 @@ sub view {
 	$self->getParent->appendTemplateLabels($var);
 
         $var->{'user.isVisitor'} = ($session{user}{userId} eq '1');
-        $var->{'user.isModerator'} = $self->canModerate;
+        $var->{'user.isModerator'} = $self->getParent->canModerate;
         $var->{'user.canPost'} = $self->getParent->canPost;
         $var->{'user.canReply'} = $self->canReply;
 
-        $var->{'layout.nested.url'} = $self->getThreadLayoutUrl("nested");
-        $var->{'layout.flat.url'} = $self->getThreadLayoutUrl("flat");
-        $var->{'layout.threaded.url'} = $self->getThreadLayoutUrl("threaded");
+        $var->{'layout.nested.url'} = $self->getLayoutUrl("nested");
+        $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");
+        $var->{'layout.threaded.url'} = $self->getLayoutUrl("threaded");
         my $layout = $session{scratch}{discussionLayout} || $session{user}{discussionLayout};
         $var->{'layout.isFlat'} = ($layout eq "flat");
         $var->{'layout.isNested'} = ($layout eq "nested");
@@ -633,7 +637,7 @@ sub view {
 
 	$var->{"search.url"} = $self->getParent->getSearchUrl;
         $var->{"back.url"} = $self->getThread->getParent->getUrl;
-	return $self->processTemplate($var,$self->getParent->get("submissionTemplateId"));
+	return $self->processTemplate($var,$self->getParent->get("threadTemplateId"));
 }
 
 

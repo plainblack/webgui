@@ -515,8 +515,8 @@ sub processPropertiesFromFormPost {
 		groupIdView => $self->getThread->get("groupIdView"),
 		groupIdEdit => $self->getThread->get("groupIdEdit")
 		);
-	$data{startDate} = $self->getThread-getParent->get("startDate") unless ($session{form}{startDate});
-	$data{endDate} = $self->getThread-getParent->get("endDate") unless ($session{form}{endDate});
+	$data{startDate} = $self->getThread->getParent->get("startDate") unless ($session{form}{startDate});
+	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($session{form}{endDate});
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
         if ($self->getThread->getParent->get("addEditStampToPosts")) {
         	$data{content} .= "<p>\n\n --- (Edited on ".WebGUI::DateTime::epochToHuman()." by ".$session{user}{alias}.") --- \n</p>";
@@ -684,7 +684,7 @@ sub www_deny {
 sub www_edit {
 	my $self = shift;
 	my %var = %{$self->getTemplateVars};
-        $var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
+        $var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getParent->getUrl})
 		.WebGUI::Form::hidden({
                 	name=>"func",
 			value=>"add"
@@ -750,7 +750,7 @@ sub www_edit {
 	$var{'form.preview'} = WebGUI::Form::submit({value=>"Preview"});
 	$var{'form.submit'} = WebGUI::Form::button({
 		value=>"Save",
-		onclick=>"this.value='Please wait...'; this.form.func.value='editSave'; this.form.submit();"
+		extras=>"onclick=\"this.value='Please wait...'; this.form.func.value='editSave'; this.form.submit();\""
 		});
 	$var{'form.footer'} = WebGUI::Form::formFooter();
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");

@@ -41,7 +41,7 @@ sub appendPostListTemplateVars {
 	my $page = $p->getPageData;
 	my $i = 0;
 	foreach my $row (@$page) {
-		my $post = WebGUI::Asset::Wobject::Forum->newByPropertyHashRef($row);
+		my $post = WebGUI::Asset::Wobject::Collaboration->newByPropertyHashRef($row);
 		$post->{_parent} = $self; # caching parent for efficiency 
 		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("ur"));
 		if ($self->get("sortBy") eq "lineage") {
@@ -66,7 +66,7 @@ sub appendPostListTemplateVars {
                         "id"=>$post->getId,
                         "url"=>$post->getUrl,
 			rating_loop=>\@rating_loop,
-			"content"=>$self->formatContent,
+			"content"=>$post->formatContent,
                         "status"=>$post->getStatus,
                       #  "thumbnail"=>$submission->getThumbnailUrl,
                        # "submission.image"=>$submission->getImageUrl,
@@ -74,7 +74,7 @@ sub appendPostListTemplateVars {
                         "dateUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%z"),
                         "timeSubmitted.human"=>epochToHuman($post->get("dateSubmitted"),"%Z"),
                         "timeUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%Z"),
-                        "userProfile.url"=>$post->getUserProfileUrl,
+                        "userProfile.url"=>$post->getPosterProfileUrl,
                         "user.isVisitor"=>$post->get("ownerUserId") eq "1",
         		"edit.url"=>$post->getEditUrl,
 			'controls'=>$controls,
@@ -114,7 +114,7 @@ sub appendTemplateLabels {
 	$var->{"edit.label"} = "Edit";
 	$var->{'endDate.label'} = "End Date";
         $var->{'exactphrase.label'} = "Exact Phrase";
-	$var->{"flat.label"} = "Flat";
+	$var->{"layout.flat.label"} = "Flat";
 	$var->{'image.label'} = "Image";
 	$var->{'link.header.label'} = "Edit Link";
 	$var->{"lock.label"} = "Lock";
@@ -123,7 +123,7 @@ sub appendTemplateLabels {
         $var->{'message.label'} = "Message";
 	$var->{"next.label"} = "Next";
         $var->{'newWindow.label'} = "Open in new window?";
-	$var->{"nested.label"} = "Nested";
+	$var->{"layout.nested.label"} = "Nested";
 	$var->{"previous.label"} = "Previous";
 	$var->{"post.label"} = "Add a post.";
 	$var->{'question.label'} = "Question";
@@ -144,7 +144,7 @@ sub appendTemplateLabels {
 	$var->{"status.label"} = "Status";
 	$var->{"thumbnail.label"} = "Thumbnail";
 	$var->{"title.label"} = "Title";
-	$var->{"threaded.label"} = "Threaded";
+	$var->{"layout.threaded.label"} = "Threaded";
 	$var->{"unlock.label"} = "Unlock";
 	$var->{"unstick.label"} = "Unstick";
 	$var->{"unsubscribe.label"} = "Unsubscribe";
@@ -1006,7 +1006,7 @@ sub www_viewRSS {
 		from Thread
 		left join asset on Thread.assetId=asset.parentId
 		left join Post on Post.assetId=asset.assetId 
-		where Thread.parentId=".quote($self->getId)." and asset.state='published' 
+		where asset.parentId=".quote($self->getId)." and asset.state='published' 
 			and asset.className='WebGUI::Asset::Post::Thread' and Post.status='approved'
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $i = 1;
