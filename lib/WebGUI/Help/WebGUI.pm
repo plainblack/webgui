@@ -63,20 +63,6 @@ our $HELP = {
 			}
 		]
 	},
-	'company information edit' => {
-		title => '656',
-		body => '611',
-		related => [
-			{
-				tag => 'settings manage',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'style macros',
-				namespace => 'WebGUI'
-			},
-		]
-	},
 	'trash empty' => {
 		title => '696',
 		body => '651',
@@ -90,22 +76,7 @@ our $HELP = {
 	'profile settings edit' => {
 		title => '672',
 		body => '627',
-		related => [
-			{
-				tag => 'settings manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'miscellaneous settings edit' => {
-		title => '674',
-		body => '629',
-		related => [
-			{
-				tag => 'settings manage',
-				namespace => 'WebGUI'
-			}
-		]
+		related => []
 	},
 	'style template' => {
 		title => '1073',
@@ -255,16 +226,6 @@ our $HELP = {
 			}
 		]
 	},
-	'user settings edit' => {
-		title => '652',
-		body => '607',
-		related => [
-			{
-				tag => 'settings manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 	'group delete' => {
 		title => '665',
 		body => '620',
@@ -285,35 +246,10 @@ our $HELP = {
 			}
 		]
 	},
-	'settings manage' => {
-		title => '662',
-		body => '617',
-		related => [
-			{
-				tag => 'company information edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'content settings edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'messaging settings edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'miscellaneous settings edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'profile settings edit',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'user settings edit',
-				namespace => 'WebGUI'
-			}
-		]
+	'settings' => {
+		title => 'settings',
+		body => 'settings help',
+		related => []
 	},
 	'groups manage' => {
 		title => '660',
@@ -405,20 +341,6 @@ our $HELP = {
 			},
 			{
 				tag => 'page delete',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'content settings edit' => {
-		title => '679',
-		body => '634',
-		related => [
-			{
-				tag => 'settings manage',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'navigation macros',
 				namespace => 'WebGUI'
 			}
 		]

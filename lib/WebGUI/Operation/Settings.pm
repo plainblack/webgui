@@ -11,12 +11,13 @@ package WebGUI::Operation::Settings;
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
+use Tie::IxHash;
+use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
-use WebGUI::HTMLForm;
+use WebGUI::TabForm;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Style;
@@ -24,197 +25,248 @@ use WebGUI::SQL;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
-sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-        $menu{WebGUI::URL::page('op=manageSettings')} = WebGUI::International::get(4);
-        return menuWrapper($_[0],\%menu);
-}
-
-#-------------------------------------------------------------------
-sub www_editCompanyInformation {
+sub www_editSettings {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output, $f);
-        $output .= helpIcon("company information edit");
-	$output .= '<h1>'.WebGUI::International::get(124).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-        $f->hidden("op","saveSettings");
-        $f->text("companyName",WebGUI::International::get(125),$session{setting}{companyName});
-        $f->email("companyEmail",WebGUI::International::get(126),$session{setting}{companyEmail});
-        $f->url("companyURL",WebGUI::International::get(127),$session{setting}{companyURL});
-	$f->submit;
-	$output .= $f->print;
-        return _submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_editContentSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output, %htmlFilter, $f, $pages);
-	$pages = WebGUI::SQL->buildHashRef("select pageId,menuTitle from page order by menuTitle");
-        %htmlFilter = ('none'=>WebGUI::International::get(420), 'most'=>WebGUI::International::get(421), 
-		'javascript'=>WebGUI::International::get(526), 'all'=>WebGUI::International::get(419));
-        $output .= helpIcon("content settings edit");
-        $output .= '<h1>'.WebGUI::International::get(525).'</h1>';
-        $f = WebGUI::HTMLForm->new;
-        $f->hidden("op","saveSettings");
-        $f->selectList("defaultPage",$pages,WebGUI::International::get(527),[$session{setting}{defaultPage}]);
-        $f->selectList("notFoundPage",$pages,WebGUI::International::get(141),[$session{setting}{notFoundPage}]);
-	$f->text(
+	my $i18n = WebGUI::International->new("WebGUI");
+	my %tabs;
+	tie %tabs, 'Tie::IxHash';
+ 	%tabs = (
+       		company=>{ label=>$i18n->get("company") },
+        	content=>{ label=>$i18n->get("content") },
+        	ui=>{ label=>$i18n->get("ui") },
+        	messaging=>{ label=>$i18n->get("messaging") },
+        	misc=>{ label=>$i18n->get("misc") },
+        	user=>{ label=>$i18n->get("user") },
+        	auth=>{ label=>$i18n->get("authentication") },
+        );
+ 	my $tabform = WebGUI::TabForm->new(\%tabs);
+	$tabform->hidden({
+		name=>"op",
+		value=>"saveSettings"});
+# company settings
+        $tabform->getTab("company")->text(
+		-name=>"companyName",
+		-label=>$i18n->get(125),
+		-value=>$session{setting}{companyName}
+		);
+        $tabform->getTab("company")->text(
+		-name=>"companyEmail",
+		-label=>$i18n->get(126),
+		-value=>$session{setting}{companyEmail}
+		);
+        $tabform->getTab("company")->url(
+		-name=>"companyURL",
+		-label=>$i18n->get(127),
+		-value=>$session{setting}{companyURL}
+		);
+# content settings
+	my $pages = WebGUI::SQL->buildHashRef("select pageId,menuTitle from page order by menuTitle");
+        my %htmlFilter = (
+		'none'=>$i18n->get(420), 
+		'most'=>$i18n->get(421), 
+		'javascript'=>$i18n->get(526), 
+		'all'=>$i18n->get(419)
+		);
+        $tabform->getTab("content")->selectList(
+		-name=>"defaultPage",
+		-options=>$pages,
+		-label=>$i18n->get(527),
+		-value=>[$session{setting}{defaultPage}]
+		);
+        $tabform->getTab("content")->selectList(
+		-name=>"notFoundPage",
+		-options=>$pages,
+		-label=>$i18n->get(141),
+		-value=>[$session{setting}{notFoundPage}]
+		);
+	$tabform->getTab("content")->text(
 		-name=>"urlExtension",
 		-value=>$session{setting}{urlExtension},
-		-label=>WebGUI::International::get("url extension")
+		-label=>$i18n->get("url extension")
 		);
-        $f->text(
+        $tabform->getTab("content")->text(
 		-name=>"favicon",
-		-label=>WebGUI::International::get(897),
+		-label=>$i18n->get(897),
 		-value=>$session{setting}{favicon}
 		);
-	$f->text(
+	$tabform->getTab("content")->text(
                 -name=>"siteicon",
-                -label=>WebGUI::International::get(898),
+                -label=>$i18n->get(898),
                 -value=>$session{setting}{siteicon}
                 );
-        $f->integer("maxAttachmentSize",WebGUI::International::get(130),$session{setting}{maxAttachmentSize});
-        $f->integer("maxImageSize",WebGUI::International::get(583),$session{setting}{maxImageSize});
-        $f->integer("thumbnailSize",WebGUI::International::get(406),$session{setting}{thumbnailSize});
-        $f->integer("snippetsPreviewLength",WebGUI::International::get(888),$session{setting}{snippetsPreviewLength});
-        $f->integer("textAreaRows",WebGUI::International::get(463),$session{setting}{textAreaRows});
-        $f->integer("textAreaCols",WebGUI::International::get(464),$session{setting}{textAreaCols});
-        $f->integer("textBoxSize",WebGUI::International::get(465),$session{setting}{textBoxSize});
-        $f->submit;
-        $output .= $f->print;
-        return _submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_editMessagingSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output, $f);
-        $output .= helpIcon("messaging settings edit");
-        $output .= '<h1>'.WebGUI::International::get(133).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-        $f->hidden("op","saveSettings");
-        $f->text("smtpServer",WebGUI::International::get(135),$session{setting}{smtpServer});
-        $f->textarea("mailFooter",WebGUI::International::get(824),$session{setting}{mailFooter});
-        $f->yesNo("alertOnNewUser",WebGUI::International::get(534),$session{setting}{alertOnNewUser});
-        $f->group("onNewUserAlertGroup",WebGUI::International::get(535),[$session{setting}{onNewUserAlertGroup}]);
-	$f->submit;
-	$output .= $f->print;
-        return _submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_editMiscSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output, $f);
-        $output .= helpIcon("miscellaneous settings edit");
-        $output .= '<h1>'.WebGUI::International::get(140).'</h1>';
-	$f = WebGUI::HTMLForm->new;
-        $f->hidden("op","saveSettings");
-	$f->yesNo("sharedClipboard",WebGUI::International::get(947),$session{setting}{sharedClipboard});
-	$f->yesNo("sharedTrash",WebGUI::International::get(946),$session{setting}{sharedTrash});
-	$f->yesNo("proxiedClientAddress",WebGUI::International::get(973),$session{setting}{proxiedClientAddress});
-	$f->yesNo("preventProxyCache",WebGUI::International::get(400),$session{setting}{preventProxyCache});
-	$f->yesNo("showDebug",WebGUI::International::get(707),$session{setting}{showDebug});
-	$f->yesNo("trackPageStatistics",WebGUI::International::get(749),$session{setting}{trackPageStatistics});
-	$f->selectList(
+        $tabform->getTab("content")->integer(
+		-name=>"maxAttachmentSize",
+		-label=>$i18n->get(130),
+		-value=>$session{setting}{maxAttachmentSize}
+		);
+        $tabform->getTab("content")->integer(
+		-name=>"maxImageSize",
+		-label=>$i18n->get(583),
+		-value=>$session{setting}{maxImageSize}
+		);
+        $tabform->getTab("content")->integer(
+		-name=>"thumbnailSize",
+		-label=>$i18n->get(406),
+		-value=>$session{setting}{thumbnailSize}
+		);
+	 $tabform->getTab("content")->yesNo(
+                -name=>"metaDataEnabled",
+                -label=>$i18n->get("Enable Metadata ?", 'MetaData'),
+                -value=>$session{setting}{metaDataEnabled}
+        	);
+# user interface settings
+	$tabform->getTab("ui")->yesNo(
+		-name=>"sharedClipboard",
+		-label=>$i18n->get(947),
+		-value=>$session{setting}{sharedClipboard}
+		);
+	$tabform->getTab("ui")->yesNo(
+		-name=>"sharedTrash",
+		-label=>$i18n->get(946),
+		-value=>$session{setting}{sharedTrash}
+		);
+        $tabform->getTab("ui")->integer(
+		-name=>"snippetsPreviewLength",
+		-label=>$i18n->get(888),
+		-value=>$session{setting}{snippetsPreviewLength}
+		);
+        $tabform->getTab("ui")->integer(
+		-name=>"textAreaRows",
+		-label=>$i18n->get(463),
+		-value=>$session{setting}{textAreaRows}
+		);
+        $tabform->getTab("ui")->integer(
+		-name=>"textAreaCols",
+		-label=>$i18n->get(464),
+		-value=>$session{setting}{textAreaCols}
+		);
+        $tabform->getTab("ui")->integer(
+		-name=>"textBoxSize",
+		-label=>$i18n->get(465),
+		-value=>$session{setting}{textBoxSize}
+		);
+# messaging settings
+        $tabform->getTab("messaging")->text(
+		-name=>"smtpServer",
+		-label=>$i18n->get(135),
+		-value=>$session{setting}{smtpServer}
+		);
+        $tabform->getTab("messaging")->textarea(
+		-name=>"mailFooter",
+		-label=>$i18n->get(824),
+		-value=>$session{setting}{mailFooter}
+		);
+        $tabform->getTab("messaging")->yesNo(
+		-name=>"alertOnNewUser",
+		-label=>$i18n->get(534),
+		-value=>$session{setting}{alertOnNewUser}
+		);
+        $tabform->getTab("messaging")->group(
+		-name=>"onNewUserAlertGroup",
+		-label=>$i18n->get(535),
+		-value=>[$session{setting}{onNewUserAlertGroup}]
+	);
+# misc settings
+	$tabform->getTab("misc")->yesNo(
+		-name=>"proxiedClientAddress",
+		-label=>$i18n->get(973),
+		-value=>$session{setting}{proxiedClientAddress}
+		);
+	$tabform->getTab("misc")->yesNo(
+		-name=>"preventProxyCache",
+		-label=>$i18n->get(400),
+		-value=>$session{setting}{preventProxyCache}
+		);
+	$tabform->getTab("misc")->yesNo(
+		-name=>"showDebug",
+		-label=>$i18n->get(707),
+		-value=>$session{setting}{showDebug}
+		);
+	$tabform->getTab("misc")->yesNo(
+		-name=>"trackPageStatistics",
+		-label=>$i18n->get(749),
+		-value=>$session{setting}{trackPageStatistics}
+		);
+	$tabform->getTab("misc")->selectList(
 		-name=>"hostToUse",
 		-value=>[$session{setting}{hostToUse}],
 		-options=>{
-			sitename=>WebGUI::International::get(1070),
-			HTTP_HOST=>WebGUI::International::get(1071)
+			sitename=>$i18n->get(1070),
+			HTTP_HOST=>$i18n->get(1071)
 			},
-		-label=>WebGUI::International::get(1069)
+		-label=>$i18n->get(1069)
 		);
-	$f->yesNo(
-		-name=>"useAdminStyle",
-		-value=>$session{setting}{useAdminStyle},
-		-label=>WebGUI::International::get(1080)
+# user settings
+	$tabform->getTab("user")->yesNo(
+		-name=>"anonymousRegistration",
+		-label=>$i18n->get(118),
+		-value=>$session{setting}{anonymousRegistration}
 		);
-	$f->template(
-		-name=>"adminStyleId",
-		-namespace=>"style",
-		-value=>$session{setting}{adminStyleId},
-		-label=>WebGUI::International::get(1081)
+   	$tabform->getTab("user")->text(
+		-name=>"runOnRegistration",
+		-label=>$i18n->get(559),
+		-value=>$session{setting}{runOnRegistration}
 		);
-	 $f->yesNo(
-                -name=>"metaDataEnabled",
-                -label=>WebGUI::International::get("Enable Metadata ?", 'MetaData'),
-                -value=>$session{setting}{metaDataEnabled},
-        );
-        $f->yesNo(
+   	$tabform->getTab("user")->yesNo(
+		-name=>"useKarma",
+		-label=>$i18n->get(539),
+		-value=>$session{setting}{useKarma}
+		);
+   	$tabform->getTab("user")->integer(
+		-name=>"karmaPerLogin",
+		-label=>$i18n->get(540),
+		-value=>$session{setting}{karmaPerLogin}
+		);
+	my ($interval, $units) = WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout});
+   	$tabform->getTab("user")->interval(
+		-name=>"sessionTimeout",
+		-label=>$i18n->get(142),
+		-intervalValue=>$interval,
+		-unitsValue=>$units
+		);
+   	$tabform->getTab("user")->yesNo(
+		-name=>"selfDeactivation",
+		-label=>$i18n->get(885),
+		-value=>$session{setting}{selfDeactivation}
+		);
+   	$tabform->getTab("user")->yesNo(
+		-name=>"encryptLogin",
+		-label=>$i18n->get(1006),
+		-value=>$session{setting}{encryptLogin}
+		);
+        $tabform->getTab("user")->yesNo(
                 -name=>"passiveProfilingEnabled",
-                -label=>WebGUI::International::get("Enable passive profiling ?", 'MetaData'),
+                -label=>$i18n->get("Enable passive profiling ?", 'MetaData'),
                 -value=>$session{setting}{passiveProfilingEnabled},
-                -extras=>' onChange="alert(\''.WebGUI::International::get("Illegal Warning","MetaData").'\')" '
+                -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning","MetaData").'\')" '
         );
-	$f->submit;
-	$output .= $f->print;
-        return _submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_editUserSettings {
-   return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-   my ($output, $f, $cmd, $html);
-   $output .= helpIcon("user settings edit");
-   $output .= '<h1>'.WebGUI::International::get(117).'</h1>';
+# auth settings 
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js",{language=>"Javascript"});
-   $output .= '<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>';
-   $f = WebGUI::HTMLForm->new("","","","","","border='0' cellpadding='0' cellspacing='0' width='800'");
-   $f->hidden("op","saveSettings");
-   $f->raw('<tr><td width="300">&nbsp;</td><td width="500">&nbsp;</td></tr>');
-   $f->yesNo("anonymousRegistration",WebGUI::International::get(118),$session{setting}{anonymousRegistration});
-   $f->text("runOnRegistration",WebGUI::International::get(559),$session{setting}{runOnRegistration});
-   $f->yesNo("useKarma",WebGUI::International::get(539),$session{setting}{useKarma});
-   $f->integer("karmaPerLogin",WebGUI::International::get(540),$session{setting}{karmaPerLogin});
-   $f->interval("sessionTimeout",WebGUI::International::get(142),WebGUI::DateTime::secondsToInterval($session{setting}{sessionTimeout}));
-   $f->yesNo("selfDeactivation",WebGUI::International::get(885),$session{setting}{selfDeactivation});
-   $f->yesNo("encryptLogin",WebGUI::International::get(1006),$session{setting}{encryptLogin});
-    
-   my $options;
-   foreach (@{$session{config}{authMethods}}) {
-      $options->{$_} = $_;
-   }
-   $f->select(
-	            -name=>"authMethod",
-				-options=>$options,
-				-label=>WebGUI::International::get(164),
-				-value=>[$session{setting}{authMethod}],
-				-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
-			  );
+   	$tabform->getTab("auth")->raw('<script language="JavaScript" > var active="'.$session{setting}{authMethod}.'"; </script>');
+   	my $options;
+   	foreach (@{$session{config}{authMethods}}) {
+      		$options->{$_} = $_;
+   	}
+   	$tabform->getTab("auth")->select(
+            	-name=>"authMethod",
+		-options=>$options,
+		-label=>$i18n->get(164),
+		-value=>[$session{setting}{authMethod}],
+		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
+		);
 	my $jscript = '<script language="JavaScript">';
 	foreach (@{$session{config}{authMethods}}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($_,1);
-		$f->raw('<tr id="'.$_.'"><td colspan="2" width="100%"><table border=0 cellspacing=0 cellpadding=0  width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
+		$tabform->getTab("auth")->raw('<tr id="'.$_.'"><td colspan="2" width="100%"><table border=0 cellspacing=0 cellpadding=0  width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
 		$jscript .= "document.getElementById(\"$_\").style.display='".(($_ eq $session{setting}{authMethod})?"":"none")."';";
 	}
 	$jscript .= "</script>";	
-
-	$f->submit( -label=>"&nbsp;");
-	$output .= $f->print;
-	$output .= $jscript;
-    return _submenu($output);
-}
-
-#-------------------------------------------------------------------
-sub www_manageSettings {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($output);
-        $output .= helpIcon("settings manage");
-        $output .= '<h1>'.WebGUI::International::get(143).'</h1>';
-        $output .= '<ul>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editCompanyInformation').'">'.WebGUI::International::get(124).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editContentSettings').'">'.WebGUI::International::get(525).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editMessagingSettings').'">'.WebGUI::International::get(133).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editMiscSettings').'">'.WebGUI::International::get(140).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editProfileSettings').'">'.WebGUI::International::get(308).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=manageMetaData').'">'.WebGUI::International::get('Manage Metadata','MetaData').'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=listReplacements').'">'.WebGUI::International::get(1048).'</a>';
-        $output .= '<li><a href="'.WebGUI::URL::page('op=editUserSettings').'">'.WebGUI::International::get(117).'</a>';
-        $output .= '</ul>';
-        return _submenu($output);
+	$tabform->getTab("auth")->raw($jscript);
+	$tabform->submit();
+	my $ac = WebGUI::AdminConsole->new;
+	$ac->setAdminFunction("settings");
+	$ac->setHelp("settings");
+    	return $ac->render($tabform->print);
 }
 
 #-------------------------------------------------------------------
@@ -230,10 +282,11 @@ sub www_saveSettings {
 			next;
 		} 
 		unless ($key eq "op") {
+			$session{setting}{$key} = $value;
 			WebGUI::SQL->write("update settings set value=".quote($value)." where name='$key'");
 		}
 	}
-	return www_manageSettings();
+	return www_editSettings();
 }
 
 1;

@@ -11,23 +11,29 @@ package WebGUI::Operation::Replacements;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::AdminConsole;
 use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-        $menu{WebGUI::URL::page("op=editReplacement&amp;replacementId=new")} = WebGUI::International::get(1047);
-        $menu{WebGUI::URL::page("op=listReplacements")} = WebGUI::International::get(1048);
-        $menu{WebGUI::URL::page('op=manageSettings')} = WebGUI::International::get(4);
-        return menuWrapper($_[0],\%menu);
+        my $workarea = shift;
+        my $title = shift;
+        $title = WebGUI::International::get($title) if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help);
+        }
+        $ac->setAdminFunction("contentFilters");
+        $ac->addSubmenuItem(WebGUI::URL::page("op=editReplacement&amp;replacementId=new"), WebGUI::International::get(1047));
+        $ac->addSubmenuItem(WebGUI::URL::page("op=listReplacements"), WebGUI::International::get("content filters"));
+        return $ac->render($workarea, $title);
 }
 
 
@@ -66,7 +72,7 @@ sub www_editReplacement {
 		-value=>$data->{replaceWith}
 		);
 	$f->submit;
-	return _submenu("<h1>".WebGUI::International::get(1052)."</h1>".$f->print);
+	return _submenu($f->print,"1052");
 }
 
 #-------------------------------------------------------------------
@@ -83,8 +89,7 @@ sub www_editReplacementSave {
 #-------------------------------------------------------------------
 sub www_listReplacements {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my $output = "<h1>".WebGUI::International::get(1053)."</h1>";
-	$output .= '<table>';
+	my $output = '<table>';
 	my $sth = WebGUI::SQL->read("select replacementId,searchFor from replacements order by searchFor");
 	while (my $data = $sth->hashRef) {
 		$output .= '<tr><td>'.deleteIcon("op=deleteReplacement&amp;replacementId=".$data->{replacementId})

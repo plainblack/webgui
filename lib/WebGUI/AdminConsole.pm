@@ -110,7 +110,7 @@ sub getAdminFunction {
 				namespace=>"WebGUI"
 			},
 			icon=>"settings.gif",
-			op=>"manageSettings",
+			op=>"editSettings",
 			group=>"3"
 		},
 		"templates"=>{
@@ -167,12 +167,12 @@ sub getAdminFunction {
 			op=>"listReplacements",
 			group=>"4"
 		},
-		"userProfileSettings"=>{
+		"userProfiling"=>{
 			title=>{
-				id=>"user profile settings",
-				namespace=>"WebGUI"
+				id=>"user profiling",
+				namespace=>"WebGUIProfile"
 			},
-			icon=>"userProfileSettings.gif",
+			icon=>"userProfiling.gif",
 			op=>"editProfileSettings",
 			group=>"3"
 		},
@@ -216,7 +216,6 @@ sub render {
 	my %var;
 	$var{"application.workarea"} = shift;
 	$var{"application.title"} = shift || $self->{_function}{title};
-	$session{page}{useEmptyStyle} = 1;
 	$var{"backtosite.label"} = WebGUI::International::get("493");
 	$var{"toggle.on.label"} = WebGUI::International::get("toggle on", "AdminConsole");
 	$var{"toggle.off.label"} = WebGUI::International::get("toggle off","AdminConsole");
@@ -232,6 +231,7 @@ sub render {
 	$var{"console.icon"} = $session{config}{extrasURL}."/adminConsole/adminConsole.gif";
 	$var{"help.url"} = $self->{_helpUrl};
 	$var{"application_loop"} = $self->getAdminFunction;
+	$session{page}{useAdminStyle} = 1;
 	return WebGUI::Template::process($session{setting}{AdminConsoleTemplate}, "AdminConsole", \%var);
 }
 

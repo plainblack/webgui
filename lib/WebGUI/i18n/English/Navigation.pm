@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Navigation;
 
 our $I18N = {
+	'add new' => {
+		message => q|Add new navigation.|,
+		lastUpdated => 1077777777,
+		context => q|A submenu item in admin console that allows the user to add a new nav config.|
+	},
+
 	'manage navigation' => {
 		message => q|Manage Navigation|,
 		lastUpdated => 1077081255,
@@ -113,8 +119,8 @@ our $I18N = {
 	},
 
 	'22' => {
-		message => q|Edit Navigation|,
-		lastUpdated => 1077080241
+		message=> q|Edit Navigation|,
+		lastUpdated => 1077078969
 	},
 
 	'13' => {
@@ -167,9 +173,9 @@ our $I18N = {
 		lastUpdated => 1077078456
 	},
 
-	'34' => {
-		message => q|Manage Navigation|,
-		lastUpdated => 1077081304
+	'preview' => {
+		message => q|Preview Navigation|,
+		lastUpdated => 1077078456
 	},
 
 	'19' => {

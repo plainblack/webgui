@@ -1,5 +1,7 @@
 6.3.0
  - Added a new, more user-friendly administrative console.
+ - Removed the admin style settings since their use has been replaced by the
+   admin console.
  - bugfix [ 1045114 ] Columns randomly ordered in SQLReport (Len Kranendonk ,
    tnx brother for reporting)
  - Sped up Navigation.pm

@@ -80,6 +80,7 @@ sub _execute {
         	} 
 		$t->param(%{$vars});
 		$t->param("webgui.version"=>$WebGUI::VERSION);
+		$t->param("webgui.status"=>$WebGUI::STATUS);
 		return $t->output;
 	} else {
 		WebGUI::ErrorHandler::warn("Error in template. ".$@);

@@ -128,8 +128,9 @@ sub process {
 	my $templateId = shift || $session{page}{styleId};
 	if ($session{page}{makePrintable}) {
 		$templateId = $session{page}{printableStyleId};
-	} elsif ($session{page}{useAdminStyle} ne "" && $session{setting}{useAdminStyle}) {
-		$templateId = $session{setting}{adminStyleId};
+	} elsif ($session{page}{useAdminStyle}) {
+		#$templateId = $session{setting}{adminStyleId};
+		$templateId = "adminConsole";
 	} elsif ($session{scratch}{personalStyleId} ne "") {
 		$templateId = $session{scratch}{personalStyleId};
 	} elsif ($session{page}{useEmptyStyle}) {

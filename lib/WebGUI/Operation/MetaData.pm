@@ -151,9 +151,6 @@ sub www_manageMetaData {
 		$output .= editIcon("op=editMetaDataField&fid=".$fieldId);
 		$output .= "<b>".$fields->{$fieldId}{fieldName}."</b><br>";
 	}	
-	$output .= '<p><a href="'.WebGUI::URL::page("op=editMetaDataField&fid=new").'">'.
-			WebGUI::International::get('Add new field','MetaData').
-			'</a></p>';
         return _submenu($output,undef,"metadata manage");
 }
 

@@ -13,6 +13,7 @@ package WebGUI::Operation::Navigation;
 use strict;
 use Tie::IxHash;
 use Tie::CPHash;
+use WebGUI::AdminConsole;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
@@ -22,7 +23,6 @@ use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Navigation;
-use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -34,20 +34,26 @@ use WebGUI::Cache;
 
 #-------------------------------------------------------------------
 sub _submenu {
-        my (%menu);
-        tie %menu, 'Tie::IxHash';
-	$menu{WebGUI::URL::page('op=editNavigation')} = 'Add new Navigation.';
-	if (($session{form}{op} eq "editNavigation" && $session{form}{navigationId} ne "new") || $session{form}{op} eq "deleteNavigationConfirm") {
-                $menu{WebGUI::URL::page('op=editNavigation&identifier='.$session{form}{identifier})} = 
-			WebGUI::International::get(18, 'Navigation');
-                $menu{WebGUI::URL::page('op=copyNavigation&navigationId='.$session{form}{navigationId})} =
-			WebGUI::International::get(19, 'Navigation');
-                $menu{WebGUI::URL::page('op=deleteNavigation&navigationId='.$session{form}{navigationId})} =
-			WebGUI::International::get(20, 'Navigation');
+        my $workarea = shift;
+        my $title = shift;
+	my $i18n = WebGUI::International->new("Navigation");
+        $title = $i18n->get($title) if ($title);
+        my $help = shift;
+        my $ac = WebGUI::AdminConsole->new;
+        if ($help) {
+                $ac->setHelp($help);
         }
-        $menu{WebGUI::URL::page('op=listNavigation')} = WebGUI::International::get(21, 'Navigation');
-        return menuWrapper($_[0],\%menu);
+        $ac->setAdminFunction("navigation");
+	$ac->addSubmenuItem(WebGUI::URL::page('op=editNavigation'),$i18n->get("add new"));
+	if (($session{form}{op} eq "editNavigation" && $session{form}{navigationId} ne "new") || $session{form}{op} eq "deleteNavigationConfirm") {
+                $ac->addSubmenuItem(WebGUI::URL::page('op=editNavigation&identifier='.$session{form}{identifier}), $i18n->get("18"));
+                $ac->addSubmenuItem(WebGUI::URL::page('op=copyNavigation&navigationId='.$session{form}{navigationId}),$i18n->get("19"));
+                $ac->addSubmenuItem(WebGUI::URL::page('op=deleteNavigation&navigationId='.$session{form}{navigationId}),$i18n->get("20"));
+        }
+        $ac->addSubmenuItem(WebGUI::URL::page('op=listNavigation'), $i18n->get("21"));
+        return $ac->render($workarea, $title);
 }
+
 
 #-------------------------------------------------------------------
 sub www_copyNavigation {
@@ -71,14 +77,13 @@ sub www_deleteNavigation {
 	if ($session{form}{navigationId} < 1000 && $session{form}{navigationId} > 0) {
 		return WebGUI::Privilege::vitalComponent();
 	}
-	my $output .= '<h1>'.WebGUI::International::get(42).'</h1>';
-        $output .= WebGUI::International::get(502).'<p>';
+        my $output = WebGUI::International::get(502).'<p>';
         $output .= '<div align="center"><a href="'.
                    WebGUI::URL::page('op=deleteNavigationConfirm&navigationId='.$session{form}{navigationId})
                    .'">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listNavigation').'">'.
 				WebGUI::International::get(45).'</a></div>';
-        return _submenu($output);
+        return _submenu($output,"42");
 }
 
 #-------------------------------------------------------------------
@@ -97,10 +102,7 @@ sub www_deleteNavigationConfirm {
 #-------------------------------------------------------------------
 sub www_editNavigation {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
-
 	my $identifier = shift || $session{form}{identifier};
-	#return  WebGUI::ErrorHandler::warn("editNavigation called without identifier") unless $identifier;	
-
 	my $config = WebGUI::Navigation::getConfig($identifier);
 	if ($config->{identifier}) {
 		# Existing config
@@ -117,7 +119,7 @@ sub www_editNavigation {
 		$config->{showUnprivilegedPages} = 0;
 		$config->{'reverse'} = 0;
 	}
-	my $output = helpIcon("navigation add/edit").'<h1>'.WebGUI::International::get(22, 'Navigation').'</h1>';
+	my $output;
 	tie my (%tabs) , 'Tie::IxHash';
 	%tabs = (
 		properties=>{
@@ -239,7 +241,7 @@ sub www_editNavigation {
 		" >';
 	$f->{_submit} = $previewButton." ".$saveButton;
 	$output .= $f->print;
-	return _submenu($output);	
+	return _submenu($output,'22',"navigation add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -281,7 +283,7 @@ sub www_editNavigationSave {
 #-------------------------------------------------------------------
 sub www_listNavigation {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
-	my $output .= helpIcon("navigation manage").'<h1>'.WebGUI::International::get(34,'Navigation').'</h1>';
+	my $output;
 	my $sth = WebGUI::SQL->read("select navigationId, identifier from Navigation order by identifier");
 	my $i = 0;
 	my @row = ();
@@ -301,13 +303,11 @@ sub www_listNavigation {
         $output .= $p->getPage($session{form}{pn});
         $output .= '</table>';
         $output .= $p->getBarTraditional($session{form}{pn});
-        return _submenu($output);
+        return _submenu($output,'34',"navigation manage");
 }
 
 #-------------------------------------------------------------------
 sub www_previewNavigation {
-	#$session{page}{useEmptyStyle} = 1;
-	$session{page}{useAdminStyle} = 1;
 	$session{var}{adminOn} = 0;
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	my $nav = WebGUI::Navigation->new(	depth=>$session{form}{depth},
@@ -321,7 +321,6 @@ sub www_previewNavigation {
 	                       			'reverse'=>$session{form}{'reverse'},
                                 );
 	my $output = qq(
-		<h1>Navigation Preview</h1>
 		<table width="100%" border="0" cellpadding="5" cellspacing="0">
 		<tr><td class="tableHeader" valign="top">
 		Configuration
@@ -345,7 +344,7 @@ sub www_previewNavigation {
 	# Because of the way the system is set up, the preview is cached. So let's remove it again...
 	WebGUI::Cache->new($nav->{_identifier}."$session{page}{pageId}", "Navigation-".$session{config}{configFile})->delete;
 	
-	return $output; 
+	return _submenu($output,"preview"); 
 }
 
 1;

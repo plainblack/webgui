@@ -71,6 +71,12 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+	'user profiling' => {
+		message => q|User Profiling|,
+		lastUpdated =>1092930637,
+                context => q|Title of the user profile settings manager for the admin console.|
+        },
+	
 };
 
 1;
