@@ -140,6 +140,7 @@ sub text {
 sub textArea {
         my ($output, $name, $value, $cols, $rows, $htmlEdit, $wrap);
         ($name, $value, $cols, $rows, $htmlEdit, $wrap) = @_;
+	$output = '<script language="JavaScript">function fixChars(element) {element.value = element.value.replace(/~V/mg,"-");}</script>';
         if ($cols eq "") {
                 $cols = 50;
         }
@@ -153,7 +154,7 @@ sub textArea {
         if ($wrap eq "") {
                 $wrap = "virtual";
         }
-        $output .= '<textarea name="'.$name.'" cols="'.$cols.'" rows="'.$rows.'" wrap="'.$wrap.'">'.$value.'</textarea>';
+        $output .= '<textarea name="'.$name.'" cols="'.$cols.'" rows="'.$rows.'" wrap="'.$wrap.'" onBlur="fixChars(this.form.'.$name.')">'.$value.'</textarea>';
         return $output;
 }
 

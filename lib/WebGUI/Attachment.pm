@@ -36,6 +36,8 @@ sub copy {
         	$newFile .= '/'.$_[0];
         	$a = FileHandle->new($oldFile,"r");
 		$b = FileHandle->new(">".$newFile);
+		binmode($a); 
+		binmode($b); 
         	cp($a,$b);
 		$a->close;
 		$b->close;

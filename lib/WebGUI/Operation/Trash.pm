@@ -23,7 +23,7 @@ our @EXPORT = qw(&www_purgeTrash &www_purgeTrashConfirm);
 #-------------------------------------------------------------------
 sub _purgeWidgets {
 	my ($b, $widgetId, $widgetType, $func);
-	$b = WebGUI::SQL->read("select widgetId, widgetType from widget where pageId=$_[0]");
+	$b = WebGUI::SQL->read("select widgetId, namespace from widget where pageId=$_[0]");
         while (($widgetId,$widgetType) = $b->array) {
         	$func = "WebGUI::Widget::".$widgetType."::purge";
                 &$func($widgetId);
