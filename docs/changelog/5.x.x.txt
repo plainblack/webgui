@@ -27,6 +27,9 @@
  - Fixed bug [ 820144 ] Theme problems under Win32
  - Fixed bug [ 834633 ] View Threaded subscriptions fails
  - Fixed bug [ 808704 ] Privilege API missing in Ruling WebGUI 5.4
+ - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
+ - Updated the German translation. (Thanks to Andreas Graf.)
+
 
 5.5.0
  - Rewrote the discussion system and added many new features in the process.
