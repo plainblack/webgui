@@ -782,8 +782,8 @@ sub www_deleteConfirm {
 =cut
 
 sub www_deleteFile {
-        $_[0]->confirm(
-                WebGUI::International::get(728),
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        return $_[0]->confirm(WebGUI::International::get(728),
                 WebGUI::URL::page('func=deleteFileConfirm&wid='.$_[0]->get("wobjectId").'&file='.$session{form}{file}),
                 WebGUI::URL::page('func=edit&wid='.$_[0]->get("wobjectId"))
                 );
@@ -798,12 +798,9 @@ sub www_deleteFile {
 =cut
 
 sub www_deleteFileConfirm {
-        if (WebGUI::Privilege::canEditPage()) {
-                $_[0]->set({$session{form}{file}=>''});
-                return $_[0]->www_edit();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
+        $_[0]->set({$session{form}{file}=>''});
+        return $_[0]->www_edit();
 }
 
 #-------------------------------------------------------------------

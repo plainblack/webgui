@@ -247,23 +247,10 @@ sub www_approveSubmission {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteAttachment {
-	my ($owner);
-	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
+sub www_deleteFile {
+	my ($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
         if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-                WebGUI::SQL->write("update UserSubmission_submission set attachment='' where submissionId=$session{form}{sid}");
-                return $_[0]->www_editSubmission();
-        } else {
-                return WebGUI::Privilege::insufficient();
-        }
-}
-
-#-------------------------------------------------------------------
-sub www_deleteImage {
-	my ($owner);
-	($owner) = WebGUI::SQL->quickArray("select userId from UserSubmission_submission where submissionId=$session{form}{sid}");
-        if ($owner == $session{user}{userId} || WebGUI::Privilege::isInGroup($_[0]->get("groupToApprove"))) {
-                WebGUI::SQL->write("update UserSubmission_submission set image='' where submissionId=$session{form}{sid}");
+		$_[0]->setCollateral("UserSubmission_submission","submissionId",{$session{form}{file}=>''},0,0);
                 return $_[0]->www_editSubmission();
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -377,13 +364,13 @@ sub www_editSubmission {
                 $f->text("title",WebGUI::International::get(35,$namespace),$submission->{title});
                 $f->HTMLArea("content",WebGUI::International::get(31,$namespace),$submission->{content});
                 if ($submission->{image} ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteImage&wid='.$session{form}{wid}.'&sid='.$submission->{submissionId}).'">'
+			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=image&wid='.$session{form}{wid}.'&sid='.$submission->{submissionId}).'">'
 				.WebGUI::International::get(391).'</a>',WebGUI::International::get(32,$namespace));
                 } else {
 			$f->file("image",WebGUI::International::get(32,$namespace));
                 }
                 if ($submission->{attachment} ne "") {
-			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteAttachment&wid='.$session{form}{wid}
+			$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=attachment&wid='.$session{form}{wid}
 				.'&sid='.$submission->{submissionId}).'">'
 				.WebGUI::International::get(391).'</a>',WebGUI::International::get(33,$namespace));
                 } else {

@@ -92,16 +92,8 @@ sub set {
 #-------------------------------------------------------------------
 sub www_deleteFile {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-	my ($delete);
-	if ($session{form}{alt} == 1) {
-		$delete = "alternateVersion1";
-	} elsif ($session{form}{alt} == 2) {
-		$delete = "alternateVersion2";
-	} else {
-		$delete = "downloadFile";
-	}
-        WebGUI::SQL->write("update DownloadManager_file set $delete='' where downloadId=$session{form}{did}");
-       return $_[0]->www_editDownload();
+	$_[0]->setCollateral("DownloadManager_file","downloadId",{$session{form}{file}=>''},0,0);
+       	return $_[0]->www_editDownload();
 }
 
 #-------------------------------------------------------------------
@@ -199,21 +191,21 @@ sub www_editDownload {
         $f->hidden("func","editDownloadSave");
 	$f->text("fileTitle",WebGUI::International::get(5,$namespace),$download{fileTitle});
 	if ($download{downloadFile} ne "") {
-		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&wid='.
+		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=downloadFile&wid='.
 			$session{form}{wid}.'&did='.$session{form}{did}).'">'.WebGUI::International::get(391).
 			'</a>',WebGUI::International::get(6,$namespace));
         } else {
 		$f->file("downloadFile",WebGUI::International::get(6,$namespace));
         }
         if ($download{alternateVersion1} ne "") {
-		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&alt=1&wid='.
+		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion1&wid='.
 			$session{form}{wid}.'&did='.$session{form}{did}).'">'.
 			WebGUI::International::get(391).'</a>',WebGUI::International::get(17,$namespace));
         } else {
 		$f->file("alternateVersion1",WebGUI::International::get(17,$namespace));
         }
         if ($download{alternateVersion2} ne "") {
-		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&alt=2&wid='.
+		$f->readOnly('<a href="'.WebGUI::URL::page('func=deleteFile&file=alternateVersion1&wid='.
 		$session{form}{wid}.'&did='.$session{form}{did}).'">'.
 			WebGUI::International::get(391).'</a>',WebGUI::International::get(18,$namespace));
         } else {
