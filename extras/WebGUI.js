@@ -25,7 +25,7 @@ function centerText(obj) {
 
 function colorText(obj) {
 	formObj = obj;
-	window.open("/lib/colorPicker.html","colorPicker","width=438,height=258");
+	window.open("/extras/colorPicker.html","colorPicker","width=438,height=258");
 }
 
 function copyright(obj) {
@@ -69,7 +69,7 @@ function setColor(remoteColor) {
 
 function showMe(obj) {
 	formObj = obj;
-	window.open("/lib/viewer.html","showMeViewer","width=500,height=300,scrollbars=1");
+	window.open("/extras/viewer.html","showMeViewer","width=500,height=300,scrollbars=1");
 }
 
 function trademark(obj) {

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I../lib/
+#!/usr/bin/perl
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -9,6 +9,10 @@
 #-------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
+
+BEGIN {
+        unshift (@INC, "../lib/");
+}
 
 use CGI::Carp qw(fatalsToBrowser);
 use strict;

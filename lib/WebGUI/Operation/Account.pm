@@ -222,7 +222,7 @@ sub www_saveAccount {
 	if ($error eq "") {
 		$encryptedPassword = Digest::MD5::md5_base64($session{form}{identifier1});
 		$uid = getNextId("userId");
-		WebGUI::SQL->write("insert into user set userId=".getNextId("userId").", username=".quote($session{form}{username}).", identifier=".quote($encryptedPassword).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
+		WebGUI::SQL->write("insert into user set userId=$uid, username=".quote($session{form}{username}).", identifier=".quote($encryptedPassword).", email=".quote($session{form}{email}).", icq=".quote($session{form}{icq}),$session{dbh});
 		WebGUI::SQL->write("insert into groupings set groupId=2,userId=$uid",$session{dbh});
 		_login($uid,$encryptedPassword);
 		$output .= 'Account created successfully!<p>';

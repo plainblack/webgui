@@ -198,10 +198,11 @@ sub www_view {
 			}
 			$output .= ", $event[4]</b>";
 			$output .= "<hr size=1>";
-			$output .= '<table cellpadding=3 cellspacing=0 border=0><tr>';
-			$output .= '<td valign="top">'.$event[0].' - </td>';
-			$output .= '<td valign="top">'.$event[1].'</td>';
-			$output .= '</tr></table><p>';
+			$output .= '<span class="eventTitle">'.$event[0].'</span>';
+			if ($event[1] ne "") {
+				$output .= ' - ';
+				$output .= ''.$event[1].'<p>';
+			}
 		}
 		$sth->finish;
 	}

@@ -156,7 +156,7 @@ sub www_view {
                         $output .= '<p><a href="'.$data{linkURL}.'">'.$data{linkTitle}.'</a>';
                 }
 		if ($data{attachment} ne "") {
-			$output .= '<p><a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$widgetId.'/'.$data{attachment}.'">[attachment: '.$data{attachment}.']</a>';
+			$output .= '<p><a href="'.$session{setting}{attachmentDirectoryWeb}.'/'.$widgetId.'/'.$data{attachment}.'"><img src="'.$session{setting}{lib}.'/attachment.gif" border=0 alt="Download Attachment"></a>';
 		}
 	}
 	if ($data{processMacros} == 1) {

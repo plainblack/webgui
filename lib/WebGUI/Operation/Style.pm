@@ -45,7 +45,7 @@ sub www_addStyle {
 sub www_addStyleSave {
         my ($output);
         if (WebGUI::Privilege::isInGroup(3)) {
-                WebGUI::SQL->write("insert into style set styleId=".getNextId("styleId")." name=".quote($session{form}{name}).", header=".quote($session{form}{header}).", footer=".quote($session{form}{footer}).", styleSheet=".quote($session{form}{styleSheet}),$session{dbh});
+                WebGUI::SQL->write("insert into style set styleId=".getNextId("styleId").", name=".quote($session{form}{name}).", header=".quote($session{form}{header}).", footer=".quote($session{form}{footer}).", styleSheet=".quote($session{form}{styleSheet}),$session{dbh});
                 $output = www_listStyles();
         } else {
                 $output = WebGUI::Privilege::insufficient();

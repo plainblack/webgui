@@ -19,7 +19,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&www_addPage &www_addPageSave &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage &www_editPageSave &www_pastePage);
+our @EXPORT = qw(&www_movePageUp &www_movePageDown &www_addPage &www_addPageSave &www_cutPage &www_deletePage &www_deletePageConfirm &www_editPage &www_editPageSave &www_pastePage);
 
 #-------------------------------------------------------------------
 sub _recursivelyChangePrivileges {
@@ -44,6 +44,17 @@ sub _recursivelyChangeStyle {
 }
 
 #-------------------------------------------------------------------
+sub _reorderPages {
+        my ($sth, $i, $pid);
+        $sth = WebGUI::SQL->read("select pageId from page where parentId=$_[0] order by sequenceNumber",$session{dbh});
+        while (($pid) = $sth->array) {
+                WebGUI::SQL->write("update page set sequenceNumber='$i' where pageId=$pid",$session{dbh});
+                $i++;
+        }
+        $sth->finish;
+}
+
+#-------------------------------------------------------------------
 sub www_addPage {
 	my ($output);
 	if (WebGUI::Privilege::canEditPage()) {
@@ -62,14 +73,14 @@ sub www_addPage {
 
 #-------------------------------------------------------------------
 sub www_addPageSave {
-	my (%parent, $urlizedTitle, $test);
+	my ($urlizedTitle, $test, $nextSeq);
 	if (WebGUI::Privilege::canEditPage()) {
-		%parent = WebGUI::SQL->quickHash("select * from page where pageId=$session{page}{pageId}",$session{dbh});	
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}",$session{dbh});
 		$urlizedTitle = urlizeTitle($session{form}{title});
 		while (($test) = WebGUI::SQL->quickArray("select urlizedTitle from page where urlizedTitle='$urlizedTitle'",$session{dbh})) {
 			$urlizedTitle .= 2;
 		}
-		WebGUI::SQL->write("insert into page set pageId=".getNextId("pageId").", parentId=$session{page}{pageId}, title=".quote($session{form}{title}).", styleId=$parent{styleId}, ownerId=$session{user}{userId}, ownerView=$parent{ownerView}, ownerEdit=$parent{ownerEdit}, groupId='$parent{groupId}', groupView=$parent{groupView}, groupEdit=$parent{groupEdit}, worldView=$parent{worldView}, worldEdit=$parent{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle'",$session{dbh});
+		WebGUI::SQL->write("insert into page set pageId=".getNextId("pageId").", parentId=$session{page}{pageId}, title=".quote($session{form}{title}).", styleId=$session{page}{styleId}, sequenceNumber='$nextSeq', ownerId=$session{user}{userId}, ownerView=$session{page}{ownerView}, ownerEdit=$session{page}{ownerEdit}, groupId='$session{page}{groupId}', groupView=$session{page}{groupView}, groupEdit=$session{page}{groupEdit}, worldView=$session{page}{worldView}, worldEdit=$session{page}{worldEdit}, metaTags=".quote($session{form}{metaTags}).", urlizedTitle='$urlizedTitle'",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -80,6 +91,7 @@ sub www_addPageSave {
 sub www_cutPage {
         if (WebGUI::Privilege::canEditPage() && $session{page}{pageId}!=1) {
                 WebGUI::SQL->write("update page set parentId=2 where pageId=".$session{page}{pageId},$session{dbh});
+		_reorderPages($session{page}{parentId});
                 WebGUI::Session::refreshPageInfo($session{page}{parentId});
                 return "";
         } else {
@@ -105,6 +117,7 @@ sub www_deletePage {
 sub www_deletePageConfirm {
         if (WebGUI::Privilege::canEditPage() && $session{page}{pageId}!=1) {
 		WebGUI::SQL->write("update page set parentId=3 where pageId=".$session{page}{pageId},$session{dbh});
+		_reorderPages($session{page}{parentId});
 		WebGUI::Session::refreshPageInfo($session{page}{parentId});
                 return "";
         } else {
@@ -169,6 +182,38 @@ sub www_editPageSave {
 			_recursivelyChangePrivileges($session{page}{pageId});
 		}
 		WebGUI::Session::refreshPageInfo($session{page}{pageId});
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_movePageDown {
+        my (@data, $thisSeq);
+        if (WebGUI::Privilege::canEditPage()) {
+                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from page where pageId=$session{page}{pageId}",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select pageId from page where parentId=$session{page}{parentId} and sequenceNumber=$thisSeq+1",$session{dbh});
+                if ($data[0] ne "") {
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber+1 where pageId=$session{page}{pageId}",$session{dbh});
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber-1 where pageId=$data[0]",$session{dbh});
+                }
+                return "";
+        } else {
+                return WebGUI::Privilege::insufficient();
+        }
+}
+
+#-------------------------------------------------------------------
+sub www_movePageUp {
+        my (@data, $thisSeq);
+        if (WebGUI::Privilege::canEditPage()) {
+                ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from page where pageId=$session{page}{pageId}",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select pageId from page where parentId=$session{page}{parentId} and sequenceNumber=$thisSeq-1",$session{dbh});
+                if ($data[0] ne "") {
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber-1 where pageId=$session{page}{pageId}",$session{dbh});
+                        WebGUI::SQL->write("update page set sequenceNumber=sequenceNumber+1 where pageId=$data[0]",$session{dbh});
+                }
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -166,7 +166,7 @@ sub www_editLink {
                 $output = '<h1>Edit Link</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("wid",$session{form}{wid});
                 $output .= WebGUI::Form::hidden("lid",$session{form}{lid});
-                $output .= WebGUI::Form::hidden("func","editEventSave");
+                $output .= WebGUI::Form::hidden("func","editLinkSave");
                 $output .= '<table>';
                 $output .= '<tr><td class="formDescription">Name</td><td>'.WebGUI::Form::text("name",20,30,$link{name}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">URL</td><td>'.WebGUI::Form::text("url",20,2048,$link{url}).'</td></tr>';
@@ -195,7 +195,7 @@ sub www_moveLinkDown {
         my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
                 ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from link where linkId=$session{form}{lid}",$session{dbh});
-                @data = WebGUI::SQL->quickArray("select linkId, min(sequenceNumber) from link where widgetId=$session{form}{wid} and sequenceNumber>$thisSeq group by widgetId",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select linkId from link where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq+1 group by widgetId",$session{dbh});
                 if ($data[0] ne "") {
                         WebGUI::SQL->write("update link set sequenceNumber=sequenceNumber+1 where linkId=$session{form}{lid}",$session{dbh});
                         WebGUI::SQL->write("update link set sequenceNumber=sequenceNumber-1 where linkId=$data[0]",$session{dbh});
@@ -211,7 +211,7 @@ sub www_moveLinkUp {
         my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
                 ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from link where linkId=$session{form}{lid}",$session{dbh});
-                @data = WebGUI::SQL->quickArray("select linkId, max(sequenceNumber) from link where widgetId=$session{form}{wid} and sequenceNumber<$thisSeq group by widgetId",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select linkId from link where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq-1 group by widgetId",$session{dbh});
                 if ($data[0] ne "") {
                         WebGUI::SQL->write("update link set sequenceNumber=sequenceNumber-1 where linkId=$session{form}{lid}",$session{dbh});
                         WebGUI::SQL->write("update link set sequenceNumber=sequenceNumber+1 where linkId=$data[0]",$session{dbh});

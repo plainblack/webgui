@@ -27,7 +27,7 @@ sub widgetName {
 sub www_add {
         my ($output);
       	if (WebGUI::Privilege::canEditPage()) {
-                $output = '<h1>Add SQL Report</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
+                $output = '<a href="'.$session{page}{url}.'?op=viewHelp&hid=20"><img src="'.$session{setting}{lib}.'/help.gif" border="0" align="right"></a><h1>Add SQL Report</h1><form method="post" enctype="multipart/form-data" action="'.$session{page}{url}.'">';
                 $output .= WebGUI::Form::hidden("widget","SQLReport");
                 $output .= WebGUI::Form::hidden("func","addSave");
                 $output .= '<table>';

@@ -64,7 +64,7 @@ sub process {
 	}
   #---crumb trail---
 	if ($output =~ /\^C/) {
-        	$temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId}).$session{page}{title}.'</span>';
+        	$temp = '<span class="crumbTrail">'._recurseCrumbTrail($session{page}{parentId}).'<a href="'.$session{page}{url}.'">'.$session{page}{title}.'</a></span>';
         	$output =~ s/\^C/$temp/g;
 	}
   #---date---
@@ -100,7 +100,7 @@ sub process {
   #---current menu vertical---
 	if ($output =~ /\^M/) {
        	 	$temp = '<span class="verticalMenu">';
-        	$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{pageId}",$session{dbh});
+        	$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{pageId} order by sequenceNumber",$session{dbh});
         	while (@data = $sth->array) {
 			if (WebGUI::Privilege::canViewPage($data[2])) {
                 		$temp .= '<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a><br>';
@@ -114,7 +114,7 @@ sub process {
 	if ($output =~ /\^m/) {
         	$temp = '<span class="horizontalMenu">';
 		$first = 1;
-        	$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{pageId}",$session{dbh});
+        	$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=$session{page}{pageId} order by sequenceNumber",$session{dbh});
         	while (@data = $sth->array) {
 			if (WebGUI::Privilege::canViewPage($data[2])) {
                 		if ($first) {
@@ -132,7 +132,7 @@ sub process {
   #---top menu vertical---
 	if ($output =~ /\^T/) {
 		$temp = '<span class="verticalMenu">';
-		$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=1",$session{dbh});
+		$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=1 order by sequenceNumber",$session{dbh});
 		while (@data = $sth->array) {
 			if (WebGUI::Privilege::canViewPage($data[2])) {
 				$temp .= '<a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[1].'">'.$data[0].'</a><br>';
@@ -146,7 +146,7 @@ sub process {
 	if ($output =~ /\^t/) {
         	$temp = '<span class="horizontalMenu">';
 		$first = 1;
-        	$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=1",$session{dbh});
+        	$sth = WebGUI::SQL->read("select title,urlizedTitle,pageId from page where parentId=1 order by sequenceNumber",$session{dbh});
         	while (@data = $sth->array) {
 			if (WebGUI::Privilege::canViewPage($data[2])) {
 				if ($first) {

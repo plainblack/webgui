@@ -36,7 +36,7 @@ sub _traverseReplyTree {
 		if ($session{form}{mid} eq $data[0]) {
 			$html .= ' class="highlight"';
 		}
-		$html .= '><td class="boardData">'.$depth.'<a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'">'.$data[1].'</a></td><td class="boardData">'.$data[2].'</td><td class="boardData">'.$data[3].'</td></tr>';
+		$html .= '><td class="tableData">'.$depth.'<a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$session{form}{wid}.'">'.$data[1].'</a></td><td class="tableData">'.$data[2].'</td><td class="tableData">'.$data[3].'</td></tr>';
 		$html .= _traverseReplyTree($data[0],$_[1]+1);
 	}
 	$sth->finish;
@@ -204,7 +204,7 @@ sub www_postNewMessageSave {
 		$mid = getNextId("messageId");
 		WebGUI::SQL->write("insert into message set messageId=$mid, userId=$session{user}{userId}, username=".quote($session{user}{username}).", subject=".quote($session{form}{subject}).", message=".quote($session{form}{message}).", widgetId=$session{form}{wid}, pid=0, dateOfPost=now()",$session{dbh});
 		WebGUI::SQL->write("update message set rid=$mid where messageId=$mid",$session{dbh});
-		return www_view($session{form}{wid});
+		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
 	}	
@@ -271,7 +271,7 @@ sub www_showMessage {
 		$html .= '<a href="'.$session{page}{url}.'?func=editMessage&mid='.$session{form}{mid}.'&wid='.$session{form}{wid}.'">Edit Message</a> &middot; ';
 	}
 	$html .= '<a href="'.$session{page}{url}.'?func=postReply&mid='.$session{form}{mid}.'&wid='.$session{form}{wid}.'">Post Reply</a></td></tr></table>';
-	$html .= '<table width="100%"><tr><td class="boardHeader">';
+	$html .= '<table width="100%"><tr><td class="tableHeader">';
 	$html .= "<b>Subject:</b> ".$message{subject}."<br>";
 	$html .= "<b>Author:</b> ".$message{username}."<br>";
 	$html .= "<b>Date:</b> ".$message{dateOfPost}."<br>";
@@ -295,13 +295,13 @@ sub www_showMessage {
 		$html .= 'Next Thread &raquo;';
 	}	
 	$html .= '</div><table border=0 cellpadding=2 cellspacing=1 width="100%">';
-	$html .= '<tr><td class="boardHeader">Subject</td><td class="boardHeader">Author</td><td class="boardHeader">Date</td></tr>';
+	$html .= '<tr><td class="tableHeader">Subject</td><td class="tableHeader">Author</td><td class="tableHeader">Date</td></tr>';
 	@data = WebGUI::SQL->quickArray("select messageId,substring(subject,1,30),username,date_format(dateOfPost,'%c/%e %l:%i%p') from message where messageId=$message{rid}",$session{dbh});
 	$html .= '<tr';
 	if ($session{form}{mid} eq $message{rid}) {
 		$html .= ' class="highlight"';
 	}
-	$html .= '><td class="boardData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$message{widgetId}.'">'.$data[1].'</a></td><td class="boardData">'.$data[2].'</td><td class="boardData">'.$data[3].'</td></tr>';
+	$html .= '><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$message{widgetId}.'">'.$data[1].'</a></td><td class="tableData">'.$data[2].'</td><td class="tableData">'.$data[3].'</td></tr>';
 	$html .= _traverseReplyTree($message{rid},1);
 	$html .= "</table>";
 	return $html;
@@ -327,10 +327,10 @@ sub www_view {
 	}
 	$html .= '</td><td align="right" valign="bottom" class="boardMenu"><a href="'.$session{page}{url}.'?func=postNewMessage&wid='.$_[0].'">Post New Message</a></td></tr></table>';
 	$html .= '<table border=0 cellpadding=2 cellspacing=1 width="100%">';
-	$html .= '<tr><td class="boardHeader">Subject</td><td class="boardHeader">Author</td><td class="boardHeader">Thread Started</td><td class="boardHeader">Replies</td><td class="boardHeader">Last Reply</td></tr>';
+	$html .= '<tr><td class="tableHeader">Subject</td><td class="tableHeader">Author</td><td class="tableHeader">Thread Started</td><td class="tableHeader">Replies</td><td class="tableHeader">Last Reply</td></tr>';
 	$sth = WebGUI::SQL->read("select messageId,substring(subject,1,30),count(messageId)-1,username,date_format(dateOfPost,'%c/%e %l:%i%p'),date_format(max(dateOfPost),'%c/%e %l:%i%p'),max(messageId) from message where widgetId=$_[0] group by rid order by messageId desc limit ".(($currentPage*$itemsPerPage)-$itemsPerPage).",".$itemsPerPage, $session{dbh});
 	while (@data = $sth->array) {
-		$html .= '<tr><td class="boardData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.$data[1].'</a></td><td class="boardData">'.$data[3].'</td><td class="boardData">'.$data[4].'</td><td class="boardData">'.$data[2].'</td><td class="boardData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[6].'&wid='.$_[0].'">'.$data[5].'</a></td></tr>';
+		$html .= '<tr><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[0].'&wid='.$_[0].'">'.$data[1].'</a></td><td class="tableData">'.$data[3].'</td><td class="tableData">'.$data[4].'</td><td class="tableData">'.$data[2].'</td><td class="tableData"><a href="'.$session{page}{url}.'?func=showMessage&mid='.$data[6].'&wid='.$_[0].'">'.$data[5].'</a></td></tr>';
 	}
 	$html .= "</table>";
 	$sth->finish;

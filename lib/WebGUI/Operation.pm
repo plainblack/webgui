@@ -15,9 +15,10 @@ use WebGUI::Operation::Account;
 use WebGUI::Operation::Admin;
 use WebGUI::Operation::Group;
 use WebGUI::Operation::Help;
+use WebGUI::Operation::Page;
 use WebGUI::Operation::Settings;
 use WebGUI::Operation::Style;
-use WebGUI::Operation::Page;
+use WebGUI::Operation::Submission;
 use WebGUI::Operation::User;
 
 

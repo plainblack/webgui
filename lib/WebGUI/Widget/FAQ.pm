@@ -197,7 +197,7 @@ sub www_moveQuestionDown {
         my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
                 ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from faqQuestion where questionId=$session{form}{qid}",$session{dbh});
-                @data = WebGUI::SQL->quickArray("select questionId, min(sequenceNumber) from faqQuestion where widgetId=$session{form}{wid} and sequenceNumber>$thisSeq group by widgetId",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select questionId from faqQuestion where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq+1 group by widgetId",$session{dbh});
                 if ($data[0] ne "") {
                         WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber+1 where questionId=$session{form}{qid}",$session{dbh});
                         WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber-1 where questionId=$data[0]",$session{dbh});
@@ -213,7 +213,7 @@ sub www_moveQuestionUp {
         my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
                 ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from faqQuestion where questionId=$session{form}{qid}",$session{dbh});
-                @data = WebGUI::SQL->quickArray("select questionId, max(sequenceNumber) from faqQuestion where widgetId=$session{form}{wid} and sequenceNumber<$thisSeq group by widgetId",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select questionId from faqQuestion where widgetId=$session{form}{wid} and sequenceNumber=$thisSeq-1 group by widgetId",$session{dbh});
                 if ($data[0] ne "") {
                         WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber-1 where questionId=$session{form}{qid}",$session{dbh});
                         WebGUI::SQL->write("update faqQuestion set sequenceNumber=sequenceNumber+1 where questionId=$data[0]",$session{dbh});

@@ -94,7 +94,7 @@ sub httpRedirect {
 #-------------------------------------------------------------------
 sub open {
         my ($key, %WebGUI, %CONFIG, %VARS, %PAGE, %FORM, $query, %COOKIES, $config, %USER, %SETTINGS, $dbh);
-	%WebGUI = (version=>"0.9.0", date=>"2001-08-13");
+	%WebGUI = (version=>"0.10.0", date=>"2001-08-17");
         $config = new WebGUI::Config '../etc/WebGUI.conf';
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);

@@ -37,13 +37,13 @@ sub create {
 	my ($widgetId, $nextSeq);
 	$widgetId = getNextId("widgetId");
 	($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from widget where pageId=$session{page}{pageId}",$session{dbh});
-        WebGUI::SQL->write("insert into widget set widgetId=$widgetId, pageId=$session{page}{pageId}, widgetType='$session{form}{widget}', title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", sequenceNumber='$nextSeq'",$session{dbh});
+        WebGUI::SQL->write("insert into widget set widgetId=$widgetId, pageId=$session{page}{pageId}, widgetType='$session{form}{widget}', processMacros='$session{form}{processMacros}', title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", dateAdded=now(), addedBy='$session{user}{userId}', sequenceNumber='$nextSeq'",$session{dbh});
 	return $widgetId;
 }
 
 #-------------------------------------------------------------------
 sub update {
-	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}' where widgetId=$session{form}{wid}",$session{dbh});
+	WebGUI::SQL->write("update widget set title=".quote($session{form}{title}).", displayTitle='$session{form}{displayTitle}', description=".quote($session{form}{description}).", processMacros='$session{form}{processMacros}', lastEdited=now(), editedBy='$session{user}{userId}' where widgetId=$session{form}{wid}",$session{dbh});
 }
 
 #-------------------------------------------------------------------
@@ -87,7 +87,7 @@ sub www_moveDown {
 	my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
 		($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from widget where widgetId=$session{form}{wid}",$session{dbh});
-		@data = WebGUI::SQL->quickArray("select widgetId, min(sequenceNumber) from widget where pageId=$session{page}{pageId} and sequenceNumber>$thisSeq group by pageId",$session{dbh});
+		@data = WebGUI::SQL->quickArray("select widgetId from widget where pageId=$session{page}{pageId} and sequenceNumber=$thisSeq+1",$session{dbh});
 		if ($data[0] ne "") {
                 	WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber+1 where widgetId=$session{form}{wid}",$session{dbh});
                 	WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber-1 where widgetId=$data[0]",$session{dbh});
@@ -103,7 +103,7 @@ sub www_moveUp {
         my (@data, $thisSeq);
         if (WebGUI::Privilege::canEditPage()) {
                 ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from widget where widgetId=$session{form}{wid}",$session{dbh});
-                @data = WebGUI::SQL->quickArray("select widgetId, max(sequenceNumber) from widget where pageId=$session{page}{pageId} and sequenceNumber<$thisSeq group by pageId",$session{dbh});
+                @data = WebGUI::SQL->quickArray("select widgetId from widget where pageId=$session{page}{pageId} and sequenceNumber=$thisSeq-1",$session{dbh});
                 if ($data[0] ne "") {
                         WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber-1 where widgetId=$session{form}{wid}",$session{dbh});
                         WebGUI::SQL->write("update widget set sequenceNumber=sequenceNumber+1 where widgetId=$data[0]",$session{dbh});

@@ -44,21 +44,24 @@ sub _displayAdminBar {
         }
         $clipboardSelect = WebGUI::Form::selectList("clipboardSelect",\%hash2,"","","","goClipboard()");
    #--admin functions
-        %hash = ( $session{page}{url}=>'Manage...', 
-			$session{env}{SCRIPT_NAME}.'/clipboard'=>'Clipboard',
-			$session{page}{url}.'?op=listGroups'=>'Groups', 
-			$session{page}{url}.'?op=editSettings'=>'Settings', 
-			$session{page}{url}.'?op=listStyles'=>'Styles', 
-			$session{env}{SCRIPT_NAME}.'/trash'=>'Trash',
-			$session{page}{url}.'?op=listUsers'=>'Users'
-			);
+	%hash = ();
+	if (WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
+        	%hash = ( 
+			$session{page}{url}.'?op=editSettings'=>'Edit Settings', 
+			$session{page}{url}.'?op=listGroups'=>'Manage Groups', 
+			$session{page}{url}.'?op=listStyles'=>'Manage Styles', 
+			$session{page}{url}.'?op=listUsers'=>'Manage Users',
+			$session{env}{SCRIPT_NAME}.'/clipboard'=>'View Clipboard',
+			$session{env}{SCRIPT_NAME}.'/trash'=>'View Trash'
+		);
+	}
+        %hash = ( $session{page}{url}=>'Admin...', 
+		$session{page}{url}.'?op=switchOffAdmin'=>'Turn Admin Off',
+		$session{page}{url}.'?op=viewHelpIndex'=>'View Help Index',
+		$session{page}{url}.'?op=viewPendingSubmissions'=>'View Pending Submissions', 
+		%hash
+	);
         $adminSelect = WebGUI::Form::selectList("adminSelect",\%hash,"","","","goAdmin()");
-  #--misc functions
-        %hash = ( $session{page}{url}=>'Miscellaneous functions...', 
-			$session{page}{url}.'?op=switchOffAdmin'=>'Turn Admin Off',
-			$session{page}{url}.'?op=viewHelpIndex'=>'View Help Index'
-			);
-        $miscSelect = WebGUI::Form::selectList("miscSelect",\%hash,"","","","goMisc()");
   #--output admin bar
 	$output = '
 	<div class="adminBar"><table class="adminBar" width="100%" cellpadding="3" cellspacing="0" border="0"><tr>
@@ -72,18 +75,10 @@ sub _displayAdminBar {
         function goClipboard(){
                 location = document.clipboard.clipboardSelect.options[document.clipboard.clipboardSelect.selectedIndex].value
         }
-        function goMisc(){
-                location = document.misc.miscSelect.options[document.misc.miscSelect.selectedIndex].value
-        }
 	//-->	</script>
 	<form name="content"> <td>'.$contentSelect.'</td> </form>
 	<form name="clipboard"> <td align="center">'.$clipboardSelect.'</td> </form>
-	';
-	if (WebGUI::Privilege::isInGroup(3,$session{user}{userId})) {
-        	$output .= '<form name="admin"> <td align="center">'.$adminSelect.'</td> </form> ';
-	}
-	$output .= '
-	<form name="misc"> <td align="right">'.$miscSelect.'</td> </form>
+        <form name="admin"> <td align="center">'.$adminSelect.'</td> </form> 
 	</tr></table></div>
 	';
 	return $output;
@@ -135,7 +130,7 @@ sub page {
 		#if (WebGUI::Privilege::canViewPage($session{page}{pageId})) {
 		if (WebGUI::Privilege::canViewPage()) {
 			if ($session{var}{adminOn}) {
-                        	$content .= '<a href="'.$session{page}{url}.'?op=editPage"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?op=cutPage"><img src="'.$session{setting}{lib}.'/cut.gif" border=0></a><a href="'.$session{page}{url}.'?op=deletePage"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a>';
+                        	$content .= '<a href="'.$session{page}{url}.'?op=editPage"><img src="'.$session{setting}{lib}.'/edit.gif" border=0></a><a href="'.$session{page}{url}.'?op=cutPage"><img src="'.$session{setting}{lib}.'/cut.gif" border=0></a><a href="'.$session{page}{url}.'?op=deletePage"><img src="'.$session{setting}{lib}.'/delete.gif" border=0></a><a href="'.$session{page}{url}.'?op=movePageUp"><img src="'.$session{setting}{lib}.'/leftArrow.gif" border=0></a><a href="'.$session{page}{url}.'?op=movePageDown"><img src="'.$session{setting}{lib}.'/rightArrow.gif" border=0></a>';
                 	}	
 			$sth = WebGUI::SQL->read("select widgetId, widgetType from widget where pageId=".$session{page}{pageId}." order by sequenceNumber, widgetId",$session{dbh});
 			while (@widgetList = $sth->array) {

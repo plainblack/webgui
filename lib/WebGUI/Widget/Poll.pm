@@ -31,7 +31,7 @@ sub _viewPoll {
 		$output .= WebGUI::Form::hidden('func','vote');
                 $output .= '<span class="pollQuestion">'.$poll{question}.'</span><br>';
                 for ($i=1; $i<=20; $i++) {
-                        if ($poll{'a'.$i} ne "") {
+                        if ($poll{'a'.$i} =~ /\w/) {
                                 $output .= WebGUI::Form::radio("answer",'a'.$i).' <span class="pollAnswer">'.$poll{'a'.$i}.'</span><br>';
                         }
                 }
@@ -57,10 +57,10 @@ sub _viewResults {
 			$totalResponses = 1;
 		}
 		for ($i=1; $i<=20; $i++) {
-			if ($poll{'a'.$i} ne "") {
+			if ($poll{'a'.$i} =~ /\w/) {
 				$output .= '<span class="pollAnswer"><hr size=1>'.$poll{'a'.$i}.'<br></span>';
-                		@data = WebGUI::SQL->quickArray("select count(*), answer from pollAnswer where answer='a$i' group by answer",$session{dbh});
-				$output .= '<table cellpadding=0 cellspacing=0 border=0><tr><td  width="'.round(150*$data[0]/$totalResponses).'" class="pollColor"></td><td class="pollAnswer">&nbsp;&nbsp;'.round(100*$data[0]/$totalResponses).'%</td></tr></table>';
+                		@data = WebGUI::SQL->quickArray("select count(*), answer from pollAnswer where answer='a$i' and widgetId=$widgetId group by answer",$session{dbh});
+				$output .= '<table cellpadding=0 cellspacing=0 border=0><tr><td width="'.round($poll{graphWidth}*$data[0]/$totalResponses).'" class="pollColor"></td><td class="pollAnswer">&nbsp;&nbsp;'.round(100*$data[0]/$totalResponses).'%</td></tr></table>';
 			}
                 }
         }
@@ -86,6 +86,7 @@ sub www_add {
                 $output .= '<tr><td class="formDescription">Active</td><td>'.WebGUI::Form::checkbox("active",1,1).'</td></tr>';
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
                 $output .= '<tr><td class="formDescription" valign="top">Who can vote?</td><td>'.WebGUI::Form::selectList("voteGroup",\%hash,).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Graph Width</td><td>'.WebGUI::Form::text("graphWidth",20,3).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Question</td><td>'.WebGUI::Form::text("question",50,255).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Answers<span><br>(Enter one answer per line. No more than 20.)</span></td><td>'.WebGUI::Form::textArea("answers",'',50,8,0,'on').'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
@@ -103,7 +104,7 @@ sub www_addSave {
 	if (WebGUI::Privilege::canEditPage()) {
 		$widgetId = create();
 		@answer = split("\n",$session{form}{answers});	
-		WebGUI::SQL->write("insert into Poll set widgetId=$widgetId, active='$session{form}{active}', voteGroup='$session{form}{voteGroup}', question=".quote($session{form}{question}).", a1=".quote($answer[0]).", a2=".quote($answer[1]).", a3=".quote($answer[2]).", a4=".quote($answer[3]).", a5=".quote($answer[4]).", a6=".quote($answer[5]).", a7=".quote($answer[6]).", a8=".quote($answer[7]).", a9=".quote($answer[8]).", a10=".quote($answer[9]).", a11=".quote($answer[10]).", a12=".quote($answer[11]).", a13=".quote($answer[12]).", a14=".quote($answer[13]).", a15=".quote($answer[14]).", a16=".quote($answer[15]).", a17=".quote($answer[16]).", a18=".quote($answer[17]).", a19=".quote($answer[18]).", a20=".quote($answer[19])."",$session{dbh});
+		WebGUI::SQL->write("insert into Poll set widgetId=$widgetId, active='$session{form}{active}', voteGroup='$session{form}{voteGroup}', graphWidth='$session{form}{graphWidth}', question=".quote($session{form}{question}).", a1=".quote($answer[0]).", a2=".quote($answer[1]).", a3=".quote($answer[2]).", a4=".quote($answer[3]).", a5=".quote($answer[4]).", a6=".quote($answer[5]).", a7=".quote($answer[6]).", a8=".quote($answer[7]).", a9=".quote($answer[8]).", a10=".quote($answer[9]).", a11=".quote($answer[10]).", a12=".quote($answer[11]).", a13=".quote($answer[12]).", a14=".quote($answer[13]).", a15=".quote($answer[14]).", a16=".quote($answer[15]).", a17=".quote($answer[16]).", a18=".quote($answer[17]).", a19=".quote($answer[18]).", a20=".quote($answer[19])."",$session{dbh});
 		return "";
 	} else {
 		return WebGUI::Privilege::insufficient();
@@ -126,6 +127,7 @@ sub www_edit {
 		%hash = WebGUI::SQL->buildHash("select groupId,groupName from groups where groupName<>'Reserved' order by groupName",$session{dbh});
                 $array[0] = $data{voteGroup};
                 $output .= '<tr><td class="formDescription" valign="top">Who can vote?</td><td>'.WebGUI::Form::selectList("voteGroup",\%hash,\@array).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Graph Width</td><td>'.WebGUI::Form::text("graphWidth",20,3,$data{graphWidth}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Question</td><td>'.WebGUI::Form::text("question",50,255,$data{question}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Answers<span><br>(Enter one answer per line. No more than 20.)</span></td><td>'.WebGUI::Form::textArea("answers",$data{a1}."\n".$data{a2}."\n".$data{a3}."\n".$data{a4}."\n".$data{a5}."\n".$data{a6}."\n".$data{a7}."\n".$data{a8}."\n".$data{a9}."\n".$data{a10}."\n".$data{a11}."\n".$data{a12}."\n".$data{a13}."\n".$data{a14}."\n".$data{a15}."\n".$data{a16}."\n".$data{a17}."\n".$data{a18}."\n".$data{a19}."\n".$data{a20}."\n",50,8,0,'on').'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
@@ -142,7 +144,7 @@ sub www_editSave {
         if (WebGUI::Privilege::canEditPage()) {
 		update();
 		@answer = split("\n",$session{form}{answers});	
-		WebGUI::SQL->write("update Poll set active='$session{form}{active}', voteGroup='$session{form}{voteGroup}', question=".quote($session{form}{question}).", a1=".quote($answer[0]).", a2=".quote($answer[1]).", a3=".quote($answer[2]).", a4=".quote($answer[3]).", a5=".quote($answer[4]).", a6=".quote($answer[5]).", a7=".quote($answer[6]).", a8=".quote($answer[7]).", a9=".quote($answer[8]).", a10=".quote($answer[9]).", a11=".quote($answer[10]).", a12=".quote($answer[11]).", a13=".quote($answer[12]).", a14=".quote($answer[13]).", a15=".quote($answer[14]).", a16=".quote($answer[15]).", a17=".quote($answer[16]).", a18=".quote($answer[17]).", a19=".quote($answer[18]).", a20=".quote($answer[19])." where widgetId=$session{form}{wid}",$session{dbh});
+		WebGUI::SQL->write("update Poll set active='$session{form}{active}', voteGroup='$session{form}{voteGroup}', graphWidth=$session{form}{graphWidth}, question=".quote($session{form}{question}).", a1=".quote($answer[0]).", a2=".quote($answer[1]).", a3=".quote($answer[2]).", a4=".quote($answer[3]).", a5=".quote($answer[4]).", a6=".quote($answer[5]).", a7=".quote($answer[6]).", a8=".quote($answer[7]).", a9=".quote($answer[8]).", a10=".quote($answer[9]).", a11=".quote($answer[10]).", a12=".quote($answer[11]).", a13=".quote($answer[12]).", a14=".quote($answer[13]).", a15=".quote($answer[14]).", a16=".quote($answer[15]).", a17=".quote($answer[16]).", a18=".quote($answer[17]).", a19=".quote($answer[18]).", a20=".quote($answer[19])." where widgetId=$session{form}{wid}",$session{dbh});
 		return "";
         } else {
                 return WebGUI::Privilege::insufficient();
@@ -171,7 +173,7 @@ sub www_view {
 #-------------------------------------------------------------------
 sub www_vote {
         WebGUI::SQL->write("insert into pollAnswer set widgetId=$session{form}{wid}, userId=$session{user}{userId}, answer='$session{form}{answer}'",$session{dbh});
-	return _viewResults($session{form}{wid});
+	return "";
 }
 
 

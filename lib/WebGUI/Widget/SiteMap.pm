@@ -23,7 +23,7 @@ sub _traversePageTree {
         for ($i=0;$i<=$_[1];$i++) {
                 $depth .= "&nbsp;&nbsp;";
         }
-	$sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]'",$session{dbh});	
+	$sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$_[0]' order by sequenceNumber",$session{dbh});	
         while (@data = $sth->array) {
 		if (WebGUI::Privilege::canViewPage($data[2])) {
                 	$output .= $depth.'&middot; <a href="'.$session{env}{SCRIPT_NAME}.'/'.$data[0].'">'.$data[1].'</a><br>';
@@ -51,7 +51,7 @@ sub www_add {
                 $output .= '<tr><td class="formDescription">Disply title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",'').'</td></tr>';
                 $output .= '<tr><td class="formDescription">Starting from this level?</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,1).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Show only this level?</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,1).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Show only one level?</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,1).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -86,7 +86,7 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">Disply title?</td><td>'.WebGUI::Form::checkbox("displayTitle",1,$data{displayTitle}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Description</td><td>'.WebGUI::Form::textArea("description",$data{description}).'</td></tr>';
                 $output .= '<tr><td class="formDescription">Starting from this level?</td><td>'.WebGUI::Form::checkbox("startAtThisLevel",1,$data{startAtThisLevel}).'</td></tr>';
-                $output .= '<tr><td class="formDescription">Show only this level?uuuu</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,$data{showOnlyThisLevel}).'</td></tr>';
+                $output .= '<tr><td class="formDescription">Show only one level?uuuu</td><td>'.WebGUI::Form::checkbox("showOnlyThisLevel",1,$data{showOnlyThisLevel}).'</td></tr>';
 		$output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -120,7 +120,7 @@ sub www_view {
 		} else {
 			$parent = 1;
 		}
-		$sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$parent'",$session{dbh});	
+		$sth = WebGUI::SQL->read("select urlizedTitle, title, pageId from page where parentId='$parent' order by sequenceNumber",$session{dbh});	
 		while (@root = $sth->array) {	
 			if (WebGUI::Privilege::canViewPage($root[2])) {
 				$output .= '&middot; <a href="'.$session{env}{SCRIPT_NAME}.'/'.$root[0].'">'.$root[1].'</a><br>';
