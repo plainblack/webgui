@@ -38,9 +38,9 @@ sub _replacement {
                         }
                         $temp .= '<a class="horizontalMenu" href="'.WebGUI::URL::gateway($data[1]).'">';
                         if ($session{page}{pageId} == $data[2]) {
-                        	$temp .= '<span class="selectedMenuItem">'.$data[1].'</span>';
+                        	$temp .= '<span class="selectedMenuItem">'.$data[0].'</span>';
                         } else {
-                                $temp .= $data[1];
+                                $temp .= $data[0];
                         }
 			$temp .= '</a>';
                 }
