@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2002 Plain Black LLC.
+# WebGUI is Copyright 2001-2003 Plain Black LLC.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
