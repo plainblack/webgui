@@ -92,17 +92,17 @@ while (my ($namespace) = $sth->array) {
 $sth->finish;
 walkTree('0','PBasset000000000000001','000001','1');
 print "\t\tMaking second round of table structure changes\n" unless ($quiet);
-WebGUI::SQL->write("drop table SiteMap");
-WebGUI::SQL->write("delete from template where namespace in ('SiteMap')");
 my $sth = WebGUI::SQL->read("select distinct(namespace) from wobject where namespace is not null");
 while (my ($namespace) = $sth->array) {
 	if (isIn($namespace, qw(Article DataForm EventsCalendar HttpProxy IndexedSearch MessageBoard Poll Product SQLReport Survey SyndicatedContent USS WobjectProxy WSClient))) {
 		WebGUI::SQL->write("alter table ".$namespace." drop column wobjectId");
+		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
+	} elsif (isIn($namespace, qw(Navigation Layout))) {
+		# do nothing
 	} else {
 		WebGUI::SQL->write("alter table ".$namespace." drop primary key");
+		WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
 	}
-	
-	WebGUI::SQL->write("alter table ".$namespace." add primary key (assetId)");
 }
 $sth->finish;
 WebGUI::SQL->write("alter table wobject drop column wobjectId");
@@ -132,9 +132,13 @@ WebGUI::SQL->write("alter table wobject drop column editedBy");
 WebGUI::SQL->write("alter table wobject drop column lastEdited");
 WebGUI::SQL->write("alter table wobject drop column allowDiscussion");
 WebGUI::SQL->write("drop table page");
+WebGUI::SQL->write("drop table FileManager");
+WebGUI::SQL->write("drop table FileManager_file");
+WebGUI::SQL->write("delete from template where namespace in ('FileManager')");
+WebGUI::SQL->write("drop table SiteMap");
+WebGUI::SQL->write("delete from template where namespace in ('SiteMap')");
 WebGUI::SQL->write("alter table Article drop column image");
 WebGUI::SQL->write("alter table Article drop column attachment");
-
 
 my %migration;
 
@@ -259,6 +263,39 @@ WebGUI::SQL->write("update Navigation set startPoint='root' where startPoint='na
 WebGUI::SQL->write("drop table tempoldnav");
 
 
+print "\tConverting navigation templates\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select templateId, template from template where namespace='Navigation'");
+while (my ($id, $template) = $sth->array) {
+	$template =~ s/isBasePage/isCurrent/isg;
+	$template =~ s/basePage/currentPage/isg;
+	$template =~ s/isRoot/isBranchRoot/isg;
+	$template =~ s/inRoot/inBranchRoot/isg;
+	$template =~ s/urlizedTitle/url/isg;
+	$template =~ s/ownerId/ownerUserId/isg;
+	$template =~ s/isTop/isTopOfBranch/isg;
+	$template =~ s/isDaughter/isChild/isg;
+	$template =~ s/isMother/isParent/isg;
+	$template =~ s/isSister/isSibling/isg;
+	$template =~ s/isLeftMost/isRankedFirst/isg;
+	$template =~ s/isRightMost/isRankedLast/isg;
+	$template =~ s/hasDaughter/hasChild/isg;
+	$template =~ s/mother/parent/isg;
+	$template =~ s/config\.button/controls/isg;
+	$template =~ s/pageId/assetId/isg;
+	$template = '
+		<tmpl_if displayTitle>
+		<h1><tmpl_var title></h1>
+		</tmpl_if>
+		<tmpl_if description>
+			<p><tmpl_var description></p>
+		</tmpl_if>
+		'.$template;
+	WebGUI::SQL->write("update template set template=".quote($template)." where templateId=".quote($id)." and namespace='Navigation'");
+}
+$sth->finish;
+
+
+
 print "\tDeleting files which are no longer used.\n" unless ($quiet);
 #unlink("../../lib/WebGUI/Page.pm");
 #unlink("../../lib/WebGUI/Operation/Page.pm");
@@ -310,10 +347,10 @@ sub walkTree {
 			WebGUI::SQL->write("insert into redirect (assetId, redirectUrl) values (".quote($pageId).",".quote($page->{redirectURL}).")");
 		} else {
 			WebGUI::SQL->write("insert into wobject (assetId, styleTemplateId, templateId, printableStyleTemplateId, 
-				cacheTimeout, cacheTimeoutVisitor, displayTitle) values (
+				cacheTimeout, cacheTimeoutVisitor, displayTitle, namespace) values (
 				".quote($pageId).", ".quote($page->{styleId}).", ".quote($page->{templateId}).", 
 				".quote($page->{printableStyleId}).", ".quote($page->{cacheTimeout}).",".quote($page->{cacheTimeoutVisitor}).",
-				0)");
+				0,'Layout')");
 			WebGUI::SQL->write("insert into layout (assetId) values (".quote($pageId).")");
 		}
 		my $rank = 1;
@@ -399,7 +436,7 @@ sub walkTree {
 				print "\t\t\tConverting File Manager ".$wobject->{wobjectId}." into File Folder Layout\n" unless ($quiet);
 				WebGUI::SQL->write("update asset set className='WebGUI::Asset::Layout' where assetId=".quote($wobjectId));
 				WebGUI::SQL->write("insert into layout (assetId) values (".quote($wobjectId).")");
-				WebGUI::SQL->write("update wobject set templateId='15' where wobjectId=".quote($wobjectId));
+				WebGUI::SQL->write("update wobject set templateId='15', namespace='Layout' where wobjectId=".quote($wobjectId));
 				print "\t\t\tMigrating attachments for File Manager ".$wobject->{wobjectId}."\n" unless ($quiet);
 				my $sth = WebGUI::SQL->read("select * from FileManager_file where wobjectId=".quote($wobjectId)." order by sequenceNumber");
 				my $rank = 1;
@@ -556,10 +593,6 @@ sub getNewId {
                       'MessageBoard' => {
                                           '1' => 'PBtmpl0000000000000047'
                                         },
-                      'FileManager' => {
-                                         '1' => 'PBtmpl0000000000000025',
-                                         '2' => 'PBtmpl0000000000000087'
-                                       },
                       'Operation/Profile/View' => {
                                                     '1' => 'PBtmpl0000000000000052'
                                                   },
@@ -820,7 +853,6 @@ sub getNewId {
                                                }
                     },
           'nav' => {
-                     '1002' => 'PBnav00000000000000005',
                      '11' => 'PBnav00000000000000006',
                      '7' => 'PBnav00000000000000019',
                      '2' => 'PBnav00000000000000014',
@@ -829,18 +861,14 @@ sub getNewId {
                      '18' => 'PBnav00000000000000013',
                      '16' => 'PBnav00000000000000011',
                      '13' => 'PBnav00000000000000008',
-                     'iBkcoHUb-z4vzYPyX0oS5A' => 'PBnav00000000000000023',
                      '6' => 'PBnav00000000000000018',
-                     'b3XBaWXeMXS39HPDfV2y5Q' => 'PBnav00000000000000022',
                      '3' => 'PBnav00000000000000015',
                      '9' => 'PBnav00000000000000021',
                      '12' => 'PBnav00000000000000007',
                      '14' => 'PBnav00000000000000009',
                      '15' => 'PBnav00000000000000010',
                      '8' => 'PBnav00000000000000020',
-                     '1001' => 'PBnav00000000000000004',
                      '4' => 'PBnav00000000000000016',
-                     '1000' => 'PBnav00000000000000003',
                      '10' => 'PBnav00000000000000002',
                      '5' => 'PBnav00000000000000017'
                    }

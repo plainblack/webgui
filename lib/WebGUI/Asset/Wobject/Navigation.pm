@@ -101,7 +101,7 @@ sub getEditForm {
 		-value=>'<div id="navStartPoint"></div>'
 		);
 	$tabform->getTab("properties")->readOnly(
-		-label=>"Assets to Include",
+		-label=>"Relatives to Include",
 		-value=>WebGUI::Form::checkbox({
 				checked=>$selfChecked,
 				name=>"assetsToInclude",
@@ -124,7 +124,6 @@ sub getEditForm {
 				value=>"pedigree"
 				}).'Pedigree<br />'
 		);
-WebGUI::ErrorHandler::warn($self->getValue("startType"));
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = (
@@ -182,13 +181,13 @@ WebGUI::ErrorHandler::warn($self->getValue("startType"));
 		changeStartPoint();
 		toggleEndPoint();
 		</script>");
-	my $previewButton = qq{
-                           <INPUT TYPE="button" VALUE="Preview" NAME="preview"
-                            OnClick="
-                                window.open('', 'navPreview', 'toolbar=no,status=no,location=no,scrollbars=yes,resizable=yes');
-                                this.form.func.value='preview';
-                                this.form.target = 'navPreview';
-                                this.form.submit()">};
+	my $previewButton;# = qq{
+                          # <INPUT TYPE="button" VALUE="Preview" NAME="preview"
+                          #  OnClick="
+                          #      window.open('', 'navPreview', 'toolbar=no,status=no,location=no,scrollbars=yes,resizable=yes');
+                          #      this.form.func.value='preview';
+                          #      this.form.target = 'navPreview';
+                          #      this.form.submit()">};
 	my $saveButton = ' <input type="button" value="'.WebGUI::International::get(62).'" onClick="
 		this.value=\''.WebGUI::International::get(452).'\';
 		this.form.func.value=\'editSave\';
@@ -207,9 +206,10 @@ sub getName {
 sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
-	my $start;
+	my ($start,$current);
 	if (!exists $session{asset}) {
 		$start = $self;
+		$current = $self;
 	} elsif ($self->get("startType") eq "specificUrl") {
 		$start = WebGUI::Asset->getByUrl($self->get("startPoint"));
 	} elsif ($self->get("startType") eq "relativeToRoot") {
@@ -229,190 +229,108 @@ sub view {
 			$start = WebGUI::Asset->newByLineage($lineage);
 		}
 	}
+	$current = $session{asset} unless (defined $current);
 	$start = $session{asset} unless (defined $start); # if none of the above results in a start point, then the current page must be it
-	my @assets = $start->getLineage();	
-
-
-my $config;
-my $base;
-
-	my (@relatives, %rules);
-	foreach my $relative ("ancestors","self","siblings","descendants") {
-		push(@relatives,$relative) if ($config->{relative});
-	}
+	my @includedRelationships = split("\n",$self->get("assetsToInclude"));
+	my %rules;
 	$rules{returnQuickReadObjects} = 1;
-	$base->getLineage(\@relatives,\%rules);
-
-	my @interestingPageProperties = ('pageId', 'parentId', 'title', 'ownerId', 'urlizedTitle',
-			'synopsis', 'newWindow', 'menuTitle', 'encryptLogin');
+	$rules{endingLineageLength} = $start->getLineageLength+$self->get("endPoint");
+	my @assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
-	my $p = $self->_getStartPageObject();
-	my $method = $self->_methods()->{$self->{_method}}{method};
-
-	my $cache = WebGUI::Cache->new($self->{_identifier}.'-'.$session{page}{pageId}, "Navigation-".$session{config}{configFile});
-	my $cacheContent = $cache->get unless $session{var}{adminOn}; 
-	my (@page_loop, $lastPage, %unfolded);
-	tie %unfolded, "Tie::IxHash";
-
-    # Store current page properties in template var
-    my $currentPage = WebGUI::Page->getPage();
-    my $currentRoot = $currentPage->getWebGUIRoot();
-    foreach my $property (@interestingPageProperties) {
-        $var->{'basepage.'.$property} = $currentPage->get($property);
-    }
-	unless (defined $cacheContent &&
-		! $session{url}{siteURL}) {	# Never use cache if an alternate site url is specified.
-		# The loop was not cached
-		my @pages = eval $method;
-		if ($@) {
-			WebGUI::ErrorHandler::warn("Error in WebGUI::Navigation::build while trying to execute $method".$@);
+	my @interestingProperties = ('assetId', 'parentId', 'title', 'ownerUserId', 'synopsis', 'newWindow', 'menuTitle');
+	foreach my $property (@interestingProperties) {
+		$var->{'currentPage.'.$property} = $current->get($property);
+	}
+	$var->{'currentPage.isHome'} = ($current->getId eq $session{setting}{defaultPage});
+	$var->{'currentPage.url'} = $current->getUrl;
+    	$var->{'currentPage.hasChild'} = $current->hasChildren;
+	my $currentLineage = $current->get("lineage");
+	my @linesToSkip;
+	my $absoluteDepthOfLastPage;
+	foreach my $asset (@assets) {
+		# skip pages we shouldn't see
+		my $skip = 0;
+		my $pageLineage = $asset->get("lineage");
+		foreach my $lineage (@linesToSkip) {
+			$skip = 1 if ($lineage =~ m/^$pageLineage/);
 		}
-		if (@pages) {
-			my $startPageDepth = $p->get("depth")+1;
-			my $maxDepth = $startPageDepth + $self->{_depth};
-			my $minDepth = $startPageDepth - $self->{_depth};
-
-			foreach my $page (@pages) {
-				my $pageData = {};
-				$pageData->{"page.absDepth"} = $page->{'depth'} + 1;
-				$pageData->{"page.isSystem"} = $page->{isSystem};
-
-				# Check if in depth range
-				next if ($pageData->{"page.absDepth"} > $maxDepth || $pageData->{"page.absDepth"} < $minDepth);
-				
-				# Check stopAtLevel
-				next if ($pageData->{"page.absDepth"} < $self->{_stopAtLevel});
-
-				# Check showSystemPages
-				next if (! $self->{_showSystemPages} && $pageData->{"page.isSystem"}); 
-	
-				# Deal with hidden pages, don't ever hide pages if admin mode is on
-				next if(($page->{'hideFromNavigation'} && ! $self->{_showHiddenPages}) && (! $session{var}{adminOn}));
-
-				# Initial page info
-				$pageData->{"page.url"} = WebGUI::URL::gateway($page->{'urlizedTitle'});
-			        if ($page->{'encryptPage'}) {
-					$pageData->{"page.url"} =~ s/http:/https:/;
-				}
-				$pageData->{"page.relDepth"} = $pageData->{"page.absDepth"} - $startPageDepth;
-				$pageData->{"page.isBasepage"} = ($page->{'pageId'} eq $session{page}{pageId});
-				$pageData->{"page.isHidden"} = $page->{'hideFromNavigation'};
-				
-				# indent
-				my $indent = 0;
-				if ($self->{_method} eq 'pedigree' 	# reverse traversing 
-				    || $self->{_method} eq 'ancestors' 		# needs another way to calculate
-				    || $self->{_method} eq 'self_and_ancestors') {	# the indent
-					if ($self->{_stopAtLevel} <= $startPageDepth && $self->{_stopAtLevel} > 0) {
-						$indent = $pageData->{"page.absDepth"} - ($self->{_stopAtLevel} - 1) - 1;
-					} elsif ($self->{_stopAtLevel} > $startPageDepth && $self->{_stopAtLevel} > 0) {
-						$indent = 0;
-					} else {
-						$indent = $pageData->{"page.absDepth"} - 1;
-					}
-				} else {
-					$indent = $pageData->{"page.absDepth"} - $startPageDepth - 1;
-				}
-				$pageData->{"page.indent_loop"} = [];
-				push(@{$pageData->{"page.indent_loop"}},{'indent'=>$_}) for(1..$indent);
-				$pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;
-
-				# Put page properties in $pageData hashref
-				foreach my $property (@interestingPageProperties) {
-					$pageData->{"page.".$property} = $page->{$property};
-				}
-				$pageData->{"page.isRoot"} = (! $page->{'parentId'});
-				$pageData->{"page.isTop"} = ($pageData->{"page.absDepth"} == 2);
-				$pageData->{"page.hasDaughter"} = ($page->{'nestedSetRight'} - $page->{'nestedSetLeft'} > 1);
-				$pageData->{"page.isDaughter"} = ($page->{'parentId'} eq $currentPage->get('pageId'));
-				$pageData->{"page.isMother"} = ($page->{'pageId'} eq $currentPage->get('parentId'));
-
-                $pageData->{"page.isAncestor"}
-				    =  (($page->{'nestedSetLeft'} < $currentPage->get('nestedSetLeft'))
-                    && ($page->{'nestedSetRight'} > $currentPage->get('nestedSetRight')));
-                $pageData->{"page.isDescendent"}
-                    =  (($page->{'nestedSetLeft'} > $currentPage->get('nestedSetLeft'))
-                    && ($page->{'nestedSetRight'} < $currentPage->get('nestedSetRight')));
-
-                $pageData->{"page.inRoot"}
-                    =  (($page->{'nestedSetLeft'} > $currentRoot->get('nestedSetLeft'))
-                    && ($page->{'nestedSetRight'} < $currentRoot->get('nestedSetRight')));
-
-				# Some information about my mother
-				my $mother = WebGUI::Page->getPage($page->{parentId});
-				if ($page->{parentId} ne "0") {
-					foreach (qw(title urlizedTitle parentId pageId)) {
-						$pageData->{"page.mother.$_"} = $mother->get($_);
-					}
-                    $pageData->{"page.isSister"}
-                        = (($mother->get("pageId") eq $currentPage->get("parentId"))
-                        && !$pageData->{"page.isBasepage"});
-				}
-
-				$pageData->{"page.inBranch"}
-                    = ($pageData->{"page.isAncestor"}
-                    || $pageData->{"page.isDescendent"}
-                    || $pageData->{"page.isSister"}
-                    || $pageData->{"page.isBasepage"});
-				
-				$pageData->{"page.isLeftMost"} = (($page->{'nestedSetLeft'} - 1) == $mother->get('nestedSetLeft'));
-				$pageData->{"page.isRightMost"} = (($page->{'nestedSetRight'} + 1) == $mother->get('nestedSetRight'));
-				my $depthDiff = ($lastPage) ? ($lastPage->{'page.absDepth'} - $pageData->{'page.absDepth'}) : 0;
-				if ($depthDiff > 0) {
-					$pageData->{"page.depthDiff"} = $depthDiff if ($depthDiff > 0);
-					$pageData->{"page.depthDiffIs".$depthDiff} = 1;
-					push(@{$pageData->{"page.depthDiff_loop"}},{}) for(1..$depthDiff);
-				}
-				
-				# Some information about my depth
-				$pageData->{"page.depthIs".$pageData->{"page.absDepth"}} = 1;
-				$pageData->{"page.relativeDepthIs".$pageData->{"page.relDepth"}} = 1;
-
-				# We need a copy of the last page for the depthDiffLoop
-				$lastPage = $pageData;
-				
-				# Store $pageData in page_loop. Mind the order.
-				if ($self->{_reverse}) {
-					unshift(@page_loop, $pageData);
-				} else {
-					push(@page_loop, $pageData);
-				}
+		next if ($skip);
+		if ($asset->get("isHidden") && !$self->get("showHiddenPages")) {
+			push (@linesToSkip,$asset->getId);
+			next;
+		}
+		if ($asset->get("isSystem") && !$self->get("showSystemPages")) {
+			push (@linesToSkip,$asset->getId);
+			next;
+		}
+		unless ($self->get("showUnprivilegedPages") || $asset->canView) {
+			push (@linesToSkip,$asset->getId);
+			next;
+		}
+		my $pageData = {};
+		foreach my $property (@interestingProperties) {
+			$pageData->{"page.".$property} = $asset->get($property);
+		}
+		# build nav variables
+		$pageData->{"page.absDepth"} = $asset->getLineageLength;
+		$pageData->{"page.relDepth"} = $asset->getLineageLength - $start->getLineageLength;
+		$pageData->{"page.isSystem"} = $asset->get("isSystem");
+		$pageData->{"page.isHidden"} = $asset->get("isHidden");
+		$pageData->{"page.isViewable"} = $asset->canView;
+		$pageData->{"page.url"} = $asset->getUrl;
+		my $indent = $pageData->{"page.relDepth"};
+		$pageData->{"page.indent_loop"} = [];
+		push(@{$pageData->{"page.indent_loop"}},{'indent'=>$_}) for(1..$indent);
+		$pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;
+		$pageData->{"page.isBranchRoot"} = ($pageData->{"page.absDepth"} == 1);
+		$pageData->{"page.isTopOfBranch"} = ($pageData->{"page.absDepth"} == 2);
+		$pageData->{"page.isChild"} = ($asset->get("parentId") eq $current->getId);
+		$pageData->{"page.isParent"} = ($asset->getId eq $current->get("parentId"));
+		$pageData->{"page.isCurrent"} = ($asset->getId eq $current->getId);
+		$pageData->{"page.isDescendant"} = ( $currentLineage =~ m/^$pageLineage/ && !$pageData->{"page.isCurrent"});
+		$pageData->{"page.isAnscestor"} = ( $pageLineage =~ m/^$currentLineage/ && !$pageData->{"page.isCurrent"});
+		$pageData->{"page.isSibling"} = (
+			$pageData->{"page.inBranchRoot"} && 
+			$asset->getLineageLength == $current->getLineageLength &&
+			!$pageData->{"page.isCurrent"}
+			);
+		my $currentBranchLineage = substr($currentLineage,0,12);
+		$pageData->{"page.inBranchRoot"} = ($currentBranchLineage =~ m/^$pageLineage/);
+		$pageData->{"page.inBranch"} = ( 
+			$pageData->{"page.isCurrent"} ||
+			$pageData->{"page.isAncestor"} ||
+			$pageData->{"page.isSibling"} ||
+			$pageData->{"page.isDescendant"}
+			);
+		$pageData->{"page.depthIs".$pageData->{"page.absDepth"}} = 1;
+		$pageData->{"page.relativeDepthIs".$pageData->{"page.relDepth"}} = 1;
+		my $depthDiff = ($absoluteDepthOfLastPage) ? ($absoluteDepthOfLastPage - $pageData->{'page.absDepth'}) : 0;
+		if ($depthDiff > 0) {
+			$pageData->{"page.depthDiff"} = $depthDiff if ($depthDiff > 0);
+			$pageData->{"page.depthDiffIs".$depthDiff} = 1;
+			push(@{$pageData->{"page.depthDiff_loop"}},{}) for(1..$depthDiff);
+		}
+		$absoluteDepthOfLastPage = $pageData->{"page.absDepth"};
+		my $parent = $self->getParent;
+		if (defined $parent) {
+			foreach my $property (@interestingProperties) {
+				$pageData->{"page.parent.".$property} = $parent->get($property);
 			}
+			$pageData->{"page.parent.url"} = $parent->getUrl;	
 		}
-
-		# We had a cache miss, so let's put the data in cache
-		$cache->set(\@page_loop, 3600*24) unless $session{var}{adminOn};
-	} else {
-		# We had a cache hit
-		@page_loop = @{$cacheContent};
-	}
-	
-	# Do the user-dependent checks (which cannot be cached globally)
-	foreach my $pageData (@page_loop) {
-		$pageData->{"page.isViewable"} = WebGUI::Page::canView($pageData->{'page.pageId'});
-		# Check privileges
-		if ($pageData->{"page.isViewable"} || $self->{_showUnprivilegedPages}) {
-			push (@{$var->{page_loop}}, $pageData);
-			push (@{$unfolded{$pageData->{"page.parentId"}}}, $pageData);
+		$pageData->{"page.hasChild"} = $asset->hasChildren;
+		# these next two variables can be very inefficient, consider getting rid of them
+		my $parentsFirstChild = $parent->getFirstChild;
+		if (defined $parentsFirstChild) {
+			$pageData->{"page.isRankedFirst"} = ($asset->getId == $parentsFirstChild->getId);
 		}
+		my $parentsLastChild = $parent->getLastChild;
+		if (defined $parentsLastChild) {
+			$pageData->{"page.isRankedLast"} = ($asset->getId == $parentsLastChild->getId);
+		}
+		push(@{$var->{page_loop}}, $pageData);	
 	}
-
-	foreach (values %unfolded) {
-		push(@{$var->{unfolded_page_loop}}, @{$_});
-	}
-	
-	# Configure button
-	$var->{'config.button'} = $self->_getEditButton();
-
-	# Some properties of the page the user's viewing.
-    $var->{'basepage.hasDaughter'} = $currentPage->hasDaughter();
-	$var->{"basepage.isHome"} = ($currentPage->get('pageId') eq '1');
-
-	if ($self->{_template}) {
-		return WebGUI::Template::processRaw($self->{_template}, $var);
-	} else {
-		return WebGUI::Template::process($self->{_templateId}, "Navigation", $var);
-	}
+	return $self->processTemplate($var,"Navigation",$self->get("templateId"));
 }
 
 
@@ -425,6 +343,7 @@ sub www_edit {
 
 
 #-------------------------------------------------------------------
+# we eventually should reaadd this
 sub www_preview {
 	my $self = shift;
 	$session{var}{adminOn} = 0;

@@ -22,14 +22,15 @@ save you many hours of grief.
 	need to download and upgrade to 5.5.x before you can upgrade
 	to 6.3 or higher.
 
- * All Site Map wobjects will be migrated to Navigation macros in
-	Articles during the upgrade. All the site map templates will
+ * All Site Map wobjects will be migrated to Navigation assets 
+	during the upgrade. All the site map templates will
 	be lost. If you want them, save them before the upgrade. Also
 	check your site after the upgrade for all site maps to make
 	sure that they look the way you want them to look.
 
  * All File Manager wobjects have been migrated to File Folder Layout
-	assets.
+	assets. The File Manager templates will be deleted during the
+	upgrade, so if you want to keep yours, get them before upgrading.
 
  * If you have any SQL reports querying internal WebGUI database tables,
 	you'll need to update them after the upgrade. Most of WebGUI's 

@@ -1,7 +1,7 @@
 6.3.0
  - Migrated all wobjects to assets.
  - Migrated pages to the layout and redirect assets.
- - Converted site maps to navigation macros.
+ - Converted site maps to navigation assets.
  - Converted file managers to layout assets with file and image assets
    attached.
  - Converted page templates to use CSS-based layouts instead of tables.

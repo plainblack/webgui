@@ -241,7 +241,7 @@ sub checkList {
 sub codearea {
 	my $params = shift;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/TabFix.js',{type=>"text/javascript"});
-	$params->{extras} = 'style="width: 99%; min-width: 440px; height: 400px" onkeypress="TabFix_keyPress(event.type)" onkeydown="TabFix_keyDown(event.type)"';
+	$params->{extras} = 'style="width: 99%; min-width: 440px; height: 400px" onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"';
 	my $output = textarea($params);
 	return $output;
 }

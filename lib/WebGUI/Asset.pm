@@ -26,6 +26,7 @@ sub addChild {
 	my $properties = shift;
 	my $id = WebGUI::Id::generate();
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
+	$self->{_hasChildren} = 1;
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, state, className, url, startDate, endDate) 
 		values (".quote($id).",".quote($self->getId).", ".quote($lineage).", 
@@ -146,6 +147,14 @@ sub demote {
 		$self->swapRank($sisterLineage);
 		$self->{_properties}{lineage} = $sisterLineage;
 	}
+}
+
+sub DESTROY {
+	my $self = shift;
+	$self->{_parent}->DESTROY if (exists $self->{_parent});
+	$self->{_firstChild}->DESTROY if (exists $self->{_firstChild});
+	$self->{_lastChild}->DESTROY if (exists $self->{_lastChild});
+	$self = undef;
 }
 
 sub duplicate {
@@ -357,10 +366,13 @@ sub getEditForm {
 }
 
 
-sub getFirstDescendant {
+sub getFirstChild {
 	my $self = shift;
-	$self->{_firstDescendant} = WebGUI::Asset->newByLineage($self->get("lineage").$self->formatRank(1)) unless (exists $self->{_firstDescendant});
-	return $self->{_firstDescendant};
+	unless (exists $self->{_firstChild}) {
+		my ($lineage) = WebGUI::SQL->quickArray("select min(lineage) from asset where parentId=".quote($self->getId));
+		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
+	}
+	return $self->{_firstChild};
 }
 
 sub getIcon {
@@ -389,11 +401,21 @@ sub getIndexerParams {
 }
 
 
+sub getLastChild {
+	my $self = shift;
+	unless (exists $self->{_lastChild}) {
+		my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
+		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
+	}
+	return $self->{_lastChild};
+}
+
 sub getLineage {
 	my $self = shift;
 	my $relatives = shift;
 	my $rules = shift;
 	my $lineage = $self->get("lineage");
+	# deal with exclusions
 	my $whereExclusion = " and state='published'";
 	if (exists $rules->{excludeClasses}) {
 		my @set;
@@ -402,10 +424,12 @@ sub getLineage {
 		}
 		$whereExclusion .= 'and ('.join(" and ",@set).')';
 	}
+	# let's get those siblings
 	my $whereSiblings;
 	if (isIn("siblings",@{$relatives})) {
 		$whereSiblings = "(parentId=".quote($self->get("parentId"))." and assetId<>".quote($self->getId).")";
 	}
+	# ancestors too
 	my @specificFamilyMembers = ();
 	if (isIn("ancestors",@{$relatives})) {
 		my @familyTree = ($lineage =~ /(.{6})/g);
@@ -413,6 +437,7 @@ sub getLineage {
                         push(@specificFamilyMembers,join("",@familyTree)) if (scalar(@familyTree));
                 }
 	}
+	# let's add ourself to the list
 	if (isIn("self",@{$relatives})) {
 		push(@specificFamilyMembers,$self->get("lineage"));
 	}
@@ -425,6 +450,7 @@ sub getLineage {
 		$whereExact .= quoteAndJoin(\@specificFamilyMembers);
 		$whereExact .= ")";
 	}
+	# we need to include descendants
 	my $whereDescendants;
 	if (isIn("descendants",@{$relatives})) {
 		if ($whereSiblings ne "" || $whereExact ne "") {
@@ -435,19 +461,32 @@ sub getLineage {
 			$whereDescendants .= " and length(lineage) <= ".($rules->{endingLineageLength}*6);
 		}
 	}
-	my $columns = "assetId, className";
+	# based upon all available criteria, let's get some assets
+	my $columns = "assetId, className, parentId";
 	$columns = "*" if ($rules->{returnQuickReadObjects});
 	my $sql = "select $columns from asset where $whereSiblings $whereExact $whereDescendants $whereExclusion order by lineage";
 	my @lineage;
+	my %relativeCache;
 	my $sth = WebGUI::SQL->read($sql);
 	while (my $properties = $sth->hashRef) {
+		# create whatever type of object was requested
+		my $asset;
 		if ($rules->{returnObjects}) {
-			push(@lineage,WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className}));
+			$asset = WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className});
 		} elsif ($rules->{returnQuickReadObjects}) {
-			push(@lineage,WebGUI::Asset->newByPropertyHashRef($properties));
+			$asset = WebGUI::Asset->newByPropertyHashRef($properties);
 		} else {
-			push(@lineage,$properties->{assetId});
+			$asset = $properties->{assetId};
 		}
+		# since we have the relatives info now, why not cache it
+		if ($rules->{returnObjects} || $rules->{returnQuickReadObjects}) {
+			my $parent = $relativeCache{$properties->{parentId}};
+			$relativeCache{$properties->{assetId}} = $asset;
+			$asset->{_parent} = $parent;
+			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
+			$parent->{_lastChild} = $asset;
+		}
+		push(@lineage,$asset);
 	}
 	$sth->finish;
 	return \@lineage;
@@ -525,8 +564,17 @@ sub getValue {
 
 sub hasChildren {
 	my $self = shift;
-	my ($hasChildren) = WebGUI::SQL->read("select count(*) from asset where parentId=".quote($self->getId));
-	return $hasChildren;
+	unless (exists $self->{_hasChildren}) {
+		if (exists $self->{_firstChild}) {
+			$self->{_hasChildren} = 1;
+		} elsif (exists $self->{_lastChild}) {
+			$self->{_hasChildren} = 1;
+		} else {
+			my ($hasChildren) = WebGUI::SQL->read("select count(*) from asset where parentId=".quote($self->getId));
+			$self->{_hasChildren} = $hasChildren;
+		}
+	}
+	return $self->{_hasChildren};
 }
 
 sub new {
