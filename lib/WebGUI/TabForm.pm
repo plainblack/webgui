@@ -124,7 +124,7 @@ sub hidden {
 
 #-------------------------------------------------------------------
 
-=head2 new ( tabHashRef )
+=head2 new ( tabHashRef , cssString)
 
 Constructor.
 
@@ -148,16 +148,25 @@ A hash reference containing the definition of the tabs. It should be constructed
                 }
         );
 
+=item cssString
+
+A string containing the link to the tab-CascadingStyleSheet
+
+ default = extrasPath.'/tabs/tabs.css'
+	
 =back
 
 =cut
 
 sub new {
-	my ($class, $tabs) = @_;
+	my ($class, $tabs, $css);
+	$class = $_[0];
+	$tabs = $_[1];
+	$css = $_[2] || $session{config}{extrasURL}.'/tabs/tabs.css';
 	foreach my $key (keys %{$tabs}) {
 		$tabs->{$key}{form} = WebGUI::HTMLForm->new;
 	}
-	bless {	_submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>$tabs }, $class;
+	bless {	_submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>$tabs, _css=>$css }, $class;
 }
 
 
@@ -172,7 +181,7 @@ Returns an HTML string with all the necessary components to draw the tab form.
 sub print {
 	my $output = '
 		<script src="'.$session{config}{extrasURL}.'/tabs/tabs.js" type="text/javascript"></script>
-		<link href="'.$session{config}{extrasURL}.'/tabs/tabs.css" rel="stylesheet" rev="stylesheet" type="text/css">
+		<link href="'.$_[0]->{_css}.'" rel="stylesheet" rev="stylesheet" type="text/css">
 	';
 	$output .= $_[0]->{_form};
 	$output .= $_[0]->{_hidden};
