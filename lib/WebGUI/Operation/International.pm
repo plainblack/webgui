@@ -13,6 +13,7 @@ package WebGUI::Operation::International;
 use Exporter;
 use strict;
 use Tie::CPHash;
+use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -227,13 +228,14 @@ sub www_exportTranslation {
 
 #-------------------------------------------------------------------
 sub www_listInternationalMessages {
-        my ($output, $sth, $key, $p, $search, $status, %data, %list, $i, $missing, @row, $f, $outOfDate, $ok);
+        my ($output, $sth, $key, $p, $search, $status, %data, %list, $deprecated, $i, $missing, @row, $f, $outOfDate, $ok);
         tie %data, 'Tie::CPHash';
         if (WebGUI::Privilege::isInGroup(3)) {
                 %data = WebGUI::SQL->quickHash("select language from language where languageId=".$session{form}{lid});
                 $missing = '<b>'.WebGUI::International::get(596).'</b>';
                 $outOfDate = '<b>'.WebGUI::International::get(719).'</b>';
                 $ok = WebGUI::International::get(720);
+		$deprecated = WebGUI::International::get(723);
                 $output = '<h1>'.WebGUI::International::get(595).' ('.$data{language}.')</h1>';
 		$f = WebGUI::HTMLForm->new(1);
 		$f->hidden("op","listInternationalMessages");
@@ -250,34 +252,40 @@ sub www_listInternationalMessages {
                         $list{"z-".$data{namespace}."-".$data{internationalId}}{namespace} = $data{namespace};
                         $list{"z-".$data{namespace}."-".$data{internationalId}}{message} = $data{message};
                         $list{"z-".$data{namespace}."-".$data{internationalId}}{lastUpdated} = $data{lastUpdated};
-                        $list{"z-".$data{namespace}."-".$data{internationalId}}{missing} = 0;
+                        $list{"z-".$data{namespace}."-".$data{internationalId}}{status} = "deleted";
                 }
                 $sth->finish;
                 $sth = WebGUI::SQL->read("select * from international where languageId=1".$search);
                 while (%data = $sth->hash) {
 			$key = $data{namespace}."-".$data{internationalId};
                         unless ($list{"z-".$key}) {
-                                $list{"a-".$key}{missing} = 1;
                                 $list{"a-".$key}{namespace} = $data{namespace};
                                 $list{"a-".$key}{id} = $data{internationalId};
+                                $list{"a-".$key}{status} = "missing";
                         } else {
-				if ($list{"z-".$key}{lastUpdated} > $data{lastUpdated}) {
+				if ($list{"z-".$key}{lastUpdated} < $data{lastUpdated}) {
                                 	$list{"o-".$key} = $list{"z-".$key};
 					delete($list{"z-".$key});
-                                	$list{"o-".$key}{outOfDate} = 1;
+                                	$list{"o-".$key}{status} = "updated";
+				} else {
+                                	$list{"q-".$key} = $list{"z-".$key};
+					delete($list{"z-".$key});
+                                	$list{"q-".$key}{status} = "ok";
 				}
 			}
                 }
                 $sth->finish;
                 foreach $key (sort {$a cmp $b} keys %list) {
-			if ($list{$key}{outOfDate}) {
+			if ($list{$key}{status} eq "updated") {
 				$status = $outOfDate;
-			} elsif ($list{$key}{missing}) {
+			} elsif ($list{$key}{status} eq "missing") {
 				$status = $missing;
+			} elsif ($list{$key}{status} eq "deleted") {
+				$status = $deprecated;
 			} else {
 				$status = $ok;
 			}
-			$row[$i] = '<tr valign="top"><td>'.$status."</td><td>"
+			$row[$i] = '<tr valign="top"><td nowrap="1">'.$status."</td><td>"
 				.editIcon('op=editInternationalMessage&lid='.$session{form}{lid}
                 		.'&iid='.$list{$key}{id}.'&namespace='.$list{$key}{namespace}.'&pn='.$session{form}{pn}
 				.'&missing='.$list{$key}{missing})."</td><td>".$list{$key}{namespace}."</td><td>"
