@@ -119,9 +119,6 @@ sub new {
 
 #-------------------------------------------------------------------
 sub www_edit {
-   return WebGUI::Privilege::insufficient()
-      unless WebGUI::Privilege::canEditPage();
-
    my $layout     = WebGUI::HTMLForm->new;
    my $privileges = WebGUI::HTMLForm->new;
    my $properties = WebGUI::HTMLForm->new;

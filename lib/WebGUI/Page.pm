@@ -228,7 +228,7 @@ sub canView {
         } elsif ($page{startDate} < WebGUI::DateTime::time() && $page{endDate} > WebGUI::DateTime::time() && WebGUI::Grouping::isInGroup($page{groupIdView})) {
                 return 1;
         } else {
-		return canEditPage($pageId);
+		return canEdit($pageId);
         }
 }
 

@@ -222,8 +222,8 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	# default editSave overruled to build & save the pageList for faster retrieval.
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
 	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	$self->SUPER::www_editSave();
 	my (%pages, $pageList);
 	my $searchRoot = $self->get("searchRoot");
