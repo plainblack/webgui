@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "1.3.0";
+our $VERSION = "1.3.1";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001 Plain Black Software.
@@ -92,7 +92,7 @@ sub _displayAdminBar {
 #-------------------------------------------------------------------
 sub _loadWidgets {
 	my (@files, $file, $use, @widget, $i);
-	opendir (DIR,"../lib/WebGUI/Widget") or WebGUI::ErrorHandler::fatalError("Can't open widget directory!");
+	opendir (DIR,$session{config}{webguiRoot}."/lib/WebGUI/Widget") or WebGUI::ErrorHandler::fatalError("Can't open widget directory!");
 	@files = readdir(DIR);
 	foreach $file (@files) {
         	if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
@@ -110,7 +110,7 @@ sub _loadWidgets {
 #-------------------------------------------------------------------
 sub page {
 	my ($preContent, $postContent, $widgetType, $function, $functionOutput, $widget, @availableWidgets, @widgetList, $sth, $httpHeader, $header, $footer, $content, $operationOutput, $operation, $adminBar);
-	WebGUI::Session::open();
+	WebGUI::Session::open($_[0]);
 	$preContent = '<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td valign="top" class="content">';
 	$postContent = '</td></tr></table>';
 	@availableWidgets = _loadWidgets();

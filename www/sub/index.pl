@@ -10,10 +10,10 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-my $webguiRoot = "..";
+my $webguiRoot = "../..";
 
 BEGIN {
-        unshift (@INC, "../lib");
+        unshift (@INC, "../../lib");
 }
 
 #-----------------DO NOT MODIFY BELOW THIS LINE--------------------

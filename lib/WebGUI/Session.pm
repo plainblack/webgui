@@ -102,7 +102,8 @@ sub open {
 	tie %USER, 'Tie::CPHash';
 	tie %VARS, 'Tie::CPHash';
 	tie %PAGE, 'Tie::CPHash';
-        $config = new Data::Config '../etc/WebGUI.conf';
+	$CONFIG{webguiRoot} = $_[0];
+        $config = new Data::Config $CONFIG{webguiRoot}.'/etc/WebGUI.conf';
         foreach ($config->param) {
                 $CONFIG{$_} = $config->param($_);
         }

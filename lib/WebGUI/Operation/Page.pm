@@ -233,9 +233,11 @@ sub www_movePageUp {
 
 #-------------------------------------------------------------------
 sub www_pastePage {
-        my ($output);
+        my ($output, $nextSeq);
+		($nextSeq) = WebGUI::SQL->quickArray("select max(sequenceNumber)+1 from page where parentId=$session{page}{pageId}",$session{dbh});
         if (WebGUI::Privilege::canEditPage()) {
-                WebGUI::SQL->write("update page set parentId=$session{page}{pageId} where pageId=$session{form}{pageId}",$session{dbh});
+                WebGUI::SQL->write("update page set parentId=$session{page}{pageId}, sequenceNumber='$nextSeq' where pageId=$session{form}{pageId}",$session{dbh});
+		_reorderPages($session{page}{pageId});
                 return "";
         } else {
                 return WebGUI::Privilege::insufficient();

@@ -31,14 +31,15 @@ sub www_viewHelp {
 	$output .= '<p><b>See Also:';
         $sth = WebGUI::SQL->read("select helpId, action, object from help where object='$help{object}' and action<>'$help{action}' order by action",$session{dbh});
         while (@data = $sth->array) {
-                $output .= ' <a href="'.$session{page}{url}.'?op=viewHelp&hid='.$data[0].'">'.$data[1].' '.$data[2].'</a>';
+                $output .= ' <a href="'.$session{page}{url}.'?op=viewHelp&hid='.$data[0].'">'.$data[1].' '.$data[2].'</a> &middot;';
         }
         $sth->finish;
         $sth = WebGUI::SQL->read("select helpId, action, object from help where helpId in ($help{seeAlso}) order by action",$session{dbh});
         while (@data = $sth->array) {
-                $output .= ' <a href="'.$session{page}{url}.'?op=viewHelp&hid='.$data[0].'">'.$data[1].' '.$data[2].'</a>';
+                $output .= ' <a href="'.$session{page}{url}.'?op=viewHelp&hid='.$data[0].'">'.$data[1].' '.$data[2].'</a> &middot;';
         }
         $sth->finish;
+        $output .= ' <a href="'.$session{page}{url}.'?op=viewHelpIndex">Help Index</a>';
         return $output;
 }
 

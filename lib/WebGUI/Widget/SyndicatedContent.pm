@@ -12,6 +12,7 @@ package WebGUI::Widget::SyndicatedContent;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::DateTime;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -79,7 +80,7 @@ sub www_edit {
                 $output .= '<tr><td class="formDescription">URL to RSS File</td><td>'.WebGUI::Form::text("rssUrl",20,2048,$data{rssUrl}).'</td></tr>';
                 $output .= '<tr><td></td><td>'.WebGUI::Form::submit("save").'</td></tr>';
 		$output .= '<tr><td><br></td></tr>';
-                $output .= '<tr><td class="formDescription">Last Fetched</td><td>'.WebGUI::DateTime($data{lastFetched},"%m/%d/%y %h:%n%p").'</td></tr>';
+                $output .= '<tr><td class="formDescription">Last Fetched</td><td>'.WebGUI::DateTime::epochToHuman($data{lastFetched},"%m/%d/%y %h:%n%p").'</td></tr>';
                 $output .= '<tr><td class="formDescription">Current Content</td><td>'.$data{content}.'</td></tr>';
                 $output .= '</table></form>';
                 return $output;
@@ -104,7 +105,7 @@ sub www_view {
 	my (%data, $output, $widgetId);
 	tie %data, 'Tie::CPHash';
 	$widgetId = shift;
-	%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=$widgetId",$session{dbh});
+	%data = WebGUI::SQL->quickHash("select * from widget,SyndicatedContent where widget.widgetId=SyndicatedContent.widgetId and widget.widgetId=$widgetId",$session{dbh});
 	if (defined %data) {
 		if ($data{displayTitle} == 1) {
 			$output = "<h1>".$data{title}."</h1>";

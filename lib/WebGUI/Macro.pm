@@ -18,7 +18,7 @@ use WebGUI::Session;
 sub process {
         my (@files, $file, $cmd, $output);
 	$output = $_[0];
-        opendir (DIR,"../lib/WebGUI/Macro") or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
+        opendir (DIR,$session{config}{webguiRoot}."/lib/WebGUI/Macro") or WebGUI::ErrorHandler::fatalError("Can't open macro directory!");
         @files = readdir(DIR);
         foreach $file (@files) {
                 if ($file ne "." && $file ne ".." && $file =~ /\.pm/) {
@@ -31,7 +31,7 @@ sub process {
         }
         closedir(DIR);
   #---script url---
-  # slash hash to go last because it is also used as the end character.
+  # slash has to go last because it is also used as the end character for configurable widgets 
         if ($output =~ /\^\//) {
                 $output =~ s/\^\//$session{env}{SCRIPT_NAME}/g;
         }
