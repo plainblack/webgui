@@ -179,12 +179,6 @@ sub process {
 		}
 		if ($session{config}{macros}{$searchString} ne "") {
       			my $cmd = "WebGUI::Macro::".$session{config}{macros}{$searchString}."::process";
-			open(DEBUG, ">> /tmp/macro");
-			print DEBUG "-------------------\n";
-			print DEBUG "searchString: $searchString\n";
-			print DEBUG "params: $params\n";
-			print DEBUG "macro: $macro\n\n";
-			close(DEBUG);
 			my $result = eval{&$cmd($params)};
 			if ($@) {
 				WebGUI::ErrorHandler::warn("Processing failed on macro: $macro: ".$@);
