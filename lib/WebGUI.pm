@@ -114,8 +114,8 @@ sub page {
 						.moveDownIcon('func=moveDown&wid='.${$wobject}{wobjectId})
 						.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
 						.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
-						.copyIcon('func=copy&wid='.${$wobject}{wobjectId})
 						.cutIcon('func=cut&wid='.${$wobject}{wobjectId})
+						.copyIcon('func=copy&wid='.${$wobject}{wobjectId})
 						.'<br>';
 				}
                                 if (${$wobject}{namespace} eq "WobjectProxy") {
