@@ -44,6 +44,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::file({name=>"image"});
  $html = WebGUI::Form::formHeader();
  $html = WebGUI::Form::filterContent({value=>"javascript"});
+ $html = WebGUI::Form::float({name=>"distance"});
  $html = WebGUI::Form::group({name=>"groupToPost"});
  $html = WebGUI::Form::hidden({name=>"wid",value=>"55"});
  $html = WebGUI::Form::hiddenList({name=>"wid",value=>"55",options=>\%options});
@@ -542,6 +543,58 @@ sub formHeader {
 
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 float ( hashRef )
+
+Returns an floating point field.
+
+=over
+
+=item name
+
+The name field for this form element.
+
+=item value
+
+The default value for this form element.
+
+=item maxlength
+
+The maximum number of characters to allow in this form element.  Defaults to 11.
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item size
+
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
+
+=back
+
+=cut
+
+sub float {
+        my $value = $_[0]->{value} || 0;
+        my $size = $_[0]->{size} || 11;
+        my $output = '<script language="JavaScript" src="'.$session{config}{extrasURL}.'/floatCheck.js"></script>';
+	$output .= text({
+		name=>$_[0]->{name},
+		value=>$value,
+		size=>$size,
+		extras=>'onKeyUp="doFloatCheck(this.form.'.$_[0]->{name}.')" '.$_[0]->{extras},
+		maxlength=>$_[0]->{maxlength}
+		});
+	return $output;
+}
+
+
+
+
 #-------------------------------------------------------------------
 
 =head2 group ( hashRef ] )
@@ -843,23 +896,12 @@ sub integer {
         my ($output, $size, $value);
         $value = $_[0]->{value} || 0;
         $size = $_[0]->{size} || 11;
-        $output = '<script language="JavaScript">function doNumCheck(field) {
-		var valid = "0123456789"
-		var ok = "yes";
-		var temp;
-		for (var i=0; i<field.value.length; i++) {
-			temp = "" + field.value.substring(i, i+1);
-			if (valid.indexOf(temp) == "-1") ok = "no";
-		}
-		if (ok == "no") {
-			field.value = field.value.substring(0, (field.value.length) - 1);
-		}
-		} </script>';
+        $output = '<script language="JavaScript" src="'.$session{config}{extrasURL}.'/numberCheck.js"></script>';
 	$output .= text({
 		name=>$_[0]->{name},
 		value=>$value,
 		size=>$size,
-		extras=>'onKeyUp="doNumCheck(this.form.'.$_[0]->{name}.')"'.$_[0]->{extras},
+		extras=>'onKeyUp="doNumCheck(this.form.'.$_[0]->{name}.')" '.$_[0]->{extras},
 		maxlength=>$_[0]->{maxlength}
 		});
 	return $output;

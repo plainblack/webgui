@@ -44,6 +44,7 @@ Package that makes HTML forms typed data and significantly reduces the code need
  $f->fieldType("dataType",\%supportedTypes,"Type of Field");
  $f->file("image","Image to Upload");
  $f->filterContent("filterThisContent","Filter This Content");
+ $f->float("distance","5.1");
  $f->group("groupToPost","Who can post?");
  $f->hidden("wid","55");
  $f->HTMLArea("description","Description");
@@ -659,6 +660,78 @@ sub filterContent {
         }
         $self->{_data} .= $output;
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 float ( name [ label, value, maxlength, extras, subtext, size, uiLevel ] )
+
+Adds an integer row to this form.
+
+=over
+
+=item name
+
+The name field for this form element.
+
+=item label
+
+The left column label for this form row.
+
+=item value
+
+The default value for this form element.
+
+=item maxlength
+
+The maximum number of characters to allow in this form element.  Defaults to 11.
+
+=item extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=item subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=item size
+
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
+
+=item uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=back
+
+=cut
+
+sub float {
+	my ($output);
+	my ($self, @p) = @_;
+	my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel) =
+		rearrange([qw(name label value maxlength extras subtext size uiLevel)], @p);
+	if (_uiLevelChecksOut($uiLevel)) {
+		$output = WebGUI::Form::float({
+			"name"=>$name,
+			"value"=>$value,
+			"maxlength"=>$maxlength,
+			"size"=>$size,
+			"extras"=>$extras
+			});
+		$output .= _subtext($subtext);
+		$output = $self->_tableFormRow($label,$output);
+	} else {
+		$output = WebGUI::Form::hidden({
+			"name"=>$name,
+			"value"=>$value
+			});
+	}
+	$self->{_data} .= $output;
+} 
+
 
 
 #-------------------------------------------------------------------
