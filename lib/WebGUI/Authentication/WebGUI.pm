@@ -72,8 +72,8 @@ sub registrationForm {
 sub registrationFormSave {
 	my $authInfo = "\n\n".WebGUI::International::get(50).": ".$session{form}{"authWebGUI.username"}."\n"
         	.WebGUI::International::get(51).": ".$session{form}{'authWebGUI.identifier'}."\n\n";
-        WebGUI::MessageLog::addEntry($_[0],"",WebGUI::International::get(870),$session{setting}{welcomeMessage}.$authInfo);
 	adminFormSave($_[0]);
+        WebGUI::MessageLog::addEntry($_[0],"",WebGUI::International::get(870),$session{setting}{welcomeMessage}.$authInfo);
 }
 
 #-------------------------------------------------------------------

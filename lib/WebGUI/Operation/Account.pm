@@ -180,11 +180,11 @@ sub www_createAccountSave {
 		$u = WebGUI::User->new("new");
 		$u->username($username);
 		$u->authMethod($session{setting}{authMethod});
-		WebGUI::Authentication::registrationFormSave($u->userId);
 		$u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
 		foreach $fieldName (keys %{$profile}) {
 			$u->profileField($fieldName,${$profile}{$fieldName});
 		}
+		WebGUI::Authentication::registrationFormSave($u->userId);
                 WebGUI::Session::start($u->userId);
 		_logLogin($u->userId,"success");
 		system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
