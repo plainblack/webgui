@@ -115,7 +115,7 @@ sub www_view {
 		($replies) = WebGUI::SQL->quickArray("select count(*) from discussion 
 			where rid=$data->{messageId} and status='Approved'");
 		$replies--;
-		@message_loop = ({
+		push(@message_loop,{
 			"last.url" => WebGUI::URL::page('func=showMessage&mid='.$last[0].'&wid='.$_[0]->get("wobjectId")),
 			"last.subject" => substr(WebGUI::HTML::filter($last[3],'all'),0,30),
 			"last.date" => epochToHuman($last[1]),
