@@ -35,7 +35,7 @@ sub duplicate {
 	$pageId = $_[1] || $data{pageId};
         $newWidgetId = create($pageId,$namespace,$data{title},$data{displayTitle},
 		$data{description},$data{processMacros},$data{templatePosition});
-	WebGUI::SQL->write("insert into MessageBoard values ($newWidgetId, $data{groupToPost}, '$data{messagesPerPage}', '$data{editTimeout}')");
+	WebGUI::SQL->write("insert into MessageBoard values ($newWidgetId, $data{groupToPost}, '$data{messagesPerPage}', '$data{editTimeout}', $data{groupToModerate})");
 	WebGUI::Discussion::duplicate($_[0],$newWidgetId);
 }
 

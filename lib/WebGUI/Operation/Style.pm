@@ -94,7 +94,7 @@ sub www_deleteStyle {
 
 #-------------------------------------------------------------------
 sub www_deleteStyleConfirm {
-        if ($session{form}{sid} < 26 || $session{form}{sid} > 0) {
+        if ($session{form}{sid} < 26 && $session{form}{sid} > 0) {
 		return WebGUI::Privilege::vitalComponent();
         } elsif (WebGUI::Privilege::isInGroup(5)) {
                 WebGUI::SQL->write("delete from style where styleId=".$session{form}{sid});
