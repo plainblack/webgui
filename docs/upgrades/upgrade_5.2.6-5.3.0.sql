@@ -609,6 +609,7 @@ delete from help where helpId=67 and namespace='WebGUI';
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (67, 'WebGUI', 968, 969, '65,WebGUI;');
 delete from help where helpId=4 and namespace='DataForm';
 insert into help (helpId,namespace,titleId,bodyId,seeAlso) values (4, 'DataForm', 88, 89, '1,DataForm;');
+update userProfileField set dataType='date' where fieldName='birthdate';
 
 
 
