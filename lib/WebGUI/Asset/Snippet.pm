@@ -87,7 +87,7 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
-                -label=>WebGUI::International::get('snippet', 'Asset'),
+                -label=>WebGUI::International::get('snippet', 'Snippet'),
                 -label=>"Snippet",
                 -value=>$self->getValue("snippet")
                 );
