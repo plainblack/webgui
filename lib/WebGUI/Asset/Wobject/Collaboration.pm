@@ -62,6 +62,7 @@ sub appendPostListTemplateVars {
 		for (my $i=0;$i<=$post->get("rating");$i++) {
 			push(@rating_loop,{'rating_loop.count'=>$i});
 		}
+		my $lastPost = $post->WebGUI::Asset::Post::Thread::getLastPost();
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
                         "id"=>$post->getId,
@@ -77,6 +78,13 @@ sub appendPostListTemplateVars {
                         "timeUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%Z"),
                         "userProfile.url"=>$post->getPosterProfileUrl,
                         "user.isVisitor"=>$post->get("ownerUserId") eq "1",
+                        "lastReply.url"=>$lastPost->getUrl(),
+                        "lastReply.title"=>$lastPost->get("title"),
+                        "lastReply.user.isVisitor"=>$lastPost->get("ownerUserId") eq "1",
+                        "lastReply.username"=>$lastPost->get("username"),
+                        "lastReply.userProfile.url"=>$lastPost->WebGUI::Asset::Post::getPosterProfileUrl(),
+                        "lastReply.dateSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%z"),
+                        "lastReply.timeSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%Z"),
         		"edit.url"=>$post->getEditUrl,
 			'controls'=>$controls,
 			'inDateRange'=>$inDateRange,

@@ -126,9 +126,17 @@ sub getIcon {
 	return $session{config}{extrasURL}.'/assets/thread.gif';
 }
 
+
 #-------------------------------------------------------------------
-sub getName {
-        return "Thread";
+sub getLastPost {
+	my $self = shift;
+	my $lastPostId = $self->get("lastPostId");
+	my $lastPost = 0;
+	if ($lastPostId) {
+		$lastPost = WebGUI::Asset->new($lastPostId);
+	}
+	return $lastPost if ($lastPost);
+	return $self;	
 }
 
 #-------------------------------------------------------------------
@@ -161,6 +169,11 @@ Formats the url to lock a thread.
 sub getLockUrl {
 	my $self = shift;
 	$self->getUrl("func=lock");
+}
+
+#-------------------------------------------------------------------
+sub getName {
+        return "Thread";
 }
 
 #-------------------------------------------------------------------
