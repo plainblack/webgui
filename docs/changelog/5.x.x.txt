@@ -3,6 +3,7 @@
    used instead of a CPHash for database access.  (Thanks to Steve Simms.)
  - When copying a Wobject to a clipboard, the previous location was
    not stored correctly.  (Thanks to Steve Smms.)
+ - Fixed a problem in the forum that showed up under Postgres.
 
 
 5.5.4

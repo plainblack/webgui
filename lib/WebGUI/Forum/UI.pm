@@ -907,13 +907,13 @@ sub forumProperties {
                 $f->integer(
 			-name=>"karmaPerPost",
 			-label=>WebGUI::International::get(541),
-			-value=>$forum->get("karmaPerPost"),
+			-value=>($forum->get("karmaPerPost") || 0),
 			-uiLevel=>7
 			);
         } else {
                 $f->hidden(
 			-name=>"karmaPerPost",
-			-value=>$forum->get("karmaPerPost")
+			-value=>($forum->get("karmaPerPost") || 0)
 			);
         }
         $f->group(
