@@ -396,14 +396,14 @@ sub www_view {
 	$maxDate = $maxDate || WebGUI::DateTime::time();
 	($junk,$maxDate) = WebGUI::DateTime::dayStartEnd($maxDate);
 	my $monthCount = WebGUI::DateTime::monthCount($minDate,$maxDate);
-	unless ($session{form}{pn}) {
+	unless ($session{form}{calPn}) {
 		$flag = 1;
 		if ($_[0]->get("defaultMonth") eq "current") {
-			$session{form}{pn} = round(WebGUI::DateTime::monthCount($minDate,WebGUI::DateTime::time())/$_[0]->getValue("paginateAfter"));
+			$session{form}{calPn} = round(WebGUI::DateTime::monthCount($minDate,WebGUI::DateTime::time())/$_[0]->getValue("paginateAfter"));
 		} elsif ($_[0]->get("defaultMonth") eq "last") {
-			$session{form}{pn} = WebGUI::DateTime::monthCount($minDate,$maxDate);
+			$session{form}{calPn} = WebGUI::DateTime::monthCount($minDate,$maxDate);
 		} else {
-			$session{form}{pn} = 1;
+			$session{form}{calPn} = 1;
 		}
 	}
 
@@ -413,7 +413,7 @@ sub www_view {
 	$var{"addevent.label"} = WebGUI::International::get(20,$_[0]->get("namespace"));
 	my @monthloop;
 	for (my $i=1;$i<=$monthCount;$i++) {
-	#	if ($session{form}{pn} == ($i)) {
+	#	if ($session{form}{calPn} == ($i)) {
 			my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
 			my ($monthStart, $monthEnd) = WebGUI::DateTime::monthStartEnd($thisMonth);
 			my @thisMonthDate = WebGUI::DateTime::epochToArray($thisMonth);
@@ -514,7 +514,7 @@ sub www_view {
 	#	}
 	#	$row[$i-1] = "page";
 	}
-	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),$_[0]->get("paginateAfter"));
+	$p = WebGUI::Paginator->new(WebGUI::URL::page("func=view&wid=".$_[0]->get("wobjectId")),$_[0]->get("paginateAfter"),"calPn);
 	$p->setDataByArrayRef(\@monthloop);
 	$var{month_loop} = $p->getPageData;
 	$p->appendTemplateVars(\%var);

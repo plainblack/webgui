@@ -15,6 +15,7 @@
  	  expires timeout and before the scheduler has cleaned them up.
 	- Macros are now negated on user profile fields and authentication
 	  fields.
+ - Bugfix [ 930425 ] Bug in EventsCalender, causing other wobjects to fail.
  
 
 
