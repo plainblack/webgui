@@ -17,6 +17,7 @@
  - fix [ 1164202 ] Data Form field types are not sticky when re-edited
  - fix [ 1149529 ] 6.3 CVS: Content positions don't save and  
        [ 1149801 ] page position not maintained (Martin Kamerbeek)
+ - fix [ 1165373 ] sort templates into folders by namespace under ImportNode
 
 
 6.5.2
