@@ -391,7 +391,7 @@ sub www_deleteEvent {
 sub www_deleteEventConfirm {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	if ($session{form}{rid} ne "") {
+	if (($session{form}{rid} ne "") and ($session{form}{rid} ne "0")) {
 		my $where = "EventsCalendar_event.EventsCalendar_recurringId=".quote($session{form}{rid});
 		my $series = $self->getParent->getLineage(["descendants"],{returnObjects=>1, 
 		joinClass=>"WebGUI::Asset::Event",whereClause=>$where});
