@@ -16,6 +16,7 @@ use Tie::CPHash;
 use WebGUI::ErrorHandler;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Operation;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -232,16 +233,16 @@ sub page {
 		$httpHeader = WebGUI::Session::httpHeader();
 		WebGUI::Session::close();
 		return $httpHeader.$operationOutput.$wobjectOutput;
+	} elsif ($operationOutput ne "") {
+		$positions->{"template.position".1} = $operationOutput;
         } elsif ($session{page}{redirectURL}) {
-                $httpHeader = WebGUI::Session::httpRedirect($session{page}{redirectURL});
-		WebGUI::Session::close();
-		return $httpHeader;
+                $httpHeader = WebGUI::Session::httpRedirect(WebGUI::Macro::process($session{page}{redirectURL}));
+                WebGUI::Session::close();
+                return $httpHeader;
         } elsif ($session{header}{redirect} ne "") {
                 $httpHeader = $session{header}{redirect};
                 WebGUI::Session::close();
                 return $httpHeader;
-	} elsif ($operationOutput ne "") {
-		$positions->{"template.position".1} = $operationOutput;
 	} elsif ($wobjectOutput ne "") {
 		$positions->{"template.position".1} = $wobjectOutput;
 	} else {
