@@ -12,16 +12,16 @@ package WebGUI::Macro::Snippet;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Collateral;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
 	my (@param, $temp);
         @param = WebGUI::Macro::getParams($_[0]);
-	($temp) = WebGUI::SQL->quickArray("select parameters from collateral where name=".quote($param[0]));
-	return $temp;
+	my $collateral = WebGUI::Collateral->find($param[0]);
+	return $collateral->get("parameters");
 }
 
 

@@ -19,12 +19,11 @@ eval " use Image::Magick; "; $hasImageMagick=0 if $@;
 
 use Exporter;
 use strict;
-use WebGUI::Attachment;
+use WebGUI::Collateral;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Node;
 use WebGUI::Operation::Shared;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -37,7 +36,7 @@ use WebGUI::HTML;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&www_editCollateral &www_editCollateralSave &www_deleteCollateral 
 	&www_deleteCollateralConfirm &www_listCollateral 
-	&www_deleteFile &www_editCollateralFolder &www_editCollateralFolderSave &www_deleteCollateralFolder 
+	&www_deleteCollateralFile &www_editCollateralFolder &www_editCollateralFolderSave &www_deleteCollateralFolder 
 	&www_deleteCollateralFolderConfirm);
 
 #-------------------------------------------------------------------
@@ -74,9 +73,8 @@ sub www_deleteCollateral {
 #-------------------------------------------------------------------
 sub www_deleteCollateralConfirm {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
-	my $node = WebGUI::Node->new("images",$session{form}{cid});
-	$node->delete;
-	WebGUI::SQL->write("delete from collateral where collateralId=".$session{form}{cid});
+	my $collateral = WebGUI::Collateral->new($session{form}{cid});
+	$collateral->delete;
 	return www_listCollateral();
 }
 
@@ -108,10 +106,11 @@ sub www_deleteCollateralFolderConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteFile {
+sub www_deleteCollateralFile {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
-	WebGUI::SQL->write("update collateral set filename='' where collateralId=".$session{form}{cid});
-	return www_editCollateral();
+	my $collateral = WebGUI::Collateral->new($session{form}{cid});
+	$collateral->delete;
+	return www_editCollateral($collateral);
 }
 
 #-------------------------------------------------------------------
@@ -126,7 +125,8 @@ sub www_editCollateral {
 		$collateral->{parameters} = 'border="0"' if ($session{form}{type} eq "image");
 		$collateral->{thumbnailSize} = $session{setting}{thumbnailSize};
 	} else {
-		$collateral = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$session{form}{cid});
+		my $c = $_[1] || WebGUI::Collateral->new($session{form}{cid});
+		$collateral = $c->get;
 	}
 	$canEdit = ($collateral->{userId} == $session{user}{userId} || WebGUI::Privilege::isInGroup(3));
 	$folderId = $session{scratch}{collateralFolderId} || 0;
@@ -183,7 +183,7 @@ sub www_editCollateral {
 		if ($canEdit) {
 			if ($collateral->{filename} ne "") {
 				$f->readOnly(
-					-value=>'<a href="'.WebGUI::URL::page('op=deleteFile&cid='
+					-value=>'<a href="'.WebGUI::URL::page('op=deleteCollateralFile&cid='
 						.$collateral->{collateralId}).'">'.WebGUI::International::get(391).'</a>',
                         		-label=>WebGUI::International::get(773)
 					);
@@ -207,7 +207,7 @@ sub www_editCollateral {
 		if ($canEdit) {
                 	if ($collateral->{filename} ne "") {
                         	$f->readOnly(
-                                	-value=>'<a href="'.WebGUI::URL::page('op=deleteFile&cid='
+                                	-value=>'<a href="'.WebGUI::URL::page('op=deleteCollateralFile&cid='
 						.$collateral->{collateralId}).'">'.
                                         	WebGUI::International::get(391).'</a>',
                                 	-label=>WebGUI::International::get(384)
@@ -264,38 +264,25 @@ sub www_editCollateral {
 sub www_editCollateralSave {
 	return WebGUI::Privilege::insufficient unless (WebGUI::Privilege::isInGroup(4));
 	WebGUI::Session::setScratch("collateralFolderId",$session{form}{collateralFolderId});
-	my ($test, $file, $addFile, $thumbnailSize, $collateral);
-	$collateral = WebGUI::SQL->quickHashRef("select * from collateral where collateralId=".$session{form}{cid}) unless ($session{form}{cid} eq "new");	
-	$thumbnailSize = $session{form}{thumbnailSize} || $session{setting}{thumbnailSize};
-
+	my ($test, $file, $addFile);
+	my $collateral = WebGUI::Collateral->new($session{form}{cid});
+	$session{form}{thumbnailSize} ||= $session{setting}{thumbnailSize};
 	if ($session{form}{cid} eq "new") {
-		$session{form}{cid} = getNextId("collateralId");
-		WebGUI::SQL->write("insert into collateral (collateralId,userId,username,collateralType) 
-			values ($session{form}{cid},
-			$session{user}{userId}, ".quote($session{user}{username}).",
-			".quote($session{form}{collateralType}).")");
-	} elsif ($collateral->{thumbnailSize} != $thumbnailSize) {
-		$file = WebGUI::Attachment->new($collateral->{filename},"images", $session{form}{cid});
-		$file->createThumbnail($thumbnailSize);
+		$session{form}{cid} = $collateral->get("collateralId");
+	} elsif ($collateral->get("thumbnailSize") != $session{form}{thumbnailSize}) {
+		$collateral->createThumbnail($session{form}{thumbnailSize});
 	}
-       	$file = WebGUI::Attachment->new("","images",$session{form}{cid});
-       	$file->save("filename", $thumbnailSize);
-	if ($file->getFilename ne "") {
-       		$addFile = ", filename=".quote($file->getFilename);
-		$session{form}{name} = $file->getFilename if ($session{form}{name} eq "");
-	}
+       	$collateral->save("filename", $session{form}{thumbnailSize});
 	$session{form}{name} = "untitled" if ($session{form}{name} eq "");
         while (($test) = WebGUI::SQL->quickArray("select name from collateral 
-		where name=".quote($session{form}{name})." and collateralId<>$session{form}{cid}")) {
+		where name=".quote($session{form}{name})." and collateralId<>".$collateral->get("collateralId"))) {
         	if ($session{form}{name} =~ /(.*)(\d+$)/) {
                 	$session{form}{name} = $1.($2+1);
         	} elsif ($test ne "") {
                 	$session{form}{name} .= "2";
                 }
         }
-	WebGUI::SQL->write("update collateral set thumbnailSize=$thumbnailSize, name=".quote($session{form}{name}).", parameters="
-		.quote($session{form}{parameters}).", collateralFolderId=$session{form}{collateralFolderId}, dateUploaded="
-		.time()." $addFile where collateralId=$session{form}{cid}");
+	$collateral->set($session{form});
 	$session{form}{collateralType} = "";
 	return www_listCollateral();
 }

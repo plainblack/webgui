@@ -11,20 +11,15 @@ package WebGUI::Macro::ThumbnailLinker;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
-use WebGUI::Attachment;
+use WebGUI::Collateral;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, %data, $image, $output);
-	tie %data, 'Tie::CPHash';
-        @param = WebGUI::Macro::getParams($_[0]);
-	%data = WebGUI::SQL->quickHash("select filename,collateralId from collateral where name='$param[0]'");
-	$image = WebGUI::Attachment->new($data{filename},"images",$data{collateralId});
-	$output = '<a href="'.$image->getURL.'"><img src="'.$image->getThumbnail.
+        my @param = WebGUI::Macro::getParams($_[0]);
+	my $collateral = WebGUI::Collateral->find($param[0]);
+	my $output = '<a href="'.$collateral->getURL.'"><img src="'.$collateral->getThumbnail.
 		'" border="0"></a><br><b>'.$param[0].'</b><p>';
 	return $output;
 }

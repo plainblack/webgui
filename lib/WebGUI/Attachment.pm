@@ -40,6 +40,8 @@ Package WebGUI::Attachment
 
 Package to manipulate WebGUI Attachments.
 
+NOTE: It is typically not recommended to use this package directly, especially when building wobjects, unless you have special needs. The attachments system has been superceded by the collateral management system. See WebGUI::Collateral for details.
+
 =head1 SYNOPSIS
 
  use WebGUI::Attachment;

@@ -11,20 +11,15 @@ package WebGUI::Macro::i_imageNoTags;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
-use WebGUI::Attachment;
+use WebGUI::Collateral;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, $image, %data);
-	tie %data, 'Tie::CPHash';
-        @param = WebGUI::Macro::getParams($_[0]);
-	%data = WebGUI::SQL->quickHash("select collateralId,filename from collateral where name=".quote($param[0]));
-	$image = WebGUI::Attachment->new($data{filename},"images",$data{collateralId});
-	return $image->getURL;
+        my @param = WebGUI::Macro::getParams($_[0]);
+	my $collateral = WebGUI::Collateral->find($param[0]);
+        return $collateral->getURL;
 }
 
 

@@ -11,21 +11,15 @@ package WebGUI::Macro::File;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
-use WebGUI::Attachment;
+use WebGUI::Collateral;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, $temp, %data, $file);
-	tie %data, 'Tie::CPHash';
-        @param = WebGUI::Macro::getParams($_[0]);
-	%data = WebGUI::SQL->quickHash("select collateralId,filename,name from collateral where name=".quote($param[0]));
-	$file = WebGUI::Attachment->new($data{filename},"images",$data{collateralId});
-	$temp = '<a href="'.$file->getURL.'"><img src="'.$file->getIcon.'" align="middle" border="0" /> '.$data{name}.'</a>'; 
-	return $temp;
+        my @param = WebGUI::Macro::getParams($_[0]);
+	my $collateral = WebGUI::Collateral->find($param[0]);
+	return '<a href="'.$collateral->getURL.'"><img src="'.$collateral->getIcon.'" align="middle" border="0" /> '.$collateral->get("name").'</a>'; 
 }
 
 1;
