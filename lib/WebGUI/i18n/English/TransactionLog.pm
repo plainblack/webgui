@@ -3,13 +3,13 @@ package WebGUI::i18n::English::TransactionLog;
 our $I18N = {
 	'cancel error' => {
 		message => q|An error has occurred while canceling the recurring transaction. Please contact the admin. Error: |,
-		lastUpdated => 0,
-		context => q|An error message that's shown when a subscription cancelation fails.|
+		lastUpdated => 1101752984,
+		context => q|An error message that's shown when a subscription cancellation fails.|
 	},
 
 	'cannot cancel' => {
 		message => q|You cannot cancel a non recurring transaction|,
-		lastUpdated => 0,
+		lastUpdated => 1101753015,
 		context => q|An error message that's shown when an attempt is made to cancel a non recurring transaction.|
 	},
 
@@ -17,7 +17,7 @@ our $I18N = {
 		message => q|The following template variables are available in this template:<br>
 <br>
 <b>errorMessage</b><br>
-A message with an error concerning the cancelation of recuuring payment.<br>
+A message with an error concerning the cancellation of recurring payment.<br>
 <br>
 <b>historyLoop</b><br>
 A loop containing the transactions in the transaction history. Within this loop these variables are also available:<br>
@@ -26,10 +26,10 @@ A loop containing the transactions in the transaction history. Within this loop 
 	The total amount of this transaction.<br>
 	<br>
 	<b>recurring</b><br>
-	A boolean that indicates wheter this is a recurring transaction or not.<br>
+	A boolean that indicates whether this is a recurring transaction or not.<br>
 	<br>
 	<b>canCancel</b><br>
-	A boolean value indicating wheter it's possible to cancel this transaction. This is only teh case with recurring payments that haven't been canceled yet.<br>
+	A boolean value indicating whether it's possible to cancel this transaction. This is only the case with recurring payments that haven't been canceled yet.<br>
 	<br>
 	<b>cancelUrl</b><br>
 	The URL to visit when you ant to cancel this recurring transaction.<br>
@@ -77,7 +77,7 @@ A loop containing the transactions in the transaction history. Within this loop 
 		The quantity in which this item is bought.<br>
 	</blockquote>
 </blockquote>|,
-		lastUpdated => 0,
+		lastUpdated => 1101753027,
 		context => q|The body of the help page of the purchase history template.|
 	},
 	'help purchase history template title' => {
