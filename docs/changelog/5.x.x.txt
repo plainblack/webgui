@@ -1,3 +1,8 @@
+5.5.5
+ - Fixed a bug in AdminBar's clipboard code where a standard hash was
+   used instead of a CPHash for database access.  (Thanks to Steve Simms.)
+
+
 5.5.4
  - Bugfix [ 849210 ] Login Redirect should filter out the "logout" operation
  - Bugfix 859816 : DataForm - security issues. Tnx Gabor for reporting.
