@@ -11,8 +11,8 @@ package Hourly::TrashExpiredContent;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Asset;
 use WebGUI::DateTime;
-use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -21,13 +21,12 @@ sub process {
 	my $offset = $session{config}{TrashExpiredContent_offset};
 	if ($offset ne "") {
 		my $epoch = time()-(86400*$offset);
-		my $sth = WebGUI::SQL->read("select pageId from page where endDate<".$epoch);
-		while (my ($pageId) = $sth->array) {
-			my $page = WebGUI::Page->new($pageId);
-			$page->delete;
+		my $sth = WebGUI::SQL->read("select assetId,className from asset where endDate<".$epoch);
+		while (my ($assetId, $class) = $sth->array) {
+			my $asset = WebGUI::Asset->newByDynamicClass($assetId,$class);
+			$asset->trash;
 		}
 		$sth->finish;
-		WebGUI::SQL->write("update wobject set pageId=3, endDate=endDate+31536000 where endDate<".$epoch);
 	}
 }
 

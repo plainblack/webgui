@@ -12,43 +12,21 @@ package Hourly::DeleteExpiredTrash;
 
 
 use strict;
+use WebGUI::Asset;
 use WebGUI::DateTime;
-use WebGUI::Page;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
 	if ($session{config}{DeleteExpiredTrash_offset} ne "") {
-		my (%properties, $base, $extended, $b, $w, $cmd, $purgeDate, $a, $pageId);
-		tie %properties, 'Tie::CPHash';
-
-		$purgeDate = (WebGUI::DateTime::time()-(86400*$session{config}{DeleteExpiredTrash_offset}));
-
-		# Delete wobjects
-		$b = WebGUI::SQL->read("select * from wobject where pageId=3 and bufferDate<" . $purgeDate);
-		while ($base = $b->hashRef) {
-			$extended = WebGUI::SQL->quickHashRef("select * from ".$base->{namespace}."
-				where wobjectId=".quote($base->{wobjectId}));
-			%properties = (%{$base}, %{$extended});
-			$cmd = "WebGUI::Wobject::".$properties{namespace};
-			$w = $cmd->new(\%properties);
-			WebGUI::ErrorHandler::audit("purging expired wobject ". $base->{wobjectId} ." from trash");
-			$w->purge;
-
+		my $expireDate = (time()-(86400*$session{config}{DeleteExpiredTrash_offset}));
+		my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' and lastUpdated <".$expireDate);
+		while (my ($id, $class) = $sth->array) {
+			my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+			$asset->purge;
 		}
-		$b->finish;
-
-		# Delete pages and all subpages
-		$a = WebGUI::SQL->read("select pageId from page where parentId=3 and bufferDate<" . $purgeDate);
-		while (($pageId) = $a->array) {
-			WebGUI::ErrorHandler::audit("purging expired page ". $pageId ." from trash");
-			WebGUI::Operation::Trash::_recursePageTree($pageId);
-			WebGUI::Operation::Trash::_purgeWobjects($pageId);
-			my $page = WebGUI::Page->new($pageId);
-			$page->purge;
-		}
-		$a->finish;
+		$sth->finish;
 	}
 }
 

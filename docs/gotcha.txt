@@ -28,6 +28,10 @@ save you many hours of grief.
 	still being upgraded. Each site will have a maintenance 
 	message displayed until its upgrade is complete.
 
+ * The EmptyTrash scheduler plugin has been removed since there's no
+	need for it with the more useful DeleteExpiredTrash module in
+	place.
+
  * This upgrade process will run for a very long time and output a
 	lot of debug information which will be useful if something
 	goes wrong. You may wish to pipe the debug info to a log

@@ -18,12 +18,10 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
+	return ""; # disabled for the time being
 	my $epoch = WebGUI::DateTime::time();
-	my $a = WebGUI::SQL->read("select forumId,archiveAfter,masterForumId from forum");
+	my $a = WebGUI::SQL->read("select assetId,archiveAfter,masterForumId from forum");
 	while (my $forum = $a->hashRef) {
-		if ($forum->{masterForumId}) {
-			($forum->{archiveAfter}) = WebGUI::SQL->quickArray("select archiveAfter from forum where masterForumId=".quote($forum->{masterForumId}));
-		}
 		my $archiveDate = $epoch - $forum->{archiveAfter};
 		my $b = WebGUI::SQL->read("select forumThreadId from forumThread where forumId=".quote($forum->{forumId})." and lastPostDate<$archiveDate");
 		while (my ($threadId) = $b->array) {
