@@ -423,7 +423,7 @@ sub www_view {
 			where wobjectId=".$_[0]->get("wobjectId"));
 	}
 	$minDate = $minDate || WebGUI::DateTime::time();
-	($minDate,$junk) = WebGUI::DateTime::dayStartEnd($minDate);
+	($minDate,$junk) = WebGUI::DateTime::monthStartEnd($minDate);
 	if ($_[0]->get("endMonth") eq "last") {
 		($maxDate) = WebGUI::SQL->quickArray("select max(endDate) from EventsCalendar_event where 
 			wobjectId=".$_[0]->get("wobjectId"));	
