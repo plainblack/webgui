@@ -52,8 +52,6 @@ to WebGUI, but who's work has made WebGUI possible:
 
 Perl.................................Larry Wall / O'Reilly
 
-HTML Area............................interactivetools.com
-
 Convert::ASN1........................Graham Barr
 
 Data::Config.........................Sébastien Aperghis-Tramoni
@@ -68,6 +66,8 @@ HTTP::BrowserDetect..................Lee Semel
 
 Net::LDAP............................Graham Barr
 
+Parse::PlainConfig...................Arthur Corliss
+
 Tie::CPHash..........................Christopher J. Madsen
 
 Tie::IxHash..........................Gurusamy Sarathy
@@ -77,6 +77,8 @@ XML::RSSLite.........................Jerrad Pierce
 
 Midas................................The Mozilla Development Team
                                      Mike Kaply
+
+HTML Area............................interactivetools.com
 
 Classic Rich Edit....................Bratta
 
