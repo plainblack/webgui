@@ -32,6 +32,7 @@ Contributing Translators.............Natalia Almazova
                                      Jose Caneira
                                      Emiliano Grilli
                                      Ehab Heikal
+                                     Bart Jol / ProcoliX
                                      Mattias Kunkel / WERU AG
                                      Andreas Ljunggren
                                      Ricardo Markiewicz
