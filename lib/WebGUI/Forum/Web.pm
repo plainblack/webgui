@@ -86,6 +86,23 @@ sub _getPostTemplateVars {
 	$var->{'post.subject.label'} = WebGUI::International::get(229);
         $var->{'post.subject'} = WebGUI::HTML::filter($post->get("subject"),"none");
         $var->{'post.message'} = WebGUI::HTML::filter($post->get("message"),$forum->get("filterPosts"));
+	if ($post->get("contentType") eq "mixed") {
+		unless ($var->{'post.message'} =~ /\<div/ig || $var->{'post.message'} =~ /\<br/ig || $var->{'post.message'} =~ /\<p/ig) {
+                	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
+        	}
+	} elsif ($post->get("contentType") eq "text") {
+               	$var->{'post.message'} =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
+               	$var->{'post.message'} =~ s/ /&nbsp;/g;
+               	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
+	} elsif ($post->get("contentType") eq "code") {
+               	$var->{'post.message'} =~ s/&/&amp;/g;
+               	$var->{'post.message'} =~ s/\</&lt;/g;
+               	$var->{'post.message'} =~ s/\>/&gt;/g;
+               	$var->{'post.message'} =~ s/\n/\<br \/\>/g;
+               	$var->{'post.message'} =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
+               	$var->{'post.message'} =~ s/ /&nbsp;/g;
+               	$var->{'post.message'} = '<div style="font-family: fixed;">'.$var->{'post.message'}.'</div>';
+	}
         if ($forum->get("allowReplacements")) {
                 my $sth = WebGUI::SQL->read("select pattern,replaceWith from forumReplacement");
                 while (my ($pattern,$replaceWith) = $sth->array) {
@@ -192,7 +209,7 @@ sub viewForum {
 			$last = WebGUI::Forum::Post->new($thread->{lastPostId});
 		}
 		my @rating_loop;
-		for (my $i=0;$i>=$thread->{rating};$i++) {
+		for (my $i=0;$i<=$thread->{rating};$i++) {
 			push(@rating_loop,{'thread.rating_loop.count'=>$i});
 		}
 		push(@thread_loop,{
@@ -289,6 +306,7 @@ sub www_post {
 		action=>$callback
 		});
 	my $defaultSubscribeValue = 0;
+	my $contentType = "mixed";
 	if ($var->{isReply}) {
 		my $reply = WebGUI::Forum::Post->new($session{form}{parentId});
 		return WebGUI::Privilege::insufficient unless ($reply->getThread->getForum->canPost);
@@ -342,10 +360,12 @@ sub www_post {
 			name=>"forumPostId",
 			value=>$post->get("forumPostId")
 			});
+		$contentType = $post->get("contentType");
 	}
 	$var->{'contentType.label'} = WebGUI::International::get(1007);
 	$var->{'contentType.form'} = WebGUI::Form::contentType({
-		name=>'contentType'
+		name=>'contentType',
+		value=>[$contentType]
 		});
 	$var->{isModerator} = $forum->isModerator;
 	$var->{allowReplacements} = $forum->get("allowReplacements");
@@ -388,12 +408,12 @@ sub www_postSave {
 	my $postId = $session{form}{forumPostId};
 	my %postData = (
 		message=>$session{form}{message},
-		subject=>$session{form}{subject}
+		subject=>$session{form}{subject},
+                contentType=>$session{form}{contentType}
 		);
 	my %postDataNew = (
 		userId=>$session{user}{userId},
-		username=>($session{form}{visitorName} || $session{user}{alias}),
-                contentType=>$session{form}{contentType}
+		username=>($session{form}{visitorName} || $session{user}{alias})
 		);
 	if ($session{form}{parentId} > 0) { # reply
 		%postData = (%postData, %postDataNew);
