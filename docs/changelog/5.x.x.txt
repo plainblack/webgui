@@ -23,6 +23,8 @@
  - Bugfix [ 893203 ] IO::Zlib not getting installed
  - Bugfix [ 893556 ] TabForm bug: uiLevels not working
  - Bugfix [ 894855 ] users cannot delete from message board
+ - Added the Polish translation. (Thanks to Indigo-Profit-Hosting.)
+ - Added an expires flag to HTTP header when prevent proxy cache is turned on.
 
 
 

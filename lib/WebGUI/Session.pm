@@ -319,11 +319,16 @@ sub httpHeader {
 	if ($session{header}{filename} && $session{header}{mimetype} eq "text/html") {
 		$session{header}{mimetype} = "application/octet-stream";
 	}
+	if ($session{setting}{preventProxyCache}) {
+		$session{header}{expires} = "-1d";
+	}
 	return $session{cgi}->header( 
-		-type => $session{header}{mimetype}.'; charset='.$session{header}{charset},
-		-cookie => $session{header}{cookie}, 
+		-type => $session{header}{mimetype},
+		-charset => $session{header}{charset},
 		-status => $session{header}{status},
-		-attachment => $session{header}{filename}
+		-cookie => $session{header}{cookie}, 
+		-attachment => $session{header}{filename},
+		-expires => $session{header}{expires}
 		);
 }
 
