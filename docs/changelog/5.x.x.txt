@@ -1,3 +1,8 @@
+5.5.3
+ - Lowercase file extension in importCollateral.pl while determinating file
+   type.
+
+
 5.5.2
  - Fixed a whole slew of bugs in the forums introduced in the last version.
  - Fixed a bug in the reply.url variable in the USS submission where template didn't get updated to reflect the new forum system.
