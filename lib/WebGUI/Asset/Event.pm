@@ -355,7 +355,7 @@ sub view {
 #        $var{"next.url"} = WebGUI::URL::page("func=viewEvent&wid=".$self->get("wobjectId")."&eid=".$id) if ($id);
 	$var{description} = $event->getValue("description");
 #	my $where = "eventscalendar.type=2";
-#	my $kiddos = $self->getLineageWhere(["children"],{returnObjects=>1,joinClass=>"WebGUI::Asset::Wobject::EventsCalendar",whereClause=>$where});
+#	my $kiddos = $self->getLineage(["children"],{returnObjects=>1,joinClass=>"WebGUI::Asset::Wobject::EventsCalendar",whereClause=>$where});
 #	my $tabform = WebGUI::TabForm->new();
 #	#let's try to create a template variable that is a tabform of agendas.
 #	foreach my $agenda (@{$kiddos}) {
@@ -393,7 +393,7 @@ sub www_deleteEventConfirm {
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	if ($session{form}{rid} ne "") {
 		my $where = "EventsCalendar_Event.EventsCalendar_recurringId=".quote($session{form}{rid});
-		my $series = $self->getParent->getLineageWhere(["descendants"],{returnObjects=>1, 
+		my $series = $self->getParent->getLineage(["descendants"],{returnObjects=>1, 
 		joinClass=>"WebGUI::Asset::Event",whereClause=>$where});
 		foreach my $trashedEvent (@{$series}) {
 			$trashedEvent->trash;
