@@ -50,30 +50,6 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
-
-#-------------------------------------------------------------------
-sub www_deleteClipboardItem {
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-        my ($output);
-	my $help;
-	if ($session{form}{wid} ne "") {
-        	$help = "wobject delete";
-	} elsif ($session{form}{pageId} ne "") {
-        	$help = "page delete";
-	}
-        $output .= WebGUI::International::get(956).'<p>';
-	if ($session{form}{wid} ne "") {
-        	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteClipboardItemConfirm&wid='
-			.$session{form}{wid}) . '">'.WebGUI::International::get(44).'</a>';
-	} elsif ($session{form}{pageId} ne "") {
-        	$output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteClipboardItemConfirm&pageId='
-			.$session{form}{pageId}) . '">'.WebGUI::International::get(44).'</a>';
-	}
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page().'">'
-		.WebGUI::International::get(45).'</a></div>';
-        return _submenu($output,"42",$help);
-}
-
 #-------------------------------------------------------------------
 sub www_deleteClipboardItemConfirm {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
