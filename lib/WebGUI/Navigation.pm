@@ -418,6 +418,14 @@ sub build {
 			foreach my $property (@interestingPageProperties) {
 				$pageData->{"page.".$property} = $page->get($property);
 			}
+
+			# Some information about my mother
+			if(ref($page->mother)) {
+				foreach (qw(title urlizedTitle parentId pageId)) {
+					$pageData->{"page.mother.$_"} = $page->mother->get($_);
+				}
+			}
+
 			# Store $pageData in page_loop. Mind the order.
 			if ($self->{_reverse}) {
 				unshift(@{$var->{page_loop}}, $pageData);
