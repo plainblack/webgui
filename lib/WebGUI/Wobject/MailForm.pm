@@ -163,9 +163,10 @@ sub www_editSave {
 #-------------------------------------------------------------------
 sub www_editField {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Privilege::canEditPage());
-    my ($output, %field, $f, %fieldTypes, %fieldStatus);
+    my ($output, %field, $f, %fieldTypes, %fieldStatus, %validation);
     tie %field, 'Tie::CPHash';
     tie %fieldTypes, 'Tie::IxHash';
+    tie %validation, 'Tie::IxHash';
 
 	%fieldStatus = ( 1 => WebGUI::International::get(4, $namespace),
 		2 => WebGUI::International::get(5, $namespace),
@@ -183,7 +184,13 @@ sub www_editField {
 		select => "Drop-Down Box",
 	);
 
-   	%fieldTypes; 
+	%validation = ( none 	=> "None",
+			notnull	=> "Not empty",
+			number 	=> "Number",
+			word	=> "Word char [a-zA-Z0-9_]",
+			email	=> "Valid E-mail address",
+	);
+
         %field = WebGUI::SQL->quickHash("select * from MailForm_field where MailForm_fieldId='$session{form}{fid}'");
         $output = helpIcon(2,$_[0]->get("namespace"));
         $output .= '<h1>'.WebGUI::International::get(20,$namespace).'</h1>';
@@ -193,11 +200,27 @@ sub www_editField {
         $f->hidden("fid",$session{form}{fid});
         $f->hidden("func","editFieldSave");
         $f->text("name",WebGUI::International::get(21,$namespace),$field{name});
+
+        $f->text(
+                -name=>"subtext",
+                -value=>$field{subtext},
+                -label=>"Subtext",
+                -subtext=>"Optional extra text"
+                );
+
         my $status = [ $field{status} ||= 3 ]; # make it modifiable by default
         $f->select("status",\%fieldStatus,WebGUI::International::get(22,$namespace),$status); 
         my $type = [ $field{type} ||= "text" ];
         $f->select("type",\%fieldTypes,WebGUI::International::get(23,$namespace),$type);
+	$f->select("validation",\%validation,"Input validation", [$field{validation} || "none"]);
 	$f->integer("width",WebGUI::International::get(8, $namespace),$field{width} || $_[0]->get("width") || 45);
+	$f->integer(
+                -name=>"rows",
+		-value=>$field{rows} || "",
+		-label=>WebGUI::International::get(27, $namespace),
+		-subtext=>WebGUI::International::get(28, $namespace),
+		);
+
         $f->textarea("possibleValues",WebGUI::International::get(24,$namespace),$field{possibleValues});
         $f->textarea("defaultValue",WebGUI::International::get(25,$namespace),$field{defaultValue});
         $f->yesNo("proceed",WebGUI::International::get(15,$namespace));
@@ -222,6 +245,9 @@ sub www_editFieldSave {
     		", possibleValues=".quote($session{form}{possibleValues}).
     		", defaultValue=".quote($session{form}{defaultValue}).
     		", width=".quote($session{form}{width}).
+    		", rows=".quote($session{form}{rows}).
+    		", validation=".quote($session{form}{validation}).
+    		", subtext=".quote($session{form}{subtext}).
     		" where MailForm_fieldId=$session{form}{fid}");
         if ($session{form}{proceed}) {
             $session{form}{fid} = "new";
@@ -334,37 +360,62 @@ sub _createField {
 
 	SWITCH: for ($data->{type}) {
 		/^text$/ && do {
-			# maxlength, extras, subtext
-			$f->text($name, $data->{name}, $data->{defaultValue}, 255, "", "", 
-                                 $data->{width} || $self->get("width"));
+			$f->text(
+				-name=>$name,
+				-label=>$data->{name},
+				-value=>$session{form}{$name} || $data->{defaultValue},
+				-maxlength=>255,
+				-size=>$data->{width} || $self->get("width"),
+				-subtext=>$data->{subtext},
+				);
 			last SWITCH;
 		};
 		/^email$/ && do {
-			# maxlength, extras, subtext
-			$f->email($name, $data->{name}, $data->{defaultValue}, 255, "", "", 
-				  $data->{width} || $self->get("width"));
+			$f->email(
+                                -name=>$name,
+                                -label=>$data->{name},
+                                -value=>$session{form}{$name} || $data->{defaultValue},
+                                -maxlength=>255,
+                                -size=>$data->{width} || $self->get("width"),
+                                -subtext=>$data->{subtext},
+                                );
 			last SWITCH;
 		};
 		/^url$/ && do {
-			# maxlength, extras, subtext
-			$f->url($name, $data->{name}, $data->{defaultValue}, 255, "", "", 
-				$data->{width} || $self->get("width"));
+                        $f->url(
+                                -name=>$name,
+                                -label=>$data->{name},
+                                -value=>$session{form}{$name} || $data->{defaultValue},
+                                -maxlength=>255,
+                                -size=>$data->{width} || $self->get("width"),
+                                -subtext=>$data->{subtext},
+                                );
 			last SWITCH;
 		};
 		/^textarea$/ && do {
-			# subtext, extras, wrap, rows, cols
-			$f->textarea($name, $data->{name}, $data->{defaultValue}, "", "", "", 10, 
-				     $data->{width} || $self->get("width") - 9);
+			$f->textarea(
+                                -name=>$name,
+                                -label=>$data->{name},
+                                -value=>$session{form}{$name} || $data->{defaultValue},
+                                -maxlength=>255,
+                                -size=>$data->{width} || $self->get("width"),
+                                -subtext=>$data->{subtext},
+				-columns=>$data->{width} || $self->get("width") - 9,
+				-rows=>$data->{rows} || 9,
+                                );
 			last SWITCH;
 		};
 		/^date$/ && do {
-			# extras, subtext
-			$f->date($name, $data->{name}, $data->{defaultValue}, "", "", $data->{width} || 15); # use small size for a date box
+			$f->date(
+				-name=>$name,
+                                -label=>$data->{name},
+                                -value=>$session{form}{$name} || $data->{defaultValue},
+				-size=>$data->{width} || $self->get("width"),
+				-subtext=>$data->{subtext},
+				);
 			last SWITCH;
 		};
 		/^yesNo$/ && do {
-			# extras, subtext
-			# allow user to enter friendly yes/no for default
 			my $value;
 			if ($data->{defaultValue} =~ /yes/i) {
 				$value = 1;
@@ -373,14 +424,23 @@ sub _createField {
 			} else {
 				$value = 2;
 			}
-			$f->yesNo($name, $data->{name}, $value, "", "");
+			$f->yesNo(
+                                -name=>$name,
+                                -label=>$data->{name},
+                                -value=>$session{form}{$name} || $data->{defaultValue},
+				-subtext=>$data->{subtext},
+				);
 			last SWITCH;
 		};
 		/^checkbox$/ && do {
-			# checked, subtext, extras
-			# the value option is used for checking the box here
 			my $value = ($data->{defaultValue} =~ /checked/i) ? 1 : "";
-			$f->checkbox($name, $data->{name}, $value, "", "", "");
+			
+			$f->checkbox(
+                                -name=>$name,
+                                -label=>$data->{name},
+                                -value=>$session{form}{$name} || $data->{defaultValue},
+                                -subtext=>$data->{subtext},
+                                );
 			last SWITCH;
 		};
 		/^select$/ && do {
@@ -392,7 +452,13 @@ sub _createField {
 				s/\s+$//; # remove trailing spaces
 				$selectOptions{$_} = $_[0]->processMacros($_);
 			}
-			$f->select($name, \%selectOptions, $data->{name}, [$data->{defaultValue}], "", "", "", "");
+			$f->selectList(
+                                -name=>$name,
+				-options=>\%selectOptions,
+                                -label=>$data->{name},
+                                -value=>[$session{form}{$name}] || [$data->{defaultValue}],
+                                -subtext=>$data->{subtext},
+				);
 			last SWITCH;
 		};
 		/^checkList$/ && do {
@@ -404,12 +470,23 @@ sub _createField {
 				s/\s+$//; # remove trailing spaces
                                 $selectOptions{$_} = $_[0]->processMacros($_);
                         }
-			# put default values in array
-			foreach (split(/\n/, $data->{defaultValue})) {
-				s/\s+$//; # remove trailing spaces
-				push(@defaultValues, $_);
+			if ($session{form}{$name}) {
+				@defaultValues = $session{cgi}->param($name);
+			} else {
+	                        # put default values in array
+        	                foreach (split(/\n/, $data->{defaultValue})) {
+                	                s/\s+$//; # remove trailing spaces
+                        	        push(@defaultValues, $_);
+                        	}
 			}
-			$f->checkList($name, \%selectOptions, $data->{name}, \@defaultValues, $vertical);
+			$f->checkList(
+				-name=>$name,
+                                -options=>\%selectOptions,
+                                -label=>$data->{name},
+                                -value=>\@defaultValues,
+                                -subtext=>$data->{subtext},
+				-vertical=>$vertical
+				);
 			last SWITCH;
 		};
 		/^radioList$/ && do {
@@ -421,12 +498,23 @@ sub _createField {
                                 s/\s+$//; # remove trailing spaces
                                 $selectOptions{$_} = $_[0]->processMacros($_);
                         }
-                        # put default values in array
-                        foreach (split(/\n/, $data->{defaultValue})) {
-                                s/\s+$//; # remove trailing spaces
-                                push(@defaultValues, $_);
+                        if ($session{form}{$name}) {
+                                @defaultValues = $session{cgi}->param($name);
+                        } else {
+                                # put default values in array
+                                foreach (split(/\n/, $data->{defaultValue})) {
+                                        s/\s+$//; # remove trailing spaces
+                                        push(@defaultValues, $_);
+                                }
                         }
-                        $f->radioList($name, \%selectOptions, $data->{name}, \@defaultValues, $vertical);
+                        $f->radioList(
+                                -name=>$name,
+                                -options=>\%selectOptions,
+                                -label=>$data->{name},
+                                -value=>\@defaultValues,
+                                -subtext=>$data->{subtext},
+                                -vertical=>$vertical
+                                );
                         last SWITCH;
                 };
 
@@ -491,7 +579,7 @@ sub www_send {
 	}
 	
 	# create the message from all fields
-	my ($message, $sth, %data);
+	my ($message, $sth, %data, $error, $output);
 	$sth = WebGUI::SQL->read("select * from MailForm_field where wobjectId=".$_[0]->get("wobjectId")." order by sequenceNumber");
 	while (%data = $sth->hash) {
 		my $urlizedName = WebGUI::URL::urlize($data{name});
@@ -506,7 +594,7 @@ sub www_send {
 			my @values = $session{cgi}->param($urlizedName);
 			$value = join(", ",@values);
 		}
-		
+		$error .= $_[0]->_validate($value, $data{validation}, $data{name}); #Validate input
 		# store results
 		if ($_[0]->get("storeEntries")) {
 			WebGUI::SQL->write("insert into MailForm_entryData values ($entryId, ".$_[0]->get("wobjectId").", ".$data{sequenceNumber}.", ".quote($data{name}).", ".quote($value).")");
@@ -515,7 +603,11 @@ sub www_send {
 		$data{name} .= ":" unless ($data{name} =~ /:$/);
 		$message .= "$data{name} $value\n";
 	}
-	my $error;	
+	if ($error ne "") {
+		$output .= $error . $_[0]->www_view;
+		return $output;
+	}
+
 	my $to = $session{form}{toField};
 	if ($to =~ /\@/) {
 		# send a direct email if the To field is an email address
@@ -543,12 +635,36 @@ sub www_send {
 		}
 	}
 	
-	my $output = $_[0]->displayTitle;
+	$output = $_[0]->displayTitle;
 	$error = $@ if $@;
 	$output .= ($error || $_[0]->get("acknowledgement"))."<p>\n<a href=\"./$session{page}{urlizedTitle}\">".WebGUI::International::get(18, $namespace)."</a>";
 	return $output;
 }
 
+#-------------------------------------------------------------------
+sub _validate {
+	my ($self, $value, $validation, $fieldName) = @_;
+	
+	return "" if ($validation eq "none");
+
+	my %regex = ( notnull => qr/^.+$/,
+                      number  => qr/^[\d\.]+$/,
+                      word    => qr/^\w+$/,
+                      email   => qr/^\s*<?[^@<>]+@[^@.<>]+(?:\.[^@.<>]+)+>?\s*$/,
+        );
+	my %message = ( notnull => "&quot;$fieldName&quot; ".WebGUI::International::get(29,$namespace),
+			number 	=> "&quot;$fieldName&quot; ".WebGUI::International::get(30,$namespace),
+			word	=> "&quot;$fieldName&quot; ".WebGUI::International::get(31,$namespace),
+			email	=> "&quot;$value&quot; "    .WebGUI::International::get(32,$namespace),
+		);
+
+	if ($value !~ $regex{$validation}) {
+		return "<LI>".$message{$validation}."</LI>";
+	} 
+
+	return "";
+	
+}
 1;
 
 
