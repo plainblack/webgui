@@ -24,10 +24,12 @@ use WebGUI::User;
 sub grabReferral {
 	if ($session{user}{userId} != 1 && $session{user}{referringAffiliate} > 0) {
 		return "";
-	} elsif ($session{user}{userId} != 1 && $session{user}{referringAffiliate} == 0 && $session{scratch}{referringAffiliate} > 0) {
+	} elsif ($session{user}{userId} != 1 && (($session{user}{referringAffiliate} == 0 && $session{scratch}{referringAffiliate} > 0) || $session{form}{affiliateId} ne "")) {
 		my $u = WebGUI::User->new($session{user}{userId});
 		$u->referringAffiliate($session{scratch}{referringAffiliate});
-		WebGUI::Session::deleteScratch("referringAffiliate");
+	} elsif ($session{user}{userId} != 1) {
+		my $u = WebGUI::User->new($session{user}{userId});
+		$u->referringAffiliate(1);
 	} elsif ($session{form}{affiliateId} ne "") {
 		WebGUI::Session::setScratch("referringAffiliate",$session{form}{affiliateId});
 	}
