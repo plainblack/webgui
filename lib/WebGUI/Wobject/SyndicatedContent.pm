@@ -217,7 +217,7 @@ sub _get_rss_data {
                 }
                 
                 _strip_html($rss);
-                
+                $rss->{items} = [ $rss->{items} ] unless (ref $rss->{items} eq 'ARRAY');
                 _normalize_items($rss->{items});
                 
                 $cache->set(Storable::freeze($rss), 3600);

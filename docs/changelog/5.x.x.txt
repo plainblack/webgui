@@ -11,6 +11,8 @@
  - Fixed a bug in form processor that caused legal email addy's with funny
    characters to fail the check.
  - Bugfix [ 855228 ] word wrap not working when posting as text
+ - Bugfix [ 855632 ] SyndicatedContent crashs when rss contains only one item
+   (Thanks to Len Kranendonk)
 
 
 5.5.3
