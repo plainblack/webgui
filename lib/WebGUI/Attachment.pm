@@ -208,7 +208,7 @@ sub getIcon {
 	$icon = $session{setting}{lib}."/fileIcons/";
 	if (isIn($extension, qw(doc dot wri))) {
                 $icon .= "doc.gif";
-        } elsif (isIn($extension, qw(txt log config conf pm cnf readme))) {
+        } elsif (isIn($extension, qw(txt log sql config conf pm cnf readme))) {
                 $icon .= "txt.gif";
 	} elsif (isIn($extension, qw(xlt csv xls))) {
                 $icon .= "xls.gif";
