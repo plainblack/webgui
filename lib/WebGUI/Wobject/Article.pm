@@ -25,7 +25,6 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::URL;
 use WebGUI::Wobject;
-use WebGUI::PassiveProfiling;
 
 our @ISA = qw(WebGUI::Wobject);
 
