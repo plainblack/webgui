@@ -19,6 +19,7 @@ use WebGUI::Template;
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
+	my %var;
         if (my $collateral = WebGUI::Collateral->find($param[0])) {
                $var{'file.url'} = $collateral->getURL;
 		$var{'file.icon'} = $collateral->getIcon;

@@ -17,6 +17,7 @@
  - Fixed a typo in Forum/UI.pm
  - bugfix [ 996284 ] Compile error in macro.pm
  - bugfix [ 997918 ] Default value in profile not working
+ - bugfix [ 997916 ] Bug and solution in File.pm
 
 6.1.1
  - bugfix [ 991313 ] Manage Translations doesn't work
