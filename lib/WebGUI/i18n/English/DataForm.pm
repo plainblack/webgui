@@ -13,38 +13,65 @@ our $I18N = {
 
 	'71' => {
 		message => q|This wobject creates a simple multipurpose data-entry form.
-Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  You
+  You
 can add additional fields to the DataForm, create multiple tabs, or use the DataForm
 as a web form to email gateway.
-
+<p> Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  They also have these unique properties:
 <p>
-<b>Acknowledgment</b><br>
+<b>^International("16","DataForm");</b><br>
 This message will be displayed to the user after they submit their data..
 
 <p>
-<b>Mail entries?</b></br>
+<b>^International("74","DataForm");</b></br>
 If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
 they can't be edited by the user.
 <p>
 <b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.
 
 <p>
-<b>Template</b><br>
+<b>^International("913","WebGUI");</b><br>
 Choose a template for your form.
 
 <p>
-<b>Email Template</b><br>
+<b>^International("81","DataForm");</b><br>
 Choose a template for the data that will be sent via email.
 
 <p>
-<b>Acknowledgment Template</b><br>
+<b>^International("81","DataForm");</b><br>
 Choose a template that will be used to display the acknowledgment.
 
 <p>
-<b>List Template</b><br>
+<b>^International("87","DataForm");</b><br>
 Choose a template that will be used to display the list of stored records in this Data Form.
+
+<p>
+<b>^International("744","DataForm");</b><br>
+After creating the Data Form, you may either begin to add fields to it
+or to return to the page where the it was created.
+
+<p>The Data Form Wobject is special in that some of the controls for it
+are only available from the template.  Be sure to read the documentation
+for the Data Form Template and to include the variables that enable these
+functions:
+
+<p>
+<b>^International("76","DataForm");</b><br>
+Add a field to a Data Form.
+
+<p>
+<b>^International("105","DataForm");</b><br>
+Add a tab to a Data Form.
+
+<p>
+<b>^International("86","DataForm");</b><br>
+List all data that has been entered into the Data Form.
+
+<p>
+<b>^International("76","DataForm");</b><br>
+Export the data from the Data Form in tab deliniated format.
+
 |,
-		lastUpdated => 1106779440,
+		lastUpdated => 1110514269,
 	},
 
 	'editField-vertical-label' => {
@@ -96,60 +123,60 @@ Choose a template that will be used to display the list of stored records in thi
 		message => q|<p>You may add as many additional fields to your Data Form as you like.
 
 <p>
-<b>Tab</b><br>
+<b>^International("104","DataForm");</b><br>
 When the form has multiple tabs, defines which tab of the form that the
 field is displayed in.  Otherwise, all fields are displayed on the same
 page.
 
 <p>
-<b>Label</b><br>
+<b>^International("77","DataForm");</b><br>
 This is an informative text label to let the user know what this field represents.
 
 <p>
-<b>Subtext</b><br>
+<b>^International("102","DataForm");</b><br>
 An extension of the label, this is a description of what should go in the field or optional instructions for the field.
 
 <p>
-<b>Field Name</b><br>
+<b>^International("21","DataForm");</b><br>
 The name of this field.  It must be unique among all of the other fields on your form.
 
 <p>
-<b>Status</b><br>
+<b>^International("22","DataForm");</b><br>
 Hidden fields will not be visible to the user, but will be sent in the email. Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
 If you choose Hidden or Displayed, be sure to fill in a Default Value.
 
 <p>
-<b>Type</b><br>
+<b>^International("23","DataForm");</b><br>
 Choose the type of form element for this field.   This is also used
 to validate any input that the user may supply.
 
 <p>
-<b>Width</b><br>
+<b>^International("8","DataForm");</b><br>
 Set the number of characters wide this form field will be.
 
 <p>
-<b>Height</b><br>
+<b>^International("27","DataForm");</b><br>
 Set the number of characters tall this form field will be. Only used on textareas and HTMLAreas.
 
 <p>
-<b>Align vertical</b><br>
+<b>^International("editField-vertical-label","DataForm");</b><br>
 This property controls whether radio buttons and checklists are laid out horizontally or vertically.
 
 <p>
-<b>Extras</b><br>
+<b>^International("editField-extras-label","DataForm");</b><br>
 Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.
 
 <p>
-<b>Possible Values</b><br>
+<b>^International("24","DataForm");</b><br>
 This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.
 
 <p>
-<b>Default Value (optional)</b><br>
+<b>^International("25","DataForm");</b><br>
 Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".
 <p>
 
 |,
-		lastUpdated => 1106779843,
+		lastUpdated => 1110514660,
 	},
 
 	'16' => {

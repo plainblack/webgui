@@ -20,7 +20,11 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
-			}
+			},
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
 		]
 	},
 	'data form fields add/edit' => {
