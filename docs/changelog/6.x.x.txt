@@ -67,6 +67,7 @@
  - Changed page system to support multiple types of pages and to make URLs
    resources in WebGUI rather than tied specifically to content pages.
  - bugfix [ 1014236 ] Crash if only 1 wobject defined in webgui config (Leendert Bottelberghs).
+ - bugfix [ 1015267 ] Wobject drag & drop not working due to GUIDs (Leendert Bottelberghs).
 
 
 6.1.1
