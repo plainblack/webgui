@@ -51,6 +51,14 @@ delete from widget where namespace='Poll';
 alter table Poll change widgetId wobjectId int not null;
 alter table Poll_answer change widgetId wobjectId int not null;
 
+insert into wobject (wobjectId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, startDate, endDate) select widgetId, pageId, title, displayTitle, processMacros, description, dateAdded, addedBy, namespace, lastEdited, editedBy, templatePosition, sequenceNumber, dateAdded, 1336444487 from widget where namespace='LinkList';
+delete from widget where namespace='LinkList';
+alter table LinkList_link change widgetId wobjectId int not null;
+alter table LinkList change widgetId wobjectId int not null;
+
+
+
+
 
 delete from international where language='Svenska';
 INSERT INTO international VALUES (367,'WebGUI','Svenska','Bäst före'); 

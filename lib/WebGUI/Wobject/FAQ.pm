@@ -48,7 +48,8 @@ sub duplicate {
                 WebGUI::SQL->write("insert into FAQ_question values ($w, $newQuestionId, "
 			.quote($data{question}).", ".quote($data{answer}).", $data{sequenceNumber})");
         }
-        $sth->finish;}
+        $sth->finish;
+}
 
 #-------------------------------------------------------------------
 sub new {
@@ -164,7 +165,7 @@ sub www_editQuestion {
                 $f->hidden("func","editQuestionSave");
                 $f->textarea("question",WebGUI::International::get(5,$namespace),$question{question});
                 $f->HTMLArea("answer",WebGUI::International::get(6,$namespace),$question{answer});
-		$f->yesNo("proceed",WebGUI::International::get(1,$namespace),1);
+		$f->yesNo("proceed",WebGUI::International::get(1,$namespace));
 		$f->submit;
                 $output .= $f->print;
                 return $output;
