@@ -634,7 +634,8 @@ sub textarea {
 
 =head2 timeField ( name )
 
-Returns the number of seconds since 00:00:00 on a 24 hour clock.
+Returns the number of seconds since 00:00:00 on a 24 hour clock. Note, this will adjust for the user's time offset in the reverse manner that the form field
+adjusts for it in order to make the times come out appropriately.
 
 =over 
 
@@ -647,7 +648,7 @@ The name of the form variable to retrieve.
 =cut
 
 sub timeField {
-	return WebGUI::DateTime::timeToSeconds($session{form}{$_[0]});
+	return WebGUI::DateTime::timeToSeconds($session{form}{$_[0]}-($session{user}{timeOffset}*3600));
 }
 
 
