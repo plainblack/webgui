@@ -70,7 +70,7 @@ sub _recurseCrumbTrail {
         if ($data{assetId}) {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
-        if ($data{assetId} ne "PBasset000000000000001") {
+        if ($data{assetId} ne "PBasset000000000000001" && $data{menuTitle}) {
                 $output .= '<a class="crumbTrail" href="'.WebGUI::URL::gateway($data{url})
                         .'">'.$data{menuTitle}.'</a> &gt; ';
         }
