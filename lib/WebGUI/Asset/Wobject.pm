@@ -360,14 +360,6 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-sub view {
-	my $self = shift;
-	return "No view has been created for this wobject.";
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_createShortcut ( )
 
 Creates a shortcut (using the wobject proxy) of this wobject on the clipboard.

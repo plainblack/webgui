@@ -203,7 +203,7 @@ sub _get_rss_data {
 		if ($] >= 5.008 && $hasEncode) {
 			$xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
 			my $xmlEncoding = $1;
-			my $encoding = "UTF-8";
+			my $encoding = "utf8";
 			if (lc($xmlEncoding) ne lc($encoding)) {
 				eval {	from_to($xml, $xmlEncoding, $encoding) };
 				WebGUI::ErrorHandler::warn($@) if ($@);
@@ -361,7 +361,6 @@ sub view {
 	my $self = shift;
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
         my $maxHeadlines = $self->get("maxHeadlines") || 1000000;
-
         my @urls = split(/\s+/,$self->get("rssUrl"));        
         if (@urls == 1) {
                 return $self->_view_single_feed($maxHeadlines);
