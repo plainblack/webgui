@@ -18,6 +18,7 @@
  - Bugfix [ 930425 ] Bug in EventsCalender, causing other wobjects to fail.
  - Bugfix [ 925586 ] HttpProxy ignores javascript in <HEAD> (thanks to
    Nicklous Roberts).
+ - Added cacheTTL param to WSClient to tweak expiration of SOAP returns.
  
 
 
