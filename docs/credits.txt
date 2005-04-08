@@ -42,7 +42,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Sean Tu / WDI
                                      Madsen Wikholm
                                      Matt Wilson / Boomer Consulting
-                                     Gerald Yung
+                                     Gerald Young
 
 
 The following are people/companies who didn't directly contribute
