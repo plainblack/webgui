@@ -154,6 +154,10 @@ sub definition {
 			mailData=>{
 				defaultValue=>0,
 				fieldType=>"yesNo"
+				},
+			defaultView=>{
+				defaultValue=>0,
+				fieldType=>"integer"
 				}
 			}
 		});
@@ -220,6 +224,14 @@ sub getEditForm {
                 -label=>WebGUI::International::get(87,"Asset_DataForm"),
                 -afterEdit=>'func=edit'
                 );
+        WebGUI::ErrorHandler::debug("getValue defaultView: ". $self->getValue("defaultView"));
+	$tabform->getTab("display")->radioList(
+		-name=>"defaultView",
+                -options=>{ 0 => 'Data Form',
+                            1 => 'Data List' },
+		-label=>WebGUI::International::get('defaultView',"Asset_DataForm"),
+		-value=>$self->getValue("defaultView"),
+		);
 	$tabform->getTab("properties")->HTMLArea(
 		-name=>"acknowledgement",
 		-label=>WebGUI::International::get(16, "Asset_DataForm"),
@@ -730,7 +742,7 @@ sub www_editField {
 		-name=>"status",
 		-options=>\%fieldStatus,
 		-label=>WebGUI::International::get(22,"Asset_DataForm"),
-		-value=> [ $field{status} || "editable" ] ),
+		-value=> [ $field{status} || "editable" ] ,
 		); 
 	$f->fieldType(
 		-name=>"type",
