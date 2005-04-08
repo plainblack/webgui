@@ -120,7 +120,7 @@ sub getUserSearchForm {
 		);
 	$f->selectList(
 		-name=>"modifier",
-		-value=>([$session{scratch}{userSearchModifier}] || ["contains"]),
+		-value=>([$session{scratch}{userSearchModifier} || "contains"]),
 		-options=>{
 			startsWith=>WebGUI::International::get("starts with"),
 			contains=>WebGUI::International::get("contains"),

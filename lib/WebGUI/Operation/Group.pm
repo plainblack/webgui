@@ -116,7 +116,7 @@ sub getGroupSearchForm {
                 );
         $f->selectList(
                 -name=>"modifier",
-                -value=>([$session{scratch}{groupSearchModifier}] || ["contains"]),
+                -value=>([$session{scratch}{groupSearchModifier} || "contains"]),
                 -options=>{
                         startsWith=>WebGUI::International::get("starts with"),
                         contains=>WebGUI::International::get("contains"),

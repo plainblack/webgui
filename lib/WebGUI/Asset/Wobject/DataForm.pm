@@ -719,7 +719,7 @@ sub www_editField {
 		-name=>"tid",
 		-options=>$tab,
 		-label=>WebGUI::International::get(104,"Asset_DataForm"),
-		-value=>[ $field{DataForm_tabId}] || [0]
+		-value=>[ $field{DataForm_tabId} || 0 ]
 		); 
         $f->text(
                 -name=>"subtext",
@@ -730,7 +730,7 @@ sub www_editField {
 		-name=>"status",
 		-options=>\%fieldStatus,
 		-label=>WebGUI::International::get(22,"Asset_DataForm"),
-		-value=>[ $field{status} ] || [ "editable" ]
+		-value=> [ $field{status} || "editable" ] ),
 		); 
 	$f->fieldType(
 		-name=>"type",
