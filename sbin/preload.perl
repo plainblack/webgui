@@ -113,33 +113,33 @@ use WebGUI::User ();
 use WebGUI::Utility ();
 
 # help
-#use WebGUI::Help::Article ();
+#use WebGUI::Help::Asset_Article ();
 #use WebGUI::Help::Asset ();
+#use WebGUI::Help::Asset_DataForm ();
+#use WebGUI::Help::Asset_EventsCalendar ();
+#use WebGUI::Help::Asset_HttpProxy ();
+#use WebGUI::Help::Asset_IndexedSearch ();
+#use WebGUI::Help::Asset_MessageBoard ();
+#use WebGUI::Help::Asset_Poll ();
+#use WebGUI::Help::Asset_Product ();
+#use WebGUI::Help::Asset_SQLReport ();
+#use WebGUI::Help::Asset_Survey ();
+#use WebGUI::Help::Asset_SyndicatedContent ();
+#use WebGUI::Help::Asset_Collaboration ();
+#use WebGUI::Help::Asset_Shortcut ();
+#use WebGUI::Help::Asset_WSClient ();
 #use WebGUI::Help::AuthLDAP ();
 #use WebGUI::Help::AuthWebGUI ();
-#use WebGUI::Help::DataForm ();
-#use WebGUI::Help::EventsCalendar ();
-#use WebGUI::Help::HttpProxy ();
-#use WebGUI::Help::IndexedSearch ();
-#use WebGUI::Help::MessageBoard ();
-#use WebGUI::Help::Poll ();
-#use WebGUI::Help::Product ();
-#use WebGUI::Help::SQLReport ();
-#use WebGUI::Help::Survey ();
-#use WebGUI::Help::SyndicatedContent ();
-#use WebGUI::Help::Collaboration ();
 #use WebGUI::Help::WebGUI ();
-#use WebGUI::Help::Shortcut ();
-#use WebGUI::Help::WSClient ();
 
 # i18n
 use WebGUI::i18n::English ();
-use WebGUI::i18n::English::Article ();
-use WebGUI::i18n::English::Collaboration ();
 use WebGUI::i18n::English::Asset ();
+use WebGUI::i18n::English::Asset_Article ();
+use WebGUI::i18n::English::Asset_Collaboration ();
+use WebGUI::i18n::English::Asset_Navigation ();
 #use WebGUI::i18n::English::AuthLDAP ();
 use WebGUI::i18n::English::AuthWebGUI ();
-use WebGUI::i18n::English::Navigation ();
 use WebGUI::i18n::English::WebGUI ();
 use WebGUI::i18n::English::WebGUIProfile ();
 
