@@ -143,7 +143,7 @@ Assign extra things like javascript events to this form element.
 
 sub asset {
 	my $params = shift;
-	my $value = $params->{value} || $params->{defaultValue};
+	my $value = defined($params->{value}) ? $params->{value} : $params->{defaultValue};
 	my $name = $params->{name} || "asset";
 	my $asset = WebGUI::Asset->newByDynamicClass($value) || WebGUI::Asset->getRoot;
 	return hidden({
@@ -1399,7 +1399,7 @@ This will be used if no value is specified.
 sub radio {
 	my $params = shift;
         my $checkedText = ' checked="1"' if ($params->{checked});
-	my $value = $params->{value}||$params->{defaultValue};
+	my $value = defined($params->{value}) ? $params->{value} : $params->{defaultValue};
         return '<input type="radio" name="'.$params->{name}.'" value="'.$value.'"'.$checkedText.' '.$params->{extras}.' />';
 }
 
@@ -1440,7 +1440,7 @@ This will be used if no value is specified.
 sub radioList {
 	my $params = shift;
         my ($output, $key, $checked);
-	my $value = $params->{value} || $params->{defaultValue};
+	my $value = defined($params->{value}) ? $params->{value} : $params->{defaultValue};
         foreach $key (keys %{$params->{options}}) {
 		$checked = 0;
                 $checked = 1 if ($key eq $value);
