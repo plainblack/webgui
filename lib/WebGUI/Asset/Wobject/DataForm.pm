@@ -155,11 +155,6 @@ sub definition {
 				defaultValue=>0,
 				fieldType=>"yesNo"
 				},
-			defaultView=>{
-				defaultValue=>0,
-				fieldType=>"integer"
-				}
-			}
 		});
         return $class->SUPER::definition($definition);
 }
@@ -224,14 +219,6 @@ sub getEditForm {
                 -label=>WebGUI::International::get(87,"Asset_DataForm"),
                 -afterEdit=>'func=edit'
                 );
-        WebGUI::ErrorHandler::debug("getValue defaultView: ". $self->getValue("defaultView"));
-	$tabform->getTab("display")->radioList(
-		-name=>"defaultView",
-                -options=>{ 0 => 'Data Form',
-                            1 => 'Data List' },
-		-label=>WebGUI::International::get('defaultView',"Asset_DataForm"),
-		-value=>$self->getValue("defaultView"),
-		);
 	$tabform->getTab("properties")->HTMLArea(
 		-name=>"acknowledgement",
 		-label=>WebGUI::International::get(16, "Asset_DataForm"),
