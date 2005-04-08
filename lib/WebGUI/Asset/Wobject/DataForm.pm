@@ -775,7 +775,7 @@ sub www_editField {
         	$f->whatNext(
 			-options=>{
 				"editField"=>WebGUI::International::get(76,"Asset_DataForm"),
-				"viewAsset_DataForm"=>WebGUI::International::get(745,"DataForm")
+				"viewDataForm"=>WebGUI::International::get(745,"Asset_DataForm")
 				},
 			-value=>"editField"
 			);
