@@ -31,10 +31,10 @@ sub process {
         $var{'user.isVisitor'} = ($session{user}{userId} eq "1");
 	$var{'customText'} = $param[1];
 	$var{'customText'} =~ s/%(.*?)%/_createURL($1)/ge;
-	$var{'hello.label'} = WebGUI::International::get(48,'Macro_L_loginToggle');
+	$var{'hello.label'} = WebGUI::International::get(48,'Macro_L_loginBox');
 	$var{'logout.url'} = WebGUI::URL::page("op=auth&method=logout");
 	$var{'account.display.url'} = WebGUI::URL::page('op=auth&method=displayAccount');
-        $var{'logout.label'} = WebGUI::International::get(49,'Macro_L_loginToggle');
+        $var{'logout.label'} = WebGUI::International::get(49,'Macro_L_loginBox');
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
         if (index(lc($ENV{HTTP_USER_AGENT}),"msie") < 0) {
