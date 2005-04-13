@@ -150,9 +150,25 @@ Chances are if you like assets to be configured a certain way, then you'll find 
   },
 
 	'asset fields title' => {
-	    message => q|Common Asset Fields|,
+	    message => q|Asset, Common Fields|,
+	    lastUpdated => 1113357557,
+	},
+
+        'asset template body' => {
+                message => q|
+<p>This variable is inserted into every template:</p>
+<P><b>controls</b><BR>
+These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.</P>
+
+        |,
+        lastUpdated => 1113357523,
+  },
+
+	'asset template title' => {
+	    message => q|Asset Template Variables|,
 	    lastUpdated => 1100463645,
 	},
+
 
 	'asset' => {
 		message => q|Asset|,

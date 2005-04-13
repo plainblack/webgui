@@ -8,6 +8,17 @@ our $HELP = {
 		title => 'asset fields title',
 		body => 'asset fields body',
 		related => [
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		]
+	},
+
+	'asset template' => {
+		title => 'asset template title',
+		body => 'asset template body',
+		related => [
 		]
 	},
 
