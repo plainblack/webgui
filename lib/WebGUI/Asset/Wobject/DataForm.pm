@@ -338,7 +338,7 @@ sub getListTemplateVars {
 			"record.edit.url"=>$self->getUrl("func=view&entryId=".$record->{DataForm_entryId}),
 			"record.edit.icon"=>editIcon("func=view&entryId=".$record->{DataForm_entryId}, $self->getUrl),
 			"record.delete.url"=>$self->getUrl("func=deleteEntry&entryId=".$record->{DataForm_entryId}),
-			"record.delete.icon"=>deleteIcon("func=deleteEntry&entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"DataForm")),
+			"record.delete.icon"=>deleteIcon("func=deleteEntry&entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"Asset_DataForm")),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},
