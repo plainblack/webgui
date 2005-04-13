@@ -580,8 +580,7 @@ The URL to edit this record.
 <p>
 
 <b>record.edit.icon</b><br>
-An icon that can be used in conjuction with <b>record.edit.url</b> to allow
-this record to be edited.
+An icon and associated URL for editing this record.
 <p>
 
 <b>record.delete.url</b><br>
@@ -589,8 +588,7 @@ The URL to delete this record.
 <p>
 
 <b>record.delete.icon</b><br>
-An icon that can be used in conjuction with <b>record.delete.url</b> to allow
-this record to be deleted.
+An icon and associated URL for deleting this record.
 <p>
 
 <b>record.username</b><br>
@@ -634,7 +632,7 @@ A conditional indicating whether this field exists for the mail subsystem of the
 </blockquote>
 
 </blockquote>|,
-		lastUpdated => 1111076507,
+		lastUpdated => 1113368156,
 	},
 
 	'24' => {
@@ -787,7 +785,11 @@ A conditional indicating whether this field exists for the mail subsystem of the
         '745' => {
 		 message => q|Go back to the page.|,
 		 lastUpdated => 1035872437,
-        }
+        },
+        'defaultView' => {
+		 message => q|Default view|,
+		 lastUpdated => 1112929856,
+        },
 
 };
 
