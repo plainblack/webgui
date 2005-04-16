@@ -1,6 +1,6 @@
 //constructor for a new file upload control object.  The object generates file upload boxes based on user
 //input.  Each file upload input is named "file"  the control must be rendered in a form.  The
-//Worspace id is the id of the div in the html page to rener the control in.
+//Workspace id is the id of the div in the html page to render the control in.
 
 function FileUploadControl(workspaceId, imageArray) {
 
