@@ -36,12 +36,10 @@
 .scrollPanelUp {
 	position:absolute; 
 	top:40;
-	z-index: 100;
 }
 
 .scrollPanelDown {
 	position: absolute;
-	z-index: 100;
 }
 
 .slidePanel {
