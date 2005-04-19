@@ -34,7 +34,6 @@ This package contains utility methods for WebGUI's database link system.
  use WebGUI::DatabaseLink;
  $hashRef = WebGUI::DatabaseLink::getList();
  %databaseLink = WebGUI::DatabaseLink::get($databaseLinkId);
- %using = WebGUI::Databaselink::whatIsUsing($databaseLinkId);
  
  $dbLink = WebGUI::DatabaseLink->new($databaseLinkId);
  $dbh = $dbLink->dbh;
@@ -73,41 +72,6 @@ A valid databaseLinkId
 
 sub get {
 		return WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($_[0]));
-}
-
-#-------------------------------------------------------------------
-=head2 whatIsUsing ( databaseLinkId )
-
-Returns an array of hashrefs containing items which use a database link.  This method will
-need to be updated any time a new item starts using Database Links.
-
-=head3 databaseLinkId
-
-A valid databaseLinkId
-
-=cut
-
-sub whatIsUsing {
-	# get list of SQLReports
-	my $sql = 'select wobject.wobjectId, wobject.title, page.menuTitle, page.urlizedTitle from wobject, SQLReport, page '.
-		'where SQLReport.databaseLinkId = '.quote($_[0]).' and SQLReport.wobjectId = wobject.wobjectId '.
-		'and wobject.pageId = page.pageId';
-	my $sth = WebGUI::SQL->read($sql);
-	my @using;
-	while (my $data = $sth->hashRef()) {
-		push @using, $data;
-	}
-	$sth->finish;
-	
-	# get list of groups
-	$sql = 'select groupId, groupName from groups where databaseLinkId = '.quote($_[0]);
-	$sth = WebGUI::SQL->read($sql);
-	while (my $data = $sth->hashRef()) {
-		push @using, $data;
-	}
-	$sth->finish;
-	
-	return @using;
 }
 
 #-------------------------------------------------------------------

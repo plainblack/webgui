@@ -59,14 +59,15 @@ Returns a boolean indicating whether the user can view the current post.
 
 sub canView {
         my $self = shift;
-	if ($self->get("status") eq "approved" || $self->get("status") eq "archived") {
-		return 1;
-	} elsif ($self->get("status") eq "denied" && $self->canEdit) {
-		return 1;
-	} else {
-		return $self->SUPER::canView;
-	}
+        if (($self->get("status") eq "approved" || $self->get("status") eq "archived") && $self->getThread->getParent->canView) {
+                return 1;
+        } elsif ($self->get("status") eq "denied" && $self->canEdit) {
+                return 1;
+        } else {
+                $self->getThread->getParent->canEdit;
+        }
 }
+
 
 #-------------------------------------------------------------------
 
@@ -429,7 +430,6 @@ sub getTemplateVars {
 				});
 		}
 	}
-	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return \%var;
 }
 
@@ -608,6 +608,7 @@ sub notifySubscribers {
                 my $u = WebGUI::User->new($userId);
                 if ($lang{$u->profileField("language")}{message} eq "") {
                         $lang{$u->profileField("language")}{var} = $self->getTemplateVars($lang{$u->profileField("language")}{var});
+			$self->getThread->getParent->appendTemplateLabels($lang{$u->profileField("language")}{var});
 			$lang{$u->profileField("language")}{var}{url} = WebGUI::URL::getSiteURL().$self->getUrl;
                         $lang{$u->profileField("language")}{var}{'notify.subscription.message'} =
                                          WebGUI::International::get(875,"Asset_Post",$u->profileField("language"));
@@ -708,6 +709,30 @@ sub rate {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 setLastPost ( id, date )
+
+Sets the last reply of this thread.
+
+=head3 id
+
+The assetId of the most recent post.
+
+=head3 date
+
+The date of the most recent post.
+
+=cut
+
+sub setLastPost {
+        my $self = shift;
+        my $id = shift;
+        my $date = shift;
+        $self->update(lastPostId=>$id, lastPostDate=>$date);
+        $self->getParent->setLastPost($id,$date);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -777,6 +802,25 @@ sub setStatusPending {
 	}
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 trash
+
+Moves post to the trash and decrements reply counter on thread.
+
+=cut
+
+sub trash {
+        my $self = shift;
+        $self->SUPER::trash;
+        $self->getThread->decrementReplies if ($self->isReply);
+        if ($self->getThread->get("lastPostId") eq $self->getId) {
+                my $threadLineage = $self->getThread->get("lineage");
+                my ($id, $date) = WebGUI::SQL->quickArray("select assetId, dateSubmitted from Post where lineage like ".quote($threadLineage.'%')." and assetId<>".quote($self->getId)." order by dateSubmitted desc");
+                $self->getThread->setLastPost($id,$date);
+        }
+}
 
 #-------------------------------------------------------------------
 

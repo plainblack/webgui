@@ -181,7 +181,7 @@ sub view {
 		WebGUI::Style::setLink($session{config}{extrasURL}."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
 		$vars{"dragger.icon"} = WebGUI::Icon::dragIcon();
 		$vars{"dragger.init"} = '
-			<iframe id="dragSubmitter" style="display: none;"></iframe>
+			<iframe id="dragSubmitter" style="display: none;" src="'.$session{config}{extrasURL}.'/spacer.gif"></iframe>
 			<script>
 				dragable_init("'.$self->getUrl("func=setContentPositions&map=").'");
 			</script>

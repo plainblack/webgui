@@ -60,14 +60,6 @@ sub www_deleteDatabaseLink {
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
         my ($output);
         $output .= WebGUI::International::get(988).'<p>';
-        foreach my $using (WebGUI::DatabaseLink::whatIsUsing($session{form}{dlid})) {
-        	if ($using->{title}) {
-				$output .= '<li>'.WebGUI::International::get(1,'SQLReport').' <a href="'.WebGUI::URL::page('func=edit&wid='.$using->{wobjectId},$using->{urlizedTitle}).'">'
-					.$using->{title}.'</a> '.WebGUI::International::get(989).' <a href="'.WebGUI::URL::gateway($using->{urlizedTitle}).'">'.$using->{menuTitle}.'</a>.</li>';
-			} else {
-				$output .= '<li>'.'Group'.' <a href="'.WebGUI::URL::page('op=editGroup&gid='.$using->{groupId}).'">'.$using->{groupName}.'</a>.</li>';
-			}
-		}
         $output .= '<p><div align="center"><a href="'.
 		WebGUI::URL::page('op=deleteDatabaseLinkConfirm&dlid='.$session{form}{dlid})
 		.'">'.WebGUI::International::get(44).'</a>';
@@ -93,7 +85,9 @@ sub www_editDatabaseLink {
 	} else {
                	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($session{form}{dlid}));
 	}
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new(
+		-extras=>'autocomplete="off"'
+		);
         $f->hidden("op","editDatabaseLinkSave");
         $f->hidden("dlid",$session{form}{dlid});
 	$f->readOnly($session{form}{dlid},WebGUI::International::get(991));

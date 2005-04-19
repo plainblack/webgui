@@ -118,12 +118,11 @@
 }
 
 .am-grid-row {
-	color: #000;
+	color: #000000;
 }
 .am-grid-row-over {
 	background-color: #C0D2DA;
-	color: #000;
-	font-weight: bold;
+	color: #000000;
 }
 
 .am-grid-col-0 {
@@ -161,6 +160,7 @@
 	color: #3E697E;
 	font-family: "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
 	cursor: pointer;
+	font-size: 11px;
 }		
 	
 .am-crumbtrail-over {
@@ -168,6 +168,7 @@
 	font-family: "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
 	cursor: pointer;
 	text-decoration: underline;
+	font-size: 11px;
 }	
 
 .contextMenu{

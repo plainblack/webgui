@@ -85,7 +85,7 @@ sub getEditForm {
 		name=>"returnUrl",
 		value=>$session{form}{returnUrl}
 		});
-	my ($descendantsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
+	my ($descendantsChecked, $ancestorsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
 	my @assetsToInclude = split("\n",$self->getValue("assetsToInclude"));
 	my $afterScript;
 	foreach my $item (@assetsToInclude) {
@@ -94,6 +94,8 @@ sub getEditForm {
 		} elsif ($item eq "descendants") {
 			$descendantsChecked = 1;
 			$afterScript = "displayNavEndPoint = false;";
+		} elsif ($item eq "ancestors") {
+			$ancestorsChecked = 1;
 		} elsif ($item eq "siblings") {
 			$siblingsChecked = 1;
 		} elsif ($item eq "pedigree") {
@@ -118,7 +120,7 @@ sub getEditForm {
 	$tabform->getTab("properties")->readOnly(
 		-label=>"Relatives to Include",
 		-value=>WebGUI::Form::checkbox({
-				checked=>$selfChecked,
+				checked=>$ancestorsChecked,
 				name=>"assetsToInclude",
 				value=>"ancestors"
 				}).'Ancestors<br />'
@@ -265,16 +267,16 @@ sub view {
 	if ($self->get("startType") eq "specificUrl") {
 		$start = WebGUI::Asset->newByUrl($self->get("startPoint"));
 	} elsif ($self->get("startType") eq "relativeToRoot") {
-		unless (($self->get("startPoint")+1) >= $self->getLineageLength) {
-			$start = WebGUI::Asset->newByLineage(substr($session{asset}->get("lineage"),0, ($self->get("startPoint") + 1) * 6));
+		unless (($self->get("startPoint")+1) >= $current->getLineageLength) {
+			$start = WebGUI::Asset->newByLineage(substr($current->get("lineage"),0, ($self->get("startPoint") + 1) * 6));
 		}
 	} elsif ($self->get("startType") eq "relativeToCurrentUrl") {
 		if ($self->get("startPoint") < 0) { 
-			$start = WebGUI::Asset->newByLineage(substr($session{asset}->get("lineage"),0,
-				($session{asset}->getLineageLength - $self->get("startPoint") + 1) * 6
+			$start = WebGUI::Asset->newByLineage(substr($current->get("lineage"),0,
+				($current->getLineageLength - $self->get("startPoint") + 1) * 6
 				));
 		} elsif ($self->get("startPoint") > 0) { 
-			my $lineage = $session{asset}->getLineage;
+			my $lineage = $current->getLineage;
 			for (1..$self->get("startPoint")) {
 				$lineage .= $self->formatRank(1);
 			}

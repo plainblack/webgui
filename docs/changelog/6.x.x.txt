@@ -19,6 +19,39 @@
  - Fixed bugs in correctly setting default values in forms with anonymous arrays.
 
 
+6.5.6
+ - Fixed a bunch of mostly cosmetic issues with the commerce system.
+ - Fixed a bug in the navigation system that would cause it not to work in
+   operations using the user style.
+ - fix [ 1171109 ] crumbtrail showing
+ - fix [ 1176383 ] Commerce for International customers
+ - fix [ 1175400 ] Shortcut.pm - refers to WebGUI::metadata
+ - fix [ 1172769 ] htmlform.pm template -> manage button
+ - fix [ 1173970 ] Redirects in trash still function
+ - fix [ 1173720 ] recursive encrypt content doesn't work
+ - fix [ 1176573 ] runHourly.pl - DeleteExpiredEvents
+ - fix [ 1175455 ] posts can be viewed by users who are not in groupIdView
+ - fix [ 1182381 ] Package deployed to self infinitely recurses
+ - fix [ 1177456 ] metadata fields do not show up in getEditForms for any
+   asset
+ - fix [ 1182302 ] getAssetAdderLinks gets prototypes that are deleted.
+ - fix [ 1182285 ] "bold" when highlighted - really messy
+ - fix [ 1177536 ] redundancy - thread.pm 6.5.5 line 559
+ - fix [ 1177336 ] DatabaseLink::whatIsUsing is out of date
+ - fix [ 1177450 ] Layout's view method does not exclude subclasses of Layouts
+ - fix [ 1176724 ] edit existing database link - wrong username/password
+ - fix [ 1176663 ] fixUrl needs to remove slashes from end of URLs
+ - fix [ 1173560 ] copyList doesn't copyList
+ - fix [ 1183014 ] deletion of post does not update lastPostId for CS
+ - fix [ 1185507 ] gotcha.txt SetPerlVar , uploadAccessHandler wrong
+ - fix [ 1185279 ] IE/SSL "Admin mode" prompts for download of port 80
+   material
+ - Fixed a bug in navigation where ancestors would become checked whenever
+   self was also checked.
+ - fix [ 1181266 ] Navigation - relative to root fails at third level
+ - fix [ 1173779 ] editSave metadata property doesn't save type
+
+
 6.5.5
  - fix [ 1171569 ] add/edit sql report help link has wrong namespace
  - Fixed a bug in the collaboration system that caused replies to fail.

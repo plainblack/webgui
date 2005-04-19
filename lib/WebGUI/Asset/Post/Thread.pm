@@ -511,6 +511,27 @@ sub subscribe {
 
 #-------------------------------------------------------------------
 
+=head2 trash
+
+Moves thread to the trash and decrements reply counter on thread.
+
+=cut
+
+sub trash {
+        my $self = shift;
+        $self->SUPER::trash;
+        $self->getParent->decrementThreads;
+        if ($self->getParent->get("lastPostId") eq $self->getId) {
+                my $parentLineage = $self->getThread->get("lineage");
+                my ($id, $date) = WebGUI::SQL->quickArray("select assetId, dateSubmitted from Post where lineage like ".quote($parentLineage.'%')." and assetId<>".quote($self->getId)." order by dateSubmitted desc");
+                $self->getParent->setLastPost($id,$date);
+        }
+
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 unlock ( )
 
 Negates the lock method.

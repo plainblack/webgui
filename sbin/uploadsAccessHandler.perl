@@ -13,7 +13,7 @@ package WebGUI::UploadsAccessHandler;
 our $webguiRoot;
 
 BEGIN {
-	use Apache;
+	use Apache::ServerUtil;
 	my $s = Apache->server;
         $webguiRoot = $s->dir_config('WebguiRoot');
         unshift (@INC, $webguiRoot."/lib");
@@ -21,15 +21,15 @@ BEGIN {
 
 print "Starting WebGUI Uploads Access Handler\n";
 
+use Apache::RequestUtil;
 use strict;
-use Apache::Constants qw(:common);
 use CGI::Util qw/escape/;
 use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::URL;
 
 sub handler {
-	my $r = shift;
+	my $r = Apache->request;
 	if (-e $r->filename) {
 		my $path = $r->filename;
 		$path =~ s/^(\/.*\/).*$/$1/;
@@ -43,18 +43,18 @@ sub handler {
 			my @privs = split("\n",$fileContents);
 			unless ($privs[1] eq "7" || $privs[1] eq "1") {
 				WebGUI::Session::open($webguiRoot, $r->dir_config('WebguiConfig'));
-				my $cookie = $r->header_in('Cookie');
+				my $cookie = $r->headers_in->{Cookie} || '';
 				$cookie =~ s/wgSession\=(.*)/$1/;
 				$cookie = WebGUI::URL::unescape($cookie);
 				WebGUI::Session::refreshSessionVars($cookie);
-				return OK if ($session{user}{userId} eq $privs[0] || WebGUI::Grouping::isInGroup($privs[1]) || WebGUI::Grouping::isInGroup($privs[2]));	
+				return Apache::OK if ($session{user}{userId} eq $privs[0] || WebGUI::Grouping::isInGroup($privs[1]) || WebGUI::Grouping::isInGroup($privs[2]));	
 				WebGUI::Session::close();
 				return 401;
 			}
 		}
-		return OK;
+		return Apache::OK;
 	} else {
-		return NOT_FOUND;
+		return Apache::NOT_FOUND;
 	}
 }
 

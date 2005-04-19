@@ -1945,8 +1945,8 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 	},
 
 	'988' => {
-		message => q|Are you certain you wish to delete this database link?  The following items are using this link and will no longer work if you delete it:|,
-		lastUpdated => 1056151382
+		message => q|Are you certain you wish to delete this database link?|,
+		lastUpdated => 1116151382
 	},
 
 	'35' => {
@@ -3287,11 +3287,6 @@ You can search users based on username and email address. You can do partial sea
 	'952' => {
 		message => q|Clipboard Date|,
 		lastUpdated => 1052850265
-	},
-
-	'989' => {
-		message => q|on page|,
-		lastUpdated => 1056151382
 	},
 
 	'1071' => {

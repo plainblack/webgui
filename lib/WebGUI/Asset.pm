@@ -419,6 +419,7 @@ The fieldId to be deleted.
 =cut
 
 sub deleteMetaDataField {
+	my $self = shift;
 	my $fieldId = shift;
 	WebGUI::SQL->beginTransaction;
         WebGUI::SQL->write("delete from metaData_properties where fieldId = ".quote($fieldId));
@@ -721,7 +722,7 @@ sub getAssetAdderLinks {
 	} else {
 		$constraint = quoteAndJoin($session{config}{assets});
 	}
-	my $sth = WebGUI::SQL->read("select className,assetId from asset where isPrototype=1 and className in ($constraint)");
+	my $sth = WebGUI::SQL->read("select className,assetId from asset where isPrototype=1 and state='published' and className in ($constraint)");
 	while (my ($class,$id) = $sth->array) {
 		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
 		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
@@ -1072,6 +1073,33 @@ sub getEditForm {
 		-value=>$self->getValue("isPrototype"),
 		-uiLevel=>9
 		);
+        if ($session{setting}{metaDataEnabled}) {
+                my $meta = $self->getMetaDataFields();
+                foreach my $field (keys %$meta) {
+                        my $fieldType = $meta->{$field}{fieldType} || "text";
+                        my $options;
+                        # Add a "Select..." option on top of a select list to prevent from
+                        # saving the value on top of the list when no choice is made.
+                        if($fieldType eq "selectList") {
+                                $options = {"", WebGUI::International::get("Select...","Asset")};
+                        }
+                        $tabform->getTab("meta")->dynamicField($fieldType,
+                                                -name=>"metadata_".$meta->{$field}{fieldId},
+                                                -label=>$meta->{$field}{fieldName},
+                                                -uiLevel=>5,
+                                                -value=>$meta->{$field}{value},
+                                                -extras=>qq/title="$meta->{$field}{description}"/,
+                                                -possibleValues=>$meta->{$field}{possibleValues},
+                                                -options=>$options
+                                );
+                }
+                # Add a quick link to add field
+                $tabform->getTab("meta")->readOnly(
+                                        -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField&fid=new").'">'.
+                                                        WebGUI::International::get('Add new field','Asset').
+                                                        '</a></p>'
+                );
+        }
 	return $tabform;
 }
 
@@ -1287,7 +1315,7 @@ sub getLineage {
 	if (exists $rules->{excludeClasses}) { # deal with exclusions
 		my @set;
 		foreach my $className (@{$rules->{excludeClasses}}) {
-			push(@set,"asset.className <> ".quote($className));
+			push(@set,"asset.className not like ".quote($className.'%'));
 		}
 		$where .= ' and ('.join(" and ",@set).')';
 	}
@@ -2352,7 +2380,7 @@ sub www_copy {
 
 Copies to clipboard assets in a list, then returns self calling method www_manageAssets(), if canEdit. Otherwise returns AdminConsole rendered insufficient privilege.
 
-cut
+=cut
 
 sub www_copyList {
 	my $self = shift;
@@ -2478,7 +2506,6 @@ Deletes a MetaDataField and returns www_manageMetaData on self, if user isInGrou
 
 sub www_deleteMetaDataField {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("content profiling");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$self->deleteMetaDataField($session{form}{fid});
 	return $self->www_manageMetaData;
@@ -2513,7 +2540,8 @@ sub www_deployPackage {
 	my $packageMasterAssetId = $session{form}{assetId};
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);
-		if (defined $packageMasterAsset && $packageMasterAsset->canView) {
+		my $masterLineage = $packageMasterAsset->get("lineage");
+                if (defined $packageMasterAsset && $packageMasterAsset->canView && $self->get("lineage") !~ /^$masterLineage/) {
 			my $deployedTreeMaster = $self->duplicateTree($packageMasterAsset);
 			$deployedTreeMaster->update({isPackage=>0});
 		}

@@ -757,6 +757,29 @@ sub recalculateRating {
 
 #-------------------------------------------------------------------
 
+=head2 setLastPost ( id, date )
+
+Sets the most recent post in this collaboration system.
+
+=head3 id
+
+The assetId of the most recent post.
+
+=head3 date
+
+The date of the most recent post.
+
+=cut
+
+sub setLastPost {
+        my $self = shift;
+        my $id = shift;
+        my $date = shift;
+        $self->update(lastPostId=>$id, lastPostDate=>$date);
+}
+
+#-------------------------------------------------------------------
+
 =head2 subscribe ( )
 
 Subscribes a user to this collaboration system.
