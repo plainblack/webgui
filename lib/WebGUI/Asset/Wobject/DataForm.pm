@@ -155,6 +155,7 @@ sub definition {
 				defaultValue=>0,
 				fieldType=>"yesNo"
 				},
+			}
 		});
         return $class->SUPER::definition($definition);
 }

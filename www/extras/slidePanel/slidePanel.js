@@ -222,6 +222,26 @@ function b_draw() {
       		this.showPanel(document.cookie);
     	else
       		this.showPanel(0);
+	//float the panel as someone scrolls
+        startY = 0;
+        var d = document;
+        function ml(id)
+        {
+                var el=d.getElementById?d.getElementById(id):d.all?d.all[id]:d.layers[id];
+                if(d.layers)el.style=el;
+                el.sP=function(y){this.style.top=y;};
+                el.y = startY;
+                return el;
+        }
+        window.floatBarWithScroll=function()
+        {
+                var pY = document.body.scrollTop;
+                ftlObj.y += (pY + startY - ftlObj.y)/8;
+                ftlObj.sP(ftlObj.y);
+                setTimeout("floatBarWithScroll()", 10);
+        }
+        ftlObj = ml("slidePanelBar");
+        floatBarWithScroll();
 }
 
 function b_showPanel(nr) {
