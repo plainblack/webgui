@@ -828,7 +828,7 @@ The template used to generate emails for users who have subscribed to this Asset
 
 <p>
 <b>^International("who moderates","Asset_Collaboration");</b><br>
-The group that will moderate posts to this Asset.
+The group that will moderate posts to this Asset, if moderation is enabled.
 
 <p>
 <b>^International("who posts","Asset_Collaboration");</b><br>
@@ -851,7 +851,7 @@ submitted by a user.
 
 <p>
 <b>^International("filter code","Asset_Collaboration");</b><br>
-Sets the level of filtering done on each post.
+Sets the level of HTML filtering done on each Post.
 
 <p>
 <b>^International("sort by","Asset_Collaboration");</b><br>
@@ -864,6 +864,10 @@ may be selected.
 Sort in ascending or descending order.
 
 <p>
+<b>^International("archive after","Asset_Collaboration");</b><br>
+The time, after which a Post is last updated, it will be archived.
+
+<p>
 <b>^International("attachments/post","Asset_Collaboration");</b><br>
 How many attachments may be added to each post?
 
@@ -872,8 +876,33 @@ How many attachments may be added to each post?
 After this timeout is reached, the Post can no longer be edited by
 the original poster.
 
+<p>
+<b>^International("allow replies","Asset_Collaboration");</b><br>
+Select "No" to prevent people from replying to this Post.
+
+<p>
+<b>^International("edit stamp","Asset_Collaboration");</b><br>
+Select "Yes" to add a stamp to each Post saying when it was last edited.
+
+<p>
+<b>^International("rich edit","Asset_Collaboration");</b><br>
+Select "Yes" to enable Rich Editing of content in Posts.
+
+<p>
+<b>^International("content filter","Asset_Collaboration");</b><br>
+Select "Yes" to filter the content in each Post with the Replacements System.
+
+<p>
+<b>^International("use preview","Asset_Collaboration");</b><br>
+Select "Yes" to display a preview of the Post to the user before submitting it.  While
+the preview is displayed, the Post can either be edited or canceled.
+
+<p>
+<b>^International("moderate","Asset_Collaboration");</b><br>
+Enable moderation for Posts to the Collaboration Asset.
+
                 |,
-		lastUpdated => 1113683370,
+		lastUpdated => 1113974026,
 	},
 
 };
