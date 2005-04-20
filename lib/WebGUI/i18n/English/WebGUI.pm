@@ -4029,9 +4029,32 @@ Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use thi
 		context => q|Tab label for the user's profile in the user manager.|
 	},
 
+	'content filter body' => {
+		message => q|<p>WebGUI has many features to accept content from outside sources, such as users posting to message boards or pulling data from external websites via the HttpProxy or SyndicatedContent Assets.  However, this can expose pose a risk to your site, for example, through cross-site scripting attacks.</p>
+<p>To help solve this problem
+many Assets have a <b>^International("418","WebGUI");</b> property that performs various leveling
+of filtering on content.  Each one is pretty self-explanatory:
+<dl>
+<dt>^International("420","WebGUI");</dd>
+<dd>No filtering will be done.  All original content will be displayed.</dd>
+<dt>^International("891","WebGUI");</dt>
+<dd>Negates WebGUI Macros.  Instead of displaying Macro output, the Macro itself
+will be shown;</dd>
+<dt>^International("526","WebGUI");</dt>
+<dd>Negates WebGUI Macros. Removes the contents of &lt;script&gt; tags and deletes
+JavaScript fields from HTML tags.</dd>
+<dt>^International("421","WebGUI");</dt>
+<dd>Removes everything except for bold, italics, breaks, etc.</dd>
+<dt>^International("419","WebGUI");</dt>
+<dd>Strips everything that it can, returning just plain old, safe text.</dd>
+</dl></p>
+|,
+		lastUpdated => 1113681314,
+	},
+
 	'glossary title' => {
-		message => q|Glossary|,
-		lastUpdated => 1111729014,
+		message => q|WebGUI Glossary|,
+		lastUpdated => 1031514049
 	},
 
 	'glossary body' => {

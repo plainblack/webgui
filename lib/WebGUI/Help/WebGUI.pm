@@ -29,6 +29,12 @@ our $HELP = {
 			}
 		]
 	},
+	'content filtering' => {
+		title => '418',
+		body => 'content filter body',
+		related => [
+		],
+	},
 	'trash empty' => {
 		title => '696',
 		body => '651',
