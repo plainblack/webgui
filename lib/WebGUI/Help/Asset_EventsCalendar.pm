@@ -6,8 +6,12 @@ our $HELP = {
 		body => '71',
 		related => [
 			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+			{
 				tag => 'event add/edit',
-				namespace => 'Asset_EventsCalendar'
+				namespace => 'Asset_Event'
 			},
 			{
 				tag => 'events calendar template',
@@ -16,20 +20,6 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
-			}
-		]
-	},
-	'event add/edit' => {
-		title => '72',
-		body => '73',
-		related => [
-			{
-				tag => 'event template',
-				namespace => 'Asset_EventsCalendar'
-			},
-			{
-				tag => 'events calendar add/edit',
-				namespace => 'Asset_EventsCalendar'
 			}
 		]
 	},
@@ -48,21 +38,11 @@ our $HELP = {
 			{
 				tag => 'wobject template',
 				namespace => 'Wobject'
-			}
-		]
-	},
-	'event template' => {
-		title => '96',
-		body => '97',
-		related => [
-			{
-				tag => 'event add/edit',
-				namespace => 'Asset_EventsCalendar'
 			},
 			{
-				tag => 'wobject template',
-				namespace => 'Wobject'
-			}
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
 		]
 	},
 };
