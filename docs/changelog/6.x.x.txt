@@ -22,9 +22,10 @@
  - Added packages list to the content adder in the asset manager.
  - Added edit icons to the list of prototypes and packages in the asset
    manager.
+ - Added the ability in the DataForm to make the default view the List, rather than
+   the Form.
  - Added a select all option to the clipboard selector in the asset manager.
  - Added a color picker form field type.
-
 
 6.5.6
  - Fixed a bunch of mostly cosmetic issues with the commerce system.
