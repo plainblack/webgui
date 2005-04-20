@@ -124,6 +124,13 @@ sub _createTabInit {
 }
 
 #-------------------------------------------------------------------
+
+sub defaultViewForm {
+        my $self = shift;
+        return ($self->get("defaultView") == 0);
+}
+
+#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
         my $definition = shift;
@@ -155,6 +162,10 @@ sub definition {
 				defaultValue=>0,
 				fieldType=>"yesNo"
 				},
+			defaultView=>{
+				defaultValue=>0,
+				fieldType=>"integer"
+				}
 			}
 		});
         return $class->SUPER::definition($definition);
@@ -220,6 +231,13 @@ sub getEditForm {
                 -label=>WebGUI::International::get(87,"Asset_DataForm"),
                 -afterEdit=>'func=edit'
                 );
+	$tabform->getTab("display")->radioList(
+		-name=>"defaultView",
+                -options=>{ 0 => WebGUI::International::get('data form','Asset_DataForm'),
+                            1 => WebGUI::International::get('data list','Asset_DataForm'),},
+		-label=>WebGUI::International::get('defaultView',"Asset_DataForm"),
+		-value=>$self->getValue("defaultView"),
+		);
 	$tabform->getTab("properties")->HTMLArea(
 		-name=>"acknowledgement",
 		-label=>WebGUI::International::get(16, "Asset_DataForm"),
@@ -287,7 +305,7 @@ sub getIndexerParams {
 					and asset.endDate > $now",
                         fieldsToIndex => ['select distinct(value) from DataForm_entryData where assetId = \'$data{assetId}\''],
                         contentType => 'assetDetail',
-                        url => 'WebGUI::URL::append($data{url}, "func=view&entryId=list}")',
+                        url => 'WebGUI::URL::append($data{url}, "func=viewList}")',
                         headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
                 }
 	};
@@ -299,8 +317,8 @@ sub getListTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	my @fieldLoop;
-	$var->{"back.url"} = $self->getUrl."&entryId=0";
-	$var->{"back.label"} = WebGUI::International::get(18,"Asset_DataForm");
+	$var->{"back.url"} = $self->getFormUrl;
+	$var->{"back.label"} = WebGUI::International::get('go to form',"Asset_DataForm");
 	#$var->{"entryId"} = $self->getId;
 	#$var->{"delete.url"} = $self->getUrl."&func=deleteAllEntries";
 	#$var->{"delete.label"} = WebGUI::International::get(91,"Asset_DataForm");
@@ -318,7 +336,7 @@ sub getListTemplateVars {
 	$a->finish;
 	$var->{field_loop} = \@fieldLoop;
 	my @recordLoop;
-	my $a = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
+	$a = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
 		where assetId=".quote($self->getId)." order by submissionDate desc");
 	while (my $record = $a->hashRef) {
 		my @dataLoop;
@@ -354,12 +372,43 @@ sub getListTemplateVars {
 }
 
 #-------------------------------------------------------------------
+
+sub getFormUrl {
+        my $self = shift;
+        my $params = shift;
+        my $url = $self->getUrl;
+        unless ($self->defaultViewForm) {
+                $url = WebGUI::URL::append($url, 'mode=form');
+        }
+        if ($params) {
+                $url = WebGUI::URL::append($url, $params);
+        }
+        return $url;
+}
+
+#-------------------------------------------------------------------
+
+sub getListUrl {
+        my $self = shift;
+        my $params = shift;
+        my $url = $self->getUrl;
+        if ($self->defaultViewForm) {
+                $url = WebGUI::URL::append($url, 'mode=list');
+        }
+        if ($params) {
+                $url = WebGUI::URL::append($url, $params);
+        }
+        return $url;
+}
+
+#-------------------------------------------------------------------
 sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{canEdit} = ($self->canEdit);
-	$var->{"entryList.url"} = $self->getUrl('func=view&entryId=list');
+	#$var->{"entryList.url"} = $self->getUrl('func=view&entryId=list');
+	$var->{"entryList.url"} = $self->getListUrl;
 	$var->{"entryList.label"} = WebGUI::International::get(86,"Asset_DataForm");
 	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
 	$var->{"export.tab.label"} = WebGUI::International::get(84,"Asset_DataForm");
@@ -387,7 +436,7 @@ sub getRecordTemplateVars {
 		$var->{userId} = $entry->{userId};
 		$var->{date} = WebGUI::DateTime::epochToHuman($entry->{submissionDate});
 		$var->{epoch} = $entry->{submissionDate};
-		$var->{"edit.URL"} = $self->getUrl('func=view&entryId='.$var->{entryId});
+		$var->{"edit.URL"} = $self->getFormUrl('entryId='.$var->{entryId});
 		$where .= " and b.DataForm_entryId=".quote($var->{entryId});
 		$join = "left join DataForm_entryData as b on a.DataForm_fieldId=b.DataForm_fieldId";
 		$select .= ", b.value";
@@ -609,13 +658,37 @@ sub view {
 	my $self = shift;
 	my $passedVars = shift;
 	my $var;
-	$var->{entryId} = $session{form}{entryId} if ($self->canEdit);
-	if ($var->{entryId} eq "list" && $self->canEdit) {
-		return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
-	}
-	# add Tab StyleSheet and JavaScript
+        ##Priority encoding
+        if ( $session{form}{mode} eq "form") {
+                $self->viewForm($passedVars);
+        }
+        elsif ( $session{form}{mode} eq "list") {
+                $self->viewList;
+        }
+	elsif( $self->defaultViewForm ) {
+                $self->viewForm($passedVars);
+        }
+        else {
+                $self->viewList();
+        }
+}
+
+#-------------------------------------------------------------------
+
+sub viewList {
+	my $self = shift;
+        return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
+}
+
+#-------------------------------------------------------------------
+
+sub viewForm {
+	my $self = shift;
+	my $passedVars = shift;
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/tabs/tabs.css', {"type"=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js', {"language"=>"JavaScript"});
+	my $var;
+	$var->{entryId} = $session{form}{entryId} if ($self->canEdit);
 	$var = $passedVars || $self->getRecordTemplateVars($var);
 	return $self->processTemplate($var,$self->get("templateId"));
 }
@@ -1017,7 +1090,7 @@ sub www_process {
 		$self->www_view($var);
 	} else {
 		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
-		return WebGUI::Style::process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId"));
+		return WebGUI::Style::process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
 	}
 }
 

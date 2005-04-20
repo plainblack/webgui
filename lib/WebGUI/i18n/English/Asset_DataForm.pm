@@ -17,21 +17,22 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|This wobject creates a simple multipurpose data-entry form.
+		message => q|This Asset creates a simple multipurpose data-entry and
+                display form.
   You
-can add additional fields to the DataForm, create multiple tabs, or use the DataForm
-as a web form to email gateway.
+can add additional fields to the DataForm, create multiple tabs, use the DataForm
+as a web form to email gateway, or easily create tables on your website with it.
 <p> Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  They also have these unique properties:
 <p>
 <b>^International("16","Asset_DataForm");</b><br>
-This message will be displayed to the user after they submit their data..
+This message will be displayed to the user after they submit their data.
 
 <p>
 <b>^International("74","Asset_DataForm");</b></br>
 If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
 they can't be edited by the user.
 <p>
-<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.
+<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.  To send an email to more than one address, separate them by commas.
 
 <p>
 <b>^International("913","WebGUI");</b><br>
@@ -48,6 +49,12 @@ Choose a template that will be used to display the acknowledgment.
 <p>
 <b>^International("87","Asset_DataForm");</b><br>
 Choose a template that will be used to display the list of stored records in this Data Form.
+
+<p>
+<b>^International("defaultView","Asset_DataForm");</b><br>
+Select the default view for the Data Form, either Form view (the default) or
+List view.  When List view is selected, no acknowledgement will be displayed
+after data is entered in the form.
 
 <p>
 <b>^International("744","Asset_DataForm");</b><br>
@@ -76,7 +83,7 @@ List all data that has been entered into the Data Form.
 Export the data from the Data Form in tab deliniated format.
 
 |,
-		lastUpdated => 1112732067,
+		lastUpdated => 1113674254,
 	},
 
 	'editField-vertical-label' => {
@@ -122,6 +129,11 @@ Export the data from the Data Form in tab deliniated format.
 	'18' => {
 		message => q|Go back!|,
 		lastUpdated => 1031514049
+	},
+
+	'go to form' => {
+		message => q|Go to form|,
+		lastUpdated => 1113423537
 	},
 
 	'72' => {
@@ -789,6 +801,14 @@ A conditional indicating whether this field exists for the mail subsystem of the
         'defaultView' => {
 		 message => q|Default view|,
 		 lastUpdated => 1112929856,
+        },
+        'data form' => {
+		 message => q|Data Form|,
+		 lastUpdated => 1113435285,
+        },
+        'data list' => {
+		 message => q|Data List|,
+		 lastUpdated => 1113435295,
         },
 
 };
