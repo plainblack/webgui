@@ -322,6 +322,7 @@ sub view {
 			$pageData->{"page.".$property} = $asset->get($property);
 		}
 		# build nav variables
+		$pageData->{"page.rank"} = $asset->getRank;
 		$pageData->{"page.absDepth"} = $asset->getLineageLength;
 		$pageData->{"page.relDepth"} = $asset->getLineageLength - $start->getLineageLength;
 		$pageData->{"page.isSystem"} = $asset->get("isSystem");

@@ -17,6 +17,11 @@
  - Fixed several bugs during the conversion of Help and International files to
    namespaces.
  - Fixed bugs in correctly setting default values in forms with anonymous arrays.
+ - Added class icons to all the content adders in the asset manager.
+ - Expsosed a page.rank template variable to the Navigation template.
+ - Added packages list to the content adder in the asset manager.
+ - Added edit icons to the list of prototypes and packages in the asset
+   manager.
 
 
 6.5.6

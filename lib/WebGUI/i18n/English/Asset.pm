@@ -8,6 +8,12 @@ our $I18N = {
 		context => q|Used when editing an entire branch, and asks whether the user wants to change this field recursively.|
 	},
 
+	'packages' => {
+		message => q|Packages|,
+		lastUpdated => 1099344172,
+		context => q|The title of the package chooser in the asset manager|
+	},
+	
 	'assets' => {
 		message => q|Assets|,
 		lastUpdated => 1099344172,

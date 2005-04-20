@@ -98,6 +98,7 @@ the Navigation Template to determine who can see them in the menu.</P>
 loop variables:</p>
 <BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
 <P dir=ltr><STRONG>page.menuTitle</STRONG><BR>The menu title of this page.</P>
+<P dir=ltr><STRONG>page.rank</STRONG><BR>The rank of this page compared with is siblings.</P>
 <P dir=ltr><STRONG>page.title</STRONG><BR>The title of this page.</P>
 <P dir=ltr><STRONG>page.url</STRONG><BR>The complete URL to this page.</P>
 <P dir=ltr><STRONG>page.assetId</STRONG><BR>The assetId of this page.</P>

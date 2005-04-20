@@ -730,6 +730,8 @@ sub getAssetAdderLinks {
 		$links{$asset->get("title")}{url} = $url;
 		$links{$asset->get("title")}{icon} = $asset->getIcon;
 		$links{$asset->get("title")}{'icon.small'} = $asset->getIcon(1);
+		$links{$asset->get("title")}{'isPrototype'} = 1;
+		$links{$asset->get("title")}{'asset'} = $asset;
 	}
 	my @sortedLinks;
 	foreach my $label (sort keys %links) {
@@ -737,7 +739,9 @@ sub getAssetAdderLinks {
 			label=>$label,
 			url=>$links{$label}{url},
 			icon=>$links{$label}{icon},
-			'icon.small'=>$links{$label}{'icon.small'}
+			'icon.small'=>$links{$label}{'icon.small'},
+			isPrototype=>$links{$label}{isPrototype},
+			asset=>$links{$label}{asset}
 			});	
 	}
 	return \@sortedLinks;
@@ -3102,18 +3106,25 @@ sub www_manageAssets {
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1083,"Asset").'</legend>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets",1)}) {
-		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
+		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= '<br />';
 	}
 	$output .= '<hr>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
-		$output .= '<a href="'.$link->{url}.'">'.$link->{label}.'</a><br />';
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
+		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= '<br />';
 	}
 	$output .= '</fieldset></div>'; 
 	my %options;
 	tie %options, 'Tie::IxHash';
 	my $hasClips = 0;
         foreach my $item (@{$self->getAssetsInClipboard(1)}) {
-              	$options{$item->{assetId}} = $item->{title};
+		my $asset = WebGUI::Asset->newByDynamicClass($item->{assetId},$item->{className});
+              	$options{$item->{assetId}} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" border="0" /> '.$item->{title};
 		$hasClips = 1;
         }
 	if ($hasClips) {
@@ -3125,6 +3136,21 @@ sub www_manageAssets {
 			.WebGUI::Form::submit({value=>"Paste"})
 			.WebGUI::Form::formFooter()
 			.' </fieldset></div> ';
+	}
+	my $hasPackages = 0;
+	my $packages;
+        foreach my $item (@{$self->getPackageList}) {
+		my $asset = WebGUI::Asset->newByDynamicClass($item->{assetId},$item->{className});
+              	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
+			<a href="'.$self->getUrl("func=deployPackage&assetId=".$item->{assetId}).'">'.$item->{title}.'</a> '
+			.editIcon("func=edit&proceed=manageAssets",$asset->get("url"))
+			.'<br />';
+		$hasPackages = 1;
+        }
+	if ($hasPackages) {
+		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset>
+			<legend>'.WebGUI::International::get("packages","Asset").'</legend>
+			'.$packages.' </fieldset></div> ';
 	}
 	$output .= '
     <div class="adminConsoleSpacer">
