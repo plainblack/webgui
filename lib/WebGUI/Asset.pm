@@ -3131,11 +3131,21 @@ sub www_manageAssets {
 		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082,"Asset").'</legend>'
 			.WebGUI::Form::formHeader()
 			.WebGUI::Form::hidden({name=>"func",value=>"pasteList"})
+			.WebGUI::Form::checkbox({extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
+			.' '.WebGUI::International::get("select all","Asset").'<br />'
 			.WebGUI::Form::checkList({name=>"assetId",vertical=>1,options=>\%options})
 			.'<br />'
 			.WebGUI::Form::submit({value=>"Paste"})
 			.WebGUI::Form::formFooter()
-			.' </fieldset></div> ';
+			.' </fieldset></div> '
+			.'<script type="text/javascript">
+			var clipboardItemSelectAllToggle = false;
+			function toggleClipboardSelectAll(form){
+			clipboardItemSelectAllToggle = clipboardItemSelectAllToggle ? false : true;
+			for(var i = 0; i < form.assetId.length; i++)
+			form.assetId[i].checked = clipboardItemSelectAllToggle;
+			}
+			</script>';
 	}
 	my $hasPackages = 0;
 	my $packages;

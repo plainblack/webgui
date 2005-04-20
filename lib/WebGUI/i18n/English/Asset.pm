@@ -8,6 +8,12 @@ our $I18N = {
 		context => q|Used when editing an entire branch, and asks whether the user wants to change this field recursively.|
 	},
 
+	'select all' => {
+		message => q|Select All|,
+		lastUpdated => 1099344172,
+		context => q|A label for the select all checkbox on the asset manager clipboard|
+	},
+	
 	'packages' => {
 		message => q|Packages|,
 		lastUpdated => 1099344172,

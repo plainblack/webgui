@@ -22,6 +22,7 @@
  - Added packages list to the content adder in the asset manager.
  - Added edit icons to the list of prototypes and packages in the asset
    manager.
+ - Added a select all option to the clipboard selector in the asset manager.
 
 
 6.5.6
