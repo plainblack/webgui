@@ -481,15 +481,15 @@ sub getEditForm {
 		-name=>"sortBy",
 		-value=>[$self->getValue("sortBy")],
 		-options=>{
-			lineage=>"Sequence",
-			dateUpdated=>"Date Updated",
-			dateSubmitted=>"Date Submitted",
-			userDefined1=>"User Defined 1",
-			userDefined2=>"User Defined 2",
-			userDefined3=>"User Defined 3",
-			userDefined4=>"User Defined 4",
-			userDefined5=>"User Defined 5",
-			title=>"Title"
+			lineage=>WebGUI::International::get('sequence', 'Asset_Collaboration'),
+			dateUpdated=>WebGUI::International::get('date updated', 'Asset_Collaboration'),
+			dateSubmitted=>WebGUI::International::get('date submitted', 'Asset_Collaboration'),
+			title=>WebGUI::International::get('title', 'Asset_Collaboration'),
+			userDefined1=>WebGUI::International::get('user defined 1', 'Asset_Collaboration'),
+			userDefined2=>WebGUI::International::get('user defined 2', 'Asset_Collaboration'),
+			userDefined3=>WebGUI::International::get('user defined 3', 'Asset_Collaboration'),
+			userDefined4=>WebGUI::International::get('user defined 4', 'Asset_Collaboration'),
+			userDefined5=>WebGUI::International::get('user defined 5', 'Asset_Collaboration'),
 			},
 		-label=>WebGUI::International::get('sort by', 'Asset_Collaboration'),
 		);
@@ -497,8 +497,8 @@ sub getEditForm {
 		-name=>"sortOrder",
 		-value=>[$self->getValue("sortOrder")],
 		-options=>{
-			asc=>"Ascending",
-			desc=>"Descending"
+			asc=>WebGUI::International::get('ascending', 'Asset_Collaboration'),
+			desc=>WebGUI::International::get('descending', 'Asset_Collaboration'),
 			},
 		-label=>WebGUI::International::get('sort order', 'Asset_Collaboration'),
 		);
