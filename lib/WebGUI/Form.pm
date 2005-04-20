@@ -43,6 +43,7 @@ Base forms package. Eliminates some of the normal code work that goes along with
  $html = WebGUI::Form::checkbox({name=>"whichOne", value=>"red"});
  $html = WebGUI::Form::checkList({name=>"dayOfWeek", options=>\%days});
  $html = WebGUI::Form::codearea({name=>"stylesheet"});
+ $html = WebGUI::Form::color({name=>"highlightColor"});
  $html = WebGUI::Form::combo({name=>"fruit",options=>\%fruit});
  $html = WebGUI::Form::contentType({name=>"contentType");
  $html = WebGUI::Form::databaseLink();
@@ -302,6 +303,33 @@ sub codearea {
 
 #-------------------------------------------------------------------
 
+=head2 color ( hashRef )
+
+Returns a color picker field.
+
+=head3 name
+
+The name field for this form element.
+
+=head3 value
+
+The value for this form element. This should be a scalar containing a hex color like "#000000".
+
+=head3 defaultValue
+
+This will be used if no value is specified.
+
+=cut
+
+sub color {
+        my $params = shift;
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/colorPicker.js',{ type=>'text/javascript' });
+	return '<script type="text/javascript">initColorPicker("'.$params->{name}.'","'.($params->{value}||$params->{defaultValue}).'");</script>';
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 combo ( hashRef )
 
 Returns a select list and a text field. If the text box is filled out it will have a value stored in "name"_new.
@@ -539,9 +567,9 @@ This will be used if no value is specified. Defaults to today and now.
 sub dateTime {
 	my $params = shift;
 	my $value = epochToSet($params->{value}||$params->{defaultValue},1);
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ language=>'javascript' });
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ language=>'javascript' });
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ type=>'text/javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ type=>'text/javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ type=>'text/javascript' });
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
         return text({
                 name=>$params->{name},
@@ -646,7 +674,7 @@ This will be used if no value is specified.
 
 sub email {
 	my $params = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/emailCheck.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/emailCheck.js',{ type=>'text/javascript' });
 	my $output .= text({
 		name=>$params->{name},
 		value=>$params->{value},
@@ -953,7 +981,7 @@ sub float {
 	my $params = shift;
         my $value = $params->{value} || 0;
         my $size = $params->{size} || 11;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
 	return text({
 		name=>$params->{name},
 		value=>$value,
@@ -1207,7 +1235,7 @@ This will be used if no value is specified.
 
 sub integer {
 	my $params = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
 	return text({
 		name=>$params->{name},
 		value=>$params->{value},
@@ -1354,7 +1382,7 @@ This will be used if no value is specified.
 
 sub phone {
 	my $params = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
         my $maxLength = $params->{maxlength} || 30;
 	return text({
 		name=>$params->{name},
@@ -1738,7 +1766,7 @@ This will be used if no value is specified. Defaults to now.
 sub timeField {
 	my $params = shift;
         my $value = WebGUI::DateTime::secondsToTime($params->{value}||$params->{defaultValue});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
 	my $output = text({
 		name=>$params->{name},
 		value=>$value,
@@ -1790,7 +1818,7 @@ This will be used if no value is specified.
 sub url {
 	my $params = shift;
         my $maxLength = $params->{maxlength} || 2048;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/addHTTP.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/addHTTP.js',{ type=>'text/javascript' });
 	return text({
 		name=>$params->{name},
 		value=>$params->{value},
@@ -1933,7 +1961,7 @@ This will be used if no value is specified.
 
 sub zipcode {
 	my $params = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ language=>'javascript' });
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
         my $maxLength = $params->{maxlength} || 10;
 	return text({
 		name=>$params->{name},

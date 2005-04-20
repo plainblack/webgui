@@ -60,6 +60,10 @@ Package that makes HTML forms typed data and significantly reduces the code need
 	-name=>"stylesheet",
 	-label=>"Stylesheet"
 	);
+ $f->color(
+	-name=>"highlightColor",
+	-label=>"Highlight Color"
+	);
  $f->combo(
 	-name=>"fruit",
 	-options=>\%fruit,
@@ -504,6 +508,61 @@ sub codearea {
         }
         $self->{_data} .= $output;
 }
+
+#-------------------------------------------------------------------
+
+=head2 color ( name, [, label, value, subtext, uiLevel, defaultValue ] )
+
+Adds a hex color picker field.
+
+=head3 name
+
+The name field for this form element.
+
+=head3 label
+
+The left column label for this form row.
+
+=head3 value
+
+The value for this form element. Should be passed as a scalar containing a hex color like this: #000000
+
+=head3 subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=head3 uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+
+=head3 defaultValue
+
+When no other value is present, will use this.
+
+=cut
+
+sub color {
+        my ($output);
+        my ($self, @p) = @_;
+        my ($name, $label, $value, $subtext, $uiLevel, $defaultValue) = rearrange([qw(name label value subtext uiLevel defaultValue)], @p);
+        if (_uiLevelChecksOut($uiLevel)) {
+                $output = WebGUI::Form::color({
+                        "name"=>$name,
+                        "value"=>$value,
+			"defaultValue"=>$defaultValue
+                        });
+                $output .= _subtext($subtext);
+                $output = $self->_tableFormRow($label,$output);
+        } else {
+                $output = WebGUI::Form::hidden({
+			"name"=>$name,
+                        "value"=>$value,
+			"defaultValue",$defaultValue
+                        });
+        }
+        $self->{_data} .= $output;
+}
+
 
 #-------------------------------------------------------------------
 
