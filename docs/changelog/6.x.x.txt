@@ -29,6 +29,8 @@
  - Fixed a bug where empty required field error messages from the data form
    were not being displayed.
  - Added a config file option to specify where the file cache is persisted.
+ - Added complete documentation of all WebGUI config file options to the
+   default config file.
 
 
 

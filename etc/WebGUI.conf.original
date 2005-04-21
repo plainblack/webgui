@@ -1,5 +1,111 @@
 ######################################
-# assets
+# PATHS AND URLS
+######################################
+
+# Add a comma seperated list of the names this site can use.
+
+sitename = www.example.com, example.com
+
+# The relative or fully qualified URL to the extras folder
+# that comes with WebGUI.
+
+extrasURL = /extras
+
+# The filesystem path to get to the extras folder that ships
+# with WebGUI.
+
+extrasPath = /data/WebGUI/www/extras
+
+# The relative for fully qualified URL to the uploads folder
+# for this site where all attachments will be stored.
+
+uploadsURL = /uploads
+
+# The filesystem path to get to the uploads folder where all
+# attachments for this site will be stored. This needs to be
+# writable by your web server.
+
+uploadsPath = /data/WebGUI/www/uploads
+
+# The scripturl tells WebGUI how to reference the gateway script 
+# when generating URLs. By default it will use the gateway
+# script's filename like /index.pl/
+
+# scripturl = /
+
+
+
+######################################
+# DATABASE CONFIGURATION
+######################################
+
+# The database connection string. It usually takes the form of
+# DBI:<driver>:<db>;host=<hostname>
+
+dsn = DBI:mysql:www_example_com
+
+# The username to authenticate to the above database.
+
+dbuser = webgui
+
+# The password to authenticate to the above database.
+
+dbpass = password
+
+# You can configure up to three read-only slaves to increase
+# WebGUI's read performance.
+
+#dbslave1 = dsn => DBI:mysql:www_example_com;host=dbslave1.example.com, \
+#	dbuser => webgui, \
+#	dbpass => password
+
+#dbslave2 = dsn => DBI:mysql:www_example_com;host=dbslave2.example.com, \
+#	dbuser => webgui, \
+#	dbpass => password
+
+#dbslave3 = dsn => DBI:mysql:www_example_com;host=dbslave3.example.com, \
+#	dbuser => webgui, \
+#	dbpass => password
+
+
+
+######################################
+# CACHING
+######################################
+
+templateCacheType=file
+
+# Tell WebGUI where to store cached files. Defaults to the 
+# /tmp or c:\temp folder depending upon your operating system.
+
+#fileCacheRoot=/path/to/cache
+
+
+
+######################################
+# AUTHENTICATION
+######################################
+
+# List the authentication plug-ins you wish to be available on
+# this site.
+
+authMethods = LDAP, WebGUI
+
+
+
+######################################
+# COMMERCE 
+######################################
+
+# List the merchant gateways you have installed and wish to be
+# available on this site.
+
+paymentPlugins = ITransact
+
+
+
+######################################
+# ASSETS
 ######################################
 
 # Specify a the list of assets you want to appear in your
@@ -26,47 +132,40 @@ assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
 	WebGUI::Asset::Wobject::WSClient
 
+# Specifiy the list of assets you want to appear in your add
+# content menus that should act as containers for other content.
+# These items are typically not content themselves, but rather
+# layout mechanisms.
+
 assetContainers = WebGUI::Asset::Wobject::Layout, \
 	WebGUI::Asset::Wobject::Folder
 
-sitename = www.example.com, example.com
-
-dsn = DBI:mysql:www_example_com
-dbuser = webgui
-dbpass = password
-
-extrasURL = /extras
-extrasPath = /data/WebGUI/www/extras
-
-uploadsURL = /uploads
-uploadsPath = /data/WebGUI/www/uploads
 
 # If exportPath is defined, an "Export" toolbar icon will appear
-# which allows you to export pages to static html
-# exportPath = /data/WebGUI/export
+# which allows you to export assets to static html. This folder
+# needs to be writable by your web server.
+
+#exportPath = /path/to/export
+
+# If soapHttpHeaderOverride is set to 1 it will enable Web 
+# Service Client assets to override the default MIME types of 
+# SOAP/WDSL content
+
+soapHttpHeaderOverride=0
+
+# Specify the number of days after an event has passed that it
+# should be purged from the Events Calendar. Comment it out if
+# you never want events to be purged automatically.
+
+DeleteExpiredEvents_offset = 30
 
 
 
 ######################################
-# CACHING
+# MACROS                             
 ######################################
 
-templateCacheType=file
-
-# Tell WebGUI where to store cached files. Defaults to the 
-# /tmp or c:\temp folder depending upon your operating system.
-
-#fileCacheRoot=/path/to/cache
-
-passiveProfileInterval = 86400	# in seconds
-
-paymentPlugins = ITransact
-
-authMethods = LDAP, WebGUI
-
-# Enable Web Service Clients to override the default MIME types of SOAP/WDSL content
-
-#soapHttpHeaderOverride=1
+# Specify the list of macros you wish to be processed on each page.
 
 macros=# => Hash_userId, \
         / => Slash_gatewayUrl, \
@@ -108,5 +207,56 @@ macros=# => Hash_userId, \
         e => e_companyEmail, \
         r => r_printable, \
         u => u_companyUrl
- 
 
+
+ 
+######################################
+# SCHEDULED TASKS
+######################################
+
+# A comma seperated list of scheduler plugins that you do NOT want
+# to run. Normally there's no reason to use this option.
+
+#excludeHourly = 
+
+# How often, in seconds, should WebGUI calculate the statistics
+# of passively profiling users to content preferences. Note that
+# this won't have any effect unless passive profiling is enabled
+# in the UI.
+
+passiveProfileInterval = 86400
+
+# If specified, the user login log will delete login history
+# information older than the specified value. It is specified in
+# days.
+
+#CleanLoginHistory_ageToDelete = 90
+
+# If minimum karma and decay factor are both specified, then a
+# user's karma will be decremented by the decay factor every hour
+# until the user has less than the minimum karma.
+
+#DecayKarma_minimumKarma = 100 
+#DecayKarma_decayFactor = 1
+
+# Specify the number of days content should remain in the
+# clipboard before being moved to the trash.
+
+DeleteExpiredClipboard_offset = 30
+
+# Specify the number of days content should remain in the trash
+# before it gets purged from the system completely.
+
+DeleteExpiredTrash_offset = 30
+
+# What hour of the day (for example, 22 = 10 PM = 22:00:00)
+# should WebGUI try to synchronize user profile information from 
+# the LDAP server. Note that this will only happen for users
+# that have LDAP as their authentication.
+
+SyncProfilesToLDAP_hour = 2
+
+# How many days after a piece of content expires should it be
+# moved to the trash.
+
+TrashExpiredContent_offset = 30
