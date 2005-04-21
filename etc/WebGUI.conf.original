@@ -33,6 +33,11 @@ uploadsPath = /data/WebGUI/www/uploads
 
 # scripturl = /
 
+# Tell WebGUI where to store cached files. Defaults to the 
+# /tmp or c:\temp folder depending upon your operating system.
+
+#fileCacheRoot=/path/to/cache
+
 
 
 ######################################
@@ -66,19 +71,6 @@ dbpass = password
 #dbslave3 = dsn => DBI:mysql:www_example_com;host=dbslave3.example.com, \
 #	dbuser => webgui, \
 #	dbpass => password
-
-
-
-######################################
-# CACHING
-######################################
-
-templateCacheType=file
-
-# Tell WebGUI where to store cached files. Defaults to the 
-# /tmp or c:\temp folder depending upon your operating system.
-
-#fileCacheRoot=/path/to/cache
 
 
 
@@ -158,6 +150,12 @@ soapHttpHeaderOverride=0
 # you never want events to be purged automatically.
 
 DeleteExpiredEvents_offset = 30
+
+# Select the type of caching you'd like WebGUI to use for
+# templates. Choose from file, ipc, memory, memory-ipc,
+# memory-file
+
+templateCacheType=file
 
 
 
