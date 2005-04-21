@@ -111,7 +111,12 @@ sub new {
 	my $class = shift;
 	my $key = shift;
 	my $namespace = shift || $session{config}{configFile};
-	$cache = new Cache::FileCache({namespace=>$namespace, auto_purge_on_set=>1});
+	my %options = (
+		namespace=>$namespace, 
+		auto_purge_on_set=>1
+		);
+	$options{cache_root} = $session{config}{fileCacheRoot} if ($session{config}{fileCacheRoot});
+	$cache = new Cache::FileCache(\%options);
 	bless {_cache => $cache, _key => $key}, $class;
 }
 

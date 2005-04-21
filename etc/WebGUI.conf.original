@@ -1,3 +1,10 @@
+######################################
+# assets
+######################################
+
+# Specify a the list of assets you want to appear in your
+# Add Content menus.
+
 assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::File, \
 	WebGUI::Asset::Snippet, \
@@ -38,7 +45,18 @@ uploadsPath = /data/WebGUI/www/uploads
 # which allows you to export pages to static html
 # exportPath = /data/WebGUI/export
 
+
+
+######################################
+# CACHING
+######################################
+
 templateCacheType=file
+
+# Tell WebGUI where to store cached files. Defaults to the 
+# /tmp or c:\temp folder depending upon your operating system.
+
+#fileCacheRoot=/path/to/cache
 
 passiveProfileInterval = 86400	# in seconds
 
@@ -47,7 +65,8 @@ paymentPlugins = ITransact
 authMethods = LDAP, WebGUI
 
 # Enable Web Service Clients to override the default MIME types of SOAP/WDSL content
-# soapHttpHeaderOverride=1
+
+#soapHttpHeaderOverride=1
 
 macros=# => Hash_userId, \
         / => Slash_gatewayUrl, \

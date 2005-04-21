@@ -1087,7 +1087,7 @@ sub www_process {
 	if ($hadErrors && !$updating) {
 		WebGUI::SQL->write("delete from DataForm_entryData where DataForm_entryId=".quote($entryId));
 		$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
-		$self->www_view($var);
+		$self->processStyle($self->view($var));
 	} else {
 		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
 		return WebGUI::Style::process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
