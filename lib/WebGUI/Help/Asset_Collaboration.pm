@@ -19,6 +19,17 @@ our $HELP = {
 		]
 	},
 
+	'collaboration post list template variables' => {
+		title => 'collaboration post list template variables title',
+		body => 'collaboration post list template variables body',
+		related => [
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+		]
+	},
+
 };
 
 1;

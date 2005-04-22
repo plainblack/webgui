@@ -904,6 +904,157 @@ Enable moderation for Posts to the Collaboration Asset.
                 |,
 		lastUpdated => 1113974026,
 	},
+	
+	'collaboration post list template variables title' => {
+		message => q|Collaboration, Post List Template Variables|,
+		lastUpdated => 1113673895,
+	},
+
+	'collaboration post list template variables body' => {
+		message => q|These variables are available in several of the templates
+used by Collaboration Assets:<p>
+
+<p>
+<b>post_loop</b><br>
+A list of posts for this Collateral Asset.
+
+<blockquote>
+
+<p>
+<b>Asset variables</b><br>
+The variables common to all Assets, such as <b>title</b>, <b>menuTitle</b>, etc.
+
+<p>
+<b>id</b><br>
+The AssetId of this Post.
+
+<p>
+<b>url</b><br>
+The URL of this Post.
+
+<p>
+<b>rating_loop</b><br>
+A loop that runs once for each point of <b>rating</b> that the Post has
+
+<blockquote>
+
+<p>
+<b>rating_loop.count</b><br>
+The index variable for the <b>rating_loop</b>.
+
+</blockquote>
+
+<p>
+<b>content</b><br>
+The formatted content of this Post.
+
+<p>
+<b>status</b><br>
+The status of this Post.
+
+<p>
+<b>thumbnail</b><br>
+If this Post has a attachements, the URL for the thumbnail of the first image attachement.
+
+<p>
+<b>image.url</b><br>
+If this Post has a attachements, the URL for the first image attachement.
+
+<p>
+<b>dateSubmitted.human</b><br>
+The date this Post was submitted, in a human readable format.
+
+<p>
+<b>dateUpdated.human</b><br>
+The date this Post was last updated, in a human readable format.
+
+<p>
+<b>timeSubmitted.human</b><br>
+The time this Post was submitted, in a human readable format.
+
+<p>
+<b>timeUpdated.human</b><br>
+The time this Post was last updated, in a human readable format.
+
+<p>
+<b>userProfile.url</b><br>
+The URL to the Profile of the User who submitted this Post.
+
+<p>
+<b>user.isVisitor</b><br>
+A conditional that is true if the poster is a visitor.
+
+<p>
+<b>edit.url</b><br>
+The URL to edit this Post.
+
+<p>
+<b>controls</b><br>
+A set of editing icons to delete or re-order this Post.
+
+<p>
+<b>inDateRange</b><br>
+A conditional indicating that the current time is greater than the start date and less than
+the end date.
+
+<p>
+<b>isSecond</b><br>
+A conditional indicating that is true if this Post is the second in this Collaboration Asset.
+
+<p>
+<b>isThird</b><br>
+A conditional indicating that is true if this Post is the third in this Collaboration Asset.
+
+<p>
+<b>isFourth</b><br>
+A conditional indicating that is true if this Post is the fourth in this Collaboration Asset.
+
+<p>
+<b>isFifth</b><br>
+A conditional indicating that is true if this Post is the fifth in this Collaboration Asset.
+
+<p>
+<b>user.isPoster</b><br>
+A conditional indicating that is true if the current user submitted this Post.
+
+<p>
+<b>lastReply.*</b><br>
+These variables are only defined if the <b>Display last reply</b> property is set to true
+in the Collaboration Asset.
+
+<p>
+<b>lastReply.url</b><br>
+The URL to the last reply to this Post.
+
+<p>
+<b>lastReply.title</b><br>
+The title of the last reply.
+
+<p>
+<b>lastReply.user.isVisitor</b><br>
+A conditional that is true if the poster of the last reply is a visitor.
+
+<p>
+<b>lastReply.username</b><br>
+The name of user who submitted the last reply.
+
+<p>
+<b>lastReply.userProfile.url</b><br>
+The URL to the Profile of the User who submitted this Post.
+
+<p>
+<b>lastReply.dateSubmitted.human</b><br>
+The date the last reply was submitted, in a human readable format.
+
+<p>
+<b>lastReply.timeSubmitted.human</b><br>
+The time the last reply was submitted, in a human readable format.
+
+</blockquote>
+
+                |,
+		lastUpdated => 1114148028,
+	},
 
 };
 
