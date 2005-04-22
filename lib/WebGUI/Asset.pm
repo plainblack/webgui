@@ -1233,6 +1233,10 @@ An integer limiting the length of the lineages of the assets to be returned. Thi
 
 An asset object reference to draw a pedigree from. A pedigree includes ancestors, siblings, descendants and other information. It's specifically used in flexing navigations.
 
+=head4 ancestorLimit
+
+An integer describing how many levels of ancestry from the start point that should be retrieved.
+
 =head4 excludeClasses
 
 An array reference containing a list of asset classes to remove from the result set. The opposite of the includOnlyClasses rule.
@@ -1276,9 +1280,12 @@ sub getLineage {
 	# ancestors too
 	my @specificFamilyMembers = ();
 	if (isIn("ancestors",@{$relatives})) {
+		my $i = 1;
 		my @familyTree = ($lineage =~ /(.{6})/g);
                 while (pop(@familyTree)) {
                         push(@specificFamilyMembers,join("",@familyTree)) if (scalar(@familyTree));
+			last if ($i >= $rules->{ancestorLimit});
+			$i++;
                 }
 	}
 	# let's add ourself to the list

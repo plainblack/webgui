@@ -1,6 +1,102 @@
 package WebGUI::i18n::English::Asset_Navigation;
 
 our $I18N = {
+
+	'Specific URL' => {
+		message => 'Specific URL',
+		lastUpdated => 0
+	},
+
+	'Relative To Current URL' => {
+		message => 'Relative To Current URL',
+		lastUpdated => 0
+	},
+
+	'Relative To Root' => {
+		message => 'Relative To Root',
+		lastUpdated => 0
+	},
+
+	'Start Point Type' => {
+		message => 'Start Point Type',
+		lastUpdated => 0
+	},
+
+	'Start Point' => {
+		message => 'Start Point',
+		lastUpdated => 0
+	},
+
+	'Infinity' => {
+		message => 'Infinity',
+		lastUpdated => 0
+	},
+
+	'Ancestor End Point' => {
+		message => 'Ancestor End Point',
+		lastUpdated => 0
+	},
+
+	'Relatives To Include' => {
+		message => 'Relatives To Include',
+		lastUpdated => 0
+	},
+
+	'Ancestors' => {
+		message => 'Ancestors',
+		lastUpdated => 0
+	},
+
+	'Siblings' => {
+		message => 'Siblings',
+		lastUpdated => 0
+	},
+
+	'Self' => {
+		message => 'Self',
+		lastUpdated => 0
+	},
+
+	'Descendants' => {
+		message => 'Descendants',
+		lastUpdated => 0
+	},
+
+	'Pedigree' => {
+		message => 'Pedigree',
+		lastUpdated => 0
+	},
+
+	'Descendant End Point' => {
+		message => 'Descendant End Point',
+		lastUpdated => 0
+	},
+
+	'' => {
+		message => '',
+		lastUpdated => 0
+	},
+
+	'' => {
+		message => '',
+		lastUpdated => 0
+	},
+
+	'' => {
+		message => '',
+		lastUpdated => 0
+	},
+
+	'' => {
+		message => '',
+		lastUpdated => 0
+	},
+
+	'' => {
+		message => '',
+		lastUpdated => 0
+	},
+
 	'32' => {
 		message => q|Show unprivileged pages|,
 		lastUpdated => 1077080845

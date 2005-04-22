@@ -31,6 +31,8 @@
  - Added a config file option to specify where the file cache is persisted.
  - Added complete documentation of all WebGUI config file options to the
    default config file.
+ - Added an end point to limit ancestors in navigation.
+ - Added missing international entries for Navigation.
  - fix [1177858] lib/WebGUI/i18n/English/Macros.pm can not translated
 
 
