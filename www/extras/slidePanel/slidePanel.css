@@ -68,6 +68,7 @@
 }
 .panelLinkIn {
 	position:absolute; 
+	cursor: pointer;
 	height: 25px;
 	overflow: hidden;
 	cursor: hand;
