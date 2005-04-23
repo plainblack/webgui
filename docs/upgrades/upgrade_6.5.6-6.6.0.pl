@@ -33,6 +33,12 @@ foreach my $key ($conf->directives) {
 		$newConfig{$key} = $conf->get($key);
 	}
 }
+my @newAssetList;
+foreach my $asset (@{$newConfig{assets}}) {
+	push(@newAssetList, $asset) unless ($asset eq "WebGUI::Asset::Template");
+}
+$newConfig{utilityAssets} = ["WebGUI::Asset::Template"];
+$newConfig{assets} = \@newAssetList;
 $conf->purge;
 $conf->set(%newConfig);
 $conf->write;

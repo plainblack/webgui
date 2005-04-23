@@ -743,8 +743,10 @@ sub getAssetAdderLinks {
 		}
 	}
 	my $constraint;
-	if ($getContainerLinks) {
+	if ($type eq "assetContainers") {
 		$constraint = quoteAndJoin($session{config}{assetContainers});
+	} elsif ($type eq "utilityAssets") {
+		$constraint = quoteAndJoin($session{config}{utilityAssets});
 	} else {
 		$constraint = quoteAndJoin($session{config}{assets});
 	}
