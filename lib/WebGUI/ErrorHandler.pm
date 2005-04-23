@@ -39,15 +39,11 @@ This package provides simple but effective error handling, debugging,  and loggi
  WebGUI::ErrorHandler::security(message);
  WebGUI::ErrorHandler::warn(message);
 
- WebGUI::ErrorHandler::getAudit();
  WebGUI::ErrorHandler::getSecurity();
  WebGUI::ErrorHandler::getSessionVars();
  WebGUI::ErrorHandler::getStackTrace();
- WebGUI::ErrorHandler::getWarnings();
 
- WebGUI::ErrorHandler::showAudit();
  WebGUI::ErrorHandler::showDebug();
- WebGUI::ErrorHandler::showSecurity();
  WebGUI::ErrorHandler::showStackTrace();
  WebGUI::ErrorHandler::showWarnings();
 
@@ -98,7 +94,7 @@ sub debug {
 	my $message = shift;
 	my $logger = getLogger();
 	$logger->debug($message);
-        $WebGUI::Session::session{debug}{'debug'} .= $message;
+        $WebGUI::Session::session{debug}{'debug'} .= $message."\n";
 }
 
 
@@ -119,7 +115,7 @@ sub error {
 	my $logger = getLogger();
 	$logger->error($message);
 	$logger->debug("Stack trace for ERROR ".$message."\n".getStackTrace());
-        $WebGUI::Session::session{debug}{'error'} .= $message;
+        $WebGUI::Session::session{debug}{'error'} .= $message."\n";
 }
 
 
@@ -231,18 +227,6 @@ sub getStackTrace {
 }
 
 
-#-------------------------------------------------------------------
-
-=head2 getWarn ( )
-
-Returns a text formatted message containing the WARN messages.
-
-=cut
-
-sub getWarnings {
-        return $WebGUI::Session::session{debug}{warning};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -260,7 +244,7 @@ sub info {
 	my $message = shift;
 	my $logger = getLogger();
 	$logger->info($message);
-        $WebGUI::Session::session{debug}{'info'} .= $message;
+        $WebGUI::Session::session{debug}{'info'} .= $message."\n";
 }
 
 
@@ -330,7 +314,7 @@ sub warn {
 	my $message = shift;
 	my $logger = getLogger();
 	$logger->warn($message);
-        $WebGUI::Session::session{debug}{'warn'} .= $message;
+        $WebGUI::Session::session{debug}{'warn'} .= $message."\n";
 }
 
 
