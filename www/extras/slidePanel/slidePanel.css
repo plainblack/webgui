@@ -59,17 +59,16 @@
 .panelLinkOut {
 	position:absolute; 
 	overflow: hidden;
-	height: 25px;
+	height: 20px;
 	cursor: hand;
 	left:0; 
-	/*border: 1px solid #eeeeee; */
 	font-size: 11px;
 	font-family: helvetica, arial, sans;
 }
 .panelLinkIn {
 	position:absolute; 
 	cursor: pointer;
-	height: 25px;
+	height: 20px;
 	overflow: hidden;
 	cursor: hand;
 	left:0; 

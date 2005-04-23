@@ -267,7 +267,7 @@ function createSlidePanelBar(name) {
   	this.ypos=0;                            // bar y-pos
   	this.width=160;                       // bar width
   	this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:document.body.offsetHeight)-10;                     // bar height
-  	this.buttonspace=25                     // distance of panel buttons
+  	this.buttonspace=22                     // distance of panel buttons
   	this.panels=new Array()                 // panels
   	this.addPanel=b_addPanel;               // add new panel to bar
   	this.draw=b_draw;                       // write HTML code of bar
