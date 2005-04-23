@@ -150,17 +150,10 @@ sub readConfig {
         foreach my $key ($config->directives) {
                 $data{$key} = $config->get($key);
         }
-        if (ref $data{assetAddPrivilege} ne "ARRAY") {
-                $data{assetAddPrivilege} = [$data{assetAddPrivilege}];
-        }
-        if (ref $data{authMethods} ne "ARRAY") {
-                $data{authMethods} = [$data{authMethods}];
-        }
-	if (ref $data{wobjects} ne "ARRAY"){
-		$data{wobjects} = [$data{wobjects}];
-	}
-	if (ref $data{paymentPlugins} ne "ARRAY") {
-		$data{paymentPlugins} = [$data{paymentPlugins}] if ($data{paymentPlugins});
+	foreach my $directive (qw(assetAddPrivilege assets utilityAssets assetContainers authMethods paymentPlugins)) {
+	        if (ref $data{$directive} ne "ARRAY") {
+        	        $data{$directive} = [$data{$directive}];
+        	}
 	}
         if( defined( $data{scripturl} ) ) {
                 # get rid of leading "/" if present.
