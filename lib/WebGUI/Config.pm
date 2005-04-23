@@ -150,6 +150,9 @@ sub readConfig {
         foreach my $key ($config->directives) {
                 $data{$key} = $config->get($key);
         }
+        if (ref $data{assetAddPrivilege} ne "ARRAY") {
+                $data{assetAddPrivilege} = [$data{assetAddPrivilege}];
+        }
         if (ref $data{authMethods} ne "ARRAY") {
                 $data{authMethods} = [$data{authMethods}];
         }

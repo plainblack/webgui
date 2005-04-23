@@ -51,7 +51,7 @@ sub process {
 				});
         	}
 		$var{contentTypes_loop} = $session{asset}->getAssetAdderLinks;
-		$var{container_loop} = $session{asset}->getAssetAdderLinks(undef,1);
+		$var{container_loop} = $session{asset}->getAssetAdderLinks(undef,"assetContainers");
 		foreach my $item (@{$session{asset}->getAssetsInClipboard(1)}) {
 			my $title = $item->{title};
 			$title =~ s/'//g; # stops it from breaking the javascript menus

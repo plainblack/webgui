@@ -106,7 +106,6 @@ paymentPlugins = ITransact
 assets = WebGUI::Asset::File::Image, \
 	WebGUI::Asset::File, \
 	WebGUI::Asset::Snippet, \
-	WebGUI::Asset::Template, \
 	WebGUI::Asset::Redirect, \
 	WebGUI::Asset::FilePile, \
 	WebGUI::Asset::Wobject::Article, \
@@ -132,6 +131,18 @@ assets = WebGUI::Asset::File::Image, \
 assetContainers = WebGUI::Asset::Wobject::Layout, \
 	WebGUI::Asset::Wobject::Folder
 
+# Specify the list assets that are used for utility purposes only
+# and are not typically used as a normal part of content
+# management.
+
+utilityAssets => WebGUI::Asset::Template
+
+# Optionally specify a group id for assets to tell WebGUI what
+# group a user needs to be part of in order to add that type of
+# asset.
+
+#assetAddPrivilege = WebGUI::Asset::Wobject::SQLReport => 3, \
+#	WebGUI:::Asset::Template => 4
 
 # If exportPath is defined, an "Export" toolbar icon will appear
 # which allows you to export assets to static html. This folder

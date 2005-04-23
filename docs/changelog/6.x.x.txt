@@ -34,6 +34,7 @@
  - Added an end point to limit ancestors in navigation.
  - Added missing international entries for Navigation.
  - fix [1177858] lib/WebGUI/i18n/English/Macros.pm can not translated
+ - Added the notion of utility assets and moved the Template asset into it.
 
 
 

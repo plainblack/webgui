@@ -65,9 +65,9 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  $html=                  WebGUI::Asset->exportAsHtml(\%params);
  $string=                WebGUI::Asset->fixUrl("Title of Page");
  $string=                WebGUI::Asset->formatRank(1);
- $hashref=               WebGUI::Asset->get("title");
+ $hashref=               WebGUI::Asset->get();
  $AdminConsoleObject=    WebGUI::Asset->getAdminConsole();
- $arrayRef=              WebGUI::Asset->getAssetAdderLinks($string, $boolean);
+ $arrayRef=              WebGUI::Asset->getAssetAdderLinks($string);
  $JavaScript=            WebGUI::Asset->getAssetManagerControl(\%hashref, $string, $bool);
  $arrayRef=              WebGUI::Asset->getAssetsInClipboard($boolean, $string);
  $arrayRef=              WebGUI::Asset->getAssetsInTrash($boolean, $string);
@@ -187,6 +187,32 @@ sub addChild {
 	return $newAsset;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 canAdd ( [userId, groupId] )
+
+Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
+
+=head3 userId
+
+Unique hash identifier for a user. If not supplied, current user. 
+
+=head3 groupId
+
+Only developers extending this method should use this parameter. By default WebGUI will check groups in this order, whichever is defined: Group id assigned in the config file for each asset. Group assigned by the developer in the asset itself if s/he extended this method to do so. The "turn admin on" group which is group id 12.
+
+=cut
+
+sub canAdd {
+	my $self = shift;
+	my $userId = shift || $session{user}{userId};
+	my $className = $self->definition->[0]->{className};
+	my $groupId = $session{config}{assetAddPrivilege}{$className} || shift || '12';
+        return WebGUI::Grouping::isInGroup($groupId,$userId);
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 canEdit ( [userId] )
@@ -207,6 +233,8 @@ sub canEdit {
 	}
         return WebGUI::Grouping::isInGroup($self->get("groupIdEdit"),$userId);
 }
+
+
 #-------------------------------------------------------------------
 
 =head2 canView ( [userId] )
@@ -671,7 +699,7 @@ sub getAdminConsole {
 
 #-------------------------------------------------------------------
 
-=head2 getAssetAdderLinks ( [addToUrl, getContainerLinks] )
+=head2 getAssetAdderLinks ( [addToUrl, type] )
 
 Returns an arrayref that contains a label (name of the class of Asset) and url (url link to function to add the class).
 
@@ -679,18 +707,16 @@ Returns an arrayref that contains a label (name of the class of Asset) and url (
 
 Any text to append to the getAssetAdderLinks URL. Usually name/variable pairs to pass in the url. If addToURL is specified, the character "&" and the text in addToUrl is appended to the returned url.
 
-=head3 getContainerLinks
+=head3 type
 
-A boolean indicating whether to return asset container links or regular asset links.
+A string indicating which type of adders to return. Defaults to "assets". Choose from "assets", "assetContainers", or "utilityAssets".
 
 =cut
 
 sub getAssetAdderLinks {
 	my $self = shift;
 	my $addToUrl = shift;
-	my $getContainerLinks = shift;
-	my $type = "assets";
-	$type = "assetContainers" if ($getContainerLinks);
+	my $type = shift || "assets";
 	my %links;
 	foreach my $class (@{$session{config}{$type}}) {
 		my $load = "use ".$class;
@@ -727,11 +753,11 @@ sub getAssetAdderLinks {
 		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
 		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
-		$links{$asset->get("title")}{url} = $url;
-		$links{$asset->get("title")}{icon} = $asset->getIcon;
-		$links{$asset->get("title")}{'icon.small'} = $asset->getIcon(1);
-		$links{$asset->get("title")}{'isPrototype'} = 1;
-		$links{$asset->get("title")}{'asset'} = $asset;
+		$links{$asset->getTitle}{url} = $url;
+		$links{$asset->getTitle}{icon} = $asset->getIcon;
+		$links{$asset->getTitle}{'icon.small'} = $asset->getIcon(1);
+		$links{$asset->getTitle}{'isPrototype'} = 1;
+		$links{$asset->getTitle}{'asset'} = $asset;
 	}
 	my @sortedLinks;
 	foreach my $label (sort keys %links) {
@@ -794,7 +820,7 @@ sub getAssetManagerControl {
 	my $ancestors = $self->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
 	my @dataArray;
 	foreach my $ancestor (@{$ancestors}) {
-		my $title = $ancestor->get("title");
+		my $title = $ancestor->getTitle;
 		$title =~ s/\'/\\\'/g;
 		push(@dataArray,"['".$ancestor->getId."','".$ancestor->getUrl."','".$title."']\n");
 	}
@@ -804,7 +830,7 @@ sub getAssetManagerControl {
 	$output .= "/*rank, title, type, lastUpdate, size, url, assetId, icon */\nvar assets = [\n";
 	@dataArray = ();
 	foreach my $child (@{$children}) {
-		my $title = $child->get("title");
+		my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
 		push(@dataArray, '['.$child->getRank.",'".$title."','".$child->getName."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))."','".formatBytes($child->get("assetSize"))."','".$child->getUrl."','".$child->getId."','".$child->getIcon(1)."']\n");
 #my $hasChildren = "false";
@@ -1407,6 +1433,24 @@ sub getLineageLength {
 	return length($self->get("lineage"))/6;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getMenuTitle ( )
+
+Returns the menu title of this asset. If it's not specified or it's "Untitled" then the asset's name will be returned instead.
+
+=cut
+
+sub getMenuTitle {
+	my $self = shift;
+	if ($self->get("menuTitle") eq "" || lc($self->get("menuTitle")) eq "untitled") {
+		return $self->getName;
+	} 
+	return $self->get("menuTitle");
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 getMetaDataFields ( [fieldId] )
@@ -1575,6 +1619,23 @@ sub getRoot {
 
 #-------------------------------------------------------------------
 
+=head2 getTitle ( )
+
+Returns the title of this asset. If it's not specified or it's "Untitled" then the asset's name will be returned instead.
+
+=cut
+
+sub getTitle {
+	my $self = shift;
+	if ($self->get("title") eq "" || lc($self->get("title")) eq "untitled") {
+		return $self->getName;
+	} 
+	return $self->get("title");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
@@ -1589,8 +1650,6 @@ sub getToolbar {
              	.moveDownIcon('func=demote',$self->get("url"))
             	.cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
-              #	.moveTopIcon('func=moveTop&wid='.${$wobject}{wobjectId})
-              #	.moveBottomIcon('func=moveBottom&wid='.${$wobject}{wobjectId})
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
 	return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
 }
@@ -2338,6 +2397,7 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 
 sub www_add {
 	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless ($self->canAdd);
 	my %prototypeProperties; 
 	if ($session{form}{'prototype'}) {
 		my $prototype = WebGUI::Asset->newByDynamicClass($session{form}{'prototype'},$session{form}{class});
@@ -2380,7 +2440,7 @@ sub www_copy {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newAsset = $self->duplicate;
-	$newAsset->update({ title=>$newAsset->get("title").' (copy)'});
+	$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
 	$newAsset->cut;
 	return $self->getContainer->www_view;
 }
@@ -2400,7 +2460,7 @@ sub www_copyList {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
-			$newAsset->update({ title=>$newAsset->get("title").' (copy)'});
+			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
 			$newAsset->cut;
 		}
 	}
@@ -2418,8 +2478,8 @@ sub www_createShortcut () {
 	my $child = $self->addChild({
 		className=>'WebGUI::Asset::Shortcut',
 		shortcutToAssetId=>$self->getId,
-		title=>$self->get("title"),
-		menuTitle=>$self->get("menuTitle"),
+		title=>$self->getTitle,
+		menuTitle=>$self->getMenuTitle,
 		isHidden=>$self->get("isHidden"),
 		newWindow=>$self->get("newWindow"),
 		startDate=>$self->get("startDate"),
@@ -3112,14 +3172,21 @@ sub www_manageAssets {
             &nbsp;
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1083,"Asset").'</legend>';
-	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets",1)}) {
+	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
-	$output .= '<hr>';
+	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
+		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= '<br />';
+	}
+	$output .= '<hr />';
+	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});

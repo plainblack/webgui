@@ -328,10 +328,12 @@ sub view {
 	$rules{ancestorLimit} = $self->get("ancestorEndPoint");
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
-	my @interestingProperties = ('assetId', 'parentId', 'title', 'ownerUserId', 'synopsis', 'newWindow', 'menuTitle');
+	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
 	foreach my $property (@interestingProperties) {
 		$var->{'currentPage.'.$property} = $current->get($property);
 	}
+	$var->{'currentPage.menuTitle'} = $current->getMenuTitle;
+	$var->{'currentPage.title'} = $current->getTitle;
 	$var->{'currentPage.isHome'} = ($current->getId eq $session{setting}{defaultPage});
 	$var->{'currentPage.url'} = $current->getUrl;
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
@@ -358,6 +360,8 @@ sub view {
 		foreach my $property (@interestingProperties) {
 			$pageData->{"page.".$property} = $asset->get($property);
 		}
+		$pageData->{'page.menuTitle'} = $asset->getMenuTitle;
+		$pageData->{'page.title'} = $asset->getTitle;
 		# build nav variables
 		$pageData->{"page.rank"} = $asset->getRank;
 		$pageData->{"page.absDepth"} = $asset->getLineageLength;
@@ -412,6 +416,8 @@ sub view {
 			foreach my $property (@interestingProperties) {
 				$pageData->{"page.parent.".$property} = $parent->get($property);
 			}
+			$pageData->{'page.parent.menuTitle'} = $parent->getMenuTitle;
+			$pageData->{'page.parent.title'} = $parent->getTitle;
 			$pageData->{"page.parent.url"} = $parent->getUrl;	
 			# these next two variables can be very inefficient, consider getting rid of them
 			my $parentsFirstChild = $parent->getFirstChild;
