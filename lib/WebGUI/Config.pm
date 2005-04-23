@@ -150,9 +150,14 @@ sub readConfig {
         foreach my $key ($config->directives) {
                 $data{$key} = $config->get($key);
         }
-	foreach my $directive (qw(assetAddPrivilege assets utilityAssets assetContainers authMethods paymentPlugins)) {
+	foreach my $directive (qw(assets utilityAssets assetContainers authMethods paymentPlugins)) {
 	        if (ref $data{$directive} ne "ARRAY") {
         	        $data{$directive} = [$data{$directive}];
+        	}
+	}
+	foreach my $directive (qw(assetAddPrivilege macros)) {
+	        if (ref $data{$directive} ne "HASH") {
+        	        $data{$directive} = {};
         	}
 	}
         if( defined( $data{scripturl} ) ) {

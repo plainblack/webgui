@@ -205,10 +205,10 @@ Only developers extending this method should use this parameter. By default WebG
 =cut
 
 sub canAdd {
-	my $self = shift;
+	my $className = shift;
 	my $userId = shift || $session{user}{userId};
-	my $className = $self->definition->[0]->{className};
-	my $groupId = $session{config}{assetAddPrivilege}{$className} || shift || '12';
+	my $subclassGroupId = shift;
+	my $groupId = $session{config}{assetAddPrivilege}{$className} || $subclassGroupId || '12';
         return WebGUI::Grouping::isInGroup($groupId,$userId);
 }
 
@@ -730,6 +730,12 @@ sub getAssetAdderLinks {
 			} else {
 				next if ($uiLevel > $session{user}{uiLevel});
 			}
+			my $canAdd = eval{$class->canAdd()};
+			if ($@) {
+				WebGUI::ErrorHandler::error("Couldn't determine if user can add ".$class." because ".$@);
+			} else {
+				next unless ($canAdd);
+			}
 			my $label = eval{$class->getName()};
 			if ($@) {
 				WebGUI::ErrorHandler::error("Couldn't get the name of ".$class." because ".$@);
@@ -753,6 +759,7 @@ sub getAssetAdderLinks {
 	my $sth = WebGUI::SQL->read("select className,assetId from asset where isPrototype=1 and state='published' and className in ($constraint)");
 	while (my ($class,$id) = $sth->array) {
 		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $session{user}{uiLevel});
 		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
 		$links{$asset->getTitle}{url} = $url;
