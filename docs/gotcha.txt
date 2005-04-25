@@ -34,6 +34,14 @@ save you many hours of grief.
 	to set up custom logging rules, see this web page:
 	http://log4perl.sourceforge.net/releases/Log-Log4perl/docs/html/Log/Log4perl/Config.html
 
+* The Payment plugins should provide two new methods: shippingCost and 
+	shippingDescription. Plugins that do not have these methods
+	will fatal error when checking out.
+
+* The Commerce/ConfirmCheckout template has a lot of new variables to
+	use, but also some (existing ones) have been renamed. Please refer
+	to the corresponding help file.
+
 
 6.5.6
 --------------------------------------------------------------------
