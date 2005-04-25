@@ -30,6 +30,32 @@ our $HELP = {
 		]
 	},
 
+	'collaboration template' => {
+		title => 'collaboration template title',
+		body => 'collaboration template body',
+		related => [
+			{
+		   		tag => 'collaboration template labels',
+				namespace => 'Asset_Collaboration',
+			},
+			{
+		   		tag => 'collaboration post list template variables',
+				namespace => 'Asset_Collaboration',
+			},
+		]
+	},
+
+	'collaboration search template' => {
+		title => 'collaboration search template title',
+		body => 'collaboration search template body',
+		related => [
+			{
+		   		tag => 'collaboration post list template variables',
+				namespace => 'Asset_Collaboration',
+			},
+		]
+	},
+
 };
 
 1;

@@ -1056,6 +1056,162 @@ The time the last reply was submitted, in a human readable format.
 		lastUpdated => 1114148028,
 	},
 
+	'collaboration template title' => {
+		message => q|Collaboration Template|,
+		lastUpdated => 1114466567,
+	},
+
+	'collaboration template body' => {
+		message => q|These variables are available in the Collaboration Template:<p>
+
+<p>
+<b>user.canPost</b><br>
+A conditional that is true if the current user can add posts to this Collaboration Asset.
+
+<p>
+<b>user.isModerator</b><br>
+A conditional that is true if the current user is a moderator for this Asset.
+
+<p>
+<b>user.isVisitor</b><br>
+A conditional that is true if the current user is a Visitor.
+
+<p>
+<b>user.isSubscribed</b><br>
+A conditional that is true if the current user is subscribed to this Collaboration Asset.
+
+<p>
+<b>add.url</b><br>
+A URL for adding a new thread.
+
+<p>
+<b>rss.url</b><br>
+A URL for downloading the RSS summary of this Asset.
+
+<p>
+<b>search.url</b><br>
+A URL for accessing the search form for this Collaboration Asset.
+
+<p>
+<b>subscribe.url</b><br>
+A URL for subscribing the current user to this Collaboration Asset.  When new content is submitted to
+the Collaboration Asset, the user will be notified.
+
+<p>
+<b>unsubscribe.url</b><br>
+A URL for unsubscribing the current user from this Asset.
+
+<p>
+<b>sortby.title.url</b><br>
+A URL for sorting and displaying the list of posts by title.
+
+<p>
+<b>sortby.username.url</b><br>
+A URL for sorting and displaying the list of posts by username.
+
+<p>
+<b>sortby.date.url</b><br>
+A URL for sorting and displaying the list of posts by the date they were submitted.
+
+<p>
+<b>sortby.lastreply.url</b><br>
+A URL for sorting and displaying the list of posts by the date they were last updated.
+
+<p>
+<b>sortby.views.url</b><br>
+A URL for sorting and displaying the list of posts by the number of times each has been read.
+
+<p>
+<b>sortby.replies.url</b><br>
+A URL for sorting and displaying the list of posts by the number of replies to the post.
+
+<p>
+<b>sortby.rating.url</b><br>
+A URL for sorting and displaying the list of posts by their ratings.
+
+                |,
+		lastUpdated => 1114466583,
+	},
+
+	'collaboration search template title' => {
+		message => q|Collaboration Search Template|,
+		lastUpdated => 1114467745,
+	},
+
+	'collaboration search template body' => {
+		message => q|These variables are available in the Collaboration Search Template:<p>
+
+<p>
+<b>form.header</b><br>
+HTML and javascript required to make the form work.
+
+<p>
+<b>all.form</b><br>
+HTML form for adding a field where all input has to be in matched pages.
+
+<p>
+<b>exactphrase.form</b><br>
+An HTML form to enter in a phrase to search for.
+
+<p>
+<b>atleastone.form</b><br>
+An HTML form to enter in a list of words.  Search results will always contain at least one of
+these.
+
+<p>
+<b>without.form</b><br>
+An HTML form to enter in a list of words.  If any word is found on a page it will not be included
+in the search results, even if other fields match.
+
+<p>
+<b>results.form</b><br>
+An HTML form for picking how many results are returned.
+
+<p>
+<b>form.search</b><br>
+A button to add to the form to begin searching.
+
+<p>
+<b>back.url</b><br>
+A URL for returning to the main view for this Collaboration Asset.
+
+<p>
+<b>unsubscribe.url</b><br>
+A URL for unsubscribing the current user from this Asset.
+
+<p>
+<b>sortby.title.url</b><br>
+A URL for sorting and displaying the list of posts by title.
+
+<p>
+<b>sortby.username.url</b><br>
+A URL for sorting and displaying the list of posts by username.
+
+<p>
+<b>sortby.date.url</b><br>
+A URL for sorting and displaying the list of posts by the date they were submitted.
+
+<p>
+<b>sortby.lastreply.url</b><br>
+A URL for sorting and displaying the list of posts by the date they were last updated.
+
+<p>
+<b>sortby.views.url</b><br>
+A URL for sorting and displaying the list of posts by the number of times each has been read.
+
+<p>
+<b>sortby.replies.url</b><br>
+A URL for sorting and displaying the list of posts by the number of replies to the post.
+
+<p>
+<b>sortby.rating.url</b><br>
+A URL for sorting and displaying the list of posts by their ratings.
+
+                |,
+		lastUpdated => 1114467741,
+	},
+
+
 };
 
 1;
