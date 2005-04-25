@@ -443,7 +443,7 @@ sub prepare {
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
-        my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatalError("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
+        my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatal("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
 	bless ({_sth => $sth, _sql => $sql}, $class);
 }
 
@@ -811,7 +811,7 @@ sub write {
 	if ($WebGUI::Session::session{setting}{showDebug}) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
-     	$dbh->do($sql) or WebGUI::ErrorHandler::fatalError("Couldn't write to the database: ".$sql." : ". DBI->errstr);
+     	$dbh->do($sql) or WebGUI::ErrorHandler::fatal("Couldn't write to the database: ".$sql." : ". DBI->errstr);
 }
 
 
