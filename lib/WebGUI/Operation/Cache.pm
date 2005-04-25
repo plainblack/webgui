@@ -33,6 +33,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_flushCache {
+        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $cache = WebGUI::Cache->new();
 	$cache->flush;
 	return www_manageCache();
