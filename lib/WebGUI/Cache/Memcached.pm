@@ -15,6 +15,7 @@ package WebGUI::Cache::Memcached;
 =cut
 
 use Cache::Memcached;
+use Digest::MD5;
 
 use HTTP::Headers;
 use HTTP::Request;
@@ -134,6 +135,11 @@ sub new {
 	my $class = shift;
 	my $key = shift;
 	my $namespace = shift || $session{config}{configFile};
+
+	# Overcome maximum key length of 255 characters 
+	if(length($key.$namespace) > 255) {
+		$key = Digest::MD5::md5_base64($key); 
+	}
 
 	my $servers = $session{config}{memcached_servers};
 	$servers = [ $servers ] unless (ref $servers);
