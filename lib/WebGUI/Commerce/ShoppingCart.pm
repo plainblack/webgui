@@ -54,12 +54,15 @@ The number of items to add. Defaults to 1 if quantity is not given.
 =cut
 
 sub add {
-	my ($self, $itemId, $itemType, $quantity);
+	my ($self, $itemId, $itemType, $quantity, $item);
 	$self = shift;
 	$itemId = shift;
 	$itemType = shift;
 	$quantity = shift || 1;
 
+	$item = WebGUI::Commerce::Item->new($itemId, $itemType);
+	return "" unless ($item->available);
+	
 	$self->{_items}{$itemId."_".$itemType} = {
 		itemId		=> $itemId,
 		itemType	=> $itemType,
@@ -70,6 +73,38 @@ sub add {
 	WebGUI::SQL->write("insert into shoppingCart ".
 		"(sessionId, itemId, itemType, quantity) values ".
 		"(".quote($self->{_sessionId}).",".quote($itemId).",".quote($itemType).",".$self->{_items}{$itemId."_".$itemType}{quantity}.")");
+}
+
+#-------------------------------------------------------------------
+sub delete {
+	my ($self, $itemId, $itemType);
+	
+	$self = shift;
+	$itemId = shift;
+	$itemType = shift;
+
+	WebGUI::SQL->write("delete from shoppingCart where sessionId=".quote($self->{_sessionId}).
+		" and itemId=".quote($itemId)." and itemType=".quote($itemType));
+	
+	delete $self->{_items}{$itemId."_".$itemType};
+}
+
+#-------------------------------------------------------------------
+sub setQuantity {
+	my ($self, $itemId, $itemType, $quantity);
+	$self = shift;
+	$itemId = shift;
+	$itemType = shift;
+	$quantity = shift;
+
+	WebGUI::ErrorHandler::fatal('No quantity or quantity is not a number: ('.$quantity.')') unless ($quantity =~ /^-?\d+$/);
+
+	return $self->delete($itemId, $itemType) if ($quantity <= 0);
+	
+	$self->{_items}{$itemId."_".$itemType}->{quantity} = $quantity;
+
+	WebGUI::SQL->write("update shoppingCart set quantity=".quote($quantity).
+		" where sessionId=".quote($self->{_sessionId})." and itemId=".quote($itemId)." and itemType=".quote($itemType));
 }
 
 #-------------------------------------------------------------------

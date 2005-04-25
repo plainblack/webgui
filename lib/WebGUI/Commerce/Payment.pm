@@ -85,8 +85,7 @@ sub configurationForm {
 	$f->yesNo(
 		-name	=> $self->prepend('enabled'),
 		-value	=> $self->enabled,
-#### intl ####
-		-label	=> 'Enable',
+		-label	=> WebGUI::International->get('enable', 'Commerce'),
 		);
 	$f->raw($form);
 
@@ -434,6 +433,16 @@ sub recurringPeriodValues {
 		);
 	
 	return \%periods;
+}
+
+#-------------------------------------------------------------------
+sub shippingCost {
+	return WebGUI::ErrorHandler::fatal("You must override the shippingCost method in the payment plugin.");
+}
+
+#-------------------------------------------------------------------
+sub shippingDescription {
+	return WebGUI::ErrorHandler::fatal("You must override the shippingDescription method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------

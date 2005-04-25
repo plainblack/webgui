@@ -95,7 +95,7 @@ sub cancelRecurringPayment {
 sub connectionError {
 	my ($self, $resultCode);
 	$self = shift;
-	
+
 	return $self->resultMessage if ($self->{_connectionError});
 	return undef;
 }
@@ -555,7 +555,7 @@ sub getRecurringPaymentStatus {
 sub errorCode {
 	my ($self, $resultCode);
 	$self = shift;
-	
+
 	$resultCode = $self->{_response}->{Status};
 	return $resultCode unless ($resultCode eq 'OK');
 	return undef;
@@ -634,6 +634,18 @@ sub resultMessage {
 }
 
 #-------------------------------------------------------------------
+sub shippingCost {
+	my $self = shift;
+	$self->{_shipping}->{cost} = shift;
+}
+
+#-------------------------------------------------------------------
+sub shippingDescription {
+	my $self = shift;
+	$self->{_shipping}->{description} = shift;
+}
+
+#-------------------------------------------------------------------
 sub submit {
 	my ($self, $xml, $items);
 	$self = shift;
@@ -703,6 +715,15 @@ my	%transactionData = %{$self->{_transactionParams}};
       </Item>\n";
 	}
 
+	if ($self->{_shipping}->{cost}) {
+		$xml .=
+"     <Item>
+        <Description>Shipping cost. ".$self->{_shipping}->{description}."</Description>
+	<Cost>".sprintf('%.2f', $self->{_shipping}->{cost})."</Cost>
+	<Qty>1</Qty>
+      </Item>\n";
+	};
+
 	$xml .=
 "    </OrderItems>
   </TransactionData>
@@ -752,6 +773,7 @@ sub supports {
 #-------------------------------------------------------------------
 sub transactionCompleted {
 	my ($self) = shift;
+
 	return ($self->{_response}->{Status} eq 'OK');
 }
 
@@ -759,7 +781,7 @@ sub transactionCompleted {
 sub transactionError {
 	my ($self, $resultCode);
 	$self = shift;
-	
+
 	$resultCode = $self->resultCode;
 	return $self->resultMessage if ($resultCode ne 'OK');
 	return undef;

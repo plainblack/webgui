@@ -7,3 +7,45 @@ update template set template = '<a href=\"<tmpl_var back.url>\"><tmpl_var back.l
 alter table Navigation change endPoint descendantEndPoint int not null default 55;
 alter table Navigation add column anscestorEndPoint int not null default 55;
 
+create table productVariants (
+	variantId	varchar(22) not null primary key,
+	productId	varchar(22) not null,
+	composition	mediumtext not null,
+	sku		varchar(255),
+	price		decimal(12,2) default 0,
+	weight		decimal(8,3) default 0,
+	skuOverride	tinyint(1) default 0,
+	priceOverride	tinyint(1) default 0,
+	weightOverride	tinyint(1) default 0,
+	available	tinyint(1) default 1
+);
+create table products (
+	productId	varchar(22) not null primary key,
+	title		varchar(255) not null,
+	description	mediumtext,
+	price		decimal(12,2) not null,
+	weight		decimal(8,3) not null,
+	sku		varchar(255) not null,
+	skuTemplate	varchar(255),
+	templateId	varchar(22)
+);
+create table productParameters (
+	parameterId	varchar(22) not null primary key,
+	productId	varchar(22) not null,
+	name		varchar(64) not null
+);
+create table productParameterOptions (
+	optionId	varchar(22) not null primary key,
+	parameterId	varchar(22) not null,
+	value		varchar(64) not null,
+	priceModifier	decimal(10,2) default 0,
+	weightModifier	decimal(6,2) default 0,
+	skuModifier	varchar(64)
+);
+
+alter table transaction add column shippingCost varchar(9) default '0.00';
+alter table transaction add column shippingMethod varchar(15);
+alter table transaction add column shippingOptions text;
+alter table transaction add column shippingStatus varchar(15) default 'NotShipped';
+alter table transaction add column trackingNumber varchar(255);
+

@@ -160,6 +160,9 @@ sub readConfig {
         	        $data{$directive} = {};
         	}
 	}
+	if (ref $data{shippingPlugins} ne "ARRAY") {
+		$data{shippingPlugins} = [$data{shippingPlugins}] if ($data{shippingPlugins});
+	}
         if( defined( $data{scripturl} ) ) {
                 # get rid of leading "/" if present.
                 $data{scripturl} =~ s/^\///;

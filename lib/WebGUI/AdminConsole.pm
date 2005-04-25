@@ -300,6 +300,15 @@ sub getAdminFunction {
 			op=>"listSubscriptions",
 			group=>"3"
 		},
+		"productManager"=>{
+			title=>{
+				id=>"manage products",
+				namespace=>"ProductManager"
+			},
+			icon=>"productManager.gif",
+			op=>"listProducts",
+			group=>"14"
+		},
 		"cache"=>{
                         title=>{
                                 id=>"manage cache",

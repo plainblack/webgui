@@ -36,6 +36,12 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+sub available {
+	return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 description ( )
 
 This returns the description of the item. This must be implemented by an item plugin.
@@ -111,6 +117,10 @@ sub name {
 	return WebGUI::ErrorHandler::fatal('The name method of WebGUI::Commerce::Item must be overridden.');
 }
 
+sub needsShipping {
+	return 0;
+}
+
 #-------------------------------------------------------------------
 
 =head2 new ( itemdId, itemType )
@@ -135,6 +145,9 @@ sub new {
     	$class = shift;
 	$id = shift;
 	$namespace = shift;
+	
+	WebGUI::ErrorHandler::fatal('No namespace') unless ($namespace);
+	WebGUI::ErrorHandler::fatal('No ID') unless ($id);
 	
     	$cmd = "WebGUI::Commerce::Item::$namespace";
 	$load = "use $cmd";
@@ -168,6 +181,19 @@ Returns the type (namespace) of the item.
 
 sub type {
 	return WebGUI::ErrorHandler::fatalError('The type method of WebGUI::Commerce::Item must be overridden.');
+}
+
+#-------------------------------------------------------------------
+
+=head2 weight ( )
+
+Returns the weight of the item. If your item has a weight, you'll want to overload this method. Weight is calculated on a unit based scale.
+So for instance if your units are kg's 3.154 means 3 kg and 154 grams.
+
+=cut
+
+sub weight {
+	return 0;
 }
 
 1;

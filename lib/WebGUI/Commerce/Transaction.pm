@@ -113,6 +113,41 @@ sub delete {
 	undef $self;
 }
 
+sub deleteItem {
+
+}
+
+#-------------------------------------------------------------------
+sub deleteItem {
+	my ($self, $itemId, $itemType, $amount, @items);
+	$self = shift;
+	$itemId = shift;
+	$itemType = shift;
+
+	WebGUI::ErrorHandler::fatal('No itemId') unless ($itemId);
+	WebGUI::ErrorHandler::fatal('No itemType') unless ($itemType);
+	
+	$amount = $self->get('amount');
+	
+	foreach (@{$self->getItems}) {
+		
+		if (($_->{itemId} eq $itemId) && ($_->{itemType} eq $itemType)) {
+			$amount = $amount - ($_->{quantity} * $_->{amount});
+		} else {
+			push(@items, $_);
+		}			
+	}
+	
+	WebGUI::SQL->write("delete from transactionItem where transactionId=".quote($self->get('transactionId')).
+		" and itemId=".quote($itemId)." and itemType=".quote($itemType));
+
+	WebGUI::SQL->write("update transaction set amount=".quote($amount)." where transactionId=".quote($self->get('transactionId')));
+	
+	$self->{_properties}{amount} = $amount;
+
+	$self->{_items} = \@items;
+}
+
 #-------------------------------------------------------------------
 
 =head2 gateway ( gatewayName )
@@ -227,6 +262,33 @@ sub getItems {
 	
 	return $self->{_items};
 }
+
+#-------------------------------------------------------------------
+sub getTransactions {
+	my ($self, $criteria, @constraints, $sql, @transactionIds, @transactions);
+	
+	$self = shift;
+	$criteria = shift;
+	
+	push (@constraints, 'initDate >= '.quote($criteria->{initStart})) if (defined $criteria->{initStart});
+	push (@constraints, 'initDate <= '.quote($criteria->{initStop})) if (defined $criteria->{initStop});
+	push (@constraints, 'initDate >= '.quote($criteria->{completionStart})) if (defined $criteria->{completionStart});
+	push (@constraints, 'initDate >= '.quote($criteria->{completionStop})) if (defined $criteria->{completionStop});
+	push (@constraints, 'status='.quote($criteria->{paymentStatus})) if (defined $criteria->{paymentStatus});
+	push (@constraints, 'shippingStatus='.quote($criteria->{shippingStatus})) if (defined $criteria->{shippingStatus});
+	
+	$sql = 'select transactionId from transaction';
+	$sql .= ' where '.join(' and ', @constraints) if (@constraints);
+	
+	@transactionIds = WebGUI::SQL->buildArray($sql);
+
+	foreach (@transactionIds) {
+		push(@transactions, WebGUI::Commerce::Transaction->new($_));
+	}
+
+	return @transactions;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -345,6 +407,62 @@ sub pendingTransactions {
 }
 
 #-------------------------------------------------------------------
+sub shippingCost {
+	my ($self, $shippingCost);
+	$self = shift;
+	$shippingCost = shift;
+
+	if ($shippingCost) {
+		$self->{_properties}{shippingCost} = $shippingCost;
+		WebGUI::SQL->write("update transaction set shippingCost=".quote($shippingCost)." where transactionId=".quote($self->{_transactionId}));
+	}
+
+	return $self->{_properties}{shippingCost};
+}
+
+#-------------------------------------------------------------------
+sub shippingMethod {
+	my ($self, $shippingMethod);
+	$self = shift;
+	$shippingMethod = shift;
+
+	if ($shippingMethod) {
+		$self->{_properties}{shippingMethod} = $shippingMethod;
+		WebGUI::SQL->write("update transaction set shippingMethod=".quote($shippingMethod)." where transactionId=".quote($self->{_transactionId}));
+	}
+
+	return $self->{_properties}{shippingMethod};
+}
+
+#-------------------------------------------------------------------
+sub shippingOptions {
+	my ($self, $shippingOptions);
+	$self = shift;
+	$shippingOptions = shift;
+
+	if ($shippingOptions) {
+		$self->{_properties}{shippingOptions} = $shippingOptions;
+		WebGUI::SQL->write("update transaction set shippingOptions=".quote($shippingOptions)." where transactionId=".quote($self->{_transactionId}));
+	}
+
+	return $self->{_properties}{shippingOptions};
+}
+
+#-------------------------------------------------------------------
+sub shippingStatus {
+	my ($self, $shippingStatus);
+	$self = shift;
+	$shippingStatus = shift;
+
+	if ($shippingStatus) {
+		$self->{_properties}{shippingStatus} = $shippingStatus;
+		WebGUI::SQL->write("update transaction set shippingStatus=".quote($shippingStatus)." where transactionId=".quote($self->{_transactionId}));
+	}
+
+	return $self->{_properties}{shippingStatus};
+}
+
+#-------------------------------------------------------------------
 
 =head2 status ( status )
 
@@ -367,6 +485,21 @@ sub status {
 	}
 
 	return $self->{_properties}{status};
+}
+
+
+#-------------------------------------------------------------------
+sub trackingNumber {
+	my ($self, $trackingNumber);
+	$self = shift;
+	$trackingNumber = shift;
+
+	if ($trackingNumber) {
+		$self->{_properties}{trackingNumber} = $trackingNumber;
+		WebGUI::SQL->write("update transaction set trackingNumber=".quote($trackingNumber)." where transactionId=".quote($self->{_transactionId}));
+	}
+
+	return $self->{_properties}{trackingNumber};
 }
 
 #-------------------------------------------------------------------

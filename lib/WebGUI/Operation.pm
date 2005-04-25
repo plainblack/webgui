@@ -184,20 +184,50 @@ sub getOperations {
 	  'redeemSubscriptionCode' => 'WebGUI::Operation::Subscription',
 	  'listSubscriptionCodes' => 'WebGUI::Operation::Subscription',
 	  'deleteSubscriptionCodes' => 'WebGUI::Operation::Subscription',
+
+	  'addToCart' => 'WebGUI::Operation::Commerce',
 	  'checkout' => 'WebGUI::Operation::Commerce',
 	  'checkoutConfirm' => 'WebGUI::Operation::Commerce',
 	  'checkoutSubmit' => 'WebGUI::Operation::Commerce',
+	  'deleteCartItem' => 'WebGUI::Operation::Commerce',
 	  'editCommerceSettings' => 'WebGUI::Operation::Commerce',
 	  'editCommerceSettingsSave' => 'WebGUI::Operation::Commerce',
-	  'listPendingTransactions' => 'WebGUI::Operation::Commerce',
+	  'listTransactions' => 'WebGUI::Operation::Commerce',
 	  'cancelTransaction' => 'WebGUI::Operation::Commerce',
 	  'completePendingTransaction' => 'WebGUI::Operation::Commerce',
 	  'selectPaymentGateway' => 'WebGUI::Operation::Commerce',
+	  'selectPaymentGatewaySave' => 'WebGUI::Operation::Commerce',
+	  'selectShippingMethod' => 'WebGUI::Operation::Commerce',
+	  'selectShippingMethodSave' => 'WebGUI::Operation::Commerce',
+	  'updateCart' => 'WebGUI::Operation::Commerce',
+	  'viewCart' => 'WebGUI::Operation::Commerce',
+	  
 	  'viewPurchaseHistory' => 'WebGUI::Operation::TransactionLog',
 	  'cancelRecurringTransaction' => 'WebGUI::Operation::TransactionLog',
+	  'deleteTransaction' => 'WebGUI::Operation::TransactionLog',
+	  'deleteTransactionItem' => 'WebGUI::Operation::TransactionLog',
+
+	  'deleteProduct' => 'WebGUI::Operation::ProductManager',
+	  'deleteProductParameter' => 'WebGUI::Operation::ProductManager',
+	  'deleteProductParameterOption' => 'WebGUI::Operation::ProductManager',
+	  'editProduct' => 'WebGUI::Operation::ProductManager',
+	  'editProductSave' => 'WebGUI::Operation::ProductManager',
+	  'editProductParameter' => 'WebGUI::Operation::ProductManager',
+	  'editProductParameterSave' => 'WebGUI::Operation::ProductManager',
+	  'editProductParameterOption' => 'WebGUI::Operation::ProductManager',
+	  'editProductParameterOptionSave' => 'WebGUI::Operation::ProductManager',
+	  'editProductVariant' => 'WebGUI::Operation::ProductManager',
+	  'editProductVariantSave' => 'WebGUI::Operation::ProductManager',
+	  'editSkuTemplate' => 'WebGUI::Operation::ProductManager',
+	  'editSkuTemplateSave' => 'WebGUI::Operation::ProductManager',
+	  'listProducts' => 'WebGUI::Operation::ProductManager',
+	  'listProductVariants' => 'WebGUI::Operation::ProductManager',
+	  'listProductVariantsSave' => 'WebGUI::Operation::ProductManager',
+	  'manageProduct' => 'WebGUI::Operation::ProductManager',
+										
 	  'manageCache' => 'WebGUI::Operation::Cache',
 	  'flushCache' => 'WebGUI::Operation::Cache',
-        };
+	};
 }
 
 1;

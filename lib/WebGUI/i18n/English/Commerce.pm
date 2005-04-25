@@ -112,12 +112,6 @@ Your password.<br>|,
 		context => q|The menu title for 'Show pending transactions' in the AdminConsole side menu.|
 	},
 
-	'list pending transactions' => {
-		message => q|Pending transactions|,
-		lastUpdated => 1101772628,
-		context => q|The title of the 'Show pending transactions' AdminConsole screen.|
-	},
-
 	'transactionId' => {
 		message => q|TransactionId|,
 		lastUpdated => 0,
@@ -421,7 +415,76 @@ A radio button tied to this plugin.<br>
 		lastUpdated => 1101881921,
 		context => q|The body of the help page of the select payment gateway template.|
 	},
-
+	'shipping tab' => {
+		message => q|Shipping|,
+		lastUpdated => 0,
+		context => q|The label of the SHipping tab in the commerce settings manager.|
+	},
+	'shipping plugin label' => {
+		message => q|Shipping plugin|,
+		lastUpdated => 0,
+		context => q|The label of the shipping plugin selection box in the commerce settings manager.|
+	},
+	'no shipping plugins selected' => {
+		message => q|There are no shipping plugins to select. Please enable plugins in the config file.|,
+		lastUpdated => 0,
+		context => q|The message that's shown in the AdminConsole/Commerce menu when there are no shipping plugins enabled.|
+	},
+	'select shipping method' => {
+		message => q|Please select a shipping method.|,
+		lastUpdated => 0,
+		context => q|The message asking the user to choose a shipping method during checkout.|
+	},
+	'no shipping methods available' => {
+		message => q|Shipping is not possible because no shipping plugins are enabled.|,
+		lastUpdated => 0,
+		context => q|A message that is shown when a user tries to checkout but no shipping plugins are enabled.|
+	},
+	'shipping select button' => {
+		message => q|Select shipping method|,
+		lastUpdated => 0,
+		context => q|The label of the select button of the select shipping form the user sees during checkout.|
+	},
+	'enable' => {
+		message => q|Enable|,
+		lastUpdated => 0,
+		context => q|The label of the enable option of the commerce plugins.|
+	},
+	'change payment gateway' => {
+		message => q|Change payment gateway|,
+		lastUpdated => 0,
+		context => q|The label for the change payament gateway url.|
+	},
+	'change shipping method' => {
+		message => q|Change shipping method|,
+		lastUpdated => 0,
+		context => q|The label for the change shipping method url.|
+	},
+	'checkout select shipping template' => {
+		message => q|Select shipping method template|,
+		lastUpdated => 0,
+		context => q|The formlabel for the 'select shipping method template' option in the commerce part of the admin console.|
+	},
+	'shopping cart empty' => {
+		message => q|Your shopping cart is empty.|,
+		lastUpdated => 0,
+		context => q|A message indicating that te shopping cart is empty.|
+	},
+	'update cart' => {
+		message => q|Update cart|,
+		lastUpdated => 0,
+		context => q|The label of the update cart button.|
+	},
+	'checkout' => {
+		message => q|Checkout|,
+		lastUpdated => 0,
+		context => q|The label of the checkout button.|
+	},
+	'list transactions' => {
+		message => q|List transactions|,
+		lastUpdated => 0,
+		context => q|List transactions label|
+	},
 };
 
 1;

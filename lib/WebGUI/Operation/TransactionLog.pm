@@ -6,6 +6,9 @@ use WebGUI::Commerce::Transaction;
 use WebGUI::Asset::Template;
 use WebGUI::DateTime;
 use WebGUI::Operation;
+use WebGUI::Form;
+use WebGUI::Privilege;
+use WebGUI::Grouping;
 
 #-------------------------------------------------------------------
 sub www_viewPurchaseHistory {
@@ -47,6 +50,28 @@ sub www_cancelRecurringTransaction {
 
 	return www_viewPurchaseHistory($message);
 }
-		
+
+#-------------------------------------------------------------------
+sub www_deleteTransaction {
+	my $transactionId;
+
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+
+	$transactionId = $session{form}{tid};
+
+	WebGUI::Commerce::Transaction->new($transactionId)->delete;
+
+	return WebGUI::Operation::execute('listTransactions');
+}
+
+#-------------------------------------------------------------------
+sub www_deleteTransactionItem {
+	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+	
+	WebGUI::Commerce::Transaction->new($session{form}{tid})->deleteItem($session{form}{iid}, $session{form}{itype});
+
+	return WebGUI::Operation::execute('listTransactions');
+}
+
 1;
 

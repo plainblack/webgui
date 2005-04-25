@@ -85,5 +85,43 @@ A loop containing the transactions in the transaction history. Within this loop 
 		lastUpdated => 0,
 		context => q|The title of the help page of the purchase history template.|
 	},
+	'init date' => {
+		message => q|Init date|,
+		lastUpdated => 0,
+		context => q|Init date label.|
+	},
+	'completion date' => {
+		message => q|Completion date|,
+		lastUpdated => 0,
+		context => q|Completion date label|
+	},
+	'and' => {
+		message => q|and|,
+		lastUpdated => 0,
+		context => q|The word 'and'|
+	},
+	'transaction status' => {
+		message => q|Transaction status|,
+		lastUpdated => 0,
+		context => q|Transaction status label.|
+	},
+	'shipping status' => {
+		message => q|Shipping status|,
+		lastUpdated => 0,
+		context => q|Shipping status label.|
+	},
+	'select' => {
+		message => q|Select|,
+		lastUpdated => 0,
+		context => q|Select button label.|
+	},
+	'list transactions title' => {
+		message => q|List transactions|,
+		lastUpdated => 0,
+		context => q|List transaction workarea title.|
+	},
+	
+};
 
-}
+1;
+
