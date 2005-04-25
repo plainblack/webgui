@@ -300,6 +300,15 @@ sub getAdminFunction {
 			op=>"listSubscriptions",
 			group=>"3"
 		},
+		"cache"=>{
+                        title=>{
+                                id=>"manage cache",
+                                namespace=>"WebGUI"
+                        },
+                        icon=>"settings.gif", # TODO Create cache icon
+                        op=>"manageCache",
+                        group=>"3"
+                },
 	};
 	if ($id) {
 		return $self->_formatFunction($functions->{$id});

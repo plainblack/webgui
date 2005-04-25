@@ -4092,6 +4092,24 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 |,
 		lastUpdated => 1112141941,
 	},
+	'manage cache'  => {
+                message => q|Cache|,
+                lastUpdated => 1031514049
+        },
+	'cache type' => {
+                message => q|Cache type|,
+                lastUpdated => 1031514049
+        },
+	'cache statistics' => {
+                message => q|Cache Statistics|,
+                lastUpdated => 1031514049
+        },
+	'clear cache' => {
+                message => q|Clear Cache|,
+                lastUpdated => 1031514049
+        },
+
+
 
 };
 

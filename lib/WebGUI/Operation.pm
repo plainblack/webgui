@@ -195,6 +195,8 @@ sub getOperations {
 	  'selectPaymentGateway' => 'WebGUI::Operation::Commerce',
 	  'viewPurchaseHistory' => 'WebGUI::Operation::TransactionLog',
 	  'cancelRecurringTransaction' => 'WebGUI::Operation::TransactionLog',
+	  'manageCache' => 'WebGUI::Operation::Cache',
+	  'flushCache' => 'WebGUI::Operation::Cache',
         };
 }
 
