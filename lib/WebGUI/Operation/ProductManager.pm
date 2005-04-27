@@ -144,7 +144,7 @@ sub www_editProductSave {
 	push(@error, $i18n->get('edit product title error')) unless $session{form}{title};
 	push(@error, $i18n->get('edit product price error')) unless ($session{form}{price} && $session{form}{price} =~ /^\d+(\.\d+)?$/);
 	push(@error, $i18n->get('edit product weight error')) unless (defined $session{form}{weight} && $session{form}{price} =~ /^\d+(\.\d+)?$/);
-	push(@error, $i18n->get('edit product title error')) unless ($session{form}{sku});
+	push(@error, $i18n->get('edit product sku error')) unless ($session{form}{sku});
 	
 	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br>'.WebGUI::Operation::execute('editProduct') if (@error);	
 
