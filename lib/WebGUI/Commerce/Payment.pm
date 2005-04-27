@@ -85,7 +85,7 @@ sub configurationForm {
 	$f->yesNo(
 		-name	=> $self->prepend('enabled'),
 		-value	=> $self->enabled,
-		-label	=> WebGUI::International->get('enable', 'Commerce'),
+		-label	=> WebGUI::International::get('enable', 'Commerce'),
 		);
 	$f->raw($form);
 
