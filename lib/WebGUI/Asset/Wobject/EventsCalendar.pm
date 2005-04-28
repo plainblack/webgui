@@ -462,9 +462,9 @@ sub view {
 	} else {
 		$monthLabel = WebGUI::International::get(561,"Asset_EventsCalendar");
 	}
-	$var{'pagination.previousPage'} = '<form method="POST" style="inline;" action="'.
+	$var{'pagination.previousPage'} = '<form method="GET" style="inline;" action="'.
 		$self->getUrl.'?calMonthStart='.$calMonthStart.
-		'"><a href="'.$self->getUrl.
+		'&reload='.WebGUI::Id::Generate.'"><a href="'.$self->getUrl.
 		'?calMonthStart='.$prevCalMonthStart.'&calMonthEnd='.$prevCalMonthEnd.'">'.
 		WebGUI::International::get(558,"Asset_EventsCalendar")." ".$monthRangeLength." ".
 		$monthLabel.'</a>';
@@ -479,11 +479,8 @@ sub view {
 		<option value="'.(3+$calMonthStart).'">4 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
 		<option value="'.(5+$calMonthStart).'">6 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
 		<option value="'.(8+$calMonthStart).'">9 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
-		<option value="'.(11+$calMonthStart).'">12 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
-		<input type="submit" value="Go" name="Go">';
-	
-	
-	
+		<option value="'.(11+$calMonthStart).'">12 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option></select>
+		<input type="submit" value="Go" name="Go" />';
 	#use Data::Dumper; return '<pre>'.Dumper(\%var).'</pre>';
 	my $vars = \%var;
 	return $self->processTemplate($vars,$self->get("templateId"));
