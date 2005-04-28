@@ -1660,7 +1660,17 @@ sub getToolbar {
             	.cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
-	return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
+	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
+	#return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
+	return '<script type="text/javascript">
+		var contextMenu = new contextMenu_create("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
+		contextMenu.addLink("'.$self->getUrl("func=promote").'","Promote");
+		contextMenu.addLink("'.$self->getUrl("func=demote").'","Demote");
+		contextMenu.addLink("'.$self->getUrl("func=createShortcut").'","Create Shortcut");
+		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","Manage");
+		contextMenu.draw();
+		</script>'.$toolbar;
 }
 
 #-------------------------------------------------------------------

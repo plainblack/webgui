@@ -102,6 +102,7 @@ Retrieve content from the filesystem cache.
 =cut
 
 sub get {
+		return undef if ($session{config}{disableCache});
                 return $_[0]->{_cache}->get($_[0]->{_key});
 }
 

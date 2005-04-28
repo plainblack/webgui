@@ -35,6 +35,8 @@
  - Added missing international entries for Navigation.
  - fix [1177858] lib/WebGUI/i18n/English/Macros.pm can not translated
  - Added the notion of utility assets and moved the Template asset into it.
+ - Added a cache disabling config option for developers who are testing
+   performance.
  - fix [ 1190834 ] Pagination of event calendar does not work for firefox
 
 

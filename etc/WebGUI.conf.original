@@ -36,9 +36,15 @@ uploadsPath = /data/WebGUI/www/uploads
 
 # Support for the memcached distributed caching system.
 # See http://www.danga.com/memcached/ for details on memcached.
-# Uncomment this and point it to your memcached server(s).
+# Uncomment this and point it to your memcached server(s). Use a
+# comma seperated list for multiple servers.
 
 # memcached_servers = 10.0.0.6:11211
+
+# Set this to 1 to disable WebGUI's caching subsystems. This is
+# mainly useful for developers.
+
+disableCache = 0
 
 # The database connection string. It usually takes the form of
 # DBI:<driver>:<db>;host=<hostname>
