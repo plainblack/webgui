@@ -38,6 +38,7 @@
  - Added a cache disabling config option for developers who are testing
    performance.
  - fix [ 1190834 ] Pagination of event calendar does not work for firefox
+ - Navigation depthIs template variables now allow for negative values.
 
 
 6.5.6

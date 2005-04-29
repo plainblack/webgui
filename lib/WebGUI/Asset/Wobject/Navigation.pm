@@ -397,9 +397,9 @@ sub view {
 		$pageData->{"page.depthIs".$pageData->{"page.absDepth"}} = 1;
 		$pageData->{"page.relativeDepthIs".$pageData->{"page.relDepth"}} = 1;
 		my $depthDiff = ($absoluteDepthOfLastPage) ? ($absoluteDepthOfLastPage - $pageData->{'page.absDepth'}) : 0;
+		$pageData->{"page.depthDiff"} = $depthDiff;
+		$pageData->{"page.depthDiffIs".$depthDiff} = 1;
 		if ($depthDiff > 0) {
-			$pageData->{"page.depthDiff"} = $depthDiff if ($depthDiff > 0);
-			$pageData->{"page.depthDiffIs".$depthDiff} = 1;
 			push(@{$pageData->{"page.depthDiff_loop"}},{}) for(1..$depthDiff);
 		}
 		$absoluteDepthOfLastPage = $pageData->{"page.absDepth"};
