@@ -37,7 +37,7 @@ my @newAssetList;
 foreach my $asset (@{$newConfig{assets}}) {
 	push(@newAssetList, $asset) unless ($asset eq "WebGUI::Asset::Template");
 }
-$newConfig{utilityAssets} = ["WebGUI::Asset::Template"];
+$newConfig{utilityAssets} = ["WebGUI::Asset::Template","WebGUI::Asset::RichEdit"];
 $newConfig{assets} = \@newAssetList;
 $newConfig{shippingPlugins} = ['ByPrice', 'ByWeight', 'PerTransaction'];
 

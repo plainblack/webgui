@@ -17,7 +17,6 @@ package WebGUI::User;
 use strict;
 use WebGUI::DateTime;
 use WebGUI::Grouping;
-use WebGUI::HTMLForm;
 use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Session;
