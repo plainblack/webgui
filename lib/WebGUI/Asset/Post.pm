@@ -40,6 +40,12 @@ our @ISA = qw(WebGUI::Asset);
 
 
 #-------------------------------------------------------------------
+sub canAdd {
+	my $class = shift;
+	$class->SUPER::canAdd(undef,'7');
+}
+
+#-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
 	return (($session{form}{func} eq "add" || ($session{form}{assetId} eq "new" && $session{form}{func} eq "editSave" && $session{form}{class} eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
@@ -640,6 +646,7 @@ sub processPropertiesFromFormPost {
 			isHidden => 1,
 			dateSubmitted=>time()
 			);
+		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
 		if ($self->getThread->getParent->canModerate) {
         		$self->getThread->lock if ($session{form}{'lock'});
         		$self->getThread->stick if ($session{form}{stick});

@@ -123,7 +123,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Layout";
+	return WebGUI::International::get("layout","Asset_Layout");
 } 
 
 

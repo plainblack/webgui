@@ -50,7 +50,6 @@ alter table transaction add column shippingStatus varchar(15) default 'NotShippe
 alter table transaction add column trackingNumber varchar(255);
 create table RichEdit (
 	assetId varchar(22) not null primary key,
-                        templateId varchar(22) not null default 'PBtmpl0000000000000180',
                         askAboutRichEdit int not null default 0,
                         preformated int not null default 0,
                         editorWidth int not null default 0,
@@ -58,12 +57,14 @@ create table RichEdit (
                         sourceEditorWidth int not null default 0,
                         sourceEditorHeight int not null default 0,
                         useBr int not null default 0,
+			nowrap int not null default 0,
                         convertNewLinesToBr int not null default 0,
                         removeLineBreaks int not null default 0,
                         npwrap int not null default 0,
                         directionality varchar(3) not null default 'ltr',
                         toolbarLocation varchar(6) not null default 'bottom',
                         cssFile varchar(255),
+                        extendedValidElements text,
                         toolbarRow1 text,
                         toolbarRow2 text,
                         toolbarRow3 text,

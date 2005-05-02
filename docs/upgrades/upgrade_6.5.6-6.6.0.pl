@@ -5,6 +5,7 @@ use File::Path;
 use Getopt::Long;
 use strict;
 use WebGUI::Asset;
+use WebGUI::Asset::Template;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -191,6 +192,15 @@ WebGUI::SQL->write("insert into settings values ('commerceViewShoppingCartTempla
 #--------------------------------------------
 print "\tAdding product managers group\n" unless ($quiet);
 WebGUI::SQL->write("insert into groups (groupId, groupName, description) values (14, 'Product Managers', 'The group that is allowed to edit, delete and create products.')");
+
+#--------------------------------------------
+print "\tRemoving rich editor templates.\n" unless ($quiet);
+my $sth = WebGUI::SQL->read("select assetId from template where namespace='richEditor'");
+while (my ($assetId) = $sth->array) {
+	my $asset = WebGUI::Asset::Template->new($assetId);
+	$asset->purge;
+}
+$sth->finish;
 
 
 WebGUI::Session::close();

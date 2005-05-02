@@ -1,42 +1,48 @@
 package WebGUI::i18n::English::Asset_Layout;
 
 our $I18N = {
+	'layout' => {
+		message => q|Page|,
+        	lastUpdated => 0,
+		context=>q|The name of the layout asset.|
+	},
+
 	'layout add/edit title' => {
-		message => q|Layout, Add/Edit|,
+		message => q|Page, Add/Edit|,
         	lastUpdated => 1106683494,
 	},
 
 	'layout add/edit body' => {
                 message => q|
-<p>Layout Assets are used to display multiple Assets on the same time, much like
-Pages in version 5 of WebGUI.  The Layout Asset consists of a template with
-multiple content areas, and Assets that are children of the Layout can be assigned
+<p>Page Assets are used to display multiple Assets on the same time, much like
+Pages in version 5 of WebGUI.  The Page Asset consists of a template with
+multiple content areas, and Assets that are children of the Page can be assigned
 to be displayed in those areas.
 
-<p>Layout Assets are Wobjects and Assets, and share the same properties of both.  Layout
+<p>Page Assets are Wobjects and Assets, and share the same properties of both.  Page
 Assets also have these unique properties:</p>
 
 <b>Template</b><br/>
-Choose a template from the list to display the contents of the Layout Asset and
+Choose a template from the list to display the contents of the Page Asset and
 its children.
 <p/>
 
 <b>What Next?</b><br/>
-After creating a new Layout Asset you may either go to that new page or go back
+After creating a new Page Asset you may either go to that new page or go back
 to the page where you created this Asset.
 <p/>
 |,
-		context => 'Describing Layout Add/Edit form specific fields',
+		context => 'Describing Page Add/Edit form specific fields',
 		lastUpdated => 1109989134,
 	},
 
 	'layout template title' => {
-		message => q|Layout Template|,
+		message => q|Page Template|,
         	lastUpdated => 1109987374,
 	},
 
 	'layout template body' => {
-                message => q|<p>The following variables are available in Layout Templates:</p>
+                message => q|<p>The following variables are available in Page Templates:</p>
 
 <P><b>showAdmin</b><br/>
 A conditional showing if the current user has turned on Admin Mode and can edit this Asset.

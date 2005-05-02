@@ -16,9 +16,10 @@ package WebGUI::Asset::RichEdit;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::Asset::Template;
+use WebGUI::Form;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -63,13 +64,13 @@ sub definition {
                 tableName=>'RichEdit',
                 className=>'WebGUI::Asset::RichEdit',
                 properties=>{
- 			templateId=>{
-                        	fieldType=>'template',
-                                defaultValue=>'PBtmpl0000000000000180'
-                                },
  			askAboutRichEdit=>{
                         	fieldType=>'yesNo',
                                 defaultValue=>0
+                                },
+ 			extendedValidElements=>{
+                        	fieldType=>'textarea',
+                                defaultValue=>'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]'
                                 },
  			preformated=>{
                         	fieldType=>'yesNo',
@@ -163,7 +164,7 @@ sub getEditForm {
 		copy => "Copy", 
 		paste => "Paste",
 		undo => "Undo",
-		redo => "Redo", 
+		'redo' => "Redo", 
 		bold => "Bold",
 		italic => "Italic",
 		underline => "Underline",
@@ -176,7 +177,7 @@ sub getEditForm {
 		numlist => "Numbered List", 
 		outdent => "Outdent", 
 		indent => "Indent", 
-		sub => "Subscript", 
+		'sub' => "Subscript", 
 		sup => "Superscript", 
 		styleselect => "Apply Style", 
 		formatselect => "Apply Format", 
@@ -185,11 +186,11 @@ sub getEditForm {
 		fontsizeselect => "Font Size", 
 		forecolor => "Foreground Color", 
 		backcolor => "Background Color",
-		link => "Create Hyperlink", 
+		'link' => "Create Hyperlink", 
 #		advlink => "Advanced Link",
 		pagetree => "WebGUI Page Tree Link",
 		anchor => "Anchor",
-		unlink => "Unlink", 
+		'unlink' => "Unlink", 
 		tablecontrols => "Table Controls",
 		table => "Create Table", 
 		row_before => "Insert Table Row Before", 
@@ -222,29 +223,50 @@ sub getEditForm {
 #		save => "Save",
 		preview => "Preview",
 		zoom => "Zoom",
-		print => "Print",
+		'print' => "Print",
 		);
-        $tabform->getTab("properties")->checkList(
-                -name=>"toolbarRow1",
-                -label=>"Toolbar Row 1",
-		-options=>\%buttons,
-                -value=>[$self->getValue("toolbarRow1")]
-                );
-        $tabform->getTab("properties")->checkList(
-                -name=>"toolbarRow2",
-                -label=>"Toolbar Row 2",
-		-options=>\%buttons,
-                -value=>[$self->getValue("toolbarRow2")]
-                );
-        $tabform->getTab("properties")->checkList(
-                -name=>"toolbarRow3",
-                -label=>"Toolbar Row 3",
-		-options=>\%buttons,
-                -value=>[$self->getValue("toolbarRow3")]
-                );
-        $tabform->getTab("display")->template(
-                -value=>$self->getValue("templateId")
-                );
+	my $buttonGrid = '<table style="font-size: 11px;">
+		<tr style="font-weight: bold;">
+			<td>Button</td>
+			<td>Row 1</td>
+			<td>Row 2</td>
+			<td>Row 3</td>
+		</tr>';
+	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));
+	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));
+	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));
+	my $evenOddToggle = 0;
+	foreach my $key (keys %buttons) {
+		$evenOddToggle = $evenOddToggle ? 0 : 1;
+		my $checked1 = isIn($key,@toolbarRow1);
+		my $checked2 = isIn($key,@toolbarRow2);
+		my $checked3 = isIn($key,@toolbarRow3);
+		$buttonGrid .= '
+	<tr'.($evenOddToggle ? ' style="background-color: #eeeeee;"' : undef).'>
+		<td>'.$buttons{$key}.'</td>
+		<td>'.WebGUI::Form::checkbox({
+			value=>$key,
+			name=>"toolbarRow1",
+			checked=>$checked1
+			}).'</td>
+		<td>'.WebGUI::Form::checkbox({
+			value=>$key,
+			name=>"toolbarRow2",
+			checked=>$checked2
+			}).'</td>
+		<td>'.WebGUI::Form::checkbox({
+			value=>$key,
+			name=>"toolbarRow3",
+			checked=>$checked3
+			}).'</td>
+	</tr>
+			';
+	}
+	$buttonGrid .= "</table>";
+	$tabform->getTab("properties")->readOnly(
+		-label=>"Toolbar Buttons",
+		-value=>$buttonGrid
+		);
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("askAboutRichEdit"),
 		-label=>"Ask user about rich using rich edit?",
@@ -253,47 +275,61 @@ sub getEditForm {
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("preformatted"),
 		-label=>"Edit preformmated text?",
-		-name=>"preformatted"
+		-name=>"preformatted",
+                -uiLevel=>9
+                );
+	$tabform->getTab("security")->textarea(
+		-value=>$self->getValue("extendedValidElements"),
+		-name=>"extendedValidElements",
+		-label=>"Extended Valid Elements",
+		-subtext=>"<br /> Must appear on one line, no carriage returns.",
+		-uiLevel=>9
+		);
+        $tabform->getTab("display")->integer(
+                -value=>$self->getValue("editorHeight"),
+		-label=>"Editor Height",
+		-name=>"editorHeight",
+                -uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("editorWidth"),
 		-label=>"Editor Width",
-		-name=>"editorWidth"
-                );
-        $tabform->getTab("display")->integer(
-                -value=>$self->getValue("editorHeight"),
-		-label=>"Editor Height",
-		-name=>"editorHeight"
-                );
-        $tabform->getTab("display")->integer(
-                -value=>$self->getValue("sourceEditorWidth"),
-		-label=>"Source Editor Width",
-		-name=>"sourceEditorWidth"
+		-name=>"editorWidth",
+		-uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("sourceEditorHeight"),
 		-label=>"Source Editor Height",
 		-name=>"sourceEditorHeight"
                 );
+        $tabform->getTab("display")->integer(
+                -value=>$self->getValue("sourceEditorWidth"),
+		-label=>"Source Editor Width",
+		-name=>"sourceEditorWidth"
+                );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("useBr"),
 		-label=>"Use &lt;br /&gt; instead of &lt;p&gt; on 'Enter'?",
-		-name=>"useBr"
+		-name=>"useBr",
+                -uiLevel=>9
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("convertNewLinesToBr"),
 		-label=>"Convert new lines to &lt;br /&gt; on paste?",
-		-name=>"convertNewLinesToBr"
+		-name=>"convertNewLinesToBr",
+                -uiLevel=>9
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("removeLineBreaks"),
 		-label=>"Remove line breaks from HTML?",
-		-name=>"removeLineBreaks"
+		-name=>"removeLineBreaks",
+                -uiLevel=>9
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("nowrap"),
 		-label=>"Do not wrap text in editor?",
-		-name=>"nowrap"
+		-name=>"nowrap",
+                -uiLevel=>9
                 );
         $tabform->getTab("properties")->selectList(
                 -value=>[$self->getValue("directionality")],
@@ -331,8 +367,8 @@ sub getEditForm {
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/snippet.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/snippet.gif';
+	return $session{config}{extrasURL}.'/adminConsole/small/richEdit.gif' if ($small);
+	return $session{config}{extrasURL}.'/adminConsole/richEdit.gif';
 }
 
 
@@ -372,25 +408,105 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Snippet";
+	return "Rich Editor";
 } 
 
 
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	my $calledAsWebMethod = shift;
+	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));	
 	push(@toolbarRow1,"contextmenu") if ($self->getValue("enableContextMenu"));
-	my $output = WebGUI::Macro::process($self->get("snippet"));
+	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));	
+	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));	
+	my @toolbarButtons = (@toolbarRow1,@toolbarRow2,@toolbarRow3);
+	my @plugins;
+	my %config = (
+		mode => "specific_textareas",
+		theme => "advanced",
+		document_base_url => "/",
+    		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
+		theme_advanced_buttons1 => join(",",@toolbarRow1),
+		theme_advanced_buttons2 => join(",",@toolbarRow2),
+		theme_advanced_buttons3 => join(",",@toolbarRow3),
+		ask => $self->getValue("askAboutRichEdit") ? "true" : "false",
+		preformatted => $self->getValue("preformatted") ? "true" : "false",
+		force_br_newlines => $self->getValue("useBr") ? "true" : "false",
+		convert_newlines_to_brs => $self->getValue("removeLineBreaks") ? "true" : "false",
+		nowrap => $self->getValue("nowrap") ? "true" : "false",
+		directionality => $self->getValue("directionality"),
+		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
+		extended_valid_elements => $self->getValue("extendedValidElements"),
+#		theme_advanced_path_location => $self->getValue("pathLocation"),
+		);
+	foreach my $button (@toolbarButtons) {
+		push(@plugins,"table") if ($button eq "tablecontrols");	
+		push(@plugins,"save") if ($button eq "save");	
+		push(@plugins,"advhr") if ($button eq "advhr");	
+		if ($button eq "advimage") {
+			push(@plugins,"advimage");
+			$config{external_link_list_url} = "";
+		}
+		if ($button eq "advlink") {
+			$config{external_image_list_url} = "";
+			$config{file_browser_callback} = "mcFileManager.filebrowserCallBack";
+			push(@plugins,"advlink");
+		}
+		push(@plugins,"emotions") if ($button eq "emotions");	
+		push(@plugins,"iespell") if ($button eq "iespell");	
+		if ($button eq "insertdate" || $button eq "inserttime" || $button eq "insertdatetime") {
+			$config{plugin_insertdate_dateFormat} = "%Y-%m-%d";
+			$config{plugin_insertdate_timeFormat} = "%H:%M:%S";
+			push(@plugins,"insertdatetime");
+		}
+		push(@plugins,"preview") if ($button eq "preview");	
+		push(@plugins,"zoom") if ($button eq "zoom");	
+		if ($button eq "flash") {
+			push(@plugins,"flash");
+			$config{flash_external_list_url} = "";
+		}
+		push(@plugins,"searchreplace") if ($button eq "search" || $button eq "replace" || $button eq "searchreplace");	
+		push(@plugins,"print") if ($button eq "print");	
+		push(@plugins,"contextmenu") if ($button eq "contextmenu");	
+		push(@plugins,"insertImage") if ($button eq "insertImage");	
+		push(@plugins,"collateral") if ($button eq "collateral");	
+		push(@plugins,"pagetree") if ($button eq "pagetree");	
+		push(@plugins,"") if ($button eq "");	
+		push(@plugins,"") if ($button eq "");	
+		push(@plugins,"") if ($button eq "");	
+		push(@plugins,"") if ($button eq "");	
+		push(@plugins,"") if ($button eq "");	
+	}
+	$config{content_css} = $self->getValue("cssFile") if ($self->getValue("cssFile") ne "");
+	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
+	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
+	$config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth") if ($self->getValue("sourceEditorWidth") > 0);
+	$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
+	$config{plugins} = join(",",@plugins);
+	my @directives;
+	foreach my $key (keys %config) {
+		if ($config{$key} eq "true" || $config{key} eq "false") {
+			push(@directives,$key." : ".$config{$key});
+		} else {
+			push(@directives,$key." : '".$config{$key}."'");
+		}
+	}
+	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/tiny_mce/tiny_mce.js",{type=>"text/javascript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/webgui.js",{type=>"text/javascript"});
+	my $output = '<script type="text/javascript">
+		tinyMCE.init({
+			'.join(",\n    ",@directives).'
+			});
+		</script>';
 	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($session{var}{adminOn} && !$calledAsWebMethod);
-	return $output unless ($self->getValue("processAsTemplate")); 
-	return WebGUI::Asset::Template->processRaw($output);
+	return $output;
 }
 
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("snippet add/edit","Snippet");
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Rich Editor Configuration");
 }
 
