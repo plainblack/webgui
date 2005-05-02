@@ -31,7 +31,7 @@ sub process {
 	my %var = ();
        $var{'group.url'} = WebGUI::URL::page("op=autoDeleteFromGroup&groupId=".$g->groupId);
        $var{'group.text'} = $param[1];
-        return WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
+        return WebGUI::Asset::Template->newByUrl($param[2] || "default_group_delete_macro")->process(\%var);
 }
 
 

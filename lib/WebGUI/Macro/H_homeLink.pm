@@ -35,11 +35,7 @@ sub process {
        		} else {
                		$var{'homeLink.text'} = WebGUI::International::get(47,'Macro_H_homelink');
        		}
-		if (defined $param[1]) {
-        		$temp =  WebGUI::Asset::Template->newByUrl($param[1])->process(\%var);
-		} else {
-			$temp = WebGUI::Asset::Template->new("PBtmpl0000000000000042")->process(\%var);
-		}
+		$temp =  WebGUI::Asset::Template->newByUrl($param[1] || "default_homelink")->process(\%var);
 	}
 	return $temp;
 }
