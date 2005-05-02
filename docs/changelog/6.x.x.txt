@@ -39,6 +39,7 @@
    performance.
  - fix [ 1190834 ] Pagination of event calendar does not work for firefox
  - Navigation depthIs template variables now allow for negative values.
+ - fix [ 1191744 ] [6.5.6] default templates wrong
  - Renamed layout asset to page.
  - CS Post reply URLs are now shortened to an incremented reply number.
  - Added a Rich Editor Configuration asset.
