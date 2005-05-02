@@ -182,6 +182,38 @@ $folder->addChild({
 
 </tmpl_if>' },'PBtmplVSC0000000000001');
 
+my $checkoutConfirm = '<a href="<tmpl_var changePayment.url>"><tmpl_var changePayment.label></a> &middot; <a href="<tmpl_var changeShipping.url>"><tmpl_var changeShipping.label></a><br>
+<br>
+
+<tmpl_var title><br>
+<ul>
+<tmpl_loop errorLoop>
+<li><tmpl_var message></li>
+</tmpl_loop>
+</ul>
+
+<table> <tr align="left">
+       <th style="border-bottom: 2px solid black">Product</th>
+       <th style="border-bottom: 2px solid black">Quantity</th>
+       <th style="border-bottom: 2px solid black">Price</th>
+       <th style="border-bottom: 2px solid black">Each</th>
+   </tr>
+
+   <tmpl_if normalItems>
+   </tmpl_if>
+
+   <tmpl_loop normalItemsLoop>
+   <tr>
+       <td align="left"><tmpl_var name></td>
+       <td align="center"><tmpl_var quantity></td>
+       <td align="right"><tmpl_var totalPrice></td>
+   </tr>
+   </tmpl_loop>
+
+';
+my $asset = WebGUI::Asset::Template->new("PBtmpl0000000000000016");
+$asset->update(template=>$checkoutConfirm);
+
 
 #--------------------------------------------
 print "\tAdding several settings\n" unless ($quiet);
