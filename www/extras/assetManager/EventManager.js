@@ -55,16 +55,19 @@ function EventManager_keyUp(e) {
 }
 
 
-
 function EventManager_documentMouseDown(e) {
     var dom = document.getElementById&&!document.all;
     e=dom? e : event;    
     obj =dom? e.target : e.srcElement
         
     var asset = manager.getAsset(obj);
-    
+        
     if (asset) {
     	
+    	if (e.button != 2) {
+	    	manager.display.primeLeftClickContextMenu();
+    		setTimeout("AssetManager_getManager().display.displayLeftClickContextMenu(" + e.clientX + "," + e.clientY + ")",1000);
+    	}
     	if (e.button != 2 || (e.button == 2 && !manager.display.isSelected(asset))) {    	
 	    	manager.display.selectAsset(asset);    	
     	} 
@@ -85,11 +88,15 @@ function EventManager_documentMouseUp(e) {
     e=dom? e : event;    
     obj =dom? e.target : e.srcElement
     var asset = manager.getAsset(obj);
-                        
-    if (asset && e.button == 2) {
+                                 
+    if ((asset && e.button == 2) || (manager.display.leftClickContextMenuPrimed && manager.contextMenu.owner == manager.display.focusObjects[0])) {		
 		return false;
     }    
-           
+        
+    //no longer want the left click context menu
+    manager.display.resetLeftClickContextMenu();    
+        manager.display.contextMenu.hide();
+                  
     if (manager.display.contextMenu.owner && (!asset || asset.assetId != manager.display.contextMenu.owner.assetId)) {
         manager.display.contextMenu.hide();
     }else {
@@ -107,6 +114,10 @@ function EventManager_documentMouseUp(e) {
 function EventManager_documentMouseMove(e) {
     var dom = document.getElementById&&!document.all;
     e=dom? e : event;
+
+    //no longer want the left click context menu
+    manager.display.resetLeftClickContextMenu();    
+
     manager.display.move(e);
     return false;
 } 

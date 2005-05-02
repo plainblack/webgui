@@ -63,7 +63,7 @@ function AssetManager(assetArrayData,headerArrayData,labels,crumbtrail) {
 	this.keys[3] = "lastUpdate";
 	this.keys[4] = "size";
 
-	this.assetType = "Asset";
+	this.assetType ="Asset";
 	this.sortEnabled = true;
 	this.displayCrumbTrail = true;		
 				
@@ -217,7 +217,7 @@ function AssetManager_buildCrumbTrail() {
 		
 //returns an asset based on a div object
 function AssetManager_getAsset(obj) {   	   
-    while (obj.tagName!=this.display.topLevelElement && !obj.asset) {
+    while (obj.tagName!=this.display.topLevelElement && obj.tagName != "HTML" && !obj.asset) {
         obj=this.display.dom? obj.parentNode : obj.parentElement    
     }   
 	return obj.asset;   
@@ -225,7 +225,8 @@ function AssetManager_getAsset(obj) {
 
 //displays the right click context menu
 function AssetManager_displayContextMenu(x,y,asset) {    
-    manager.contextMenu.render(asset.getContextMenu(),x,y,asset);    
+      manager.display.dragStop();
+	manager.contextMenu.render(asset.getContextMenu(),x,y,asset);    
 }
 
 //returns the asset IDS of all selected assets

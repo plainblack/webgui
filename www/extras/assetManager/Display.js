@@ -34,9 +34,28 @@ function Display() {
     this.selectAsset = Display_selectAsset;
     this.isSelected = Display_isSelected;
     this.clearSelectedAssets = Display_clearSelectedAssets;
+	//used for the 3 second left mouse button menu - like a mac
+	this.leftClickContextMenuPrimed= false;
+	this.primeLeftClickContextMenu = Display_primeLeftClickContextMenu;
+	this.resetLeftClickContextMenu = Display_resetLeftClickContextMenu;
+	this.displayLeftClickContextMenu = Display_displayLeftClickContextMenu;
 }
 
 //---------Method Implementations -------------
+
+function Display_primeLeftClickContextMenu() {
+	this.leftClickContextMenuPrimed = true;
+}
+
+function Display_resetLeftClickContextMenu() {
+	this.leftClickContextMenuPrimed = false;	
+}
+
+function Display_displayLeftClickContextMenu(x,y) {	
+	if (this.leftClickContextMenuPrimed) {    	
+    	manager.displayContextMenu(x,y,this.focusObjects[0]);            				
+	}
+}
 
 //changes the z index of obj to be greater than all other elements
 function Display_bringToFront(obj) {

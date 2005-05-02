@@ -805,7 +805,7 @@ manager.disableDisplay(0) is added to the script if parameter is defined.
 sub getAssetManagerControl {
 	my $self = shift;
 	my $children = shift;
-	my $controlType = shift;
+	my $controlType = shift || "ManageAssets";
 	my $removeRank = shift;
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
@@ -816,7 +816,7 @@ sub getAssetManagerControl {
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManager.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManagerAsset.js', {type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/CrumbTrailAsset.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/'.$controlType.'.js', {type=>"text/javascript"}) if (defined $controlType);
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/'.$controlType.'.js', {type=>"text/javascript"});# if (defined $controlType);
 	my $output = '
 		<div id="contextMenu" class="contextMenu"></div>
    		<div id="propertiesWindow" class="propertiesWindow"></div>
@@ -855,8 +855,9 @@ sub getAssetManagerControl {
 	$output .= "labels['view'] = 'View';\n";
 	$output .= "labels['delete'] = 'Delete';\n";
 	$output .= "labels['restore'] = 'Restore';\n";
+	$output .= "labels['shortcut'] = 'Create Shortcut';\n";
 	$output .= "labels['purge'] = 'Purge';\n";
-	$output .= "labels['go'] = 'Go';\n";
+	$output .= "labels['go'] = 'Manage';\n";
 	$output .= "labels['properties'] = 'Properties';\n";
 	$output .= "labels['editTree'] = 'Edit Branch';\n";
 	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);\n";
@@ -1319,7 +1320,7 @@ sub getLineage {
 		my @familyTree = ($lineage =~ /(.{6})/g);
                 while (pop(@familyTree)) {
                         push(@specificFamilyMembers,join("",@familyTree)) if (scalar(@familyTree));
-			last if ($i >= $rules->{ancestorLimit});
+			last if ($i >= $rules->{ancestorLimit} && exists $rules->{ancestorLimit});
 			$i++;
                 }
 	}
@@ -1655,8 +1656,6 @@ sub getToolbar {
 	my $self = shift;
 	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"))
               	.editIcon('func=edit',$self->get("url"))
-             	.moveUpIcon('func=promote',$self->get("url"))
-             	.moveDownIcon('func=demote',$self->get("url"))
             	.cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
@@ -1667,8 +1666,8 @@ sub getToolbar {
 		var contextMenu = new contextMenu_create("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","Promote");
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","Demote");
-		contextMenu.addLink("'.$self->getUrl("func=createShortcut").'","Create Shortcut");
 		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","Manage");
+		contextMenu.addLink("'.$self->getUrl.'","View");
 		contextMenu.draw();
 		</script>'.$toolbar;
 }
@@ -2510,6 +2509,7 @@ sub www_createShortcut () {
 		templateId=>'PBtmpl0000000000000140'
 		});
 	$child->cut;
+	return $self->getContainer->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
 	return $self->getContainer->www_view;
 }
 

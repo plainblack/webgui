@@ -38,7 +38,11 @@ sub process {
        		} else {
                		$var{'printable.text'} = WebGUI::International::get(53,'Macro_r_printable');
        		}
-		$temp =  WebGUI::Asset::Template->newByUrl($param[2] || "default_make_printable")->process(\%var);
+		if ($param[2]) {
+         		$temp =  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
+		} else {
+         		$temp =  WebGUI::Asset::Template->new("PBtmpl0000000000000045")->process(\%var);
+		}
 	}
 	return $temp;
 }

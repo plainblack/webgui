@@ -43,6 +43,15 @@
  - Renamed layout asset to page.
  - CS Post reply URLs are now shortened to an incremented reply number.
  - Added a Rich Editor Configuration asset.
+ - Fixed a bug where a blank page would be displayed if a user logged out on a
+   page that visitors could not access.
+ - Fixed a bug in the make printable macro that used the wrong default
+   template.
+ - Added a context menu to inline editing that is accessible by right-click
+   or by left-click-hold on the asset's class icon.
+ - The context menu in the asset manager is now accessible via left-click-hold
+   for more familiarity with mac users.
+ - Added "create shortcut" as a context menu option in the asset manager.
 
 
 6.5.6

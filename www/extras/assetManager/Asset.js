@@ -175,9 +175,9 @@ this.remove = function() {
 //adds http, the hostname, and a trailing parameter delimiter to the url
 this.getWrappedURL = function() {
 	if (this.url.indexOf("?") == -1) {
-		return "http://" + AssetManager_getManager().tools.getHostName(location.href) + this.url + "?";
+		return this.url + "?";
 	}else {
-		return "http://" + AssetManager_getManager().tools.getHostName(location.href) + this.url + "&";
+		return this.url + "&";
     }
 }
 
