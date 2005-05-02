@@ -212,7 +212,7 @@ my $checkoutConfirm = '<a href="<tmpl_var changePayment.url>"><tmpl_var changePa
 
 ';
 my $asset = WebGUI::Asset::Template->new("PBtmpl0000000000000016");
-$asset->update(template=>$checkoutConfirm);
+$asset->update({template=>$checkoutConfirm});
 
 
 #--------------------------------------------
