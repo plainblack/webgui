@@ -32,7 +32,11 @@ sub process {
                       $var{'toggle.url'} = WebGUI::URL::page('op=switchOnAdmin');
                       $var{'toggle.text'} = $turnOn;
                  }
-		return WebGUI::Asset::Template->newByUrl($templateName || "default_admin_toggle_macro")->process(\%var);
+		if ($templateName) {
+         		return  WebGUI::Asset::Template->newByUrl($templateName)->process(\%var);
+		} else {
+         		return  WebGUI::Asset::Template->new("PBtmpl0000000000000036")->process(\%var);
+		}
 	}
        return "";
 }

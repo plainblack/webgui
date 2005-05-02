@@ -31,7 +31,11 @@ sub process {
        my %var = ();
        $var{'group.url'} = WebGUI::URL::page("op=autoAddToGroup&groupId=".$g->groupId);
        $var{'group.text'} = $param[1];
-       return WebGUI::Asset::Template->newByUrl($param[2]||"default_group_add_macro")->process(\%var);
+	if ($param[2]) {
+		return  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
+	} else {
+		return  WebGUI::Asset::Template->new("PBtmpl0000000000000040")->process(\%var);
+	}
 }
 
 

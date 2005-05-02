@@ -26,7 +26,7 @@ sub _createURL {
 #-------------------------------------------------------------------
 sub process {
         my @param = WebGUI::Macro::getParams($_[0]);
-	my $templateId = $param[2] || "PBtmpl0000000000000092";
+	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	
         $var{'user.isVisitor'} = ($session{user}{userId} eq "1");
 	$var{'customText'} = $param[1];

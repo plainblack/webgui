@@ -24,7 +24,11 @@ sub process {
 	return WebGUI::URL::page("op=auth&method=init") if ($param[0] eq "linkonly");
        $var{'account.url'} = WebGUI::URL::page('op=auth&method=init');
        $var{'account.text'} = $param[0] || WebGUI::International::get(46.'Macro_a_account');
-         return WebGUI::Asset::Template->newByUrl($param[1]||"default_account_macro")->process(\%var);
+	if ($param[1]) {
+		return  WebGUI::Asset::Template->newByUrl($param[1])->process(\%var);
+	} else {
+		return  WebGUI::Asset::Template->new("PBtmpl0000000000000037")->process(\%var);
+	}
 }
 
 
