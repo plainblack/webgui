@@ -32,8 +32,8 @@ $userId = 1;
 
 GetOptions(
 	'configFile:s'=>\$configFile,
-	'pageId:i'=>\$pageId,
-	'userId:i'=>\$userId,
+	'pageId:s'=>\$pageId,
+	'userId:s'=>\$userId,
 	'toFile:s'=>\$toFile,
 	'stripHTML'=>\$stripHTML,
 	'help'=>\$help,
@@ -50,7 +50,7 @@ Usage: perl $0 --configFile=<webguiConfig>
 
 Options:
 
-	--pageId        Set the page to be generated.
+	--assetId       Set the page to be generated.
 
         --help		Displays this message.
 
@@ -58,7 +58,7 @@ Options:
 			Defaults to "1" (Visitor).
 
 	--styleId	Set an alternate style for the page.
-			Defaults to page's default style.
+			Defaults to asset's default style.
 
 	--toFile	Set the path and filename to write the
 			content to instead of standard out.
@@ -69,25 +69,19 @@ Options:
 			text may have formatting problems as a
 			result.
 
-	--relativeUrls	If set, all navigation URL's will be relative
-			instead of absolute. Defaults to "0" (absolute
-			URLs)
-
 STOP
 	exit;
 }
 
 # Open WebGUI session
 WebGUI::Session::open($webguiRoot,$configFile);
-WebGUI::Session::refreshUserInfo(3,$session{dbh});
+WebGUI::Session::refreshUserInfo($userId,$session{dbh});
 
-my $e = WebGUI::Export->new(
-				pageId => $pageId,
-				userId => $userId,
-				styleId => $styleId,
-				stripHTML => $stripHTML,
-				relativeUrls => $relativeUrls
-			);
+
+my $asset = WebGUI::Asset->new($pageId);
+$asset->{_properties}{styleTemplateId} = $styleId if ($styleId);
+my $content = $asset->www_view;
+$content = WebGUI::HTML::filter($content,"all") if ($stripHTML);
 
 my $content = $e->generate;
 if ($toFile) {

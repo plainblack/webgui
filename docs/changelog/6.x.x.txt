@@ -52,6 +52,7 @@
  - The context menu in the asset manager is now accessible via left-click-hold
    for more familiarity with mac users.
  - Added "create shortcut" as a context menu option in the asset manager.
+ - Fixed generateContent.pl to work with the new asset tree.
 
 
 6.5.6
