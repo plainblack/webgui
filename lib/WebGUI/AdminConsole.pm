@@ -314,7 +314,7 @@ sub getAdminFunction {
                                 id=>"manage cache",
                                 namespace=>"WebGUI"
                         },
-                        icon=>"settings.gif", # TODO Create cache icon
+                        icon=>"cache.gif",
                         op=>"manageCache",
                         group=>"3"
                 },
