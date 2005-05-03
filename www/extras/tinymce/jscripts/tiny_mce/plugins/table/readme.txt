@@ -13,8 +13,6 @@ Initialization example:
     plugins : "table",
     theme_advanced_buttons3_add_before : "tablecontrols"
   });
-		html += tinyMCE.getControlHTML("row_props");
-		html += tinyMCE.getControlHTML("cell_props");
 
 Table controls:
   tablecontrols               All table control below and some separators between them.
@@ -41,3 +39,6 @@ Table plugin commands:
   mceTableInsertColBefore   Inserts a column before the current cursor location.
   mceTableInsertColAfter    Inserts a column after the current cursor location.
   mceTableDeleteCol         Deletes the column at the current cursor location.
+
+Options:
+ table_color_fields         If set to true, tables dialogs will have color fields.

@@ -1,5 +1,5 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('preview', 'cs,de,el,en,fr_ca,it,ko,pt,sv,zh_cn,fa,fr');
+tinyMCE.importPluginLanguagePack('preview', 'cs,de,el,en,fr_ca,it,ko,pt,sv,zh_cn,fa,fr,pl');
 
 /**
  * Returns the HTML contents of the preview control.

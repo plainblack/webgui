@@ -57,3 +57,4 @@ tinyMCELang['lang_paste_desc'] = 'Einf&uuml;gen';
 tinyMCELang['lang_link_list'] = 'Verweisliste';
 tinyMCELang['lang_image_list'] = 'Bildliste';
 tinyMCELang['lang_browse'] = 'Durchsuchen';
+tinyMCELang['lang_image_props_desc'] = 'Image properties';

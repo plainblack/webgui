@@ -1,5 +1,5 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('advhr', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr');
+tinyMCE.importPluginLanguagePack('advhr', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr,pl');
 
 function TinyMCE_advhr_getControlHTML(control_name) {
     switch (control_name) {

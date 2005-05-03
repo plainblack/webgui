@@ -28,3 +28,6 @@ tinyMCELang['lang_table_cell_desc'] = '单元格属性';
 tinyMCELang['lang_insert_table_valign'] = '垂直对齐';
 tinyMCELang['lang_insert_table_align_top'] = '顶端';
 tinyMCELang['lang_insert_table_align_bottom'] = '底部';
+tinyMCELang['lang_table_props_desc'] = 'Table properties';
+tinyMCELang['lang_table_bordercolor'] = 'Border color';
+tinyMCELang['lang_table_bgcolor'] = 'Bg color';

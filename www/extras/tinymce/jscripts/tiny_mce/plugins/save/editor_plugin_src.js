@@ -1,5 +1,5 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('save', 'en,zh_cn,cs,fa,fr_ca,fr,de');
+tinyMCE.importPluginLanguagePack('save', 'en,zh_cn,cs,fa,fr_ca,fr,de,pl');
 
 /**
  * Returns the HTML contents of the save control.

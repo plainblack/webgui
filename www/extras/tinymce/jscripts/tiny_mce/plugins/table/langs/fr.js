@@ -28,3 +28,6 @@ tinyMCELang['lang_table_cell_desc'] = 'Propri&eacute;t&eacute;s de la cellule';
 tinyMCELang['lang_insert_table_valign'] = 'Alignement Vertical';
 tinyMCELang['lang_insert_table_align_top'] = 'Haut';
 tinyMCELang['lang_insert_table_align_bottom'] = 'Bas';
+tinyMCELang['lang_table_props_desc'] = 'Table properties';
+tinyMCELang['lang_table_bordercolor'] = 'Border color';
+tinyMCELang['lang_table_bgcolor'] = 'Bg color';

@@ -1,5 +1,5 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('insertdatetime', 'cs,el,en,fr_ca,it,ko,sv,zh_cn,fa,fr,de');
+tinyMCE.importPluginLanguagePack('insertdatetime', 'cs,el,en,fr_ca,it,ko,sv,zh_cn,fa,fr,de,pl');
 
 /**
  * Returns the HTML contents of the insertdate, inserttime controls.

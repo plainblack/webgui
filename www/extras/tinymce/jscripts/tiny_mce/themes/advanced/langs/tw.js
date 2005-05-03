@@ -83,3 +83,4 @@ tinyMCELang['lang_paste_desc'] = 'Paste';
 tinyMCELang['lang_link_list'] = 'Link list';
 tinyMCELang['lang_image_list'] = 'Image list';
 tinyMCELang['lang_browse'] = 'Browse';
+tinyMCELang['lang_image_props_desc'] = 'Image properties';

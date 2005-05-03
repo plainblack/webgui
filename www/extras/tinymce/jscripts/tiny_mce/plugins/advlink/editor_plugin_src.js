@@ -1,5 +1,5 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('advlink', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr');
+tinyMCE.importPluginLanguagePack('advlink', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr,pl');
 
 /**
  * Insert link template function.
@@ -7,7 +7,7 @@ tinyMCE.importPluginLanguagePack('advlink', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr');
 function TinyMCE_advlink_getInsertLinkTemplate() {
     var template = new Array();
     template['file']   = '../../plugins/advlink/link.htm';
-    template['width']  = 440;
+    template['width']  = 400;
     template['height'] = 420;
 
     // Language specific width and height addons

@@ -9,6 +9,9 @@ if (url != null)
 </script>
 <script language="javascript" type="text/javascript">
 <!--
+	// Disable auto resize
+	tinyMCE.getWindowArg('mce_windowresize', false);
+
     function myRegexpReplace(in_str, reg_exp, replace_str, opts) {
         if (typeof opts == "undefined")
             opts = 'g';
@@ -81,18 +84,9 @@ if (url != null)
 		// Handle file browser
 		if (tinyMCE.getParam("file_browser_callback") != null) {
 			document.getElementById('href').style.width = '280px';
-
-			var html = '';
-
-			html += '<img id="browserBtn" src="../../themes/advanced/images/browse.gif"';
-			html += ' onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');"';
-			html += ' onmouseout="tinyMCE.restoreClass(this);"';
-			html += ' onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');"';
-			html += ' onclick="javascript:tinyMCE.openFileBrowser(\'href\',document.forms[0].href.value,\'file\',window);"';
-			html += ' width="20" height="18" border="0" title="' + tinyMCE.getLang('lang_browse') + '"';
-			html += ' class="mceButtonNormal" alt="' + tinyMCE.getLang('lang_browse') + '" />';
-
-			document.getElementById('browser').innerHTML = html;
+			document.getElementById('winurl').style.width = '180px';
+			document.getElementById('browser1').innerHTML = getBrowserHTML('href');
+			document.getElementById('browser2').innerHTML = getBrowserHTML('winurl');
 		}
 
 		// Auto select link in list
@@ -103,6 +97,8 @@ if (url != null)
 			}
 		}
 
+		// Autoresize and focus
+		TinyMCEPopup_autoResize();
         window.focus();
     }
 
@@ -235,6 +231,20 @@ if (url != null)
         }
     }
 
+	function getBrowserHTML(name) {
+		var html = "";
+
+		html += '<img id="browserBtn" src="../../themes/advanced/images/browse.gif"';
+		html += ' onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');"';
+		html += ' onmouseout="tinyMCE.restoreClass(this);"';
+		html += ' onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');"';
+		html += ' onclick="javascript:tinyMCE.openFileBrowser(\'' + name + '\',document.forms[0].' + name + '.value,\'file\',window);"';
+		html += ' width="20" height="18" border="0" title="' + tinyMCE.getLang('lang_browse') + '"';
+		html += ' class="mceButtonNormal" alt="' + tinyMCE.getLang('lang_browse') + '" />';
+
+		return html;
+	}
+
     function setPopupInputs() {
         var formObj = document.forms[0];
         var ids     = new Array('url','name','left','top','width','height','location','menubar','toolbar','status','scrollbars','resizable','return');
@@ -286,18 +296,18 @@ if (url != null)
 </head>
 <body onload="init();">
     <form onsubmit="insertLink();return false;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0" width="100">
             <tr>
                 <td align="center" valign="middle"><table border="0" cellpadding="4" cellspacing="0">
                     <tr>
-                        <td colspan="2" class="title">{$lang_insert_link_title}</td>
+                        <td colspan="2" class="title" nowrap="nowrap">{$lang_insert_link_title}</td>
                     </tr>
                     <tr>
-                        <td align="right">{$lang_insert_link_url}:</td>
+                        <td align="right" nowrap="nowrap">{$lang_insert_link_url}:</td>
                       <td><table border="0" cellspacing="0" cellpadding="0">
                             <tr>
                               <td><input name="href" type="text" id="href" value="" style="width: 300px;" /></td>
-                              <td id="browser"></td>
+                              <td id="browser1"></td>
                             </tr>
                           </table></td>
                     </tr>
@@ -320,7 +330,7 @@ if (url != null)
 					  </script>
 					  <!-- /Link list -->
                     <tr>
-                        <td align="right">{$lang_theme_insert_link_titlefield}:</td>
+                        <td align="right" nowrap="nowrap">{$lang_theme_insert_link_titlefield}:</td>
                         <td><input name="linktitle" type="text" id="linktitle" value="" style="width: 300px;" /></td>
                     </tr>
                     <tr>
@@ -363,7 +373,12 @@ if (url != null)
                             <table border="0" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td align="right" nowrap="nowrap">{$lang_insert_link_popup_url}:&nbsp;</td>
-                                    <td id="labelurl"><input type="text" name="winurl" id="winurl" value="" style="width: 200px;" /></td>
+                                    <td id="labelurl"><table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                              <td><input type="text" name="winurl" id="winurl" value="" style="width: 200px;" /></td>
+                              <td id="browser2"></td>
+                            </tr>
+                          </table></td>
                                 </tr>
                                 <tr>
                                     <td align="right" nowrap="nowrap" id="labelname">{$lang_insert_link_popup_name}:&nbsp;</td>
