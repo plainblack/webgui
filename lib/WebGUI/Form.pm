@@ -17,6 +17,7 @@ package WebGUI::Form;
 use strict;
 use Tie::IxHash;
 use WebGUI::Asset;
+use WebGUI::Asset::RichEdit;
 use WebGUI::Asset::Template;
 use WebGUI::DateTime;
 use WebGUI::International;
@@ -1141,6 +1142,10 @@ Returns an HTML area. An HTML area is different than a standard text area in tha
 
 The name field for this form element.
 
+=head3 richEditorId
+
+An asset Id of a rich editor to display for this field.
+
 =head3 value
 
 The default value for this form element.
@@ -1171,16 +1176,10 @@ This will be used if no value is specified.
 
 sub HTMLArea {
 	my $params = shift;
-        my ($output, $rows, $columns, $htmlArea);
-	my %var;
-	# Store all scalar options in template variables
-        foreach (keys %{$params}) {
-           $var{"form.".$_} = $params->{$_} unless (ref $params->{$_});
-        }
-	# Textarea field
-        $rows = $params->{rows} || ($session{setting}{textAreaRows}+20);
-        $columns = $params->{columns} || ($session{setting}{textAreaCols}+10);
-        $var{textarea} = textarea({
+        my $rows = $params->{rows} || ($session{setting}{textAreaRows}+20);
+        my $columns = $params->{columns} || ($session{setting}{textAreaCols}+10);
+	my $richEditId = $params->{richEditId} || "PBrichedit000000000001";
+        my $output = textarea({
                 name=>$params->{name},
                 value=>$params->{value},
                 wrap=>$params->{wrap},
@@ -1189,14 +1188,8 @@ sub HTMLArea {
                 extras=>$params->{extras}.' onBlur="fixChars(this.form.'.$params->{name}.')" id="'.$params->{name}.'"'.' mce_editable="true" ',
 		defaultValue=>$params->{defaultValue}
                 });
-	# Other variables
-	$var{"button"} = '<input type="button" onClick="openEditWindow(this.form.'.$params->{name}.')" value="'
-                .WebGUI::International::get(171).'" style="font-size: 8pt;" /><br />';
-	if ($session{user}{richEditor} eq 'none') {
-		return $var{textarea};
-	} else {
-		#return WebGUI::Asset::Template->new($session{user}{richEditor})->process(\%var);
-	}
+	$output .= WebGUI::Asset::RichEdit->new($richEditId)->view;
+	return $output;
 }
 
 #-------------------------------------------------------------------

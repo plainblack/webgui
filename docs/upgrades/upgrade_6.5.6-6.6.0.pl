@@ -234,6 +234,35 @@ while (my ($assetId) = $sth->array) {
 }
 $sth->finish;
 
+#--------------------------------------------
+print "\tAdding rich editor configurations.\n" unless ($quiet);
+my $importNode = WebGUI::Asset->getImportNode;
+$importNode->addChild({
+	className=>"WebGUI::Asset::RichEdit",
+	title=>"Content Manager's Rich Edit",
+	menuTitle=>"Content Manager's Rich Edit",
+	url=>"content_managers_rich_edit",
+	ownerUserId=>3,
+	groupIdView=>12,
+	groupIdEdit=>4,
+	toolbarRow1=>"bold\nitalic\njustifyleft\njustifyright\njustifycenter\njustifyfull\nindent\noutdent\nstyleselect\nremoveformat",
+	toolbarRow2=>"bullist\nnumlist\nsub\nsup\nlink\npagetree\nanchor\nunlink\nadvhr\nimage\ninsertImage\ncharmap\ncollateral",
+	toolbarRow3=>"tablecontrols\nvisualaid\npreview\nsource\nsearchreplace",
+	sourceEditorWidth=>600,
+	sourceEditorHeight=>500,
+	enableContextMenu=>1
+	},"PBrichedit000000000001");
+$importNode->addChild({
+	className=>"WebGUI::Asset::RichEdit",
+	title=>"Forum Rich Edit",
+	menuTitle=>"Forum Rich Edit",
+	url=>"forum_rich_edit",
+	ownerUserId=>3,
+	groupIdView=>7,
+	groupIdEdit=>4,
+	toolbarRow1=>"bold\nitalic\nbullist\nnumlist\nlink\nunlink\ncode\nemotions"
+	},"PBrichedit000000000002");
+
 
 WebGUI::Session::close();
 
