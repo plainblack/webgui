@@ -1012,24 +1012,11 @@ sub www_edit {
 		name=>"title",
 		value=>$title
 		});
-	if ($self->getThread->getParent->get("allowRichEdit")) {
-		$var{'content.form'} = WebGUI::Form::textarea({
-			name=>"content",
-			value=>$content
-			});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/tinymce/jscripts/tiny_mce/tiny_mce.js',{type=>"text/javascript"});
-	$var{'content.form'} = ' <script language="javascript" type="text/javascript">
-        tinyMCE.init({
-		theme : "simple",
-                mode : "textareas"
-        });
-</script> <textarea name="content" style="min-width: 400px; width: 100%; height: 300px;">'.$content.'</textarea>';
-	} else {
-		$var{'content.form'} = WebGUI::Form::textarea({
-			name=>"content",
-			value=>$content
-			});
-	}
+	$var{'content.form'} = WebGUI::Form::HTMLArea({
+		name=>"content",
+		value=>$content,
+		richEditId=>$self->getThread->getParent->get("richEditor")
+		});
 	$var{'form.submit'} = WebGUI::Form::submit({
 		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."'; this.form.func.value='editSave'; this.form.submit();\""
 		});

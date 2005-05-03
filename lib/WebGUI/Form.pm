@@ -1178,7 +1178,7 @@ sub HTMLArea {
 	my $params = shift;
         my $rows = $params->{rows} || ($session{setting}{textAreaRows}+20);
         my $columns = $params->{columns} || ($session{setting}{textAreaCols}+10);
-	my $richEditId = $params->{richEditId} || "PBrichedit000000000001";
+	my $richEditId = $params->{richEditId} || $session{setting}{richEditor} || "PBrichedit000000000001";
         my $output = textarea({
                 name=>$params->{name},
                 value=>$params->{value},

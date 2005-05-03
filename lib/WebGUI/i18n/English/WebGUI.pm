@@ -3899,6 +3899,9 @@ The primary URL of your company. This will appear on all automated emails sent f
 
 <P><B>Thumbnail Size</B><BR>When images are uploaded to your system, they will automatically have thumbnails generated at the size specified here (unless overridden on a case-by-case basis). Thumbnail size is measured in pixels. 
 
+<p><b>Default Rich Editor</b><br />
+This is the rich editor configuration that will be used by default when a rich editor is needed. This can be overridden in certain applications such as the Collaboration System.</p>
+
 <B>Text Area Rows</B>, <B>Text Area Columns</B> and <B>Text Box Size</B> allow the size of
 forms that WebGUI generates to be customized on a site-by-site basis.
 

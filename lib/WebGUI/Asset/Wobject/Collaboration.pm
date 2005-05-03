@@ -325,9 +325,9 @@ sub definition {
 				fieldType=>"filterContent",
 				defaultValue=>'javascript'
 				},
-			allowRichEdit =>{
-				fieldType=>"yesNo",
-				defaultValue=>0
+			richEditor =>{
+				fieldType=>"selectList",
+				defaultValue=>"PBrichedit000000000002"
 				},
 			attachmentsPerPost =>{
 				fieldType=>"integer",
@@ -527,10 +527,11 @@ sub getEditForm {
 		-label=>WebGUI::International::get('edit stamp', 'Asset_Collaboration'),
 		-value=>$self->getValue("addEditStampToPosts")
 		);
-        $tabform->getTab("display")->yesNo(
-		-name=>"allowRichEdit",
-		-label=>WebGUI::International::get('rich edit', 'Asset_Collaboration'),
-		-value=>$self->getValue("allowRichEdit")
+        $tabform->getTab("display")->selectList(
+		-name=>"richEditor",
+		-label=>WebGUI::International::get('rich editor', 'Asset_Collaboration'),
+		-options=>WebGUI::SQL->buildHashRef("select assetId, title from asset where className='WebGUI::Asset::RichEdit' order by title"),
+		-value=>[$self->getValue("richEditor")]
 		);
         $tabform->getTab("display")->yesNo(
 		-name=>"useContentFilter",

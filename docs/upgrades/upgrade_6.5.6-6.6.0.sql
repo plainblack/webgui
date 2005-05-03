@@ -69,3 +69,10 @@ create table RichEdit (
                         toolbarRow3 text,
                         enableContextMenu int not null default 0
 );
+delete from settings where name='richEditCss';
+insert into settings values ("richEditor","PBrichedit000000000001");
+alter table Collaboration drop column allowRichEdit;
+alter table Collaboration add column richEditor varchar(22) not null default 'PBrichedit000000000002';
+delete from userProfileField where fieldName like 'richEditor%';
+delete from userProfileData where fieldName like 'richEditor%';
+

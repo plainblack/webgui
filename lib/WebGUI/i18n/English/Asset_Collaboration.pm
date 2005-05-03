@@ -481,9 +481,9 @@ our $I18N = {
 		lastUpdated => 1109698614,
 	},
 
-	'rich edit' => {
-		message => q|Allow rich edit?|,
-		lastUpdated => 1109698614,
+	'rich editor' => {
+		message => q|Rich Editor|,
+		lastUpdated => 0,
 	},
 
 	'content filter' => {
