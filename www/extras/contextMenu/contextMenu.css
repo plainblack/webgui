@@ -1,0 +1,31 @@
+.contextMenu_skin {
+        position:absolute;
+        width:120px;
+        border:2px outset #eeeeee;
+        font-family: helvetica, arial, sans-serif;
+        line-height:18px;
+        cursor: default;
+        font-size:12px;
+        z-index:100;
+        visibility:hidden;
+        padding: 4px;
+        background-color: #eeeeee;
+        background-image: url(bg.jpg);
+        background-repeat: repeat-x;
+	font-weight: normal;
+}
+.contextMenu_skin A {
+	font-weight: normal;
+        width: 100%;
+        color: black;
+        text-decoration: none;
+        margin: 1px;
+}
+.contextMenu_skin A:hover {
+	font-weight: normal;
+        color: black;
+        margin: 0px;
+        background-color: #eeeeee;
+        border: 1px solid #dddddd;
+}
+

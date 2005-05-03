@@ -70,6 +70,10 @@ sub definition {
 				noFormPost=>1,
 				defaultValue=>undef,
 				fieldType=>"hidden"
+				},
+			assetsToHide => {
+				defaultValue=>undef,
+				fieldType=>"checkList"
 				}
                         }
                 });
@@ -100,6 +104,21 @@ sub getEditForm {
                       	 	""=>WebGUI::International::get(847, 'Asset_Layout')
                               	},
 			-value=>"view"
+			);
+	} else {
+		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
+		my $children = $self->getLineage(["children"],{"returnQuickReadObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
+		my %childIds;
+		foreach my $child (@{$children}) {
+			$childIds{$child->getId} = $child->getTitle;	
+		}
+		$tabform->getTab("display")->checkList(
+			-name=>"assetsToHide",
+			-value=>\@assetsToHide,
+			-options=>\%childIds,
+			-label=>"Assets To Hide",
+			-vertical=>1,
+			-uiLevel=>9
 			);
 	}
 	return $tabform;
@@ -147,6 +166,7 @@ sub view {
 	my %vars;
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));
+	my @hidden = split("\n",$self->getValue("assetsToHide"));
 	my $i = 1;
 	my @found;
 	foreach my $position (@positions) {
@@ -154,10 +174,12 @@ sub view {
 		foreach my $asset (@assets) {
 			foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
-					push(@{$vars{"position".$i."_loop"}},{
-						id=>$child->getId,
-						content=>$child->view
-						}) if $child->canView;	
+					unless (isIn($asset,@hidden)) {
+						push(@{$vars{"position".$i."_loop"}},{
+							id=>$child->getId,
+							content=>$child->view
+							}) if $child->canView;	
+					}
 					push(@found, $child->getId);
 				}
 			}

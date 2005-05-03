@@ -75,4 +75,5 @@ alter table Collaboration drop column allowRichEdit;
 alter table Collaboration add column richEditor varchar(22) not null default 'PBrichedit000000000002';
 delete from userProfileField where fieldName like 'richEditor%';
 delete from userProfileData where fieldName like 'richEditor%';
+alter table Layout add column assetsToHide text;
 

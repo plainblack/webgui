@@ -1454,13 +1454,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 If no value is specified, this will be used.
 
+=head3 richEditId
+
+An asset Id of a rich editor config. Defaults to the default rich editor in the settings.
+
 =cut
 
 sub HTMLArea {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue, $richEditId) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue richEditId)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::HTMLArea({
                         "name"=>$name,
@@ -1469,7 +1473,8 @@ sub HTMLArea {
                         "columns"=>$columns,
                         "rows"=>$rows,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			defaultValue=>$defaultValue,
+			richEditId=>$richEditId
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);

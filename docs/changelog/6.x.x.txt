@@ -54,6 +54,8 @@
  - Added "create shortcut" as a context menu option in the asset manager.
  - Fixed generateContent.pl to work with the new asset tree.
  - Updated TinyMCE to version 1.44.
+ - Added an option to the layout to hide child assets from being displayed.
+   This allows you to use non-layout child assets as stand alone pages.
 
 
 6.5.6

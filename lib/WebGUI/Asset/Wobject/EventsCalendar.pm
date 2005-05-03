@@ -465,7 +465,7 @@ sub view {
 	}
 	$var{'pagination.previousPage'} = '<form method="GET" style="inline;" action="'.
 		$self->getUrl.'?calMonthStart='.$calMonthStart.
-		'&reload='.WebGUI::Id::Generate.'"><a href="'.$self->getUrl.
+		'&reload='.WebGUI::Id::generate().'"><a href="'.$self->getUrl.
 		'?calMonthStart='.$prevCalMonthStart.'&calMonthEnd='.$prevCalMonthEnd.'">'.
 		WebGUI::International::get(558,"Asset_EventsCalendar")." ".$monthRangeLength." ".
 		$monthLabel.'</a>';
