@@ -57,6 +57,10 @@ sub definition {
 				fieldType=>"yesNo",
 				defaultValue=>0,
 				},
+			disableContentLock=>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
 			resolveMultiples=>{
 				fieldType=>"selectList",
 				defaultValue=>"mostRecent",
@@ -137,6 +141,11 @@ sub getEditForm {
 					this.form.proxyCriteria.disabled=true;
 				}"|
                 );
+		$tabform->getTab("properties")->yesNo(
+			-name=>"disableContentLock",
+			-value=>$self->getValue("disableContentLock"),
+			-label=>WebGUI::International::get("disable content lock","Asset_Shortcut")
+			);
 		if ($self->getValue("shortcutByCriteria") == 0) {
 			$self->{_disabled} = 'disabled=true';
 		}
@@ -229,7 +238,7 @@ sub getShortcutByCriteria {
 	my $scratchId;
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
-		if($session{scratch}{$scratchId}) {
+		if($session{scratch}{$scratchId} && !$self->getValue("disableContentLock")) {
 			return $session{scratch}{$scratchId} unless ($session{var}{adminOn});
 		}
 	}

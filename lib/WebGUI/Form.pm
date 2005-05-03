@@ -1142,7 +1142,7 @@ Returns an HTML area. An HTML area is different than a standard text area in tha
 
 The name field for this form element.
 
-=head3 richEditorId
+=head3 richEditId
 
 An asset Id of a rich editor to display for this field.
 

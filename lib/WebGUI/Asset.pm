@@ -833,9 +833,10 @@ sub getAssetManagerControl {
 		$title =~ s/\'/\\\'/g;
 		push(@dataArray,"['".$ancestor->getId."','".$ancestor->getUrl."','".$title."']\n");
 	}
+	my $i18n = WebGUI::International->new("Asset");
 	$output .= join(",",@dataArray);
 	$output .= "];\n";
-	$output .= "var columnHeadings = ['Rank','Title','Type','Last Updated','Size'];\n";
+	$output .= "var columnHeadings = ['".$i18n->get("rank")."','".$i18n->get("99")."','".$i18n->get("type")."','".$i18n->get("last updated")."','".$i18n->get("size")."'];\n";
 	$output .= "/*rank, title, type, lastUpdate, size, url, assetId, icon */\nvar assets = [\n";
 	@dataArray = ();
 	foreach my $child (@{$children}) {
@@ -848,18 +849,16 @@ sub getAssetManagerControl {
 	}
 	$output .= join(",",@dataArray);
 	$output .= "];\n var labels = new Array();\n";
-	$output .= "labels['edit'] = 'Edit';\n";
-	$output .= "labels['cut'] = 'Cut';\n";
-	$output .= "labels['copy'] = 'Copy';\n";
-	$output .= "labels['move'] = 'Move';\n";
-	$output .= "labels['view'] = 'View';\n";
-	$output .= "labels['delete'] = 'Delete';\n";
-	$output .= "labels['restore'] = 'Restore';\n";
-	$output .= "labels['shortcut'] = 'Create Shortcut';\n";
-	$output .= "labels['purge'] = 'Purge';\n";
-	$output .= "labels['go'] = 'Manage';\n";
-	$output .= "labels['properties'] = 'Properties';\n";
-	$output .= "labels['editTree'] = 'Edit Branch';\n";
+	$output .= "labels['edit'] = '".$i18n->get("edit")."';\n";
+	$output .= "labels['cut'] = '".$i18n->get("cut")."';\n";
+	$output .= "labels['copy'] = '".$i18n->get("copy")."';\n";
+	$output .= "labels['view'] = '".$i18n->get("view")."';\n";
+	$output .= "labels['delete'] = '".$i18n->get("delete")."';\n";
+	$output .= "labels['restore'] = '".$i18n->get("restore")."';\n";
+	$output .= "labels['shortcut'] = '".$i18n->get("create shortcut")."';\n";
+	$output .= "labels['purge'] = '".$i18n->get("purge")."';\n";
+	$output .= "labels['go'] = '".$i18n->get("manage")."';\n";
+	$output .= "labels['editTree'] = '".$i18n->get("edit branch")."';\n";
 	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);\n";
 	$output .= "manager.assetType='".$controlType."';\n" if (defined $controlType);
 	$output .= "manager.disableDisplay(0);\n" if (defined $removeRank);
@@ -1662,12 +1661,13 @@ sub getToolbar {
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	#return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
+	my $i18n = WebGUI::International->new("Asset");
 	return '<script type="text/javascript">
 		var contextMenu = new contextMenu_create("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
-		contextMenu.addLink("'.$self->getUrl("func=promote").'","Promote");
-		contextMenu.addLink("'.$self->getUrl("func=demote").'","Demote");
-		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","Manage");
-		contextMenu.addLink("'.$self->getUrl.'","View");
+		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
+		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
+		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
+		contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
 		contextMenu.draw();
 		</script>'.$toolbar;
 }

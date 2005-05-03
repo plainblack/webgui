@@ -2,6 +2,12 @@ package WebGUI::i18n::English::Asset_Shortcut;
 
 our $I18N = {
 
+	'disable content lock' => {
+		message => q|Disable content lock?|,
+		lastUpdated => 0,
+		context=> q|asset property|
+	},
+
 	'85' => {
 		message => q|Description|,
 		lastUpdated => 1031514049
@@ -78,6 +84,9 @@ Set to "yes" to use the display title setting of the shortcut instead of the ori
 <b>Override template?</b><br>
 Set to "yes" to use the template of the shortcut of the original template of the asset.
 <p>
+
+<b>Disable content lock?</b><br />
+By default if you proxy by alternate criteria the shortcut will lock on to a particular piece of content and show you only that piece of content until the end of your session. However, in some circumstances you may wish for this content to rotate. You can do that by disabling the content lock.
 
 <b>Shortcut by alternate criteria?</b><br>
 Set to "yes" to enable selecting a asset based upon custom criteria. Metadata must be enabled for this option to function properly.

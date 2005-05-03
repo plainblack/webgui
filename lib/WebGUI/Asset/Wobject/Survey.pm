@@ -589,7 +589,7 @@ sub view {
 			$var->{question_loop} = $self->getQuestionsLoop($var->{'response.Id'});
 		}
 	}
-	$var->{'form.header'} = WebGUI::Form::formHeader({-action=>$self->getUrl})
+	$var->{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
 		.WebGUI::Form::hidden({
 			name=>'func',
 			value=>'respond'
@@ -990,7 +990,7 @@ sub www_viewGradebook {
 	$var->{title} = WebGUI::International::get(71,'Asset_Survey');
 	my $p = WebGUI::Paginator->new($self->getUrl('func=viewGradebook'));
 	$p->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate from Survey_response 
-		where isComplete=1 and Survey_id=".quote($self->get("Survey_id"))." order by username,ipAddress,startDate");
+		where Survey_id=".quote($self->get("Survey_id"))." order by username,ipAddress,startDate");
 	my $users = $p->getPageData;
 	($var->{'question.count'}) = WebGUI::SQL->quickArray("select count(*) from Survey_question where Survey_id=".quote($self->get("Survey_id")));
 	if ($var->{'question.count'} > $self->get("questionsPerResponse")) {

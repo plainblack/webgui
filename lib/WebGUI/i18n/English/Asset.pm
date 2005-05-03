@@ -1,7 +1,102 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
-
+	'rank' => {
+		message => q|Rank|,
+		lastUpdated => 0,
+		context => q|Column heading in asset manager.|
+	},
+	
+	'type' => {
+		message => q|Type|,
+		lastUpdated => 0,
+		context => q|Column heading in asset manager.|
+	},
+	
+	'size' => {
+		message => q|Size|,
+		lastUpdated => 0,
+		context => q|Column heading in asset manager.|
+	},
+	
+	'last updated' => {
+		message => q|Last Updated|,
+		lastUpdated => 0,
+		context => q|Column heading in asset manager.|
+	},
+	
+	'purge' => {
+		message => q|Purge|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'restore' => {
+		message => q|Restore|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'promote' => {
+		message => q|Promote|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'demote' => {
+		message => q|Demote|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'cut' => {
+		message => q|Cut|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'copy' => {
+		message => q|Copy|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'create shortcut' => {
+		message => q|Create Shortcut|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'view' => {
+		message => q|View|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'delete' => {
+		message => q|Delete|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'manage' => {
+		message => q|Manage|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'edit branch' => {
+		message => q|Edit Branch|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
+	'edit' => {
+		message => q|Edit|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
 	'change' => {
 		message => q|Change recursively?|,
 		lastUpdated => 1099344172,

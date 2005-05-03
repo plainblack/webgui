@@ -286,7 +286,14 @@ sub getToolbar {
 			$returnUrl = "&proceed=goBackToPage&returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);	
 		}
 		my $toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
-		return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
+		my $i18n = WebGUI::International->new("Asset");
+		return '<script type="text/javascript">
+                var contextMenu = new contextMenu_create("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
+                contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("copy").'");
+                contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
+                contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
+                contextMenu.draw();
+                </script>'.$toolbar;
 	}
 	return $self->SUPER::getToolbar();
 }
