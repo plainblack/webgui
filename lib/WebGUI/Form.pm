@@ -1188,7 +1188,7 @@ sub HTMLArea {
                 extras=>$params->{extras}.' onBlur="fixChars(this.form.'.$params->{name}.')" id="'.$params->{name}.'"'.' mce_editable="true" ',
 		defaultValue=>$params->{defaultValue}
                 });
-	$output .= WebGUI::Asset::RichEdit->new($richEditId)->view;
+	$output .= WebGUI::Asset::RichEdit->new($richEditId)->getRichEditor;
 	return $output;
 }
 

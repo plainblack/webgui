@@ -245,9 +245,9 @@ $importNode->addChild({
 	ownerUserId=>3,
 	groupIdView=>12,
 	groupIdEdit=>4,
-	toolbarRow1=>"bold\nitalic\njustifyleft\njustifyright\njustifycenter\njustifyfull\nindent\noutdent\nstyleselect\nremoveformat",
-	toolbarRow2=>"bullist\nnumlist\nsub\nsup\nlink\npagetree\nanchor\nunlink\nadvhr\nimage\ninsertImage\ncharmap\ncollateral",
-	toolbarRow3=>"tablecontrols\nvisualaid\npreview\nsource\nsearchreplace",
+	toolbarRow1=>"bold\nitalic\njustifyleft\njustifyright\njustifycenter\njustifyfull\nindent\noutdent\nsub\nsup\nformatselect\nremoveformat",
+	toolbarRow2=>"bullist\nnumlist\nlink\npagetree\nanchor\nunlink\nadvhr\nimage\ninsertImage\ncharmap\ncollateral",
+	toolbarRow3=>"tablecontrols\nvisualaid\npreview\ncode\ncleanup\nreplace",
 	sourceEditorWidth=>600,
 	sourceEditorHeight=>500,
 	enableContextMenu=>1
@@ -260,7 +260,7 @@ $importNode->addChild({
 	ownerUserId=>3,
 	groupIdView=>7,
 	groupIdEdit=>4,
-	toolbarRow1=>"bold\nitalic\nbullist\nnumlist\nlink\nunlink\ncode\nemotions"
+	toolbarRow1=>"bold\nitalic\nbullist\nnumlist\nlink\nunlink\nemotions"
 	},"PBrichedit000000000002");
 
 

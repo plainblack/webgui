@@ -72,7 +72,7 @@ sub definition {
                         	fieldType=>'textarea',
                                 defaultValue=>'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]'
                                 },
- 			preformated=>{
+ 			preformatted=>{
                         	fieldType=>'yesNo',
                                 defaultValue=>0
                                 },
@@ -93,10 +93,6 @@ sub definition {
                                 defaultValue=>0
                                 },
  			useBr=>{
-                        	fieldType=>'yesNo',
-                                defaultValue=>0
-                                },
- 			convertNewLinesToBr=>{
                         	fieldType=>'yesNo',
                                 defaultValue=>0
                                 },
@@ -158,8 +154,7 @@ sub getEditForm {
 	tie %buttons, "Tie::IxHash";
 	%buttons = (
 		search => "Find",
-		replace => "Replace",
-		searchreplace => "Find and Replace",
+		replace => "Find and Replace",
 		cut => "Cut", 
 		copy => "Copy", 
 		paste => "Paste",
@@ -181,7 +176,6 @@ sub getEditForm {
 		sup => "Superscript", 
 		styleselect => "Apply Style", 
 		formatselect => "Apply Format", 
-		code => "Code", 
 		fontselect => "Font", 
 		fontsizeselect => "Font Size", 
 		forecolor => "Foreground Color", 
@@ -192,13 +186,6 @@ sub getEditForm {
 		anchor => "Anchor",
 		'unlink' => "Unlink", 
 		tablecontrols => "Table Controls",
-		table => "Create Table", 
-		row_before => "Insert Table Row Before", 
-		row_after => "Insert Table Row After",
-		delete_row => "Delete Table Row", 
-		col_before => "Insert Table Column Before", 
-		col_after => "Insert Table Column After", 
-		delete_col => "Delete Table Column", 
 		visualaid => "Toggle Table Visual Aid", 
 #		spacer => "Toolbar Spacer", 
 #		separator => "Toolbar Separator", 
@@ -207,22 +194,21 @@ sub getEditForm {
 		advhr => "Advanced Horizontal Rule",
 		inserttime => "Insert Time",
 		insertdate => "Insert Date",
-		insertdatetime => "Insert Date and Time",
 		image => "Image", 
 		insertImage => "WebGUI Image",
 #		advimage => "Advanced Image",
-#		flash => "Flash Movie",
+		flash => "Flash Movie",
 		charmap => "Special Character", 
 		collateral => "WebGUI Macro",
 		emotions => "Emoticons",
 		help => "Help", 
-		iespell => "Internet Explorer Spell Checker",
+		iespell => "Spell Checker (IE Only)",
 		removeformat => "Remove Formatting", 
-		source => "View Source",
+		code => "View/Edit Source", 
 		cleanup => "Clean Up Code", 
-#		save => "Save",
+		save => "Save / Submit",
 		preview => "Preview",
-		zoom => "Zoom",
+		zoom => "Zoom (IE Only)",
 		'print' => "Print",
 		);
 	my $buttonGrid = '<table style="font-size: 11px;">
@@ -269,12 +255,12 @@ sub getEditForm {
 		);
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("askAboutRichEdit"),
-		-label=>"Ask user about rich using rich edit?",
+		-label=>"Ask user about using rich edit?",
 		-name=>"askAboutRichEdit"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("preformatted"),
-		-label=>"Edit preformmated text?",
+		-label=>"Preserve whitespace as preformatted text?",
 		-name=>"preformatted",
                 -uiLevel=>9
                 );
@@ -314,18 +300,12 @@ sub getEditForm {
                 -uiLevel=>9
                 );
         $tabform->getTab("properties")->yesNo(
-                -value=>$self->getValue("convertNewLinesToBr"),
-		-label=>"Convert new lines to &lt;br /&gt; on paste?",
-		-name=>"convertNewLinesToBr",
-                -uiLevel=>9
-                );
-        $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("removeLineBreaks"),
 		-label=>"Remove line breaks from HTML?",
 		-name=>"removeLineBreaks",
                 -uiLevel=>9
                 );
-        $tabform->getTab("properties")->yesNo(
+        $tabform->getTab("display")->yesNo(
                 -value=>$self->getValue("nowrap"),
 		-label=>"Do not wrap text in editor?",
 		-name=>"nowrap",
@@ -413,7 +393,7 @@ sub getName {
 
 
 #-------------------------------------------------------------------
-sub view {
+sub getRichEditor {
 	my $self = shift;
 	my $calledAsWebMethod = shift;
 	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));	
@@ -433,7 +413,8 @@ sub view {
 		ask => $self->getValue("askAboutRichEdit") ? "true" : "false",
 		preformatted => $self->getValue("preformatted") ? "true" : "false",
 		force_br_newlines => $self->getValue("useBr") ? "true" : "false",
-		convert_newlines_to_brs => $self->getValue("removeLineBreaks") ? "true" : "false",
+		force_p_newlines => $self->getValue("useBr") ? "false" : "true",
+		remove_linebreaks => $self->getValue("removeLineBreaks") ? "true" : "false",
 		nowrap => $self->getValue("nowrap") ? "true" : "false",
 		directionality => $self->getValue("directionality"),
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
@@ -486,7 +467,7 @@ sub view {
 	$config{plugins} = join(",",@plugins);
 	my @directives;
 	foreach my $key (keys %config) {
-		if ($config{$key} eq "true" || $config{key} eq "false") {
+		if ($config{$key} eq "true" || $config{$key} eq "false") {
 			push(@directives,$key." : ".$config{$key});
 		} else {
 			push(@directives,$key." : '".$config{$key}."'");
@@ -494,13 +475,19 @@ sub view {
 	}
 	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/tiny_mce/tiny_mce.js",{type=>"text/javascript"});
 	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/webgui.js",{type=>"text/javascript"});
-	my $output = '<script type="text/javascript">
+	return '<script type="text/javascript">
 		tinyMCE.init({
 			'.join(",\n    ",@directives).'
 			});
 		</script>';
-	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($session{var}{adminOn} && !$calledAsWebMethod);
-	return $output;
+}
+
+
+#-------------------------------------------------------------------
+sub view {
+	my $self = shift;
+	return '<p>'.$self->getToolbar.'</p>' if ($session{var}{adminOn});
+	return undef;
 }
 
 #-------------------------------------------------------------------
