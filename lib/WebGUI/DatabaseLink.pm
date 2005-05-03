@@ -151,7 +151,7 @@ sub new {
 				databaseLinkId=>"0",
 				DSN=>$session{config}{dsn},
 				username=>$session{config}{dbuser},
-				identifier=>$session{config}{dpass},
+				identifier=>$session{config}{dbpass},
 				title=>"WebGUI Database"
 				);
 		} else {
