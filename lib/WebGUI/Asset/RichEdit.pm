@@ -20,6 +20,7 @@ use WebGUI::Form;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Utility;
+use WebGUI::International;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -153,71 +154,75 @@ sub getEditForm {
 	my %buttons;
 	tie %buttons, "Tie::IxHash";
 	%buttons = (
-		search => "Find",
-		replace => "Find and Replace",
-		cut => "Cut", 
-		copy => "Copy", 
-		paste => "Paste",
-		undo => "Undo",
-		'redo' => "Redo", 
-		bold => "Bold",
-		italic => "Italic",
-		underline => "Underline",
-		strikethrough => "Strike Through", 
-		justifyleft => "Left Justified", 
-		justifycenter => "Centered", 
-		justifyright => "Right Justified", 
-		justifyfull => "Fully Justified", 
-		bullist => "Bulleted List", 
-		numlist => "Numbered List", 
-		outdent => "Outdent", 
-		indent => "Indent", 
-		'sub' => "Subscript", 
-		sup => "Superscript", 
-		styleselect => "Apply Style", 
-		formatselect => "Apply Format", 
-		fontselect => "Font", 
-		fontsizeselect => "Font Size", 
-		forecolor => "Foreground Color", 
-		backcolor => "Background Color",
-		'link' => "Create Hyperlink", 
-#		advlink => "Advanced Link",
-		pagetree => "WebGUI Page Tree Link",
-		anchor => "Anchor",
-		'unlink' => "Unlink", 
-		tablecontrols => "Table Controls",
-		visualaid => "Toggle Table Visual Aid", 
-#		spacer => "Toolbar Spacer", 
-#		separator => "Toolbar Separator", 
-#		rowseparator => "Toolbar Row Separator",
-		hr => "Insert Horizontal Rule", 
-		advhr => "Advanced Horizontal Rule",
-		inserttime => "Insert Time",
-		insertdate => "Insert Date",
-		image => "Image", 
-		insertImage => "WebGUI Image",
-#		advimage => "Advanced Image",
-		flash => "Flash Movie",
-		charmap => "Special Character", 
-		collateral => "WebGUI Macro",
-		emotions => "Emoticons",
-		help => "Help", 
-		iespell => "Spell Checker (IE Only)",
-		removeformat => "Remove Formatting", 
-		code => "View/Edit Source", 
-		cleanup => "Clean Up Code", 
-		save => "Save / Submit",
-		preview => "Preview",
-		zoom => "Zoom (IE Only)",
-		'print' => "Print",
+		'search' => WebGUI::International::get('search', 'Asset_RichEdit'),
+		'replace' => WebGUI::International::get('replace', 'Asset_RichEdit'),
+		'cut' => WebGUI::International::get('cut', 'Asset_RichEdit'),
+		'copy' => WebGUI::International::get('copy', 'Asset_RichEdit'),
+		'paste' => WebGUI::International::get('paste', 'Asset_RichEdit'),
+		'undo' => WebGUI::International::get('undo', 'Asset_RichEdit'),
+		'redo' => WebGUI::International::get('redo', 'Asset_RichEdit'),
+		'bold' => WebGUI::International::get('bold', 'Asset_RichEdit'),
+		'italic' => WebGUI::International::get('italic', 'Asset_RichEdit'),
+		'underline' => WebGUI::International::get('underline', 'Asset_RichEdit'),
+		'strikethrough' => WebGUI::International::get('strikethrough', 'Asset_RichEdit'),
+		'justifyleft' => WebGUI::International::get('justifyleft', 'Asset_RichEdit'),
+		'justifycenter' => WebGUI::International::get('justifycenter', 'Asset_RichEdit'),
+		'justifyright' => WebGUI::International::get('justifyright', 'Asset_RichEdit'),
+		'justifyfull' => WebGUI::International::get('justifyfull', 'Asset_RichEdit'),
+		'bullist' => WebGUI::International::get('bullist', 'Asset_RichEdit'),
+		'numlist' => WebGUI::International::get('numlist', 'Asset_RichEdit'),
+		'outdent' => WebGUI::International::get('outdent', 'Asset_RichEdit'),
+		'indent' => WebGUI::International::get('indent', 'Asset_RichEdit'),
+		'sub' => WebGUI::International::get('sub', 'Asset_RichEdit'),
+		'sup' => WebGUI::International::get('sup', 'Asset_RichEdit'),
+		'styleselect' => WebGUI::International::get('styleselect', 'Asset_RichEdit'),
+		'formatselect' => WebGUI::International::get('formatselect', 'Asset_RichEdit'),
+		'fontselect' => WebGUI::International::get('fontselect', 'Asset_RichEdit'),
+		'fontsizeselect' => WebGUI::International::get('fontsizeselect', 'Asset_RichEdit'),
+		'forecolor' => WebGUI::International::get('forecolor', 'Asset_RichEdit'),
+		'backcolor' => WebGUI::International::get('backcolor', 'Asset_RichEdit'),
+		'link' => WebGUI::International::get('link', 'Asset_RichEdit'),
+		'pagetree' => WebGUI::International::get('pagetree', 'Asset_RichEdit'),
+		'anchor' => WebGUI::International::get('anchor', 'Asset_RichEdit'),
+		'unlink' => WebGUI::International::get('unlink', 'Asset_RichEdit'),
+		'tablecontrols' => WebGUI::International::get('tablecontrols', 'Asset_RichEdit'),
+		'visualaid' => WebGUI::International::get('visualaid', 'Asset_RichEdit'),
+		'hr' => WebGUI::International::get('hr', 'Asset_RichEdit'),
+		'advhr' => WebGUI::International::get('advhr', 'Asset_RichEdit'),
+		'inserttime' => WebGUI::International::get('inserttime', 'Asset_RichEdit'),
+		'insertdate' => WebGUI::International::get('insertdate', 'Asset_RichEdit'),
+		'image' => WebGUI::International::get('image', 'Asset_RichEdit'),
+		'insertImage' => WebGUI::International::get('insertImage', 'Asset_RichEdit'),
+		'flash' => WebGUI::International::get('flash', 'Asset_RichEdit'),
+		'charmap' => WebGUI::International::get('charmap', 'Asset_RichEdit'),
+		'collateral' => WebGUI::International::get('collateral', 'Asset_RichEdit'),
+		'emotions' => WebGUI::International::get('emotions', 'Asset_RichEdit'),
+		'help' => WebGUI::International::get('help', 'Asset_RichEdit'),
+		'iespell' => WebGUI::International::get('iespell', 'Asset_RichEdit'),
+		'removeformat' => WebGUI::International::get('removeformat', 'Asset_RichEdit'),
+		'code' => WebGUI::International::get('code', 'Asset_RichEdit'),
+		'cleanup' => WebGUI::International::get('cleanup', 'Asset_RichEdit'),
+		'save' => WebGUI::International::get('save', 'Asset_RichEdit'),
+		'preview' => WebGUI::International::get('preview', 'Asset_RichEdit'),
+		'zoom' => WebGUI::International::get('zoom', 'Asset_RichEdit'),
+		'print' => WebGUI::International::get('print', 'Asset_RichEdit'),
+#		'advlink' => "Advanced Link",
+#		'spacer' => "Toolbar Spacer", 
+#		'separator' => "Toolbar Separator", 
+#		'rowseparator' => "Toolbar Row Separator",
+#		'advimage' => "Advanced Image",
 		);
-	my $buttonGrid = '<table style="font-size: 11px;">
+	my $buttonGrid = sprintf qq!<table style="font-size: 11px;">
 		<tr style="font-weight: bold;">
-			<td>Button</td>
-			<td>Row 1</td>
-			<td>Row 2</td>
-			<td>Row 3</td>
-		</tr>';
+			<td>%s</td>
+			<td>%s</td>
+			<td>%s</td>
+			<td>%s</td>
+		</tr>!,
+		WebGUI::International::get('button','Asset_RichEdit'),
+		WebGUI::International::get('row 1','Asset_RichEdit'),
+		WebGUI::International::get('row 2','Asset_RichEdit'),
+		WebGUI::International::get('row 3','Asset_RichEdit');
 	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));
 	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));
 	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));
@@ -250,93 +255,94 @@ sub getEditForm {
 	}
 	$buttonGrid .= "</table>";
 	$tabform->getTab("properties")->readOnly(
-		-label=>"Toolbar Buttons",
+		-label=>WebGUI::International::get('toolbar buttons', 'Asset_RichEdit'),
 		-value=>$buttonGrid
 		);
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("askAboutRichEdit"),
-		-label=>"Ask user about using rich edit?",
+		-label=>WebGUI::International::get('using rich edit', 'Asset_RichEdit'),
 		-name=>"askAboutRichEdit"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("preformatted"),
-		-label=>"Preserve whitespace as preformatted text?",
+		-label=>WebGUI::International::get('preformatted', 'Asset_RichEdit'),
 		-name=>"preformatted",
                 -uiLevel=>9
                 );
 	$tabform->getTab("security")->textarea(
 		-value=>$self->getValue("extendedValidElements"),
 		-name=>"extendedValidElements",
-		-label=>"Extended Valid Elements",
-		-subtext=>"<br /> Must appear on one line, no carriage returns.",
+		-label=>WebGUI::International::get('extended elements', 'Asset_RichEdit'),
+		-subtext=>WebGUI::International::get('extended elements subtext', 'Asset_RichEdit'),
 		-uiLevel=>9
 		);
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("editorHeight"),
-		-label=>"Editor Height",
+		-label=>WebGUI::International::get('editor height', 'Asset_RichEdit'),
 		-name=>"editorHeight",
                 -uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("editorWidth"),
-		-label=>"Editor Width",
+		-label=>WebGUI::International::get('editor width', 'Asset_RichEdit'),
 		-name=>"editorWidth",
 		-uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("sourceEditorHeight"),
-		-label=>"Source Editor Height",
+		-label=>WebGUI::International::get('source editor height', 'Asset_RichEdit'),
 		-name=>"sourceEditorHeight"
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("sourceEditorWidth"),
-		-label=>"Source Editor Width",
+		-label=>WebGUI::International::get('source editor width', 'Asset_RichEdit'),
 		-name=>"sourceEditorWidth"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("useBr"),
-		-label=>"Use &lt;br /&gt; instead of &lt;p&gt; on 'Enter'?",
+		-label=>WebGUI::International::get('use br', 'Asset_RichEdit'),
 		-name=>"useBr",
                 -uiLevel=>9
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("removeLineBreaks"),
-		-label=>"Remove line breaks from HTML?",
+		-label=>WebGUI::International::get('remove line breaks', 'Asset_RichEdit'),
 		-name=>"removeLineBreaks",
                 -uiLevel=>9
                 );
         $tabform->getTab("display")->yesNo(
                 -value=>$self->getValue("nowrap"),
-		-label=>"Do not wrap text in editor?",
+		-label=>WebGUI::International::get('no wrap', 'Asset_RichEdit'),
 		-name=>"nowrap",
                 -uiLevel=>9
                 );
         $tabform->getTab("properties")->selectList(
                 -value=>[$self->getValue("directionality")],
-		-label=>"Text Direction",
+		-label=>WebGUI::International::get('directionality', 'Asset_RichEdit'),
 		-name=>"directionality",
 		-options=>{
-			ltr=>"Left To Right",
-			rtl=>"Right To Left"
+			ltr=>WebGUI::International::get('left to right', 'Asset_RichEdit'),
+			rtl=>WebGUI::International::get('right to left', 'Asset_RichEdit'),
 			}
                 );
         $tabform->getTab("display")->selectList(
                 -value=>[$self->getValue("toolbarLocation")],
 		-label=>"Toolbar Location",
+		-label=>WebGUI::International::get('toolbar location', 'Asset_RichEdit'),
 		-name=>"toolbarLocation",
 		-options=>{
-			top=>"Top",
-			bottom=>"Bottom"
+			top=>WebGUI::International::get('top', 'Asset_RichEdit'),
+			bottom=>WebGUI::International::get('bottom', 'Asset_RichEdit'),
 			}
                 );
         $tabform->getTab("properties")->text(
                 -value=>$self->getValue("cssFile"),
-		-label=>"CSS File",
+		-label=>WebGUI::International::get('css file', 'Asset_RichEdit'),
 		-name=>"cssFile"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("enableContextMenu"),
-		-label=>"Enable Context Menu",
+		-label=>WebGUI::International::get('enable context menu', 'Asset_RichEdit'),
 		-name=>"enableContextMenu"
                 );
 	return $tabform;
