@@ -318,7 +318,7 @@ sub moveBottomIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'moveBottom.gif" align="middle" border="0" alt="'WebGUI::International::get('Move To Bottom','Icon').'" title="'.WebGUI::International::get('Move To Bottom','Icon').'" /></a>';
+        $output .= '<img src="'._getBaseURL().'moveBottom.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move To Bottom','Icon').'" title="'.WebGUI::International::get('Move To Bottom','Icon').'" /></a>';
         return $output;
 }
 
