@@ -15,6 +15,7 @@ use WebGUI::Auth;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Form;
+use WebGUI::LDAPLink;
 use WebGUI::Mail;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -98,13 +99,37 @@ sub _isValidLDAPUser {
 sub addUserForm {
     my $self = shift;
     my $userData = $self->getParams;
-    my $ldapUrl = $session{form}{'authLDAP.ldapUrl'} || $userData->{ldapUrl} || $session{setting}{ldapURL};
-	my $connectDN = $session{form}{'authLDAP.connectDN'} || $userData->{connectDN};
-	
+    my $ldapUrl = $session{form}{'authLDAP_ldapUrl'} || $userData->{ldapUrl} || $session{setting}{ldapURL};
+	my $connectDN = $session{form}{'authLDAP_connectDN'} || $userData->{connectDN};
+	my $ldapConnection = $session{form}{'authLDAP_ldapConnection'} || $userData->{ldapConnection};
+	my $ldapLinks = WebGUI::SQL->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
 	my $f = WebGUI::HTMLForm->new;
-	$f->url("authLDAP.ldapUrl",WebGUI::International::get(3,'AuthLDAP'),$ldapUrl);
-	$f->text("authLDAP.connectDN",WebGUI::International::get(4,'AuthLDAP'),$connectDN);
-	return $f->printRowsOnly;
+	my $jscript = "";
+	if(scalar(keys %{$ldapLinks}) > 0) {
+	   my $jsArray = "";
+	   foreach my $key (keys %{$ldapLinks}) {
+	      next unless ($key);
+	      $jsArray .= 'ldapValue["'.$key.'"]="'.$ldapLinks->{$key}.'";'."\n";
+	   }
+	   $jsArray .= 'ldapValue["0"]="'.$ldapUrl.'";'."\n";
+	   $jscript = qq|
+	   <script>
+	      <!--
+	        var ldapValue = new Array();
+		    $jsArray
+	      //-->
+	   </script>|;
+	   $f->selectList(
+	                -name=>"authLDAP_ldapConnection",
+					-label=>WebGUI::International::get("ldapConnection",'AuthLDAP'),
+					-options=>WebGUI::LDAPLink::getList(),
+					-value=>[$ldapConnection],
+					-extras=>q|onchange="this.form.authLDAP_ldapUrl.value=ldapValue[this.options[this.selectedIndex].value];"|
+				  );
+	}
+	$f->url("authLDAP_ldapUrl",WebGUI::International::get(3,'AuthLDAP'),$ldapUrl);
+	$f->text("authLDAP_connectDN",WebGUI::International::get(4,'AuthLDAP'),$connectDN);
+	return $jscript.$f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
@@ -118,8 +143,9 @@ sub addUserForm {
 sub addUserFormSave {
    my $self = shift;
    my $properties;
-   $properties->{connectDN} = $session{form}{'authLDAP.connectDN'};
-   $properties->{ldapUrl} = $session{form}{'authLDAP.ldapUrl'};
+   $properties->{connectDN} = $session{form}{'authLDAP_connectDN'};
+   $properties->{ldapUrl} = $session{form}{'authLDAP_ldapUrl'};
+   $properties->{ldapConnection} = $session{form}{'authLDAP_ldapConnection'};
    $self->SUPER::addUserFormSave($properties); 
 }
 
@@ -309,7 +335,50 @@ sub editUserFormSave {
 
 sub editUserSettingsForm {
    my $self = shift;
-   my $f = WebGUI::HTMLForm->new;
+   my $sth = WebGUI::SQL->read("select * from ldapLink");
+    my $f = WebGUI::HTMLForm->new;
+	my $jscript = "";
+   if($sth->rows > 0 ){
+      my $jsArray = "";
+      $jsArray = qq|ldapValue["0"] = ["$session{setting}{ldapUserRDN}","$session{setting}{ldapURL}","$session{setting}{ldapId}","$session{setting}{ldapIdName}","$session{setting}{ldapPasswordName}","$session{setting}{ldapSendWelcomeMessage}","$session{setting}{ldapWelcomeMessage}","$session{setting}{ldapAccountTemplate}","$session{setting}{ldapCreateAccountTemplate}","$session{setting}{ldapLoginTemplate}"];|."\n";
+      while (my $lhash = $sth->hashRef) {
+         $jsArray .= qq|ldapValue["$lhash->{ldapLinkId}"] = ["$lhash->{ldapUserRDN}","$lhash->{ldapUrl}","$lhash->{ldapIdentity}","$lhash->{ldapIdentityName}","$lhash->{ldapPasswordName}","$lhash->{ldapSendWelcomeMessage}","$lhash->{ldapWelcomeMessage}","$lhash->{ldapAccountTemplate}","$lhash->{ldapCreateAccountTemplate}","$lhash->{ldapLoginTemplate}"];|."\n";
+      }
+      $jscript = qq|
+	    <script>
+	      <!--
+	        var ldapValue = new Array(); 
+		    $jsArray;
+		 
+		    function changeFormValues(form,key) {
+		       var arr = ldapValue[key];
+			   form.ldapUserRDN.value=arr[0];
+			   form.ldapURL.value=arr[1];
+			   form.ldapId.value=arr[2];
+			   form.ldapIdName.value=arr[3];
+			   form.ldapPasswordName.value=arr[4];
+			   if(arr[5] == 1){
+			      form.ldapSendWelcomeMessage[0].checked=true;
+			      form.ldapSendWelcomeMessage[1].checked=false;
+			   }else{
+			      form.ldapSendWelcomeMessage[0].checked=false;
+			      form.ldapSendWelcomeMessage[1].checked=true;
+			   }
+			   form.ldapWelcomeMessage.value=arr[6];
+			   form.ldapAccountTemplate.value=arr[7];
+			   form.ldapCreateAccountTemplate.value=arr[8];
+			   form.ldapLoginTemplate.value=arr[9];
+		    }
+	     //-->
+	   </script>|;
+      $f->selectList(
+	                -name=>"ldapConnection",
+					-label=>WebGUI::International::get("ldapConnection",'AuthLDAP'),
+					-options=>WebGUI::LDAPLink::getList(),
+					-value=>[$session{setting}{ldapConnection}],
+					-extras=>q|onchange="changeFormValues(this.form,this.options[this.selectedIndex].value);"|
+				  );
+   }
    $f->text("ldapUserRDN",WebGUI::International::get(9,'AuthLDAP'),$session{setting}{ldapUserRDN});
    $f->url("ldapURL",WebGUI::International::get(5,'AuthLDAP'),$session{setting}{ldapURL});
    $f->text("ldapId",WebGUI::International::get(6,'AuthLDAP'),$session{setting}{ldapId});
@@ -343,7 +412,7 @@ sub editUserSettingsForm {
 		-namespace=>"Auth/LDAP/Login",
 		-label=>WebGUI::International::get("login template","AuthLDAP")
 		);
-   return $f->printRowsOnly;
+   return $jscript.$f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
