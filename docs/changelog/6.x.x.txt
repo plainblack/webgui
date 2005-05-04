@@ -1,4 +1,8 @@
-﻿6.6.0
+﻿6.6.1
+ - Replaced defective confirm checkout commerce template.
+
+
+6.6.0
  - Added a shopping cart system and salable products management system. This
    completes the foundation of WebGUI's commerce system and will allow us to
    add very rich commerce features in the 7.x series. (Thanks to ProcoliX and

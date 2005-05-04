@@ -47,7 +47,6 @@ CREATE TABLE Collaboration (
   addEditStampToPosts int(11) NOT NULL default '0',
   editTimeout int(11) NOT NULL default '3600',
   attachmentsPerPost int(11) NOT NULL default '0',
-  allowRichEdit int(11) NOT NULL default '1',
   filterCode varchar(30) NOT NULL default 'javascript',
   useContentFilter int(11) NOT NULL default '1',
   threads int(11) NOT NULL default '0',
@@ -62,6 +61,9 @@ CREATE TABLE Collaboration (
   subscriptionGroupId varchar(22) default NULL,
   allowReplies int(11) NOT NULL default '0',
   displayLastReply int(11) NOT NULL default '0',
+  richEditor varchar(22) NOT NULL default 'PBrichedit000000000002',
+  karmaRatingMultiplier int(11) NOT NULL default '0',
+  karmaSpentToRate int(11) NOT NULL default '0',
   PRIMARY KEY  (assetId)
 ) TYPE=MyISAM;
 
@@ -70,7 +72,7 @@ CREATE TABLE Collaboration (
 --
 
 
-INSERT INTO Collaboration VALUES ('DC1etlIaBRQitXnchZKvUw','3','4',0,0,'wCIc38CvNHUK7aY92Ww4SQ','PBtmpl0000000000000067','PBtmpl0000000000000114','PBtmpl0000000000000031','PBtmpl0000000000000027','lineage','asc',0,0,931536000,2,1,'none',0,5,2,0,0,NULL,NULL,31536000,10,1000,'a7jbpVdbzxchqtSj_9W71w',0,0);
+INSERT INTO Collaboration VALUES ('DC1etlIaBRQitXnchZKvUw','3','4',0,0,'wCIc38CvNHUK7aY92Ww4SQ','PBtmpl0000000000000067','PBtmpl0000000000000114','PBtmpl0000000000000031','PBtmpl0000000000000027','lineage','asc',0,0,931536000,2,'none',0,5,2,0,0,NULL,NULL,31536000,10,1000,'a7jbpVdbzxchqtSj_9W71w',0,0,'PBrichedit000000000002',0,0);
 
 --
 -- Table structure for table `DataForm`
@@ -84,6 +86,7 @@ CREATE TABLE DataForm (
   listTemplateId varchar(22) default NULL,
   assetId varchar(22) NOT NULL default '',
   templateId varchar(22) NOT NULL default '',
+  defaultView int(11) NOT NULL default '0',
   PRIMARY KEY  (assetId)
 ) TYPE=MyISAM;
 
@@ -92,7 +95,7 @@ CREATE TABLE DataForm (
 --
 
 
-INSERT INTO DataForm VALUES ('Thank you for telling your friends about WebGUI!',1,'PBtmpl0000000000000085','PBtmpl0000000000000104','PBtmpl0000000000000021','Szs5eev3OMssmnsyLRZmWA','PBtmpl0000000000000020');
+INSERT INTO DataForm VALUES ('Thank you for telling your friends about WebGUI!',1,'PBtmpl0000000000000085','PBtmpl0000000000000104','PBtmpl0000000000000021','Szs5eev3OMssmnsyLRZmWA','PBtmpl0000000000000020',0);
 
 --
 -- Table structure for table `DataForm_entry`
@@ -333,6 +336,9 @@ INSERT INTO Folder VALUES ('lUjGdT_Hhi_EFhsYr1Ouyw','PBtmpl0000000000000078');
 INSERT INTO Folder VALUES ('7Xhdnqu3qkDWHEnRgk6Uzw','PBtmpl0000000000000078');
 INSERT INTO Folder VALUES ('xPyASYtR44mpDk3ba4YyIg','PBtmpl0000000000000078');
 INSERT INTO Folder VALUES ('S99spbsvn96tgRA0oVUl2A','PBtmpl0000000000000078');
+INSERT INTO Folder VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','');
+INSERT INTO Folder VALUES ('60wqz7KzyCDCHVNaavhQUA','');
+INSERT INTO Folder VALUES ('fhevmqeVTLRCmI_z-NidQQ','');
 
 --
 -- Table structure for table `HttpProxy`
@@ -1207,6 +1213,7 @@ CREATE TABLE Layout (
   assetId varchar(22) NOT NULL default '',
   templateId varchar(22) NOT NULL default '',
   contentPositions text,
+  assetsToHide text,
   PRIMARY KEY  (assetId)
 ) TYPE=MyISAM;
 
@@ -1215,12 +1222,12 @@ CREATE TABLE Layout (
 --
 
 
-INSERT INTO Layout VALUES ('68sKwDgf9cGH58-NZcU4lg','PBtmpl0000000000000054','TKzUMeIxRLrZ3NAEez6CXQ,sWVXMZGibxHe2Ekj1DCldA');
-INSERT INTO Layout VALUES ('_iHetEvMQUOoxS-T2CM0sQ','PBtmpl0000000000000054','x_WjMvFmilhX-jvZuIpinw');
-INSERT INTO Layout VALUES ('8Bb8gu-me2mhL3ljFyiWLg','PBtmpl0000000000000054','DC1etlIaBRQitXnchZKvUw');
-INSERT INTO Layout VALUES ('2TqQc4OISddWCZmRY1_m8A','PBtmpl0000000000000054','fK-HMSboA3uu0c1KYkYspA');
-INSERT INTO Layout VALUES ('Swf6L8poXKc7hUaNPkBevw','PBtmpl0000000000000054','Szs5eev3OMssmnsyLRZmWA');
-INSERT INTO Layout VALUES ('x3OFY6OJh_qsXkZfPwug4A','PBtmpl0000000000000054','pJd5TLAjfWMVXD6sCRLwUg');
+INSERT INTO Layout VALUES ('68sKwDgf9cGH58-NZcU4lg','PBtmpl0000000000000054','TKzUMeIxRLrZ3NAEez6CXQ,sWVXMZGibxHe2Ekj1DCldA',NULL);
+INSERT INTO Layout VALUES ('_iHetEvMQUOoxS-T2CM0sQ','PBtmpl0000000000000054','x_WjMvFmilhX-jvZuIpinw',NULL);
+INSERT INTO Layout VALUES ('8Bb8gu-me2mhL3ljFyiWLg','PBtmpl0000000000000054','DC1etlIaBRQitXnchZKvUw',NULL);
+INSERT INTO Layout VALUES ('2TqQc4OISddWCZmRY1_m8A','PBtmpl0000000000000054','fK-HMSboA3uu0c1KYkYspA',NULL);
+INSERT INTO Layout VALUES ('Swf6L8poXKc7hUaNPkBevw','PBtmpl0000000000000054','Szs5eev3OMssmnsyLRZmWA',NULL);
+INSERT INTO Layout VALUES ('x3OFY6OJh_qsXkZfPwug4A','PBtmpl0000000000000054','pJd5TLAjfWMVXD6sCRLwUg',NULL);
 
 --
 -- Table structure for table `MessageBoard`
@@ -1247,11 +1254,12 @@ CREATE TABLE Navigation (
   assetsToInclude text,
   startType varchar(35) default NULL,
   startPoint varchar(255) default NULL,
-  endPoint varchar(35) default NULL,
+  descendantEndPoint int(11) NOT NULL default '55',
   showSystemPages int(11) NOT NULL default '0',
   showHiddenPages int(11) NOT NULL default '0',
   showUnprivilegedPages int(11) NOT NULL default '0',
   templateId varchar(22) NOT NULL default '',
+  anscestorEndPoint int(11) NOT NULL default '55',
   PRIMARY KEY  (assetId)
 ) TYPE=MyISAM;
 
@@ -1260,28 +1268,28 @@ CREATE TABLE Navigation (
 --
 
 
-INSERT INTO Navigation VALUES ('pJd5TLAjfWMVXD6sCRLwUg','descendants','specificUrl','root','55',0,0,0,'PBtmpl0000000000000048');
-INSERT INTO Navigation VALUES ('PBnav00000000000000001','self\nancestors','relativeToCurrentUrl','0','55',0,0,0,'PBtmpl0000000000000093');
-INSERT INTO Navigation VALUES ('PBnav00000000000000014','pedigree','relativeToRoot','1','55',0,0,0,'PBtmpl0000000000000048');
-INSERT INTO Navigation VALUES ('PBnav00000000000000015','descendants','relativeToCurrentUrl','0','1',0,0,0,'PBtmpl0000000000000048');
-INSERT INTO Navigation VALUES ('PBnav00000000000000016','descendants','relativeToCurrentUrl','0','1',0,0,0,'PBtmpl0000000000000108');
-INSERT INTO Navigation VALUES ('PBnav00000000000000017','self\nsiblings','relativeToCurrentUrl','0','55',0,0,0,'PBtmpl0000000000000117');
-INSERT INTO Navigation VALUES ('PBnav00000000000000018','descendants','relativeToCurrentUrl','-1','1',0,0,0,'PBtmpl0000000000000048');
-INSERT INTO Navigation VALUES ('PBnav00000000000000019','descendants','relativeToCurrentUrl','-1','1',0,0,0,'PBtmpl0000000000000108');
-INSERT INTO Navigation VALUES ('PBnav00000000000000020','descendants','relativeToRoot','0','1',0,0,0,'PBtmpl0000000000000108');
-INSERT INTO Navigation VALUES ('PBnav00000000000000021','descendants','specificUrl','home','3',0,0,0,'PBtmpl0000000000000117');
-INSERT INTO Navigation VALUES ('PBnav00000000000000002','descendants','specificUrl','home','3',0,0,0,'PBtmpl0000000000000048');
-INSERT INTO Navigation VALUES ('PBnav00000000000000006','descendants','specificUrl','home','1',0,0,0,'PBtmpl0000000000000108');
-INSERT INTO Navigation VALUES ('PBnav00000000000000007','descendants','relativeToRoot','1','1',0,0,0,'PBtmpl0000000000000048');
-INSERT INTO Navigation VALUES ('PBnav00000000000000008','descendants','relativeToRoot','1','1',0,0,0,'PBtmpl0000000000000108');
-INSERT INTO Navigation VALUES ('PBnav00000000000000009','descendants','relativeToRoot','0','1',0,0,0,'PBtmpl0000000000000124');
-INSERT INTO Navigation VALUES ('PBnav00000000000000010',NULL,'relativeToRoot','1','1',0,0,0,'PBtmpl0000000000000117');
-INSERT INTO Navigation VALUES ('PBnav00000000000000011','self\ndescendants','relativeToRoot','1','55',0,0,0,'PBtmpl0000000000000130');
-INSERT INTO Navigation VALUES ('PBnav00000000000000012','descendants','relativeToRoot','1','55',0,0,0,'PBtmpl0000000000000134');
-INSERT INTO Navigation VALUES ('PBnav00000000000000013','self\ndescendants','relativeToCurrentUrl','0','55',0,0,0,'PBtmpl0000000000000136');
-INSERT INTO Navigation VALUES ('f2bihDeMoI-Ojt2dutJNQA',NULL,'relativeToRoot','1','1',0,0,0,'PBtmpl0000000000000071');
-INSERT INTO Navigation VALUES ('KZ2UytxNpbF-3Eg3RNvQQQ','descendants','relativeToCurrentUrl','0','1',0,0,0,'PBtmpl0000000000000075');
-INSERT INTO Navigation VALUES ('G0wlShbk_XruYVfbXqWq_w','pedigree','relativeToRoot','1','55',0,0,0,'PBtmpl0000000000000048');
+INSERT INTO Navigation VALUES ('pJd5TLAjfWMVXD6sCRLwUg','descendants','specificUrl','root',55,0,0,0,'PBtmpl0000000000000048',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000001','self\nancestors','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000093',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000014','pedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000015','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000048',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000016','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000108',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000017','self\nsiblings','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000117',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000018','descendants','relativeToCurrentUrl','-1',1,0,0,0,'PBtmpl0000000000000048',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000019','descendants','relativeToCurrentUrl','-1',1,0,0,0,'PBtmpl0000000000000108',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000020','descendants','relativeToRoot','0',1,0,0,0,'PBtmpl0000000000000108',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000021','descendants','specificUrl','home',3,0,0,0,'PBtmpl0000000000000117',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000002','descendants','specificUrl','home',3,0,0,0,'PBtmpl0000000000000048',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000006','descendants','specificUrl','home',1,0,0,0,'PBtmpl0000000000000108',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000007','descendants','relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000048',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000008','descendants','relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000108',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000009','descendants','relativeToRoot','0',1,0,0,0,'PBtmpl0000000000000124',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000010',NULL,'relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000117',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000011','self\ndescendants','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000130',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000012','descendants','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000134',55);
+INSERT INTO Navigation VALUES ('PBnav00000000000000013','self\ndescendants','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000136',55);
+INSERT INTO Navigation VALUES ('f2bihDeMoI-Ojt2dutJNQA',NULL,'relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000071',55);
+INSERT INTO Navigation VALUES ('KZ2UytxNpbF-3Eg3RNvQQQ','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000075',55);
+INSERT INTO Navigation VALUES ('G0wlShbk_XruYVfbXqWq_w','pedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55);
 
 --
 -- Table structure for table `Poll`
@@ -1526,6 +1534,41 @@ CREATE TABLE Product_specification (
 --
 
 
+
+--
+-- Table structure for table `RichEdit`
+--
+
+CREATE TABLE RichEdit (
+  assetId varchar(22) NOT NULL default '',
+  askAboutRichEdit int(11) NOT NULL default '0',
+  preformatted int(11) NOT NULL default '0',
+  editorWidth int(11) NOT NULL default '0',
+  editorHeight int(11) NOT NULL default '0',
+  sourceEditorWidth int(11) NOT NULL default '0',
+  sourceEditorHeight int(11) NOT NULL default '0',
+  useBr int(11) NOT NULL default '0',
+  nowrap int(11) NOT NULL default '0',
+  removeLineBreaks int(11) NOT NULL default '0',
+  npwrap int(11) NOT NULL default '0',
+  directionality char(3) NOT NULL default 'ltr',
+  toolbarLocation varchar(6) NOT NULL default 'bottom',
+  cssFile varchar(255) default NULL,
+  extendedValidElements text,
+  toolbarRow1 text,
+  toolbarRow2 text,
+  toolbarRow3 text,
+  enableContextMenu int(11) NOT NULL default '0',
+  PRIMARY KEY  (assetId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `RichEdit`
+--
+
+
+INSERT INTO RichEdit VALUES ('PBrichedit000000000001',0,0,0,0,600,500,0,0,0,0,'ltr','bottom',NULL,NULL,'bold\nitalic\njustifyleft\njustifyright\njustifycenter\njustifyfull\nindent\noutdent\nsub\nsup\nformatselect\nremoveformat','bullist\nnumlist\nlink\npagetree\nanchor\nunlink\nadvhr\nimage\ninsertImage\ncharmap\ncollateral','tablecontrols\nvisualaid\npreview\ncode\ncleanup\nreplace',1);
+INSERT INTO RichEdit VALUES ('PBrichedit000000000002',0,0,0,0,0,0,0,0,0,0,'ltr','bottom',NULL,NULL,'bold\nitalic\nbullist\nnumlist\nlink\nunlink\nemotions',NULL,NULL,0);
 
 --
 -- Table structure for table `SQLReport`
@@ -1809,8 +1852,8 @@ CREATE TABLE asset (
   extraHeadTags text,
   isPrototype int(11) NOT NULL default '0',
   PRIMARY KEY  (assetId),
-  UNIQUE KEY lineage (lineage),
   UNIQUE KEY url (url),
+  UNIQUE KEY lineage (lineage),
   KEY parentId (parentId),
   KEY state_parentId_lineage (state,parentId,lineage),
   KEY isPrototype_className_assetId (isPrototype,className,assetId)
@@ -1822,7 +1865,7 @@ CREATE TABLE asset (
 
 
 INSERT INTO asset VALUES ('PBasset000000000000001','infinity','000001','published','WebGUI::Asset','Root','Root','root',997995720,32472169200,'3','3','3',NULL,0,1,1,0,0,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBasset000000000000002','PBasset000000000000001','000001000001','published','WebGUI::Asset::Wobject::Folder','Import Node','Import','root/import',997995720,32472169200,'3','3','3',NULL,0,1,1,0,212,1110941437,'1',0,NULL,0);
+INSERT INTO asset VALUES ('PBasset000000000000002','PBasset000000000000001','000001000001','published','WebGUI::Asset::Wobject::Folder','Import Node','Import','root/import',997995720,32472169200,'3','3','3',NULL,0,1,1,0,212,1115241872,'1',0,NULL,0);
 INSERT INTO asset VALUES ('68sKwDgf9cGH58-NZcU4lg','PBasset000000000000001','000001000002','published','WebGUI::Asset::Wobject::Layout','Home','Home','home',946710000,2082783600,'3','7','3',NULL,0,0,0,0,532,0,NULL,0,'',0);
 INSERT INTO asset VALUES ('TKzUMeIxRLrZ3NAEez6CXQ','68sKwDgf9cGH58-NZcU4lg','000001000002000001','published','WebGUI::Asset::Wobject::Article','Welcome','Welcome','home/welcome',946710000,2082783600,'3','7','3',NULL,0,1,0,0,1599,0,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('sWVXMZGibxHe2Ekj1DCldA','68sKwDgf9cGH58-NZcU4lg','000001000002000002','published','WebGUI::Asset::Wobject::Article','Key Benefits','Key Benefits','home/key_benefits',946710000,2082783600,'3','7','3',NULL,0,1,0,0,2279,0,NULL,0,NULL,0);
@@ -1864,7 +1907,7 @@ INSERT INTO asset VALUES ('f2bihDeMoI-Ojt2dutJNQA','Wmjn6I1fe9DKhiIR39YC0g','000
 INSERT INTO asset VALUES ('KZ2UytxNpbF-3Eg3RNvQQQ','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000020','published','WebGUI::Asset::Wobject::Navigation','currentMenuHorizontal_1001','currentMenuHorizontal_1001','currentmenuhorizontal_1001',997995720,32472169200,'3','7','4',NULL,0,1,0,0,563,1109194981,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('G0wlShbk_XruYVfbXqWq_w','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000021','published','WebGUI::Asset::Wobject::Navigation','FlexMenu_1002','FlexMenu_1002','flexmenu_1002',997995720,32472169200,'3','7','4',NULL,0,1,0,0,513,1109194981,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('UE5_3bD7kWDLUN2B-iuNuA','PBasset000000000000002','000001000001000002','published','WebGUI::Asset::Wobject::Folder','Files, Snippets, and Images','Files, Snippets, and Images','collateral',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','PBasset000000000000002','000001000001000003','published','WebGUI::Asset::Wobject::Folder','Templates','Templates','templates',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1111265938,'1',0,NULL,0);
+INSERT INTO asset VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','PBasset000000000000002','000001000001000003','published','WebGUI::Asset::Wobject::Folder','Templates','Templates','templates',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1115241872,'1',0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000103','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000005','published','WebGUI::Asset::Template','Left Align Image','Left Align Image','left_align_image',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1417,1109194981,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000105','b26vQzyaqz0EBMWH_oPdrg','000001000001000003000151000002','published','WebGUI::Asset::Template','Calendar Month (Small)','Calendar Month (Small)','calendar_month_small',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2194,1109194981,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000023','jCMdSbD6IA535I16Pcik7Q','000001000001000003000152000001','published','WebGUI::Asset::Template','Default Event','Default Event','default_event',997995720,32472169200,'3','4','4',NULL,0,1,0,0,756,1109194981,NULL,0,NULL,0);
@@ -1923,7 +1966,7 @@ INSERT INTO asset VALUES ('PBtmpl0000000000000050','6MrxI11jyXuB-UUrX69lXQ','000
 INSERT INTO asset VALUES ('PBtmpl0000000000000049','VnUEcXfsbwgB5rqslQ3n1A','000001000001000003000173000001','published','WebGUI::Asset::Template','Default MessageLog Message Template','Default MessageLog Message Template','default_messagelog_message_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,427,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000051','xxuM0xMjhIA3lFq99GY05Q','000001000001000003000175000001','published','WebGUI::Asset::Template','Default Edit Profile Template','Default Edit Profile Template','default_edit_profile_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1330,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000052','kHlR8-nCFRrwlEV1uapu_Q','000001000001000003000176000001','published','WebGUI::Asset::Template','Default Profile Display Template','Default Profile Display Template','default_profile_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,593,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000126','h34TI6OYynW5Q_FYLbZiig','000001000001000003000181000001','published','WebGUI::Asset::Template','lastResort','lastResort','lastresort',997995720,32472169200,'3','4','4',NULL,0,1,0,0,504,1109194982,NULL,0,NULL,0);
+INSERT INTO asset VALUES ('PBrichedit000000000002','PBasset000000000000002','000001000001000005','published','WebGUI::Asset::RichEdit','Forum Rich Edit','Forum Rich Edit','forum_rich_edit',997995720,9223372036854775807,'3','7','4',NULL,0,0,0,0,246,1115241872,'1',0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000063','lUjGdT_Hhi_EFhsYr1Ouyw','000001000001000003000187000001','published','WebGUI::Asset::Template','Default Overview Report','Default Overview Report','default_overview_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3098,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000062','QWS2acYOu3Y4uNsWvVChTg','000001000001000003000186000001','published','WebGUI::Asset::Template','Default Gradebook Report','Default Gradebook Report','default_gradebook_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1411,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000061','ffWKX2dW4t1eWgfNng605w','000001000001000003000185000001','published','WebGUI::Asset::Template','Default Survey','Default Survey','default_survey',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3117,1109194982,NULL,0,NULL,0);
@@ -1931,7 +1974,7 @@ INSERT INTO asset VALUES ('PBtmpl0000000000000064','7Xhdnqu3qkDWHEnRgk6Uzw','000
 INSERT INTO asset VALUES ('PBtmpl0000000000000116','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000005','published','WebGUI::Asset::Template','Tab Form','Tab Form','tab_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2348,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000069','S99spbsvn96tgRA0oVUl2A','000001000001000003000190000002','published','WebGUI::Asset::Template','Xmethods: getTemp','Xmethods: getTemp','xmethods_gettemp',997995720,32472169200,'3','4','4',NULL,0,1,0,0,359,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000100','S99spbsvn96tgRA0oVUl2A','000001000001000003000190000001','published','WebGUI::Asset::Template','Google: doGoogleSearch','Google: doGoogleSearch','google_dogooglesearch',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1397,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000035','Fh_KALcbkc8CkBR3I6dU0g','000001000001000003000159000001','published','WebGUI::Asset::Template','Default Admin Bar','Default Admin Bar','default_admin_bar',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1810,1109194982,NULL,0,NULL,0);
+INSERT INTO asset VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000191','published','WebGUI::Asset::Wobject::Folder','Commerce/Product','Commerce/Product','commerce/product',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,201,1115241872,'1',0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000090','Fh_KALcbkc8CkBR3I6dU0g','000001000001000003000159000002','published','WebGUI::Asset::Template','DHTML Admin Bar','DHTML Admin Bar','dhtml_admin_bar',997995720,32472169200,'3','4','4',NULL,0,1,0,0,4440,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000093','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000004','published','WebGUI::Asset::Template','crumbTrail','crumbTrail','crumbtrail2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,462,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000048','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000010','published','WebGUI::Asset::Template','verticalMenu','verticalMenu','verticalmenu',997995720,32472169200,'3','4','4',NULL,0,1,0,0,569,1109194982,NULL,0,NULL,0);
@@ -1980,11 +2023,11 @@ INSERT INTO asset VALUES ('PBtmpl0000000000000042','J1uh__tKV2BARcSeFE7MSg','000
 INSERT INTO asset VALUES ('PBtmpl0000000000000045','mKI2EjkU9QH6dJKkx7VEvw','000001000001000003000169000001','published','WebGUI::Asset::Template','Default Make Printable','Default Make Printable','default_make_printable',997995720,32472169200,'3','4','4',NULL,0,1,0,0,90,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000043','7EfoKU41oB0ZU6NmVIud4A','000001000001000003000167000001','published','WebGUI::Asset::Template','Default LoginToggle','Default LoginToggle','default_logintoggle',997995720,32472169200,'3','4','4',NULL,0,1,0,0,82,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000003','ZexTeuMQaZ1fh4FOpLNlYw','000001000001000003000130000001','published','WebGUI::Asset::Template','Attachment Box','Attachment Box','attachment_box',997995720,32472169200,'3','4','4',NULL,0,1,0,0,477,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000138','h34TI6OYynW5Q_FYLbZiig','000001000001000003000181000002','published','WebGUI::Asset::Template','TinyMCE','TinyMCE','tinymce',997995720,32472169200,'3','4','4',NULL,0,1,0,0,734,1109194982,NULL,0,NULL,0);
+INSERT INTO asset VALUES ('PBrichedit000000000001','PBasset000000000000002','000001000001000004','published','WebGUI::Asset::RichEdit','Content Manager\'s Rich Edit','Content Manager\'s Rich Edit','content_managers_rich_edit',997995720,9223372036854775807,'3','12','4',NULL,0,0,0,0,487,1115241872,'1',0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000053','r4FQlrIkS1_MTuk-vVqRNg','000001000001000003000177000001','published','WebGUI::Asset::Template','Subscription code redemption','Subscription code redemption','subscription_code_redemption',997995720,32472169200,'3','4','4',NULL,0,1,0,0,121,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000046','HOleaBMUZT6B5qJmbcV5xg','000001000001000003000170000001','published','WebGUI::Asset::Template','Subscriptionitem default template','Subscriptionitem default template','subscriptionitem_default_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,136,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000018','5SdElAemaCKBfheDk7rz8A','000001000001000003000147000001','published','WebGUI::Asset::Template','Default transaction error template','Default transaction error template','default_transaction_error_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,484,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000016','j3yljeaT2y9fLkSHM5Zbow','000001000001000003000145000001','published','WebGUI::Asset::Template','Default checkout confirmation template','Default checkout confirmation template','default_checkout_confirmation_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,429,1109194982,NULL,0,NULL,0);
+INSERT INTO asset VALUES ('PBtmpl0000000000000016','j3yljeaT2y9fLkSHM5Zbow','000001000001000003000145000001','published','WebGUI::Asset::Template','Default checkout confirmation template','Default checkout confirmation template','default_checkout_confirmation_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1090,1115241872,'1',0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000019','arabONid_vy2W6cALhELxA','000001000001000003000148000001','published','WebGUI::Asset::Template','Default view purchase history template','Default view purchase history template','default_view_purchase_history_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,540,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000015','VvgRRrE6UsmWi7y7hMCXbw','000001000001000003000144000001','published','WebGUI::Asset::Template','Default cancel checkout template','Default cancel checkout template','default_cancel_checkout_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,18,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000017','2jkEIs9YpL10dZsA3RH4sw','000001000001000003000146000001','published','WebGUI::Asset::Template','Default payment gateway selection template','Default payment gateway selection template','default_payment_gateway_selection_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,468,1109194982,NULL,0,NULL,0);
@@ -2053,6 +2096,11 @@ INSERT INTO asset VALUES ('lUjGdT_Hhi_EFhsYr1Ouyw','RTsbVBEYnn3OPZWmXyIFhQ','000
 INSERT INTO asset VALUES ('7Xhdnqu3qkDWHEnRgk6Uzw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000188','published','WebGUI::Asset::Wobject::Folder','Survey/Response','Survey/Response','templates/survey/response',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265938,'1',0,NULL,0);
 INSERT INTO asset VALUES ('xPyASYtR44mpDk3ba4YyIg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000189','published','WebGUI::Asset::Wobject::Folder','SyndicatedContent','SyndicatedContent','templates/syndicatedcontent',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265938,'1',0,NULL,0);
 INSERT INTO asset VALUES ('S99spbsvn96tgRA0oVUl2A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000190','published','WebGUI::Asset::Wobject::Folder','WSClient','WSClient','templates/wsclient',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,261,1111265938,'1',0,NULL,0);
+INSERT INTO asset VALUES ('PBtmplCP00000000000001','Rn5Ef8vMDQ0ebtaxS_-JXA','000001000001000003000191000001','published','WebGUI::Asset::Template','Default Product Template','Default Product Template','default-produuct-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,694,1115241872,'1',0,NULL,0);
+INSERT INTO asset VALUES ('60wqz7KzyCDCHVNaavhQUA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000192','published','WebGUI::Asset::Wobject::Folder','Commerce/SelectShippingMethod','Commerce/SelectShippingMethod','commerce/selectshippingmethod',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,240,1115241872,'1',0,NULL,0);
+INSERT INTO asset VALUES ('PBtmplCSSM000000000001','60wqz7KzyCDCHVNaavhQUA','000001000001000003000192000001','published','WebGUI::Asset::Template','Default Select Shipping Method Template','Default Select Shipping Method Template','default-select-shipping-method-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,746,1115241872,'1',0,NULL,0);
+INSERT INTO asset VALUES ('fhevmqeVTLRCmI_z-NidQQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000193','published','WebGUI::Asset::Wobject::Folder','Commerce/ViewShoppingCart','Commerce/ViewShoppingCart','commerce/viewshoppingcart',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,228,1115241872,'1',0,NULL,0);
+INSERT INTO asset VALUES ('PBtmplVSC0000000000001','fhevmqeVTLRCmI_z-NidQQ','000001000001000003000193000001','published','WebGUI::Asset::Template','Default Shopping Cart Template','Default Shopping Cart Template','default-shoppingcart-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,1527,1115241872,'1',0,NULL,0);
 
 --
 -- Table structure for table `assetHistory`
@@ -2200,6 +2248,25 @@ INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added 
 INSERT INTO assetHistory VALUES ('xPyASYtR44mpDk3ba4YyIg','1',1111265938,'created');
 INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child S99spbsvn96tgRA0oVUl2A');
 INSERT INTO assetHistory VALUES ('S99spbsvn96tgRA0oVUl2A','1',1111265938,'created');
+INSERT INTO assetHistory VALUES ('PBtmpl0000000000000035','1',1115241871,'purged');
+INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241871,'added child Rn5Ef8vMDQ0ebtaxS_-JXA');
+INSERT INTO assetHistory VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','1',1115241871,'created');
+INSERT INTO assetHistory VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','1',1115241872,'added child PBtmplCP00000000000001');
+INSERT INTO assetHistory VALUES ('PBtmplCP00000000000001','1',1115241872,'created');
+INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241872,'added child 60wqz7KzyCDCHVNaavhQUA');
+INSERT INTO assetHistory VALUES ('60wqz7KzyCDCHVNaavhQUA','1',1115241872,'created');
+INSERT INTO assetHistory VALUES ('60wqz7KzyCDCHVNaavhQUA','1',1115241872,'added child PBtmplCSSM000000000001');
+INSERT INTO assetHistory VALUES ('PBtmplCSSM000000000001','1',1115241872,'created');
+INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241872,'added child fhevmqeVTLRCmI_z-NidQQ');
+INSERT INTO assetHistory VALUES ('fhevmqeVTLRCmI_z-NidQQ','1',1115241872,'created');
+INSERT INTO assetHistory VALUES ('fhevmqeVTLRCmI_z-NidQQ','1',1115241872,'added child PBtmplVSC0000000000001');
+INSERT INTO assetHistory VALUES ('PBtmplVSC0000000000001','1',1115241872,'created');
+INSERT INTO assetHistory VALUES ('PBtmpl0000000000000126','1',1115241872,'purged');
+INSERT INTO assetHistory VALUES ('PBtmpl0000000000000138','1',1115241872,'purged');
+INSERT INTO assetHistory VALUES ('PBasset000000000000002','1',1115241872,'added child PBrichedit000000000001');
+INSERT INTO assetHistory VALUES ('PBrichedit000000000001','1',1115241872,'created');
+INSERT INTO assetHistory VALUES ('PBasset000000000000002','1',1115241872,'added child PBrichedit000000000002');
+INSERT INTO assetHistory VALUES ('PBrichedit000000000002','1',1115241872,'created');
 
 --
 -- Table structure for table `authentication`
@@ -2372,6 +2439,7 @@ INSERT INTO groups VALUES ('OL-d6C93EeUr4Rja-q3-yQ','mdIaXozmVNE_Rga2BY0mxA','Th
 INSERT INTO groups VALUES ('YPCggIxdKT3AMMlML-CAuw','9kDcFufTKbMTkeAHyP36fw','The group to store subscriptions for the thread 9kDcFufTKbMTkeAHyP36fw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
 INSERT INTO groups VALUES ('C02CXMw3c42EJJR_nktyMw','5Y8eOI2u_HOvkzrRuLdz1g','The group to store subscriptions for the thread 5Y8eOI2u_HOvkzrRuLdz1g',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
 INSERT INTO groups VALUES ('zZmjNsD1FhaSFkgXvnCQUg','ImmYJRWOPFedzI4Bg1k6GA','The group to store subscriptions for the thread ImmYJRWOPFedzI4Bg1k6GA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
+INSERT INTO groups VALUES ('14','Product Managers','The group that is allowed to edit, delete and create products.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,1,1);
 
 --
 -- Table structure for table `incrementer`
@@ -2406,6 +2474,35 @@ CREATE TABLE karmaLog (
 --
 
 
+
+--
+-- Table structure for table `ldapLink`
+--
+
+CREATE TABLE ldapLink (
+  ldapLinkId varchar(22) NOT NULL default '',
+  ldapLinkName varchar(255) NOT NULL default '',
+  ldapUrl varchar(255) NOT NULL default '',
+  connectDn varchar(255) NOT NULL default '',
+  identifier varchar(255) NOT NULL default '',
+  ldapUserRDN varchar(255) default NULL,
+  ldapIdentity varchar(255) default NULL,
+  ldapIdentityName varchar(255) default NULL,
+  ldapPasswordName varchar(255) default NULL,
+  ldapSendWelcomeMessage char(2) default NULL,
+  ldapWelcomeMessage text,
+  ldapAccountTemplate varchar(22) default NULL,
+  ldapCreateAccountTemplate varchar(22) default NULL,
+  ldapLoginTemplate varchar(22) default NULL,
+  PRIMARY KEY  (ldapLinkId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `ldapLink`
+--
+
+
+INSERT INTO ldapLink VALUES ('1uBbhUm686mkFZ1ghv7Lag','Default LDAP Connection','ldap://ldap.mycompany.com:389/o=MyCompany','','','cn','shortname','LDAP Shortname','LDAP Password','0','Welcome to our site.','PBtmpl0000000000000004','PBtmpl0000000000000005','PBtmpl0000000000000006');
 
 --
 -- Table structure for table `messageLog`
@@ -2457,7 +2554,7 @@ CREATE TABLE metaData_values (
   fieldId varchar(22) NOT NULL default '',
   value varchar(100) default NULL,
   assetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (fieldId)
+  PRIMARY KEY  (fieldId,assetId)
 ) TYPE=MyISAM;
 
 --
@@ -2499,6 +2596,89 @@ CREATE TABLE passiveProfileLog (
 
 --
 -- Dumping data for table `passiveProfileLog`
+--
+
+
+
+--
+-- Table structure for table `productParameterOptions`
+--
+
+CREATE TABLE productParameterOptions (
+  optionId varchar(22) NOT NULL default '',
+  parameterId varchar(22) NOT NULL default '',
+  value varchar(64) NOT NULL default '',
+  priceModifier decimal(10,2) default '0.00',
+  weightModifier decimal(6,2) default '0.00',
+  skuModifier varchar(64) default NULL,
+  PRIMARY KEY  (optionId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `productParameterOptions`
+--
+
+
+
+--
+-- Table structure for table `productParameters`
+--
+
+CREATE TABLE productParameters (
+  parameterId varchar(22) NOT NULL default '',
+  productId varchar(22) NOT NULL default '',
+  name varchar(64) NOT NULL default '',
+  PRIMARY KEY  (parameterId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `productParameters`
+--
+
+
+
+--
+-- Table structure for table `productVariants`
+--
+
+CREATE TABLE productVariants (
+  variantId varchar(22) NOT NULL default '',
+  productId varchar(22) NOT NULL default '',
+  composition mediumtext NOT NULL,
+  sku varchar(255) default NULL,
+  price decimal(12,2) default '0.00',
+  weight decimal(8,3) default '0.000',
+  skuOverride tinyint(1) default '0',
+  priceOverride tinyint(1) default '0',
+  weightOverride tinyint(1) default '0',
+  available tinyint(1) default '1',
+  PRIMARY KEY  (variantId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `productVariants`
+--
+
+
+
+--
+-- Table structure for table `products`
+--
+
+CREATE TABLE products (
+  productId varchar(22) NOT NULL default '',
+  title varchar(255) NOT NULL default '',
+  description mediumtext,
+  price decimal(12,2) NOT NULL default '0.00',
+  weight decimal(8,3) NOT NULL default '0.000',
+  sku varchar(255) NOT NULL default '',
+  skuTemplate varchar(255) default NULL,
+  templateId varchar(22) default NULL,
+  PRIMARY KEY  (productId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `products`
 --
 
 
@@ -2567,12 +2747,8 @@ INSERT INTO settings VALUES ('maxAttachmentSize','10000');
 INSERT INTO settings VALUES ('sessionTimeout','3600');
 INSERT INTO settings VALUES ('smtpServer','localhost');
 INSERT INTO settings VALUES ('companyEmail','info@mycompany.com');
-INSERT INTO settings VALUES ('ldapURL','ldap://ldap.mycompany.com:389/o=MyCompany');
 INSERT INTO settings VALUES ('companyName','My Company');
 INSERT INTO settings VALUES ('companyURL','http://www.mycompany.com');
-INSERT INTO settings VALUES ('ldapId','shortname');
-INSERT INTO settings VALUES ('ldapIdName','LDAP Shortname');
-INSERT INTO settings VALUES ('ldapPasswordName','LDAP Password');
 INSERT INTO settings VALUES ('authMethod','WebGUI');
 INSERT INTO settings VALUES ('anonymousRegistration','0');
 INSERT INTO settings VALUES ('notFoundPage','68sKwDgf9cGH58-NZcU4lg');
@@ -2594,23 +2770,20 @@ INSERT INTO settings VALUES ('useKarma','0');
 INSERT INTO settings VALUES ('karmaPerLogin','1');
 INSERT INTO settings VALUES ('runOnRegistration','');
 INSERT INTO settings VALUES ('maxImageSize','100000');
-INSERT INTO settings VALUES ('showDebug','0');
-INSERT INTO settings VALUES ('richEditCss','^/;site.css');
+INSERT INTO settings VALUES ('showDebug','1');
+INSERT INTO settings VALUES ('richEditor','PBrichedit000000000001');
 INSERT INTO settings VALUES ('selfDeactivation','1');
 INSERT INTO settings VALUES ('snippetsPreviewLength','30');
 INSERT INTO settings VALUES ('mailFooter','^c;\n^e;\n^u;\n');
 INSERT INTO settings VALUES ('webguiSendWelcomeMessage','0');
 INSERT INTO settings VALUES ('webguiWelcomeMessage','Welcome to our site.');
 INSERT INTO settings VALUES ('proxiedClientAddress','0');
-INSERT INTO settings VALUES ('ldapUserRDN','cn');
 INSERT INTO settings VALUES ('encryptLogin','0');
 INSERT INTO settings VALUES ('hostToUse','HTTP_HOST');
 INSERT INTO settings VALUES ('webguiExpirePasswordOnCreation','0');
 INSERT INTO settings VALUES ('webguiPasswordLength','0');
 INSERT INTO settings VALUES ('webguiPasswordRecovery','1');
 INSERT INTO settings VALUES ('webguiPasswordTimeout','3122064000');
-INSERT INTO settings VALUES ('ldapWelcomeMessage','Welcome to our site.');
-INSERT INTO settings VALUES ('ldapSendWelcomeMessage','0');
 INSERT INTO settings VALUES ('commerceCheckoutCanceledTemplateId','1');
 INSERT INTO settings VALUES ('webguiChangePassword','1');
 INSERT INTO settings VALUES ('webguiChangeUsername','1');
@@ -2630,10 +2803,10 @@ INSERT INTO settings VALUES ('webguiCreateAccountTemplate','PBtmpl00000000000000
 INSERT INTO settings VALUES ('webguiExpiredPasswordTemplate','PBtmpl0000000000000012');
 INSERT INTO settings VALUES ('webguiLoginTemplate','PBtmpl0000000000000013');
 INSERT INTO settings VALUES ('webguiPasswordRecoveryTemplate','PBtmpl0000000000000014');
-INSERT INTO settings VALUES ('ldapAccountTemplate','PBtmpl0000000000000004');
-INSERT INTO settings VALUES ('ldapCreateAccountTemplate','PBtmpl0000000000000005');
-INSERT INTO settings VALUES ('ldapLoginTemplate','PBtmpl0000000000000006');
 INSERT INTO settings VALUES ('specialState','init');
+INSERT INTO settings VALUES ('ldapConnection',NULL);
+INSERT INTO settings VALUES ('commerceSelectShippingMethodTemplateId','PBtmplCSSM000000000001');
+INSERT INTO settings VALUES ('commerceViewShoppingCartTemplateId','PBtmplVSC0000000000001');
 
 --
 -- Table structure for table `shoppingCart`
@@ -2804,7 +2977,7 @@ INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if sess
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if error_loop>\r\n<ul>\r\n<tmpl_loop error_loop>\r\n  <li><b><tmpl_var error.message></b>\r\n</tmpl_loop>\r\n</ul>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if canEdit>\r\n      <a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\r\n      &middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\r\n      <tmpl_if entryId>\r\n        &middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\r\n      </tmpl_if>\r\n      <tmpl_if session.var.adminOn>\r\n          &middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\r\n			 &middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\r\n     </tmpl_if>\r\n   <p /> \r\n</tmpl_if>\r\n\r\n<tmpl_var form.start>\r\n<table>\r\n<tmpl_loop field_loop>\r\n  <tmpl_unless field.isHidden>\r\n     <tr><td class=\"formDescription\" valign=\"top\">\r\n        <tmpl_if session.var.adminOn><tmpl_if canEdit><tmpl_var field.controls></tmpl_if></tmpl_if>\r\n        <tmpl_var field.label>\r\n     </td><td class=\"tableData\" valign=\"top\">\r\n       <tmpl_if field.isDisplayed>\r\n            <tmpl_var field.value>\r\n       <tmpl_else>\r\n            <tmpl_var field.form>\r\n       </tmpl_if>\r\n        <tmpl_if field.required>*</tmpl_if>\r\n        <span class=\"formSubtext\"><br /><tmpl_var field.subtext></span>\r\n     </td></tr>\r\n  </tmpl_unless>\r\n</tmpl_loop>\r\n<tr><td></td><td><tmpl_var form.send></td></tr>\r\n</table>\r\n\r\n<tmpl_var form.end>\r\n','DataForm',1,1,'PBtmpl0000000000000020');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_var edit.url>\n\n<tmpl_loop field_loop><tmpl_unless field.isMailField><tmpl_var field.label>:	 <tmpl_var field.value>\n</tmpl_unless></tmpl_loop>','DataForm',1,1,'PBtmpl0000000000000085');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_var acknowledgement>\r\n<p />\r\n<table border=\"0\">\r\n<tmpl_loop field_loop>\r\n<tmpl_unless field.isMailField><tmpl_unless field.isHidden>\r\n  <tr><td class=\"tableHeader\"><tmpl_var field.label></td>\r\n  <td class=\"tableData\"><tmpl_var field.value></td></tr>\r\n</tmpl_unless></tmpl_unless>\r\n</tmpl_loop>\r\n</table>\r\n<p />\r\n<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>','DataForm',1,1,'PBtmpl0000000000000104');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>\n<p />\n<table width=\"100%\">\n<tr>\n<td class=\"tableHeader\">Entry ID</td>\n<tmpl_loop field_loop>\n  <tmpl_unless field.isMailField>\n    <td class=\"tableHeader\"><tmpl_var field.label></td>\n  </tmpl_unless field.isMailField>\n</tmpl_loop field_loop>\n<td class=\"tableHeader\">Submission Date</td>\n</tr>\n<tmpl_loop record_loop>\n<tr>\n  <td class=\"tableData\"><a href=\"<tmpl_var record.edit.url>\"><tmpl_var record.entryId></a></td>\n  <tmpl_loop record.data_loop>\n    <tmpl_unless record.data.isMailField>\n       <td class=\"tableData\"><tmpl_var record.data.value></td>\n     </tmpl_unless record.data.isMailField>\n  </tmpl_loop record.data_loop>\n  <td class=\"tableData\"><tmpl_var record.submissionDate.human></td>\n</tr>\n</tmpl_loop record_loop>\n</table>','DataForm/List',1,1,'PBtmpl0000000000000021');
+INSERT INTO template VALUES ('<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>\n<tmpl_if session.var.adminOn>\n<p><tmpl_var controls></p>\n</tmpl_if><p />\n<table width=\"100%\">\n<tr>\n<td class=\"tableHeader\">Entry ID</td>\n<tmpl_loop field_loop>\n  <tmpl_unless field.isMailField>\n    <td class=\"tableHeader\"><tmpl_var field.label></td>\n  </tmpl_unless field.isMailField>\n</tmpl_loop field_loop>\n<td class=\"tableHeader\">Submission Date</td>\n</tr>\n<tmpl_loop record_loop>\n<tr>\n  <td class=\"tableData\"><a href=\"<tmpl_var record.edit.url>\"><tmpl_var record.entryId></a></td>\n  <tmpl_loop record.data_loop>\n    <tmpl_unless record.data.isMailField>\n       <td class=\"tableData\"><tmpl_var record.data.value></td>\n     </tmpl_unless record.data.isMailField>\n  </tmpl_loop record.data_loop>\n  <td class=\"tableData\"><tmpl_var record.submissionDate.human></td>\n</tr>\n</tmpl_loop record_loop>\n</table>','DataForm/List',1,1,'PBtmpl0000000000000021');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if search.for>\r\n  <tmpl_if content>\r\n    <!-- Display search string. Remove if unwanted -->\r\n    <tmpl_var search.for>\r\n  <tmpl_else>\r\n    <!-- Error: Starting point not found -->\r\n    <b>Error: Search string <i><tmpl_var search.for></i> not found in content.</b>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var content>\r\n\r\n<tmpl_if stop.at>\r\n  <tmpl_if content.trailing>\r\n    <!-- Display stop search string. Remove if unwanted -->\r\n    <tmpl_var stop.at>\r\n  <tmpl_else>\r\n    <!-- Warning: End point not found -->\r\n    <b>Warning: Ending search point <i><tmpl_var stop.at></i> not found in content.</b>\r\n  </tmpl_if>\r\n</tmpl_if>','HttpProxy',1,1,'PBtmpl0000000000000033');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n<tmpl_if session.var.adminOn>\n   <a href=\"<tmpl_var forum.add.url>\"><tmpl_var forum.add.label></a><p />\n</tmpl_if>\n\n<tmpl_if areMultipleForums>\n	<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\">\n		<tr>\n			<tmpl_if session.var.adminOn>\n				<td></td>\n			</tmpl_if>\n			<td class=\"tableHeader\"><tmpl_var title.label></td>\n			<td class=\"tableHeader\"><tmpl_var views.label></td>\n			<td class=\"tableHeader\"><tmpl_var rating.label></td>\n			<td class=\"tableHeader\"><tmpl_var threads.label></td>\n			<td class=\"tableHeader\"><tmpl_var replies.label></td>\n			<td class=\"tableHeader\"><tmpl_var lastpost.label></td>\n		</tr>\n		<tmpl_loop forum_loop>\n			<tr>\n				<tmpl_if session.var.adminOn>\n					<td><tmpl_var forum.controls></td>\n				</tmpl_if>\n				<td class=\"tableData\">\n					<a href=\"<tmpl_var forum.url>\"><tmpl_var forum.title></a><br />\n					<span style=\"font-size: 10px;\"><tmpl_var forum.description></span>\n				</td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.views></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.rating></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.threads></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.replies></td>\n				<td class=\"tableData\"><span style=\"font-size: 10px;\">\n					<a href=\"<tmpl_var forum.lastpost.url>\"><tmpl_var forum.lastpost.subject></a>\n					by \n					<tmpl_if forum.lastpost.user.isVisitor>\n						<tmpl_var forum.lastpost.user.name>\n					<tmpl_else>\n						<a href=\"<tmpl_var forum.lastpost.user.profile>\"><tmpl_var forum.lastpost.user.name></a>\n					</tmpl_if>\n					on <tmpl_var forum.lastpost.date> @ <tmpl_var forum.lastpost.time>\n				</span></td>\n			</tr>\n		</tmpl_loop>\n	</table>\n<tmpl_else>\n	<h2><tmpl_var default.title></h2>\n	<tmpl_if session.var.adminOn>\n		<tmpl_var default.controls><br />\n	</tmpl_if>\n	<tmpl_var default.description><p />\n	<tmpl_var default.listing>\n</tmpl_if>','MessageBoard',1,1,'PBtmpl0000000000000047');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n\r\n<h1><tmpl_var message.header.label></h1>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_if user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var visitorName.label></td>\r\n				<td><tmpl_var visitorName.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var subject.label></td>\r\n		<td><tmpl_var title.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var message.label></td>\r\n		<td><tmpl_var content.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if attachment.form>\r\n		<tr>\r\n			<td><tmpl_var attachment.label></td>\r\n			<td><tmpl_var attachment.form></td>\r\n		</tr>\r\n	</tmpl_if>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000029');
@@ -2824,7 +2997,6 @@ INSERT INTO template VALUES ('<h1><tmpl_var displayTitle></h1>\r\n\r\n<table wid
 INSERT INTO template VALUES ('<tmpl_var displayTitle>\r\n<b><tmpl_var message.subject></b><br>\r\n<tmpl_var message.dateOfEntry><br>\r\n<tmpl_var message.status><br><br>\r\n<tmpl_var message.text><p>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_if message.takeAction>\r\n         <li><tmpl_var message.takeAction>\r\n      </tmpl_if>\r\n      <tmpl_loop message.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>\r\n\r\n\r\n','Operation/MessageLog/Message',1,1,'PBtmpl0000000000000049');
 INSERT INTO template VALUES ('<tmpl_var displayTitle>\r\n\r\n<tmpl_if profile.message>\r\n   <tmpl_var profile.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var profile.form.header>\r\n<table >\r\n<tmpl_var profile.form.hidden>\r\n\r\n<tmpl_loop profile.form.elements>\r\n     <tr>\r\n       <td class=\"tableHeader\" valign=\"top\" colspan=\"2\">\r\n         <tmpl_var profile.form.category>\r\n       </td>\r\n     </tr>\r\n \r\n <tmpl_loop profile.form.category.loop>\r\n   <tr>\r\n    <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var profile.form.element.label>\r\n    </td>\r\n    <td class=\"tableData\">\r\n      <tmpl_var profile.form.element>\r\n      <tmpl_if profile.form.element.subtext>\r\n        <span class=\"formSubtext\">\r\n         <tmpl_var profile.form.element.subtext>\r\n        </span>\r\n      </tmpl_if>\r\n    </td>\r\n   </tr>\r\n </tmpl_loop>\r\n</tmpl_loop>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n <td class=\"formDescription\" valign=\"top\"></td>\r\n <td class=\"tableData\">\r\n     <tmpl_var profile.form.submit>\r\n </td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop profile.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/Profile/Edit',1,1,'PBtmpl0000000000000051');
 INSERT INTO template VALUES ('<tmpl_var displayTitle>\r\n\r\n<table>\r\n  <tmpl_loop profile.elements>\r\n    <tr>\r\n    <tmpl_if profile.category>\r\n      <td colspan=\"2\" class=\"tableHeader\">\r\n        <tmpl_var profile.category>\r\n      </td>\r\n    <tmpl_else>\r\n      <td class=\"tableHeader\">\r\n         <tmpl_var profile.label>\r\n      </td>\r\n      <td class=\"tableData\">\r\n         <tmpl_var profile.value>\r\n      </td>\r\n    </tmpl_if>   \r\n    </tr>\r\n  </tmpl_loop>\r\n</table>\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop profile.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/Profile/View',1,1,'PBtmpl0000000000000052');
-INSERT INTO template VALUES ('^JavaScript(\"<tmpl_var session.config.extrasURL>/textFix.js\");\r\n\r\n<script language=\"JavaScript\">\r\n      var formObj;\r\n      var extrasDir=\"<tmpl_var session.config.extrasURL>\";\r\n      function openEditWindow(obj) {\r\n         formObj = obj;\r\n         window.open(\"<tmpl_var session.config.extrasURL>/lastResortEdit.html\",\"editWindow\",\"width=500,height=410\");\r\n      }\r\n      function setContent(content) {\r\n         formObj.value = content;\r\n      } \r\n</script>\r\n\r\n<tmpl_var button>\r\n\r\n<tmpl_var textarea>','richEditor',1,1,'PBtmpl0000000000000126');
 INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n<br /> <br />\n\n<script>\nfunction toggleDiv(divId) {\n   if (document.getElementById(divId).style.visibility == \"none\") {\n	document.getElementById(divId).style.display = \"block\";\n   } else {\n	document.getElementById(divId).style.display = \"none\";	\n   }\n}\n</script>\n\n<tmpl_loop question_loop>\n	<b><tmpl_var question></b>\n              <tmpl_if question.isRadioList>\n                        <table class=\"tableData\">\n                        <tr class=\"tableHeader\"><td width=\"60%\"><tmpl_var answer.label></td>\n                                <td width=\"20%\"><tmpl_var response.count.label></td>\n                                <td width=\"20%\"><tmpl_var response.percent.label></td></tr>\n                        <tmpl_loop answer_loop>\n                                <tmpl_if answer.isCorrect>\n                                        <tr class=\"highlight\">\n                                <tmpl_else>\n                                        <tr>\n                                </tmpl_if>\n                                	<td><tmpl_var answer></td>\n                                	<td><tmpl_var answer.response.count></td>\n                                	<td><tmpl_var answer.response.percent></td>\n			<tmpl_if allowComment>\n                        			<td><a href=\"#\" onClick=\"toggle(\'comment<tmpl_var answer.id>\');\"><tmpl_var show.comments.label></a></td>\n			</tmpl_if>\n                               </tr>\n		<tmpl_if question.allowComment>\n			<tr id=\"comment<tmpl_var answer.id>\">\n				<td colspan=\"3\">\n					<tmpl_loop comment_loop>\n						<p>\n						<tmpl_var answer.comment>\n						</p>\n					</tmpl_loop>\n				</td>\n			</tr>\n		</tmpl_if>\n		</tmpl_loop>\n                        </table>\n               <tmpl_else>\n                        <br />\n		<a href=\"#\" onClick=\"toggle(\'response<tmpl_var question.id>\');\"><tmpl_var show.answers.label></a>\n		<br />\n		<div id=\"response<tmpl_var question.id>\">\n			<tmpl_loop answer_loop>\n				<p>\n				<tmpl_var answer.response>\n				</p>\n                			<tmpl_if question.allowComment>\n					<blockquote>\n					<tmpl_var answer.comment>\n					</blockquote>\n                			</tmpl_if>\n			</tmpl_loop>\n		</div>\n                </tmpl_if>\n	<br /><br /><br />\n\n</tmpl_loop>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n\n','Survey/Overview',1,1,'PBtmpl0000000000000063');
 INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n<br /> <br />\n\n<table class=\"tableData\">\n<tr class=\"tableHeader\"><td width=\"60%\"><tmpl_var response.user.label></td>\n                <td width=\"20%\"><tmpl_var response.count.label></td>\n                <td width=\"20%\"><tmpl_var response.percent.label></td></tr>\n<tmpl_loop response_loop>\n<tr>\n	<td><a href=\"<tmpl_var response.url>\"><tmpl_var response.user.name></a></td>\n	<td><tmpl_var response.count.correct>/<tmpl_var question.count></td>\n             <td><tmpl_var response.percent>%</td>\n</tr>\n</tmpl_loop>\n</table>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','Survey/Gradebook',1,1,'PBtmpl0000000000000062');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n\n<tmpl_if description>\n  <tmpl_var description><p />\n</tmpl_if>\n\n\n<tmpl_if user.canTakeSurvey>\n	<tmpl_if response.isComplete>\n		<tmpl_if mode.isSurvey>\n			<tmpl_var thanks.survey.label>\n		<tmpl_else>\n			<tmpl_var thanks.quiz.label>\n			<div align=\"center\">\n				<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.total>\n				<br />\n				<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% \n			</div>\n		</tmpl_if>\n		<tmpl_if user.canRespondAgain>\n			<br /> <br /> <a href=\"<tmpl_var start.newResponse.url>\"><tmpl_var start.newResponse.label></a>\n		</tmpl_if>\n	<tmpl_else>\n		<tmpl_if response.id>\n			<tmpl_var form.header>\n			<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\" class=\"content\">\n				<tr>\n					<td valign=\"top\">\n					<tmpl_loop question_loop>\n						<p><tmpl_var question.question></p>\n						<tmpl_var question.answer.label><br />\n						<tmpl_var question.answer.field><br />\n						<br />\n						<tmpl_if question.allowComment>\n							<tmpl_var question.comment.label><br />\n							<tmpl_var question.comment.field><br />\n						</tmpl_if>\n					</tmpl_loop>\n					</td>\n					<td valign=\"top\" nowrap=\"1\">\n						<b><tmpl_var questions.sofar.label>:</b> <tmpl_var questions.sofar.count> / <tmpl_var questions.total> <br />\n						<tmpl_unless mode.isSurvey>\n							<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.sofar.count><br />\n							<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% / 100%<br />\n						</tmpl_unless>\n					</td>\n				</tr>\n			</table>\n			<div align=\"center\"><tmpl_var form.submit></div>\n			<tmpl_var form.footer>\n		<tmpl_else>\n			<a href=\"<tmpl_var start.newResponse.url>\"><tmpl_var start.newResponse.label></a>\n		</tmpl_if>\n	</tmpl_if>\n<tmpl_else>\n	<tmpl_if mode.isSurvey>\n		<tmpl_var survey.noprivs.label>\n	<tmpl_else>\n		<tmpl_var quiz.noprivs.label>\n	</tmpl_if>\n</tmpl_if>\n<br />\n<br />\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n\n<tmpl_if session.var.adminOn>\n	<p>\n		<a href=\"<tmpl_var question.add.url>\"><tmpl_var question.add.label></a>\n	</p>\n	<tmpl_loop question.edit_loop>\n		<tmpl_var question.edit.controls>\n          	<tmpl_var question.edit.question>\n		<br />\n        </tmpl_loop>\n</tmpl_if>\n','Survey',1,1,'PBtmpl0000000000000061');
@@ -2832,8 +3004,10 @@ INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canView
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if error_loop>\r\n	<ul>\r\n		<tmpl_loop error_loop>\r\n			<li><b><tmpl_var error.message></b>\r\n			</tmpl_loop>\r\n	</ul>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n	<tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if canEdit>\r\n	<a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\r\n		&middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\r\n	<tmpl_if entryId>\r\n		&middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\r\n	</tmpl_if>\r\n	<tmpl_if session.var.adminOn>\r\n		&middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\r\n		&middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\r\n	</tmpl_if>\r\n<p /> \r\n</tmpl_if>\r\n<tmpl_var form.start>\r\n<link href=\"/extras/tabs/tabs.css\" rel=\"stylesheet\" rev=\"stylesheet\" type=\"text/css\">\r\n<div class=\"tabs\">\r\n	<tmpl_loop tab_loop>\r\n		<span onclick=\"toggleTab(<tmpl_var tab.sequence>)\" id=\"tab<tmpl_var tab.sequence>\" class=\"tab\"><tmpl_var tab.label>\r\n		<tmpl_if session.var.adminOn>\r\n			<tmpl_if canEdit>\r\n				<tmpl_var tab.controls>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n		</span>\r\n	</tmpl_loop>\r\n</div>\r\n<tmpl_loop tab_loop>\r\n	<tmpl_var tab.start>\r\n		<table>\r\n			<tmpl_loop tab.field_loop>\r\n				<tmpl_unless tab.field.isHidden>\r\n						<tr>\r\n							<td class=\"formDescription\" valign=\"top\">\r\n								<tmpl_if session.var.adminOn>\r\n									<tmpl_if canEdit>\r\n										<tmpl_var tab.field.controls>\r\n									</tmpl_if>\r\n								</tmpl_if>\r\n								<tmpl_var tab.field.label>\r\n							</td>\r\n							<td class=\"tableData\" valign=\"top\">\r\n								<tmpl_if tab.field.isDisplayed>\r\n									<tmpl_var tab.field.value>\r\n								<tmpl_else>\r\n									<tmpl_var tab.field.form>\r\n								</tmpl_if>\r\n								<tmpl_if tab.field.isRequired>*</tmpl_if>\r\n								<span class=\"formSubtext\">\r\n									<br />\r\n									<tmpl_var tab.field.subtext>\r\n								</span>\r\n							</td>\r\n						</tr>\r\n				</tmpl_unless>\r\n			</tmpl_loop>\r\n			<tr>\r\n				<td colspan=\"2\">\r\n					<span class=\"tabSubtext\"><tmpl_var tab.subtext></span>\r\n				</td>\r\n			</tr>\r\n		</table>\r\n		<br>\r\n		<tmpl_var form.save>\r\n	<tmpl_var tab.end>\r\n</tmpl_loop>\r\n<tmpl_var tab.init>\r\n<tmpl_var form.end>\r\n','DataForm',1,1,'PBtmpl0000000000000116');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n\r\n<tmpl_if results>\r\n  <tmpl_loop results>\r\n    The current temp is: <tmpl_var result>\r\n  </tmpl_loop>\r\n<tmpl_else>\r\n  Failed to retrieve temp.\r\n</tmpl_if>','WSClient',1,1,'PBtmpl0000000000000069');
 INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\n.googleDetail {\n  font-size: 9px;\n}\n</style>\n\n<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n<form method=\"post\">\n <input type=\"hidden\" name=\"func\" value=\"view\">\n <input type=\"hidden\" name=\"wid\" value=\"<tmpl_var wobjectId>\">\n <input type=\"hidden\" name=\"targetWobjects\" value=\"doGoogleSearch\">\n <input type=\"text\" name=\"q\"><input type=\"submit\" value=\"Search\">\n</form>\n\n<tmpl_if results>\n  <tmpl_loop results>\n   <tmpl_if resultElements>\n      <p> You searched for <b><tmpl_var searchQuery></b>. We found around <tmpl_var estimatedTotalResultsCount> matching records.</p>\n   </tmpl_if>\n\n   <tmpl_loop resultElements>\n     <a href=\"<tmpl_var URL>\">\n	<tmpl_if title>\n		    <tmpl_var title>\n	<tmpl_else>\n                    <tmpl_var url>\n        </tmpl_if>\n     </a><br />\n        <tmpl_if snippet>\n            <tmpl_var snippet><br />\n        </tmpl_if>\n        <div class=\"googleDetail\">\n        <tmpl_if summary>\n            <b>Description:</b> <tmpl_var summary><br />\n        </tmpl_if>\n        <a href=\"<tmpl_var URL>\"><tmpl_var URL></a>\n     <tmpl_if cachedSize>\n           - <tmpl_var cachedSize>\n     </tmpl_if>\n     </div><br />\n    </tmpl_loop>\n  </tmpl_loop>\n<tmpl_else>\n   Could not retrieve results from Google.\n</tmpl_if>','WSClient',1,1,'PBtmpl0000000000000100');
-INSERT INTO template VALUES ('<script language=\"JavaScript\" type=\"text/javascript\">   <!--\r\n        function goContent(){\r\n                location = document.content.contentSelect.options[document.content.contentSelect.selectedIndex].value\r\n        }\r\n        function goAdmin(){\r\n                location = document.admin.adminSelect.options[document.admin.adminSelect.selectedIndex].value\r\n        }\r\n        //-->   </script>\r\n \r\n<div class=\"adminBar\">\r\n<table class=\"adminBar\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">\r\n	<tr>\r\n        		<form name=\"content\"> <td>\r\n<select name=\"contentSelect\" onChange=\"goContent()\">\r\n<option value=\"\"><tmpl_var addcontent.label></option>\r\n\r\n<tmpl_if clipboard_loop>\r\n<optgroup label=\"<tmpl_var clipboard.label>\">	\r\n<tmpl_loop clipboard_loop>\r\n<option value=\"<tmpl_var clipboard.url>\"><tmpl_var clipboard.label></option>\r\n</tmpl_loop>\r\n</optgroup>\r\n</tmpl_if>\r\n<tmpl_loop container_loop> <option value=\"<tmpl_var container.url>\"><tmpl_var container.label></option> </tmpl_loop>\r\n<tmpl_if contentTypes_loop>\r\n<optgroup label=\"<tmpl_var contentTypes.label>\">	\r\n<tmpl_loop contentTypes_loop>\r\n<option value=\"<tmpl_var contentType.url>\"><tmpl_var contentType.label></option>\r\n</tmpl_loop>\r\n</optgroup>\r\n</tmpl_if>\r\n\r\n<tmpl_if package_loop>\r\n<optgroup label=\"<tmpl_var packages.label>\">	\r\n<tmpl_loop package_loop>\r\n<option value=\"<tmpl_var package.url>\"><tmpl_var package.label></option>\r\n</tmpl_loop>\r\n</optgroup>\r\n</tmpl_if>\r\n\r\n</select>\r\n		</td> </form>\r\n\r\n        		<form name=\"admin\"> <td align=\"center\">\r\n			<select name=\"adminSelect\" onChange=\"goAdmin()\">\r\n				<option value=\"\"><tmpl_var admin.label></option>\r\n				<tmpl_loop admin_loop>\r\n					<option value=\"<tmpl_var admin.url>\"><tmpl_var admin.label></option>\r\n				</tmpl_loop>\r\n			</select>\r\n		</td> </form>\r\n        	</tr>\r\n</table>\r\n</div>\r\n','Macro/AdminBar',1,1,'PBtmpl0000000000000035');
-INSERT INTO template VALUES ('^JavaScript(\"<tmpl_var session.config.extrasURL>/coolmenus/coolmenus4.js\");\r\n<style type=\"text/css\">\r\n                                                                                                                                                          \r\n.adminBarTop,.adminBarTopOver,.adminBarSub,.adminBarSubOver{position:absolute; overflow:hidden; cursor:pointer; cursor:hand}\r\n.adminBarTop,.adminBarTopOver{padding:4px; font-size:12px; font-weight:bold}\r\n.adminBarTop{color:white; border: 1px solid #aaaaaa; }\r\n.adminBarTopOver,.adminBarSubOver{color:#EC4300;}\r\n.adminBarSub,.adminBarSubOver{padding:2px; font-size:11px; font-weight:bold}\r\n.adminBarSub{color: white; background-color: #666666; layer-background-color: #666666;}\r\n.adminBarSubOver,.adminBarSubOver,.adminBarBorder,.adminBarBkg{layer-background-color: black; background-color: black;}\r\n.adminBarBorder{position:absolute; visibility:hidden; z-index:300}\r\n.adminBarBkg{position:absolute; width:10; height:10; visibility:hidden; }\r\n</style>\r\n\r\n<script language=\"JavaScript1.2\">\r\n/*****************************************************************************\r\nCopyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)\r\n                                                                                                                                                             \r\nDHTML coolMenus - Get it at coolmenus.dhtmlcentral.com\r\nVersion 4.0_beta\r\nThis script can be used freely as long as all copyright messages are\r\nintact.\r\n                                                                                                                                                             \r\nExtra info - Coolmenus reference/help - Extra links to help files ****\r\nCSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37\r\nGeneral: http://coolmenus.dhtmlcentral.com/reference.asp?m=35\r\nMenu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47\r\nLevel properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48\r\nBackground bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49\r\nItem properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50\r\n******************************************************************************/\r\nadminBar=new makeCM(\"adminBar\"); \r\n\r\n//menu properties\r\nadminBar.resizeCheck=1; \r\nadminBar.rows=1;  \r\nadminBar.onlineRoot=\"\"; \r\nadminBar.pxBetween =0;\r\nadminBar.fillImg=\"\"; \r\nadminBar.fromTop=0; \r\nadminBar.fromLeft=30; \r\nadminBar.wait=600; \r\nadminBar.zIndex=10000;\r\nadminBar.menuPlacement=\"left\";\r\n\r\n//background bar properties\r\nadminBar.useBar=1; \r\nadminBar.barWidth=\"\"; \r\nadminBar.barHeight=\"menu\"; \r\nadminBar.barX=0;\r\nadminBar.barY=\"menu\"; \r\nadminBar.barClass=\"adminBarBkg\";\r\nadminBar.barBorderX=0; \r\nadminBar.barBorderY=0;\r\n\r\nadminBar.level[0]=new cm_makeLevel(160,20,\"adminBarTop\",\"adminBarTopOver\",1,1,\"adminBarBorder\",0,\"bottom\",0,0,0,0,0);\r\nadminBar.level[1]=new cm_makeLevel(160,18,\"adminBarSub\",\"adminBarSubOver\",1,1,\"adminBarBorder\",0,\"right\",0,5,\"menu_arrow.gif\",10,10);\r\n\r\n\r\nadminBar.makeMenu(\'addcontent\',\'\',\'<tmpl_var addcontent.label>\',\'\');\r\n\r\n<tmpl_if clipboard_loop>\r\nadminBar.makeMenu(\'clipboard\',\'addcontent\',\'<tmpl_var clipboard.label> &raquo;\',\'\');\r\n<tmpl_loop clipboard_loop> \r\n	adminBar.makeMenu(\'clipboard<tmpl_var __counter__>\',\'clipboard\',\'<tmpl_var clipboard.label>\',\'<tmpl_var clipboard.url>\');\r\n</tmpl_loop>\r\n</tmpl_if>\r\n<tmpl_loop container_loop> adminBar.makeMenu(\'container<tmpl_var __counter__>\',\'addcontent\',\'<tmpl_var container.label>\',\'<tmpl_var container.url>\'); </tmpl_loop>\r\n<tmpl_if contentTypes_loop>\r\nadminBar.makeMenu(\'contentTypes\',\'addcontent\',\'<tmpl_var contentTypes.label> &raquo;\',\'\');\r\n<tmpl_loop contentTypes_loop> \r\n	adminBar.makeMenu(\'contentTypes<tmpl_var __counter__>\',\'contentTypes\',\'<tmpl_var contentType.label>\',\'<tmpl_var contentType.url>\');\r\n</tmpl_loop>\r\n</tmpl_if>\r\n\r\n<tmpl_if package_loop>\r\n<tmpl_if packages.canAdd>\r\nadminBar.makeMenu(\'packages\',\'addcontent\',\'<tmpl_var packages.label> &raquo;\',\'\');\r\n<tmpl_loop package_loop> \r\n	adminBar.makeMenu(\'package<tmpl_var __counter__>\',\'packages\',\'<tmpl_var package.label>\',\'<tmpl_var package.url>\');\r\n</tmpl_loop>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n\r\nadminBar.makeMenu(\'admin\',\'\',\'<tmpl_var admin.label>\',\'\');\r\n<tmpl_loop admin_loop> \r\n	adminBar.makeMenu(\'admin<tmpl_var admin.count>\',\'admin\',\'<tmpl_var admin.label>\',\'<tmpl_var admin.url>\');\r\n</tmpl_loop>\r\n \r\nadminBar.construct()\r\n</script>\r\n','Macro/AdminBar',1,1,'PBtmpl0000000000000090');
+INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n<tmpl_var description><br>\n<br>\n<tmpl_var variants.message><br>\n\n<table>\n	<tmpl_loop variantLoop>\n	<tr>\n		<td style=\"indent: 40px\">\n		<tmpl_loop variant.compositionLoop>\n			<tmpl_var parameter>: <tmpl_var value><tmpl_unless __LAST__>,</tmpl_unless>\n		</tmpl_loop>\n		</td>\n		<td>$ <tmpl_var variant.price></td>\n		<td><a href=\"<tmpl_var variant.addToCart.url>\"><tmpl_var variant.addToCart.label></a></td>\n	</tr>\n	</tmpl_loop>\n</table>','Commerce/Product',1,1,'PBtmplCP00000000000001');
+INSERT INTO template VALUES ('<tmpl_if pluginsAvailable>\n   <tmpl_var message><br>\n    <tmpl_var formHeader>\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n    <tmpl_loop pluginLoop>\n            <tr>\n                        <td><tmpl_var formElement></td>\n                     <td align=\"left\"><tmpl_var name></td>\n           </tr>\n       </tmpl_loop>\n        </table>\n    <tmpl_var formSubmit>\n    <tmpl_var formFooter>\n<tmpl_else>\n <tmpl_var noPluginsMessage>\n</tmpl_if>','Commerce/SelectShippingMethod',1,1,'PBtmplCSSM000000000001');
+INSERT INTO template VALUES ('<tmpl_if cartEmpty>\n<tmpl_var cartEmpty.message>\n<tmpl_else>\n\n<tmpl_var updateForm.header>\n<table>	\n	<tr align=\"left\">\n		<th></th>\n		<th style=\"border-bottom: 2px solid black\">Product</th>\n		<th style=\"border-bottom: 2px solid black\">Quantity</th>\n		<th style=\"border-bottom: 2px solid black\">Price</th>\n	</tr>\n\n	<tmpl_if normalItems>\n	</tmpl_if>\n\n	<tmpl_loop normalItemsLoop>\n	<tr>\n		<td><tmpl_var deleteIcon></td>\n		<td align=\"left\"><tmpl_var name></td>\n		<td align=\"center\"><tmpl_var quantity.form></td>\n		<td align=\"right\"><tmpl_var totalPrice></td>\n	</tr>\n	</tmpl_loop>\n\n	<tmpl_loop recurringItemsLoop>\n	<tr>\n		<td><tmpl_var deleteIcon></td>\n		<td align=\"left\"><tmpl_var name></td>\n		<td align=\"center\"><tmpl_var quantity.form></td>\n		<td align=\"right\"><tmpl_var totalPrice></td>\n	</tr>\n</tmpl_loop>\n	<tr style=\"border-top: 1px solid black\">\n		<td></td>\n		<td style=\"border-top: 1px solid black\">&nbsp;</td>\n		<td align=\"right\" style=\"border-top: 1px solid black\"><b>Total</b></td>\n		<td align=\"right\" colspan=\"3\" style=\"border-top: 1px solid black\"><b><tmpl_var total></b></td>\n	</tr>\n\n</table>\n\n<tmpl_var updateForm.button>\n<tmpl_var updateForm.footer>\n\n<tmpl_var checkoutForm.header>\n<tmpl_var checkoutForm.button>\n<tmpl_var checkoutForm.footer> \n\n</tmpl_if>','Commerce/ViewShoppingCart',1,1,'PBtmplVSC0000000000001');
+INSERT INTO template VALUES ('^StyleSheet(^Extras;/slidePanel/slidePanel.css);\r\n^JavaScript(^Extras;/slidePanel/slidePanel.js);\r\n\r\n<script type=\"text/javascript\">\r\n\r\n  var slider = new createSlidePanelBar(\'WebGUIAdminBar\');\r\n  var panel;\r\n\r\n  panel = new createPanel(\'adminconsole\',\'Admin Console\');\r\n<tmpl_loop adminConsole_loop>\r\n <tmpl_if canUse>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var title>\',\"<tmpl_var url>\");\r\n </tmpl_if>\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n  panel = new createPanel(\'clipboard\',\'Clipboard\');\r\n<tmpl_loop clipboard_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n  panel = new createPanel(\'packages\',\'Packages\');\r\n<tmpl_loop package_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n\r\n  panel = new createPanel(\'assets\',\'New Content\');\r\n  <tmpl_loop container_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n panel.addLink(\'^Extras;/spacer.gif\',\'<hr>\',\"\");\n <tmpl_loop contentTypes_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n  slider.draw();\r\n\r\n\r\n</script>\r\n','Macro/AdminBar',1,1,'PBtmpl0000000000000090');
 INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<span class=\"crumbTrail\">\r\n<tmpl_loop page_loop>\r\n<a class=\"crumbTrail\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &gt; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000093');
 INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls><br>\r\n</tmpl_if>\r\n<span class=\"verticalMenu\">\r\n<tmpl_loop page_loop>\r\n<tmpl_var page.indent><a class=\"verticalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if> href=\"<tmpl_var page.url>\">\r\n   <tmpl_if page.isCurrent>\r\n      <span class=\"selectedMenuItem\"><tmpl_var page.menuTitle></span>\r\n   <tmpl_else><tmpl_var page.menuTitle></tmpl_if></a><br>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000048');
 INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<span class=\"horizontalMenu\">\r\n<tmpl_loop page_loop>\r\n<a class=\"horizontalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000108');
@@ -2854,7 +3028,7 @@ INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\r\n\r\n<tmpl_if
 INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\r\n<tmpl_if expired.message>\r\n   <tmpl_var expired.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var expired.form.header>\r\n<table >\r\n<tmpl_var expired.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var expired.form.oldPassword.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n      <tmpl_var expired.form.oldPassword>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var expired.form.password.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n      <tmpl_var expired.form.password>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n  <tmpl_var expired.form.passwordConfirm.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n   <tmpl_var expired.form.passwordConfirm>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\">\r\n   <tmpl_var expired.form.submit>\r\n   </td>\r\n</tr>\r\n</table>\r\n<tmpl_var expired.form.footer>','Auth/WebGUI/Expired',1,1,'PBtmpl0000000000000012');
 INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\r\n<tmpl_if login.message>\r\n   <tmpl_var login.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var login.form.header>\r\n<table >\r\n<tmpl_var login.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var login.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n             <tmpl_if anonymousRegistration.isAllowed>\n	     <li><a href=\"<tmpl_var createAccount.url>\"><tmpl_var createAccount.label></a></li>\n	  </tmpl_if>\n\n   </ul>\r\n</div>','Auth/LDAP/Login',1,1,'PBtmpl0000000000000006');
 INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\n\r\n<tmpl_var account.message>\r\n<tmpl_if account.form.karma>\r\n<br><br>\r\n<table>\r\n<tr>\r\n  <td class=\"formDescription\">\r\n      <tmpl_var account.form.karma.label>\r\n  </td>\r\n  <td class=\"tableData\">\r\n       <tmpl_var account.form.karma>\r\n  </td>\r\n</tr>\r\n</table>\r\n</tmpl_if>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop account.options>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Auth/LDAP/Account',1,1,'PBtmpl0000000000000004');
-INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\r\n</h1>\n<tmpl_if create.message>\r\n   <tmpl_var create.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var create.form.header>\r\n<table >\r\n<tmpl_var create.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.ldapId.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.ldapId></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.password></td>\r\n</tr>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\n     <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\n \n  </ul>\r\n</div>','Auth/LDAP/Create',1,1,'PBtmpl0000000000000005');
+INSERT INTO template VALUES ('<h1>\r\n   <tmpl_var title>\r\n</h1>\r\n<tmpl_if create.message>\r\n   <tmpl_var create.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var create.form.header>\r\n<table >\r\n<tmpl_var create.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.ldapConnection.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.ldapConnection></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.ldapId.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.ldapId></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.password></td>\r\n</tr>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n     <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\r\n \r\n  </ul>\r\n</div>','Auth/LDAP/Create',1,1,'PBtmpl0000000000000005');
 INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<p>\n<tmpl_var question>\n</p>\n\n<div align=\"center\">\n\n<a href=\"<tmpl_var yes.url>\"><tmpl_var yes.label></a>\n\n&nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; \n\n<a href=\"<tmpl_var no.url>\"><tmpl_var no.label></a>\n\n</div>\n','prompt',1,1,'PBtmpl0000000000000057');
 INSERT INTO template VALUES ('<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\r\n        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n        <head>\r\n                <title>^Page(\"title\"); - WebGUI</title>\r\n				<tmpl_var head.tags>\r\n                <style type=\"text/css\">\r\n	.menu {\r\n		position: absolute;\r\n		top: 25px;\r\n		left: 10px;\r\n		width: 180px;\r\n		font-family: helvetica, arial;\r\n		font-size: 12px;\r\n	}\r\n.contentArea {\r\n	border: 1px solid #cccccc;\r\n	margin: 25px 10px 10px 190px;\r\n	padding: 5px;\r\n		font-family: helvetica, arial;\r\n	min-height: 400px;\r\n}\r\n/* Hides from non-ie: the holly hack \\*/\r\n* html .adminConsoleWorkArea {\r\n	zoom: 1.00;\r\n	display: inline;\r\n	}\r\n/* End hide from non-ie */\r\n\r\n\r\n                 </style>\r\n        </head>\r\n        <body>	\r\n			^AdminBar;\r\n	<div class=\"menu\">\r\n		^AssetProxy(flexmenu);\r\n	</div>\r\n	<div class=\"contentArea\">\r\n		<tmpl_var body.content>\r\n		<br /><br /><hr />\r\n		^LoginToggle; \r\n		&nbsp; ^a(^@;); \r\n		&nbsp; ^H;\r\n		&nbsp; ^AdminToggle;\r\n	</div>\r\n</body>\r\n</html>\r\n','style',0,0,'PBtmpl0000000000000060');
 INSERT INTO template VALUES ('<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n		<html>\n		<head>\n			<title>^Page(title); - <tmpl_var session.setting.companyName></title>\n				\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	\n		<style>\r\n\r\ninput:focus, textarea:focus {\r\n background-color: #D5E0E1;\r\n}\r\n\r\ninput, textarea, select {\r\n -moz-border-radius: 6px;\r\n background-color: #B9CDCF;\r\n border: ridge;\r\n}\r\n\r\n\r\n.content{\r\n	color: #000000;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 5px;\r\n}\r\n\r\nbody{\r\n	color: Black;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 0px;\r\n	background-position: top;\r\n	background-repeat: repeat-x;\r\n}\r\n\r\na {\r\n	color:#EC4300;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: underline;\r\n}\r\n\r\na:hover{\r\n	color:#EC4300; \r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: none;\r\n}\r\n\r\n.adminBar {\r\n  background-color: #CCCCCC;\r\n  font-family: helvetica, arial;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #CCCCCC;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  font-size: 10pt;\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #CECECE;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n\r\nh1 {\r\n	font-size: 14pt;\r\n	font-family: helvetica, arial;\r\n	color: #EC4300;\r\n}\r\n\r\n.tab {\r\n  -moz-border-radius: 6px 6px 0px 0px;\r\n border: 1px solid black;\r\n   background-color: #eeeeee;\r\n}\r\n.tabBody {\r\n   border: 1px solid black;\r\n   border-top: 1px solid black;\r\n   border-left: 1px solid black;\r\n   background-color: #dddddd; \r\n}\r\ndiv.tabs {\r\n    line-height: 15px;\r\n    font-size: 14px;\r\n}\r\n.tabHover {\r\n   background-color: #cccccc;\r\n}\r\n.tabActive { \r\n   background-color: #dddddd; \r\n}\r\n\r\n</style>\r\n		\r\n\r\n\r\n\n		</head>\n				<body bgcolor=\"#D5E0E1\" leftmargin=\"0\" topmargin=\"0\" rightmargin=\"0\" bottommargin=\"0\" marginwidth=\"0\" marginheight=\"0\">\r\n\r\n^AdminBar(\"PBtmpl0000000000000090\");<br /> <br />\r\n\r\n<div class=\"content\" style=\"padding: 10px;\">\r\n  \n			<tmpl_var body.content>\n		\r\n</div>\r\n\r\n\r\n<div width=\"100%\" style=\"color: white; padding: 3px; background-color: black; text-align: center;\">^H; / ^PageTitle; / ^AdminToggle; / ^LoginToggle; / ^a;</div>\r\n</body>\r\n\r\n\r\n\r\n\r\n\r\n\n		</html>\n		','style',1,1,'9tBSOV44a9JPS8CcerOvYw');
@@ -2880,11 +3054,10 @@ INSERT INTO template VALUES ('<a class=\"homeLink\" href=\"<tmpl_var homeLink.ur
 INSERT INTO template VALUES ('<a class=\"makePrintableLink\" href=\"<tmpl_var printable.url>\"><tmpl_var printable.text></a>','Macro/r_printable',1,1,'PBtmpl0000000000000045');
 INSERT INTO template VALUES ('<a class=\"loginToggleLink\" href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/LoginToggle',1,1,'PBtmpl0000000000000043');
 INSERT INTO template VALUES ('<p>\r\n  <table cellpadding=3 cellspacing=0 border=1>\r\n  <tr>   \r\n    <td class=\"tableHeader\">\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var session.config.extrasURL>/attachment.gif\" border=\"0\" alt=\"<tmpl_var attachment.name>\"></a></td><td>\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var attachment.icon>\" align=\"middle\" width=\"16\" height=\"16\" border=\"0\" alt=\"<tmpl_var attachment.name>\"><tmpl_var attachment.name></a>\r\n    </td>\r\n  </tr>\r\n  </table>\r\n</p>\r\n','AttachmentBox',1,1,'PBtmpl0000000000000003');
-INSERT INTO template VALUES ('^JavaScript(\"<tmpl_var session.config.extrasURL>/tinymce/jscripts/tiny_mce/tiny_mce.js\");\r\n<script language=\"javascript\" type=\"text/javascript\">\r\n	  tinyMCE.init({\r\n    theme : \"advanced\",\r\n    mode : \"specific_textareas\",\r\n    elements : \"elm1,elm2\",\r\n    content_css : \"<tmpl_var session.setting.richEditCss>\",\r\n    extended_valid_elements : \"a[href|target|name]\",\r\n    plugins : \"collateral,emotions,insertImage,iespell,pagetree,table\",\r\n    theme_advanced_buttons2_add : \"insertImage,pagetree,collateral\",     \r\n    theme_advanced_buttons3_add : \"emotions,iespell\"     ,\r\n    theme_advanced_buttons3_add_before : \"tablecontrols,separator\",\r\n    debug : false,\r\nauto_reset_designmode : true \r\n });\r\n</script>\r\n\r\n<tmpl_var textarea>','richEditor',1,1,'PBtmpl0000000000000138');
 INSERT INTO template VALUES ('<tmpl_if batchDescription>\r\nBatch: <tmpl_var batchDescription>\r\n</tmpl_if>\r\n\r\n<tmpl_var message><br>\r\n<tmpl_var codeForm>','Operation/RedeemSubscription',1,1,'PBtmpl0000000000000053');
 INSERT INTO template VALUES ('<h2><tmpl_var name></h2>\r\n<tmpl_var description><br>\r\n<br>\r\n<br>\r\n$ <tmpl_var price><br>\r\n<a href=\"<tmpl_var url>\">Subscribe now</a><br>','Macro/SubscriptionItem',1,1,'PBtmpl0000000000000046');
 INSERT INTO template VALUES ('<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\r\n  <tr>\r\n    <th>Transaction description</th>\r\n    <th>Price</th>\r\n    <th>Status</th>\r\n    <th>Error</th>\r\n  </tr>\r\n<tmpl_loop resultLoop>\r\n  <tr>\r\n    <td align=\"left\"><tmpl_var purchaseDescription></td>\r\n    <td align=\"right\"><tmpl_var purchaseAmount></td>\r\n    <td><tmpl_var status></td>\r\n    <td align=\"left\"><tmpl_var error> (<tmpl_var errorCode>)</td>\r\n  </tr>\r\n</tmpl_loop>\r\n</table><br>\r\n<br>\r\n\r\n<tmpl_var statusExplanation>','Commerce/TransactionError',1,1,'PBtmpl0000000000000018');
-INSERT INTO template VALUES ('<tmpl_var title><br>\r\n<br>\r\n<ul>\r\n<tmpl_loop errorLoop>\r\n<li><tmpl_var message></li>\r\n</tmpl_loop>\r\n</ul>\r\n\r\n<tmpl_if recurringItems>\r\n<table border=\"0\" cellpadding=\"5\">\r\n<tmpl_loop recurringLoop>\r\n  <tr>\r\n    <td align=\"left\"><b>Subscription \"<tmpl_var name>\"</b></td>\r\n    <td> : </td>\r\n    <td align=\"left\">$ <tmpl_var price> every <tmpl_var period></td>\r\n  </tr>\r\n</tmpl_loop>\r\n</table><br>\r\n<br>\r\n</tmpl_if>\r\n<tmpl_var form>','Commerce/ConfirmCheckout',1,1,'PBtmpl0000000000000016');
+INSERT INTO template VALUES ('<a href=\"<tmpl_var changePayment.url>\"><tmpl_var changePayment.label></a> &middot; <a href=\"<tmpl_var changeShipping.url>\"><tmpl_var changeShipping.label></a><br>\n<br>\n\n<tmpl_var title><br>\n<ul>\n<tmpl_loop errorLoop>\n<li><tmpl_var message></li>\n</tmpl_loop>\n</ul>\n\n<table> <tr align=\"left\">\n       <th style=\"border-bottom: 2px solid black\">Product</th>\n       <th style=\"border-bottom: 2px solid black\">Quantity</th>\n       <th style=\"border-bottom: 2px solid black\">Price</th>\n       <th style=\"border-bottom: 2px solid black\">Each</th>\n   </tr>\n\n   <tmpl_if normalItems>\n   </tmpl_if>\n\n   <tmpl_loop normalItemsLoop>\n   <tr>\n       <td align=\"left\"><tmpl_var name></td>\n       <td align=\"center\"><tmpl_var quantity></td>\n       <td align=\"right\"><tmpl_var totalPrice></td>\n   </tr>\n   </tmpl_loop>\n\n','Commerce/ConfirmCheckout',1,1,'PBtmpl0000000000000016');
 INSERT INTO template VALUES ('<table border=\"0\">\r\n<tmpl_loop purchaseHistoryLoop>\r\n	<tr>\r\n		<td><b><tmpl_var initDate></b></td>\r\n		<td><b><tmpl_var completionDate></b></td>\r\n		<td align=\"right\"><b>$ <tmpl_var amount></b></td>\r\n		<td><b><tmpl_var status></b></td>\r\n		<td><tmpl_if canCancel><a href=\"<tmpl_var cancelUrl>\">Cancel</a></tmpl_if></td>\r\n	</tr>\r\n	<tmpl_loop itemLoop>\r\n	<tr>\r\n		<td \"align=right\"><tmpl_var quantity> x </td>\r\n		<td \"align=left\"><tmpl_var itemName></td>\r\n		<td \"align=right\">$ <tmpl_var amount></td>\r\n	</tr>\r\n	</tmpl_loop>\r\n</tmpl_loop>\r\n</table>','Commerce/ViewPurchaseHistory',1,1,'PBtmpl0000000000000019');
 INSERT INTO template VALUES ('<tmpl_var message>','Commerce/CheckoutCanceled',1,1,'PBtmpl0000000000000015');
 INSERT INTO template VALUES ('<tmpl_if pluginsAvailable>\r\n   <tmpl_var message><br>\r\n    <tmpl_var formHeader>\r\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\r\n    <tmpl_loop pluginLoop>\r\n            <tr>\r\n                        <td><tmpl_var formElement></td>\r\n                     <td align=\"left\"><tmpl_var name></td>\r\n           </tr>\r\n       </tmpl_loop>\r\n        </table>\r\n    <tmpl_var formSubmit>\r\n    <tmpl_var formFooter>\r\n<tmpl_else>\r\n <tmpl_var noPluginsMessage>\r\n</tmpl_if>','Commerce/SelectPaymentGateway',1,1,'PBtmpl0000000000000017');
@@ -2944,6 +3117,11 @@ CREATE TABLE transaction (
   completionDate int(11) default '0',
   status varchar(10) NOT NULL default 'Pending',
   lastPayedTerm int(6) NOT NULL default '0',
+  shippingCost varchar(9) default '0.00',
+  shippingMethod varchar(15) default NULL,
+  shippingOptions text,
+  shippingStatus varchar(15) default 'NotShipped',
+  trackingNumber varchar(255) default NULL,
   PRIMARY KEY  (transactionId)
 ) TYPE=MyISAM;
 
@@ -3100,8 +3278,6 @@ INSERT INTO userProfileField VALUES ('alias','WebGUI::International::get(858)',1
 INSERT INTO userProfileField VALUES ('signature','WebGUI::International::get(859)',1,0,'HTMLArea','','',5,'3',0,1);
 INSERT INTO userProfileField VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'yesNo','','1',9,'4',0,1);
 INSERT INTO userProfileField VALUES ('publicEmail','WebGUI::International::get(860)',1,0,'yesNo','','1',10,'4',0,1);
-INSERT INTO userProfileField VALUES ('richEditor','WebGUI::International::get(496)',1,0,'selectList','{\'PBtmpl0000000000000126\'=>WebGUI::International::get(880),\r\nnone=>WebGUI::International::get(881),\r\n\'PBtmpl0000000000000138\'=>WebGUI::International::get(\"tinymce\")\n}','[\'PBtmpl0000000000000138\']',11,'4',0,1);
-INSERT INTO userProfileField VALUES ('richEditorMode','WebGUI::International::get(882)',1,0,'selectList','{\r\ninline=>WebGUI::International::get(883),\r\npopup=>WebGUI::International::get(884)\r\n}','[\'inline\']',12,'4',0,1);
 INSERT INTO userProfileField VALUES ('toolbar','WebGUI::International::get(746)',0,0,'selectList','WebGUI::Icon::getToolbarOptions()','[\'useLanguageDefault\']',13,'4',0,0);
 
 --
@@ -3180,7 +3356,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('6.5.5','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('6.6.0','initial install',unix_timestamp());
 
 --
 -- Table structure for table `wobject`
@@ -3303,4 +3479,7 @@ INSERT INTO wobject VALUES (1,'Survey/Overview','lUjGdT_Hhi_EFhsYr1Ouyw','PBtmpl
 INSERT INTO wobject VALUES (1,'Survey/Response','7Xhdnqu3qkDWHEnRgk6Uzw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
 INSERT INTO wobject VALUES (1,'SyndicatedContent','xPyASYtR44mpDk3ba4YyIg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
 INSERT INTO wobject VALUES (1,'WSClient','S99spbsvn96tgRA0oVUl2A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
+INSERT INTO wobject VALUES (1,NULL,'Rn5Ef8vMDQ0ebtaxS_-JXA','','',60,3600);
+INSERT INTO wobject VALUES (1,NULL,'60wqz7KzyCDCHVNaavhQUA','','',60,3600);
+INSERT INTO wobject VALUES (1,NULL,'fhevmqeVTLRCmI_z-NidQQ','','',60,3600);
 
