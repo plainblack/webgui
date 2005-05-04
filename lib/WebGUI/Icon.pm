@@ -103,7 +103,7 @@ sub copyIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'copy.gif" align="middle" border="0" alt="Copy" title="Copy" /></a>';
+        $output .= '<img src="'._getBaseURL().'copy.gif" align="middle" border="0" alt="'.WebGUI::International::get('Copy','Icon').'" title="'.WebGUI::International::get('Copy','Icon').'" /></a>';
         return $output;
 }
 
@@ -127,7 +127,7 @@ sub cutIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'cut.gif" align="middle" border="0" alt="Cut" title="Cut" /></a>';
+        $output .= '<img src="'._getBaseURL().'cut.gif" align="middle" border="0" alt="'.WebGUI::International::get('Cut','Icon').'" title="'.WebGUI::International::get('Cut','Icon').'" /></a>';
         return $output;
 }
 
@@ -161,7 +161,7 @@ sub deleteIcon {
         $pageURL = $_[1] || $session{env}{PATH_INFO};
 	
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'" '.$confirmText.'>';
-	$output .= '<img src="'._getBaseURL().'delete.gif" align="middle" border="0" alt="Delete" title="Delete" /></a>';
+	$output .= '<img src="'._getBaseURL().'delete.gif" align="middle" border="0" alt="'.WebGUI::International::get('Delete','Icon').'" title="'.WebGUI::International::get('Delete','Icon').'" /></a>';
 	return $output;
 }
 
@@ -174,7 +174,7 @@ Generates an icon that can be used to drag content.
 =cut
 
 sub dragIcon {
-        return '<img id="dragTrigger" class="dragTrigger" src="'._getBaseURL().'drag.gif" align="middle" border="0" alt="Drag" title="Drag" />';
+        return '<img id="dragTrigger" class="dragTrigger" src="'._getBaseURL().'drag.gif" align="middle" border="0" alt="'.WebGUI::International::get('Drag','Icon').'" title="'.WebGUI::International::get('Drag','Icon').'" />';
 }
 
 #-------------------------------------------------------------------
@@ -197,7 +197,7 @@ sub editIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'edit.gif" align="middle" border="0" alt="Edit" title="Edit" /></a>';
+        $output .= '<img src="'._getBaseURL().'edit.gif" align="middle" border="0" alt="'.WebGUI::International::get('Edit','Icon').'" title="'.WebGUI::International::get('Edit','Icon').'" /></a>';
         return $output;
 }
 
@@ -222,7 +222,7 @@ sub exportIcon {
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
 	# TODO Change icon to Jeffs export icon
-        $output .= '<img src="'._getBaseURL().'export.gif" align="middle" border="0" alt="Export" title="Export" /></a>';
+        $output .= '<img src="'._getBaseURL().'export.gif" align="middle" border="0" alt="'.WebGUI::International::get('Export','Icon').'" title="'.WebGUI::International::get('Export','Icon').'" /></a>';
         return $output;
 }
 
@@ -270,7 +270,7 @@ sub helpIcon {
 	my ($output, $namespace);
 	$namespace = $_[1] || "WebGUI";
 	$output = '<a href="'.WebGUI::URL::page('op=viewHelp&hid='.$_[0].'&namespace='.$namespace).
-		'" target="_blank"><img src="'._getBaseURL().'help.gif" border="0" align="right" title="Help" Alt="Help"></a>';
+		'" target="_blank"><img src="'._getBaseURL().'help.gif" border="0" align="right" title="'.WebGUI::International::get('Help','Icon').'" Alt="'.WebGUI::International::get('Help','Icon').'"></a>';
 	return $output;
 }
 
@@ -294,7 +294,7 @@ sub manageIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'manage.gif" align="middle" border="0" alt="Manage" title="Manage" /></a>';
+        $output .= '<img src="'._getBaseURL().'manage.gif" align="middle" border="0" alt="'.WebGUI::International::get('Manage','Icon').'" title="'.WebGUI::International::get('Manage','Icon').'" /></a>';
         return $output;
 }
 
@@ -318,7 +318,7 @@ sub moveBottomIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'moveBottom.gif" align="middle" border="0" alt="Move To Bottom" title="Move To Bottom" /></a>';
+        $output .= '<img src="'._getBaseURL().'moveBottom.gif" align="middle" border="0" alt="'WebGUI::International::get('Move To Bottom','Icon').'" title="'.WebGUI::International::get('Move To Bottom','Icon').'" /></a>';
         return $output;
 }
 
@@ -342,7 +342,7 @@ sub moveDownIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'moveDown.gif" align="middle" border="0" alt="Move Down" title="Move Down" /></a>';
+        $output .= '<img src="'._getBaseURL().'moveDown.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Down','Icon').'" title="'.WebGUI::International::get('Move Down','Icon').'" /></a>';
         return $output;
 }
 
@@ -366,7 +366,7 @@ sub moveLeftIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'moveLeft.gif" align="middle" border="0" alt="Move Left" title="Move Left" /></a>';
+        $output .= '<img src="'._getBaseURL().'moveLeft.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Left','Icon').'" title="'.WebGUI::International::get('Move Left','Icon').'" /></a>';
         return $output;
 }
 
@@ -390,7 +390,7 @@ sub moveRightIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'moveRight.gif" align="middle" border="0" alt="Move Right" title="Move Right" /></a>';
+        $output .= '<img src="'._getBaseURL().'moveRight.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Right','Icon').'" title="'.WebGUI::International::get('Move Right','Icon').'" /></a>';
         return $output;
 }
 
@@ -414,7 +414,7 @@ sub moveTopIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'moveTop.gif" align="middle" border="0" alt="Move To Top" title="Move To Top" /></a>';
+        $output .= '<img src="'._getBaseURL().'moveTop.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move To Top','Icon').'" title="'.WebGUI::International::get('Move To Top','Icon').'" /></a>';
         return $output;
 }
 
@@ -438,7 +438,7 @@ sub moveUpIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'moveUp.gif" align="middle" border="0" alt="Move Up" title="Move Up" /></a>';
+        $output .= '<img src="'._getBaseURL().'moveUp.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Up','Icon').'" title="'.WebGUI::International::get('Move Up','Icon').'" /></a>';
         return $output;
 }
 
@@ -451,7 +451,7 @@ Generates an icon that looks like a page. It's purpose is to represent whether y
 =cut
 
 sub pageIcon {
-        return '<img src="'._getBaseURL().'page.gif" align="middle" border="0" alt="Page Settings" title="Page Settings" />';
+        return '<img src="'._getBaseURL().'page.gif" align="middle" border="0" alt="'.WebGUI::International::get('Page Settings','Icon').'" title="'.WebGUI::International::get('Page Settings','Icon').'" />';
 }
 
 #-------------------------------------------------------------------
@@ -474,7 +474,7 @@ sub pasteIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'paste.gif" align="middle" border="0" alt="Paste" title="Paste" /></a>';
+        $output .= '<img src="'._getBaseURL().'paste.gif" align="middle" border="0" alt="'.WebGUI::International::get('Paste','Icon').'" title="'.WebGUI::International::get('Paste','Icon').'" /></a>';
         return $output;
 }
 
@@ -498,7 +498,7 @@ sub shortcutIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'shortcut.gif" align="middle" border="0" alt="Shortcut" title="Create Shortcut" /></a>';
+        $output .= '<img src="'._getBaseURL().'shortcut.gif" align="middle" border="0" alt="'.WebGUI::International::get('Create Shortcut','Icon').'" title="'.WebGUI::International::get('Create Shortcut','Icon').'" /></a>';
         return $output;
 }
 
@@ -522,7 +522,7 @@ sub viewIcon {
         my ($output, $pageURL);
         $pageURL = $_[1] || $session{env}{PATH_INFO};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
-        $output .= '<img src="'._getBaseURL().'view.gif" align="middle" border="0" alt="View" title="View" /></a>';
+        $output .= '<img src="'._getBaseURL().'view.gif" align="middle" border="0" alt="'.WebGUI::International::get('View','Icon').'" title="'.WebGUI::International::get('View','Icon').'" /></a>';
         return $output;
 }
 
@@ -535,7 +535,7 @@ Generates an icon that looks like a wobject. It's purpose is to represent whethe
 =cut
 
 sub wobjectIcon {
-        return '<img src="'._getBaseURL().'wobject.gif" align="middle" border="0" alt="Wobject Settings" title="Wobject Settings" />';
+        return '<img src="'._getBaseURL().'wobject.gif" align="middle" border="0" alt="'.WebGUI::International::get('Wobject Settings','Icon').'" title="'.WebGUI::International::get('Wobject Settings','Icon').'" />';
 }
 
 
