@@ -87,6 +87,12 @@ sub getOperations {
           'editDatabaseLink' => 'WebGUI::Operation::DatabaseLink',
           'editDatabaseLinkSave' => 'WebGUI::Operation::DatabaseLink',
           'listDatabaseLinks' => 'WebGUI::Operation::DatabaseLink',
+		  'copyLDAPLink' => 'WebGUI::Operation::LDAPLink',
+		  'deleteLDAPLink' => 'WebGUI::Operation::LDAPLink',
+		  'editLDAPLink' => 'WebGUI::Operation::LDAPLink',
+		  'editLDAPLinkSave' => 'WebGUI::Operation::LDAPLink',
+		  'listLDAPLinks' => 'WebGUI::Operation::LDAPLink',
+		  
           'formAssetTree' => 'WebGUI::Operation::FormHelpers',
           'richEditPageTree' => 'WebGUI::Operation::FormHelpers',
           'richEditImageTree' => 'WebGUI::Operation::FormHelpers',

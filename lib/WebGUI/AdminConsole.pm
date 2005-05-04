@@ -192,6 +192,15 @@ sub getAdminFunction {
 			op=>"listDatabaseLinks",
 			group=>"3"
 		},
+		"ldapconnections"=>{
+			title=>{
+				id=>"ldapconnections",
+				namespace=>"WebGUI"
+			},
+			icon=>"databases.gif",
+			op=>"listLDAPLinks",
+			group=>"3"
+		},
 		"groups"=>{
 			title=>{
 				id=>"89",
