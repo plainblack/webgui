@@ -108,6 +108,11 @@ Default label for the anonymous registration link.
 		message => q|Invalid LDAP connection URL. Contact your administrator.|,
 		lastUpdated => 1071849063
 	},
+	
+	'ldapConnection' => {
+		message => q|LDAP Connection|,
+		lastUpdated => 1071849063
+	},
 
 	'6' => {
 		message => q|LDAP Identity (default)|,
