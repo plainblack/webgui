@@ -80,3 +80,21 @@ alter table Collaboration add column karmaRatingMultiplier int not null default 
 alter table Collaboration add column karmaSpentToRate int not null default 0;
 
 
+create table ldapLink (
+    ldapLinkId varchar(22) not null primary key,
+    ldapLinkName varchar(255) not null,
+    ldapUrl varchar(255) not null,
+    connectDn varchar(255) not null,
+    identifier varchar(255) not null,
+    ldapUserRDN varchar(255),
+    ldapIdentity varchar(255),
+    ldapIdentityName varchar(255),
+    ldapPasswordName varchar(255),
+    ldapSendWelcomeMessage varchar(2),
+    ldapWelcomeMessage text,
+    ldapAccountTemplate varchar(22),
+    ldapCreateAccountTemplate varchar(22),
+    ldapLoginTemplate varchar(22)
+);
+
+insert into settings (name,value) values ('ldapConnection',NULL);
