@@ -15,6 +15,7 @@ use WebGUI::Auth;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Form;
+use WebGUI::Icon;
 use WebGUI::LDAPLink;
 use WebGUI::Mail;
 use WebGUI::Session;
@@ -46,8 +47,8 @@ my %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol
 sub _isValidLDAPUser {
    my $self = shift;
    my ($uri, $error, $ldap, $search, $auth, $connectDN);
-   
-   $uri = URI->new($session{setting}{ldapURL}) or $error = WebGUI::International::get(2,'AuthLDAP');
+   my $connection = $self->{_connection};
+   $uri = URI->new($connection->{ldapURL}) or $error = WebGUI::International::get(2,'AuthLDAP');
    if($error ne ""){
       $self->error($error);
 	  return 0;
@@ -55,19 +56,19 @@ sub _isValidLDAPUser {
    
    if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
       if ($ldap->bind) {
-         $search = $ldap->search (base=>$uri->dn,filter=>$session{setting}{ldapId}."=".$session{form}{'authLDAP.ldapId'});
-            if (defined $search->entry(0)) {
-				if ($session{setting}{ldapUserRDN} eq 'dn') {
+	      $search = $ldap->search ( base=>$uri->dn, filter=>$connection->{ldapIdentity}."=".$session{form}{'authLDAP_ldapId'});
+			if (defined $search->entry(0)) {
+				if ($connection->{ldapUserRDN} eq 'dn') {
                    $connectDN = $search->entry(0)->dn;
                 } else {
-                   $connectDN = $search->entry(0)->get_value($session{setting}{ldapUserRDN});
+                   $connectDN = $search->entry(0)->get_value($connection->{ldapUserRDN});
                 }
                 $ldap->unbind;
                 $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'AuthLDAP');
-                $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP.identifier'});
+                $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP_identifier'});
                 if ($auth->code == 48 || $auth->code == 49) {
                    $error .= '<li>'.WebGUI::International::get(68);
-                   WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP.ldapId'});
+                   WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP_ldapId'});
                 } elsif ($auth->code > 0) {
                    $error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
            		   WebGUI::ErrorHandler::error("LDAP error: ".$ldapStatusCode{$auth->code});
@@ -75,11 +76,11 @@ sub _isValidLDAPUser {
                 $ldap->unbind;
         	} else {
                $error .= '<li>'.WebGUI::International::get(68);
-               WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP.ldapId'});
+               WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP_ldapId'});
             }
 	 } else {
 	     $error = WebGUI::International::get(2,'AuthLDAP');
-		 WebGUI::ErrorHandler::error("Couldn't bind to LDAP server: ".$session{setting}{ldapURL});
+		 WebGUI::ErrorHandler::error("Couldn't bind to LDAP server: ".$connection->{ldapURL});
 	 }
   } else {
      $error = WebGUI::International::get(2,'AuthLDAP');
@@ -99,7 +100,8 @@ sub _isValidLDAPUser {
 sub addUserForm {
     my $self = shift;
     my $userData = $self->getParams;
-    my $ldapUrl = $session{form}{'authLDAP_ldapUrl'} || $userData->{ldapUrl} || $session{setting}{ldapURL};
+	my $connection = $self->{_connection};
+    my $ldapUrl = $session{form}{'authLDAP_ldapUrl'} || $userData->{ldapUrl} || $connection->{ldapURL};
 	my $connectDN = $session{form}{'authLDAP_connectDN'} || $userData->{connectDN};
 	my $ldapConnection = $session{form}{'authLDAP_ldapConnection'} || $userData->{ldapConnection};
 	my $ldapLinks = WebGUI::SQL->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
@@ -204,11 +206,25 @@ sub createAccount {
  	   return $self->displayLogin;
     } 
 	
+	if($session{form}{connection}) {
+	   WebGUI::Session::setScratch("ldapConnection",$session{form}{connection});
+	   $self->{_connection} = WebGUI::LDAPLink::get($session{form}{connection}); 
+	}
+	my $connection = $self->{_connection};
 	$vars->{'create.message'} = $_[0] if ($_[0]);
-    $vars->{'create.form.ldapId'} = WebGUI::Form::text({"name"=>"authLDAP.ldapId","value"=>$session{form}{"authLDAP.ldapId"}});
-    $vars->{'create.form.ldapId.label'} = $session{setting}{ldapIdName};
-    $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authLDAP.identifier","value"=>$session{form}{"authLDAP.identifier"}});
-    $vars->{'create.form.password.label'} = $session{setting}{ldapPasswordName};
+	$vars->{'create.form.ldapConnection.label'} = WebGUI::International::get("ldapConnection","AuthLDAP");
+	
+	my $url = WebGUI::URL::page("op=auth&method=createAccount&connection=");
+	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectList({
+	                name=>"ldapConnection",
+					options=>WebGUI::LDAPLink::getList(),
+					value=>[$connection->{ldapLinkId}],
+					extras=>qq|onchange="location.href='$url'+this.options[this.selectedIndex].value"|
+				  });
+    $vars->{'create.form.ldapId'} = WebGUI::Form::text({"name"=>"authLDAP_ldapId","value"=>$session{form}{"authLDAP_ldapId"}});
+    $vars->{'create.form.ldapId.label'} = $connection->{ldapIdentityName};
+    $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authLDAP_identifier","value"=>$session{form}{"authLDAP_identifier"}});
+    $vars->{'create.form.password.label'} = $connection->{ldapPasswordName};
     
     $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$session{form}{confirm}});
     return $self->SUPER::createAccount("createAccountSave",$vars);
@@ -217,8 +233,8 @@ sub createAccount {
 #-------------------------------------------------------------------
 sub createAccountSave {
    my $self = shift;
-   my $username = $session{form}{'authLDAP.ldapId'};
-   my $password = $session{form}{'authLDAP.identifier'};
+   my $username = $session{form}{'authLDAP_ldapId'};
+   my $password = $session{form}{'authLDAP_identifier'};
    my $error = "";
    
    #Validate user in LDAP
@@ -226,17 +242,18 @@ sub createAccountSave {
       return $self->createAccount("<h1>".WebGUI::International::get(70)."</h1>".$self->error);
    }
    
+   my $connection = $self->{_connection};
    #Get connectDN from settings   
-   my $uri = URI->new($session{setting}{ldapURL});
+   my $uri = URI->new($connection->{ldapURL});
    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
    $ldap->bind;
-   my $search = $ldap->search (base => $uri->dn, filter=>$session{setting}{ldapId}."=".$username);
+   my $search = $ldap->search (base => $uri->dn, filter=>$connection->{ldapIdentity}."=".$username);
    my $connectDN = "";
    if (defined $search->entry(0)) {
-      if ($session{setting}{ldapUserRDN} eq 'dn') {
+      if ($connection->{ldapUserRDN} eq 'dn') {
 	     $connectDN = $search->entry(0)->dn;
 	  } else { 
-		 $connectDN = $search->entry(0)->get_value($session{setting}{ldapUserRDN});
+		 $connectDN = $search->entry(0)->get_value($connection->{ldapUserRDN});
 	  }
    }
    $ldap->unbind;
@@ -256,7 +273,7 @@ sub createAccountSave {
    
    my $properties;
    $properties->{connectDN} = $connectDN;
-   $properties->{ldapUrl} = $session{setting}{ldapURL};
+   $properties->{ldapUrl} = $connection->{ldapURL};
    
    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
@@ -335,99 +352,38 @@ sub editUserFormSave {
 
 sub editUserSettingsForm {
    my $self = shift;
-   my $sth = WebGUI::SQL->read("select * from ldapLink");
-    my $f = WebGUI::HTMLForm->new;
-	my $jscript = "";
-   if($sth->rows > 0 ){
-      my $jsArray = "";
-      $jsArray = qq|ldapValue["0"] = ["$session{setting}{ldapUserRDN}","$session{setting}{ldapURL}","$session{setting}{ldapId}","$session{setting}{ldapIdName}","$session{setting}{ldapPasswordName}","$session{setting}{ldapSendWelcomeMessage}","$session{setting}{ldapWelcomeMessage}","$session{setting}{ldapAccountTemplate}","$session{setting}{ldapCreateAccountTemplate}","$session{setting}{ldapLoginTemplate}"];|."\n";
-      while (my $lhash = $sth->hashRef) {
-         $jsArray .= qq|ldapValue["$lhash->{ldapLinkId}"] = ["$lhash->{ldapUserRDN}","$lhash->{ldapUrl}","$lhash->{ldapIdentity}","$lhash->{ldapIdentityName}","$lhash->{ldapPasswordName}","$lhash->{ldapSendWelcomeMessage}","$lhash->{ldapWelcomeMessage}","$lhash->{ldapAccountTemplate}","$lhash->{ldapCreateAccountTemplate}","$lhash->{ldapLoginTemplate}"];|."\n";
-      }
-      $jscript = qq|
-	    <script>
-	      <!--
-	        var ldapValue = new Array(); 
-		    $jsArray;
-		 
-		    function changeFormValues(form,key) {
-		       var arr = ldapValue[key];
-			   form.ldapUserRDN.value=arr[0];
-			   form.ldapURL.value=arr[1];
-			   form.ldapId.value=arr[2];
-			   form.ldapIdName.value=arr[3];
-			   form.ldapPasswordName.value=arr[4];
-			   if(arr[5] == 1){
-			      form.ldapSendWelcomeMessage[0].checked=true;
-			      form.ldapSendWelcomeMessage[1].checked=false;
-			   }else{
-			      form.ldapSendWelcomeMessage[0].checked=false;
-			      form.ldapSendWelcomeMessage[1].checked=true;
-			   }
-			   form.ldapWelcomeMessage.value=arr[6];
-			   form.ldapAccountTemplate.value=arr[7];
-			   form.ldapCreateAccountTemplate.value=arr[8];
-			   form.ldapLoginTemplate.value=arr[9];
-		    }
-	     //-->
-	   </script>|;
-      $f->selectList(
-	                -name=>"ldapConnection",
-					-label=>WebGUI::International::get("ldapConnection",'AuthLDAP'),
-					-options=>WebGUI::LDAPLink::getList(),
-					-value=>[$session{setting}{ldapConnection}],
-					-extras=>q|onchange="changeFormValues(this.form,this.options[this.selectedIndex].value);"|
-				  );
+   my $f = WebGUI::HTMLForm->new;
+   my $ldapConnection = WebGUI::Form::selectList({
+	                name=>"ldapConnection",
+					options=>WebGUI::LDAPLink::getList(),
+					value=>[$session{setting}{ldapConnection}]
+				  });
+   my $ldapConnectionLabel = WebGUI::International::get("ldapConnection",'AuthLDAP'); 
+   my $buttons = "";
+   if($session{setting}{ldapConnection}) {
+      $buttons = editIcon("op=editLDAPLink&returnUrl=".WebGUI::URL::escape(WebGUI::URL::page("op=editSettings"))."&llid=".$session{setting}{ldapConnection});
    }
-   $f->text("ldapUserRDN",WebGUI::International::get(9,'AuthLDAP'),$session{setting}{ldapUserRDN});
-   $f->url("ldapURL",WebGUI::International::get(5,'AuthLDAP'),$session{setting}{ldapURL});
-   $f->text("ldapId",WebGUI::International::get(6,'AuthLDAP'),$session{setting}{ldapId});
-   $f->text("ldapIdName",WebGUI::International::get(7,'AuthLDAP'),$session{setting}{ldapIdName});
-   $f->text("ldapPasswordName",WebGUI::International::get(8,'AuthLDAP'),$session{setting}{ldapPasswordName});
-   $f->yesNo(
-             -name=>"ldapSendWelcomeMessage",
-             -value=>$session{setting}{ldapSendWelcomeMessage},
-             -label=>WebGUI::International::get(868)
-             );
-   $f->textarea(
-                -name=>"ldapWelcomeMessage",
-                -value=>$session{setting}{ldapWelcomeMessage},
-                -label=>WebGUI::International::get(869)
-               );
-	$f->template(
-		-name=>"ldapAccountTemplate",
-		-value=>$session{setting}{ldapAccountTemplate},
-		-namespace=>"Auth/LDAP/Account",
-		-label=>WebGUI::International::get("account template","AuthLDAP")
-		);
-	$f->template(
-		-name=>"ldapCreateAccountTemplate",
-		-value=>$session{setting}{ldapCreateAccountTemplate},
-		-namespace=>"Auth/LDAP/Create",
-		-label=>WebGUI::International::get("create account template","AuthLDAP")
-		);
-	$f->template(
-		-name=>"ldapLoginTemplate",
-		-value=>$session{setting}{ldapLoginTemplate},
-		-namespace=>"Auth/LDAP/Login",
-		-label=>WebGUI::International::get("login template","AuthLDAP")
-		);
-   return $jscript.$f->printRowsOnly;
+   $buttons .= manageIcon("op=listLDAPLinks&returnUrl=".WebGUI::URL::escape(WebGUI::URL::page("op=editSettings")));
+   $f->raw(qq|<tr><td class="formDescription" valign="top" style="width: 25%;">$ldapConnectionLabel</td><td class="tableData" style="width: 75%;">$ldapConnection&nbsp;$buttons</td></tr>|);
+   return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
 sub getAccountTemplateId {
-	return $session{setting}{ldapAccountTemplate} || "PBtmpl0000000000000004";
+    my $self = shift;
+	return ($self->{_connection}->{ldapAccountTemplate} || "PBtmpl0000000000000004");
 }
 
 #-------------------------------------------------------------------
 sub getCreateAccountTemplateId {
-	return $session{setting}{ldapCreateAccountTemplate} || "PBtmpl0000000000000005";
+    my $self = shift;
+	return ($self->{_connection}->{ldapCreateAccountTemplate} || "PBtmpl0000000000000005");
 }
 
 #-------------------------------------------------------------------
 sub getLoginTemplateId {
-	return $session{setting}{ldapLoginTemplate} || "PBtmpl0000000000000006";
+    my $self = shift;
+    return ($self->{_connection}->{ldapLoginTemplate} || "PBtmpl0000000000000006");
 }
 
 #-------------------------------------------------------------------
@@ -437,6 +393,7 @@ sub login {
       WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 	  return $self->displayLogin("<h1>".WebGUI::International::get(70)."</h1>".$self->error);
    }
+   WebGUI::Session::deleteScratch("ldapConnection");
    return $self->SUPER::login();  #Standard login routine for login
 }
 
@@ -447,6 +404,7 @@ sub new {
    my $userId = $_[1];
    my @callable = ('createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','createAccountSave','deactivateAccountConfirm');
    my $self = WebGUI::Auth->new($authMethod,$userId,\@callable);
+   $self->{_connection} = WebGUI::LDAPLink::get(($session{scratch}{ldapConnection} || $session{setting}{ldapConnection}));
    bless $self, $class;
 }
 
