@@ -263,6 +263,24 @@ $importNode->addChild({
 	toolbarRow1=>"bold\nitalic\nbullist\nnumlist\nlink\nunlink\nemotions"
 	},"PBrichedit000000000002");
 
+#--------------------------------------------
+print "\tUpdating LDAP Connections.\n" unless ($quiet);
+my %ldapConnProps = ();
+$ldapConnProps{ldapLinkId} = "new";
+$ldapConnProps{ldapLinkName} = "Default LDAP Connection";
+$ldapConnProps{ldapUrl} = $session{setting}{ldapURL} || "ldap://mycompany.com:389";
+$ldapConnProps{ldapUserRDN} = $session{setting}{ldapUserRDN};
+$ldapConnProps{ldapIdentity} = $session{setting}{ldapId};
+$ldapConnProps{ldapIdentityName} = $session{setting}{ldapIdName};
+$ldapConnProps{ldapPasswordName} = $session{setting}{ldapPasswordName};
+$ldapConnProps{ldapSendWelcomeMessage} = $session{setting}{ldapSendWelcomeMessage};
+$ldapConnProps{ldapWelcomeMessage} = $session{setting}{ldapWelcomeMessage};
+$ldapConnProps{ldapAccountTemplate} = $session{setting}{ldapAccountTemplate} || "PBtmpl0000000000000004";
+$ldapConnProps{ldapCreateAccountTemplate} = $session{setting}{ldapCreateAccountTemplate} || "PBtmpl0000000000000005";
+$ldapConnProps{ldapLoginTemplate} = $session{setting}{ldapLoginTemplate} || "PBtmpl0000000000000006";   
+WebGUI::SQL->setRow("ldapLink","ldapLinkId",\%ldapConnProps);
+
+WebGUI::SQL->write("delete from settings where name in ('ldapURL','ldapUserRDN','ldapId','ldapIdName','ldapPasswordName','ldapSendWelcomeMessage','ldapWelcomeMessage','ldapAccountTemplate','ldapCreateAccountTemplate','ldapLoginTemplate')");
 
 WebGUI::Session::close();
 
