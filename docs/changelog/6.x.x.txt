@@ -74,6 +74,13 @@
    Connections created in the Admin Console (Thanks to MABIS Healthcare for
    funding this enhancement.)
  - Thumnail macro has been updated to work with the asset tree system.
+ - fix [ 1170169 ] Admin menu cut off in 800x600 resolution
+ - fix [ 1192714 ] New posts for CS doesn't use TinyMCE by default.
+ - fix [ 1190480 ] [6.5.6] Editor choice ignored in Forums
+ - fix [ 1175666 ] CVS code still using WebGUI::Collateral
+ - fix [ 1176172 ] Thumbnail Macro dosn't work
+ - fix [ 1180291 ] tinymce resets src of img incorrectly
+ - fix [ 1186395 ] survey: view statisics broken
  - RFE 1035743, internationalize WebGUI macros.
 
 
