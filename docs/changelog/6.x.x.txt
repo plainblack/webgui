@@ -1,4 +1,4 @@
-6.6.0
+﻿6.6.0
  - Added a new admin panel for inline content editing.
  - Tweaked the preloader so WebGUI uses a little less memory per process.
  - upgrade.pl and testEnvironment.pl now use the same config file reader as
@@ -61,6 +61,9 @@
    survey's.
  - Attached the karma system to the ratings system in the Collaboration
    system.
+ - Added API for connecting to LDAP directories
+ - Added Admininstration Module for creating Multiple LDAP Connections on a WebGUI site
+ - Modified LDAP Authentication Module to allow users to choose from the Ldap Connections created in the Admin Console
 
 
 6.5.6
