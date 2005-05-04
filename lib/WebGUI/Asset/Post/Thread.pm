@@ -461,6 +461,12 @@ sub rate {
 			where Post.threadId=".quote($self->getId)." and Post.rating>0");
         	my $average = round($sum/$count);
         	$self->update({rating=>$average});
+		if ($session{setting}{useKarma}) {
+			my $poster = WebGUI::User->new($self->get("ownerUserId"));
+			$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
+			my $rater = WebGUI::User->new($session{user}{userId});
+			$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId); 
+		}
         	$self->getParent->recalculateRating;
         }
 }

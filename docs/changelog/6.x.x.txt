@@ -59,6 +59,9 @@
  - Internationalized a bunch of stuff that was previously uninternationalized.
  - Fixed a bug in the survey that caused users to not be able to submit
    survey's.
+ - Attached the karma system to the ratings system in the Collaboration
+   system.
+
 
 6.5.6
  - Fixed a bunch of mostly cosmetic issues with the commerce system.

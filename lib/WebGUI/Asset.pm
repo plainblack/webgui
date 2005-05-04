@@ -2415,7 +2415,6 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 
 sub www_add {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canAdd);
 	my %prototypeProperties; 
 	if ($session{form}{'prototype'}) {
 		my $prototype = WebGUI::Asset->newByDynamicClass($session{form}{'prototype'},$session{form}{class});
@@ -2443,6 +2442,7 @@ sub www_add {
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($session{form}{class}, @{$session{config}{assetContainers}}));
 	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
 	$newAsset->{_parent} = $self;
+	return WebGUI::Privilege::insufficient() unless ($newAsset->canAdd);
 	return $newAsset->www_edit();
 }
 

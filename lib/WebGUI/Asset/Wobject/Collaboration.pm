@@ -377,6 +377,14 @@ sub definition {
 				fieldType=>"integer",
 				defaultValue=>0
 				},
+			karmaSpentToRate => {
+				fieldType => "integer",
+				defaultValue=> 0
+				},
+			karmaRatingMultiplier => {
+				fieldType => "integer",
+				defaultValue=> 0
+				},
 			moderatePosts =>{
 				fieldType=>"yesNo",
 				defaultValue=>0
@@ -469,8 +477,29 @@ sub getEditForm {
 			-label=>WebGUI::International::get('karma/post', 'Asset_Collaboration'),
 			-value=>$self->getValue("karmaPerPost")
 			);
+                $tabform->getTab("properties")->integer(
+			-name=>"karmaSpentToRate",
+			-label=>WebGUI::International::get('karma spent to rate', 'Asset_Collaboration'),
+			-value=>$self->getValue("karmaSpentToRate")
+			);
+                $tabform->getTab("properties")->integer(
+			-name=>"karmaRatingMultiplier",
+			-label=>WebGUI::International::get('karma rating multiplier', 'Asset_Collaboration'),
+			-value=>$self->getValue("karmaRatingMultiplier")
+			);
         } else {
-                $tabform->getTab("properties")->hidden("karmaPerPost",$self->getValue("karmaPerPost"));
+                $tabform->getTab("properties")->hidden(
+			-name=>"karmaPerPost",
+			-value=>$self->getValue("karmaPerPost")
+			);
+                $tabform->getTab("properties")->hidden(
+			-name=>"karmaSpentToRate",
+			-value=>$self->getValue("karmaSpentToRate")
+			);
+                $tabform->getTab("properties")->hidden(
+			-name=>"karmaRatingMultiplier",
+			-value=>$self->getValue("karmaRatingMultiplier")
+			);
         }
 	$tabform->getTab("security")->filterContent(
 		-value=>$self->getValue("filterCode"),

@@ -1,6 +1,21 @@
 package WebGUI::i18n::English::Asset_Collaboration;
 
 our $I18N = {
+	'preview' => {
+		message => q|preview|,
+		lastUpdated => 0,
+	},
+
+	'karma spent to rate' => {
+		message => q|Karma Spent To Rate|,
+		lastUpdated => 0,
+	},
+
+	'karma rating multiplier' => {
+		message => q|Karma Rating Multiplier|,
+		lastUpdated => 0,
+	},
+
 	'delete file warning' => {
 		message => q|Are you sure you wish to delete this file?|,
 		lastUpdated => 1109618544,
@@ -848,6 +863,14 @@ Setting this number very high can slow the generation of the page.
 <b>^International("karma/post","Asset_Collaboration");</b><br>
 If Karma is enabled on your site, the amount of Karma added for each Post
 submitted by a user.
+
+<p>
+<b>^International("karma spent to rate","Asset_Collaboration");</b><br />
+If karma is enabled on your site, this amount will be subtracted from the user rating a post as sort of a cost of rating posts. It is meant to keep users in check from just rating everything without thinking about the rating.
+
+<p>
+<b>^International("karma rating multiplier","Asset_Collaboration");</b><br />
+If karma is enabled on your site, this amount multiplied by the rating the user gives a post will be the amount of karma the original author of the post receives.
 
 <p>
 <b>^International("filter code","Asset_Collaboration");</b><br>

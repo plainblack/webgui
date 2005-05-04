@@ -76,4 +76,7 @@ alter table Collaboration add column richEditor varchar(22) not null default 'PB
 delete from userProfileField where fieldName like 'richEditor%';
 delete from userProfileData where fieldName like 'richEditor%';
 alter table Layout add column assetsToHide text;
+alter table Collaboration add column karmaRatingMultiplier int not null default 0;
+alter table Collaboration add column karmaSpentToRate int not null default 0;
+
 
