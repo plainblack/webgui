@@ -74,6 +74,7 @@
    Connections created in the Admin Console (Thanks to MABIS Healthcare for
    funding this enhancement.)
  - Thumnail macro has been updated to work with the asset tree system.
+ - RFE 1035743, internationalize WebGUI macros.
 
 
 6.5.6
