@@ -133,7 +133,7 @@ Returns a hash reference  containing all ldap links.  The format is:
 sub getList {
     my %list;
 	tie %list, "Tie::IxHash";
-	%list = ('0'=>WebGUI::International::get("ldap link"),WebGUI::SQL->buildHash("select ldapLinkId, ldapLinkName from ldapLink order by ldapLinkName"));
+	%list = WebGUI::SQL->buildHash("select ldapLinkId, ldapLinkName from ldapLink order by ldapLinkName");
 	return \%list;
 }
 
