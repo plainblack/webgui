@@ -34,12 +34,16 @@ sub _submenu {
    if ($help) {
       $ac->setHelp($help);
    }
-   $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink&llid=new'), WebGUI::International::get("LDAPLink_982"));
+   my $returnUrl = "";
+   if($session{form}{returnUrl}) {
+      $returnUrl = "&returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
+   }
+   $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink&llid=new'.$returnUrl), WebGUI::International::get("LDAPLink_982"));
    if ($session{form}{op} eq "editLDAPLink" && $session{form}{llid} ne "new") {
-      $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink&llid='.$session{form}{llid}), WebGUI::International::get("LDAPLink_983"));
-      $ac->addSubmenuItem(WebGUI::URL::page('op=copyLDAPLink&llid='.$session{form}{llid}), WebGUI::International::get("LDAPLink_984"));
+      $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink&llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_983"));
+      $ac->addSubmenuItem(WebGUI::URL::page('op=copyLDAPLink&llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_984"));
 	  $ac->addSubmenuItem(WebGUI::URL::page('op=deleteLDAPLink&llid='.$session{form}{llid}), WebGUI::International::get("LDAPLink_985"));
-	  $ac->addSubmenuItem(WebGUI::URL::page('op=listLDAPLinks'), WebGUI::International::get("LDAPLink_986"));
+	  $ac->addSubmenuItem(WebGUI::URL::page('op=listLDAPLinks'.$returnUrl), WebGUI::International::get("LDAPLink_986"));
    }
    return $ac->render($workarea, $title);
 }
@@ -76,6 +80,7 @@ sub www_editLDAPLink {
    $f = WebGUI::HTMLForm->new( -extras=>'autocomplete="off"' );
    $f->hidden("op","editLDAPLinkSave");
    $f->hidden("llid",$session{form}{llid});
+   $f->hidden("returnUrl",$session{form}{returnUrl});
    $f->readOnly($session{form}{llid},WebGUI::International::get("LDAPLink_991"));
    $f->text("ldapLinkName",WebGUI::International::get("LDAPLink_992"),$db{ldapLinkName});
    $f->text("ldapUrl",WebGUI::International::get("LDAPLink_993"),$db{ldapUrl});
@@ -139,6 +144,9 @@ sub www_editLDAPLinkSave {
    $properties->{ldapCreateAccountTemplate} = WebGUI::FormProcessor::template("ldapCreateAccountTemplate");
    $properties->{ldapLoginTemplate} = WebGUI::FormProcessor::template("ldapLoginTemplate");
    WebGUI::SQL->setRow("ldapLink","ldapLinkId",$properties);
+   if($session{form}{returnUrl}) {
+      WebGUI::HTTP::setRedirect($session{form}{returnUrl});
+   }
    return www_listLDAPLinks();
 }
 
@@ -146,14 +154,18 @@ sub www_editLDAPLinkSave {
 sub www_listLDAPLinks {
    return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
    my ($output, $p, $sth, $data, @row, $i);
+   my $returnUrl = "";
+   if($session{form}{returnUrl}) {
+      $returnUrl = "&returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
+   }
    $sth = WebGUI::SQL->read("select * from ldapLink order by ldapLinkName");
    $row[$i] = '<tr><td valign="top" class="tableData">&nbsp;</td><td valign="top" class="tableData">'.WebGUI::International::get("LDAPLink_1076").'</td><td>'.WebGUI::International::get("LDAPLink_1077").'</td></tr>';
    $i++;
    while ($data = $sth->hashRef) {
       $row[$i] = '<tr><td valign="top" class="tableData">'
 	        .deleteIcon('op=deleteLDAPLink&llid='.$data->{ldapLinkId},WebGUI::URL::page(),WebGUI::International::get("LDAPLink_988"))
-			.editIcon('op=editLDAPLink&llid='.$data->{ldapLinkId})
-			.copyIcon('op=copyLDAPLink&llid='.$data->{ldapLinkId})
+			.editIcon('op=editLDAPLink&llid='.$data->{ldapLinkId}.$returnUrl)
+			.copyIcon('op=copyLDAPLink&llid='.$data->{ldapLinkId}.$returnUrl)
 			.'</td>';
       $row[$i] .= '<td valign="top" class="tableData">'.$data->{ldapLinkName}.'</td>';
 	  
