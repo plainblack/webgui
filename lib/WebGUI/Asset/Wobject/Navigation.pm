@@ -171,7 +171,7 @@ sub getEditForm {
 				value=>"pedigree"
 				}).$i18n->get('Pedigree').'<br />'
 		);
-	my %options;
+	%options = ();
 	tie %options, 'Tie::IxHash';
 	%options = (
 		'1'=>'./a/ (+1)',
