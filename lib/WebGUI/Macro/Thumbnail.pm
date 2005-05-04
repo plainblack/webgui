@@ -11,15 +11,15 @@ package WebGUI::Macro::Thumbnail;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Collateral;
+use WebGUI::Asset::File::Image;
 use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	if (my $collateral = WebGUI::Collateral->find($param[0])) {
-	        return $collateral->getThumbnail;
+        my ($url) = WebGUI::Macro::getParams(shift);
+	if (my $image = WebGUI::Asset::File::Image->newByUrl($url)) {
+	        return $image->getThumbnailUrl;
         } else {
                 return undef;
         }

@@ -1,4 +1,9 @@
 ﻿6.6.0
+ - Added a shopping cart system and salable products management system. This
+   completes the foundation of WebGUI's commerce system and will allow us to
+   add very rich commerce features in the 7.x series. (Thanks to ProcoliX and
+   Boomer Consulting for each contributing some funding toward the development
+   of these features.)
  - Added a new admin panel for inline content editing.
  - Tweaked the preloader so WebGUI uses a little less memory per process.
  - upgrade.pl and testEnvironment.pl now use the same config file reader as
@@ -61,9 +66,14 @@
    survey's.
  - Attached the karma system to the ratings system in the Collaboration
    system.
- - Added API for connecting to LDAP directories
- - Added Admininstration Module for creating Multiple LDAP Connections on a WebGUI site
- - Modified LDAP Authentication Module to allow users to choose from the Ldap Connections created in the Admin Console
+ - Added API for connecting to LDAP directories (Thanks to MABIS Healthcare
+   for funding this enhancement.)
+ - Added Admininstration Module for creating Multiple LDAP Connections on a 
+   WebGUI site (Thanks to MABIS Healthcare for funding this enhancement.)
+ - Modified LDAP Authentication Module to allow users to choose from the LDAP 
+   Connections created in the Admin Console (Thanks to MABIS Healthcare for
+   funding this enhancement.)
+ - Thumnail macro has been updated to work with the asset tree system.
 
 
 6.5.6

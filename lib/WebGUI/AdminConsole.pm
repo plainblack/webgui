@@ -197,7 +197,7 @@ sub getAdminFunction {
 				id=>"ldapconnections",
 				namespace=>"WebGUI"
 			},
-			icon=>"databases.gif",
+			icon=>"ldap.gif",
 			op=>"listLDAPLinks",
 			group=>"3"
 		},
