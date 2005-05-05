@@ -28,7 +28,7 @@ use WebGUI::Utility;
 sub process {
 	return "" unless ($session{var}{adminOn});
 	my @param = WebGUI::Macro::getParams($_[0]);
-        my $templateId = $param[0] || "PBtmpl0000000000000035";
+        my $templateId = $param[0] || "PBtmpl0000000000000090";
         my %var;
 	my (%cphash, %hash2, %hash, $r, @item, $query);
 	tie %hash, "Tie::IxHash";
