@@ -20,7 +20,9 @@ WebGUI::Session::open("../..",$configFile);
 
 #--------------------------------------------
 print "\tUpdating Commerce Templates\n" unless ($quiet);
-my $template = '<a href="<tmpl_var changePayment.url>"><tmpl_var changePayment.label></a> &middot; <a href="<tmpl_var changeShipping.url>"><tmpl_var changeShipping.label></a><br>
+my $template = '<a href="<tmpl_var viewShoppingCart.url>"><tmpl_var viewShoppingCart.label></a> &middot;
+<a href="<tmpl_var changePayment.url>"><tmpl_var changePayment.label></a> &middot; 
+<a href="<tmpl_var changeShipping.url>"><tmpl_var changeShipping.label></a><br>
 <br>
 
 <tmpl_var title><br>

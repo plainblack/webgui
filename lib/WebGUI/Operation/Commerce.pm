@@ -180,6 +180,8 @@ sub www_checkoutConfirm {
 	$var{'changePayment.label'} = $i18n->get('change payment gateway');
 	$var{'changeShipping.url'} = WebGUI::URL::page('op=selectShippingMethod');
 	$var{'changeShipping.label'} = $i18n->get('change shipping method');
+	$var{'viewShoppingCart.url'} = WebGUI::URL::page('op=viewCart');
+	$var{'viewShoppingCart.label'} = $i18n->get('view shopping cart');
 
 	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceConfirmCheckoutTemplateId})->process(\%var));
 }
