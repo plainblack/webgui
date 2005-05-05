@@ -387,7 +387,7 @@ sub www_listSubscriptions {
 sub www_purchaseSubscription {
 	WebGUI::Commerce::ShoppingCart->new->add($session{form}{sid}, 'Subscription');
 	
-	return WebGUI::Operation::execute('checkout');
+	return WebGUI::HTTP::setRedirect(WebGUI::URL::page('op=checkout'));
 }
 
 #-------------------------------------------------------------------
