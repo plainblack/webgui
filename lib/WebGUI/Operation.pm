@@ -192,6 +192,7 @@ sub getOperations {
 	  'deleteSubscriptionCodes' => 'WebGUI::Operation::Subscription',
 
 	  'addToCart' => 'WebGUI::Operation::Commerce',
+	  'confirmRecurringTransaction' => 'WebGUI::Operation::Commerce',
 	  'checkout' => 'WebGUI::Operation::Commerce',
 	  'checkoutConfirm' => 'WebGUI::Operation::Commerce',
 	  'checkoutSubmit' => 'WebGUI::Operation::Commerce',

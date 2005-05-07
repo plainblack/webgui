@@ -436,11 +436,35 @@ sub recurringPeriodValues {
 }
 
 #-------------------------------------------------------------------
+
+=head2 shippingCost ( amount )
+
+This sets the shippingcost involved with the transaction. Your plugin must override this
+method.
+
+=head3 amount
+
+The amaount of money that's being charged for shipping.
+
+=cut
+
 sub shippingCost {
 	return WebGUI::ErrorHandler::fatal("You must override the shippingCost method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
+
+=head2 shippingDescription ( message )
+
+This method sets the description for the shipping cost of the transaction. You must overload 
+this method if you are writing a custom plugin.
+
+=head3 message
+
+The description of the shiping cost.
+
+=cut
+
 sub shippingDescription {
 	return WebGUI::ErrorHandler::fatal("You must override the shippingDescription method in the payment plugin.");
 }

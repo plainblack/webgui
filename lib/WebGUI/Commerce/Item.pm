@@ -36,6 +36,12 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 available ( )
+
+Returns a boolean indicating that the item is available or not.
+
+=cut
+
 sub available {
 	return 1;
 }
@@ -116,6 +122,14 @@ Returns the name of the item. This must be implemented by an item plugin.
 sub name {
 	return WebGUI::ErrorHandler::fatal('The name method of WebGUI::Commerce::Item must be overridden.');
 }
+
+#-------------------------------------------------------------------
+
+=head2 needsShipping ( )
+
+Return a boolean indicating whether the item needs to be shipped or not. Defaults to false. 
+
+=cut
 
 sub needsShipping {
 	return 0;

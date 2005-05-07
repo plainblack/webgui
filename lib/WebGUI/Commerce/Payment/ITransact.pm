@@ -11,6 +11,7 @@ use WebGUI::International;
 use LWP::UserAgent;
 use XML::Simple;
 use HTTP::Cookies;
+use WebGUI::SQL;
 
 our @ISA = qw(WebGUI::Commerce::Payment);
 
@@ -523,7 +524,7 @@ sub getRecurringPaymentStatus {
 	$recurringId = shift;
 	$term = shift || 1;
 	
-	my %resolve = {
+	my %resolve = (
 		weekly		=> 7*3600*24,
 		biweekly	=> 14*3600*24,
 		fourweekly	=> 28*3600*24,
@@ -531,7 +532,7 @@ sub getRecurringPaymentStatus {
 		quarterly	=> 91*3600*24,
 		halfyearly	=> 182*3600*24,
 		yearly		=> 365*3600*24
-		};
+	);
 
 	my $transactionData = WebGUI::SQL->quickHashRef("select * from ITransact_recurringStatus where gatewayId=".quote($recurringId));
 	

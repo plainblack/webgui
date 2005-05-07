@@ -118,6 +118,26 @@ sub deleteItem {
 }
 
 #-------------------------------------------------------------------
+
+=head2 deleteItem ( itemId, itemType )
+
+Deletes an item from a transaction. This will purge the record from the database, and
+updates the amount of the transaction. It doesn't change the shipping cost however.
+
+Also if you want to credit the user (you'll probably want to) for the amount of the 
+removed items, you must do this yourself. 
+
+=head3 itemId
+
+The id of the item you want to remove.
+
+=head3 itemType
+
+The type of the item you want to remove.
+
+=cut
+
+#-------------------------------------------------------------------
 sub deleteItem {
 	my ($self, $itemId, $itemType, $amount, @items);
 	$self = shift;
@@ -243,7 +263,7 @@ sub getByGatewayId {
 	$gatewayId = shift;
 	$paymentGateway = shift;
 
-	($transactionId) = WebGUI::SQL->quickArray("select transaction Id from transaction where gatewayId=".quote($gatewayId).
+	($transactionId) = WebGUI::SQL->quickArray("select transactionId from transaction where gatewayId=".quote($gatewayId).
 		" and gateway=".quote($paymentGateway));
 
 	return WebGUI::Commerce::Transaction->new($transactionId) if $transactionId;
@@ -264,6 +284,36 @@ sub getItems {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getTransactions ( constraints )
+
+Returns an array consisting of WebGUI::Commerce::Transaction objects complying to
+the passed constraints.
+
+=head3 constraints
+
+A hashref containing the contrains by which the transactions are selected. These can be:
+
+	* initStart
+		Epoch that specifies the lower bounds on the initialisation date.
+
+	* initStop
+		Epoch that specifies the upper bound on the initialisation date.
+
+	* completionStart
+		Epoch specifying the lower bound on the completion date.
+	
+	* completionStop
+		Epoch specifying the upper bound on the completion date.
+
+	* status
+		The status of the transaction. Can be: Pending, Completed or Canceled
+
+	* shippingStatus
+		The shipping status of the transaction. Can be: NotShipped, Shipped or Delivered
+
+=cut	
+
 sub getTransactions {
 	my ($self, $criteria, @constraints, $sql, @transactionIds, @transactions);
 	
@@ -272,8 +322,8 @@ sub getTransactions {
 	
 	push (@constraints, 'initDate >= '.quote($criteria->{initStart})) if (defined $criteria->{initStart});
 	push (@constraints, 'initDate <= '.quote($criteria->{initStop})) if (defined $criteria->{initStop});
-	push (@constraints, 'initDate >= '.quote($criteria->{completionStart})) if (defined $criteria->{completionStart});
-	push (@constraints, 'initDate >= '.quote($criteria->{completionStop})) if (defined $criteria->{completionStop});
+	push (@constraints, 'completionDate >= '.quote($criteria->{completionStart})) if (defined $criteria->{completionStart});
+	push (@constraints, 'completionDate <= '.quote($criteria->{completionStop})) if (defined $criteria->{completionStop});
 	push (@constraints, 'status='.quote($criteria->{paymentStatus})) if (defined $criteria->{paymentStatus});
 	push (@constraints, 'shippingStatus='.quote($criteria->{shippingStatus})) if (defined $criteria->{shippingStatus});
 	
@@ -407,6 +457,17 @@ sub pendingTransactions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 shippingCost ( [amount] )
+
+Returns the shipping cost for this transaction. If amount is supplied the sipping cost will
+be set to that value.
+
+=head3 amount
+If supplied the shipping cost of the transaction will be set to this value.
+
+=cut
+
 sub shippingCost {
 	my ($self, $shippingCost);
 	$self = shift;
@@ -421,6 +482,17 @@ sub shippingCost {
 }
 
 #-------------------------------------------------------------------
+
+=head2 shippingMethod ( [ method ] )
+
+Returns the shipping method for this transaction. If amount is supplied the shipping method will
+be set to it.
+
+=head3 method
+If supplied the shipping method of the transaction will be set to this value.
+
+=cut
+
 sub shippingMethod {
 	my ($self, $shippingMethod);
 	$self = shift;
@@ -435,6 +507,18 @@ sub shippingMethod {
 }
 
 #-------------------------------------------------------------------
+
+=head2 shippingOptions ( [ options ] )
+
+Returns the shipping options for this transaction. If options is supplied the shipping options will
+be set to it.
+
+=head3 options
+If supplied the shipping options of the transaction will be set to this value. This should probably 
+be some serialized datastructure.
+
+=cut
+
 sub shippingOptions {
 	my ($self, $shippingOptions);
 	$self = shift;
@@ -449,6 +533,17 @@ sub shippingOptions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 shippingStatus ( [ status ] )
+
+Returns the shipping status for this transaction. If status is supplied the shipping status will
+be set to it.
+
+=head3 status
+If supplied the shipping status of the transaction will be set to this value.
+
+=cut
+
 sub shippingStatus {
 	my ($self, $shippingStatus);
 	$self = shift;
@@ -489,6 +584,17 @@ sub status {
 
 
 #-------------------------------------------------------------------
+
+=head2 trackingNumber ( [ number ] )
+
+Returns the tracking number of the shipped transaction. If numer is supplied the tracking number will
+be set to it.
+
+=head3 number
+If supplied the tracking number of the transaction will be set to this value.
+
+=cut
+
 sub trackingNumber {
 	my ($self, $trackingNumber);
 	$self = shift;

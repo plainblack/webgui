@@ -327,8 +327,8 @@ sub www_completePendingTransaction {
 #-------------------------------------------------------------------
 sub www_confirmRecurringTransaction {
 	my($plugin, %var);
+	
 	$plugin = WebGUI::Commerce::Payment->load($session{form}{gateway});
-
 	if ($plugin) {
 		$plugin->confirmRecurringTransaction;
 	}

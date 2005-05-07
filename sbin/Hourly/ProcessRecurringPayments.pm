@@ -20,9 +20,6 @@ sub _getDuration {
 	return addToDate(0,1,0,0) if $duration eq 'Yearly';
 }
 
-
-
-
 sub process {
 	my @recurringTransactions = WebGUI::SQL->buildArray("select transactionId from transaction where recurring=1 and status='Completed'");
 
@@ -34,7 +31,7 @@ sub process {
 		my $time = time;
 		$time -= $transaction->get('initDate');
 		my $term = int($time / _getDuration($item->duration)) + 1;
-		
+
 		if ($term > $transaction->lastPayedTerm) {
 			my $payment = WebGUI::Commerce::Payment->load($transaction->gateway);
 			
@@ -52,7 +49,7 @@ sub process {
 				} elsif ($status->{resultCode} eq '0') {
 					$output .= "OK";
 					push (@ok, $output);
-					$item->apply unless ($term == 1);
+					$item->handler($transaction->get(userId)) unless ($term == 1);
 					$transaction->lastPayedTerm($term);
 				} else {
 					$output .= "PAYMENT FAILED: ".$status->{resultCode};

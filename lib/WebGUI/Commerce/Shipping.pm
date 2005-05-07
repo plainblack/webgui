@@ -5,10 +5,26 @@ use WebGUI::SQL;
 use WebGUI::HTMLForm;
 use WebGUI::Commerce::ShoppingCart;
 
+#-------------------------------------------------------------------
+
+=head2 calc
+
+Returns the calculated shipping cost. Your plugin must override this method.
+
+=cut
 
 sub calc {
 	return WebGUI::ErrorHanlder::fatal('The calc method must be overriden.');
 };
+
+#-------------------------------------------------------------------
+
+=head2 description
+
+Returns a description of the shipping configuration. Defaults to the name of your plugin
+if you do not overload this method.
+
+=cut
 
 sub description {
 	return $_[0]->name;
@@ -70,9 +86,27 @@ sub get {
 	return $_[0]->{_properties}{$_[1]};
 }
 
+#-------------------------------------------------------------------
+
+=head2 getOptions
+
+Returns a hash containing the parameters of a user configurable shipping method. If
+your shipping plugin has an options form you should overload this method.
+
+=cut
+
 sub getOptions {
 	return {};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getShippingItems
+
+Returns an arrayref containing the items, marked for shipping. If no items are set
+using setShippingOptions it this method will default to the shopping cart of the user.
+
+=cut
 
 sub getShippingItems {
 	my ($normal, $recurring, @allItems, @items, $self);
@@ -142,6 +176,12 @@ sub init {
 
 #-------------------------------------------------------------------
 
+=head2 getShoppingCart
+
+Returns a WebGUI::Commerce::ShoppingCart object of the current user.
+
+=cut
+
 sub getShoppingCart {
 	return $_[0]->{_shoppingCart};
 };
@@ -151,7 +191,7 @@ sub getShoppingCart {
 =head2 load ( namespace )
 
 A convienient method to load a plugin. It handles all error checking and stuff for you.
-This is a SUPER class method only and shoud NOT be overridden.
+This is a SUPER class method only and should NOT be overridden.
 
 =head3 namespace
 
@@ -199,6 +239,16 @@ sub namespace {
 	return $_[0]->{_namespace};
 }
 
+#-------------------------------------------------------------------
+
+=head2 optionsOk
+
+Indicates whether the options loaded into the plugin (by using either setOptions or processOptionsForm)
+are correct. If your plugin is able of being configured by an options form you must overload this method.
+Defaults to true.
+
+=cut
+
 sub optionsOk {
 	return 1;
 }
@@ -232,11 +282,45 @@ sub prepend {
 	return "~Shipping~".$self->namespace."~".$name;
 }
 
+#-------------------------------------------------------------------
+
+=head2 processOptionsForm
+
+Processes the submitted form variables from the optionsForm and stores them
+into the plugin. You only need to overload this method if your plugin is capable
+of using user configurable options.
+
+=cut
+
 sub processOptionsForm {
 }
 
+#-------------------------------------------------------------------
+
+=head2 setOptions ( options )
+
+Stores the supplied option hash into the plugin object.
+
+=head3 options
+
+Hashref containing the options.
+
+=cut
+
 sub setOptions {
 }
+
+#-------------------------------------------------------------------
+
+=head2 setShippingItems ( items )
+
+Sets the items the shipping is to be calculated for.
+
+=head3 items
+
+Arrayref containing the items.
+
+=cut
 
 sub setShippingItems {
 	my ($self, $items);
@@ -246,17 +330,68 @@ sub setShippingItems {
 	$self->{_shippingItems} = $items;
 }
 
+#-------------------------------------------------------------------
+
+=head2 supportsTracking
+
+Returns a boolean indicating whether this plugin supports tracking of the shipment.
+Overload this method if your plugin does. Defaults to false.
+
+=cut
+
 sub supportsTracking {
 	return 0;
 }
 
+#-------------------------------------------------------------------
+
+=head2 trackingInfo
+
+Returns a message containing information about the shipment tracking (ie. where the 
+package is or  something like that). If your plugin support these tracking, you probably
+want to overload this method. Defaults to "".
+
+=cut
+
 sub trackingInfo {
-	return {};
+	return "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 trackingNumber
+
+Returns the tracking ID supplied by the shipment company. If your plugin supports tracking
+you'll have to overload this method. Defaults to undef.
+
+=cut
 
 sub trackingNumber {
 	return undef;
 }
+
+#-------------------------------------------------------------------
+
+=head2 trackingUrl
+
+Returns the URL where the user can go to either fill in the tracking number or view the tracking 
+info of his package. Overload this method if your plugin supports tracking. Defaults to undef.
+
+=cut
+
+sub  trackingUrl {
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 optionsOk
+
+This method returns a boolean indicating wheter the supplied options (loaded into the plugin 
+by either setOptions or processOptionsForm) are valid. Overload if your plugin support configuration 
+options. Defaults to true.
+
+=cut
 
 sub optionsOk {
 	return 1;	

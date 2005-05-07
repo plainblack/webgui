@@ -20,7 +20,12 @@ shopping cart is tied to the sessionId and, thus, expires when the sessionId exp
 $shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 
 $shoppingCart->add('myItemId', 'myItem', 3);
-$shoppingCart->empty;
+$shoppingCart->setQuantity('myItemId', 'myItem', 2);
+
+$shoppingCart->delete('myItemId', 'myItem');		# These two lines are equivalent;
+$shoppingCart->setQuantity('myItemId', 'myItem', 0);	#
+
+$shoppingCart->empty;					# Remove contents from cart
 
 ($normal, $recurring) = $shoppingCart->getItems;
 $normal->[0]->{quantity}	# quantity of first normal item
@@ -76,6 +81,21 @@ sub add {
 }
 
 #-------------------------------------------------------------------
+
+=head2 delete ( itemId, itemType )
+
+Deletes the item identified by the passed parameters from the cart.
+
+=head3 itemId
+
+The id of the item to delete.
+
+=head3 itemType
+
+the type (namespace) of the item to delete.
+
+=cut
+
 sub delete {
 	my ($self, $itemId, $itemType);
 	
@@ -90,6 +110,32 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setQuantity ( itemId, itemType, quantity )
+
+Sets the quantity of an item (identified by itemId and itemType) in the shopping 
+cart. When quantity is set to zero or a negative number, the item will be deleted
+from the cart.
+
+This method only operates on items that are already in the cart. You cannot use it
+to add new items to the cart. In order to that use the add method.
+
+Generates a fatal error when the quantity is not a number.
+
+=head3 itemId
+
+The is of item you want to set the quantity for.
+
+=head3 itemType
+
+The type (namespace) of the item.
+
+=head3 quantity
+
+The quantity you want to set the item to.
+
+=cut
+
 sub setQuantity {
 	my ($self, $itemId, $itemType, $quantity);
 	$self = shift;
@@ -111,7 +157,7 @@ sub setQuantity {
 
 =head2 empty ( )
 
-Invoking this method will putrge all content from the shopping cart.
+Invoking this method will purge all content from the shopping cart.
 
 =cut
 
@@ -154,9 +200,6 @@ The total price of this item. Ie. totalPrice = quantity * price.
 =head3 item
 
 The instanciated plugin of this item. See WebGUI::Commerce::Item for a detailed API.
-
-For example:
-
 
 =cut
 
