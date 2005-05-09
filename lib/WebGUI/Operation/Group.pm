@@ -199,8 +199,8 @@ sub www_autoDeleteFromGroup {
 #-------------------------------------------------------------------
 sub www_deleteGroup {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::vitalComponent() if (isIn($session{form}{gid}, qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
         my ($output);
-        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::vitalComponent()) if ($session{form}{gid} < 26 && $session{form}{gid} > 0);
         $output .= WebGUI::International::get(86).'<p>';
         $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteGroupConfirm&gid='.$session{form}{gid}).
 		'">'.WebGUI::International::get(44).'</a>';
@@ -212,7 +212,7 @@ sub www_deleteGroup {
 #-------------------------------------------------------------------
 sub www_deleteGroupConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::vitalComponent()) if ($session{form}{gid} < 26 && $session{form}{gid} > 0);
+	return WebGUI::Privilege::vitalComponent() if (isIn($session{form}{gid}, qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
 	my $g = WebGUI::Group->new($session{form}{gid});
 	$g->delete;
         return www_listGroups();
