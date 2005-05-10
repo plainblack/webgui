@@ -251,7 +251,13 @@ sub createAccountSave {
    #Get connectDN from settings   
    my $uri = URI->new($connection->{ldapURL});
    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
-   $ldap->bind;
+   my $auth;
+   if($connection->{connectDn}) {
+      $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
+   }else{
+      $auth = $ldap->bind;
+   }
+   #$ldap->bind;
    my $search = $ldap->search (base => $uri->dn, filter=>$connection->{ldapIdentity}."=".$username);
    my $connectDN = "";
    if (defined $search->entry(0)) {
