@@ -259,7 +259,7 @@ sub www_saveSettings {
 	foreach $key (keys %{$session{form}}) {
 		$value = $session{form}{$key};
 		if ($key =~ m/(.*)_interval/) {
-			$value = WebGUI::DateTime::intervalToSeconds($session{form}{$key},$session{form}{$1."_units"});
+			$value = WebGUI::FormProcessor::interval($1);
 			$key = $1;
 		} elsif ($key =~ m/_units/) {
 			next;
