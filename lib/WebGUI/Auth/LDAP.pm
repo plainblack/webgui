@@ -55,7 +55,12 @@ sub _isValidLDAPUser {
    }
    
    if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
-      if ($ldap->bind) {
+      if($connection->{connectDn}) {
+	     $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
+	  }else{
+	     $auth = $ldap->bind;
+	  }
+      if ($auth) {
 	      $search = $ldap->search ( base=>$uri->dn, filter=>$connection->{ldapIdentity}."=".$session{form}{'authLDAP_ldapId'});
 			if (defined $search->entry(0)) {
 				if ($connection->{ldapUserRDN} eq 'dn') {
