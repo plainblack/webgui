@@ -380,7 +380,7 @@ Returns a boolean indicating whether this thread is marked read for the user.
 sub isMarkedRead {
         my $self = shift;
 	return 1 if $self->isPoster;
-        my ($isRead) = WebGUI::SQL->quickArray("select count(*) from Post_read where userId=".quote($session{user}{userId})." and threadId=".quote($self->getId)." and postId=".quote($self->get("lastPostId"));
+      my ($isRead) = WebGUI::SQL->quickArray("select count(*) from Post_read where userId=".quote($session{user}{userId})." and threadId=".quote($self->getId)." and postId=".quote($self->get("lastPostId")));
         return $isRead;
 }
 
