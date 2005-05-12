@@ -410,6 +410,7 @@ sub getTemplateVars {
         $var{'rate.url.4'} = $self->getRateUrl(4);
         $var{'rate.url.5'} = $self->getRateUrl(5);
         $var{'hasRated'} = $self->hasRated;
+        $var{'isMarkedRead'} = $self->isMarkedRead;
 	my $gotImage;
 	my $gotAttachment;
 	@{$var{'attachment_loop'}} = ();
