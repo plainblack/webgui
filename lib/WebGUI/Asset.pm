@@ -1394,8 +1394,11 @@ sub getLineage {
 		$columns = "*";
 		$slavedb = WebGUI::SQL->getSlave;
 	}
-	my $sortOrder = ($rules->{invertTree}) ? "desc" : "asc"; 
-	my $sql = "select $columns from $tables where $where order by lineage $sortOrder";
+	my $sortOrder = ($rules->{invertTree}) ? "lineage desc" : "lineage asc"; 
+	if (exists $rules->{orderByClause}) {
+		$sortOrder = $rules->{orderByClause};
+	}
+	my $sql = "select $columns from $tables where $where order by $sortOrder";
 	my @lineage;
 	my %relativeCache;
 	my $sth = WebGUI::SQL->read($sql, $slavedb);
@@ -1952,26 +1955,26 @@ Optional string representing a URL.
 
 sub newByUrl {
 	my $class = shift;
-        my $url = shift || $session{env}{PATH_INFO};
-        $url = lc($url);
-        $url =~ s/\/$//;
-        $url =~ s/^\///;
-        $url =~ s/\'//;
-        $url =~ s/\"//;
-        my $asset;
-        if ($url ne "") {
+	my $url = shift || $session{env}{PATH_INFO};
+	$url = lc($url);
+	$url =~ s/\/$//;
+	$url =~ s/^\///;
+	$url =~ s/\'//;
+	$url =~ s/\"//;
+	my $asset;
+	if ($url ne "") {
 		my $asset = WebGUI::Cache->new("asseturl_".$url)->get;
 		unless (exists $asset->{assetId}) {
-                	$asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where url=".quote($url));
+			$asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where url=".quote($url));
 			WebGUI::Cache->new("asseturl_".$url)->set($asset,3600);
 		}
 		if ($asset->{assetId} ne "" || $asset->{className} ne "") {
 			return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
 		} else {
-        		return $class->newByDynamicClass($session{setting}{notFoundPage});
+			return $class->newByDynamicClass($session{setting}{notFoundPage});
 		}
-        }
-        return $class->newByDynamicClass($session{setting}{defaultPage});
+	}
+	return $class->newByDynamicClass($session{setting}{defaultPage});
 }
 
 #-------------------------------------------------------------------
