@@ -1,16 +1,16 @@
-package WebGUI::Mail;
+﻿package WebGUI::Mail;
 
 =head1 LEGAL
 
- -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2005 Plain Black Corporation.
- -------------------------------------------------------------------
-  Please read the legal notices (docs/legal.txt) and the license
-  (docs/license.txt) that came with this distribution before using
-  this software.
- -------------------------------------------------------------------
-  http://www.plainblack.com                     info@plainblack.com
- -------------------------------------------------------------------
+-------------------------------------------------------------------
+WebGUI is Copyright 2001-2005 Plain Black Corporation.
+-------------------------------------------------------------------
+Please read the legal notices (docs/legal.txt) and the license
+(docs/license.txt) that came with this distribution before using
+this software.
+-------------------------------------------------------------------
+http://www.plainblack.com                     info@plainblack.com
+-------------------------------------------------------------------
 
 =cut
 
@@ -31,8 +31,8 @@ This package provides access to use SMTP based email services.
 
 =head1 SYNOPSIS
 
- use WebGUI::Mail;
- WebGUI::Mail::send($to,$subject,$message);
+use WebGUI::Mail;
+WebGUI::Mail::send($to,$subject,$message);
 
 =head1 METHODS
 
@@ -48,7 +48,7 @@ These methods are available from this class:
 
 Sends an SMTP email message to the specified user.
 
-=head3 to 
+=head3 to
 
 An email address for the TO line.
 
@@ -75,28 +75,32 @@ The email address for the BCC line.
 =cut
 
 sub send {
-        my ($smtp, $message, $from, $footer);
-        foreach my $option (\$_[0], \$_[1], \$_[3], \$_[4], \$_[5]) {
-           if(${$option}) {
-                if (${$option} =~ /(?:From|To|Date|X-Mailer|Subject|Received|Message-Id)\s*:/is) {
-                   use WebGUI::ErrorHandler;
-                   return WebGUI::ErrorHandler::security("pass a malicious value to the mail header.");
-                }
-           }
-        }
+	my ($smtp, $message, $from, $footer);
+	foreach my $option (\$_[0], \$_[1], \$_[3], \$_[4], \$_[5]) {
+		if(${$option}) {
+			if (${$option} =~ /(?:From|To|Date|X-Mailer|Subject|Received|Message-Id)\s*:/is) {
+				use WebGUI::ErrorHandler;
+				return WebGUI::ErrorHandler::security("pass a malicious value to the mail header.");
+			}
+		}
+	}
 	$from = $_[4] || $session{setting}{companyEmail};
 	#header
 	$message = "To: $_[0]\n";
-        $message .= "From: $from\n";
-        $message .= "CC: $_[3]\n" if ($_[3]);
-        $message .= "BCC: $_[5]\n" if ($_[5]);
-        $message .= "Subject: ".$_[1]."\n";
+	$message .= "From: $from\n";
+	$message .= "CC: $_[3]\n" if ($_[3]);
+	$message .= "BCC: $_[5]\n" if ($_[5]);
+	$message .= "Subject: ".$_[1]."\n";
 	$message .= "Date: ".WebGUI::DateTime::epochToHuman("","%W, %d %C %y %j:%n:%s %O")."\n";
-	$message .= "Content-Type: text/plain; charset=UTF-8\n";
-        $message .= "\n";
+	if (($_[2] =~ m/<html>/i) || ($_[2] =~ m/<a\sname=/i)) {
+		$message .= "Content-Type: text/html; charset=UTF-8\n";
+	} else {
+		$message .= "Content-Type: text/plain; charset=UTF-8\n";
+	}
+	$message .= "\n";
 	$message = WebGUI::Macro::process($message);
-        #body
-        $message .= $_[2]."\n";
+	#body
+	$message .= $_[2]."\n";
 	#footer
 	$message .= WebGUI::Macro::process("\n".$session{setting}{mailFooter});
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
@@ -107,23 +111,20 @@ sub send {
 			WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
 		}
 	} else {
-        	$smtp = Net::SMTP->new($session{setting}{smtpServer}); # connect to an SMTP server
-        	if (defined $smtp) {
-        		$smtp->mail($from);     # use the sender's address here
-        		$smtp->to($_[0]);             # recipient's address
-        		$smtp->cc($_[3]) if ($_[3]);          
-        		$smtp->bcc($_[5]) if ($_[5]);         
-        		$smtp->data();              # Start the mail
-        		$smtp->datasend($message);
-        		$smtp->dataend();           # Finish sending the mail
-        		$smtp->quit;                # Close the SMTP connection
-        	} else {
-                	WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
-        	}
+		$smtp = Net::SMTP->new($session{setting}{smtpServer}); # connect to an SMTP server
+		if (defined $smtp) {
+			$smtp->mail($from);     # use the sender's address here
+			$smtp->to($_[0]);             # recipient's address
+			$smtp->cc($_[3]) if ($_[3]);
+			$smtp->bcc($_[5]) if ($_[5]);
+			$smtp->data();              # Start the mail
+			$smtp->datasend($message);
+			$smtp->dataend();           # Finish sending the mail
+			$smtp->quit;                # Close the SMTP connection
+		} else {
+			WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
+		}
 	}
 }
-
-
-
 
 1;
