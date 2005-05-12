@@ -19,7 +19,8 @@ use WebGUI::Session;
 sub process {
         my ($url) = WebGUI::Macro::getParams(shift);
 	my $asset = WebGUI::Asset->newByUrl($url);
-	if (defined $asset) {
+	#Sorry, you cannot proxy the notfound page.
+	if (defined $asset && $asset->getId ne $session{setting}{notFoundPage}) {
 		$asset->toggleToolbar;
 		return $asset->canView ? $asset->view : undef;
 	} else {
