@@ -756,7 +756,7 @@ sub setStatusApproved {
         unless ($self->isPoster) {
                 WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->getUrl,579);
         }
-        $self->notifySubscribers;
+        $self->notifySubscribers unless ($session{form}{func} eq 'add');
 }
 
 
