@@ -243,7 +243,7 @@ sub getEditForm {
 #		-name=>"availableSeats", -label=>WebGUI::International::get(528,"Asset_Event"),
 #		-value=>$self->getValue("availableSeats")
 #		);
-	if (($session{form}{func} eq "addStyledEvent") || ($session{form}{func} eq "addEvent")) {
+	if (($session{form}{func} eq "addStyledEvent") || ($session{form}{func} eq "add") || ($session{form}{func} eq "addEvent")) {
 		my %recursEvery;
 		tie %recursEvery, 'Tie::IxHash';
 		%recursEvery = (
