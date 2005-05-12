@@ -88,7 +88,10 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	my $originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
+	my $originalTemplate;
+	$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("collaborationTemplateId")) if (ref $self->getShortcut eq "WebGUI::Asset::Wobject::Collaboration");
+	#Shortcuts of Posts and Threads and other assets without a "templateId" 
+	# are going to be ->view'ed by their original parent's settings anyway.
 	$tabform->getTab("properties")->HTMLArea(
 		-value=>$self->getValue("description"),
                 -label=>WebGUI::International::get(85, 'Asset_Shortcut'),
