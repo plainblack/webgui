@@ -89,6 +89,7 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $originalTemplate;
+	$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
 	$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("collaborationTemplateId")) if (ref $self->getShortcut eq "WebGUI::Asset::Wobject::Collaboration");
 	#Shortcuts of Posts and Threads and other assets without a "templateId" 
 	# are going to be ->view'ed by their original parent's settings anyway.
