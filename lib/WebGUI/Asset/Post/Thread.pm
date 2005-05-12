@@ -580,7 +580,7 @@ sub unsubscribe {
 sub view {
 	my $self = shift;
         $self->markRead;
-        $self->incrementViews;
+        $self->incrementViews unless ($session{form}{func} eq 'rate');
         WebGUI::Session::setScratch("discussionLayout",$session{form}{layout});
         my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
