@@ -9,6 +9,11 @@
  - fix [ 1197781 ] Collaboration: sorting bug in sub_view FIXED! 
    and [ 1182478 ] Coll::appendPostListTemplateVars does not sort by isSticky
  - fix [ 1182630 ] thread::isMarkedRead should check thread's lastpost,not self
+ - fix [ 1197620 ] upgrade_6.2.11-6.3.0.pl : Missing posts - FIXED!
+ - fix [ 1200874 ] "reply with quote" in WebGUI Help
+ - fix [ 1190276 ] cannot use encrypt page recursively
+ - fix [ 1197360 ] "anscestor" flub in 6.6.0 upgrade file.
+ - fix [ 1191650 ] plainblack.com links that are copy/pasted append ..
 
 
 6.6.0
