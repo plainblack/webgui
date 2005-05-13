@@ -209,11 +209,11 @@ The URL to deny this Post, if it's moderated.
 <p>
 
 <b>reply.url</b><br>
-The URL to reply to this Post and quote it in your reply.
+The URL to reply to this Post without quoting it.
 <p>
 
-<b>reply.withoutQuote.url</b><br>
-The URL to reply to this Post without quoting it.
+<b>reply.withQuote.url</b><br>
+The URL to initiate a quoted reply to this Post.
 <p>
 
 <b>url</b><br>

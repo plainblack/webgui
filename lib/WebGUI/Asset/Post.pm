@@ -383,34 +383,27 @@ sub getTemplateVars {
 	$var{"userId"} = $self->get("ownerUserId");
 	$var{"user.isPoster"} = $self->isPoster;
 	$var{"userProfile.url"} = $self->getUrl("op=viewProfile&uid=".$self->get("ownerUserId"));
-
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
-
 	$var{'title.short'} = $self->chopTitle;
 	$var{content} = $self->formatContent if ($self->getThread);
-
-        $var{'user.canEdit'} = $self->canEdit if ($self->getThread);
-        $var{"delete.url"} = $self->getDeleteUrl;
-        $var{"edit.url"} = $self->getEditUrl;
-
+	$var{'user.canEdit'} = $self->canEdit if ($self->getThread);
+	$var{"delete.url"} = $self->getDeleteUrl;
+	$var{"edit.url"} = $self->getEditUrl;
 	$var{"status"} = $self->getStatus;
-        $var{"approve.url"} = $self->getApproveUrl;
-        $var{"deny.url"} = $self->getDenyUrl;
-
+	$var{"approve.url"} = $self->getApproveUrl;
+	$var{"deny.url"} = $self->getDenyUrl;
 	$var{"reply.url"} = $self->getReplyUrl;
-        $var{'reply.withquote.url'} = $self->getReplyUrl(1);
-
-        $var{'url'} = WebGUI::URL::getSiteURL().$self->getUrl.'#'.$self->getId;
-
-        $var{'rating.value'} = $self->get("rating")+0;
-        $var{'rate.url.1'} = $self->getRateUrl(1);
-        $var{'rate.url.2'} = $self->getRateUrl(2);
-        $var{'rate.url.3'} = $self->getRateUrl(3);
-        $var{'rate.url.4'} = $self->getRateUrl(4);
-        $var{'rate.url.5'} = $self->getRateUrl(5);
-        $var{'hasRated'} = $self->hasRated;
-        $var{'isMarkedRead'} = $self->isMarkedRead;
+	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
+	$var{'url'} = WebGUI::URL::getSiteURL().$self->getUrl.'#'.$self->getId;
+	$var{'rating.value'} = $self->get("rating")+0;
+	$var{'rate.url.1'} = $self->getRateUrl(1);
+	$var{'rate.url.2'} = $self->getRateUrl(2);
+	$var{'rate.url.3'} = $self->getRateUrl(3);
+	$var{'rate.url.4'} = $self->getRateUrl(4);
+	$var{'rate.url.5'} = $self->getRateUrl(5);
+	$var{'hasRated'} = $self->hasRated;
+	$var{'isMarkedRead'} = $self->isMarkedRead;
 	my $gotImage;
 	my $gotAttachment;
 	@{$var{'attachment_loop'}} = ();
