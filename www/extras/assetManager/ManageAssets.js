@@ -11,7 +11,7 @@ asset.getContextMenu = function () {
         arr[arr.length] = new ContextMenuItem(this.labels["view"],"javascript:" + this.evalReference() + ".view()");
         arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
         arr[arr.length] = new ContextMenuItem(this.labels["edit"],"javascript:" + this.evalReference() + ".edit()");
-        arr[arr.length] = new ContextMenuItem(this.labels["editTree"],"javascript:" + this.evalReference() + ".editBranch()");
+        arr[arr.length] = new ContextMenuItem(this.labels["editTree"],"javascript:" + this.evalReference() + ".editTree()");
         arr[arr.length] = new ContextMenuItem("<img src='/extras/assetManager/breakerLine.gif'>","");
         arr[arr.length] = new ContextMenuItem(this.labels["cut"],"javascript:" + this.evalReference() + ".cut()");
         arr[arr.length] = new ContextMenuItem(this.labels["copy"],"javascript:" + this.evalReference() + ".copy()");
