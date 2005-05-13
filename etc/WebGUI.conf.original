@@ -119,7 +119,7 @@ assetContainers = WebGUI::Asset::Wobject::Layout, \
 # and are not typically used as a normal part of content
 # management.
 
-utilityAssets => WebGUI::Asset::Template, \
+utilityAssets = WebGUI::Asset::Template, \
 		WebGUI::Asset::RichEdit
 
 # Optionally specify a group id for assets to tell WebGUI what
