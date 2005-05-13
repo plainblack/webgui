@@ -1,5 +1,14 @@
 ﻿6.6.1
  - Replaced defective confirm checkout commerce template.
+ - fix [ 1160019 ] Notification content type [temp fix -mwilson]
+ - fix [ 1173544 ] Rating increases view count [mwilson]
+ - fix [ 1177020 ] Preview, then Save a Post -subscribers get two notifications
+ - fix [ 1178367 ] Edit Shortcut doesn't work with wobjects without templateId
+ - fix [ 1180455 ] assetproxy of a nonexistent asset inserts the page_not_found
+ - fix [ 1182449 ] isMarkedRead not a template var in Post::getTemplateVars
+ - fix [ 1197781 ] Collaboration: sorting bug in sub_view FIXED! 
+   and [ 1182478 ] Coll::appendPostListTemplateVars does not sort by isSticky
+ - fix [ 1182630 ] thread::isMarkedRead should check thread's lastpost,not self
 
 
 6.6.0
