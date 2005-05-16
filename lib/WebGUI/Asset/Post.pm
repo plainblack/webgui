@@ -818,7 +818,7 @@ sub trash {
         $self->getThread->decrementReplies if ($self->isReply);
         if ($self->getThread->get("lastPostId") eq $self->getId) {
                 my $threadLineage = $self->getThread->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select assetId, dateSubmitted from Post where lineage like ".quote($threadLineage.'%')." and assetId<>".quote($self->getId)." order by dateSubmitted desc");
+                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($threadLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId order by Post.dateSubmitted desc");
                 $self->getThread->setLastPost($id,$date);
         }
 }
