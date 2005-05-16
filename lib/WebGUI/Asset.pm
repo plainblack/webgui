@@ -587,7 +587,7 @@ sub exportAsHtml {
 	WebGUI::Session::refreshUserInfo($userId) unless ($userId == $session{user}{userId});
 	delete $session{form}; 
 	$session{var}{adminOn} = $self->get('adminOn');
-	WebGUI::Session::refreshPageInfo($self->get('pageId'));
+	$self->WebGUI::Session::refreshPageInfo;
 	$self->{_properties}{cacheTimeout} = $self->{_properties}{cacheTimeoutVisitor} = 1;
 	$session{config}{uploadsURL} = $uploadsUrl;
 	$session{config}{extrasURL} = $extrasUrl;

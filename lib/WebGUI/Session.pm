@@ -383,19 +383,19 @@ sub open {
 
 #-------------------------------------------------------------------
 
-=head2 refreshPageInfo ( pageId ) 
+=head2 refreshPageInfo ( asset ) 
 
-Updates the WebGUI session to reflect new page information.
+Updates the WebGUI session to reflect new asset information.
 
-=head3 pageId
+=head3 asset
 
-Specify which page you want to change to.
+Specify which asset you want to change to.
 
 =cut
 
 sub refreshPageInfo {
-	my $pageId = shift;
-	$session{page} = WebGUI::SQL->quickHashRef("select * from page where pageId=".quote($pageId));
+	my $self = shift;
+	$session{asset} = $self;
 }
 
 #-------------------------------------------------------------------
