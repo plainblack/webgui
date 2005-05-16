@@ -67,7 +67,7 @@ sub appendPostListTemplateVars {
 			my $lastPost = $post->getLastPost();
 			if ($self->get("displayLastReply")) {
 				%lastReply = (
-					"lastReply.url"=>$lastPost->getUrl(),
+					"lastReply.url"=>$lastPost->getUrl.'#'.$lastPost->getId,
                         		"lastReply.title"=>$lastPost->get("title"),
                         		"lastReply.user.isVisitor"=>$lastPost->get("ownerUserId") eq "1",
                         		"lastReply.username"=>$lastPost->get("username"),
@@ -80,7 +80,7 @@ sub appendPostListTemplateVars {
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
                         "id"=>$post->getId,
-                        "url"=>$post->getUrl,
+                        "url"=>$post->getUrl.'#'.$post->getId,
 			rating_loop=>\@rating_loop,
 			"content"=>$post->formatContent,
                         "status"=>$post->getStatus,
