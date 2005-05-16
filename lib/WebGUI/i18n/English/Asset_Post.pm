@@ -396,6 +396,16 @@ A conditional indicating whether this Post should be opened in a new window.
 		lastUpdated => 1111464988,
 	},
 
+	'Edited_on' => {
+		message => q|Edited on|,
+		lastUpdated => 1116259200
+	},
+
+	'By' => {
+		message => q| by |,
+		lastUpdated => 1116259200,
+	},
+
 	'notification template title' => {
 		message => q|Notification Template|,
                 lastUpdated => 1111253044,

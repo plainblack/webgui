@@ -653,12 +653,12 @@ sub processPropertiesFromFormPost {
 	$data{startDate} = $self->getThread->getParent->get("startDate") unless ($session{form}{startDate});
 	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($session{form}{endDate});
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
-        if ($self->getThread->getParent->get("addEditStampToPosts")) {
-        	$data{content} .= "\n\n --- (Edited on ".WebGUI::DateTime::epochToHuman(undef,"%z %Z [GMT%O]")." by ".$session{user}{alias}.") --- \n";
-		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
-			$data{content} = '<p>'.$data{content}.'</p>';
-		}
-        }
+	if ($self->getThread->getParent->get("addEditStampToPosts")) {
+		$data{content} .= "\n\n --- (".WebGUI::International::get('Edited_on','Asset_Post')." ".WebGUI::DateTime::epochToHuman(undef,"%z %Z [GMT%O]").WebGUI::International::get('By','Asset_Post').$session{user}{alias}.") --- \n";
+	}
+	if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
+		$data{content} = '<p>'.$data{content}.'</p>';
+	}
 	$self->update(\%data);
         $self->getThread->subscribe if ($session{form}{subscribe});
         if ($self->getThread->getParent->get("moderatePosts")) {
@@ -680,7 +680,7 @@ sub processPropertiesFromFormPost {
 	WebGUI::Cache->new("wobject_".$self->getThread->getParent->getId."_".$session{user}{userId})->delete;
 	WebGUI::Cache->new("cspost_".($self->getParent->getId)."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_1")->delete;
 }
-                                                                                                                                                       
+
 
 #-------------------------------------------------------------------
 
