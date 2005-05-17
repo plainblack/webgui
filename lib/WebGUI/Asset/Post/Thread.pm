@@ -134,7 +134,7 @@ sub getLastPost {
 	my $lastPostId = $self->get("lastPostId");
 	my $lastPost;
 	if ($lastPostId) {
-		$lastPost = WebGUI::Asset::Post::Thread->new($lastPostId);
+		$lastPost = WebGUI::Asset::Post->new($lastPostId);
 	}
 	return $lastPost if (defined $lastPost);
 	return $self;	
