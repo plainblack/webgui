@@ -10,9 +10,9 @@ our $I18N = {
 	'thumbnail body' => {
 		message => q|
 
-<b>&#94;Thumbnail(<i>assetId</i>);</b><br>
+<b>&#94;Thumbnail(<i>url</i>);</b><br>
 This macro will allow you to fetch the thumbnail for any File or Image Asset by its
-AssetId.
+url.
 <p>
 
 |,
