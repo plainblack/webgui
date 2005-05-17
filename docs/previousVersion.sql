@@ -1289,7 +1289,7 @@ INSERT INTO Navigation VALUES ('PBnav00000000000000012','descendants','relativeT
 INSERT INTO Navigation VALUES ('PBnav00000000000000013','self\ndescendants','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000136',55);
 INSERT INTO Navigation VALUES ('f2bihDeMoI-Ojt2dutJNQA',NULL,'relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000071',55);
 INSERT INTO Navigation VALUES ('KZ2UytxNpbF-3Eg3RNvQQQ','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000075',55);
-INSERT INTO Navigation VALUES ('G0wlShbk_XruYVfbXqWq_w','pedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55);
+INSERT INTO Navigation VALUES ('G0wlShbk_XruYVfbXqWq_w','ancestors\nself\npedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55);
 
 --
 -- Table structure for table `Poll`
