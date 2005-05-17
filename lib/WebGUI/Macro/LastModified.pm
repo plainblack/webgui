@@ -13,23 +13,19 @@ package WebGUI::Macro::LastModified;
 use strict;
 use WebGUI::DateTime;
 use WebGUI::Macro;
+use WebGUI::Asset;
 use WebGUI::Session;
+use WebGUI::International;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-        my ($label, $format, $time, $output);
-
-        ($label, $format) = WebGUI::Macro::getParams(shift);
-        $format = '%z' if ($format eq "");
-	$output = "";
-
-        ($time) = WebGUI::SQL->quickArray("SELECT max(lastEdited) FROM wobject where pageId=".quote($session{page}{pageId}),WebGUI::SQL->getSlave);
-        if ($time) {
-		$output = $label.epochToHuman($time,$format);
-	}
-
-        return $output;
+	my ($label, $format, $time);
+	($label, $format) = WebGUI::Macro::getParams(shift);
+	$format = '%z' if ($format eq "");
+	($time) = WebGUI::SQL->quickArray("SELECT lastUpdated FROM asset where assetId=".quote($session{asset}->getId),WebGUI::SQL->getSlave);
+	return WebGUI::International::get(43,'Asset_Survey') if $time eq 0;
+	return $label.epochToHuman($time,$format) if ($time);
 }
 
 1;
