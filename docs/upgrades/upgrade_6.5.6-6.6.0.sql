@@ -5,7 +5,7 @@ alter table DataForm add column defaultView int(11) DEFAULT 0 NOT NULL;
 
 update template set template = '<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>\n<tmpl_if session.var.adminOn>\n<p><tmpl_var controls></p>\n</tmpl_if><p />\n<table width=\"100%\">\n<tr>\n<td class=\"tableHeader\">Entry ID</td>\n<tmpl_loop field_loop>\n  <tmpl_unless field.isMailField>\n    <td class=\"tableHeader\"><tmpl_var field.label></td>\n  </tmpl_unless field.isMailField>\n</tmpl_loop field_loop>\n<td class=\"tableHeader\">Submission Date</td>\n</tr>\n<tmpl_loop record_loop>\n<tr>\n  <td class=\"tableData\"><a href=\"<tmpl_var record.edit.url>\"><tmpl_var record.entryId></a></td>\n  <tmpl_loop record.data_loop>\n    <tmpl_unless record.data.isMailField>\n       <td class=\"tableData\"><tmpl_var record.data.value></td>\n     </tmpl_unless record.data.isMailField>\n  </tmpl_loop record.data_loop>\n  <td class=\"tableData\"><tmpl_var record.submissionDate.human></td>\n</tr>\n</tmpl_loop record_loop>\n</table>' where assetId='PBtmpl0000000000000021';
 alter table Navigation change endPoint descendantEndPoint int not null default 55;
-alter table Navigation add column ancestorEndPoint int not null default 55;
+alter table Navigation add column anscestorEndPoint int not null default 55;
 
 create table productVariants (
 	variantId	varchar(22) not null primary key,
