@@ -448,27 +448,25 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 =cut
 
 sub rate {
-        my $self = shift;
-        my $rating = shift;
-        unless ($self->hasRated) {
-                WebGUI::SQL->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-                        .quote($self->getId).", ".quote($session{user}{userId}).", ".quote($session{env}{REMOTE_ADDR}).",
-                        ".WebGUI::DateTime::time().", $rating)");
-        	my ($count) = WebGUI::SQL->quickArray("select count(*) from Post left join asset on Post.assetId=asset.assetId 
-			where Post.threadId=".quote($self->getId)." and Post.rating>0");
-        	$count = $count || 1;
-        	my ($sum) = WebGUI::SQL->quickArray("select sum(Post.rating) from Post left join asset on Post.assetId=asset.assetId
-			where Post.threadId=".quote($self->getId)." and Post.rating>0");
-        	my $average = round($sum/$count);
-        	$self->update({rating=>$average});
+	my $self = shift;
+	my $rating = shift;
+	unless ($self->hasRated) {
+		WebGUI::SQL->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
+			.quote($self->getId).", ".quote($session{user}{userId}).", ".quote($session{env}{REMOTE_ADDR}).",
+		".WebGUI::DateTime::time().", ".quote($rating).")");
+		my ($count) = WebGUI::SQL->quickArray("select count(*) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".quote($self->getId)." and Post.rating>0");
+		$count = $count || 1;
+		my ($sum) = WebGUI::SQL->quickArray("select sum(Post.rating) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".quote($self->getId)." and Post.rating>0");
+		my $average = round($sum/$count);
+		$self->update({rating=>$average});
 		if ($session{setting}{useKarma}) {
 			my $poster = WebGUI::User->new($self->get("ownerUserId"));
 			$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
 			my $rater = WebGUI::User->new($session{user}{userId});
-			$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId); 
+			$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId);
 		}
-        	$self->getParent->recalculateRating;
-        }
+		$self->getParent->recalculateRating;
+	}
 }
 
 

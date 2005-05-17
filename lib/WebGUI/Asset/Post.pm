@@ -395,7 +395,7 @@ sub getTemplateVars {
 	$var{"deny.url"} = $self->getDenyUrl;
 	$var{"reply.url"} = $self->getReplyUrl;
 	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
-	$var{'url'} = WebGUI::URL::getSiteURL().$self->getUrl.'#'.$self->getId;
+	$var{'url'} = $self->getUrl.'#'.$self->getId;
 	$var{'rating.value'} = $self->get("rating")+0;
 	$var{'rate.url.1'} = $self->getRateUrl(1);
 	$var{'rate.url.2'} = $self->getRateUrl(2);
@@ -706,7 +706,7 @@ sub rate {
         	my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from Post_rating where assetId=".quote($self->getId));
         	my $average = WebGUI::Utility::round($sum/$count);
         	$self->update({rating=>$average});
-		$self->getThread->rate;
+		$self->getThread->rate($rating);
 	}
 }
 
@@ -1049,7 +1049,7 @@ The web method to rate a post.
 
 sub www_rate {	
 	my $self = shift;
-	$self->rate($session{form}{rating}) if ($self->canView && !$self->hasRated);
+	$self->WebGUI::Asset::Post::rate($session{form}{rating}) if ($self->canView && !$self->hasRated);
 	$self->www_view;
 }
 
