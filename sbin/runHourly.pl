@@ -80,7 +80,7 @@ if (opendir (PLUGDIR,$plugdir)) {
 if (opendir (CONFDIR,$confdir)) {
         @files = readdir(CONFDIR);
         foreach $file (@files) {
-                if ($file =~ /(.*?)\.conf$/ && $file ne "some_other_site.conf") {
+                if ($file =~ /(.*?)\.conf$/ && $file ne "some_other_site.conf" && !($file =~ /log\.conf/ || $file =~ /(.*?)log\.conf$/)) {
 			print "\nProcessing ".$file.":\n" if ($verbose);
 			my $startTime = time();
 			WebGUI::Session::open($webguiRoot,$file);
