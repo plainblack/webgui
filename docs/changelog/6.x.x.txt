@@ -30,6 +30,7 @@
  - fix [ 1203693 ] Delete group fails with vital component
  - fix [ 1198695 ] 6.6 ß - Can't call method error on ratings.
  - fix [ 1204123 ] Bug: sortby.lastreply.url
+ - fix [ 1203779 ] "Remove" Button in FileUploadControl not internationalized
 
 
 6.6.0
