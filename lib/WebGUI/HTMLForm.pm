@@ -128,6 +128,10 @@ $f->dynamicField(text,
 	-intervalValue=>12,
 	-unitsValue=>"hours"
 	);
+ $f->ldapLink(
+    -name=>"ldapLink",
+	-label="LDAP Connection"
+    )
  $f->password(
 	-name=>"identifier",
 	-label=>"Password"
@@ -1626,6 +1630,85 @@ sub interval {
         $self->{_data} .= $output;
 }
 
+#-------------------------------------------------------------------
+
+=head2 ldapLink (  [name , value, label, afterEdit, extras, uiLevel, defaultValue ] )
+
+Adds a ldap link select list to the form.
+
+=head3 name
+
+The name of this form element.
+
+=head3 value
+
+The default value(s) for this form element. This should be passed as an array reference.
+
+=head3 label
+
+The left column label for this form row. Defaults to "LDAP Link".
+
+=head3 size 
+
+The number of characters tall this form element should be. Defaults to "1".
+
+=head3 multiple
+
+A boolean value for whether this select list should allow multiple selections. Defaults to "0".
+
+=head3 extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=head3 afterEdit
+
+A URL that will be acted upon after editing a database link. Typically there is a link next to the select list that reads "Edit this ldap link" and this is the URL to go to after editing is complete.
+
+=head3 uiLevel
+
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "5".
+
+=head3 defaultValue
+
+When no other value is passed, we'll use this.
+
+=cut
+
+sub ldapLink {
+   my ($output, $subtext);
+   my ($self, @p) = @_;
+   my ($name, $value, $label, $size, $multiple, $afterEdit, $extras, $uiLevel, $defaultValue) = rearrange([qw(name value label size multiple afterEdit extras uiLevel defaultValue)], @p);
+   $size = 1 unless ($size);
+   $multiple = 0 unless ($multiple);
+   if (_uiLevelChecksOut($uiLevel)) {
+      $label = $label || WebGUI::International::get(1075);
+	  if (WebGUI::Grouping::isInGroup(3)) {
+	     if ($afterEdit) {
+            $subtext = editIcon("op=editLDAPLink&amp;llid=".$value."&amp;afterEdit=".WebGUI::URL::escape($afterEdit));
+         }
+         $subtext .= manageIcon("op=listLDAPLinks");
+	  }
+      $output = WebGUI::Form::ldapLink({
+                	"name"=>$name,
+                	"value"=>$value,
+                	"extras"=>$extras,
+					"size"=>$size,
+					"multiple"=>$multiple,
+			        "defaultValue"=>$defaultValue
+                	});
+      $output .= _subtext($subtext);
+      $output = $self->_tableFormRow($label,$output);
+   } else {
+      $output = WebGUI::Form::hidden({
+                        "name"=>$name,
+                        "value"=>$value,
+			            "defaultValue"=>$defaultValue
+                      });
+   }
+   $self->{_data} .= $output;
+}
 
 #-------------------------------------------------------------------
 

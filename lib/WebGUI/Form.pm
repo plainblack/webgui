@@ -1296,6 +1296,57 @@ sub interval {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+                                                                                                                                                      
+=head2 ldapLink ( hashRef )
+                                                                                                                                                       
+Returns a select list of ldap links.
+                                                                                                                                                       
+=head3 name
+                                                                                                                                                       
+The name field for this form element. Defaults to "ldapLinkId".
+                                                                                                                                                       
+=head3 value
+                                                                                                                                               
+The default value(s) for this form element. This should be passed as an array reference. 
+                                                                                                                                         
+=head3 defaultValue
+
+This will be used if no value is specified. Defaults to 0 (the WebGUI database).
+
+=head3 size 
+
+The number of characters tall this form element should be. Defaults to "1".
+
+=head3 multiple
+
+A boolean value for whether this select list should allow multiple selections. Defaults to "0".
+
+=head3 extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=cut
+                                                                                                                                                             
+sub ldapLink {
+	my $params = shift;
+    my $value = $params->{value} || [$params->{defaultValue}] || [0];
+    my $name = $params->{name} || "ldapLinkId";
+	my $size = $params->{size} || 1;
+	my $multiple = $params->{multiple} || 0;
+	my $extras = $params->{extras} || "";
+    return selectList({
+                name=>$name,
+                options=>WebGUI::LDAPLink::getList(),
+                value=>$value,
+				size=>$size,
+				multiple=>$multiple,
+				extras=>$extras
+                });
+}
+
 
 #-------------------------------------------------------------------
 
