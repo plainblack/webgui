@@ -4361,6 +4361,11 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 1056151382
 	},
 	
+	'LDAPLink_1075' => {
+		message => q|LDAP Connection|,
+		lastUpdated => 1070899134
+	},
+	
 	'LDAPLink_1076' => {
 		message => q|WebGUI LDAP Connection|,
 		lastUpdated => 1070899134
