@@ -1316,6 +1316,11 @@ will be modified to make it unique.|,
 		lastUpdated => 1047838780
 	},
 
+	'removeLabel' => {
+		message => q|remove|,
+		lastUpdated => 1116450882
+	},
+
 	'72' => {
 		message => q|recover|,
 		lastUpdated => 1031514049
