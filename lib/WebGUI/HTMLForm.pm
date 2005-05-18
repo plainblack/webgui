@@ -1683,7 +1683,7 @@ sub ldapLink {
    $size = 1 unless ($size);
    $multiple = 0 unless ($multiple);
    if (_uiLevelChecksOut($uiLevel)) {
-      $label = $label || WebGUI::International::get(1075);
+      $label = $label || WebGUI::International::get("LDAPLink_1075");
 	  if (WebGUI::Grouping::isInGroup(3)) {
 	     if ($afterEdit) {
             $subtext = editIcon("op=editLDAPLink&amp;llid=".$value."&amp;afterEdit=".WebGUI::URL::escape($afterEdit));
