@@ -1,6 +1,6 @@
 ﻿6.6.1
  - Replaced defective confirm checkout commerce template.
- - fix [ 1160019 ] Notification content type [temp fix -mwilson]
+ - fix [ 1160019 ] Notification content type [temp fix] <mwilson's fixes>
  - fix [ 1173544 ] Rating increases view count [mwilson]
  - fix [ 1177020 ] Preview, then Save a Post -subscribers get two notifications
  - fix [ 1178367 ] Edit Shortcut doesn't work with wobjects without templateId
@@ -14,6 +14,21 @@
  - fix [ 1190276 ] cannot use encrypt page recursively
  - fix [ 1197360 ] "anscestor" flub in 6.6.0 upgrade file.
  - fix [ 1191650 ] plainblack.com links that are copy/pasted append ..
+ - fix [ 1190814 ] The builtin help describes the removed Navigation macro
+ - fix [ 1199193 ] lastReply.url not complete
+ - fix [ 1201322 ] Form: fixChars don't work
+ - fix [ 1198799 ] Moving Threads or Posts in the Trash
+ - fix [ 1198000 ] Macro not listed in Rich Editor Assset helper
+ - fix [ 1196929 ] page table still being used
+ - fix [ 1195909 ] create.sql - left navigation doesn't show home
+ - fix [ 1193694 ] webgui::auth::webgui::createAccountSave $self->_logLogin bug
+ - fix [ 1186440 ] Asset/Post.pm content type only checked if editStamp set
+ - fix [ 1203331 ] i18n::Macro_Thumbnail.pm
+ - fix [ 1203413 ] Fix: Rating bug in Thread.pm
+ - fix [ 1203603 ] Error in admin console
+ - fix [ 1187037 ] LastModified.pm refers to LastEdited and pageId from wobject
+ - fix [ 1203693 ] Delete group fails with vital component
+ - fix [ 1198695 ] 6.6 ß - Can't call method error on ratings.
 
 
 6.6.0
