@@ -490,7 +490,7 @@ sub getUploadControl {
 			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
 		}
 	}
-	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images, '.WebGUI::International::get('removeLabel','WebGUI').');
+	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images, "'.WebGUI::International::get('removeLabel','WebGUI').'");
 	uploader.addRow();
 	</script>';
 	return $uploadControl;
