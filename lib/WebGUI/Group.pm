@@ -671,6 +671,75 @@ sub dbCacheTimeout {
         return $class->{_group}{"dbCacheTimeout"};
 }
 
+#-------------------------------------------------------------------
 
+=head2 ldapGroup ( [ value ] )
+
+Returns the ldapGroup for this group.
+
+=head3 value
+
+If specified, the ldapGroup is set to this value.
+
+=cut
+
+sub ldapGroup {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+           $class->{_group}{"ldapGroup"} = $value;
+           WebGUI::SQL->write("update groups set ldapGroup=".quote($value).",
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+        }
+        return $class->{_group}{"ldapGroup"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 ldapGroupProperty ( [ value ] )
+
+Returns the ldap group property for this group.
+
+=head3 value
+
+If specified, the ldapGroupProperty is set to this value.
+
+=cut
+
+sub ldapGroupProperty {
+        my ($class, $value);
+        $class = shift;
+        $value = shift;
+        if (defined $value) {
+           $class->{_group}{"ldapGroupProperty"} = $value;
+           WebGUI::SQL->write("update groups set ldapGroupProperty=".quote($value).",
+                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+        }
+        return $class->{_group}{"ldapGroupProperty"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 ldapRecursiveProperty ( [ value ] )
+
+Returns the ldap group recursive property used to find groups of groups.
+
+=head3 value
+
+If specified, the ldapRecursiveProperty is set to this value.
+
+=cut
+
+sub ldapRecursiveProperty {
+   my ($class, $value);
+   $class = shift;
+   $value = shift;
+   if (defined $value) {
+      $class->{_group}{"ldapRecursiveProperty"} = $value;
+      WebGUI::SQL->write("update groups set ldapRecursiveProperty=".quote($value).", lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+   }
+   return $class->{_group}{"ldapRecursiveProperty"};
+}
 
 1;
