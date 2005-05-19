@@ -336,6 +336,22 @@ sub www_editGroup {
 		-value=>$g->dbQuery,
 		-label=>WebGUI::International::get(1005)
 		);
+	$f->text(
+	       -name=>"ldapGroup",
+		   -label=>WebGUI::International::get("LDAPLink_ldapGroup"),
+	       -value=>$g->ldapGroup
+		);
+    $f->text(
+	       -name=>"ldapGroupProperty",
+		   -label=>WebGUI::International::get("LDAPLink_ldapGroupProperty"),
+		   -value=>$g->ldapGroupProperty,
+		   -defaultValue=>"member"
+	    );
+    $f->text(
+	       -name=>"ldapRecursiveProperty",
+		   -label=>WebGUI::International::get("LDAPLink_ldapRecursiveProperty"),
+		   -value=>$g->ldapRecursiveProperty
+	    );
 	$f->interval(
 		-name=>"dbCacheTimeout",
 		-label=>WebGUI::International::get(1004), 
@@ -365,7 +381,10 @@ sub www_editGroupSave {
 	$g->databaseLinkId($session{form}{databaseLinkId});
 	$g->dbQuery($session{form}{dbQuery});
 	$g->dbCacheTimeout(WebGUI::FormProcessor::interval("dbCacheTimeout"));
-        return www_listGroups();
+	$g->ldapGroup(WebGUI::FormProcessor::text("ldapGroup"));
+	$g->ldapGroupProperty(WebGUI::FormProcessor::text("ldapGroupProperty"));
+	$g->ldapRecursiveProperty(WebGUI::FormProcessor::text("ldapRecursiveProperty"));
+    return www_listGroups();
 }
 
 #-------------------------------------------------------------------
