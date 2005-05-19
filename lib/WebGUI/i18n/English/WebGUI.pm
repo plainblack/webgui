@@ -4431,7 +4431,21 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		message => q|Are you certain you wish to delete this ldap connection?|,
 		lastUpdated => 1116151382
 	},
-
+	
+	'LDAPLink_ldapGroup' => {
+		message => q|LDAP Group|,
+		lastUpdated => 1116151382
+	},
+	
+	'LDAPLink_ldapGroupProperty' => {
+		message => q|LDAP Group Property|,
+		lastUpdated => 1116151382
+	},
+	
+	'LDAPLink_ldapRecursiveProperty' => {
+		message => q|LDAP Recursive Group Property|,
+		lastUpdated => 1116151382
+	},
 
 };
 
