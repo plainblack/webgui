@@ -15,9 +15,11 @@ package WebGUI::Grouping;
 =cut
 
 use strict;
+use WebGUI::Auth;
 use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
+use WebGUI::LDAPLink;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -357,7 +359,7 @@ sub isInGroup {
 	}
         ### Get data for auxillary checks.
         tie %group, 'Tie::CPHash';
-        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout from groups where groupId=".quote($gid));
+        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout,ldapGroup,ldapGroupProperty,ldapRecursiveProperty from groups where groupId=".quote($gid));
         ### Check IP Address
         if ($group{ipFilter} ne "") {
                 $group{ipFilter} =~ s/\t//g;
@@ -435,6 +437,42 @@ sub isInGroup {
                         }
                 }
         }
+		
+		 ### Check external database
+        if ($group{ldapGroup} ne "" && $group{ldapGroupProperty} ne "") {
+		   # skip if not logged in
+		   unless($uid eq '1') {
+		      my $u = WebGUI::User->new($uid);
+			  # skip if user is not set to LDAP
+			  if($u->authMethod eq "LDAP") {
+			     my $auth = WebGUI::Auth->new("LDAP",$uid);
+				 my $params = $auth->getParams();
+				 my $ldapLink = WebGUI::LDAPLink->new($params->{ldapConnection});
+				 if($ldapLink ne "") {
+					my $people = [];
+					if($group{ldapRecursiveProperty}) {
+					   $ldapLink->recurseProperty($group{ldapGroup},$people,$group{ldapGroupProperty},$group{ldapRecursiveProperty});
+					}else {
+					   $people = $ldapLink->getProperty($group{ldapGroup},$group{ldapGroupProperty});
+					}
+					 
+				    if(isIn($params->{connectDN},@{$people})) {
+					   $session{isInGroup}{$uid}{$gid} = 1;
+                       if ($group{dbCacheTimeout} > 10) {
+                          WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
+                          WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
+                       }
+					} else {
+					   $session{isInGroup}{$uid}{$gid} = 0;
+                       WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 10);
+					}
+					$ldapLink->unbind;
+				    return 1 if ($session{isInGroup}{$uid}{$gid});
+				 }
+			  }
+		   }
+		}
+		
         ### Check for groups of groups.
         my $groups = WebGUI::Grouping::getGroupsInGroup($gid,1);
         foreach (@{$groups}) {
