@@ -58,7 +58,7 @@ sub bind {
 	my ($uri, $ldap, $auth, $result, $error);
 	
 	if (defined $class->{_connection}) {
-		return $class->{_connetcion};
+		return $class->{_connection};
 	}
 	
 	my $ldapUrl = $class->{_ldapLink}->{ldapUrl};
@@ -190,6 +190,124 @@ sub new {
 	return undef unless $ldapLinkId;
 	$ldapLink = get($ldapLinkId);
 	bless {_ldapLinkId => $ldapLinkId, _ldapLink => $ldapLink }, $class;
+}
+
+#-------------------------------------------------------------------
+=head2  getProperty(dn,property)
+
+  Returns the results of a search on the property passed in
+
+=head3 distinguished name of property
+
+ distinguished name of group to check users for
+
+=head3 property
+
+ ldap property to retrieve from distinguished name
+
+=cut
+
+sub getProperty {
+   my $self = shift;
+   my $ldap = $self->bind;
+   my $dn = $_[0];
+   my $property = $_[1];
+   return [] unless($ldap && $dn && $property);
+   my $results = [];
+   my $msg = $ldap->search( 
+                             base   => $dn,
+                             scope  => 'sub',
+                             filter => "&(objectClass=*)"
+                          );
+   if(!$msg->code && $msg->count > 0 ){
+      my $entry = $msg->entry(($msg->count)-1);
+      $results = $entry->get_value($property,asref => 1);
+   }
+   return $results;
+}
+
+#-------------------------------------------------------------------
+=head2  getRecursiveProperty(dn,property[,recursiveProperty])
+
+  Returns the results of a search on the property passed in
+
+=head3 distinguished name of property
+
+ distinguished name of group to check users for
+
+=head3 property
+
+ ldap property to retrieve from distinguished name
+
+=head3 recursiveProperty
+
+ property to recursively search.  If no recursive property is passed, the
+ 
+=cut
+
+#sub getRecursiveProperty {
+#   my $self = shift;
+#   my $ldap = $self->bind;
+#   my $dn = $_[0];
+#   my $property = $_[1];
+#   my $recProp = $_[2] || $property;
+#   return [] unless($ldap && $dn && $property);
+#   my $results = [];
+#   my $msg = $ldap->search( 
+#                             base   => $dn,
+#                             scope  => 'sub',
+#                             filter => "&(objectClass=*)"
+#                          );
+#   if(!$msg->code && $msg->count > 0 ){
+#      my $entry = $msg->entry(($msg->count)-1);
+#      $self->recurseProperty($entry,$users,$property,$recProp,0);
+#   }
+#   return $results;
+#}
+
+#-------------------------------------------------------------------
+=head2  recurseProperty(base,array,property,alternateKey)
+
+  Returns the whether or not the user is in a particular group
+
+=cut
+
+sub recurseProperty {
+   my $self = shift;
+   my $ldap = $self->bind;
+   my $base = $_[0];
+   my $array = $_[1] || [];
+   my $property = $_[2];
+   my $recProperty = $_[3] || $property;
+   my $count = $_[4] || 0;
+   return unless($ldap && $base && $property);
+   
+   #Prevent infinate recursion
+   $count++;
+   return if $count == 99;
+   
+   #search the base
+   my $msg = $ldap->search( 
+                                 base   => $base,
+                                 scope  => 'sub',
+                                 filter => "&(objectClass=*)"
+                              );
+   #return if nothing found
+   return if($msg->code || $msg->count == 0);
+   #loop through the results
+   for (my $i = 0; $i < $msg->count; $i++) {
+      my $entry = $msg->entry($i);
+      #push all the values stored in the property on to the array stack
+	  my $properties = $entry->get_value($property,asref => 1);
+      push(@{$array},@{$properties});
+	  #Loop through the recursive keys
+	  if($property ne $recProperty) {
+	     $properties = $entry->get_value($recProperty,asref => 1);
+	  }
+	  foreach my $prop (@{$properties}) {
+	     $self->recurseProperty($prop,$array,$property,$recProperty,$count);
+	  }
+   }  
 }
 
 1;
