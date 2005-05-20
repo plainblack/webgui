@@ -1,5 +1,6 @@
 ﻿6.6.1
  - Replaced defective confirm checkout commerce template.
+ - Fixed a typo in the Navigation table schema.
  - fix [ 1160019 ] Notification content type [temp fix] <mwilson's fixes>
  - fix [ 1173544 ] Rating increases view count [mwilson]
  - fix [ 1177020 ] Preview, then Save a Post -subscribers get two notifications

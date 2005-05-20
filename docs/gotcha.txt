@@ -16,6 +16,7 @@ save you many hours of grief.
 	them using testEnvironment.pl The new modules you'll need 
 	to install are:
 
+	Log::Log4perl
 	Net::LDAP
 	Date::Manip
 	DBIx::FullTextSearch
