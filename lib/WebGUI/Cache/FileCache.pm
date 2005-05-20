@@ -90,7 +90,11 @@ Remove all objects from the filecache system.
 sub flush {
 		my $self = shift;
 		$self->SUPER::flush();
-                return $self->{_cache}->Clear;
+  	foreach my $namespace ($self->{_cache}->get_namespaces) {
+                next if ($namespace =~ /\.conf$/ && $namespace ne $session{config}{configFile});
+                $self->{_cache}->set_namespace($namespace);
+		$self->{_cache}->clear;
+        }
 }
 
 #-------------------------------------------------------------------
@@ -206,6 +210,7 @@ sub stats {
         my $output;
 	$output = "Total size of file cache: ".$self->{_cache}->Size()." bytes\n";
 	foreach my $namespace ($self->{_cache}->get_namespaces) {
+		next if ($namespace =~ /\.conf$/ && $namespace ne $session{config}{configFile});
 		$self->{_cache}->set_namespace($namespace);
 		$output .= "\t$namespace : ".($self->{_cache}->get_keys).
 				" items / ".$self->{_cache}->size()." bytes\n";

@@ -32,7 +32,7 @@
  - fix [ 1198695 ] 6.6 ß - Can't call method error on ratings.
  - fix [ 1204123 ] Bug: sortby.lastreply.url
  - fix [ 1203779 ] "Remove" Button in FileUploadControl not internationalized
-
+ - fix [ 1201650 ] Server-wide Cache can be viewed/cleared by an admin
 
 6.6.0
  - Added a shopping cart system and salable products management system. This
