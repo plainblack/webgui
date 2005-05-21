@@ -134,9 +134,10 @@ our $I18N = {
 	},
 
 	'1093' => {
-		message => q|<P>Edit Navigation lets you add and edit what are essentially 'menu templates' -- they define which pages' Menu Names should be included in a menu, optionally based on where that menu appears.</P>
-<P>The Add/Edit Navigation form allows you to do choose the set of pages, and to choose which
-template is used to create the menu.</P>
+		message => q|<P>The Add/Edit Navigation form allows you to do choose the which pages are shown in
+		your site navigation, and how to display them.  Some of the default Navigation templates that come with WebGUI are
+		vertical, horizontal and crumbtrail.  These templates can often be styled via CSS to match your site's design, instead
+		of rewriting the templates.</P>
 <P><B>Identifier</B><BR>This is the (unique) label you will later use to specify this Navigation definition in a &#94;Navigation(); macro.</P>
 <P><B>Base Page<BR></B>This identifies the spot in the Page Tree where the macro should commence listing pages. The first three choices will create 'absolute' menus -- ones which will display the same pages no matter which page you use the macro from. </P>
 <P></P>
@@ -165,7 +166,7 @@ the Navigation Template to determine who can see them in the menu.</P>
 <P><B>Template</B><BR>This menu permits you to select a template which is used to style the output created by the macro -- if you need the same collection of pages in multiple formats, you'll need to create multiple Navigation entries with (slightly) different names; the Copy Navigation button is useful for this.</P>
 <P><B>Reverse Output</B><BR>When this option is switched on, the menu will be in reverse order.</P>
 <P><B>Preview</B><BR>The Preview button allows you to view a navigation setup without actually saving it.</P>|,
-		lastUpdated => 1106872055,
+		lastUpdated => 1116701049,
 	},
 
 	'1096' => {
