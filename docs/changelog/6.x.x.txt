@@ -2,7 +2,7 @@
  - Replaced defective confirm checkout commerce template.
  - Fixed a typo in the Navigation table schema.
  - fix [ 1160019 ] Notification content type [temp fix] <mwilson's fixes>
- - fix [ 1173544 ] Rating increases view count [mwilson]
+ - fix [ 1173544 ] Rating increases view count
  - fix [ 1177020 ] Preview, then Save a Post -subscribers get two notifications
  - fix [ 1178367 ] Edit Shortcut doesn't work with wobjects without templateId
  - fix [ 1180455 ] assetproxy of a nonexistent asset inserts the page_not_found
@@ -33,6 +33,8 @@
  - fix [ 1204123 ] Bug: sortby.lastreply.url
  - fix [ 1203779 ] "Remove" Button in FileUploadControl not internationalized
  - fix [ 1201650 ] Server-wide Cache can be viewed/cleared by an admin
+ - fix [ 1197095 ] runHourly not finishing
+
 
 6.6.0
  - Added a shopping cart system and salable products management system. This
