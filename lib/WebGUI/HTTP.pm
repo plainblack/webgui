@@ -81,7 +81,7 @@ sub getHeader {
 	my $status = getStatus();
 	if($session{env}{MOD_PERL}) {
         	my $r;
-		if ($$mod_perl::VERSION >= 1.999023) {
+		if ($mod_perl::VERSION >= 1.999023) {
 			$r = Apache2::RequestUtil->request;
 		} else {
 			$r = Apache->request;
