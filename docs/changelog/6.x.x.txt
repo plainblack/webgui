@@ -39,6 +39,8 @@
  - Fixed a bug with the rich editor locking up when switching between tabs.
  - fix [ 1187256 ] WG v6.5.6 incompatible with mod_perl v2.0.0RC5? (Koen de
    Jonge)
+ - fix [ 1206199 ] ^/; macro edited in save mode...
+ - fix [ 1206046 ] function tinyMCE_WebGUI_Cleanup don't work
 
 
 6.6.0

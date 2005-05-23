@@ -11,6 +11,7 @@ function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
         url = url.replace(new RegExp("%3B", "g"), ";");
         url = url.replace(new RegExp("%28", "g"), "(");
         url = url.replace(new RegExp("%29", "g"), ")");
+	url = url.replace(/^\/\^/,"^");
         return url;
 }
 

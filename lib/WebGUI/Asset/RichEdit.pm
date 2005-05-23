@@ -427,7 +427,6 @@ sub getRichEditor {
 		directionality => $self->getValue("directionality"),
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
 		extended_valid_elements => $self->getValue("extendedValidElements"),
-#		theme_advanced_path_location => $self->getValue("pathLocation"),
 		);
 	foreach my $button (@toolbarButtons) {
 		push(@plugins,"table") if ($button eq "tablecontrols");	
