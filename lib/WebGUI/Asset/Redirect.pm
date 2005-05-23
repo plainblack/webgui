@@ -17,6 +17,7 @@ package WebGUI::Asset::Redirect;
 use strict;
 use WebGUI::Asset;
 use WebGUI::HTTP;
+use WebGUI::Macro;
 use WebGUI::Session;
 
 our @ISA = qw(WebGUI::Asset);
@@ -150,7 +151,7 @@ sub www_view {
 	if ($session{var}{adminOn}) {
 		return $self->getContainer->www_view;
 	}
-WebGUI::HTTP::setRedirect($self->get("redirectUrl")) unless $self->newByUrl($self->get("redirectUrl"))->getUrl eq $self->getUrl;
+	WebGUI::HTTP::setRedirect(WebGUI::Macro::process($self->get("redirectUrl"))) unless $self->newByUrl($self->get("redirectUrl"))->getUrl eq $self->getUrl;
 	return "Redirect is self-referential";
 }
 

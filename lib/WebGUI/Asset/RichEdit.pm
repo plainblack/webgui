@@ -412,6 +412,7 @@ sub getRichEditor {
 		mode => "specific_textareas",
 		theme => "advanced",
 		document_base_url => "/",
+		auto_reset_designmode => "true",
     		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
     		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
 		theme_advanced_buttons1 => join(",",@toolbarRow1),

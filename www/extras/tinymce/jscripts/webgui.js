@@ -14,7 +14,7 @@ function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
         return url;
 }
 
-function tinyMCE_WebGUI_Cleanup(content) {
+function tinyMCE_WebGUI_Cleanup(type,content) {
 	return content.replace(new RegExp("&quot;","g"),'"');
 }
 

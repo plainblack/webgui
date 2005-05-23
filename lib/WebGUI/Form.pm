@@ -1432,7 +1432,7 @@ sub phone {
 	return text({
 		name=>$params->{name},
 		maxlength=>$maxLength,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789-()+ \')" '.$params->{extras},
+		extras=>'onkeyup="doInputCheck(this.form.'.$params->{name}.',\'0123456789-()+ \')" '.$params->{extras},
 		value=>$params->{value},
 		size=>$params->{size},
 		defaultValue=>$params->{defaultValue}

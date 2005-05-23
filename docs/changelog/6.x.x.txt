@@ -33,7 +33,12 @@
  - fix [ 1204123 ] Bug: sortby.lastreply.url
  - fix [ 1203779 ] "Remove" Button in FileUploadControl not internationalized
  - fix [ 1201650 ] Server-wide Cache can be viewed/cleared by an admin
+ - fix [ 1205128 ] typo in \lib\WebGUI\AdminConsole.pm
+ - Fixed a bug with macro quotes and TinyMCE.
  - fix [ 1197095 ] runHourly not finishing
+ - Fixed a bug with the rich editor locking up when switching between tabs.
+ - fix [ 1187256 ] WG v6.5.6 incompatible with mod_perl v2.0.0RC5? (Koen de
+   Jonge)
 
 
 6.6.0
@@ -120,6 +125,8 @@
  - fix [ 1180291 ] tinymce resets src of img incorrectly
  - fix [ 1186395 ] survey: view statisics broken
  - RFE 1035743, internationalize WebGUI macros.
+ - Redirects now process macros in the redirect URL.
+ - You can now tie LDAP groups to WebGUI groups.
 
 
 6.5.6

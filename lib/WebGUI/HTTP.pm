@@ -80,7 +80,12 @@ sub getHeader {
 	$params{"-cookie"} = $session{http}{cookie};
 	my $status = getStatus();
 	if($session{env}{MOD_PERL}) {
-        	my $r = Apache->request;
+        	my $r;
+		if ($$mod_perl::VERSION >= 1.999023) {
+			$r = Apache2::RequestUtil->request;
+		} else {
+			$r = Apache->request;
+		}		
                 if(defined($r)) {
                 	$r->custom_response($status, '<!-- '.$session{http}{statusDescription}.' -->' );
                         $r->status($status);
