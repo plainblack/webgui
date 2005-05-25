@@ -1259,7 +1259,7 @@ CREATE TABLE Navigation (
   showHiddenPages int(11) NOT NULL default '0',
   showUnprivilegedPages int(11) NOT NULL default '0',
   templateId varchar(22) NOT NULL default '',
-  anscestorEndPoint int(11) NOT NULL default '55',
+  ancestorEndPoint int(11) NOT NULL default '55',
   PRIMARY KEY  (assetId)
 ) TYPE=MyISAM;
 
@@ -1852,8 +1852,8 @@ CREATE TABLE asset (
   extraHeadTags text,
   isPrototype int(11) NOT NULL default '0',
   PRIMARY KEY  (assetId),
-  UNIQUE KEY url (url),
   UNIQUE KEY lineage (lineage),
+  UNIQUE KEY url (url),
   KEY parentId (parentId),
   KEY state_parentId_lineage (state,parentId,lineage),
   KEY isPrototype_className_assetId (isPrototype,className,assetId)
@@ -2027,7 +2027,7 @@ INSERT INTO asset VALUES ('PBrichedit000000000001','PBasset000000000000002','000
 INSERT INTO asset VALUES ('PBtmpl0000000000000053','r4FQlrIkS1_MTuk-vVqRNg','000001000001000003000177000001','published','WebGUI::Asset::Template','Subscription code redemption','Subscription code redemption','subscription_code_redemption',997995720,32472169200,'3','4','4',NULL,0,1,0,0,121,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000046','HOleaBMUZT6B5qJmbcV5xg','000001000001000003000170000001','published','WebGUI::Asset::Template','Subscriptionitem default template','Subscriptionitem default template','subscriptionitem_default_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,136,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000018','5SdElAemaCKBfheDk7rz8A','000001000001000003000147000001','published','WebGUI::Asset::Template','Default transaction error template','Default transaction error template','default_transaction_error_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,484,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000016','j3yljeaT2y9fLkSHM5Zbow','000001000001000003000145000001','published','WebGUI::Asset::Template','Default checkout confirmation template','Default checkout confirmation template','default_checkout_confirmation_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1090,1115241872,'1',0,NULL,0);
+INSERT INTO asset VALUES ('PBtmpl0000000000000016','j3yljeaT2y9fLkSHM5Zbow','000001000001000003000145000001','published','WebGUI::Asset::Template','Default checkout confirmation template','Default checkout confirmation template','default_checkout_confirmation_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2034,1116875930,'1',0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000019','arabONid_vy2W6cALhELxA','000001000001000003000148000001','published','WebGUI::Asset::Template','Default view purchase history template','Default view purchase history template','default_view_purchase_history_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,540,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000015','VvgRRrE6UsmWi7y7hMCXbw','000001000001000003000144000001','published','WebGUI::Asset::Template','Default cancel checkout template','Default cancel checkout template','default_cancel_checkout_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,18,1109194982,NULL,0,NULL,0);
 INSERT INTO asset VALUES ('PBtmpl0000000000000017','2jkEIs9YpL10dZsA3RH4sw','000001000001000003000146000001','published','WebGUI::Asset::Template','Default payment gateway selection template','Default payment gateway selection template','default_payment_gateway_selection_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,468,1109194982,NULL,0,NULL,0);
@@ -2414,6 +2414,9 @@ CREATE TABLE groups (
   dbQuery text,
   isEditable int(11) NOT NULL default '1',
   showInForms int(11) NOT NULL default '1',
+  ldapGroup varchar(255) default NULL,
+  ldapGroupProperty varchar(255) default NULL,
+  ldapRecursiveProperty varchar(255) default NULL,
   PRIMARY KEY  (groupId)
 ) TYPE=MyISAM;
 
@@ -2422,24 +2425,24 @@ CREATE TABLE groups (
 --
 
 
-INSERT INTO groups VALUES ('1','Visitors','This is the public group that has no privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1);
-INSERT INTO groups VALUES ('2','Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1);
-INSERT INTO groups VALUES ('3','Admins','Anyone who belongs to this group has privileges to do anything and everything.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1);
-INSERT INTO groups VALUES ('4','Content Managers','Users that have privileges to edit content on this site. The user still needs to be added to a group that has editing privileges on specific pages.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1);
-INSERT INTO groups VALUES ('6','Package Managers','Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1);
-INSERT INTO groups VALUES ('7','Everyone','A group that automatically includes all users including Visitors.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1);
-INSERT INTO groups VALUES ('8','Template Managers','Users that have privileges to edit templates for this site.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1);
-INSERT INTO groups VALUES ('9','Theme Managers','Users in this group can use the theme manager to create new themes and install themes from other systems.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1);
-INSERT INTO groups VALUES ('13','Export Managers','Users in this group can export pages to disk.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1);
-INSERT INTO groups VALUES ('11','Secondary Admins','Users that have limited administrative privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1);
-INSERT INTO groups VALUES ('12','Turn Admin On','These users can enable admin mode.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,0);
-INSERT INTO groups VALUES ('a7jbpVdbzxchqtSj_9W71w','DC1etlIaBRQitXnchZKvUw','The group to store subscriptions for the collaboration system DC1etlIaBRQitXnchZKvUw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
-INSERT INTO groups VALUES ('wP1Lt8NIySq9MS8xPGnAsQ','pSygeMG7bSL1Za0SNqfUbw','The group to store subscriptions for the thread pSygeMG7bSL1Za0SNqfUbw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
-INSERT INTO groups VALUES ('OL-d6C93EeUr4Rja-q3-yQ','mdIaXozmVNE_Rga2BY0mxA','The group to store subscriptions for the thread mdIaXozmVNE_Rga2BY0mxA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
-INSERT INTO groups VALUES ('YPCggIxdKT3AMMlML-CAuw','9kDcFufTKbMTkeAHyP36fw','The group to store subscriptions for the thread 9kDcFufTKbMTkeAHyP36fw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
-INSERT INTO groups VALUES ('C02CXMw3c42EJJR_nktyMw','5Y8eOI2u_HOvkzrRuLdz1g','The group to store subscriptions for the thread 5Y8eOI2u_HOvkzrRuLdz1g',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
-INSERT INTO groups VALUES ('zZmjNsD1FhaSFkgXvnCQUg','ImmYJRWOPFedzI4Bg1k6GA','The group to store subscriptions for the thread ImmYJRWOPFedzI4Bg1k6GA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0);
-INSERT INTO groups VALUES ('14','Product Managers','The group that is allowed to edit, delete and create products.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,1,1);
+INSERT INTO groups VALUES ('1','Visitors','This is the public group that has no privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('2','Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('3','Admins','Anyone who belongs to this group has privileges to do anything and everything.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('4','Content Managers','Users that have privileges to edit content on this site. The user still needs to be added to a group that has editing privileges on specific pages.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('6','Package Managers','Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('7','Everyone','A group that automatically includes all users including Visitors.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('8','Template Managers','Users that have privileges to edit templates for this site.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('9','Theme Managers','Users in this group can use the theme manager to create new themes and install themes from other systems.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('13','Export Managers','Users in this group can export pages to disk.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('11','Secondary Admins','Users that have limited administrative privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('12','Turn Admin On','These users can enable admin mode.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,0,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('a7jbpVdbzxchqtSj_9W71w','DC1etlIaBRQitXnchZKvUw','The group to store subscriptions for the collaboration system DC1etlIaBRQitXnchZKvUw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('wP1Lt8NIySq9MS8xPGnAsQ','pSygeMG7bSL1Za0SNqfUbw','The group to store subscriptions for the thread pSygeMG7bSL1Za0SNqfUbw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('OL-d6C93EeUr4Rja-q3-yQ','mdIaXozmVNE_Rga2BY0mxA','The group to store subscriptions for the thread mdIaXozmVNE_Rga2BY0mxA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('YPCggIxdKT3AMMlML-CAuw','9kDcFufTKbMTkeAHyP36fw','The group to store subscriptions for the thread 9kDcFufTKbMTkeAHyP36fw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('C02CXMw3c42EJJR_nktyMw','5Y8eOI2u_HOvkzrRuLdz1g','The group to store subscriptions for the thread 5Y8eOI2u_HOvkzrRuLdz1g',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('zZmjNsD1FhaSFkgXvnCQUg','ImmYJRWOPFedzI4Bg1k6GA','The group to store subscriptions for the thread ImmYJRWOPFedzI4Bg1k6GA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
+INSERT INTO groups VALUES ('14','Product Managers','The group that is allowed to edit, delete and create products.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,1,1,NULL,NULL,NULL);
 
 --
 -- Table structure for table `incrementer`
@@ -2770,7 +2773,7 @@ INSERT INTO settings VALUES ('useKarma','0');
 INSERT INTO settings VALUES ('karmaPerLogin','1');
 INSERT INTO settings VALUES ('runOnRegistration','');
 INSERT INTO settings VALUES ('maxImageSize','100000');
-INSERT INTO settings VALUES ('showDebug','1');
+INSERT INTO settings VALUES ('showDebug','0');
 INSERT INTO settings VALUES ('richEditor','PBrichedit000000000001');
 INSERT INTO settings VALUES ('selfDeactivation','1');
 INSERT INTO settings VALUES ('snippetsPreviewLength','30');
@@ -2803,10 +2806,11 @@ INSERT INTO settings VALUES ('webguiCreateAccountTemplate','PBtmpl00000000000000
 INSERT INTO settings VALUES ('webguiExpiredPasswordTemplate','PBtmpl0000000000000012');
 INSERT INTO settings VALUES ('webguiLoginTemplate','PBtmpl0000000000000013');
 INSERT INTO settings VALUES ('webguiPasswordRecoveryTemplate','PBtmpl0000000000000014');
-INSERT INTO settings VALUES ('specialState','init');
 INSERT INTO settings VALUES ('ldapConnection',NULL);
 INSERT INTO settings VALUES ('commerceSelectShippingMethodTemplateId','PBtmplCSSM000000000001');
 INSERT INTO settings VALUES ('commerceViewShoppingCartTemplateId','PBtmplVSC0000000000001');
+INSERT INTO settings VALUES ('specialState','init');
+INSERT INTO settings VALUES ('commerceSendDailyReportTo','');
 
 --
 -- Table structure for table `shoppingCart`
@@ -3057,7 +3061,7 @@ INSERT INTO template VALUES ('<p>\r\n  <table cellpadding=3 cellspacing=0 border
 INSERT INTO template VALUES ('<tmpl_if batchDescription>\r\nBatch: <tmpl_var batchDescription>\r\n</tmpl_if>\r\n\r\n<tmpl_var message><br>\r\n<tmpl_var codeForm>','Operation/RedeemSubscription',1,1,'PBtmpl0000000000000053');
 INSERT INTO template VALUES ('<h2><tmpl_var name></h2>\r\n<tmpl_var description><br>\r\n<br>\r\n<br>\r\n$ <tmpl_var price><br>\r\n<a href=\"<tmpl_var url>\">Subscribe now</a><br>','Macro/SubscriptionItem',1,1,'PBtmpl0000000000000046');
 INSERT INTO template VALUES ('<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\r\n  <tr>\r\n    <th>Transaction description</th>\r\n    <th>Price</th>\r\n    <th>Status</th>\r\n    <th>Error</th>\r\n  </tr>\r\n<tmpl_loop resultLoop>\r\n  <tr>\r\n    <td align=\"left\"><tmpl_var purchaseDescription></td>\r\n    <td align=\"right\"><tmpl_var purchaseAmount></td>\r\n    <td><tmpl_var status></td>\r\n    <td align=\"left\"><tmpl_var error> (<tmpl_var errorCode>)</td>\r\n  </tr>\r\n</tmpl_loop>\r\n</table><br>\r\n<br>\r\n\r\n<tmpl_var statusExplanation>','Commerce/TransactionError',1,1,'PBtmpl0000000000000018');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var changePayment.url>\"><tmpl_var changePayment.label></a> &middot; <a href=\"<tmpl_var changeShipping.url>\"><tmpl_var changeShipping.label></a><br>\n<br>\n\n<tmpl_var title><br>\n<ul>\n<tmpl_loop errorLoop>\n<li><tmpl_var message></li>\n</tmpl_loop>\n</ul>\n\n<table> <tr align=\"left\">\n       <th style=\"border-bottom: 2px solid black\">Product</th>\n       <th style=\"border-bottom: 2px solid black\">Quantity</th>\n       <th style=\"border-bottom: 2px solid black\">Price</th>\n       <th style=\"border-bottom: 2px solid black\">Each</th>\n   </tr>\n\n   <tmpl_if normalItems>\n   </tmpl_if>\n\n   <tmpl_loop normalItemsLoop>\n   <tr>\n       <td align=\"left\"><tmpl_var name></td>\n       <td align=\"center\"><tmpl_var quantity></td>\n       <td align=\"right\"><tmpl_var totalPrice></td>\n   </tr>\n   </tmpl_loop>\n\n','Commerce/ConfirmCheckout',1,1,'PBtmpl0000000000000016');
+INSERT INTO template VALUES ('<a href=\"<tmpl_var viewShoppingCart.url>\"><tmpl_var viewShoppingCart.label></a> &middot;\n<a href=\"<tmpl_var changePayment.url>\"><tmpl_var changePayment.label></a> &middot; \n<a href=\"<tmpl_var changeShipping.url>\"><tmpl_var changeShipping.label></a><br>\n<br>\n\n<tmpl_var title><br>\n<ul>\n<tmpl_loop errorLoop>\n<li><tmpl_var message></li>\n</tmpl_loop>\n</ul>\n\n<table> <tr align=\"left\">\n      <th style=\"border-bottom: 2px solid black\">Product</th>\n      <th style=\"border-bottom: 2px solid black\">Quantity</th>\n      <th style=\"border-bottom: 2px solid black\">Price</th>\n      <th style=\"border-bottom: 2px solid black\">Each</th>\n  </tr>\n\n  <tmpl_if normalItems>\n  </tmpl_if>\n\n  <tmpl_loop normalItemsLoop>\n  <tr>\n      <td align=\"left\"><tmpl_var name></td>\n      <td align=\"center\"><tmpl_var quantity></td>\n      <td align=\"right\"><tmpl_var totalPrice></td>\n  </tr>\n  </tmpl_loop>\n\n  <tmpl_loop recurringItemsLoop>\n  <tr>\n      <td align=\"left\"><tmpl_var name></td>\n      <td align=\"center\"><tmpl_var quantity></td>\n      <td align=\"right\"><tmpl_var totalPrice></td>\n      <td align=\"left\"><tmpl_var period></td>\n  </tr>\n</tmpl_loop>\n  <tr style=\"border-top: 1px solid black\">\n      <td style=\"border-top: 1px solid black\">&nbsp;</td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b>Subtotal</b></td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b><tmpl_var subtotal></b></td>\n  </tr>\n  <tr>\n      <td colspan=\"2\" align=\"right\">Shipping</td>\n      <td align=\"right\"><tmpl_var shippingCost></td>\n  <tr>\n      <td colspan=\"2\" align=\"right\" style=\"border-top: 1px solid black\"><b>Total</b></td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b><tmpl_var total></b></td>\n\n</table>\n\n<br><br>\n\n<tmpl_var form>','Commerce/ConfirmCheckout',1,1,'PBtmpl0000000000000016');
 INSERT INTO template VALUES ('<table border=\"0\">\r\n<tmpl_loop purchaseHistoryLoop>\r\n	<tr>\r\n		<td><b><tmpl_var initDate></b></td>\r\n		<td><b><tmpl_var completionDate></b></td>\r\n		<td align=\"right\"><b>$ <tmpl_var amount></b></td>\r\n		<td><b><tmpl_var status></b></td>\r\n		<td><tmpl_if canCancel><a href=\"<tmpl_var cancelUrl>\">Cancel</a></tmpl_if></td>\r\n	</tr>\r\n	<tmpl_loop itemLoop>\r\n	<tr>\r\n		<td \"align=right\"><tmpl_var quantity> x </td>\r\n		<td \"align=left\"><tmpl_var itemName></td>\r\n		<td \"align=right\">$ <tmpl_var amount></td>\r\n	</tr>\r\n	</tmpl_loop>\r\n</tmpl_loop>\r\n</table>','Commerce/ViewPurchaseHistory',1,1,'PBtmpl0000000000000019');
 INSERT INTO template VALUES ('<tmpl_var message>','Commerce/CheckoutCanceled',1,1,'PBtmpl0000000000000015');
 INSERT INTO template VALUES ('<tmpl_if pluginsAvailable>\r\n   <tmpl_var message><br>\r\n    <tmpl_var formHeader>\r\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\r\n    <tmpl_loop pluginLoop>\r\n            <tr>\r\n                        <td><tmpl_var formElement></td>\r\n                     <td align=\"left\"><tmpl_var name></td>\r\n           </tr>\r\n       </tmpl_loop>\r\n        </table>\r\n    <tmpl_var formSubmit>\r\n    <tmpl_var formFooter>\r\n<tmpl_else>\r\n <tmpl_var noPluginsMessage>\r\n</tmpl_if>','Commerce/SelectPaymentGateway',1,1,'PBtmpl0000000000000017');
@@ -3299,7 +3303,6 @@ CREATE TABLE userSession (
 --
 
 
-
 --
 -- Table structure for table `userSessionScratch`
 --
@@ -3356,7 +3359,7 @@ CREATE TABLE webguiVersion (
 --
 
 
-INSERT INTO webguiVersion VALUES ('6.6.0','initial install',unix_timestamp());
+INSERT INTO webguiVersion VALUES ('6.6.1','initial install',unix_timestamp());
 
 --
 -- Table structure for table `wobject`
