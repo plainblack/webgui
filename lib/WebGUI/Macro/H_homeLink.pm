@@ -33,7 +33,7 @@ sub process {
        		if ($param[0] ne "") {
                		$var{'homeLink.text'} = $param[0];
        		} else {
-               		$var{'homeLink.text'} = WebGUI::International::get(47,'Macro_H_homelink');
+               		$var{'homeLink.text'} = WebGUI::International::get(47,'Macro_H_homeLink');
        		}
 		if ($param[1]) {
          		$temp =  WebGUI::Asset::Template->newByUrl($param[1])->process(\%var);
