@@ -23,7 +23,6 @@ You can find syndicated content at the following locations:
 </li><li><a href="http://www.voidstar.com/node.php?id=144">http://www.voidstar.com/node.php?id=144</a>
 </li><li><a href="http://my.userland.com/">http://my.userland.com</a>
 </li><li><a href="http://www.webreference.com/services/news/">http://www.webreference.com/services/news/</a>
-</li><li><a href="http://www.xmltree.com/">http://www.xmltree.com</a>
 </li><li><a href="http://w.moreover.com/">http://w.moreover.com/</a>
 </li></ul>
 
