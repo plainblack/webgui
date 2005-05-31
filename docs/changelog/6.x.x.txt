@@ -1,4 +1,8 @@
-﻿6.6.1
+﻿6.6.2
+ - fix [ 1210493 ] mistypo in query in thread.pm in table name
+
+
+6.6.1
  - Replaced defective confirm checkout commerce template.
  - Fixed a typo in the Navigation table schema.
  - fix [ 1160019 ] Notification content type [temp fix] <mwilson's fixes>
