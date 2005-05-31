@@ -31,9 +31,14 @@ its children.
 After creating a new Page Asset you may either go to that new page or go back
 to the page where you created this Asset.
 <p/>
+
+<b>Assets to Hide</b><br/>
+This list contains one checkbox for each child Asset of the Page.  Select the
+checkbox for any Asset that you do not want displayed in the Page Asset.
+<p/>
 |,
 		context => 'Describing Page Add/Edit form specific fields',
-		lastUpdated => 1109989134,
+		lastUpdated => 1117512802,
 	},
 
 	'layout template title' => {
