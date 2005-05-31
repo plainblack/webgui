@@ -527,7 +527,7 @@ sub trash {
         $self->getParent->decrementThreads;
         if ($self->getParent->get("lastPostId") eq $self->getId) {
                 my $parentLineage = $self->getThread->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($parentLineage.'%')." and Post.assetId<>".quote($self->getId)." and post.assetId=asset.assetId order by Post.dateSubmitted desc");
+                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($parentLineage.'%')." and Post.assetId<>".quote($self->getId)." and Post.assetId=asset.assetId order by Post.dateSubmitted desc");
                 $self->getParent->setLastPost($id,$date);
         }
 }
