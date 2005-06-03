@@ -1,5 +1,7 @@
 6.6.2
  - fix [ 1210493 ] mistypo in query in thread.pm in table name
+ - Fixed a bug in the ITransact plugin that did not handle months with 31 days.
+ - fix [ 1200782 ] user.isModerator don't work
  - fix [ 1209539 ] RSS online help URL points to casino site
 
 

@@ -603,6 +603,7 @@ sub recurringTransaction {
 	if ($recurring) {
 		# initial amount = (daysInMonth - dayInMonth) / daysInMonth * amount
 		$initialAmount = (WebGUI::DateTime::getDaysInMonth(time) - (WebGUI::DateTime::localtime)[2])*$recurring->{amount}/WebGUI::DateTime::getDaysInMonth(time);
+		$initialAmount = $recurring->{amount} if ($initialAmount < 1);
 		$self->{_recurring} = 1;
 		$self->{_transactionParams} = {
 			START		=> $recurring->{start} || WebGUI::DateTime::epochToHuman(WebGUI::DateTime::addToDate(time, 0, 0, 1), '%m%d%y'),

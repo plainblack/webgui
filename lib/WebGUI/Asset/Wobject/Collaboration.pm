@@ -190,7 +190,7 @@ sub canEdit {
 #-------------------------------------------------------------------
 sub canModerate {
 	my $self = shift;
-	return WebGUI::Grouping::isInGroup($self->get("moderateGroupId")) || $self->canEdit;
+	return WebGUI::Grouping::isInGroup($self->get("moderateGroupId"));
 }
 
 #-------------------------------------------------------------------
