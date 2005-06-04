@@ -798,7 +798,7 @@ sub www_editQuestion {
 		my $ql = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 		$ql = { ('-1' => WebGUI::International::get(82,'Asset_Survey'),%$ql) };
-		$f->select(
+		$f->selectList(
 			-name	=> "gotoQuestion",
 			-options=> $ql,
 			-value	=> [$question->{gotoQuestion}],
