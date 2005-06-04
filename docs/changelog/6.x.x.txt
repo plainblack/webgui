@@ -6,6 +6,7 @@
  - fix [ 1213524 ] Survey.pm: unable to edit answers
  - fix [ 1213516 ] Survey.pm: question order=response driven doesn't work
    (Thanks to misja1)
+ - fix [ 1212596 ] Field disableContentLock is missing in Shortcut table
 
 6.6.1
  - Replaced defective confirm checkout commerce template.

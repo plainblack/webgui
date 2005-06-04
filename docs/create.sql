@@ -1625,6 +1625,7 @@ CREATE TABLE Shortcut (
   assetId varchar(22) NOT NULL default '',
   templateId varchar(22) NOT NULL default '',
   shortcutToAssetId varchar(22) NOT NULL default '',
+  disableContentLock int(11) NOT NULL default '0',
   PRIMARY KEY  (assetId)
 ) TYPE=MyISAM;
 
