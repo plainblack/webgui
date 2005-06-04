@@ -841,10 +841,8 @@ sub www_editQuestion {
 		}
 		$sth->finish;
 	}
-
 	$self->getAdminConsole->setHelp("question add/edit","Survey");
-	return $self->getAdminConsole->render($f->print, WebGUI::International::get(17,'Asset_Survey'));
-
+	return $self->getAdminConsole->render($output, WebGUI::International::get(17,'Asset_Survey'));
 }
 
 #-------------------------------------------------------------------
