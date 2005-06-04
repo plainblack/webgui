@@ -4,6 +4,8 @@
  - fix [ 1200782 ] user.isModerator don't work
  - fix [ 1209539 ] RSS online help URL points to casino site
  - fix [ 1213524 ] Survey.pm: unable to edit answers
+ - fix [ 1213516 ] Survey.pm: question order=response driven doesn't work
+   (Thanks to misja1)
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
