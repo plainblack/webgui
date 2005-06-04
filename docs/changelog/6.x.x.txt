@@ -3,7 +3,7 @@
  - Fixed a bug in the ITransact plugin that did not handle months with 31 days.
  - fix [ 1200782 ] user.isModerator don't work
  - fix [ 1209539 ] RSS online help URL points to casino site
-
+ - fix [ 1213524 ] Survey.pm: unable to edit answers
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
