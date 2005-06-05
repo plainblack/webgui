@@ -127,6 +127,7 @@ function b_addPanel(panel) {
 
 // Draw the slider
 function b_draw() {
+	document.body.style.marginLeft = '160px';	
 	var i;
 	var j;
 	var t=0;
@@ -137,33 +138,35 @@ function b_draw() {
 	var slidemenu_width='160px' //specify width of menu (in pixels)
 	var slidemenu_reveal='15px' //specify amount that menu should protrude initially
 	var slidemenu_top='0px'   //specify vertical offset of menu on page
-	document.write('<div id="slidePanelBar" style="left:'+((parseInt(slidemenu_width)-parseInt(slidemenu_reveal))*-1)+'px; top:'+slidemenu_top+'; width:'+slidemenu_width+'" onmouseover="pullSlidePanelBar()" onmouseout="pushSlidePanelBar()">');
-	document.write('<div id="slidePanelBarHandle">&raquo;<br />&raquo;<br />&raquo;<br />&raquo;<br />&raquo;<br /></div>');
+	//document.write('<div id="slidePanelBar" style="left:'+((parseInt(slidemenu_width)-parseInt(slidemenu_reveal))*-1)+'px; top:'+slidemenu_top+'px; width:'+slidemenu_width+'px;" onmouseover="pullSlidePanelBar()" onmouseout="pushSlidePanelBar()">');
+	document.write('<div id="slidePanelBar" style="left:0px; top:'+slidemenu_top+'px; width:'+slidemenu_width+'px"/ >');
+	//document.write('<div id="slidePanelBarHandle">&raquo;<br />&raquo;<br />&raquo;<br />&raquo;<br />&raquo;<br /></div>');
+
     	//slide panel .
     	document.write('<div class="slidePanel" id='+this.name+' style="left:');
-    	document.write(this.xpos+'; top:'+this.ypos+'; width:'+this.width);
-    	document.write('; height:'+this.height+'; ')
-    	document.write('; clip:rect(0,'+this.width+','+this.height+',0)">');
+    	document.write(this.xpos+'px; top:'+this.ypos+'px; width:'+this.width);
+    	document.write('px; height:'+this.height+'px; ')
+    	document.write('; clip:rect(0px,'+this.width+'px,'+this.height+'px,0px)">');
     	h=this.height-((this.panels.length-1)*panelButtonHeight)
 
     	//one layer for every panel...
     	for (i=0;i<this.panels.length;i++) {
       		document.write('<div class="panel" id='+this.name+'_panel'+i);
       		document.write(' style="top:'+t);
-      		document.write('; width:'+this.width+'; height:'+h+'; clip:rect(0px, ');
+      		document.write('px; width:'+this.width+'px; height:'+h+'px; clip:rect(0px, ');
       		document.write(this.width+'px, '+h+'px, 0px);">');
       		t=t+panelButtonHeight;
 
        		//one layer to host the panel links 
       		document.write('<div class="panelLinkHolder" id='+this.name+'_panel'+i);
-      		document.write('_f style="top:'+panelLinkTop+'; width:');
-      		document.write(this.width+'; height:');
-      		document.write((this.panels[i].img.length*this.buttonspace)+';">');
+      		document.write('_f style="top:'+panelLinkTop+'px; width:');
+      		document.write(this.width+'px; height:');
+      		document.write((this.panels[i].img.length*this.buttonspace)+'px;">');
       		mtop=0
 
       		for (j=0;j<this.panels[i].img.length;j++) {
-			document.write('<div id="'+this.name+'_panel'+i+'_b'+j+'" class="panelLinkOut" style="top:'+mtop+';width:'+this.width+';" onmouseover="this.className=\'panelLinkIn\';" onmouseup="document.location=\''+this.panels[i].act[j]+'\';" onmouseout="this.className=\'panelLinkOut\';">');
-			document.write('<img src="'+this.panels[i].img[j]+'" align="middle" border="0" alt="icon" />');
+			document.write('<div id="'+this.name+'_panel'+i+'_b'+j+'" class="panelLinkOut" style="top:'+mtop+'px;width:'+this.width+'px;" onmouseover="this.className=\'panelLinkIn\';" onmouseup="document.location=\''+this.panels[i].act[j]+'\';" onmouseout="this.className=\'panelLinkOut\';">');
+			document.write('<img src="'+this.panels[i].img[j]+'" align="middle" border="0px" alt="icon" />');
 			document.write(' '+this.panels[i].lbl[j]);
 			document.write('</div>');
         		mtop=mtop+this.buttonspace;
@@ -174,7 +177,7 @@ function b_draw() {
         	document.write('<div id='+this.name+'_panel'+i+'_c class="panelButton" ');
         	document.write('onClick="javascript:'+this.v+'.showPanel('+i);
         	document.write(');" style="width:');
-        	document.write((this.width-c)+'; height:'+(panelButtonHeight-c)+';"><a href="#" ');
+        	document.write((this.width-c)+'px; height:'+(panelButtonHeight-c)+'px;"><a href="#" ');
         	document.write('onClick="'+this.v+'.showPanel('+i+');this.blur();');
         	document.write('return false;">');
         	document.write(this.panels[i].caption);
@@ -183,18 +186,18 @@ function b_draw() {
       		// scroll-up
       		document.write('<div id='+this.name+'_panel'+i);
       		document.write('_m1 class="scrollPanelUp" style="left:');
-      		document.write((this.width-20)+';"><a href="#" onclick="');
+      		document.write((this.width-20)+'px;"><a href="#" onclick="');
       		document.write(this.panels[i].v+'.down(16);this.blur();return false;" >');
-      		document.write('<img src="'+getWebguiProperty("extrasURL")+'/slidePanel/arrowup.gif" border="0" alt="scroll up" />');
+      		document.write('<img src="'+getWebguiProperty("extrasURL")+'/slidePanel/arrowup.gif" border="0px" alt="scroll up" />');
       		document.write('</a></div>');
 
 		// scroll-down
       		document.write('<div class="scrollPanelDown" id='+this.name+'_panel'+i);
       		document.write('_m2 style="top:');
-      		document.write((this.height-(this.panels.length)*panelButtonHeight)+'; left:');
-      		document.write((this.width-20)+';"><a href="#" onclick="');
+      		document.write((this.height-(this.panels.length)*panelButtonHeight)+'px; left:');
+      		document.write((this.width-20)+'px;"><a href="#" onclick="');
       		document.write(this.panels[i].v+'.up(16);this.blur();return false">');
-      		document.write('<img src="'+getWebguiProperty("extrasURL")+'/slidePanel/arrowdown.gif" border="0" alt="scroll down" />');
+      		document.write('<img src="'+getWebguiProperty("extrasURL")+'/slidePanel/arrowdown.gif" border="0px" alt="scroll down" />');
       		document.write('</a></div>');
 
       		document.write('</div>')
@@ -253,9 +256,9 @@ function b_showPanel(nr) {
   	l = this.panels.length;
   	for (i=0;i<l;i++) {
     		if (i>nr) {
-      			this.panels[i].obj.style.top=this.height-((l-i)*panelButtonHeight);
+      			this.panels[i].obj.style.top=this.height-((l-i)*panelButtonHeight)+"px";
     		} else {
-      			this.panels[i].obj.style.top=i*panelButtonHeight;
+      			this.panels[i].obj.style.top=i*panelButtonHeight+"px";
     		}
   	}
 }
