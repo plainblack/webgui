@@ -1656,11 +1656,11 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"))
-              	.editIcon('func=edit',$self->get("url"))
-            	.cutIcon('func=cut',$self->get("url"))
-            	.copyIcon('func=copy',$self->get("url"));
-        $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
+	my $toolbar = deleteIcon('func=delete',$self->getUrl,WebGUI::International::get(43,"Asset"))
+              	.editIcon('func=edit',$self->getUrl)
+            	.cutIcon('func=cut',$self->getUrl)
+            	.copyIcon('func=copy',$self->getUrl);
+        $toolbar .= shortcutIcon('func=createShortcut',$self->getUrl) unless ($self->get("className") =~ /Shortcut/);
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	#return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
@@ -3197,21 +3197,21 @@ sub www_manageAssets {
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->getUrl) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->getUrl) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->getUrl) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '</fieldset></div>'; 
@@ -3249,7 +3249,7 @@ sub www_manageAssets {
 		my $asset = WebGUI::Asset->newByDynamicClass($item->{assetId},$item->{className});
               	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
 			<a href="'.$self->getUrl("func=deployPackage&assetId=".$item->{assetId}).'">'.$item->{title}.'</a> '
-			.editIcon("func=edit&proceed=manageAssets",$asset->get("url"))
+			.editIcon("func=edit&proceed=manageAssets",$asset->getUrl)
 			.'<br />';
 		$hasPackages = 1;
         }
