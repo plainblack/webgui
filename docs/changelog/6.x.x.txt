@@ -1,4 +1,4 @@
-﻿6.6.2
+6.6.2
  - fix [ 1210493 ] mistypo in query in thread.pm in table name
  - Fixed a bug in the ITransact plugin that did not handle months with 31 days.
  - fix [ 1200782 ] user.isModerator don't work
@@ -8,7 +8,7 @@
    (Thanks to misja1)
  - fix [ 1212596 ] Field disableContentLock is missing in Shortcut table
  - fix [ 1215228 ] getToolbar uses get("url") instead of getUrl
-
+ - fix [ 1187040 ] getNextChildRank doesn't handle rank 999999
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
