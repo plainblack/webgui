@@ -1526,11 +1526,12 @@ Returns a 6 digit number with leading zeros of the next rank a child will get.
 =cut
 
 sub getNextChildRank {
-	my $self = shift;
+	my $self = shift;	
 	my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
 	my $rank;
 	if (defined $lineage) {
 		$rank = $self->getRank($lineage);
+		if ($rank >= 999998) { WebGUI::ErrorHandler->fatal; }
 		$rank++;
 	} else {
 		$rank = 1;
