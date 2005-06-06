@@ -12,6 +12,7 @@
  - fix [ 1189186 ] 6.6 CVS Admin menu is invisible on failsafe templater
  - fix [ 1215228 ] getToolbar uses get("url") instead of getUrl
  - fix [ 1187040 ] getNextChildRank doesn't handle rank 999999
+ - fix [ 1179021 ] cannot set default value of 0 in several form elements
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
