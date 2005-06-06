@@ -14,6 +14,7 @@
  - fix [ 1187040 ] getNextChildRank doesn't handle rank 999999
  - fix [ 1179021 ] cannot set default value of 0 in several form elements
  - fix [ 1172993 ] Product asset issues
+ - fix [ 1195523 ] Bug in Data Type Telephone Number
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
