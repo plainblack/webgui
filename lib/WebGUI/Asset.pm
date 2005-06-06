@@ -1087,7 +1087,7 @@ sub getEditForm {
                -excludeGroups=>[1,7],
                -uiLevel=>6
                );
-	$tabform->addTab("meta","Meta",3);
+	$tabform->addTab("meta",WebGUI::International::get("Metadata","Asset"),3);
         $tabform->getTab("meta")->textarea(
                 -name=>"synopsis",
                 -label=>WebGUI::International::get(412,"Asset"),
