@@ -561,7 +561,7 @@ sub color {
                 $output = WebGUI::Form::hidden({
 			"name"=>$name,
                         "value"=>$value,
-			"defaultValue",$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -640,7 +640,7 @@ sub combo {
 			"name"=>$name,
                         "options"=>$options,
                         "value"=>$value,
-			"defaultValue",$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -845,7 +845,7 @@ sub date {
                         "noDate"=>$noDate,
                         "size"=>$size,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -853,7 +853,7 @@ sub date {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>epochToSet($value),
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -905,7 +905,7 @@ sub dateTime {
                         "name"=>$name,
                         "value"=>$value,
 			"extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -913,7 +913,7 @@ sub dateTime {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>epochToSet($value,1),
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1020,7 +1020,7 @@ sub email {
                         "maxlength"=>$maxlength,
                         "size"=>$size,
                         "extras"=>$extras,
-			"defaultValue" => $defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1028,7 +1028,7 @@ sub email {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1209,7 +1209,7 @@ sub filterContent {
                         "name"=>$name,
                         "value"=>$value,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1217,7 +1217,7 @@ sub filterContent {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1282,7 +1282,7 @@ sub float {
 			"maxlength"=>$maxlength,
 			"size"=>$size,
 			"extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
 			});
 		$output .= _subtext($subtext);
 		$output = $self->_tableFormRow($label,$output);
@@ -1290,7 +1290,7 @@ sub float {
 		$output = WebGUI::Form::hidden({
 			"name"=>$name,
 			"value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
 			});
 	}
 	$self->{_data} .= $output;
@@ -1363,8 +1363,8 @@ sub group {
                         "value"=>$value,
                         "multiple"=>$multiple,
                         "extras"=>$extras,
-			excludeGroups=>$excludeGroups,
-			defaultValue=>$defaultValue
+			"excludeGroups"=>$excludeGroups,
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1374,7 +1374,7 @@ sub group {
 			"name"=>$name,
                         "options"=>$hashRef,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1406,7 +1406,7 @@ sub hidden {
         $self->{_data} .= WebGUI::Form::hidden({
 		"name"=>$name,
 		"value"=>$value,
-		defaultValue=>$defaultValue
+		"defaultValue"=>$defaultValue
 		});
 }
 
@@ -1477,8 +1477,8 @@ sub HTMLArea {
                         "columns"=>$columns,
                         "rows"=>$rows,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue,
-			richEditId=>$richEditId
+			"defaultValue"=>$defaultValue,
+			"richEditId"=>$richEditId
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1486,7 +1486,7 @@ sub HTMLArea {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,	
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1550,7 +1550,7 @@ sub integer {
                         "maxlength"=>$maxlength,
                         "size"=>$size,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1612,7 +1612,7 @@ sub interval {
                         "name"=>$name,
                         "value"=>$value,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1822,7 +1822,7 @@ sub password {
                         "size"=>$size,
                         "maxlength"=>$maxlength,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1830,7 +1830,7 @@ sub password {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1894,7 +1894,7 @@ sub phone {
                         "size"=>$size,
                         "maxlength"=>$maxlength,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1902,7 +1902,7 @@ sub phone {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -1985,7 +1985,7 @@ sub radio {
                         "value"=>$value,
                         "checked"=>$checked,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -1994,7 +1994,7 @@ sub radio {
                 	$output = WebGUI::Form::hidden({
                         	"name"=>$name,
                         	"value"=>$value,
-				defaultValue=>$defaultValue
+				"defaultValue"=>$defaultValue
                         	});
 		}
         }
@@ -2059,7 +2059,7 @@ sub radioList {
                         "value"=>$value,
                         "vertical"=>$vertical,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -2067,7 +2067,7 @@ sub radioList {
                 $output = WebGUI::Form::hidden({
 			"name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2204,7 +2204,7 @@ sub selectList {
                         "size"=>$size,
                         "extras"=>$extras,
 			"sortByValue"=>$sortByValue,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -2213,7 +2213,7 @@ sub selectList {
 			"name"=>$name,
                         "options"=>$options,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2256,7 +2256,7 @@ sub submit {
         $output = WebGUI::Form::submit({
                 "value"=>$value,
                 "extras"=>$extras,
-		defaultValue=>$defaultValue
+		"defaultValue"=>$defaultValue
                 });
         $output .= _subtext($subtext);
         $output = $self->_tableFormRow($label,$output);
@@ -2326,7 +2326,7 @@ sub template {
                 	"value"=>$value,
                 	"namespace"=>$namespace,
                 	"extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                 	});
                 $output .= _subtext($buttons.$subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -2334,7 +2334,7 @@ sub template {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2398,7 +2398,7 @@ sub text {
                         "size"=>$size,
                         "maxlength"=>$maxlength,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
@@ -2406,7 +2406,7 @@ sub text {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2475,7 +2475,7 @@ sub textarea {
                         "columns"=>$columns,
                         "rows"=>$rows,
                         "extras"=>$extras,
-			defaultValue =>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
@@ -2483,7 +2483,7 @@ sub textarea {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2542,7 +2542,7 @@ sub timeField {
                         "value"=>$value,
                         "size"=>$size,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -2550,7 +2550,7 @@ sub timeField {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>secondsToTime($value),
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2627,7 +2627,7 @@ sub url {
                         "size"=>$size,
                         "maxlength"=>$maxlength,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
@@ -2635,7 +2635,7 @@ sub url {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2696,7 +2696,7 @@ sub whatNext {
 			"options"=>$options,
                         "value"=>$value,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
                 $output = $self->_tableFormRow($label,$output);
@@ -2704,7 +2704,7 @@ sub whatNext {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
@@ -2828,7 +2828,7 @@ sub zipcode {
                         "size"=>$size,
                         "maxlength"=>$maxlength,
                         "extras"=>$extras,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
         	$output = $self->_tableFormRow($label,$output);
@@ -2836,7 +2836,7 @@ sub zipcode {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
                         "value"=>$value,
-			defaultValue=>$defaultValue
+			"defaultValue"=>$defaultValue
                         });
         }
         $self->{_data} .= $output;
