@@ -207,6 +207,7 @@ sub getEditForm {
 		-name=>"templateId",
       		-value=>$self->getValue("templateId"),
       		-namespace=>"DataForm",
+                -label=>WebGUI::International::get(82,"Asset_DataForm"),
 		-afterEdit=>'func=edit',
 		-defaultValue=>"PBtmpl0000000000000141"
    		);

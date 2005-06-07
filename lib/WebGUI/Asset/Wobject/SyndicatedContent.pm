@@ -84,6 +84,7 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"SyndicatedContent"
+		-label=>WebGUI::International::get(72,"Asset_SyndicatedContent"),
    		);
 	$tabform->getTab("properties")->url(
 		-name=>"rssUrl",

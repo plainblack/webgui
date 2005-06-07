@@ -60,7 +60,8 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
-      		-namespace=>"Article"
+      		-namespace=>"Article",
+                -label=>WebGUI::International::get(72,"Asset_Article"),
    		);
 	$tabform->getTab("properties")->text(
 		-name=>"linkTitle",

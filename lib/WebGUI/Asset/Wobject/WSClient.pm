@@ -157,6 +157,7 @@ sub getEditForm {
       -name      => 'templateId',
       -value     => $self->getValue('templateId'),
       -namespace => "WSClient"
+      -label => WebGUI::International::get(72, "Asset_WSClient"),
    );
    $tabform->getTab("display")->yesNo (
       -name  => 'preprocessMacros',

@@ -172,6 +172,7 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Poll"
+		-label=>WebGUI::International::get(73,"Asset_Poll"),
    		);
         my ($i, $answers);
 	for ($i=1; $i<=20; $i++) {

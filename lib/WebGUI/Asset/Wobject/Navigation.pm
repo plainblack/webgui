@@ -81,9 +81,11 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
+	my $i18n = WebGUI::International->new("Asset_Navigation");
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
-      		-namespace=>"Navigation"
+      		-namespace=>"Navigation",
+		-label=>$i18n->get(1096),
    		);
 	$tabform->hidden({
 		name=>"returnUrl",
@@ -106,7 +108,6 @@ sub getEditForm {
 			$pedigreeChecked = 1;
 		}
 	}
-	my $i18n = WebGUI::International->new("Asset_Navigation");
 	$tabform->getTab("properties")->selectList(
 		-name=>"startType",
 		-options=>{

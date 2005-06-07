@@ -100,6 +100,7 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
+                -label=>WebGUI::International::get('http proxy template title',"Asset_DataForm"),
       		-namespace=>"HttpProxy"
    		);
 	my %hash;

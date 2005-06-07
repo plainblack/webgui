@@ -138,6 +138,7 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
+                -label=>WebGUI::International::get(72,"Asset_SQLReport"),
       		-namespace=>"SQLReport"
    		);
         $tabform->getTab("properties")->yesNo(

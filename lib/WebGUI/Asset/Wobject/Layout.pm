@@ -95,6 +95,7 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
+      		-label=>WebGUI::International::get('layout template title', 'Asset_Layout'),
       		-namespace=>"Layout"
    		);
 	if ($self->get("assetId") eq "new") {
