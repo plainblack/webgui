@@ -2721,7 +2721,7 @@ sub www_editMetaDataField {
         $f->fieldType(
                 -name=>"fieldType",
                 -label=>WebGUI::International::get(486,"Asset"),
-                -value=>[$fieldInfo->{fieldType} || "text"],
+                -value=>$fieldInfo->{fieldType} || "text",
 		-types=> [ qw /text integer yesNo selectList radioList/ ]
                 );
 	$f->textarea("possibleValues",WebGUI::International::get(487,"Asset"),$fieldInfo->{possibleValues});
