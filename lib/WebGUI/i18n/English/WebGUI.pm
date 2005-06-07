@@ -981,118 +981,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1036864905
 	},
 
-	'606' => {
-		message => q|Think of pages as containers for content. For instance, if you want to write a letter to the editor of your favorite magazine you'd get out a notepad (or open a word processor) and start filling it with your thoughts. The same is true with WebGUI. Create a page, then add your content to the page.
-<p>
-
-<b>Title</b><br>
-The title of the page is what your users will use to navigate through the site. Titles should be descriptive, but not very long.
-<p>
-
-
-<b>Menu Title</b><br>
-A shorter or altered title to appear in navigation. If left blank this will default to <i>Title</i>.
-<p>
-
-<b>URL</b><br>
-You may either specify a URL for the asset, or if you leave this blank, a URL based on the <b>Title</b> will be generated.
-<p>
-
-<b>Redirect URL</b><br>
-When this page is visited, the user will be redirected to the URL specified here. 
-<p>
-<b>NOTE:</b> The redirects will be disabled while in admin mode in order to make it easier to edit the properties of the page.
-<p>
-
-
-<b>Hide from navigation?</b><br>
-Select yes to prevent this asset from being displayed in Navigation Assets.
-<p>
-<B>NOTE:</b> This will not hide the page from the page tree (Administrative functions... &gt; Manage page tree.), only from navigation assets, such as menus and site maps.
-<p>
-
-<b>Open in new window?</b><br>
-Select yes to open this page in a new window. This is often used in conjunction with the <b>Redirect URL</b> parameter.
-<p>
-
-<b>Encrypt content?</b><br>
-Select yes to serve this page over SSL.
-<p>
-
-
-
-<b>Language</b><br/>
-Choose the default language for this page. All WebGUI generated messages will appear in that language and the character set will be changed to the character set for that language.
-<p/>
-
-<P><B>Cache Timeout</B><BR>The amount of time this page should remain cached for registered users. 
-
-<P><B>Cache Timeout (Visitors)</B><BR>The amount of time this page should remain cached for visitors. 
-
-<P><B>NOTE:</B> Page caching is only available if your administrator has installed the Cache::FileCache Perl module. Using page caching can improve site performance by as much as 1000%.&nbsp;
-
-
-<P><b>Template</b><br>
-By default, WebGUI has one big content area to place wobjects. However, by specifying a template other than the default you can sub-divide the content area into several sections.
-<p>
-
-<b>Synopsis</b><br>
-A short description of a page. 
-<p>
-
-<b>Meta Tags</b><br>
-Meta tags are used by some search engines to associate key words to a particular page. You can find a  <a href="http://vancouver-webpages.com/META/mk-metas.html">little utility here</a> that will help you build meta tags if you've never done it before.
-<p>
-
-<i>Advanced Users:</i> If you have other things (like JavaScript) you usually put in the  area of your pages, you may put them here as well.
-<p>
-
-<b>Use default meta tags?</b><br>
-If you don't wish to specify meta tags yourself, WebGUI can generate meta tags based on the page title and your company's name. Check this box to enable the WebGUI-generated meta tags.
-<p>
-
-
-<b>Style</b><br>
-By default, when you create a page, it inherits a few traits from its parent. One of those traits is style. Choose from the list of styles if you would like to change the appearance of this page. See <i>Add Style</i> for more details.
-<p>
-
-<b>Printable Style</b><br>
-This sets the printable style for this page to be something other than the WebGUI Default Printable Style.
-<p>
-
-<b>Start Date</b><br>
-The date when users may begin viewing this page. Note that before this date only content managers with the rights to edit this page will see it.
-<p>
-
-<b>End Date</b><br>
-The date when users will stop viewing this page. Note that after this date only content managers with the rights to edit this page will see it.
-<p>
-
-<b>Owner</b><br>
-The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
-<p>
-<b>NOTE:</b> The owner can only be changed by an administrator.
-<p>
-
-
-<b>Who can view?</b><br>
-Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.
-<p>
-
-<b>Who can edit?</b><br>
-Choose the group that can edit this page. The group assigned editing rights can also always view the page.
-<p>
-
-<b>Recursively set privileges?</b><br>
-You can optionally give the privileges of this page to all pages under this page.
-<p>
-
-<b>What next?</b><br/>
-If you leave this on the default setting you'll be redirected to the new page after creating it.
-<p/>|,
-		lastUpdated =>  1104629236,
-	},
-
 	'60' => {
 		message => q|Are you certain you want to deactivate your account. If you proceed your account information will be lost permanently.|,
 		lastUpdated => 1031514049
@@ -1166,11 +1054,6 @@ That particular example will help you get good ranking on search engines.
 	'333' => {
 		message => q|Work Country|,
 		lastUpdated => 1031514049
-	},
-
-	'895' => {
-		message => q|Cache Timeout|,
-		lastUpdated => 1056292971
 	},
 
 	'323' => {
@@ -2769,11 +2652,6 @@ The local path of the directory where attachments are to be stored. (Perhaps /va
 	'1078' => {
 		message => q|There is already a user of this system with the email address you've entered.  Press "Save" if you still wish to create this user|,
 		lastUpdated => 1067951807
-	},
-
-	'896' => {
-		message => q|Cache Timeout (Visitors)|,
-		lastUpdated => 1056292980
 	},
 
 	'928' => {
