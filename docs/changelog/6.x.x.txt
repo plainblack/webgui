@@ -1,4 +1,5 @@
 6.6.2
+ - RFE [ 1216056 ] Template names not specific enough
  - fix [ 1210493 ] mistypo in query in thread.pm in table name
  - Fixed a bug in the ITransact plugin that did not handle months with 31 days.
  - fix [ 1200782 ] user.isModerator don't work
