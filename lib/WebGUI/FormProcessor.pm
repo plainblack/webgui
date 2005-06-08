@@ -486,16 +486,19 @@ The default value for this variable. If the variable is undefined then the defau
 =cut
 
 sub process {
+
 	my ($name, $type, $default) = @_;
 	my $value;
 	$type = "text" if ($type eq "");
 	$value = &$type($name);
+
 	unless (defined $value) {
 		return $default;
 	}
 	if ($value =~ /^[\s]+$/) {
 		return undef;
 	}
+
 	return $value;
 }
 
@@ -631,7 +634,6 @@ sub timeField {
 Returns a URL.
 
 =head3 name
-
 The name of the form variable to retrieve.
 
 =cut
@@ -652,7 +654,7 @@ sub url {
 
 =head2 yesNo ( name )
 
-Returns either a 1 or 0 representing yes and no. Defaults to "0".
+Returns either a 1 or 0 or undef representing yes, no, and undefined. Defaults to "0".
 
 =head3 name
 
@@ -664,7 +666,12 @@ sub yesNo {
 	if ($session{form}{$_[0]} > 0) {
 		return 1;
 	}
-	return 0;
+	elsif ($session{form}{$_[0]} eq "") {
+		return undef;
+	}
+	else {
+		return 0;
+	}
 }
 
 
