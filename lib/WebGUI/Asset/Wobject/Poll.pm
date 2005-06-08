@@ -163,6 +163,7 @@ sub duplicate {
 		$newAsset->setVote($data->{answer}, $data->{userId}, $data->{ipAddress});
 	}
 	$sth->finish;
+	return $newAsset;
 }
 
 #-------------------------------------------------------------------
