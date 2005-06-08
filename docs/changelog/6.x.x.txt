@@ -16,6 +16,9 @@
  - fix [ 1179021 ] cannot set default value of 0 in several form elements
  - fix [ 1172993 ] Product asset issues
  - fix [ 1195523 ] Bug in Data Type Telephone Number
+ - fix [ 1216052 ] Can't copy polls
+ - Fixed a bug that was preventing population of the Poll template drop down
+   list.
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
