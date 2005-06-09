@@ -21,6 +21,7 @@
    list.
  - fix [ 1203834 ] accounts created by anon. reg. disobey def. userprofile
    settings
+ - fix [ 1216062 ] http proxy not proxing images
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
