@@ -45,7 +45,7 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"MessageBoard",
-      		-label=>WebGUI::International::get(73,"Asset_MessageBoard");
+      		-label=>WebGUI::International::get(73,"Asset_MessageBoard")
    		);
 	return $tabform;
 }
