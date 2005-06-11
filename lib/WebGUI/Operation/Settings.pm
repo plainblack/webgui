@@ -98,7 +98,7 @@ sub www_editSettings {
 		);
 	 $tabform->getTab("content")->yesNo(
                 -name=>"metaDataEnabled",
-                -label=>$i18n->get("Enable Metadata ?", 'Asset'),
+                -label=>$i18n->get("Enable Metadata ?"),
                 -value=>$session{setting}{metaDataEnabled}
         	);
 # user interface settings
@@ -126,13 +126,13 @@ sub www_editSettings {
 		);
 	$tabform->getTab("ui")->template(
 		-name=>"userFunctionStyleId",
-		-label=>"User Function Style",
+		-label=>$i18n->get('user function style'),
 		-namespace=>"style",
 		-value=>$session{setting}{userFunctionStyleId}
 		);
 	$tabform->getTab("ui")->template(
 		-name=>"AdminConsoleTemplate",
-		-label=>"Admin Console Template",
+		-label=>$i18n->get('admin console template'),
 		-namespace=>"AdminConsole",
 		-value=>$session{setting}{AdminConsoleTemplate}
 		);

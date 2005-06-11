@@ -320,11 +320,6 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 		lastUpdated => 1089039511
 	},
 
-	'Enable Metadata ?' => {
-		message => q|Enable Metadata ?|,
-		lastUpdated => 1089039511
-	},
-
 	'Edit Metadata' => {
 		message => q|Edit Metadata property|,
 		lastUpdated => 1089039511
@@ -401,8 +396,7 @@ information about the content, and is defined in terms of property-value pairs.<
 <i>source</i> with a <i>value</i> of <i>newspaper</i>.</p>
 <p>Metadata properties are defined globally, while Metadata values are set for
 each asset under the tab &quot;Meta&quot; in the asset properties.</p>
-<p>Before you can use metadata in WebGUI, you'll have to switch the &quot;Enable Metadata
-?&quot; setting to Yes in the Manage Settings menu.</p>
+<p>Before you can use metadata in WebGUI, you have to enable metadata in the WebGUI Settings (Content tab)</p>
 <p>Usage of metadata:</p>
 <ul>
   <li><p><b>Passive Profiling</b><br>

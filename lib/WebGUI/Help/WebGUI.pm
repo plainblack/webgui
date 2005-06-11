@@ -68,16 +68,6 @@ our $HELP = {
 			}
 		]
 	},
-	'messaging settings edit' => {
-		title => '663',
-		body => '618',
-		related => [
-			{
-				tag => 'settings',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 
 	'style sheets using' => {
 		title => '668',
