@@ -3717,11 +3717,11 @@ config file.</p>
 
 <b>Company Name</b><br>
 The name of your company. It will appear on all emails and anywhere you use the Company Name style macro.
-<br><br>
+<p>
 
 <b>Company Email Address</b><br>
 A general email address at your company. This is the address that all automated messages will come from. It can also be used via Company Email Address style macro.
-<br><br>
+<p>
 
 <b>Company URL</b><br>
 The primary URL of your company. This will appear on all automated emails sent from the WebGUI system. It is also available via the Company URL style macro.
@@ -3775,6 +3775,7 @@ Defines which style to be used to style WebGUI operations (profile editing, mess
 The style to be used by the Admin Console.
 
 <h2>Messaging</h2>
+
 <p><b>SMTP Server</b><br>
 This is the address of your local mail server. It is needed for all features that use the Internet email system (such as password recovery).
 <p>
@@ -3793,14 +3794,7 @@ Should someone be alerted when a new user registers anonymously?
 What group should be alerted when a new user registers?
 <p>
 
-
-<P><b>Use shared clipboard?</b><br>
-Enables a single, system-wide clipboard shared by all users.  Default is user separated clipboards.
-<p>
-
-<b>Use shared trash?</b><br>
-Enables a single, system-wide trash shared by all users.  Default is user separated trash.
-<p>
+<h2>Miscellaneous</h2>
 
 <b>If proxied, use real client IP address?</b><br>
 If enabled and if the environment variable HTTP_X_FORWARDED_FOR is present, it's value will be used in place of REMOTE_ADDRESS as the client browser's IP address.  This is required for IP based groups to function properly in reverse-proxied, load-balanced system architectures.  In these environments, all requests would otherwise appear to come from the same host, namely the proxy server.  If you are uncertain if you need this setting enabled, you should probably leave it turned off.
@@ -3823,10 +3817,11 @@ WebGUI can track some statistical information for your site. However, this will 
 Select which host to use by default when generating URLs. Config Sitename will use the "sitename" variable from your config file. And Env HTTP Host will use the "HTTP_HOST" environment variable provided by the web server.
 <p>
 
+<h2>User</h2>
 
 <p><b>Anonymous Registration</b><br>
 Do you wish visitors to your site to be able to register themselves?
-<br><br>
+<p>
 
 <b>Run On Registration</b><br>
 If there is a command line specified here, it will be executed each time a user registers anonymously.
@@ -3848,43 +3843,40 @@ The amount of time that a user session remains active (before needing to log in 
 Do you wish to provide your users with a means to deactivate their account without your intervention?
 <p>
 
-<b>Authentication Method (default)</b><br>
-What should the default authentication method be for new accounts that are created? The two available options are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.
-<br><br>
-
-<i>NOTE:</i> Authentication settings can be customized on a per user basis.
-
-
-
-<p>
-<b>NOTE:</b> Depending upon what authentication modules you have installed in your system you'll see any number of options after this point. The following are the options for the two authentication methods installed by default.
-<p>
-
 <b>Encrypt Login?</b><br>
 Should the system use the HTTPS protocol for the login form?  Note that setting this option to true will only encrypt the authentication itself, not anything else before or after the authentication.
+<p>
+
+<b>Enable passive profiling?</b><br>
+Used in conjuction with Metadata, this keeps a record of every wobject viewed by
+a user.
+<p>
+
+<h2>Authentication</h2>
+
+<b>Authentication Method</b><br>
+What should the default authentication method be for new accounts that are created? The two available options are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.
+<p>
+
+<i>NOTE:</i> Authentication settings can be customized on a per user basis.
+<p>
+
+<b>NOTE:</b> Depending upon what authentication modules you have installed in your system you'll see any number of options after this point. The following are the options for the two authentication methods installed by default.
 <p>
 
 <h2>WebGUI Authentication Options</h2>
 
 <b>Minimum Password Length</b><br>
 Set the minimum length that passwords can be.  If set to 0, there is no minimum length.
-<br><br>
+<p>
 
 <b>Password Timeout</b><br>
 Set how long before a user's password expires and has to change it.
-<br><br>
+<p>
 
 <b>Expire passwords on user creation?</b><br>
 Should a user's password be expired when he is created by an administrator forcing a change?
-<br><br>
-
-<b>Allow Users to Change Username?</b><br>
-Should users be allowed to change their Usernames?
-<br><br>
-
-<b>Allow Users to Change Password?</b><br>
-Should users be allowed to change their passwords?
-<br><br>
+<p>
 
 <b>Send welcome message?</b><br>
 Do you wish WebGUI to automatically send users a welcome message when they register for your site? 
@@ -3896,35 +3888,89 @@ Do you wish WebGUI to automatically send users a welcome message when they regis
 Type the message that you'd like to be sent to users upon registration.
 <p>
 
+<b>Allow Users to Change Username?</b><br>
+Should users be allowed to change their Usernames?
+<p>
+
+<b>Allow Users to Change Passwords?</b><br>
+Should users be allowed to change their Passwords?
+<p>
+
+<b>Allow Password Recovery?</b><br>
+Can users recover their passwords?
+<p>
+
 <b>Recover Password Message</b><br>
 Type a message that will be sent to your users if they try to recover their WebGUI password.
 <p>
 
+<b>Validate email addresses</b><br>
+Before a user's account is activated, require that they click on a link sent to their email
+account.
+<p>
 
+<b>Use captcha image</b><br>
+Require the user to enter in the data from a captcha image before activating an account.
+<p>
+
+<b>Account Template</b><br>
+Template to be used to display a user's account.
+<p>
+
+<b>Create Account Template</b><br>
+Template to be used to show the form for creating an account.
+<p>
+
+<b>Expired Password Template</b><br>
+Template used to inform user that their password has expired.
+<p>
+
+<b>Login Template</b><br>
+Template used to display login information to the user as an operation as opposed to inside of a page via a macro.
+<p>
+
+<b>Password Recovery Template</b><br>
+Template used to display a form to the user to recover their password, if the feature is enabled.
+<p>
 
 <h2>LDAP Authentication Options</h2>
 
 <b>LDAP URL (default)</b><br>
 The default url to your LDAP server. The LDAP URL takes the form of <b>ldap://[server]:[port]/[base DN]</b>. Example: ldap://ldap.mycompany.com:389/o=MyCompany.
-<br><br>
-
-
-
+<p>
 
 <b>LDAP Identity</b><br>
 The LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.
-<br><br>
+<p>
 
 <b>LDAP Identity Name</b><br>
 The label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</i>. So you could enter that label here for consistency.
-<br><br>
+<p>
 
 <b>LDAP Password Name</b><br>
 Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use this label as you would LDAP Identity Name.
 <p>
 
+<P><b>Use shared clipboard?</b><br>
+Enables a single, system-wide clipboard shared by all users.  Default is user separated clipboards.
+<p>
+
+<b>Use shared trash?</b><br>
+Enables a single, system-wide trash shared by all users.  Default is user separated trash.
+<p>
+
 |,
-		lastUpdated => 1118453944,
+		lastUpdated => 1118457872,
+	},
+
+	'Enable passive profiling ?' => {
+		message => q|Enable passive profiling ?|,
+		lastUpdated => 1089039511
+	},
+
+	'Illegal Warning' => {
+		message => q|Enabling this feature is illegal in some countries, like Australia. In addition, some countries require you to add a warning to your site if you use this feature. Consult your local authorities for local laws. Plain Black Corporation is not responsible for your illegal activities, regardless of ignorance or malice.|,
+		lastUpdated => 1089039511
 	},
 
 	'account' => {
@@ -3974,6 +4020,11 @@ JavaScript fields from HTML tags.</dd>
 Everything inside of WebGUI is an Asset: files, images, forums, threads in forums, posts in threads, templates, Wobjects (like Articles, DataForms, EventsCalendars) and more.
 <p>
 
+<b>captcha</b><br>
+An image displaying a message along with lines or shades that make it hard for a computer
+to do character recognition.  Used in WebGUI to prevent accounts from being created by programs or spiders.
+<p>
+
 <b>locked</b><br>
 If Posts and Threads are "locked", no new posts can be added and no existing posts can be edited.
 <p>
@@ -4000,7 +4051,7 @@ are for collecting data from users (and optionally emailing a copy), and
 Message Boards hold forums for users.  There are many different Wobjects in WebGUI.
 
 |,
-		lastUpdated => 1112141941,
+		lastUpdated => 1118457360,
 	},
 	'manage cache'  => {
                 message => q|Cache|,

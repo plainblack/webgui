@@ -220,9 +220,9 @@ sub www_editSettings {
 		);
         $tabform->getTab("user")->yesNo(
                 -name=>"passiveProfilingEnabled",
-                -label=>$i18n->get("Enable passive profiling ?", 'Asset'),
+                -label=>$i18n->get("Enable passive profiling ?"),
                 -value=>$session{setting}{passiveProfilingEnabled},
-                -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning","Asset").'\')" '
+                -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning").'\')" '
         );
 # auth settings 
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js",{language=>"Javascript"});
