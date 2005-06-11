@@ -330,11 +330,6 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 		lastUpdated => 1089039511
 	},
 
-	'Enable passive profiling ?' => {
-		message => q|Enable passive profiling ?|,
-		lastUpdated => 1089039511
-	},
-
 	'deleteConfirm' => {
 		message => q|Are you certain you want to delete this Metadata property ?|,
 		lastUpdated => 1089039511
@@ -347,11 +342,6 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 
 	'Delete Metadata field' => {
 		message => q|Delete Metadata property|,
-		lastUpdated => 1089039511
-	},
-
-	'Illegal Warning' => {
-		message => q|Enabling this feature is illegal in some countries, like Australia. In addition, some countries require you to add a warning to your site if you use this feature. Consult your local authorities for local laws. Plain Black Corporation is not responsible for your illegal activities, regardless of ignorance or malice.|,
 		lastUpdated => 1089039511
 	},
 
