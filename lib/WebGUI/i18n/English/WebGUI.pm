@@ -3935,9 +3935,15 @@ Template used to display a form to the user to recover their password, if the fe
 
 <h2>LDAP Authentication Options</h2>
 
-<b>LDAP URL (default)</b><br>
-The default url to your LDAP server. The LDAP URL takes the form of <b>ldap://[server]:[port]/[base DN]</b>. Example: ldap://ldap.mycompany.com:389/o=MyCompany.
+<b>LDAP Connection</b><br>
+Select which of the configured LDAP connections to use to authenticate users.
 <p>
+|,
+		lastUpdated => 1118457872,
+	},
+
+'ldap help body' => {
+        message => q|
 
 <b>LDAP Identity</b><br>
 The LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.
@@ -3962,6 +3968,7 @@ Enables a single, system-wide trash shared by all users.  Default is user separa
 |,
 		lastUpdated => 1118457872,
 	},
+
 
 	'Enable passive profiling ?' => {
 		message => q|Enable passive profiling ?|,
