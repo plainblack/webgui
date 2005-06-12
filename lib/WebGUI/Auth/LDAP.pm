@@ -27,21 +27,8 @@ use Net::LDAP;
 
 our @ISA = qw(WebGUI::Auth);
 
-my %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)',
-        3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)',
-        6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)',
-        9=>'Referral (10)', 11=>'Admin Limit Exceeded (11)', 12=>'Unavailable Critical Extension (12)',
-        13=>'Confidentiality Required (13)', 14=>'Sasl Bind In Progress (14)',
-        15=>'No Such Attribute (16)', 17=>'Undefined Attribute Type (17)',
-        18=>'Inappropriate Matching (18)', 19=>'Constraint Violation (19)',
-        20=>'Attribute Or Value Exists (20)', 21=>'Invalid Attribute Syntax (21)', 32=>'No Such Object (32)',
-        33=>'Alias Problem (33)', 34=>'Invalid DN Syntax (34)', 36=>'Alias Dereferencing Problem (36)',
-        48=>'Inappropriate Authentication (48)', 49=>'Invalid Credentials (49)',
-        50=>'Insufficient Access Rights (50)', 51=>'Busy (51)', 52=>'Unavailable (52)',
-        53=>'Unwilling To Perform (53)', 54=>'Loop Detect (54)', 64=>'Naming Violation (64)',
-        65=>'Object Class Violation (65)', 66=>'Not Allowed On Non Leaf (66)', 67=>'Not Allowed On RDN (67)',
-        68=>'Entry Already Exists (68)', 69=>'Object Class Mods Prohibited (69)',
-        71=>'Affects Multiple DSAs (71)', 80=>'other (80)');
+my %ldapStatusCode = map { $_ => WebGUI::International::get("LDAPLink_".$_, "AuthLDAP") }
+                     (0..21, 32,33,34,36, 48..54, 64..71, 80);
 
 #-------------------------------------------------------------------
 sub _isValidLDAPUser {

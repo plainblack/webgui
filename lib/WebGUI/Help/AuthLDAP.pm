@@ -1,6 +1,11 @@
 package WebGUI::Help::AuthLDAP;
 
 our $HELP = {
+	'ldap connection add/edit' => {
+		title => 'LDAPLink_990',
+		body => 'ldap connection add/edit body',
+		related => [ ],
+	},
 	'ldap authentication display account template' => {
 		title => 'account-1',
 		body => 'account-2',

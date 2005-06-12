@@ -338,18 +338,18 @@ sub www_editGroup {
 		);
 	$f->text(
 	       -name=>"ldapGroup",
-		   -label=>WebGUI::International::get("LDAPLink_ldapGroup"),
+		   -label=>WebGUI::International::get("LDAPLink_ldapGroup","AuthLDAP"),
 	       -value=>$g->ldapGroup
 		);
     $f->text(
 	       -name=>"ldapGroupProperty",
-		   -label=>WebGUI::International::get("LDAPLink_ldapGroupProperty"),
+		   -label=>WebGUI::International::get("LDAPLink_ldapGroupProperty","AuthLDAP"),
 		   -value=>$g->ldapGroupProperty,
 		   -defaultValue=>"member"
 	    );
     $f->text(
 	       -name=>"ldapRecursiveProperty",
-		   -label=>WebGUI::International::get("LDAPLink_ldapRecursiveProperty"),
+		   -label=>WebGUI::International::get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
 		   -value=>$g->ldapRecursiveProperty
 	    );
 	$f->interval(

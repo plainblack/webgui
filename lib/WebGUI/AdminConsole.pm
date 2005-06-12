@@ -195,7 +195,7 @@ sub getAdminFunction {
 		"ldapconnections"=>{
 			title=>{
 				id=>"ldapconnections",
-				namespace=>"WebGUI"
+				namespace=>"AuthLDAP"
 			},
 			icon=>"ldap.gif",
 			op=>"listLDAPLinks",
