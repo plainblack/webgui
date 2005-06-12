@@ -2139,7 +2139,7 @@ Returns 1. Deletes an asset from tables and removes anything bound to that asset
 
 sub purge {
 	my $self = shift;
-	WebGUI::Cache->new("asset_".$self->getId)->delete;
+	$self->purgeCache;
 	$self->updateHistory("purged");
 	WebGUI::SQL->beginTransaction;
 	foreach my $definition (@{$self->definition}) {
@@ -2151,6 +2151,30 @@ sub purge {
 	return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 purgeTree ( )
+
+Purges all cache entries associated with this asset.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+
+	my $assetId = $self->getId;
+	my $assetUrl = $self->getUrl;
+	$assetUrl =~ s/^\///; 	#remove beginning / from url
+	my $lineage = $self->get("lineage");
+
+	WebGUI::Cache->new("asset_".$assetId)->delete;
+	WebGUI::Cache->new("asseturl_".$assetUrl)->delete;
+	WebGUI::Cache->new("childCount_".$assetId)->delete;
+	WebGUI::Cache->new("firstChild_".$assetId)->delete;
+	WebGUI::Cache->new("lastChild_".$assetId)->delete;
+	WebGUI::Cache->new("lineage_".$lineage)->delete;
+
+}
 #-------------------------------------------------------------------
 
 =head2 purgeTree ( )
@@ -2338,7 +2362,7 @@ Hash reference of properties and values to set.
 sub update {
         my $self = shift;
         my $properties = shift;
-	WebGUI::Cache->new("asset_".$self->getId)->delete;
+	$self->purgeCache;
         WebGUI::SQL->beginTransaction;
         foreach my $definition (@{$self->definition}) {
                 my @setPairs;
