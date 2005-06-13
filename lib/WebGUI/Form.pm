@@ -1671,9 +1671,20 @@ sub template {
 	my $params = shift;
         my $templateId = $params->{value} || $params->{defaultValue};
 	my $name = $params->{name} || "templateId";
+	my $userId = $session{user}{userId};
+	my $templateList = WebGUI::Asset::Template->getList($params->{namespace});
+
+	#Remove entries from template list that the user does not have permission to view.
+        for my $assetId ( keys %{$templateList} ) {
+       	  my $asset = WebGUI::Asset->new($assetId);
+
+          if (!$asset->canView($userId)) {
+            delete $templateList->{$assetId}; 
+	  }
+	}
         return selectList({
                 name=>$name,
-                options=>WebGUI::Asset::Template->getList($params->{namespace}),
+                options=>$templateList,
                 value=>[$templateId],
 		extras=>$params->{extras}
                 });
