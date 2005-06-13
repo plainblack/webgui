@@ -27,6 +27,7 @@
    settings
  - fix [ 1216062 ] http proxy not proxing images
  - fix [ 1216066 ] url caching broken
+ - fix [ 1218475 ] cannot set "who to view" in style templates
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
