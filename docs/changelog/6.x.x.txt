@@ -1,4 +1,4 @@
-6.6.2
+﻿6.6.2
  - Fixed help for LDAP connections.
  - Internationalized all LDAP error messages
  - Moved all LDAP help and labels into its own file (AuthLDAP)
@@ -28,6 +28,9 @@
  - fix [ 1216062 ] http proxy not proxing images
  - fix [ 1216066 ] url caching broken
  - fix [ 1218475 ] cannot set "who to view" in style templates
+ - fix [ 1219745 ] setSize doesn't work with Images
+ - fix [ 1206045 ] Max Image Size don't work
+
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
