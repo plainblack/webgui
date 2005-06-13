@@ -552,12 +552,23 @@ The URL used to connect to the LDAP server.
 <p>
 
 <b>Connect DN</b><br>
+DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
+directory. In this case, the "Connect DN" is the DN that point's the the user account
+record. Usually that will look something like:</p>
+
+<p>cn=Joe Shmoe,ou=people,dc=example,dc=com
 <p>
 
 <b>Identifier</b><br>
+The password for the LDAP connection
 <p>
 
 <b>User RDN</b><br>
+RDN is a relative distinguished name. It means that we're looking at only part of the
+path. In this case, the "User RDN" is the path to where user records can be found.
+Usually the RDN looks something like:</p>
+
+<p>ou=people,dc=example,dc=com
 <p>
 
 <b>LDAP Identity</b><br>
