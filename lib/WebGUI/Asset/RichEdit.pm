@@ -401,7 +401,7 @@ sub getName {
 #-------------------------------------------------------------------
 sub getRichEditor {
 	my $self = shift;
-	my $calledAsWebMethod = shift;
+	my $nameId = shift;
 	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));	
 	push(@toolbarRow1,"contextmenu") if ($self->getValue("enableContextMenu"));
 	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));	
@@ -409,7 +409,8 @@ sub getRichEditor {
 	my @toolbarButtons = (@toolbarRow1,@toolbarRow2,@toolbarRow3);
 	my @plugins;
 	my %config = (
-		mode => "specific_textareas",
+		mode => "exact",
+		elements => $nameId,
 		theme => "advanced",
 		document_base_url => "/",
 		auto_reset_designmode => "true",

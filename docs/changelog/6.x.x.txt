@@ -15,7 +15,7 @@
  - fix [ 1214399 ] Admin Bar Unusable
  - fix [ 1196086 ] certain DOCTYPEs break the admin slidebar
  - fix [ 1189186 ] 6.6 CVS Admin menu is invisible on failsafe templater
- - fix [ 1215228 ] getToolbar uses get("url") instead of getUrl
+ - fix [ 1215228 ] getToolbar uses get("url") instead of getUrl [mwilson]
  - fix [ 1187040 ] getNextChildRank doesn't handle rank 999999
  - fix [ 1179021 ] cannot set default value of 0 in several form elements
  - fix [ 1172993 ] Product asset issues
@@ -28,9 +28,10 @@
  - fix [ 1216062 ] http proxy not proxing images
  - fix [ 1216066 ] url caching broken
  - fix [ 1218475 ] cannot set "who to view" in style templates
- - fix [ 1219745 ] setSize doesn't work with Images
- - fix [ 1206045 ] Max Image Size don't work
- - fix [ 1219805 ] storage.pm renameFile refers to getNode
+ - fix [ 1219745 ] setSize doesn't work with Images [mwilson]
+ - fix [ 1206045 ] Max Image Size don't work [mwilson]
+ - fix [ 1219805 ] storage.pm renameFile refers to getNode [mwilson]
+ - fix [ 1216061 ] 2 rich editors - 1 field [mwilson]
 
 
 6.6.1

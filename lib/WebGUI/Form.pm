@@ -1189,7 +1189,7 @@ sub HTMLArea {
 		defaultValue=>$params->{defaultValue}
                 });
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/textFix.js',{ type=>'text/javascript' });
-	$output .= WebGUI::Asset::RichEdit->new($richEditId)->getRichEditor;
+	$output .= WebGUI::Asset::RichEdit->new($richEditId)->getRichEditor($params->{name});
 	return $output;
 }
 
