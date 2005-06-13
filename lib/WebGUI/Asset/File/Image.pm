@@ -204,7 +204,20 @@ sub processPropertiesFromFormPost {
 	unless ($parameters =~ /alt\=/) {
 		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
 	}
-	$self->generateThumbnail;
+	my $storage = $self->getStorageLocation;
+	$self->generateThumbnail($session{setting}{maxImageSize});
+	$storage->deleteFile($self->get("filename"));
+	$storage->renameFile('thumb-'.$self->get("filename"),$self->get("filename"));
+	$self->generateThumbnail($session{form}{thumbnailSize});
+}
+
+#-------------------------------------------------------------------
+sub setSize {
+	my $self = shift;
+	my $input = shift;
+	my $storage = $self->getStorageLocation;
+	my $size = ($input > $storage->getFileSize($self->get("filename"))) ? $input : $storage->getFileSize($self->get("filename"));
+	return $self->SUPER::setSize($size);
 }
 
 #-------------------------------------------------------------------
@@ -217,8 +230,6 @@ sub view {
 	$var{thumbnail} = $self->getThumbnailUrl;
 	return $self->processTemplate(\%var,$self->get("templateId"));
 }
-
-
 
 #-------------------------------------------------------------------
 sub www_edit {
