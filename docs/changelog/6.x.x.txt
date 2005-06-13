@@ -30,6 +30,7 @@
  - fix [ 1218475 ] cannot set "who to view" in style templates
  - fix [ 1219745 ] setSize doesn't work with Images
  - fix [ 1206045 ] Max Image Size don't work
+ - fix [ 1219805 ] storage.pm renameFile refers to getNode
 
 
 6.6.1
