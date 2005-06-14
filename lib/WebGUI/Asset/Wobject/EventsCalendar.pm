@@ -213,7 +213,7 @@ sub view {
 	my $self = shift;  
 	#define default view month range.  Note that this could be different from 
 	#the range a user is allowed to view - set by the events calendar limitations.
-	my $monthRangeLength = int($self->getValue("paginateAfter"));
+	my $monthRangeLength = int($self->get("paginateAfter"));
 	# Let's limit the range to 72 for now; later we can make it definable in the calendar itself.
 	$monthRangeLength = 1 if ($monthRangeLength < 0);
 	$monthRangeLength = 72 if ($monthRangeLength > 72);

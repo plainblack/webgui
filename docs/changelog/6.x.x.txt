@@ -1,4 +1,6 @@
 ﻿6.6.2
+ - fix [ 1220552 ] moderation of postings/threads
+ - fix [ 1218870 ] !! Bugs in Article.pm (old 'Discussion allowed' feature)
  - Fixed help for LDAP connections.
  - Internationalized all LDAP error messages
  - Moved all LDAP help and labels into its own file (AuthLDAP)

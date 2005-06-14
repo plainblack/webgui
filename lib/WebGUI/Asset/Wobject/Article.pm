@@ -12,8 +12,6 @@ package WebGUI::Asset::Wobject::Article;
 
 use strict;
 use WebGUI::DateTime;
-#use WebGUI::Forum;
-#use WebGUI::Forum::UI;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
@@ -188,29 +186,11 @@ sub view {
 		$var{description} = $p->getPage;
 	}
 	$p->appendTemplateVars(\%var);
-	my $callback = $self->getUrl;
-	if ($self->get("allowDiscussion")) {
-		my $forum = WebGUI::Forum->new($self->get("forumId"));
-		$var{"replies.count"} = ($forum->get("replies") + $forum->get("threads"));
-		$var{"replies.URL"} = WebGUI::Forum::UI::formatForumURL($callback,$forum->get("forumId"));
-		$var{"replies.label"} = WebGUI::International::get(28,"Asset_Article");
-		$var{"post.URL"} = WebGUI::Forum::UI::formatNewThreadURL($callback,$forum->get("forumId"));
-        	$var{"post.label"} = WebGUI::International::get(24,"Asset_Article");
-	}
 	my $templateId = $self->get("templateId");
         if ($session{form}{overrideTemplateId} ne "") {
                 $templateId = $session{form}{overrideTemplateId};
         }
-	if ($session{form}{forumOp}) {
-		return WebGUI::Forum::UI::forumOp({
-			callback=>$callback,
-			title=>$self->get("title"),
-			description=>$self->get("description"),
-			forumId=>$self->get("forumId")
-			});
-	} else {
-		return $self->processTemplate(\%var, $templateId);
-	}
+	return $self->processTemplate(\%var, $templateId);
 }
 
 

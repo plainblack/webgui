@@ -28,7 +28,7 @@
 	border-style: solid;
 } 
 
-.panelButton A {
+.panelButton A, .panelButton A:visited, .panelButton A:link {
 	text-decoration: none;
 	color: black;
 }

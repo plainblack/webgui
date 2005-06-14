@@ -2486,7 +2486,7 @@ sub www_copy {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newAsset = $self->duplicate;
-	$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
+	$newAsset->update({ title=>$self->getTitle.' (copy)'});
 	$newAsset->cut;
 	return $self->getContainer->www_view;
 }

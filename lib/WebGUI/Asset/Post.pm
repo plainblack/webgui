@@ -645,8 +645,6 @@ sub processPropertiesFromFormPost {
         		$self->getThread->lock if ($session{form}{'lock'});
         		$self->getThread->stick if ($session{form}{stick});
 		}
-	} else {
-		$data{ownerUserId} = $session{form}{userId};
 	}
 	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
 	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
@@ -953,6 +951,10 @@ sub www_edit {
 			.WebGUI::Form::hidden({
 				name=>"userId",
 				value=>$self->getValue("ownerUserId")
+				})
+			.WebGUI::Form::hidden({
+				name=>"username",
+				value=>$self->getValue("username")
 				});
 		$var{isEdit} = 1;
 		$content = $self->getValue("content");

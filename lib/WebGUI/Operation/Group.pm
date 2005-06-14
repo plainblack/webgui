@@ -178,7 +178,7 @@ sub www_addUsersToGroupSecondarySave {
 
 #-------------------------------------------------------------------
 sub www_autoAddToGroup {
-        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::insufficient()) unless ($session{user}{userId} != 1);
+        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::insufficient()) unless ($session{user}{userId} ne 1);
 	my $group = WebGUI::Group->new($session{form}{groupId});
 	if ($group->autoAdd) {
 		WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$session{form}{groupId}]);
@@ -188,7 +188,7 @@ sub www_autoAddToGroup {
 
 #-------------------------------------------------------------------
 sub www_autoDeleteFromGroup {
-        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::insufficient()) unless ($session{user}{userId} != 1);
+        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::insufficient()) unless ($session{user}{userId} ne 1);
 	my $group = WebGUI::Group->new($session{form}{groupId});
 	if ($group->autoDelete) {
 		WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$session{form}{groupId}]);
@@ -220,7 +220,7 @@ sub www_deleteGroupConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteGroupGrouping {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup('3'));
 	WebGUI::Grouping::deleteGroupsFromGroups([$session{form}{delete}],[$session{form}{gid}]);
         return www_manageGroupsInGroup();
 }
@@ -228,8 +228,8 @@ sub www_deleteGroupGrouping {
 #-------------------------------------------------------------------
 sub www_deleteGrouping {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        if (($session{user}{userId} == $session{form}{uid} || $session{form}{uid} == 3) && $session{form}{gid} == 3) {
-                return _submenu(WebGUI::Privilege::vitalComponent());
+        if (($session{user}{userId} eq $session{form}{uid} || $session{form}{uid} eq '3') && $session{form}{gid} eq '3') {
+                return WebGUI::Privilege::vitalComponent();
         }
         my @users = $session{cgi}->param('uid');
         my @groups = $session{cgi}->param("gid");
@@ -244,7 +244,7 @@ sub www_deleteGrouping {
 sub www_deleteGroupingSecondary {
         return WebGUI::Privilege::adminOnly() unless _hasSecondaryPrivilege($session{form}{gid});
         if ($session{user}{userId} eq $session{form}{uid}) {
-                return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::vitalComponent());
+                return WebGUI::Privilege::vitalComponent();
         }
         WebGUI::Grouping::deleteUsersFromGroups([$session{form}{uid}],[$session{form}{gid}]);
         return www_manageUsersInGroupSecondary();
