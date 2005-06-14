@@ -33,7 +33,7 @@
  - fix [ 1219805 ] storage.pm renameFile refers to getNode [mwilson]
  - fix [ 1216061 ] 2 rich editors - 1 field [mwilson]
  - fix [ 1220072 ] typo in Help: Template, Language
-
+ - fix [ 1220397 ] Cannot Copy Form
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
