@@ -399,6 +399,18 @@ sub render {
 	$var{"console.canUse"} = $acParams->{canUse};
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
+	if (exists $session{asset}) {
+		my $importNode = $session{asset}->getImportNode;
+		my $importNodeLineage = $importNode->get("lineage");
+		my $assetLineage = $session{asset}->get("lineage");
+		if ($assetLineage =~ /^$importNodeLineage/) {
+			$var{"backtosite.url"} = $session{asset}->getDefault->getUrl;
+		} else {
+			$var{"backtosite.url"} = $session{asset}->getContainer->getUrl;
+		}
+	} else {
+		$var{"backtosite.url"} = WebGUI::URL::page();
+	}
 	$var{"application_loop"} = $self->getAdminFunction;
 	return WebGUI::Style::process(WebGUI::Asset::Template->new($session{setting}{AdminConsoleTemplate})->process(\%var),"PBtmpl0000000000000137");
 }

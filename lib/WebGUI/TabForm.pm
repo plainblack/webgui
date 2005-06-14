@@ -185,6 +185,10 @@ A hash reference containing the definition of the tabs. It should be constructed
 A string containing the link to the tab-CascadingStyleSheet
 
  default = extrasPath.'/tabs/tabs.css'
+
+=head3 cancelUrl
+
+A URL to go to when the cancel button is pressed.
 	
 =cut
 
@@ -192,6 +196,7 @@ sub new {
 	my $class = shift;
 	my $startingTabs = shift;
 	my $css = shift || $session{config}{extrasURL}.'/tabs/tabs.css';
+	my $cancelUrl = shift || WebGUI::URL::page();
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
@@ -201,7 +206,7 @@ sub new {
 	}
 	my $cancel = WebGUI::Form::button({
 			value=>WebGUI::International::get('cancel'),
-			extras=>q|onClick="location.href='|.WebGUI::URL::page().q|'"|
+			extras=>q|onClick="location.href='|.$cancelUrl.q|'"|
 			});
 	bless {	_cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }

@@ -51,10 +51,10 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  
  use WebGUI::Asset;
 
- $AssetObject=           WebGUI::Asset->addChild(\%properties);
- $integer=               WebGUI::Asset->canEdit("An_Id_AbCdeFGHiJkLMNOP");
- $integer=               WebGUI::Asset->canView("An_Id_AbCdeFGHiJkLMNOP");
-                         WebGUI::Asset->cascadeLineage(100001,100101110111);
+ $newAsset = $asset->addChild(\%properties);
+ $boolean = $asset->canEdit("An_Id_AbCdeFGHiJkLMNOP");
+ $boolean = $asset->canView("An_Id_AbCdeFGHiJkLMNOP");
+ $asset->cascadeLineage(100001,100101110111);
  $html=                  WebGUI::Asset->checkExportPath();
                          WebGUI::Asset->cut();
  $arrayRef=              WebGUI::Asset->definition(\@arr);
@@ -71,7 +71,8 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  $JavaScript=            WebGUI::Asset->getAssetManagerControl(\%hashref, $string, $bool);
  $arrayRef=              WebGUI::Asset->getAssetsInClipboard($boolean, $string);
  $arrayRef=              WebGUI::Asset->getAssetsInTrash($boolean, $string);
- $containerRef=          WebGUI::Asset->getContainer();
+ $containerRef=          $asset->getContainer();
+ $asset =			WebGUI::Asset->getDefault();
  $tabform=               WebGUI::Asset->getEditForm();
  getFirstChild
  getIcon
@@ -83,6 +84,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  getMetaDataFields
  getName
  getNextChildRank
+ getNotFound
  getParent
  getParentLineage
  getRank
@@ -968,6 +970,20 @@ sub getContainer {
 
 #-------------------------------------------------------------------
 
+=head2 getDefault ( )
+
+Returns the default object, which is also known by some as the "Home Page". The default object is set in the settings.
+
+=cut
+
+sub getDefault {
+	my $class = shift;
+	return $class->newByDynamicClass($session{setting}{defaultPage});
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm ( )
 
 Creates and returns a tabform to edit parameters of an Asset.
@@ -976,7 +992,7 @@ Creates and returns a tabform to edit parameters of an Asset.
 
 sub getEditForm {
 	my $self = shift;
-	my $tabform = WebGUI::TabForm->new();
+	my $tabform = WebGUI::TabForm->new(undef,undef,$self->getContainer->getUrl());
 	$tabform->hidden({
 		name=>"func",
 		value=>"editSave"
@@ -1541,6 +1557,20 @@ sub getNextChildRank {
 
 #-------------------------------------------------------------------
 
+=head2 getNotFound ( )
+
+Returns the not found object. The not found object is set in the settings.
+
+=cut
+
+sub getNotFound {
+	my $class = shift;
+	return $class->newByDynamicClass($session{setting}{notFoundPage});
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getPackageList ( )
 
 Returns an array of hashes containing title, assetId, and className for all assets defined as packages.
@@ -1884,7 +1914,7 @@ sub newByDynamicClass {
         if ($className eq "") {
         	WebGUI::HTTP::setStatus('404',"Page Not Found");
 		WebGUI::ErrorHandler::fatal("The page not found page doesn't exist.") if ($assetId eq $session{setting}{notFoundPage});
-                return WebGUI::Asset->newByDynamicClass($session{setting}{notFoundPage});
+                return $class->getNotFound;
         }
 	my $cmd = "use ".$className;
         eval ($cmd);
@@ -1972,10 +2002,10 @@ sub newByUrl {
 		if ($asset->{assetId} ne "" || $asset->{className} ne "") {
 			return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
 		} else {
-			return $class->newByDynamicClass($session{setting}{notFoundPage});
+			return $class->getNotFound;
 		}
 	}
-	return $class->newByDynamicClass($session{setting}{defaultPage});
+	return $class->getDefault;
 }
 
 #-------------------------------------------------------------------

@@ -1,4 +1,5 @@
 ﻿6.6.2
+ - Changed the back to site link in the admin console to act intuitively rather than logically.
  - fix [ 1220552 ] moderation of postings/threads
  - fix [ 1218870 ] !! Bugs in Article.pm (old 'Discussion allowed' feature)
  - Fixed help for LDAP connections.
