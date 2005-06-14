@@ -197,6 +197,7 @@ sub duplicate {
        }
        $sthField->finish;
        $sthTab->finish;
+       return $newAsset;
 }
 
 #-------------------------------------------------------------------
