@@ -32,6 +32,7 @@
  - fix [ 1206045 ] Max Image Size don't work [mwilson]
  - fix [ 1219805 ] storage.pm renameFile refers to getNode [mwilson]
  - fix [ 1216061 ] 2 rich editors - 1 field [mwilson]
+ - fix [ 1220072 ] typo in Help: Template, Language
 
 
 6.6.1

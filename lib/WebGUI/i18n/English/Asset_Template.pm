@@ -88,7 +88,7 @@ Create your template by using template commands and variables, macros, and HTML.
 Both the template language and template variables are case-insensitive.
 <p/>
 <b>Session Variables</b><br/>
-In addition to any variables defined in a given template, of the session variables are made available to you with this syntax:
+In addition to any variables defined in a given template, the session variables are made available to you with this syntax:
 <p>
 
 &lt;tmpl_var session.<i>section</i>.<i>variable</i>&gt;
