@@ -242,7 +242,7 @@ sub www_edit {
 		-namespace=>"ImageAsset",
 		-defaultValue=>"PBtmpl0000000000000088"
 		);
-        $self->getAdminConsole->setHelp("image add/edit","Image");
+        $self->getAdminConsole->setHelp("image add/edit","Asset_Image");
         return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("edit image","Asset_Image"));
 }
 

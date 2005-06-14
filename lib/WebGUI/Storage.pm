@@ -637,7 +637,7 @@ sub renameFile {
 	my $self = shift;
 	my $filename = shift;
 	my $newFilename = shift;
-        rename $self->getPath($filename), $self->getNode->getPath($newFilename);
+        rename $self->getPath($filename), $self->getPath($newFilename);
 }
 
 
