@@ -221,7 +221,7 @@ sub getLatestWebguiVersion {
 
 #----------------------------------------
 sub getOs {
-	if ($^O =~ /^Win/) {
+	if ($^O =~ /MSWin32/i || $^O =~ /^Win/i) {
 		return "Windowsish";
 	}
 	return "Linuxish";
