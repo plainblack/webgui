@@ -34,6 +34,8 @@
  - fix [ 1216061 ] 2 rich editors - 1 field [mwilson]
  - fix [ 1220072 ] typo in Help: Template, Language
  - fix [ 1220397 ] Cannot Copy Form
+ - fix [ 1220456 ] Image.pm add/edit image help goes nowhere.
+
 
 6.6.1
  - Replaced defective confirm checkout commerce template.
