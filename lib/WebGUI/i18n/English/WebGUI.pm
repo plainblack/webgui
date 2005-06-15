@@ -4051,10 +4051,20 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
                 message => q|Clear Cache|,
                 lastUpdated => 1031514049
         },
-	
+
 	'Enable Metadata ?' => {
 		message => q|Enable Metadata ?|,
 		lastUpdated => 1089039511
+	},
+
+	'groups to add' => {
+		message => q|GROUPS TO ADD|,
+		lastUpdated => 1118861810
+	},
+
+	'groups to delete' => {
+		message => q|GROUPS TO DELETE|,
+		lastUpdated => 1118861810
 	},
 
 };

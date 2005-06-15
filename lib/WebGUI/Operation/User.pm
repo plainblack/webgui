@@ -318,7 +318,7 @@ sub www_editUser {
 	@exclude = (@exclude,"1","2","7");
 	$tabform->getTab("groups")->group(
 		-name=>"groupsToAdd",
-		-label=>"GROUPS TO ADD",
+		-label=>$i18n->get("groups to add"),
 		-excludeGroups=>\@exclude,
 		-size=>15,
 		-multiple=>1,
@@ -340,7 +340,7 @@ sub www_editUser {
 		-name=>"groupsToDelete",
 		-options=>WebGUI::SQL->buildHashRef("select groupId, groupName from groups 
 			where groupId in (".quoteAndJoin(\@include).") and showInForms=1 order by groupName"),
-		-label=>"GROUPS TO DELETE",
+		-label=>$i18n->get("groups to delete"),
 		-multiple=>1,
 		-size=>15,
 		-value=>\@groupsToDelete
