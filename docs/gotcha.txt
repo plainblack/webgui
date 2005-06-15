@@ -15,6 +15,10 @@ save you many hours of grief.
 	problems in it. If you just upgraded to 6.6.2, you need not
 	worry, the upgrade is unaffected by this problem.
 
+ * If you're randomly getting logged out before upgrading to this
+	release, clear your browser cache and cookies after upgrading
+	to this release and the problem will go away.
+
 
 6.6.0
 --------------------------------------------------------------------

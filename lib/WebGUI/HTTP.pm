@@ -156,14 +156,14 @@ The time that the cookie should remain in the browser. Defaults to "+10y" (10 ye
 =cut
 
 sub setCookie {
-        my $ttl = $_[2] || '+10y';
-	my $domain;
+	my $name = shift;
+	my $value = shift;
+        my $ttl = shift || '+10y';
         push @{$session{http}{cookie}}, $session{cgi}->cookie(
-                -name=>$_[0],
-                -value=>$_[1],
+                -name=>$name,
+                -value=>$value,
                 -expires=>$ttl,
-                -path=>'/',
-                -domain=>$domain
+                -path=>'/'
                 );
 }
 

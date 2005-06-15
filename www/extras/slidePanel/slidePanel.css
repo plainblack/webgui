@@ -2,6 +2,7 @@
 	position:absolute;
 	font:bold 12px Verdana;
 	line-height:20px;
+  	text-align: left;
 }
 
 #slidePanelBarHandle {

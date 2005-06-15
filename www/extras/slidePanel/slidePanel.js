@@ -251,7 +251,7 @@ function b_showPanel(nr) {
 	var i
 	var l
 	var o
-  	document.cookie=nr;
+  //	document.cookie=nr;
   	this.aktPanel=nr;
   	l = this.panels.length;
   	for (i=0;i<l;i++) {

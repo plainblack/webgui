@@ -695,7 +695,7 @@ my	%transactionData = %{$self->{_transactionParams}};
 "    <RecurringData>
       <RecurRecipe>$transactionData{RECIPE}</RecurRecipe>
       <RecurReps>$transactionData{TERM}</RecurReps>
-      <RecurTotal>$transactionData{INITIALAMT}</RecurTotal>
+      <RecurTotal>$transactionData{AMT}</RecurTotal>
       <RecurDesc>$transactionData{DESCRIPTION}</RecurDesc>
     </RecurringData>";
 	};
