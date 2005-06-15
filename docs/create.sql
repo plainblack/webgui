@@ -1,3491 +1,948 @@
--- MySQL dump 8.23
---
--- Host: localhost    Database: dev
----------------------------------------------------------
--- Server version	3.23.58
 
---
--- Table structure for table `Article`
---
-
-CREATE TABLE Article (
-  linkTitle varchar(255) default NULL,
-  linkURL text,
-  convertCarriageReturns int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Article`
---
-
-
-INSERT INTO Article VALUES ('','',0,'TKzUMeIxRLrZ3NAEez6CXQ','PBtmpl0000000000000002');
-INSERT INTO Article VALUES ('','',0,'sWVXMZGibxHe2Ekj1DCldA','PBtmpl0000000000000002');
-INSERT INTO Article VALUES ('','',0,'x_WjMvFmilhX-jvZuIpinw','PBtmpl0000000000000002');
-
---
--- Table structure for table `Collaboration`
---
-
-CREATE TABLE Collaboration (
-  assetId varchar(22) NOT NULL default '',
-  postGroupId varchar(22) NOT NULL default '2',
-  moderateGroupId varchar(22) NOT NULL default '4',
-  moderatePosts int(11) NOT NULL default '0',
-  karmaPerPost int(11) NOT NULL default '0',
-  collaborationTemplateId varchar(22) NOT NULL default '',
-  threadTemplateId varchar(22) NOT NULL default '',
-  postFormTemplateId varchar(22) NOT NULL default '',
-  searchTemplateId varchar(22) NOT NULL default '',
-  notificationTemplateId varchar(22) NOT NULL default '',
-  sortBy varchar(35) NOT NULL default 'dateUpdated',
-  sortOrder varchar(4) NOT NULL default 'desc',
-  usePreview int(11) NOT NULL default '1',
-  addEditStampToPosts int(11) NOT NULL default '0',
-  editTimeout int(11) NOT NULL default '3600',
-  attachmentsPerPost int(11) NOT NULL default '0',
-  filterCode varchar(30) NOT NULL default 'javascript',
-  useContentFilter int(11) NOT NULL default '1',
-  threads int(11) NOT NULL default '0',
-  views int(11) NOT NULL default '0',
-  replies int(11) NOT NULL default '0',
-  rating int(11) NOT NULL default '0',
-  lastPostId varchar(22) default NULL,
-  lastPostDate bigint(20) default NULL,
-  archiveAfter int(11) NOT NULL default '31536000',
-  postsPerPage int(11) NOT NULL default '10',
-  threadsPerPage int(11) NOT NULL default '30',
-  subscriptionGroupId varchar(22) default NULL,
-  allowReplies int(11) NOT NULL default '0',
-  displayLastReply int(11) NOT NULL default '0',
-  richEditor varchar(22) NOT NULL default 'PBrichedit000000000002',
-  karmaRatingMultiplier int(11) NOT NULL default '0',
-  karmaSpentToRate int(11) NOT NULL default '0',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Collaboration`
---
-
-
-INSERT INTO Collaboration VALUES ('DC1etlIaBRQitXnchZKvUw','3','4',0,0,'wCIc38CvNHUK7aY92Ww4SQ','PBtmpl0000000000000067','PBtmpl0000000000000114','PBtmpl0000000000000031','PBtmpl0000000000000027','lineage','asc',0,0,931536000,2,'none',0,5,2,0,0,NULL,NULL,31536000,10,1000,'a7jbpVdbzxchqtSj_9W71w',0,0,'PBrichedit000000000002',0,0);
-
---
--- Table structure for table `DataForm`
---
-
-CREATE TABLE DataForm (
-  acknowledgement text,
-  mailData int(11) NOT NULL default '1',
-  emailTemplateId varchar(22) default NULL,
-  acknowlegementTemplateId varchar(22) default NULL,
-  listTemplateId varchar(22) default NULL,
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  defaultView int(11) NOT NULL default '0',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `DataForm`
---
-
-
-INSERT INTO DataForm VALUES ('Thank you for telling your friends about WebGUI!',1,'PBtmpl0000000000000085','PBtmpl0000000000000104','PBtmpl0000000000000021','Szs5eev3OMssmnsyLRZmWA','PBtmpl0000000000000020',0);
-
---
--- Table structure for table `DataForm_entry`
---
-
-CREATE TABLE DataForm_entry (
-  DataForm_entryId varchar(22) NOT NULL default '',
-  userId varchar(22) default NULL,
-  username varchar(255) default NULL,
-  ipAddress varchar(255) default NULL,
-  submissionDate int(11) NOT NULL default '0',
-  assetId varchar(22) default NULL,
-  PRIMARY KEY  (DataForm_entryId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `DataForm_entry`
---
-
-
-
---
--- Table structure for table `DataForm_entryData`
---
-
-CREATE TABLE DataForm_entryData (
-  DataForm_entryId varchar(22) NOT NULL default '',
-  DataForm_fieldId varchar(22) NOT NULL default '',
-  value text,
-  assetId varchar(22) default NULL,
-  PRIMARY KEY  (DataForm_entryId,DataForm_fieldId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `DataForm_entryData`
---
-
-
-
---
--- Table structure for table `DataForm_field`
---
-
-CREATE TABLE DataForm_field (
-  DataForm_fieldId varchar(22) NOT NULL default '',
-  sequenceNumber int(11) NOT NULL default '0',
-  name varchar(255) NOT NULL default '',
-  status varchar(35) default NULL,
-  type varchar(30) NOT NULL default '',
-  possibleValues text,
-  defaultValue text,
-  width int(11) default NULL,
-  subtext mediumtext,
-  rows int(11) default NULL,
-  isMailField int(11) NOT NULL default '0',
-  label varchar(255) default NULL,
-  DataForm_tabId varchar(22) NOT NULL default '0',
-  vertical smallint(1) default '1',
-  extras varchar(128) default NULL,
-  assetId varchar(22) default NULL,
-  PRIMARY KEY  (DataForm_fieldId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `DataForm_field`
---
-
-
-INSERT INTO DataForm_field VALUES ('1000',1,'from','required','email','','',0,'',0,1,'Your Email Address','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
-INSERT INTO DataForm_field VALUES ('1001',2,'to','required','email','','',0,'',0,1,'Your Friends Email Address','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
-INSERT INTO DataForm_field VALUES ('1002',3,'cc','hidden','email',NULL,NULL,0,NULL,NULL,1,'Cc','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
-INSERT INTO DataForm_field VALUES ('1003',4,'bcc','hidden','email',NULL,NULL,0,NULL,NULL,1,'Bcc','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
-INSERT INTO DataForm_field VALUES ('1004',5,'subject','hidden','text','','Cool CMS',0,'',0,1,'Subject','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
-INSERT INTO DataForm_field VALUES ('1005',6,'url','visible','url','','http://www.plainblack.com/webgui',0,'',0,1,'URL','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
-INSERT INTO DataForm_field VALUES ('1006',7,'message','required','textarea','','Hey I just wanted to tell you about this great program called WebGUI that I found: http://www.plainblack.com/webgui\r\n\r\nYou should really check it out.',34,'',6,0,'Message','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
-
---
--- Table structure for table `DataForm_tab`
---
-
-CREATE TABLE DataForm_tab (
-  label varchar(255) NOT NULL default '',
-  subtext text,
-  sequenceNumber int(11) NOT NULL default '0',
-  DataForm_tabId varchar(22) NOT NULL default '',
-  assetId varchar(22) default NULL
-) TYPE=MyISAM;
-
---
--- Dumping data for table `DataForm_tab`
---
-
-
-
---
--- Table structure for table `EventsCalendar`
---
-
-CREATE TABLE EventsCalendar (
-  calendarLayout varchar(30) NOT NULL default 'list',
-  paginateAfter int(11) NOT NULL default '50',
-  startMonth varchar(35) NOT NULL default 'current',
-  endMonth varchar(35) NOT NULL default 'after12',
-  defaultMonth varchar(35) NOT NULL default 'current',
-  eventTemplateId varchar(22) default NULL,
-  scope int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `EventsCalendar`
---
-
-
-
---
--- Table structure for table `EventsCalendar_event`
---
-
-CREATE TABLE EventsCalendar_event (
-  description text,
-  eventStartDate bigint(20) default NULL,
-  eventEndDate bigint(20) default NULL,
-  EventsCalendar_recurringId varchar(22) default NULL,
-  eventLocation text,
-  templateId varchar(22) default NULL,
-  assetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId),
-  KEY EventsCalendar1 (eventEndDate,eventStartDate)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `EventsCalendar_event`
---
-
-
-
---
--- Table structure for table `FileAsset`
---
-
-CREATE TABLE FileAsset (
-  assetId varchar(22) NOT NULL default '',
-  storageId varchar(22) NOT NULL default '',
-  filename varchar(255) NOT NULL default '',
-  olderVersions text,
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `FileAsset`
---
-
-
-
---
--- Table structure for table `Folder`
---
-
-CREATE TABLE Folder (
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Folder`
---
-
-
-INSERT INTO Folder VALUES ('PBasset000000000000002','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('Wmjn6I1fe9DKhiIR39YC0g','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('UE5_3bD7kWDLUN2B-iuNuA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('HCQF9FBLWK3Se06yGLoliw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('79BY6IHpAtE2yuQwROh9tg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('ZexTeuMQaZ1fh4FOpLNlYw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('_r8Y0WwiHLyVEFe5M0idYQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('Mkc1dJDw-lqExS5uy7QReA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('zyS1TsKDvBk7Y55_GlWgxA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('CDzQSnxPMWCy2j5ZOxWbrw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('RPo_G59wjPTGE1-IhiE44A','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('Oq61G3_QSM5TzArFUzUBiA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('jcIZMBAyEcmXktAVwPxgIw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('ThLKZPeKbRAVEYTkKAxeCg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('8r4-zJ6g-qOecM1PsvADbQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('ECq9dLm5vmh4t963yDx1og','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('PNGrWdYDhJZTv1-sAX6W1Q','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('guQGD9YiTn55PqOUTjCc0A','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('-MlWyWh12ibRM8gAzRy41g','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('VvgRRrE6UsmWi7y7hMCXbw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('j3yljeaT2y9fLkSHM5Zbow','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('2jkEIs9YpL10dZsA3RH4sw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('5SdElAemaCKBfheDk7rz8A','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('arabONid_vy2W6cALhELxA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('sb7g8aCLMq-XigfBdmw2cg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('BAoMajIxnoGlrxhDVgot9g','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('b26vQzyaqz0EBMWH_oPdrg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('jCMdSbD6IA535I16Pcik7Q','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('-Kmb-MEV4ni9d0tn_BYGXA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('ZWv7HLTQ4oERBIFJHBz1Ow','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('RcOR25DbCizyAfNWvr-2ow','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('59f_y-iE0k8dSMVIyX5SBg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('2DAYoiOdplxZCrEwmrVhwQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('tJ_X5F3Dkaz8vO6CigbJrg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('Fh_KALcbkc8CkBR3I6dU0g','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('WTPOJerammxgkIdCWnR9uw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('PttBzI13R8HXqQn40I4UFg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('VdTZ8_2vlZwVVuv_I7DsWA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('BBoAtdsTo2AGPe4k9kfkxA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('A-m4h7Q3LYt61G54zpEGqA','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('Wquzj9XSpxL_gpGXkoU6tg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('J1uh__tKV2BARcSeFE7MSg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('7EfoKU41oB0ZU6NmVIud4A','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('n1xT2JUidbeqNMN2zyvHAQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('mKI2EjkU9QH6dJKkx7VEvw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('HOleaBMUZT6B5qJmbcV5xg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('L070eyyGhoWx5cSUeNRrow','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('c3jDvo_bK3jFqjIefgXjUw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('VnUEcXfsbwgB5rqslQ3n1A','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('6MrxI11jyXuB-UUrX69lXQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('xxuM0xMjhIA3lFq99GY05Q','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('kHlR8-nCFRrwlEV1uapu_Q','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('r4FQlrIkS1_MTuk-vVqRNg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('EvgkCMpx4kUonmjhhZXRjg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('I2DQUdFVd9FtcSealp4cTQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('khkob2AmnIKAxKJeXHE3fQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('h34TI6OYynW5Q_FYLbZiig','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('i7emhSfswYNreLAwn1wBRw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('o9PZOa7fy9AZa8fKmhoPrQ','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('eLdzeSyvZfml-YVFfgUiaw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('ffWKX2dW4t1eWgfNng605w','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('QWS2acYOu3Y4uNsWvVChTg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('lUjGdT_Hhi_EFhsYr1Ouyw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('7Xhdnqu3qkDWHEnRgk6Uzw','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('xPyASYtR44mpDk3ba4YyIg','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('S99spbsvn96tgRA0oVUl2A','PBtmpl0000000000000078');
-INSERT INTO Folder VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','');
-INSERT INTO Folder VALUES ('60wqz7KzyCDCHVNaavhQUA','');
-INSERT INTO Folder VALUES ('fhevmqeVTLRCmI_z-NidQQ','');
-
---
--- Table structure for table `HttpProxy`
---
-
-CREATE TABLE HttpProxy (
-  proxiedUrl varchar(255) default NULL,
-  timeout int(11) default NULL,
-  removeStyle int(11) default NULL,
-  filterHtml varchar(30) default NULL,
-  followExternal int(11) default NULL,
-  followRedirect int(11) default NULL,
-  cacheHttp int(11) default '0',
-  useCache int(11) default '0',
-  debug int(11) default '0',
-  rewriteUrls int(11) default NULL,
-  searchFor varchar(255) default NULL,
-  stopAt varchar(255) default NULL,
-  cookieJarStorageId varchar(22) default NULL,
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `HttpProxy`
---
-
-
-
---
--- Table structure for table `ITransact_recurringStatus`
---
-
-CREATE TABLE ITransact_recurringStatus (
-  gatewayId varchar(128) NOT NULL default '',
-  initDate int(11) NOT NULL default '0',
-  lastTransaction int(11) NOT NULL default '0',
-  status varchar(10) NOT NULL default '',
-  errorMessage varchar(128) default NULL,
-  recipe varchar(15) NOT NULL default '',
-  PRIMARY KEY  (gatewayId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `ITransact_recurringStatus`
---
-
-
-
---
--- Table structure for table `ImageAsset`
---
-
-CREATE TABLE ImageAsset (
-  assetId varchar(22) NOT NULL default '',
-  thumbnailSize int(11) NOT NULL default '50',
-  parameters text,
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `ImageAsset`
---
-
-
-
---
--- Table structure for table `IndexedSearch`
---
-
-CREATE TABLE IndexedSearch (
-  indexName varchar(35) default 'Search_index',
-  users text,
-  searchRoot text,
-  pageList text,
-  namespaces text,
-  paginateAfter int(11) default NULL,
-  languages text,
-  contentTypes text,
-  previewLength int(11) default NULL,
-  highlight int(11) default NULL,
-  highlight_1 varchar(35) default NULL,
-  highlight_2 varchar(35) default NULL,
-  highlight_3 varchar(35) default NULL,
-  highlight_4 varchar(35) default NULL,
-  highlight_5 varchar(35) default NULL,
-  forceSearchRoots smallint(1) default '1',
-  linkURL text,
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `IndexedSearch`
---
-
-
-
---
--- Table structure for table `IndexedSearch_default`
---
-
-CREATE TABLE IndexedSearch_default (
-  param varchar(16) binary NOT NULL default '',
-  value varchar(255) default NULL,
-  PRIMARY KEY  (param)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `IndexedSearch_default`
---
-
-
-INSERT INTO IndexedSearch_default VALUES ('','');
-INSERT INTO IndexedSearch_default VALUES ('protocol','40');
-INSERT INTO IndexedSearch_default VALUES ('num_of_docs','0');
-INSERT INTO IndexedSearch_default VALUES ('frontend','none');
-INSERT INTO IndexedSearch_default VALUES ('backend','phrase');
-INSERT INTO IndexedSearch_default VALUES ('table','IndexedSearch_default');
-INSERT INTO IndexedSearch_default VALUES ('index_splitter','/(\\w{2,$word_length})/g');
-INSERT INTO IndexedSearch_default VALUES ('word_id_table','IndexedSearch_default_words');
-INSERT INTO IndexedSearch_default VALUES ('count_bits','8');
-INSERT INTO IndexedSearch_default VALUES ('search_splitter','/(\\w{2,$word_length}\\*?)/g');
-INSERT INTO IndexedSearch_default VALUES ('data_table','IndexedSearch_default_data');
-INSERT INTO IndexedSearch_default VALUES ('name_length','255');
-INSERT INTO IndexedSearch_default VALUES ('position_bits','32');
-INSERT INTO IndexedSearch_default VALUES ('blob_direct_fetc','20');
-INSERT INTO IndexedSearch_default VALUES ('filter','map { lc $_ if ($_ !~ /\\^.*;/) }');
-INSERT INTO IndexedSearch_default VALUES ('doc_id_bits','16');
-INSERT INTO IndexedSearch_default VALUES ('init_env','');
-INSERT INTO IndexedSearch_default VALUES ('stemmer',NULL);
-INSERT INTO IndexedSearch_default VALUES ('word_length','20');
-INSERT INTO IndexedSearch_default VALUES ('stoplist',NULL);
-INSERT INTO IndexedSearch_default VALUES ('word_id_bits','16');
-INSERT INTO IndexedSearch_default VALUES ('max_doc_id','10');
-
---
--- Table structure for table `IndexedSearch_default_data`
---
-
-CREATE TABLE IndexedSearch_default_data (
-  word_id smallint(5) unsigned NOT NULL default '0',
-  doc_id smallint(5) unsigned NOT NULL default '0',
-  idx longblob NOT NULL,
-  KEY word_id (word_id),
-  KEY doc_id (doc_id)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `IndexedSearch_default_data`
---
-
-
-INSERT INTO IndexedSearch_default_data VALUES (1,1,'Y\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (2,1,'<\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (3,1,':\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (4,1,'X\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (5,1,'$\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (6,1,'H\0\0\0Z\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (7,1,'S\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (8,1,'L\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (9,1,'?\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (10,1,'\0\0\0\r\0\0\0A\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (11,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (12,1,'T\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (13,1,';\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (14,1,'J\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (15,1,'&\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (16,1,'5\0\0\0>\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (17,1,'\0\0\0\0\0\0\0\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (18,1,'P\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (19,1,'4\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (20,1,'C\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (21,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (22,1,'-\0\0\03\0\0\0I\0\0\0K\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (23,1,'O\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (24,1,'G\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (25,1,'B\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (26,1,'	\0\0\0\0\0\0\Z\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (27,1,'\n\0\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (28,1,'\0\0\0\0\0\0\0\0\0)\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (29,1,'\'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (30,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (31,1,'7\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (32,1,'/\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (33,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (34,1,'M\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (35,1,'@\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (36,1,'.\0\0\06\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (37,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (38,1,'F\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (39,1,'\0\0\0U\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (40,1,'#\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (41,1,'8\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (42,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (43,1,'\"\0\0\0+\0\0\0D\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (44,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (45,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (46,1,'R\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (47,1,'\0\0\0%\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (48,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (49,1,'!\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (50,1,'(\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (51,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (52,1,'\0\0\0N\0\0\0W\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (53,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (54,1,'9\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (55,1,',\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (56,1,'2\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (57,1,'*\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (58,1,'E\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (59,1,'1\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (60,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (61,1,' \0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (62,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (63,1,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (64,1,'0\0\0\0Q\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (65,1,'=\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (66,1,'V\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (67,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (68,2,'\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (69,2,'\0\0\0\0\0\0%\0\0\0(\0\0\02\0\0\07\0\0\0A\0\0\0\\\0\0\0¢\0\0\0Ô\0\0\0ˇ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (70,2,'S\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (71,2,'\0\0\0à\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (72,2,'\0\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (73,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (74,2,'y\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (75,2,'!\0\0\04\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (76,2,'—\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (77,2,'Ä\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (78,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (79,2,'+\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (80,2,';\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (81,2,'ü\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (10,2,'\0\0\0\0\0\0L\0\0\0T\0\0\0z\0\0\0ì\0\0\0®\0\0\0º\0\0\0¿\0\0\0‰\0\0\0Û\0\0\0˙\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (82,2,'k\0\0\0√\0\0\0˚\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (12,2,',\0\0\0F\0\0\0b\0\0\0i\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (83,2,'“\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (84,2,'t\0\0\0Ö\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (85,2,'π\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (16,2,'*\0\0\0<\0\0\0É\0\0\0ù\0\0\0ƒ\0\0\0Ÿ\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (86,2,'n\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (87,2,'=\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (21,2,'O\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (22,2,'ó\0\0\0Ì\0\0\0˘\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (88,2,'\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (25,2,'á\0\0\0ï\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (26,2,'d\0\0\0p\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (89,2,'«\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (90,2,'@\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (91,2,'.\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (92,2,'Ï\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (29,2,'M\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (93,2,'G\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (94,2,'‡\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (33,2,'â\0\0\0é\0\0\0¥\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (95,2,'\n\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (96,2,'∑\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (34,2,'\0\0\0\0\0\0B\0\0\0–\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (97,2,'Õ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (98,2,'õ\0\0\0≈\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (99,2,'\'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (100,2,'Æ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (101,2,'◊\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (102,2,'æ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (46,2,'R\0\0\0™\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (103,2,'_\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (104,2,'0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (105,2,'Ë\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (106,2,'5\0\0\0`\0\0\0ë\0\0\0Ω\0\0\0¬\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (47,2,'œ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (107,2,'	\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (108,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (109,2,'Ê\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (110,2,'3\0\0\0]\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (111,2,'6\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (51,2,'ﬁ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (112,2,'í\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (113,2,'\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (114,2,'#\0\0\0P\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (115,2,'[\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (116,2,'s\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (117,2,'Ü\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (118,2,'Œ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (119,2,'≠\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (120,2,'J\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (121,2,'•\0\0\0€\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (122,2,'\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (123,2,'e\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (124,2,'8\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (125,2,'„\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (64,2,'o\0\0\0©\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (126,2,'j\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (63,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (127,2,'1\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (128,2,'å\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (129,2,'‹\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (130,2,'&\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (131,2,' \0\0\0-\0\0\0c\0\0\0¶\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (132,2,'\0\0\0î\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (1,2,'$\0\0\0Q\0\0\0x\0\0\0ê\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (133,2,'^\0\0\0Ñ\0\0\0ä\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (134,2,'˛\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (135,2,'|\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (136,2,'f\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (137,2,'≥\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (11,2,'‚\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (138,2,'∞\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (14,2,'q\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (139,2,'\Z\0\0\0E\0\0\0è\0\0\0ß\0\0\0ª\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (140,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (141,2,'u\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (142,2,'\r\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (143,2,'w\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (144,2,'ö\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (145,2,'Â\0\0\0Á\0\0\0ˆ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (146,2,'C\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (147,2,'‘\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (148,2,'ﬂ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (27,2,'\0\0\0\0\0\0H\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (149,2,'ò\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (28,2,'\0\0\0:\0\0\0X\0\0\0†\0\0\0¨\0\0\0Ø\0\0\0∂\0\0\0 \0\0\0Î\0\0\0Ò\0\0\0\0\0\0\0\0\n\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (30,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (150,2,'Í\0\0\0	\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (151,2,'±\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (152,2,'>\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (153,2,'l\0\0\0{\0\0\0£\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (154,2,'~\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (39,2,'\0\0\0∫\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (155,2,'r\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (156,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (157,2,'ÿ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (158,2,'À\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (42,2,'˜\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (43,2,'Z\0\0\0v\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (159,2,'\0\0\0I\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (160,2,'9\0\0\0W\0\0\0´\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (161,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (162,2,'m\0\0\0§\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (163,2,'ã\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (164,2,'g\0\0\0≤\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (165,2,'\"\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (166,2,'\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (167,2,'\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (48,2,'˝\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (168,2,'ı\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (169,2,'U\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (170,2,'¡\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (171,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (49,2,'÷\0\0\0Ù\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (172,2,'a\0\0\0h\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (173,2,'…\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (174,2,'K\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (175,2,'D\0\0\0Ó\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (52,2,'È\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (176,2,'û\0\0\0⁄\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (177,2,'”\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (178,2,'µ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (179,2,'V\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (180,2,'¯\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (181,2,'\0\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (182,2,'ø\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (183,2,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (184,2,'?\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (59,2,')\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (185,2,'›\0\0\0¸\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (186,2,'/\0\0\0Y\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (187,2,'Ç\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (188,2,'ô\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (60,2,'·\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (61,2,'\r\0\0\0\0\0\0ç\0\0\0Ú\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (189,2,'Å\0\0\0»\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (190,2,'ú\0\0\0°\0\0\0∆\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (191,2,'}\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (192,2,'N\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (193,2,'\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (194,2,'Ã\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (195,2,'’\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (196,2,'∏\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (197,2,'ñ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (67,3,'w\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (198,3,'4\0\0\0P\0\0\0ù\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (69,3,'\0\0\0\0\0\0(\0\0\0K\0\0\0]\0\0\0c\0\0\0t\0\0\0É\0\0\0é\0\0\0†\0\0\0©\0\0\0Ω\0\0\0Õ\0\0\0Ì\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (199,3,'z\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (200,3,'≈\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (71,3,'\0\0\0Ï\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (201,3,'@\0\0\0g\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (202,3,'û\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (76,3,'N\0\0\0v\0\0\0Â\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (203,3,')\0\0\0è\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (204,3,'®\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (10,3,'\0\0\0€\0\0\0·\0\0\0Î\0\0\0Ù\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (82,3,'∫\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (12,3,'%\0\0\0f\0\0\0r\0\0\0õ\0\0\0¢\0\0\0Æ\0\0\0“\0\0\0Ú\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (16,3,'\0\0\0o\0\0\0î\0\0\0¿\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (205,3,'5\0\0\0Q\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (206,3,'3\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (207,3,'Á\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (208,3,'Ä\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (22,3,'X\0\0\0ﬂ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (209,3,'ø\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (25,3,'ó\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (210,3,'ï\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (26,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (90,3,'È\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (89,3,'M\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (211,3,'p\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (33,3,'\r\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (34,3,'l\0\0\0Ñ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (212,3,'9\0\0\0B\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (213,3,'\n\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (214,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (100,3,'}\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (46,3,'i\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (215,3,'ﬁ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (216,3,'E\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (217,3,'1\0\0\0b\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (218,3,'u\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (219,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (220,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (106,3,'\0\0\0-\0\0\0=\0\0\0_\0\0\0n\0\0\0Å\0\0\0Ü\0\0\0ö\0\0\0—\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (221,3,'?\0\0\0â\0\0\0«\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (222,3,'Ò\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (223,3,'\"\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (110,3,'	\0\0\0^\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (224,3,'G\0\0\0\0\0\0π\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (225,3,'ì\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (226,3,'Ë\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (113,3,'•\0\0\0™\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (227,3,'Ó\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (228,3,'À\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (229,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (230,3,'7\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (231,3,'æ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (232,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (233,3,'\0\0\0\0\0\0›\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (234,3,'J\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (235,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (236,3,'±\0\0\0√\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (237,3,'‰\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (238,3,'.\0\0\0`\0\0\0∞\0\0\0≤\0\0\0¬\0\0\0ƒ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (239,3,'T\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (240,3,'\0\0\0\0\0\08\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (241,3,'∑\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (131,3,'¶\0\0\0¨\0\0\0¥\0\0\0–\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (133,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (1,3,'\0\0\0\\\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (242,3,'‹\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (4,3,'I\0\0\0ñ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (243,3,'‡\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (244,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (245,3,'e\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (7,3,'ç\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (246,3,'>\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (247,3,'Ê\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (11,3,'„\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (138,3,'j\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (248,3,'W\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (14,3,'å\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (139,3,'$\0\0\0q\0\0\0~\0\0\0á\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (249,3,'ô\0\0\0Ø\0\0\0”\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (18,3,':\0\0\0C\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (250,3,'!\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (251,3,'Ô\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (252,3,'Ç\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (253,3,'\Z\0\0\0\'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (254,3,'ë\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (28,3,' \0\0\0+\0\0\06\0\0\0;\0\0\0D\0\0\0x\0\0\0≠\0\0\0Ÿ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (255,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (256,3,'µ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (257,3,'y\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (258,3,'2\0\0\0{\0\0\0ä\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (259,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (35,3,'R\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (260,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (261,3,'í\0\0\0 \0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (39,3,'s\0\0\0ú\0\0\0£\0\0\0ı\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (262,3,'[\0\0\0ê\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (158,3,'’\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (43,3,'\0\0\0/\0\0\0F\0\0\0S\0\0\0V\0\0\0a\0\0\0à\0\0\0ò\0\0\0§\0\0\0∂\0\0\0∏\0\0\0…\0\0\0œ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (44,3,'O\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (263,3,'Z\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (264,3,'≥\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (160,3,'*\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (163,3,'#\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (265,3,'\0\0\0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (266,3,'º\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (267,3,'L\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (268,3,'¡\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (165,3,'H\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (269,3,'◊\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (167,3,'&\0\0\0´\0\0\0Û\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (48,3,'\0\0\0Y\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (168,3,'h\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (172,3,'ÿ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (49,3,'|\0\0\0ã\0\0\0‘\0\0\0Í\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (270,3,'k\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (271,3,'0\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (176,3,'∆\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (272,3,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (273,3,'A\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (60,3,'‚\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (190,3,'ü\0\0\0Ã\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (274,3,'d\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (275,3,'U\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (276,3,',\0\0\0<\0\0\0m\0\0\0Ö\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (277,3,'÷\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (278,3,'ß\0\0\0ª\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (279,3,'Œ\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (195,3,'»\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (280,3,'°\0\0\0⁄\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (281,4,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (12,4,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (282,4,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (281,5,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (12,5,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (282,5,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (283,5,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (284,6,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (285,7,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (286,8,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (287,9,'\0\0\0');
-INSERT INTO IndexedSearch_default_data VALUES (235,10,'\0\0\0');
-
---
--- Table structure for table `IndexedSearch_default_words`
---
-
-CREATE TABLE IndexedSearch_default_words (
-  word varchar(20) binary NOT NULL default '',
-  id smallint(5) unsigned NOT NULL auto_increment,
-  PRIMARY KEY  (id),
-  UNIQUE KEY word (word)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `IndexedSearch_default_words`
---
-
-
-INSERT INTO IndexedSearch_default_words VALUES ('that',1);
-INSERT INTO IndexedSearch_default_words VALUES ('projects',2);
-INSERT INTO IndexedSearch_default_words VALUES ('governments',3);
-INSERT INTO IndexedSearch_default_words VALUES ('on',4);
-INSERT INTO IndexedSearch_default_words VALUES ('business',5);
-INSERT INTO IndexedSearch_default_words VALUES ('list',6);
-INSERT INTO IndexedSearch_default_words VALUES ('reason',7);
-INSERT INTO IndexedSearch_default_words VALUES ('them',8);
-INSERT INTO IndexedSearch_default_words VALUES ('individuals',9);
-INSERT INTO IndexedSearch_default_words VALUES ('webgui',10);
-INSERT INTO IndexedSearch_default_words VALUES ('black',11);
-INSERT INTO IndexedSearch_default_words VALUES ('your',12);
-INSERT INTO IndexedSearch_default_words VALUES ('clubs',13);
-INSERT INTO IndexedSearch_default_words VALUES ('some',14);
-INSERT INTO IndexedSearch_default_words VALUES ('but',15);
-INSERT INTO IndexedSearch_default_words VALUES ('and',16);
-INSERT INTO IndexedSearch_default_words VALUES ('welcome',17);
-INSERT INTO IndexedSearch_default_words VALUES ('here',18);
-INSERT INTO IndexedSearch_default_words VALUES ('small',19);
-INSERT INTO IndexedSearch_default_words VALUES ('over',20);
-INSERT INTO IndexedSearch_default_words VALUES ('system',21);
-INSERT INTO IndexedSearch_default_words VALUES ('of',22);
-INSERT INTO IndexedSearch_default_words VALUES ('found',23);
-INSERT INTO IndexedSearch_default_words VALUES ('brief',24);
-INSERT INTO IndexedSearch_default_words VALUES ('all',25);
-INSERT INTO IndexedSearch_default_words VALUES ('is',26);
-INSERT INTO IndexedSearch_default_words VALUES ('web',27);
-INSERT INTO IndexedSearch_default_words VALUES ('to',28);
-INSERT INTO IndexedSearch_default_words VALUES ('powerful',29);
-INSERT INTO IndexedSearch_default_words VALUES ('home',30);
-INSERT INTO IndexedSearch_default_words VALUES ('businesses',31);
-INSERT INTO IndexedSearch_default_words VALUES ('enterprise',32);
-INSERT INTO IndexedSearch_default_words VALUES ('it',33);
-INSERT INTO IndexedSearch_default_words VALUES ('can',34);
-INSERT INTO IndexedSearch_default_words VALUES ('using',35);
-INSERT INTO IndexedSearch_default_words VALUES ('large',36);
-INSERT INTO IndexedSearch_default_words VALUES ('right',37);
-INSERT INTO IndexedSearch_default_words VALUES ('today',38);
-INSERT INTO IndexedSearch_default_words VALUES ('site',39);
-INSERT INTO IndexedSearch_default_words VALUES ('average',40);
-INSERT INTO IndexedSearch_default_words VALUES ('schools',41);
-INSERT INTO IndexedSearch_default_words VALUES ('made',42);
-INSERT INTO IndexedSearch_default_words VALUES ('the',43);
-INSERT INTO IndexedSearch_default_words VALUES ('done',44);
-INSERT INTO IndexedSearch_default_words VALUES ('designed',45);
-INSERT INTO IndexedSearch_default_words VALUES ('no',46);
-INSERT INTO IndexedSearch_default_words VALUES ('user',47);
-INSERT INTO IndexedSearch_default_words VALUES ('this',48);
-INSERT INTO IndexedSearch_default_words VALUES ('for',49);
-INSERT INTO IndexedSearch_default_words VALUES ('enough',50);
-INSERT INTO IndexedSearch_default_words VALUES ('by',51);
-INSERT INTO IndexedSearch_default_words VALUES ('be',52);
-INSERT INTO IndexedSearch_default_words VALUES ('management',53);
-INSERT INTO IndexedSearch_default_words VALUES ('universities',54);
-INSERT INTO IndexedSearch_default_words VALUES ('needs',55);
-INSERT INTO IndexedSearch_default_words VALUES ('thousands',56);
-INSERT INTO IndexedSearch_default_words VALUES ('satisfy',57);
-INSERT INTO IndexedSearch_default_words VALUES ('world',58);
-INSERT INTO IndexedSearch_default_words VALUES ('are',59);
-INSERT INTO IndexedSearch_default_words VALUES ('plain',60);
-INSERT INTO IndexedSearch_default_words VALUES ('use',61);
-INSERT INTO IndexedSearch_default_words VALUES ('friendly',62);
-INSERT INTO IndexedSearch_default_words VALUES ('easy',63);
-INSERT INTO IndexedSearch_default_words VALUES ('there',64);
-INSERT INTO IndexedSearch_default_words VALUES ('communities',65);
-INSERT INTO IndexedSearch_default_words VALUES ('shouldn',66);
-INSERT INTO IndexedSearch_default_words VALUES ('want',67);
-INSERT INTO IndexedSearch_default_words VALUES ('fuss',68);
-INSERT INTO IndexedSearch_default_words VALUES ('you',69);
-INSERT INTO IndexedSearch_default_words VALUES ('two',70);
-INSERT INTO IndexedSearch_default_words VALUES ('if',71);
-INSERT INTO IndexedSearch_default_words VALUES ('key',72);
-INSERT INTO IndexedSearch_default_words VALUES ('key_benefits',73);
-INSERT INTO IndexedSearch_default_words VALUES ('makes',74);
-INSERT INTO IndexedSearch_default_words VALUES ('editing',75);
-INSERT INTO IndexedSearch_default_words VALUES ('also',76);
-INSERT INTO IndexedSearch_default_words VALUES ('always',77);
-INSERT INTO IndexedSearch_default_words VALUES ('unique',78);
-INSERT INTO IndexedSearch_default_words VALUES ('what',79);
-INSERT INTO IndexedSearch_default_words VALUES ('install',80);
-INSERT INTO IndexedSearch_default_words VALUES ('aids',81);
-INSERT INTO IndexedSearch_default_words VALUES ('functions',82);
-INSERT INTO IndexedSearch_default_words VALUES ('adjust',83);
-INSERT INTO IndexedSearch_default_words VALUES ('technology',84);
-INSERT INTO IndexedSearch_default_words VALUES ('lingual',85);
-INSERT INTO IndexedSearch_default_words VALUES ('though',86);
-INSERT INTO IndexedSearch_default_words VALUES ('learn',87);
-INSERT INTO IndexedSearch_default_words VALUES ('still',88);
-INSERT INTO IndexedSearch_default_words VALUES ('have',89);
-INSERT INTO IndexedSearch_default_words VALUES ('programs',90);
-INSERT INTO IndexedSearch_default_words VALUES ('will',91);
-INSERT INTO IndexedSearch_default_words VALUES ('think',92);
-INSERT INTO IndexedSearch_default_words VALUES ('trusty',93);
-INSERT INTO IndexedSearch_default_words VALUES ('when',94);
-INSERT INTO IndexedSearch_default_words VALUES ('bold',95);
-INSERT INTO IndexedSearch_default_words VALUES ('build',96);
-INSERT INTO IndexedSearch_default_words VALUES ('15',97);
-INSERT INTO IndexedSearch_default_words VALUES ('online',98);
-INSERT INTO IndexedSearch_default_words VALUES ('where',99);
-INSERT INTO IndexedSearch_default_words VALUES ('yourself',100);
-INSERT INTO IndexedSearch_default_words VALUES ('dates',101);
-INSERT INTO IndexedSearch_default_words VALUES ('fact',102);
-INSERT INTO IndexedSearch_default_words VALUES ('restricted',103);
-INSERT INTO IndexedSearch_default_words VALUES ('like',104);
-INSERT INTO IndexedSearch_default_words VALUES ('wouldn',105);
-INSERT INTO IndexedSearch_default_words VALUES ('in',106);
-INSERT INTO IndexedSearch_default_words VALUES ('weight',107);
-INSERT INTO IndexedSearch_default_words VALUES ('inline',108);
-INSERT INTO IndexedSearch_default_words VALUES ('knew',109);
-INSERT INTO IndexedSearch_default_words VALUES ('re',110);
-INSERT INTO IndexedSearch_default_words VALUES ('addition',111);
-INSERT INTO IndexedSearch_default_words VALUES ('mind',112);
-INSERT INTO IndexedSearch_default_words VALUES ('add',113);
-INSERT INTO IndexedSearch_default_words VALUES ('ensures',114);
-INSERT INTO IndexedSearch_default_words VALUES ('same',115);
-INSERT INTO IndexedSearch_default_words VALUES ('cool',116);
-INSERT INTO IndexedSearch_default_words VALUES ('after',117);
-INSERT INTO IndexedSearch_default_words VALUES ('languages',118);
-INSERT INTO IndexedSearch_default_words VALUES ('limit',119);
-INSERT INTO IndexedSearch_default_words VALUES ('flexible',120);
-INSERT INTO IndexedSearch_default_words VALUES ('localized',121);
-INSERT INTO IndexedSearch_default_words VALUES ('features',122);
-INSERT INTO IndexedSearch_default_words VALUES ('laid',123);
-INSERT INTO IndexedSearch_default_words VALUES ('don',124);
-INSERT INTO IndexedSearch_default_words VALUES ('created',125);
-INSERT INTO IndexedSearch_default_words VALUES ('navigation',126);
-INSERT INTO IndexedSearch_default_words VALUES ('while',127);
-INSERT INTO IndexedSearch_default_words VALUES ('why',128);
-INSERT INTO IndexedSearch_default_words VALUES ('oddities',129);
-INSERT INTO IndexedSearch_default_words VALUES ('know',130);
-INSERT INTO IndexedSearch_default_words VALUES ('content',131);
-INSERT INTO IndexedSearch_default_words VALUES ('has',132);
-INSERT INTO IndexedSearch_default_words VALUES ('not',133);
-INSERT INTO IndexedSearch_default_words VALUES ('allows',134);
-INSERT INTO IndexedSearch_default_words VALUES ('our',135);
-INSERT INTO IndexedSearch_default_words VALUES ('out',136);
-INSERT INTO IndexedSearch_default_words VALUES ('timezone',137);
-INSERT INTO IndexedSearch_default_words VALUES ('one',138);
-INSERT INTO IndexedSearch_default_words VALUES ('with',139);
-INSERT INTO IndexedSearch_default_words VALUES ('manage',140);
-INSERT INTO IndexedSearch_default_words VALUES ('behind',141);
-INSERT INTO IndexedSearch_default_words VALUES ('core',142);
-INSERT INTO IndexedSearch_default_words VALUES ('scenes',143);
-INSERT INTO IndexedSearch_default_words VALUES ('cuts',144);
-INSERT INTO IndexedSearch_default_words VALUES ('we',145);
-INSERT INTO IndexedSearch_default_words VALUES ('edit',146);
-INSERT INTO IndexedSearch_default_words VALUES ('local',147);
-INSERT INTO IndexedSearch_default_words VALUES ('design',148);
-INSERT INTO IndexedSearch_default_words VALUES ('wizards',149);
-INSERT INTO IndexedSearch_default_words VALUES ('able',150);
-INSERT INTO IndexedSearch_default_words VALUES ('language',151);
-INSERT INTO IndexedSearch_default_words VALUES ('any',152);
-INSERT INTO IndexedSearch_default_words VALUES ('work',153);
-INSERT INTO IndexedSearch_default_words VALUES ('concern',154);
-INSERT INTO IndexedSearch_default_words VALUES ('pretty',155);
-INSERT INTO IndexedSearch_default_words VALUES ('then',156);
-INSERT INTO IndexedSearch_default_words VALUES ('times',157);
-INSERT INTO IndexedSearch_default_words VALUES ('more',158);
-INSERT INTO IndexedSearch_default_words VALUES ('browser',159);
-INSERT INTO IndexedSearch_default_words VALUES ('need',160);
-INSERT INTO IndexedSearch_default_words VALUES ('font',161);
-INSERT INTO IndexedSearch_default_words VALUES ('faster',162);
-INSERT INTO IndexedSearch_default_words VALUES ('useful',163);
-INSERT INTO IndexedSearch_default_words VALUES ('or',164);
-INSERT INTO IndexedSearch_default_words VALUES ('interface',165);
-INSERT INTO IndexedSearch_default_words VALUES ('upgrade',166);
-INSERT INTO IndexedSearch_default_words VALUES ('new',167);
-INSERT INTO IndexedSearch_default_words VALUES ('so',168);
-INSERT INTO IndexedSearch_default_words VALUES ('sites',169);
-INSERT INTO IndexedSearch_default_words VALUES ('built',170);
-INSERT INTO IndexedSearch_default_words VALUES ('wysiwyg',171);
-INSERT INTO IndexedSearch_default_words VALUES ('how',172);
-INSERT INTO IndexedSearch_default_words VALUES ('translated',173);
-INSERT INTO IndexedSearch_default_words VALUES ('designs',174);
-INSERT INTO IndexedSearch_default_words VALUES ('everything',175);
-INSERT INTO IndexedSearch_default_words VALUES ('other',176);
-INSERT INTO IndexedSearch_default_words VALUES ('their',177);
-INSERT INTO IndexedSearch_default_words VALUES ('snap',178);
-INSERT INTO IndexedSearch_default_words VALUES ('ever',179);
-INSERT INTO IndexedSearch_default_words VALUES ('most',180);
-INSERT INTO IndexedSearch_default_words VALUES ('benefits',181);
-INSERT INTO IndexedSearch_default_words VALUES ('even',182);
-INSERT INTO IndexedSearch_default_words VALUES ('dt',183);
-INSERT INTO IndexedSearch_default_words VALUES ('complicated',184);
-INSERT INTO IndexedSearch_default_words VALUES ('pluggable',185);
-INSERT INTO IndexedSearch_default_words VALUES ('look',186);
-INSERT INTO IndexedSearch_default_words VALUES ('usability',187);
-INSERT INTO IndexedSearch_default_words VALUES ('short',188);
-INSERT INTO IndexedSearch_default_words VALUES ('been',189);
-INSERT INTO IndexedSearch_default_words VALUES ('help',190);
-INSERT INTO IndexedSearch_default_words VALUES ('first',191);
-INSERT INTO IndexedSearch_default_words VALUES ('templating',192);
-INSERT INTO IndexedSearch_default_words VALUES ('without',193);
-INSERT INTO IndexedSearch_default_words VALUES ('than',194);
-INSERT INTO IndexedSearch_default_words VALUES ('settings',195);
-INSERT INTO IndexedSearch_default_words VALUES ('multi',196);
-INSERT INTO IndexedSearch_default_words VALUES ('kinds',197);
-INSERT INTO IndexedSearch_default_words VALUES ('these',198);
-INSERT INTO IndexedSearch_default_words VALUES ('another',199);
-INSERT INTO IndexedSearch_default_words VALUES ('many',200);
-INSERT INTO IndexedSearch_default_words VALUES ('password',201);
-INSERT INTO IndexedSearch_default_words VALUES ('controls',202);
-INSERT INTO IndexedSearch_default_words VALUES ('ll',203);
-INSERT INTO IndexedSearch_default_words VALUES ('lets',204);
-INSERT INTO IndexedSearch_default_words VALUES ('steps',205);
-INSERT INTO IndexedSearch_default_words VALUES ('follow',206);
-INSERT INTO IndexedSearch_default_words VALUES ('several',207);
-INSERT INTO IndexedSearch_default_words VALUES ('privileges',208);
-INSERT INTO IndexedSearch_default_words VALUES ('users',209);
-INSERT INTO IndexedSearch_default_words VALUES ('menus',210);
-INSERT INTO IndexedSearch_default_words VALUES ('mess',211);
-INSERT INTO IndexedSearch_default_words VALUES ('click',212);
-INSERT INTO IndexedSearch_default_words VALUES ('reading',213);
-INSERT INTO IndexedSearch_default_words VALUES ('ve',214);
-INSERT INTO IndexedSearch_default_words VALUES ('copy',215);
-INSERT INTO IndexedSearch_default_words VALUES ('turn',216);
-INSERT INTO IndexedSearch_default_words VALUES ('administrator',217);
-INSERT INTO IndexedSearch_default_words VALUES ('might',218);
-INSERT INTO IndexedSearch_default_words VALUES ('got',219);
-INSERT INTO IndexedSearch_default_words VALUES ('order',220);
-INSERT INTO IndexedSearch_default_words VALUES ('admin',221);
-INSERT INTO IndexedSearch_default_words VALUES ('enjoy',222);
-INSERT INTO IndexedSearch_default_words VALUES ('anything',223);
-INSERT INTO IndexedSearch_default_words VALUES ('administrative',224);
-INSERT INTO IndexedSearch_default_words VALUES ('buttons',225);
-INSERT INTO IndexedSearch_default_words VALUES ('support',226);
-INSERT INTO IndexedSearch_default_words VALUES ('run',227);
-INSERT INTO IndexedSearch_default_words VALUES ('toolbars',228);
-INSERT INTO IndexedSearch_default_words VALUES ('means',229);
-INSERT INTO IndexedSearch_default_words VALUES ('get',230);
-INSERT INTO IndexedSearch_default_words VALUES ('control',231);
-INSERT INTO IndexedSearch_default_words VALUES ('trivial',232);
-INSERT INTO IndexedSearch_default_words VALUES ('getting',233);
-INSERT INTO IndexedSearch_default_words VALUES ('note',234);
-INSERT INTO IndexedSearch_default_words VALUES ('message',235);
-INSERT INTO IndexedSearch_default_words VALUES ('well',236);
-INSERT INTO IndexedSearch_default_words VALUES ('software',237);
-INSERT INTO IndexedSearch_default_words VALUES ('as',238);
-INSERT INTO IndexedSearch_default_words VALUES ('block',239);
-INSERT INTO IndexedSearch_default_words VALUES ('started',240);
-INSERT INTO IndexedSearch_default_words VALUES ('clipboard',241);
-INSERT INTO IndexedSearch_default_words VALUES ('consider',242);
-INSERT INTO IndexedSearch_default_words VALUES ('ruling',243);
-INSERT INTO IndexedSearch_default_words VALUES ('trouble',244);
-INSERT INTO IndexedSearch_default_words VALUES ('change',245);
-INSERT INTO IndexedSearch_default_words VALUES ('username',246);
-INSERT INTO IndexedSearch_default_words VALUES ('provides',247);
-INSERT INTO IndexedSearch_default_words VALUES ('top',248);
-INSERT INTO IndexedSearch_default_words VALUES ('pages',249);
-INSERT INTO IndexedSearch_default_words VALUES ('do',250);
-INSERT INTO IndexedSearch_default_words VALUES ('into',251);
-INSERT INTO IndexedSearch_default_words VALUES ('case',252);
-INSERT INTO IndexedSearch_default_words VALUES ('installation',253);
-INSERT INTO IndexedSearch_default_words VALUES ('notice',254);
-INSERT INTO IndexedSearch_default_words VALUES ('good',255);
-INSERT INTO IndexedSearch_default_words VALUES ('from',256);
-INSERT INTO IndexedSearch_default_words VALUES ('create',257);
-INSERT INTO IndexedSearch_default_words VALUES ('account',258);
-INSERT INTO IndexedSearch_default_words VALUES ('running',259);
-INSERT INTO IndexedSearch_default_words VALUES ('job',260);
-INSERT INTO IndexedSearch_default_words VALUES ('little',261);
-INSERT INTO IndexedSearch_default_words VALUES ('now',262);
-INSERT INTO IndexedSearch_default_words VALUES ('page',263);
-INSERT INTO IndexedSearch_default_words VALUES ('paste',264);
-INSERT INTO IndexedSearch_default_words VALUES ('getting_started',265);
-INSERT INTO IndexedSearch_default_words VALUES ('let',266);
-INSERT INTO IndexedSearch_default_words VALUES ('could',267);
-INSERT INTO IndexedSearch_default_words VALUES ('groups',268);
-INSERT INTO IndexedSearch_default_words VALUES ('about',269);
-INSERT INTO IndexedSearch_default_words VALUES ('else',270);
-INSERT INTO IndexedSearch_default_words VALUES ('default',271);
-INSERT INTO IndexedSearch_default_words VALUES ('up',272);
-INSERT INTO IndexedSearch_default_words VALUES ('123qwe',273);
-INSERT INTO IndexedSearch_default_words VALUES ('should',274);
-INSERT INTO IndexedSearch_default_words VALUES ('at',275);
-INSERT INTO IndexedSearch_default_words VALUES ('log',276);
-INSERT INTO IndexedSearch_default_words VALUES ('information',277);
-INSERT INTO IndexedSearch_default_words VALUES ('menu',278);
-INSERT INTO IndexedSearch_default_words VALUES ('manipulate',279);
-INSERT INTO IndexedSearch_default_words VALUES ('administer',280);
-INSERT INTO IndexedSearch_default_words VALUES ('email',281);
-INSERT INTO IndexedSearch_default_words VALUES ('address',282);
-INSERT INTO IndexedSearch_default_words VALUES ('friends',283);
-INSERT INTO IndexedSearch_default_words VALUES ('cc',284);
-INSERT INTO IndexedSearch_default_words VALUES ('bcc',285);
-INSERT INTO IndexedSearch_default_words VALUES ('subject',286);
-INSERT INTO IndexedSearch_default_words VALUES ('url',287);
-
---
--- Table structure for table `IndexedSearch_docInfo`
---
-
-CREATE TABLE IndexedSearch_docInfo (
-  docId int(11) NOT NULL default '0',
-  indexName varchar(35) NOT NULL default 'Search_index',
-  assetId varchar(22) default NULL,
-  groupIdView varchar(22) default NULL,
-  special_groupIdView varchar(22) default NULL,
-  namespace varchar(35) default NULL,
-  location varchar(255) default NULL,
-  headerShortcut text,
-  bodyShortcut text,
-  contentType text NOT NULL,
-  ownerId varchar(22) default NULL,
-  dateIndexed int(11) NOT NULL default '0',
-  PRIMARY KEY  (docId,indexName)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `IndexedSearch_docInfo`
---
-
-
-INSERT INTO IndexedSearch_docInfo VALUES (1,'IndexedSearch_default','TKzUMeIxRLrZ3NAEez6CXQ','7','7','Article','/home/welcome','select title from asset where assetId = \'TKzUMeIxRLrZ3NAEez6CXQ\'','select description from wobject where assetId = \'TKzUMeIxRLrZ3NAEez6CXQ\'','content','3',1109980803);
-INSERT INTO IndexedSearch_docInfo VALUES (2,'IndexedSearch_default','sWVXMZGibxHe2Ekj1DCldA','7','7','Article','/home/key_benefits','select title from asset where assetId = \'sWVXMZGibxHe2Ekj1DCldA\'','select description from wobject where assetId = \'sWVXMZGibxHe2Ekj1DCldA\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (3,'IndexedSearch_default','x_WjMvFmilhX-jvZuIpinw','7','7','Article','/getting_started/getting_started','select title from asset where assetId = \'x_WjMvFmilhX-jvZuIpinw\'','select description from wobject where assetId = \'x_WjMvFmilhX-jvZuIpinw\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (4,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1000\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1000\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (5,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1001\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1001\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (6,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1002\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1002\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (7,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1003\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1003\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (8,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1004\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1004\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (9,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1005\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1005\'','content','3',1109980804);
-INSERT INTO IndexedSearch_docInfo VALUES (10,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1006\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1006\'','content','3',1109980804);
-
---
--- Table structure for table `Layout`
---
-
-CREATE TABLE Layout (
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  contentPositions text,
-  assetsToHide text,
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Layout`
---
-
-
-INSERT INTO Layout VALUES ('68sKwDgf9cGH58-NZcU4lg','PBtmpl0000000000000054','TKzUMeIxRLrZ3NAEez6CXQ,sWVXMZGibxHe2Ekj1DCldA',NULL);
-INSERT INTO Layout VALUES ('_iHetEvMQUOoxS-T2CM0sQ','PBtmpl0000000000000054','x_WjMvFmilhX-jvZuIpinw',NULL);
-INSERT INTO Layout VALUES ('8Bb8gu-me2mhL3ljFyiWLg','PBtmpl0000000000000054','DC1etlIaBRQitXnchZKvUw',NULL);
-INSERT INTO Layout VALUES ('2TqQc4OISddWCZmRY1_m8A','PBtmpl0000000000000054','fK-HMSboA3uu0c1KYkYspA',NULL);
-INSERT INTO Layout VALUES ('Swf6L8poXKc7hUaNPkBevw','PBtmpl0000000000000054','Szs5eev3OMssmnsyLRZmWA',NULL);
-INSERT INTO Layout VALUES ('x3OFY6OJh_qsXkZfPwug4A','PBtmpl0000000000000054','pJd5TLAjfWMVXD6sCRLwUg',NULL);
-
---
--- Table structure for table `MessageBoard`
---
-
-CREATE TABLE MessageBoard (
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `MessageBoard`
---
-
-
-
---
--- Table structure for table `Navigation`
---
-
-CREATE TABLE Navigation (
-  assetId varchar(22) NOT NULL default '',
-  assetsToInclude text,
-  startType varchar(35) default NULL,
-  startPoint varchar(255) default NULL,
-  descendantEndPoint int(11) NOT NULL default '55',
-  showSystemPages int(11) NOT NULL default '0',
-  showHiddenPages int(11) NOT NULL default '0',
-  showUnprivilegedPages int(11) NOT NULL default '0',
-  templateId varchar(22) NOT NULL default '',
-  ancestorEndPoint int(11) NOT NULL default '55',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Navigation`
---
-
-
-INSERT INTO Navigation VALUES ('pJd5TLAjfWMVXD6sCRLwUg','descendants','specificUrl','root',55,0,0,0,'PBtmpl0000000000000048',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000001','self\nancestors','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000093',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000014','pedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000015','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000048',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000016','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000108',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000017','self\nsiblings','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000117',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000018','descendants','relativeToCurrentUrl','-1',1,0,0,0,'PBtmpl0000000000000048',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000019','descendants','relativeToCurrentUrl','-1',1,0,0,0,'PBtmpl0000000000000108',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000020','descendants','relativeToRoot','0',1,0,0,0,'PBtmpl0000000000000108',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000021','descendants','specificUrl','home',3,0,0,0,'PBtmpl0000000000000117',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000002','descendants','specificUrl','home',3,0,0,0,'PBtmpl0000000000000048',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000006','descendants','specificUrl','home',1,0,0,0,'PBtmpl0000000000000108',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000007','descendants','relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000048',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000008','descendants','relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000108',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000009','descendants','relativeToRoot','0',1,0,0,0,'PBtmpl0000000000000124',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000010',NULL,'relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000117',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000011','self\ndescendants','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000130',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000012','descendants','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000134',55);
-INSERT INTO Navigation VALUES ('PBnav00000000000000013','self\ndescendants','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000136',55);
-INSERT INTO Navigation VALUES ('f2bihDeMoI-Ojt2dutJNQA',NULL,'relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000071',55);
-INSERT INTO Navigation VALUES ('KZ2UytxNpbF-3Eg3RNvQQQ','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000075',55);
-INSERT INTO Navigation VALUES ('G0wlShbk_XruYVfbXqWq_w','ancestors\nself\npedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55);
-
---
--- Table structure for table `Poll`
---
-
-CREATE TABLE Poll (
-  active int(11) NOT NULL default '1',
-  graphWidth int(11) NOT NULL default '150',
-  voteGroup varchar(22) default NULL,
-  question varchar(255) default NULL,
-  a1 varchar(255) default NULL,
-  a2 varchar(255) default NULL,
-  a3 varchar(255) default NULL,
-  a4 varchar(255) default NULL,
-  a5 varchar(255) default NULL,
-  a6 varchar(255) default NULL,
-  a7 varchar(255) default NULL,
-  a8 varchar(255) default NULL,
-  a9 varchar(255) default NULL,
-  a10 varchar(255) default NULL,
-  a11 varchar(255) default NULL,
-  a12 varchar(255) default NULL,
-  a13 varchar(255) default NULL,
-  a14 varchar(255) default NULL,
-  a15 varchar(255) default NULL,
-  a16 varchar(255) default NULL,
-  a17 varchar(255) default NULL,
-  a18 varchar(255) default NULL,
-  a19 varchar(255) default NULL,
-  a20 varchar(255) default NULL,
-  karmaPerVote int(11) NOT NULL default '0',
-  randomizeAnswers int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Poll`
---
-
-
-
---
--- Table structure for table `Poll_answer`
---
-
-CREATE TABLE Poll_answer (
-  answer char(3) default NULL,
-  userId varchar(22) default NULL,
-  ipAddress varchar(50) default NULL,
-  assetId varchar(22) default NULL
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Poll_answer`
---
-
-
-
---
--- Table structure for table `Post`
---
-
-CREATE TABLE Post (
-  assetId varchar(22) NOT NULL default '',
-  threadId varchar(22) NOT NULL default '',
-  dateSubmitted bigint(20) default NULL,
-  dateUpdated bigint(20) default NULL,
-  username varchar(30) default NULL,
-  content mediumtext,
-  status varchar(30) NOT NULL default 'approved',
-  views int(11) NOT NULL default '0',
-  contentType varchar(35) NOT NULL default 'mixed',
-  userDefined1 text,
-  userDefined2 text,
-  userDefined3 text,
-  userDefined4 text,
-  userDefined5 text,
-  storageId varchar(22) default NULL,
-  rating int(11) NOT NULL default '0',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Post`
---
-
-
-INSERT INTO Post VALUES ('pSygeMG7bSL1Za0SNqfUbw','pSygeMG7bSL1Za0SNqfUbw',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_talk_to_experts.gif\" align=\"right\" style=\"padding-left: 15px;\" /> Our website contains all of the different methods for reaching us. Our friendly staff will be happy to assist you in any way possible.\r\n\r\n','approved',2,'html','http://www.plainblack.com/contact_us','0',NULL,NULL,NULL,NULL,0);
-INSERT INTO Post VALUES ('mdIaXozmVNE_Rga2BY0mxA','mdIaXozmVNE_Rga2BY0mxA',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_manual.gif\" align=\"right\" style=\"padding-left: 15px;\" />Ruling WebGUI is the definitive guide to everything WebGUI related. It has been compiled by the experts at Plain Black and covers almost all aspects of WebGUI. When you purchase Ruling WebGUI, you will receive updates to this great manual for one full year.','approved',0,'html','http://www.plainblack.com/store/rwg','0',NULL,NULL,NULL,NULL,0);
-INSERT INTO Post VALUES ('9kDcFufTKbMTkeAHyP36fw','9kDcFufTKbMTkeAHyP36fw',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_tech_support.gif\" align=\"right\" style=\"padding-left: 15px;\" />The WebGUI Support Center is there to help you when you get stuck. With a system as large as WebGUI, you\'ll likely have some questions, and our courteous and knowlegable staff is available to answer those questions. And best of all, you get Ruling WebGUI free when you sign up for the Support Center.\r\n\r\n','approved',0,'html','http://www.plainblack.com/store/support','0',NULL,NULL,NULL,NULL,0);
-INSERT INTO Post VALUES ('5Y8eOI2u_HOvkzrRuLdz1g','5Y8eOI2u_HOvkzrRuLdz1g',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_hosting.gif\" align=\"right\" style=\"padding-left: 15px;\" />We provide professional hosting services for you so you don\'t have to go through the trouble of finding a hoster who likely won\'t know what to do with WebGUI anyway.','approved',0,'html','http://www.plainblack.com/store/hosting','0',NULL,NULL,NULL,NULL,0);
-INSERT INTO Post VALUES ('ImmYJRWOPFedzI4Bg1k6GA','ImmYJRWOPFedzI4Bg1k6GA',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_look_great.gif\" align=\"right\" style=\"padding-left: 15px;\" />Let Plain Black\'s design team build you a professional looking design. Our award-winning designers can get you the look you need on time and on budget, every time.','approved',0,'html','http://www.plainblack.com/design','0',NULL,NULL,NULL,NULL,0);
-
---
--- Table structure for table `Post_rating`
---
-
-CREATE TABLE Post_rating (
-  assetId varchar(22) NOT NULL default '',
-  userId varchar(22) NOT NULL default '',
-  ipAddress varchar(15) NOT NULL default '',
-  dateOfRating bigint(20) default NULL,
-  rating int(11) NOT NULL default '0'
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Post_rating`
---
-
-
-
---
--- Table structure for table `Post_read`
---
-
-CREATE TABLE Post_read (
-  postId varchar(22) NOT NULL default '',
-  threadId varchar(22) NOT NULL default '',
-  userId varchar(22) NOT NULL default '',
-  readDate bigint(20) default NULL
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Post_read`
---
-
-
-INSERT INTO Post_read VALUES ('pSygeMG7bSL1Za0SNqfUbw','pSygeMG7bSL1Za0SNqfUbw','1',1109194986);
-
---
--- Table structure for table `Product`
---
-
-CREATE TABLE Product (
-  image1 varchar(255) default NULL,
-  image2 varchar(255) default NULL,
-  image3 varchar(255) default NULL,
-  brochure varchar(255) default NULL,
-  manual varchar(255) default NULL,
-  warranty varchar(255) default NULL,
-  price varchar(255) default NULL,
-  productNumber varchar(255) default NULL,
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Product`
---
-
-
-
---
--- Table structure for table `Product_accessory`
---
-
-CREATE TABLE Product_accessory (
-  sequenceNumber int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  accessoryAssetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId,accessoryAssetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Product_accessory`
---
-
-
-
---
--- Table structure for table `Product_benefit`
---
-
-CREATE TABLE Product_benefit (
-  Product_benefitId varchar(22) NOT NULL default '',
-  benefit varchar(255) default NULL,
-  sequenceNumber int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (Product_benefitId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Product_benefit`
---
-
-
-
---
--- Table structure for table `Product_feature`
---
-
-CREATE TABLE Product_feature (
-  Product_featureId varchar(22) NOT NULL default '',
-  feature varchar(255) default NULL,
-  sequenceNumber int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (Product_featureId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Product_feature`
---
-
-
-
---
--- Table structure for table `Product_related`
---
-
-CREATE TABLE Product_related (
-  sequenceNumber int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  relatedAssetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId,relatedAssetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Product_related`
---
-
-
-
---
--- Table structure for table `Product_specification`
---
-
-CREATE TABLE Product_specification (
-  Product_specificationId varchar(22) NOT NULL default '',
-  name varchar(255) default NULL,
-  value varchar(255) default NULL,
-  units varchar(255) default NULL,
-  sequenceNumber int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (Product_specificationId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Product_specification`
---
-
-
-
---
--- Table structure for table `RichEdit`
---
-
-CREATE TABLE RichEdit (
-  assetId varchar(22) NOT NULL default '',
-  askAboutRichEdit int(11) NOT NULL default '0',
-  preformatted int(11) NOT NULL default '0',
-  editorWidth int(11) NOT NULL default '0',
-  editorHeight int(11) NOT NULL default '0',
-  sourceEditorWidth int(11) NOT NULL default '0',
-  sourceEditorHeight int(11) NOT NULL default '0',
-  useBr int(11) NOT NULL default '0',
-  nowrap int(11) NOT NULL default '0',
-  removeLineBreaks int(11) NOT NULL default '0',
-  npwrap int(11) NOT NULL default '0',
-  directionality char(3) NOT NULL default 'ltr',
-  toolbarLocation varchar(6) NOT NULL default 'bottom',
-  cssFile varchar(255) default NULL,
-  extendedValidElements text,
-  toolbarRow1 text,
-  toolbarRow2 text,
-  toolbarRow3 text,
-  enableContextMenu int(11) NOT NULL default '0',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `RichEdit`
---
-
-
-INSERT INTO RichEdit VALUES ('PBrichedit000000000001',0,0,0,0,600,500,0,0,0,0,'ltr','bottom',NULL,NULL,'bold\nitalic\njustifyleft\njustifyright\njustifycenter\njustifyfull\nindent\noutdent\nsub\nsup\nformatselect\nremoveformat','bullist\nnumlist\nlink\npagetree\nanchor\nunlink\nadvhr\nimage\ninsertImage\ncharmap\ncollateral','tablecontrols\nvisualaid\npreview\ncode\ncleanup\nreplace',1);
-INSERT INTO RichEdit VALUES ('PBrichedit000000000002',0,0,0,0,0,0,0,0,0,0,'ltr','bottom',NULL,NULL,'bold\nitalic\nbullist\nnumlist\nlink\nunlink\nemotions',NULL,NULL,0);
-
---
--- Table structure for table `SQLReport`
---
-
-CREATE TABLE SQLReport (
-  dbQuery1 text,
-  paginateAfter int(11) NOT NULL default '50',
-  preprocessMacros1 int(11) default '0',
-  debugMode int(11) NOT NULL default '0',
-  databaseLinkId1 varchar(22) default NULL,
-  placeholderParams1 text,
-  preprocessMacros2 int(11) default '0',
-  dbQuery2 text,
-  placeholderParams2 text,
-  databaseLinkId2 varchar(22) default NULL,
-  preprocessMacros3 int(11) default '0',
-  dbQuery3 text,
-  placeholderParams3 text,
-  databaseLinkId3 varchar(22) default NULL,
-  preprocessMacros4 int(11) default '0',
-  dbQuery4 text,
-  placeholderParams4 text,
-  databaseLinkId4 varchar(22) default NULL,
-  preprocessMacros5 int(11) default '0',
-  dbQuery5 text,
-  placeholderParams5 text,
-  databaseLinkId5 varchar(22) default NULL,
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `SQLReport`
---
-
-
-
---
--- Table structure for table `Shortcut`
---
-
-CREATE TABLE Shortcut (
-  overrideTitle int(11) NOT NULL default '0',
-  overrideDescription int(11) NOT NULL default '0',
-  overrideTemplate int(11) NOT NULL default '0',
-  overrideDisplayTitle int(11) NOT NULL default '0',
-  overrideTemplateId varchar(22) NOT NULL default '',
-  shortcutByCriteria int(11) NOT NULL default '0',
-  resolveMultiples varchar(30) default 'mostRecent',
-  shortcutCriteria text NOT NULL,
-  description mediumtext,
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  shortcutToAssetId varchar(22) NOT NULL default '',
-  disableContentLock int(11) NOT NULL default '0',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Shortcut`
---
-
-
-
---
--- Table structure for table `Survey`
---
-
-CREATE TABLE Survey (
-  questionOrder varchar(30) default NULL,
-  groupToTakeSurvey varchar(22) default NULL,
-  groupToViewReports varchar(22) default NULL,
-  mode varchar(30) default NULL,
-  Survey_id varchar(22) default NULL,
-  anonymous char(1) NOT NULL default '0',
-  questionsPerPage int(11) NOT NULL default '1',
-  responseTemplateId varchar(22) default NULL,
-  overviewTemplateId varchar(22) default NULL,
-  maxResponsesPerUser int(11) NOT NULL default '1',
-  questionsPerResponse int(11) NOT NULL default '9999999',
-  gradebookTemplateId varchar(22) default 'PBtmpl0000000000000062',
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Survey`
---
-
-
-
---
--- Table structure for table `Survey_answer`
---
-
-CREATE TABLE Survey_answer (
-  Survey_id varchar(22) default NULL,
-  Survey_questionId varchar(22) default NULL,
-  Survey_answerId varchar(22) NOT NULL default '',
-  sequenceNumber int(11) NOT NULL default '1',
-  gotoQuestion varchar(22) default NULL,
-  answer varchar(255) default NULL,
-  isCorrect int(11) NOT NULL default '0',
-  PRIMARY KEY  (Survey_answerId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Survey_answer`
---
-
-
-
---
--- Table structure for table `Survey_question`
---
-
-CREATE TABLE Survey_question (
-  Survey_id varchar(22) default NULL,
-  Survey_questionId varchar(22) NOT NULL default '',
-  question text,
-  sequenceNumber int(11) NOT NULL default '1',
-  allowComment int(11) NOT NULL default '0',
-  randomizeAnswers int(11) NOT NULL default '0',
-  answerFieldType varchar(35) default NULL,
-  gotoQuestion varchar(22) default NULL,
-  PRIMARY KEY  (Survey_questionId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Survey_question`
---
-
-
-
---
--- Table structure for table `Survey_questionResponse`
---
-
-CREATE TABLE Survey_questionResponse (
-  Survey_id varchar(22) default NULL,
-  Survey_questionId varchar(22) NOT NULL default '',
-  Survey_answerId varchar(22) NOT NULL default '',
-  Survey_responseId varchar(22) NOT NULL default '',
-  response varchar(255) default NULL,
-  comment text,
-  dateOfResponse int(11) default NULL,
-  PRIMARY KEY  (Survey_questionId,Survey_answerId,Survey_responseId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Survey_questionResponse`
---
-
-
-
---
--- Table structure for table `Survey_response`
---
-
-CREATE TABLE Survey_response (
-  Survey_id varchar(22) default NULL,
-  Survey_responseId varchar(22) NOT NULL default '',
-  userId varchar(22) default NULL,
-  username varchar(255) default NULL,
-  ipAddress varchar(15) default NULL,
-  startDate int(11) default NULL,
-  endDate int(11) default NULL,
-  isComplete int(11) NOT NULL default '0',
-  PRIMARY KEY  (Survey_responseId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Survey_response`
---
-
-
-
---
--- Table structure for table `SyndicatedContent`
---
-
-CREATE TABLE SyndicatedContent (
-  rssUrl text,
-  maxHeadlines int(11) NOT NULL default '0',
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  displayMode varchar(20) NOT NULL default 'interleaved',
-  hasTerms varchar(255) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `SyndicatedContent`
---
-
-
-INSERT INTO SyndicatedContent VALUES ('http://www.plainblack.com/news/news?func=viewRSS',3,'fK-HMSboA3uu0c1KYkYspA','GNvjCFQWjY2AF2uf0aCM8Q');
-
---
--- Table structure for table `Thread`
---
-
-CREATE TABLE Thread (
-  assetId varchar(22) NOT NULL default '',
-  replies int(11) NOT NULL default '0',
-  lastPostId varchar(22) NOT NULL default '0',
-  lastPostDate bigint(20) default NULL,
-  isLocked int(11) NOT NULL default '0',
-  isSticky int(11) NOT NULL default '0',
-  subscriptionGroupId varchar(22) default NULL,
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `Thread`
---
-
-
-INSERT INTO Thread VALUES ('pSygeMG7bSL1Za0SNqfUbw',0,'',NULL,0,0,'wP1Lt8NIySq9MS8xPGnAsQ');
-INSERT INTO Thread VALUES ('mdIaXozmVNE_Rga2BY0mxA',0,'',NULL,0,0,'OL-d6C93EeUr4Rja-q3-yQ');
-INSERT INTO Thread VALUES ('9kDcFufTKbMTkeAHyP36fw',0,'',NULL,0,0,'YPCggIxdKT3AMMlML-CAuw');
-INSERT INTO Thread VALUES ('5Y8eOI2u_HOvkzrRuLdz1g',0,'',NULL,0,0,'C02CXMw3c42EJJR_nktyMw');
-INSERT INTO Thread VALUES ('ImmYJRWOPFedzI4Bg1k6GA',0,'',NULL,0,0,'zZmjNsD1FhaSFkgXvnCQUg');
-
---
--- Table structure for table `WSClient`
---
-
-CREATE TABLE WSClient (
-  callMethod text,
-  uri varchar(255) NOT NULL default '',
-  proxy varchar(255) NOT NULL default '',
-  preprocessMacros int(11) NOT NULL default '0',
-  paginateAfter int(11) NOT NULL default '50',
-  paginateVar varchar(35) default NULL,
-  debugMode int(11) NOT NULL default '0',
-  params text,
-  execute_by_default tinyint(4) NOT NULL default '1',
-  decodeUtf8 tinyint(3) unsigned NOT NULL default '0',
-  httpHeader varchar(50) default NULL,
-  sharedCache tinyint(3) unsigned NOT NULL default '0',
-  cacheTTL smallint(5) unsigned NOT NULL default '60',
-  assetId varchar(22) NOT NULL default '',
-  templateId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `WSClient`
---
-
-
-
---
--- Table structure for table `asset`
---
-
-CREATE TABLE asset (
-  assetId varchar(22) NOT NULL default '',
-  parentId varchar(22) NOT NULL default '',
-  lineage varchar(255) NOT NULL default '',
-  state varchar(35) NOT NULL default '',
-  className varchar(255) NOT NULL default '',
-  title varchar(255) NOT NULL default 'untitled',
-  menuTitle varchar(255) NOT NULL default 'untitled',
-  url varchar(255) NOT NULL default '',
-  startDate bigint(20) NOT NULL default '997995720',
-  endDate bigint(20) NOT NULL default '32472169200',
-  ownerUserId varchar(22) NOT NULL default '',
-  groupIdView varchar(22) NOT NULL default '',
-  groupIdEdit varchar(22) NOT NULL default '',
-  synopsis text,
-  newWindow int(11) NOT NULL default '0',
-  isHidden int(11) NOT NULL default '0',
-  isSystem int(11) NOT NULL default '0',
-  encryptPage int(11) NOT NULL default '0',
-  assetSize int(11) NOT NULL default '0',
-  lastUpdated bigint(20) NOT NULL default '0',
-  lastUpdatedBy varchar(22) default NULL,
-  isPackage int(11) NOT NULL default '0',
-  extraHeadTags text,
-  isPrototype int(11) NOT NULL default '0',
-  PRIMARY KEY  (assetId),
-  UNIQUE KEY lineage (lineage),
-  UNIQUE KEY url (url),
-  KEY parentId (parentId),
-  KEY state_parentId_lineage (state,parentId,lineage),
-  KEY isPrototype_className_assetId (isPrototype,className,assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `asset`
---
-
-
-INSERT INTO asset VALUES ('PBasset000000000000001','infinity','000001','published','WebGUI::Asset','Root','Root','root',997995720,32472169200,'3','3','3',NULL,0,1,1,0,0,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBasset000000000000002','PBasset000000000000001','000001000001','published','WebGUI::Asset::Wobject::Folder','Import Node','Import','root/import',997995720,32472169200,'3','3','3',NULL,0,1,1,0,212,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('68sKwDgf9cGH58-NZcU4lg','PBasset000000000000001','000001000002','published','WebGUI::Asset::Wobject::Layout','Home','Home','home',946710000,2082783600,'3','7','3',NULL,0,0,0,0,532,0,NULL,0,'',0);
-INSERT INTO asset VALUES ('TKzUMeIxRLrZ3NAEez6CXQ','68sKwDgf9cGH58-NZcU4lg','000001000002000001','published','WebGUI::Asset::Wobject::Article','Welcome','Welcome','home/welcome',946710000,2082783600,'3','7','3',NULL,0,1,0,0,1599,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('sWVXMZGibxHe2Ekj1DCldA','68sKwDgf9cGH58-NZcU4lg','000001000002000002','published','WebGUI::Asset::Wobject::Article','Key Benefits','Key Benefits','home/key_benefits',946710000,2082783600,'3','7','3',NULL,0,1,0,0,2279,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('_iHetEvMQUOoxS-T2CM0sQ','68sKwDgf9cGH58-NZcU4lg','000001000002000003','published','WebGUI::Asset::Wobject::Layout','Getting Started','Getting Started','getting_started',946710000,2082783600,'3','7','3','',0,0,0,0,567,0,NULL,0,'',0);
-INSERT INTO asset VALUES ('x_WjMvFmilhX-jvZuIpinw','_iHetEvMQUOoxS-T2CM0sQ','000001000002000003000001','published','WebGUI::Asset::Wobject::Article','Getting Started','Getting Started','getting_started/getting_started',946710000,2082783600,'3','7','3',NULL,0,1,0,0,2254,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('8Bb8gu-me2mhL3ljFyiWLg','68sKwDgf9cGH58-NZcU4lg','000001000002000004','published','WebGUI::Asset::Wobject::Layout','What should you do next?','Your Next Step','your_next_step',946710000,2082783600,'3','7','3','',0,0,0,0,575,0,NULL,0,'',0);
-INSERT INTO asset VALUES ('DC1etlIaBRQitXnchZKvUw','8Bb8gu-me2mhL3ljFyiWLg','000001000002000004000001','published','WebGUI::Asset::Wobject::Collaboration','Your Next Step','Your Next Step','your_next_step/your_next_step',946710000,2082783600,'3','7','3',NULL,0,1,0,0,563,1109194990,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('pSygeMG7bSL1Za0SNqfUbw','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000001','published','WebGUI::Asset::Post::Thread','Talk to the Experts','Talk to the Experts','talk_to_the_experts',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_talk_to_experts.gif\" align=\"right\" style=\"padding-left: 15px;\" /> Our website contains all of the different methods for reaching us. Our friendly staff will be happy to assist you in any way possible.\r',0,1,0,0,809,1109194990,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('mdIaXozmVNE_Rga2BY0mxA','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000002','published','WebGUI::Asset::Post::Thread','Get the Manual','Get the Manual','get_the_manual',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_manual.gif\" align=\"right\" style=\"padding-left: 15px;\" />Ruling WebGUI is the definitive guide to everything WebGUI related. It has been compiled by the experts at Plain Black and covers almost all aspects of WebGUI. When you purchase Ruling WebGUI, you will receive updates to this great manual for one full year.',0,1,0,0,359,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('9kDcFufTKbMTkeAHyP36fw','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000003','published','WebGUI::Asset::Post::Thread','Purchase Technical Support','Purchase Technical Support','purchase_technical_support',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_tech_support.gif\" align=\"right\" style=\"padding-left: 15px;\" />The WebGUI Support Center is there to help you when you get stuck. With a system as large as WebGUI, you\'ll likely have some questions, and our courteous and knowlegable staff is available to answer those questions. And best of all, you get Ruling WebGUI free when you sign up for the Support Center.\r',0,1,0,0,403,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('5Y8eOI2u_HOvkzrRuLdz1g','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000004','published','WebGUI::Asset::Post::Thread','Sign Up for Hosting','Sign Up for Hosting','sign_up_for_hosting',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_hosting.gif\" align=\"right\" style=\"padding-left: 15px;\" />We provide professional hosting services for you so you don\'t have to go through the trouble of finding a hoster who likely won\'t know what to do with WebGUI anyway.',0,1,0,0,259,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('ImmYJRWOPFedzI4Bg1k6GA','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000005','published','WebGUI::Asset::Post::Thread','Look Great','Look Great','look_great',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_look_great.gif\" align=\"right\" style=\"padding-left: 15px;\" />Let Plain Black\'s design team build you a professional looking design. Our award-winning designers can get you the look you need on time and on budget, every time.',0,1,0,0,260,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('2TqQc4OISddWCZmRY1_m8A','68sKwDgf9cGH58-NZcU4lg','000001000002000005','published','WebGUI::Asset::Wobject::Layout','The Latest News','The Latest News','the_latest_news',946710000,2082783600,'3','7','3','',0,0,0,0,569,0,NULL,0,'',0);
-INSERT INTO asset VALUES ('fK-HMSboA3uu0c1KYkYspA','2TqQc4OISddWCZmRY1_m8A','000001000002000005000001','published','WebGUI::Asset::Wobject::SyndicatedContent','The Latest News','The Latest News','the_latest_news/the_latest_news',946710000,2082783600,'3','7','3',NULL,0,1,0,0,552,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('Swf6L8poXKc7hUaNPkBevw','68sKwDgf9cGH58-NZcU4lg','000001000002000006','published','WebGUI::Asset::Wobject::Layout','Tell A Friend','Tell A Friend','tell_a_friend',946710000,2082783600,'3','7','3','',0,0,0,0,563,0,NULL,0,'',0);
-INSERT INTO asset VALUES ('Szs5eev3OMssmnsyLRZmWA','Swf6L8poXKc7hUaNPkBevw','000001000002000006000001','published','WebGUI::Asset::Wobject::DataForm','Tell A Friend','Tell A Friend','tell_a_friend/tell_a_friend',946710000,2082783600,'3','7','3',NULL,0,1,0,0,472,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('x3OFY6OJh_qsXkZfPwug4A','68sKwDgf9cGH58-NZcU4lg','000001000002000007','published','WebGUI::Asset::Wobject::Layout','Site Map','Site Map','site_map',946710000,2082783600,'3','7','3','',0,0,0,0,548,0,NULL,0,'',0);
-INSERT INTO asset VALUES ('pJd5TLAjfWMVXD6sCRLwUg','x3OFY6OJh_qsXkZfPwug4A','000001000002000007000001','published','WebGUI::Asset::Wobject::Navigation','Site Map','Site Map','site_map/site_map',1001744792,1336444487,'3','7','3',NULL,0,1,0,0,440,0,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('Wmjn6I1fe9DKhiIR39YC0g','PBasset000000000000002','000001000001000001','published','WebGUI::Asset::Wobject::Folder','Navigation Configurations','Navigation Configurations','navigation_configurations',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000001','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000001','published','WebGUI::Asset::Wobject::Navigation','crumbTrail','crumbTrail','crumbtrail',997995720,32472169200,'3','7','4',NULL,0,1,0,0,516,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000014','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000002','published','WebGUI::Asset::Wobject::Navigation','FlexMenu','FlexMenu','flexmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,498,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000015','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000003','published','WebGUI::Asset::Wobject::Navigation','currentMenuVertical','currentMenuVertical','currentmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,539,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000016','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000004','published','WebGUI::Asset::Wobject::Navigation','currentMenuHorizontal','currentMenuHorizontal','currentmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,545,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000017','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000005','published','WebGUI::Asset::Wobject::Navigation','PreviousDropMenu','PreviousDropMenu','previousdropmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,533,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000018','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000006','published','WebGUI::Asset::Wobject::Navigation','previousMenuVertical','previousMenuVertical','previousmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,543,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000019','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000007','published','WebGUI::Asset::Wobject::Navigation','previousMenuHorizontal','previousMenuHorizontal','previousmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,549,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000020','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000008','published','WebGUI::Asset::Wobject::Navigation','rootmenu','rootmenu','rootmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,500,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000021','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000009','published','WebGUI::Asset::Wobject::Navigation','SpecificDropMenu','SpecificDropMenu','specificdropmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,524,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000002','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000010','published','WebGUI::Asset::Wobject::Navigation','SpecificSubMenuVertical','SpecificSubMenuVertical','specificsubmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,545,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000006','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000011','published','WebGUI::Asset::Wobject::Navigation','SpecificSubMenuHorizontal','SpecificSubMenuHorizontal','specificsubmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,551,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000007','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000012','published','WebGUI::Asset::Wobject::Navigation','TopLevelMenuVertical','TopLevelMenuVertical','toplevelmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,536,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000008','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000013','published','WebGUI::Asset::Wobject::Navigation','TopLevelMenuHorizontal','TopLevelMenuHorizontal','toplevelmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,542,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000009','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000014','published','WebGUI::Asset::Wobject::Navigation','RootTab','RootTab','roottab',997995720,32472169200,'3','7','4',NULL,0,1,0,0,497,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000010','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000015','published','WebGUI::Asset::Wobject::Navigation','TopDropMenu','TopDropMenu','topdropmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,483,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000011','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000016','published','WebGUI::Asset::Wobject::Navigation','dtree','dtree','dtree',997995720,32472169200,'3','7','4',NULL,0,1,0,0,497,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000012','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000017','published','WebGUI::Asset::Wobject::Navigation','coolmenu','coolmenu','coolmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,501,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBnav00000000000000013','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000018','published','WebGUI::Asset::Wobject::Navigation','Synopsis','Synopsis','synopsis',997995720,32472169200,'3','7','4',NULL,0,1,0,0,512,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('f2bihDeMoI-Ojt2dutJNQA','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000019','published','WebGUI::Asset::Wobject::Navigation','TopLevelMenuHorizontal_1000','TopLevelMenuHorizontal_1000','toplevelmenuhorizontal_1000',997995720,32472169200,'3','7','4',NULL,0,1,0,0,534,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('KZ2UytxNpbF-3Eg3RNvQQQ','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000020','published','WebGUI::Asset::Wobject::Navigation','currentMenuHorizontal_1001','currentMenuHorizontal_1001','currentmenuhorizontal_1001',997995720,32472169200,'3','7','4',NULL,0,1,0,0,563,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('G0wlShbk_XruYVfbXqWq_w','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000021','published','WebGUI::Asset::Wobject::Navigation','FlexMenu_1002','FlexMenu_1002','flexmenu_1002',997995720,32472169200,'3','7','4',NULL,0,1,0,0,513,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('UE5_3bD7kWDLUN2B-iuNuA','PBasset000000000000002','000001000001000002','published','WebGUI::Asset::Wobject::Folder','Files, Snippets, and Images','Files, Snippets, and Images','collateral',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','PBasset000000000000002','000001000001000003','published','WebGUI::Asset::Wobject::Folder','Templates','Templates','templates',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000103','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000005','published','WebGUI::Asset::Template','Left Align Image','Left Align Image','left_align_image',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1417,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000105','b26vQzyaqz0EBMWH_oPdrg','000001000001000003000151000002','published','WebGUI::Asset::Template','Calendar Month (Small)','Calendar Month (Small)','calendar_month_small',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2194,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000023','jCMdSbD6IA535I16Pcik7Q','000001000001000003000152000001','published','WebGUI::Asset::Template','Default Event','Default Event','default_event',997995720,32472169200,'3','4','4',NULL,0,1,0,0,756,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000086','b26vQzyaqz0EBMWH_oPdrg','000001000001000003000151000003','published','WebGUI::Asset::Template','Events List','Events List','events_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1568,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000084','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000001','published','WebGUI::Asset::Template','Center Image','Center Image','center_image',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1228,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000002','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000002','published','WebGUI::Asset::Template','Default Article','Default Article','default_article',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1416,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000115','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000006','published','WebGUI::Asset::Template','Linked Image with Caption','Linked Image with Caption','linked_image_with_caption',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1571,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000066','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000003','published','WebGUI::Asset::Template','Default USS','Default USS','default_uss',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1702,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000080','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000004','published','WebGUI::Asset::Template','FAQ','FAQ','faq',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1132,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000097','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000013','published','WebGUI::Asset::Template','Traditional with Thumbnails','Traditional with Thumbnails','traditional_with_thumbnails',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1640,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000112','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000015','published','WebGUI::Asset::Template','Weblog','Weblog','weblog',997995720,32472169200,'3','4','4',NULL,0,1,0,0,10881,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000121','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000009','published','WebGUI::Asset::Template','Photo Gallery','Photo Gallery','photo_gallery',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1148,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000067','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000001','published','WebGUI::Asset::Template','Default Submission','Default Submission','default_submission',997995720,32472169200,'3','4','4',NULL,0,1,0,0,11190,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000026','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000002','published','WebGUI::Asset::Template','Default Forum','Default Forum','default_forum',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2449,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000128','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000001','published','WebGUI::Asset::Template','Classifieds','Classifieds','classifieds',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1242,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000079','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000012','published','WebGUI::Asset::Template','Topics','Topics','topics',997995720,32472169200,'3','4','4',NULL,0,1,0,0,865,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000083','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000007','published','WebGUI::Asset::Template','Link List','Link List','link_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1068,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000082','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000014','published','WebGUI::Asset::Template','Unordered List','Unordered List','unordered_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1066,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000056','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000002','published','WebGUI::Asset::Template','Default Product','Default Product','default_product',997995720,32472169200,'3','4','4',NULL,0,1,0,0,4434,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000095','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000001','published','WebGUI::Asset::Template','Benefits Showcase','Benefits Showcase','benefits_showcase',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2168,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000110','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000004','published','WebGUI::Asset::Template','Three Columns','Three Columns','three_columns',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3782,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000135','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000006','published','WebGUI::Asset::Template','Side By Side','Side By Side','side_by_side',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1729,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000131','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000005','published','WebGUI::Asset::Template','Right Column','Right Column','right_column',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1729,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000119','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000003','published','WebGUI::Asset::Template','Left Column Collateral','Left Column Collateral','left_column_collateral',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2491,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000054','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000001','published','WebGUI::Asset::Template','Default Page','Default Page','default_page',997995720,32472169200,'3','4','4',NULL,0,1,0,0,921,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000024','-Kmb-MEV4ni9d0tn_BYGXA','000001000001000003000153000001','published','WebGUI::Asset::Template','File','File','file',997995720,32472169200,'3','4','4',NULL,0,1,0,0,212,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000088','59f_y-iE0k8dSMVIyX5SBg','000001000001000003000156000001','published','WebGUI::Asset::Template','Image','Image','image',997995720,32472169200,'3','4','4',NULL,0,1,0,0,147,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000078','ZWv7HLTQ4oERBIFJHBz1Ow','000001000001000003000154000001','published','WebGUI::Asset::Template','File Folder','File Folder','file_folder',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1059,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000125','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000002','published','WebGUI::Asset::Template','Left Column','Left Column','left_column',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1727,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000118','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000007','published','WebGUI::Asset::Template','Three Over One','Three Over One','three_over_one',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2916,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000109','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000004','published','WebGUI::Asset::Template','One Over Three','One Over Three','one_over_three',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2914,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000094','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000003','published','WebGUI::Asset::Template','News','News','news',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2883,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000133','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000005','published','WebGUI::Asset::Template','Guest Book','Guest Book','guest_book',997995720,32472169200,'3','4','4',NULL,0,1,0,0,865,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000065','xPyASYtR44mpDk3ba4YyIg','000001000001000003000189000001','published','WebGUI::Asset::Template','Default Syndicated Content','Default Syndicated Content','default_syndicated_content',997995720,32472169200,'3','4','4',NULL,0,1,0,0,799,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000055','EvgkCMpx4kUonmjhhZXRjg','000001000001000003000178000001','published','WebGUI::Asset::Template','Default Poll','Default Poll','default_poll',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1114,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000020','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000004','published','WebGUI::Asset::Template','Mail Form','Mail Form','mail_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1620,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000085','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000003','published','WebGUI::Asset::Template','Default Email','Default Email','default_email',997995720,32472169200,'3','4','4',NULL,0,1,0,0,254,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000104','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000001','published','WebGUI::Asset::Template','Default Acknowledgement','Default Acknowledgement','default_acknowledgement',997995720,32472169200,'3','4','4',NULL,0,1,0,0,479,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000021','BAoMajIxnoGlrxhDVgot9g','000001000001000003000150000001','published','WebGUI::Asset::Template','Data List','Data List','data_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,793,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000033','RcOR25DbCizyAfNWvr-2ow','000001000001000003000155000001','published','WebGUI::Asset::Template','Default HTTP Proxy','Default HTTP Proxy','default_http_proxy',997995720,32472169200,'3','4','4',NULL,0,1,0,0,871,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000047','L070eyyGhoWx5cSUeNRrow','000001000001000003000171000001','published','WebGUI::Asset::Template','Default Message Board','Default Message Board','default_message_board',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2119,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000029','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000001','published','WebGUI::Asset::Template','Default Post Form','Default Post Form','default_post_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,976,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000032','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000002','published','WebGUI::Asset::Template','Default Thread','Default Thread','default_thread',997995720,32472169200,'3','4','4',NULL,0,1,0,0,9673,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000027','ECq9dLm5vmh4t963yDx1og','000001000001000003000140000001','published','WebGUI::Asset::Template','Default Forum Notification','Default Forum Notification','default_forum_notification',997995720,32472169200,'3','4','4',NULL,0,1,0,0,155,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000031','guQGD9YiTn55PqOUTjCc0A','000001000001000003000142000001','published','WebGUI::Asset::Template','Default Forum Search','Default Forum Search','default_forum_search',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1866,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000071','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000002','published','WebGUI::Asset::Template','AutoGen ^t;','AutoGen ^t;','autogen_t',997995720,32472169200,'3','4','4',NULL,0,1,0,0,463,1109194981,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000075','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000001','published','WebGUI::Asset::Template','AutoGen ^m;','AutoGen ^m;','autogen_m',997995720,32472169200,'3','4','4',NULL,0,1,0,0,464,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('GNvjCFQWjY2AF2uf0aCM8Q','xPyASYtR44mpDk3ba4YyIg','000001000001000003000189000002','published','WebGUI::Asset::Template','Syndicated Articles','Syndicated Articles','syndicated_articles',997995720,32472169200,'3','4','4',NULL,0,1,0,0,792,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000068','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000002','published','WebGUI::Asset::Template','Default Submission Form','Default Submission Form','default_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,870,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000099','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000003','published','WebGUI::Asset::Template','FAQ Submission Form','FAQ Submission Form','faq_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,657,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000114','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000005','published','WebGUI::Asset::Template','Link List Submission Form','Link List Submission Form','link_list_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,812,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000092','n1xT2JUidbeqNMN2zyvHAQ','000001000001000003000168000002','published','WebGUI::Asset::Template','Horizontal Login Box','Horizontal Login Box','horizontal_login_box',997995720,32472169200,'3','4','4',NULL,0,1,0,0,897,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000044','n1xT2JUidbeqNMN2zyvHAQ','000001000001000003000168000001','published','WebGUI::Asset::Template','Default Login Box','Default Login Box','default_login_box',997995720,32472169200,'3','4','4',NULL,0,1,0,0,844,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000059','o9PZOa7fy9AZa8fKmhoPrQ','000001000001000003000183000001','published','WebGUI::Asset::Template','Default SQL Report','Default SQL Report','default_sql_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,4016,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000050','6MrxI11jyXuB-UUrX69lXQ','000001000001000003000174000001','published','WebGUI::Asset::Template','Default Messsage Log Display Template','Default Messsage Log Display Template','default_messsage_log_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1334,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000049','VnUEcXfsbwgB5rqslQ3n1A','000001000001000003000173000001','published','WebGUI::Asset::Template','Default MessageLog Message Template','Default MessageLog Message Template','default_messagelog_message_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,427,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000051','xxuM0xMjhIA3lFq99GY05Q','000001000001000003000175000001','published','WebGUI::Asset::Template','Default Edit Profile Template','Default Edit Profile Template','default_edit_profile_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1330,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000052','kHlR8-nCFRrwlEV1uapu_Q','000001000001000003000176000001','published','WebGUI::Asset::Template','Default Profile Display Template','Default Profile Display Template','default_profile_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,593,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBrichedit000000000002','PBasset000000000000002','000001000001000005','published','WebGUI::Asset::RichEdit','Forum Rich Edit','Forum Rich Edit','forum_rich_edit',997995720,9223372036854775807,'3','7','4',NULL,0,0,0,0,246,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000063','lUjGdT_Hhi_EFhsYr1Ouyw','000001000001000003000187000001','published','WebGUI::Asset::Template','Default Overview Report','Default Overview Report','default_overview_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3098,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000062','QWS2acYOu3Y4uNsWvVChTg','000001000001000003000186000001','published','WebGUI::Asset::Template','Default Gradebook Report','Default Gradebook Report','default_gradebook_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1411,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000061','ffWKX2dW4t1eWgfNng605w','000001000001000003000185000001','published','WebGUI::Asset::Template','Default Survey','Default Survey','default_survey',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3117,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000064','7Xhdnqu3qkDWHEnRgk6Uzw','000001000001000003000188000001','published','WebGUI::Asset::Template','Default Response','Default Response','default_response',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1613,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000116','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000005','published','WebGUI::Asset::Template','Tab Form','Tab Form','tab_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2348,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000069','S99spbsvn96tgRA0oVUl2A','000001000001000003000190000002','published','WebGUI::Asset::Template','Xmethods: getTemp','Xmethods: getTemp','xmethods_gettemp',997995720,32472169200,'3','4','4',NULL,0,1,0,0,359,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000100','S99spbsvn96tgRA0oVUl2A','000001000001000003000190000001','published','WebGUI::Asset::Template','Google: doGoogleSearch','Google: doGoogleSearch','google_dogooglesearch',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1397,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000191','published','WebGUI::Asset::Wobject::Folder','Commerce/Product','Commerce/Product','commerce/product',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,201,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000090','Fh_KALcbkc8CkBR3I6dU0g','000001000001000003000159000002','published','WebGUI::Asset::Template','DHTML Admin Bar','DHTML Admin Bar','dhtml_admin_bar',997995720,32472169200,'3','4','4',NULL,0,1,0,0,4440,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000093','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000004','published','WebGUI::Asset::Template','crumbTrail','crumbTrail','crumbtrail2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,462,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000048','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000010','published','WebGUI::Asset::Template','verticalMenu','verticalMenu','verticalmenu',997995720,32472169200,'3','4','4',NULL,0,1,0,0,569,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000108','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000007','published','WebGUI::Asset::Template','horizontalMenu','horizontalMenu','horizontalmenu',997995720,32472169200,'3','4','4',NULL,0,1,0,0,474,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000117','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000005','published','WebGUI::Asset::Template','DropMenu','DropMenu','dropmenu',997995720,32472169200,'3','4','4',NULL,0,1,0,0,757,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000124','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000009','published','WebGUI::Asset::Template','Tabs','Tabs','tabs',997995720,32472169200,'3','4','4',NULL,0,1,0,0,489,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000130','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000006','published','WebGUI::Asset::Template','dtree','dtree','dtree2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,909,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000022','b26vQzyaqz0EBMWH_oPdrg','000001000001000003000151000001','published','WebGUI::Asset::Template','Calendar Month (Big)','Calendar Month (Big)','calendar_month_big',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2137,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000134','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000003','published','WebGUI::Asset::Template','Cool Menus','Cool Menus','cool_menus',997995720,32472169200,'3','4','4',NULL,0,1,0,0,6334,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000034','2DAYoiOdplxZCrEwmrVhwQ','000001000001000003000157000001','published','WebGUI::Asset::Template','Default Search','Default Search','default_search',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2477,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000077','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000006','published','WebGUI::Asset::Template','Job Listing','Job Listing','job_listing',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1294,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000098','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000003','published','WebGUI::Asset::Template','Job','Job','job',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1423,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000122','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000004','published','WebGUI::Asset::Template','Job Submission Form','Job Submission Form','job_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,796,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000136','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000008','published','WebGUI::Asset::Template','Synopsis','Synopsis','synopsis2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,605,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000013','jcIZMBAyEcmXktAVwPxgIw','000001000001000003000137000001','published','WebGUI::Asset::Template','Default WebGUI Login Template','Default WebGUI Login Template','default_webgui_login_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1019,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000010','CDzQSnxPMWCy2j5ZOxWbrw','000001000001000003000134000001','published','WebGUI::Asset::Template','Default WebGUI Account Display Template','Default WebGUI Account Display Template','default_webgui_account_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1183,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000011','RPo_G59wjPTGE1-IhiE44A','000001000001000003000135000001','published','WebGUI::Asset::Template','Default WebGUI Anonymous Registration Template','Default WebGUI Anonymous Registration Template','default_webgui_anonymous_registration_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1305,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000014','ThLKZPeKbRAVEYTkKAxeCg','000001000001000003000138000001','published','WebGUI::Asset::Template','Default WebGUI Password Recovery Template','Default WebGUI Password Recovery Template','default_webgui_password_recovery_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,803,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000012','Oq61G3_QSM5TzArFUzUBiA','000001000001000003000136000001','published','WebGUI::Asset::Template','Default WebGUI Password Reset Template','Default WebGUI Password Reset Template','default_webgui_password_reset_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,944,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000006','zyS1TsKDvBk7Y55_GlWgxA','000001000001000003000133000001','published','WebGUI::Asset::Template','Default LDAP Login Template','Default LDAP Login Template','default_ldap_login_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,874,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000004','_r8Y0WwiHLyVEFe5M0idYQ','000001000001000003000131000001','published','WebGUI::Asset::Template','Default LDAP Account Display Template','Default LDAP Account Display Template','default_ldap_account_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,456,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000005','Mkc1dJDw-lqExS5uy7QReA','000001000001000003000132000001','published','WebGUI::Asset::Template','Default LDAP Anonymous Registration Template','Default LDAP Anonymous Registration Template','default_ldap_anonymous_registration_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1004,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000057','khkob2AmnIKAxKJeXHE3fQ','000001000001000003000180000001','published','WebGUI::Asset::Template','Default WebGUI Yes/No Prompt','Default WebGUI Yes/No Prompt','default_webgui_yes/no_prompt',997995720,32472169200,'3','4','4',NULL,0,1,0,0,232,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000060','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000003','published','WebGUI::Asset::Template','Fail Safe','Fail Safe','fail_safe',997995720,32472169200,'3','4','4',NULL,0,1,0,0,776,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('9tBSOV44a9JPS8CcerOvYw','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000006','published','WebGUI::Asset::Template','WebGUI 6 Admin Style','WebGUI 6 Admin Style','webgui_6_admin_style',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2530,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('B1bNjWVtzSjsvGZh9lPz_A','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000005','published','WebGUI::Asset::Template','WebGUI 6','WebGUI 6','webgui_6',997995720,32472169200,'3','4','4',NULL,0,1,0,0,7898,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000111','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000004','published','WebGUI::Asset::Template','Make Page Printable','Make Page Printable','make_page_printable',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1756,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000137','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000001','published','WebGUI::Asset::Template','Admin Console','Admin Console','admin_console',997995720,32472169200,'3','4','4',NULL,0,1,0,0,503,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000132','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000002','published','WebGUI::Asset::Template','Empty','Empty','empty',997995720,32472169200,'3','4','4',NULL,0,1,0,0,23,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000123','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000003','published','WebGUI::Asset::Template','Item','Item','item',997995720,32472169200,'3','4','4',NULL,0,1,0,0,644,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000129','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000004','published','WebGUI::Asset::Template','Item w/pop-up Links','Item w/pop-up Links','item_w/pop-up_links',997995720,32472169200,'3','4','4',NULL,0,1,0,0,676,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000081','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000010','published','WebGUI::Asset::Template','Q and A','Q and A','q_and_a',997995720,32472169200,'3','4','4',NULL,0,1,0,0,876,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000101','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000008','published','WebGUI::Asset::Template','Ordered List','Ordered List','ordered_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1067,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('HCQF9FBLWK3Se06yGLoliw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000128','published','WebGUI::Asset::Wobject::Folder','AdminConsole','AdminConsole','templates/adminconsole',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,277,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('wCIc38CvNHUK7aY92Ww4SQ','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000011','published','WebGUI::Asset::Template','Titled Link List','Titled Link List','titled_link_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1038,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000113','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000004','published','WebGUI::Asset::Template','Link','Link','link',997995720,32472169200,'3','4','4',NULL,0,1,0,0,797,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000037','PttBzI13R8HXqQn40I4UFg','000001000001000003000161000001','published','WebGUI::Asset::Template','Default Account Macro','Default Account Macro','default_account_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,82,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000038','VdTZ8_2vlZwVVuv_I7DsWA','000001000001000003000162000001','published','WebGUI::Asset::Template','Default Editable Toggle Macro','Default Editable Toggle Macro','default_editable_toggle_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,58,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000036','WTPOJerammxgkIdCWnR9uw','000001000001000003000160000001','published','WebGUI::Asset::Template','Default Admin Toggle Macro','Default Admin Toggle Macro','default_admin_toggle_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,58,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000039','BBoAtdsTo2AGPe4k9kfkxA','000001000001000003000163000001','published','WebGUI::Asset::Template','Default File Macro','Default File Macro','default_file_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,114,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000091','BBoAtdsTo2AGPe4k9kfkxA','000001000001000003000163000002','published','WebGUI::Asset::Template','File no icon','File no icon','file_no_icon',997995720,32472169200,'3','4','4',NULL,0,1,0,0,54,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000107','BBoAtdsTo2AGPe4k9kfkxA','000001000001000003000163000003','published','WebGUI::Asset::Template','File with size','File with size','file_with_size',997995720,32472169200,'3','4','4',NULL,0,1,0,0,136,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000040','A-m4h7Q3LYt61G54zpEGqA','000001000001000003000164000001','published','WebGUI::Asset::Template','Default Group Add Macro','Default Group Add Macro','default_group_add_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,56,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000041','Wquzj9XSpxL_gpGXkoU6tg','000001000001000003000165000001','published','WebGUI::Asset::Template','Default Group Delete Macro','Default Group Delete Macro','default_group_delete_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,56,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000042','J1uh__tKV2BARcSeFE7MSg','000001000001000003000166000001','published','WebGUI::Asset::Template','Default Homelink','Default Homelink','default_homelink',997995720,32472169200,'3','4','4',NULL,0,1,0,0,79,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000045','mKI2EjkU9QH6dJKkx7VEvw','000001000001000003000169000001','published','WebGUI::Asset::Template','Default Make Printable','Default Make Printable','default_make_printable',997995720,32472169200,'3','4','4',NULL,0,1,0,0,90,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000043','7EfoKU41oB0ZU6NmVIud4A','000001000001000003000167000001','published','WebGUI::Asset::Template','Default LoginToggle','Default LoginToggle','default_logintoggle',997995720,32472169200,'3','4','4',NULL,0,1,0,0,82,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000003','ZexTeuMQaZ1fh4FOpLNlYw','000001000001000003000130000001','published','WebGUI::Asset::Template','Attachment Box','Attachment Box','attachment_box',997995720,32472169200,'3','4','4',NULL,0,1,0,0,477,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBrichedit000000000001','PBasset000000000000002','000001000001000004','published','WebGUI::Asset::RichEdit','Content Manager\'s Rich Edit','Content Manager\'s Rich Edit','content_managers_rich_edit',997995720,9223372036854775807,'3','12','4',NULL,0,0,0,0,487,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000053','r4FQlrIkS1_MTuk-vVqRNg','000001000001000003000177000001','published','WebGUI::Asset::Template','Subscription code redemption','Subscription code redemption','subscription_code_redemption',997995720,32472169200,'3','4','4',NULL,0,1,0,0,121,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000046','HOleaBMUZT6B5qJmbcV5xg','000001000001000003000170000001','published','WebGUI::Asset::Template','Subscriptionitem default template','Subscriptionitem default template','subscriptionitem_default_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,136,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000018','5SdElAemaCKBfheDk7rz8A','000001000001000003000147000001','published','WebGUI::Asset::Template','Default transaction error template','Default transaction error template','default_transaction_error_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,484,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000016','j3yljeaT2y9fLkSHM5Zbow','000001000001000003000145000001','published','WebGUI::Asset::Template','Default checkout confirmation template','Default checkout confirmation template','default_checkout_confirmation_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2034,1116875930,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000019','arabONid_vy2W6cALhELxA','000001000001000003000148000001','published','WebGUI::Asset::Template','Default view purchase history template','Default view purchase history template','default_view_purchase_history_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,540,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000015','VvgRRrE6UsmWi7y7hMCXbw','000001000001000003000144000001','published','WebGUI::Asset::Template','Default cancel checkout template','Default cancel checkout template','default_cancel_checkout_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,18,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000017','2jkEIs9YpL10dZsA3RH4sw','000001000001000003000146000001','published','WebGUI::Asset::Template','Default payment gateway selection template','Default payment gateway selection template','default_payment_gateway_selection_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,468,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000001','HCQF9FBLWK3Se06yGLoliw','000001000001000003000128000001','published','WebGUI::Asset::Template','Admin Console','Admin Console','admin_console2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2754,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000140','i7emhSfswYNreLAwn1wBRw','000001000001000003000182000001','published','WebGUI::Asset::Template','Default Shortcut','Default Shortcut','PBtmpl0000000000000140',997995720,32472169200,'3','4','4',NULL,0,1,0,0,901,1109194982,NULL,0,NULL,0);
-INSERT INTO asset VALUES ('PBtmpl0000000000000141','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000002','published','WebGUI::Asset::Template','Default DataForm','Default DataForm','PBtmpl0000000000000141',997995720,9223372036854775807,'3','4','4',NULL,0,1,0,0,2493,1110941437,'1',0,NULL,0);
-INSERT INTO asset VALUES ('79BY6IHpAtE2yuQwROh9tg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000129','published','WebGUI::Asset::Wobject::Folder','Article','Article','templates/article',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,257,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('ZexTeuMQaZ1fh4FOpLNlYw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000130','published','WebGUI::Asset::Wobject::Folder','AttachmentBox','AttachmentBox','templates/attachmentbox',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('_r8Y0WwiHLyVEFe5M0idYQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000131','published','WebGUI::Asset::Wobject::Folder','Auth/LDAP/Account','Auth/LDAP/Account','templates/auth/ldap/account',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('Mkc1dJDw-lqExS5uy7QReA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000132','published','WebGUI::Asset::Wobject::Folder','Auth/LDAP/Create','Auth/LDAP/Create','templates/auth/ldap/create',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('zyS1TsKDvBk7Y55_GlWgxA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000133','published','WebGUI::Asset::Wobject::Folder','Auth/LDAP/Login','Auth/LDAP/Login','templates/auth/ldap/login',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('CDzQSnxPMWCy2j5ZOxWbrw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000134','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Account','Auth/WebGUI/Account','templates/auth/webgui/account',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,305,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('RPo_G59wjPTGE1-IhiE44A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000135','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Create','Auth/WebGUI/Create','templates/auth/webgui/create',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,301,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('Oq61G3_QSM5TzArFUzUBiA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000136','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Expired','Auth/WebGUI/Expired','templates/auth/webgui/expired',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,305,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('jcIZMBAyEcmXktAVwPxgIw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000137','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Login','Auth/WebGUI/Login','templates/auth/webgui/login',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('ThLKZPeKbRAVEYTkKAxeCg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000138','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Recovery','Auth/WebGUI/Recovery','templates/auth/webgui/recovery',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('8r4-zJ6g-qOecM1PsvADbQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000139','published','WebGUI::Asset::Wobject::Folder','Collaboration','Collaboration','templates/collaboration',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265933,'1',0,NULL,0);
-INSERT INTO asset VALUES ('ECq9dLm5vmh4t963yDx1og','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000140','published','WebGUI::Asset::Wobject::Folder','Collaboration/Notification','Collaboration/Notification','templates/collaboration/notification',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,333,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PNGrWdYDhJZTv1-sAX6W1Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000141','published','WebGUI::Asset::Wobject::Folder','Collaboration/PostForm','Collaboration/PostForm','templates/collaboration/postform',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('guQGD9YiTn55PqOUTjCc0A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000142','published','WebGUI::Asset::Wobject::Folder','Collaboration/Search','Collaboration/Search','templates/collaboration/search',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('-MlWyWh12ibRM8gAzRy41g','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000143','published','WebGUI::Asset::Wobject::Folder','Collaboration/Thread','Collaboration/Thread','templates/collaboration/thread',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('VvgRRrE6UsmWi7y7hMCXbw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000144','published','WebGUI::Asset::Wobject::Folder','Commerce/CheckoutCanceled','Commerce/CheckoutCanceled','templates/commerce/checkoutcanceled',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,329,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('j3yljeaT2y9fLkSHM5Zbow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000145','published','WebGUI::Asset::Wobject::Folder','Commerce/ConfirmCheckout','Commerce/ConfirmCheckout','templates/commerce/confirmcheckout',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,325,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('2jkEIs9YpL10dZsA3RH4sw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000146','published','WebGUI::Asset::Wobject::Folder','Commerce/SelectPaymentGateway','Commerce/SelectPaymentGateway','templates/commerce/selectpaymentgateway',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,345,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('5SdElAemaCKBfheDk7rz8A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000147','published','WebGUI::Asset::Wobject::Folder','Commerce/TransactionError','Commerce/TransactionError','templates/commerce/transactionerror',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,329,1111265934,'1',0,NULL,0);
-INSERT INTO asset VALUES ('arabONid_vy2W6cALhELxA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000148','published','WebGUI::Asset::Wobject::Folder','Commerce/ViewPurchaseHistory','Commerce/ViewPurchaseHistory','templates/commerce/viewpurchasehistory',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,341,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('sb7g8aCLMq-XigfBdmw2cg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000149','published','WebGUI::Asset::Wobject::Folder','DataForm','DataForm','templates/dataform',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,261,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('BAoMajIxnoGlrxhDVgot9g','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000150','published','WebGUI::Asset::Wobject::Folder','DataForm/List','DataForm/List','templates/dataform/list',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('b26vQzyaqz0EBMWH_oPdrg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000151','published','WebGUI::Asset::Wobject::Folder','EventsCalendar','EventsCalendar','templates/eventscalendar',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,285,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('jCMdSbD6IA535I16Pcik7Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000152','published','WebGUI::Asset::Wobject::Folder','EventsCalendar/Event','EventsCalendar/Event','templates/eventscalendar/event',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('-Kmb-MEV4ni9d0tn_BYGXA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000153','published','WebGUI::Asset::Wobject::Folder','FileAsset','FileAsset','templates/fileasset',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,265,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('ZWv7HLTQ4oERBIFJHBz1Ow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000154','published','WebGUI::Asset::Wobject::Folder','Folder','Folder','templates/folder',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('RcOR25DbCizyAfNWvr-2ow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000155','published','WebGUI::Asset::Wobject::Folder','HttpProxy','HttpProxy','templates/httpproxy',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,265,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('59f_y-iE0k8dSMVIyX5SBg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000156','published','WebGUI::Asset::Wobject::Folder','ImageAsset','ImageAsset','templates/imageasset',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('2DAYoiOdplxZCrEwmrVhwQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000157','published','WebGUI::Asset::Wobject::Folder','IndexedSearch','IndexedSearch','templates/indexedsearch',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('tJ_X5F3Dkaz8vO6CigbJrg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000158','published','WebGUI::Asset::Wobject::Folder','Layout','Layout','templates/layout',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265935,'1',0,NULL,0);
-INSERT INTO asset VALUES ('Fh_KALcbkc8CkBR3I6dU0g','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000159','published','WebGUI::Asset::Wobject::Folder','Macro/AdminBar','Macro/AdminBar','templates/macro/adminbar',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,285,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('WTPOJerammxgkIdCWnR9uw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000160','published','WebGUI::Asset::Wobject::Folder','Macro/AdminToggle','Macro/AdminToggle','templates/macro/admintoggle',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PttBzI13R8HXqQn40I4UFg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000161','published','WebGUI::Asset::Wobject::Folder','Macro/a_account','Macro/a_account','templates/macro/a_account',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('VdTZ8_2vlZwVVuv_I7DsWA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000162','published','WebGUI::Asset::Wobject::Folder','Macro/EditableToggle','Macro/EditableToggle','templates/macro/editabletoggle',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('BBoAtdsTo2AGPe4k9kfkxA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000163','published','WebGUI::Asset::Wobject::Folder','Macro/File','Macro/File','templates/macro/file',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('A-m4h7Q3LYt61G54zpEGqA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000164','published','WebGUI::Asset::Wobject::Folder','Macro/GroupAdd','Macro/GroupAdd','templates/macro/groupadd',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,285,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('Wquzj9XSpxL_gpGXkoU6tg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000165','published','WebGUI::Asset::Wobject::Folder','Macro/GroupDelete','Macro/GroupDelete','templates/macro/groupdelete',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('J1uh__tKV2BARcSeFE7MSg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000166','published','WebGUI::Asset::Wobject::Folder','Macro/H_homeLink','Macro/H_homeLink','templates/macro/h_homelink',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('7EfoKU41oB0ZU6NmVIud4A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000167','published','WebGUI::Asset::Wobject::Folder','Macro/LoginToggle','Macro/LoginToggle','templates/macro/logintoggle',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('n1xT2JUidbeqNMN2zyvHAQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000168','published','WebGUI::Asset::Wobject::Folder','Macro/L_loginBox','Macro/L_loginBox','templates/macro/l_loginbox',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('mKI2EjkU9QH6dJKkx7VEvw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000169','published','WebGUI::Asset::Wobject::Folder','Macro/r_printable','Macro/r_printable','templates/macro/r_printable',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('HOleaBMUZT6B5qJmbcV5xg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000170','published','WebGUI::Asset::Wobject::Folder','Macro/SubscriptionItem','Macro/SubscriptionItem','templates/macro/subscriptionitem',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('L070eyyGhoWx5cSUeNRrow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000171','published','WebGUI::Asset::Wobject::Folder','MessageBoard','MessageBoard','templates/messageboard',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,277,1111265936,'1',0,NULL,0);
-INSERT INTO asset VALUES ('c3jDvo_bK3jFqjIefgXjUw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000172','published','WebGUI::Asset::Wobject::Folder','Navigation','Navigation','templates/navigation',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('VnUEcXfsbwgB5rqslQ3n1A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000173','published','WebGUI::Asset::Wobject::Folder','Operation/MessageLog/Message','Operation/MessageLog/Message','templates/operation/messagelog/message',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,341,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('6MrxI11jyXuB-UUrX69lXQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000174','published','WebGUI::Asset::Wobject::Folder','Operation/MessageLog/View','Operation/MessageLog/View','templates/operation/messagelog/view',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,329,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('xxuM0xMjhIA3lFq99GY05Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000175','published','WebGUI::Asset::Wobject::Folder','Operation/Profile/Edit','Operation/Profile/Edit','templates/operation/profile/edit',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('kHlR8-nCFRrwlEV1uapu_Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000176','published','WebGUI::Asset::Wobject::Folder','Operation/Profile/View','Operation/Profile/View','templates/operation/profile/view',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('r4FQlrIkS1_MTuk-vVqRNg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000177','published','WebGUI::Asset::Wobject::Folder','Operation/RedeemSubscription','Operation/RedeemSubscription','templates/operation/redeemsubscription',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,341,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('EvgkCMpx4kUonmjhhZXRjg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000178','published','WebGUI::Asset::Wobject::Folder','Poll','Poll','templates/poll',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,245,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('I2DQUdFVd9FtcSealp4cTQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000179','published','WebGUI::Asset::Wobject::Folder','Product','Product','templates/product',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,257,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('khkob2AmnIKAxKJeXHE3fQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000180','published','WebGUI::Asset::Wobject::Folder','prompt','prompt','templates/prompt',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('h34TI6OYynW5Q_FYLbZiig','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000181','published','WebGUI::Asset::Wobject::Folder','richEditor','richEditor','templates/richeditor',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('i7emhSfswYNreLAwn1wBRw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000182','published','WebGUI::Asset::Wobject::Folder','Shortcut','Shortcut','templates/shortcut',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,261,1111265937,'1',0,NULL,0);
-INSERT INTO asset VALUES ('o9PZOa7fy9AZa8fKmhoPrQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000183','published','WebGUI::Asset::Wobject::Folder','SQLReport','SQLReport','templates/sqlreport',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,265,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('eLdzeSyvZfml-YVFfgUiaw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000184','published','WebGUI::Asset::Wobject::Folder','style','style','templates/style',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,249,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('ffWKX2dW4t1eWgfNng605w','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000185','published','WebGUI::Asset::Wobject::Folder','Survey','Survey','templates/survey',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('QWS2acYOu3Y4uNsWvVChTg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000186','published','WebGUI::Asset::Wobject::Folder','Survey/Gradebook','Survey/Gradebook','templates/survey/gradebook',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('lUjGdT_Hhi_EFhsYr1Ouyw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000187','published','WebGUI::Asset::Wobject::Folder','Survey/Overview','Survey/Overview','templates/survey/overview',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('7Xhdnqu3qkDWHEnRgk6Uzw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000188','published','WebGUI::Asset::Wobject::Folder','Survey/Response','Survey/Response','templates/survey/response',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('xPyASYtR44mpDk3ba4YyIg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000189','published','WebGUI::Asset::Wobject::Folder','SyndicatedContent','SyndicatedContent','templates/syndicatedcontent',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('S99spbsvn96tgRA0oVUl2A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000190','published','WebGUI::Asset::Wobject::Folder','WSClient','WSClient','templates/wsclient',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,261,1111265938,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmplCP00000000000001','Rn5Ef8vMDQ0ebtaxS_-JXA','000001000001000003000191000001','published','WebGUI::Asset::Template','Default Product Template','Default Product Template','default-produuct-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,694,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('60wqz7KzyCDCHVNaavhQUA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000192','published','WebGUI::Asset::Wobject::Folder','Commerce/SelectShippingMethod','Commerce/SelectShippingMethod','commerce/selectshippingmethod',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,240,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmplCSSM000000000001','60wqz7KzyCDCHVNaavhQUA','000001000001000003000192000001','published','WebGUI::Asset::Template','Default Select Shipping Method Template','Default Select Shipping Method Template','default-select-shipping-method-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,746,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('fhevmqeVTLRCmI_z-NidQQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000193','published','WebGUI::Asset::Wobject::Folder','Commerce/ViewShoppingCart','Commerce/ViewShoppingCart','commerce/viewshoppingcart',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,228,1115241872,'1',0,NULL,0);
-INSERT INTO asset VALUES ('PBtmplVSC0000000000001','fhevmqeVTLRCmI_z-NidQQ','000001000001000003000193000001','published','WebGUI::Asset::Template','Default Shopping Cart Template','Default Shopping Cart Template','default-shoppingcart-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,1527,1115241872,'1',0,NULL,0);
-
---
--- Table structure for table `assetHistory`
---
-
-CREATE TABLE assetHistory (
-  assetId varchar(22) NOT NULL default '',
-  userId varchar(22) NOT NULL default '',
-  dateStamp bigint(20) NOT NULL default '0',
-  actionTaken varchar(255) NOT NULL default ''
-) TYPE=MyISAM;
-
---
--- Dumping data for table `assetHistory`
---
-
-
-INSERT INTO assetHistory VALUES ('PBasset000000000000002','1',1109194982,'added child PBtmpl0000000000000140');
-INSERT INTO assetHistory VALUES ('PBtmpl0000000000000140','1',1109194982,'created');
-INSERT INTO assetHistory VALUES ('PBasset000000000000002','1',1110941437,'added child PBtmpl0000000000000141');
-INSERT INTO assetHistory VALUES ('PBtmpl0000000000000141','1',1110941437,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265932,'added child HCQF9FBLWK3Se06yGLoliw');
-INSERT INTO assetHistory VALUES ('HCQF9FBLWK3Se06yGLoliw','1',1111265932,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child 79BY6IHpAtE2yuQwROh9tg');
-INSERT INTO assetHistory VALUES ('79BY6IHpAtE2yuQwROh9tg','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child ZexTeuMQaZ1fh4FOpLNlYw');
-INSERT INTO assetHistory VALUES ('ZexTeuMQaZ1fh4FOpLNlYw','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child _r8Y0WwiHLyVEFe5M0idYQ');
-INSERT INTO assetHistory VALUES ('_r8Y0WwiHLyVEFe5M0idYQ','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child Mkc1dJDw-lqExS5uy7QReA');
-INSERT INTO assetHistory VALUES ('Mkc1dJDw-lqExS5uy7QReA','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child zyS1TsKDvBk7Y55_GlWgxA');
-INSERT INTO assetHistory VALUES ('zyS1TsKDvBk7Y55_GlWgxA','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child CDzQSnxPMWCy2j5ZOxWbrw');
-INSERT INTO assetHistory VALUES ('CDzQSnxPMWCy2j5ZOxWbrw','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child RPo_G59wjPTGE1-IhiE44A');
-INSERT INTO assetHistory VALUES ('RPo_G59wjPTGE1-IhiE44A','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child Oq61G3_QSM5TzArFUzUBiA');
-INSERT INTO assetHistory VALUES ('Oq61G3_QSM5TzArFUzUBiA','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child jcIZMBAyEcmXktAVwPxgIw');
-INSERT INTO assetHistory VALUES ('jcIZMBAyEcmXktAVwPxgIw','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child ThLKZPeKbRAVEYTkKAxeCg');
-INSERT INTO assetHistory VALUES ('ThLKZPeKbRAVEYTkKAxeCg','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child 8r4-zJ6g-qOecM1PsvADbQ');
-INSERT INTO assetHistory VALUES ('8r4-zJ6g-qOecM1PsvADbQ','1',1111265933,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child ECq9dLm5vmh4t963yDx1og');
-INSERT INTO assetHistory VALUES ('ECq9dLm5vmh4t963yDx1og','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child PNGrWdYDhJZTv1-sAX6W1Q');
-INSERT INTO assetHistory VALUES ('PNGrWdYDhJZTv1-sAX6W1Q','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child guQGD9YiTn55PqOUTjCc0A');
-INSERT INTO assetHistory VALUES ('guQGD9YiTn55PqOUTjCc0A','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child -MlWyWh12ibRM8gAzRy41g');
-INSERT INTO assetHistory VALUES ('-MlWyWh12ibRM8gAzRy41g','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child VvgRRrE6UsmWi7y7hMCXbw');
-INSERT INTO assetHistory VALUES ('VvgRRrE6UsmWi7y7hMCXbw','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child j3yljeaT2y9fLkSHM5Zbow');
-INSERT INTO assetHistory VALUES ('j3yljeaT2y9fLkSHM5Zbow','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child 2jkEIs9YpL10dZsA3RH4sw');
-INSERT INTO assetHistory VALUES ('2jkEIs9YpL10dZsA3RH4sw','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child 5SdElAemaCKBfheDk7rz8A');
-INSERT INTO assetHistory VALUES ('5SdElAemaCKBfheDk7rz8A','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child arabONid_vy2W6cALhELxA');
-INSERT INTO assetHistory VALUES ('arabONid_vy2W6cALhELxA','1',1111265934,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child sb7g8aCLMq-XigfBdmw2cg');
-INSERT INTO assetHistory VALUES ('sb7g8aCLMq-XigfBdmw2cg','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child BAoMajIxnoGlrxhDVgot9g');
-INSERT INTO assetHistory VALUES ('BAoMajIxnoGlrxhDVgot9g','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child b26vQzyaqz0EBMWH_oPdrg');
-INSERT INTO assetHistory VALUES ('b26vQzyaqz0EBMWH_oPdrg','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child jCMdSbD6IA535I16Pcik7Q');
-INSERT INTO assetHistory VALUES ('jCMdSbD6IA535I16Pcik7Q','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child -Kmb-MEV4ni9d0tn_BYGXA');
-INSERT INTO assetHistory VALUES ('-Kmb-MEV4ni9d0tn_BYGXA','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child ZWv7HLTQ4oERBIFJHBz1Ow');
-INSERT INTO assetHistory VALUES ('ZWv7HLTQ4oERBIFJHBz1Ow','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child RcOR25DbCizyAfNWvr-2ow');
-INSERT INTO assetHistory VALUES ('RcOR25DbCizyAfNWvr-2ow','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child 59f_y-iE0k8dSMVIyX5SBg');
-INSERT INTO assetHistory VALUES ('59f_y-iE0k8dSMVIyX5SBg','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child 2DAYoiOdplxZCrEwmrVhwQ');
-INSERT INTO assetHistory VALUES ('2DAYoiOdplxZCrEwmrVhwQ','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child tJ_X5F3Dkaz8vO6CigbJrg');
-INSERT INTO assetHistory VALUES ('tJ_X5F3Dkaz8vO6CigbJrg','1',1111265935,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child Fh_KALcbkc8CkBR3I6dU0g');
-INSERT INTO assetHistory VALUES ('Fh_KALcbkc8CkBR3I6dU0g','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child WTPOJerammxgkIdCWnR9uw');
-INSERT INTO assetHistory VALUES ('WTPOJerammxgkIdCWnR9uw','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child PttBzI13R8HXqQn40I4UFg');
-INSERT INTO assetHistory VALUES ('PttBzI13R8HXqQn40I4UFg','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child VdTZ8_2vlZwVVuv_I7DsWA');
-INSERT INTO assetHistory VALUES ('VdTZ8_2vlZwVVuv_I7DsWA','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child BBoAtdsTo2AGPe4k9kfkxA');
-INSERT INTO assetHistory VALUES ('BBoAtdsTo2AGPe4k9kfkxA','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child A-m4h7Q3LYt61G54zpEGqA');
-INSERT INTO assetHistory VALUES ('A-m4h7Q3LYt61G54zpEGqA','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child Wquzj9XSpxL_gpGXkoU6tg');
-INSERT INTO assetHistory VALUES ('Wquzj9XSpxL_gpGXkoU6tg','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child J1uh__tKV2BARcSeFE7MSg');
-INSERT INTO assetHistory VALUES ('J1uh__tKV2BARcSeFE7MSg','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child 7EfoKU41oB0ZU6NmVIud4A');
-INSERT INTO assetHistory VALUES ('7EfoKU41oB0ZU6NmVIud4A','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child n1xT2JUidbeqNMN2zyvHAQ');
-INSERT INTO assetHistory VALUES ('n1xT2JUidbeqNMN2zyvHAQ','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child mKI2EjkU9QH6dJKkx7VEvw');
-INSERT INTO assetHistory VALUES ('mKI2EjkU9QH6dJKkx7VEvw','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child HOleaBMUZT6B5qJmbcV5xg');
-INSERT INTO assetHistory VALUES ('HOleaBMUZT6B5qJmbcV5xg','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child L070eyyGhoWx5cSUeNRrow');
-INSERT INTO assetHistory VALUES ('L070eyyGhoWx5cSUeNRrow','1',1111265936,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child c3jDvo_bK3jFqjIefgXjUw');
-INSERT INTO assetHistory VALUES ('c3jDvo_bK3jFqjIefgXjUw','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child VnUEcXfsbwgB5rqslQ3n1A');
-INSERT INTO assetHistory VALUES ('VnUEcXfsbwgB5rqslQ3n1A','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child 6MrxI11jyXuB-UUrX69lXQ');
-INSERT INTO assetHistory VALUES ('6MrxI11jyXuB-UUrX69lXQ','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child xxuM0xMjhIA3lFq99GY05Q');
-INSERT INTO assetHistory VALUES ('xxuM0xMjhIA3lFq99GY05Q','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child kHlR8-nCFRrwlEV1uapu_Q');
-INSERT INTO assetHistory VALUES ('kHlR8-nCFRrwlEV1uapu_Q','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child r4FQlrIkS1_MTuk-vVqRNg');
-INSERT INTO assetHistory VALUES ('r4FQlrIkS1_MTuk-vVqRNg','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child EvgkCMpx4kUonmjhhZXRjg');
-INSERT INTO assetHistory VALUES ('EvgkCMpx4kUonmjhhZXRjg','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child I2DQUdFVd9FtcSealp4cTQ');
-INSERT INTO assetHistory VALUES ('I2DQUdFVd9FtcSealp4cTQ','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child khkob2AmnIKAxKJeXHE3fQ');
-INSERT INTO assetHistory VALUES ('khkob2AmnIKAxKJeXHE3fQ','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child h34TI6OYynW5Q_FYLbZiig');
-INSERT INTO assetHistory VALUES ('h34TI6OYynW5Q_FYLbZiig','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child i7emhSfswYNreLAwn1wBRw');
-INSERT INTO assetHistory VALUES ('i7emhSfswYNreLAwn1wBRw','1',1111265937,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child o9PZOa7fy9AZa8fKmhoPrQ');
-INSERT INTO assetHistory VALUES ('o9PZOa7fy9AZa8fKmhoPrQ','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child eLdzeSyvZfml-YVFfgUiaw');
-INSERT INTO assetHistory VALUES ('eLdzeSyvZfml-YVFfgUiaw','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child ffWKX2dW4t1eWgfNng605w');
-INSERT INTO assetHistory VALUES ('ffWKX2dW4t1eWgfNng605w','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child QWS2acYOu3Y4uNsWvVChTg');
-INSERT INTO assetHistory VALUES ('QWS2acYOu3Y4uNsWvVChTg','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child lUjGdT_Hhi_EFhsYr1Ouyw');
-INSERT INTO assetHistory VALUES ('lUjGdT_Hhi_EFhsYr1Ouyw','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child 7Xhdnqu3qkDWHEnRgk6Uzw');
-INSERT INTO assetHistory VALUES ('7Xhdnqu3qkDWHEnRgk6Uzw','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child xPyASYtR44mpDk3ba4YyIg');
-INSERT INTO assetHistory VALUES ('xPyASYtR44mpDk3ba4YyIg','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child S99spbsvn96tgRA0oVUl2A');
-INSERT INTO assetHistory VALUES ('S99spbsvn96tgRA0oVUl2A','1',1111265938,'created');
-INSERT INTO assetHistory VALUES ('PBtmpl0000000000000035','1',1115241871,'purged');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241871,'added child Rn5Ef8vMDQ0ebtaxS_-JXA');
-INSERT INTO assetHistory VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','1',1115241871,'created');
-INSERT INTO assetHistory VALUES ('Rn5Ef8vMDQ0ebtaxS_-JXA','1',1115241872,'added child PBtmplCP00000000000001');
-INSERT INTO assetHistory VALUES ('PBtmplCP00000000000001','1',1115241872,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241872,'added child 60wqz7KzyCDCHVNaavhQUA');
-INSERT INTO assetHistory VALUES ('60wqz7KzyCDCHVNaavhQUA','1',1115241872,'created');
-INSERT INTO assetHistory VALUES ('60wqz7KzyCDCHVNaavhQUA','1',1115241872,'added child PBtmplCSSM000000000001');
-INSERT INTO assetHistory VALUES ('PBtmplCSSM000000000001','1',1115241872,'created');
-INSERT INTO assetHistory VALUES ('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241872,'added child fhevmqeVTLRCmI_z-NidQQ');
-INSERT INTO assetHistory VALUES ('fhevmqeVTLRCmI_z-NidQQ','1',1115241872,'created');
-INSERT INTO assetHistory VALUES ('fhevmqeVTLRCmI_z-NidQQ','1',1115241872,'added child PBtmplVSC0000000000001');
-INSERT INTO assetHistory VALUES ('PBtmplVSC0000000000001','1',1115241872,'created');
-INSERT INTO assetHistory VALUES ('PBtmpl0000000000000126','1',1115241872,'purged');
-INSERT INTO assetHistory VALUES ('PBtmpl0000000000000138','1',1115241872,'purged');
-INSERT INTO assetHistory VALUES ('PBasset000000000000002','1',1115241872,'added child PBrichedit000000000001');
-INSERT INTO assetHistory VALUES ('PBrichedit000000000001','1',1115241872,'created');
-INSERT INTO assetHistory VALUES ('PBasset000000000000002','1',1115241872,'added child PBrichedit000000000002');
-INSERT INTO assetHistory VALUES ('PBrichedit000000000002','1',1115241872,'created');
-
---
--- Table structure for table `authentication`
---
-
-CREATE TABLE authentication (
-  userId varchar(22) NOT NULL default '',
-  authMethod varchar(30) NOT NULL default '',
-  fieldName varchar(128) NOT NULL default '',
-  fieldData text,
-  PRIMARY KEY  (userId,authMethod,fieldName)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `authentication`
---
-
-
-INSERT INTO authentication VALUES ('1','LDAP','ldapUrl',NULL);
-INSERT INTO authentication VALUES ('3','LDAP','ldapUrl','');
-INSERT INTO authentication VALUES ('1','LDAP','connectDN',NULL);
-INSERT INTO authentication VALUES ('3','LDAP','connectDN','');
-INSERT INTO authentication VALUES ('1','WebGUI','identifier','No Login');
-INSERT INTO authentication VALUES ('3','WebGUI','identifier','RvlMjeFPs2aAhQdo/xt/Kg');
-INSERT INTO authentication VALUES ('1','WebGUI','passwordLastUpdated','1078704037');
-INSERT INTO authentication VALUES ('1','WebGUI','passwordTimeout','3122064000');
-INSERT INTO authentication VALUES ('1','WebGUI','changeUsername','1');
-INSERT INTO authentication VALUES ('1','WebGUI','changePassword','1');
-INSERT INTO authentication VALUES ('3','WebGUI','passwordLastUpdated','1078704037');
-INSERT INTO authentication VALUES ('3','WebGUI','passwordTimeout','3122064000');
-INSERT INTO authentication VALUES ('3','WebGUI','changeUsername','1');
-INSERT INTO authentication VALUES ('3','WebGUI','changePassword','1');
-
---
--- Table structure for table `commerceSettings`
---
-
-CREATE TABLE commerceSettings (
-  fieldName varchar(64) NOT NULL default '',
-  fieldValue varchar(255) NOT NULL default '',
-  namespace varchar(64) NOT NULL default '',
-  type varchar(10) NOT NULL default ''
-) TYPE=MyISAM;
-
---
--- Dumping data for table `commerceSettings`
---
-
-
-
---
--- Table structure for table `databaseLink`
---
-
-CREATE TABLE databaseLink (
-  databaseLinkId varchar(22) NOT NULL default '',
-  title varchar(255) default NULL,
-  DSN varchar(255) default NULL,
-  username varchar(255) default NULL,
-  identifier varchar(255) default NULL,
-  PRIMARY KEY  (databaseLinkId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `databaseLink`
---
-
-
-
---
--- Table structure for table `groupGroupings`
---
-
-CREATE TABLE groupGroupings (
-  groupId char(22) NOT NULL default '',
-  inGroup char(22) NOT NULL default ''
-) TYPE=MyISAM;
-
---
--- Dumping data for table `groupGroupings`
---
-
-
-INSERT INTO groupGroupings VALUES ('4','12');
-INSERT INTO groupGroupings VALUES ('6','12');
-INSERT INTO groupGroupings VALUES ('8','12');
-INSERT INTO groupGroupings VALUES ('9','12');
-INSERT INTO groupGroupings VALUES ('11','12');
-INSERT INTO groupGroupings VALUES ('3','2');
-INSERT INTO groupGroupings VALUES ('3','4');
-INSERT INTO groupGroupings VALUES ('3','5');
-INSERT INTO groupGroupings VALUES ('3','6');
-INSERT INTO groupGroupings VALUES ('3','7');
-INSERT INTO groupGroupings VALUES ('3','8');
-INSERT INTO groupGroupings VALUES ('3','9');
-INSERT INTO groupGroupings VALUES ('3','13');
-INSERT INTO groupGroupings VALUES ('3','11');
-INSERT INTO groupGroupings VALUES ('3','12');
-
---
--- Table structure for table `groupings`
---
-
-CREATE TABLE groupings (
-  groupId char(22) NOT NULL default '',
-  userId char(22) NOT NULL default '',
-  expireDate int(11) NOT NULL default '2114402400',
-  groupAdmin int(11) NOT NULL default '0',
-  PRIMARY KEY  (groupId,userId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `groupings`
---
-
-
-INSERT INTO groupings VALUES ('1','1',2114402400,0);
-INSERT INTO groupings VALUES ('3','3',2114402400,0);
-INSERT INTO groupings VALUES ('7','1',2114402400,0);
-INSERT INTO groupings VALUES ('7','3',2114402400,0);
-INSERT INTO groupings VALUES ('2','3',2114402400,0);
-
---
--- Table structure for table `groups`
---
-
-CREATE TABLE groups (
-  groupId varchar(22) NOT NULL default '',
-  groupName varchar(30) default NULL,
-  description varchar(255) default NULL,
-  expireOffset int(11) NOT NULL default '314496000',
-  karmaThreshold int(11) NOT NULL default '1000000000',
-  ipFilter text,
-  dateCreated int(11) NOT NULL default '997938000',
-  lastUpdated int(11) NOT NULL default '997938000',
-  deleteOffset int(11) NOT NULL default '14',
-  expireNotifyOffset int(11) NOT NULL default '-14',
-  expireNotifyMessage text,
-  expireNotify int(11) NOT NULL default '0',
-  scratchFilter text,
-  autoAdd int(11) NOT NULL default '0',
-  autoDelete int(11) NOT NULL default '0',
-  databaseLinkId varchar(22) default NULL,
-  dbCacheTimeout int(11) NOT NULL default '3600',
-  dbQuery text,
-  isEditable int(11) NOT NULL default '1',
-  showInForms int(11) NOT NULL default '1',
-  ldapGroup varchar(255) default NULL,
-  ldapGroupProperty varchar(255) default NULL,
-  ldapRecursiveProperty varchar(255) default NULL,
-  PRIMARY KEY  (groupId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `groups`
---
-
-
-INSERT INTO groups VALUES ('1','Visitors','This is the public group that has no privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('2','Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('3','Admins','Anyone who belongs to this group has privileges to do anything and everything.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('4','Content Managers','Users that have privileges to edit content on this site. The user still needs to be added to a group that has editing privileges on specific pages.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('6','Package Managers','Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('7','Everyone','A group that automatically includes all users including Visitors.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('8','Template Managers','Users that have privileges to edit templates for this site.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('9','Theme Managers','Users in this group can use the theme manager to create new themes and install themes from other systems.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('13','Export Managers','Users in this group can export pages to disk.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('11','Secondary Admins','Users that have limited administrative privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('12','Turn Admin On','These users can enable admin mode.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,0,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('a7jbpVdbzxchqtSj_9W71w','DC1etlIaBRQitXnchZKvUw','The group to store subscriptions for the collaboration system DC1etlIaBRQitXnchZKvUw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('wP1Lt8NIySq9MS8xPGnAsQ','pSygeMG7bSL1Za0SNqfUbw','The group to store subscriptions for the thread pSygeMG7bSL1Za0SNqfUbw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('OL-d6C93EeUr4Rja-q3-yQ','mdIaXozmVNE_Rga2BY0mxA','The group to store subscriptions for the thread mdIaXozmVNE_Rga2BY0mxA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('YPCggIxdKT3AMMlML-CAuw','9kDcFufTKbMTkeAHyP36fw','The group to store subscriptions for the thread 9kDcFufTKbMTkeAHyP36fw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('C02CXMw3c42EJJR_nktyMw','5Y8eOI2u_HOvkzrRuLdz1g','The group to store subscriptions for the thread 5Y8eOI2u_HOvkzrRuLdz1g',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('zZmjNsD1FhaSFkgXvnCQUg','ImmYJRWOPFedzI4Bg1k6GA','The group to store subscriptions for the thread ImmYJRWOPFedzI4Bg1k6GA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL);
-INSERT INTO groups VALUES ('14','Product Managers','The group that is allowed to edit, delete and create products.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,1,1,NULL,NULL,NULL);
-
---
--- Table structure for table `incrementer`
---
-
-CREATE TABLE incrementer (
-  incrementerId varchar(50) NOT NULL default '',
-  nextValue int(11) NOT NULL default '1',
-  PRIMARY KEY  (incrementerId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `incrementer`
---
-
-
-
---
--- Table structure for table `karmaLog`
---
-
-CREATE TABLE karmaLog (
-  userId varchar(22) default NULL,
-  amount int(11) NOT NULL default '1',
-  source varchar(255) default NULL,
-  description text,
-  dateModified int(11) NOT NULL default '1026097656'
-) TYPE=MyISAM;
-
---
--- Dumping data for table `karmaLog`
---
-
-
-
---
--- Table structure for table `ldapLink`
---
-
-CREATE TABLE ldapLink (
-  ldapLinkId varchar(22) NOT NULL default '',
-  ldapLinkName varchar(255) NOT NULL default '',
-  ldapUrl varchar(255) NOT NULL default '',
-  connectDn varchar(255) NOT NULL default '',
-  identifier varchar(255) NOT NULL default '',
-  ldapUserRDN varchar(255) default NULL,
-  ldapIdentity varchar(255) default NULL,
-  ldapIdentityName varchar(255) default NULL,
-  ldapPasswordName varchar(255) default NULL,
-  ldapSendWelcomeMessage char(2) default NULL,
-  ldapWelcomeMessage text,
-  ldapAccountTemplate varchar(22) default NULL,
-  ldapCreateAccountTemplate varchar(22) default NULL,
-  ldapLoginTemplate varchar(22) default NULL,
-  PRIMARY KEY  (ldapLinkId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `ldapLink`
---
-
-
-INSERT INTO ldapLink VALUES ('1uBbhUm686mkFZ1ghv7Lag','Default LDAP Connection','ldap://ldap.mycompany.com:389/o=MyCompany','','','cn','shortname','LDAP Shortname','LDAP Password','0','Welcome to our site.','PBtmpl0000000000000004','PBtmpl0000000000000005','PBtmpl0000000000000006');
-
---
--- Table structure for table `messageLog`
---
-
-CREATE TABLE messageLog (
-  messageLogId varchar(22) NOT NULL default '',
-  userId varchar(22) NOT NULL default '',
-  message text,
-  url text,
-  dateOfEntry int(11) default NULL,
-  subject varchar(255) default NULL,
-  status varchar(30) default 'notice',
-  PRIMARY KEY  (messageLogId,userId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `messageLog`
---
-
-
-
---
--- Table structure for table `metaData_properties`
---
-
-CREATE TABLE metaData_properties (
-  fieldId varchar(22) NOT NULL default '',
-  fieldName varchar(100) NOT NULL default '',
-  description mediumtext NOT NULL,
-  fieldType varchar(30) default NULL,
-  possibleValues text,
-  defaultValue varchar(100) default NULL,
-  PRIMARY KEY  (fieldId),
-  UNIQUE KEY field_unique (fieldName)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `metaData_properties`
---
-
-
-
---
--- Table structure for table `metaData_values`
---
-
-CREATE TABLE metaData_values (
-  fieldId varchar(22) NOT NULL default '',
-  value varchar(100) default NULL,
-  assetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (fieldId,assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `metaData_values`
---
-
-
-
---
--- Table structure for table `passiveProfileAOI`
---
-
-CREATE TABLE passiveProfileAOI (
-  userId varchar(22) NOT NULL default '',
-  fieldId varchar(22) NOT NULL default '',
-  value varchar(100) NOT NULL default '',
-  count int(11) default NULL,
-  PRIMARY KEY  (userId,fieldId,value)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `passiveProfileAOI`
---
-
-
-
---
--- Table structure for table `passiveProfileLog`
---
-
-CREATE TABLE passiveProfileLog (
-  passiveProfileLogId varchar(22) NOT NULL default '',
-  userId varchar(22) default NULL,
-  sessionId varchar(60) default NULL,
-  wobjectId varchar(22) default NULL,
-  dateOfEntry int(11) default '0',
-  PRIMARY KEY  (passiveProfileLogId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `passiveProfileLog`
---
-
-
-
---
--- Table structure for table `productParameterOptions`
---
-
-CREATE TABLE productParameterOptions (
-  optionId varchar(22) NOT NULL default '',
-  parameterId varchar(22) NOT NULL default '',
-  value varchar(64) NOT NULL default '',
-  priceModifier decimal(10,2) default '0.00',
-  weightModifier decimal(6,2) default '0.00',
-  skuModifier varchar(64) default NULL,
-  PRIMARY KEY  (optionId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `productParameterOptions`
---
-
-
-
---
--- Table structure for table `productParameters`
---
-
-CREATE TABLE productParameters (
-  parameterId varchar(22) NOT NULL default '',
-  productId varchar(22) NOT NULL default '',
-  name varchar(64) NOT NULL default '',
-  PRIMARY KEY  (parameterId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `productParameters`
---
-
-
-
---
--- Table structure for table `productVariants`
---
-
-CREATE TABLE productVariants (
-  variantId varchar(22) NOT NULL default '',
-  productId varchar(22) NOT NULL default '',
-  composition mediumtext NOT NULL,
-  sku varchar(255) default NULL,
-  price decimal(12,2) default '0.00',
-  weight decimal(8,3) default '0.000',
-  skuOverride tinyint(1) default '0',
-  priceOverride tinyint(1) default '0',
-  weightOverride tinyint(1) default '0',
-  available tinyint(1) default '1',
-  PRIMARY KEY  (variantId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `productVariants`
---
-
-
-
---
--- Table structure for table `products`
---
-
-CREATE TABLE products (
-  productId varchar(22) NOT NULL default '',
-  title varchar(255) NOT NULL default '',
-  description mediumtext,
-  price decimal(12,2) NOT NULL default '0.00',
-  weight decimal(8,3) NOT NULL default '0.000',
-  sku varchar(255) NOT NULL default '',
-  skuTemplate varchar(255) default NULL,
-  templateId varchar(22) default NULL,
-  PRIMARY KEY  (productId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `products`
---
-
-
-
---
--- Table structure for table `redirect`
---
-
-CREATE TABLE redirect (
-  assetId varchar(22) NOT NULL default '',
-  redirectUrl text,
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `redirect`
---
-
-
-
---
--- Table structure for table `replacements`
---
-
-CREATE TABLE replacements (
-  replacementId varchar(22) NOT NULL default '',
-  searchFor varchar(255) default NULL,
-  replaceWith text,
-  PRIMARY KEY  (replacementId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `replacements`
---
-
-
-INSERT INTO replacements VALUES ('1','[quote]','<blockquote><i>');
-INSERT INTO replacements VALUES ('2','[/quote]','</i></blockquote>');
-INSERT INTO replacements VALUES ('3','[image]','<img src=\"');
-INSERT INTO replacements VALUES ('4','[/image]','\" border=\"0\" / >');
-INSERT INTO replacements VALUES ('5','shit','crap');
-INSERT INTO replacements VALUES ('6','fuck','farg');
-INSERT INTO replacements VALUES ('7','asshole','icehole');
-INSERT INTO replacements VALUES ('8','nigger','guy');
-INSERT INTO replacements VALUES ('9','[b]','<b>');
-INSERT INTO replacements VALUES ('10','[/b]','</b>');
-INSERT INTO replacements VALUES ('11','[i]','<i>');
-INSERT INTO replacements VALUES ('12','[/i]','</i>');
-
---
--- Table structure for table `settings`
---
-
-CREATE TABLE settings (
-  name varchar(255) NOT NULL default '',
-  value text,
-  PRIMARY KEY  (name)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `settings`
---
-
-
-INSERT INTO settings VALUES ('maxAttachmentSize','10000');
-INSERT INTO settings VALUES ('sessionTimeout','3600');
-INSERT INTO settings VALUES ('smtpServer','localhost');
-INSERT INTO settings VALUES ('companyEmail','info@mycompany.com');
-INSERT INTO settings VALUES ('companyName','My Company');
-INSERT INTO settings VALUES ('companyURL','http://www.mycompany.com');
-INSERT INTO settings VALUES ('authMethod','WebGUI');
-INSERT INTO settings VALUES ('anonymousRegistration','0');
-INSERT INTO settings VALUES ('notFoundPage','68sKwDgf9cGH58-NZcU4lg');
-INSERT INTO settings VALUES ('webguiRecoverPasswordEmail','Someone (probably you) requested your account information be sent. Your password has been reset. The following represents your new account information:');
-INSERT INTO settings VALUES ('profileName','1');
-INSERT INTO settings VALUES ('profileExtraContact','1');
-INSERT INTO settings VALUES ('profileMisc','1');
-INSERT INTO settings VALUES ('profileHome','0');
-INSERT INTO settings VALUES ('profileWork','0');
-INSERT INTO settings VALUES ('preventProxyCache','0');
-INSERT INTO settings VALUES ('thumbnailSize','50');
-INSERT INTO settings VALUES ('textAreaRows','5');
-INSERT INTO settings VALUES ('textAreaCols','50');
-INSERT INTO settings VALUES ('textBoxSize','30');
-INSERT INTO settings VALUES ('defaultPage','68sKwDgf9cGH58-NZcU4lg');
-INSERT INTO settings VALUES ('onNewUserAlertGroup','3');
-INSERT INTO settings VALUES ('alertOnNewUser','0');
-INSERT INTO settings VALUES ('useKarma','0');
-INSERT INTO settings VALUES ('karmaPerLogin','1');
-INSERT INTO settings VALUES ('runOnRegistration','');
-INSERT INTO settings VALUES ('maxImageSize','100000');
-INSERT INTO settings VALUES ('showDebug','0');
-INSERT INTO settings VALUES ('richEditor','PBrichedit000000000001');
-INSERT INTO settings VALUES ('selfDeactivation','1');
-INSERT INTO settings VALUES ('snippetsPreviewLength','30');
-INSERT INTO settings VALUES ('mailFooter','^c;\n^e;\n^u;\n');
-INSERT INTO settings VALUES ('webguiSendWelcomeMessage','0');
-INSERT INTO settings VALUES ('webguiWelcomeMessage','Welcome to our site.');
-INSERT INTO settings VALUES ('proxiedClientAddress','0');
-INSERT INTO settings VALUES ('encryptLogin','0');
-INSERT INTO settings VALUES ('hostToUse','HTTP_HOST');
-INSERT INTO settings VALUES ('webguiExpirePasswordOnCreation','0');
-INSERT INTO settings VALUES ('webguiPasswordLength','0');
-INSERT INTO settings VALUES ('webguiPasswordRecovery','1');
-INSERT INTO settings VALUES ('webguiPasswordTimeout','3122064000');
-INSERT INTO settings VALUES ('commerceCheckoutCanceledTemplateId','1');
-INSERT INTO settings VALUES ('webguiChangePassword','1');
-INSERT INTO settings VALUES ('webguiChangeUsername','1');
-INSERT INTO settings VALUES ('metaDataEnabled','0');
-INSERT INTO settings VALUES ('passiveProfilingEnabled','0');
-INSERT INTO settings VALUES ('urlExtension','');
-INSERT INTO settings VALUES ('commerceConfirmCheckoutTemplateId','1');
-INSERT INTO settings VALUES ('commercePaymentPlugin','PayFlowPro');
-INSERT INTO settings VALUES ('commerceSelectPaymentGatewayTemplateId','1');
-INSERT INTO settings VALUES ('commerceTransactionErrorTemplateId','1');
-INSERT INTO settings VALUES ('AdminConsoleTemplate','PBtmpl0000000000000001');
-INSERT INTO settings VALUES ('userFunctionStyleId','B1bNjWVtzSjsvGZh9lPz_A');
-INSERT INTO settings VALUES ('webguiValidateEmail','0');
-INSERT INTO settings VALUES ('webguiUseCaptcha','1');
-INSERT INTO settings VALUES ('webguiAccountTemplate','PBtmpl0000000000000010');
-INSERT INTO settings VALUES ('webguiCreateAccountTemplate','PBtmpl0000000000000011');
-INSERT INTO settings VALUES ('webguiExpiredPasswordTemplate','PBtmpl0000000000000012');
-INSERT INTO settings VALUES ('webguiLoginTemplate','PBtmpl0000000000000013');
-INSERT INTO settings VALUES ('webguiPasswordRecoveryTemplate','PBtmpl0000000000000014');
-INSERT INTO settings VALUES ('ldapConnection',NULL);
-INSERT INTO settings VALUES ('commerceSelectShippingMethodTemplateId','PBtmplCSSM000000000001');
-INSERT INTO settings VALUES ('commerceViewShoppingCartTemplateId','PBtmplVSC0000000000001');
-INSERT INTO settings VALUES ('specialState','init');
-INSERT INTO settings VALUES ('commerceSendDailyReportTo','');
-
---
--- Table structure for table `shoppingCart`
---
-
-CREATE TABLE shoppingCart (
-  sessionId varchar(22) NOT NULL default '',
-  itemId varchar(64) NOT NULL default '',
-  itemType varchar(40) NOT NULL default '',
-  quantity int(4) NOT NULL default '0',
-  PRIMARY KEY  (sessionId,itemId,itemType)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `shoppingCart`
---
-
-
-
---
--- Table structure for table `snippet`
---
-
-CREATE TABLE snippet (
-  assetId varchar(22) NOT NULL default '',
-  snippet mediumtext,
-  processAsTemplate int(11) NOT NULL default '0',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `snippet`
---
-
-
-
---
--- Table structure for table `subscription`
---
-
-CREATE TABLE subscription (
-  subscriptionId varchar(22) NOT NULL default '',
-  name varchar(128) default NULL,
-  price float default '0',
-  description mediumtext,
-  subscriptionGroup varchar(22) NOT NULL default '',
-  duration varchar(12) NOT NULL default 'Monthly',
-  executeOnSubscription varchar(128) default NULL,
-  karma int(4) default '0',
-  deleted int(1) default '0',
-  PRIMARY KEY  (subscriptionId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `subscription`
---
-
-
-
---
--- Table structure for table `subscriptionCode`
---
-
-CREATE TABLE subscriptionCode (
-  batchId varchar(22) NOT NULL default '',
-  code varchar(64) NOT NULL default '',
-  status varchar(10) NOT NULL default 'Unused',
-  dateCreated int(11) NOT NULL default '0',
-  dateUsed int(11) NOT NULL default '0',
-  expires int(11) NOT NULL default '0',
-  usedBy varchar(22) NOT NULL default '0',
-  PRIMARY KEY  (code)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `subscriptionCode`
---
-
-
-
---
--- Table structure for table `subscriptionCodeBatch`
---
-
-CREATE TABLE subscriptionCodeBatch (
-  batchId varchar(22) NOT NULL default '',
-  name varchar(128) default NULL,
-  description mediumtext NOT NULL,
-  subscriptionId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (batchId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `subscriptionCodeBatch`
---
-
-
-
---
--- Table structure for table `subscriptionCodeSubscriptions`
---
-
-CREATE TABLE subscriptionCodeSubscriptions (
-  code varchar(64) NOT NULL default '',
-  subscriptionId varchar(22) NOT NULL default '',
-  UNIQUE KEY code (code,subscriptionId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `subscriptionCodeSubscriptions`
---
-
-
-
---
--- Table structure for table `template`
---
-
-CREATE TABLE template (
-  template mediumtext,
-  namespace varchar(35) NOT NULL default 'Page',
-  isEditable int(11) NOT NULL default '1',
-  showInForms int(11) NOT NULL default '1',
-  assetId varchar(22) NOT NULL default '',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `template`
---
-
-
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n  <img src=\"<tmpl_var image.url>\" align=\"left\" border=\"0\">\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if linkurl>\r\n  <tmpl_if linktitle>\r\n    <p /><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000103');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p />\r\n</tmpl_if>\r\n\r\n\n\n\n<tmpl_loop month_loop>\n	<table border=\"1\" width=\"100%\">\n	<tr><td colspan=7 class=\"tableHeader\"><h2 align=\"center\"><tmpl_var month> <tmpl_var year></h2></td></tr>\n	<tr>\n	<tmpl_if session.user.firstDayOfWeek>\n		<th class=\"tableData\"><tmpl_var monday.label.short></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var thursday.label.short></th>\n		<th class=\"tableData\"><tmpl_var friday.label.short></th>\n		<th class=\"tableData\"><tmpl_var saturday.label.short></th>\n		<th class=\"tableData\"><tmpl_var sunday.label.short></th>\n	<tmpl_else>\n		<th class=\"tableData\"><tmpl_var sunday.label.short></th>\n		<th class=\"tableData\"><tmpl_var monday.label.short></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var thursday.label.short></th>\n		<th class=\"tableData\"><tmpl_var friday.label.short></th>\n		<th class=\"tableData\"><tmpl_var saturday.label.short></th>\n	</tmpl_if>\n	</tr><tr>\n	<tmpl_loop prepad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n 	<tmpl_loop day_loop>\n		<tmpl_if isStartOfWeek>\n			<tr>\n		</tmpl_if>\n		<td class=\"table<tmpl_if isToday>Header<tmpl_else>Data</tmpl_if>\" width=\"28\" valign=\"top\" align=\"left\"><p><b>\n				<tmpl_if url>\n					<a href=\"<tmpl_var url>\"><tmpl_var day></a>\n				<tmpl_else>\n					<tmpl_var day>\n				</tmpl_if>\n		</b></p></td>		\n		<tmpl_if isEndOfWeek>\n			</tr>\n		</tmpl_if>\n	</tmpl_loop>\n	<tmpl_loop postpad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n	</tr>\n	</table>\n</tmpl_loop>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','EventsCalendar',1,1,'PBtmpl0000000000000105');
-INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\r\n\r\n<table width=\"100%\" cellspacing=\"0\" cellpadding=\"5\" border=\"0\">\r\n<tr>\r\n<td valign=\"top\" class=\"tableHeader\" width=\"100%\">\r\n<b><tmpl_var start.label>:</b> <tmpl_var start.date><br />\r\n<b><tmpl_var end.label>:</b> <tmpl_var end.date><br />\r\n</td><td valign=\"top\" class=\"tableMenu\" nowrap=\"1\">\r\n\r\n<tmpl_if canEdit>\r\n     <a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a><br />\r\n     <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if previous.url>\r\n     <a href=\"<tmpl_var previous.url>\"><tmpl_var previous.label></a><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if next.url>\r\n     <a href=\"<tmpl_var next.url>\"><tmpl_var next.label></a><br />\r\n</tmpl_if>\r\n\r\n</td></tr>\r\n</table>\r\n<tmpl_var description>','EventsCalendar/Event',1,1,'PBtmpl0000000000000023');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p />\r\n</tmpl_if>\r\n\r\n\n<tmpl_loop month_loop>\n	<tmpl_loop day_loop>\n		<tmpl_loop event_loop>\n			<tmpl_if isFirstDayOfEvent>\n				<tmpl_unless dateIsSameAsPrevious>\n					<b>\n						<tmpl_var start.day.dayOfWeek> <tmpl_var start.month> <tmpl_var start.day><tmpl_unless startEndYearMatch>,\n						          <tmpl_ start.year> - \n							<tmpl_var end.day.dayOfWeek> <tmpl_var end.month> <tmpl_var end.day></tmpl_unless><tmpl_unless startEndMonthMatch> - <tmpl_var end.day.dayOfWeek> <tmpl_var end.month> <tmpl_var end.day><tmpl_else><tmpl_unless startEndDayMatch> - <tmpl_var end.day></tmpl_unless></tmpl_unless>, <tmpl_var end.year>\n					</b>\n				</tmpl_unless>\n				<blockquote>\n					<tmpl_if session.var.adminOn>\n						<a href=\"<tmpl_var url>\">\n					</tmpl_if>\n					<i><tmpl_var name></i>\n					<tmpl_if session.var.adminOn>\n						</a>\n					</tmpl_if>\n					<tmpl_if description>\n						- <tmpl_var description>\n					</tmpl_if description>\n				</blockquote>\n			</tmpl_if>\n		</tmpl_loop>\n	</tmpl_loop>\n</tmpl_loop>\n\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','EventsCalendar',1,1,'PBtmpl0000000000000086');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <div align=\"center\"><img src=\"<tmpl_var image.url>\" border=\"0\"></div>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if linkurl>\r\n  <tmpl_if linktitle>\r\n    <p /><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000084');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n  <img src=\"<tmpl_var image.url>\" align=\"right\" border=\"0\">\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if linkUrl>\r\n  <tmpl_if linkTitle>\r\n    <p /><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000002');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n   <table align=\"right\"><tr><td align=\"center\">\r\n   <tmpl_if linkUrl>\r\n        <a href=\"<tmpl_var linkUrl>\">\r\n      <img src=\"<tmpl_var image.url>\" border=\"0\">\r\n       <br /><tmpl_var linkTitle></a>\r\n    <tmpl_else>\r\n           <img src=\"<tmpl_var image.url>\" border=\"0\">\r\n           <br /> <tmpl_var linkTitle>\r\n   </tmpl_if>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n\r\n\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000115');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.title.url>\"><tmpl_var title.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.date.url>\"><tmpl_var date.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.username.url>\"><tmpl_var by.label></a></td>\r\n</tr>\r\n<tmpl_loop post_loop>\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateUpdated.human></td>\r\n	<tmpl_if user.isVisitor>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var username></td>\r\n	<tmpl_else>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\r\n	</tmpl_if>\r\n</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000066');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n\r\n<ul>\r\n	<tmpl_loop post_loop>\r\n	   <li><a href=\"#<tmpl_var assetId>\"><span class=\"faqQuestion\"><tmpl_var title></span></a>\r\n	</tmpl_loop>\r\n</ul>\r\n\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<a name=\"<tmpl_var assetId>\"></a><span class=\"faqQuestion\"><tmpl_var title></span><br />\r\n	<tmpl_var content>\r\n	<p><a href=\"#top\">[top]</a></p>\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000080');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.title.url>\"><tmpl_var title.label></a></td>\r\n	<td class=\"forumHead\"><tmpl_var thumbnail.label></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.date.url>\"><tmpl_var date.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.username.url>\"><tmpl_var by.label></a></td>\r\n</tr>\r\n<tmpl_loop post_loop>\r\n	<tr>\r\n		<tmpl_if user.isModerator>\r\n			<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n		</tmpl_if>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" style=\"text-align: center;\">\r\n			<tmpl_if thumbnail>\r\n				 <a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var title>\" /></a>\r\n			<tmpl_else>\r\n				 &nbsp;\r\n			</tmpl_if>\r\n		</td>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateUpdated.human></td>\r\n		<tmpl_if user.isVisitor>\r\n			<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var username></td>\r\n		<tmpl_else>\r\n			<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\r\n		</tmpl_if>\r\n	</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','Collaboration',1,1,'PBtmpl0000000000000097');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<style type=\"text/css\">\r\n.weblogTitleBar {\r\n	font-weight: bold;\r\n	font-size: 14px;\r\n}\r\n.weblogLegend {\r\n	font-size: 9px;\r\n	color: #999999;\r\n}\r\n.weblogReadMore {\r\n	text-align: right;\r\n	font-size: 9px;\r\n	width: 100%;\r\n}\r\n.weblogSynopsis {\r\n	border: 1px solid #bbbbbb;\r\n	font-size: 13px;\r\n	padding: 5px;\r\n	-moz-border-radius: 6px;\r\n}\r\n</style>\r\n\r\n<p />\r\n\r\n<tmpl_loop post_loop>\r\n	<div class=\"weblogTitleBar\">\r\n		<tmpl_var title> \r\n	</div>\r\n	<fieldset class=\"weblogSynopsis\">\r\n		<legend class=\"weblogLegend\" align=\"left\">\r\n			<tmpl_var by.label> <a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>  \r\n			- \r\n			<tmpl_var dateSubmitted.human>\r\n			<tmpl_if replies>\r\n				- <tmpl_var replies> <tmpl_var replies.label>\r\n			</tmpl_if>\r\n			<tmpl_if user.isPoster>\r\n				 - <tmpl_var status>\r\n			<tmpl_else>\r\n				<tmpl_if user.isModerator>\r\n					- <tmpl_var status>\r\n				</tmpl_if>\r\n			</tmpl_if>\r\n		</legend>\r\n		<tmpl_if thumbnail>\r\n			<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var title>\" align=\"right\" /></a>\r\n		</tmpl_if>\r\n		<tmpl_var synopsis>\r\n		<div class=\"weblogReadMore\">\r\n			<a href=\"<tmpl_var url>\"><tmpl_var readmore.label></a>\r\n		</div>\r\n	</fieldset>\r\n	<p />\r\n</tmpl_loop>        \r\n\r\n						 \r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n						 ','Collaboration',1,1,'PBtmpl0000000000000112');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<style type=\"text/css\">\r\n.picture {\r\n padding: 0px; \r\n margin: 10px;\r\n float: left;\r\n width: 150px;\r\n font-size: 12px;\r\n height: 100px;\r\n overflow: hidden;\r\n}\r\n</style>\r\n\r\n<br />\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<div class=\"picture\">\r\n		<div style=\"text-align: center;\">\r\n			<tmpl_if user.isPoster><div>(<tmpl_var status>)</div></tmpl_if>\r\n			<div><a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var title>\" /></a></div>\r\n			<div><a href=\"<tmpl_var url>\"><tmpl_var title></a></div>\r\n		</div>\r\n	</div>\r\n</tmpl_loop>\r\n\r\n\r\n<div style=\"clear: both;\"></div>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','Collaboration',1,1,'PBtmpl0000000000000121');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n\r\n<h1><tmpl_var title></h1>\r\n\r\n<div style=\"float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;\">\r\n	<b><tmpl_var user.label>:</b> \r\n		<tmpl_if user.isVisitor>\r\n			<tmpl_var username>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n		</tmpl_if>\r\n		<br />\r\n	<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n	<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n	<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n		<tmpl_unless hasRated>\r\n			 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n		</tmpl_unless>\r\n		<br />\r\n	<tmpl_if user.isModerator>\r\n		<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n	<tmpl_else>	\r\n		<tmpl_if user.isPoster>\r\n			<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n		</tmpl_if>	\r\n	</tmpl_if>	\r\n</div>\r\n\r\n\r\n\r\n<tmpl_var content>\r\n\r\n<tmpl_if attachment_loop>\r\n	<br />\r\n		<tmpl_loop attachment_loop>\r\n			<div style=\"float: left; padding: 5px;\">\r\n				<a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a>\r\n			</div>\r\n		</tmpl_loop>\r\n		<div style=\"clear: both;\"></div>\r\n	<br />\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined1>\r\n	<p><tmpl_var userDefined1></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined2>\r\n	<p><tmpl_var userDefined2></p>\r\n</tmpl_if>\r\n	\r\n<tmpl_if userDefined3>\r\n	<p><tmpl_var userDefined3></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined4>\r\n	<p><tmpl_var userDefined4></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined5>\r\n	<p><tmpl_var userDefined5></p>\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_unless isLocked>\r\n	<p>\r\n		<tmpl_if user.canReply>\r\n			<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if user.canEdit>\r\n			<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n			<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_unless>\r\n\r\n\r\n<tmpl_if repliesAllowed>\r\n\r\n	<style>\r\n		.postBorder {\r\n			border: 1px solid #cccccc;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postBorderCurrent {\r\n			border: 3px dotted black;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postSubject {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-weight: bold;\r\n			padding: 3px;\r\n		}\r\n		.postData {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postControls {\r\n			border-top: 1px solid #cccccc;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postMessage {\r\n			padding: 3px;\r\n		}\r\n		.currentThread {\r\n			background-color: #eeeeee;\r\n		}\r\n		.threadHead {\r\n			font-weight: bold;\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.threadData {\r\n			font-size: 11px;\r\n			padding: 3px;\r\n		}\r\n	</style>\r\n\r\n	<div style=\"float: left; width: 70%\">\r\n		<h1><tmpl_var replies.label></h1>\r\n	</div>\r\n	<div style=\"width: 30%; float: left; text-align: right;\">\r\n		<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n		function goLayout(){\r\n			location = document.discussionlayout.layoutSelect.options[document.discussionlayout.layoutSelect.selectedIndex].value\r\n		}\r\n		//-->	\r\n		</script>\r\n		<form name=\"discussionlayout\">\r\n			<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n				<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n				<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n				<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n			</select> \r\n		</form> \r\n	</div>\r\n	<div style=\"clear: both;\"></div>\r\n\r\n	<tmpl_if layout.isThreaded>\r\n	<!-- begin threaded layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<tmpl_if isCurrent>\r\n					<div class=\"postBorder\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%;\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>	\r\n				</tmpl_if>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n		<table style=\"width: 100%\">\r\n			<thead>\r\n				<tr>\r\n					<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n					<td class=\"threadHead\"><tmpl_var user.label></td>\r\n					<td class=\"threadHead\"><tmpl_var date.label></td>\r\n				</tr>\r\n			</thead>\r\n			<tbody>\r\n				<tmpl_loop post_loop>\r\n					<tmpl_unless isThreadRoot>\r\n						<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n							<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n							<td class=\"threadData\"><tmpl_var username></td>\r\n							<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n						</tr>\r\n					</tmpl_unless>\r\n				</tmpl_loop>\r\n			</tbody>\r\n		</table>	\r\n	<!-- end threaded layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isFlat>\r\n	<!-- begin flat layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n					<a name=\"<tmpl_var assetId>\"></a>\r\n					<div class=\"postSubject\">\r\n						<tmpl_var title>\r\n					</div>\r\n					<div class=\"postData\">\r\n						<div style=\"float: left; width: 50%\">\r\n							<b><tmpl_var user.label>:</b> \r\n								<tmpl_if user.isVisitor>\r\n									<tmpl_var username>\r\n								<tmpl_else>\r\n									<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n								</tmpl_if>\r\n								<br />\r\n							<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n						</div>	\r\n						<div>\r\n							<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n							<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n								<tmpl_unless hasRated>\r\n									 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n								</tmpl_unless>\r\n								<br />\r\n							<tmpl_if user.isModerator>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n							<tmpl_else>	\r\n								<tmpl_if user.isPoster>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n								</tmpl_if>	\r\n							</tmpl_if>	\r\n						</div>	\r\n					</div>\r\n					<div class=\"postMessage\">\r\n						<tmpl_var content>\r\n						<tmpl_loop attachment_loop>\r\n							<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n						</tmpl_loop>\r\n						<div style=\"clear: both;\"></div>\r\n					</div>\r\n					<tmpl_unless isLocked>\r\n						<div class=\"postControls\">\r\n							<tmpl_if user.canReply>\r\n								<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n							</tmpl_if>\r\n							<tmpl_if user.canEdit>\r\n								<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n								<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n							</tmpl_if>\r\n						</div>\r\n					</tmpl_unless>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end flat layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isNested>\r\n	<!-- begin nested layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n					<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end nested layout -->\r\n	</tmpl_if>\r\n\r\n	\r\n	\r\n	\r\n	<tmpl_if pagination.pageCount.isMultiple>\r\n		<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n			[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n		</div>\r\n	</tmpl_if>\r\n	\r\n	\r\n</tmpl_if>	\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n	<a href=\"<tmpl_var collaboration.url>\">[<tmpl_var back.label>]</a>\r\n	<tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000067');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><tmpl_var subject.label></td>\r\n	<td class=\"forumHead\"><tmpl_var user.label></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.views.url>\"><tmpl_var views.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.replies.url>\"><tmpl_var replies.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.rating.url>\"><tmpl_var rating.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.date.url>\"><tmpl_var date.label></a></td>\r\n	<tmpl_if displayLastReply>\r\n		<td class=\"forumHead\"><a href=\"<tmpl_var sortby.lastreply.url>\"><tmpl_var lastReply.label></a></td>\r\n	</tmpl_if>\r\n</tr>\r\n<tmpl_loop post_loop>\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a></td>\r\n	<tmpl_if user.isVisitor>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var username></td>\r\n	<tmpl_else>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" align=\"center\"><tmpl_var views></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" align=\"center\"><tmpl_var replies></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" align=\"center\"><tmpl_var rating></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateSubmitted.human> @ <tmpl_var timeSubmitted.human></td>\r\n	<tmpl_if displayLastReply>\r\n		<td  class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" style=\"font-size: 11px;\">\r\n			<a href=\"<tmpl_var lastReply.url>\"><tmpl_var lastReply.title></a>\r\n			by \r\n			<tmpl_if lastReply.user.isVisitor>\r\n				<tmpl_var lastReply.username>\r\n			<tmpl_else>\r\n				<a href=\"<tmpl_var lastReply.userProfile.url>\"><tmpl_var lastReply.username></a>\r\n			</tmpl_if>\r\n			on <tmpl_var lastReply.dateSubmitted.human> @ <tmpl_var lastReply.timeSubmitted.human>\r\n		</td>\r\n	</tmpl_if>\r\n</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000026');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<style>\r\n.ad {\r\n border: 1px dotted #aaaaaa; \r\n padding: 10px; \r\n margin: 0px;\r\n float: left;\r\n width: 140px;\r\n font-size: 12px;\r\n height: 175px;\r\n overflow: hidden;\r\n}\r\n</style>\r\n\r\n<br />\r\n\r\n<tmpl_loop post_loop>\r\n	<div class=\"ad\">\r\n		<div style=\"text-align: center;\">\r\n			<b><a href=\"<tmpl_var url>\"><tmpl_var title></a></b><br />\r\n			<tmpl_if user.isPoster>(<tmpl_var status>)</tmpl_if>\r\n			<tmpl_if thumbnail>\r\n				<div style=\"margin: 3px;\">\r\n					<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" /></a>\r\n				</div>\r\n			</tmpl_if>\r\n		</div>\r\n		<tmpl_var synopsis>\r\n	</div>\r\n</tmpl_loop>\r\n\r\n<div style=\"clear: both;\"></div>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000128');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<h2><tmpl_var title></h2>\r\n	<tmpl_var content>\r\n	<p />\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000079');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<p>\r\n		<tmpl_if userDefined1><a href=\"<tmpl_var userDefined1>\"	<tmpl_if userDefined2>target=\"_blank\"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>\r\n		<tmpl_if content>\r\n				  - <tmpl_var content>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000083');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n<ul>\r\n	<tmpl_loop post_loop>\r\n		<li>\r\n			<tmpl_if user.isPoster>\r\n				<tmpl_unless session.var.adminOn>\r\n					[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			<tmpl_if user.isModerator>\r\n				<tmpl_if session.var.adminOn>\r\n					<tmpl_var controls>\r\n				<tmpl_else>\r\n					<tmpl_unless user.isPoster>\r\n						<tmpl_unless session.var.adminOn>\r\n							[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n						</tmpl_unless>\r\n					</tmpl_unless>\r\n				</tmpl_if>\r\n				(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n			</tmpl_if>\r\n			<tmpl_if userDefined1><a href=\"<tmpl_var userDefined1>\"	<tmpl_if userDefined2>target=\"_blank\"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>\r\n			<tmpl_if content>\r\n					  - <tmpl_var content>\r\n			</tmpl_if>\r\n		</li>\r\n	</tmpl_loop>\r\n</ul>\r\n\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000082');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\r\n.productFeatureHeader,.productSpecificationHeader,.productRelatedHeader,.productAccessoryHeader, .productBenefitHeader  {\r\n    font-weight: bold;\r\n    font-size: 15px;\r\n}\r\n.productFeature,.productSpecification,.productRelated,.productAccessory, .productBenefit {\r\n    font-size: 12px;\r\n}\r\n.productAttributeSeperator {\r\n    background-color: black;\r\n}\r\n</style>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">\r\n<tr>\r\n  <td class=\"content\" valign=\"top\">\r\n\r\n<tmpl_if description>\r\n   <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if price>\r\n    <b>Price:</b> <tmpl_var price><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if productnumber>\r\n    <b>Product Number:</b> <tmpl_var productNumber><br />\r\n</tmpl_if>\r\n\r\n<br>\r\n\r\n<tmpl_if brochure.url>\r\n    <a href=\"<tmpl_var brochure.url>\"><img src=\"<tmpl_var brochure.icon>\" border=0 align=\"absmiddle\"><tmpl_var brochure.label></a><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if manual.url>\r\n    <a href=\"<tmpl_var manual.url>\"><img src=\"<tmpl_var manual.icon>\" border=0 align=\"absmiddle\"><tmpl_var manual.label></a><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if warranty.url>\r\n    <a href=\"<tmpl_var warranty.url>\"><img src=\"<tmpl_var warranty.icon>\" border=0 align=\"absmiddle\"><tmpl_var warranty.label></a><br />\r\n</tmpl_if>\r\n\r\n  </td>\r\n\r\n<td valign=\"top\">\r\n<tmpl_if thumbnail1>\r\n    <a href=\"<tmpl_var image1>\"><img src=\"<tmpl_var thumbnail1>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n<tmpl_if thumbnail2>\r\n    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n<tmpl_if thumbnail3>\r\n    <a href=\"<tmpl_var image3>\"><img src=\"<tmpl_var thumbnail3>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n  </td>\r\n</tr>\r\n</table>\r\n\r\n\r\n<table border=\"0\" cellpadding=\"0\" cellspacing=\"5\">\r\n<tr>\r\n<td valign=\"top\" class=\"productFeature\"><div class=\"productFeatureHeader\">Features</div>\r\n\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addfeature.url>\"><tmpl_var addfeature.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop feature_loop>∑<tmpl_if session.var.adminOn><tmpl_var feature.controls></tmpl_if><tmpl_var feature.feature><br />\r\n</tmpl_loop>\r\n<p/>\r\n</td>\r\n\r\n  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>\r\n\r\n  <td valign=\"top\" class=\"productBenefit\"><div class=\"productBenefitHeader\">Benefits</div>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addBenefit.url>\"><tmpl_var addBenefit.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop benefit_loop>∑<tmpl_if session.var.adminOn><tmpl_var benefit.controls></tmpl_if><tmpl_var benefit.benefit><br />\r\n</tmpl_loop>\r\n<p/></td>\r\n\r\n  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>\r\n\r\n  <td valign=\"top\" class=\"productSpecification\"><div class=\"productSpecificationHeader\">Specifications</div>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop specification_loop>∑<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />\r\n</tmpl_loop>\r\n<p/></td>\r\n\r\n  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>\r\n\r\n  <td valign=\"top\" class=\"productAccessory\"><div class=\"productAccessoryHeader\">Accessories</div>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop accessory_loop>∑<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br />\r\n</tmpl_loop>\r\n<p/></td>\r\n\r\n  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>\r\n\r\n  <td valign=\"top\" class=\"productRelated\"><div class=\"productRelatedHeader\">Related Products</div>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addRelatedProduct.url>\"><tmpl_var addRelatedProduct.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop relatedproduct_loop>∑<tmpl_if session.var.adminOn><tmpl_var RelatedProduct.controls></tmpl_if><a href=\"<tmpl_var relatedproduct.url>\"><tmpl_var relatedproduct.title></a><br />\r\n</tmpl_loop>\r\n</td>\r\n\r\n</tr>\r\n</table>\r\n\r\n','Product',1,1,'PBtmpl0000000000000056');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\r\n.productOptions {\r\n  font-family: Helvetica, Arial, sans-serif;\r\n  font-size: 11px;\r\n}\r\n</style>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if image1>\r\n    <img src=\"<tmpl_var image1>\" border=\"0\" /><p />\r\n</tmpl_if>\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">\r\n<tr>\r\n  <td class=\"content\" valign=\"top\" width=\"66%\"><tmpl_if description>\r\n<tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n  <b>Benefits</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addBenefit.url>\"><tmpl_var addBenefit.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop benefit_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var benefit.controls></tmpl_if><tmpl_var benefit.benefit><br />\r\n</tmpl_loop>\r\n\r\n  </td>\r\n  <td valign=\"top\" width=\"34%\" class=\"productOptions\">\r\n\r\n<tmpl_if thumbnail2>\r\n    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n\r\n<b>Specifications</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop specification_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />\r\n</tmpl_loop>\r\n\r\n<b>Options</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop accessory_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br />\r\n</tmpl_loop>\r\n\r\n<b>Other Products</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addRelatedProduct.url>\"><tmpl_var addRelatedProduct.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop relatedproduct_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var RelatedProduct.controls></tmpl_if><a href=\"<tmpl_var relatedproduct.url>\"><tmpl_var relatedproduct.title></a><br />\r\n</tmpl_loop>\r\n\r\n  </td>\r\n</tr>\r\n</table>\r\n\r\n','Product',1,1,'PBtmpl0000000000000095');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\r\n.productFeatureHeader,.productSpecificationHeader,.productRelatedHeader,.productAccessoryHeader, .productBenefitHeader  {\r\n   font-weight: bold;\r\n   font-size: 15px;\r\n}\r\n.productFeature,.productSpecification,.productRelated,.productAccessory, .productBenefit {\r\n   font-size: 12px;\r\n}\r\n\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">\r\n<tr>\r\n  <td align=\"center\">\r\n<tmpl_if thumbnail1>\r\n    <a href=\"<tmpl_var image1>\"><img src=\"<tmpl_var thumbnail1>\" border=\"0\" /></a>\r\n</tmpl_if>\r\n</td>\r\n   <td align=\"center\">\r\n<tmpl_if thumbnail2>\r\n    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a>\r\n</tmpl_if>\r\n</td>\r\n  <td align=\"center\">\r\n<tmpl_if thumbnail3>\r\n    <a href=\"<tmpl_var image3>\"><img src=\"<tmpl_var thumbnail3>\" border=\"0\" /></a>\r\n</tmpl_if>\r\n</td>\r\n</tr>\r\n</table>\r\n<table border=\"0\" cellpadding=\"0\" cellspacing=\"5\" width=\"100%\">\r\n<tr>\r\n  <td valign=\"top\" class=\"tableData\" width=\"35%\">\r\n\r\n<b>Features</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addfeature.url>\"><tmpl_var addfeature.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop feature_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var feature.controls></tmpl_if><tmpl_var feature.feature><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Benefits</b><br/>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addBenefit.url>\"><tmpl_var addBenefit.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop benefit_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var benefit.controls></tmpl_if><tmpl_var benefit.benefit><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n</td>\r\n  <td valign=\"top\" class=\"tableData\" width=\"35%\">\r\n\r\n<b>Specifications</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop specification_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Accessories</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop accessory_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Related Products</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addRelatedProduct.url>\"><tmpl_var addRelatedProduct.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop relatedproduct_loop>\r\n   ∑<tmpl_if session.var.adminOn><tmpl_var RelatedProduct.controls></tmpl_if><a href=\"<tmpl_var relatedproduct.url>\"><tmpl_var relatedproduct.title></a><br />\r\n</tmpl_loop>\r\n<p />\r\n</td>\r\n  <td class=\"tableData\" valign=\"top\" width=\"30%\">\r\n    <tmpl_if price> \r\n    <b>Price:</b> <tmpl_var price><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if productnumber>\r\n    <b>Product Number:</b> <tmpl_var productNumber><br />\r\n</tmpl_if>\r\n<br />\r\n<tmpl_if brochure.url>\r\n    <a href=\"<tmpl_var brochure.url>\"><img src=\"<tmpl_var brochure.icon>\" border=0 align=\"absmiddle\" /><tmpl_var brochure.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if manual.url>\r\n    <a href=\"<tmpl_var manual.url>\"><img src=\"<tmpl_var manual.icon>\" border=0 align=\"absmiddle\" /><tmpl_var manual.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if warranty.url>\r\n    <a href=\"<tmpl_var warranty.url>\"><img src=\"<tmpl_var warranty.icon>\" border=0 align=\"absmiddle\" /><tmpl_var warranty.label></a><br />\r\n</tmpl_if>\r\n  </td>\r\n</tr>\r\n</table>\r\n\r\n\r\n','Product',1,1,'PBtmpl0000000000000110');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000135');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 66%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000131');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\r\n.productCollateral {\r\n   font-size: 11px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n\r\n<table width=\"100%\">\r\n<tr><td valign=\"top\" class=\"productCollateral\" width=\"100\">\r\n<img src=\"^Extras;spacer.gif\" width=\"100\" height=\"1\" /><br />\r\n<tmpl_if brochure.url>\r\n    <a href=\"<tmpl_var brochure.url>\"><img src=\"<tmpl_var brochure.icon>\" border=0 align=\"absmiddle\" /><tmpl_var brochure.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if manual.url>\r\n    <a href=\"<tmpl_var manual.url>\"><img src=\"<tmpl_var manual.icon>\" border=0 align=\"absmiddle\" /><tmpl_var manual.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if warranty.url>\r\n    <a href=\"<tmpl_var warranty.url>\"><img src=\"<tmpl_var warranty.icon>\" border=0 align=\"absmiddle\" /><tmpl_var warranty.label></a><br />\r\n</tmpl_if>\r\n<br/>\r\n<div align=\"center\">\r\n<tmpl_if thumbnail1>\r\n    <a href=\"<tmpl_var image1>\"><img src=\"<tmpl_var thumbnail1>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n<tmpl_if thumbnail2>\r\n    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n<tmpl_if thumbnail3>\r\n    <a href=\"<tmpl_var image3>\"><img src=\"<tmpl_var thumbnail3>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n</div>\r\n</td><td valign=\"top\" class=\"content\" width=\"100%\">\r\n<tmpl_if description>\r\n<tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<b>Specs:</b><br/>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop specification_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Features:</b><br/>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addfeature.url>\"><tmpl_var addfeature.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop feature_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var feature.controls></tmpl_if><tmpl_var feature.feature><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Options:</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop accessory_loop>\r\n  &middot;<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br />\r\n</tmpl_loop>\r\n\r\n</td></tr>\r\n</table>\r\n','Product',1,1,'PBtmpl0000000000000119');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000054');
-INSERT INTO template VALUES ('<tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if><a href=\"<tmpl_var fileUrl>\"><img src=\"<tmpl_var fileIcon>\" alt=\"<tmpl_var title>\" border=\"0\" /><tmpl_var filename></a>','FileAsset',1,1,'PBtmpl0000000000000024');
-INSERT INTO template VALUES ('<tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if><img src=\"<tmpl_var fileUrl>\" <tmpl_var parameters> />','ImageAsset',1,1,'PBtmpl0000000000000088');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a><tmpl_if session.var.adminOn>\r\n <p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n      <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n     <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" class=\"content\">\r\n<tmpl_loop subfolder_loop>\r\n<tr>\r\n    	<td class=\"tableData\" valign=\"top\">\r\n		<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon.small>\" border=\"0\" alt=\"<tmpl_var title>\"></a> <a href=\"<tmpl_var url>\"><tmpl_var title></a>\r\n	</td>\r\n\r\n	<td class=\"tableData\" valign=\"top\" colspan=\"3\">\r\n		<tmpl_var synopsis>\r\n	</td>\r\n</tr>\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_loop file_loop>\r\n<tr>\r\n\r\n 	<td valign=\"top\" class=\"tableData\">\r\n		<tmpl_if session.var.adminOn>\r\n			<tmpl_if canEdit>\r\n				<tmpl_var controls>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n		<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon.small>\" border=\"0\" alt=\"<tmpl_var title>\"></a> <a href=\"<tmpl_var url>\"><tmpl_var title>\r\n	</td>\r\n   	<td class=\"tableData\" valign=\"top\">\r\n		<tmpl_var synopsis>\r\n	</td>\r\n     	<td class=\"tableData\" valign=\"top\">\r\n		^D(\"%z %Z\",<tmpl_var date.epoch>);\r\n	</td>\r\n   	<td class=\"tableData\" valign=\"top\">\r\n		<tmpl_var size>\r\n	</td>\r\n</tr>\r\n</tmpl_loop>\r\n\r\n</table>','Folder',1,1,'PBtmpl0000000000000078');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 66%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000125');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n\r\n<!-- begin position 3 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position3\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position3_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 3 -->\r\n\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<!-- begin position 4 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position4\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position4_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 4 -->\r\n\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000118');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<!-- begin position 1 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 2 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n\r\n<!-- begin position 3 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position3\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position3_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 3 -->\r\n\r\n\r\n<!-- begin position 4 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position4\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position4_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 4 -->\r\n\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000109');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<!-- begin position 1 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 2 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n\r\n<!-- begin position 3 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position3\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position3_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 3 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<!-- begin position 4 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position4\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position4_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 4 -->\r\n\r\n\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000094');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n<tmpl_loop post_loop>\r\n\r\n<div><b>On <tmpl_var dateSubmitted.human> <a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a> from <a href=\"<tmpl_var url>\">the \'<tmpl_var title>\' department</a> wrote</b></div>\r\n<div><i><tmpl_var synopsis></i></div>\r\n<div><a href=\"<tmpl_var url>\"><tmpl_var readmore.label></a></div>\r\n<p/>\r\n\r\n</tmpl_loop>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000133');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<h1>\r\n<tmpl_if channel.link>\r\n     <a href=\"<tmpl_var channel.link>\" target=\"_blank\"><tmpl_var channel.title></a>    \r\n<tmpl_else>\r\n     <tmpl_var channel.title>\r\n</tmpl_if>\r\n</h1>\r\n\r\n<tmpl_if channel.description>\r\n    <tmpl_var channel.description><p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_loop item_loop>\r\n<li>\r\n  <tmpl_if link>\r\n       <a href=\"<tmpl_var link>\" target=\"_blank\"><tmpl_var title></a>    \r\n    <tmpl_else>\r\n       <tmpl_var title>\r\n  </tmpl_if>\r\n     <tmpl_if description>\r\n        - <tmpl_var description>\r\n     </tmpl_if>\r\n     <br>\r\n\r\n</tmpl_loop>','SyndicatedContent',1,1,'PBtmpl0000000000000065');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<span class=\"pollQuestion\"><tmpl_var question></span><br />\r\n\r\n<tmpl_if canVote>\r\n\r\n    <tmpl_var form.start>\r\n    <tmpl_loop answer_loop>\r\n         <tmpl_var answer.form> <tmpl_var answer.text><br />\r\n    </tmpl_loop>\r\n     <p />\r\n    <tmpl_var form.submit>\r\n    <tmpl_var form.end>\r\n\r\n<tmpl_else>\r\n\r\n    <tmpl_loop answer_loop>\r\n       <span class=\"pollAnswer\"><hr size=\"1\"><tmpl_var answer.text><br></span>\r\n       <table cellpadding=0 cellspacing=0 border=0><tr>\r\n           <td width=\"<tmpl_var answer.graphWidth>\" class=\"pollColor\"><img src=\"^Extras;spacer.gif\" height=\"1\" width=\"1\"></td>\r\n           <td class=\"pollAnswer\">&nbsp;&nbsp;<tmpl_var answer.percent>% (<tmpl_var answer.total>)</td>\r\n       </tr></table>\r\n    </tmpl_loop>\r\n    <span class=\"pollAnswer\"><hr size=\"1\"><b><tmpl_var responses.label>:</b> <tmpl_var responses.total></span>\r\n\r\n</tmpl_if>\r\n\r\n','Poll',1,1,'PBtmpl0000000000000055');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if error_loop>\r\n<ul>\r\n<tmpl_loop error_loop>\r\n  <li><b><tmpl_var error.message></b>\r\n</tmpl_loop>\r\n</ul>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if canEdit>\r\n      <a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\r\n      &middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\r\n      <tmpl_if entryId>\r\n        &middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\r\n      </tmpl_if>\r\n      <tmpl_if session.var.adminOn>\r\n          &middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\r\n			 &middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\r\n     </tmpl_if>\r\n   <p /> \r\n</tmpl_if>\r\n\r\n<tmpl_var form.start>\r\n<table>\r\n<tmpl_loop field_loop>\r\n  <tmpl_unless field.isHidden>\r\n     <tr><td class=\"formDescription\" valign=\"top\">\r\n        <tmpl_if session.var.adminOn><tmpl_if canEdit><tmpl_var field.controls></tmpl_if></tmpl_if>\r\n        <tmpl_var field.label>\r\n     </td><td class=\"tableData\" valign=\"top\">\r\n       <tmpl_if field.isDisplayed>\r\n            <tmpl_var field.value>\r\n       <tmpl_else>\r\n            <tmpl_var field.form>\r\n       </tmpl_if>\r\n        <tmpl_if field.required>*</tmpl_if>\r\n        <span class=\"formSubtext\"><br /><tmpl_var field.subtext></span>\r\n     </td></tr>\r\n  </tmpl_unless>\r\n</tmpl_loop>\r\n<tr><td></td><td><tmpl_var form.send></td></tr>\r\n</table>\r\n\r\n<tmpl_var form.end>\r\n','DataForm',1,1,'PBtmpl0000000000000020');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_var edit.url>\n\n<tmpl_loop field_loop><tmpl_unless field.isMailField><tmpl_var field.label>:	 <tmpl_var field.value>\n</tmpl_unless></tmpl_loop>','DataForm',1,1,'PBtmpl0000000000000085');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_var acknowledgement>\r\n<p />\r\n<table border=\"0\">\r\n<tmpl_loop field_loop>\r\n<tmpl_unless field.isMailField><tmpl_unless field.isHidden>\r\n  <tr><td class=\"tableHeader\"><tmpl_var field.label></td>\r\n  <td class=\"tableData\"><tmpl_var field.value></td></tr>\r\n</tmpl_unless></tmpl_unless>\r\n</tmpl_loop>\r\n</table>\r\n<p />\r\n<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>','DataForm',1,1,'PBtmpl0000000000000104');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>\n<tmpl_if session.var.adminOn>\n<p><tmpl_var controls></p>\n</tmpl_if><p />\n<table width=\"100%\">\n<tr>\n<td class=\"tableHeader\">Entry ID</td>\n<tmpl_loop field_loop>\n  <tmpl_unless field.isMailField>\n    <td class=\"tableHeader\"><tmpl_var field.label></td>\n  </tmpl_unless field.isMailField>\n</tmpl_loop field_loop>\n<td class=\"tableHeader\">Submission Date</td>\n</tr>\n<tmpl_loop record_loop>\n<tr>\n  <td class=\"tableData\"><a href=\"<tmpl_var record.edit.url>\"><tmpl_var record.entryId></a></td>\n  <tmpl_loop record.data_loop>\n    <tmpl_unless record.data.isMailField>\n       <td class=\"tableData\"><tmpl_var record.data.value></td>\n     </tmpl_unless record.data.isMailField>\n  </tmpl_loop record.data_loop>\n  <td class=\"tableData\"><tmpl_var record.submissionDate.human></td>\n</tr>\n</tmpl_loop record_loop>\n</table>','DataForm/List',1,1,'PBtmpl0000000000000021');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if search.for>\r\n  <tmpl_if content>\r\n    <!-- Display search string. Remove if unwanted -->\r\n    <tmpl_var search.for>\r\n  <tmpl_else>\r\n    <!-- Error: Starting point not found -->\r\n    <b>Error: Search string <i><tmpl_var search.for></i> not found in content.</b>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var content>\r\n\r\n<tmpl_if stop.at>\r\n  <tmpl_if content.trailing>\r\n    <!-- Display stop search string. Remove if unwanted -->\r\n    <tmpl_var stop.at>\r\n  <tmpl_else>\r\n    <!-- Warning: End point not found -->\r\n    <b>Warning: Ending search point <i><tmpl_var stop.at></i> not found in content.</b>\r\n  </tmpl_if>\r\n</tmpl_if>','HttpProxy',1,1,'PBtmpl0000000000000033');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n<tmpl_if session.var.adminOn>\n   <a href=\"<tmpl_var forum.add.url>\"><tmpl_var forum.add.label></a><p />\n</tmpl_if>\n\n<tmpl_if areMultipleForums>\n	<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\">\n		<tr>\n			<tmpl_if session.var.adminOn>\n				<td></td>\n			</tmpl_if>\n			<td class=\"tableHeader\"><tmpl_var title.label></td>\n			<td class=\"tableHeader\"><tmpl_var views.label></td>\n			<td class=\"tableHeader\"><tmpl_var rating.label></td>\n			<td class=\"tableHeader\"><tmpl_var threads.label></td>\n			<td class=\"tableHeader\"><tmpl_var replies.label></td>\n			<td class=\"tableHeader\"><tmpl_var lastpost.label></td>\n		</tr>\n		<tmpl_loop forum_loop>\n			<tr>\n				<tmpl_if session.var.adminOn>\n					<td><tmpl_var forum.controls></td>\n				</tmpl_if>\n				<td class=\"tableData\">\n					<a href=\"<tmpl_var forum.url>\"><tmpl_var forum.title></a><br />\n					<span style=\"font-size: 10px;\"><tmpl_var forum.description></span>\n				</td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.views></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.rating></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.threads></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.replies></td>\n				<td class=\"tableData\"><span style=\"font-size: 10px;\">\n					<a href=\"<tmpl_var forum.lastpost.url>\"><tmpl_var forum.lastpost.subject></a>\n					by \n					<tmpl_if forum.lastpost.user.isVisitor>\n						<tmpl_var forum.lastpost.user.name>\n					<tmpl_else>\n						<a href=\"<tmpl_var forum.lastpost.user.profile>\"><tmpl_var forum.lastpost.user.name></a>\n					</tmpl_if>\n					on <tmpl_var forum.lastpost.date> @ <tmpl_var forum.lastpost.time>\n				</span></td>\n			</tr>\n		</tmpl_loop>\n	</table>\n<tmpl_else>\n	<h2><tmpl_var default.title></h2>\n	<tmpl_if session.var.adminOn>\n		<tmpl_var default.controls><br />\n	</tmpl_if>\n	<tmpl_var default.description><p />\n	<tmpl_var default.listing>\n</tmpl_if>','MessageBoard',1,1,'PBtmpl0000000000000047');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n\r\n<h1><tmpl_var message.header.label></h1>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_if user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var visitorName.label></td>\r\n				<td><tmpl_var visitorName.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var subject.label></td>\r\n		<td><tmpl_var title.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var message.label></td>\r\n		<td><tmpl_var content.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if attachment.form>\r\n		<tr>\r\n			<td><tmpl_var attachment.label></td>\r\n			<td><tmpl_var attachment.form></td>\r\n		</tr>\r\n	</tmpl_if>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000029');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n\r\n<style>\r\n	.postBorder {\r\n		border: 1px solid #cccccc;\r\n		width: 100%;\r\n		margin-bottom: 10px;\r\n	}\r\n 	.postBorderCurrent {\r\n		border: 3px dotted black;\r\n		width: 100%;\r\n		margin-bottom: 10px;\r\n	}\r\n	.postSubject {\r\n		border-bottom: 1px solid #cccccc;\r\n		font-weight: bold;\r\n		padding: 3px;\r\n	}\r\n	.postData {\r\n		border-bottom: 1px solid #cccccc;\r\n		font-size: 11px;\r\n		background-color: #eeeeee;\r\n		color: black;\r\n		padding: 3px;\r\n	}\r\n	.postControls {\r\n		border-top: 1px solid #cccccc;\r\n		background-color: #eeeeee;\r\n		color: black;\r\n		padding: 3px;\r\n	}\r\n	.postMessage {\r\n		padding: 3px;\r\n	}\r\n	.currentThread {\r\n		background-color: #eeeeee;\r\n	}\r\n	.threadHead {\r\n		font-weight: bold;\r\n		border-bottom: 1px solid #cccccc;\r\n		font-size: 11px;\r\n		background-color: #eeeeee;\r\n		color: black;\r\n		padding: 3px;\r\n	}\r\n	.threadData {\r\n		font-size: 11px;\r\n		padding: 3px;\r\n	}\r\n</style>\r\n	\r\n\r\n\r\n<div style=\"float: left; width: 70%\">\r\n	<h1><a href=\"<tmpl_var collaboration.url>\"><tmpl_var collaboration.title></a></h1>\r\n</div>\r\n<div style=\"width: 30%; float: left; text-align: right;\">\r\n	<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n	function goLayout(){\r\n		location = document.layout.layoutSelect.options[document.layout.layoutSelect.selectedIndex].value\r\n	}\r\n	//-->	\r\n	</script>\r\n	<form name=\"layout\">\r\n		<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n			<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n			<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n			<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n		</select> \r\n	</form> \r\n</div>\r\n<div style=\"clear: both;\"></div>\r\n\r\n	\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n<tmpl_if layout.isThreaded>\r\n<!-- begin threaded layout -->\r\n	<tmpl_loop post_loop>\r\n		<tmpl_if isCurrent>\r\n			<div class=\"postBorder\">\r\n				<a name=\"<tmpl_var assetId>\"></a>\r\n				<div class=\"postSubject\">\r\n					<tmpl_var title>\r\n				</div>\r\n				<div class=\"postData\">\r\n					<div style=\"float: left; width: 50%;\">\r\n						<b><tmpl_var user.label>:</b> \r\n							<tmpl_if user.isVisitor>\r\n								<tmpl_var username>\r\n							<tmpl_else>\r\n								<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n							</tmpl_if>\r\n							<br />\r\n						<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n					</div>	\r\n					<div>\r\n						<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n						<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n							<tmpl_unless hasRated>\r\n								 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n							</tmpl_unless>\r\n							<br />\r\n						<tmpl_if user.isModerator>\r\n							<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n						<tmpl_else>	\r\n							<tmpl_if user.isPoster>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n							</tmpl_if>	\r\n						</tmpl_if>	\r\n					</div>	\r\n				</div>\r\n				<div class=\"postMessage\">\r\n					<tmpl_var content>\r\n<tmpl_loop attachment_loop>\r\n  <div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n</tmpl_loop>\r\n<div style=\"clear: both;\"></div>\r\n				</div>\r\n				<tmpl_unless isLocked>\r\n					<div class=\"postControls\">\r\n						<tmpl_if user.canReply>\r\n							<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n						</tmpl_if>\r\n						<tmpl_if user.canEdit>\r\n							<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n							<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n						</tmpl_if>\r\n					</div>\r\n				</tmpl_unless>\r\n			</div>	\r\n		</tmpl_if>\r\n	</tmpl_loop>\r\n	<table style=\"width: 100%\">\r\n		<thead>\r\n			<tr>\r\n				<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n				<td class=\"threadHead\"><tmpl_var user.label></td>\r\n				<td class=\"threadHead\"><tmpl_var date.label></td>\r\n			</tr>\r\n		</thead>\r\n		<tbody>\r\n			<tmpl_loop post_loop>\r\n				<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n					<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n					<td class=\"threadData\"><tmpl_var username></td>\r\n					<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n				</tr>\r\n			</tmpl_loop>\r\n		</tbody>\r\n	</table>	\r\n<!-- end threaded layout -->\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_if layout.isFlat>\r\n<!-- begin flat layout -->\r\n	<tmpl_loop post_loop>\r\n		<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n			<a name=\"<tmpl_var assetId>\"></a>\r\n			<div class=\"postSubject\">\r\n				<tmpl_var title>\r\n			</div>\r\n			<div class=\"postData\">\r\n				<div style=\"float: left; width: 50%\">\r\n					<b><tmpl_var user.label>:</b> \r\n						<tmpl_if user.isVisitor>\r\n							<tmpl_var username>\r\n						<tmpl_else>\r\n							<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n						</tmpl_if>\r\n						<br />\r\n					<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n				</div>	\r\n				<div>\r\n					<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n					<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n						<tmpl_unless hasRated>\r\n							 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n						</tmpl_unless>\r\n						<br />\r\n					<tmpl_if user.isModerator>\r\n						<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n					<tmpl_else>	\r\n						<tmpl_if user.isPoster>\r\n							<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n						</tmpl_if>	\r\n					</tmpl_if>	\r\n				</div>	\r\n			</div>\r\n			<div class=\"postMessage\">\r\n				<tmpl_var content>\r\n<tmpl_loop attachment_loop>\r\n  <div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n</tmpl_loop>\r\n<div style=\"clear: both;\"></div>\r\n\r\n			</div>\r\n			<tmpl_unless isLocked>\r\n				<div class=\"postControls\">\r\n					<tmpl_if user.canReply>\r\n						<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n					</tmpl_if>\r\n					<tmpl_if user.canEdit>\r\n						<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n						<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n					</tmpl_if>\r\n				</div>\r\n			</tmpl_unless>\r\n		</div>\r\n	</tmpl_loop>\r\n<!-- end flat layout -->\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_if layout.isNested>\r\n<!-- begin nested layout -->\r\n    <tmpl_loop post_loop>\r\n		<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n			<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n				<a name=\"<tmpl_var assetId>\"></a>\r\n				<div class=\"postSubject\">\r\n					<tmpl_var title>\r\n				</div>\r\n				<div class=\"postData\">\r\n					<div style=\"float: left; width: 50%\">\r\n						<b><tmpl_var user.label>:</b> \r\n							<tmpl_if user.isVisitor>\r\n								<tmpl_var username>\r\n							<tmpl_else>\r\n								<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n							</tmpl_if>\r\n							<br />\r\n						<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n					</div>	\r\n					<div>\r\n						<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n						<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n							<tmpl_unless hasRated>\r\n								 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n							</tmpl_unless>\r\n							<br />\r\n						<tmpl_if user.isModerator>\r\n							<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n						<tmpl_else>	\r\n							<tmpl_if user.isPoster>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n							</tmpl_if>	\r\n						</tmpl_if>	\r\n					</div>	\r\n				</div>\r\n				<div class=\"postMessage\">\r\n					<tmpl_var content>\r\n<tmpl_loop attachment_loop>\r\n  <div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n</tmpl_loop>\r\n<div style=\"clear: both;\"></div>\r\n\r\n				</div>\r\n				<tmpl_unless isLocked>\r\n					<div class=\"postControls\">\r\n						<tmpl_if user.canReply>\r\n							<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n						</tmpl_if>\r\n						<tmpl_if user.canEdit>\r\n							<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n							<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n						</tmpl_if>\r\n					</div>\r\n				</tmpl_unless>\r\n			</div>\r\n		</div>\r\n	</tmpl_loop>\r\n<!-- end nested layout -->\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n	<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n		[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n	</div>\r\n</tmpl_if>\r\n\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n    <tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000032');
-INSERT INTO template VALUES ('<tmpl_var notify.subscription.message>\r\n\r\n<tmpl_var url>','Collaboration/Notification',1,1,'PBtmpl0000000000000027');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_var form.header>\n<table width=\"100%\" class=\"tableMenu\">\n<tr><td align=\"right\" width=\"15%\">\n	<h1><tmpl_var search.label></h1>\n	</td>\n	<td valign=\"top\" width=\"70%\" align=\"center\">\n		<table>\n			<tr><td class=\"tableData\"><tmpl_var all.label></td><td class=\"tableData\"><tmpl_var all.form></td></tr>\'\n			<tr><td class=\"tableData\"><tmpl_var exactphrase.label></td><td class=\"tableData\"><tmpl_var exactphrase.form></td></tr>\n			<tr><td class=\"tableData\"><tmpl_var atleastone.label></td><td class=\"tableData\"><tmpl_var atleastone.form></td></tr>\n			<tr><td class=\"tableData\"><tmpl_var without.label></td><td class=\"tableData\"><tmpl_var without.form></td></tr>\n			<tr><td class=\"tableData\"><tmpl_var results.label></td><td class=\"tableData\"><tmpl_var results.form></td></tr>\n		</table>\n	</td><td width=\"15%\">\n        		<tmpl_var form.search>\n	</td>\n</tr></table>\n<tmpl_var form.footer>\n<tmpl_if doit>\n	<table width=\"100%\" cellspacing=\"0\" cellpadding=\"3\" border=\"0\">\n	<tr>\n		<td class=\"tableHeader\"><tmpl_var title.label></td>\n		<td class=\"tableHeader\"><tmpl_var user.label></td>\n		<td class=\"tableHeader\"><tmpl_var date.label></td>\n	</tr>\n	<tmpl_loop post_loop>\n			<tr>\n			<td class=\"tableData\"><a href=\"<tmpl_var url>\"><tmpl_var title></a></td>\n			<tmpl_if user.isVisitor>\n				<td class=\"tableData\"><tmpl_var username></td>\n			<tmpl_else>\n				<td class=\"tableData\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\n			</tmpl_if>\n			<td class=\"tableData\"><tmpl_var date> @ <tmpl_var time></td>\n		</tr>\n	</tmpl_loop>\n	</table>\n</tmpl_if>\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>','Collaboration/Search',1,1,'PBtmpl0000000000000031');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\n<tmpl_var controls>\n</tmpl_if>\n<span class=\"horizontalMenu\">\n<tmpl_loop page_loop>\n<a class=\"horizontalMenu\"\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\n</tmpl_loop>\n</span>','Navigation',1,1,'PBtmpl0000000000000071');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\n<tmpl_var controls>\n</tmpl_if>\n<span class=\"horizontalMenu\">\n<tmpl_loop page_loop>\n<a class=\"horizontalMenu\" \n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\n</tmpl_loop>\n</span>','Navigation',1,1,'PBtmpl0000000000000075');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n<h1>\n<tmpl_if channel.link>\n     <a href=\"<tmpl_var channel.link>\" target=\"_blank\"><tmpl_var channel.title></a>    \n<tmpl_else>\n     <tmpl_var channel.title>\n</tmpl_if>\n</h1>\n\n<tmpl_if channel.description>\n    <tmpl_var channel.description><p />\n</tmpl_if>\n\n\n<tmpl_loop item_loop>\n\n       <b><tmpl_var title></b>\n     <tmpl_if description>\n        <br /><tmpl_var description>\n     </tmpl_if>\n  <tmpl_if link>\n       <br /><a href=\"<tmpl_var link>\" target=\"_blank\" style=\"font-size: 9px;\">Read More...</a>    \n   </tmpl_if>\n     <br /><br />\n\n</tmpl_loop>','SyndicatedContent',1,1,'GNvjCFQWjY2AF2uf0aCM8Q');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_unless isReply><tmpl_if preview.synopsis><p><i><tmpl_var preview.synopsis></i></p></tmpl_if></tmpl_unless>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var submission.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_if user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var visitorName.label></td>\r\n				<td><tmpl_var visitorName.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var title.label></td>\r\n		<td><tmpl_var title.form></td>\r\n	</tr>\r\n	<tmpl_unless isReply>\r\n		<tr>\r\n			<td><tmpl_var synopsis.label></td>\r\n			<td><tmpl_var synopsis.form></td>\r\n		</tr>\r\n	</tmpl_unless>	\r\n	<tr>\r\n		<td><tmpl_var body.label></td>\r\n		<td><tmpl_var content.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_unless isReply>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless isReply>\r\n		<tr>\r\n			<td><tmpl_var startDate.label></td>\r\n			<td><tmpl_var startDate.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var endDate.label></td>\r\n			<td><tmpl_var endDate.form></td>\r\n		</tr>\r\n	</tmpl_unless>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000068');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var question.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isReply>\r\n		<tr>\r\n			<td><tmpl_var subject.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var message.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n	<tmpl_else>\r\n		<tr>\r\n			<td><tmpl_var question.label></td>\r\n			<td><tmpl_var title.form.textarea></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var answer.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000099');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n<tmpl_if preview.userDefined1><p><a href=\"<tmpl_var preview.userDefined1>\" <tmpl_if preview.userDefined2>target=\"_blank\"</tmpl_if>><tmpl_var preview.userDefined1></a></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var link.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isReply>\r\n		<tr>\r\n			<td><tmpl_var subject.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var message.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n	<tmpl_else>\r\n		<tr>\r\n			<td><tmpl_var title.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var url.label></td>\r\n			<td><tmpl_var userDefined1.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var newWindow.label></td>\r\n			<td><tmpl_var userDefined1.form.yesNo></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var description.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n	<tmpl_if reply.userDefined1><p><a href=\"<tmpl_var reply.userDefined1>\" <tmpl_if reply.userDefined2>target=\"_blank\"</tmpl_if>><tmpl_var reply.userDefined1></a></p></tmpl_if>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000114');
-INSERT INTO template VALUES ('<div class=\"loginBox\">\r\n<tmpl_if user.isVisitor>\r\n	<tmpl_var form.header>\r\n	<table border=\"0\" class=\"loginBox\" cellpadding=\"1\" cellspacing=\"0\">\r\n	<tr>\r\n		<td><tmpl_var username.form></td>\r\n		<td><tmpl_var password.form></td>\r\n		<td><tmpl_var form.login></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var username.label></td>\r\n		<td><tmpl_var password.label></td>\r\n		<td></td>\r\n	</tr>\r\n	</table>             	<tmpl_if session.setting.anonymousRegistration>\r\n                        <a href=\"<tmpl_var account.create.url>\"><tmpl_var account.create.label></a>\r\n	</tmpl_if>		<tmpl_var form.footer> \r\n<tmpl_else>\r\n	<tmpl_unless customText>\r\n		<tmpl_var hello.label> <a href=\"<tmpl_var account.display.url>\"><tmpl_var session.user.username></a>.\r\n                          <a href=\"<tmpl_var logout.url>\"><tmpl_var logout.label></a><br />\r\n	<tmpl_else>\r\n		<tmpl_var customText>\r\n	</tmpl_unless>\r\n</tmpl_if>\r\n</div>\r\n','Macro/L_loginBox',1,1,'PBtmpl0000000000000092');
-INSERT INTO template VALUES ('<div class=\"loginBox\">\r\n<tmpl_if user.isVisitor>\r\n	<tmpl_var form.header>\r\n             <span><tmpl_var username.label><br></span>\r\n             <tmpl_var username.form>\r\n             <span><br><tmpl_var password.label><br></span>\r\n             <tmpl_var password.form>\r\n             <span><br></span>\r\n             <tmpl_var form.login>\r\n	<tmpl_var form.footer>\r\n	<tmpl_if session.setting.anonymousRegistration>\r\n                        <p><a href=\"<tmpl_var account.create.url>\"><tmpl_var account.create.label></a></p>\r\n	</tmpl_if>	\r\n<tmpl_else>\r\n	<tmpl_unless customText>\r\n		<tmpl_var hello.label> <a href=\"<tmpl_var account.display.url>\"><tmpl_var session.user.username></a>.\r\n                          <a href=\"<tmpl_var logout.url>\"><tmpl_var logout.label></a>\r\n	<tmpl_else>\r\n		<tmpl_var customText>\r\n	</tmpl_unless>\r\n</tmpl_if>\r\n</div>\r\n','Macro/L_loginBox',1,1,'PBtmpl0000000000000044');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if debugMode>\r\n	<ul>\r\n	<tmpl_loop debug_loop>\r\n		<li><tmpl_var debug.output></li>\r\n	</tmpl_loop>\r\n	</ul>\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n<tr>\r\n   <tmpl_loop columns_loop>\r\n	<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n   </tmpl_loop>\r\n</tr>\r\n\r\n<tmpl_loop rows_loop>\r\n   <tr>\r\n   <tmpl_loop row.field_loop>\r\n	<td class=\"tableData\"><tmpl_var field.value></td>\r\n   </tmpl_loop>\r\n   </tr>\r\n   <!-- Handle nested query2 -->\r\n   <tmpl_if hasNest>\r\n	<tr>\r\n	<td colspan=\"<tmpl_var columns.count>\">\r\n	<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n	<tr>\r\n	<td width=\"20\">\r\n	   &nbsp;\r\n	</td>\r\n	<td>\r\n	   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n	   <tr>\r\n	   <tmpl_loop query2.columns_loop>\r\n		<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n	   </tmpl_loop>\r\n	   </tr>\r\n	   <tmpl_loop query2.rows_loop>\r\n	   <tr>\r\n	   <tmpl_loop query2.row.field_loop>\r\n		<td class=\"tableData\"><tmpl_var field.value></td>\r\n	   </tmpl_loop>\r\n	   </tr>\r\n	   <!-- Handle nested query3 -->\r\n	   <tmpl_if query2.hasNest>\r\n		<tr>\r\n		<td colspan=\"<tmpl_var query2.columns.count>\">\r\n		<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n		<tr>\r\n		<td width=\"20\">\r\n		   &nbsp;\r\n		</td>\r\n		<td>\r\n		   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n		   <tr>\r\n		   <tmpl_loop query3.columns_loop>\r\n			<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n		   </tmpl_loop>\r\n		   </tr>\r\n		   <tmpl_loop query3.rows_loop>\r\n		   <tr>\r\n		   <tmpl_loop query3.row.field_loop>\r\n			<td class=\"tableData\"><tmpl_var field.value></td>\r\n		   </tmpl_loop>\r\n		   </tr>\r\n	   		<!-- Handle nested query4 -->\r\n			   <tmpl_if query3.hasNest>\r\n				<tr>\r\n				<td colspan=\"<tmpl_var query3.columns.count>\">\r\n				<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n				<tr>\r\n				<td width=\"20\">\r\n				   &nbsp;\r\n				</td>\r\n				<td>\r\n				   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n				   <tr>\r\n				   <tmpl_loop query4.columns_loop>\r\n					<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n				   </tmpl_loop>\r\n				   </tr>\r\n				   <tmpl_loop query4.rows_loop>\r\n				   <tr>\r\n				   <tmpl_loop query4.row.field_loop>\r\n					<td class=\"tableData\"><tmpl_var field.value></td>\r\n				   </tmpl_loop>\r\n			   		<!-- Handle nested query5 -->\r\n					   <tmpl_if query4.hasNest>\r\n						<tr>\r\n						<td colspan=\"<tmpl_var query4.columns.count>\">\r\n						<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n						<tr>\r\n						<td width=\"20\">\r\n						   &nbsp;\r\n						</td>\r\n						<td>\r\n						   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n						   <tr>\r\n						   <tmpl_loop query5.columns_loop>\r\n							<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n						   </tmpl_loop>\r\n						   </tr>\r\n						   <tmpl_loop query5.rows_loop>\r\n						   <tr>\r\n						   <tmpl_loop query5.row.field_loop>\r\n							<td class=\"tableData\"><tmpl_var field.value></td>\r\n						   </tmpl_loop>\r\n						   </tr>\r\n						   </tmpl_loop>\r\n						   </table>\r\n						</td>\r\n						</tr>\r\n						</table>\r\n					        </td>\r\n			        		</tr>\r\n					   </tmpl_if>\r\n				   </tr>\r\n				   </tmpl_loop>\r\n				   </table>\r\n				</td>\r\n				</tr>\r\n				</table>\r\n			        </td>\r\n			        </tr>\r\n			   </tmpl_if>\r\n		   </tmpl_loop>\r\n		   </table>\r\n		</td>\r\n		</tr>\r\n		</table>\r\n	        </td>\r\n	        </tr>\r\n	   </tmpl_if>\r\n	   </tmpl_loop>\r\n	   </table>\r\n	</td>\r\n	</tr>\r\n	</table>\r\n   </td>\r\n</tr>\r\n</tmpl_if>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>   <tmpl_var pagination.pageList.upTo20>  <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>','SQLReport',1,1,'PBtmpl0000000000000059');
-INSERT INTO template VALUES ('<h1><tmpl_var displayTitle></h1>\r\n\r\n<table width=\"100%\" cellspacing=1 cellpadding=2 border=0>\r\n<tr>\r\n   <td class=\"tableHeader\">\r\n      <tmpl_var message.subject.label>\r\n   </td>\r\n   <td class=\"tableHeader\">\r\n      <tmpl_var message.status.label>\r\n   </td>\r\n   <td class=\"tableHeader\">\r\n      <tmpl_var message.dateOfEntry.label>\r\n   </td>\r\n</tr>\r\n<tmpl_if message.noresults>\r\n   <tr>\r\n       <td class=\"tableData\">\r\n          <tmpl_var message.noresults>\r\n       </td>\r\n       <td class=\"tableData\">\r\n          &nbsp;\r\n       </td>\r\n       <td class=\"tableData\">\r\n          &nbsp;\r\n       </td>\r\n   </tr>\r\n<tmpl_else>\r\n   <tmpl_loop message.loop>\r\n      <tr>\r\n         <td class=\"tableData\">\r\n            <tmpl_var message.subject>\r\n         </td>\r\n         <td class=\"tableData\">\r\n            <tmpl_var message.status>\r\n         </td>\r\n         <td class=\"tableData\">\r\n            <tmpl_var message.dateOfEntry>\r\n         </td>\r\n     </tr>\r\n  </tmpl_loop>\r\n</tmpl_if>\r\n</table>\r\n<tmpl_if message.multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var message.previousPage>  &middot; <tmpl_var message.pageList> &middot; <tmpl_var message.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop message.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/MessageLog/View',1,1,'PBtmpl0000000000000050');
-INSERT INTO template VALUES ('<tmpl_var displayTitle>\r\n<b><tmpl_var message.subject></b><br>\r\n<tmpl_var message.dateOfEntry><br>\r\n<tmpl_var message.status><br><br>\r\n<tmpl_var message.text><p>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_if message.takeAction>\r\n         <li><tmpl_var message.takeAction>\r\n      </tmpl_if>\r\n      <tmpl_loop message.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>\r\n\r\n\r\n','Operation/MessageLog/Message',1,1,'PBtmpl0000000000000049');
-INSERT INTO template VALUES ('<tmpl_var displayTitle>\r\n\r\n<tmpl_if profile.message>\r\n   <tmpl_var profile.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var profile.form.header>\r\n<table >\r\n<tmpl_var profile.form.hidden>\r\n\r\n<tmpl_loop profile.form.elements>\r\n     <tr>\r\n       <td class=\"tableHeader\" valign=\"top\" colspan=\"2\">\r\n         <tmpl_var profile.form.category>\r\n       </td>\r\n     </tr>\r\n \r\n <tmpl_loop profile.form.category.loop>\r\n   <tr>\r\n    <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var profile.form.element.label>\r\n    </td>\r\n    <td class=\"tableData\">\r\n      <tmpl_var profile.form.element>\r\n      <tmpl_if profile.form.element.subtext>\r\n        <span class=\"formSubtext\">\r\n         <tmpl_var profile.form.element.subtext>\r\n        </span>\r\n      </tmpl_if>\r\n    </td>\r\n   </tr>\r\n </tmpl_loop>\r\n</tmpl_loop>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n <td class=\"formDescription\" valign=\"top\"></td>\r\n <td class=\"tableData\">\r\n     <tmpl_var profile.form.submit>\r\n </td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop profile.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/Profile/Edit',1,1,'PBtmpl0000000000000051');
-INSERT INTO template VALUES ('<tmpl_var displayTitle>\r\n\r\n<table>\r\n  <tmpl_loop profile.elements>\r\n    <tr>\r\n    <tmpl_if profile.category>\r\n      <td colspan=\"2\" class=\"tableHeader\">\r\n        <tmpl_var profile.category>\r\n      </td>\r\n    <tmpl_else>\r\n      <td class=\"tableHeader\">\r\n         <tmpl_var profile.label>\r\n      </td>\r\n      <td class=\"tableData\">\r\n         <tmpl_var profile.value>\r\n      </td>\r\n    </tmpl_if>   \r\n    </tr>\r\n  </tmpl_loop>\r\n</table>\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop profile.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/Profile/View',1,1,'PBtmpl0000000000000052');
-INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n<br /> <br />\n\n<script>\nfunction toggleDiv(divId) {\n   if (document.getElementById(divId).style.visibility == \"none\") {\n	document.getElementById(divId).style.display = \"block\";\n   } else {\n	document.getElementById(divId).style.display = \"none\";	\n   }\n}\n</script>\n\n<tmpl_loop question_loop>\n	<b><tmpl_var question></b>\n              <tmpl_if question.isRadioList>\n                        <table class=\"tableData\">\n                        <tr class=\"tableHeader\"><td width=\"60%\"><tmpl_var answer.label></td>\n                                <td width=\"20%\"><tmpl_var response.count.label></td>\n                                <td width=\"20%\"><tmpl_var response.percent.label></td></tr>\n                        <tmpl_loop answer_loop>\n                                <tmpl_if answer.isCorrect>\n                                        <tr class=\"highlight\">\n                                <tmpl_else>\n                                        <tr>\n                                </tmpl_if>\n                                	<td><tmpl_var answer></td>\n                                	<td><tmpl_var answer.response.count></td>\n                                	<td><tmpl_var answer.response.percent></td>\n			<tmpl_if allowComment>\n                        			<td><a href=\"#\" onClick=\"toggle(\'comment<tmpl_var answer.id>\');\"><tmpl_var show.comments.label></a></td>\n			</tmpl_if>\n                               </tr>\n		<tmpl_if question.allowComment>\n			<tr id=\"comment<tmpl_var answer.id>\">\n				<td colspan=\"3\">\n					<tmpl_loop comment_loop>\n						<p>\n						<tmpl_var answer.comment>\n						</p>\n					</tmpl_loop>\n				</td>\n			</tr>\n		</tmpl_if>\n		</tmpl_loop>\n                        </table>\n               <tmpl_else>\n                        <br />\n		<a href=\"#\" onClick=\"toggle(\'response<tmpl_var question.id>\');\"><tmpl_var show.answers.label></a>\n		<br />\n		<div id=\"response<tmpl_var question.id>\">\n			<tmpl_loop answer_loop>\n				<p>\n				<tmpl_var answer.response>\n				</p>\n                			<tmpl_if question.allowComment>\n					<blockquote>\n					<tmpl_var answer.comment>\n					</blockquote>\n                			</tmpl_if>\n			</tmpl_loop>\n		</div>\n                </tmpl_if>\n	<br /><br /><br />\n\n</tmpl_loop>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n\n','Survey/Overview',1,1,'PBtmpl0000000000000063');
-INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n<br /> <br />\n\n<table class=\"tableData\">\n<tr class=\"tableHeader\"><td width=\"60%\"><tmpl_var response.user.label></td>\n                <td width=\"20%\"><tmpl_var response.count.label></td>\n                <td width=\"20%\"><tmpl_var response.percent.label></td></tr>\n<tmpl_loop response_loop>\n<tr>\n	<td><a href=\"<tmpl_var response.url>\"><tmpl_var response.user.name></a></td>\n	<td><tmpl_var response.count.correct>/<tmpl_var question.count></td>\n             <td><tmpl_var response.percent>%</td>\n</tr>\n</tmpl_loop>\n</table>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','Survey/Gradebook',1,1,'PBtmpl0000000000000062');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n\n<tmpl_if description>\n  <tmpl_var description><p />\n</tmpl_if>\n\n\n<tmpl_if user.canTakeSurvey>\n	<tmpl_if response.isComplete>\n		<tmpl_if mode.isSurvey>\n			<tmpl_var thanks.survey.label>\n		<tmpl_else>\n			<tmpl_var thanks.quiz.label>\n			<div align=\"center\">\n				<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.total>\n				<br />\n				<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% \n			</div>\n		</tmpl_if>\n		<tmpl_if user.canRespondAgain>\n			<br /> <br /> <a href=\"<tmpl_var start.newResponse.url>\"><tmpl_var start.newResponse.label></a>\n		</tmpl_if>\n	<tmpl_else>\n		<tmpl_if response.id>\n			<tmpl_var form.header>\n			<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\" class=\"content\">\n				<tr>\n					<td valign=\"top\">\n					<tmpl_loop question_loop>\n						<p><tmpl_var question.question></p>\n						<tmpl_var question.answer.label><br />\n						<tmpl_var question.answer.field><br />\n						<br />\n						<tmpl_if question.allowComment>\n							<tmpl_var question.comment.label><br />\n							<tmpl_var question.comment.field><br />\n						</tmpl_if>\n					</tmpl_loop>\n					</td>\n					<td valign=\"top\" nowrap=\"1\">\n						<b><tmpl_var questions.sofar.label>:</b> <tmpl_var questions.sofar.count> / <tmpl_var questions.total> <br />\n						<tmpl_unless mode.isSurvey>\n							<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.sofar.count><br />\n							<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% / 100%<br />\n						</tmpl_unless>\n					</td>\n				</tr>\n			</table>\n			<div align=\"center\"><tmpl_var form.submit></div>\n			<tmpl_var form.footer>\n		<tmpl_else>\n			<a href=\"<tmpl_var start.newResponse.url>\"><tmpl_var start.newResponse.label></a>\n		</tmpl_if>\n	</tmpl_if>\n<tmpl_else>\n	<tmpl_if mode.isSurvey>\n		<tmpl_var survey.noprivs.label>\n	<tmpl_else>\n		<tmpl_var quiz.noprivs.label>\n	</tmpl_if>\n</tmpl_if>\n<br />\n<br />\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n\n<tmpl_if session.var.adminOn>\n	<p>\n		<a href=\"<tmpl_var question.add.url>\"><tmpl_var question.add.label></a>\n	</p>\n	<tmpl_loop question.edit_loop>\n		<tmpl_var question.edit.controls>\n          	<tmpl_var question.edit.question>\n		<br />\n        </tmpl_loop>\n</tmpl_if>\n','Survey',1,1,'PBtmpl0000000000000061');
-INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n</tmpl_if>\n<a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a><p/>\n<b><tmpl_var start.date.label>:</b> <tmpl_var start.date.human> <tmpl_var start.time.human><br />\n<b><tmpl_var end.date.label>:</b> <tmpl_var end.date.human> <tmpl_var end.time.human><br />\n<b><tmpl_var duration.label>:</b> <tmpl_var duration.minutes> <tmpl_var duration.minutes.label> <tmpl_var duration.seconds> <tmpl_var duration.seconds.label>\n\n<p/>\n<tmpl_loop question_loop>\n\n               <b><tmpl_var question></b><br />\n                  <table class=\"tableData\" width=\"100%\">\n<tmpl_if question.isRadioList>\n               \n    <tr><td valign=\"top\" class=\"tableHeader\" width=\"25%\">\n                               <tmpl_var answer.label></td><td width=\"75%\">\n                   <tmpl_var question.answer>                       \n</td></tr>\n        </tmpl_if>\n               <tr><td width=\"25%\" valign=\"top\" class=\"tableHeader\"><tmpl_var response.label></td>\n               \n<td width=\"75%\"><tmpl_var question.response></td></tr>\n                <tmpl_if question.comment>\n                        <tr><td valign=\"top\" class=\"tableHeader\">\n                                <tmpl_var comment.label> </td>\n                                <td><tmpl_var question.comment></td></tr>\n               </tmpl_if>\n\n       </table><p/>\n</tmpl_loop>','Survey/Response',1,1,'PBtmpl0000000000000064');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if error_loop>\r\n	<ul>\r\n		<tmpl_loop error_loop>\r\n			<li><b><tmpl_var error.message></b>\r\n			</tmpl_loop>\r\n	</ul>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n	<tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if canEdit>\r\n	<a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\r\n		&middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\r\n	<tmpl_if entryId>\r\n		&middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\r\n	</tmpl_if>\r\n	<tmpl_if session.var.adminOn>\r\n		&middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\r\n		&middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\r\n	</tmpl_if>\r\n<p /> \r\n</tmpl_if>\r\n<tmpl_var form.start>\r\n<link href=\"/extras/tabs/tabs.css\" rel=\"stylesheet\" rev=\"stylesheet\" type=\"text/css\">\r\n<div class=\"tabs\">\r\n	<tmpl_loop tab_loop>\r\n		<span onclick=\"toggleTab(<tmpl_var tab.sequence>)\" id=\"tab<tmpl_var tab.sequence>\" class=\"tab\"><tmpl_var tab.label>\r\n		<tmpl_if session.var.adminOn>\r\n			<tmpl_if canEdit>\r\n				<tmpl_var tab.controls>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n		</span>\r\n	</tmpl_loop>\r\n</div>\r\n<tmpl_loop tab_loop>\r\n	<tmpl_var tab.start>\r\n		<table>\r\n			<tmpl_loop tab.field_loop>\r\n				<tmpl_unless tab.field.isHidden>\r\n						<tr>\r\n							<td class=\"formDescription\" valign=\"top\">\r\n								<tmpl_if session.var.adminOn>\r\n									<tmpl_if canEdit>\r\n										<tmpl_var tab.field.controls>\r\n									</tmpl_if>\r\n								</tmpl_if>\r\n								<tmpl_var tab.field.label>\r\n							</td>\r\n							<td class=\"tableData\" valign=\"top\">\r\n								<tmpl_if tab.field.isDisplayed>\r\n									<tmpl_var tab.field.value>\r\n								<tmpl_else>\r\n									<tmpl_var tab.field.form>\r\n								</tmpl_if>\r\n								<tmpl_if tab.field.isRequired>*</tmpl_if>\r\n								<span class=\"formSubtext\">\r\n									<br />\r\n									<tmpl_var tab.field.subtext>\r\n								</span>\r\n							</td>\r\n						</tr>\r\n				</tmpl_unless>\r\n			</tmpl_loop>\r\n			<tr>\r\n				<td colspan=\"2\">\r\n					<span class=\"tabSubtext\"><tmpl_var tab.subtext></span>\r\n				</td>\r\n			</tr>\r\n		</table>\r\n		<br>\r\n		<tmpl_var form.save>\r\n	<tmpl_var tab.end>\r\n</tmpl_loop>\r\n<tmpl_var tab.init>\r\n<tmpl_var form.end>\r\n','DataForm',1,1,'PBtmpl0000000000000116');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n\r\n<tmpl_if results>\r\n  <tmpl_loop results>\r\n    The current temp is: <tmpl_var result>\r\n  </tmpl_loop>\r\n<tmpl_else>\r\n  Failed to retrieve temp.\r\n</tmpl_if>','WSClient',1,1,'PBtmpl0000000000000069');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\n.googleDetail {\n  font-size: 9px;\n}\n</style>\n\n<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n<form method=\"post\">\n <input type=\"hidden\" name=\"func\" value=\"view\">\n <input type=\"hidden\" name=\"wid\" value=\"<tmpl_var wobjectId>\">\n <input type=\"hidden\" name=\"targetWobjects\" value=\"doGoogleSearch\">\n <input type=\"text\" name=\"q\"><input type=\"submit\" value=\"Search\">\n</form>\n\n<tmpl_if results>\n  <tmpl_loop results>\n   <tmpl_if resultElements>\n      <p> You searched for <b><tmpl_var searchQuery></b>. We found around <tmpl_var estimatedTotalResultsCount> matching records.</p>\n   </tmpl_if>\n\n   <tmpl_loop resultElements>\n     <a href=\"<tmpl_var URL>\">\n	<tmpl_if title>\n		    <tmpl_var title>\n	<tmpl_else>\n                    <tmpl_var url>\n        </tmpl_if>\n     </a><br />\n        <tmpl_if snippet>\n            <tmpl_var snippet><br />\n        </tmpl_if>\n        <div class=\"googleDetail\">\n        <tmpl_if summary>\n            <b>Description:</b> <tmpl_var summary><br />\n        </tmpl_if>\n        <a href=\"<tmpl_var URL>\"><tmpl_var URL></a>\n     <tmpl_if cachedSize>\n           - <tmpl_var cachedSize>\n     </tmpl_if>\n     </div><br />\n    </tmpl_loop>\n  </tmpl_loop>\n<tmpl_else>\n   Could not retrieve results from Google.\n</tmpl_if>','WSClient',1,1,'PBtmpl0000000000000100');
-INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n<tmpl_var description><br>\n<br>\n<tmpl_var variants.message><br>\n\n<table>\n	<tmpl_loop variantLoop>\n	<tr>\n		<td style=\"indent: 40px\">\n		<tmpl_loop variant.compositionLoop>\n			<tmpl_var parameter>: <tmpl_var value><tmpl_unless __LAST__>,</tmpl_unless>\n		</tmpl_loop>\n		</td>\n		<td>$ <tmpl_var variant.price></td>\n		<td><a href=\"<tmpl_var variant.addToCart.url>\"><tmpl_var variant.addToCart.label></a></td>\n	</tr>\n	</tmpl_loop>\n</table>','Commerce/Product',1,1,'PBtmplCP00000000000001');
-INSERT INTO template VALUES ('<tmpl_if pluginsAvailable>\n   <tmpl_var message><br>\n    <tmpl_var formHeader>\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n    <tmpl_loop pluginLoop>\n            <tr>\n                        <td><tmpl_var formElement></td>\n                     <td align=\"left\"><tmpl_var name></td>\n           </tr>\n       </tmpl_loop>\n        </table>\n    <tmpl_var formSubmit>\n    <tmpl_var formFooter>\n<tmpl_else>\n <tmpl_var noPluginsMessage>\n</tmpl_if>','Commerce/SelectShippingMethod',1,1,'PBtmplCSSM000000000001');
-INSERT INTO template VALUES ('<tmpl_if cartEmpty>\n<tmpl_var cartEmpty.message>\n<tmpl_else>\n\n<tmpl_var updateForm.header>\n<table>	\n	<tr align=\"left\">\n		<th></th>\n		<th style=\"border-bottom: 2px solid black\">Product</th>\n		<th style=\"border-bottom: 2px solid black\">Quantity</th>\n		<th style=\"border-bottom: 2px solid black\">Price</th>\n	</tr>\n\n	<tmpl_if normalItems>\n	</tmpl_if>\n\n	<tmpl_loop normalItemsLoop>\n	<tr>\n		<td><tmpl_var deleteIcon></td>\n		<td align=\"left\"><tmpl_var name></td>\n		<td align=\"center\"><tmpl_var quantity.form></td>\n		<td align=\"right\"><tmpl_var totalPrice></td>\n	</tr>\n	</tmpl_loop>\n\n	<tmpl_loop recurringItemsLoop>\n	<tr>\n		<td><tmpl_var deleteIcon></td>\n		<td align=\"left\"><tmpl_var name></td>\n		<td align=\"center\"><tmpl_var quantity.form></td>\n		<td align=\"right\"><tmpl_var totalPrice></td>\n	</tr>\n</tmpl_loop>\n	<tr style=\"border-top: 1px solid black\">\n		<td></td>\n		<td style=\"border-top: 1px solid black\">&nbsp;</td>\n		<td align=\"right\" style=\"border-top: 1px solid black\"><b>Total</b></td>\n		<td align=\"right\" colspan=\"3\" style=\"border-top: 1px solid black\"><b><tmpl_var total></b></td>\n	</tr>\n\n</table>\n\n<tmpl_var updateForm.button>\n<tmpl_var updateForm.footer>\n\n<tmpl_var checkoutForm.header>\n<tmpl_var checkoutForm.button>\n<tmpl_var checkoutForm.footer> \n\n</tmpl_if>','Commerce/ViewShoppingCart',1,1,'PBtmplVSC0000000000001');
-INSERT INTO template VALUES ('^StyleSheet(^Extras;/slidePanel/slidePanel.css);\r\n^JavaScript(^Extras;/slidePanel/slidePanel.js);\r\n\r\n<script type=\"text/javascript\">\r\n\r\n  var slider = new createSlidePanelBar(\'WebGUIAdminBar\');\r\n  var panel;\r\n\r\n  panel = new createPanel(\'adminconsole\',\'Admin Console\');\r\n<tmpl_loop adminConsole_loop>\r\n <tmpl_if canUse>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var title>\',\"<tmpl_var url>\");\r\n </tmpl_if>\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n  panel = new createPanel(\'clipboard\',\'Clipboard\');\r\n<tmpl_loop clipboard_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n  panel = new createPanel(\'packages\',\'Packages\');\r\n<tmpl_loop package_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n\r\n  panel = new createPanel(\'assets\',\'New Content\');\r\n  <tmpl_loop container_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n panel.addLink(\'^Extras;/spacer.gif\',\'<hr>\',\"\");\n <tmpl_loop contentTypes_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n  slider.draw();\r\n\r\n\r\n</script>\r\n','Macro/AdminBar',1,1,'PBtmpl0000000000000090');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<span class=\"crumbTrail\">\r\n<tmpl_loop page_loop>\r\n<a class=\"crumbTrail\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &gt; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000093');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls><br>\r\n</tmpl_if>\r\n<span class=\"verticalMenu\">\r\n<tmpl_loop page_loop>\r\n<tmpl_var page.indent><a class=\"verticalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if> href=\"<tmpl_var page.url>\">\r\n   <tmpl_if page.isCurrent>\r\n      <span class=\"selectedMenuItem\"><tmpl_var page.menuTitle></span>\r\n   <tmpl_else><tmpl_var page.menuTitle></tmpl_if></a><br>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000048');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<span class=\"horizontalMenu\">\r\n<tmpl_loop page_loop>\r\n<a class=\"horizontalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000108');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<script language=\"JavaScript\" type=\"text/javascript\">\r\nfunction go(formObj){\r\n   if (formObj.chooser.options[formObj.chooser.selectedIndex].value != \"none\") {\r\n	location = formObj.chooser.options[formObj.chooser.selectedIndex].value\r\n   }\r\n}\r\n</script>\r\n<form>\r\n<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<select name=\"chooser\" size=1 onChange=\"go(this.form)\">\r\n<option value=none>Where do you want to go?</option>\r\n<tmpl_loop page_loop>\r\n<option value=\"<tmpl_var page.url>\"><tmpl_loop page.indent_loop>&nbsp;&nbsp;</tmpl_loop>- <tmpl_var page.menuTitle></option>\r\n</tmpl_loop>\r\n</select>\r\n</form>','Navigation',1,1,'PBtmpl0000000000000117');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<tmpl_loop page_loop>\r\n   <tmpl_if page.isCurrent>\r\n      <span class=\"rootTabOn\">\r\n   <tmpl_else>\r\n      <span class=\"rootTabOff\">\r\n   </tmpl_if>\r\n   <a <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if> href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   </span>\r\n</tmpl_loop>','Navigation',1,1,'PBtmpl0000000000000124');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		^StyleSheet(\"<tmpl_var session.config.extrasURL>/Navigation/dtree/dtree.css\");\r\n^JavaScript(\"<tmpl_var session.config.extrasURL>/Navigation/dtree/dtree.js\");\r\n\r\n<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n\r\n<script>\r\n// Path to dtree directory\r\n_dtree_url = \"<tmpl_var session.config.extrasURL>/Navigation/dtree/\";\r\n</script>\r\n\r\n<div class=\"dtree\">\r\n<script type=\"text/javascript\">\r\n<!--\r\n	d = new dTree(\'d\');\r\n	<tmpl_loop page_loop>\r\n	d.add(\r\n		\'<tmpl_var page.assetId>\',\r\n		<tmpl_if __first__>-99<tmpl_else>\'<tmpl_var page.parentId>\'</tmpl_if>,\r\n		\'<tmpl_var page.menuTitle>\',\r\n		\'<tmpl_var page.url>\',\r\n		\'<tmpl_var page.synopsis>\'\r\n		<tmpl_if page.newWindow>,\'_blank\'</tmpl_if>\r\n	);\r\n	</tmpl_loop>\r\n	document.write(d);\r\n//-->\r\n</script>\r\n\r\n</div>','Navigation',1,1,'PBtmpl0000000000000130');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop month_loop>\n	<table border=\"1\" width=\"100%\">\n	<tr><td colspan=7 class=\"tableHeader\"><h2 align=\"center\"><tmpl_var month> <tmpl_var year></h2></td></tr>\n	<tr>\n	<tmpl_if session.user.firstDayOfWeek>\n		<th class=\"tableData\"><tmpl_var monday.label></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label></th>\n		<th class=\"tableData\"><tmpl_var thursday.label></th>\n		<th class=\"tableData\"><tmpl_var friday.label></th>\n		<th class=\"tableData\"><tmpl_var saturday.label></th>\n		<th class=\"tableData\"><tmpl_var sunday.label></th>\n	<tmpl_else>\n		<th class=\"tableData\"><tmpl_var sunday.label></th>\n		<th class=\"tableData\"><tmpl_var monday.label></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label></th>\n		<th class=\"tableData\"><tmpl_var thursday.label></th>\n		<th class=\"tableData\"><tmpl_var friday.label></th>\n		<th class=\"tableData\"><tmpl_var saturday.label></th>\n	</tmpl_if>\n	</tr><tr>\n	<tmpl_loop prepad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n 	<tmpl_loop day_loop>\n		<tmpl_if isStartOfWeek>\n			<tr>\n		</tmpl_if>\n		<td class=\"table<tmpl_if isToday>Header<tmpl_else>Data</tmpl_if>\" width=\"14%\" valign=\"top\" align=\"left\"><p><b><tmpl_var day></b></p>\n		<tmpl_loop event_loop>\n			<tmpl_if name>\n				&middot;<a href=\"<tmpl_var url>\"><tmpl_var name></a><br />\n			</tmpl_if>\n		</tmpl_loop>\n		</td>\n		<tmpl_if isEndOfWeek>\n			</tr>\n		</tmpl_if>\n	</tmpl_loop>\n	<tmpl_loop postpad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n	</tr>\n	</table>\n</tmpl_loop>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','EventsCalendar',1,1,'PBtmpl0000000000000022');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n\r\n<style>\r\n/* CoolMenus 4 - default styles - do not edit */\r\n.cCMAbs{position:absolute; visibility:hidden; left:0; top:0}\r\n/* CoolMenus 4 - default styles - end */\r\n\r\n/*Styles for level 0*/\r\n.cLevel0,.cLevel0over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:12px; font-weight:bold;\r\n\r\n}\r\n.cLevel0{background-color:navy; layer-background-color:navy; color:white;\r\ntext-align: center;\r\n}\r\n.cLevel0over{background-color:navy; layer-background-color:navy; color:white; cursor:pointer; cursor:hand; \r\ntext-align: center; \r\n}\r\n\r\n.cLevel0border{position:absolute; visibility:hidden; background-color:#569635; layer-background-color:#006699; \r\n \r\n}\r\n\r\n\r\n/*Styles for level 1*/\r\n.cLevel1, .cLevel1over{position:absolute; padding:2px; font-family:tahoma, arial,helvetica; font-size:11px; font-weight:bold}\r\n.cLevel1{background-color:Navy; layer-background-color:Navy; color:white;}\r\n.cLevel1over{background-color:#336699; layer-background-color:#336699; color:Yellow; cursor:pointer; cursor:hand; }\r\n.cLevel1border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}\r\n\r\n/*Styles for level 2*/\r\n.cLevel2, .cLevel2over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:10px; font-weight:bold}\r\n.cLevel2{background-color:Navy; layer-background-color:Navy; color:white;}\r\n.cLevel2over{background-color:#0099cc; layer-background-color:#0099cc; color:Yellow; cursor:pointer; cursor:hand; }\r\n.cLevel2border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}\r\n\r\n</style>\r\n\r\n  \r\n\r\n^JavaScript(\"<tmpl_var session.config.extrasURL>/coolmenus/coolmenus4.js\");\r\n<script language=\"JavaScript\">\r\n/*****************************************************************************\r\nCopyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)\r\n\r\nDHTML coolMenus - Get it at coolmenus.dhtmlcentral.com\r\nVersion 4.0_beta\r\nThis script can be used freely as long as all copyright messages are\r\nintact.\r\n\r\nExtra info - Coolmenus reference/help - Extra links to help files **** \r\nCSS help: http://coolmenus.dhtmlcentral.com/projects/coolmenus/reference.asp?m=37\r\nGeneral: http://coolmenus.dhtmlcentral.com/reference.asp?m=35\r\nMenu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47\r\nLevel properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48\r\n\r\nBackground bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49\r\nItem properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50\r\n******************************************************************************/\r\n\r\n/*** \r\nThis is the menu creation code - place it right after you body tag\r\nFeel free to add this to a stand-alone js file and link it to your page.\r\n**/\r\n\r\n//Menu object creation\r\ncoolmenu=new makeCM(\"coolmenu\") //Making the menu object. Argument: menuname\r\n\r\ncoolmenu.frames = 0\r\n\r\n//Menu properties   \r\ncoolmenu.onlineRoot=\"\"\ncoolmenu.pxBetween=2\r\ncoolmenu.fromLeft=200 \r\ncoolmenu.fromTop=100   \r\ncoolmenu.rows=1\r\ncoolmenu.menuPlacement=\"center\"   //The whole menu alignment, left, center, or right\r\n                                                             \r\ncoolmenu.resizeCheck=1 \r\ncoolmenu.wait=1000 \r\ncoolmenu.fillImg=\"cm_fill.gif\"\r\ncoolmenu.zIndex=100\r\n\r\n//Background bar properties\r\ncoolmenu.useBar=0\r\ncoolmenu.barWidth=\"100%\"\r\ncoolmenu.barHeight=\"menu\" \r\ncoolmenu.barClass=\"cBar\"\r\ncoolmenu.barX=0 \r\ncoolmenu.barY=0\r\ncoolmenu.barBorderX=0\r\ncoolmenu.barBorderY=0\r\ncoolmenu.barBorderClass=\"\"\r\n\r\n//Level properties - ALL properties have to be spesified in level 0\r\ncoolmenu.level[0]=new cm_makeLevel() //Add this for each new level\r\ncoolmenu.level[0].width=110\r\ncoolmenu.level[0].height=21 \r\ncoolmenu.level[0].regClass=\"cLevel0\"\r\ncoolmenu.level[0].overClass=\"cLevel0over\"\r\ncoolmenu.level[0].borderX=1\r\ncoolmenu.level[0].borderY=1\r\ncoolmenu.level[0].borderClass=\"cLevel0border\"\r\ncoolmenu.level[0].offsetX=0\r\ncoolmenu.level[0].offsetY=0\r\ncoolmenu.level[0].rows=0\r\ncoolmenu.level[0].arrow=0\r\ncoolmenu.level[0].arrowWidth=0\r\ncoolmenu.level[0].arrowHeight=0\r\ncoolmenu.level[0].align=\"bottom\"\r\n\r\n//EXAMPLE SUB LEVEL[1] PROPERTIES - You have to specify the properties you want different from LEVEL[0] - If you want all items to look the same just remove this\r\ncoolmenu.level[1]=new cm_makeLevel() //Add this for each new level (adding one to the number)\r\ncoolmenu.level[1].width=coolmenu.level[0].width+20\r\ncoolmenu.level[1].height=25\r\ncoolmenu.level[1].regClass=\"cLevel1\"\r\ncoolmenu.level[1].overClass=\"cLevel1over\"\r\ncoolmenu.level[1].borderX=1\r\ncoolmenu.level[1].borderY=1\r\ncoolmenu.level[1].align=\"right\" \r\ncoolmenu.level[1].offsetX=0\r\ncoolmenu.level[1].offsetY=0\r\ncoolmenu.level[1].borderClass=\"cLevel1border\"\r\n\r\n\r\n//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to spesify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this\r\ncoolmenu.level[2]=new cm_makeLevel() //Add this for each new level (adding one to the number)\r\ncoolmenu.level[2].width=coolmenu.level[0].width+20\r\ncoolmenu.level[2].height=25\r\ncoolmenu.level[2].offsetX=0\r\ncoolmenu.level[2].offsetY=0\r\ncoolmenu.level[2].regClass=\"cLevel2\"\r\ncoolmenu.level[2].overClass=\"cLevel2over\"\r\ncoolmenu.level[2].borderClass=\"cLevel2border\"\r\n\r\n//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to spesify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this\r\ncoolmenu.level[3]=new cm_makeLevel() //Add this for each new level (adding one to the number)\r\ncoolmenu.level[3].width=coolmenu.level[0].width+20\r\ncoolmenu.level[3].height=25\r\ncoolmenu.level[3].offsetX=0\r\ncoolmenu.level[3].offsetY=0\r\ncoolmenu.level[3].regClass=\"cLevel2\"\r\ncoolmenu.level[3].overClass=\"cLevel2over\"\r\ncoolmenu.level[3].borderClass=\"cLevel2border\"\r\n\r\n\r\n\r\n<tmpl_loop page_loop>\r\ncoolmenu.makeMenu(\'coolmenu_<tmpl_var page.assetId>\'.replace(/\\-/g,\"a\"),\'coolmenu_<tmpl_var page.parent.assetId>\'.replace(/\\-/g,\"a\"),\"<tmpl_var page.menuTitle>\",\'<tmpl_var page.url>\'<tmpl_if page.newWindow>,\'_blank\'</tmpl_if>);\r\n</tmpl_loop>\r\n\r\n\r\ncoolmenu.construct();\r\n\r\n</script>','Navigation',1,1,'PBtmpl0000000000000134');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\r\n<tmpl_if session.var.adminOn>\r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>	\r\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<table class=\"tableMenu\" width=\"100%\">\r\n  <tbody>\r\n    <tr>\r\n      <td align=\"center\" width=\"15%\">\r\n      <h1><tmpl_var int.search></h1>\r\n      </td>\r\n      <td vAlign=\"top\" align=\"middle\">\r\n      <table>\r\n      <form method=\"post\" action=\"<tmpl_var actionURL>\">\r\n      <tbody>\r\n      <tr>\r\n	<td colspan=\"2\" class=\"tableData\">\r\n	   <input maxLength=\"255\" size=\"30\" value=\'<tmpl_var query>\' name=\"query\">\r\n	</td>\r\n	<td class=\"tableData\"><tmpl_var submit></td>\r\n      </tr>\r\n      <tr>\r\n	<td class=\"tableData\" valign=\"top\">\r\n\r\n	</td>\r\n	<td class=\"tableData\" valign=\"top\">\r\n	   <tmpl_loop contentTypesSimple>\r\n	     <tmpl_unless __FIRST__>\r\n	     	<input type=\"checkbox\" name=\"contentTypes\" value=\"<tmpl_var value>\"\r\n		<tmpl_if type_content>\r\n		   <tmpl_if query>\r\n			<tmpl_if selected>\r\n			   checked=\"1\"\r\n			</tmpl_if>\r\n		   <tmpl_else>\r\n			checked=\"1\"\r\n		   </tmpl_if>\r\n		<tmpl_else>\r\n		   <tmpl_if selected>checked=\"1\"</tmpl_if>\r\n		</tmpl_if>\r\n		><tmpl_var name>\r\n                <br>\r\n	     </tmpl_unless>\r\n	   </tmpl_loop>\r\n	</td>\r\n        <td></td>\r\n      </tbody>\r\n      </form>\r\n      </table>\r\n      </td>      \r\n    </tr>\r\n  </tbody>\r\n</table>\r\n\r\n<p/>\r\n<tmpl_if numberOfResults>\r\n   <p>Results <tmpl_var startNr> - <tmpl_var endNr> of about <tmpl_var numberOfResults> \r\n   containing <b>\"<tmpl_var queryHighlighted>\"</b>. Search took <b><tmpl_var duration></b> seconds.</p>\r\n   <ol style=\"Margin-Top: 0px; Margin-Bottom: 0px;\" start=\"<tmpl_var startNr>\">\r\n   <tmpl_loop resultsLoop>\r\n      <li>\r\n	   <a href=\"<tmpl_var location>\">\r\n	      <tmpl_if header><tmpl_var header><tmpl_else>No Title</tmpl_if></a>\r\n	   <div>\r\n	      <tmpl_if \"body\">\r\n		   <span class=\"preview\"><tmpl_var \"body\"></span><br/>\r\n	      </tmpl_if>\r\n	      <span style=\"color:#666666;\">Location: <tmpl_var crumbTrail></span>\r\n	      <br/>\r\n	      <br/>\r\n	   </div>\r\n      </li>\r\n   </tmpl_loop>\r\n   </ol>\r\n</tmpl_if> \r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','IndexedSearch',1,1,'PBtmpl0000000000000034');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><tmpl_var job.title.label></td>\r\n	<td class=\"forumHead\"><tmpl_var location.label></td>\r\n	<td class=\"forumHead\"><tmpl_var compensation.label></td>\r\n	<td class=\"forumHead\"><tmpl_var date.label></td>\r\n</tr>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var userDefined2></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var userDefined1></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateSubmitted.human></td>\r\n</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000077');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<h1><tmpl_var title></h1>\r\n\r\n\r\n<tmpl_if user.isModerator>\r\n	<div style=\"float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;\">\r\n		<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n	</div>\r\n</tmpl_if>	\r\n\r\n\r\n<tmpl_if content>\r\n	<b>Job Description</b><br />\r\n	<p><tmpl_var content></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined3>\r\n	<b>Job Requirements</b><br />\r\n	<p><tmpl_var userDefined3></p>\r\n</tmpl_if>\r\n\r\n<table>\r\n<tr>\r\n  <td class=\"tableHeader\">Date Posted</td>\r\n  <td class=\"tableData\"><tmpl_var dateSubmitted.human></td>\r\n</tr>\r\n<tr>\r\n  <td  class=\"tableHeader\">Location</td>\r\n  <td class=\"tableData\"><tmpl_var userDefined2></td>\r\n</tr>\r\n<tr>\r\n  <td  class=\"tableHeader\">Compensation</td>\r\n  <td class=\"tableData\"><tmpl_var userDefined1></td>\r\n</tr>\r\n<tr>\r\n  <td  class=\"tableHeader\">Views</td>\r\n  <td class=\"tableData\"><tmpl_var views></td>\r\n</tr>\r\n</table>\r\n\r\n<tmpl_if attachment_loop>\r\n	<br />\r\n		<tmpl_loop attachment_loop>\r\n			<div style=\"float: left; padding: 5px;\">\r\n				<a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a>\r\n			</div>\r\n		</tmpl_loop>\r\n		<div style=\"clear: both;\"></div>\r\n	<br />\r\n</tmpl_if>\r\n\r\n<tmpl_unless isLocked>\r\n	<p>\r\n		<tmpl_if user.canReply>\r\n			<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if user.canEdit>\r\n			<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n			<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_unless>\r\n\r\n\r\n<tmpl_if repliesAllowed>\r\n\r\n	<style>\r\n		.postBorder {\r\n			border: 1px solid #cccccc;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postBorderCurrent {\r\n			border: 3px dotted black;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postSubject {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-weight: bold;\r\n			padding: 3px;\r\n		}\r\n		.postData {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postControls {\r\n			border-top: 1px solid #cccccc;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postMessage {\r\n			padding: 3px;\r\n		}\r\n		.currentThread {\r\n			background-color: #eeeeee;\r\n		}\r\n		.threadHead {\r\n			font-weight: bold;\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.threadData {\r\n			font-size: 11px;\r\n			padding: 3px;\r\n		}\r\n	</style>\r\n\r\n	<div style=\"float: left; width: 70%\">\r\n		<h1><tmpl_var replies.label></h1>\r\n	</div>\r\n	<div style=\"width: 30%; float: left; text-align: right;\">\r\n		<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n		function goLayout(){\r\n			location = document.discussionlayout.layoutSelect.options[document.discussionlayout.layoutSelect.selectedIndex].value\r\n		}\r\n		//-->	\r\n		</script>\r\n		<form name=\"discussionlayout\">\r\n			<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n				<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n				<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n				<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n			</select> \r\n		</form> \r\n	</div>\r\n	<div style=\"clear: both;\"></div>\r\n\r\n	<tmpl_if layout.isThreaded>\r\n	<!-- begin threaded layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<tmpl_if isCurrent>\r\n					<div class=\"postBorder\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%;\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>	\r\n				</tmpl_if>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n		<table style=\"width: 100%\">\r\n			<thead>\r\n				<tr>\r\n					<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n					<td class=\"threadHead\"><tmpl_var user.label></td>\r\n					<td class=\"threadHead\"><tmpl_var date.label></td>\r\n				</tr>\r\n			</thead>\r\n			<tbody>\r\n				<tmpl_loop post_loop>\r\n					<tmpl_unless isThreadRoot>\r\n						<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n							<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n							<td class=\"threadData\"><tmpl_var username></td>\r\n							<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n						</tr>\r\n					</tmpl_unless>\r\n				</tmpl_loop>\r\n			</tbody>\r\n		</table>	\r\n	<!-- end threaded layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isFlat>\r\n	<!-- begin flat layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n					<a name=\"<tmpl_var assetId>\"></a>\r\n					<div class=\"postSubject\">\r\n						<tmpl_var title>\r\n					</div>\r\n					<div class=\"postData\">\r\n						<div style=\"float: left; width: 50%\">\r\n							<b><tmpl_var user.label>:</b> \r\n								<tmpl_if user.isVisitor>\r\n									<tmpl_var username>\r\n								<tmpl_else>\r\n									<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n								</tmpl_if>\r\n								<br />\r\n							<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n						</div>	\r\n						<div>\r\n							<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n							<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n								<tmpl_unless hasRated>\r\n									 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n								</tmpl_unless>\r\n								<br />\r\n							<tmpl_if user.isModerator>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n							<tmpl_else>	\r\n								<tmpl_if user.isPoster>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n								</tmpl_if>	\r\n							</tmpl_if>	\r\n						</div>	\r\n					</div>\r\n					<div class=\"postMessage\">\r\n						<tmpl_var content>\r\n						<tmpl_loop attachment_loop>\r\n							<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n						</tmpl_loop>\r\n						<div style=\"clear: both;\"></div>\r\n					</div>\r\n					<tmpl_unless isLocked>\r\n						<div class=\"postControls\">\r\n							<tmpl_if user.canReply>\r\n								<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n							</tmpl_if>\r\n							<tmpl_if user.canEdit>\r\n								<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n								<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n							</tmpl_if>\r\n						</div>\r\n					</tmpl_unless>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end flat layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isNested>\r\n	<!-- begin nested layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n					<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end nested layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if pagination.pageCount.isMultiple>\r\n		<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n			[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n		</div>\r\n	</tmpl_if>\r\n	\r\n	\r\n</tmpl_if>	\r\n\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n	<a href=\"<tmpl_var collaboration.url>\">[<tmpl_var back.label>]</a>\r\n	<tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000098');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n<tmpl_if preview.userDefined3><p><tmpl_var preview.userDefined3></p></tmpl_if>\r\n<tmpl_if preview.userDefined1><p><tmpl_var preview.userDefined1></p></tmpl_if>\r\n<tmpl_if preview.userDefined2><p><tmpl_var preview.userDefined2></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var job.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isReply>\r\n		<tr>\r\n			<td><tmpl_var subject.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var message.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n	<tmpl_else>\r\n		<tr>\r\n			<td><tmpl_var job.title.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var synopsis.label></td>\r\n			<td><tmpl_var synopsis.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var job.description.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var job.requirements.label></td>\r\n			<td><tmpl_var userDefined3.form.htmlarea></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var compensation.label></td>\r\n			<td><tmpl_var userDefined1.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var location.label></td>\r\n			<td><tmpl_var userDefined2.form></td>\r\n		</tr>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n		<tr>\r\n			<td><tmpl_var startDate.label></td>\r\n			<td><tmpl_var startDate.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var endDate.label></td>\r\n			<td><tmpl_var endDate.form></td>\r\n		</tr>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n	<tmpl_if reply.userDefined3><p><tmpl_var reply.userDefined3></p></tmpl_if>\r\n	<tmpl_if reply.userDefined1><p><tmpl_var reply.userDefined1></p></tmpl_if>\r\n	<tmpl_if reply.userDefined2><p><tmpl_var reply.userDefined2></p></tmpl_if>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000122');
-INSERT INTO template VALUES ('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\n<tmpl_var controls>\n</tmpl_if>\n<div class=\"synopsis\">\r\n<tmpl_loop page_loop>\r\n   <div class=\"synopsis_title\">\r\n      <a href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   </div>\r\n   <tmpl_if page.indent>\r\n      <div class=\"synopsis_sub\">\r\n         <tmpl_var page.synopsis>\r\n      </div>\r\n   <tmpl_else>\r\n      <div class=\"synopsis_summary\">\r\n         <tmpl_var page.synopsis>\r\n      </div>\r\n   </tmpl_if>\r\n</tmpl_loop>\r\n</div>','Navigation',1,1,'PBtmpl0000000000000136');
-INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\n<tmpl_if login.message>\r\n   <tmpl_var login.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var login.form.header>\r\n<table >\r\n<tmpl_var login.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var login.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\n     <tmpl_if recoverPassword.isAllowed>\n	     <li><a href=\"<tmpl_var recoverPassword.url>\"><tmpl_var recoverPassword.label></a></li>\n	  </tmpl_if>\n           <tmpl_if anonymousRegistration.isAllowed>\n	     <li><a href=\"<tmpl_var createAccount.url>\"><tmpl_var createAccount.label></a></li>\n	  </tmpl_if>\r\n   </ul>\r\n</div>','Auth/WebGUI/Login',1,1,'PBtmpl0000000000000013');
-INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\n\n<tmpl_if account.message>\r\n   <tmpl_var account.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var account.form.header>\r\n<table >\r\n\n<tmpl_if account.form.karma>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.karma.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.karma></td>\r\n</tr>\r\n</tmpl_if>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.passwordConfirm.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.passwordConfirm></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var account.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop account.options>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Auth/WebGUI/Account',1,1,'PBtmpl0000000000000010');
-INSERT INTO template VALUES ('   <h1><tmpl_var title></h1>\r\n\r\n<tmpl_if create.message>\r\n   <tmpl_var create.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var create.form.header>\r\n<table >\r\n<tmpl_if useCaptcha>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.captcha.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.captcha></td>\r\n</tr>\r\n</tmpl_if>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.passwordConfirm.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.passwordConfirm></td>\r\n</tr>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\r\n      <tmpl_if recoverPassword.isAllowed>\r\n	     <li><a href=\"<tmpl_var recoverPassword.url>\"><tmpl_var recoverPassword.label></a></li>\r\n	  </tmpl_if>\r\n   </ul>\r\n</div>','Auth/WebGUI/Create',1,1,'PBtmpl0000000000000011');
-INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\r\n\r\n<tmpl_if recover.message>\r\n   <tmpl_var recover.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var recover.form.header>\r\n<table >\r\n<tmpl_var recover.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var recover.form.email.label></td>\r\n   <td class=\"tableData\"><tmpl_var recover.form.email></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var recover.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var recover.form.footer>\r\n\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\n       <tmpl_if anonymousRegistration.isAllowed>\n	     <li><a href=\"<tmpl_var createAccount.url>\"><tmpl_var createAccount.label></a></li>\n	  </tmpl_if>\n         <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\n      \r\n   </ul>\r\n</div>','Auth/WebGUI/Recovery',1,1,'PBtmpl0000000000000014');
-INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\r\n<tmpl_if expired.message>\r\n   <tmpl_var expired.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var expired.form.header>\r\n<table >\r\n<tmpl_var expired.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var expired.form.oldPassword.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n      <tmpl_var expired.form.oldPassword>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var expired.form.password.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n      <tmpl_var expired.form.password>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n  <tmpl_var expired.form.passwordConfirm.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n   <tmpl_var expired.form.passwordConfirm>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\">\r\n   <tmpl_var expired.form.submit>\r\n   </td>\r\n</tr>\r\n</table>\r\n<tmpl_var expired.form.footer>','Auth/WebGUI/Expired',1,1,'PBtmpl0000000000000012');
-INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\r\n<tmpl_if login.message>\r\n   <tmpl_var login.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var login.form.header>\r\n<table >\r\n<tmpl_var login.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var login.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n             <tmpl_if anonymousRegistration.isAllowed>\n	     <li><a href=\"<tmpl_var createAccount.url>\"><tmpl_var createAccount.label></a></li>\n	  </tmpl_if>\n\n   </ul>\r\n</div>','Auth/LDAP/Login',1,1,'PBtmpl0000000000000006');
-INSERT INTO template VALUES ('<h1>\n   <tmpl_var title>\n</h1>\n\n\r\n<tmpl_var account.message>\r\n<tmpl_if account.form.karma>\r\n<br><br>\r\n<table>\r\n<tr>\r\n  <td class=\"formDescription\">\r\n      <tmpl_var account.form.karma.label>\r\n  </td>\r\n  <td class=\"tableData\">\r\n       <tmpl_var account.form.karma>\r\n  </td>\r\n</tr>\r\n</table>\r\n</tmpl_if>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop account.options>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Auth/LDAP/Account',1,1,'PBtmpl0000000000000004');
-INSERT INTO template VALUES ('<h1>\r\n   <tmpl_var title>\r\n</h1>\r\n<tmpl_if create.message>\r\n   <tmpl_var create.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var create.form.header>\r\n<table >\r\n<tmpl_var create.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.ldapConnection.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.ldapConnection></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.ldapId.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.ldapId></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.password></td>\r\n</tr>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n     <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\r\n \r\n  </ul>\r\n</div>','Auth/LDAP/Create',1,1,'PBtmpl0000000000000005');
-INSERT INTO template VALUES ('<h1><tmpl_var title></h1>\n\n<p>\n<tmpl_var question>\n</p>\n\n<div align=\"center\">\n\n<a href=\"<tmpl_var yes.url>\"><tmpl_var yes.label></a>\n\n&nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; \n\n<a href=\"<tmpl_var no.url>\"><tmpl_var no.label></a>\n\n</div>\n','prompt',1,1,'PBtmpl0000000000000057');
-INSERT INTO template VALUES ('<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\r\n        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n        <head>\r\n                <title>^Page(\"title\"); - WebGUI</title>\r\n				<tmpl_var head.tags>\r\n                <style type=\"text/css\">\r\n	.menu {\r\n		position: absolute;\r\n		top: 25px;\r\n		left: 10px;\r\n		width: 180px;\r\n		font-family: helvetica, arial;\r\n		font-size: 12px;\r\n	}\r\n.contentArea {\r\n	border: 1px solid #cccccc;\r\n	margin: 25px 10px 10px 190px;\r\n	padding: 5px;\r\n		font-family: helvetica, arial;\r\n	min-height: 400px;\r\n}\r\n/* Hides from non-ie: the holly hack \\*/\r\n* html .adminConsoleWorkArea {\r\n	zoom: 1.00;\r\n	display: inline;\r\n	}\r\n/* End hide from non-ie */\r\n\r\n\r\n                 </style>\r\n        </head>\r\n        <body>	\r\n			^AdminBar;\r\n	<div class=\"menu\">\r\n		^AssetProxy(flexmenu);\r\n	</div>\r\n	<div class=\"contentArea\">\r\n		<tmpl_var body.content>\r\n		<br /><br /><hr />\r\n		^LoginToggle; \r\n		&nbsp; ^a(^@;); \r\n		&nbsp; ^H;\r\n		&nbsp; ^AdminToggle;\r\n	</div>\r\n</body>\r\n</html>\r\n','style',0,0,'PBtmpl0000000000000060');
-INSERT INTO template VALUES ('<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n		<html>\n		<head>\n			<title>^Page(title); - <tmpl_var session.setting.companyName></title>\n				\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	\n		<style>\r\n\r\ninput:focus, textarea:focus {\r\n background-color: #D5E0E1;\r\n}\r\n\r\ninput, textarea, select {\r\n -moz-border-radius: 6px;\r\n background-color: #B9CDCF;\r\n border: ridge;\r\n}\r\n\r\n\r\n.content{\r\n	color: #000000;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 5px;\r\n}\r\n\r\nbody{\r\n	color: Black;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 0px;\r\n	background-position: top;\r\n	background-repeat: repeat-x;\r\n}\r\n\r\na {\r\n	color:#EC4300;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: underline;\r\n}\r\n\r\na:hover{\r\n	color:#EC4300; \r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: none;\r\n}\r\n\r\n.adminBar {\r\n  background-color: #CCCCCC;\r\n  font-family: helvetica, arial;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #CCCCCC;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  font-size: 10pt;\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #CECECE;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n\r\nh1 {\r\n	font-size: 14pt;\r\n	font-family: helvetica, arial;\r\n	color: #EC4300;\r\n}\r\n\r\n.tab {\r\n  -moz-border-radius: 6px 6px 0px 0px;\r\n border: 1px solid black;\r\n   background-color: #eeeeee;\r\n}\r\n.tabBody {\r\n   border: 1px solid black;\r\n   border-top: 1px solid black;\r\n   border-left: 1px solid black;\r\n   background-color: #dddddd; \r\n}\r\ndiv.tabs {\r\n    line-height: 15px;\r\n    font-size: 14px;\r\n}\r\n.tabHover {\r\n   background-color: #cccccc;\r\n}\r\n.tabActive { \r\n   background-color: #dddddd; \r\n}\r\n\r\n</style>\r\n		\r\n\r\n\r\n\n		</head>\n				<body bgcolor=\"#D5E0E1\" leftmargin=\"0\" topmargin=\"0\" rightmargin=\"0\" bottommargin=\"0\" marginwidth=\"0\" marginheight=\"0\">\r\n\r\n^AdminBar(\"PBtmpl0000000000000090\");<br /> <br />\r\n\r\n<div class=\"content\" style=\"padding: 10px;\">\r\n  \n			<tmpl_var body.content>\n		\r\n</div>\r\n\r\n\r\n<div width=\"100%\" style=\"color: white; padding: 3px; background-color: black; text-align: center;\">^H; / ^PageTitle; / ^AdminToggle; / ^LoginToggle; / ^a;</div>\r\n</body>\r\n\r\n\r\n\r\n\r\n\r\n\n		</html>\n		','style',1,1,'9tBSOV44a9JPS8CcerOvYw');
-INSERT INTO template VALUES ('<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n		<html>\n		<head>\n			<title>^Page(title); - <tmpl_var session.setting.companyName></title>\n				\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	\n		<style>\r\n\r\n.nav,  A.nav:hover, .verticalMenu {\r\n font-size: 10px;\r\n text-decoration: none;\r\n}\r\n\r\n.pageTitle, .pageTitle A {\r\n  font-size: 30px;\r\n}\r\n\r\ninput:focus, textarea:focus {\r\n background-color: #D5E0E1;\r\n}\r\n\r\ninput, textarea, select {\r\n -moz-border-radius: 6px;\r\n background-color: #B9CDCF;\r\n border: ridge;\r\n}\r\n\r\n.wgBoxTop{\r\n	background-image: url(\"^Extras;/styles/webgui6/hdr_bg_corner_right.jpg\");\r\n        width: 195px;\r\n        height: 93px;\r\n}\r\n.wgBoxBottom{\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_clouds.jpg\");\r\n	padding-bottom: 21px;\r\n        width: 529px;\r\n        height: 88px;\r\n}\r\n.logo {\r\n	background-image: url(\"^Extras;/styles/webgui6/hdr_bg_corner_left.jpg\");\r\n	background-color: #F4F4F4;\r\n	width: 195px;\r\n        height: 93px;\r\n        padding-bottom: 25px;\r\n}\r\n.login {\r\n        width: 334px;\r\n        height: 93px;\r\n	background-image: url(\"^Extras;/styles/webgui6/hdr_bg_center.jpg\");\r\n	background-color: #C1D6D8;\r\n        padding-top: 5px;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10px;\r\n	font-weight: bold;\r\n	color: #EC4300;\r\n}\n  input.loginBoxField { \n font-size: 10px;\n background-color: white;\n }\n .loginBox {\n font-size: 10px;\n }\n input.loginBoxButton {\n font-size: 10px;\n }  \r\n.iconBox{\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_corner_left_top.jpg\");\r\n        width: 195px;\r\n        height: 88px;\r\n        vertical-align: bottom;\r\n        text-align: center;\r\n}\r\n.dateLeft {\r\n	background-image: url(\"^Extras;/styles/webgui6/date_bg_left.jpg\");	\r\n     width: 53px;\r\n     height: 59px;\r\n}\r\n\r\n.dateRight {\r\n     width: 53px;\r\n     height: 59px;\r\n	background-image: url(\"^Extras;/styles/webgui6/date_right_bg.jpg\");	\r\n}\r\n\r\n.date {\r\n	color: #393C3C;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 11px;\r\n	font-weight: bold;\r\n}\r\n\r\n.contentbgLeft {\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_left.jpg\");	\r\n    width: 53px;\r\n	\r\n}\r\n.contentbgRight {\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_right.jpg\");	\r\n	\r\n}\r\n\r\n\r\n.content{\r\n	color: #000000;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 5px;\r\n}\r\n\r\nbody{\r\n	color: Black;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 0px;\r\n        background-image: url(\"^Extras;/styles/webgui6/bg.gif\");\r\n	background-position: top;\r\n	background-repeat: repeat-x;\r\n}\r\n\r\na {\r\n	color:#EC4300;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: underline;\r\n}\r\n\r\na:hover{\r\n	color:#EC4300; \r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: none;\r\n}\r\n\r\n.adminBar {\r\n  background-color: #CCCCCC;\r\n  font-family: helvetica, arial;\r\n}\r\n.tableMenu {\r\n  background-color: #CCCCCC;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n.tableMenu a {\r\n  font-size: 10pt;\r\n  text-decoration: none;\r\n}\r\n.tableHeader {\r\n  background-color: #CECECE;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n.pollColor {\r\n  background-color: #CCCCCC;\r\n  border: thin solid #393C3C;\r\n}\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\nh1, h2, h3, h4, h5, h6 {\r\n   font-family: helvetica, arial;\r\n	color: #EC4300;\r\n}\r\n\r\nh1 {\r\n	font-size: 14pt;\r\n	font-family: helvetica, arial;\r\n	color: #EC4300;\r\n}\r\n\r\n.tab {\r\n  border: 1px solid black;\r\n   background-color: #eeeeee;\r\n}\r\n.tabBody {\r\n   border: 1px solid black;\r\n   border-top: 1px solid black;\r\n   border-left: 1px solid black;\r\n   background-color: #dddddd; \r\n}\r\ndiv.tabs {\r\n    line-height: 15px;\r\n    font-size: 14px;\r\n}\r\n.tabHover {\r\n   background-color: #cccccc;\r\n}\r\n.tabActive { \r\n   background-color: #dddddd; \r\n}\r\n\r\n</style>\r\n		\n		</head>\n		<body bgcolor=\"#D5E0E1\" leftmargin=\"0\" topmargin=\"0\" rightmargin=\"0\" bottommargin=\"0\" marginwidth=\"0\" marginheight=\"0\">\r\n^AdminBar(\"PBtmpl0000000000000090\");\r\n\r\n<!-- logo / login table starts here -->\r\n<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>	\r\n		<td width=\"195\" align=\"center\" class=\"logo\"><a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/wg_logo.gif\"></a></td>\r\n		<td width=\"334\" align=\"center\" valign=\"top\" class=\"login\">^L(\"17\",\"\",\"PBtmpl0000000000000092\"); ^AdminToggle;</td>\r\n		<td width=\"195\" align=\"center\" class=\"wgBoxTop\" valign=\"bottom\"><a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/wg_box_top.gif\"></a></td>\r\n	</tr>\r\n</table>\r\n<!-- logo / login table ends here -->\r\n<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n	<!-- print, email icons here -->\r\n		<td class=\"iconBox\">\n &nbsp; &nbsp; &nbsp; &nbsp; \r\n<a href=\"^H(linkonly);\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_home.gif\" title=\"Go Home\" alt=\"home\" /></a> \n <a href=\"^/;tell_a_friend\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_email.gif\" alt=\"Email\" title=\"Email a friend about this site.\" /></a>\r\n<a href=\"^r(linkonly);\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_print.gif\" alt=\"Print\" title=\"Make page printable.\" /></a> \n <a href=\"site_map\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_site_map.gif\" title=\"View the site map.\" ALT=\"Site Map\" /></a> <a href=\"http://www.plainblack.com\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_pb.gif\" ALT=\"Plain Black Icon\" title=\"Visit plainblack.com.\" /></a>\r\n</td>\r\n	<!-- box clouds here -->\r\n		<td class=\"wgBoxBottom\">^Spacer(56,1);<a href=\"http://www.plainblack.com/what_is_webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/txt_the_last.gif\"></a>^Spacer(26,1);<a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/wg_box_bottom.gif\"></a></td>\r\n	</tr>\r\n</table>\r\n<!-- date & page title table start here -->\r\n<table width=\"724\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n		<td class=\"dateLeft\">^Spacer(53,59);</td>\r\n		<td width=\"141\" bgcolor=\"#BDC6C7\" class=\"date\">^D(\"%c %D, %y\");</td>\r\n		<td><img border=\"0\" src=\"^Extras;/styles/webgui6/date_right_shadow.gif\"></td>\r\n		<td width=\"467\" bgcolor=\"#B9CDCF\"><div class=\"pageTitle\">^PageTitle;</div></td>\r\n		<td class=\"dateRight\">^Spacer(53,59);</td>\r\n	</tr>\r\n</table>\r\n<!-- date and page title table end here -->\r\n<!-- left nav & content table start here -->\r\n<table width=\"724\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n		<td class=\"contentbgLeft\">^Spacer(53,1);</td>\r\n		<!-- nav column -->\r\n		<td width=\"142\" valign=\"top\" bgcolor=\"#E2E1E1\" style=\"width: 142px;\">\r\n<br /> <div class=\"nav\">\r\n^AssetProxy(\"flexmenu_1002\");\r\n</div> <br /> <br />\r\n<a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/powered_by_aqua_blue.gif\"></a>\r\n</td>\r\n\r\n		<td valign=\"top\" bgcolor=\"#F4F4F4\"><img border=\"0\" src=\"^Extras;/styles/webgui6/lnav_shadow.jpg\"></td>\r\n		<!-- content column -->\r\n		<td width=\"466\" valign=\"top\" bgcolor=\"#F4F4F4\" class=\"content\">\n			<tmpl_var body.content>\n		</td>\r\n		<td class=\"contentbgRight\">^Spacer(53,1);</td>\r\n	</tr>\r\n</table>\r\n<!-- left nav & content table end here -->\r\n<!-- footer -->\r\n<table width=\"724\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n		<td><img border=\"0\" src=\"^Extras;/styles/webgui6/footer.jpg\"></td>\r\n	</tr>\r\n        <tr>\r\n                <td align=\"center\"><a href=\"http://www.plainblack.com\"><img border=\"0\" src=\"^Extras;/styles/webgui6/logo_pb.gif\"></a><br /><span style=\"font-size: 11px;\"><a href=\"http://www.plainblack.com/design\">Design by Plain Black</a></span></td>\r\n        </tr>\r\n</table>\r\n</body>\n		</html>\n		','style',1,1,'B1bNjWVtzSjsvGZh9lPz_A');
-INSERT INTO template VALUES ('<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n		<html>\n		<head>\n			<title>^Page(title); - <tmpl_var session.setting.companyName></title>\n				\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	\n		<style>\r\n\r\n.content{\r\n  background-color: #ffffff;\r\n  color: #000000;\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  padding: 10pt;\r\n}\r\n\r\nH1 {\r\n  font-family: helvetica, arial;\r\n  font-size: 16pt;\r\n}\r\n\r\nA {\r\n  color: #EF4200;\r\n}\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n.formDescription {\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n}\r\n\r\n.formSubtext {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.highlight {\r\n  background-color: #dddddd;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #cccccc;\r\n  font-size: 8pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #cccccc;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.pollAnswer {\r\n  font-family: Helvetica, Arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.pollColor {\r\n  background-color: #444444;\r\n}\r\n\r\n.pollQuestion {\r\n  font-face: Helvetica, Arial;\r\n  font-weight: bold;\r\n}\r\n\r\n.faqQuestion {\r\n  font-size: 12pt;\r\n  font-weight: bold;\r\n  color: #000000;\r\n}\r\n\r\n</style>\n		</head>\n		^AdminBar(\"\");\n\n<body onLoad=\"window.print()\">\r\n<div align=\"center\"><a href=\"^PageUrl;\"><img src=\"^Extras;plainblack.gif\" border=\"0\"></a></div>\n\n\n			<tmpl_var body.content>\n		\n\n<div align=\"center\">© 2001-2004 Plain Black LLC</div>\r\n</body>\n		</html>\n		','style',1,1,'PBtmpl0000000000000111');
-INSERT INTO template VALUES ('<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\r\n        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n<head>\r\n        <title>WebGUI <tmpl_var session.webgui.version>-<tmpl_var session.webgui.status> Admin Console</title>\r\n        	\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	 \r\n</head>\r\n<body>\r\n<tmpl_var body.content>\r\n</body>\r\n</html>\r\n','style',1,0,'PBtmpl0000000000000137');
-INSERT INTO template VALUES ('<tmpl_var body.content>','style',0,0,'PBtmpl0000000000000132');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displaytitle>\r\n   <tmpl_if linkurl>\r\n       <a href=\"<tmpl_var linkurl>\">\r\n    </tmpl_if>\r\n     <span class=\"itemTitle\"><tmpl_var title></span>\r\n   <tmpl_if linkurl>\r\n      </a>\r\n    </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if attachment.name>\r\n   <tmpl_if displaytitle> - </tmpl_if>\r\n   <a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var attachment.Icon>\" border=\"0\" alt=\"<tmpl_var attachment.name>\" width=\"16\" height=\"16\" border=\"0\" align=\"middle\" /></a>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  - <tmpl_var description>\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000123');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displaytitle>\r\n   <tmpl_if linkurl>\r\n       <a href=\"<tmpl_var linkurl>\" target=\"_blank\">\r\n    </tmpl_if>\r\n     <span class=\"itemTitle\"><tmpl_var title></span>\r\n   <tmpl_if linkurl>\r\n      </a>\r\n    </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if attachment.name>\r\n   <tmpl_if displaytitle> - </tmpl_if>\r\n   <a href=\"<tmpl_var attachment.url>\" target=\"_blank\"><img src=\"<tmpl_var attachment.Icon>\" border=\"0\" alt=\"<tmpl_var attachment.name>\" width=\"16\" height=\"16\" border=\"0\" align=\"middle\" /></a>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  - <tmpl_var description>\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000129');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<b>Q: <tmpl_var title></span></b><br />\r\n	A: <tmpl_var content>\r\n	<p />\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000081');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n<ol>\r\n	<tmpl_loop post_loop>\r\n		<li>\r\n			<tmpl_if user.isPoster>\r\n				<tmpl_unless session.var.adminOn>\r\n					[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			<tmpl_if user.isModerator>\r\n				<tmpl_if session.var.adminOn>\r\n					<tmpl_var controls>\r\n				<tmpl_else>\r\n					<tmpl_unless user.isPoster>\r\n						<tmpl_unless session.var.adminOn>\r\n							[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n						</tmpl_unless>\r\n					</tmpl_unless>\r\n				</tmpl_if>\r\n				(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n			</tmpl_if>\r\n			<tmpl_if userDefined1><a href=\"<tmpl_var userDefined1>\"	<tmpl_if userDefined2>target=\"_blank\"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>\r\n			<tmpl_if content>\r\n					  - <tmpl_var content>\r\n			</tmpl_if>\r\n		</li>\r\n	</tmpl_loop>\r\n</ol>\r\n\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000101');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n <tmpl_if user.canPost>\n			<a href=\"<tmpl_var add.url>\"> <tmpl_var addlink.label></a><p />\n</tmpl_if>\n\n<tmpl_loop post_loop>\n   \n		<tmpl_if user.isPoster>\n			<tmpl_unless session.var.adminOn>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</tmpl_unless>\n		</tmpl_if>\n		<tmpl_if user.isModerator>\n			<tmpl_if session.var.adminOn><tmpl_var controls><tmpl_else><tmpl_unless user.isPoster><tmpl_unless session.var.adminOn>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</tmpl_unless></tmpl_unless></tmpl_if>\n		<br />\n   </tmpl_if>\n\n  <a href=\"<tmpl_var userDefined1>\"\n   <tmpl_if userDefined2>\n          target=\"_blank\"\n    </tmpl_if>\n    ><span class=\"linkTitle\"><tmpl_var title></span></a>\n\n    <tmpl_if content>\n              <br /> <tmpl_var content>\n   </tmpl_if>\n   <p />\n</tmpl_loop>\n','Collaboration',1,1,'wCIc38CvNHUK7aY92Ww4SQ');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n\r\n<h1><tmpl_var title></h1>\r\n\r\n<tmpl_if user.isModerator>\r\n	<div style=\"float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;\">\r\n		<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n	</div>\r\n</tmpl_if>	\r\n\r\n\r\n<tmpl_if content>\r\n	<b>Link Description</b><br />\r\n	<p><tmpl_var content></p>\r\n</tmpl_if>\r\n\r\n<b>Link URL</b><br />\r\n<a href=\"<tmpl_var userDefined1>\"><tmpl_var userDefined1></a>\r\n\r\n<tmpl_if attachment_loop>\r\n	<br />\r\n		<tmpl_loop attachment_loop>\r\n			<div style=\"float: left; padding: 5px;\">\r\n				<a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a>\r\n			</div>\r\n		</tmpl_loop>\r\n		<div style=\"clear: both;\"></div>\r\n	<br />\r\n</tmpl_if>\r\n\r\n<tmpl_unless isLocked>\r\n	<p>\r\n		<tmpl_if user.canReply>\r\n			<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if user.canEdit>\r\n			<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n			<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_unless>\r\n\r\n\r\n<tmpl_if repliesAllowed>\r\n\r\n	<style>\r\n		.postBorder {\r\n			border: 1px solid #cccccc;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postBorderCurrent {\r\n			border: 3px dotted black;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postSubject {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-weight: bold;\r\n			padding: 3px;\r\n		}\r\n		.postData {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postControls {\r\n			border-top: 1px solid #cccccc;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postMessage {\r\n			padding: 3px;\r\n		}\r\n		.currentThread {\r\n			background-color: #eeeeee;\r\n		}\r\n		.threadHead {\r\n			font-weight: bold;\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.threadData {\r\n			font-size: 11px;\r\n			padding: 3px;\r\n		}\r\n	</style>\r\n\r\n	<div style=\"float: left; width: 70%\">\r\n		<h1><tmpl_var replies.label></h1>\r\n	</div>\r\n	<div style=\"width: 30%; float: left; text-align: right;\">\r\n		<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n		function goLayout(){\r\n			location = document.discussionlayout.layoutSelect.options[document.discussionlayout.layoutSelect.selectedIndex].value\r\n		}\r\n		//-->	\r\n		</script>\r\n		<form name=\"discussionlayout\">\r\n			<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n				<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n				<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n				<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n			</select> \r\n		</form> \r\n	</div>\r\n	<div style=\"clear: both;\"></div>\r\n\r\n	<tmpl_if layout.isThreaded>\r\n	<!-- begin threaded layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<tmpl_if isCurrent>\r\n					<div class=\"postBorder\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%;\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>	\r\n				</tmpl_if>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n		<table style=\"width: 100%\">\r\n			<thead>\r\n				<tr>\r\n					<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n					<td class=\"threadHead\"><tmpl_var user.label></td>\r\n					<td class=\"threadHead\"><tmpl_var date.label></td>\r\n				</tr>\r\n			</thead>\r\n			<tbody>\r\n				<tmpl_loop post_loop>\r\n					<tmpl_unless isThreadRoot>\r\n						<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n							<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n							<td class=\"threadData\"><tmpl_var username></td>\r\n							<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n						</tr>\r\n					</tmpl_unless>\r\n				</tmpl_loop>\r\n			</tbody>\r\n		</table>	\r\n	<!-- end threaded layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isFlat>\r\n	<!-- begin flat layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n					<a name=\"<tmpl_var assetId>\"></a>\r\n					<div class=\"postSubject\">\r\n						<tmpl_var title>\r\n					</div>\r\n					<div class=\"postData\">\r\n						<div style=\"float: left; width: 50%\">\r\n							<b><tmpl_var user.label>:</b> \r\n								<tmpl_if user.isVisitor>\r\n									<tmpl_var username>\r\n								<tmpl_else>\r\n									<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n								</tmpl_if>\r\n								<br />\r\n							<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n						</div>	\r\n						<div>\r\n							<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n							<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n								<tmpl_unless hasRated>\r\n									 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n								</tmpl_unless>\r\n								<br />\r\n							<tmpl_if user.isModerator>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n							<tmpl_else>	\r\n								<tmpl_if user.isPoster>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n								</tmpl_if>	\r\n							</tmpl_if>	\r\n						</div>	\r\n					</div>\r\n					<div class=\"postMessage\">\r\n						<tmpl_var content>\r\n						<tmpl_loop attachment_loop>\r\n							<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n						</tmpl_loop>\r\n						<div style=\"clear: both;\"></div>\r\n					</div>\r\n					<tmpl_unless isLocked>\r\n						<div class=\"postControls\">\r\n							<tmpl_if user.canReply>\r\n								<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n							</tmpl_if>\r\n							<tmpl_if user.canEdit>\r\n								<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n								<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n							</tmpl_if>\r\n						</div>\r\n					</tmpl_unless>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end flat layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isNested>\r\n	<!-- begin nested layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n					<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end nested layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if pagination.pageCount.isMultiple>\r\n		<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n			[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n		</div>\r\n	</tmpl_if>\r\n	\r\n	\r\n</tmpl_if>	\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n	<a href=\"<tmpl_var collaboration.url>\">[List All Links]</a>\r\n	<tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000113');
-INSERT INTO template VALUES ('<a class=\"myAccountLink\" href=\"<tmpl_var account.url>\"><tmpl_var account.text></a>','Macro/a_account',1,1,'PBtmpl0000000000000037');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/EditableToggle',1,1,'PBtmpl0000000000000038');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/AdminToggle',1,1,'PBtmpl0000000000000036');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var file.url>\"><img src=\"<tmpl_var file.icon>\" align=\"middle\" border=\"0\" /><tmpl_var file.name></a>','Macro/File',1,1,'PBtmpl0000000000000039');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var file.url>\"><tmpl_var file.name></a>','Macro/File',1,1,'PBtmpl0000000000000091');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var file.url>\"><img src=\"<tmpl_var file.icon>\" align=\"middle\" border=\"0\" /><tmpl_var file.name></a>(<tmpl_var file.size>)','Macro/File',1,1,'PBtmpl0000000000000107');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var group.url>\"><tmpl_var group.text></a>','Macro/GroupAdd',1,1,'PBtmpl0000000000000040');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var group.url>\"><tmpl_var group.text></a>','Macro/GroupDelete',1,1,'PBtmpl0000000000000041');
-INSERT INTO template VALUES ('<a class=\"homeLink\" href=\"<tmpl_var homeLink.url>\"><tmpl_var homeLink.text></a>','Macro/H_homeLink',1,1,'PBtmpl0000000000000042');
-INSERT INTO template VALUES ('<a class=\"makePrintableLink\" href=\"<tmpl_var printable.url>\"><tmpl_var printable.text></a>','Macro/r_printable',1,1,'PBtmpl0000000000000045');
-INSERT INTO template VALUES ('<a class=\"loginToggleLink\" href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/LoginToggle',1,1,'PBtmpl0000000000000043');
-INSERT INTO template VALUES ('<p>\r\n  <table cellpadding=3 cellspacing=0 border=1>\r\n  <tr>   \r\n    <td class=\"tableHeader\">\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var session.config.extrasURL>/attachment.gif\" border=\"0\" alt=\"<tmpl_var attachment.name>\"></a></td><td>\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var attachment.icon>\" align=\"middle\" width=\"16\" height=\"16\" border=\"0\" alt=\"<tmpl_var attachment.name>\"><tmpl_var attachment.name></a>\r\n    </td>\r\n  </tr>\r\n  </table>\r\n</p>\r\n','AttachmentBox',1,1,'PBtmpl0000000000000003');
-INSERT INTO template VALUES ('<tmpl_if batchDescription>\r\nBatch: <tmpl_var batchDescription>\r\n</tmpl_if>\r\n\r\n<tmpl_var message><br>\r\n<tmpl_var codeForm>','Operation/RedeemSubscription',1,1,'PBtmpl0000000000000053');
-INSERT INTO template VALUES ('<h2><tmpl_var name></h2>\r\n<tmpl_var description><br>\r\n<br>\r\n<br>\r\n$ <tmpl_var price><br>\r\n<a href=\"<tmpl_var url>\">Subscribe now</a><br>','Macro/SubscriptionItem',1,1,'PBtmpl0000000000000046');
-INSERT INTO template VALUES ('<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\r\n  <tr>\r\n    <th>Transaction description</th>\r\n    <th>Price</th>\r\n    <th>Status</th>\r\n    <th>Error</th>\r\n  </tr>\r\n<tmpl_loop resultLoop>\r\n  <tr>\r\n    <td align=\"left\"><tmpl_var purchaseDescription></td>\r\n    <td align=\"right\"><tmpl_var purchaseAmount></td>\r\n    <td><tmpl_var status></td>\r\n    <td align=\"left\"><tmpl_var error> (<tmpl_var errorCode>)</td>\r\n  </tr>\r\n</tmpl_loop>\r\n</table><br>\r\n<br>\r\n\r\n<tmpl_var statusExplanation>','Commerce/TransactionError',1,1,'PBtmpl0000000000000018');
-INSERT INTO template VALUES ('<a href=\"<tmpl_var viewShoppingCart.url>\"><tmpl_var viewShoppingCart.label></a> &middot;\n<a href=\"<tmpl_var changePayment.url>\"><tmpl_var changePayment.label></a> &middot; \n<a href=\"<tmpl_var changeShipping.url>\"><tmpl_var changeShipping.label></a><br>\n<br>\n\n<tmpl_var title><br>\n<ul>\n<tmpl_loop errorLoop>\n<li><tmpl_var message></li>\n</tmpl_loop>\n</ul>\n\n<table> <tr align=\"left\">\n      <th style=\"border-bottom: 2px solid black\">Product</th>\n      <th style=\"border-bottom: 2px solid black\">Quantity</th>\n      <th style=\"border-bottom: 2px solid black\">Price</th>\n      <th style=\"border-bottom: 2px solid black\">Each</th>\n  </tr>\n\n  <tmpl_if normalItems>\n  </tmpl_if>\n\n  <tmpl_loop normalItemsLoop>\n  <tr>\n      <td align=\"left\"><tmpl_var name></td>\n      <td align=\"center\"><tmpl_var quantity></td>\n      <td align=\"right\"><tmpl_var totalPrice></td>\n  </tr>\n  </tmpl_loop>\n\n  <tmpl_loop recurringItemsLoop>\n  <tr>\n      <td align=\"left\"><tmpl_var name></td>\n      <td align=\"center\"><tmpl_var quantity></td>\n      <td align=\"right\"><tmpl_var totalPrice></td>\n      <td align=\"left\"><tmpl_var period></td>\n  </tr>\n</tmpl_loop>\n  <tr style=\"border-top: 1px solid black\">\n      <td style=\"border-top: 1px solid black\">&nbsp;</td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b>Subtotal</b></td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b><tmpl_var subtotal></b></td>\n  </tr>\n  <tr>\n      <td colspan=\"2\" align=\"right\">Shipping</td>\n      <td align=\"right\"><tmpl_var shippingCost></td>\n  <tr>\n      <td colspan=\"2\" align=\"right\" style=\"border-top: 1px solid black\"><b>Total</b></td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b><tmpl_var total></b></td>\n\n</table>\n\n<br><br>\n\n<tmpl_var form>','Commerce/ConfirmCheckout',1,1,'PBtmpl0000000000000016');
-INSERT INTO template VALUES ('<table border=\"0\">\r\n<tmpl_loop purchaseHistoryLoop>\r\n	<tr>\r\n		<td><b><tmpl_var initDate></b></td>\r\n		<td><b><tmpl_var completionDate></b></td>\r\n		<td align=\"right\"><b>$ <tmpl_var amount></b></td>\r\n		<td><b><tmpl_var status></b></td>\r\n		<td><tmpl_if canCancel><a href=\"<tmpl_var cancelUrl>\">Cancel</a></tmpl_if></td>\r\n	</tr>\r\n	<tmpl_loop itemLoop>\r\n	<tr>\r\n		<td \"align=right\"><tmpl_var quantity> x </td>\r\n		<td \"align=left\"><tmpl_var itemName></td>\r\n		<td \"align=right\">$ <tmpl_var amount></td>\r\n	</tr>\r\n	</tmpl_loop>\r\n</tmpl_loop>\r\n</table>','Commerce/ViewPurchaseHistory',1,1,'PBtmpl0000000000000019');
-INSERT INTO template VALUES ('<tmpl_var message>','Commerce/CheckoutCanceled',1,1,'PBtmpl0000000000000015');
-INSERT INTO template VALUES ('<tmpl_if pluginsAvailable>\r\n   <tmpl_var message><br>\r\n    <tmpl_var formHeader>\r\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\r\n    <tmpl_loop pluginLoop>\r\n            <tr>\r\n                        <td><tmpl_var formElement></td>\r\n                     <td align=\"left\"><tmpl_var name></td>\r\n           </tr>\r\n       </tmpl_loop>\r\n        </table>\r\n    <tmpl_var formSubmit>\r\n    <tmpl_var formFooter>\r\n<tmpl_else>\r\n <tmpl_var noPluginsMessage>\r\n</tmpl_if>','Commerce/SelectPaymentGateway',1,1,'PBtmpl0000000000000017');
-INSERT INTO template VALUES ('^StyleSheet(^Extras;/adminConsole/adminConsole.css);\r\n^JavaScript(^Extras;/adminConsole/adminConsole.js);\r\n\r\n<div id=\"application_help\">\r\n  <tmpl_if help.url>\r\n    <a href=\"<tmpl_var help.url>\" target=\"_blank\"><img src=\"^Extras;/adminConsole/small/help.gif\" alt=\"?\" border=\"0\" /></a>\r\n  </tmpl_if>\r\n</div>\r\n<div id=\"application_icon\">\r\n    <img src=\"<tmpl_var application.icon>\" border=\"0\" title=\"<tmpl_var application.title>\" alt=\"<tmpl_var application.title>\" />\r\n</div>\r\n<div class=\"adminConsoleTitleIconMedalian\">\r\n<img src=\"^Extras;/adminConsole/medalian.gif\" border=\"0\" alt=\"*\" />\r\n</div>\r\n<div id=\"console_icon\">\r\n     <img src=\"<tmpl_var console.icon>\" border=\"0\" title=\"<tmpl_var console.title>\" alt=\"<tmpl_var console.title>\" />\r\n</div>\r\n<div id=\"application_title\">\r\n       <tmpl_var application.title>\r\n</div>\r\n<div id=\"console_title\">\r\n       <tmpl_var console.title>\r\n</div>\r\n<div id=\"application_workarea\">\r\n       <tmpl_var application.workArea>\r\n</div>\r\n<div id=\"console_workarea\">\r\n        <div class=\"adminConsoleSpacer\">\r\n            &nbsp;\r\n        </div>\r\n        <tmpl_loop application_loop>\r\n                <tmpl_if canUse>\r\n                     <div class=\"adminConsoleApplication\">\r\n                           <a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon>\" border=\"0\" title=\"<tmpl_var title>\" alt=\"<tmpl_var title>\" /></a><br />\r\n                           <a href=\"<tmpl_var url>\"><tmpl_var title></a>\r\n                     </div>\r\n               </tmpl_if>\r\n       </tmpl_loop>\r\n        <div class=\"adminConsoleSpacer\">\r\n            &nbsp;\r\n        </div>\r\n</div>\r\n<div class=\"adminConsoleMenu\">\r\n        <div id=\"adminConsoleMainMenu\" class=\"adminConsoleMainMenu\">\r\n                <div id=\"console_toggle_on\">\r\n                        <a href=\"#\" onClick=\"toggleAdminConsole()\"><tmpl_var toggle.on.label></a><br />\r\n                </div>\r\n                <div id=\"console_toggle_off\">\r\n                        <a href=\"#\" onClick=\"toggleAdminConsole()\"><tmpl_var toggle.off.label></a><br />\r\n                </div>\r\n        </div>\r\n        <div id=\"adminConsoleApplicationSubmenu\"  class=\"adminConsoleApplicationSubmenu\">\r\n              <tmpl_loop submenu_loop>\r\n                        <a href=\"<tmpl_var url>\" <tmpl_var extras>><tmpl_var label></a><br />\r\n              </tmpl_loop>\r\n        </div>\r\n        <div id=\"adminConsoleUtilityMenu\" class=\"adminConsoleUtilityMenu\">\r\n                <a href=\"^PageUrl;\"><tmpl_var backtosite.label></a><br />\r\n                ^AdminToggle;<br />\r\n                ^LoginToggle;<br />\r\n        </div>\r\n</div>\r\n<script lang=\"JavaScript\">\r\n  initAdminConsole(<tmpl_if application.title>true<tmpl_else>false</tmpl_if>,<tmpl_if submenu_loop>true<tmpl_else>false</tmpl_if>);\r\n</script>\r\n','AdminConsole',1,1,'PBtmpl0000000000000001');
-INSERT INTO template VALUES ('\n<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n	<div style=\"width: 100%; border: 1px groove black;\">\n		<div style=\"width: 100%; background-image: url(<tmpl_var session.config.extrasURL>/opaque.gif);\">\n			<div style=\"text-align: center; font-weight: bold;\"><a href=\"<tmpl_var originalURL>\"><tmpl_var shortcut.label></a></div>\n		</div>\n</tmpl_if>	\n<tmpl_var shortcut.content>\n<tmpl_if session.var.adminOn>\n		<div style=\"width: 100%; background-image: url(<tmpl_var session.config.extrasURL>/opaque.gif);\">\n			<div style=\"text-align: center; font-weight: bold;\"><a href=\"<tmpl_var originalURL>\"><tmpl_var shortcut.label></a></div>\n		</div>\n	</div>\n</tmpl_if>	\n		','Shortcut',1,1,'PBtmpl0000000000000140');
-INSERT INTO template VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n<p><tmpl_var controls></p>\n</tmpl_if>\n<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if error_loop>\n<ul>\n<tmpl_loop error_loop>\n<li><b><tmpl_var error.message></b>\n</tmpl_loop>\n</ul>\n</tmpl_if>\n\n<tmpl_if description>\n<tmpl_var description><p />\n</tmpl_if>\n\n<tmpl_if canEdit>\n<a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\n&middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\n<tmpl_if entryId>\n&middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\n</tmpl_if>\n<tmpl_if session.var.adminOn>\n&middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\n&middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\n</tmpl_if>\n<p />\n</tmpl_if>\n<tmpl_var form.start>\n<table>\n        <tmpl_loop field_loop>\n                <tmpl_unless field.isHidden>\n                        <tr>\n                                <td class=\"formDescription\" valign=\"top\">\n                                        <tmpl_if session.var.adminOn>\n                                                <tmpl_if canEdit>\n                                                        <tmpl_var field.controls>\n                                                </tmpl_if>\n                                        </tmpl_if>\n                                        <tmpl_var field.label>\n                                </td>\n                                <td class=\"tableData\" valign=\"top\">\n                                        <tmpl_if field.isDisplayed>\n                                                <tmpl_var field.value>\n                                        <tmpl_else>\n                                                <tmpl_var field.form>\n                                        </tmpl_if>\n                                        <tmpl_if field.isRequired>*</tmpl_if>\n                                        <span class=\"formSubtext\">\n                                                <br />\n                                                <tmpl_var field.subtext>\n                                        </span>\n                                </td>\n                        </tr>\n                </tmpl_unless>\n        </tmpl_loop>\n</table>\n<br>\n<tmpl_var form.save>\n<tmpl_var form.end>\n','DataForm',1,1,'PBtmpl0000000000000141');
-
---
--- Table structure for table `theme`
---
-
-CREATE TABLE theme (
-  themeId varchar(22) NOT NULL default '',
-  name varchar(255) default NULL,
-  designer varchar(255) default NULL,
-  designerURL text,
-  original int(11) NOT NULL default '1',
-  webguiVersion varchar(10) default NULL,
-  versionNumber int(11) NOT NULL default '0'
-) TYPE=MyISAM;
-
---
--- Dumping data for table `theme`
---
-
-
-
---
--- Table structure for table `themeComponent`
---
-
-CREATE TABLE themeComponent (
-  themeId varchar(22) default NULL,
-  themeComponentId varchar(22) default NULL,
-  type varchar(35) default NULL,
-  id varchar(255) default NULL
-) TYPE=MyISAM;
-
---
--- Dumping data for table `themeComponent`
---
-
-
-
---
--- Table structure for table `transaction`
---
-
-CREATE TABLE transaction (
-  transactionId varchar(22) NOT NULL default '',
-  userId varchar(22) NOT NULL default '',
-  amount float NOT NULL default '0',
-  gatewayId varchar(128) default NULL,
-  gateway varchar(64) NOT NULL default '',
-  recurring tinyint(1) NOT NULL default '0',
-  initDate int(11) NOT NULL default '0',
-  completionDate int(11) default '0',
-  status varchar(10) NOT NULL default 'Pending',
-  lastPayedTerm int(6) NOT NULL default '0',
-  shippingCost varchar(9) default '0.00',
-  shippingMethod varchar(15) default NULL,
-  shippingOptions text,
-  shippingStatus varchar(15) default 'NotShipped',
-  trackingNumber varchar(255) default NULL,
-  PRIMARY KEY  (transactionId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `transaction`
---
-
-
-
---
--- Table structure for table `transactionItem`
---
-
-CREATE TABLE transactionItem (
-  transactionId varchar(22) NOT NULL default '',
-  itemName varchar(64) NOT NULL default '',
-  amount float NOT NULL default '0',
-  quantity int(4) NOT NULL default '0',
-  itemId varchar(64) NOT NULL default '',
-  itemType varchar(40) NOT NULL default ''
-) TYPE=MyISAM;
-
---
--- Dumping data for table `transactionItem`
---
-
-
-
---
--- Table structure for table `userLoginLog`
---
-
-CREATE TABLE userLoginLog (
-  userId varchar(22) default NULL,
-  status varchar(30) default NULL,
-  timeStamp int(11) default NULL,
-  ipAddress varchar(128) default NULL,
-  userAgent text
-) TYPE=MyISAM;
-
---
--- Dumping data for table `userLoginLog`
---
-
-
-
---
--- Table structure for table `userProfileCategory`
---
-
-CREATE TABLE userProfileCategory (
-  profileCategoryId varchar(22) NOT NULL default '',
-  categoryName varchar(255) default NULL,
-  sequenceNumber int(11) NOT NULL default '1',
-  visible int(11) NOT NULL default '1',
-  editable int(11) NOT NULL default '1',
-  PRIMARY KEY  (profileCategoryId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `userProfileCategory`
---
-
-
-INSERT INTO userProfileCategory VALUES ('1','WebGUI::International::get(449,\"WebGUI\");',6,1,1);
-INSERT INTO userProfileCategory VALUES ('2','WebGUI::International::get(440,\"WebGUI\");',2,1,1);
-INSERT INTO userProfileCategory VALUES ('3','WebGUI::International::get(439,\"WebGUI\");',1,1,1);
-INSERT INTO userProfileCategory VALUES ('4','WebGUI::International::get(445,\"WebGUI\");',7,0,1);
-INSERT INTO userProfileCategory VALUES ('5','WebGUI::International::get(443,\"WebGUI\");',3,1,1);
-INSERT INTO userProfileCategory VALUES ('6','WebGUI::International::get(442,\"WebGUI\");',4,1,1);
-INSERT INTO userProfileCategory VALUES ('7','WebGUI::International::get(444,\"WebGUI\");',5,1,1);
-
---
--- Table structure for table `userProfileData`
---
-
-CREATE TABLE userProfileData (
-  userId varchar(22) NOT NULL default '',
-  fieldName varchar(128) NOT NULL default '',
-  fieldData text,
-  PRIMARY KEY  (userId,fieldName)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `userProfileData`
---
-
-
-INSERT INTO userProfileData VALUES ('1','language','English');
-INSERT INTO userProfileData VALUES ('3','language','English');
-INSERT INTO userProfileData VALUES ('3','uiLevel','9');
-
---
--- Table structure for table `userProfileField`
---
-
-CREATE TABLE userProfileField (
-  fieldName varchar(128) NOT NULL default '',
-  fieldLabel varchar(255) default NULL,
-  visible int(11) NOT NULL default '0',
-  required int(11) NOT NULL default '0',
-  dataType varchar(128) NOT NULL default 'text',
-  dataValues text,
-  dataDefault text,
-  sequenceNumber int(11) NOT NULL default '1',
-  profileCategoryId varchar(22) default NULL,
-  protected int(11) NOT NULL default '0',
-  editable int(11) NOT NULL default '1',
-  PRIMARY KEY  (fieldName)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `userProfileField`
---
-
-
-INSERT INTO userProfileField VALUES ('email','WebGUI::International::get(56,\"WebGUI\");',1,1,'email',NULL,NULL,1,'2',1,1);
-INSERT INTO userProfileField VALUES ('firstName','WebGUI::International::get(314,\"WebGUI\");',1,0,'text',NULL,NULL,1,'3',1,1);
-INSERT INTO userProfileField VALUES ('middleName','WebGUI::International::get(315,\"WebGUI\");',1,0,'text',NULL,NULL,2,'3',1,1);
-INSERT INTO userProfileField VALUES ('lastName','WebGUI::International::get(316,\"WebGUI\");',1,0,'text',NULL,NULL,3,'3',1,1);
-INSERT INTO userProfileField VALUES ('icq','WebGUI::International::get(317,\"WebGUI\");',1,0,'text',NULL,NULL,2,'2',1,1);
-INSERT INTO userProfileField VALUES ('aim','WebGUI::International::get(318,\"WebGUI\");',1,0,'text',NULL,NULL,3,'2',1,1);
-INSERT INTO userProfileField VALUES ('msnIM','WebGUI::International::get(319,\"WebGUI\");',1,0,'text',NULL,NULL,4,'2',1,1);
-INSERT INTO userProfileField VALUES ('yahooIM','WebGUI::International::get(320,\"WebGUI\");',1,0,'text',NULL,NULL,5,'2',1,1);
-INSERT INTO userProfileField VALUES ('cellPhone','WebGUI::International::get(321,\"WebGUI\");',1,0,'phone',NULL,NULL,6,'2',1,1);
-INSERT INTO userProfileField VALUES ('pager','WebGUI::International::get(322,\"WebGUI\");',1,0,'phone',NULL,NULL,7,'2',1,1);
-INSERT INTO userProfileField VALUES ('emailToPager','WebGUI::International::get(441,\"WebGUI\");',1,0,'email',NULL,NULL,8,'2',1,1);
-INSERT INTO userProfileField VALUES ('language','WebGUI::International::get(304,\"WebGUI\");',1,0,'selectList','WebGUI::International::getLanguages()','[\'English\']',1,'4',1,1);
-INSERT INTO userProfileField VALUES ('homeAddress','WebGUI::International::get(323,\"WebGUI\");',1,0,'text',NULL,NULL,1,'5',1,1);
-INSERT INTO userProfileField VALUES ('homeCity','WebGUI::International::get(324,\"WebGUI\");',1,0,'text',NULL,NULL,2,'5',1,1);
-INSERT INTO userProfileField VALUES ('homeState','WebGUI::International::get(325,\"WebGUI\");',1,0,'text',NULL,NULL,3,'5',1,1);
-INSERT INTO userProfileField VALUES ('homeZip','WebGUI::International::get(326,\"WebGUI\");',1,0,'zipcode',NULL,NULL,4,'5',1,1);
-INSERT INTO userProfileField VALUES ('homeCountry','WebGUI::International::get(327,\"WebGUI\");',1,0,'text',NULL,NULL,5,'5',1,1);
-INSERT INTO userProfileField VALUES ('homePhone','WebGUI::International::get(328,\"WebGUI\");',1,0,'phone',NULL,NULL,6,'5',1,1);
-INSERT INTO userProfileField VALUES ('workAddress','WebGUI::International::get(329,\"WebGUI\");',1,0,'text',NULL,NULL,2,'6',1,1);
-INSERT INTO userProfileField VALUES ('workCity','WebGUI::International::get(330,\"WebGUI\");',1,0,'text',NULL,NULL,3,'6',1,1);
-INSERT INTO userProfileField VALUES ('workState','WebGUI::International::get(331,\"WebGUI\");',1,0,'text',NULL,NULL,4,'6',1,1);
-INSERT INTO userProfileField VALUES ('workZip','WebGUI::International::get(332,\"WebGUI\");',1,0,'zipcode',NULL,NULL,5,'6',1,1);
-INSERT INTO userProfileField VALUES ('workCountry','WebGUI::International::get(333,\"WebGUI\");',1,0,'text',NULL,NULL,6,'6',1,1);
-INSERT INTO userProfileField VALUES ('workPhone','WebGUI::International::get(334,\"WebGUI\");',1,0,'phone',NULL,NULL,7,'6',1,1);
-INSERT INTO userProfileField VALUES ('gender','WebGUI::International::get(335,\"WebGUI\");',1,0,'selectList','{\r\n  \'neuter\'=>WebGUI::International::get(403),\r\n  \'male\'=>WebGUI::International::get(339),\r\n  \'female\'=>WebGUI::International::get(340)\r\n}','[\'neuter\']',1,'7',1,1);
-INSERT INTO userProfileField VALUES ('birthdate','WebGUI::International::get(336,\"WebGUI\");',1,0,'date',NULL,NULL,2,'7',1,1);
-INSERT INTO userProfileField VALUES ('homeURL','WebGUI::International::get(337,\"WebGUI\");',1,0,'url',NULL,NULL,7,'5',1,1);
-INSERT INTO userProfileField VALUES ('workURL','WebGUI::International::get(446,\"WebGUI\");',1,0,'url',NULL,NULL,8,'6',1,1);
-INSERT INTO userProfileField VALUES ('workName','WebGUI::International::get(450,\"WebGUI\");',1,0,'text',NULL,NULL,1,'6',1,1);
-INSERT INTO userProfileField VALUES ('timeOffset','WebGUI::International::get(460,\"WebGUI\");',1,0,'text',NULL,'\'0\'',3,'4',1,1);
-INSERT INTO userProfileField VALUES ('dateFormat','WebGUI::International::get(461,\"WebGUI\");',1,0,'selectList','{\r\n \'%M/%D/%y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%M/%D/%y\"),\r\n \'%y-%m-%d\'=>WebGUI::DateTime::epochToHuman(\"\",\"%y-%m-%d\"),\r\n \'%D-%c-%y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%D-%c-%y\"),\r\n \'%c %D, %y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%c %D, %y\")\r\n}\r\n','[\'%M/%D/%y\']',4,'4',1,1);
-INSERT INTO userProfileField VALUES ('timeFormat','WebGUI::International::get(462,\"WebGUI\");',1,0,'selectList','{\r\n \'%H:%n %p\'=>WebGUI::DateTime::epochToHuman(\"\",\"%H:%n %p\"),\r\n \'%H:%n:%s %p\'=>WebGUI::DateTime::epochToHuman(\"\",\"%H:%n:%s %p\"),\r\n \'%j:%n\'=>WebGUI::DateTime::epochToHuman(\"\",\"%j:%n\"),\r\n \'%j:%n:%s\'=>WebGUI::DateTime::epochToHuman(\"\",\"%j:%n:%s\")\r\n}\r\n','[\'%H:%n %p\']',5,'4',1,1);
-INSERT INTO userProfileField VALUES ('discussionLayout','WebGUI::International::get(509)',1,0,'selectList','{\n  threaded=>WebGUI::International::get(511),\n  flat=>WebGUI::International::get(510),\n  nested=>WebGUI::International::get(1045)\n}\n','[\'threaded\']',6,'4',0,1);
-INSERT INTO userProfileField VALUES ('INBOXNotifications','WebGUI::International::get(518)',1,0,'selectList','{ \r\n  none=>WebGUI::International::get(519),\r\n email=>WebGUI::International::get(520),\r\n  emailToPager=>WebGUI::International::get(521),\r\n  icq=>WebGUI::International::get(522)\r\n}','[\'email\']',7,'4',0,1);
-INSERT INTO userProfileField VALUES ('firstDayOfWeek','WebGUI::International::get(699,\"WebGUI\");',1,0,'selectList','{0=>WebGUI::International::get(27,\"WebGUI\"),1=>WebGUI::International::get(28,\"WebGUI\")}','[0]',3,'4',1,1);
-INSERT INTO userProfileField VALUES ('uiLevel','WebGUI::International::get(739,\"WebGUI\");',0,0,'selectList','{\r\n0=>WebGUI::International::get(729,\"WebGUI\"),\r\n1=>WebGUI::International::get(730,\"WebGUI\"),\r\n2=>WebGUI::International::get(731,\"WebGUI\"),\r\n3=>WebGUI::International::get(732,\"WebGUI\"),\r\n4=>WebGUI::International::get(733,\"WebGUI\"),\r\n5=>WebGUI::International::get(734,\"WebGUI\"),\r\n6=>WebGUI::International::get(735,\"WebGUI\"),\r\n7=>WebGUI::International::get(736,\"WebGUI\"),\r\n8=>WebGUI::International::get(737,\"WebGUI\"),\r\n9=>WebGUI::International::get(738,\"WebGUI\")\r\n}','[5]',8,'4',1,0);
-INSERT INTO userProfileField VALUES ('alias','WebGUI::International::get(858)',1,0,'text','','',4,'3',0,1);
-INSERT INTO userProfileField VALUES ('signature','WebGUI::International::get(859)',1,0,'HTMLArea','','',5,'3',0,1);
-INSERT INTO userProfileField VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'yesNo','','1',9,'4',0,1);
-INSERT INTO userProfileField VALUES ('publicEmail','WebGUI::International::get(860)',1,0,'yesNo','','1',10,'4',0,1);
-INSERT INTO userProfileField VALUES ('toolbar','WebGUI::International::get(746)',0,0,'selectList','WebGUI::Icon::getToolbarOptions()','[\'useLanguageDefault\']',13,'4',0,0);
-
---
--- Table structure for table `userSession`
---
-
-CREATE TABLE userSession (
-  sessionId varchar(22) NOT NULL default '',
-  expires int(11) default NULL,
-  lastPageView int(11) default NULL,
-  adminOn int(11) NOT NULL default '0',
-  lastIP varchar(50) default NULL,
-  userId varchar(22) default NULL,
-  PRIMARY KEY  (sessionId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `userSession`
---
-
-
---
--- Table structure for table `userSessionScratch`
---
-
-CREATE TABLE userSessionScratch (
-  sessionId varchar(22) NOT NULL default '',
-  name varchar(255) default NULL,
-  value varchar(255) default NULL
-) TYPE=MyISAM;
-
---
--- Dumping data for table `userSessionScratch`
---
-
-
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE users (
-  userId varchar(22) NOT NULL default '',
-  username varchar(100) default NULL,
-  authMethod varchar(30) NOT NULL default 'WebGUI',
-  dateCreated int(11) NOT NULL default '1019867418',
-  lastUpdated int(11) NOT NULL default '1019867418',
-  karma int(11) NOT NULL default '0',
-  status varchar(35) NOT NULL default 'Active',
-  referringAffiliate varchar(22) NOT NULL default '',
-  PRIMARY KEY  (userId),
-  UNIQUE KEY username_unique (username)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `users`
---
-
-
-INSERT INTO users VALUES ('1','Visitor','WebGUI',1019867418,1019867418,0,'Active','0');
-INSERT INTO users VALUES ('3','Admin','WebGUI',1019867418,1109989293,0,'Active','1');
-
---
--- Table structure for table `webguiVersion`
---
-
-CREATE TABLE webguiVersion (
-  webguiVersion varchar(10) default NULL,
-  versionType varchar(30) default NULL,
-  dateApplied int(11) default NULL
-) TYPE=MyISAM;
-
---
--- Dumping data for table `webguiVersion`
---
-
-
-INSERT INTO webguiVersion VALUES ('6.6.1','initial install',unix_timestamp());
-
---
--- Table structure for table `wobject`
---
-
-CREATE TABLE wobject (
-  displayTitle int(11) NOT NULL default '1',
-  description mediumtext,
-  assetId varchar(22) NOT NULL default '',
-  styleTemplateId varchar(22) NOT NULL default '',
-  printableStyleTemplateId varchar(22) NOT NULL default '',
-  cacheTimeout int(11) NOT NULL default '60',
-  cacheTimeoutVisitor int(11) NOT NULL default '3600',
-  PRIMARY KEY  (assetId)
-) TYPE=MyISAM;
-
---
--- Dumping data for table `wobject`
---
-
-
-INSERT INTO wobject VALUES (1,'Welcome to WebGUI. This is web done right.\n<br /><br />\nWebGUI is a user-friendly web site management system made by <a href=\"http://www.plainblack.com\">Plain Black</a>. It is designed to be easy to use for the average business user, but powerful enough to satisfy the needs of a large enterprise.\n<br /><br />\nThere are thousands of <a href=\"http://www.adinknetwork.com\" target=\"_blank\">small</a> and <a href=\"http://www.brunswickbowling.com\" target=\"_blank\">large</a> businesses, <a href=\"http://www.troy30c.org\" target=\"_blank\">schools</a>, <a href=\"http://goaggies.cameron.edu/\" target=\"_blank\">universities</a>, <a href=\"http://www.lambtononline.ca/\" target=\"_blank\">governments</a>, <a href=\"http://www.hetnieuweland.nl/\" target=\"_blank\">clubs</a>, <a href=\"http://www.k3b.org\" target=\"_blank\">projects</a>, <a href=\"http://www.cmsmatrix.org\" target=\"_blank\">communities</a>, and <a href=\"http://www.primaat.com\" target=\"_blank\">individuals</a> using WebGUI all over the world today. A brief list of some of them can be found <a href=\"http://www.plainblack.com/webgui/examples\">here</a>. There\'s no reason your site shouldn\'t be on that list.<br /><br />','TKzUMeIxRLrZ3NAEez6CXQ','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (1,'<img src=\"^Extras;styles/webgui6/img_hands.jpg\" style=\"position: relative;\" align=\"right\" />\n<style>\ndt {\n font-weight: bold;\n}\n</style>\n\n<dl>\n\n<dt>Easy to Use</dt>\n<dd>If you can use a web browser, then you can manage a web site with WebGUI. WebGUI\'s unique WYSIWYG inline content editing interface ensures that you know where you are and what your content will look like while you\'re editing. In addition, you don\'t need to install and learn any complicated programs, you can edit everything with your trusty web browser.</dd>\n<br />\n\n<dt>Flexible Designs</dt>\n<dd>WebGUI\'s powerful templating system ensures that no two WebGUI sites ever need to look the same. You\'re not restricted in how your content is laid out or how your navigation functions.</dd>\n<br />\n\n<dt>Work Faster</dt>\n<dd>Though there is some pretty cool technology behind the scenes that makes WebGUI work, our first concern has always been usability and not technology. After all if it\'s not useful, why use it? With that in mind WebGUI has all kinds of wizards, short cuts, online help, and other aids to help you work faster.</dd>\n<br />\n\n<dt>Localized Content</dt>\n<dd>With WebGUI there\'s no need to limit yourself to one language or timezone. It\'s a snap to build a multi-lingual site with WebGUI. In fact, even WebGUI\'s built in functions and online help have been translated to more than 15 languages. User\'s can also adjust their local settings for dates, times, and other localized oddities. </dd>\n<br />\n\n<dt>Pluggable By Design</dt>\n<dd>When <a href=\"http://www.plainblack.com\">Plain Black</a> created WebGUI we knew we wouldn\'t be able to think of everything you want to use WebGUI for, so we made most of WebGUI\'s functions pluggable. This allows you to add new features to WebGUI and still be able to upgrade the core system without a fuss.</dd>\n\n</dl>','sWVXMZGibxHe2Ekj1DCldA','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,'If you\'re reading this message it means that you\'ve got WebGUI up and running. Good job! The installation is not trivial.\n\n<p/>\n \nIn order to do anything useful with your new installation you\'ll need to log in as the default administrator account. Follow these steps to get started:\n\n<p/>\n\n<ol>\n<li><a href=\"^a(linkonly);\">Click here to log in.</a> (You specified the username and password when you first visited your new WebGUI site.)\n<li><a href=\"^PageUrl;?op=switchOnAdmin\">Click here to turn the administrative interface on.</a>\n</ol>\n<blockquote style=\"font-size: 10px;\">\n<b>NOTE:</b> You could have also done these steps using the block at the top of this page.\n</blockquote>\n\n<p/>\n\n You might want to <a href=\"^PageUrl;?op=listUsers\">create another account</a> for yourself with Administrative privileges in case you can\'t log in with the Admin account for some reason.\n\n<p/>\n \nYou\'ll now notice little buttons and menus on all the pages in your site. These controls help you administer your site. The \"Add content\" menu lets you add new content to your pages as well as paste content from the clipboard. The \"Administrative functions\" menu let\'s you control users and groups as well as many other admin settings. The little toolbars help you manipulate the content in your pages.\n\n\n<p/>\n\nFor more information about how to administer <a href=\"http://www.plainblack.com/webgui\">WebGUI</a> consider getting a copy of <a href=\"http://www.plainblack.com/store/rwg\">Ruling WebGUI</a>. <a href=\"http://www.plainblack.com\">Plain Black</a> also provides several <a href=\"http://www.plainblack.com/store/support\">Support Programs</a> for WebGUI if you run into trouble.\n\n<p/>\n \nEnjoy your new WebGUI site!','x_WjMvFmilhX-jvZuIpinw','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,' To learn more about WebGUI and how you can best implement WebGUI in your organization, please see the choices below.\n\n','DC1etlIaBRQitXnchZKvUw','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,'This is the latest news from Plain Black and WebGUI pulled directly from the site every hour.','fK-HMSboA3uu0c1KYkYspA','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,'Tell a friend about WebGUI.','Szs5eev3OMssmnsyLRZmWA','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,'','pJd5TLAjfWMVXD6sCRLwUg','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,NULL,'68sKwDgf9cGH58-NZcU4lg','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,NULL,'_iHetEvMQUOoxS-T2CM0sQ','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,NULL,'8Bb8gu-me2mhL3ljFyiWLg','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,NULL,'2TqQc4OISddWCZmRY1_m8A','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,NULL,'Swf6L8poXKc7hUaNPkBevw','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (0,NULL,'x3OFY6OJh_qsXkZfPwug4A','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600);
-INSERT INTO wobject VALUES (1,NULL,'PBasset000000000000002','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,NULL,'Wmjn6I1fe9DKhiIR39YC0g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000001','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000014','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000015','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000016','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000017','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000018','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000019','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000020','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000021','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000002','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000006','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000007','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000008','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000009','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000010','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000011','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000012','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'PBnav00000000000000013','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'f2bihDeMoI-Ojt2dutJNQA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'KZ2UytxNpbF-3Eg3RNvQQQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (0,NULL,'G0wlShbk_XruYVfbXqWq_w','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,NULL,'UE5_3bD7kWDLUN2B-iuNuA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,NULL,'RTsbVBEYnn3OPZWmXyIFhQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'AdminConsole','HCQF9FBLWK3Se06yGLoliw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Article','79BY6IHpAtE2yuQwROh9tg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'AttachmentBox','ZexTeuMQaZ1fh4FOpLNlYw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/LDAP/Account','_r8Y0WwiHLyVEFe5M0idYQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/LDAP/Create','Mkc1dJDw-lqExS5uy7QReA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/LDAP/Login','zyS1TsKDvBk7Y55_GlWgxA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/WebGUI/Account','CDzQSnxPMWCy2j5ZOxWbrw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/WebGUI/Create','RPo_G59wjPTGE1-IhiE44A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/WebGUI/Expired','Oq61G3_QSM5TzArFUzUBiA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/WebGUI/Login','jcIZMBAyEcmXktAVwPxgIw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Auth/WebGUI/Recovery','ThLKZPeKbRAVEYTkKAxeCg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Collaboration','8r4-zJ6g-qOecM1PsvADbQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Collaboration/Notification','ECq9dLm5vmh4t963yDx1og','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Collaboration/PostForm','PNGrWdYDhJZTv1-sAX6W1Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Collaboration/Search','guQGD9YiTn55PqOUTjCc0A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Collaboration/Thread','-MlWyWh12ibRM8gAzRy41g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Commerce/CheckoutCanceled','VvgRRrE6UsmWi7y7hMCXbw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Commerce/ConfirmCheckout','j3yljeaT2y9fLkSHM5Zbow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Commerce/SelectPaymentGateway','2jkEIs9YpL10dZsA3RH4sw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Commerce/TransactionError','5SdElAemaCKBfheDk7rz8A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Commerce/ViewPurchaseHistory','arabONid_vy2W6cALhELxA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'DataForm','sb7g8aCLMq-XigfBdmw2cg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'DataForm/List','BAoMajIxnoGlrxhDVgot9g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'EventsCalendar','b26vQzyaqz0EBMWH_oPdrg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'EventsCalendar/Event','jCMdSbD6IA535I16Pcik7Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'FileAsset','-Kmb-MEV4ni9d0tn_BYGXA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Folder','ZWv7HLTQ4oERBIFJHBz1Ow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'HttpProxy','RcOR25DbCizyAfNWvr-2ow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'ImageAsset','59f_y-iE0k8dSMVIyX5SBg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'IndexedSearch','2DAYoiOdplxZCrEwmrVhwQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Layout','tJ_X5F3Dkaz8vO6CigbJrg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/AdminBar','Fh_KALcbkc8CkBR3I6dU0g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/AdminToggle','WTPOJerammxgkIdCWnR9uw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/a_account','PttBzI13R8HXqQn40I4UFg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/EditableToggle','VdTZ8_2vlZwVVuv_I7DsWA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/File','BBoAtdsTo2AGPe4k9kfkxA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/GroupAdd','A-m4h7Q3LYt61G54zpEGqA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/GroupDelete','Wquzj9XSpxL_gpGXkoU6tg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/H_homeLink','J1uh__tKV2BARcSeFE7MSg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/LoginToggle','7EfoKU41oB0ZU6NmVIud4A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/L_loginBox','n1xT2JUidbeqNMN2zyvHAQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/r_printable','mKI2EjkU9QH6dJKkx7VEvw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Macro/SubscriptionItem','HOleaBMUZT6B5qJmbcV5xg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'MessageBoard','L070eyyGhoWx5cSUeNRrow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Navigation','c3jDvo_bK3jFqjIefgXjUw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Operation/MessageLog/Message','VnUEcXfsbwgB5rqslQ3n1A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Operation/MessageLog/View','6MrxI11jyXuB-UUrX69lXQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Operation/Profile/Edit','xxuM0xMjhIA3lFq99GY05Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Operation/Profile/View','kHlR8-nCFRrwlEV1uapu_Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Operation/RedeemSubscription','r4FQlrIkS1_MTuk-vVqRNg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Poll','EvgkCMpx4kUonmjhhZXRjg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Product','I2DQUdFVd9FtcSealp4cTQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'prompt','khkob2AmnIKAxKJeXHE3fQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'richEditor','h34TI6OYynW5Q_FYLbZiig','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Shortcut','i7emhSfswYNreLAwn1wBRw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'SQLReport','o9PZOa7fy9AZa8fKmhoPrQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'style','eLdzeSyvZfml-YVFfgUiaw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Survey','ffWKX2dW4t1eWgfNng605w','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Survey/Gradebook','QWS2acYOu3Y4uNsWvVChTg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Survey/Overview','lUjGdT_Hhi_EFhsYr1Ouyw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'Survey/Response','7Xhdnqu3qkDWHEnRgk6Uzw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'SyndicatedContent','xPyASYtR44mpDk3ba4YyIg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,'WSClient','S99spbsvn96tgRA0oVUl2A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600);
-INSERT INTO wobject VALUES (1,NULL,'Rn5Ef8vMDQ0ebtaxS_-JXA','','',60,3600);
-INSERT INTO wobject VALUES (1,NULL,'60wqz7KzyCDCHVNaavhQUA','','',60,3600);
-INSERT INTO wobject VALUES (1,NULL,'fhevmqeVTLRCmI_z-NidQQ','','',60,3600);
-
+CREATE TABLE `Article` (
+  `linkTitle` varchar(255) default NULL,
+  `linkURL` text,
+  `convertCarriageReturns` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `Article` VALUES ('','',0,'TKzUMeIxRLrZ3NAEez6CXQ','PBtmpl0000000000000002'),('','',0,'sWVXMZGibxHe2Ekj1DCldA','PBtmpl0000000000000002'),('','',0,'x_WjMvFmilhX-jvZuIpinw','PBtmpl0000000000000002');
+CREATE TABLE `Collaboration` (
+  `assetId` varchar(22) NOT NULL default '',
+  `postGroupId` varchar(22) NOT NULL default '2',
+  `moderateGroupId` varchar(22) NOT NULL default '4',
+  `moderatePosts` int(11) NOT NULL default '0',
+  `karmaPerPost` int(11) NOT NULL default '0',
+  `collaborationTemplateId` varchar(22) NOT NULL default '',
+  `threadTemplateId` varchar(22) NOT NULL default '',
+  `postFormTemplateId` varchar(22) NOT NULL default '',
+  `searchTemplateId` varchar(22) NOT NULL default '',
+  `notificationTemplateId` varchar(22) NOT NULL default '',
+  `sortBy` varchar(35) NOT NULL default 'dateUpdated',
+  `sortOrder` varchar(4) NOT NULL default 'desc',
+  `usePreview` int(11) NOT NULL default '1',
+  `addEditStampToPosts` int(11) NOT NULL default '0',
+  `editTimeout` int(11) NOT NULL default '3600',
+  `attachmentsPerPost` int(11) NOT NULL default '0',
+  `filterCode` varchar(30) NOT NULL default 'javascript',
+  `useContentFilter` int(11) NOT NULL default '1',
+  `threads` int(11) NOT NULL default '0',
+  `views` int(11) NOT NULL default '0',
+  `replies` int(11) NOT NULL default '0',
+  `rating` int(11) NOT NULL default '0',
+  `lastPostId` varchar(22) default NULL,
+  `lastPostDate` bigint(20) default NULL,
+  `archiveAfter` int(11) NOT NULL default '31536000',
+  `postsPerPage` int(11) NOT NULL default '10',
+  `threadsPerPage` int(11) NOT NULL default '30',
+  `subscriptionGroupId` varchar(22) default NULL,
+  `allowReplies` int(11) NOT NULL default '0',
+  `displayLastReply` int(11) NOT NULL default '0',
+  `richEditor` varchar(22) NOT NULL default 'PBrichedit000000000002',
+  `karmaRatingMultiplier` int(11) NOT NULL default '0',
+  `karmaSpentToRate` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `Collaboration` VALUES ('DC1etlIaBRQitXnchZKvUw','3','4',0,0,'wCIc38CvNHUK7aY92Ww4SQ','PBtmpl0000000000000067','PBtmpl0000000000000114','PBtmpl0000000000000031','PBtmpl0000000000000027','lineage','asc',0,0,931536000,2,'none',0,5,2,0,0,NULL,NULL,31536000,10,1000,'a7jbpVdbzxchqtSj_9W71w',0,0,'PBrichedit000000000002',0,0);
+CREATE TABLE `DataForm` (
+  `acknowledgement` text,
+  `mailData` int(11) NOT NULL default '1',
+  `emailTemplateId` varchar(22) default NULL,
+  `acknowlegementTemplateId` varchar(22) default NULL,
+  `listTemplateId` varchar(22) default NULL,
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  `defaultView` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `DataForm` VALUES ('Thank you for telling your friends about WebGUI!',1,'PBtmpl0000000000000085','PBtmpl0000000000000104','PBtmpl0000000000000021','Szs5eev3OMssmnsyLRZmWA','PBtmpl0000000000000020',0);
+CREATE TABLE `DataForm_entry` (
+  `DataForm_entryId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) default NULL,
+  `username` varchar(255) default NULL,
+  `ipAddress` varchar(255) default NULL,
+  `submissionDate` int(11) NOT NULL default '0',
+  `assetId` varchar(22) default NULL,
+  PRIMARY KEY  (`DataForm_entryId`)
+) TYPE=MyISAM;
+CREATE TABLE `DataForm_entryData` (
+  `DataForm_entryId` varchar(22) NOT NULL default '',
+  `DataForm_fieldId` varchar(22) NOT NULL default '',
+  `value` text,
+  `assetId` varchar(22) default NULL,
+  PRIMARY KEY  (`DataForm_entryId`,`DataForm_fieldId`)
+) TYPE=MyISAM;
+CREATE TABLE `DataForm_field` (
+  `DataForm_fieldId` varchar(22) NOT NULL default '',
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `name` varchar(255) NOT NULL default '',
+  `status` varchar(35) default NULL,
+  `type` varchar(30) NOT NULL default '',
+  `possibleValues` text,
+  `defaultValue` text,
+  `width` int(11) default NULL,
+  `subtext` mediumtext,
+  `rows` int(11) default NULL,
+  `isMailField` int(11) NOT NULL default '0',
+  `label` varchar(255) default NULL,
+  `DataForm_tabId` varchar(22) NOT NULL default '0',
+  `vertical` smallint(1) default '1',
+  `extras` varchar(128) default NULL,
+  `assetId` varchar(22) default NULL,
+  PRIMARY KEY  (`DataForm_fieldId`)
+) TYPE=MyISAM;
+INSERT INTO `DataForm_field` VALUES ('1000',1,'from','required','email','','',0,'',0,1,'Your Email Address','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA'),('1001',2,'to','required','email','','',0,'',0,1,'Your Friends Email Address','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA'),('1002',3,'cc','hidden','email',NULL,NULL,0,NULL,NULL,1,'Cc','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA'),('1003',4,'bcc','hidden','email',NULL,NULL,0,NULL,NULL,1,'Bcc','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA'),('1004',5,'subject','hidden','text','','Cool CMS',0,'',0,1,'Subject','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA'),('1005',6,'url','visible','url','','http://www.plainblack.com/webgui',0,'',0,1,'URL','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA'),('1006',7,'message','required','textarea','','Hey I just wanted to tell you about this great program called WebGUI that I found: http://www.plainblack.com/webgui\r\n\r\nYou should really check it out.',34,'',6,0,'Message','0',1,NULL,'Szs5eev3OMssmnsyLRZmWA');
+CREATE TABLE `DataForm_tab` (
+  `label` varchar(255) NOT NULL default '',
+  `subtext` text,
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `DataForm_tabId` varchar(22) NOT NULL default '',
+  `assetId` varchar(22) default NULL
+) TYPE=MyISAM;
+CREATE TABLE `EventsCalendar` (
+  `calendarLayout` varchar(30) NOT NULL default 'list',
+  `paginateAfter` int(11) NOT NULL default '50',
+  `startMonth` varchar(35) NOT NULL default 'current',
+  `endMonth` varchar(35) NOT NULL default 'after12',
+  `defaultMonth` varchar(35) NOT NULL default 'current',
+  `eventTemplateId` varchar(22) default NULL,
+  `scope` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `EventsCalendar_event` (
+  `description` text,
+  `eventStartDate` bigint(20) default NULL,
+  `eventEndDate` bigint(20) default NULL,
+  `EventsCalendar_recurringId` varchar(22) default NULL,
+  `eventLocation` text,
+  `templateId` varchar(22) default NULL,
+  `assetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`),
+  KEY `EventsCalendar1` (`eventEndDate`,`eventStartDate`)
+) TYPE=MyISAM;
+CREATE TABLE `FileAsset` (
+  `assetId` varchar(22) NOT NULL default '',
+  `storageId` varchar(22) NOT NULL default '',
+  `filename` varchar(255) NOT NULL default '',
+  `olderVersions` text,
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Folder` (
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `Folder` VALUES ('PBasset000000000000002','PBtmpl0000000000000078'),('Wmjn6I1fe9DKhiIR39YC0g','PBtmpl0000000000000078'),('UE5_3bD7kWDLUN2B-iuNuA','PBtmpl0000000000000078'),('RTsbVBEYnn3OPZWmXyIFhQ','PBtmpl0000000000000078'),('HCQF9FBLWK3Se06yGLoliw','PBtmpl0000000000000078'),('79BY6IHpAtE2yuQwROh9tg','PBtmpl0000000000000078'),('ZexTeuMQaZ1fh4FOpLNlYw','PBtmpl0000000000000078'),('_r8Y0WwiHLyVEFe5M0idYQ','PBtmpl0000000000000078'),('Mkc1dJDw-lqExS5uy7QReA','PBtmpl0000000000000078'),('zyS1TsKDvBk7Y55_GlWgxA','PBtmpl0000000000000078'),('CDzQSnxPMWCy2j5ZOxWbrw','PBtmpl0000000000000078'),('RPo_G59wjPTGE1-IhiE44A','PBtmpl0000000000000078'),('Oq61G3_QSM5TzArFUzUBiA','PBtmpl0000000000000078'),('jcIZMBAyEcmXktAVwPxgIw','PBtmpl0000000000000078'),('ThLKZPeKbRAVEYTkKAxeCg','PBtmpl0000000000000078'),('8r4-zJ6g-qOecM1PsvADbQ','PBtmpl0000000000000078'),('ECq9dLm5vmh4t963yDx1og','PBtmpl0000000000000078'),('PNGrWdYDhJZTv1-sAX6W1Q','PBtmpl0000000000000078'),('guQGD9YiTn55PqOUTjCc0A','PBtmpl0000000000000078'),('-MlWyWh12ibRM8gAzRy41g','PBtmpl0000000000000078'),('VvgRRrE6UsmWi7y7hMCXbw','PBtmpl0000000000000078'),('j3yljeaT2y9fLkSHM5Zbow','PBtmpl0000000000000078'),('2jkEIs9YpL10dZsA3RH4sw','PBtmpl0000000000000078'),('5SdElAemaCKBfheDk7rz8A','PBtmpl0000000000000078'),('arabONid_vy2W6cALhELxA','PBtmpl0000000000000078'),('sb7g8aCLMq-XigfBdmw2cg','PBtmpl0000000000000078'),('BAoMajIxnoGlrxhDVgot9g','PBtmpl0000000000000078'),('b26vQzyaqz0EBMWH_oPdrg','PBtmpl0000000000000078'),('jCMdSbD6IA535I16Pcik7Q','PBtmpl0000000000000078'),('-Kmb-MEV4ni9d0tn_BYGXA','PBtmpl0000000000000078'),('ZWv7HLTQ4oERBIFJHBz1Ow','PBtmpl0000000000000078'),('RcOR25DbCizyAfNWvr-2ow','PBtmpl0000000000000078'),('59f_y-iE0k8dSMVIyX5SBg','PBtmpl0000000000000078'),('2DAYoiOdplxZCrEwmrVhwQ','PBtmpl0000000000000078'),('tJ_X5F3Dkaz8vO6CigbJrg','PBtmpl0000000000000078'),('Fh_KALcbkc8CkBR3I6dU0g','PBtmpl0000000000000078'),('WTPOJerammxgkIdCWnR9uw','PBtmpl0000000000000078'),('PttBzI13R8HXqQn40I4UFg','PBtmpl0000000000000078'),('VdTZ8_2vlZwVVuv_I7DsWA','PBtmpl0000000000000078'),('BBoAtdsTo2AGPe4k9kfkxA','PBtmpl0000000000000078'),('A-m4h7Q3LYt61G54zpEGqA','PBtmpl0000000000000078'),('Wquzj9XSpxL_gpGXkoU6tg','PBtmpl0000000000000078'),('J1uh__tKV2BARcSeFE7MSg','PBtmpl0000000000000078'),('7EfoKU41oB0ZU6NmVIud4A','PBtmpl0000000000000078'),('n1xT2JUidbeqNMN2zyvHAQ','PBtmpl0000000000000078'),('mKI2EjkU9QH6dJKkx7VEvw','PBtmpl0000000000000078'),('HOleaBMUZT6B5qJmbcV5xg','PBtmpl0000000000000078'),('L070eyyGhoWx5cSUeNRrow','PBtmpl0000000000000078'),('c3jDvo_bK3jFqjIefgXjUw','PBtmpl0000000000000078'),('VnUEcXfsbwgB5rqslQ3n1A','PBtmpl0000000000000078'),('6MrxI11jyXuB-UUrX69lXQ','PBtmpl0000000000000078'),('xxuM0xMjhIA3lFq99GY05Q','PBtmpl0000000000000078'),('kHlR8-nCFRrwlEV1uapu_Q','PBtmpl0000000000000078'),('r4FQlrIkS1_MTuk-vVqRNg','PBtmpl0000000000000078'),('EvgkCMpx4kUonmjhhZXRjg','PBtmpl0000000000000078'),('I2DQUdFVd9FtcSealp4cTQ','PBtmpl0000000000000078'),('khkob2AmnIKAxKJeXHE3fQ','PBtmpl0000000000000078'),('h34TI6OYynW5Q_FYLbZiig','PBtmpl0000000000000078'),('i7emhSfswYNreLAwn1wBRw','PBtmpl0000000000000078'),('o9PZOa7fy9AZa8fKmhoPrQ','PBtmpl0000000000000078'),('eLdzeSyvZfml-YVFfgUiaw','PBtmpl0000000000000078'),('ffWKX2dW4t1eWgfNng605w','PBtmpl0000000000000078'),('QWS2acYOu3Y4uNsWvVChTg','PBtmpl0000000000000078'),('lUjGdT_Hhi_EFhsYr1Ouyw','PBtmpl0000000000000078'),('7Xhdnqu3qkDWHEnRgk6Uzw','PBtmpl0000000000000078'),('xPyASYtR44mpDk3ba4YyIg','PBtmpl0000000000000078'),('S99spbsvn96tgRA0oVUl2A','PBtmpl0000000000000078'),('Rn5Ef8vMDQ0ebtaxS_-JXA',''),('60wqz7KzyCDCHVNaavhQUA',''),('fhevmqeVTLRCmI_z-NidQQ','');
+CREATE TABLE `HttpProxy` (
+  `proxiedUrl` varchar(255) default NULL,
+  `timeout` int(11) default NULL,
+  `removeStyle` int(11) default NULL,
+  `filterHtml` varchar(30) default NULL,
+  `followExternal` int(11) default NULL,
+  `followRedirect` int(11) default NULL,
+  `cacheHttp` int(11) default '0',
+  `useCache` int(11) default '0',
+  `debug` int(11) default '0',
+  `rewriteUrls` int(11) default NULL,
+  `searchFor` varchar(255) default NULL,
+  `stopAt` varchar(255) default NULL,
+  `cookieJarStorageId` varchar(22) default NULL,
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `ITransact_recurringStatus` (
+  `gatewayId` varchar(128) NOT NULL default '',
+  `initDate` int(11) NOT NULL default '0',
+  `lastTransaction` int(11) NOT NULL default '0',
+  `status` varchar(10) NOT NULL default '',
+  `errorMessage` varchar(128) default NULL,
+  `recipe` varchar(15) NOT NULL default '',
+  PRIMARY KEY  (`gatewayId`)
+) TYPE=MyISAM;
+CREATE TABLE `ImageAsset` (
+  `assetId` varchar(22) NOT NULL default '',
+  `thumbnailSize` int(11) NOT NULL default '50',
+  `parameters` text,
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `IndexedSearch` (
+  `indexName` varchar(35) default 'Search_index',
+  `users` text,
+  `searchRoot` text,
+  `pageList` text,
+  `namespaces` text,
+  `paginateAfter` int(11) default NULL,
+  `languages` text,
+  `contentTypes` text,
+  `previewLength` int(11) default NULL,
+  `highlight` int(11) default NULL,
+  `highlight_1` varchar(35) default NULL,
+  `highlight_2` varchar(35) default NULL,
+  `highlight_3` varchar(35) default NULL,
+  `highlight_4` varchar(35) default NULL,
+  `highlight_5` varchar(35) default NULL,
+  `forceSearchRoots` smallint(1) default '1',
+  `linkURL` text,
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `IndexedSearch_default` (
+  `param` varchar(16) binary NOT NULL default '',
+  `value` varchar(255) default NULL,
+  PRIMARY KEY  (`param`)
+) TYPE=MyISAM;
+INSERT INTO `IndexedSearch_default` VALUES ('',''),('protocol','40'),('num_of_docs','0'),('frontend','none'),('backend','phrase'),('table','IndexedSearch_default'),('index_splitter','/(\\w{2,$word_length})/g'),('word_id_table','IndexedSearch_default_words'),('count_bits','8'),('search_splitter','/(\\w{2,$word_length}\\*?)/g'),('data_table','IndexedSearch_default_data'),('name_length','255'),('position_bits','32'),('blob_direct_fetc','20'),('filter','map { lc $_ if ($_ !~ /\\^.*;/) }'),('doc_id_bits','16'),('init_env',''),('stemmer',NULL),('word_length','20'),('stoplist',NULL),('word_id_bits','16'),('max_doc_id','10');
+CREATE TABLE `IndexedSearch_default_data` (
+  `word_id` smallint(5) unsigned NOT NULL default '0',
+  `doc_id` smallint(5) unsigned NOT NULL default '0',
+  `idx` longblob NOT NULL,
+  KEY `word_id` (`word_id`),
+  KEY `doc_id` (`doc_id`)
+) TYPE=MyISAM;
+INSERT INTO `IndexedSearch_default_data` VALUES (1,1,'Y\0\0\0'),(2,1,'<\0\0\0'),(3,1,':\0\0\0'),(4,1,'X\0\0\0'),(5,1,'$\0\0\0'),(6,1,'H\0\0\0Z\0\0\0'),(7,1,'S\0\0\0'),(8,1,'L\0\0\0'),(9,1,'?\0\0\0'),(10,1,'\0\0\0\r\0\0\0A\0\0\0'),(11,1,'\0\0\0'),(12,1,'T\0\0\0'),(13,1,';\0\0\0'),(14,1,'J\0\0\0'),(15,1,'&\0\0\0'),(16,1,'5\0\0\0>\0\0\0'),(17,1,'\0\0\0\0\0\0\0\0\0\0\0\0'),(18,1,'P\0\0\0'),(19,1,'4\0\0\0'),(20,1,'C\0\0\0'),(21,1,'\0\0\0'),(22,1,'-\0\0\03\0\0\0I\0\0\0K\0\0\0'),(23,1,'O\0\0\0'),(24,1,'G\0\0\0'),(25,1,'B\0\0\0'),(26,1,'	\0\0\0\0\0\0\Z\0\0\0'),(27,1,'\n\0\0\0\0\0\0'),(28,1,'\0\0\0\0\0\0\0\0\0)\0\0\0'),(29,1,'\'\0\0\0'),(30,1,'\0\0\0'),(31,1,'7\0\0\0'),(32,1,'/\0\0\0'),(33,1,'\0\0\0'),(34,1,'M\0\0\0'),(35,1,'@\0\0\0'),(36,1,'.\0\0\06\0\0\0'),(37,1,'\0\0\0'),(38,1,'F\0\0\0'),(39,1,'\0\0\0U\0\0\0'),(40,1,'#\0\0\0'),(41,1,'8\0\0\0'),(42,1,'\0\0\0'),(43,1,'\"\0\0\0+\0\0\0D\0\0\0'),(44,1,'\0\0\0'),(45,1,'\0\0\0'),(46,1,'R\0\0\0'),(47,1,'\0\0\0%\0\0\0'),(48,1,'\0\0\0'),(49,1,'!\0\0\0'),(50,1,'(\0\0\0'),(51,1,'\0\0\0'),(52,1,'\0\0\0N\0\0\0W\0\0\0'),(53,1,'\0\0\0'),(54,1,'9\0\0\0'),(55,1,',\0\0\0'),(56,1,'2\0\0\0'),(57,1,'*\0\0\0'),(58,1,'E\0\0\0'),(59,1,'1\0\0\0'),(60,1,'\0\0\0'),(61,1,' \0\0\0'),(62,1,'\0\0\0'),(63,1,'\0\0\0'),(64,1,'0\0\0\0Q\0\0\0'),(65,1,'=\0\0\0'),(66,1,'V\0\0\0'),(67,2,'\0\0\0'),(68,2,'\0\0'),(69,2,'\0\0\0\0\0\0%\0\0\0(\0\0\02\0\0\07\0\0\0A\0\0\0\\\0\0\0¢\0\0\0Ô\0\0\0ˇ\0\0\0'),(70,2,'S\0\0\0'),(71,2,'\0\0\0à\0\0\0'),(72,2,'\0\0\0\0\0\0'),(73,2,'\0\0\0'),(74,2,'y\0\0\0'),(75,2,'!\0\0\04\0\0\0'),(76,2,'—\0\0\0'),(77,2,'Ä\0\0\0'),(78,2,'\0\0\0'),(79,2,'+\0\0\0'),(80,2,';\0\0\0'),(81,2,'ü\0\0\0'),(10,2,'\0\0\0\0\0\0L\0\0\0T\0\0\0z\0\0\0ì\0\0\0®\0\0\0º\0\0\0¿\0\0\0‰\0\0\0Û\0\0\0˙\0\0\0\0\0'),(82,2,'k\0\0\0√\0\0\0˚\0\0\0'),(12,2,',\0\0\0F\0\0\0b\0\0\0i\0\0\0'),(83,2,'“\0\0\0'),(84,2,'t\0\0\0Ö\0\0\0'),(85,2,'π\0\0\0'),(16,2,'*\0\0\0<\0\0\0É\0\0\0ù\0\0\0ƒ\0\0\0Ÿ\0\0\0\0\0'),(86,2,'n\0\0\0'),(87,2,'=\0\0\0'),(21,2,'O\0\0\0\0\0'),(22,2,'ó\0\0\0Ì\0\0\0˘\0\0\0'),(88,2,'\0\0'),(25,2,'á\0\0\0ï\0\0\0'),(26,2,'d\0\0\0p\0\0\0'),(89,2,'«\0\0\0'),(90,2,'@\0\0\0'),(91,2,'.\0\0\0'),(92,2,'Ï\0\0\0'),(29,2,'M\0\0\0'),(93,2,'G\0\0\0'),(94,2,'‡\0\0\0'),(33,2,'â\0\0\0é\0\0\0¥\0\0\0'),(95,2,'\n\0\0\0'),(96,2,'∑\0\0\0'),(34,2,'\0\0\0\0\0\0B\0\0\0–\0\0\0'),(97,2,'Õ\0\0\0'),(98,2,'õ\0\0\0≈\0\0\0'),(99,2,'\'\0\0\0'),(100,2,'Æ\0\0\0'),(101,2,'◊\0\0\0'),(102,2,'æ\0\0\0'),(46,2,'R\0\0\0™\0\0\0'),(103,2,'_\0\0\0'),(104,2,'0\0\0\0'),(105,2,'Ë\0\0\0'),(106,2,'5\0\0\0`\0\0\0ë\0\0\0Ω\0\0\0¬\0\0\0'),(47,2,'œ\0\0\0'),(107,2,'	\0\0\0'),(108,2,'\0\0\0'),(109,2,'Ê\0\0\0'),(110,2,'3\0\0\0]\0\0\0'),(111,2,'6\0\0\0'),(51,2,'ﬁ\0\0\0'),(112,2,'í\0\0\0'),(113,2,'\0\0'),(114,2,'#\0\0\0P\0\0\0'),(115,2,'[\0\0\0'),(116,2,'s\0\0\0'),(117,2,'Ü\0\0\0'),(118,2,'Œ\0\0\0'),(119,2,'≠\0\0\0'),(120,2,'J\0\0\0'),(121,2,'•\0\0\0€\0\0\0'),(122,2,'\0\0'),(123,2,'e\0\0\0'),(124,2,'8\0\0\0'),(125,2,'„\0\0\0'),(64,2,'o\0\0\0©\0\0\0'),(126,2,'j\0\0\0'),(63,2,'\0\0\0'),(127,2,'1\0\0\0'),(128,2,'å\0\0\0'),(129,2,'‹\0\0\0'),(130,2,'&\0\0\0'),(131,2,' \0\0\0-\0\0\0c\0\0\0¶\0\0\0'),(132,2,'\0\0\0î\0\0\0'),(1,2,'$\0\0\0Q\0\0\0x\0\0\0ê\0\0\0'),(133,2,'^\0\0\0Ñ\0\0\0ä\0\0\0'),(134,2,'˛\0\0\0'),(135,2,'|\0\0\0'),(136,2,'f\0\0\0'),(137,2,'≥\0\0\0'),(11,2,'‚\0\0\0'),(138,2,'∞\0\0\0'),(14,2,'q\0\0\0'),(139,2,'\Z\0\0\0E\0\0\0è\0\0\0ß\0\0\0ª\0\0\0'),(140,2,'\0\0\0'),(141,2,'u\0\0\0'),(142,2,'\r\0\0'),(143,2,'w\0\0\0'),(144,2,'ö\0\0\0'),(145,2,'Â\0\0\0Á\0\0\0ˆ\0\0\0'),(146,2,'C\0\0\0'),(147,2,'‘\0\0\0'),(148,2,'ﬂ\0\0\0'),(27,2,'\0\0\0\0\0\0H\0\0\0'),(149,2,'ò\0\0\0'),(28,2,'\0\0\0:\0\0\0X\0\0\0†\0\0\0¨\0\0\0Ø\0\0\0∂\0\0\0 \0\0\0Î\0\0\0Ò\0\0\0\0\0\0\0\0\n\0\0'),(30,2,'\0\0\0'),(150,2,'Í\0\0\0	\0\0'),(151,2,'±\0\0\0'),(152,2,'>\0\0\0'),(153,2,'l\0\0\0{\0\0\0£\0\0\0'),(154,2,'~\0\0\0'),(39,2,'\0\0\0∫\0\0\0'),(155,2,'r\0\0\0'),(156,2,'\0\0\0'),(157,2,'ÿ\0\0\0'),(158,2,'À\0\0\0'),(42,2,'˜\0\0\0'),(43,2,'Z\0\0\0v\0\0\0\0\0'),(159,2,'\0\0\0I\0\0\0'),(160,2,'9\0\0\0W\0\0\0´\0\0\0'),(161,2,'\0\0\0'),(162,2,'m\0\0\0§\0\0\0'),(163,2,'ã\0\0\0'),(164,2,'g\0\0\0≤\0\0\0'),(165,2,'\"\0\0\0'),(166,2,'\0\0'),(167,2,'\0\0'),(48,2,'˝\0\0\0'),(168,2,'ı\0\0\0'),(169,2,'U\0\0\0'),(170,2,'¡\0\0\0'),(171,2,'\0\0\0'),(49,2,'÷\0\0\0Ù\0\0\0'),(172,2,'a\0\0\0h\0\0\0'),(173,2,'…\0\0\0'),(174,2,'K\0\0\0'),(175,2,'D\0\0\0Ó\0\0\0'),(52,2,'È\0\0\0\0\0'),(176,2,'û\0\0\0⁄\0\0\0'),(177,2,'”\0\0\0'),(178,2,'µ\0\0\0'),(179,2,'V\0\0\0'),(180,2,'¯\0\0\0'),(181,2,'\0\0\0\0\0\0'),(182,2,'ø\0\0\0'),(183,2,'\0\0\0'),(184,2,'?\0\0\0'),(59,2,')\0\0\0'),(185,2,'›\0\0\0¸\0\0\0'),(186,2,'/\0\0\0Y\0\0\0'),(187,2,'Ç\0\0\0'),(188,2,'ô\0\0\0'),(60,2,'·\0\0\0'),(61,2,'\r\0\0\0\0\0\0ç\0\0\0Ú\0\0\0'),(189,2,'Å\0\0\0»\0\0\0'),(190,2,'ú\0\0\0°\0\0\0∆\0\0\0'),(191,2,'}\0\0\0'),(192,2,'N\0\0\0'),(193,2,'\0\0'),(194,2,'Ã\0\0\0'),(195,2,'’\0\0\0'),(196,2,'∏\0\0\0'),(197,2,'ñ\0\0\0'),(67,3,'w\0\0\0'),(198,3,'4\0\0\0P\0\0\0ù\0\0\0'),(69,3,'\0\0\0\0\0\0(\0\0\0K\0\0\0]\0\0\0c\0\0\0t\0\0\0É\0\0\0é\0\0\0†\0\0\0©\0\0\0Ω\0\0\0Õ\0\0\0Ì\0\0\0'),(199,3,'z\0\0\0'),(200,3,'≈\0\0\0'),(71,3,'\0\0\0Ï\0\0\0'),(201,3,'@\0\0\0g\0\0\0'),(202,3,'û\0\0\0'),(76,3,'N\0\0\0v\0\0\0Â\0\0\0'),(203,3,')\0\0\0è\0\0\0'),(204,3,'®\0\0\0'),(10,3,'\0\0\0€\0\0\0·\0\0\0Î\0\0\0Ù\0\0\0'),(82,3,'∫\0\0\0'),(12,3,'%\0\0\0f\0\0\0r\0\0\0õ\0\0\0¢\0\0\0Æ\0\0\0“\0\0\0Ú\0\0\0'),(16,3,'\0\0\0o\0\0\0î\0\0\0¿\0\0\0'),(205,3,'5\0\0\0Q\0\0\0'),(206,3,'3\0\0\0'),(207,3,'Á\0\0\0'),(208,3,'Ä\0\0\0'),(22,3,'X\0\0\0ﬂ\0\0\0'),(209,3,'ø\0\0\0'),(25,3,'ó\0\0\0'),(210,3,'ï\0\0\0'),(26,3,'\0\0\0'),(90,3,'È\0\0\0'),(89,3,'M\0\0\0'),(211,3,'p\0\0\0'),(33,3,'\r\0\0\0'),(34,3,'l\0\0\0Ñ\0\0\0'),(212,3,'9\0\0\0B\0\0\0'),(213,3,'\n\0\0\0'),(214,3,'\0\0\0'),(100,3,'}\0\0\0'),(46,3,'i\0\0\0'),(215,3,'ﬁ\0\0\0'),(216,3,'E\0\0\0'),(217,3,'1\0\0\0b\0\0\0'),(218,3,'u\0\0\0'),(219,3,'\0\0\0'),(220,3,'\0\0\0'),(106,3,'\0\0\0-\0\0\0=\0\0\0_\0\0\0n\0\0\0Å\0\0\0Ü\0\0\0ö\0\0\0—\0\0\0'),(221,3,'?\0\0\0â\0\0\0«\0\0\0'),(222,3,'Ò\0\0\0'),(223,3,'\"\0\0\0'),(110,3,'	\0\0\0^\0\0\0'),(224,3,'G\0\0\0\0\0\0π\0\0\0'),(225,3,'ì\0\0\0'),(226,3,'Ë\0\0\0'),(113,3,'•\0\0\0™\0\0\0'),(227,3,'Ó\0\0\0'),(228,3,'À\0\0\0'),(229,3,'\0\0\0'),(230,3,'7\0\0\0'),(231,3,'æ\0\0\0'),(232,3,'\0\0\0'),(233,3,'\0\0\0\0\0\0›\0\0\0'),(234,3,'J\0\0\0'),(235,3,'\0\0\0'),(236,3,'±\0\0\0√\0\0\0'),(237,3,'‰\0\0\0'),(238,3,'.\0\0\0`\0\0\0∞\0\0\0≤\0\0\0¬\0\0\0ƒ\0\0\0'),(239,3,'T\0\0\0'),(240,3,'\0\0\0\0\0\08\0\0\0'),(241,3,'∑\0\0\0'),(131,3,'¶\0\0\0¨\0\0\0¥\0\0\0–\0\0\0'),(133,3,'\0\0\0'),(1,3,'\0\0\0\\\0\0\0'),(242,3,'‹\0\0\0'),(4,3,'I\0\0\0ñ\0\0\0'),(243,3,'‡\0\0\0'),(244,3,'\0\0\0'),(245,3,'e\0\0\0'),(7,3,'ç\0\0\0'),(246,3,'>\0\0\0'),(247,3,'Ê\0\0\0'),(11,3,'„\0\0\0'),(138,3,'j\0\0\0'),(248,3,'W\0\0\0'),(14,3,'å\0\0\0'),(139,3,'$\0\0\0q\0\0\0~\0\0\0á\0\0\0'),(249,3,'ô\0\0\0Ø\0\0\0”\0\0\0'),(18,3,':\0\0\0C\0\0\0'),(250,3,'!\0\0\0'),(251,3,'Ô\0\0\0'),(252,3,'Ç\0\0\0'),(253,3,'\Z\0\0\0\'\0\0\0'),(254,3,'ë\0\0\0'),(28,3,' \0\0\0+\0\0\06\0\0\0;\0\0\0D\0\0\0x\0\0\0≠\0\0\0Ÿ\0\0\0'),(255,3,'\0\0\0'),(256,3,'µ\0\0\0'),(257,3,'y\0\0\0'),(258,3,'2\0\0\0{\0\0\0ä\0\0\0'),(259,3,'\0\0\0'),(35,3,'R\0\0\0'),(260,3,'\0\0\0'),(261,3,'í\0\0\0 \0\0\0'),(39,3,'s\0\0\0ú\0\0\0£\0\0\0ı\0\0\0'),(262,3,'[\0\0\0ê\0\0\0'),(158,3,'’\0\0\0'),(43,3,'\0\0\0/\0\0\0F\0\0\0S\0\0\0V\0\0\0a\0\0\0à\0\0\0ò\0\0\0§\0\0\0∂\0\0\0∏\0\0\0…\0\0\0œ\0\0\0'),(44,3,'O\0\0\0'),(263,3,'Z\0\0\0'),(264,3,'≥\0\0\0'),(160,3,'*\0\0\0'),(163,3,'#\0\0\0'),(265,3,'\0\0\0\0\0\0'),(266,3,'º\0\0\0'),(267,3,'L\0\0\0'),(268,3,'¡\0\0\0'),(165,3,'H\0\0\0'),(269,3,'◊\0\0\0'),(167,3,'&\0\0\0´\0\0\0Û\0\0\0'),(48,3,'\0\0\0Y\0\0\0'),(168,3,'h\0\0\0'),(172,3,'ÿ\0\0\0'),(49,3,'|\0\0\0ã\0\0\0‘\0\0\0Í\0\0\0'),(270,3,'k\0\0\0'),(271,3,'0\0\0\0'),(176,3,'∆\0\0\0'),(272,3,'\0\0\0'),(273,3,'A\0\0\0'),(60,3,'‚\0\0\0'),(190,3,'ü\0\0\0Ã\0\0\0'),(274,3,'d\0\0\0'),(275,3,'U\0\0\0'),(276,3,',\0\0\0<\0\0\0m\0\0\0Ö\0\0\0'),(277,3,'÷\0\0\0'),(278,3,'ß\0\0\0ª\0\0\0'),(279,3,'Œ\0\0\0'),(195,3,'»\0\0\0'),(280,3,'°\0\0\0⁄\0\0\0'),(281,4,'\0\0\0'),(12,4,'\0\0\0'),(282,4,'\0\0\0'),(281,5,'\0\0\0'),(12,5,'\0\0\0'),(282,5,'\0\0\0'),(283,5,'\0\0\0'),(284,6,'\0\0\0'),(285,7,'\0\0\0'),(286,8,'\0\0\0'),(287,9,'\0\0\0'),(235,10,'\0\0\0');
+CREATE TABLE `IndexedSearch_default_words` (
+  `word` varchar(20) binary NOT NULL default '',
+  `id` smallint(5) unsigned NOT NULL auto_increment,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `word` (`word`)
+) TYPE=MyISAM;
+INSERT INTO `IndexedSearch_default_words` VALUES ('that',1),('projects',2),('governments',3),('on',4),('business',5),('list',6),('reason',7),('them',8),('individuals',9),('webgui',10),('black',11),('your',12),('clubs',13),('some',14),('but',15),('and',16),('welcome',17),('here',18),('small',19),('over',20),('system',21),('of',22),('found',23),('brief',24),('all',25),('is',26),('web',27),('to',28),('powerful',29),('home',30),('businesses',31),('enterprise',32),('it',33),('can',34),('using',35),('large',36),('right',37),('today',38),('site',39),('average',40),('schools',41),('made',42),('the',43),('done',44),('designed',45),('no',46),('user',47),('this',48),('for',49),('enough',50),('by',51),('be',52),('management',53),('universities',54),('needs',55),('thousands',56),('satisfy',57),('world',58),('are',59),('plain',60),('use',61),('friendly',62),('easy',63),('there',64),('communities',65),('shouldn',66),('want',67),('fuss',68),('you',69),('two',70),('if',71),('key',72),('key_benefits',73),('makes',74),('editing',75),('also',76),('always',77),('unique',78),('what',79),('install',80),('aids',81),('functions',82),('adjust',83),('technology',84),('lingual',85),('though',86),('learn',87),('still',88),('have',89),('programs',90),('will',91),('think',92),('trusty',93),('when',94),('bold',95),('build',96),('15',97),('online',98),('where',99),('yourself',100),('dates',101),('fact',102),('restricted',103),('like',104),('wouldn',105),('in',106),('weight',107),('inline',108),('knew',109),('re',110),('addition',111),('mind',112),('add',113),('ensures',114),('same',115),('cool',116),('after',117),('languages',118),('limit',119),('flexible',120),('localized',121),('features',122),('laid',123),('don',124),('created',125),('navigation',126),('while',127),('why',128),('oddities',129),('know',130),('content',131),('has',132),('not',133),('allows',134),('our',135),('out',136),('timezone',137),('one',138),('with',139),('manage',140),('behind',141),('core',142),('scenes',143),('cuts',144),('we',145),('edit',146),('local',147),('design',148),('wizards',149),('able',150),('language',151),('any',152),('work',153),('concern',154),('pretty',155),('then',156),('times',157),('more',158),('browser',159),('need',160),('font',161),('faster',162),('useful',163),('or',164),('interface',165),('upgrade',166),('new',167),('so',168),('sites',169),('built',170),('wysiwyg',171),('how',172),('translated',173),('designs',174),('everything',175),('other',176),('their',177),('snap',178),('ever',179),('most',180),('benefits',181),('even',182),('dt',183),('complicated',184),('pluggable',185),('look',186),('usability',187),('short',188),('been',189),('help',190),('first',191),('templating',192),('without',193),('than',194),('settings',195),('multi',196),('kinds',197),('these',198),('another',199),('many',200),('password',201),('controls',202),('ll',203),('lets',204),('steps',205),('follow',206),('several',207),('privileges',208),('users',209),('menus',210),('mess',211),('click',212),('reading',213),('ve',214),('copy',215),('turn',216),('administrator',217),('might',218),('got',219),('order',220),('admin',221),('enjoy',222),('anything',223),('administrative',224),('buttons',225),('support',226),('run',227),('toolbars',228),('means',229),('get',230),('control',231),('trivial',232),('getting',233),('note',234),('message',235),('well',236),('software',237),('as',238),('block',239),('started',240),('clipboard',241),('consider',242),('ruling',243),('trouble',244),('change',245),('username',246),('provides',247),('top',248),('pages',249),('do',250),('into',251),('case',252),('installation',253),('notice',254),('good',255),('from',256),('create',257),('account',258),('running',259),('job',260),('little',261),('now',262),('page',263),('paste',264),('getting_started',265),('let',266),('could',267),('groups',268),('about',269),('else',270),('default',271),('up',272),('123qwe',273),('should',274),('at',275),('log',276),('information',277),('menu',278),('manipulate',279),('administer',280),('email',281),('address',282),('friends',283),('cc',284),('bcc',285),('subject',286),('url',287);
+CREATE TABLE `IndexedSearch_docInfo` (
+  `docId` int(11) NOT NULL default '0',
+  `indexName` varchar(35) NOT NULL default 'Search_index',
+  `assetId` varchar(22) default NULL,
+  `groupIdView` varchar(22) default NULL,
+  `special_groupIdView` varchar(22) default NULL,
+  `namespace` varchar(35) default NULL,
+  `location` varchar(255) default NULL,
+  `headerShortcut` text,
+  `bodyShortcut` text,
+  `contentType` text NOT NULL,
+  `ownerId` varchar(22) default NULL,
+  `dateIndexed` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`docId`,`indexName`)
+) TYPE=MyISAM;
+INSERT INTO `IndexedSearch_docInfo` VALUES (1,'IndexedSearch_default','TKzUMeIxRLrZ3NAEez6CXQ','7','7','Article','/home/welcome','select title from asset where assetId = \'TKzUMeIxRLrZ3NAEez6CXQ\'','select description from wobject where assetId = \'TKzUMeIxRLrZ3NAEez6CXQ\'','content','3',1109980803),(2,'IndexedSearch_default','sWVXMZGibxHe2Ekj1DCldA','7','7','Article','/home/key_benefits','select title from asset where assetId = \'sWVXMZGibxHe2Ekj1DCldA\'','select description from wobject where assetId = \'sWVXMZGibxHe2Ekj1DCldA\'','content','3',1109980804),(3,'IndexedSearch_default','x_WjMvFmilhX-jvZuIpinw','7','7','Article','/getting_started/getting_started','select title from asset where assetId = \'x_WjMvFmilhX-jvZuIpinw\'','select description from wobject where assetId = \'x_WjMvFmilhX-jvZuIpinw\'','content','3',1109980804),(4,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1000\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1000\'','content','3',1109980804),(5,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1001\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1001\'','content','3',1109980804),(6,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1002\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1002\'','content','3',1109980804),(7,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1003\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1003\'','content','3',1109980804),(8,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1004\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1004\'','content','3',1109980804),(9,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1005\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1005\'','content','3',1109980804),(10,'IndexedSearch_default','Szs5eev3OMssmnsyLRZmWA','7','7','DataForm_field','/tell_a_friend/tell_a_friend','select label from DataForm_field where DataForm_fieldId = \'1006\'','select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'1006\'','content','3',1109980804);
+CREATE TABLE `Layout` (
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  `contentPositions` text,
+  `assetsToHide` text,
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `Layout` VALUES ('68sKwDgf9cGH58-NZcU4lg','PBtmpl0000000000000054','TKzUMeIxRLrZ3NAEez6CXQ,sWVXMZGibxHe2Ekj1DCldA',NULL),('_iHetEvMQUOoxS-T2CM0sQ','PBtmpl0000000000000054','x_WjMvFmilhX-jvZuIpinw',NULL),('8Bb8gu-me2mhL3ljFyiWLg','PBtmpl0000000000000054','DC1etlIaBRQitXnchZKvUw',NULL),('2TqQc4OISddWCZmRY1_m8A','PBtmpl0000000000000054','fK-HMSboA3uu0c1KYkYspA',NULL),('Swf6L8poXKc7hUaNPkBevw','PBtmpl0000000000000054','Szs5eev3OMssmnsyLRZmWA',NULL),('x3OFY6OJh_qsXkZfPwug4A','PBtmpl0000000000000054','pJd5TLAjfWMVXD6sCRLwUg',NULL);
+CREATE TABLE `MessageBoard` (
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Navigation` (
+  `assetId` varchar(22) NOT NULL default '',
+  `assetsToInclude` text,
+  `startType` varchar(35) default NULL,
+  `startPoint` varchar(255) default NULL,
+  `descendantEndPoint` int(11) NOT NULL default '55',
+  `showSystemPages` int(11) NOT NULL default '0',
+  `showHiddenPages` int(11) NOT NULL default '0',
+  `showUnprivilegedPages` int(11) NOT NULL default '0',
+  `templateId` varchar(22) NOT NULL default '',
+  `ancestorEndPoint` int(11) NOT NULL default '55',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `Navigation` VALUES ('pJd5TLAjfWMVXD6sCRLwUg','descendants','specificUrl','root',55,0,0,0,'PBtmpl0000000000000048',55),('PBnav00000000000000001','self\nancestors','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000093',55),('PBnav00000000000000014','pedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55),('PBnav00000000000000015','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000048',55),('PBnav00000000000000016','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000108',55),('PBnav00000000000000017','self\nsiblings','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000117',55),('PBnav00000000000000018','descendants','relativeToCurrentUrl','-1',1,0,0,0,'PBtmpl0000000000000048',55),('PBnav00000000000000019','descendants','relativeToCurrentUrl','-1',1,0,0,0,'PBtmpl0000000000000108',55),('PBnav00000000000000020','descendants','relativeToRoot','0',1,0,0,0,'PBtmpl0000000000000108',55),('PBnav00000000000000021','descendants','specificUrl','home',3,0,0,0,'PBtmpl0000000000000117',55),('PBnav00000000000000002','descendants','specificUrl','home',3,0,0,0,'PBtmpl0000000000000048',55),('PBnav00000000000000006','descendants','specificUrl','home',1,0,0,0,'PBtmpl0000000000000108',55),('PBnav00000000000000007','descendants','relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000048',55),('PBnav00000000000000008','descendants','relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000108',55),('PBnav00000000000000009','descendants','relativeToRoot','0',1,0,0,0,'PBtmpl0000000000000124',55),('PBnav00000000000000010',NULL,'relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000117',55),('PBnav00000000000000011','self\ndescendants','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000130',55),('PBnav00000000000000012','descendants','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000134',55),('PBnav00000000000000013','self\ndescendants','relativeToCurrentUrl','0',55,0,0,0,'PBtmpl0000000000000136',55),('f2bihDeMoI-Ojt2dutJNQA',NULL,'relativeToRoot','1',1,0,0,0,'PBtmpl0000000000000071',55),('KZ2UytxNpbF-3Eg3RNvQQQ','descendants','relativeToCurrentUrl','0',1,0,0,0,'PBtmpl0000000000000075',55),('G0wlShbk_XruYVfbXqWq_w','ancestors\nself\npedigree','relativeToRoot','1',55,0,0,0,'PBtmpl0000000000000048',55);
+CREATE TABLE `Poll` (
+  `active` int(11) NOT NULL default '1',
+  `graphWidth` int(11) NOT NULL default '150',
+  `voteGroup` varchar(22) default NULL,
+  `question` varchar(255) default NULL,
+  `a1` varchar(255) default NULL,
+  `a2` varchar(255) default NULL,
+  `a3` varchar(255) default NULL,
+  `a4` varchar(255) default NULL,
+  `a5` varchar(255) default NULL,
+  `a6` varchar(255) default NULL,
+  `a7` varchar(255) default NULL,
+  `a8` varchar(255) default NULL,
+  `a9` varchar(255) default NULL,
+  `a10` varchar(255) default NULL,
+  `a11` varchar(255) default NULL,
+  `a12` varchar(255) default NULL,
+  `a13` varchar(255) default NULL,
+  `a14` varchar(255) default NULL,
+  `a15` varchar(255) default NULL,
+  `a16` varchar(255) default NULL,
+  `a17` varchar(255) default NULL,
+  `a18` varchar(255) default NULL,
+  `a19` varchar(255) default NULL,
+  `a20` varchar(255) default NULL,
+  `karmaPerVote` int(11) NOT NULL default '0',
+  `randomizeAnswers` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Poll_answer` (
+  `answer` char(3) default NULL,
+  `userId` varchar(22) default NULL,
+  `ipAddress` varchar(50) default NULL,
+  `assetId` varchar(22) default NULL
+) TYPE=MyISAM;
+CREATE TABLE `Post` (
+  `assetId` varchar(22) NOT NULL default '',
+  `threadId` varchar(22) NOT NULL default '',
+  `dateSubmitted` bigint(20) default NULL,
+  `dateUpdated` bigint(20) default NULL,
+  `username` varchar(30) default NULL,
+  `content` mediumtext,
+  `status` varchar(30) NOT NULL default 'approved',
+  `views` int(11) NOT NULL default '0',
+  `contentType` varchar(35) NOT NULL default 'mixed',
+  `userDefined1` text,
+  `userDefined2` text,
+  `userDefined3` text,
+  `userDefined4` text,
+  `userDefined5` text,
+  `storageId` varchar(22) default NULL,
+  `rating` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `Post` VALUES ('pSygeMG7bSL1Za0SNqfUbw','pSygeMG7bSL1Za0SNqfUbw',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_talk_to_experts.gif\" align=\"right\" style=\"padding-left: 15px;\" /> Our website contains all of the different methods for reaching us. Our friendly staff will be happy to assist you in any way possible.\r\n\r\n','approved',2,'html','http://www.plainblack.com/contact_us','0',NULL,NULL,NULL,NULL,0),('mdIaXozmVNE_Rga2BY0mxA','mdIaXozmVNE_Rga2BY0mxA',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_manual.gif\" align=\"right\" style=\"padding-left: 15px;\" />Ruling WebGUI is the definitive guide to everything WebGUI related. It has been compiled by the experts at Plain Black and covers almost all aspects of WebGUI. When you purchase Ruling WebGUI, you will receive updates to this great manual for one full year.','approved',0,'html','http://www.plainblack.com/store/rwg','0',NULL,NULL,NULL,NULL,0),('9kDcFufTKbMTkeAHyP36fw','9kDcFufTKbMTkeAHyP36fw',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_tech_support.gif\" align=\"right\" style=\"padding-left: 15px;\" />The WebGUI Support Center is there to help you when you get stuck. With a system as large as WebGUI, you\'ll likely have some questions, and our courteous and knowlegable staff is available to answer those questions. And best of all, you get Ruling WebGUI free when you sign up for the Support Center.\r\n\r\n','approved',0,'html','http://www.plainblack.com/store/support','0',NULL,NULL,NULL,NULL,0),('5Y8eOI2u_HOvkzrRuLdz1g','5Y8eOI2u_HOvkzrRuLdz1g',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_hosting.gif\" align=\"right\" style=\"padding-left: 15px;\" />We provide professional hosting services for you so you don\'t have to go through the trouble of finding a hoster who likely won\'t know what to do with WebGUI anyway.','approved',0,'html','http://www.plainblack.com/store/hosting','0',NULL,NULL,NULL,NULL,0),('ImmYJRWOPFedzI4Bg1k6GA','ImmYJRWOPFedzI4Bg1k6GA',1076705448,1076706084,'Admin','<img src=\"^Extras;styles/webgui6/img_look_great.gif\" align=\"right\" style=\"padding-left: 15px;\" />Let Plain Black\'s design team build you a professional looking design. Our award-winning designers can get you the look you need on time and on budget, every time.','approved',0,'html','http://www.plainblack.com/design','0',NULL,NULL,NULL,NULL,0);
+CREATE TABLE `Post_rating` (
+  `assetId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) NOT NULL default '',
+  `ipAddress` varchar(15) NOT NULL default '',
+  `dateOfRating` bigint(20) default NULL,
+  `rating` int(11) NOT NULL default '0'
+) TYPE=MyISAM;
+CREATE TABLE `Post_read` (
+  `postId` varchar(22) NOT NULL default '',
+  `threadId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) NOT NULL default '',
+  `readDate` bigint(20) default NULL
+) TYPE=MyISAM;
+INSERT INTO `Post_read` VALUES ('pSygeMG7bSL1Za0SNqfUbw','pSygeMG7bSL1Za0SNqfUbw','1',1109194986);
+CREATE TABLE `Product` (
+  `image1` varchar(255) default NULL,
+  `image2` varchar(255) default NULL,
+  `image3` varchar(255) default NULL,
+  `brochure` varchar(255) default NULL,
+  `manual` varchar(255) default NULL,
+  `warranty` varchar(255) default NULL,
+  `price` varchar(255) default NULL,
+  `productNumber` varchar(255) default NULL,
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Product_accessory` (
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  `accessoryAssetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`,`accessoryAssetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Product_benefit` (
+  `Product_benefitId` varchar(22) NOT NULL default '',
+  `benefit` varchar(255) default NULL,
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`Product_benefitId`)
+) TYPE=MyISAM;
+CREATE TABLE `Product_feature` (
+  `Product_featureId` varchar(22) NOT NULL default '',
+  `feature` varchar(255) default NULL,
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`Product_featureId`)
+) TYPE=MyISAM;
+CREATE TABLE `Product_related` (
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  `relatedAssetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`,`relatedAssetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Product_specification` (
+  `Product_specificationId` varchar(22) NOT NULL default '',
+  `name` varchar(255) default NULL,
+  `value` varchar(255) default NULL,
+  `units` varchar(255) default NULL,
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`Product_specificationId`)
+) TYPE=MyISAM;
+CREATE TABLE `RichEdit` (
+  `assetId` varchar(22) NOT NULL default '',
+  `askAboutRichEdit` int(11) NOT NULL default '0',
+  `preformatted` int(11) NOT NULL default '0',
+  `editorWidth` int(11) NOT NULL default '0',
+  `editorHeight` int(11) NOT NULL default '0',
+  `sourceEditorWidth` int(11) NOT NULL default '0',
+  `sourceEditorHeight` int(11) NOT NULL default '0',
+  `useBr` int(11) NOT NULL default '0',
+  `nowrap` int(11) NOT NULL default '0',
+  `removeLineBreaks` int(11) NOT NULL default '0',
+  `npwrap` int(11) NOT NULL default '0',
+  `directionality` char(3) NOT NULL default 'ltr',
+  `toolbarLocation` varchar(6) NOT NULL default 'bottom',
+  `cssFile` varchar(255) default NULL,
+  `extendedValidElements` text,
+  `toolbarRow1` text,
+  `toolbarRow2` text,
+  `toolbarRow3` text,
+  `enableContextMenu` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `RichEdit` VALUES ('PBrichedit000000000001',0,0,0,0,600,500,0,0,0,0,'ltr','bottom',NULL,NULL,'bold\nitalic\njustifyleft\njustifyright\njustifycenter\njustifyfull\nindent\noutdent\nsub\nsup\nformatselect\nremoveformat','bullist\nnumlist\nlink\npagetree\nanchor\nunlink\nadvhr\nimage\ninsertImage\ncharmap\ncollateral','tablecontrols\nvisualaid\npreview\ncode\ncleanup\nreplace',1),('PBrichedit000000000002',0,0,0,0,0,0,0,0,0,0,'ltr','bottom',NULL,NULL,'bold\nitalic\nbullist\nnumlist\nlink\nunlink\nemotions',NULL,NULL,0);
+CREATE TABLE `SQLReport` (
+  `dbQuery1` text,
+  `paginateAfter` int(11) NOT NULL default '50',
+  `preprocessMacros1` int(11) default '0',
+  `debugMode` int(11) NOT NULL default '0',
+  `databaseLinkId1` varchar(22) default NULL,
+  `placeholderParams1` text,
+  `preprocessMacros2` int(11) default '0',
+  `dbQuery2` text,
+  `placeholderParams2` text,
+  `databaseLinkId2` varchar(22) default NULL,
+  `preprocessMacros3` int(11) default '0',
+  `dbQuery3` text,
+  `placeholderParams3` text,
+  `databaseLinkId3` varchar(22) default NULL,
+  `preprocessMacros4` int(11) default '0',
+  `dbQuery4` text,
+  `placeholderParams4` text,
+  `databaseLinkId4` varchar(22) default NULL,
+  `preprocessMacros5` int(11) default '0',
+  `dbQuery5` text,
+  `placeholderParams5` text,
+  `databaseLinkId5` varchar(22) default NULL,
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Shortcut` (
+  `overrideTitle` int(11) NOT NULL default '0',
+  `overrideDescription` int(11) NOT NULL default '0',
+  `overrideTemplate` int(11) NOT NULL default '0',
+  `overrideDisplayTitle` int(11) NOT NULL default '0',
+  `overrideTemplateId` varchar(22) NOT NULL default '',
+  `shortcutByCriteria` int(11) NOT NULL default '0',
+  `resolveMultiples` varchar(30) default 'mostRecent',
+  `shortcutCriteria` text NOT NULL,
+  `description` mediumtext,
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  `shortcutToAssetId` varchar(22) NOT NULL default '',
+  `disableContentLock` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Survey` (
+  `questionOrder` varchar(30) default NULL,
+  `groupToTakeSurvey` varchar(22) default NULL,
+  `groupToViewReports` varchar(22) default NULL,
+  `mode` varchar(30) default NULL,
+  `Survey_id` varchar(22) default NULL,
+  `anonymous` char(1) NOT NULL default '0',
+  `questionsPerPage` int(11) NOT NULL default '1',
+  `responseTemplateId` varchar(22) default NULL,
+  `overviewTemplateId` varchar(22) default NULL,
+  `maxResponsesPerUser` int(11) NOT NULL default '1',
+  `questionsPerResponse` int(11) NOT NULL default '9999999',
+  `gradebookTemplateId` varchar(22) default 'PBtmpl0000000000000062',
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `Survey_answer` (
+  `Survey_id` varchar(22) default NULL,
+  `Survey_questionId` varchar(22) default NULL,
+  `Survey_answerId` varchar(22) NOT NULL default '',
+  `sequenceNumber` int(11) NOT NULL default '1',
+  `gotoQuestion` varchar(22) default NULL,
+  `answer` varchar(255) default NULL,
+  `isCorrect` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`Survey_answerId`)
+) TYPE=MyISAM;
+CREATE TABLE `Survey_question` (
+  `Survey_id` varchar(22) default NULL,
+  `Survey_questionId` varchar(22) NOT NULL default '',
+  `question` text,
+  `sequenceNumber` int(11) NOT NULL default '1',
+  `allowComment` int(11) NOT NULL default '0',
+  `randomizeAnswers` int(11) NOT NULL default '0',
+  `answerFieldType` varchar(35) default NULL,
+  `gotoQuestion` varchar(22) default NULL,
+  PRIMARY KEY  (`Survey_questionId`)
+) TYPE=MyISAM;
+CREATE TABLE `Survey_questionResponse` (
+  `Survey_id` varchar(22) default NULL,
+  `Survey_questionId` varchar(22) NOT NULL default '',
+  `Survey_answerId` varchar(22) NOT NULL default '',
+  `Survey_responseId` varchar(22) NOT NULL default '',
+  `response` varchar(255) default NULL,
+  `comment` text,
+  `dateOfResponse` int(11) default NULL,
+  PRIMARY KEY  (`Survey_questionId`,`Survey_answerId`,`Survey_responseId`)
+) TYPE=MyISAM;
+CREATE TABLE `Survey_response` (
+  `Survey_id` varchar(22) default NULL,
+  `Survey_responseId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) default NULL,
+  `username` varchar(255) default NULL,
+  `ipAddress` varchar(15) default NULL,
+  `startDate` int(11) default NULL,
+  `endDate` int(11) default NULL,
+  `isComplete` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`Survey_responseId`)
+) TYPE=MyISAM;
+CREATE TABLE `SyndicatedContent` (
+  `rssUrl` text,
+  `maxHeadlines` int(11) NOT NULL default '0',
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `SyndicatedContent` VALUES ('http://www.plainblack.com/news/news?func=viewRSS',3,'fK-HMSboA3uu0c1KYkYspA','GNvjCFQWjY2AF2uf0aCM8Q');
+CREATE TABLE `Thread` (
+  `assetId` varchar(22) NOT NULL default '',
+  `replies` int(11) NOT NULL default '0',
+  `lastPostId` varchar(22) NOT NULL default '0',
+  `lastPostDate` bigint(20) default NULL,
+  `isLocked` int(11) NOT NULL default '0',
+  `isSticky` int(11) NOT NULL default '0',
+  `subscriptionGroupId` varchar(22) default NULL,
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `Thread` VALUES ('pSygeMG7bSL1Za0SNqfUbw',0,'',NULL,0,0,'wP1Lt8NIySq9MS8xPGnAsQ'),('mdIaXozmVNE_Rga2BY0mxA',0,'',NULL,0,0,'OL-d6C93EeUr4Rja-q3-yQ'),('9kDcFufTKbMTkeAHyP36fw',0,'',NULL,0,0,'YPCggIxdKT3AMMlML-CAuw'),('5Y8eOI2u_HOvkzrRuLdz1g',0,'',NULL,0,0,'C02CXMw3c42EJJR_nktyMw'),('ImmYJRWOPFedzI4Bg1k6GA',0,'',NULL,0,0,'zZmjNsD1FhaSFkgXvnCQUg');
+CREATE TABLE `WSClient` (
+  `callMethod` text,
+  `uri` varchar(255) NOT NULL default '',
+  `proxy` varchar(255) NOT NULL default '',
+  `preprocessMacros` int(11) NOT NULL default '0',
+  `paginateAfter` int(11) NOT NULL default '50',
+  `paginateVar` varchar(35) default NULL,
+  `debugMode` int(11) NOT NULL default '0',
+  `params` text,
+  `execute_by_default` tinyint(4) NOT NULL default '1',
+  `decodeUtf8` tinyint(3) unsigned NOT NULL default '0',
+  `httpHeader` varchar(50) default NULL,
+  `sharedCache` tinyint(3) unsigned NOT NULL default '0',
+  `cacheTTL` smallint(5) unsigned NOT NULL default '60',
+  `assetId` varchar(22) NOT NULL default '',
+  `templateId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `asset` (
+  `assetId` varchar(22) NOT NULL default '',
+  `parentId` varchar(22) NOT NULL default '',
+  `lineage` varchar(255) NOT NULL default '',
+  `state` varchar(35) NOT NULL default '',
+  `className` varchar(255) NOT NULL default '',
+  `title` varchar(255) NOT NULL default 'untitled',
+  `menuTitle` varchar(255) NOT NULL default 'untitled',
+  `url` varchar(255) NOT NULL default '',
+  `startDate` bigint(20) NOT NULL default '997995720',
+  `endDate` bigint(20) NOT NULL default '32472169200',
+  `ownerUserId` varchar(22) NOT NULL default '',
+  `groupIdView` varchar(22) NOT NULL default '',
+  `groupIdEdit` varchar(22) NOT NULL default '',
+  `synopsis` text,
+  `newWindow` int(11) NOT NULL default '0',
+  `isHidden` int(11) NOT NULL default '0',
+  `isSystem` int(11) NOT NULL default '0',
+  `encryptPage` int(11) NOT NULL default '0',
+  `assetSize` int(11) NOT NULL default '0',
+  `lastUpdated` bigint(20) NOT NULL default '0',
+  `lastUpdatedBy` varchar(22) default NULL,
+  `isPackage` int(11) NOT NULL default '0',
+  `extraHeadTags` text,
+  `isPrototype` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`assetId`),
+  UNIQUE KEY `lineage` (`lineage`),
+  UNIQUE KEY `url` (`url`),
+  KEY `parentId` (`parentId`),
+  KEY `state_parentId_lineage` (`state`,`parentId`,`lineage`),
+  KEY `isPrototype_className_assetId` (`isPrototype`,`className`,`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `asset` VALUES ('PBasset000000000000001','infinity','000001','published','WebGUI::Asset','Root','Root','root',997995720,32472169200,'3','3','3',NULL,0,1,1,0,0,0,NULL,0,NULL,0),('PBasset000000000000002','PBasset000000000000001','000001000001','published','WebGUI::Asset::Wobject::Folder','Import Node','Import','root/import',997995720,32472169200,'3','3','3',NULL,0,1,1,0,212,1115241872,'1',0,NULL,0),('68sKwDgf9cGH58-NZcU4lg','PBasset000000000000001','000001000002','published','WebGUI::Asset::Wobject::Layout','Home','Home','home',946710000,2082783600,'3','7','3',NULL,0,0,0,0,532,0,NULL,0,'',0),('TKzUMeIxRLrZ3NAEez6CXQ','68sKwDgf9cGH58-NZcU4lg','000001000002000001','published','WebGUI::Asset::Wobject::Article','Welcome','Welcome','home/welcome',946710000,2082783600,'3','7','3',NULL,0,1,0,0,1599,0,NULL,0,NULL,0),('sWVXMZGibxHe2Ekj1DCldA','68sKwDgf9cGH58-NZcU4lg','000001000002000002','published','WebGUI::Asset::Wobject::Article','Key Benefits','Key Benefits','home/key_benefits',946710000,2082783600,'3','7','3',NULL,0,1,0,0,2279,0,NULL,0,NULL,0),('_iHetEvMQUOoxS-T2CM0sQ','68sKwDgf9cGH58-NZcU4lg','000001000002000003','published','WebGUI::Asset::Wobject::Layout','Getting Started','Getting Started','getting_started',946710000,2082783600,'3','7','3','',0,0,0,0,567,0,NULL,0,'',0),('x_WjMvFmilhX-jvZuIpinw','_iHetEvMQUOoxS-T2CM0sQ','000001000002000003000001','published','WebGUI::Asset::Wobject::Article','Getting Started','Getting Started','getting_started/getting_started',946710000,2082783600,'3','7','3',NULL,0,1,0,0,2254,0,NULL,0,NULL,0),('8Bb8gu-me2mhL3ljFyiWLg','68sKwDgf9cGH58-NZcU4lg','000001000002000004','published','WebGUI::Asset::Wobject::Layout','What should you do next?','Your Next Step','your_next_step',946710000,2082783600,'3','7','3','',0,0,0,0,575,0,NULL,0,'',0),('DC1etlIaBRQitXnchZKvUw','8Bb8gu-me2mhL3ljFyiWLg','000001000002000004000001','published','WebGUI::Asset::Wobject::Collaboration','Your Next Step','Your Next Step','your_next_step/your_next_step',946710000,2082783600,'3','7','3',NULL,0,1,0,0,563,1109194990,NULL,0,NULL,0),('pSygeMG7bSL1Za0SNqfUbw','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000001','published','WebGUI::Asset::Post::Thread','Talk to the Experts','Talk to the Experts','talk_to_the_experts',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_talk_to_experts.gif\" align=\"right\" style=\"padding-left: 15px;\" /> Our website contains all of the different methods for reaching us. Our friendly staff will be happy to assist you in any way possible.\r',0,1,0,0,809,1109194990,NULL,0,NULL,0),('mdIaXozmVNE_Rga2BY0mxA','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000002','published','WebGUI::Asset::Post::Thread','Get the Manual','Get the Manual','get_the_manual',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_manual.gif\" align=\"right\" style=\"padding-left: 15px;\" />Ruling WebGUI is the definitive guide to everything WebGUI related. It has been compiled by the experts at Plain Black and covers almost all aspects of WebGUI. When you purchase Ruling WebGUI, you will receive updates to this great manual for one full year.',0,1,0,0,359,0,NULL,0,NULL,0),('9kDcFufTKbMTkeAHyP36fw','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000003','published','WebGUI::Asset::Post::Thread','Purchase Technical Support','Purchase Technical Support','purchase_technical_support',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_tech_support.gif\" align=\"right\" style=\"padding-left: 15px;\" />The WebGUI Support Center is there to help you when you get stuck. With a system as large as WebGUI, you\'ll likely have some questions, and our courteous and knowlegable staff is available to answer those questions. And best of all, you get Ruling WebGUI free when you sign up for the Support Center.\r',0,1,0,0,403,0,NULL,0,NULL,0),('5Y8eOI2u_HOvkzrRuLdz1g','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000004','published','WebGUI::Asset::Post::Thread','Sign Up for Hosting','Sign Up for Hosting','sign_up_for_hosting',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_hosting.gif\" align=\"right\" style=\"padding-left: 15px;\" />We provide professional hosting services for you so you don\'t have to go through the trouble of finding a hoster who likely won\'t know what to do with WebGUI anyway.',0,1,0,0,259,0,NULL,0,NULL,0),('ImmYJRWOPFedzI4Bg1k6GA','DC1etlIaBRQitXnchZKvUw','000001000002000004000001000005','published','WebGUI::Asset::Post::Thread','Look Great','Look Great','look_great',946710000,2114406000,'3','7','3','<img src=\"^Extras;styles/webgui6/img_look_great.gif\" align=\"right\" style=\"padding-left: 15px;\" />Let Plain Black\'s design team build you a professional looking design. Our award-winning designers can get you the look you need on time and on budget, every time.',0,1,0,0,260,0,NULL,0,NULL,0),('2TqQc4OISddWCZmRY1_m8A','68sKwDgf9cGH58-NZcU4lg','000001000002000005','published','WebGUI::Asset::Wobject::Layout','The Latest News','The Latest News','the_latest_news',946710000,2082783600,'3','7','3','',0,0,0,0,569,0,NULL,0,'',0),('fK-HMSboA3uu0c1KYkYspA','2TqQc4OISddWCZmRY1_m8A','000001000002000005000001','published','WebGUI::Asset::Wobject::SyndicatedContent','The Latest News','The Latest News','the_latest_news/the_latest_news',946710000,2082783600,'3','7','3',NULL,0,1,0,0,552,0,NULL,0,NULL,0),('Swf6L8poXKc7hUaNPkBevw','68sKwDgf9cGH58-NZcU4lg','000001000002000006','published','WebGUI::Asset::Wobject::Layout','Tell A Friend','Tell A Friend','tell_a_friend',946710000,2082783600,'3','7','3','',0,0,0,0,563,0,NULL,0,'',0),('Szs5eev3OMssmnsyLRZmWA','Swf6L8poXKc7hUaNPkBevw','000001000002000006000001','published','WebGUI::Asset::Wobject::DataForm','Tell A Friend','Tell A Friend','tell_a_friend/tell_a_friend',946710000,2082783600,'3','7','3',NULL,0,1,0,0,472,0,NULL,0,NULL,0),('x3OFY6OJh_qsXkZfPwug4A','68sKwDgf9cGH58-NZcU4lg','000001000002000007','published','WebGUI::Asset::Wobject::Layout','Site Map','Site Map','site_map',946710000,2082783600,'3','7','3','',0,0,0,0,548,0,NULL,0,'',0),('pJd5TLAjfWMVXD6sCRLwUg','x3OFY6OJh_qsXkZfPwug4A','000001000002000007000001','published','WebGUI::Asset::Wobject::Navigation','Site Map','Site Map','site_map/site_map',1001744792,1336444487,'3','7','3',NULL,0,1,0,0,440,0,NULL,0,NULL,0),('Wmjn6I1fe9DKhiIR39YC0g','PBasset000000000000002','000001000001000001','published','WebGUI::Asset::Wobject::Folder','Navigation Configurations','Navigation Configurations','navigation_configurations',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1109194981,NULL,0,NULL,0),('PBnav00000000000000001','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000001','published','WebGUI::Asset::Wobject::Navigation','crumbTrail','crumbTrail','crumbtrail',997995720,32472169200,'3','7','4',NULL,0,1,0,0,516,1109194981,NULL,0,NULL,0),('PBnav00000000000000014','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000002','published','WebGUI::Asset::Wobject::Navigation','FlexMenu','FlexMenu','flexmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,498,1109194981,NULL,0,NULL,0),('PBnav00000000000000015','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000003','published','WebGUI::Asset::Wobject::Navigation','currentMenuVertical','currentMenuVertical','currentmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,539,1109194981,NULL,0,NULL,0),('PBnav00000000000000016','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000004','published','WebGUI::Asset::Wobject::Navigation','currentMenuHorizontal','currentMenuHorizontal','currentmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,545,1109194981,NULL,0,NULL,0),('PBnav00000000000000017','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000005','published','WebGUI::Asset::Wobject::Navigation','PreviousDropMenu','PreviousDropMenu','previousdropmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,533,1109194981,NULL,0,NULL,0),('PBnav00000000000000018','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000006','published','WebGUI::Asset::Wobject::Navigation','previousMenuVertical','previousMenuVertical','previousmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,543,1109194981,NULL,0,NULL,0),('PBnav00000000000000019','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000007','published','WebGUI::Asset::Wobject::Navigation','previousMenuHorizontal','previousMenuHorizontal','previousmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,549,1109194981,NULL,0,NULL,0),('PBnav00000000000000020','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000008','published','WebGUI::Asset::Wobject::Navigation','rootmenu','rootmenu','rootmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,500,1109194981,NULL,0,NULL,0),('PBnav00000000000000021','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000009','published','WebGUI::Asset::Wobject::Navigation','SpecificDropMenu','SpecificDropMenu','specificdropmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,524,1109194981,NULL,0,NULL,0),('PBnav00000000000000002','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000010','published','WebGUI::Asset::Wobject::Navigation','SpecificSubMenuVertical','SpecificSubMenuVertical','specificsubmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,545,1109194981,NULL,0,NULL,0),('PBnav00000000000000006','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000011','published','WebGUI::Asset::Wobject::Navigation','SpecificSubMenuHorizontal','SpecificSubMenuHorizontal','specificsubmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,551,1109194981,NULL,0,NULL,0),('PBnav00000000000000007','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000012','published','WebGUI::Asset::Wobject::Navigation','TopLevelMenuVertical','TopLevelMenuVertical','toplevelmenuvertical',997995720,32472169200,'3','7','4',NULL,0,1,0,0,536,1109194981,NULL,0,NULL,0),('PBnav00000000000000008','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000013','published','WebGUI::Asset::Wobject::Navigation','TopLevelMenuHorizontal','TopLevelMenuHorizontal','toplevelmenuhorizontal',997995720,32472169200,'3','7','4',NULL,0,1,0,0,542,1109194981,NULL,0,NULL,0),('PBnav00000000000000009','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000014','published','WebGUI::Asset::Wobject::Navigation','RootTab','RootTab','roottab',997995720,32472169200,'3','7','4',NULL,0,1,0,0,497,1109194981,NULL,0,NULL,0),('PBnav00000000000000010','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000015','published','WebGUI::Asset::Wobject::Navigation','TopDropMenu','TopDropMenu','topdropmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,483,1109194981,NULL,0,NULL,0),('PBnav00000000000000011','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000016','published','WebGUI::Asset::Wobject::Navigation','dtree','dtree','dtree',997995720,32472169200,'3','7','4',NULL,0,1,0,0,497,1109194981,NULL,0,NULL,0),('PBnav00000000000000012','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000017','published','WebGUI::Asset::Wobject::Navigation','coolmenu','coolmenu','coolmenu',997995720,32472169200,'3','7','4',NULL,0,1,0,0,501,1109194981,NULL,0,NULL,0),('PBnav00000000000000013','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000018','published','WebGUI::Asset::Wobject::Navigation','Synopsis','Synopsis','synopsis',997995720,32472169200,'3','7','4',NULL,0,1,0,0,512,1109194981,NULL,0,NULL,0),('f2bihDeMoI-Ojt2dutJNQA','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000019','published','WebGUI::Asset::Wobject::Navigation','TopLevelMenuHorizontal_1000','TopLevelMenuHorizontal_1000','toplevelmenuhorizontal_1000',997995720,32472169200,'3','7','4',NULL,0,1,0,0,534,1109194981,NULL,0,NULL,0),('KZ2UytxNpbF-3Eg3RNvQQQ','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000020','published','WebGUI::Asset::Wobject::Navigation','currentMenuHorizontal_1001','currentMenuHorizontal_1001','currentmenuhorizontal_1001',997995720,32472169200,'3','7','4',NULL,0,1,0,0,563,1109194981,NULL,0,NULL,0),('G0wlShbk_XruYVfbXqWq_w','Wmjn6I1fe9DKhiIR39YC0g','000001000001000001000021','published','WebGUI::Asset::Wobject::Navigation','FlexMenu_1002','FlexMenu_1002','flexmenu_1002',997995720,32472169200,'3','7','4',NULL,0,1,0,0,513,1109194981,NULL,0,NULL,0),('UE5_3bD7kWDLUN2B-iuNuA','PBasset000000000000002','000001000001000002','published','WebGUI::Asset::Wobject::Folder','Files, Snippets, and Images','Files, Snippets, and Images','collateral',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1109194981,NULL,0,NULL,0),('RTsbVBEYnn3OPZWmXyIFhQ','PBasset000000000000002','000001000001000003','published','WebGUI::Asset::Wobject::Folder','Templates','Templates','templates',997995720,32472169200,'3','4','4',NULL,0,1,0,0,0,1115241872,'1',0,NULL,0),('PBtmpl0000000000000103','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000005','published','WebGUI::Asset::Template','Left Align Image','Left Align Image','left_align_image',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1417,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000105','b26vQzyaqz0EBMWH_oPdrg','000001000001000003000151000002','published','WebGUI::Asset::Template','Calendar Month (Small)','Calendar Month (Small)','calendar_month_small',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2194,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000023','jCMdSbD6IA535I16Pcik7Q','000001000001000003000152000001','published','WebGUI::Asset::Template','Default Event','Default Event','default_event',997995720,32472169200,'3','4','4',NULL,0,1,0,0,756,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000086','b26vQzyaqz0EBMWH_oPdrg','000001000001000003000151000003','published','WebGUI::Asset::Template','Events List','Events List','events_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1568,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000084','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000001','published','WebGUI::Asset::Template','Center Image','Center Image','center_image',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1228,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000002','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000002','published','WebGUI::Asset::Template','Default Article','Default Article','default_article',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1416,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000115','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000006','published','WebGUI::Asset::Template','Linked Image with Caption','Linked Image with Caption','linked_image_with_caption',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1571,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000066','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000003','published','WebGUI::Asset::Template','Default USS','Default USS','default_uss',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1702,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000080','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000004','published','WebGUI::Asset::Template','FAQ','FAQ','faq',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1132,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000097','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000013','published','WebGUI::Asset::Template','Traditional with Thumbnails','Traditional with Thumbnails','traditional_with_thumbnails',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1640,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000112','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000015','published','WebGUI::Asset::Template','Weblog','Weblog','weblog',997995720,32472169200,'3','4','4',NULL,0,1,0,0,10881,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000121','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000009','published','WebGUI::Asset::Template','Photo Gallery','Photo Gallery','photo_gallery',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1148,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000067','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000001','published','WebGUI::Asset::Template','Default Submission','Default Submission','default_submission',997995720,32472169200,'3','4','4',NULL,0,1,0,0,11190,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000026','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000002','published','WebGUI::Asset::Template','Default Forum','Default Forum','default_forum',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2449,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000128','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000001','published','WebGUI::Asset::Template','Classifieds','Classifieds','classifieds',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1242,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000079','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000012','published','WebGUI::Asset::Template','Topics','Topics','topics',997995720,32472169200,'3','4','4',NULL,0,1,0,0,865,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000083','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000007','published','WebGUI::Asset::Template','Link List','Link List','link_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1068,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000082','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000014','published','WebGUI::Asset::Template','Unordered List','Unordered List','unordered_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1066,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000056','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000002','published','WebGUI::Asset::Template','Default Product','Default Product','default_product',997995720,32472169200,'3','4','4',NULL,0,1,0,0,4434,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000095','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000001','published','WebGUI::Asset::Template','Benefits Showcase','Benefits Showcase','benefits_showcase',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2168,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000110','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000004','published','WebGUI::Asset::Template','Three Columns','Three Columns','three_columns',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3782,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000135','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000006','published','WebGUI::Asset::Template','Side By Side','Side By Side','side_by_side',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1729,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000131','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000005','published','WebGUI::Asset::Template','Right Column','Right Column','right_column',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1729,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000119','I2DQUdFVd9FtcSealp4cTQ','000001000001000003000179000003','published','WebGUI::Asset::Template','Left Column Collateral','Left Column Collateral','left_column_collateral',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2491,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000054','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000001','published','WebGUI::Asset::Template','Default Page','Default Page','default_page',997995720,32472169200,'3','4','4',NULL,0,1,0,0,921,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000024','-Kmb-MEV4ni9d0tn_BYGXA','000001000001000003000153000001','published','WebGUI::Asset::Template','File','File','file',997995720,32472169200,'3','4','4',NULL,0,1,0,0,212,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000088','59f_y-iE0k8dSMVIyX5SBg','000001000001000003000156000001','published','WebGUI::Asset::Template','Image','Image','image',997995720,32472169200,'3','4','4',NULL,0,1,0,0,147,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000078','ZWv7HLTQ4oERBIFJHBz1Ow','000001000001000003000154000001','published','WebGUI::Asset::Template','File Folder','File Folder','file_folder',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1059,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000125','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000002','published','WebGUI::Asset::Template','Left Column','Left Column','left_column',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1727,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000118','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000007','published','WebGUI::Asset::Template','Three Over One','Three Over One','three_over_one',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2916,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000109','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000004','published','WebGUI::Asset::Template','One Over Three','One Over Three','one_over_three',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2914,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000094','tJ_X5F3Dkaz8vO6CigbJrg','000001000001000003000158000003','published','WebGUI::Asset::Template','News','News','news',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2883,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000133','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000005','published','WebGUI::Asset::Template','Guest Book','Guest Book','guest_book',997995720,32472169200,'3','4','4',NULL,0,1,0,0,865,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000065','xPyASYtR44mpDk3ba4YyIg','000001000001000003000189000001','published','WebGUI::Asset::Template','Default Syndicated Content','Default Syndicated Content','default_syndicated_content',997995720,32472169200,'3','4','4',NULL,0,1,0,0,799,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000055','EvgkCMpx4kUonmjhhZXRjg','000001000001000003000178000001','published','WebGUI::Asset::Template','Default Poll','Default Poll','default_poll',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1114,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000020','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000004','published','WebGUI::Asset::Template','Mail Form','Mail Form','mail_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1620,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000085','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000003','published','WebGUI::Asset::Template','Default Email','Default Email','default_email',997995720,32472169200,'3','4','4',NULL,0,1,0,0,254,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000104','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000001','published','WebGUI::Asset::Template','Default Acknowledgement','Default Acknowledgement','default_acknowledgement',997995720,32472169200,'3','4','4',NULL,0,1,0,0,479,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000021','BAoMajIxnoGlrxhDVgot9g','000001000001000003000150000001','published','WebGUI::Asset::Template','Data List','Data List','data_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,793,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000033','RcOR25DbCizyAfNWvr-2ow','000001000001000003000155000001','published','WebGUI::Asset::Template','Default HTTP Proxy','Default HTTP Proxy','default_http_proxy',997995720,32472169200,'3','4','4',NULL,0,1,0,0,871,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000047','L070eyyGhoWx5cSUeNRrow','000001000001000003000171000001','published','WebGUI::Asset::Template','Default Message Board','Default Message Board','default_message_board',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2119,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000029','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000001','published','WebGUI::Asset::Template','Default Post Form','Default Post Form','default_post_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,976,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000032','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000002','published','WebGUI::Asset::Template','Default Thread','Default Thread','default_thread',997995720,32472169200,'3','4','4',NULL,0,1,0,0,9673,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000027','ECq9dLm5vmh4t963yDx1og','000001000001000003000140000001','published','WebGUI::Asset::Template','Default Forum Notification','Default Forum Notification','default_forum_notification',997995720,32472169200,'3','4','4',NULL,0,1,0,0,155,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000031','guQGD9YiTn55PqOUTjCc0A','000001000001000003000142000001','published','WebGUI::Asset::Template','Default Forum Search','Default Forum Search','default_forum_search',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1866,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000071','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000002','published','WebGUI::Asset::Template','AutoGen ^t;','AutoGen ^t;','autogen_t',997995720,32472169200,'3','4','4',NULL,0,1,0,0,463,1109194981,NULL,0,NULL,0),('PBtmpl0000000000000075','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000001','published','WebGUI::Asset::Template','AutoGen ^m;','AutoGen ^m;','autogen_m',997995720,32472169200,'3','4','4',NULL,0,1,0,0,464,1109194982,NULL,0,NULL,0),('GNvjCFQWjY2AF2uf0aCM8Q','xPyASYtR44mpDk3ba4YyIg','000001000001000003000189000002','published','WebGUI::Asset::Template','Syndicated Articles','Syndicated Articles','syndicated_articles',997995720,32472169200,'3','4','4',NULL,0,1,0,0,792,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000068','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000002','published','WebGUI::Asset::Template','Default Submission Form','Default Submission Form','default_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,870,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000099','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000003','published','WebGUI::Asset::Template','FAQ Submission Form','FAQ Submission Form','faq_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,657,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000114','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000005','published','WebGUI::Asset::Template','Link List Submission Form','Link List Submission Form','link_list_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,812,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000092','n1xT2JUidbeqNMN2zyvHAQ','000001000001000003000168000002','published','WebGUI::Asset::Template','Horizontal Login Box','Horizontal Login Box','horizontal_login_box',997995720,32472169200,'3','4','4',NULL,0,1,0,0,897,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000044','n1xT2JUidbeqNMN2zyvHAQ','000001000001000003000168000001','published','WebGUI::Asset::Template','Default Login Box','Default Login Box','default_login_box',997995720,32472169200,'3','4','4',NULL,0,1,0,0,844,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000059','o9PZOa7fy9AZa8fKmhoPrQ','000001000001000003000183000001','published','WebGUI::Asset::Template','Default SQL Report','Default SQL Report','default_sql_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,4016,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000050','6MrxI11jyXuB-UUrX69lXQ','000001000001000003000174000001','published','WebGUI::Asset::Template','Default Messsage Log Display Template','Default Messsage Log Display Template','default_messsage_log_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1334,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000049','VnUEcXfsbwgB5rqslQ3n1A','000001000001000003000173000001','published','WebGUI::Asset::Template','Default MessageLog Message Template','Default MessageLog Message Template','default_messagelog_message_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,427,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000051','xxuM0xMjhIA3lFq99GY05Q','000001000001000003000175000001','published','WebGUI::Asset::Template','Default Edit Profile Template','Default Edit Profile Template','default_edit_profile_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1330,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000052','kHlR8-nCFRrwlEV1uapu_Q','000001000001000003000176000001','published','WebGUI::Asset::Template','Default Profile Display Template','Default Profile Display Template','default_profile_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,593,1109194982,NULL,0,NULL,0),('PBrichedit000000000002','PBasset000000000000002','000001000001000005','published','WebGUI::Asset::RichEdit','Forum Rich Edit','Forum Rich Edit','forum_rich_edit',997995720,9223372036854775807,'3','7','4',NULL,0,0,0,0,246,1115241872,'1',0,NULL,0),('PBtmpl0000000000000063','lUjGdT_Hhi_EFhsYr1Ouyw','000001000001000003000187000001','published','WebGUI::Asset::Template','Default Overview Report','Default Overview Report','default_overview_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3098,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000062','QWS2acYOu3Y4uNsWvVChTg','000001000001000003000186000001','published','WebGUI::Asset::Template','Default Gradebook Report','Default Gradebook Report','default_gradebook_report',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1411,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000061','ffWKX2dW4t1eWgfNng605w','000001000001000003000185000001','published','WebGUI::Asset::Template','Default Survey','Default Survey','default_survey',997995720,32472169200,'3','4','4',NULL,0,1,0,0,3117,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000064','7Xhdnqu3qkDWHEnRgk6Uzw','000001000001000003000188000001','published','WebGUI::Asset::Template','Default Response','Default Response','default_response',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1613,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000116','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000005','published','WebGUI::Asset::Template','Tab Form','Tab Form','tab_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2348,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000069','S99spbsvn96tgRA0oVUl2A','000001000001000003000190000002','published','WebGUI::Asset::Template','Xmethods: getTemp','Xmethods: getTemp','xmethods_gettemp',997995720,32472169200,'3','4','4',NULL,0,1,0,0,359,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000100','S99spbsvn96tgRA0oVUl2A','000001000001000003000190000001','published','WebGUI::Asset::Template','Google: doGoogleSearch','Google: doGoogleSearch','google_dogooglesearch',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1397,1109194982,NULL,0,NULL,0),('Rn5Ef8vMDQ0ebtaxS_-JXA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000191','published','WebGUI::Asset::Wobject::Folder','Commerce/Product','Commerce/Product','commerce/product',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,201,1115241872,'1',0,NULL,0),('PBtmpl0000000000000090','Fh_KALcbkc8CkBR3I6dU0g','000001000001000003000159000002','published','WebGUI::Asset::Template','DHTML Admin Bar','DHTML Admin Bar','dhtml_admin_bar',997995720,32472169200,'3','4','4',NULL,0,1,0,0,4440,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000093','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000004','published','WebGUI::Asset::Template','crumbTrail','crumbTrail','crumbtrail2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,462,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000048','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000010','published','WebGUI::Asset::Template','verticalMenu','verticalMenu','verticalmenu',997995720,32472169200,'3','4','4',NULL,0,1,0,0,569,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000108','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000007','published','WebGUI::Asset::Template','horizontalMenu','horizontalMenu','horizontalmenu',997995720,32472169200,'3','4','4',NULL,0,1,0,0,474,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000117','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000005','published','WebGUI::Asset::Template','DropMenu','DropMenu','dropmenu',997995720,32472169200,'3','4','4',NULL,0,1,0,0,757,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000124','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000009','published','WebGUI::Asset::Template','Tabs','Tabs','tabs',997995720,32472169200,'3','4','4',NULL,0,1,0,0,489,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000130','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000006','published','WebGUI::Asset::Template','dtree','dtree','dtree2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,909,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000022','b26vQzyaqz0EBMWH_oPdrg','000001000001000003000151000001','published','WebGUI::Asset::Template','Calendar Month (Big)','Calendar Month (Big)','calendar_month_big',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2137,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000134','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000003','published','WebGUI::Asset::Template','Cool Menus','Cool Menus','cool_menus',997995720,32472169200,'3','4','4',NULL,0,1,0,0,6334,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000034','2DAYoiOdplxZCrEwmrVhwQ','000001000001000003000157000001','published','WebGUI::Asset::Template','Default Search','Default Search','default_search',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2477,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000077','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000006','published','WebGUI::Asset::Template','Job Listing','Job Listing','job_listing',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1294,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000098','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000003','published','WebGUI::Asset::Template','Job','Job','job',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1423,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000122','PNGrWdYDhJZTv1-sAX6W1Q','000001000001000003000141000004','published','WebGUI::Asset::Template','Job Submission Form','Job Submission Form','job_submission_form',997995720,32472169200,'3','4','4',NULL,0,1,0,0,796,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000136','c3jDvo_bK3jFqjIefgXjUw','000001000001000003000172000008','published','WebGUI::Asset::Template','Synopsis','Synopsis','synopsis2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,605,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000013','jcIZMBAyEcmXktAVwPxgIw','000001000001000003000137000001','published','WebGUI::Asset::Template','Default WebGUI Login Template','Default WebGUI Login Template','default_webgui_login_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1019,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000010','CDzQSnxPMWCy2j5ZOxWbrw','000001000001000003000134000001','published','WebGUI::Asset::Template','Default WebGUI Account Display Template','Default WebGUI Account Display Template','default_webgui_account_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1183,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000011','RPo_G59wjPTGE1-IhiE44A','000001000001000003000135000001','published','WebGUI::Asset::Template','Default WebGUI Anonymous Registration Template','Default WebGUI Anonymous Registration Template','default_webgui_anonymous_registration_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1305,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000014','ThLKZPeKbRAVEYTkKAxeCg','000001000001000003000138000001','published','WebGUI::Asset::Template','Default WebGUI Password Recovery Template','Default WebGUI Password Recovery Template','default_webgui_password_recovery_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,803,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000012','Oq61G3_QSM5TzArFUzUBiA','000001000001000003000136000001','published','WebGUI::Asset::Template','Default WebGUI Password Reset Template','Default WebGUI Password Reset Template','default_webgui_password_reset_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,944,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000006','zyS1TsKDvBk7Y55_GlWgxA','000001000001000003000133000001','published','WebGUI::Asset::Template','Default LDAP Login Template','Default LDAP Login Template','default_ldap_login_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,874,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000004','_r8Y0WwiHLyVEFe5M0idYQ','000001000001000003000131000001','published','WebGUI::Asset::Template','Default LDAP Account Display Template','Default LDAP Account Display Template','default_ldap_account_display_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,456,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000005','Mkc1dJDw-lqExS5uy7QReA','000001000001000003000132000001','published','WebGUI::Asset::Template','Default LDAP Anonymous Registration Template','Default LDAP Anonymous Registration Template','default_ldap_anonymous_registration_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1004,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000057','khkob2AmnIKAxKJeXHE3fQ','000001000001000003000180000001','published','WebGUI::Asset::Template','Default WebGUI Yes/No Prompt','Default WebGUI Yes/No Prompt','default_webgui_yes/no_prompt',997995720,32472169200,'3','4','4',NULL,0,1,0,0,232,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000060','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000003','published','WebGUI::Asset::Template','Fail Safe','Fail Safe','fail_safe',997995720,32472169200,'3','4','4',NULL,0,1,0,0,776,1109194982,NULL,0,NULL,0),('9tBSOV44a9JPS8CcerOvYw','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000006','published','WebGUI::Asset::Template','WebGUI 6 Admin Style','WebGUI 6 Admin Style','webgui_6_admin_style',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2530,1109194982,NULL,0,NULL,0),('B1bNjWVtzSjsvGZh9lPz_A','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000005','published','WebGUI::Asset::Template','WebGUI 6','WebGUI 6','webgui_6',997995720,32472169200,'3','4','4',NULL,0,1,0,0,7898,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000111','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000004','published','WebGUI::Asset::Template','Make Page Printable','Make Page Printable','make_page_printable',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1756,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000137','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000001','published','WebGUI::Asset::Template','Admin Console','Admin Console','admin_console',997995720,32472169200,'3','4','4',NULL,0,1,0,0,503,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000132','eLdzeSyvZfml-YVFfgUiaw','000001000001000003000184000002','published','WebGUI::Asset::Template','Empty','Empty','empty',997995720,32472169200,'3','4','4',NULL,0,1,0,0,23,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000123','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000003','published','WebGUI::Asset::Template','Item','Item','item',997995720,32472169200,'3','4','4',NULL,0,1,0,0,644,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000129','79BY6IHpAtE2yuQwROh9tg','000001000001000003000129000004','published','WebGUI::Asset::Template','Item w/pop-up Links','Item w/pop-up Links','item_w/pop-up_links',997995720,32472169200,'3','4','4',NULL,0,1,0,0,676,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000081','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000010','published','WebGUI::Asset::Template','Q and A','Q and A','q_and_a',997995720,32472169200,'3','4','4',NULL,0,1,0,0,876,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000101','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000008','published','WebGUI::Asset::Template','Ordered List','Ordered List','ordered_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1067,1109194982,NULL,0,NULL,0),('HCQF9FBLWK3Se06yGLoliw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000128','published','WebGUI::Asset::Wobject::Folder','AdminConsole','AdminConsole','templates/adminconsole',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,277,1111265933,'1',0,NULL,0),('wCIc38CvNHUK7aY92Ww4SQ','8r4-zJ6g-qOecM1PsvADbQ','000001000001000003000139000011','published','WebGUI::Asset::Template','Titled Link List','Titled Link List','titled_link_list',997995720,32472169200,'3','4','4',NULL,0,1,0,0,1038,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000113','-MlWyWh12ibRM8gAzRy41g','000001000001000003000143000004','published','WebGUI::Asset::Template','Link','Link','link',997995720,32472169200,'3','4','4',NULL,0,1,0,0,797,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000037','PttBzI13R8HXqQn40I4UFg','000001000001000003000161000001','published','WebGUI::Asset::Template','Default Account Macro','Default Account Macro','default_account_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,82,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000038','VdTZ8_2vlZwVVuv_I7DsWA','000001000001000003000162000001','published','WebGUI::Asset::Template','Default Editable Toggle Macro','Default Editable Toggle Macro','default_editable_toggle_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,58,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000036','WTPOJerammxgkIdCWnR9uw','000001000001000003000160000001','published','WebGUI::Asset::Template','Default Admin Toggle Macro','Default Admin Toggle Macro','default_admin_toggle_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,58,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000039','BBoAtdsTo2AGPe4k9kfkxA','000001000001000003000163000001','published','WebGUI::Asset::Template','Default File Macro','Default File Macro','default_file_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,114,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000091','BBoAtdsTo2AGPe4k9kfkxA','000001000001000003000163000002','published','WebGUI::Asset::Template','File no icon','File no icon','file_no_icon',997995720,32472169200,'3','4','4',NULL,0,1,0,0,54,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000107','BBoAtdsTo2AGPe4k9kfkxA','000001000001000003000163000003','published','WebGUI::Asset::Template','File with size','File with size','file_with_size',997995720,32472169200,'3','4','4',NULL,0,1,0,0,136,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000040','A-m4h7Q3LYt61G54zpEGqA','000001000001000003000164000001','published','WebGUI::Asset::Template','Default Group Add Macro','Default Group Add Macro','default_group_add_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,56,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000041','Wquzj9XSpxL_gpGXkoU6tg','000001000001000003000165000001','published','WebGUI::Asset::Template','Default Group Delete Macro','Default Group Delete Macro','default_group_delete_macro',997995720,32472169200,'3','4','4',NULL,0,1,0,0,56,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000042','J1uh__tKV2BARcSeFE7MSg','000001000001000003000166000001','published','WebGUI::Asset::Template','Default Homelink','Default Homelink','default_homelink',997995720,32472169200,'3','4','4',NULL,0,1,0,0,79,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000045','mKI2EjkU9QH6dJKkx7VEvw','000001000001000003000169000001','published','WebGUI::Asset::Template','Default Make Printable','Default Make Printable','default_make_printable',997995720,32472169200,'3','4','4',NULL,0,1,0,0,90,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000043','7EfoKU41oB0ZU6NmVIud4A','000001000001000003000167000001','published','WebGUI::Asset::Template','Default LoginToggle','Default LoginToggle','default_logintoggle',997995720,32472169200,'3','4','4',NULL,0,1,0,0,82,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000003','ZexTeuMQaZ1fh4FOpLNlYw','000001000001000003000130000001','published','WebGUI::Asset::Template','Attachment Box','Attachment Box','attachment_box',997995720,32472169200,'3','4','4',NULL,0,1,0,0,477,1109194982,NULL,0,NULL,0),('PBrichedit000000000001','PBasset000000000000002','000001000001000004','published','WebGUI::Asset::RichEdit','Content Manager\'s Rich Edit','Content Manager\'s Rich Edit','content_managers_rich_edit',997995720,9223372036854775807,'3','12','4',NULL,0,0,0,0,487,1115241872,'1',0,NULL,0),('PBtmpl0000000000000053','r4FQlrIkS1_MTuk-vVqRNg','000001000001000003000177000001','published','WebGUI::Asset::Template','Subscription code redemption','Subscription code redemption','subscription_code_redemption',997995720,32472169200,'3','4','4',NULL,0,1,0,0,121,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000046','HOleaBMUZT6B5qJmbcV5xg','000001000001000003000170000001','published','WebGUI::Asset::Template','Subscriptionitem default template','Subscriptionitem default template','subscriptionitem_default_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,136,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000018','5SdElAemaCKBfheDk7rz8A','000001000001000003000147000001','published','WebGUI::Asset::Template','Default transaction error template','Default transaction error template','default_transaction_error_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,484,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000016','j3yljeaT2y9fLkSHM5Zbow','000001000001000003000145000001','published','WebGUI::Asset::Template','Default checkout confirmation template','Default checkout confirmation template','default_checkout_confirmation_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2034,1116875930,'1',0,NULL,0),('PBtmpl0000000000000019','arabONid_vy2W6cALhELxA','000001000001000003000148000001','published','WebGUI::Asset::Template','Default view purchase history template','Default view purchase history template','default_view_purchase_history_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,540,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000015','VvgRRrE6UsmWi7y7hMCXbw','000001000001000003000144000001','published','WebGUI::Asset::Template','Default cancel checkout template','Default cancel checkout template','default_cancel_checkout_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,18,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000017','2jkEIs9YpL10dZsA3RH4sw','000001000001000003000146000001','published','WebGUI::Asset::Template','Default payment gateway selection template','Default payment gateway selection template','default_payment_gateway_selection_template',997995720,32472169200,'3','4','4',NULL,0,1,0,0,468,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000001','HCQF9FBLWK3Se06yGLoliw','000001000001000003000128000001','published','WebGUI::Asset::Template','Admin Console','Admin Console','admin_console2',997995720,32472169200,'3','4','4',NULL,0,1,0,0,2754,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000140','i7emhSfswYNreLAwn1wBRw','000001000001000003000182000001','published','WebGUI::Asset::Template','Default Shortcut','Default Shortcut','PBtmpl0000000000000140',997995720,32472169200,'3','4','4',NULL,0,1,0,0,901,1109194982,NULL,0,NULL,0),('PBtmpl0000000000000141','sb7g8aCLMq-XigfBdmw2cg','000001000001000003000149000002','published','WebGUI::Asset::Template','Default DataForm','Default DataForm','PBtmpl0000000000000141',997995720,9223372036854775807,'3','4','4',NULL,0,1,0,0,2493,1110941437,'1',0,NULL,0),('79BY6IHpAtE2yuQwROh9tg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000129','published','WebGUI::Asset::Wobject::Folder','Article','Article','templates/article',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,257,1111265933,'1',0,NULL,0),('ZexTeuMQaZ1fh4FOpLNlYw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000130','published','WebGUI::Asset::Wobject::Folder','AttachmentBox','AttachmentBox','templates/attachmentbox',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265933,'1',0,NULL,0),('_r8Y0WwiHLyVEFe5M0idYQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000131','published','WebGUI::Asset::Wobject::Folder','Auth/LDAP/Account','Auth/LDAP/Account','templates/auth/ldap/account',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265933,'1',0,NULL,0),('Mkc1dJDw-lqExS5uy7QReA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000132','published','WebGUI::Asset::Wobject::Folder','Auth/LDAP/Create','Auth/LDAP/Create','templates/auth/ldap/create',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265933,'1',0,NULL,0),('zyS1TsKDvBk7Y55_GlWgxA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000133','published','WebGUI::Asset::Wobject::Folder','Auth/LDAP/Login','Auth/LDAP/Login','templates/auth/ldap/login',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265933,'1',0,NULL,0),('CDzQSnxPMWCy2j5ZOxWbrw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000134','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Account','Auth/WebGUI/Account','templates/auth/webgui/account',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,305,1111265933,'1',0,NULL,0),('RPo_G59wjPTGE1-IhiE44A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000135','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Create','Auth/WebGUI/Create','templates/auth/webgui/create',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,301,1111265933,'1',0,NULL,0),('Oq61G3_QSM5TzArFUzUBiA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000136','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Expired','Auth/WebGUI/Expired','templates/auth/webgui/expired',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,305,1111265933,'1',0,NULL,0),('jcIZMBAyEcmXktAVwPxgIw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000137','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Login','Auth/WebGUI/Login','templates/auth/webgui/login',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265933,'1',0,NULL,0),('ThLKZPeKbRAVEYTkKAxeCg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000138','published','WebGUI::Asset::Wobject::Folder','Auth/WebGUI/Recovery','Auth/WebGUI/Recovery','templates/auth/webgui/recovery',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265933,'1',0,NULL,0),('8r4-zJ6g-qOecM1PsvADbQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000139','published','WebGUI::Asset::Wobject::Folder','Collaboration','Collaboration','templates/collaboration',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265933,'1',0,NULL,0),('ECq9dLm5vmh4t963yDx1og','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000140','published','WebGUI::Asset::Wobject::Folder','Collaboration/Notification','Collaboration/Notification','templates/collaboration/notification',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,333,1111265934,'1',0,NULL,0),('PNGrWdYDhJZTv1-sAX6W1Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000141','published','WebGUI::Asset::Wobject::Folder','Collaboration/PostForm','Collaboration/PostForm','templates/collaboration/postform',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265934,'1',0,NULL,0),('guQGD9YiTn55PqOUTjCc0A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000142','published','WebGUI::Asset::Wobject::Folder','Collaboration/Search','Collaboration/Search','templates/collaboration/search',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265934,'1',0,NULL,0),('-MlWyWh12ibRM8gAzRy41g','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000143','published','WebGUI::Asset::Wobject::Folder','Collaboration/Thread','Collaboration/Thread','templates/collaboration/thread',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265934,'1',0,NULL,0),('VvgRRrE6UsmWi7y7hMCXbw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000144','published','WebGUI::Asset::Wobject::Folder','Commerce/CheckoutCanceled','Commerce/CheckoutCanceled','templates/commerce/checkoutcanceled',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,329,1111265934,'1',0,NULL,0),('j3yljeaT2y9fLkSHM5Zbow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000145','published','WebGUI::Asset::Wobject::Folder','Commerce/ConfirmCheckout','Commerce/ConfirmCheckout','templates/commerce/confirmcheckout',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,325,1111265934,'1',0,NULL,0),('2jkEIs9YpL10dZsA3RH4sw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000146','published','WebGUI::Asset::Wobject::Folder','Commerce/SelectPaymentGateway','Commerce/SelectPaymentGateway','templates/commerce/selectpaymentgateway',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,345,1111265934,'1',0,NULL,0),('5SdElAemaCKBfheDk7rz8A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000147','published','WebGUI::Asset::Wobject::Folder','Commerce/TransactionError','Commerce/TransactionError','templates/commerce/transactionerror',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,329,1111265934,'1',0,NULL,0),('arabONid_vy2W6cALhELxA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000148','published','WebGUI::Asset::Wobject::Folder','Commerce/ViewPurchaseHistory','Commerce/ViewPurchaseHistory','templates/commerce/viewpurchasehistory',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,341,1111265935,'1',0,NULL,0),('sb7g8aCLMq-XigfBdmw2cg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000149','published','WebGUI::Asset::Wobject::Folder','DataForm','DataForm','templates/dataform',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,261,1111265935,'1',0,NULL,0),('BAoMajIxnoGlrxhDVgot9g','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000150','published','WebGUI::Asset::Wobject::Folder','DataForm/List','DataForm/List','templates/dataform/list',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265935,'1',0,NULL,0),('b26vQzyaqz0EBMWH_oPdrg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000151','published','WebGUI::Asset::Wobject::Folder','EventsCalendar','EventsCalendar','templates/eventscalendar',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,285,1111265935,'1',0,NULL,0),('jCMdSbD6IA535I16Pcik7Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000152','published','WebGUI::Asset::Wobject::Folder','EventsCalendar/Event','EventsCalendar/Event','templates/eventscalendar/event',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265935,'1',0,NULL,0),('-Kmb-MEV4ni9d0tn_BYGXA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000153','published','WebGUI::Asset::Wobject::Folder','FileAsset','FileAsset','templates/fileasset',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,265,1111265935,'1',0,NULL,0),('ZWv7HLTQ4oERBIFJHBz1Ow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000154','published','WebGUI::Asset::Wobject::Folder','Folder','Folder','templates/folder',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265935,'1',0,NULL,0),('RcOR25DbCizyAfNWvr-2ow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000155','published','WebGUI::Asset::Wobject::Folder','HttpProxy','HttpProxy','templates/httpproxy',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,265,1111265935,'1',0,NULL,0),('59f_y-iE0k8dSMVIyX5SBg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000156','published','WebGUI::Asset::Wobject::Folder','ImageAsset','ImageAsset','templates/imageasset',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265935,'1',0,NULL,0),('2DAYoiOdplxZCrEwmrVhwQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000157','published','WebGUI::Asset::Wobject::Folder','IndexedSearch','IndexedSearch','templates/indexedsearch',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,281,1111265935,'1',0,NULL,0),('tJ_X5F3Dkaz8vO6CigbJrg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000158','published','WebGUI::Asset::Wobject::Folder','Layout','Layout','templates/layout',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265935,'1',0,NULL,0),('Fh_KALcbkc8CkBR3I6dU0g','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000159','published','WebGUI::Asset::Wobject::Folder','Macro/AdminBar','Macro/AdminBar','templates/macro/adminbar',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,285,1111265936,'1',0,NULL,0),('WTPOJerammxgkIdCWnR9uw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000160','published','WebGUI::Asset::Wobject::Folder','Macro/AdminToggle','Macro/AdminToggle','templates/macro/admintoggle',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0),('PttBzI13R8HXqQn40I4UFg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000161','published','WebGUI::Asset::Wobject::Folder','Macro/a_account','Macro/a_account','templates/macro/a_account',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265936,'1',0,NULL,0),('VdTZ8_2vlZwVVuv_I7DsWA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000162','published','WebGUI::Asset::Wobject::Folder','Macro/EditableToggle','Macro/EditableToggle','templates/macro/editabletoggle',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,309,1111265936,'1',0,NULL,0),('BBoAtdsTo2AGPe4k9kfkxA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000163','published','WebGUI::Asset::Wobject::Folder','Macro/File','Macro/File','templates/macro/file',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265936,'1',0,NULL,0),('A-m4h7Q3LYt61G54zpEGqA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000164','published','WebGUI::Asset::Wobject::Folder','Macro/GroupAdd','Macro/GroupAdd','templates/macro/groupadd',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,285,1111265936,'1',0,NULL,0),('Wquzj9XSpxL_gpGXkoU6tg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000165','published','WebGUI::Asset::Wobject::Folder','Macro/GroupDelete','Macro/GroupDelete','templates/macro/groupdelete',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0),('J1uh__tKV2BARcSeFE7MSg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000166','published','WebGUI::Asset::Wobject::Folder','Macro/H_homeLink','Macro/H_homeLink','templates/macro/h_homelink',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265936,'1',0,NULL,0),('7EfoKU41oB0ZU6NmVIud4A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000167','published','WebGUI::Asset::Wobject::Folder','Macro/LoginToggle','Macro/LoginToggle','templates/macro/logintoggle',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0),('n1xT2JUidbeqNMN2zyvHAQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000168','published','WebGUI::Asset::Wobject::Folder','Macro/L_loginBox','Macro/L_loginBox','templates/macro/l_loginbox',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265936,'1',0,NULL,0),('mKI2EjkU9QH6dJKkx7VEvw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000169','published','WebGUI::Asset::Wobject::Folder','Macro/r_printable','Macro/r_printable','templates/macro/r_printable',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265936,'1',0,NULL,0),('HOleaBMUZT6B5qJmbcV5xg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000170','published','WebGUI::Asset::Wobject::Folder','Macro/SubscriptionItem','Macro/SubscriptionItem','templates/macro/subscriptionitem',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265936,'1',0,NULL,0),('L070eyyGhoWx5cSUeNRrow','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000171','published','WebGUI::Asset::Wobject::Folder','MessageBoard','MessageBoard','templates/messageboard',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,277,1111265936,'1',0,NULL,0),('c3jDvo_bK3jFqjIefgXjUw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000172','published','WebGUI::Asset::Wobject::Folder','Navigation','Navigation','templates/navigation',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265937,'1',0,NULL,0),('VnUEcXfsbwgB5rqslQ3n1A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000173','published','WebGUI::Asset::Wobject::Folder','Operation/MessageLog/Message','Operation/MessageLog/Message','templates/operation/messagelog/message',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,341,1111265937,'1',0,NULL,0),('6MrxI11jyXuB-UUrX69lXQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000174','published','WebGUI::Asset::Wobject::Folder','Operation/MessageLog/View','Operation/MessageLog/View','templates/operation/messagelog/view',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,329,1111265937,'1',0,NULL,0),('xxuM0xMjhIA3lFq99GY05Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000175','published','WebGUI::Asset::Wobject::Folder','Operation/Profile/Edit','Operation/Profile/Edit','templates/operation/profile/edit',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265937,'1',0,NULL,0),('kHlR8-nCFRrwlEV1uapu_Q','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000176','published','WebGUI::Asset::Wobject::Folder','Operation/Profile/View','Operation/Profile/View','templates/operation/profile/view',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,317,1111265937,'1',0,NULL,0),('r4FQlrIkS1_MTuk-vVqRNg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000177','published','WebGUI::Asset::Wobject::Folder','Operation/RedeemSubscription','Operation/RedeemSubscription','templates/operation/redeemsubscription',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,341,1111265937,'1',0,NULL,0),('EvgkCMpx4kUonmjhhZXRjg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000178','published','WebGUI::Asset::Wobject::Folder','Poll','Poll','templates/poll',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,245,1111265937,'1',0,NULL,0),('I2DQUdFVd9FtcSealp4cTQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000179','published','WebGUI::Asset::Wobject::Folder','Product','Product','templates/product',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,257,1111265937,'1',0,NULL,0),('khkob2AmnIKAxKJeXHE3fQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000180','published','WebGUI::Asset::Wobject::Folder','prompt','prompt','templates/prompt',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265937,'1',0,NULL,0),('h34TI6OYynW5Q_FYLbZiig','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000181','published','WebGUI::Asset::Wobject::Folder','richEditor','richEditor','templates/richeditor',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,269,1111265937,'1',0,NULL,0),('i7emhSfswYNreLAwn1wBRw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000182','published','WebGUI::Asset::Wobject::Folder','Shortcut','Shortcut','templates/shortcut',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,261,1111265937,'1',0,NULL,0),('o9PZOa7fy9AZa8fKmhoPrQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000183','published','WebGUI::Asset::Wobject::Folder','SQLReport','SQLReport','templates/sqlreport',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,265,1111265938,'1',0,NULL,0),('eLdzeSyvZfml-YVFfgUiaw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000184','published','WebGUI::Asset::Wobject::Folder','style','style','templates/style',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,249,1111265938,'1',0,NULL,0),('ffWKX2dW4t1eWgfNng605w','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000185','published','WebGUI::Asset::Wobject::Folder','Survey','Survey','templates/survey',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,253,1111265938,'1',0,NULL,0),('QWS2acYOu3Y4uNsWvVChTg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000186','published','WebGUI::Asset::Wobject::Folder','Survey/Gradebook','Survey/Gradebook','templates/survey/gradebook',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,293,1111265938,'1',0,NULL,0),('lUjGdT_Hhi_EFhsYr1Ouyw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000187','published','WebGUI::Asset::Wobject::Folder','Survey/Overview','Survey/Overview','templates/survey/overview',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265938,'1',0,NULL,0),('7Xhdnqu3qkDWHEnRgk6Uzw','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000188','published','WebGUI::Asset::Wobject::Folder','Survey/Response','Survey/Response','templates/survey/response',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,289,1111265938,'1',0,NULL,0),('xPyASYtR44mpDk3ba4YyIg','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000189','published','WebGUI::Asset::Wobject::Folder','SyndicatedContent','SyndicatedContent','templates/syndicatedcontent',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,297,1111265938,'1',0,NULL,0),('S99spbsvn96tgRA0oVUl2A','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000190','published','WebGUI::Asset::Wobject::Folder','WSClient','WSClient','templates/wsclient',997995720,9223372036854775807,'3','4','3',NULL,0,1,0,0,261,1111265938,'1',0,NULL,0),('PBtmplCP00000000000001','Rn5Ef8vMDQ0ebtaxS_-JXA','000001000001000003000191000001','published','WebGUI::Asset::Template','Default Product Template','Default Product Template','default-produuct-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,694,1115241872,'1',0,NULL,0),('60wqz7KzyCDCHVNaavhQUA','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000192','published','WebGUI::Asset::Wobject::Folder','Commerce/SelectShippingMethod','Commerce/SelectShippingMethod','commerce/selectshippingmethod',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,240,1115241872,'1',0,NULL,0),('PBtmplCSSM000000000001','60wqz7KzyCDCHVNaavhQUA','000001000001000003000192000001','published','WebGUI::Asset::Template','Default Select Shipping Method Template','Default Select Shipping Method Template','default-select-shipping-method-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,746,1115241872,'1',0,NULL,0),('fhevmqeVTLRCmI_z-NidQQ','RTsbVBEYnn3OPZWmXyIFhQ','000001000001000003000193','published','WebGUI::Asset::Wobject::Folder','Commerce/ViewShoppingCart','Commerce/ViewShoppingCart','commerce/viewshoppingcart',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,228,1115241872,'1',0,NULL,0),('PBtmplVSC0000000000001','fhevmqeVTLRCmI_z-NidQQ','000001000001000003000193000001','published','WebGUI::Asset::Template','Default Shopping Cart Template','Default Shopping Cart Template','default-shoppingcart-template',997995720,9223372036854775807,'3','7','3',NULL,0,0,0,0,1527,1115241872,'1',0,NULL,0);
+CREATE TABLE `assetHistory` (
+  `assetId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) NOT NULL default '',
+  `dateStamp` bigint(20) NOT NULL default '0',
+  `actionTaken` varchar(255) NOT NULL default ''
+) TYPE=MyISAM;
+INSERT INTO `assetHistory` VALUES ('PBasset000000000000002','1',1109194982,'added child PBtmpl0000000000000140'),('PBtmpl0000000000000140','1',1109194982,'created'),('PBasset000000000000002','1',1110941437,'added child PBtmpl0000000000000141'),('PBtmpl0000000000000141','1',1110941437,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265932,'added child HCQF9FBLWK3Se06yGLoliw'),('HCQF9FBLWK3Se06yGLoliw','1',1111265932,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child 79BY6IHpAtE2yuQwROh9tg'),('79BY6IHpAtE2yuQwROh9tg','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child ZexTeuMQaZ1fh4FOpLNlYw'),('ZexTeuMQaZ1fh4FOpLNlYw','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child _r8Y0WwiHLyVEFe5M0idYQ'),('_r8Y0WwiHLyVEFe5M0idYQ','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child Mkc1dJDw-lqExS5uy7QReA'),('Mkc1dJDw-lqExS5uy7QReA','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child zyS1TsKDvBk7Y55_GlWgxA'),('zyS1TsKDvBk7Y55_GlWgxA','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child CDzQSnxPMWCy2j5ZOxWbrw'),('CDzQSnxPMWCy2j5ZOxWbrw','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child RPo_G59wjPTGE1-IhiE44A'),('RPo_G59wjPTGE1-IhiE44A','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child Oq61G3_QSM5TzArFUzUBiA'),('Oq61G3_QSM5TzArFUzUBiA','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child jcIZMBAyEcmXktAVwPxgIw'),('jcIZMBAyEcmXktAVwPxgIw','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child ThLKZPeKbRAVEYTkKAxeCg'),('ThLKZPeKbRAVEYTkKAxeCg','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265933,'added child 8r4-zJ6g-qOecM1PsvADbQ'),('8r4-zJ6g-qOecM1PsvADbQ','1',1111265933,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child ECq9dLm5vmh4t963yDx1og'),('ECq9dLm5vmh4t963yDx1og','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child PNGrWdYDhJZTv1-sAX6W1Q'),('PNGrWdYDhJZTv1-sAX6W1Q','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child guQGD9YiTn55PqOUTjCc0A'),('guQGD9YiTn55PqOUTjCc0A','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child -MlWyWh12ibRM8gAzRy41g'),('-MlWyWh12ibRM8gAzRy41g','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child VvgRRrE6UsmWi7y7hMCXbw'),('VvgRRrE6UsmWi7y7hMCXbw','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child j3yljeaT2y9fLkSHM5Zbow'),('j3yljeaT2y9fLkSHM5Zbow','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child 2jkEIs9YpL10dZsA3RH4sw'),('2jkEIs9YpL10dZsA3RH4sw','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child 5SdElAemaCKBfheDk7rz8A'),('5SdElAemaCKBfheDk7rz8A','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265934,'added child arabONid_vy2W6cALhELxA'),('arabONid_vy2W6cALhELxA','1',1111265934,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child sb7g8aCLMq-XigfBdmw2cg'),('sb7g8aCLMq-XigfBdmw2cg','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child BAoMajIxnoGlrxhDVgot9g'),('BAoMajIxnoGlrxhDVgot9g','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child b26vQzyaqz0EBMWH_oPdrg'),('b26vQzyaqz0EBMWH_oPdrg','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child jCMdSbD6IA535I16Pcik7Q'),('jCMdSbD6IA535I16Pcik7Q','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child -Kmb-MEV4ni9d0tn_BYGXA'),('-Kmb-MEV4ni9d0tn_BYGXA','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child ZWv7HLTQ4oERBIFJHBz1Ow'),('ZWv7HLTQ4oERBIFJHBz1Ow','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child RcOR25DbCizyAfNWvr-2ow'),('RcOR25DbCizyAfNWvr-2ow','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child 59f_y-iE0k8dSMVIyX5SBg'),('59f_y-iE0k8dSMVIyX5SBg','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child 2DAYoiOdplxZCrEwmrVhwQ'),('2DAYoiOdplxZCrEwmrVhwQ','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265935,'added child tJ_X5F3Dkaz8vO6CigbJrg'),('tJ_X5F3Dkaz8vO6CigbJrg','1',1111265935,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child Fh_KALcbkc8CkBR3I6dU0g'),('Fh_KALcbkc8CkBR3I6dU0g','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child WTPOJerammxgkIdCWnR9uw'),('WTPOJerammxgkIdCWnR9uw','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child PttBzI13R8HXqQn40I4UFg'),('PttBzI13R8HXqQn40I4UFg','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child VdTZ8_2vlZwVVuv_I7DsWA'),('VdTZ8_2vlZwVVuv_I7DsWA','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child BBoAtdsTo2AGPe4k9kfkxA'),('BBoAtdsTo2AGPe4k9kfkxA','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child A-m4h7Q3LYt61G54zpEGqA'),('A-m4h7Q3LYt61G54zpEGqA','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child Wquzj9XSpxL_gpGXkoU6tg'),('Wquzj9XSpxL_gpGXkoU6tg','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child J1uh__tKV2BARcSeFE7MSg'),('J1uh__tKV2BARcSeFE7MSg','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child 7EfoKU41oB0ZU6NmVIud4A'),('7EfoKU41oB0ZU6NmVIud4A','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child n1xT2JUidbeqNMN2zyvHAQ'),('n1xT2JUidbeqNMN2zyvHAQ','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child mKI2EjkU9QH6dJKkx7VEvw'),('mKI2EjkU9QH6dJKkx7VEvw','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child HOleaBMUZT6B5qJmbcV5xg'),('HOleaBMUZT6B5qJmbcV5xg','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265936,'added child L070eyyGhoWx5cSUeNRrow'),('L070eyyGhoWx5cSUeNRrow','1',1111265936,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child c3jDvo_bK3jFqjIefgXjUw'),('c3jDvo_bK3jFqjIefgXjUw','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child VnUEcXfsbwgB5rqslQ3n1A'),('VnUEcXfsbwgB5rqslQ3n1A','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child 6MrxI11jyXuB-UUrX69lXQ'),('6MrxI11jyXuB-UUrX69lXQ','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child xxuM0xMjhIA3lFq99GY05Q'),('xxuM0xMjhIA3lFq99GY05Q','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child kHlR8-nCFRrwlEV1uapu_Q'),('kHlR8-nCFRrwlEV1uapu_Q','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child r4FQlrIkS1_MTuk-vVqRNg'),('r4FQlrIkS1_MTuk-vVqRNg','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child EvgkCMpx4kUonmjhhZXRjg'),('EvgkCMpx4kUonmjhhZXRjg','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child I2DQUdFVd9FtcSealp4cTQ'),('I2DQUdFVd9FtcSealp4cTQ','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child khkob2AmnIKAxKJeXHE3fQ'),('khkob2AmnIKAxKJeXHE3fQ','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child h34TI6OYynW5Q_FYLbZiig'),('h34TI6OYynW5Q_FYLbZiig','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265937,'added child i7emhSfswYNreLAwn1wBRw'),('i7emhSfswYNreLAwn1wBRw','1',1111265937,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child o9PZOa7fy9AZa8fKmhoPrQ'),('o9PZOa7fy9AZa8fKmhoPrQ','1',1111265938,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child eLdzeSyvZfml-YVFfgUiaw'),('eLdzeSyvZfml-YVFfgUiaw','1',1111265938,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child ffWKX2dW4t1eWgfNng605w'),('ffWKX2dW4t1eWgfNng605w','1',1111265938,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child QWS2acYOu3Y4uNsWvVChTg'),('QWS2acYOu3Y4uNsWvVChTg','1',1111265938,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child lUjGdT_Hhi_EFhsYr1Ouyw'),('lUjGdT_Hhi_EFhsYr1Ouyw','1',1111265938,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child 7Xhdnqu3qkDWHEnRgk6Uzw'),('7Xhdnqu3qkDWHEnRgk6Uzw','1',1111265938,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child xPyASYtR44mpDk3ba4YyIg'),('xPyASYtR44mpDk3ba4YyIg','1',1111265938,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1111265938,'added child S99spbsvn96tgRA0oVUl2A'),('S99spbsvn96tgRA0oVUl2A','1',1111265938,'created'),('PBtmpl0000000000000035','1',1115241871,'purged'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241871,'added child Rn5Ef8vMDQ0ebtaxS_-JXA'),('Rn5Ef8vMDQ0ebtaxS_-JXA','1',1115241871,'created'),('Rn5Ef8vMDQ0ebtaxS_-JXA','1',1115241872,'added child PBtmplCP00000000000001'),('PBtmplCP00000000000001','1',1115241872,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241872,'added child 60wqz7KzyCDCHVNaavhQUA'),('60wqz7KzyCDCHVNaavhQUA','1',1115241872,'created'),('60wqz7KzyCDCHVNaavhQUA','1',1115241872,'added child PBtmplCSSM000000000001'),('PBtmplCSSM000000000001','1',1115241872,'created'),('RTsbVBEYnn3OPZWmXyIFhQ','1',1115241872,'added child fhevmqeVTLRCmI_z-NidQQ'),('fhevmqeVTLRCmI_z-NidQQ','1',1115241872,'created'),('fhevmqeVTLRCmI_z-NidQQ','1',1115241872,'added child PBtmplVSC0000000000001'),('PBtmplVSC0000000000001','1',1115241872,'created'),('PBtmpl0000000000000126','1',1115241872,'purged'),('PBtmpl0000000000000138','1',1115241872,'purged'),('PBasset000000000000002','1',1115241872,'added child PBrichedit000000000001'),('PBrichedit000000000001','1',1115241872,'created'),('PBasset000000000000002','1',1115241872,'added child PBrichedit000000000002'),('PBrichedit000000000002','1',1115241872,'created');
+CREATE TABLE `authentication` (
+  `userId` varchar(22) NOT NULL default '',
+  `authMethod` varchar(30) NOT NULL default '',
+  `fieldName` varchar(128) NOT NULL default '',
+  `fieldData` text,
+  PRIMARY KEY  (`userId`,`authMethod`,`fieldName`)
+) TYPE=MyISAM;
+INSERT INTO `authentication` VALUES ('1','LDAP','ldapUrl',NULL),('3','LDAP','ldapUrl',''),('1','LDAP','connectDN',NULL),('3','LDAP','connectDN',''),('1','WebGUI','identifier','No Login'),('3','WebGUI','identifier','RvlMjeFPs2aAhQdo/xt/Kg'),('1','WebGUI','passwordLastUpdated','1078704037'),('1','WebGUI','passwordTimeout','3122064000'),('1','WebGUI','changeUsername','1'),('1','WebGUI','changePassword','1'),('3','WebGUI','passwordLastUpdated','1078704037'),('3','WebGUI','passwordTimeout','3122064000'),('3','WebGUI','changeUsername','1'),('3','WebGUI','changePassword','1');
+CREATE TABLE `commerceSettings` (
+  `fieldName` varchar(64) NOT NULL default '',
+  `fieldValue` varchar(255) NOT NULL default '',
+  `namespace` varchar(64) NOT NULL default '',
+  `type` varchar(10) NOT NULL default ''
+) TYPE=MyISAM;
+CREATE TABLE `databaseLink` (
+  `databaseLinkId` varchar(22) NOT NULL default '',
+  `title` varchar(255) default NULL,
+  `DSN` varchar(255) default NULL,
+  `username` varchar(255) default NULL,
+  `identifier` varchar(255) default NULL,
+  PRIMARY KEY  (`databaseLinkId`)
+) TYPE=MyISAM;
+CREATE TABLE `groupGroupings` (
+  `groupId` char(22) NOT NULL default '',
+  `inGroup` char(22) NOT NULL default ''
+) TYPE=MyISAM;
+INSERT INTO `groupGroupings` VALUES ('4','12'),('6','12'),('8','12'),('9','12'),('11','12'),('3','2'),('3','4'),('3','5'),('3','6'),('3','7'),('3','8'),('3','9'),('3','13'),('3','11'),('3','12');
+CREATE TABLE `groupings` (
+  `groupId` char(22) NOT NULL default '',
+  `userId` char(22) NOT NULL default '',
+  `expireDate` int(11) NOT NULL default '2114402400',
+  `groupAdmin` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`groupId`,`userId`)
+) TYPE=MyISAM;
+INSERT INTO `groupings` VALUES ('1','1',2114402400,0),('3','3',2114402400,0),('7','1',2114402400,0),('7','3',2114402400,0),('2','3',2114402400,0);
+CREATE TABLE `groups` (
+  `groupId` varchar(22) NOT NULL default '',
+  `groupName` varchar(30) default NULL,
+  `description` varchar(255) default NULL,
+  `expireOffset` int(11) NOT NULL default '314496000',
+  `karmaThreshold` int(11) NOT NULL default '1000000000',
+  `ipFilter` text,
+  `dateCreated` int(11) NOT NULL default '997938000',
+  `lastUpdated` int(11) NOT NULL default '997938000',
+  `deleteOffset` int(11) NOT NULL default '14',
+  `expireNotifyOffset` int(11) NOT NULL default '-14',
+  `expireNotifyMessage` text,
+  `expireNotify` int(11) NOT NULL default '0',
+  `scratchFilter` text,
+  `autoAdd` int(11) NOT NULL default '0',
+  `autoDelete` int(11) NOT NULL default '0',
+  `databaseLinkId` varchar(22) default NULL,
+  `dbCacheTimeout` int(11) NOT NULL default '3600',
+  `dbQuery` text,
+  `isEditable` int(11) NOT NULL default '1',
+  `showInForms` int(11) NOT NULL default '1',
+  `ldapGroup` varchar(255) default NULL,
+  `ldapGroupProperty` varchar(255) default NULL,
+  `ldapRecursiveProperty` varchar(255) default NULL,
+  PRIMARY KEY  (`groupId`)
+) TYPE=MyISAM;
+INSERT INTO `groups` VALUES ('1','Visitors','This is the public group that has no privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL),('2','Registered Users','All registered users belong to this group automatically. There are no associated privileges other than that the user has an account and is logged in.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL),('3','Admins','Anyone who belongs to this group has privileges to do anything and everything.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL),('4','Content Managers','Users that have privileges to edit content on this site. The user still needs to be added to a group that has editing privileges on specific pages.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL),('6','Package Managers','Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL),('7','Everyone','A group that automatically includes all users including Visitors.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,0,1,NULL,NULL,NULL),('8','Template Managers','Users that have privileges to edit templates for this site.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL),('9','Theme Managers','Users in this group can use the theme manager to create new themes and install themes from other systems.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL),('13','Export Managers','Users in this group can export pages to disk.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL),('11','Secondary Admins','Users that have limited administrative privileges.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,1,NULL,NULL,NULL),('12','Turn Admin On','These users can enable admin mode.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,'0',3600,NULL,1,0,NULL,NULL,NULL),('a7jbpVdbzxchqtSj_9W71w','DC1etlIaBRQitXnchZKvUw','The group to store subscriptions for the collaboration system DC1etlIaBRQitXnchZKvUw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL),('wP1Lt8NIySq9MS8xPGnAsQ','pSygeMG7bSL1Za0SNqfUbw','The group to store subscriptions for the thread pSygeMG7bSL1Za0SNqfUbw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL),('OL-d6C93EeUr4Rja-q3-yQ','mdIaXozmVNE_Rga2BY0mxA','The group to store subscriptions for the thread mdIaXozmVNE_Rga2BY0mxA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL),('YPCggIxdKT3AMMlML-CAuw','9kDcFufTKbMTkeAHyP36fw','The group to store subscriptions for the thread 9kDcFufTKbMTkeAHyP36fw',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL),('C02CXMw3c42EJJR_nktyMw','5Y8eOI2u_HOvkzrRuLdz1g','The group to store subscriptions for the thread 5Y8eOI2u_HOvkzrRuLdz1g',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL),('zZmjNsD1FhaSFkgXvnCQUg','ImmYJRWOPFedzI4Bg1k6GA','The group to store subscriptions for the thread ImmYJRWOPFedzI4Bg1k6GA',314496000,1000000000,NULL,1109194980,1109194980,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,0,0,NULL,NULL,NULL),('14','Product Managers','The group that is allowed to edit, delete and create products.',314496000,1000000000,NULL,997938000,997938000,14,-14,NULL,0,NULL,0,0,NULL,3600,NULL,1,1,NULL,NULL,NULL);
+CREATE TABLE `incrementer` (
+  `incrementerId` varchar(50) NOT NULL default '',
+  `nextValue` int(11) NOT NULL default '1',
+  PRIMARY KEY  (`incrementerId`)
+) TYPE=MyISAM;
+CREATE TABLE `karmaLog` (
+  `userId` varchar(22) default NULL,
+  `amount` int(11) NOT NULL default '1',
+  `source` varchar(255) default NULL,
+  `description` text,
+  `dateModified` int(11) NOT NULL default '1026097656'
+) TYPE=MyISAM;
+CREATE TABLE `ldapLink` (
+  `ldapLinkId` varchar(22) NOT NULL default '',
+  `ldapLinkName` varchar(255) NOT NULL default '',
+  `ldapUrl` varchar(255) NOT NULL default '',
+  `connectDn` varchar(255) NOT NULL default '',
+  `identifier` varchar(255) NOT NULL default '',
+  `ldapUserRDN` varchar(255) default NULL,
+  `ldapIdentity` varchar(255) default NULL,
+  `ldapIdentityName` varchar(255) default NULL,
+  `ldapPasswordName` varchar(255) default NULL,
+  `ldapSendWelcomeMessage` char(2) default NULL,
+  `ldapWelcomeMessage` text,
+  `ldapAccountTemplate` varchar(22) default NULL,
+  `ldapCreateAccountTemplate` varchar(22) default NULL,
+  `ldapLoginTemplate` varchar(22) default NULL,
+  PRIMARY KEY  (`ldapLinkId`)
+) TYPE=MyISAM;
+INSERT INTO `ldapLink` VALUES ('1uBbhUm686mkFZ1ghv7Lag','Default LDAP Connection','ldap://ldap.mycompany.com:389/o=MyCompany','','','cn','shortname','LDAP Shortname','LDAP Password','0','Welcome to our site.','PBtmpl0000000000000004','PBtmpl0000000000000005','PBtmpl0000000000000006');
+CREATE TABLE `messageLog` (
+  `messageLogId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) NOT NULL default '',
+  `message` text,
+  `url` text,
+  `dateOfEntry` int(11) default NULL,
+  `subject` varchar(255) default NULL,
+  `status` varchar(30) default 'notice',
+  PRIMARY KEY  (`messageLogId`,`userId`)
+) TYPE=MyISAM;
+CREATE TABLE `metaData_properties` (
+  `fieldId` varchar(22) NOT NULL default '',
+  `fieldName` varchar(100) NOT NULL default '',
+  `description` mediumtext NOT NULL,
+  `fieldType` varchar(30) default NULL,
+  `possibleValues` text,
+  `defaultValue` varchar(100) default NULL,
+  PRIMARY KEY  (`fieldId`),
+  UNIQUE KEY `field_unique` (`fieldName`)
+) TYPE=MyISAM;
+CREATE TABLE `metaData_values` (
+  `fieldId` varchar(22) NOT NULL default '',
+  `value` varchar(100) default NULL,
+  `assetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`fieldId`,`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `passiveProfileAOI` (
+  `userId` varchar(22) NOT NULL default '',
+  `fieldId` varchar(22) NOT NULL default '',
+  `value` varchar(100) NOT NULL default '',
+  `count` int(11) default NULL,
+  PRIMARY KEY  (`userId`,`fieldId`,`value`)
+) TYPE=MyISAM;
+CREATE TABLE `passiveProfileLog` (
+  `passiveProfileLogId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) default NULL,
+  `sessionId` varchar(60) default NULL,
+  `wobjectId` varchar(22) default NULL,
+  `dateOfEntry` int(11) default '0',
+  PRIMARY KEY  (`passiveProfileLogId`)
+) TYPE=MyISAM;
+CREATE TABLE `productParameterOptions` (
+  `optionId` varchar(22) NOT NULL default '',
+  `parameterId` varchar(22) NOT NULL default '',
+  `value` varchar(64) NOT NULL default '',
+  `priceModifier` decimal(10,2) default '0.00',
+  `weightModifier` decimal(6,2) default '0.00',
+  `skuModifier` varchar(64) default NULL,
+  PRIMARY KEY  (`optionId`)
+) TYPE=MyISAM;
+CREATE TABLE `productParameters` (
+  `parameterId` varchar(22) NOT NULL default '',
+  `productId` varchar(22) NOT NULL default '',
+  `name` varchar(64) NOT NULL default '',
+  PRIMARY KEY  (`parameterId`)
+) TYPE=MyISAM;
+CREATE TABLE `productVariants` (
+  `variantId` varchar(22) NOT NULL default '',
+  `productId` varchar(22) NOT NULL default '',
+  `composition` mediumtext NOT NULL,
+  `sku` varchar(255) default NULL,
+  `price` decimal(12,2) default '0.00',
+  `weight` decimal(8,3) default '0.000',
+  `skuOverride` tinyint(1) default '0',
+  `priceOverride` tinyint(1) default '0',
+  `weightOverride` tinyint(1) default '0',
+  `available` tinyint(1) default '1',
+  PRIMARY KEY  (`variantId`)
+) TYPE=MyISAM;
+CREATE TABLE `products` (
+  `productId` varchar(22) NOT NULL default '',
+  `title` varchar(255) NOT NULL default '',
+  `description` mediumtext,
+  `price` decimal(12,2) NOT NULL default '0.00',
+  `weight` decimal(8,3) NOT NULL default '0.000',
+  `sku` varchar(255) NOT NULL default '',
+  `skuTemplate` varchar(255) default NULL,
+  `templateId` varchar(22) default NULL,
+  PRIMARY KEY  (`productId`)
+) TYPE=MyISAM;
+CREATE TABLE `redirect` (
+  `assetId` varchar(22) NOT NULL default '',
+  `redirectUrl` text,
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `replacements` (
+  `replacementId` varchar(22) NOT NULL default '',
+  `searchFor` varchar(255) default NULL,
+  `replaceWith` text,
+  PRIMARY KEY  (`replacementId`)
+) TYPE=MyISAM;
+INSERT INTO `replacements` VALUES ('1','[quote]','<blockquote><i>'),('2','[/quote]','</i></blockquote>'),('3','[image]','<img src=\"'),('4','[/image]','\" border=\"0\" / >'),('5','shit','crap'),('6','fuck','farg'),('7','asshole','icehole'),('8','nigger','guy'),('9','[b]','<b>'),('10','[/b]','</b>'),('11','[i]','<i>'),('12','[/i]','</i>');
+CREATE TABLE `settings` (
+  `name` varchar(255) NOT NULL default '',
+  `value` text,
+  PRIMARY KEY  (`name`)
+) TYPE=MyISAM;
+INSERT INTO `settings` VALUES ('maxAttachmentSize','10000'),('sessionTimeout','3600'),('smtpServer','localhost'),('companyEmail','info@mycompany.com'),('companyName','My Company'),('companyURL','http://www.mycompany.com'),('authMethod','WebGUI'),('anonymousRegistration','0'),('notFoundPage','68sKwDgf9cGH58-NZcU4lg'),('webguiRecoverPasswordEmail','Someone (probably you) requested your account information be sent. Your password has been reset. The following represents your new account information:'),('profileName','1'),('profileExtraContact','1'),('profileMisc','1'),('profileHome','0'),('profileWork','0'),('preventProxyCache','0'),('thumbnailSize','50'),('textAreaRows','5'),('textAreaCols','50'),('textBoxSize','30'),('defaultPage','68sKwDgf9cGH58-NZcU4lg'),('onNewUserAlertGroup','3'),('alertOnNewUser','0'),('useKarma','0'),('karmaPerLogin','1'),('runOnRegistration',''),('maxImageSize','100000'),('showDebug','0'),('richEditor','PBrichedit000000000001'),('selfDeactivation','1'),('snippetsPreviewLength','30'),('mailFooter','^c;\n^e;\n^u;\n'),('webguiSendWelcomeMessage','0'),('webguiWelcomeMessage','Welcome to our site.'),('proxiedClientAddress','0'),('encryptLogin','0'),('hostToUse','HTTP_HOST'),('webguiExpirePasswordOnCreation','0'),('webguiPasswordLength','0'),('webguiPasswordRecovery','1'),('webguiPasswordTimeout','3122064000'),('commerceCheckoutCanceledTemplateId','1'),('webguiChangePassword','1'),('webguiChangeUsername','1'),('metaDataEnabled','0'),('passiveProfilingEnabled','0'),('urlExtension',''),('commerceConfirmCheckoutTemplateId','1'),('commercePaymentPlugin','PayFlowPro'),('commerceSelectPaymentGatewayTemplateId','1'),('commerceTransactionErrorTemplateId','1'),('AdminConsoleTemplate','PBtmpl0000000000000001'),('userFunctionStyleId','B1bNjWVtzSjsvGZh9lPz_A'),('webguiValidateEmail','0'),('webguiUseCaptcha','1'),('webguiAccountTemplate','PBtmpl0000000000000010'),('webguiCreateAccountTemplate','PBtmpl0000000000000011'),('webguiExpiredPasswordTemplate','PBtmpl0000000000000012'),('webguiLoginTemplate','PBtmpl0000000000000013'),('webguiPasswordRecoveryTemplate','PBtmpl0000000000000014'),('ldapConnection',NULL),('commerceSelectShippingMethodTemplateId','PBtmplCSSM000000000001'),('commerceViewShoppingCartTemplateId','PBtmplVSC0000000000001'),('commerceSendDailyReportTo',''),('specialState','init');
+CREATE TABLE `shoppingCart` (
+  `sessionId` varchar(22) NOT NULL default '',
+  `itemId` varchar(64) NOT NULL default '',
+  `itemType` varchar(40) NOT NULL default '',
+  `quantity` int(4) NOT NULL default '0',
+  PRIMARY KEY  (`sessionId`,`itemId`,`itemType`)
+) TYPE=MyISAM;
+CREATE TABLE `snippet` (
+  `assetId` varchar(22) NOT NULL default '',
+  `snippet` mediumtext,
+  `processAsTemplate` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+CREATE TABLE `subscription` (
+  `subscriptionId` varchar(22) NOT NULL default '',
+  `name` varchar(128) default NULL,
+  `price` float default '0',
+  `description` mediumtext,
+  `subscriptionGroup` varchar(22) NOT NULL default '',
+  `duration` varchar(12) NOT NULL default 'Monthly',
+  `executeOnSubscription` varchar(128) default NULL,
+  `karma` int(4) default '0',
+  `deleted` int(1) default '0',
+  PRIMARY KEY  (`subscriptionId`)
+) TYPE=MyISAM;
+CREATE TABLE `subscriptionCode` (
+  `batchId` varchar(22) NOT NULL default '',
+  `code` varchar(64) NOT NULL default '',
+  `status` varchar(10) NOT NULL default 'Unused',
+  `dateCreated` int(11) NOT NULL default '0',
+  `dateUsed` int(11) NOT NULL default '0',
+  `expires` int(11) NOT NULL default '0',
+  `usedBy` varchar(22) NOT NULL default '0',
+  PRIMARY KEY  (`code`)
+) TYPE=MyISAM;
+CREATE TABLE `subscriptionCodeBatch` (
+  `batchId` varchar(22) NOT NULL default '',
+  `name` varchar(128) default NULL,
+  `description` mediumtext NOT NULL,
+  `subscriptionId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`batchId`)
+) TYPE=MyISAM;
+CREATE TABLE `subscriptionCodeSubscriptions` (
+  `code` varchar(64) NOT NULL default '',
+  `subscriptionId` varchar(22) NOT NULL default '',
+  UNIQUE KEY `code` (`code`,`subscriptionId`)
+) TYPE=MyISAM;
+CREATE TABLE `template` (
+  `template` mediumtext,
+  `namespace` varchar(35) NOT NULL default 'Page',
+  `isEditable` int(11) NOT NULL default '1',
+  `showInForms` int(11) NOT NULL default '1',
+  `assetId` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `template` VALUES ('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n  <img src=\"<tmpl_var image.url>\" align=\"left\" border=\"0\">\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if linkurl>\r\n  <tmpl_if linktitle>\r\n    <p /><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000103'),('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p />\r\n</tmpl_if>\r\n\r\n\n\n\n<tmpl_loop month_loop>\n	<table border=\"1\" width=\"100%\">\n	<tr><td colspan=7 class=\"tableHeader\"><h2 align=\"center\"><tmpl_var month> <tmpl_var year></h2></td></tr>\n	<tr>\n	<tmpl_if session.user.firstDayOfWeek>\n		<th class=\"tableData\"><tmpl_var monday.label.short></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var thursday.label.short></th>\n		<th class=\"tableData\"><tmpl_var friday.label.short></th>\n		<th class=\"tableData\"><tmpl_var saturday.label.short></th>\n		<th class=\"tableData\"><tmpl_var sunday.label.short></th>\n	<tmpl_else>\n		<th class=\"tableData\"><tmpl_var sunday.label.short></th>\n		<th class=\"tableData\"><tmpl_var monday.label.short></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label.short></th>\n		<th class=\"tableData\"><tmpl_var thursday.label.short></th>\n		<th class=\"tableData\"><tmpl_var friday.label.short></th>\n		<th class=\"tableData\"><tmpl_var saturday.label.short></th>\n	</tmpl_if>\n	</tr><tr>\n	<tmpl_loop prepad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n 	<tmpl_loop day_loop>\n		<tmpl_if isStartOfWeek>\n			<tr>\n		</tmpl_if>\n		<td class=\"table<tmpl_if isToday>Header<tmpl_else>Data</tmpl_if>\" width=\"28\" valign=\"top\" align=\"left\"><p><b>\n				<tmpl_if url>\n					<a href=\"<tmpl_var url>\"><tmpl_var day></a>\n				<tmpl_else>\n					<tmpl_var day>\n				</tmpl_if>\n		</b></p></td>		\n		<tmpl_if isEndOfWeek>\n			</tr>\n		</tmpl_if>\n	</tmpl_loop>\n	<tmpl_loop postpad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n	</tr>\n	</table>\n</tmpl_loop>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','EventsCalendar',1,1,'PBtmpl0000000000000105'),('<h1><tmpl_var title></h1>\r\n\r\n<table width=\"100%\" cellspacing=\"0\" cellpadding=\"5\" border=\"0\">\r\n<tr>\r\n<td valign=\"top\" class=\"tableHeader\" width=\"100%\">\r\n<b><tmpl_var start.label>:</b> <tmpl_var start.date><br />\r\n<b><tmpl_var end.label>:</b> <tmpl_var end.date><br />\r\n</td><td valign=\"top\" class=\"tableMenu\" nowrap=\"1\">\r\n\r\n<tmpl_if canEdit>\r\n     <a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a><br />\r\n     <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if previous.url>\r\n     <a href=\"<tmpl_var previous.url>\"><tmpl_var previous.label></a><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if next.url>\r\n     <a href=\"<tmpl_var next.url>\"><tmpl_var next.label></a><br />\r\n</tmpl_if>\r\n\r\n</td></tr>\r\n</table>\r\n<tmpl_var description>','EventsCalendar/Event',1,1,'PBtmpl0000000000000023'),('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p />\r\n</tmpl_if>\r\n\r\n\n<tmpl_loop month_loop>\n	<tmpl_loop day_loop>\n		<tmpl_loop event_loop>\n			<tmpl_if isFirstDayOfEvent>\n				<tmpl_unless dateIsSameAsPrevious>\n					<b>\n						<tmpl_var start.day.dayOfWeek> <tmpl_var start.month> <tmpl_var start.day><tmpl_unless startEndYearMatch>,\n						          <tmpl_ start.year> - \n							<tmpl_var end.day.dayOfWeek> <tmpl_var end.month> <tmpl_var end.day></tmpl_unless><tmpl_unless startEndMonthMatch> - <tmpl_var end.day.dayOfWeek> <tmpl_var end.month> <tmpl_var end.day><tmpl_else><tmpl_unless startEndDayMatch> - <tmpl_var end.day></tmpl_unless></tmpl_unless>, <tmpl_var end.year>\n					</b>\n				</tmpl_unless>\n				<blockquote>\n					<tmpl_if session.var.adminOn>\n						<a href=\"<tmpl_var url>\">\n					</tmpl_if>\n					<i><tmpl_var name></i>\n					<tmpl_if session.var.adminOn>\n						</a>\n					</tmpl_if>\n					<tmpl_if description>\n						- <tmpl_var description>\n					</tmpl_if description>\n				</blockquote>\n			</tmpl_if>\n		</tmpl_loop>\n	</tmpl_loop>\n</tmpl_loop>\n\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','EventsCalendar',1,1,'PBtmpl0000000000000086'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <div align=\"center\"><img src=\"<tmpl_var image.url>\" border=\"0\"></div>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if linkurl>\r\n  <tmpl_if linktitle>\r\n    <p /><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000084'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n  <img src=\"<tmpl_var image.url>\" align=\"right\" border=\"0\">\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if linkUrl>\r\n  <tmpl_if linkTitle>\r\n    <p /><a href=\"<tmpl_var linkUrl>\"><tmpl_var linkTitle></a>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000002'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"content\">\r\n   <table align=\"right\"><tr><td align=\"center\">\r\n   <tmpl_if linkUrl>\r\n        <a href=\"<tmpl_var linkUrl>\">\r\n      <img src=\"<tmpl_var image.url>\" border=\"0\">\r\n       <br /><tmpl_var linkTitle></a>\r\n    <tmpl_else>\r\n           <img src=\"<tmpl_var image.url>\" border=\"0\">\r\n           <br /> <tmpl_var linkTitle>\r\n   </tmpl_if>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n<tmpl_var attachment.box> <p />\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isFirstPage>\r\n<tmpl_if image.url>\r\n  </td></tr></table>\r\n</tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n<tmpl_var pagination.previousPage> \r\n&middot;\r\n<tmpl_var pagination.pageList.upTo20>\r\n&middot;\r\n<tmpl_var pagination.nextPage>\r\n</tmpl_if>\r\n\r\n<tmpl_if pagination.isLastPage>\r\n\r\n<tmpl_if allowDiscussion>\r\n  <p><table width=\"100%\" cellspacing=\"2\" cellpadding=\"1\" border=\"0\">\r\n  <tr><td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var replies.URL>\"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>\r\n  <td align=\"center\" width=\"50%\" class=\"tableMenu\"><a href=\"<tmpl_var post.url>\"><tmpl_var post.label></a></td></tr>\r\n  </table>\r\n</tmpl_if>\r\n\r\n\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000115'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.title.url>\"><tmpl_var title.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.date.url>\"><tmpl_var date.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.username.url>\"><tmpl_var by.label></a></td>\r\n</tr>\r\n<tmpl_loop post_loop>\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateUpdated.human></td>\r\n	<tmpl_if user.isVisitor>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var username></td>\r\n	<tmpl_else>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\r\n	</tmpl_if>\r\n</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000066'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n\r\n<ul>\r\n	<tmpl_loop post_loop>\r\n	   <li><a href=\"#<tmpl_var assetId>\"><span class=\"faqQuestion\"><tmpl_var title></span></a>\r\n	</tmpl_loop>\r\n</ul>\r\n\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<a name=\"<tmpl_var assetId>\"></a><span class=\"faqQuestion\"><tmpl_var title></span><br />\r\n	<tmpl_var content>\r\n	<p><a href=\"#top\">[top]</a></p>\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000080'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.title.url>\"><tmpl_var title.label></a></td>\r\n	<td class=\"forumHead\"><tmpl_var thumbnail.label></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.date.url>\"><tmpl_var date.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.username.url>\"><tmpl_var by.label></a></td>\r\n</tr>\r\n<tmpl_loop post_loop>\r\n	<tr>\r\n		<tmpl_if user.isModerator>\r\n			<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n		</tmpl_if>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" style=\"text-align: center;\">\r\n			<tmpl_if thumbnail>\r\n				 <a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var title>\" /></a>\r\n			<tmpl_else>\r\n				 &nbsp;\r\n			</tmpl_if>\r\n		</td>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateUpdated.human></td>\r\n		<tmpl_if user.isVisitor>\r\n			<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var username></td>\r\n		<tmpl_else>\r\n			<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\r\n		</tmpl_if>\r\n	</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','Collaboration',1,1,'PBtmpl0000000000000097'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<style type=\"text/css\">\r\n.weblogTitleBar {\r\n	font-weight: bold;\r\n	font-size: 14px;\r\n}\r\n.weblogLegend {\r\n	font-size: 9px;\r\n	color: #999999;\r\n}\r\n.weblogReadMore {\r\n	text-align: right;\r\n	font-size: 9px;\r\n	width: 100%;\r\n}\r\n.weblogSynopsis {\r\n	border: 1px solid #bbbbbb;\r\n	font-size: 13px;\r\n	padding: 5px;\r\n	-moz-border-radius: 6px;\r\n}\r\n</style>\r\n\r\n<p />\r\n\r\n<tmpl_loop post_loop>\r\n	<div class=\"weblogTitleBar\">\r\n		<tmpl_var title> \r\n	</div>\r\n	<fieldset class=\"weblogSynopsis\">\r\n		<legend class=\"weblogLegend\" align=\"left\">\r\n			<tmpl_var by.label> <a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>  \r\n			- \r\n			<tmpl_var dateSubmitted.human>\r\n			<tmpl_if replies>\r\n				- <tmpl_var replies> <tmpl_var replies.label>\r\n			</tmpl_if>\r\n			<tmpl_if user.isPoster>\r\n				 - <tmpl_var status>\r\n			<tmpl_else>\r\n				<tmpl_if user.isModerator>\r\n					- <tmpl_var status>\r\n				</tmpl_if>\r\n			</tmpl_if>\r\n		</legend>\r\n		<tmpl_if thumbnail>\r\n			<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var title>\" align=\"right\" /></a>\r\n		</tmpl_if>\r\n		<tmpl_var synopsis>\r\n		<div class=\"weblogReadMore\">\r\n			<a href=\"<tmpl_var url>\"><tmpl_var readmore.label></a>\r\n		</div>\r\n	</fieldset>\r\n	<p />\r\n</tmpl_loop>        \r\n\r\n						 \r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n						 ','Collaboration',1,1,'PBtmpl0000000000000112'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<style type=\"text/css\">\r\n.picture {\r\n padding: 0px; \r\n margin: 10px;\r\n float: left;\r\n width: 150px;\r\n font-size: 12px;\r\n height: 100px;\r\n overflow: hidden;\r\n}\r\n</style>\r\n\r\n<br />\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<div class=\"picture\">\r\n		<div style=\"text-align: center;\">\r\n			<tmpl_if user.isPoster><div>(<tmpl_var status>)</div></tmpl_if>\r\n			<div><a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var title>\" /></a></div>\r\n			<div><a href=\"<tmpl_var url>\"><tmpl_var title></a></div>\r\n		</div>\r\n	</div>\r\n</tmpl_loop>\r\n\r\n\r\n<div style=\"clear: both;\"></div>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','Collaboration',1,1,'PBtmpl0000000000000121'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n\r\n<h1><tmpl_var title></h1>\r\n\r\n<div style=\"float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;\">\r\n	<b><tmpl_var user.label>:</b> \r\n		<tmpl_if user.isVisitor>\r\n			<tmpl_var username>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n		</tmpl_if>\r\n		<br />\r\n	<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n	<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n	<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n		<tmpl_unless hasRated>\r\n			 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n		</tmpl_unless>\r\n		<br />\r\n	<tmpl_if user.isModerator>\r\n		<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n	<tmpl_else>	\r\n		<tmpl_if user.isPoster>\r\n			<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n		</tmpl_if>	\r\n	</tmpl_if>	\r\n</div>\r\n\r\n\r\n\r\n<tmpl_var content>\r\n\r\n<tmpl_if attachment_loop>\r\n	<br />\r\n		<tmpl_loop attachment_loop>\r\n			<div style=\"float: left; padding: 5px;\">\r\n				<a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a>\r\n			</div>\r\n		</tmpl_loop>\r\n		<div style=\"clear: both;\"></div>\r\n	<br />\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined1>\r\n	<p><tmpl_var userDefined1></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined2>\r\n	<p><tmpl_var userDefined2></p>\r\n</tmpl_if>\r\n	\r\n<tmpl_if userDefined3>\r\n	<p><tmpl_var userDefined3></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined4>\r\n	<p><tmpl_var userDefined4></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined5>\r\n	<p><tmpl_var userDefined5></p>\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_unless isLocked>\r\n	<p>\r\n		<tmpl_if user.canReply>\r\n			<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if user.canEdit>\r\n			<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n			<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_unless>\r\n\r\n\r\n<tmpl_if repliesAllowed>\r\n\r\n	<style>\r\n		.postBorder {\r\n			border: 1px solid #cccccc;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postBorderCurrent {\r\n			border: 3px dotted black;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postSubject {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-weight: bold;\r\n			padding: 3px;\r\n		}\r\n		.postData {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postControls {\r\n			border-top: 1px solid #cccccc;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postMessage {\r\n			padding: 3px;\r\n		}\r\n		.currentThread {\r\n			background-color: #eeeeee;\r\n		}\r\n		.threadHead {\r\n			font-weight: bold;\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.threadData {\r\n			font-size: 11px;\r\n			padding: 3px;\r\n		}\r\n	</style>\r\n\r\n	<div style=\"float: left; width: 70%\">\r\n		<h1><tmpl_var replies.label></h1>\r\n	</div>\r\n	<div style=\"width: 30%; float: left; text-align: right;\">\r\n		<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n		function goLayout(){\r\n			location = document.discussionlayout.layoutSelect.options[document.discussionlayout.layoutSelect.selectedIndex].value\r\n		}\r\n		//-->	\r\n		</script>\r\n		<form name=\"discussionlayout\">\r\n			<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n				<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n				<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n				<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n			</select> \r\n		</form> \r\n	</div>\r\n	<div style=\"clear: both;\"></div>\r\n\r\n	<tmpl_if layout.isThreaded>\r\n	<!-- begin threaded layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<tmpl_if isCurrent>\r\n					<div class=\"postBorder\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%;\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>	\r\n				</tmpl_if>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n		<table style=\"width: 100%\">\r\n			<thead>\r\n				<tr>\r\n					<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n					<td class=\"threadHead\"><tmpl_var user.label></td>\r\n					<td class=\"threadHead\"><tmpl_var date.label></td>\r\n				</tr>\r\n			</thead>\r\n			<tbody>\r\n				<tmpl_loop post_loop>\r\n					<tmpl_unless isThreadRoot>\r\n						<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n							<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n							<td class=\"threadData\"><tmpl_var username></td>\r\n							<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n						</tr>\r\n					</tmpl_unless>\r\n				</tmpl_loop>\r\n			</tbody>\r\n		</table>	\r\n	<!-- end threaded layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isFlat>\r\n	<!-- begin flat layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n					<a name=\"<tmpl_var assetId>\"></a>\r\n					<div class=\"postSubject\">\r\n						<tmpl_var title>\r\n					</div>\r\n					<div class=\"postData\">\r\n						<div style=\"float: left; width: 50%\">\r\n							<b><tmpl_var user.label>:</b> \r\n								<tmpl_if user.isVisitor>\r\n									<tmpl_var username>\r\n								<tmpl_else>\r\n									<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n								</tmpl_if>\r\n								<br />\r\n							<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n						</div>	\r\n						<div>\r\n							<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n							<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n								<tmpl_unless hasRated>\r\n									 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n								</tmpl_unless>\r\n								<br />\r\n							<tmpl_if user.isModerator>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n							<tmpl_else>	\r\n								<tmpl_if user.isPoster>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n								</tmpl_if>	\r\n							</tmpl_if>	\r\n						</div>	\r\n					</div>\r\n					<div class=\"postMessage\">\r\n						<tmpl_var content>\r\n						<tmpl_loop attachment_loop>\r\n							<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n						</tmpl_loop>\r\n						<div style=\"clear: both;\"></div>\r\n					</div>\r\n					<tmpl_unless isLocked>\r\n						<div class=\"postControls\">\r\n							<tmpl_if user.canReply>\r\n								<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n							</tmpl_if>\r\n							<tmpl_if user.canEdit>\r\n								<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n								<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n							</tmpl_if>\r\n						</div>\r\n					</tmpl_unless>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end flat layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isNested>\r\n	<!-- begin nested layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n					<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end nested layout -->\r\n	</tmpl_if>\r\n\r\n	\r\n	\r\n	\r\n	<tmpl_if pagination.pageCount.isMultiple>\r\n		<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n			[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n		</div>\r\n	</tmpl_if>\r\n	\r\n	\r\n</tmpl_if>	\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n	<a href=\"<tmpl_var collaboration.url>\">[<tmpl_var back.label>]</a>\r\n	<tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000067'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><tmpl_var subject.label></td>\r\n	<td class=\"forumHead\"><tmpl_var user.label></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.views.url>\"><tmpl_var views.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.replies.url>\"><tmpl_var replies.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.rating.url>\"><tmpl_var rating.label></a></td>\r\n	<td class=\"forumHead\"><a href=\"<tmpl_var sortby.date.url>\"><tmpl_var date.label></a></td>\r\n	<tmpl_if displayLastReply>\r\n		<td class=\"forumHead\"><a href=\"<tmpl_var sortby.lastreply.url>\"><tmpl_var lastReply.label></a></td>\r\n	</tmpl_if>\r\n</tr>\r\n<tmpl_loop post_loop>\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a></td>\r\n	<tmpl_if user.isVisitor>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var username></td>\r\n	<tmpl_else>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" align=\"center\"><tmpl_var views></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" align=\"center\"><tmpl_var replies></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" align=\"center\"><tmpl_var rating></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateSubmitted.human> @ <tmpl_var timeSubmitted.human></td>\r\n	<tmpl_if displayLastReply>\r\n		<td  class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\" style=\"font-size: 11px;\">\r\n			<a href=\"<tmpl_var lastReply.url>\"><tmpl_var lastReply.title></a>\r\n			by \r\n			<tmpl_if lastReply.user.isVisitor>\r\n				<tmpl_var lastReply.username>\r\n			<tmpl_else>\r\n				<a href=\"<tmpl_var lastReply.userProfile.url>\"><tmpl_var lastReply.username></a>\r\n			</tmpl_if>\r\n			on <tmpl_var lastReply.dateSubmitted.human> @ <tmpl_var lastReply.timeSubmitted.human>\r\n		</td>\r\n	</tmpl_if>\r\n</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000026'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<style>\r\n.ad {\r\n border: 1px dotted #aaaaaa; \r\n padding: 10px; \r\n margin: 0px;\r\n float: left;\r\n width: 140px;\r\n font-size: 12px;\r\n height: 175px;\r\n overflow: hidden;\r\n}\r\n</style>\r\n\r\n<br />\r\n\r\n<tmpl_loop post_loop>\r\n	<div class=\"ad\">\r\n		<div style=\"text-align: center;\">\r\n			<b><a href=\"<tmpl_var url>\"><tmpl_var title></a></b><br />\r\n			<tmpl_if user.isPoster>(<tmpl_var status>)</tmpl_if>\r\n			<tmpl_if thumbnail>\r\n				<div style=\"margin: 3px;\">\r\n					<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var thumbnail>\" border=\"0\" /></a>\r\n				</div>\r\n			</tmpl_if>\r\n		</div>\r\n		<tmpl_var synopsis>\r\n	</div>\r\n</tmpl_loop>\r\n\r\n<div style=\"clear: both;\"></div>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000128'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<h2><tmpl_var title></h2>\r\n	<tmpl_var content>\r\n	<p />\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000079'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<p>\r\n		<tmpl_if userDefined1><a href=\"<tmpl_var userDefined1>\"	<tmpl_if userDefined2>target=\"_blank\"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>\r\n		<tmpl_if content>\r\n				  - <tmpl_var content>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000083'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n<ul>\r\n	<tmpl_loop post_loop>\r\n		<li>\r\n			<tmpl_if user.isPoster>\r\n				<tmpl_unless session.var.adminOn>\r\n					[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			<tmpl_if user.isModerator>\r\n				<tmpl_if session.var.adminOn>\r\n					<tmpl_var controls>\r\n				<tmpl_else>\r\n					<tmpl_unless user.isPoster>\r\n						<tmpl_unless session.var.adminOn>\r\n							[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n						</tmpl_unless>\r\n					</tmpl_unless>\r\n				</tmpl_if>\r\n				(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n			</tmpl_if>\r\n			<tmpl_if userDefined1><a href=\"<tmpl_var userDefined1>\"	<tmpl_if userDefined2>target=\"_blank\"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>\r\n			<tmpl_if content>\r\n					  - <tmpl_var content>\r\n			</tmpl_if>\r\n		</li>\r\n	</tmpl_loop>\r\n</ul>\r\n\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000082'),('<a name=\"<tmpl_var assetId>\"></a><tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if><style>.productFeatureHeader,.productSpecificationHeader,.productRelatedHeader,.productAccessoryHeader, .productBenefitHeader  {    font-weight: bold;    font-size: 15px;}.productFeature,.productSpecification,.productRelated,.productAccessory, .productBenefit {    font-size: 12px;}.productAttributeSeperator {    background-color: black;}</style><tmpl_if displayTitle>    <h1><tmpl_var title></h1></tmpl_if><table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\"><tr>  <td class=\"content\" valign=\"top\"><tmpl_if description>   <tmpl_var description><p /></tmpl_if><tmpl_if price>    <b>Price:</b> <tmpl_var price><br /></tmpl_if><tmpl_if productnumber>    <b>Product Number:</b> <tmpl_var productNumber><br /></tmpl_if><br><tmpl_if brochure.url>    <a href=\"<tmpl_var brochure.url>\"><img src=\"<tmpl_var brochure.icon>\" border=0 align=\"absmiddle\"><tmpl_var brochure.label></a><br /></tmpl_if><tmpl_if manual.url>    <a href=\"<tmpl_var manual.url>\"><img src=\"<tmpl_var manual.icon>\" border=0 align=\"absmiddle\"><tmpl_var manual.label></a><br /></tmpl_if><tmpl_if warranty.url>    <a href=\"<tmpl_var warranty.url>\"><img src=\"<tmpl_var warranty.icon>\" border=0 align=\"absmiddle\"><tmpl_var warranty.label></a><br /></tmpl_if>  </td><td valign=\"top\"><tmpl_if thumbnail1>    <a href=\"<tmpl_var image1>\"><img src=\"<tmpl_var thumbnail1>\" border=\"0\" /></a><p /></tmpl_if><tmpl_if thumbnail2>    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a><p /></tmpl_if><tmpl_if thumbnail3>    <a href=\"<tmpl_var image3>\"><img src=\"<tmpl_var thumbnail3>\" border=\"0\" /></a><p /></tmpl_if>  </td></tr></table><table border=\"0\" cellpadding=\"0\" cellspacing=\"5\"><tr><td valign=\"top\" class=\"productFeature\"><div class=\"productFeatureHeader\">Features</div><tmpl_if session.var.adminOn>  <a href=\"<tmpl_var addfeature.url>\"><tmpl_var addfeature.label></a><p /></tmpl_if><tmpl_loop feature_loop>  <tmpl_if session.var.adminOn><tmpl_var feature.controls></tmpl_if><tmpl_var feature.feature><br /></tmpl_loop><p/></td>  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>  <td valign=\"top\" class=\"productBenefit\"><div class=\"productBenefitHeader\">Benefits</div><tmpl_if session.var.adminOn>  <a href=\"<tmpl_var addBenefit.url>\"><tmpl_var addBenefit.label></a><p /></tmpl_if><tmpl_loop benefit_loop>  <tmpl_if session.var.adminOn><tmpl_var benefit.controls></tmpl_if><tmpl_var benefit.benefit><br /></tmpl_loop><p/></td>  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>  <td valign=\"top\" class=\"productSpecification\"><div class=\"productSpecificationHeader\">Specifications</div><tmpl_if session.var.adminOn>  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p /></tmpl_if><tmpl_loop specification_loop>  <tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br /></tmpl_loop><p/></td>  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>  <td valign=\"top\" class=\"productAccessory\"><div class=\"productAccessoryHeader\">Accessories</div><tmpl_if session.var.adminOn>  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p /></tmpl_if><tmpl_loop accessory_loop>  <tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br /></tmpl_loop><p/></td>  <td class=\"productAttributeSeperator\"><img src=\"^Extras;spacer.gif\" width=\"1\" height=\"1\"></td>  <td valign=\"top\" class=\"productRelated\"><div class=\"productRelatedHeader\">Related Products</div><tmpl_if session.var.adminOn>  <a href=\"<tmpl_var addRelatedProduct.url>\"><tmpl_var addRelatedProduct.label></a><p /></tmpl_if><tmpl_loop relatedproduct_loop>  <tmpl_if session.var.adminOn><tmpl_var RelatedProduct.controls></tmpl_if><a href=\"<tmpl_var relatedproduct.url>\"><tmpl_var relatedproduct.title></a><br /></tmpl_loop></td></tr></table>','Product',1,1,'PBtmpl0000000000000056'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\r\n.productOptions {\r\n  font-family: Helvetica, Arial, sans-serif;\r\n  font-size: 11px;\r\n}\r\n</style>\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if image1>\r\n    <img src=\"<tmpl_var image1>\" border=\"0\" /><p />\r\n</tmpl_if>\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">\r\n<tr>\r\n  <td class=\"content\" valign=\"top\" width=\"66%\"><tmpl_if description>\r\n<tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n  <b>Benefits</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addBenefit.url>\"><tmpl_var addBenefit.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop benefit_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var benefit.controls></tmpl_if><tmpl_var benefit.benefit><br />\r\n</tmpl_loop>\r\n\r\n  </td>\r\n  <td valign=\"top\" width=\"34%\" class=\"productOptions\">\r\n\r\n<tmpl_if thumbnail2>\r\n    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n\r\n<b>Specifications</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop specification_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />\r\n</tmpl_loop>\r\n\r\n<b>Options</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop accessory_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br />\r\n</tmpl_loop>\r\n\r\n<b>Other Products</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addRelatedProduct.url>\"><tmpl_var addRelatedProduct.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop relatedproduct_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var RelatedProduct.controls></tmpl_if><a href=\"<tmpl_var relatedproduct.url>\"><tmpl_var relatedproduct.title></a><br />\r\n</tmpl_loop>\r\n\r\n  </td>\r\n</tr>\r\n</table>\r\n\r\n','Product',1,1,'PBtmpl0000000000000095'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\r\n.productFeatureHeader,.productSpecificationHeader,.productRelatedHeader,.productAccessoryHeader, .productBenefitHeader  {\r\n   font-weight: bold;\r\n   font-size: 15px;\r\n}\r\n.productFeature,.productSpecification,.productRelated,.productAccessory, .productBenefit {\r\n   font-size: 12px;\r\n}\r\n\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">\r\n<tr>\r\n  <td align=\"center\">\r\n<tmpl_if thumbnail1>\r\n    <a href=\"<tmpl_var image1>\"><img src=\"<tmpl_var thumbnail1>\" border=\"0\" /></a>\r\n</tmpl_if>\r\n</td>\r\n   <td align=\"center\">\r\n<tmpl_if thumbnail2>\r\n    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a>\r\n</tmpl_if>\r\n</td>\r\n  <td align=\"center\">\r\n<tmpl_if thumbnail3>\r\n    <a href=\"<tmpl_var image3>\"><img src=\"<tmpl_var thumbnail3>\" border=\"0\" /></a>\r\n</tmpl_if>\r\n</td>\r\n</tr>\r\n</table>\r\n<table border=\"0\" cellpadding=\"0\" cellspacing=\"5\" width=\"100%\">\r\n<tr>\r\n  <td valign=\"top\" class=\"tableData\" width=\"35%\">\r\n\r\n<b>Features</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addfeature.url>\"><tmpl_var addfeature.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop feature_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var feature.controls></tmpl_if><tmpl_var feature.feature><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Benefits</b><br/>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addBenefit.url>\"><tmpl_var addBenefit.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop benefit_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var benefit.controls></tmpl_if><tmpl_var benefit.benefit><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n</td>\r\n  <td valign=\"top\" class=\"tableData\" width=\"35%\">\r\n\r\n<b>Specifications</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop specification_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Accessories</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop accessory_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Related Products</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addRelatedProduct.url>\"><tmpl_var addRelatedProduct.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop relatedproduct_loop>\r\n   ∑<tmpl_if session.var.adminOn><tmpl_var RelatedProduct.controls></tmpl_if><a href=\"<tmpl_var relatedproduct.url>\"><tmpl_var relatedproduct.title></a><br />\r\n</tmpl_loop>\r\n<p />\r\n</td>\r\n  <td class=\"tableData\" valign=\"top\" width=\"30%\">\r\n    <tmpl_if price> \r\n    <b>Price:</b> <tmpl_var price><br />\r\n</tmpl_if>\r\n\r\n<tmpl_if productnumber>\r\n    <b>Product Number:</b> <tmpl_var productNumber><br />\r\n</tmpl_if>\r\n<br />\r\n<tmpl_if brochure.url>\r\n    <a href=\"<tmpl_var brochure.url>\"><img src=\"<tmpl_var brochure.icon>\" border=0 align=\"absmiddle\" /><tmpl_var brochure.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if manual.url>\r\n    <a href=\"<tmpl_var manual.url>\"><img src=\"<tmpl_var manual.icon>\" border=0 align=\"absmiddle\" /><tmpl_var manual.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if warranty.url>\r\n    <a href=\"<tmpl_var warranty.url>\"><img src=\"<tmpl_var warranty.icon>\" border=0 align=\"absmiddle\" /><tmpl_var warranty.label></a><br />\r\n</tmpl_if>\r\n  </td>\r\n</tr>\r\n</table>\r\n\r\n\r\n','Product',1,1,'PBtmpl0000000000000110'),('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000135'),('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 66%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000131'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\r\n.productCollateral {\r\n   font-size: 11px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n\r\n<table width=\"100%\">\r\n<tr><td valign=\"top\" class=\"productCollateral\" width=\"100\">\r\n<img src=\"^Extras;spacer.gif\" width=\"100\" height=\"1\" /><br />\r\n<tmpl_if brochure.url>\r\n    <a href=\"<tmpl_var brochure.url>\"><img src=\"<tmpl_var brochure.icon>\" border=0 align=\"absmiddle\" /><tmpl_var brochure.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if manual.url>\r\n    <a href=\"<tmpl_var manual.url>\"><img src=\"<tmpl_var manual.icon>\" border=0 align=\"absmiddle\" /><tmpl_var manual.label></a><br />\r\n</tmpl_if>\r\n<tmpl_if warranty.url>\r\n    <a href=\"<tmpl_var warranty.url>\"><img src=\"<tmpl_var warranty.icon>\" border=0 align=\"absmiddle\" /><tmpl_var warranty.label></a><br />\r\n</tmpl_if>\r\n<br/>\r\n<div align=\"center\">\r\n<tmpl_if thumbnail1>\r\n    <a href=\"<tmpl_var image1>\"><img src=\"<tmpl_var thumbnail1>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n<tmpl_if thumbnail2>\r\n    <a href=\"<tmpl_var image2>\"><img src=\"<tmpl_var thumbnail2>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n<tmpl_if thumbnail3>\r\n    <a href=\"<tmpl_var image3>\"><img src=\"<tmpl_var thumbnail3>\" border=\"0\" /></a><p />\r\n</tmpl_if>\r\n</div>\r\n</td><td valign=\"top\" class=\"content\" width=\"100%\">\r\n<tmpl_if description>\r\n<tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<b>Specs:</b><br/>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addSpecification.url>\"><tmpl_var addSpecification.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop specification_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if><b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Features:</b><br/>\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addfeature.url>\"><tmpl_var addfeature.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop feature_loop>\r\n  ∑<tmpl_if session.var.adminOn><tmpl_var feature.controls></tmpl_if><tmpl_var feature.feature><br />\r\n</tmpl_loop>\r\n<p />\r\n\r\n<b>Options:</b><br />\r\n<tmpl_if session.var.adminOn>\r\n  <a href=\"<tmpl_var addaccessory.url>\"><tmpl_var addaccessory.label></a><p />\r\n</tmpl_if>\r\n<tmpl_loop accessory_loop>\r\n  &middot;<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if><a href=\"<tmpl_var accessory.url>\"><tmpl_var accessory.title></a><br />\r\n</tmpl_loop>\r\n\r\n</td></tr>\r\n</table>\r\n','Product',1,1,'PBtmpl0000000000000119'),('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000054'),('<tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if><a href=\"<tmpl_var fileUrl>\"><img src=\"<tmpl_var fileIcon>\" alt=\"<tmpl_var title>\" border=\"0\" /><tmpl_var filename></a>','FileAsset',1,1,'PBtmpl0000000000000024'),('<tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if><img src=\"<tmpl_var fileUrl>\" <tmpl_var parameters> />','ImageAsset',1,1,'PBtmpl0000000000000088'),('<a name=\"<tmpl_var assetId>\"></a><tmpl_if session.var.adminOn>\r\n <p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if displayTitle>\r\n      <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n     <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" class=\"content\">\r\n<tmpl_loop subfolder_loop>\r\n<tr>\r\n    	<td class=\"tableData\" valign=\"top\">\r\n		<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon.small>\" border=\"0\" alt=\"<tmpl_var title>\"></a> <a href=\"<tmpl_var url>\"><tmpl_var title></a>\r\n	</td>\r\n\r\n	<td class=\"tableData\" valign=\"top\" colspan=\"3\">\r\n		<tmpl_var synopsis>\r\n	</td>\r\n</tr>\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_loop file_loop>\r\n<tr>\r\n\r\n 	<td valign=\"top\" class=\"tableData\">\r\n		<tmpl_if session.var.adminOn>\r\n			<tmpl_if canEdit>\r\n				<tmpl_var controls>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n		<a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon.small>\" border=\"0\" alt=\"<tmpl_var title>\"></a> <a href=\"<tmpl_var url>\"><tmpl_var title>\r\n	</td>\r\n   	<td class=\"tableData\" valign=\"top\">\r\n		<tmpl_var synopsis>\r\n	</td>\r\n     	<td class=\"tableData\" valign=\"top\">\r\n		^D(\"%z %Z\",<tmpl_var date.epoch>);\r\n	</td>\r\n   	<td class=\"tableData\" valign=\"top\">\r\n		<tmpl_var size>\r\n	</td>\r\n</tr>\r\n</tmpl_loop>\r\n\r\n</table>','Folder',1,1,'PBtmpl0000000000000078'),('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 66%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000125'),('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 1 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n\r\n<!-- begin position 2 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n\r\n<!-- begin position 3 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position3\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position3_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 3 -->\r\n\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<!-- begin position 4 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position4\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position4_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 4 -->\r\n\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000118'),('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<!-- begin position 1 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 2 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n\r\n<!-- begin position 3 -->\r\n<div style=\"width: 34%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position3\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position3_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 3 -->\r\n\r\n\r\n<!-- begin position 4 -->\r\n<div style=\"width: 33%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position4\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position4_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 4 -->\r\n\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000109'),('<a href=\"<tmpl_var assetId>\"></a>\r\n\r\n<tmpl_if displayTitle>\r\n  <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  <p><tmpl_var description></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if showAdmin>\r\n<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<!-- begin position 1 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position1\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position1_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 1 -->\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n<div>\r\n<!-- begin position 2 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position2\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position2_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 2 -->\r\n\r\n<!-- begin position 3 -->\r\n<div style=\"width: 50%; float: left;\">\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position3\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position3_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 3 -->\r\n</div>\r\n\r\n<div style=\"clear: both;\">&nbsp;</div>\r\n\r\n\r\n<!-- begin position 4 -->\r\n<div>\r\n<tmpl_if showAdmin>\r\n	<table border=\"0\" id=\"position4\" class=\"content\"><tbody>\r\n</tmpl_if>\r\n\r\n<tmpl_loop position4_loop>\r\n	<tmpl_if showAdmin>\r\n            	<tr id=\"td<tmpl_var id>\">\r\n            		<td><div id=\"td<tmpl_var id>_div\" class=\"dragable\">      \r\n	</tmpl_if>\r\n\r\n	<div class=\"content\"><tmpl_var dragger.icon><tmpl_var content></div>\r\n\r\n	<tmpl_if showAdmin>\r\n         			</div></td>\r\n            	</tr>\r\n	</tmpl_if>\r\n</tmpl_loop>\r\n\r\n<tmpl_if showAdmin> \r\n            </tbody></table>\r\n</tmpl_if>\r\n</div>\r\n<!-- end position 4 -->\r\n\r\n\r\n\r\n\r\n<tmpl_if showAdmin> \r\n	<table><tr id=\"blank\" class=\"hidden\"><td><div><div class=\"empty\">&nbsp;</div></div></td></tr></table>\r\n            <tmpl_var dragger.init>\r\n</tmpl_if>\r\n		','Layout',1,1,'PBtmpl0000000000000094'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n<tmpl_loop post_loop>\r\n\r\n<div><b>On <tmpl_var dateSubmitted.human> <a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a> from <a href=\"<tmpl_var url>\">the \'<tmpl_var title>\' department</a> wrote</b></div>\r\n<div><i><tmpl_var synopsis></i></div>\r\n<div><a href=\"<tmpl_var url>\"><tmpl_var readmore.label></a></div>\r\n<p/>\r\n\r\n</tmpl_loop>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000133'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<h1>\r\n<tmpl_if channel.link>\r\n     <a href=\"<tmpl_var channel.link>\" target=\"_blank\"><tmpl_var channel.title></a>    \r\n<tmpl_else>\r\n     <tmpl_var channel.title>\r\n</tmpl_if>\r\n</h1>\r\n\r\n<tmpl_if channel.description>\r\n    <tmpl_var channel.description><p />\r\n</tmpl_if>\r\n\r\n\r\n<tmpl_loop item_loop>\r\n<li>\r\n  <tmpl_if link>\r\n       <a href=\"<tmpl_var link>\" target=\"_blank\"><tmpl_var title></a>    \r\n    <tmpl_else>\r\n       <tmpl_var title>\r\n  </tmpl_if>\r\n     <tmpl_if description>\r\n        - <tmpl_var description>\r\n     </tmpl_if>\r\n     <br>\r\n\r\n</tmpl_loop>','SyndicatedContent',1,1,'PBtmpl0000000000000065'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<span class=\"pollQuestion\"><tmpl_var question></span><br />\r\n\r\n<tmpl_if canVote>\r\n\r\n    <tmpl_var form.start>\r\n    <tmpl_loop answer_loop>\r\n         <tmpl_var answer.form> <tmpl_var answer.text><br />\r\n    </tmpl_loop>\r\n     <p />\r\n    <tmpl_var form.submit>\r\n    <tmpl_var form.end>\r\n\r\n<tmpl_else>\r\n\r\n    <tmpl_loop answer_loop>\r\n       <span class=\"pollAnswer\"><hr size=\"1\"><tmpl_var answer.text><br></span>\r\n       <table cellpadding=0 cellspacing=0 border=0><tr>\r\n           <td width=\"<tmpl_var answer.graphWidth>\" class=\"pollColor\"><img src=\"^Extras;spacer.gif\" height=\"1\" width=\"1\"></td>\r\n           <td class=\"pollAnswer\">&nbsp;&nbsp;<tmpl_var answer.percent>% (<tmpl_var answer.total>)</td>\r\n       </tr></table>\r\n    </tmpl_loop>\r\n    <span class=\"pollAnswer\"><hr size=\"1\"><b><tmpl_var responses.label>:</b> <tmpl_var responses.total></span>\r\n\r\n</tmpl_if>\r\n\r\n','Poll',1,1,'PBtmpl0000000000000055'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if error_loop>\r\n<ul>\r\n<tmpl_loop error_loop>\r\n  <li><b><tmpl_var error.message></b>\r\n</tmpl_loop>\r\n</ul>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if canEdit>\r\n      <a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\r\n      &middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\r\n      <tmpl_if entryId>\r\n        &middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\r\n      </tmpl_if>\r\n      <tmpl_if session.var.adminOn>\r\n          &middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\r\n			 &middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\r\n     </tmpl_if>\r\n   <p /> \r\n</tmpl_if>\r\n\r\n<tmpl_var form.start>\r\n<table>\r\n<tmpl_loop field_loop>\r\n  <tmpl_unless field.isHidden>\r\n     <tr><td class=\"formDescription\" valign=\"top\">\r\n        <tmpl_if session.var.adminOn><tmpl_if canEdit><tmpl_var field.controls></tmpl_if></tmpl_if>\r\n        <tmpl_var field.label>\r\n     </td><td class=\"tableData\" valign=\"top\">\r\n       <tmpl_if field.isDisplayed>\r\n            <tmpl_var field.value>\r\n       <tmpl_else>\r\n            <tmpl_var field.form>\r\n       </tmpl_if>\r\n        <tmpl_if field.required>*</tmpl_if>\r\n        <span class=\"formSubtext\"><br /><tmpl_var field.subtext></span>\r\n     </td></tr>\r\n  </tmpl_unless>\r\n</tmpl_loop>\r\n<tr><td></td><td><tmpl_var form.send></td></tr>\r\n</table>\r\n\r\n<tmpl_var form.end>\r\n','DataForm',1,1,'PBtmpl0000000000000020'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_var edit.url>\n\n<tmpl_loop field_loop><tmpl_unless field.isMailField><tmpl_var field.label>:	 <tmpl_var field.value>\n</tmpl_unless></tmpl_loop>','DataForm',1,1,'PBtmpl0000000000000085'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_var acknowledgement>\r\n<p />\r\n<table border=\"0\">\r\n<tmpl_loop field_loop>\r\n<tmpl_unless field.isMailField><tmpl_unless field.isHidden>\r\n  <tr><td class=\"tableHeader\"><tmpl_var field.label></td>\r\n  <td class=\"tableData\"><tmpl_var field.value></td></tr>\r\n</tmpl_unless></tmpl_unless>\r\n</tmpl_loop>\r\n</table>\r\n<p />\r\n<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>','DataForm',1,1,'PBtmpl0000000000000104'),('<a href=\"<tmpl_var back.url>\"><tmpl_var back.label></a>\n<tmpl_if session.var.adminOn>\n<p><tmpl_var controls></p>\n</tmpl_if><p />\n<table width=\"100%\">\n<tr>\n<td class=\"tableHeader\">Entry ID</td>\n<tmpl_loop field_loop>\n  <tmpl_unless field.isMailField>\n    <td class=\"tableHeader\"><tmpl_var field.label></td>\n  </tmpl_unless field.isMailField>\n</tmpl_loop field_loop>\n<td class=\"tableHeader\">Submission Date</td>\n</tr>\n<tmpl_loop record_loop>\n<tr>\n  <td class=\"tableData\"><a href=\"<tmpl_var record.edit.url>\"><tmpl_var record.entryId></a></td>\n  <tmpl_loop record.data_loop>\n    <tmpl_unless record.data.isMailField>\n       <td class=\"tableData\"><tmpl_var record.data.value></td>\n     </tmpl_unless record.data.isMailField>\n  </tmpl_loop record.data_loop>\n  <td class=\"tableData\"><tmpl_var record.submissionDate.human></td>\n</tr>\n</tmpl_loop record_loop>\n</table>','DataForm/List',1,1,'PBtmpl0000000000000021'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if search.for>\r\n  <tmpl_if content>\r\n    <!-- Display search string. Remove if unwanted -->\r\n    <tmpl_var search.for>\r\n  <tmpl_else>\r\n    <!-- Error: Starting point not found -->\r\n    <b>Error: Search string <i><tmpl_var search.for></i> not found in content.</b>\r\n  </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_var content>\r\n\r\n<tmpl_if stop.at>\r\n  <tmpl_if content.trailing>\r\n    <!-- Display stop search string. Remove if unwanted -->\r\n    <tmpl_var stop.at>\r\n  <tmpl_else>\r\n    <!-- Warning: End point not found -->\r\n    <b>Warning: Ending search point <i><tmpl_var stop.at></i> not found in content.</b>\r\n  </tmpl_if>\r\n</tmpl_if>','HttpProxy',1,1,'PBtmpl0000000000000033'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n<tmpl_if session.var.adminOn>\n   <a href=\"<tmpl_var forum.add.url>\"><tmpl_var forum.add.label></a><p />\n</tmpl_if>\n\n<tmpl_if areMultipleForums>\n	<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\">\n		<tr>\n			<tmpl_if session.var.adminOn>\n				<td></td>\n			</tmpl_if>\n			<td class=\"tableHeader\"><tmpl_var title.label></td>\n			<td class=\"tableHeader\"><tmpl_var views.label></td>\n			<td class=\"tableHeader\"><tmpl_var rating.label></td>\n			<td class=\"tableHeader\"><tmpl_var threads.label></td>\n			<td class=\"tableHeader\"><tmpl_var replies.label></td>\n			<td class=\"tableHeader\"><tmpl_var lastpost.label></td>\n		</tr>\n		<tmpl_loop forum_loop>\n			<tr>\n				<tmpl_if session.var.adminOn>\n					<td><tmpl_var forum.controls></td>\n				</tmpl_if>\n				<td class=\"tableData\">\n					<a href=\"<tmpl_var forum.url>\"><tmpl_var forum.title></a><br />\n					<span style=\"font-size: 10px;\"><tmpl_var forum.description></span>\n				</td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.views></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.rating></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.threads></td>\n				<td class=\"tableData\" align=\"center\"><tmpl_var forum.replies></td>\n				<td class=\"tableData\"><span style=\"font-size: 10px;\">\n					<a href=\"<tmpl_var forum.lastpost.url>\"><tmpl_var forum.lastpost.subject></a>\n					by \n					<tmpl_if forum.lastpost.user.isVisitor>\n						<tmpl_var forum.lastpost.user.name>\n					<tmpl_else>\n						<a href=\"<tmpl_var forum.lastpost.user.profile>\"><tmpl_var forum.lastpost.user.name></a>\n					</tmpl_if>\n					on <tmpl_var forum.lastpost.date> @ <tmpl_var forum.lastpost.time>\n				</span></td>\n			</tr>\n		</tmpl_loop>\n	</table>\n<tmpl_else>\n	<h2><tmpl_var default.title></h2>\n	<tmpl_if session.var.adminOn>\n		<tmpl_var default.controls><br />\n	</tmpl_if>\n	<tmpl_var default.description><p />\n	<tmpl_var default.listing>\n</tmpl_if>','MessageBoard',1,1,'PBtmpl0000000000000047'),('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n\r\n<h1><tmpl_var message.header.label></h1>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_if user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var visitorName.label></td>\r\n				<td><tmpl_var visitorName.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var subject.label></td>\r\n		<td><tmpl_var title.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var message.label></td>\r\n		<td><tmpl_var content.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if attachment.form>\r\n		<tr>\r\n			<td><tmpl_var attachment.label></td>\r\n			<td><tmpl_var attachment.form></td>\r\n		</tr>\r\n	</tmpl_if>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000029'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n\r\n<style>\r\n	.postBorder {\r\n		border: 1px solid #cccccc;\r\n		width: 100%;\r\n		margin-bottom: 10px;\r\n	}\r\n 	.postBorderCurrent {\r\n		border: 3px dotted black;\r\n		width: 100%;\r\n		margin-bottom: 10px;\r\n	}\r\n	.postSubject {\r\n		border-bottom: 1px solid #cccccc;\r\n		font-weight: bold;\r\n		padding: 3px;\r\n	}\r\n	.postData {\r\n		border-bottom: 1px solid #cccccc;\r\n		font-size: 11px;\r\n		background-color: #eeeeee;\r\n		color: black;\r\n		padding: 3px;\r\n	}\r\n	.postControls {\r\n		border-top: 1px solid #cccccc;\r\n		background-color: #eeeeee;\r\n		color: black;\r\n		padding: 3px;\r\n	}\r\n	.postMessage {\r\n		padding: 3px;\r\n	}\r\n	.currentThread {\r\n		background-color: #eeeeee;\r\n	}\r\n	.threadHead {\r\n		font-weight: bold;\r\n		border-bottom: 1px solid #cccccc;\r\n		font-size: 11px;\r\n		background-color: #eeeeee;\r\n		color: black;\r\n		padding: 3px;\r\n	}\r\n	.threadData {\r\n		font-size: 11px;\r\n		padding: 3px;\r\n	}\r\n</style>\r\n	\r\n\r\n\r\n<div style=\"float: left; width: 70%\">\r\n	<h1><a href=\"<tmpl_var collaboration.url>\"><tmpl_var collaboration.title></a></h1>\r\n</div>\r\n<div style=\"width: 30%; float: left; text-align: right;\">\r\n	<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n	function goLayout(){\r\n		location = document.layout.layoutSelect.options[document.layout.layoutSelect.selectedIndex].value\r\n	}\r\n	//-->	\r\n	</script>\r\n	<form name=\"layout\">\r\n		<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n			<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n			<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n			<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n		</select> \r\n	</form> \r\n</div>\r\n<div style=\"clear: both;\"></div>\r\n\r\n	\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n<tmpl_if layout.isThreaded>\r\n<!-- begin threaded layout -->\r\n	<tmpl_loop post_loop>\r\n		<tmpl_if isCurrent>\r\n			<div class=\"postBorder\">\r\n				<a name=\"<tmpl_var assetId>\"></a>\r\n				<div class=\"postSubject\">\r\n					<tmpl_var title>\r\n				</div>\r\n				<div class=\"postData\">\r\n					<div style=\"float: left; width: 50%;\">\r\n						<b><tmpl_var user.label>:</b> \r\n							<tmpl_if user.isVisitor>\r\n								<tmpl_var username>\r\n							<tmpl_else>\r\n								<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n							</tmpl_if>\r\n							<br />\r\n						<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n					</div>	\r\n					<div>\r\n						<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n						<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n							<tmpl_unless hasRated>\r\n								 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n							</tmpl_unless>\r\n							<br />\r\n						<tmpl_if user.isModerator>\r\n							<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n						<tmpl_else>	\r\n							<tmpl_if user.isPoster>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n							</tmpl_if>	\r\n						</tmpl_if>	\r\n					</div>	\r\n				</div>\r\n				<div class=\"postMessage\">\r\n					<tmpl_var content>\r\n<tmpl_loop attachment_loop>\r\n  <div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n</tmpl_loop>\r\n<div style=\"clear: both;\"></div>\r\n				</div>\r\n				<tmpl_unless isLocked>\r\n					<div class=\"postControls\">\r\n						<tmpl_if user.canReply>\r\n							<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n						</tmpl_if>\r\n						<tmpl_if user.canEdit>\r\n							<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n							<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n						</tmpl_if>\r\n					</div>\r\n				</tmpl_unless>\r\n			</div>	\r\n		</tmpl_if>\r\n	</tmpl_loop>\r\n	<table style=\"width: 100%\">\r\n		<thead>\r\n			<tr>\r\n				<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n				<td class=\"threadHead\"><tmpl_var user.label></td>\r\n				<td class=\"threadHead\"><tmpl_var date.label></td>\r\n			</tr>\r\n		</thead>\r\n		<tbody>\r\n			<tmpl_loop post_loop>\r\n				<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n					<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n					<td class=\"threadData\"><tmpl_var username></td>\r\n					<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n				</tr>\r\n			</tmpl_loop>\r\n		</tbody>\r\n	</table>	\r\n<!-- end threaded layout -->\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_if layout.isFlat>\r\n<!-- begin flat layout -->\r\n	<tmpl_loop post_loop>\r\n		<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n			<a name=\"<tmpl_var assetId>\"></a>\r\n			<div class=\"postSubject\">\r\n				<tmpl_var title>\r\n			</div>\r\n			<div class=\"postData\">\r\n				<div style=\"float: left; width: 50%\">\r\n					<b><tmpl_var user.label>:</b> \r\n						<tmpl_if user.isVisitor>\r\n							<tmpl_var username>\r\n						<tmpl_else>\r\n							<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n						</tmpl_if>\r\n						<br />\r\n					<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n				</div>	\r\n				<div>\r\n					<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n					<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n						<tmpl_unless hasRated>\r\n							 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n						</tmpl_unless>\r\n						<br />\r\n					<tmpl_if user.isModerator>\r\n						<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n					<tmpl_else>	\r\n						<tmpl_if user.isPoster>\r\n							<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n						</tmpl_if>	\r\n					</tmpl_if>	\r\n				</div>	\r\n			</div>\r\n			<div class=\"postMessage\">\r\n				<tmpl_var content>\r\n<tmpl_loop attachment_loop>\r\n  <div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n</tmpl_loop>\r\n<div style=\"clear: both;\"></div>\r\n\r\n			</div>\r\n			<tmpl_unless isLocked>\r\n				<div class=\"postControls\">\r\n					<tmpl_if user.canReply>\r\n						<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n					</tmpl_if>\r\n					<tmpl_if user.canEdit>\r\n						<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n						<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n					</tmpl_if>\r\n				</div>\r\n			</tmpl_unless>\r\n		</div>\r\n	</tmpl_loop>\r\n<!-- end flat layout -->\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_if layout.isNested>\r\n<!-- begin nested layout -->\r\n    <tmpl_loop post_loop>\r\n		<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n			<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n				<a name=\"<tmpl_var assetId>\"></a>\r\n				<div class=\"postSubject\">\r\n					<tmpl_var title>\r\n				</div>\r\n				<div class=\"postData\">\r\n					<div style=\"float: left; width: 50%\">\r\n						<b><tmpl_var user.label>:</b> \r\n							<tmpl_if user.isVisitor>\r\n								<tmpl_var username>\r\n							<tmpl_else>\r\n								<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n							</tmpl_if>\r\n							<br />\r\n						<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n					</div>	\r\n					<div>\r\n						<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n						<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n							<tmpl_unless hasRated>\r\n								 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n							</tmpl_unless>\r\n							<br />\r\n						<tmpl_if user.isModerator>\r\n							<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n						<tmpl_else>	\r\n							<tmpl_if user.isPoster>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n							</tmpl_if>	\r\n						</tmpl_if>	\r\n					</div>	\r\n				</div>\r\n				<div class=\"postMessage\">\r\n					<tmpl_var content>\r\n<tmpl_loop attachment_loop>\r\n  <div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n</tmpl_loop>\r\n<div style=\"clear: both;\"></div>\r\n\r\n				</div>\r\n				<tmpl_unless isLocked>\r\n					<div class=\"postControls\">\r\n						<tmpl_if user.canReply>\r\n							<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n						</tmpl_if>\r\n						<tmpl_if user.canEdit>\r\n							<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n							<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n						</tmpl_if>\r\n					</div>\r\n				</tmpl_unless>\r\n			</div>\r\n		</div>\r\n	</tmpl_loop>\r\n<!-- end nested layout -->\r\n</tmpl_if>\r\n\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n	<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n		[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n	</div>\r\n</tmpl_if>\r\n\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n    <tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000032'),('<tmpl_var notify.subscription.message>\r\n\r\n<tmpl_var url>','Collaboration/Notification',1,1,'PBtmpl0000000000000027'),('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_var form.header>\n<table width=\"100%\" class=\"tableMenu\">\n<tr><td align=\"right\" width=\"15%\">\n	<h1><tmpl_var search.label></h1>\n	</td>\n	<td valign=\"top\" width=\"70%\" align=\"center\">\n		<table>\n			<tr><td class=\"tableData\"><tmpl_var all.label></td><td class=\"tableData\"><tmpl_var all.form></td></tr>\'\n			<tr><td class=\"tableData\"><tmpl_var exactphrase.label></td><td class=\"tableData\"><tmpl_var exactphrase.form></td></tr>\n			<tr><td class=\"tableData\"><tmpl_var atleastone.label></td><td class=\"tableData\"><tmpl_var atleastone.form></td></tr>\n			<tr><td class=\"tableData\"><tmpl_var without.label></td><td class=\"tableData\"><tmpl_var without.form></td></tr>\n			<tr><td class=\"tableData\"><tmpl_var results.label></td><td class=\"tableData\"><tmpl_var results.form></td></tr>\n		</table>\n	</td><td width=\"15%\">\n        		<tmpl_var form.search>\n	</td>\n</tr></table>\n<tmpl_var form.footer>\n<tmpl_if doit>\n	<table width=\"100%\" cellspacing=\"0\" cellpadding=\"3\" border=\"0\">\n	<tr>\n		<td class=\"tableHeader\"><tmpl_var title.label></td>\n		<td class=\"tableHeader\"><tmpl_var user.label></td>\n		<td class=\"tableHeader\"><tmpl_var date.label></td>\n	</tr>\n	<tmpl_loop post_loop>\n			<tr>\n			<td class=\"tableData\"><a href=\"<tmpl_var url>\"><tmpl_var title></a></td>\n			<tmpl_if user.isVisitor>\n				<td class=\"tableData\"><tmpl_var username></td>\n			<tmpl_else>\n				<td class=\"tableData\"><a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a></td>\n			</tmpl_if>\n			<td class=\"tableData\"><tmpl_var date> @ <tmpl_var time></td>\n		</tr>\n	</tmpl_loop>\n	</table>\n</tmpl_if>\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>','Collaboration/Search',1,1,'PBtmpl0000000000000031'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\n<tmpl_var controls>\n</tmpl_if>\n<span class=\"horizontalMenu\">\n<tmpl_loop page_loop>\n<a class=\"horizontalMenu\"\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\n</tmpl_loop>\n</span>','Navigation',1,1,'PBtmpl0000000000000071'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\n<tmpl_var controls>\n</tmpl_if>\n<span class=\"horizontalMenu\">\n<tmpl_loop page_loop>\n<a class=\"horizontalMenu\" \n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\n</tmpl_loop>\n</span>','Navigation',1,1,'PBtmpl0000000000000075'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n<h1>\n<tmpl_if channel.link>\n     <a href=\"<tmpl_var channel.link>\" target=\"_blank\"><tmpl_var channel.title></a>    \n<tmpl_else>\n     <tmpl_var channel.title>\n</tmpl_if>\n</h1>\n\n<tmpl_if channel.description>\n    <tmpl_var channel.description><p />\n</tmpl_if>\n\n\n<tmpl_loop item_loop>\n\n       <b><tmpl_var title></b>\n     <tmpl_if description>\n        <br /><tmpl_var description>\n     </tmpl_if>\n  <tmpl_if link>\n       <br /><a href=\"<tmpl_var link>\" target=\"_blank\" style=\"font-size: 9px;\">Read More...</a>    \n   </tmpl_if>\n     <br /><br />\n\n</tmpl_loop>','SyndicatedContent',1,1,'GNvjCFQWjY2AF2uf0aCM8Q'),('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_unless isReply><tmpl_if preview.synopsis><p><i><tmpl_var preview.synopsis></i></p></tmpl_if></tmpl_unless>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var submission.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_if user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var visitorName.label></td>\r\n				<td><tmpl_var visitorName.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var title.label></td>\r\n		<td><tmpl_var title.form></td>\r\n	</tr>\r\n	<tmpl_unless isReply>\r\n		<tr>\r\n			<td><tmpl_var synopsis.label></td>\r\n			<td><tmpl_var synopsis.form></td>\r\n		</tr>\r\n	</tmpl_unless>	\r\n	<tr>\r\n		<td><tmpl_var body.label></td>\r\n		<td><tmpl_var content.form></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_unless isReply>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless isReply>\r\n		<tr>\r\n			<td><tmpl_var startDate.label></td>\r\n			<td><tmpl_var startDate.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var endDate.label></td>\r\n			<td><tmpl_var endDate.form></td>\r\n		</tr>\r\n	</tmpl_unless>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000068'),('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var question.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isReply>\r\n		<tr>\r\n			<td><tmpl_var subject.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var message.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n	<tmpl_else>\r\n		<tr>\r\n			<td><tmpl_var question.label></td>\r\n			<td><tmpl_var title.form.textarea></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var answer.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000099'),('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n<tmpl_if preview.userDefined1><p><a href=\"<tmpl_var preview.userDefined1>\" <tmpl_if preview.userDefined2>target=\"_blank\"</tmpl_if>><tmpl_var preview.userDefined1></a></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var link.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isReply>\r\n		<tr>\r\n			<td><tmpl_var subject.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var message.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n	<tmpl_else>\r\n		<tr>\r\n			<td><tmpl_var title.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var url.label></td>\r\n			<td><tmpl_var userDefined1.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var newWindow.label></td>\r\n			<td><tmpl_var userDefined1.form.yesNo></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var description.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n	<tmpl_if reply.userDefined1><p><a href=\"<tmpl_var reply.userDefined1>\" <tmpl_if reply.userDefined2>target=\"_blank\"</tmpl_if>><tmpl_var reply.userDefined1></a></p></tmpl_if>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000114'),('<div class=\"loginBox\">\r\n<tmpl_if user.isVisitor>\r\n	<tmpl_var form.header>\r\n	<table border=\"0\" class=\"loginBox\" cellpadding=\"1\" cellspacing=\"0\">\r\n	<tr>\r\n		<td><tmpl_var username.form></td>\r\n		<td><tmpl_var password.form></td>\r\n		<td><tmpl_var form.login></td>\r\n	</tr>\r\n	<tr>\r\n		<td><tmpl_var username.label></td>\r\n		<td><tmpl_var password.label></td>\r\n		<td></td>\r\n	</tr>\r\n	</table>             	<tmpl_if session.setting.anonymousRegistration>\r\n                        <a href=\"<tmpl_var account.create.url>\"><tmpl_var account.create.label></a>\r\n	</tmpl_if>		<tmpl_var form.footer> \r\n<tmpl_else>\r\n	<tmpl_unless customText>\r\n		<tmpl_var hello.label> <a href=\"<tmpl_var account.display.url>\"><tmpl_var session.user.username></a>.\r\n                          <a href=\"<tmpl_var logout.url>\"><tmpl_var logout.label></a><br />\r\n	<tmpl_else>\r\n		<tmpl_var customText>\r\n	</tmpl_unless>\r\n</tmpl_if>\r\n</div>\r\n','Macro/L_loginBox',1,1,'PBtmpl0000000000000092'),('<div class=\"loginBox\">\r\n<tmpl_if user.isVisitor>\r\n	<tmpl_var form.header>\r\n             <span><tmpl_var username.label><br></span>\r\n             <tmpl_var username.form>\r\n             <span><br><tmpl_var password.label><br></span>\r\n             <tmpl_var password.form>\r\n             <span><br></span>\r\n             <tmpl_var form.login>\r\n	<tmpl_var form.footer>\r\n	<tmpl_if session.setting.anonymousRegistration>\r\n                        <p><a href=\"<tmpl_var account.create.url>\"><tmpl_var account.create.label></a></p>\r\n	</tmpl_if>	\r\n<tmpl_else>\r\n	<tmpl_unless customText>\r\n		<tmpl_var hello.label> <a href=\"<tmpl_var account.display.url>\"><tmpl_var session.user.username></a>.\r\n                          <a href=\"<tmpl_var logout.url>\"><tmpl_var logout.label></a>\r\n	<tmpl_else>\r\n		<tmpl_var customText>\r\n	</tmpl_unless>\r\n</tmpl_if>\r\n</div>\r\n','Macro/L_loginBox',1,1,'PBtmpl0000000000000044'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if debugMode>\r\n	<ul>\r\n	<tmpl_loop debug_loop>\r\n		<li><tmpl_var debug.output></li>\r\n	</tmpl_loop>\r\n	</ul>\r\n</tmpl_if>\r\n\r\n<table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n<tr>\r\n   <tmpl_loop columns_loop>\r\n	<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n   </tmpl_loop>\r\n</tr>\r\n\r\n<tmpl_loop rows_loop>\r\n   <tr>\r\n   <tmpl_loop row.field_loop>\r\n	<td class=\"tableData\"><tmpl_var field.value></td>\r\n   </tmpl_loop>\r\n   </tr>\r\n   <!-- Handle nested query2 -->\r\n   <tmpl_if hasNest>\r\n	<tr>\r\n	<td colspan=\"<tmpl_var columns.count>\">\r\n	<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n	<tr>\r\n	<td width=\"20\">\r\n	   &nbsp;\r\n	</td>\r\n	<td>\r\n	   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n	   <tr>\r\n	   <tmpl_loop query2.columns_loop>\r\n		<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n	   </tmpl_loop>\r\n	   </tr>\r\n	   <tmpl_loop query2.rows_loop>\r\n	   <tr>\r\n	   <tmpl_loop query2.row.field_loop>\r\n		<td class=\"tableData\"><tmpl_var field.value></td>\r\n	   </tmpl_loop>\r\n	   </tr>\r\n	   <!-- Handle nested query3 -->\r\n	   <tmpl_if query2.hasNest>\r\n		<tr>\r\n		<td colspan=\"<tmpl_var query2.columns.count>\">\r\n		<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n		<tr>\r\n		<td width=\"20\">\r\n		   &nbsp;\r\n		</td>\r\n		<td>\r\n		   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n		   <tr>\r\n		   <tmpl_loop query3.columns_loop>\r\n			<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n		   </tmpl_loop>\r\n		   </tr>\r\n		   <tmpl_loop query3.rows_loop>\r\n		   <tr>\r\n		   <tmpl_loop query3.row.field_loop>\r\n			<td class=\"tableData\"><tmpl_var field.value></td>\r\n		   </tmpl_loop>\r\n		   </tr>\r\n	   		<!-- Handle nested query4 -->\r\n			   <tmpl_if query3.hasNest>\r\n				<tr>\r\n				<td colspan=\"<tmpl_var query3.columns.count>\">\r\n				<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n				<tr>\r\n				<td width=\"20\">\r\n				   &nbsp;\r\n				</td>\r\n				<td>\r\n				   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n				   <tr>\r\n				   <tmpl_loop query4.columns_loop>\r\n					<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n				   </tmpl_loop>\r\n				   </tr>\r\n				   <tmpl_loop query4.rows_loop>\r\n				   <tr>\r\n				   <tmpl_loop query4.row.field_loop>\r\n					<td class=\"tableData\"><tmpl_var field.value></td>\r\n				   </tmpl_loop>\r\n			   		<!-- Handle nested query5 -->\r\n					   <tmpl_if query4.hasNest>\r\n						<tr>\r\n						<td colspan=\"<tmpl_var query4.columns.count>\">\r\n						<table width=\"100%\" cellspacing=0 cellpadding=0>\r\n						<tr>\r\n						<td width=\"20\">\r\n						   &nbsp;\r\n						</td>\r\n						<td>\r\n						   <table width=\"100%\" cellspacing=0 cellpadding=0 style=\"border: 1px solid black;\">\r\n						   <tr>\r\n						   <tmpl_loop query5.columns_loop>\r\n							<td class=\"tableHeader\"><tmpl_var column.name></td>\r\n						   </tmpl_loop>\r\n						   </tr>\r\n						   <tmpl_loop query5.rows_loop>\r\n						   <tr>\r\n						   <tmpl_loop query5.row.field_loop>\r\n							<td class=\"tableData\"><tmpl_var field.value></td>\r\n						   </tmpl_loop>\r\n						   </tr>\r\n						   </tmpl_loop>\r\n						   </table>\r\n						</td>\r\n						</tr>\r\n						</table>\r\n					        </td>\r\n			        		</tr>\r\n					   </tmpl_if>\r\n				   </tr>\r\n				   </tmpl_loop>\r\n				   </table>\r\n				</td>\r\n				</tr>\r\n				</table>\r\n			        </td>\r\n			        </tr>\r\n			   </tmpl_if>\r\n		   </tmpl_loop>\r\n		   </table>\r\n		</td>\r\n		</tr>\r\n		</table>\r\n	        </td>\r\n	        </tr>\r\n	   </tmpl_if>\r\n	   </tmpl_loop>\r\n	   </table>\r\n	</td>\r\n	</tr>\r\n	</table>\r\n   </td>\r\n</tr>\r\n</tmpl_if>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>   <tmpl_var pagination.pageList.upTo20>  <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>','SQLReport',1,1,'PBtmpl0000000000000059'),('<h1><tmpl_var displayTitle></h1>\r\n\r\n<table width=\"100%\" cellspacing=1 cellpadding=2 border=0>\r\n<tr>\r\n   <td class=\"tableHeader\">\r\n      <tmpl_var message.subject.label>\r\n   </td>\r\n   <td class=\"tableHeader\">\r\n      <tmpl_var message.status.label>\r\n   </td>\r\n   <td class=\"tableHeader\">\r\n      <tmpl_var message.dateOfEntry.label>\r\n   </td>\r\n</tr>\r\n<tmpl_if message.noresults>\r\n   <tr>\r\n       <td class=\"tableData\">\r\n          <tmpl_var message.noresults>\r\n       </td>\r\n       <td class=\"tableData\">\r\n          &nbsp;\r\n       </td>\r\n       <td class=\"tableData\">\r\n          &nbsp;\r\n       </td>\r\n   </tr>\r\n<tmpl_else>\r\n   <tmpl_loop message.loop>\r\n      <tr>\r\n         <td class=\"tableData\">\r\n            <tmpl_var message.subject>\r\n         </td>\r\n         <td class=\"tableData\">\r\n            <tmpl_var message.status>\r\n         </td>\r\n         <td class=\"tableData\">\r\n            <tmpl_var message.dateOfEntry>\r\n         </td>\r\n     </tr>\r\n  </tmpl_loop>\r\n</tmpl_if>\r\n</table>\r\n<tmpl_if message.multiplePages>\r\n  <div class=\"pagination\">\r\n    <tmpl_var message.previousPage>  &middot; <tmpl_var message.pageList> &middot; <tmpl_var message.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop message.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/MessageLog/View',1,1,'PBtmpl0000000000000050'),('<tmpl_var displayTitle>\r\n<b><tmpl_var message.subject></b><br>\r\n<tmpl_var message.dateOfEntry><br>\r\n<tmpl_var message.status><br><br>\r\n<tmpl_var message.text><p>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_if message.takeAction>\r\n         <li><tmpl_var message.takeAction>\r\n      </tmpl_if>\r\n      <tmpl_loop message.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>\r\n\r\n\r\n','Operation/MessageLog/Message',1,1,'PBtmpl0000000000000049'),('<tmpl_var displayTitle>\r\n\r\n<tmpl_if profile.message>\r\n   <tmpl_var profile.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var profile.form.header>\r\n<table >\r\n<tmpl_var profile.form.hidden>\r\n\r\n<tmpl_loop profile.form.elements>\r\n     <tr>\r\n       <td class=\"tableHeader\" valign=\"top\" colspan=\"2\">\r\n         <tmpl_var profile.form.category>\r\n       </td>\r\n     </tr>\r\n \r\n <tmpl_loop profile.form.category.loop>\r\n   <tr>\r\n    <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var profile.form.element.label>\r\n    </td>\r\n    <td class=\"tableData\">\r\n      <tmpl_var profile.form.element>\r\n      <tmpl_if profile.form.element.subtext>\r\n        <span class=\"formSubtext\">\r\n         <tmpl_var profile.form.element.subtext>\r\n        </span>\r\n      </tmpl_if>\r\n    </td>\r\n   </tr>\r\n </tmpl_loop>\r\n</tmpl_loop>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n <td class=\"formDescription\" valign=\"top\"></td>\r\n <td class=\"tableData\">\r\n     <tmpl_var profile.form.submit>\r\n </td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop profile.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/Profile/Edit',1,1,'PBtmpl0000000000000051'),('<tmpl_var displayTitle>\r\n\r\n<table>\r\n  <tmpl_loop profile.elements>\r\n    <tr>\r\n    <tmpl_if profile.category>\r\n      <td colspan=\"2\" class=\"tableHeader\">\r\n        <tmpl_var profile.category>\r\n      </td>\r\n    <tmpl_else>\r\n      <td class=\"tableHeader\">\r\n         <tmpl_var profile.label>\r\n      </td>\r\n      <td class=\"tableData\">\r\n         <tmpl_var profile.value>\r\n      </td>\r\n    </tmpl_if>   \r\n    </tr>\r\n  </tmpl_loop>\r\n</table>\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop profile.accountOptions>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Operation/Profile/View',1,1,'PBtmpl0000000000000052'),('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n<br /> <br />\n\n<script>\nfunction toggleDiv(divId) {\n   if (document.getElementById(divId).style.visibility == \"none\") {\n	document.getElementById(divId).style.display = \"block\";\n   } else {\n	document.getElementById(divId).style.display = \"none\";	\n   }\n}\n</script>\n\n<tmpl_loop question_loop>\n	<b><tmpl_var question></b>\n              <tmpl_if question.isRadioList>\n                        <table class=\"tableData\">\n                        <tr class=\"tableHeader\"><td width=\"60%\"><tmpl_var answer.label></td>\n                                <td width=\"20%\"><tmpl_var response.count.label></td>\n                                <td width=\"20%\"><tmpl_var response.percent.label></td></tr>\n                        <tmpl_loop answer_loop>\n                                <tmpl_if answer.isCorrect>\n                                        <tr class=\"highlight\">\n                                <tmpl_else>\n                                        <tr>\n                                </tmpl_if>\n                                	<td><tmpl_var answer></td>\n                                	<td><tmpl_var answer.response.count></td>\n                                	<td><tmpl_var answer.response.percent></td>\n			<tmpl_if allowComment>\n                        			<td><a href=\"#\" onClick=\"toggle(\'comment<tmpl_var answer.id>\');\"><tmpl_var show.comments.label></a></td>\n			</tmpl_if>\n                               </tr>\n		<tmpl_if question.allowComment>\n			<tr id=\"comment<tmpl_var answer.id>\">\n				<td colspan=\"3\">\n					<tmpl_loop comment_loop>\n						<p>\n						<tmpl_var answer.comment>\n						</p>\n					</tmpl_loop>\n				</td>\n			</tr>\n		</tmpl_if>\n		</tmpl_loop>\n                        </table>\n               <tmpl_else>\n                        <br />\n		<a href=\"#\" onClick=\"toggle(\'response<tmpl_var question.id>\');\"><tmpl_var show.answers.label></a>\n		<br />\n		<div id=\"response<tmpl_var question.id>\">\n			<tmpl_loop answer_loop>\n				<p>\n				<tmpl_var answer.response>\n				</p>\n                			<tmpl_if question.allowComment>\n					<blockquote>\n					<tmpl_var answer.comment>\n					</blockquote>\n                			</tmpl_if>\n			</tmpl_loop>\n		</div>\n                </tmpl_if>\n	<br /><br /><br />\n\n</tmpl_loop>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n\n','Survey/Overview',1,1,'PBtmpl0000000000000063'),('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n<br /> <br />\n\n<table class=\"tableData\">\n<tr class=\"tableHeader\"><td width=\"60%\"><tmpl_var response.user.label></td>\n                <td width=\"20%\"><tmpl_var response.count.label></td>\n                <td width=\"20%\"><tmpl_var response.percent.label></td></tr>\n<tmpl_loop response_loop>\n<tr>\n	<td><a href=\"<tmpl_var response.url>\"><tmpl_var response.user.name></a></td>\n	<td><tmpl_var response.count.correct>/<tmpl_var question.count></td>\n             <td><tmpl_var response.percent>%</td>\n</tr>\n</tmpl_loop>\n</table>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','Survey/Gradebook',1,1,'PBtmpl0000000000000062'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n\n<tmpl_if description>\n  <tmpl_var description><p />\n</tmpl_if>\n\n\n<tmpl_if user.canTakeSurvey>\n	<tmpl_if response.isComplete>\n		<tmpl_if mode.isSurvey>\n			<tmpl_var thanks.survey.label>\n		<tmpl_else>\n			<tmpl_var thanks.quiz.label>\n			<div align=\"center\">\n				<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.total>\n				<br />\n				<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% \n			</div>\n		</tmpl_if>\n		<tmpl_if user.canRespondAgain>\n			<br /> <br /> <a href=\"<tmpl_var start.newResponse.url>\"><tmpl_var start.newResponse.label></a>\n		</tmpl_if>\n	<tmpl_else>\n		<tmpl_if response.id>\n			<tmpl_var form.header>\n			<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\" class=\"content\">\n				<tr>\n					<td valign=\"top\">\n					<tmpl_loop question_loop>\n						<p><tmpl_var question.question></p>\n						<tmpl_var question.answer.label><br />\n						<tmpl_var question.answer.field><br />\n						<br />\n						<tmpl_if question.allowComment>\n							<tmpl_var question.comment.label><br />\n							<tmpl_var question.comment.field><br />\n						</tmpl_if>\n					</tmpl_loop>\n					</td>\n					<td valign=\"top\" nowrap=\"1\">\n						<b><tmpl_var questions.sofar.label>:</b> <tmpl_var questions.sofar.count> / <tmpl_var questions.total> <br />\n						<tmpl_unless mode.isSurvey>\n							<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.sofar.count><br />\n							<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% / 100%<br />\n						</tmpl_unless>\n					</td>\n				</tr>\n			</table>\n			<div align=\"center\"><tmpl_var form.submit></div>\n			<tmpl_var form.footer>\n		<tmpl_else>\n			<a href=\"<tmpl_var start.newResponse.url>\"><tmpl_var start.newResponse.label></a>\n		</tmpl_if>\n	</tmpl_if>\n<tmpl_else>\n	<tmpl_if mode.isSurvey>\n		<tmpl_var survey.noprivs.label>\n	<tmpl_else>\n		<tmpl_var quiz.noprivs.label>\n	</tmpl_if>\n</tmpl_if>\n<br />\n<br />\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var delete.all.responses.url>\"><tmpl_var delete.all.responses.label></a> \n	<br />\n	<a href=\"<tmpl_var export.answers.url>\"><tmpl_var export.answers.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.questions.url>\"><tmpl_var export.questions.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.responses.url>\"><tmpl_var export.responses.label></a> \n	&bull;\n	<a href=\"<tmpl_var export.composite.url>\"><tmpl_var export.composite.label></a> \n</tmpl_if>\n\n\n<tmpl_if session.var.adminOn>\n	<p>\n		<a href=\"<tmpl_var question.add.url>\"><tmpl_var question.add.label></a>\n	</p>\n	<tmpl_loop question.edit_loop>\n		<tmpl_var question.edit.controls>\n          	<tmpl_var question.edit.question>\n		<br />\n        </tmpl_loop>\n</tmpl_if>\n','Survey',1,1,'PBtmpl0000000000000061'),('<h1><tmpl_var title></h1>\n\n<tmpl_if user.canViewReports>\n	<a href=\"<tmpl_var survey.url>\"><tmpl_var survey.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.overview.url>\"><tmpl_var report.overview.label></a> \n	&bull;\n	<a href=\"<tmpl_var report.gradebook.url>\"><tmpl_var report.gradebook.label></a> \n</tmpl_if>\n<a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a><p/>\n<b><tmpl_var start.date.label>:</b> <tmpl_var start.date.human> <tmpl_var start.time.human><br />\n<b><tmpl_var end.date.label>:</b> <tmpl_var end.date.human> <tmpl_var end.time.human><br />\n<b><tmpl_var duration.label>:</b> <tmpl_var duration.minutes> <tmpl_var duration.minutes.label> <tmpl_var duration.seconds> <tmpl_var duration.seconds.label>\n\n<p/>\n<tmpl_loop question_loop>\n\n               <b><tmpl_var question></b><br />\n                  <table class=\"tableData\" width=\"100%\">\n<tmpl_if question.isRadioList>\n               \n    <tr><td valign=\"top\" class=\"tableHeader\" width=\"25%\">\n                               <tmpl_var answer.label></td><td width=\"75%\">\n                   <tmpl_var question.answer>                       \n</td></tr>\n        </tmpl_if>\n               <tr><td width=\"25%\" valign=\"top\" class=\"tableHeader\"><tmpl_var response.label></td>\n               \n<td width=\"75%\"><tmpl_var question.response></td></tr>\n                <tmpl_if question.comment>\n                        <tr><td valign=\"top\" class=\"tableHeader\">\n                                <tmpl_var comment.label> </td>\n                                <td><tmpl_var question.comment></td></tr>\n               </tmpl_if>\n\n       </table><p/>\n</tmpl_loop>','Survey/Response',1,1,'PBtmpl0000000000000064'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if error_loop>\r\n	<ul>\r\n		<tmpl_loop error_loop>\r\n			<li><b><tmpl_var error.message></b>\r\n			</tmpl_loop>\r\n	</ul>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n	<tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if canEdit>\r\n	<a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\r\n		&middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\r\n	<tmpl_if entryId>\r\n		&middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\r\n	</tmpl_if>\r\n	<tmpl_if session.var.adminOn>\r\n		&middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\r\n		&middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\r\n	</tmpl_if>\r\n<p /> \r\n</tmpl_if>\r\n<tmpl_var form.start>\r\n<link href=\"/extras/tabs/tabs.css\" rel=\"stylesheet\" rev=\"stylesheet\" type=\"text/css\">\r\n<div class=\"tabs\">\r\n	<tmpl_loop tab_loop>\r\n		<span onclick=\"toggleTab(<tmpl_var tab.sequence>)\" id=\"tab<tmpl_var tab.sequence>\" class=\"tab\"><tmpl_var tab.label>\r\n		<tmpl_if session.var.adminOn>\r\n			<tmpl_if canEdit>\r\n				<tmpl_var tab.controls>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n		</span>\r\n	</tmpl_loop>\r\n</div>\r\n<tmpl_loop tab_loop>\r\n	<tmpl_var tab.start>\r\n		<table>\r\n			<tmpl_loop tab.field_loop>\r\n				<tmpl_unless tab.field.isHidden>\r\n						<tr>\r\n							<td class=\"formDescription\" valign=\"top\">\r\n								<tmpl_if session.var.adminOn>\r\n									<tmpl_if canEdit>\r\n										<tmpl_var tab.field.controls>\r\n									</tmpl_if>\r\n								</tmpl_if>\r\n								<tmpl_var tab.field.label>\r\n							</td>\r\n							<td class=\"tableData\" valign=\"top\">\r\n								<tmpl_if tab.field.isDisplayed>\r\n									<tmpl_var tab.field.value>\r\n								<tmpl_else>\r\n									<tmpl_var tab.field.form>\r\n								</tmpl_if>\r\n								<tmpl_if tab.field.isRequired>*</tmpl_if>\r\n								<span class=\"formSubtext\">\r\n									<br />\r\n									<tmpl_var tab.field.subtext>\r\n								</span>\r\n							</td>\r\n						</tr>\r\n				</tmpl_unless>\r\n			</tmpl_loop>\r\n			<tr>\r\n				<td colspan=\"2\">\r\n					<span class=\"tabSubtext\"><tmpl_var tab.subtext></span>\r\n				</td>\r\n			</tr>\r\n		</table>\r\n		<br>\r\n		<tmpl_var form.save>\r\n	<tmpl_var tab.end>\r\n</tmpl_loop>\r\n<tmpl_var tab.init>\r\n<tmpl_var form.end>\r\n','DataForm',1,1,'PBtmpl0000000000000116'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n\r\n<tmpl_if results>\r\n  <tmpl_loop results>\r\n    The current temp is: <tmpl_var result>\r\n  </tmpl_loop>\r\n<tmpl_else>\r\n  Failed to retrieve temp.\r\n</tmpl_if>','WSClient',1,1,'PBtmpl0000000000000069'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<style>\n.googleDetail {\n  font-size: 9px;\n}\n</style>\n\n<h1><tmpl_var title></h1>\n\n<tmpl_if description>\n  <tmpl_var description><br /><br />\n</tmpl_if>\n\n<form method=\"post\">\n <input type=\"hidden\" name=\"func\" value=\"view\">\n <input type=\"hidden\" name=\"wid\" value=\"<tmpl_var wobjectId>\">\n <input type=\"hidden\" name=\"targetWobjects\" value=\"doGoogleSearch\">\n <input type=\"text\" name=\"q\"><input type=\"submit\" value=\"Search\">\n</form>\n\n<tmpl_if results>\n  <tmpl_loop results>\n   <tmpl_if resultElements>\n      <p> You searched for <b><tmpl_var searchQuery></b>. We found around <tmpl_var estimatedTotalResultsCount> matching records.</p>\n   </tmpl_if>\n\n   <tmpl_loop resultElements>\n     <a href=\"<tmpl_var URL>\">\n	<tmpl_if title>\n		    <tmpl_var title>\n	<tmpl_else>\n                    <tmpl_var url>\n        </tmpl_if>\n     </a><br />\n        <tmpl_if snippet>\n            <tmpl_var snippet><br />\n        </tmpl_if>\n        <div class=\"googleDetail\">\n        <tmpl_if summary>\n            <b>Description:</b> <tmpl_var summary><br />\n        </tmpl_if>\n        <a href=\"<tmpl_var URL>\"><tmpl_var URL></a>\n     <tmpl_if cachedSize>\n           - <tmpl_var cachedSize>\n     </tmpl_if>\n     </div><br />\n    </tmpl_loop>\n  </tmpl_loop>\n<tmpl_else>\n   Could not retrieve results from Google.\n</tmpl_if>','WSClient',1,1,'PBtmpl0000000000000100'),('<h1><tmpl_var title></h1>\n<tmpl_var description><br>\n<br>\n<tmpl_var variants.message><br>\n\n<table>\n	<tmpl_loop variantLoop>\n	<tr>\n		<td style=\"indent: 40px\">\n		<tmpl_loop variant.compositionLoop>\n			<tmpl_var parameter>: <tmpl_var value><tmpl_unless __LAST__>,</tmpl_unless>\n		</tmpl_loop>\n		</td>\n		<td>$ <tmpl_var variant.price></td>\n		<td><a href=\"<tmpl_var variant.addToCart.url>\"><tmpl_var variant.addToCart.label></a></td>\n	</tr>\n	</tmpl_loop>\n</table>','Commerce/Product',1,1,'PBtmplCP00000000000001'),('<tmpl_if pluginsAvailable>\n   <tmpl_var message><br>\n    <tmpl_var formHeader>\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n    <tmpl_loop pluginLoop>\n            <tr>\n                        <td><tmpl_var formElement></td>\n                     <td align=\"left\"><tmpl_var name></td>\n           </tr>\n       </tmpl_loop>\n        </table>\n    <tmpl_var formSubmit>\n    <tmpl_var formFooter>\n<tmpl_else>\n <tmpl_var noPluginsMessage>\n</tmpl_if>','Commerce/SelectShippingMethod',1,1,'PBtmplCSSM000000000001'),('<tmpl_if cartEmpty>\n<tmpl_var cartEmpty.message>\n<tmpl_else>\n\n<tmpl_var updateForm.header>\n<table>	\n	<tr align=\"left\">\n		<th></th>\n		<th style=\"border-bottom: 2px solid black\">Product</th>\n		<th style=\"border-bottom: 2px solid black\">Quantity</th>\n		<th style=\"border-bottom: 2px solid black\">Price</th>\n	</tr>\n\n	<tmpl_if normalItems>\n	</tmpl_if>\n\n	<tmpl_loop normalItemsLoop>\n	<tr>\n		<td><tmpl_var deleteIcon></td>\n		<td align=\"left\"><tmpl_var name></td>\n		<td align=\"center\"><tmpl_var quantity.form></td>\n		<td align=\"right\"><tmpl_var totalPrice></td>\n	</tr>\n	</tmpl_loop>\n\n	<tmpl_loop recurringItemsLoop>\n	<tr>\n		<td><tmpl_var deleteIcon></td>\n		<td align=\"left\"><tmpl_var name></td>\n		<td align=\"center\"><tmpl_var quantity.form></td>\n		<td align=\"right\"><tmpl_var totalPrice></td>\n	</tr>\n</tmpl_loop>\n	<tr style=\"border-top: 1px solid black\">\n		<td></td>\n		<td style=\"border-top: 1px solid black\">&nbsp;</td>\n		<td align=\"right\" style=\"border-top: 1px solid black\"><b>Total</b></td>\n		<td align=\"right\" colspan=\"3\" style=\"border-top: 1px solid black\"><b><tmpl_var total></b></td>\n	</tr>\n\n</table>\n\n<tmpl_var updateForm.button>\n<tmpl_var updateForm.footer>\n\n<tmpl_var checkoutForm.header>\n<tmpl_var checkoutForm.button>\n<tmpl_var checkoutForm.footer> \n\n</tmpl_if>','Commerce/ViewShoppingCart',1,1,'PBtmplVSC0000000000001'),('^StyleSheet(^Extras;/slidePanel/slidePanel.css);\r\n^JavaScript(^Extras;/slidePanel/slidePanel.js);\r\n\r\n<script type=\"text/javascript\">\r\n\r\n  var slider = new createSlidePanelBar(\'WebGUIAdminBar\');\r\n  var panel;\r\n\r\n  panel = new createPanel(\'adminconsole\',\'Admin Console\');\r\n<tmpl_loop adminConsole_loop>\r\n <tmpl_if canUse>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var title>\',\"<tmpl_var url>\");\r\n </tmpl_if>\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n  panel = new createPanel(\'clipboard\',\'Clipboard\');\r\n<tmpl_loop clipboard_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n  panel = new createPanel(\'packages\',\'Packages\');\r\n<tmpl_loop package_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n\r\n\r\n  panel = new createPanel(\'assets\',\'New Content\');\r\n  <tmpl_loop container_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n panel.addLink(\'^Extras;/spacer.gif\',\'<hr>\',\"\");\n <tmpl_loop contentTypes_loop>\r\n	panel.addLink(\'<tmpl_var icon.small>\',\'<tmpl_var label>\',\"<tmpl_var url>\");\r\n</tmpl_loop>\r\n  slider.addPanel(panel);\r\n  slider.draw();\r\n\r\n\r\n</script>\r\n','Macro/AdminBar',1,1,'PBtmpl0000000000000090'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<span class=\"crumbTrail\">\r\n<tmpl_loop page_loop>\r\n<a class=\"crumbTrail\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &gt; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000093'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls><br>\r\n</tmpl_if>\r\n<span class=\"verticalMenu\">\r\n<tmpl_loop page_loop>\r\n<tmpl_var page.indent><a class=\"verticalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if> href=\"<tmpl_var page.url>\">\r\n   <tmpl_if page.isCurrent>\r\n      <span class=\"selectedMenuItem\"><tmpl_var page.menuTitle></span>\r\n   <tmpl_else><tmpl_var page.menuTitle></tmpl_if></a><br>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000048'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<span class=\"horizontalMenu\">\r\n<tmpl_loop page_loop>\r\n<a class=\"horizontalMenu\" \r\n   <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if>\r\n   href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   <tmpl_unless \"__last__\"> &middot; </tmpl_unless>\r\n</tmpl_loop>\r\n</span>','Navigation',1,1,'PBtmpl0000000000000108'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<script language=\"JavaScript\" type=\"text/javascript\">\r\nfunction go(formObj){\r\n   if (formObj.chooser.options[formObj.chooser.selectedIndex].value != \"none\") {\r\n	location = formObj.chooser.options[formObj.chooser.selectedIndex].value\r\n   }\r\n}\r\n</script>\r\n<form>\r\n<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<select name=\"chooser\" size=1 onChange=\"go(this.form)\">\r\n<option value=none>Where do you want to go?</option>\r\n<tmpl_loop page_loop>\r\n<option value=\"<tmpl_var page.url>\"><tmpl_loop page.indent_loop>&nbsp;&nbsp;</tmpl_loop>- <tmpl_var page.menuTitle></option>\r\n</tmpl_loop>\r\n</select>\r\n</form>','Navigation',1,1,'PBtmpl0000000000000117'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n<tmpl_loop page_loop>\r\n   <tmpl_if page.isCurrent>\r\n      <span class=\"rootTabOn\">\r\n   <tmpl_else>\r\n      <span class=\"rootTabOff\">\r\n   </tmpl_if>\r\n   <a <tmpl_if page.newWindow>target=\"_blank\"</tmpl_if> href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   </span>\r\n</tmpl_loop>','Navigation',1,1,'PBtmpl0000000000000124'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		^StyleSheet(\"<tmpl_var session.config.extrasURL>/Navigation/dtree/dtree.css\");\r\n^JavaScript(\"<tmpl_var session.config.extrasURL>/Navigation/dtree/dtree.js\");\r\n\r\n<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n\r\n<script>\r\n// Path to dtree directory\r\n_dtree_url = \"<tmpl_var session.config.extrasURL>/Navigation/dtree/\";\r\n</script>\r\n\r\n<div class=\"dtree\">\r\n<script type=\"text/javascript\">\r\n<!--\r\n	d = new dTree(\'d\');\r\n	<tmpl_loop page_loop>\r\n	d.add(\r\n		\'<tmpl_var page.assetId>\',\r\n		<tmpl_if __first__>-99<tmpl_else>\'<tmpl_var page.parentId>\'</tmpl_if>,\r\n		\'<tmpl_var page.menuTitle>\',\r\n		\'<tmpl_var page.url>\',\r\n		\'<tmpl_var page.synopsis>\'\r\n		<tmpl_if page.newWindow>,\'_blank\'</tmpl_if>\r\n	);\r\n	</tmpl_loop>\r\n	document.write(d);\r\n//-->\r\n</script>\r\n\r\n</div>','Navigation',1,1,'PBtmpl0000000000000130'),('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<tmpl_if session.var.adminOn>\r\n    <a href=\"<tmpl_var addevent.url>\"><tmpl_var addevent.label></a>\r\n    <p />\r\n</tmpl_if>\r\n\r\n<tmpl_loop month_loop>\n	<table border=\"1\" width=\"100%\">\n	<tr><td colspan=7 class=\"tableHeader\"><h2 align=\"center\"><tmpl_var month> <tmpl_var year></h2></td></tr>\n	<tr>\n	<tmpl_if session.user.firstDayOfWeek>\n		<th class=\"tableData\"><tmpl_var monday.label></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label></th>\n		<th class=\"tableData\"><tmpl_var thursday.label></th>\n		<th class=\"tableData\"><tmpl_var friday.label></th>\n		<th class=\"tableData\"><tmpl_var saturday.label></th>\n		<th class=\"tableData\"><tmpl_var sunday.label></th>\n	<tmpl_else>\n		<th class=\"tableData\"><tmpl_var sunday.label></th>\n		<th class=\"tableData\"><tmpl_var monday.label></th>\n		<th class=\"tableData\"><tmpl_var tuesday.label></th>\n		<th class=\"tableData\"><tmpl_var wednesday.label></th>\n		<th class=\"tableData\"><tmpl_var thursday.label></th>\n		<th class=\"tableData\"><tmpl_var friday.label></th>\n		<th class=\"tableData\"><tmpl_var saturday.label></th>\n	</tmpl_if>\n	</tr><tr>\n	<tmpl_loop prepad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n 	<tmpl_loop day_loop>\n		<tmpl_if isStartOfWeek>\n			<tr>\n		</tmpl_if>\n		<td class=\"table<tmpl_if isToday>Header<tmpl_else>Data</tmpl_if>\" width=\"14%\" valign=\"top\" align=\"left\"><p><b><tmpl_var day></b></p>\n		<tmpl_loop event_loop>\n			<tmpl_if name>\n				&middot;<a href=\"<tmpl_var url>\"><tmpl_var name></a><br />\n			</tmpl_if>\n		</tmpl_loop>\n		</td>\n		<tmpl_if isEndOfWeek>\n			</tr>\n		</tmpl_if>\n	</tmpl_loop>\n	<tmpl_loop postpad_loop>\n		<td>&nbsp;</td>\n	</tmpl_loop>\n	</tr>\n	</table>\n</tmpl_loop>\n\n\n<tmpl_if pagination.pageCount.isMultiple>\n  <div class=\"pagination\">\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\n  </div>\n</tmpl_if>\n','EventsCalendar',1,1,'PBtmpl0000000000000022'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\r\n<tmpl_var controls>\r\n</tmpl_if>\r\n\r\n<style>\r\n/* CoolMenus 4 - default styles - do not edit */\r\n.cCMAbs{position:absolute; visibility:hidden; left:0; top:0}\r\n/* CoolMenus 4 - default styles - end */\r\n\r\n/*Styles for level 0*/\r\n.cLevel0,.cLevel0over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:12px; font-weight:bold;\r\n\r\n}\r\n.cLevel0{background-color:navy; layer-background-color:navy; color:white;\r\ntext-align: center;\r\n}\r\n.cLevel0over{background-color:navy; layer-background-color:navy; color:white; cursor:pointer; cursor:hand; \r\ntext-align: center; \r\n}\r\n\r\n.cLevel0border{position:absolute; visibility:hidden; background-color:#569635; layer-background-color:#006699; \r\n \r\n}\r\n\r\n\r\n/*Styles for level 1*/\r\n.cLevel1, .cLevel1over{position:absolute; padding:2px; font-family:tahoma, arial,helvetica; font-size:11px; font-weight:bold}\r\n.cLevel1{background-color:Navy; layer-background-color:Navy; color:white;}\r\n.cLevel1over{background-color:#336699; layer-background-color:#336699; color:Yellow; cursor:pointer; cursor:hand; }\r\n.cLevel1border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}\r\n\r\n/*Styles for level 2*/\r\n.cLevel2, .cLevel2over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:10px; font-weight:bold}\r\n.cLevel2{background-color:Navy; layer-background-color:Navy; color:white;}\r\n.cLevel2over{background-color:#0099cc; layer-background-color:#0099cc; color:Yellow; cursor:pointer; cursor:hand; }\r\n.cLevel2border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}\r\n\r\n</style>\r\n\r\n  \r\n\r\n^JavaScript(\"<tmpl_var session.config.extrasURL>/coolmenus/coolmenus4.js\");\r\n<script language=\"JavaScript\">\r\n/*****************************************************************************\r\nCopyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)\r\n\r\nDHTML coolMenus - Get it at coolmenus.dhtmlcentral.com\r\nVersion 4.0_beta\r\nThis script can be used freely as long as all copyright messages are\r\nintact.\r\n\r\nExtra info - Coolmenus reference/help - Extra links to help files **** \r\nCSS help: http://coolmenus.dhtmlcentral.com/projects/coolmenus/reference.asp?m=37\r\nGeneral: http://coolmenus.dhtmlcentral.com/reference.asp?m=35\r\nMenu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47\r\nLevel properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48\r\n\r\nBackground bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49\r\nItem properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50\r\n******************************************************************************/\r\n\r\n/*** \r\nThis is the menu creation code - place it right after you body tag\r\nFeel free to add this to a stand-alone js file and link it to your page.\r\n**/\r\n\r\n//Menu object creation\r\ncoolmenu=new makeCM(\"coolmenu\") //Making the menu object. Argument: menuname\r\n\r\ncoolmenu.frames = 0\r\n\r\n//Menu properties   \r\ncoolmenu.onlineRoot=\"\"\ncoolmenu.pxBetween=2\r\ncoolmenu.fromLeft=200 \r\ncoolmenu.fromTop=100   \r\ncoolmenu.rows=1\r\ncoolmenu.menuPlacement=\"center\"   //The whole menu alignment, left, center, or right\r\n                                                             \r\ncoolmenu.resizeCheck=1 \r\ncoolmenu.wait=1000 \r\ncoolmenu.fillImg=\"cm_fill.gif\"\r\ncoolmenu.zIndex=100\r\n\r\n//Background bar properties\r\ncoolmenu.useBar=0\r\ncoolmenu.barWidth=\"100%\"\r\ncoolmenu.barHeight=\"menu\" \r\ncoolmenu.barClass=\"cBar\"\r\ncoolmenu.barX=0 \r\ncoolmenu.barY=0\r\ncoolmenu.barBorderX=0\r\ncoolmenu.barBorderY=0\r\ncoolmenu.barBorderClass=\"\"\r\n\r\n//Level properties - ALL properties have to be spesified in level 0\r\ncoolmenu.level[0]=new cm_makeLevel() //Add this for each new level\r\ncoolmenu.level[0].width=110\r\ncoolmenu.level[0].height=21 \r\ncoolmenu.level[0].regClass=\"cLevel0\"\r\ncoolmenu.level[0].overClass=\"cLevel0over\"\r\ncoolmenu.level[0].borderX=1\r\ncoolmenu.level[0].borderY=1\r\ncoolmenu.level[0].borderClass=\"cLevel0border\"\r\ncoolmenu.level[0].offsetX=0\r\ncoolmenu.level[0].offsetY=0\r\ncoolmenu.level[0].rows=0\r\ncoolmenu.level[0].arrow=0\r\ncoolmenu.level[0].arrowWidth=0\r\ncoolmenu.level[0].arrowHeight=0\r\ncoolmenu.level[0].align=\"bottom\"\r\n\r\n//EXAMPLE SUB LEVEL[1] PROPERTIES - You have to specify the properties you want different from LEVEL[0] - If you want all items to look the same just remove this\r\ncoolmenu.level[1]=new cm_makeLevel() //Add this for each new level (adding one to the number)\r\ncoolmenu.level[1].width=coolmenu.level[0].width+20\r\ncoolmenu.level[1].height=25\r\ncoolmenu.level[1].regClass=\"cLevel1\"\r\ncoolmenu.level[1].overClass=\"cLevel1over\"\r\ncoolmenu.level[1].borderX=1\r\ncoolmenu.level[1].borderY=1\r\ncoolmenu.level[1].align=\"right\" \r\ncoolmenu.level[1].offsetX=0\r\ncoolmenu.level[1].offsetY=0\r\ncoolmenu.level[1].borderClass=\"cLevel1border\"\r\n\r\n\r\n//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to spesify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this\r\ncoolmenu.level[2]=new cm_makeLevel() //Add this for each new level (adding one to the number)\r\ncoolmenu.level[2].width=coolmenu.level[0].width+20\r\ncoolmenu.level[2].height=25\r\ncoolmenu.level[2].offsetX=0\r\ncoolmenu.level[2].offsetY=0\r\ncoolmenu.level[2].regClass=\"cLevel2\"\r\ncoolmenu.level[2].overClass=\"cLevel2over\"\r\ncoolmenu.level[2].borderClass=\"cLevel2border\"\r\n\r\n//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to spesify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this\r\ncoolmenu.level[3]=new cm_makeLevel() //Add this for each new level (adding one to the number)\r\ncoolmenu.level[3].width=coolmenu.level[0].width+20\r\ncoolmenu.level[3].height=25\r\ncoolmenu.level[3].offsetX=0\r\ncoolmenu.level[3].offsetY=0\r\ncoolmenu.level[3].regClass=\"cLevel2\"\r\ncoolmenu.level[3].overClass=\"cLevel2over\"\r\ncoolmenu.level[3].borderClass=\"cLevel2border\"\r\n\r\n\r\n\r\n<tmpl_loop page_loop>\r\ncoolmenu.makeMenu(\'coolmenu_<tmpl_var page.assetId>\'.replace(/\\-/g,\"a\"),\'coolmenu_<tmpl_var page.parent.assetId>\'.replace(/\\-/g,\"a\"),\"<tmpl_var page.menuTitle>\",\'<tmpl_var page.url>\'<tmpl_if page.newWindow>,\'_blank\'</tmpl_if>);\r\n</tmpl_loop>\r\n\r\n\r\ncoolmenu.construct();\r\n\r\n</script>','Navigation',1,1,'PBtmpl0000000000000134'),('<a name=\"<tmpl_var assetId>\"></a>\r\n<tmpl_if session.var.adminOn>\r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>	\r\n		<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description><p />\r\n</tmpl_if>\r\n\r\n<table class=\"tableMenu\" width=\"100%\">\r\n  <tbody>\r\n    <tr>\r\n      <td align=\"center\" width=\"15%\">\r\n      <h1><tmpl_var int.search></h1>\r\n      </td>\r\n      <td vAlign=\"top\" align=\"middle\">\r\n      <table>\r\n      <form method=\"post\" action=\"<tmpl_var actionURL>\">\r\n      <tbody>\r\n      <tr>\r\n	<td colspan=\"2\" class=\"tableData\">\r\n	   <input maxLength=\"255\" size=\"30\" value=\'<tmpl_var query>\' name=\"query\">\r\n	</td>\r\n	<td class=\"tableData\"><tmpl_var submit></td>\r\n      </tr>\r\n      <tr>\r\n	<td class=\"tableData\" valign=\"top\">\r\n\r\n	</td>\r\n	<td class=\"tableData\" valign=\"top\">\r\n	   <tmpl_loop contentTypesSimple>\r\n	     <tmpl_unless __FIRST__>\r\n	     	<input type=\"checkbox\" name=\"contentTypes\" value=\"<tmpl_var value>\"\r\n		<tmpl_if type_content>\r\n		   <tmpl_if query>\r\n			<tmpl_if selected>\r\n			   checked=\"1\"\r\n			</tmpl_if>\r\n		   <tmpl_else>\r\n			checked=\"1\"\r\n		   </tmpl_if>\r\n		<tmpl_else>\r\n		   <tmpl_if selected>checked=\"1\"</tmpl_if>\r\n		</tmpl_if>\r\n		><tmpl_var name>\r\n                <br>\r\n	     </tmpl_unless>\r\n	   </tmpl_loop>\r\n	</td>\r\n        <td></td>\r\n      </tbody>\r\n      </form>\r\n      </table>\r\n      </td>      \r\n    </tr>\r\n  </tbody>\r\n</table>\r\n\r\n<p/>\r\n<tmpl_if numberOfResults>\r\n   <p>Results <tmpl_var startNr> - <tmpl_var endNr> of about <tmpl_var numberOfResults> \r\n   containing <b>\"<tmpl_var queryHighlighted>\"</b>. Search took <b><tmpl_var duration></b> seconds.</p>\r\n   <ol style=\"Margin-Top: 0px; Margin-Bottom: 0px;\" start=\"<tmpl_var startNr>\">\r\n   <tmpl_loop resultsLoop>\r\n      <li>\r\n	   <a href=\"<tmpl_var location>\">\r\n	      <tmpl_if header><tmpl_var header><tmpl_else>No Title</tmpl_if></a>\r\n	   <div>\r\n	      <tmpl_if \"body\">\r\n		   <span class=\"preview\"><tmpl_var \"body\"></span><br/>\r\n	      </tmpl_if>\r\n	      <span style=\"color:#666666;\">Location: <tmpl_var crumbTrail></span>\r\n	      <br/>\r\n	      <br/>\r\n	   </div>\r\n      </li>\r\n   </tmpl_loop>\r\n   </ol>\r\n</tmpl_if> \r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n','IndexedSearch',1,1,'PBtmpl0000000000000034'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p> \r\n</tmpl_if>\r\n\r\n<style type=\"text/css\">\r\n.forumHead {\r\n background-color: #eeeeee;\r\n border-bottom: 1px solid #cccccc;\r\n padding: 2px;\r\n padding-bottom: 4px;\r\n font-size: 13px;\r\n font-weight: bold;\r\n}\r\n.oddThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #83cc83;\r\n padding-bottom: 4px;\r\n}\r\n.evenThread {\r\n font-size: 13px;\r\n border-bottom: 1px dashed #aaaaff;\r\n padding-bottom: 4px;\r\n}\r\n</style>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\"><tmpl_var add.label></a>\r\n		&bull;\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\"><tmpl_var unsubscribe.label></a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\"><tmpl_var subscribe.label></a>\r\n		</tmpl_if>\r\n		&bull;\r\n	</tmpl_unless>\r\n	<a href=\"<tmpl_var search.url>\"><tmpl_var search.label></a>\r\n</p>\r\n\r\n<table width=\"100%\">\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"forumHead\"><tmpl_var status.label></td>\r\n	</tmpl_if>\r\n	<td class=\"forumHead\"><tmpl_var job.title.label></td>\r\n	<td class=\"forumHead\"><tmpl_var location.label></td>\r\n	<td class=\"forumHead\"><tmpl_var compensation.label></td>\r\n	<td class=\"forumHead\"><tmpl_var date.label></td>\r\n</tr>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n<tr>\r\n	<tmpl_if user.isModerator>\r\n		<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var status></td>\r\n	</tmpl_if>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><a href=\"<tmpl_var url>\"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var userDefined2></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var userDefined1></td>\r\n	<td class=\"<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>\"><tmpl_var dateSubmitted.human></td>\r\n</tr>\r\n</tmpl_loop>\r\n</table>\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000077'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n<h1><tmpl_var title></h1>\r\n\r\n\r\n<tmpl_if user.isModerator>\r\n	<div style=\"float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;\">\r\n		<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n	</div>\r\n</tmpl_if>	\r\n\r\n\r\n<tmpl_if content>\r\n	<b>Job Description</b><br />\r\n	<p><tmpl_var content></p>\r\n</tmpl_if>\r\n\r\n<tmpl_if userDefined3>\r\n	<b>Job Requirements</b><br />\r\n	<p><tmpl_var userDefined3></p>\r\n</tmpl_if>\r\n\r\n<table>\r\n<tr>\r\n  <td class=\"tableHeader\">Date Posted</td>\r\n  <td class=\"tableData\"><tmpl_var dateSubmitted.human></td>\r\n</tr>\r\n<tr>\r\n  <td  class=\"tableHeader\">Location</td>\r\n  <td class=\"tableData\"><tmpl_var userDefined2></td>\r\n</tr>\r\n<tr>\r\n  <td  class=\"tableHeader\">Compensation</td>\r\n  <td class=\"tableData\"><tmpl_var userDefined1></td>\r\n</tr>\r\n<tr>\r\n  <td  class=\"tableHeader\">Views</td>\r\n  <td class=\"tableData\"><tmpl_var views></td>\r\n</tr>\r\n</table>\r\n\r\n<tmpl_if attachment_loop>\r\n	<br />\r\n		<tmpl_loop attachment_loop>\r\n			<div style=\"float: left; padding: 5px;\">\r\n				<a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a>\r\n			</div>\r\n		</tmpl_loop>\r\n		<div style=\"clear: both;\"></div>\r\n	<br />\r\n</tmpl_if>\r\n\r\n<tmpl_unless isLocked>\r\n	<p>\r\n		<tmpl_if user.canReply>\r\n			<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if user.canEdit>\r\n			<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n			<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_unless>\r\n\r\n\r\n<tmpl_if repliesAllowed>\r\n\r\n	<style>\r\n		.postBorder {\r\n			border: 1px solid #cccccc;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postBorderCurrent {\r\n			border: 3px dotted black;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postSubject {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-weight: bold;\r\n			padding: 3px;\r\n		}\r\n		.postData {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postControls {\r\n			border-top: 1px solid #cccccc;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postMessage {\r\n			padding: 3px;\r\n		}\r\n		.currentThread {\r\n			background-color: #eeeeee;\r\n		}\r\n		.threadHead {\r\n			font-weight: bold;\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.threadData {\r\n			font-size: 11px;\r\n			padding: 3px;\r\n		}\r\n	</style>\r\n\r\n	<div style=\"float: left; width: 70%\">\r\n		<h1><tmpl_var replies.label></h1>\r\n	</div>\r\n	<div style=\"width: 30%; float: left; text-align: right;\">\r\n		<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n		function goLayout(){\r\n			location = document.discussionlayout.layoutSelect.options[document.discussionlayout.layoutSelect.selectedIndex].value\r\n		}\r\n		//-->	\r\n		</script>\r\n		<form name=\"discussionlayout\">\r\n			<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n				<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n				<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n				<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n			</select> \r\n		</form> \r\n	</div>\r\n	<div style=\"clear: both;\"></div>\r\n\r\n	<tmpl_if layout.isThreaded>\r\n	<!-- begin threaded layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<tmpl_if isCurrent>\r\n					<div class=\"postBorder\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%;\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>	\r\n				</tmpl_if>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n		<table style=\"width: 100%\">\r\n			<thead>\r\n				<tr>\r\n					<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n					<td class=\"threadHead\"><tmpl_var user.label></td>\r\n					<td class=\"threadHead\"><tmpl_var date.label></td>\r\n				</tr>\r\n			</thead>\r\n			<tbody>\r\n				<tmpl_loop post_loop>\r\n					<tmpl_unless isThreadRoot>\r\n						<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n							<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n							<td class=\"threadData\"><tmpl_var username></td>\r\n							<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n						</tr>\r\n					</tmpl_unless>\r\n				</tmpl_loop>\r\n			</tbody>\r\n		</table>	\r\n	<!-- end threaded layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isFlat>\r\n	<!-- begin flat layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n					<a name=\"<tmpl_var assetId>\"></a>\r\n					<div class=\"postSubject\">\r\n						<tmpl_var title>\r\n					</div>\r\n					<div class=\"postData\">\r\n						<div style=\"float: left; width: 50%\">\r\n							<b><tmpl_var user.label>:</b> \r\n								<tmpl_if user.isVisitor>\r\n									<tmpl_var username>\r\n								<tmpl_else>\r\n									<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n								</tmpl_if>\r\n								<br />\r\n							<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n						</div>	\r\n						<div>\r\n							<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n							<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n								<tmpl_unless hasRated>\r\n									 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n								</tmpl_unless>\r\n								<br />\r\n							<tmpl_if user.isModerator>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n							<tmpl_else>	\r\n								<tmpl_if user.isPoster>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n								</tmpl_if>	\r\n							</tmpl_if>	\r\n						</div>	\r\n					</div>\r\n					<div class=\"postMessage\">\r\n						<tmpl_var content>\r\n						<tmpl_loop attachment_loop>\r\n							<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n						</tmpl_loop>\r\n						<div style=\"clear: both;\"></div>\r\n					</div>\r\n					<tmpl_unless isLocked>\r\n						<div class=\"postControls\">\r\n							<tmpl_if user.canReply>\r\n								<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n							</tmpl_if>\r\n							<tmpl_if user.canEdit>\r\n								<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n								<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n							</tmpl_if>\r\n						</div>\r\n					</tmpl_unless>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end flat layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isNested>\r\n	<!-- begin nested layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n					<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end nested layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if pagination.pageCount.isMultiple>\r\n		<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n			[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n		</div>\r\n	</tmpl_if>\r\n	\r\n	\r\n</tmpl_if>	\r\n\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n	<a href=\"<tmpl_var collaboration.url>\">[<tmpl_var back.label>]</a>\r\n	<tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000098'),('<a name=\"<tmpl_var assetId>\"></a> \r\n\r\n<tmpl_if preview.title><p><b><tmpl_var preview.title></b></p></tmpl_if>\r\n<tmpl_if preview.content><p><tmpl_var preview.content></p></tmpl_if>\r\n<tmpl_if preview.userDefined3><p><tmpl_var preview.userDefined3></p></tmpl_if>\r\n<tmpl_if preview.userDefined1><p><tmpl_var preview.userDefined1></p></tmpl_if>\r\n<tmpl_if preview.userDefined2><p><tmpl_var preview.userDefined2></p></tmpl_if>\r\n\r\n<tmpl_if isReply>\r\n	<h1><tmpl_var message.header.label></h1>\r\n<tmpl_else>\r\n	<h1><tmpl_var job.header.label></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_var form.header>\r\n<table>\r\n	<tmpl_if isReply>\r\n		<tr>\r\n			<td><tmpl_var subject.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var message.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n	<tmpl_else>\r\n		<tr>\r\n			<td><tmpl_var job.title.label></td>\r\n			<td><tmpl_var title.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var synopsis.label></td>\r\n			<td><tmpl_var synopsis.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var job.description.label></td>\r\n			<td><tmpl_var content.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var job.requirements.label></td>\r\n			<td><tmpl_var userDefined3.form.htmlarea></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var compensation.label></td>\r\n			<td><tmpl_var userDefined1.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var location.label></td>\r\n			<td><tmpl_var userDefined2.form></td>\r\n		</tr>\r\n		<tmpl_if attachment.form>\r\n			<tr>\r\n				<td><tmpl_var attachment.label></td>\r\n				<td><tmpl_var attachment.form></td>\r\n			</tr>\r\n		</tmpl_if>\r\n		<tr>\r\n			<td><tmpl_var startDate.label></td>\r\n			<td><tmpl_var startDate.form></td>\r\n		</tr>\r\n		<tr>\r\n			<td><tmpl_var endDate.label></td>\r\n			<td><tmpl_var endDate.form></td>\r\n		</tr>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td><tmpl_var contentType.label></td>\r\n		<td><tmpl_var contentType.form></td>\r\n	</tr>\r\n	<tmpl_if isNewPost>\r\n		<tmpl_unless user.isVisitor>\r\n			<tr>\r\n				<td><tmpl_var subscribe.label></td>\r\n				<td><tmpl_var subscribe.form></td>\r\n			</tr>\r\n		</tmpl_unless>\r\n		<tmpl_if isNewThread>\r\n			<tmpl_if user.isModerator>\r\n				<tr>\r\n					<td><tmpl_var lock.label></td>\r\n					<td><tmpl_var lock.form></td>\r\n				</tr>\r\n				<tr>\r\n					<td><tmpl_var stick.label></td>\r\n					<td><tmpl_var sticky.form></td>\r\n				</tr>\r\n			</tmpl_if>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tr>\r\n		<td></td>\r\n		<td><tmpl_if usePreview><tmpl_var form.preview></tmpl_if><tmpl_var form.submit></td>\r\n	</tr>\r\n</table>\r\n<tmpl_var form.footer>\r\n\r\n<tmpl_if isReply>\r\n	<p><b><tmpl_var reply.title></b></p>\r\n	<tmpl_var reply.content>\r\n	<tmpl_if reply.userDefined3><p><tmpl_var reply.userDefined3></p></tmpl_if>\r\n	<tmpl_if reply.userDefined1><p><tmpl_var reply.userDefined1></p></tmpl_if>\r\n	<tmpl_if reply.userDefined2><p><tmpl_var reply.userDefined2></p></tmpl_if>\r\n</tmpl_if>\r\n','Collaboration/PostForm',1,1,'PBtmpl0000000000000122'),('\n		<tmpl_if displayTitle>\n		<h1><tmpl_var title></h1>\n		</tmpl_if>\n		<tmpl_if description>\n			<p><tmpl_var description></p>\n		</tmpl_if>\n		<tmpl_if session.var.adminOn>\n<tmpl_var controls>\n</tmpl_if>\n<div class=\"synopsis\">\r\n<tmpl_loop page_loop>\r\n   <div class=\"synopsis_title\">\r\n      <a href=\"<tmpl_var page.url>\"><tmpl_var page.menuTitle></a>\r\n   </div>\r\n   <tmpl_if page.indent>\r\n      <div class=\"synopsis_sub\">\r\n         <tmpl_var page.synopsis>\r\n      </div>\r\n   <tmpl_else>\r\n      <div class=\"synopsis_summary\">\r\n         <tmpl_var page.synopsis>\r\n      </div>\r\n   </tmpl_if>\r\n</tmpl_loop>\r\n</div>','Navigation',1,1,'PBtmpl0000000000000136'),('<h1>\n   <tmpl_var title>\n</h1>\n\n<tmpl_if login.message>\r\n   <tmpl_var login.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var login.form.header>\r\n<table >\r\n<tmpl_var login.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var login.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\n     <tmpl_if recoverPassword.isAllowed>\n	     <li><a href=\"<tmpl_var recoverPassword.url>\"><tmpl_var recoverPassword.label></a></li>\n	  </tmpl_if>\n           <tmpl_if anonymousRegistration.isAllowed>\n	     <li><a href=\"<tmpl_var createAccount.url>\"><tmpl_var createAccount.label></a></li>\n	  </tmpl_if>\r\n   </ul>\r\n</div>','Auth/WebGUI/Login',1,1,'PBtmpl0000000000000013'),('<h1>\n   <tmpl_var title>\n</h1>\n\n\n<tmpl_if account.message>\r\n   <tmpl_var account.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var account.form.header>\r\n<table >\r\n\n<tmpl_if account.form.karma>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.karma.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.karma></td>\r\n</tr>\r\n</tmpl_if>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var account.form.passwordConfirm.label></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.passwordConfirm></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var account.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var account.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop account.options>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Auth/WebGUI/Account',1,1,'PBtmpl0000000000000010'),('   <h1><tmpl_var title></h1>\r\n\r\n<tmpl_if create.message>\r\n   <tmpl_var create.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var create.form.header>\r\n<table >\r\n<tmpl_if useCaptcha>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.captcha.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.captcha></td>\r\n</tr>\r\n</tmpl_if>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.passwordConfirm.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.passwordConfirm></td>\r\n</tr>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\r\n      <tmpl_if recoverPassword.isAllowed>\r\n	     <li><a href=\"<tmpl_var recoverPassword.url>\"><tmpl_var recoverPassword.label></a></li>\r\n	  </tmpl_if>\r\n   </ul>\r\n</div>','Auth/WebGUI/Create',1,1,'PBtmpl0000000000000011'),('<h1>\n   <tmpl_var title>\n</h1>\n\r\n\r\n<tmpl_if recover.message>\r\n   <tmpl_var recover.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var recover.form.header>\r\n<table >\r\n<tmpl_var recover.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var recover.form.email.label></td>\r\n   <td class=\"tableData\"><tmpl_var recover.form.email></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var recover.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var recover.form.footer>\r\n\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\n       <tmpl_if anonymousRegistration.isAllowed>\n	     <li><a href=\"<tmpl_var createAccount.url>\"><tmpl_var createAccount.label></a></li>\n	  </tmpl_if>\n         <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\n      \r\n   </ul>\r\n</div>','Auth/WebGUI/Recovery',1,1,'PBtmpl0000000000000014'),('<h1>\n   <tmpl_var title>\n</h1>\n\r\n<tmpl_if expired.message>\r\n   <tmpl_var expired.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var expired.form.header>\r\n<table >\r\n<tmpl_var expired.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var expired.form.oldPassword.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n      <tmpl_var expired.form.oldPassword>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n      <tmpl_var expired.form.password.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n      <tmpl_var expired.form.password>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\">\r\n  <tmpl_var expired.form.passwordConfirm.label>\r\n   </td>\r\n   <td class=\"tableData\">\r\n   <tmpl_var expired.form.passwordConfirm>\r\n   </td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\">\r\n   <tmpl_var expired.form.submit>\r\n   </td>\r\n</tr>\r\n</table>\r\n<tmpl_var expired.form.footer>','Auth/WebGUI/Expired',1,1,'PBtmpl0000000000000012'),('<h1>\n   <tmpl_var title>\n</h1>\r\n<tmpl_if login.message>\r\n   <tmpl_var login.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var login.form.header>\r\n<table >\r\n<tmpl_var login.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.username.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.username></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var login.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.password></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var login.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var login.form.footer>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n             <tmpl_if anonymousRegistration.isAllowed>\n	     <li><a href=\"<tmpl_var createAccount.url>\"><tmpl_var createAccount.label></a></li>\n	  </tmpl_if>\n\n   </ul>\r\n</div>','Auth/LDAP/Login',1,1,'PBtmpl0000000000000006'),('<h1>\n   <tmpl_var title>\n</h1>\n\n\r\n<tmpl_var account.message>\r\n<tmpl_if account.form.karma>\r\n<br><br>\r\n<table>\r\n<tr>\r\n  <td class=\"formDescription\">\r\n      <tmpl_var account.form.karma.label>\r\n  </td>\r\n  <td class=\"tableData\">\r\n       <tmpl_var account.form.karma>\r\n  </td>\r\n</tr>\r\n</table>\r\n</tmpl_if>\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n      <tmpl_loop account.options>\r\n         <li><tmpl_var options.display>\r\n      </tmpl_loop>\r\n   </ul>\r\n</div>','Auth/LDAP/Account',1,1,'PBtmpl0000000000000004'),('<h1>\r\n   <tmpl_var title>\r\n</h1>\r\n<tmpl_if create.message>\r\n   <tmpl_var create.message>\r\n</tmpl_if>\r\n\r\n<tmpl_var create.form.header>\r\n<table >\r\n<tmpl_var create.form.hidden>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.ldapConnection.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.ldapConnection></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.ldapId.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.ldapId></td>\r\n</tr>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var create.form.password.label></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.password></td>\r\n</tr>\r\n<tmpl_loop create.form.profile>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"><tmpl_var profile.formElement.label></td>\r\n   <td class=\"tableData\"><tmpl_var profile.formElement></td>\r\n</tr>\r\n</tmpl_loop>\r\n<tr>\r\n   <td class=\"formDescription\" valign=\"top\"></td>\r\n   <td class=\"tableData\"><tmpl_var create.form.submit></td>\r\n</tr>\r\n</table>\r\n<tmpl_var create.form.footer>\r\n\r\n\r\n<div class=\"accountOptions\">\r\n   <ul>\r\n     <li><a href=\"<tmpl_var login.url>\"><tmpl_var login.label></a></li>\r\n \r\n  </ul>\r\n</div>','Auth/LDAP/Create',1,1,'PBtmpl0000000000000005'),('<h1><tmpl_var title></h1>\n\n<p>\n<tmpl_var question>\n</p>\n\n<div align=\"center\">\n\n<a href=\"<tmpl_var yes.url>\"><tmpl_var yes.label></a>\n\n&nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; \n\n<a href=\"<tmpl_var no.url>\"><tmpl_var no.label></a>\n\n</div>\n','prompt',1,1,'PBtmpl0000000000000057'),('<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\r\n        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n        <head>\r\n                <title>^Page(\"title\"); - WebGUI</title>\r\n				<tmpl_var head.tags>\r\n                <style type=\"text/css\">\r\n	.menu {\r\n		position: absolute;\r\n		top: 25px;\r\n		left: 10px;\r\n		width: 180px;\r\n		font-family: helvetica, arial;\r\n		font-size: 12px;\r\n	}\r\n.contentArea {\r\n	border: 1px solid #cccccc;\r\n	margin: 25px 10px 10px 190px;\r\n	padding: 5px;\r\n		font-family: helvetica, arial;\r\n	min-height: 400px;\r\n}\r\n/* Hides from non-ie: the holly hack \\*/\r\n* html .adminConsoleWorkArea {\r\n	zoom: 1.00;\r\n	display: inline;\r\n	}\r\n/* End hide from non-ie */\r\n\r\n\r\n                 </style>\r\n        </head>\r\n        <body>	\r\n			^AdminBar;\r\n	<div class=\"menu\">\r\n		^AssetProxy(flexmenu);\r\n	</div>\r\n	<div class=\"contentArea\">\r\n		<tmpl_var body.content>\r\n		<br /><br /><hr />\r\n		^LoginToggle; \r\n		&nbsp; ^a(^@;); \r\n		&nbsp; ^H;\r\n		&nbsp; ^AdminToggle;\r\n	</div>\r\n</body>\r\n</html>\r\n','style',0,0,'PBtmpl0000000000000060'),('<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n		<html>\n		<head>\n			<title>^Page(title); - <tmpl_var session.setting.companyName></title>\n				\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	\n		<style>\r\n\r\ninput:focus, textarea:focus {\r\n background-color: #D5E0E1;\r\n}\r\n\r\ninput, textarea, select {\r\n -moz-border-radius: 6px;\r\n background-color: #B9CDCF;\r\n border: ridge;\r\n}\r\n\r\n\r\n.content{\r\n	color: #000000;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 5px;\r\n}\r\n\r\nbody{\r\n	color: Black;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 0px;\r\n	background-position: top;\r\n	background-repeat: repeat-x;\r\n}\r\n\r\na {\r\n	color:#EC4300;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: underline;\r\n}\r\n\r\na:hover{\r\n	color:#EC4300; \r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: none;\r\n}\r\n\r\n.adminBar {\r\n  background-color: #CCCCCC;\r\n  font-family: helvetica, arial;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #CCCCCC;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  font-size: 10pt;\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #CECECE;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n\r\nh1 {\r\n	font-size: 14pt;\r\n	font-family: helvetica, arial;\r\n	color: #EC4300;\r\n}\r\n\r\n.tab {\r\n  -moz-border-radius: 6px 6px 0px 0px;\r\n border: 1px solid black;\r\n   background-color: #eeeeee;\r\n}\r\n.tabBody {\r\n   border: 1px solid black;\r\n   border-top: 1px solid black;\r\n   border-left: 1px solid black;\r\n   background-color: #dddddd; \r\n}\r\ndiv.tabs {\r\n    line-height: 15px;\r\n    font-size: 14px;\r\n}\r\n.tabHover {\r\n   background-color: #cccccc;\r\n}\r\n.tabActive { \r\n   background-color: #dddddd; \r\n}\r\n\r\n</style>\r\n		\r\n\r\n\r\n\n		</head>\n				<body bgcolor=\"#D5E0E1\" leftmargin=\"0\" topmargin=\"0\" rightmargin=\"0\" bottommargin=\"0\" marginwidth=\"0\" marginheight=\"0\">\r\n\r\n^AdminBar(\"PBtmpl0000000000000090\");<br /> <br />\r\n\r\n<div class=\"content\" style=\"padding: 10px;\">\r\n  \n			<tmpl_var body.content>\n		\r\n</div>\r\n\r\n\r\n<div width=\"100%\" style=\"color: white; padding: 3px; background-color: black; text-align: center;\">^H; / ^PageTitle; / ^AdminToggle; / ^LoginToggle; / ^a;</div>\r\n</body>\r\n\r\n\r\n\r\n\r\n\r\n\n		</html>\n		','style',1,1,'9tBSOV44a9JPS8CcerOvYw'),('<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n		<html>\n		<head>\n			<title>^Page(title); - <tmpl_var session.setting.companyName></title>\n				\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	\n		<style>\r\n\r\n.nav,  A.nav:hover, .verticalMenu {\r\n font-size: 10px;\r\n text-decoration: none;\r\n}\r\n\r\n.pageTitle, .pageTitle A {\r\n  font-size: 30px;\r\n}\r\n\r\ninput:focus, textarea:focus {\r\n background-color: #D5E0E1;\r\n}\r\n\r\ninput, textarea, select {\r\n -moz-border-radius: 6px;\r\n background-color: #B9CDCF;\r\n border: ridge;\r\n}\r\n\r\n.wgBoxTop{\r\n	background-image: url(\"^Extras;/styles/webgui6/hdr_bg_corner_right.jpg\");\r\n        width: 195px;\r\n        height: 93px;\r\n}\r\n.wgBoxBottom{\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_clouds.jpg\");\r\n	padding-bottom: 21px;\r\n        width: 529px;\r\n        height: 88px;\r\n}\r\n.logo {\r\n	background-image: url(\"^Extras;/styles/webgui6/hdr_bg_corner_left.jpg\");\r\n	background-color: #F4F4F4;\r\n	width: 195px;\r\n        height: 93px;\r\n        padding-bottom: 25px;\r\n}\r\n.login {\r\n        width: 334px;\r\n        height: 93px;\r\n	background-image: url(\"^Extras;/styles/webgui6/hdr_bg_center.jpg\");\r\n	background-color: #C1D6D8;\r\n        padding-top: 5px;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10px;\r\n	font-weight: bold;\r\n	color: #EC4300;\r\n}\n  input.loginBoxField { \n font-size: 10px;\n background-color: white;\n }\n .loginBox {\n font-size: 10px;\n }\n input.loginBoxButton {\n font-size: 10px;\n }  \r\n.iconBox{\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_corner_left_top.jpg\");\r\n        width: 195px;\r\n        height: 88px;\r\n        vertical-align: bottom;\r\n        text-align: center;\r\n}\r\n.dateLeft {\r\n	background-image: url(\"^Extras;/styles/webgui6/date_bg_left.jpg\");	\r\n     width: 53px;\r\n     height: 59px;\r\n}\r\n\r\n.dateRight {\r\n     width: 53px;\r\n     height: 59px;\r\n	background-image: url(\"^Extras;/styles/webgui6/date_right_bg.jpg\");	\r\n}\r\n\r\n.date {\r\n	color: #393C3C;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 11px;\r\n	font-weight: bold;\r\n}\r\n\r\n.contentbgLeft {\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_left.jpg\");	\r\n    width: 53px;\r\n	\r\n}\r\n.contentbgRight {\r\n	background-image: url(\"^Extras;/styles/webgui6/content_bg_right.jpg\");	\r\n	\r\n}\r\n\r\n\r\n.content{\r\n	color: #000000;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 5px;\r\n}\r\n\r\nbody{\r\n	color: Black;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-size: 10pt;\r\n	padding: 0px;\r\n        background-image: url(\"^Extras;/styles/webgui6/bg.gif\");\r\n	background-position: top;\r\n	background-repeat: repeat-x;\r\n}\r\n\r\na {\r\n	color:#EC4300;\r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: underline;\r\n}\r\n\r\na:hover{\r\n	color:#EC4300; \r\n	font-family: Arial, Helvetica, sans-serif;\r\n	font-weight: bold;\r\n	text-decoration: none;\r\n}\r\n\r\n.adminBar {\r\n  background-color: #CCCCCC;\r\n  font-family: helvetica, arial;\r\n}\r\n.tableMenu {\r\n  background-color: #CCCCCC;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n.tableMenu a {\r\n  font-size: 10pt;\r\n  text-decoration: none;\r\n}\r\n.tableHeader {\r\n  background-color: #CECECE;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n.pollColor {\r\n  background-color: #CCCCCC;\r\n  border: thin solid #393C3C;\r\n}\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\nh1, h2, h3, h4, h5, h6 {\r\n   font-family: helvetica, arial;\r\n	color: #EC4300;\r\n}\r\n\r\nh1 {\r\n	font-size: 14pt;\r\n	font-family: helvetica, arial;\r\n	color: #EC4300;\r\n}\r\n\r\n.tab {\r\n  border: 1px solid black;\r\n   background-color: #eeeeee;\r\n}\r\n.tabBody {\r\n   border: 1px solid black;\r\n   border-top: 1px solid black;\r\n   border-left: 1px solid black;\r\n   background-color: #dddddd; \r\n}\r\ndiv.tabs {\r\n    line-height: 15px;\r\n    font-size: 14px;\r\n}\r\n.tabHover {\r\n   background-color: #cccccc;\r\n}\r\n.tabActive { \r\n   background-color: #dddddd; \r\n}\r\n\r\n</style>\r\n		\n		</head>\n		<body bgcolor=\"#D5E0E1\" leftmargin=\"0\" topmargin=\"0\" rightmargin=\"0\" bottommargin=\"0\" marginwidth=\"0\" marginheight=\"0\">\r\n^AdminBar(\"PBtmpl0000000000000090\");\r\n\r\n<!-- logo / login table starts here -->\r\n<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>	\r\n		<td width=\"195\" align=\"center\" class=\"logo\"><a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/wg_logo.gif\"></a></td>\r\n		<td width=\"334\" align=\"center\" valign=\"top\" class=\"login\">^L(\"17\",\"\",\"PBtmpl0000000000000092\"); ^AdminToggle;</td>\r\n		<td width=\"195\" align=\"center\" class=\"wgBoxTop\" valign=\"bottom\"><a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/wg_box_top.gif\"></a></td>\r\n	</tr>\r\n</table>\r\n<!-- logo / login table ends here -->\r\n<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n	<!-- print, email icons here -->\r\n		<td class=\"iconBox\">\n &nbsp; &nbsp; &nbsp; &nbsp; \r\n<a href=\"^H(linkonly);\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_home.gif\" title=\"Go Home\" alt=\"home\" /></a> \n <a href=\"^/;tell_a_friend\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_email.gif\" alt=\"Email\" title=\"Email a friend about this site.\" /></a>\r\n<a href=\"^r(linkonly);\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_print.gif\" alt=\"Print\" title=\"Make page printable.\" /></a> \n <a href=\"site_map\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_site_map.gif\" title=\"View the site map.\" ALT=\"Site Map\" /></a> <a href=\"http://www.plainblack.com\"><img border=\"0\" src=\"^Extras;/styles/webgui6/icon_pb.gif\" ALT=\"Plain Black Icon\" title=\"Visit plainblack.com.\" /></a>\r\n</td>\r\n	<!-- box clouds here -->\r\n		<td class=\"wgBoxBottom\">^Spacer(56,1);<a href=\"http://www.plainblack.com/what_is_webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/txt_the_last.gif\"></a>^Spacer(26,1);<a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/wg_box_bottom.gif\"></a></td>\r\n	</tr>\r\n</table>\r\n<!-- date & page title table start here -->\r\n<table width=\"724\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n		<td class=\"dateLeft\">^Spacer(53,59);</td>\r\n		<td width=\"141\" bgcolor=\"#BDC6C7\" class=\"date\">^D(\"%c %D, %y\");</td>\r\n		<td><img border=\"0\" src=\"^Extras;/styles/webgui6/date_right_shadow.gif\"></td>\r\n		<td width=\"467\" bgcolor=\"#B9CDCF\"><div class=\"pageTitle\">^PageTitle;</div></td>\r\n		<td class=\"dateRight\">^Spacer(53,59);</td>\r\n	</tr>\r\n</table>\r\n<!-- date and page title table end here -->\r\n<!-- left nav & content table start here -->\r\n<table width=\"724\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n		<td class=\"contentbgLeft\">^Spacer(53,1);</td>\r\n		<!-- nav column -->\r\n		<td width=\"142\" valign=\"top\" bgcolor=\"#E2E1E1\" style=\"width: 142px;\">\r\n<br /> <div class=\"nav\">\r\n^AssetProxy(\"flexmenu_1002\");\r\n</div> <br /> <br />\r\n<a href=\"http://www.plainblack.com/webgui\"><img border=\"0\" src=\"^Extras;/styles/webgui6/powered_by_aqua_blue.gif\"></a>\r\n</td>\r\n\r\n		<td valign=\"top\" bgcolor=\"#F4F4F4\"><img border=\"0\" src=\"^Extras;/styles/webgui6/lnav_shadow.jpg\"></td>\r\n		<!-- content column -->\r\n		<td width=\"466\" valign=\"top\" bgcolor=\"#F4F4F4\" class=\"content\">\n			<tmpl_var body.content>\n		</td>\r\n		<td class=\"contentbgRight\">^Spacer(53,1);</td>\r\n	</tr>\r\n</table>\r\n<!-- left nav & content table end here -->\r\n<!-- footer -->\r\n<table width=\"724\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\r\n	<tr>\r\n		<td><img border=\"0\" src=\"^Extras;/styles/webgui6/footer.jpg\"></td>\r\n	</tr>\r\n        <tr>\r\n                <td align=\"center\"><a href=\"http://www.plainblack.com\"><img border=\"0\" src=\"^Extras;/styles/webgui6/logo_pb.gif\"></a><br /><span style=\"font-size: 11px;\"><a href=\"http://www.plainblack.com/design\">Design by Plain Black</a></span></td>\r\n        </tr>\r\n</table>\r\n</body>\n		</html>\n		','style',1,1,'B1bNjWVtzSjsvGZh9lPz_A'),('<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n		<html>\n		<head>\n			<title>^Page(title); - <tmpl_var session.setting.companyName></title>\n				\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	\n		<style>\r\n\r\n.content{\r\n  background-color: #ffffff;\r\n  color: #000000;\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  padding: 10pt;\r\n}\r\n\r\nH1 {\r\n  font-family: helvetica, arial;\r\n  font-size: 16pt;\r\n}\r\n\r\nA {\r\n  color: #EF4200;\r\n}\r\n\r\n.pagination {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n  text-align: center;\r\n}\r\n\r\n.formDescription {\r\n  font-family: helvetica, arial;\r\n  font-size: 10pt;\r\n  font-weight: bold;\r\n}\r\n\r\n.formSubtext {\r\n  font-family: helvetica, arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.highlight {\r\n  background-color: #dddddd;\r\n}\r\n\r\n.tableMenu {\r\n  background-color: #cccccc;\r\n  font-size: 8pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableMenu a {\r\n  text-decoration: none;\r\n}\r\n\r\n.tableHeader {\r\n  background-color: #cccccc;\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.tableData {\r\n  font-size: 10pt;\r\n  font-family: Helvetica, Arial;\r\n}\r\n\r\n.pollAnswer {\r\n  font-family: Helvetica, Arial;\r\n  font-size: 8pt;\r\n}\r\n\r\n.pollColor {\r\n  background-color: #444444;\r\n}\r\n\r\n.pollQuestion {\r\n  font-face: Helvetica, Arial;\r\n  font-weight: bold;\r\n}\r\n\r\n.faqQuestion {\r\n  font-size: 12pt;\r\n  font-weight: bold;\r\n  color: #000000;\r\n}\r\n\r\n</style>\n		</head>\n		^AdminBar(\"\");\n\n<body onLoad=\"window.print()\">\r\n<div align=\"center\"><a href=\"^PageUrl;\"><img src=\"^Extras;plainblack.gif\" border=\"0\"></a></div>\n\n\n			<tmpl_var body.content>\n		\n\n<div align=\"center\">© 2001-2004 Plain Black LLC</div>\r\n</body>\n		</html>\n		','style',1,1,'PBtmpl0000000000000111'),('<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\r\n        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n<head>\r\n        <title>WebGUI <tmpl_var session.webgui.version>-<tmpl_var session.webgui.status> Admin Console</title>\r\n        	\n	<link rel=\"icon\" href=\"^Extras;favicon.png\" type=\"image/png\" />\n	<link rel=\"SHORTCUT ICON\" href=\"^Extras;favicon.ico\" />\n	<tmpl_var head.tags>\n	 \r\n</head>\r\n<body>\r\n<tmpl_var body.content>\r\n</body>\r\n</html>\r\n','style',1,0,'PBtmpl0000000000000137'),('<tmpl_var body.content>','style',0,0,'PBtmpl0000000000000132'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displaytitle>\r\n   <tmpl_if linkurl>\r\n       <a href=\"<tmpl_var linkurl>\">\r\n    </tmpl_if>\r\n     <span class=\"itemTitle\"><tmpl_var title></span>\r\n   <tmpl_if linkurl>\r\n      </a>\r\n    </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if attachment.name>\r\n   <tmpl_if displaytitle> - </tmpl_if>\r\n   <a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var attachment.Icon>\" border=\"0\" alt=\"<tmpl_var attachment.name>\" width=\"16\" height=\"16\" border=\"0\" align=\"middle\" /></a>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  - <tmpl_var description>\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000123'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n</tmpl_if>	\n		<tmpl_if displaytitle>\r\n   <tmpl_if linkurl>\r\n       <a href=\"<tmpl_var linkurl>\" target=\"_blank\">\r\n    </tmpl_if>\r\n     <span class=\"itemTitle\"><tmpl_var title></span>\r\n   <tmpl_if linkurl>\r\n      </a>\r\n    </tmpl_if>\r\n</tmpl_if>\r\n\r\n<tmpl_if attachment.name>\r\n   <tmpl_if displaytitle> - </tmpl_if>\r\n   <a href=\"<tmpl_var attachment.url>\" target=\"_blank\"><img src=\"<tmpl_var attachment.Icon>\" border=\"0\" alt=\"<tmpl_var attachment.name>\" width=\"16\" height=\"16\" border=\"0\" align=\"middle\" /></a>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n  - <tmpl_var description>\r\n</tmpl_if>','Article',1,1,'PBtmpl0000000000000129'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n\r\n<tmpl_loop post_loop>\r\n	<tmpl_if user.isPoster>\r\n		<tmpl_unless session.var.adminOn>\r\n			<div>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</div>\r\n		</tmpl_unless>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<div>\r\n			<tmpl_if session.var.adminOn>\r\n				<tmpl_var controls>\r\n			<tmpl_else>\r\n				<tmpl_unless user.isPoster>\r\n					<tmpl_unless session.var.adminOn>\r\n						[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n					</tmpl_unless>\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n		</div>\r\n	</tmpl_if>\r\n	<b>Q: <tmpl_var title></span></b><br />\r\n	A: <tmpl_var content>\r\n	<p />\r\n</tmpl_loop>\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000081'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<tmpl_var controls> \r\n</tmpl_if>\r\n\r\n\r\n<tmpl_if displayTitle>\r\n    <h1><tmpl_var title></h1>\r\n</tmpl_if>\r\n\r\n<tmpl_if description>\r\n    <tmpl_var description>\r\n</tmpl_if>\r\n\r\n<p>\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n	<tmpl_if pagination.pageCount.isMultiple>	\r\n		<a href=\"<tmpl_var search.url>\">[<tmpl_var search.label>]</a>\r\n	</tmpl_if>\r\n</p>\r\n\r\n<ol>\r\n	<tmpl_loop post_loop>\r\n		<li>\r\n			<tmpl_if user.isPoster>\r\n				<tmpl_unless session.var.adminOn>\r\n					[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n				</tmpl_unless>\r\n			</tmpl_if>\r\n			<tmpl_if user.isModerator>\r\n				<tmpl_if session.var.adminOn>\r\n					<tmpl_var controls>\r\n				<tmpl_else>\r\n					<tmpl_unless user.isPoster>\r\n						<tmpl_unless session.var.adminOn>\r\n							[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]\r\n						</tmpl_unless>\r\n					</tmpl_unless>\r\n				</tmpl_if>\r\n				(<a href=\"<tmpl_var url>\"><tmpl_var status></a>)\r\n			</tmpl_if>\r\n			<tmpl_if userDefined1><a href=\"<tmpl_var userDefined1>\"	<tmpl_if userDefined2>target=\"_blank\"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>\r\n			<tmpl_if content>\r\n					  - <tmpl_var content>\r\n			</tmpl_if>\r\n		</li>\r\n	</tmpl_loop>\r\n</ol>\r\n\r\n\r\n\r\n<tmpl_if pagination.pageCount.isMultiple>\r\n  <div class=\"pagination\">\r\n    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>\r\n  </div>\r\n</tmpl_if>\r\n\r\n\r\n','Collaboration',1,1,'PBtmpl0000000000000101'),('<a name=\"<tmpl_var assetId>\"></a> <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if><tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if description>\n    <tmpl_var description><p />\n</tmpl_if>\n\n <tmpl_if user.canPost>\n			<a href=\"<tmpl_var add.url>\"> <tmpl_var addlink.label></a><p />\n</tmpl_if>\n\n<tmpl_loop post_loop>\n   \n		<tmpl_if user.isPoster>\n			<tmpl_unless session.var.adminOn>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</tmpl_unless>\n		</tmpl_if>\n		<tmpl_if user.isModerator>\n			<tmpl_if session.var.adminOn><tmpl_var controls><tmpl_else><tmpl_unless user.isPoster><tmpl_unless session.var.adminOn>[<a href=\"<tmpl_var edit.url>\"><tmpl_var edit.label></a>]</tmpl_unless></tmpl_unless></tmpl_if>\n		<br />\n   </tmpl_if>\n\n  <a href=\"<tmpl_var userDefined1>\"\n   <tmpl_if userDefined2>\n          target=\"_blank\"\n    </tmpl_if>\n    ><span class=\"linkTitle\"><tmpl_var title></span></a>\n\n    <tmpl_if content>\n              <br /> <tmpl_var content>\n   </tmpl_if>\n   <p />\n</tmpl_loop>\n','Collaboration',1,1,'wCIc38CvNHUK7aY92Ww4SQ'),('<a name=\"<tmpl_var assetId>\"></a> \r\n<tmpl_if session.var.adminOn> \r\n	<p><tmpl_var controls></p>\r\n</tmpl_if>\r\n\r\n\r\n<h1><tmpl_var title></h1>\r\n\r\n<tmpl_if user.isModerator>\r\n	<div style=\"float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;\">\r\n		<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n	</div>\r\n</tmpl_if>	\r\n\r\n\r\n<tmpl_if content>\r\n	<b>Link Description</b><br />\r\n	<p><tmpl_var content></p>\r\n</tmpl_if>\r\n\r\n<b>Link URL</b><br />\r\n<a href=\"<tmpl_var userDefined1>\"><tmpl_var userDefined1></a>\r\n\r\n<tmpl_if attachment_loop>\r\n	<br />\r\n		<tmpl_loop attachment_loop>\r\n			<div style=\"float: left; padding: 5px;\">\r\n				<a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a>\r\n			</div>\r\n		</tmpl_loop>\r\n		<div style=\"clear: both;\"></div>\r\n	<br />\r\n</tmpl_if>\r\n\r\n<tmpl_unless isLocked>\r\n	<p>\r\n		<tmpl_if user.canReply>\r\n			<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if user.canEdit>\r\n			<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n			<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n		</tmpl_if>\r\n	</p>\r\n</tmpl_unless>\r\n\r\n\r\n<tmpl_if repliesAllowed>\r\n\r\n	<style>\r\n		.postBorder {\r\n			border: 1px solid #cccccc;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postBorderCurrent {\r\n			border: 3px dotted black;\r\n			width: 100%;\r\n			margin-bottom: 10px;\r\n		}\r\n		.postSubject {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-weight: bold;\r\n			padding: 3px;\r\n		}\r\n		.postData {\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postControls {\r\n			border-top: 1px solid #cccccc;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.postMessage {\r\n			padding: 3px;\r\n		}\r\n		.currentThread {\r\n			background-color: #eeeeee;\r\n		}\r\n		.threadHead {\r\n			font-weight: bold;\r\n			border-bottom: 1px solid #cccccc;\r\n			font-size: 11px;\r\n			background-color: #eeeeee;\r\n			color: black;\r\n			padding: 3px;\r\n		}\r\n		.threadData {\r\n			font-size: 11px;\r\n			padding: 3px;\r\n		}\r\n	</style>\r\n\r\n	<div style=\"float: left; width: 70%\">\r\n		<h1><tmpl_var replies.label></h1>\r\n	</div>\r\n	<div style=\"width: 30%; float: left; text-align: right;\">\r\n		<script language=\"JavaScript\" type=\"text/javascript\">	<!--\r\n		function goLayout(){\r\n			location = document.discussionlayout.layoutSelect.options[document.discussionlayout.layoutSelect.selectedIndex].value\r\n		}\r\n		//-->	\r\n		</script>\r\n		<form name=\"discussionlayout\">\r\n			<select name=\"layoutSelect\" size=\"1\" onChange=\"goLayout()\">\r\n				<option value=\"<tmpl_var layout.flat.url>\" <tmpl_if layout.isFlat>selected=\"1\"</tmpl_if>><tmpl_var layout.flat.label></option>\r\n				<option value=\"<tmpl_var layout.nested.url>\" <tmpl_if layout.isNested>selected=\"1\"</tmpl_if>><tmpl_var layout.nested.label></option>\r\n				<option value=\"<tmpl_var layout.threaded.url>\" <tmpl_if layout.isThreaded>selected=\"1\"</tmpl_if>><tmpl_var layout.threaded.label></option>\r\n			</select> \r\n		</form> \r\n	</div>\r\n	<div style=\"clear: both;\"></div>\r\n\r\n	<tmpl_if layout.isThreaded>\r\n	<!-- begin threaded layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<tmpl_if isCurrent>\r\n					<div class=\"postBorder\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%;\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>	\r\n				</tmpl_if>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n		<table style=\"width: 100%\">\r\n			<thead>\r\n				<tr>\r\n					<td class=\"threadHead\"><tmpl_var subject.label></td>\r\n					<td class=\"threadHead\"><tmpl_var user.label></td>\r\n					<td class=\"threadHead\"><tmpl_var date.label></td>\r\n				</tr>\r\n			</thead>\r\n			<tbody>\r\n				<tmpl_loop post_loop>\r\n					<tmpl_unless isThreadRoot>\r\n						<tr <tmpl_if isCurrent>class=\"currentThread\"</tmpl_if>>\r\n							<td class=\"threadData\"><tmpl_loop indent_loop>&nbsp; &nbsp;</tmpl_loop><a href=\"<tmpl_var url>\"><tmpl_var title.short></a></td>\r\n							<td class=\"threadData\"><tmpl_var username></td>\r\n							<td class=\"threadData\"><tmpl_var dateSubmitted.human></td>\r\n						</tr>\r\n					</tmpl_unless>\r\n				</tmpl_loop>\r\n			</tbody>\r\n		</table>	\r\n	<!-- end threaded layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isFlat>\r\n	<!-- begin flat layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n					<a name=\"<tmpl_var assetId>\"></a>\r\n					<div class=\"postSubject\">\r\n						<tmpl_var title>\r\n					</div>\r\n					<div class=\"postData\">\r\n						<div style=\"float: left; width: 50%\">\r\n							<b><tmpl_var user.label>:</b> \r\n								<tmpl_if user.isVisitor>\r\n									<tmpl_var username>\r\n								<tmpl_else>\r\n									<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n								</tmpl_if>\r\n								<br />\r\n							<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n						</div>	\r\n						<div>\r\n							<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n							<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n								<tmpl_unless hasRated>\r\n									 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n								</tmpl_unless>\r\n								<br />\r\n							<tmpl_if user.isModerator>\r\n								<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n							<tmpl_else>	\r\n								<tmpl_if user.isPoster>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n								</tmpl_if>	\r\n							</tmpl_if>	\r\n						</div>	\r\n					</div>\r\n					<div class=\"postMessage\">\r\n						<tmpl_var content>\r\n						<tmpl_loop attachment_loop>\r\n							<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n						</tmpl_loop>\r\n						<div style=\"clear: both;\"></div>\r\n					</div>\r\n					<tmpl_unless isLocked>\r\n						<div class=\"postControls\">\r\n							<tmpl_if user.canReply>\r\n								<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n							</tmpl_if>\r\n							<tmpl_if user.canEdit>\r\n								<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n								<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n							</tmpl_if>\r\n						</div>\r\n					</tmpl_unless>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end flat layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if layout.isNested>\r\n	<!-- begin nested layout -->\r\n		<tmpl_loop post_loop>\r\n			<tmpl_unless isThreadRoot>\r\n				<div style=\"margin-left: <tmpl_var depthX10>px;\">\r\n					<div class=\"postBorder<tmpl_if isCurrent>Current</tmpl_if>\">\r\n						<a name=\"<tmpl_var assetId>\"></a>\r\n						<div class=\"postSubject\">\r\n							<tmpl_var title>\r\n						</div>\r\n						<div class=\"postData\">\r\n							<div style=\"float: left; width: 50%\">\r\n								<b><tmpl_var user.label>:</b> \r\n									<tmpl_if user.isVisitor>\r\n										<tmpl_var username>\r\n									<tmpl_else>\r\n										<a href=\"<tmpl_var userProfile.url>\"><tmpl_var username></a>\r\n									</tmpl_if>\r\n									<br />\r\n								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />\r\n							</div>	\r\n							<div>\r\n								<b><tmpl_var views.label>:</b> <tmpl_var views><br />\r\n								<b><tmpl_var rating.label>:</b> <tmpl_var rating>\r\n									<tmpl_unless hasRated>\r\n										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href=\"<tmpl_var rate.url.1>\">1</a>, <a href=\"<tmpl_var rate.url.2>\">2</a>, <a href=\"<tmpl_var rate.url.3>\">3</a>, <a href=\"<tmpl_var rate.url.4>\">4</a>, <a href=\"<tmpl_var rate.url.5>\">5</a> ]\r\n									</tmpl_unless>\r\n									<br />\r\n								<tmpl_if user.isModerator>\r\n									<b><tmpl_var status.label>:</b> <tmpl_var status>  &nbsp; &nbsp; [ <a href=\"<tmpl_var approve.url>\"><tmpl_var approve.label></a> | <a href=\"<tmpl_var deny.url>\"><tmpl_var deny.label></a> ]<br />\r\n								<tmpl_else>	\r\n									<tmpl_if user.isPoster>\r\n										<b><tmpl_var status.label>:</b> <tmpl_var status><br />\r\n									</tmpl_if>	\r\n								</tmpl_if>	\r\n							</div>	\r\n						</div>\r\n						<div class=\"postMessage\">\r\n							<tmpl_var content>\r\n							<tmpl_loop attachment_loop>\r\n								<div style=\"float: left; padding: 5px;\"><a href=\"<tmpl_var url>\"><tmpl_if isImage><img src=\"<tmpl_var thumbnail>\" border=\"0\" alt=\"<tmpl_var filename>\" /><tmpl_else><img src=\"<tmpl_var icon>\" border=\"0\" alt=\"<tmpl_var filename>\" align=\"middle\" /> <tmpl_var filename></tmpl_if></a></div>\r\n							</tmpl_loop>\r\n							<div style=\"clear: both;\"></div>\r\n						</div>\r\n						<tmpl_unless isLocked>\r\n							<div class=\"postControls\">\r\n								<tmpl_if user.canReply>\r\n									<a href=\"<tmpl_var reply.url>\">[<tmpl_var reply.label>]</a>\r\n								</tmpl_if>\r\n								<tmpl_if user.canEdit>\r\n									<a href=\"<tmpl_var edit.url>\">[<tmpl_var edit.label>]</a>\r\n									<a href=\"<tmpl_var delete.url>\">[<tmpl_var delete.label>]</a>\r\n								</tmpl_if>\r\n							</div>\r\n						</tmpl_unless>\r\n					</div>\r\n				</div>\r\n			</tmpl_unless>\r\n		</tmpl_loop>\r\n	<!-- end nested layout -->\r\n	</tmpl_if>\r\n	\r\n	\r\n	\r\n	<tmpl_if pagination.pageCount.isMultiple>\r\n		<div class=\"pagination\" style=\"margin-top: 20px;\">\r\n			[ <tmpl_var pagination.previousPage>  | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]\r\n		</div>\r\n	</tmpl_if>\r\n	\r\n	\r\n</tmpl_if>	\r\n\r\n<div style=\"margin-top: 20px;\">\r\n    <tmpl_if previous.url>\r\n		<a href=\"<tmpl_var previous.url>\">[<tmpl_var previous.label>]</a> \r\n	</tmpl_if>	\r\n	<a href=\"<tmpl_var collaboration.url>\">[List All Links]</a>\r\n	<tmpl_if next.url>\r\n		<a href=\"<tmpl_var next.url>\">[<tmpl_var next.label>]</a> \r\n	</tmpl_if>	\r\n	<tmpl_if user.canPost>\r\n		<a href=\"<tmpl_var add.url>\">[<tmpl_var add.label>]</a>\r\n	</tmpl_if>\r\n	<tmpl_if user.isModerator>\r\n		<tmpl_if isSticky>\r\n			<a href=\"<tmpl_var unstick.url>\">[<tmpl_var unstick.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var stick.url>\">[<tmpl_var stick.label>]</a>\r\n		</tmpl_if>\r\n		<tmpl_if isLocked>\r\n			<a href=\"<tmpl_var unlock.url>\">[<tmpl_var unlock.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var lock.url>\">[<tmpl_var lock.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_if>\r\n	<tmpl_unless user.isVisitor>\r\n		<tmpl_if user.isSubscribed>\r\n			<a href=\"<tmpl_var unsubscribe.url>\">[<tmpl_var unsubscribe.label>]</a>\r\n		<tmpl_else>\r\n			<a href=\"<tmpl_var subscribe.url>\">[<tmpl_var subscribe.label>]</a>\r\n		</tmpl_if>\r\n	</tmpl_unless>\r\n</div>\r\n\r\n\r\n\r\n','Collaboration/Thread',1,1,'PBtmpl0000000000000113'),('<a class=\"myAccountLink\" href=\"<tmpl_var account.url>\"><tmpl_var account.text></a>','Macro/a_account',1,1,'PBtmpl0000000000000037'),('<a href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/EditableToggle',1,1,'PBtmpl0000000000000038'),('<a href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/AdminToggle',1,1,'PBtmpl0000000000000036'),('<a href=\"<tmpl_var file.url>\"><img src=\"<tmpl_var file.icon>\" align=\"middle\" border=\"0\" /><tmpl_var file.name></a>','Macro/File',1,1,'PBtmpl0000000000000039'),('<a href=\"<tmpl_var file.url>\"><tmpl_var file.name></a>','Macro/File',1,1,'PBtmpl0000000000000091'),('<a href=\"<tmpl_var file.url>\"><img src=\"<tmpl_var file.icon>\" align=\"middle\" border=\"0\" /><tmpl_var file.name></a>(<tmpl_var file.size>)','Macro/File',1,1,'PBtmpl0000000000000107'),('<a href=\"<tmpl_var group.url>\"><tmpl_var group.text></a>','Macro/GroupAdd',1,1,'PBtmpl0000000000000040'),('<a href=\"<tmpl_var group.url>\"><tmpl_var group.text></a>','Macro/GroupDelete',1,1,'PBtmpl0000000000000041'),('<a class=\"homeLink\" href=\"<tmpl_var homeLink.url>\"><tmpl_var homeLink.text></a>','Macro/H_homeLink',1,1,'PBtmpl0000000000000042'),('<a class=\"makePrintableLink\" href=\"<tmpl_var printable.url>\"><tmpl_var printable.text></a>','Macro/r_printable',1,1,'PBtmpl0000000000000045'),('<a class=\"loginToggleLink\" href=\"<tmpl_var toggle.url>\"><tmpl_var toggle.text></a>','Macro/LoginToggle',1,1,'PBtmpl0000000000000043'),('<p>\r\n  <table cellpadding=3 cellspacing=0 border=1>\r\n  <tr>   \r\n    <td class=\"tableHeader\">\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var session.config.extrasURL>/attachment.gif\" border=\"0\" alt=\"<tmpl_var attachment.name>\"></a></td><td>\r\n<a href=\"<tmpl_var attachment.url>\"><img src=\"<tmpl_var attachment.icon>\" align=\"middle\" width=\"16\" height=\"16\" border=\"0\" alt=\"<tmpl_var attachment.name>\"><tmpl_var attachment.name></a>\r\n    </td>\r\n  </tr>\r\n  </table>\r\n</p>\r\n','AttachmentBox',1,1,'PBtmpl0000000000000003'),('<tmpl_if batchDescription>\r\nBatch: <tmpl_var batchDescription>\r\n</tmpl_if>\r\n\r\n<tmpl_var message><br>\r\n<tmpl_var codeForm>','Operation/RedeemSubscription',1,1,'PBtmpl0000000000000053'),('<h2><tmpl_var name></h2>\r\n<tmpl_var description><br>\r\n<br>\r\n<br>\r\n$ <tmpl_var price><br>\r\n<a href=\"<tmpl_var url>\">Subscribe now</a><br>','Macro/SubscriptionItem',1,1,'PBtmpl0000000000000046'),('<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\r\n  <tr>\r\n    <th>Transaction description</th>\r\n    <th>Price</th>\r\n    <th>Status</th>\r\n    <th>Error</th>\r\n  </tr>\r\n<tmpl_loop resultLoop>\r\n  <tr>\r\n    <td align=\"left\"><tmpl_var purchaseDescription></td>\r\n    <td align=\"right\"><tmpl_var purchaseAmount></td>\r\n    <td><tmpl_var status></td>\r\n    <td align=\"left\"><tmpl_var error> (<tmpl_var errorCode>)</td>\r\n  </tr>\r\n</tmpl_loop>\r\n</table><br>\r\n<br>\r\n\r\n<tmpl_var statusExplanation>','Commerce/TransactionError',1,1,'PBtmpl0000000000000018'),('<a href=\"<tmpl_var viewShoppingCart.url>\"><tmpl_var viewShoppingCart.label></a> &middot;\n<a href=\"<tmpl_var changePayment.url>\"><tmpl_var changePayment.label></a> &middot; \n<a href=\"<tmpl_var changeShipping.url>\"><tmpl_var changeShipping.label></a><br>\n<br>\n\n<tmpl_var title><br>\n<ul>\n<tmpl_loop errorLoop>\n<li><tmpl_var message></li>\n</tmpl_loop>\n</ul>\n\n<table> <tr align=\"left\">\n      <th style=\"border-bottom: 2px solid black\">Product</th>\n      <th style=\"border-bottom: 2px solid black\">Quantity</th>\n      <th style=\"border-bottom: 2px solid black\">Price</th>\n      <th style=\"border-bottom: 2px solid black\">Each</th>\n  </tr>\n\n  <tmpl_if normalItems>\n  </tmpl_if>\n\n  <tmpl_loop normalItemsLoop>\n  <tr>\n      <td align=\"left\"><tmpl_var name></td>\n      <td align=\"center\"><tmpl_var quantity></td>\n      <td align=\"right\"><tmpl_var totalPrice></td>\n  </tr>\n  </tmpl_loop>\n\n  <tmpl_loop recurringItemsLoop>\n  <tr>\n      <td align=\"left\"><tmpl_var name></td>\n      <td align=\"center\"><tmpl_var quantity></td>\n      <td align=\"right\"><tmpl_var totalPrice></td>\n      <td align=\"left\"><tmpl_var period></td>\n  </tr>\n</tmpl_loop>\n  <tr style=\"border-top: 1px solid black\">\n      <td style=\"border-top: 1px solid black\">&nbsp;</td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b>Subtotal</b></td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b><tmpl_var subtotal></b></td>\n  </tr>\n  <tr>\n      <td colspan=\"2\" align=\"right\">Shipping</td>\n      <td align=\"right\"><tmpl_var shippingCost></td>\n  <tr>\n      <td colspan=\"2\" align=\"right\" style=\"border-top: 1px solid black\"><b>Total</b></td>\n      <td align=\"right\" style=\"border-top: 1px solid black\"><b><tmpl_var total></b></td>\n\n</table>\n\n<br><br>\n\n<tmpl_var form>','Commerce/ConfirmCheckout',1,1,'PBtmpl0000000000000016'),('<table border=\"0\">\r\n<tmpl_loop purchaseHistoryLoop>\r\n	<tr>\r\n		<td><b><tmpl_var initDate></b></td>\r\n		<td><b><tmpl_var completionDate></b></td>\r\n		<td align=\"right\"><b>$ <tmpl_var amount></b></td>\r\n		<td><b><tmpl_var status></b></td>\r\n		<td><tmpl_if canCancel><a href=\"<tmpl_var cancelUrl>\">Cancel</a></tmpl_if></td>\r\n	</tr>\r\n	<tmpl_loop itemLoop>\r\n	<tr>\r\n		<td \"align=right\"><tmpl_var quantity> x </td>\r\n		<td \"align=left\"><tmpl_var itemName></td>\r\n		<td \"align=right\">$ <tmpl_var amount></td>\r\n	</tr>\r\n	</tmpl_loop>\r\n</tmpl_loop>\r\n</table>','Commerce/ViewPurchaseHistory',1,1,'PBtmpl0000000000000019'),('<tmpl_var message>','Commerce/CheckoutCanceled',1,1,'PBtmpl0000000000000015'),('<tmpl_if pluginsAvailable>\r\n   <tmpl_var message><br>\r\n    <tmpl_var formHeader>\r\n       <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\r\n    <tmpl_loop pluginLoop>\r\n            <tr>\r\n                        <td><tmpl_var formElement></td>\r\n                     <td align=\"left\"><tmpl_var name></td>\r\n           </tr>\r\n       </tmpl_loop>\r\n        </table>\r\n    <tmpl_var formSubmit>\r\n    <tmpl_var formFooter>\r\n<tmpl_else>\r\n <tmpl_var noPluginsMessage>\r\n</tmpl_if>','Commerce/SelectPaymentGateway',1,1,'PBtmpl0000000000000017'),('^StyleSheet(^Extras;/adminConsole/adminConsole.css);\r\n^JavaScript(^Extras;/adminConsole/adminConsole.js);\r\n\r\n<div id=\"application_help\">\r\n  <tmpl_if help.url>\r\n    <a href=\"<tmpl_var help.url>\" target=\"_blank\"><img src=\"^Extras;/adminConsole/small/help.gif\" alt=\"?\" border=\"0\" /></a>\r\n  </tmpl_if>\r\n</div>\r\n<div id=\"application_icon\">\r\n    <img src=\"<tmpl_var application.icon>\" border=\"0\" title=\"<tmpl_var application.title>\" alt=\"<tmpl_var application.title>\" />\r\n</div>\r\n<div class=\"adminConsoleTitleIconMedalian\">\r\n<img src=\"^Extras;/adminConsole/medalian.gif\" border=\"0\" alt=\"*\" />\r\n</div>\r\n<div id=\"console_icon\">\r\n     <img src=\"<tmpl_var console.icon>\" border=\"0\" title=\"<tmpl_var console.title>\" alt=\"<tmpl_var console.title>\" />\r\n</div>\r\n<div id=\"application_title\">\r\n       <tmpl_var application.title>\r\n</div>\r\n<div id=\"console_title\">\r\n       <tmpl_var console.title>\r\n</div>\r\n<div id=\"application_workarea\">\r\n       <tmpl_var application.workArea>\r\n</div>\r\n<div id=\"console_workarea\">\r\n        <div class=\"adminConsoleSpacer\">\r\n            &nbsp;\r\n        </div>\r\n        <tmpl_loop application_loop>\r\n                <tmpl_if canUse>\r\n                     <div class=\"adminConsoleApplication\">\r\n                           <a href=\"<tmpl_var url>\"><img src=\"<tmpl_var icon>\" border=\"0\" title=\"<tmpl_var title>\" alt=\"<tmpl_var title>\" /></a><br />\r\n                           <a href=\"<tmpl_var url>\"><tmpl_var title></a>\r\n                     </div>\r\n               </tmpl_if>\r\n       </tmpl_loop>\r\n        <div class=\"adminConsoleSpacer\">\r\n            &nbsp;\r\n        </div>\r\n</div>\r\n<div class=\"adminConsoleMenu\">\r\n        <div id=\"adminConsoleMainMenu\" class=\"adminConsoleMainMenu\">\r\n                <div id=\"console_toggle_on\">\r\n                        <a href=\"#\" onClick=\"toggleAdminConsole()\"><tmpl_var toggle.on.label></a><br />\r\n                </div>\r\n                <div id=\"console_toggle_off\">\r\n                        <a href=\"#\" onClick=\"toggleAdminConsole()\"><tmpl_var toggle.off.label></a><br />\r\n                </div>\r\n        </div>\r\n        <div id=\"adminConsoleApplicationSubmenu\"  class=\"adminConsoleApplicationSubmenu\">\r\n              <tmpl_loop submenu_loop>\r\n                        <a href=\"<tmpl_var url>\" <tmpl_var extras>><tmpl_var label></a><br />\r\n              </tmpl_loop>\r\n        </div>\r\n        <div id=\"adminConsoleUtilityMenu\" class=\"adminConsoleUtilityMenu\">\r\n                <a href=\"<tmpl_var backtosite.url>\"><tmpl_var backtosite.label></a><br />\r\n                ^AdminToggle;<br />\r\n                ^LoginToggle;<br />\r\n        </div>\r\n</div>\r\n<script lang=\"JavaScript\">\r\n  initAdminConsole(<tmpl_if application.title>true<tmpl_else>false</tmpl_if>,<tmpl_if submenu_loop>true<tmpl_else>false</tmpl_if>);\r\n</script>\r\n','AdminConsole',1,1,'PBtmpl0000000000000001'),('\n<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n	<p><tmpl_var controls></p>\n	<div style=\"width: 100%; border: 1px groove black;\">\n		<div style=\"width: 100%; background-image: url(<tmpl_var session.config.extrasURL>/opaque.gif);\">\n			<div style=\"text-align: center; font-weight: bold;\"><a href=\"<tmpl_var originalURL>\"><tmpl_var shortcut.label></a></div>\n		</div>\n</tmpl_if>	\n<tmpl_var shortcut.content>\n<tmpl_if session.var.adminOn>\n		<div style=\"width: 100%; background-image: url(<tmpl_var session.config.extrasURL>/opaque.gif);\">\n			<div style=\"text-align: center; font-weight: bold;\"><a href=\"<tmpl_var originalURL>\"><tmpl_var shortcut.label></a></div>\n		</div>\n	</div>\n</tmpl_if>	\n		','Shortcut',1,1,'PBtmpl0000000000000140'),('<a name=\"<tmpl_var assetId>\"></a>\n<tmpl_if session.var.adminOn>\n<p><tmpl_var controls></p>\n</tmpl_if>\n<tmpl_if displayTitle>\n    <h1><tmpl_var title></h1>\n</tmpl_if>\n\n<tmpl_if error_loop>\n<ul>\n<tmpl_loop error_loop>\n<li><b><tmpl_var error.message></b>\n</tmpl_loop>\n</ul>\n</tmpl_if>\n\n<tmpl_if description>\n<tmpl_var description><p />\n</tmpl_if>\n\n<tmpl_if canEdit>\n<a href=\"<tmpl_var entryList.url>\"><tmpl_var entryList.label></a>\n&middot; <a href=\"<tmpl_var export.tab.url>\"><tmpl_var export.tab.label></a>\n<tmpl_if entryId>\n&middot; <a href=\"<tmpl_var delete.url>\"><tmpl_var delete.label></a>\n</tmpl_if>\n<tmpl_if session.var.adminOn>\n&middot; <a href=\"<tmpl_var addField.url>\"><tmpl_var addField.label></a>\n&middot; <a href=\"<tmpl_var addTab.url>\"><tmpl_var addTab.label></a>\n</tmpl_if>\n<p />\n</tmpl_if>\n<tmpl_var form.start>\n<table>\n        <tmpl_loop field_loop>\n                <tmpl_unless field.isHidden>\n                        <tr>\n                                <td class=\"formDescription\" valign=\"top\">\n                                        <tmpl_if session.var.adminOn>\n                                                <tmpl_if canEdit>\n                                                        <tmpl_var field.controls>\n                                                </tmpl_if>\n                                        </tmpl_if>\n                                        <tmpl_var field.label>\n                                </td>\n                                <td class=\"tableData\" valign=\"top\">\n                                        <tmpl_if field.isDisplayed>\n                                                <tmpl_var field.value>\n                                        <tmpl_else>\n                                                <tmpl_var field.form>\n                                        </tmpl_if>\n                                        <tmpl_if field.isRequired>*</tmpl_if>\n                                        <span class=\"formSubtext\">\n                                                <br />\n                                                <tmpl_var field.subtext>\n                                        </span>\n                                </td>\n                        </tr>\n                </tmpl_unless>\n        </tmpl_loop>\n</table>\n<br>\n<tmpl_var form.save>\n<tmpl_var form.end>\n','DataForm',1,1,'PBtmpl0000000000000141');
+CREATE TABLE `theme` (
+  `themeId` varchar(22) NOT NULL default '',
+  `name` varchar(255) default NULL,
+  `designer` varchar(255) default NULL,
+  `designerURL` text,
+  `original` int(11) NOT NULL default '1',
+  `webguiVersion` varchar(10) default NULL,
+  `versionNumber` int(11) NOT NULL default '0'
+) TYPE=MyISAM;
+CREATE TABLE `themeComponent` (
+  `themeId` varchar(22) default NULL,
+  `themeComponentId` varchar(22) default NULL,
+  `type` varchar(35) default NULL,
+  `id` varchar(255) default NULL
+) TYPE=MyISAM;
+CREATE TABLE `transaction` (
+  `transactionId` varchar(22) NOT NULL default '',
+  `userId` varchar(22) NOT NULL default '',
+  `amount` float NOT NULL default '0',
+  `gatewayId` varchar(128) default NULL,
+  `gateway` varchar(64) NOT NULL default '',
+  `recurring` tinyint(1) NOT NULL default '0',
+  `initDate` int(11) NOT NULL default '0',
+  `completionDate` int(11) default '0',
+  `status` varchar(10) NOT NULL default 'Pending',
+  `lastPayedTerm` int(6) NOT NULL default '0',
+  `shippingCost` varchar(9) default '0.00',
+  `shippingMethod` varchar(15) default NULL,
+  `shippingOptions` text,
+  `shippingStatus` varchar(15) default 'NotShipped',
+  `trackingNumber` varchar(255) default NULL,
+  PRIMARY KEY  (`transactionId`)
+) TYPE=MyISAM;
+CREATE TABLE `transactionItem` (
+  `transactionId` varchar(22) NOT NULL default '',
+  `itemName` varchar(64) NOT NULL default '',
+  `amount` float NOT NULL default '0',
+  `quantity` int(4) NOT NULL default '0',
+  `itemId` varchar(64) NOT NULL default '',
+  `itemType` varchar(40) NOT NULL default ''
+) TYPE=MyISAM;
+CREATE TABLE `userLoginLog` (
+  `userId` varchar(22) default NULL,
+  `status` varchar(30) default NULL,
+  `timeStamp` int(11) default NULL,
+  `ipAddress` varchar(128) default NULL,
+  `userAgent` text
+) TYPE=MyISAM;
+CREATE TABLE `userProfileCategory` (
+  `profileCategoryId` varchar(22) NOT NULL default '',
+  `categoryName` varchar(255) default NULL,
+  `sequenceNumber` int(11) NOT NULL default '1',
+  `visible` int(11) NOT NULL default '1',
+  `editable` int(11) NOT NULL default '1',
+  PRIMARY KEY  (`profileCategoryId`)
+) TYPE=MyISAM;
+INSERT INTO `userProfileCategory` VALUES ('1','WebGUI::International::get(449,\"WebGUI\");',6,1,1),('2','WebGUI::International::get(440,\"WebGUI\");',2,1,1),('3','WebGUI::International::get(439,\"WebGUI\");',1,1,1),('4','WebGUI::International::get(445,\"WebGUI\");',7,0,1),('5','WebGUI::International::get(443,\"WebGUI\");',3,1,1),('6','WebGUI::International::get(442,\"WebGUI\");',4,1,1),('7','WebGUI::International::get(444,\"WebGUI\");',5,1,1);
+CREATE TABLE `userProfileData` (
+  `userId` varchar(22) NOT NULL default '',
+  `fieldName` varchar(128) NOT NULL default '',
+  `fieldData` text,
+  PRIMARY KEY  (`userId`,`fieldName`)
+) TYPE=MyISAM;
+INSERT INTO `userProfileData` VALUES ('1','language','English'),('3','language','English'),('3','uiLevel','9');
+CREATE TABLE `userProfileField` (
+  `fieldName` varchar(128) NOT NULL default '',
+  `fieldLabel` varchar(255) default NULL,
+  `visible` int(11) NOT NULL default '0',
+  `required` int(11) NOT NULL default '0',
+  `dataType` varchar(128) NOT NULL default 'text',
+  `dataValues` text,
+  `dataDefault` text,
+  `sequenceNumber` int(11) NOT NULL default '1',
+  `profileCategoryId` varchar(22) default NULL,
+  `protected` int(11) NOT NULL default '0',
+  `editable` int(11) NOT NULL default '1',
+  PRIMARY KEY  (`fieldName`)
+) TYPE=MyISAM;
+INSERT INTO `userProfileField` VALUES ('email','WebGUI::International::get(56,\"WebGUI\");',1,1,'email',NULL,NULL,1,'2',1,1),('firstName','WebGUI::International::get(314,\"WebGUI\");',1,0,'text',NULL,NULL,1,'3',1,1),('middleName','WebGUI::International::get(315,\"WebGUI\");',1,0,'text',NULL,NULL,2,'3',1,1),('lastName','WebGUI::International::get(316,\"WebGUI\");',1,0,'text',NULL,NULL,3,'3',1,1),('icq','WebGUI::International::get(317,\"WebGUI\");',1,0,'text',NULL,NULL,2,'2',1,1),('aim','WebGUI::International::get(318,\"WebGUI\");',1,0,'text',NULL,NULL,3,'2',1,1),('msnIM','WebGUI::International::get(319,\"WebGUI\");',1,0,'text',NULL,NULL,4,'2',1,1),('yahooIM','WebGUI::International::get(320,\"WebGUI\");',1,0,'text',NULL,NULL,5,'2',1,1),('cellPhone','WebGUI::International::get(321,\"WebGUI\");',1,0,'phone',NULL,NULL,6,'2',1,1),('pager','WebGUI::International::get(322,\"WebGUI\");',1,0,'phone',NULL,NULL,7,'2',1,1),('emailToPager','WebGUI::International::get(441,\"WebGUI\");',1,0,'email',NULL,NULL,8,'2',1,1),('language','WebGUI::International::get(304,\"WebGUI\");',1,0,'selectList','WebGUI::International::getLanguages()','[\'English\']',1,'4',1,1),('homeAddress','WebGUI::International::get(323,\"WebGUI\");',1,0,'text',NULL,NULL,1,'5',1,1),('homeCity','WebGUI::International::get(324,\"WebGUI\");',1,0,'text',NULL,NULL,2,'5',1,1),('homeState','WebGUI::International::get(325,\"WebGUI\");',1,0,'text',NULL,NULL,3,'5',1,1),('homeZip','WebGUI::International::get(326,\"WebGUI\");',1,0,'zipcode',NULL,NULL,4,'5',1,1),('homeCountry','WebGUI::International::get(327,\"WebGUI\");',1,0,'text',NULL,NULL,5,'5',1,1),('homePhone','WebGUI::International::get(328,\"WebGUI\");',1,0,'phone',NULL,NULL,6,'5',1,1),('workAddress','WebGUI::International::get(329,\"WebGUI\");',1,0,'text',NULL,NULL,2,'6',1,1),('workCity','WebGUI::International::get(330,\"WebGUI\");',1,0,'text',NULL,NULL,3,'6',1,1),('workState','WebGUI::International::get(331,\"WebGUI\");',1,0,'text',NULL,NULL,4,'6',1,1),('workZip','WebGUI::International::get(332,\"WebGUI\");',1,0,'zipcode',NULL,NULL,5,'6',1,1),('workCountry','WebGUI::International::get(333,\"WebGUI\");',1,0,'text',NULL,NULL,6,'6',1,1),('workPhone','WebGUI::International::get(334,\"WebGUI\");',1,0,'phone',NULL,NULL,7,'6',1,1),('gender','WebGUI::International::get(335,\"WebGUI\");',1,0,'selectList','{\r\n  \'neuter\'=>WebGUI::International::get(403),\r\n  \'male\'=>WebGUI::International::get(339),\r\n  \'female\'=>WebGUI::International::get(340)\r\n}','[\'neuter\']',1,'7',1,1),('birthdate','WebGUI::International::get(336,\"WebGUI\");',1,0,'date',NULL,NULL,2,'7',1,1),('homeURL','WebGUI::International::get(337,\"WebGUI\");',1,0,'url',NULL,NULL,7,'5',1,1),('workURL','WebGUI::International::get(446,\"WebGUI\");',1,0,'url',NULL,NULL,8,'6',1,1),('workName','WebGUI::International::get(450,\"WebGUI\");',1,0,'text',NULL,NULL,1,'6',1,1),('timeOffset','WebGUI::International::get(460,\"WebGUI\");',1,0,'text',NULL,'\'0\'',3,'4',1,1),('dateFormat','WebGUI::International::get(461,\"WebGUI\");',1,0,'selectList','{\r\n \'%M/%D/%y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%M/%D/%y\"),\r\n \'%y-%m-%d\'=>WebGUI::DateTime::epochToHuman(\"\",\"%y-%m-%d\"),\r\n \'%D-%c-%y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%D-%c-%y\"),\r\n \'%c %D, %y\'=>WebGUI::DateTime::epochToHuman(\"\",\"%c %D, %y\")\r\n}\r\n','[\'%M/%D/%y\']',4,'4',1,1),('timeFormat','WebGUI::International::get(462,\"WebGUI\");',1,0,'selectList','{\r\n \'%H:%n %p\'=>WebGUI::DateTime::epochToHuman(\"\",\"%H:%n %p\"),\r\n \'%H:%n:%s %p\'=>WebGUI::DateTime::epochToHuman(\"\",\"%H:%n:%s %p\"),\r\n \'%j:%n\'=>WebGUI::DateTime::epochToHuman(\"\",\"%j:%n\"),\r\n \'%j:%n:%s\'=>WebGUI::DateTime::epochToHuman(\"\",\"%j:%n:%s\")\r\n}\r\n','[\'%H:%n %p\']',5,'4',1,1),('discussionLayout','WebGUI::International::get(509)',1,0,'selectList','{\n  threaded=>WebGUI::International::get(511),\n  flat=>WebGUI::International::get(510),\n  nested=>WebGUI::International::get(1045)\n}\n','[\'threaded\']',6,'4',0,1),('INBOXNotifications','WebGUI::International::get(518)',1,0,'selectList','{ \r\n  none=>WebGUI::International::get(519),\r\n email=>WebGUI::International::get(520),\r\n  emailToPager=>WebGUI::International::get(521),\r\n  icq=>WebGUI::International::get(522)\r\n}','[\'email\']',7,'4',0,1),('firstDayOfWeek','WebGUI::International::get(699,\"WebGUI\");',1,0,'selectList','{0=>WebGUI::International::get(27,\"WebGUI\"),1=>WebGUI::International::get(28,\"WebGUI\")}','[0]',3,'4',1,1),('uiLevel','WebGUI::International::get(739,\"WebGUI\");',0,0,'selectList','{\r\n0=>WebGUI::International::get(729,\"WebGUI\"),\r\n1=>WebGUI::International::get(730,\"WebGUI\"),\r\n2=>WebGUI::International::get(731,\"WebGUI\"),\r\n3=>WebGUI::International::get(732,\"WebGUI\"),\r\n4=>WebGUI::International::get(733,\"WebGUI\"),\r\n5=>WebGUI::International::get(734,\"WebGUI\"),\r\n6=>WebGUI::International::get(735,\"WebGUI\"),\r\n7=>WebGUI::International::get(736,\"WebGUI\"),\r\n8=>WebGUI::International::get(737,\"WebGUI\"),\r\n9=>WebGUI::International::get(738,\"WebGUI\")\r\n}','[5]',8,'4',1,0),('alias','WebGUI::International::get(858)',1,0,'text','','',4,'3',0,1),('signature','WebGUI::International::get(859)',1,0,'HTMLArea','','',5,'3',0,1),('publicProfile','WebGUI::International::get(861)',1,0,'yesNo','','1',9,'4',0,1),('publicEmail','WebGUI::International::get(860)',1,0,'yesNo','','1',10,'4',0,1),('toolbar','WebGUI::International::get(746)',0,0,'selectList','WebGUI::Icon::getToolbarOptions()','[\'useLanguageDefault\']',13,'4',0,0);
+CREATE TABLE `userSession` (
+  `sessionId` varchar(22) NOT NULL default '',
+  `expires` int(11) default NULL,
+  `lastPageView` int(11) default NULL,
+  `adminOn` int(11) NOT NULL default '0',
+  `lastIP` varchar(50) default NULL,
+  `userId` varchar(22) default NULL,
+  PRIMARY KEY  (`sessionId`)
+) TYPE=MyISAM;
+CREATE TABLE `userSessionScratch` (
+  `sessionId` varchar(22) NOT NULL default '',
+  `name` varchar(255) default NULL,
+  `value` varchar(255) default NULL
+) TYPE=MyISAM;
+CREATE TABLE `users` (
+  `userId` varchar(22) NOT NULL default '',
+  `username` varchar(100) default NULL,
+  `authMethod` varchar(30) NOT NULL default 'WebGUI',
+  `dateCreated` int(11) NOT NULL default '1019867418',
+  `lastUpdated` int(11) NOT NULL default '1019867418',
+  `karma` int(11) NOT NULL default '0',
+  `status` varchar(35) NOT NULL default 'Active',
+  `referringAffiliate` varchar(22) NOT NULL default '',
+  PRIMARY KEY  (`userId`),
+  UNIQUE KEY `username_unique` (`username`)
+) TYPE=MyISAM;
+INSERT INTO `users` VALUES ('1','Visitor','WebGUI',1019867418,1019867418,0,'Active','0'),('3','Admin','WebGUI',1019867418,1109989293,0,'Active','1');
+CREATE TABLE `webguiVersion` (
+  `webguiVersion` varchar(10) default NULL,
+  `versionType` varchar(30) default NULL,
+  `dateApplied` int(11) default NULL
+) TYPE=MyISAM;
+CREATE TABLE `wobject` (
+  `displayTitle` int(11) NOT NULL default '1',
+  `description` mediumtext,
+  `assetId` varchar(22) NOT NULL default '',
+  `styleTemplateId` varchar(22) NOT NULL default '',
+  `printableStyleTemplateId` varchar(22) NOT NULL default '',
+  `cacheTimeout` int(11) NOT NULL default '60',
+  `cacheTimeoutVisitor` int(11) NOT NULL default '3600',
+  PRIMARY KEY  (`assetId`)
+) TYPE=MyISAM;
+INSERT INTO `wobject` VALUES (1,'Welcome to WebGUI. This is web done right.\n<br /><br />\nWebGUI is a user-friendly web site management system made by <a href=\"http://www.plainblack.com\">Plain Black</a>. It is designed to be easy to use for the average business user, but powerful enough to satisfy the needs of a large enterprise.\n<br /><br />\nThere are thousands of <a href=\"http://www.adinknetwork.com\" target=\"_blank\">small</a> and <a href=\"http://www.brunswickbowling.com\" target=\"_blank\">large</a> businesses, <a href=\"http://www.troy30c.org\" target=\"_blank\">schools</a>, <a href=\"http://goaggies.cameron.edu/\" target=\"_blank\">universities</a>, <a href=\"http://www.lambtononline.ca/\" target=\"_blank\">governments</a>, <a href=\"http://www.hetnieuweland.nl/\" target=\"_blank\">clubs</a>, <a href=\"http://www.k3b.org\" target=\"_blank\">projects</a>, <a href=\"http://www.cmsmatrix.org\" target=\"_blank\">communities</a>, and <a href=\"http://www.primaat.com\" target=\"_blank\">individuals</a> using WebGUI all over the world today. A brief list of some of them can be found <a href=\"http://www.plainblack.com/webgui/examples\">here</a>. There\'s no reason your site shouldn\'t be on that list.<br /><br />','TKzUMeIxRLrZ3NAEez6CXQ','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(1,'<img src=\"^Extras;styles/webgui6/img_hands.jpg\" style=\"position: relative;\" align=\"right\" />\n<style>\ndt {\n font-weight: bold;\n}\n</style>\n\n<dl>\n\n<dt>Easy to Use</dt>\n<dd>If you can use a web browser, then you can manage a web site with WebGUI. WebGUI\'s unique WYSIWYG inline content editing interface ensures that you know where you are and what your content will look like while you\'re editing. In addition, you don\'t need to install and learn any complicated programs, you can edit everything with your trusty web browser.</dd>\n<br />\n\n<dt>Flexible Designs</dt>\n<dd>WebGUI\'s powerful templating system ensures that no two WebGUI sites ever need to look the same. You\'re not restricted in how your content is laid out or how your navigation functions.</dd>\n<br />\n\n<dt>Work Faster</dt>\n<dd>Though there is some pretty cool technology behind the scenes that makes WebGUI work, our first concern has always been usability and not technology. After all if it\'s not useful, why use it? With that in mind WebGUI has all kinds of wizards, short cuts, online help, and other aids to help you work faster.</dd>\n<br />\n\n<dt>Localized Content</dt>\n<dd>With WebGUI there\'s no need to limit yourself to one language or timezone. It\'s a snap to build a multi-lingual site with WebGUI. In fact, even WebGUI\'s built in functions and online help have been translated to more than 15 languages. User\'s can also adjust their local settings for dates, times, and other localized oddities. </dd>\n<br />\n\n<dt>Pluggable By Design</dt>\n<dd>When <a href=\"http://www.plainblack.com\">Plain Black</a> created WebGUI we knew we wouldn\'t be able to think of everything you want to use WebGUI for, so we made most of WebGUI\'s functions pluggable. This allows you to add new features to WebGUI and still be able to upgrade the core system without a fuss.</dd>\n\n</dl>','sWVXMZGibxHe2Ekj1DCldA','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,'If you\'re reading this message it means that you\'ve got WebGUI up and running. Good job! The installation is not trivial.\n\n<p/>\n \nIn order to do anything useful with your new installation you\'ll need to log in as the default administrator account. Follow these steps to get started:\n\n<p/>\n\n<ol>\n<li><a href=\"^a(linkonly);\">Click here to log in.</a> (You specified the username and password when you first visited your new WebGUI site.)\n<li><a href=\"^PageUrl;?op=switchOnAdmin\">Click here to turn the administrative interface on.</a>\n</ol>\n<blockquote style=\"font-size: 10px;\">\n<b>NOTE:</b> You could have also done these steps using the block at the top of this page.\n</blockquote>\n\n<p/>\n\n You might want to <a href=\"^PageUrl;?op=listUsers\">create another account</a> for yourself with Administrative privileges in case you can\'t log in with the Admin account for some reason.\n\n<p/>\n \nYou\'ll now notice little buttons and menus on all the pages in your site. These controls help you administer your site. The \"Add content\" menu lets you add new content to your pages as well as paste content from the clipboard. The \"Administrative functions\" menu let\'s you control users and groups as well as many other admin settings. The little toolbars help you manipulate the content in your pages.\n\n\n<p/>\n\nFor more information about how to administer <a href=\"http://www.plainblack.com/webgui\">WebGUI</a> consider getting a copy of <a href=\"http://www.plainblack.com/store/rwg\">Ruling WebGUI</a>. <a href=\"http://www.plainblack.com\">Plain Black</a> also provides several <a href=\"http://www.plainblack.com/store/support\">Support Programs</a> for WebGUI if you run into trouble.\n\n<p/>\n \nEnjoy your new WebGUI site!','x_WjMvFmilhX-jvZuIpinw','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,' To learn more about WebGUI and how you can best implement WebGUI in your organization, please see the choices below.\n\n','DC1etlIaBRQitXnchZKvUw','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,'This is the latest news from Plain Black and WebGUI pulled directly from the site every hour.','fK-HMSboA3uu0c1KYkYspA','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,'Tell a friend about WebGUI.','Szs5eev3OMssmnsyLRZmWA','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,'','pJd5TLAjfWMVXD6sCRLwUg','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,NULL,'68sKwDgf9cGH58-NZcU4lg','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,NULL,'_iHetEvMQUOoxS-T2CM0sQ','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,NULL,'8Bb8gu-me2mhL3ljFyiWLg','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,NULL,'2TqQc4OISddWCZmRY1_m8A','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,NULL,'Swf6L8poXKc7hUaNPkBevw','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(0,NULL,'x3OFY6OJh_qsXkZfPwug4A','B1bNjWVtzSjsvGZh9lPz_A','PBtmpl0000000000000111',60,600),(1,NULL,'PBasset000000000000002','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,NULL,'Wmjn6I1fe9DKhiIR39YC0g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000001','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000014','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000015','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000016','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000017','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000018','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000019','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000020','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000021','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000002','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000006','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000007','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000008','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000009','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000010','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000011','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000012','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'PBnav00000000000000013','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'f2bihDeMoI-Ojt2dutJNQA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'KZ2UytxNpbF-3Eg3RNvQQQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(0,NULL,'G0wlShbk_XruYVfbXqWq_w','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,NULL,'UE5_3bD7kWDLUN2B-iuNuA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,NULL,'RTsbVBEYnn3OPZWmXyIFhQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'AdminConsole','HCQF9FBLWK3Se06yGLoliw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Article','79BY6IHpAtE2yuQwROh9tg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'AttachmentBox','ZexTeuMQaZ1fh4FOpLNlYw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/LDAP/Account','_r8Y0WwiHLyVEFe5M0idYQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/LDAP/Create','Mkc1dJDw-lqExS5uy7QReA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/LDAP/Login','zyS1TsKDvBk7Y55_GlWgxA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/WebGUI/Account','CDzQSnxPMWCy2j5ZOxWbrw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/WebGUI/Create','RPo_G59wjPTGE1-IhiE44A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/WebGUI/Expired','Oq61G3_QSM5TzArFUzUBiA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/WebGUI/Login','jcIZMBAyEcmXktAVwPxgIw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Auth/WebGUI/Recovery','ThLKZPeKbRAVEYTkKAxeCg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Collaboration','8r4-zJ6g-qOecM1PsvADbQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Collaboration/Notification','ECq9dLm5vmh4t963yDx1og','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Collaboration/PostForm','PNGrWdYDhJZTv1-sAX6W1Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Collaboration/Search','guQGD9YiTn55PqOUTjCc0A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Collaboration/Thread','-MlWyWh12ibRM8gAzRy41g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Commerce/CheckoutCanceled','VvgRRrE6UsmWi7y7hMCXbw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Commerce/ConfirmCheckout','j3yljeaT2y9fLkSHM5Zbow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Commerce/SelectPaymentGateway','2jkEIs9YpL10dZsA3RH4sw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Commerce/TransactionError','5SdElAemaCKBfheDk7rz8A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Commerce/ViewPurchaseHistory','arabONid_vy2W6cALhELxA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'DataForm','sb7g8aCLMq-XigfBdmw2cg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'DataForm/List','BAoMajIxnoGlrxhDVgot9g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'EventsCalendar','b26vQzyaqz0EBMWH_oPdrg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'EventsCalendar/Event','jCMdSbD6IA535I16Pcik7Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'FileAsset','-Kmb-MEV4ni9d0tn_BYGXA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Folder','ZWv7HLTQ4oERBIFJHBz1Ow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'HttpProxy','RcOR25DbCizyAfNWvr-2ow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'ImageAsset','59f_y-iE0k8dSMVIyX5SBg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'IndexedSearch','2DAYoiOdplxZCrEwmrVhwQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Layout','tJ_X5F3Dkaz8vO6CigbJrg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/AdminBar','Fh_KALcbkc8CkBR3I6dU0g','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/AdminToggle','WTPOJerammxgkIdCWnR9uw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/a_account','PttBzI13R8HXqQn40I4UFg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/EditableToggle','VdTZ8_2vlZwVVuv_I7DsWA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/File','BBoAtdsTo2AGPe4k9kfkxA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/GroupAdd','A-m4h7Q3LYt61G54zpEGqA','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/GroupDelete','Wquzj9XSpxL_gpGXkoU6tg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/H_homeLink','J1uh__tKV2BARcSeFE7MSg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/LoginToggle','7EfoKU41oB0ZU6NmVIud4A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/L_loginBox','n1xT2JUidbeqNMN2zyvHAQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/r_printable','mKI2EjkU9QH6dJKkx7VEvw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Macro/SubscriptionItem','HOleaBMUZT6B5qJmbcV5xg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'MessageBoard','L070eyyGhoWx5cSUeNRrow','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Navigation','c3jDvo_bK3jFqjIefgXjUw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Operation/MessageLog/Message','VnUEcXfsbwgB5rqslQ3n1A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Operation/MessageLog/View','6MrxI11jyXuB-UUrX69lXQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Operation/Profile/Edit','xxuM0xMjhIA3lFq99GY05Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Operation/Profile/View','kHlR8-nCFRrwlEV1uapu_Q','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Operation/RedeemSubscription','r4FQlrIkS1_MTuk-vVqRNg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Poll','EvgkCMpx4kUonmjhhZXRjg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Product','I2DQUdFVd9FtcSealp4cTQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'prompt','khkob2AmnIKAxKJeXHE3fQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'richEditor','h34TI6OYynW5Q_FYLbZiig','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Shortcut','i7emhSfswYNreLAwn1wBRw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'SQLReport','o9PZOa7fy9AZa8fKmhoPrQ','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'style','eLdzeSyvZfml-YVFfgUiaw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Survey','ffWKX2dW4t1eWgfNng605w','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Survey/Gradebook','QWS2acYOu3Y4uNsWvVChTg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Survey/Overview','lUjGdT_Hhi_EFhsYr1Ouyw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'Survey/Response','7Xhdnqu3qkDWHEnRgk6Uzw','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'SyndicatedContent','xPyASYtR44mpDk3ba4YyIg','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,'WSClient','S99spbsvn96tgRA0oVUl2A','PBtmpl0000000000000060','PBtmpl0000000000000111',60,3600),(1,NULL,'Rn5Ef8vMDQ0ebtaxS_-JXA','','',60,3600),(1,NULL,'60wqz7KzyCDCHVNaavhQUA','','',60,3600),(1,NULL,'fhevmqeVTLRCmI_z-NidQQ','','',60,3600);
+insert into webguiVersion (webguiVersion,versionType,dateApplied) values ('6.6.3','initial install',unix_timestamp());
