@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.6.3
+--------------------------------------------------------------------
+ * If you created your site using the create.sql script from 6.6.2
+	you will need to recreate it from the new create.sql script
+	from 6.6.3. The 6.6.2 version has some unrecoverable
+	problems in it. If you just upgraded to 6.6.2, you need not
+	worry, the upgrade is unaffected by this problem.
+
+
 6.6.0
 --------------------------------------------------------------------
  * Perl modules that used to be shipped with WebGUI are now required
