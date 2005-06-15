@@ -1758,6 +1758,8 @@ CREATE TABLE SyndicatedContent (
   maxHeadlines int(11) NOT NULL default '0',
   assetId varchar(22) NOT NULL default '',
   templateId varchar(22) NOT NULL default '',
+  displayMode varchar(20) NOT NULL default 'interleaved',
+  hasTerms varchar(255) NOT NULL default '',
   PRIMARY KEY  (assetId)
 ) TYPE=MyISAM;
 

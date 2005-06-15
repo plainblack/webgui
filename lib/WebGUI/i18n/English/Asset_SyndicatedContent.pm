@@ -1,20 +1,38 @@
 package WebGUI::i18n::English::Asset_SyndicatedContent;
 
 our $I18N = {
-	'3' => {
-		message => q|Maximum Number of Headlines|,
-		lastUpdated => 1057208065
-	},
-
-	'71' => {
-		message => q|Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
+           '1' => {
+                    'lastUpdated' => 1031514049,
+                    'message' => 'URL to RSS File'
+                  },
+           '2' => {
+                    'lastUpdated' => 1031514049,
+                    'message' => 'Syndicated Content'
+                  },
+           '3' => {
+                    'lastUpdated' => 1057208065,
+                    'message' => 'Maximum Number of Headlines'
+                  },
+           '4' => {
+                    'lastUpdated' => 1031514049,
+                    'message' => 'Edit Syndicated Content'
+                  },
+           '61' => {
+                     'lastUpdated' => 1047855741,
+                     'message' => 'Syndicated Content, Add/Edit'
+                   },
+           '71' => {
+                     'lastUpdated' => 1110070203,
+                     'message' => 'Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
+<p>
+Some terminology: RSS "feeds" (or "channels") are published by websites as collections of "items."
 <p>
 This Syndicated Content client is a Wobject and an Asset, so it has the properties of both.  It also has
 these unique properties:
 <p>
 
 <b>URL to RSS file</b><br>
-Provide the exact URL (starting with http://) to the syndicated content's RDF or RSS file. The syndicated content will be downloaded from this URL hourly.
+Provide the exact URL (starting with http://) to the syndicated content\'s RDF or RSS file. The syndicated content will be downloaded from this URL hourly.
 <br><br>
 You can find syndicated content at the following locations:
 </p><ul>
@@ -25,59 +43,47 @@ You can find syndicated content at the following locations:
 </li><li><a href="http://www.webreference.com/services/news/">http://www.webreference.com/services/news/</a>
 </li><li><a href="http://w.moreover.com/">http://w.moreover.com/</a>
 </li></ul>
-
+Currently, we can handle RSS versions .90, .91, 1.0, and 2.0. Atom feeds aren\'t supported for now. Probably other RSS-ish files would work too.
 <p>
 
-To create an aggregate RSS feed, include a list of space separated URLs instead of a single URL.  For an aggregate feed, the system will display an equal number of headlines from each source, sorted by the date the system first received the story.<p>
+To create an aggregate RSS feed (one that pulls information from multiple RSS feeds), include a list of URLs, one on each line, instead of a single URL.  Items will be sorted by the date WebGUI first received the story.<p>
+
+<b>Display Mode</b><br>
+If you\'re aggregating feeds, you can change the mode in which the items are displayed. "Grouped by Feed" means the items will be grouped together by the feeds they come from. "Interleaved" means the items will be mixed together in a "round-robin" fashion from all the feeds. If you\'re grouping your feeds, please look at <b>new_rss_site</b> "item_loop" template variables, it gives you a hook allowing you to output the feed title
+<p>
+
+<b>With any of these terms</b><br>
+Enter terms (separated by commas) that you\'d like to filter the feeds on. For instance, if you enter:<br>
+<blockquote><b>linux, windows development, blogs</b></blockquote>
+The Syndicated Content web object will display items containing "linux", "windows development" or "blogs" (in the title or description of the item) from all the feeds you\'re aggregating together.
+<p>
 
 <b>Template</b><br>
 Select a template for this content.
 <p><b>Maximum Headlines</b><br>
-Enter the maximum number of headlines that should be displayed.  For an aggregate feed, the system will display an equal number of headlines from each source, even if doing so requires displaying more than the requested maximum number of headlines.  Set to zero to allow any number of headlines.
-<p>|,
-		lastUpdated => 1110070203,
-	},
-
-	'61' => {
-		message => q|Syndicated Content, Add/Edit|,
-		lastUpdated => 1047855741
-	},
-
-	'2' => {
-		message => q|Syndicated Content|,
-		lastUpdated => 1031514049
-	},
-
-	'1' => {
-		message => q|URL to RSS File|,
-		lastUpdated => 1031514049
-	},
-
-	'4' => {
-		message => q|Edit Syndicated Content|,
-		lastUpdated => 1031514049
-	},
-
-	'72' => {
-		message => q|Syndicated Content Template|,
-		lastUpdated => 1047855526
-	},
-
-	'73' => {
-		message => q|The following are the template variables available to the Syndicated Content template.
+Enter the maximum number of headlines that should be displayed.  Set to zero to allow any number of headlines.
+<p>'
+                   },
+           '72' => {
+                     'lastUpdated' => 1047855526,
+                     'message' => 'Syndicated Content Template'
+                   },
+           '73' => {
+                     'lastUpdated' => 1047855526,
+                     'message' => 'The following are the template variables available to the Syndicated Content template.
 
 <p>
 
 <b>channel.title</b><br>
-The title of this piece of syndicated content.
+The title of this piece of syndicated content. This will be the same as the title of the Syndicated Content object when you\'re creating an aggregate feed.
 <p>
 
 <b>channel.description</b><br>
-A description of the content available through this channel.
+A description of the content available through this channel. This will be the same as the description of the Syndicated Content object when you\'re creating an aggregate feed.
 <p>
 
 <b>channel.link</b><br>
-A URL back to the originating site of this channel.
+A URL back to the originating site of this channel. This variable *will not* exist when you\'re creating an aggregate feed, because there\'s no single channel to link to.
 <p>
 
 <b>item_loop</b><br>
@@ -85,21 +91,55 @@ A loop containing the data from this channel.
 
 <blockquote>
 
+<b>site_title</b><br>
+The title of the RSS feed this item comes from
+<p>
+
+<b>site_link</b><br>
+Link to the source RSS feed.
+<p>
+
+<b>new_rss_site</b><br>
+A "boolean" variable (suitable for using in a &lt;tmpl_if&gt; tag) that indicates we\'ve started outputting items from a source RSS feed different than the previous item. This is most useful when you\'re viewing feeds in "grouped" mode- it gives you a hook to output <b>site_title</b> and <b>site_link</b> at the right time.
+<p>
+
+
 <b>title</b><br>
-The title of a piece of content.
+The title of a piece of content. If you\'re filtering on terms, this field will be inspected.
 <p>
 
 <b>description</b><br>
-The description of the content.
+The description of the content. If you\'re filtering on terms, this field will be inspected as well.
 <p>
 
 <b>link</b>
-A URL directly to the original content.
+A URL directly to the content of the item.
 
-</blockquote>|,
-		lastUpdated => 1047855526
-	},
-
-};
-
+</blockquote>'
+                   },
+           'displayModeLabel' => {
+                                   'lastUpdated' => 1047855526,
+                                   'message' => 'Display Mode'
+                                 },
+           'displayModeSubtext' => {
+                                     'lastUpdated' => 1047855526,
+                                     'message' => '<br></br>"Interleaved" means items from all feeds are lumped together, "Grouped by Feed" means items are grouped by the feed they came from. Either setting is fine if you\'re only bringing in a single feed.'
+                                   },
+           'grouped' => {
+                          'lastUpdated' => 1047855526,
+                          'message' => 'Grouped by Feed'
+                        },
+           'hasTermsLabel' => {
+                                'lastUpdated' => 1047855526,
+                                'message' => 'With any of these terms'
+                              },
+           'interleaved' => {
+                              'lastUpdated' => 1047855526,
+                              'message' => 'Interleaved'
+                            },
+           'rssTabName' => {
+                             'lastUpdated' => 1118417024,
+                             'message' => 'RSS'
+                           }
+         };
 1;
