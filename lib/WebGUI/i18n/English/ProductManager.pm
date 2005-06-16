@@ -162,6 +162,18 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|A message indicating that a variant is available.|
 	},
+	'variant ID' => {
+		message => q|variantId|,
+		lastUpdated => 1118937717,
+	},
+	'parameter ID' => {
+		message => q|parameterId|,
+		lastUpdated => 1118937717,
+	},
+	'option ID' => {
+		message => q|optionId|,
+		lastUpdated => 1118937717,
+	},
 	'properties' => {
 		message => q|Properties|,
 		lastUpdated => 0,

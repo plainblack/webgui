@@ -186,7 +186,7 @@ sub www_editProductParameter {
 	$f->hidden('parameterId', $parameterId);
 	$f->hidden('productId', $productId);
 	$f->readOnly(
-		-label		=> 'parameterId',
+		-label		=> $i18n->get('parameter ID'),
 		-value		=> $parameterId,
 	);
 	$f->text(
@@ -256,7 +256,7 @@ sub www_editProductParameterOption {
 	$f->hidden('optionId', $optionId);
 	$f->hidden('parameterId', $session{form}{parameterId});
 	$f->readOnly(
-		-label		=> 'optionId',
+		-label		=> $i18n->get('option ID'),
 		-value		=> $optionId
 	);
 	$f->text(
@@ -329,7 +329,7 @@ sub www_editProductVariant {
 	$f->hidden('op', 'editProductVariantSave');
 	$f->hidden('variantId', $variantId);
 	$f->readOnly(
-		-label	=> 'varaiantId',
+		-label	=> $i18n->get('variant ID'),
 		-value	=> $variant->{variantId}
 	);
 	$f->float(
