@@ -1,5 +1,13 @@
-6.6.3
+6.7.0
  - fix [ 1221284 ] Operation\user.pm i18n {internationalize labels}
+
+
+6.6.3
+ - Fixed a recurring transaction commerce bug.
+ - fix [ 1218874 ] Unable to edit any Assets nested in a Layout
+ - Fixed a bad create.sql script from the last release.
+ - fix [ 1215281 ] Users randomly logged out
+
 
 6.6.2
  - Changed the back to site link in the admin console to act intuitively rather than logically.
