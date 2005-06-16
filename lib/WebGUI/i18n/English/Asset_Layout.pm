@@ -85,6 +85,11 @@ The type of the file (PDF, etc.)
 		lastUpdated => 1109987366,
 	},
 
+	'assets to hide' => {
+		message => q|Assets To Hide.|,
+		lastUpdated => 1118942468
+	},
+
 	'823' => {
 		message => q|Go to the new page.|,
 		lastUpdated => 1038706332

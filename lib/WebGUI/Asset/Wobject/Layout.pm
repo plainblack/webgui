@@ -117,7 +117,7 @@ sub getEditForm {
 			-name=>"assetsToHide",
 			-value=>\@assetsToHide,
 			-options=>\%childIds,
-			-label=>"Assets To Hide",
+			-label=>WebGUI::International::get('assets to hide', 'Asset_Layout'),
 			-vertical=>1,
 			-uiLevel=>9
 			);
