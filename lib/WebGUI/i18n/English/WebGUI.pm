@@ -2095,6 +2095,36 @@ Large sites using external group data will be making many calls to the external 
 		context => q|asset property|
 	},
 
+	'target' => {
+		message => q|Target|,
+		lastUpdated => 1118936724,
+		context => q|form helper, rich edit page tree|
+	},
+
+	'done' => {
+		message => q|Done|,
+		lastUpdated => 1118936724,
+		context => q|form helper, rich edit page tree|
+	},
+
+	'link in same window' => {
+		message => q|Open link in same window.|,
+		lastUpdated => 1118936724,
+		context => q|form helper, rich edit page tree|
+	},
+
+	'link in new window' => {
+		message => q|Open link in new window.|,
+		lastUpdated => 1118936724,
+		context => q|form helper, rich edit page tree|
+	},
+
+	'link enter alert' => {
+		message => q|You must enter a link URL.|,
+		lastUpdated => 1118936724,
+		context => q|form helper, rich edit page tree|
+	},
+
 	'412' => {
 		message => q|Synopsis|,
 		lastUpdated => 1031514049

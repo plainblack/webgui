@@ -50,17 +50,18 @@ sub www_richEditPageTree {
 	my $f = WebGUI::HTMLForm->new(-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
 		-name=>"url",
-		-label=>"URL",
+		-label=>WebGUI::International::get(104),
 		-extras=>'id="url"'
 		);
 	$f->selectList(
 		-name=>"target",
-		-label=>"Target",
-		-options=>{"_self"=>"Open link in same window.","_blank"=>"Open link in new window."},
+		-label=>WebGUI::International::get('target'),
+		-options=>{"_self"=>WebGUI::International::get('link in same window'),
+		           "_blank"=>WebGUI::International::get('link in new window'),
 		-extras=>'id="target"'
 		);
 	$f->button(
-		-value=>"Done",
+		-value=>WebGUI::International::get('done'),
 		-extras=>'onclick="createLink()"'
 		);
 	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
@@ -70,7 +71,7 @@ sub www_richEditPageTree {
 function createLink() {
     if (window.opener) {        
         if (document.getElementById("url").value == "") {
-           alert("You must enter a link url");
+           alert('.WebGUI::International::get("link enter alert").');
            document.getElementById("url").focus();
         }
 window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url").value,document.getElementById("target").value);
