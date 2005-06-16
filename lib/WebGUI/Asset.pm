@@ -3119,7 +3119,7 @@ sub www_export {
 			-value=>[1],
 		);
 	$f->text(
-			-label=>"Directory Index",
+			-label=>WebGUI::International::get("directory index","Asset"),
 			-name=>"index",
 			-value=>"index.html"
 		);
