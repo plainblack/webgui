@@ -3985,6 +3985,11 @@ Select which of the configured LDAP connections to use to authenticate users.
 		lastUpdated => 1089039511
 	},
 
+	'default rich editor' => {
+		message => q|Default Rich Editor|,
+		lastUpdated => 1118941685,
+	},
+
 	'account' => {
 		message => q|Account|,
 		lastUpdated => 1098327046,

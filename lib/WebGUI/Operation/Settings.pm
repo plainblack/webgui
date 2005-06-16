@@ -104,7 +104,7 @@ sub www_editSettings {
 # user interface settings
 	$tabform->getTab("ui")->selectList(
 		-name=>"richEditor",
-		-label=>"Default Rich Editor",
+		-label=>$i18n->get("default rich editor"),
 		-value=>[$session{setting}{richEditor}],
 		-options=>WebGUI::SQL->buildHashRef("select assetId,title from asset where className='WebGUI::Asset::RichEdit' order by title"),
 		-defaultValue=>["PBrichedit000000000001"]
