@@ -327,7 +327,6 @@ sub getEditForm {
                 );
         $tabform->getTab("display")->selectList(
                 -value=>[$self->getValue("toolbarLocation")],
-		-label=>"Toolbar Location",
 		-label=>WebGUI::International::get('toolbar location', 'Asset_RichEdit'),
 		-name=>"toolbarLocation",
 		-options=>{
