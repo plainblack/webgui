@@ -839,6 +839,11 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
+	'password clear text' => {
+		message => q|Displayed in clear text so you can ensure you\'ve typed it correctly.|,
+		lastUpdated => 1118942066
+	},
+
 	'456' => {
 		message => q|Back to user list.|,
 		lastUpdated => 1031514049

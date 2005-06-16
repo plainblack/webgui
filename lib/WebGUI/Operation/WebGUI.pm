@@ -40,6 +40,7 @@ sub www_genesis {
 
 #-------------------------------------------------------------------
 sub www_setup {
+	my $i18n = WebGUI::International->new("WebGUI");
 	unless ($session{setting}{specialState} eq "init") {
 		if (rand(10)>5) {
 			return www_genesis();
@@ -72,17 +73,17 @@ sub www_setup {
 		$f->text(
 			-name=>"companyName",
 			-value=>$session{setting}{companyName},
-			-label=>"Company Name"
+			-label=>$i18n->get(125),
 			);
 		$f->email(
 			-name=>"companyEmail",
 			-value=>$session{setting}{companyEmail},
-			-label=>"Company Email Address"
+			-label=>$i18n->get(126),
 			);
 		$f->url(
 			-name=>"companyURL",
 			-value=>$session{setting}{companyURL},
-			-label=>"Company URL"
+			-label=>$i18n->get(127),
 			);
 		$f->submit;
 		$output .= $f->print;
@@ -108,18 +109,18 @@ sub www_setup {
 		$f->text(
 			-name=>"username",
 			-value=>$u->username,
-			-label=>"Username"
+			-label=>$i18n->get(50),
 			);
 		$f->text(
 			-name=>"identifier",
 			-value=>"123qwe",
-			-label=>"Password",
-			-subtext=>'<div style=\"font-size: 10px;\">(Displayed in clear text so you can ensure you\'ve typed it correctly.)</div>'
+			-label=>$i18n->get(51),
+			-subtext=>'<div style=\"font-size: 10px;\">(.$i18n->get("password clear text").')</div>'
 			);
 		$f->email(
 			-name=>"email",
 			-value=>$u->profileField("email"),
-			-label=>"Email Address"
+			-label=>$i18n->get(56),
 			);
 		$f->submit;
 		$output .= $f->print; 
