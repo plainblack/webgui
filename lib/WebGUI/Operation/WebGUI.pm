@@ -115,7 +115,7 @@ sub www_setup {
 			-name=>"identifier",
 			-value=>"123qwe",
 			-label=>$i18n->get(51),
-			-subtext=>'<div style=\"font-size: 10px;\">(.$i18n->get("password clear text").')</div>'
+			-subtext=>'<div style=\"font-size: 10px;\">('.$i18n->get("password clear text").')</div>'
 			);
 		$f->email(
 			-name=>"email",
