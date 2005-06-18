@@ -6,6 +6,14 @@ our $HELP = {
 		title => 'file add/edit title',
 		body => 'file add/edit body',
 		fields => [
+			{
+				title => 'new file',
+				description => 'new file description'
+			},
+			{
+				title => 'current file',
+				description => 'current file description'
+			},
 		],
 		related => [
 			{

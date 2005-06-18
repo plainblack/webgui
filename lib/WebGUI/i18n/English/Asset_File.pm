@@ -11,16 +11,9 @@ our $I18N = {
 
 <P>Since Files are Assets, so they have all the properties that Assets do.  Below are the properties that are specific to Image Assets:</P>
 
-<P><b>^International("new file","Asset_File");</b><br/>
-Enter the path to a file, or use the "Browse" button to find a file on your local hard
-drive that you would like to be uploaded.
-
-<P><b>^International("current file","Asset_File");</b><br/>
-If this Asset already contains a file, a link to the file with its associated icon will be shown.
-
 |,
 		context => 'Describing file add/edit form specific fields',
-		lastUpdated => 1106762796,
+		lastUpdated => 1119068839,
 	},
 	'file template title' => {
 		message => q|File, Template|,
@@ -57,11 +50,24 @@ The type of the file (PDF, etc.)
 		lastUpdated => 1106762086
 	},
 
+	'current file description' => {
+		message => q|If this Asset already contains a file, a link to the file with its associated icon will be shown.|,
+		lastUpdated => 1119068809
+	},
+
+
 	'new file' => {
 		message => q|New file to upload|,
 		context => q|label for File asset form|,
 		lastUpdated => 1106762088
 	},
+
+
+	'new file description' => {
+		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
+		lastUpdated => 1119068745
+	},
+
 
 };
 
