@@ -22,69 +22,84 @@ our $I18N = {
   You
 can add additional fields to the DataForm, create multiple tabs, use the DataForm
 as a web form to email gateway, or easily create tables on your website with it.
-<p> Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  They also have these unique properties:
-<p>
-<b>^International("16","Asset_DataForm");</b><br>
-This message will be displayed to the user after they submit their data.
-
-<p>
-<b>^International("74","Asset_DataForm");</b></br>
-If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
-they can't be edited by the user.
-<p>
-<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.  To send an email to more than one address, separate them by commas.
-
-<p>
-<b>^International("913","WebGUI");</b><br>
-Choose a template for your form.
-
-<p>
-<b>^International("81","Asset_DataForm");</b><br>
-Choose a template for the data that will be sent via email.
-
-<p>
-<b>^International("81","Asset_DataForm");</b><br>
-Choose a template that will be used to display the acknowledgment.
-
-<p>
-<b>^International("87","Asset_DataForm");</b><br>
-Choose a template that will be used to display the list of stored records in this Data Form.
-
-<p>
-<b>^International("defaultView","Asset_DataForm");</b><br>
-Select the default view for the Data Form, either Form view (the default) or
-List view.  When List view is selected, no acknowledgement will be displayed
-after data is entered in the form.
-
-<p>
-<b>^International("744","Asset_DataForm");</b><br>
-After creating the Data Form, you may either begin to add fields to it
-or to return to the page where the it was created.
 
 <p>The Data Form Wobject is special in that some of the controls for it
 are only available from the template.  Be sure to read the documentation
-for the Data Form Template and to include the variables that enable these
-functions:
+for the Data Form Template and to include the variables that enable those
+functions.
 
-<p>
-<b>^International("76","Asset_DataForm");</b><br>
-Add a field to a Data Form.
-
-<p>
-<b>^International("105","Asset_DataForm");</b><br>
-Add a tab to a Data Form.
-
-<p>
-<b>^International("86","Asset_DataForm");</b><br>
-List all data that has been entered into the Data Form.
-
-<p>
-<b>^International("76","Asset_DataForm");</b><br>
-Export the data from the Data Form in tab deliniated format.
-
+<p> Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  They also have these unique properties:
 |,
-		lastUpdated => 1113674254,
+		lastUpdated => 1119071111,
 	},
+
+        '16 description' => {
+                message => q|This message will be displayed to the user after they submit their data.|,
+                lastUpdated => 1119071283,
+        },
+
+        '74 description' => {
+                message => q|If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
+they can't be edited by the user.
+<p>
+<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.  To send an email to more than one address, separate them by commas.|,
+                lastUpdated => 1119071283,
+        },
+
+
+        '913 description' => {
+                message => q|Choose a template for your form.|,
+                lastUpdated => 1119071072,
+        },
+
+        '81 description' => {
+                message => q|Choose a template for the data that will be sent via email.|,
+                lastUpdated => 1119071072,
+        },
+
+        '81 description' => {
+                message => q|Choose a template that will be used to display the acknowledgment.|,
+                lastUpdated => 1119071072,
+        },
+
+        '87 description' => {
+                message => q|Choose a template that will be used to display the list of stored records in this Data Form.|,
+                lastUpdated => 1119071072,
+        },
+
+        'defaultView description' => {
+                message => q|Select the default view for the Data Form, either Form view (the default) or
+List view.  When List view is selected, no acknowledgement will be displayed
+after data is entered in the form.|,
+                lastUpdated => 1119071072,
+        },
+
+        '744 description' => {
+                message => q|After creating the Data Form, you may either begin to add fields to it
+or to return to the page where the it was created.|,
+                lastUpdated => 1119071072,
+        },
+
+        '76 description' => {
+                message => q|Add a field to a Data Form.|,
+                lastUpdated => 1119071072,
+        },
+
+        '105 description' => {
+                message => q|Add a tab to a Data Form.|,
+                lastUpdated => 1119071072,
+        },
+
+        '86 description' => {
+                message => q|List all data that has been entered into the Data Form.|,
+                lastUpdated => 1119071072,
+        },
+
+        '76 description' => {
+                message => q|Export the data from the Data Form in tab deliniated format.|,
+                lastUpdated => 1119071072,
+        },
+
 
 	'editField-vertical-label' => {
 		message => q|Align vertical|,
