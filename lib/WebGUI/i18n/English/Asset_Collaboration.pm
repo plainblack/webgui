@@ -816,117 +816,142 @@ our $I18N = {
 
 <P>Collaboration Assets have the properties of Assets and Wobjects, as well as the
 properties listed below:</p>
-
-<p>
-<b>^International("display last reply","Asset_Collaboration");</b><br>
-If set to Yes, template variables will be added to allow the display the last Post.
-
-<p>
-<b>^International("system template","Asset_Collaboration");</b><br>
-This is the master template for the Collaboration Asset.
-
-<p>
-<b>^International("thread template","Asset_Collaboration");</b><br>
-The template to display a thread.
-
-<p>
-<b>^International("post template","Asset_Collaboration");</b><br>
-The template for an individual post.
-
-<p>
-<b>^International("search template","Asset_Collaboration");</b><br>
-The template for this Collaboration Asset"s search form and results.
-
-<p>
-<b>^International("notification template","Asset_Collaboration");</b><br>
-The template used to generate emails for users who have subscribed to this Asset.
-
-<p>
-<b>^International("who moderates","Asset_Collaboration");</b><br>
-The group that will moderate posts to this Asset, if moderation is enabled.
-
-<p>
-<b>^International("who posts","Asset_Collaboration");</b><br>
-The group allowed to submit posts to this Asset.
-
-<p>
-<b>^International("threads/page","Asset_Collaboration");</b><br>
-The number of threads displayed on each page in the system template.
-Setting this number very high can slow the generation of the page.
-
-<p>
-<b>^International("posts/page","Asset_Collaboration");</b><br>
-The number of posts displayed on each page in the thread template.
-Setting this number very high can slow the generation of the page.
-
-<p>
-<b>^International("karma/post","Asset_Collaboration");</b><br>
-If Karma is enabled on your site, the amount of Karma added for each Post
-submitted by a user.
-
-<p>
-<b>^International("karma spent to rate","Asset_Collaboration");</b><br />
-If karma is enabled on your site, this amount will be subtracted from the user rating a post as sort of a cost of rating posts. It is meant to keep users in check from just rating everything without thinking about the rating.
-
-<p>
-<b>^International("karma rating multiplier","Asset_Collaboration");</b><br />
-If karma is enabled on your site, this amount multiplied by the rating the user gives a post will be the amount of karma the original author of the post receives.
-
-<p>
-<b>^International("filter code","Asset_Collaboration");</b><br>
-Sets the level of HTML filtering done on each Post.
-
-<p>
-<b>^International("sort by","Asset_Collaboration");</b><br>
-By default, all posts are displayed in a sorted order.  Use this
-field to choose by what property they are sorted.  Multiple properties
-may be selected.
-
-<p>
-<b>^International("sort order","Asset_Collaboration");</b><br>
-Sort in ascending or descending order.
-
-<p>
-<b>^International("archive after","Asset_Collaboration");</b><br>
-The time, after which a Post is last updated, it will be archived.
-
-<p>
-<b>^International("attachments/post","Asset_Collaboration");</b><br>
-How many attachments may be added to each post?
-
-<p>
-<b>^International("editTimeout","Asset_Collaboration");</b><br>
-After this timeout is reached, the Post can no longer be edited by
-the original poster.
-
-<p>
-<b>^International("allow replies","Asset_Collaboration");</b><br>
-Select "No" to prevent people from replying to this Post.
-
-<p>
-<b>^International("edit stamp","Asset_Collaboration");</b><br>
-Select "Yes" to add a stamp to each Post saying when it was last edited.
-
-<p>
-<b>^International("rich edit","Asset_Collaboration");</b><br>
-Select "Yes" to enable Rich Editing of content in Posts.
-
-<p>
-<b>^International("content filter","Asset_Collaboration");</b><br>
-Select "Yes" to filter the content in each Post with the Replacements System.
-
-<p>
-<b>^International("use preview","Asset_Collaboration");</b><br>
-Select "Yes" to display a preview of the Post to the user before submitting it.  While
-the preview is displayed, the Post can either be edited or canceled.
-
-<p>
-<b>^International("moderate","Asset_Collaboration");</b><br>
-Enable moderation for Posts to the Collaboration Asset.
-
                 |,
 		lastUpdated => 1113974026,
 	},
+
+        'display last reply description' => {
+                message => q|If set to Yes, template variables will be added to allow the display the last Post.|,
+                lastUpdated => 1119070429,
+        },
+
+        'system template description' => {
+                message => q|This is the master template for the Collaboration Asset.|,
+                lastUpdated => 1119070429,
+        },
+
+        'thread template description' => {
+                message => q|The template to display a thread.|,
+                lastUpdated => 1119070429,
+        },
+
+        'post template description' => {
+                message => q|The template for an individual post.|,
+                lastUpdated => 1119070429,
+        },
+
+        'search template description' => {
+                message => q|The template for this Collaboration Asset"s search form and results.|,
+                lastUpdated => 1119070429,
+        },
+
+        'notification template description' => {
+                message => q|The template used to generate emails for users who have subscribed to this Asset.|,
+                lastUpdated => 1119070429,
+        },
+
+        'who moderates description' => {
+                message => q|The group that will moderate posts to this Asset, if moderation is enabled.|,
+                lastUpdated => 1119070429,
+        },
+
+        'who posts description' => {
+                message => q|The group allowed to submit posts to this Asset.|,
+                lastUpdated => 1119070429,
+        },
+
+        'threads/page description' => {
+                message => q|The number of threads displayed on each page in the system template.
+Setting this number very high can slow the generation of the page.|,
+                lastUpdated => 1119070429,
+        },
+
+        'posts/page description' => {
+                message => q|The number of posts displayed on each page in the thread template.
+Setting this number very high can slow the generation of the page.|,
+                lastUpdated => 1119070429,
+        },
+
+        'karma/post description' => {
+                message => q|If Karma is enabled on your site, the amount of Karma added for each Post
+submitted by a user.|,
+                lastUpdated => 1119070429,
+        },
+
+        'karma spent to rate description' => {
+                message => q|If karma is enabled on your site, this amount will be subtracted from the user rating a post as sort of a cost of rating posts. It is meant to keep users in check from just rating everything without thinking about the rating.|,
+                lastUpdated => 1119070429,
+        },
+
+        'karma rating multiplier description' => {
+                message => q|If karma is enabled on your site, this amount multiplied by the rating the user gives a post will be the amount of karma the original author of the post receives.|,
+                lastUpdated => 1119070429,
+        },
+
+        'filter code description' => {
+                message => q|Sets the level of HTML filtering done on each Post.|,
+                lastUpdated => 1119070429,
+        },
+
+        'sort by description' => {
+                message => q|By default, all posts are displayed in a sorted order.  Use this
+field to choose by what property they are sorted.  Multiple properties
+may be selected.|,
+                lastUpdated => 1119070429,
+        },
+
+        'sort order description' => {
+                message => q|Sort in ascending or descending order.|,
+                lastUpdated => 1119070429,
+        },
+
+        'archive after description' => {
+                message => q|The time, after which a Post is last updated, it will be archived.|,
+                lastUpdated => 1119070429,
+        },
+
+        'attachments/post description' => {
+                message => q|How many attachments may be added to each post?|,
+                lastUpdated => 1119070429,
+        },
+
+        'editTimeout description' => {
+                message => q|After this timeout is reached, the Post can no longer be edited by
+the original poster.|,
+                lastUpdated => 1119070429,
+        },
+
+        'allow replies description' => {
+                message => q|Select "No" to prevent people from replying to this Post.|,
+                lastUpdated => 1119070429,
+        },
+
+        'edit stamp description' => {
+                message => q|Select "Yes" to add a stamp to each Post saying when it was last edited.|,
+                lastUpdated => 1119070429,
+        },
+
+        'rich edit description' => {
+                message => q|Select "Yes" to enable Rich Editing of content in Posts.|,
+                lastUpdated => 1119070429,
+        },
+
+        'content filter description' => {
+                message => q|Select "Yes" to filter the content in each Post with the Replacements System.|,
+                lastUpdated => 1119070429,
+        },
+
+        'use preview description' => {
+                message => q|Select "Yes" to display a preview of the Post to the user before submitting it.  While
+the preview is displayed, the Post can either be edited or canceled.|,
+                lastUpdated => 1119070429,
+        },
+
+        'moderate description' => {
+                message => q|Enable moderation for Posts to the Collaboration Asset.|,
+                lastUpdated => 1119070429,
+        },
+
 	
 	'collaboration post list template variables title' => {
 		message => q|Collaboration, Post List Template Variables|,
