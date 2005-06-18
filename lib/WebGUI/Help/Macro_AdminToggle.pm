@@ -5,6 +5,8 @@ our $HELP = {
         'admin toggle' => {
 		title => 'admin toggle title',
 		body => 'admin toggle body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

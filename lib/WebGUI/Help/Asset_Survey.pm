@@ -4,6 +4,8 @@ our $HELP = {
 	'survey add/edit' => {
 		title => '3',
 		body => '4',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -42,6 +44,8 @@ our $HELP = {
 	'question add/edit' => {
 		title => '17',
 		body => 'question add/edit body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'survey add/edit',
@@ -52,6 +56,8 @@ our $HELP = {
 	'survey template' => {
 		title => '88',
 		body => '89',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'survey template common vars',
@@ -70,6 +76,8 @@ our $HELP = {
 	'survey template common vars' => {
 		title => '90',
 		body => '91',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'survey template',
@@ -80,6 +88,8 @@ our $HELP = {
 	'gradebook report template' => {
 		title => '1087',
 		body => '1088',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'pagination template variables',
@@ -98,6 +108,8 @@ our $HELP = {
 	'survey response template' => {
 		title => '1089',
 		body => '1090',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'survey template common vars',
@@ -112,6 +124,8 @@ our $HELP = {
 	'statistical overview report template' => {
 		title => '1091',
 		body => '1092',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'pagination template variables',

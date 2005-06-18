@@ -4,6 +4,8 @@ our $HELP = {
 	'packages creating' => {
 		title => '681',
 		body => '636',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'package add',
@@ -22,6 +24,8 @@ our $HELP = {
 	'package add' => {
 		title => '680',
 		body => '635',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'packages creating',
@@ -32,12 +36,16 @@ our $HELP = {
 	'content filtering' => {
 		title => '418',
 		body => 'content filter body',
+		fields => [
+		],
 		related => [
 		],
 	},
 	'trash empty' => {
 		title => '696',
 		body => '651',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'trash manage',
@@ -48,11 +56,15 @@ our $HELP = {
 	'profile settings edit' => {
 		title => '672',
 		body => '627',
+		fields => [
+		],
 		related => []
 	},
 	'style template' => {
 		title => '1073',
 		body => '1074',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'style sheets using',
@@ -72,6 +84,8 @@ our $HELP = {
 	'style sheets using' => {
 		title => '668',
 		body => '623',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'style template',
@@ -82,6 +96,8 @@ our $HELP = {
 	'group add/edit' => {
 		title => '667',
 		body => '622',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'groups manage',
@@ -96,6 +112,8 @@ our $HELP = {
 	'group delete' => {
 		title => '665',
 		body => '620',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'groups manage',
@@ -106,11 +124,15 @@ our $HELP = {
 	'settings' => {
 		title => 'settings',
 		body => 'settings help',
+		fields => [
+		],
 		related => []
 	},
 	'groups default' => {
 		title => 'groups default title',
 		body => 'groups default body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'groups manage',
@@ -121,6 +143,8 @@ our $HELP = {
 	'groups manage' => {
 		title => '660',
 		body => '615',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'groups default',
@@ -143,6 +167,8 @@ our $HELP = {
 	'users manage' => {
 		title => '658',
 		body => '613',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'groups manage',
@@ -165,6 +191,8 @@ our $HELP = {
 	'user delete' => {
 		title => '657',
 		body => '612',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'users manage',
@@ -175,6 +203,8 @@ our $HELP = {
 	'user profile edit' => {
 		title => '682',
 		body => '637',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'users manage',
@@ -185,6 +215,8 @@ our $HELP = {
 	'user add/edit' => {
 		title => '655',
 		body => '610',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'users manage',
@@ -195,6 +227,8 @@ our $HELP = {
 	'page delete' => {
 		title => '653',
 		body => '608',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'page add/edit',
@@ -205,6 +239,8 @@ our $HELP = {
 	'page add/edit' => {
 		title => '642',
 		body => '606',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'page delete',
@@ -216,6 +252,8 @@ our $HELP = {
 	'trash manage' => {
 		title => '960',
 		body => '961',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'trash empty',
@@ -226,6 +264,8 @@ our $HELP = {
 	'clipboard manage' => {
 		title => '957',
 		body => '958',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'clipboard empty',
@@ -236,6 +276,8 @@ our $HELP = {
 	'karma using' => {
 		title => '697',
 		body => '698',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'article add/edit',
@@ -262,6 +304,8 @@ our $HELP = {
 	'clipboard empty' => {
 		title => '968',
 		body => '969',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'clipboard manage',
@@ -272,6 +316,8 @@ our $HELP = {
 	'themes manage' => {
 		title => '931',
 		body => '932',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'templates manage',
@@ -294,6 +340,8 @@ our $HELP = {
 	'theme edit' => {
 		title => '933',
 		body => '934',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'themes manage',
@@ -304,6 +352,8 @@ our $HELP = {
 	'theme import' => {
 		title => '936',
 		body => '937',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'themes manage',
@@ -314,6 +364,8 @@ our $HELP = {
 	'theme delete' => {
 		title => '938',
 		body => '939',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'themes manage',
@@ -324,6 +376,8 @@ our $HELP = {
 	'database links manage' => {
 		title => '997',
 		body => '1000',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'database link add/edit',
@@ -342,6 +396,8 @@ our $HELP = {
 	'database link add/edit' => {
 		title => '998',
 		body => '1001',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'database links manage',
@@ -360,6 +416,8 @@ our $HELP = {
 	'database link delete' => {
 		title => '999',
 		body => '1002',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'database links manage',
@@ -378,6 +436,8 @@ our $HELP = {
 	'pagination template variables' => {
 		title => '1085',
 		body => '1086',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'wobject template',
@@ -388,12 +448,16 @@ our $HELP = {
 	'page export' => {
                 title => 'Page, Export',
                 body => 'Page, Export body',
+		fields => [
+		],
                 related => [
                 ],
 	},
 	'glossary' => {
                 title => 'glossary title',
                 body => 'glossary body',
+		fields => [
+		],
                 related => [
                 ],
 	},

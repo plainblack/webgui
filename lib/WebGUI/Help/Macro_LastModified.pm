@@ -5,6 +5,8 @@ our $HELP = {
         'last modified' => {
 		title => 'last modified title',
 		body => 'last modified body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

@@ -5,6 +5,8 @@ our $HELP = {
         'editable toggle' => {
 		title => 'editable toggle title',
 		body => 'editable toggle body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

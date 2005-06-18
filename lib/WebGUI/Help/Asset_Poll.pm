@@ -4,6 +4,8 @@ our $HELP = {
 	'poll add/edit' => {
 		title => '61',
 		body => '71',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'poll template',
@@ -18,6 +20,8 @@ our $HELP = {
 	'poll template' => {
 		title => '73',
 		body => '74',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'poll add/edit',

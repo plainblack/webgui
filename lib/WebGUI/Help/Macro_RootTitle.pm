@@ -5,6 +5,8 @@ our $HELP = {
         'root title' => {
 		title => 'root title title',
 		body => 'root title body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

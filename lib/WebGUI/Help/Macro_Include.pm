@@ -5,6 +5,8 @@ our $HELP = {
         'include' => {
 		title => 'include title',
 		body => 'include body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

@@ -5,6 +5,8 @@ our $HELP = {
 	'wobjects using' => {
 		title => '671',
 		body => '626',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',
@@ -28,6 +30,8 @@ our $HELP = {
 	'wobject add/edit' => {
 		title => '677',
 		body => '632',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -43,6 +47,8 @@ our $HELP = {
 	'wobject delete' => {
 		title => '664',
 		body => '619',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'wobjects using',
@@ -54,6 +60,8 @@ our $HELP = {
 	'wobject template' => {
 		title => '827',
 		body => '828',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'pagination template variables',

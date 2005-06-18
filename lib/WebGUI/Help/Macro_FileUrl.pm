@@ -5,6 +5,8 @@ our $HELP = {
         'file url' => {
 		title => 'file url title',
 		body => 'file url body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

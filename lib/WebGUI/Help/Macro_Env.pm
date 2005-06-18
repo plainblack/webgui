@@ -5,6 +5,8 @@ our $HELP = {
         'env' => {
 		title => 'env title',
 		body => 'env body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

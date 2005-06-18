@@ -5,6 +5,8 @@ our $HELP = {
         'file add/edit' => {
 		title => 'file add/edit title',
 		body => 'file add/edit body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -20,6 +22,8 @@ our $HELP = {
         'file template' => {
 		title => 'file template title',
 		body => 'file template body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'file add/edit',

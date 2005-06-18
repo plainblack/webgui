@@ -5,6 +5,8 @@ our $HELP = {
         'folder add/edit' => {
 		title => 'folder add/edit title',
 		body => 'folder add/edit body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -24,6 +26,8 @@ our $HELP = {
         'folder template' => {
 		title => 'folder template title',
 		body => 'folder template body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'folder add/edit',

@@ -4,6 +4,8 @@ our $HELP = {
 	'data form add/edit' => {
 		title => '61',
 		body => '71',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'data form fields add/edit',
@@ -30,6 +32,8 @@ our $HELP = {
 	'data form fields add/edit' => {
 		title => '62',
 		body => '72',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'data form template',
@@ -44,6 +48,8 @@ our $HELP = {
 	'data form template' => {
 		title => '82',
 		body => '83',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'data form fields add/edit',
@@ -62,6 +68,8 @@ our $HELP = {
 	'data form list template' => {
 		title => '88',
 		body => '89',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'data form add/edit',

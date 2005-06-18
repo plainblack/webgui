@@ -5,6 +5,8 @@ our $HELP = {
         'if' => {
 		title => 'if title',
 		body => 'if body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

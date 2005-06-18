@@ -7,6 +7,8 @@ our $HELP = {
         'macros using' => {
 		title => 'macros using title',
 		body => 'macros using body',
+		fields => [
+		],
 		related => [
                         {
                                 tag => "macros list",
@@ -18,6 +20,8 @@ our $HELP = {
         'macros list' => {
 		title => 'macros list title',
 		body => 'macros list body',
+		fields => [
+		],
 		related => [ 
                              sort { $a->{tag} cmp $b->{tag} }
                              map {

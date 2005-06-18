@@ -12,33 +12,22 @@ our $I18N = {
 
 NOTE: You can create a multi-paged article by placing the separator macro (&#94;-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.
 
-<P><b>^International("913","WebGUI");</b><br>
-Select a template from the list to layout your Wobject.  Each Wobject
-may only use templates for their own namespace.  For example, Articles
-can only use templates from the "Article" namespace.  Layouts can only
-use templates from the "page" namespace.
-
-<p><b>^International("1","Asset_Article");</b><br>
-If you wish to add a link to your article, enter the title of the link in this field. 
-<br><br>
-<i>Example:</i> Google
-
-<p><b>^International("8","Asset_Article");</b><br>
-If you added a link title, now add the URL (uniform resource locater) here. 
-<br><br>
-<i>Example:</i> http://www.google.com
-
-<p><b>^International("10","Asset_Article");</b><br>
-If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.
-
 |,
-		lastUpdated => 1112732053,
+		lastUpdated => 1119066571,
 	},
 
 	'7' => {
 		message => q|Link Title|,
 		lastUpdated => 1031514049
 	},
+
+	'link title description' => {
+		message => q|If you wish to add a link to your article, enter the title of the link in this field. 
+<p>
+<i>Example:</i> Google|,
+		lastUpdated => 1119066359
+	},
+
 
 	'1' => {
 		message => q|Article|,
@@ -49,6 +38,15 @@ If you're publishing HTML there's generally no need to check this option, but if
 		message => q|Article Template|,
 		lastUpdated => 1038794871
 	},
+
+	'article template description' => {
+		message => q|Select a template from the list to layout your Wobject.  Each Wobject
+may only use templates for their own namespace.  For example, Articles
+can only use templates from the "Article" namespace.  Layouts can only
+use templates from the "page" namespace.|,
+		lastUpdated => 1119066250
+	},
+
 
 	'28' => {
 		message => q|View Responses|,
@@ -69,6 +67,14 @@ If you're publishing HTML there's generally no need to check this option, but if
 		message => q|Link URL|,
 		lastUpdated => 1031514049
 	},
+
+	'link url description' => {
+		message => q|If you added a link title, now add the URL (uniform resource locater) here. 
+<br><br>
+<i>Example:</i> http://www.google.com|,
+		lastUpdated => 1119066412
+	},
+
 
 	'73' => {
 		message => q|The following template variables are available for article templates.
@@ -195,6 +201,13 @@ The URL to view the replies to this article.
 		message => q|Convert carriage returns?|,
 		lastUpdated => 1031514049
 	},
+
+	'carriage return description' => {
+		message => q|
+If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.|,
+		lastUpdated => 1119066524
+	},
+
 
 };
 

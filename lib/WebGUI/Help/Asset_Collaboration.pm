@@ -4,6 +4,8 @@ our $HELP = {
 	'collaboration add/edit' => {
 		title => 'collaboration add/edit title',
 		body => 'collaboration add/edit body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'content filtering',
@@ -15,6 +17,8 @@ our $HELP = {
 	'collaboration template labels' => {
 		title => 'collaboration template labels title',
 		body => 'collaboration template labels body',
+		fields => [
+		],
 		related => [
 		]
 	},
@@ -22,6 +26,8 @@ our $HELP = {
 	'collaboration post list template variables' => {
 		title => 'collaboration post list template variables title',
 		body => 'collaboration post list template variables body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -33,6 +39,8 @@ our $HELP = {
 	'collaboration template' => {
 		title => 'collaboration template title',
 		body => 'collaboration template body',
+		fields => [
+		],
 		related => [
 			{
 		   		tag => 'collaboration template labels',
@@ -48,6 +56,8 @@ our $HELP = {
 	'collaboration search template' => {
 		title => 'collaboration search template title',
 		body => 'collaboration search template body',
+		fields => [
+		],
 		related => [
 			{
 		   		tag => 'collaboration post list template variables',

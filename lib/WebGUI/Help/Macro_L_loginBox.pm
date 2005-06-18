@@ -5,6 +5,8 @@ our $HELP = {
         'login box' => {
 		title => 'login box title',
 		body => 'login box body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

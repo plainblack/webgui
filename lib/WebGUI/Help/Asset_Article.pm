@@ -4,6 +4,24 @@ our $HELP = {
 	'article add/edit' => {
 		title => '61',
 		body => '71',
+		fields => [
+                        {
+                                title => '72',
+                                description => 'article template description',
+                        },
+                        {
+                                title => '7',
+                                description => 'link title description',
+                        },
+                        {
+                                title => '8',
+                                description => 'link url description',
+                        },
+                        {
+                                title => '10',
+                                description => 'carriage return description',
+                        },
+		],
 		related => [
 			{
 				tag => 'article template',
@@ -17,11 +35,13 @@ our $HELP = {
 				tag => 'asset fields',
 				namespace => 'Asset'
 			},
-		]
+		],
 	},
 	'article template' => {
 		title => '72',
 		body => '73',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'article add/edit',

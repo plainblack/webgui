@@ -4,6 +4,8 @@ our $HELP = {
 	'navigation add/edit' => {
 		title => '1098',
 		body => '1093',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'navigation template',
@@ -22,6 +24,8 @@ our $HELP = {
 	'navigation template' => {
 		title => '1096',
 		body => '1097',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'navigation add/edit',
@@ -40,6 +44,8 @@ our $HELP = {
 	'navigation manage' => {
 		title => '1094',
 		body => '1095',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'navigation template',

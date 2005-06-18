@@ -4,6 +4,8 @@ our $HELP = {
 	'shortcut add/edit' => {
 		title => '5',
 		body => '6',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'wobjects using',
@@ -20,6 +22,8 @@ our $HELP = {
 	'shortcut template' => {
 		title => 'shortcut template title',
 		body => 'shortcut template body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'wobjects using',

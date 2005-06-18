@@ -4,6 +4,8 @@ our $HELP = {
 	'syndicated content add/edit' => {
 		title => '61',
 		body => '71',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'syndicated content template',
@@ -22,6 +24,8 @@ our $HELP = {
 	'syndicated content template' => {
 		title => '72',
 		body => '73',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'syndicated content add/edit',

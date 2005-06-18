@@ -5,6 +5,8 @@ our $HELP = {
         'image add/edit' => {
 		title => 'image add/edit title',
 		body => 'image add/edit body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',

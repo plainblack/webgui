@@ -5,6 +5,8 @@ our $HELP = {
         'file pile add/edit' => {
 		title => 'file pile add/edit title',
 		body => 'file pile add/edit body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',

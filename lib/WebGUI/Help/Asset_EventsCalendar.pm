@@ -4,6 +4,8 @@ our $HELP = {
 	'events calendar add/edit' => {
 		title => '61',
 		body => '71',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -26,6 +28,8 @@ our $HELP = {
 	'events calendar template' => {
 		title => '94',
 		body => '95',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'events calendar add/edit',

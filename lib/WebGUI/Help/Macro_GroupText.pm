@@ -5,6 +5,8 @@ our $HELP = {
         'group text' => {
 		title => 'group text title',
 		body => 'group text body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

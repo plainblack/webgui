@@ -5,6 +5,8 @@ our $HELP = {
         'home link' => {
 		title => 'home link title',
 		body => 'home link body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

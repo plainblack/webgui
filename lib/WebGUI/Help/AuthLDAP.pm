@@ -4,11 +4,15 @@ our $HELP = {
 	'ldap connection add/edit' => {
 		title => 'LDAPLink_990',
 		body => 'ldap connection add/edit body',
+		fields => [
+		],
 		related => [ ],
 	},
 	'ldap authentication display account template' => {
 		title => 'account-1',
 		body => 'account-2',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'ldap authentication anonymous registration template',
@@ -27,6 +31,8 @@ our $HELP = {
 	'ldap authentication login template' => {
 		title => 'login-1',
 		body => 'login-2',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'ldap authentication anonymous registration template',
@@ -45,6 +51,8 @@ our $HELP = {
 	'ldap authentication anonymous registration template' => {
 		title => 'create-1',
 		body => 'create-2',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'ldap authentication display account template',

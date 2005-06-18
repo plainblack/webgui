@@ -5,6 +5,8 @@ our $HELP = {
         'admin text' => {
 		title => 'admin text title',
 		body => 'admin text body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

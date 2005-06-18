@@ -7,6 +7,8 @@ our $HELP = {
 	'asset fields' => {
 		title => 'asset fields title',
 		body => 'asset fields body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'template language',
@@ -18,6 +20,8 @@ our $HELP = {
 	'asset template' => {
 		title => 'asset template title',
 		body => 'asset template body',
+		fields => [
+		],
 		related => [
 		]
 	},
@@ -25,6 +29,8 @@ our $HELP = {
 	'metadata manage'=> {
 		title => 'content profiling',
 		body => 'metadata manage body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'metadata edit property',
@@ -47,6 +53,8 @@ our $HELP = {
 	'metadata edit property' => {
                 title => 'Metadata, Edit property',
                 body => 'metadata edit property body',
+		fields => [
+		],
                 related => [
 			{
 				tag => 'metadata manage',
@@ -70,6 +78,8 @@ our $HELP = {
 	'asset list' => {
 		title => 'asset list title',
 		body => 'asset list body',
+		fields => [
+		],
 		related => [ map {
 				 my ($namespace) = /::(\w+)$/;
 				 my $tag = $namespace;

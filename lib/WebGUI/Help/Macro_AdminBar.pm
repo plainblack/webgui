@@ -5,6 +5,8 @@ our $HELP = {
         'admin bar' => {
 		title => 'admin bar title',
 		body => 'admin bar body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

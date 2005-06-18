@@ -5,6 +5,8 @@ our $HELP = {
         'gateway url' => {
 		title => 'gateway url title',
 		body => 'gateway url body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

@@ -4,6 +4,8 @@ our $HELP = {
 	'indexed search add/edit' => {
 		title => '26',
 		body => '27',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'wobjects using',
@@ -18,6 +20,8 @@ our $HELP = {
 	'indexed search template' => {
 		title => '29',
 		body => '28',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'wobjects using',

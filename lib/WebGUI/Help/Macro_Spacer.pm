@@ -5,6 +5,8 @@ our $HELP = {
         'spacer' => {
 		title => 'spacer title',
 		body => 'spacer body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

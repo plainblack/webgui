@@ -5,6 +5,8 @@ our $HELP = {
         'asset proxy' => {
 		title => 'asset proxy title',
 		body => 'asset proxy body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

@@ -5,6 +5,8 @@ our $HELP = {
         'printable' => {
 		title => 'printable title',
 		body => 'printable body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

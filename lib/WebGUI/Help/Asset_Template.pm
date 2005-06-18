@@ -5,6 +5,8 @@ our $HELP = {
 	'templates manage' => {
 		title => '683',
 		body => '638',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'themes manage',
@@ -27,6 +29,8 @@ our $HELP = {
 	'template add/edit' => {
 		title => '684',
 		body => '639',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'templates manage',
@@ -38,6 +42,8 @@ our $HELP = {
 	'template delete' => {
 		title => '685',
 		body => '640',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'templates manage',
@@ -49,6 +55,8 @@ our $HELP = {
 	'template language' => {
 		title => '825',
 		body => '826',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'templates manage',

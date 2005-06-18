@@ -5,6 +5,8 @@ our $HELP = {
         'layout add/edit' => {
 		title => 'layout add/edit title',
 		body => 'layout add/edit body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -24,6 +26,8 @@ our $HELP = {
         'layout template' => {
 		title => 'layout template title',
 		body => 'layout template body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'layout add/edit',

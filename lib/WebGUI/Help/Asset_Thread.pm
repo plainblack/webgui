@@ -4,6 +4,8 @@ our $HELP = {
 	'thread template variables' => {
 		title => 'thread template title',
 		body => 'thread template body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'template language',

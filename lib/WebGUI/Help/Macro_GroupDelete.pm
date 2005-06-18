@@ -5,6 +5,8 @@ our $HELP = {
         'group delete' => {
 		title => 'group delete title',
 		body => 'group delete body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

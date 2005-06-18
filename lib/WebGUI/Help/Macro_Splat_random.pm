@@ -5,6 +5,8 @@ our $HELP = {
         'random' => {
 		title => 'random title',
 		body => 'random body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

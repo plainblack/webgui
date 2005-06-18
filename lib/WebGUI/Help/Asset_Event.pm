@@ -4,6 +4,8 @@ our $HELP = {
 	'event add/edit' => {
 		title => '72',
 		body => '73',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -18,6 +20,8 @@ our $HELP = {
 	'event template' => {
 		title => '96',
 		body => '97',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'template language',

@@ -5,6 +5,8 @@ our $HELP = {
         'java script' => {
 		title => 'java script title',
 		body => 'java script body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

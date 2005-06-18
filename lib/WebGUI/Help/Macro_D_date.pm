@@ -5,6 +5,8 @@ our $HELP = {
         'date' => {
 		title => 'date title',
 		body => 'date body',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'macros using',

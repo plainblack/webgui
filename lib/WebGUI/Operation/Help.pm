@@ -14,6 +14,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::International;
+use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::URL;
@@ -49,15 +50,24 @@ sub www_viewHelp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new("help");
 	my $namespace = $session{form}{namespace} || "WebGUI";
+        my $i18n = WebGUI::International->new($namespace);
 	my $help = _get($session{form}{hid},$namespace);
 	foreach my $row (@{$help->{related}}) {
 		my $relatedHelp = _get($row->{tag},$row->{namespace});
 		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),WebGUI::International::get($relatedHelp->{title},$row->{namespace}));
 	}
+        my %vars;
+        $vars{body} = $i18n->get($help->{body});
+        foreach my $row (@{ $help->{fields} }) {
+                push @{ $vars{fields} }, 
+                        { 'title' =>       $i18n->get($row->{title}),
+                          'description' => $i18n->get($row->{description}), }
+        }
+        my $body = WebGUI::Asset::Template->new("PBtmplHelp000000000001")->process(\%vars);
     	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
     	return $ac->render(
-		WebGUI::Macro::process(WebGUI::International::get($help->{body},$namespace)), 
-		WebGUI::International::get(93).': '.WebGUI::International::get($help->{title},$namespace)
+		WebGUI::Macro::process($body), 
+		WebGUI::International::get(93).': '.$i18n->get($help->{title})
 		);
 }
 

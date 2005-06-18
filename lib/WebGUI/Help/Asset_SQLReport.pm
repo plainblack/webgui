@@ -4,6 +4,8 @@ our $HELP = {
 	'sql report add/edit' => {
 		title => '61',
 		body => '71',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'sql report template',
@@ -18,6 +20,8 @@ our $HELP = {
 	'sql report template' => {
 		title => '72',
 		body => '73',
+		fields => [
+		],
 		related => [
 			{
 				tag => 'pagination template variables',
