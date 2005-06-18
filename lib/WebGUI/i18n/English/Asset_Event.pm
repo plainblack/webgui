@@ -7,33 +7,34 @@ our $I18N = {
 		lastUpdated => 1038887363
 	},
 
+        'Title description' => {
+                message => q|The title for this event.|,
+                lastUpdated => 1119072889,
+        },
+
+        'Description description' => {
+                message => q|The activities of this event or information about where the event is to be held.|,
+                lastUpdated => 1119072889,
+        },
+
+        'Start Date description' => {
+                message => q|The date and time when the event begins.|,
+                lastUpdated => 1119072889,
+        },
+
+        'End Date description' => {
+                message => q|The date and time when the event ends.|,
+                lastUpdated => 1119072889,
+        },
+
+        'Recurs every description' => {
+                message => q|How many times and how often the event recurs.|,
+                lastUpdated => 1119072889,
+        },
+
 	'73' => {
-		message => q|<b>Title</b><br>
-The title for this event.
-<p>
-
-<b>Description</b><br>
-The activities of this event or information about where the event is to be held.
-<p>
-
-<b>Start Date</b><br>
-The date and time when the event begins.
-<p>
-
-<b>End Date</b><br>
-The date and time when the event ends.
-<p>
-
-<b>Recurs every</b><br>
-How many times and how often the event recurs.
-
-<p>
-<b>What next?</b><br>
-Select "add new event" if you'd like to add another event, otherwise select "go back to page".
-This option is only available when adding an Events Calendar, not editing one.
-<p>
-|,
-		lastUpdated => 1099549204
+		message => q||,
+		lastUpdated => 1119072931
 	},
 
 	'96' => {
@@ -260,6 +261,10 @@ The description of this event.
                      'lastUpdated' => 1108397891,
                      'message' => 'Event Location'
                    },
+          '515 description' => {
+                     'lastUpdated' => 1119073282,
+                     'message' => 'Where the event will occur'
+                   },
           '518' => {
                      'lastUpdated' => 1108397891,
                      'message' => 'Present EULA-type accept/cancel form<br />for user to confirm registration?'
@@ -289,8 +294,12 @@ The description of this event.
                      'message' => 'Number of Seats Available (-1 for unlimited)'
                    },
           '530' => {
-                     'lastUpdated' => 1108397891,
-                     'message' => 'View Event Template'
+                     'lastUpdated' => 1119073382,
+                     'message' => 'Event Template'
+                   },
+          '530 description' => {
+                     'lastUpdated' => 1119073378,
+                     'message' => 'Template used to display the information about the event'
                    },
           '76' => {
                     'lastUpdated' => 1031514049,

@@ -5,7 +5,31 @@ our $HELP = {
 		title => '72',
 		body => '73',
 		fields => [
-		],
+                        {
+                                title => '512',
+                                description => 'Description description'
+                        },
+                        {
+                                title => '513',
+                                description => 'Start Date description'
+                        },
+                        {
+                                title => '514',
+                                description => 'End Date description'
+                        },
+                        {
+                                title => '515',
+                                description => '515 description'
+                        },
+                        {
+                                title => '530',
+                                description => '530 description'
+                        },
+                        {
+                                title => '8',
+                                description => 'Recurs every description'
+                        },
+                ],
 		related => [
 			{
 				tag => 'asset fields',
