@@ -152,64 +152,74 @@ or to return to the page where the it was created.|,
 	},
 
 	'72' => {
-		message => q|<p>You may add as many additional fields to your Data Form as you like.
-
-<p>
-<b>^International("104","Asset_DataForm");</b><br>
-When the form has multiple tabs, defines which tab of the form that the
-field is displayed in.  Otherwise, all fields are displayed on the same
-page.
-
-<p>
-<b>^International("77","Asset_DataForm");</b><br>
-This is an informative text label to let the user know what this field represents.
-
-<p>
-<b>^International("102","Asset_DataForm");</b><br>
-An extension of the label, this is a description of what should go in the field or optional instructions for the field.
-
-<p>
-<b>^International("21","Asset_DataForm");</b><br>
-The name of this field.  It must be unique among all of the other fields on your form.
-
-<p>
-<b>^International("22","Asset_DataForm");</b><br>
-Hidden fields will not be visible to the user, but will be sent in the email. Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
-If you choose Hidden or Displayed, be sure to fill in a Default Value.
-
-<p>
-<b>^International("23","Asset_DataForm");</b><br>
-Choose the type of form element for this field.   This is also used
-to validate any input that the user may supply.
-
-<p>
-<b>^International("8","Asset_DataForm");</b><br>
-Set the number of characters wide this form field will be.
-
-<p>
-<b>^International("27","Asset_DataForm");</b><br>
-Set the number of characters tall this form field will be. Only used on textareas and HTMLAreas.
-
-<p>
-<b>^International("editField-vertical-label","Asset_DataForm");</b><br>
-This property controls whether radio buttons and checklists are laid out horizontally or vertically.
-
-<p>
-<b>^International("editField-extras-label","Asset_DataForm");</b><br>
-Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.
-
-<p>
-<b>^International("24","Asset_DataForm");</b><br>
-This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.
-
-<p>
-<b>^International("25","Asset_DataForm");</b><br>
-Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".
-<p>
-
-|,
-		lastUpdated => 1112732072,
+		message => q|<p>You may add as many additional fields to your Data Form as you like.<p>|,
+		lastUpdated => 1119156650,
 	},
+
+        '104 description' => {
+                message => q|When the form has multiple tabs, defines which tab of the form that the
+field is displayed in.  Otherwise, all fields are displayed on the same
+page.|,
+                lastUpdated => 1119156590,
+        },
+
+        '77 description' => {
+                message => q|This is an informative text label to let the user know what this field represents.|,
+                lastUpdated => 1119156590,
+        },
+
+        '102 description' => {
+                message => q|An extension of the label, this is a description of what should go in the field or optional instructions for the field.|,
+                lastUpdated => 1119156590,
+        },
+
+        '21 description' => {
+                message => q|The name of this field.  It must be unique among all of the other fields on your form.|,
+                lastUpdated => 1119156590,
+        },
+
+        '22 description' => {
+                message => q|Hidden fields will not be visible to the user, but will be sent in the email. Displayed fields can be seen by the user but not modified. Modifiable fields can be filled in by the user. Required fields must be filled in by the user.
+If you choose Hidden or Displayed, be sure to fill in a Default Value.|,
+                lastUpdated => 1119156590,
+        },
+
+        '23 description' => {
+                message => q|Choose the type of form element for this field.   This is also used
+to validate any input that the user may supply.|,
+                lastUpdated => 1119156590,
+        },
+
+        '8 description' => {
+                message => q|Set the number of characters wide this form field will be.|,
+                lastUpdated => 1119156590,
+        },
+
+        '27 description' => {
+                message => q|Set the number of characters tall this form field will be. Only used on textareas and HTMLAreas.|,
+                lastUpdated => 1119156590,
+        },
+
+        'editField-vertical-label description' => {
+                message => q|This property controls whether radio buttons and checklists are laid out horizontally or vertically.|,
+                lastUpdated => 1119156590,
+        },
+
+        'editField-extras-label description' => {
+                message => q|Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.|,
+                lastUpdated => 1119156590,
+        },
+
+        '24 description' => {
+                message => q|This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.|,
+                lastUpdated => 1119156590,
+        },
+
+        '25 description' => {
+                message => q|Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
+                lastUpdated => 1119156590,
+        },
+
 
 	'16' => {
 		message => q|Acknowledgment|,

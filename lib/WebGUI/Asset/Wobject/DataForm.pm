@@ -209,6 +209,7 @@ sub getEditForm {
       		-value=>$self->getValue("templateId"),
       		-namespace=>"DataForm",
                 -label=>WebGUI::International::get(82,"Asset_DataForm"),
+                -hoverHelp=>WebGUI::International::get('82 description',"Asset_DataForm"),
 		-afterEdit=>'func=edit',
 		-defaultValue=>"PBtmpl0000000000000141"
    		);
@@ -217,6 +218,7 @@ sub getEditForm {
                 -value=>$self->getValue("emailTemplateId"),
                 -namespace=>"DataForm",
                 -label=>WebGUI::International::get(80,"Asset_DataForm"),
+                -hoverHelp=>WebGUI::International::get('80 description',"Asset_DataForm"),
                 -afterEdit=>'func=edit'
                 );
         $tabform->getTab("display")->template(
@@ -224,6 +226,7 @@ sub getEditForm {
                 -value=>$self->getValue("acknowlegementTemplateId"),
                 -namespace=>"DataForm",
                 -label=>WebGUI::International::get(81,"Asset_DataForm"),
+                -hoverHelp=>WebGUI::International::get('81 description',"Asset_DataForm"),
                 -afterEdit=>'func=edit'
                 );
         $tabform->getTab("display")->template(
@@ -231,6 +234,7 @@ sub getEditForm {
                 -value=>$self->getValue("listTemplateId"),
                 -namespace=>"DataForm/List",
                 -label=>WebGUI::International::get(87,"Asset_DataForm"),
+                -hoverHelp=>WebGUI::International::get('87 description',"Asset_DataForm"),
                 -afterEdit=>'func=edit'
                 );
 	$tabform->getTab("display")->radioList(
@@ -238,16 +242,19 @@ sub getEditForm {
                 -options=>{ 0 => WebGUI::International::get('data form','Asset_DataForm'),
                             1 => WebGUI::International::get('data list','Asset_DataForm'),},
 		-label=>WebGUI::International::get('defaultView',"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('defaultView description',"Asset_DataForm"),
 		-value=>$self->getValue("defaultView"),
 		);
 	$tabform->getTab("properties")->HTMLArea(
 		-name=>"acknowledgement",
 		-label=>WebGUI::International::get(16, "Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('16 description', "Asset_DataForm"),
 		-value=>($self->get("acknowledgement") || WebGUI::International::get(3, "Asset_DataForm"))
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"mailData",
 		-label=>WebGUI::International::get(74,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('74 description',"Asset_DataForm"),
 		-value=>$self->getValue("mailData")
 		);
 	if ($self->getId eq "new" && $session{form}{proceed} ne "manageAssets") {
@@ -776,17 +783,20 @@ sub www_editField {
 	$f->text(
                 -name=>"label",
                 -label=>WebGUI::International::get(77,"Asset_DataForm"),
+                -hoverHelp=>WebGUI::International::get('77 description',"Asset_DataForm"),
                 -value=>$field{label}
                 );
         $f->text(
 		-name=>"name",
 		-label=>WebGUI::International::get(21,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('21 description',"Asset_DataForm"),
 		-value=>$field{name}
 		);
 	if($field{sequenceNumber} && ! $field{isMailField}) {
 		$f->integer(
 			-name=>"position",
 			-label=>WebGUI::International::get('Field Position',"Asset_DataForm"),
+			-hoverHelp=>WebGUI::International::get('Field Position description',"Asset_DataForm"),
 			-value=>$field{sequenceNumber}
 		);	
 	}
@@ -794,55 +804,65 @@ sub www_editField {
 		-name=>"tid",
 		-options=>$tab,
 		-label=>WebGUI::International::get(104,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('104 description',"Asset_DataForm"),
 		-value=>[ $field{DataForm_tabId} || 0 ]
 		); 
         $f->text(
                 -name=>"subtext",
                 -value=>$field{subtext},
                 -label=>WebGUI::International::get(79,"Asset_DataForm"),
+                -hoverHelp=>WebGUI::International::get('79 description',"Asset_DataForm"),
                 );
         $f->selectList(
 		-name=>"status",
 		-options=>\%fieldStatus,
 		-label=>WebGUI::International::get(22,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('22 description',"Asset_DataForm"),
 		-value=> [ $field{status} || "editable" ] ,
 		); 
 	$f->fieldType(
 		-name=>"type",
 		-label=>WebGUI::International::get(23,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('23 description',"Asset_DataForm"),
 		-value=>$field{type} || "text"
 		);
 	$f->integer(
 		-name=>"width",
 		-label=>WebGUI::International::get(8,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('8 description',"Asset_DataForm"),
 		-value=>($field{width} || 0)
 		);
 	$f->integer(
                 -name=>"rows",
 		-value=>$field{rows} || 0,
 		-label=>WebGUI::International::get(27,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('27 description',"Asset_DataForm"),
 		-subtext=>WebGUI::International::get(28,"Asset_DataForm"),
 		);
 	$f->yesNo(
 		-name=>"vertical",
 		-value=>$field{vertical},
 		-label=>WebGUI::International::get('editField-vertical-label', "Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('editField-vertical-label description', "Asset_DataForm"),
 		-subtext=>WebGUI::International::get('editField-vertical-subtext', "Asset_DataForm")
 		);
 	$f->text(
 		-name=>"extras",
 		-value=>$field{extras},
 		-label=>WebGUI::International::get('editField-extras-label', "Asset_DataForm")
+		-hoverHelp=>WebGUI::International::get('editField-extras-label description', "Asset_DataForm")
 		);
         $f->textarea(
 		-name=>"possibleValues",
 		-label=>WebGUI::International::get(24,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('24 description',"Asset_DataForm"),
 		-value=>$field{possibleValues},
 		-subtext=>'<br>'.WebGUI::International::get(85,"Asset_DataForm")
 		);
         $f->textarea(
 		-name=>"defaultValue",
 		-label=>WebGUI::International::get(25,"Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('25 description',"Asset_DataForm"),
 		-value=>$field{defaultValue},
 		-subtext=>'<br>'.WebGUI::International::get(85,"Asset_DataForm")
 		);

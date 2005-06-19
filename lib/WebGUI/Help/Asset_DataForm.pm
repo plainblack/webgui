@@ -81,6 +81,54 @@ our $HELP = {
 		title => '62',
 		body => '72',
 		fields => [
+                        {
+                                title => '104',
+                                description => '104 description'
+                        },
+                        {
+                                title => '77',
+                                description => '77 description'
+                        },
+                        {
+                                title => '102',
+                                description => '102 description'
+                        },
+                        {
+                                title => '21',
+                                description => '21 description'
+                        },
+                        {
+                                title => '22',
+                                description => '22 description'
+                        },
+                        {
+                                title => '23',
+                                description => '23 description'
+                        },
+                        {
+                                title => '8',
+                                description => '8 description'
+                        },
+                        {
+                                title => '27',
+                                description => '27 description'
+                        },
+                        {
+                                title => 'editField-vertical-label',
+                                description => 'editField-vertical-label description'
+                        },
+                        {
+                                title => 'editField-extras-label',
+                                description => 'editField-extras-label description'
+                        },
+                        {
+                                title => '24',
+                                description => '24 description'
+                        },
+                        {
+                                title => '25',
+                                description => '25 description'
+                        },
 		],
 		related => [
 			{
