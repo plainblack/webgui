@@ -1840,11 +1840,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 		lastUpdated => 1031514049
 	},
 
-	'11' => {
-		message => q|Empty trash.|,
-		lastUpdated => 1051514049
-	},
-
 	'492' => {
 		message => q|Profile fields list.|,
 		lastUpdated => 1031514049

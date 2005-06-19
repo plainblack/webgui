@@ -289,11 +289,11 @@ sub getToolbar {
 		my $toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
 		my $i18n = WebGUI::International->new("Asset");
 		return '<script type="text/javascript">
-                var contextMenu = new contextMenu_create("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
+                var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
                 contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("copy").'");
                 contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
                 contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
-                contextMenu.draw();
+                contextMenu.print();
                 </script>'.$toolbar;
 	}
 	return $self->SUPER::getToolbar();

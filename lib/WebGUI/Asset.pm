@@ -68,7 +68,6 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  $hashref=               WebGUI::Asset->get();
  $AdminConsoleObject=    WebGUI::Asset->getAdminConsole();
  $arrayRef=              WebGUI::Asset->getAssetAdderLinks($string);
- $JavaScript=            WebGUI::Asset->getAssetManagerControl(\%hashref, $string, $bool);
  $arrayRef=              WebGUI::Asset->getAssetsInClipboard($boolean, $string);
  $arrayRef=              WebGUI::Asset->getAssetsInTrash($boolean, $string);
  $containerRef=          $asset->getContainer();
@@ -784,94 +783,6 @@ sub getAssetAdderLinks {
 	return \@sortedLinks;
 }
 
-#-------------------------------------------------------------------
-
-=head2 getAssetManagerControl ( children [,controlType,removeRank] )
-
-Returns a text string of HTML code (Javascript) for the Asset Manager Control Page. English only.
-
-=head3 children
-
-A hashref of the children of the Asset to be managed.
-
-=head3 controlType
-
-An optional string representing the controlType (manager.assetType) to be passed to the assetManager script.
-
-=head3 removeRank
-
-manager.disableDisplay(0) is added to the script if parameter is defined.
-
-=cut
-
-sub getAssetManagerControl {
-	my $self = shift;
-	my $children = shift;
-	my $controlType = shift || "ManageAssets";
-	my $removeRank = shift;
-	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Tools.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/ContextMenu.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Asset.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/Display.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/EventManager.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManager.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/AssetManagerAsset.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/CrumbTrailAsset.js', {type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/'.$controlType.'.js', {type=>"text/javascript"});# if (defined $controlType);
-	my $output = '
-		<div id="contextMenu" class="contextMenu"></div>
-   		<div id="propertiesWindow" class="propertiesWindow"></div>
-   		<div id="crumbtrail"></div>
-   		<div id="workspace">Retrieving Assets...</div>
-   		<div id="dragImage" class="dragIdentifier">hello</div>
-		';
-	$output .= "<script>\n";
-	$output .= "/* assetId, url, title */\nvar crumbtrail = [\n";
-	my $ancestors = $self->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
-	my @dataArray;
-	foreach my $ancestor (@{$ancestors}) {
-		my $title = $ancestor->getTitle;
-		$title =~ s/\'/\\\'/g;
-		push(@dataArray,"['".$ancestor->getId."','".$ancestor->getUrl."','".$title."']\n");
-	}
-	my $i18n = WebGUI::International->new("Asset");
-	$output .= join(",",@dataArray);
-	$output .= "];\n";
-	$output .= "var columnHeadings = ['".$i18n->get("rank")."','".$i18n->get("99")."','".$i18n->get("type")."','".$i18n->get("last updated")."','".$i18n->get("size")."'];\n";
-	$output .= "/*rank, title, type, lastUpdate, size, url, assetId, icon */\nvar assets = [\n";
-	@dataArray = ();
-	foreach my $child (@{$children}) {
-		my $title = $child->getTitle;
-		$title =~ s/\'/\\\'/g;
-		push(@dataArray, '['.$child->getRank.",'".$title."','".$child->getName."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))."','".formatBytes($child->get("assetSize"))."','".$child->getUrl."','".$child->getId."','".$child->getIcon(1)."']\n");
-#my $hasChildren = "false";
-		#$hasChildren = "true" if ($child->hasChildren);
-		#$output .= $hasChildren;
-	}
-	$output .= join(",",@dataArray);
-	$output .= "];\n var labels = new Array();\n";
-	$output .= "labels['edit'] = '".$i18n->get("edit")."';\n";
-	$output .= "labels['cut'] = '".$i18n->get("cut")."';\n";
-	$output .= "labels['copy'] = '".$i18n->get("copy")."';\n";
-	$output .= "labels['view'] = '".$i18n->get("view")."';\n";
-	$output .= "labels['delete'] = '".$i18n->get("delete")."';\n";
-	$output .= "labels['restore'] = '".$i18n->get("restore")."';\n";
-	$output .= "labels['shortcut'] = '".$i18n->get("create shortcut")."';\n";
-	$output .= "labels['purge'] = '".$i18n->get("purge")."';\n";
-	$output .= "labels['go'] = '".$i18n->get("manage")."';\n";
-	$output .= "labels['editTree'] = '".$i18n->get("edit branch")."';\n";
-	$output .= "var manager = new AssetManager(assets,columnHeadings,labels,crumbtrail);\n";
-	$output .= "manager.assetType='".$controlType."';\n" if (defined $controlType);
-	$output .= "manager.disableDisplay(0);\n" if (defined $removeRank);
-	if ($controlType eq "ManageTrash" || $controlType eq "ManageClipboard") {
-		$output .= "manager.displayCrumbTrail = false;\n";
-	#	$output .= "manager.sortEnabled = false;\n";
-	}
-	$output .= "manager.renderAssets();\n";
-	$output .= "</script>\n";
-	return $output;
-}
 
 #-------------------------------------------------------------------
 
@@ -1710,15 +1621,15 @@ sub getToolbar {
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
-	#return '<img src="'.$self->getIcon(1).'" border="0" title="'.$self->getName.'" alt="'.$self->getName.'" align="absmiddle">'.$toolbar;
 	my $i18n = WebGUI::International->new("Asset");
 	return '<script type="text/javascript">
-		var contextMenu = new contextMenu_create("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
+		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
+		contextMenu.addLink("'.$self->getUrl("func=editTree").'","'.$i18n->get("edit branch").'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
 		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
 		contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
-		contextMenu.draw();
+		contextMenu.print();
 		</script>'.$toolbar;
 }
 
@@ -3259,12 +3170,57 @@ Main page to manage assets. Renders an AdminConsole with a list of assets. If ca
 sub www_manageAssets {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $children = $self->getLineage(["children"],{returnObjects=>1});
-	my $output = $self->getAssetManagerControl($children);
-	$output .= ' <div class="adminConsoleSpacer">
+  	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
+        WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
+  	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+        WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
+        my $i18n = WebGUI::International->new("Asset");
+	my $ancestors = $self->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
+        my @crumbtrail;
+        foreach my $ancestor (@{$ancestors}) {
+                push(@crumbtrail,'<a href="'.$ancestor->getUrl("func=manageAssets").'">'.$ancestor->getTitle.'</a>');
+        }
+	my $output = '<div class="am-crumbtrail">'.join(" > ",@crumbtrail).'</div>';
+	$output .= "
+   <script type=\"text/javascript\">
+     var assetManager = new AssetManager();
+         assetManager.AddColumn('','','center','form');
+         assetManager.AddColumn('','','center','');
+         assetManager.AddColumn('".$i18n->get("rank")."','','right','numeric');
+         assetManager.AddColumn('".$i18n->get("99")."','','left','');
+         assetManager.AddColumn('".$i18n->get("type")."','','left','');
+         assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
+         assetManager.AddColumn('".$i18n->get("size")."','','right','');
+         assetManager.AddColumn('Locked','','center','');\n";
+	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
+		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
+                contextMenu.addLink("'.$child->getUrl("func=editTree").'","'.$i18n->get("edit branch").'");
+                contextMenu.addLink("'.$child->getUrl("func=createShortcut&proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
+                contextMenu.addLink("'.$child->getUrl("func=promote").'","'.$i18n->get("promote").'");
+                contextMenu.addLink("'.$child->getUrl("func=demote").'","'.$i18n->get("demote").'");
+                contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
+         	$output .= "assetManager.AddLine('"
+			.WebGUI::Form::checkbox({
+				name=>'assetId',
+				value=>$child->getId
+				})
+			."','<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+contextMenu.draw()," 
+			.$child->getRank
+			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$child->getTitle
+			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
+			."','".formatBytes($child->get("assetSize"))."','');\n";
+         	$output .= "assetManager.AddLineSortData('','','','".$child->getTitle."','".$child->getName
+			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."','');\n";
+	}
+	$output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList");
+		assetManager.AddButton("'.$i18n->get("cut").'","cutList");
+		assetManager.AddButton("'.$i18n->get("copy").'","copyList");
+		assetManager.Write();        
+		</script> <div class="adminConsoleSpacer">
             &nbsp;
         </div>
-		<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1083,"Asset").'</legend>';
+		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.WebGUI::International::get(1083,"Asset").'</legend>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
@@ -3295,7 +3251,7 @@ sub www_manageAssets {
 		$hasClips = 1;
         }
 	if ($hasClips) {
-		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082,"Asset").'</legend>'
+		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082,"Asset").'</legend>'
 			.WebGUI::Form::formHeader()
 			.WebGUI::Form::hidden({name=>"func",value=>"pasteList"})
 			.WebGUI::Form::checkbox({extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
@@ -3325,7 +3281,7 @@ sub www_manageAssets {
 		$hasPackages = 1;
         }
 	if ($hasPackages) {
-		$output .= '<div style="float: left; padding-right: 30px; font-size: 14px;"><fieldset>
+		$output .= '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset>
 			<legend>'.WebGUI::International::get("packages","Asset").'</legend>
 			'.$packages.' </fieldset></div> ';
 	}
@@ -3366,7 +3322,36 @@ sub www_manageClipboard {
 	foreach my $assetData (@{$self->getAssetsInClipboard($limit)}) {
 		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
-	return $ac->render($self->getAssetManagerControl(\@assets,"ManageClipboard"), $header);
+WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+        WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
+        my $i18n = WebGUI::International->new("Asset");
+        my $output = "
+   <script type=\"text/javascript\">
+     var assetManager = new AssetManager();
+         assetManager.AddColumn('','','center','form');
+         assetManager.AddColumn('".$i18n->get("99")."','','left','');
+         assetManager.AddColumn('".$i18n->get("type")."','','left','');
+         assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
+         assetManager.AddColumn('".$i18n->get("size")."','','right','');
+         \n";
+        foreach my $child (@assets) {
+                $output .= "assetManager.AddLine('"
+                        .WebGUI::Form::checkbox({
+                                name=>'assetId',
+                                value=>$child->getId
+                                })
+                        ."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$child->getTitle
+                        ."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+                        ."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
+                        ."','".formatBytes($child->get("assetSize"))."');\n";
+                $output .= "assetManager.AddLineSortData('','".$child->getTitle."','".$child->getName
+                        ."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
+        }
+        $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList");
+		assetManager.AddButton("'.$i18n->get("restore").'","restoreList");
+                assetManager.Write();        
+                </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
+	return $ac->render($output, $header);
 }
 
 #-------------------------------------------------------------------
@@ -3411,18 +3396,42 @@ sub www_manageTrash {
 	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
 		$header = WebGUI::International::get(965,"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10),"Asset");
-		$ac->addSubmenuItem($self->getUrl('func=emptyTrash&systemTrash=1'), WebGUI::International::get(967,"Asset"), 
-			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"',"Asset");
 	} else {
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash&systemTrash=1'), WebGUI::International::get(964),"Asset");
-		$ac->addSubmenuItem($self->getUrl('func=emptyTrash'), WebGUI::International::get(11,"Asset"),
-			'onclick="return window.confirm(\''.WebGUI::International::get(651).'\')"',"Asset");
 		$limit = 1;
 	}
 	foreach my $assetData (@{$self->getAssetsInTrash($limit)}) {
 		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
-	return $ac->render($self->getAssetManagerControl(\@assets,"ManageTrash",1), $header);
+  	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+        WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
+        my $i18n = WebGUI::International->new("Asset");
+	my $output = "
+   <script type=\"text/javascript\">
+     var assetManager = new AssetManager();
+         assetManager.AddColumn('','','center','form');
+         assetManager.AddColumn('".$i18n->get("99")."','','left','');
+         assetManager.AddColumn('".$i18n->get("type")."','','left','');
+         assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
+         assetManager.AddColumn('".$i18n->get("size")."','','right','');
+         \n";
+	foreach my $child (@assets) {
+         	$output .= "assetManager.AddLine('"
+			.WebGUI::Form::checkbox({
+				name=>'assetId',
+				value=>$child->getId
+				})
+			."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$child->getTitle
+			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
+			."','".formatBytes($child->get("assetSize"))."');\n";
+         	$output .= "assetManager.AddLineSortData('','".$child->getTitle."','".$child->getName
+			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
+	}
+	$output .= 'assetManager.AddButton("'.$i18n->get("restore").'","restoreList");
+		assetManager.Write();        
+		</script> <div class="adminConsoleSpacer"> &nbsp;</div>';
+	return $ac->render($output, $header);
 }
 
 
@@ -3473,24 +3482,6 @@ sub www_promote {
 	return $self->getContainer->www_view;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_purgeList ( )
-
-Purges assets from "trash".  Returns the Manage Trash asset list.
-
-=cut
-
-sub www_purgeList {
-	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $id ($session{cgi}->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($id);
-		$asset->purge;
-	}
-	return $self->www_manageTrash();
-}
 
 #-------------------------------------------------------------------
 

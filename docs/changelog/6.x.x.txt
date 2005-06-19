@@ -3,6 +3,12 @@
  - All form field labels have been internationalized.
  - Added hover help. (Special thanks to Colin Kuskie for all his help with
    this.)
+ - Removed long since depricated support for the eopro editor.
+ - Class icon context menus are now left click enabled rather than right click
+   enabled because some users were confused by right clicking on a web page,
+   and mac users, having only one mouse button, couldn't do it.
+ - Rewrote the asset manager UI to have a little less whiz-bang and a bunch
+   more user friendliness due to user feedback.
 
 6.6.3
  - Fixed a recurring transaction commerce bug.

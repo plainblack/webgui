@@ -25,12 +25,6 @@ our $I18N = {
 		context => q|Column heading in asset manager.|
 	},
 	
-	'purge' => {
-		message => q|Purge|,
-		lastUpdated => 0,
-		context => q|Used in asset context menus.|
-	},
-	
 	'restore' => {
 		message => q|Restore|,
 		lastUpdated => 0,
@@ -444,10 +438,6 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
                     lastUpdated => 1073152790,
                     message => q|Printable Style|
                   },
-        '967' => {
-                   lastUpdated => 1052850265,
-                   message => q|Empty system trash.|
-                 },
         '959' => {
                    lastUpdated => 1052850265,
                    message => q|Empty system clipboard.|
@@ -582,10 +572,6 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
         '497' => {
                    lastUpdated => 1031514049,
                    message => q|Start Date|
-                 },
-        '651' => {
-                   lastUpdated => 1101514049,
-                   message => q|Emptying your trash will remove these assets from your site forever. Are you sure you want to continue?|
                  },
         '498' => {
                    lastUpdated => 1031514049,
