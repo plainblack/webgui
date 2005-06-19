@@ -1,6 +1,8 @@
 6.7.0
  - fix [ 1221284 ] Operation\user.pm i18n {internationalize labels}
  - All form field labels have been internationalized.
+ - Added hover help. (Special thanks to Colin Kuskie for all his help with
+   this.)
 
 6.6.3
  - Fixed a recurring transaction commerce bug.

@@ -218,12 +218,28 @@ sub _subtext {
 
 #-------------------------------------------------------------------
 sub _tableFormRow {
-	unless ($_[0]->{_noTable}) {
-		my $class = $_[0]->{_class};
+	my $self = shift;
+	my $label = shift;
+	my $formControl = shift;
+	my $hoverHelp = shift;
+	unless ($self->{_noTable}) {
+		my $class = $self->{_class};
 		$class = qq| class="$class" | if($class);
-        	return '<tr'.$class.'><td class="formDescription" valign="top" style="width: 25%;">'.$_[1].'</td><td class="tableData" style="width: 75%;">'.$_[2]."</td></tr>\n";
+		$hoverHelp =~ s/\r/ /g;	
+		$hoverHelp =~ s/\n/ /g;	
+		$hoverHelp =~ s/&amp;/& amp;/g;	
+		$hoverHelp =~ s/&gt;/& gt;/g;	
+		$hoverHelp =~ s/&lt;/& lt;/g;	
+		$hoverHelp =~ s/&/&amp;/g;	
+		$hoverHelp =~ s/>/&gt;/g;	
+		$hoverHelp =~ s/</&lt;/g;	
+		$hoverHelp =~ s/"/&quot;/g;	
+		$hoverHelp =~ s/'/\\'/g;	
+		$hoverHelp =~ s/^\s+//;
+		my $tooltip = qq|onmouseover="return escape('$hoverHelp')"| if ($hoverHelp);
+        	return '<tr'.$class.'><td '.$tooltip.' class="formDescription" valign="top" style="width: 25%;">'.$label.'</td><td class="tableData" style="width: 75%;">'.$formControl."</td></tr>\n";
 	} else {
-		return $_[2];
+		return $formControl;
 	}
 }
 
@@ -274,11 +290,15 @@ If value is not specified we'll use this instead.
 
 What UI level is required to see this control.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub asset {
         my ($self, @p) = @_;
-        my ($name, $label, $value, $class, $extras, $subtext, $defaultValue, $uiLevel) = rearrange([qw(name label value class extras subtext defaultValue uiLevel)], @p);
+        my ($name, $label, $value, $class, $extras, $subtext, $defaultValue, $uiLevel, $hoverHelp) = rearrange([qw(name label value class extras subtext defaultValue uiLevel hoverHelp)], @p);
 	my $output;
 	if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::asset({
@@ -289,7 +309,7 @@ sub asset {
 			"defaultValue"=>$defaultValue
 			});
 		$output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output,$hoverHelp);
 	} else {
 		$output = WebGUI::Form::hidden({
 			"name"=>$name,
@@ -329,19 +349,23 @@ Extra text to describe this form element or to provide special instructions.
 
 If no value is specified, a default value to use. Defaults to "save".
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub button {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $label, $extras, $subtext, $defaultValue) = rearrange([qw(value label extras subtext defaultValue)], @p);
+        my ($value, $label, $extras, $subtext, $defaultValue, $hoverHelp) = rearrange([qw(value label extras subtext defaultValue hoverHelp)], @p);
         $output = WebGUI::Form::button({
                 "value"=>$value,
                 "extras"=>$extras,
 		"defaultValue"=>$defaultValue
                 });
         $output .= _subtext($subtext);
-        $output = $self->_tableFormRow($label,$output);
+        $output = $self->_tableFormRow($label,$output,$hoverHelp);
         $self->{_data} .= $output;
 }
 
@@ -385,13 +409,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no value is specified, we'll use this. Defaults to "1".
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub checkbox {
 	my ($output);
 	my ($self, @p) = @_;
-    	my ($name, $label, $checked, $subtext, $value, $extras, $uiLevel, $defaultValue) = 
-		rearrange([qw(name label checked subtext value extras uiLevel defaultValue)], @p);
+    	my ($name, $label, $checked, $subtext, $value, $extras, $uiLevel, $defaultValue, $hoverHelp) = 
+		rearrange([qw(name label checked subtext value extras uiLevel defaultValue hoverHelp)], @p);
 	if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::checkbox({
 			"name"=>$name,
@@ -401,7 +429,7 @@ sub checkbox {
 			"defaultValue"=>$defaultValue
 			});
 		$output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output,$hoverHelp);
 	} else {
 		if ($checked) {
 			$output = WebGUI::Form::hidden({
@@ -458,13 +486,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is passed, use this. Should be passed as an array reference.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub checkList {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name options label value vertical extras subtext uiLevel defaultValue)], @p);
+        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name options label value vertical extras subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::checkList({
 			"name"=>$name,
@@ -474,7 +506,7 @@ sub checkList {
 			"extras"=>$extras
 			});
         	$output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
 	} else {
 		$output = WebGUI::Form::hiddenList({
 			"name"=>$name,
@@ -486,11 +518,67 @@ sub checkList {
         $self->{_data} .= $output;
 }
 
+
+
+#-------------------------------------------------------------------
+
+=head2 codearea ( name [, label, value, subtext, extras, wrap, rows, columns, uiLevel, defaultValue ] )
+
+Adds a codearea row to this form. A code area is different than a standard text area in that it stretches to fill more area of the screen, and allows for text editor type keystrokes such as tabs.
+
+=head3 name
+
+The name field for this form element.
+
+=head3 label
+
+The left column label for this form row.
+
+=head3 value
+
+The default value for this form element.
+
+=head3 subtext
+
+Extra text to describe this form element or to provide special instructions.
+
+=head3 extras
+
+If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
+
+ 'onChange="this.form.submit()"'
+
+=head3 wrap
+
+The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
+        
+=head3 rows
+                
+The number of characters tall this form element should be. There should be no reason for anyone to specify this.
+                
+=head3 columns          
+                        
+The number of characters wide this form element should be. There should be no reason for anyone to specify this.
+                        
+=head3 uiLevel          
+                        
+The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
+                
+=head3 defaultValue
+                
+If no value is specified, this will be used.
+                        
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
+=cut
+
 sub codearea {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::codearea({
                         "name"=>$name,
@@ -502,7 +590,7 @@ sub codearea {
 			defaultValue =>$defaultValue
                         });
                 $output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -543,12 +631,16 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is present, will use this.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub color {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $uiLevel, $defaultValue) = rearrange([qw(name label value subtext uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $subtext, $uiLevel, $defaultValue, $hoverHelp) = rearrange([qw(name label value subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::color({
                         "name"=>$name,
@@ -556,7 +648,7 @@ sub color {
 			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
 			"name"=>$name,
@@ -616,13 +708,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is present, will use this. Should be passed as an array reference.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub combo {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name options label value size multiple extras subtext uiLevel defaultValue)], @p);
+        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name options label value size multiple extras subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::combo({
                         "name"=>$name,
@@ -634,7 +730,7 @@ sub combo {
 			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hiddenList({
 			"name"=>$name,
@@ -686,13 +782,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no value is specified, we'll use this.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub contentType {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $types, $label, $value, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name types label value extras subtext uiLevel defaultValue)], @p);
+        my ($name, $types, $label, $value, $extras, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name types label value extras subtext uiLevel defaultValue hoverHelp)], @p);
 	$uiLevel = 3 if ($uiLevel eq "");
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = WebGUI::International::get(1007) unless ($label);
@@ -704,7 +804,7 @@ sub contentType {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -752,13 +852,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is passed, we'll use this.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub databaseLink {
         my ($output, $subtext);
         my ($self, @p) = @_;
-        my ($name, $value, $label, $afterEdit, $extras, $uiLevel, $defaultValue) = 
-		rearrange([qw(name value label afterEdit extras uiLevel defaultValue)], @p);
+        my ($name, $value, $label, $afterEdit, $extras, $uiLevel, $defaultValue, $hoverHelp) = 
+		rearrange([qw(name value label afterEdit extras uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(1075);
 		if (WebGUI::Grouping::isInGroup(3)) {
@@ -774,7 +878,7 @@ sub databaseLink {
 			"defaultValue"=>$defaultValue
                 	});
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -831,13 +935,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no value is specified, use this. Defaults to today.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub date {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $size, $noDate, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value extras subtext size noDate uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $extras, $subtext, $size, $noDate, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value extras subtext size noDate uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::date({
                         "name"=>$name,
@@ -893,13 +1001,17 @@ Extra parameters such as javascript or style sheet information that you wish to 
 
 =head3 defaultValue
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub dateTime {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $uiLevel, $extras, $defaultValue) = 
-		rearrange([qw(name label value subtext uiLevel extras defaultValue)], @p);
+        my ($name, $label, $value, $subtext, $uiLevel, $extras, $defaultValue, $hoverHelp) = 
+		rearrange([qw(name label value subtext uiLevel extras defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::dateTime({
                         "name"=>$name,
@@ -951,7 +1063,7 @@ sub dynamicField {
         if (_uiLevelChecksOut($param{uiLevel})) {
 		$output = WebGUI::Form::dynamicField($fieldType, \%param);
                 $output .= _subtext($param{subtext});
-                $output = $self->_tableFormRow($param{label},$output);
+                $output = $self->_tableFormRow($param{label},$output,$param{hoverHelp});
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$param{name},
@@ -1006,13 +1118,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is specified, this will be used.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub email {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::email({
                         "name"=>$name,
@@ -1079,13 +1195,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is specified, this will be used.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub fieldType {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name types label value size multiple extras subtext uiLevel defaultValue)], @p);
+        my ($name, $types, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name types label value size multiple extras subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::fieldType({
                         "name"=>$name,
@@ -1097,7 +1217,7 @@ sub fieldType {
 			"defaultValue"=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1140,13 +1260,17 @@ The number of characters wide this form element should be. There should be no re
 
 The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub file {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $subtext, $extras, $size, $uiLevel) =
-                rearrange([qw(name label subtext extras size uiLevel)], @p);
+        my ($name, $label, $subtext, $extras, $size, $uiLevel,$hoverHelp) =
+                rearrange([qw(name label subtext extras size uiLevel hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::file({
                         "name"=>$name,
@@ -1196,13 +1320,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is present, this will be used.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub filterContent {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value extras subtext uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $extras, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value extras subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = WebGUI::International::get(418) if ($label eq "");
                 $output = WebGUI::Form::filterContent({
@@ -1212,7 +1340,7 @@ sub filterContent {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1268,13 +1396,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is specified, this will be used.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub float {
 	my ($output);
 	my ($self, @p) = @_;
-	my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-		rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
+	my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue, $hoverHelp) =
+		rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue hoverHelp)], @p);
 	if (_uiLevelChecksOut($uiLevel)) {
 		$output = WebGUI::Form::float({
 			"name"=>$name,
@@ -1285,7 +1417,7 @@ sub float {
 			defaultValue=>$defaultValue
 			});
 		$output .= _subtext($subtext);
-		$output = $self->_tableFormRow($label,$output);
+		$output = $self->_tableFormRow($label,$output,$hoverHelp);
 	} else {
 		$output = WebGUI::Form::hidden({
 			"name"=>$name,
@@ -1346,13 +1478,17 @@ An array reference containing a list of groups to exclude from the list.
 
 When no other value is specified, this will be used. Should be passed as an array reference. Defaults to "7" (Everyone).
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub group {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $excludeGroups, $defaultValue) =
-                rearrange([qw(name label value size multiple extras subtext uiLevel excludeGroups defaultValue)], @p);
+        my ($name, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $excludeGroups, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value size multiple extras subtext uiLevel excludeGroups defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		if (WebGUI::Grouping::isInGroup(3)) {
 			$subtext = manageIcon("op=listGroups").$subtext;
@@ -1367,7 +1503,7 @@ sub group {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
 		my $hashRef = WebGUI::SQL->buildHashRef("select groupId,groupName from groups");
                 $output = WebGUI::Form::hiddenList({
@@ -1462,13 +1598,17 @@ If no value is specified, this will be used.
 
 An asset Id of a rich editor config. Defaults to the default rich editor in the settings.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub HTMLArea {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue, $richEditId) =
-                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue richEditId)], @p);
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue, $richEditId, $hoverHelp) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue richEditId hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::HTMLArea({
                         "name"=>$name,
@@ -1481,7 +1621,7 @@ sub HTMLArea {
 			richEditId=>$richEditId
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1536,13 +1676,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 If no value is specified, this will be used.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub integer {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::integer({
                         "name"=>$name,
@@ -1553,7 +1697,7 @@ sub integer {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1600,13 +1744,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no value is specified, we'll use this instead. Defaults to 1.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub interval {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value extras subtext uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $extras, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value extras subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::interval({
                         "name"=>$name,
@@ -1615,7 +1763,7 @@ sub interval {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
 		my ($interval, $units) = WebGUI::DateTime::secondsToInterval($value||$defaultValue||1);
                 $output = WebGUI::Form::hidden({
@@ -1674,12 +1822,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no other value is passed, we'll use this.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub ldapLink {
    my ($output, $subtext);
    my ($self, @p) = @_;
-   my ($name, $value, $label, $size, $multiple, $afterEdit, $extras, $uiLevel, $defaultValue) = rearrange([qw(name value label size multiple afterEdit extras uiLevel defaultValue)], @p);
+   my ($name, $value, $label, $size, $multiple, $afterEdit, $extras, $uiLevel, $defaultValue, $hoverHelp) = 
+	rearrange([qw(name value label size multiple afterEdit extras uiLevel defaultValue hoverHelp)], @p);
    $size = 1 unless ($size);
    $multiple = 0 unless ($multiple);
    if (_uiLevelChecksOut($uiLevel)) {
@@ -1699,7 +1852,7 @@ sub ldapLink {
 			        "defaultValue"=>$defaultValue
                 	});
       $output .= _subtext($subtext);
-      $output = $self->_tableFormRow($label,$output);
+      $output = $self->_tableFormRow($label,$output,$hoverHelp);
    } else {
       $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1808,13 +1961,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 When no value is specified, this will be used instead.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub password {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $maxlength, $extras, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value subtext maxlength extras size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $subtext, $maxlength, $extras, $size, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value subtext maxlength extras size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::password({
                         "name"=>$name,
@@ -1825,7 +1982,7 @@ sub password {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1880,13 +2037,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 If no value is specified, we'll use this instead.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub phone {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::phone({
                         "name"=>$name,
@@ -1897,7 +2058,7 @@ sub phone {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1917,7 +2078,7 @@ Returns the HTML for this form object.
 =cut
 
 sub print {
-        return $_[0]->{_header}.$_[0]->{_data}.$_[0]->{_footer};
+        return $_[0]->{_header}.$_[0]->{_data}.$_[0]->{_footer}.'<script language="JavaScript" type="text/javascript" src="'.$session{config}{extrasURL}.'/wz_tooltip.js"></script>';
 }
 
 #-------------------------------------------------------------------
@@ -1972,13 +2133,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 If no value is specified, we'll use this instead.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub radio {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $checked, $value, $subtext, $extras, $uiLevel, $defaultValue) =
-                rearrange([qw(name label checked value subtext extras uiLevel defaultValue)], @p);
+        my ($name, $label, $checked, $value, $subtext, $extras, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label checked value subtext extras uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::radio({
                         "name"=>$name,
@@ -1988,7 +2153,7 @@ sub radio {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
 		if ($checked) {
                 	$output = WebGUI::Form::hidden({
@@ -2045,13 +2210,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 If no other value is specified, we'll use this instead.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub radioList {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(name options label value vertical extras subtext uiLevel defaultValue)], @p);
+        my ($name, $options, $label, $value, $vertical, $extras, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name options label value vertical extras subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::radioList({
                         "name"=>$name,
@@ -2062,7 +2231,7 @@ sub radioList {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
 			"name"=>$name,
@@ -2121,17 +2290,21 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 If no value is specified, we'll use this.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub readOnly {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $label, $subtext, $uiLevel, $defaultValue) =
-                rearrange([qw(value label subtext uiLevel defaultValue)], @p);
+        my ($value, $label, $subtext, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(value label subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = $value || $defaultValue;
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output, $hoverHelp);
         }
         $self->{_data} .= $output;
 }
@@ -2188,13 +2361,17 @@ A boolean value for whether the values in the options hash should be sorted.
 
 If no value is specified, this will be used. Pass as an array reference.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub selectList {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $sortByValue, $defaultValue) =
-                rearrange([qw(name options label value size multiple extras subtext uiLevel sortByValue defaultValue)], @p);
+        my ($name, $options, $label, $value, $size, $multiple, $extras, $subtext, $uiLevel, $sortByValue, $defaultValue, $hoverHelp) =
+                rearrange([qw(name options label value size multiple extras subtext uiLevel sortByValue defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::selectList({
                         "name"=>$name,
@@ -2207,7 +2384,7 @@ sub selectList {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hiddenList({
 			"name"=>$name,
@@ -2247,19 +2424,23 @@ Extra text to describe this form element or to provide special instructions.
 
 If no value is specified, this will be used. Defaults to "save".
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub submit {
         my ($output);
         my ($self, @p) = @_;
-        my ($value, $label, $extras, $subtext, $defaultValue) = rearrange([qw(value label extras subtext defaultValue)], @p);
+        my ($value, $label, $extras, $subtext, $defaultValue,$hoverHelp) = rearrange([qw(value label extras subtext defaultValue hoverHelp)], @p);
         $output = WebGUI::Form::submit({
                 "value"=>$value,
                 "extras"=>$extras,
 		defaultValue=>$defaultValue
                 });
         $output .= _subtext($subtext);
-        $output = $self->_tableFormRow($label,$output);
+        $output = $self->_tableFormRow($label,$output,$hoverHelp);
         $self->{_data} .= $output;
 }
 
@@ -2303,13 +2484,17 @@ If no value is specified, this will be used.
 
 Any extra information you want to include after the field.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub template {
         my ($output, $buttons);
         my ($self, @p) = @_;
-        my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel, $defaultValue, $subtext) = 
-		rearrange([qw(name value label namespace afterEdit extras uiLevel defaultValue subtext)], @p);
+        my ($name, $value, $label, $namespace, $afterEdit, $extras, $uiLevel, $defaultValue, $subtext,$hoverHelp) = 
+		rearrange([qw(name value label namespace afterEdit extras uiLevel defaultValue subtext hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(356);
 		my $template = WebGUI::Asset->newByDynamicClass($value);
@@ -2329,7 +2514,7 @@ sub template {
 			defaultValue=>$defaultValue
                 	});
                 $output .= _subtext($buttons.$subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -2342,7 +2527,7 @@ sub template {
 
 #-------------------------------------------------------------------
 
-=head2 text ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue ] )
+=head2 text ( name [, label, value, maxlength, extras, subtext, size, uiLevel, defaultValue, hoverHelp ] )
 
 Adds a text row to this form.
 
@@ -2384,13 +2569,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 This will be used if no value is specified.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub text {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::text({
                         "name"=>$name,
@@ -2401,7 +2590,7 @@ sub text {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -2460,13 +2649,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 This will be used if no value is specified.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub textarea {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $subtext, $extras, $wrap, $rows, $columns, $uiLevel, $defaultValue,$hoverHelp) =
+                rearrange([qw(name label value subtext extras wrap rows columns uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::textarea({
                         "name"=>$name,
@@ -2478,7 +2671,7 @@ sub textarea {
 			defaultValue =>$defaultValue
                         });
                 $output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -2529,13 +2722,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 This will be used if no value is specified.
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub timeField {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value extras subtext size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $extras, $subtext, $size, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value extras subtext size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::time({
                         "name"=>$name,
@@ -2545,7 +2742,7 @@ sub timeField {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output, $hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -2613,13 +2810,19 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 =head3 defaultValue
 
+A value to be set if value is empty.
+
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub url {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue, $hoverHelp) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::url({
                         "name"=>$name,
@@ -2630,7 +2833,7 @@ sub url {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -2681,13 +2884,17 @@ If you want to add anything special to this form element like javascript actions
 
 Used if value is not specified. 
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub whatNext {
         my ($output);
         my ($self, @p) = @_;
-        my ($options, $value, $name, $label, $subtext, $uiLevel, $extras, $defaultValue) =
-                rearrange([qw(options value name label subtext uiLevel extras defaultValue)], @p);
+        my ($options, $value, $name, $label, $subtext, $uiLevel, $extras, $defaultValue, $hoverHelp) =
+                rearrange([qw(options value name label subtext uiLevel extras defaultValue hoverHelp)], @p);
 	$uiLevel |= 1;
 	$label |= WebGUI::International::get(744);
         if (_uiLevelChecksOut($uiLevel)) {
@@ -2699,7 +2906,7 @@ sub whatNext {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -2745,13 +2952,18 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 =head3 defaultValue
 
 This will be used if value is not specified. Defaults to 1.
+
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub yesNo {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $extras, $subtext, $uiLevel) =
-                rearrange([qw(name label value extras subtext uiLevel)], @p);
+        my ($name, $label, $value, $extras, $subtext, $uiLevel, $hoverHelp) =
+                rearrange([qw(name label value extras subtext uiLevel hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::yesNo({
                         "name"=>$name,
@@ -2759,7 +2971,7 @@ sub yesNo {
                         "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
 		$value = 0 unless ($value);
                 $output = WebGUI::Form::hidden({
@@ -2814,13 +3026,17 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 
 Used if value not specified. 
 
+=head3 hoverHelp
+
+A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+
 =cut
 
 sub zipcode {
         my ($output);
         my ($self, @p) = @_;
-        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue) =
-                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue)], @p);
+        my ($name, $label, $value, $maxlength, $extras, $subtext, $size, $uiLevel, $defaultValue,$hoverHelp) =
+                rearrange([qw(name label value maxlength extras subtext size uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
                 $output = WebGUI::Form::zipcode({
                         "name"=>$name,
@@ -2831,7 +3047,7 @@ sub zipcode {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-        	$output = $self->_tableFormRow($label,$output);
+        	$output = $self->_tableFormRow($label,$output, $hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,

@@ -59,18 +59,21 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Article",
+		-hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
                 -label=>WebGUI::International::get(72,"Asset_Article"),
    		);
 	$tabform->getTab("properties")->text(
 		-name=>"linkTitle",
 		-label=>WebGUI::International::get(7,"Asset_Article"),
 		-value=>$self->getValue("linkTitle"),
+		-hoverHelp=>WebGUI::International::get('link title description','Asset_Article'),
 		-uiLevel=>3
 		);
         $tabform->getTab("properties")->url(
 		-name=>"linkURL",
 		-label=>WebGUI::International::get(8,"Asset_Article"),
 		-value=>$self->getValue("linkURL"),
+		-hoverHelp=>WebGUI::International::get('link url description','Asset_Article'),
 		-uiLevel=>3
 		);
 	$tabform->getTab("display")->yesNo(
@@ -78,6 +81,7 @@ sub getEditForm {
 		-label=>WebGUI::International::get(10,"Asset_Article"),
 		-value=>$self->getValue("convertCarriageReturns"),
 		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,"Asset_Article").'</span>',
+		-hoverHelp=>WebGUI::International::get('carriage return description','Asset_Article'),
 		-uiLevel=>5,
 		-defaultValue=>0
 		);

@@ -64,8 +64,8 @@ The following tips should also help make your migration easer:
 	
 	EXAMPLE: WebGUI::Form::formHeader({action=>$self->getUrl});
 	
-	:%s/WebGUI::URL::page/$self->getURL/gc
-	:%s/WebGUI::URL::page/$_[0]->getURL/gc
+	:%s/WebGUI::URL::page/$self->getUrl/gc
+	:%s/WebGUI::URL::page/$_[0]->getUrl/gc
 	:%s/WebGUI::HTMLForm->new\(();\|;\)/WebGUI::HTMLForm->new(-action=>$self->getUrl);/gc
 	:%s/WebGUI::Form::formHeader\(();\|;\)/WebGUI::Form::formHeader({-action=>$self->getUrl});/gc
 
@@ -112,12 +112,10 @@ The following tips should also help make your migration easer:
 	1.2.11 Rename your name() method to getName().
 
 	1.2.12 If your wobject used the forum system, then check out the new
-	lib/WebGUI/Asset/Wobject/Forum.pm system.
+	lib/WebGUI/Asset/Wobject/Collaboration.pm system.
 
-	1.2.13 If your wobject used attachments, then at bare minimum check
-	lib/WebGUI/Storage.pm, but also consider using loose coupling with 
-	lib/WebGUI/Asset/File.pm or lib/WebGUI/Asset/File/Image.pm the same
-	way that the Article wobject does.
+	1.2.13 If your wobject used attachments, then check lib/WebGUI/Storage.pm and 
+	lib/WebGUI/Storage/Image.pm
 
 	1.2.14 The parameters for the wobject processTemplate() method have changed.
 
