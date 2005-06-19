@@ -74,25 +74,29 @@ sub edit {
 	$tabform->getTab("properties")->yesNo(
                	-name=>"isHidden",
                	-value=>1,
-               	-label=>WebGUI::International::get(886,"Asset"),
+               	-label=>WebGUI::International::get(886,"FilePile"),
+               	-hoverHelp=>WebGUI::International::get('886 description',"FilePile"),
                	-uiLevel=>6
                	);
        	$tabform->getTab("properties")->yesNo(
                 -name=>"newWindow",
        	        -value=>0,
-               	-label=>WebGUI::International::get(940,"Asset"),
+               	-label=>WebGUI::International::get(940,"FilePile"),
+               	-hoverHelp=>WebGUI::International::get('940 description',"FilePile"),
                 -uiLevel=>6
        	        );
 	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
 	$tabform->getTab("security")->dateTime(
                	-name=>"startDate",
-                -label=>WebGUI::International::get(497,"Asset"),
+                -label=>WebGUI::International::get(497,"FilePile"),
+                -hoverHelp=>WebGUI::International::get('497 description',"FilePile"),
        	        -value=>$self->get("startDate"),
                	-uiLevel=>6
                 );
        	$tabform->getTab("security")->dateTime(
                	-name=>"endDate",
-                -label=>WebGUI::International::get(498,"Asset"),
+                -label=>WebGUI::International::get(498,"FilePile"),
+                -hoverHelp=>WebGUI::International::get('498 description',"FilePile"),
        	        -value=>$self->get("endDate"),
                	-uiLevel=>6
                	);
@@ -114,26 +118,30 @@ sub edit {
        	$tabform->getTab("security")->selectList(
        		-name=>"ownerUserId",
               	-options=>$users,
-       	       	-label=>WebGUI::International::get(108,"Asset"),
+       	       	-label=>WebGUI::International::get(108,"FilePile"),
+       	       	-hoverHelp=>WebGUI::International::get('108 description',"FilePile"),
        		-value=>[$self->get("ownerUserId")],
        		-subtext=>$subtext,
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdView",
-       		-label=>WebGUI::International::get(872,"Asset"),
+       		-label=>WebGUI::International::get(872,"FilePile"),
+       		-hoverHelp=>WebGUI::International::get('872 description',"FilePile"),
        		-value=>[$self->get("groupIdView")],
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdEdit",
-       		-label=>WebGUI::International::get(871,"Asset"),
+       		-label=>WebGUI::International::get(871,"FilePile"),
+       		-hoverHelp=>WebGUI::International::get('871 description',"FilePile"),
        		-value=>[$self->get("groupIdEdit")],
        		-excludeGroups=>[1,7],
        		-uiLevel=>6
        		);
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get("upload files", "Asset_FilePile"),
+		-hoverHelp=>WebGUI::International::get("upload files", "Asset_FilePile"),
 		-value=>$self->getUploadControl
 		);
         $self->getAdminConsole->setHelp("file pile add/edit","FilePile");

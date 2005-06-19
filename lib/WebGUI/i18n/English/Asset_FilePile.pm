@@ -12,50 +12,59 @@ our $I18N = {
 <P>Unlike most Assets, File Piles do not share the base set of Asset properties.  All File Piles
 have the following properties:
 
-<p>
-<b>^International("886","Asset");</b><br>
-Whether or not this asset will be hidden from the navigation menu and site maps.
-</p>
-
-<p>
-<b>^International("940","Asset");</b><br>
-Select yes to open this asset in a new window.
-</p>
-
-<p>
-<b>^International("497","Asset");</b><br>
-The date when users may begin viewing this page. Before this date only Content Managers with the rights to edit this page will see it.
-</p>
-
-<p>
-<b>^International("498","Asset");</b><br>
-The date when users will stop viewing this page. After this date only Content Managers with the rights to edit this page will see it.
-</p>
-
-<p>
-<b>^International("108","Asset");</b><br>
-The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
-</p>
-
-<p>
-<b>^International("872","Asset");</b><br>
-Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.
-</p>
-
-<p>
-<b>^International("871","Asset");</b><br>
-Choose the group that can edit this page. The group assigned editing rights can also always view the page.
-</p>
-
-<p>
-<b>^International("upload files","Asset_FilePile");</b><br>
-This is where files can be uploaded from your computer.
-</p>
-
 |,
 		context => 'Describing file pile add/edit form specific fields',
-		lastUpdated => 1111799160,
+		lastUpdated => 1119214836,
 	},
+
+        '886 description' => {
+                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
+        '940 description' => {
+                message => q|Select yes to open this asset in a new window.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
+        '497 description' => {
+                message => q|The date when users may begin viewing this page. Before this date only Content Managers with the rights to edit this page will see it.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
+        '498 description' => {
+                message => q|The date when users will stop viewing this page. After this date only Content Managers with the rights to edit this page will see it.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
+        '108 description' => {
+                message => q|The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
+        '872 description' => {
+                message => q|Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
+        '871 description' => {
+                message => q|Choose the group that can edit this page. The group assigned editing rights can also always view the page.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
+        'upload files description' => {
+                message => q|This is where files can be uploaded from your computer.
+</p>|,
+                lastUpdated => 1119214815,
+        },
+
 
 	'add pile' => {
 		message => q|Add a Pile of Files|,
@@ -69,6 +78,92 @@ This is where files can be uploaded from your computer.
 		lastUpdated => 1107387247,
 	},
 
+        '886' => {
+                   lastUpdated => 1044727952,
+                   message => q|Hide from navigation?|
+                 },
+
+        '886 description' => {
+                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.<br>
+<i>UI level: 6</i>
+</p>|,
+                lastUpdated => 1119149899,
+        },
+
+        '940' => {
+                   lastUpdated => 1050438829,
+                   message => q|Open in new window?|
+                 },
+
+        '940 description' => {
+                message => q|Select yes to open this asset in a new window.<br>
+<i>UI level: 6</i>
+</p>|,
+                lastUpdated => 1119149899,
+        }
+
+        '497' => {
+                   lastUpdated => 1031514049,
+                   message => q|Start Date|
+                 },
+
+        '497 description' => {
+                message => q|The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br>
+<i>UI level: 6</i>.
+</p>|,
+                lastUpdated => 1119149899,
+        }
+
+        '498' => {
+                   lastUpdated => 1031514049,
+                   message => q|End Date|
+                 },
+
+        '498 description' => {
+                message => q|The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br>
+<i>UI level: 6</i>
+</p>|,
+                lastUpdated => 1119149899,
+        },
+
+        '108' => {
+                   lastUpdated => 1031514049,
+                   message => q|Owner|
+                 },
+
+        '108 description' => {
+                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br>
+<i>UI level: 6</i>
+</p>
+<p> <b>NOTE:</b> The owner can only be changed by an administrator.
+</p>|,
+                lastUpdated => 1119149899,
+        },
+
+        '872' => {
+                   lastUpdated => 1044218038,
+                   message => q|Who can view?|
+                 },
+
+        '872 description' => {
+                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br>
+<i>UI level: 6</i>
+</p>|,
+                lastUpdated => 1119149899,
+        },
+
+        '871' => {
+                   lastUpdated => 1044218026,
+                   message => q|Who can edit?|
+                 },
+
+        '871 description' => {
+                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br>
+<i>UI level: 6</i>
+</p>|,
+                lastUpdated => 1119149899,
+        },
+        
 };
 
 1;
