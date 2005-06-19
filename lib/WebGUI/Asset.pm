@@ -1021,18 +1021,21 @@ sub getEditForm {
 	$tabform->getTab("properties")->text(
 		-label=>WebGUI::International::get(99,"Asset"),
 		-name=>"title",
+		-hoverHelp=>WebGUI::International::get('99 description','Asset'),
 		-value=>$self->get("title")
 		);
 	$tabform->getTab("properties")->text(
 		-label=>WebGUI::International::get(411,"Asset"),
 		-name=>"menuTitle",
 		-value=>$self->get("menuTitle"),
+		-hoverHelp=>WebGUI::International::get('411 description',"Asset"),
 		-uiLevel=>1
 		);
         $tabform->getTab("properties")->text(
                 -name=>"url",
                 -label=>WebGUI::International::get(104,"Asset"),
                 -value=>$self->get("url"),
+		-hoverHelp=>WebGUI::International::get('104 description',"Asset"),
                 -uiLevel=>3
                 );
 	$tabform->addTab("display",WebGUI::International::get(105,"Asset"),5);
@@ -1040,12 +1043,14 @@ sub getEditForm {
                 -name=>"isHidden",
                 -value=>$self->get("isHidden"),
                 -label=>WebGUI::International::get(886,"Asset"),
+		-hoverHelp=>WebGUI::International::get('886 description',"Asset"),
                 -uiLevel=>6
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"newWindow",
                 -value=>$self->get("newWindow"),
                 -label=>WebGUI::International::get(940,"Asset"),
+		-hoverHelp=>WebGUI::International::get('940 description',"Asset"),
                 -uiLevel=>6
                 );
 	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
@@ -1053,17 +1058,20 @@ sub getEditForm {
                 -name=>"encryptPage",
                 -value=>$self->get("encryptPage"),
                 -label=>WebGUI::International::get('encrypt page',"Asset"),
+		-hoverHelp=>WebGUI::International::get('encrypt page description',"Asset"),
                 -uiLevel=>6
                 );
 	$tabform->getTab("security")->dateTime(
                 -name=>"startDate",
                 -label=>WebGUI::International::get(497,"Asset"),
+		-hoverHelp=>WebGUI::International::get('497 description',"Asset"),
                 -value=>$self->get("startDate"),
                 -uiLevel=>6
                 );
         $tabform->getTab("security")->dateTime(
                 -name=>"endDate",
                 -label=>WebGUI::International::get(498,"Asset"),
+		-hoverHelp=>WebGUI::International::get('498 description',"Asset"),
                 -value=>$self->get("endDate"),
                 -uiLevel=>6
                 );
@@ -1086,6 +1094,7 @@ sub getEditForm {
                -name=>"ownerUserId",
                -options=>$users,
                -label=>WebGUI::International::get(108,"Asset"),
+		-hoverHelp=>WebGUI::International::get('108 description',"Asset"),
                -value=>[$self->get("ownerUserId")],
                -subtext=>$subtext,
                -uiLevel=>6
@@ -1093,12 +1102,14 @@ sub getEditForm {
         $tabform->getTab("security")->group(
                -name=>"groupIdView",
                -label=>WebGUI::International::get(872,"Asset"),
+		-hoverHelp=>WebGUI::International::get('872 description',"Asset"),
                -value=>[$self->get("groupIdView")],
                -uiLevel=>6
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdEdit",
                -label=>WebGUI::International::get(871,"Asset"),
+		-hoverHelp=>WebGUI::International::get('871 description',"Asset"),
                -value=>[$self->get("groupIdEdit")],
                -excludeGroups=>[1,7],
                -uiLevel=>6
@@ -1107,24 +1118,28 @@ sub getEditForm {
         $tabform->getTab("meta")->textarea(
                 -name=>"synopsis",
                 -label=>WebGUI::International::get(412,"Asset"),
+		-hoverHelp=>WebGUI::International::get('412 description',"Asset"),
                 -value=>$self->get("synopsis"),
                 -uiLevel=>3
                 );
         $tabform->getTab("meta")->textarea(
                 -name=>"extraHeadTags",
 		-label=>WebGUI::International::get("extra head tags","Asset"),
+		-hoverHelp=>WebGUI::International::get('extra head tags description',"Asset"),
                 -value=>$self->get("extraHeadTags"),
                 -uiLevel=>5
                 );
 	$tabform->getTab("meta")->yesNo(
 		-name=>"isPackage",
 		-label=>WebGUI::International::get("make package","Asset"),
+		-hoverHelp=>WebGUI::International::get('make package description',"Asset"),
 		-value=>$self->getValue("isPackage"),
 		-uiLevel=>7
 		);
 	$tabform->getTab("meta")->yesNo(
 		-name=>"isPrototype",
 		-label=>WebGUI::International::get("make prototype","Asset"),
+		-hoverHelp=>WebGUI::International::get('make prototype description',"Asset"),
 		-value=>$self->getValue("isPrototype"),
 		-uiLevel=>9
 		);
@@ -1153,6 +1168,7 @@ sub getEditForm {
                                         -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField&fid=new").'">'.
                                                         WebGUI::International::get('Add new field','Asset').
                                                         '</a></p>'
+                                        -hoverHelp=>WebGUI::International::get('make prototype description',"Asset"),
                 );
         }
 	return $tabform;

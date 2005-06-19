@@ -143,118 +143,133 @@ our $I18N = {
 	},
 
         'asset fields body' => {
-                message => q|
-<P><B>^International("asset id","Asset");</B><BR>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>
+                message => q|These are the base properties that all Assets share:<p>|,
+                context => q|Describing the form to add or edit an Asset.|,
+                lastUpdated => 1111984345,
+        },
 
-<p>
-<b>^International("99","Asset");</b><br>
-The title of the asset.  This should be descriptive, but not very long.  If left
+        'asset id description' => {
+                message => q|This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>|,
+                lastUpdated => 1119149899,
+        },
+
+        '99 description' => {
+                message => q|The title of the asset.  This should be descriptive, but not very long.  If left
 blank, this will be set to "Untitled".
 </p>
-<P><I>Note:</I> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <B>Title</B> is used to distinguish this Asset from others.</p>
+<P><I>Note:</I> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <B>Title</B> is used to distinguish this Asset from others.</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("411","Asset");</b><br>
-A shorter title that will appear in navigation.  If left blank, this will default
+        '411 description' => {
+                message => q|A shorter title that will appear in navigation.  If left blank, this will default
 to the <b>Title</b>.<br>
 <i>UI level: 1</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("104","Asset");</b><br>
-The URL for this asset.  It must be unique.  If this field is left blank, then
+        '104 description' => {
+                message => q|The URL for this asset.  It must be unique.  If this field is left blank, then
 a URL will be made from the parent's URL and the <b>Menu Title</b>.<br>
 <i>UI level: 3</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("412","Asset");</b><br>
-A short description of this Asset. <br>
+        '412 description' => {
+                message => q|A short description of this Asset. <br>
 <i>UI level: 6</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("886","Asset");</b><br>
-Whether or not this asset will be hidden from the navigation menu and site maps.<br>
+        '886 description' => {
+                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.<br>
 <i>UI level: 6</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("940","Asset");</b><br>
-Select yes to open this asset in a new window.<br>
+        '940 description' => {
+                message => q|Select yes to open this asset in a new window.<br>
 <i>UI level: 6</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>Encrypt page?</b><br>
-Should this page containing this asset be served over SSL?<br>
+        'encrypt page description' => {
+                message => q|Should the page containing this asset be served over SSL?<br>
 <i>UI level: 6</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("497","Asset");</b><br>
-The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br>
+        '497 description' => {
+                message => q|The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br>
 <i>UI level: 6</i>.
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("498","Asset");</b><br>
-The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br>
+        '498 description' => {
+                message => q|The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br>
+<i>UI level: 6</i>
+</p>|,
+                lastUpdated => 1119149899,
+        },
+
+        '108 description' => {
+                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br>
 <i>UI level: 6</i>
 </p>
+<p> <b>NOTE:</b> The owner can only be changed by an administrator.
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("108","Asset");</b><br>
-The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br>
+        '872 description' => {
+                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br>
 <i>UI level: 6</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>NOTE:</b> The owner can only be changed by an administrator.
-</p>
-
-<p>
-<b>^International("872","Asset");</b><br>
-Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br>
+        '871 description' => {
+                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br>
 <i>UI level: 6</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("871","Asset");</b><br>
-Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br>
-<i>UI level: 6</i>
-</p>
-
-<p>
-<b>^International("412","Asset");</b><br>
-A short description of this Asset.<br>
+        '412 description' => {
+                message => q|A short description of this Asset.<br>
 <i>UI level: 3</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("extra head tags","Asset");</b><br>
-These tags will be added to the &lt;HEAD&gt; section of each page that the asset appears on.<br>
+        'extra head tags description' => {
+                message => q|These tags will be added to the &lt;HEAD&gt; section of each page that the asset appears on.<br>
 <i>UI level: 5</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("make package","Asset");</b><br>
-Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
+        'make package description' => {
+                message => q|Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
 creating an Asset, or sets of Assets, is done by creating a package that can be reused
 through the site.  Check yes if you want this Asset to be available as a package.<br>
 <i>UI level: 7</i>
-</p>
+</p>|,
+                lastUpdated => 1119149899,
+        },
 
-<p>
-<b>^International("make prototype","Asset");</b><br>
-Chances are if you like assets to be configured a certain way, then you'll find prototypes useful. By setting an asset as a prototype you can create new items in your add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a prototype. From then on you can just "Add content > New Content > Photo Gallery".<br>
-<i>UI level: 9</i>
-</p>
-
-        |,
-        context => q|Describing the form to add or edit an Asset.|,
-        lastUpdated => 1111984345,
-  },
+        'make prototype description' => {
+                message => q|Chances are if you like assets to be configured a certain way, then you'll find prototypes useful. By setting an asset as a prototype you can create new items in your add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a prototype. From then on you can just "Add content > New Content > Photo Gallery".<br>
+<i>UI level: 9</i>|,
+                lastUpdated => 1119149899,
+        },
 
 	'asset fields title' => {
 	    message => q|Asset, Common Fields|,
