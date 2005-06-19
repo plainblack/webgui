@@ -164,25 +164,34 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	#return $tabform;
 	$tabform->getTab("properties")->HTMLArea(
-		-name=>"description", -label=>WebGUI::International::get(512,"Asset_Event"),
+		-name=>"description",
+                -label=>WebGUI::International::get(512,"Asset_Event"),
+                -hoverHelp=>WebGUI::International::get('512 description',"Asset_Event"),
 		-value=>$self->getValue("description")
 		);
 	$tabform->getTab("properties")->dateTime(
-		-name=>"eventStartDate", -label=>WebGUI::International::get(513,"Asset_Event"),
+		-name=>"eventStartDate",
+                -label=>WebGUI::International::get(513,"Asset_Event"),
+                -hoverHelp=>WebGUI::International::get('513 description',"Asset_Event"),
 		-extras=>'onBlur="this.form.eventEndDate.value=this.form.eventStartDate.value;this.form.until.value=this.form.eventStartDate.value;"',
 		-value=>$self->getValue("eventStartDate")
 		);
 	$tabform->getTab("properties")->dateTime(
-		-name=>"eventEndDate", -label=>WebGUI::International::get(514,"Asset_Event"),
+		-name=>"eventEndDate",
+                -label=>WebGUI::International::get(514,"Asset_Event"),
+                -hoverHelp=>WebGUI::International::get('514 description',"Asset_Event"),
 		-extras=>'onBlur="this.form.until.value=this.form.eventEndDate.value;"',
 		-value=>$self->getValue("eventEndDate")
 		);
 	$tabform->getTab("properties")->text(
-		-name=>"eventLocation", -label=>WebGUI::International::get(515,"Asset_Event"),
+		-name=>"eventLocation",
+                -label=>WebGUI::International::get(515,"Asset_Event"),
+                -hoverHelp=>WebGUI::International::get('515 description',"Asset_Event"),
 		-value=>$self->getValue("eventLocation")
 		);
 #	$tabform->getTab("properties")->yesNo(
-#		-name=>"allowRegistration", -label=>WebGUI::International::get(516,"Asset_Event"),
+#		-name=>"allowRegistration",
+#               -label=>WebGUI::International::get(516,"Asset_Event"),
 #		-value=>$self->getValue("allowRegistration")
 #		);
 #	$tabform->getTab("properties")->yesNo(
@@ -255,6 +264,7 @@ sub getEditForm {
 		);
 		$tabform->getTab("properties")->readOnly(
 			-label=>WebGUI::International::get(8,"Asset_Event"),
+			-hoverHelp=>WebGUI::International::get('8 description',"Asset_Event"),
 			-value=>WebGUI::Form::integer({
 				name=>"interval",
 				defaultValue=>1
@@ -281,6 +291,7 @@ sub getEditForm {
     -value=>$self->getValue("templateId"),
     -namespace=>"EventsCalendar/Event",
     -label=>WebGUI::International::get(530,"Asset_Event"),
+    -hoverHelp=>WebGUI::International::get('530 description',"Asset_Event"),
     -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
     );
 #	$tabform->getTab("display")->template(
