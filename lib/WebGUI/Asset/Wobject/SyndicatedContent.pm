@@ -23,8 +23,11 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Asset::Wobject;
 use XML::RSSLite;
+use XML::RSS::Creator;
 use LWP::UserAgent;
 use WebGUI::ErrorHandler;
+use WebGUI::URL;
+use WebGUI::HTTP;
 use POSIX qw/floor/;
 my $hasEncode=1;
 eval " use Encode qw(from_to); "; $hasEncode=0 if $@;
@@ -523,14 +526,18 @@ Returns the rendered output of the wobject.
 
 sub view {
 	my $self = shift;
+	my $rssFlavor = shift;
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 
         my $maxHeadlines = $self->get("maxHeadlines") || 1000000;
         my @urls = split(/\s+/,$self->get("rssUrl"));
 
+	#We came into this subroutine as
+	my $rssObject=($rssFlavor) ? XML::RSS::Creator->new(version=>$rssFlavor) : undef;
+
         my %var;
 	
-	my($item_loop,$rss_feeds)=$self->_get_items(\@urls, $maxHeadlines);
+	my($item_loop,$rss_feeds)=$self->_get_items(\@urls, $maxHeadlines,$rssObject);
 	if(@$rss_feeds > 1){
 	    #If there is more than one (valid) feed in this wobject, put in the wobject description info.
 	    $var{'channel.title'} = $self->get("title");
@@ -541,11 +548,56 @@ sub view {
 	    $var{"channel.link"} = $rss_feeds->[0]->{channel}->{link};
 	    $var{"channel.description"} = $rss_feeds->[0]->{channel}->{description};
 	}
+	$self->_createRSSURLs(\%var);
         $var{item_loop} = $item_loop;
+	
+	if ($rssObject) {
+	    $self->_constructRSS($rssObject,\%var);
+	    my $rss=$rssObject->as_string;
+	    WebGUI::HTTP::setMimeType('text/xml');
 
-        return $self->processTemplate(\%var,$self->get("templateId"));
+	    #Looks like a kludge, but what this does is put in the proper
+	    #XSLT stylesheet so the RSS doesn't look like total ass.
+	    my $siteURL=WebGUI::URL::getSiteURL().WebGUI::URL::gateway();
+	    $rss=~s|<\?xml version="1\.0" encoding="UTF\-8"\?>|<\?xml version="1\.0" encoding="UTF\-8"\?>\n<?xml\-stylesheet type="text/xsl" href="${siteURL}xslt/rss$rssFlavor.xsl"\?>\n|;
+	    return $rss;
+
+	} else {
+	    return $self->processTemplate(\%var,$self->get("templateId"));
+	}
+
 }
 
+sub _constructRSS{
+    my($self,$rssObject,$var)=@_;
+    #They've chosen to emit this as an RSS feed, in one of the four flavors we support.
+    $rssObject->channel(
+			title=>$var->{'channel.title'} || $self->get('title'),
+			link=>WebGUI::URL::page('',1),
+			description=>$var->{'channel.description'} || ''
+		       );
+    foreach my $item (@{$var->{item_loop}}) {
+	# I know this seems kludgy, but because XML::RSSLite parses
+	# feeds loosely, sometimes it returns a data structure when it shouldn't.
+	# So we're only pushing in attributes when they AREN'T a reference to 
+	# a data structure.
+	my %attributes;
+	foreach my $attribute(keys %$item){
+	    $attributes{$attribute}=$item->{$attribute} if (! ref($item->{$attribute}));
+	}
+	$rssObject->add_item(%attributes);
+    }
+}
+
+
+sub _createRSSURLs{
+    my $self=shift;
+    my $var=shift;
+    foreach({ver=>'1.0',param=>'10'},{ver=>'0.9',param=>'090'},{ver=>'0.91',param=>'091'},{ver=>'2.0',param=>'20'}){
+	$var->{'rss.url.'.$_->{ver}}=$self->getUrl('func=viewRSS'.$_->{param});
+    }
+    $var->{'rss.url'}=$self->getUrl('func=viewRSS20');
+}
 
 =head2 www_edit()
 
@@ -558,6 +610,51 @@ sub www_edit {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("syndicated content add/edit","Asset_SyndicatedContent");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("4","Asset_SyndicatedContent"));
+}
+
+=head2 www_viewRSS090()
+
+Emit an RSS 0.9 feed.
+
+=cut
+
+sub www_viewRSS090{
+    my $self=shift;
+    return $self->view('0.9');
+}
+
+=head2 www_viewRSS091()
+
+Emit an RSS 0.91 feed.
+
+=cut
+
+sub www_viewRSS091{
+    my $self=shift;
+    return $self->view('0.91');
+}
+
+=head2 www_viewRSS10()
+
+Emit an RSS 1.0 feed.
+
+=cut
+
+sub www_viewRSS10{
+    my $self=shift;
+    return $self->view('1.0');
+}
+
+
+=head2 www_viewRSS20()
+
+Emit an RSS 2.0 feed.
+
+=cut
+
+sub www_viewRSS20{
+    my $self=shift;
+    return $self->view('2.0');
 }
 
 

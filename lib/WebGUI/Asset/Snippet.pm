@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
+use WebGUI::HTTP;
 use WebGUI::Session;
 
 our @ISA = qw(WebGUI::Asset);
@@ -29,7 +30,7 @@ Package WebGUI::Asset::Snippet
 
 =head1 DESCRIPTION
 
-Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse in other pages. Can be used for things like HTML segments, javascript, and cascading style sheets.
+Provides a mechanism to publish arbitrary code snippets to WebGUI for reuse in other pages. Can be used for things like HTML segments, javascript, and cascading style sheets. You can also specify the MIME type of the snippet, allowing you to serve XML, CSS and other text files directly from the WebGUI asset system and have browsers recognize them correctly.
 
 =head1 SYNOPSIS
 
@@ -70,7 +71,12 @@ sub definition {
  			processAsTemplate=>{
                         	fieldType=>'yesNo',
                                 defaultValue=>0
+                                },
+			mimeType=>{
+                        	fieldType=>'text',
+                                defaultValue=>'text/html'
                                 }
+
                         }
                 });
         return $class->SUPER::definition($definition);
@@ -89,6 +95,10 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my %mimeTypes;
+	foreach ('text/html','text/css','text/javascript','text/plain','text/xml','application/xml') {
+	    $mimeTypes{$_}=$_;
+	} 
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
                 -label=>WebGUI::International::get('snippet', 'Asset_Snippet'),
@@ -99,6 +109,13 @@ sub getEditForm {
                 -label=>WebGUI::International::get('process as template', 'Asset_Snippet'),
                 -value=>$self->getValue("processAsTemplate")
                 );
+        $tabform->getTab("properties")->combo(
+                -name=>"mimeType",
+                -label=>WebGUI::International::get('mimeType', 'Asset_Snippet'),
+                -value=>[$self->getValue('mimeType')],
+		-options=>\%mimeTypes
+                );
+
 	return $tabform;
 }
 
@@ -180,6 +197,8 @@ A web accessible version of the view method.
 
 sub www_view {
 	my $self = shift;
+	my $mimeType=$self->getValue('mimeType');
+	WebGUI::HTTP::setMimeType($mimeType || 'text/html');
 	return $self->view(1);
 }
 

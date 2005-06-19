@@ -13,6 +13,12 @@ our $I18N = {
         	lastUpdated => 1104630516,
 	},
 
+	'mimeType' => {
+		message => q|MIME Type|,
+        	lastUpdated => 1104630516,
+	},
+	
+
 	'snippet add/edit title' => {
 		message => q|Snippet, Add/Edit|,
         	lastUpdated => 1104630516,
@@ -29,6 +35,10 @@ This is the snippet.  Either type it in or copy and paste it into the form field
 
 <p><b>Process as template?</b><br />
 This will run the snippet through the template engine. It will enable you to use session variables in the snippet, but it is a little slower.
+</p>
+
+<p><b>MIME Type</b><br />
+Allows you to specify the MIME type of this asset when viewed via the web, useful if you'd like to serve CSS, plain text,  javascript or other text files directly from the WebGUI asset system. Defaults to <b>text/html</b>.
 </p>
 |,
                 context => 'Describing snippets and its sole field.',

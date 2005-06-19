@@ -25,9 +25,9 @@ our $I18N = {
                      'lastUpdated' => 1110070203,
                      'message' => 'Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
 <p>
-Some terminology: RSS "feeds" (or "channels") are published by websites as collections of "items."
+The Syndicated Content system also has the ability to "republish" it\'s items as RSS 0.9, 0.91, 1.0 and 2.0 flavor feeds. This means you can aggregate a bunch of feeds together, filter on relevant keywords and then republish this aggregated feed, and the Syndicated Content wobject will take care of all the messy stuff for you. See the "Syndicated Content Template" help for additional information. 
 <p>
-This Syndicated Content client is a Wobject and an Asset, so it has the properties of both.  It also has
+The Syndicated Content client is a Wobject and an Asset, so it has the properties of both.  It also has
 these unique properties:
 <p>
 
@@ -72,8 +72,6 @@ Enter the maximum number of headlines that should be displayed.  Set to zero to 
                      'lastUpdated' => 1047855526,
                      'message' => 'The following are the template variables available to the Syndicated Content template.
 
-<p>
-
 <b>channel.title</b><br>
 The title of this piece of syndicated content. This will be the same as the title of the Syndicated Content object when you\'re creating an aggregate feed.
 <p>
@@ -85,6 +83,27 @@ A description of the content available through this channel. This will be the sa
 <b>channel.link</b><br>
 A URL back to the originating site of this channel. This variable *will not* exist when you\'re creating an aggregate feed, because there\'s no single channel to link to.
 <p>
+
+<b>rss.url</b><br>
+This is the URL to use to get the contents of this Syndicated Content wobject as an RSS 2.0 feed. Additionally, you can specify RSS versions via the following template variables:
+
+<blockquote>
+<b>rss.url.0.9</b><br>
+The contents of this wobject as an RSS 0.9 feed.
+<p>
+<b>rss.url.0.91</b><br>
+The contents of this wobject as an RSS 0.91 feed.
+<p>
+<b>rss.url.1.0</b><br>
+The contents of this wobject as an RSS 1.0 feed.
+<p>
+<b>rss.url.2.0</b><br>
+The contents of this wobject as an RSS 2.0 feed.
+<p>
+</blockquote>
+
+Additionally, RSS feeds are transformed into HTML via XSLT stylesheets for "friendly" in-browser viewing. These XSLT stylesheets are stored in the WebGUI collateral system as snippets.
+</p>
 
 <b>item_loop</b><br>
 A loop containing the data from this channel.
