@@ -102,13 +102,9 @@ sub duplicate {
 #-------------------------------------------------------------------
 sub getBox {
 	my $self = shift;
-	my %var;
-       	$var{"attachment.icon"} = $self->getFileIconUrl;
-       	$var{"attachment.url"} = $self->getFileUrl;
-       	$var{"attachment.name"} = $self->get("filename");
-       	$var{"attachment.size"} = $self->getStorageLocation->getFileSize;
-       	$var{"attachment.type"} = $self->getStorageLocation->getFileExtension;
-       	return $self->processTemplate(\%var,"PBtmpl0000000000000003");
+	my $var = {};
+        $self->getStorageLocation->getVars($self->get("filename"),$var);
+       	return $self->processTemplate($var,"PBtmpl0000000000000003");
 }
 
 #-------------------------------------------------------------------
@@ -125,6 +121,7 @@ sub getEditForm {
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
 			-label=>WebGUI::International::get('current file', 'Asset_File'),
+			-hoverHelp=>WebGUI::International::get('current file description', 'Asset_File'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
 			);
 		
@@ -132,6 +129,7 @@ sub getEditForm {
         $tabform->getTab("properties")->file(
                	-name=>"file",
 		-label=>WebGUI::International::get('new file', 'Asset_File'),
+		-hoverHelp=>WebGUI::International::get('new file description', 'Asset_File'),
                	);
 	return $tabform;
 }
