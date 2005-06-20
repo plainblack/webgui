@@ -3349,8 +3349,8 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
                 $output .= "assetManager.AddLineSortData('','".$child->getTitle."','".$child->getName
                         ."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
         }
-        $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList");
-		assetManager.AddButton("'.$i18n->get("restore").'","restoreList");
+        $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","this.form.func.value=\\\'deleteList\\\';this.form.submit();");
+		assetManager.AddButton("'.$i18n->get("delete").'","this.form.func.value=\\\'restoreList\\\';this.form.submit();");
                 assetManager.Write();        
                 </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);
