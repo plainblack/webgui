@@ -102,7 +102,13 @@ our $I18N = {
 		lastUpdated => 1099344172,
 		context => q|A label for the select all checkbox on the asset manager clipboard|
 	},
-	
+
+	'unselect all' => {
+		message => q|Unselect All|,
+		lastUpdated => 1119240143,
+		context => q|A label for the unselect all checkbox on the asset manager|
+	},
+
 	'packages' => {
 		message => q|Packages|,
 		lastUpdated => 1099344172,

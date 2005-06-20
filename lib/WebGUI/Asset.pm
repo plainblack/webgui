@@ -3184,8 +3184,8 @@ sub www_manageAssets {
 	$output .= "
    <script type=\"text/javascript\">
      var assetManager = new AssetManager();
-         assetManager.AddColumn('','','center','form');
-         assetManager.AddColumn('','','center','');
+         assetManager.AddColumn('&nbsp;','','center','form');
+         assetManager.AddColumn('&nbsp;','','center','');
          assetManager.AddColumn('".$i18n->get("rank")."','','right','numeric');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
@@ -3213,9 +3213,11 @@ sub www_manageAssets {
          	$output .= "assetManager.AddLineSortData('','','','".$child->getTitle."','".$child->getName
 			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."','');\n";
 	}
-	$output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList");
-		assetManager.AddButton("'.$i18n->get("cut").'","cutList");
-		assetManager.AddButton("'.$i18n->get("copy").'","copyList");
+	$output .= 'assetManager.AddButton("'.WebGUI::International::get("select all","Asset").'","var fieldList=document.assetManagerForm.assetId;for(i=0;i<fieldList.length;i++)fieldList[i].checked=true;}");
+		assetManager.AddButton("'.WebGUI::International::get("unselect all","Asset").'","var fieldList=document.assetManagerForm.assetId;for(i=0;i<fieldList.length;i++)fieldList[i].checked=false;}");
+		assetManager.AddButton("'.$i18n->get("delete").'","this.form.func.value=\\\'deleteList\\\';this.form.submit();");
+		assetManager.AddButton("'.$i18n->get("cut").'","this.form.func.value=\\\'cutList\\\';this.form.submit();");
+		assetManager.AddButton("'.$i18n->get("copy").'","this.form.func.value=\\\'copyList\\\';this.form.submit();");
 		assetManager.Write();        
 		</script> <div class="adminConsoleSpacer">
             &nbsp;

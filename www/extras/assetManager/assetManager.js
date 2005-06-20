@@ -77,7 +77,7 @@ function AssetManager_AddColumn(name,td,align,type) {
 function AssetManager_Write() {
 	var open_div = "";
 	var close_div =	"";
-	document.write('<form method="post"><input type="hidden" name="func" />');
+	document.write('<form method="post" name="assetManagerForm"><input type="hidden" name="func" />');
 	document.write('<table class="am-table">');
 	document.write('<thead><tr class="am-headers">');
 	for (var i=0; i<this.Columns.length; i++) {
@@ -104,7 +104,7 @@ function AssetManager_Write() {
 	}
 	document.write('</tbody></table>');
 	for (var j=0; j<this.Buttons.length; j++) {
-		document.write('<input type="button" onclick="this.form.func.value=\''+this.Buttons[j].func+'\';this.form.submit();" value="'+this.Buttons[j].label+'" />');
+		document.write('<input type="button" onclick="'+this.Buttons[j].func+'" value="'+this.Buttons[j].label+'" />');
 	}
 	document.write('</form>');
 }
@@ -122,11 +122,18 @@ function AssetManager_SortRows(table,column) {
 	if (table.tablecontainsforms) {
 		var iname="1";
 		var tempcolumns = new Object();
+		var tempcheckboxes = new Object();
 		for (var i=0; i<table.Lines.length; i++) {
 			for (var j=0; j<table.Columns.length; j++) {
 				if(table.Columns[j].type == "form") {
 					var cell_name = "d"+table.name+"-"+i+"-"+j;
 					tempcolumns[iname] = document.getElementById(cell_name).innerHTML;
+					// Okay, this is an even nastier hack...
+					// Other temporary arrays could be created to hold other attribute states.
+					var inputboxes = document.getElementById(cell_name).getElementsByTagName('input');
+					for(k = 0; k < inputboxes.length; k++) {
+						tempcheckboxes[iname] = inputboxes[k].checked;
+						}
 					table.Lines[i][j].text = iname;
 					iname++;
 					}
@@ -180,6 +187,10 @@ function AssetManager_SortRows(table,column) {
 				if(table.Columns[j].type == "form") {
 					var iname = table.Lines[i][j].text;
 					document.getElementById(cell_name).innerHTML = tempcolumns[iname];
+					var inputboxes = document.getElementById(cell_name).getElementsByTagName('input');
+					for(k = 0; k < inputboxes.length; k++) {
+						inputboxes[k].checked = tempcheckboxes[iname];
+						}
 					}
 				else {
 					document.getElementById(cell_name).innerHTML = table.Lines[i][j].text;
