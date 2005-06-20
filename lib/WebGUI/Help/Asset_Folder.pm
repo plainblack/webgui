@@ -6,6 +6,10 @@ our $HELP = {
 		title => 'folder add/edit title',
 		body => 'folder add/edit body',
 		fields => [
+                        {
+                                title => 'Template',
+                                description => 'Template description'
+                        },
 		],
 		related => [
 			{

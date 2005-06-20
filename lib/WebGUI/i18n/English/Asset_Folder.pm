@@ -21,16 +21,20 @@ our $I18N = {
 		message => q|<p>Folder Assets are used to display lists of Assets and subfolders just like a file browserin an operating system.</p>
 <P>Folders are Wobjects, so they have all the same properties as Wobjects and Assets.  Folders also have these unique properties and functions:</p>
 
-<p><b>Template</b><br>
-This menu permits you to select a template to style the display of the Folder contents</p>
-
-<p><b>What Next?</b><br>
-After creating a new Folder, do you wish to go back to the original page where you created the Folder
-to do you want to go to the new Folder?</p>
-
 |,
-        	lastUpdated => 1109713278,
+        	lastUpdated => 1119221349,
 	},
+
+        'Template description' => {
+                message => q|This menu permits you to select a template to style the display of the Folder contents</p>|,
+                lastUpdated => 1119221331,
+        },
+
+        'What Next? description' => {
+                message => q|After creating a new Folder, do you wish to go back to the original page where you created the Folder
+to do you want to go to the new Folder?</p>|,
+                lastUpdated => 1119221331,
+        },
 
 	'folder template title' => {
 		message => q|Folder Template|,
