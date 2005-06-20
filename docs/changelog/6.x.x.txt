@@ -9,6 +9,11 @@
    and mac users, having only one mouse button, couldn't do it.
  - Rewrote the asset manager UI to have a little less whiz-bang and a bunch
    more user friendliness due to user feedback.
+ - The File and Image assets are now considered utility assets and the default
+   way to upload files will be through the File Pile. Anyone wishing to make
+   the File and Image assets available as normal assets in the new content
+   menu are still able to do so, and existing sites will be left as they are.
+
 
 6.6.3
  - Fixed a recurring transaction commerce bug.

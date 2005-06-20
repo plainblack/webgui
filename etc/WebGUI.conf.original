@@ -87,9 +87,7 @@ paymentPlugins = ITransact
 # Specify a the list of assets you want to appear in your
 # Add Content menus.
 
-assets = WebGUI::Asset::File::Image, \
-	WebGUI::Asset::File, \
-	WebGUI::Asset::Snippet, \
+assets = WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Redirect, \
 	WebGUI::Asset::FilePile, \
 	WebGUI::Asset::Wobject::Article, \
@@ -120,7 +118,9 @@ assetContainers = WebGUI::Asset::Wobject::Layout, \
 # management.
 
 utilityAssets = WebGUI::Asset::Template, \
-		WebGUI::Asset::RichEdit
+		WebGUI::Asset::RichEdit, \ 
+		WebGUI::Asset::File::Image, \
+		WebGUI::Asset::File
 
 # Optionally specify a group id for assets to tell WebGUI what
 # group a user needs to be part of in order to add that type of
