@@ -110,7 +110,7 @@ sub insertSyndicatedContentTemplate{
      <br>
 
 </tmpl_loop>|;
-    my $template=$templates->addChild(
+    my $template=$import->addChild(
 				      {
 				       className=>'WebGUI::Asset::Template',
 				       title=>'Default Grouped Aggregate Feeds',
