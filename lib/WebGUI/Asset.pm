@@ -2467,6 +2467,10 @@ sub www_copyList {
 			$newAsset->cut;
 		}
 	}
+	if ($session{form}{proceed} ne "") {
+                my $method = "www_".$session{form}{proceed};
+                return $self->$method();
+        }
 	return $self->www_manageAssets();
 }
 
@@ -2531,6 +2535,10 @@ sub www_cutList {
 			$asset->cut;
 		}
 	}
+	if ($session{form}{proceed} ne "") {
+                my $method = "www_".$session{form}{proceed};
+                return $self->$method();
+        }
 	return $self->www_manageAssets();
 }
 
@@ -2568,6 +2576,10 @@ sub www_deleteList {
 			$asset->trash;
 		}
 	}
+	if ($session{form}{proceed} ne "") {
+                my $method = "www_".$session{form}{proceed};
+                return $self->$method();
+        }
 	return $self->www_manageAssets();
 }
 
@@ -3184,7 +3196,7 @@ sub www_manageAssets {
 	$output .= "
    <script type=\"text/javascript\">
      var assetManager = new AssetManager();
-         assetManager.AddColumn('&nbsp;','','center','form');
+         assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('&nbsp;','','center','');
          assetManager.AddColumn('".$i18n->get("rank")."','','right','numeric');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
@@ -3213,12 +3225,17 @@ sub www_manageAssets {
          	$output .= "assetManager.AddLineSortData('','','','".$child->getTitle."','".$child->getName
 			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."','');\n";
 	}
-	$output .= 'assetManager.AddButton("'.WebGUI::International::get("select all","Asset").'","var fieldList=document.assetManagerForm.assetId;for(i=0;i<fieldList.length;i++)fieldList[i].checked=true;}");
-		assetManager.AddButton("'.WebGUI::International::get("unselect all","Asset").'","var fieldList=document.assetManagerForm.assetId;for(i=0;i<fieldList.length;i++)fieldList[i].checked=false;}");
-		assetManager.AddButton("'.$i18n->get("delete").'","this.form.func.value=\\\'deleteList\\\';this.form.submit();");
-		assetManager.AddButton("'.$i18n->get("cut").'","this.form.func.value=\\\'cutList\\\';this.form.submit();");
-		assetManager.AddButton("'.$i18n->get("copy").'","this.form.func.value=\\\'copyList\\\';this.form.submit();");
+	$output .= '
+		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
+		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
+		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
 		assetManager.Write();        
+                var assetListSelectAllToggle = false;
+                function toggleAssetListSelectAll(form){
+                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
+                        for(var i = 0; i < form.assetId.length; i++)
+                        form.assetId[i].checked = assetListSelectAllToggle;
+                 }
 		</script> <div class="adminConsoleSpacer">
             &nbsp;
         </div>
@@ -3330,7 +3347,7 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
         my $output = "
    <script type=\"text/javascript\">
      var assetManager = new AssetManager();
-         assetManager.AddColumn('','','center','form');
+         assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
@@ -3349,9 +3366,15 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
                 $output .= "assetManager.AddLineSortData('','".$child->getTitle."','".$child->getName
                         ."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
         }
-        $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","this.form.func.value=\\\'deleteList\\\';this.form.submit();");
-		assetManager.AddButton("'.$i18n->get("delete").'","this.form.func.value=\\\'restoreList\\\';this.form.submit();");
+        $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageClipboard");
+		assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageClipboard");
                 assetManager.Write();        
+                var assetListSelectAllToggle = false;
+                function toggleAssetListSelectAll(form){
+                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
+                        for(var i = 0; i < form.assetId.length; i++)
+                        form.assetId[i].checked = assetListSelectAllToggle;
+                 }
                 </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);
 }
@@ -3411,7 +3434,7 @@ sub www_manageTrash {
 	my $output = "
    <script type=\"text/javascript\">
      var assetManager = new AssetManager();
-         assetManager.AddColumn('','','center','form');
+         assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
@@ -3430,8 +3453,14 @@ sub www_manageTrash {
          	$output .= "assetManager.AddLineSortData('','".$child->getTitle."','".$child->getName
 			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
 	}
-	$output .= 'assetManager.AddButton("'.$i18n->get("restore").'","restoreList");
+	$output .= 'assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
 		assetManager.Write();        
+                var assetListSelectAllToggle = false;
+                function toggleAssetListSelectAll(form){
+                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
+                        for(var i = 0; i < form.assetId.length; i++)
+                        form.assetId[i].checked = assetListSelectAllToggle;
+                 }
 		</script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);
 }
@@ -3500,6 +3529,10 @@ sub www_restoreList {
 		my $asset = WebGUI::Asset->newByDynamicClass($id);
 		$asset->publish;
 	}
+	if ($session{form}{proceed} ne "") {
+                my $method = "www_".$session{form}{proceed};
+                return $self->$method();
+        }
 	return $self->www_manageTrash();
 }
 

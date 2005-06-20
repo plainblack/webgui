@@ -39,11 +39,12 @@ function AssetManager_AddLine() {
 	}
 
 // Add a button to the form
-function AssetManager_AddButton(label,func) {
+function AssetManager_AddButton(label,func,proceed) {
 	var index = this.Buttons.length;
 	this.Buttons[index] = new Object();
 	this.Buttons[index].label = label;
 	this.Buttons[index].func = func;
+	this.Buttons[index].proceed = proceed;
 }
 
 // Define sorting data for the last line added
@@ -77,11 +78,12 @@ function AssetManager_AddColumn(name,td,align,type) {
 function AssetManager_Write() {
 	var open_div = "";
 	var close_div =	"";
-	document.write('<form method="post" name="assetManagerForm"><input type="hidden" name="func" />');
+	document.write('<form method="post" name="assetManagerForm"><input type="hidden" name="func" /><input type="hidden" name="proceed" />');
 	document.write('<table class="am-table">');
 	document.write('<thead><tr class="am-headers">');
 	for (var i=0; i<this.Columns.length; i++) {
-		document.write('<td class="am-header"><a class="sort" href="javascript:AssetManager_SortRows(assetManager,'+i+');">'+this.Columns[i].name+'</a></td>');
+		var title = (this.Columns[i].type == "form") ? this.Columns[i].name : '<a class="sort" href="javascript:AssetManager_SortRows(assetManager,'+i+');">'+this.Columns[i].name+'</a>';
+		document.write('<td class="am-header">'+title+'</td>');
 	}
 	document.write('</tr><tbody>');
 	for (var i=0; i<this.Lines.length; i++) {
@@ -104,7 +106,7 @@ function AssetManager_Write() {
 	}
 	document.write('</tbody></table>');
 	for (var j=0; j<this.Buttons.length; j++) {
-		document.write('<input type="button" onclick="'+this.Buttons[j].func+'" value="'+this.Buttons[j].label+'" />');
+		document.write('<input type="button" onclick="this.form.func.value=\''+this.Buttons[j].func+'\';this.form.proceed.value=\''+this.Buttons[j].proceed+'\';this.form.submit();" value="'+this.Buttons[j].label+'" />');
 	}
 	document.write('</form>');
 }
