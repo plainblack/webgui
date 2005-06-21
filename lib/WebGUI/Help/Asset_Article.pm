@@ -8,18 +8,22 @@ our $HELP = {
                         {
                                 title => '72',
                                 description => 'article template description',
+                                namespace => 'Asset_Article',
                         },
                         {
                                 title => '7',
                                 description => 'link title description',
+                                namespace => 'Asset_Article',
                         },
                         {
                                 title => '8',
                                 description => 'link url description',
+                                namespace => 'Asset_Article',
                         },
                         {
                                 title => '10',
                                 description => 'carriage return description',
+                                namespace => 'Asset_Article',
                         },
 		],
 		related => [

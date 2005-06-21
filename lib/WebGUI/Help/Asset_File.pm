@@ -8,21 +8,23 @@ our $HELP = {
 		fields => [
 			{
 				title => 'new file',
-				description => 'new file description'
+				description => 'new file description',
+				namespace => 'Asset_File',
 			},
 			{
 				title => 'current file',
-				description => 'current file description'
+				description => 'current file description',
+				namespace => 'Asset_File',
 			},
 		],
 		related => [
 			{
 				tag => 'asset fields',
-				namespace => 'Asset'
+				namespace => 'Asset',
 			},
 			{
 				tag => 'file template',
-				namespace => 'Asset_File'
+				namespace => 'Asset_File',
 			},
 		]
 	},
@@ -35,11 +37,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'file add/edit',
-				namespace => 'Asset_File'
+				namespace => 'Asset_File',
 			},
 			{
 				tag => 'template language',
-				namespace => 'Asset_Template'
+				namespace => 'Asset_Template',
 			},
 		]
 	},

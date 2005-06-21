@@ -60,8 +60,8 @@ sub www_viewHelp {
         $vars{body} = $i18n->get($help->{body});
         foreach my $row (@{ $help->{fields} }) {
                 push @{ $vars{fields} }, 
-                        { 'title' =>       $i18n->get($row->{title}),
-                          'description' => $i18n->get($row->{description}), }
+                        { 'title' =>       WebGUI::International::get($row->{title},$row->{namespace}),
+                          'description' => WebGUI::International::get($row->{description},$row->{namespace}), }
         }
         my $body = WebGUI::Asset::Template->new("PBtmplHelp000000000001")->process(\%vars);
     	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));

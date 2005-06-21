@@ -8,21 +8,22 @@ our $HELP = {
 		fields => [
                         {
                                 title => 'Template',
-                                description => 'Template description'
+                                description => 'Template description',
+				namespace => 'Asset_Folder',
                         },
 		],
 		related => [
 			{
 				tag => 'asset fields',
-				namespace => 'Asset'
+				namespace => 'Asset',
 			},
 			{
 				tag => 'wobject add/edit',
-				namespace => 'Wobject'
+				namespace => 'Wobject',
 			},
 			{
 				tag => 'folder template',
-				namespace => 'Asset_Folder'
+				namespace => 'Asset_Folder',
 			},
 		]
 	},
@@ -35,11 +36,11 @@ our $HELP = {
 		related => [
 			{
 				tag => 'folder add/edit',
-				namespace => 'Asset_Folder'
+				namespace => 'Asset_Folder',
 			},
 			{
 				tag => 'template language',
-				namespace => 'Asset_Template'
+				namespace => 'Asset_Template',
 			},
 		]
 	},

@@ -7,103 +7,128 @@ our $HELP = {
 		fields => [
                         {
                                 title => 'display last reply',
-                                description => 'display last reply description'
+                                description => 'display last reply description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'system template',
-                                description => 'system template description'
+                                description => 'system template description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'thread template',
-                                description => 'thread template description'
+                                description => 'thread template description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'post template',
-                                description => 'post template description'
+                                description => 'post template description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'search template',
-                                description => 'search template description'
+                                description => 'search template description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'notification template',
-                                description => 'notification template description'
+                                description => 'notification template description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'who moderates',
-                                description => 'who moderates description'
+                                description => 'who moderates description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'who posts',
-                                description => 'who posts description'
+                                description => 'who posts description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'threads/page',
-                                description => 'threads/page description'
+                                description => 'threads/page description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'posts/page',
-                                description => 'posts/page description'
+                                description => 'posts/page description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'karma/post',
-                                description => 'karma/post description'
+                                description => 'karma/post description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'karma spent to rate',
-                                description => 'karma spent to rate description'
+                                description => 'karma spent to rate description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'karma rating multiplier',
-                                description => 'karma rating multiplier description'
+                                description => 'karma rating multiplier description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'filter code',
-                                description => 'filter code description'
+                                description => 'filter code description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'sort by',
-                                description => 'sort by description'
+                                description => 'sort by description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'sort order',
-                                description => 'sort order description'
+                                description => 'sort order description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'archive after',
-                                description => 'archive after description'
+                                description => 'archive after description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'attachments/post',
-                                description => 'attachments/post description'
+                                description => 'attachments/post description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'editTimeout',
-                                description => 'editTimeout description'
+                                description => 'editTimeout description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'allow replies',
-                                description => 'allow replies description'
+                                description => 'allow replies description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'edit stamp',
-                                description => 'edit stamp description'
+                                description => 'edit stamp description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'rich edit',
-                                description => 'rich edit description'
+                                description => 'rich edit description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'content filter',
-                                description => 'content filter description'
+                                description => 'content filter description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'use preview',
-                                description => 'use preview description'
+                                description => 'use preview description',
+                                namespace => 'Asset_Collaboration',
                         },
                         {
                                 title => 'moderate',
-                                description => 'moderate description'
+                                description => 'moderate description',
+                                namespace => 'Asset_Collaboration',
                         },
 		],
 		related => [

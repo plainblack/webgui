@@ -100,7 +100,8 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
-                -label=>WebGUI::International::get('http proxy template title',"Asset_DataForm"),
+                -label=>WebGUI::International::get('http proxy template title',"Asset_HttpProxy"),
+                -hoverHelp=>WebGUI::International::get('http proxy template title description',"Asset_HttpProxy"),
       		-namespace=>"HttpProxy"
    		);
 	my %hash;
@@ -109,26 +110,31 @@ sub getEditForm {
         $tabform->getTab("properties")->url(
 		-name=>"proxiedUrl", 
 		-label=>WebGUI::International::get(1,"Asset_HttpProxy"),
+		-hoverHelp=>WebGUI::International::get('1 description',"Asset_HttpProxy"),
 		-value=>$self->getValue("proxiedUrl")
 		);
         $tabform->getTab("security")->yesNo(
         	-name=>"followExternal",
                 -label=>WebGUI::International::get(5,"Asset_HttpProxy"),
+                -hoverHelp=>WebGUI::International::get('5 description',"Asset_HttpProxy"),
                 -value=>$self->getValue("followExternal")
                 );
         $tabform->getTab("security")->yesNo(
                 -name=>"followRedirect",
                 -label=>WebGUI::International::get(8,"Asset_HttpProxy"),
+                -hoverHelp=>WebGUI::International::get('8 description',"Asset_HttpProxy"),
                 -value=>$self->getValue("followRedirect")
                 );
         $tabform->getTab("properties")->yesNo(
                 -name=>"rewriteUrls",
                 -label=>WebGUI::International::get(12,"Asset_HttpProxy"),
+                -hoverHelp=>WebGUI::International::get('12 description',"Asset_HttpProxy"),
                 -value=>$self->getValue("rewriteUrls")
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"removeStyle",
                 -label=>WebGUI::International::get(6,"Asset_HttpProxy"),
+                -hoverHelp=>WebGUI::International::get('6 description',"Asset_HttpProxy"),
                 -value=>$self->getValue("removeStyle")
                 );
 	$tabform->getTab("display")->filterContent(
@@ -139,16 +145,19 @@ sub getEditForm {
 		-name=>"timeout", 
 		-options=>\%hash, 
 		-label=>WebGUI::International::get(4,"Asset_HttpProxy"),
+		-hoverHelp=>WebGUI::International::get('4 description',"Asset_HttpProxy"),
 		-value=>[$self->getValue("timeout")]
 		);
         $tabform->getTab("display")->text(
                 -name=>"searchFor",
                 -label=>WebGUI::International::get(13,"Asset_HttpProxy"),
+                -hoverHelp=>WebGUI::International::get('13 description',"Asset_HttpProxy"),
                 -value=>$self->getValue("searchFor")
                 );
         $tabform->getTab("display")->text(
                 -name=>"stopAt",
                 -label=>WebGUI::International::get(14,"Asset_HttpProxy"),
+                -hoverHelp=>WebGUI::International::get('14 description',"Asset_HttpProxy"),
                 -value=>$self->getValue("stopAt")
                 );
 	return $tabform;

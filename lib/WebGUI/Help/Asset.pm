@@ -10,71 +10,88 @@ our $HELP = {
 		fields => [
                         {
                                 title => 'asset id',
+                                namespace => 'Asset',
                                 description => 'asset id description'
                         },
                         {
                                 title => '99',
-                                description => '99 description'
+                                description => '99 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '411',
-                                description => '411 description'
+                                description => '411 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '104',
-                                description => '104 description'
+                                description => '104 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '412',
-                                description => '412 description'
+                                description => '412 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '886',
-                                description => '886 description'
+                                description => '886 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '940',
-                                description => '940 description'
+                                description => '940 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => 'encrypt page',
-                                description => 'encrypt page description'
+                                description => 'encrypt page description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '497',
-                                description => '497 description'
+                                description => '497 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '498',
-                                description => '498 description'
+                                description => '498 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '108',
-                                description => '108 description'
+                                description => '108 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '872',
-                                description => '872 description'
+                                description => '872 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '871',
-                                description => '871 description'
+                                description => '871 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => '412',
-                                description => '412 description'
+                                description => '412 description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => 'extra head tags',
-                                description => 'extra head tags description'
+                                description => 'extra head tags description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => 'make package',
-                                description => 'make package description'
+                                description => 'make package description',
+                                namespace => 'Asset',
                         },
                         {
                                 title => 'make prototype',
-                                description => 'make prototype description'
+                                description => 'make prototype description',
+                                namespace => 'Asset',
                         },
 		],
 		related => [

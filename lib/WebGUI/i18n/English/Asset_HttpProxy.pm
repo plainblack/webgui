@@ -8,53 +8,12 @@ our $I18N = {
 
 	'11' => {
 		message => q|The HTTP Proxy wobject is a very powerful tool. It enables you to embed external sites and applications into your site. For example, if you have a web mail system that you wish your staff could access through the intranet, then you could use the HTTP Proxy to accomplish that.
-
 <p>
 
-<b>URL to proxy</b><br>
-The starting URL for the proxy.
-<p>
-
-<b>Allow proxying of other domains?</b><br>
-If you proxy a site like Yahoo! that links to other domains, do you wish to allow the user to follow the links to those other domains, or should the proxy stop them as they try to leave the original site you specified?
-<p>
-
-<b>Follow redirects?</b><br>
-Sometimes the URL to a page is actually a redirection to another page. Do you wish to follow those redirections when they occur?
-<p>
-
-<b>Rewrite URLs?</b><br>
-Switch this to No if you want to deep link an external page.
-<p>
-
-<b>Template</b><br>
-Use this select list to choose a template to show the output of the proxied content.
-<p>
-
-<b>Remove style?</b><br>
-Do you wish to remove the stylesheet from the proxied content in favor of the stylesheet from your site?
-<p>
-
-<b>Filter Content</b><br>
-Choose the level of HTML filtering you wish to apply to the proxied content.
-<p>
-
-<b>Timeout</b><br>
-The amount of time (in seconds) that WebGUI should wait for a connection before giving up on an external page.
-<p>
-
-<b>Search for</b><br>
-A search string used as starting point. Use this when you want to display only a part of the proxied content. Content before this point is not displayed
-<p>
-
-<b>Stop at</b><br>
-A search string used as ending point. Content after this point is not displayed.
-<p>
 <i>Note: The <b>Search for</b> and <b>Stop at</b> strings are included in the content in the default template. You can change this by creating your own template.</i>
 <p>
-
 |,
-		lastUpdated => 1109715109,
+		lastUpdated => 1119244182,
 	},
 
 	'http proxy template title' => {
@@ -86,6 +45,51 @@ Any text after the <b>Stop At</b> string.
 |,
 		lastUpdated => 1109714266,
 	},
+
+        '1 description' => {
+                message => q|The starting URL for the proxy.|,
+                lastUpdated => 1119244033,
+        },
+
+        '5 description' => {
+                message => q|If you proxy a site like Yahoo! that links to other domains, do you wish to allow the user to follow the links to those other domains, or should the proxy stop them as they try to leave the original site you specified?|,
+                lastUpdated => 1119244033,
+        },
+
+        '8 description' => {
+                message => q|Sometimes the URL to a page is actually a redirection to another page. Do you wish to follow those redirections when they occur?|,
+                lastUpdated => 1119244033,
+        },
+
+        '12 description' => {
+                message => q|Switch this to No if you want to deep link an external page.|,
+                lastUpdated => 1119244033,
+        },
+
+        'http proxy template title description' => {
+                message => q|Use this select list to choose a template to show the output of the proxied content.|,
+                lastUpdated => 1119244033,
+        },
+
+        '6 description' => {
+                message => q|Do you wish to remove the stylesheet from the proxied content in favor of the stylesheet from your site?|,
+                lastUpdated => 1119244033,
+        },
+
+        '4 description' => {
+                message => q|The amount of time (in seconds) that WebGUI should wait for a connection before giving up on an external page.|,
+                lastUpdated => 1119244033,
+        },
+
+        '13 description' => {
+                message => q|A search string used as starting point. Use this when you want to display only a part of the proxied content. Content before this point is not displayed|,
+                lastUpdated => 1119244033,
+        },
+
+        '14 description' => {
+                message => q|A search string used as ending point. Content after this point is not displayed.|,
+                lastUpdated => 1119244033,
+        },
 
 	'3' => {
 		message => q|HTTP Proxy|,

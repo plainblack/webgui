@@ -292,6 +292,11 @@ The URL of the web site for this theme's designer. If you are in the business of
 		lastUpdated => 1046604931
 	},
 
+	'418 description' => {
+		message => q|Choose the level of HTML filtering you wish to apply to the proxied content.|,
+		lastUpdated => 1046604931
+	},
+
 	'933' => {
 		message => q|Theme, Edit|,
 		lastUpdated => 1050430737
