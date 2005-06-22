@@ -96,6 +96,7 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-label=>WebGUI::International::get('layout template title', 'Asset_Layout'),
+      		-hoverHelp=>WebGUI::International::get('template description', 'Asset_Layout'),
       		-namespace=>"Layout"
    		);
 	if ($self->get("assetId") eq "new") {
@@ -118,6 +119,7 @@ sub getEditForm {
 			-value=>\@assetsToHide,
 			-options=>\%childIds,
 			-label=>WebGUI::International::get('assets to hide', 'Asset_Layout'),
+			-hoverHelp=>WebGUI::International::get('assets to hide description', 'Asset_Layout'),
 			-vertical=>1,
 			-uiLevel=>9
 			);

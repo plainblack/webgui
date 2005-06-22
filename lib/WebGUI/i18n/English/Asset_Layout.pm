@@ -20,26 +20,24 @@ multiple content areas, and Assets that are children of the Page can be assigned
 to be displayed in those areas.
 
 <p>Page Assets are Wobjects and Assets, and share the same properties of both.  Page
-Assets also have these unique properties:</p>
-
-<b>Template</b><br/>
-Choose a template from the list to display the contents of the Page Asset and
-its children.
-<p/>
-
-<b>What Next?</b><br/>
-After creating a new Page Asset you may either go to that new page or go back
-to the page where you created this Asset.
-<p/>
-
-<b>Assets to Hide</b><br/>
-This list contains one checkbox for each child Asset of the Page.  Select the
-checkbox for any Asset that you do not want displayed in the Page Asset.
-<p/>
-|,
+Assets also have these unique properties:</p>|,
 		context => 'Describing Page Add/Edit form specific fields',
-		lastUpdated => 1117512802,
+		lastUpdated => 1119410129,
 	},
+
+        'template description' => {
+                message => q|Choose a template from the list to display the contents of the Page Asset and
+its children.
+<p/>|,
+                lastUpdated => 1119410080,
+        },
+
+        'assets to hide description' => {
+                message => q|This list contains one checkbox for each child Asset of the Page.  Select the
+checkbox for any Asset that you do not want displayed in the Page Asset.
+<p/>|,
+                lastUpdated => 1119410080,
+        },
 
 	'layout template title' => {
 		message => q|Page Template|,

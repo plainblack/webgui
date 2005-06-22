@@ -6,6 +6,21 @@ our $HELP = {
 		title => 'layout add/edit title',
 		body => 'layout add/edit body',
 		fields => [
+                        {
+                                title => 'Template',
+                                description => 'Template description',
+                                namespace => 'Asset_Layout',
+                        },
+                        {
+                                title => '498',
+                                description => '498 description',
+                                namespace => 'Asset_FilePile',
+                        },
+                        {
+                                title => 'Assets to Hide',
+                                description => 'Assets to Hide description',
+                                namespace => 'Asset_Layout',
+                        },
 		],
 		related => [
 			{
