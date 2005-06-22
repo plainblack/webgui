@@ -95,62 +95,62 @@ our $HELP = {
 		fields => [
                         {
                                 title => '104',
-                                description => '104 description'
+                                description => '104 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '77',
-                                description => '77 description'
+                                description => '77 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '102',
-                                description => '102 description'
+                                description => '102 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '21',
-                                description => '21 description'
+                                description => '21 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '22',
-                                description => '22 description'
+                                description => '22 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '23',
-                                description => '23 description'
+                                description => '23 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '8',
-                                description => '8 description'
+                                description => '8 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '27',
-                                description => '27 description'
+                                description => '27 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => 'editField-vertical-label',
-                                description => 'editField-vertical-label description'
+                                description => 'editField-vertical-label description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => 'editField-extras-label',
-                                description => 'editField-extras-label description'
+                                description => 'editField-extras-label description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '24',
-                                description => '24 description'
+                                description => '24 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
                                 title => '25',
-                                description => '25 description'
+                                description => '25 description',
                                 namespace => 'Asset_DataForm',
                         },
 		],
