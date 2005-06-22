@@ -500,6 +500,7 @@ my $lastCollateralFolderId = 'nolastid';
 my ($parentId, $baseLineage);
 my $sth = WebGUI::SQL->read("select * from collateral order by collateralFolderId");
 while (my $data = $sth->hashRef) {
+	next if ($data->{filename} eq "");
 	print "\t\tConverting collateral item ".$data->{collateralId}." for folder ".$data->{collateralFolderId}."\n" unless ($quiet);
 	unless ($lastCollateralFolderId eq $data->{collateralFolderId}) {
 		my $id = $data->{collateralFolderId};
