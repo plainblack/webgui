@@ -100,7 +100,7 @@ have the following properties:
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,
-        }
+        },
 
         '497' => {
                    lastUpdated => 1031514049,
@@ -112,7 +112,7 @@ have the following properties:
 <i>UI level: 6</i>.
 </p>|,
                 lastUpdated => 1119149899,
-        }
+        },
 
         '498' => {
                    lastUpdated => 1031514049,
