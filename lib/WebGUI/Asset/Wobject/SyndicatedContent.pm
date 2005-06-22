@@ -25,43 +25,11 @@ use WebGUI::Asset::Wobject;
 use XML::RSSLite;
 use LWP::UserAgent;
 use WebGUI::ErrorHandler;
-use POSIX qw/floor/;
 my $hasEncode=1;
 eval " use Encode qw(from_to); "; $hasEncode=0 if $@;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
-=head1 NAME
-
-Package WebGUI::Asset::Wobject::SyndicatedContent
-
-=head1 DESCRIPTION
-
-Displays items and channels from RSS feeds.
-
-=head1 SYNOPSIS
-
-use WebGUI::Asset::Wobject::SyndicatedWobject;
-
-
-=head1 METHODS
-
-These methods are available from this class:
-
-=cut
-
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
-
-Defines the properties of this asset.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
 
 
 #-------------------------------------------------------------------
@@ -78,31 +46,19 @@ sub definition {
 				},
 			rssUrl=>{
 				defaultValue=>undef,
-				fieldType=>"textarea"
+				fieldType=>"url"
 				},
                         maxHeadlines=>{
 				fieldType=>"integer",
 				defaultValue=>10
 				},
-			displayMode=>{
-				      fieldType=>"text",
-				      defaultValue=>"interleaved"
-				     },
-			hasTerms=>{
-				   fieldType=>"text",
-				   defaultValue=>""
-				  }
 			}
 		});
         return $class->SUPER::definition($definition);
 }
 
-=head2 getName ()
 
-Returns the icons associated with this asset.
-
-=cut
-
+#-------------------------------------------------------------------
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
@@ -110,35 +66,18 @@ sub getIcon {
 	return $session{config}{extrasURL}.'/assets/syndicatedContent.gif';
 }
 
-
-=head2 getName ()
-
-Returns the displayable name of this asset.
-
-=cut
-
+#-------------------------------------------------------------------
 sub getName {
         return WebGUI::International::get(2,"Asset_SyndicatedContent");
 }
 
-=head2 getUiLevel ()
-
-Returns the displayable name of this asset.
-
-=cut
-
+#-------------------------------------------------------------------
 sub getUiLevel {
         return 6;
 }
 
+
 #-------------------------------------------------------------------
-
-=head2 getEditForm ()
-
-Returns the TabForm object that will be used in generating the edit page for this asset.
-
-=cut
-
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
@@ -147,44 +86,23 @@ sub getEditForm {
       		-namespace=>"SyndicatedContent",
 		-label=>WebGUI::International::get(72,"Asset_SyndicatedContent"),
    		);
-	$tabform->getTab("display")->selectList(
-		-name=>"displayMode",
-		-options=>{
-			'interleaved'=>WebGUI::International::get("interleaved","Asset_SyndicatedContent"),
-			'grouped'=>WebGUI::International::get("grouped","Asset_SyndicatedContent"),
-			 },
-		-sortByValue=>1,
-		-label=>WebGUI::International::get("displayModeLabel","Asset_SyndicatedContent"),
-		-value=>[$self->getValue('displayMode')],
-		-subtext=>WebGUI::International::get("displayModeSubtext","Asset_SyndicatedContent"),
-		);
-	$tabform->getTab("display")->text(
-		-name=>"hasTerms",
-		-label=>WebGUI::International::get("hasTermsLabel","Asset_SyndicatedContent"),
-		-maxlength=>255,
-		-value=>$self->getValue("hasTerms"),
-		);
-	$tabform->getTab("properties")->textarea(
+	$tabform->getTab("properties")->url(
 		-name=>"rssUrl",
 		-label=>WebGUI::International::get(1,"Asset_SyndicatedContent"),
 		-value=>$self->getValue("rssUrl")
 		);
-
 	$tabform->getTab("display")->integer(
 		-name=>"maxHeadlines",
 		-label=>WebGUI::International::get(3,"Asset_SyndicatedContent"),
 		-value=>$self->getValue("maxHeadlines")
 		);
-	#$tabform->addTab("rss",WebGUI::International::get("rssTabName","Asset_SyndicatedContent"));
-	
 	return $tabform;
 }
 
 #-------------------------------------------------------------------
 # strip all html tags from the given data structure.  This is important to
 # prevent cross site scripting attacks
-#my $_stripped_html = {};
-
+my $_stripped_html = {};
 sub _strip_html {
         #my ($data) = @_;
         
@@ -211,7 +129,6 @@ sub _strip_html {
 #-------------------------------------------------------------------
 # horrible kludge to find the channel or item record
 # in the varying kinds of rss structures returned by RSSLite
-
 sub _find_record {
         my ($data, $regex) = @_;
         
@@ -249,7 +166,6 @@ sub _find_record {
 # the guid, if it is a link, always means the former.
 # Also copy the first few words of the description into the title if 
 # there is no title
-
 sub _normalize_items {
         #my ($items) = @_;
         
@@ -279,7 +195,7 @@ sub _normalize_items {
 
 #-------------------------------------------------------------------
 sub _get_rss_data {
-        my $url = shift;
+        my ($url) = @_;
         
         my $cache = WebGUI::Cache->new("url:" . $url, "RSS");
         my $rss_serial = $cache->get;
@@ -307,16 +223,19 @@ sub _get_rss_data {
 			}
 				
 		}
+
+                
+                # there is no encode_entities_numeric that I can find, so I am 
+                # commenting this out. -hal
+                #    $xml =~ s#(<title>)(.*?)(</title>)#$1.encode_entities_numeric(decode_entities($2)).$3#ges;
+                #    $xml =~ s#(<description>)(.*?)(</description>)#$1.encode_entities_numeric(decode_entities($2)).$3#ges; 
                 
                 my $rss_lite = {};
                 eval {
                         XML::RSSLite::parseXML($rss_lite, \$xml);
                 };
                 if ($@) {
-                        WebGUI::ErrorHandler::warn("error parsing rss for url $url :".$@);
-			#Returning undef on a parse failure is a change from previous behaviour,
-			#but it SHOULDN'T have a major effect.
-			return undef;
+                        WebGUI::ErrorHandler::warn("error parsing rss for url $url");
                 }
                 
                 # make sure that the {channel} points to the channel 
@@ -324,7 +243,6 @@ sub _get_rss_data {
                 # of items.  without this voodoo, different versions of 
                 # rss return the data in different places in the data 
                 # structure.
-
                 $rss_lite = {channel => $rss_lite};
                 if (!($rss->{channel} = 
                       _find_record($rss_lite, qr/^channel$/))) {
@@ -333,19 +251,13 @@ sub _get_rss_data {
                 if (!($rss->{items} = _find_record($rss_lite, qr/^items?$/))) {
                         WebGUI::ErrorHandler::warn("unable to find item info for url $url");
                         $rss->{items} = [];
-		}
+                }
                 
                 _strip_html($rss);
                  $rss->{items} = [ $rss->{items} ] unless (ref $rss->{items} eq 'ARRAY');
 
                 _normalize_items($rss->{items});
-
-		#Assign dates "globally" rather than when seen in a viewed feed.
-		#This is important because we can "filter" now and want to ensure we keep order
-		#correctly as new items appear.
-		_assign_rss_dates($rss->{items});
-
-                #Default to an hour timeout
+                
                 $cache->set(Storable::freeze($rss), 3600);
         }
         
@@ -356,7 +268,6 @@ sub _get_rss_data {
 # rss items don't have a standard date, so timestamp them the first time
 # we see them and use that timestamp as the date.  Periodically nuke the
 # whole database to keep the thing from growing too large
-
 sub _assign_rss_dates {
         my ($items) = @_;
         
@@ -374,189 +285,113 @@ sub _assign_rss_dates {
   }
 
 #-------------------------------------------------------------------
-# $items is the hashref to put items into.
-# $rss_feeds is an arrayref of all the feeds in this wobject
-# The only difference between an "interleaved" feed and a grouped feed
-# is the order the items are output.
-
-sub _create_grouped_items{
-    my($items,$rss_feeds,$maxHeadlines,$hasTermsRegex)=@_;
-    
-    _create_interleaved_items($items,$rss_feeds,$maxHeadlines,$hasTermsRegex);
-    
-    @$items=sort{$a->{'site_title'} cmp $b->{'site_title'}} @$items;
-    
-    #Loop through the items and output the "site_
-    my $siteTitleTracker;
-    foreach(@$items){
-	if($siteTitleTracker ne $_->{site_title}){
-	    $_->{new_rss_site}=1;
-	}
-	$siteTitleTracker=$_->{site_title};
-    }
-}
-
-
-#-------------------------------------------------------------------
-# Loop through the feeds for this wobject 
-# and push in the items in "interleaved mode"
-# No need to return because we're doing everything by reference.
-
-sub _create_interleaved_items{
-    my($items,$rss_feeds,$maxHeadlines,$hasTermsRegex)=@_;
-    my $items_remain = 1;
-    while((@$items < $maxHeadlines) && $items_remain){
-	foreach my $rss(@$rss_feeds){
-	    $items_remain=0;
-	    if(defined $rss->{items}
-	       && @$items < $maxHeadlines
-	       && (my $item = shift @{$rss->{items}})
-	      ){
-		$item->{site_title}=$rss->{channel}->{title};
-		$item->{site_link}=$rss->{channel}->{link};
-		if(! $hasTermsRegex || _check_hasTerms($item,$hasTermsRegex)){
-		    push(@{$items},$item);
-		} 
-		if (@{$rss->{items}}) {
-		    $items_remain = 1;
-		}
-	    }
-	}
-    }
-}
-
-#-------------------------------------------------------------------
-# Uses the regex constructed in _get_items (with the terms defaulting to OR)
-# to see if the title or description associated with this item match the kinds
-# of items we're looking for.
-#
-
-sub _check_hasTerms{
-    my($item,$hasTermsRegex)=@_;
-    my $to_check=$item->{title}.$item->{description};
-    if( $to_check =~ /$hasTermsRegex/gism){
-	return 1;
-    } else {
-	return 0;
-    }
-}
-
-
-################################################################################
-sub _make_regex{
-    my $terms=shift;
-    my @terms=split(/,/,$terms);
-    return join("|",@terms);
-}
-#############################
-
-
-#-------------------------------------------------------------------
-# So- We're going to manage an "aggregate cache" that represents
-# the rendering of the cumulative feeds in a Syndicated Wobject,
-# but let each feed "fend for itself" based on URL in the cache.
-#
-# This means we can set up the hourly task to get and cache each
-# individual feed WITHOUT having to re-request (undoubtedly the slowest
-# part of every RSS parsing action is the network traffic) each feed 
-# when we re-render each aggregrate representation.
-#
-# If, however, a feed expires between hourly tasks, it will be re-requested and
-# parsed per the usual. BUT, if a feed ever goes un-requested for more than an hour,
-# then it's retrieval schedule will be taken over by the hourly task, and we'll
-# be pre-seeding the RSS object cache automatically.
-#
-# Having the caching set up this way means we can re-use the same raw feed all over the site without
-# having each wobject request it separately, ASSUMING the URL is the same.
-#
-# All the values that may have an effect on the composition of items
-# are included in the cache key for the aggregate representation.
-
-sub _get_items {
+sub _get_aggregate_items {
 	my $self = shift;
 	my $urls = shift;
 	my $maxHeadlines = shift;
         
-	my $displayMode=$self->getValue('displayMode');
-
-	my $hasTermsRegex=_make_regex($self->getValue('hasTerms'));
-	my $maxHeadlines=$self->getValue('maxHeadlines');
-	
-	my $key=join(":",("aggregate", $displayMode,$hasTermsRegex,$maxHeadlines,$self->get("rssUrl")));
-
-        my $cache = WebGUI::Cache->new($key, "RSS");
+        my $cache = WebGUI::Cache->new("aggregate:" . 
+                                       $self->get("rssUrl"), "RSS");
         my $items = Storable::thaw($cache->get());
-	my @rss_feeds;
         if (!$items) {
                 $items = [];
+                my $items_remain = 1;
                 
+                my @rsss;
                 for my $url (@{$urls}) {
-		    my $rss_info=_get_rss_data($url);
-		    push(@rss_feeds, $rss_info) if($rss_info);
+                        push(@rsss, _get_rss_data($url));
                 }
-
-		#Sort feeds in order by channel title.
-		#@rss_feeds=sort{$a->{channel}->{title} cmp $b->{channel}->{title}} @rss_feeds;
-		
-                if ($displayMode eq 'grouped') {
-		    _create_grouped_items($items,\@rss_feeds,$maxHeadlines,$hasTermsRegex);
-		} else {
-		    _create_interleaved_items($items,\@rss_feeds,$maxHeadlines,$hasTermsRegex);
-		}
+                
+                while ((@{$items} < $maxHeadlines) && $items_remain) {
+                        $items_remain = 0;
+                        for my $rss (@rsss) {
+                                if ($rss->{items} && 
+                                    (my $item = shift(@{$rss->{items}}))) {
+                                        push(@{$items}, 
+                                             {site_title => $rss->{channel}->{title},
+                                              site_link => $rss->{channel}->{link},
+                                              link => $item->{link},
+                                              title => $item->{title},
+                                              description => $item->{description},
+                                             });
+                                        if (@{$rss->{items}}) {
+                                                $items_remain = 1;
+                                        }
+                                }
+                        }
+                }
+                
+                _assign_rss_dates($items);
                 
                 @{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
                 
+                #if (@{$items} > $_aggregate_size) {
+                #  @{$items} = @{$items}[0..($_aggregate_size-1)];
+                #}
+                
                 $cache->set(Storable::freeze($items), 3600);
-	    }
+        }
         
-	#So return the item loop and the first RSS feed, because 
-	#when we're parsing a single feed we can use that feed's title and 
-	#description for channel.title, channel.link, and channel.description
-        return ($items,\@rss_feeds);
-}
+        return $items;
+}  
 
-=head2 view()
-
-Returns the rendered output of the wobject.
-
-=cut
-
-sub view {
+#-------------------------------------------------------------------
+# interleave stories from each feed, up to a total of $_aggregate_size
+sub _view_aggregate_feed {
 	my $self = shift;
-	$self->logView() if ($session{setting}{passiveProfilingEnabled});
-
-        my $maxHeadlines = $self->get("maxHeadlines") || 1000000;
-        my @urls = split(/\s+/,$self->get("rssUrl"));
-
+	my $urls = shift;
+	my $maxHeadlines = shift;
         my %var;
-	
-	my($item_loop,$rss_feeds)=$self->_get_items(\@urls, $maxHeadlines);
-	if(@$rss_feeds > 1){
-	    #If there is more than one (valid) feed in this wobject, put in the wobject description info.
-	    $var{'channel.title'} = $self->get("title");
-	    $var{'channel.description'} = $self->get("description");
-	} else {
-	    #One feed. Put in the info from the feed.
-	    $var{"channel.title"} = $rss_feeds->[0]->{channel}->{title};
-	    $var{"channel.link"} = $rss_feeds->[0]->{channel}->{link};
-	    $var{"channel.description"} = $rss_feeds->[0]->{channel}->{description};
-	}
-        $var{item_loop} = $item_loop;
-
+        $var{'channel.title'} = $self->get("title");
+        $var{'channel.description'} = $self->get("description");
+        $var{item_loop} = $self->_get_aggregate_items($urls, $maxHeadlines);
+        
         return $self->processTemplate(\%var,$self->get("templateId"));
 }
 
 
-=head2 www_edit()
+#-------------------------------------------------------------------
+sub _view_single_feed {
+	my $self = shift;
+        my $maxHeadlines = shift;
+        my $rss = _get_rss_data($self->get("rssUrl"));
+        my %var;
+        $var{"channel.title"} = $rss->{channel}->{title};
+        $var{"channel.link"} = $rss->{channel}->{link};
+        $var{"channel.description"} = $rss->{channel}->{description};
+        my @items;
+        $rss->{items} ||= [];
+        for (my $i = 0; ($i < @{$rss->{items}}) && ($i < $maxHeadlines);$i++) {
+                my $item = $rss->{items}->[$i];
+                push (@items,{
+                              link=>$item->{link},
+                              title=>$item->{title},
+                              description=>$item->{description}
+                             });
+        }
+        $var{item_loop} = \@items;
+        return $self->processTemplate(\%var,$self->get("templateId"));
+}
 
-Sets parameters and returns a form to edit this wobject.
+#-------------------------------------------------------------------
+sub view {
+	my $self = shift;
+	$self->logView() if ($session{setting}{passiveProfilingEnabled});
+        my $maxHeadlines = $self->get("maxHeadlines") || 1000000;
+        my @urls = split(/\s+/,$self->get("rssUrl"));        
+        if (@urls == 1) {
+                return $self->_view_single_feed($maxHeadlines);
+        } else {
+                return $self->_view_aggregate_feed(\@urls, $maxHeadlines);
+        }
+}
 
-=cut
 
+#-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("syndicated content add/edit","Asset_SyndicatedContent");
+        $self->getAdminConsole->setHelp("syndicated content add/edit","SyndicatedContent");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("4","Asset_SyndicatedContent"));
 }
 
