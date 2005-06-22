@@ -5,6 +5,11 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		fields => [
+                        {
+                                title => '73',
+                                namespace => 'Asset_MessageBoard',
+                                description => '73 description'
+                        },
 		],
 		related => [
 			{

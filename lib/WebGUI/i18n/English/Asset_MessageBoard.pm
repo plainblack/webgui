@@ -187,6 +187,11 @@ A conditional indicating whether there is more than one forum.
 		lastUpdated => 1066584179
 	},
 
+	'73 description' => {
+		message => q|Choose a template to display your message board|,
+		lastUpdated => 1119411673
+	},
+
 	'76' => {
 		message => q|Are you certain you wish to delete this forum and all the posts it contains?|,
 		lastUpdated => 1066055963
