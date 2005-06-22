@@ -1322,7 +1322,7 @@ When no other value is present, this will be used.
 
 =head3 hoverHelp
 
-A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
+When no other value is present, this will be used.
 
 =cut
 
@@ -1333,6 +1333,7 @@ sub filterContent {
                 rearrange([qw(name label value extras subtext uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = WebGUI::International::get(418) if ($label eq "");
+                $hoverHelp = WebGUI::International::get('418 description') if ($hoverHelp eq "");
                 $output = WebGUI::Form::filterContent({
                         "name"=>$name,
                         "value"=>$value,
