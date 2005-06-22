@@ -48,7 +48,7 @@ $conf->write;
 
 #--------------------------------------------
 print "\tAdding default product template\n" unless ($quiet);
-my $import = WebGUI::Asset->newByUrl('templates');
+my $import = WebGUI::Asset->getImportNode;
 my $folder = $import->addChild({
 	title=>"Commerce/Product",
 	menuTitle=>"Commerce/Product",
