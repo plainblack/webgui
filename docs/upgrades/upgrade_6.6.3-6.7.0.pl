@@ -34,6 +34,7 @@ sub insertHelpTemplate{
 <tmpl_if fields>
 <dl>
 <tmpl_loop fields>
+
    <dt><tmpl_var title></dt>
       <dd><tmpl_var description></dd>
 </tmpl_loop>
@@ -41,7 +42,14 @@ sub insertHelpTemplate{
 </tmpl_if>
 EOT
 
-    my $folder = WebGUI::Asset->newByUrl('templates/AdminConsole');
+    my $import=WebGUI::Asset->getImportNode;
+    
+    my $folder = $import->addChild({
+				    title=>"6.7.0 Help System Template",
+				    menuTitle=>"6.7.0 Help System Template",
+				    url=>"6-7-0HelpSystemTemplate",
+				    className=>"WebGUI::Asset::Wobject::Folder"
+				   });
     $folder->addChild({
 		       namespace=>'AdminConsole',
 		       title=>'Help',
@@ -53,10 +61,10 @@ EOT
 		       template=>$helpTemplate},'PBtmplHelp000000000001');
 }
 
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub insertSyndicatedContentTemplate{
-    my $import=WebGUI::Asset->getImportNode;
-    
+
     my $template=q|<a name="<tmpl_var assetId>"></a>
 <tmpl_if session.var.adminOn>
 	<p><tmpl_var controls></p>
@@ -110,39 +118,41 @@ sub insertSyndicatedContentTemplate{
      <br>
 
 </tmpl_loop>|;
+
+    my $import=WebGUI::Asset->getImportNode;
     my $template=$import->addChild(
-				      {
-				       className=>'WebGUI::Asset::Template',
-				       title=>'Default Grouped Aggregate Feeds',
-				       namespace=>'SyndicatedContent',
-				       menuTitle=>'Default Grouped Aggregate Feeds',
-				       url=>'templates/syndicatedcontent/default_grouped_feeds',
-				       ownerUserID=>3,
-				       groupIdView=>7,
-				       groupIdEdit=>4,
-				       isHidden=>1,
-				       template=>$template
-				      },'DPUROtmpl0000000000001'
-				     );
+				   {
+				    className=>'WebGUI::Asset::Template',
+				    title=>'Default Grouped Aggregate Feeds',
+				    namespace=>'SyndicatedContent',
+				    menuTitle=>'Default Grouped Aggregate Feeds',
+				    url=>'templates/syndicatedcontent/default_grouped_feeds',
+				    ownerUserID=>3,
+				    groupIdView=>7,
+				    groupIdEdit=>4,
+				    isHidden=>1,
+				    template=>$template
+				   },'DPUROtmpl0000000000001'
+				  );
 }
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub insertXSLTSheets{
-    my $collateral=WebGUI::Asset->newByUrl('collateral');
+    my $import=WebGUI::Asset->getImportNode;
     
-    my $folder=$collateral->addChild(
-				     {
-				      className=>'WebGUI::Asset::Wobject::Folder',
-				      title=>'Syndicated Content XSLT',
-				      menuTitle=>'Syndicated Content XSLT',
-				      url=>'xslt',
-				      startDate=>time(),
-				      endDate=>time()+ 60*60*24*365*10,
-				      groupEditId=>4,
-				      groupViewId=>2
-				     }
-				    );
+    my $folder=$import->addChild(
+				 {
+				  className=>'WebGUI::Asset::Wobject::Folder',
+				  title=>'Syndicated Content XSLT',
+				  menuTitle=>'Syndicated Content XSLT',
+				  url=>'xslt',
+				  startDate=>time(),
+				  endDate=>time()+ 60*60*24*365*10,
+				  groupEditId=>4,
+				  groupViewId=>2
+				 }
+				);
     add_090xslt($folder);
     add_091xslt($folder);
     add_10xslt($folder);
