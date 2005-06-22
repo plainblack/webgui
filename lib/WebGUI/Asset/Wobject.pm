@@ -226,12 +226,14 @@ sub getEditForm {
 	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
                 -label=>WebGUI::International::get(174,'Wobject'),
+                -hoverHelp=>WebGUI::International::get('174 description','Wobject'),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5
                 );
          $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
 		-label=>WebGUI::International::get(1073,'Wobject'),
+		-hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
 		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
@@ -239,6 +241,7 @@ sub getEditForm {
          $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
 		-label=>WebGUI::International::get(1079,'Wobject'),
+		-hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
@@ -246,17 +249,20 @@ sub getEditForm {
 	$tabform->getTab("properties")->HTMLArea(
                 -name=>"description",
                 -label=>WebGUI::International::get(85,'Wobject'),
+                -hoverHelp=>WebGUI::International::get('85 description','Wobject'),
                 -value=>$self->getValue("description")
                 );
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeout",
                 -label=>WebGUI::International::get(895,'Wobject'),
+                -hoverHelp=>WebGUI::International::get('895 description','Wobject'),
                 -value=>$self->getValue("cacheTimeout"),
                 -uiLevel=>8
                 );
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeoutVisitor",
                 -label=>WebGUI::International::get(896,'Wobject'),
+                -hoverHelp=>WebGUI::International::get('896 description','Wobject'),
                 -value=>$self->getValue("cacheTimeoutVisitor"),
                 -uiLevel=>8
                 );
