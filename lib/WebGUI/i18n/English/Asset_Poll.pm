@@ -81,43 +81,52 @@ The total number of votes that have been placed on this poll.
 
 	'71' => {
 		message => q|Polls can be used to get the impressions of your users on various topics.  Polls are Wobjects and Assets so they have the basic properties of both of those.  Polls also have these unique properties:
-<p>
-<b>Active</b><br>
-If this box is checked, then users will be able to vote. Otherwise they'll only be able to see the results of the poll.
-<p>
-
-<b>Who can vote?</b><br>
-Choose a group that can vote on this Poll.  The default group is Everyone.
-<p>
-
-<b>Karma Per Vote</b><br>
-How much karma should be given to a user when they vote?  This option is only
-available if karma is enabled in the settings.  The default amount is 0.
-<p>
-
-<b>Graph Width</b><br>
-The width of the poll results graph. The width is measured in pixels.  The default
-width is 150 pixels.
-<p>
-
-<b>Question</b><br>
-What is the question you'd like to ask your users?
-<p>
-
-<b>Answers</b><br>
-Enter the possible answers to your question. Enter only one answer per line. Polls are only capable of 20 possible answers.
-<p>
-
-<b>Randomize answers?</b><br>
-In order to be sure that the ordering of the answers in the poll does not bias your users, it is often helpful to present the options in a random order each time they are shown. Select "yes" to randomize the answers on the poll.
-<p>
-
-<b>Reset votes?</b><br>
-Reset the votes on this Poll.  This option is only available when editing an existing Poll.
-<p>
 |,
-		lastUpdated => 1109998278,
+		lastUpdated => 1119412535,
 	},
+
+        '3 description' => {
+                message => q|If this box is checked, then users will be able to vote. Otherwise they'll only be able to see the results of the poll.|,
+                lastUpdated => 1119412478,
+        },
+
+        '4 description' => {
+                message => q|Choose a group that can vote on this Poll.  The default group is Everyone.|,
+                lastUpdated => 1119412478,
+        },
+
+        '20 description' => {
+                message => q|How much karma should be given to a user when they vote?  This option is only
+available if karma is enabled in the settings.  The default amount is 0.|,
+                lastUpdated => 1119412478,
+        },
+
+        '5 description' => {
+                message => q|The width of the poll results graph. The width is measured in pixels.  The default
+width is 150 pixels.|,
+                lastUpdated => 1119412478,
+        },
+
+        '6 description' => {
+                message => q|What is the question you'd like to ask your users?|,
+                lastUpdated => 1119412478,
+        },
+
+        '7 description' => {
+                message => q|Enter the possible answers to your question. Enter only one answer per line. Polls are only capable of 20 possible answers.|,
+                lastUpdated => 1119412478,
+        },
+
+        '72 description' => {
+                message => q|In order to be sure that the ordering of the answers in the poll does not bias your users, it is often helpful to present the options in a random order each time they are shown. Select "yes" to randomize the answers on the poll.|,
+                lastUpdated => 1119412478,
+        },
+
+        '10 description' => {
+                message => q|Reset the votes on this Poll.  This option is only available when editing an existing Poll.|,
+                lastUpdated => 1119412478,
+        },
+
 
 	'3' => {
 		message => q|Active|,
@@ -172,6 +181,11 @@ Reset the votes on this Poll.  This option is only available when editing an exi
 	'73' => {
 		message => q|Poll Template|,
 		lastUpdated => 1050183668
+	},
+
+	'73 description' => {
+		message => q|Select a template to display your Poll|,
+		lastUpdated => 1119412624
 	},
 
 	'10' => {

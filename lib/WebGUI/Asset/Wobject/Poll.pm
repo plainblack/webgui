@@ -174,6 +174,7 @@ sub getEditForm {
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Poll",
 		-label=>WebGUI::International::get(73,"Asset_Poll")
+		-hoverHelp=>WebGUI::International::get('73 description',"Asset_Poll")
    		);
         my ($i, $answers);
 	for ($i=1; $i<=20; $i++) {
@@ -184,17 +185,20 @@ sub getEditForm {
 	$tabform->getTab("security")->yesNo(
 		-name=>"active",
 		-label=>WebGUI::International::get(3,"Asset_Poll"),
+		-hoverHelp=>WebGUI::International::get('3 description',"Asset_Poll"),
 		-value=>$self->getValue("active")
 		);
         $tabform->getTab("security")->group(
 		-name=>"voteGroup",
 		-label=>WebGUI::International::get(4,"Asset_Poll"),
+		-hoverHelp=>WebGUI::International::get('4 description',"Asset_Poll"),
 		-value=>[$self->getValue("voteGroup")]
 		);
 	if ($session{setting}{useKarma}) {
 		$tabform->getTab("properties")->integer(
 			-name=>"karmaPerVote",
 			-label=>WebGUI::International::get(20,"Asset_Poll"),
+			-hoverHelp=>WebGUI::International::get('20 description',"Asset_Poll"),
 			-value=>$self->getValue("karmaPerVote")
 			);
 	} else {
@@ -206,27 +210,32 @@ sub getEditForm {
 	$tabform->getTab("display")->integer(
 		-name=>"graphWidth",
 		-label=>WebGUI::International::get(5,"Asset_Poll"),
+		-hoverHelp=>WebGUI::International::get('5 description',"Asset_Poll"),
 		-value=>$self->getValue("graphWidth")
 		);
 	$tabform->getTab("properties")->text(
 		-name=>"question",
 		-label=>WebGUI::International::get(6,"Asset_Poll"),
+		-hoverHelp=>WebGUI::International::get('6 description',"Asset_Poll"),
 		-value=>$self->getValue("question")
 		);
         $tabform->getTab("properties")->textarea(
 		-name=>"answers",
 		-label=>WebGUI::International::get(7,"Asset_Poll"),
+		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Poll"),
 		-subtext=>('<span class="formSubtext"><br>'.WebGUI::International::get(8,"Asset_Poll").'</span>'),
 		-value=>$answers
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"randomizeAnswers",
 		-label=>WebGUI::International::get(72,"Asset_Poll"),
+		-hoverHelp=>WebGUI::International::get('72 description',"Asset_Poll"),
 		-value=>$self->getValue("randomizeAnswers")
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"resetVotes",
 		-label=>WebGUI::International::get(10,"Asset_Poll")
+		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Poll")
 		);
 	return $tabform;
 }
