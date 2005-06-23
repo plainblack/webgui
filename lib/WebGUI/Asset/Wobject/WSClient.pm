@@ -117,7 +117,7 @@ sub definition {
 		defaultValue=>undef
          },
          cacheTTL         => {
-            fieldType     => 'integer',
+            fieldType     => 'interval',
             defaultValue  => 60,
          },
          sharedCache      => {
@@ -156,7 +156,7 @@ sub getEditForm {
    $tabform->getTab("display")->template(
       -name      => 'templateId',
       -value     => $self->getValue('templateId'),
-      -namespace => "WSClient"
+      -namespace => "WSClient",
       -label => WebGUI::International::get(72, "Asset_WSClient"),
    );
    $tabform->getTab("display")->yesNo (
@@ -240,7 +240,7 @@ sub getEditForm {
       -label   => WebGUI::International::get(28, "Asset_WSClient"),
       -value   => $self->get('sharedCache'),
    );
-   $tabform->getTab("properties")->text (
+   $tabform->getTab("properties")->interval (
       -name     => 'cacheTTL',
       -label    => WebGUI::International::get(27, "Asset_WSClient"),
       -value    => $self->get('cacheTTL'),
