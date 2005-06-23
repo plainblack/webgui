@@ -28,9 +28,10 @@ use LWP::UserAgent;
 use WebGUI::ErrorHandler;
 use WebGUI::URL;
 use WebGUI::HTTP;
+use WebGUI::Style;
 use POSIX qw/floor/;
 my $hasEncode=1;
-eval " use Encode qw(from_to); "; $hasEncode=0 if $@;
+eval ' use Encode qw(from_to); '; $hasEncode=0 if $@;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -76,30 +77,32 @@ sub definition {
                 className=>'WebGUI::Asset::Wobject::SyndicatedContent',
                 properties=>{
 			templateId =>{
-				fieldType=>"template",
+				fieldType=>'template',
 				defaultValue=>'PBtmpl0000000000000065'
 				},
 			rssUrl=>{
 				defaultValue=>undef,
-				fieldType=>"textarea"
+				fieldType=>'textarea'
 				},
                         maxHeadlines=>{
-				fieldType=>"integer",
+				fieldType=>'integer',
 				defaultValue=>10
 				},
 			displayMode=>{
-				      fieldType=>"text",
-				      defaultValue=>"interleaved"
+				      fieldType=>'text',
+				      defaultValue=>'interleaved'
 				     },
 			hasTerms=>{
-				   fieldType=>"text",
-				   defaultValue=>""
+				   fieldType=>'text',
+				   defaultValue=>''
 				  }
 			}
 		});
         return $class->SUPER::definition($definition);
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 getName ()
 
 Returns the icons associated with this asset.
@@ -114,6 +117,7 @@ sub getIcon {
 }
 
 
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 getName ()
 
 Returns the displayable name of this asset.
@@ -121,9 +125,11 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-        return WebGUI::International::get(2,"Asset_SyndicatedContent");
+        return WebGUI::International::get(2,'Asset_SyndicatedContent');
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 getUiLevel ()
 
 Returns the displayable name of this asset.
@@ -134,8 +140,8 @@ sub getUiLevel {
         return 6;
 }
 
-#-------------------------------------------------------------------
 
+#-------------------------------------------------------------------
 =head2 getEditForm ()
 
 Returns the TabForm object that will be used in generating the edit page for this asset.
@@ -145,40 +151,40 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-   	$tabform->getTab("display")->template(
+   	$tabform->getTab('display')->template(
       		-value=>$self->getValue('templateId'),
-      		-namespace=>"SyndicatedContent",
-		-label=>WebGUI::International::get(72,"Asset_SyndicatedContent"),
+      		-namespace=>'SyndicatedContent',
+		-label=>WebGUI::International::get(72,'Asset_SyndicatedContent'),
    		);
-	$tabform->getTab("display")->selectList(
-		-name=>"displayMode",
+	$tabform->getTab('display')->selectList(
+		-name=>'displayMode',
 		-options=>{
-			'interleaved'=>WebGUI::International::get("interleaved","Asset_SyndicatedContent"),
-			'grouped'=>WebGUI::International::get("grouped","Asset_SyndicatedContent"),
+			'interleaved'=>WebGUI::International::get('interleaved','Asset_SyndicatedContent'),
+			'grouped'=>WebGUI::International::get('grouped','Asset_SyndicatedContent'),
 			 },
 		-sortByValue=>1,
-		-label=>WebGUI::International::get("displayModeLabel","Asset_SyndicatedContent"),
+		-label=>WebGUI::International::get('displayModeLabel','Asset_SyndicatedContent'),
 		-value=>[$self->getValue('displayMode')],
-		-subtext=>WebGUI::International::get("displayModeSubtext","Asset_SyndicatedContent"),
+		-subtext=>WebGUI::International::get('displayModeSubtext','Asset_SyndicatedContent'),
 		);
-	$tabform->getTab("display")->text(
-		-name=>"hasTerms",
-		-label=>WebGUI::International::get("hasTermsLabel","Asset_SyndicatedContent"),
+	$tabform->getTab('display')->text(
+		-name=>'hasTerms',
+		-label=>WebGUI::International::get('hasTermsLabel','Asset_SyndicatedContent'),
 		-maxlength=>255,
-		-value=>$self->getValue("hasTerms"),
+		-value=>$self->getValue('hasTerms'),
 		);
-	$tabform->getTab("properties")->textarea(
-		-name=>"rssUrl",
-		-label=>WebGUI::International::get(1,"Asset_SyndicatedContent"),
-		-value=>$self->getValue("rssUrl")
+	$tabform->getTab('properties')->textarea(
+		-name=>'rssUrl',
+		-label=>WebGUI::International::get(1,'Asset_SyndicatedContent'),
+		-value=>$self->getValue('rssUrl')
 		);
 
-	$tabform->getTab("display")->integer(
-		-name=>"maxHeadlines",
-		-label=>WebGUI::International::get(3,"Asset_SyndicatedContent"),
-		-value=>$self->getValue("maxHeadlines")
+	$tabform->getTab('display')->integer(
+		-name=>'maxHeadlines',
+		-label=>WebGUI::International::get(3,'Asset_SyndicatedContent'),
+		-value=>$self->getValue('maxHeadlines')
 		);
-	#$tabform->addTab("rss",WebGUI::International::get("rssTabName","Asset_SyndicatedContent"));
+	#$tabform->addTab('rss',WebGUI::International::get('rssTabName','Asset_SyndicatedContent'));
 	
 	return $tabform;
 }
@@ -269,8 +275,8 @@ sub _normalize_items {
                         if (@description_words <= $max_words) {
                                 $item->{title} = $item->{description};
                         } else {
-                                $item->{title} = join(" ", @description_words[0..$max_words-1]) . 
-                                  " ...";
+                                $item->{title} = join(' ', @description_words[0..$max_words-1]) . 
+                                  ' ...';
                         }
                 }
                 
@@ -284,7 +290,7 @@ sub _normalize_items {
 sub _get_rss_data {
         my $url = shift;
         
-        my $cache = WebGUI::Cache->new("url:" . $url, "RSS");
+        my $cache = WebGUI::Cache->new('url:' . $url, 'RSS');
         my $rss_serial = $cache->get;
         my $rss = {};
         if ($rss_serial) {
@@ -303,7 +309,7 @@ sub _get_rss_data {
 		if ($] >= 5.008 && $hasEncode) {
 			$xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
 			my $xmlEncoding = $1;
-			my $encoding = "utf8";
+			my $encoding = 'utf8';
 			if (lc($xmlEncoding) ne lc($encoding)) {
 				eval {	from_to($xml, $xmlEncoding, $encoding) };
 				WebGUI::ErrorHandler::warn($@) if ($@);
@@ -366,7 +372,7 @@ sub _assign_rss_dates {
         for my $item (@{$items}) {
                 my $key = 'dates:' . ($item->{guid} || $item->{title} || 
                                       $item->{description} || $item->{link});
-                my $cache = WebGUI::Cache->new($key, "RSS");
+                my $cache = WebGUI::Cache->new($key, 'RSS');
                 if (my $date = $cache->get()) {
                         $item->{date} = $date;
                 } else {
@@ -444,14 +450,12 @@ sub _check_hasTerms{
     }
 }
 
-
-################################################################################
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _make_regex{
     my $terms=shift;
     my @terms=split(/,/,$terms);
-    return join("|",@terms);
+    return join('|',@terms);
 }
-#############################
 
 
 #-------------------------------------------------------------------
@@ -485,9 +489,9 @@ sub _get_items {
 	my $hasTermsRegex=_make_regex($self->getValue('hasTerms'));
 	my $maxHeadlines=$self->getValue('maxHeadlines');
 	
-	my $key=join(":",("aggregate", $displayMode,$hasTermsRegex,$maxHeadlines,$self->get("rssUrl")));
+	my $key=join(':',('aggregate', $displayMode,$hasTermsRegex,$maxHeadlines,$self->get('rssUrl')));
 
-        my $cache = WebGUI::Cache->new($key, "RSS");
+        my $cache = WebGUI::Cache->new($key, 'RSS');
         my $items = Storable::thaw($cache->get());
 	my @rss_feeds;
         if (!$items) {
@@ -518,6 +522,8 @@ sub _get_items {
         return ($items,\@rss_feeds);
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 view()
 
 Returns the rendered output of the wobject.
@@ -529,8 +535,9 @@ sub view {
 	my $rssFlavor = shift;
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 
-        my $maxHeadlines = $self->get("maxHeadlines") || 1000000;
-        my @urls = split(/\s+/,$self->get("rssUrl"));
+        my $maxHeadlines = $self->get('maxHeadlines') || 1000000;
+        my @urls = split(/\s+/,$self->get('rssUrl'));
+	my $title=$self->get('title');
 
 	#We came into this subroutine as
 	my $rssObject=($rssFlavor) ? XML::RSS::Creator->new(version=>$rssFlavor) : undef;
@@ -540,16 +547,19 @@ sub view {
 	my($item_loop,$rss_feeds)=$self->_get_items(\@urls, $maxHeadlines,$rssObject);
 	if(@$rss_feeds > 1){
 	    #If there is more than one (valid) feed in this wobject, put in the wobject description info.
-	    $var{'channel.title'} = $self->get("title");
-	    $var{'channel.description'} = $self->get("description");
+	    $var{'channel.title'} = $title;
+	    $var{'channel.description'} = $self->get('description');
 	} else {
 	    #One feed. Put in the info from the feed.
-	    $var{"channel.title"} = $rss_feeds->[0]->{channel}->{title};
-	    $var{"channel.link"} = $rss_feeds->[0]->{channel}->{link};
-	    $var{"channel.description"} = $rss_feeds->[0]->{channel}->{description};
+	    $var{'channel.title'} = $rss_feeds->[0]->{channel}->{title} || $title;
+	    $var{'channel.link'} = $rss_feeds->[0]->{channel}->{link};
+	    $var{'channel.description'} = $rss_feeds->[0]->{channel}->{description};
 	}
 	$self->_createRSSURLs(\%var);
         $var{item_loop} = $item_loop;
+
+	#Construct the title for the link.
+	_constructRSSHeadTitleLink(\%var,$title || $var{'channel.title'});
 	
 	if ($rssObject) {
 	    $self->_constructRSS($rssObject,\%var);
@@ -563,11 +573,25 @@ sub view {
 	    return $rss;
 
 	} else {
-	    return $self->processTemplate(\%var,$self->get("templateId"));
+	    return $self->processTemplate(\%var,$self->get('templateId'));
 	}
 
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+sub _constructRSSHeadTitleLink{
+    my($var,$rssTitle)=@_;
+    my $rssFeedSuffix=WebGUI::International::get('RSS Feed Title Suffix','Asset_SyndicatedContent');
+    WebGUI::Style::setLink($var->{'rss.url'},
+			   { rel=>	'alternate', 
+			     type=>	'application/rss+xml', 
+			     title=> ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix }
+			  );
+}
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _constructRSS{
     my($self,$rssObject,$var)=@_;
     #They've chosen to emit this as an RSS feed, in one of the four flavors we support.
@@ -590,6 +614,7 @@ sub _constructRSS{
 }
 
 
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _createRSSURLs{
     my $self=shift;
     my $var=shift;
@@ -599,6 +624,8 @@ sub _createRSSURLs{
     $var->{'rss.url'}=$self->getUrl('func=viewRSS20');
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 www_edit()
 
 Sets parameters and returns a form to edit this wobject.
@@ -608,10 +635,12 @@ Sets parameters and returns a form to edit this wobject.
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("syndicated content add/edit","Asset_SyndicatedContent");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("4","Asset_SyndicatedContent"));
+        $self->getAdminConsole->setHelp('syndicated content add/edit','Asset_SyndicatedContent');
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('4','Asset_SyndicatedContent'));
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 www_viewRSS090()
 
 Emit an RSS 0.9 feed.
@@ -623,6 +652,8 @@ sub www_viewRSS090{
     return $self->view('0.9');
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 www_viewRSS091()
 
 Emit an RSS 0.91 feed.
@@ -634,6 +665,8 @@ sub www_viewRSS091{
     return $self->view('0.91');
 }
 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 www_viewRSS10()
 
 Emit an RSS 1.0 feed.
@@ -646,6 +679,7 @@ sub www_viewRSS10{
 }
 
 
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 www_viewRSS20()
 
 Emit an RSS 2.0 feed.
