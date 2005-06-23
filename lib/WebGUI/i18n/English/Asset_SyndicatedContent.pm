@@ -1,10 +1,10 @@
 package WebGUI::i18n::English::Asset_SyndicatedContent;
 
 our $I18N = {
-           '1' => {
-                    'lastUpdated' => 1031514049,
-                    'message' => 'URL to RSS File'
-                  },
+	     '1' => {
+		     'lastUpdated' => 1031514049,
+		     'message' => 'URL to RSS File'
+		    },
            '2' => {
                     'lastUpdated' => 1031514049,
                     'message' => 'Syndicated Content'
@@ -156,9 +156,13 @@ A URL directly to the content of the item.
                               'lastUpdated' => 1047855526,
                               'message' => 'Interleaved'
                             },
-           'rssTabName' => {
-                             'lastUpdated' => 1118417024,
-                             'message' => 'RSS'
-                           }
+	     'rssTabName' => {
+			      'lastUpdated' => 1118417024,
+			      'message' => 'RSS'
+			     },
+	     'RSS Feed Title Suffix' => {
+			    'lastUpdated' => 1118417024,
+			    'message' => 'RSS 2.0 Feed'
+                           },
          };
 1;
