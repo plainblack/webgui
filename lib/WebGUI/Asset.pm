@@ -1219,10 +1219,6 @@ An integer describing how many levels of ancestry from the start point that shou
 
 An array reference containing a list of asset classes to remove from the result set. The opposite of the includOnlyClasses rule.
 
-=head4 returnQuickReadObjects
-
-A boolean indicating that we should return objects that contain only base asset information rather than asset ids. This is mainly useful for navigation, clipboard, trash, and other system level functions.
-
 =head4 returnObjects
 
 A boolean indicating that we should return objects rather than asset ids.
@@ -3211,6 +3207,8 @@ sub www_manageAssets {
                 contextMenu.addLink("'.$child->getUrl("func=promote").'","'.$i18n->get("promote").'");
                 contextMenu.addLink("'.$child->getUrl("func=demote").'","'.$i18n->get("demote").'");
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
+		my $title = $child->getTitle;
+		$title =~ s/\'/\\\'/g;
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
 				name=>'assetId',
@@ -3218,11 +3216,11 @@ sub www_manageAssets {
 				})
 			."','<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+contextMenu.draw()," 
 			.$child->getRank
-			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$child->getTitle
+			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
 			."','".formatBytes($child->get("assetSize"))."','');\n";
-         	$output .= "assetManager.AddLineSortData('','','','".$child->getTitle."','".$child->getName
+         	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."','');\n";
 	}
 	$output .= '
@@ -3354,16 +3352,18 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
         foreach my $child (@assets) {
+		my $title = $child->getTitle;
+                $title =~ s/\'/\\\'/g;
                 $output .= "assetManager.AddLine('"
                         .WebGUI::Form::checkbox({
                                 name=>'assetId',
                                 value=>$child->getId
                                 })
-                        ."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$child->getTitle
+                        ."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
                         ."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
                         ."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
                         ."','".formatBytes($child->get("assetSize"))."');\n";
-                $output .= "assetManager.AddLineSortData('','".$child->getTitle."','".$child->getName
+                $output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
                         ."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
         }
         $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageClipboard");
@@ -3441,16 +3441,18 @@ sub www_manageTrash {
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
 	foreach my $child (@assets) {
+		my $title = $child->getTitle;
+                $title =~ s/\'/\\\'/g;
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
 				name=>'assetId',
 				value=>$child->getId
 				})
-			."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$child->getTitle
+			."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
 			."','".formatBytes($child->get("assetSize"))."');\n";
-         	$output .= "assetManager.AddLineSortData('','".$child->getTitle."','".$child->getName
+         	$output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
 			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
 	}
 	$output .= 'assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
