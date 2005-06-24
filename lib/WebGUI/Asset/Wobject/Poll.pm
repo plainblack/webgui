@@ -223,7 +223,7 @@ sub getEditForm {
 		-name=>"answers",
 		-label=>WebGUI::International::get(7,"Asset_Poll"),
 		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Poll"),
-		-subtext=>('<span class="formSubtext"><br>'.WebGUI::International::get(8,"Asset_Poll").'</span>'),
+		-subtext=>('<span class="formSubtext"><br />'.WebGUI::International::get(8,"Asset_Poll").'</span>'),
 		-value=>$answers
 		);
 	$tabform->getTab("display")->yesNo(
@@ -234,7 +234,7 @@ sub getEditForm {
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"resetVotes",
-		-label=>WebGUI::International::get(10,"Asset_Poll")
+		-label=>WebGUI::International::get(10,"Asset_Poll"),
 		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Poll")
 		);
 	return $tabform;
