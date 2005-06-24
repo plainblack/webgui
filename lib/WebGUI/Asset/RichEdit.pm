@@ -256,16 +256,19 @@ sub getEditForm {
 	$buttonGrid .= "</table>";
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get('toolbar buttons', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('toolbar buttons description', 'Asset_RichEdit'),
 		-value=>$buttonGrid
 		);
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("askAboutRichEdit"),
 		-label=>WebGUI::International::get('using rich edit', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('using rich edit description', 'Asset_RichEdit'),
 		-name=>"askAboutRichEdit"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("preformatted"),
 		-label=>WebGUI::International::get('preformatted', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('preformatted description', 'Asset_RichEdit'),
 		-name=>"preformatted",
                 -uiLevel=>9
                 );
@@ -273,52 +276,61 @@ sub getEditForm {
 		-value=>$self->getValue("extendedValidElements"),
 		-name=>"extendedValidElements",
 		-label=>WebGUI::International::get('extended elements', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('extended elements description', 'Asset_RichEdit'),
 		-subtext=>WebGUI::International::get('extended elements subtext', 'Asset_RichEdit'),
 		-uiLevel=>9
 		);
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("editorHeight"),
 		-label=>WebGUI::International::get('editor height', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('editor height description', 'Asset_RichEdit'),
 		-name=>"editorHeight",
                 -uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("editorWidth"),
 		-label=>WebGUI::International::get('editor width', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('editor width description', 'Asset_RichEdit'),
 		-name=>"editorWidth",
 		-uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("sourceEditorHeight"),
 		-label=>WebGUI::International::get('source editor height', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('source editor height description', 'Asset_RichEdit'),
 		-name=>"sourceEditorHeight"
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("sourceEditorWidth"),
 		-label=>WebGUI::International::get('source editor width', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('source editor width description', 'Asset_RichEdit'),
 		-name=>"sourceEditorWidth"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("useBr"),
 		-label=>WebGUI::International::get('use br', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('use br description', 'Asset_RichEdit'),
 		-name=>"useBr",
                 -uiLevel=>9
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("removeLineBreaks"),
 		-label=>WebGUI::International::get('remove line breaks', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('remove line breaks description', 'Asset_RichEdit'),
 		-name=>"removeLineBreaks",
                 -uiLevel=>9
                 );
         $tabform->getTab("display")->yesNo(
                 -value=>$self->getValue("nowrap"),
 		-label=>WebGUI::International::get('no wrap', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('no wrap description', 'Asset_RichEdit'),
 		-name=>"nowrap",
                 -uiLevel=>9
                 );
         $tabform->getTab("properties")->selectList(
                 -value=>[$self->getValue("directionality")],
 		-label=>WebGUI::International::get('directionality', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('directionality description', 'Asset_RichEdit'),
 		-name=>"directionality",
 		-options=>{
 			ltr=>WebGUI::International::get('left to right', 'Asset_RichEdit'),
@@ -328,6 +340,7 @@ sub getEditForm {
         $tabform->getTab("display")->selectList(
                 -value=>[$self->getValue("toolbarLocation")],
 		-label=>WebGUI::International::get('toolbar location', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('toolbar location description', 'Asset_RichEdit'),
 		-name=>"toolbarLocation",
 		-options=>{
 			top=>WebGUI::International::get('top', 'Asset_RichEdit'),
@@ -337,11 +350,13 @@ sub getEditForm {
         $tabform->getTab("properties")->text(
                 -value=>$self->getValue("cssFile"),
 		-label=>WebGUI::International::get('css file', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('css file description', 'Asset_RichEdit'),
 		-name=>"cssFile"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("enableContextMenu"),
 		-label=>WebGUI::International::get('enable context menu', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('enable context menu description', 'Asset_RichEdit'),
 		-name=>"enableContextMenu"
                 );
 	return $tabform;

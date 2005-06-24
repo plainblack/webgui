@@ -339,59 +339,70 @@ our $I18N = {
 	'rich edit add/edit body' => {
 		message => q|<p>This Asset allows you to customize the Rich Editor used by WebGUI for WYSIWIG HTML editing and
 		to have multiple configurations available for Collaboration Assets.</p>
-
-<p><b>^International("using rich edit","Asset_RichEdit");</b><br>
-Ask the user whether or not to use the Rich Editor on this form.
-</p>
-
-<p><b>^International("preformatted","Asset_RichEdit");</b><br>
-Normally, in HTML multiple spaces, tabs and carriage returns are considered as a single space.  If this
-option is set to Yes, then all whitespace entered into the form will be preserved as is.
-</p>
-
-<p><b>^International("extended elements","Asset_RichEdit");</b><br>
-A list of HTML tags and which elements are allowed inside of them.
-</p>
-
-<p><b>^International("editor height","Asset_RichEdit");</b><br>
-The height of the Rich Editor, in pixels
-</p>
-
-<p><b>^International("editor width","Asset_RichEdit");</b><br>
-The width of the Rich Editor, in pixels
-</p>
-
-<p><b>^International("use br","Asset_RichEdit");</b><br>
-Uses break tags &lt;BR&gt; instead of paragraph tags &lt;P&gt; when a newline is entered in the editor.
-</p>
-
-<p><b>^International("remove line breaks","Asset_RichEdit");</b><br>
-Removes line breaks from generated HTML.
-</p>
-
-<p><b>^International("no wrap","Asset_RichEdit");</b><br>
-Prevents word wrapping in the editor.
-</p>
-
-<p><b>^International("directionality","Asset_RichEdit");</b><br>
-Allows handling of languages that go from right to left or left to right.
-</p>
-
-<p><b>^International("toolbar location","Asset_RichEdit");</b><br>
-Set whether the toolbar should be placed above (top) or below (bottom) the form.
-</p>
-
-<p><b>^International("css file","Asset_RichEdit");</b><br>
-Specifies a CSS file used to style the contents of the editor.
-</p>
-
-<p><b>^International("enable context menu","Asset_RichEdit");</b><br>
-Adds the context menu to toolbar row 1.
-</p>
-
-|,
-        	lastUpdated => 1117736707,
+	        |,
+        	lastUpdated => 1119584956,
 	},
+
+        'using rich edit description' => {
+                message => q|Ask the user whether or not to use the Rich Editor on this form.|,
+                lastUpdated => 1119584875,
+        },
+
+        'preformatted description' => {
+                message => q|Normally, in HTML multiple spaces, tabs and carriage returns are considered as a single space.  If this
+option is set to Yes, then all whitespace entered into the form will be preserved as is.|,
+                lastUpdated => 1119584875,
+        },
+
+        'extended elements description' => {
+                message => q|A list of HTML tags and which elements are allowed inside of them.|,
+                lastUpdated => 1119584875,
+        },
+
+        'editor height description' => {
+                message => q|The height of the Rich Editor, in pixels|,
+                lastUpdated => 1119584875,
+        },
+
+        'editor width description' => {
+                message => q|The width of the Rich Editor, in pixels|,
+                lastUpdated => 1119584875,
+        },
+
+        'use br description' => {
+                message => q|Uses break tags &lt;BR&gt; instead of paragraph tags &lt;P&gt; when a newline is entered in the editor.|,
+                lastUpdated => 1119584875,
+        },
+
+        'remove line breaks description' => {
+                message => q|Removes line breaks from generated HTML.|,
+                lastUpdated => 1119584875,
+        },
+
+        'no wrap description' => {
+                message => q|Prevents word wrapping in the editor.|,
+                lastUpdated => 1119584875,
+        },
+
+        'directionality description' => {
+                message => q|Allows handling of languages that go from right to left or left to right.|,
+                lastUpdated => 1119584875,
+        },
+
+        'toolbar location description' => {
+                message => q|Set whether the toolbar should be placed above (top) or below (bottom) the form.|,
+                lastUpdated => 1119584875,
+        },
+
+        'css file description' => {
+                message => q|Specifies a CSS file used to style the contents of the editor.|,
+                lastUpdated => 1119584875,
+        },
+
+        'enable context menu description' => {
+                message => q|Adds the context menu to toolbar row 1.|,
+                lastUpdated => 1119584875,
+        },
 
 };
 
