@@ -827,7 +827,7 @@ sub www_editQuestion {
 	my $output = $f->print;
 	if ($question->{Survey_questionId} ne "new" && $question->{answerFieldType} ne "text") {
 		$output .= '<a href="'.$self->getUrl('func=editAnswer&aid=new&qid='
-			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,'Asset_Survey').'</a><p>';
+			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,'Asset_Survey').'</a><p />';
 		$sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
 			where Survey_questionId=".quote($question->{Survey_questionId})." order by sequenceNumber");
 		while (%data = $sth->hash) {
@@ -837,7 +837,7 @@ sub www_editQuestion {
                                 editIcon('func=editAnswer&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
                                 moveUpIcon('func=moveAnswerUp'.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
                                 moveDownIcon('func=moveAnswerDown&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
-                                ' '.$data{answer}.'<br>';
+                                ' '.$data{answer}.'<br />';
 		}
 		$sth->finish;
 	}
