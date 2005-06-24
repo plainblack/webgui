@@ -207,7 +207,7 @@ sub getEditForm {
                 -value=>$self->getValue("showUnprivilegedPages")
         	);
 	my $start = $self->getValue("startPoint");
-	$tabform->getTab("properties")->raw("<script type=\"text/javascript\">
+	$tabform->getTab("properties")->raw("<script language=\"javascript\" type=\"text/javascript\">
 		var displayNavDescendantEndPoint = true;
 		var displayNavAncestorEndPoint = true;
 		function toggleDescendantEndPoint () {
@@ -230,7 +230,7 @@ sub getEditForm {
 		}
 		function changeStartPoint () {
 			var types = new Array();
-			types['specificUrl']='<input type=\"text\" name=\"startPoint\" value=\"".$start."\">';
+			types['specificUrl']='<input type=\"text\" name=\"startPoint\" value=\"".$start."\" />';
 			types['relativeToRoot']='<select name=\"startPoint\"><option value=\"0\"".(($start == 0)?' selected=\"1\"':'').">/ (0)</option><option value=\"1\"".(($start eq "1")?' selected=\"1\"':'').">/a/ (+1)</option><option value=\"2\"".(($start eq "2")?' selected=\"1\"':'').">/a/b/ (+2)</option><option value=\"3\"".(($start eq "3")?' selected=\"1\"':'').">/a/b/c/ (+3)</option><option value=\"4\"".(($start eq "4")?' selected=\"1\"':'').">/a/b/c/d/ (+4)</option><option value=\"5\"".(($start eq "5")?' selected=\"1\"':'').">/a/b/c/d/e/ (+5)</option><option value=\"6\"".(($start eq "6")?' selected=\"1\"':'').">/a/b/c/d/e/f/ (+6)</option><option value=\"7\"".(($start eq "7")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/ (+7)</option><option value=\"8\"".(($start eq "8")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/h/ (+8)</option><option value=\"9\"".(($start eq "9")?' selected=\"1\"':'').">/a/b/c/d/e/f/g/h/i/ (+9)</option></select>';
 			types['relativeToCurrentUrl']='<select name=\"startPoint\"><option value=\"-3\"".(($start eq "-3")?' selected=\"1\"':'').">../../.././ (-3)</option><option value=\"-2\"".(($start eq "-2")?' selected=\"1\"':'').">../.././ (-2)</option><option value=\"-1\"".(($start eq "-1")?' selected=\"1\"':'').">.././ (-1)</option><option value=\"0\"".(($start == 0)?' selected=\"1\"':'').">./ (0)</option><option value=\"1\"".(($start eq "1")?' selected=\"1\"':'').">./a/ (+1)</option><option value=\"2\"".(($start eq "2")?' selected=\"1\"':'').">./a/b/ (+2)</option><option value=\"3\"".(($start eq "3")?' selected=\"1\"':'').">./a/b/c/ (+3)</option></select>';
 			document.getElementById('navStartPoint').innerHTML=types[document.getElementById('navStartType').options[document.getElementById('navStartType').selectedIndex].value];
@@ -252,7 +252,7 @@ sub getEditForm {
 		this.form.func.value=\'editSave\';
 		this.form.target=\'_self\';
 		this.form.submit();
-		" >';
+		" />';
 	$tabform->{_submit} = $previewButton." ".$saveButton;
 	return $tabform;
 }
@@ -288,7 +288,7 @@ sub getToolbar {
 		}
 		my $toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
 		my $i18n = WebGUI::International->new("Asset");
-		return '<script type="text/javascript">
+		return '<script language="javascript" type="text/javascript">
                 var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
                 contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("copy").'");
                 contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
@@ -483,16 +483,16 @@ sub www_preview {
 		</td><td class="tableHeader" valign="top">Output</td></tr>
 		<tr><td class="tableHeader" valign="top">
 		<font size=1>
-			Identifier: $session{form}{identifier}<br>
-			startAt: $session{form}{startAt}<br>
-			method: $session{form}{method}<br>
-			stopAtLevel: $session{form}{stopAtLevel}<br>
-			depth: $session{form}{depth}<br>
-			templateId: $session{form}{templateId}<br>
-			reverse: $session{form}{'reverse'}<br>
-			showSystemPages: $session{form}{showSystemPages}<br>
-			showHiddenPages: $session{form}{showHiddenPages}<br>
-			showUnprivilegedPages: $session{form}{showUnprivilegedPages}<br>
+			Identifier: $session{form}{identifier}<br />
+			startAt: $session{form}{startAt}<br />
+			method: $session{form}{method}<br />
+			stopAtLevel: $session{form}{stopAtLevel}<br />
+			depth: $session{form}{depth}<br />
+			templateId: $session{form}{templateId}<br />
+			reverse: $session{form}{'reverse'}<br />
+			showSystemPages: $session{form}{showSystemPages}<br />
+			showHiddenPages: $session{form}{showHiddenPages}<br />
+			showUnprivilegedPages: $session{form}{showUnprivilegedPages}<br />
 		</font>
 		</td><td class="tableData" valign="top">
 		) . $nav->build . qq(</td></tr></table>);

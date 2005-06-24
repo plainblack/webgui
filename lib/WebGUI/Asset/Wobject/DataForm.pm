@@ -119,7 +119,7 @@ sub _tonull {
 sub _createTabInit {
 	my $id = shift;
 	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where assetId=".quote($id));
-	my $output = '<script type="text/javascript"> var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
+	my $output = '<script type="text/javascript" language="javascript"> var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
 	return $output;
 }
 
@@ -857,14 +857,14 @@ sub www_editField {
 		-label=>WebGUI::International::get(24,"Asset_DataForm"),
 		-hoverHelp=>WebGUI::International::get('24 description',"Asset_DataForm"),
 		-value=>$field{possibleValues},
-		-subtext=>'<br>'.WebGUI::International::get(85,"Asset_DataForm")
+		-subtext=>'<br />'.WebGUI::International::get(85,"Asset_DataForm")
 		);
         $f->textarea(
 		-name=>"defaultValue",
 		-label=>WebGUI::International::get(25,"Asset_DataForm"),
 		-hoverHelp=>WebGUI::International::get('25 description',"Asset_DataForm"),
 		-value=>$field{defaultValue},
-		-subtext=>'<br>'.WebGUI::International::get(85,"Asset_DataForm")
+		-subtext=>'<br />'.WebGUI::International::get(85,"Asset_DataForm")
 		);
 	if ($session{form}{fid} eq "new" && $session{form}{proceed} ne "manageAssets") {
         	$f->whatNext(
