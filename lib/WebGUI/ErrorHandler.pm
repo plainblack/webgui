@@ -145,9 +145,9 @@ sub fatal {
 		print "<h1>Problem With Request</h1>                        
 			We have encountered a problem with your request. Please use your back button and try again.                         
 			If this problem persists, please contact us with what you were trying to do and the time and date of the problem.";
-                print '<br>'.$WebGUI::Session::session{setting}{companyName};
-                print '<br>'.$WebGUI::Session::session{setting}{companyEmail};
-                print '<br>'.$WebGUI::Session::session{setting}{companyURL};
+                print '<br />'.$WebGUI::Session::session{setting}{companyName};
+                print '<br />'.$WebGUI::Session::session{setting}{companyEmail};
+                print '<br />'.$WebGUI::Session::session{setting}{companyURL};
         } else {
 	        print "<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n"; 
 		print "<p>".$message."</p>\n";
