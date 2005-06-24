@@ -1329,10 +1329,6 @@ sub getLineage {
 	# based upon all available criteria, let's get some assets
 	my $columns = "asset.assetId, asset.className, asset.parentId";
 	my $slavedb;
-	if ($rules->{returnQuickReadObjects}) {
-		$columns = "*";
-		$slavedb = WebGUI::SQL->getSlave;
-	}
 	my $sortOrder = ($rules->{invertTree}) ? "lineage desc" : "lineage asc"; 
 	if (exists $rules->{orderByClause}) {
 		$sortOrder = $rules->{orderByClause};
@@ -1350,13 +1346,11 @@ sub getLineage {
 			} else {
 				$asset = WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className});
 			}
-		} elsif ($rules->{returnQuickReadObjects}) {
-			$asset = WebGUI::Asset->newByPropertyHashRef($properties);
 		} else {
 			$asset = $properties->{assetId};
 		}
 		# since we have the relatives info now, why not cache it
-		if ($rules->{returnObjects} || $rules->{returnQuickReadObjects}) {
+		if ($rules->{returnObjects}) {
 			my $parent = $relativeCache{$properties->{parentId}};
 			$relativeCache{$properties->{assetId}} = $asset;
 			$asset->{_parent} = $parent;
@@ -3235,7 +3229,7 @@ sub www_manageAssets {
   	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
-	my $ancestors = $self->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
+	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
         my @crumbtrail;
         foreach my $ancestor (@{$ancestors}) {
                 push(@crumbtrail,'<a href="'.$ancestor->getUrl("func=manageAssets").'">'.$ancestor->getTitle.'</a>');

@@ -109,7 +109,7 @@ sub getEditForm {
 			);
 	} else {
 		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
-		my $children = $self->getLineage(["children"],{"returnQuickReadObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
+		my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
 		my %childIds;
 		foreach my $child (@{$children}) {
 			$childIds{$child->getId} = $child->getTitle;	

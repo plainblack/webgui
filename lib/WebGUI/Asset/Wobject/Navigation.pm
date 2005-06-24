@@ -330,7 +330,7 @@ sub view {
 	$start = $current unless (defined $start); # if none of the above results in a start point, then the current page must be it
 	my @includedRelationships = split("\n",$self->get("assetsToInclude"));
 	my %rules;
-	$rules{returnQuickReadObjects} = 1;
+	$rules{returnObjects} = 1;
 	$rules{endingLineageLength} = $start->getLineageLength+$self->get("descendantEndPoint");
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->get("ancestorEndPoint");

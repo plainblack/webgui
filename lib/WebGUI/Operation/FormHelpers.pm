@@ -20,13 +20,13 @@ use WebGUI::Style;
 sub www_formAssetTree {
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
 	my @crumb;
-	my $ancestors = $base->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
+	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
 		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree&classLimiter=".$session{form}{classLimiter}."&formId="
                         .$session{form}{formId}).'">'.$ancestor->get("menuTitle").'</a>');
 	}	
 	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
-	my $children = $base->getLineage(["children"],{returnQuickReadObjects=>1});
+	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($child->get("className") =~ /^$session{form}{classLimiter}/) {
@@ -81,12 +81,12 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url"
 </script><fieldset><legend>Pages</legend> ';
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
 	my @crumb;
-	my $ancestors = $base->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
+	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
 		push(@crumb,'<a href="'.$ancestor->getUrl("op=richEditPageTree").'">'.$ancestor->get("menuTitle").'</a>');
 	}	
 	$output .= '<p>'.join(" &gt; ", @crumb)."</p>\n";
-	my $children = $base->getLineage(["children"],{returnQuickReadObjects=>1});
+	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		$output .= '<a href="#" onclick="document.getElementById(\'url\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
@@ -101,12 +101,12 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url"
 sub www_richEditImageTree {
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
 	my @crumb;
-	my $ancestors = $base->getLineage(["self","ancestors"],{returnQuickReadObjects=>1});
+	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
 		push(@crumb,'<a href="'.$ancestor->getUrl("op=richEditImageTree").'">'.$ancestor->get("menuTitle").'</a>');
 	}	
 	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
-	my $children = $base->getLineage(["children"],{returnQuickReadObjects=>1});
+	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($child->get("className") =~ /^WebGUI::Asset::File::Image/) {
