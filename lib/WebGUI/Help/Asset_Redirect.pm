@@ -6,6 +6,11 @@ our $HELP = {
 		title => 'redirect add/edit title',
 		body => 'redirect add/edit body',
 		fields => [
+                        {
+                                title => 'redirect url',
+                                description => 'redirect url description',
+                                namespace => 'Asset_Redirect',
+                        },
 		],
 		related => [
 			{

@@ -88,6 +88,7 @@ sub getEditForm {
         $tabform->getTab("properties")->url(
                 -name=>"redirectUrl",
                 -label=>WebGUI::International::get('redirect url', 'Asset_Redirect'),
+                -hoverHelp=>WebGUI::International::get('redirect url description', 'Asset_Redirect'),
                 -value=>$self->getValue("redirectUrl")
                 );
 	return $tabform;
