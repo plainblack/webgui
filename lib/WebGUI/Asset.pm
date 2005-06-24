@@ -311,7 +311,7 @@ sub checkExportPath {
 	if(defined $session{config}{exportPath}) {
 		if(-d $session{config}{exportPath}) {
 			unless (-w $session{config}{exportPath}) {
-				$error .= 'Error: The export path '.$session{config}{exportPath}.' is not writable.<br>
+				$error .= 'Error: The export path '.$session{config}{exportPath}.' is not writable.<br />
 						Make sure that the webserver has permissions to write to that directory';
 			}
 		} else {
@@ -1618,7 +1618,7 @@ sub getToolbar {
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	my $i18n = WebGUI::International->new("Asset");
-	return '<script type="text/javascript">
+	return '<script type="text/javascript" language="javascript">
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
 		contextMenu.addLink("'.$self->getUrl("func=editTree").'","'.$i18n->get("edit branch").'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
@@ -2804,7 +2804,7 @@ sub www_editTree {
 					title=>WebGUI::International::get(99,"Asset"),
 					currentUrl=>"Current URL"
 					}
-				})."<script type=\"text/javascript\">
+				})."<script type=\"text/javascript\" language=\"javascript\">
 			function toggleSpecificBaseUrl () {
 				if (document.getElementById('baseUrlBy').options[document.getElementById('baseUrlBy').selectedIndex].value == 'specifiedBase') {
 					document.getElementById('baseUrl').innerHTML='<input type=\"text\" name=\"baseUrl\" />';
@@ -3190,7 +3190,7 @@ sub www_manageAssets {
         }
 	my $output = '<div class="am-crumbtrail">'.join(" > ",@crumbtrail).'</div>';
 	$output .= "
-   <script type=\"text/javascript\">
+   <script type=\"text/javascript\" language=\"javascript\">
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('&nbsp;','','center','');
@@ -3278,7 +3278,7 @@ sub www_manageAssets {
 			.WebGUI::Form::submit({value=>"Paste"})
 			.WebGUI::Form::formFooter()
 			.' </fieldset></div> '
-			.'<script type="text/javascript">
+			.'<script type="text/javascript" language="javascript">
 			var clipboardItemSelectAllToggle = false;
 			function toggleClipboardSelectAll(form){
 			clipboardItemSelectAllToggle = clipboardItemSelectAllToggle ? false : true;
@@ -3343,7 +3343,7 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
         WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
         my $output = "
-   <script type=\"text/javascript\">
+   <script type=\"text/javascript\" language=\"javascript\">
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
@@ -3397,7 +3397,7 @@ sub www_manageMetaData {
 	foreach my $fieldId (keys %{$fields}) {
 		$output .= deleteIcon("func=deleteMetaDataField&fid=".$fieldId,$self->get("url"),WebGUI::International::get('deleteConfirm','Asset'));
 		$output .= editIcon("func=editMetaDataField&fid=".$fieldId,$self->get("url"));
-		$output .= " <b>".$fields->{$fieldId}{fieldName}."</b><br>";
+		$output .= " <b>".$fields->{$fieldId}{fieldName}."</b><br />";
 	}	
         $ac->setHelp("metadata manage","Asset");
 	return $ac->render($output);
@@ -3432,7 +3432,7 @@ sub www_manageTrash {
         WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
 	my $output = "
-   <script type=\"text/javascript\">
+   <script type=\"text/javascript\" language=\"javascript\">
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
