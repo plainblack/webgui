@@ -57,7 +57,7 @@ sub www_richEditPageTree {
 		-name=>"target",
 		-label=>WebGUI::International::get('target'),
 		-options=>{"_self"=>WebGUI::International::get('link in same window'),
-		           "_blank"=>WebGUI::International::get('link in new window'),
+		           "_blank"=>WebGUI::International::get('link in new window')},
 		-extras=>'id="target"'
 		);
 	$f->button(

@@ -28,15 +28,11 @@ Package WebGUI::Asset
 
 =head1 DESCRIPTION
 
-Package to manipulate items in WebGUI's asset system. Replaces Collateral.
+The admin console is a menuing system to manage webgui's administrative functions.
 
 =head1 SYNOPSIS
 
-An asset is the basic class of content in WebGUI. This handles security, urls, and other basic information common to all content items.
-
-A lineage is a concatenated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's ancestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants.
- 
- use WebGUI::Asset;
+ use WebGUI::AdminConsole;
 
  _formatFunction
  addSubmenuItem
@@ -154,6 +150,15 @@ sub getAdminFunction {
 			},
 			icon=>"assets.gif",
 			func=>"manageAssets",
+			group=>"12"
+		},
+		"versions"=>{
+			title=>{
+				id=>"content versioning",
+				namespace=>"Asset"
+			},
+			icon=>"versionTags.gif",
+			func=>"manageVersions",
 			group=>"12"
 		},
 		"users"=>{

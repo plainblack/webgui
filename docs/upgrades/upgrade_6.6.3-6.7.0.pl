@@ -8,6 +8,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Asset::Snippet;
 use WebGUI::Session;
+use WebGUI::SQL;
 
 my $configFile;
 my $quiet;
@@ -20,11 +21,25 @@ GetOptions(
 WebGUI::Session::open("../..",$configFile);
 
 insertHelpTemplate();
-
 insertXSLTSheets();
 insertSyndicatedContentTemplate();
+addAssetVersioning();
 
 WebGUI::Session::close();
+
+sub addAssetVersioning {
+    	print "\tMaking changes for asset versioning\n" unless ($quiet);
+	WebGUI::SQL->write("create table assetVersionTag (
+		tagId varchar(22) not null primary key,
+		name varchar(255) not null,
+		isCommitted int not null default 0,
+		creationDate bigint not null default 0,
+		createdBy varchar(22),
+		commitDate bigint not null default 0,
+		committedBy varchar(22)
+		)");
+}
+
 
 sub insertHelpTemplate{
     print "\tInserting new Help template\n" unless ($quiet);

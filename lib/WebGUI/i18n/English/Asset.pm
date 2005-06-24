@@ -1,6 +1,42 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'manage versions' => {
+		message => q|Manage versions.|,
+		lastUpdated => 0,
+		context => q|Menu item in version tag manager.|
+	},
+
+	'manage committed versions' => {
+		message => q|Manage committed versions.|,
+		lastUpdated => 0,
+		context => q|Menu item in version tag manager.|
+	},
+
+	'add version tag' => {
+		message => q|Add Version Tag|,
+		lastUpdated => 0,
+		context => q|Admin console label.|
+	},
+
+	'content versioning' => {
+		message => q|Content Versioning|,
+		lastUpdated => 0,
+		context => q|Admin console label.|
+	},
+
+	'committed versions' => {
+		message => q|Committed Versions|,
+		lastUpdated => 0,
+		context => q|Admin console label.|
+	},
+
+	'add a version tag' => {
+		message => q|Add a version tag.|,
+		lastUpdated => 0,
+		context => q|Menu item in version tag manager.|
+	},
+
 	'rank' => {
 		message => q|Rank|,
 		lastUpdated => 0,

@@ -2429,6 +2429,58 @@ sub www_add {
 
 #-------------------------------------------------------------------
 
+=head2 www_addVersionTag ()
+
+Displays the add version tag form.
+
+=cut
+
+sub www_addVersionTag {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("versions");
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	my $i18n = WebGUI::International->new("Asset");
+        $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
+	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	my $tag = WebGUI::SQL->getRow("assetVersionTag","tagId",$session{form}{tagId});
+	$f->hidden(
+		-name=>"func",
+		-value=>"addVersionTagSave"
+		);
+	$f->text(
+		-name=>"name",
+		-label=>"Version Tag Name",
+		-value=>$tag->{name}
+		);
+	$f->submit;
+        return $ac->render($f->print,$i18n->get("add version tag"));	
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_addVersionTagSave ()
+
+Adds a version tag and sets the user's default version tag to that.
+
+=cut
+
+sub www_addVersionTagSave {
+	my $self = shift;
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	my $tagId = WebGUI::SQL->setRow("assetVersionTag","tagId",{
+		tagId=>"new",
+		name=>$session{form}{name},
+		creationDate=>time(),
+		createdBy=>$session{user}{userId}
+		});
+	WebGUI::Session::setScratch("versionTag",$tagId);
+	return $self->www_manageVersions();
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_copy ( )
 
 Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit. Otherwise returns an AdminConsole rendered as insufficient privilege.
@@ -3381,6 +3433,33 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
 
 #-------------------------------------------------------------------
 
+=head2 www_manageVersionTags ()
+
+Shows a list of the currently available asset version tags.
+
+=cut
+
+sub www_manageCommittedVersions {
+        my $self = shift;
+        my $ac = WebGUI::AdminConsole->new("versions");
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+        my $i18n = WebGUI::International->new("Asset");
+        $ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
+        $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
+        my $output = '<table width=100% class="content">
+        <tr><th>Tag Name</th><th>Committed On</th><th>Committed By</th><th></th></tr> ';
+        my $sth = WebGUI::SQL->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
+        while (my ($id,$name,$date,$by) = $sth->array) {
+                my $u = WebGUI::User->new($by);
+                $output .= '<tr><td>'.$name.'</td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td>[rollback]</td></tr>';
+        }
+        $sth->finish;
+        $output .= '</table>';
+        return $ac->render($output,$i18n->get("committed versions"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_manageMetaData ( )
 
 Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, renders an insufficient privilege page.
@@ -3467,6 +3546,36 @@ sub www_manageTrash {
 	return $ac->render($output, $header);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_manageVersionTags ()
+
+Shows a list of the currently available asset version tags.
+
+=cut
+
+sub www_manageVersions {
+	my $self = shift;
+        my $ac = WebGUI::AdminConsole->new("versions");
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	$ac->setHelp("versions manage");
+	my $i18n = WebGUI::International->new("Asset");
+	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
+	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
+	my ($tag) = WebGUI::SQL->quickArray("select name from assetVersionTag where tagId=".quote($session{scratch}{versionTag}));
+	$tag ||= "None";
+	my $output = '<p>You are currently working under a tag called: <b>'.$tag.'</b>.</p><table width=100% class="content">
+	<tr><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
+	my $sth = WebGUI::SQL->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
+	while (my ($id,$name,$date,$by) = $sth->array) {
+		my $u = WebGUI::User->new($by);
+		$output .= '<tr><td><a href="'.$self->getUrl("func=setVersionTag&tagId=".$id).'">'.$name.'</a></td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td>[cancel] [commit]</td></tr>';
+	}
+	$sth->finish;	
+	$output .= '</table>';
+	return $ac->render($output);
+}
 
 #-------------------------------------------------------------------
 
@@ -3571,6 +3680,21 @@ sub www_setRank {
 	$self->setRank($newRank) if (defined $newRank);
 	$session{asset} = $self->getParent;
 	return $self->getParent->www_manageAssets();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_setVersionTag ()
+
+Sets the current user's working version tag.
+
+=cut
+
+sub www_setVersionTag () {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless WebGUI::Grouping::isInGroup(12);
+	WebGUI::Session::setScratch("versionTag",$session{form}{tagId});
+	return $self->www_manageVersions();
 }
 
 #-------------------------------------------------------------------
