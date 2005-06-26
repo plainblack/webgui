@@ -380,6 +380,7 @@ sub _assign_rss_dates {
                         $cache->set($item->{date}, '1 year');
                 }
         }
+	@{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
   }
 
 #-------------------------------------------------------------------
@@ -424,7 +425,7 @@ sub _create_interleaved_items{
 		$item->{site_title}=$rss->{channel}->{title};
 		$item->{site_link}=$rss->{channel}->{link};
 		if(! $hasTermsRegex || _check_hasTerms($item,$hasTermsRegex)){
-		    push(@{$items},$item);
+		    push @{$items},$item;
 		} 
 		if (@{$rss->{items}}) {
 		    $items_remain = 1;
@@ -511,7 +512,7 @@ sub _get_items {
 		    _create_interleaved_items($items,\@rss_feeds,$maxHeadlines,$hasTermsRegex);
 		}
                 
-                @{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
+                #@{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
                 
                 $cache->set(Storable::freeze($items), 3600);
 	    }
