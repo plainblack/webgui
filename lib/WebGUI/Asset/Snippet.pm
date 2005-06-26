@@ -102,16 +102,19 @@ sub getEditForm {
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
                 -label=>WebGUI::International::get('snippet', 'Asset_Snippet'),
+                -hoverHelp=>WebGUI::International::get('snippet description', 'Asset_Snippet'),
                 -value=>$self->getValue("snippet")
                 );
         $tabform->getTab("properties")->yesNo(
                 -name=>"processAsTemplate",
                 -label=>WebGUI::International::get('process as template', 'Asset_Snippet'),
+                -hoverHelp=>WebGUI::International::get('process as template description', 'Asset_Snippet'),
                 -value=>$self->getValue("processAsTemplate")
                 );
         $tabform->getTab("properties")->combo(
                 -name=>"mimeType",
                 -label=>WebGUI::International::get('mimeType', 'Asset_Snippet'),
+                -hoverHelp=>WebGUI::International::get('mimeType description', 'Asset_Snippet'),
                 -value=>[$self->getValue('mimeType')],
 		-options=>\%mimeTypes
                 );

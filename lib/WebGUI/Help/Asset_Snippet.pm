@@ -6,6 +6,21 @@ our $HELP = {
 		title => 'snippet add/edit title',
 		body => 'snippet add/edit body',
 		fields => [
+                        {
+                                title => 'snippet',
+                                description => 'snippet description',
+                                namespace => 'Asset_Snippet',
+                        },
+                        {
+                                title => 'process as template',
+                                description => 'process as template description',
+                                namespace => 'Asset_Snippet',
+                        },
+                        {
+                                title => 'mimeType',
+                                description => 'mimeType description',
+                                namespace => 'Asset_Snippet',
+                        },
 		],
 		related => [
 			{
