@@ -865,6 +865,7 @@ sub databaseLink {
 		rearrange([qw(name value label afterEdit extras uiLevel defaultValue hoverHelp)], @p);
         if (_uiLevelChecksOut($uiLevel)) {
 		$label = $label || WebGUI::International::get(1075);
+		$hoverHelp = $hoverHelp || WebGUI::International::get('1075 description');
 		if (WebGUI::Grouping::isInGroup(3)) {
 			if ($afterEdit) {
                                 $subtext = editIcon("op=editDatabaseLink&amp;lid=".$value."&amp;afterEdit=".WebGUI::URL::escape($afterEdit));

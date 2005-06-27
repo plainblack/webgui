@@ -779,6 +779,11 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1056151382
 	},
 
+	'1075 description' => {
+		message => q|Select one of these databases to run your query against.|,
+		lastUpdated => 1119840669,
+	},
+
 	'381' => {
 		message => q|WebGUI received a malformed request and was unable to continue. Proprietary characters being passed through a form typically cause this. Please feel free to hit your back button and try again.|,
 		lastUpdated => 1031514049
