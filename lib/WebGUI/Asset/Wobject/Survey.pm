@@ -185,6 +185,7 @@ sub getEditForm {
 	$tabform->getTab('display')->template(
 		-name		=> 'templateId',
 		-label		=> WebGUI::International::get('view template', 'Asset_Survey'),
+		-hoverHelp	=> WebGUI::International::get('view template description', 'Asset_Survey'),
 		-value		=> $self->getValue('templateId'),
 		-namespace	=> 'Survey',
 		-afterEdit	=> 'func=edit'
@@ -192,6 +193,7 @@ sub getEditForm {
 	$tabform->getTab('display')->template(
 		-name		=> 'responseTemplateId',
 		-label		=> WebGUI::International::get('response template', 'Asset_Survey'),
+		-hoverHelp	=> WebGUI::International::get('response template description', 'Asset_Survey'),
 		-value		=> $self->getValue('responseTemplateId'),
 		-namespace	=> 'Survey/Response',
 		-afterEdit	=> 'func=edit'
@@ -199,6 +201,7 @@ sub getEditForm {
 	$tabform->getTab('display')->template(
 		-name		=> 'gradebookTemplateId',
 		-label		=> WebGUI::International::get('gradebook template', 'Asset_Survey'),
+		-hoverHelp	=> WebGUI::International::get('gradebook template description', 'Asset_Survey'),
 		-value		=> $self->getValue('gradebookTemplateId'),
 		-namespace	=> 'Survey/Gradebook',
 		-afterEdit	=> 'func=edit'
@@ -206,6 +209,7 @@ sub getEditForm {
 	$tabform->getTab('display')->template(
 		-name		=> 'overviewTemplateId',
 		-label		=> WebGUI::International::get('overview template', 'Asset_Survey'),
+		-hoverHelp	=> WebGUI::International::get('overview template description', 'Asset_Survey'),
 		-value		=> $self->getValue('overviewTemplateId'),
 		-namespace	=> 'Survey/Overview',
 		-afterEdit	=> 'func=edit'
@@ -219,12 +223,14 @@ sub getEditForm {
                 	response => WebGUI::International::get(7,'Asset_Survey')
 			},
 		-label		=> WebGUI::International::get(8,'Asset_Survey'),
+		-hoverHelp	=> WebGUI::International::get('8 description','Asset_Survey'),
 		-value		=> [$self->getValue("questionOrder")]
 		);
 	$tabform->getTab('display')->integer(
 		-name		=> "questionsPerPage",
 		-value		=> $self->getValue("questionsPerPage"),
 		-label		=> WebGUI::International::get(83,'Asset_Survey')
+		-hoverHelp	=> WebGUI::International::get('83 description','Asset_Survey')
 		);
         $tabform->getTab('properties')->selectList(
                 -name	=> "mode",
@@ -233,31 +239,37 @@ sub getEditForm {
                 	quiz => WebGUI::International::get(10,'Asset_Survey')
 			},
                 -label		=> WebGUI::International::get(11,'Asset_Survey'),
+                -hoverHelp	=> WebGUI::International::get('11 description','Asset_Survey'),
                 -value		=> [$self->getValue("mode")]
                 );
 	$tabform->getTab('properties')->yesNo(
 		-name		=> "anonymous",
                	-value		=> $self->getValue("anonymous"),
                	-label		=> WebGUI::International::get(81,'Asset_Survey')
+               	-hoverHelp	=> WebGUI::International::get('81 description','Asset_Survey')
                	);
 	$tabform->getTab('properties')->integer(
 		-name		=> "maxResponsesPerUser",
 		-value		=> $self->getValue("maxResponsesPerUser"),
 		-label		=> WebGUI::International::get(84,'Asset_Survey')
+		-hoverHelp	=> WebGUI::International::get('84 description','Asset_Survey')
 		);
 	$tabform->getTab('properties')->integer(
 		-name		=> "questionsPerResponse",
 		-value		=> $self->getValue("questionsPerResponse"),
 		-label		=> WebGUI::International::get(85,'Asset_Survey')
+		-hoverHelp	=> WebGUI::International::get('85 description','Asset_Survey')
 		);	
 	$tabform->getTab('security')->group(
 		-name		=> "groupToTakeSurvey",
 		-value		=> [$self->getValue("groupToTakeSurvey")],
 		-label		=> WebGUI::International::get(12,'Asset_Survey')
+		-hoverHelp	=> WebGUI::International::get('12 description','Asset_Survey')
 		);
         $tabform->getTab('security')->group(
                 -name		=> "groupToViewReports",
                 -label		=> WebGUI::International::get(13,'Asset_Survey'),
+                -hoverHelp	=> WebGUI::International::get('13 description','Asset_Survey'),
                 -value		=> [$self->getValue("groupToViewReports")]
                 );
 	if ($self->get("wobjectId") eq "new") {
@@ -267,6 +279,7 @@ sub getEditForm {
 				backToPage=>WebGUI::International::get(745,'Asset_Survey')
 				},
 			-value=>"addQuestion"
+                        -hoverHelp	=> WebGUI::International::get('what next','Asset_Survey'),
 			);
 	}
 
@@ -783,16 +796,19 @@ sub www_editQuestion {
 		-name	=> "question",
 		-value	=> $question->{question},
 		-label	=> WebGUI::International::get(14,'Asset_Survey')
+		-hoverHelp	=> WebGUI::International::get('14 description','Asset_Survey')
 		);
 	$f->yesNo(
 		-name	=> "allowComment",
 		-value	=> $question->{allowComment},
 		-label	=> WebGUI::International::get(15,'Asset_Survey')
+		-hoverHelp	=> WebGUI::International::get('15 description','Asset_Survey')
 		);
 	$f->yesNo(
 		-name	=> "randomizeAnswers",
 		-value	=> $question->{randomizeAnswers},
 		-label	=> WebGUI::International::get(16,'Asset_Survey')
+		-hoverHelp	=> WebGUI::International::get('16 description','Asset_Survey')
 		);
 	if ($self->get("questionOrder") eq "response") {
 		my $ql = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
@@ -803,6 +819,7 @@ sub www_editQuestion {
 			-options=> $ql,
 			-value	=> [$question->{gotoQuestion}],
 			-label	=> WebGUI::International::get(21,'Asset_Survey')
+			-hoverHelp	=> WebGUI::International::get('21 description','Asset_Survey')
 			);
 	}
 	
@@ -821,6 +838,7 @@ sub www_editQuestion {
         	$f->whatNext(
                 	-options=> \%options,
                 	-value	=> "addMultipleChoiceAnswer"
+			-hoverHelp	=> WebGUI::International::get('what next question description','Asset_Survey')
                 	);
 	}
 	$f->submit;

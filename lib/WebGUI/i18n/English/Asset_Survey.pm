@@ -656,65 +656,92 @@ The default label for survey.url.
 		message => q|Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.
 <p/>
 Surveys are Wobjects and Assets, so they have the properties of both.  Survery have these unique properties:<p/>
-
-<b>Template</b><br/>
-This template is used to display the Survey itself.
-<p/>
-
-<b>Survey Template Response</b><br/>
-This template is used to display the questions and answers for the user to pick.
-<p/>
-
-<b>Gradebook Template</b><br/>
-This template is used to display, on a user-by-user basis how many questions they got
-correct and what percentage answered were correct.
-<p/>
-
-<b>Statistical Overview Template</b><br/>
-This template is used to display a statistical overview of the all responses
-to the Survey.
-<p/>
-
-<b>Question Order</b><br/>
-The order the questions will be asked. Sequential displays the questions in the order you create them. Random displays the questions randomly. Response driven displays the questions in order based on the responses of the users.
-<p/>
-
-<b>Questions per page</b><br/>
-The number of questions that will be displayed per page.  The default is 1.
-<p/>
-
-<b>Mode</b><br/>
-By default the Survey is in survey mode. This allows it to ask questions of your users. However, if you switch to Quiz mode, you can have a self-correcting test of your user's knowledge.
-<p/>
-
-<b>Anonymous responses?</b><br/>
-Select whether or not the survey will record and display information that can identify a user and their responses.  If left at the default value of "No", the survey will record the user's IP address as well as their WebGUI User ID and Username if logged in.  This info will then be available in the survey's reports.  If set to "Yes", these three fields will contain scrambled data that can not be traced to a particular user.
-<p/>
-
-<b>Maximum Responses Per User?</b><br/>
-The number of times the user can attempt to get the correct answer on each question.  The
-default is 1.
-<p/>
-
-<b>Questions Per Response?</b><br/>
-How many questions are given to each user?
-<p/>
-
-<b>Who can take the survey?</b><br/>
-Which users can participate in the survey?
-<p/>
-
-<b>Who can view reports?</b><br/>
-Who can view the results of the survey?
-<p/>
-
-<b>What next?</b><br/>
-After creating a new Survey, you may either starting adding questions or go back to the page where
-the survey was added.
-<p/>
 |,
-		lastUpdated => 1110059528
+		lastUpdated => 1119849727
 	},
+
+        'view template description' => {
+                message => q|This template is used to display the Survey itself.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        'response template description' => {
+                message => q|This template is used to display the questions and answers for the user to pick.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        'gradebook template description' => {
+                message => q|This template is used to display, on a user-by-user basis how many questions they got
+correct and what percentage answered were correct.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        'overview template description' => {
+                message => q|This template is used to display a statistical overview of the all responses
+to the Survey.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '8 description' => {
+                message => q|The order the questions will be asked. Sequential displays the questions in the order you create them. Random displays the questions randomly. Response driven displays the questions in order based on the responses of the users.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '83 description' => {
+                message => q|The number of questions that will be displayed per page.  The default is 1.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '11 description' => {
+                message => q|By default the Survey is in survey mode. This allows it to ask questions of your users. However, if you switch to Quiz mode, you can have a self-correcting test of your user's knowledge.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '81 description' => {
+                message => q|Select whether or not the survey will record and display information that can identify a user and their responses.  If left at the default value of "No", the survey will record the user's IP address as well as their WebGUI User ID and Username if logged in.  This info will then be available in the survey's reports.  If set to "Yes", these three fields will contain scrambled data that can not be traced to a particular user.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '84 description' => {
+                message => q|The number of times the user can attempt to get the correct answer on each question.  The
+default is 1.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '85 description' => {
+                message => q|How many questions are given to each user?
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '12 description' => {
+                message => q|Which users can participate in the survey?
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        '13 description' => {
+                message => q|Who can view the results of the survey?
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
+        'what next' => {
+                message => q|After creating a new Survey, you may either starting adding questions or go back to the page where
+the survey was added.
+<p/>|,
+                lastUpdated => 1119849705,
+        },
+
 
 	'34' => {
 		message => q|Agree|,
@@ -1061,21 +1088,37 @@ A comment.
 	},
 
         'question add/edit body' => {
-		message => q|
-<p><b>Question</b><br />
-This is the question that the user will be asked.
-</p>
+		message => q||,
+		lastUpdated => 1119851165,
+	},
 
-<p><b>Allow comment?</b><br />
-If set to Yes, then the user will be allowed to add a comment to their response to this question.
-</p>
+        '14 description' => {
+                message => q|This is the question that the user will be asked.
+</p>|,
+                lastUpdated => 1119851108,
+        },
 
-<p><b>Randomize answers?</b><br />
-If set to Yes, then the answers will be shuffled for each user.
-</p>
+        '15 description' => {
+                message => q|If set to Yes, then the user will be allowed to add a comment to their response to this question.
+</p>|,
+                lastUpdated => 1119851108,
+        },
 
-<p><b>What next?</b><br />
-After defining the question, you may supply an answer:
+        '16 description' => {
+                message => q|If set to Yes, then the answers will be shuffled for each user.
+</p>|,
+                lastUpdated => 1119851108,
+        },
+
+        '21 description' => {
+                message => q|Used to define the question that follows this one when the question order for the survey
+is set to "response".
+</p>|,
+                lastUpdated => 1119851108,
+        },
+
+        'what next question description' => {
+                message => q|After defining the question, you may supply an answer:
 <ul>
 <li>Multiple Choice</il>
 <li>Text</il>
@@ -1083,11 +1126,9 @@ After defining the question, you may supply an answer:
 <li>Opinion</il>
 </ul>
 or you may return to the survey.
-</p>
-
-             |,
-		lastUpdated => 1110006259,
-	},
+</p>|,
+                lastUpdated => 1119851108,
+        },
 
 };
 
