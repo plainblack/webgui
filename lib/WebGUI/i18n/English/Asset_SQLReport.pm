@@ -8,62 +8,63 @@ our $I18N = {
 
 	'71' => {
 		message => q|SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.
-<p>SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL Reports also have these unique properties:
-<p>
-
-<b>Template</b><br>
-Select a template to display the results of your SQL Report.
-<p>
-
-<b>Nested query support</b><br>
+<p><b>Nested query support</b><br>
 The SQL Report wobject supports up to 5 nested queries (1 base query and 4 subqueries). Each subsequent query is executed for each row in the previous query results. For example, if you have two queries: query1 and query2, then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
 <p>
+SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL Reports also have these unique properties:
+<p>|,
+		lastUpdated => 1119841674,
+	},
 
-<b>Debug?</b><br>
-If you want to display debugging and error messages on the page, check this box.
-<p>
+        '72 description' => {
+                message => q|Select a template to display the results of your SQL Report.
+<p>|,
+                lastUpdated => 1119841649,
+        },
 
-<b>Preprocess macros on query?</b><br>
-If you're using WebGUI macros in your query you'll want to check this box.
-<p>
+        '16 description' => {
+                message => q|If you want to display debugging and error messages on the page, check this box.
+<p>|,
+                lastUpdated => 1119841649,
+        },
 
-<b>Placeholder Parameters</b><br>
-Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.<br>
+        'Placeholder Parameters description' => {
+                message => q|Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.<br>
 Placeholder Parameters are delimited by commas.<br>
 There are four input types:
 <ul><b>Integer</b><br>A simple number</ul>
 <ul><b>Form</b><br>Form fields begin with "form:".</ul>
 <ul><b>Query results</b><br>Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</ul>
 <ul><b>String</b><br>Anything else is a string</ul>
-
 <p>Example:
 <blockquote>
 Query: select * from some_table where some_field = ? and some_other_field < ?<br>
 Placeholder Parameters: query1:pageId,form:field1
 </blockquote>
-
 In this example the first question mark will contain the field value of pageId in query1,
 while the second question mark will contain the form variable "field1".
-<p>
+<p>|,
+                lastUpdated => 1119841649,
+        },
 
-<b>Query</b><br>
-This is a standard SQL query. If you are unfamiliar with SQL then you'll likely not want to use this wobject.<br>
-A question mark ? in the query represents a placeholder. Note that the ? is not enclosed in quotation marks, even when the placeholder represents a string. 
+        '15 description' => {
+                message => q|If you're using WebGUI macros in your query you'll want to check this box.
+<p>|,
+                lastUpdated => 1119841649,
+        },
 
-<p>
+        '4 description' => {
+                message => q|This is a standard SQL query. If you are unfamiliar with SQL then you'll likely not want to use this wobject.<br>
+A question mark ? in the query represents a placeholder. Note that the ? is not enclosed in quotation marks, even when the placeholder represents a string. |,
+                lastUpdated => 1119841649,
+        },
 
-<b>Database Link</b><br>
-The administrator can configure common databases on which you can run SQL Reports, freeing you from having to know or enter the connectivity information.
-<p>
+        '14 description' => {
+                message => q|How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?
+<p>|,
+                lastUpdated => 1119841649,
+        },
 
-<b>Paginate After</b><br>
-How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?
-<p>
-
-
-|,
-		lastUpdated => 1110001858,
-	},
 
 	'61' => {
 		message => q|SQL Report, Add/Edit|,

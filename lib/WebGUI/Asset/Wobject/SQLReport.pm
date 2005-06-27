@@ -139,11 +139,13 @@ sub getEditForm {
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
                 -label=>WebGUI::International::get(72,"Asset_SQLReport"),
+                -hoverHelp=>WebGUI::International::get('72 description',"Asset_SQLReport"),
       		-namespace=>"SQLReport"
    		);
         $tabform->getTab("properties")->yesNo(
                 -name=>"debugMode",
                 -label=>WebGUI::International::get(16,"Asset_SQLReport"),
+                -hoverHelp=>WebGUI::International::get('16 description',"Asset_SQLReport"),
                 -value=>$self->getValue("debugMode")
                 );
 
@@ -178,16 +180,19 @@ sub getEditForm {
 	   $tabform->getTab("properties")->yesNo(
 	  	   -name=>"preprocessMacros".$nr,
 		   -label=>WebGUI::International::get(15,"Asset_SQLReport"),
+		   -hoverHelp=>WebGUI::International::get('15 description',"Asset_SQLReport"),
 		   -value=>$self->getValue("preprocessMacros".$nr)
 		   );
 	   $tabform->getTab("properties")->textarea(
                    -name=>"placeholderParams".$nr,
                    -label=>WebGUI::International::get('Placeholder Parameters',"Asset_SQLReport"),
+                   -hoverHelp=>WebGUI::International::get('Placeholder Parameters description',"Asset_SQLReport"),
                    -value=>$self->getValue("placeholderParams".$nr)
                    );
 	   $tabform->getTab("properties")->codearea(
 		   -name=>"dbQuery".$nr,
 		   -label=>WebGUI::International::get(4,"Asset_SQLReport"),
+		   -hoverHelp=>WebGUI::International::get('4 description',"Asset_SQLReport"),
 		   -value=>$self->getValue("dbQuery".$nr)
 		   );
 	   $tabform->getTab("properties")->databaseLink(
@@ -220,6 +225,7 @@ sub getEditForm {
 	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
 		-label=>WebGUI::International::get(14,"Asset_SQLReport"),
+		-hoverHelp=>WebGUI::International::get('14 description',"Asset_SQLReport"),
 		-value=>$self->getValue("paginateAfter")
 		);
 	return $tabform;

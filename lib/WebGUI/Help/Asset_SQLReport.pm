@@ -5,6 +5,36 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		fields => [
+                        {
+                                title => '72',
+                                description => '72 description',
+                                namespace => 'Asset_SQLReport',
+                        },
+                        {
+                                title => '16',
+                                description => '16 description',
+                                namespace => 'Asset_SQLReport',
+                        },
+                        {
+                                title => 'Placeholder Parameters',
+                                description => 'Placeholder Parameters description',
+                                namespace => 'Asset_SQLReport',
+                        },
+                        {
+                                title => '15',
+                                description => '15 description',
+                                namespace => 'Asset_SQLReport',
+                        },
+                        {
+                                title => '4',
+                                description => '4 description',
+                                namespace => 'Asset_SQLReport',
+                        },
+                        {
+                                title => '14',
+                                description => '14 description',
+                                namespace => 'Asset_SQLReport',
+                        },
 		],
 		related => [
 			{
