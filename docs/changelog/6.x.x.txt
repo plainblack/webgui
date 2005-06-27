@@ -1,4 +1,11 @@
-﻿6.6.3
+﻿6.6.4
+ - Fixed an upgrade script bug in 6.2.11-6.3.0.
+ - Fixed an upgrade script bug in 6.5.6-6.6.0.
+ - Fixed an error handler bug in the auth system.
+ - Fixed a typo in syndicated content that made templates not appear.
+
+
+6.6.3
  - Fixed a recurring transaction commerce bug.
  - fix [ 1218874 ] Unable to edit any Assets nested in a Layout
  - Fixed a bad create.sql script from the last release.
