@@ -62,50 +62,76 @@ our $I18N = {
 		message => q|With the shortcut you can mirror an asset. This is useful if you want to reuse the same content in multiple sections of your site.
 <p>
 
-<b>NOTE:</b> The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each Asset's toolbar.
-<p>
-
-<b>Asset to Mirror</b><br>
-Provides a link to the original asset being mirrored.
-<p>
-
-<b>Override title?</b><br>
-Set to "yes" to use the title of the shortcut instead of the original title of the asset.
-<p>
-
-<b>Override description?</b><br>
-Set to "yes" to use the description of the shortcut instead of the original description of the asset.
-<p>
-
-<b>Override display title?</b><br>
-Set to "yes" to use the display title setting of the shortcut instead of the original display title setting of the asset.
-<p>
-
-<b>Override template?</b><br>
-Set to "yes" to use the template of the shortcut of the original template of the asset.
-<p>
-
-<b>Disable content lock?</b><br />
-By default if you proxy by alternate criteria the shortcut will lock on to a particular piece of content and show you only that piece of content until the end of your session. However, in some circumstances you may wish for this content to rotate. You can do that by disabling the content lock.
-
-<b>Shortcut by alternate criteria?</b><br>
-Set to "yes" to enable selecting a asset based upon custom criteria. Metadata must be enabled for this option to function properly.
-<p>
-
-<b>Resolve Multiples?</b><br>
-Sets the order to use when multiple assets are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br>
-Most Recent will select the most recent asset that match the shortcut criteria.
-<p>
-
-<b>Criteria</b><br>
-A statement to determinate what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
-A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.
-<p>
-<b>NOTE:</b> Shortcut will automatically add a template variable to the asset it's mirroring called 'originalURL'. You can use that to link to the original content that's being mirrored.
+<b>NOTES:</b><br/>
+The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each Asset's toolbar.
 <p>
 |,
-		lastUpdated => 1109561313,
+		lastUpdated => 1119905819,
 	},
+
+        '85 description' => {
+                message => q|Content for this shortcut.  This is normally not used, unless you opt to have the shortcut's
+description replace the description of the original Asset.|,
+                lastUpdated => 1119905806,
+        },
+
+        'shortcut template title description' => {
+                message => q|Select a template from the list to display the Shortcut.|,
+                lastUpdated => 1119905806,
+        },
+
+        'override asset template description' => {
+                message => q|Select a template that can optionally override the original Asset template.|,
+                lastUpdated => 1119905806,
+        },
+
+        '7 description' => {
+                message => q|Set to "yes" to use the title of the shortcut instead of the original title of the asset.|,
+                lastUpdated => 1119905806,
+        },
+
+        '8 description' => {
+                message => q|Set to "yes" to use the display title setting of the shortcut instead of the original display title setting of the asset.|,
+                lastUpdated => 1119905806,
+        },
+
+        '9 description' => {
+                message => q|Set to "yes" to use the description of the shortcut instead of the original description of the asset.|,
+                lastUpdated => 1119905806,
+        },
+
+        '1 description' => {
+                message => q|Provides a link to the original Asset being mirrored.|,
+                lastUpdated => 1119905806,
+        },
+
+        '10 description' => {
+                message => q|Set to "yes" to use the override template of the shortcut instead of the original template of the asset.|,
+                lastUpdated => 1119905806,
+        },
+
+        'Shortcut by alternate criteria? description' => {
+                message => q|Set to "yes" to enable selecting a asset based upon custom criteria. Metadata must be enabled for this option to function properly.|,
+                lastUpdated => 1119905806,
+        },
+
+        'disable content lock description' => {
+                message => q|By default if you proxy by alternate criteria the shortcut will lock on to a particular piece of content and show you only that piece of content until the end of your session. However, in some circumstances you may wish for this content to rotate. You can do that by disabling the content lock.|,
+                lastUpdated => 1119905806,
+        },
+
+        'Resolve Multiples? description' => {
+                message => q|Sets the order to use when multiple assets are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br>
+Most Recent will select the most recent asset that match the shortcut criteria.|,
+                lastUpdated => 1119905806,
+        },
+
+        'Criteria description' => {
+                message => q|A statement to determinate what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
+A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.|,
+                lastUpdated => 1119905806,
+        },
+
 
 	'greater than' => {
 		message => q|greater than|,
@@ -160,6 +186,11 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	'10' => {
 		message => q|Override template?|,
 		lastUpdated => 1053183837
+	},
+
+	'override asset template' => {
+		message => q|Override Asset Template|,
+		lastUpdated => 1119896310
 	},
 
 	'OR' => {

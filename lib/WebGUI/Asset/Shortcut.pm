@@ -96,46 +96,57 @@ sub getEditForm {
 	$tabform->getTab("properties")->HTMLArea(
 		-value=>$self->getValue("description"),
                 -label=>WebGUI::International::get(85, 'Asset_Shortcut'),
+                -hoverHelp=>WebGUI::International::get('85 description', 'Asset_Shortcut'),
 		-name=>"description"
 		);
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
+                -label=>WebGUI::International::get('shortcut template title', 'Asset_Shortcut'),
+                -hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
 		-namespace=>"Shortcut"
 		);
 	$tabform->getTab("display")->template(
 		-name=>"overrideTemplateId",
 		-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
+                -label=>WebGUI::International::get('override asset template', 'Asset_Shortcut'),
+                -hoverHelp=>WebGUI::International::get('override asset template description', 'Asset_Shortcut'),
 		-namespace=>$originalTemplate->get("namespace")
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideTitle",
 		-value=>$self->getValue("overrideTitle"),
 		-label=>WebGUI::International::get(7,"Asset_Shortcut")
+		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"overrideDisplayTitle",
 		-value=>$self->getValue("overrideDisplayTitle"),
 		-label=>WebGUI::International::get(8,"Asset_Shortcut")
+		-hoverHelp=>WebGUI::International::get('8 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideDescription",
 		-value=>$self->getValue("overrideDescription"),
 		-label=>WebGUI::International::get(9,"Asset_Shortcut")
+		-hoverHelp=>WebGUI::International::get('9 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"overrideTemplate",
 		-value=>$self->getValue("overrideTemplate"),
 		-label=>WebGUI::International::get(10,"Asset_Shortcut")
+		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get(1,"Asset_Shortcut"),
+		-hoverHelp=>WebGUI::International::get('1 description',"Asset_Shortcut"),
 		-value=>'<a href="'.$self->getShortcut->getUrl.'">'.$self->getShortcut->get('title').'</a> ('.$self->getShortcut->getId.')'
 		);
 	if($session{setting}{metaDataEnabled}) {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"shortcutByCriteria",
 			-value=>$self->getValue("shortcutByCriteria"),
-			-label=>WebGUI::International::get("Asset_Shortcut by alternate criteria?","Shortcut"),
+			-label=>WebGUI::International::get("Shortcut by alternate criteria?","Asset_Shortcut"),
+			-hoverHelp=>WebGUI::International::get("Shortcut by alternate criteria? description","Asset_Shortcut"),
 			-extras=>q|Onchange="
 				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
@@ -149,6 +160,7 @@ sub getEditForm {
 			-name=>"disableContentLock",
 			-value=>$self->getValue("disableContentLock"),
 			-label=>WebGUI::International::get("disable content lock","Asset_Shortcut")
+			-hoverHelp=>WebGUI::International::get("disable content lock description","Asset_Shortcut")
 			);
 		if ($self->getValue("shortcutByCriteria") == 0) {
 			$self->{_disabled} = 'disabled=true';
@@ -157,6 +169,7 @@ sub getEditForm {
 			-name=>"resolveMultiples",
 			-value=>[ $self->getValue("resolveMultiples") ],
 			-label=>WebGUI::International::get("Resolve Multiples?","Asset_Shortcut"),
+			-hoverHelp=>WebGUI::International::get("Resolve Multiples? description","Asset_Shortcut"),
 			-options=>{
 				mostRecent=>WebGUI::International::get("Most Recent","Asset_Shortcut"),
 				random=>WebGUI::International::get("Random","Asset_Shortcut"),
@@ -167,6 +180,7 @@ sub getEditForm {
 		 $tabform->getTab("properties")->readOnly(
         		-value=>$self->_drawQueryBuilder(),
 		        -label=>WebGUI::International::get("Criteria","Asset_Shortcut"),
+		        -hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut"),
 	        );
 	}
 	return $tabform;
