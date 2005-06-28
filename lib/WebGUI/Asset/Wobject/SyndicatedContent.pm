@@ -155,6 +155,7 @@ sub getEditForm {
       		-value=>$self->getValue('templateId'),
       		-namespace=>'SyndicatedContent',
 		-label=>WebGUI::International::get(72,'Asset_SyndicatedContent'),
+		-hoverHelp=>WebGUI::International::get('72 description','Asset_SyndicatedContent'),
    		);
 	$tabform->getTab('display')->selectList(
 		-name=>'displayMode',
@@ -164,24 +165,28 @@ sub getEditForm {
 			 },
 		-sortByValue=>1,
 		-label=>WebGUI::International::get('displayModeLabel','Asset_SyndicatedContent'),
+		-hoverHelp=>WebGUI::International::get('displayModeLabel description','Asset_SyndicatedContent'),
 		-value=>[$self->getValue('displayMode')],
 		-subtext=>WebGUI::International::get('displayModeSubtext','Asset_SyndicatedContent'),
 		);
 	$tabform->getTab('display')->text(
 		-name=>'hasTerms',
 		-label=>WebGUI::International::get('hasTermsLabel','Asset_SyndicatedContent'),
+		-hoverHelp=>WebGUI::International::get('hasTermsLabel description','Asset_SyndicatedContent'),
 		-maxlength=>255,
 		-value=>$self->getValue('hasTerms'),
 		);
 	$tabform->getTab('properties')->textarea(
 		-name=>'rssUrl',
 		-label=>WebGUI::International::get(1,'Asset_SyndicatedContent'),
+		-hoverHelp=>WebGUI::International::get( description1,'Asset_SyndicatedContent'),
 		-value=>$self->getValue('rssUrl')
 		);
 
 	$tabform->getTab('display')->integer(
 		-name=>'maxHeadlines',
 		-label=>WebGUI::International::get(3,'Asset_SyndicatedContent'),
+		-hoverHelp=>WebGUI::International::get( description3,'Asset_SyndicatedContent'),
 		-value=>$self->getValue('maxHeadlines')
 		);
 	#$tabform->addTab('rss',WebGUI::International::get('rssTabName','Asset_SyndicatedContent'));

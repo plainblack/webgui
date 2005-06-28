@@ -22,47 +22,15 @@ our $I18N = {
                      'message' => 'Syndicated Content, Add/Edit'
                    },
            '71' => {
-                     'lastUpdated' => 1110070203,
-                     'message' => 'Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
+                     'lastUpdated' => 1119977726,
+                     'message' => q|Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
 <p>
-The Syndicated Content system also has the ability to "republish" it\'s items as RSS 0.9, 0.91, 1.0 and 2.0 flavor feeds. This means you can aggregate a bunch of feeds together, filter on relevant keywords and then republish this aggregated feed, and the Syndicated Content wobject will take care of all the messy stuff for you. See the "Syndicated Content Template" help for additional information. 
+The Syndicated Content system also has the ability to "republish" it's items as RSS 0.9, 0.91, 1.0 and 2.0 flavor feeds. This means you can aggregate a bunch of feeds together, filter on relevant keywords and then republish this aggregated feed, and the Syndicated Content wobject will take care of all the messy stuff for you. See the "Syndicated Content Template" help for additional information. 
 <p>
 The Syndicated Content client is a Wobject and an Asset, so it has the properties of both.  It also has
 these unique properties:
 <p>
-
-<b>URL to RSS file</b><br>
-Provide the exact URL (starting with http://) to the syndicated content\'s RDF or RSS file. The syndicated content will be downloaded from this URL hourly.
-<br><br>
-You can find syndicated content at the following locations:
-</p><ul>
-<li><a href="http://www.newsisfree.com/">http://www.newsisfree.com</a>
-</li><li><a href="http://www.syndic8.com/">http://www.syndic8.com</a>
-</li><li><a href="http://www.voidstar.com/node.php?id=144">http://www.voidstar.com/node.php?id=144</a>
-</li><li><a href="http://my.userland.com/">http://my.userland.com</a>
-</li><li><a href="http://www.webreference.com/services/news/">http://www.webreference.com/services/news/</a>
-</li><li><a href="http://w.moreover.com/">http://w.moreover.com/</a>
-</li></ul>
-Currently, we can handle RSS versions .90, .91, 1.0, and 2.0. Atom feeds aren\'t supported for now. Probably other RSS-ish files would work too.
-<p>
-
-To create an aggregate RSS feed (one that pulls information from multiple RSS feeds), include a list of URLs, one on each line, instead of a single URL.  Items will be sorted by the date WebGUI first received the story.<p>
-
-<b>Display Mode</b><br>
-If you\'re aggregating feeds, you can change the mode in which the items are displayed. "Grouped by Feed" means the items will be grouped together by the feeds they come from. "Interleaved" means the items will be mixed together in a "round-robin" fashion from all the feeds. If you\'re grouping your feeds, please look at <b>new_rss_site</b> "item_loop" template variables, it gives you a hook allowing you to output the feed title
-<p>
-
-<b>With any of these terms</b><br>
-Enter terms (separated by commas) that you\'d like to filter the feeds on. For instance, if you enter:<br>
-<blockquote><b>linux, windows development, blogs</b></blockquote>
-The Syndicated Content web object will display items containing "linux", "windows development" or "blogs" (in the title or description of the item) from all the feeds you\'re aggregating together.
-<p>
-
-<b>Template</b><br>
-Select a template for this content.
-<p><b>Maximum Headlines</b><br>
-Enter the maximum number of headlines that should be displayed.  Set to zero to allow any number of headlines.
-<p>'
+|
                    },
            '72' => {
                      'lastUpdated' => 1047855526,
@@ -164,5 +132,44 @@ A URL directly to the content of the item.
 			    'lastUpdated' => 1118417024,
 			    'message' => 'RSS 2.0 Feed'
                            },
+	'72 description' => {
+                message => q|Select a template for this content.|,
+                lastUpdated => 1119977659,
+        },
+
+        'displayModeLabel description' => {
+                message => q|If you're aggregating feeds, you can change the mode in which the items are displayed. "Grouped by Feed" means the items will be grouped together by the feeds they come from. "Interleaved" means the items will be mixed together in a "round-robin" fashion from all the feeds. If you're grouping your feeds, please look at <b>new_rss_site</b> "item_loop" template variables, it gives you a hook allowing you to output the feed title|,
+                lastUpdated => 1119977659,
+        },
+
+        'hasTermsLabel description' => {
+                message => q|Enter terms (separated by commas) that you'd like to filter the feeds on. For instance, if you enter:<br>
+<blockquote><b>linux, windows development, blogs</b></blockquote>
+The Syndicated Content web object will display items containing "linux", "windows development" or "blogs" (in the title or description of the item) from all the feeds you're aggregating together.|,
+                lastUpdated => 1119977659,
+        },
+
+        '1 description' => {
+                message => q|Provide the exact URL (starting with http://) to the syndicated content's RDF or RSS file. The syndicated content will be downloaded from this URL hourly.
+<br><br>
+You can find syndicated content at the following locations:
+</p><ul>
+<li><a href="http://www.newsisfree.com/">http://www.newsisfree.com</a>
+</li><li><a href="http://www.syndic8.com/">http://www.syndic8.com</a>
+</li><li><a href="http://www.voidstar.com/node.php?id=144">http://www.voidstar.com/node.php?id=144</a>
+</li><li><a href="http://my.userland.com/">http://my.userland.com</a>
+</li><li><a href="http://www.webreference.com/services/news/">http://www.webreference.com/services/news/</a>
+</li><li><a href="http://w.moreover.com/">http://w.moreover.com/</a>
+</li></ul>
+Currently, we can handle RSS versions .90, .91, 1.0, and 2.0. Atom feeds aren't supported for now. Probably other RSS-ish files would work too.
+<p>
+To create an aggregate RSS feed (one that pulls information from multiple RSS feeds), include a list of URLs, one on each line, instead of a single URL.  Items will be sorted by the date WebGUI first received the story.<p>|,
+                lastUpdated => 1119977659,
+        },
+
+        '3 description' => {
+                message => q|Enter the maximum number of headlines that should be displayed.  Set to zero to allow any number of headlines.|,
+                lastUpdated => 1119977659,
+        },
          };
 1;

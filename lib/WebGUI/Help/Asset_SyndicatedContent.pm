@@ -5,6 +5,31 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		fields => [
+                        {
+                                title => '72',
+                                description => '72 description',
+                                namespace => 'Asset_SyndicatedContent',
+                        },
+                        {
+                                title => 'displayModeLabel',
+                                description => 'displayModeLabel description',
+                                namespace => 'Asset_SyndicatedContent',
+                        },
+                        {
+                                title => 'hasTermsLabel',
+                                description => 'hasTermsLabel description',
+                                namespace => 'Asset_SyndicatedContent',
+                        },
+                        {
+                                title => '1',
+                                description => '1 description',
+                                namespace => 'Asset_SyndicatedContent',
+                        },
+                        {
+                                title => '3',
+                                description => '3 description',
+                                namespace => 'Asset_SyndicatedContent',
+                        },
 		],
 		related => [
 			{
