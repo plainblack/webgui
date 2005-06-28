@@ -51,18 +51,28 @@ our $I18N = {
 		message => q|<b>Template Name</b><br/>
 Give this template a descriptive name so that you'll know what it is when you're applying a template to content.
 <p/>
-
-<b>Namespace</b><br/>
-What type of template is this?
-<p/>
-
-<b>Template</b><br/>
-Create your template by using template commands and variables, macros, and HTML.
-<p/>
-
-<b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.|,
-		lastUpdated => 1038890615
+<b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.
+|,
+		lastUpdated => 1119979659
 	},
+
+        'namespace description' => {
+                message => q|What type of template is this?
+<p/>|,
+                lastUpdated => 1119979645,
+        },
+
+        'show in forms description' => {
+                message => q|Should this template be shown in the list of template from this namespace?
+<p/>|,
+                lastUpdated => 1119979645,
+        },
+
+        'template description' => {
+                message => q|Create your template by using template commands and variables, macros, and HTML.
+<p/>|,
+                lastUpdated => 1119979645,
+        },
 
 	'685' => {
 		message => q|Template, Delete|,

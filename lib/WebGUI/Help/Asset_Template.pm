@@ -30,6 +30,21 @@ our $HELP = {
 		title => '684',
 		body => '639',
 		fields => [
+                        {
+                                title => 'namespace',
+                                description => 'namespace description',
+                                namespace => 'Asset_Template',
+                        },
+                        {
+                                title => 'show in forms',
+                                description => 'show in forms description',
+                                namespace => 'Asset_Template',
+                        },
+                        {
+                                title => 'template',
+                                description => 'template description',
+                                namespace => 'Asset_Template',
+                        },
 		],
 		related => [
 			{

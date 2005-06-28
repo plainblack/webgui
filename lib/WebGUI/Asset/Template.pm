@@ -148,11 +148,13 @@ sub getEditForm {
 			-name=>"namespace",
 			-options=>$namespaces,
 			-label=>WebGUI::International::get('namespace','Asset_Template'),
+			-hoverHelp=>WebGUI::International::get('namespace description','Asset_Template'),
 			-value=>[$session{form}{namespace}] 
 			);
 	} else {
 		$tabform->getTab("meta")->readOnly(
 			-label=>WebGUI::International::get('namespace','Asset_Template'),
+			-hoverHelp=>WebGUI::International::get('namespace description','Asset_Template'),
 			-value=>$self->getValue("namespace")
 			);	
 		$tabform->getTab("meta")->hidden(
@@ -164,10 +166,12 @@ sub getEditForm {
 		-name=>"showInForms",
 		-value=>$self->getValue("showInForms"),
 		-label=>WebGUI::International::get('show in forms', 'Asset_Template'),
+		-hoverHelp=>WebGUI::International::get('show in forms description', 'Asset_Template'),
 		);
         $tabform->getTab("properties")->codearea(
 		-name=>"template",
 		-label=>WebGUI::International::get('template', 'Asset_Template'),
+		-hoverHelp=>WebGUI::International::get('template description', 'Asset_Template'),
 		-value=>$self->getValue("template")
 		);
 	return $tabform;
