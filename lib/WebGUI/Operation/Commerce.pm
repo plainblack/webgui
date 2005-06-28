@@ -244,7 +244,7 @@ sub www_checkoutSubmit {
 		foreach (@{$currentPurchase->{items}}) {
 			$transaction->addItem($_->{item}, $_->{quantity});
 			$amount += ($_->{item}->price * $_->{quantity});
-			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br>';
+			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';
 		}
 		$transaction->shippingCost($shippingCost);
 		$transaction->shippingMethod($shipping->namespace);
@@ -430,7 +430,7 @@ sub www_editCommerceSettings {
 		
 	# payment plugin
 	if (%paymentPlugins) {
-		$tabform->getTab('payment')->raw('<script language="JavaScript" > var activePayment="'.$paymentPlugin.'"; </script>');
+		$tabform->getTab('payment')->raw('<script language="JavaScript" type="text/javascript"> var activePayment="'.$paymentPlugin.'"; </script>');
 		$tabform->getTab("payment")->selectList(
 			-name		=> 'commercePaymentPlugin',
 			-options	=> \%paymentPlugins,
@@ -439,7 +439,7 @@ sub www_editCommerceSettings {
 			-extras		=> 'onChange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
 			);
 			
-		$jscript = '<script language="JavaScript">';
+		$jscript = '<script language="JavaScript" type="text/javascript">';
 		foreach $currentPlugin (@paymentPlugins) {
 			$tabform->getTab('payment')->raw('<tr id="'.$currentPlugin->namespace.'"><td colspan="2" width="100%">'.
 				'<table border=0 cellspacing=0 cellpadding=0  width="100%">'.
@@ -453,8 +453,8 @@ sub www_editCommerceSettings {
 	}
 
 	if (@failedPaymentPlugins) {
-		$tabform->getTab('payment')->raw('<tr><td colspan="2" align="left"><br>'.$i18n->get('failed payment plugins').
-						'<br><ul><li>'.join('</li><li>', @failedPaymentPlugins).'</li></ul></td></tr>');
+		$tabform->getTab('payment')->raw('<tr><td colspan="2" align="left"><br />'.$i18n->get('failed payment plugins').
+						'<br /><ul><li>'.join('</li><li>', @failedPaymentPlugins).'</li></ul></td></tr>');
 	}
 
 # Shipping plugins...
@@ -471,7 +471,7 @@ sub www_editCommerceSettings {
 	
 	# shipping plugin
 	if (%shippingPlugins) {
-		$tabform->getTab('shipping')->raw('<script language="JavaScript" > var activeShipping="'.$shippingPlugin.'"; </script>');
+		$tabform->getTab('shipping')->raw('<script language="JavaScript" type="text/javascript"> var activeShipping="'.$shippingPlugin.'"; </script>');
 		$tabform->getTab('shipping')->selectList(
 			-name	=> 'commerceShippingPlugin',
 			-options=> \%shippingPlugins,
@@ -480,7 +480,7 @@ sub www_editCommerceSettings {
 			-extras	=> 'onChange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
 			);
 		
-		$jscript = '<script language="JavaScript">';
+		$jscript = '<script language="JavaScript" type="text/javascript">';
 		foreach $currentPlugin (@shippingPlugins) {
 			$tabform->getTab('shipping')->raw('<tr id="'.$currentPlugin->namespace.'"><td colspan="2" width="100%">'.
 				'<table border=0 cellspacing=0 cellpadding=0  width="100%">'.
