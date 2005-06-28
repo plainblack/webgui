@@ -436,7 +436,7 @@ sub www_editCommerceSettings {
 			-options	=> \%paymentPlugins,
 			-label		=> $i18n->get('payment form'),
 			-value		=> [$paymentPlugin],
-			-extras		=> 'onChange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
+			-extras		=> 'onchange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
 			);
 			
 		$jscript = '<script language="JavaScript" type="text/javascript">';
@@ -477,7 +477,7 @@ sub www_editCommerceSettings {
 			-options=> \%shippingPlugins,
 			-label	=> $i18n->get('shipping plugin label'),
 			-value	=> [$shippingPlugin],
-			-extras	=> 'onChange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
+			-extras	=> 'onchange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
 			);
 		
 		$jscript = '<script language="JavaScript" type="text/javascript">';
