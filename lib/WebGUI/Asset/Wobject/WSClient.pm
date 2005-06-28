@@ -158,46 +158,55 @@ sub getEditForm {
       -value     => $self->getValue('templateId'),
       -namespace => "WSClient",
       -label => WebGUI::International::get(72, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('72 description', "Asset_WSClient"),
    );
    $tabform->getTab("display")->yesNo (
       -name  => 'preprocessMacros',
       -label => WebGUI::International::get(8, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('8 description', "Asset_WSClient"),
       -value => $self->get('preprocessMacros'),
    );
   	$tabform->getTab("display")->integer(
       -name  => 'paginateAfter',
       -label => WebGUI::International::get(13, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('13 description', "Asset_WSClient"),
       -value => $self->getValue("paginateAfter")
    );
    $tabform->getTab("display")->text (
       -name  => 'paginateVar',
       -label => WebGUI::International::get(14, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('14 description', "Asset_WSClient"),
       -value => $self->get('paginateVar'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'uri',
       -label => WebGUI::International::get(2, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('2 description', "Asset_WSClient"),
       -value => $self->get('uri'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'proxy',
       -label => WebGUI::International::get(3, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('3 description', "Asset_WSClient"),
       -value => $self->get('proxy'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'callMethod',
       -label => WebGUI::International::get(4, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('4 description', "Asset_WSClient"),
       -value => $self->get('callMethod'),
    );
    $tabform->getTab("properties")->textarea ( 
       -name  => 'params',
       -label => WebGUI::International::get(5, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('5 description', "Asset_WSClient"),
       -value => $self->get('params'),
    );
    if ($session{'config'}{'soapHttpHeaderOverride'}) {
       $tabform->getTab("properties")->text (
          -name  => 'httpHeader',
          -label => WebGUI::International::get(16, "Asset_WSClient"),
+         -hoverHelp => WebGUI::International::get('16 description', "Asset_WSClient"),
          -value => $self->get('httpHeader'),
       );
    } else {
@@ -210,17 +219,20 @@ sub getEditForm {
    $tabform->getTab("properties")->yesNo (
       -name  => 'execute_by_default',
       -label => WebGUI::International::get(11, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('11 description', "Asset_WSClient"),
       -value => $self->get('execute_by_default'),
    );
    $tabform->getTab("properties")->yesNo (
       -name  => 'debugMode',
       -label => WebGUI::International::get(9, "Asset_WSClient"),
+      -hoverHelp => WebGUI::International::get('9 description', "Asset_WSClient"),
       -value => $self->get('debugMode'),
    );
    if ($utf8FieldType eq 'yesNo') {
       $tabform->getTab("properties")->yesNo (
          -name  => 'decodeUtf8',
          -label => WebGUI::International::get(15, "Asset_WSClient"),
+         -hoverHelp => WebGUI::International::get('15 description', "Asset_WSClient"),
          -value => $self->get('decodeUtf8'),
       );
    } else {
@@ -238,11 +250,13 @@ sub getEditForm {
       -name    => 'sharedCache',
       -options => $cacheopts,
       -label   => WebGUI::International::get(28, "Asset_WSClient"),
+      -hoverHelp   => WebGUI::International::get('28 description', "Asset_WSClient"),
       -value   => $self->get('sharedCache'),
    );
    $tabform->getTab("properties")->interval (
       -name     => 'cacheTTL',
       -label    => WebGUI::International::get(27, "Asset_WSClient"),
+      -hoverHelp    => WebGUI::International::get('27 description', "Asset_WSClient"),
       -value    => $self->get('cacheTTL'),
    );
 	return $tabform;
