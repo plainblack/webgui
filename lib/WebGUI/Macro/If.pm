@@ -24,7 +24,7 @@ sub process {
         my $return = $compartment->reval($expression);
         
         return "<p><b>If Macro failed:</b> $@ <p>Expression: $expression
-		<br>Display if true: $true<br>Display if false: $false" if ($@);
+		<br />Display if true: $true<br />Display if false: $false" if ($@);
         
         $output = $true if ($return);
         
