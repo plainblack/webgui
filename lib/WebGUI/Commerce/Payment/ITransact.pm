@@ -457,7 +457,7 @@ sub configurationForm {
 		-value	=> $self->get('emailMessage')
 		);
 	$f->readOnly(
-		-value	=> '<br>'
+		-value	=> '<br />'
 		);
 	if ($self->get('vendorId')) {
 		$f->readOnly(
@@ -465,10 +465,10 @@ sub configurationForm {
 			);
 	}
 	$f->readOnly(
-		-value	=> '<br>'
+		-value	=> '<br />'
 		);
 	$f->readOnly(
-		-value	=> $i18n->get('extra info').'<br><b>https://'.$session{config}{defaultSitename}.WebGUI::URL::getScriptURL().'?op=confirmRecurringTransaction&gateway='.$self->namespace
+		-value	=> $i18n->get('extra info').'<br /><b>https://'.$session{config}{defaultSitename}.WebGUI::URL::getScriptURL().'?op=confirmRecurringTransaction&gateway='.$self->namespace
 		);
 		
 	return $self->SUPER::configurationForm($f->printRowsOnly);
