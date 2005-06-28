@@ -712,12 +712,14 @@ sub www_editAnswer {
                 -name=>"answer",
                 -value=>$answer->{answer},
                 -label=>WebGUI::International::get(19,'Asset_Survey')
+                -hoverHelp=>WebGUI::International::get('19 description','Asset_Survey')
                 );
 	if ($self->get("mode") eq "quiz") {
         	$f->yesNo(
                 	-name=>"isCorrect",
                 	-value=>$answer->{isCorrect},
                 	-label=>WebGUI::International::get(20,'Asset_Survey')
+                	-hoverHelp=>WebGUI::International::get('20 description','Asset_Survey')
                 	);
 	} else {
 		$f->hidden("isCorrect",0);
@@ -731,6 +733,7 @@ sub www_editAnswer {
 			-options=>$question,
 			-value=>[$answer->{gotoQuestion}],
 			-label=>WebGUI::International::get(21,'Asset_Survey')
+			-hoverHelp=>WebGUI::International::get('21 description','Asset_Survey')
 			);
 	}
 	if ($answer->{Survey_answerId} eq "new") {
@@ -745,6 +748,7 @@ sub www_editAnswer {
                 $f->whatNext(
                         -options=>\%options,
                         -value=>"addAnswer"
+			-hoverHelp=>WebGUI::International::get('what next answer description','Asset_Survey')
                         );
         }
         $f->submit;

@@ -1124,10 +1124,33 @@ is set to "response".
 <li>Text</il>
 <li>Frequency</il>
 <li>Opinion</il>
+<li>Or you may return to the survey</li>
 </ul>
-or you may return to the survey.
 </p>|,
-                lastUpdated => 1119851108,
+                lastUpdated => 1119982880,
+        },
+
+	'answer add/edit body' => {
+                message => q||,
+                lastUpdated => 1119993979,
+	},
+
+        '19 description' => {
+                message => q|The answer to this question.|,
+                lastUpdated => 1119993924,
+        },
+
+        '20 description' => {
+                message => q|If you have set the Survey to Quiz mode, then you can define if this answer
+is correct or not.|,
+                lastUpdated => 1119993924,
+        },
+
+        'what next answer description' => {
+                message => q|After defining the answer, you can add an answer to this question, addi
+		another question, edit the current question or go back to the page containing the
+		Survey|,
+                lastUpdated => 1119993846,
         },
 
 };

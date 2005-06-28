@@ -85,6 +85,10 @@ our $HELP = {
 				namespace => 'Asset_Survey'
 			},
 			{
+				tag => 'answer add/edit',
+				namespace => 'Asset_Survey'
+			},
+			{
 				tag => 'survey template',
 				namespace => 'Asset_Survey'
 			},
@@ -137,6 +141,41 @@ our $HELP = {
                         },
 		],
 		related => [
+			{
+				tag => 'survey add/edit',
+				namespace => 'Asset_Survey'
+			},
+			{
+				tag => 'answer add/edit',
+				namespace => 'Asset_Survey'
+			},
+		]
+	},
+	'answer add/edit' => {
+		title => '18',
+		body => 'answer add/edit body',
+		fields => [
+                        {
+                                title => '19',
+                                description => '19 description',
+                                namespace => 'Asset_Survey',
+                        },
+                        {
+                                title => '20',
+                                description => '20 description',
+                                namespace => 'Asset_Survey',
+                        },
+                        {
+                                title => '21',
+                                description => '21 description',
+                                namespace => 'Asset_Survey',
+                        },
+		],
+		related => [
+			{
+				tag => 'question add/edit',
+				namespace => 'Asset_Survey'
+			},
 			{
 				tag => 'survey add/edit',
 				namespace => 'Asset_Survey'
