@@ -903,7 +903,7 @@ sub www_editQuestionSave {
                 $_[0]->addAnswer(43,$session{form}{qid});
                 $_[0]->addAnswer(39,$session{form}{qid});
 	} elsif ($session{form}{proceed} eq "addQuestion") {
-		$session{form}{qid} eq "new";
+		$session{form}{qid} = "new";
                 return $_[0]->www_editQuestion();
 	}
         return "";
