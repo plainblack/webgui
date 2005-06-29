@@ -1002,11 +1002,11 @@ The status of this Post.
 
 <p>
 <b>thumbnail</b><br>
-If this Post has attachements, the URL for the thumbnail of the first image attachement.
+If this Post has attachments, the URL for the thumbnail of the first image attachment.
 
 <p>
 <b>image.url</b><br>
-If this Post has attachements, the URL for the first image attachement.
+If this Post has attachments, the URL for the first image attachment.
 
 <p>
 <b>dateSubmitted.human</b><br>
