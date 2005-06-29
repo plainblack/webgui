@@ -203,7 +203,7 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
-      		-namespace=>"Product"
+      		-namespace=>"Product",
 		-label=>WebGUI::International::get(62,"Asset_Product"),
    		);
 	$tabform->getTab("properties")->text(
