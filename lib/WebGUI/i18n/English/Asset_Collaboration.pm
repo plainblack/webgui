@@ -1002,11 +1002,11 @@ The status of this Post.
 
 <p>
 <b>thumbnail</b><br>
-If this Post has a attachements, the URL for the thumbnail of the first image attachement.
+If this Post has attachements, the URL for the thumbnail of the first image attachement.
 
 <p>
 <b>image.url</b><br>
-If this Post has a attachements, the URL for the first image attachement.
+If this Post has attachements, the URL for the first image attachement.
 
 <p>
 <b>dateSubmitted.human</b><br>
@@ -1101,7 +1101,7 @@ The time the last reply was submitted, in a human readable format.
 </blockquote>
 
                 |,
-		lastUpdated => 1114148028,
+		lastUpdated => 1120083131,
 	},
 
 	'collaboration template title' => {
