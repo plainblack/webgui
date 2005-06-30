@@ -179,14 +179,14 @@ sub getEditForm {
 	$tabform->getTab('properties')->textarea(
 		-name=>'rssUrl',
 		-label=>WebGUI::International::get(1,'Asset_SyndicatedContent'),
-		-hoverHelp=>WebGUI::International::get('rssUrl Hover','Asset_SyndicatedContent'),
+		-hoverHelp=>WebGUI::International::get('1 description','Asset_SyndicatedContent'),
 		-value=>$self->getValue('rssUrl')
 		);
 
 	$tabform->getTab('display')->integer(
 		-name=>'maxHeadlines',
 		-label=>WebGUI::International::get(3,'Asset_SyndicatedContent'),
-		-hoverHelp=>WebGUI::International::get('maxHeadlines Hover','Asset_SyndicatedContent'),
+		-hoverHelp=>WebGUI::International::get('3 description','Asset_SyndicatedContent'),
 		-value=>$self->getValue('maxHeadlines')
 		);
 	#$tabform->addTab('rss',WebGUI::International::get('rssTabName','Asset_SyndicatedContent'));
