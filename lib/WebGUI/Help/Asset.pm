@@ -175,7 +175,9 @@ our $HELP = {
 				 { tag => "$tag add/edit",
 				   namespace => $namespace }
 			     }
-		             @{ $session{config}{assets} }, @{ $session{config}{assetContainers} }
+		             @{ $session{config}{assets} },
+                             @{ $session{config}{assetContainers} },
+                             @{ $session{config}{utilityAssets} },
 			   ],
 	},
 
