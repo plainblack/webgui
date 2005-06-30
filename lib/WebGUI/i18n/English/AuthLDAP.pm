@@ -114,6 +114,11 @@ Default label for the anonymous registration link.
 		lastUpdated => 1071849063
 	},
 
+	'ldapConnection description' => {
+		message => q|Select one of the preconfigured LDAP connections to authenticate this user|,
+		lastUpdated => 1120171999
+	},
+
 	'6' => {
 		message => q|LDAP Identity (default)|,
 		lastUpdated => 1031514049
@@ -552,10 +557,10 @@ Default text for password form field.
 
         'LDAPLink_994 description' => {
                 message => q|DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
-directory. In this case, the "Connect DN" is the DN that point's the the user account
+directory. In this case, the "Connect DN" is the DN that points to the user account
 record. Usually that will look something like:</p>
 <p>cn=Joe Shmoe,ou=people,dc=example,dc=com|,
-                lastUpdated => 1120164594,
+                lastUpdated => 1120172492,
         },
 
         'LDAPLink_995 description' => {
