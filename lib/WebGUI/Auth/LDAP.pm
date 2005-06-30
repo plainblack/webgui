@@ -116,13 +116,22 @@ sub addUserForm {
 	   $f->selectList(
 	                -name=>"authLDAP_ldapConnection",
 					-label=>WebGUI::International::get("ldapConnection",'AuthLDAP'),
+					-hoverHelp=>WebGUI::International::get("ldapConnection description",'AuthLDAP'),
 					-options=>WebGUI::LDAPLink::getList(),
 					-value=>[$ldapConnection],
 					-extras=>q|onchange="this.form.authLDAP_ldapUrl.value=ldapValue[this.options[this.selectedIndex].value];"|
 				  );
 	}
-	$f->url("authLDAP_ldapUrl",WebGUI::International::get(3,'AuthLDAP'),$ldapUrl);
-	$f->text("authLDAP_connectDN",WebGUI::International::get(4,'AuthLDAP'),$connectDN);
+	$f->url(
+		-name => "authLDAP_ldapUrl",
+		-label => WebGUI::International::get(3,'AuthLDAP'),
+		-value => $ldapUrl,
+	);
+	$f->text(
+		-name => "authLDAP_connectDN",
+		-label => WebGUI::International::get(4,'AuthLDAP'),
+		-value => $connectDN,
+	);
 	return $jscript.$f->printRowsOnly;
 }
 
