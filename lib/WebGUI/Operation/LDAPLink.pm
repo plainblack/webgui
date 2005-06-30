@@ -78,46 +78,102 @@ sub www_editLDAPLink {
    %db = WebGUI::SQL->quickHash("select * from ldapLink where ldapLinkId=".quote($session{form}{llid}));
    
    $f = WebGUI::HTMLForm->new( -extras=>'autocomplete="off"' );
-   $f->hidden("op","editLDAPLinkSave");
-   $f->hidden("llid",$session{form}{llid});
-   $f->hidden("returnUrl",$session{form}{returnUrl});
-   $f->readOnly($session{form}{llid},WebGUI::International::get("LDAPLink_991","AuthLDAP"));
-   $f->text("ldapLinkName",WebGUI::International::get("LDAPLink_992","AuthLDAP"),$db{ldapLinkName});
-   $f->text("ldapUrl",WebGUI::International::get("LDAPLink_993","AuthLDAP"),$db{ldapUrl});
-   $f->text("connectDn",WebGUI::International::get("LDAPLink_994","AuthLDAP"),$db{connectDn});
-   $f->password("identifier",WebGUI::International::get("LDAPLink_995","AuthLDAP"),$db{identifier});
-   
-   $f->text("ldapUserRDN",WebGUI::International::get(9,'AuthLDAP'),$db{ldapUserRDN});
-   $f->text("ldapIdentity",WebGUI::International::get(6,'AuthLDAP'),$db{ldapIdentity});
-   $f->text("ldapIdentityName",WebGUI::International::get(7,'AuthLDAP'),$db{ldapIdentityName});
-   $f->text("ldapPasswordName",WebGUI::International::get(8,'AuthLDAP'),$db{ldapPasswordName});
+   $f->hidden(
+   		-name => "op",
+		-value => "editLDAPLinkSave",
+	     );
+   $f->hidden(
+   		-name => "llid",
+		-value => $session{form}{llid},
+	     );
+   $f->hidden(
+   		-name => "returnUrl",
+		-value => $session{form}{returnUrl},
+	     );
+   $f->readOnly(
+		-label => WebGUI::International::get("LDAPLink_991","AuthLDAP"),
+   		-value => $session{form}{llid},
+	       );
+   $f->text(
+   		-name  => "ldapLinkName",
+		-label => WebGUI::International::get("LDAPLink_992","AuthLDAP"),
+		-hoverHelp => WebGUI::International::get("LDAPLink_992 description","AuthLDAP"),
+		-value => $db{ldapLinkName},
+	   );
+   $f->text(
+   		-name => "ldapUrl",
+		-label => WebGUI::International::get("LDAPLink_993","AuthLDAP"),
+		-hoverHelp => WebGUI::International::get("LDAPLink_993 description","AuthLDAP"),
+		-value => $db{ldapUrl},
+	   );
+   $f->text(
+   		-name => "connectDn",
+		-label => WebGUI::International::get("LDAPLink_994","AuthLDAP"),
+		-hoverHelp => WebGUI::International::get("LDAPLink_994 description","AuthLDAP"),
+		-value => $db{connectDn},
+	   );
+   $f->password(
+   		-name => "identifier",
+		-label => WebGUI::International::get("LDAPLink_995","AuthLDAP"),
+		-hoverHelp => WebGUI::International::get("LDAPLink_995 description","AuthLDAP"),
+		-value => $db{identifier},
+		);
+   $f->text(
+   		-name => "ldapUserRDN",
+		-label => WebGUI::International::get(9,'AuthLDAP'),
+		-hoverHelp => WebGUI::International::get('9 description','AuthLDAP'),
+		-value => $db{ldapUserRDN},
+	   );
+   $f->text(
+		-name => "ldapIdentity",
+		-label => WebGUI::International::get(6,'AuthLDAP'),
+		-hoverHelp => WebGUI::International::get('6 description','AuthLDAP'),
+		-value => $db{ldapIdentity},
+   );
+   $f->text(
+		-name => "ldapIdentityName",
+		-label => WebGUI::International::get(7,'AuthLDAP'),
+		-hoverHelp => WebGUI::International::get('7 description','AuthLDAP'),
+		-value => $db{ldapIdentityName},
+   );
+   $f->text(
+		-name => "ldapPasswordName",
+		-label => WebGUI::International::get(8,'AuthLDAP'),
+		-hoverHelp => WebGUI::International::get('8 description','AuthLDAP'),
+		-value => $db{ldapPasswordName},
+   );
    $f->yesNo(
              -name=>"ldapSendWelcomeMessage",
              -value=>$db{ldapSendWelcomeMessage},
-             -label=>WebGUI::International::get(868)
+             -label=>WebGUI::International::get(868,"AuthLDAP")
+             -hoverHelp=>WebGUI::International::get('868 description',"AuthLDAP")
              );
    $f->textarea(
                 -name=>"ldapWelcomeMessage",
                 -value=>$db{ldapWelcomeMessage},
-                -label=>WebGUI::International::get(869)
+                -label=>WebGUI::International::get(869,"AuthLDAP")
+                -hoverHelp=>WebGUI::International::get('869 description',"AuthLDAP")
                );
 	$f->template(
 		-name=>"ldapAccountTemplate",
 		-value=>$db{ldapAccountTemplate},
 		-namespace=>"Auth/LDAP/Account",
 		-label=>WebGUI::International::get("account template","AuthLDAP")
+		-hoverHelp=>WebGUI::International::get("account template description","AuthLDAP")
 		);
 	$f->template(
 		-name=>"ldapCreateAccountTemplate",
 		-value=>$db{ldapCreateAccountTemplate},
 		-namespace=>"Auth/LDAP/Create",
 		-label=>WebGUI::International::get("create account template","AuthLDAP")
+		-hoverHelp=>WebGUI::International::get("create account template description","AuthLDAP")
 		);
 	$f->template(
 		-name=>"ldapLoginTemplate",
 		-value=>$db{ldapLoginTemplate},
 		-namespace=>"Auth/LDAP/Login",
 		-label=>WebGUI::International::get("login template","AuthLDAP")
+		-hoverHelp=>WebGUI::International::get("login template description","AuthLDAP")
 		);
    
    $f->submit;

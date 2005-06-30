@@ -540,76 +540,92 @@ Default text for password form field.
 		lastUpdated => 1056151382
 	},
 
-        'ldap connection add/edit body' => {
-                message => q|
+        'LDAPLink_992 description' => {
+                message => q|The name of this connection.  All LDAP connection names must be unique.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>Name</b><br>
-The name of this connection.  All LDAP connection names must be unique.
-<p>
+        'LDAPLink_993 description' => {
+                message => q|The URL used to connect to the LDAP server.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>LDAP URL</b><br>
-The URL used to connect to the LDAP server.
-<p>
-
-<b>Connect DN</b><br>
-DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
+        'LDAPLink_994 description' => {
+                message => q|DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
 directory. In this case, the "Connect DN" is the DN that point's the the user account
 record. Usually that will look something like:</p>
+<p>cn=Joe Shmoe,ou=people,dc=example,dc=com|,
+                lastUpdated => 1120164594,
+        },
 
-<p>cn=Joe Shmoe,ou=people,dc=example,dc=com
-<p>
+        'LDAPLink_995 description' => {
+                message => q|The password for the LDAP connection|,
+                lastUpdated => 1120164594,
+        },
 
-<b>Identifier</b><br>
-The password for the LDAP connection
-<p>
-
-<b>User RDN</b><br>
-RDN is a relative distinguished name. It means that we're looking at only part of the
+        '9 description' => {
+                message => q|RDN is a relative distinguished name. It means that we're looking at only part of the
 path. In this case, the "User RDN" is the path to where user records can be found.
 Usually the RDN looks something like:</p>
+<p>ou=people,dc=example,dc=com|,
+                lastUpdated => 1120164594,
+        },
 
-<p>ou=people,dc=example,dc=com
-<p>
+        '6 description' => {
+                message => q|The LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>LDAP Identity</b><br>
-The LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.
-<p>
+        '7 description' => {
+                message => q|The label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</i>. So you could enter that label here for consistency.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>LDAP Identity Name</b><br>
-The label used to describe the LDAP Identity to the user. For instance, some companies use an LDAP server for their proxy server users to authenticate against. In the documentation or training already provided to their users, the LDAP identity is known as their <i>Web Username</i>. So you could enter that label here for consistency.
-<p>
+        '8 description' => {
+                message => q|Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use this label as you would LDAP Identity Name.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>LDAP Password Name</b><br>
-Just as the LDAP Identity Name is a label, so is the LDAP Password Name. Use this label as you would LDAP Identity Name.
+        '868 description' => {
+                message => q|Do you wish WebGUI to automatically send users a welcome message when they register for your site? 
 <p>
+<b>NOTE:</b> In addition to the message you specify below, the user's account information will be included in the message.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>User RDN</b><br>
-<p>
+        '869 description' => {
+                message => q|Type the message that you'd like to be sent to users upon registration.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>Send welcome message?</b><br>
-Do you wish WebGUI to automatically send users a welcome message when they register for your site? 
-<p>
-<b>NOTE:</b> In addition to the message you specify below, the user's account information will be included in the message.
-<p>
+        'account template description' => {
+                message => q|Template to be used to display a user's account.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>Welcome Message</b> <br>
-Type the message that you'd like to be sent to users upon registration.
-<p>
+        'create account template description' => {
+                message => q|Template to be used to show the form for creating an account.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>Account Template</b><br>
-Template to be used to display a user's account.
-<p>
+        'login template description' => {
+                message => q|Template used to display login information to the user as an operation as opposed to inside of a page via a macro.|,
+                lastUpdated => 1120164594,
+        },
 
-<b>Create Account Template</b><br>
-Template to be used to show the form for creating an account.
-<p>
+        'ldap connection add/edit body' => {
+                message => q| |,
+		lastUpdated => 1120164639,
+	},
 
-<b>Login Template</b><br>
-Template used to display login information to the user as an operation as opposed to inside of a page via a macro.
-<p>
+	'868' => {
+		message => q|Send welcome message?|,
+		lastUpdated => 1120164338
+	},
 
-|,
-		lastUpdated => 1118542474,
+	'869' => {
+		message => q|Welcome Message|,
+		lastUpdated => 1120164366
 	},
 
 	'LDAPLink_1075' => {
