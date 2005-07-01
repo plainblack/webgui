@@ -47,16 +47,19 @@ sub www_editSettings {
         $tabform->getTab("company")->text(
 		-name=>"companyName",
 		-label=>$i18n->get(125),
+		-hoverHelp=>$i18n->get('125 description'),
 		-value=>$session{setting}{companyName}
 		);
         $tabform->getTab("company")->text(
 		-name=>"companyEmail",
 		-label=>$i18n->get(126),
+		-hoverHelp=>$i18n->get('126 description'),
 		-value=>$session{setting}{companyEmail}
 		);
         $tabform->getTab("company")->url(
 		-name=>"companyURL",
 		-label=>$i18n->get(127),
+		-hoverHelp=>$i18n->get('127 description'),
 		-value=>$session{setting}{companyURL}
 		);
 # content settings
@@ -69,11 +72,13 @@ sub www_editSettings {
         $tabform->getTab("content")->asset(
 		-name=>"defaultPage",
 		-label=>$i18n->get(527),
+		-hoverHelp=>$i18n->get('527 description'),
 		-value=>$session{setting}{defaultPage}
 		);
         $tabform->getTab("content")->asset(
 		-name=>"notFoundPage",
 		-label=>$i18n->get(141),
+		-hoverHelp=>$i18n->get('141 description'),
 		-value=>$session{setting}{notFoundPage}
 		);
 	$tabform->getTab("content")->text(

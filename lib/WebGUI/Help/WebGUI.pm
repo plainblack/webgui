@@ -125,6 +125,171 @@ our $HELP = {
 		title => 'settings',
 		body => 'settings help',
 		fields => [
+                        {
+                                title => '125',
+                                description => '125 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '126',
+                                description => '126 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '127',
+                                description => '127 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '527',
+                                description => '527 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '141',
+                                description => '141 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'url extension',
+                                description => 'url extension description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '130',
+                                description => '130 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '583',
+                                description => '583 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '406',
+                                description => '406 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'Enable Metadata ?',
+                                description => 'Enable Metadata ? description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'default rich editor',
+                                description => 'default rich editor description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '463',
+                                description => '463 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '464',
+                                description => '464 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '465',
+                                description => '465 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'user function style',
+                                description => 'user function style description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'admin console template',
+                                description => 'admin console template description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '135',
+                                description => '135 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '824',
+                                description => '824 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '534',
+                                description => '534 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '535',
+                                description => '535 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '973',
+                                description => '973 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '400',
+                                description => '400 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '707',
+                                description => '707 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '1069',
+                                description => '1069 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '118',
+                                description => '118 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '559',
+                                description => '559 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '539',
+                                description => '539 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '540',
+                                description => '540 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '142',
+                                description => '142 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '885',
+                                description => '885 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '1006',
+                                description => '1006 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'Enable passive profiling ?',
+                                description => 'Enable passive profiling ? description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '164',
+                                description => '164 description',
+                                namespace => 'WebGUI',
+                        },
 		],
 		related => []
 	},
