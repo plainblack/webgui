@@ -2,7 +2,7 @@ function addCriteria ( fieldname, opform, valform ) {
    var form = opform.form;
    var operator = getValue(opform);
    var value = getValue(valform);
-   var criteria = form.proxyCriteria.value;
+   var criteria = form.shortcutCriteria.value;
    var conjunction = "";
    if(! /^\s*$/.test(criteria)) {
    		conjunction = " " + getValue(form.conjunction) + " ";
@@ -15,7 +15,7 @@ function addCriteria ( fieldname, opform, valform ) {
 	value = '"' + value + '"';
    }
    var statement = fieldname + " " + operator + " " + value;
-   form.proxyCriteria.value = criteria + conjunction + statement;
+   form.shortcutCriteria.value = criteria + conjunction + statement;
 }
 
 function getValue(sel) {

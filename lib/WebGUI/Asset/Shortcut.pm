@@ -135,14 +135,14 @@ sub getEditForm {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"shortcutByCriteria",
 			-value=>$self->getValue("shortcutByCriteria"),
-			-label=>WebGUI::International::get("Asset_Shortcut by alternate criteria?","Shortcut"),
+			-label=>WebGUI::International::get("Shortcut by alternate criteria?","Shortcut"),
 			-extras=>q|Onchange="
 				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
-					this.form.proxyCriteria.disabled=false;
+					this.form.shortcutCriteria.disabled=false;
 				} else {
  					this.form.resolveMultiples.disabled=true;
-					this.form.proxyCriteria.disabled=true;
+					this.form.shortcutCriteria.disabled=true;
 				}"|
                 );
 		$tabform->getTab("properties")->yesNo(
@@ -399,8 +399,8 @@ sub _drawQueryBuilder {
 	# Static form fields
 	my $shortcutCriteriaField = WebGUI::Form::textarea({
 	                	        name=>"shortcutCriteria",
-        	                	value=>$_[0]->getValue("shortcutCriteria"),
-					extras=>'style="width: 100%" '.$_[0]->{_disabled}
+        	                	value=>$self->getValue("shortcutCriteria"),
+					extras=>'style="width: 100%" '.$self->{_disabled}
                 	        });
 	my $conjunctionField = WebGUI::Form::selectList({
 					name=>"conjunction",

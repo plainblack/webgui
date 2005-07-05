@@ -3,6 +3,7 @@
  - Fixed an upgrade script bug in 6.5.6-6.6.0.
  - Fixed an error handler bug in the auth system.
  - Fixed a typo in syndicated content that made templates not appear.
+ - Fixed several bugs in shortcut asset.
 
 
 6.6.3
