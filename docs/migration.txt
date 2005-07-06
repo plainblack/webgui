@@ -7,7 +7,7 @@ developer then this file won't make a lot of sense.
 
 CONTENTS
 
-1. Wobject Migration
+1. Wobject/Asset Migration
 2. Macro Migration
 3. Authentication Migration
 4. Scheduler Migration
@@ -15,8 +15,8 @@ CONTENTS
 
 
 
-1. Wobject Migration
---------------------
+1. Wobject/Asset Migration
+--------------------------
 
 1.1 Global Unique Wobject IDs
 
@@ -124,6 +124,40 @@ The following tips should also help make your migration easer:
 	1.2.15 If you were using the template system directly rather than
 	using the wobject processTemplate() method, please note that it has
 	been replaced by the WebGUI::Asset::Template asset.
+
+
+1.3 Quick Read Assets
+
+As of 6.7.0 Quick Read Assets have been removed. If you adopted quick read
+assets between 6.3.0 and 6.7.0 you'll need to change the getLineage rule from
+returnQuickReadObjects to returnObjects.
+
+
+1.4 Versioning
+
+If you're building any custom assets you'll need to write an upgrade script
+for 6.6 to 6.7 that will add a revisionDate (bigint) field to your namespace
+table. And you'll need to select the revisionDate from the asset table to
+initially populate the field in your table. revisionDate along with assetId
+should create a composite primary key for your table. Here are some example
+SQL queries to get you started in your transition:
+
+	alter table MyAsset add column revisionDate bigint not null;
+	alter table MyAsset drop primary key;
+	...look up the revision date for each asset instance from the asset table...
+	alter table MyAsset add primary key (assetId,revisionDate);
+
+Other than that you shouldn't have to make any revisions to your asset to
+support versioning. Your collateral tables need not have the revision date as
+they'll be tied to the assetId regardless of the revision date.
+
+
+1.5 Constructor API Change
+
+In 6.7.0 the new() and newByDynamicClass() API's in WebGUI::Asset changed
+slightly. In most situations the changes will not cause any problems, but for
+some asset developers there may be a slight change.
+
 
 
 2. Macro Migration

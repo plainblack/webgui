@@ -509,10 +509,12 @@ sub www_addStyledEvent {
 		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
 		isHidden => $self->get("isHidden"),
 		startDate => $self->get("startDate"),
-		endDate => $self->get("endDate")
+		endDate => $self->get("endDate"),
+		assetId=> "new",
+		className=>"WebGUI::Asset::Event"
 		);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn(ref $session{form}{class}, @{$session{config}{assetContainers}}));
-	my $newAsset = WebGUI::Asset->newByDynamicClass("new","WebGUI::Asset::Event",\%properties);
+	my $newAsset = WebGUI::Asset->newByPropertyHashRef(\%properties);
 	$newAsset->{_parent} = $self;
 		#get parent so we can get the parent's style.  Hopefully the parent is an EventsCalendar.  If not, oh well.
 #	return "You must add an Event as a child of an EventsCalendar." unless ($self->getValue("className") = "WebGUI::Asset::Wobject::EventsCalendar");

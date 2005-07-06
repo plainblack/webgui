@@ -115,25 +115,25 @@ sub getEditForm {
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideTitle",
 		-value=>$self->getValue("overrideTitle"),
-		-label=>WebGUI::International::get(7,"Asset_Shortcut")
+		-label=>WebGUI::International::get(7,"Asset_Shortcut"),
 		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"overrideDisplayTitle",
 		-value=>$self->getValue("overrideDisplayTitle"),
-		-label=>WebGUI::International::get(8,"Asset_Shortcut")
+		-label=>WebGUI::International::get(8,"Asset_Shortcut"),
 		-hoverHelp=>WebGUI::International::get('8 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideDescription",
 		-value=>$self->getValue("overrideDescription"),
-		-label=>WebGUI::International::get(9,"Asset_Shortcut")
+		-label=>WebGUI::International::get(9,"Asset_Shortcut"),
 		-hoverHelp=>WebGUI::International::get('9 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"overrideTemplate",
 		-value=>$self->getValue("overrideTemplate"),
-		-label=>WebGUI::International::get(10,"Asset_Shortcut")
+		-label=>WebGUI::International::get(10,"Asset_Shortcut"),
 		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("properties")->readOnly(
@@ -150,16 +150,16 @@ sub getEditForm {
 			-extras=>q|Onchange="
 				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
-					this.form.proxyCriteria.disabled=false;
+					this.form.shortcutCriteria.disabled=false;
 				} else {
  					this.form.resolveMultiples.disabled=true;
-					this.form.proxyCriteria.disabled=true;
+					this.form.shortcutCriteria.disabled=true;
 				}"|
                 );
 		$tabform->getTab("properties")->yesNo(
 			-name=>"disableContentLock",
 			-value=>$self->getValue("disableContentLock"),
-			-label=>WebGUI::International::get("disable content lock","Asset_Shortcut")
+			-label=>WebGUI::International::get("disable content lock","Asset_Shortcut"),
 			-hoverHelp=>WebGUI::International::get("disable content lock description","Asset_Shortcut")
 			);
 		if ($self->getValue("shortcutByCriteria") == 0) {
@@ -180,7 +180,7 @@ sub getEditForm {
 		 $tabform->getTab("properties")->readOnly(
         		-value=>$self->_drawQueryBuilder(),
 		        -label=>WebGUI::International::get("Criteria","Asset_Shortcut"),
-		        -hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut"),
+		        -hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut")
 	        );
 	}
 	return $tabform;
@@ -232,7 +232,7 @@ A typical hashRef for this function will look like:
 {
 	proxiedNamespace => "Article",
 	resolveMultiples => "random",
-	proxyCriteria => "State = Wisconsin AND Country != Sauk"
+	shortcutCriteria => 'State = "Wisconsin" AND County != "Sauk"'
 }
 
 Most of the time this will be a:
@@ -413,8 +413,8 @@ sub _drawQueryBuilder {
 	# Static form fields
 	my $shortcutCriteriaField = WebGUI::Form::textarea({
 	                	        name=>"shortcutCriteria",
-        	                	value=>$_[0]->getValue("shortcutCriteria"),
-					extras=>'style="width: 100%" '.$_[0]->{_disabled}
+        	                	value=>$self->getValue("shortcutCriteria"),
+					extras=>'style="width: 100%" '.$self->{_disabled}
                 	        });
 	my $conjunctionField = WebGUI::Form::selectList({
 					name=>"conjunction",

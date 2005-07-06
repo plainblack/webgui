@@ -122,10 +122,6 @@ The URL for executing this admin function.
 		lastUpdated => 1031514049
 	},
 
-	'82' => {
-		message => q|Administrative functions...|,
-		lastUpdated => 1031514049
-	},
 };
 
 1;

@@ -20,10 +20,10 @@ GetOptions(
 
 WebGUI::Session::open("../..",$configFile);
 
+addAssetVersioning();
 insertHelpTemplate();
 insertXSLTSheets();
 insertSyndicatedContentTemplate();
-addAssetVersioning();
 
 WebGUI::Session::close();
 
@@ -38,6 +38,76 @@ sub addAssetVersioning {
 		commitDate bigint not null default 0,
 		committedBy varchar(22)
 		)");
+	my $now = time();
+	WebGUI::SQL->write("insert into assetVersionTag values ('pbversion0000000000001','Initial Import','1',$now,'3',$now,'3')");
+	WebGUI::SQL->write("insert into assetVersionTag values ('pbversion0000000000002','Auto Commit','1',$now,'3',$now,'3')");
+	foreach my $table (qw(FileAsset Post RichEdit Snippet EventsCalendar_Event ImageAsset Thread redirect Shortcut Template Article EventsCalendar IndexedSearch MessageBoard SQLReport Folder Navigation Survey WSClient Collaboration HttpProxy Layout Poll SyndicatedContent Product DataForm wobject)) {
+		WebGUI::SQL->write("alter table $table add column revisionDate bigint not null");
+		WebGUI::SQL->write("update $table set revisionDate=$now");
+		WebGUI::SQL->write("alter table $table drop primary key");
+		WebGUI::SQL->write("alter table $table add primary key (assetId,revisionDate)");
+	}	
+	WebGUI::SQL->write("create table assetData (
+		assetId varchar(22) not null,
+		revisionDate bigint,
+		revisedBy varchar(22) not null,
+		tagId varchar(22) not null,
+		status varchar(35) not null default 'pending',
+		title varchar(255) not null default 'untitled',
+		menuTitle varchar(255) not null default 'untitled',
+		url varchar(255) not null,
+		ownerUserId varchar(22) not null default '3',
+		groupIdView varchar(22) not null default '7',
+		groupIdEdit varchar(22) not null default '4',
+		startDate bigint not null default 997995720,
+		endDate bigint not null default 32472169200,
+		synopsis text,
+		newWindow int not null default 0,
+		isHidden int not null default 0,
+		isPackage int not null default 0,
+		isPrototype int not null default 0,	
+		encryptPage int not null default 0,
+		assetSize int not null default 0,
+		extraHeadTags text,
+		primary key (assetId,revisionDate)
+		)");
+	my $statement = WebGUI::SQL->prepare("insert into assetData values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	my $sth = WebGUI::SQL->read("select * from asset");
+	while (my $data = $sth->hashRef) {
+		$statement->execute([
+			$data->{assetId},
+			$now,
+			'3',
+			'pbversion0000000000001',
+			'approved',
+			$data->{title},
+			$data->{menuTitle},
+			$data->{url},
+			$data->{ownerUserId},
+			$data->{groupIdView},
+			$data->{groupIdEdit},
+			$data->{startDate},
+			$data->{endDate},
+			$data->{synopsis},
+			$data->{newWindow},
+			$data->{isHidden},
+			$data->{isPackage},
+			$data->{isPrototype},
+			$data->{encryptPage},
+			$data->{assetSize},
+			$data->{extraHeadTags}
+			]);
+	}
+	$sth->finish;
+	WebGUI::SQL->write("alter table asset add column creationDate bigint not null default 997995720");
+	WebGUI::SQL->write("alter table asset add column createdBy varchar(22) not null default '3'");
+	WebGUI::SQL->write("alter table asset add column stateChangedBy varchar(22) not null default '3'");
+	WebGUI::SQL->write("alter table asset add column isLockedBy varchar(22)");
+	WebGUI::SQL->write("update asset set creationDate=$now, createdBy='3'");
+	foreach my $field (qw(url groupIdView title menuTitle startDate endDate ownerUserId groupIdEdit synopsis newWindow isHidden isSystem encryptPage assetSize lastUpdated lastUpdatedBy isPackage extraHeadTags isPrototype)) {
+		WebGUI::SQL->write("alter table asset drop column $field");
+	}
+
 }
 
 

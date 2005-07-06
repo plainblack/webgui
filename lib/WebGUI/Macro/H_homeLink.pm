@@ -11,37 +11,31 @@ package WebGUI::Macro::H_homeLink;
 #-------------------------------------------------------------------
 
 use strict;
+use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-        my (@param, $temp);
-        @param = WebGUI::Macro::getParams($_[0]);
-	if ($session{setting}{defaultPage} eq $session{page}{pageId}) {
-		$temp = $session{page}{urlizedTitle};
-	} else {
-		($temp) = WebGUI::SQL->quickArray("select url from asset where assetId=".quote($session{setting}{defaultPage}),WebGUI::SQL->getSlave);
-	}
-	$temp = WebGUI::URL::gateway($temp);
-	if ($param[0] ne "linkonly") {
+        my ($label, $templateUrl) = WebGUI::Macro::getParams(shift);
+	my $home = WebGUI::Asset->getDefault;
+	if ($label ne "linkonly") {
 		my %var;
-       		$var{'homelink.url'} = $temp;
-       		if ($param[0] ne "") {
-               		$var{'homeLink.text'} = $param[0];
+       		$var{'homelink.url'} = $home->getUrl;
+       		if ($label ne "") {
+               		$var{'homeLink.text'} = $label;
        		} else {
                		$var{'homeLink.text'} = WebGUI::International::get(47,'Macro_H_homeLink');
        		}
-		if ($param[1]) {
-         		$temp =  WebGUI::Asset::Template->newByUrl($param[1])->process(\%var);
+		if ($templateUrl) {
+         		return WebGUI::Asset::Template->newByUrl($templateUrl)->process(\%var);
 		} else {
-         		$temp =  WebGUI::Asset::Template->new("PBtmpl0000000000000042")->process(\%var);
+         		return WebGUI::Asset::Template->new("PBtmpl0000000000000042")->process(\%var);
 		}
 	}
-	return $temp;
+	return $home->getUrl;
 }
 
 

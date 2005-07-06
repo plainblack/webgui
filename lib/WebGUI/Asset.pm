@@ -52,6 +52,7 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  use WebGUI::Asset;
 
  $newAsset = $asset->addChild(\%properties);
+ $newVersion = $asset->addRevision(\%properties);
  $boolean = $asset->canEdit("An_Id_AbCdeFGHiJkLMNOP");
  $boolean = $asset->canView("An_Id_AbCdeFGHiJkLMNOP");
  $asset->cascadeLineage(100001,100101110111);
@@ -106,8 +107,10 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  setParent
  setRank
  setSize
+ setVersionLock
  swapRank
  trash
+ unsetVersionLock
  update
  updateHistory
  view
@@ -140,13 +143,13 @@ A lineage is a concatenated series of sequence numbers, each six digits long, th
  www_setParent
  www_setRank
  www_view
- 
 
 =head1 METHODS
 
 These methods are available from this class:
 
 =cut
+
 #-------------------------------------------------------------------
 
 =head2 addChild ( properties [, id ] )
@@ -170,24 +173,52 @@ sub addChild {
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, state, className, url, startDate, endDate, ownerUserId, groupIdEdit, groupIdView) 
-		values (".quote($id).",".quote($self->getId).", ".quote($lineage).", 
-		'published', ".quote($properties->{className}).", ".quote($id).",
-		997995720, 9223372036854775807,'3','3','7')");
-	my $tempAsset = WebGUI::Asset->newByDynamicClass("new",$properties->{className});
-	foreach my $definition (@{$tempAsset->definition}) {
-		unless ($definition->{tableName} eq "asset") {
-			WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId) values (".quote($id).")");
-		}
-	}
+	my $now = time();
+	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".quote($id).",".quote($self->getId).", ".quote($lineage).", ".$now.", ".quote($session{user}{userId}).", ".quote($properties->{className}).", 'published')");
+	my $temp = WebGUI::Asset->newByPropertyHashRef({
+		assetId=>$id,
+		className=>$properties->{className}
+		});
+	my $newAsset = $temp->addRevision($properties,$now);
 	WebGUI::SQL->commit;
-	my $newAsset = WebGUI::Asset->newByDynamicClass($id, $properties->{className});
 	$self->updateHistory("added child ".$id);
-	$newAsset->updateHistory("created");
-	$newAsset->update($properties);
 	return $newAsset;
 }
 
+#-------------------------------------------------------------------
+
+=head2 addRevision ( properties [ , revisionDate ] )
+
+Adds a revision of an existing asset. Note that programmers should almost never call this method directly, but rather use the update() method instead.
+
+=head3 properties
+
+A hash reference containing a list of properties to associate with the child. The only required property value is "className"
+        
+=head3 revisionDate
+
+An epoch date representing the date/time stamp that this revision was created. Defaults to time().
+        
+=cut    
+        
+sub addRevision {
+        my $self = shift;
+        my $properties = shift;
+	my $now = shift || time();
+	my $versionTag = $session{scratch}{versionTag} || 'pbversion0000000000002';
+	WebGUI::SQL->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
+		ownerUserId, groupIdEdit, groupIdView) values (".quote($self->getId).",".$now.", ".quote($session{user}{userId}).", 
+		".quote($versionTag).", 'approved', ".quote($self->getId).", 997995720, 9223372036854775807,'3','3','7')");
+        foreach my $definition (@{$self->definition}) {
+                unless ($definition->{tableName} eq "assetData") {
+                        WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".quote($self->getId).",".$now.")");
+                }
+        }               
+        my $newVersion = WebGUI::Asset->new($self->getId, $properties->{className}, $now);
+        $newVersion->updateHistory("created revision");
+        $newVersion->update($properties);
+        return $newVersion;
+}
 
 #-------------------------------------------------------------------
 
@@ -286,7 +317,7 @@ sub cascadeLineage {
         my $newLineage = shift;
         my $oldLineage = shift || $self->get("lineage");
 	my $now = time();
-        my $prepared = WebGUI::SQL->prepare("update asset set lineage=?, lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=$now where assetId=?");
+        my $prepared = WebGUI::SQL->prepare("update asset set lineage=? where assetId=?");
 	my $descendants = WebGUI::SQL->read("select assetId,lineage from asset where lineage like ".quote($oldLineage.'%'));
 	while (my ($assetId, $lineage) = $descendants->array) {
 		WebGUI::Cache->new("asset_".$assetId)->delete;
@@ -337,11 +368,12 @@ Removes asset from lineage, places it in clipboard state. The "gap" in the linea
 sub cut {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='clipboard-limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%')." and state='published'");
-	WebGUI::SQL->write("update asset set state='clipboard', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update asset set state='clipboard-limbo' where lineage like ".quote($self->get("lineage").'%')." and state='published'");
+	WebGUI::SQL->write("update asset set state='clipboard', stateChangedBy=".quote($session{user}{userId})." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
+	$self->purgeCache;
 }
  
 #-------------------------------------------------------------------
@@ -361,7 +393,7 @@ sub definition {
         my $definition = shift || [];
 	my @newDef = @{$definition};
         push(@newDef, {
-                tableName=>'asset',
+                tableName=>'assetData',
                 className=>'WebGUI::Asset',
                 properties=>{
                                 title=>{
@@ -626,7 +658,7 @@ sub fixUrl {
 	if ($session{setting}{urlExtension} ne "" && !($url =~ /\./)) {
 		$url .= ".".$session{setting}{urlExtension};
 	}
-	my ($test) = WebGUI::SQL->quickArray("select url from asset where assetId<>".quote($self->getId)." and url=".quote($url));
+	my ($test) = WebGUI::SQL->quickArray("select url from assetData where assetId<>".quote($self->getId)." and url=".quote($url));
         if ($test) {
                 my @parts = split(/\./,$url);
                 if ($parts[0] =~ /(.*)(\d+$)/) {
@@ -757,9 +789,9 @@ sub getAssetAdderLinks {
 	} else {
 		$constraint = quoteAndJoin($session{config}{assets});
 	}
-	my $sth = WebGUI::SQL->read("select className,assetId from asset where isPrototype=1 and state='published' and className in ($constraint)");
-	while (my ($class,$id) = $sth->array) {
-		my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+	my $sth = WebGUI::SQL->read("select asset.className,asset.assetId,max(assetData.revisionDate) from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) group by assetData.assetId");
+	while (my ($class,$id,$date) = $sth->array) {
+		my $asset = WebGUI::Asset->new($id,$class,$date);
 		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $session{user}{uiLevel});
 		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
@@ -807,18 +839,30 @@ sub getAssetsInClipboard {
 	my @assets;
 	my $limit;
 	if ($limitToUser) {
-		$limit = "and lastUpdatedBy=".quote($userId);
+		$limit = "and asset.stateChangedBy=".quote($userId);
 	}
-	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where state='clipboard' $limit order by lastUpdated desc");
-	while (my ($id, $title, $class) = $sth->array) {
-		push(@assets, {
-			title => $title,
-			assetId => $id,
-			className => $class
-			});
-	}
-	$sth->finish;
-	return \@assets;
+        my $sth = WebGUI::SQL->read("
+                select 
+                        asset.assetId, 
+                        max(assetData.revisionDate),
+                        asset.className
+                from 
+                        asset                 
+		left join 
+                        assetData on asset.assetId=assetData.assetId 
+                where 
+			asset.state='clipboard'
+			$limit
+		group by
+			assetData.assetId
+                order by 
+                        assetData.title desc
+                        ");
+        while (my ($id, $date, $class) = $sth->array) {
+                push(@assets, WebGUI::Asset->new($id,$class,$date));
+        }
+        $sth->finish;
+        return \@assets;
 }
 
 #-------------------------------------------------------------------
@@ -844,16 +888,28 @@ sub getAssetsInTrash {
 	my @assets;
 	my $limit;
 	if ($limitToUser) {
-		$limit = "and lastUpdatedBy=".quote($userId);
+		$limit = "and asset.stateChangedBy=".quote($userId);
 	}
-	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where state='trash' $limit order by lastUpdated desc");
-	while (my ($id, $title, $class) = $sth->array) {
-		push(@assets, {
-			title => $title,
-			assetId => $id,
-			className => $class
-			});
-	}
+	my $sth = WebGUI::SQL->read("
+                select 
+                        asset.assetId, 
+                        max(assetData.revisionDate),
+                        asset.className
+                from 
+                        asset                 
+                left join 
+                        assetData on asset.assetId=assetData.assetId 
+                where 
+                        asset.state='trash'
+                        $limit
+		group by
+			assetData.assetId
+                order by 
+                        assetData.title desc
+                        ");
+        while (my ($id, $date, $class) = $sth->array) {
+                push(@assets, WebGUI::Asset->new($id,$class,$date));
+        }
 	$sth->finish;
 	return \@assets;
 }
@@ -1294,21 +1350,8 @@ sub getLineage {
 		}
 		push(@whereModifiers, "(".join(" or ",@mods).")") if (scalar(@mods));
 	}
-	# formulate a where clause
-	my $where = "state='published'";
-	$where = "state in (".quoteAndJoin($rules->{statesToInclude}).")" if (exists $rules->{statesToInclude});
-	if (exists $rules->{excludeClasses}) { # deal with exclusions
-		my @set;
-		foreach my $className (@{$rules->{excludeClasses}}) {
-			push(@set,"asset.className not like ".quote($className.'%'));
-		}
-		$where .= ' and ('.join(" and ",@set).')';
-	}
-	if (exists $rules->{includeOnlyClasses}) {
-		$where .= ' and (asset.className in ('.quoteAndJoin($rules->{includeOnlyClasses}).'))';
-	}
-	$where .= " and ".join(" or ",@whereModifiers) if (scalar(@whereModifiers));
-	my $tables = "asset ";
+	# deal with custom joined tables if we must
+	my $tables = "asset left join assetData on asset.assetId=assetData.assetId ";
 	if (exists $rules->{joinClass}) {
 		my $className = $rules->{joinClass};
 		my $cmd = "use ".$className;
@@ -1317,42 +1360,64 @@ sub getLineage {
 		foreach my $definition (@{$className->definition}) {
 			unless ($definition->{tableName} eq "asset") {
 				my $tableName = $definition->{tableName};
-				$tables .= ", $tableName ";
-				$where .= " and (asset.assetId = $tableName.assetId) "; 
+				$tables .= " left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
 			}
 			last;
 		}
 	}
+	# formulate a where clause
+	my $where;
+	## custom states
+	if (exists $rules->{statesToInclude}) {
+		$where = "asset.state in (".quoteAndJoin($rules->{statesToInclude}).")";
+	} else {
+		$where = "asset.state='published'";
+	}
+	## get only approved items or those that i'm currently working on
+	$where .= " and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{tagId}).")";
+	## class exclusions
+	if (exists $rules->{excludeClasses}) {
+		my @set;
+		foreach my $className (@{$rules->{excludeClasses}}) {
+			push(@set,"asset.className not like ".quote($className.'%'));
+		}
+		$where .= ' and ('.join(" and ",@set).')';
+	}
+	## class inclusions
+	if (exists $rules->{includeOnlyClasses}) {
+		$where .= ' and (asset.className in ('.quoteAndJoin($rules->{includeOnlyClasses}).'))';
+	}
+	## finish up our where clause
+	$where .= " and ".join(" or ",@whereModifiers) if (scalar(@whereModifiers));
 	if (exists $rules->{whereClause}) {
 		$where .= ' and ('.$rules->{whereClause}.')';
 	}
 	# based upon all available criteria, let's get some assets
-	my $columns = "asset.assetId, asset.className, asset.parentId";
-	my $slavedb;
-	my $sortOrder = ($rules->{invertTree}) ? "lineage desc" : "lineage asc"; 
+	my $columns = "asset.assetId, asset.className, asset.parentId, max(assetData.revisionDate)";
+	my $sortOrder = ($rules->{invertTree}) ? "asset.lineage desc" : "asset.lineage asc"; 
 	if (exists $rules->{orderByClause}) {
 		$sortOrder = $rules->{orderByClause};
 	}
-	my $sql = "select $columns from $tables where $where order by $sortOrder";
+	my $sql = "select $columns from $tables where $where group by assetData.assetId order by $sortOrder";
 	my @lineage;
 	my %relativeCache;
-	my $sth = WebGUI::SQL->read($sql, $slavedb);
-	while (my $properties = $sth->hashRef) {
+	my $sth = WebGUI::SQL->read($sql);
+	while (my ($id, $class, $parentId, $version) = $sth->array) {
 		# create whatever type of object was requested
 		my $asset;
 		if ($rules->{returnObjects}) {
-			if ($self->getId eq $properties->{assetId}) { # possibly save ourselves a hit to the database
+			if ($self->getId eq $id) { # possibly save ourselves a hit to the database
 				$asset =  $self;
 			} else {
-				$asset = WebGUI::Asset->newByDynamicClass($properties->{assetId}, $properties->{className});
+				$asset = WebGUI::Asset->new($id, $class, $version);
 			}
 		} else {
-			$asset = $properties->{assetId};
+			$asset = $id;
 		}
 		# since we have the relatives info now, why not cache it
 		if ($rules->{returnObjects}) {
-			my $parent = $relativeCache{$properties->{parentId}};
-			$relativeCache{$properties->{assetId}} = $asset;
+			my $parent = $relativeCache{$parentId};
+			$relativeCache{$id} = $asset;
 			$asset->{_parent} = $parent;
 			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
 			$parent->{_lastChild} = $asset;
@@ -1481,8 +1546,7 @@ Returns the not found object. The not found object is set in the settings.
 =cut
 
 sub getNotFound {
-	my $class = shift;
-	return $class->newByDynamicClass($session{setting}{notFoundPage});
+	return WebGUI::Asset->newByDynamicClass($session{setting}{notFoundPage});
 }
 
 
@@ -1497,13 +1561,29 @@ Returns an array of hashes containing title, assetId, and className for all asse
 sub getPackageList {
 	my $self = shift;
 	my @assets;
-	my $sth = WebGUI::SQL->read("select assetId, title, className from asset where isPackage=1 order by lastUpdated desc");
-	while (my ($id, $title, $class) = $sth->array) {
-		push(@assets, {
-			title => $title,
-			assetId => $id,
-			className => $class
-			});
+	my $sth = WebGUI::SQL->read("
+		select 
+			asset.assetId, 
+			max(assetData.revisionDate),
+			asset.className
+		from 
+			asset 
+		left join 
+			assetData on asset.assetId=assetData.assetId 
+		where 
+			assetData.isPackage=1 and
+			( 
+				assetData.status='approved' or
+  				assetData.tagId=".quote($session{scratch}{versionTag})."
+			) and
+			asset.state='published'	
+		group by
+			assetData.assetId
+		order by 
+			assetData.title desc
+			");
+	while (my ($id, $date, $class) = $sth->array) {
+		push(@assets, WebGUI::Asset->new($id,$class,$date));
 	}
 	$sth->finish;
 	return \@assets;
@@ -1723,11 +1803,7 @@ sub hasChildren {
 		} elsif (exists $self->{_lastChild}) {
 			$self->{_hasChildren} = 1;
 		} else {
-			my $hasChildren = WebGUI::Cache->new("childCount_".$self->getId)->get;
-			unless (defined $hasChildren) {
-				($hasChildren) = WebGUI::SQL->quickArray("select count(*) from asset where parentId=".quote($self->getId));
-				WebGUI::Cache->new("childCount_".$self->getId)->set($hasChildren);
-			}
+			my ($hasChildren) = WebGUI::SQL->quickArray("select count(*) from asset where parentId=".quote($self->getId));
 			$self->{_hasChildren} = $hasChildren;
 		}
 	}
@@ -1736,56 +1812,56 @@ sub hasChildren {
 
 #-------------------------------------------------------------------
 
-=head2 new ( assetId||"new" [,overrideProperties] )
+=head2 new ( assetId [, className, revisionDate ] )
 
 Constructor. This does not create an asset. Returns a new object if it can, otherwise returns undef.
 
 =head3 assetId
 
-The assetId of the asset you're creating an object reference for. Must not be blank. If specified as "new" then the object properties returns an assetId of new.
+The assetId of the asset you're creating an object reference for. Must not be blank. 
 
-=head3 overrideProperties
+=head3 className
 
-A hash of properties to set besides defaults.
+By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
+
+=head3 revisionDate 
+
+An epoch date that represents a specific version of an asset. By default the most recent version will be used.
 
 =cut
-
-
 
 sub new {
 	my $class = shift;
 	my $assetId = shift;
-	my $overrideProperties = shift;
-	my $properties;
-	$properties = WebGUI::Cache->new("asset_".$assetId)->get unless($session{var}{adminOn});
-	if ($assetId eq "new") {
-		$properties = $overrideProperties;
-		$properties->{assetId} = "new";
-		$properties->{className} = $class;
-	} elsif (exists $properties->{assetId}) {
+	return undef unless ($assetId);
+	my $className = shift;
+	my $revisionDate = shift;
+	unless ($revisionDate) {
+		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId=".quote($assetId)." group by assetData.assetId order by assetData.revisionDate");
+	}
+	return undef unless ($revisionDate);
+        if ($className) {
+		my $cmd = "use ".$className;
+        	eval ($cmd);
+		if ($@) {
+        		WebGUI::ErrorHandler::error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+			return undef;
+		}
+		$class = $className;
+	}
+	my $properties = WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->get;
+	if (exists $properties->{assetId}) {
 		# got properties from cache
 	} else { 
-		my $definitions = $class->definition;
-		my @definitionsReversed = reverse(@{$definitions});
-		shift(@definitionsReversed);
 		my $sql = "select * from asset";
-		foreach my $definition (@definitionsReversed) {
-			$sql .= " left join ".$definition->{tableName}." on asset.assetId=".$definition->{tableName}.".assetId";
+		foreach my $definition (@{$class->definition}) {
+			$sql .= " left join ".$definition->{tableName}." on asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
 		}
 		$sql .= " where asset.assetId=".quote($assetId);
 		$properties = WebGUI::SQL->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
-		WebGUI::Cache->new("asset_".$assetId)->set($properties,$properties->{cacheTimeout});
+		WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->set($properties,60*60*24);
 	}
-	if (defined $overrideProperties) {
-		foreach my $definition (@{$class->definition}) {
-			foreach my $property (keys %{$definition->{properties}}) {
-				if (exists $overrideProperties->{$property}) {
-					$properties->{$property} = $overrideProperties->{$property};
-				}
-			}
-		}
-	}	
 	if (defined $properties) {
 		my $object = { _properties => $properties };
 		bless $object, $class;
@@ -1796,49 +1872,28 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 newByDynamicClass ( assetId [,className,overrideProperties] )
+=head2 newByDynamicClass ( assetId [ , revisionDate ] )
 
-Returns a new Asset object based upon the className. Returns a "notFoundPage" Asset if className is not specified and can't be looked up.
+Similar to new() except that it will look up the classname of an asset rather than making you specify it. Returns undef if it can't find the classname.
 
 =head3 assetId
 
 Must be a valid assetId
 
-=head3 className
+=head3 revisionDate
 
-String of class to use. Defaults to className of assetId, if it can be found in the asset table. 
-
-=head3 overrideProperties
-
-Any properties to set besides defaults.
+A specific revision date for the asset to retrieve. If not specified, the most recent one will be used.
 
 =cut
 
 sub newByDynamicClass {
 	my $class = shift;
 	my $assetId = shift;
+	my $revisionDate = shift;
 	return undef unless defined $assetId;
-	my $className = shift;
-	my $overrideProperties = shift;
-	unless (defined $className) {
-		my $asset = WebGUI::Cache->new("asset_".$assetId)->get;
-		if (exists $asset->{className}) {
-			$className = $asset->{className};
-		} else {
-        		($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
-		}
-	}
-        if ($className eq "") {
-        	WebGUI::HTTP::setStatus('404',"Page Not Found");
-		WebGUI::ErrorHandler::fatal("The page not found page doesn't exist.") if ($assetId eq $session{setting}{notFoundPage});
-                return $class->getNotFound;
-        }
-	my $cmd = "use ".$className;
-        eval ($cmd);
-        WebGUI::ErrorHandler::fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
-        my $assetObject = eval{$className->new($assetId,$overrideProperties)};
-        WebGUI::ErrorHandler::fatal("Couldn't create asset instance for ".$assetId.". Root cause: ".$@) if ($@);
-	return $assetObject;
+       	my ($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
+	return undef unless ($className);
+	return WebGUI::Asset->new($assetId,$className,$revisionDate);
 }
 
 
@@ -1857,12 +1912,8 @@ Lineage string.
 sub newByLineage {
 	my $class = shift;
         my $lineage = shift;
-	my $asset = WebGUI::Cache->new("lineage_".$lineage)->get;
-	unless (exists $asset->{assetId}) {
-        	$asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where lineage=".quote($lineage));
-		WebGUI::Cache->new("lineage_".$lineage)->set($asset);
-	}
-	return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
+        my $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where lineage=".quote($lineage));
+	return WebGUI::Asset->new($asset->{assetId}, $asset->{className});
 }
 
 #-------------------------------------------------------------------
@@ -1911,15 +1962,28 @@ sub newByUrl {
 	$url =~ s/\"//;
 	my $asset;
 	if ($url ne "") {
-		my $asset = WebGUI::Cache->new("asseturl_".$url)->get;
-		unless (exists $asset->{assetId}) {
-			$asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where url=".quote($url));
-			WebGUI::Cache->new("asseturl_".$url)->set($asset,3600);
-		}
-		if ($asset->{assetId} ne "" || $asset->{className} ne "") {
-			return WebGUI::Asset->newByDynamicClass($asset->{assetId}, $asset->{className});
+		my ($id, $class, $version) = WebGUI::SQL->quickArray("
+			select 
+				asset.assetId, 
+				asset.className,
+				max(assetData.revisionDate) 
+			from 
+				asset 
+			left join
+				assetData on asset.assetId=assetData.assetId
+			where 
+				assetData.url=".quote($url)." and
+				(
+					assetData.status='approved' or
+					assetData.tagId=".quote($session{scratch}{versionTag})."
+				)
+			group by
+				assetData.assetId
+			");
+		if ($id ne "" || $class ne "") {
+			return WebGUI::Asset->new($id, $class, $version);
 		} else {
-			return $class->getNotFound;
+			return WebGUI::Asset->getNotFound;
 		}
 	}
 	return $class->getDefault;
@@ -1942,12 +2006,13 @@ sub paste {
 	my $assetId = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);	
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
-		WebGUI::SQL->write("update asset set state='published', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
+		WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId})." where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
 		$self->{_properties}{state} = "published";
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
 	}
 	return 0;
+	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -1978,6 +2043,7 @@ sub processPropertiesFromFormPost {
 		$data{url} =~ s/(.*)\..*/$1/;
 		$data{url} .= '/'.$data{menuTitle};
 	}
+	WebGUI::SQL->beginTransaction;
 	$self->update(\%data);
 	foreach my $form (keys %{$session{form}}) {
 		if ($form =~ /^metadata_(.*)$/) {
@@ -2000,6 +2066,7 @@ sub processPropertiesFromFormPost {
 			}
 		}
 	}
+	WebGUI::SQL->commit;
 }
 
 
@@ -2072,15 +2139,16 @@ Sets an asset and it's descendants to a state of 'published' regardless of it's 
 
 sub publish {
 	my $self = shift;
-	WebGUI::SQL->write("update asset set state='published', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId})." where lineage like ".quote($self->get("lineage").'%'));
 	$self->{_properties}{state} = "published";
+	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------
 
 =head2 purge ( )
 
-Returns 1. Deletes an asset from tables and removes anything bound to that asset.
+Deletes an asset from tables and removes anything bound to that asset.
 
 =cut
 
@@ -2093,9 +2161,10 @@ sub purge {
 		WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId));
 	}
 	WebGUI::SQL->write("delete from metaData_values where assetId = ".quote($self->getId));
+	WebGUI::SQL->write("delete from asset where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
+	$self->purgeCache;
 	$self = undef;
-	return 1;
 }
 
 #-------------------------------------------------------------------
@@ -2108,20 +2177,9 @@ Purges all cache entries associated with this asset.
 
 sub purgeCache {
 	my $self = shift;
-
-	my $assetId = $self->getId;
-	my $assetUrl = $self->getUrl;
-	$assetUrl =~ s/^\///; 	#remove beginning / from url
-	my $lineage = $self->get("lineage");
-
-	WebGUI::Cache->new("asset_".$assetId)->delete;
-	WebGUI::Cache->new("asseturl_".$assetUrl)->delete;
-	WebGUI::Cache->new("childCount_".$assetId)->delete;
-	WebGUI::Cache->new("firstChild_".$assetId)->delete;
-	WebGUI::Cache->new("lastChild_".$assetId)->delete;
-	WebGUI::Cache->new("lineage_".$lineage)->delete;
-
+	WebGUI::Cache->new("asset_".$self->getId."/".$self->get("revisionDate"))->delete;
 }
+
 #-------------------------------------------------------------------
 
 =head2 purgeTree ( )
@@ -2162,11 +2220,12 @@ sub setParent {
 		my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
 		return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
 		WebGUI::SQL->beginTransaction;
-		WebGUI::SQL->write("update asset set parentId=".quote($newParent->getId).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
+		WebGUI::SQL->write("update asset set parentId=".quote($newParent->getId)." where assetId=".quote($self->getId));
 		$self->cascadeLineage($lineage);
 		WebGUI::SQL->commit;
 		$self->updateHistory("moved to parent ".$newParent->getId);
 		$self->{_properties}{lineage} = $lineage;
+		$self->purgeCache;
 		return 1;
 	}
 	return 0;
@@ -2174,7 +2233,7 @@ sub setParent {
 
 #-------------------------------------------------------------------
 
-=head2 setrank ( newRank )
+=head2 setRank ( newRank )
 
 Returns 1. Changes rank of Asset.
 
@@ -2207,6 +2266,7 @@ sub setRank {
 	$self->cascadeLineage($previous,$temp);
 	$self->{_properties}{lineage} = $previous;
 	WebGUI::SQL->commit;
+	$self->purgeCache;
 	$self->updateHistory("changed rank");
 	return 1;
 }
@@ -2230,7 +2290,23 @@ sub setSize {
 	foreach my $key (keys %{$self->get}) {
 		$sizetest .= $self->get($key);
 	}
-	WebGUI::SQL->write("update asset set assetSize=".(length($sizetest)+$extra).", lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update assetData set assetSize=".(length($sizetest)+$extra)." where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
+	$self->purgeCache;
+}
+	
+#-------------------------------------------------------------------
+
+=head2 setVersionLock ( ) 
+
+Sets the versioning lock to "on" so that this piece of content may not be edited by anyone else now that it has been edited.
+
+=cut
+
+sub setVersionLock {
+	my $self = shift;
+	WebGUI::SQL->write("update asset set isLockedBy=".quote($session{user}{userId})." where assetId=".quote($self->getId));
+	$self->updateHistory("locked");
+	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -2270,11 +2346,12 @@ Removes asset from lineage, places it in trash state. The "gap" in the lineage i
 sub trash {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='trash-limbo', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%'));
-	WebGUI::SQL->write("update asset set state='trash', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update asset set state='trash-limbo' where lineage like ".quote($self->get("lineage").'%'));
+	WebGUI::SQL->write("update asset set state='trash', stateChangedBy=".quote($session{user}{userId})." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
+	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -2296,9 +2373,25 @@ sub toggleToolbar {
 
 #-------------------------------------------------------------------
 
+=head2 unsetVersionLock ( ) 
+
+Sets the versioning lock to "off" so that this piece of content may be edited once again.
+
+=cut
+
+sub unsetVersionLock {
+	my $self = shift;
+	WebGUI::SQL->write("update asset set isLockedBy=NULL where assetId=".quote($self->getId));
+	$self->updateHistory("unlocked");
+	$self->purgeCache;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 update ( properties )
 
-Returns 1. Updates properties of an Asset to given or default values.
+Updates the properties of an existing revision. If you want to create a new revision, please use addRevision().
 
 =head3 properties
 
@@ -2309,14 +2402,9 @@ Hash reference of properties and values to set.
 sub update {
         my $self = shift;
         my $properties = shift;
-	$self->purgeCache;
-        WebGUI::SQL->beginTransaction;
+	$self->setVersionLock;
         foreach my $definition (@{$self->definition}) {
                 my @setPairs;
-                if ($definition->{tableName} eq "asset") {
-                        push(@setPairs,"lastUpdated=".time());
-                        push(@setPairs,"lastUpdatedBy=".quote($session{user}{userId}));
-                }
                 foreach my $property (keys %{$definition->{properties}}) {
                         next unless (exists $properties->{$property});
                         my $value = $properties->{$property};
@@ -2328,12 +2416,11 @@ sub update {
                         push(@setPairs, $property."=".quote($value));
                 }
                 if (scalar(@setPairs) > 0) {
-                        WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId));
+                        WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
         		$self->setSize;
                 }
         }
-        WebGUI::SQL->commit;
-        return 1;
+	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -2357,11 +2444,7 @@ sub updateHistory {
 	my $action = shift;
 	my $userId = shift || $session{user}{userId} || '3';
 	my $dateStamp = time();
-	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (
-		".quote($self->getId).", ".quote($userId).", ".quote($action).", ".$dateStamp.")");
-	WebGUI::SQL->write("update asset set lastUpdated=".$dateStamp.", lastUpdatedBy=".quote($userId)." where assetId=".quote($self->getId));
-	WebGUI::SQL->commit;
+	WebGUI::SQL->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".quote($self->getId).", ".quote($userId).", ".quote($action).", ".$dateStamp.")");
 }
 
 #-------------------------------------------------------------------
@@ -2392,7 +2475,7 @@ sub www_add {
 	my $self = shift;
 	my %prototypeProperties; 
 	if ($session{form}{'prototype'}) {
-		my $prototype = WebGUI::Asset->newByDynamicClass($session{form}{'prototype'},$session{form}{class});
+		my $prototype = WebGUI::Asset->new($session{form}{'prototype'},$session{form}{class});
 		foreach my $definition (@{$prototype->definition}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {
 				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
@@ -2412,10 +2495,12 @@ sub www_add {
 		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
 		isHidden => $self->get("isHidden"),
 		startDate => $self->get("startDate"),
-		endDate => $self->get("endDate")
+		endDate => $self->get("endDate"),
+		className=>$session{form}{class},
+		assetId=>"new"
 		);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($session{form}{class}, @{$session{config}{assetContainers}}));
-	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
+	my $newAsset = WebGUI::Asset->newByPropertyHashRef(\%properties);
 	$newAsset->{_parent} = $self;
 	return WebGUI::Privilege::insufficient() unless ($newAsset->canAdd);
 	return $newAsset->www_edit();
@@ -2700,6 +2785,8 @@ sub www_edit {
 
 Saves and updates history. If canEdit, returns www_manageAssets() if a new Asset is created, otherwise returns www_view().  Will return an insufficient Privilege if canEdit returns False.
 
+NOTE: Don't try to override or overload this method. It won't work. What you are looking for is processPropertiesFromFormPost().
+
 =cut
 
 sub www_editSave {
@@ -2710,7 +2797,7 @@ sub www_editSave {
 		$object = $self->addChild({className=>$session{form}{class}});	
 		$object->{_parent} = $self;
 	} else {
-		$object = $self;
+		$object = $self->addRevision;
 	}
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
@@ -3048,8 +3135,7 @@ sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	foreach my $assetData (@{$self->getAssetsInClipboard(!($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)))}) {
-		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
+	foreach my $asset (@{$self->getAssetsInClipboard(!($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)))}) {
 		$asset->trash;
 	}
 	return $self->www_manageClipboard();
@@ -3067,8 +3153,7 @@ sub www_emptyTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("trash");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	foreach my $assetData (@{$self->getAssetsInTrash(!($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)))}) {
-		my $asset = WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className});
+	foreach my $asset (@{$self->getAssetsInTrash(!($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)))}) {
 		$asset->purgeTree;
 	}
 	return $self->www_manageTrash();
@@ -3264,10 +3349,10 @@ sub www_manageAssets {
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
-			."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
+			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."','');\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
-			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."','');\n";
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');\n";
 	}
 	$output .= '
 		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
@@ -3308,9 +3393,8 @@ sub www_manageAssets {
 	my %options;
 	tie %options, 'Tie::IxHash';
 	my $hasClips = 0;
-        foreach my $item (@{$self->getAssetsInClipboard(1)}) {
-		my $asset = WebGUI::Asset->newByDynamicClass($item->{assetId},$item->{className});
-              	$options{$item->{assetId}} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" border="0" /> '.$item->{title};
+        foreach my $asset (@{$self->getAssetsInClipboard(1)}) {
+              	$options{$asset->getId} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" border="0" /> '.$asset->getTitle;
 		$hasClips = 1;
         }
 	if ($hasClips) {
@@ -3335,10 +3419,9 @@ sub www_manageAssets {
 	}
 	my $hasPackages = 0;
 	my $packages;
-        foreach my $item (@{$self->getPackageList}) {
-		my $asset = WebGUI::Asset->newByDynamicClass($item->{assetId},$item->{className});
+        foreach my $asset (@{$self->getPackageList}) {
               	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
-			<a href="'.$self->getUrl("func=deployPackage&assetId=".$item->{assetId}).'">'.$item->{title}.'</a> '
+			<a href="'.$self->getUrl("func=deployPackage&assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
 			.editIcon("func=edit&proceed=manageAssets",$asset->get("url"))
 			.'<br />';
 		$hasPackages = 1;
@@ -3368,7 +3451,6 @@ sub www_manageClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("clipboard");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
-	my @assets;
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
 	if ($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)) {
@@ -3382,9 +3464,6 @@ sub www_manageClipboard {
 			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
 		$limit = 1;
 	}
-	foreach my $assetData (@{$self->getAssetsInClipboard($limit)}) {
-		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
-	}
 WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
@@ -3397,7 +3476,7 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
-        foreach my $child (@assets) {
+        foreach my $child (@{$self->getAssetsInClipboard($limit)}) {
 		my $title = $child->getTitle;
                 $title =~ s/\'/\\\'/g;
                 $output .= "assetManager.AddLine('"
@@ -3407,10 +3486,10 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
                                 })
                         ."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
                         ."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
-                        ."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
+                        ."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
                         ."','".formatBytes($child->get("assetSize"))."');\n";
                 $output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
-                        ."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
+                        ."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
         }
         $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageClipboard");
 		assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageClipboard");
@@ -3488,7 +3567,6 @@ sub www_manageTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("trash");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	my @assets;
 	my ($header, $limit);
         $ac->setHelp("trash manage");
 	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
@@ -3497,9 +3575,6 @@ sub www_manageTrash {
 	} else {
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash&systemTrash=1'), WebGUI::International::get(964),"Asset");
 		$limit = 1;
-	}
-	foreach my $assetData (@{$self->getAssetsInTrash($limit)}) {
-		push(@assets,WebGUI::Asset->newByDynamicClass($assetData->{assetId},$assetData->{className}));
 	}
   	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
@@ -3513,7 +3588,7 @@ sub www_manageTrash {
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
-	foreach my $child (@assets) {
+	foreach my $child (@{$self->getAssetsInTrash($limit)}) {
 		my $title = $child->getTitle;
                 $title =~ s/\'/\\\'/g;
          	$output .= "assetManager.AddLine('"
@@ -3523,10 +3598,10 @@ sub www_manageTrash {
 				})
 			."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
-			."','".WebGUI::DateTime::epochToHuman($child->get("lastUpdated"))
+			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."');\n";
          	$output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
-			."','".$child->get("lastUpdated")."','".$child->get("assetSize")."');\n";
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
 	}
 	$output .= 'assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
 		assetManager.Write();        
