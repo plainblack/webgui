@@ -21,11 +21,28 @@ GetOptions(
 WebGUI::Session::open("../..",$configFile);
 
 addAssetVersioning();
+updateConfigFile();
 insertHelpTemplate();
 insertXSLTSheets();
 insertSyndicatedContentTemplate();
 
 WebGUI::Session::close();
+
+sub updateConfigFile {
+	print "\tUpdating config file.\n" unless ($quiet);
+	my $pathToConfig = '../../etc/'.$configFile;
+	my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig, 'PURGE'=>1);
+	my %newConfig;
+	foreach my $key ($conf->directives) { # delete unwanted stuff
+        	unless ($key eq "wobject") {
+                	$newConfig{$key} = $conf->get($key);
+        	}
+	}
+	$newConfig{fileCacheSizeLimit} = 100000000;
+	$conf->purge;
+	$conf->set(%newConfig);
+	$conf->write;
+}
 
 sub addAssetVersioning {
     	print "\tMaking changes for asset versioning\n" unless ($quiet);

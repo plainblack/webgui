@@ -1,4 +1,5 @@
 6.7.0
+ - Added asset versioning.
  - fix [ 1229188 ] typo in Help: Collaboration, Post List Template Variables
  - fix [ 1221284 ] Operation\user.pm i18n {internationalize labels}
  - All form field labels have been internationalized.
@@ -14,6 +15,7 @@
    way to upload files will be through the File Pile. Anyone wishing to make
    the File and Image assets available as normal assets in the new content
    menu are still able to do so, and existing sites will be left as they are.
+ - Added a file cache size limit option to the config file.
 
 
 6.6.3

@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.7.0
+--------------------------------------------------------------------
+ * The asset API has changed slightly due to versioning, so if you
+	have any custom assets, check out migration.txt to make
+	sure they will comply.
+
 
 6.6.3
 --------------------------------------------------------------------

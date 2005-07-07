@@ -14,7 +14,7 @@ package WebGUI::Cache::FileCache;
 
 =cut
 
-use Cache::FileCache;
+use Cache::SizeAwareFileCache;
 
 use HTTP::Headers;
 use HTTP::Request;
@@ -136,7 +136,7 @@ sub new {
 		auto_purge_on_set=>1
 		);
 	$options{cache_root} = $session{config}{fileCacheRoot} if ($session{config}{fileCacheRoot});
-	$cache = new Cache::FileCache(\%options);
+	$cache = new Cache::SizeAwareFileCache(\%options);
 	bless {_cache => $cache, _key => $key}, $class;
 }
 
@@ -196,6 +196,25 @@ sub setByHTTP {
 	}
 	return $response->content;
 }
+
+#-------------------------------------------------------------------
+
+=head2 shrink ( [ size ] ) 
+
+Reduces the cache down to a specific size to conserve filesystem space.
+
+=head3 size
+
+A size to shrink the cache to in bytes. Defaults to the fileCacheSizeLimit variable in the config file.
+
+=cut
+
+sub shrink {
+	my $self = shift;
+	my $size = shift || $session{config}{fileCacheSizeLimit} || 10000000;
+	$self->{_cache}->limit_size($size);
+}
+
 
 #-------------------------------------------------------------------
 

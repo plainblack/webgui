@@ -106,19 +106,20 @@ sub getIndexerParams {
                         sql => "select Article.assetId,
 					Article.linkTitle,
 					Article.linkURL,
-					asset.title,
-					asset.menuTitle,
-					asset.url,
+					assetData.title,
+					assetData.menuTitle,
+					assetData.url,
 					asset.className,
-					asset.ownerUserId,
-					asset.groupIdView,
-					asset.synopsis,
+					assetData.ownerUserId,
+					assetData.groupIdView,
+					assetData.synopsis,
 					wobject.description
 				from asset, Article
 				left join wobject on wobject.assetId = asset.assetId
+				left join assetData asset.assetId=assetData.assetId
 				where asset.assetId = Article.assetId
-                                        and asset.startDate < $now
-                                        and asset.endDate > $now",
+                                        and assetData.startDate < $now
+                                        and assetData.endDate > $now",
                         fieldsToIndex => ["linkTitle" ,"linkURL","title","menuTitle","url","synopsis","description" ],
                         contentType => 'content',
                         url => 'WebGUI::URL::gateway($data{url})',

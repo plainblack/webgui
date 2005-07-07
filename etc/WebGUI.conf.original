@@ -34,6 +34,10 @@ uploadsPath = /data/WebGUI/www/uploads
 
 #fileCacheRoot=/path/to/cache
 
+# Tell WebGUI how big to let the file cache grow in bytes.
+
+fileCacheSizeLimit=100000000
+
 # Support for the memcached distributed caching system.
 # See http://www.danga.com/memcached/ for details on memcached.
 # Uncomment this and point it to your memcached server(s). Use a

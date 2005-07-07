@@ -66,7 +66,7 @@ These methods are available from this package:
 sub _recurseCrumbTrail {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select assetId,parentId,menuTitle,url from asset where assetId=".quote($_[0]));
+        %data = WebGUI::SQL->quickHash("select asset.assetId,asset.parentId,assetData.menuTitle,asset.url from asset left join assetData on asset.assetId=assetData.assetId where asset.assetId=".quote($_[0])." group by assetData.assetId order by assetData.revisionDate desc");
         if ($data{assetId}) {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
