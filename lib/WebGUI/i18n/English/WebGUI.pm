@@ -682,6 +682,21 @@ How should this user be notified when they get a new WebGUI message?
 		lastUpdated => 1031514049
 	},
 
+        '556 description' => {
+                message => q|How much karma should be added or subtracted from the user's karma?|,
+                lastUpdated => 1120768600,
+        },
+
+        '557 description' => {
+                message => q|The reason why the user's karma has been changed.|,
+                lastUpdated => 1120768600,
+        },
+
+	'edit user karma body' => {
+		message => q|Most karma adjustments are done automatically based on what the user does on your website.  However, karma can also be adjusted by Admins<p/>|,
+		lastUpdated => 1120768627
+	},
+
 	'12' => {
 		message => q|Turn admin off.|,
 		lastUpdated => 1031514049

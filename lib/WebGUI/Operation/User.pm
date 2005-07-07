@@ -394,13 +394,27 @@ sub www_editUserKarma {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         $f = WebGUI::HTMLForm->new;
-        $f->hidden("op","editUserKarmaSave");
-        $f->hidden("uid",$session{form}{uid});
-	$f->integer("amount",WebGUI::International::get(556));
-	$f->text("description",WebGUI::International::get(557));
+        $f->hidden(
+		-name => "op",
+		-value => "editUserKarmaSave",
+        );
+        $f->hidden(
+		-name => "uid",
+		-value => $session{form}{uid},
+        );
+	$f->integer(
+		-name => "amount",
+		-label => WebGUI::International::get(556),
+		-hoverHelp => WebGUI::International::get('556 description'),
+	);
+	$f->text(
+		-name => "description",
+		-label => WebGUI::International::get(557),
+		-hoverHelp => WebGUI::International::get('557 description'),
+	);
         $f->submit;
         $output .= $f->print;
-        return _submenu($output,'558',"karma using");
+        return _submenu($output,'558',"edit user karma");
 }
 
 #-------------------------------------------------------------------

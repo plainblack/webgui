@@ -466,6 +466,44 @@ our $HELP = {
 			},
 		]
 	},
+	'edit user karma' => {
+		title => '558',
+		body => 'edit user karma body',
+		fields => [
+                        {
+                                title => '556',
+                                description => '556 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '557',
+                                description => '557 description',
+                                namespace => 'WebGUI',
+                        },
+		],
+		related => [
+			{
+				tag => 'article add/edit',
+				namespace => 'Asset_Article'
+			},
+			{
+				tag => 'group add/edit',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'message board add/edit',
+				namespace => 'Asset_MessageBoard'
+			},
+			{
+				tag => 'poll add/edit',
+				namespace => 'Asset_Poll'
+			},
+			{
+				tag => 'settings',
+				namespace => 'WebGUI'
+			},
+		]
+	},
 	'clipboard empty' => {
 		title => '968',
 		body => '969',
