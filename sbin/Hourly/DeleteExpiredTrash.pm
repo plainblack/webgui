@@ -13,7 +13,6 @@ package Hourly::DeleteExpiredTrash;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -21,9 +20,9 @@ use WebGUI::SQL;
 sub process {
 	if ($session{config}{DeleteExpiredTrash_offset} ne "") {
 		my $expireDate = (time()-(86400*$session{config}{DeleteExpiredTrash_offset}));
-		my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' and lastUpdated <".$expireDate);
+		my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' and stateChanged <".$expireDate);
 		while (my ($id, $class) = $sth->array) {
-			my $asset = WebGUI::Asset->newByDynamicClass($id,$class);
+			my $asset = WebGUI::Asset->new($id,$class);
 			$asset->purge;
 		}
 		$sth->finish;

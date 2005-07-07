@@ -21,9 +21,10 @@ sub process {
 	my $offset = $session{config}{TrashExpiredContent_offset};
 	if ($offset ne "") {
 		my $epoch = time()-(86400*$offset);
-		my $sth = WebGUI::SQL->read("select assetId,className from asset where endDate<".$epoch);
-		while (my ($assetId, $class) = $sth->array) {
-			my $asset = WebGUI::Asset->newByDynamicClass($assetId,$class);
+		my $sth = WebGUI::SQL->read("select asset.assetId,asset.className,max(assetData.revisionDate) from asset left join assetData on
+			asset.assetId=assetData.assetId where assetData.endDate<".$epoch." and assetData.status<>'pending' group by asset.assetData");
+		while (my ($assetId, $class, $version) = $sth->array) {
+			my $asset = WebGUI::Asset->new($assetId,$class,$version);
 			$asset->trash;
 		}
 		$sth->finish;

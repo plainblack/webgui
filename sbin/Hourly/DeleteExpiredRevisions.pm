@@ -1,4 +1,4 @@
-package Hourly::DeleteExpiredClipboard;
+package Hourly::DeleteExpiredRevisions;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2005 Plain Black Corporation.
@@ -18,12 +18,14 @@ use WebGUI::SQL;
 
 #-----------------------------------------
 sub process {
-	if ($session{config}{DeleteExpiredClipboard_offset} ne "") {
-		my $expireDate = (time()-(86400*$session{config}{DeleteExpiredClipboard_offset}));
-		my $sth = WebGUI::SQL->read("select assetId,className from asset where state='clipboard' and stateChanged <".$expireDate);
-		while (my ($id, $class) = $sth->array) {
-			my $asset = WebGUI::Asset->new($id,$class);
-			$asset->trash;
+	if ($session{config}{DeleteExpiredRevisions_offset} ne "") {
+		my $expireDate = (time()-(86400*$session{config}{DeleteExpiredRevisions_offset}));
+		my $sth = WebGUI::SQL->read("select assetData.assetId,asset.className,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.revisionDate<".$expireDate." order by assetData.revisionDate asc");
+		while (my ($id, $class, $version) = $sth->array) {
+			my $asset = WebGUI::Asset->new($id,$class,$version);
+			if ($asset->getRevisionCount("approved") > 1) {
+				$asset->purgeRevision;
+			}
 		}
 		$sth->finish;
 	}

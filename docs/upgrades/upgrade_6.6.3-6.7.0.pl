@@ -39,6 +39,7 @@ sub updateConfigFile {
         	}
 	}
 	$newConfig{fileCacheSizeLimit} = 100000000;
+	$newConfig{DeleteExpiredRevisions_offset} = 365;
 	$conf->purge;
 	$conf->set(%newConfig);
 	$conf->write;
@@ -118,6 +119,7 @@ sub addAssetVersioning {
 	$sth->finish;
 	WebGUI::SQL->write("alter table asset add column creationDate bigint not null default 997995720");
 	WebGUI::SQL->write("alter table asset add column createdBy varchar(22) not null default '3'");
+	WebGUI::SQL->write("alter table asset add column stateChanged varchar(22) not null default 997995720");
 	WebGUI::SQL->write("alter table asset add column stateChangedBy varchar(22) not null default '3'");
 	WebGUI::SQL->write("alter table asset add column isLockedBy varchar(22)");
 	WebGUI::SQL->write("update asset set creationDate=$now, createdBy='3'");

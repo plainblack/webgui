@@ -320,10 +320,13 @@ sub cascadeLineage {
         my $prepared = WebGUI::SQL->prepare("update asset set lineage=? where assetId=?");
 	my $descendants = WebGUI::SQL->read("select assetId,lineage from asset where lineage like ".quote($oldLineage.'%'));
 	while (my ($assetId, $lineage) = $descendants->array) {
-		WebGUI::Cache->new("asset_".$assetId)->delete;
-		WebGUI::Cache->new("lineage_".$lineage)->delete;
 		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
 		$prepared->execute([$fixedLineage,$assetId]);
+		my $sth = WebGUI::SQL->read("select assetId,revisionDate from assetData where asset=".quote($assetId));
+		while (my ($id,$version) = $sth->array) {
+			WebGUI::Cache->new("asset_".$id."/".$version)->delete;
+		}
+		$sth->finish;
 	}
 	$descendants->finish;
 }
@@ -369,7 +372,7 @@ sub cut {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("update asset set state='clipboard-limbo' where lineage like ".quote($self->get("lineage").'%')." and state='published'");
-	WebGUI::SQL->write("update asset set state='clipboard', stateChangedBy=".quote($session{user}{userId})." where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update asset set state='clipboard', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
@@ -1646,6 +1649,26 @@ sub getRank {
 
 #-------------------------------------------------------------------
 
+=head2 getRevisionCount ( [ status ] )
+
+Returns the number of revisions available for this asset.
+
+=head3 status
+
+Optionally specify to get the count based upon the status of the revisions. Options are "approved", "pending", "denied". Defaults to any status.
+
+=cut
+
+sub getRevisionCount {
+	my $self = shift;
+	my $status = shift;
+	my $statusClause = " and status=".quote($status) if ($status);
+	my ($count) = WebGUI::SQL->quickArray("select count(*) from assetData where assetId=".quote($self->getId).$statusClause);
+	return $count;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRoot ()
 
 Returns the root asset object.
@@ -2006,13 +2029,19 @@ sub paste {
 	my $assetId = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);	
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
-		WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId})." where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
-		$self->{_properties}{state} = "published";
+		my $assetIds = WebGUI::SQL->buildArrayRef("select assetId from asset where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
+		my $idList = quoteAndJoin($assetIds);
+		WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId in (".$idList.")");
+		my $sth = WebGUI::SQL->read("select assetId,revisionDate from assetData where assetId in (".$idList.")");
+		while ( my ($id,$version) = $sth->array) {
+			# we do the purge directly cuz it's a lot faster than instanciating all these assets
+			WebGUI::Cache->new("asset_".$id."/".$version)->delete;
+		}
+		$sth->finish;
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
 	}
 	return 0;
-	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -2139,9 +2168,16 @@ Sets an asset and it's descendants to a state of 'published' regardless of it's 
 
 sub publish {
 	my $self = shift;
-	WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId})." where lineage like ".quote($self->get("lineage").'%'));
+	my $assetIds = WebGUI::SQL->buildArrayRef("select assetId from asset where lineage like ".quote($self->get("lineage").'%'));
+        my $idList = quoteAndJoin($assetIds);
+        WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId in (".$idList.")");
+        my $sth = WebGUI::SQL->read("select assetId,revisionDate from assetData where assetId in (".$idList.")");
+        while ( my ($id,$version) = $sth->array) {
+        	# we do the purge directly cuz it's a lot faster than instanciating all these assets
+                WebGUI::Cache->new("asset_".$id."/".$version)->delete;
+        }
+        $sth->finish;
 	$self->{_properties}{state} = "published";
-	$self->purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -2154,8 +2190,6 @@ Deletes an asset from tables and removes anything bound to that asset.
 
 sub purge {
 	my $self = shift;
-	$self->purgeCache;
-	$self->updateHistory("purged");
 	WebGUI::SQL->beginTransaction;
 	foreach my $definition (@{$self->definition}) {
 		WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId));
@@ -2164,8 +2198,33 @@ sub purge {
 	WebGUI::SQL->write("delete from asset where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->purgeCache;
+	$self->updateHistory("purged");
 	$self = undef;
 }
+
+#-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+Deletes a revision of an asset. If it's the last revision, it purges the asset all together.
+
+=cut
+
+sub purgeRevision {
+	my $self = shift;
+	if ($self->getRevisionCount > 1) {
+		WebGUI::SQL->beginTransaction;
+        	foreach my $definition (@{$self->definition}) {                
+			WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
+        	}       
+        	WebGUI::SQL->commit;
+		$self->purgeCache;
+		$self->updateHistory("purged revision ".$self->get("revisionDate"));
+	} else {
+		$self->purge;
+	}
+}
+
 
 #-------------------------------------------------------------------
 
@@ -2347,7 +2406,7 @@ sub trash {
 	my $self = shift;
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("update asset set state='trash-limbo' where lineage like ".quote($self->get("lineage").'%'));
-	WebGUI::SQL->write("update asset set state='trash', stateChangedBy=".quote($session{user}{userId})." where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update asset set state='trash', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
