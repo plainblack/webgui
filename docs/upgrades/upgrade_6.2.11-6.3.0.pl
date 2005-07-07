@@ -432,6 +432,8 @@ $sth->finish;
 
 
 print "\tConverting collateral manager items into assets\n" unless ($quiet);
+WebGUI::SQL->write("update collateral set collateralFolderId='0' where collateralFolderId=''");
+WebGUI::SQL->write("update collateral set collateralFolderId='0' where collateralFolderId is null");
 my $collateralRootLineage = getNextLineage('PBasset000000000000002');
 my $collateralRootId = WebGUI::SQL->setRow("asset","assetId",{
 	assetId=>"new",
@@ -500,7 +502,7 @@ my $lastCollateralFolderId = 'nolastid';
 my ($parentId, $baseLineage);
 my $sth = WebGUI::SQL->read("select * from collateral order by collateralFolderId");
 while (my $data = $sth->hashRef) {
-	next if ($data->{filename} eq "");
+	next if ($data->{filename} eq "" && $data->{collateralType} ne "snippet");
 	print "\t\tConverting collateral item ".$data->{collateralId}." for folder ".$data->{collateralFolderId}."\n" unless ($quiet);
 	unless ($lastCollateralFolderId eq $data->{collateralFolderId}) {
 		my $id = $data->{collateralFolderId};
