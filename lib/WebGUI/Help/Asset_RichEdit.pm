@@ -66,13 +66,13 @@ our $HELP = {
                                 description => 'enable context menu description',
                                 namespace => 'Asset_RichEdit',
                         },
-		]
+		],
 		related => [
 			{
 				tag => 'asset fields',
 				namespace => 'Asset'
 			},
-		]
+		],
 	},
 
 };

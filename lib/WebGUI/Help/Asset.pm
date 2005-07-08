@@ -175,9 +175,10 @@ our $HELP = {
 				 { tag => "$tag add/edit",
 				   namespace => $namespace }
 			     }
-		             @{ $session{config}{assets} },
-                             @{ $session{config}{assetContainers} },
-                             @{ $session{config}{utilityAssets} },
+                             grep { $_ } ##Filter out empty entries
+                                     @{ $session{config}{assets} },
+                                     @{ $session{config}{assetContainers} },
+                                     @{ $session{config}{utilityAssets} },
 			   ],
 	},
 

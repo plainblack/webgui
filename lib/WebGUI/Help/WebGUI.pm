@@ -97,6 +97,96 @@ our $HELP = {
 		title => '667',
 		body => '622',
 		fields => [
+                        {
+                                title => '84',
+                                description => '84 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '85',
+                                description => '85 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '367',
+                                description => '367 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '865',
+                                description => '865 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '864',
+                                description => '864 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '866',
+                                description => '866 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '863',
+                                description => '863 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '538',
+                                description => '538 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '857',
+                                description => '857 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '945',
+                                description => '945 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '974',
+                                description => '974 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '975',
+                                description => '975 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '1075',
+                                description => '1075 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '1005',
+                                description => '1005 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'LDAPLink_ldapGroup',
+                                description => 'LDAPLink_ldapGroup description',
+                                namespace => 'AuthLDAP',
+                        },
+                        {
+                                title => 'LDAPLink_ldapGroupProperty',
+                                description => 'LDAPLink_ldapGroupProperty description',
+                                namespace => 'AuthLDAP',
+                        },
+                        {
+                                title => 'LDAPLink_ldapRecursiveProperty',
+                                description => 'LDAPLink_ldapRecursiveProperty description',
+                                namespace => 'AuthLDAP',
+                        },
+                        {
+                                title => '1004',
+                                description => '1004 description',
+                                namespace => 'WebGUI',
+                        },
 		],
 		related => [
 			{

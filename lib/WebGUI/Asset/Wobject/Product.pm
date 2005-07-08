@@ -205,15 +205,18 @@ sub getEditForm {
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Product",
 		-label=>WebGUI::International::get(62,"Asset_Product"),
+		-hoverHelp=>WebGUI::International::get('62 description',"Asset_Product"),
    		);
 	$tabform->getTab("properties")->text(
 		-name=>"price",
 		-label=>WebGUI::International::get(10,"Asset_Product"),
+		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Product"),
 		-value=>$self->getValue("price")
 		);
     $tabform->getTab("properties")->text(
 		-name=>"productNumber",
 		-label=>WebGUI::International::get(11,"Asset_Product"),
+		-hoverHelp=>WebGUI::International::get('11 description',"Asset_Product"),
 		-value=>$self->getValue("productNumber")
 		);
     $self->_addFileTab($tabform,"image1",7);
@@ -345,12 +348,24 @@ sub www_addAccessory {
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
    my ($f, $accessory, @usedAccessories);
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-   $f->hidden("func","addAccessorySave");
+   $f->hidden(
+		-name => "func",
+		-value => "addAccessorySave",
+   );
    @usedAccessories = WebGUI::SQL->buildArray("select accessoryAssetId from Product_accessory where assetId=".quote($self->getId));
    push(@usedAccessories,$self->getId);
    $accessory = WebGUI::SQL->buildHashRef("select assetId, title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".quoteAndJoin(\@usedAccessories).")");
-   $f->selectList("accessoryAccessId",$accessory,WebGUI::International::get(17,'Asset_Product'));
-   $f->yesNo("proceed",WebGUI::International::get(18,'Asset_Product'));
+   $f->selectList(
+		-name => "accessoryAccessId",
+		-options => $accessory,
+		-label => WebGUI::International::get(17,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('17 description','Asset_Product'),
+   );
+   $f->yesNo(
+		-name => "proceed",
+		-label => WebGUI::International::get(18,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('18 description','Asset_Product'),
+   );
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product accessory add/edit");
 }
@@ -372,12 +387,24 @@ sub www_addRelated {
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
    my ($f, $related, @usedRelated);
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-   $f->hidden("func","addRelatedSave");
+   $f->hidden(
+		-name => "func",
+		-value => "addRelatedSave",
+   );
    @usedRelated = WebGUI::SQL->buildArray("select relatedAssetId from Product_related where assetId=".quote($self->getId));
    push(@usedRelated,$self->getId);
    $related = WebGUI::SQL->buildHashRef("select assetId,title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".quoteAndJoin(\@usedRelated).")");
-   $f->selectList("relatedAssetId",$related,WebGUI::International::get(20,'Asset_Product'));
-   $f->yesNo("proceed",WebGUI::International::get(21,'Asset_Product'));
+   $f->selectList(
+		-name => "relatedAssetId",
+		-options => $related,
+		-label => WebGUI::International::get(20,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('20 description','Asset_Product'),
+   );
+   $f->yesNo(
+		-name => "proceed",
+		-label => WebGUI::International::get(21,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('21 description','Asset_Product'),
+   );
    $f->submit;
    return $self->getAdminConsole->render($f->print,"product related add/edit");
 }
@@ -479,11 +506,27 @@ sub www_editBenefit {
    my ($data, $f, $benefits);
    $data = $self->getCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-   $f->hidden("bid",$data->{Product_benefitId});
-   $f->hidden("func","editBenefitSave");
+   $f->hidden(
+		-name => "bid",
+		-value => $data->{Product_benefitId},
+   );
+   $f->hidden(
+		-name => "func",
+		-value => "editBenefitSave",
+   );
    $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
-   $f->combo("benefit",$benefits,WebGUI::International::get(51,'Asset_Product'),[$data->{benefits}]);
-   $f->yesNo("proceed",WebGUI::International::get(52,'Asset_Product'));
+   $f->combo(
+		-name => "benefit",
+		-options => $benefits,
+		-label => WebGUI::International::get(51,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('51 description','Asset_Product'),
+		-value => [$data->{benefits}],
+   );
+   $f->yesNo(
+		-name => "proceed",
+		-label => WebGUI::International::get(52,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('52 description','Asset_Product'),
+   );
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product benefit add/edit");
 }
@@ -510,11 +553,27 @@ sub www_editFeature {
    my ($data, $f, $features);
    $data = $self->getCollateral("Product_feature","Product_featureId",$session{form}{fid});
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-   $f->hidden("fid",$data->{Product_featureId});
-   $f->hidden("func","editFeatureSave");
+   $f->hidden(
+		-name => "fid",
+		-value => $data->{Product_featureId},
+   );
+   $f->hidden(
+		-name => "func",
+		-value => "editFeatureSave",
+   );
    $features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
-   $f->combo("feature",$features,WebGUI::International::get(23,'Asset_Product'),[$data->{feature}]);
-   $f->yesNo("proceed",WebGUI::International::get(24,'Asset_Product'));
+   $f->combo(
+		-name => "feature",
+		-options => $features,
+		-label => WebGUI::International::get(23,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('23 description','Asset_Product'),
+		-value => [$data->{feature}],
+   );
+   $f->yesNo(
+		-name => "proceed",
+		-label => WebGUI::International::get(24,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('24 description','Asset_Product'),
+   );
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product feature add/edit");
 }
@@ -540,14 +599,41 @@ sub www_editSpecification {
    my ($data, $f, $hashRef);
    $data = $self->getCollateral("Product_specification","Product_specificationId",$session{form}{sid});
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-   $f->hidden("sid",$data->{Product_specificationId});
-   $f->hidden("func","editSpecificationSave");
+   $f->hidden(
+		-name => "sid",
+		-value => $data->{Product_specificationId},
+   );
+   $f->hidden(
+		-name => "func",
+		-value => "editSpecificationSave",
+   );
    $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
-   $f->combo("name",$hashRef,WebGUI::International::get(26,'Asset_Product'),[$data->{name}]);
-   $f->text("value",WebGUI::International::get(27,'Asset_Product'),$data->{value});
+   $f->combo(
+		-name => "name",
+		-options => $hashRef,
+		-label => WebGUI::International::get(26,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('26 description','Asset_Product'),
+		-value => [$data->{name}],
+   );
+   $f->text(
+		-name => "value",
+		-label => WebGUI::International::get(27,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('27 description','Asset_Product'),
+		-value => $data->{value},
+   );
    $hashRef = WebGUI::SQL->buildHashRef("select units,units from Product_specification order by units");
-   $f->combo("units",$hashRef,WebGUI::International::get(29,'Asset_Product'),[$data->{units}]);
-   $f->yesNo("proceed",WebGUI::International::get(28,'Asset_Product'));
+   $f->combo(
+		-name => "units",
+		-options => $hashRef,
+		-label => WebGUI::International::get(29,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('29 description','Asset_Product'),
+		-value => [$data->{units}],
+   );
+   $f->yesNo(
+		-name => "proceed",
+		-label => WebGUI::International::get(28,'Asset_Product'),
+		-hoverHelp => WebGUI::International::get('28 description','Asset_Product'),
+   );
    $f->submit;
    return $self->getAdminConsole->render($f->print, "product specification add/edit");
 }

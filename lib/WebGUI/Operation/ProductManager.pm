@@ -90,41 +90,48 @@ sub www_editProduct {
 	$f->text(
 		-name		=> 'title',
 		-label		=> $i18n->get('title'),
+		-hoverHelp	=> $i18n->get('title description'),
 		-value		=> $session{form}{title} || $product->{title},
 		-maxlength	=> 255,
 	);
 	$f->textarea(
 		-name		=> 'description',
 		-label		=> $i18n->get('description'),
+		-hoverHelp	=> $i18n->get('description description'),
 		-value		=> $session{form}{decsription} || $product->{description},
 	);
 	$f->float(
 		-name		=> 'price',
 		-label		=> $i18n->get('price'),
+		-hoverHelp	=> $i18n->get('price description'),
 		-value		=> $session{form}{price} || $product->{price},
 		-maxlength	=> 13,
 	);
 	$f->float(
 		-name		=> 'weight',
 		-label		=> $i18n->get('weight'),
+		-hoverHelp	=> $i18n->get('weight description'),
 		-value		=> $session{form}{weight} || $product->{weight},
 		-maxlength	=> 9,
 	);
 	$f->text(
 		-name		=> 'sku',
 		-label		=> $i18n->get('sku'),
+		-hoverHelp	=> $i18n->get('sku description'),
 		-value		=> $session{form}{sku} || $product->{SKU},
 		-maxlength	=> 64,
 	);
 	$f->template(
 		-name		=> 'templateId',
 		-label		=> $i18n->get('template'),
+		-hoverHelp	=> $i18n->get('template description'),
 		-value		=> $session{form}{templateId} || $product->{templateId},
 		-namespace	=> 'Commerce/Product',
 	);
 	$f->text(
 		-name		=> 'skuTemplate',
 		-label		=> $i18n->get('sku template'),
+		-hoverHelp	=> $i18n->get('sku template description'),
 		-value		=> $session{form}{skuTemplate} || $product->{skuTemplate},
 		-maxlength	=> 255,
 	);

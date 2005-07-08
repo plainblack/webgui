@@ -378,62 +378,84 @@ The WebGUI management controls for this related product.
 		lastUpdated => 1031514049
 	},
 
+        '51 description' => {
+                message => q|You may enter a new benefit, or select from one you've already entered.
+<p>|,
+                lastUpdated => 1120337226,
+        },
+
+        '52 description' => {
+                message => q|If you'd like to add another benefit right away, select "Yes".
+<p>|,
+                lastUpdated => 1120337226,
+        },
+
 	'50' => {
 		message => q|Benefits are typically the result of the features of your product. They are why your product is so good. If you add benefits, you may also wish to consider adding some features.
 <p>
-
-<b>Benefit</b><br>
-You may enter a new benefit, or select from one you've already entered.
-<p>
-
-<b>Add another benefit?</b><br>
-If you'd like to add another benefit right away, select "Yes".
-<p>
 |,
-		lastUpdated => 1031514049
+		lastUpdated => 1120337252
 	},
+
+        '62 description' => {
+                message => q|Select a layout for this product.
+<p/>|,
+                lastUpdated => 1120332527,
+        },
+
+        '10 description' => {
+                message => q|The price of this product. You may optionally enter text like "call for pricing" if you wish, or you may leave it blank.
+<p>|,
+                lastUpdated => 1120332527,
+        },
+
+        '11 description' => {
+                message => q|The product number, SKU, ISBN, or other identifier for this product.
+<p>|,
+                lastUpdated => 1120332527,
+        },
+
+        '7 description' => {
+                message => q|An image of this product.
+<p>|,
+                lastUpdated => 1120332527,
+        },
+
+        '8 description' => {
+                message => q|An image of this product.
+<p>|,
+                lastUpdated => 1120332527,
+        },
+
+        '9 description' => {
+                message => q|An image of this product.
+<p>|,
+                lastUpdated => 1120332527,
+        },
+
+        '13 description' => {
+                message => q|The brochure for this product.
+<p>|,
+                lastUpdated => 1120332527,
+        },
+
+        '14 description' => {
+                message => q|The product, user, or service manual for this product.
+<p>|,
+                lastUpdated => 1120332527,
+        },
+
+        '15 description' => {
+                message => q|The warranty for this product.
+<p>|,
+                lastUpdated => 1120332527,
+        },
 
 	'39' => {
 		message => q|WebGUI has a product management system built in to enable you to publish your products and services to your site quickly and easily.
 <p>
-
-<b>Template</b><br/>
-Select a layout for this product.
-<p/>
-
-<b>Price</b><br>
-The price of this product. You may optionally enter text like "call for pricing" if you wish, or you may leave it blank.
-<p>
-
-<b>Product Number</b><br>
-The product number, SKU, ISBN, or other identifier for this product.
-<p>
-
-<b>Product Image 1</b><br>
-An image of this product.
-<p>
-
-<b>Product Image 2</b><br>
-An image of this product.
-<p>
-
-<b>Product Image 3</b><br>
-An image of this product.
-<p>
-
-<b>Brochure</b><br>
-The brochure for this product.
-<p>
-
-<b>Manual</b><br>
-The product, user, or service manual for this product.
-<p>
-
-<b>Warranty</b><br>
-The warranty for this product.
-<p>
 |,
-		lastUpdated => 1038889846
+		lastUpdated => 1120332572
 	},
 
 	'36' => {
@@ -456,19 +478,23 @@ The warranty for this product.
 		lastUpdated => 1031514049
 	},
 
+        '23 description' => {
+                message => q|You may enter a new feature, or select one you entered for another product in the system.
+<p>|,
+                lastUpdated => 1120335791,
+        },
+
+        '24 description' => {
+                message => q|If you'd like to add another feature right away, select "Yes".
+<p>|,
+                lastUpdated => 1120335791,
+        },
+
 	'41' => {
 		message => q|Features are selling points for a product. IE: Reasons to buy your product. Features often result in benefits, so you may want to also add some benefits to this product.
 <p>
-
-<b>Feature</b><br>
-You may enter a new feature, or select one you entered for another product in the system.
-<p>
-
-<b>Add another feature?</b><br>
-If you'd like to add another feature right away, select "Yes".
-<p>
 |,
-		lastUpdated => 1031514049
+		lastUpdated => 1120335841
 	},
 
 	'58' => {
@@ -476,18 +502,20 @@ If you'd like to add another feature right away, select "Yes".
 		lastUpdated => 1031514049
 	},
 
+        '20 description' => {
+                message => q|Choose from the list of products you've already entered.
+<p>|,
+                lastUpdated => 1120337083,
+        },
+
+        '21 description' => {
+                message => q|Select "Yes" if you have another related product to add.
+<p>|,
+                lastUpdated => 1120337083,
+        },
+
 	'47' => {
 		message => q|Related products are products that are comparable or complementary to other products.
-<p>
-
-
-<b>Related products</b><br>
-Choose from the list of products you've already entered.
-<p>
-
-
-<b>Add another related product?</b><br>
-Select "Yes" if you have another related product to add.
 <p>
 
 |,
@@ -534,17 +562,22 @@ Select "Yes" if you have another related product to add.
 		lastUpdated => 1031514049
 	},
 
+        '17 description' => {
+                message => q|Choose from the list of products you've already entered.
+<p>|,
+                lastUpdated => 1120336412,
+        },
+
+        '18 description' => {
+                message => q|Select "Yes" if you have another accessory to add.
+<p>|,
+                lastUpdated => 1120336412,
+        },
+
 	'45' => {
 		message => q|Accessories are products that enhance other products.
 <p>
 
-<b>Accessory</b><br>
-Choose from the list of products you've already entered.
-<p>
-
-<b>Add another accessory?</b><br>
-Select "Yes" if you have another accessory to add.
-<p>
 |,
 		lastUpdated => 1031514049
 	},
@@ -554,32 +587,34 @@ Select "Yes" if you have another accessory to add.
 		lastUpdated => 1031514049
 	},
 
+        '26 description' => {
+                message => q|The type of specification. For instance, height, weight,   or color. You may select one you've entered for another product, or type in a new specification.
+<p>|,
+                lastUpdated => 1120336437,
+        },
+
+        '27 description' => {
+                message => q|The actual specification value. For instance, if you chose height as the Label, then you'd enter a numeric value like "18".
+<p>|,
+                lastUpdated => 1120336120,
+        },
+
+        '29 description' => {
+                message => q|The unit of measurement for this specification. For instance, if you chose height for your label, perhaps the units would be "meters".
+<p>|,
+                lastUpdated => 1120336120,
+        },
+
+        '28 description' => {
+                message => q|If you'd like to add another specification, select "Yes".
+<p>|,
+                lastUpdated => 1120336120,
+        },
+
 	'43' => {
 		message => q|Specifications are the technical details of your product.
-<p>
-
-
-<b>Label</b><br>
-The type of specification. For instance, height, weight,   or color. You may select one you've entered for another product, or type in a new specification.
-<p>
-
-
-<b>Specification</b><br>
-The actual specification value. For instance, if you chose height as the Label, then you'd enter a numeric value like "18".
-<p>
-
-
-<b>Units</b><br>
-The unit of measurement for this specification. For instance, if you chose height for your label, perhaps the units would be "meters".
-<p>
-
-
-<b>Add another specification?</b><br>
-If you'd like to add another specification, select "Yes".
-<p>
-
-|,
-		lastUpdated => 1031514049
+<p>|,
+		lastUpdated => 1120336146
 	},
 
 	'19' => {

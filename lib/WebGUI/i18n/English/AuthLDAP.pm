@@ -663,14 +663,29 @@ Usually the RDN looks something like:</p>
 		lastUpdated => 1116151382
 	},
 
+	'LDAPLink_ldapGroup description' => {
+		message => q|Group membership can also be controlled via LDAP.  Provide the LDAP DN of a group to check users for.  Next, set either the LDAP Group Property or the LDAP Recursive Group Property.|,
+		lastUpdated => 1120447990,
+	},
+
 	'LDAPLink_ldapGroupProperty' => {
 		message => q|LDAP Group Property|,
 		lastUpdated => 1116151382
 	},
 
+	'LDAPLink_ldapGroupProperty description' => {
+		message => q|LDAP property to retrieve from the LDAP Group.  If both the LDAP Recursive Group Propery and LDAP Group Property are set, then the Recursive Group Property will be used.|,
+		lastUpdated => 1120447986,
+	},
+
 	'LDAPLink_ldapRecursiveProperty' => {
 		message => q|LDAP Recursive Group Property|,
 		lastUpdated => 1116151382
+	},
+
+	'LDAPLink_ldapRecursiveProperty description' => {
+		message => q|A property to recursively search the LDAP Group for.  If both the LDAP Recursive Group Propery and LDAP Group Property are set, then the Recursive Group Property will be used.|,
+		lastUpdated => 1120447983,
 	},
 
 	'ldapconnections' => {

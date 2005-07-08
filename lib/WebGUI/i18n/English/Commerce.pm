@@ -64,21 +64,24 @@ our $I18N = {
 	},
 
 	'help manage commerce body' => {
-		message => q|The commerce system of WebGUI is highly configurable. You can set the following properties:<br>
-<br>
+		message => q|The commerce system of WebGUI is highly configurable. You can set the following properties:<p>
+
 <b>^International("confirm checkout template","Commerce");</b><br>
 This template is shown when a user is asked to confirm his purchase. The form data for the payment gateway is also shown here.<br>
 <br>
+
 <b>^International("transaction error template","Commerce");</b><br>
 This is the template that's shown if any error occurs during the payment process. This could be a declined credit card or a false cvv2 code, for instance. Also an 'error' is triggered by a fraud protection filter or some other service that requires manual interaction from the merchant.<br>
 <br>
+
 <b>^International("checkout canceled template","Commerce");</b><br>
 This is the template that the user sees when he cancels the transaction. This normally only occurs with remote-side payment gateways (like PayPal). This is because a site-side payment gateway usually uses a single step process.<br>
 <br>
+
 <b>^International("daily report email","Commerce");</b>
 Everyday the scheduler plugin that checks and updates subscriptions send a report on on the successful and failed term payments. Here you can set to which email address it should send this report.<br>
 <br>
-<h2>Payment plugins</h2>
+
 <b>Payment plugin</b><br>
 You can select the payment plugin to use here. Please note that you have to enable the plugins you want to choose from in the WebGUI configuration file. If you don't do this they won't show up here.<br>
 <br>

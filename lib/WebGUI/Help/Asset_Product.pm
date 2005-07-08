@@ -5,6 +5,51 @@ our $HELP = {
 		title => '38',
 		body => '39',
 		fields => [
+                        {
+                                title => '62',
+                                description => '62 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '10',
+                                description => '10 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '11',
+                                description => '11 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '7',
+                                description => '7 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '8',
+                                description => '8 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '9',
+                                description => '9 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '13',
+                                description => '13 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '14',
+                                description => '14 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '15',
+                                description => '15 description',
+                                namespace => 'Asset_Product',
+                        },
 		],
 		related => [
 			{
@@ -41,6 +86,16 @@ our $HELP = {
 		title => '40',
 		body => '41',
 		fields => [
+                        {
+                                title => '23',
+                                description => '23 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '24',
+                                description => '24 description',
+                                namespace => 'Asset_Product',
+                        },
 		],
 		related => [
 			{
@@ -57,6 +112,26 @@ our $HELP = {
 		title => '42',
 		body => '43',
 		fields => [
+                        {
+                                title => '26',
+                                description => '26 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '27',
+                                description => '27 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '29',
+                                description => '29 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '28',
+                                description => '28 description',
+                                namespace => 'Asset_Product',
+                        },
 		],
 		related => [
 			{
@@ -69,6 +144,16 @@ our $HELP = {
 		title => '44',
 		body => '45',
 		fields => [
+                        {
+                                title => '17',
+                                description => '17 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '18',
+                                description => '18 description',
+                                namespace => 'Asset_Product',
+                        },
 		],
 		related => [
 			{
@@ -81,6 +166,16 @@ our $HELP = {
 		title => '46',
 		body => '47',
 		fields => [
+                        {
+                                title => '20',
+                                description => '20 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '21',
+                                description => '21 description',
+                                namespace => 'Asset_Product',
+                        },
 		],
 		related => [
 			{
@@ -93,6 +188,16 @@ our $HELP = {
 		title => '49',
 		body => '50',
 		fields => [
+                        {
+                                title => '51',
+                                description => '51 description',
+                                namespace => 'Asset_Product',
+                        },
+                        {
+                                title => '52',
+                                description => '52 description',
+                                namespace => 'Asset_Product',
+                        },
 		],
 		related => [
 			{

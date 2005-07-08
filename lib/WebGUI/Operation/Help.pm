@@ -37,15 +37,6 @@ sub _link {
 }
 
 #-------------------------------------------------------------------
-sub _seeAlso {
-	my $related = shift;
-	my $namespace = shift;
-	my $output;
-	return $output;
-}
-
-
-#-------------------------------------------------------------------
 sub www_viewHelp {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new("help");

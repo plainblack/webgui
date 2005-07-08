@@ -23,6 +23,41 @@ our $HELP = {
 		title => 'help edit product title',
 		body => 'help edit product body',
 		fields => [
+                        {
+                                title => 'title',
+                                description => 'title description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'description',
+                                description => 'description description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'price',
+                                description => 'price description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'weight',
+                                description => 'weight description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'sku',
+                                description => 'sku description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'template',
+                                description => 'template description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'sku template',
+                                description => 'sku template description',
+                                namespace => 'ProductManager',
+                        },
 		],
 		related => [
 			{

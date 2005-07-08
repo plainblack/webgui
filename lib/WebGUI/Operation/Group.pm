@@ -262,38 +262,57 @@ sub www_editGroup {
 	$f = WebGUI::HTMLForm->new;
         $f->hidden("op","editGroupSave");
         $f->hidden("gid",$session{form}{gid});
-	$f->readOnly($g->groupId,WebGUI::International::get(379));
-        $f->text("groupName",WebGUI::International::get(84),$g->name);
-        $f->textarea("description",WebGUI::International::get(85),$g->description);
+        $f->readOnly(
+		-label => WebGUI::International::get(379),
+		-value => $g->groupId,
+        );
+        $f->text(
+		-name => "groupName",
+		-label => WebGUI::International::get(84),
+		-hoverHelp => WebGUI::International::get('84 description'),
+		-value => $g->name,
+        );
+        $f->textarea(
+		-name => "description",
+		-label => WebGUI::International::get(85),
+		-hoverHelp => WebGUI::International::get('85 description'),
+		-value => $g->description,
+        );
         $f->interval(
 		-name=>"expireOffset",
 		-label=>WebGUI::International::get(367), 
+		-hoverHelp=>WebGUI::International::get('367 description'), 
 		-value=>$g->expireOffset
 		);
 	$f->yesNo(
 		-name=>"expireNotify",
 		-value=>$g->expireNotify,
 		-label=>WebGUI::International::get(865)
+		-hoverHelp=>WebGUI::International::get('865 description')
 		);
 	$f->integer(
 		-name=>"expireNotifyOffset",
 		-value=>$g->expireNotifyOffset,
 		-label=>WebGUI::International::get(864)
+		-hoverHelp=>WebGUI::International::get('864 description')
 		);
         $f->textarea(
                 -name=>"expireNotifyMessage",
 		-value=>$g->expireNotifyMessage,
 		-label=>WebGUI::International::get(866)
+		-hoverHelp=>WebGUI::International::get('866 description')
                 );
         $f->integer(
                 -name=>"deleteOffset",
                 -value=>$g->deleteOffset,
                 -label=>WebGUI::International::get(863)
+                -hoverHelp=>WebGUI::International::get('863 description')
                 );
 	if ($session{setting}{useKarma}) {
 		$f->integer(
                         -name=>"karmaThreshold",
                         -label=>WebGUI::International::get(538),
+                        -hoverHelp=>WebGUI::International::get('538 description'),
                         -value=>$g->karmaThreshold
                         );
 	}
@@ -301,11 +320,13 @@ sub www_editGroup {
 		-name=>"ipFilter",
 		-value=>$g->ipFilter,
 		-label=>WebGUI::International::get(857)
+		-hoverHelp=>WebGUI::International::get('857 description')
 		);
 	$f->textarea(
 		-name=>"scratchFilter",
 		-value=>$g->scratchFilter,
 		-label=>WebGUI::International::get(945)
+		-hoverHelp=>WebGUI::International::get('945 description')
 		);
 	if ($session{form}{gid} eq "3") {
 		$f->hidden(
@@ -321,11 +342,13 @@ sub www_editGroup {
 			-name=>"autoAdd",
 			-value=>$g->autoAdd,
 			-label=>WebGUI::International::get(974)
+			-hoverHelp=>WebGUI::International::get('974 description')
 			);
 		$f->yesNo(
 			-name=>"autoDelete",
 			-value=>$g->autoDelete,
 			-label=>WebGUI::International::get(975)
+			-hoverHelp=>WebGUI::International::get('975 description')
 			);
 	}
 	$f->databaseLink(
@@ -335,26 +358,31 @@ sub www_editGroup {
 		-name=>"dbQuery",
 		-value=>$g->dbQuery,
 		-label=>WebGUI::International::get(1005)
+		-hoverHelp=>WebGUI::International::get('1005 description')
 		);
 	$f->text(
 	       -name=>"ldapGroup",
 		   -label=>WebGUI::International::get("LDAPLink_ldapGroup","AuthLDAP"),
+		   -hoverHelp=>WebGUI::International::get("LDAPLink_ldapGroup","AuthLDAP"),
 	       -value=>$g->ldapGroup
 		);
     $f->text(
 	       -name=>"ldapGroupProperty",
 		   -label=>WebGUI::International::get("LDAPLink_ldapGroupProperty","AuthLDAP"),
+		   -hoverHelp=>WebGUI::International::get("LDAPLink_ldapGroupProperty","AuthLDAP"),
 		   -value=>$g->ldapGroupProperty,
 		   -defaultValue=>"member"
 	    );
     $f->text(
 	       -name=>"ldapRecursiveProperty",
 		   -label=>WebGUI::International::get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
+		   -hoverHelp=>WebGUI::International::get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
 		   -value=>$g->ldapRecursiveProperty
 	    );
 	$f->interval(
 		-name=>"dbCacheTimeout",
 		-label=>WebGUI::International::get(1004), 
+		-hoverHelp=>WebGUI::International::get('1004 description'), 
 		-value=>$g->dbCacheTimeout
 		);
 	$f->submit;
