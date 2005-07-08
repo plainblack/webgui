@@ -634,6 +634,26 @@ our $HELP = {
 		title => '933',
 		body => '934',
 		fields => [
+                        {
+                                title => '903',
+                                description => '903 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '904',
+                                description => '904 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '905',
+                                description => '905 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '906',
+                                description => '906 description',
+                                namespace => 'WebGUI',
+                        },
 		],
 		related => [
 			{

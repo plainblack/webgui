@@ -158,14 +158,35 @@ sub www_editTheme {
                	$theme = WebGUI::SQL->quickHashRef("select * from theme where themeId=".quote($session{form}{themeId}));
 	}
 	$f = WebGUI::HTMLForm->new;
-        $f->hidden("op","editThemeSave");
-        $f->hidden("themeId",$session{form}{themeId});
-	$f->readOnly($session{form}{themeId},WebGUI::International::get(903));
-        $f->text("name",WebGUI::International::get(904),$theme->{name});
-        $f->text("designer",WebGUI::International::get(905),$theme->{designer});
+        $f->hidden(
+		-name => "op",
+		-value => "editThemeSave",
+        );
+        $f->hidden(
+		-name => "themeId",
+		-value => $session{form}{themeId},
+        );
+	$f->readOnly(
+		-name => $session{form}{themeId},
+		-label => WebGUI::International::get(903),
+		-hoverHelp => WebGUI::International::get('903 description'),
+	);
+        $f->text(
+		-name => "name",
+		-label => WebGUI::International::get(904),
+		-hoverHelp => WebGUI::International::get('904 description'),
+		-value => $theme,
+        );
+        $f->text(
+		-name => "designer",
+		-label => WebGUI::International::get(905),
+		-hoverHelp => WebGUI::International::get('905 description'),
+		-value => $theme,
+        );
         $f->url(
 		-name=>"designerURL",
 		-label=>WebGUI::International::get(906),
+		-hoverHelp=>WebGUI::International::get('906 description'),
 		-value=>$theme->{designerURL}
 		);
 	if ($session{form}{themeId} eq "new") {
@@ -206,7 +227,7 @@ sub www_editTheme {
 		}
 		$sth->finish;
 	}
-        return _submenu($output,'902',"theme add/edit");
+        return _submenu($output,'902',"theme edit");
 }
 
 #-------------------------------------------------------------------
@@ -285,6 +306,7 @@ sub www_importTheme {
 	$f->file(
 		-name=>"themePackage",
 		-label=>WebGUI::International::get(921)
+		-hoverHelp=>WebGUI::International::get('921 description')
 		);
 	$f->submit(WebGUI::International::get(929));
 	return _submenu($f->print,'927',"theme import");
@@ -309,14 +331,17 @@ sub www_importThemeValidate {
 		);
 	$f->readOnly(
 		-label=>WebGUI::International::get(904),
+		-hoverHelp=>WebGUI::International::get('904 description'),
 		-value=>$theme->{name}
 		);
 	$f->readOnly(
 		-label=>WebGUI::International::get(905),
+		-hoverHelp=>WebGUI::International::get('905 description'),
 		-value=>$theme->{designer}
 		);
 	$f->readOnly(
 		-label=>WebGUI::International::get(906),
+		-hoverHelp=>WebGUI::International::get('906 description'),
 		-value=>$theme->{designerURL}
 		);
 	$f->hidden(

@@ -117,29 +117,34 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+        '903 description' => {
+                message => q|The unique ID for this theme within this WebGUI site. This ID will change if this theme is imported into another site.|,
+                lastUpdated => 1120856677,
+        },
+
+        '904 description' => {
+                message => q|This is the unique name of the theme. It must be unique in every site that the theme will be imported into. This name will not change across sites.|,
+                lastUpdated => 1120856677,
+        },
+
+        '905 description' => {
+                message => q|The name of the person or company that created this theme. |,
+                lastUpdated => 1120856677,
+        },
+
+        '906 description' => {
+                message => q|The URL of the web site for this theme's designer. If you are in the business of creating themes for WebGUI, then this is your place to attract attention to your offerings.|,
+                lastUpdated => 1120856677,
+        },
+
+
 	'934' => {
 		message => q|Creating and editing themes is a fairly simple process. First you set up some basic properties for the theme, and then you start adding components to the theme. 
 <p>
 The basic properties of a theme cannot be changed by anyone except the site that the theme was created on. The following are the definitions of the basic properties of a theme:
 <p>
-<b>Theme ID</b><br>
-The unique ID for this theme within this WebGUI site. This ID will change if this theme is imported into another site.
-<p>
-
-<b>Theme Name</b><br>
-This is the unique name of the theme. It must be unique in every site that the theme will be imported into. This name will not change across sites.
-<p>
-
-<b>Theme Designer</b><br>
-The name of the person or company that created this theme. 
-<p>
-
-<b>Designer URL</b><br>
-The URL of the web site for this theme's designer. If you are in the business of creating themes for WebGUI, then this is your place to attract attention to your offerings.
-<p>
-
 |,
-		lastUpdated => 1050430737
+		lastUpdated => 1120856659
 	},
 
 	'978' => {
@@ -1804,6 +1809,11 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 		lastUpdated => 1050260403
 	},
 
+	'921 description' => {
+		message => q|Select a file from your computer to import.|,
+		lastUpdated => 1120857461
+	},
+
 	'1069' => {
 		message => q|Host To Use|,
 		lastUpdated => 1066641432
@@ -2460,6 +2470,11 @@ div.tabs {
 	'922' => {
 		message => q|Created With|,
 		lastUpdated => 1050262917
+	},
+
+	'922 description' => {
+		message => q|The version of WebGUI that was used to create this theme.|,
+		lastUpdated => 1120857530
 	},
 
 	'871' => {
