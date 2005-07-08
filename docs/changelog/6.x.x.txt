@@ -16,6 +16,11 @@
    the File and Image assets available as normal assets in the new content
    menu are still able to do so, and existing sites will be left as they are.
  - Added a file cache size limit option to the config file.
+ - Added "content type" to Snippets, allowing for CSS, XML, javascript and 
+   other file formats to be served directly from a snippet.
+ - Enhanced aggregation features of the SyndicatedContent wobject, including
+   keyword filtering, content republishing, XSLT stylesheet support and 
+   different "display modes".
 
 
 6.6.3
