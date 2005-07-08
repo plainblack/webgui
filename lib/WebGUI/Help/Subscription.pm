@@ -5,6 +5,41 @@ our $HELP = {
 		title => 'help edit subscription title',
 		body => 'help edit subscription body',
 		fields => [
+                        {
+                                title => 'subscription name',
+                                description => 'subscription name description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'subscription price',
+                                description => 'subscription price description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'subscription description',
+                                description => 'subscription description description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'subscription group',
+                                description => 'subscription group description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'subscription duration',
+                                description => 'subscription duration description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'execute on subscription',
+                                description => 'execute on subscription description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'subscription karma',
+                                description => 'subscription karma description',
+                                namespace => 'Subscription',
+                        },
 		],
 		related => [
 			{
@@ -52,6 +87,31 @@ our $HELP = {
 		title => 'help create batch title',
 		body => 'help create batch body',
 		fields => [
+                        {
+                                title => 'noc',
+                                description => 'noc description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'code length',
+                                description => 'code length description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'code expire',
+                                description => 'code expire description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'association',
+                                description => 'association description',
+                                namespace => 'Subscription',
+                        },
+                        {
+                                title => 'batch description',
+                                description => 'batch description description',
+                                namespace => 'Subscription',
+                        },
 		],
 		related => [
 			{

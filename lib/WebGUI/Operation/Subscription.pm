@@ -68,21 +68,25 @@ sub www_createSubscriptionCodeBatch {
 	$f->integer(
 		-name	=> 'noc',
 		-label	=> $i18n->get('noc'),
+		-hoverHelp	=> $i18n->get('noc description'),
 		-value	=> $session{form}{noc} || 1
 		);
 	$f->integer(
 		-name	=> 'codeLength',
 		-label	=> $i18n->get('code length'),
+		-hoverHelp	=> $i18n->get('code length description'),
 		-value	=> $session{form}{codeLength} || 64
 		);
 	$f->interval(
 		-name	=> 'expires',
 		-label	=> $i18n->get('codes expire'),
+		-hoverHelp	=> $i18n->get('codes expire description'),
 		-value	=> $session{form}{expires} || WebGUI::DateTime::intervalToSeconds(1, 'months')
 		);
 	$f->selectList(
 		-name	=> 'subscriptionId',
 		-label	=> $i18n->get('association'), 
+		-hoverHelp	=> $i18n->get('association description'), 
 		-options=> \%subscriptions,
 		-multiple=>1,
 		-size	=> 5,
@@ -91,6 +95,7 @@ sub www_createSubscriptionCodeBatch {
 	$f->textarea(
 		-name	=> 'description',
 		-label	=> $i18n->get('batch description'),
+		-hoverHelp	=> $i18n->get('batch description description'),
 		-value	=> $session{form}{description}
 		);
 	$f->submit;
@@ -194,38 +199,45 @@ sub www_editSubscription {
 	$f->text(
 		-name	=> 'name',
 		-label	=> $i18n->get('subscription name'),
+		-hoverHelp	=> $i18n->get('subscription name description'),
 		-value	=> $properties->{name}
 		);
 	$f->float(
 		-name	=> 'price',
 		-label	=> $i18n->get('subscription price'),
+		-hoverHelp	=> $i18n->get('subscription price description'),
 		-value	=> $properties->{price} || '0.00'
 		);
 	$f->textarea(
 		-name	=> 'description',
 		-label	=> $i18n->get('subscription description'),
+		-hoverHelp	=> $i18n->get('subscription description description'),
 		-value	=> $properties->{description}
 		);
 	$f->group(
 		-name	=> 'subscriptionGroup',
 		-label	=> $i18n->get('subscription group'),
+		-hoverHelp	=> $i18n->get('subscription group description'),
 		-value	=> [$properties->{subscriptionGroup} || 2]
 		);
 	$f->selectList(
 		-name	=> 'duration',
 		-label	=> $i18n->get('subscription duration'),
+		-hoverHelp	=> $i18n->get('subscription duration description'),
 		-value	=> [$properties->{duration} || 'Monthly'],
 		-options=> WebGUI::Commerce::Payment::recurringPeriodValues
 		);
 	$f->text(
 		-name	=> 'executeOnSubscription',
 		-label	=> $i18n->get('execute on subscription'),
+		-hoverHelp	=> $i18n->get('execute on subscription description'),
 		-value	=> $properties->{executeOnSubscription}
 		);
 	if ($session{setting}{useKarma}) {
 		$f->integer(
 			-name	=> 'karma',
 			-label	=> $i18n->get('subscription karma'),
+			-hoverHelp	=> $i18n->get('subscription karma description'),
 			-value	=> $properties->{karma} || 0
 			);
 	}
@@ -423,6 +435,7 @@ sub www_redeemSubscriptionCode {
 	$f->text(
 		-name		=> 'code',
 		-label		=> $i18n->get('code'),
+		-hoverHelp	=> $i18n->get('code description'),
 		-maxLength	=> 64,
 		-size		=> 30
 		);

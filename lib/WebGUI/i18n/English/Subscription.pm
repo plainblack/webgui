@@ -61,6 +61,11 @@ our $I18N = {
 		context => q|Shows up in the table header in listSubscriptionCodes.|
 	},
 
+	'code description' => {
+		message => q|The subscription code that you want to redeem|,
+		lastUpdated => 1101228391,
+	},
+
 	'delete batch confirm' => {
 		message => q|Are you sure to delete this batch?|,
 		lastUpdated => 1101228391,
@@ -97,32 +102,46 @@ our $I18N = {
 		context => q|The Add/Edit subscription help page title.|
 	},
 
+        'subscription name description' => {
+                message => q|Name of the subscription.<p>|,
+                lastUpdated => 1120861450,
+        },
+
+        'subscription price description' => {
+                message => q|Price to pay for the subscription.<p>|,
+                lastUpdated => 1120861450,
+        },
+
+        'subscription description description' => {
+                message => q|Detailed description of the subscription.<p>|,
+                lastUpdated => 1120861450,
+        },
+
+        'subscription group description' => {
+                message => q|When a user payed the fee, he/she will be added to this group.<p>|,
+                lastUpdated => 1120861450,
+        },
+
+        'subscription duration description' => {
+                message => q|This sets the length of one subscription term. ie. You pay every month, or every half year.<p>|,
+                lastUpdated => 1120861450,
+        },
+
+        'execute on subscription description' => {
+                message => q|A (Perl) script to call when someone has subscribed and payed.<p>|,
+                lastUpdated => 1120861450,
+        },
+
+        'subscription karma description' => {
+                message => q|The amount of karma which is added to the user after he/she subscribes.<p>|,
+                lastUpdated => 1120861450,
+        },
+
 	'help edit subscription body' => {
 		message => q|A subscription will allow the user a piece of content which he/she has
-payed for. The following is the list of properties attached to each
-Description.<br>
-<br>
-<b>Subscription name</b><br>
-Name of the subscription.<br>
-<br>
-<b>Price</b><br>
-Price to pay for the subscription.<br>
-<br>
-<b>Description</b><br>
-Detailed description of the subscription.<br>
-<br>
-<b>Group to subscribe to</b><br>
-When a user payed the fee, he/she will be added to this group.<br>
-<br>
-<b>Subscription period</b><br>
-This sets the length of one subscription term. ie. You pay every month, or every half year.<br>
-<br>
-<b>Execute on subscription</b><br>
-A (Perl) script to call when someone has subscribed and payed.<br>
-<br>
-<b>Karma</b><br>
-The amount of karma which is added to the user after he/she subscribes.<br>|,
-		lastUpdated => 1101754802,
+payed for. The following is the list of properties attached to each Description.<p>
+|,
+		lastUpdated => 1120861475,
 		context => q|The Add/Edit subscription help page text.|
 	},
 
@@ -289,7 +308,7 @@ The amount of karma which is added to the user after he/she subscribes.<br>|,
 	},
 
 	'help manage subscription codes body' => {
-		message => q|A subscription code is a 64 character code that is tied to a set of subscriptions. A user can redeem such a code, and thus make himself subscribed for one term to all subscriptions the code is tied to, using the 'Redeem a subscription code' link in his account menu. Note that when redeeming a subscription code no money is charged.|,
+		message => q|A subscription code is a string of characters that is tied to a set of subscriptions. A user can redeem such a code, and thus make himself subscribed for one term to all subscriptions the code is tied to, using the 'Redeem a subscription code' link in his account menu. Note that when redeeming a subscription code no money is charged.|,
 		lastUpdated => 1101754831,
 		context => q|The content of the Manage Subscriptions codes help page.|
 	},
@@ -299,22 +318,37 @@ The amount of karma which is added to the user after he/she subscribes.<br>|,
 		lastUpdated => 0,
 		context => q|The title of the Create Subscription code batch help page.|
 	},
+
+        'noc description' => {
+                message => q|Number of codes to create<p>|,
+                lastUpdated => 1120858265,
+        },
+
+        'code length description' => {
+                message => q|The number of characters in the generated codes.  Codes must be at least 10
+characters long.<p>|,
+                lastUpdated => 1120858265,
+        },
+
+        'code expire description' => {
+                message => q|The code must be used before this date.<p>|,
+                lastUpdated => 1120858265,
+        },
+
+        'association description' => {
+                message => q|Which subscription(s) are made with the generated codes.<p>|,
+                lastUpdated => 1120858265,
+        },
+
+        'batch description description' => {
+                message => q|Description of the batch.<br>|,
+                lastUpdated => 1120858265,
+        },
+
 	
 	'help create batch body' => {
-		message => q|Generate a batch of subscription codes.<br>
-<br>
-<b>Number of codes in batch</b><br>
-Number of codes to create<br>
-<br>
-<b>Codes expires on</b><br>
-The code must be used before this date.<br>
-<br>
-<b>Associate with subscription</b><br>
-Which subscription(s) are made with the generated codes.<br>
-<br>
-<b>Batch description</b><br>
-Description of the batch.<br>|,
-		lastUpdated => 0,
+		message => q|Generate a batch of subscription codes.<p> |,
+		lastUpdated => 1120858203,
 		context => q|The content of the Create Subscription code batch help page.|
 	},
 
