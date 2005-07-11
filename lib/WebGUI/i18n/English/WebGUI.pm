@@ -3205,6 +3205,34 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1066418983
 	},
 
+        '1050 description' => {
+                message => q|A string to search for.  All punctuation will be escaped.|,
+                lastUpdated => 1121052295,
+        },
+
+        '1051 description' => {
+                message => q|What you want the string to be replaced with.|,
+                lastUpdated => 1121052295,
+        },
+
+	'replacements edit body' => {
+		message => q|
+<p>Many Assets allow you to control HTML and javascript that is entered by users, but that is
+limited to the scope of the Asset and don't control content entered users.  WebGUI has a
+sitewide system called Content Filtering that provides that ability.</p>
+
+<p>It works much like the Search and Replace function of word processors.  First, enter
+a string to be searched for.  Then enter in the string that you want to replace it.</p>
+
+<p>Most of the time, this Content Filter will be used to remove offensive words such as slang,
+curses or racial slurs.  However, it can also be used as a preprocessor for inline macros.  See
+the default replacements that ship with WebGUI for examples.</p>
+
+<p>Only Admins may configure the Content Filter.</p>
+|,
+		lastUpdated => 1121052324
+	},
+
 	'735' => {
 		message => q|6 Professional|,
 		lastUpdated => 1033836686

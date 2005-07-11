@@ -41,6 +41,24 @@ our $HELP = {
 		related => [
 		],
 	},
+	'replacements edit' => {
+		title => '1052',
+		body => 'replacements edit body',
+		fields => [
+                        {
+                                title => '1050',
+                                description => '1050 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '1051',
+                                description => '1051 description',
+                                namespace => 'WebGUI',
+                        },
+		],
+		related => [
+		],
+	},
 	'trash empty' => {
 		title => '696',
 		body => '651',

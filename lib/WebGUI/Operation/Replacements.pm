@@ -63,15 +63,17 @@ sub www_editReplacement {
 	$f->text(
 		-name=>"searchFor",
 		-label=>WebGUI::International::get(1050),
+		-hoverHelp=>WebGUI::International::get('1050 description'),
 		-value=>$data->{searchFor}
 		);
 	$f->textarea(
 		-label=>WebGUI::International::get(1051),
+		-hoverHelp=>WebGUI::International::get('1051 description'),
 		-name=>"replaceWith",
 		-value=>$data->{replaceWith}
 		);
 	$f->submit;
-	return _submenu($f->print,"1052");
+	return _submenu($f->print,"1052",'replacements edit');
 }
 
 #-------------------------------------------------------------------
