@@ -226,12 +226,6 @@ Choose the group that can edit this asset. The group assigned editing rights can
 </p>
 
 <p>
-<b>^International("412","Asset");</b><br>
-A short description of this Asset.<br>
-<i>UI level: 3</i>
-</p>
-
-<p>
 <b>^International("extra head tags","Asset");</b><br>
 These tags will be added to the &lt;HEAD&gt; section of each page that the asset appears on.<br>
 <i>UI level: 5</i>
