@@ -207,13 +207,6 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br>
                 lastUpdated => 1119149899,
         },
 
-        '412 description' => {
-                message => q|A short description of this Asset. <br>
-<i>UI level: 6</i>
-</p>|,
-                lastUpdated => 1119149899,
-        },
-
         '886 description' => {
                 message => q|Whether or not this asset will be hidden from the navigation menu and site maps.<br>
 <i>UI level: 6</i>
