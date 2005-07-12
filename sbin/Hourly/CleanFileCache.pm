@@ -13,11 +13,31 @@ package Hourly::CleanFileCache;
 use strict;
 use WebGUI::Session;
 use WebGUI::Cache::FileCache;
+use File::Path;
 
 #-------------------------------------------------------------------
 sub process {
-	my $cache = WebGUI::Cache::FileCache->new;
-	$cache->shrink;
+	traverse(WebGUI::Cache::FileCache->getCacheRoot);	
+}
+
+#-------------------------------------------------------------------
+sub traverse {
+	my $path = shift;
+	if (opendir(DIR,$path)) {
+        	my @files = readdir(DIR);
+                foreach my $file (@files) {
+                        unless ($file eq "." || $file eq "..") {
+				if (open(FILE,"<".$path."/expires")) {
+					my $expires = <FILE>;
+					close(FILE);
+					rmtree($path) if ($expires < time());
+				} else {
+                                	traverse($path."/".$file);
+				}
+                        }
+                }
+                closedir(DIR);
+        }
 }
 
 1;

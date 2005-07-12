@@ -44,12 +44,12 @@ use HTML::Template ();
 use Parse::PlainConfig ();
 use Net::SMTP ();
 use Log::Log4perl ();
-use Cache::Cache ();
 use Tie::IxHash ();
 use Tie::CPHash ();
 use Time::HiRes ();
 use Date::Manip ();
 use Image::Magick ();
+use Storable;
 use XML::Simple ();
 
 ####

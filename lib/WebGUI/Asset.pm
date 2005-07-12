@@ -16,7 +16,6 @@ package WebGUI::Asset;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::Asset::Template;
 use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::DateTime;
@@ -193,7 +192,7 @@ Adds a revision of an existing asset. Note that programmers should almost never 
 
 =head3 properties
 
-A hash reference containing a list of properties to associate with the child. The only required property value is "className"
+A hash reference containing a list of properties to associate with the child. 
         
 =head3 revisionDate
 
@@ -214,7 +213,7 @@ sub addRevision {
                         WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".quote($self->getId).",".$now.")");
                 }
         }               
-        my $newVersion = WebGUI::Asset->new($self->getId, $properties->{className}, $now);
+        my $newVersion = WebGUI::Asset->new($self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
         $newVersion->update($properties);
         return $newVersion;
@@ -394,8 +393,7 @@ An array reference containing additional information to include with the default
 sub definition {
         my $class = shift;
         my $definition = shift || [];
-	my @newDef = @{$definition};
-        push(@newDef, {
+        push(@{$definition}, {
                 tableName=>'assetData',
                 className=>'WebGUI::Asset',
                 properties=>{
@@ -418,7 +416,7 @@ sub definition {
                                 url=>{
                                         fieldType=>'text',
                                         defaultValue=>undef,
-					filter=>'fixUrl',
+					filter=>'fixUrl'
                                         },
                                 groupIdEdit=>{
                                         fieldType=>'group',
@@ -467,7 +465,7 @@ sub definition {
 					}
                         }
                 });
-        return \@newDef;
+        return $definition;
 }
 
 #-------------------------------------------------------------------
@@ -1532,7 +1530,7 @@ sub getNextChildRank {
 	my $rank;
 	if (defined $lineage) {
 		$rank = $self->getRank($lineage);
-		if ($rank >= 999998) { WebGUI::ErrorHandler->fatal; }
+		WebGUI::ErrorHandler::fatal("Asset ".$self->getId." has too many children.") if ($rank >= 999998);
 		$rank++;
 	} else {
 		$rank = 1;
@@ -1860,7 +1858,8 @@ sub new {
 	my $className = shift;
 	my $revisionDate = shift;
 	unless ($revisionDate) {
-		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId=".quote($assetId)." group by assetData.assetId order by assetData.revisionDate");
+		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId="
+			.quote($assetId)." group by assetData.assetId order by assetData.revisionDate");
 	}
 	return undef unless ($revisionDate);
         if ($className) {
@@ -1872,22 +1871,29 @@ sub new {
 		}
 		$class = $className;
 	}
-	my $properties = WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->get;
+	my $properties = $session{assetprops}{$assetId}{$revisionDate};
+	#	$properties = WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->get;
+#	if ( $session{assetcache}{$assetId}{$revisionDate}) {
+#		return $session{assetcache}{$assetId}{$revisionDate};
+#	}
 	if (exists $properties->{assetId}) {
 		# got properties from cache
 	} else { 
 		my $sql = "select * from asset";
 		foreach my $definition (@{$class->definition}) {
-			$sql .= " left join ".$definition->{tableName}." on asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
+			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
+				.$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
 		}
 		$sql .= " where asset.assetId=".quote($assetId);
 		$properties = WebGUI::SQL->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
-		WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->set($properties,60*60*24);
+	#	WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->set($properties,60*60*24);
+		$session{assetprops}{$assetId}{$revisionDate} = $properties;
 	}
 	if (defined $properties) {
 		my $object = { _properties => $properties };
 		bless $object, $class;
+	#	$session{assetcache}{$assetId}{$revisionDate} = $object;
 		return $object;
 	}	
 	return undef;
@@ -1935,8 +1941,8 @@ Lineage string.
 sub newByLineage {
 	my $class = shift;
         my $lineage = shift;
-        my $asset = WebGUI::SQL->quickHashRef("select assetId, className from asset where lineage=".quote($lineage));
-	return WebGUI::Asset->new($asset->{assetId}, $asset->{className});
+        my ($id,$class) = WebGUI::SQL->quickArray("select assetId, className from asset where lineage=".quote($lineage));
+	return WebGUI::Asset->new($id, $class);
 }
 
 #-------------------------------------------------------------------
@@ -2009,7 +2015,7 @@ sub newByUrl {
 			return WebGUI::Asset->getNotFound;
 		}
 	}
-	return $class->getDefault;
+	return WebGUI::Asset->getDefault;
 }
 
 #-------------------------------------------------------------------
@@ -2128,7 +2134,7 @@ sub processTemplate {
 		%{$self->{_properties}},
 		%{$var}
 		);
-	my $template = WebGUI::Asset::Template->new($templateId);
+	my $template = WebGUI::Asset->new($templateId,"WebGUI::Asset::Template");
 	if (defined $template) {
 		return $template->process(\%vars);
 	} else {
@@ -2237,6 +2243,8 @@ Purges all cache entries associated with this asset.
 sub purgeCache {
 	my $self = shift;
 	WebGUI::Cache->new("asset_".$self->getId."/".$self->get("revisionDate"))->delete;
+	delete $session{assetcache}{$self->getId};
+	delete $session{assetprops}{$self->getId};
 }
 
 #-------------------------------------------------------------------
@@ -3787,7 +3795,7 @@ Returns a www_manageAssets() method. Sets a new parent via the results of a form
 sub www_setParent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $newParent = WebGUI::Asset->new($session{form}{assetId});
+	my $newParent = WebGUI::Asset->newByDynamicClass($session{form}{assetId});
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
 

@@ -14,13 +14,10 @@ package WebGUI::Cache::FileCache;
 
 =cut
 
-use Cache::SizeAwareFileCache;
 
-use HTTP::Headers;
-use HTTP::Request;
-use LWP::UserAgent;
-use WebGUI::ErrorHandler;
+use Storable qw(nstore retrieve);
 use WebGUI::Session;
+use File::Path;
 
 our @ISA = qw(WebGUI::Cache);
 
@@ -54,29 +51,26 @@ Remove content from the filesystem cache.
 =cut
 
 sub delete {
-	$_[0]->{_cache}->remove($_[0]->{_key});
+	my $self = shift;
+	rmtree($self->{_cachefolder});
 }
-
 
 #-------------------------------------------------------------------
 
-=head2 deleteByRegex ( regex )
+=head2 deleteChunk ( key )
 
-Remove content from the filesystem cache where the key meets the condition of the regular expression.
+Remove a partial composite key from the cache.
 
-=head3 regex
+=head3 key
 
-A regular expression that will match keys in the current namespace. Example: m/^navigation_.*/
+A partial composite key to remove.
 
 =cut
 
-sub deleteByRegex {
-		my @keys = $_[0]->{_cache}->get_keys();
-		foreach my $key (@keys) {
-			if ($key =~ $_[1]) {
-                		$_[0]->{_cache}->remove($key);
-			}
-		}
+sub deleteChunk {
+	my $self = shift;
+	my $key = $self->parseKey(shift);
+	rmtree($self->getCacheRoot()."/".$self->{_namespace}."/".$key);
 }
 
 #-------------------------------------------------------------------
@@ -88,13 +82,9 @@ Remove all objects from the filecache system.
 =cut
 
 sub flush {
-		my $self = shift;
-		$self->SUPER::flush();
-  	foreach my $namespace ($self->{_cache}->get_namespaces) {
-                next if ($namespace =~ /\.conf$/ && $namespace ne $session{config}{configFile});
-                $self->{_cache}->set_namespace($namespace);
-		$self->{_cache}->clear;
-        }
+	my $self = shift;
+	$self->SUPER::flush();
+	rmtree($self->getCacheRoot."/".$self->{_namespace});
 }
 
 #-------------------------------------------------------------------
@@ -106,9 +96,39 @@ Retrieve content from the filesystem cache.
 =cut
 
 sub get {
-		return undef if ($session{config}{disableCache});
-                return $_[0]->{_cache}->get($_[0]->{_key});
+	my $self = shift;
+	return undef if ($session{config}{disableCache});
+	if (open(FILE,"<".$self->{_cachefolder}."/expires")) {
+		my $expires = <FILE>;
+		close(FILE);
+		return undef if ($expires < time());
+		return retrieve($self->{_cachefolder}."/cache");
+	}
+	return undef;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getCacheRoot ( )
+
+Figures out what the cache root should be. A class method.
+
+=cut
+
+sub getCacheRoot {
+	my $class = shift;
+	my $root = $session{config}{fileCacheRoot};
+	unless ($root) {
+		if ($session{os}{windowsish}) {
+			$root = $session{env}{TEMP} || $session{env}{TMP} || "/temp";
+		} else {
+			$root = "/tmp";
+		}
+		$root .= "/WebGUICache";
+	}
+	return $root;	
+}
+
 
 #-------------------------------------------------------------------
 
@@ -129,15 +149,10 @@ Defaults to the config filename for the current site. The only reason to overrid
 sub new {
 	my $cache;
 	my $class = shift;
-	my $key = shift;
+	my $key = $class->parseKey(shift);
 	my $namespace = shift || $session{config}{configFile};
-	my %options = (
-		namespace=>$namespace, 
-		auto_purge_on_set=>1
-		);
-	$options{cache_root} = $session{config}{fileCacheRoot} if ($session{config}{fileCacheRoot});
-	$cache = new Cache::SizeAwareFileCache(\%options);
-	bless {_cache => $cache, _key => $key}, $class;
+	my $path = $class->getCacheRoot()."/".$namespace."/".$key;
+	bless {_cachefolder => $path, _key=>$key, _namespace=>$namespace}, $class;
 }
 
 
@@ -158,61 +173,21 @@ The time to live for this content. This is the amount of time (in seconds) that 
 =cut
 
 sub set {
-	my $ttl = $_[2] || 60;
-		$_[0]->{_cache}->set($_[0]->{_key},$_[1],$ttl);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 setByHTTP ( url [, ttl ] )
-
-Retrieves a document via HTTP and stores it in the cache and returns the content as a string.
-
-=head3 url
-
-The URL of the document to retrieve. It must begin with the standard "http://".
-
-=head3 ttl
-
-The time to live for this content. This is the amount of time (in seconds) that the content will remain in the cache. Defaults to "60".
-
-=cut
-
-sub setByHTTP {
-	my $userAgent = new LWP::UserAgent;
-        $userAgent->agent("WebGUI/".$WebGUI::VERSION);
-        $userAgent->timeout(30);
-	my $header = new HTTP::Headers;
-        my $referer = "http://webgui.http.request/".$session{env}{SERVER_NAME}.$session{env}{REQUEST_URI};
-        chomp $referer;
-        $header->referer($referer);
-        my $request = new HTTP::Request (GET => $_[1], $header);
-        my $response = $userAgent->request($request);
-	if ($response->is_error) {
-		WebGUI::ErrorHandler::warn($_[1]." could not be retrieved.");
-	} else {
-		$_[0]->set($response->content,$_[2]);
-	}
-	return $response->content;
-}
-
-#-------------------------------------------------------------------
-
-=head2 shrink ( [ size ] ) 
-
-Reduces the cache down to a specific size to conserve filesystem space.
-
-=head3 size
-
-A size to shrink the cache to in bytes. Defaults to the fileCacheSizeLimit variable in the config file.
-
-=cut
-
-sub shrink {
 	my $self = shift;
-	my $size = shift || $session{config}{fileCacheSizeLimit} || 10000000;
-	$self->{_cache}->limit_size($size);
+	my $content = shift;
+	my $ttl = shift || 60;
+	my $path = $self->{_cachefolder};
+	unless (-e $path) {
+		eval {mkpath($path)};
+		if ($@) {
+			WebGUI::ErrorHandler::error("Couldn't create cache folder: ".$path." : ".$@);
+			return;
+		}
+	}
+	nstore($content, $path."/cache");
+	open(FILE,">".$path."/expires");
+	print FILE time()+$ttl;
+	close(FILE);
 }
 
 
@@ -226,17 +201,8 @@ Returns statistic information about the caching system.
 
 sub stats {
         my $self = shift;
-        my $output;
-	$output = "Total size of file cache: ".$self->{_cache}->Size()." bytes\n";
-	foreach my $namespace ($self->{_cache}->get_namespaces) {
-		next if ($namespace =~ /\.conf$/ && $namespace ne $session{config}{configFile});
-		$self->{_cache}->set_namespace($namespace);
-		$output .= "\t$namespace : ".($self->{_cache}->get_keys).
-				" items / ".$self->{_cache}->size()." bytes\n";
-	}
-        return $output;
+	return undef;
 }
-
 
 1;
 

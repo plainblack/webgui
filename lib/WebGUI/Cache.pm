@@ -14,9 +14,11 @@ package WebGUI::Cache;
 
 =cut
 
-use WebGUI::Cache::FileCache;
 use WebGUI::Session;
 use File::Path;
+use HTTP::Headers;
+use HTTP::Request;
+use LWP::UserAgent;
 
 =head1 NAME
 
@@ -39,9 +41,38 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 delete ( )
+
+Delete a key from the cache. Must be overridden.
+
+=cut
+
+sub delete {
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteChunk ( key )
+
+Deletes a bunch of keys from the cache based upon a partial composite key. Unless overridden by the cache subclass this will just flush the whole cache.
+
+=head3 key
+
+An array reference representing the portion of the key to delete. So if you have a key like ["asset","abc","def"] and you want to delete all items that match abc, you'd specify ["asset","abc"].
+
+=cut
+
+sub deleteChunk {
+	$self = shift;
+	$self->flush;
+}
+
+#-------------------------------------------------------------------
+
 =head2 flush ( )
 
-Flushes the caching system.
+Flushes the caching system. Must be overloaded.
 
 =cut
 
@@ -49,18 +80,32 @@ sub flush {
 	rmtree($session{config}{uploadsPath}.$session{os}{slash}."temp");
 }
 
+#-------------------------------------------------------------------
+
+=head2 get ( )
+
+Retrieves a key value from the cache. Must be overridden.
+
+=cut
+
+sub get {
+
+}
+
 
 #-------------------------------------------------------------------
 
-=head2 new ( otions )
+=head2 new ( key, [ namepsace ] )
 
-The new method will return a handler for the configured caching mechanism.
-Defaults to WebGUI::Cache::FileCache.
+The new method will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
 
-=head3 options 
+=head3 key
 
-Options to pass to the new constructor. See the caching methods in WebGUI/Cache/*
-for documentation of the options.
+A key to store the value under or retrieve it from.
+
+=head3 namespace
+
+A subdivider to store this cache under. When building your own cache plug-in default this to the WebGUI config file.
 
 =cut
 
@@ -71,9 +116,112 @@ sub new {
 		require WebGUI::Cache::Memcached;
 		return WebGUI::Cache::Memcached->new(@_);
 	} else {
+		require WebGUI::Cache::FileCache;
 		return WebGUI::Cache::FileCache->new(@_);
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 parseKey ( key ) 
+
+Returns a formatted string version of the key. A class method.
+
+=head3 key
+
+Can either be a text key, or a composite key. If it's a composite key, it will be an array reference of strings that can be joined together to create a key. You might want to use a composite key in order to be able to delete large portions of cache all at once. For instance, if you have a key of ["asset","abc","def"] you can delete all cache matching ["asset","abc"].
+
+=cut
+
+sub parseKey {
+	my $class = shift;
+	my $key = shift;
+	if (ref $key eq "ARRAY") {
+		my @parts = @{$key};
+		my @fixed;
+		foreach my $part (@parts) {
+			$part = Digest::MD5::md5_base64($part);
+        		$part =~ s/\//-/g;
+			push(@fixed,$part);
+		}
+		return join('/',@fixed);
+	} else {
+		$key = Digest::MD5::md5_base64($key);
+                $key =~ s/\//-/g;
+		return $key;
+	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 set ( value [, ttl] )
+
+Sets a key value to the cache. Must be overridden.
+
+=head3 value
+
+A scalar value to store.
+
+=head3 ttl
+
+A time in seconds for the cache to exist. When you override default it to 60 seconds.
+
+=cut
+
+sub set {
+
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setByHTTP ( url [, ttl ] )
+
+Retrieves a document via HTTP and stores it in the cache and returns the content as a string. No need to override.
+
+=head3 url
+
+The URL of the document to retrieve. It must begin with the standard "http://".
+
+=head3 ttl
+
+The time to live for this content. This is the amount of time (in seconds) that the content will remain in the cache. Defaults to "60".
+
+=cut
+
+sub setByHTTP {
+	my $self = shift;
+	my $url = shift;
+	my $ttl = shift;
+        my $userAgent = new LWP::UserAgent;
+        $userAgent->agent("WebGUI/".$WebGUI::VERSION);
+        $userAgent->timeout(30);
+        my $header = new HTTP::Headers;
+        my $referer = "http://webgui.http.request/".$session{env}{SERVER_NAME}.$session{env}{REQUEST_URI};
+        chomp $referer;
+        $header->referer($referer);
+        my $request = new HTTP::Request (GET => $url, $header);
+        my $response = $userAgent->request($request);
+        if ($response->is_error) {
+                WebGUI::ErrorHandler::error($url." could not be retrieved.");
+        } else {
+                $self->set($response->content,$ttl);
+        }
+        return $response->content;
+}
+
+#-------------------------------------------------------------------
+
+=head2 stats ( )
+
+Return a formatted text string describing cache usage. Must be overridden.
+
+=cut
+
+sub stats {
+
+}
+
 
 1;
 

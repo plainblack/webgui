@@ -16,11 +16,6 @@ package WebGUI::Cache::Memcached;
 
 use Cache::Memcached;
 use Digest::MD5;
-
-use HTTP::Headers;
-use HTTP::Request;
-use LWP::UserAgent;
-use WebGUI::ErrorHandler;
 use WebGUI::Session;
 
 our @ISA = qw(WebGUI::Cache);
@@ -59,23 +54,6 @@ sub delete {
 	$_[0]->{_cache}->delete($_[0]->{_key});
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 deleteByRegex ( )
-
-This method is here to keep the API compatible. 
-Because of the nature of memcached it does not support a way to retrieve
-the list of cache keys. 
-
-The whole cache will be flushed if deleteByRegex is called.
-
-=cut
-
-sub deleteByRegex {
-		my $self = shift;
-		return $self->flush;
-}
 
 #-------------------------------------------------------------------
 
@@ -134,7 +112,7 @@ Defaults to the config filename for the current site. The only reason to overrid
 sub new {
 	my $cache;
 	my $class = shift;
-	my $key = shift;
+	my $key = $class->parseKey(shift);
 	my $namespace = shift || $session{config}{configFile};
 
 	# Overcome maximum key length of 255 characters 
@@ -176,40 +154,6 @@ sub set {
 		$_[0]->{_cache}->set($_[0]->{_key},$_[1],$ttl);
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 setByHTTP ( url [, ttl ] )
-
-Retrieves a document via HTTP and stores it in the cache and returns the content as a string.
-
-=head3 url
-
-The URL of the document to retrieve. It must begin with the standard "http://".
-
-=head3 ttl
-
-The time to live for this content. This is the amount of time (in seconds) that the content will remain in the cache. Defaults to "60".
-
-=cut
-
-sub setByHTTP {
-	my $userAgent = new LWP::UserAgent;
-        $userAgent->agent("WebGUI/".$WebGUI::VERSION);
-        $userAgent->timeout(30);
-	my $header = new HTTP::Headers;
-        my $referer = "http://webgui.http.request/".$session{env}{SERVER_NAME}.$session{env}{REQUEST_URI};
-        chomp $referer;
-        $header->referer($referer);
-        my $request = new HTTP::Request (GET => $_[1], $header);
-        my $response = $userAgent->request($request);
-	if ($response->is_error) {
-		WebGUI::ErrorHandler::warn($_[1]." could not be retrieved.");
-	} else {
-		$_[0]->set($response->content,$_[2]);
-	}
-	return $response->content;
-}
 
 #-------------------------------------------------------------------
 

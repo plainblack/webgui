@@ -53,7 +53,6 @@ checkModule("Archive::Tar",1.05);
 checkModule("IO::Zlib",1.01);
 checkModule("Compress::Zlib",1.34);
 checkModule("Net::SMTP",2.24);
-checkModule("Cache::Cache",1.02);
 checkModule("Tie::IxHash",1.21);
 checkModule("Tie::CPHash",1.001);
 checkModule("XML::Simple",2.09);

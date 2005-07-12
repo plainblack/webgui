@@ -305,6 +305,8 @@ sub getToolbar {
 sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
+use Time::HiRes;
+my $t = [Time::HiRes::gettimeofday()];
 	my $start;
 	$session{asset} = WebGUI::Asset->newByUrl unless (exists $session{asset});
 	my $current = $session{asset};
@@ -335,6 +337,8 @@ sub view {
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->get("ancestorEndPoint");
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
+my $timeoutput = "get records: ".Time::HiRes::tv_interval($t)."<br />";
+my $t = [Time::HiRes::gettimeofday()];
 	my $var = {'page_loop' => []};
 	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
 	foreach my $property (@interestingProperties) {
@@ -439,7 +443,12 @@ sub view {
 		}
 		push(@{$var->{page_loop}}, $pageData);	
 	}
-	return $self->processTemplate($var,$self->get("templateId"));
+$timeoutput .= "build vars: ".Time::HiRes::tv_interval($t)."<br />";
+my $t = [Time::HiRes::gettimeofday()];
+	my $output = $self->processTemplate($var,$self->get("templateId"));
+$timeoutput .= "process template: ".Time::HiRes::tv_interval($t)."<br />";
+	return $output."<br />".$timeoutput;
+
 }
 
 
