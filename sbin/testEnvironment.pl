@@ -64,7 +64,7 @@ checkModule("Net::LDAP",0.25);
 checkModule("Date::Manip",5.42);
 checkModule("HTML::Highlight",0.20);
 checkModule("HTML::TagFilter",0.07);
-checkModule("HTML::Template",2.6);
+checkModule("HTML::Template",2.7);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
 checkModule("DBIx::FullTextSearch",0.73);
