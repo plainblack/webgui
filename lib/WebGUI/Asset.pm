@@ -318,14 +318,12 @@ sub cascadeLineage {
 	my $now = time();
         my $prepared = WebGUI::SQL->prepare("update asset set lineage=? where assetId=?");
 	my $descendants = WebGUI::SQL->read("select assetId,lineage from asset where lineage like ".quote($oldLineage.'%'));
+	my $cache = WebGUI::Cache->new;
 	while (my ($assetId, $lineage) = $descendants->array) {
 		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
 		$prepared->execute([$fixedLineage,$assetId]);
-		my $sth = WebGUI::SQL->read("select assetId,revisionDate from assetData where asset=".quote($assetId));
-		while (my ($id,$version) = $sth->array) {
-			WebGUI::Cache->new("asset_".$id."/".$version)->delete;
-		}
-		$sth->finish;
+                # we do the purge directly cuz it's a lot faster than instanciating all these assets
+                $cache->deleteChunk(["asset",$assetId]);
 	}
 	$descendants->finish;
 }
@@ -1153,11 +1151,7 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 sub getFirstChild {
 	my $self = shift;
 	unless (exists $self->{_firstChild}) {
-		my $lineage = WebGUI::Cache->new("firstchild_".$self->getId)->get;
-		unless ($lineage) {
-			($lineage) = WebGUI::SQL->quickArray("select min(lineage) from asset where parentId=".quote($self->getId));
-			WebGUI::Cache->new("firstchild_".$self->getId)->set($lineage);
-		}
+		my ($lineage) = WebGUI::SQL->quickArray("select min(lineage) from asset where parentId=".quote($self->getId));
 		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_firstChild};
@@ -1232,11 +1226,7 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 sub getLastChild {
 	my $self = shift;
 	unless (exists $self->{_lastChild}) {
-		my $lineage = WebGUI::Cache->new("lastchild_".$self->getId)->get;
-		unless ($lineage) {
-			($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
-			WebGUI::Cache->new("lastchild_".$self->getId)->set($lineage);
-		}
+		my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
 		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_lastChild};
@@ -1871,11 +1861,8 @@ sub new {
 		}
 		$class = $className;
 	}
-	my $properties = $session{assetprops}{$assetId}{$revisionDate};
-	#	$properties = WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->get;
-#	if ( $session{assetcache}{$assetId}{$revisionDate}) {
-#		return $session{assetcache}{$assetId}{$revisionDate};
-#	}
+	my $cache = WebGUI::Cache->new(["asset",$assetId,$revisionDate]);
+	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
 		# got properties from cache
 	} else { 
@@ -1887,13 +1874,11 @@ sub new {
 		$sql .= " where asset.assetId=".quote($assetId);
 		$properties = WebGUI::SQL->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
-	#	WebGUI::Cache->new("asset_".$assetId."/".$revisionDate)->set($properties,60*60*24);
-		$session{assetprops}{$assetId}{$revisionDate} = $properties;
+		$cache->set($properties,60*60*24);
 	}
 	if (defined $properties) {
 		my $object = { _properties => $properties };
 		bless $object, $class;
-	#	$session{assetcache}{$assetId}{$revisionDate} = $object;
 		return $object;
 	}	
 	return undef;
@@ -2038,12 +2023,11 @@ sub paste {
 		my $assetIds = WebGUI::SQL->buildArrayRef("select assetId from asset where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
 		my $idList = quoteAndJoin($assetIds);
 		WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId in (".$idList.")");
-		my $sth = WebGUI::SQL->read("select assetId,revisionDate from assetData where assetId in (".$idList.")");
-		while ( my ($id,$version) = $sth->array) {
+		my $cache = WebGUI::Cache->new;
+		foreach my $id (@{$assetIds}) {
 			# we do the purge directly cuz it's a lot faster than instanciating all these assets
-			WebGUI::Cache->new("asset_".$id."/".$version)->delete;
+			$cache->deleteChunk(["asset",$id]);
 		}
-		$sth->finish;
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
 	}
@@ -2177,12 +2161,11 @@ sub publish {
 	my $assetIds = WebGUI::SQL->buildArrayRef("select assetId from asset where lineage like ".quote($self->get("lineage").'%'));
         my $idList = quoteAndJoin($assetIds);
         WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId in (".$idList.")");
-        my $sth = WebGUI::SQL->read("select assetId,revisionDate from assetData where assetId in (".$idList.")");
-        while ( my ($id,$version) = $sth->array) {
+	my $cache = WebGUI::Cache->new;
+        foreach my $id (@{$assetIds}) {
         	# we do the purge directly cuz it's a lot faster than instanciating all these assets
-                WebGUI::Cache->new("asset_".$id."/".$version)->delete;
+                $cache->deleteChunk(["asset",$id]);
         }
-        $sth->finish;
 	$self->{_properties}{state} = "published";
 }
 
@@ -2204,6 +2187,7 @@ sub purge {
 	WebGUI::SQL->write("delete from asset where assetId=".quote($self->getId));
 	WebGUI::SQL->commit;
 	$self->purgeCache;
+	WebGUI::Cache->new->deleteChunk(["asset",$self->getId]);
 	$self->updateHistory("purged");
 	$self = undef;
 }
@@ -2234,17 +2218,15 @@ sub purgeRevision {
 
 #-------------------------------------------------------------------
 
-=head2 purgeTree ( )
+=head2 purgeCache ( )
 
-Purges all cache entries associated with this asset.
+Purges all cache entries associated with this revision.
 
 =cut
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new("asset_".$self->getId."/".$self->get("revisionDate"))->delete;
-	delete $session{assetcache}{$self->getId};
-	delete $session{assetprops}{$self->getId};
+	WebGUI::Cache->new(["asset",$self->getId,$self->get("revisionDate")])->delete;
 }
 
 #-------------------------------------------------------------------

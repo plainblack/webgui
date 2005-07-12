@@ -52,7 +52,7 @@ Remove content from the filesystem cache.
 
 sub delete {
 	my $self = shift;
-	rmtree($self->{_cachefolder});
+	rmtree($self->getFolder());
 }
 
 #-------------------------------------------------------------------
@@ -70,7 +70,7 @@ A partial composite key to remove.
 sub deleteChunk {
 	my $self = shift;
 	my $key = $self->parseKey(shift);
-	rmtree($self->getCacheRoot()."/".$self->{_namespace}."/".$key);
+	rmtree($self->getNamespaceRoot()."/".$key);
 }
 
 #-------------------------------------------------------------------
@@ -84,7 +84,7 @@ Remove all objects from the filecache system.
 sub flush {
 	my $self = shift;
 	$self->SUPER::flush();
-	rmtree($self->getCacheRoot."/".$self->{_namespace});
+	rmtree($self->getNamespaceRoot);
 }
 
 #-------------------------------------------------------------------
@@ -98,25 +98,44 @@ Retrieve content from the filesystem cache.
 sub get {
 	my $self = shift;
 	return undef if ($session{config}{disableCache});
-	if (open(FILE,"<".$self->{_cachefolder}."/expires")) {
+	if (open(FILE,"<".$self->getFolder()."/expires")) {
 		my $expires = <FILE>;
 		close(FILE);
 		return undef if ($expires < time());
-		return retrieve($self->{_cachefolder}."/cache");
+		my $value;
+		eval {$value = retrieve($self->getFolder()."/cache")};
+		if (ref $value eq "SCALAR") {
+			return $$value;
+		} else {
+			return $value;
+		}
 	}
 	return undef;
 }
 
 #-------------------------------------------------------------------
 
-=head2 getCacheRoot ( )
+=head getFolder ( )
 
-Figures out what the cache root should be. A class method.
+Returns the path to the cache folder for this key.
 
 =cut
 
-sub getCacheRoot {
-	my $class = shift;
+sub getFolder {
+	my $self = shift;
+	return $self->getNamespaceRoot()."/".$self->{_key};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getNamepsaceRoot ( )
+
+Figures out what the cache root for this namespace should be. A class method.
+
+=cut
+
+sub getNamespaceRoot {
+	my $self = shift;
 	my $root = $session{config}{fileCacheRoot};
 	unless ($root) {
 		if ($session{os}{windowsish}) {
@@ -126,9 +145,45 @@ sub getCacheRoot {
 		}
 		$root .= "/WebGUICache";
 	}
+	$root .= "/".$self->{_namespace};
 	return $root;	
 }
 
+#-------------------------------------------------------------------
+
+=head2 getNamespaceSize ( )
+
+Returns the size (in bytes) of the current cache under this namespace. Consequently it also cleans up expired cache items.
+
+=cut
+
+sub getNamespaceSize {
+        my $self = shift;
+        my $expiresModifier = shift || 0;
+        my $path = shift || $self->getNamespaceRoot;
+        my $filesRmaining;
+        if (opendir(DIR,$path)) {
+                my @files = readdir(DIR);
+                foreach my $file (@files) {
+                        unless ($file eq "." || $file eq "..") {
+                                if (open(FILE,"<".$path."/expires")) {
+                                        my $expires = <FILE>;
+                                        close(FILE);
+                                        if ($expires < time()+$expiresModifier) {
+                                                rmtree($path); 
+                                        } else {
+                                                my (@attributes) = stat($self->getPath($filename));
+                                                $filesRemaining += $attributes[7];
+                                        }
+                                } else {
+                                        $filesRemaining += $self->getNamespaceSize($expiresModifier,$path."/".$file);
+                                }
+                        }
+                }
+                closedir(DIR);
+        }
+        return $filesRemaining;
+}
 
 #-------------------------------------------------------------------
 
@@ -151,8 +206,7 @@ sub new {
 	my $class = shift;
 	my $key = $class->parseKey(shift);
 	my $namespace = shift || $session{config}{configFile};
-	my $path = $class->getCacheRoot()."/".$namespace."/".$key;
-	bless {_cachefolder => $path, _key=>$key, _namespace=>$namespace}, $class;
+	bless {_key=>$key, _namespace=>$namespace}, $class;
 }
 
 
@@ -176,7 +230,7 @@ sub set {
 	my $self = shift;
 	my $content = shift;
 	my $ttl = shift || 60;
-	my $path = $self->{_cachefolder};
+	my $path = $self->getFolder();
 	unless (-e $path) {
 		eval {mkpath($path)};
 		if ($@) {
@@ -184,7 +238,13 @@ sub set {
 			return;
 		}
 	}
-	nstore($content, $path."/cache");
+	my $value;
+	unless (ref $content) {
+		$value = \$content;
+	} else {
+		$value = $content;
+	}
+	nstore($value, $path."/cache");
 	open(FILE,">".$path."/expires");
 	print FILE time()+$ttl;
 	close(FILE);
@@ -201,7 +261,7 @@ Returns statistic information about the caching system.
 
 sub stats {
         my $self = shift;
-	return undef;
+	return $self->getNamespaceSize." bytes";
 }
 
 1;

@@ -21,6 +21,8 @@
  - Enhanced aggregation features of the SyndicatedContent wobject, including
    keyword filtering, content republishing, XSLT stylesheet support and 
    different "display modes".
+ - Wrote a whole new caching system for WebGUI that is up to 10 times more
+   efficient than the old caching system.
 
 
 6.6.3
