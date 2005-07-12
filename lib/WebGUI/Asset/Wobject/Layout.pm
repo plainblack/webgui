@@ -189,7 +189,7 @@ sub view {
 	}
 	# deal with unplaced children
 	foreach my $child (@{$children}) {
-		unless (isIn($child->getId, @found)) {
+		unless (isIn($child->getId, @found)||isIn($child->getId,@hidden)) {
 			push(@{$vars{"position1_loop"}},{
 				id=>$child->getId,
 				content=>$child->view

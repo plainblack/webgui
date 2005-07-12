@@ -4,6 +4,13 @@
  - Fixed an error handler bug in the auth system.
  - Fixed a typo in syndicated content that made templates not appear.
  - Fixed several bugs in shortcut asset.
+ - fix [ 1224828 ] contra intuitive location when switching admin off
+ - fix [ 1230977 ] Products not shown when only in Admin group
+ - fix [ 1234214 ] Layout.pm (view) doesn't hide children (Emiliano Bruni)
+ - fix [ 1231070 ] undef $session{isInGroup}; should be delete
+   $session{isInGro (Matt Wilson)
+ - Updated the file system privileges mod_perl handler to work under multiple
+   versions of mod_perl.
 
 
 6.6.3

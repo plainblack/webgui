@@ -992,7 +992,7 @@ Creates and returns a tabform to edit parameters of an Asset.
 
 sub getEditForm {
 	my $self = shift;
-	my $tabform = WebGUI::TabForm->new(undef,undef,$self->getContainer->getUrl());
+	my $tabform = WebGUI::TabForm->new(undef,undef,$self->getUrl());
 	$tabform->hidden({
 		name=>"func",
 		value=>"editSave"

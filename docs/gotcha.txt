@@ -91,6 +91,11 @@ save you many hours of grief.
 
 6.3.0
 --------------------------------------------------------------------
+ * After upgrading your site you'll have to reset the privileges on
+ 	your uploads folder to make sure that the web server has
+	the privileges it needs to write due to a large number of
+	changes on the filesystem.
+
  * In order to upgrade to 6.3.0 or beyond you need to have already
 	already upgraded to 6.2.0 or above. The upgrades will fail if
 	you try to jump from any 6.1 (or prior) version directly to
