@@ -263,8 +263,13 @@ sub page {
                 $url = getSiteURL();
         }
         $url .= getScriptURL();
-       	my $pathinfo = $session{env}{PATH_INFO};
-	$pathinfo =~ s/^\/(.*)/$1/;
+	my $pathinfo;
+        if ($session{asset}) {
+                $pathinfo = $session{asset}->get("url");
+        } else {
+                $pathinfo = $session{env}{PATH_INFO};
+                $pathinfo =~ s/^\/(.*)/$1/;
+        }
         $url .= $pathinfo;
         if ($session{setting}{preventProxyCache} == 1 && !$skipPreventProxyCache) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());

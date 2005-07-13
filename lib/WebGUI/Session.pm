@@ -194,8 +194,8 @@ sub convertVisitorToUser {
 	if ($session{setting}{passiveProfilingEnabled}) {
 		WebGUI::SQL->write("update passiveProfileLog set userId = ".quote($_[1])." where sessionId = ".quote($_[0]));
 	}	
-	undef $session{isInGroup};		# decache some performance enhancers because we're
-	undef $session{gotGroupsForUser};       # user ids.
+	delete $session{isInGroup};		# decache some performance enhancers because we're
+	delete $session{gotGroupsForUser};       # user ids.
 	$session{var}{userId} = $_[1];
 	refreshUserInfo($_[1]);
 }
