@@ -2156,10 +2156,20 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		context => q|asset property|
 	},
 
+	'104 description' => {
+		message => q|Enter a URL for your link|,
+		lastUpdated => 1121298520,
+	},
+
 	'target' => {
 		message => q|Target|,
 		lastUpdated => 1118936724,
 		context => q|form helper, rich edit page tree|
+	},
+
+	'target description' => {
+		message => q|Choose whether the link, when clicked, will open in the same window or open in another one|,
+		lastUpdated => 1121298550,
 	},
 
 	'done' => {

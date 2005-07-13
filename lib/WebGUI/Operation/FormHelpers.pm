@@ -51,11 +51,13 @@ sub www_richEditPageTree {
 	$f->text(
 		-name=>"url",
 		-label=>WebGUI::International::get(104),
+		-hoverHelp=>WebGUI::International::get('104 description'),
 		-extras=>'id="url"'
 		);
 	$f->selectList(
 		-name=>"target",
 		-label=>WebGUI::International::get('target'),
+		-hoverHelp=>WebGUI::International::get('target description'),
 		-options=>{"_self"=>WebGUI::International::get('link in same window'),
 		           "_blank"=>WebGUI::International::get('link in new window')},
 		-extras=>'id="target"'
