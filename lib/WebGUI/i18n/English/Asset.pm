@@ -651,6 +651,49 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
 		 message => q|Directory Index|,
 	       },
 
+        'Depth description' => {
+                message => q|Sets the depth of the page tree to export. Use a depth of 0 to export only the current page. </p>|,
+                lastUpdated => 1121361557,
+        },
+
+        'Export as user description' => {
+                message => q|Run the export as this user. Defaults to Visitor.</p>|,
+                lastUpdated => 1121361557,
+        },
+
+        'directory index description' => {
+                message => q|If the URL of the Asset to be exported looks like a directory, the directory index will
+be appended to it.</p>|,
+                lastUpdated => 1121361557,
+        },
+
+        'Extras URL description' => {
+                message => q|Sets the Extras URL. Defaults to the configured extrasURL in the WebGUI
+config file.</p>|,
+                lastUpdated => 1121361557,
+        },
+
+        'Uploads URL description' => {
+                message => q|Sets the Uploads URL. Defaults to the configured uploadsURL in the WebGUI config file.</p>|,
+                lastUpdated => 1121361557,
+        },
+
+	'Page, Export' => {
+                message => q|Page, Export|,
+                lastUpdated => 1089039511,
+                context => q|Help title for Page Export operation|
+        },
+	'Page, Export body' => {
+                message => q|
+<p>The Export Page function allows you to export WebGUI pages to static
+HTML files on disk.  The &quot;exportPath&quot; variable in the WebGUI
+config file must be enabled for this function to be available.</p>
+				|,
+                lastUpdated => 1121361734,
+                context => q|Help body for Page Export operation|
+        },
+
+
 };
 
 1;

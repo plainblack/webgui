@@ -111,6 +111,40 @@ our $HELP = {
 		]
 	},
 
+	'page export' => {
+                title => 'Page, Export',
+                body => 'Page, Export body',
+		fields => [
+                        {
+                                title => 'Depth',
+                                description => 'Depth description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => 'Export as user',
+                                description => 'Export as user description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => 'directory index',
+                                description => 'directory index description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => 'Extras URL',
+                                description => 'Extras URL description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => 'Uploads URL',
+                                description => 'Uploads URL description',
+                                namespace => 'Asset',
+                        },
+		],
+                related => [
+                ],
+	},
+
 	'metadata manage'=> {
 		title => 'content profiling',
 		body => 'metadata manage body',

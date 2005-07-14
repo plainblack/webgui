@@ -776,14 +776,6 @@ our $HELP = {
 			}
 		]
 	},
-	'page export' => {
-                title => 'Page, Export',
-                body => 'Page, Export body',
-		fields => [
-		],
-                related => [
-                ],
-	},
 	'glossary' => {
                 title => 'glossary title',
                 body => 'glossary body',

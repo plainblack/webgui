@@ -3219,32 +3219,37 @@ Displays the export page administrative interface
 sub www_export {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
-        $self->getAdminConsole->setHelp("page export");
+        $self->getAdminConsole->setHelp("page export", "Asset");
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden("func","exportStatus");
 	$f->integer(
 			-label=>WebGUI::International::get('Depth',"Asset"),
+			-hoverHelp=>WebGUI::International::get('Depth description',"Asset"),
 			-name=>"depth",
 			-value=>99,
 		);
 	$f->selectList(
 			-label=>WebGUI::International::get('Export as user',"Asset"),
+			-hoverHelp=>WebGUI::International::get('Export as user description',"Asset"),
 			-name=>"userId",
 			-options=>WebGUI::SQL->buildHashRef("select userId, username from users"),
 			-value=>[1],
 		);
 	$f->text(
 			-label=>WebGUI::International::get("directory index","Asset"),
+			-hoverHelp=>WebGUI::International::get("directory index description","Asset"),
 			-name=>"index",
 			-value=>"index.html"
 		);
 	$f->text(
 			-label=>WebGUI::International::get('Extras URL',"Asset"),
+			-hoverHelp=>WebGUI::International::get('Extras URL description',"Asset"),
 			-name=>"extrasURL",
 			-value=>$session{config}{extrasURL}
 		);
 	$f->text(
                         -label=>WebGUI::International::get('Uploads URL',"Asset"),
+                        -hoverHelp=>WebGUI::International::get('Uploads URL description',"Asset"),
                         -name=>"uploadsURL",
                         -value=>$session{config}{uploadsURL}
                 );
@@ -3271,7 +3276,7 @@ sub www_exportStatus {
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'extrasURL='.$session{form}{extrasURL});
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'uploadsURL='.$session{form}{uploadsURL});
 	my $output = '<IFRAME SRC="'.$iframeUrl.'" TITLE="'.WebGUI::International::get('Page Export Status',"Asset").'" WIDTH="410" HEIGHT="200"></IFRAME>';
-        $self->getAdminConsole->render($output,WebGUI::International::get('Page Export Status'),"Asset");
+        $self->getAdminConsole->render($output,WebGUI::International::get('Page Export Status',"Asset"),"Asset");
 }
 
 #-------------------------------------------------------------------
