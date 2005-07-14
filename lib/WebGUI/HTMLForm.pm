@@ -957,7 +957,7 @@ sub date {
 			defaultValue=>$defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1140,7 +1140,7 @@ sub email {
 			"defaultValue" => $defaultValue
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         } else {
                 $output = WebGUI::Form::hidden({
                         "name"=>$name,
@@ -1279,7 +1279,7 @@ sub file {
                         "extras"=>$extras
                         });
                 $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output);
+                $output = $self->_tableFormRow($label,$output,$hoverHelp);
         }
         $self->{_data} .= $output;
 }
