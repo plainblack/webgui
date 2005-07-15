@@ -369,6 +369,24 @@ sub processPropertiesFromFormPost {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head setParent ( newParent ) 
+
+We're overloading the setParent in Asset because we don't want events to be able to be posted to anything other than the events calendar.
+
+=head3 newParent
+
+An asset object to make the parent of this asset.
+
+=cut
+
+sub setParent {
+        my $self = shift;
+        my $newParent = shift;
+        return 0 unless ($newParent->get("className") eq "WebGUI::Asset::Wobject::EventsCalendar");
+        return $self->SUPER::setParent($newParent);
+}
 
 #-------------------------------------------------------------------
 sub view {

@@ -358,7 +358,7 @@ sub open {
 	### evironment variables from web server
 	$session{env} = \%ENV;
 	### check to see if client is proxied and adjust remote_addr as necessary
-	if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
+	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
 		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
 	}
 	###----------------------------
@@ -491,13 +491,8 @@ Session id will be generated if not specified. In almost every case you should l
 sub start {
 	my ($sessionId);
 	$sessionId = $_[1] || _uniqueSessionId();
-	if (($session{setting}{proxiedClientAddress} eq "1") && ($ENV{HTTP_X_FORWARDED_FOR} ne "")) {
-		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{HTTP_X_FORWARDED_FOR}', ".quote($_[0]).")");
-	} else {
-		WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-			(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', ".quote($_[0]).")");
-	}
+	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
+		(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', ".quote($_[0]).")");
 	push @{$session{http}{cookie}}, $session{cgi}->cookie(
                 -name=>"wgSession",
                 -value=>$sessionId,

@@ -668,7 +668,6 @@ sub processPropertiesFromFormPost {
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
 		$self->setSize($storage->getFileSize($filename));
-		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 		foreach my $file (@{$storage->getFiles}) {
 			$storage->generateThumbnail($file);
 		}
@@ -730,6 +729,26 @@ sub setLastPost {
         my $date = shift;
         $self->update(lastPostId=>$id, lastPostDate=>$date);
         $self->getParent->setLastPost($id,$date);
+}
+
+
+#-------------------------------------------------------------------
+
+=head setParent ( newParent ) 
+
+We're overloading the setParent in Asset because we don't want posts to be able to be posted to anything other than other posts or threads.
+
+=head3 newParent
+
+An asset object to make the parent of this asset.
+
+=cut
+
+sub setParent {
+	my $self = shift;
+	my $newParent = shift;
+	return 0 unless ($newParent->get("className") eq "WebGUI::Asset::Post" || $newParent->get("className") eq "WebGUI::Asset::Post::Thread");
+	return $self->SUPER::setParent($newParent);
 }
 
 
@@ -832,6 +851,27 @@ Negates the markRead method.
 sub unmarkRead {
 	my $self = shift;
         WebGUI::SQL->write("delete from forumRead where userId=".quote($session{user}{userId})." and postId=".quote($self->getId));
+}
+
+#-------------------------------------------------------------------
+
+=head2 update
+
+We overload the update method from WebGUI::Asset in order to handle file system privileges.
+
+=cut
+
+sub update {
+        my $self = shift;
+        my %before = (
+                owner => $self->get("ownerUserId"),
+                view => $self->get("groupIdView"),
+                edit => $self->get("groupIdEdit")
+                );
+        $self->SUPER::update(@_);
+        if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
+                $self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+        }
 }
 
 #-------------------------------------------------------------------
@@ -1014,7 +1054,7 @@ sub www_edit {
 		richEditId=>$self->getThread->getParent->get("richEditor")
 		});
 	$var{'form.submit'} = WebGUI::Form::submit({
-		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."'; this.form.func.value='editSave'; this.form.submit();\""
+		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."'; this.form.func.value='editSave'; this.form.submit();return false;\""
 		});
 	$var{'form.preview'} = WebGUI::Form::submit({
 		value=>WebGUI::International::get("preview","Asset_Collaboration")

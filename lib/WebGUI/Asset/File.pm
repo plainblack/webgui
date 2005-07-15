@@ -214,7 +214,6 @@ sub processPropertiesFromFormPost {
 		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
 		$self->setSize($storage->getFileSize($filename));
-		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 		$self->{_storageLocation} = $storage;
 	} else {
 		$storage->delete;
@@ -238,6 +237,28 @@ sub purge {
 	}
 	$self->getStorageLocation->delete;
 	return $self->SUPER::purge;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 update
+
+We overload the update method from WebGUI::Asset in order to handle file system privileges.
+
+=cut
+
+sub update {
+	my $self = shift;
+	my %before = (
+		owner => $self->get("ownerUserId"),
+		view => $self->get("groupIdView"),
+		edit => $self->get("groupIdEdit")
+		);
+	$self->SUPER::update(@_);
+	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
+		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+	}
 }
 
 

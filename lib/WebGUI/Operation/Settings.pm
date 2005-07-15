@@ -159,11 +159,6 @@ sub www_editSettings {
 	);
 # misc settings
 	$tabform->getTab("misc")->yesNo(
-		-name=>"proxiedClientAddress",
-		-label=>$i18n->get(973),
-		-value=>$session{setting}{proxiedClientAddress}
-		);
-	$tabform->getTab("misc")->yesNo(
 		-name=>"preventProxyCache",
 		-label=>$i18n->get(400),
 		-value=>$session{setting}{preventProxyCache}

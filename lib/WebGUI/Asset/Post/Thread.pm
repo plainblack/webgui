@@ -473,6 +473,26 @@ sub rate {
 
 #-------------------------------------------------------------------
 
+=head setParent ( newParent ) 
+
+We're overloading the setParent in Asset because we don't want threads to be able to be posted to anything other than other collaboration systems.
+
+=head3 newParent
+
+An asset object to make the parent of this asset.
+
+=cut
+
+sub setParent {
+        my $self = shift;
+        my $newParent = shift;
+        return 0 unless ($newParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration");
+	# specify the Asset package here directly because we don't want to use the ruls in WebGUI::Asset::Post, as they don't fit for Threads.
+        return $self->WebGUI::Asset::setParent($newParent);
+}
+
+#-------------------------------------------------------------------
+
 =head2 setStatusApproved ( )
 
 Sets the post to approved and sends any necessary notifications.

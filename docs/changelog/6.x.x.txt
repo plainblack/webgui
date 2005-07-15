@@ -11,6 +11,18 @@
    $session{isInGro (Matt Wilson)
  - Updated the file system privileges mod_perl handler to work under multiple
    versions of mod_perl.
+ - Fixed a sorting problem in the Collaboration System.
+ - fix [ 1237120 ] wG allows you to cut/paste USS sub & paste it on a page! ERR
+ - fix [ 1236414 ] Collaboration System conflicts when two on a page
+ - fix [ 1231390 ] When Pasting Content More Than One Item is Pasted to Page
+ - fix [ 1231376 ] Secondary Admins Have No Access
+ - fix [ 1231388 ] Missing Break Tags All Over The Place (Matt Wilson)
+ - HTTP_X_FORWARDED_FOR automatically replaces REMOTE_ADDR when present so we
+   can capture accurate IP addresses for clients through proxies.
+ - fix [ 1221781 ] Metadata quicklink always visible in Asset Form
+ - fix [ 1229387 ] collaboration system file privs
+ - fix [ 1228342 ] edit branch doesn't set privs for filesystem
+ - fix [ 1221676 ] Duplicate postings in Collaboration System on IE
 
 
 6.6.3

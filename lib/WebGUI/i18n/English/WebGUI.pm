@@ -3064,11 +3064,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1091514049
 	},
 
-	'973' => {
-		message => q|If proxied, use real client IP address?|,
-		lastUpdated => 1053459227
-	},
-
 	'339' => {
 		message => q|Male|,
 		lastUpdated => 1031514049
@@ -3798,10 +3793,6 @@ What group should be alerted when a new user registers?
 <p>
 
 <h2>Miscellaneous</h2>
-
-<b>If proxied, use real client IP address?</b><br>
-If enabled and if the environment variable HTTP_X_FORWARDED_FOR is present, it's value will be used in place of REMOTE_ADDRESS as the client browser's IP address.  This is required for IP based groups to function properly in reverse-proxied, load-balanced system architectures.  In these environments, all requests would otherwise appear to come from the same host, namely the proxy server.  If you are uncertain if you need this setting enabled, you should probably leave it turned off.
-<p>
 
 <b>Prevent Proxy Caching</b><br>
 Some companies have proxy servers that cause problems with WebGUI. If you're experiencing problems with WebGUI, and you have a proxy server, you may want to set this setting to <i>Yes</i>. Beware that WebGUI's URLs will not be as user-friendly after this feature is turned on.

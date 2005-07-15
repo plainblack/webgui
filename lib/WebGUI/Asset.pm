@@ -1148,12 +1148,14 @@ sub getEditForm {
                                                 -options=>$options
                                 );
                 }
-                # Add a quick link to add field
-                $tabform->getTab("meta")->readOnly(
+		if (WebGUI::Grouping::isInGroup(3)) {
+                	# Add a quick link to add field
+                	$tabform->getTab("meta")->readOnly(
                                         -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField&fid=new").'">'.
                                                         WebGUI::International::get('Add new field','Asset').
                                                         '</a></p>'
-                );
+                		);
+		}
         }
 	return $tabform;
 }
@@ -1840,7 +1842,7 @@ sub new {
 	my $assetId = shift;
 	my $overrideProperties = shift;
 	my $properties;
-	$properties = WebGUI::Cache->new("asset_".$assetId)->get unless($session{var}{adminOn});
+	$properties = WebGUI::Cache->new("asset_".$assetId)->get;# unless($session{var}{adminOn});
 	if ($assetId eq "new") {
 		$properties = $overrideProperties;
 		$properties->{assetId} = "new";
@@ -2025,7 +2027,7 @@ sub paste {
 	my $assetId = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);	
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
-		WebGUI::SQL->write("update asset set state='published', lastUpdatedBy=".quote($session{user}{userId}).", lastUpdated=".time()." where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
+		$pastedAsset->publish;
 		$self->{_properties}{state} = "published";
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
