@@ -1712,35 +1712,6 @@ One package that many people create is a Page/Article package. It is often the c
 		lastUpdated => 1031514049
 	},
 
-	'828' => {
-		message => q|Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.
-<p/>
-<b>title</b><br/>
-The title for this wobject.
-<p/>
-
-<b>displayTitle</b><br/>
-A conditional variable for whether or not the title should be displayed.
-<p/>
-
-<b>description</b><br/>
-The description of this wobject.
-<p/>
-
-<b>wobjectId</b><br/>
-The unique identifier that WebGUI uses to control this wobject.
-<p/>
-
-<b>isShortcut</b><br />
-A conditional indicating if this wobject is a shortcut to an original wobject.
-<p />
-
-<b>originalURL</b><br />
-If this wobject is a shortcut, then this URL will direct you to the original wobject.
-<p />|,
-		lastUpdated => 1053469640
-	},
-
 	'90' => {
 		message => q|Add new group.|,
 		lastUpdated => 1031514049
@@ -2705,31 +2676,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 
 	'576' => {
 		message => q|Delete|,
-		lastUpdated => 1031514049
-	},
-
-	'616' => {
-		message => q|<b>Path to WebGUI Extras</b><br>
-The web-path to the directory containing WebGUI images and javascript files.
-<br><br>
-
-<b>Maximum Attachment Size</b><br>
-The maximum size of files allowed to be uploaded to this site. This applies to all wobjects that allow uploaded files and images (like Article and User Contributions). This size is measured in kilobytes.
-<br><br>
-
-<b>Thumbnail Size</b><br>
-The size of the longest side of thumbnails. The thumbnail generation maintains the aspect ratio of the image. Therefore, if this value is set to 100, and you have an image that's 400 pixels wide and 200 pixels tall, the thumbnail will be 100 pixels wide and 50 pixels tall.
-<p>
-<i>Note:</i> Thumbnails are automatically generated as images are uploaded to the system.
-<p>
-
-<b>Web Attachment Path</b><br>
-The web-path of the directory where attachments are to be stored.
-<br><br>
-
-<b>Server Attachment Path</b><br>
-The local path of the directory where attachments are to be stored. (Perhaps /var/www/public/uploads) Be sure that the web server has the rights to write to that directory.
-|,
 		lastUpdated => 1031514049
 	},
 
