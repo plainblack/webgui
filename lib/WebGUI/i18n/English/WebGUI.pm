@@ -342,14 +342,6 @@ The basic properties of a theme cannot be changed by anyone except the site that
 		lastUpdated => 1056151382
 	},
 
-	'627' => {
-		message => q|Profiles are used to extend the information of a particular user. In some cases profiles are important to a site, in others they are not. The profiles system is completely extensible. You can add as much information to the users profile as you like.
-<p>
-
-|,
-		lastUpdated => 1031514049
-	},
-
 	'23' => {
 		message => q|September|,
 		lastUpdated => 1031514049
@@ -368,11 +360,6 @@ The basic properties of a theme cannot be changed by anyone except the site that
 	'950' => {
 		message => q|Empty clipboard.|,
 		lastUpdated => 1052850265
-	},
-
-	'486' => {
-		message => q|Data Type|,
-		lastUpdated => 1031514049
 	},
 
 	'509' => {
@@ -475,98 +462,6 @@ Be aware that any database links you create here will be available to all conten
 		lastUpdated => 1031514049
 	},
 
-	'637' => {
-		message => q|<b>First Name</b><br>
-The given name of this user.
-<p>
-
-<b>Middle Name</b><br>
-The middle name of this user.
-<p>
-
-<b>Last Name</b><br>
-The surname (or family name) of this user.
-<p>
-
-<b>Email Address</b><br>
-The user's email address. This must only be specified if the user will partake in functions that require email.
-<p>
-
-<b>ICQ UIN</b><br>
-The <a href="http://www.icq.com/">ICQ</a> UIN is the "User ID Number" on the ICQ network. ICQ is a very popular instant messaging platform.
-<p>
-
-<b>AIM Id</b><br>
-The account id for the <a href="http://www.aim.com/">AOL Instant Messenger</a> system.
-<p>
-
-<b>MSN Messenger Id</b><br>
-The account id for the <a href="http://messenger.msn.com/">Microsoft Network Instant Messenger</a> system.
-<p>
-
-<b>Yahoo! Messenger Id</b><br>
-The account id for the <a href="http://messenger.yahoo.com/">Yahoo! Instant Messenger</a> system.
-<p>
-
-<b>Cell Phone</b><br>
-This user's cellular telephone number.
-<p>
-
-<b>Pager</b><br>
-This user's pager telephone number.
-<p>
-
-<b>Email To Pager Gateway</b><br>
-This user's text pager email address.
-<p>
-
-<b>Home Information</b><br>
-The postal (or street) address for this user's home.
-<p>
-
-<b>Work Information</b><br>
-The postal (or street) address for this user's company.
-<p>
-
-<b>Gender</b><br>
-This user's sex.
-<p>
-
-<b>Birth Date</b><br>
-This user's date of birth.
-<p>
-
-<b>Language</b><br>
-The language used to display system related messages.
-<p>
-
-<b>Time Offset</b><br>
-A number of hours (plus or minus) different this user's time is from the server. This is used to adjust for time zones.
-<p>
-
-<b>First Day Of Week</b><br>
-The first day of the week on this user's local calendar. For instance, in the United States the first day of the week is Sunday, but in many places in Europe, the first day of the week is Monday.
-<p>
-
-<b>Date Format</b><br>
-What format should dates on this site appear in?
-<p>
-
-<b>Time Format</b><br>
-What format should times on this site appear in? 
-<p>
-
-<b>Discussion Layout</b><br>
-Should discussions be laid out flat or threaded? Flat puts all replies on one page in the order they were created. Threaded shows the hierarchical list of replies as they were created.
-<p>
-
-<b>Inbox Notifications</b><br>
-How should this user be notified when they get a new WebGUI message?
-
-|,
-		lastUpdated => 1111449957,
-	},
-
 	'351' => {
 		message => q|Message|,
 		lastUpdated => 1031514049
@@ -575,11 +470,6 @@ How should this user be notified when they get a new WebGUI message?
 	'999' => {
 		message => q|Database Link, Delete|,
 		lastUpdated => 1056151382
-	},
-
-	'488' => {
-		message => q|Default Value(s)|,
-		lastUpdated => 1031514049
 	},
 
 	'61' => {
@@ -989,11 +879,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 <p>
 <b>TIP:</b> When building a theme, be sure to name the components (styles, templates, assets) in the theme with some name that is unique to the theme. This is useful so that your users can find the components in your theme, as well as to avoid name conflicts.|,
 		lastUpdated => 1070027889
-	},
-
-	'672' => {
-		message => q|Profile Settings, Edit|,
-		lastUpdated => 1031514049
 	},
 
 	'349' => {
@@ -1559,16 +1444,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 		lastUpdated => 1031514049
 	},
 
-	'469' => {
-		message => q|Id|,
-		lastUpdated => 1031514049
-	},
-
-	'682' => {
-		message => q|User Profile, Edit|,
-		lastUpdated => 1031514049
-	},
-
 	'635' => {
 		message => q|Packages are groups of pages and wobjects that are predefined to be deployed together. A package manager may see the need to create a package several pages with a message board, an FAQ, and a Poll because that task is performed quite often. Packages are often defined to lessen the burden of repetitive tasks.
 <br><br>
@@ -1843,11 +1718,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 
 	'35' => {
 		message => q|Administrative Function|,
-		lastUpdated => 1031514049
-	},
-
-	'492' => {
-		message => q|Profile fields list.|,
 		lastUpdated => 1031514049
 	},
 
@@ -2846,11 +2716,6 @@ The headings of columns on things like message boards and user contributions.
 		lastUpdated => 1036553016
 	},
 
-	'472' => {
-		message => q|Label|,
-		lastUpdated => 1031514049
-	},
-
 	'362' => {
 		message => q|SideBySide|,
 		lastUpdated => 1031514049
@@ -3250,11 +3115,6 @@ You can search users based on username and email address. You can do partial sea
 		lastUpdated => 1066641511
 	},
 
-	'487' => {
-		message => q|Possible Values|,
-		lastUpdated => 1031514049
-	},
-
 	'636' => {
 		message => q|To create a package follow these simple steps:
 
@@ -3445,11 +3305,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 
 	'70' => {
 		message => q|Error|,
-		lastUpdated => 1031514049
-	},
-
-	'470' => {
-		message => q|Name|,
 		lastUpdated => 1031514049
 	},
 

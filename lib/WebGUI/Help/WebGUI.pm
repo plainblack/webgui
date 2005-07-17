@@ -71,13 +71,6 @@ our $HELP = {
 			}
 		]
 	},
-	'profile settings edit' => {
-		title => '672',
-		body => '627',
-		fields => [
-		],
-		related => []
-	},
 	'style template' => {
 		title => '1073',
 		body => '1074',
@@ -449,7 +442,7 @@ our $HELP = {
 			},
 			{
 				tag => 'user profile edit',
-				namespace => 'WebGUI'
+				namespace => 'WebGUIProfile'
 			},
 			{
 				tag => 'user add/edit',
@@ -464,18 +457,6 @@ our $HELP = {
 	'user delete' => {
 		title => '657',
 		body => '612',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'users manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'user profile edit' => {
-		title => '682',
-		body => '637',
 		fields => [
 		],
 		related => [
