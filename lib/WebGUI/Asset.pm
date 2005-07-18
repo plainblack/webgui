@@ -1924,7 +1924,7 @@ Lineage string.
 =cut
 
 sub newByLineage {
-	my $class = shift;
+	my $self = shift;
         my $lineage = shift;
         my ($id,$class) = WebGUI::SQL->quickArray("select assetId, className from asset where lineage=".quote($lineage));
 	return WebGUI::Asset->new($id, $class);
