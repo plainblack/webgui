@@ -1,4 +1,4 @@
-package WebGUI::Help::WebGUI;
+package WebGUI::Help::WebGUIProfile;
 
 our $HELP = {
 	'profile settings edit' => {
