@@ -125,7 +125,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Redirect";
+	return WebGUI::International::get('redirect',"Asset_Redirect");
 } 
 
 

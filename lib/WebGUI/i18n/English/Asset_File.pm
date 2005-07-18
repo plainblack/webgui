@@ -62,7 +62,12 @@ The type of the file (PDF, etc.)
 		lastUpdated => 1106762088
 	},
 
-
+        'file' => {
+                message => q|File|,
+                context => q|label for Asset Manager, getName|,
+                lastUpdated => 1121703035,
+        },
+                                                                                                                              
 	'new file description' => {
 		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
 		lastUpdated => 1119068745

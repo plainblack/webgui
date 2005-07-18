@@ -172,7 +172,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "File";
+	return WebGUI::International::get('file',"Asset_File");
 } 
 
 

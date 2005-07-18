@@ -168,7 +168,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Snippet";
+	return WebGUI::International::get('snippet',"Asset_Snippet");
 } 
 
 

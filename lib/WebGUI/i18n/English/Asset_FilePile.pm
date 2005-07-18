@@ -72,6 +72,12 @@ have the following properties:
 		lastUpdated => 1107387324,
 	},
 
+	'file pile' => {
+		message => q|File Pile|,
+		context => q|label for Asset Manager, getName|,
+		lastUpdated => 1121702938,
+	},
+
 	'upload files' => {
 		message => q|Upload Files|,
 		context => q|label for File Pile asset form|,

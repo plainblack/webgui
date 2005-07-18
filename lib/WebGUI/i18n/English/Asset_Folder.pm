@@ -108,6 +108,11 @@ If this Asset is a File, the URL to the actual file for downloading.
         	lastUpdated => 1106683494,
 	},
 
+	'folder' => {
+		message => q|Folder|,
+		context => q|label for Asset Manager|,
+		lastUpdated => 1121703567,
+	},
 
 };
 

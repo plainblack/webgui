@@ -174,7 +174,7 @@ sub getLockUrl {
 
 #-------------------------------------------------------------------
 sub getName {
-        return "Thread";
+	return WebGUI::International::get('thread',"Asset_Thread");
 }
 
 #-------------------------------------------------------------------

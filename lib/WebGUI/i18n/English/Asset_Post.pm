@@ -441,6 +441,17 @@ user subscribed to.
 		lastUpdated => 1031514049
 	},
 
+        'post' => {
+                message => q|Post|,
+                context => q|label for Asset Manager, getName|,
+                lastUpdated => 1121703104,
+        },
+                                                                                                                              
+	'new file description' => {
+		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
+		lastUpdated => 1119068745
+	},
+
 };
 
 1;

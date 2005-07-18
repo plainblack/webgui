@@ -161,7 +161,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Image";
+	return WebGUI::International::get('image',"Asset_Image");
 } 
 
 

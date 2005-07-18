@@ -218,7 +218,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Template";
+	return WebGUI::International::get('template',"Asset_Template");
 } 
 
 

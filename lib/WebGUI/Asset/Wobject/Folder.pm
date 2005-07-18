@@ -120,7 +120,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-	return "Folder";
+	return WebGUI::International::get("folder","Asset_Folder");
 } 
 
 

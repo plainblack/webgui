@@ -616,7 +616,7 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 sub getName {
-        return "Collaboration System";
+	return WebGUI::International::get('collaboration system',"Asset_collaboration");
 }
 
 

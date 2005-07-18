@@ -281,7 +281,7 @@ sub getImageUrl {
 
 #-------------------------------------------------------------------
 sub getName {
-        return "Post";
+	return WebGUI::International::get('post',"Asset_Post");
 }
 
 #-------------------------------------------------------------------

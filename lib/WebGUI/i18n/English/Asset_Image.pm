@@ -16,6 +16,17 @@ as File Assets.  Below are the properties that are specific to Image Assets:</P>
 		lastUpdated => 1119409764,
 	},
 
+        'image' => {
+                message => q|Image|,
+                context => q|label for Asset Manager, getName|,
+                lastUpdated => 1121703104,
+        },
+                                                                                                                              
+	'new file description' => {
+		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
+		lastUpdated => 1119068745
+	},
+
         'Thumbnail size description' => {
                 message => q|A thumbnail of the Image will be created and available for use in
 templates.  The longest side of the thumbnail will be set to this size
