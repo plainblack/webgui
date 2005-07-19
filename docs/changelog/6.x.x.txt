@@ -25,6 +25,7 @@
  - Wrote a whole new caching system for WebGUI that is up to 10 times more
    efficient than the old caching system.
  - fix [ 1239601 ] Thread::getName is not Internationalized (and many other Assets, too)
+ - fix [ 1240316 ] Doc erro in Folder template thumbnail => thumbnail.url
 
 
 6.6.3
