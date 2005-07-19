@@ -665,12 +665,19 @@ sub processPropertiesFromFormPost {
                 $self->setStatusApproved;
         }
 	my $storage = $self->getStorageLocation;
-	my $filename = $storage->addFileFromFormPost("file");
+	my $filename;
+	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
+	$filename = $storage->addFileFromFormPost("file", $attachmentLimit) if $attachmentLimit;
 	if (defined $filename) {
 		$self->setSize($storage->getFileSize($filename));
 		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 		foreach my $file (@{$storage->getFiles}) {
-			$storage->generateThumbnail($file);
+			if ($storage->isImage($file)) {
+				$storage->generateThumbnail($file,$session{setting}{maxImageSize});
+				$storage->deleteFile($file);
+				$storage->renameFile('thumb-'.$file,$file);
+				$storage->generateThumbnail($file);
+			}
 		}
 	}
 	$session{form}{proceed} = "redirectToParent";

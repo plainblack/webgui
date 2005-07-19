@@ -1676,7 +1676,7 @@ sub template {
 
 	#Remove entries from template list that the user does not have permission to view.
         for my $assetId ( keys %{$templateList} ) {
-       	  my $asset = WebGUI::Asset->new($assetId);
+       	  my $asset = WebGUI::Asset::Template->new($assetId);
 
           if (!$asset->canView($userId)) {
             delete $templateList->{$assetId}; 

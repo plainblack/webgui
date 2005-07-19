@@ -830,7 +830,7 @@ sub setLastPost {
         my $self = shift;
         my $id = shift;
         my $date = shift;
-        $self->update(lastPostId=>$id, lastPostDate=>$date);
+        $self->update({lastPostId=>$id, lastPostDate=>$date});
 }
 
 #-------------------------------------------------------------------
@@ -843,6 +843,7 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
+	WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
 	WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
@@ -856,6 +857,7 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
+	WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
 	WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 

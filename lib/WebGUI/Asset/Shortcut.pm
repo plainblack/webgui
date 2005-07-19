@@ -212,6 +212,7 @@ sub getShortcut {
 		}
 	}
 	$self->{_shortcut}{_properties}{templateId} = $self->get("overrideTemplateId") if ($self->get("overrideTemplate"));
+	$self->{_shortcut}{_properties}{collaborationTemplateId} = $self->get("overrideTemplateId") if ($self->get("overrideTemplate"));
 	$self->{_shortcut}{_properties}{title} = $self->get("title") if ($self->get("overrideTitle"));
 	$self->{_shortcut}{_properties}{description} = $self->get("description") if ($self->get("overrideDescription"));
 	$self->{_shortcut}{_properties}{title} = $self->get("displayTitle") if ($self->get("overrideDisplayTitle"));

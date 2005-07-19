@@ -1409,7 +1409,7 @@ sub getLineage {
 		if ($rules->{returnObjects}) {
 			my $parent = $relativeCache{$parentId};
 			$relativeCache{$id} = $asset;
-			$asset->{_parent} = $parent;
+			$asset->{_parent} = $parent if exists $relativeCache{$properties->{parentId}};
 			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
 			$parent->{_lastChild} = $asset;
 		}
