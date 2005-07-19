@@ -1,4 +1,20 @@
 ﻿6.6.4
+ - fix [ 1239475 ] post::processPropertiesFromFormPost doesn't check attachment
+   (mwilson)
+ - fix [ 1239488 ] post::processPropertiesFromFormPost thumbnails non-images
+   (mwilson)
+ - fix [ 1206045 ] Max Image Size don't work (fixed for good this time-mwilson)
+ - fix [ 1218993 ] Clicking of icon of active operation does nothing (mwilson)
+ - fix [ 1239576 ] New survey cached as blank (mwilson)
+ - fix [ 1224016 ] Survey.pm edit answer problems (mwilson)
+ - fix [ 1231377 ] When An Admin Logs Out Site Disappears (mwilson)
+ - fix [ 1230990 ] {_parent} is sometimes set to undef (mwilson)
+ - fix [ 1230985 ] $session{page}{empty} is not reset before each... (mwilson)
+ - fix [ 1226720 ] error msg when deleting last post from a coll.... (mwilson)
+ - fix [ 1226945 ] subscribe link doesn't update (mwilson)
+ - fix [ 1227208 ] Unable to override template on shortcut (mwilson)
+ - fix [ 1230505 ] IndexedSearch::getEditForm error msgs aren't......(mwilson)
+ - fix [ 1238001 ] HTMLForm->file rearrange problem, extras become subtext
  - Fixed an upgrade script bug in 6.2.11-6.3.0.
  - Fixed an upgrade script bug in 6.5.6-6.6.0.
  - Fixed an error handler bug in the auth system.
