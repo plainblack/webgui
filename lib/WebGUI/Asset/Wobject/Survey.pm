@@ -674,12 +674,12 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
-	$_[0]->SUPER::www_editSave(); 
+	my $output = $_[0]->SUPER::www_editSave(); 
 	if ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} = "new";
 		return $_[0]->www_editQuestion;
 	}
-        return "";
+	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -713,7 +713,7 @@ sub www_editAnswer {
 		$question = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 		$question = { ('-1' => WebGUI::International::get(82,'Asset_Survey'),%$question) };
-		$f->select(
+		$f->selectList(
 			-name=>"gotoQuestion",
 			-options=>$question,
 			-value=>[$answer->{gotoQuestion}],
@@ -833,10 +833,10 @@ sub www_editQuestion {
 		while (%data = $sth->hash) {
 			$output .= 
 				deleteIcon('func=deleteAnswerConfirm&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, 
-					$self->getUrl,WebGUI::International::get(45,'Asset_Survey')).
-                                editIcon('func=editAnswer&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
-                                moveUpIcon('func=moveAnswerUp'.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
-                                moveDownIcon('func=moveAnswerDown&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->getUrl).
+					$self->get("url"),WebGUI::International::get(45,'Asset_Survey')).
+                                editIcon('func=editAnswer&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->get("url")).
+                                moveUpIcon('func=moveAnswerUp'.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->get("url")).
+                                moveDownIcon('func=moveAnswerDown&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->get("url")).
                                 ' '.$data{answer}.'<br>';
 		}
 		$sth->finish;

@@ -105,7 +105,7 @@ sub getEditForm {
 	$sth->finish;
 	unless(%indexName) {
 		return "<p><b>" . WebGUI::International::get(2,"Asset_IndexedSearch") .
-			 "<p>" . WebGUI::International::get(3,"Asset_IndexedSearch") . "</b></p>";
+			 "<p>" . WebGUI::International::get(3,"Asset_IndexedSearch") . "</p></b></p>";
 	}
 	
 	# Index to use
@@ -381,10 +381,13 @@ sub view {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("search add/edit");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("26","Asset_IndexedSearch"));
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	$self->getAdminConsole->setHelp("search add/edit");
+	my $form = $self->getEditForm;
+	my $output = $form;
+	$output = $form->print unless $form =~ /^<p><b/;
+	return $self->getAdminConsole->render($output,WebGUI::International::get("26","Asset_IndexedSearch"));
 }
 
 #-------------------------------------------------------------------

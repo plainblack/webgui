@@ -816,7 +816,7 @@ sub setLastPost {
         my $self = shift;
         my $id = shift;
         my $date = shift;
-        $self->update(lastPostId=>$id, lastPostDate=>$date);
+        $self->update({lastPostId=>$id, lastPostDate=>$date});
 }
 
 #-------------------------------------------------------------------
@@ -829,6 +829,7 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
+	WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
 	WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
@@ -842,6 +843,7 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
+	WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
 	WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
@@ -1083,10 +1085,10 @@ sub _get_rfc822_date {
 # encode a string to include in xml (for RSS export)
 sub _xml_encode {
 	my $text = shift;
-        $text =~ s/&/&amp;/g;
-        $text =~ s/</&lt;/g;
-        $text =~ s/\]\]>/\]\]&gt;/g;
-        return $text;
+	$text =~ s/&/&amp;/g;
+	$text =~ s/</&lt;/g;
+	$text =~ s/\]\]>/\]\]&gt;/g;
+	return $text;
 }
 
 #-------------------------------------------------------------------

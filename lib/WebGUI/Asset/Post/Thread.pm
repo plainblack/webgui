@@ -530,7 +530,8 @@ Subscribes the user to this thread.
 sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
-        WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
+  WebGUI::Cache->new("cspost_".$self->getId."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_".$session{form}{pn})->delete;
+  WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
 #-------------------------------------------------------------------
@@ -548,7 +549,7 @@ sub trash {
         if ($self->getParent->get("lastPostId") eq $self->getId) {
                 my $parentLineage = $self->getThread->get("lineage");
                 my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($parentLineage.'%')." and Post.assetId<>".quote($self->getId)." and Post.assetId=asset.assetId order by Post.dateSubmitted desc");
-                $self->getParent->setLastPost($id,$date);
+                $self->getParent->setLastPost('','') ? $self->getParent->setLastPost($id,$date) : $id;
         }
 }
 
@@ -589,7 +590,8 @@ Negates the subscribe method.
 
 sub unsubscribe {
 	my $self = shift;
-        WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
+  WebGUI::Cache->new("cspost_".$self->getId."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_".$session{form}{pn})->delete;
+  WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
 }
 
 

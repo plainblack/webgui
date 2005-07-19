@@ -1438,7 +1438,7 @@ sub getLineage {
 		if ($rules->{returnObjects} || $rules->{returnQuickReadObjects}) {
 			my $parent = $relativeCache{$properties->{parentId}};
 			$relativeCache{$properties->{assetId}} = $asset;
-			$asset->{_parent} = $parent;
+			$asset->{_parent} = $parent if exists $relativeCache{$properties->{parentId}};
 			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
 			$parent->{_lastChild} = $asset;
 		}
@@ -2485,7 +2485,6 @@ sub www_add {
 				$prototypeProperties{$property} = $prototype->get($property);
 			}
 		}
-		
 	}
 	my %properties = (
 		%prototypeProperties,
@@ -2498,7 +2497,7 @@ sub www_add {
 		isHidden => $self->get("isHidden"),
 		startDate => $self->get("startDate"),
 		endDate => $self->get("endDate")
-		);
+	);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($session{form}{class}, @{$session{config}{assetContainers}}));
 	my $newAsset = WebGUI::Asset->newByDynamicClass("new",$session{form}{class},\%properties);
 	$newAsset->{_parent} = $self;
@@ -3508,7 +3507,7 @@ Returns a www_manageAssets() method. Sets a new parent via the results of a form
 sub www_setParent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $newParent = WebGUI::Asset->new($session{form}{assetId});
+	my $newParent = WebGUI::Asset->newByDynamicClass($session{form}{assetId});
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
 

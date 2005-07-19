@@ -190,9 +190,12 @@ Provide the form variable name to which the file being uploaded is assigned. Not
 sub addFileFromFormPost {
 	my $self = shift;
 	my $formVariableName = shift;
-        return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
+	my $attachmentLimit = shift;\
+	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
 	my $filename;
+	my $attachmentCount = 1;
         foreach my $tempPath ($session{cgi}->upload($formVariableName)) {
+        	last if $attachmentCount > $attachmentLimit;
                 if ($tempPath =~ /([^\/\\]+)$/) {
                         $filename = $1;
                 } else {
@@ -206,6 +209,7 @@ sub addFileFromFormPost {
                 $filename = WebGUI::URL::makeCompliant($filename);
 		my $bytesread;
                 my $file = FileHandle->new(">".$self->getPath($filename));
+                $attachmentCount++;
                 if (defined $file) {
 			my $buffer;
                         binmode $file;
