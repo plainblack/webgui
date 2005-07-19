@@ -94,7 +94,7 @@ The URL of the Asset.
 <p><b>isImage</b><br>
 A conditional indicating if this Asset is an Image Asset.
 
-<p><b>thumbnail</b><br>
+<p><b>thumbnail.url</b><br>
 If this Asset is an Image, the URL to the thumbnail for it.
 
 <p><b>isFile</b><br>
@@ -105,7 +105,7 @@ If this Asset is a File, the URL to the actual file for downloading.
 
 </blockquote>
 		|,
-        	lastUpdated => 1106683494,
+        	lastUpdated => 1121790331,
 	},
 
 	'folder' => {
