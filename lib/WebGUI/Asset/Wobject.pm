@@ -69,6 +69,7 @@ sub definition {
         push(@{$definition}, {
                 tableName=>'wobject',
                 className=>'WebGUI::Asset::Wobject',
+		autoGenerateForms=>1,
                 properties=>{
                                 description=>{
                                         fieldType=>'HTMLArea',
@@ -248,17 +249,20 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	my $definition = $self->definition;
-	my $properties = $definition->[0]{properties};
-	foreach my $fieldname (keys %{$properties}) {
-		my %params;
-		foreach my $key (keys %{$properties->{$fieldname}}) {
-			next if ($key eq "tab" || $key eq "fieldType");
-			$params{"-".$key} = $properties->{$fieldname}{$key}
+	foreach my $definition (@{$self->definition}) {
+		my $properties = $definition->{properties};
+		next unless ($definition->{autoGenerateForms});
+		foreach my $fieldname (keys %{$properties}) {
+			my %params;
+			foreach my $key (keys %{$properties->{$fieldname}}) {
+				next if ($key eq "tab" || $key eq "fieldType");
+				$params{"-".$key} = $properties->{$fieldname}{$key}
+			}
+			$params{"-value"} = $self->getValue($fieldname);
+			$params{"-name"} = $fieldname;
+			my $tab = $properties->{$fieldname}{tab} || "properties";
+			$tabform->getTab($tab)->dynamicField($properties->{$fieldname}{fieldType},%params);
 		}
-		$params{"-value"} = $self->getValue($fieldname);
-		$params{"-name"} = $fieldname;
-		$tabform->getTab($properties->{$fieldname}{tab})->dynamicField($properties->{$fieldname}{fieldType},%params);
 	}
 	return $tabform;
 }

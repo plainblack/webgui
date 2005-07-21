@@ -74,11 +74,13 @@ sub definition {
         my $definition = shift;
         push(@{$definition}, {
 		assetName=>WebGUI::International::get(2,'Asset_SyndicatedContent'),
+		autoGenerateForms=>1,
 		icon=>'syndicatedContent.gif',
                 tableName=>'SyndicatedContent',
                 className=>'WebGUI::Asset::Wobject::SyndicatedContent',
                 properties=>{
 			templateId =>{
+				tab=>"display",
 				fieldType=>'template',
 				defaultValue=>'PBtmpl0000000000000065',
 				namespace=>'SyndicatedContent',
@@ -86,18 +88,21 @@ sub definition {
                 		hoverHelp=>WebGUI::International::get('72 description','Asset_SyndicatedContent')
 				},
 			rssUrl=>{
+				tab=>"properties",
 				defaultValue=>undef,
 				fieldType=>'textarea',
 				label=>WebGUI::International::get(1,'Asset_SyndicatedContent'),
                 		hoverHelp=>WebGUI::International::get('1 description','Asset_SyndicatedContent')
 				},
                         maxHeadlines=>{
+				tab=>"properties",
 				fieldType=>'integer',
 				defaultValue=>10,
 				label=>WebGUI::International::get(3,'Asset_SyndicatedContent'),
                 		hoverHelp=>WebGUI::International::get('3 description','Asset_SyndicatedContent')
 				},
 			displayMode=>{
+				tab=>"display",
 				fieldType=>'selectList',
 				defaultValue=>'interleaved',
 				options=>{
@@ -110,6 +115,7 @@ sub definition {
                 		subtext=>WebGUI::International::get('displayModeSubtext','Asset_SyndicatedContent')
 				},
 			hasTerms=>{
+				tab=>"properties",
 				fieldType=>'text',
 				defaultValue=>'',
 				label=>WebGUI::International::get('hasTermsLabel','Asset_SyndicatedContent'),

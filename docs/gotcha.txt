@@ -14,6 +14,20 @@ save you many hours of grief.
 	sure they will comply.
 
 
+6.6.4
+--------------------------------------------------------------------
+ * Please ensure you're running HTML::Template version 2.7, which
+        supports javascript escaping and is needed to ensure js
+        menus work everywhere. To see what version you're running,
+        type:
+        perl -MHTML::Template -e 'print $HTML::Template::VERSION."\n"'
+        at a command prompt, or alternatively use the
+        sbin/testEnvironment.pl script included with WebGUI. If
+  	you've had your WebGUI site running on versions prior to 6.4
+	then you should delete your lib/HTML folder as it contains
+	an outdated version of HTML::Template.
+
+
 6.6.3
 --------------------------------------------------------------------
  * If you created your site using the create.sql script from 6.6.2

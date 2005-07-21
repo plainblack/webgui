@@ -28,17 +28,20 @@ sub definition {
 	push(@{$definition}, {
 		assetName=>WebGUI::International::get(1,"Asset_Article"),
 		icon=>'article.gif',
+		autoGenerateForms=>1,
 		tableName=>'Article',
 		className=>'WebGUI::Asset::Wobject::Article',
 		properties=>{
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000002',	
+				tab=>"display",
 				namespace=>"Article",
                 		hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
                 		label=>WebGUI::International::get(72,"Asset_Article")
 				},
 			linkURL=>{
+				tab=>"properties",
 				fieldType=>'url',
 				defaultValue=>undef,
 				label=>WebGUI::International::get(8,"Asset_Article"),
@@ -46,6 +49,7 @@ sub definition {
                 		uiLevel=>3
 				},
 			linkTitle=>{
+				tab=>"properties",
 				fieldType=>'text',
 				defaultValue=>undef,
 				label=>WebGUI::International::get(7,"Asset_Article"),
@@ -53,6 +57,7 @@ sub definition {
                 		uiLevel=>3
 				},
 			convertCarriageReturns=>{
+				tab=>"display",
 				fieldType=>'yesNo',
 				defaultValue=>0,
 				label=>WebGUI::International::get(10,"Asset_Article"),

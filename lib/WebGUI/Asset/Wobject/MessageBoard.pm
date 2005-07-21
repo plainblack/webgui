@@ -30,8 +30,10 @@ sub definition {
 		icon=>'messageBoard.gif',
 		tableName=>'MessageBoard',
 		className=>'WebGUI::Asset::Wobject::MessageBoard',
+		autoGenerateForms=>1,
 		properties=>{
 			templateId =>{
+				tab=>"display",
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000047',	
 				namespace=>"MessageBoard",

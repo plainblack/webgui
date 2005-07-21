@@ -1182,8 +1182,8 @@ sub getIcon {
 	my $small = shift;
 	my $definition = $self->definition;
 	my $icon = $definition->[0]{icon} || "assets.gif";
-	return $session{config}{extrasURL}.'/adminConsole/small/'.$icon if ($small);
-	return $session{config}{extrasURL}.'/adminConsole/'.$icon;
+	return $session{config}{extrasURL}.'/assets/small/'.$icon if ($small);
+	return $session{config}{extrasURL}.'/assets/'.$icon;
 }
 
 #-------------------------------------------------------------------
