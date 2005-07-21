@@ -95,7 +95,7 @@ sub definition {
                                         },
                                 cacheTimeoutVisitor=>{
                                         fieldType=>'interval',
-                                        defaultValue=>600
+                                        defaultValue=>600,
 					tab=>"display",
 					label=>WebGUI::International::get(896,'Wobject'),
 					hoverHelp=>WebGUI::International::get('896 description','Wobject'),
