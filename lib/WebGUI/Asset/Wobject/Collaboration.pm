@@ -866,6 +866,9 @@ sub view {
                 WebGUI::Session::setScratch($scratchSortOrder, $sortOrder);
 	}
 	$sortBy ||= "dateUpdated";
+	if ($sortBy eq "lastReply") {
+		$sortBy = "Thread.lastPostDate";
+	}
 	$sortOrder ||= "desc";
 	my %var;
 	$var{'user.canPost'} = $self->canPost;
@@ -877,7 +880,7 @@ sub view {
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
 	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
-	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastUpdated");
+	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastReply");
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");
 	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
 	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");

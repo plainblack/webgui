@@ -1,4 +1,7 @@
 ﻿6.6.4
+ - fix [ 1238539 ] REQUEST_URI broken in WRE
+ - fix [ 1227887 ] setScratch("redirectAfterLogin") doesn't save
+   $session{form}
  - fix [ 1239475 ] post::processPropertiesFromFormPost doesn't check attachment
    (mwilson)
  - fix [ 1239488 ] post::processPropertiesFromFormPost thumbnails non-images
@@ -39,6 +42,8 @@
  - fix [ 1229387 ] collaboration system file privs
  - fix [ 1228342 ] edit branch doesn't set privs for filesystem
  - fix [ 1221676 ] Duplicate postings in Collaboration System on IE
+ - Added an email override option to the config file for testing email
+   functions.
 
 
 6.6.3
