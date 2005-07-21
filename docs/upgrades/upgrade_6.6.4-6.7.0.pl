@@ -145,9 +145,7 @@ sub insertHelpTemplate{
 </dl>
 </tmpl_if>
 EOT
-
     my $import=WebGUI::Asset->getImportNode;
-    
     my $folder = $import->addChild({
 				    title=>"6.7.0 Help System Template",
 				    menuTitle=>"6.7.0 Help System Template",
@@ -168,6 +166,7 @@ EOT
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub insertSyndicatedContentTemplate{
+    print "\tInserting new syndicated content template\n" unless ($quiet);
 
     my $template=q|<a name="<tmpl_var assetId>"></a>
 <tmpl_if session.var.adminOn>
@@ -243,6 +242,7 @@ sub insertSyndicatedContentTemplate{
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub insertXSLTSheets{
+    print "\tInserting syndicated content XSLT\n" unless ($quiet);
     my $import=WebGUI::Asset->getImportNode;
     
     my $folder=$import->addChild(

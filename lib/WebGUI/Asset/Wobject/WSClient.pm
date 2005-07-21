@@ -60,6 +60,8 @@ sub _create_cache_key {
 sub definition {
 	my $class = shift;
 	my $definition = shift;
+my $httpHeaderFieldType;
+   if ($session{'config'}{'soapHttpHeaderOverride'}) {
       $httpHeaderFieldType = 'text';
    } else {
       $httpHeaderFieldType = 'hidden';
