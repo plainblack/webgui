@@ -135,7 +135,9 @@ sub definition {
 	my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get(1,"Asset_DataForm"),
                 tableName=>'DataForm',
+		icon=>'dataForm.gif',
                 className=>'WebGUI::Asset::Wobject::DataForm',
                 properties=>{
 			templateId =>{
@@ -270,13 +272,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/dataForm.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/dataForm.gif';
-}
 
 #-------------------------------------------------------------------
 sub getIndexerParams {
@@ -542,10 +537,6 @@ sub getRecordTemplateVars {
 	return $var;
 }
 
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(1,"Asset_DataForm");
-}
 
 #-------------------------------------------------------------------
 sub getUiLevel {

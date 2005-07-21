@@ -259,6 +259,8 @@ sub definition {
 	my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get('collaboration system',"Asset_collaboration"),
+		icon=>'collaboration.gif',
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',
                 properties=>{
@@ -605,20 +607,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/collaboration.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/collaboration.gif';
-}
-
-
-#-------------------------------------------------------------------
-sub getName {
-	return WebGUI::International::get('collaboration system',"Asset_collaboration");
-}
-
 
 #-------------------------------------------------------------------
 
@@ -775,10 +763,21 @@ sub isSubscribed {
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
+        my $updatePrivs = ($session{form}{groupIdView} ne $self->get("groupIdView") || $session{form}{moderateGroupId} ne $self->get("moderateGroupId"));
 	$self->SUPER::processPropertiesFromFormPost;
 	if ($self->get("subscriptionGroupId") eq "") {
 		$self->createSubscriptionGroup;
 	}
+        if ($updatePrivs) {
+                foreach my $descendant (@{$self->getLineage(["descendants"],{returnObjects=>1})}) {
+                        $descendant->update({
+                                groupIdView=>$self->get("groupIdView"),
+                                groupIdEdit=>$self->get("moderateGroupId")
+                                });
+                }
+        }
+	WebGUI::Session::deleteScratch($self->getId."_sortBy");
+        WebGUI::Session::deleteScratch($self->getId."_sortDir");
 }
 
 
@@ -869,9 +868,9 @@ sub view {
 	my $scratchSortOrder = $self->getId."_sortDir";
 	my $sortBy = $session{form}{sortBy} || $session{scratch}{$scratchSortBy} || $self->get("sortBy");
 	my $sortOrder = $session{scratch}{$scratchSortOrder} || $self->get("sortOrder");
-	if ($sortBy ne $session{scratch}{$scratchSortBy}) {
+	if ($sortBy ne $session{scratch}{$scratchSortBy} && $session{form}{func} ne "editSave") {
 		WebGUI::Session::setScratch($scratchSortBy,$session{form}{sortBy});
-	} elsif ($session{form}{sortBy}) {
+	} elsif ($session{form}{sortBy} && $session{form}{func} ne "editSave") {
                 if ($sortOrder eq "asc") {
                         $sortOrder = "desc";
                 } else {

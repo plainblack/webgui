@@ -38,11 +38,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #	return WebGUI::Grouping::isInGroup($self->getValue("groupIdManage"),$userId);
 #}
 
+
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(2,"Asset_EventsCalendar"),
+		icon=>'calendar.gif',
 		tableName=>'EventsCalendar',
 		className=>'WebGUI::Asset::Wobject::EventsCalendar',
 		properties=>{
@@ -178,19 +181,6 @@ sub getEditForm {
 	#		-uiLevel=>6
 	#	);
 	return $tabform;
-}
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/calendar.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/calendar.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(2,"Asset_EventsCalendar");
 }
 
 

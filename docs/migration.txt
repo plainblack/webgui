@@ -125,6 +125,15 @@ The following tips should also help make your migration easer:
 	using the wobject processTemplate() method, please note that it has
 	been replaced by the WebGUI::Asset::Template asset.
 
+        1.2.16 Since all assets are now pages, you need to provide your own
+        view level security on your www_ methods like this:
+
+        return WebGUI::Privilege::noAccess() unless ($self->canView);
+
+        and like this:
+
+        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+
 
 1.3 Quick Read Assets
 

@@ -26,24 +26,39 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(1,"Asset_Article"),
+		icon=>'article.gif',
 		tableName=>'Article',
 		className=>'WebGUI::Asset::Wobject::Article',
 		properties=>{
 			templateId =>{
 				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000002'
+				defaultValue=>'PBtmpl0000000000000002',	
+				namespace=>"Article",
+                		hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
+                		label=>WebGUI::International::get(72,"Asset_Article")
 				},
 			linkURL=>{
 				fieldType=>'url',
-				defaultValue=>undef
+				defaultValue=>undef,
+				label=>WebGUI::International::get(8,"Asset_Article"),
+                		hoverHelp=>WebGUI::International::get('link url description','Asset_Article'),
+                		uiLevel=>3
 				},
 			linkTitle=>{
 				fieldType=>'text',
-				defaultValue=>undef
+				defaultValue=>undef,
+				label=>WebGUI::International::get(7,"Asset_Article"),
+                		hoverHelp=>WebGUI::International::get('link title description','Asset_Article'),
+                		uiLevel=>3
 				},
 			convertCarriageReturns=>{
 				fieldType=>'yesNo',
-				defaultValue=>0
+				defaultValue=>0,
+				label=>WebGUI::International::get(10,"Asset_Article"),
+                		subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,"Asset_Article").'</span>',
+                		hoverHelp=>WebGUI::International::get('carriage return description','Asset_Article'),
+                		uiLevel=>5
 				}
 			}
 		});
@@ -51,51 +66,6 @@ sub definition {
 }
 
 
-
-#-------------------------------------------------------------------
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-   	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
-      		-namespace=>"Article",
-		-hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
-                -label=>WebGUI::International::get(72,"Asset_Article"),
-   		);
-	$tabform->getTab("properties")->text(
-		-name=>"linkTitle",
-		-label=>WebGUI::International::get(7,"Asset_Article"),
-		-value=>$self->getValue("linkTitle"),
-		-hoverHelp=>WebGUI::International::get('link title description','Asset_Article'),
-		-uiLevel=>3
-		);
-        $tabform->getTab("properties")->url(
-		-name=>"linkURL",
-		-label=>WebGUI::International::get(8,"Asset_Article"),
-		-value=>$self->getValue("linkURL"),
-		-hoverHelp=>WebGUI::International::get('link url description','Asset_Article'),
-		-uiLevel=>3
-		);
-	$tabform->getTab("display")->yesNo(
-		-name=>"convertCarriageReturns",
-		-label=>WebGUI::International::get(10,"Asset_Article"),
-		-value=>$self->getValue("convertCarriageReturns"),
-		-subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,"Asset_Article").'</span>',
-		-hoverHelp=>WebGUI::International::get('carriage return description','Asset_Article'),
-		-uiLevel=>5,
-		-defaultValue=>0
-		);
-	return $tabform;
-}
-
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/article.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/article.gif';
-}
 
 #-------------------------------------------------------------------
 sub getIndexerParams {
@@ -130,10 +100,6 @@ sub getIndexerParams {
         };
 }
 
-#-------------------------------------------------------------------
-sub getName {
-	return WebGUI::International::get(1,"Asset_Article");
-}
 
 
 #-------------------------------------------------------------------

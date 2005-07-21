@@ -55,17 +55,18 @@ sub _create_cache_key {
    return $cache_key;
 }
 
+
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $definition = shift;
-	my $httpHeaderFieldType;
-   if ($session{'config'}{'soapHttpHeaderOverride'}) {
       $httpHeaderFieldType = 'text';
    } else {
       $httpHeaderFieldType = 'hidden';
    }
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(1, "Asset_WSClient"),
+		icon=>'web_services.gif',
 		tableName=>'WSClient',
 		className=>'WebGUI::Asset::Wobject::WSClient',
 		properties=>{
@@ -129,19 +130,6 @@ sub definition {
         return $class->SUPER::definition($definition);
 }
 
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/web_services.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/web_services.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-   return WebGUI::International::get(1, "Asset_WSClient");
-}
 
 #-------------------------------------------------------------------
 sub getUiLevel {

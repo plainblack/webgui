@@ -392,8 +392,10 @@ sub definition {
         my $class = shift;
         my $definition = shift || [];
         push(@{$definition}, {
+		assetName=>WebGUI::International::get("asset","Asset"),
                 tableName=>'assetData',
                 className=>'WebGUI::Asset',
+		icon=>'assets.gif'
                 properties=>{
                                 title=>{
                                         fieldType=>'text',
@@ -1129,13 +1131,15 @@ sub getEditForm {
                                                 -options=>$options
                                 );
                 }
-                # Add a quick link to add field
-                $tabform->getTab("meta")->readOnly(
+		if (WebGUI::Grouping::isInGroup(3)) {
+                	# Add a quick link to add field
+                	$tabform->getTab("meta")->readOnly(
                                         -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField&fid=new").'">'.
                                                         WebGUI::International::get('Add new field','Asset').
                                                         '</a></p>'
                                         -hoverHelp=>WebGUI::International::get('make prototype description',"Asset"),
-                );
+                	);
+		}
         }
 	return $tabform;
 }
@@ -1172,8 +1176,10 @@ If this evaluates to True, then the smaller extras/adminConsole/small/assets.gif
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	return $session{config}{extrasURL}.'/adminConsole/small/assets.gif' if ($small);
-	return $session{config}{extrasURL}.'/adminConsole/assets.gif';
+	my $definition = $self->definition;
+	my $icon = $definition->[0]{icon};
+	return $session{config}{extrasURL}.'/adminConsole/small/'.$icon if ($small);
+	return $session{config}{extrasURL}.'/adminConsole/'.$icon;
 }
 
 #-------------------------------------------------------------------
@@ -1503,7 +1509,9 @@ Returns the internationalization of the word "Asset".
 =cut
 
 sub getName {
-	return WebGUI::International::get("asset","Asset");
+	my $self = shift;
+	my $definition = $self->definition;
+	return $definition->[0]{assetName};
 }
 
 #-------------------------------------------------------------------
@@ -2020,14 +2028,7 @@ sub paste {
 	my $assetId = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);	
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
-		my $assetIds = WebGUI::SQL->buildArrayRef("select assetId from asset where lineage like ".quote($self->get("lineage").'%')." and (state='clipboard' or state='clipboard-limbo')");
-		my $idList = quoteAndJoin($assetIds);
-		WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId in (".$idList.")");
-		my $cache = WebGUI::Cache->new;
-		foreach my $id (@{$assetIds}) {
-			# we do the purge directly cuz it's a lot faster than instanciating all these assets
-			$cache->deleteChunk(["asset",$id]);
-		}
+		$pastedAsset->publish;
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
 	}

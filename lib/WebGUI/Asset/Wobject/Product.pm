@@ -77,6 +77,8 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(1,"Asset_Product"),
+		icon=>'product.gif',
 		tableName=>'Product',
 		className=>'WebGUI::Asset::Wobject::Product',
 		properties=>{
@@ -299,10 +301,6 @@ sub getIndexerParams {
 	};
 }
 
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(1,"Asset_Product");
-}
 
 #-------------------------------------------------------------------
 sub getThumbnailFilename {

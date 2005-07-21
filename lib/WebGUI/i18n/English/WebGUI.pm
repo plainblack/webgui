@@ -2981,11 +2981,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1091514049
 	},
 
-	'973' => {
-		message => q|If proxied, use real client IP address?|,
-		lastUpdated => 1053459227
-	},
-
 	'339' => {
 		message => q|Male|,
 		lastUpdated => 1031514049
@@ -3682,11 +3677,6 @@ Optionally, if you are running a sendmail server on the same machine as WebGUI, 
 
         '535 description' => {
                 message => q|What group should be alerted when a new user registers?|,
-                lastUpdated => 1120239343,
-        },
-
-        '973 description' => {
-                message => q|If enabled and if the environment variable HTTP_X_FORWARDED_FOR is present, it's value will be used in place of REMOTE_ADDRESS as the client browser's IP address.  This is required for IP based groups to function properly in reverse-proxied, load-balanced system architectures.  In these environments, all requests would otherwise appear to come from the same host, namely the proxy server.  If you are uncertain if you need this setting enabled, you should probably leave it turned off.|,
                 lastUpdated => 1120239343,
         },
 

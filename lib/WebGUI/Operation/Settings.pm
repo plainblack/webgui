@@ -162,12 +162,6 @@ sub www_editSettings {
 		-label=>$i18n->get(535),
 		-value=>[$session{setting}{onNewUserAlertGroup}]
 	);
-# misc settings
-	$tabform->getTab("misc")->yesNo(
-		-name=>"proxiedClientAddress",
-		-label=>$i18n->get(973),
-		-value=>$session{setting}{proxiedClientAddress}
-		);
 	$tabform->getTab("misc")->yesNo(
 		-name=>"preventProxyCache",
 		-label=>$i18n->get(400),

@@ -26,43 +26,21 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(2,"Asset_MessageBoard"),
+		icon=>'messageBoard.gif',
 		tableName=>'MessageBoard',
 		className=>'WebGUI::Asset::Wobject::MessageBoard',
 		properties=>{
 			templateId =>{
 				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000047'
+				defaultValue=>'PBtmpl0000000000000047',	
+				namespace=>"MessageBoard",
+                		label=>WebGUI::International::get(73,"Asset_MessageBoard"),
+                		hoverHelp=>WebGUI::International::get('73 description',"Asset_MessageBoard")
 				},
 			}
 		});
         return $class->SUPER::definition($definition);
-}
-
-#-------------------------------------------------------------------
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-   	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
-      		-namespace=>"MessageBoard",
-      		-label=>WebGUI::International::get(73,"Asset_MessageBoard")
-      		-hoverHelp=>WebGUI::International::get('73 description',"Asset_MessageBoard")
-   		);
-	return $tabform;
-}
-
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/messageBoard.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/messageBoard.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(2,"Asset_MessageBoard");
 }
 
 

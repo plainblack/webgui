@@ -62,6 +62,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>'Rich Editor',
+		icon=>'richEdit.gif',
                 tableName=>'RichEdit',
                 className=>'WebGUI::Asset::RichEdit',
                 properties=>{
@@ -363,14 +365,6 @@ sub getEditForm {
 }
 
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/adminConsole/small/richEdit.gif' if ($small);
-	return $session{config}{extrasURL}.'/adminConsole/richEdit.gif';
-}
-
 
 #-------------------------------------------------------------------
 
@@ -398,18 +392,6 @@ Returns the UI level of this asset.
 sub getUiLevel {
 	return 5;
 }
-
-#-------------------------------------------------------------------
-
-=head2 getName 
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-	return "Rich Editor";
-} 
 
 
 #-------------------------------------------------------------------

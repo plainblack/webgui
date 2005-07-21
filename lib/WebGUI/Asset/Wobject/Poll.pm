@@ -38,7 +38,9 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(1,"Asset_Poll"),
 		tableName=>'Poll',
+		icon=>'poll.gif',
 		className=>'WebGUI::Asset::Wobject::Poll',
 		properties=>{
 			templateId =>{
@@ -241,14 +243,6 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/poll.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/poll.gif';
-}
-
-#-------------------------------------------------------------------
 sub getIndexerParams {
 	my $self = shift;        
 	my $now = shift;
@@ -277,11 +271,6 @@ sub getIndexerParams {
                 }
 
 	};
-}
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(1,"Asset_Poll");
 }
 
 

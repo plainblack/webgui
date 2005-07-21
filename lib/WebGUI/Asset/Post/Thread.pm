@@ -72,6 +72,8 @@ sub definition {
 	my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get('thread',"Asset_Thread"),
+		icon=>'thread.gif',
                 tableName=>'Thread',
                 className=>'WebGUI::Asset::Post::Thread',
                 properties=>{
@@ -119,14 +121,6 @@ sub DESTROY {
 }
 
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/thread.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/thread.gif';
-}
-
 
 #-------------------------------------------------------------------
 sub getLastPost {
@@ -172,10 +166,6 @@ sub getLockUrl {
 	$self->getUrl("func=lock");
 }
 
-#-------------------------------------------------------------------
-sub getName {
-	return WebGUI::International::get('thread',"Asset_Thread");
-}
 
 #-------------------------------------------------------------------
 
@@ -470,6 +460,25 @@ sub rate {
 }
 
 
+#-------------------------------------------------------------------
+
+=head setParent ( newParent ) 
+
+We're overloading the setParent in Asset because we don't want threads to be able to be posted to anything other than other collaboration systems.
+
+=head3 newParent 
+        
+An asset object to make the parent of this asset.
+
+=cut
+
+sub setParent {
+        my $self = shift;
+        my $newParent = shift;
+        return 0 unless ($newParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration");
+        # specify the Asset package here directly because we don't want to use the ruls in WebGUI::Asset::Post, as they don't fit for Threads.
+        return $self->WebGUI::Asset::setParent($newParent);
+}  
 
 #-------------------------------------------------------------------
 

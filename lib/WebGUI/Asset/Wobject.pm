@@ -72,27 +72,52 @@ sub definition {
                 properties=>{
                                 description=>{
                                         fieldType=>'HTMLArea',
-                                        defaultValue=>undef
+                                        defaultValue=>undef,
+					tab=>"properties",
+					label=>WebGUI::International::get(85,'Wobject'),
+					hoverHelp=>WebGUI::International::get('85 description','Wobject')
                                         },
                                 displayTitle=>{
                                         fieldType=>'yesNo',
-                                        defaultValue=>1
+                                        defaultValue=>1,
+					tab=>"display",
+					label=>WebGUI::International::get(174,'Wobject'),
+					hoverHelp=>WebGUI::International::get('174 description','Wobject'),
+					uiLevel=>5
                                         },
                                 cacheTimeout=>{
                                         fieldType=>'interval',
-                                        defaultValue=>60
+                                        defaultValue=>60,
+					tab=>"display",
+					label=>WebGUI::International::get(895,'Wobject'),
+					hoverHelp=>WebGUI::International::get('895 description','Wobject'),
+					uiLevel=>8
                                         },
                                 cacheTimeoutVisitor=>{
                                         fieldType=>'interval',
                                         defaultValue=>600
+					tab=>"display",
+					label=>WebGUI::International::get(896,'Wobject'),
+					hoverHelp=>WebGUI::International::get('896 description','Wobject'),
+					uiLevel=>8
                                         },
 				styleTemplateId=>{
 					fieldType=>'template',
-					defaultValue=>undef
+					defaultValue=>undef,
+					tab=>"display",
+					label=>WebGUI::International::get(1073,'Wobject'),
+					hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
+					namespace=>'style',
+					afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 					},
 				printableStyleTemplateId=>{
 					fieldType=>'template',
-					defaultValue=>undef
+					defaultValue=>undef,
+					tab=>"display",
+					label=>WebGUI::International::get(1079,'Wobject'),
+					hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
+					namespace=>'style',
+					afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
 					}
                         }
                 });
@@ -223,49 +248,18 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	$tabform->getTab("display")->yesNo(
-                -name=>"displayTitle",
-                -label=>WebGUI::International::get(174,'Wobject'),
-                -hoverHelp=>WebGUI::International::get('174 description','Wobject'),
-                -value=>$self->getValue("displayTitle"),
-                -uiLevel=>5
-                );
-         $tabform->getTab("display")->template(
-		-name=>"styleTemplateId",
-		-label=>WebGUI::International::get(1073,'Wobject'),
-		-hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
-		-value=>$self->getValue("styleTemplateId"),
-		-namespace=>'style',
-		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
-		);
-         $tabform->getTab("display")->template(
-		-name=>"printableStyleTemplateId",
-		-label=>WebGUI::International::get(1079,'Wobject'),
-		-hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
-		-value=>$self->getValue("printableStyleTemplateId"),
-		-namespace=>'style',
-		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
-		);
-	$tabform->getTab("properties")->HTMLArea(
-                -name=>"description",
-                -label=>WebGUI::International::get(85,'Wobject'),
-                -hoverHelp=>WebGUI::International::get('85 description','Wobject'),
-                -value=>$self->getValue("description")
-                );
-        $tabform->getTab("display")->interval(
-                -name=>"cacheTimeout",
-                -label=>WebGUI::International::get(895,'Wobject'),
-                -hoverHelp=>WebGUI::International::get('895 description','Wobject'),
-                -value=>$self->getValue("cacheTimeout"),
-                -uiLevel=>8
-                );
-        $tabform->getTab("display")->interval(
-                -name=>"cacheTimeoutVisitor",
-                -label=>WebGUI::International::get(896,'Wobject'),
-                -hoverHelp=>WebGUI::International::get('896 description','Wobject'),
-                -value=>$self->getValue("cacheTimeoutVisitor"),
-                -uiLevel=>8
-                );
+	my $definition = $self->definition;
+	my $properties = $definition->[0]{properties};
+	foreach my $fieldname (keys %{$properties}) {
+		my %params;
+		foreach my $key (keys %{$properties->{$fieldname}}) {
+			next if ($key eq "tab" || $key eq "fieldType");
+			$params{"-".$key} = $properties->{$fieldname}{$key}
+		}
+		$params{"-value"} = $self->getValue($fieldname);
+		$params{"-name"} = $fieldname;
+		$tabform->getTab($properties->{$fieldname}{tab})->dynamicField($properties->{$fieldname}{fieldType},%params);
+	}
 	return $tabform;
 }
 

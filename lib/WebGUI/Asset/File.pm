@@ -60,6 +60,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get('file',"Asset_File"),
                 tableName=>'FileAsset',
                 className=>'WebGUI::Asset::File',
                 properties=>{
@@ -164,19 +165,6 @@ sub getIcon {
 
 
 #-------------------------------------------------------------------
-
-=head2 getName 
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-	return WebGUI::International::get('file',"Asset_File");
-} 
-
-
-#-------------------------------------------------------------------
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -212,7 +200,6 @@ sub processPropertiesFromFormPost {
 		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
 		$self->setSize($storage->getFileSize($filename));
-		$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 		$self->{_storageLocation} = $storage;
 	} else {
 		$storage->delete;
@@ -238,6 +225,27 @@ sub purge {
 	return $self->SUPER::purge;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 update
+
+We overload the update method from WebGUI::Asset in order to handle file system privileges.
+
+=cut
+
+sub update {
+        my $self = shift;
+        my %before = (
+                owner => $self->get("ownerUserId"),
+                view => $self->get("groupIdView"),
+                edit => $self->get("groupIdEdit")
+                );
+        $self->SUPER::update(@_);
+        if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
+                $self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+        }
+}
 
 #-------------------------------------------------------------------
 sub view {

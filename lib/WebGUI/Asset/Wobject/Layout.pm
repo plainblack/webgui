@@ -59,6 +59,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get("layout","Asset_Layout"),
+		icon=>'layout.gif',
                 tableName=>'Layout',
                 className=>'WebGUI::Asset::Wobject::Layout',
                 properties=>{
@@ -128,25 +130,6 @@ sub getEditForm {
 }
 
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/layout.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/layout.gif';
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-	return WebGUI::International::get("layout","Asset_Layout");
-} 
 
 
 #-------------------------------------------------------------------

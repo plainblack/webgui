@@ -73,60 +73,56 @@ sub definition {
 	my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get(2,'Asset_SyndicatedContent'),
+		icon=>'syndicatedContent.gif',
                 tableName=>'SyndicatedContent',
                 className=>'WebGUI::Asset::Wobject::SyndicatedContent',
                 properties=>{
 			templateId =>{
 				fieldType=>'template',
-				defaultValue=>'PBtmpl0000000000000065'
+				defaultValue=>'PBtmpl0000000000000065',
+				namespace=>'SyndicatedContent',
+               	 		label=>WebGUI::International::get(72,'Asset_SyndicatedContent'),
+                		hoverHelp=>WebGUI::International::get('72 description','Asset_SyndicatedContent')
 				},
 			rssUrl=>{
 				defaultValue=>undef,
-				fieldType=>'textarea'
+				fieldType=>'textarea',
+				label=>WebGUI::International::get(1,'Asset_SyndicatedContent'),
+                		hoverHelp=>WebGUI::International::get('1 description','Asset_SyndicatedContent')
 				},
                         maxHeadlines=>{
 				fieldType=>'integer',
-				defaultValue=>10
+				defaultValue=>10,
+				label=>WebGUI::International::get(3,'Asset_SyndicatedContent'),
+                		hoverHelp=>WebGUI::International::get('3 description','Asset_SyndicatedContent')
 				},
 			displayMode=>{
-				      fieldType=>'text',
-				      defaultValue=>'interleaved'
-				     },
+				fieldType=>'selectList',
+				defaultValue=>'interleaved',
+				options=>{
+                        		'interleaved'=>WebGUI::International::get('interleaved','Asset_SyndicatedContent'),
+                        		'grouped'=>WebGUI::International::get('grouped','Asset_SyndicatedContent'),
+                         		},
+                		sortByValue=>1,
+                		label=>WebGUI::International::get('displayModeLabel','Asset_SyndicatedContent'),
+                		hoverHelp=>WebGUI::International::get('displayModeLabel description','Asset_SyndicatedContent'),
+                		subtext=>WebGUI::International::get('displayModeSubtext','Asset_SyndicatedContent')
+				},
 			hasTerms=>{
-				   fieldType=>'text',
-				   defaultValue=>''
-				  }
+				fieldType=>'text',
+				defaultValue=>'',
+				label=>WebGUI::International::get('hasTermsLabel','Asset_SyndicatedContent'),
+                		hoverHelp=>WebGUI::International::get('hasTermsLabel description','Asset_SyndicatedContent'),
+                		maxlength=>255
+				}
 			}
 		});
         return $class->SUPER::definition($definition);
 }
 
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 getName ()
 
-Returns the icons associated with this asset.
-
-=cut
-
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/syndicatedContent.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/syndicatedContent.gif';
-}
-
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 getName ()
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get(2,'Asset_SyndicatedContent');
-}
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -140,59 +136,6 @@ sub getUiLevel {
         return 6;
 }
 
-
-#-------------------------------------------------------------------
-=head2 getEditForm ()
-
-Returns the TabForm object that will be used in generating the edit page for this asset.
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-   	$tabform->getTab('display')->template(
-      		-value=>$self->getValue('templateId'),
-      		-namespace=>'SyndicatedContent',
-		-label=>WebGUI::International::get(72,'Asset_SyndicatedContent'),
-		-hoverHelp=>WebGUI::International::get('72 description','Asset_SyndicatedContent'),
-   		);
-	$tabform->getTab('display')->selectList(
-		-name=>'displayMode',
-		-options=>{
-			'interleaved'=>WebGUI::International::get('interleaved','Asset_SyndicatedContent'),
-			'grouped'=>WebGUI::International::get('grouped','Asset_SyndicatedContent'),
-			 },
-		-sortByValue=>1,
-		-label=>WebGUI::International::get('displayModeLabel','Asset_SyndicatedContent'),
-		-hoverHelp=>WebGUI::International::get('displayModeLabel description','Asset_SyndicatedContent'),
-		-value=>[$self->getValue('displayMode')],
-		-subtext=>WebGUI::International::get('displayModeSubtext','Asset_SyndicatedContent'),
-		);
-	$tabform->getTab('display')->text(
-		-name=>'hasTerms',
-		-label=>WebGUI::International::get('hasTermsLabel','Asset_SyndicatedContent'),
-		-hoverHelp=>WebGUI::International::get('hasTermsLabel description','Asset_SyndicatedContent'),
-		-maxlength=>255,
-		-value=>$self->getValue('hasTerms'),
-		);
-	$tabform->getTab('properties')->textarea(
-		-name=>'rssUrl',
-		-label=>WebGUI::International::get(1,'Asset_SyndicatedContent'),
-		-hoverHelp=>WebGUI::International::get('1 description','Asset_SyndicatedContent'),
-		-value=>$self->getValue('rssUrl')
-		);
-
-	$tabform->getTab('display')->integer(
-		-name=>'maxHeadlines',
-		-label=>WebGUI::International::get(3,'Asset_SyndicatedContent'),
-		-hoverHelp=>WebGUI::International::get('3 description','Asset_SyndicatedContent'),
-		-value=>$self->getValue('maxHeadlines')
-		);
-	#$tabform->addTab('rss',WebGUI::International::get('rssTabName','Asset_SyndicatedContent'));
-	
-	return $tabform;
-}
 
 #-------------------------------------------------------------------
 # strip all html tags from the given data structure.  This is important to

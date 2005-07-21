@@ -59,6 +59,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get("folder","Asset_Folder"),
+		icon=>'folder.gif',
                 tableName=>'Folder',
                 className=>'WebGUI::Asset::Wobject::Folder',
                 properties=>{
@@ -101,27 +103,6 @@ sub getEditForm {
 	}
 	return $tabform;
 }
-
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/folder.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/folder.gif';
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-	return WebGUI::International::get("folder","Asset_Folder");
-} 
 
 
 #-------------------------------------------------------------------

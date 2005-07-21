@@ -86,10 +86,11 @@ sub send {
 	}
 	$from = $_[4] || $session{setting}{companyEmail};
 	#header
-	$message = "To: $_[0]\n";
+	my $to = $session{config}{emailOverride} || $_[0];
+	$message = "To: $to\n";
 	$message .= "From: $from\n";
-	$message .= "CC: $_[3]\n" if ($_[3]);
-	$message .= "BCC: $_[5]\n" if ($_[5]);
+	$message .= "CC: $_[3]\n" if ($_[3] && !$session{config}{emailOverride});
+	$message .= "BCC: $_[5]\n" if ($_[5] && !$session{config}{emailOverride});
 	$message .= "Subject: ".$_[1]."\n";
 	$message .= "Date: ".WebGUI::DateTime::epochToHuman("","%W, %d %C %y %j:%n:%s %O")."\n";
 	if (($_[2] =~ m/<html>/i) || ($_[2] =~ m/<a\sname=/i)) {
@@ -103,6 +104,7 @@ sub send {
 	$message .= $_[2]."\n";
 	#footer
 	$message .= WebGUI::Macro::process("\n".$session{setting}{mailFooter});
+	$message .= "\n\n\nThis message was intended for ".$_[0].", but was overridden in the config file.\n\n\n";
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
 		if (open(MAIL,"| $session{setting}{smtpServer} -t -oi")) {
 			print MAIL $message;
@@ -114,9 +116,9 @@ sub send {
 		$smtp = Net::SMTP->new($session{setting}{smtpServer}); # connect to an SMTP server
 		if (defined $smtp) {
 			$smtp->mail($from);     # use the sender's address here
-			$smtp->to($_[0]);             # recipient's address
-			$smtp->cc($_[3]) if ($_[3]);
-			$smtp->bcc($_[5]) if ($_[5]);
+			$smtp->to($to);             # recipient's address
+			$smtp->cc($_[3]) if ($_[3] && !$session{config}{emailOverride});
+			$smtp->bcc($_[5]) if ($_[5] && !$session{config}{emailOverride});
 			$smtp->data();              # Start the mail
 			$smtp->datasend($message);
 			$smtp->dataend();           # Finish sending the mail

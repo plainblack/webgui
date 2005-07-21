@@ -99,6 +99,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get('template',"Asset_Template"),
+		icon=>'template.gif',
                 tableName=>'template',
                 className=>'WebGUI::Asset::Template',
                 properties=>{
@@ -179,13 +181,6 @@ sub getEditForm {
 
 
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/template.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/template.gif';
-}
 
 
 #-------------------------------------------------------------------
@@ -208,18 +203,6 @@ sub getList {
 	return WebGUI::SQL->buildHashRef("select assetData.assetId,assetData.title from template left join asset on asset.assetId=template.assetId left join assetData on asset.assetId=assetData.assetId where template.namespace=".quote($namespace)." and template.showInForms=1 and asset.state='published' and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).") group by assetData.assetId order by assetData.title",WebGUI::SQL->getSlave);
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 getName 
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-	return WebGUI::International::get('template',"Asset_Template");
-} 
 
 
 #-------------------------------------------------------------------

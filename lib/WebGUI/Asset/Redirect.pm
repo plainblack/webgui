@@ -60,6 +60,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get('redirect',"Asset_Redirect"),
+		icon=>'redirect.gif',
                 tableName=>'redirect',
                 className=>'WebGUI::Asset::Redirect',
                 properties=>{
@@ -95,13 +97,6 @@ sub getEditForm {
 }
 
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/redirect.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/redirect.gif';
-}
 
 
 #-------------------------------------------------------------------
@@ -115,18 +110,6 @@ Returns the UI level of this asset.
 sub getUiLevel {
 	return 9;
 }
-
-#-------------------------------------------------------------------
-
-=head2 getName 
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-	return WebGUI::International::get('redirect',"Asset_Redirect");
-} 
 
 
 

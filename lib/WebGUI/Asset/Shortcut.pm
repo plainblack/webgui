@@ -25,6 +25,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get(3,"Asset_Shortcut"),
+		icon=>'shortcut.gif',
                 tableName=>'Shortcut',
                 className=>'WebGUI::Asset::Shortcut',
                 properties=>{
@@ -184,19 +186,6 @@ sub getEditForm {
 	        );
 	}
 	return $tabform;
-}
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/shortcut.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/shortcut.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(3,"Asset_Shortcut");
 }
 
 

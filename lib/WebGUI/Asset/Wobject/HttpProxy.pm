@@ -33,6 +33,8 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(3,"Asset_HttpProxy"),
+		icon=>'httpProxy.gif',
 		tableName=>'HttpProxy',
 		className=>'WebGUI::Asset::Wobject::HttpProxy',
 		properties=>{
@@ -163,19 +165,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/httpProxy.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/httpProxy.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(3,"Asset_HttpProxy");
-}
 
 #-------------------------------------------------------------------
 sub getUiLevel {

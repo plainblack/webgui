@@ -32,6 +32,8 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get(1,"Asset_SQLReport"),
+		icon=>'sqlReport.gif',
 		tableName=>'SQLReport',
 		className=>'WebGUI::Asset::Wobject::SQLReport',
 		properties=>{
@@ -229,19 +231,6 @@ sub getEditForm {
 		-value=>$self->getValue("paginateAfter")
 		);
 	return $tabform;
-}
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/sqlReport.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/sqlReport.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(1,"Asset_SQLReport");
 }
 
 

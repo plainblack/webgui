@@ -64,6 +64,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get('image',"Asset_Image"),
                 tableName=>'ImageAsset',
                 className=>'WebGUI::Asset::File::Image',
                 properties=>{
@@ -150,19 +151,6 @@ sub getIcon {
 	return $session{config}{extrasURL}.'/assets/image.gif' unless ($small);
 	$self->SUPER::getIcon(1);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 getName 
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getName {
-	return WebGUI::International::get('image',"Asset_Image");
-} 
 
 
 #-------------------------------------------------------------------

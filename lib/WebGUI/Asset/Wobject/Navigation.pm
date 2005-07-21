@@ -27,12 +27,13 @@ use WebGUI::Utility;
 our @ISA = qw(WebGUI::Asset::Wobject);
 
 
-
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
+		assetName=>WebGUI::International::get("navigation","Asset_Navigation"),
+		icon=>'navigation.gif',
 		tableName=>'Navigation',
 		className=>'WebGUI::Asset::Wobject::Navigation',
 		properties=>{
@@ -257,18 +258,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/navigation.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/navigation.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-	return WebGUI::International::get("navigation","Asset_Navigation");
-}
 
 
 #-------------------------------------------------------------------

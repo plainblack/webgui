@@ -78,6 +78,10 @@ dbpass = password
 #	dbuser => webgui, \
 #	dbpass => password
 
+# Set this value if you wish to override all outbound emails to a specific
+# user for testing purposes.
+#emailOverride = joe@example.com
+
 # List the authentication plug-ins you wish to be available on
 # this site.
 

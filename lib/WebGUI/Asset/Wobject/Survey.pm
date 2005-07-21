@@ -55,6 +55,8 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
+		assetName=>WebGUI::International::get(1,'Asset_Survey'),
+		icon=>'survey.gif',
 		tableName	=> 'Survey',
 		className	=> 'WebGUI::Asset::Wobject::Survey',
                 properties	=> {
@@ -286,13 +288,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/small/survey.gif' if ($small);
-	return $session{config}{extrasURL}.'/assets/survey.gif';
-}
 
 #
 # WID FIXEN!
@@ -520,10 +515,6 @@ sub getUserId {
 	return $userId;
 }
 
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(1,'Asset_Survey');
-}
 
 #-------------------------------------------------------------------
 sub purge {
