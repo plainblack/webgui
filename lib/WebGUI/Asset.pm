@@ -391,10 +391,6 @@ An array reference containing additional information to include with the default
 sub definition {
         my $class = shift;
         my $definition = shift || [];
-	my $name = WebGUI::International::get("asset","Asset");
-	if (scalar(@{$definition})) {
-#		$name = $definition->[0]{assetName};
-	};
         push(@{$definition}, {
 		assetName=>WebGUI::International::get("asset","Asset"),
                 tableName=>'assetData',
@@ -403,7 +399,7 @@ sub definition {
                 properties=>{
                                 title=>{
                                         fieldType=>'text',
-                                        defaultValue=>$name
+                                        defaultValue=>undef
                                         },
                                 menuTitle=>{
                                         fieldType=>'text',
@@ -1879,11 +1875,7 @@ sub new {
 		# got properties from cache
 	} else { 
 		my $sql = "select * from asset";
-my @def = @{$class->definition};
-WebGUI::ErrorHandler::debug(scalar(@def));
-WebGUI::ErrorHandler::debug($className);
 		foreach my $definition (@{$class->definition}) {
-WebGUI::ErrorHandler::warn($definition->{assetName});
 			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
 				.$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
 		}
