@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'revisions' => {
+		message => q|Revisions|,
+		lastUpdated => 0,
+		context => q|Context menu item.|
+	},
+
 	'manage versions' => {
 		message => q|Manage versions.|,
 		lastUpdated => 0,

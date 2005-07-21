@@ -1717,6 +1717,7 @@ sub getToolbar {
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
 		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
+		contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
 		contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
 		contextMenu.print();
 		</script>'.$toolbar;
@@ -3608,6 +3609,34 @@ sub www_manageMetaData {
 	}	
         $ac->setHelp("metadata manage","Asset");
 	return $ac->render($output);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_manageRevisions ()
+
+Shows a list of the revisions for this asset.
+
+=cut
+
+sub www_manageRevisions {
+        my $self = shift;
+        my $ac = WebGUI::AdminConsole->new("versions");
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+        my $i18n = WebGUI::International->new("Asset");
+        #$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
+        #$ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
+        my $output = '<table width=100% class="content">
+        <tr><th>Revision Date</th><th>Revised By</th><th>Tag Name</th><th></th></tr> ';
+        my $sth = WebGUI::SQL->read("select assetData.revisionDate, users.username, assetVersionTag.name from assetData 
+		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
+		where assetData.assetId=".quote($self->getId));
+        while (my ($date,$by,$tag) = $sth->array) {
+                $output .= '<tr><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$by.'</td><td>'.$tag.'</td><td>[rollback]</td></tr>';
+        }
+        $sth->finish;
+        $output .= '</table>';
+        return $ac->render($output,$i18n->get("committed versions"));
 }
 
 #-------------------------------------------------------------------
