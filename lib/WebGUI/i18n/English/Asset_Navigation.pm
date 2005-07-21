@@ -133,65 +133,77 @@ our $I18N = {
 		lastUpdated => 1078208044
 	},
 
+        '1096 description' => {
+                message => q|Choose a template to use for displaying your navigation|,
+                lastUpdated => 1121969610,
+        },
+
+        'Start Point Type description' => {
+                message => q|Pick where the navigation should start choosing pages, via a specific URL, relative to the current
+URL or at a page relative to the root page.|,
+                lastUpdated => 1121969610,
+        },
+
+        'Start Point description' => {
+                message => q|Based on the Start Point Type, where the navigation will begin choosing pages.|,
+                lastUpdated => 1121969610,
+        },
+
+        'Ancestor End Point description' => {
+                message => q|If the Start Point Type is set to relative to Current URL, how many levels above the current URL
+the navigation should start.|,
+                lastUpdated => 1121969610,
+        },
+
+        'Relatives To Include description' => {
+                message => q|The Navigation Asset can filter out pages that you do not want to be in the navigation.  Select
+all of the classes of pages that should be included:<br>
+<dl>
+<dt>Ancestors</dt>
+<dd>Pages higher than the current page in the tree.</dd>
+<dt>Self</dt>
+<dd>The current page.</dd>
+<dt>Siblings</dt>
+<dd>Pages at the same level as the current URL.</dd>
+<dt>Descendents</dt>
+<dd>Pages lower than the current page in the tree.</dd>
+<dt>Pedigree</dt>
+<dd>When using a different start page, this option selects the Ancestors, Siblings and Descendents of that page.</dd>|,
+                lastUpdated => 1121969610,
+        },
+
+        'Descendant End Point description' => {
+                message => q|The number of levels down from the Start Point where should the navigation end.|,
+                lastUpdated => 1121969610,
+        },
+
+        '30 description' => {
+                message => q|Should the menus the macro creates include System pages such as Trash, Clipboard, Page not found, etc.?  If you want Admins or Content Managers to be able to see System Pages, then select Yes and use the Navigation Template to hide them.|,
+                lastUpdated => 1121969610,
+        },
+
+        '31 description' => {
+                message => q|Should the menus include pages which are marked as Hidden? Similar to
+System Pages, if you want certain groups to be able to see Hidden Pages, then select Yes and use
+the Navigation Template to determine who can see them in the menu.</P>
+<P>NOTE: Any user in Admin mode will automatically be able to see all pages that they can edit regardless of whether they are hidden or the value of this property.|,
+                lastUpdated => 1121969610,
+        },
+
+        '32 description' => {
+                message => q|Should the menus the macro creates include pages which the currently logged-in user does not have the privilege to view?|,
+                lastUpdated => 1121969610,
+        },
+
+
 	'1093' => {
 		message => q|<P>The Add/Edit Navigation form allows you to do choose the which pages are shown in
 		your site navigation, and how to display them.  Some of the default Navigation templates that come with WebGUI are
 		vertical, horizontal and crumbtrail.  These templates can often be styled via CSS to match your site's design, instead
 		of rewriting the templates.</P>
-<P><B>Identifier</B><BR>
-This is the (unique) label you will later use to specify this Navigation definition in a &#94;Navigation(); macro.
-
-<P><B>Base Page</B><BR>
-This identifies the spot in the Page Tree where the macro should commence listing pages. The first three choices will create 'absolute' menus -- ones which will display the same pages no matter which page you use the macro from.
-
-<P>The next four create 'relative' menus -- ones in which the items which will be displayed depend on the location in the page tree of the page in which you use the macro.</P>
-
-<P>Use the 'Add new value' option if you want to specify a custom starting page. You can refer to a starting page by its urlized title or its pageId.</P>
-
-<P><B>Return a Loop With</B><BR>
-This determines which pages relative to the base page will be included in the menu which the macro creates.</P>
-<UL>
-<LI>daughters - pages below the base page 
-<LI>sisters - pages at the same level as the base page, excluding the base page itself. 
-<LI>self and sisters - all pages at the same level as the base page. 
-<LI>descendants - all the descendants of base page (daughters, granddaughters, grand-granddaughters, etc) 
-<LI>self and descendants - base page and all of it's descendants. 
-<LI>childless descendants - The "leaf nodes" under base page. Also called "terminal nodes" -- i.e. pages that have no daughters. 
-<LI>generation - base page, it's sisters, it's cousins, grand cousins, grand-grand cousins, etc. Technically spoken: Pages that share the same depth as "base page". 
-<LI>ancestors - all base page ancestors, starting with it's mother, then grandmother, etc, up to the root page. 
-<LI>self and ancestors - same as ancestors but starting at base page. 
-<LI>pedigree - This is what we know as the "FlexMenu". Starting at base page, it returns its daughters, self and sisters, ancestors and the sisters of each ancestor.<BR></LI></UL>
-
-<P><B>Stop traversing when reaching level</B><BR>
-This allows you to prune a menu -- in either direction -- when it reaches a <I>specific</I> level in the page tree. It's slightly different in effect than Max Depth.
-
-<P><B>Max Depth</B><BR>
-This allows you to prune a menu -- in either direction -- when it reaches a <I>number of levels</I> in the page tree. 'Stop Traversing' is absolute; 'Max Depth' is relative. Presumably, if you set both, whichever one takes effect <I>first</I> will be the active limit (that is, they're OR'd together).
-
-<P><B>Show System Pages</B><BR>
-Should the menus the macro creates include System pages such as Trash, Clipboard, Page not found, etc.?  If you want Admins or Content Managers to be able to see System Pages, then select Yes and use the Navigation Template to hide them.
-
-<P><B>Show Hidden Pages</B><BR>
-Should the menus include pages which are marked as Hidden? Similar to
-System Pages, if you want certain groups to be able to see Hidden Pages, then select Yes and use
-the Navigation Template to determine who can see them in the menu.</P>
-<P>NOTE: Any user in Admin mode will automatically be able to see all pages that they can edit regardless of whether they are hidden or the value of this property.
-
-<P><B>Show Unprivileged Pages</B><BR>
-Should the menus the macro creates include pages which the currently logged-in user does not have the privilege to view?
-
-<P><B>Template</B><BR>
-Select a template which is used to style the output created by the macro -- if you need the same collection of pages in multiple formats, you'll need to create multiple Navigation entries with (slightly) different names; the Copy Navigation button is useful for this.
-
-<P><B>Reverse Output</B><BR>
-When this option is switched on, the menu will be in reverse order.
-
-<P><B>Preview</B><BR>
-The Preview button allows you to view a navigation setup without actually saving it.
-
 |,
 
-		lastUpdated => 1116701049,
+		lastUpdated => 1121969647,
 	},
 
 	'1096' => {

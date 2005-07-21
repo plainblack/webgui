@@ -5,6 +5,51 @@ our $HELP = {
 		title => '1098',
 		body => '1093',
 		fields => [
+                        {
+                                title => '1096',
+                                description => '1096 description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => 'Start Point Type',
+                                description => 'Start Point Type description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => 'Start Point',
+                                description => 'Start Point description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => 'Ancestor End Point',
+                                description => 'Ancestor End Point description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => 'Relatives To Include',
+                                description => 'Relatives To Include description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => 'Descendant End Point',
+                                description => 'Descendant End Point description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => '30',
+                                description => '30 description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => '31',
+                                description => '31 description',
+                                namespace => 'Asset_Navigation',
+                        },
+                        {
+                                title => '32',
+                                description => '32 description',
+                                namespace => 'Asset_Navigation',
+                        },
 		],
 		related => [
 			{

@@ -87,6 +87,7 @@ sub getEditForm {
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Navigation",
 		-label=>$i18n->get(1096),
+		-hoverHelp=>$i18n->get('1096 description'),
    		);
 	$tabform->hidden({
 		name=>"returnUrl",
@@ -118,10 +119,12 @@ sub getEditForm {
 			},
 		-value=>[$self->getValue("startType")],
 		-label=>$i18n->get("Start Point Type"),
+		-hoverHelp=>$i18n->get("Start Point Type description"),
 		-extras=>'id="navStartType" onChange="changeStartPoint()"'
 		);
 	$tabform->getTab("properties")->readOnly(
 		-label=>$i18n->get("Start Point"),
+		-hoverHelp=>$i18n->get("Start Point description"),
 		-value=>'<div id="navStartPoint"></div>'
 		);
 	my %options = ();
@@ -145,6 +148,7 @@ sub getEditForm {
 		);
 	$tabform->getTab("properties")->readOnly(
 		-label=>$i18n->get("Relatives To Include"),
+		-hoverHelp=>$i18n->get("Relatives To Include description"),
 		-value=>WebGUI::Form::checkbox({
 				checked=>$ancestorsChecked,
 				name=>"assetsToInclude",
@@ -194,17 +198,20 @@ sub getEditForm {
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>'showSystemPages',
-		-label=>WebGUI::International::get(30,'Asset_Navigation'),
+		-label=>$i18n->get(30),
+		-hoverHelp=>$i18n->get('30 description'),
 		-value=>$self->getValue("showSystemPages")
 		);
         $tabform->getTab("display")->yesNo(
                 -name=>'showHiddenPages',
-                -label=>WebGUI::International::get(31,'Asset_Navigation'),
+                -label=>$i18n->get(31),
+                -hoverHelp=>$i18n->get('31 description'),
                 -value=>$self->getValue("showHiddenPages")
         	);
         $tabform->getTab("display")->yesNo(
                 -name=>'showUnprivilegedPages',
-                -label=>WebGUI::International::get(32,'Asset_Navigation'),
+                -label=>$i18n->get(32),
+                -hoverHelp=>$i18n->get('32 description'),
                 -value=>$self->getValue("showUnprivilegedPages")
         	);
 	my $start = $self->getValue("startPoint");
