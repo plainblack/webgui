@@ -188,10 +188,10 @@ Provide the form variable name to which the file being uploaded is assigned. Not
 =cut
 
 sub addFileFromFormPost {
+	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
 	my $self = shift;
 	my $formVariableName = shift;
-	my $attachmentLimit = shift;\
-	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
+	my $attachmentLimit = shift;
 	my $filename;
 	my $attachmentCount = 1;
         foreach my $tempPath ($session{cgi}->upload($formVariableName)) {
