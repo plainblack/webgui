@@ -1737,7 +1737,7 @@ This will be used if no value is specified.
 
 =cut
 
-sub texta {
+sub text {
 	my $params = shift;
         my $value = _fixSpecialCharacters($params->{value}||$params->{defaultValue});
 	$value = _fixQuotes($value);
