@@ -117,36 +117,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-        '903 description' => {
-                message => q|The unique ID for this theme within this WebGUI site. This ID will change if this theme is imported into another site.|,
-                lastUpdated => 1120856677,
-        },
-
-        '904 description' => {
-                message => q|This is the unique name of the theme. It must be unique in every site that the theme will be imported into. This name will not change across sites.|,
-                lastUpdated => 1120856677,
-        },
-
-        '905 description' => {
-                message => q|The name of the person or company that created this theme. |,
-                lastUpdated => 1120856677,
-        },
-
-        '906 description' => {
-                message => q|The URL of the web site for this theme's designer. If you are in the business of creating themes for WebGUI, then this is your place to attract attention to your offerings.|,
-                lastUpdated => 1120856677,
-        },
-
-
-	'934' => {
-		message => q|Creating and editing themes is a fairly simple process. First you set up some basic properties for the theme, and then you start adding components to the theme. 
-<p>
-The basic properties of a theme cannot be changed by anyone except the site that the theme was created on. The following are the definitions of the basic properties of a theme:
-<p>
-|,
-		lastUpdated => 1120856659
-	},
-
 	'978' => {
 		message => q|User added successfully.|,
 		lastUpdated => 1053804577
@@ -267,16 +237,6 @@ The basic properties of a theme cannot be changed by anyone except the site that
 		lastUpdated => 1031514049
 	},
 
-	'917' => {
-		message => q|Add a theme component.|,
-		lastUpdated => 1050232824
-	},
-
-	'926' => {
-		message => q|This theme was created with a newer version of WebGUI than is installed on your system. You must upgrade before installing this theme.|,
-		lastUpdated => 1050264990
-	},
-
 	'859' => {
 		message => q|Signature|,
 		lastUpdated => 1043879866
@@ -300,11 +260,6 @@ The basic properties of a theme cannot be changed by anyone except the site that
 	'418 description' => {
 		message => q|Choose the level of HTML filtering you wish to apply to the proxied content.|,
 		lastUpdated => 1046604931
-	},
-
-	'933' => {
-		message => q|Theme, Edit|,
-		lastUpdated => 1050430737
 	},
 
 	'706' => {
@@ -492,11 +447,6 @@ Be aware that any database links you create here will be available to all conten
 		lastUpdated => 1031514049
 	},
 
-	'901' => {
-		message => q|Add a new theme.|,
-		lastUpdated => 1050190107
-	},
-
 	'1035' => {
 		message => q|Notification Template|,
 		lastUpdated => 1066034661
@@ -664,11 +614,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'914' => {
-		message => q|Image|,
-		lastUpdated => 1050232286
-	},
-
 	'965' => {
 		message => q|System Trash|,
 		lastUpdated => 1099050265
@@ -704,11 +649,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'906' => {
-		message => q|Designer URL|,
-		lastUpdated => 1050191766
-	},
-
 	'496' => {
 		message => q|Editor To Use|,
 		lastUpdated => 1031514049
@@ -732,11 +672,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'42' => {
 		message => q|Please Confirm|,
 		lastUpdated => 1031514049
-	},
-
-	'927' => {
-		message => q|Import Theme|,
-		lastUpdated => 1050265139
 	},
 
 	'1073' => {
@@ -809,11 +744,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'919' => {
-		message => q|Edit this theme.|,
-		lastUpdated => 1050247154
-	},
-
 	'746' => {
 		message => q|Toolbar Icon Set|,
 		lastUpdated => 1036046598
@@ -872,13 +802,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'990' => {
 		message => q|Edit Database Link|,
 		lastUpdated => 1056151382
-	},
-
-	'932' => {
-		message => q|Themes are a mechanism to quickly install new styles, templates, and assets into a WebGUI site. They are also great for moving those same items from one site to another.
-<p>
-<b>TIP:</b> When building a theme, be sure to name the components (styles, templates, assets) in the theme with some name that is unique to the theme. This is useful so that your users can find the components in your theme, as well as to avoid name conflicts.|,
-		lastUpdated => 1070027889
 	},
 
 	'349' => {
@@ -956,19 +879,9 @@ That particular example will help you get good ranking on search engines.
 		lastUpdated => 1031514049
 	},
 
-	'911' => {
-		message => q|Component|,
-		lastUpdated => 1050232236
-	},
-
 	'17' => {
 		message => q|March|,
 		lastUpdated => 1031514049
-	},
-
-	'907' => {
-		message => q|Are you certain you wish to delete this theme?|,
-		lastUpdated => 1050230443
 	},
 
 	'333' => {
@@ -1079,11 +992,6 @@ will be modified to make it unique.|,
 		lastUpdated => 1031514049
 	},
 
-	'920' => {
-		message => q|Export this theme.|,
-		lastUpdated => 1050247169
-	},
-
 	'660' => {
 		message => q|Groups, Manage|,
 		lastUpdated => 1031514049
@@ -1152,11 +1060,6 @@ will be modified to make it unique.|,
 	'359' => {
 		message => q|Right Column|,
 		lastUpdated => 1031514049
-	},
-
-	'918' => {
-		message => q|Delete this theme.|,
-		lastUpdated => 1050247144
 	},
 
 	'108' => {
@@ -1318,11 +1221,6 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 		lastUpdated => 1031514049
 	},
 
-	'931' => {
-		message => q|Themes, Manage|,
-		lastUpdated => 1050437240
-	},
-
 	'725' => {
 		message => q|Your username cannot be blank.|,
 		lastUpdated => 1031879612
@@ -1367,10 +1265,6 @@ Users that have privileges to edit styles for this site. These privileges do not
 
 <b>Template Managers</b><br>
 Users that have privileges to edit templates for this site.
-<p>
-
-<b>Theme Managers</b><br>
-Users in this group can use the theme manager to create new themes and install themes from other systems.
 <p>
 
 <b>Turn Admin On</b><br>
@@ -1615,16 +1509,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1057208065
 	},
 
-	'937' => {
-		message => q|In order to import a theme you need a valid theme file exported from another WebGUI site. Just select the theme from your hard drive and click the "Import" button. You'll then get a confirmation screen asking whether this is the theme you wanted to import. If you agree, click on the "Import" button again and you'll have your new theme. You can then start to apply the theme to your site as you would any normal style, template, or collateral data.
-<p>
-You cannot import a theme twice. If you wish to import a new version of a theme, then you must first delete the previous version of the theme. 
-<p>
-You also cannot import a theme from a version of WebGUI that is newer than the one you're using. Therefore if you are using WebGUI 5.2.4 and a theme was created with WebGUI 6.0.0, then you will not be allowed to import the theme until you upgrade.
-|,
-		lastUpdated => 1050436484
-	},
-
 	'891' => {
 		message => q|Only negate macros.|,
 		lastUpdated => 1047838859
@@ -1648,16 +1532,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 	'16' => {
 		message => q|February|,
 		lastUpdated => 1031514049
-	},
-
-	'921' => {
-		message => q|Theme Package File|,
-		lastUpdated => 1050260403
-	},
-
-	'921 description' => {
-		message => q|Select a file from your computer to import.|,
-		lastUpdated => 1120857461
 	},
 
 	'1069' => {
@@ -1751,16 +1625,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 		lastUpdated => 1044126938
 	},
 
-	'904' => {
-		message => q|Theme Name|,
-		lastUpdated => 1050190959
-	},
-
-	'930' => {
-		message => q|View Theme|,
-		lastUpdated => 1050270912
-	},
-
 	'442' => {
 		message => q|Work Information|,
 		lastUpdated => 1031514049
@@ -1807,11 +1671,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 		lastUpdated => 1031514049
 	},
 
-	'939' => {
-		message => q|When you delete a theme you've created all you're actually deleting is the basic properties for the theme. However, when you delete a theme you've imported, you'll also be deleting all of its components (styles, templates, and collateral) as well. Be careful that you are no longer using any of those components before deleting them.|,
-		lastUpdated => 1050437207
-	},
-
 	'320' => {
 		message => q|<a href="http://messenger.yahoo.com/">Yahoo! Messenger</a> Id|,
 		lastUpdated => 1031514049
@@ -1825,11 +1684,6 @@ You also cannot import a theme from a version of WebGUI that is newer than the o
 	'732' => {
 		message => q|3 Rookie|,
 		lastUpdated => 1033836660
-	},
-
-	'913' => {
-		message => q|Template|,
-		lastUpdated => 1050232279
 	},
 
 	'811' => {
@@ -2318,16 +2172,6 @@ div.tabs {
 		lastUpdated => 1099434667
 	},
 
-	'922' => {
-		message => q|Created With|,
-		lastUpdated => 1050262917
-	},
-
-	'922 description' => {
-		message => q|The version of WebGUI that was used to create this theme.|,
-		lastUpdated => 1120857530
-	},
-
 	'871' => {
 		message => q|Who can edit?|,
 		lastUpdated => 1044218026
@@ -2353,16 +2197,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 
 |,
 		lastUpdated => 1101775447,
-	},
-
-	'902' => {
-		message => q|Edit Theme|,
-		lastUpdated => 1050190716
-	},
-
-	'936' => {
-		message => q|Theme, Import|,
-		lastUpdated => 1050436484
 	},
 
 	'827' => {
@@ -2462,11 +2296,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 	'422' => {
 		message => q|<h1>Login Failed</h1>The information supplied does not match the account.|,
 		lastUpdated => 1031514049
-	},
-
-	'905' => {
-		message => q|Theme Designer|,
-		lastUpdated => 1050191749
 	},
 
 	'817' => {
@@ -2572,11 +2401,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 	'1078' => {
 		message => q|There is already a user of this system with the email address you've entered.  Press "Save" if you still wish to create this user|,
 		lastUpdated => 1067951807
-	},
-
-	'928' => {
-		message => q|Do you wish to import this theme?|,
-		lastUpdated => 1050265284
 	},
 
 	'623' => {
@@ -2821,11 +2645,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'923' => {
-		message => q|Theme Version|,
-		lastUpdated => 1050262964
-	},
-
 	'313' => {
 		message => q|Allow miscellaneous information?|,
 		lastUpdated => 1031514049
@@ -2891,16 +2710,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'935' => {
-		message => q|The file you uploaded does not appear to be a valid theme file.|,
-		lastUpdated => 1050431137
-	},
-
-	'908' => {
-		message => q|Are you certain you wish to remove this component from this theme?|,
-		lastUpdated => 1050230878
-	},
-
 	'81' => {
 		message => q|Account updated successfully!|,
 		lastUpdated => 1031514049
@@ -2924,11 +2733,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'823' => {
 		message => q|Go to the new page.|,
 		lastUpdated => 1038706332
-	},
-
-	'903' => {
-		message => q|Theme ID|,
-		lastUpdated => 1050190880
 	},
 
 	'371' => {
@@ -2959,11 +2763,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'808' => {
 		message => q|Email this group.|,
 		lastUpdated => 1037579487
-	},
-
-	'924' => {
-		message => q|Import a theme.|,
-		lastUpdated => 1050262993
 	},
 
 	'885' => {
@@ -3004,11 +2803,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'345' => {
 		message => q|Not A Member|,
 		lastUpdated => 1031514049
-	},
-
-	'915' => {
-		message => q|File|,
-		lastUpdated => 1050232294
 	},
 
 	'319' => {
@@ -3192,11 +2986,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1031514049
 	},
 
-	'938' => {
-		message => q|Theme, Delete|,
-		lastUpdated => 1050437207
-	},
-
 	'879' => {
 		message => q|Classic Editor (Internet Explorer 5+)|,
 		lastUpdated => 1044705103
@@ -3210,11 +2999,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	'10' => {
 		message => q|Manage trash.|,
 		lastUpdated => 1031514049
-	},
-
-	'929' => {
-		message => q|Import!|,
-		lastUpdated => 1050265357
 	},
 
 	'958' => {
@@ -3328,11 +3112,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1031514049
 	},
 
-	'909' => {
-		message => q|Add Theme Component|,
-		lastUpdated => 1050232207
-	},
-
 	'403' => {
 		message => q|Prefer not to say.|,
 		lastUpdated => 1031514049
@@ -3393,11 +3172,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1044126838
 	},
 
-	'900' => {
-		message => q|Manage themes.|,
-		lastUpdated => 1050189066
-	},
-
 	'1016' => {
 		message => q|Replies|,
 		lastUpdated => 1031514049
@@ -3421,11 +3195,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	'105' => {
 		message => q|Display|,
 		lastUpdated => 1046638916
-	},
-
-	'925' => {
-		message => q|You already have another version of this theme installed. You must delete it before installing it again.|,
-		lastUpdated => 1050264954
 	},
 
 	'146' => {
@@ -3486,12 +3255,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		message => q|Packages|,
 		lastUpdated =>1092930637,
                 context => q|Title of the package manager for the admin console.|
-        },
-	
-	'themes' => {
-		message => q|Themes|,
-		lastUpdated =>1092930637,
-                context => q|Title of the themes manager for the admin console.|
         },
 	
 	'help' => {

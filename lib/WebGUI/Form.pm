@@ -83,6 +83,19 @@ All of the functions in this package accept the input of a hash reference contai
 
 =cut
 
+sub AUTOLOAD {
+	our $AUTOLOAD;
+	my $name = (split /::/, $AUTOLOAD)[-1];
+	my @params = @_;
+	my $cmd = "use WebGUI::Form::".$name;
+        eval ($cmd);
+        if ($@) {
+        	WebGUI::ErrorHandler::error("Couldn't compile form field: ".$name.". Root cause: ".$@);
+                return undef;
+        }
+	my $class = "WebGUI::Form::".$name;
+	return $class->new(@params)->toHtml;
+}
 
 #-------------------------------------------------------------------
 sub _fixMacros {
@@ -1724,7 +1737,7 @@ This will be used if no value is specified.
 
 =cut
 
-sub text {
+sub texta {
 	my $params = shift;
         my $value = _fixSpecialCharacters($params->{value}||$params->{defaultValue});
 	$value = _fixQuotes($value);

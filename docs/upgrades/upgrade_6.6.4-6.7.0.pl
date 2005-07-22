@@ -9,6 +9,7 @@ use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Asset::Snippet;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Group;
 
 my $configFile;
 my $quiet;
@@ -25,6 +26,7 @@ updateConfigFile();
 insertHelpTemplate();
 insertXSLTSheets();
 insertSyndicatedContentTemplate();
+WebGUI::Group->new('9')->delete;
 
 WebGUI::Session::close();
 
@@ -59,7 +61,7 @@ sub addAssetVersioning {
 	my $now = time();
 	WebGUI::SQL->write("insert into assetVersionTag values ('pbversion0000000000001','Initial Import','1',$now,'3',$now,'3')");
 	WebGUI::SQL->write("insert into assetVersionTag values ('pbversion0000000000002','Auto Commit','1',$now,'3',$now,'3')");
-	foreach my $table (qw(FileAsset Post RichEdit Snippet EventsCalendar_Event ImageAsset Thread redirect Shortcut Template Article EventsCalendar IndexedSearch MessageBoard SQLReport Folder Navigation Survey WSClient Collaboration HttpProxy Layout Poll SyndicatedContent Product DataForm wobject)) {
+	foreach my $table (qw(FileAsset Post RichEdit snippet EventsCalendar_event ImageAsset Thread redirect Shortcut template Article EventsCalendar IndexedSearch MessageBoard SQLReport Folder Navigation Survey WSClient Collaboration HttpProxy Layout Poll SyndicatedContent Product DataForm wobject)) {
 		WebGUI::SQL->write("alter table $table add column revisionDate bigint not null");
 		WebGUI::SQL->write("update $table set revisionDate=$now");
 		WebGUI::SQL->write("alter table $table drop primary key");
