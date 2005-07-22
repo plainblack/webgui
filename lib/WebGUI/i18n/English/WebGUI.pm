@@ -1067,24 +1067,17 @@ will be modified to make it unique.|,
 		lastUpdated => 1031514049
 	},
 
-	'1001' => {
-		message => q|<p>
-The following fields make up a Database Link.
-<p>
+        '992 description' => {
+                message => q|A title for the database link.|,
+                lastUpdated => 1122070396,
+        },
 
-<b>Title</b><br>
-A title for the database link.
-<p>
-
-<b>DSN</b><br>
-<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of
+        '993 description' => {
+                message => q|<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of
 <blockquote>DBI:[driver]:[database name]:[host].</blockquote>
 <p>
-
-
 <i>Example:</i> DBI:mysql:WebGUI:localhost
 <p>
-
 Here are some examples for other databases.<br>
 <dl>
 <dt><a href="http://search.cpan.org/author/TIMB/DBD-Oracle-1.14/Oracle.pm#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
@@ -1092,31 +1085,35 @@ Here are some examples for other databases.<br>
 DBD::Oracle must be installed.<br>
 You must be using mod_perl and configure <b>PerlSetEnv ORACLE_HOME /home/oracle/product/8.1.7</b> in httpd.conf. Without setting ORACLE_HOME, you can connect using DBI:Oracle:host=myhost.com;sid=SID
 </dd>
-
 <dt><a href="http://search.cpan.org/author/OYAMA/DBD-PgPP-0.04/PgPP.pm#THE_DBI_CLASS">PostgreSQL</a>:</dt>
 <dd>DBI:PgPP:dbname=DBNAME[;host=hOST]<br>
 DBD::PgPP must be installed.
 </dd>
-
-
 <dt><a href="http://search.cpan.org/author/MEWP/DBD-Sybase-1.00/Sybase.pm#Specifying_other_connection_specific_parameters">Sybase</a>:</dt>
 <dd>DBI:Sybase:[server=SERVERNAME][database=DATABASE]<br>
 DBD::Sybase must be installed.<br>
 You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2</b> in httpd.conf.
 </dd>
-</dl>
+</dl>|,
+                lastUpdated => 1122070396,
+        },
 
-<p>
-<b>Database User</b><br>
-The username you use to connect to the DSN.
-<p>
+        '994 description' => {
+                message => q|The username you use to connect to the DSN.|,
+                lastUpdated => 1122070396,
+        },
 
+        '995 description' => {
+                message => q|The password you use to connect to the DSN.|,
+                lastUpdated => 1122070396,
+        },
 
-<b>Database Password</b><br>
-The password you use to connect to the DSN.
+	'1001' => {
+		message => q|<p>
+The following fields make up a Database Link.
 <p>
 |,
-		lastUpdated => 1099536266
+		lastUpdated => 1122070424
 	},
 
 	'556' => {

@@ -88,13 +88,43 @@ sub www_editDatabaseLink {
 	$f = WebGUI::HTMLForm->new(
 		-extras=>'autocomplete="off"'
 		);
-        $f->hidden("op","editDatabaseLinkSave");
-        $f->hidden("dlid",$session{form}{dlid});
-	$f->readOnly($session{form}{dlid},WebGUI::International::get(991));
-        $f->text("title",WebGUI::International::get(992),$db{title});
-        $f->text("DSN",WebGUI::International::get(993),$db{DSN});
-        $f->text("username",WebGUI::International::get(994),$db{username});
-        $f->password("identifier",WebGUI::International::get(995),$db{identifier});
+        $f->hidden(
+		-name => "op",
+		-value => "editDatabaseLinkSave",
+        );
+        $f->hidden(
+		-name => "dlid",
+		-value => $session{form}{dlid},
+        );
+	$f->readOnly(
+		-value => $session{form}{dlid},
+		-label => WebGUI::International::get(991),
+		-hoverHelp => WebGUI::International::get('991 description'),
+	);
+        $f->text(
+		-name => "title",
+		-label => WebGUI::International::get(992),
+		-hoverHelp => WebGUI::International::get('992 description'),
+		-value => $db{title},
+        );
+        $f->text(
+		-name => "DSN",
+		-label => WebGUI::International::get(993),
+		-hoverHelp => WebGUI::International::get('993 description'),
+		-value => $db{DSN},
+        );
+        $f->text(
+		-name => "username",
+		-label => WebGUI::International::get(994),
+		-hoverHelp => WebGUI::International::get('994 description'),
+		-value => $db{username},
+        );
+        $f->password(
+		-name => "identifier",
+		-label => WebGUI::International::get(995),
+		-hoverHelp => WebGUI::International::get('995 description'),
+		-value => $db{identifier},
+        );
         $f->submit;
 	$output .= $f->print;
         return _submenu($output,"990","database link add/edit");
