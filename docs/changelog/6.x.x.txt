@@ -1,4 +1,8 @@
-﻿6.6.4
+﻿6.6.5
+ - fix [ 1243131 ] In 6.6.4 you cannot upload anything (ebruni)
+
+
+6.6.4
  - fix [ 1238539 ] REQUEST_URI broken in WRE
  - fix [ 1227887 ] setScratch("redirectAfterLogin") doesn't save
    $session{form}
