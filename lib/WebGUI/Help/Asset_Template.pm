@@ -9,10 +9,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'themes manage',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'template add/edit',
 				namespace => 'Asset_Template'
 			},
