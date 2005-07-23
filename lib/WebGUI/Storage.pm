@@ -190,7 +190,7 @@ Provide the form variable name to which the file being uploaded is assigned. Not
 sub addFileFromFormPost {
 	my $self = shift;
 	my $formVariableName = shift;
-	my $attachmentLimit = shift;
+	my $attachmentLimit = shift || 99999;
 	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
 	my $filename;
 	my $attachmentCount = 1;
