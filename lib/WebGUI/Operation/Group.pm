@@ -116,7 +116,7 @@ sub getGroupSearchForm {
                 );
         $f->selectList(
                 -name=>"modifier",
-                -value=>([$session{scratch}{groupSearchModifier} || "contains"]),
+                -value=>([$session{scratch}{groupSearchModifier} || WebGUI::International::get("contains") ]),
                 -options=>{
                         startsWith=>WebGUI::International::get("starts with"),
                         contains=>WebGUI::International::get("contains"),
@@ -407,9 +407,19 @@ sub www_editGrouping {
         $f->hidden("gid",$session{form}{gid});
 	my $u = WebGUI::User->new($session{form}{uid});
 	my $g = WebGUI::Group->new($session{form}{gid});
-        $f->readOnly($u->username,WebGUI::International::get(50));
-        $f->readOnly($g->name,WebGUI::International::get(84));
-	$f->date("expireDate",WebGUI::International::get(369),WebGUI::Grouping::userGroupExpireDate($session{form}{uid},$session{form}{gid}));
+        $f->readOnly(
+		-value => $u->username,
+		-label => WebGUI::International::get(50),
+        );
+        $f->readOnly(
+		-value => $g->name,
+		-label => WebGUI::International::get(84),
+        );
+	$f->date(
+		-name => "expireDate",
+		-label => WebGUI::International::get(369),
+		-value => WebGUI::Grouping::userGroupExpireDate($session{form}{uid},$session{form}{gid}),
+	);
 	$f->yesNo(
 		-name=>"groupAdmin",
 		-label=>WebGUI::International::get(977),
