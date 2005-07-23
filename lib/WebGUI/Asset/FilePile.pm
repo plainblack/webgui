@@ -168,6 +168,7 @@ sub editSave {
               	$data{templateId} = 'PBtmpl0000000000000088' if ($className eq  "WebGUI::Asset::File::Image");
 		$data{url} = $class->getParent->getUrl.'/'.$filename;
 		my $newAsset = $class->getParent->addChild(\%data);
+		delete $newAsset->{_storageLocation};
 		$newAsset->setSize($storage->getFileSize($filename));
 		$newAsset->generateThumbnail if ($className eq "WebGUI::Asset::File::Image");
 	}
