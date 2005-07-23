@@ -107,6 +107,7 @@ sub getOperations {
           'emailGroupSend' => 'WebGUI::Operation::Group',
           'manageGroupsInGroup' => 'WebGUI::Operation::Group',
           'addGroupsToGroupSave' => 'WebGUI::Operation::Group',
+          'addUsersToGroupSave' => 'WebGUI::Operation::Group',
           'deleteGroupGrouping' => 'WebGUI::Operation::Group',
           'autoAddToGroup' => 'WebGUI::Operation::Group',
           'autoDeleteFromGroup' => 'WebGUI::Operation::Group',
