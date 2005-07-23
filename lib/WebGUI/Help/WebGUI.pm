@@ -104,6 +104,38 @@ our $HELP = {
 			}
 		]
 	},
+	'grouping edit' => {
+		title => 'grouping edit title',
+		body => 'grouping edit body',
+		fields => [
+                        {
+                                title => '50',
+                                description => '50 description groupings',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '84',
+                                description => '84 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '369',
+                                description => '369 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '977',
+                                description => '977 description',
+                                namespace => 'WebGUI',
+                        },
+		],
+		related => [
+			{
+				tag => 'groups default',
+				namespace => 'WebGUI'
+			}
+		],
+	},
 	'group add/edit' => {
 		title => '667',
 		body => '622',

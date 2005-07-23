@@ -426,7 +426,7 @@ sub www_editGrouping {
 		-value=>WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid})
 		);
 	$f->submit;
-        return _submenu($f->print,'370');
+        return _submenu($f->print,'370','grouping edit');
 }
 
 #-------------------------------------------------------------------

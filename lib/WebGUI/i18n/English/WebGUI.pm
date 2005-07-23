@@ -594,6 +594,40 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
+	'grouping edit title' => {
+		message => q|Grouping, Edit|,
+		lastUpdated => 1122079302
+	},
+
+	'grouping edit body' => {
+		message => q|You can set how long a user is in a group, or assign them to be a group
+		admin.|,
+		lastUpdated => 1122079302
+	},
+
+        '50 description' => {
+                message => q|The name of the user.|,
+                lastUpdated => 1122088999,
+        },
+
+        '84 description groupings' => {
+                message => q|The name of the group.|,
+                lastUpdated => 1122088999,
+        },
+
+        '369 description' => {
+                message => q|When the user's membership in the group expires.|,
+                lastUpdated => 1122088999,
+        },
+
+        '977 description' => {
+                message => q|Set this to yes to make this user a secondary admin.  Secondary admins have the ability
+to add or remove user from their groups.
+		|,
+                lastUpdated => 1122088999,
+        },
+
+
 	'309' => {
 		message => q|Allow real name?|,
 		lastUpdated => 1031514049
@@ -1692,6 +1726,7 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		message => q|Clipboard, Manage|,
 		lastUpdated => 1052850265
 	},
+
         '84 description' => {
                 message => q|A name for the group. It is best if the name is descriptive so you know what it is at a glance.
 <p>|,
