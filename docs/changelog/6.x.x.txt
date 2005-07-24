@@ -37,6 +37,8 @@
    subclasses.
  - fix [ 1239601 ] Thread::getName is not Internationalized (and many other Assets, too)
  - fix [ 1240316 ] Doc erro in Folder template thumbnail => thumbnail.url
+ - The Navigation template variable "unfolded_page_loop" was removed a long
+   time ago, but the documentation was never updated until now.
 
 
 6.6.4
