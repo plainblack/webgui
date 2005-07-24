@@ -124,7 +124,7 @@ sub view {
 	my $children = $self->getLineage( ["children"], { returnObjects=>1 });
 	my %vars;
 	foreach my $child (@{$children}) {
-		if (ref $child eq "WebGUI::Asset::Wobject::Folder") {
+		if (ref($child) eq "WebGUI::Asset::Wobject::Folder") {
 			push(@{$vars{"subfolder_loop"}}, {
 				id => $child->getId,
 				url => $child->getUrl,
@@ -133,9 +133,9 @@ sub view {
 				"icon.big"=>$child->getIcon
 				});
 		} else {
-			my $isImage = (ref $child =~ /^WebGUI::Asset::File::Image/);
+			my $isImage = (ref($child) =~ /^WebGUI::Asset::File::Image/);
 			my $thumbnail = $child->getThumbnailUrl if ($isImage);
-			my $isFile = (ref $child =~ /^WebGUI::Asset::File/);
+			my $isFile = (ref($child) =~ /^WebGUI::Asset::File/);
 			my $file = $child->getFileUrl if ($isFile);
 			push(@{$vars{"file_loop"}},{
 				id=>$child->getId,
