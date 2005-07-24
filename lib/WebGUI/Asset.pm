@@ -3408,12 +3408,14 @@ sub www_manageAssets {
 			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."','');\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
-			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');\n";
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');
+			assetManager.addAssetMetaData('".$child->getUrl("func=manageAssets")."', '".$self->getRank."');\n";
 	}
 	$output .= '
 		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
+		assetManager.initializeDragEventHandlers();
 		assetManager.Write();        
                 var assetListSelectAllToggle = false;
                 function toggleAssetListSelectAll(form){
