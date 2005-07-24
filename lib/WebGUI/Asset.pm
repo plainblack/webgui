@@ -3409,7 +3409,7 @@ sub www_manageAssets {
 			."','".formatBytes($child->get("assetSize"))."','');\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');
-			assetManager.addAssetMetaData('".$child->getUrl("func=manageAssets")."', '".$self->getRank."');\n";
+			assetManager.addAssetMetaData('".$child->getUrl("func=manageAssets")."', '".$child->getRank."');\n";
 	}
 	$output .= '
 		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
