@@ -114,13 +114,13 @@ sub www_editDatabaseLink {
 		-value => $db{DSN},
         );
         $f->text(
-		-name => "username",
+		-name => "dbusername",
 		-label => WebGUI::International::get(994),
 		-hoverHelp => WebGUI::International::get('994 description'),
 		-value => $db{username},
         );
         $f->password(
-		-name => "identifier",
+		-name => "dbidentifier",
 		-label => WebGUI::International::get(995),
 		-hoverHelp => WebGUI::International::get('995 description'),
 		-value => $db{identifier},
@@ -138,7 +138,7 @@ sub www_editDatabaseLinkSave {
 		WebGUI::SQL->write("insert into databaseLink (databaseLinkId) values (".quote($session{form}{dlid}).")");
 	}
 	    WebGUI::SQL->write("update databaseLink set title=".quote($session{form}{title}).", DSN=".quote($session{form}{DSN}).",
-		username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier})." where databaseLinkId=".quote($session{form}{dlid}));
+		username=".quote($session{form}{dbusername}).", identifier=".quote($session{form}{dbidentifier})." where databaseLinkId=".quote($session{form}{dlid}));
         return www_listDatabaseLinks();
 }
 
