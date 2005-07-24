@@ -85,7 +85,7 @@ sub www_editLDAPLink {
    $f->text("ldapLinkName",WebGUI::International::get("LDAPLink_992","AuthLDAP"),$db{ldapLinkName});
    $f->text("ldapUrl",WebGUI::International::get("LDAPLink_993","AuthLDAP"),$db{ldapUrl});
    $f->text("connectDn",WebGUI::International::get("LDAPLink_994","AuthLDAP"),$db{connectDn});
-   $f->password("identifier",WebGUI::International::get("LDAPLink_995","AuthLDAP"),$db{identifier});
+   $f->password("ldapidentifier",WebGUI::International::get("LDAPLink_995","AuthLDAP"),$db{identifier});
    
    $f->text("ldapUserRDN",WebGUI::International::get(9,'AuthLDAP'),$db{ldapUserRDN});
    $f->text("ldapIdentity",WebGUI::International::get(6,'AuthLDAP'),$db{ldapIdentity});
@@ -133,7 +133,7 @@ sub www_editLDAPLinkSave {
    $properties->{ldapLinkName} = $session{form}{ldapLinkName};
    $properties->{ldapUrl} = $session{form}{ldapUrl};
    $properties->{connectDn} = $session{form}{connectDn};
-   $properties->{identifier} = $session{form}{identifier};
+   $properties->{identifier} = $session{form}{ldapidentifier};
    $properties->{ldapUserRDN} = $session{form}{ldapUserRDN};
    $properties->{ldapIdentity} = $session{form}{ldapIdentity};
    $properties->{ldapIdentityName} = $session{form}{ldapIdentityName};

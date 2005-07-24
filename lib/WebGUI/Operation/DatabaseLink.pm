@@ -85,16 +85,14 @@ sub www_editDatabaseLink {
 	} else {
                	%db = WebGUI::SQL->quickHash("select * from databaseLink where databaseLinkId=".quote($session{form}{dlid}));
 	}
-	$f = WebGUI::HTMLForm->new(
-		-extras=>'autocomplete="off"'
-		);
+	$f = WebGUI::HTMLForm->new();
         $f->hidden("op","editDatabaseLinkSave");
         $f->hidden("dlid",$session{form}{dlid});
 	$f->readOnly($session{form}{dlid},WebGUI::International::get(991));
         $f->text("title",WebGUI::International::get(992),$db{title});
         $f->text("DSN",WebGUI::International::get(993),$db{DSN});
-        $f->text("username",WebGUI::International::get(994),$db{username});
-        $f->password("identifier",WebGUI::International::get(995),$db{identifier});
+        $f->text("dbusername",WebGUI::International::get(994),$db{username});
+        $f->password("dbidentifier",WebGUI::International::get(995),$db{identifier});
         $f->submit;
 	$output .= $f->print;
         return _submenu($output,"990","database link add/edit");
@@ -108,7 +106,7 @@ sub www_editDatabaseLinkSave {
 		WebGUI::SQL->write("insert into databaseLink (databaseLinkId) values (".quote($session{form}{dlid}).")");
 	}
 	    WebGUI::SQL->write("update databaseLink set title=".quote($session{form}{title}).", DSN=".quote($session{form}{DSN}).",
-		username=".quote($session{form}{username}).", identifier=".quote($session{form}{identifier})." where databaseLinkId=".quote($session{form}{dlid}));
+		username=".quote($session{form}{dbusername}).", identifier=".quote($session{form}{dbidentifier})." where databaseLinkId=".quote($session{form}{dlid}));
         return www_listDatabaseLinks();
 }
 
