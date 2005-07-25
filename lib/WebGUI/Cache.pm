@@ -72,7 +72,7 @@ sub deleteChunk {
 
 =head2 flush ( )
 
-Flushes the caching system. Must be overloaded.
+Flushes the caching system. Must be overridden.
 
 =cut
 

@@ -78,6 +78,11 @@ sub definition {
 				fieldType=>"text",
                                 defaultValue=>undef
                                 },
+			cookieJarStorageId=>{
+                                noFormPost=>1,
+                                fieldType=>"hidden",
+                                defaultValue=>undef
+                                }
 			}
 		});
         return $class->SUPER::definition($definition);
@@ -302,7 +307,7 @@ sub view {
 		$var{content} = $1 || $var{content};
 		$var{"content.trailing"} = $2;
 	}
-         my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"));
+         my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl);
          $var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
          $p->DESTROY; 
    
@@ -348,5 +353,18 @@ sub www_edit {
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("2","Asset_HttpProxy"));
 }
 
+#-------------------------------------------------------------------
+
+sub www_view {
+        my $self = shift;
+        my $output = $self->view;
+        return WebGUI::Privilege::noAccess() unless $self->canView;
+        # this is s a stop gap. we need to do something here that deals with the real www_view and caching, etc.
+        if (WebGUI::HTTP::getMimeType() ne "text/html") {
+                return $output;
+        } else {
+                return $self->processStyle($output);
+        }
+}
 
 1;
