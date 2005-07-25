@@ -407,13 +407,23 @@ sub getQuestionVars {
 		name=>'comment_'.$questionId
 		});
 	$var{'question.comment.label'} = WebGUI::International::get(51,'Asset_Survey');
-	if ($question->{answerFieldType} eq "text") {
-		my ($answer) = WebGUI::SQL->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".quote($question->{Survey_questionId})); 
-		$var{'question.answer.field'} = WebGUI::Form::hidden({
+
+	my $answer;
+	($answer) = WebGUI::SQL->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".quote($question->{Survey_questionId}));
+	$var{'question.answer.field'} = WebGUI::Form::hidden({
 			name=>'answerId_'.$questionId,
 			value=>$answer
 			});
+	if ($question->{answerFieldType} eq "text") {
 		$var{'question.answer.field'} .= WebGUI::Form::text({
+			name=>'textResponse_'.$questionId
+			});
+	} elsif ($question->{answerFieldType} eq "HTMLArea") {
+		$var{'question.answer.field'} .= WebGUI::Form::HTMLArea({
+			name=>'textResponse_'.$questionId
+			});
+	} elsif ($question->{answerFieldType} eq "textArea") {
+		$var{'question.answer.field'} .= WebGUI::Form::textarea({
 			name=>'textResponse_'.$questionId
 			});
 	} else {
@@ -827,6 +837,8 @@ sub www_editQuestion {
                         "addBooleanAnswer"		=> WebGUI::International::get(25,'Asset_Survey'),
                         "addFrequencyAnswer"		=> WebGUI::International::get(26,'Asset_Survey'),
                         "addOpinionAnswer"		=> WebGUI::International::get(27,'Asset_Survey'),
+                        "addHTMLAreaAnswer"		=> WebGUI::International::get(100,'Asset_Survey'),
+                        "addTextAreaAnswer"		=> WebGUI::International::get(101,'Asset_Survey'),
 			#"addQuestion"			=> WebGUI::International::get(28,'Asset_Survey'),
                         "backToPage"			=> WebGUI::International::get(745,'Asset_Survey')
 			);
@@ -838,7 +850,11 @@ sub www_editQuestion {
 	}
 	$f->submit;
 	my $output = $f->print;
-	if ($question->{Survey_questionId} ne "new" && $question->{answerFieldType} ne "text") {
+	if ($question->{Survey_questionId} ne "new" 
+	   && $question->{answerFieldType} ne "text" 
+	   && $question->{answerFieldType} ne "HTMLArea"
+	   && $question->{answerFieldType} ne "textArea"
+	) {
 		$output .= '<a href="'.$self->getUrl('func=editAnswer&aid=new&qid='
 			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,'Asset_Survey').'</a><p />';
 		$sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
@@ -893,6 +909,12 @@ sub www_editQuestionSave {
                 $_[0]->addAnswer(42,$session{form}{qid});
                 $_[0]->addAnswer(43,$session{form}{qid});
                 $_[0]->addAnswer(39,$session{form}{qid});
+	} elsif ($session{form}{proceed} eq "addHTMLAreaAnswer") {
+		$_[0]->setAnswerType("HTMLArea",$session{form}{qid});
+		$_[0]->addAnswer(0,$session{form}{qid});
+	} elsif ($session{form}{proceed} eq "addTextAreaAnswer") {
+		$_[0]->setAnswerType("textArea",$session{form}{qid});
+		$_[0]->addAnswer(0,$session{form}{qid});
 	} elsif ($session{form}{proceed} eq "addQuestion") {
 		$session{form}{qid} = "new";
                 return $_[0]->www_editQuestion();

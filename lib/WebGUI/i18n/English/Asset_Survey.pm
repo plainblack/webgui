@@ -1,10 +1,22 @@
 package WebGUI::i18n::English::Asset_Survey;
 
 our $I18N = {
+
+	'100' => {
+		message => q|Add a HTML Area Answer|,
+		lastUpdated => 1122296097
+	},
+	
+	'101' => {
+	        message => q|Add a Text Area Answer|,
+	        lastUpdated => 1122296097
+        },
+
 	'32' => {
 		message => q|False|,
 		lastUpdated => 1037498832
 	},
+
 
 	'33' => {
 		message => q|Strongly Agree|,
