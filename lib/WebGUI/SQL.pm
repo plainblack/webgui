@@ -39,7 +39,7 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  use WebGUI::SQL;
 
  my $sth = WebGUI::SQL->prepare($sql);
- $sth->execute(@values);
+ $sth->execute([ @values ]);
 
  $sth = WebGUI::SQL->read($sql);
  $sth = WebGUI::SQL->unconditionalRead($sql);
