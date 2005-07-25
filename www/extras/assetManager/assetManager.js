@@ -288,7 +288,7 @@ function AssetManager_dragStart(firedobj,xCoordinate,yCoordinate) {
  
     this.focusObject=firedobj;
     this.bringToFront(document.getElementById("dragImage"));
-    document.getElementById("dragImage").innerHTML = "&nbsp;&nbsp;" + firedobj.id + "&nbsp;&nbsp;";
+    document.getElementById("dragImage").innerHTML = "&nbsp;&nbsp;" + firedobj.metaData.title + "&nbsp;&nbsp;";
     this.x=xCoordinate;
     this.y=yCoordinate;
     
@@ -394,7 +394,8 @@ function AssetManager_spy(x,y) {
             fObj=fObj.offsetParent;
         }
                                                                                     
-        if (x >x1 && x < (x1 + obj.offsetWidth)) {
+	var fudge = 13;
+        if (x >(x1 + fudge) && x < (x1 + obj.offsetWidth + fudge)) {
 			//add 13 pixels for ie since border widths are included in calculation
 			//var fudge = this.dom? 0:13;
 			var fudge = 13;
@@ -456,10 +457,11 @@ function AssetManager_adjustScrollBars(e) {
 
 //adds the asset meta data to an array.  When the write method is called, the meta
 //data is appended to the draggable divs as a meta data property
-function AssetManager_addAssetMetaData(url, rank) {
+function AssetManager_addAssetMetaData(url, rank,title) {
     var obj = new Object();
     obj.url = url;
-    obj.rank = rank;                            
+    obj.rank = rank;
+    obj.title = title;
     this.metaData[rank-1] = obj;
     
 }
@@ -481,7 +483,7 @@ function AssetManager_documentMouseDown(e) {
     if (e.button != 2) {
     	assetManager.dragStart(obj,e.clientX,e.clientY);
     }
-    return true;
+    return false;
 } 
 
 /* called on document mouse up.  Gets a reference to the asset manager and passes in event*/
