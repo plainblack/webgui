@@ -1,4 +1,4 @@
-package WebGUI::Operation::Settings;
+PACKAge WebGUI::Operation::Settings;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2005 Plain Black Corporation.
@@ -84,7 +84,7 @@ sub www_editSettings {
 	$tabform->getTab("content")->text(
 		-name=>"urlExtension",
 		-value=>$session{setting}{urlExtension},
-		-label=>$i18n->get("url extension")
+		-label=>$i18n->get("url extension"),
 		);
         $tabform->getTab("content")->integer(
 		-name=>"maxAttachmentSize",
@@ -179,7 +179,7 @@ sub www_editSettings {
 			sitename=>$i18n->get(1070),
 			HTTP_HOST=>$i18n->get(1071)
 			},
-		-label=>$i18n->get(1069)
+		-label=>$i18n->get(1069),
 		);
 # user settings
 	$tabform->getTab("user")->yesNo(

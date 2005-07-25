@@ -145,35 +145,35 @@ sub www_editLDAPLink {
    $f->yesNo(
              -name=>"ldapSendWelcomeMessage",
              -value=>$db{ldapSendWelcomeMessage},
-             -label=>WebGUI::International::get(868,"AuthLDAP")
-             -hoverHelp=>WebGUI::International::get('868 description',"AuthLDAP")
+             -label=>WebGUI::International::get(868,"AuthLDAP"),
+             -hoverHelp=>WebGUI::International::get('868 description',"AuthLDAP"),
              );
    $f->textarea(
                 -name=>"ldapWelcomeMessage",
                 -value=>$db{ldapWelcomeMessage},
-                -label=>WebGUI::International::get(869,"AuthLDAP")
-                -hoverHelp=>WebGUI::International::get('869 description',"AuthLDAP")
+                -label=>WebGUI::International::get(869,"AuthLDAP"),
+                -hoverHelp=>WebGUI::International::get('869 description',"AuthLDAP"),
                );
 	$f->template(
 		-name=>"ldapAccountTemplate",
 		-value=>$db{ldapAccountTemplate},
 		-namespace=>"Auth/LDAP/Account",
-		-label=>WebGUI::International::get("account template","AuthLDAP")
-		-hoverHelp=>WebGUI::International::get("account template description","AuthLDAP")
+		-label=>WebGUI::International::get("account template","AuthLDAP"),
+		-hoverHelp=>WebGUI::International::get("account template description","AuthLDAP"),
 		);
 	$f->template(
 		-name=>"ldapCreateAccountTemplate",
 		-value=>$db{ldapCreateAccountTemplate},
 		-namespace=>"Auth/LDAP/Create",
-		-label=>WebGUI::International::get("create account template","AuthLDAP")
-		-hoverHelp=>WebGUI::International::get("create account template description","AuthLDAP")
+		-label=>WebGUI::International::get("create account template","AuthLDAP"),
+		-hoverHelp=>WebGUI::International::get("create account template description","AuthLDAP"),
 		);
 	$f->template(
 		-name=>"ldapLoginTemplate",
 		-value=>$db{ldapLoginTemplate},
 		-namespace=>"Auth/LDAP/Login",
-		-label=>WebGUI::International::get("login template","AuthLDAP")
-		-hoverHelp=>WebGUI::International::get("login template description","AuthLDAP")
+		-label=>WebGUI::International::get("login template","AuthLDAP"),
+		-hoverHelp=>WebGUI::International::get("login template description","AuthLDAP"),
 		);
    
    $f->submit;

@@ -270,26 +270,26 @@ sub www_editGroup {
 	$f->yesNo(
 		-name=>"expireNotify",
 		-value=>$g->expireNotify,
-		-label=>WebGUI::International::get(865)
-		-hoverHelp=>WebGUI::International::get('865 description')
+		-label=>WebGUI::International::get(865),
+		-hoverHelp=>WebGUI::International::get('865 description'),
 		);
 	$f->integer(
 		-name=>"expireNotifyOffset",
 		-value=>$g->expireNotifyOffset,
-		-label=>WebGUI::International::get(864)
-		-hoverHelp=>WebGUI::International::get('864 description')
+		-label=>WebGUI::International::get(864),
+		-hoverHelp=>WebGUI::International::get('864 description'),
 		);
         $f->textarea(
                 -name=>"expireNotifyMessage",
 		-value=>$g->expireNotifyMessage,
-		-label=>WebGUI::International::get(866)
-		-hoverHelp=>WebGUI::International::get('866 description')
+		-label=>WebGUI::International::get(866),
+		-hoverHelp=>WebGUI::International::get('866 description'),
                 );
         $f->integer(
                 -name=>"deleteOffset",
                 -value=>$g->deleteOffset,
-                -label=>WebGUI::International::get(863)
-                -hoverHelp=>WebGUI::International::get('863 description')
+                -label=>WebGUI::International::get(863),
+                -hoverHelp=>WebGUI::International::get('863 description'),
                 );
 	if ($session{setting}{useKarma}) {
 		$f->integer(
@@ -302,14 +302,14 @@ sub www_editGroup {
 	$f->textarea(
 		-name=>"ipFilter",
 		-value=>$g->ipFilter,
-		-label=>WebGUI::International::get(857)
-		-hoverHelp=>WebGUI::International::get('857 description')
+		-label=>WebGUI::International::get(857),
+		-hoverHelp=>WebGUI::International::get('857 description'),
 		);
 	$f->textarea(
 		-name=>"scratchFilter",
 		-value=>$g->scratchFilter,
-		-label=>WebGUI::International::get(945)
-		-hoverHelp=>WebGUI::International::get('945 description')
+		-label=>WebGUI::International::get(945),
+		-hoverHelp=>WebGUI::International::get('945 description'),
 		);
 	if ($session{form}{gid} eq "3") {
 		$f->hidden(
@@ -324,14 +324,14 @@ sub www_editGroup {
 		$f->yesNo(
 			-name=>"autoAdd",
 			-value=>$g->autoAdd,
-			-label=>WebGUI::International::get(974)
-			-hoverHelp=>WebGUI::International::get('974 description')
+			-label=>WebGUI::International::get(974),
+			-hoverHelp=>WebGUI::International::get('974 description'),
 			);
 		$f->yesNo(
 			-name=>"autoDelete",
 			-value=>$g->autoDelete,
-			-label=>WebGUI::International::get(975)
-			-hoverHelp=>WebGUI::International::get('975 description')
+			-label=>WebGUI::International::get(975),
+			-hoverHelp=>WebGUI::International::get('975 description'),
 			);
 	}
 	$f->databaseLink(
@@ -340,8 +340,8 @@ sub www_editGroup {
 	$f->textarea(
 		-name=>"dbQuery",
 		-value=>$g->dbQuery,
-		-label=>WebGUI::International::get(1005)
-		-hoverHelp=>WebGUI::International::get('1005 description')
+		-label=>WebGUI::International::get(1005),
+		-hoverHelp=>WebGUI::International::get('1005 description'),
 		);
 	$f->text(
 	       -name=>"ldapGroup",
@@ -447,16 +447,19 @@ sub www_emailGroup {
 	$f->email(
 		-name=>"from",
 		-value=>$session{setting}{companyEmail},
-		-label=>WebGUI::International::get(811)
+		-label=>WebGUI::International::get(811),
+		-hoverHelp=>WebGUI::International::get('811 description'),
 		);
 	$f->text(
 		-name=>"subject",
-		-label=>WebGUI::International::get(229)
+		-label=>WebGUI::International::get(229),
+		-hoverHelp=>WebGUI::International::get('229 description'),
 		);
 	$f->textarea(
 		-name=>"message",
 		-label=>WebGUI::International::get(230),
-		-rows=>(5+$session{setting}{textAreaRows})
+		-hoverHelp=>WebGUI::International::get('230 description'),
+		-rows=>(5+$session{setting}{textAreaRows}),
 		);
 	$f->submit(WebGUI::International::get(810));
 	$output = $f->print;

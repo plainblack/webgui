@@ -120,7 +120,7 @@ sub www_editProfileCategory {
 	$f->yesNo(
 		-name=>"editable",
 		-value=>$data{editable},
-		-label=>WebGUI::International::get(897,"WebGUIProfile")
+		-label=>WebGUI::International::get(897,"WebGUIProfile"),
 		);
 	$f->submit;
 	$output .= $f->print;
@@ -170,7 +170,7 @@ sub www_editProfileField {
 	$f->yesNo(
                 -name=>"editable",
                 -value=>$data{editable},
-                -label=>WebGUI::International::get(897,"WebGUIProfile")
+                -label=>WebGUI::International::get(897,"WebGUIProfile"),
                 );
 	$f->yesNo(
 		-name=>"required",
