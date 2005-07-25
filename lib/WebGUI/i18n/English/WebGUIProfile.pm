@@ -12,7 +12,12 @@ our $I18N = {
 	},
 
 	'470' => {
-		message => q|Name|,
+		message => q|Category Name|,
+		lastUpdated => 1031514049
+	},
+
+	'475' => {
+		message => q|Field Name|,
 		lastUpdated => 1031514049
 	},
 
@@ -41,16 +46,52 @@ our $I18N = {
 		lastUpdated => 1036964807
 	},
 
-	'627' => {
-		message => q|Profiles are used to extend the information of a particular user. In some cases profiles are important to a site, in others they are not. The profiles system is completely extensible. You can add as much information to the users profile as you like.
-<p>
+        '475 description' => {
+                message => q|The name of the field, used internally in the database.|,
+                lastUpdated => 1122316558,
+        },
 
+        '472 description' => {
+                message => q|A short, descriptive label displayed to the user.  This can be a call to WebGUI's
+Internationalizaton system if labels need to be localized.|,
+                lastUpdated => 1122316558,
+        },
+
+        '474 description' => {
+                message => q|Should the user be required to fill out this field?|,
+                lastUpdated => 1122316558,
+        },
+
+        '486 description' => {
+                message => q|Choose the type of form element for this field.   This is also used
+to validate any input that the user may supply.|,
+                lastUpdated => 1122316558,
+        },
+
+        '487 description' => {
+                message => q|This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.|,
+                lastUpdated => 1122316558,
+        },
+
+        '488 description' => {
+                message => q|Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
+                lastUpdated => 1122316558,
+        },
+
+        '489 description' => {
+                message => q|Select a category to place this field under.|,
+                lastUpdated => 1122316558,
+        },
+
+	'627' => {
+		message => q|Profiles are used to extend the information of a particular user. In some cases profiles are important to a site, in others they are not. The profiles system is completely extensible. You can add as much information to the user profiles as you like.
+<p>
 |,
-		lastUpdated => 1031514049
+		lastUpdated => 1122316616
 	},
 
 	'492' => {
-		message => q|Profile fields list.|,
+		message => q|Profile fields list|,
 		lastUpdated => 1031514049
 	},
 
@@ -153,8 +194,8 @@ How should this user be notified when they get a new WebGUI message?
 	},
 
 	'672' => {
-		message => q|Profile Settings, Edit|,
-		lastUpdated => 1031514049
+		message => q|User Profile Settings, Edit|,
+		lastUpdated => 1122315465
 	},
 
 	'466' => {
@@ -165,6 +206,35 @@ How should this user be notified when they get a new WebGUI message?
 	'468' => {
 		message => q|Edit User Profile Category|,
 		lastUpdated => 1031514049
+	},
+
+        '470 description' => {
+                message => q|The name of the this category.|,
+                lastUpdated => 1122315199,
+        },
+
+        '473 description' => {
+                message => q|Should the category be visible to users?|,
+                lastUpdated => 1122315199,
+        },
+
+        '897 description' => {
+                message => q|Should the category be editable by users?|,
+                lastUpdated => 1122315199,
+        },
+
+	'user profile category add/edit title' => {
+		message => q|User Profile Category, Add/Edit|,
+		lastUpdated => 1122314930
+	},
+
+	'user profile category add/edit body' => {
+		message => q|
+WebGUI's user profile is completely configurable, including the ability to add
+new categories of profile settings.
+
+|,
+		lastUpdated => 1122314932
 	},
 
 	'489' => {

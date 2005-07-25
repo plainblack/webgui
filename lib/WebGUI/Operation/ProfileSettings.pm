@@ -95,23 +95,28 @@ sub www_editProfileCategory {
 	my ($output, $f, %data);
 	tie %data, 'Tie::CPHash';
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden("op","editProfileCategorySave");
+	$f->hidden(
+		-name => "op",
+		-value => "editProfileCategorySave",
+	);
 	if ($session{form}{cid}) {
 		$f->hidden(
 			-name => "cid",
 			-value => $session{form}{cid},
 		);
-		$f->readOnly($session{form}{cid},WebGUI::International::get(469,"WebGUIProfile"));
 		$f->readOnly(
-		-name => $session{form}{cid}_v,
-		-label => WebGUI::International::get(469_s,
-		-value => "WebGUIProfile"_q,
+			-name => $session{form}{cid},
+			-label => WebGUI::International::get(469,"WebGUIProfile");
 		);
 		%data = WebGUI::SQL->quickHash("select * from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
 	} else {
                 $f->hidden("cid","new");
 	}
-	$f->text("categoryName",WebGUI::International::get(470,"WebGUIProfile"),$data{categoryName});
+	$f->text(
+		-name => "categoryName",
+		-label => WebGUI::International::get(470,"WebGUIProfile"),
+		-value => $data{categoryName},
+	);
 	$f->yesNo(
                 -name=>"visible",
                 -label=>WebGUI::International::get(473,"WebGUIProfile"),
@@ -124,7 +129,7 @@ sub www_editProfileCategory {
 		);
 	$f->submit;
 	$output .= $f->print;
-	return _submenu($output,'468');
+	return _submenu($output,'468','user profile category add/edit','WebGUIProfile');
 }
 
 #-------------------------------------------------------------------
@@ -152,39 +157,75 @@ sub www_editProfileField {
 	my ($output, $f, %data, %hash, $key);
 	tie %data, 'Tie::CPHash';
         $f = WebGUI::HTMLForm->new;
-        $f->hidden("op","editProfileFieldSave");
+        $f->hidden(
+		-name => "op",
+		-value => "editProfileFieldSave",
+        );
 	if ($session{form}{fid} ne 'new') {
-              	$f->hidden("fid",$session{form}{fid});
-		$f->readOnly($session{form}{fid},WebGUI::International::get(470,"WebGUIProfile"));
+              	$f->hidden(
+			-name => "fid",
+			-value => $session{form}{fid},
+              	);
+		$f->readOnly(
+			-value => $session{form}{fid},
+			-label => WebGUI::International::get(475,"WebGUIProfile"),
+			-hoverHelp => WebGUI::International::get('475 description',"WebGUIProfile"),
+		);
 		%data = WebGUI::SQL->quickHash("select * from userProfileField where fieldName=".quote($session{form}{fid}));
 	} else {
-               	$f->hidden("new",1);
-               	$f->text("fid",WebGUI::International::get(470,"WebGUIProfile"));
+               	$f->hidden(
+			-name => "new",
+			-value => 1,
+               	);
+               	$f->text(
+			-name => "fid",
+			-label => WebGUI::International::get(475,"WebGUIProfile"),
+			-hoverHelp => WebGUI::International::get('475 description',"WebGUIProfile"),
+               	);
 	}
-	$f->text("fieldLabel",WebGUI::International::get(472,"WebGUIProfile"),$data{fieldLabel});
+	$f->text(
+		-name => "fieldLabel",
+		-label => WebGUI::International::get(472,"WebGUIProfile"),
+		-hoverHelp => WebGUI::International::get('472 description',"WebGUIProfile"),
+		-value => $data{fieldLabel},
+	);
 	$f->yesNo(
 		-name=>"visible",
 		-label=>WebGUI::International::get(473,"WebGUIProfile"),
+		-hoverHelp=>WebGUI::International::get('473 description',"WebGUIProfile"),
 		-value=>$data{visible}
 		);
 	$f->yesNo(
                 -name=>"editable",
                 -value=>$data{editable},
                 -label=>WebGUI::International::get(897,"WebGUIProfile"),
+                -hoverHelp=>WebGUI::International::get('897 description',"WebGUIProfile"),
                 );
 	$f->yesNo(
 		-name=>"required",
 		-label=>WebGUI::International::get(474,"WebGUIProfile"),
+		-hoverHelp=>WebGUI::International::get('474 description',"WebGUIProfile"),
 		-value=>$data{required}
 		);
 	$f->fieldType(
 		-name=>"dataType",
 		-label=>WebGUI::International::get(486,"WebGUIProfile"),
+		-hoverHelp=>WebGUI::International::get('486 description',"WebGUIProfile"),
 		-value=>$data{dataType},
 		-defaultValue=>"text"
 		);
-	$f->textarea("dataValues",WebGUI::International::get(487,"WebGUIProfile"),$data{dataValues});
-	$f->textarea("dataDefault",WebGUI::International::get(488,"WebGUIProfile"),$data{dataDefault});
+	$f->textarea(
+		-name => "dataValues",
+		-label => WebGUI::International::get(487,"WebGUIProfile"),
+		-hoverHelp => WebGUI::International::get('487 description',"WebGUIProfile"),
+		-value => $data{dataValues},
+	);
+	$f->textarea(
+		-name => "dataDefault",
+		-label => WebGUI::International::get(488,"WebGUIProfile"),
+		-hoverHelp => WebGUI::International::get('488 description',"WebGUIProfile"),
+		-value => $data{dataDefault},
+	);
 	tie %hash, 'Tie::CPHash';
 	%hash = WebGUI::SQL->buildHash("select profileCategoryId,categoryName from userProfileCategory order by categoryName");
 	foreach $key (keys %hash) {
@@ -194,11 +235,12 @@ sub www_editProfileField {
 		-name=>"profileCategoryId",
 		-options=>\%hash,
 		-label=>WebGUI::International::get(489,"WebGUIProfile"),
+		-hoverHelp=>WebGUI::International::get('489 description',"WebGUIProfile"),
 		-value=>[$data{profileCategoryId}]
 		);
         $f->submit;
         $output .= $f->print;
-	return _submenu($output,'471',undef,"WebGUIProfile");
+	return _submenu($output,'471','profile settings edit',"WebGUIProfile");
 }
 
 #-------------------------------------------------------------------
@@ -271,7 +313,7 @@ sub www_editProfileSettings {
 		$b->finish;
 	}
 	$a->finish;
-	return _submenu($output,undef,"profile settings edit");
+	return _submenu($output,undef,"profile settings edit",'WebGUIProfile');
 }
 
 #-------------------------------------------------------------------
