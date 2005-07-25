@@ -231,7 +231,7 @@ sub getEditForm {
 	$tabform->getTab('display')->integer(
 		-name		=> "questionsPerPage",
 		-value		=> $self->getValue("questionsPerPage"),
-		-label		=> WebGUI::International::get(83,'Asset_Survey')
+		-label		=> WebGUI::International::get(83,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('83 description','Asset_Survey')
 		);
         $tabform->getTab('properties')->selectList(
@@ -247,25 +247,25 @@ sub getEditForm {
 	$tabform->getTab('properties')->yesNo(
 		-name		=> "anonymous",
                	-value		=> $self->getValue("anonymous"),
-               	-label		=> WebGUI::International::get(81,'Asset_Survey')
+               	-label		=> WebGUI::International::get(81,'Asset_Survey'),
                	-hoverHelp	=> WebGUI::International::get('81 description','Asset_Survey')
                	);
 	$tabform->getTab('properties')->integer(
 		-name		=> "maxResponsesPerUser",
 		-value		=> $self->getValue("maxResponsesPerUser"),
-		-label		=> WebGUI::International::get(84,'Asset_Survey')
+		-label		=> WebGUI::International::get(84,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('84 description','Asset_Survey')
 		);
 	$tabform->getTab('properties')->integer(
 		-name		=> "questionsPerResponse",
 		-value		=> $self->getValue("questionsPerResponse"),
-		-label		=> WebGUI::International::get(85,'Asset_Survey')
+		-label		=> WebGUI::International::get(85,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('85 description','Asset_Survey')
 		);	
 	$tabform->getTab('security')->group(
 		-name		=> "groupToTakeSurvey",
 		-value		=> [$self->getValue("groupToTakeSurvey")],
-		-label		=> WebGUI::International::get(12,'Asset_Survey')
+		-label		=> WebGUI::International::get(12,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('12 description','Asset_Survey')
 		);
         $tabform->getTab('security')->group(
@@ -280,7 +280,7 @@ sub getEditForm {
 				addQuestion=>WebGUI::International::get(28,'Asset_Survey'),
 				backToPage=>WebGUI::International::get(745,'Asset_Survey')
 				},
-			-value=>"addQuestion"
+			-value=>"addQuestion",
                         -hoverHelp	=> WebGUI::International::get('what next','Asset_Survey'),
 			);
 	}
@@ -702,14 +702,14 @@ sub www_editAnswer {
         $f->text(
                 -name=>"answer",
                 -value=>$answer->{answer},
-                -label=>WebGUI::International::get(19,'Asset_Survey')
+                -label=>WebGUI::International::get(19,'Asset_Survey'),
                 -hoverHelp=>WebGUI::International::get('19 description','Asset_Survey')
                 );
 	if ($self->get("mode") eq "quiz") {
         	$f->yesNo(
                 	-name=>"isCorrect",
                 	-value=>$answer->{isCorrect},
-                	-label=>WebGUI::International::get(20,'Asset_Survey')
+                	-label=>WebGUI::International::get(20,'Asset_Survey'),
                 	-hoverHelp=>WebGUI::International::get('20 description','Asset_Survey')
                 	);
 	} else {
@@ -723,7 +723,7 @@ sub www_editAnswer {
 			-name=>"gotoQuestion",
 			-options=>$question,
 			-value=>[$answer->{gotoQuestion}],
-			-label=>WebGUI::International::get(21,'Asset_Survey')
+			-label=>WebGUI::International::get(21,'Asset_Survey'),
 			-hoverHelp=>WebGUI::International::get('21 description','Asset_Survey')
 			);
 	}
@@ -738,7 +738,7 @@ sub www_editAnswer {
                         );
                 $f->whatNext(
                         -options=>\%options,
-                        -value=>"addAnswer"
+                        -value=>"addAnswer",
 			-hoverHelp=>WebGUI::International::get('what next answer description','Asset_Survey')
                         );
         }
@@ -790,19 +790,19 @@ sub www_editQuestion {
 	$f->HTMLArea(
 		-name	=> "question",
 		-value	=> $question->{question},
-		-label	=> WebGUI::International::get(14,'Asset_Survey')
+		-label	=> WebGUI::International::get(14,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('14 description','Asset_Survey')
 		);
 	$f->yesNo(
 		-name	=> "allowComment",
 		-value	=> $question->{allowComment},
-		-label	=> WebGUI::International::get(15,'Asset_Survey')
+		-label	=> WebGUI::International::get(15,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('15 description','Asset_Survey')
 		);
 	$f->yesNo(
 		-name	=> "randomizeAnswers",
 		-value	=> $question->{randomizeAnswers},
-		-label	=> WebGUI::International::get(16,'Asset_Survey')
+		-label	=> WebGUI::International::get(16,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('16 description','Asset_Survey')
 		);
 	if ($self->get("questionOrder") eq "response") {
@@ -813,7 +813,7 @@ sub www_editQuestion {
 			-name	=> "gotoQuestion",
 			-options=> $ql,
 			-value	=> [$question->{gotoQuestion}],
-			-label	=> WebGUI::International::get(21,'Asset_Survey')
+			-label	=> WebGUI::International::get(21,'Asset_Survey'),
 			-hoverHelp	=> WebGUI::International::get('21 description','Asset_Survey')
 			);
 	}
@@ -832,7 +832,7 @@ sub www_editQuestion {
 			);
         	$f->whatNext(
                 	-options=> \%options,
-                	-value	=> "addMultipleChoiceAnswer"
+                	-value	=> "addMultipleChoiceAnswer",
 			-hoverHelp	=> WebGUI::International::get('what next question description','Asset_Survey')
                 	);
 	}
