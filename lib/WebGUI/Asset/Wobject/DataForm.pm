@@ -840,8 +840,8 @@ sub www_editField {
 	$f->text(
 		-name=>"extras",
 		-value=>$field{extras},
-		-label=>WebGUI::International::get('editField-extras-label', "Asset_DataForm")
-		-hoverHelp=>WebGUI::International::get('editField-extras-label description', "Asset_DataForm")
+		-label=>WebGUI::International::get('editField-extras-label', "Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('editField-extras-label description', "Asset_DataForm"),
 		);
         $f->textarea(
 		-name=>"possibleValues",
