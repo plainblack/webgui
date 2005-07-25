@@ -4,6 +4,7 @@
  - fix [ 1240325 ] FilePile doesn't create thumbnail when upload images (mwilson)
  - fix [ 1240324 ] Folder.pm error evaluating $isImage (ebruni)
  - fix [ 1240140 ] Database link username in 6.6.3 is wrong (mwilson)
+ - Fixed a bug where HTTP Proxy asset couldn't proxy images properly.
 
 6.6.4
  - fix [ 1238539 ] REQUEST_URI broken in WRE

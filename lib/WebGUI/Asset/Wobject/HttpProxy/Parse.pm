@@ -20,31 +20,22 @@ use vars qw(@ISA);
 @ISA = qw(HTML::Parser);
 
  
-my %linkElements =            # from HTML::Element.pm
-  (
-   body   => 'background',
-   base   => 'href',
-   a      => 'href',
-   img    => [qw('src' 'lowsrc' 'usemap')], # lowsrc is a Netscape invention
-   form   => 'action',
-   input  => 'src',
-   'link'  => 'href',         # need quoting since link is a perl builtin
-   frame  => 'src',
-   iframe => 'src',
-   applet => 'codebase',
-   area   => 'href',
-   script   => 'src',
-   iframe  => 'src',
-  );
-  
-my %tag_attr;
-for my $tag (keys %linkElements) {
-  my $tagval = $linkElements{$tag};
-  for my $attr (ref $tagval ? @$tagval : $tagval) {
-    $tag_attr{"$tag $attr"}++;
-  }
-}
-
+my %tag_attr = (
+	"body background" => 1,
+	"base href" => 1,
+	"a href" => 1,
+	"img src" => 1,
+	"img lowsrc" => 1,
+	"img usemap" => 1,
+	"form action" => 1,
+	"input src" => 1,
+	"link href" => 1,
+	"frame src" => 1,
+	"applet codebase" => 1,
+	"iframe src" => 1,
+	"area href" => 1,
+	"script src" => 1
+	);
 
 sub new {
   	my $pack = shift;
@@ -53,6 +44,7 @@ sub new {
   	$self->{Content} = shift;
   	$self->{assetId} = shift;
 	$self->{rewriteUrls} = shift;
+	$self->{assetUrl} = shift;
   	$self->{Filtered} ="";
   	$self->{FormAction} = "";
   	$self->{FormActionIsDefined} = 0;
@@ -135,10 +127,10 @@ sub start {
           				if (lc($tag) eq "form" && lc($_) eq "action") {  # Found FORM ACTION
 	    					$self->{FormActionIsDefined}=1;
             					$self->{FormAction} = $val;  # set FormAction to include hidden field later
-            					$val = WebGUI::URL::page;    # Form Action returns to us
+            					$val = $self->{assetUrl};    # Form Action returns to us
           				} else {
 						$val =~ s/\n//g;	# Bugfix 757068
-            					$val = WebGUI::URL::page('proxiedUrl='.WebGUI::URL::escape($val).'&func=view'); # return to us
+            					$val = WebGUI::URL::append($self->{assetUrl},'proxiedUrl='.WebGUI::URL::escape($val).'&func=view'); # return to us
           				}
         			}
       			}
