@@ -17,6 +17,7 @@ package WebGUI::Form::checkList;
 use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::Form::checkbox;
+use WebGUI::Form::hiddenList;
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -141,7 +142,23 @@ sub toHtml {
         return $output;
 }
 
+#-------------------------------------------------------------------
 
+=head2 toHtmlAsHidden ( )
+
+Creates a series of hidden fields representing the data in the list.
+
+=cut
+
+sub toHtmlAsHidden {
+        my $self = shift;
+        return WebGUI::Form::hiddenList->new(
+                value=>$self->{value},
+                defaultValue=>$self->{defaultValue},
+                name=>$self->{name},
+                options=>$self->{options}
+                )->toHtmlAsHidden;
+}
 
 1;
 

@@ -3313,6 +3313,12 @@ Privileges and styles assigned to pages in the package will not be copied when t
                 context => q|Field type name|
         },
 
+	'hidden list' => {
+		message => q|Hidden List|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
 	'hidden' => {
 		message => q|Hidden|,
 		lastUpdated =>0,

@@ -38,163 +38,19 @@ Package that makes HTML forms typed data and significantly reduces the code need
  use WebGUI::HTMLForm;
  $f = WebGUI::HTMLForm->new;
 
- $f-asset(
-	-value=>$assetId,
-	-label=>"Pick an Asset"
+ $f->someFormControlType(
+	name=>"someName",
+	value=>"someValue"
 	);
- $f->button(
-	-value=>"Click me!",
-	-extras=>qq|onClick="alert('Aaaaaaaggggghh!!!!')"|
-	);
- $f->checkbox(
-	-name=>"whichOne",
-	-label=>"Is red your favorite?",
-	-value=>"red"
-	);
- $f->checkList(
-	-name=>"dayOfWeek",
-	-options=>\%days,
-	-label=>"Which day?"
-	);
- $f->codearea(
-	-name=>"stylesheet",
-	-label=>"Stylesheet"
-	);
- $f->color(
-	-name=>"highlightColor",
-	-label=>"Highlight Color"
-	);
- $f->combo(
-	-name=>"fruit",
-	-options=>\%fruit,
-	-label=>"Choose a fruit or enter your own."
-	);
- $f->contentType(
-	-name=>"contentType"
-	);
- $f->date(
-	-name=>"endDate",
-	-label=>"End Date",
-	-value=>$endDate
-	);
- $f->dateTime(
-	-name=>"endDate",
-	-label=>"End Date",
-	-value=>$endDate
-	);
-$f->dynamicField(text,
-        -name=>"firstName",
-        -label=>"First Name"
-        );
- $f->email(
-	-name=>"emailAddress",
-	-label=>"Email Address"
-	);
- $f->fieldType(
-	-name=>"dataType",
-	-label=>"Type of Field"
-	);
- $f->file(
-	-name=>"image",
-	-label=>"Image to Upload"
-	);
- $f->filterContent(
-	-name=>"filterThisContent",
-	-label=>"Filter This Content"
-	);
- $f->float(
-	-name=>"distance",
-	-label=>"5.1"
-	);
- $f->group(
-	-name=>"groupToPost",
-	-label=>"Who can post?"
-	);
- $f->hidden(
-	-name=>"wid",
-	-value=>"55"
-	);
- $f->HTMLArea(
-	-name=>"description",
-	-label=>"Description"
-	);
- $f->integer(
-	-name=>"size",
-	-label=>"Size"
-	);
- $f->interval(
-	-name=>"timeToLive",
-	-label=>"How long should this last?",
-	-intervalValue=>12,
-	-unitsValue=>"hours"
-	);
- $f->ldapLink(
-    -name=>"ldapLink",
-	-label="LDAP Connection"
-    )
- $f->password(
-	-name=>"identifier",
-	-label=>"Password"
-	);
- $f->phone(
-	-name=>"cellPhone",
-	-label=>"Cell Phone"
-	);
- $f->radio(
-	-name=>"whichOne",
-	-label=>"Is red your favorite?",
-	-value=>"red"
-	);
- $f->radioList(
-	-name=>"dayOfWeek",
-	-options=>\%days,
-	-label=>"Which day?"
-	);
- $f->raw(
-	-value=>"text"
-	);
- $f->readOnly(
-	-value=>"34",
-	-label=>"Page ID"
-	);
- $f->selectList(
-	-name=>"dayOfWeek",
-	-options=>\%days,
-	-label=>"Which day?"
-	);
- $f->submit;
- $f->template(
-	-name=>"templateId",
-	-label=>"Page Template"
-	);
+
+ Example:
+
  $f->text(
-	-name=>"firstName", 
-	-label=>"First Name"
+	name=>"title",
+	value=>"My Big Article"
 	);
- $f->textarea(
-	-name=>"emailMessage",
-	-label=>"Email Message"
-	);
- $f->timeField(
-	-name=>"endDate",
-	-label=>"End Date",
-	-value=>$endDate
-	);
- $f->url(
-	-name=>"homepage",
-	-label=>"Home Page"
-	);
- $f->whatNext(
-	-options=>\%options
-	);
- $f->yesNo(
-	-name=>"happy",
-	-label=>"Are you happy?"
-	);
- $f->zipcode(
-	-name=>"workZip",
-	-label=>"Office Zip Code"
-	);
+
+See the list of form control types for details on what's available.
 
  $f->trClass("class");		# Sets a Table Row class
 

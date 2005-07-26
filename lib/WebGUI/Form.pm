@@ -531,48 +531,6 @@ sub group {
 }
 
 
-#-------------------------------------------------------------------
-
-=head2 hiddenList ( hashRef )
-
-Returns a list of hidden fields. This is primarily to be used by the HTMLForm package, but we decided to make it a public method in case anybody else had a use for it.
-
-=head3 name
-
-The name of this field.
-
-=head3 options 
-
-A hash reference where the key is the "name" of the hidden field.
-
-=head3 value
-
-An array reference where each value in the array should be a name from the hash (if you want it to show up in the hidden list). 
-
-=head3 defaultValue
-
-This will be used if no value is specified. Should be passed as an array reference.
-
-=cut
-
-sub hiddenList {
-	my $params = shift;
-        my ($output, $key, $item);
-	my $values = $params->{value} || $params->{defaultValue};
-        foreach $key (keys %{$params->{options}}) {
-                foreach $item (@{$values}) {
-                        if ($item eq $key) {
-				$output .= hidden({
-					name=>$params->{name},
-					value=>$key
-					});
-                        }
-                }
-        }
-        return $output."\n";
-}
-
-
 
 #-------------------------------------------------------------------
 
