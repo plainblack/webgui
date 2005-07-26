@@ -1481,6 +1481,32 @@ One package that many people create is a Page/Article package. It is often the c
 		lastUpdated => 1037579611
 	},
 
+        '811 description' => {
+                message => q|Who the email is from.|,
+                lastUpdated => 1122093200,
+        },
+
+        '229 description' => {
+                message => q|The subject of the email.|,
+                lastUpdated => 1122093200,
+        },
+
+        '230 description' => {
+                message => q|The message that will be sent to all members of the group.  The email will not
+be in HTML format, and no attachments can be included.|,
+                lastUpdated => 1122093200,
+        },
+
+	'group email title' => {
+		message => q|Group, Email|,
+		lastUpdated => 1122092662
+	},
+
+	'group email body' => {
+		message => q|<p>This provides an easy way to contact all of the members of a group at once.</p> |,
+		lastUpdated => 1037579611
+	},
+
 	'332' => {
 		message => q|Work Zip Code|,
 		lastUpdated => 1031514049
@@ -3127,6 +3153,16 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	'88' => {
 		message => q|Users In Group|,
 		lastUpdated => 1031514049
+	},
+
+	'manage users in group title' => {
+		message => q|Users In Group|,
+		lastUpdated => 1122094682
+	},
+
+	'manage users in group body' => {
+		message => q||,
+		lastUpdated => 1122094683
 	},
 
 	'1009' => {

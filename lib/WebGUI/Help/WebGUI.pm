@@ -136,6 +136,29 @@ our $HELP = {
 			}
 		],
 	},
+	'group email' => {
+		title => 'group email title',
+		body => 'group email body',
+		fields => [
+                        {
+                                title => '811',
+                                description => '811 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '229',
+                                description => '229 description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => '230',
+                                description => '230 description',
+                                namespace => 'WebGUI',
+                        },
+		],
+		related => [
+		],
+	},
 	'group add/edit' => {
 		title => '667',
 		body => '622',
@@ -234,6 +257,10 @@ our $HELP = {
 		related => [
 			{
 				tag => 'groups manage',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'group email',
 				namespace => 'WebGUI'
 			},
 			{
@@ -455,6 +482,14 @@ our $HELP = {
 				tag => 'users manage',
 				namespace => 'WebGUI'
 			}
+		]
+	},
+	'manage users in group' => {
+		title => 'manage users in group title',
+		body => 'manage users in group body',
+		fields => [
+		],
+		related => [
 		]
 	},
 	'users manage' => {
