@@ -115,17 +115,20 @@ sub www_editProfileCategory {
 	$f->text(
 		-name => "categoryName",
 		-label => WebGUI::International::get(470,"WebGUIProfile"),
+		-hoverHelp => WebGUI::International::get('470 description',"WebGUIProfile"),
 		-value => $data{categoryName},
 	);
 	$f->yesNo(
                 -name=>"visible",
                 -label=>WebGUI::International::get(473,"WebGUIProfile"),
+                -hoverHelp=>WebGUI::International::get('473 description',"WebGUIProfile"),
                 -value=>$data{visible}
                 );
 	$f->yesNo(
 		-name=>"editable",
 		-value=>$data{editable},
 		-label=>WebGUI::International::get(897,"WebGUIProfile"),
+		-hoverHelp=>WebGUI::International::get('897 description',"WebGUIProfile"),
 		);
 	$f->submit;
 	$output .= $f->print;
