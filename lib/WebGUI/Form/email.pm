@@ -16,6 +16,7 @@ package WebGUI::Form::email;
 
 use strict;
 use base 'WebGUI::Form::text';
+use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Style;
 
@@ -36,6 +37,19 @@ This is a subclass of WebGUI::Form::text.
 The following methods are specifically available from this class. Check the superclass for additional methods.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+        return WebGUI::International::get("480","WebGUI");
+}
+
 
 #-------------------------------------------------------------------
 

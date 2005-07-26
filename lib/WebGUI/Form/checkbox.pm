@@ -16,6 +16,7 @@ package WebGUI::Form::checkbox;
 
 use strict;
 use base 'WebGUI::Form::Control';
+use WebGUI::International;
 use WebGUI::Session;
 
 =head1 NAME
@@ -68,6 +69,19 @@ sub definition {
 			}
 		});
 	return $class->SUPER::definition($definition);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+        return WebGUI::International::get("943","WebGUI");
 }
 
 

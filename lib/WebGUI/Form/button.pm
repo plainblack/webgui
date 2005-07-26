@@ -67,6 +67,19 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+        return WebGUI::International::get("button","WebGUI");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a button.

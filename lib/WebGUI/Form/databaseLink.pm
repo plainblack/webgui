@@ -18,6 +18,8 @@ use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::DatabaseLink;
 use WebGUI::Form::selectList;
+use WebGUI::Grouping;
+use WebGUI::International;
 use WebGUI::Session;
 
 =head1 NAME
@@ -56,6 +58,18 @@ The identifier for this field. Defaults to "databaseLinkId".
 
 A database link id. Defaults to "0", which is the WebGUI database.
 
+=head4 afterEdit
+
+A URL that will be acted upon after editing a database link. Typically there is a link next to the select list that reads "Edit this database link" and this is the URL to go to after editing is complete.
+
+=head4 label
+
+A label displayed next to the field when toHtmlWithWrapper() is called. Defaults to "Database Link".
+
+=head4 hoverHelp
+
+A tooltip to tell the user what to do with the field. Defaults a standard piece of help for Database Links.
+
 =cut
 
 sub definition {
@@ -68,10 +82,30 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>0
 			},
+		afterEdit=>{
+			defaultValue=>undef
+			},
+		label=>{
+			defaultValue=>WebGUI::International::get(1075)
+			},
+		hoverHelp=>{
+			defaultValue=>WebGUI::International::get('1075 description')
+			},
 		});
 	return $class->SUPER::definition($definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+        return WebGUI::International::get("1075","WebGUI");
+}
 
 #-------------------------------------------------------------------
 
@@ -88,6 +122,25 @@ sub toHtml {
 		options=>WebGUI::DatabaseLink::getList(),
 		value=>[$self->{value}]
 		)->toHtml;
+}
+
+#-------------------------------------------------------------------
+
+=head2 toHtmlWithWrapper ( )
+
+=cut
+
+sub toHtmlWithWrapper {
+	my $self = shift;
+	if (WebGUI::Grouping::isInGroup(3)) {
+		my $subtext;
+		if ($self->{afterEdit}) {
+			$subtext = editIcon("op=editDatabaseLink&amp;lid=".$self->{value}."&amp;afterEdit=".WebGUI::URL::escape($self->{afterEdit}));
+		}
+		$subtext = .= manageIcon("op=listDatabaseLinks");
+		$self->{subtext} = $subtext . $self->{subtext};
+	}
+	return $self->SUPER::toHtmlWithWrapper;
 }
 
 

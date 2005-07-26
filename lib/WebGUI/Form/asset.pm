@@ -20,6 +20,7 @@ use WebGUI::Asset;
 use WebGUI::Form::button;
 use WebGUI::Form::hidden;
 use WebGUI::Form::text;
+use WebGUI::International;
 use WebGUI::Session;
 
 =head1 NAME
@@ -72,6 +73,19 @@ sub definition {
 			},
 		});
 	return $class->SUPER::definition($definition);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+	return WebGUI::International::get("asset","Asset");
 }
 
 

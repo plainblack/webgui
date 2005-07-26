@@ -41,6 +41,19 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+        return WebGUI::International::get("combobox","WebGUI");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getValueFromPost ( )
 
 Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.

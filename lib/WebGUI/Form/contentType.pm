@@ -75,6 +75,19 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+        return WebGUI::International::get("1007","WebGUI");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getValueFromPost ( )
 
 Returns either what's posted or if nothing comes back it returns "mixed".

@@ -167,6 +167,19 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getName ( )
+
+Returns a human readable name for this form control type. You MUST override this method with your own when creating new form controls.
+
+=cut
+
+sub getName {
+	return "Form control not properly created."
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 fixMacros ( string ) 
 
 Returns the string having converted all macros in the string to HTML entities so that they won't be processed my the macro engine, but instead will be displayed.
@@ -297,7 +310,6 @@ sub new {
 	unless (exists $params{value}) {
 		$params{value} = $params{defaultValue};
 	}
-WebGUI::ErrorHandler::debug($class);
 	bless \%params, $class;
 }
 
@@ -362,7 +374,10 @@ sub toHtmlWithWrapper {
         	$hoverHelp = qq| onmouseover="return escape('$hoverHelp')"| if ($hoverHelp);
 		my $subtext = $self->{subtext};
 		$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
-		return '<tr'.$rowClass.'><td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->{label}.'</td><td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->toHtml.$subtext."</td></tr>\n";
+		return '<tr'.$rowClass.'>
+				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->{label}.'</td>
+				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->toHtml().$subtext."</td>
+			</tr>\n";
 	} else {
 		return $self->toHtmlAsHidden;
 	}

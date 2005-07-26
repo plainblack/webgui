@@ -3301,6 +3301,36 @@ Privileges and styles assigned to pages in the package will not be copied when t
                 context => q|option for Rich Editor in profile|
         },
 
+	'color' => {
+		message => q|Color|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'combobox' => {
+		message => q|Combo Box|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'hidden' => {
+		message => q|Hidden|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'codearea' => {
+		message => q|Code Area|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'button' => {
+		message => q|Button|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
 	'cancel' => {
 		message => q|cancel|,
 		lastUpdated =>1092930637,
