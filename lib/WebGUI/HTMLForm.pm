@@ -254,6 +254,30 @@ sub _uiLevelChecksOut {
 
 #-------------------------------------------------------------------
 
+=head2 AUTOLOAD ()
+        
+Dynamically creates functions on the fly for all the different form control types.
+
+=cut    
+        
+sub AUTOLOAD {  
+        our $AUTOLOAD;
+        my $name = (split /::/, $AUTOLOAD)[-1];
+        my @params = @_;
+        my $cmd = "use WebGUI::Form::".$name;
+        eval ($cmd);    
+        if ($@) {
+                WebGUI::ErrorHandler::error("Couldn't compile form control: ".$name.". Root cause: ".$@);
+                return undef;
+        }       
+        my $class = "WebGUI::Form::".$name;
+        return $class->new(@params)->toHtmlWithWrapper;
+}       
+        
+
+
+#-------------------------------------------------------------------
+
 =head2 asset ( name, label, value, class, extras, subtext, defaultValue, uiLevel )
 
 Returns an asset picker control.

@@ -39,6 +39,8 @@
  - fix [ 1240316 ] Doc erro in Folder template thumbnail => thumbnail.url
  - The Navigation template variable "unfolded_page_loop" was removed a long
    time ago, but the documentation was never updated until now.
+ - Created a new pluggable form control backend. See migration.txt for
+   details.
 
 
 6.6.5

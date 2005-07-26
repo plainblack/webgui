@@ -397,3 +397,33 @@ a slight impact on the WebGUI::ErrorHandler API. Although there are many
 changes, the only thing anyone should notice is that fatalError() was renamed
 to fatal().
 
+
+5.18 Form API Changed
+
+In 6.7 we made the form controls pluggable so that new ones can be added
+without changing the core code at all. This change is mostly transparent
+unless you're still using the ancient deprecated WebGUI::HTMLForm syntax that
+allows you to pass in form control properties as arrays like this:
+
+my $f = WebGUI::HTMLForm->new;
+$f->text("nameGoesHere","value goes here","label goes here");
+
+Instead you should be using something like this:
+
+$f->text(
+   name=>"nameGoesHere",
+   value=>"Value Goes Here",
+   label=>"Label goes here"
+  );
+
+Note you can pass in the parameters as either a hash reference or a hash and
+the param names can be tagged or not. Here are examples:
+
+$f->text(-name=>"nameGoesHere");
+$f->text({-name=>"nameGoesHere"});
+$f->text(name=>"nameGoesHere");
+$f->text({name=>"nameGoesHere"});
+
+See WebGUI::HTMLForm and WebGUI::Form::Control for additional information.
+
+

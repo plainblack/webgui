@@ -76,194 +76,25 @@ sub _checkEmailAddy {
 
 #-------------------------------------------------------------------
 
-=head2 asset ( name )
+=head2 AUTOLOAD ()
 
-Returns an asset id.
-
-=head3 name
-
-The name of the form variable to retrieve.
+Dynamically creates functions on the fly for all the different form control types.
 
 =cut
 
-sub asset {
-	return $session{form}{$_[0]};
+sub AUTOLOAD {
+        our $AUTOLOAD;
+        my $name = (split /::/, $AUTOLOAD)[-1];
+	my $fieldName = shift;
+        my $cmd = "use WebGUI::Form::".$name;
+        eval ($cmd);
+        if ($@) {
+                WebGUI::ErrorHandler::error("Couldn't compile form control: ".$name.". Root cause: ".$@);
+                return undef;
+        }
+        my $class = "WebGUI::Form::".$name;
+        return $class->new({name=>$fieldName})->getValueFromPost;
 }
-
-#-------------------------------------------------------------------
-
-=head2 checkbox ( name )
-
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub checkbox {
-	return selectList($_[0]);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 checkList ( name )
-
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub checkList {
-	return selectList($_[0]);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 codearea ( name )
-
-Returns a string.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub codearea {
-	return $session{form}{$_[0]};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 color ( name )
-
-Returns a hex color string like: #000000
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub color {
-	my $color = $session{form}{$_[0]};
-	return undef unless $color =~ /\#\w{6}/;
-	return $color;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 combo ( name )
-
-Returns either an array of values or a scalar value depending upon what you request.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub combo {
-	if ($session{form}{$_[0]."_new"}) {
-		return $session{form}{$_[0]."_new"};
-	}
-	return selectList($_[0]);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 contentType ( name )
-
-Returns a content type. Defaults to "mixed".
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub contentType {
-	return ($session{form}{$_[0]} || "mixed");
-}
-
-#-------------------------------------------------------------------
-
-=head2 databaseLink ( name )
-
-Returns the ID of a database link.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub databaseLink {
-	return selectList($_[0]);
-}
-
-#-------------------------------------------------------------------
-
-=head2 date ( name )
-
-Returns an epoch datestamp.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub date {
-	return WebGUI::DateTime::setToEpoch($session{form}{$_[0]});
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 dateTime ( name )
-
-Returns an epoch datestamp.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub dateTime {
-	return WebGUI::DateTime::setToEpoch($session{form}{$_[0]});
-}
-
-#-------------------------------------------------------------------
-
-=head2 email ( name )
-
-Returns an email address.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub email {
-	if (_checkEmailAddy($session{form}{$_[0]})) {
-		return $session{form}{$_[0]};
-	}
-	return undef;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -337,22 +168,6 @@ sub group {
 		return $value;
 	}
 	return 2;
-}
-
-#-------------------------------------------------------------------
-
-=head2 hidden ( name )
-
-Returns a string.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub hidden {
-	return $session{form}{$_[0]};
 }
 
 
@@ -537,23 +352,6 @@ sub radioList {
 }
 
 
-#-------------------------------------------------------------------
-
-=head2 selectList ( name )
-
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub selectList {
-	my @data = $session{cgi}->param($_[0]);
-	return wantarray ? @data : join("\n",@data);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -574,39 +372,6 @@ sub template {
 	return 1;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 text ( name )
-
-Returns a string of text.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub text {
-	return $session{form}{$_[0]};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 textarea ( name )
-
-Returns a string of text.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub textarea {
-	return $session{form}{$_[0]};
-}
 
 
 #-------------------------------------------------------------------
@@ -672,26 +437,6 @@ sub yesNo {
 	else {
 		return 0;
 	}
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 zipcode ( name )
-
-Returns a string which allows uppercase alpha characters, digits, spaces, and hypens (dashes).
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub zipcode {
-	if ($session{form}{$_[0]} =~ /^[A-Z\d\s\-]+$/) {
-		return $session{form}{$_[0]};
-	}
-	return undef;
 }
 
 

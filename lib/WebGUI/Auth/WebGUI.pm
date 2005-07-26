@@ -387,7 +387,11 @@ sub editUserSettingsForm {
              -value=>$session{setting}{webguiPasswordRecovery},
              -label=>WebGUI::International::get(6,'AuthWebGUI')
              );
-   $f->textarea("webguiRecoverPasswordEmail",WebGUI::International::get(134),$session{setting}{webguiRecoverPasswordEmail});
+   $f->textarea(
+		-name=>"webguiRecoverPasswordEmail",
+		-label=>WebGUI::International::get(134),
+		-value=>$session{setting}{webguiRecoverPasswordEmail}
+		);
    	$f->yesNo(
 		-name=>"webguiValidateEmail",
              	-value=>$session{setting}{webguiValidateEmail},

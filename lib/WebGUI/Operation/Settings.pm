@@ -1,4 +1,4 @@
-PACKAge WebGUI::Operation::Settings;
+package WebGUI::Operation::Settings;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2005 Plain Black Corporation.
