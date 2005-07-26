@@ -33,7 +33,7 @@ Package WebGUI::Form
 
 =head1 DESCRIPTION
 
-Base forms package. Eliminates some of the normal code work that goes along with creating forms. Used by the HTMLForm package.
+This is a convenience package which provides a simple interface to use all of the form controls without having to load each one seperately, create objects, and call methods.
 
 =head1 SYNOPSIS
 
@@ -530,115 +530,6 @@ sub group {
 		
 }
 
-
-
-#-------------------------------------------------------------------
-
-=head2 HTMLArea ( hashRef )
-
-Returns an HTML area. An HTML area is different than a standard text area in that it provides rich edit functionality and some special error trapping for HTML and other special characters.
-
-=head3 name
-
-The name field for this form element.
-
-=head3 richEditId
-
-An asset Id of a rich editor to display for this field.
-
-=head3 value
-
-The default value for this form element.
-
-=head3 extras
-
-If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
-
- 'onChange="this.form.submit()"'
-
-=head3 wrap
-
-The method for wrapping text in the text area. Defaults to "virtual". There should be almost no reason to specify this.
-
-=head3 rows
-
-The number of characters tall this form element should be. There should be no reason for anyone to specify this.
-
-=head3 columns
-
-The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=head3 defaultValue
-
-This will be used if no value is specified.
-
-=cut
-
-sub HTMLArea {
-	my $params = shift;
-        my $rows = $params->{rows} || ($session{setting}{textAreaRows}+20);
-        my $columns = $params->{columns} || ($session{setting}{textAreaCols}+10);
-	my $richEditId = $params->{richEditId} || $session{setting}{richEditor} || "PBrichedit000000000001";
-        my $output = textarea({
-                name=>$params->{name},
-                value=>$params->{value},
-                wrap=>$params->{wrap},
-                columns=>$columns,
-                rows=>$rows,
-                extras=>$params->{extras}.' onBlur="fixChars(this.form.'.$params->{name}.')" id="'.$params->{name}.'"'.' mce_editable="true" ',
-		defaultValue=>$params->{defaultValue}
-                });
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/textFix.js',{ type=>'text/javascript' });
-	$output .= WebGUI::Asset::RichEdit->new($richEditId)->getRichEditor($params->{name});
-	return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 integer ( hashRef )
-
-Returns an integer field.
-
-=head3 name
-
-The name field for this form element.
-
-=head3 value
-
-The default value for this form element.
-
-=head3 maxlength
-
-The maximum number of characters to allow in this form element.  Defaults to 11.
-
-=head3 extras
-
-If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
-
- 'onChange="this.form.submit()"'
-
-=head3 size
-
-The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=head3 defaultValue
-
-This will be used if no value is specified.
-
-=cut
-
-sub integer {
-	my $params = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
-	return text({
-		name=>$params->{name},
-		value=>$params->{value},
-		defaultValue=>$params->{defaultValue} || 0,
-		size=>$params->{size} || 11,
-		extras=>'onKeyUp="doInputCheck(this.form.'.$params->{name}.',\'0123456789-\')" '.$params->{extras},
-		maxlength=>$params->{maxlength}
-		});
-}
 
 #-------------------------------------------------------------------
 

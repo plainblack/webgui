@@ -1,0 +1,131 @@
+package WebGUI::Form::HTMLArea;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2005 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+use strict;
+use base 'WebGUI::Form::textarea';
+use WebGUI::Asset::RichEdit;
+use WebGUI::HTML;
+use WebGUI::International;
+use WebGUI::Session;
+use WebGUI::Style;
+
+=head1 NAME
+
+Package WebGUI::Form::HTMLArea
+
+=head1 DESCRIPTION
+
+Creates an HTML Area form control if the user's browser supports it. This basically puts a word processor in the field for them.
+
+=head1 SEE ALSO
+
+This is a subclass of WebGUI::Form::textarea.
+
+=head1 METHODS 
+
+The following methods are specifically available from this class. Check the superclass for additional methods.
+
+=cut
+
+
+#-------------------------------------------------------------------
+
+=head2 definition ( [ additionalTerms ] )
+
+See the super class for additional details.
+
+=head3 additionalTerms
+
+The following additional parameters have been added via this sub class.
+
+=head4 rows
+
+The number of rows (in characters) tall the box should be. Defaults to the setting textAreaRows + 20.
+
+=head4 columns
+
+The number of columns (in characters) wide the box should be. Defaults to the setting textAreaCols + 10.
+
+=head4 richEditId
+
+The ID of the WebGUI::Asset::RichEdit object to load. Defaults to the richEditor setting or  "PBrichedit000000000001" if that's not set.
+
+=head
+
+=cut
+
+sub definition {
+        my $class = shift;
+        my $definition = shift || [];
+        push(@{$definition}, {
+                rows=>{
+                        defaultValue=> $session{setting}{textAreaRows}+20
+                        },
+                columns=>{
+                        defaultValue=> $session{setting}{textAreaCols}+10
+                        },
+                richEditId=>{
+                        defaultValue=>$session{setting}{richEditor} || "PBrichedit000000000001"
+                        }
+                });
+        return $class->SUPER::definition($definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ()
+
+Returns the human readable name or type of this form control.
+
+=cut
+
+sub getName {
+        return WebGUI::International::get("477","WebGUI");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getValueFromPost ( )
+
+Returns the value of this form field after stipping unwanted tags like <body>.
+
+=cut
+
+sub getValueFromPost {
+	my $self = shift;
+	return WebGUI::HTML::cleanSegment($self->SUPER::getValueFromPost());
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 toHtml ( )
+
+Renders an HTML area field.
+
+=cut
+
+sub toHtml {
+	my $self = shift;
+        WebGUI::Style::setScript($session{config}{extrasURL}.'/textFix.js',{ type=>'text/javascript' });
+	$self->{extras} .= ' onBlur="fixChars(this.form.'.$self->{name}.')" id="'.$self->{name}.'"'.' mce_editable="true" ';	
+	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->{richEditId})->getRichEditor($self->{name});
+}
+
+
+1;
+

@@ -15,7 +15,7 @@ package WebGUI::Form::codearea;
 =cut
 
 use strict;
-use base 'WebGUI::Form::text';
+use base 'WebGUI::Form::textarea';
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Style;

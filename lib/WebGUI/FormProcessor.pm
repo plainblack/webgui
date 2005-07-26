@@ -25,44 +25,18 @@ Package WebGUI::FormProcessor;
 
 =head1 DESCRIPTION
 
-This package helps in the processing of the form variables that are returned from any WebGUI form.
+This is a convenience package to the individual form controls. It allows you to get the form post results back without having to load each form control seperately, instanciate an object, and call methods.
 
 =head1 SYNOPSIS
 
  use WebGUI::FormProcessor;
  $value = WebGUI::FormProcessor::process("favoriteColor","selectList","black");
 
- $value = WebGUI::FormProcessor::asset("assetId");
- $value = WebGUI::FormProcessor::checkbox("whichOne");
- $value = WebGUI::FormProcessor::checkList("dayOfWeek");
- $value = WebGUI::FormProcessor::codearea("snippet");
- $value = WebGUI::FormProcessor::color("highlightColor");
- $value = WebGUI::FormProcessor::combo("fruit");
- $value = WebGUI::FormProcessor::contentType("text");
- $value = WebGUI::FormProcessor::date("endDate");
- $value = WebGUI::FormProcessor::dateTime("whenToDoIt");
- $value = WebGUI::FormProcessor::email("emailAddress");
- $value = WebGUI::FormProcessor::fieldType("fieldType");
- $value = WebGUI::FormProcessor::filterContent("javascript");
- $value = WebGUI::FormProcessor::float("distance");
- $value = WebGUI::FormProcessor::group("groupToPost");
- $value = WebGUI::FormProcessor::hidden("wid");
- $value = WebGUI::FormProcessor::hiddenList("colors");
- $value = WebGUI::FormProcessor::HTMLArea("description");
- $value = WebGUI::FormProcessor::integer("size");
- $value = WebGUI::FormProcessor::interval("timeToLive");
- $value = WebGUI::FormProcessor::password("identifier");
- $value = WebGUI::FormProcessor::phone("cellPhone");
- $value = WebGUI::FormProcessor::radio("whichOne");
- $value = WebGUI::FormProcessor::radioList("dayOfWeek");
- $value = WebGUI::FormProcessor::selectList("dayOfWeek");
- $value = WebGUI::FormProcessor::template("templateId");
- $value = WebGUI::FormProcessor::text("firstName");
- $value = WebGUI::FormProcessor::textarea("emailMessage");
- $value = WebGUI::FormProcessor::timeField("wakeupCall");
- $value = WebGUI::FormProcessor::url("homepage");
- $value = WebGUI::FormProcessor::yesNo("happy");
- $value = WebGUI::FormProcessor::zipcode("workZip");
+ $value = WebGUI::FormProcessor::someFormControlType("fieldName");
+
+ Example:
+
+ $value WebGUI::FormProcessor::text("title");
 
 =head1 METHODS
 
@@ -185,23 +159,6 @@ The name of the form variable to retrieve.
 
 sub hiddenList {
 	return selectList($_[0]);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 HTMLArea ( name )
-
-Returns a string of HTML that has been cleaned of header information.
-
-=head3 name
-
-The name of the form variable to retrieve.
-
-=cut
-
-sub HTMLArea {
-	return WebGUI::HTML::cleanSegment($session{form}{$_[0]});
 }
 
 
