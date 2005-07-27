@@ -1,4 +1,4 @@
-package WebGUI::Form::integer;
+package WebGUI::Form::float;
 
 =head1 LEGAL
 
@@ -22,11 +22,11 @@ use WebGUI::Style;
 
 =head1 NAME
 
-Package WebGUI::Form::integer
+Package WebGUI::Form::float
 
 =head1 DESCRIPTION
 
-Creates an input field that accepts positive and negative integer.
+Returns a floating point number (decimal) field.
 
 =head1 SEE ALSO
 
@@ -50,7 +50,7 @@ The following additional parameters have been added via this sub class.
 
 =head4 maxlength
 
-Defaults to 11. Determines the maximum number of characters allowed in this field.
+Defaults to 14. Determines the maximum number of characters allowed in this field.
 
 =head4 defaultValue
 
@@ -67,7 +67,7 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		maxlength=>{
-			defaultValue=> 11
+			defaultValue=> 14
 			},
 		defaultValue=>{
 			defaultValue=>0
@@ -89,7 +89,7 @@ Returns the human readable name or type of this form control.
 =cut
 
 sub getName {
-        return WebGUI::International::get("482","WebGUI");
+        return WebGUI::International::get("float","WebGUI");
 }
 
 
@@ -97,31 +97,31 @@ sub getName {
 
 =head2 getValueFromPost ( )
 
-Returns the integer from the form post, or returns 0 if the post result is invalid.
+Returns the integer from the form post, or returns 0.0 if the post result is invalid.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
 	my $value = $session{cgi}->param($self->{name});
-	if ($value =~ /^[\d\-]+$/) {
+	if ($value =~ /^[\d\-\.]+$/) {
                 return $value;
         }
-        return 0;
+        return 0.0;
 }
 
 #-------------------------------------------------------------------
 
 =head2 toHtml ( )
 
-Renders an integer field.
+Renders a floating point field.
 
 =cut
 
 sub toHtml {
         my $self = shift;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onkeyup="doInputCheck(this.form.'.$self->{name}.',\'0123456789-\')"';
+	$self->{extras} .= ' onkeyup="doInputCheck(this.form.'.$self->{name}.',\'0123456789-.\')"';
 	return $self->SUPER::toHtml;
 }
 

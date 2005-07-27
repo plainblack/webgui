@@ -62,7 +62,7 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		options=>{
+		types=>{
 			defaultValue=>[qw(mixed html code text)]
 			},
 		defaultValue=>{

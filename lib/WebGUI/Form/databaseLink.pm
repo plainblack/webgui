@@ -19,6 +19,7 @@ use base 'WebGUI::Form::Control';
 use WebGUI::DatabaseLink;
 use WebGUI::Form::selectList;
 use WebGUI::Grouping;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -127,6 +128,8 @@ sub toHtml {
 #-------------------------------------------------------------------
 
 =head2 toHtmlWithWrapper ( )
+
+Renders the form field to HTML as a table row complete with labels, subtext, hoverhelp, etc. Also adds manage and edit icons next to the field if the current user is in the admins group.
 
 =cut
 
