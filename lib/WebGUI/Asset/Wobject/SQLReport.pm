@@ -285,19 +285,23 @@ sub _storeQueries {
 
 #-------------------------------------------------------------------
 sub _parsePlaceholderParams {
-	my $self = shift;
-	my $params = shift;
-	my @placeholderParams;
-	foreach my $param (split /\s*,\s*/, $params) {
-		if($param =~ /^form:/) {
-			$param = $session{form}{$'};
-		} elsif ($param =~ /^query(\d):/) {
-			$param = $self->{_query}{$1}{rowData}{$'};
-		}
-		$param = WebGUI::Macro::process($param);
-		push(@placeholderParams, $param);
-	}
-	return \@placeholderParams;
+        my $self = shift;
+        my $params = shift;
+        my @placeholderParams;
+        foreach my $row (split(/\n/,$params)) {
+                next unless $row ne "";
+                my ($type,$field) = split(/:/,$row);
+                chop($field);
+                my $param;
+                if($type =~ /^form/) {
+                        $param = $session{form}{$field};
+                } elsif ($param =~ /^query(\d)/) {
+                        $param = $self->{_query}{$1}{rowData}{$field};
+                }
+                $param = WebGUI::Macro::process($param);
+                push(@placeholderParams, $param);
+        }
+        return \@placeholderParams;
 }
 
 

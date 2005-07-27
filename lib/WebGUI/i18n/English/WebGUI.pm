@@ -3325,6 +3325,18 @@ Privileges and styles assigned to pages in the package will not be copied when t
                 context => q|Field type name|
         },
 
+	'interval' => {
+		message => q|Interval|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'group' => {
+		message => q|Group|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
 	'codearea' => {
 		message => q|Code Area|,
 		lastUpdated =>0,
