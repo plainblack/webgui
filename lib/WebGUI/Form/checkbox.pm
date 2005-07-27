@@ -95,7 +95,7 @@ Renders and input tag of type checkbox.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixQuotes($self->{value});
+	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->{value})));
 	my $checkedText = ' checked="checked"' if ($self->{checked});
 	return '<input type="checkbox" name="'.$self->{name}.'" value="'.$value.'"'.$checkedText.' '.$self->{extras}.' />';
 }

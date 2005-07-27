@@ -215,7 +215,8 @@ sub www_editProfileField {
 		-label=>WebGUI::International::get(486,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('486 description',"WebGUIProfile"),
 		-value=>$data{dataType},
-		-defaultValue=>"text"
+		-defaultValue=>"text",
+		-types=>[qw(dateTime time float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList)]
 		);
 	$f->textarea(
 		-name => "dataValues",

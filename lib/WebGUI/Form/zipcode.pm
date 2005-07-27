@@ -100,7 +100,7 @@ sub getValueFromPost {
 
 =head2 toHtml ( )
 
-Renders an input tag of type text.
+Renders a zip code field.
 
 =cut
 

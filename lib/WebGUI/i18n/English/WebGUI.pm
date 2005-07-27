@@ -3270,11 +3270,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 		lastUpdated => 1031514049
 	},
 
-	'356' => {
-		message => q|Template|,
-		lastUpdated => 1031514049
-	},
-
 	'38' => {
 		message => q|You do not have sufficient privileges to perform this operation. Please ^a(log in with an account); that has sufficient privileges before attempting this operation.|,
 		lastUpdated => 1031514049
@@ -3339,6 +3334,24 @@ Privileges and styles assigned to pages in the package will not be copied when t
 
 	'codearea' => {
 		message => q|Code Area|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'radio' => {
+		message => q|Radio Button|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'read only' => {
+		message => q|Read Only|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'submit' => {
+		message => q|Submit|,
 		lastUpdated =>0,
                 context => q|Field type name|
         },

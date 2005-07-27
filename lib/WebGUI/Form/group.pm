@@ -118,7 +118,7 @@ sub getValueFromPost {
         if (scalar(@data)) {
 		return wantarray ? @data : join("\n",@data);
 	}
-	return wantarray ? @[2] : 2;
+	return wantarray ? @{[2]} : 2;
 }
 
 #-------------------------------------------------------------------
@@ -176,8 +176,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub toHtmlWithWrapper {
         my $self = shift;
         if (WebGUI::Grouping::isInGroup(3)) {
-                my $subtext;
-                $subtext = .= manageIcon("op=listGroups");
+                my $subtext = manageIcon("op=listGroups");
                 $self->{subtext} = $subtext . $self->{subtext};
         }
         return $self->SUPER::toHtmlWithWrapper;

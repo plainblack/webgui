@@ -22,6 +22,7 @@ use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::URL;
 
 =head1 NAME
 
@@ -61,11 +62,7 @@ A database link id. Defaults to "0", which is the WebGUI database.
 
 =head4 afterEdit
 
-A URL that will be acted upon after editing a database link. Typically there is a link next to the select list that reads "Edit this database link" and this is the URL to go to after editing is complete.
-
-=head4 label
-
-A label displayed next to the field when toHtmlWithWrapper() is called. Defaults to "Database Link".
+A URL that will be acted upon after editing a database link. 
 
 =head4 hoverHelp
 
@@ -85,9 +82,6 @@ sub definition {
 			},
 		afterEdit=>{
 			defaultValue=>undef
-			},
-		label=>{
-			defaultValue=>WebGUI::International::get(1075)
 			},
 		hoverHelp=>{
 			defaultValue=>WebGUI::International::get('1075 description')
@@ -121,7 +115,8 @@ sub toHtml {
 	return WebGUI::Form::selectList->new(
 		name=>$self->{name},
 		options=>WebGUI::DatabaseLink::getList(),
-		value=>[$self->{value}]
+		value=>[$self->{value}],
+		extras=>$self->{extras}
 		)->toHtml;
 }
 
@@ -140,11 +135,12 @@ sub toHtmlWithWrapper {
 		if ($self->{afterEdit}) {
 			$subtext = editIcon("op=editDatabaseLink&amp;lid=".$self->{value}."&amp;afterEdit=".WebGUI::URL::escape($self->{afterEdit}));
 		}
-		$subtext = .= manageIcon("op=listDatabaseLinks");
+		$subtext .= manageIcon("op=listDatabaseLinks");
 		$self->{subtext} = $subtext . $self->{subtext};
 	}
 	return $self->SUPER::toHtmlWithWrapper;
 }
+
 
 
 

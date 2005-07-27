@@ -122,7 +122,7 @@ sub toHtml {
 		extras=>$self->{extras}
 		)->toHtml
 		.WebGUI::Form::selectList->new(
-		options=>\%units
+		options=>\%units,
 		name=>$self->{name}."_units",
 		value=>[$self->{value}]
 		)->toHtml;
