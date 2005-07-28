@@ -45,6 +45,7 @@ sub definition {
 	my $definition = shift;
 	push(@{$definition}, {
 		assetName=>WebGUI::International::get(2,"Asset_EventsCalendar"),
+		uiLevel => 9,
 		icon=>'calendar.gif',
 		tableName=>'EventsCalendar',
 		className=>'WebGUI::Asset::Wobject::EventsCalendar',
@@ -183,11 +184,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-
-#-------------------------------------------------------------------
-sub getUiLevel {
-	return 9;
-}
 
 
 #-------------------------------------------------------------------

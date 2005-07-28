@@ -65,6 +65,7 @@ sub definition {
         my $definition = shift;
         push(@{$definition}, {
 		assetName=>WebGUI::International::get(1,'Asset_Survey'),
+		uiLevel => 5,
 		icon=>'survey.gif',
 		tableName	=> 'Survey',
 		className	=> 'WebGUI::Asset::Wobject::Survey',
@@ -616,11 +617,6 @@ sub setAnswerType {
 		Survey_id=>$_[0]->get("Survey_id"),
 		answerFieldType=>$_[1]
 		},1,0,"Survey_id");
-}
-
-#-------------------------------------------------------------------
-sub getUiLevel {
-	return 5;
 }
 
 #-------------------------------------------------------------------

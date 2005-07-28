@@ -1743,14 +1743,16 @@ sub getToolbarState {
 
 =head2 getUiLevel ( )
 
-Always returns zero.
+Returns the UI Level specified in the asset definition or from the config file if it's overridden. And if neither of those is specified, then it returns 1.
 
-=cut
-
+=cut    
+        
 sub getUiLevel {
-	my $self = shift;
-	return 0;
-}
+        my $self = shift;
+        my $definition = $self->definition;
+        return $session{config}{assetUiLevel}{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1;
+}  
+
 
 #-------------------------------------------------------------------
 

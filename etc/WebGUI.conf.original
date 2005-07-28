@@ -137,6 +137,13 @@ utilityAssets = WebGUI::Asset::Template, \
 #assetAddPrivilege = WebGUI::Asset::Wobject::SQLReport => 3, \
 #	WebGUI:::Asset::Template => 4
 
+# Optionally override the default UI Level of any asset. This
+# dermines whether the current user has the appropriate UI Level
+# to add assets of that type.
+
+#assetUiLevel = WebGUI::Asset::Wobject::WSClient => 7,
+#	WebGUI::Asset::RichEdit => 4
+
 # You can override the UI Levels of any field in the edit form of
 # any asset using the following variables. Basically just take the
 # class name of the asset seperated by underscores, and append

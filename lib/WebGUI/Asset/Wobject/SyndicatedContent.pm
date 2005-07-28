@@ -74,6 +74,7 @@ sub definition {
         my $definition = shift;
         push(@{$definition}, {
 		assetName=>WebGUI::International::get(2,'Asset_SyndicatedContent'),
+		uiLevel=>6,
 		autoGenerateForms=>1,
 		icon=>'syndicatedContent.gif',
                 tableName=>'SyndicatedContent',
@@ -129,18 +130,6 @@ sub definition {
 
 
 
-
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 getUiLevel ()
-
-Returns the displayable name of this asset.
-
-=cut
-
-sub getUiLevel {
-        return 6;
-}
 
 
 #-------------------------------------------------------------------

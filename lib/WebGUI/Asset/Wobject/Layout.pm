@@ -132,17 +132,6 @@ sub getEditForm {
 
 
 
-#-------------------------------------------------------------------
-
-=head2 getUiLevel ()
-
-Returns the UI level of this asset.
-
-=cut
-
-sub getUiLevel {
-	return 5;
-}
 
 
 #-------------------------------------------------------------------

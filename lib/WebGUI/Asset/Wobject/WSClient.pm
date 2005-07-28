@@ -68,6 +68,7 @@ my $httpHeaderFieldType;
    }
 	push(@{$definition}, {
 		assetName=>WebGUI::International::get(1, "Asset_WSClient"),
+		uiLevel=>9,
 		icon=>'web_services.gif',
 		tableName=>'WSClient',
 		className=>'WebGUI::Asset::Wobject::WSClient',
@@ -132,11 +133,6 @@ my $httpHeaderFieldType;
         return $class->SUPER::definition($definition);
 }
 
-
-#-------------------------------------------------------------------
-sub getUiLevel {
-	return 9;
-}
 
 
 #-------------------------------------------------------------------

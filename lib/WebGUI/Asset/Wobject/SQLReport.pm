@@ -33,6 +33,7 @@ sub definition {
 	my $definition = shift;
 	push(@{$definition}, {
 		assetName=>WebGUI::International::get(1,"Asset_SQLReport"),
+		uiLevel => 9,
 		icon=>'sqlReport.gif',
 		tableName=>'SQLReport',
 		className=>'WebGUI::Asset::Wobject::SQLReport',
@@ -231,12 +232,6 @@ sub getEditForm {
 		-value=>$self->getValue("paginateAfter")
 		);
 	return $tabform;
-}
-
-
-#-------------------------------------------------------------------
-sub getUiLevel {
-	return 9;
 }
 
 

@@ -64,6 +64,7 @@ sub definition {
         push(@{$definition}, {
 		assetName=>'Rich Editor',
 		icon=>'richEdit.gif',
+		uiLevel => 5,
                 tableName=>'RichEdit',
                 className=>'WebGUI::Asset::RichEdit',
                 properties=>{
@@ -380,18 +381,6 @@ sub getToolbar {
 	return $self->SUPER::getToolbar();
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 getUiLevel ()
-
-Returns the UI level of this asset.
-
-=cut
-
-sub getUiLevel {
-	return 5;
-}
 
 
 #-------------------------------------------------------------------

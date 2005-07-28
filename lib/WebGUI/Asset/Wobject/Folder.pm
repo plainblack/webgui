@@ -60,6 +60,7 @@ sub definition {
         my $definition = shift;
         push(@{$definition}, {
 		assetName=>WebGUI::International::get("folder","Asset_Folder"),
+		uiLevel => 5,
 		icon=>'folder.gif',
                 tableName=>'Folder',
                 className=>'WebGUI::Asset::Wobject::Folder',
@@ -102,19 +103,6 @@ sub getEditForm {
 			);
 	}
 	return $tabform;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getUiLevel ()
-
-Returns the UI level of this asset.
-
-=cut
-
-sub getUiLevel {
-	return 5;
 }
 
 

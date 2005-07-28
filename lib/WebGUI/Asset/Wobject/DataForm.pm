@@ -136,6 +136,7 @@ sub definition {
         my $definition = shift;
         push(@{$definition}, {
 		assetName=>WebGUI::International::get(1,"Asset_DataForm"),
+		uiLevel => 5,
                 tableName=>'DataForm',
 		icon=>'dataForm.gif',
                 className=>'WebGUI::Asset::Wobject::DataForm',
@@ -538,10 +539,6 @@ sub getRecordTemplateVars {
 }
 
 
-#-------------------------------------------------------------------
-sub getUiLevel {
-        return 5;
-}
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {	

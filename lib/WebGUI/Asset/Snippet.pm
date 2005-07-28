@@ -62,6 +62,7 @@ sub definition {
         my $definition = shift;
         push(@{$definition}, {
 		assetName=>WebGUI::International::get('snippet',"Asset_Snippet"),
+		uiLevel => 5,
 		icon=>'snippet.gif',
                 tableName=>'snippet',
                 className=>'WebGUI::Asset::Snippet',
@@ -140,18 +141,6 @@ sub getToolbar {
 	return $self->SUPER::getToolbar();
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 getUiLevel ()
-
-Returns the UI level of this asset.
-
-=cut
-
-sub getUiLevel {
-	return 5;
-}
 
 
 

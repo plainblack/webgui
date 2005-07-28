@@ -34,6 +34,7 @@ sub definition {
 	my $definition = shift;
 	push(@{$definition}, {
 		assetName=>WebGUI::International::get(3,"Asset_HttpProxy"),
+		uiLevel => 5,
 		icon=>'httpProxy.gif',
 		tableName=>'HttpProxy',
 		className=>'WebGUI::Asset::Wobject::HttpProxy',
@@ -168,12 +169,6 @@ sub getEditForm {
                 -value=>$self->getValue("stopAt")
                 );
 	return $tabform;
-}
-
-
-#-------------------------------------------------------------------
-sub getUiLevel {
-	return 5;
 }
 
 
