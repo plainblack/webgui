@@ -1,4 +1,4 @@
-package WebGUI::Form::text;
+package WebGUI::Form::file;
 
 =head1 LEGAL
 
@@ -18,10 +18,12 @@ use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::Storage;
+use WebGUI::Style;
 
 =head1 NAME
 
-Package WebGUI::Form::text
+Package WebGUI::Form::file
 
 =head1 DESCRIPTION
 
@@ -47,13 +49,13 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
-=head4 maxlength
+=head4 name
 
-Defaults to 255. Determines the maximum number of characters allowed in this field.
+If no name is specified a default name of "file" will be used.
 
-=head4 size
+=head4 maxAttachments
 
-Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big of a text box to display.
+Defaults to 1. Determines how many files the user can upload with this form control.
 
 =cut
 
@@ -61,11 +63,11 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		maxlength=>{
-			defaultValue=> 255
-			},
-		size=>{
-			defaultValue=>$session{setting}{textBoxSize} || 30
+		name=>{
+			defaultValue=>"file"
+			}
+		maxAttachments=>{
+			defaultValue=>1
 			}
 		});
 	return $class->SUPER::definition($definition);
@@ -81,43 +83,45 @@ Returns the human readable name or type of this form control.
 =cut
 
 sub getName {
-        return WebGUI::International::get("475","WebGUI");
+        return WebGUI::International::get("file","WebGUI");
 }
 
 
+
+#-------------------------------------------------------------------
+
+=head2 getValueFromPost ( )
+
+Returns the storageId for the storage location that the file(s) got uploaded to. Returns undef if no files were uploaded.
+
+=cut
+
+sub getValueFromPost {
+	my $self = shift;
+	my $storage = WebGUI::Storage->create;
+        $storage->addFileFromFormPost($self->{name});
+	@files = $storage->getFiles;
+	if (scalar(@files) < 1) {
+		$storage->delete;
+		return undef;
+	} else {
+		return $storage->getId;
+	}
+}
 
 #-------------------------------------------------------------------
 
 =head2 toHtml ( )
 
-Renders an input tag of type text.
+Renders a file upload control.
 
 =cut
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->{value})));
-        return '<input type="text" name="'.$self->{name}.'" value="'.$value.'" size="'.$self->{size}.'" maxlength="'.$self->{maxlength}.'" '.$self->{extras}.' />';
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 files ( hashRef )
-
-Returns a multiple file upload control.
-
-=head3 name
-
-The name field for this form element.
-
-=cut
-
-sub files {
         WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
-        my $uploadControl = '<div id="fileUploadControl"> </div>
-                <script>
-                var images = new Array();
+        my $uploadControl = '<script type="text/javascript">
+                var fileIcons = new Array();
                 ';
         opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
         my @files = readdir(DIR);
@@ -129,11 +133,24 @@ sub files {
                         $uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
                 }
         }
-        $uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images, "'.WebGUI::International::get('removeLabel','WebGUI').'");
+        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->{name}.'", fileIcons, "'.WebGUI::International::get('removeLabel','WebGUI').'","'.$self->{maxAttachments}.'");
         uploader.addRow();
         </script>';
         return $uploadControl;
 }
+
+#-------------------------------------------------------------------
+
+=head4 toHtmlAsHidden ( )
+
+Returns undef.
+
+=cut
+
+sub toHtmlAsHidden {
+	return undef;
+}
+
 
 1;
 

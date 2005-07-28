@@ -306,9 +306,22 @@ sub new {
 	my @reversedDefinitions = reverse @{$class->definition};
 	foreach my $definition (@reversedDefinitions) {
 		foreach my $fieldName (keys %{$definition}) {
-			$params{$fieldName} = $raw{$fieldName} || $raw{"-".$fieldName} || $definition->{$fieldName}{defaultValue};
+			my $value = $raw{$fieldName};
+			# if we have no value, try the tagged name
+			unless (defined $value) {
+				$value = $raw{"-".$fieldName};
+			}
+			# if we still have no value try the default value for the field
+			unless (defined $value) {
+				$value = $definition->{$fieldName}{defaultValue};
+			}
+			# and finally, if we have a value, let's set it
+			if (defined $value) {
+				$params{$fieldName} = $value;
+			}
 		}
 	}
+	# if the value field is undefined, lets use the defaultValue field instead
 	unless (exists $params{value}) {
 		$params{value} = $params{defaultValue};
 	}

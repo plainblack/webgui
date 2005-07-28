@@ -128,7 +128,6 @@ sub getEditForm {
 		
 	}
         $tabform->getTab("properties")->file(
-               	-name=>"file",
 		-label=>WebGUI::International::get('new file', 'Asset_File'),
 		-hoverHelp=>WebGUI::International::get('new file description', 'Asset_File'),
                	);

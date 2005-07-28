@@ -191,62 +191,6 @@ sub dynamicField {
 
 #-------------------------------------------------------------------
 
-=head2 file ( name [, label, subtext, extras, size, uiLevel ] )
-
-Adds a file browse row to this form.
-
-=head3 name
-
-The name field for this form element.
-
-=head3 label
-
-The left column label for this form row.
-
-=head3 subtext
-
-Extra text to describe this form element or to provide special instructions.
-
-=head3 extras
-
-If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
-
- 'onChange="this.form.submit()"'
-
-=head3 size
-
-The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=head3 uiLevel
-
-The UI level for this field. See the WebGUI developer's site for details. Defaults to "0".
-
-=head3 hoverHelp
-
-A string of text or HTML to be displayed when a user's mouse hover's over a field label. It is meant to describe to the user what to use the field for.
-
-=cut
-
-sub file {
-        my ($output);
-        my ($self, @p) = @_;
-        my ($name, $label, $subtext, $extras, $size, $uiLevel,$hoverHelp) =
-                rearrange([qw(name label subtext extras size uiLevel hoverHelp)], @p);
-        if (_uiLevelChecksOut($uiLevel)) {
-                $output = WebGUI::Form::file({
-                        "name"=>$name,
-                        "size"=>$size,
-                        "extras"=>$extras
-                        });
-                $output .= _subtext($subtext);
-                $output = $self->_tableFormRow($label,$output,$hoverHelp);
-        }
-        $self->{_data} .= $output;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 new ( [ noTable, action, method, extras, enctype, tableExtras ] )
 
 Constructor.

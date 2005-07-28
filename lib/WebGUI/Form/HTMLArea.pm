@@ -123,7 +123,7 @@ sub toHtml {
 	my $self = shift;
         WebGUI::Style::setScript($session{config}{extrasURL}.'/textFix.js',{ type=>'text/javascript' });
 	$self->{extras} .= ' id="'.$self->{name}.'" onBlur="fixChars(this.form.'.$self->{name}.')" mce_editable="true" ';	
-	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->{richEditId})->getRichEditor();
+	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->{richEditId})->getRichEditor($self->{name});
 }
 
 

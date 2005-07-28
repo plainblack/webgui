@@ -158,69 +158,6 @@ sub dynamicField {
 }
 
 
-#-------------------------------------------------------------------
-
-=head2 file ( hashRef )
-
-Returns a file upload field.
-
-=head3 name
-
-The name field for this form element.
-
-=head3 extras
-
-If you want to add anything special to this form element like javascript actions, or stylesheet information, you'd add it in here as follows:
-
- 'onChange="this.form.submit()"'
-
-=head3 size
-
-The number of characters wide this form element should be. There should be no reason for anyone to specify this.
-
-=cut
-
-sub file {
-	my $params = shift;
-        my $size = $params->{size} || $session{setting}{textBoxSize} || 30;
-        return '<input type="file" name="'.$params->{name}.'" size="'.$size.'" '.$params->{extras}.' />';
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 files ( hashRef )
-
-Returns a multiple file upload control.
-
-=head3 name
-
-The name field for this form element.
-
-=cut
-
-sub files {
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
-	my $uploadControl = '<div id="fileUploadControl"> </div>
-		<script>
-		var images = new Array();
-		';
-	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
-	my @files = readdir(DIR);
-	closedir(DIR);
-	foreach my $file (@files) {
-		unless ($file eq "." || $file eq "..") {
-			my $ext = $file;
-			$ext =~ s/(.*?)\.gif/$1/;
-			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
-		}
-	}
-	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images, "'.WebGUI::International::get('removeLabel','WebGUI').'");
-	uploader.addRow();
-	</script>';
-	return $uploadControl;
-}
-
 
 #-------------------------------------------------------------------
 

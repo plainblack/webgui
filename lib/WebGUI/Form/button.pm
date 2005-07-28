@@ -58,7 +58,7 @@ sub definition {
 	my $definition = shift || [];
 	push(@{$definition}, {
 		defaultValue=>{
-			defaultValue=>WebGUI::International::get(62)
+			defaultValue=>WebGUI::International::get(62,"WebGUI")
 			}
 		});
 	return $class->SUPER::definition($definition);
