@@ -288,6 +288,8 @@ Accepts any parameters specified by the definition() method. This parameter set 
  my $obj = $class->new(name=>"this", value=>"that");
  my $obj = $class->new(-name=>"this", -value=>"that");
 
+Please note that an id attribute is automatically added to every form element with a name of name_formId. So if your form element has a name of "description" then the id attribute assigned to it would be "description_formId".
+
 =cut
 
 sub new {
