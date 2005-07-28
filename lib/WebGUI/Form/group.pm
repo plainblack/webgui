@@ -68,12 +68,19 @@ An array reference containing a list of groups to exclude from the list. Default
 
 This will be used if no value is specified. Should be passed as an array reference. Defaults to 7 (Everyone).
 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		size=>{
 			defaultValue=>1
 			},

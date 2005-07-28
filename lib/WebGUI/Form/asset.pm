@@ -59,12 +59,19 @@ The name of the field. Defaults to "asset".
 
 Limits the list of selectable assets to a specific class, such as "WebGUI::Asset::Wobject::Article", specified by this parameter.
 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		name=>{
 			defaultValue=> "asset"
 			},

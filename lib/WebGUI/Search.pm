@@ -180,7 +180,7 @@ sub form {
         $f->raw('</td><td width="15%">');
         $f->selectList("numResults",\%results,'',[$numResults]);
         $f->raw('<p/>');
-        $f->submit(WebGUI::International::get(170));
+        $f->submit(value=>WebGUI::International::get(170));
         $f->raw('</td>');
         $output .= $f->print;
         $output .= '</tr></table>';

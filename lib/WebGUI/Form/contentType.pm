@@ -56,12 +56,19 @@ An array reference of field types to be displayed. The types are "mixed", "html"
 
 An array reference of the items to be checked if no value is specified. Defaults to "mixed". Possible values are "mixed", "code", "html", and "text".
 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		types=>{
 			defaultValue=>[qw(mixed html code text)]
 			},

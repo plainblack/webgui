@@ -56,12 +56,19 @@ Defaults to 1. How many characters tall should this control be represented.
 
 An array reference containing the form control types to be selectable. Defaults to all available types.
 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		size=>{
 			defaultValue=>1
 			},

@@ -87,7 +87,7 @@ Add extra attributes to the form tag like
 
 =head4 label
 
-A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to the getName() method call.
+A text label that will be displayed if toHtmlWithWrapper() is called.
 
 =head4 uiLevel
 
@@ -138,7 +138,7 @@ sub definition {
 			defaultValue=>undef
 			},
 		label=>{
-			defaultValue=>$class->getName
+			defaultValue=>undef
 			},
 		uiLevel=>{
 			defaultValue=>1

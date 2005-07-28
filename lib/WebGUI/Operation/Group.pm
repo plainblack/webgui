@@ -128,7 +128,7 @@ sub getGroupSearchForm {
                 -value=>$session{scratch}{groupSearchKeyword},
                 -size=>15
                 );
-        $f->submit(WebGUI::International::get(170));
+        $f->submit(value=>WebGUI::International::get(170));
         $output .= $f->print;
         $output .= '</div>';
 	return $output;

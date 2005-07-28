@@ -59,12 +59,19 @@ The identifier for this field. Defaults to "templateId".
                 
 The namespace for the list of templates to return. If this is omitted, all templates will be displayed.
                 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		name=>{
 			defaultValue=>"templateId"
 			},

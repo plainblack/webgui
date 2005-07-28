@@ -72,12 +72,19 @@ The number of characters tall this list should be. Defaults to '1'.
         
 Boolean indicating whether the user can select multiple items from this list like a checkList. Defaults to "0".
 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		name=>{
 			defaultValue=>"ldapLinkId"
 			},

@@ -68,12 +68,19 @@ A URL that will be acted upon after editing a database link.
 
 A tooltip to tell the user what to do with the field. Defaults a standard piece of help for Database Links.
 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		name=>{
 			defaultValue=>"databaseLinkId"
 			},

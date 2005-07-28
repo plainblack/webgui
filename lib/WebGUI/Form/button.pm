@@ -60,9 +60,6 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>WebGUI::International::get(62,"WebGUI")
 			},
-		label=>{
-			defaultValue=>""
-			}
 		});
 	return $class->SUPER::definition($definition);
 }

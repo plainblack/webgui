@@ -171,7 +171,7 @@ sub www_checkoutConfirm {
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden('op', 'checkoutSubmit');
 	$f->raw($plugin->checkoutForm);
-	$f->submit($i18n->get('pay button'));
+	$f->submit(value=>$i18n->get('pay button'));
 	
 	$var{form} = $f->print;
 	$var{title} = $i18n->get('checkout confirm title');

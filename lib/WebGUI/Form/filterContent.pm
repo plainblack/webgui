@@ -57,12 +57,19 @@ The name of this field to be passed through the URI. Defaults to "filterContent"
 
 A tooltip for what to do with this field. Defaults to a general explaination of content filters.
 
+=head4 label
+
+A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
 =cut
 
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		label=>{
+			defaultValue=>$class->getName()
+			},
 		name=>{
 			defaultValue=>"filterContent"
 			},
