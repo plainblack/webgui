@@ -27,9 +27,127 @@ insertHelpTemplate();
 insertXSLTSheets();
 insertSyndicatedContentTemplate();
 WebGUI::Group->new('9')->delete;
+updateDefaultSurveyViewTemplate();
 
 WebGUI::Session::close();
 
+#-------------------------------------------------
+sub updateDefaultSurveyViewTemplate {
+	print "\tUpdating Default Survey View template.\n" unless ($quiet);
+
+	my $template = q|<a name="<tmpl_var assetId>"></a>
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>	
+		<tmpl_if displayTitle>
+    <h1><tmpl_var title></h1>
+</tmpl_if>
+
+
+<tmpl_if description>
+  <tmpl_var description><p />
+</tmpl_if>
+
+
+<tmpl_if user.canTakeSurvey>
+	<tmpl_if response.isComplete>
+		<tmpl_if mode.isSurvey>
+			<tmpl_var thanks.survey.label>
+		<tmpl_else>
+			<tmpl_var thanks.quiz.label>
+			<div align="center">
+				<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.total>
+				<br />
+				<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% 
+			</div>
+		</tmpl_if>
+		<tmpl_if user.canRespondAgain>
+			<br /> <br /> <a href="<tmpl_var start.newResponse.url>"><tmpl_var start.newResponse.label></a>
+		</tmpl_if>
+	<tmpl_else>
+		<tmpl_if response.id>
+			<tmpl_var form.header>
+			<table width="100%" cellpadding="3" cellspacing="0" border="0" class="content">
+				<tr>
+					<td valign="top">
+					<tmpl_loop question_loop>
+						<p><tmpl_var question.question></p>
+						<tmpl_var question.answer.label><br />
+						<tmpl_var question.answer.field><br />
+						<br />
+						<tmpl_if question.allowComment>
+							<tmpl_var question.comment.label><br />
+							<tmpl_var question.comment.field><br />
+						</tmpl_if>
+					</tmpl_loop>
+					</td>
+					<td valign="top" nowrap="1">
+						<b><tmpl_var questions.sofar.label>:</b> <tmpl_var questions.sofar.count> / <tmpl_var questions.total> <br />
+						<tmpl_unless mode.isSurvey>
+							<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.sofar.count><br />
+							<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% / 100%<br />
+						</tmpl_unless>
+					</td>
+				</tr>
+			</table>
+			<div align="center"><tmpl_var form.submit></div>
+			<tmpl_var form.footer>
+		<tmpl_else>
+			<a href="<tmpl_var start.newResponse.url>"><tmpl_var start.newResponse.label></a>
+		</tmpl_if>
+	</tmpl_if>
+<tmpl_else>
+	<tmpl_if mode.isSurvey>
+		<tmpl_var survey.noprivs.label>
+	<tmpl_else>
+		<tmpl_var quiz.noprivs.label>
+	</tmpl_if>
+</tmpl_if>
+<br />
+<br />
+<tmpl_if user.canViewReports>
+	<a href="<tmpl_var report.gradebook.url>"><tmpl_var report.gradebook.label></a> 
+	&bull;
+	<a href="<tmpl_var report.overview.url>"><tmpl_var report.overview.label></a> 
+	&bull;
+	<a href="<tmpl_var delete.all.responses.url>"><tmpl_var delete.all.responses.label></a> 
+	<br />
+	<a href="<tmpl_var export.answers.url>"><tmpl_var export.answers.label></a> 
+	&bull;
+	<a href="<tmpl_var export.questions.url>"><tmpl_var export.questions.label></a> 
+	&bull;
+	<a href="<tmpl_var export.responses.url>"><tmpl_var export.responses.label></a> 
+	&bull;
+	<a href="<tmpl_var export.composite.url>"><tmpl_var export.composite.label></a> 
+</tmpl_if>
+
+
+<tmpl_if session.var.adminOn>
+	<p>
+		<a href="<tmpl_var question.add.url>"><tmpl_var question.add.label></a>
+	</p>
+		<p><a href="<tmpl_var section.add.url>"><tmpl_var section.add.label></a></p>
+
+	<tmpl_loop section.edit_loop>
+		<tmpl_var section.edit.controls>
+          	<b><tmpl_var section.edit.sectionName></b>
+		<br />
+<tmpl_loop section.questions_loop>
+&nbsp;&nbsp;&nbsp;<tmpl_var question.edit.controls><tmpl_var question.edit.question>
+		</tmpl_loop>
+	<br />
+        </tmpl_loop>
+	
+	
+</tmpl_if> |; 
+	my $properties = { 'template' => $template };
+	my $currentVersion = WebGUI::Asset::Template->new('PBtmpl0000000000000061');
+	my $newVersion = $currentVersion->addRevision($properties);
+	
+
+}
+
+#-------------------------------------------------
 sub updateConfigFile {
 	print "\tUpdating config file.\n" unless ($quiet);
 	my $pathToConfig = '../../etc/'.$configFile;
@@ -47,6 +165,7 @@ sub updateConfigFile {
 	$conf->write;
 }
 
+#-------------------------------------------------
 sub addAssetVersioning {
     	print "\tMaking changes for asset versioning\n" unless ($quiet);
 	WebGUI::SQL->write("create table assetVersionTag (
@@ -131,7 +250,7 @@ sub addAssetVersioning {
 
 }
 
-
+#-------------------------------------------------
 sub insertHelpTemplate{
     print "\tInserting new Help template\n" unless ($quiet);
     my $helpTemplate = <<EOT;

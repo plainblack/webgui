@@ -14,6 +14,11 @@ save you many hours of grief.
 	sure they will comply.
 
 
+ * The templates for Survey assets has changed a little.  After
+        upgrading you will notice that your custom view templates
+	will not display your questions for editing in Admin mode.
+	You will need to put your questions loop inside of a section
+	loop.  See the default view template for an example.
 6.6.4
 --------------------------------------------------------------------
  * Please ensure you're running HTML::Template version 2.7, which

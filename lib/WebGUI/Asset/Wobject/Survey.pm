@@ -40,6 +40,15 @@ sub addAnswer {
 }
 
 #-------------------------------------------------------------------
+sub addSection {
+	$_[0]->setCollateral("Survey_section","Survey_sectionId",{
+		Survey_id=>$_[0]->get("Survey_id"),
+		Survey_sectionId=>"new",
+		sectionName=>$_[1]
+		},1,0,"Survey_id");
+}
+
+#-------------------------------------------------------------------
 sub completeResponse {
 	my $self = shift;
 	my $responseId = shift;
@@ -222,7 +231,8 @@ sub getEditForm {
 		-options	=> {
 			sequential => WebGUI::International::get(5,'Asset_Survey'),
                 	random => WebGUI::International::get(6,'Asset_Survey'),
-                	response => WebGUI::International::get(7,'Asset_Survey')
+                	response => WebGUI::International::get(7,'Asset_Survey'),
+                	section => WebGUI::International::get(106, 'Asset_Survey')
 			},
 		-label		=> WebGUI::International::get(8,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('8 description','Asset_Survey'),
@@ -371,12 +381,24 @@ sub getQuestionsLoop {
 		@ids = $self->getSequentialQuestionIds($responseId);
 	} elsif ($self->get("questionOrder") eq "response") {
 		@ids = $self->getResponseDrivenQuestionIds($responseId);
+	} elsif ($self->get("questionOrder") eq "section") {
+		@ids = $self->getSectionDrivenQuestionIds($responseId);
 	} else {
 		@ids = $self->getRandomQuestionIds($responseId);
 	}
 	my $length = scalar(@ids);
 	my $i = 1;
 	my @loop;
+	
+	#Ignore questions per page when using sections, return all questions for current section
+	if ($self->get("questionOrder") eq "section") {
+	  while ($i <= $length) {
+	  	push(@loop,$self->getQuestionVars($ids[($i-1)]));
+	  	$i++;
+	  }
+	  return \@loop;
+	}
+	
 	my $questionResponseCount = $self->getQuestionResponseCount($responseId);
 	while ($i <= $length && $i<= $self->get("questionsPerPage") && ($questionResponseCount + $i) <= $self->getValue("questionsPerResponse")) {
 		push(@loop,$self->getQuestionVars($ids[($i-1)]));
@@ -493,6 +515,37 @@ sub getResponseDrivenQuestionIds {
 }
 
 #-------------------------------------------------------------------
+sub getSectionDrivenQuestionIds {
+	my $self = shift;
+	my $responseId = shift;
+	my @usedQuestionIds = WebGUI::SQL->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".quote($responseId));
+	my @questions;
+	my $where = " where Survey_question.Survey_id=".quote($self->get("Survey_id"));
+	$where .= " and Survey_question.Survey_sectionId=Survey_section.Survey_sectionId";	
+	
+	if ($#usedQuestionIds+1 > 0) {
+		$where .= " and Survey_questionId not in (".quoteAndJoin(\@usedQuestionIds).")";
+	}
+		
+	my $sth = WebGUI::SQL->read("select Survey_questionId, Survey_question.Survey_sectionId from Survey_question,
+			Survey_section $where order by Survey_section.sequenceNumber, Survey_question.sequenceNumber");
+
+	my $loopCount=0;
+	my $currentSection;
+	while (my $hashRef = $sth->hashRef) {
+	  if ($loopCount == 0){ $currentSection = $hashRef->{Survey_sectionId}; }
+	  if ($currentSection eq $hashRef->{Survey_sectionId}) {
+	    push (@questions, $hashRef->{Survey_questionId});
+	  }
+	  $loopCount++;
+	}
+	$sth->finish;
+	return @questions;
+}
+
+
+
+#-------------------------------------------------------------------
 sub getResponseId {
 	my $self = shift;
 	return $session{scratch}{$self->getResponseIdString};
@@ -525,7 +578,15 @@ sub getUserId {
 	return $userId;
 }
 
-
+#-------------------------------------------------------------------
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+	if ($session{form}{assetId} eq "new") {
+	  $self->addSection(WebGUI::International::get(107, 'Asset_Survey'));
+	}
+	
+}
 #-------------------------------------------------------------------
 sub purge {
 	my ($count) = WebGUI::SQL->quickArray("select count(*) from Survey where Survey_id=".quote($_[0]->get("Survey_id")));
@@ -533,6 +594,7 @@ sub purge {
         	WebGUI::SQL->write("delete from Survey_question where Survey_id=".quote($_[0]->get("Survey_id")));
         	WebGUI::SQL->write("delete from Survey_answer where Survey_id=".quote($_[0]->get("Survey_id")));
         	WebGUI::SQL->write("delete from Survey_response where Survey_id=".quote($_[0]->get("Survey_id")));
+        	WebGUI::SQL->write("delete from Survey_section where Survey_id=".quote($_[0]->get("Survey_id")));
 	}
         $_[0]->SUPER::purge();
 }
@@ -568,10 +630,21 @@ sub view {
 	my $var = $self->getMenuVars;
 	$var->{'question.add.url'} = $self->getUrl('func=editQuestion&qid=new');
 	$var->{'question.add.label'} = WebGUI::International::get(30,'Asset_Survey');
-	my @edit;
-	my $sth = WebGUI::SQL->read("select Survey_questionId,question from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
-	while (my %data = $sth->hash) {
-		push(@edit,{
+	$var->{'section.add.url'} = $self->getUrl('func=editSection&sid=new');
+	$var->{'section.add.label'} = WebGUI::International::get(104,'Asset_Survey');
+	my @sectionEdit;
+	
+	# Get Sections
+	my $sth = WebGUI::SQL->read("select Survey_sectionId,sectionName from Survey_section where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
+	while (my %sectionData = $sth->hash) {
+		my @edit;
+		
+		# Get Questions for this section
+		my $sth2 = WebGUI::SQL->read("select Survey_questionId,question from Survey_question 
+		   where Survey_id=".quote($self->get("Survey_id"))."
+		   and Survey_sectionId=".quote($sectionData{Survey_sectionId})." order by sequenceNumber");
+		while (my %data = $sth2->hash) {
+		  push(@edit,{
 			'question.edit.controls'=>
 				deleteIcon('func=deleteQuestionConfirm&qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Asset_Survey')).
 				editIcon('func=editQuestion&qid='.$data{Survey_questionId}, $self->get("url")).
@@ -579,10 +652,25 @@ sub view {
 				moveDownIcon('func=moveQuestionDown&qid='.$data{Survey_questionId}, $self->get("url")),
 			'question.edit.question'=>$data{question},
 			'question.edit.id'=>$data{Survey_questionId}
+		  });
+		}
+		$sth2->finish;
+	
+		push(@sectionEdit,{
+			'section.edit.controls'=>
+				deleteIcon('func=deleteSectionConfirm&sid='.$sectionData{Survey_sectionId}, $self->get("url"), WebGUI::International::get(105,'Asset_Survey')).
+				editIcon('func=editSection&sid='.$sectionData{Survey_sectionId}, $self->get("url")).
+				moveUpIcon('func=moveSectionUp&sid='.$sectionData{Survey_sectionId}, $self->get("url")).
+				moveDownIcon('func=moveSectionDown&sid='.$sectionData{Survey_sectionId}, $self->get("url")),
+			'section.edit.sectionName'=>$sectionData{sectionName},
+			'section.edit.id'=>$sectionData{Survey_sectionId},
+			'section.questions_loop'=>\@edit
 			});
-		$var->{'question.edit_loop'} = \@edit;
+		$var->{'section.edit_loop'} = \@sectionEdit;
+		
 	}
 	$sth->finish;
+		
 	$var->{'user.canTakeSurvey'} = WebGUI::Grouping::isInGroup($self->get("groupToTakeSurvey"));
 	if ($var->{'user.canTakeSurvey'}) {
 		$var->{'response.Id'} = $self->getResponseId();
@@ -648,6 +736,22 @@ sub www_deleteQuestionConfirm {
 }
 
 #-------------------------------------------------------------------
+sub www_deleteSectionConfirm {
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        my $none = WebGUI::International::get(107, 'Asset_Survey');
+        my ($sectionName) = WebGUI::SQL->quickArray("select sectionName from Survey_section where Survey_sectionId="
+        		.quote($session{form}{sid}));
+        if ($sectionName =~ /$none/) {
+	  return WebGUI::Privilege::vitalComponent();
+	}
+        
+	WebGUI::SQL->write("delete from Survey_section where Survey_sectionId=".quote($session{form}{sid}));
+        $_[0]->deleteCollateral("Survey_section","Survey_sectionId",$session{form}{sid});
+        $_[0]->reorderCollateral("Survey_section","Survey_sectionId","Survey_id");
+        return "";
+}
+
+#-------------------------------------------------------------------
 sub www_deleteResponse {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         return $_[0]->confirm(WebGUI::International::get(72,'Asset_Survey'),
@@ -693,6 +797,7 @@ sub www_editSave {
 		$session{form}{qid} = "new";
 		return $_[0]->www_editQuestion;
 	}
+		
 	return $output;
 }
 
@@ -797,6 +902,7 @@ sub www_editQuestion {
 	$f->hidden("func","editQuestionSave");
 	$f->hidden("qid",$question->{Survey_questionId});
 	$f->hidden("answerFieldType",$answerFieldType);
+	
 	$f->HTMLArea(
 		-name	=> "question",
 		-value	=> $question->{question},
@@ -815,6 +921,17 @@ sub www_editQuestion {
 		-label	=> WebGUI::International::get(16,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('16 description','Asset_Survey')
 		);
+	
+	my $sectionList = WebGUI::SQL->buildHashRef("select Survey_sectionId,sectionName
+			  from Survey_section where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
+			  
+	$f->selectList(
+			-name	=> "section",
+			-options=> $sectionList,
+			-value	=> [$question->{Survey_sectionId}],
+			-label	=> WebGUI::International::get(106, 'Asset_Survey')
+		      );
+			
 	if ($self->get("questionOrder") eq "response") {
 		my $ql = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
@@ -877,6 +994,7 @@ sub www_editQuestion {
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+		
 	$session{form}{qid} = $_[0]->setCollateral("Survey_question", "Survey_questionId", {
                 question=>$session{form}{question},
         	Survey_questionId=>$session{form}{qid},
@@ -884,7 +1002,8 @@ sub www_editQuestionSave {
                 allowComment=>$session{form}{allowComment},
 		gotoQuestion=>$session{form}{gotoQuestion},
 		answerFieldType=>$session{form}{answerFieldType},
-                randomizeAnswers=>$session{form}{randomizeAnswers}
+                randomizeAnswers=>$session{form}{randomizeAnswers},
+                Survey_sectionId=>$session{form}{section}
                 },1,0,"Survey_id");
         if ($session{form}{proceed} eq "addMultipleChoiceAnswer") {
         	$session{form}{aid} = "new";
@@ -920,6 +1039,44 @@ sub www_editQuestionSave {
                 return $_[0]->www_editQuestion();
 	}
         return "";
+}
+
+#-------------------------------------------------------------------
+sub www_editSection {
+	my ($f, $section, $sectionName, $self);
+	$self = shift;
+	my $none = WebGUI::International::get(107, 'Asset_Survey');
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	$section = $self->getCollateral("Survey_section","Survey_sectionId",$session{form}{sid});
+	
+	if ($section->{sectionName} =~ /$none/) {
+	  return WebGUI::Privilege::vitalComponent;
+	}
+	
+	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	$f->hidden("wid",$self->get("wobjectId"));
+	$f->hidden("func","editSectionSave");
+	$f->hidden("sid",$section->{Survey_sectionId});
+
+	$f->text(
+		-name	=> "sectionName",
+		-value	=> $section->{sectionName},
+		-label	=> WebGUI::International::get(102,'Asset_Survey')
+	);
+	$f->submit;
+	my $output = $f->print;
+	return $self->getAdminConsole->render($output, WebGUI::International::get(103,'Asset_Survey'));
+}
+
+#-------------------------------------------------------------------
+sub www_editSectionSave {
+	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	$session{form}{sid} = $_[0]->setCollateral("Survey_section", "Survey_sectionId", {
+                sectionName => $session{form}{sectionName},
+        	Survey_sectionId=>$session{form}{sid},
+		Survey_id=>$_[0]->get("Survey_id"),
+                },1,0,"Survey_id");
+	return "";
 }
 
 #-------------------------------------------------------------------
@@ -978,6 +1135,20 @@ sub www_moveQuestionDown {
 sub www_moveQuestionUp {
         return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Survey_question","Survey_questionId",$session{form}{qid},"Survey_id");
+        return ""; 
+}
+
+#-------------------------------------------------------------------
+sub www_moveSectionDown {
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        $_[0]->moveCollateralDown("Survey_section","Survey_sectionId",$session{form}{sid},"Survey_id");
+        return "";
+}
+
+#-------------------------------------------------------------------
+sub www_moveSectionUp {
+        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        $_[0]->moveCollateralUp("Survey_section","Survey_sectionId",$session{form}{sid},"Survey_id");
         return ""; 
 }
 

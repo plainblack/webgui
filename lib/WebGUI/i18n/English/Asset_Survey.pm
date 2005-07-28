@@ -12,6 +12,37 @@ our $I18N = {
 	        lastUpdated => 1122296097
         },
 
+	'102' => {
+	        message => q|Section Name|,
+	        lastUpdated => 1122296097
+        },
+        
+        '103' => {
+                message => q|Survey Section, Add/Edit|,
+                lastUpdated => 1122296097
+        },
+
+        '104' => {
+                message => q|Add a new section|,
+                lastUpdated => 1122296097
+        },
+
+        '105' => {
+                message => q|Are you sure you wish to delete this section?|,
+                lastUpdated => 1122296097
+        },
+
+        '106' => {
+                message => q|Section|,
+                lastUpdated => 1122296097
+        },
+
+        '107' => {
+                message => q|None|,
+                lastUpdated => 1122296097
+        },
+
+
 	'32' => {
 		message => q|False|,
 		lastUpdated => 1037498832
