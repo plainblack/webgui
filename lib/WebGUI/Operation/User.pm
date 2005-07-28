@@ -121,6 +121,7 @@ sub getUserSearchForm {
 	$f->selectList(
 		-name=>"modifier",
 		-value=>([$session{scratch}{userSearchModifier} || "contains"]),
+		-label=>"",
 		-options=>{
 			startsWith=>WebGUI::International::get("starts with"),
 			contains=>WebGUI::International::get("contains"),
@@ -129,11 +130,13 @@ sub getUserSearchForm {
 		);
 	$f->text(
 		-name=>"keyword",
+		-label=>"",
 		-value=>$session{scratch}{userSearchKeyword},
 		-size=>15
 		);
 	$f->selectList(
 		-name	=> "status",
+		-label=>"",
 		-value	=> [$session{scratch}{userSearchStatus} || "users.status like '%'"],
 		-options=> { 
 			""		=> WebGUI::International::get(821),
@@ -142,7 +145,7 @@ sub getUserSearchForm {
 			Selfdestructed	=> WebGUI::International::get(819)
 			}
 	);
-	$f->submit(WebGUI::International::get(170));
+	$f->submit(value=>WebGUI::International::get(170));
 	$output .= $f->print;
 	$output .= '</div>';
 	return $output;

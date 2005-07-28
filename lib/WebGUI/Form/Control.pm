@@ -362,10 +362,8 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	if ($self->{uiLevel} <= $session{user}{uiLevel} 
-		|| ( $session{config}{$self->{uiLevelOverride}}{$self->{name}} 
-		&& $session{config}{$self->{uiLevelOverride}}{$self->{name}} <= $session{user}{uiLevel})) 
-		{
+WebGUI::ErrorHandler::debug($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}});
+	if ($self->{uiLevel} <= $session{user}{uiLevel} && $session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}} <= $session{user}{uiLevel}) {
 		my $rowClass = $self->{rowClass};
         	$rowClass = qq| class="$rowClass" | if($self->{rowClass});
 		my $labelClass = $self->{labelClass};

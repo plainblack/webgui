@@ -120,7 +120,8 @@ sub AUTOLOAD {
         our $AUTOLOAD;
 	my $self = shift;
         my $name = (split /::/, $AUTOLOAD)[-1];
-        my @params = @_;
+        my %params = @_;
+	$params{uiLevelOverride} ||= $self->{_uiLevelOverride};
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);    
         if ($@) {
@@ -128,7 +129,7 @@ sub AUTOLOAD {
                 return undef;
         }       
         my $class = "WebGUI::Form::".$name;
-        $self->{_data} .= $class->new(@params)->toHtmlWithWrapper;
+        $self->{_data} .= $class->new(%params)->toHtmlWithWrapper;
 }       
         
 #-------------------------------------------------------------------
@@ -227,20 +228,19 @@ If you want to add anything special to the form's table like a name or styleshee
 
 sub new {
 	my ($header, $footer);
-        my ($self, @p) = @_;
-        my ($noTable, $action, $method, $extras, $enctype, $tableExtras) =
-                rearrange([qw(noTable action method extras enctype tableExtras)], @p);
-	$noTable = $noTable || 0;
+	my $class = shift;
+	my %param = @_;
+	$param{noTable} ||= 0;
 	$header = "\n\n".WebGUI::Form::formHeader({
-		"action"=>$action,
-		"extras"=>$extras,
-		"method"=>$method,
-		"enctype"=>$enctype
+		action=>$param{action},
+		extras=>$param{extras},
+		method=>$param{method},
+		enctype=>$param{enctype}
 		});
-	$header .= "\n<table ".$tableExtras.'><tbody>' unless ($noTable);
-	$footer = "</tbody></table>\n" unless ($noTable);
+	$header .= "\n<table ".$param{tableExtras}.'><tbody>' unless ($param{noTable});
+	$footer = "</tbody></table>\n" unless ($param{noTable});
 	$footer .= WebGUI::Form::formFooter();
-        bless {_noTable => $noTable, _header => $header, _footer => $footer, _data => ''}, $self;
+        bless {_uiLevelOverride=>$param{uiLevelOverride}, _noTable => $param{noTable}, _header => $header, _footer => $footer, _data => ''}, $class;
 }
 
 #-------------------------------------------------------------------

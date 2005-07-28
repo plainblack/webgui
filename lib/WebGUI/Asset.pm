@@ -960,7 +960,9 @@ Creates and returns a tabform to edit parameters of an Asset.
 
 sub getEditForm {
 	my $self = shift;
-	my $tabform = WebGUI::TabForm->new(undef,undef,$self->getUrl());
+	my $uiLevelOverride = $self->get("className");
+	$uiLevelOverride =~ s/\:\:/_/g;
+	my $tabform = WebGUI::TabForm->new(undef,undef,$self->getUrl(),$uiLevelOverride);
 	$tabform->hidden({
 		name=>"func",
 		value=>"editSave"

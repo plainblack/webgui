@@ -98,7 +98,7 @@ sub addTab {
 	my $name = shift;
 	my $label = shift;
 	my $uiLevel = shift || 0;
-	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new;
+	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new(uiLevelOverride=>$self->{_uiLevelOverride});
 	$self->{_tab}{$name}{label} = $label;
 	$self->{_tab}{$name}{uiLevel} = $uiLevel;
 }
@@ -197,10 +197,11 @@ sub new {
 	my $startingTabs = shift;
 	my $css = shift || $session{config}{extrasURL}.'/tabs/tabs.css';
 	my $cancelUrl = shift || WebGUI::URL::page();
+	my $uiLevelOverride = shift;
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
-		$tabs{$key}{form} = WebGUI::HTMLForm->new;
+		$tabs{$key}{form} = WebGUI::HTMLForm->new(uiLevelOverride=>$uiLevelOverride);
 		$tabs{$key}{label} = $startingTabs->{$key}->{label};
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
@@ -208,7 +209,7 @@ sub new {
 			value=>WebGUI::International::get('cancel'),
 			extras=>q|onClick="location.href='|.$cancelUrl.q|'"|
 			});
-	bless {	_cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
+	bless {	_uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
 
 

@@ -137,6 +137,15 @@ utilityAssets = WebGUI::Asset::Template, \
 #assetAddPrivilege = WebGUI::Asset::Wobject::SQLReport => 3, \
 #	WebGUI:::Asset::Template => 4
 
+# You can override the UI Levels of any field in the edit form of
+# any asset using the following variables. Basically just take the
+# class name of the asset seperated by underscores, and append
+# _uiLevel to the end of it, then you can start specifying field
+# names and associated UI Level.
+
+#WebGUI_Asset_Wobject_Article = menuTitle => 9, url => 8
+#WebGUI_Asset_RichEdit = askAboutRichEdit => 7, preformatted => 3
+
 # If exportPath is defined, an "Export" toolbar icon will appear
 # which allows you to export assets to static html. This folder
 # needs to be writable by your web server.

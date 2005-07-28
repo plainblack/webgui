@@ -1,4 +1,6 @@
 6.7.0
+ - Added the ability to override the UI Level of any field in the edit form of
+   any asset in the WebGUI config file.
  - fix [ 1229042 ] crumbtrail should show full path...
  - Added asset versioning.
  - fix [ 1229188 ] typo in Help: Collaboration, Post List Template Variables
