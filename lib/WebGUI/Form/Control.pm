@@ -302,9 +302,7 @@ sub new {
 		%raw = @_;
 	}
 	my %params;
-	# Ensure that overrides overwrite the previously defined definition of a field
-	my @reversedDefinitions = reverse @{$class->definition};
-	foreach my $definition (@reversedDefinitions) {
+	foreach my $definition (reverse @{$class->definition}) {
 		foreach my $fieldName (keys %{$definition}) {
 			my $value = $raw{$fieldName};
 			# if we have no value, try the tagged name

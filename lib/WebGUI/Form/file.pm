@@ -65,7 +65,7 @@ sub definition {
 	push(@{$definition}, {
 		name=>{
 			defaultValue=>"file"
-			}
+			},
 		maxAttachments=>{
 			defaultValue=>1
 			}
@@ -100,7 +100,7 @@ sub getValueFromPost {
 	my $self = shift;
 	my $storage = WebGUI::Storage->create;
         $storage->addFileFromFormPost($self->{name});
-	@files = $storage->getFiles;
+	my @files = $storage->getFiles;
 	if (scalar(@files) < 1) {
 		$storage->delete;
 		return undef;
@@ -130,7 +130,7 @@ sub toHtml {
                 unless ($file eq "." || $file eq "..") {
                         my $ext = $file;
                         $ext =~ s/(.*?)\.gif/$1/;
-                        $uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
+                        $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
                 }
         }
         $uploadControl .= 'var uploader = new FileUploadControl("'.$self->{name}.'", fileIcons, "'.WebGUI::International::get('removeLabel','WebGUI').'","'.$self->{maxAttachments}.'");

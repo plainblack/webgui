@@ -2,14 +2,17 @@
 //input.  Each file upload input is named "file"  the control must be rendered in a form.  The
 //Workspace id is the id of the div in the html page to render the control in.
 
-function FileUploadControl(workspaceId, imageArray, removeLabel) {
+function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit) {
 
-	this.images = images;
+	this.images = imageArray;
 	this.fileLimit = fileLimit;
 	this.fileCount = 1;
+	this.fieldName = fieldName;
+	workspaceId = fieldName+"_fileUploadControl";
+	this.workspaceId = workspaceId;
 	this.dom=document.getElementById&&!document.all;
 	this.topLevelElement=this.dom? "HTML" : "BODY"
-	
+	document.write('<div id="'+workspaceId+'"> </div>');	
 	var workspace = document.getElementById(workspaceId);
 	
 	var str = '<table border="0"><tbody id="' + workspaceId + '.fileUpload.body">';			
@@ -17,8 +20,8 @@ function FileUploadControl(workspaceId, imageArray, removeLabel) {
 	
 	str +='<table style="display: none;">'
 	
-	str += '<tr id="' + workspaceId + '.template" class="fileUploadRow"><td><img src="' + images["unknown"] + '" style="visibility: hidden"></td>';
-	str +='<td><input type="file" name="file" size="40" onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)"></td></tr>';
+	str += '<tr id="' + workspaceId + '.template" class="fileUploadRow"><td><img src="' + imageArray["unknown"] + '" style="visibility: hidden"></td>';
+	str +='<td><input type="file" name="'+fieldName+'" size="40" onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)"></td></tr>';
 	
 	str += '</table>';
 	
@@ -80,11 +83,6 @@ function FileUploadControl_swapImage(firedobj) {
 
 //removes a row from the control
 function FileUploadControl_removeRow(firedobj) {    
-
-	if (this.tbody.childNodes[this.tbody.childNodes.length -1] == this.getRow(firedobj)) {
-			window.status="cant remove last; return true";
-			return;
-	}
     var row = this.getRow(firedobj);
 	this.tbody.removeChild(row);
 }
@@ -104,9 +102,12 @@ function FileUploadControl_removeButtonClick(e) {
     var firedobj =dom? e.target : e.srcElement
 
 	var control = FileUploadControl_getControl(firedobj);
-
+  	if (control.tbody.childNodes[control.tbody.childNodes.length -1] == control.getRow(firedobj)) {
+		control.addRow();
+        } else {
+		control.fileCount--;
+	}
 	control.removeRow(firedobj);
-	control.fileCount--;
 
 }
 

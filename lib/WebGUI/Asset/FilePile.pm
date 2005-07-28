@@ -74,29 +74,29 @@ sub edit {
 	$tabform->getTab("properties")->yesNo(
                	-name=>"isHidden",
                	-value=>1,
-               	-label=>WebGUI::International::get(886,"FilePile"),
-               	-hoverHelp=>WebGUI::International::get('886 description',"FilePile"),
+               	-label=>WebGUI::International::get(886,"Asset_FilePile"),
+               	-hoverHelp=>WebGUI::International::get('886 description',"Asset_FilePile"),
                	-uiLevel=>6
                	);
        	$tabform->getTab("properties")->yesNo(
                 -name=>"newWindow",
        	        -value=>0,
-               	-label=>WebGUI::International::get(940,"FilePile"),
-               	-hoverHelp=>WebGUI::International::get('940 description',"FilePile"),
+               	-label=>WebGUI::International::get(940,"Asset_FilePile"),
+               	-hoverHelp=>WebGUI::International::get('940 description',"Asset_FilePile"),
                 -uiLevel=>6
        	        );
 	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
 	$tabform->getTab("security")->dateTime(
                	-name=>"startDate",
-                -label=>WebGUI::International::get(497,"FilePile"),
-                -hoverHelp=>WebGUI::International::get('497 description',"FilePile"),
+                -label=>WebGUI::International::get(497,"Asset_FilePile"),
+                -hoverHelp=>WebGUI::International::get('497 description',"Asset_FilePile"),
        	        -value=>$self->get("startDate"),
                	-uiLevel=>6
                 );
        	$tabform->getTab("security")->dateTime(
                	-name=>"endDate",
-                -label=>WebGUI::International::get(498,"FilePile"),
-                -hoverHelp=>WebGUI::International::get('498 description',"FilePile"),
+                -label=>WebGUI::International::get(498,"Asset_FilePile"),
+                -hoverHelp=>WebGUI::International::get('498 description',"Asset_FilePile"),
        	        -value=>$self->get("endDate"),
                	-uiLevel=>6
                	);
@@ -118,33 +118,33 @@ sub edit {
        	$tabform->getTab("security")->selectList(
        		-name=>"ownerUserId",
               	-options=>$users,
-       	       	-label=>WebGUI::International::get(108,"FilePile"),
-       	       	-hoverHelp=>WebGUI::International::get('108 description',"FilePile"),
+       	       	-label=>WebGUI::International::get(108,"Asset_FilePile"),
+       	       	-hoverHelp=>WebGUI::International::get('108 description',"Asset_FilePile"),
        		-value=>[$self->get("ownerUserId")],
        		-subtext=>$subtext,
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdView",
-       		-label=>WebGUI::International::get(872,"FilePile"),
-       		-hoverHelp=>WebGUI::International::get('872 description',"FilePile"),
+       		-label=>WebGUI::International::get(872,"Asset_FilePile"),
+       		-hoverHelp=>WebGUI::International::get('872 description',"Asset_FilePile"),
        		-value=>[$self->get("groupIdView")],
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdEdit",
-       		-label=>WebGUI::International::get(871,"FilePile"),
-       		-hoverHelp=>WebGUI::International::get('871 description',"FilePile"),
+       		-label=>WebGUI::International::get(871,"Asset_FilePile"),
+       		-hoverHelp=>WebGUI::International::get('871 description',"Asset_FilePile"),
        		-value=>[$self->get("groupIdEdit")],
        		-excludeGroups=>[1,7],
        		-uiLevel=>6
        		);
-	$tabform->getTab("properties")->readOnly(
+	$tabform->getTab("properties")->file(
 		-label=>WebGUI::International::get("upload files", "Asset_FilePile"),
 		-hoverHelp=>WebGUI::International::get("upload files", "Asset_FilePile"),
-		-value=>$self->getUploadControl
+		-maxAttachments=>100
 		);
-        $self->getAdminConsole->setHelp("file pile add/edit","FilePile");
+        $self->getAdminConsole->setHelp("file pile add/edit","Asset_FilePile");
 	return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("add pile", "Asset_FilePile"));
 }
 
@@ -208,30 +208,6 @@ sub getName {
         return WebGUI::International::get('file pile',"Asset_FilePile");
 } 
 
-#-------------------------------------------------------------------
-sub getUploadControl {
-	my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
-	my $uploadControl = '<div id="fileUploadControl"> </div>
-		<script>
-		var fileLimit = 100;
-		var images = new Array();
-		';
-	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
-	my @files = readdir(DIR);
-	closedir(DIR);
-	foreach my $file (@files) {
-		unless ($file eq "." || $file eq "..") {
-			my $ext = $file;
-			$ext =~ s/(.*?)\.gif/$1/;
-			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
-		}
-	}
-	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images, "'.WebGUI::International::get('removeLabel','WebGUI').'");
-	uploader.addRow();
-	</script>';
-	return $uploadControl;
-}
 
 
 #-------------------------------------------------------------------

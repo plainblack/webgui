@@ -465,25 +465,9 @@ sub getUploadControl {
 		}
 		return $uploadControl unless ($i < $maxAttachments);
 	}
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
-	$uploadControl .= '<div id="fileUploadControl"> </div>
-		<script>
-		var images = new Array();
-		var fileLimit = '.$maxAttachments.';
-		';
-	opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
-	my @files = readdir(DIR);
-	closedir(DIR);
-	foreach my $file (@files) {
-		unless ($file eq "." || $file eq "..") {
-			my $ext = $file;
-			$ext =~ s/(.*?)\.gif/$1/;
-			$uploadControl .= 'images["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
-		}
-	}
-	$uploadControl .= 'var uploader = new FileUploadControl("fileUploadControl", images, "'.WebGUI::International::get('removeLabel','WebGUI').'");
-	uploader.addRow();
-	</script>';
+	$uploadControl .= WebGUI::Form::file(
+		maxAttachments=>$maxAttachments
+		);
 	return $uploadControl;
 }
 
