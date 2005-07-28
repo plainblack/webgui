@@ -142,6 +142,7 @@ sub toHtml {
 	my $self = shift;
 	return WebGUI::Form::selectList->new(
 		name=>$self->{name},
+		id=>$self->{id},
 		options=>WebGUI::LDAPLink::getList(),
 		value=>$self->{value},
 		multiple=>$self->{multiple},

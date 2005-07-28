@@ -109,17 +109,19 @@ sub toHtml {
         my $asset = WebGUI::Asset->newByDynamicClass($self->{value}) || WebGUI::Asset->getRoot;
         return WebGUI::Form::hidden->new(
                         name=>$self->{name},
-                        extras=>'id="'.$self->{name}.'" '.$self->{extras},
-                        value=>$asset->getId
+                        extras=>$self->{extras},
+                        value=>$asset->getId,
+			id=>$self->{id}
                         )->toHtml
                 .WebGUI::Form::text->new(
                         name=>$self->{name}."_display",
-                        extras=>'id="'.$self->{name}."_display".'" readonly="1"',
-                        value=>$asset->get("title")
+                        extras=>' readonly="1" ',
+                        value=>$asset->get("title"),
+			id=>$self->{id}."_display"
                         )->toHtml
                 .WebGUI::Form::button->new(
                         value=>"...",
-                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree&classLimiter=".$self->{class}."&formId=".$self->{name}).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree&classLimiter=".$self->{class}."&formId=".$self->{id}).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;
 }
 

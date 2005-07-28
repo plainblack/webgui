@@ -107,6 +107,7 @@ Renders a question selector asking the user where they want to go.
 sub toHtml {
 	my $self = shift;
 	return WebGUI::Form::selectList->new(
+		id=>$self->{id},
 		name=>$self->{name},
 		options=>$self->{options},
 		value=>[$self->{value}],

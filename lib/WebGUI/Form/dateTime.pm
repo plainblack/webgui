@@ -126,11 +126,12 @@ sub toHtml {
                 name=>$self->{name},
                 value=>$value,
                 size=>$self->{size},
-                extras=>'id="'.$self->{name}.'Id" '.$self->{extras},
+                extras=>$self->{extras},
+		id=>$self->{id},
                 maxlength=>$self->{maxlength}
                 )->toHtml . '<script type="text/javascript"> 
                         Calendar.setup({ 
-                                inputField : "'.$self->{name}.'Id", 
+                                inputField : "'.$self->{name}.'", 
                                 ifFormat : "%Y-%m-%d %H:%M:%S", 
                                 showsTime : true, 
                                 timeFormat : "12",

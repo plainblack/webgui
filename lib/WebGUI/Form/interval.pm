@@ -120,10 +120,12 @@ sub toHtml {
 		name=>$self->{name}."_interval",
 		value=>$interval,
 		extras=>$self->{extras}
+		id=>$self->{id}."_interval",
 		)->toHtml
 		.WebGUI::Form::selectList->new(
 		options=>\%units,
 		name=>$self->{name}."_units",
+		id=>$self->{id}."_units",
 		value=>[$self->{value}]
 		)->toHtml;
 }

@@ -113,6 +113,7 @@ sub toHtml {
           	}
         }
 	return WebGUI::Form::selectList->new(
+		id=>$self->{id},
 		name=>$self->{name},
 		options=>$templateList,
 		value=>[$self->{value}],

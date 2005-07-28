@@ -97,7 +97,7 @@ Renders an input tag of type password.
 sub toHtml {
 	my $self = shift;
         return '<input type="password" name="'.$self->{name}.'" value="'.$self->fixQuotes($self->{value}).'" size="'.
-                $self->{size}.'" maxlength="'.$self->{maxLength}.'" '.$self->{extras}.' />';
+                $self->{size}.'" id="'.$self->{id}.'" maxlength="'.$self->{maxLength}.'" '.$self->{extras}.' />';
 }
 
 

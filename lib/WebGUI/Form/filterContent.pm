@@ -127,6 +127,7 @@ sub toHtml {
                 'all'=>WebGUI::International::get(419)
                 );
 	return WebGUI::Form::selectList->new(
+		id=>$self->{id},
 		options=>\%filter,
 		name=>$self->{name},
 		value=>[$self->{value}],

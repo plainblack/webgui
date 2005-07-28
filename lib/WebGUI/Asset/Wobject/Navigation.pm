@@ -120,7 +120,8 @@ sub getEditForm {
 		-value=>[$self->getValue("startType")],
 		-label=>$i18n->get("Start Point Type"),
 		-hoverHelp=>$i18n->get("Start Point Type description"),
-		-extras=>'id="navStartType" onChange="changeStartPoint()"'
+		-id=>"navStartType",
+		-extras=>'onchange="changeStartPoint()"'
 		);
 	$tabform->getTab("properties")->readOnly(
 		-label=>$i18n->get("Start Point"),

@@ -130,6 +130,7 @@ sub toHtml {
         }
 	return WebGUI::Form::selectList->new(
 		options=>\%types,
+		id=>$self->{id},
 		name=>$self->{name},
 		value=>[$self->{value}],
 		extras=>$self->{extras},

@@ -117,6 +117,7 @@ sub toHtml {
 	$self->{extras} .= ' onkeyup="doInputCheck(this.form.'.$self->{name}.',\'0123456789:\')"';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::button->new(
+			id=>$self->{id},
 			extras=>'style="font-size: 8pt;" onClick="window.timeField = this.form.'.$self->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}. '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>WebGUI::International::get(970)
 			)->toHtml;

@@ -2979,7 +2979,8 @@ sub www_editTree {
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_url"}),
 		-value=>WebGUI::Form::selectList({
                 	name=>"baseUrlBy",
-			extras=>'id="baseUrlBy" onchange="toggleSpecificBaseUrl()"',
+			extras=>'onchange="toggleSpecificBaseUrl()"',
+			id=>"baseUrlBy",
 			options=>{
 				parentUrl=>"Parent URL",
 				specifiedBase=>"Specified Base",

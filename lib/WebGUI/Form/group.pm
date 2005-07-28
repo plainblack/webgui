@@ -145,6 +145,7 @@ sub toHtml {
 	return WebGUI::Form::selectList->new(
 		options=>WebGUI::SQL->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName"),
 		name=>$self->{name},
+		id=>$self->{id},
 		value=>$self->{value},
 		extras=>$self->{extras},
 		size=>$self->{size},

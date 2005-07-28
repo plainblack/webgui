@@ -149,6 +149,7 @@ sub toHtml {
 		$options{$type} = $class->getName;
 	}
 	return WebGUI::Form::selectList->new(
+		id=>$self->{id},
 		name=>$self->{name},
 		options=>\%options,
 		value=>[$self->{value}],

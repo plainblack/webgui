@@ -79,7 +79,7 @@ Renders an email address field.
 sub toHtml {
         my $self = shift;
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/emailCheck.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onChange="emailCheck(this.value)" ';
+	$self->{extras} .= ' onchange="emailCheck(this.value)" ';
 	return $self->SUPER::toHtml;
 }
 

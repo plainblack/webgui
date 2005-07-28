@@ -132,7 +132,7 @@ Renders a select list form control.
 sub toHtml {
 	my $self = shift;
         my $multiple = ' multiple="1"' if ($self->{multiple});
-        my $output = '<select name="'.$self->{name}.'" size="'.$self->{size}.'" '.$self->{extras}.$multiple.'>';
+        my $output = '<select name="'.$self->{name}.'" size="'.$self->{size}.'" id="'.$self->{id}.'" '.$self->{extras}.$multiple.'>';
         my %options;
         tie %options, 'Tie::IxHash';
         if ($self->{sortByValue}) {

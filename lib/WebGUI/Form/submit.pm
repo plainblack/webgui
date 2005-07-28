@@ -62,7 +62,7 @@ sub toHtml {
 	my $self = shift;
  	my $value = $self->fixQuotes($self->{value});
 	$self->{extras} ||= 'onclick="this.value=\''.WebGUI::International::get(452).'\'"';
-        return '<input type="submit" name="'.$self->{name}.'" value="'.$value.'" '.$self->{extras}.' />';
+        return '<input id="'.$self->{id}.'" type="submit" name="'.$self->{name}.'" value="'.$value.'" '.$self->{extras}.' />';
 }
 
 1;

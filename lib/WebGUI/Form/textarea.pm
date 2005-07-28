@@ -106,7 +106,7 @@ Renders an input tag of type text.
 sub toHtml {
 	my $self = shift;
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->{value})));
-	return '<textarea name="'.$self->{name}.'" cols="'.$self->{columns}.'" rows="'.$self->{rows}.'" wrap="'.
+	return '<textarea id="'.$self->{id}.'" name="'.$self->{name}.'" cols="'.$self->{columns}.'" rows="'.$self->{rows}.'" wrap="'.
                 $self->{wrap}.'" '.$self->{extras}.'>'.$value.'</textarea>';
 }
 

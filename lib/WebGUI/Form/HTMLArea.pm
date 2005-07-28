@@ -122,8 +122,8 @@ Renders an HTML area field.
 sub toHtml {
 	my $self = shift;
         WebGUI::Style::setScript($session{config}{extrasURL}.'/textFix.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' id="'.$self->{name}.'" onBlur="fixChars(this.form.'.$self->{name}.')" mce_editable="true" ';	
-	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->{richEditId})->getRichEditor($self->{name});
+	$self->{extras} .= ' onblur="fixChars(this.form.'.$self->{name}.')" mce_editable="true" ';	
+	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->{richEditId})->getRichEditor($self->{id});
 }
 
 

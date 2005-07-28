@@ -83,7 +83,8 @@ sub toHtml {
 	return $self->SUPER::toHtml
 		.WebGUI::Form::text->new(
 			size=>$session{setting}{textBoxSize}-5,
-			name=>$self->{name}."_new"
+			name=>$self->{name}."_new",
+			id=>$self->{id}."_new"
 			)->toHtml;
 }
 

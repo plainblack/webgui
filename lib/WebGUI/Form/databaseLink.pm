@@ -120,6 +120,7 @@ Renders a database connection picker control.
 sub toHtml {
 	my $self = shift;
 	return WebGUI::Form::selectList->new(
+		id=>$self->{id},
 		name=>$self->{name},
 		options=>WebGUI::DatabaseLink::getList(),
 		value=>[$self->{value}],
