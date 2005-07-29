@@ -71,6 +71,11 @@ our $HELP = {
 		title => 'help edit parameter title',
 		body => 'help edit parameter body',
 		fields => [
+                        {
+                                title => 'edit parameter name',
+                                description => 'edit parameter name description',
+                                namespace => 'ProductManager',
+                        },
 		],
 		related => [
 		]
@@ -79,6 +84,26 @@ our $HELP = {
 		title => 'help edit option title',
 		body => 'help edit option body',
 		fields => [
+                        {
+                                title => 'edit option value',
+                                description => 'edit option value description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'edit option price modifier',
+                                description => 'edit option price modifier description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'edit option weight modifier',
+                                description => 'edit option weight modifier description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'edit option sku modifier',
+                                description => 'edit option sku modifier description',
+                                namespace => 'ProductManager',
+                        },
 		],
 		related => [
 		]
@@ -95,6 +120,26 @@ our $HELP = {
 		title => 'help edit variant title',
 		body => 'help edit variant body',
 		fields => [
+                        {
+                                title => 'price override',
+                                description => 'price override description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'weight override',
+                                description => 'weight override description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'sku override',
+                                description => 'sku override description',
+                                namespace => 'ProductManager',
+                        },
+                        {
+                                title => 'available',
+                                description => 'available description',
+                                namespace => 'ProductManager',
+                        },
 		],
 		related => [
 		]

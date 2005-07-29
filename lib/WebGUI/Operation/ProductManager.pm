@@ -137,7 +137,7 @@ sub www_editProduct {
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit product', 'edit product');
+	return _submenu($f->print, 'edit product', 'edit product', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -189,9 +189,18 @@ sub www_editProductParameter {
 	}
 	
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'editProductParameterSave');
-	$f->hidden('parameterId', $parameterId);
-	$f->hidden('productId', $productId);
+	$f->hidden(
+		-name => 'op',
+		-value => 'editProductParameterSave',
+	);
+	$f->hidden(
+		-name => 'parameterId',
+		-value => $parameterId,
+	);
+	$f->hidden(
+		-name => 'productId',
+		-value => $productId,
+	);
 	$f->readOnly(
 		-label		=> $i18n->get('parameter ID'),
 		-value		=> $parameterId,
@@ -199,12 +208,13 @@ sub www_editProductParameter {
 	$f->text(
 		-name		=> 'name',
 		-label		=> $i18n->get('edit parameter name'),
+		-hoverHelp	=> $i18n->get('edit parameter name description'),
 		-value		=> $session{form}{name} || $parameter->{name},
 		-maxlength	=> 64,
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit parameter', 'edit parameter');
+	return _submenu($f->print, 'edit parameter', 'edit parameter', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -259,9 +269,18 @@ sub www_editProductParameterOption {
 	}
 
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'editProductParameterOptionSave');
-	$f->hidden('optionId', $optionId);
-	$f->hidden('parameterId', $session{form}{parameterId});
+	$f->hidden(
+		-name => 'op',
+		-value => 'editProductParameterOptionSave',
+	);
+	$f->hidden(
+		-name => 'optionId',
+		-value => $optionId,
+	);
+	$f->hidden(
+		-name => 'parameterId',
+		-value => $session{form}{parameterId},
+	);
 	$f->readOnly(
 		-label		=> $i18n->get('option ID'),
 		-value		=> $optionId
@@ -269,30 +288,34 @@ sub www_editProductParameterOption {
 	$f->text(
 		-name		=> 'value',
 		-label		=> $i18n->get('edit option value'),
+		-hoverHelp	=> $i18n->get('edit option value description'),
 		-value		=> $session{form}{value} || $option->{value},
 		-maxlength	=> 64,
 	);
 	$f->float(
 		-name		=> 'priceModifier',
 		-label		=> $i18n->get('edit option price modifier'),
+		-hoverHelp	=> $i18n->get('edit option price modifier description'),
 		-value		=> $session{form}{priceModifier} || $option->{priceModifier},
 		-maxlength	=> 11,
 	);
 	$f->float(
 		-name		=> 'weightModifier',
 		-label		=> $i18n->get('edit option weight modifier'),
+		-hoverHelp	=> $i18n->get('edit option weight modifier description'),
 		-value		=> $session{form}{weightModifier} || $option->{weightModifier},
 		-maxlength	=> 7,
 	);
 	$f->text(
 		-name		=> 'skuModifier',
 		-label		=> $i18n->get('edit option sku modifier'),
+		-hoverHelp	=> $i18n->get('edit option sku modifier description'),
 		-value		=> $session{form}{skuModifier} || $option->{skuModifier},
 		-maxlength	=> 64,
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit option', 'edit option');
+	return _submenu($f->print, 'edit option', 'edit option', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -342,26 +365,30 @@ sub www_editProductVariant {
 	$f->float(
 		-name	=> 'price',
 		-label	=> $i18n->get('price override'),
+		-hoverHelp	=> $i18n->get('price override description'),
 		-value	=> $variant->{priceOverride} ? $variant->{price} : ''
 	);
 	$f->float(
 		-name	=> 'weight',
 		-label	=> $i18n->get('weight override'),
+		-hoverHelp	=> $i18n->get('weight override description'),
 		-value	=> $variant->{weightOverride} ? $variant->{weight} : ''
 	);
 	$f->text(
 		-name	=> 'sku',
 		-label	=> $i18n->get('sku override'),
+		-hoverHelp	=> $i18n->get('sku override description'),
 		-value	=> $variant->{skuOverride} ? $variant->{sku} : ''
 	);
 	$f->yesNo(
 		-name	=> 'available',
 		-label	=> $i18n->get('available'),
+		-hoverHelp	=> $i18n->get('available description'),
 		-value	=> $variant->{available}
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit variant', 'edit variant');
+	return _submenu($f->print, 'edit variant', 'edit variant', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -405,7 +432,7 @@ sub www_editSkuTemplate {
 	$f->submit;
 	$output .= $f->print;
 
-	return _submenu($output, 'edit sku composition label', 'edit sku template');
+	return _submenu($output, 'edit sku composition label', 'edit sku template', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -445,7 +472,7 @@ sub www_listProducts {
 	}
 	$output .= '</table>';
 
-	return _submenu($output, 'list products', 'list products');
+	return _submenu($output, 'list products', 'list products', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -507,7 +534,7 @@ sub www_listProductVariants {
 	$output .= WebGUI::Form::submit;
 	$output .= WebGUI::Form::formFooter;
 
-	return _submenu($output, 'list variants label', 'list variants');
+	return _submenu($output, 'list variants label', 'list variants', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -571,7 +598,7 @@ sub www_manageProduct {
 		$output .= '<br>';
 	}
 
-	return _submenu($output, 'manage product', 'manage product');
+	return _submenu($output, 'manage product', 'manage product', 'ProductManager');
 }
 
 1;
