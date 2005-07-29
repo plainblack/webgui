@@ -119,7 +119,7 @@ sub toHtml {
 	return WebGUI::Form::integer->new(
 		name=>$self->{name}."_interval",
 		value=>$interval,
-		extras=>$self->{extras}
+		extras=>$self->{extras},
 		id=>$self->{id}."_interval",
 		)->toHtml
 		.WebGUI::Form::selectList->new(
