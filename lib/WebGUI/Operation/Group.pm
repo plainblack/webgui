@@ -410,19 +410,23 @@ sub www_editGrouping {
         $f->readOnly(
 		-value => $u->username,
 		-label => WebGUI::International::get(50),
+		-hoverHelp => WebGUI::International::get('50 description'),
         );
         $f->readOnly(
 		-value => $g->name,
 		-label => WebGUI::International::get(84),
+		-hoverHelp => WebGUI::International::get('84 description'),
         );
 	$f->date(
 		-name => "expireDate",
 		-label => WebGUI::International::get(369),
+		-hoverHelp => WebGUI::International::get('369 description'),
 		-value => WebGUI::Grouping::userGroupExpireDate($session{form}{uid},$session{form}{gid}),
 	);
 	$f->yesNo(
 		-name=>"groupAdmin",
 		-label=>WebGUI::International::get(977),
+		-hoverHelp=>WebGUI::International::get('977 description'),
 		-value=>WebGUI::Grouping::userGroupAdmin($session{form}{uid},$session{form}{gid})
 		);
 	$f->submit;
