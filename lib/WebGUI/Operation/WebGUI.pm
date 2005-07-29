@@ -74,16 +74,19 @@ sub www_setup {
 			-name=>"companyName",
 			-value=>$session{setting}{companyName},
 			-label=>$i18n->get(125),
+			-hoverHelp=>$i18n->get('125 description'),
 			);
 		$f->email(
 			-name=>"companyEmail",
 			-value=>$session{setting}{companyEmail},
 			-label=>$i18n->get(126),
+			-hoverHelp=>$i18n->get('126 description'),
 			);
 		$f->url(
 			-name=>"companyURL",
 			-value=>$session{setting}{companyURL},
 			-label=>$i18n->get(127),
+			-hoverHelp=>$i18n->get('127 description'),
 			);
 		$f->submit;
 		$output .= $f->print;
@@ -110,17 +113,20 @@ sub www_setup {
 			-name=>"username",
 			-value=>$u->username,
 			-label=>$i18n->get(50),
+			-hoverHelp=>$i18n->get('50 setup description'),
 			);
 		$f->text(
 			-name=>"identifier",
 			-value=>"123qwe",
 			-label=>$i18n->get(51),
+			-hoverHelp=>$i18n->get('51 description'),
 			-subtext=>'<div style=\"font-size: 10px;\">('.$i18n->get("password clear text").')</div>'
 			);
 		$f->email(
 			-name=>"email",
 			-value=>$u->profileField("email"),
 			-label=>$i18n->get(56),
+			-hoverHelp=>$i18n->get('56 description'),
 			);
 		$f->submit;
 		$output .= $f->print; 

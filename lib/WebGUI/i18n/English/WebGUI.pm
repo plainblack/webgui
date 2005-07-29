@@ -610,6 +610,11 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
                 lastUpdated => 1122088999,
         },
 
+        '50 setup description' => {
+                message => q|The username for your admin account.  Defaults to Admin|,
+                lastUpdated => 1122610919,
+        },
+
         '84 description groupings' => {
                 message => q|The name of the group.|,
                 lastUpdated => 1122088999,
@@ -726,6 +731,11 @@ to add or remove user from their groups.
 	'51' => {
 		message => q|Password|,
 		lastUpdated => 1031514049
+	},
+
+	'51 description' => {
+		message => q|The password for the admin account.  Do not forget to change this from the default!|,
+		lastUpdated => 1122611044
 	},
 
 	'password clear text' => {
@@ -3107,6 +3117,11 @@ Privileges and styles assigned to pages in the package will not be copied when t
 
 	'56' => {
 		message => q|Email Address|,
+		lastUpdated => 1031514049
+	},
+
+	'56 description' => {
+		message => q|The email address for the admin.  It can be used to send administrative notices.|,
 		lastUpdated => 1031514049
 	},
 
