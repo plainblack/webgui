@@ -117,8 +117,12 @@ Renders a date picker control.
 sub toHtml {
         my $self = shift;
 	my $value = WebGUI::DateTime::epochToSet($self->{value},1);
+	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
+	unless ($language) {
+		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
+	}
         WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ type=>'text/javascript' });
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-en.js',{ type=>'text/javascript' });
+        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
         WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ type=>'text/javascript' });
         WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	my $mondayFirst = $session{user}{firstDayOfWeek} ? "true" : "false";
@@ -131,7 +135,7 @@ sub toHtml {
                 maxlength=>$self->{maxlength}
                 )->toHtml . '<script type="text/javascript"> 
                         Calendar.setup({ 
-                                inputField : "'.$self->{name}.'", 
+                                inputField : "'.$self->{id}.'", 
                                 ifFormat : "%Y-%m-%d %H:%M:%S", 
                                 showsTime : true, 
                                 timeFormat : "12",

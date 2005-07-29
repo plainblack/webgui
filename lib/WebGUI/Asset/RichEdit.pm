@@ -452,6 +452,11 @@ sub getRichEditor {
 		push(@plugins,"") if ($button eq "");	
 		push(@plugins,"") if ($button eq "");	
 	}
+	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
+	unless ($language) {
+		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
+	}
+	$config{language} = $language;
 	$config{content_css} = $self->getValue("cssFile") if ($self->getValue("cssFile") ne "");
 	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);

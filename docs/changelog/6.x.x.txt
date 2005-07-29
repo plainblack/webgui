@@ -1,6 +1,10 @@
 6.7.0
  - Added the ability to override the UI Level of any field in the edit form of
    any asset in the WebGUI config file.
+ - Translation providers can now add languageAbbreviation and locale
+   properties to their translation in order to activate the translations of
+   javascript helper components like the rich editor and the calendar
+   date picker.
  - Added the ability to override the UI Level of an entire asset in the config
    file.
  - fix [ 1229042 ] crumbtrail should show full path...

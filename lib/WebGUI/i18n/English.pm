@@ -5,7 +5,9 @@ use strict;
 
 our $LANGUAGE = {
 	label => 'English',
-	toolbar => 'metal'
+	toolbar => 'metal',
+	languageAbbreviation => 'en',
+	locale => 'US'
 };
 
 sub makeUrlCompliant {
