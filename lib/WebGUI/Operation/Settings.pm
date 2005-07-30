@@ -102,6 +102,11 @@ sub www_editSettings {
 		-value=>$session{setting}{thumbnailSize}
 		);
 	 $tabform->getTab("content")->yesNo(
+                -name=>"autoCommit",
+                -label=>WebGUI::International::get("enable autocommit of asset versioning","Asset"),
+                -value=>$session{setting}{autoCommit}
+        	);
+	 $tabform->getTab("content")->yesNo(
                 -name=>"metaDataEnabled",
                 -label=>$i18n->get("Enable Metadata ?"),
                 -value=>$session{setting}{metaDataEnabled}

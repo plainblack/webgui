@@ -168,6 +168,7 @@ sub updateConfigFile {
 #-------------------------------------------------
 sub addAssetVersioning {
     	print "\tMaking changes for asset versioning\n" unless ($quiet);
+	WebGUI::SQL->write("insert into settings ('autoCommit','1')");
 	WebGUI::SQL->write("create table assetVersionTag (
 		tagId varchar(22) not null primary key,
 		name varchar(255) not null,

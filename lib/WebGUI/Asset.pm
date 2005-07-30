@@ -2254,6 +2254,69 @@ sub purgeTree {
 
 #-------------------------------------------------------------------
 
+=head2 rollbackSiteToTime ( time ) 
+
+A class method. Rollback the entire site to a specific point in time. Returns 1 if successful.
+
+=head3 time
+
+The epoch time to rollback to. Anything after this time will be permanently deleted.
+
+=cut
+
+sub rollbackToTime {
+	my $class = shift;
+	my $toTime = shift;
+ 	unless ($toTime) {	
+		return 0;
+		WebGUI::ErrorHandler::warn("You must specify a time when you call rollbackSiteToTime().");
+	}
+	my $sth = WebGUI::SQL->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.revisionDate > ".$toTime." order by assetData.revisionDate desc");
+	while (my ($class, $id, $revisionDate) = $sth->array) {
+		my $revision = WebGUI::Asset->new($id, $class, $revisionDate);
+		$revision->purgeRevision;
+	}
+	$sth->finish;
+	return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 rollbackVersionTag ( tagId )
+
+A class method. Eliminates all revisions of all assets created under a specific version tag. Also removes the version tag.
+
+=head3 tagId
+
+The unique identifier of the version tag to be purged.
+
+=cut
+
+sub rollbackVersionTag {
+	my $class = shift;
+	my $tagId = shift;
+ 	unless ($tagId) {	
+		return 0;
+		WebGUI::ErrorHandler::warn("You must specify a tag ID when you call rollbackVersionTag().");
+	}
+	if ($tagId eq "pbversion0000000000001" || $tagId eq "pbversion0000000000002") {
+		return 0;
+		WebGUI::ErrorHandler::warn("You cannot rollback a tag that is required for the system to operate.");	
+	}
+	my $sth = WebGUI::SQL->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ".quote($tagId)." order by assetData.revisionDate desc");
+	while (my ($class, $id, $revisionDate) = $sth->array) {
+		my $revision = WebGUI::Asset->new($id, $class, $revisionDate);
+		$revision->purgeRevision;
+	}
+	$sth->finish;
+	WebGUI::SQL->write("delete from assetVersionTag where tagId=".quote($tagId));
+	WebGUI::SQL->write("delete from userSessionScratch where name='versionTag' and value=".quote($tagId));
+	return 1;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 setParent ( newParent )
 
 Moves an asset to a new Parent and returns 1 if successful, otherwise returns 0.
@@ -3580,6 +3643,8 @@ sub www_manageCommittedVersions {
         my $ac = WebGUI::AdminConsole->new("versions");
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
         my $i18n = WebGUI::International->new("Asset");
+	my $rollback = $i18n->get('rollback');
+	my $rollbackPrompt = $i18n->get('rollback version tag confirm');
         $ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
@@ -3587,7 +3652,7 @@ sub www_manageCommittedVersions {
         my $sth = WebGUI::SQL->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
         while (my ($id,$name,$date,$by) = $sth->array) {
                 my $u = WebGUI::User->new($by);
-                $output .= '<tr><td>'.$name.'</td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td>[rollback]</td></tr>';
+                $output .= '<tr><td>'.$name.'</td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td><a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
         }
         $sth->finish;
         $output .= '</table>';
@@ -3634,16 +3699,16 @@ sub www_manageRevisions {
         #$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
         #$ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
-        <tr><th>Revision Date</th><th>Revised By</th><th>Tag Name</th><th></th></tr> ';
+        <tr><th></th><th>Revision Date</th><th>Revised By</th><th>Tag Name</th></tr> ';
         my $sth = WebGUI::SQL->read("select assetData.revisionDate, users.username, assetVersionTag.name from assetData 
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
 		where assetData.assetId=".quote($self->getId));
         while (my ($date,$by,$tag) = $sth->array) {
-                $output .= '<tr><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$by.'</td><td>'.$tag.'</td><td>[rollback]</td></tr>';
+                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=rollbackAssetRevision",$self->get("url"),$i18n->get("purge revision prompt")).'</td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$by.'</td><td>'.$tag.'</td></tr>';
         }
         $sth->finish;
         $output .= '</table>';
-        return $ac->render($output,$i18n->get("committed versions"));
+        return $ac->render($output,$i18n->get("committed versions").": ".$self->getTitle);
 }
 
 #-------------------------------------------------------------------
@@ -3719,18 +3784,21 @@ sub www_manageVersions {
 	my $self = shift;
         my $ac = WebGUI::AdminConsole->new("versions");
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	my $i18n = WebGUI::International->new("Asset");
 	$ac->setHelp("versions manage");
 	my $i18n = WebGUI::International->new("Asset");
 	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
 	my ($tag) = WebGUI::SQL->quickArray("select name from assetVersionTag where tagId=".quote($session{scratch}{versionTag}));
 	$tag ||= "None";
+	my $rollback = $i18n->get("rollback");
+	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
 	my $output = '<p>You are currently working under a tag called: <b>'.$tag.'</b>.</p><table width=100% class="content">
 	<tr><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
 	my $sth = WebGUI::SQL->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
 	while (my ($id,$name,$date,$by) = $sth->array) {
 		my $u = WebGUI::User->new($by);
-		$output .= '<tr><td><a href="'.$self->getUrl("func=setVersionTag&tagId=".$id).'">'.$name.'</a></td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td>[cancel] [commit]</td></tr>';
+		$output .= '<tr><td><a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$name.'</a></td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td><a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a> [commit]</td></tr>';
 	}
 	$sth->finish;	
 	$output .= '</table>';
@@ -3785,6 +3853,17 @@ sub www_promote {
 }
 
 
+#-------------------------------------------------------------------A
+
+sub www_purgeAssetRevision {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $revisionDate = $session{form}{revisionDate};
+	return undef unless $revisionDate;
+	WebGUI::Asset->new($self->getId,$self->get("className"),$revisionDate)->purgeRevision;
+	return $self->www_manageRevisions;
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_restoreList ( )
@@ -3806,6 +3885,29 @@ sub www_restoreList {
         }
 	return $self->www_manageTrash();
 }
+
+
+#-------------------------------------------------------------------A
+
+sub www_rollbackVersionTag {
+	my $self = shift;
+	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
+	my $tagId = $session{form}{tagId};
+	if ($tagId) {
+		$self->rollbackVersionTag($tagId);
+	}
+	return $self->www_manageVersions;
+}
+
+#-------------------------------------------------------------------A
+
+sub www_rollbackSiteToTime {
+	my $self = shift;
+	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
+
+}
+
+
 
 
 #-------------------------------------------------------------------

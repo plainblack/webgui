@@ -290,7 +290,7 @@ sub _parsePlaceholderParams {
                 my $param;
                 if($type =~ /^form/) {
                         $param = $session{form}{$field};
-                } elsif ($param =~ /^query(\d)/) {
+                } elsif ($type =~ /^query(\d)/) {
                         $param = $self->{_query}{$1}{rowData}{$field};
                 }
                 $param = WebGUI::Macro::process($param);

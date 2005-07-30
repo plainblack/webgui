@@ -1,6 +1,30 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'purge revision prompt' => {
+		message => q|Are you certain you wish to delete this revision of this asset? It CANNOT be restored if you delete it.|,
+		lastUpdated => 0,
+		context => q|The prompt for purging a revision from the asset tree.|
+	},
+
+	'rollback version tag confirm' => {
+		message => q|Are you certain you wish to delete this version tag and all content created under it? It CANNOT be restored if you delete it.|,
+		lastUpdated => 0,
+		context => q|The prompt for purging a version tag from the asset tree.|
+	},
+
+	'enable autocommit of asset versioning' => {
+		message => q|Enable autocommit of asset versioning?|,
+		lastUpdated => 0,
+		context => q|A label for the toggle for asset versioning.|
+	},
+
+	'rollback' => {
+		message => q|Rollback|,
+		lastUpdated => 0,
+		context => q|The label for purging a revision from the asset tree.|
+	},
+
 	'revisions' => {
 		message => q|Revisions|,
 		lastUpdated => 0,

@@ -4,6 +4,12 @@ body{
 	border: 5px #4E8AAB solid;
 	margin:0px;
 }
+
+th {
+	text-align: left;
+	font-family: "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+}
+
 .adminConsoleTitleIcon {
 	position: absolute;
 	top: 12px;
