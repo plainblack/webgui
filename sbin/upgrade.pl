@@ -227,7 +227,7 @@ foreach my $config (keys %config) {
 	my $dumpcmd = $config{$config}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$config}{backupPath} || $backupDir;
 	mkdir($backupTo);
-	while ($upgrade{$config{$config}{version}}{sql} ne "") {
+	while ($upgrade{$config{$config}{version}}{sql} ne "" || $upgrade{$config{$config}{version}}{pl} ne "") {
 		my $upgrade = $upgrade{$config{$config}{version}}{from};
 		unless ($skipBackup) {
 			print "\n".$config{$config}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
@@ -244,17 +244,19 @@ foreach my $config (keys %config) {
 				fatalError();
 			}
 		}
-		print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
-		my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
-		$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
-		$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
-		$cmd .= " --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
-		unless (system($cmd)) {
-			print "OK\n" unless ($quiet);
-		} else {
-                	print "Failed!\n" unless ($quiet);
-			fatalError();
-                }
+		if ($upgrade{$upgrade}{sql} ne "") {
+			print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
+			my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
+			$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
+			$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
+			$cmd .= " --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
+			unless (system($cmd)) {
+				print "OK\n" unless ($quiet);
+			} else {
+                		print "Failed!\n" unless ($quiet);
+				fatalError();
+                	}
+		}
 		if ($upgrade{$upgrade}{pl} ne "") {
 			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$config;
 			$cmd .= " --quiet" if ($quiet);

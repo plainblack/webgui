@@ -432,3 +432,13 @@ $f->text(name=>"this",id==>"myownpersonalid");
 
 See WebGUI::HTMLForm and WebGUI::Form::Control for additional information.
 
+
+5.19 SQL Files For Upgrades Depricated
+
+Starting with WebGUI 6.7.0 .sql files will no longer be used in core upgrades
+of WebGUI sites. We also suggest not using them for upgrades of custom code.
+The reason is that the database is becoming very complex, and it's easier to
+introduce errors to the database when modifying it directly rather than using
+the APIs.
+
+

@@ -21,20 +21,47 @@ GetOptions(
 
 WebGUI::Session::open("../..",$configFile);
 
+WebGUI::SQL->write("insert into webguiVersion values ('6.7.0','upgrade',unix_timestamp())");
+
+giveSnippetsMimeTypes();
 addAssetVersioning();
 updateConfigFile();
 insertHelpTemplate();
-insertXSLTSheets();
-insertSyndicatedContentTemplate();
-WebGUI::Group->new('9')->delete;
-updateDefaultSurveyViewTemplate();
+makeSyndicatedContentChanges();
+removeOldThemeSystem();
+addSectionsToSurveys();
 
 WebGUI::Session::close();
 
 #-------------------------------------------------
-sub updateDefaultSurveyViewTemplate {
-	print "\tUpdating Default Survey View template.\n" unless ($quiet);
+sub giveSnippetsMimeTypes {
+	print "\tAllowing snippets to handle mime types.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table snippet add column mimeType varchar(50) not null default 'text/html'");
+}
 
+
+#-------------------------------------------------
+sub removeOldThemeSystem {
+	print "\tRemoving the old theme system.\n" unless ($quiet);
+	WebGUI::SQL->write("drop table theme");
+	WebGUI::SQL->write("drop table themeComponent");
+	WebGUI::Group->new('9')->delete;
+}
+
+#-------------------------------------------------
+sub makeSyndicatedContentChanges {
+	print "\tMaking changes to the syndicated content asset.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table SyndicatedContent add column displayMode varchar(20) not null default 'interleaved'");
+	WebGUI::SQL->write("alter table SyndicatedContent add column hasTerms varchar(255) not null");
+	insertXSLTSheets();
+	insertSyndicatedContentTemplate();
+}
+
+#-------------------------------------------------
+sub addSectionsToSurveys {
+	print "\tAdding sections to Surveys.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table Survey_question add column Survey_sectionId varchar(22) null");
+	WebGUI::SQL->write("create table Survey_section (Survey_id varchar(22) null, Survey_sectionId varchar(22) not null, sectionName text null, sequenceNumber int(11) not null default 1, primary key (Survey_sectionId))");
 	my $template = q|<a name="<tmpl_var assetId>"></a>
 <tmpl_if session.var.adminOn>
 	<p><tmpl_var controls></p>
@@ -168,7 +195,7 @@ sub updateConfigFile {
 #-------------------------------------------------
 sub addAssetVersioning {
     	print "\tMaking changes for asset versioning\n" unless ($quiet);
-	WebGUI::SQL->write("insert into settings ('autoCommit','1')");
+	WebGUI::SQL->write("insert into settings values ('autoCommit','1')");
 	WebGUI::SQL->write("create table assetVersionTag (
 		tagId varchar(22) not null primary key,
 		name varchar(255) not null,
