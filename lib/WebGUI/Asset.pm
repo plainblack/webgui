@@ -221,6 +221,31 @@ sub addRevision {
 
 #-------------------------------------------------------------------
 
+=head2 addVersionTag ( [ name ] ) 
+
+A class method. Creates a version tag and assigns the tag to the current user's version tag. Returns the id of the tag created.
+
+=head3 name
+
+The name of the version tag. If not specified, one will be generated using the current user's name along with the date.
+
+=cut
+
+sub addVersionTag {
+	my $class = shift;
+	my $name = shift || WebGUI::DateTime::epochToHuman()." / ".$session{user}{username};
+	my $tagId = WebGUI::SQL->setRow("assetVersionTag","tagId",{
+		tagId=>"new",
+		name=>$name,
+		creationDate=>time(),
+		createdBy=>$session{user}{userId}
+		});
+	WebGUI::Session::setScratch("versionTag",$tagId);
+	return $tagId;
+} 
+
+#-------------------------------------------------------------------
+
 =head2 canAdd ( [userId, groupId] )
 
 Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
@@ -2665,13 +2690,7 @@ Adds a version tag and sets the user's default version tag to that.
 sub www_addVersionTagSave {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
-	my $tagId = WebGUI::SQL->setRow("assetVersionTag","tagId",{
-		tagId=>"new",
-		name=>$session{form}{name},
-		creationDate=>time(),
-		createdBy=>$session{user}{userId}
-		});
-	WebGUI::Session::setScratch("versionTag",$tagId);
+	$self->addVersionTag($sesion{form}{name});
 	return $self->www_manageVersions();
 }
 
@@ -2911,6 +2930,9 @@ sub www_editSave {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $object;
+	unless($session{setting}{autoCommit} || $session{scratch}{versionTag}) {
+		$self->addVersionTag;
+	}
 	if ($session{form}{assetId} eq "new") {
 		$object = $self->addChild({className=>$session{form}{class}});	
 		$object->{_parent} = $self;

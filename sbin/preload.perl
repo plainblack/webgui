@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 my $webguiRoot;
 
 BEGIN {
