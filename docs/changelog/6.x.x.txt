@@ -1,4 +1,6 @@
 6.7.0
+ - Fixed a potential problem where editing a page under rare very rare 
+   conditions could destroy the not found page.
  - Added the ability to override the UI Level of any field in the edit form of
    any asset in the WebGUI config file.
  - Translation providers can now add languageAbbreviation and locale

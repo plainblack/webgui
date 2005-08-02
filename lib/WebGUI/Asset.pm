@@ -1056,7 +1056,8 @@ sub newByUrl {
 		if ($id ne "" || $class ne "") {
 			return WebGUI::Asset->new($id, $class, $version);
 		} else {
-			return WebGUI::Asset->getNotFound;
+			WebGUI::ErrorHandler::warn("The URL $url was requested, but does not exist in your asset tree.");
+			return undef;
 		}
 	}
 	return WebGUI::Asset->getDefault;

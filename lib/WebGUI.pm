@@ -89,20 +89,24 @@ sub page {
 	my $output = _processOperations();
 	if ($output eq "") {
 		my $asset = WebGUI::Asset->newByUrl($assetUrl);
-		$session{asset} = $asset;
-		my $method = "view";
-		if (exists $session{form}{func}) {
-			$method = $session{form}{func};
-		}
-		$method = "www_".$method;
-		$output = eval{$asset->$method()};
-		if ($@) {
-			WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{env}{PATH_INFO}." Root cause: ".$@);
-			$output = $asset->www_view;
-		} else {
-			if ($output eq "" && $method ne "view") {
-				$output = $asset->www_view;
+		if (defined $asset) {
+			$session{asset} = $asset;
+			my $method = "view";
+			if (exists $session{form}{func}) {
+				$method = $session{form}{func};
 			}
+			$method = "www_".$method;
+			$output = eval{$asset->$method()};
+			if ($@) {
+				WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{env}{PATH_INFO}." Root cause: ".$@);
+				$output = $asset->www_view;
+			} else {
+				if ($output eq "" && $method ne "view") {
+					$output = $asset->www_view;
+				}
+			}
+		} else {
+			$output = WebGUI::Asset->getNotFound->www_view;
 		}
 	}
 	WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
