@@ -159,7 +159,7 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 =cut
 
 sub close {
-	$session{asset}->DESTROY() if (exists $session{asset});
+	$session{asset}->DESTROY() if (exists $session{asset} && $session{asset} ne "");
 	foreach my $slavedbh (@{$session{slave}}) {
 		$slavedbh->disconnect();
 	}

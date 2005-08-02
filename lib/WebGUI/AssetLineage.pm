@@ -405,7 +405,7 @@ sub getLineage {
 		$where = "asset.state='published'";
 	}
 	## get only approved items or those that i'm currently working on
-	$where .= " and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{tagId}).")";
+	$where .= " and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).")";
 	## class exclusions
 	if (exists $rules->{excludeClasses}) {
 		my @set;

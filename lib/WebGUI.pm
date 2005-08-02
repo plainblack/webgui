@@ -106,7 +106,9 @@ sub page {
 				}
 			}
 		} else {
-			$output = WebGUI::Asset->getNotFound->www_view;
+			my $notFound = WebGUI::Asset->getNotFound;
+			$session{asset} = $notFound;
+			$output = $notFound->www_view;
 		}
 	}
 	WebGUI::Affiliate::grabReferral();	# process affilliate tracking request

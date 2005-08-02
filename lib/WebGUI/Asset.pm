@@ -792,9 +792,11 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"))
-              	.editIcon('func=edit',$self->get("url"))
-            	.cutIcon('func=cut',$self->get("url"))
+	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"));
+	if (!$self->isLocked || $self->get("isLockedBy") eq $session{user}{userId}) {
+        	$toolbar .= editIcon('func=edit',$self->get("url"));
+	}
+        $toolbar .= cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
@@ -927,7 +929,8 @@ sub new {
 	my $revisionDate = shift;
 	unless ($revisionDate) {
 		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId="
-			.quote($assetId)." group by assetData.assetId order by assetData.revisionDate");
+			.quote($assetId)." and status='approved' or tagId=".quote($session{scratch}{versionTag}." 
+			group by assetData.assetId order by assetData.revisionDate");
 	}
 	return undef unless ($revisionDate);
         if ($className) {
@@ -1250,7 +1253,6 @@ Hash reference of properties and values to set.
 sub update {
         my $self = shift;
         my $properties = shift;
-	$self->setVersionLock;
         foreach my $definition (@{$self->definition}) {
                 my @setPairs;
                 foreach my $property (keys %{$definition->{properties}}) {
@@ -1367,6 +1369,7 @@ sub www_editSave {
 		$object = $self->addChild({className=>$session{form}{class}});	
 		$object->{_parent} = $self;
 	} else {
+		return $self->getContainer->www_view if ($self->isLocked && $self->get("isLockedBy") ne $session{user}{userId});
 		$object = $self->addRevision;
 	}
 	$object->processPropertiesFromFormPost;
@@ -1417,29 +1420,39 @@ sub www_manageAssets {
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
-         assetManager.AddColumn('Locked','','center','');\n";
+         assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n";
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
                 contextMenu.addLink("'.$child->getUrl("func=createShortcut&proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
                 contextMenu.addLink("'.$child->getUrl("func=promote").'","'.$i18n->get("promote").'");
                 contextMenu.addLink("'.$child->getUrl("func=demote").'","'.$i18n->get("demote").'");
+		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
 		my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
+		my $locked;
+		my $edit;
+		if ($child->isLocked) {
+			$locked = WebGUI::International::get("138");
+			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+" if ($child->get("isLockedBy") eq $session{user}{userId});
+		} else {
+			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+";
+			$locked = WebGUI::International::get("139");
+		}
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
 				name=>'assetId',
 				value=>$child->getId
 				})
-			."','<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+contextMenu.draw()," 
+			."',".$edit."contextMenu.draw()," 
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
-			."','".formatBytes($child->get("assetSize"))."','');\n";
+			."','".formatBytes($child->get("assetSize"))."','<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>');\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
-			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','".$locked."');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$child->getTitle."');\n";
 	}
 	$output .= '

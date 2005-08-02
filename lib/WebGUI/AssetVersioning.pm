@@ -57,9 +57,10 @@ sub addRevision {
         my $properties = shift;
 	my $now = shift || time();
 	my $versionTag = $session{scratch}{versionTag} || 'pbversion0000000000002';
+	my $status = $session{setting}{autoCommit} ? 'approved' : 'pending';
 	WebGUI::SQL->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
 		ownerUserId, groupIdEdit, groupIdView) values (".quote($self->getId).",".$now.", ".quote($session{user}{userId}).", 
-		".quote($versionTag).", 'approved', ".quote($self->getId).", 997995720, 9223372036854775807,'3','3','7')");
+		".quote($versionTag).", ".quote($status).", ".quote($self->getId).", 997995720, 9223372036854775807,'3','3','7')");
         foreach my $definition (@{$self->definition}) {
                 unless ($definition->{tableName} eq "assetData") {
                         WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".quote($self->getId).",".$now.")");
@@ -68,6 +69,7 @@ sub addRevision {
         my $newVersion = WebGUI::Asset->new($self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
         $newVersion->update($properties);
+	$newVersion->setVersionLock unless ($session{setting}{autoCommit});
         return $newVersion;
 }
 
@@ -85,7 +87,7 @@ The name of the version tag. If not specified, one will be generated using the c
 
 sub addVersionTag {
 	my $class = shift;
-	my $name = shift || WebGUI::DateTime::epochToHuman()." / ".$session{user}{username};
+	my $name = shift || "Autotag created ".WebGUI::DateTime::epochToHuman()." by ".$session{user}{username};
 	my $tagId = WebGUI::SQL->setRow("assetVersionTag","tagId",{
 		tagId=>"new",
 		name=>$name,
@@ -95,6 +97,30 @@ sub addVersionTag {
 	WebGUI::Session::setScratch("versionTag",$tagId);
 	return $tagId;
 } 
+
+
+#-------------------------------------------------------------------
+
+sub commit {
+	my $self = shift;
+	$self->unsetVersionLock;
+	WebGUI::SQL->write("update assetData set status='approved' where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
+	$self->purgeCache;
+}
+
+#-------------------------------------------------------------------
+
+sub commitVersionTag {
+	my $class = shift;
+	my $tagId = shift;
+	my $sth = WebGUI::SQL->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=".quote($tagId));
+	while (my ($id,$class,$version) = $sth->array) {
+		WebGUI::Asset->new($id,$class,$version)->commit;
+	}
+	$sth->finish;
+	WebGUI::SQL->write("update assetVersionTag set isCommitted=1, commitDate=".time().", committedBy=".quote($session{user}{userId})." where tagId=".quote($tagId));
+	WebGUI::SQL->write("delete from userSessionScratch where name='versionTag' and value=".quote($tagId));
+}
 
 
 #-------------------------------------------------------------------
@@ -115,6 +141,20 @@ sub getRevisionCount {
 	my $statusClause = " and status=".quote($status) if ($status);
 	my ($count) = WebGUI::SQL->quickArray("select count(*) from assetData where assetId=".quote($self->getId).$statusClause);
 	return $count;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isLocked ( )
+
+Returns a boolean indicating whether the asset is locked for editing by the versioning system.
+
+=cut
+
+sub isLocked {
+	my $self = shift;
+	return $self->get("isLockedBy") ? 1 : 0;
 }
 
 
@@ -308,6 +348,18 @@ sub www_addVersionTagSave {
 }
 
 
+#-------------------------------------------------------------------A
+
+sub www_commitVersionTag {
+	my $self = shift;
+	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
+	my $tagId = $session{form}{tagId};
+	if ($tagId) {
+		$self->commitVersionTag($tagId);
+	}
+	return $self->www_manageVersions;
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_manageVersionTags ()
@@ -387,13 +439,19 @@ sub www_manageVersions {
 	my ($tag) = WebGUI::SQL->quickArray("select name from assetVersionTag where tagId=".quote($session{scratch}{versionTag}));
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
+	my $commit = $i18n->get("commit");
 	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
+	my $commitPrompt = $i18n->get("commit version tag confirm");
 	my $output = '<p>You are currently working under a tag called: <b>'.$tag.'</b>.</p><table width=100% class="content">
 	<tr><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
 	my $sth = WebGUI::SQL->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
 	while (my ($id,$name,$date,$by) = $sth->array) {
 		my $u = WebGUI::User->new($by);
-		$output .= '<tr><td><a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$name.'</a></td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td><a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a> [commit]</td></tr>';
+		$output .= '<tr><td><a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$name.'</a></td>
+			<td>'.WebGUI::DateTime::epochToHuman($date).'</td>
+			<td>'.$u->username.'</td>
+			<td><a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a> |
+			<a href="'.$self->getUrl("func=commitVersionTag;tagId=".$id).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
 	$sth->finish;	
 	$output .= '</table>';

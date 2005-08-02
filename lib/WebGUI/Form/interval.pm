@@ -126,7 +126,7 @@ sub toHtml {
 		options=>\%units,
 		name=>$self->{name}."_units",
 		id=>$self->{id}."_units",
-		value=>[$self->{value}]
+		value=>[$units]
 		)->toHtml;
 }
 

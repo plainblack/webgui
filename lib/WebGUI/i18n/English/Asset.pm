@@ -13,16 +13,34 @@ our $I18N = {
 		context => q|The prompt for purging a version tag from the asset tree.|
 	},
 
+	'commit version tag confirm' => {
+		message => q|Are you certain you wish to commit this version tag and everything edited under it?|,
+		lastUpdated => 0,
+		context => q|The prompt for committing a version tag to the asset tree.|
+	},
+
 	'enable autocommit of asset versioning' => {
 		message => q|Enable autocommit of asset versioning?|,
 		lastUpdated => 0,
 		context => q|A label for the toggle for asset versioning.|
 	},
 
+	'commit' => {
+		message => q|Commit|,
+		lastUpdated => 0,
+		context => q|The label for committing a tag to the asset tree.|
+	},
+
 	'rollback' => {
 		message => q|Rollback|,
 		lastUpdated => 0,
 		context => q|The label for purging a revision from the asset tree.|
+	},
+
+	'locked' => {
+		message => q|Locked|,
+		lastUpdated => 0,
+		context => q|A label for a column in the asset manager indicating whether the asset is locked for editing.|
 	},
 
 	'revisions' => {

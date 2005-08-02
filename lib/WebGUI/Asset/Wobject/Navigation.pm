@@ -283,7 +283,10 @@ sub getToolbar {
 		if (exists $session{asset}) {
 			$returnUrl = "&proceed=goBackToPage&returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);	
 		}
-		my $toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
+		my $toolbar;
+		if (!$self->isLocked || $self->get("isLockedBy") eq $session{user}{userId}) {
+			$toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
+		}
 		my $i18n = WebGUI::International->new("Asset");
 		return '<script language="javascript" type="text/javascript">
                 var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
