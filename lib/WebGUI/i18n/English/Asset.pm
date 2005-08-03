@@ -25,6 +25,18 @@ our $I18N = {
 		context => q|A label for the toggle for asset versioning.|
 	},
 
+	'set tag' => {
+		message => q|Set As Working Tag|,
+		lastUpdated => 0,
+		context => q|The label for choosing as a tag to work under.|
+	},
+
+	'revisions in tag' => {
+		message => q|Revisions In Tag|,
+		lastUpdated => 0,
+		context => q|The label for displaying the revisions created under a specific tag.|
+	},
+
 	'commit' => {
 		message => q|Commit|,
 		lastUpdated => 0,

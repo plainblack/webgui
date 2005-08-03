@@ -162,7 +162,7 @@ sub getAdminFunction {
 			},
 			icon=>"versionTags.gif",
 			func=>"manageVersions",
-			group=>"12"
+			group=>"3"
 		},
 		"users"=>{
 			title=>{

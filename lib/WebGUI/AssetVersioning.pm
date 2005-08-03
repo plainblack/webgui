@@ -382,7 +382,11 @@ sub www_manageCommittedVersions {
         my $sth = WebGUI::SQL->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
         while (my ($id,$name,$date,$by) = $sth->array) {
                 my $u = WebGUI::User->new($by);
-                $output .= '<tr><td>'.$name.'</td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$u->username.'</td><td><a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
+                $output .= '<tr>
+			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
+			<td>'.WebGUI::DateTime::epochToHuman($date).'</td>
+			<td>'.$u->username.'</td>
+			<td><a href="'.$self->getUrl("proceed=manageCommittedVersions;func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
         }
         $sth->finish;
         $output .= '</table>';
@@ -403,15 +407,16 @@ sub www_manageRevisions {
         my $ac = WebGUI::AdminConsole->new("versions");
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
         my $i18n = WebGUI::International->new("Asset");
-        #$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
-        #$ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Revision Date</th><th>Revised By</th><th>Tag Name</th></tr> ';
-        my $sth = WebGUI::SQL->read("select assetData.revisionDate, users.username, assetVersionTag.name from assetData 
+        my $sth = WebGUI::SQL->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData 
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
 		where assetData.assetId=".quote($self->getId));
-        while (my ($date,$by,$tag) = $sth->array) {
-                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=rollbackAssetRevision",$self->get("url"),$i18n->get("purge revision prompt")).'</td><td>'.WebGUI::DateTime::epochToHuman($date).'</td><td>'.$by.'</td><td>'.$tag.'</td></tr>';
+        while (my ($date,$by,$tag,$tagId) = $sth->array) {
+                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")).'</td>
+			<td><a href="'.$self->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
+			<td>'.$by.'</td>
+			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$tagId).'">'.$tag.'</a></td></tr>';
         }
         $sth->finish;
         $output .= '</table>';
@@ -430,16 +435,16 @@ Shows a list of the currently available asset version tags.
 sub www_manageVersions {
 	my $self = shift;
         my $ac = WebGUI::AdminConsole->new("versions");
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	my $i18n = WebGUI::International->new("Asset");
 	$ac->setHelp("versions manage");
-	my $i18n = WebGUI::International->new("Asset");
 	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
 	my ($tag) = WebGUI::SQL->quickArray("select name from assetVersionTag where tagId=".quote($session{scratch}{versionTag}));
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
 	my $commit = $i18n->get("commit");
+	my $setTag = $i18n->get("set tag");
 	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
 	my $commitPrompt = $i18n->get("commit version tag confirm");
 	my $output = '<p>You are currently working under a tag called: <b>'.$tag.'</b>.</p><table width=100% class="content">
@@ -450,7 +455,9 @@ sub www_manageVersions {
 		$output .= '<tr><td><a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$name.'</a></td>
 			<td>'.WebGUI::DateTime::epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
-			<td><a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a> |
+			<td>
+			<a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$setTag.'</a> |
+			<a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a> |
 			<a href="'.$self->getUrl("func=commitVersionTag;tagId=".$id).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
 	$sth->finish;	
@@ -459,14 +466,47 @@ sub www_manageVersions {
 }
 
 
-#-------------------------------------------------------------------A
+#-------------------------------------------------------------------
 
-sub www_purgeAssetRevision {
+sub www_manageRevisionsInTag {
+	my $self = shift;
+	my $ac = WebGUI::AdminConsole->new("versions");
+        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+        my $i18n = WebGUI::International->new("Asset");
+	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
+	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
+        $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
+        my $output = '<table width=100% class="content">
+        <tr><th></th><th>Title</th><th>Type</th><th>Revision Date</th><th>Revised By</th></tr> ';
+        my $sth = WebGUI::SQL->read("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
+		left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
+		where assetData.tagId=".quote($session{form}{tagId}));
+        while (my ($date,$by,$id, $class) = $sth->array) {
+		my $asset = WebGUI::Asset->new($id,$class,$date);
+                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$session{form}{tagId}.";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
+			<td>'.$asset->getTitle.'</td>
+			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
+			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
+			<td>'.$by.'</td></tr>';
+        }
+        $sth->finish;
+        $output .= '</table>';
+	my $tag = WebGUI::SQL->getRow("assetVersionTag","tagId",$session{form}{tagId});
+        return $ac->render($output,$i18n->get("revisions in tag").": ".$tag->{name});
+}
+
+
+#-------------------------------------------------------------------
+
+sub www_purgeRevision {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $revisionDate = $session{form}{revisionDate};
 	return undef unless $revisionDate;
 	WebGUI::Asset->new($self->getId,$self->get("className"),$revisionDate)->purgeRevision;
+	if ($session{form}{proceed} eq "manageRevisionsInTag") {
+		return $self->www_manageRevisionsInTag;
+	}
 	return $self->www_manageRevisions;
 }
 
@@ -479,6 +519,9 @@ sub www_rollbackVersionTag {
 	my $tagId = $session{form}{tagId};
 	if ($tagId) {
 		$self->rollbackVersionTag($tagId);
+	}
+	if ($session{form}{proceed} eq "manageCommittedVersions") {
+		return $self->www_manageCommittedVersions;
 	}
 	return $self->www_manageVersions;
 }
@@ -507,6 +550,14 @@ sub www_setVersionTag () {
 	return $self->www_manageVersions();
 }
 
+
+#-------------------------------------------------------------------
+
+sub www_viewRevision {
+	my $self = shift;
+	my $otherSelf = WebGUI::Asset->new($self->getId,$self->get("className"),$session{form}{revisionDate});
+	return (defined $otherSelf) ? $otherSelf->www_view : undef;
+}
 
 1;
 
