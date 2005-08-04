@@ -119,7 +119,7 @@ sub definition {
 				},
 			username => {
 				fieldType=>"hidden",
-				defaultValue=>$session{user}{alias} || $session{user}{username}
+				defaultValue=>$session{form}{visitorUsername} || $session{user}{alias} || $session{user}{username}
 				},
 			status => {
 				noFormPost=>1,
