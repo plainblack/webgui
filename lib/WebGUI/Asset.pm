@@ -361,7 +361,7 @@ sub getAssetAdderLinks {
 			if ($@) {
 				WebGUI::ErrorHandler::error("Couldn't get UI level of ".$class." because ".$@);
 			} else {
-				next if ($uiLevel > $session{user}{uiLevel});
+				next if ($uiLevel > $session{user}{uiLevel} || WebGUI::Grouping::isInGroup(3));
 			}
 			my $canAdd = eval{$class->canAdd()};
 			if ($@) {

@@ -1,4 +1,6 @@
 6.7.0
+ - Being in the admins group automatically results in a UI level capable of
+   seeing everything.
  - Fixed a potential problem where editing a page under rare very rare 
    conditions could destroy the not found page.
  - Added the ability to override the UI Level of any field in the edit form of

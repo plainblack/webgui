@@ -15,6 +15,7 @@ package WebGUI::Form::Control;
 =cut
 
 use strict;
+use WebGUI::Grouping;
 use WebGUI::Session;
 
 =head1 NAME
@@ -400,7 +401,14 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	if ($self->{uiLevel} <= $session{user}{uiLevel} && $session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}} <= $session{user}{uiLevel}) {
+	my $passUiLevelCheck = 0;
+	if ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}}) { # use override if it exists
+		$passUiLevelCheck = ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}} <= $session{user}{uiLevel});
+	} else { # use programmed default
+		$passUiLevelCheck = ($self->{uiLevel} <= $session{user}{uiLevel});
+	}
+	$passUiLevelCheck = WebGUI::Grouping::isInGroup(3) unless ($passUiLevelCheck); # override if in admins group
+	if ($passUiLevelCheck) {
 		my $rowClass = $self->{rowClass};
         	$rowClass = qq| class="$rowClass" | if($self->{rowClass});
 		my $labelClass = $self->{labelClass};
