@@ -1,11 +1,8 @@
 // WebGUI Specific javascript functions for TinyMCE
 
 function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
-	// Use default URL convertor, old 1.43 else 1.44+
-        if (typeof(TinyMCE_convertURL) != "undefined")
-        	url = TinyMCE_convertURL(url, node, on_save);
-        else
-                url = tinyMCE.convertURL(url, node, on_save);
+	// The next line would have tried formatting the URL, but we don't want it to
+        //url = tinyMCE.convertURL(url, node, on_save);
         // Do custom WebUI convertion, replace back ^();
         url = url.replace(new RegExp("%5E", "g"), "^");
         url = url.replace(new RegExp("%3B", "g"), ";");
@@ -15,7 +12,11 @@ function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
         return url;
 }
 
-function tinyMCE_WebGUI_Cleanup(type,content) {
-	return content.replace(new RegExp("&quot;","g"),'"');
+function tinyMCE_WebGUI_Cleanup(type,value) {
+//	alert(value);
+	if (value != "[object HTMLBodyElement]") {
+		value = value.replace(new RegExp("&quot;", "g"),"\"");
+	}
+	return value;
 }
 

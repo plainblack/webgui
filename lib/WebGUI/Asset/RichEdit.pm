@@ -453,11 +453,10 @@ sub getRichEditor {
 		push(@plugins,"insertImage") if ($button eq "insertImage");	
 		push(@plugins,"collateral") if ($button eq "collateral");	
 		push(@plugins,"pagetree") if ($button eq "pagetree");	
-		push(@plugins,"") if ($button eq "");	
-		push(@plugins,"") if ($button eq "");	
-		push(@plugins,"") if ($button eq "");	
-		push(@plugins,"") if ($button eq "");	
-		push(@plugins,"") if ($button eq "");	
+		if ($button eq "code") {
+			$config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth") if ($self->getValue("sourceEditorWidth") > 0);
+			$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
+		}
 	}
 	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
 	unless ($language) {
@@ -467,8 +466,6 @@ sub getRichEditor {
 	$config{content_css} = $self->getValue("cssFile") if ($self->getValue("cssFile") ne "");
 	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
-	$config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth") if ($self->getValue("sourceEditorWidth") > 0);
-	$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
 	$config{plugins} = join(",",@plugins);
 	my @directives;
 	foreach my $key (keys %config) {
