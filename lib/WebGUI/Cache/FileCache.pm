@@ -232,7 +232,10 @@ sub set {
 	my $ttl = shift || 60;
 	my $path = $self->getFolder();
 	unless (-e $path) {
-		eval {mkpath($path)};
+		my $oldumask = umask();
+		umask(0000);
+		eval {mkpath($path,0)};
+		umask($oldumask);
 		if ($@) {
 			WebGUI::ErrorHandler::error("Couldn't create cache folder: ".$path." : ".$@);
 			return;

@@ -17,13 +17,13 @@ our $I18N = {
         	lastUpdated => 1115139859,
 	},
 
-	'extended elements' => {
-		message => q|Extended Valid Elements|,
+	'elements' => {
+		message => q|Valid Elements|,
         	lastUpdated => 1115148094,
 	},
 
-	'extended elements subtext' => {
-		message => q|<br /> Must appear on one line, no carriage returns.|,
+	'elements subtext' => {
+		message => q|<br /> Must appear on one line, no carriage returns, and in the format of tag1[attr1\|attr2],tag2[attr1].|,
         	lastUpdated => 1115148094,
 	},
 
@@ -120,6 +120,18 @@ our $I18N = {
 	},
 	'paste' => {
 		message => q|Paste|,
+        	lastUpdated => 1115150778,
+	},
+	'pastetext' => {
+		message => q|Paste as Plain Text|,
+        	lastUpdated => 1115150778,
+	},
+	'pasteword' => {
+		message => q|Paste from Word|,
+        	lastUpdated => 1115150778,
+	},
+	'fullscreen' => {
+		message => q|Fullscreen|,
         	lastUpdated => 1115150778,
 	},
 	'undo' => {
@@ -354,8 +366,8 @@ option is set to Yes, then all whitespace entered into the form will be preserve
                 lastUpdated => 1119584875,
         },
 
-        'extended elements description' => {
-                message => q|A list of HTML tags and which elements are allowed inside of them.|,
+        'elements description' => {
+                message => q|A list of HTML tags and their attributes that the rich editor will accept. All others will be stripped. To allow anything set it to *[*]. |,
                 lastUpdated => 1119584875,
         },
 

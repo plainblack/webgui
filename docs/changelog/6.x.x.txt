@@ -1,4 +1,10 @@
 6.7.0
+ - Upgraded the rich editor to 1.45.
+ - Rich edit now has three new buttons: paste from word, paste as plain text,
+   and fullscreen.
+ - Rich editor defaultly does not validate HTML tags and therefore will allow
+   the slop that it was stripping out before. While less strict, this is less
+   confusing to end users.
  - Being in the admins group automatically results in a UI level capable of
    seeing everything.
  - fix [ 1251390 ] Security tab doesn't appear for member of Admins

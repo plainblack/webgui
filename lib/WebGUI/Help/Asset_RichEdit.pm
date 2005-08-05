@@ -17,8 +17,8 @@ our $HELP = {
                                 namespace => 'Asset_RichEdit',
                         },
                         {
-                                title => 'extended elements',
-                                description => 'extended elements description',
+                                title => 'elements',
+                                description => 'elements description',
                                 namespace => 'Asset_RichEdit',
                         },
                         {

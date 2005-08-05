@@ -31,8 +31,19 @@ makeSyndicatedContentChanges();
 removeOldThemeSystem();
 addSectionsToSurveys();
 increaseProxyUrlLength();
+upgradeRichEdit();
 
 WebGUI::Session::close();
+
+#-------------------------------------------------
+sub upgradeRichEdit {
+	print "\tUpgrade rich editor to version 1.45.\n" unless ($quiet);
+	WebGUI::SQL->write("update RichEdit set extendedValidElements='*[*]' where assetId='PBrichedit000000000001'");
+	my $prepend = 'a[name|href|target|title],strong/b[class],em\/i[class],strike[class],u[class],p[dir|class|align],ol,ul,li,br,img[class|src|border=0|alt|title|hspace|vspace|width|height|align],sub,sup,blockquote[dir|style],table[border=0|cellspacing|cellpadding|width|height|class|align],tr[class|rowspan|width|height|align|valign],td[dir|class|colspan|rowspan|width|height|align|valign],div[dir|class|align],span[class|align],pre[class|align],address[class|align],h1[dir|class|align],h2[dir|class|align],h3[dir|class|align],h4[dir|class|align],h5[dir|class|align],h6[dir|class|align],hr';
+	WebGUI::SQL->write("update RichEdit set extendedValidElements=concat(".quote($prepend).",',',extendedValidElements) where assetId<>'PBrichedit000000000001'");
+	WebGUI::SQL->write("alter table RichEdit change extendedValidElements validElements mediumtext");
+}
+
 
 #-------------------------------------------------
 sub increaseProxyUrlLength {

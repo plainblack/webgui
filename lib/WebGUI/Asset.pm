@@ -1458,7 +1458,7 @@ sub www_manageAssets {
 			."','".formatBytes($child->get("assetSize"))."','<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>');\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','".$locked."');
-			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$child->getTitle."');\n";
+			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
 	}
 	$output .= '
 		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");

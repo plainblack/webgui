@@ -72,7 +72,7 @@ sub definition {
                         	fieldType=>'yesNo',
                                 defaultValue=>0
                                 },
- 			extendedValidElements=>{
+ 			validElements=>{
                         	fieldType=>'textarea',
                                 defaultValue=>'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]'
                                 },
@@ -162,6 +162,8 @@ sub getEditForm {
 		'cut' => WebGUI::International::get('cut', 'Asset_RichEdit'),
 		'copy' => WebGUI::International::get('copy', 'Asset_RichEdit'),
 		'paste' => WebGUI::International::get('paste', 'Asset_RichEdit'),
+		'pastetext' => WebGUI::International::get('pastetext', 'Asset_RichEdit'),
+		'pasteword' => WebGUI::International::get('pasteword', 'Asset_RichEdit'),
 		'undo' => WebGUI::International::get('undo', 'Asset_RichEdit'),
 		'redo' => WebGUI::International::get('redo', 'Asset_RichEdit'),
 		'bold' => WebGUI::International::get('bold', 'Asset_RichEdit'),
@@ -207,6 +209,7 @@ sub getEditForm {
 		'cleanup' => WebGUI::International::get('cleanup', 'Asset_RichEdit'),
 		'save' => WebGUI::International::get('save', 'Asset_RichEdit'),
 		'preview' => WebGUI::International::get('preview', 'Asset_RichEdit'),
+		'fullscreen' => WebGUI::International::get('fullscreen', 'Asset_RichEdit'),
 		'zoom' => WebGUI::International::get('zoom', 'Asset_RichEdit'),
 		'print' => WebGUI::International::get('print', 'Asset_RichEdit'),
 #		'advlink' => "Advanced Link",
@@ -276,11 +279,11 @@ sub getEditForm {
                 -uiLevel=>9
                 );
 	$tabform->getTab("security")->textarea(
-		-value=>$self->getValue("extendedValidElements"),
-		-name=>"extendedValidElements",
-		-label=>WebGUI::International::get('extended elements', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('extended elements description', 'Asset_RichEdit'),
-		-subtext=>WebGUI::International::get('extended elements subtext', 'Asset_RichEdit'),
+		-value=>$self->getValue("validElements"),
+		-name=>"validElements",
+		-label=>WebGUI::International::get('elements', 'Asset_RichEdit'),
+		-hoverHelp=>WebGUI::International::get('elements description', 'Asset_RichEdit'),
+		-subtext=>WebGUI::International::get('elements subtext', 'Asset_RichEdit'),
 		-uiLevel=>9
 		);
         $tabform->getTab("display")->integer(
@@ -412,12 +415,13 @@ sub getRichEditor {
 		nowrap => $self->getValue("nowrap") ? "true" : "false",
 		directionality => $self->getValue("directionality"),
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
-		extended_valid_elements => $self->getValue("extendedValidElements"),
+		valid_elements => $self->getValue("validElements"),
 		);
 	foreach my $button (@toolbarButtons) {
 		push(@plugins,"table") if ($button eq "tablecontrols");	
 		push(@plugins,"save") if ($button eq "save");	
 		push(@plugins,"advhr") if ($button eq "advhr");	
+		push(@plugins,"fullscreen") if ($button eq "fullscreen");	
 		if ($button eq "advimage") {
 			push(@plugins,"advimage");
 			$config{external_link_list_url} = "";
@@ -429,6 +433,9 @@ sub getRichEditor {
 		}
 		push(@plugins,"emotions") if ($button eq "emotions");	
 		push(@plugins,"iespell") if ($button eq "iespell");	
+		if ($button eq "paste" || $button eq "pastetext" || $button eq "pasteword") {
+			push(@plugins,"paste");
+		}
 		if ($button eq "insertdate" || $button eq "inserttime" || $button eq "insertdatetime") {
 			$config{plugin_insertdate_dateFormat} = "%Y-%m-%d";
 			$config{plugin_insertdate_timeFormat} = "%H:%M:%S";
