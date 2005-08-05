@@ -1,5 +1,5 @@
 /* Import theme	specific language pack */
-tinyMCE.importPluginLanguagePack('searchreplace', 'en,sv,zh_cn,fa,fr_ca,fr,de,pl');
+tinyMCE.importPluginLanguagePack('searchreplace', 'en,sv,zh_cn,fa,fr_ca,fr,de,pl,pt_br,cs,nl');
 
 function TinyMCE_searchreplace_getControlHTML(control_name)	{
 	switch (control_name) {
@@ -93,6 +93,13 @@ function TinyMCE_searchreplace_execCommand(editor_id, element, command,	user_int
 			} else {
 				var win = tinyMCE.getInstanceById(editor_id).contentWindow;
 				var doc = tinyMCE.getInstanceById(editor_id).contentWindow.document;
+				var body = tinyMCE.getInstanceById(editor_id).contentWindow.document.body;
+
+				// Whats the point
+				if (body.innerHTML == "") {
+					alert(tinyMCE.getLang('lang_searchreplace_notfound'));
+					return true;
+				}
 
 				// Handle replace current
 				if (value['replacemode'] == "current") {

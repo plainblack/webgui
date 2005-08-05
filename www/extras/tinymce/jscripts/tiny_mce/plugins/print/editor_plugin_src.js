@@ -1,5 +1,5 @@
 /* Import theme	specific language pack */
-tinyMCE.importPluginLanguagePack('print', 'en,sv,zh_cn,fa,fr_ca,fr,de,pl');
+tinyMCE.importPluginLanguagePack('print', 'en,sv,zh_cn,fa,fr_ca,fr,de,pl,pt_br,cs,nl');
 
 function TinyMCE_print_getControlHTML(control_name)	{
 	switch (control_name) {

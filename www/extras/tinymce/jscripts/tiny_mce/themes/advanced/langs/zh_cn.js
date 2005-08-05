@@ -1,4 +1,5 @@
-// Simplified Chinese lang variables contributed by cube316 (cube316@etang.com)
+// Simplified Chinese lang variables contributed by cube316 (cube316@gmail.com)
+//请访问 http://www.cube316.net/ 以获取TinyMCE的中文支持
 
 tinyMCELang['lang_theme_style_select'] = '格式';
 tinyMCELang['lang_theme_code_desc'] = '编辑HTML源代码';
@@ -24,10 +25,11 @@ tinyMCELang['lang_insert_image_align_absmiddle'] = '绝对居中';
 tinyMCELang['lang_insert_image_align_absbottom'] = '绝对底部';
 tinyMCELang['lang_insert_image_align_left'] = '左对齐';
 tinyMCELang['lang_insert_image_align_right'] = '右对齐';
-tinyMCELang['lang_theme_font_size'] = '字体大小';
-tinyMCELang['lang_theme_fontdefault'] = '默认';
+tinyMCELang['lang_theme_font_size'] = '-- Font size --';
+tinyMCELang['lang_theme_fontdefault'] = '-- Font family --';
+tinyMCELang['lang_theme_block'] = '-- Format --';
 tinyMCELang['lang_theme_paragraph'] = '段落';
-tinyMCELang['lang_theme_div'] = 'Div';
+tinyMCELang['lang_theme_div'] = '层';
 tinyMCELang['lang_theme_address'] = '地址';
 tinyMCELang['lang_theme_pre'] = '预格式化的';
 tinyMCELang['lang_theme_h1'] = '标题 1';
@@ -55,4 +57,7 @@ tinyMCELang['lang_paste_desc'] = '粘贴';
 tinyMCELang['lang_link_list'] = '链接列表';
 tinyMCELang['lang_image_list'] = '图像列表';
 tinyMCELang['lang_browse'] = '浏览';
-tinyMCELang['lang_image_props_desc'] = 'Image properties';
+tinyMCELang['lang_image_props_desc'] = '图像属性';
+tinyMCELang['lang_newdocument_desc'] = '新建文档';
+tinyMCELang['lang_class'] = '类';
+tinyMCELang['lang_newdocument'] = 'Are you sure you want clear all contents?';

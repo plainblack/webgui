@@ -1,5 +1,5 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('emotions', 'en,sv,zh_cn,cs,fa,fr_ca,fr,de,pl');
+tinyMCE.importPluginLanguagePack('emotions', 'en,sv,zh_cn,cs,fa,fr_ca,fr,de,pl,pt_br,nl');
 
 /**
  * Returns the HTML contents of the emotions control.
@@ -7,7 +7,7 @@ tinyMCE.importPluginLanguagePack('emotions', 'en,sv,zh_cn,cs,fa,fr_ca,fr,de,pl')
 function TinyMCE_emotions_getControlHTML(control_name) {
 	switch (control_name) {
 		case "emotions":
-			return '<img id="{$editor_id}_emotions" src="{$pluginurl}/images/emotions.gif" title="{$lang_emotions_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceEmotion\');">';
+			return '<img id="{$editor_id}_emotions" src="{$pluginurl}/images/emotions.gif" title="{$lang_emotions_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceEmotion\');">';
 	}
 
 	return "";

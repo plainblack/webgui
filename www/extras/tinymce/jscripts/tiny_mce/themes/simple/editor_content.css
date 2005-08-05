@@ -22,3 +22,6 @@ pre {
 	font-size: 10px;
 }
 
+.mceVisualAid {
+	border: 1px dashed #BBBBBB;
+}

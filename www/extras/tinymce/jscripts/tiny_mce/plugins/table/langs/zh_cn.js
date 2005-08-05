@@ -1,4 +1,5 @@
-// Simplified Chinese lang variables contributed by cube316 (cube316@etang.com) 
+// Simplified Chinese lang variables contributed by cube316 (cube316@gmail.com)
+//请访问 http://www.cube316.net/ 以获取TinyMCE的中文支持
 
 tinyMCELang['lang_table_desc'] = '插入新表格';
 tinyMCELang['lang_table_insert_row_before_desc'] = '在前面插入行';
@@ -28,6 +29,14 @@ tinyMCELang['lang_table_cell_desc'] = '单元格属性';
 tinyMCELang['lang_insert_table_valign'] = '垂直对齐';
 tinyMCELang['lang_insert_table_align_top'] = '顶端';
 tinyMCELang['lang_insert_table_align_bottom'] = '底部';
-tinyMCELang['lang_table_props_desc'] = 'Table properties';
-tinyMCELang['lang_table_bordercolor'] = 'Border color';
-tinyMCELang['lang_table_bgcolor'] = 'Bg color';
+tinyMCELang['lang_table_props_desc'] = '表格属性';
+tinyMCELang['lang_table_bordercolor'] = '边框颜色';
+tinyMCELang['lang_table_bgcolor'] = '背景颜色';
+tinyMCELang['lang_table_merge_cells_title'] = '合并单元格';
+tinyMCELang['lang_table_split_cells_desc'] = '拆分单元格';
+tinyMCELang['lang_table_merge_cells_desc'] = '合并单元格';
+tinyMCELang['lang_table_cut_row_desc'] = '剪切行';
+tinyMCELang['lang_table_copy_row_desc'] = '复制行';
+tinyMCELang['lang_table_paste_row_before_desc'] = '在前面插入行';
+tinyMCELang['lang_table_paste_row_after_desc'] = '在后面插入行';
+tinyMCELang['lang_table_insert_desc'] = 'Insert a new table';

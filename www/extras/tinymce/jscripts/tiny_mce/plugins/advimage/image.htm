@@ -4,14 +4,16 @@
 <script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
 <script language="javascript">
 var url = tinyMCE.getParam("external_image_list_url");
-if (url != null)
-	document.write('<sc'+'ript language="javascript" type="text/javascript" src="' + tinyMCE.documentBasePath + "/" + url + '"></sc'+'ript>');
+if (url != null) {
+	// Fix relative
+	if (url.charAt(0) != '/')
+		url = tinyMCE.documentBasePath + "/" + url;
+
+	document.write('<sc'+'ript language="javascript" type="text/javascript" src="' + url + '"></sc'+'ript>');
+}
 </script>
 <script language="javascript" type="text/javascript">
 <!--
-	// Disable auto resize
-	tinyMCE.getWindowArg('mce_windowresize', false);
-
     function myRegexpReplace(in_str, reg_exp, replace_str, opts) {
         if (typeof opts == "undefined")
             opts = 'g';
@@ -20,43 +22,40 @@ if (url != null)
     }
 
     function insertImage() {
-        if (window.opener) {
-            var src         = document.forms[0].src.value;
-            var alt         = document.forms[0].alt.value;
-            var title       = document.forms[0].title.value;
-            var border      = document.forms[0].border.value;
-            var vspace      = document.forms[0].vspace.value;
-            var hspace      = document.forms[0].hspace.value;
-            var width       = document.forms[0].width.value;
-            var height      = document.forms[0].height.value;
-            var align       = document.forms[0].align.options[document.forms[0].align.selectedIndex].value;
-            var onmouseover = document.forms[0].onmouseover.value;
-            var onmouseout  = document.forms[0].onmouseout.value;
+		var formObj = document.forms[0];
 
-        // added 2004-11-10 by Michael Keck (me@michaelkeck.de)
-        // supporting onmouse over / out for image swap ...
-            // only support the onmouse over/out if both values are given
-            if (onmouseover!='' && onmouseout!='' && document.forms[0].onmousemove.checked==true) {
-                onmouseover="this.src='" + onmouseover + "';";
-                onmouseout ="this.src='" + onmouseout + "';";
-            } else {
-                onmouseover="";
-                onmouseout ="";
-            }
+        if (window.opener) {
+            var src         = formObj.src.value;
+            var alt         = formObj.alt.value;
+            var title       = formObj.title.value;
+            var border      = formObj.border.value;
+            var vspace      = formObj.vspace.value;
+            var hspace      = formObj.hspace.value;
+            var width       = formObj.width.value;
+            var height      = formObj.height.value;
+            var align       = formObj.align.options[formObj.align.selectedIndex].value;
+            var onmouseover = formObj.onmouseover.value;
+            var onmouseout  = formObj.onmouseout.value;
+
+			if (!formObj.onmousemove.checked)
+				onmouseover = onmouseout = "";
 
             window.opener.tinyMCE.insertImage(src, alt, border, hspace, vspace, width, height, align, title, onmouseover, onmouseout);
-            top.close();
+
+			// Close the dialog
+			tinyMCE.closeDialog();
         }
     }
 
     function init() {
         var formObj = document.forms[0];
-        var arrOnOver = new Array(), arrOnOut  = new Array();
         var strOnOver = "", strOnOut  = "";
+
         for (var i=0; i<document.forms[0].align.options.length; i++) {
             if (document.forms[0].align.options[i].value == tinyMCE.getWindowArg('align'))
                 document.forms[0].align.options.selectedIndex = i;
         }
+
         formObj.src.value    = tinyMCE.getWindowArg('src');
         formObj.alt.value    = tinyMCE.getWindowArg('alt');
         formObj.title.value  = tinyMCE.getWindowArg('title');
@@ -65,37 +64,13 @@ if (url != null)
         formObj.hspace.value = tinyMCE.getWindowArg('hspace');
         formObj.width.value  = tinyMCE.getWindowArg('width');
         formObj.height.value = tinyMCE.getWindowArg('height');
-        formObj.height.value = tinyMCE.getWindowArg('height');
 
 		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
 
-    // added 2004-11-10 by Michael Keck (me@michaelkeck.de)
-    // supporting onmouse over / out for image swap ...
-        arrOnOver            = tinyMCE.getWindowArg('onmouseover').split(';');
-        arrOnOut             = tinyMCE.getWindowArg('onmouseout').split(';');
-        for (var i=0; i<arrOnOver.length; i++) {
-            if (arrOnOver[i].indexOf('this.src=\'')!=-1) {
-                strOnOver = arrOnOver[i];
-                break;
-             }
-        }
-        for (var i=0; i<arrOnOut.length; i++) {
-            if (arrOnOut[i].indexOf('this.src=\'')!=-1) {
-                strOnOut = arrOnOut[i];
-                break;
-             }
-        }
-        if (strOnOver!='') {
-                strOnOver = myRegexpReplace(strOnOver,"this.src='","","gi");
-                strOnOver = myRegexpReplace(strOnOver,"'","","gi");
-                strOnOver = myRegexpReplace(strOnOver,";","","gi");
-        }
-        if (strOnOut!='') {
-                strOnOut = myRegexpReplace(strOnOut,"this.src='","","gi");
-                strOnOut = myRegexpReplace(strOnOut,"'","","gi");
-                strOnOut = myRegexpReplace(strOnOut,";","","gi");
-        }
-        if (strOnOver!='' && strOnOut!='') {
+        strOnOver            = tinyMCE.getWindowArg('onmouseover');
+        strOnOut             = tinyMCE.getWindowArg('onmouseout');
+
+        if (strOnOver != '' && strOnOut != '') {
             setOnMouseInput('enabled');
             formObj.onmousemove.checked = true;
             formObj.onmouseover.value   = strOnOver;
@@ -134,11 +109,9 @@ if (url != null)
         htmlprev += ' marginwidth="0" marginheight="0" frameborder="0" src="' + src + '"' 
         htmlprev += ' style="margin:0px;border: 1px solid black;width:135px;height:135px"></iframe>'; 
 
-        document.getElementById('prev').innerHTML = htmlprev; 
+        document.getElementById('prev').innerHTML = htmlprev;
 
-		// Autoresize and focus
-		TinyMCEPopup_autoResize();
-        window.focus();
+	getImageData();
     }
 
 	function selectByValue(form_obj, field_name, value) {
@@ -166,9 +139,6 @@ if (url != null)
 		return html;
 	}
 
-// added 2004-11-10 by Michael Keck (me@michaelkeck.de)
-// supporting onmouse over / out for image swap ...
-// this function is needed for visual show, if onmouse over/out available
     function setOnMouseInput(stat){
         var formObj = document.forms[0];
         if (stat=='enabled') {
@@ -190,7 +160,8 @@ if (url != null)
     }
 
     function cancelAction() {
-        top.close();
+		// Close the dialog
+		tinyMCE.closeDialog();
     }
 
 	var preloadImg = new Image();
@@ -211,6 +182,11 @@ if (url != null)
 	}
 
 	function getImageData() {
+		if (document.forms[0].src.value == "") {
+			self.preview.location = "about:blank";
+			return;
+		}
+
 		preloadImg = new Image();
 
 		tinyMCE.addEvent(preloadImg, "load", updateImageData);
@@ -224,10 +200,30 @@ if (url != null)
 
 		self.preview.location = src; 
 	}
+
+    function changeHeight() {
+       	var formObj = document.forms[0];
+
+		if (!tinyMCE.getParam("advimage_constrain_proportions", false) || formObj.width.value == "")
+			return;
+
+       	var temp = (formObj.width.value / preloadImg.width) * preloadImg.height;
+       	formObj.height.value = temp.toFixed(0);
+    }
+
+   	function changeWidth() {
+       	var formObj = document.forms[0];
+
+		if (!tinyMCE.getParam("advimage_constrain_proportions", false) || formObj.height.value == "")
+			return;
+
+       	var temp = (formObj.height.value / preloadImg.height) * preloadImg.width;
+       	formObj.width.value = temp.toFixed(0);
+   	}
 //-->
 </script>
 </head>
-<body onload="window.focus();init();"> 
+<body onload="init();"> 
     <form onsubmit="insertImage();return false;"> 
         <table border="0" cellpadding="0" cellspacing="0" width="300"> 
             <tr> 
@@ -248,9 +244,8 @@ if (url != null)
                  <script language="javascript"> 
                   if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) { 
                      var html = ""; 
-
                      html += '<tr><td align="right" nowrap="nowrap">{$lang_image_list}:</td>'; 
-                     html += '<td colspan="2"><select name="image_list" style="width: 280px" onchange="this.form.src.value=this.options[this.selectedIndex].value;resetImageData();getImageData();">'; 
+                     html += '<td colspan="2"><select name="image_list" style="width: 280px" onchange="this.form.alt.value=this.options[this.selectedIndex].text;this.form.title.value=this.options[this.selectedIndex].text;this.form.src.value=this.options[this.selectedIndex].value;resetImageData();getImageData();">'; 
                      html += '<option value="">---</option>'; 
 
                      for (var i=0; i<tinyMCEImageList.length; i++) 
@@ -273,10 +268,10 @@ if (url != null)
                     <tr> 
                         <td align="right" nowrap="nowrap">{$lang_insert_image_dimensions}:</td> 
                         <td nowrap="nowrap"> 
-                            <input name="width" type="text" id="width" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" /> x 
-                            <input name="height" type="text" id="height" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" /> px 
+                            <input name="width" type="text" id="width" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" onChange="changeHeight();" /> x 
+                            <input name="height" type="text" id="height" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" onChange="changeWidth();" /> px 
                         </td>
-						<td rowspan="6" valign="top"><div id="prev" name="prev" style="margin:0px;border:none;width:135px;height:135px"></div></td> 
+			<td rowspan="6" valign="top"><div id="prev" name="prev" style="margin:0px;border:none;width:135px;height:135px"></div></td> 
                     </tr> 
                     <tr> 
                         <td align="right" nowrap="nowrap">{$lang_insert_image_border}:</td> 
@@ -371,6 +366,6 @@ if (url != null)
                 </table></td> 
             </tr> 
         </table> 
-    </form> 
+    </form>
 </body> 
 </html> 

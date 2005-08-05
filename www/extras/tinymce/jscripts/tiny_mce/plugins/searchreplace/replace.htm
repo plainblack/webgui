@@ -16,14 +16,13 @@
 //		formObj.wholeword.checked = tinyMCE.getWindowArg("wholeword");
 
 		tinyMCE.execInstanceCommand(tinyMCE.getWindowArg("editor_id"), "mceResetSearch", false, {dummy : ""}, false);
-		window.focus();
 	}
 
     function searchNext(replacemode) {
         var formObj = document.forms[0];
 
 		// Whats the point?
-		if (formObj.searchstring.value == formObj.replacestring.value)
+		if (formObj.searchstring.value == "" || formObj.searchstring.value == formObj.replacestring.value)
 			return;
 
 		// Do search
@@ -39,7 +38,8 @@
     }
 
     function cancelAction() {
-        top.close();
+		// Close the dialog
+		tinyMCE.closeDialog();
     }
 //-->
 </script>
@@ -75,7 +75,7 @@
 </table></td>
 </tr>
       </table>
-  <table border="0" width="100%" cellspacing="0" cellpadding="4">
+  <table border="0" width="300" cellspacing="0" cellpadding="4">
     <tr>
       <td><input name="findBtn" type="button" id="findBtn" value="{$lang_searchreplace_findnext}" onclick="searchNext('none');" /></td>
       <td><input name="replaceBtn" type="button" id="replaceBtn" value="{$lang_searchreplace_replace}" onclick="searchNext('current');" /></td>

@@ -39,8 +39,9 @@ tinyMCELang['lang_insert_image_align_absmiddle'] = '$B@dBP$KCf(B';
 tinyMCELang['lang_insert_image_align_absbottom'] = '$B@dBP$K2<(B';
 tinyMCELang['lang_insert_image_align_left'] = '$B:8(B';
 tinyMCELang['lang_insert_image_align_right'] = '$B1&(B';
-tinyMCELang['lang_theme_font_size'] = 'Font size';
-tinyMCELang['lang_theme_fontdefault'] = '$BI8=`(B';
+tinyMCELang['lang_theme_font_size'] = '-- Font size --';
+tinyMCELang['lang_theme_fontdefault'] = '-- Font family --';
+tinyMCELang['lang_theme_block'] = '-- Format --';
 tinyMCELang['lang_theme_colorpicker_title'] = '$B?\'$N;XDj(B';
 tinyMCELang['lang_theme_colorpicker_apply'] = '$BE,MQ(B';
 tinyMCELang['lang_theme_forecolor_desc'] = '$BA07J?\'(B';
@@ -54,3 +55,6 @@ tinyMCELang['lang_link_list'] = 'Link list';
 tinyMCELang['lang_image_list'] = 'Image list';
 tinyMCELang['lang_browse'] = 'Browse';
 tinyMCELang['lang_image_props_desc'] = 'Image properties';
+tinyMCELang['lang_newdocument_desc'] = 'New document';
+tinyMCELang['lang_class'] = '$B%/%i%9(B';
+tinyMCELang['lang_newdocument'] = 'Are you sure you want clear all contents?';

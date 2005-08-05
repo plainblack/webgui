@@ -35,21 +35,18 @@ function TinyMCEPlugin_onLoad() {
 		document.body.innerHTML = tinyMCE.applyTemplate(document.body.innerHTML, tinyMCE.windowArgs);
 
 	// Auto resize window
-	if (tinyMCE.getWindowArg('mce_windowresize', true)) {
-		var width = tinyMCE.isMSIE ? document.body.offsetWidth : window.innerWidth;
-		var height = tinyMCE.isMSIE ? document.body.offsetHeight : window.innerHeight;
-		var dx = document.body.scrollWidth - width;
-		var dy = document.body.scrollHeight - height;
+	if (tinyMCE.getWindowArg('mce_windowresize', true))
+		TinyMCEPopup_autoResize();
 
-		if (tinyMCE.isMSIE) {
-			window.dialogWidth = (parseInt(window.dialogWidth) + dx) + "px";
-			window.dialogHeight = (parseInt(window.dialogHeight) + dy + 3) + "px";
-		} else
-			window.resizeBy(dx + 15, dy + 15);
-	}
+	if (tinyMCE.settings["dialog_type"] == "window")
+		window.focus();
 }
 
 function TinyMCEPopup_autoResize() {
+	// Div mode, skip resize
+	if (tinyMCE.settings["dialog_type"] == "div")
+		return;
+
 	var isMSIE = (navigator.appName == "Microsoft Internet Explorer");
 	var isOpera = (navigator.userAgent.indexOf("Opera") != -1);
 
@@ -57,7 +54,7 @@ function TinyMCEPopup_autoResize() {
 		return;
 
 	if (isMSIE) {
-		window.resizeTo(10, 10);
+		try { window.resizeTo(10, 10); } catch (e) {}
 
 		var elm = document.body;
 		var width = elm.offsetWidth;
@@ -65,7 +62,7 @@ function TinyMCEPopup_autoResize() {
 		var dx = (elm.scrollWidth - width) + 4;
 		var dy = elm.scrollHeight - height;
 
-		window.resizeBy(dx, dy);
+		try { window.resizeBy(dx, dy); } catch (e) {}
 	} else {
 		window.scrollBy(1000, 1000);
 		if (window.scrollX > 0 || window.scrollY > 0) {
@@ -77,6 +74,19 @@ function TinyMCEPopup_autoResize() {
 			window.moveTo(x, y);
 		}
 	}
+}
+
+// Re-patch it
+if (tinyMCE.settings["dialog_type"] == "window") {
+	tinyMCE.closeDialog = function() {
+		// Remove div or close window
+		if (tinyMCE.settings["dialog_type"] == "div") {
+			var div = document.getElementById(tinyMCE._currentDialog);
+			if (div)
+				div.parentNode.removeChild(div);
+		} else
+			window.close();
+	};
 }
 
 // Add onload trigger

@@ -1,16 +1,21 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('insertdatetime', 'cs,el,en,fr_ca,it,ko,sv,zh_cn,fa,fr,de,pl');
+tinyMCE.importPluginLanguagePack('insertdatetime', 'cs,el,en,fr_ca,it,ko,sv,zh_cn,fa,fr,de,pl,pt_br,nl');
 
 /**
  * Returns the HTML contents of the insertdate, inserttime controls.
  */
 function TinyMCE_insertdatetime_getControlHTML(control_name) {
+	var safariPatch = '" onclick="';
+
+	if (tinyMCE.isSafari)
+		safariPatch = "";
+
 	switch (control_name) {
 		case "insertdate":
-			return '<img id="{$editor_id}_insertdate" src="{$pluginurl}/images/insertdate.gif" title="{$lang_insertdate_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceInsertDate\');">';
+			return '<img id="{$editor_id}_insertdate" src="{$pluginurl}/images/insertdate.gif" title="{$lang_insertdate_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');' + safariPatch + 'tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceInsertDate\');">';
 
 		case "inserttime":
-			return '<img id="{$editor_id}_inserttime" src="{$pluginurl}/images/inserttime.gif" title="{$lang_inserttime_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceInsertTime\');">';
+			return '<img id="{$editor_id}_inserttime" src="{$pluginurl}/images/inserttime.gif" title="{$lang_inserttime_desc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');' + safariPatch + 'tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceInsertTime\');">';
 	}
 
 	return "";

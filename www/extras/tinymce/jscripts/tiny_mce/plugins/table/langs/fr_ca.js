@@ -1,4 +1,4 @@
-// Canadian French lang variables by Virtuelcom
+// Canadian French lang variables by Virtuelcom   last modification: 2005-06-15
 
 tinyMCELang['lang_table_desc'] = 'Insérer un nouveau tableau';
 tinyMCELang['lang_table_insert_row_before_desc'] = 'Insérer une ligne avant';
@@ -31,3 +31,11 @@ tinyMCELang['lang_insert_table_align_bottom'] = 'Bas';
 tinyMCELang['lang_table_props_desc'] = 'Table properties';
 tinyMCELang['lang_table_bordercolor'] = 'Border color';
 tinyMCELang['lang_table_bgcolor'] = 'Bg color';
+tinyMCELang['lang_table_merge_cells_title'] = 'Merge table cells';
+tinyMCELang['lang_table_split_cells_desc'] = 'Split table cells';
+tinyMCELang['lang_table_merge_cells_desc'] = 'Merge table cells';
+tinyMCELang['lang_table_cut_row_desc'] = 'Cut table row';
+tinyMCELang['lang_table_copy_row_desc'] = 'Copy table row';
+tinyMCELang['lang_table_paste_row_before_desc'] = 'Paste table row before';
+tinyMCELang['lang_table_paste_row_after_desc'] = 'Paste table row after';
+tinyMCELang['lang_table_insert_desc'] = 'Insert a new table';

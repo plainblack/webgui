@@ -1,6 +1,6 @@
-// Canadian French lang variables by Virtuelcom
+// Canadian French lang variables by Virtuelcom   last modification: 2005-06-15
 
-tinyMCELang['lang_theme_style_select'] = 'Styles';
+tinyMCELang['lang_theme_style_select'] = '-- Styles --';
 tinyMCELang['lang_theme_code_desc'] = 'Modifier le code source HTML';
 tinyMCELang['lang_theme_code_title'] = 'Éditeur de code source HTML';
 tinyMCELang['lang_theme_code_wordwrap'] = 'Word wrap';
@@ -24,8 +24,9 @@ tinyMCELang['lang_insert_image_align_absmiddle'] = 'Milieu absolu';
 tinyMCELang['lang_insert_image_align_absbottom'] = 'Bas absolu';
 tinyMCELang['lang_insert_image_align_left'] = 'Gauche';
 tinyMCELang['lang_insert_image_align_right'] = 'Droit';
-tinyMCELang['lang_theme_font_size'] = 'Grandeur police';
-tinyMCELang['lang_theme_fontdefault'] = 'Défaut';
+tinyMCELang['lang_theme_font_size'] = 'Taille';
+tinyMCELang['lang_theme_fontdefault'] = '-- Police --';
+tinyMCELang['lang_theme_block'] = '-- Format --';
 tinyMCELang['lang_theme_paragraph'] = 'Paragraphe';
 tinyMCELang['lang_theme_div'] = 'Div';
 tinyMCELang['lang_theme_address'] = 'Addresse';
@@ -55,4 +56,7 @@ tinyMCELang['lang_paste_desc'] = 'Coller';
 tinyMCELang['lang_link_list'] = 'Liste de liens';
 tinyMCELang['lang_image_list'] = 'Liste d\'images';
 tinyMCELang['lang_browse'] = 'Sélectionner';
-tinyMCELang['lang_image_props_desc'] = 'Image properties';
+tinyMCELang['lang_image_props_desc'] = 'Propriétés de l\'image';
+tinyMCELang['lang_newdocument_desc'] = 'Nouveau Document';
+tinyMCELang['lang_class'] = 'Classe';
+tinyMCELang['lang_newdocument'] = 'Are you sure you want clear all contents?';

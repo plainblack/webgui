@@ -4,14 +4,16 @@
 <script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
 <script language="javascript">
 var url = tinyMCE.getParam("external_link_list_url");
-if (url != null)
-	document.write('<sc'+'ript language="javascript" type="text/javascript" src="' + tinyMCE.documentBasePath + "/" + url + '"></sc'+'ript>');
+if (url != null) {
+	// Fix relative
+	if (url.charAt(0) != '/')
+		url = tinyMCE.documentBasePath + "/" + url;
+
+	document.write('<sc'+'ript language="javascript" type="text/javascript" src="' + url + '"></sc'+'ript>');
+}
 </script>
 <script language="javascript" type="text/javascript">
 <!--
-	// Disable auto resize
-	tinyMCE.getWindowArg('mce_windowresize', false);
-
     function myRegexpReplace(in_str, reg_exp, replace_str, opts) {
         if (typeof opts == "undefined")
             opts = 'g';
@@ -96,10 +98,6 @@ if (url != null)
 					formObj.link_list.options[i].selected = true;
 			}
 		}
-
-		// Autoresize and focus
-		TinyMCEPopup_autoResize();
-        window.focus();
     }
 
     function insertLink() {
@@ -193,7 +191,9 @@ if (url != null)
             if (target!='' && target!='please_insert_on_target_in_textfield') {
                 //alert (onclick);
                 window.opener.tinyMCE.insertLink(href, target, title, onclick);
-                top.close();
+
+				// Close the dialog
+				tinyMCE.closeDialog();
             } else {
                 alert(tinyMCE.getLang('lang_insert_link_popup_missingtarget'));
                 formObj.framename.select();
@@ -280,7 +280,8 @@ if (url != null)
     }
 
     function cancelAction() {
-        top.close();
+		// Close the dialog
+		tinyMCE.closeDialog();
     }
 //-->
 </script>

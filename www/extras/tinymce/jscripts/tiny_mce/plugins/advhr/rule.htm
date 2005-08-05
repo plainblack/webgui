@@ -18,7 +18,6 @@
             formObj.width2.value = "%";
             formObj.width.value  = formObj.width.value.substring(0,formObj.width.value.length-1);
         }
-        window.focus();
     }
 
     function insertHR() {
@@ -42,14 +41,16 @@
             }
             html += ' />';
             tinyMCE.execCommand("mceInsertContent",true,html);
-            top.close();
-        }
+
+			// Close the dialog
+			tinyMCE.closeDialog();
+		}
     }
 
     function cancelAction() {
-        top.close();
+		// Close the dialog
+		tinyMCE.closeDialog();
     }
-
 //-->
 </script>
 <style type="text/css">

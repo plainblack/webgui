@@ -15,11 +15,13 @@
 //		formObj.wholeword.checked = tinyMCE.getWindowArg("wholeword");
 
 		tinyMCE.execInstanceCommand(tinyMCE.getWindowArg("editor_id"), "mceResetSearch", false, {dummy : ""}, false);
-		window.focus();
 	}
 
     function searchNext() {
         var formObj = document.forms[0];
+
+		if (formObj.searchstring.value == "")
+			return;
 
 		// Do search
 		tinyMCE.execInstanceCommand(tinyMCE.getWindowArg("editor_id"), 'mceSearch', false, { 
@@ -32,7 +34,8 @@
     }
 
     function cancelAction() {
-        top.close();
+		// Close the dialog
+		tinyMCE.closeDialog();
     }
 //-->
 </script>
@@ -63,7 +66,7 @@
 </table></td>
 </tr>
       </table>
-  <table border="0" width="100%" cellspacing="0" cellpadding="4">
+  <table border="0" width="300" cellspacing="0" cellpadding="4">
     <tr>
       <td><input name="findBtn" type="submit" id="findBtn" value="{$lang_searchreplace_findnext}" /></td>
       <td align="right"><input name="cancelBtn" type="button" id="cancelBtn" value="{$lang_searchreplace_cancel}" onclick="cancelAction();" /></td>

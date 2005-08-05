@@ -1,5 +1,5 @@
 /* Import plugin specific language pack */
-tinyMCE.importPluginLanguagePack('flash', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr,pl');
+tinyMCE.importPluginLanguagePack('flash', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr,pl,pt_br,nl');
 
 function TinyMCE_flash_initInstance(inst) {
 	if (!tinyMCE.settings['flash_skip_plugin_css'])
@@ -9,7 +9,7 @@ function TinyMCE_flash_initInstance(inst) {
 function TinyMCE_flash_getControlHTML(control_name) {
     switch (control_name) {
         case "flash":
-            return '<img id="{$editor_id}_flash" src="{$pluginurl}/images/flash.gif" title="{$lang_insert_flash}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceFlash\');" />';
+            return '<img id="{$editor_id}_flash" src="{$pluginurl}/images/flash.gif" title="{$lang_insert_flash}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceFlash\');" />';
     }
 
     return "";
@@ -85,8 +85,8 @@ function TinyMCE_flash_execCommand(editor_id, element, command, user_interface, 
 					return true;
 
 				// Get rest of Flash items
-				swffile = getAttrib(focusElm, 'title');
-				//swffile = eval(tinyMCE.settings['urlconvertor_callback'] + "(swffile, null, true);");
+				swffile = getAttrib(focusElm, 'alt');
+				swffile = eval(tinyMCE.settings['urlconverter_callback'] + "(swffile, null, true);");
 				swfwidth = getAttrib(focusElm, 'width');
 				swfheight = getAttrib(focusElm, 'height');
 				action = "update";
@@ -102,6 +102,32 @@ function TinyMCE_flash_execCommand(editor_id, element, command, user_interface, 
 
 function TinyMCE_flash_cleanup(type, content) {
 	switch (type) {
+		case "insert_to_editor_dom":
+			var imgs = content.getElementsByTagName("img");
+			for (var i=0; i<imgs.length; i++) {
+				if (tinyMCE.getAttrib(imgs[i], "name") == "mce_plugin_flash") {
+					var src = tinyMCE.getAttrib(imgs[i], "alt");
+
+					src = tinyMCE.convertRelativeToAbsoluteURL(tinyMCE.settings['base_href'], src);
+
+					imgs[i].setAttribute('alt', src);
+				}
+			}
+			break;
+
+		case "get_from_editor_dom":
+			var imgs = content.getElementsByTagName("img");
+			for (var i=0; i<imgs.length; i++) {
+				if (tinyMCE.getAttrib(imgs[i], "name") == "mce_plugin_flash") {
+					var src = tinyMCE.getAttrib(imgs[i], "alt");
+
+					src = eval(tinyMCE.settings['urlconverter_callback'] + "(src, null, true);");
+
+					imgs[i].setAttribute('alt', src);
+				}
+			}
+			break;
+
 		case "insert_to_editor":
 			var startPos = 0;
 			var embedList = new Array();
@@ -158,15 +184,19 @@ function TinyMCE_flash_cleanup(type, content) {
 				endPos += 2;
 
 				var embedHTML = '';
+				var wmode = tinyMCE.getParam("flash_wmode", "");
+				var quality = tinyMCE.getParam("flash_quality", "high");
+				var menu = tinyMCE.getParam("flash_menu", "false");
 
 				// Insert object + embed
 				embedHTML += '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"';
 				embedHTML += ' codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0"';
 				embedHTML += ' width="' + attribs["width"] + '" height="' + attribs["height"] + '">';
 				embedHTML += '<param name="movie" value="' + attribs["title"] + '" />';
-				embedHTML += '<param name="quality" value="high" />';
-				embedHTML += '<param name="menu" value="false" />';
-				embedHTML += '<embed src="' + attribs["title"] + '" quality="high" menu="false" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="' + attribs["width"] + '" height="' + attribs["height"] + '"></embed></object>';
+				embedHTML += '<param name="quality" value="' + quality + '" />';
+				embedHTML += '<param name="menu" value="' + menu + '" />';
+				embedHTML += '<param name="wmode" value="' + wmode + '" />';
+				embedHTML += '<embed src="' + attribs["title"] + '" wmode="' + wmode + '" quality="' + quality + '" menu="' + menu + '" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="' + attribs["width"] + '" height="' + attribs["height"] + '"></embed></object>';
 
 				// Insert embed/object chunk
 				chunkBefore = content.substring(0, startPos);
