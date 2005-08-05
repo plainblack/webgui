@@ -103,6 +103,38 @@ sub getMetaDataFields {
 
 #-------------------------------------------------------------------
 
+=head2 updateMetaData ( fieldName, value )
+
+Updates the value of a metadata field for this asset.
+
+=head3 fieldName
+
+The name of the field to update.
+
+=head3 value
+
+The value to set this field to. Leave blank to unset it.
+
+=cut
+
+sub updateMetaData {
+	my $self = shift;
+	my $fieldName = shift;
+	my $value = shift;
+	my ($exists) = WebGUI::SQL->quickArray("select count(*) from metaData_values where assetId = ".quote($self->getId)." and fieldId = ".quote($fieldName));
+        if (!$exists && $value ne "") {
+        	WebGUI::SQL->write("insert into metaData_values (fieldId, assetId) values (".quote($fieldName).",".quote($self->getId).")");
+        }
+        if ($value  eq "") { # Keep it clean
+                WebGUI::SQL->write("delete from metaData_values where assetId = ".quote($self->getId)." and fieldId = ".quote($fieldName));
+        } else {
+                WebGUI::SQL->write("update metaData_values set value = ".quote($value)." where assetId = ".quote($self->getId)." and fieldId=".quote($fieldName));
+        }
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteMetaDataField ( )
 
 Deletes a MetaDataField and returns www_manageMetaData on self, if user isInGroup(4), if not, renders a "content profiling" AdminConsole as insufficient privilege. 

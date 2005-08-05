@@ -1,6 +1,9 @@
 6.7.0
  - Being in the admins group automatically results in a UI level capable of
    seeing everything.
+ - fix [ 1251390 ] Security tab doesn't appear for member of Admins
+ - HTTP Proxy URLs can now be up to 2048 characters long.
+ - The Edit Branch function now allows you to recursively set meta data.
  - Fixed a potential problem where editing a page under rare very rare 
    conditions could destroy the not found page.
  - Added the ability to override the UI Level of any field in the edit form of

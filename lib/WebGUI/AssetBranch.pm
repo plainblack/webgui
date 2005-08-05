@@ -237,6 +237,37 @@ sub www_editBranch {
                -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_groupIdEdit"})
 		);
+        $tabform->addTab("meta",WebGUI::International::get("Metadata","Asset"),3);
+        $tabform->getTab("meta")->textarea(
+                -name=>"extraHeadTags",
+                -label=>WebGUI::International::get("extra head tags","Asset"),
+                -hoverHelp=>WebGUI::International::get('extra head tags description',"Asset"),
+                -value=>$self->get("extraHeadTags"),
+                -uiLevel=>5,
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_extraHeadTags"})
+                );
+        if ($session{setting}{metaDataEnabled}) {
+                my $meta = $self->getMetaDataFields();
+                foreach my $field (keys %$meta) {
+                        my $fieldType = $meta->{$field}{fieldType} || "text";
+                        my $options;
+                        # Add a "Select..." option on top of a select list to prevent from
+                        # saving the value on top of the list when no choice is made.
+                        if($fieldType eq "selectList") {
+                                $options = {"", WebGUI::International::get("Select...","Asset")};
+                        }
+                        $tabform->getTab("meta")->dynamicField($fieldType,
+                                 -name=>"metadata_".$meta->{$field}{fieldId},
+                                 -label=>$meta->{$field}{fieldName},
+                                 -uiLevel=>5,
+                                 -value=>$meta->{$field}{value},
+                                 -extras=>qq/title="$meta->{$field}{description}"/,
+                                 -possibleValues=>$meta->{$field}{possibleValues},
+                                 -options=>$options,
+				 -subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_metadata_".$meta->{$field}{fieldId}})
+                                );
+                }
+        }	
 	return $ac->render($tabform->print, "Edit Branch");
 }
 
@@ -265,6 +296,7 @@ sub www_editBranchSave {
 	$data{ownerUserId} = WebGUI::FormProcessor::selectList("ownerUserId") if (WebGUI::FormProcessor::yesNo("change_ownerUserId"));
 	$data{groupIdView} = WebGUI::FormProcessor::group("groupIdView") if (WebGUI::FormProcessor::yesNo("change_groupIdView"));
 	$data{groupIdEdit} = WebGUI::FormProcessor::group("groupIdEdit") if (WebGUI::FormProcessor::yesNo("change_groupIdEdit"));
+	$data{extraHeadTags} = WebGUI::FormProcessor::group("extraHeadTags") if (WebGUI::FormProcessor::yesNo("change_extraHeadTags"));
 	my ($urlBaseBy, $urlBase, $endOfUrl);
 	my $changeUrl = WebGUI::FormProcessor::yesNo("change_url");
 	if ($changeUrl) {
@@ -292,7 +324,15 @@ sub www_editBranchSave {
 				$data{url} .= $descendant->get("url");
 			}
 		}
-		$descendant->update(\%data);
+		my $newRevision = $descendant->addRevision(\%data);
+		foreach my $form (keys %{$session{form}}) {
+                	if ($form =~ /^metadata_(.*)$/) {
+				my $fieldName = $1;
+				if (WebGUI::FormProcessor::yesNo("change_metadata_".$fieldName)) {
+                        		$newRevision->updateMetaData($fieldName,$session{form}{$form});
+				}
+                	}
+        	}
 	}
 	delete $self->{_parent};
 	$session{asset} = $self->getParent;

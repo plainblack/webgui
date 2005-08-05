@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+my $toVersion = "6.7.0";
 
 use lib "../../lib";
 use File::Path;
@@ -21,7 +21,7 @@ GetOptions(
 
 WebGUI::Session::open("../..",$configFile);
 
-WebGUI::SQL->write("insert into webguiVersion values ('6.7.0','upgrade',unix_timestamp())");
+WebGUI::SQL->write("insert into webguiVersion value (".quote($toVersion).",'upgrade',".time().")");
 
 giveSnippetsMimeTypes();
 addAssetVersioning();
@@ -30,8 +30,15 @@ insertHelpTemplate();
 makeSyndicatedContentChanges();
 removeOldThemeSystem();
 addSectionsToSurveys();
+increaseProxyUrlLength();
 
 WebGUI::Session::close();
+
+#-------------------------------------------------
+sub increaseProxyUrlLength {
+	print "\tMaking HTTP Proxy URLs accept lengths of up to 2048 characters.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table HttpProxy change proxiedUrl proxiedUrl text");
+}
 
 #-------------------------------------------------
 sub giveSnippetsMimeTypes {

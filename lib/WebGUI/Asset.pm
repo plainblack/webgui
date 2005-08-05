@@ -361,7 +361,7 @@ sub getAssetAdderLinks {
 			if ($@) {
 				WebGUI::ErrorHandler::error("Couldn't get UI level of ".$class." because ".$@);
 			} else {
-				next if ($uiLevel > $session{user}{uiLevel} || WebGUI::Grouping::isInGroup(3));
+				next if ($uiLevel > $session{user}{uiLevel} && !WebGUI::Grouping::isInGroup(3));
 			}
 			my $canAdd = eval{$class->canAdd()};
 			if ($@) {
@@ -1085,6 +1085,11 @@ sub processPropertiesFromFormPost {
 				$definition->{properties}{$property}{fieldType},
 				$definition->{properties}{$property}{defaultValue}
 				);
+		}
+	}
+	foreach my $form (keys %{$session{form}}) {
+		if ($form =~ /^metadata_(.*)$/) {
+			$self->updateMetaData($1,$session{form}{$form});
 		}
 	}
 	$data{title} = "Untitled" unless ($data{title});
