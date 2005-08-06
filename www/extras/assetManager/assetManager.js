@@ -147,7 +147,6 @@ function AssetManager_Write() {
 				//added for dragging to map draggable objects and meta data objects
 				if (j==2) {
 					this.draggableObjects[i] = document.getElementById(div_name);
-					//this.draggableObjects[i].onmousedown=AssetManager_documentMouseDown;
 					if (this.metaData && this.metaData[i]) {
 						this.draggableObjects[i].metaData = this.metaData[i];
 					}
