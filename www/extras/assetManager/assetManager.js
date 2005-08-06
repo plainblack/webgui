@@ -139,7 +139,7 @@ function AssetManager_Write() {
 				else {
 					var align = "";
 					}
-				open_div = "<div id=\""+div_name+"\" "+align+">";
+				open_div = "<div id=\""+div_name+"\" "+align+" style='width:100%;'>";
 				close_div= "</div>";
 				
 				document.write("<td "+this.Columns[j].td+">"+open_div+this.Lines[i][j].text+close_div+"</td>");
@@ -147,6 +147,7 @@ function AssetManager_Write() {
 				//added for dragging to map draggable objects and meta data objects
 				if (j==2) {
 					this.draggableObjects[i] = document.getElementById(div_name);
+					//this.draggableObjects[i].onmousedown=AssetManager_documentMouseDown;
 					if (this.metaData && this.metaData[i]) {
 						this.draggableObjects[i].metaData = this.metaData[i];
 					}
@@ -280,6 +281,7 @@ function AssetManager_dragStart(firedobj,xCoordinate,yCoordinate) {
 	    }
     }
     
+    if (!found) return;
     
     this.dragEnabled=true;
 
@@ -288,6 +290,8 @@ function AssetManager_dragStart(firedobj,xCoordinate,yCoordinate) {
  
     this.focusObject=firedobj;
     this.bringToFront(document.getElementById("dragImage"));
+    
+    //alert(firedobj.id);
     document.getElementById("dragImage").innerHTML = "&nbsp;&nbsp;" + firedobj.metaData.title + "&nbsp;&nbsp;";
     this.x=xCoordinate;
     this.y=yCoordinate;
