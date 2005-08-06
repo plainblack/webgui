@@ -2,6 +2,7 @@ var panelButtonHeight = 23;
 var panelLinkTop = 25;
 
 
+
 //create a crossbrowser layer object
 function createLayerObject(name) {
   	this.name=name;
@@ -29,7 +30,7 @@ function b_hide(){
 
 //crossbrowser move absolute
 function b_moveTo(x,y){
-  	this.x = x;
+	this.x = x;
   	this.y = y;
   	this.css.left=x;
   	this.css.top=y;
@@ -71,18 +72,23 @@ function b_testScroll() {
 
 //scroll the panel content up
 function b_up(nr) {
-    	this.ftop = this.ftop - 5;
+
+
+	this.ftop = this.ftop - 5;
     	this.objf.style.top=this.ftop;
-    	nr--
+    	//this.objf.style.zIndex=1;
+	nr--
     	if (nr>0)
       		setTimeout(this.v+'.up('+nr+');',10);
     	else
       		this.testScroll();
 }
 
+
+
 //scroll the panel content down
 function b_down(nr) {
-    	this.ftop = this.ftop + 5;
+	this.ftop = this.ftop + 5;
     	if (this.ftop>=panelLinkTop) {
       		this.ftop=panelLinkTop;
       		nr=0;
@@ -207,7 +213,8 @@ function b_draw() {
 
   	for (i=0;i<this.panels.length;i++) {
     		this.panels[i].obj=document.getElementById(this.name+'_panel'+i);
-      		this.panels[i].objc=document.getElementById(this.name+'_panel'+i+'_c');
+      		this.panels[i].obj.style.zIndex=10000;
+		this.panels[i].objc=document.getElementById(this.name+'_panel'+i+'_c');
       		this.panels[i].objf=document.getElementById(this.name+'_panel'+i+'_f');
       		this.panels[i].objm1=document.getElementById(this.name+'_panel'+i+'_m1');
       		this.panels[i].objm2=document.getElementById(this.name+'_panel'+i+'_m2');
@@ -223,7 +230,7 @@ function b_draw() {
     	//actual panel is saved in a cookie
     	if (document.cookie)
       		this.showPanel(document.cookie);
-    	else
+        else
       		this.showPanel(0);
 	//float the panel as someone scrolls
         startY = 0;
@@ -238,14 +245,26 @@ function b_draw() {
         }
         window.floatBarWithScroll=function()
         {
-                var pY = document.body.scrollTop;
-                ftlObj.y += (pY + startY - ftlObj.y)/8;
+                
+		//Added to allow support for xhtml transitional
+		var docElement = document.documentElement;
+    
+		if (document.compatMode == "BackCompat") {
+			docElement = document.body;
+		}
+
+		
+		//var pY = document.body.scrollTop;
+                var pY = docElement.scrollTop;
+		ftlObj.y += (pY + startY - ftlObj.y)/8;
                 ftlObj.sP(ftlObj.y);
                 setTimeout("floatBarWithScroll()", 10);
         }
         ftlObj = ml("slidePanelBar");
         floatBarWithScroll();
 }
+
+
 
 function b_showPanel(nr) {
 	var i
@@ -255,7 +274,8 @@ function b_showPanel(nr) {
   	this.aktPanel=nr;
   	l = this.panels.length;
   	for (i=0;i<l;i++) {
-    		if (i>nr) {
+    		//alert(nr);		
+		if (i>nr) {
       			this.panels[i].obj.style.top=this.height-((l-i)*panelButtonHeight)+"px";
     		} else {
       			this.panels[i].obj.style.top=i*panelButtonHeight+"px";
@@ -264,12 +284,21 @@ function b_showPanel(nr) {
 }
 
 function createSlidePanelBar(name) {
-  	this.aktPanel=0;                        // last open panel
+	//Added to allow support for xhtml transitional
+	var docElement = document.documentElement;
+    
+	if (document.compatMode == "BackCompat") {
+		docElement = document.body;
+	}  	
+	
+	
+	this.aktPanel=0;                        // last open panel
   	this.name=name                          // name
   	this.xpos=0;                            // bar x-pos
   	this.ypos=0;                            // bar y-pos
   	this.width=160;                       // bar width
-  	this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:document.body.offsetHeight)-10;                     // bar height
+  	//this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:document.body.offsetHeight)-10;                     // bar height
+	this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:docElement.offsetHeight)-10;                     // bar height
   	this.buttonspace=22                     // distance of panel buttons
   	this.panels=new Array()                 // panels
   	this.addPanel=b_addPanel;               // add new panel to bar
