@@ -22,7 +22,7 @@ use WebGUI::URL;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&helpIcon &becomeIcon &cutIcon &copyIcon &deleteIcon &editIcon &manageIcon
-	&moveBottomIcon &moveDownIcon &moveLeftIcon &moveRightIcon &moveTopIcon &moveUpIcon
+	&moveBottomIcon &moveDownIcon &moveLeftIcon &moveRightIcon &moveTopIcon &moveUpIcon &lockedIcon
 	&pageIcon &dragIcon &shortcutIcon &pasteIcon &wobjectIcon &viewIcon &exportIcon);
 
 =head1 NAME
@@ -272,6 +272,30 @@ sub helpIcon {
 	$output = '<a href="'.WebGUI::URL::page('op=viewHelp&hid='.$_[0].'&namespace='.$namespace).
 		'" target="_blank"><img src="'._getBaseURL().'help.gif" border="0" align="right" title="'.WebGUI::International::get('Help','Icon').'" Alt="'.WebGUI::International::get('Help','Icon').'"></a>';
 	return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 lockedIcon ( urlParameters [, pageURL ] )
+
+Generates a button that represents a management function. Is toggled out in place of the edit icon when an asset is locked.
+
+=head3 urlParameters
+
+Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
+
+=head3 pageURL
+
+The URL to any page. Defaults to the current page.
+
+=cut
+
+sub lockedIcon {
+        my ($output, $pageURL);
+        $pageURL = $_[1] || $session{env}{PATH_INFO};
+        $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
+        $output .= '<img src="'._getBaseURL().'locked.gif" align="middle" border="0" alt="'.WebGUI::International::get('locked','Icon').'" title="'.WebGUI::International::get('locked','Icon').'" /></a>';
+        return $output;
 }
 
 #-------------------------------------------------------------------

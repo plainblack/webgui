@@ -795,6 +795,8 @@ sub getToolbar {
 	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"));
 	if (!$self->isLocked || $self->get("isLockedBy") eq $session{user}{userId}) {
         	$toolbar .= editIcon('func=edit',$self->get("url"));
+	} else {
+		$toolbar .= lockedIcon('func=manageRevisions',$self->get("url"));
 	}
         $toolbar .= cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
@@ -1439,11 +1441,11 @@ sub www_manageAssets {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = WebGUI::International::get("138");
+			$locked = '<img src="'.$session{config}{extrasURL}.'/adminConsole/locked.gif" alt="locked" border="0" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+" if ($child->get("isLockedBy") eq $session{user}{userId});
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+";
-			$locked = WebGUI::International::get("139");
+			$locked = '<img src="'.$session{config}{extrasURL}.'/adminConsole/unlocked.gif" alt="unlocked" border="0" />';
 		}
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
@@ -1457,7 +1459,7 @@ sub www_manageAssets {
 			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."','<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>');\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
-			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','".$locked."');
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
 	}
 	$output .= '

@@ -46,6 +46,24 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 addRevision
+
+Override the default method in order to deal with attachments.
+
+=cut
+
+sub addRevision {
+	my $self = shift;
+	my $newSelf = $self->addRevision(@_);
+	if ($self->get("storageId")) {
+		my $newStorage = WebGUI::Storage->get($self->get("storageId"))->copy;
+		$newSelf->update({storageId=>$newStorage->getId});
+	}
+	return $newSelf;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -74,11 +92,6 @@ sub definition {
 					fieldType=>'hidden',
 					defaultValue=>undef
 					},
-				olderVersions=>{
-					noFormPost=>1,
-					fieldType=>'hidden',
-					defaultValue=>undef
-					},
 				templateId=>{
 					fieldType=>'template',
 					defaultValue=>'PBtmpl0000000000000024'
@@ -95,7 +108,7 @@ sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(shift);
 	my $newStorage = $self->getStorageLocation->copy;
-	$newAsset->update({storageId=>$newStorage->getId,olderVersions=>''});
+	$newAsset->update({storageId=>$newStorage->getId});
 	return $newAsset;
 }
 
@@ -182,46 +195,41 @@ sub getStorageLocation {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	# might have to create a new storage location for versioning
-	my $storage = ($self->get("storageId") eq "") ? $self->getStorageLocation : $self->getStorageLocation->create;
+	my $storage = $self->getStorageLocation;
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
-		my $oldVersions = $self->get("olderVersions");
-		if ($self->get("filename")) { # do file versioning
-			$oldVersions .= "\n".$self->get("storageId")."|".$self->get("filename");
-		}
 		my %data;
 		$data{filename} = $filename;
 		$data{storageId} = $storage->getId;
-		$data{olderVersions} = $oldVersions;
 		$data{title} = $filename unless ($session{form}{title});
 		$data{menuTitle} = $filename unless ($session{form}{menuTitle});
 		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
 		$self->setSize($storage->getFileSize($filename));
 		$self->{_storageLocation} = $storage;
-	} else {
-		$storage->delete;
-		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 	}
+	$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 purge
-
-=cut
-
 sub purge {
 	my $self = shift;
-	my @old = split("\n",$self->get("olderVersions"));
-	foreach my $oldone (@old) {
-		my ($storageId, $filename) = split("|",$oldone);
-		$self->getStorageLocation->delete;
+	my $sth = WebGUI::SQL->read("select storageId from FileAsset where assetId=".quote($self->getId));
+	while (my ($storageId) = $sth->array) {
+		WebGUI::Storage->get($storageId)->delete;
 	}
-	$self->getStorageLocation->delete;
+	$sth->finish;
 	return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+sub purgeRevision {
+	my $self = shift;
+	$self->getStorageLocation->delete;
+	return $self->SUPER::purgeRevision;
 }
 
 
@@ -229,7 +237,7 @@ sub purge {
 
 =head2 update
 
-We overload the update method from WebGUI::Asset in order to handle file system privileges.
+We override the update method from WebGUI::Asset in order to handle file system privileges.
 
 =cut
 

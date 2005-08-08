@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::Icon;
 
 our $I18N = {
+	'locked' => {
+		message => q|Locked|,
+		lastUpdated => 1096319549
+	},
+
 	'Move Up' => {
 		message => q|Move Up|,
 		lastUpdated => 1096319549

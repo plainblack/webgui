@@ -293,7 +293,15 @@ sub addAssetVersioning {
 	foreach my $field (qw(url groupIdView title menuTitle startDate endDate ownerUserId groupIdEdit synopsis newWindow isHidden isSystem encryptPage assetSize lastUpdated lastUpdatedBy isPackage extraHeadTags isPrototype)) {
 		WebGUI::SQL->write("alter table asset drop column $field");
 	}
-
+	# clean up the psuedo version tracking in files
+	$sth = WebGUI::SQL->read("select olderVersions from FileAsset");
+	while (my ($old) = $sth->array) {
+		foreach my $storageId (split("\n",$old)) {
+			WebGUI::Storage->get($storageId)->delete;
+		}
+	}
+	$sth->finish;
+	WebGUI::SQL->write("alter table FileAsset drop column olderVersions");
 }
 
 #-------------------------------------------------
