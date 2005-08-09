@@ -1441,11 +1441,11 @@ sub www_manageAssets {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = '<img src="'.$session{config}{extrasURL}.'/adminConsole/locked.gif" alt="locked" border="0" />';
+			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/locked.gif" alt="locked" border="0" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+" if ($child->get("isLockedBy") eq $session{user}{userId});
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+";
-			$locked = '<img src="'.$session{config}{extrasURL}.'/adminConsole/unlocked.gif" alt="unlocked" border="0" />';
+			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
