@@ -40,6 +40,24 @@ our @ISA = qw(WebGUI::Asset);
 
 
 #-------------------------------------------------------------------
+                
+=head2 addRevision
+        
+Override the default method in order to deal with attachments.
+
+=cut
+
+sub addRevision {
+        my $self = shift;
+        my $newSelf = $self->SUPER::addRevision(@_);
+        if ($self->get("storageId")) {
+                my $newStorage = WebGUI::Storage->get($self->get("storageId"))->copy;
+                $newSelf->update({storageId=>$newStorage->getId});
+        }       
+        return $newSelf;
+}  
+
+#-------------------------------------------------------------------
 sub canAdd {
 	my $class = shift;
 	$class->SUPER::canAdd(undef,'7');
@@ -659,6 +677,30 @@ sub processPropertiesFromFormPost {
 	WebGUI::Cache->new("wobject_".$self->getThread->getParent->getId."_".$session{user}{userId})->delete;
 	WebGUI::Cache->new("cspost_".($self->getParent->getId)."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_1")->delete;
 }
+
+
+#-------------------------------------------------------------------
+
+sub purge {
+        my $self = shift;
+        my $sth = WebGUI::SQL->read("select storageId from FileAsset where assetId=".quote($self->getId));
+        while (my ($storageId) = $sth->array) {
+                WebGUI::Storage->get($storageId)->delete;
+        }
+        $sth->finish;
+	WebGUI::SQL->write("delete from Post_rating where assetId=".quote($self->getId));
+	WebGUI::SQL->write("delete from Post_read where postId=".quote($self->getId));
+        return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+sub purgeRevision {
+        my $self = shift;
+        $self->getStorageLocation->delete;
+        return $self->SUPER::purgeRevision;
+}
+
 
 
 #-------------------------------------------------------------------

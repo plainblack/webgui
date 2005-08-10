@@ -69,9 +69,12 @@ print "Starting..." unless ($quiet);
 WebGUI::Session::open($webguiRoot,$configFile);
 print "OK\n" unless ($quiet);
 
+print "Rewriting existing lineage...\n" unless ($quiet);
+WebGUI::SQL->write("update asset set lineage=concat('old___',lineage)");
+my ($lineage) = WebGUI::SQL->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
+
 print "Rebuilding lineage...\n" unless ($quiet);
-my $oldRootLineage = WebGUI::SQL->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
-$oldRootLineage = sprintf("%06d",$oldRootLineage);
+my ($oldRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
 printChange("Asset ID","Old Lineage","New Lineage");
 printChange('PBasset000000000000001',$oldRootLineage,'000001');
 WebGUI::SQL->write("update asset set lineage='000001' where assetId='PBasset000000000000001'");

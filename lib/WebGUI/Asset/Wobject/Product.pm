@@ -16,15 +16,12 @@ use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Storage;
+use WebGUI::Storage::Image;
 use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 
-# do a check to see if they've installed Image::Magick
-my  $hasImageMagick = 1;
-eval " use Image::Magick; "; $hasImageMagick=0 if $@;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -34,8 +31,7 @@ sub _addFileTab {
    my $tabform = $_[0];
    my $column = $_[1];
    my $internationalId = $_[2];
-   my ($value) = WebGUI::SQL->quickArray("select $column from Product where assetId=".quote($self->getId));
-   if($value eq ""){
+   unless ($self->get($column)){
       $tabform->getTab("properties")->file(
 	      -name=>$column,
 		  -label=>WebGUI::International::get($internationalId,"Asset_Product"),
@@ -43,7 +39,7 @@ sub _addFileTab {
       return;
    }
    
-   my $file = WebGUI::Storage->get($value);
+   my $file = WebGUI::Storage->get($self->get($column));
    $tabform->getTab("properties")->readOnly(
 	      -value=>'<a href="'.$self->getUrl('func=deleteFileConfirm&file='.$column).'">'.WebGUI::International::get("deleteImage","Asset_Product").'</a>',
 	      -label=>WebGUI::International::get($internationalId,"Asset_Product"),
@@ -66,10 +62,30 @@ sub _duplicateFile {
 sub _save {
    my $self = shift;
    return "" unless ($session{form}{$_[0]});
-   my $file = WebGUI::Storage->create;
-   $file->addFileFromFormPost($_[0]);
-   $self->generateThumbnails($file);
-   WebGUI::SQL->write("update Product set $_[0]=".quote($file->getId)." where assetId=".quote($self->getId));
+   my $file = WebGUI::Storage::Image->create;
+   	my $filename = $file->addFileFromFormPost($_[0]);
+	$file->generateThumbnail($filename);
+   	WebGUI::SQL->write("update Product set $_[0]=".quote($file->getId)." where assetId=".quote($self->getId));
+}
+
+#-------------------------------------------------------------------
+        
+=head2 addRevision
+        
+Override the default method in order to deal with attachments.
+
+=cut
+
+sub addRevision {
+        my $self = shift;
+        my $newSelf = $self->SUPER::addRevision(@_);
+	foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
+        	if ($self->get($field)) {
+                	my $newStorage = WebGUI::Storage->get($self->get($field))->copy;
+                	$newSelf->update({$field=>$newStorage->getId});
+        	}
+	}
+        return $newSelf;
 }
 
 #-------------------------------------------------------------------
@@ -149,53 +165,6 @@ sub duplicate {
       WebGUI::SQL->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".quote($newAsset->getId).", ".quote($data{relatedAssetId}).", $data{sequenceNumber})");
    }
    $sth->finish;
-}
-
-#-------------------------------------------------------------------
-
-=head2 generateThumbnails ( filestore, [ thumbnailSize ] ) 
-
-Generates a thumbnail for this image.
-
-=head3 thumbnailSize
-
-A size, in pixels, of the maximum height or width of a thumbnail. If specified this will change the thumbnail size of the image. If unspecified the thumbnail size set in the properties of this asset will be used.
-
-=cut
-
-sub generateThumbnails {
-	my $self = shift;
-	my $filestore = $_[0];
-	my $thumbnailSize = $_[1] || $session{setting}{thumbnailSize} || 50;
-	my $files = $filestore->getFiles();
-	my $thumbErr = 1;
-	foreach my $file (@{$files}){
-	   if (defined $filestore && isIn(lc($filestore->getFileExtension($file)),qw(jpg jpeg gif png tif tiff bmp)) && $hasImageMagick) {
-		  my $filePath = $filestore->getPath;
-		  my $image = Image::Magick->new;
-		  my $error = $image->Read($filePath.$session{os}{slash}.$file);
-		  if ($error) {
-		     WebGUI::ErrorHandler::warn("Couldn't read image for thumbnail creation: ".$error);
-			 $thumbErr = 0;
-		  }
-          my ($x, $y) = $image->Get('width','height');
-          my $n = $thumbnailSize;
-          if ($x > $n || $y > $n) {
-             my $r = $x>$y ? $x / $n : $y / $n;
-             $image->Scale(width=>($x/$r),height=>($y/$r));
-          }
-          if (isIn($filestore->getFileExtension($file), qw(tif tiff bmp))) {
-             $error = $image->Write($filePath.$session{os}{slash}.'thumb-'.$file.'.png');
-          } else {
-             $error = $image->Write($filePath.$session{os}{slash}.'thumb-'.$file);
-          }
-		  if ($error) {
-		     WebGUI::ErrorHandler::warn("Couldn't create thumbnail: ".$error);
-			 $thumbErr = 0;
-		  }
-	   }
-	}
-	return $thumbErr; # couldn't generate thumbnail
 }
 
 #-------------------------------------------------------------------
@@ -324,21 +293,35 @@ sub getThumbnailUrl {
 
 #-------------------------------------------------------------------
 sub purge {
-   my $self = shift;
-   my @array = WebGUI::SQL->quickArray("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".quote($self->getId));
-   foreach my $id (@array){
-      next if ($id eq "");
-	  my $store = WebGUI::Storage->get($id);
-	  $store->delete; 
-   }
-   WebGUI::SQL->write("delete from Product_accessory where assetId=".quote($self->getId)." or accessoryAssetId=".quote($self->getId));
-   WebGUI::SQL->write("delete from Product_related where assetId=".quote($self->getId)." or relatedAssetId=".quote($self->getId));
-   WebGUI::SQL->write("delete from Product_benefit where assetId=".quote($self->getId));
-   WebGUI::SQL->write("delete from Product_feature where assetId=".quote($self->getId));
-   WebGUI::SQL->write("delete from Product_specification where assetId=".quote($self->getId));
-   $self->SUPER::purge();
+   	my $self = shift;
+   	my $sth = WebGUI::SQL->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".quote($self->getId));
+	while (my @array = $sth->array) {
+   		foreach my $id (@array){
+      			next if ($id eq "");
+	  		WebGUI::Storage->get($id)->delete; 
+   		}
+	}
+	$sth->finish;
+   	WebGUI::SQL->write("delete from Product_accessory where assetId=".quote($self->getId)." or accessoryAssetId=".quote($self->getId));
+   	WebGUI::SQL->write("delete from Product_related where assetId=".quote($self->getId)." or relatedAssetId=".quote($self->getId));
+   	WebGUI::SQL->write("delete from Product_benefit where assetId=".quote($self->getId));
+   	WebGUI::SQL->write("delete from Product_feature where assetId=".quote($self->getId));
+   	WebGUI::SQL->write("delete from Product_specification where assetId=".quote($self->getId));
+   	$self->SUPER::purge();
 }
 
+#-------------------------------------------------------------------
+
+sub purgeRevision {
+        my $self = shift;
+        WebGUI::Storage->get($self->get("image1"))->delete if ($self->get("image1"));
+        WebGUI::Storage->get($self->get("image2"))->delete if ($self->get("image2"));
+        WebGUI::Storage->get($self->get("image3"))->delete if ($self->get("image3"));
+        WebGUI::Storage->get($self->get("brochure"))->delete if ($self->get("brochure"));
+        WebGUI::Storage->get($self->get("manual"))->delete if ($self->get("manual"));
+        WebGUI::Storage->get($self->get("warranty"))->delete if ($self->get("warranty"));
+        return $self->SUPER::purgeRevision;
+}
 
 #-------------------------------------------------------------------
 sub www_addAccessory {

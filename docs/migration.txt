@@ -156,6 +156,11 @@ SQL queries to get you started in your transition:
 	...look up the revision date for each asset instance from the asset table...
 	alter table MyAsset add primary key (assetId,revisionDate);
 
+In addition, if you wish to version the attachments to your asset, you'll need
+to add addRevision(), purge(), and purgeRevision() methods to your asset. See
+WebGUI::Asset::File and WebGUI::Asset:Post for examples of what these methods
+should look like.
+
 Other than that you shouldn't have to make any revisions to your asset to
 support versioning. Your collateral tables need not have the revision date as
 they'll be tied to the assetId regardless of the revision date.
