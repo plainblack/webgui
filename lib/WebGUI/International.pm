@@ -184,7 +184,7 @@ sub makeUrlCompliant {
 	WebGUI::ErrorHandler::warn($cmd." failed to compile because ".$@) if ($@);
 	$cmd = $cmd."::makeUrlCompliant";
 	my $output = eval{&$cmd($url)};	
-	WebGUI::ErrorHandler::warn("Couldn't execute ".$cmd." because ".$@) if ($@);
+	WebGUI::ErrorHandler::fatal("Couldn't execute ".$cmd." because ".$@.". Maybe your languagepack misses the makeUrlCompliant method?") if ($@);
 	return $output;
 }
 
