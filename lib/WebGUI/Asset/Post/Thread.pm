@@ -184,15 +184,18 @@ sub getNextThread {
 				select * 
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
-				left join Post on Post.assetId=asset.assetId 
+				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
+				left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 				where asset.parentId=".quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
 					and ".$sortBy.">".quote($self->get($sortBy))." 
 					and (
-						Post.status in ('approved','archived')
-						or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
+						assetData.status in ('approved','archived')
+						 or assetData.tagId=".quote($session{scratch}{versionTag})."
+						or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
 						)
+				group by assetData.assetId
 				order by ".$sortBy." asc 
 				",WebGUI::SQL->getSlave)
 			);
@@ -219,15 +222,18 @@ sub getPreviousThread {
 			WebGUI::SQL->quickHashRef(" select * 
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
-				left join Post on Post.assetId=asset.assetId 
+				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
+				left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 				where asset.parentId=".quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
 					and ".$sortBy."<".quote($self->get($sortBy))." 
 					and (
-						Post.status in ('approved','archived')
-						or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
+						assetData.status in ('approved','archived')
+						 or assetData.tagId=".quote($session{scratch}{versionTag})."
+						or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
 						)
+				group by assetData.assetId
 				order by ".$sortBy." desc ",WebGUI::SQL->getSlave)
 			);
 		delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
@@ -621,15 +627,18 @@ sub view {
 
         my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
 	my $sql = "select * from asset 
-		left join Thread on Thread.assetId=asset.assetId
-		left join Post on Post.assetId=asset.assetId
+		left join assetData on assetData.assetId=asset.assetId
+		left join Thread on Thread.assetId=assetData.assetId and assetData.revisionDate=Thread.revisionDate
+		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 		where asset.lineage like ".quote($self->get("lineage").'%')
 		."	and asset.state='published'
 			and (
-				Post.status in ('approved','archived')";
-	$sql .= "		or Post.status='pending'" if ($self->getParent->canModerate);
-	$sql .= "		or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
+				assetData.status in ('approved','archived')
+						 or assetData.tagId=".quote($session{scratch}{versionTag});
+	$sql .= "		or assetData.status='pending'" if ($self->getParent->canModerate);
+	$sql .= "		or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
 				)
+		group by assetData.assetId
 		order by ";
 	if ($layout eq "flat") {
 		$sql .= "Post.dateSubmitted";

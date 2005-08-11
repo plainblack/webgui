@@ -302,6 +302,14 @@ sub addAssetVersioning {
 	}
 	$sth->finish;
 	WebGUI::SQL->write("alter table FileAsset drop column olderVersions");
+	my $writeStatus = WebGUI::SQL->prepare("update assetData set status=? where assetId=? and revisionDate=?");
+	my $sth = WebGUI::SQL->read("select status,assetId,revisionDate from Post");
+	while (my ($status,$id,$version) = $sth->array) {
+		$writeStatus->execute([$status,$id,$version]);
+	}
+	$sth->finish;
+	$writeStatus->finish;
+	WebGUI::SQL->write('alter table Post drop column status');
 }
 
 #-------------------------------------------------

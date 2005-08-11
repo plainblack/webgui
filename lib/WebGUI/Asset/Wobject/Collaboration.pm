@@ -898,17 +898,18 @@ sub view {
 	$var{"search.url"} = $self->getSearchUrl;
 	$var{"subscribe.url"} = $self->getSubscribeUrl;
 	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
-	my $constraints = "(Post.status='approved' or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')";
+	my $constraints = "(assetData.status='approved' or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1') or assetData.tagId=".quote($session{scratch}{versionTag});
 	if ($var{canModerate}) {
-		$constraints .= " or Post.status='pending'"; 
+		$constraints .= " or assetData.status='pending'"; 
 	}
 	$constraints .= ")";
 	my $sql = "select * 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
-		left join Post on Post.assetId=asset.assetId 
+		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate
+		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
 		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
-		order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
+		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);
@@ -1031,14 +1032,16 @@ sub www_search {
 		# this is for trained professionals only and should not be attempted at home
 		my $sql = "select *
 			from asset
-			left join Thread on Thread.assetId=asset.assetId
-			left join Post on Post.assetId=asset.assetId
+			left join assetData on assetData.assetId=asset.assetId
+			left join Thread on Thread.assetId=assetData.assetId and assetData.revisionDate = Thread.revisionDate
+			left join Post on Post.assetId=assetData.assetId and assetData.revisionDate = Post.revisionDate
 			where (asset.className='WebGUI::Asset::Post' or asset.className='WebGUI::Asset::Post::Thread')
 				and asset.lineage  like ".quote($self->get("lineage").'%')."
 				and asset.assetId<>".quote($self->getId)."
 				and (
-					Post.status in ('approved','archived')";
-		$sql .= "		or Post.status='pending'" if ($self->canModerate);
+					assetData.status in ('approved','archived')
+				 or assetData.tagId=".quote($session{scratch}{versionTag});
+		$sql .= "		or assetData.status='pending'" if ($self->canModerate);
 		$sql .= "		or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
 					) ";
 		$sql .= " and ($all) " if ($all ne "");
@@ -1048,7 +1051,7 @@ sub www_search {
 		$sql .= " ($atLeastOne) " if ($atLeastOne ne "");
 		$sql .= " and " if ($sql ne "" && $without ne "");
 		$sql .= " ($without) " if ($without ne "");
-		$sql .= " order by Post.dateSubmitted desc";
+		$sql .= " group by assetData.assetId order by Post.dateSubmitted desc";
 		my $p = WebGUI::Paginator->new($self->getUrl("func=search&doit=1"),$numResults);
 		$self->appendPostListTemplateVars(\%var, $sql, $p);
         }
@@ -1130,9 +1133,13 @@ sub www_viewRSS {
 	my $sth = WebGUI::SQL->read("select * 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
-		left join Post on Post.assetId=asset.assetId 
+		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate=Post.revisionDate
+		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate=assetData.revisionDate
 		where asset.parentId=".quote($self->getId)." and asset.state='published' 
-			and asset.className='WebGUI::Asset::Post::Thread' and Post.status='approved'
+			and asset.className='WebGUI::Asset::Post::Thread' 
+			and (assetData.status='approved'
+			 or assetData.tagId=".quote($session{scratch}{versionTag}).")
+		group by assetData.assetId
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $i = 1;
         while (my $data = $sth->hashRef) {
