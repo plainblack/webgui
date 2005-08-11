@@ -161,6 +161,10 @@ to add addRevision(), purge(), and purgeRevision() methods to your asset. See
 WebGUI::Asset::File and WebGUI::Asset:Post for examples of what these methods
 should look like.
 
+Also, if you have written any queries to go against the "asset" table, you
+should note that the asset table has been split into two tables "asset" and
+"assetData". So you'll need to change your queries appropriately.
+
 Other than that you shouldn't have to make any revisions to your asset to
 support versioning. Your collateral tables need not have the revision date as
 they'll be tied to the assetId regardless of the revision date.

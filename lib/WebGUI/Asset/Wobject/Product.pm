@@ -335,7 +335,7 @@ sub www_addAccessory {
    );
    @usedAccessories = WebGUI::SQL->buildArray("select accessoryAssetId from Product_accessory where assetId=".quote($self->getId));
    push(@usedAccessories,$self->getId);
-   $accessory = WebGUI::SQL->buildHashRef("select assetId, title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".quoteAndJoin(\@usedAccessories).")");
+   $accessory = WebGUI::SQL->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Wobject::Product' and asset.assetId not in (".quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).") group by assetData.assetId");
    $f->selectList(
 		-name => "accessoryAccessId",
 		-options => $accessory,
@@ -436,7 +436,7 @@ sub www_deleteFileConfirm {
    my $store = $self->get($column);
    my $file = WebGUI::Storage->get($store);
    $file->delete;
-   WebGUI::SQL->write("update Product set $column=NULL where assetId=".quote($self->getId()));
+	$self->update({$column => ''});
    return $self->www_edit;
 }
 
@@ -723,7 +723,12 @@ sub view {
    $self->logView() if ($session{setting}{passiveProfilingEnabled});
    my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
    tie %data, 'Tie::CPHash';
-   my ($image1, $image2, $image3, $brochure, $manual, $warranty) = WebGUI::SQL->quickArray("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".quote($self->getId));
+	my $brochure = $self->get("brochure");
+	my $manual = $self->get("manual");
+	my $warranty = $self->get("warranty");
+	my $image1 = $self->get("image1");
+	my $image2 = $self->get("image2");
+	my $image3 = $self->get("image3");
    #---brochure
    if ($brochure) {
       $file = WebGUI::Storage->get($brochure);
@@ -820,18 +825,17 @@ sub view {
 	#---accessories 
    $var{"addaccessory.url"} = $self->getUrl('func=addAccessory');
    $var{"addaccessory.label"} = WebGUI::International::get(36,'Asset_Product');
-   $sth = WebGUI::SQL->read("select asset.title, asset.url, Product_accessory.accessoryAssetId 
-                             from   Product_accessory,asset 
+   $sth = WebGUI::SQL->read("select Product_accessory.accessoryAssetId from   Product_accessory
 		                     where Product_accessory.assetId=".quote($self->getId)." 
-		                     and Product_accessory.accessoryAssetId=asset.assetId 
 		                     order by Product_accessory.sequenceNumber");
-   while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteAccessoryConfirm&aid='.$data{accessoryAssetId},$self->get("url"),WebGUI::International::get(2,'Asset_Product'))
-                 .moveUpIcon('func=moveAccessoryUp&aid='.$data{accessoryAssetId},$self->get("url"))
-                 .moveDownIcon('func=moveAccessoryDown&aid='.$data{accessoryAssetId},$self->get("url"));
+   while (my ($id) = $sth->array) {
+      $segment = deleteIcon('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),WebGUI::International::get(2,'Asset_Product'))
+                 .moveUpIcon('func=moveAccessoryUp&aid='.$id,$self->get("url"))
+                 .moveDownIcon('func=moveAccessoryDown&aid='.$id,$self->get("url"));
+		my $accessory = WebGUI::Asset->newByDynamicClass($id);
 	  push(@accessoryloop,{
-			               "accessory.URL"=>WebGUI::URL::gateway($data{url}),
-			               "accessory.title"=>$data{title},
+			               "accessory.URL"=>$accessory->getUrl,
+			               "accessory.title"=>$accessory->getTitle,
 			               "accessory.controls"=>$segment
 			               });
    }
@@ -841,18 +845,18 @@ sub view {
    #---related
    $var{"addrelatedproduct.url"} = $self->getUrl('func=addRelated');
    $var{"addrelatedproduct.label"} = WebGUI::International::get(37,'Asset_Product');
-   $sth = WebGUI::SQL->read("select asset.title,asset.url,Product_related.relatedAssetId 
-		                     from Product_related,asset 
+   $sth = WebGUI::SQL->read("select Product_related.relatedAssetId 
+		                     from Product_related 
 		                     where Product_related.assetId=".quote($self->getId)." 
-		                     and Product_related.relatedAssetId=asset.assetId 
 		                     order by Product_related.sequenceNumber");
-   while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteRelatedConfirm&rid='.$data{relatedAssetId},$self->get("url"),WebGUI::International::get(4,'Asset_Product'))
-                 .moveUpIcon('func=moveRelatedUp&rid='.$data{relatedAssetId},$self->get("url"))
-                 .moveDownIcon('func=moveRelatedDown&rid='.$data{relatedAssetId},$self->get("url"));
+   while (my ($id) = $sth->array) {
+      $segment = deleteIcon('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),WebGUI::International::get(4,'Asset_Product'))
+                 .moveUpIcon('func=moveRelatedUp&rid='.$id,$self->get("url"))
+                 .moveDownIcon('func=moveRelatedDown&rid='.$id,$self->get("url"));
+		my $related = WebGUI::Asset->newByDynamicClass($id);
       push(@relatedloop,{
-			              "relatedproduct.URL"=>WebGUI::URL::gateway($data{url}),
-			              "relatedproduct.title"=>$data{title},
+			              "relatedproduct.URL"=>$related->getUrl,
+			              "relatedproduct.title"=>$related->getTitle,
                           "relatedproduct.controls"=>$segment
 			            });
    }

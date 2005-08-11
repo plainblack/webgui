@@ -26,7 +26,6 @@ use WebGUI::Operation;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
@@ -406,29 +405,6 @@ sub view {
 	$var{"edit.label"} = WebGUI::International::get(575,"Asset_Event");
 	$var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&rid='.$self->getValue("EventsCalendar_recurringId"));
 	$var{"delete.label"} = WebGUI::International::get(576,"Asset_Event");
-#	my $query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>".quote($event->getValue("EventsCalendar_eventId});
-#	$query .= " and wobjectId=".quote($self->get("wobjectId")) unless ($self->get("isMaster"));
-#	$query .= " and startDate<=$event->getValue("startDate} order by startDate desc, endDate desc";
-#	($id) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
-#	$var{"previous.label"} = '&laquo;'.WebGUI::International::get(92,"Asset_Event");
-#	$var{"previous.url"} = WebGUI::URL::page("func=viewEvent&wid=".$self->get("wobjectId")."&eid=".$id) if ($id);
-#	$query = "select EventsCalendar_eventId from EventsCalendar_event where EventsCalendar_eventId<>".quote($event->getValue("EventsCalendar_eventId});
-#	$query .= " and wobjectId=".quote($self->get("wobjectId")) unless ($self->get("isMaster"));
-#	$query .= " and startDate>=$event->getValue("eventStartDate") order by startDate, endDate";
-#        ($id) = WebGUI::SQL->quickArray($query,WebGUI::SQL->getSlave);
-#        $var{"next.label"} = WebGUI::International::get(93,"Asset_Event").'&raquo;';
-#        $var{"next.url"} = WebGUI::URL::page("func=viewEvent&wid=".$self->get("wobjectId")."&eid=".$id) if ($id);
-	$var{description} = $event->getValue("description");
-#	my $where = "eventscalendar.type=2";
-#	my $kiddos = $self->getLineage(["children"],{returnObjects=>1,joinClass=>"WebGUI::Asset::Wobject::EventsCalendar",whereClause=>$where});
-#	my $tabform = WebGUI::TabForm->new();
-#	#let's try to create a template variable that is a tabform of agendas.
-#	foreach my $agenda (@{$kiddos}) {
-#		$tabform->addTab($agenda->getId,$agenda->getValue("title"));
-#		#These will be in order of lineage.  Use the Asset Manager to change the order.
-#		$tabform->getTab($agenda->getId)->raw($agenda->WebGUI::Asset::Wobject::EventsCalendar::view);
-#	}
-#	$var{agendas} = $tabform->print;
 	my $vars = \%var;
 	#get parent so we can get the parent's style.  Hopefully the parent is an EventsCalendar.  If not, oh well.
 	my $parent = $self->getParent;

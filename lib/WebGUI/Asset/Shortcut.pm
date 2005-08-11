@@ -215,20 +215,6 @@ sub getShortcut {
 This function will search for a asset that match a metadata criteria set.
 If no asset is found, undef will be returned.
 
-=head3 hashRef
-
-A typical hashRef for this function will look like:
-
-{
-	proxiedNamespace => "Article",
-	resolveMultiples => "random",
-	shortcutCriteria => 'State = "Wisconsin" AND County != "Sauk"'
-}
-
-Most of the time this will be a:
-
-WebGUI::SQL->quickHashRef("select * from AssetProxy where assetId=".quote($proxiedId));
-
 =cut
 
 sub getShortcutByCriteria {

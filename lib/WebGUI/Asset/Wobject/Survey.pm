@@ -1348,7 +1348,6 @@ sub www_viewStatisticalOverview {
 	$p->appendTemplateVars($var);
 
 	return $self->processTemplate($var, $self->getValue("overviewTemplateId"));
-#	return $self->processTemplate($self->getValue("overviewTemplateId"),$var,"Survey/Overview");
 }
 
 1;
