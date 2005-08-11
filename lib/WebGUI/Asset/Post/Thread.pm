@@ -179,9 +179,8 @@ sub getNextThread {
 	my $self = shift;
         unless (exists $self->{_next}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		$self->{_next} = WebGUI::Asset::Post->newByPropertyHashRef(
-			WebGUI::SQL->quickHashRef("
-				select * 
+		my ($id, $class, $version) = WebGUI::SQL->quickHashRef("
+				select asset.assetId,asset.className,assetData.revisionDate
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
@@ -197,8 +196,8 @@ sub getNextThread {
 						)
 				group by assetData.assetId
 				order by ".$sortBy." asc 
-				",WebGUI::SQL->getSlave)
-			);
+				",WebGUI::SQL->getSlave);
+		$self->{_next} = WebGUI::Asset::Post->new($id,$class,$version);
 		delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_next};
@@ -218,8 +217,8 @@ sub getPreviousThread {
 	my $self = shift;
         unless (exists $self->{_previous}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		$self->{_previous} = WebGUI::Asset::Post->newByPropertyHashRef(
-			WebGUI::SQL->quickHashRef(" select * 
+		my ($id, $class, $version) = WebGUI::SQL->quickHashRef("
+				select asset.assetId,asset.className,assetData.revisionDate
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
@@ -234,8 +233,8 @@ sub getPreviousThread {
 						or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
-				order by ".$sortBy." desc ",WebGUI::SQL->getSlave)
-			);
+				order by ".$sortBy." desc ",WebGUI::SQL->getSlave);
+		$self->{_previous} = WebGUI::Asset::Post->new($id,$class,$version);
 		delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_previous};
@@ -626,9 +625,8 @@ sub view {
         $var->{'unlock.url'} = $self->getUnlockUrl;
 
         my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
-	my $sql = "select * from asset 
+	my $sql = "select asset.assetId, asset.className, assetData.revisionDate from asset 
 		left join assetData on assetData.assetId=asset.assetId
-		left join Thread on Thread.assetId=assetData.assetId and assetData.revisionDate=Thread.revisionDate
 		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 		where asset.lineage like ".quote($self->get("lineage").'%')
 		."	and asset.state='published'
@@ -649,7 +647,7 @@ sub view {
 	$currentPageUrl =~ s/^\///;
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
-		my $reply = WebGUI::Asset::Post->newByPropertyHashRef($dataSet);
+		my $reply = WebGUI::Asset::Post->new($dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
 		$reply->{_thread} = $self; # caching thread for better performance
 		my %replyVars = %{$reply->getTemplateVars};
 		$replyVars{isCurrent} = ($reply->get("url") eq $currentPageUrl);

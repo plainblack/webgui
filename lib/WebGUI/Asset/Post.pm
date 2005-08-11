@@ -678,7 +678,7 @@ sub processPropertiesFromFormPost {
 
 sub purge {
         my $self = shift;
-        my $sth = WebGUI::SQL->read("select storageId from FileAsset where assetId=".quote($self->getId));
+        my $sth = WebGUI::SQL->read("select storageId from Post where assetId=".quote($self->getId));
         while (my ($storageId) = $sth->array) {
                 WebGUI::Storage->get($storageId)->delete;
         }
