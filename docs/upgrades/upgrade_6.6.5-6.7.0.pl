@@ -20,6 +20,7 @@ GetOptions(
 );
 
 WebGUI::Session::open("../..",$configFile);
+WebGUI::Session::refreshUserInfo(3);
 
 WebGUI::SQL->write("insert into webguiVersion value (".quote($toVersion).",'upgrade',".time().")");
 
@@ -335,6 +336,7 @@ EOT
 				    url=>"6-7-0HelpSystemTemplate",
 				    className=>"WebGUI::Asset::Wobject::Folder"
 				   });
+	$folder->commit;
     $folder->addChild({
 		       namespace=>'AdminConsole',
 		       title=>'Help',
@@ -343,7 +345,7 @@ EOT
 		       showInForms=>1,
 		       isEditable=>1,
 		       className=>"WebGUI::Asset::Template",
-		       template=>$helpTemplate},'PBtmplHelp000000000001');
+		       template=>$helpTemplate},'PBtmplHelp000000000001')->commit;
 }
 
 
@@ -406,7 +408,7 @@ sub insertSyndicatedContentTemplate{
 </tmpl_loop>|;
 
     my $import=WebGUI::Asset->getImportNode;
-    my $template=$import->addChild(
+    $import->addChild(
 				   {
 				    className=>'WebGUI::Asset::Template',
 				    title=>'Default Grouped Aggregate Feeds',
@@ -419,7 +421,7 @@ sub insertSyndicatedContentTemplate{
 				    isHidden=>1,
 				    template=>$template
 				   },'DPUROtmpl0000000000001'
-				  );
+				  )->commit;
 }
 
 
@@ -440,6 +442,7 @@ sub insertXSLTSheets{
 				  groupViewId=>2
 				 }
 				);
+	$folder->commit;
     add_090xslt($folder);
     add_091xslt($folder);
     add_10xslt($folder);
@@ -543,6 +546,7 @@ You're viewing an <a href="http://www.purplepages.ie/RSS/netscape/rss0.90.html">
 				   snippet=>$snippet090
 				  },'SynConXSLT000000000001'
 				 );
+	$snippet->commit;
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -646,6 +650,7 @@ You're viewing an <a href="http://backend.userland.com/rss091">RSS version 0.91 
 				   snippet=>$snippet091
 				  },'SynConXSLT000000000002'
 				 );
+	$snippet->commit;
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -755,6 +760,7 @@ You're viewing an <a href="http://web.resource.org/rss/1.0/">RSS version 1.0 fee
 				   snippet=>$snippet10
 				  },'SynConXSLT000000000003'
 				 );
+	$snippet->commit;
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -861,6 +867,7 @@ You're viewing an <a href="http://blogs.law.harvard.edu/tech/rss">RSS version 2.
 				   snippet=>$snippet20
 				  },'SynConXSLT000000000004'
 				 );
+	$snippet->commit;
 }
 
 

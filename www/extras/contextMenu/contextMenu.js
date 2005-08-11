@@ -1,23 +1,10 @@
 var ie5=document.all&&document.getElementById
 var contextMenu_items = new Array();
 
-document.onmousedown=contextMenu_hideAll;
-
-function contextMenu_hideAll(e) {     
-      e =ie5? event : e;
-	var firedobj = ie5?e.srcElement:e.target;
-
-	while (firedobj != null && firedobj.tagName != "HTML" && firedobj.tagName != "IMG") {
-		if (firedobj.id.indexOf("contextMenu") != -1) {
-			return;
-		}
-		firedobj = firedobj.offsetParent;
-      }   
-   contextMenu_hide();
-}
+document.onmousedown=contextMenu_hide;
 
 function contextMenu_renderLeftClick(menuId,e) {
-	contextMenu_hideAll(e);
+	contextMenu_hide(e);
 	contextMenu_show(menuId,e);
 	e.cancelBubble=true;
 	e.returnValue=false;
@@ -90,6 +77,7 @@ function contextMenu_draw(){
 		output += '<img src="' + this.imagePath + '" id="contextMenu_' + this.id + '" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)" alt="' + this.name + '" title="' + this.name + '" align="absmiddle" />';
 	} else {
 		output += '<a href="#" id="contextMenu_' + this.id + '" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)">' + this.name + '</a>';
+		//output += '<a href="javascript:contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)" id="contextMenu_' + this.id + '">' + this.name + '</a>';
 	}
 	return output;
 }
