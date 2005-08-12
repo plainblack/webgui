@@ -106,11 +106,14 @@ sub www_editProfileCategory {
 		);
 		$f->readOnly(
 			-name => $session{form}{cid},
-			-label => WebGUI::International::get(469,"WebGUIProfile");
+			-label => WebGUI::International::get(469,"WebGUIProfile"),
 		);
 		%data = WebGUI::SQL->quickHash("select * from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
 	} else {
-                $f->hidden("cid","new");
+                $f->hidden(
+			-name => "cid",
+			-value => "new"
+		);
 	}
 	$f->text(
 		-name => "categoryName",

@@ -107,7 +107,10 @@ sub getUserSearchForm {
 	WebGUI::Session::setScratch("userSearchModifier",$session{form}{modifier});
 	my $output = '<div align="center">';
 	my $f = WebGUI::HTMLForm->new(1);
-	$f->hidden("op",$op);
+	$f->hidden(
+		-name => "op",
+		-value => $op
+		);
 	foreach my $key (keys %{$params}) {
 		$f->hidden(
 			-name=>$key,
@@ -241,9 +244,17 @@ sub www_editUser {
 		Selfdestructed	=>$i18n->get(819)
 		);
 	if ($u->userId eq $session{user}{userId}) {
-		$tabform->getTab("account")->hidden("status",$u->status);
+		$tabform->getTab("account")->hidden(
+			-name => "status",
+			-value => $u->status
+			);
 	} else {
-		$tabform->getTab("account")->selectList("status",\%status,$i18n->get(816),[$u->status]);
+		$tabform->getTab("account")->selectList(
+			-name => "status",
+			-options => \%status,
+			-label => $i18n->get(816),
+			-value => [$u->status]
+			);
 	}
 	my $options;
 	foreach (@{$session{config}{authMethods}}) {

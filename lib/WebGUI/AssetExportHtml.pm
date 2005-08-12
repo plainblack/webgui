@@ -137,7 +137,10 @@ sub www_export {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
         $self->getAdminConsole->setHelp("page export", "Asset");
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-        $f->hidden("func","exportStatus");
+        $f->hidden(
+		-name => "func",
+		-value => "exportStatus"
+		);
 	$f->integer(
 			-label=>WebGUI::International::get('Depth',"Asset"),
 			-hoverHelp=>WebGUI::International::get('Depth description',"Asset"),

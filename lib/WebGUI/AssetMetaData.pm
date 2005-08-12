@@ -167,8 +167,14 @@ sub www_editMetaDataField {
 	}
 	my $fid = $session{form}{fid} || "new";
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-        $f->hidden("func", "editMetaDataFieldSave");
-        $f->hidden("fid", $fid);
+        $f->hidden(
+		-name => "func", 
+		-value => "editMetaDataFieldSave"
+		);
+        $f->hidden(
+		-name => "fid", 
+		-value => $fid
+	);
         $f->readOnly(
                 -value=>$fid,
                 -label=>WebGUI::International::get('Field Id','Asset'),
