@@ -390,7 +390,6 @@ sub setParent {
 sub view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
-		$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my ($output, $event, %var, $id);
 	$event = $self;
 	$var{title} = $event->getValue("title");
