@@ -380,7 +380,7 @@ sub www_editUserSave {
 		@groups = $session{cgi}->param("groupsToDelete");
 		$u->deleteFromGroups(\@groups);
 	} else {
-       		$error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</ul>';
+       		$error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</li></ul>';
 	}
 	if ($isSecondary) {
 		return _submenu(WebGUI::International::get(978));

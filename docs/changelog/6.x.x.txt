@@ -65,7 +65,8 @@
    details.
  - Changed warning generated when a languagepack misses the makeUrlCompliant
    procedure to a fatal error, since this will lead to a false url in the asset
-   table.
+   table. (mkamerbeek/Procolix)
+ - fix [ 1249114 ] unclosed <li> elements in auth modules (mkamerbeek/Procolix)
 
 6.6.5
  - fix [ 1243131 ] In 6.6.4 you cannot upload anything (ebruni/mwilson)

@@ -116,9 +116,9 @@ sub validateProfileData {
    while (%field = $a->hash) {
       $data{$field{fieldName}} = WebGUI::Macro::negate(WebGUI::FormProcessor::process($field{fieldName},$field{dataType}, $field{dataDefault}));
 	  if ($field{required} && $data{$field{fieldName}} eq "") {
-	     $error .= '<li>'.(eval $field{fieldLabel}).' '.WebGUI::International::get(451);
+	     $error .= '<li>'.(eval $field{fieldLabel}).' '.WebGUI::International::get(451).'</li>';
 	  }elsif($field{fieldName} eq "email" && isDuplicateEmail($data{$field{fieldName}})){
-		 $warning .= '<li>'.WebGUI::International::get(1072);
+		 $warning .= '<li>'.WebGUI::International::get(1072).'</li>';
 	  }
    }
    $a->finish;

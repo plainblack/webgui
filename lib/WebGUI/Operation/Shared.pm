@@ -78,9 +78,9 @@ sub menuWrapper {
         $output .= $_[0];
         $output .= '</td><td width="30%" class="tableMenu" valign="top">';
 	foreach $key (keys %{$_[1]}) {
-        	$output .= '<li><a href="'.$key.'">'.$_[1]->{$key}.'</a>';
+        	$output .= '<li><a href="'.$key.'">'.$_[1]->{$key}.'</a></li>';
 	}
-        $output .= '<li><a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(493).'</a>';
+        $output .= '<li><a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(493).'</a></li>';
         $output .= '</td></tr></table>';
         return $output;
 }

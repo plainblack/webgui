@@ -44,14 +44,14 @@ sub _isValidPassword {
    my $error = "";
 
    if ($password ne $confirm) {
-      $error .= '<li>'.WebGUI::International::get(3,'AuthWebGUI');
+      $error .= '<li>'.WebGUI::International::get(3,'AuthWebGUI').'</li>';
    }
    if ($password eq "") {
-      $error .= '<li>'.WebGUI::International::get(4,'AuthWebGUI');
+      $error .= '<li>'.WebGUI::International::get(4,'AuthWebGUI').'</li>';
    }
 
    if ($self->getSetting("passwordLength") && length($password) < $self->getSetting("passwordLength")){
-      $error .= '<li>'.WebGUI::International::get(7,'AuthWebGUI')." ".$self->getSetting("passwordLength");
+      $error .= '<li>'.WebGUI::International::get(7,'AuthWebGUI')." ".$self->getSetting("passwordLength").'</li>';
    }
 
    $self->error($error);
@@ -209,7 +209,7 @@ sub createAccountSave {
    #If Email address is not unique, a warning is displayed
    if($warning ne "" && !$session{form}{confirm}){
       $session{form}{confirm} = 1;
-      return $self->createAccount('<li>'.WebGUI::International::get(1078));
+      return $self->createAccount('<li>'.WebGUI::International::get(1078).'</li>');
    }
 
    my $properties;
@@ -546,8 +546,8 @@ sub recoverPasswordFinish {
 	}
 	$sth->finish();
 	 
-   return $self->displayLogin('<ul><li>'.WebGUI::International::get(75).'</ul>') if($flag);
-   return $self->recoverPassword('<ul><li>'.WebGUI::International::get(76).'</ul>');
+   return $self->displayLogin('<ul><li>'.WebGUI::International::get(75).'</li></ul>') if($flag);
+   return $self->recoverPassword('<ul><li>'.WebGUI::International::get(76).'</li></ul>');
 }
 
 #-------------------------------------------------------------------
@@ -583,8 +583,8 @@ sub resetExpiredPasswordSave {
    $session{form}{username} = $u->username;
    
    $error .= $self->error if(!$self->authenticate($session{form}{oldPassword}));
-   $error .= '<li>'.WebGUI::International::get(5,'AuthWebGUI') if($session{form}{identifier} eq "password");
-   $error .= '<li>'.WebGUI::International::get(12,'AuthWebGUI') if ($session{form}{oldPassword} eq $session{form}{identifier});
+   $error .= '<li>'.WebGUI::International::get(5,'AuthWebGUI').'</li>' if($session{form}{identifier} eq "password");
+   $error .= '<li>'.WebGUI::International::get(12,'AuthWebGUI').'</li>' if ($session{form}{oldPassword} eq $session{form}{identifier});
    $error .= $self->error if(!$self->_isValidPassword($session{form}{identifier},$session{form}{identifierConfirm}));
    
    return $self->resetExpiredPassword("<h1>".WebGUI::International::get(70)."</h1>".$error) if($error ne "");
@@ -597,7 +597,7 @@ sub resetExpiredPasswordSave {
    
    $msg = $self->login;
    if($msg eq ""){
-      $msg = "<li>".WebGUI::International::get(17,'AuthWebGUI');
+      $msg = "<li>".WebGUI::International::get(17,'AuthWebGUI').'</li>';
    }
    return $self->displayLogin($msg);
 }
@@ -628,7 +628,7 @@ sub updateAccount {
    my $username = $session{form}{'authWebGUI.username'};
    my $password = $session{form}{'authWebGUI.identifier'};
    my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
-   my $display = '<li>'.WebGUI::International::get(81).'<p>';
+   my $display = '<li>'.WebGUI::International::get(81).'</li>';
    my $error = "";
    
    if($self->userId eq '1'){

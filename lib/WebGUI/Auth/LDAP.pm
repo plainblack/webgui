@@ -59,15 +59,15 @@ sub _isValidLDAPUser {
                 $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'AuthLDAP');
                 $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP_identifier'});
                 if ($auth->code == 48 || $auth->code == 49) {
-                   $error .= '<li>'.WebGUI::International::get(68);
+                   $error .= '<li>'.WebGUI::International::get(68).'</li>';
                    WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP_ldapId'});
                 } elsif ($auth->code > 0) {
-                   $error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69);
+                   $error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69).'</li>';
            		   WebGUI::ErrorHandler::error("LDAP error: ".$ldapStatusCode{$auth->code});
                 }
                 $ldap->unbind;
         	} else {
-               $error .= '<li>'.WebGUI::International::get(68);
+               $error .= '<li>'.WebGUI::International::get(68).'</li>';
                WebGUI::ErrorHandler::warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP_ldapId'});
             }
 	 } else {
@@ -275,7 +275,7 @@ sub createAccountSave {
    #If Email address is not unique, a warning is displayed
    if($warning ne "" && !$session{form}{confirm}){
       $session{form}{confirm} = 1;
-      return $self->createAccount('<li>'.WebGUI::International::get(1078));
+      return $self->createAccount('<li>'.WebGUI::International::get(1078).'</li>');
    }
    
    my $properties;

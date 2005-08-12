@@ -1163,10 +1163,10 @@ is set to "response".
         'what next question description' => {
                 message => q|After defining the question, you may supply an answer:
 <ul>
-<li>Multiple Choice</il>
-<li>Text</il>
-<li>Frequency</il>
-<li>Opinion</il>
+<li>Multiple Choice</li>
+<li>Text</li>
+<li>Frequency</li>
+<li>Opinion</li>
 <li>Or you may return to the survey</li>
 </ul>
 </p>|,

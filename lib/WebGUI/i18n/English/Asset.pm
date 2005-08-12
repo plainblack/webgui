@@ -501,6 +501,7 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
     Metadata in combination with passive profiling produces AOI (Areas of
     Interest) information. You can retrieve the value of a metadata property
     with the &#94;AOIRank(); and &#AOIHits(); macros.</p>
+  </li>
   <li><p><b>Show content based upon criteria<br>
     </b>The Wobject Proxy allows you to select content based upon criteria like:<blockquote>
     contenttype = sport AND source != newspaper</blockquote>
