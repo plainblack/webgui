@@ -19,6 +19,12 @@ save you many hours of grief.
 	will not display your questions for editing in Admin mode.
 	You will need to put your questions loop inside of a section
 	loop.  See the default view template for an example.
+
+ * If you have any SQL reports going against the asset table, note that
+	it has been split into two tables "asset" and "assetData" and
+	your SQL reports will need to change.
+
+
 6.6.4
 --------------------------------------------------------------------
  * Please ensure you're running HTML::Template version 2.7, which

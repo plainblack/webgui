@@ -180,7 +180,7 @@ sub getNextThread {
         unless (exists $self->{_next}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
 		my ($id, $class, $version) = WebGUI::SQL->quickHashRef("
-				select asset.assetId,asset.className,assetData.revisionDate
+				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
@@ -218,7 +218,7 @@ sub getPreviousThread {
         unless (exists $self->{_previous}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
 		my ($id, $class, $version) = WebGUI::SQL->quickHashRef("
-				select asset.assetId,asset.className,assetData.revisionDate
+				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
@@ -233,7 +233,7 @@ sub getPreviousThread {
 						or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
-				order by ".$sortBy." desc ",WebGUI::SQL->getSlave);
+				order by ".$sortBy." desc, assetData.revisionDate desc ",WebGUI::SQL->getSlave);
 		$self->{_previous} = WebGUI::Asset::Post->new($id,$class,$version);
 		delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
@@ -625,7 +625,7 @@ sub view {
         $var->{'unlock.url'} = $self->getUnlockUrl;
 
         my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
-	my $sql = "select asset.assetId, asset.className, assetData.revisionDate from asset 
+	my $sql = "select asset.assetId, asset.className, max(assetData.revisionDate) from asset 
 		left join assetData on assetData.assetId=asset.assetId
 		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 		where asset.lineage like ".quote($self->get("lineage").'%')

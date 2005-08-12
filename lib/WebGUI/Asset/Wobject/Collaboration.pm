@@ -904,7 +904,7 @@ sub view {
 		$constraints .= " or assetData.status='pending'"; 
 	}
 	$constraints .= ")";
-	my $sql = "select asset.assetId,asset.className,assetData.revisionDate 
+	my $sql = "select asset.assetId,asset.className,max(assetData.revisionDate)
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate
@@ -1031,7 +1031,7 @@ sub www_search {
         	}
 		# please note that the SQL generated here-in is not for the feint of heart, mind, or stomach
 		# this is for trained professionals only and should not be attempted at home
-		my $sql = "select asset.assetId, asset.className, assetData.revisionDate
+		my $sql = "select asset.assetId, asset.className, max(assetData.revisionDate)
 			from asset
 			left join assetData on assetData.assetId=asset.assetId
 			left join Thread on Thread.assetId=assetData.assetId and assetData.revisionDate = Thread.revisionDate
@@ -1131,7 +1131,7 @@ sub www_viewRSS {
 <link>$encUrl</link>
 <description>$encDescription</description>
 ~;
-	my $sth = WebGUI::SQL->read("select * 
+	my $sth = WebGUI::SQL->read("select asset.assetId, asset.className, max(assetData.revisionDate) 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate=Post.revisionDate
@@ -1143,8 +1143,8 @@ sub www_viewRSS {
 		group by assetData.assetId
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $i = 1;
-        while (my $data = $sth->hashRef) {
-		my $post = WebGUI::Asset::Wobject::Collaboration->newByPropertyHashRef($data);
+        while (my ($id, $class, $version)  = $sth->hashRef) {
+		my $post = WebGUI::Asset::Wobject::Collaboration->new($id, $class, $version);
 
                 my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
                 my $encTitle = _xml_encode($post->get("title"));
