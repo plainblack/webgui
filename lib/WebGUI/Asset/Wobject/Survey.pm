@@ -193,7 +193,10 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
 
-	$tabform->getTab('properties')->hidden("Survey_id",($self->get("Survey_id") || WebGUI::Id::generate()));
+	$tabform->getTab('properties')->hidden(
+		-name => "Survey_id",
+		-value => ($self->get("Survey_id") || WebGUI::Id::generate())
+	);
 	$tabform->getTab('display')->template(
 		-name		=> 'templateId',
 		-label		=> WebGUI::International::get('view template', 'Asset_Survey'),
@@ -806,10 +809,22 @@ sub www_editAnswer {
         
 	$answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-        $f->hidden("wid",$session{form}{wid});
-        $f->hidden("func","editAnswerSave");
-        $f->hidden("qid",$session{form}{qid});
-        $f->hidden("aid",$answer->{Survey_answerId});
+        $f->hidden(
+		-name => "wid",
+		-value => $session{form}{wid}
+	);
+        $f->hidden(
+		-name => "func",
+		-value => "editAnswerSave"
+	);
+        $f->hidden(
+		-name => "qid",
+		-value => $session{form}{qid}
+	);
+        $f->hidden(
+		-name => "aid",
+		-value => $answer->{Survey_answerId}
+	);
         $f->text(
                 -name=>"answer",
                 -value=>$answer->{answer},
@@ -824,7 +839,10 @@ sub www_editAnswer {
                 	-hoverHelp=>WebGUI::International::get('20 description','Asset_Survey')
                 	);
 	} else {
-		$f->hidden("isCorrect",0);
+		$f->hidden(
+			-name => "isCorrect",
+			-value => 0
+		);
 	}
 	if ($self->get("questionOrder") eq "response") {
 		$question = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
@@ -894,11 +912,22 @@ sub www_editQuestion {
 	$answerFieldType = $question->{answerFieldType} || "radioList";
 	
 	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-	$f->hidden("wid",$self->get("wobjectId"));
-	$f->hidden("func","editQuestionSave");
-	$f->hidden("qid",$question->{Survey_questionId});
-	$f->hidden("answerFieldType",$answerFieldType);
-	
+	$f->hidden(
+		-name => "wid",
+		-value => $self->get("wobjectId")
+	);
+	$f->hidden(
+		-name => "func",
+		-value => "editQuestionSave"
+	);
+	$f->hidden(
+		-name => "qid",
+		-value => $question->{Survey_questionId}
+	);
+	$f->hidden(
+		-name => "answerFieldType",
+		-value => $answerFieldType
+	);
 	$f->HTMLArea(
 		-name	=> "question",
 		-value	=> $question->{question},
@@ -1050,9 +1079,18 @@ sub www_editSection {
 	}
 	
 	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-	$f->hidden("wid",$self->get("wobjectId"));
-	$f->hidden("func","editSectionSave");
-	$f->hidden("sid",$section->{Survey_sectionId});
+	$f->hidden(
+		-name => "wid",
+		-value => $self->get("wobjectId")
+	);
+	$f->hidden(
+		-name => "func",
+		-value => "editSectionSave"
+	);
+	$f->hidden(
+		-name => "sid",
+		-value => $section->{Survey_sectionId}
+	);
 
 	$f->text(
 		-name	=> "sectionName",

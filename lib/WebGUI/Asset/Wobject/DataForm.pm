@@ -766,8 +766,14 @@ sub www_editField {
 	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".quote($self->getId));
 	$tab->{0} = WebGUI::International::get("no tab","Asset_DataForm");
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-        $f->hidden("fid",$session{form}{fid});
-        $f->hidden("func","editFieldSave");
+        $f->hidden(
+		-name => "fid",
+		-value => $session{form}{fid}
+	);
+        $f->hidden(
+		-name => "func",
+		-value => "editFieldSave"
+	);
 	$f->text(
                 -name=>"label",
                 -label=>WebGUI::International::get(77,"Asset_DataForm"),
@@ -917,8 +923,14 @@ sub www_editTab {
         	%tab = WebGUI::SQL->quickHash("select * from DataForm_tab where DataForm_tabId=".quote($session{form}{tid}));
 	}
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-        $f->hidden("tid",$session{form}{tid});
-        $f->hidden("func","editTabSave");
+        $f->hidden(
+		-name => "tid",
+		-value => $session{form}{tid}
+	);
+        $f->hidden(
+		-name => "func",
+		-value => "editTabSave"
+	);
 	$f->text(
                 -name=>"label",
 		-label=>WebGUI::International::get(101,"Asset_DataForm"),
