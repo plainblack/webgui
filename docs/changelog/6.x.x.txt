@@ -67,6 +67,8 @@
    procedure to a fatal error, since this will lead to a false url in the asset
    table. (mkamerbeek/Procolix)
  - fix [ 1249114 ] unclosed <li> elements in auth modules (mkamerbeek/Procolix)
+ - fix [ 1249117 ] resetExpiredPassword not a callable method from authmodules. 
+   Includes an additional bugfix in resetExpiredPasswordSave method (mkamerbeek/Procolix)
 
 6.6.5
  - fix [ 1243131 ] In 6.6.4 you cannot upload anything (ebruni/mwilson)

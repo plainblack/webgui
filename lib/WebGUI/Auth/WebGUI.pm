@@ -487,7 +487,7 @@ sub new {
    my $class = shift;
    my $authMethod = $_[0];
    my $userId = $_[1];
-   my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPasswordSave','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');
+   my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');
    my $self = WebGUI::Auth->new($authMethod,$userId,\@callable);
    bless $self, $class;
 }
@@ -582,7 +582,7 @@ sub resetExpiredPasswordSave {
    $u = WebGUI::User->new($session{form}{uid});
    $session{form}{username} = $u->username;
    
-   $error .= $self->error if(!$self->authenticate($session{form}{oldPassword}));
+   $error .= $self->error if(!$self->authenticate($u->username,$session{form}{oldPassword}));
    $error .= '<li>'.WebGUI::International::get(5,'AuthWebGUI').'</li>' if($session{form}{identifier} eq "password");
    $error .= '<li>'.WebGUI::International::get(12,'AuthWebGUI').'</li>' if ($session{form}{oldPassword} eq $session{form}{identifier});
    $error .= $self->error if(!$self->_isValidPassword($session{form}{identifier},$session{form}{identifierConfirm}));
