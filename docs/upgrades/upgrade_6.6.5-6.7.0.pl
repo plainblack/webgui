@@ -298,6 +298,7 @@ sub addAssetVersioning {
 	$sth = WebGUI::SQL->read("select olderVersions from FileAsset");
 	while (my ($old) = $sth->array) {
 		foreach my $storageId (split("\n",$old)) {
+			next unless ($storageId);
 			WebGUI::Storage->get($storageId)->delete;
 		}
 	}

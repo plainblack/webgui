@@ -352,7 +352,8 @@ Deletes this storage location and its contents (if any) from the filesystem and 
 
 sub delete {
 	my $self = shift;
-        rmtree($self->getPath);
+	my $path = $self->getPath;
+        rmtree($path) if ($path);
 	undef $self;
 }
 
@@ -390,6 +391,7 @@ The unique identifier for this file system storage location.
 sub get {
 	my $class = shift;
 	my $id = shift;
+	return undef unless $id;
 	$id =~ m/^(.{2})(.{2})/;
 	my $self = {_id => $id, _part1 => $1, _part2 => $2};
 	bless $self, ref($class)||$class;
@@ -587,6 +589,10 @@ If specified, we'll return a path to the file rather than the storage location.
 sub getPath {
 	my $self = shift;	
 	my $file = shift;
+	unless ($session{config}{uploadsPath} && $self->{_part1} && $self->{_part2} && $self->getId) {
+		$self->_addError("storage object malformed");
+		return undef;
+	}
         my $path = $session{config}{uploadsPath}
 		.$session{os}{slash}.$self->{_part1}
 		.$session{os}{slash}.$self->{_part2}

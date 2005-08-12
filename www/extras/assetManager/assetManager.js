@@ -471,7 +471,8 @@ function AssetManager_addAssetMetaData(url, rank,title) {
 
 //********Event Handlers***********
 function AssetManager_initializeDragEventHandlers() {
-    document.onmousedown=AssetManager_documentMouseDown;
+	var old = (document.onmousedown) ? document.onmousedown : function () {};
+    	document.onmousedown= function () {old();AssetManager_documentMouseDown();};
     document.onmouseup=AssetManager_documentMouseUp;
     document.onmousemove=AssetManager_documentMouseMove;
 }
