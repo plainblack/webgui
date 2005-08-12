@@ -120,7 +120,7 @@ sub www_view {
 	if ($session{var}{adminOn}) {
 		return $self->getContainer->www_view;
 	}
-	WebGUI::HTTP::setRedirect(WebGUI::Macro::process($self->get("redirectUrl"))) unless $self->newByUrl($self->get("redirectUrl"))->getUrl eq $self->getUrl;
+	WebGUI::HTTP::setRedirect(WebGUI::Macro::process($self->get("redirectUrl"))) unless $self->get("redirectUrl") eq $self->get("url");
 	return "Redirect is self-referential";
 }
 

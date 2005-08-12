@@ -1,3 +1,8 @@
+6.7.1
+ - Fixed a fatal error with Redirects
+ - Fixed a fatal error in the date field in the new pluggable forms system.
+
+
 6.7.0
  - Upgraded the rich editor to 1.45.
  - Rich edit now has three new buttons: paste from word, paste as plain text,
