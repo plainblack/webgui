@@ -22,7 +22,7 @@ GetOptions(
 WebGUI::Session::open("../..",$configFile);
 WebGUI::Session::refreshUserInfo(3);
 
-WebGUI::SQL->write("insert into webguiVersion value (".quote($toVersion).",'upgrade',".time().")");
+WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
 
 giveSnippetsMimeTypes();
 addAssetVersioning();
