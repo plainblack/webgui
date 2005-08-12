@@ -169,7 +169,10 @@ sub www_checkoutConfirm {
 	$plugin = WebGUI::Commerce::Payment->load(WebGUI::Session::getScratch('paymentGateway'));
 
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'checkoutSubmit');
+	$f->hidden(
+		-name => 'op', 
+		-value => 'checkoutSubmit'
+		);
 	$f->raw($plugin->checkoutForm);
 	$f->submit(value=>$i18n->get('pay button'));
 	

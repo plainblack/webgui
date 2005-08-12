@@ -64,7 +64,10 @@ sub www_createSubscriptionCodeBatch {
 	%subscriptions = WebGUI::SQL->buildHash("select subscriptionId, name from subscription where deleted != 1 order by name");
 	
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'createSubscriptionCodeBatchSave');
+	$f->hidden(
+		-name => 'op', 
+		-value => 'createSubscriptionCodeBatchSave'
+		);
 	$f->integer(
 		-name	=> 'noc',
 		-label	=> $i18n->get('noc'),
@@ -190,8 +193,14 @@ sub www_editSubscription {
 	$subscriptionId = $session{form}{sid} || 'new';
 
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'editSubscriptionSave');
-	$f->hidden('sid', $subscriptionId);
+	$f->hidden(
+		-name => 'op', 
+		-value => 'editSubscriptionSave'
+		);
+	$f->hidden(
+		-name => 'sid', 
+		-value => $subscriptionId
+	);
 	$f->readOnly(
 		-label	=> $i18n->get('subscriptionId'),
 		-value	=> $subscriptionId
@@ -431,7 +440,10 @@ sub www_redeemSubscriptionCode {
 	}
 	
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op','redeemSubscriptionCode');
+	$f->hidden(
+		-name => 'op',
+		-value => 'redeemSubscriptionCode'
+		);
 	$f->text(
 		-name		=> 'code',
 		-label		=> $i18n->get('code'),

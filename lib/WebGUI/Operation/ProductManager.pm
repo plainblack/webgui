@@ -85,8 +85,14 @@ sub www_editProduct {
 	}
 	
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'editProductSave');
-	$f->hidden('productId', $productId);
+	$f->hidden(
+		-name => 'op', 
+		-value => 'editProductSave'
+		);
+	$f->hidden(
+		-name => 'productId', 
+		-value => $productId
+	);
 	$f->text(
 		-name		=> 'title',
 		-label		=> $i18n->get('title'),
@@ -356,8 +362,14 @@ sub www_editProductVariant {
 	$variant = WebGUI::Product->getByVariantId($variantId)->getVariant($variantId);
 	
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'editProductVariantSave');
-	$f->hidden('variantId', $variantId);
+	$f->hidden(
+		-name => 'op', 
+		-value => 'editProductVariantSave'
+	);
+	$f->hidden(
+		-name => 'variantId', 
+		-value => $variantId
+	);
 	$f->readOnly(
 		-label	=> $i18n->get('variant ID'),
 		-value	=> $variant->{variantId}
@@ -422,8 +434,14 @@ sub www_editSkuTemplate {
 	$output .= "</ul><br>";
 	
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden('op', 'editSkuTemplateSave');
-	$f->hidden('productId', $productId);
+	$f->hidden(
+		-name => 'op', 
+		-value => 'editSkuTemplateSave'
+		);
+	$f->hidden(
+		-name => 'productId', 
+		-value => $productId
+		);
 	$f->text(
 		-name	=> 'skuTemplate',
 		-value	=> $product->get('skuTemplate'),
@@ -531,8 +549,8 @@ sub www_listProductVariants {
 		$output .= "</tr>";
 	}
 	$output .= "</table>";
-	$output .= WebGUI::Form::submit;
-	$output .= WebGUI::Form::formFooter;
+	$output .= WebGUI::Form::submit();
+	$output .= WebGUI::Form::formFooter();
 
 	return _submenu($output, 'list variants label', 'list variants', 'ProductManager');
 }
