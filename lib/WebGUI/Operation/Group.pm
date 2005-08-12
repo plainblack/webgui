@@ -109,7 +109,10 @@ sub getGroupSearchForm {
                         -value=>$params->{$key}
                         );
         }  
-        $f->hidden("op",$op);
+        $f->hidden(
+		-name => "op",
+		-value => $op
+	);
         $f->hidden(
                 -name=>"doit",
                 -value=>1
@@ -243,8 +246,14 @@ sub www_editGroup {
 		$g = WebGUI::Group->new($session{form}{gid});
 	}
 	$f = WebGUI::HTMLForm->new;
-        $f->hidden("op","editGroupSave");
-        $f->hidden("gid",$session{form}{gid});
+        $f->hidden(
+		-name => "op",
+		-value => "editGroupSave",
+	);
+        $f->hidden(
+		-name => "gid",
+		-value => $session{form}{gid}
+	);
         $f->readOnly(
 		-label => WebGUI::International::get(379),
 		-value => $g->groupId,
@@ -402,9 +411,18 @@ sub www_editGroupSave {
 sub www_editGrouping {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session{form}{gid}));
 	my $f = WebGUI::HTMLForm->new;
-        $f->hidden("op","editGroupingSave");
-        $f->hidden("uid",$session{form}{uid});
-        $f->hidden("gid",$session{form}{gid});
+        $f->hidden(
+		-name => "op",
+		-value => "editGroupingSave"
+	);
+        $f->hidden(
+		-name => "uid",
+		-value => $session{form}{uid}
+	);
+        $f->hidden(
+		-name => "gid",
+		-value => $session{form}{gid}
+	);
 	my $u = WebGUI::User->new($session{form}{uid});
 	my $g = WebGUI::Group->new($session{form}{gid});
         $f->readOnly(
@@ -446,8 +464,14 @@ sub www_emailGroup {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session{form}{gid}));
 	my ($output,$f);
 	$f = WebGUI::HTMLForm->new;
-	$f->hidden("op","emailGroupSend");
-	$f->hidden("gid",$session{form}{gid});
+	$f->hidden(
+		-name => "op",
+		-value => "emailGroupSend"
+	);
+	$f->hidden(
+		-name => "gid",
+		-value => $session{form}{gid}
+	);
 	$f->email(
 		-name=>"from",
 		-value=>$session{setting}{companyEmail},
@@ -546,8 +570,14 @@ sub www_manageGroupsInGroup {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session{form}{gid}));
 	my ($output, $p, $group, $groups, $f);
         $f = WebGUI::HTMLForm->new;
-        $f->hidden("op","addGroupsToGroupSave");
-        $f->hidden("gid",$session{form}{gid});
+        $f->hidden(
+		-name => "op",
+		-value => "addGroupsToGroupSave"
+	);
+        $f->hidden(
+		-name => "gid",
+		-value => $session{form}{gid}
+	);
 	$groups = WebGUI::Grouping::getGroupsInGroup($session{form}{gid},1);
 	push(@$groups,$session{form}{gid});
         $f->group(
@@ -618,8 +648,14 @@ sub www_manageUsersInGroup {
 	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");
 	return _submenu($output) unless ($session{form}{doit} || $userCount < 250 || $session{form}{pn} > 1);
 	my $f = WebGUI::HTMLForm->new;
-	$f->hidden("gid",$session{form}{gid});
-	$f->hidden("op","addUsersToGroupSave");
+	$f->hidden(
+		-name => "gid",
+		-value => $session{form}{gid}
+	);
+	$f->hidden(
+		-name => "op",
+		-value => "addUsersToGroupSave"
+	);
 	my $existingUsers = WebGUI::Grouping::getUsersInGroup($session{form}{gid});
 	push(@{$existingUsers},"1");
 	my %users;
