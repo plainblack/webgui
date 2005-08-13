@@ -17,6 +17,7 @@ package WebGUI::Form::date;
 use strict;
 use base 'WebGUI::Form::text';
 use WebGUI::DateTime;
+use WebGUI::Form::text;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Style;
@@ -123,7 +124,7 @@ Renders a date picker control.
 
 sub toHtml {
         my $self = shift;
-	my $self->{value} = WebGUI::DateTime::epochToSet($self->{value}) unless ($self->{noDate} && $self->{value} eq '');
+	$self->{value} = WebGUI::DateTime::epochToSet($self->{value}) unless ($self->{noDate} && $self->{value} eq '');
 	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
 	unless ($language) {
 		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
@@ -133,7 +134,7 @@ sub toHtml {
         WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ type=>'text/javascript' });
         WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	my $mondayFirst = $session{user}{firstDayOfWeek} ? "true" : "false";
-        return $self->toHtml . '<script type="text/javascript"> 
+        return $self->WebGUI::Form::text::toHtml . '<script type="text/javascript"> 
                         Calendar.setup({ 
                                 inputField : "'.$self->{id}.'", 
                                 ifFormat : "%Y-%m-%d", 

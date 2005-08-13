@@ -352,6 +352,7 @@ sub getAssetAdderLinks {
 	my $type = shift || "assets";
 	my %links;
 	foreach my $class (@{$session{config}{$type}}) {
+		next unless $class;
 		my $load = "use ".$class;
 		eval ($load);
 		if ($@) {

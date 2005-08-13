@@ -23,7 +23,8 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub www_killSession {
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return www_viewActiveSessions() if $session{form}{sid} eq $session{var}{sessionId};
+	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::Session::end($session{form}{sid});
 	return www_viewActiveSessions();
 }

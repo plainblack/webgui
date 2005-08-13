@@ -53,7 +53,7 @@ sub www_viewStatistics {
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(349).':</td><td class="tableData">'.$version.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from asset where state='published'");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(147).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from asset where isPackage=1");
+	($data) = WebGUI::SQL->quickArray("select count(distinct assetId) from assetData where isPackage=1");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(794).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = WebGUI::SQL->quickArray("select count(*) from template");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(792).':</td><td class="tableData">'.$data.'</td></tr>';

@@ -166,29 +166,40 @@ sub www_editMetaDataField {
 		$fieldInfo = $self->getMetaDataFields($session{form}{fid});
 	}
 	my $fid = $session{form}{fid} || "new";
-        my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-        $f->hidden(
-		-name => "func", 
+	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	$f->hidden(
+		-name => "func",
 		-value => "editMetaDataFieldSave"
-		);
-        $f->hidden(
-		-name => "fid", 
+	);
+	$f->hidden(
+		-name => "fid",
 		-value => $fid
 	);
-        $f->readOnly(
-                -value=>$fid,
-                -label=>WebGUI::International::get('Field Id','Asset'),
-                );
-        $f->text("fieldName", WebGUI::International::get('Field name','Asset'), $fieldInfo->{fieldName});
-	$f->textarea("description", WebGUI::International::get(85,"Asset"), $fieldInfo->{description});
-        $f->fieldType(
-                -name=>"fieldType",
-                -label=>WebGUI::International::get(486,"Asset"),
-                -value=>$fieldInfo->{fieldType} || "text",
+	$f->readOnly(
+		-value=>$fid,
+		-label=>WebGUI::International::get('Field Id','Asset'),
+	);
+	$f->text(
+		-name=>"fieldName",
+		-label=>WebGUI::International::get('Field name','Asset'),
+		-value=>$fieldInfo->{fieldName}
+	);
+	$f->textarea(
+		-name=>"description",
+		-label=>WebGUI::International::get(85,"Asset"),
+		-value=>$fieldInfo->{description});
+	$f->fieldType(
+		-name=>"fieldType",
+		-label=>WebGUI::International::get(486,"Asset"),
+		-value=>$fieldInfo->{fieldType} || "text",
 		-types=> [ qw /text integer yesNo selectList radioList/ ]
-                );
-	$f->textarea("possibleValues",WebGUI::International::get(487,"Asset"),$fieldInfo->{possibleValues});
-        $f->submit();
+	);
+	$f->textarea(
+		-name=>"possibleValues",
+		-label=>WebGUI::International::get(487,"Asset"),
+		-value=>$fieldInfo->{possibleValues}
+	);
+	$f->submit();
 	$ac->setHelp("metadata edit property","Asset");
 	return $ac->render($f->print, WebGUI::International::get('Edit Metadata',"Asset"));
 }

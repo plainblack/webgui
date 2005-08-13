@@ -161,7 +161,7 @@ sub getNamespaceSize {
         my $self = shift;
         my $expiresModifier = shift || 0;
         my $path = shift || $self->getNamespaceRoot;
-        my $filesRmaining;
+        my $filesRemaining = '0';
         if (opendir(DIR,$path)) {
                 my @files = readdir(DIR);
                 foreach my $file (@files) {
@@ -172,7 +172,7 @@ sub getNamespaceSize {
                                         if ($expires < time()+$expiresModifier) {
                                                 rmtree($path); 
                                         } else {
-                                                my (@attributes) = stat($self->getPath($filename));
+                                                my (@attributes) = stat($path.'/'.$file);
                                                 $filesRemaining += $attributes[7];
                                         }
                                 } else {
@@ -263,7 +263,7 @@ Returns statistic information about the caching system.
 =cut
 
 sub stats {
-        my $self = shift;
+	my $self = shift;
 	return $self->getNamespaceSize." bytes";
 }
 
