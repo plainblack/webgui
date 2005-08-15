@@ -8,6 +8,7 @@
  - Added some more exception handling to getAssetAdderLinks (mwilson)
  - fixed more arrayed Form parameters in www_editMetaDataField (mwilson)
  - fixed a bunch more errors in the new date field - (mwilson)
+ - fixed a fatal error in whatNext.pm (mwilson)
 
 
 6.7.0

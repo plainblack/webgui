@@ -80,6 +80,9 @@ sub definition {
 		name=>{
 			defaultValue=>"proceed"
 			},
+		options=>{
+			defaultValue=>{}
+			}
 		});
 	return $class->SUPER::definition($definition);
 }
