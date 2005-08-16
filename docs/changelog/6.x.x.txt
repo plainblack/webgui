@@ -2,6 +2,7 @@
  - Fixed a fatal error with Redirects
  - Fixed a fatal error in the date field in the new pluggable forms system.
  - Fixed a nasty logout bug.
+ - Fixed a formatting problem with the forum rich editor.
  - Fixed a fatal error in www_viewStatistics (mwilson)
  - Fixed some errors in FileCache.pm (mwilson)
  - Disabled killing of own session since it sometimes displays weird things
