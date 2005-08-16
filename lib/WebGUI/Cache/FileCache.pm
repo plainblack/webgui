@@ -161,7 +161,7 @@ sub getNamespaceSize {
         my $self = shift;
         my $expiresModifier = shift || 0;
         my $path = shift || $self->getNamespaceRoot;
-        my $filesRemaining = '0';
+        my $filesRemaining = 0;
         if (opendir(DIR,$path)) {
                 my @files = readdir(DIR);
                 foreach my $file (@files) {

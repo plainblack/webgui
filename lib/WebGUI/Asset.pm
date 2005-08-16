@@ -932,7 +932,7 @@ sub new {
 	my $revisionDate = shift;
 	unless ($revisionDate) {
 		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId="
-			.quote($assetId)." and status='approved' or tagId=".quote($session{scratch}{versionTag})." 
+			.quote($assetId)." and  (status='approved' or status='archived'  or tagId=".quote($session{scratch}{versionTag}).")
 			group by assetData.assetId order by assetData.revisionDate");
 	}
 	return undef unless ($revisionDate);
@@ -1053,7 +1053,7 @@ sub newByUrl {
 			where 
 				assetData.url=".quote($url)." and
 				(
-					assetData.status='approved' or
+					assetData.status='approved' or assetData.status='archived' or
 					assetData.tagId=".quote($session{scratch}{versionTag})."
 				)
 			group by
