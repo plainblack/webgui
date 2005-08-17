@@ -269,6 +269,17 @@ Any text string. Most likely will have been the Asset's name or title.
 sub fixUrl {
 	my $self = shift;
 	my $url = WebGUI::URL::urlize(shift);
+	my @badUrls = ($session{config}{extrasURL}, $session{config}{uploadsURL});
+	foreach my $badUrl (@badUrls) {
+		if ($badUrl =~ /^http/) {
+			$badUrl =~ s/^http.*\/(.*)$/$1/;
+		} else {
+			$badUrl =~ s/^\/(.*)/$1/;
+		}
+		if ($url =~ /^$badUrl/) {
+			$url = "_".$url;
+		}
+	}
 	if (length($url) > 250) {
 		$url = substr($url,220);
 	}

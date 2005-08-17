@@ -102,6 +102,7 @@ sub getOperations {
           'deleteGroupConfirm' => 'WebGUI::Operation::Group',
           'deleteGroupConfirm' => 'WebGUI::Operation::Group',
           'deleteGroupGrouping' => 'WebGUI::Operation::Group',
+          'editGroup' => 'WebGUI::Operation::Group',
           'editGroupSave' => 'WebGUI::Operation::Group',
           'listGroups' => 'WebGUI::Operation::Group',
           'emailGroup' => 'WebGUI::Operation::Group',

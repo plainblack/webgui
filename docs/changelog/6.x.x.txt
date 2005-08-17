@@ -15,6 +15,8 @@
    not get their properties copied from the previous revision.
  - Set the rich editor to use a bigger font by default if no style sheet
    specifically setting it was called.
+ - fix [ 1256549 ] Users are allowed to set url to extras or uploads
+ - fix [ 1262505 ] Unable to edit group info
 
 
 6.7.0
