@@ -26,7 +26,7 @@ WebGUI::Session::refreshUserInfo(3);
 
 WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
 fixForumRichEdit();
-fixMissingThreadIds();
+fixMissingThreadData();
 
 WebGUI::Session::close();
 
@@ -41,18 +41,22 @@ sub fixForumRichEdit {
 
 
 #-------------------------------------------------
-sub fixMissingThreadIds {
-        print "\tFixing missing thread ids.\n" unless ($quiet);
+sub fixMissingThreadData {
+        print "\tFixing missing thread data.\n" unless ($quiet);
 	my $sth = WebGUI::SQL->read("select assetId from Post where threadId=''");
 	while (my ($assetId) = $sth->array) {
-        	print $assetId."\t";
         	my $threadId = getThreadId($assetId);
-        	print $threadId."\n";
         	my $sql = "update Post set threadId=".quote($threadId)." where assetId=".quote($assetId);
-        	#print $sql."\n";
         	WebGUI::SQL->write($sql);
 	}
 	$sth->finish;
+my $sth = WebGUI::SQL->read("select assetId from assetData where ownerUserId=''");
+while (my ($assetId) = $sth->array) {
+        my ($userId, $viewGroup, $editGroup, $startDate, $endDate) = WebGUI::SQL->quickArray("select ownerUserId,groupIdView,groupIdEdit,startDate,endDate from assetData where assetId=".quote($assetId)." order by revisionDate asc limit 1");
+        my $sql = "update assetData set ownerUserId=".quote($userId).", groupIdView=".quote($viewGroup).", groupIdEdit=".quote($editGroup).", startDate=".quote($startDate).", endDate=".quote($endDate)." where assetId=".quote($assetId);
+        WebGUI::SQL->write($sql);
+}
+$sth->finish;
 }
 
 #-------------------------------------------------
