@@ -1,5 +1,7 @@
 my $toVersion = "6.7.1";
 
+$|=1; #disable output buffering
+
 use lib "../../lib";
 use File::Path;
 use Getopt::Long;
@@ -24,7 +26,7 @@ WebGUI::Session::refreshUserInfo(3);
 
 WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
 fixForumRichEdit();
-
+fixMissingThreadIds();
 
 WebGUI::Session::close();
 
@@ -38,3 +40,26 @@ sub fixForumRichEdit {
 }
 
 
+#-------------------------------------------------
+sub fixMissingThreadIds {
+        print "\tFixing missing thread ids.\n" unless ($quiet);
+	my $sth = WebGUI::SQL->read("select assetId from Post where threadId=''");
+	while (my ($assetId) = $sth->array) {
+        	print $assetId."\t";
+        	my $threadId = getThreadId($assetId);
+        	print $threadId."\n";
+        	my $sql = "update Post set threadId=".quote($threadId)." where assetId=".quote($assetId);
+        	#print $sql."\n";
+        	WebGUI::SQL->write($sql);
+	}
+	$sth->finish;
+}
+
+#-------------------------------------------------
+sub getThreadId {
+        my $assetId = shift;
+        my ($parentId, $className) = WebGUI::SQL->quickArray("select parentId, className from asset where assetId=".quote($assetId));
+        return $assetId if ($className eq 'WebGUI::Asset::Post::Thread');
+        return undef if ($parentId eq 'PBasset000000000000001');
+        return getThreadId($parentId);
+}
