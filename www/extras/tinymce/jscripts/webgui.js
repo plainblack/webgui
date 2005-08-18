@@ -14,7 +14,8 @@ function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
 
 function tinyMCE_WebGUI_Cleanup(type,value) {
 //	alert(value);
-	if (value != "[object HTMLBodyElement]") {
+//	return value;
+	if (value != "[object HTMLBodyElement]" && value != "[object]") {
 		value = value.replace(new RegExp("&quot;", "g"),"\"");
 	}
 	return value;

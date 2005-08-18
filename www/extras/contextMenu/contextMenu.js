@@ -1,8 +1,8 @@
 var ie5=document.all&&document.getElementById
 var contextMenu_items = new Array();
 
-var contextMenu_old = (document.onmousedown) ? document.onmousdown : function () {};
-document.onmousedown= function () {contextMenu_old();contextMenu_hide();};
+var contextMenu_old = (document.onclick) ? document.onclick : function () {};
+document.onclick= function () {contextMenu_old();contextMenu_hide();};
 
 function contextMenu_renderLeftClick(menuId,e) {
 	contextMenu_hide(e);

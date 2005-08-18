@@ -18,6 +18,9 @@
  - fix [ 1256549 ] Users are allowed to set url to extras or uploads
  - fix [ 1262505 ] Unable to edit group info
  - Added the missing export toolbar icon.
+ - Fixed the context menus that were unclickable.
+ - Fixed a problem with the rich editor in Internet Explorer that caused it
+   not to save new content.
  - fix [ 1261789 ] fixed(?) can't edit collaboration (Collaboration.pm) (andreasg)
 
 

@@ -1445,8 +1445,6 @@ sub www_manageAssets {
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
                 contextMenu.addLink("'.$child->getUrl("func=createShortcut&proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
-                contextMenu.addLink("'.$child->getUrl("func=promote").'","'.$i18n->get("promote").'");
-                contextMenu.addLink("'.$child->getUrl("func=demote").'","'.$i18n->get("demote").'");
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
 		my $title = $child->getTitle;

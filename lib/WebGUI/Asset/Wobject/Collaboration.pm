@@ -979,7 +979,7 @@ sub www_search {
 	$self->appendTemplateLabels(\%var);
         $var{doit} = $session{form}{doit};
         if ($session{form}{doit}) {
-                my @fieldsToSearch = qw(asset.title asset.synopsis Post.content Post.username Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5);
+                my @fieldsToSearch = qw(assetData.title assetData.synopsis Post.content Post.username Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5);
 		my $all;
 		if ($session{scratch}{$self->getId."_all"} ne "") {
 			$session{scratch}{$self->getId."_all"} =~ s/,/ /g;
