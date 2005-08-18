@@ -813,6 +813,7 @@ sub getToolbar {
         $toolbar .= cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
+	$toolbar .= exportIcon('func=export',$self->get("url")) if defined ($session{config}{exportPath});
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	my $i18n = WebGUI::International->new("Asset");

@@ -17,6 +17,7 @@
    specifically setting it was called.
  - fix [ 1256549 ] Users are allowed to set url to extras or uploads
  - fix [ 1262505 ] Unable to edit group info
+ - Added the missing export toolbar icon.
 
 
 6.7.0
