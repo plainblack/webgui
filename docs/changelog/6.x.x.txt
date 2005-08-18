@@ -22,6 +22,9 @@
  - Fixed a problem with the rich editor in Internet Explorer that caused it
    not to save new content.
  - fix [ 1261789 ] fixed(?) can't edit collaboration (Collaboration.pm) (andreasg)
+ - fix [ 1262239 ] Error when searching discussion
+ - fix [ 1253545 ] moving wobjects around in a Layout doesn't spawn revisions
+ - fix [ 1262991 ] runHourly fails on asset.assetData
 
 
 6.7.0

@@ -1034,7 +1034,6 @@ sub www_search {
 		my $sql = "select asset.assetId, asset.className, max(assetData.revisionDate)
 			from asset
 			left join assetData on assetData.assetId=asset.assetId
-			left join Thread on Thread.assetId=assetData.assetId and assetData.revisionDate = Thread.revisionDate
 			left join Post on Post.assetId=assetData.assetId and assetData.revisionDate = Post.revisionDate
 			where (asset.className='WebGUI::Asset::Post' or asset.className='WebGUI::Asset::Post::Thread')
 				and asset.lineage  like ".quote($self->get("lineage").'%')."
@@ -1043,7 +1042,7 @@ sub www_search {
 					assetData.status in ('approved','archived')
 				 or assetData.tagId=".quote($session{scratch}{versionTag});
 		$sql .= "		or assetData.status='pending'" if ($self->canModerate);
-		$sql .= "		or (asset.ownerUserId=".quote($session{user}{userId})." and asset.ownerUserId<>'1')
+		$sql .= "		or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
 					) ";
 		$sql .= " and ($all) " if ($all ne "");
 		$sql .= " and " if ($sql ne "" && $exactPhrase ne "");

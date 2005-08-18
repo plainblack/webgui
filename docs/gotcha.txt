@@ -24,6 +24,9 @@ save you many hours of grief.
 	it has been split into two tables "asset" and "assetData" and
 	your SQL reports will need to change.
 
+ * The indexed search asset has been disabled until 6.8 where it will
+ 	be entirely rewritten from the ground up.
+
 
 6.6.4
 --------------------------------------------------------------------

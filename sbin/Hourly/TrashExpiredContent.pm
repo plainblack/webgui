@@ -22,7 +22,7 @@ sub process {
 	if ($offset ne "") {
 		my $epoch = time()-(86400*$offset);
 		my $sth = WebGUI::SQL->read("select asset.assetId,asset.className,max(assetData.revisionDate) from asset left join assetData on
-			asset.assetId=assetData.assetId where assetData.endDate<".$epoch." and assetData.status<>'pending' group by asset.assetData");
+			asset.assetId=assetData.assetId where assetData.endDate<".$epoch." group by assetData.assetId");
 		while (my ($assetId, $class, $version) = $sth->array) {
 			my $asset = WebGUI::Asset->new($assetId,$class,$version);
 			$asset->trash;

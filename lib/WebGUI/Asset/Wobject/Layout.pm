@@ -204,7 +204,7 @@ sub www_edit {
 sub www_setContentPositions {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	$self->update({
+	$self->addRevision({
 		contentPositions=>$session{form}{map}
 		});
 	return "Map set: ".$session{form}{map};

@@ -22,6 +22,8 @@ use WebGUI::Asset::Wobject::IndexedSearch::Search;
 
 #-------------------------------------------------------------------
 sub process {
+	#disabled until 6.8
+	return "";
 	my $indexName = 'IndexedSearch_default';
         my $htmlFilter = 'all';
         my $stopList = 'none';
