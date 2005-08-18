@@ -584,7 +584,7 @@ sub getEditForm {
 		-name=>"richEditor",
 		-label=>WebGUI::International::get('rich editor', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('rich editor description', 'Asset_Collaboration'),
-		-options=>WebGUI::SQL->buildHashRef("select assetId, title from asset where className='WebGUI::Asset::RichEdit' order by title"),
+		-options=>WebGUI::SQL->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title"),
 		-value=>[$self->getValue("richEditor")]
 		);
         $tabform->getTab("display")->yesNo(
