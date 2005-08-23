@@ -55,7 +55,7 @@ Dynamically creates functions on the fly for all the different form control type
 
 sub AUTOLOAD {
         our $AUTOLOAD;
-        my $name = (split /::/, $AUTOLOAD)[-1];
+        my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
 	my $fieldName = shift;
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
@@ -93,16 +93,15 @@ sub process {
 
 	my ($name, $type, $default) = @_;
 	my $value;
-	$type = "text" if ($type eq "");
+	$type = ucfirst($type);
+	$type = "Text" if ($type eq "");
 	$value = &$type($name);
-
 	unless (defined $value) {
 		return $default;
 	}
 	if ($value =~ /^[\s]+$/) {
 		return undef;
 	}
-
 	return $value;
 }
 

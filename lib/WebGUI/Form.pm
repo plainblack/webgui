@@ -64,7 +64,7 @@ Dynamically creates functions on the fly for all the different form control type
 
 sub AUTOLOAD {
 	our $AUTOLOAD;
-	my $name = (split /::/, $AUTOLOAD)[-1];
+	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);	
 	my @params = @_;
 	my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
@@ -124,11 +124,11 @@ The field options. See the documentation for the desired field for more informat
 =cut
 
 sub dynamicField {
-	my $fieldType = shift;
+	my $fieldType = ucfirst(shift);
 	my $param = shift;
 
         # Set options for fields that use a list.
-        if (isIn($fieldType,qw(selectList checkList radioList))) {
+        if (isIn($fieldType,qw(SelectList CheckList RadioList))) {
                 delete $param->{size};
                 my %options;
                 tie %options, 'Tie::IxHash';
@@ -142,7 +142,7 @@ sub dynamicField {
                 $param->{options} = \%options;
         }
         # Convert value to list for selectList / checkList
-        if (isIn($fieldType,qw(selectList checkList)) && ref $param->{value} ne "ARRAY") {
+        if (isIn($fieldType,qw(SelectList CheckList)) && ref $param->{value} ne "ARRAY") {
                 my @defaultValues;
                 foreach (split(/\n/, $param->{value})) {
                                 s/\s+$//; # remove trailing spaces
@@ -154,7 +154,6 @@ sub dynamicField {
 	# Return the appropriate field.
 	no strict 'refs';
 	return &$fieldType($param);
-
 }
 
 

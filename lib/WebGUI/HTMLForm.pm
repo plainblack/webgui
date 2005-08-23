@@ -119,7 +119,7 @@ Dynamically creates functions on the fly for all the different form control type
 sub AUTOLOAD {  
         our $AUTOLOAD;
 	my $self = shift;
-        my $name = (split /::/, $AUTOLOAD)[-1];
+        my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
         my %params = @_;
 	$params{uiLevelOverride} ||= $self->{_uiLevelOverride};
         my $cmd = "use WebGUI::Form::".$name;
@@ -167,7 +167,7 @@ The field options. See the documentation for the desired field for more informat
 
 sub dynamicField {
 	my $self = shift;
-	my $fieldType = shift;
+	my $fieldType = ucfirst(shift);
 	my %param = @_;
 	foreach my $key (keys %param) {		# strip off the leading minus sign in each parameter key.
 		$key=~/^-(.*)$/;
@@ -180,7 +180,7 @@ sub dynamicField {
                 $output .= _subtext($param{subtext});
                 $output = $self->_tableFormRow($param{label},$output,$param{hoverHelp});
         } else {
-                $output = WebGUI::Form::hidden({
+                $output = WebGUI::Form::Hidden({
                         "name"=>$param{name},
                         "value"=>$param{value},
 			"defaultValue"=>$param{defaultValue}

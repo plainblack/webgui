@@ -152,7 +152,7 @@ B<NOTE:> This uses the same syntax of the WebGUI::Form::hidden() method.
 sub hidden {
 	my $self = shift;
 	my $params = shift;
-	$self->{_hidden} .= WebGUI::Form::hidden($params);
+	$self->{_hidden} .= WebGUI::Form::Hidden($params);
 }
 
 
@@ -263,7 +263,7 @@ B<NOTE:> This uses the same syntax of the WebGUI::Form::submit() method.
 sub submit {
 	my $self = shift;
 	my $submit = shift;
-	$self->{_submit} = WebGUI::Form::submit($submit);
+	$self->{_submit} = WebGUI::Form::Submit($submit);
 }
 
 
