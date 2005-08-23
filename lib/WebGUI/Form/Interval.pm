@@ -117,13 +117,17 @@ sub toHtml {
                 'months'=>WebGUI::International::get(702),
                 'years'=>WebGUI::International::get(703));
         my ($interval, $units) = WebGUI::DateTime::secondsToInterval($self->{value});
-	my $out = WebGUI::Form::Integer->new(
+	# not sure why, but these things need to be defined like this or
+	# they fail under some circumstnaces 
+	my $cmd = "WebGUI::Form::Integer";
+	my $out = $cmd->new(
 		name=>$self->{name}."_interval",
 		value=>$interval,
 		extras=>$self->{extras},
 		id=>$self->{id}."_interval",
 		)->toHtml;
-	$out .= WebGUI::Form::SelectList->new(
+	$cmd = "WebGUI::Form::SelectList";
+	$out .= $cmd->new(
 		options=>\%units,
 		name=>$self->{name}."_units",
 		id=>$self->{id}."_units",

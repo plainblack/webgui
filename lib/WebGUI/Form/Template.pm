@@ -112,7 +112,10 @@ sub toHtml {
             		delete $templateList->{$assetId};
           	}
         }
-	my $selectList = WebGUI::Form::SelectList->new(
+	# not sure why, but for some reason this fails under certain circumstances unless defined
+	# in this manner. The syndicated content asset is an example where it fails.
+	my $cmd = "WebGUI::Form::SelectList";
+	my $selectList = $cmd->new(
 		id=>$self->{id},
 		name=>$self->{name},
 		options=>$templateList,
