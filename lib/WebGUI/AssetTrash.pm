@@ -96,6 +96,7 @@ Deletes an asset from tables and removes anything bound to that asset.
 
 sub purge {
 	my $self = shift;
+	return undef if ($self->getId eq $session{setting}{defaultPage} || $self->getId eq $session{setting}{notFoundPage});
 	WebGUI::SQL->beginTransaction;
 	foreach my $definition (@{$self->definition}) {
 		WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId));
@@ -120,6 +121,7 @@ Removes asset from lineage, places it in trash state. The "gap" in the lineage i
 
 sub trash {
 	my $self = shift;
+	return undef if ($self->getId eq $session{setting}{defaultPage} || $self->getId eq $session{setting}{notFoundPage});
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("update asset set state='trash-limbo' where lineage like ".quote($self->get("lineage").'%'));
 	WebGUI::SQL->write("update asset set state='trash', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId=".quote($self->getId));

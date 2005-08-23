@@ -1,8 +1,9 @@
 6.7.2
  - fix [ 1265788 ] SyndicatedContent *not working* in 6.7.x
-
+ - fix [ 1245765 ] Missing 'page not found' crashes settings
 
 6.7.1
+ - fix [ 1206046 ] function tinyMCE_WebGUI_Cleanup don't work
  - Fixed a fatal error with Redirects
  - Fixed a fatal error in the date field in the new pluggable forms system.
  - Fixed a nasty logout bug.

@@ -49,6 +49,7 @@ Removes asset from lineage, places it in clipboard state. The "gap" in the linea
 
 sub cut {
 	my $self = shift;
+	return undef if ($self->getId eq $session{setting}{defaultPage} || $self->getId eq $session{setting}{notFoundPage});
 	WebGUI::SQL->beginTransaction;
 	WebGUI::SQL->write("update asset set state='clipboard-limbo' where lineage like ".quote($self->get("lineage").'%')." and state='published'");
 	WebGUI::SQL->write("update asset set state='clipboard', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId=".quote($self->getId));
