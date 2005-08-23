@@ -69,7 +69,8 @@ sub getPackageList {
 			assetData.title desc
 			");
 	while (my ($id, $date, $class) = $sth->array) {
-		push(@assets, WebGUI::Asset->new($id,$class,$date));
+		my $asset = WebGUI::Asset->new($id,$class);
+		push(@assets, $asset) if ($asset->get("isPackage"));
 	}
 	$sth->finish;
 	return \@assets;

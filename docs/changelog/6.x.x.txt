@@ -10,8 +10,13 @@
  - fix [ 1225432 ] plainblack.com: print is broken
  - fix [ 1249882 ] Make page printable in RWG broken
  - fix [ 1255313 ] r_printable includes index.pl sometimes
+ - fix [ 1248006 ] Spell check create.sql
+ - fix [ 1248040 ] plainblack forum search not showing dates
+ - fix [ 1265771 ] assets that were formerly packages are still on packageList
+
 
 6.7.1
+ - fix [ 1251608 ] can't login
  - fix [ 1206046 ] function tinyMCE_WebGUI_Cleanup don't work
  - Fixed a fatal error with Redirects
  - Fixed a fatal error in the date field in the new pluggable forms system.
