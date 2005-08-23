@@ -119,6 +119,8 @@ sub process {
 	$var{'head.tags'} = '
 		<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Content-Script-Type" content="text/javascript" />
+		<meta http-equiv="Content-Style-Type" content="text/css" />
                 <script type="text/javascript">
                         function getWebguiProperty (propName) {
                                 var props = new Array();

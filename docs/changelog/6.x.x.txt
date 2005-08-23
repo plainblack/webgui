@@ -4,6 +4,12 @@
  - fix [ 1263934 ] 6.6.5 Import Scripts Asset URLs
  - fix [ 1260760 ] Default endDate in asset table too high for FreeBSD
  - fix [ 1249486 ] default script language is not declared
+ - fix [ 1164205 ] TinyMCE files not found by Apache 
+ - fix [ 1038289 ] Performance problems with 6.2
+ - fix [ 1236961 ] Admin bar broken on IE under XHTML Transitional DTD
+ - fix [ 1225432 ] plainblack.com: print is broken
+ - fix [ 1249882 ] Make page printable in RWG broken
+ - fix [ 1255313 ] r_printable includes index.pl sometimes
 
 6.7.1
  - fix [ 1206046 ] function tinyMCE_WebGUI_Cleanup don't work

@@ -68,11 +68,22 @@ These functions are available from this package:
 
 sub epochToDate {
 	my $secs	= shift;
-	return &ParseDateString("epoch $secs");
+	my $cache = WebGUI::Cache->new(["epochToDate",$secs],"DateTime");
+	my $value = $cache->get;
+	return $value if ($value);
+	my $converted = &ParseDateString("epoch $secs");
+	$cache->set($converted);
+	return $converted;
 }
 
 sub dateToEpoch {
-	return &UnixDate(shift,"%s");
+	my $date = shift;
+	my $cache = WebGUI::Cache->new(["dateToEpoch",$date],"DateTime");
+	my $value = $cache->get;
+	return $value if ($value);
+	my $converted = &UnixDate($date,"%s");
+	$cache->set($converted);
+	return $converted;
 }
 
 

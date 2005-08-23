@@ -26,7 +26,9 @@ sub process {
 	if ($session{env}{REQUEST_URI} =~ /op\=/) {
 		$append = 'op2='.WebGUI::URL::escape($append);
 	}
-        $temp = WebGUI::URL::append($session{env}{REQUEST_URI},$append);
+	$temp = WebGUI::URL::gateway($session{env}{PATH_INFO},$append);
+        $temp =~ s/\/\//\//;
+        $temp = WebGUI::URL::append($temp,$session{env}{QUERY_STRING});
 	if ($param[1] ne "") {
 		$temp = WebGUI::URL::append($temp,'styleId='.$param[1]);
 	}

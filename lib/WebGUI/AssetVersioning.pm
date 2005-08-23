@@ -60,7 +60,7 @@ sub addRevision {
 	my $status = $session{setting}{autoCommit} ? 'approved' : 'pending';
 	WebGUI::SQL->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
 		ownerUserId, groupIdEdit, groupIdView) values (".quote($self->getId).",".$now.", ".quote($session{user}{userId}).", 
-		".quote($versionTag).", ".quote($status).", ".quote($self->getId).", 997995720, 9223372036854775807,'3','3','7')");
+		".quote($versionTag).", ".quote($status).", ".quote($self->getId).", 997995720, 32472169200,'3','3','7')");
         foreach my $definition (@{$self->definition}) {
                 unless ($definition->{tableName} eq "assetData") {
                         WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".quote($self->getId).",".$now.")");
