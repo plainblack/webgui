@@ -1,6 +1,7 @@
 6.7.2
  - fix [ 1265788 ] SyndicatedContent *not working* in 6.7.x
- - fix [ 1245765 ] Missing 'page not found' crashes settings
+ - fix [ 1245765 ] Missing 'page not found' crashes settings 
+ - fix [ 1263934 ] 6.6.5 Import Scripts Asset URLs
 
 6.7.1
  - fix [ 1206046 ] function tinyMCE_WebGUI_Cleanup don't work

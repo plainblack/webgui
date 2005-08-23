@@ -283,7 +283,10 @@ sub fixUrl {
 	if (length($url) > 250) {
 		$url = substr($url,220);
 	}
-	if ($session{setting}{urlExtension} ne "" && !($url =~ /\./)) {
+	if ($session{setting}{urlExtension} ne "" #don't add an extension if one isn't set
+		&& !($url =~ /\./) #don't add an extension of the url already contains a dot
+		&& $self->get("url") eq $self->getId # only add it if we're creating a new url
+		) {
 		$url .= ".".$session{setting}{urlExtension};
 	}
 	my ($test) = WebGUI::SQL->quickArray("select url from assetData where assetId<>".quote($self->getId)." and url=".quote($url));
