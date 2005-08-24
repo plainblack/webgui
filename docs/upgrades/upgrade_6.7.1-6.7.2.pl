@@ -21,6 +21,8 @@ WebGUI::Session::open("../..",$configFile);
 WebGUI::Session::refreshUserInfo(3);
 
 WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
+WebGUI::SQL->write("update DataForm_field set type=".quote('TimeField')." where type=".quote('time'));
+WebGUI::SQL->write("update userProfileField set dataType=".quote('TimeField')." where dataType=".quote('time'));
 fixSpelling();
 fixCSTemplate();
 
