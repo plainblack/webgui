@@ -17,7 +17,7 @@ package WebGUI::Form::Date;
 use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::DateTime;
-use WebGUI::Form::text;
+use WebGUI::Form::Text;
 use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::Style;

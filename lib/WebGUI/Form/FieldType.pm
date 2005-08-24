@@ -139,7 +139,7 @@ sub toHtml {
 	my $self = shift;
 	my %options;
 	foreach my $type (@{$self->{types}}) {
-		my $class = "WebGUI::Form::".$type;
+		my $class = "WebGUI::Form::".ucfirst($type);
 		my $cmd = "use ".$class;
         	eval ($cmd);    
         	if ($@) { 

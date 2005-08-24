@@ -1,4 +1,5 @@
 6.7.2
+ - fix [ 1268605 ] field type selection broken (midellaq)
  - fix [ 1267548 ] can't add metadata field (midellaq) 
  - fix [ 1265788 ] SyndicatedContent *not working* in 6.7.x
  - fix [ 1245765 ] Missing 'page not found' crashes settings 
