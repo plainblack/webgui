@@ -24,6 +24,8 @@ use WebGUI::Utility;
 sub _get {
 	my $id = shift;
 	my $namespace = shift;
+	$namespace =~ s/[^\w\d\s]//g;
+	$id =~ s/[^\w\d\s\/]//g;
 	my $cmd = "WebGUI::Help::".$namespace;
         my $load = "use ".$cmd;
         eval($load);
