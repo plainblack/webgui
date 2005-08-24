@@ -819,7 +819,7 @@ sub www_editField {
 		-label=>WebGUI::International::get(23,"Asset_DataForm"),
 		-hoverHelp=>WebGUI::International::get('23 description',"Asset_DataForm"),
 		-value=>$field{type} || "text",
-		-types=>[qw(dateTime time float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList)]
+		-types=>[qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList)]
 		);
 	$f->integer(
 		-name=>"width",
