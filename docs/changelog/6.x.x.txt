@@ -14,7 +14,7 @@
  - fix [ 1248006 ] Spell check create.sql
  - fix [ 1248040 ] plainblack forum search not showing dates
  - fix [ 1265771 ] assets that were formerly packages are still on packageList
-
+ - fix [ 1177447 ] deployPackage does not retain content pos. (mwilson)
 
 6.7.1
  - fix [ 1251608 ] can't login
