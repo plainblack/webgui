@@ -652,7 +652,7 @@ sub getEditForm {
                 	$tabform->getTab("meta")->readOnly(
                                         -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField&fid=new").'">'.
                                                         WebGUI::International::get('Add new field','Asset').
-                                                        '</a></p>'
+                                                        '</a></p>',
                                         -hoverHelp=>WebGUI::International::get('make prototype description',"Asset"),
                 	);
 		}
