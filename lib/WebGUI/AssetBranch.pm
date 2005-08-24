@@ -53,9 +53,17 @@ sub duplicateBranch {
 	my $self = shift;
 	my $assetToDuplicate = shift || $self;
 	my $newAsset = $self->duplicate($assetToDuplicate);
+	my $contentPositions;
+	$contentPositions = $assetToDuplicate->get("contentPositions");
 	foreach my $child (@{$assetToDuplicate->getLineage(["children"],{returnObjects=>1})}) {
-		$newAsset->duplicateBranch($child);
+		my $newChild = $newAsset->duplicateBranch($child);
+		if ($contentPositions) {
+			my $newChildId = $newChild->getId;
+			my $oldChildId = $child->getId;
+			$contentPositions =~ s/${oldChildId}/${newChildId}/g;
+		}
 	}
+	$newAsset->update({contentPositions=>$contentPositions}) if $contentPositions;
 	return $newAsset;
 }
 

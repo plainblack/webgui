@@ -67,10 +67,8 @@ sub _formatFunction {
 	my $url;
 	if (exists $function->{func}) {
 		$url = WebGUI::URL::page("func=".$function->{func});
-		$url = '#' if $session{form}{func} eq $function->{func};
 	} else {
 		$url = WebGUI::URL::page("op=".$function->{op});
-		$url = '#' if $session{form}{op} eq $function->{op};
 	}
 	return {
 		title=>WebGUI::International::get($function->{title}{id}, $function->{title}{namespace}),
