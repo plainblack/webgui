@@ -33,7 +33,8 @@
  - fix [ 1240899 ] File Upload Control strangeness in IE under XHTML
  - fix [ 1208496 ] Link to a page in WebGUI broken on IE - Done button broken.
  - fix [ 1264301 ] HTML Link in text editor broken
-
+ - Removed the positive options for Navigations with start points relative to
+   the current URL since they didn't make any sense.
 
 
 6.7.1
