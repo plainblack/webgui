@@ -94,6 +94,10 @@ sub page {
 			my $method = "view";
 			if (exists $session{form}{func}) {
 				$method = $session{form}{func};
+				unless ($method =~ /^[A-Za-z]+$/) {
+					WebGUI::ErrorHandler::security("tried to call a non-existent method $method on $assetUrl");
+					$method = "view";
+				}
 			}
 			$method = "www_".$method;
 			$output = eval{$asset->$method()};
