@@ -44,10 +44,10 @@ sub getRequiredProfileFields {
     while($data = $a->hashRef) {
 	   my %hash = ();
        $method = $data->{dataType};
-       $label = eval $data->{fieldLabel};
-	   $default = eval $data->{dataDefault};
+       $label = WebGUI::Operation::Shared::secureEval($data->{fieldLabel});
+	   $default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
 	   if ($method eq "selectList") {
-          $values = eval $data->{dataValues};
+          $values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
 		  # note: this big if statement doesn't look elegant, but doing regular ORs caused problems with the array reference.
           if ($session{form}{$data->{fieldName}}) {
              $default = [$session{form}{$data->{fieldName}}];
@@ -116,7 +116,7 @@ sub validateProfileData {
    while (%field = $a->hash) {
       $data{$field{fieldName}} = WebGUI::Macro::negate(WebGUI::FormProcessor::process($field{fieldName},$field{dataType}, $field{dataDefault}));
 	  if ($field{required} && $data{$field{fieldName}} eq "") {
-	     $error .= '<li>'.(eval $field{fieldLabel}).' '.WebGUI::International::get(451).'</li>';
+	     $error .= '<li>'.(WebGUI::Operation::Shared::secureEval($field{fieldLabel})).' '.WebGUI::International::get(451).'</li>';
 	  }elsif($field{fieldName} eq "email" && isDuplicateEmail($data{$field{fieldName}})){
 		 $warning .= '<li>'.WebGUI::International::get(1072).'</li>';
 	  }
@@ -145,13 +145,13 @@ sub www_editProfile {
    while($data = $a->hashRef) {
        $counter++;
 	   my %hash = ();
-	   $category = eval $data->{categoryName};
+	   $category = WebGUI::Operation::Shared::secureEval($data->{categoryName});
        $method = $data->{dataType};
-       $label = eval $data->{fieldLabel};
-	   $default = eval $data->{dataDefault};
+       $label = WebGUI::Operation::Shared::secureEval($data->{fieldLabel});
+	   $default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
 	   
                 if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
-          		$values = eval $data->{dataValues};
+          		$values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
                         my $orderedValues = {};
                         tie %{$orderedValues}, 'Tie::IxHash';
                         foreach my $ov (sort keys %{$values}) {
@@ -231,16 +231,16 @@ sub www_viewProfile {
 		and userProfileCategory.visible=1 and userProfileField.visible=1 order by userProfileCategory.sequenceNumber,
 		userProfileField.sequenceNumber",WebGUI::SQL->getSlave);
     while (%data = $a->hash) {
-	   $category = eval $data{categoryName};
+	   $category = WebGUI::Operation::Shared::secureEval($data{categoryName});
        if ($category ne $previousCategory) {
           my $header;
 		  $header->{'profile.category'} = $category;
 		  push(@array,$header);
        }
 	   
-	   $label = eval $data{fieldLabel};
+	   $label = WebGUI::Operation::Shared::secureEval($data{fieldLabel});
 	   if ($data{dataValues}) {
-	      $value = eval $data{dataValues};
+	      $value = WebGUI::Operation::Shared::secureEval($data{dataValues});
 		  $value = ${$value}{$u->profileField($data{fieldName})};
 	   } else {
 		  $value = $u->profileField($data{fieldName});

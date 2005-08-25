@@ -18,6 +18,7 @@ use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
+use Safe;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&menuWrapper);
@@ -95,6 +96,38 @@ sub userStyle {
 	}
 }
 
+#-------------------------------------------------------------------
+# This function is here to replace the dangerous eval calls in the User Profile System.
+sub secureEval {
+	my $code = shift;
+
+	# Handle WebGUI function calls
+	my %trusted = (
+		'WebGUI::International::get' => sub {WebGUI::International::get(@_)},
+		'WebGUI::International::getLanguages' => sub { WebGUI::International::getLanguages(@_) },
+		'WebGUI::DateTime::epochToHuman' => sub { WebGUI::DateTime::epochToHuman(@_) },
+		'WebGUI::Icon::getToolbarOptions' => sub { WebGUI::Icon::getToolbarOptions(@_) },		
+	);
+	foreach my $function (keys %trusted ) {
+		while ($code =~ /($function\(([^)]*)\)\s*;*)/g) {
+			my $cmd = $1;
+			my @param = split (/,/,$2);
+			@param = map { s/^['"]|['"]$//g; $_; } @param;
+			my $output = $trusted{$function}(@param);
+			return $output if (ref $output);	
+			$code =~ s/\Q$cmd/'$output'/g;
+		}
+	}
+	
+	# Execute simple perl code like ['English'] for default value.
+	# Inside the Safe compartment there's no WebGUI available
+	my $compartment = new Safe;
+	my $eval = $compartment->reval($code);
+	if ($eval) {
+		return $eval;
+	} 
+	return $code;
+}
 
 
 1;

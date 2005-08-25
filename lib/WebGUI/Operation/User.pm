@@ -280,13 +280,13 @@ sub www_editUser {
                 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
 	my $previousCategory;
         while(my %data = $a->hash) {
-              	my $category = eval $data{categoryName};
+              	my $category = WebGUI::Operation::Shared::secureEval($data{categoryName});
                 if ($category ne $previousCategory) {
                       	$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
                 }
-                my $values = eval $data{dataValues};
+                my $values = WebGUI::Operation::Shared::secureEval($data{dataValues});
                 my $method = $data{dataType};
-                my $label = eval $data{fieldLabel};
+                my $label = WebGUI::Operation::Shared::secureEval($data{fieldLabel});
 		my $default;
                 if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
                         my $orderedValues = {};
@@ -299,7 +299,7 @@ sub www_editUser {
                         } elsif (defined $u->profileField($data{fieldName}) && (defined($values->{$u->profileField($data{fieldName})}))) {
                                 $default = [$u->profileField($data{fieldName})];
                         } else {
-                                $default = eval $data{dataDefault};
+                                $default = WebGUI::Operation::Shared::secureEval($data{dataDefault});
                         }
                  	$tabform->getTab("profile")->$method(
 				-name=>$data{fieldName},
@@ -313,7 +313,7 @@ sub www_editUser {
                         } elsif (defined $u->profileField($data{fieldName})) {
                                 $default = $u->profileField($data{fieldName});
                         } else {
-                                $default = eval $data{dataDefault};
+                                $default = WebGUI::Operation::Shared::secureEval($data{dataDefault});
                         }
                         $tabform->getTab("profile")->$method(
 				-name=>$data{fieldName},
