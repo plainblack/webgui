@@ -726,30 +726,6 @@ sub rate {
 	}
 }
 
-#-------------------------------------------------------------------
-
-=head2 setLastPost ( id, date )
-
-Sets the last reply of this thread.
-
-=head3 id
-
-The assetId of the most recent post.
-
-=head3 date
-
-The date of the most recent post.
-
-=cut
-
-sub setLastPost {
-        my $self = shift;
-        my $id = shift;
-        my $date = shift;
-        $self->update(lastPostId=>$id, lastPostDate=>$date);
-        $self->getParent->setLastPost($id,$date);
-}
-
 
 #-------------------------------------------------------------------
 
@@ -853,7 +829,7 @@ sub trash {
         $self->getThread->decrementReplies if ($self->isReply);
         if ($self->getThread->get("lastPostId") eq $self->getId) {
                 my $threadLineage = $self->getThread->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($threadLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId order by Post.dateSubmitted desc");
+                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($threadLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
                 $self->getThread->setLastPost($id,$date);
         }
 }

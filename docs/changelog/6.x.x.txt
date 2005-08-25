@@ -18,6 +18,7 @@
  - fix [ 1265771 ] assets that were formerly packages are still on packageList
  - fix [ 1177447 ] deployPackage does not retain content pos. (mwilson)
  - fix [ 1256718 ] Assets disappear after changing page layout (mwilson)
+ - fix [ 1267326 ] LastPost varibale not updating correctly in Msg Board
  - fix [ 1262002 ] no "next Thread" or "previous Thread" links (mwilson)
  - fix [ 1252626 ] navigation relative to current url broken (mwilson)
  - fix [ 1261994 ] getLineageLength (mwilson)

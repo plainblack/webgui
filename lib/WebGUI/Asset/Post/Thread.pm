@@ -467,6 +467,31 @@ sub rate {
 
 #-------------------------------------------------------------------
 
+=head2 setLastPost ( id, date )
+
+Sets the last reply of this thread.
+
+=head3 id
+
+The assetId of the most recent post.
+
+=head3 date
+
+The date of the most recent post.
+
+=cut
+
+sub setLastPost {
+        my $self = shift;
+        my $id = shift;
+        my $date = shift;
+        $self->update({lastPostId=>$id, lastPostDate=>$date});
+        $self->getParent->setLastPost($id,$date);
+}
+
+
+#-------------------------------------------------------------------
+
 =head setParent ( newParent ) 
 
 We're overloading the setParent in Asset because we don't want threads to be able to be posted to anything other than other collaboration systems.
@@ -542,7 +567,7 @@ sub trash {
         $self->getParent->decrementThreads;
         if ($self->getParent->get("lastPostId") eq $self->getId) {
                 my $parentLineage = $self->getThread->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($parentLineage.'%')." and Post.assetId<>".quote($self->getId)." and Post.assetId=asset.assetId order by Post.dateSubmitted desc");
+                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($parentLineage.'%')." and Post.assetId<>".quote($self->getId)." and Post.assetId=asset.assetId and asset.state='published' order by Post.dateSubmitted desc");
                 $self->getParent->setLastPost('','') ? $self->getParent->setLastPost($id,$date) : $id;
         }
 }
