@@ -115,8 +115,8 @@ sub definition {
 sub DESTROY {
 	my $self = shift;
 	return unless defined $self;
-	$self->{_next}->DESTROY if (exists $self->{_next});
-	$self->{_previous}->DESTROY if (exists $self->{_previous});
+	$self->{_next}->DESTROY if (defined $self->{_next});
+	$self->{_previous}->DESTROY if (defined $self->{_previous});
 	$self->SUPER::DESTROY;
 }
 
@@ -177,9 +177,9 @@ Returns a thread object for the next (newer) thread in the same forum.
 
 sub getNextThread {
 	my $self = shift;
-        unless (exists $self->{_next}) {
+        unless (defined $self->{_next}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		my ($id, $class, $version) = WebGUI::SQL->quickHashRef("
+		my ($id, $class, $version) = WebGUI::SQL->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
@@ -197,8 +197,8 @@ sub getNextThread {
 				group by assetData.assetId
 				order by ".$sortBy." asc 
 				",WebGUI::SQL->getSlave);
-		$self->{_next} = WebGUI::Asset::Post->new($id,$class,$version);
-		delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
+		$self->{_next} = WebGUI::Asset->new($id,$class,$version);
+	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_next};
 }
@@ -215,9 +215,9 @@ Returns a thread object for the previous (older) thread in the same forum.
 
 sub getPreviousThread {
 	my $self = shift;
-        unless (exists $self->{_previous}) {
+        unless (defined $self->{_previous}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		my ($id, $class, $version) = WebGUI::SQL->quickHashRef("
+		my ($id, $class, $version) = WebGUI::SQL->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
@@ -234,8 +234,8 @@ sub getPreviousThread {
 						)
 				group by assetData.assetId
 				order by ".$sortBy." desc, assetData.revisionDate desc ",WebGUI::SQL->getSlave);
-		$self->{_previous} = WebGUI::Asset::Post->new($id,$class,$version);
-		delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
+		$self->{_previous} = WebGUI::Asset::Post::Thread->new($id,$class,$version);
+	#	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_previous};
 }
