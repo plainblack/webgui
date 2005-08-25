@@ -317,8 +317,8 @@ sub view {
 	} elsif ($self->get("startType") eq "relativeToCurrentUrl") {
 		if ($self->get("startPoint") < 0) { 
 			$start = WebGUI::Asset->newByLineage(substr($current->get("lineage"),0,
-				($current->getLineageLength + $self->get("startPoint") + 1) * 6
-				));
+				($current->getLineageLength - $self->get("startPoint") + 1) * 6))
+					if (($current->getLineageLength - $self->get("startPoint") + 1) * 6);
 		} elsif ($self->get("startPoint") > 0) { 
 			my $lineage = $current->get("lineage");
 			for (1..$self->get("startPoint")) {

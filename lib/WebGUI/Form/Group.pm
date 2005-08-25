@@ -165,7 +165,7 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
         my $self = shift;
-        return WebGUI::Form::hiddenList->new(
+        return WebGUI::Form::HiddenList->new(
                 value=>$self->{value},
                 defaultValue=>$self->{defaultValue},
                 name=>$self->{name},
