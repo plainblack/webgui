@@ -42,7 +42,7 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help, 'Subscription');
         }
-	$ac->addSubmenuItem(WebGUI::URL::page('op=editSubscription&sid=new'), $i18n->get('add subscription'));
+	$ac->addSubmenuItem(WebGUI::URL::page('op=editSubscription;sid=new'), $i18n->get('add subscription'));
 	$ac->addSubmenuItem(WebGUI::URL::page('op=createSubscriptionCodeBatch'), $i18n->get('generate batch')); 
 	$ac->addSubmenuItem(WebGUI::URL::page('op=listSubscriptionCodes'), $i18n->get('manage codes'));
 	$ac->addSubmenuItem(WebGUI::URL::page('op=listSubscriptionCodeBatches'), $i18n->get('manage batches'));
@@ -282,9 +282,9 @@ sub www_listSubscriptionCodeBatches {
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach (@{$batches}) {
 		$output .= '<tr><td>';		
-		$output .= deleteIcon('op=deleteSubscriptionCodeBatch&bid='.$_->{batchId}, undef, $i18n->get('delete batch confirm'));
+		$output .= deleteIcon('op=deleteSubscriptionCodeBatch;bid='.$_->{batchId}, undef, $i18n->get('delete batch confirm'));
 		$output .= '<td>'.$_->{description}.'</td>';
-		$output .= '<td><a href="'.WebGUI::URL::page('op=listSubscriptionCodes&selection=b&bid='.$_->{batchId}).'">'.$i18n->get('list codes in batch').'</a></td>';
+		$output .= '<td><a href="'.WebGUI::URL::page('op=listSubscriptionCodes;selection=b;bid='.$_->{batchId}).'">'.$i18n->get('list codes in batch').'</a></td>';
 		$output .= '</tr>';
 	}
 	$output .= '</table>';
@@ -333,15 +333,15 @@ sub www_listSubscriptionCodes {
 	
 	if ($session{form}{selection} eq 'du') {
 		$where = " and dateUsed >= ".quote($duStart)." and dateUsed <= ".quote($duStop);
-		$ops = '&duStart='.$duStart.'&duStop='.$duStop.'&selection=du';
+		$ops = ';duStart='.$duStart.';duStop='.$duStop.';selection=du';
 		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodes'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} elsif ($session{form}{selection} eq 'dc') {
 		$where = " and dateCreated >= ".quote($dcStart)." and dateCreated <= ".quote($dcStop);
-		$ops = '&dcStart='.$dcStart.'&dcStop='.$dcStop.'&selection=dc';
+		$ops = ';dcStart='.$dcStart.';dcStop='.$dcStop.';selection=dc';
 		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodes'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} elsif ($session{form}{selection} eq 'b') {
 		$where = " and t1.batchId=".quote($session{form}{bid});
-		$ops = '&bid='.$session{form}{bid}.'&selection=b';
+		$ops = ';bid='.$session{form}{bid}.';selection=b';
 		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} else {
 		return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
@@ -391,8 +391,8 @@ sub www_listSubscriptions {
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach (@{$subscriptions}) {
 		$output .= '<tr>';
-		$output .= '<td>'.editIcon('op=editSubscription&sid='.$_->{subscriptionId});
-		$output .= deleteIcon('op=deleteSubscription&sid='.$_->{subscriptionId}, undef, $i18n->get('delete subscription confirm')).'</td>';
+		$output .= '<td>'.editIcon('op=editSubscription;sid='.$_->{subscriptionId});
+		$output .= deleteIcon('op=deleteSubscription;sid='.$_->{subscriptionId}, undef, $i18n->get('delete subscription confirm')).'</td>';
 		$output .= '<td>'.$_->{name}.'</td>';
 		$output .= '</tr>';
 	}

@@ -36,13 +36,13 @@ sub _submenu {
    }
    my $returnUrl = "";
    if($session{form}{returnUrl}) {
-      $returnUrl = "&returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
+      $returnUrl = ";returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
    }
-   $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink&llid=new'.$returnUrl), WebGUI::International::get("LDAPLink_982","AuthLDAP"));
+   $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink;llid=new'.$returnUrl), WebGUI::International::get("LDAPLink_982","AuthLDAP"));
    if ($session{form}{op} eq "editLDAPLink" && $session{form}{llid} ne "new") {
-      $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink&llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_983","AuthLDAP"));
-      $ac->addSubmenuItem(WebGUI::URL::page('op=copyLDAPLink&llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_984","AuthLDAP"));
-	  $ac->addSubmenuItem(WebGUI::URL::page('op=deleteLDAPLink&llid='.$session{form}{llid}), WebGUI::International::get("LDAPLink_985","AuthLDAP"));
+      $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink;llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_983","AuthLDAP"));
+      $ac->addSubmenuItem(WebGUI::URL::page('op=copyLDAPLink;llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_984","AuthLDAP"));
+	  $ac->addSubmenuItem(WebGUI::URL::page('op=deleteLDAPLink;llid='.$session{form}{llid}), WebGUI::International::get("LDAPLink_985","AuthLDAP"));
 	  $ac->addSubmenuItem(WebGUI::URL::page('op=listLDAPLinks'.$returnUrl), WebGUI::International::get("LDAPLink_986","AuthLDAP"));
    }
    return $ac->render($workarea, $title);
@@ -212,16 +212,16 @@ sub www_listLDAPLinks {
    my ($output, $p, $sth, $data, @row, $i);
    my $returnUrl = "";
    if($session{form}{returnUrl}) {
-      $returnUrl = "&returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
+      $returnUrl = ";returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
    }
    $sth = WebGUI::SQL->read("select * from ldapLink order by ldapLinkName");
    $row[$i] = '<tr><td valign="top" class="tableData">&nbsp;</td><td valign="top" class="tableData">'.WebGUI::International::get("LDAPLink_1076","AuthLDAP").'</td><td>'.WebGUI::International::get("LDAPLink_1077","AuthLDAP").'</td></tr>';
    $i++;
    while ($data = $sth->hashRef) {
       $row[$i] = '<tr><td valign="top" class="tableData">'
-	        .deleteIcon('op=deleteLDAPLink&llid='.$data->{ldapLinkId},WebGUI::URL::page(),WebGUI::International::get("LDAPLink_988","AuthLDAP"))
-			.editIcon('op=editLDAPLink&llid='.$data->{ldapLinkId}.$returnUrl)
-			.copyIcon('op=copyLDAPLink&llid='.$data->{ldapLinkId}.$returnUrl)
+	        .deleteIcon('op=deleteLDAPLink;llid='.$data->{ldapLinkId},WebGUI::URL::page(),WebGUI::International::get("LDAPLink_988","AuthLDAP"))
+			.editIcon('op=editLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
+			.copyIcon('op=copyLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
 			.'</td>';
       $row[$i] .= '<td valign="top" class="tableData">'.$data->{ldapLinkName}.'</td>';
 	  

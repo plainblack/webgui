@@ -35,7 +35,7 @@ sub _get {
 
 #-------------------------------------------------------------------
 sub _link {
-	return WebGUI::URL::page('op=viewHelp&hid='.WebGUI::URL::escape($_[0]).'&namespace='.$_[1]);
+	return WebGUI::URL::page('op=viewHelp;hid='.WebGUI::URL::escape($_[0]).';namespace='.$_[1]);
 }
 
 #-------------------------------------------------------------------

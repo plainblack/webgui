@@ -139,7 +139,7 @@ sub toHtmlWithWrapper {
         if (defined $template && $template->canEdit) {
                 my $returnUrl;
                 if (exists $session{asset}) {
-                        $returnUrl = "&proceed=goBackToPage&returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);
+                        $returnUrl = ";proceed=goBackToPage;returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);
                 }
                 my $buttons = editIcon("func=edit".$returnUrl,$template->get("url"));
                 $buttons .= manageIcon("func=manageAssets",$template->getParent->get("url"));

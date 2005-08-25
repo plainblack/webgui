@@ -56,15 +56,15 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help,"WebGUIProfile");
         }
-	$ac->addSubmenuItem(WebGUI::URL::page("op=editProfileCategory&cid=new"), WebGUI::International::get(490,"WebGUIProfile"));
-	$ac->addSubmenuItem(WebGUI::URL::page("op=editProfileField&fid=new"), WebGUI::International::get(491,"WebGUIProfile"));
+	$ac->addSubmenuItem(WebGUI::URL::page("op=editProfileCategory;cid=new"), WebGUI::International::get(490,"WebGUIProfile"));
+	$ac->addSubmenuItem(WebGUI::URL::page("op=editProfileField;fid=new"), WebGUI::International::get(491,"WebGUIProfile"));
         if ((($session{form}{op} eq "editProfileField" && $session{form}{fid} ne "new") || $session{form}{op} eq "deleteProfileField") && $session{form}{cid} eq "") {
-		$ac->addSubmenuItem(WebGUI::URL::page('op=editProfileField&fid='.$session{form}{fid}), WebGUI::International::get(787,"WebGUIProfile"));
-		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteProfileField&fid='.$session{form}{fid}), WebGUI::International::get(788,"WebGUIProfile"));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=editProfileField;fid='.$session{form}{fid}), WebGUI::International::get(787,"WebGUIProfile"));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteProfileField;fid='.$session{form}{fid}), WebGUI::International::get(788,"WebGUIProfile"));
 	}
         if ((($session{form}{op} eq "editProfileCategory" && $session{form}{cid} ne "new") || $session{form}{op} eq "deleteProfileCategory") && $session{form}{fid} eq "") {
-		$ac->addSubmenuItem(WebGUI::URL::page('op=editProfileCategory&cid='.$session{form}{cid}), WebGUI::International::get(789,"WebGUIProfile"));
-		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteProfileCategory&cid='.$session{form}{cid}), WebGUI::International::get(790,"WebGUIProfile"));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=editProfileCategory;cid='.$session{form}{cid}), WebGUI::International::get(789,"WebGUIProfile"));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteProfileCategory;cid='.$session{form}{cid}), WebGUI::International::get(790,"WebGUIProfile"));
         }
 	$ac->addSubmenuItem(WebGUI::URL::page("op=editProfileSettings"), WebGUI::International::get(492,"WebGUIProfile"));
         return $ac->render($workarea, $title);
@@ -295,10 +295,10 @@ sub www_editProfileSettings {
 	tie %field, 'Tie::CPHash';
 	$a = WebGUI::SQL->read("select * from userProfileCategory order by sequenceNumber");
 	while (%category = $a->hash) {
-		$output .= deleteIcon('op=deleteProfileCategoryConfirm&cid='.$category{profileCategoryId},'',WebGUI::International::get(466,"WebGUIProfile")); 
-		$output .= editIcon('op=editProfileCategory&cid='.$category{profileCategoryId}); 
-		$output .= moveUpIcon('op=moveProfileCategoryUp&cid='.$category{profileCategoryId}); 
-		$output .= moveDownIcon('op=moveProfileCategoryDown&cid='.$category{profileCategoryId}); 
+		$output .= deleteIcon('op=deleteProfileCategoryConfirm;cid='.$category{profileCategoryId},'',WebGUI::International::get(466,"WebGUIProfile")); 
+		$output .= editIcon('op=editProfileCategory;cid='.$category{profileCategoryId}); 
+		$output .= moveUpIcon('op=moveProfileCategoryUp;cid='.$category{profileCategoryId}); 
+		$output .= moveDownIcon('op=moveProfileCategoryDown;cid='.$category{profileCategoryId}); 
 		$output .= ' <b>';
 		$output .= WebGUI::Operation::Shared::secureEval($category{categoryName});
 		$output .= '</b><br>';
@@ -306,10 +306,10 @@ sub www_editProfileSettings {
 			profileCategoryId=".quote($category{profileCategoryId})." order by sequenceNumber");
 		while (%field = $b->hash) {
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        $output .= deleteIcon('op=deleteProfileFieldConfirm&fid='.$field{fieldName},'',WebGUI::International::get(467,"WebGUIProfile"));
-       	                $output .= editIcon('op=editProfileField&fid='.$field{fieldName});
-               	        $output .= moveUpIcon('op=moveProfileFieldUp&fid='.$field{fieldName});
-                       	$output .= moveDownIcon('op=moveProfileFieldDown&fid='.$field{fieldName});
+                        $output .= deleteIcon('op=deleteProfileFieldConfirm;fid='.$field{fieldName},'',WebGUI::International::get(467,"WebGUIProfile"));
+       	                $output .= editIcon('op=editProfileField;fid='.$field{fieldName});
+               	        $output .= moveUpIcon('op=moveProfileFieldUp;fid='.$field{fieldName});
+                       	$output .= moveDownIcon('op=moveProfileFieldDown;fid='.$field{fieldName});
                        	$output .= ' ';
 			$output .= WebGUI::Operation::Shared::secureEval($field{fieldLabel});
 			$output .= '<br>';

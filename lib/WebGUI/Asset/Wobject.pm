@@ -109,7 +109,7 @@ sub definition {
 					label=>WebGUI::International::get(1073,'Wobject'),
 					hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
 					namespace=>'style',
-					afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
+					afterEdit=>'op=editPage;npp='.$session{form}{npp}
 					},
 				printableStyleTemplateId=>{
 					fieldType=>'template',
@@ -118,7 +118,7 @@ sub definition {
 					label=>WebGUI::International::get(1079,'Wobject'),
 					hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
 					namespace=>'style',
-					afterEdit=>'op=editPage&amp;npp='.$session{form}{npp}
+					afterEdit=>'op=editPage;npp='.$session{form}{npp}
 					}
                         }
                 });

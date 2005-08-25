@@ -52,7 +52,7 @@ sub cancelRecurringPayment {
 		# Login to iTransact
 		$request = HTTP::Request->new(POST => 'https://secure.paymentclearing.com/cgi-bin/rc/sess.cgi');
 		$request->content_type('application/x-www-form-urlencoded');
-		$request->content('mid='.$self->get('vendorId').'&pwd='.$self->get('password').'&cookie_precheck=0');
+		$request->content('mid='.$self->get('vendorId').';pwd='.$self->get('password').';cookie_precheck=0');
 
 		$response = $userAgent->request($request);
 
@@ -73,8 +73,8 @@ sub cancelRecurringPayment {
 		my $request = HTTP::Request->new(POST => 'https://secure.paymentclearing.com/cgi-bin/rc/recur/update/update.cgi');
 		$request->content_type('application/x-www-form-urlencoded');
 		$request->content(
-			'reps=0&'.			# Set number of remaining repetition to zero in order to cancel
-			'recipe_code='.$recipe.'&'.	
+			'reps=0;'.			# Set number of remaining repetition to zero in order to cancel
+			'recipe_code='.$recipe.';'.	
 			'xid='.$recurring->{id});
 
 		my $response = $userAgent->request($request);
@@ -468,7 +468,7 @@ sub configurationForm {
 		-value	=> '<br />'
 		);
 	$f->readOnly(
-		-value	=> $i18n->get('extra info').'<br /><b>https://'.$session{config}{defaultSitename}.WebGUI::URL::getScriptURL().'?op=confirmRecurringTransaction&gateway='.$self->namespace
+		-value	=> $i18n->get('extra info').'<br /><b>https://'.$session{config}{defaultSitename}.WebGUI::URL::getScriptURL().'?op=confirmRecurringTransaction;gateway='.$self->namespace
 		);
 		
 	return $self->SUPER::configurationForm($f->printRowsOnly);

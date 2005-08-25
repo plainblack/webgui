@@ -45,7 +45,7 @@ sub process {
 			'variant.weight' => $_->{weight},
 			'variant.sku' => $_->{sku},
 			'variant.compositionLoop' => \@compositionLoop,
-			'variant.addToCart.url' => WebGUI::URL::page('op=addToCart&itemType=Product&itemId='.$_->{variantId}),
+			'variant.addToCart.url' => WebGUI::URL::page('op=addToCart;itemType=Product;itemId='.$_->{variantId}),
 			'variant.addToCart.label' => WebGUI::International::get('add to cart', 'Macro_Product'),
 		}) if ($_->{available});
 	}

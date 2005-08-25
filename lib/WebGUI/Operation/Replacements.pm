@@ -30,7 +30,7 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->addSubmenuItem(WebGUI::URL::page("op=editReplacement&amp;replacementId=new"), WebGUI::International::get(1047));
+        $ac->addSubmenuItem(WebGUI::URL::page("op=editReplacement;replacementId=new"), WebGUI::International::get(1047));
         $ac->addSubmenuItem(WebGUI::URL::page("op=listReplacements"), WebGUI::International::get("content filters"));
         return $ac->render($workarea, $title);
 }
@@ -94,8 +94,8 @@ sub www_listReplacements {
 	$output .= '<tr><td></td><td class="tableHeader">'.WebGUI::International::get(1050).'</td><td class="tableHeader">'.WebGUI::International::get(1051).'</td></tr>';
 	my $sth = WebGUI::SQL->read("select replacementId,searchFor,replaceWith from replacements order by searchFor");
 	while (my $data = $sth->hashRef) {
-		$output .= '<tr><td>'.deleteIcon("op=deleteReplacement&amp;replacementId=".$data->{replacementId})
-			.editIcon("op=editReplacement&amp;replacementId=".$data->{replacementId}).'</td>';
+		$output .= '<tr><td>'.deleteIcon("op=deleteReplacement;replacementId=".$data->{replacementId})
+			.editIcon("op=editReplacement;replacementId=".$data->{replacementId}).'</td>';
 		$data->{replaceWith} =~ s/\&/\&amp\;/g;
 		$data->{replaceWith} =~ s/\</\&lt\;/g;
         	$data->{replaceWith} =~ s/\>/\&gt\;/g;

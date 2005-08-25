@@ -67,7 +67,7 @@ The URL to append information to.
 
 Name value pairs to add to the URL in the form of:
 
- name1=value1&name2=value2&name3=value3
+ name1=value1;name2=value2;name3=value3
 
 =cut
 
@@ -75,7 +75,7 @@ sub append {
 	my ($url);
 	$url = $_[0];
 	if ($url =~ /\?/) {
-		$url .= '&'.$_[1];
+		$url .= ';'.$_[1];
 	} else {
 		$url .= '?'.$_[1];
 	}
@@ -115,7 +115,7 @@ The urlized title of a page that you wish to create a URL for.
 
 Name value pairs to add to the URL in the form of:
 
- name1=value1&name2=value2&name3=value3
+ name1=value1;name2=value2;name3=value3
 
 =cut
 
@@ -242,7 +242,7 @@ Returns the URL of the current page.
 
 Name value pairs to add to the URL in the form of:
 
- name1=value1&name2=value2&name3=value3
+ name1=value1;name2=value2;name3=value3
 
 =head3 useSiteUrl
 

@@ -41,7 +41,7 @@ sub _processOperations {
 	$opNumber++;
 	if ($output eq "" && exists $session{form}{"op".$opNumber}) {
 		my $urlString = WebGUI::URL::unescape($session{form}{"op".$opNumber});
-		my @pairs = split(/\&/,$urlString);
+		my @pairs = split(/\;/,$urlString);
 		my %form;
 		foreach my $pair (@pairs) {
 			my @param = split(/\=/,$pair);

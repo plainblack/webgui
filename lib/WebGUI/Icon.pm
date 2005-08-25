@@ -269,7 +269,7 @@ If your help documentation is not in the WebGUI namespace, then you must specify
 sub helpIcon {
 	my ($output, $namespace);
 	$namespace = $_[1] || "WebGUI";
-	$output = '<a href="'.WebGUI::URL::page('op=viewHelp&hid='.$_[0].'&namespace='.$namespace).
+	$output = '<a href="'.WebGUI::URL::page('op=viewHelp;hid='.$_[0].';namespace='.$namespace).
 		'" target="_blank"><img src="'._getBaseURL().'help.gif" border="0" align="right" title="'.WebGUI::International::get('Help','Icon').'" Alt="'.WebGUI::International::get('Help','Icon').'"></a>';
 	return $output;
 }

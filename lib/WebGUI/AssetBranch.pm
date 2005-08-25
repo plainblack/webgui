@@ -159,7 +159,7 @@ sub www_editBranch {
 		-label=>WebGUI::International::get(1073,"Asset"),
 		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
-		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
+		-afterEdit=>'op=editPage;npp='.$session{form}{npp},
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_styleTemplateId"})
 		);
          $tabform->getTab("display")->template(
@@ -167,7 +167,7 @@ sub www_editBranch {
 		-label=>WebGUI::International::get(1079,"Asset"),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
-		-afterEdit=>'op=editPage&amp;npp='.$session{form}{npp},
+		-afterEdit=>'op=editPage;npp='.$session{form}{npp},
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_printableStyleTemplateId"})
 		);
         $tabform->getTab("display")->interval(

@@ -89,10 +89,10 @@ sub _fieldAdminIcons {
 	my $tid = shift;
 	my $cantDelete = shift;
 	my $output;
-	$output = deleteIcon('func=deleteFieldConfirm&fid='.$fid.'&tid='.$tid,$self->get("url"),WebGUI::International::get(19,"Asset_DataForm")) unless ($cantDelete);
-	$output .= editIcon('func=editField&fid='.$fid.'&tid='.$tid,$self->get("url"))
-		.moveUpIcon('func=moveFieldUp&fid='.$fid.'&tid='.$tid,$self->get("url"))
-		.moveDownIcon('func=moveFieldDown&fid='.$fid.'&tid='.$tid,$self->get("url"));
+	$output = deleteIcon('func=deleteFieldConfirm;fid='.$fid.';tid='.$tid,$self->get("url"),WebGUI::International::get(19,"Asset_DataForm")) unless ($cantDelete);
+	$output .= editIcon('func=editField;fid='.$fid.';tid='.$tid,$self->get("url"))
+		.moveUpIcon('func=moveFieldUp;fid='.$fid.';tid='.$tid,$self->get("url"))
+		.moveDownIcon('func=moveFieldDown;fid='.$fid.';tid='.$tid,$self->get("url"));
 	return $output;
 }
 #-------------------------------------------------------------------
@@ -101,10 +101,10 @@ sub _tabAdminIcons {
 	my $tid = shift;
 	my $cantDelete = shift;
 	my $output;
-	$output = deleteIcon('func=deleteTabConfirm&tid='.$tid,$self->get("url"),WebGUI::International::get(100,"Asset_DataForm")) unless ($cantDelete);
-	$output .= editIcon('func=editTab&tid='.$tid,$self->get("url"))
-		.moveLeftIcon('func=moveTabLeft&tid='.$tid,$self->get("url"))
-		.moveRightIcon('func=moveTabRight&tid='.$tid,$self->get("url"));
+	$output = deleteIcon('func=deleteTabConfirm;tid='.$tid,$self->get("url"),WebGUI::International::get(100,"Asset_DataForm")) unless ($cantDelete);
+	$output .= editIcon('func=editTab;tid='.$tid,$self->get("url"))
+		.moveLeftIcon('func=moveTabLeft;tid='.$tid,$self->get("url"))
+		.moveRightIcon('func=moveTabRight;tid='.$tid,$self->get("url"));
 	return $output;
 }
 
@@ -325,7 +325,7 @@ sub getListTemplateVars {
 	$var->{"back.url"} = $self->getFormUrl;
 	$var->{"back.label"} = WebGUI::International::get('go to form',"Asset_DataForm");
 	#$var->{"entryId"} = $self->getId;
-	#$var->{"delete.url"} = $self->getUrl."&func=deleteAllEntries";
+	#$var->{"delete.url"} = $self->getUrl.";func=deleteAllEntries";
 	#$var->{"delete.label"} = WebGUI::International::get(91,"Asset_DataForm");
 	my $a = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
 		where assetId=".quote($self->getId)." order by sequenceNumber");
@@ -359,10 +359,10 @@ sub getListTemplateVars {
 		$b->finish;
 		push(@recordLoop,{
 			"record.ipAddress"=>$record->{ipAddress},
-			"record.edit.url"=>$self->getUrl("func=view&entryId=".$record->{DataForm_entryId}),
-			"record.edit.icon"=>editIcon("func=view&entryId=".$record->{DataForm_entryId}, $self->getUrl),
-			"record.delete.url"=>$self->getUrl("func=deleteEntry&entryId=".$record->{DataForm_entryId}),
-			"record.delete.icon"=>deleteIcon("func=deleteEntry&entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"Asset_DataForm")),
+			"record.edit.url"=>$self->getUrl("func=view;entryId=".$record->{DataForm_entryId}),
+			"record.edit.icon"=>editIcon("func=view;entryId=".$record->{DataForm_entryId}, $self->getUrl),
+			"record.delete.url"=>$self->getUrl("func=deleteEntry;entryId=".$record->{DataForm_entryId}),
+			"record.delete.icon"=>deleteIcon("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"Asset_DataForm")),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},
@@ -412,12 +412,12 @@ sub getRecordTemplateVars {
 	my $var = shift;
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{canEdit} = ($self->canEdit);
-	#$var->{"entryList.url"} = $self->getUrl('func=view&entryId=list');
+	#$var->{"entryList.url"} = $self->getUrl('func=view;entryId=list');
 	$var->{"entryList.url"} = $self->getListUrl;
 	$var->{"entryList.label"} = WebGUI::International::get(86,"Asset_DataForm");
 	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
 	$var->{"export.tab.label"} = WebGUI::International::get(84,"Asset_DataForm");
-	$var->{"delete.url"} = $self->getUrl('func=deleteEntry&entryId='.$var->{entryId});
+	$var->{"delete.url"} = $self->getUrl('func=deleteEntry;entryId='.$var->{entryId});
 	$var->{"delete.label"} = WebGUI::International::get(90,"Asset_DataForm");
 	$var->{"back.url"} = $self->getUrl;
 	$var->{"back.label"} = WebGUI::International::get(18,"Asset_DataForm");

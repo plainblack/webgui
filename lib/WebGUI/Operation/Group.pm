@@ -49,17 +49,17 @@ sub _submenu {
                 $ac->setHelp($help);
         }
 	if (WebGUI::Grouping::isInGroup(3)) {
-	        $ac->addSubmenuItem(WebGUI::URL::page('op=editGroup&gid=new'), WebGUI::International::get(90));
+	        $ac->addSubmenuItem(WebGUI::URL::page('op=editGroup;gid=new'), WebGUI::International::get(90));
 	}
 	if (WebGUI::Grouping::isInGroup(11)) {
         	unless ($session{form}{op} eq "listGroups" 
 			|| $session{form}{gid} eq "new" 
 			|| $session{form}{op} eq "deleteGroupConfirm") {
-        	        $ac->addSubmenuItem(WebGUI::URL::page("op=editGroup&gid=".$session{form}{gid}), WebGUI::International::get(753));
-                	$ac->addSubmenuItem(WebGUI::URL::page("op=manageUsersInGroup&gid=".$session{form}{gid}), WebGUI::International::get(754));
-	                $ac->addSubmenuItem(WebGUI::URL::page("op=manageGroupsInGroup&gid=".$session{form}{gid}), WebGUI::International::get(807));
-        	        $ac->addSubmenuItem(WebGUI::URL::page("op=emailGroup&gid=".$session{form}{gid}), WebGUI::International::get(808));
-                	$ac->addSubmenuItem(WebGUI::URL::page("op=deleteGroup&gid=".$session{form}{gid}), WebGUI::International::get(806));
+        	        $ac->addSubmenuItem(WebGUI::URL::page("op=editGroup;gid=".$session{form}{gid}), WebGUI::International::get(753));
+                	$ac->addSubmenuItem(WebGUI::URL::page("op=manageUsersInGroup;gid=".$session{form}{gid}), WebGUI::International::get(754));
+	                $ac->addSubmenuItem(WebGUI::URL::page("op=manageGroupsInGroup;gid=".$session{form}{gid}), WebGUI::International::get(807));
+        	        $ac->addSubmenuItem(WebGUI::URL::page("op=emailGroup;gid=".$session{form}{gid}), WebGUI::International::get(808));
+                	$ac->addSubmenuItem(WebGUI::URL::page("op=deleteGroup;gid=".$session{form}{gid}), WebGUI::International::get(806));
 	        }
         	$ac->addSubmenuItem(WebGUI::URL::page("op=listGroups"), WebGUI::International::get(756));
 	}
@@ -146,8 +146,8 @@ sub walkGroups {
         my $sth = WebGUI::SQL->read("select groups.groupId, groups.groupName from groupGroupings left join groups on groups.groupId=groupGroupings.groupId where groupGroupings.inGroup=".quote($parentId));
         while (my ($id, $name) = $sth->array) {
 		$output .= $indent
-			.deleteIcon('op=deleteGroupGrouping&gid='.$parentId.'&delete='.$id)
-			.editIcon('op=editGroup&gid='.$id)
+			.deleteIcon('op=deleteGroupGrouping;gid='.$parentId.';delete='.$id)
+			.editIcon('op=editGroup;gid='.$id)
 			.' '.$name.'<br />';
                 $output .= walkGroups($id,$indent."&nbsp; &nbsp; ");
         }
@@ -197,7 +197,7 @@ sub www_deleteGroup {
 	return WebGUI::Privilege::vitalComponent() if (isIn($session{form}{gid}, qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
         my ($output);
         $output .= WebGUI::International::get(86).'<p>';
-        $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteGroupConfirm&gid='.$session{form}{gid}).
+        $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteGroupConfirm;gid='.$session{form}{gid}).
 		'">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listGroups').'">'
 		.WebGUI::International::get(45).'</a></div>';
@@ -524,7 +524,7 @@ sub www_listGroups {
 			my ($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($row->{groupId}));
 			$output .= '
 			<tr>
-				<td valign="top" class="tableData"><a href="'.WebGUI::URL::page("op=editGroup&gid=".$row->{groupId}).'">'.$row->{groupName}.'</a></td>
+				<td valign="top" class="tableData"><a href="'.WebGUI::URL::page("op=editGroup;gid=".$row->{groupId}).'">'.$row->{groupName}.'</a></td>
 				<td valign="top" class="tableData">'.$row->{description}.'</td>
 				<td valign="top" class="tableData">'.$userCount.'</td>
 			</tr>
@@ -542,7 +542,7 @@ sub www_listGroups {
         	while (@data = $sth->array) {
                 	$row[$i] = '<tr>';
                 	$row[$i] .= '<td valign="top" class="tableData"><a href="'
-                        	.WebGUI::URL::page('op=manageUsersInGroup&gid='.$data[0]).'">'.$data[1].'</td>';
+                        	.WebGUI::URL::page('op=manageUsersInGroup;gid='.$data[0]).'">'.$data[1].'</td>';
                 	$row[$i] .= '<td valign="top" class="tableData">'.$data[2].'</td>';
                 	($userCount) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($data[0]));
                 	$row[$i] .= '<td valign="top" class="tableData">'.$userCount.'</td></tr>';
@@ -591,21 +591,6 @@ sub www_manageGroupsInGroup {
         $output .= $f->print;
 	$output .= '<p />';
 	$output .= walkGroups($session{form}{gid});
-#<table class="tableData" align="center">';
-#	$output .= '<tr class="tableHeader"><td></td><td>'.WebGUI::International::get(84).'</td></tr>';
-#	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=manageGroupsInGroup&gid='.$session{form}{gid}));
-#	$p->setDataByQuery("select a.groupName as name,a.groupId as id from groups a 
-#		left join groupGroupings b on a.groupId=b.groupId 
-#		where b.inGroup=".quote($session{form}{gid})." order by a.groupName");
-#	$groups = $p->getPageData;
-#	foreach $group (@$groups) {
-#		$output .= '<tr><td>'
-#			.deleteIcon('op=deleteGroupGrouping&gid='.$session{form}{gid}.'&delete='.$group->{id})
-#			.'</td><td><a href="'.WebGUI::URL::page('op=editGroup&gid='.$group->{id}).'">'
-#			.$group->{name}.'</a></td></tr>';
-#	}
-#	$output .= '</table>';
-#	$output .= $p->getBarTraditional;
 	return _submenu($output,'813');
 }
 
@@ -625,7 +610,7 @@ sub www_manageUsersInGroup {
 		.WebGUI::Icon::_getBaseURL().'delete.gif" border="0"></td>
                 <td class="tableHeader">'.WebGUI::International::get(50).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
-	my $p = WebGUI::Paginator->new(WebGUI::URL::page("op=manageUsersInGroup&gid=".$session{form}{gid}));
+	my $p = WebGUI::Paginator->new(WebGUI::URL::page("op=manageUsersInGroup;gid=".$session{form}{gid}));
         $p->setDataByQuery("select users.username,users.userId,groupings.expireDate
                 from groupings,users where groupings.groupId=".quote($session{form}{gid})." and groupings.userId=users.userId
                 order by users.username");
@@ -635,10 +620,10 @@ sub www_manageUsersInGroup {
 				name=>"uid",
 				value=>$row->{userId}
 				})
-                        .deleteIcon('op=deleteGrouping&uid='.$row->{userId}.'&gid='.$session{form}{gid})
-                        .editIcon('op=editGrouping&uid='.$row->{userId}.'&gid='.$session{form}{gid})
+                        .deleteIcon('op=deleteGrouping;uid='.$row->{userId}.';gid='.$session{form}{gid})
+                        .editIcon('op=editGrouping;uid='.$row->{userId}.';gid='.$session{form}{gid})
                         .'</td>';
-                $output .= '<td class="tableData"><a href="'.WebGUI::URL::page('op=editUser&uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';
+                $output .= '<td class="tableData"><a href="'.WebGUI::URL::page('op=editUser;uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';
                 $output .= '<td class="tableData">'.epochToHuman($row->{expireDate},"%z").'</td></tr>';
         }
         $output .= '</table>'.WebGUI::Form::formFooter();
@@ -660,7 +645,7 @@ sub www_manageUsersInGroup {
 	push(@{$existingUsers},"1");
 	my %users;
 	tie %users, "Tie::IxHash";
-	my $sth = WebGUI::Operation::User::doUserSearch("op=manageUsersInGroup&gid=".$session{form}{gid},0,$existingUsers);
+	my $sth = WebGUI::Operation::User::doUserSearch("op=manageUsersInGroup;gid=".$session{form}{gid},0,$existingUsers);
 	while (my $data = $sth->hashRef) {
 		$users{$data->{userId}} = $data->{username};
 		$users{$data->{userId}} .= " (".$data->{email}.")" if ($data->{email});

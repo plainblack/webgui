@@ -43,7 +43,7 @@ sub process {
 			my $title = $package->getTitle;
 			$title =~ s/'//g; # stops it from breaking the javascript menus
                 	push(@{$var{'package_loop'}},{
-				'url'=>$session{asset}->getUrl("func=deployPackage&assetId=".$package->getId),
+				'url'=>$session{asset}->getUrl("func=deployPackage;assetId=".$package->getId),
 				'label'=>$title,
 				'icon.small'=>$package->getIcon(1),
 				'icon'=>$package->getIcon()
@@ -56,7 +56,7 @@ sub process {
 			$title =~ s/'//g; # stops it from breaking the javascript menus
 			push(@{$var{clipboard_loop}}, {
 				'label'=>$title,
-				'url'=>$session{asset}->getUrl("func=paste&assetId=".$asset->getId),
+				'url'=>$session{asset}->getUrl("func=paste;assetId=".$asset->getId),
 				'icon.small'=>$asset->getIcon(1),
 				'icon'=>$asset->getIcon()
 				});

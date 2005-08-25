@@ -15,9 +15,15 @@ fixTimeFields();
 fixSpelling();
 fixCSTemplate();
 speedUpAdminConsole();
+removeOldFiles();
 
 finish();
 
+#-------------------------------------------------
+sub removeOldFiles {
+        print "\tRemoving files that are no longer needed.\n" unless ($quiet);
+	unlink("../../lib/WebGUI/Search.pm");
+}
 
 #-------------------------------------------------
 sub speedUpAdminConsole {

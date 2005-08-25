@@ -306,10 +306,10 @@ sub www_manageClipboard {
 	if ($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)) {
 		$header = WebGUI::International::get(966,"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949),"Asset");
-		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard&systemClipboard=1'), WebGUI::International::get(959,"Asset"), 
+		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), WebGUI::International::get(959,"Asset"), 
 			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
 	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageClipboard&systemClipboard=1'), WebGUI::International::get(954),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=manageClipboard;systemClipboard=1'), WebGUI::International::get(954),"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), WebGUI::International::get(950,"Asset"),
 			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
 		$limit = 1;

@@ -121,7 +121,7 @@ sub toHtml {
                         )->toHtml
                 .WebGUI::Form::Button->new(
                         value=>"...",
-                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree&classLimiter=".$self->{class}."&formId=".$self->{id}).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree;classLimiter=".$self->{class}.";formId=".$self->{id}).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;
 }
 

@@ -182,7 +182,7 @@ sub toHtmlWithWrapper {
 	if (WebGUI::Grouping::isInGroup(3)) {
 		my $subtext;
 		if ($self->{afterEdit}) {
-			$subtext = editIcon("op=editLDAPLink&amp;llid=".$self->{value}."&amp;afterEdit=".WebGUI::URL::escape($self->{afterEdit}));
+			$subtext = editIcon("op=editLDAPLink;llid=".$self->{value}.";afterEdit=".WebGUI::URL::escape($self->{afterEdit}));
 		}
          	$subtext .= manageIcon("op=listLDAPLinks");
 		$self->{subtext} = $subtext . $self->{subtext};

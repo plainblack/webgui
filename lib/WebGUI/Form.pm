@@ -202,7 +202,7 @@ sub formHeader {
 	if ($action =~ /\?/) {
 		my ($path,$query) = split(/\?/,$action);
 		$action = $path;
-		my @params = split(/\&/,$query);
+		my @params = split(/\;/,$query);
 		foreach my $param (@params) {
 			$param =~ s/amp;(.*)/$1/;
 			my ($name,$value) = split(/\=/,$param);

@@ -100,7 +100,6 @@ use WebGUI::MessageLog ();
 use WebGUI::Operation ();
 use WebGUI::Paginator ();
 use WebGUI::Privilege ();
-use WebGUI::Search ();
 use WebGUI::Session ();
 use WebGUI::SQL ();
 use WebGUI::Storage ();

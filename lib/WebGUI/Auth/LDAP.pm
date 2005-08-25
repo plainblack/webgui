@@ -215,7 +215,7 @@ sub createAccount {
 	$vars->{'create.message'} = $_[0] if ($_[0]);
 	$vars->{'create.form.ldapConnection.label'} = WebGUI::International::get("ldapConnection","AuthLDAP");
 	
-	my $url = WebGUI::URL::page("op=auth&method=createAccount&connection=");
+	my $url = WebGUI::URL::page("op=auth;method=createAccount;connection=");
 	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectList({
 	                name=>"ldapConnection",
 					options=>WebGUI::LDAPLink::getList(),
@@ -368,9 +368,9 @@ sub editUserSettingsForm {
    my $ldapConnectionLabel = WebGUI::International::get("ldapConnection",'AuthLDAP'); 
    my $buttons = "";
    if($session{setting}{ldapConnection}) {
-      $buttons = editIcon("op=editLDAPLink&returnUrl=".WebGUI::URL::escape(WebGUI::URL::page("op=editSettings"))."&llid=".$session{setting}{ldapConnection});
+      $buttons = editIcon("op=editLDAPLink;returnUrl=".WebGUI::URL::escape(WebGUI::URL::page("op=editSettings")).";llid=".$session{setting}{ldapConnection});
    }
-   $buttons .= manageIcon("op=listLDAPLinks&returnUrl=".WebGUI::URL::escape(WebGUI::URL::page("op=editSettings")));
+   $buttons .= manageIcon("op=listLDAPLinks;returnUrl=".WebGUI::URL::escape(WebGUI::URL::page("op=editSettings")));
    $f->raw(qq|<tr><td class="formDescription" valign="top" style="width: 25%;">$ldapConnectionLabel</td><td class="tableData" style="width: 75%;">$ldapConnection&nbsp;$buttons</td></tr>|);
    return $f->printRowsOnly;
 }

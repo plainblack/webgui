@@ -30,10 +30,10 @@ sub _submenu {
 
 	my $productId = $session{form}{productId} || WebGUI::Session::getScratch('managingProduct');
 	undef $productId if ($productId eq 'new');
-	$ac->addSubmenuItem(WebGUI::URL::page('op=editProduct&productId=new'), $i18n->get('add product'));
+	$ac->addSubmenuItem(WebGUI::URL::page('op=editProduct;productId=new'), $i18n->get('add product'));
 	$ac->addSubmenuItem(WebGUI::URL::page('op=listProducts'), $i18n->get('list products'));
-	$ac->addSubmenuItem(WebGUI::URL::page('op=manageProduct&productId='.$productId), $i18n->get('manage product')) if ($productId);
-	$ac->addSubmenuItem(WebGUI::URL::page('op=listProductVariants&productId='.$productId), $i18n->get('list variants')) if ($productId);
+	$ac->addSubmenuItem(WebGUI::URL::page('op=manageProduct;productId='.$productId), $i18n->get('manage product')) if ($productId);
+	$ac->addSubmenuItem(WebGUI::URL::page('op=listProductVariants;productId='.$productId), $i18n->get('list variants')) if ($productId);
 
 	return $ac->render($workarea, $title);
 }
@@ -482,8 +482,8 @@ sub www_listProducts {
 	while ($row = $sth->hashRef) {
 		$output .= '<tr>';
 		$output .= '<td>';
-		$output .= deleteIcon('op=deleteProduct&productId='.$row->{productId});
-		$output .= editIcon('op=manageProduct&productId='.$row->{productId});
+		$output .= deleteIcon('op=deleteProduct;productId='.$row->{productId});
+		$output .= editIcon('op=manageProduct;productId='.$row->{productId});
 		$output .= '</td>';
 		$output .= '<td>'.$row->{title}.'</td>';
 		$output .= '</tr>';
@@ -545,7 +545,7 @@ sub www_listProductVariants {
 			name	=> 'available',
 			value	=> $_->{variantId},
 			checked	=> $_->{available},
-			}).editIcon('op=editProductVariant&variantId='.$_->{variantId})."</td>";
+			}).editIcon('op=editProductVariant;variantId='.$_->{variantId})."</td>";
 		$output .= "</tr>";
 	}
 	$output .= "</table>";
@@ -588,7 +588,7 @@ sub www_manageProduct {
 	$product = WebGUI::Product->new($productId);
 	
 	$output .= "<h1>".$product->get('title')."</h1>";
-	$output .= "<h2>".$i18n->get('properties').editIcon('op=editProduct&productId='.$productId)."</h2>";
+	$output .= "<h2>".$i18n->get('properties').editIcon('op=editProduct;productId='.$productId)."</h2>";
 	$output .= "<table>";
 	$output .= "<tr><td>".$i18n->get('price')."</td><td>".$product->get('price')."</td></tr>";
 	$output .= "<tr><td>".$i18n->get('weight')."</td><td>".$product->get('weight')."</td></tr>";
@@ -598,20 +598,20 @@ sub www_manageProduct {
 	$output .= "</table>";
 	
 	$output .= "<h2>Parameters</h2>";
-	$output .= '<a href="'.WebGUI::URL::page('op=editProductParameter&parameterId=new&productId='.$product->get('productId')).'">'.
+	$output .= '<a href="'.WebGUI::URL::page('op=editProductParameter;parameterId=new;productId='.$product->get('productId')).'">'.
 		$i18n->get('add parameter').'</a><br>';
 	foreach $parameter (@{$product->getParameter}) {
-		$output .= deleteIcon('op=deleteProductParameter&parameterId='.$parameter->{parameterId}).
-			editIcon('op=editProductParameter&parameterId='.$parameter->{parameterId});
+		$output .= deleteIcon('op=deleteProductParameter;parameterId='.$parameter->{parameterId}).
+			editIcon('op=editProductParameter;parameterId='.$parameter->{parameterId});
 		$output .= '<span style="margin-left: 10px"><b>'.$parameter->{name}.'</b></span><br>';
 		$output .= '<a style="margin-left: 20px" href="'.
-			WebGUI::URL::page('op=editProductParameterOption&optionId=new&parameterId='.$parameter->{parameterId}).'">'.
+			WebGUI::URL::page('op=editProductParameterOption;optionId=new;parameterId='.$parameter->{parameterId}).'">'.
 			$i18n->get('add option').'</a><br>';
 		foreach $optionId (@{$parameter->{options}}) {
 			$option = $product->getOption($optionId);
 			$output .= '<span style="margin-left: 20px">'.
-				deleteIcon('op=deleteProductParameterOption&optionId='.$option->{optionId}).
-				editIcon('op=editProductParameterOption&parameterId='.$parameter->{parameterId}.'&optionId='.$option->{optionId}).$option->{value}.'</span><br>';
+				deleteIcon('op=deleteProductParameterOption;optionId='.$option->{optionId}).
+				editIcon('op=editProductParameterOption;parameterId='.$parameter->{parameterId}.';optionId='.$option->{optionId}).$option->{value}.'</span><br>';
 		}
 		$output .= '<br>';
 	}

@@ -141,7 +141,7 @@ sub toHtmlWithWrapper {
 	if (WebGUI::Grouping::isInGroup(3)) {
 		my $subtext;
 		if ($self->{afterEdit}) {
-			$subtext = editIcon("op=editDatabaseLink&amp;lid=".$self->{value}."&amp;afterEdit=".WebGUI::URL::escape($self->{afterEdit}));
+			$subtext = editIcon("op=editDatabaseLink;lid=".$self->{value}.";afterEdit=".WebGUI::URL::escape($self->{afterEdit}));
 		}
 		$subtext .= manageIcon("op=listDatabaseLinks");
 		$self->{subtext} = $subtext . $self->{subtext};

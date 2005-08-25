@@ -24,7 +24,7 @@ sub www_viewPurchaseHistory {
 		push(@historyLoop, {
 			(%properties),
 			itemLoop 	=> $_->getItems,
-			cancelUrl 	=> WebGUI::URL::page('op=cancelRecurringTransaction&tid='.$properties{transactionId}),
+			cancelUrl 	=> WebGUI::URL::page('op=cancelRecurringTransaction;tid='.$properties{transactionId}),
 			canCancel 	=> ($properties{recurring} && ($properties{status} eq 'Completed')),
 			});
 	}

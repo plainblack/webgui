@@ -229,7 +229,7 @@ Formats the URL to approve a post.
 
 sub getApproveUrl {
 	my $self = shift;
-	return $self->getUrl("func=approve&mlog=".$session{form}{mlog});
+	return $self->getUrl("func=approve;mlog=".$session{form}{mlog});
 }
 
 #-------------------------------------------------------------------
@@ -255,7 +255,7 @@ Formats the url to deny a post.
 
 sub getDenyUrl {
 	my $self = shift;
-	return $self->getUrl("func=deny&mlog=".$session{form}{mlog});
+	return $self->getUrl("func=deny;mlog=".$session{form}{mlog});
 }
 
 #-------------------------------------------------------------------
@@ -298,7 +298,7 @@ Formats the url to view a users profile.
 
 sub getPosterProfileUrl {
 	my $self = shift;
-	return $self->getUrl("op=viewProfile&uid=".$self->get("ownerUserId"));
+	return $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
 }
 
 #-------------------------------------------------------------------
@@ -316,7 +316,7 @@ An integer between 1 and 5 (5 = best).
 sub getRateUrl {
 	my $self = shift;
 	my $rating = shift;
-	return $self->getUrl("func=rate&rating=".$rating."#".$self->getId);
+	return $self->getUrl("func=rate;rating=".$rating."#".$self->getId);
 }
 
 #-------------------------------------------------------------------
@@ -334,7 +334,7 @@ If specified the reply with automatically quote the parent post.
 sub getReplyUrl {
 	my $self = shift;
 	my $withQuote = shift || 0;
-	return $self->getUrl("func=add&class=WebGUI::Asset::Post&withQuote=".$withQuote);
+	return $self->getUrl("func=add;class=WebGUI::Asset::Post;withQuote=".$withQuote);
 }
 
 #-------------------------------------------------------------------
@@ -386,7 +386,7 @@ sub getTemplateVars {
 	my %var = %{$self->get};
 	$var{"userId"} = $self->get("ownerUserId");
 	$var{"user.isPoster"} = $self->isPoster;
-	$var{"userProfile.url"} = $self->getUrl("op=viewProfile&uid=".$self->get("ownerUserId"));
+	$var{"userProfile.url"} = $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
 	$var{'title.short'} = $self->chopTitle;
@@ -471,7 +471,7 @@ sub getUploadControl {
 	if ($self->get("storageId")) {
 		my $i;
 		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
-			$uploadControl .= deleteIcon("func=deleteFile&filename=".$filename,$self->get("url"),WebGUI::International::get("delete file warning","Asset_Collaboration"))	
+			$uploadControl .= deleteIcon("func=deleteFile;filename=".$filename,$self->get("url"),WebGUI::International::get("delete file warning","Asset_Collaboration"))	
 				.' <a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a>'
 				.'<br />';
 			$i++;

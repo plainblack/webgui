@@ -34,11 +34,11 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help);
         }
-	$ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink&dlid=new'), WebGUI::International::get(982));
+	$ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink;dlid=new'), WebGUI::International::get(982));
 	if (($session{form}{op} eq "editDatabaseLink" && $session{form}{dlid} ne "new") || $session{form}{op} eq "deleteDatabaseLink") {
-                $ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink&dlid='.$session{form}{dlid}), WebGUI::International::get(983));
-                $ac->addSubmenuItem(WebGUI::URL::page('op=copyDatabaseLink&dlid='.$session{form}{dlid}), WebGUI::International::get(984));
-		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteDatabaseLink&dlid='.$session{form}{dlid}), WebGUI::International::get(985));
+                $ac->addSubmenuItem(WebGUI::URL::page('op=editDatabaseLink;dlid='.$session{form}{dlid}), WebGUI::International::get(983));
+                $ac->addSubmenuItem(WebGUI::URL::page('op=copyDatabaseLink;dlid='.$session{form}{dlid}), WebGUI::International::get(984));
+		$ac->addSubmenuItem(WebGUI::URL::page('op=deleteDatabaseLink;dlid='.$session{form}{dlid}), WebGUI::International::get(985));
 		$ac->addSubmenuItem(WebGUI::URL::page('op=listDatabaseLinks'), WebGUI::International::get(986));
 	}
         return $ac->render($workarea, $title);
@@ -61,7 +61,7 @@ sub www_deleteDatabaseLink {
         my ($output);
         $output .= WebGUI::International::get(988).'<p>';
         $output .= '<p><div align="center"><a href="'.
-		WebGUI::URL::page('op=deleteDatabaseLinkConfirm&dlid='.$session{form}{dlid})
+		WebGUI::URL::page('op=deleteDatabaseLinkConfirm;dlid='.$session{form}{dlid})
 		.'">'.WebGUI::International::get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listDatabaseLinks').
 		'">'.WebGUI::International::get(45).'</a></div>';
@@ -151,9 +151,9 @@ sub www_listDatabaseLinks {
 	$i++;
         while (%data = $sth->hash) {
                 $row[$i] = '<tr><td valign="top" class="tableData">'
-			.deleteIcon('op=deleteDatabaseLink&dlid='.$data{databaseLinkId})
-			.editIcon('op=editDatabaseLink&dlid='.$data{databaseLinkId})
-			.copyIcon('op=copyDatabaseLink&dlid='.$data{databaseLinkId})
+			.deleteIcon('op=deleteDatabaseLink;dlid='.$data{databaseLinkId})
+			.editIcon('op=editDatabaseLink;dlid='.$data{databaseLinkId})
+			.copyIcon('op=copyDatabaseLink;dlid='.$data{databaseLinkId})
 			.'</td>';
                 $row[$i] .= '<td valign="top" class="tableData">'.$data{title}.'</td></tr>';
                 $i++;

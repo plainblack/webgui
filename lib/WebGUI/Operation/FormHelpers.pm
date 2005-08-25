@@ -22,7 +22,7 @@ sub www_formAssetTree {
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
-		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree&classLimiter=".$session{form}{classLimiter}."&formId="
+		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree;classLimiter=".$session{form}{classLimiter}.";formId="
                         .$session{form}{formId}).'">'.$ancestor->get("menuTitle").'</a>');
 	}	
 	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
@@ -36,7 +36,7 @@ sub www_formAssetTree {
 		} else {
 			$output .= "(&bull;) ";
 		}
-		$output .= '<a href="'.$child->getUrl("op=formAssetTree&classLimiter=".$session{form}{classLimiter}."&formId="
+		$output .= '<a href="'.$child->getUrl("op=formAssetTree;classLimiter=".$session{form}{classLimiter}.";formId="
 			.$session{form}{formId}).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;

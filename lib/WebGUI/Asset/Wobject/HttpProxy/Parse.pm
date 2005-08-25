@@ -130,7 +130,7 @@ sub start {
             					$val = $self->{assetUrl};    # Form Action returns to us
           				} else {
 						$val =~ s/\n//g;	# Bugfix 757068
-            					$val = WebGUI::URL::append($self->{assetUrl},'proxiedUrl='.WebGUI::URL::escape($val).'&func=view'); # return to us
+            					$val = WebGUI::URL::append($self->{assetUrl},'proxiedUrl='.WebGUI::URL::escape($val).';func=view'); # return to us
           				}
         			}
       			}

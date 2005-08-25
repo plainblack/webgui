@@ -451,3 +451,18 @@ introduce errors to the database when modifying it directly rather than using
 the APIs.
 
 
+5.20 Use ; instead of & in URLs
+
+In our effort to achieve full XHTML strict compliance we have switched
+WebGUI's internals to expect a ; instead of a & as the URL query parameter
+delimiter in 6.7.2. You must update your WebGUI plugins to reflect this new
+URL style.
+
+
+5.21 WebGUI::Search Removed
+
+The old WebGUI::Search package has been removed in 6.7.2. It hasn't been used
+by any WebGUI core package since 6.3 and wasn't really used much prior to that. 
+If you were using it, just copy it's subs into your app.
+
+

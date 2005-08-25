@@ -290,7 +290,7 @@ sub view {
     for (keys %{$session{'form'}}) {
        unless (exists $seen{$_}) {
           $query_string .= WebGUI::URL::escape($_) . '='
-             . WebGUI::URL::escape($session{'form'}{$_}) . '&';
+             . WebGUI::URL::escape($session{'form'}{$_}) . ';';
        }
     }
     $url = WebGUI::URL::page($query_string);
@@ -503,7 +503,7 @@ sub view {
 	$p->appendTemplateVars(\%var);
          for ('pagination.firstPage','pagination.lastPage','pagination.nextPage','pagination.pageList',
 		'pagination.previousPage', 'pagination.pageList.upTo20', 'pagination.pageList.upTo10') {
-            $var{$_} =~ s/\?/\?cache=$cache_key\&/g;
+            $var{$_} =~ s/\?/\?cache=$cache_key\;/g;
          }
       }
 

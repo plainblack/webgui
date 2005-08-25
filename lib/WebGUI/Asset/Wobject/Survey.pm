@@ -627,9 +627,9 @@ sub view {
 	my $self = shift;
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
-	$var->{'question.add.url'} = $self->getUrl('func=editQuestion&qid=new');
+	$var->{'question.add.url'} = $self->getUrl('func=editQuestion;qid=new');
 	$var->{'question.add.label'} = WebGUI::International::get(30,'Asset_Survey');
-	$var->{'section.add.url'} = $self->getUrl('func=editSection&sid=new');
+	$var->{'section.add.url'} = $self->getUrl('func=editSection;sid=new');
 	$var->{'section.add.label'} = WebGUI::International::get(104,'Asset_Survey');
 	my @sectionEdit;
 	
@@ -645,10 +645,10 @@ sub view {
 		while (my %data = $sth2->hash) {
 		  push(@edit,{
 			'question.edit.controls'=>
-				deleteIcon('func=deleteQuestionConfirm&qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Asset_Survey')).
-				editIcon('func=editQuestion&qid='.$data{Survey_questionId}, $self->get("url")).
-				moveUpIcon('func=moveQuestionUp&qid='.$data{Survey_questionId}, $self->get("url")).
-				moveDownIcon('func=moveQuestionDown&qid='.$data{Survey_questionId}, $self->get("url")),
+				deleteIcon('func=deleteQuestionConfirm;qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Asset_Survey')).
+				editIcon('func=editQuestion;qid='.$data{Survey_questionId}, $self->get("url")).
+				moveUpIcon('func=moveQuestionUp;qid='.$data{Survey_questionId}, $self->get("url")).
+				moveDownIcon('func=moveQuestionDown;qid='.$data{Survey_questionId}, $self->get("url")),
 			'question.edit.question'=>$data{question},
 			'question.edit.id'=>$data{Survey_questionId}
 		  });
@@ -657,10 +657,10 @@ sub view {
 	
 		push(@sectionEdit,{
 			'section.edit.controls'=>
-				deleteIcon('func=deleteSectionConfirm&sid='.$sectionData{Survey_sectionId}, $self->get("url"), WebGUI::International::get(105,'Asset_Survey')).
-				editIcon('func=editSection&sid='.$sectionData{Survey_sectionId}, $self->get("url")).
-				moveUpIcon('func=moveSectionUp&sid='.$sectionData{Survey_sectionId}, $self->get("url")).
-				moveDownIcon('func=moveSectionDown&sid='.$sectionData{Survey_sectionId}, $self->get("url")),
+				deleteIcon('func=deleteSectionConfirm;sid='.$sectionData{Survey_sectionId}, $self->get("url"), WebGUI::International::get(105,'Asset_Survey')).
+				editIcon('func=editSection;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
+				moveUpIcon('func=moveSectionUp;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
+				moveDownIcon('func=moveSectionDown;sid='.$sectionData{Survey_sectionId}, $self->get("url")),
 			'section.edit.sectionName'=>$sectionData{sectionName},
 			'section.edit.id'=>$sectionData{Survey_sectionId},
 			'section.questions_loop'=>\@edit
@@ -701,7 +701,7 @@ sub view {
 			});
 	$var->{'questions.sofar.label'} = WebGUI::International::get(86,'Asset_Survey');
 	$var->{'start.newResponse.label'} = WebGUI::International::get(87,'Asset_Survey');
-	$var->{'start.newResponse.url'} = $self->getUrl("func=view&startNew=1"); 
+	$var->{'start.newResponse.url'} = $self->getUrl("func=view;startNew=1"); 
 	$var->{'thanks.survey.label'} = WebGUI::International::get(46,'Asset_Survey');
 	$var->{'thanks.quiz.label'} = WebGUI::International::get(47,'Asset_Survey');
 	$var->{'questions.total'} = $self->getQuestionCount;
@@ -754,7 +754,7 @@ sub www_deleteSectionConfirm {
 sub www_deleteResponse {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
         return $_[0]->confirm(WebGUI::International::get(72,'Asset_Survey'),
-                $_[0]->getUrl('func=deleteResponseConfirm&responseId='.$session{form}{responseId}));
+                $_[0]->getUrl('func=deleteResponseConfirm;responseId='.$session{form}{responseId}));
 }
 
 #-------------------------------------------------------------------
@@ -997,17 +997,17 @@ sub www_editQuestion {
 	   && $question->{answerFieldType} ne "HTMLArea"
 	   && $question->{answerFieldType} ne "textArea"
 	) {
-		$output .= '<a href="'.$self->getUrl('func=editAnswer&aid=new&qid='
+		$output .= '<a href="'.$self->getUrl('func=editAnswer;aid=new;qid='
 			.$question->{Survey_questionId}).'">'.WebGUI::International::get(23,'Asset_Survey').'</a><p />';
 		$sth = WebGUI::SQL->read("select Survey_answerId,answer from Survey_answer 
 			where Survey_questionId=".quote($question->{Survey_questionId})." order by sequenceNumber");
 		while (%data = $sth->hash) {
 			$output .= 
-				deleteIcon('func=deleteAnswerConfirm&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, 
+				deleteIcon('func=deleteAnswerConfirm;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, 
 					$self->get("url"),WebGUI::International::get(45,'Asset_Survey')).
-                                editIcon('func=editAnswer&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->get("url")).
-                                moveUpIcon('func=moveAnswerUp'.'&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->get("url")).
-                                moveDownIcon('func=moveAnswerDown&qid='.$question->{Survey_questionId}.'&aid='.$data{Survey_answerId}, $self->get("url")).
+                                editIcon('func=editAnswer;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
+                                moveUpIcon('func=moveAnswerUp'.';qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
+                                moveDownIcon('func=moveAnswerDown;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
                                 ' '.$data{answer}.'<br>';
 		}
 		$sth->finish;
@@ -1243,7 +1243,7 @@ sub www_viewGradebook {
                 	Survey_answer b on a.Survey_answerId=b.Survey_answerId where a.Survey_responseId=".quote($user->{Survey_responseId})
 			." and b.isCorrect=1");
 		push(@responseloop, {
-			'response.url'=>$self->getUrl('func=viewIndividualSurvey&responseId='.$user->{Survey_responseId}),
+			'response.url'=>$self->getUrl('func=viewIndividualSurvey;responseId='.$user->{Survey_responseId}),
 			'response.user.name'=>($user->{userId} eq '1') ? $user->{ipAddress} : $user->{username},
 			'response.count.correct' => $correctCount,
 			'response.percent' => round(($correctCount/$var->{'question.count'})*100)
@@ -1263,7 +1263,7 @@ sub www_viewIndividualSurvey {
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});
 	my $var = $self->getMenuVars;
 	$var->{'title'} = WebGUI::International::get(70,'Asset_Survey');
-	$var->{'delete.url'} = $self->getUrl('func=deleteResponse&responseId='.$session{form}{responseId});
+	$var->{'delete.url'} = $self->getUrl('func=deleteResponse;responseId='.$session{form}{responseId});
 	$var->{'delete.label'} = WebGUI::International::get(69,'Asset_Survey');
 	my $response = WebGUI::SQL->getRow("Survey_response","Survey_responseId",$session{form}{responseId});
 	$var->{'start.date.label'} = WebGUI::International::get(76,'Asset_Survey');

@@ -192,7 +192,7 @@ sub view {
 		$vars{"dragger.init"} = '
 			<iframe id="dragSubmitter" style="display: none;" src="'.$session{config}{extrasURL}.'/spacer.gif"></iframe>
 			<script>
-				dragable_init("'.$self->getUrl("func=setContentPositions&map=").'");
+				dragable_init("'.$self->getUrl("func=setContentPositions;map=").'");
 			</script>
 			<style>
 			.dragging, .empty {

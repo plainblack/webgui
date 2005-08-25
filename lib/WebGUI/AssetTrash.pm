@@ -211,7 +211,7 @@ sub www_manageTrash {
 		$header = WebGUI::International::get(965,"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10),"Asset");
 	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash&systemTrash=1'), WebGUI::International::get(964),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), WebGUI::International::get(964),"Asset");
 		$limit = 1;
 	}
   	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});

@@ -352,7 +352,7 @@ Returns an arrayref that contains a label (name of the class of Asset) and url (
 
 =head3 addToUrl
 
-Any text to append to the getAssetAdderLinks URL. Usually name/variable pairs to pass in the url. If addToURL is specified, the character "&" and the text in addToUrl is appended to the returned url.
+Any text to append to the getAssetAdderLinks URL. Usually name/variable pairs to pass in the url. If addToURL is specified, the character ";" and the text in addToUrl is appended to the returned url.
 
 =head3 type
 
@@ -388,7 +388,7 @@ sub getAssetAdderLinks {
 			if ($@) {
 				WebGUI::ErrorHandler::error("Couldn't get the name of ".$class." because ".$@);
 			} else {
-				my $url = $self->getUrl("func=add&class=".$class);
+				my $url = $self->getUrl("func=add;class=".$class);
 				$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
 				$links{$label}{url} = $url;
 				$links{$label}{icon} = $class->getIcon;
@@ -408,7 +408,7 @@ sub getAssetAdderLinks {
 	while (my ($class,$id,$date) = $sth->array) {
 		my $asset = WebGUI::Asset->new($id,$class,$date);
 		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $session{user}{uiLevel});
-		my $url = $self->getUrl("func=add&class=".$class."&prototype=".$id);
+		my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
 		$links{$asset->getTitle}{url} = $url;
 		$links{$asset->getTitle}{icon} = $asset->getIcon;
@@ -650,7 +650,7 @@ sub getEditForm {
 		if (WebGUI::Grouping::isInGroup(3)) {
                 	# Add a quick link to add field
                 	$tabform->getTab("meta")->readOnly(
-                                        -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField&fid=new").'">'.
+                                        -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField;fid=new").'">'.
                                                         WebGUI::International::get('Add new field','Asset').
                                                         '</a></p>',
                                         -hoverHelp=>WebGUI::International::get('make prototype description',"Asset"),
@@ -871,7 +871,7 @@ Returns a URL of Asset based upon WebGUI's gateway script.
 
 Name value pairs to add to the URL in the form of:
 
- name1=value1&name2=value2&name3=value3
+ name1=value1;name2=value2;name3=value3
 
 =cut
 
@@ -1447,7 +1447,7 @@ sub www_manageAssets {
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
-                contextMenu.addLink("'.$child->getUrl("func=createShortcut&proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
+                contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
 		my $title = $child->getTitle;
@@ -1456,9 +1456,9 @@ sub www_manageAssets {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+" if ($child->get("isLockedBy") eq $session{user}{userId});
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->get("isLockedBy") eq $session{user}{userId});
 		} else {
-			$edit = "'<a href=\"".$child->getUrl("func=edit&proceed=manageAssets")."\">Edit</a> | '+";
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
          	$output .= "assetManager.AddLine('"
@@ -1495,21 +1495,21 @@ sub www_manageAssets {
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= editIcon("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= editIcon("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit&proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= editIcon("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '</fieldset></div>'; 
@@ -1544,8 +1544,8 @@ sub www_manageAssets {
 	my $packages;
         foreach my $asset (@{$self->getPackageList}) {
               	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
-			<a href="'.$self->getUrl("func=deployPackage&assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
-			.editIcon("func=edit&proceed=manageAssets",$asset->get("url"))
+			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
+			.editIcon("func=edit;proceed=manageAssets",$asset->get("url"))
 			.'<br />';
 		$hasPackages = 1;
         }

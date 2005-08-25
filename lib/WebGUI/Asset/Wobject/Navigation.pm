@@ -281,7 +281,7 @@ sub getToolbar {
 	if ($self->getToolbarState) {
 		my $returnUrl;
 		if (exists $session{asset}) {
-			$returnUrl = "&proceed=goBackToPage&returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);	
+			$returnUrl = ";proceed=goBackToPage;returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);	
 		}
 		my $toolbar;
 		if (!$self->isLocked || $self->get("isLockedBy") eq $session{user}{userId}) {

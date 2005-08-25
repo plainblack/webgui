@@ -21,7 +21,6 @@ use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Privilege;
-use WebGUI::Search;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
@@ -619,7 +618,7 @@ Formats the url to start a new thread.
 
 sub getNewThreadUrl {
 	my $self = shift;
-	$self->getUrl("func=add&class=WebGUI::Asset::Post::Thread");
+	$self->getUrl("func=add;class=WebGUI::Asset::Post::Thread");
 }
 
 #-------------------------------------------------------------------
@@ -1052,7 +1051,7 @@ sub www_search {
 		$sql .= " and " if ($sql ne "" && $without ne "");
 		$sql .= " ($without) " if ($without ne "");
 		$sql .= " group by assetData.assetId order by Post.dateSubmitted desc";
-		my $p = WebGUI::Paginator->new($self->getUrl("func=search&doit=1"),$numResults);
+		my $p = WebGUI::Paginator->new($self->getUrl("func=search;doit=1"),$numResults);
 		$self->appendPostListTemplateVars(\%var, $sql, $p);
         }
         return  $self->processStyle($self->processTemplate(\%var, $self->get("searchTemplateId")));

@@ -292,21 +292,21 @@ sub getEditForm {
     -namespace=>"EventsCalendar/Event",
     -label=>WebGUI::International::get(530,"Asset_Event"),
     -hoverHelp=>WebGUI::International::get('530 description',"Asset_Event"),
-    -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
+    -afterEdit=>'func=edit;wid='.$self->get("wobjectId")
     );
 #	$tabform->getTab("display")->template(
 #    -name=>"regNotifyTemplateId",
 #    -value=>$self->getValue("regNotifyTemplateId"),
 #    -namespace=>"EventsCalendar/Event",
 #    -label=>WebGUI::International::get(531,"Asset_Event"),
-#    -afterEdit=>'func=edit&wid='.$self->get("wobjectId")
+#    -afterEdit=>'func=edit;wid='.$self->get("wobjectId")
 #    );
 #  $tabform->getTab("display")->template(
 #  	-name=>"reminderTemplateId",
 #		-value=>$self->getValue("reminderTemplateId"),
 #		-namespace=>"EventsCalendar/Event",
 #		-label=>WebGUI::International::get(532,"Asset_Event"),
-#		-afterEdit=>'func=edit&wid='.$self->get("wobjectId")
+#		-afterEdit=>'func=edit;wid='.$self->get("wobjectId")
 #		);
 #	$tabform->getTab("security")->group(
 #		-name=>"groupCanRegister", -label=>WebGUI::International::get(533,"Asset_Event"),
@@ -402,7 +402,7 @@ sub view {
 	$var{canEdit} = $self->canEdit;
 	$var{"edit.url"} = WebGUI::URL::page('func=edit');
 	$var{"edit.label"} = WebGUI::International::get(575,"Asset_Event");
-	$var{"delete.url"} = WebGUI::URL::page('func=deleteEvent&rid='.$self->getValue("EventsCalendar_recurringId"));
+	$var{"delete.url"} = WebGUI::URL::page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
 	$var{"delete.label"} = WebGUI::International::get(576,"Asset_Event");
 	my $vars = \%var;
 	#get parent so we can get the parent's style.  Hopefully the parent is an EventsCalendar.  If not, oh well.
@@ -419,7 +419,7 @@ sub www_deleteEvent {
 	$output = '<h1>'.WebGUI::International::get(42,"Asset_Event").'</h1>';
 	$output .= WebGUI::International::get(75,"Asset_Event").'<p><blockquote>';
 	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm').'">'.WebGUI::International::get(76,"Asset_Event").'</a><p>';
-	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm&rid='.$session{form}{rid}).'">'
+	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm;rid='.$session{form}{rid}).'">'
 		.WebGUI::International::get(77,"Asset_Event").'</a><p>' if (($session{form}{rid} ne "") and ($session{form}{rid} ne "0"));
 	$output .= '<a href="'.$self->getUrl.'">'.WebGUI::International::get(78,"Asset_Event").'</a>';
 	$output .= '</blockquote>';

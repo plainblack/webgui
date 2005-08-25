@@ -205,7 +205,7 @@ sub createAccount {
 	$vars->{'create.form.submit'} = WebGUI::Form::submit({});
     $vars->{'create.form.footer'} = WebGUI::Form::formFooter();
 	
-    $vars->{'login.url'} = WebGUI::URL::page('op=auth&method=init');
+    $vars->{'login.url'} = WebGUI::URL::page('op=auth;method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
 	return WebGUI::Asset::Template->new($self->getCreateAccountTemplateId)->process($vars);
@@ -286,7 +286,7 @@ sub deactivateAccount {
    my %var; 
   	$var{title} = WebGUI::International::get(42);
    	$var{question} =  WebGUI::International::get(60);
-   	$var{'yes.url'} = WebGUI::URL::page('op=auth&method='.$method);
+   	$var{'yes.url'} = WebGUI::URL::page('op=auth;method='.$method);
 	$var{'yes.label'} = WebGUI::International::get(44);
    	$var{'no.url'} = WebGUI::URL::page();
 	$var{'no.label'} = WebGUI::International::get(45);
@@ -399,7 +399,7 @@ sub displayLogin {
 	$vars->{'login.form.submit'} = WebGUI::Form::submit({"value"=>WebGUI::International::get(52)});
 	$vars->{'login.form.footer'} = WebGUI::Form::formFooter();
 	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
-	$vars->{'createAccount.url'} = WebGUI::URL::page('op=auth&method=createAccount');
+	$vars->{'createAccount.url'} = WebGUI::URL::page('op=auth;method=createAccount');
 	$vars->{'createAccount.label'} = WebGUI::International::get(67);
 	return WebGUI::Asset::Template->new($self->getLoginTemplateId)->process($vars);
 }

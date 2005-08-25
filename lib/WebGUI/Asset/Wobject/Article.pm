@@ -127,7 +127,7 @@ sub view {
 	if ($self->get("convertCarriageReturns")) {
 		$var{description} =~ s/\n/\<br\>\n/g;
 	}
-	$var{"new.template"} = $self->getUrl."&overrideTemplateId=";
+	$var{"new.template"} = $self->getUrl.";overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
 	$var{"description.first.100words"} = $var{"description.full"};

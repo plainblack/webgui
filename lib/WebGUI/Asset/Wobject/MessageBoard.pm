@@ -92,7 +92,7 @@ sub view {
 			});
 	}
 	$var{'default.listing'} = $first->view if ($count == 1 && defined $first);
-	$var{'forum.add.url'} = $self->getUrl("func=add&class=WebGUI::Asset::Wobject::Collaboration");
+	$var{'forum.add.url'} = $self->getUrl("func=add;class=WebGUI::Asset::Wobject::Collaboration");
 	$var{'forum.add.label'} = WebGUI::International::get(75,"Asset_MessageBoard");
 	$var{'title.label'} = WebGUI::International::get('title','Asset_MessageBoard');
 	$var{'views.label'} = WebGUI::International::get('views',,'Asset_MessageBoard');

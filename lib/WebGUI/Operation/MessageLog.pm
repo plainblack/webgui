@@ -46,7 +46,7 @@ sub www_viewMessageLog {
    my $messages = $p->getPageData;
    foreach my $message (@$messages) {   
       my $hash;
-      $hash->{'message.subject'} =  '<a href="'.WebGUI::URL::page('op=viewMessageLogMessage&mlog='.$message->{messageLogId}).'">'.$message->{subject}.'</a>';
+      $hash->{'message.subject'} =  '<a href="'.WebGUI::URL::page('op=viewMessageLogMessage;mlog='.$message->{messageLogId}).'">'.$message->{subject}.'</a>';
       my $status = _status->{$message->{status}};
       $status = '<a href="'.WebGUI::URL::append($message->{url},'mlog='.$message->{messageLogId}).'">'.$status.'</a>' if ($message->{url} ne "");
       $hash->{'message.status'} = $status;

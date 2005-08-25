@@ -131,7 +131,7 @@ sub getEditForm {
 			-label=>WebGUI::International::get(80,"Asset_EventsCalendar"),
 			-value=>$self->getValue('eventTemplateId'),
 			-namespace=>"EventsCalendar/Event",
-			-afterEdit=>'func=edit&wid='.$self->get("wobjectId")
+			-afterEdit=>'func=edit;wid='.$self->get("wobjectId")
 		);
 		$tabform->getTab("display")->selectList(
 			-name=>"startMonth",
@@ -421,7 +421,7 @@ sub view {
 	my %var;
 	$var{month_loop} = \@$monthloop;
 #	$var{"canManage"} = $self->canManage;
-	$var{"addevent.url"} = $self->getUrl().'?func=addStyledEvent&class=WebGUI::Asset::Event';
+	$var{"addevent.url"} = $self->getUrl().'?func=addStyledEvent;class=WebGUI::Asset::Event';
 	$var{"addevent.label"} = WebGUI::International::get(20,"Asset_EventsCalendar");
 	$var{'sunday.label'} = WebGUI::DateTime::getDayName(7);
 	$var{'monday.label'} = WebGUI::DateTime::getDayName(1);
@@ -451,12 +451,12 @@ sub view {
 	}
 	$var{'pagination.previousPage'} = '<form method="GET" style="inline;" action="'.
 		$self->getUrl.'?calMonthStart='.$calMonthStart.
-		'&reload='.WebGUI::Id::generate().'"><a href="'.$self->getUrl.
-		'?calMonthStart='.$prevCalMonthStart.'&calMonthEnd='.$prevCalMonthEnd.'">'.
+		';reload='.WebGUI::Id::generate().'"><a href="'.$self->getUrl.
+		'?calMonthStart='.$prevCalMonthStart.';calMonthEnd='.$prevCalMonthEnd.'">'.
 		WebGUI::International::get(558,"Asset_EventsCalendar")." ".$monthRangeLength." ".
 		$monthLabel.'</a>';
 	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.
-		'?calMonthStart='.$nextCalMonthStart.'&calMonthEnd='.$nextCalMonthEnd.'">'.
+		'?calMonthStart='.$nextCalMonthStart.';calMonthEnd='.$nextCalMonthEnd.'">'.
 		WebGUI::International::get(559,"Asset_EventsCalendar")." ".$monthRangeLength." ".
 		$monthLabel.'</a></form>';
 	$var{'pagination.pageList.upTo20'} = '<select size="1" name="calMonthEnd">

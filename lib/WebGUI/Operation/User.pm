@@ -44,16 +44,16 @@ sub _submenu {
                 $ac->setHelp($help);
         }
 	if (WebGUI::Grouping::isInGroup(11)) {
-		$ac->addSubmenuItem(WebGUI::URL::page("op=editUser&uid=new"), WebGUI::International::get(169));
+		$ac->addSubmenuItem(WebGUI::URL::page("op=editUser;uid=new"), WebGUI::International::get(169));
 	}
 	if (WebGUI::Grouping::isInGroup(3)) {
 		unless ($session{form}{op} eq "listUsers" 
 			|| $session{form}{op} eq "deleteUserConfirm") {
-			$ac->addSubmenuItem(WebGUI::URL::page("op=editUser&uid=".$session{form}{uid}), WebGUI::International::get(457));
-			$ac->addSubmenuItem(WebGUI::URL::page('op=becomeUser&uid='.$session{form}{uid}), WebGUI::International::get(751));
-			$ac->addSubmenuItem(WebGUI::URL::page('op=deleteUser&uid='.$session{form}{uid}), WebGUI::International::get(750));
+			$ac->addSubmenuItem(WebGUI::URL::page("op=editUser;uid=".$session{form}{uid}), WebGUI::International::get(457));
+			$ac->addSubmenuItem(WebGUI::URL::page('op=becomeUser;uid='.$session{form}{uid}), WebGUI::International::get(751));
+			$ac->addSubmenuItem(WebGUI::URL::page('op=deleteUser;uid='.$session{form}{uid}), WebGUI::International::get(750));
 			if ($session{setting}{useKarma}) {
-				$ac->addSubmenuItem(WebGUI::URL::page("op=editUserKarma&uid=".$session{form}{uid}), WebGUI::International::get(555));
+				$ac->addSubmenuItem(WebGUI::URL::page("op=editUserKarma;uid=".$session{form}{uid}), WebGUI::International::get(555));
 			}
 		}
 		$ac->addSubmenuItem(WebGUI::URL::page("op=listUsers"), WebGUI::International::get(456));
@@ -186,7 +186,7 @@ sub www_deleteUser {
 		return _submenu(WebGUI::Privilege::vitalComponent());
         } else {
                 $output .= WebGUI::International::get(167).'<p>';
-                $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteUserConfirm&uid='.$session{form}{uid}).
+                $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteUserConfirm;uid='.$session{form}{uid}).
 			'">'.WebGUI::International::get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listUsers').'">'.
 			WebGUI::International::get(45).'</a></div>'; 
@@ -470,7 +470,7 @@ sub www_listUsers {
 	foreach my $data (@{$p->getPageData}) {
 		$output .= '<tr class="tableData">';
 		$output .= '<td>'.$status{$data->{status}}.'</td>';
-		$output .= '<td><a href="'.WebGUI::URL::page('op=editUser&uid='.$data->{userId})
+		$output .= '<td><a href="'.WebGUI::URL::page('op=editUser;uid='.$data->{userId})
 			.'">'.$data->{username}.'</a></td>';
 		$output .= '<td class="tableData">'.$data->{email}.'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{dateCreated},"%z").'</td>';
