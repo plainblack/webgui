@@ -81,8 +81,8 @@ sub get {
 		$language = $_[2] || $session{user}{language} || "English";
 	}
 	$id =~ s/[^\w\d\s\/]//g;
-	$language =~ s/[^\w\d\s]//g;
-	$namespace =~ s/[^\w\d\s]//g;
+	$language =~ s/[^\w\d\s\/]//g;
+	$namespace =~ s/[^\w\d\s\/]//g;
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
 	my $load = "use ".$cmd;
 	eval($load);
