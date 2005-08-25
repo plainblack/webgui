@@ -419,7 +419,7 @@ sub getLineage {
 		$where .= ' and (asset.className in ('.quoteAndJoin($rules->{includeOnlyClasses}).'))';
 	}
 	## finish up our where clause
-	$where .= " and ".join(" or ",@whereModifiers) if (scalar(@whereModifiers));
+	$where .= ' and ('.join(" or ",@whereModifiers).')' if (scalar(@whereModifiers));
 	if (exists $rules->{whereClause}) {
 		$where .= ' and ('.$rules->{whereClause}.')';
 	}
