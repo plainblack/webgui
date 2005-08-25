@@ -143,17 +143,29 @@ sub view {
 	my @positions = split(/\./,$self->get("contentPositions"));
 	my @hidden = split("\n",$self->getValue("assetsToHide"));
 	my $i = 1;
+	my $template= WebGUI::Asset->newByDynamicClass($self->get("templateId"))->get("template");
+	my $numPositions = 1;
+	foreach my $j (2..15) {
+		$numPositions = $j if $template =~ m/position${j}\_loop/;
+	}
 	my @found;
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
 		foreach my $asset (@assets) {
 			foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
-					unless (isIn($asset,@hidden)) {
-						push(@{$vars{"position".$i."_loop"}},{
-							id=>$child->getId,
-							content=>$child->view
-							}) if $child->canView;	
+					unless (isIn($asset,@hidden) || !($child->canView)) {
+						if ($i > $numPositions) {
+							push(@{$vars{"position1_loop"}},{
+								id=>$child->getId,
+								content=>$child->view
+							});
+						} else {
+							push(@{$vars{"position".$i."_loop"}},{
+								id=>$child->getId,
+								content=>$child->view
+							});
+						}
 					}
 					push(@found, $child->getId);
 				}

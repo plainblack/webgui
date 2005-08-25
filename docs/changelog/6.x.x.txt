@@ -3,8 +3,6 @@
  - fix [ 1267548 ] can't add metadata field (midellaq) 
  - fix [ 1265788 ] SyndicatedContent *not working* in 6.7.x
  - fix [ 1266285 ] 6.7.1 - UserProfile Fields Time error (Len Kranendonk)
-
-=======
  - fix [ 1245765 ] Missing 'page not found' crashes settings 
  - fix [ 1263934 ] 6.6.5 Import Scripts Asset URLs
  - fix [ 1260760 ] Default endDate in asset table too high for FreeBSD
@@ -19,7 +17,8 @@
  - fix [ 1248040 ] plainblack forum search not showing dates
  - fix [ 1265771 ] assets that were formerly packages are still on packageList
  - fix [ 1177447 ] deployPackage does not retain content pos. (mwilson)
->>>>>>> 1.450
+ - fix [ 1256718 ] Assets disappear after changing page layout (mwilson)
+
 
 6.7.1
  - fix [ 1251608 ] can't login
