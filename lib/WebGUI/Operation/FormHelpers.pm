@@ -52,7 +52,6 @@ sub www_richEditPageTree {
 		-name=>"url",
 		-label=>WebGUI::International::get(104),
 		-hoverHelp=>WebGUI::International::get('104 description'),
-		-extras=>'id="url"'
 		);
 	$f->selectList(
 		-name=>"target",
@@ -60,7 +59,6 @@ sub www_richEditPageTree {
 		-hoverHelp=>WebGUI::International::get('target description'),
 		-options=>{"_self"=>WebGUI::International::get('link in same window'),
 		           "_blank"=>WebGUI::International::get('link in new window')},
-		-extras=>'id="target"'
 		);
 	$f->button(
 		-value=>WebGUI::International::get('done'),
@@ -72,11 +70,11 @@ sub www_richEditPageTree {
 	<script language="javascript">
 function createLink() {
     if (window.opener) {        
-        if (document.getElementById("url").value == "") {
-           alert('.WebGUI::International::get("link enter alert").');
-           document.getElementById("url").focus();
+        if (document.getElementById("url_formId").value == "") {
+           alert("'.WebGUI::International::get("link enter alert").'");
+           document.getElementById("url_formId").focus();
         }
-window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url").value,document.getElementById("target").value);
+window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_formId").value,document.getElementById("target_formId").value);
      window.close();
     }
 }
@@ -91,7 +89,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url"
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
-		$output .= '<a href="#" onclick="document.getElementById(\'url\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
 	return $output.'</fieldset></fieldset>';

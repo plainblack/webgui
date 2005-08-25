@@ -752,7 +752,7 @@ sub speedUpAdminConsole {
 <div id="console_icon">
      <img src="<tmpl_var console.icon>" border="0" title="<tmpl_var console.title>" alt="<tmpl_var console.title>" />
 </div>
-<script lang="JavaScript">
+<script type="text/javascript">
   initAdminConsole(<tmpl_if application.title>true<tmpl_else>false</tmpl_if>,<tmpl_if submenu_loop>true<tmpl_else>false</tmpl_if>);
 </script>
 
