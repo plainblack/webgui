@@ -1399,15 +1399,15 @@ sub www_editSave {
 	$object->updateHistory("edited");
 	if ($session{form}{proceed} eq "manageAssets") {
 		$session{asset} = $object->getParent;
-		return $object->getParent->www_manageAssets;
+		return $session{asset}->www_manageAssets;
 	}
 	if ($session{form}{proceed} ne "") {
 		my $method = "www_".$session{form}{proceed};
 		$session{asset} = $object;
-		return $object->$method();
+		return $session{asset}->$method();
 	}
 	$session{asset} = $object->getContainer;
-	return $self->getContainer->www_view;
+	return $session{asset}->www_view;
 }
 
 

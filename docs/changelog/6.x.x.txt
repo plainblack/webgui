@@ -25,6 +25,11 @@
  - fix [ 1262002 ] no "next Thread" or "previous Thread" links (mwilson)
  - fix [ 1252626 ] navigation relative to current url broken (mwilson)
  - fix [ 1261994 ] getLineageLength (mwilson)
+ - Updated references to Ruling WebGUI to be changed to WebGUI Done Right in
+   the default content.
+ - Changed the page templates to float better in IE.
+ - Fixed a bug that caused the page layout template not to change immediately
+   upon an edit.
 
 
 6.7.1
