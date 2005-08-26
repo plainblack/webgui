@@ -82,7 +82,11 @@ sub addUserForm {
    my $self = shift;
    my $userData = $self->getParams;
    my $f = WebGUI::HTMLForm->new;
-   $f->password("authWebGUI.identifier",WebGUI::International::get(51),"password");
+   $f->password(
+	name=>"authWebGUI.identifier",
+	label=>WebGUI::International::get(51),
+	value=>"password"
+	);
    $f->interval(
 	-name=>"authWebGUI.passwordTimeout",
 	-label=>WebGUI::International::get(16,'AuthWebGUI'),

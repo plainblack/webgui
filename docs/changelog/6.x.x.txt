@@ -35,6 +35,13 @@
  - fix [ 1264301 ] HTML Link in text editor broken
  - Removed the positive options for Navigations with start points relative to
    the current URL since they didn't make any sense.
+ - Fixed a bug where password field was not being displayed in the user manager.
+ - Fixed a bug in version management where you couldn't see the list of things
+   changed under a specific tag.
+ - Fixed a bug in versioning that would allow a user not using the same tag as
+   the original editor to edit a locked asset.
+ - Fixed a bug that would not allow an editor to commit an individual asset
+   revision.
 
 
 6.7.1

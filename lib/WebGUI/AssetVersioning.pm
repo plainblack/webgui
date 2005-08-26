@@ -102,6 +102,27 @@ sub addVersionTag {
 
 #-------------------------------------------------------------------
 
+=head2 canEditIfLocked ( )
+
+Returns a boolean indicating whether this asset is locked and if the current user can edit it in that state.
+
+=cut
+
+sub canEditIfLocked {
+	my $self = shift;
+	return 0 unless ($self->isLocked);
+	return ($self->get("isLockedBy") eq $session{user}{userId});
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 commit ( )
+
+Unlock's the asset and sets it to approved.
+
+=cut
+
 sub commit {
 	my $self = shift;
 	$self->unsetVersionLock;
@@ -110,6 +131,16 @@ sub commit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 commitVersionTag ( tagId )
+
+Commits all assets edited under a version tag, and then sets the version tag to committed.
+
+=head3 tagId
+
+The unique id of the tag to be committed.
+
+=cut
 
 sub commitVersionTag {
 	my $class = shift;
@@ -349,7 +380,16 @@ sub www_addVersionTagSave {
 }
 
 
-#-------------------------------------------------------------------A
+#-------------------------------------------------------------------
+
+sub www_commitRevision {
+	my $self = shift;
+	return WebGUI::Privilege::adminOnly() unless $self->canEdit;
+	$self->commit;
+	return $self->getContainer->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
+	return $self->getContainer->www_view;
+}
+#-------------------------------------------------------------------
 
 sub www_commitVersionTag {
 	my $self = shift;
@@ -417,7 +457,8 @@ sub www_manageRevisions {
                 $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td><a href="'.$self->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
 			<td>'.$by.'</td>
-			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$tagId).'">'.$tag.'</a></td></tr>';
+			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$tagId).'">'.$tag.'</a></td>
+			</tr>';
         }
         $sth->finish;
         $output .= '</table>';
@@ -449,16 +490,17 @@ sub www_manageVersions {
 	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
 	my $commitPrompt = $i18n->get("commit version tag confirm");
 	my $output = '<p>You are currently working under a tag called: <b>'.$tag.'</b>.</p><table width=100% class="content">
-	<tr><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
+	<tr><th></th><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
 	my $sth = WebGUI::SQL->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
 	while (my ($id,$name,$date,$by) = $sth->array) {
 		my $u = WebGUI::User->new($by);
-		$output .= '<tr><td><a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$name.'</a></td>
+		$output .= '<tr>
+			<td>'.WebGUI::Icon::deleteIcon("func=rollbackVersionTag;tagId=".$id,$self->get("url"),$rollbackPrompt).'</td>
+			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
 			<td>'.WebGUI::DateTime::epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
 			<td>
 			<a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$setTag.'</a> |
-			<a href="'.$self->getUrl("func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a> |
 			<a href="'.$self->getUrl("func=commitVersionTag;tagId=".$id).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
 	$sth->finish;	

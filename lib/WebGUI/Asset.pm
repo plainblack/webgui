@@ -808,18 +808,20 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 sub getToolbar {
 	my $self = shift;
 	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"));
-	if (!$self->isLocked || $self->get("isLockedBy") eq $session{user}{userId}) {
+	my $commit;
+	my $i18n = WebGUI::International->new("Asset");
+	if (($self->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId")) || !$self->isLocked) {
         	$toolbar .= editIcon('func=edit',$self->get("url"));
 	} else {
 		$toolbar .= lockedIcon('func=manageRevisions',$self->get("url"));
 	}
+	$commit = 'contextMenu.addLink("'.$self->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($self->canEditIfLocked);
         $toolbar .= cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
 	$toolbar .= exportIcon('func=export',$self->get("url")) if defined ($session{config}{exportPath});
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
-	my $i18n = WebGUI::International->new("Asset");
 	return '<script type="text/javascript" language="javascript">
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
 		contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
@@ -827,6 +829,7 @@ sub getToolbar {
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
 		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
 		contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
+		'.$commit.'
 		contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
 		contextMenu.print();
 		</script>'.$toolbar;
@@ -1209,13 +1212,13 @@ sub publish {
 
 =head2 purgeCache ( )
 
-Purges all cache entries associated with this revision.
+Purges all cache entries associated with this asset.
 
 =cut
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new(["asset",$self->getId,$self->get("revisionDate")])->delete;
+	WebGUI::Cache->new(["asset",$self->getId])->delete;
 }
 
 
@@ -1392,7 +1395,7 @@ sub www_editSave {
 		$object = $self->addChild({className=>$session{form}{class}});	
 		$object->{_parent} = $self;
 	} else {
-		return $self->getContainer->www_view if ($self->isLocked && $self->get("isLockedBy") ne $session{user}{userId});
+		return $self->getContainer->www_view if ($self->canEditIfLocked || !$self->isLocked);
 		$object = $self->addRevision;
 	}
 	$object->processPropertiesFromFormPost;
@@ -1445,10 +1448,12 @@ sub www_manageAssets {
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n";
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
+		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
                 contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
+		'.$commit.'
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
 		my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
@@ -1456,7 +1461,7 @@ sub www_manageAssets {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->get("isLockedBy") eq $session{user}{userId});
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId"));
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
