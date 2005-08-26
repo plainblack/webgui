@@ -1395,8 +1395,11 @@ sub www_editSave {
 		$object = $self->addChild({className=>$session{form}{class}});	
 		$object->{_parent} = $self;
 	} else {
-		return $self->getContainer->www_view if ($self->canEditIfLocked || !$self->isLocked);
-		$object = $self->addRevision;
+		if ($self->canEditIfLocked || !$self->isLocked) {
+                        $object = $self->addRevision;
+                } else {
+                        return $self->getContainer->www_view;
+                }
 	}
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
