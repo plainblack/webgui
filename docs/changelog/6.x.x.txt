@@ -1,3 +1,9 @@
+6.7.3
+ - User search now includes user alias.
+ - Fixed a bug in the user manager where userId, date created, date updated,
+   and karma were not showing up when editing users.
+
+
 6.7.2
  - fix [ 1163407 ] Ampersand XHTML 1.0 Non-Compliant
  - fix [ 1243559 ] profile field security vulnerability (Len Kranendonk)

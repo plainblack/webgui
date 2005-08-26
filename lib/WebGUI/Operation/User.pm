@@ -84,9 +84,11 @@ sub doUserSearch {
 	}
 	$keyword = quote($keyword);
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
-		email.fieldData as email from users left join userProfileData email on users.userId=email.userId and email.fieldName='email'
-		where $selectedStatus  and (users.username like ".$keyword." or email.fieldData like ".$keyword.") 
-		and users.userId not in (".quoteAndJoin($userFilter).")  order by users.username";
+                email.fieldData as email from users 
+                left join userProfileData email on users.userId=email.userId and email.fieldName='email'
+                left join userProfileData useralias on users.userId=useralias.userId and useralias.fieldName='alias'
+                where $selectedStatus  and (users.username like ".$keyword." or useralias.fieldData like ".$keyword." or email.fieldData like ".$keyword.") 
+                and users.userId not in (".quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
         	my $p = WebGUI::Paginator->new(WebGUI::URL::page("op=".$op));
 		$p->setDataByQuery($sql);
@@ -227,10 +229,10 @@ sub www_editUser {
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$session{form}{uid}});
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
-	$tabform->getTab("account")->readOnly($session{form}{uid},$i18n->get(378));
-    	$tabform->getTab("account")->readOnly($u->karma,$i18n->get(537)) if ($session{setting}{useKarma});
-    	$tabform->getTab("account")->readOnly(epochToHuman($u->dateCreated,"%z"),$i18n->get(453));
-    	$tabform->getTab("account")->readOnly(epochToHuman($u->lastUpdated,"%z"),$i18n->get(454));
+	$tabform->getTab("account")->readOnly(value=>$session{form}{uid},label=>$i18n->get(378));
+    	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session{setting}{useKarma});
+    	$tabform->getTab("account")->readOnly(value=>epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
+    	$tabform->getTab("account")->readOnly(value=>epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
     	$tabform->getTab("account")->text(
 		-name=>"username",
 		-label=>$i18n->get(50),
