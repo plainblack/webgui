@@ -42,6 +42,7 @@
    the original editor to edit a locked asset.
  - Fixed a bug that would not allow an editor to commit an individual asset
    revision.
+ - Fixed survey template.
 
 
 6.7.1
@@ -76,6 +77,8 @@
 
 
 6.7.0
+ - Added Survey section feature
+- Added two new Survey answer types. HTMLArea and textarea.
  - Upgraded the rich editor to 1.45.
  - Rich edit now has three new buttons: paste from word, paste as plain text,
    and fullscreen.
