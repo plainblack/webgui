@@ -663,6 +663,20 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
+=head2 getExtraHeadTags (  )
+
+Returns the extraHeadTags stored in the asset.  Called in WebGUI::Style::generateAdditionalHeadTags if this asset is the $session{asset}.  Also called in WebGUI::Layout::view for its child assets.  Overriden in Shortcut.pm.
+
+=cut
+
+sub getExtraHeadTags {
+	my $self = shift;
+	return $self->get("extraHeadTags");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getIcon ( [small] )
 
 Returns the icon located under extras/adminConsole/assets.gif

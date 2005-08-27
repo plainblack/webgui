@@ -53,7 +53,7 @@ These subroutines are available from this package:
 
 =head2 generateAdditionalHeadTags ( )
 
-Creates tags that were set using setLink, setMeta, setScript, and setRawHeadTags.
+Creates tags that were set using setLink, setMeta, setScript, extraHeadTags, and setRawHeadTags.
 
 =cut
 
@@ -84,6 +84,9 @@ sub generateAdditionalHeadTags {
 		}
 		$tags .= ' />'."\n";
 	}
+	# append extraHeadTags
+	$tags .= $session{asset}->getExtraHeadTags."\n";
+	
 	delete $session{page}{head};
 	return $tags;
 }

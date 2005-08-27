@@ -155,6 +155,7 @@ sub view {
 			foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
+						WebGUI::Style::setRawHeadTags($child->getExtraHeadTags);
 						if ($i > $numPositions) {
 							push(@{$vars{"position1_loop"}},{
 								id=>$child->getId,

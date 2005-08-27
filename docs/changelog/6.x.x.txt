@@ -3,6 +3,7 @@
  - Fixed a bug in the user manager where userId, date created, date updated,
    and karma were not showing up when editing users.
  - fix [ 1274239 ] Can Not Save Edits to Assets
+ - fix [ 1274414 ] extraHeadTags entirely unused (mwilson)
 
 
 6.7.2
