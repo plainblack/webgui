@@ -16,7 +16,7 @@ our $I18N = {
 		lastUpdated => 1078852969
 	},
 
-	'account-1' => {
+	'display account template title' => {
 		message => q|LDAP Authentication Display Account Template|,
 		lastUpdated => 1078852969
 	},
@@ -36,7 +36,7 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'create-1' => {
+	'anon reg template title' => {
 		message => q|LDAP Authentication Anonymous Registration Template|,
 		lastUpdated => 1078855925
 	},
@@ -46,7 +46,7 @@ our $I18N = {
 		lastUpdated => 1039450730
 	},
 
-	'login-2' => {
+	'auth login template body' => {
 		message => q|The following template variables are available for LDAP Authentication Login templates. 
 
 <P>
@@ -149,7 +149,7 @@ Default label for the anonymous registration link.
 		lastUpdated => 1031514049
 	},
 
-	'account-2' => {
+	'display account template body' => {
 		message => q|The following template variables are available for the LDAP Authentication Display Account templates. 
 <P>
 <B>account.form.karma</B><BR>
@@ -180,7 +180,7 @@ Any message returned by the system.  Usually displays after the form is submitte
 		lastUpdated => 1071845113
 	},
 
-	'create-2' => {
+	'anon reg template body' => {
 		message => q|The following template variables are available for LDAP Authentication Anonymous Registration templates.
 
 <P>
@@ -254,7 +254,7 @@ Default text for password form field.
 		lastUpdated => 1031514049
 	},
 
-	'login-1' => {
+	'auth login template title' => {
 		message => q|LDAP Authentication Login Template|,
 		lastUpdated => 1078854953
 	},

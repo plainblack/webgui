@@ -74,8 +74,8 @@ our $HELP = {
 		related => [ ],
 	},
 	'ldap authentication display account template' => {
-		title => 'account-1',
-		body => 'account-2',
+		title => 'display account template title',
+		body => 'display account template body',
 		fields => [
 		],
 		related => [
@@ -94,8 +94,8 @@ our $HELP = {
 		]
 	},
 	'ldap authentication login template' => {
-		title => 'login-1',
-		body => 'login-2',
+		title => 'auth login template title',
+		body => 'auth login template body',
 		fields => [
 		],
 		related => [
@@ -114,8 +114,8 @@ our $HELP = {
 		]
 	},
 	'ldap authentication anonymous registration template' => {
-		title => 'create-1',
-		body => 'create-2',
+		title => 'anon reg template title',
+		body => 'anon reg template body',
 		fields => [
 		],
 		related => [
