@@ -519,7 +519,7 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
                 lastUpdated => 1110530955
         },
 
-	'Metadata, Edit property' => {
+	'metadata edit property' => {
 		message => q|Metadata, Edit|,
 		lastUpdated => 1089039511
 	},

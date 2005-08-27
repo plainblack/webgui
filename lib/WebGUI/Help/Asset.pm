@@ -170,7 +170,7 @@ our $HELP = {
 		],
 	},
 	'metadata edit property' => {
-                title => 'Metadata, Edit property',
+                title => 'metadata edit property',
                 body => 'metadata edit property body',
 		fields => [
 		],
