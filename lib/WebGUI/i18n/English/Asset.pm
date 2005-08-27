@@ -739,12 +739,12 @@ config file.</p>|,
                 lastUpdated => 1121361557,
         },
 
-	'Page, Export' => {
+	'Page Export' => {
                 message => q|Page, Export|,
                 lastUpdated => 1089039511,
                 context => q|Help title for Page Export operation|
         },
-	'Page, Export body' => {
+	'Page Export body' => {
                 message => q|
 <p>The Export Page function allows you to export WebGUI pages to static
 HTML files on disk.  The &quot;exportPath&quot; variable in the WebGUI

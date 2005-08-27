@@ -112,8 +112,8 @@ our $HELP = {
 	},
 
 	'page export' => {
-                title => 'Page, Export',
-                body => 'Page, Export body',
+                title => 'Page Export',
+                body => 'Page Export body',
 		fields => [
                         {
                                 title => 'Depth',
