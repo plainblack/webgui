@@ -390,7 +390,8 @@ sub setParent {
 sub view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
-	my ($output, $event, %var, $id);
+	my ($output, $event, $id);
+	my %var = $self->get;
 	$event = $self;
 	$var{title} = $event->getValue("title");
 	$var{"start.label"} =  WebGUI::International::get(14,"Asset_Event");
