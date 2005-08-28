@@ -2,8 +2,8 @@ package WebGUI::Help::AuthWebGUI;
 
 our $HELP = {
 	'webgui authentication display account template' => {
-		title => 'account-1',
-		body => 'account-2',
+		title => 'display account template title',
+		body => 'display account template body',
 		fields => [
 		],
 		related => [
@@ -14,8 +14,8 @@ our $HELP = {
 		]
 	},
 	'webgui authentication login template' => {
-		title => 'login-1',
-		body => 'login-2',
+		title => 'login template title',
+		body => 'login template body',
 		fields => [
 		],
 		related => [
@@ -26,8 +26,8 @@ our $HELP = {
 		]
 	},
 	'webgui authentication anonymous registration template' => {
-		title => 'create-1',
-		body => 'create-2',
+		title => 'anon reg template title',
+		body => 'anon reg template body',
 		fields => [
 		],
 		related => [
@@ -38,8 +38,8 @@ our $HELP = {
 		]
 	},
 	'webgui authentication password recovery template' => {
-		title => 'recovery-1',
-		body => 'recovery-2',
+		title => 'recovery template title',
+		body => 'recovery template body',
 		fields => [
 		],
 		related => [
@@ -50,8 +50,8 @@ our $HELP = {
 		]
 	},
 	'webgui authentication password expiration template' => {
-		title => 'expired-1',
-		body => 'expired-2',
+		title => 'expired template title',
+		body => 'expired template body',
 		fields => [
 		],
 		related => [
