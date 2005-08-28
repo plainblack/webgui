@@ -1712,11 +1712,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'642' => {
-		message => q|Page, Add/Edit|,
-		lastUpdated => 1078569027
-	},
-
 	'67' => {
 		message => q|Create a new account.|,
 		lastUpdated => 1031514049

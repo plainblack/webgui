@@ -12,10 +12,6 @@ our $HELP = {
 				namespace => 'WebGUI'
 			},
 			{
-				tag => 'page add/edit',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'page delete',
 				namespace => 'WebGUI'
 			}
@@ -546,22 +542,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'page add/edit',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'page add/edit' => {
-		title => '642',
-		body => '606',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'page delete',
-				namespace => 'WebGUI'
-			}
 		]
 	},
 
