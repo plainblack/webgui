@@ -9,13 +9,28 @@ my $configFile;
 my $quiet;
 
 start();
-
+deleteOldHelpFiles();
 finish();
 
 #-------------------------------------------------
 #sub fixSomething {
 #        print "\tFixing ....\n" unless ($quiet);
 
+sub deleteOldHelpFiles {
+	my @dupes = qw/Article Collaboration DataForm EventsCalendar File Folder Survey HttpProxy
+		       IndexedSearch Image Layout MessageBoard Navigation Poll Post Product
+		       Redirect Shortcut Snippet SQLReport SyndicatedContent Template Thread/;
+	my $path = "../../lib/WebGUI/";
+	print "\tDeleting old documentation\n" unless ($quiet);
+	foreach my $dupe (@dupes) {
+		print "\tDeleting old documentation for $dupe\n" unless ($quiet);
+		foreach my $dir ("Help/", "i18n/English/") {
+			my $file = join '', $path, $dir, $dupe, '.pm';
+			my $files_deleted = unlink($file);
+			print("\t\tUnable to delete $file: $!\n") unless $quiet or $files_deleted;
+		}
+	}
+}
 
 
 #-------------------------------------------------
