@@ -471,10 +471,18 @@ function AssetManager_addAssetMetaData(url, rank,title) {
 
 //********Event Handlers***********
 function AssetManager_initializeDragEventHandlers() {
-	var old = (document.onmousedown) ? document.onmousedown : function () {};
-    	document.onmousedown= function () {old();AssetManager_documentMouseDown();};
-    document.onmouseup=AssetManager_documentMouseUp;
-    document.onmousemove=AssetManager_documentMouseMove;
+	document.onmousedown=AssetManager_documentMouseDown;
+	document.onmouseup=AssetManager_documentMouseUp;
+	document.onmousemove=AssetManager_documentMouseMove;
+/*
+	// Failed attempt at making it more compatible.
+	var oldOnMouseDown = (document.onmousedown) ? document.onmousedown : function () {};
+    	document.onmousedown= function () {oldOnMouseDown();AssetManager_documentMouseDown();};
+	var oldOnMouseUp = (document.onmouseup) ? document.onmouseup : function () {};
+    	document.onmouseup= function () { oldOnMouseUp();AssetManager_documentMouseUp();};
+	var oldOnMouseMove= (document.onmousemove) ? document.onmousemove : function () {};
+    	document.onmousemove= function () { oldOnMouseMove();AssetManager_documentMouseMove();};
+*/
 }
 
 /* called on document mouse down.  Gets a reference to the asset manager and passes in event*/

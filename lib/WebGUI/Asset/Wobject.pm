@@ -256,12 +256,13 @@ sub getEditForm {
 			my %params;
 			foreach my $key (keys %{$properties->{$fieldname}}) {
 				next if ($key eq "tab" || $key eq "fieldType");
-				$params{"-".$key} = $properties->{$fieldname}{$key}
+				$params{$key} = $properties->{$fieldname}{$key}
 			}
-			$params{"-value"} = $self->getValue($fieldname);
-			$params{"-name"} = $fieldname;
+			$params{value} = $self->getValue($fieldname);
+			$params{name} = $fieldname;
+			$params{fieldType} = $properties->{$fieldname}{fieldType};
 			my $tab = $properties->{$fieldname}{tab} || "properties";
-			$tabform->getTab($tab)->dynamicField($properties->{$fieldname}{fieldType},%params);
+			$tabform->getTab($tab)->dynamicField(%params);
 		}
 	}
 	return $tabform;

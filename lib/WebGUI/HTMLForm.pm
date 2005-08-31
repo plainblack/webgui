@@ -64,38 +64,6 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
-sub _subtext {
-	my $output;
-        if ($_[0] ne "") {
-                $output .= '<span class="formSubtext"> '.$_[0].'</span>';
-        } 
-	return $output;
-}
-
-#-------------------------------------------------------------------
-sub _tableFormRow {
-	my $self = shift;
-	my $label = shift;
-	my $formControl = shift;
-	my $hoverHelp = shift;
-		my $class = $self->{_class};
-		$class = qq| class="$class" | if($class);
-		$hoverHelp =~ s/\r/ /g;	
-		$hoverHelp =~ s/\n/ /g;	
-		$hoverHelp =~ s/&amp;/& amp;/g;	
-		$hoverHelp =~ s/&gt;/& gt;/g;	
-		$hoverHelp =~ s/&lt;/& lt;/g;	
-		$hoverHelp =~ s/&/&amp;/g;	
-		$hoverHelp =~ s/>/&gt;/g;	
-		$hoverHelp =~ s/</&lt;/g;	
-		$hoverHelp =~ s/"/&quot;/g;	
-		$hoverHelp =~ s/'/\\'/g;	
-		$hoverHelp =~ s/^\s+//;
-		my $tooltip = qq|onmouseover="return escape('$hoverHelp')"| if ($hoverHelp);
-        	return '<tr'.$class.'><td '.$tooltip.' class="formDescription" valign="top" style="width: 25%;">'.$label.'</td><td class="tableData" style="width: 75%;">'.$formControl."</td></tr>\n";
-}
-
-#-------------------------------------------------------------------
 sub _uiLevelChecksOut {
 	if ($_[0] <= $session{user}{uiLevel}) {
 		return 1;
@@ -139,50 +107,6 @@ Disposes of the form object.
 sub DESTROY {
 	my $self = shift;
 	$self = undef;
-}
-
-
-
-#-------------------------------------------------------------------
-                                                                                                                             
-=head2 dynamicField ( fieldType , options )
-                                                                                                                             
-Adds a dynamic field to this form. This is primarily useful for building dynamic form fields.
-Because of the dynamic nature of this field, it supports only the -option=>value 
-way of specifying parameters.
-                                                                                                                             
-=head3 fieldType
-
-The field type to use. The field name is the name of the method from this forms package.
-
-=head3 options
-
-The field options. See the documentation for the desired field for more information.
-                                                                                                                             
-=cut
-
-sub dynamicField {
-	my $self = shift;
-	my $fieldType = ucfirst(shift);
-	my %param = @_;
-	foreach my $key (keys %param) {		# strip off the leading minus sign in each parameter key.
-		$key=~/^-(.*)$/;
-		$param{$1} = $param{$key};
-		delete $param{$key};
-	}
-	my $output;
-        if (_uiLevelChecksOut($param{uiLevel})) {
-		$output = WebGUI::Form::dynamicField($fieldType, \%param);
-                $output .= _subtext($param{subtext});
-                $output = $self->_tableFormRow($param{label},$output,$param{hoverHelp});
-        } else {
-                $output = WebGUI::Form::Hidden({
-                        "name"=>$param{name},
-                        "value"=>$param{value},
-			"defaultValue"=>$param{defaultValue}
-                        });
-        }
-        $self->{_data} .= $output;
 }
 
 

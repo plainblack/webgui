@@ -16,6 +16,7 @@ package WebGUI::Form::DateTime;
 
 use strict;
 use base 'WebGUI::Form::Text';
+use WebGUI::Form::Hidden;
 use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Session;
@@ -142,6 +143,22 @@ sub toHtml {
                                 mondayFirst : '.$mondayFirst.'
                                 }); 
                         </script>';
+}
+
+#-------------------------------------------------------------------
+
+=head2 toHtmlAsHidden ( )
+
+Renders the form field to HTML as a hidden field rather than whatever field type it was supposed to be.
+
+=cut
+
+sub toHtmlAsHidden {
+        my $self = shift;
+	return WebGUI::Form::Hidden->new(
+		name=>$self->{name},
+		value=>WebGUI::DateTime::epochToSet($self->{value},1)	
+		)->toHtmlAsHidden;
 }
 
 1;

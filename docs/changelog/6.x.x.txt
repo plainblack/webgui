@@ -8,6 +8,12 @@
  - fix [ 1276695 ] Addition to 'viewRSS not working' (6.7.2) (Andrew Khmelev)
  - Fixed a layout problem with the user search form.
  - fix [ 1250418 ] unable to edit posts more than once
+ - fix [ 1245871 ] redirectAfterLogin url malformed
+ - fix [ 1274951 ] Unable to drag rank in asset manager
+ - fix [ 1276449 ] 6.7.1 content invisible after edit by content manager
+ - Fixed a few bugs in the new form system related to UI levels and hidden
+   fields.
+
 
 6.7.2
  - fix [ 1163407 ] Ampersand XHTML 1.0 Non-Compliant

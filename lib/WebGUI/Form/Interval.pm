@@ -149,13 +149,13 @@ sub toHtmlAsHidden {
 	my $self = shift;
         my ($interval, $units) = WebGUI::DateTime::secondsToInterval($self->{value});
         return WebGUI::Form::Hidden->new(
-                        "name"=>$self->{name}.'_interval',
-                        "value"=>$interval
+                        name=>$self->{name}.'_interval',
+                        value=>$interval
                         )->toHtmlAsHidden
         	.WebGUI::Form::Hidden->new(
-                        "name"=>$self->{name}.'_units',
-                        "value"=>$units
-                        )->toHtmmlAsHidden;
+                        name=>$self->{name}.'_units',
+                        value=>$units
+                        )->toHtmlAsHidden;
 }
 
 1;

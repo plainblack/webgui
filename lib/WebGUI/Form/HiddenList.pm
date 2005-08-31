@@ -110,7 +110,7 @@ sub toHtmlAsHidden {
 	my $self = shift;
 	my $output;
         foreach my $key (keys %{$self->{options}}) {
-                foreach my $item (@{$self->{values}}) {
+                foreach my $item (@{$self->{value}}) {
                         if ($item eq $key) {
                                 $output .= WebGUI::Form::Hidden->(
                                         name=>$self->{name},
