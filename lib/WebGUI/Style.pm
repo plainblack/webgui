@@ -85,7 +85,7 @@ sub generateAdditionalHeadTags {
 		$tags .= ' />'."\n";
 	}
 	# append extraHeadTags
-	$tags .= $session{asset}->getExtraHeadTags."\n";
+	$tags .= $session{asset}->getExtraHeadTags."\n" if ($session{asset});
 	
 	delete $session{page}{head};
 	return $tags;

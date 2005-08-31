@@ -1141,13 +1141,13 @@ sub www_viewRSS {
 		group by assetData.assetId
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $i = 1;
-        while (my ($id, $class, $version)  = $sth->hashRef) {
+        while (my ($id, $class, $version)  = $sth->array) {
 		my $post = WebGUI::Asset::Wobject::Collaboration->new($id, $class, $version);
 
                 my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
                 my $encTitle = _xml_encode($post->get("title"));
                 my $encPubDate = _xml_encode(_get_rfc822_date($post->get("dateUpdated")));
-                my $encDescription = _xml_encode($self->get("synopsis"));
+                my $encDescription = _xml_encode($post->get("synopsis"));
                 $xml .= qq~
 <item>
 <title>$encTitle</title>

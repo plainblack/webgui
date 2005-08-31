@@ -18,6 +18,7 @@ use WebGUI::DateTime;
 use WebGUI::FormProcessor;
 use WebGUI::Group;
 use WebGUI::Grouping;
+use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -107,23 +108,23 @@ sub getUserSearchForm {
 	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
 	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
 	WebGUI::Session::setScratch("userSearchModifier",$session{form}{modifier});
-	my $output = '<div align="center">';
-	my $f = WebGUI::HTMLForm->new(1);
-	$f->hidden(
-		-name => "op",
-		-value => $op
-		);
+	my $output = '<div align="center">'
+		.WebGUI::Form::formHeader()
+		.WebGUI::Form::hidden(
+			name => "op",
+			value => $op
+			);
 	foreach my $key (keys %{$params}) {
-		$f->hidden(
-			-name=>$key,
-			-value=>$params->{$key}
+		$output .= WebGUI::Form::hidden(
+			name=>$key,
+			value=>$params->{$key}
 			);
 	}
-	$f->hidden(
+	$output .= WebGUI::Form::hidden(
 		-name=>"doit",
 		-value=>1
-		);
-	$f->selectList(
+		)
+	.WebGUI::Form::selectList(
 		-name=>"modifier",
 		-value=>([$session{scratch}{userSearchModifier} || "contains"]),
 		-options=>{
@@ -131,13 +132,13 @@ sub getUserSearchForm {
 			contains=>WebGUI::International::get("contains"),
 			endsWith=>WebGUI::International::get("ends with")
 			}
-		);
-	$f->text(
+		)
+	.WebGUI::Form::text(
 		-name=>"keyword",
 		-value=>$session{scratch}{userSearchKeyword},
 		-size=>15
-		);
-	$f->selectList(
+		)
+	.WebGUI::Form::selectList(
 		-name	=> "status",
 		-value	=> [$session{scratch}{userSearchStatus} || "users.status like '%'"],
 		-options=> { 
@@ -146,9 +147,9 @@ sub getUserSearchForm {
 			Deactivated	=> WebGUI::International::get(818),
 			Selfdestructed	=> WebGUI::International::get(819)
 			}
-	);
-	$f->submit(value=>WebGUI::International::get(170));
-	$output .= $f->print;
+	)
+	.WebGUI::Form::submit(value=>WebGUI::International::get(170))
+	.WebGUI::Form::formFooter();
 	$output .= '</div>';
 	return $output;
 }

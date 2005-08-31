@@ -4,7 +4,10 @@
    and karma were not showing up when editing users.
  - fix [ 1274239 ] Can Not Save Edits to Assets
  - fix [ 1274414 ] extraHeadTags entirely unused (mwilson)
-
+ - fix [ 1276625 ] viewRSS not working (Andrew Khmelev)
+ - fix [ 1276695 ] Addition to 'viewRSS not working' (6.7.2) (Andrew Khmelev)
+ - Fixed a layout problem with the user search form.
+ - fix [ 1250418 ] unable to edit posts more than once
 
 6.7.2
  - fix [ 1163407 ] Ampersand XHTML 1.0 Non-Compliant

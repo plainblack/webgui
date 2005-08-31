@@ -983,7 +983,7 @@ sub www_edit {
 				value=>"edit"
 				})
 			.WebGUI::Form::hidden({
-				name=>"userId",
+				name=>"ownerUserId",
 				value=>$self->getValue("ownerUserId")
 				})
 			.WebGUI::Form::hidden({

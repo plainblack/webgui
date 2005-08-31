@@ -78,7 +78,6 @@ sub _tableFormRow {
 	my $label = shift;
 	my $formControl = shift;
 	my $hoverHelp = shift;
-	unless ($self->{_noTable}) {
 		my $class = $self->{_class};
 		$class = qq| class="$class" | if($class);
 		$hoverHelp =~ s/\r/ /g;	
@@ -94,9 +93,6 @@ sub _tableFormRow {
 		$hoverHelp =~ s/^\s+//;
 		my $tooltip = qq|onmouseover="return escape('$hoverHelp')"| if ($hoverHelp);
         	return '<tr'.$class.'><td '.$tooltip.' class="formDescription" valign="top" style="width: 25%;">'.$label.'</td><td class="tableData" style="width: 75%;">'.$formControl."</td></tr>\n";
-	} else {
-		return $formControl;
-	}
 }
 
 #-------------------------------------------------------------------
@@ -192,13 +188,9 @@ sub dynamicField {
 
 #-------------------------------------------------------------------
 
-=head2 new ( [ noTable, action, method, extras, enctype, tableExtras ] )
+=head2 new ( [ action, method, extras, enctype, tableExtras ] )
 
 Constructor.
-
-=head3 noTable
-
-If this is set to "1" then no table elements will be wrapped around each form element. Defaults to "0".
 
 =head3 action
 
@@ -230,17 +222,16 @@ sub new {
 	my ($header, $footer);
 	my $class = shift;
 	my %param = @_;
-	$param{noTable} ||= 0;
 	$header = "\n\n".WebGUI::Form::formHeader({
 		action=>$param{action},
 		extras=>$param{extras},
 		method=>$param{method},
 		enctype=>$param{enctype}
 		});
-	$header .= "\n<table ".$param{tableExtras}.'><tbody>' unless ($param{noTable});
-	$footer = "</tbody></table>\n" unless ($param{noTable});
+	$header .= "\n<table ".$param{tableExtras}.'><tbody>';
+	$footer = "</tbody></table>\n" ;
 	$footer .= WebGUI::Form::formFooter();
-        bless {_uiLevelOverride=>$param{uiLevelOverride}, _noTable => $param{noTable}, _header => $header, _footer => $footer, _data => ''}, $class;
+        bless {_uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;
 }
 
 #-------------------------------------------------------------------
