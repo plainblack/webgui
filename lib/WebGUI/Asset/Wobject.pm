@@ -108,8 +108,7 @@ sub definition {
 					tab=>"display",
 					label=>WebGUI::International::get(1073,'Wobject'),
 					hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
-					namespace=>'style',
-					afterEdit=>'op=editPage;npp='.$session{form}{npp}
+					namespace=>'style'
 					},
 				printableStyleTemplateId=>{
 					fieldType=>'template',
@@ -117,8 +116,7 @@ sub definition {
 					tab=>"display",
 					label=>WebGUI::International::get(1079,'Wobject'),
 					hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
-					namespace=>'style',
-					afterEdit=>'op=editPage;npp='.$session{form}{npp}
+					namespace=>'style'
 					}
                         }
                 });
@@ -255,12 +253,11 @@ sub getEditForm {
 		foreach my $fieldname (keys %{$properties}) {
 			my %params;
 			foreach my $key (keys %{$properties->{$fieldname}}) {
-				next if ($key eq "tab" || $key eq "fieldType");
-				$params{$key} = $properties->{$fieldname}{$key}
+				next if ($key eq "tab");
+				$params{$key} = $properties->{$fieldname}{$key};
 			}
 			$params{value} = $self->getValue($fieldname);
 			$params{name} = $fieldname;
-			$params{fieldType} = $properties->{$fieldname}{fieldType};
 			my $tab = $properties->{$fieldname}{tab} || "properties";
 			$tabform->getTab($tab)->dynamicField(%params);
 		}

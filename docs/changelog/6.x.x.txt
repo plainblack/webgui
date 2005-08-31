@@ -13,6 +13,9 @@
  - fix [ 1276449 ] 6.7.1 content invisible after edit by content manager
  - Fixed a few bugs in the new form system related to UI levels and hidden
    fields.
+ - fix [ 1275024 ] Can not edit layout on 6.7.2
+ - fix [ 1262235 ] sql report form params
+
 
 
 6.7.2

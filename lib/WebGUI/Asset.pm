@@ -637,14 +637,15 @@ sub getEditForm {
                         if($fieldType eq "selectList") {
                                 $options = {"", WebGUI::International::get("Select...","Asset")};
                         }
-                        $tabform->getTab("meta")->dynamicField($fieldType,
-                                                -name=>"metadata_".$meta->{$field}{fieldId},
-                                                -label=>$meta->{$field}{fieldName},
-                                                -uiLevel=>5,
-                                                -value=>$meta->{$field}{value},
-                                                -extras=>qq/title="$meta->{$field}{description}"/,
-                                                -possibleValues=>$meta->{$field}{possibleValues},
-                                                -options=>$options
+                        $tabform->getTab("meta")->dynamicField(
+                                                name=>"metadata_".$meta->{$field}{fieldId},
+                                                label=>$meta->{$field}{fieldName},
+                                                uiLevel=>5,
+                                                value=>$meta->{$field}{value},
+                                                extras=>qq/title="$meta->{$field}{description}"/,
+                                                possibleValues=>$meta->{$field}{possibleValues},
+                                                options=>$options,
+						fieldType=>$fieldType
                                 );
                 }
 		if (WebGUI::Grouping::isInGroup(3)) {

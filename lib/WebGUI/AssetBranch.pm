@@ -264,15 +264,16 @@ sub www_editBranch {
                         if($fieldType eq "selectList") {
                                 $options = {"", WebGUI::International::get("Select...","Asset")};
                         }
-                        $tabform->getTab("meta")->dynamicField($fieldType,
-                                 -name=>"metadata_".$meta->{$field}{fieldId},
-                                 -label=>$meta->{$field}{fieldName},
-                                 -uiLevel=>5,
-                                 -value=>$meta->{$field}{value},
-                                 -extras=>qq/title="$meta->{$field}{description}"/,
-                                 -possibleValues=>$meta->{$field}{possibleValues},
-                                 -options=>$options,
-				 -subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_metadata_".$meta->{$field}{fieldId}})
+                        $tabform->getTab("meta")->dynamicField(
+                                 name=>"metadata_".$meta->{$field}{fieldId},
+                                 label=>$meta->{$field}{fieldName},
+                                 uiLevel=>5,
+                                 value=>$meta->{$field}{value},
+                                 extras=>qq/title="$meta->{$field}{description}"/,
+                                 possibleValues=>$meta->{$field}{possibleValues},
+                                 options=>$options,
+				 subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_metadata_".$meta->{$field}{fieldId}}),
+				fieldType=>$fieldType
                                 );
                 }
         }	

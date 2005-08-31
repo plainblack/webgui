@@ -94,11 +94,8 @@ The normal params you'd pass in to the field. Included in this list must be one 
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_);
-	my $param = {};
-	foreach my $key (keys %{$self}) {
-		$param->{$key} = $self->{$key};
-	}
+	my %raw = @_;
+	my $param = \%raw;
         my $fieldType = ucfirst($param->{fieldType});
 	delete $param->{fieldType};
         # Set options for fields that use a list.

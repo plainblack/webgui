@@ -284,9 +284,9 @@ sub _parsePlaceholderParams {
         my $params = shift;
         my @placeholderParams;
         foreach my $row (split(/\n/,$params)) {
-                next unless $row ne "";
+		chop($row) if ($row =~ m/\s+$/);	
+                next if ($row =~ /^\s*$/);
                 my ($type,$field) = split(/:/,$row);
-                chop($field);
                 my $param;
                 if($type =~ /^form/) {
                         $param = $session{form}{$field};

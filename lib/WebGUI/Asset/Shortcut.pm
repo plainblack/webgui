@@ -460,12 +460,13 @@ sub _drawQueryBuilder {
 					});	
 		# The value select field
 		my $valFieldName = "val_field".$i;
-		my $valueField = WebGUI::Form::dynamicField($fieldType, {
+		my $valueField = WebGUI::Form::dynamicField(
+						fieldType=>$fieldType,
                                                 name=>$valFieldName,
                                                 uiLevel=>5,
                                                 extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
                                                 possibleValues=>$fields->{$field}{possibleValues},
-					});
+					);
 		# An empty row
 		$output .= qq|
                           <tr>
