@@ -693,6 +693,7 @@ sub getIcon {
 	my $small = shift;
 	my $definition = $self->definition;
 	my $icon = $definition->[0]{icon} || "assets.gif";
+	return $session{config}{extrasURL}."/adminConsole/assets.gif" if ($icon eq "assets.gif");
 	return $session{config}{extrasURL}.'/assets/small/'.$icon if ($small);
 	return $session{config}{extrasURL}.'/assets/'.$icon;
 }
@@ -837,7 +838,7 @@ sub getToolbar {
 	$toolbar .= exportIcon('func=export',$self->get("url")) if defined ($session{config}{exportPath});
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
-	return '<script type="text/javascript" language="javascript">
+	return '<script type="text/javascript">
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
 		contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
@@ -1455,7 +1456,7 @@ sub www_manageAssets {
         }
 	my $output = '<div class="am-crumbtrail">'.join(" > ",@crumbtrail).'</div>';
 	$output .= "
-   <script type=\"text/javascript\" language=\"javascript\">
+   <script type=\"text/javascript\">
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('&nbsp;','','center','');
@@ -1479,9 +1480,9 @@ sub www_manageAssets {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId"));
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId"));
 		} else {
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
          	$output .= "assetManager.AddLine('"
@@ -1492,9 +1493,9 @@ sub www_manageAssets {
 			."',".$edit."contextMenu.draw()," 
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
-			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
-			."','".formatBytes($child->get("assetSize"))."','<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>');\n";
+			."','".formatBytes($child->get("assetSize"))."','<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>');\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
@@ -1554,7 +1555,7 @@ sub www_manageAssets {
 			.WebGUI::Form::submit({value=>"Paste"})
 			.WebGUI::Form::formFooter()
 			.' </fieldset></div> '
-			.'<script type="text/javascript" language="javascript">
+			.'<script type="text/javascript">
 			var clipboardItemSelectAllToggle = false;
 			function toggleClipboardSelectAll(form){
 			clipboardItemSelectAllToggle = clipboardItemSelectAllToggle ? false : true;
