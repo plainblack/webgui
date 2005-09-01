@@ -216,7 +216,7 @@ sub getEditForm {
                 -value=>$self->getValue("showUnprivilegedPages")
         	);
 	my $start = $self->getValue("startPoint");
-	$tabform->getTab("properties")->raw("<script language=\"javascript\" type=\"text/javascript\">
+	$tabform->getTab("properties")->raw("<script type=\"text/javascript\">
 		var displayNavDescendantEndPoint = true;
 		var displayNavAncestorEndPoint = true;
 		function toggleDescendantEndPoint () {
@@ -288,7 +288,7 @@ sub getToolbar {
 			$toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
 		}
 		my $i18n = WebGUI::International->new("Asset");
-		return '<script language="javascript" type="text/javascript">
+		return '<script type="text/javascript">
                 var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
                 contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("copy").'");
                 contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");

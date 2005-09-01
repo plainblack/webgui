@@ -119,7 +119,7 @@ sub _tonull {
 sub _createTabInit {
 	my $id = shift;
 	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where assetId=".quote($id));
-	my $output = '<script type="text/javascript" language="javascript"> var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
+	my $output = '<script type="text/javascript">var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
 	return $output;
 }
 
@@ -683,7 +683,7 @@ sub viewForm {
 	my $self = shift;
 	my $passedVars = shift;
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/tabs/tabs.css', {"type"=>"text/css"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js', {"language"=>"JavaScript"});
+	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js', {"type"=>"text/javascript"});
 	my $var;
 	$var->{entryId} = $session{form}{entryId} if ($self->canEdit);
 	$var = $passedVars || $self->getRecordTemplateVars($var);

@@ -1008,7 +1008,7 @@ sub www_editQuestion {
                                 editIcon('func=editAnswer;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
                                 moveUpIcon('func=moveAnswerUp'.';qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
                                 moveDownIcon('func=moveAnswerDown;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
-                                ' '.$data{answer}.'<br>';
+                                ' '.$data{answer}.'<br />';
 		}
 		$sth->finish;
 	}

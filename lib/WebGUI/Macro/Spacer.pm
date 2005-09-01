@@ -21,7 +21,7 @@ sub process {
         @param = WebGUI::Macro::getParams($_[0]);
         $width = $param[0] if defined $param[0];
         $height = $param[1] if defined $param[1];
-        $output = '<img src="'.$session{config}{extrasURL}.'/spacer.gif"'.(defined $width?' width="'.$width.'"':'').(defined $height?' height="'.$height.'"':'').' border="0">';
+        $output = '<img src="'.$session{config}{extrasURL}.'/spacer.gif"'.(defined $width?' width="'.$width.'"':'').(defined $height?' height="'.$height.'"':'').' border="0" alt="" />';
         return $output;
 }
 

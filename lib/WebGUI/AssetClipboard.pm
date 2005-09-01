@@ -318,7 +318,7 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
         WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
         my $output = "
-   <script type=\"text/javascript\" language=\"javascript\">
+   <script type=\"text/javascript\">
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');

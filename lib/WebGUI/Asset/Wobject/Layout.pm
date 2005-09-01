@@ -187,15 +187,15 @@ sub view {
 	if ($vars{showAdmin}) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
-		WebGUI::Style::setScript($session{config}{extrasURL}."/draggable.js",{ type=>"text/javascript", language=>"javascript"	});
+		WebGUI::Style::setScript($session{config}{extrasURL}."/draggable.js",{ type=>"text/javascript" });
 		WebGUI::Style::setLink($session{config}{extrasURL}."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
 		$vars{"dragger.icon"} = WebGUI::Icon::dragIcon();
 		$vars{"dragger.init"} = '
 			<iframe id="dragSubmitter" style="display: none;" src="'.$session{config}{extrasURL}.'/spacer.gif"></iframe>
-			<script>
+			<script type="text/javascript">
 				dragable_init("'.$self->getUrl("func=setContentPositions;map=").'");
 			</script>
-			<style>
+			<style type="text/css">
 			.dragging, .empty {
 				  background-image: url("'.$session{config}{extrasURL}.'/opaque.gif");
 			}

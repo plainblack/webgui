@@ -154,7 +154,7 @@ sub getEditForm {
 
 	# Add toggleQuery javascript
 	$tabform->getTab("properties")->raw(qq|
-		<script language="javascript">
+		<script type="text/javascript">
 		function toggleQuery(Id) {
 			queryClass = "query" + Id;
 			var tr = document.getElementsByTagName("tr");
@@ -215,7 +215,7 @@ sub getEditForm {
 	   # Make empty query blocks invisible
            if ($nr > 1 && ($self->get("dbQuery".$nr) eq "" || $self->get("dbQuery".($nr-1)) eq "")) {
 		$tabform->getTab("properties")->raw(qq|
-                        <script language="javascript">
+                        <script type="text/javascript">
                                 toggleQuery('$nr');
                         </script>
                         |);

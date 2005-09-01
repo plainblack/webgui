@@ -167,7 +167,7 @@ Returns the HTML for this form object.
 =cut
 
 sub print {
-        return $_[0]->{_header}.$_[0]->{_data}.$_[0]->{_footer}.'<script language="JavaScript" type="text/javascript" src="'.$session{config}{extrasURL}.'/wz_tooltip.js"></script>';
+        return $_[0]->{_header}.$_[0]->{_data}.$_[0]->{_footer}.'<script type="text/javascript" src="'.$session{config}{extrasURL}.'/wz_tooltip.js"></script>';
 }
 
 #-------------------------------------------------------------------

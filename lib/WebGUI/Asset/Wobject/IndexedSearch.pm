@@ -186,10 +186,10 @@ sub getEditForm {
 
 	# Color picker for highlight colors
 	$tabform->getTab("display")->raw 	(	-value=>'
-				<SCRIPT LANGUAGE="Javascript" SRC="'.$session{config}{extrasURL}.'/wobject/IndexedSearch/ColorPicker2.js"></SCRIPT>
-				<SCRIPT LANGUAGE="JavaScript">
+				<script type="text/javascript" src="'.$session{config}{extrasURL}.'/wobject/IndexedSearch/ColorPicker2.js"></script>
+				<script type="text/javascript">
 				var cp = new ColorPicker("window");
-				</SCRIPT>'
+				</script>'
 			);
 	for (1..5) {
 		my $highlight = "highlight_$_";

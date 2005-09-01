@@ -121,7 +121,7 @@ sub www_editBranch {
 					title=>WebGUI::International::get(99,"Asset"),
 					currentUrl=>"Current URL"
 					}
-				})."<script type=\"text/javascript\" language=\"javascript\">
+				})."<script type=\"text/javascript\">
 			function toggleSpecificBaseUrl () {
 				if (document.getElementById('baseUrlBy').options[document.getElementById('baseUrlBy').selectedIndex].value == 'specifiedBase') {
 					document.getElementById('baseUrl').innerHTML='<input type=\"text\" name=\"baseUrl\" />';

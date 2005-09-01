@@ -416,7 +416,7 @@ sub _drawQueryBuilder {
 	
 	# html
 	my $output;
-	$output .= '<script type="text/javascript" language="javascript" src="'.
+	$output .= '<script type="text/javascript" src="'.
 		$session{config}{extrasURL}.'/wobject/Shortcut/querybuilder.js"></script>';
 	$output .= '<link href="'.$session{config}{extrasURL}.
 			'/wobject/Shortcut/querybuilder.css" type="text/css" rel="stylesheet">';
