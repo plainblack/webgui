@@ -352,9 +352,9 @@ sub www_listSubscriptionCodes {
 
 	$codes = $p->getPageData;
 
-	$output .= '<br>'.$delete.'<br>' if ($delete);
+	$output .= '<br />'.$delete.'<br />' if ($delete);
 	$output .= $p->getBarTraditional($session{form}{pn});
-	$output .= '<br>';
+	$output .= '<br />';
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr>';
 	$output .= '<th>'.$i18n->get('batchId').'</th><th>'.$i18n->get('code').'</th><th>'.$i18n->get('creation date').

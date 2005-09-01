@@ -67,7 +67,7 @@ sub www_richEditPageTree {
 	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
 	my $output = '<fieldset><legend>Insert A Link</legend>
 		<fieldset><legend>Link Settings</legend>'.$f->print.'</fieldset>
-	<script language="javascript">
+	<script type="text/javascript">
 function createLink() {
     if (window.opener) {        
         if (document.getElementById("url_formId").value == "") {
@@ -131,7 +131,7 @@ sub www_richEditViewThumbnail {
 		$output .= '<br />';
 		$output .= $image->get("filename");
 		$output .= '</div>';
-		$output .= '<script type="text/javascript" language="javascript">';
+		$output .= '<script type="text/javascript">';
 		$output .= "\nvar src = '".$image->getFileUrl."';\n";
 		$output .= "if(src.length > 0) {
 				var manager=window.parent;

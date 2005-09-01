@@ -159,7 +159,7 @@ sub www_editProductSave {
 	push(@error, $i18n->get('edit product weight error')) unless (defined $session{form}{weight} && $session{form}{price} =~ /^\d+(\.\d+)?$/);
 	push(@error, $i18n->get('edit product sku error')) unless ($session{form}{sku});
 	
-	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br>'.WebGUI::Operation::execute('editProduct') if (@error);	
+	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);	
 
 	$productId = $session{form}{productId};
 	$product = WebGUI::Product->new($productId);
@@ -335,7 +335,7 @@ sub www_editProductParameterOptionSave {
 	push (@error, $i18n->get('edit option value error')) unless ($session{form}{value});
 	push (@error, $i18n->get('edit option parameterId error')) unless ($session{form}{parameterId});
 
-	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br>'.WebGUI::Operation::execute('editProduct') if (@error);
+	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);
 
 	$product = WebGUI::Product->getByParameterId($session{form}{parameterId});
 	$optionId = $session{form}{optionId};
@@ -425,13 +425,13 @@ sub www_editSkuTemplate {
 	$productId = $session{form}{productId};
 	$product = WebGUI::Product->new($productId);
 	
-	$output .= "Available are: <br>\n";
+	$output .= "Available are: <br />\n";
 	$output .= "<ul><li>base</li>\n";
 	foreach (@{$product->getParameter}) {
 		($name = $_->{name}) =~ s/[ ><]/\./g;
 		$output .= "<li>param.".$name."</li>\n";
 	}
-	$output .= "</ul><br>";
+	$output .= "</ul><br />";
 	
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden(
@@ -599,21 +599,21 @@ sub www_manageProduct {
 	
 	$output .= "<h2>Parameters</h2>";
 	$output .= '<a href="'.WebGUI::URL::page('op=editProductParameter;parameterId=new;productId='.$product->get('productId')).'">'.
-		$i18n->get('add parameter').'</a><br>';
+		$i18n->get('add parameter').'</a><br />';
 	foreach $parameter (@{$product->getParameter}) {
 		$output .= deleteIcon('op=deleteProductParameter;parameterId='.$parameter->{parameterId}).
 			editIcon('op=editProductParameter;parameterId='.$parameter->{parameterId});
-		$output .= '<span style="margin-left: 10px"><b>'.$parameter->{name}.'</b></span><br>';
+		$output .= '<span style="margin-left: 10px"><b>'.$parameter->{name}.'</b></span><br />';
 		$output .= '<a style="margin-left: 20px" href="'.
 			WebGUI::URL::page('op=editProductParameterOption;optionId=new;parameterId='.$parameter->{parameterId}).'">'.
-			$i18n->get('add option').'</a><br>';
+			$i18n->get('add option').'</a><br />';
 		foreach $optionId (@{$parameter->{options}}) {
 			$option = $product->getOption($optionId);
 			$output .= '<span style="margin-left: 20px">'.
 				deleteIcon('op=deleteProductParameterOption;optionId='.$option->{optionId}).
-				editIcon('op=editProductParameterOption;parameterId='.$parameter->{parameterId}.';optionId='.$option->{optionId}).$option->{value}.'</span><br>';
+				editIcon('op=editProductParameterOption;parameterId='.$parameter->{parameterId}.';optionId='.$option->{optionId}).$option->{value}.'</span><br />';
 		}
-		$output .= '<br>';
+		$output .= '<br />';
 	}
 
 	return _submenu($output, 'manage product', 'manage product', 'ProductManager');

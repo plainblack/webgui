@@ -301,7 +301,7 @@ sub www_editProfileSettings {
 		$output .= moveDownIcon('op=moveProfileCategoryDown;cid='.$category{profileCategoryId}); 
 		$output .= ' <b>';
 		$output .= WebGUI::Operation::Shared::secureEval($category{categoryName});
-		$output .= '</b><br>';
+		$output .= '</b><br />';
 		$b = WebGUI::SQL->read("select * from userProfileField where 
 			profileCategoryId=".quote($category{profileCategoryId})." order by sequenceNumber");
 		while (%field = $b->hash) {
@@ -312,7 +312,7 @@ sub www_editProfileSettings {
                        	$output .= moveDownIcon('op=moveProfileFieldDown;fid='.$field{fieldName});
                        	$output .= ' ';
 			$output .= WebGUI::Operation::Shared::secureEval($field{fieldLabel});
-			$output .= '<br>';
+			$output .= '<br />';
 		}
 		$b->finish;
 	}

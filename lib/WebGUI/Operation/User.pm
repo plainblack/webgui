@@ -225,8 +225,8 @@ sub www_editUser {
 	my $tabform = WebGUI::TabForm->new(\%tabs);
 	$tabform->formHeader({extras=>'autocomplete="off"'});
 	my $u = WebGUI::User->new(($session{form}{uid} eq 'new') ? '' : $session{form}{uid});
-	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {language=>"JavaScript"});
-	$tabform->getTab("account")->raw('<script language="JavaScript" > var active="'.$u->authMethod.'"; </script>');
+	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {type=>"text/javascript"});
+	$tabform->getTab("account")->raw('<script type="text/javascript" > var active="'.$u->authMethod.'"; </script>');
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$session{form}{uid}});
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
@@ -270,7 +270,7 @@ sub www_editUser {
 		-value=>[$u->authMethod],
 		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
-	my $jscript = '<script language="JavaScript">';
+	my $jscript = '<script type="text/javascript">';
 	foreach (@{$session{config}{authMethods}}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
 		$tabform->getTab("account")->raw('<tr id="'.$_.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
