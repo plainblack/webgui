@@ -33,7 +33,7 @@ This package provides an interface to the passive profiling system.
 =head1 SYNOPSIS
 
  use WebGUI::PassiveProfiling;
- WebGUI::PassiveProfiling::add( $wobjectId );
+ WebGUI::PassiveProfiling::add( $assetId );
 
 =head1 METHODS
 
@@ -43,24 +43,24 @@ These functions/methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 add ( wobjectId )
+=head2 add ( assetId )
 
-Adds a wobjectId to the passive profile log.
+Adds a assetId to the passive profile log.
 
-=head3 wobjectId
+=head3 assetId
 
-The wobjectId to add.
+The assetId to add.
 
 =cut
 
 sub add {
 	return unless ($session{setting}{passiveProfilingEnabled});
-	my $wobjectId = shift;
-	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, wobjectId, dateOfEntry)
+	my $assetId = shift;
+	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry)
 		     values (".quote(WebGUI::Id::generate()).",".
 				quote($session{user}{userId}).",".
 				quote($session{var}{sessionId}).",".
-				quote($wobjectId).",".
+				quote($assetId).",".
 				quote(WebGUI::DateTime::time()).")";
 	WebGUI::SQL->write($sql);
 	return;
@@ -98,7 +98,7 @@ is logged in the passiveProfileAOI table.
 
 =head3 hashRef
 
-A hashRef with userId and wobjectId.
+A hashRef with userId and assetId.
 
 =cut
 
@@ -108,11 +108,11 @@ sub summarizeAOI {
 		select f.fieldName, 
 			f.fieldType, 
 			d.fieldId, 
-			d.wobjectId, 
+			d.assetId, 
 			d.value 
 		from metaData_values d , metaData_properties f 
 		where f.fieldId = d.fieldId 
-			and d.wobjectId = ".quote($data->{wobjectId});
+			and d.assetId = ".quote($data->{assetId});
 
         my $sth = WebGUI::SQL->read($sql);
         while (my $field = $sth->hashRef) {

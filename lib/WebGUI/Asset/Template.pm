@@ -114,7 +114,6 @@ sub definition {
 					defaultValue=>1
 					},
 				showInForms=>{
-					noFormPost=>1,
 					fieldType=>'yesNo',
 					defaultValue=>1
 				},

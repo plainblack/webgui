@@ -3529,7 +3529,7 @@ Privileges and styles assigned to pages in the package will not be copied when t
                 lastUpdated => 1120239343,
         },
 
-        'Enable Metadata ? description' => {
+        'Enable Metadata description' => {
                 message => q|This enables the metadata tab on Assets so that metadata can be entered
 and tracked by WebGUI.|,
                 lastUpdated => 1120239343,
@@ -3638,7 +3638,7 @@ Optionally, if you are running a sendmail server on the same machine as WebGUI, 
                 lastUpdated => 1120239343,
         },
 
-        'Enable passive profiling ? description' => {
+        'Enable passive profiling description' => {
                 message => q|Used in conjuction with Metadata, this keeps a record of every wobject viewed by
 a user.|,
                 lastUpdated => 1120239343,
@@ -3744,8 +3744,8 @@ Select which of the configured LDAP connections to use to authenticate users.
 		lastUpdated => 1089039511
 	},
 
-	'Enable passive profiling ?' => {
-		message => q|Enable passive profiling ?|,
+	'Enable passive profiling' => {
+		message => q|Enable passive profiling?|,
 		lastUpdated => 1089039511
 	},
 
@@ -3856,8 +3856,8 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
                 lastUpdated => 1031514049
         },
 
-	'Enable Metadata ?' => {
-		message => q|Enable Metadata ?|,
+	'Enable Metadata' => {
+		message => q|Enable Metadata?|,
 		lastUpdated => 1089039511
 	},
 

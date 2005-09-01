@@ -177,6 +177,17 @@ slightly. In most situations the changes will not cause any problems, but for
 some asset developers there may be a slight change.
 
 
+1.6 Binary GUIDs
+
+In 6.7.3 we noticed a problem with the GUID system. MySQL by default reads
+varchar fields as case insensitive, which can cause a big overlap problem for
+assetIds, userIds, and anything else that uses GUIDs. Therefore you need to
+alter all your custom tables and add the binary operator to the GUID field
+definitions like so:
+
+alter table MyTable change assetId assetId binary not null;
+
+
 
 2. Macro Migration
 -------------------

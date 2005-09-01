@@ -108,7 +108,7 @@ sub www_editSettings {
         	);
 	 $tabform->getTab("content")->yesNo(
                 -name=>"metaDataEnabled",
-                -label=>$i18n->get("Enable Metadata ?"),
+                -label=>$i18n->get("Enable Metadata"),
                 -value=>$session{setting}{metaDataEnabled}
         	);
 # user interface settings
@@ -224,7 +224,7 @@ sub www_editSettings {
 		);
         $tabform->getTab("user")->yesNo(
                 -name=>"passiveProfilingEnabled",
-                -label=>$i18n->get("Enable passive profiling ?"),
+                -label=>$i18n->get("Enable passive profiling"),
                 -value=>$session{setting}{passiveProfilingEnabled},
                 -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning").'\')" '
         );

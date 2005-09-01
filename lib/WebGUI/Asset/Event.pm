@@ -292,21 +292,18 @@ sub getEditForm {
     -namespace=>"EventsCalendar/Event",
     -label=>WebGUI::International::get(530,"Asset_Event"),
     -hoverHelp=>WebGUI::International::get('530 description',"Asset_Event"),
-    -afterEdit=>'func=edit;wid='.$self->get("wobjectId")
     );
 #	$tabform->getTab("display")->template(
 #    -name=>"regNotifyTemplateId",
 #    -value=>$self->getValue("regNotifyTemplateId"),
 #    -namespace=>"EventsCalendar/Event",
 #    -label=>WebGUI::International::get(531,"Asset_Event"),
-#    -afterEdit=>'func=edit;wid='.$self->get("wobjectId")
 #    );
 #  $tabform->getTab("display")->template(
 #  	-name=>"reminderTemplateId",
 #		-value=>$self->getValue("reminderTemplateId"),
 #		-namespace=>"EventsCalendar/Event",
 #		-label=>WebGUI::International::get(532,"Asset_Event"),
-#		-afterEdit=>'func=edit;wid='.$self->get("wobjectId")
 #		);
 #	$tabform->getTab("security")->group(
 #		-name=>"groupCanRegister", -label=>WebGUI::International::get(533,"Asset_Event"),

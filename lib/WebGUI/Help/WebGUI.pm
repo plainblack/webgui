@@ -327,8 +327,8 @@ our $HELP = {
                                 namespace => 'WebGUI',
                         },
                         {
-                                title => 'Enable Metadata ?',
-                                description => 'Enable Metadata ? description',
+                                title => 'Enable Metadata',
+                                description => 'Enable Metadata description',
                                 namespace => 'WebGUI',
                         },
                         {
@@ -432,8 +432,8 @@ our $HELP = {
                                 namespace => 'WebGUI',
                         },
                         {
-                                title => 'Enable passive profiling ?',
-                                description => 'Enable passive profiling ? description',
+                                title => 'Enable passive profiling',
+                                description => 'Enable passive profiling description',
                                 namespace => 'WebGUI',
                         },
                         {

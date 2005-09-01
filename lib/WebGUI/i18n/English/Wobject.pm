@@ -19,16 +19,16 @@ A conditional variable for whether or not the title should be displayed.
 The description of this wobject.
 
 <p/>
-<b>wobjectId</b><br/>
-The unique identifier that WebGUI uses to control this wobject.
+<b>assetId</b><br/>
+The unique identifier that WebGUI uses to control this asset.
 
 <p/>
 <b>isShortcut</b><br />
-A conditional indicating if this wobject is a shortcut to an original wobject.
+A conditional indicating if this wobject is a shortcut to an original asset.
 
 <p />
 <b>originalURL</b><br />
-If this wobject is a shortcut, then this URL will direct you to the original wobject.
+If this wobject is a shortcut, then this URL will direct you to the original asset.
 
 |
                    },

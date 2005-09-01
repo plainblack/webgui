@@ -131,7 +131,6 @@ sub getEditForm {
 			-label=>WebGUI::International::get(80,"Asset_EventsCalendar"),
 			-value=>$self->getValue('eventTemplateId'),
 			-namespace=>"EventsCalendar/Event",
-			-afterEdit=>'func=edit;wid='.$self->get("wobjectId")
 		);
 		$tabform->getTab("display")->selectList(
 			-name=>"startMonth",

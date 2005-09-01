@@ -15,7 +15,14 @@
    fields.
  - fix [ 1275024 ] Can not edit layout on 6.7.2
  - fix [ 1262235 ] sql report form params
-
+ - fix [ 1277529 ] Extra radio buttons in Settings console
+ - Removed the last remnants of wobject ids.
+ - Fixed a GUID case sensitivity problem.
+ - Fixed several large security holes. See the security advisory on
+   getwebgui.com for details.
+ - fix [ 1279157 ] showInForms option not stored
+ - fix [ 1250290 ] ECommerce state field broken on Plainblack.com
+ - fix [ 1261985 ] (Fix?) sortby.lastreply.url (Andreas Graf)
 
 
 6.7.2

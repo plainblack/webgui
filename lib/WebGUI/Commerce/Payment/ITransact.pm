@@ -805,7 +805,7 @@ sub validateFormData {
 	push (@error, $i18n->get('invalid lastName')) unless ($session{form}{lastName});
 	push (@error, $i18n->get('invalid address')) unless ($session{form}{address});
 	push (@error, $i18n->get('invalid city')) unless ($session{form}{city});
-	push (@error, $i18n->get('invalid zip')) unless ($session{form}{zipcode});
+	push (@error, $i18n->get('invalid zip')) if ($session{form}{zipcode} eq "" && $session{form}{country} eq "United States");
 	push (@error, $i18n->get('invalid email')) unless ($session{form}{email});
 	
 	push (@error, $i18n->get('invalid card number')) unless ($session{form}{cardNumber} =~ /^\d+$/);	

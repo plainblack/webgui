@@ -68,7 +68,7 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
 
  $dbh = WebGUI::SQL->getSlave;
 
- $id = getNextId("wobjectId");
+ $id = getNextId("someId");
  $string = quote($string);
 
 =head1 METHODS

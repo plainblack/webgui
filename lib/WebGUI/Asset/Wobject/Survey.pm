@@ -288,7 +288,7 @@ sub getEditForm {
                 -hoverHelp	=> WebGUI::International::get('13 description','Asset_Survey'),
                 -value		=> [$self->getValue("groupToViewReports")]
                 );
-	if ($self->get("wobjectId") eq "new") {
+	if ($self->get("assetId") eq "new") {
 		$tabform->getTab('properties')->whatNext(
 			-options=>{
 				addQuestion=>WebGUI::International::get(28,'Asset_Survey'),
@@ -810,8 +810,8 @@ sub www_editAnswer {
 	$answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{aid});
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
-		-name => "wid",
-		-value => $session{form}{wid}
+		-name => "assetId",
+		-value => $session{form}{assetId}
 	);
         $f->hidden(
 		-name => "func",
@@ -913,8 +913,8 @@ sub www_editQuestion {
 	
 	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
 	$f->hidden(
-		-name => "wid",
-		-value => $self->get("wobjectId")
+		-name => "assetId",
+		-value => $self->get("assetId")
 	);
 	$f->hidden(
 		-name => "func",
@@ -1080,8 +1080,8 @@ sub www_editSection {
 	
 	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
 	$f->hidden(
-		-name => "wid",
-		-value => $self->get("wobjectId")
+		-name => "assetId",
+		-value => $self->get("assetId")
 	);
 	$f->hidden(
 		-name => "func",
