@@ -189,17 +189,19 @@ sub view {
 		# for end users to work with our templates
 		WebGUI::Style::setScript($session{config}{extrasURL}."/draggable.js",{ type=>"text/javascript" });
 		WebGUI::Style::setLink($session{config}{extrasURL}."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+		WebGUI::Style::setRawHeadTags('
+			<style type="text/css">
+			.dragging, .empty {
+				  background-image: url("'.$session{config}{extrasURL}.'/opaque.gif");
+			}
+			</style>
+			');
 		$vars{"dragger.icon"} = WebGUI::Icon::dragIcon();
 		$vars{"dragger.init"} = '
 			<iframe id="dragSubmitter" style="display: none;" src="'.$session{config}{extrasURL}.'/spacer.gif"></iframe>
 			<script type="text/javascript">
 				dragable_init("'.$self->getUrl("func=setContentPositions;map=").'");
 			</script>
-			<style type="text/css">
-			.dragging, .empty {
-				  background-image: url("'.$session{config}{extrasURL}.'/opaque.gif");
-			}
-			</style>
 			';
 	}
 
