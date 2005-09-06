@@ -115,7 +115,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head getFolder ( )
+=head2 getFolder ( )
 
 Returns the path to the cache folder for this key.
 

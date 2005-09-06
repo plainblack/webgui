@@ -59,8 +59,6 @@ The number of columns (in characters) wide the box should be. Defaults to the se
 
 The style of wrapping this form should use. Defaults to "virtual". Other possible values are "off" and "physical".
 
-=head
-
 =cut
 
 sub definition {

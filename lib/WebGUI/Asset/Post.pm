@@ -729,7 +729,7 @@ sub rate {
 
 #-------------------------------------------------------------------
 
-=head setParent ( newParent ) 
+=head2 setParent ( newParent ) 
 
 We're overloading the setParent in Asset because we don't want posts to be able to be posted to anything other than other posts or threads.
 

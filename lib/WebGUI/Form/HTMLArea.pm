@@ -63,8 +63,6 @@ The number of columns (in characters) wide the box should be. Defaults to the se
 
 The ID of the WebGUI::Asset::RichEdit object to load. Defaults to the richEditor setting or  "PBrichedit000000000001" if that's not set.
 
-=head
-
 =cut
 
 sub definition {
