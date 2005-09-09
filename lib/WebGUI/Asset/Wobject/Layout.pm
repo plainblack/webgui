@@ -16,6 +16,7 @@ package WebGUI::Asset::Wobject::Layout;
 
 use strict;
 use WebGUI::Asset::Wobject;
+use WebGUI::ErrorHandler;
 use WebGUI::Icon;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -149,6 +150,7 @@ sub view {
 		$numPositions = $j if $template =~ m/position${j}\_loop/;
 	}
 	my @found;
+	my $showPerformance = WebGUI::ErrorHandler::canShowPerformanceIndicators();
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
 		foreach my $asset (@assets) {
@@ -156,15 +158,18 @@ sub view {
 				if ($asset eq $child->getId) {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
 						WebGUI::Style::setRawHeadTags($child->getExtraHeadTags);
+						my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
+						my $view = $child->view;
+						$view .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
 						if ($i > $numPositions) {
 							push(@{$vars{"position1_loop"}},{
 								id=>$child->getId,
-								content=>$child->view
+								content=>$view
 							});
 						} else {
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
-								content=>$child->view
+								content=>$view
 							});
 						}
 					}
@@ -177,10 +182,15 @@ sub view {
 	# deal with unplaced children
 	foreach my $child (@{$children}) {
 		unless (isIn($child->getId, @found)||isIn($child->getId,@hidden)) {
-			push(@{$vars{"position1_loop"}},{
-				id=>$child->getId,
-				content=>$child->view
-				}) if $child->canView;
+			if ($child->canView) {
+				my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
+				my $view = $child->view;
+				$view .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
+				push(@{$vars{"position1_loop"}},{
+					id=>$child->getId,
+					content=>$view
+					});
+			}
 		}
 	}
 	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);

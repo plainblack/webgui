@@ -91,7 +91,7 @@ sub canShowDebug {
 				(
 					$WebGUI::Session::session{setting}{showDebug}
 				) && (
-					$WebGUI::Session::session{setting}{debugIp} =~ /^$WebGUI::Session::session{env}{REMOTE_ADDR}/ || 
+					$WebGUI::Session::session{env}{REMOTE_ADDR} =~ /^$WebGUI::Session::session{setting}{debugIp}/ || 
 					$WebGUI::Session::session{setting}{debugIp} eq ""
 				)
 			);
@@ -106,11 +106,13 @@ Returns true if the user meets the conditions to see performance indicators and 
 =cut
 
 sub canShowPerformanceIndicators {
+		my $mask = $WebGUI::Session::session{setting}{debugIp};
+		my $ip = $WebGUI::Session::session{env}{REMOTE_ADDR};
        		return (
 				(
 					$WebGUI::Session::session{setting}{showPerformanceIndicators} 
 				) && (
-					$WebGUI::Session::session{setting}{debugIp} =~ /^$session{env}{REMOTE_ADDR}/ || 
+					$ip =~ /^$mask/ || 
 					$WebGUI::Session::session{setting}{debugIp} eq ""
 				)
 			);

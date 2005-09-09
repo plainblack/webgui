@@ -11,18 +11,23 @@ package WebGUI::Macro::AssetProxy;
 #-------------------------------------------------------------------
 
 use strict;
+use Time::HiRes;
 use WebGUI::Asset;
+use WebGUI::ErrorHandler;
 use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
         my ($url) = WebGUI::Macro::getParams(shift);
+	my $t = [Time::HiRes::gettimeofday()] if (WebGUI::ErrorHandler::canShowPerformanceIndicators());
 	my $asset = WebGUI::Asset->newByUrl($url);
 	#Sorry, you cannot proxy the notfound page.
 	if (defined $asset && $asset->getId ne $session{setting}{notFoundPage}) {
 		$asset->toggleToolbar;
-		return $asset->canView ? $asset->view : undef;
+		my $output = $asset->canView ? $asset->view : undef;
+		$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if (WebGUI::ErrorHandler::canShowPerformanceIndicators());
+		return $output;
 	} else {
 		return "Invalid Asset URL";
 	}
