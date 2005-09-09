@@ -440,7 +440,7 @@ sub prepare {
 	my $class = shift;
 	my $sql = shift;
 	my $dbh = shift || _getDefaultDb();
-	if ($WebGUI::Session::session{setting}{showDebug}) {
+	if (WebGUI::ErrorHandler::canShowDebug()) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
         my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatal("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
@@ -777,7 +777,7 @@ sub unconditionalRead {
 	my $sql = shift;
 	my $dbh = shift || _getDefaultDb();
 	my $placeholders = shift;
-	if ($WebGUI::Session::session{setting}{showDebug}) {
+	if (WebGUI::ErrorHandler::canShowDebug()) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
         my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
@@ -808,7 +808,7 @@ sub write {
 	my $class = shift;
 	my $sql = shift;
 	my $dbh = shift || _getDefaultDb();
-	if ($WebGUI::Session::session{setting}{showDebug}) {
+	if (WebGUI::ErrorHandler::canShowDebug()) {
 		push(@{$WebGUI::Session::session{SQLquery}},$sql);
 	}
      	$dbh->do($sql) or WebGUI::ErrorHandler::fatal("Couldn't write to the database: ".$sql." : ". DBI->errstr);

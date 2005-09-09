@@ -80,6 +80,45 @@ sub audit {
 
 #-------------------------------------------------------------------
 
+=head canShowDebug ( )
+
+Returns true if the user meets the condition to see debugging information and debug mode is enabled.
+
+=cut
+
+sub canShowDebug {
+       		return (
+				(
+					$WebGUI::Session::session{setting}{showDebug}
+				) && (
+					$WebGUI::Session::session{setting}{debugIp} =~ /^$WebGUI::Session::session{env}{REMOTE_ADDR}/ || 
+					$WebGUI::Session::session{setting}{debugIp} eq ""
+				)
+			);
+}
+
+#-------------------------------------------------------------------
+
+=head canShowPerformanceIndicators ()
+
+Returns true if the user meets the conditions to see performance indicators and performance indicators are enabled.
+
+=cut
+
+sub canShowPerformanceIndicators {
+       		return (
+				(
+					$WebGUI::Session::session{setting}{showPerformanceIndicators} 
+				) && (
+					$WebGUI::Session::session{setting}{debugIp} =~ /^$session{env}{REMOTE_ADDR}/ || 
+					$WebGUI::Session::session{setting}{debugIp} eq ""
+				)
+			);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 debug ( message )
 
 Adds a DEBUG type message to the log. These events should be things that are only used for diagnostic purposes.

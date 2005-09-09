@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "6.7.3";
+our $VERSION = "6.7.4";
 our $STATUS = "gamma";
 
 #-------------------------------------------------------------------
@@ -120,7 +120,7 @@ sub page {
                 $output = WebGUI::HTTP::getHeader();
         } else {
                 $output = WebGUI::HTTP::getHeader().$output;
-       		if ($session{setting}{showDebug} || ($session{form}{debug}==1 && WebGUI::Grouping::isInGroup(3))) {
+       		if (WebGUI::ErrorHandler::canShowDebug()) {
 			$output .= WebGUI::ErrorHandler::showDebug();
        		}
         }

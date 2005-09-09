@@ -172,10 +172,20 @@ sub www_editSettings {
 		-label=>$i18n->get(400),
 		-value=>$session{setting}{preventProxyCache}
 		);
+	$tabform->getTab("misc")->text(
+		-name=>"debugIp",
+		-label=>$i18n->get("debug ip"),
+		-value=>$session{setting}{debugIp}
+		);
 	$tabform->getTab("misc")->yesNo(
 		-name=>"showDebug",
 		-label=>$i18n->get(707),
 		-value=>$session{setting}{showDebug}
+		);
+	$tabform->getTab("misc")->yesNo(
+		-name=>"showPerformanceIndicators",
+		-label=>$i18n->get('show performance indicators'),
+		-value=>$session{setting}{showPerformanceIndicators}
 		);
 	$tabform->getTab("misc")->selectList(
 		-name=>"hostToUse",

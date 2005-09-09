@@ -387,6 +387,16 @@ our $HELP = {
                                 namespace => 'WebGUI',
                         },
                         {
+                                title => 'debug ip',
+                                description => 'debug ip description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'show performance indicators',
+                                description => 'show performance indicators description',
+                                namespace => 'WebGUI',
+                        },
+                        {
                                 title => '707',
                                 description => '707 description',
                                 namespace => 'WebGUI',

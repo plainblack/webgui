@@ -1,6 +1,26 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'show performance indicators' => {
+		message => q|Show performance indicators?|,
+		lastUpdated => 0
+	},
+
+	'show performance indicators description' => {
+		message => q|This will display the time (in seconds) it took to build each item on the page. It's useful for debugging performance problems.|,
+		lastUpdated => 0 
+	},
+
+	'debug ip description' => {
+		message => q|This will limit debugging output to a specific IP address or IP range. To limit the output to anyone in a subnet of 10.0.0.0/24 you'd simply enter '10.0.0.'.|,
+		lastUpdated => 0
+	},
+
+	'debug ip' => {
+		message => q|Debug IP|,
+		lastUpdated => 0
+	},
+
 	'304' => {
 		message => q|Language|,
 		lastUpdated => 1031514049

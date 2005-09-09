@@ -1,5 +1,14 @@
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3
+ - Fixed the default assets icon.
+ - Made further alterations to the page layout templates to make them work
+   better in IE.
+ - Added a date caching switch to the config file so people don't have to use
+   the new date caching system if they don't want to.
+ - Added an IP based limiter to the debug option, and for that reason
+   eliminated the unlikely, though potentially dangerous debug=1 URL option.
+ - Added a performance indicator debug option to the settings.
+
 
 6.7.3
  - User search now includes user alias.
