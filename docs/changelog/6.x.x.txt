@@ -8,6 +8,8 @@
  - Added an IP based limiter to the debug option, and for that reason
    eliminated the unlikely, though potentially dangerous debug=1 URL option.
  - Added a performance indicator debug option to the settings.
+ - The locked icon in the asset manager no longer shows up unless autocommit
+   is disabled.
 
 
 6.7.3

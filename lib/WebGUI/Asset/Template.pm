@@ -17,7 +17,6 @@ package WebGUI::Asset::Template;
 use HTML::Template;
 use strict;
 use WebGUI::Asset;
-use WebGUI::ErrorHandler;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::SQL;

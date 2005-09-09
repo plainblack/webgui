@@ -1463,8 +1463,8 @@ sub www_manageAssets {
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
-         assetManager.AddColumn('".$i18n->get("size")."','','right','');
-         assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n";
+         assetManager.AddColumn('".$i18n->get("size")."','','right','');\n";
+         $output .= "assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n" unless ($session{setting}{autoCommit});
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
 		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
@@ -1484,6 +1484,7 @@ sub www_manageAssets {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($session{setting}{autoCommit});
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
 				name=>'assetId',
@@ -1494,9 +1495,9 @@ sub www_manageAssets {
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
-			."','".formatBytes($child->get("assetSize"))."','<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>');\n";
+			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
-			."','".$child->get("revisionDate")."','".$child->get("assetSize")."','');
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
 	}
 	$output .= '
