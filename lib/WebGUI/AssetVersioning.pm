@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use WebGUI::Session;
+use WebGUI::Paginator;
 
 =head1 NAME
 
@@ -521,10 +522,12 @@ sub www_manageRevisionsInTag {
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Title</th><th>Type</th><th>Revision Date</th><th>Revised By</th></tr> ';
-        my $sth = WebGUI::SQL->read("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
+	my $p = WebGUI::Paginator->new($self->getUrl("func=manageRevisionsInTag;tagId=".$session{form}{tagId}));
+	$p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
 		left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
 		where assetData.tagId=".quote($session{form}{tagId}));
-        while (my ($date,$by,$id, $class) = $sth->array) {
+	foreach my $row (@{$p->getPageData}) {
+        	my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
 		my $asset = WebGUI::Asset->new($id,$class,$date);
                 $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$session{form}{tagId}.";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td>'.$asset->getTitle.'</td>
@@ -532,8 +535,7 @@ sub www_manageRevisionsInTag {
 			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
 			<td>'.$by.'</td></tr>';
         }
-        $sth->finish;
-        $output .= '</table>';
+        $output .= '</table>'.$p->getBarSimple;
 	my $tag = WebGUI::SQL->getRow("assetVersionTag","tagId",$session{form}{tagId});
         return $ac->render($output,$i18n->get("revisions in tag").": ".$tag->{name});
 }
@@ -559,6 +561,7 @@ sub www_purgeRevision {
 sub www_rollbackVersionTag {
 	my $self = shift;
 	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
+	return WebGUI::Privilege::vitalComponent() if ($session{form}{tagId} eq "pbversion0000000000001" || $session{form}{tagId} eq "pbversion0000000000002");
 	my $tagId = $session{form}{tagId};
 	if ($tagId) {
 		$self->rollbackVersionTag($tagId);

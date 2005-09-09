@@ -10,6 +10,16 @@
  - Added a performance indicator debug option to the settings.
  - The locked icon in the asset manager no longer shows up unless autocommit
    is disabled.
+ - Added pagination to the versioning manager.
+ - Eliminated the possiblitity of rolling back the "auto commit" and "initial
+   import" tags.
+ - Any attempt to view "root" will redirect the user to the default page.
+ - fix [ 1285604 ] getVars undefined in Asset::File.pm
+ - fix [ 1284330 ] error in page export function
+ - Fixed a trash purging problem.
+ - fix [ 1281516 ] Undefined subroutine &WebGUI::Asset::File::quote runHourly
+ - fix [ 1281430 ] www_restoreList should be in AssetTrash.pm
+
 
 
 6.7.3

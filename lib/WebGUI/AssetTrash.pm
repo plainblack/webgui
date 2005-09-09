@@ -176,25 +176,6 @@ sub www_deleteList {
 
 #-------------------------------------------------------------------
 
-=head2 www_emptyTrash ( )
-
-Calls the purgeTree() method to delete all items in Trash. Returns the www_manageTrash() method. If isInGroup(4) returns false, renders insufficient privilege page.
-
-=cut
-
-sub www_emptyTrash {
-	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("trash");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	foreach my $asset (@{$self->getAssetsInTrash(!($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)))}) {
-		$asset->purgeTree;
-	}
-	return $self->www_manageTrash();
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_manageTrash ( )
 
 Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is False, renders an insufficient privilege page.
@@ -251,6 +232,28 @@ sub www_manageTrash {
                  }
 		</script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_restoreList ( )
+
+Restores a piece of content from the trash back to it's original location.
+
+=cut
+
+sub www_restoreList {
+        my $self = shift;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        foreach my $id ($session{cgi}->param("assetId")) {
+                my $asset = WebGUI::Asset->newByDynamicClass($id);
+                $asset->publish;
+        }
+        if ($session{form}{proceed} ne "") {
+                my $method = "www_".$session{form}{proceed};
+                return $self->$method();
+        }
+        return $self->www_manageTrash();
 }
 
 

@@ -1325,9 +1325,7 @@ Returns "".
 
 sub view {
 	my $self = shift;
-	if ($session{var}{adminOn}) {
-		return $self->getToolbar;
-	}
+	WebGUI::HTTP::setRedirect($self->getDefault->getUrl);
 	return undef;
 }
 
@@ -1586,28 +1584,6 @@ sub www_manageAssets {
 	return $self->getAdminConsole->render($output);
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_restoreList ( )
-
-Restores a piece of content from the trash back to it's original location.
-
-=cut
-
-sub www_restoreList {
-	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $id ($session{cgi}->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($id);
-		$asset->publish;
-	}
-	if ($session{form}{proceed} ne "") {
-                my $method = "www_".$session{form}{proceed};
-                return $self->$method();
-        }
-	return $self->www_manageTrash();
-}
 
 
 #-------------------------------------------------------------------

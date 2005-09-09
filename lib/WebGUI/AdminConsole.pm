@@ -409,7 +409,7 @@ sub render {
 		my $importNode = $session{asset}->getImportNode;
 		my $importNodeLineage = $importNode->get("lineage");
 		my $assetLineage = $session{asset}->get("lineage");
-		if ($assetLineage =~ /^$importNodeLineage/) {
+		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001") {
 			$var{"backtosite.url"} = $session{asset}->getDefault->getUrl;
 		} else {
 			$var{"backtosite.url"} = $session{asset}->getContainer->getUrl;

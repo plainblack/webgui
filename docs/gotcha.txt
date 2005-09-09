@@ -9,6 +9,8 @@ save you many hours of grief.
 
 6.7.0
 --------------------------------------------------------------------
+ * In order to upgrade to 6.7 you must first upgrade to 6.6.
+
  * The asset API has changed slightly due to versioning, so if you
 	have any custom assets, check out migration.txt to make
 	sure they will comply.

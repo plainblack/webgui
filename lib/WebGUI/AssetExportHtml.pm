@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use WebGUI::Session;
+use File::Path;
 
 =head1 NAME
 

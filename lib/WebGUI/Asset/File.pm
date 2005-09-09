@@ -19,6 +19,7 @@ use WebGUI::Asset;
 use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Storage;
+use WebGUI::SQL;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -117,7 +118,6 @@ sub duplicate {
 sub getBox {
 	my $self = shift;
 	my $var = {};
-        $self->getStorageLocation->getVars($self->get("filename"),$var);
        	return $self->processTemplate($var,"PBtmpl0000000000000003");
 }
 

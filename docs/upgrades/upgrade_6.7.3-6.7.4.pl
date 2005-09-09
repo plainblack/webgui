@@ -13,9 +13,16 @@ start();
 
 updatePageTemplates();
 addDebug();
+fixFutureDates();
 
 finish();
 
+
+#-------------------------------------------------
+sub fixFutureDates {
+        print "\tFixing end dates which appear too far in the future.\n" unless ($quiet);
+	WebGUI::SQL->write("update assetData set endDate = 32472169200 where  endDate > 32472169200");
+}
 
 #-------------------------------------------------
 sub addDebug {
