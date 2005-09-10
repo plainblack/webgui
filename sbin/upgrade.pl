@@ -20,6 +20,8 @@ use File::Path;
 use Getopt::Long;
 use strict;
 use WebGUI::Config;
+use WebGUI::Session;
+use WebGUI::Setting;
 use WebGUI::SQL;
 
 my $help;
@@ -164,8 +166,11 @@ foreach my $filename (keys %{$configs}) {
 			order by dateApplied desc, webguiVersion desc limit 1",$dbh);
 		unless ($history) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
-			$dbh->do("replace into settings (name,value) values ('specialState','upgrading')") unless ($history);
-			rmtree($configs->{$filename}{uploadsPath}.$slash."temp");
+				WebGUI::Session::open($webguiRoot,$filename);
+				WebGUI::Setting::remove('specialState');
+				WebGUI::Setting::add('specialState','upgrading');
+				WebGUI::Session::close();
+				rmtree($configs->{$filename}{uploadsPath}.$slash."temp");
 		}
 		$dbh->disconnect;
 	} else {
@@ -220,21 +225,21 @@ print "\nREADY TO BEGIN UPGRADES\n" unless ($quiet);
 my $notRun = 1;
 			
 chdir($upgradesPath);
-foreach my $config (keys %config) {
-	my $clicmd = $config{$config}{mysqlCLI} || $mysql;
-	my $dumpcmd = $config{$config}{mysqlDump} || $mysqldump;
-	my $backupTo = $config{$config}{backupPath} || $backupDir;
+foreach my $filename (keys %config) {
+	my $clicmd = $config{$filename}{mysqlCLI} || $mysql;
+	my $dumpcmd = $config{$filename}{mysqlDump} || $mysqldump;
+	my $backupTo = $config{$filename}{backupPath} || $backupDir;
 	mkdir($backupTo);
-	while ($upgrade{$config{$config}{version}}{sql} ne "" || $upgrade{$config{$config}{version}}{pl} ne "") {
-		my $upgrade = $upgrade{$config{$config}{version}}{from};
+	while ($upgrade{$config{$filename}{version}}{sql} ne "" || $upgrade{$config{$filename}{version}}{pl} ne "") {
+		my $upgrade = $upgrade{$config{$filename}{version}}{from};
 		unless ($skipBackup) {
-			print "\n".$config{$config}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
-			print "\tBacking up $config{$config}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
-			my $cmd = $dumpcmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
-			$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
-			$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
-			$cmd .= " --add-drop-table --databases ".$config{$config}{db}." > "
-				.$backupTo.$slash.$config{$config}{db}."_".$upgrade{$upgrade}{from}.".sql";
+			print "\n".$config{$filename}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
+			print "\tBacking up $config{$filename}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
+			my $cmd = $dumpcmd." -u".$config{$filename}{dbuser}." -p".$config{$filename}{dbpass};
+			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
+			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
+			$cmd .= " --add-drop-table --databases ".$config{$filename}{db}." > "
+				.$backupTo.$slash.$config{$filename}{db}."_".$upgrade{$upgrade}{from}.".sql";
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);
 			} else {
@@ -244,10 +249,10 @@ foreach my $config (keys %config) {
 		}
 		if ($upgrade{$upgrade}{sql} ne "") {
 			print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
-			my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
-			$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
-			$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
-			$cmd .= " --database=".$config{$config}{db}." < ".$upgrade{$upgrade}{sql};
+			my $cmd = $clicmd." -u".$config{$filename}{dbuser}." -p".$config{$filename}{dbpass};
+			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
+			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
+			$cmd .= " --database=".$config{$filename}{db}." < ".$upgrade{$upgrade}{sql};
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);
 			} else {
@@ -256,27 +261,21 @@ foreach my $config (keys %config) {
                 	}
 		}
 		if ($upgrade{$upgrade}{pl} ne "") {
-			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$config;
+			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$filename;
 			$cmd .= " --quiet" if ($quiet);
 			if (system($cmd)) {
 				print "\tProcessing upgrade executable failed!\n";
 				fatalError();
 			}
 		}
-		$config{$config}{version} = $upgrade{$upgrade}{to};
+		$config{$filename}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
 	}
+	WebGUI::Session::open("../..",$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);
-	my $cmd = $clicmd." -u".$config{$config}{dbuser}." -p".$config{$config}{dbpass};
-	$cmd .= " --host=".$config{$config}{host} if ($config{$config}{host});
-	$cmd .= " --port=".$config{$config}{port} if ($config{$config}{port});
-	$cmd .= " --database=".$config{$config}{db}." -e \"delete from settings where name='specialState'\"";
-	unless (system($cmd)) {
-		print "OK\n" unless ($quiet);
-	} else {
-               	print "Failed!\n" unless ($quiet);
-		fatalError();
-        }
+	WebGUI::Setting::remove('specialState');
+	WebGUI::Session::close();
+	print "OK\n" unless ($quiet);
 }
 
 if ($notRun) {
