@@ -11,6 +11,7 @@ package WebGUI::Asset::Wobject::Article;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Paginator;
@@ -25,13 +26,9 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 sub definition {
 	my $class = shift;
 	my $definition = shift;
-	push(@{$definition}, {
-		assetName=>WebGUI::International::get(1,"Asset_Article"),
-		icon=>'article.gif',
-		autoGenerateForms=>1,
-		tableName=>'Article',
-		className=>'WebGUI::Asset::Wobject::Article',
-		properties=>{
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000002',	
@@ -65,7 +62,14 @@ sub definition {
                 		hoverHelp=>WebGUI::International::get('carriage return description','Asset_Article'),
                 		uiLevel=>5
 				}
-			}
+		);
+	push(@{$definition}, {
+		assetName=>WebGUI::International::get(1,"Asset_Article"),
+		icon=>'article.gif',
+		autoGenerateForms=>1,
+		tableName=>'Article',
+		className=>'WebGUI::Asset::Wobject::Article',
+		properties=>\%properties
 		});
         return $class->SUPER::definition($definition);
 }

@@ -26,6 +26,7 @@
    page.
  - Added some new indicies to make asset queries .01 to .1 seconds faster per query.
  - fix [ 1274488 ] Visitors language not recognized 6.7.2
+ - fix [ 1266159 ] 6.7.1 - getEditForm fields are in funky order
 
 
 6.7.3

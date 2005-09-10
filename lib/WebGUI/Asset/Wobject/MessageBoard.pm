@@ -11,6 +11,7 @@ package WebGUI::Asset::Wobject::MessageBoard;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::IxHash;
 use WebGUI::Asset::Wobject;
 use WebGUI::DateTime;
 use WebGUI::International;
@@ -25,13 +26,9 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 sub definition {
 	my $class = shift;
 	my $definition = shift;
-	push(@{$definition}, {
-		assetName=>WebGUI::International::get(2,"Asset_MessageBoard"),
-		icon=>'messageBoard.gif',
-		tableName=>'MessageBoard',
-		className=>'WebGUI::Asset::Wobject::MessageBoard',
-		autoGenerateForms=>1,
-		properties=>{
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
 			templateId =>{
 				tab=>"display",
 				fieldType=>"template",
@@ -39,8 +36,15 @@ sub definition {
 				namespace=>"MessageBoard",
                 		label=>WebGUI::International::get(73,"Asset_MessageBoard"),
                 		hoverHelp=>WebGUI::International::get('73 description',"Asset_MessageBoard")
-				},
-			}
+				}
+		);
+	push(@{$definition}, {
+		assetName=>WebGUI::International::get(2,"Asset_MessageBoard"),
+		icon=>'messageBoard.gif',
+		tableName=>'MessageBoard',
+		className=>'WebGUI::Asset::Wobject::MessageBoard',
+		autoGenerateForms=>1,
+		properties=>\%properties
 		});
         return $class->SUPER::definition($definition);
 }

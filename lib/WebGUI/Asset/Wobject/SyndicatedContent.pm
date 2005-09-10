@@ -14,6 +14,7 @@ use HTML::Entities;
 use strict;
 use Storable;
 use Tie::CPHash;
+use Tie::IxHash;
 use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::HTMLForm;
@@ -67,19 +68,12 @@ A hash reference passed in from a subclass definition.
 
 =cut
 
-
-#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
         my $definition = shift;
-        push(@{$definition}, {
-		assetName=>WebGUI::International::get(2,'Asset_SyndicatedContent'),
-		uiLevel=>6,
-		autoGenerateForms=>1,
-		icon=>'syndicatedContent.gif',
-                tableName=>'SyndicatedContent',
-                className=>'WebGUI::Asset::Wobject::SyndicatedContent',
-                properties=>{
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
 			templateId =>{
 				tab=>"display",
 				fieldType=>'template',
@@ -123,7 +117,15 @@ sub definition {
                 		hoverHelp=>WebGUI::International::get('hasTermsLabel description','Asset_SyndicatedContent'),
                 		maxlength=>255
 				}
-			}
+		);
+        push(@{$definition}, {
+		assetName=>WebGUI::International::get(2,'Asset_SyndicatedContent'),
+		uiLevel=>6,
+		autoGenerateForms=>1,
+		icon=>'syndicatedContent.gif',
+                tableName=>'SyndicatedContent',
+                className=>'WebGUI::Asset::Wobject::SyndicatedContent',
+                properties=>%properties
 		});
         return $class->SUPER::definition($definition);
 }

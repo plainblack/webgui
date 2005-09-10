@@ -66,11 +66,9 @@ An array of hashes to prepend to the list
 sub definition {
         my $class = shift;
         my $definition = shift;
-        push(@{$definition}, {
-                tableName=>'wobject',
-                className=>'WebGUI::Asset::Wobject',
-		autoGenerateForms=>1,
-                properties=>{
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+        %properties = ( 
                                 description=>{
                                         fieldType=>'HTMLArea',
                                         defaultValue=>undef,
@@ -118,7 +116,12 @@ sub definition {
 					hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
 					namespace=>'style'
 					}
-                        }
+		);
+        push(@{$definition}, {
+                tableName=>'wobject',
+                className=>'WebGUI::Asset::Wobject',
+		autoGenerateForms=>1,
+		properties => \%properties
                 });
         return $class->SUPER::definition($definition);
 }
@@ -247,7 +250,7 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	foreach my $definition (@{$self->definition}) {
+	foreach my $definition (reverse @{$self->definition}) {
 		my $properties = $definition->{properties};
 		next unless ($definition->{autoGenerateForms});
 		foreach my $fieldname (keys %{$properties}) {
