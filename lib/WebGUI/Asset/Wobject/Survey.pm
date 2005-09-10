@@ -784,7 +784,7 @@ sub www_deleteAllResponsesConfirm {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("survey add/edit","Survey");
+	$self->getAdminConsole->setHelp("survey add/edit","Asset_Survey");
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,'Asset_Survey'));
 }
 
@@ -873,7 +873,7 @@ sub www_editAnswer {
         }
         $f->submit;
 
-#	$self->getAdminConsole->setHelp("answer add/edit","Survey");
+#	$self->getAdminConsole->setHelp("answer add/edit","Asset_Survey");
 	return $self->getAdminConsole->render($f->print, WebGUI::International::get(18,'Asset_Survey'));
 
 }
@@ -1012,7 +1012,7 @@ sub www_editQuestion {
 		}
 		$sth->finish;
 	}
-	$self->getAdminConsole->setHelp("question add/edit","Survey");
+	$self->getAdminConsole->setHelp("question add/edit","Asset_Survey");
 	return $self->getAdminConsole->render($output, WebGUI::International::get(17,'Asset_Survey'));
 }
 

@@ -102,7 +102,7 @@ sub getEditForm {
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("redirect add/edit", "Redirect");
+        $self->getAdminConsole->setHelp("redirect add/edit", "Asset_Redirect");
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Redirect");
 }
 

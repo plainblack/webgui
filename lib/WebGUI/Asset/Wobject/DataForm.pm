@@ -742,7 +742,7 @@ sub www_deleteTabConfirm {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("data form add/edit","DataForm");
+	$self->getAdminConsole->setHelp("data form add/edit","Asset_DataForm");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("7","Asset_DataForm"));
 }
 
@@ -872,7 +872,7 @@ sub www_editField {
 	}
         $f->submit;
 	my $ac = $self->getAdminConsole;
-	$ac->setHelp("data form fields add/edit","DataForm");
+	$ac->setHelp("data form fields add/edit","Asset_DataForm");
         return $ac->render($f->print,WebGUI::International::get('20',"Asset_DataForm"));
 }
 
@@ -953,7 +953,7 @@ sub www_editTab {
 	}
         $f->submit;
 	my $ac = $self->getAdminConsole;
-	$ac->setHelp("data form fields add/edit","DataForm");
+	$ac->setHelp("data form fields add/edit","Asset_DataForm");
         return $ac->render($f->print,WebGUI::International::get('20',"Asset_DataForm"));
 }
 

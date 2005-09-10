@@ -222,7 +222,7 @@ sub view {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("layout add/edit", "Layout");
+        $self->getAdminConsole->setHelp("layout add/edit", "Asset_Layout");
         return $self->getAdminConsole->render($self->getEditForm->print,"Edit Layout");
 }
 

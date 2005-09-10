@@ -366,7 +366,7 @@ sub view {
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("shortcut add/edit","Shortcut");
+	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
 }
 

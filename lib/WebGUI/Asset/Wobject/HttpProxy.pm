@@ -344,7 +344,7 @@ sub view {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("http proxy add/edit","HttpProxy");
+	$self->getAdminConsole->setHelp("http proxy add/edit","Asset_HttpProxy");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("2","Asset_HttpProxy"));
 }
 

@@ -274,7 +274,7 @@ sub www_edit {
 		-value=>$self->getValue("templateId"),
 		-namespace=>"FileAsset"
 		);
-        $self->getAdminConsole->setHelp("file add/edit", "File");
+        $self->getAdminConsole->setHelp("file add/edit", "Asset_File");
         return $self->getAdminConsole->render($tabform->print,"Edit File");
 }
 

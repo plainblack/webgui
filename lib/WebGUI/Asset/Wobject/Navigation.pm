@@ -447,7 +447,7 @@ sub view {
 sub www_edit {
         my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("navigation add/edit","Navigation");
+	$self->getAdminConsole->setHelp("navigation add/edit","Asset_Navigation");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("22","Asset_Navigation"));
 }
 
