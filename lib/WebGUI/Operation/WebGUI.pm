@@ -16,7 +16,7 @@ use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Session;
-use WebGUI::SQL;
+use WebGUI::Setting;
 use WebGUI::Style;
 use WebGUI::User;
 
@@ -91,10 +91,10 @@ sub www_setup {
 		$f->submit;
 		$output .= $f->print;
 	} elsif ($session{form}{step} eq "3") {
-		WebGUI::SQL->write("update settings set value=".quote(WebGUI::FormProcessor::text("companyName"))." where name='companyName'");
-		WebGUI::SQL->write("update settings set value=".quote(WebGUI::FormProcessor::url("companyURL"))." where name='companyURL'");
-		WebGUI::SQL->write("update settings set value=".quote(WebGUI::FormProcessor::email("companyEmail"))." where name='companyEmail'");
-		WebGUI::SQL->write("delete from settings where name='specialState'");
+		WebGUI::Setting::set('companyName',WebGUI::FormProcessor::text("companyName"));
+		WebGUI::Setting::set('companyURL',WebGUI::FormProcessor::url("companyURL"));
+		WebGUI::Setting::set('companyEmail',WebGUI::FormProcessor::email("companyEmail"));
+		WebGUI::Setting::remove('specialState');
 		WebGUI::HTTP::setRedirect($session{env}{SCRIPT_NAME});
 		return "";
 	} else {

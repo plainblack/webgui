@@ -24,7 +24,9 @@ use Tie::CPHash;
 use WebGUI::Config;
 use WebGUI::ErrorHandler;
 use WebGUI::Id;
+use WebGUI::Setting;
 use WebGUI::SQL;
+use WebGUI::User;
 use WebGUI::Utility;
 use URI::Escape;
 
@@ -93,44 +95,20 @@ sub _setupSessionVars {
 
 #-------------------------------------------------------------------
 sub _setupUserInfo {
-	my (%default, $key, %user, $uid, %profile, $value);
-	tie %user, 'Tie::CPHash';
-	$uid = $_[0] || 1;
-	%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($uid));
-	if ($user{userId} eq "") {
-		_setupUserInfo("1");
-	} else {
-		%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
-			from userProfileData, userProfileField where userProfileData.fieldName=userProfileField.fieldName 
-			and userProfileData.userId=".quote($user{userId}));
-		%user = (%user, %profile);
-		$user{language} = $session{page}{languageId} if ($user{userId} eq '1' || $user{language} eq '');
-		%default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId='4'");
-		foreach $key (keys %default) {
-			if ($user{$key} eq "") {
-				$value = eval($default{$key});
-				if (ref $value eq "ARRAY") {
-					$user{$key} = $$value[0];
-				} else {
-					$user{$key} = $value;
-				}
-			}
-		}
-		$session{user} = \%user;
-		if ($session{env}{MOD_PERL}) {
-			my $r;
-                	if ($mod_perl::VERSION >= 1.999023) {
-                        	$r = Apache2::RequestUtil->request;
-                	} else {
-                       	 	$r = Apache->request;
-                	}
-               		if(defined($r)) {
-                       		$r->user($session{user}{username});
-               		}
-       		}
-		$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/);
-		$session{user}{alias} = $session{user}{username} if ($session{user}{alias} eq "");
-	}
+	my $u = WebGUI::User->new(shift);
+	%{$session{user}} = (%{$u->{_profile}}, %{$u->{_user}});
+	if ($session{env}{MOD_PERL}) {
+		my $r;
+               	if ($mod_perl::VERSION >= 1.999023) {
+                      	$r = Apache2::RequestUtil->request;
+               	} else {
+               	 	$r = Apache->request;
+               	}
+               	if(defined($r)) {
+               		$r->user($session{user}{username});
+        	}
+       	}
+	$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/ || $session{user}{alias} eq "");
 }
 
 #-------------------------------------------------------------------
@@ -342,8 +320,15 @@ sub open {
 		}
 	}
 	###----------------------------
+	### evironment variables from web server
+	$session{env} = \%ENV;
+	### check to see if client is proxied and adjust remote_addr as necessary
+	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
+		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
+	}
+	###----------------------------
 	### global system settings (from settings table)
-	$session{setting} = WebGUI::SQL->buildHashRef("select name,value from settings");
+	$session{setting} = WebGUI::Setting::get();
 	###----------------------------
 	### CGI object
 	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
@@ -354,13 +339,6 @@ sub open {
 		$CGI::POST_MAX=-1;
 		$session{cgi} = CGI->new();
         }
-	###----------------------------
-	### evironment variables from web server
-	$session{env} = \%ENV;
-	### check to see if client is proxied and adjust remote_addr as necessary
-	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
-		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
-	}
 	###----------------------------
 	### form variables
 	foreach ($session{cgi}->param) {

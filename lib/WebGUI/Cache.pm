@@ -77,7 +77,7 @@ Flushes the caching system. Must be overridden.
 =cut
 
 sub flush {
-	rmtree($session{config}{uploadsPath}.$session{os}{slash}."temp");
+	rmtree($WebGUI::Session::session{config}{uploadsPath}.$WebGUI::Session::session{os}{slash}."temp");
 }
 
 #-------------------------------------------------------------------
@@ -112,7 +112,7 @@ A subdivider to store this cache under. When building your own cache plug-in def
 sub new {
 	my $cache;
 	my $class = shift;
-	if($session{config}{memcached_servers}) {
+	if($WebGUI::Session::session{config}{memcached_servers}) {
 		require WebGUI::Cache::Memcached;
 		return WebGUI::Cache::Memcached->new(@_);
 	} else {
@@ -197,7 +197,7 @@ sub setByHTTP {
         $userAgent->agent("WebGUI/".$WebGUI::VERSION);
         $userAgent->timeout(30);
         my $header = new HTTP::Headers;
-        my $referer = "http://webgui.http.request/".$session{env}{SERVER_NAME}.$session{env}{REQUEST_URI};
+        my $referer = "http://webgui.http.request/".$WebGUI::Session::session{env}{SERVER_NAME}.$WebGUI::Session::session{env}{REQUEST_URI};
         chomp $referer;
         $header->referer($referer);
         my $request = new HTTP::Request (GET => $url, $header);

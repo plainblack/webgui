@@ -20,6 +20,7 @@ use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Setting;
 use WebGUI::Style;
 use WebGUI::SQL;
 use WebGUI::URL;
@@ -279,8 +280,7 @@ sub www_saveSettings {
 			next;
 		} 
 		unless ($key eq "op") {
-			$session{setting}{$key} = $value;
-			WebGUI::SQL->write("update settings set value=".quote($value)." where name='$key'");
+			WebGUI::Setting::set($key,$value);
 		}
 	}
 	return www_editSettings();

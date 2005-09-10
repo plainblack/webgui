@@ -20,6 +20,12 @@
  - fix [ 1281516 ] Undefined subroutine &WebGUI::Asset::File::quote runHourly
  - fix [ 1281430 ] www_restoreList should be in AssetTrash.pm
  - fix help links on the Asset add/edit forms
+ - Added cache to settings which increased performance by .02 seconds per
+   page.
+ - Added user cache which increased performance by more than .1 seconds per
+   page.
+ - Added some new indicies to make asset queries .01 to .1 seconds faster per query.
+ - fix [ 1274488 ] Visitors language not recognized 6.7.2
 
 
 6.7.3

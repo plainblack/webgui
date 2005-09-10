@@ -4,6 +4,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Asset;
+use WebGUI::Setting;
 
 my $toVersion = "6.7.4";
 my $configFile;
@@ -14,9 +15,17 @@ start();
 updatePageTemplates();
 addDebug();
 fixFutureDates();
+makeQueriesFaster();
 
 finish();
 
+
+#-------------------------------------------------
+sub makeQueriesFaster {
+        print "\tMaking queries a little faster.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table assetData add index assetId_url_revisionDate_status_tagId (assetId,url,revisionDate,status,tagId)");
+	WebGUI::SQL->write("alter table asset add index className_assetId_state (className,assetId,state)");
+}
 
 #-------------------------------------------------
 sub fixFutureDates {
@@ -27,8 +36,8 @@ sub fixFutureDates {
 #-------------------------------------------------
 sub addDebug {
         print "\tAdding more debug options.\n" unless ($quiet);
-	WebGUI::SQL->write("insert into settings values ('debugIp','')");
-	WebGUI::SQL->write("insert into settings values ('showPerformanceIndicators','0')");
+	WebGUI::Setting::add("debugIp","");
+	WebGUI::Setting::add("showPerformanceIndicators","0");
 }
 
 #-------------------------------------------------

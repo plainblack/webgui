@@ -101,6 +101,7 @@ use WebGUI::Operation ();
 use WebGUI::Paginator ();
 use WebGUI::Privilege ();
 use WebGUI::Session ();
+use WebGUI::Setting ();
 use WebGUI::SQL ();
 use WebGUI::Storage ();
 use WebGUI::Style ();

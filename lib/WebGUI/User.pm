@@ -15,14 +15,11 @@ package WebGUI::User;
 =cut
 
 use strict;
-use WebGUI::DateTime;
-use WebGUI::Grouping;
+use WebGUI::Cache;
 use WebGUI::Id;
-use WebGUI::International;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
-use WebGUI::Operation::Auth;
+
 
 =head1 NAME
 
@@ -60,6 +57,7 @@ These methods are available from this class:
 sub _create {
 	my $userId = shift || WebGUI::Id::generate();
 	WebGUI::SQL->write("insert into users (userId,dateCreated) values (".quote($userId).",".time().")");
+	require WebGUI::Grouping;
 	WebGUI::Grouping::addUsersToGroups([$userId],[2,7]);
         return $userId;
 }
@@ -81,6 +79,7 @@ An override for the default offset of the grouping. Specified in seconds.
 =cut
 
 sub addToGroups {
+	require WebGUI::Grouping;
 	WebGUI::Grouping::addUsersToGroups([$_[0]->{_userId}],$_[1],$_[2]);
 }
 
@@ -130,8 +129,10 @@ Deletes this user.
 
 sub delete {
         my $class = shift;
+	require WebGUI::Operation::Auth;
         WebGUI::SQL->write("delete from users where userId=".quote($class->{_userId}));
         WebGUI::SQL->write("delete from userProfileData where userId=".quote($class->{_userId}));
+	require WebGUI::Grouping;
 	WebGUI::Grouping::deleteUsersFromGroups([$class->{_userId}],WebGUI::Grouping::getGroupsForUser($class->{_userId}));
 	WebGUI::SQL->write("delete from messageLog where userId=".quote($class->{_userId}));
 
@@ -157,6 +158,7 @@ An array reference containing a list of groups.
 =cut
 
 sub deleteFromGroups {
+	require WebGUI::Grouping;
 	WebGUI::Grouping::deleteUsersFromGroups([$_[0]->{_userId}],$_[1]);
 }
 
@@ -231,28 +233,39 @@ A unique ID to use instead of the ID that WebGUI will generate for you. It must 
 =cut
 
 sub new {
-        my ($class, $userId, %default, $value, $key, %user, %profile);
-	tie %user, 'Tie::CPHash';
-        $class = shift;
-        $userId = shift || 1;
+        my $class = shift;
+        my $userId = shift || 1;
 	my $overrideId = shift;
         $userId = _create($overrideId) if ($userId eq "new");
-	%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($userId));
-	%profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
-		from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
-		userProfileData.userId=".quote($user{userId}));
-        %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
-        foreach $key (keys %default) {
-        	if ($profile{$key} eq "") {
-                	$value = eval($default{$key});
-                        if (ref $value eq "ARRAY") {
+	my $cache = WebGUI::Cache->new(["user",$userId]);
+	my $userData = $cache->get;
+	unless ($userData->{_userId}) {
+		my %user;
+		tie %user, 'Tie::CPHash';
+		%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($userId));
+		my %profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
+			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
+			userProfileData.userId=".quote($user{userId}));
+        	my %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
+        	foreach my $key (keys %default) {
+			my $value;
+        		if ($profile{$key} eq "") {
+                		$value = eval($default{$key});
+                        	if (ref $value eq "ARRAY") {
                         	$profile{$key} = $$value[0];
-                        } else {
-                        	$profile{$key} = $value;
-                        }
-                }
+                        	} else {
+                        		$profile{$key} = $value;
+                        	}
+                	}
+		}
+		$userData = {
+			_userId => $userId,
+			_user => \%user,
+			_profile => \%profile
+			};
+		$cache->set($userData, 60*60*24);
         }
-        bless {_userId => $userId, _user => \%user, _profile =>\%profile }, $class;
+        bless $userData, $class;
 }
 
 #-------------------------------------------------------------------

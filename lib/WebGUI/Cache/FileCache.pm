@@ -97,7 +97,7 @@ Retrieve content from the filesystem cache.
 
 sub get {
 	my $self = shift;
-	return undef if ($session{config}{disableCache});
+	return undef if ($WebGUI::Session::session{config}{disableCache});
 	if (open(FILE,"<".$self->getFolder()."/expires")) {
 		my $expires = <FILE>;
 		close(FILE);
@@ -136,10 +136,10 @@ Figures out what the cache root for this namespace should be. A class method.
 
 sub getNamespaceRoot {
 	my $self = shift;
-	my $root = $session{config}{fileCacheRoot};
+	my $root = $WebGUI::Session::session{config}{fileCacheRoot};
 	unless ($root) {
-		if ($session{os}{windowsish}) {
-			$root = $session{env}{TEMP} || $session{env}{TMP} || "/temp";
+		if ($WebGUI::Session::session{os}{windowsish}) {
+			$root = $WebGUI::Session::session{env}{TEMP} || $WebGUI::Session::session{env}{TMP} || "/temp";
 		} else {
 			$root = "/tmp";
 		}
@@ -205,7 +205,7 @@ sub new {
 	my $cache;
 	my $class = shift;
 	my $key = $class->parseKey(shift);
-	my $namespace = shift || $session{config}{configFile};
+	my $namespace = shift || $WebGUI::Session::session{config}{configFile};
 	bless {_key=>$key, _namespace=>$namespace}, $class;
 }
 

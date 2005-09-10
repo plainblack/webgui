@@ -89,7 +89,7 @@ Retrieve content from the filesystem cache.
 =cut
 
 sub get {
-		return undef if ($session{config}{disableCache});
+		return undef if ($WebGUI::Session::session{config}{disableCache});
                 return $_[0]->{_cache}->get($_[0]->{_key});
 }
 
@@ -113,14 +113,14 @@ sub new {
 	my $cache;
 	my $class = shift;
 	my $key = $class->parseKey(shift);
-	my $namespace = shift || $session{config}{configFile};
+	my $namespace = shift || $WebGUI::Session::session{config}{configFile};
 
 	# Overcome maximum key length of 255 characters 
 	if(length($key.$namespace) > 255) {
 		$key = Digest::MD5::md5_base64($key); 
 	}
 
-	my $servers = $session{config}{memcached_servers};
+	my $servers = $WebGUI::Session::session{config}{memcached_servers};
 	$servers = [ $servers ] unless (ref $servers);
 
 	my %options = (
