@@ -336,7 +336,7 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br>
                 message => q|These tags will be added to the &lt;head&gt; section of each page that the asset appears on.<br>
 <i>UI level: 5</i>
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1126471216,
         },
 
         'make package description' => {
