@@ -16,8 +16,18 @@ updatePageTemplates();
 addDebug();
 fixFutureDates();
 makeQueriesFaster();
+readdingIsSystem();
 
 finish();
+
+
+#-------------------------------------------------
+sub readdingIsSystem {
+        print "\tRe-adding the isSystem flag to the asset table.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table asset add column isSystem int not null default 0");
+	WebGUI::SQL->write("update asset set isSystem=1 where assetId='PBasset000000000000001'");
+	WebGUI::SQL->write("update asset set isSystem=1 where assetId='PBasset000000000000002'");
+}
 
 
 #-------------------------------------------------

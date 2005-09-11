@@ -1321,7 +1321,8 @@ Returns "".
 
 sub view {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($self->getDefault->getUrl);
+	WebGUI::HTTP::setRedirect($self->getDefault->getUrl) if ($self->getId eq "PBasset000000000000001");
+	return $self->getToolbar if ($session{var}{adminOn});
 	return undef;
 }
 
