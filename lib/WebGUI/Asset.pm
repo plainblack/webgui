@@ -1074,26 +1074,21 @@ sub newByUrl {
 	$url =~ s/\"//;
 	my $asset;
 	if ($url ne "") {
-		my ($id, $class, $version) = WebGUI::SQL->quickArray("
+		my ($id, $class) = WebGUI::SQL->quickArray("
 			select 
 				asset.assetId, 
-				asset.className,
-				max(assetData.revisionDate) 
+				asset.className
 			from 
 				asset 
 			left join
 				assetData on asset.assetId=assetData.assetId
 			where 
-				assetData.url=".quote($url)." and
-				(
-					assetData.status='approved' or assetData.status='archived' or
-					assetData.tagId=".quote($session{scratch}{versionTag})."
-				)
+				assetData.url=".quote($url)." 
 			group by
 				assetData.assetId
 			");
 		if ($id ne "" || $class ne "") {
-			return WebGUI::Asset->new($id, $class, $version);
+			return WebGUI::Asset->new($id, $class);
 		} else {
 			WebGUI::ErrorHandler::warn("The URL $url was requested, but does not exist in your asset tree.");
 			return undef;

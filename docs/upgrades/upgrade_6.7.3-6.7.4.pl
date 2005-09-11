@@ -23,7 +23,8 @@ finish();
 #-------------------------------------------------
 sub makeQueriesFaster {
         print "\tMaking queries a little faster.\n" unless ($quiet);
-	WebGUI::SQL->write("alter table assetData add index assetId_url_revisionDate_status_tagId (assetId,url,revisionDate,status,tagId)");
+	WebGUI::SQL->write("alter table assetData add index assetId_url (assetId,url)");
+	WebGUI::SQL->write("alter table assetData add index assetId_revisionDate_status_tagId (assetId,revisionDate,status,tagId)");
 	WebGUI::SQL->write("alter table asset add index className_assetId_state (className,assetId,state)");
 }
 
