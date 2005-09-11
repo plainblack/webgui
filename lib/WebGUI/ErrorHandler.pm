@@ -80,7 +80,7 @@ sub audit {
 
 #-------------------------------------------------------------------
 
-=head canShowDebug ( )
+=head2 canShowDebug ( )
 
 Returns true if the user meets the condition to see debugging information and debug mode is enabled.
 
@@ -99,7 +99,7 @@ sub canShowDebug {
 
 #-------------------------------------------------------------------
 
-=head canShowPerformanceIndicators ()
+=head2 canShowPerformanceIndicators ()
 
 Returns true if the user meets the conditions to see performance indicators and performance indicators are enabled.
 

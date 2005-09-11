@@ -171,8 +171,6 @@ A boolean indicating whether or not to enable highlight. Defaults to "1".
 
 A reference to an array of CSS color identificators.
 
-=head3 
-
 =cut
 
 sub getDetails {

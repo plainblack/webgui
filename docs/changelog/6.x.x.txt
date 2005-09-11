@@ -1,5 +1,6 @@
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3
+ - fix [ 1287994 ] POD errors in 6.7.4
  - Fixed the default assets icon.
  - Made further alterations to the page layout templates to make them work
    better in IE.
