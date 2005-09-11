@@ -150,7 +150,8 @@ Alphanumeric ID tag of Asset.
 sub paste {
 	my $self = shift;
 	my $assetId = shift;
-	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);	
+	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);
+return 0 unless ($self->get("state") eq "published");
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish;
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);

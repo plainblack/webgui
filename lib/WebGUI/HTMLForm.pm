@@ -86,6 +86,7 @@ sub AUTOLOAD {
         my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
         my %params = @_;
 	$params{uiLevelOverride} ||= $self->{_uiLevelOverride};
+	$params{rowClass} = $self->{_class};
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);    
         if ($@) {

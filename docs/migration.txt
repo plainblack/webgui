@@ -305,7 +305,7 @@ converted them from regular functions into methods.
 
 In 6.1 we completely rewrote the underlying template framework to add template
 caching. Any plug-ins that use WebGUI::Template, must be updated to reflect
-the new API.
+the new API. Template caching is currently disabled, however.
 
 
 5.7 Internationalization and Help Change
@@ -326,7 +326,7 @@ is still intact as well. See WebGUI::International for API changes.
 As a developer you can convert your translations (including English) and your
 help files using a script we provide. You can find the script here:
 
-http://www.plainblack.com/translations?wid=1552&func=viewSubmission&sid=1213
+http://www.plainblack.com/translations/translations
 
 
 5.8 WebGUI::Session Changes
@@ -450,10 +450,14 @@ passing in an id parameter like this:
 
 $f->text(name=>"this",id==>"myownpersonalid");
 
+Also, calls to WebGUI::Form::submit must be changed to WebGUI::Form::Submit.
+Also, WebGUI::Form::Submit by itself doesn't work. WebGUI::Form::Submit() 
+must be used.
+
 See WebGUI::HTMLForm and WebGUI::Form::Control for additional information.
 
 
-5.19 SQL Files For Upgrades Depricated
+5.19 SQL Files For Upgrades Deprecated
 
 Starting with WebGUI 6.7.0 .sql files will no longer be used in core upgrades
 of WebGUI sites. We also suggest not using them for upgrades of custom code.

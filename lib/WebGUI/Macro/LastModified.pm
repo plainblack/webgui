@@ -20,10 +20,11 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
+	return '' unless $session{asset};
 	my ($label, $format, $time);
 	($label, $format) = WebGUI::Macro::getParams(shift);
 	$format = '%z' if ($format eq "");
-	($time) = WebGUI::SQL->quickArray("SELECT lastUpdated FROM asset where assetId=".quote($session{asset}->getId),WebGUI::SQL->getSlave);
+	($time) = WebGUI::SQL->quickArray("SELECT max(revisionDate) FROM assetData where assetId=".quote($session{asset}->getId),WebGUI::SQL->getSlave);
 	return WebGUI::International::get(43,'Asset_Survey') if $time eq 0;
 	return $label.epochToHuman($time,$format) if ($time);
 }

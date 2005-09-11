@@ -14,25 +14,16 @@ use strict;
 use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::Form;
-use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::International;
-use WebGUI::MessageLog;
-use WebGUI::Operation;
-use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Style;
-use WebGUI::Asset::Template;
 use WebGUI::URL;
-use WebGUI::User;
-use WebGUI::Utility;
 use WebGUI::Asset;
-use WebGUI::Asset::Wobject::EventsCalendar;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -50,119 +41,36 @@ sub definition {
 			description => {
 				fieldType=>"HTMLArea",
 				defaultValue=>undef
-				},
+			},
 			eventStartDate => {
 				fieldType=>"dateTime",
 				defaultValue=>time()
-				},
+			},
 			eventEndDate => {
 				fieldType=>"dateTime",
 				defaultValue=>time()
-				},
+			},
 			EventsCalendar_recurringId => {
 				fieldType=>"hidden",
 				defaultValue=>undef
-				},
+			},
 			eventLocation => {
 				fieldType=>"text",
 				defaultValue=>undef
-				},
-#			allowRegistration => {
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			allowUnregistration => {
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			regConfirm => {
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			regNotify => {
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			regStartDate => {
-#				fieldType=>"dateTime",
-#				defaultValue=>time()
-#				},
-#			regEndDate => {
-#				fieldType=>"dateTime",
-#				defaultValue=>time()
-#				},
-#			allowReminders => {
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			reminderStartDate => {
-#				fieldType=>"dateTime",
-#				defaultValue=>time()
-#				},
-#			reminderEndDate => {
-#				fieldType=>"dateTime",
-#				defaultValue=>time()
-#				},
-#			reminderRecurs => {
-#				fieldType=>"interval",
-#				defaultValue=>604800
-#				},
-#			chargeForEvent => {
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			firstAttendeeFee => {
-#				fieldType=>"float",
-#				defaultValue=>0
-#				},
-#			secondAttendeeFee => {
-#				fieldType=>"float",
-#				defaultValue=>0
-#				},
-#			availableSeats => {
-#				fieldType=>"integer",
-#				defaultValue=>0
-#				},
+			},
 			templateId => {
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000023'
-				},
-#			regConfirmTemplateId => {
-#				fieldType=>"template",
-#				defaultValue=>'MWtmplregConfirm000001'
-#				},
-#			regNotifyTemplateId => {
-#				fieldType=>"template",
-#				defaultValue=>'MWtmplregNotify0000001'
-#				},
-#			reminderTemplateId => {
-#				fieldType=>"template",
-#				defaultValue=>'MWtmplreminder00000001'
-#				},
-#			groupCanRegister => {
-#				fieldType=>"group",
-#				defaultValue=>'2'
-#				},
-#			groupCanReminder => {
-#				fieldType=>"group",
-#				defaultValue=>'2'
-#				},
-#			groupRegNotify => {
-#				fieldType=>"group",
-#				defaultValue=>'3'
-#			}
+			}
 		}
 	});
 	return $class->SUPER::definition($definition);
 }
 
-
-
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	#return $tabform;
 	$tabform->getTab("properties")->HTMLArea(
 		-name=>"description",
                 -label=>WebGUI::International::get(512,"Asset_Event"),
@@ -189,70 +97,7 @@ sub getEditForm {
                 -hoverHelp=>WebGUI::International::get('515 description',"Asset_Event"),
 		-value=>$self->getValue("eventLocation")
 		);
-#	$tabform->getTab("properties")->yesNo(
-#		-name=>"allowRegistration",
-#               -label=>WebGUI::International::get(516,"Asset_Event"),
-#		-value=>$self->getValue("allowRegistration")
-#		);
-#	$tabform->getTab("properties")->yesNo(
-#		-name=>"allowUnregistration", -label=>WebGUI::International::get(517,"Asset_Event"),
-#		-value=>$self->getValue("allowUnregistration")
-#		);
-#	$tabform->getTab("properties")->yesNo(
-#		-name=>"regConfirm", -label=>WebGUI::International::get(518,"Asset_Event"),
-#		-value=>$self->getValue("regConfirm")
-#		);
-#  $tabform->getTab("properties")->yesNo(
-#		-name=>"regNotify", -label=>WebGUI::International::get(519,"Asset_Event"),
-#		-value=>$self->getValue("regNotify")
-#		);
-#	$tabform->getTab("properties")->dateTime(
-#		-name=>"regStartDate", -label=>WebGUI::International::get(520,"Asset_Event"),
-#		-extras=>'onBlur="this.form.regEndDate.value=this.form.regStartDate.value;this.form.until.value=this.form.regStartDate.value;"',
-#		-value=>$self->getValue("regStartDate")
-#		);
-#	$tabform->getTab("properties")->dateTime(
-#		-name=>"regEndDate", -label=>WebGUI::International::get(521,"Asset_Event"),
-#		-extras=>'onBlur="this.form.until.value=this.form.regEndDate.value;"',
-#		-value=>$self->getValue("regEndDate")
-#		);
-#	$tabform->getTab("properties")->yesNo(
-#		-name=>"allowReminders", -label=>WebGUI::International::get(522,"Asset_Event"),
-#		-value=>$self->getValue("allowReminders")
-#		);
-#	$tabform->getTab("properties")->dateTime(
-#		-name=>"reminderStartDate", -label=>WebGUI::International::get(523,"Asset_Event"),
-#		-extras=>'onBlur="this.form.reminderEndDate.value=this.form.reminderStartDate.value;this.form.until.value=this.form.reminderStartDate.value;"',
-#		-value=>$self->getValue("reminderStartDate")
-#		);
-#	$tabform->getTab("properties")->dateTime(
-#		-name=>"reminderEndDate", -label=>WebGUI::International::get(524,"Asset_Event"),
-#		-extras=>'onBlur="this.form.until.value=this.form.reminderEndDate.value;"',
-#		-value=>$self->getValue("regEndDate")
-#		);
-#	$tabform->getTab("properties")->interval(
-#		-name=>"reminderRecurs", 
-#		-label=>WebGUI::International::get(524.5,"Asset_Event"),
-#		-value=>$self->getValue("reminderRecurs")
-#		);
-# Not quite implemented yet...
-#	$tabform->getTab("properties")->yesNo(
-#		-name=>"chargeForEvent", -label=>WebGUI::International::get(525,"Asset_Event"),
-#		-value=>$self->getValue("chargeForEvent")
-#		);
-#	$tabform->getTab("properties")->float(
-#		-name=>"firstAttendeeFee", -label=>WebGUI::International::get(526,"Asset_Event"),
-#		-value=>$self->getValue("firstAttendeeFee")
-#		);
-#	$tabform->getTab("properties")->float(
-#		-name=>"secondAttendeeFee", -label=>WebGUI::International::get(527,"Asset_Event"),
-#		-value=>$self->getValue("secondAttendeeFee")
-#		);
-#	$tabform->getTab("properties")->integer(
-#		-name=>"availableSeats", -label=>WebGUI::International::get(528,"Asset_Event"),
-#		-value=>$self->getValue("availableSeats")
-#		);
-	if (($session{form}{func} eq "addStyledEvent") || ($session{form}{func} eq "add") || ($session{form}{func} eq "addEvent")) {
+	if ($session{form}{func} eq "add") {
 		my %recursEvery;
 		tie %recursEvery, 'Tie::IxHash';
 		%recursEvery = (
@@ -279,13 +124,6 @@ sub getEditForm {
 					})
 			);
 	}
-#	$tabform->getTab("display")->template(
-#    -name=>"confirmationTemplateId",
-#    -value=>$self->getValue("confirmationTemplateId"),
-#    -namespace=>"EventsCalendar/Event",
-#    -label=>WebGUI::International::get(529,"Asset_Event"),
-#    -afterEdit=>'func=edit'
-#    );
 	$tabform->getTab("display")->template(
     -name=>"templateId",
     -value=>$self->getValue("templateId"),
@@ -293,30 +131,6 @@ sub getEditForm {
     -label=>WebGUI::International::get(530,"Asset_Event"),
     -hoverHelp=>WebGUI::International::get('530 description',"Asset_Event"),
     );
-#	$tabform->getTab("display")->template(
-#    -name=>"regNotifyTemplateId",
-#    -value=>$self->getValue("regNotifyTemplateId"),
-#    -namespace=>"EventsCalendar/Event",
-#    -label=>WebGUI::International::get(531,"Asset_Event"),
-#    );
-#  $tabform->getTab("display")->template(
-#  	-name=>"reminderTemplateId",
-#		-value=>$self->getValue("reminderTemplateId"),
-#		-namespace=>"EventsCalendar/Event",
-#		-label=>WebGUI::International::get(532,"Asset_Event"),
-#		);
-#	$tabform->getTab("security")->group(
-#		-name=>"groupCanRegister", -label=>WebGUI::International::get(533,"Asset_Event"),
-#		-value=>[$self->getValue("groupCanRegister")]
-#		);
-#	$tabform->getTab("security")->group(
-#		-name=>"groupCanReminder", -label=>WebGUI::International::get(534,"Asset_Event"),
-#		-value=>[$self->getValue("groupCanReminder")]
-#		);
-#	$tabform->getTab("security")->group(
-#		-name=>"groupNotify", -label=>WebGUI::International::get(535,"Asset_Event"),
-#		-value=>[$self->getValue("regNotifyGroupId")]
-#		);
 	return $tabform;
 }
 
@@ -329,7 +143,7 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	if ($session{form}{assetId} eq "new") {
 		$self->update({eventEndDate=>$self->get("eventStartDate")}) unless ($self->get("eventEndDate") >= $self->get("eventStartDate"));
-		if ($session{form}{recursEvery} ne "never") {
+		if ($session{form}{recursEvery} && $session{form}{recursEvery} ne "never") {
 			my $until = WebGUI::DateTime::setToEpoch($session{form}{until});
 			$until = $self->get("eventEndDate") unless ($until >= $self->get("eventEndDate"));
 			my $interval = ($session{form}{interval} < 1) ? 1 : $session{form}{interval};
@@ -402,10 +216,9 @@ sub view {
 	$var{"edit.label"} = WebGUI::International::get(575,"Asset_Event");
 	$var{"delete.url"} = WebGUI::URL::page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
 	$var{"delete.label"} = WebGUI::International::get(576,"Asset_Event");
-	my $vars = \%var;
 	#get parent so we can get the parent's style.  Hopefully the parent is an EventsCalendar.  If not, oh well.
 	my $parent = $self->getParent;
-	return WebGUI::Style::process($self->processTemplate($vars,$self->getValue("templateId")),$parent->getValue("styleTemplateId"));
+	return WebGUI::Style::process($self->processTemplate(\%var,$self->getValue("templateId")),$parent->getValue("styleTemplateId"));
 }
 
 
@@ -421,7 +234,7 @@ sub www_deleteEvent {
 		.WebGUI::International::get(77,"Asset_Event").'</a><p>' if (($session{form}{rid} ne "") and ($session{form}{rid} ne "0"));
 	$output .= '<a href="'.$self->getUrl.'">'.WebGUI::International::get(78,"Asset_Event").'</a>';
 	$output .= '</blockquote>';
-	return return WebGUI::Style::process($output,$self->getParent->getValue("styleTemplateId"));
+	return WebGUI::Style::process($output,$self->getParent->getValue("styleTemplateId"));
 }
 
 
@@ -451,17 +264,6 @@ sub www_edit {
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('13', 'Asset_Event'));
 }
 
-
-
-
-#-------------------------------------------------------------------
-#sub www_editStyled {
-#	my $self = shift;
-#	#get parent so we can get the parent's style.  Hopefully the parent is a wobject.  If not, oh well.
-#	my $parent = WebGUI::Asset->newByDynamicClass($self->get("parentId"));
-#	return WebGUI::Privilege::noAccess() unless (($parent->getValue("className") eq "WebGUI::Asset::Wobject::EventsCalendar") && #($parent->canEdit));
-#	return WebGUI::Style::process($self->getEditForm->print,$parent->getValue("styleTemplateId"));
-#}
 
 1;
 

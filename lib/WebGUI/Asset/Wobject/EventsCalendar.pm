@@ -62,14 +62,6 @@ sub definition {
 				fieldType=>"selectList",
 				defaultValue=>'0'
 			},
-		#	type =>{
-		#		fieldType=>"selectList",
-		#		defaultValue=>'0'
-		#	},
-		#	groupIdManage =>{
-		#		fieldType=>"group",
-		#		defaultValue=>'4'
-		#	},
 			startMonth=>{
 				fieldType=>"selectList",
 				defaultValue=>"current"
@@ -98,88 +90,70 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	#	$tabform->getTab("properties")->selectList(
-	#		-name=>"type",
-	#		-label=>WebGUI::International::get(501,"Asset_EventsCalendar"),
-	#		-value=>[$self->getValue("type")],
-	#		-options=>{
-	#			0=>WebGUI::International::get(502,"Asset_EventsCalendar"),
-	#			1=>WebGUI::International::get(503,"Asset_EventsCalendar"),
-	#			2=>WebGUI::International::get(504,"Asset_EventsCalendar"),
-	#			3=>WebGUI::International::get(505,"Asset_EventsCalendar"),
-	#			4=>WebGUI::International::get(506,"Asset_EventsCalendar")
-	#		},
-	#	);
-		$tabform->getTab("properties")->selectList(
-			-name=>"scope",
-			-label=>WebGUI::International::get(507,"Asset_EventsCalendar"),
-			-value=>[$self->getValue("scope")],
-			-options=>{
-				0=>WebGUI::International::get(508,"Asset_EventsCalendar"),
-				1=>WebGUI::International::get(510,"Asset_EventsCalendar"),
-				2=>WebGUI::International::get(509,"Asset_EventsCalendar"),
-			}
-		);
-   	$tabform->getTab("display")->template(
-   		-name=>"templateId",
-			-label=>WebGUI::International::get(94,"Asset_EventsCalendar"),
-			-value=>$self->getValue('templateId'),
-			-namespace=>"EventsCalendar"
-		);
-   	$tabform->getTab("display")->template(
-   		-name=>"eventTemplateId",
-			-label=>WebGUI::International::get(80,"Asset_EventsCalendar"),
-			-value=>$self->getValue('eventTemplateId'),
-			-namespace=>"EventsCalendar/Event",
-		);
-		$tabform->getTab("display")->selectList(
-			-name=>"startMonth",
-			-options=>{
-				"january"=>WebGUI::International::get('january','Asset_EventsCalendar'),
-				"now"=>WebGUI::International::get(98,"Asset_EventsCalendar"),
-				"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
-				"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
-			},
-			-label=>WebGUI::International::get(81,"Asset_EventsCalendar"),
-			-value=>[$self->getValue("startMonth")]
-		);
-		my %options;
-		tie %options, 'Tie::IxHash';
-		%options = (
+	$tabform->getTab("properties")->selectList(
+		-name=>"scope",
+		-label=>WebGUI::International::get(507,"Asset_EventsCalendar"),
+		-value=>[$self->getValue("scope")],
+		-options=>{
+			0=>WebGUI::International::get(508,"Asset_EventsCalendar"),
+			1=>WebGUI::International::get(510,"Asset_EventsCalendar"),
+			2=>WebGUI::International::get(509,"Asset_EventsCalendar"),
+		}
+	);
+ 	$tabform->getTab("display")->template(
+ 		-name=>"templateId",
+		-label=>WebGUI::International::get(94,"Asset_EventsCalendar"),
+		-value=>$self->getValue('templateId'),
+		-namespace=>"EventsCalendar"
+	);
+ 	$tabform->getTab("display")->template(
+ 		-name=>"eventTemplateId",
+		-label=>WebGUI::International::get(80,"Asset_EventsCalendar"),
+		-value=>$self->getValue('eventTemplateId'),
+		-namespace=>"EventsCalendar/Event",
+	);
+	$tabform->getTab("display")->selectList(
+		-name=>"startMonth",
+		-options=>{
+			"january"=>WebGUI::International::get('january','Asset_EventsCalendar'),
+			"now"=>WebGUI::International::get(98,"Asset_EventsCalendar"),
+			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
+			"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
+		},
+		-label=>WebGUI::International::get(81,"Asset_EventsCalendar"),
+		-value=>[$self->getValue("startMonth")]
+	);
+	my %options;
+	tie %options, 'Tie::IxHash';
+	%options = (
+		"last"=>WebGUI::International::get(85,"Asset_EventsCalendar"),
+		"after12"=>WebGUI::International::get(86,"Asset_EventsCalendar"),
+		"after9"=>WebGUI::International::get(87,"Asset_EventsCalendar"),
+		"after6"=>WebGUI::International::get(88,"Asset_EventsCalendar"),
+		"after3"=>WebGUI::International::get(89,"Asset_EventsCalendar"),
+		"current"=>WebGUI::International::get(82,"Asset_EventsCalendar")
+	);
+	$tabform->getTab("display")->selectList(
+		-name=>"endMonth",
+		-options=>\%options,
+		-label=>WebGUI::International::get(84,"Asset_EventsCalendar"),
+		-value=>[$self->getValue("endMonth")]
+	);
+	$tabform->getTab("display")->selectList(
+		-name=>"defaultMonth",
+		-options=>{
+			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
 			"last"=>WebGUI::International::get(85,"Asset_EventsCalendar"),
-			"after12"=>WebGUI::International::get(86,"Asset_EventsCalendar"),
-			"after9"=>WebGUI::International::get(87,"Asset_EventsCalendar"),
-			"after6"=>WebGUI::International::get(88,"Asset_EventsCalendar"),
-			"after3"=>WebGUI::International::get(89,"Asset_EventsCalendar"),
-			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar")
-		);
-		$tabform->getTab("display")->selectList(
-			-name=>"endMonth",
-			-options=>\%options,
-			-label=>WebGUI::International::get(84,"Asset_EventsCalendar"),
-			-value=>[$self->getValue("endMonth")]
-		);
-		$tabform->getTab("display")->selectList(
-			-name=>"defaultMonth",
-			-options=>{
-				"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
-				"last"=>WebGUI::International::get(85,"Asset_EventsCalendar"),
-				"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
-			},
-			-label=>WebGUI::International::get(90,"Asset_EventsCalendar"),
-			-value=>[$self->getValue("defaultMonth")]
-		);
-		$tabform->getTab("display")->integer(
-			-name=>"paginateAfter",
-			-label=>WebGUI::International::get(19,"Asset_EventsCalendar"),
-			-value=>$self->getValue("paginateAfter")
-		);
-	#	$tabform->getTab("security")->group(
-	#		-name=>"groupIdManage",
-	#		-label=>WebGUI::International::get(500,"Asset_EventsCalendar"),
-	#		-value=>[$self->getValue("groupIdManage")],
-	#		-uiLevel=>6
-	#	);
+			"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
+		},
+		-label=>WebGUI::International::get(90,"Asset_EventsCalendar"),
+		-value=>[$self->getValue("defaultMonth")]
+	);
+	$tabform->getTab("display")->integer(
+		-name=>"paginateAfter",
+		-label=>WebGUI::International::get(19,"Asset_EventsCalendar"),
+		-value=>$self->getValue("paginateAfter")
+	);
 	return $tabform;
 }
 
@@ -187,14 +161,6 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 sub view {
-	
-	#  All of this really needs to be redone like the old 
-	#  EventsCalendar... except this time using getLineage to 
-	#  filter instead of doing all sorts of pruning.  Also, caching
-	#  needs to be re-enabled.  Also, see the note below at line
-	#  407 - each dayloop event array needs to be sorted by startTime.
-	
-	
 	my $self = shift;  
 	#define default view month range.  Note that this could be different from 
 	#the range a user is allowed to view - set by the events calendar limitations.
@@ -215,25 +181,18 @@ sub view {
 
 	my ( $junk, $sameDate, $p, @list, $date, $flag, %previous, $maxDate, $minDate);  
 	my $monthloop;
-
-	#had to disable caching because each event can have its own security. 
-	# It can be re-added, of course.
-
 	my $scope = $self->getValue("scope");
 	my $children;
-	# get All My Children.
 	if ($scope == 0) { #calendar's scope is regular (immediate descendants)
 		$children = $self->getLineage(["children"],{returnObjects=>1,
-			includeOnlyClasses=>["WebGUI::Asset::Event","WebGUI::Asset::Relation"]});
+			includeOnlyClasses=>["WebGUI::Asset::Event"]});
 	} elsif ($scope == 2) { #calendar is master
 		$children = $self->getLineage(["descendants"],{returnObjects=>1,
-			includeOnlyClasses=>["WebGUI::Asset::Event","WebGUI::Asset::Relation"]});
+			includeOnlyClasses=>["WebGUI::Asset::Event"]});
 	} elsif ($scope == 1) { #calendar is global
 		$children = WebGUI::Asset::getRoot()->getLineage(["descendants"],{returnObjects=>1,
-			includeOnlyClasses=>["WebGUI::Asset::Event","WebGUI::Asset::Relation"]}); 
+			includeOnlyClasses=>["WebGUI::Asset::Event"]}); 
 	}
-	# get Type of Calendar
-#	my $calType = $self->getValue("type");
 
 	my $startMonth = $self->getValue("startMonth");
 	#define range of allowed months from the wobject settings.
@@ -299,8 +258,6 @@ sub view {
 				next if (($eventEndDate < $minDate) && $startsNow);
 				#Hide this event unless we are allowed to see it.  Funny that each event has 4 date/time pairs.
 				next unless $event->canView; 
-				# only display events for this person's Personal Calendar, if it's so set.
-	#			next unless (($calType != 1) || ($event->isMyEvent()));
 				my $eventLength = WebGUI::DateTime::getDaysInInterval($eventStartDate,$eventEndDate);
 				my ($startYear, $startMonth, $startDay, $startDate, $startTime, $startAmPm, $startDayOfWeek) = split " ", 
 					WebGUI::DateTime::epochToHuman($eventStartDate, "%y %c %D %z %Z %w");
@@ -359,68 +316,65 @@ sub view {
 
 				$previous{start} = $startYear."-".$startMonth."-".$startDay;
 				$previous{end} = $endYear."-".$endMonth."-".$endDay;
-#			} elsif (ref $event eq "WebGUI::Asset::Relation") {
-#				print "\n";
 			}
 		}
-		if (($startsNow || ($startMonth eq "first")) && ($calHasEvent == 0)) {
+	#	if (($startsNow || ($startMonth eq "first")) && ($calHasEvent == 0)) {
 			#Let's process an extra month if this month had no events, 
 			#and if we're at the beginning of the calendar, and if 
 			#the calendar is supposed to start with the first event or now.
-			$calMonthEnd++ unless $monthHasEvent;
-			next unless $monthHasEvent;
+	#		$calMonthEnd++ unless $monthHasEvent;
+	#		next unless $monthHasEvent;
+	#	}
+		my $dayOfWeekCounter = 1;
+		my $firstDayInFirstWeek = WebGUI::DateTime::getFirstDayInMonthPosition($thisMonth);
+		my $daysInMonth = WebGUI::DateTime::getDaysInMonth($thisMonth);
+		my @prepad;
+		while ($dayOfWeekCounter < $firstDayInFirstWeek) {
+			push(@prepad,{
+				count => $dayOfWeekCounter
+			});
+			$dayOfWeekCounter++;
 		}
-			my $dayOfWeekCounter = 1;
-			my $firstDayInFirstWeek = WebGUI::DateTime::getFirstDayInMonthPosition($thisMonth);
-			my $daysInMonth = WebGUI::DateTime::getDaysInMonth($thisMonth);
-			my @prepad;
-			while ($dayOfWeekCounter < $firstDayInFirstWeek) {
-				push(@prepad,{
-					count => $dayOfWeekCounter
-					});
-        			$dayOfWeekCounter++;
+		my @date = WebGUI::DateTime::epochToArray($thisMonth);
+		my @dayloop;
+		for (my $dayCounter=1; $dayCounter <= $daysInMonth; $dayCounter++) {
+			#----------------------------------------------------------------------------
+			#sort each day's events here - still needs to be done!
+			#----------------------------------------------------------------------------
+			push(@dayloop, {
+				dayOfWeek => $dayOfWeekCounter,
+				day=>$dayCounter,
+				isStartOfWeek=>($dayOfWeekCounter==1),
+				isEndOfWeek=>($dayOfWeekCounter==7),
+				isToday=>($date[0]."-".$date[1]."-".$dayCounter eq $now[0]."-".$now[1]."-".$now[2]),
+				event_loop=>\@{$events{$dayCounter}},
+				url=>$events{$dayCounter}->[0]->{url}
+			});
+			if ($dayOfWeekCounter == 7) {
+				$dayOfWeekCounter = 1;
+			} else {
+				$dayOfWeekCounter++;
 			}
-			my @date = WebGUI::DateTime::epochToArray($thisMonth);
-			my @dayloop;
-			for (my $dayCounter=1; $dayCounter <= $daysInMonth; $dayCounter++) {
-				#----------------------------------------------------------------------------
-				#sort each day's events here - still needs to be done!
-				#----------------------------------------------------------------------------
-				push(@dayloop, {
-					dayOfWeek => $dayOfWeekCounter,
-					day=>$dayCounter,
-					isStartOfWeek=>($dayOfWeekCounter==1),
-					isEndOfWeek=>($dayOfWeekCounter==7),
-					isToday=>($date[0]."-".$date[1]."-".$dayCounter eq $now[0]."-".$now[1]."-".$now[2]),
-					event_loop=>\@{$events{$dayCounter}},
-					url=>$events{$dayCounter}->[0]->{url}
-					});
-        			if ($dayOfWeekCounter == 7) {
-                			$dayOfWeekCounter = 1;
-       		 		} else {
-                			$dayOfWeekCounter++;
-        			}
-			}
-			my @postpad;
-			while ($dayOfWeekCounter <= 7 && $dayOfWeekCounter > 1) {
-				push(@postpad,{
-					count => $dayOfWeekCounter
-					});
-        			$dayOfWeekCounter++;
-			}
-			push(@$monthloop, {
-				'daysInMonth'=>$daysInMonth,
-				'day_loop'=>\@dayloop,
-				'prepad_loop'=>\@prepad,
-				'postpad_loop'=>\@postpad,
-				'month'=>WebGUI::DateTime::getMonthName($date[1]),
-				'year'=>$date[0]
-				});  
+		}
+		my @postpad;
+		while ($dayOfWeekCounter <= 7 && $dayOfWeekCounter > 1) {
+			push(@postpad,{
+				count => $dayOfWeekCounter
+			});
+			$dayOfWeekCounter++;
+		}
+		push(@$monthloop, {
+			'daysInMonth'=>$daysInMonth,
+			'day_loop'=>\@dayloop,
+			'prepad_loop'=>\@prepad,
+			'postpad_loop'=>\@postpad,
+			'month'=>WebGUI::DateTime::getMonthName($date[1]),
+			'year'=>$date[0]
+		});
 	}
 	my %var;
 	$var{month_loop} = \@$monthloop;
-#	$var{"canManage"} = $self->canManage;
-	$var{"addevent.url"} = $self->getUrl().'?func=addStyledEvent;class=WebGUI::Asset::Event';
+	$var{"addevent.url"} = $self->getUrl().'?func=add;class=WebGUI::Asset::Event';
 	$var{"addevent.label"} = WebGUI::International::get(20,"Asset_EventsCalendar");
 	$var{'sunday.label'} = WebGUI::DateTime::getDayName(7);
 	$var{'monday.label'} = WebGUI::DateTime::getDayName(1);
@@ -472,42 +426,6 @@ sub view {
 	return $self->processTemplate($vars,$self->get("templateId"));
 	
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 www_addStyledEvent ( )
-
-Adds an event.
-
-=cut
-
-sub www_addStyledEvent {
-	my $self = shift;
-	my %properties = (
-		groupIdView => $self->get("groupIdView"),
-		groupIdEdit => $self->get("groupIdEdit"),
-		ownerUserId => $self->get("ownerUserId"),
-		encryptPage => $self->get("encryptPage"),
-		templateId => $self->get("eventTemplateId"),
-		styleTemplateId => $self->get("styleTemplateId"),
-		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
-		isHidden => $self->get("isHidden"),
-		startDate => $self->get("startDate"),
-		endDate => $self->get("endDate"),
-		assetId=> "new",
-		className=>"WebGUI::Asset::Event"
-		);
-	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn(ref $session{form}{class}, @{$session{config}{assetContainers}}));
-	my $newAsset = WebGUI::Asset->newByPropertyHashRef(\%properties);
-	$newAsset->{_parent} = $self;
-		#get parent so we can get the parent's style.  Hopefully the parent is an EventsCalendar.  If not, oh well.
-#	return "You must add an Event as a child of an EventsCalendar." unless ($self->getValue("className") = "WebGUI::Asset::Wobject::EventsCalendar");
-	return WebGUI::Privilege::noAccess() unless ($self->canEdit);
-	return WebGUI::Style::process($newAsset->getEditForm->print,$self->getValue("styleTemplateId"));
-}
-
-
 
 #-------------------------------------------------------------------
 sub www_edit {

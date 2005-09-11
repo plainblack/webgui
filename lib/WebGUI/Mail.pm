@@ -104,7 +104,7 @@ sub send {
 	$message .= $_[2]."\n";
 	#footer
 	$message .= WebGUI::Macro::process("\n".$session{setting}{mailFooter});
-	$message .= "\n\n\nThis message was intended for ".$_[0].", but was overridden in the config file.\n\n\n";
+	$message .= "\n\n\nThis message was intended for ".$_[0].", but was overridden in the config file.\n\n\n" if ($session{config}{emailOverride});
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
 		if (open(MAIL,"| $session{setting}{smtpServer} -t -oi")) {
 			print MAIL $message;

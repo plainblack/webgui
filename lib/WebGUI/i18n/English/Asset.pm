@@ -333,7 +333,7 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br>
         },
 
         'extra head tags description' => {
-                message => q|These tags will be added to the &lt;HEAD&gt; section of each page that the asset appears on.<br>
+                message => q|These tags will be added to the &lt;head&gt; section of each page that the asset appears on.<br>
 <i>UI level: 5</i>
 </p>|,
                 lastUpdated => 1119149899,
@@ -382,9 +382,9 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 	},
 
 	'extra head tags' => {
-		message => q|Extra HEAD tags|,
+		message => q|Extra &lt;head&gt; elements (tags)|,
 		context => q|label for Asset form|,
-        	lastUpdated => 1106762071,
+        	lastUpdated => 1126381168,
 	},
 
 	'create package' => {

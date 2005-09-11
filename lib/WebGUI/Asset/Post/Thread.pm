@@ -672,6 +672,7 @@ sub view {
 	$currentPageUrl =~ s/^\///;
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
+		next unless ($dataSet->{className} eq "WebGUI::Asset::Post" || $dataSet->{className} eq "WebGUI::Asset::Post::Thread"); #handle non posts!
 		my $reply = WebGUI::Asset::Post->new($dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
 		$reply->{_thread} = $self; # caching thread for better performance
 		my %replyVars = %{$reply->getTemplateVars};

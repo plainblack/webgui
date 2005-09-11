@@ -32,7 +32,15 @@
  - Fixed a bug where privileges were not being set correctly on cache files
    and that was causing write errors.
  - fix [ 1281437 ] hidden children appear when changing assetsToHide
-
+ - fix [ 1265771 ] assets that were formerly prototypes are... (mwilson)
+ - fix [ 1280018 ] add new sql report - all query fields visible (mwilson)
+ - fix [ 1283740 ] overridden in WebGUI/Mail.pm (mwilson)
+ - fix [ 1282511 ] WebGUI::Form::submit disabled (mwilson)
+ - fix [ 1281854 ] migration.txt - 5.6, 5.7 need some updating. (mwilson)
+ - fix [ 1281842 ] rand() needs srand() on win32 mod_perl (mwilson)
+ - fix [ 1281435 ] Asset::paste() or Asset::setParent() needs... (mwilson)
+ - fix [ 1280374 ] Events calendar with no end date set loops... (mwilson)
+ - fix [ 1230352 ] Navigation Template (mwilson)
 
 6.7.3
  - User search now includes user alias.
@@ -40,9 +48,7 @@
    and karma were not showing up when editing users.
  - fix [ 1274239 ] Can Not Save Edits to Assets
  - fix [ 1274414 ] extraHeadTags entirely unused (mwilson)
-<<<<<<< 6.x.x.txt
  - fix [ 1265709 ] 6.7.1 - most help topics appear twice
-=======
  - fix [ 1276625 ] viewRSS not working (Andrew Khmelev)
  - fix [ 1276695 ] Addition to 'viewRSS not working' (6.7.2) (Andrew Khmelev)
  - Fixed a layout problem with the user search form.
@@ -62,8 +68,6 @@
  - fix [ 1279157 ] showInForms option not stored
  - fix [ 1250290 ] ECommerce state field broken on Plainblack.com
  - fix [ 1261985 ] (Fix?) sortby.lastreply.url (Andreas Graf)
->>>>>>> 1.474
-
 
 6.7.2
  - fix [ 1163407 ] Ampersand XHTML 1.0 Non-Compliant
@@ -1496,4 +1500,3 @@ webgui.
    (Thanks to Steve Simms.)
  - Changed the upgrade system to stop after an error so the sys admin can fix
    the problem before continuing.
-

@@ -59,7 +59,8 @@ Generates a captcha image (105px x 26px) and returns the filename and challenge 
 sub addFileFromCaptcha {
 	my $self = shift;
 	my $challenge;
-	$challenge.= ('A'..'Z')[26*rand] foreach (1..6);
+	srand;
+	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
 	my $filename = "captcha.".WebGUI::Id::generate().".png";
 	my $image = Image::Magick->new;
 	$image->Set(size=>'105x26');

@@ -248,7 +248,7 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 sub getFirstChild {
 	my $self = shift;
 	unless (exists $self->{_firstChild}) {
-		my ($lineage) = WebGUI::SQL->quickArray("select min(lineage) from asset where parentId=".quote($self->getId));
+		my ($lineage) = WebGUI::SQL->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
 		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_firstChild};
@@ -266,7 +266,7 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 sub getLastChild {
 	my $self = shift;
 	unless (exists $self->{_lastChild}) {
-		my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
+		my ($lineage) = WebGUI::SQL->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
 		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_lastChild};
