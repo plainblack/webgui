@@ -135,7 +135,7 @@ sub duplicate {
 	
 	$newAsset = $self->SUPER::duplicate(shift);
 	$newSurveyId = WebGUI::Id::generate();
-	$newAsset->set({
+	$newAsset->update({
 		Survey_id=>$newSurveyId
 		});
 	$a = WebGUI::SQL->read("select * from Survey_question where Survey_id=".quote($self->get("Survey_id"))
@@ -165,6 +165,7 @@ sub duplicate {
 		$b->finish;
 	}
 	$a->finish;
+	return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -291,10 +292,10 @@ sub getEditForm {
 	if ($self->get("assetId") eq "new") {
 		$tabform->getTab('properties')->whatNext(
 			-options=>{
-				addQuestion=>WebGUI::International::get(28,'Asset_Survey'),
+				editQuestion=>WebGUI::International::get(28,'Asset_Survey'),
 				backToPage=>WebGUI::International::get(745,'Asset_Survey')
 				},
-			-value=>"addQuestion",
+			-value=>"editQuestion",
                         -hoverHelp	=> WebGUI::International::get('what next','Asset_Survey'),
 			);
 	}

@@ -28,6 +28,7 @@
  - fix [ 1274488 ] Visitors language not recognized 6.7.2
  - fix [ 1266159 ] 6.7.1 - getEditForm fields are in funky order
  - fix [ 1283629 ] Forum bug in 6.5.6
+ - fix [ 1279887 ] unable to copy Survey Wobject
 
 
 6.7.3
