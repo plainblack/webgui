@@ -142,7 +142,7 @@ sub view {
 	my %vars;
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));
-	my @hidden = split("\n",$self->getValue("assetsToHide"));
+	my @hidden = split("\n",$self->get("assetsToHide"));
 	my $i = 1;
 	my $template= WebGUI::Asset->newByDynamicClass($self->get("templateId"))->get("template");
 	my $numPositions = 1;

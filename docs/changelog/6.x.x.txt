@@ -29,6 +29,9 @@
  - fix [ 1266159 ] 6.7.1 - getEditForm fields are in funky order
  - fix [ 1283629 ] Forum bug in 6.5.6
  - fix [ 1279887 ] unable to copy Survey Wobject
+ - Fixed a bug where privileges were not being set correctly on cache files
+   and that was causing write errors.
+ - fix [ 1281437 ] hidden children appear when changing assetsToHide
 
 
 6.7.3

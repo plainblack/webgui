@@ -711,7 +711,7 @@ sub view {
 	$var->{'mode.isSurvey'} = ($self->get("mode") eq "survey");
 	$var->{'survey.noprivs.label'} = WebGUI::International::get(48,'Asset_Survey');
 	$var->{'quiz.noprivs.label'} = WebGUI::International::get(49,'Asset_Survey');
-	return $self->processTemplate($var, $self->getValue("templateId"));
+	return $self->processTemplate($var, $self->get("templateId"));
 }
 
 #-------------------------------------------------------------------

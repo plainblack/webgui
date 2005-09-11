@@ -230,12 +230,11 @@ sub set {
 	my $self = shift;
 	my $content = shift;
 	my $ttl = shift || 60;
+	my $oldumask = umask();
+	umask(0000);
 	my $path = $self->getFolder();
 	unless (-e $path) {
-		my $oldumask = umask();
-		umask(0000);
 		eval {mkpath($path,0)};
-		umask($oldumask);
 		if ($@) {
 			WebGUI::ErrorHandler::error("Couldn't create cache folder: ".$path." : ".$@);
 			return;
@@ -251,6 +250,7 @@ sub set {
 	open(FILE,">".$path."/expires");
 	print FILE time()+$ttl;
 	close(FILE);
+	umask($oldumask);
 }
 
 
