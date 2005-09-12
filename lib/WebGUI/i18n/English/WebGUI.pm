@@ -1292,7 +1292,7 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 <p>
 
 <b>Admins</b><br>
-Admins are users who have unlimited privileges within WebGUI. A user should only be added to the admin group if they oversee the system. Usually only one to three people will be added to this group.
+Admins are users who have unlimited privileges within WebGUI. A user should only be added to the admin group if they oversee the system. Usually only one to three people will be added to this group.  Once a person has been added to this group, their UI level is automatically updated to 9.
 <p>
 
 <b>Content Managers</b><br>
@@ -1336,7 +1336,7 @@ These users are allowed to turn on Admin mode.
 Visitors are users who are not logged in using an account on the system. Also, if you wish to punish a registered user you could remove him/her from the Registered Users group and insert him/her into the Visitors group.
 <p>
 |,
-		lastUpdated => 1100157165
+		lastUpdated => 1126539068
 	},
 
 	'615' => {
@@ -3848,6 +3848,8 @@ If Posts and Threads are set to being "sticky", they will appear at the top of t
 For WebGUI Content Managers and Admins, the Asset and Wobject edit
 screens can be configured to make them easier to use, based on each
 user's UI level.  The UI level can be altered by Admins in the user's profile.
+Users added to the Admin group have their UI level automatically set to 9
+to give them full access to the site controls.
 <p>
 
 <b>Wobjects</b><br>
@@ -3857,7 +3859,7 @@ are for collecting data from users (and optionally emailing a copy), and
 Message Boards hold forums for users.  There are many different Wobjects in WebGUI.
 
 |,
-		lastUpdated => 1118457360,
+		lastUpdated => 1126539126,
 	},
 	'manage cache'  => {
                 message => q|Cache|,
