@@ -125,7 +125,7 @@ sub definition {
 		icon=>'syndicatedContent.gif',
                 tableName=>'SyndicatedContent',
                 className=>'WebGUI::Asset::Wobject::SyndicatedContent',
-                properties=>%properties
+                properties=>\%properties
 		});
         return $class->SUPER::definition($definition);
 }
@@ -235,7 +235,7 @@ sub _normalize_items {
 sub _get_rss_data {
         my $url = shift;
         
-        my $cache = WebGUI::Cache->new('url:' . $url, 'RSS');
+	my $cache = WebGUI::Cache->new('url:' . $url, 'RSS');
         my $rss_serial = $cache->get;
         my $rss = {};
         if ($rss_serial) {
@@ -483,6 +483,7 @@ sub view {
 
         my $maxHeadlines = $self->get('maxHeadlines') || 1000000;
         my @urls = split(/\s+/,$self->get('rssUrl'));
+	return $self->processTemplate({},$self->get('templateId')) unless (scalar(@urls));
 	my $title=$self->get('title');
 
 	#We came into this subroutine as
@@ -506,7 +507,6 @@ sub view {
 
 	#Construct the title for the link.
 	_constructRSSHeadTitleLink(\%var,$title || $var{'channel.title'});
-	
 	if ($rssObject) {
 	    $self->_constructRSS($rssObject,\%var);
 	    my $rss=$rssObject->as_string;
