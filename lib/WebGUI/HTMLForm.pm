@@ -148,10 +148,10 @@ sub new {
 	my $class = shift;
 	my %param = @_;
 	$header = "\n\n".WebGUI::Form::formHeader({
-		action=>$param{action},
-		extras=>$param{extras},
-		method=>$param{method},
-		enctype=>$param{enctype}
+		action=>($param{action} || $param{'-action'}),
+		extras=>($param{extras} || $param{'-extras'}),
+		method=>($param{method} || $param{'-method'}),
+		enctype=>($param{enctype} || $param{'-enctype'})
 		});
 	$header .= "\n<table ".$param{tableExtras}.'><tbody>';
 	$footer = "</tbody></table>\n" ;
