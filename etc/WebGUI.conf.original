@@ -75,16 +75,16 @@ dbpass = password
 # increase WebGUI's read performance.
 
 #dbslave1 = dsn => DBI:mysql:www_example_com;host=dbslave1.example.com, \
-#	dbuser => webgui, \
-#	dbpass => password
+#	user => webgui, \
+#	pass => password
 
 #dbslave2 = dsn => DBI:mysql:www_example_com;host=dbslave2.example.com, \
-#	dbuser => webgui, \
-#	dbpass => password
+#	user => webgui, \
+#	pass => password
 
 #dbslave3 = dsn => DBI:mysql:www_example_com;host=dbslave3.example.com, \
-#	dbuser => webgui, \
-#	dbpass => password
+#	user => webgui, \
+#	pass => password
 
 # Set this value if you wish to override all outbound emails to a specific
 # user for testing purposes.

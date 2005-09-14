@@ -2,6 +2,7 @@
  - Fixed a syntax error in Syndicated Content.
  - Fixed an infinite loop problem in Syndicated Content when no URLs were
    specified.
+ - Corrected an error in the built in WebGUI config file documentation.
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3
