@@ -129,7 +129,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 sub duplicate {
-	my ($self, $newAsset, $newSurveyId, $qdata, $adata, $rdata, $a, $b, $c);
+	my ($self, $newAsset, $newSurveyId, $qdata, $adata, $rdata, $a, $b, $c, $s, $sdata, $oldSectionId);
 	
 	$self = shift;
 	
@@ -138,16 +138,26 @@ sub duplicate {
 	$newAsset->update({
 		Survey_id=>$newSurveyId
 		});
-	$a = WebGUI::SQL->read("select * from Survey_question where Survey_id=".quote($self->get("Survey_id"))
+		
+	$s = WebGUI::SQL->read("select * from Survey_section where Survey_id=".quote($self->get("Survey_id"))
 		." order by sequenceNumber");
-	while ($qdata = $a->hashRef) {
+	while ($sdata = $s->hashRef) {
+		$oldSectionId = $sdata->{Survey_sectionId};
+		$sdata->{Survey_sectionId} = "new";
+		$sdata->{Survey_Id} = $newSurveyId;
+		$sdata->{Survey_sectionId} = $newAsset->setCollateral("Survey_section", "Survey_sectionId",$sdata,1,0, "Survey_id");
+	
+	  $a = WebGUI::SQL->read("select * from Survey_question where Survey_id=".quote($self->get("Survey_id"))
+		." and Survey_sectionId=".quote($oldSectionId)." order by sequenceNumber");
+	  while ($qdata = $a->hashRef) {
 		$b = WebGUI::SQL->read("select * from Survey_answer where Survey_questionId=".quote($qdata->{Survey_questionId})
 			." order by sequenceNumber");
 		$qdata->{Survey_questionId} = "new";
 		$qdata->{Survey_id} = $newSurveyId;
+		$qdata->{Survey_sectionId} = $sdata->{Survey_sectionId};
 		$qdata->{Survey_questionId} = $newAsset->setCollateral("Survey_question","Survey_questionId",$qdata,1,0,"Survey_id");
 		while ($adata = $b->hashRef) {
-			$c = WebGUI::SQL->read("select * from Survey_response where Survey_answerId=".quote($adata->{Survey_answerId}));
+			$c = WebGUI::SQL->read("select * from Survey_questionResponse where Survey_answerId=".quote($adata->{Survey_answerId}));
 			$adata->{Survey_answerId} = "new";
 			$adata->{Survey_questionId} = $qdata->{Survey_questionId};
 			$adata->{Survey_id} = $newSurveyId;
@@ -163,8 +173,12 @@ sub duplicate {
 			$c->finish;
 		}
 		$b->finish;
+	  }
+	  $a->finish;
+	
 	}
-	$a->finish;
+	$s->finish;
+	
 	return $newAsset;
 }
 

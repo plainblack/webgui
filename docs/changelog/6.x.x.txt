@@ -3,6 +3,8 @@
  - Fixed an infinite loop problem in Syndicated Content when no URLs were
    specified.
  - Corrected an error in the built in WebGUI config file documentation.
+ - Fixed Survey copy bug that prevented asset from appearing in clipboard.
+ - Fixed Survey copy bug that was preventing section data from being copied.
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3
