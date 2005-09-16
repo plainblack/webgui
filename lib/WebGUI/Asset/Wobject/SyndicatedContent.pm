@@ -253,7 +253,7 @@ sub _get_rss_data {
 		# Convert encoding if needed / Perl 5.8.0 or up required.
 		if ($] >= 5.008 && $hasEncode) {
 			$xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
-			my $xmlEncoding = $1;
+			my $xmlEncoding = $1 || 'utf8';
 			my $encoding = 'utf8';
 			if (lc($xmlEncoding) ne lc($encoding)) {
 				eval {	from_to($xml, $xmlEncoding, $encoding) };
