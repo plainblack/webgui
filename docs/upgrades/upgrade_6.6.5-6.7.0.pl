@@ -235,7 +235,7 @@ sub addAssetVersioning {
 	}	
 	WebGUI::SQL->write("create table assetData (
 		assetId varchar(22) not null,
-		revisionDate bigint,
+		revisionDate bigint not null,
 		revisedBy varchar(22) not null,
 		tagId varchar(22) not null,
 		status varchar(35) not null default 'pending',

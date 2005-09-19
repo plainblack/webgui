@@ -9,6 +9,15 @@
  - fix [ 1293947 ] 6.7.3 Cannot use a second AssetProxy with IE, Stack overflow (Wouter van Oijen / ProcoliX)
  - Added a few more performance enhanceers which can cut the number of
    database queries per page in half in some cases.
+ - fix [ 1292597 ] Trash not emptied
+ - fix [ 1292209 ] purgeTree called in runHourly.pl (6.7.4)
+ - fix [ 1290600 ] 6.6.5-6.7.0 upgrade script (fix) (Nicklous Roberts)
+ - fix [ 1288786 ] Names of copied style templates doesnt update.
+ - fix [ 1292538 ] Template::getList isn't versioned
+ - fix [ 1241451 ] Images not showing up in TinyMCE
+ - fix [ 1252786 ] rich edit ie image problem
+ - fix [ 1284248 ] runHourly.pl moving assets I don't want in trash to trash
+
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3

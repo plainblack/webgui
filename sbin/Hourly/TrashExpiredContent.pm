@@ -25,7 +25,7 @@ sub process {
 			asset.assetId=assetData.assetId where assetData.endDate<".$epoch." group by assetData.assetId");
 		while (my ($assetId, $class, $version) = $sth->array) {
 			my $asset = WebGUI::Asset->new($assetId,$class,$version);
-			$asset->trash;
+			$asset->trash if ($asset->get("endDate") < $epoch);
 		}
 		$sth->finish;
 	}
