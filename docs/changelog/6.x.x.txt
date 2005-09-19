@@ -7,6 +7,8 @@
  - Fixed Survey copy bug that was preventing section data from being copied.
  - Workedaround a bug for broken xml docs in Syndicated Content. (mwilson)
  - fix [ 1293947 ] 6.7.3 Cannot use a second AssetProxy with IE, Stack overflow (Wouter van Oijen / ProcoliX)
+ - Added a few more performance enhanceers which can cut the number of
+   database queries per page in half in some cases.
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3

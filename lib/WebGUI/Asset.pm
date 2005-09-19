@@ -963,11 +963,12 @@ sub new {
 	my $assetId = shift;
 	return undef unless ($assetId);
 	my $className = shift;
-	my $revisionDate = shift;
+	my $revisionDate = shift || $session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId="
 			.quote($assetId)." and  (status='approved' or status='archived'  or tagId=".quote($session{scratch}{versionTag}).")
 			group by assetData.assetId order by assetData.revisionDate");
+		$session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'} = $revisionDate unless ($session{config}{disableCache});
 	}
 	return undef unless ($revisionDate);
         if ($className) {
@@ -1023,7 +1024,11 @@ sub newByDynamicClass {
 	my $assetId = shift;
 	my $revisionDate = shift;
 	return undef unless defined $assetId;
-       	my ($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
+	my $className = $session{assetClass}{$assetId};
+	unless ($className) {
+       		($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
+		$session{assetClass}{$assetId} = $className unless ($session{config}{disableCache});
+	}
 	return undef unless ($className);
 	return WebGUI::Asset->new($assetId,$className,$revisionDate);
 }

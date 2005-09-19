@@ -248,7 +248,11 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 sub getFirstChild {
 	my $self = shift;
 	unless (exists $self->{_firstChild}) {
-		my ($lineage) = WebGUI::SQL->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+		my $lineage = $session{assetLineage}{firstChild}{$self->getId};
+		unless ($lineage) {
+			($lineage) = WebGUI::SQL->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+			$session{assetLineage}{firstChild}{$self->getId} = $lineage unless ($session{config}{disableCache});
+		}
 		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_firstChild};
@@ -266,7 +270,11 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 sub getLastChild {
 	my $self = shift;
 	unless (exists $self->{_lastChild}) {
-		my ($lineage) = WebGUI::SQL->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+		my $lineage = $session{assetLineage}{lastChild}{$self->getId};
+		unless ($lineage) {
+			($lineage) = WebGUI::SQL->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+			$session{assetLineage}{lastChild}{$self->getId} = $lineage;
+		}
 		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
 	}
 	return $self->{_lastChild};
@@ -592,7 +600,13 @@ Lineage string.
 sub newByLineage {
 	my $self = shift;
         my $lineage = shift;
-        my ($id,$class) = WebGUI::SQL->quickArray("select assetId, className from asset where lineage=".quote($lineage));
+	my $id = $session{assetLineage}{$lineage}{id};
+	my $class = $session{assetLineage}{$lineage}{class};
+        unless ($id && $class) {
+		($id,$class) = WebGUI::SQL->quickArray("select assetId, className from asset where lineage=".quote($lineage));
+		$session{assetLineage}{$lineage}{id} = $id unless ($session{config}{disableCache});
+		$session{assetLineage}{$lineage}{class} = $class unless ($session{config}{disableCache});
+	}
 	return WebGUI::Asset->new($id, $class);
 }
 

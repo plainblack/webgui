@@ -230,7 +230,7 @@ sub getGroupsForUser {
 		foreach my $gid (@groups) {
 			$session{isInGroup}{$userId}{$gid} = 1;
 		}
-		$session{gotGroupsForUser}{$userId} = \@groups;
+		$session{gotGroupsForUser}{$userId} = \@groups unless ($session{config}{disableCache});
 		return \@groups;
         }
 }
@@ -278,7 +278,7 @@ sub getGroupsInGroup {
                         my $gog = getGroupsInGroup($group,1,$loopCount);
                         push(@groupsOfGroups, @$gog);
                 }
-		$session{gotGroupsInGroup}{recursive}{$groupId} = \@groupsOfGroups;
+		$session{gotGroupsInGroup}{recursive}{$groupId} = \@groupsOfGroups  unless ($session{config}{disableCache});
                 return \@groupsOfGroups;
 	}
 	$session{gotGroupsInGroup}{direct}{$groupId} = $groups;
@@ -351,7 +351,7 @@ sub isInGroup {
 	unless ($secondRun) {			# don't look up user groups if we've already done it once.
 	        my $groups = WebGUI::Grouping::getGroupsForUser($uid,1);
 	        foreach (@{$groups}) {
-	                $session{isInGroup}{$uid}{$_} = 1;
+	                $session{isInGroup}{$uid}{$_} = 1 unless ($session{config}{disableCache});
         	}
         	if ($session{isInGroup}{$uid}{$gid} eq '1') {
                 	return 1;
@@ -370,7 +370,7 @@ sub isInGroup {
                 my @ips = split(";",$group{ipFilter});
                 foreach my $ip (@ips) {
                         if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
-                                $session{isInGroup}{$uid}{$gid} = 1;
+                                $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
                                 return 1;
                         }
                 }
@@ -385,7 +385,7 @@ sub isInGroup {
                 foreach my $var (@vars) {
                         my ($name, $value) = split(/\=/,$var);
                         if ($session{scratch}{$name} eq $value) {
-                                $session{isInGroup}{$uid}{$gid} = 1;
+                                $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
                                 return 1;
                         }
                 }
@@ -399,7 +399,7 @@ sub isInGroup {
                         ($karma) = WebGUI::SQL->quickHash("select karma from users where userId=".quote($uid));
                 }
                 if ($karma >= $group{karmaThreshold}) {
-                        $session{isInGroup}{$uid}{$gid} = 1;
+                        $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
                         return 1;
                 }
         }
@@ -418,13 +418,13 @@ sub isInGroup {
                                         } else {
                                                 my ($result) = $sth->array;
                                                 if ($result == 1) {
-                                                        $session{isInGroup}{$uid}{$gid} = 1;
+                                                        $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
                                                         if ($group{dbCacheTimeout} > 0) {
                                                                 WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
                                                                 WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
                                                         }
                                                 } else {
-                                                        $session{isInGroup}{$uid}{$gid} = 0;
+                                                        $session{isInGroup}{$uid}{$gid} = 0 unless ($session{config}{disableCache});
                                                         WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 0);
                                                 }
                                         }
@@ -457,13 +457,13 @@ sub isInGroup {
 					}
 					 
 				    if(isIn($params->{connectDN},@{$people})) {
-					   $session{isInGroup}{$uid}{$gid} = 1;
+					   $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
                        if ($group{dbCacheTimeout} > 10) {
                           WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
                           WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
                        }
 					} else {
-					   $session{isInGroup}{$uid}{$gid} = 0;
+					   $session{isInGroup}{$uid}{$gid} = 0 unless ($session{config}{disableCache});
                        WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 10);
 					}
 					$ldapLink->unbind;
@@ -478,11 +478,11 @@ sub isInGroup {
         foreach (@{$groups}) {
                 $session{isInGroup}{$uid}{$_} = isInGroup($_, $uid, 1);
                 if ($session{isInGroup}{$uid}{$_}) {
-                        $session{isInGroup}{$uid}{$gid} = 1; # cache current group also so we don't have to do the group in group check again
+                        $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache}); # cache current group also so we don't have to do the group in group check again
                         return 1;
                 }
         }
-        $session{isInGroup}{$uid}{$gid} = 0;
+        $session{isInGroup}{$uid}{$gid} = 0 unless ($session{config}{disableCache});
         return 0;
 }
 
