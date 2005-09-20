@@ -17,7 +17,11 @@
  - fix [ 1241451 ] Images not showing up in TinyMCE
  - fix [ 1252786 ] rich edit ie image problem
  - fix [ 1284248 ] runHourly.pl moving assets I don't want in trash to trash
-
+ - fix [ 1288699 ] 6.7.4 - username sometimes does not appear
+ - fix [ 1296468 ] Username doesn't show up in Edit User Account
+ - fix [ 1295921 ] Problem with Survey content.
+ - fix [ 1290460 ] Survey error when adding multiple choice answers
+ - fix [ 1288887 ] new user information mail dos'nt contains the username
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3

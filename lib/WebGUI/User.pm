@@ -239,7 +239,7 @@ sub new {
         $userId = _create($overrideId) if ($userId eq "new");
 	my $cache = WebGUI::Cache->new(["user",$userId]);
 	my $userData = $cache->get;
-	unless ($userData->{_userId}) {
+	unless ($userData->{_userId} && $userData->{_user}{username}) {
 		my %user;
 		tie %user, 'Tie::CPHash';
 		%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($userId));
