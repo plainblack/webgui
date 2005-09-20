@@ -1400,10 +1400,10 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 	},
 
 	'635' => {
-		message => q|Packages are groups of pages and wobjects that are predefined to be deployed together. A package manager may see the need to create a package several pages with a message board, an FAQ, and a Poll because that task is performed quite often. Packages are often defined to lessen the burden of repetitive tasks.
+		message => q|Packages are groups of Assets that are predefined to be deployed together. A package manager may see the need to create a package several pages with a message board, an FAQ, and a Poll because that task is performed quite often. Packages are often defined to lessen the burden of repetitive tasks.
 <br><br>
 One package that many people create is a Page/Article package. It is often the case that you want to add a page with an article on it for content. Instead of going through the steps of creating a page, going to the page, and then adding an article to the page, you may wish to simply create a package to do those steps all at once.|,
-		lastUpdated => 1038889471
+		lastUpdated => 1127257709
 	},
 
 	'353' => {
