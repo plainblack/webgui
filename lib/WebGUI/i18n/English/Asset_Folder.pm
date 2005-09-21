@@ -25,9 +25,9 @@ our $I18N = {
         	lastUpdated => 1126238060,
 	},
 
-        'Template description' => {
+        'folder template description' => {
                 message => q|This menu permits you to select a template to style the display of the Folder contents</p>|,
-                lastUpdated => 1119221331,
+                lastUpdated => 1127278558,
         },
 
         'What Next? description' => {

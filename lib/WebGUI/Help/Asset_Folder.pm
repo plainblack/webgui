@@ -7,7 +7,7 @@ our $HELP = {
 		body => 'folder add/edit body',
 		fields => [
                         {
-                                title => 'Template',
+                                title => 'folder template title',
                                 description => 'Template description',
 				namespace => 'Asset_Folder',
                         },
