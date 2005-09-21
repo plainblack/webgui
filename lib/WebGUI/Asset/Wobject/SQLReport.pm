@@ -207,7 +207,7 @@ sub getEditForm {
 	   if ($nr < 5	and ($self->get("dbQuery".($nr+1)) eq "" || ($self->get("dbQuery".($nr)) eq "" and $self->get("dbQuery".($nr+1)) ne ""))) {
 	           $tabform->getTab("properties")->button(
         	           -value=>WebGUI::International::get('Add another query',"Asset_SQLReport"),
-                	   -extras=>'onClick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
+                	   -extras=>'onclick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
 	                   -noWait=>1
         	           );
 	   }

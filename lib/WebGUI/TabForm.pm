@@ -207,7 +207,7 @@ sub new {
 	}
 	my $cancel = WebGUI::Form::button({
 			value=>WebGUI::International::get('cancel'),
-			extras=>q|onClick="location.href='|.$cancelUrl.q|'"|
+			extras=>q|onclick="location.href='|.$cancelUrl.q|'"|
 			});
 	bless {	_uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }

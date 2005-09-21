@@ -198,8 +198,8 @@ sub getEditForm {
 					-size=>7,
 					-value=>$self->getValue($highlight),
 					-subtext=>qq{
-						<A HREF="#" onClick="cp.select($highlight,'$highlight');
-						return false;" NAME="$highlight" ID="$highlight">Pick</A>}
+						<a href="#" onclick="cp.select($highlight,'$highlight');
+						return false;" name="$highlight" id="$highlight">Pick</a>}
 				);
 	}
 	return $tabform;

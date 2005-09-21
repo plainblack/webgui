@@ -118,7 +118,7 @@ sub toHtml {
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new(
 			id=>$self->{id},
-			extras=>'style="font-size: 8pt;" onClick="window.timeField = this.form.'.$self->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}. '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
+			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}. '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>WebGUI::International::get(970)
 			)->toHtml;
 }

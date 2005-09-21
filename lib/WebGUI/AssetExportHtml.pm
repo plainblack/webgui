@@ -198,7 +198,7 @@ sub www_exportStatus {
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'userId='.$session{form}{userId});
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'extrasURL='.$session{form}{extrasURL});
 	$iframeUrl = WebGUI::URL::append($iframeUrl, 'uploadsURL='.$session{form}{uploadsURL});
-	my $output = '<IFRAME SRC="'.$iframeUrl.'" TITLE="'.WebGUI::International::get('Page Export Status',"Asset").'" WIDTH="410" HEIGHT="200"></IFRAME>';
+	my $output = '<iframe src="'.$iframeUrl.'" title="'.WebGUI::International::get('Page Export Status',"Asset").'" width="410" height="200"></iframe>';
         $self->getAdminConsole->render($output,WebGUI::International::get('Page Export Status',"Asset"),"Asset");
 }
 

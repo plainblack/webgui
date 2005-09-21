@@ -217,6 +217,7 @@ sub getEditForm {
         	);
 	my $start = $self->getValue("startPoint");
 	$tabform->getTab("properties")->raw("<script type=\"text/javascript\">
+		//<![CDATA[
 		var displayNavDescendantEndPoint = true;
 		var displayNavAncestorEndPoint = true;
 		function toggleDescendantEndPoint () {
@@ -248,6 +249,7 @@ sub getEditForm {
 		changeStartPoint();
 		".($descendantsChecked ? "" : "toggleDescendantEndPoint();")."
 		".($ancestorsChecked ? "" : "toggleAncestorEndPoint();")."
+		//]]>
 		</script>");
 	my $previewButton;# = qq{
                           # <INPUT TYPE="button" VALUE="Preview" NAME="preview"
@@ -256,7 +258,7 @@ sub getEditForm {
                           #      this.form.func.value='preview';
                           #      this.form.target = 'navPreview';
                           #      this.form.submit()">};
-	my $saveButton = ' <input type="button" value="'.WebGUI::International::get(62).'" onClick="
+	my $saveButton = ' <input type="button" value="'.WebGUI::International::get(62).'" onclick="
 		this.value=\''.WebGUI::International::get(452).'\';
 		this.form.func.value=\'editSave\';
 		this.form.target=\'_self\';

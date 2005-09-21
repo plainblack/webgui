@@ -320,6 +320,7 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
         my $i18n = WebGUI::International->new("Asset");
         my $output = "
    <script type=\"text/javascript\">
+   //<![CDATA[
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
@@ -351,6 +352,7 @@ WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.c
                         for(var i = 0; i < form.assetId.length; i++)
                         form.assetId[i].checked = assetListSelectAllToggle;
                  }
+		 //]]>
                 </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);
 }
