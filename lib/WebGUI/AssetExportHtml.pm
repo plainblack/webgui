@@ -54,7 +54,10 @@ sub checkExportPath {
 						Make sure that the webserver has permissions to write to that directory';
 			}
 		} else {
-			$error .= 'Error: The export path '.$session{config}{exportPath}.' does not exist.';
+			eval {mkpath($session{config}{exportPath},0)};
+                	if ($@) {
+                        	$error .= 'Error: The export path '.$session{config}{exportPath}.' does not exist, and couldn\'t create it because '.$@;
+                	}
 		}
 	} else {
 		$error.= 'Error: The export path is not configured. Please set the exportPath variable in the WebGUI config file';

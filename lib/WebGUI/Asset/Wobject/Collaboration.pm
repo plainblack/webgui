@@ -41,7 +41,6 @@ sub appendPostListTemplateVars {
 	my $page = $p->getPageData;
 	my $i = 0;
 	foreach my $row (@$page) {
-		#my $post = WebGUI::Asset::Wobject::Collaboration->newByPropertyHashRef($row);
 		my $post = WebGUI::Asset::Wobject::Collaboration->new($row->{assetId}, $row->{className}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
 		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("url"));
@@ -903,7 +902,7 @@ sub view {
 		$constraints .= " or assetData.status='pending'"; 
 	}
 	$constraints .= ")";
-	my $sql = "select asset.assetId,asset.className,max(assetData.revisionDate)
+	my $sql = "select asset.assetId,asset.className,max(assetData.revisionDate) as revisionDate
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate
@@ -1030,7 +1029,7 @@ sub www_search {
         	}
 		# please note that the SQL generated here-in is not for the feint of heart, mind, or stomach
 		# this is for trained professionals only and should not be attempted at home
-		my $sql = "select asset.assetId, asset.className, max(assetData.revisionDate)
+		my $sql = "select asset.assetId, asset.className, max(assetData.revisionDate) as revisionDate
 			from asset
 			left join assetData on assetData.assetId=asset.assetId
 			left join Post on Post.assetId=assetData.assetId and assetData.revisionDate = Post.revisionDate

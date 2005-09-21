@@ -744,8 +744,13 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 =cut
 
 sub setToEpoch {
+	my $set = shift;
+	# in epochToSet we use epochToHuman, which includes the time
+	# offset of the user, so we need to remove that here.
+	my $offset = $session{user}{timeOffset} || 0;
+	$set -= $offset*3600;
 	my @now = epochToArray(WebGUI::DateTime::time());
-	my ($date,$time) = split(/ /,$_[0]);
+	my ($date,$time) = split(/ /,$set);
  	my ($year, $month, $day) = split(/\-/,$date);
 	my ($hour, $minute, $second) = split(/\:/,$time);
 	if (int($year) < 3000 && int($year) > 1000) {

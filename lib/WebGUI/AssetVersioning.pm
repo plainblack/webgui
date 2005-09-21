@@ -70,8 +70,8 @@ sub addRevision {
         my $newVersion = WebGUI::Asset->new($self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
-        $newVersion->update($properties) if ($properties);
 	$newVersion->setVersionLock unless ($session{setting}{autoCommit});
+        $newVersion->update($properties) if ($properties);
         return $newVersion;
 }
 
@@ -127,7 +127,7 @@ Unlock's the asset and sets it to approved.
 sub commit {
 	my $self = shift;
 	$self->unsetVersionLock;
-	WebGUI::SQL->write("update assetData set status='approved' where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
+	$self->update({status=>'approved'});
 	$self->purgeCache;
 }
 

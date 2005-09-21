@@ -8,7 +8,8 @@
  - Workedaround a bug for broken xml docs in Syndicated Content. (mwilson)
  - fix [ 1293947 ] 6.7.3 Cannot use a second AssetProxy with IE, Stack overflow (Wouter van Oijen / ProcoliX)
  - Added a few more performance enhanceers which can cut the number of
-   database queries per page in half in some cases.
+   database queries per page in half in some cases. And can reduce the number
+   of queries on Collaboration System related pages even further.
  - fix [ 1292597 ] Trash not emptied
  - fix [ 1292209 ] purgeTree called in runHourly.pl (6.7.4)
  - fix [ 1290600 ] 6.6.5-6.7.0 upgrade script (fix) (Nicklous Roberts)
@@ -22,6 +23,14 @@
  - fix [ 1295921 ] Problem with Survey content.
  - fix [ 1290460 ] Survey error when adding multiple choice answers
  - fix [ 1288887 ] new user information mail dos'nt contains the username
+ - The export system now attempts to create the export path if it doesn't
+   already exist.
+ - fix [ 1287741 ] 6.7.3 Cannot insert a WebGUI collateral image in IE.
+ - fix [ 1293163 ] Error when using Syndication
+ - fix [ 1295718 ] Moderating submissions/posts is broken 
+ - fix [ 1288770 ] Couldn't call method www_view on asset
+ - fix [ 1278672 ] Timezones does not still not work properly in webgui
+
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3

@@ -204,6 +204,11 @@ sub definition {
                                         fieldType=>'dateTime',
                                         defaultValue=>32472169200
                                         },
+				status=>{
+					noFormPost=>1,
+					fieldType=>'hidden',
+					defaultValue=>'approved'
+					},
 				assetSize=>{
 					noFormPost=>1,
 					fieldType=>'hidden',

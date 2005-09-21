@@ -756,7 +756,7 @@ Sets the post to approved and sends any necessary notifications.
 
 sub setStatusApproved {
 	my $self = shift;
-        $self->update({status=>'approved'});
+        $self->commit;
         $self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if $self->isReply;
         unless ($self->isPoster) {
                 WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->getUrl,579);
@@ -810,7 +810,7 @@ sub setStatusPending {
 	} else {
         	$self->update({status=>'pending'});
         	WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
-                	$self->getUrl("func=view"),578,'WebGUI','pending');
+                	$self->getUrl,578,'WebGUI','pending');
 	}
 }
 
