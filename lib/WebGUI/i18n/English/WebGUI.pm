@@ -1005,20 +1005,18 @@ That particular example will help you get good ranking on search engines.
 	},
 
 	'961' => {
-		message => q|The trash is a special system location where deleted content is temporarily stored. Items in the trash may be managed individually. You may cut an item to the clipboard or permanently delete it by selecting the appropriate icon.  You may also purge/delete all items in the trash by choosing the Empty trash menu option.
-<p><b>Title</b><br>The name of the item in the trash.  You may view the item by selecting the title.
-<p><b>Type</b><br>The type of content.  For instance, a Page, Article, EventsCalendar, etc.
-<p><b>Trash Date</b><br>The date and time the item was added to the trash
-<p><b>Previous Location</b><br>The location where the item was previously found.  You may view the previous location by selecting the location.<p><b>Username</b><br>The username of the individual who placed the item in the trash.  This optional field is only visible in shared trash environments or when an administrator is managing the system trash.
-<p>Note that when Pages are in the clipboard that their URLs are still active in the WebGUI
+		message => q|<p>The trash is a special system location where deleted content is temporarily stored. Items in the trash may be cut to the clipboard or restored to their previous location.</p>
+<p><b>Title</b><br />The name of the item in the trash.  You may view the item by selecting the title.</p>
+<p><b>Type</b><br />The type of content.  For instance, a Page, Article, EventsCalendar, etc.</p>
+<p><b>Last Updated</b><br />The date and time the item was added to the trash.</p>
+<p><b>Size</b><br />The size of the Asset.</p>
+<p>Note that when Assets are in the trash that their URLs are still active in the WebGUI
 system.  If another page with an identical URL is created, the URL of the newly created page
-will be modified to make it unique.|,
-		lastUpdated => 1101775325,
-	},
-
-	'651' => {
-		message => q|Emptying your trash will remove these assets from your site forever. Are you sure you want to continue?|,
-		lastUpdated => 1101514049
+will be modified to make it unique.</p>
+<p>It is no longer possible to manually delete items from the trash, due to versioning.  Items in the trash will be automatically
+removed from the system after a set period of time.  That period of time is set in the config file, TrashExpiredContent_offset</p>
+<p>To truly delete an Asset from the system, rollback all releases of it under "Content Versioning"</p>|,
+		lastUpdated => 1127337912,
 	},
 
 	'498' => {
@@ -3052,11 +3050,6 @@ Privileges and styles assigned to pages in the package will not be copied when t
 	'821' => {
 		message => q|Any|,
 		lastUpdated => 1038432387
-	},
-
-	'696' => {
-		message => q|Trash, Empty|,
-		lastUpdated => 1031514049
 	},
 
 	'ends with' => {

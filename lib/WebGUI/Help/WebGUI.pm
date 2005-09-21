@@ -55,18 +55,6 @@ our $HELP = {
 		related => [
 		],
 	},
-	'trash empty' => {
-		title => '696',
-		body => '651',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'trash manage',
-				namespace => 'WebGUI'
-			}
-		]
-	},
 	'style template' => {
 		title => '1073',
 		body => '1074',
@@ -561,10 +549,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'trash empty',
-				namespace => 'WebGUI'
-			}
 		]
 	},
 	'clipboard manage' => {

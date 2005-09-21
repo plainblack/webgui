@@ -31,7 +31,7 @@
  - fix [ 1288770 ] Couldn't call method www_view on asset
  - fix [ 1278672 ] Timezones does not still not work properly in webgui
  - fix [ 1281347 ] double slash in URL (in style template WebGUI 6)
-
+ - fix [ 1289336 ] Trash cannot be emptied 6.7.4 gamma (documentation fix)
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3
