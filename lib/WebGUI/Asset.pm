@@ -844,6 +844,7 @@ sub getToolbar {
 	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	return '<script type="text/javascript">
+		//<![CDATA[
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
 		contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
@@ -853,6 +854,7 @@ sub getToolbar {
 		'.$commit.'
 		contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
 		contextMenu.print();
+		//]]>
 		</script>'.$toolbar;
 }
 
@@ -1461,6 +1463,7 @@ sub www_manageAssets {
 	my $output = '<div class="am-crumbtrail">'.join(" > ",@crumbtrail).'</div>';
 	$output .= "
    <script type=\"text/javascript\">
+   //<![CDATA[
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('&nbsp;','','center','');
@@ -1517,6 +1520,7 @@ sub www_manageAssets {
                         for(var i = 0; i < form.assetId.length; i++)
                         form.assetId[i].checked = assetListSelectAllToggle;
                  }
+		//]]>
 		</script> <div class="adminConsoleSpacer">
             &nbsp;
         </div>
@@ -1561,12 +1565,14 @@ sub www_manageAssets {
 			.WebGUI::Form::formFooter()
 			.' </fieldset></div> '
 			.'<script type="text/javascript">
+			//<![CDATA[
 			var clipboardItemSelectAllToggle = false;
 			function toggleClipboardSelectAll(form){
 			clipboardItemSelectAllToggle = clipboardItemSelectAllToggle ? false : true;
 			for(var i = 0; i < form.assetId.length; i++)
 			form.assetId[i].checked = clipboardItemSelectAllToggle;
 			}
+			//]]>
 			</script>';
 	}
 	my $hasPackages = 0;
