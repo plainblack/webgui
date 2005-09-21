@@ -30,6 +30,7 @@
  - fix [ 1295718 ] Moderating submissions/posts is broken 
  - fix [ 1288770 ] Couldn't call method www_view on asset
  - fix [ 1278672 ] Timezones does not still not work properly in webgui
+ - fix [ 1281347 ] double slash in URL (in style template WebGUI 6)
 
 
 6.7.4

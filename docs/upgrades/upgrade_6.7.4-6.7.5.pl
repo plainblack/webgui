@@ -13,6 +13,7 @@ my $quiet;
 start();
 
 fixSurveyAnswerDefinition();
+fixTemplatesExtras();
 
 finish();
 
@@ -23,6 +24,18 @@ sub fixSurveyAnswerDefinition {
 	WebGUI::SQL->write("alter table Survey_answer change gotoQuestion gotoQuestion varchar(22) binary");
 }
 
+
+#-------------------------------------------------
+sub fixTemplatesExtras {
+	print "\tFixing built-in templates with the Extras Macro.\n" unless ($quiet);
+	my @tmpls = WebGUI::SQL->buildArray("select distinct assetId from template");
+	foreach my $id (@tmpls) {
+		my $asset = WebGUI::Asset->new($id,"WebGUI::Asset::Template");
+		my $template = $asset->get("template");
+		$template =~ s/\^Extras;\//^Extras;/ixsg;
+		$asset->addRevision({template=>$template})->commit;
+	}
+}
 
 
 
