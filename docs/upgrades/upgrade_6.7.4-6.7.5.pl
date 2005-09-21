@@ -13,8 +13,9 @@ my $quiet;
 start();
 
 fixSurveyAnswerDefinition();
-#fixTemplates();
-#fixArticles();
+fixTemplates();
+fixArticles();
+sleep(1); # have to wait a second to add these revisions because you can't have two revisions of the same thing in the same second
 fixTemplatesExtras();
 
 finish();
