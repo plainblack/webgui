@@ -111,6 +111,15 @@ our $HELP = {
 		]
 	},
 
+	'content prototypes' => {
+		title => 'prototype using title',
+		body => 'prototype using body',
+		fields => [
+		],
+		related => [
+		]
+	},
+
 	'page export' => {
                 title => 'Page Export',
                 body => 'Page Export body',

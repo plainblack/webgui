@@ -349,9 +349,22 @@ through the site.  Check yes if you want this Asset to be available as a package
         },
 
         'make prototype description' => {
-                message => q|Chances are if you like assets to be configured a certain way, then you'll find prototypes useful. By setting an asset as a prototype you can create new items in your add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a prototype. From then on you can just "Add content > New Content > Photo Gallery".<br>
+                message => q|Set this Asset to be a Content Prototype so that others can use it on your site.
 <i>UI level: 9</i>|,
                 lastUpdated => 1119149899,
+        },
+
+        'prototype using title' => {
+                message => q|Content Prototypes, Using|,
+                lastUpdated => 1127413710,
+        },
+
+        'prototype using body' => {
+                message => q|<p>Chances are if you like assets to be configured a certain way, then you'll find Prototypes useful. By setting an Asset as a Prototype you can create new items in your Add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a Prototype. From then on you can just "Add content > New Content > Photo Gallery".</p>
+<p>The title of the Asset is used as the name of the Content Prototype in the Add content menu.  If you set the title
+of your prototype to be the same as the name of an Asset (Article, DataForm, etc.) then it will replace the WebGUI
+default Asset in the menu.</p>|,
+                lastUpdated => 1127413713,
         },
 
 	'asset fields title' => {
