@@ -86,20 +86,24 @@ sub www_editSettings {
 		-name=>"urlExtension",
 		-value=>$session{setting}{urlExtension},
 		-label=>$i18n->get("url extension"),
+		-hoverHelp=>$i18n->get("url extension description"),
 		);
         $tabform->getTab("content")->integer(
 		-name=>"maxAttachmentSize",
 		-label=>$i18n->get(130),
+		-hoverHelp=>$i18n->get('130 description'),
 		-value=>$session{setting}{maxAttachmentSize}
 		);
         $tabform->getTab("content")->integer(
 		-name=>"maxImageSize",
 		-label=>$i18n->get(583),
+		-hoverHelp=>$i18n->get('583 description'),
 		-value=>$session{setting}{maxImageSize}
 		);
         $tabform->getTab("content")->integer(
 		-name=>"thumbnailSize",
 		-label=>$i18n->get(406),
+		-hoverHelp=>$i18n->get('406 description'),
 		-value=>$session{setting}{thumbnailSize}
 		);
 	 $tabform->getTab("content")->yesNo(
@@ -110,12 +114,14 @@ sub www_editSettings {
 	 $tabform->getTab("content")->yesNo(
                 -name=>"metaDataEnabled",
                 -label=>$i18n->get("Enable Metadata"),
+                -hoverHelp=>$i18n->get("Enable Metadata description"),
                 -value=>$session{setting}{metaDataEnabled}
         	);
 # user interface settings
 	$tabform->getTab("ui")->selectList(
 		-name=>"richEditor",
 		-label=>$i18n->get("default rich editor"),
+		-hoverHelp=>$i18n->get("default rich editor description"),
 		-value=>[$session{setting}{richEditor}],
 		-options=>WebGUI::SQL->buildHashRef("select assetData.assetId,assetData.title from asset left join assetData on asset.assetId=assetData.assetId where asset.className='WebGUI::Asset::RichEdit' order by assetData.title"),
 		-defaultValue=>["PBrichedit000000000001"]
@@ -123,27 +129,32 @@ sub www_editSettings {
         $tabform->getTab("ui")->integer(
 		-name=>"textAreaRows",
 		-label=>$i18n->get(463),
+		-hoverHelp=>$i18n->get('463 description'),
 		-value=>$session{setting}{textAreaRows}
 		);
         $tabform->getTab("ui")->integer(
 		-name=>"textAreaCols",
 		-label=>$i18n->get(464),
+		-hoverHelp=>$i18n->get('464 description'),
 		-value=>$session{setting}{textAreaCols}
 		);
         $tabform->getTab("ui")->integer(
 		-name=>"textBoxSize",
 		-label=>$i18n->get(465),
+		-hoverHelp=>$i18n->get('465 description'),
 		-value=>$session{setting}{textBoxSize}
 		);
 	$tabform->getTab("ui")->template(
 		-name=>"userFunctionStyleId",
 		-label=>$i18n->get('user function style'),
+		-hoverHelp=>$i18n->get('user function style description'),
 		-namespace=>"style",
 		-value=>$session{setting}{userFunctionStyleId}
 		);
 	$tabform->getTab("ui")->template(
 		-name=>"AdminConsoleTemplate",
 		-label=>$i18n->get('admin console template'),
+		-hoverHelp=>$i18n->get('admin console template description'),
 		-namespace=>"AdminConsole",
 		-value=>$session{setting}{AdminConsoleTemplate}
 		);
@@ -151,41 +162,49 @@ sub www_editSettings {
         $tabform->getTab("messaging")->text(
 		-name=>"smtpServer",
 		-label=>$i18n->get(135),
+		-hoverHelp=>$i18n->get('135 description'),
 		-value=>$session{setting}{smtpServer}
 		);
         $tabform->getTab("messaging")->textarea(
 		-name=>"mailFooter",
 		-label=>$i18n->get(824),
+		-hoverHelp=>$i18n->get('824 description'),
 		-value=>$session{setting}{mailFooter}
 		);
         $tabform->getTab("messaging")->yesNo(
 		-name=>"alertOnNewUser",
 		-label=>$i18n->get(534),
+		-hoverHelp=>$i18n->get('534 description'),
 		-value=>$session{setting}{alertOnNewUser}
 		);
         $tabform->getTab("messaging")->group(
 		-name=>"onNewUserAlertGroup",
 		-label=>$i18n->get(535),
+		-hoverHelp=>$i18n->get('535 description'),
 		-value=>[$session{setting}{onNewUserAlertGroup}]
 	);
 	$tabform->getTab("misc")->yesNo(
 		-name=>"preventProxyCache",
 		-label=>$i18n->get(400),
+		-hoverHelp=>$i18n->get('400 description'),
 		-value=>$session{setting}{preventProxyCache}
 		);
 	$tabform->getTab("misc")->text(
 		-name=>"debugIp",
 		-label=>$i18n->get("debug ip"),
+		-hoverHelp=>$i18n->get("debug ip description"),
 		-value=>$session{setting}{debugIp}
 		);
 	$tabform->getTab("misc")->yesNo(
 		-name=>"showDebug",
 		-label=>$i18n->get(707),
+		-hoverHelp=>$i18n->get('707 description'),
 		-value=>$session{setting}{showDebug}
 		);
 	$tabform->getTab("misc")->yesNo(
 		-name=>"showPerformanceIndicators",
 		-label=>$i18n->get('show performance indicators'),
+		-hoverHelp=>$i18n->get('show performance indicators description'),
 		-value=>$session{setting}{showPerformanceIndicators}
 		);
 	$tabform->getTab("misc")->selectList(
@@ -196,46 +215,55 @@ sub www_editSettings {
 			HTTP_HOST=>$i18n->get(1071)
 			},
 		-label=>$i18n->get(1069),
+		-hoverHelp=>$i18n->get('1069 description'),
 		);
 # user settings
 	$tabform->getTab("user")->yesNo(
 		-name=>"anonymousRegistration",
 		-label=>$i18n->get(118),
+		-hoverHelp=>$i18n->get('118 description'),
 		-value=>$session{setting}{anonymousRegistration}
 		);
    	$tabform->getTab("user")->text(
 		-name=>"runOnRegistration",
 		-label=>$i18n->get(559),
+		-hoverHelp=>$i18n->get('559 description'),
 		-value=>$session{setting}{runOnRegistration}
 		);
    	$tabform->getTab("user")->yesNo(
 		-name=>"useKarma",
 		-label=>$i18n->get(539),
+		-hoverHelp=>$i18n->get('539 description'),
 		-value=>$session{setting}{useKarma}
 		);
    	$tabform->getTab("user")->integer(
 		-name=>"karmaPerLogin",
 		-label=>$i18n->get(540),
+		-hoverHelp=>$i18n->get('540 description'),
 		-value=>$session{setting}{karmaPerLogin}
 		);
    	$tabform->getTab("user")->interval(
 		-name=>"sessionTimeout",
 		-label=>$i18n->get(142),
+		-hoverHelp=>$i18n->get('142 description'),
 		-value=>$session{setting}{sessionTimeout}
 		);
    	$tabform->getTab("user")->yesNo(
 		-name=>"selfDeactivation",
 		-label=>$i18n->get(885),
+		-hoverHelp=>$i18n->get('885 description'),
 		-value=>$session{setting}{selfDeactivation}
 		);
    	$tabform->getTab("user")->yesNo(
 		-name=>"encryptLogin",
 		-label=>$i18n->get(1006),
+		-hoverHelp=>$i18n->get('1006 description'),
 		-value=>$session{setting}{encryptLogin}
 		);
         $tabform->getTab("user")->yesNo(
                 -name=>"passiveProfilingEnabled",
                 -label=>$i18n->get("Enable passive profiling"),
+                -hoverHelp=>$i18n->get("Enable passive profiling description"),
                 -value=>$session{setting}{passiveProfilingEnabled},
                 -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning").'\')" '
         );
@@ -250,6 +278,7 @@ sub www_editSettings {
             	-name=>"authMethod",
 		-options=>$options,
 		-label=>$i18n->get(164),
+		-hoverHelp=>$i18n->get('164 description'),
 		-value=>[$session{setting}{authMethod}],
 		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
