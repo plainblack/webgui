@@ -759,7 +759,7 @@ to add or remove user from their groups.
 	},
 
 	'password clear text' => {
-		message => q|Displayed in clear text so you can ensure you\'ve typed it correctly.|,
+		message => q|Displayed in clear text so you can ensure you've typed it correctly.|,
 		lastUpdated => 1118942066
 	},
 
