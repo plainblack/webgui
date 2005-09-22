@@ -233,73 +233,70 @@ our $I18N = {
 	},
 
         'asset fields body' => {
-                message => q|These are the base properties that all Assets share:<p>|,
+                message => q|<p>These are the base properties that all Assets share:</p>|,
                 context => q|Describing the form to add or edit an Asset.|,
-                lastUpdated => 1111984345,
+                lastUpdated => 1127426220,
         },
 
         'asset id description' => {
-                message => q|This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>|,
-                lastUpdated => 1119149899,
+                message => q|<p>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>|,
+                lastUpdated => 1127426210,
         },
 
         '99 description' => {
-                message => q|The title of the asset.  This should be descriptive, but not very long.  If left
-blank, this will be set to "Untitled".
-</p>
+                message => q|<p>The title of the asset.  This should be descriptive, but not very long.  If left
+blank, this will be set to "Untitled".</p>
 <P><I>Note:</I> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <B>Title</B> is used to distinguish this Asset from others.</p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1127426207,
         },
 
         '411 description' => {
-                message => q|A shorter title that will appear in navigation.  If left blank, this will default
-to the <b>Title</b>.<br>
-<i>UI level: 1</i>
-</p>|,
-                lastUpdated => 1119149899,
+                message => q|<p>A shorter title that will appear in navigation. If left blank,
+this will default to the <b>Title</b>.<br />
+<i>UI level: 1</i></p>|,
+                lastUpdated => 1127426204,
         },
 
         '104 description' => {
-                message => q|The URL for this asset.  It must be unique.  If this field is left blank, then
-a URL will be made from the parent's URL and the <b>Menu Title</b>.<br>
-<i>UI level: 3</i>
-</p>|,
-                lastUpdated => 1119149899,
+                message => q|<p>The URL for this asset.  It must be unique.  If this field is left blank, then
+a URL will be made from the parent's URL and the <b>Menu Title</b>.<br />
+<i>UI level: 3</i></p>|,
+                lastUpdated => 1127426200,
         },
 
         '886 description' => {
-                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.<br>
+                message => q|<p>Whether or not this asset will be hidden from the navigation menu and site maps.<br />
 <i>UI level: 6</i>
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1127426198,
         },
 
         '940 description' => {
-                message => q|Select yes to open this asset in a new window.<br>
+                message => q|<p>Select yes to open this asset in a new window.<br />
 <i>UI level: 6</i>
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1127426196,
         },
 
         'encrypt page description' => {
-                message => q|Should the page containing this asset be served over SSL?<br>
+                message => q|<p>Should the page containing this asset be served over SSL?<br />
 <i>UI level: 6</i>
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1127426194,
         },
 
         '497 description' => {
-                message => q|The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br>
+                message => q|<p>The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br />
 <i>UI level: 6</i>.
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1127426192,
         },
 
         '498 description' => {
-                message => q|The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br>
+                message => q|<p>The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br />
 <i>UI level: 6</i>
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1127426188,
         },
 
         '108 description' => {
