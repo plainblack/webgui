@@ -5,7 +5,7 @@
  - Corrected an error in the built in WebGUI config file documentation.
  - Fixed Survey copy bug that prevented asset from appearing in clipboard.
  - Fixed Survey copy bug that was preventing section data from being copied.
- - Workedaround a bug for broken xml docs in Syndicated Content. (mwilson)
+ - Workedaround a bug for broken xml docs in Syndicated Content. 
  - fix [ 1293947 ] 6.7.3 Cannot use a second AssetProxy with IE, Stack overflow (Wouter van Oijen / ProcoliX)
  - Added a few more performance enhanceers which can cut the number of
    database queries per page in half in some cases. And can reduce the number
