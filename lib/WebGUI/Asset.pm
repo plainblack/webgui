@@ -1241,6 +1241,9 @@ Purges all cache entries associated with this asset.
 
 sub purgeCache {
 	my $self = shift;
+	delete $session{assetLineage};
+	delete $session{assetClass};
+	delete $session{assetRevision};
 	WebGUI::Cache->new(["asset",$self->getId])->delete;
 }
 

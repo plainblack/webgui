@@ -71,7 +71,7 @@ sub addRevision {
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
 	$newVersion->setVersionLock unless ($session{setting}{autoCommit});
-        $newVersion->update($properties) if ($properties);
+        $newVersion->update($properties) if (defined $properties);
         return $newVersion;
 }
 
