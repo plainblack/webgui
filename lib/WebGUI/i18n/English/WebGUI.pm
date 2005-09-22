@@ -7,12 +7,12 @@ our $I18N = {
 	},
 
 	'show performance indicators description' => {
-		message => q|This will display the time (in seconds) it took to build each item on the page. It's useful for debugging performance problems.|,
-		lastUpdated => 0 
+		message => q|This will display the time (in seconds) it took to build each item on the page. It is useful for debugging performance problems.|,
+		lastUpdated => 1127413010,
 	},
 
 	'debug ip description' => {
-		message => q|This will limit debugging output to a specific IP address or IP range. To limit the output to anyone in a subnet of 10.0.0.0/24 you'd simply enter '10.0.0.'.|,
+		message => q|This will limit debugging output to a specific IP address or IP range. To limit the output to anyone in a subnet of 10.0.0.0/24 you'd simply enter 10.0.0. |,
 		lastUpdated => 0
 	},
 
@@ -593,15 +593,10 @@ Be aware that any database links you create here will be available to all conten
 	},
 
 	'1002' => {
-		message => q|<p>
-When you delete a database link, all SQL Reports using that link will stop working.  A list of all affected reports is shown on the confirmation screen.
-<p>
-
-
-As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
-<p>
+		message => q|<p> When you delete a database link, all SQL Reports using that link will stop working.  A list of all affected reports is shown on the confirmation screen.</p>
+<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.</p>
 |,
-		lastUpdated => 1056151382
+		lastUpdated => 1127413182
 	},
 
 	'1084' => {
