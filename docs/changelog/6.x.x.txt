@@ -33,6 +33,7 @@
  - fix [ 1281347 ] double slash in URL (in style template WebGUI 6)
  - fix [ 1289336 ] Trash cannot be emptied 6.7.4 gamma (documentation fix)
  - fix [ 1293180 ] packages help needs updating (documentation fix)
+ - fix [ 1286646 ] help things (documentation fix, content prototypes)
 
 6.7.4
  - fix [ 1279861 ] POD errors in 6.7.3
