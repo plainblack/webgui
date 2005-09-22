@@ -1,32 +1,12 @@
 package WebGUI::Help::WebGUI;
 
 our $HELP = {
-	'packages creating' => {
+	'packages using' => {
 		title => '681',
 		body => '636',
 		fields => [
 		],
 		related => [
-			{
-				tag => 'package add',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'page delete',
-				namespace => 'WebGUI'
-			}
-		]
-	},
-	'package add' => {
-		title => '680',
-		body => '635',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'packages creating',
-				namespace => 'WebGUI'
-			}
 		]
 	},
 	'content filtering' => {

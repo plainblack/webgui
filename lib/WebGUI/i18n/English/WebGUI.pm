@@ -1397,13 +1397,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 		lastUpdated => 1031514049
 	},
 
-	'635' => {
-		message => q|Packages are groups of Assets that are predefined to be deployed together. A package manager may see the need to create a package several pages with a message board, an FAQ, and a Poll because that task is performed quite often. Packages are often defined to lessen the burden of repetitive tasks.
-<br><br>
-One package that many people create is a Page/Article package. It is often the case that you want to add a page with an article on it for content. Instead of going through the steps of creating a page, going to the page, and then adding an article to the page, you may wish to simply create a package to do those steps all at once.|,
-		lastUpdated => 1127257709
-	},
-
 	'353' => {
 		message => q|You have no messages in your Inbox at this time.|,
 		lastUpdated => 1031514049
@@ -2048,7 +2041,7 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 	},
 
 	'681' => {
-		message => q|Packages, Creating|,
+		message => q|Packages, Using|,
 		lastUpdated => 1038889481
 	},
 
@@ -2097,11 +2090,6 @@ You can find out more about karma in <a href="http://www.plainblack.com/ruling_w
 	'starts with' => {
 		message => q|Starts With|,
 		lastUpdated => 1089039511
-	},
-
-	'680' => {
-		message => q|Package, Add|,
-		lastUpdated => 1038889471
 	},
 
 	'552' => {
@@ -2986,30 +2974,34 @@ You can search users based on username and email address. You can do partial sea
 	},
 
 	'636' => {
-		message => q|To create a package follow these simple steps:
+		message => q|
+<p>Packages are groups of Assets that are predefined to be redeployed
+together. It works exactly the same as the clipboard, except that you
+do not need to cut or copy the Assets before redeploying, or pasting,
+the Assets in other areas of the site.</p>
 
+<p>Packages are often defined to lessen the burden of repetitive tasks. A
+package manager may see the need to create a package several of pages with
+a message board, an FAQ, and a Poll because that task is performed often.</p>
+
+<p>In order to define or delete packages you must be in the Package
+Managers group or in the Admins group.</p>
+
+<p>To create a package follow these simple steps, just go the Metadata tab of
+any Asset's Add/Edit form and select "Make package?".  The Package will consist of
+that Asset and all Assets below it.</p>
+
+<p>To deploy a Package:
 <ol>
-<li> From the admin menu select "Manage packages."
-</li>
-
-<li> Add a page and give it a name. The name of the page will be the name of the package.
-</li>
-
-<li> Go to the new page you created and start adding pages and wobjects. Any pages or wobjects you add will be created each time this package is deployed. 
-</li>
+<li>Point your browser at a page on the site where you want to deploy the Package.</li>
+<li>Enable Admin mode.</li>
+<li>Select the Package tab from the Admin Bar.</li>
+<li>Click on the name of the Package to deploy.</li>
 </ol>
 
-<b>Notes:</b><br>
-In order to add, edit, or delete packages you must be in the Package Mangers group or in the Admins group.
-<br><br>
-
-If you add content to any of the wobjects, that content will automatically be copied when the package is deployed.
-<br><br>
-
-Privileges and styles assigned to pages in the package will not be copied when the package is deployed. Instead the pages will take the privileges and styles of the area to which they are deployed.
-<p>
+<p>All Asset URLs in the Package will be made unique after being deployed.</p>
 |,
-		lastUpdated => 1038889481
+		lastUpdated => 1127363010
 	},
 
 	'561' => {
