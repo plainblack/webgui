@@ -758,7 +758,8 @@ div.tabs {
 </body>
 </html>
 END
-	WebGUI::Asset->new("B1bNjWVtzSjsvGZh9lPz_A","WebGUI::Asset::Template")->addRevision({template=>$template})->commit;
+	my $asset = WebGUI::Asset->new("B1bNjWVtzSjsvGZh9lPz_A","WebGUI::Asset::Template");
+	$asset->addRevision({template=>$template})->commit if (defined $asset);
 
 	# style > WebGUI 6 Admin Style
 	my $template = <<END;
@@ -896,7 +897,8 @@ div.tabs {
 </body>
 </html>
 END
-	WebGUI::Asset->new("9tBSOV44a9JPS8CcerOvYw","WebGUI::Asset::Template")->addRevision({template=>$template})->commit;
+	my $asset = WebGUI::Asset->new("9tBSOV44a9JPS8CcerOvYw","WebGUI::Asset::Template");
+	$asset->addRevision({template=>$template})->commit if (defined $asset);
 }
 
 #-------------------------------------------------
@@ -942,7 +944,8 @@ allows you to add new features to WebGUI and still be able to upgrade
 the core system without a fuss.</dd>
 </dl>
 END
-	WebGUI::Asset->new("sWVXMZGibxHe2Ekj1DCldA","WebGUI::Asset::Wobject::Article")->addRevision({description=>$description})->commit;
+	my $asset = WebGUI::Asset->new("sWVXMZGibxHe2Ekj1DCldA","WebGUI::Asset::Wobject::Article");
+	$asset->addRevision({description=>$description})->commit if (defined $asset);
 }
 
 #-------------------------------------------------
