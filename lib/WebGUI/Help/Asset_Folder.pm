@@ -8,7 +8,7 @@ our $HELP = {
 		fields => [
                         {
                                 title => 'folder template title',
-                                description => 'Template description',
+                                description => 'folder template description',
 				namespace => 'Asset_Folder',
                         },
 		],
