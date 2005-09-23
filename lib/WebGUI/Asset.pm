@@ -1244,7 +1244,7 @@ sub purgeCache {
 	delete $session{assetLineage};
 	delete $session{assetClass};
 	delete $session{assetRevision};
-	WebGUI::Cache->new(["asset",$self->getId])->delete;
+	WebGUI::Cache->new(["asset",$self->getId,$self->get("revisionDate")])->deleteChunk(["asset",$self->getId]);
 }
 
 
