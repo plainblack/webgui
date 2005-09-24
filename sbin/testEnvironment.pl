@@ -153,7 +153,8 @@ sub checkModule {
         my $statement = "require ".$module.";";
         if (eval($statement)) {
 		$statement = '$'.$module."::VERSION";
-		if (my $currentVersion = eval($statement)) {
+		my $currentVersion = eval($statement);
+		if ($currentVersion >= $version) {
 			printResult("OK");
 		} else {
                 	printResult("Outdated - Current: ".$currentVersion." / Required: ".$version);
