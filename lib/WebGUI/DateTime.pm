@@ -744,20 +744,16 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 =cut
 
 sub setToEpoch {
-	my $set = shift;
-	# in epochToSet we use epochToHuman, which includes the time
-	# offset of the user, so we need to remove that here.
-	my $offset = $session{user}{timeOffset} || 0;
-	$set -= $offset*3600;
-	my @now = epochToArray(WebGUI::DateTime::time());
-	my ($date,$time) = split(/ /,$set);
- 	my ($year, $month, $day) = split(/\-/,$date);
-	my ($hour, $minute, $second) = split(/\:/,$time);
-	if (int($year) < 3000 && int($year) > 1000) {
-		$year = int($year);
-	} else {
-		$year = $now[0];
-	}
+        my $set = shift;
+        my @now = epochToArray(WebGUI::DateTime::time());
+        my ($date,$time) = split(/ /,$set);
+        my ($year, $month, $day) = split(/\-/,$date);
+        my ($hour, $minute, $second) = split(/\:/,$time);
+        if (int($year) < 3000 && int($year) > 1000) {
+                $year = int($year);
+        } else {
+                $year = $now[0];
+        } 
         if (int($month) < 13 && int($month) > 0) {
                 $month = int($month);
         } else {
@@ -768,7 +764,12 @@ sub setToEpoch {
         } else {
                 $day = $now[2];
         }
-	return arrayToEpoch($year,$month,$day,$hour,$minute,$second);
+        my $epoch = arrayToEpoch($year,$month,$day,$hour,$minute,$second);
+        # in epochToSet we use epochToHuman, which includes the time
+        # offset of the user, so we need to remove that here.
+        my $offset = $session{user}{timeOffset} || 0;
+        $epoch -= $offset*3600;
+        return $epoch;
 }
 
 #-------------------------------------------------------------------

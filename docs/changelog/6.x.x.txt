@@ -1,5 +1,9 @@
 6.7.6
-- fix [ 1302878 ] testEnvironment.pl does not check versions (Wouter van Oijen / ProcoliX)
+ - Fixed a bug in setToEpoch that caused dates to be improperly formatted.
+ - Fixed a problem with the slide panel where the links would sometimes take
+   the properties of the style.
+ - fix [ 1302878 ] testEnvironment.pl does not check versions (Wouter van Oijen / ProcoliX)
+
 
 6.7.5
  - Fixed a syntax error in Syndicated Content.
