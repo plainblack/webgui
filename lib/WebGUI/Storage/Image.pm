@@ -62,12 +62,13 @@ sub addFileFromCaptcha {
 	srand;
 	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
 	my $filename = "captcha.".WebGUI::Id::generate().".png";
-	my $image = Image::Magick->new;
+	my $image = Image::Magick->new();
 	$image->Set(size=>'105x26');
 	$image->ReadImage('xc:white');
-	$image->Annotate(pointsize=>20, skewY=>5, skewX=>11, gravity=>'center', fill=>'black', antialias=>'true', text=>$challenge);
-	$image->Swirl(degrees=>10);
-	$image->AddNoise(noise=>'Multiplicative');
+	$image->AddNoise(noise=>"Multiplicative");
+	$image->Annotate(font=>$session{config}{webguiRoot}."/lib/default.ttf", pointsize=>30, skewY=>0, skewX=>0, gravity=>'center', fill=>'white', antialias=>'true', text=>$challenge);
+	$image->Blur(geometry=>"1");
+	$image->Set(type=>"Grayscale");
 	$image->Border(fill=>'black', width=>1, height=>1);
 	$image->Write($self->getPath($filename));
 	return ($filename, $challenge);
