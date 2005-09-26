@@ -1203,8 +1203,8 @@ sub processTemplate {
 	if (defined $template) {
 		return $template->process(\%vars);
 	} else {
-		WebGUI::ErrorHandler::error("Can't instanciate template $templateId for asset ".$self->getId);
-		return "Error: Can't instanciate template ".$templateId;
+		WebGUI::ErrorHandler::error("Can't instantiate template $templateId for asset ".$self->getId);
+		return "Error: Can't instantiate template ".$templateId;
 	}
 }
 
@@ -1224,7 +1224,7 @@ sub publish {
         WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId in (".$idList.")");
 	my $cache = WebGUI::Cache->new;
         foreach my $id (@{$assetIds}) {
-        	# we do the purge directly cuz it's a lot faster than instanciating all these assets
+        	# we do the purge directly cuz it's a lot faster than instantiating all these assets
                 $cache->deleteChunk(["asset",$id]);
         }
 	$self->{_properties}{state} = "published";

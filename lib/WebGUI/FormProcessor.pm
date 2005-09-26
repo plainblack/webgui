@@ -25,7 +25,7 @@ Package WebGUI::FormProcessor;
 
 =head1 DESCRIPTION
 
-This is a convenience package to the individual form controls. It allows you to get the form post results back without having to load each form control seperately, instanciate an object, and call methods.
+This is a convenience package to the individual form controls. It allows you to get the form post results back without having to load each form control seperately, instantiate an object, and call methods.
 
 =head1 SYNOPSIS
 

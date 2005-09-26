@@ -98,7 +98,7 @@ sub cascadeLineage {
 	while (my ($assetId, $lineage) = $descendants->array) {
 		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
 		$prepared->execute([$fixedLineage,$assetId]);
-                # we do the purge directly cuz it's a lot faster than instanciating all these assets
+                # we do the purge directly cuz it's a lot faster than instantiating all these assets
                 $cache->deleteChunk(["asset",$assetId]);
 	}
 	$descendants->finish;

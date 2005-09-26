@@ -128,7 +128,7 @@ sub getShippingItems {
 
 =head2 getEnabledPlugins
 
-Returns a reference to an array of all enabled instanciated payment plugins.
+Returns a reference to an array of all enabled instantiated payment plugins.
 
 =cut
 

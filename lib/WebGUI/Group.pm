@@ -377,7 +377,7 @@ An alternative to the constructor "new", use find as a constructor by name rathe
 
 =head3 name
 
-The name of the group you wish to instanciate.
+The name of the group you wish to instantiate.
 
 =cut
 

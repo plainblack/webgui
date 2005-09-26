@@ -199,7 +199,7 @@ The total price of this item. Ie. totalPrice = quantity * price.
 
 =head3 item
 
-The instanciated plugin of this item. See WebGUI::Commerce::Item for a detailed API.
+The instantiated plugin of this item. See WebGUI::Commerce::Item for a detailed API.
 
 =cut
 

@@ -148,7 +148,7 @@ sub process {
 	if (defined $style) {
 		$output = $style->process(\%var);
 	} else {
-		$output = "WebGUI was unable to instanciate your style template.".$var{'body.content'};
+		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
 	}
 	$output = WebGUI::Macro::process($output);
 	my $macroHeadTags = generateAdditionalHeadTags();

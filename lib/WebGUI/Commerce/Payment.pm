@@ -42,7 +42,7 @@ method if your plugin can handle recurring payments.
 A hashref containing:
 
 	id		=> the gateway ID of the transaction,
-	transaction	=> the instanciated WebGUI::Commerce::Transaction object
+	transaction	=> the instantiated WebGUI::Commerce::Transaction object
 
 =cut	
 
@@ -167,7 +167,7 @@ sub get {
 
 =head2 getEnabledPlugins
 
-Returns a reference to an array of all enabled instanciated payment plugins.
+Returns a reference to an array of all enabled instantiated payment plugins.
 
 =cut
 
