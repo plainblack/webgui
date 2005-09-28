@@ -110,9 +110,9 @@ description replace the description of the original Asset.|,
                 lastUpdated => 1119905806,
         },
 
-        'Shortcut by alternate criteria? description' => {
+        'Shortcut by alternate criteria description' => {
                 message => q|Set to "yes" to enable selecting a asset based upon custom criteria. Metadata must be enabled for this option to function properly.|,
-                lastUpdated => 1119905806,
+                lastUpdated => 1127927137,
         },
 
         'disable content lock description' => {
@@ -148,9 +148,9 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 		lastUpdated => 1053183804
 	},
 
-	'Shortcut by alternate criteria?' => {
+	'Shortcut by alternate criteria' => {
 		message => q|Shortcut by alternate criteria?|,
-		lastUpdated => 1053183804
+		lastUpdated => 1127927125
 	},
 
 	'not equal to' => {

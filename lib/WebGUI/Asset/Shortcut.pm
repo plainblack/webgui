@@ -147,8 +147,8 @@ sub getEditForm {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"shortcutByCriteria",
 			-value=>$self->getValue("shortcutByCriteria"),
-			-label=>WebGUI::International::get("Shortcut by alternate criteria?","Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get("Shortcut by alternate criteria? description","Asset_Shortcut"),
+			-label=>WebGUI::International::get("Shortcut by alternate criteria","Asset_Shortcut"),
+			-hoverHelp=>WebGUI::International::get("Shortcut by alternate criteria description","Asset_Shortcut"),
 			-extras=>q|Onchange="
 				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
