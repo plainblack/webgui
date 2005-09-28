@@ -5,6 +5,7 @@
  - fix [ 1302878 ] testEnvironment.pl does not check versions (Wouter van Oijen / ProcoliX)
  - fix [ 1238223 ] captcha image broken in WRE
  - fix [ 1288783 ] Captcha picture only works with the latest ImageMagick.
+ - fix [ 1306915 ] Missing label on shortcut - Metadata
 
 
 6.7.5
