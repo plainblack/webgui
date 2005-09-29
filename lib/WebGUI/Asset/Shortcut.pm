@@ -170,8 +170,8 @@ sub getEditForm {
 		$tabform->getTab("properties")->selectList(
 			-name=>"resolveMultiples",
 			-value=>[ $self->getValue("resolveMultiples") ],
-			-label=>WebGUI::International::get("Resolve Multiples?","Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get("Resolve Multiples? description","Asset_Shortcut"),
+			-label=>WebGUI::International::get("Resolve Multiples","Asset_Shortcut"),
+			-hoverHelp=>WebGUI::International::get("Resolve Multiples description","Asset_Shortcut"),
 			-options=>{
 				mostRecent=>WebGUI::International::get("Most Recent","Asset_Shortcut"),
 				random=>WebGUI::International::get("Random","Asset_Shortcut"),

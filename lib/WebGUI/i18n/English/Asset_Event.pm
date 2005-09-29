@@ -169,10 +169,6 @@ The description of this event.
                      'lastUpdated' => 1108397891,
                      'message' => 'Description'
                    },
-          '524.5' => {
-                       'lastUpdated' => 1108397891,
-                       'message' => 'Reminders Recur Every'
-                     },
           '75' => {
                     'lastUpdated' => 1031514049,
                     'message' => 'Which do you wish to do?'

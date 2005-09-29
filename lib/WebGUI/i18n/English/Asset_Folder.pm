@@ -30,10 +30,10 @@ our $I18N = {
                 lastUpdated => 1127278558,
         },
 
-        'What Next? description' => {
+        'What Next description' => {
                 message => q|After creating a new Folder, do you wish to go back to the original page where you created the Folder
 to do you want to go to the new Folder?</p>|,
-                lastUpdated => 1119221331,
+                lastUpdated => 1127959255,
         },
 
 	'folder template title' => {

@@ -134,13 +134,13 @@ our $HELP = {
                                 namespace => 'Asset_DataForm',
                         },
                         {
-                                title => 'editField-vertical-label',
-                                description => 'editField-vertical-label description',
+                                title => 'editField vertical label',
+                                description => 'editField vertical label description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
-                                title => 'editField-extras-label',
-                                description => 'editField-extras-label description',
+                                title => 'editField extras label',
+                                description => 'editField extras label description',
                                 namespace => 'Asset_DataForm',
                         },
                         {

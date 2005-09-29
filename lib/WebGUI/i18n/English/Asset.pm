@@ -408,9 +408,9 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 		lastUpdated => 1089039511,
 	},
 
-	'Select...' => {
+	'Select' => {
 		message => q|Select...|,
-		lastUpdated => 1089039511
+		lastUpdated => 1127958072
 	},
 
 	'duplicateField' => {

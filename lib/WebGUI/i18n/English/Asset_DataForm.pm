@@ -101,9 +101,9 @@ or to return to the page where the it was created.|,
         },
 
 
-	'editField-vertical-label' => {
+	'editField vertical label' => {
 		message => q|Align vertical|,
-		lastUpdated => 1090575731
+		lastUpdated => 1127958354
 	},
 
 	'102' => {
@@ -200,14 +200,14 @@ to validate any input that the user may supply.|,
                 lastUpdated => 1119156590,
         },
 
-        'editField-vertical-label description' => {
+        'editField vertical label description' => {
                 message => q|This property controls whether radio buttons and checklists are laid out horizontally or vertically.|,
-                lastUpdated => 1119156590,
+                lastUpdated => 1127958365,
         },
 
-        'editField-extras-label description' => {
+        'editField extras label description' => {
                 message => q|Here you can enter additional tag properties for the field tag. For instance 'class="myClass"'.|,
-                lastUpdated => 1119156590,
+                lastUpdated => 1127958371,
         },
 
         '24 description' => {
@@ -549,14 +549,14 @@ The end of the form.
 		lastUpdated => 1052048005
 	},
 
-	'editField-extras-label' => {
+	'editField extras label' => {
 		message => q|Extras|,
-		lastUpdated => 1090575731
+		lastUpdated => 1127958376
 	},
 
-	'editField-vertical-subtext' => {
+	'editField vertical subtext' => {
 		message => q|This property only affects radio- and checklists.|,
-		lastUpdated => 1090575731
+		lastUpdated => 1127958381
 	},
 
 	'89' => {

@@ -262,7 +262,7 @@ sub www_editBranch {
                         # Add a "Select..." option on top of a select list to prevent from
                         # saving the value on top of the list when no choice is made.
                         if($fieldType eq "selectList") {
-                                $options = {"", WebGUI::International::get("Select...","Asset")};
+                                $options = {"", WebGUI::International::get("Select","Asset")};
                         }
                         $tabform->getTab("meta")->dynamicField(
                                  name=>"metadata_".$meta->{$field}{fieldId},

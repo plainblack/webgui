@@ -46,8 +46,8 @@ our $HELP = {
                                 namespace => 'Asset_Shortcut',
                         },
                         {
-                                title => 'Shortcut by alternate criteria?',
-                                description => 'Shortcut by alternate criteria? description',
+                                title => 'Shortcut by alternate criteria',
+                                description => 'Shortcut by alternate criteria description',
                                 namespace => 'Asset_Shortcut',
                         },
                         {
@@ -56,8 +56,8 @@ our $HELP = {
                                 namespace => 'Asset_Shortcut',
                         },
                         {
-                                title => 'Resolve Multiples?',
-                                description => 'Resolve Multiples? description',
+                                title => 'Resolve Multiples',
+                                description => 'Resolve Multiples description',
                                 namespace => 'Asset_Shortcut',
                         },
                         {

@@ -23,9 +23,9 @@ our $I18N = {
 		lastUpdated => 1053183804
 	},
 
-	'Resolve Multiples?' => {
+	'Resolve Multiples' => {
 		message => q|Resolve Multiples?|,
-		lastUpdated => 1053183804
+		lastUpdated => 1127959325
 	},
 
 	'7' => {
@@ -120,10 +120,10 @@ description replace the description of the original Asset.|,
                 lastUpdated => 1119905806,
         },
 
-        'Resolve Multiples? description' => {
+        'Resolve Multiples description' => {
                 message => q|Sets the order to use when multiple assets are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br>
 Most Recent will select the most recent asset that match the shortcut criteria.|,
-                lastUpdated => 1119905806,
+                lastUpdated => 1127959329,
         },
 
         'Criteria description' => {
