@@ -273,7 +273,7 @@ sub www_listSubscriptionCodeBatches {
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	$p = WebGUI::Paginator->new('op=listSubscriptionCodeBatches');
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listSubscriptionCodeBatches'));
 	$p->setDataByQuery("select * from subscriptionCodeBatch");
 
 	$batches = $p->getPageData;
@@ -347,7 +347,7 @@ sub www_listSubscriptionCodes {
 		return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
 	}
 	
-	$p = WebGUI::Paginator->new('op=listSubscriptionCodes'.$ops);
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listSubscriptionCodes'.$ops));
 	$p->setDataByQuery("select t1.*, t2.* from subscriptionCode as t1, subscriptionCodeBatch as t2 where t1.batchId=t2.batchId ".$where);
 
 	$codes = $p->getPageData;
@@ -383,7 +383,7 @@ sub www_listSubscriptions {
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	$p = WebGUI::Paginator->new('op=listSubscriptions');
+	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listSubscriptions'));
 	$p->setDataByQuery('select subscriptionId, name from subscription where deleted != 1');
 	$subscriptions = $p->getPageData;
 
