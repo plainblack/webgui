@@ -244,7 +244,7 @@ sub print {
 	$output .= '<div class="tabs">'.$tabs.$self->{_submit}."&nbsp;&nbsp;".$self->{_cancel}.'</div>';
 	$output .= $form;
 	$output .= WebGUI::Form::formFooter();
-	$output .= '<script>var numberOfTabs = '.($i-1).'; initTabs();</script>';
+	$output .= '<script type="text/javascript">var numberOfTabs = '.($i-1).'; initTabs();</script>';
 	$output .= '<script type="text/javascript" src="'.$session{config}{extrasURL}.'/wz_tooltip.js"></script>';
 	return $output;
 }
