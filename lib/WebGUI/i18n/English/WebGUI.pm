@@ -3645,13 +3645,13 @@ a user.|,
         },
 
         '164 description' => {
-                message => q|What should the default authentication method be for new accounts that are created? The two available options are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.
+                message => q|Set the default authentication method for new accounts.  The two available options by default are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.  Other methods can be provided by writing a custom authentication plug-in.
 <p>
 <i>NOTES:</i><P>
 Authentication settings can be customized on a per user basis.
 <p>
 Depending upon what authentication modules you have installed in your system you'll see any number of options after this point.|,
-                lastUpdated => 1120239343,
+                lastUpdated => 1128549239,
         },
 
 	
