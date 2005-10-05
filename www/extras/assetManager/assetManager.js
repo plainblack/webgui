@@ -318,7 +318,6 @@ function AssetManager_dragStop() {
 		url =url + "&";
             }
 
-		alert(this.overObject.id);
 	        url = url + "func=setRank&rank="+ this.overObject.metaData.rank;
 		
 		
@@ -466,6 +465,7 @@ function AssetManager_addAssetMetaData(url, rank,title) {
     obj.url = url;
     obj.rank = rank;
     obj.title = title;
+    //this.metaData[rank-1] = obj;
     this.metaData[this.metaData.length] = obj;
 }
 
