@@ -513,7 +513,7 @@ sub www_emailGroupSend {
 sub www_listGroups {
 	if (WebGUI::Grouping::isInGroup(3)) {
 		my $output = getGroupSearchForm("listGroups");
-		my ($groupCount) = WebGUI::SQL->quickArray("select count(*) from groups");
+		my ($groupCount) = WebGUI::SQL->quickArray("select count(*) from groups where isEditable=1");
         	return _submenu($output) unless ($session{form}{doit} || $groupCount<250 || $session{form}{pn} > 1);
 		$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
