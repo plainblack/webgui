@@ -137,7 +137,7 @@ sub process {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 		$var{'head.tags'} .= '
                 	<meta http-equiv="Pragma" content="no-cache" />
-                	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max_age=0" />
+                	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0" />
                 	<meta http-equiv="Expires" content="0" />
 			';
         }
