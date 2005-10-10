@@ -9,7 +9,7 @@
  - fix [ 1306915 ] Missing label on shortcut - Metadata
  - Fixed a pagination bug in the subscription code pagination.
  - Added a table of contents to the Help system.
-
+ - Documented the Product Macro and internationalized messages inside of it.
 
 6.7.5
  - Fixed a syntax error in Syndicated Content.
