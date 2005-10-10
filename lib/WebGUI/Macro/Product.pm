@@ -19,7 +19,7 @@ sub process {
 	($productId) = WebGUI::SQL->quickArray("select productId from products where sku=".quote($_[0])) unless ($productId);
 	($productId) = WebGUI::SQL->quickArray("select productId from products where productId=".quote($_[0])) unless ($productId);
 	
-	return 'Cannot find product' unless ($productId);
+	return WebGUI::International::get('cannot find product','Macro_Product') unless ($productId);
 
 	$product = WebGUI::Product->new($productId);
 
