@@ -44,7 +44,7 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get(2,"Asset_EventsCalendar"),
+		assetName=>WebGUI::International::get('assetName',"Asset_EventsCalendar"),
 		uiLevel => 9,
 		icon=>'calendar.gif',
 		tableName=>'EventsCalendar',

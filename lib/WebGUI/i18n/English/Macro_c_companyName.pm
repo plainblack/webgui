@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_c_companyName;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Company Name|,
+        lastUpdated => 1128837978,
+    },
+
     'company name title' => {
         message => q|Company Name Macro|,
         lastUpdated => 1112374923,

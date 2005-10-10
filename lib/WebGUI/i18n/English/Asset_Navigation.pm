@@ -117,9 +117,9 @@ our $I18N = {
 		lastUpdated => 1077078456
 	},
 
-	'navigation' => {
+	'assetName' => {
 		message => q|Navigation|,
-		lastUpdated => 1077078526,
+		lastUpdated => 1128834268,
 		context => q|Title of the navigation manager in the admin console.|
 	},
 

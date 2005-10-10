@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_URLEncode;
 
 our $I18N = {
 
-    'url encode title' => {
-        message => q|URL Encode Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|URL Encode|,
+		lastUpdated => 1128919146,
+	},
+
+	'url encode title' => {
+		message => q|URL Encode Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'url encode body' => {
 		message => q|

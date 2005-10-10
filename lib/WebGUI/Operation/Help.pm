@@ -21,21 +21,60 @@ use WebGUI::URL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
+sub _load {
+	my $namespace = shift;
+	$namespace =~ s/[^\w\d\s]//g;
+	my $cmd = "WebGUI::Help::".$namespace;
+        my $load = sprintf 'use %-s; $%-s::HELP;', $cmd, $cmd;
+	my $hash = eval($load);
+	unless ($@) {
+		return $hash
+	}
+	else {
+		WebGUI::ErrorHandler::error("Help failed to compile: $namespace. ".$@);
+		return {};
+	}
+}
+
+#-------------------------------------------------------------------
 sub _get {
 	my $id = shift;
 	my $namespace = shift;
-	$namespace =~ s/[^\w\d\s]//g;
-	$id =~ s/[^\w\d\s\/]//g;
-	my $cmd = "WebGUI::Help::".$namespace;
-        my $load = "use ".$cmd;
-        eval($load);
-        $cmd = "\$".$cmd."::HELP->{'".$id."'}";
-        return eval($cmd);
+	my $help = _load($namespace);
+	if (keys %{ $help } ) {
+		return $help->{$id};
+	}
+	else {
+		return "Unable to load help for $namespace -> $id\n";
+	}
 }
 
 #-------------------------------------------------------------------
 sub _link {
 	return WebGUI::URL::page('op=viewHelp;hid='.WebGUI::URL::escape($_[0]).';namespace='.$_[1]);
+}
+
+#-------------------------------------------------------------------
+sub _linkTOC {
+	return WebGUI::URL::page('op=viewHelpChapter;namespace='.$_[0]);
+}
+
+#-------------------------------------------------------------------
+sub _getHelpName {
+	my $file = shift;
+	my $helpName;
+	WebGUI::ErrorHandler::warn("file=$file");
+	if ($file =~ /^Asset_/) {
+		$helpName = WebGUI::International::get('assetName',$file);
+	}
+	elsif ($file =~ /^Macro_/) {
+		$helpName = WebGUI::International::get('macroName',$file);
+	}
+	else {
+		$helpName = WebGUI::International::get('topicName',$file);
+	}
+	WebGUI::ErrorHandler::warn("helpName=$helpName");
+	return $helpName;
 }
 
 #-------------------------------------------------------------------
@@ -58,6 +97,7 @@ sub www_viewHelp {
         }
         my $body = WebGUI::Asset::Template->new("PBtmplHelp000000000001")->process(\%vars);
     	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
+    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
     	return $ac->render(
 		WebGUI::Macro::process($body), 
 		WebGUI::International::get(93).': '.$i18n->get($help->{title})
@@ -76,20 +116,12 @@ sub www_viewHelpIndex {
         foreach my $file (@files) {
                 if ($file =~ /(.*?)\.pm$/) {
                         my $namespace = $1;
-                        my $cmd = "WebGUI::Help::".$namespace;
-                        my $load = "use ".$cmd;
-                        eval($load);
-                        unless ($@) {
-                                $cmd = "\$".$cmd."::HELP";
-                                my $help = eval($cmd);
-				foreach my $key (keys %{$help}) {
-                                        push @helpIndex, [$namespace, $key,
-                                                          WebGUI::International::get($help->{$key}{title},$namespace)];
-					$i++;
-				}
-                        } else {
-                                WebGUI::ErrorHandler::error("Help failed to compile: $namespace. ".$@);
-                        }
+			my $help = _load($namespace);
+			foreach my $key (keys %{$help}) {
+				push @helpIndex, [$namespace, $key,
+						WebGUI::International::get($help->{$key}{title},$namespace)];
+				$i++;
+			}
                 }
         }
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
@@ -105,7 +137,57 @@ sub www_viewHelpIndex {
                 }	
 	}
 	$output .= '</td></tr></table>';
-	return WebGUI::AdminConsole->new("help")->render($output);
+	my $ac = WebGUI::AdminConsole->new("help");
+    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
+	return $ac->render($output, join ': ',WebGUI::International::get(93), WebGUI::International::get('help index'));
+}
+
+#-------------------------------------------------------------------
+sub www_viewHelpTOC {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
+        my @helpIndex;
+	my $i;
+        my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Help";
+        opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
+        my @files = grep { /\.pm$/} readdir(DIR);
+        closedir(DIR);
+	my $third = round(@files/3 + 0.50);
+	my @entries;
+	foreach my $file (@files) {
+		$file =~ s/\.pm$//;
+		push @entries, [_getHelpName($file), $file];
+	}
+	$i = 0;
+	my $output = '<table width="100%" class="content"><tr><td valign="top">';
+	@entries = sort { $a->[0] cmp $b->[0] } @entries;
+        foreach my $helpEntry (@entries) {
+		my ($helpName, $helpFile) = @{ $helpEntry };
+                $output .= '<p><a href="'._linkTOC($helpFile).'">'.$helpName."</a></p>\n";
+                $i++;
+                if ($i % $third == 0) {
+                        $output .= '</td><td valign="top">';
+                }	
+	}
+	$output .= '</td></tr></table>';
+	my $ac = WebGUI::AdminConsole->new("help");
+    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
+	return $ac->render($output, join ': ',WebGUI::International::get(93), WebGUI::International::get('help toc'));
+}
+
+#-------------------------------------------------------------------
+sub www_viewHelpChapter {
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
+	my $namespace = $session{form}{namespace};
+	my $help = _load($namespace);
+	my @entries = sort keys %{ $help };
+	my $output = '';
+        foreach my $id (@entries) {
+                $output .= '<p><a href="'._link($id,$namespace).'">'.WebGUI::International::get($help->{$id}{title},$namespace).'</a></p>';
+	}
+	my $ac = WebGUI::AdminConsole->new("help");
+    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
+    	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
+	return $ac->render($output, join ': ',WebGUI::International::get(93), _getHelpName($namespace));
 }
 
 1;

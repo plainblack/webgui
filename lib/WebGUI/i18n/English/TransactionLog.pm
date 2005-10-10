@@ -120,6 +120,12 @@ A loop containing the transactions in the transaction history. Within this loop 
 		lastUpdated => 0,
 		context => q|List transaction workarea title.|
 	},
+
+	'topicName' => {
+		message => q|Transaction Log|,
+		lastUpdated => 1128920040,
+		context => q|An error message that's shown when an attempt is made to cancel a non recurring transaction.|
+	},
 	
 };
 

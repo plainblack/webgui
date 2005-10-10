@@ -122,6 +122,11 @@ The URL for executing this admin function.
 		lastUpdated => 1031514049
 	},
 
+	'macroName' => {
+		message => q|AdminBar|,
+		lastUpdated => 1128837324
+	},
+
 };
 
 1;

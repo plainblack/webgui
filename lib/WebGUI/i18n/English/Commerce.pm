@@ -493,6 +493,10 @@ A radio button tied to this plugin.<br>
 		lastUpdated => 0,
 		context => q|The label for the view shopping cart link in the confirm checkout screen.|
 	},
+	'topicName' => {
+		message => q|Commerce|,
+		lastUpdated => 1128920490,
+	},
 
 };
 

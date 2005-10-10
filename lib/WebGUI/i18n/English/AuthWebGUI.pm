@@ -236,6 +236,11 @@ our $I18N = {
 		lastUpdated => 1071507752
 	},
 
+	'topicName' => {
+		message => q|WebGUI Authentication|,
+		lastUpdated => 1128919828,
+	},
+
 };
 
 1;

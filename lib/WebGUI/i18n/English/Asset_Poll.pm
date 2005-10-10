@@ -163,9 +163,9 @@ width is 150 pixels.|,
 		lastUpdated => 1031514049
 	},
 
-	'1' => {
+	'assetName' => {
 		message => q|Poll|,
-		lastUpdated => 1031514049
+		lastUpdated => 1128831777
 	},
 
 	'4' => {

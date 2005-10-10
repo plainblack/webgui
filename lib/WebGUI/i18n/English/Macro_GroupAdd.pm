@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_GroupAdd;
 
 our $I18N = {
 
-    'group add title' => {
-        message => q|Group Add Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Group Add|,
+		lastUpdated => 1128838422,
+	},
+
+	'group add title' => {
+		message => q|Group Add Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'group add body' => {
 		message => q|

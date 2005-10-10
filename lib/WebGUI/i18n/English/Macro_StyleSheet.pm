@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_StyleSheet;
 
 our $I18N = {
 
-    'style sheet title' => {
-        message => q|Style Sheet Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Style Sheet|,
+		lastUpdated => 1128919083,
+	},
+
+	'style sheet title' => {
+		message => q|Style Sheet Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'style sheet body' => {
 		message => q|

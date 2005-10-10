@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_H_homeLink;
 
 our $I18N = {
 
-    'home link title' => {
-        message => q|Home Link Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Home Link|,
+		lastUpdated => 1128838633,
+	},
+
+	'home link title' => {
+		message => q|Home Link Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'home link body' => {
 		message => q|

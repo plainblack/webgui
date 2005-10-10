@@ -61,7 +61,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('snippet',"Asset_Snippet"),
+		assetName=>WebGUI::International::get('assetName',"Asset_Snippet"),
 		uiLevel => 5,
 		icon=>'snippet.gif',
                 tableName=>'snippet',
@@ -104,7 +104,7 @@ sub getEditForm {
 	} 
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
-                -label=>WebGUI::International::get('snippet', 'Asset_Snippet'),
+                -label=>WebGUI::International::get('assetName', 'Asset_Snippet'),
                 -hoverHelp=>WebGUI::International::get('snippet description', 'Asset_Snippet'),
                 -value=>$self->getValue("snippet")
                 );

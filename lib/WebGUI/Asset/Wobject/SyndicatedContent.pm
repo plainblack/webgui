@@ -119,7 +119,7 @@ sub definition {
 				}
 		);
         push(@{$definition}, {
-		assetName=>WebGUI::International::get(2,'Asset_SyndicatedContent'),
+		assetName=>WebGUI::International::get('assetName','Asset_SyndicatedContent'),
 		uiLevel=>6,
 		autoGenerateForms=>1,
 		icon=>'syndicatedContent.gif',

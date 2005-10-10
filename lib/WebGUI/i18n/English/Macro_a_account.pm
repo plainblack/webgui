@@ -39,6 +39,11 @@ The translated label for the account link, or the text that you supply to the ma
 		message => q|My Account|,
 		lastUpdated => 1031514049
 	},
+
+	'macroName' => {
+		message => q|Account|,
+		lastUpdated => 1128837060
+	},
 };
 
 1;

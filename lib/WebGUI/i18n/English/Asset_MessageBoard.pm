@@ -177,9 +177,9 @@ A conditional indicating whether there is more than one forum.
 		lastUpdated => 1066584548
 	},
 
-	'2' => {
+	'assetName' => {
 		message => q|Message Board|,
-		lastUpdated => 1031514049
+		lastUpdated => 1128831826
 	},
 
 	'73' => {

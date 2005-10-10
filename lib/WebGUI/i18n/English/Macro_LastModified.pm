@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_LastModified;
 
 our $I18N = {
 
-    'last modified title' => {
-        message => q|LastModified Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|LastModified|,
+		lastUpdated => 1128839043,
+	},
+
+	'last modified title' => {
+		message => q|LastModified Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'last modified body' => {
 		message => q|

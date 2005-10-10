@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_AdminText;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Admin Text|,
+        lastUpdated => 1128837612,
+    },
+
     'admin text title' => {
         message => q|Admin Text Macro|,
         lastUpdated => 1112466408,

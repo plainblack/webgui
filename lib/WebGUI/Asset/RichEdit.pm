@@ -62,7 +62,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		assetName=>'Rich Editor',
+		assetName=>WebGUI::International::get('assetName','Asset_RichEdit'),
 		icon=>'richEdit.gif',
 		uiLevel => 5,
                 tableName=>'RichEdit',

@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_Include;
 
 our $I18N = {
 
-    'include title' => {
-        message => q|Include Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Include|,
+		lastUpdated => 1128838682,
+	},
+
+	'include title' => {
+		message => q|Include Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'include body' => {
 		message => q|

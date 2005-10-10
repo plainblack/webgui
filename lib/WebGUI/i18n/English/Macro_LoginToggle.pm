@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_LoginToggle;
 
 our $I18N = {
 
-    'login toggle title' => {
-        message => q|Login Toggle Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Login Toggle|,
+		lastUpdated => 1128839147,
+	},
+
+	'login toggle title' => {
+		message => q|Login Toggle Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'login toggle body' => {
 		message => q|

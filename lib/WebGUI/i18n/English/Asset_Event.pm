@@ -213,8 +213,8 @@ The description of this event.
                     'lastUpdated' => 1031514049,
                     'message' => 'Don\'t delete anything, I made a mistake.'
                   },
-          '511' => {
-                     'lastUpdated' => 1108397891,
+          'assetName' => {
+                     'lastUpdated' => 1128639297,
                      'message' => 'Event'
                    },
           '702' => {

@@ -64,7 +64,7 @@ sub definition {
 				}
 		);
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get(1,"Asset_Article"),
+		assetName=>WebGUI::International::get('assetName',"Asset_Article"),
 		icon=>'article.gif',
 		autoGenerateForms=>1,
 		tableName=>'Article',

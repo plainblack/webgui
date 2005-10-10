@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_JavaScript;
 
 our $I18N = {
 
-    'java script title' => {
-        message => q|JavaScript Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|JavaScript|,
+		lastUpdated => 1128839022,
+	},
+
+	'java script title' => {
+		message => q|JavaScript Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'java script body' => {
 		message => q|

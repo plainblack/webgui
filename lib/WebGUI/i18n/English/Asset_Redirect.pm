@@ -30,10 +30,10 @@ The URL where the user will be redirected.
                 lastUpdated => 1119574089,
         },
 
-        'redirect' => {
+        'assetName' => {
                 message => q|Redirect|,
                 context => q|label for Asset Manager, getName|,
-                lastUpdated => 1121703197,
+                lastUpdated => 1128829970,
         },
 
 };

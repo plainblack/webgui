@@ -39,7 +39,7 @@ sub definition {
 				}
 		);
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get(2,"Asset_MessageBoard"),
+		assetName=>WebGUI::International::get(assetName,"Asset_MessageBoard"),
 		icon=>'messageBoard.gif',
 		tableName=>'MessageBoard',
 		className=>'WebGUI::Asset::Wobject::MessageBoard',

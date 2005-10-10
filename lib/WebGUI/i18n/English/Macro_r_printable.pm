@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_r_printable;
 
 our $I18N = {
 
-    'printable title' => {
-        message => q|Make Page Printable Macro|,
-        lastUpdated => 1112503983,
-    },
+	'macroName' => {
+		message => q|Make Page Printable|,
+		lastUpdated => 1128919002,
+	},
+
+	'printable title' => {
+		message => q|Make Page Printable Macro|,
+		lastUpdated => 1112503983,
+	},
 
 	'printable body' => {
 		message => q|

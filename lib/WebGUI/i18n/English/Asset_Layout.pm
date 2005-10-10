@@ -1,9 +1,9 @@
 package WebGUI::i18n::English::Asset_Layout;
 
 our $I18N = {
-	'layout' => {
+	'assetName' => {
 		message => q|Page|,
-        	lastUpdated => 0,
+        	lastUpdated => 1128832065,
 		context=>q|The name of the layout asset.|
 	},
 

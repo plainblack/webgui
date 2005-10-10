@@ -692,7 +692,12 @@ Usually the RDN looks something like:</p>
 		message => q|LDAP Connections|,
 		lastUpdated =>1092930637,
         context => q|Title of the ldap connection manager for the admin console.|
-    },
+	},
+
+	'topicName' => {
+		message => q|LDAP Authentication|,
+		lastUpdated => 1128919880
+	},
 
 };
 

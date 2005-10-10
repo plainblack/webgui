@@ -3873,6 +3873,26 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 1118861810
 	},
 
+	'help index' => {
+		message => q|Index|,
+		lastUpdated => 1128552837
+	},
+
+	'help toc' => {
+		message => q|Table of Contents|,
+		lastUpdated => 1128552846
+	},
+
+	'help contents' => {
+		message => q|Help Contents|,
+		lastUpdated => 1128553296
+	},
+
+	'topicName' => {
+		message => q|WebGUI|,
+		lastUpdated => 1128919994,
+	},
+
 };
 
 1;

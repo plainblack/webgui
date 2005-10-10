@@ -2,9 +2,9 @@ package WebGUI::i18n::English::Asset_Snippet;
 
 our $I18N = {
 
-	'snippet' => {
+	'assetName' => {
 		message => q|Snippet|,
-        	lastUpdated => 1104629663,
+        	lastUpdated => 1128830080,
 		context => 'Default name of all snippets'
 	},
 

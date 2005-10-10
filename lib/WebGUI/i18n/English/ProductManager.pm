@@ -547,6 +547,10 @@ the form.<br>|,
 		lastUpdated => 1120449297,
 		context	=> q|The body of the edit sku template help page|
 	},
+	'topicName' => {
+		message => q|Product Manager|,
+		lastUpdated => 1128919931,
+	},
 
 };
 

@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_AOIHits;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|AOI Hits|,
+        lastUpdated => 1128837648,
+    },
+
     'aoi hits title' => {
         message => q|AOI Hits Macro|,
         lastUpdated => 1112466408,

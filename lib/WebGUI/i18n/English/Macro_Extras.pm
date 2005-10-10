@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_Extras;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Extras|,
+        lastUpdated => 1128838281,
+    },
+
     'extras title' => {
         message => q|Extras Macro|,
         lastUpdated => 1112466752,

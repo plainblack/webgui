@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_PageUrl;
 
 our $I18N = {
 
-    'page url title' => {
-        message => q|Page URL Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Page URL|,
+		lastUpdated => 1128839374,
+	},
+
+	'page url title' => {
+		message => q|Page URL Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'page url body' => {
 		message => q|

@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_RawHeadTags;
 
 our $I18N = {
 
-    'raw head tags title' => {
-        message => q|Raw Head Tags Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Raw Head Tags|,
+		lastUpdated => 1128918979,
+	},
+
+	'raw head tags title' => {
+		message => q|Raw Head Tags Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'raw head tags body' => {
 		message => q|

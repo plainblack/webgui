@@ -25,7 +25,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		assetName=>WebGUI::International::get(3,"Asset_Shortcut"),
+		assetName=>WebGUI::International::get('assetName',"Asset_Shortcut"),
 		icon=>'shortcut.gif',
                 tableName=>'Shortcut',
                 className=>'WebGUI::Asset::Shortcut',

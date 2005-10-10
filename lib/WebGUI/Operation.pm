@@ -116,6 +116,8 @@ sub getOperations {
           'addUsersToGroupSave' => 'WebGUI::Operation::Group',
           'viewHelp' => 'WebGUI::Operation::Help',
           'viewHelpIndex' => 'WebGUI::Operation::Help',
+          'viewHelpTOC' => 'WebGUI::Operation::Help',
+          'viewHelpChapter' => 'WebGUI::Operation::Help',
           'viewMessageLog' => 'WebGUI::Operation::MessageLog',
           'viewMessageLogMessage' => 'WebGUI::Operation::MessageLog',
           'editProfile' => 'WebGUI::Operation::Profile',

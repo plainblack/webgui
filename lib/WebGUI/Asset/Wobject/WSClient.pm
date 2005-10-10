@@ -67,7 +67,7 @@ my $httpHeaderFieldType;
       $httpHeaderFieldType = 'hidden';
    }
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get(1, "Asset_WSClient"),
+		assetName=>WebGUI::International::get('assetName', "Asset_WSClient"),
 		uiLevel=>9,
 		icon=>'web_services.gif',
 		tableName=>'WSClient',

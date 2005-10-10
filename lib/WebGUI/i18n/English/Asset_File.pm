@@ -62,10 +62,10 @@ The type of the file (PDF, etc.)
 		lastUpdated => 1106762088
 	},
 
-        'file' => {
+        'assetName' => {
                 message => q|File|,
                 context => q|label for Asset Manager, getName|,
-                lastUpdated => 1121703035,
+                lastUpdated => 1128640132,
         },
                                                                                                                               
 	'new file description' => {

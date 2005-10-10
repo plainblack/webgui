@@ -764,6 +764,10 @@ config file must be enabled for this function to be available.</p>
                 context => q|Help body for Page Export operation|
         },
 
+	'topicName' => {
+		message => q|Assets|,
+		lastUpdated => 1128920336,
+	},
 
 };
 

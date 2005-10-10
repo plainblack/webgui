@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_PageTitle;
 
 our $I18N = {
 
-    'page title title' => {
-        message => q|PageTitle Macro|,
-        lastUpdated => 1112503983,
-    },
+	'macroName' => {
+		message => q|Page Title|,
+		lastUpdated => 1128839334,
+	},
+
+	'page title title' => {
+		message => q|Page Title Macro|,
+		lastUpdated => 1128839384,
+	},
 
 	'page title body' => {
 		message => q|

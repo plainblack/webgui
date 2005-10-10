@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_User;
 
 our $I18N = {
 
-    'user title' => {
-        message => q|User Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|User|,
+		lastUpdated => 1128919153,
+	},
+
+	'user title' => {
+		message => q|User Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'user body' => {
 		message => q|

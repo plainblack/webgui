@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_Quote;
 
 our $I18N = {
 
-    'quote title' => {
-        message => q|Quote Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Quote|,
+		lastUpdated => 1128918940,
+	},
+
+	'quote title' => {
+		message => q|Quote Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'quote body' => {
 		message => q|

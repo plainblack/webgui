@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_RandomAssetProxy;
 
 our $I18N = {
 
-    'random asset proxy title' => {
-        message => q|Random Asset Proxy Macro|,
-        lastUpdated => 1112315917,
-    },
+	'macroName' => {
+		message => q|Random Asset Proxy|,
+		lastUpdated => 1128918962,
+	},
+
+	'random asset proxy title' => {
+		message => q|Random Asset Proxy Macro|,
+		lastUpdated => 1112315917,
+	},
 
     'random asset proxy body' => {
         message => q|

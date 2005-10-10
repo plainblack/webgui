@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_SubscriptionItemPurchaseUrl;
 
 our $I18N = {
 
-    'subscription item purchase url title' => {
-        message => q|Subscription Item Purchase URL Macro|,
-        lastUpdated => 1112548245,
-    },
+	'macroName' => {
+		message => q|Subscription Item Purchase URL|,
+		lastUpdated => 1128919107,
+	},
+
+	'subscription item purchase url title' => {
+		message => q|Subscription Item Purchase URL Macro|,
+		lastUpdated => 1112548245,
+	},
 
 	'subscription item purchase url body' => {
 		message => q|

@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_Execute;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Execute|,
+        lastUpdated => 1128838230,
+    },
+
     'execute title' => {
         message => q|Execute Macro|,
         lastUpdated => 1112466408,

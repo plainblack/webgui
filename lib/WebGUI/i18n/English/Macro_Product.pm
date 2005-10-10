@@ -11,6 +11,10 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Message indicatin the available configurations.|
 	}
+	'macroName' => {
+		message => q|Product|,
+		lastUpdated => 1128918830,
+	}
 };
 
 1;

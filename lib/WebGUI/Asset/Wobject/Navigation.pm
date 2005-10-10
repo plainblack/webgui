@@ -32,7 +32,7 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get("navigation","Asset_Navigation"),
+		assetName=>WebGUI::International::get("assetName","Asset_Navigation"),
 		icon=>'navigation.gif',
 		tableName=>'Navigation',
 		className=>'WebGUI::Asset::Wobject::Navigation',

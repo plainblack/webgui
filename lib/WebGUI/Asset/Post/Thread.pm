@@ -72,7 +72,7 @@ sub definition {
 	my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('thread',"Asset_Thread"),
+		assetName=>WebGUI::International::get('assetName',"Asset_Thread"),
 		icon=>'thread.gif',
                 tableName=>'Thread',
                 className=>'WebGUI::Asset::Post::Thread',

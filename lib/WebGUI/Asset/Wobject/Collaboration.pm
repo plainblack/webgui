@@ -258,7 +258,7 @@ sub definition {
 	my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('collaboration system',"Asset_Collaboration"),
+		assetName=>WebGUI::International::get('assetName',"Asset_Collaboration"),
 		icon=>'collaboration.gif',
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',

@@ -416,6 +416,11 @@ option is set to Yes, then all whitespace entered into the form will be preserve
                 lastUpdated => 1119584875,
         },
 
+        'assetName' => {
+                message => q|Rich Edit|,
+                lastUpdated => 1128830747,
+        },
+
 };
 
 1;

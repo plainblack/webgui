@@ -420,6 +420,11 @@ The form in which the user can enter his subscription code.<br>|,
 		context => q|The error message that shows up when a wrong code length is specified.|
 	},
 
+	'topicName' => {
+		message => q|Subscriptions|,
+		lastUpdated => 1128920064,
+	},
+
 };
 
 1;

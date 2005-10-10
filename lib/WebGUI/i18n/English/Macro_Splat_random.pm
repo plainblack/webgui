@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_Splat_random;
 
 our $I18N = {
 
-    'random title' => {
-        message => q|Random Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Random|,
+		lastUpdated => 1128919051,
+	},
+
+	'random title' => {
+		message => q|Random Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'random body' => {
 		message => q|

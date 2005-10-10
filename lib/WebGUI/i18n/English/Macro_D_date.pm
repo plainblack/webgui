@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_D_date;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Date|,
+        lastUpdated => 1128837997,
+    },
+
     'date title' => {
         message => q|Date Macro|,
         lastUpdated => 1112466408,

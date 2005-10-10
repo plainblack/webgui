@@ -37,7 +37,7 @@ our $HELP = {
                                 namespace => 'Asset_Template',
                         },
                         {
-                                title => 'template',
+                                title => 'assetName',
                                 description => 'template description',
                                 namespace => 'Asset_Template',
                         },

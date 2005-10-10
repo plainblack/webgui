@@ -13,10 +13,10 @@ our $I18N = {
 		lastUpdated => 1107391135,
 	},
 
-	'template' => {
+	'assetName' => {
 		message => q|Template|,
 		context => q|label for Template Add/Edit Form|,
-		lastUpdated => 1107391162,
+		lastUpdated => 1128830570,
 	},
 
 	'edit template' => {

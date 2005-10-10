@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_AOIRank;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|AOI Rank|,
+        lastUpdated => 1128837912,
+    },
+
     'aoi rank title' => {
         message => q|AOI Rank Macro|,
         lastUpdated => 1112466408,

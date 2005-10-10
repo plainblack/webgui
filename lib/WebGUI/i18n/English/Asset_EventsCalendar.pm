@@ -102,8 +102,8 @@ The title of an individual event.
                     'lastUpdated' => 1038190379,
                     'message' => 'Event Template'
                   },
-          '2' => {
-                   'lastUpdated' => 1031514049,
+          'assetName' => {
+                   'lastUpdated' => 1128832357,
                    'message' => 'Events Calendar'
                  },
           '560' => {

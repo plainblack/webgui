@@ -441,10 +441,10 @@ user subscribed to.
 		lastUpdated => 1031514049
 	},
 
-        'post' => {
+        'assetName' => {
                 message => q|Post|,
                 context => q|label for Asset Manager, getName|,
-                lastUpdated => 1121703104,
+                lastUpdated => 1128829703,
         },
                                                                                                                               
 	'new file description' => {

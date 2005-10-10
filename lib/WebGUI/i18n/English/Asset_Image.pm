@@ -16,10 +16,10 @@ as File Assets.  Below are the properties that are specific to Image Assets:</P>
 		lastUpdated => 1119409764,
 	},
 
-        'image' => {
+        'assetName' => {
                 message => q|Image|,
                 context => q|label for Asset Manager, getName|,
-                lastUpdated => 1121703104,
+                lastUpdated => 1128639970,
         },
                                                                                                                               
 	'new file description' => {

@@ -233,9 +233,9 @@ The WebGUI management controls for this related product.
 		lastUpdated => 1031514049
 	},
 
-	'1' => {
+	'assetName' => {
 		message => q|Product|,
-		lastUpdated => 1031514049
+		lastUpdated => 1128831682
 	},
 
 	'18' => {

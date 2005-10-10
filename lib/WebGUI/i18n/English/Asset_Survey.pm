@@ -545,9 +545,9 @@ The default label for survey.url.
 		lastUpdated => 1110068088,
 	},
 
-	'1' => {
+	'assetName' => {
 		message => q|Survey|,
-		lastUpdated => 1033942924
+		lastUpdated => 1128832543
 	},
 
 	'88' => {

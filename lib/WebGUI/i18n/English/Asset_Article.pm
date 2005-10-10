@@ -29,9 +29,9 @@ NOTE: You can create a multi-paged article by placing the separator macro (&#94;
 	},
 
 
-	'1' => {
+	'assetName' => {
 		message => q|Article|,
-		lastUpdated => 1031514049
+		lastUpdated => 1128830974
 	},
 
 	'72' => {

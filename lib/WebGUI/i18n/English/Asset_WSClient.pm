@@ -120,9 +120,9 @@ property allows you to override the default MIME type for this page.|,
 		lastUpdated => 1055348597
 	},
 
-	'1' => {
+	'assetName' => {
 		message => q|Web Services Client|,
-		lastUpdated => 1033575504
+		lastUpdated => 1128834404
 	},
 
 	'72' => {

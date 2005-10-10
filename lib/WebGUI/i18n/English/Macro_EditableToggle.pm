@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_EditableToggle;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Editable Toggle|,
+        lastUpdated => 1128838139,
+    },
+
     'editable toggle title' => {
         message => q|Editable Toggle Macro|,
         lastUpdated => 1112466408,

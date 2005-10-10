@@ -5,8 +5,8 @@ our $I18N = {
 		     'lastUpdated' => 1031514049,
 		     'message' => 'URL to RSS File'
 		    },
-           '2' => {
-                    'lastUpdated' => 1031514049,
+           'assetName' => {
+                    'lastUpdated' => 1128832427,
                     'message' => 'Syndicated Content'
                   },
            '3' => {

@@ -72,10 +72,10 @@ have the following properties:
 		lastUpdated => 1107387324,
 	},
 
-	'file pile' => {
+	'assetName' => {
 		message => q|File Pile|,
 		context => q|label for Asset Manager, getName|,
-		lastUpdated => 1121702938,
+		lastUpdated => 1128639521,
 	},
 
 	'upload files' => {

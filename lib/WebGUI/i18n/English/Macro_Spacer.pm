@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_Spacer;
 
 our $I18N = {
 
-    'spacer title' => {
-        message => q|Spacer Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Spacer|,
+		lastUpdated => 1128919040,
+	},
+
+	'spacer title' => {
+		message => q|Spacer Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'spacer body' => {
 		message => q|

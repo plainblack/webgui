@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_AssetProxy;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Asset Proxy|,
+        lastUpdated => 1128837929,
+    },
+
     'asset proxy title' => {
         message => q|Asset Proxy Macro|,
         lastUpdated => 1112315917,

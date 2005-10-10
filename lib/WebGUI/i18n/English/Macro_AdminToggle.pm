@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_AdminToggle;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Admin Toggle|,
+        lastUpdated => 1128837629,
+    },
+
     'admin toggle title' => {
         message => q|Admin Toggle Macro|,
         lastUpdated => 1112466408,

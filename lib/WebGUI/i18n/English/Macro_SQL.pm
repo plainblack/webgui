@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_SQL;
 
 our $I18N = {
 
-    'sql title' => {
-        message => q|SQL Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|SQL|,
+		lastUpdated => 1128919058,
+	},
+
+	'sql title' => {
+		message => q|SQL Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'sql body' => {
 		message => q|

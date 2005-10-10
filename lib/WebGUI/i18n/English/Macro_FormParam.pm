@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_FormParam;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|Form Parameter|,
+        lastUpdated => 1128838349,
+    },
+
     'form param title' => {
         message => q|Form Parameter Macro|,
         lastUpdated => 1112466408,

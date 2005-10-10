@@ -205,7 +205,7 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-        return WebGUI::International::get('file pile',"Asset_FilePile");
+        return WebGUI::International::get('assetName',"Asset_FilePile");
 } 
 
 

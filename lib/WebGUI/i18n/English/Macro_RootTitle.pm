@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_RootTitle;
 
 our $I18N = {
 
-    'root title title' => {
-        message => q|Root Title Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Root Title|,
+		lastUpdated => 1128918994,
+	},
+
+	'root title title' => {
+		message => q|Root Title Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'root title body' => {
 		message => q|

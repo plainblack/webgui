@@ -91,9 +91,9 @@ Any text after the <b>Stop At</b> string.
                 lastUpdated => 1119244033,
         },
 
-	'3' => {
+	'assetName' => {
 		message => q|HTTP Proxy|,
-		lastUpdated => 1031510000
+		lastUpdated => 1128831337
 	},
 
 	'9' => {

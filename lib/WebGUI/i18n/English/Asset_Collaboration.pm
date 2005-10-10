@@ -2,10 +2,10 @@ package WebGUI::i18n::English::Asset_Collaboration;
 
 our $I18N = {
 
-	'collaboration system' => {
+	'assetName' => {
 		message => q|Collaboration System|,
 		context => q|label for Asset Manager|,
-		lastUpdated => 1107391162,
+		lastUpdated => 1128831039,
 	},
 
 	'preview' => {

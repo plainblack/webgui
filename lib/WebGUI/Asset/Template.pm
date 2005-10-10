@@ -99,7 +99,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('template',"Asset_Template"),
+		assetName=>WebGUI::International::get('assetName',"Asset_Template"),
 		icon=>'template.gif',
                 tableName=>'template',
                 className=>'WebGUI::Asset::Template',
@@ -171,7 +171,7 @@ sub getEditForm {
 		);
         $tabform->getTab("properties")->codearea(
 		-name=>"template",
-		-label=>WebGUI::International::get('template', 'Asset_Template'),
+		-label=>WebGUI::International::get('assetName', 'Asset_Template'),
 		-hoverHelp=>WebGUI::International::get('template description', 'Asset_Template'),
 		-value=>$self->getValue("template")
 		);

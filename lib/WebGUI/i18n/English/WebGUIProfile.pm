@@ -292,6 +292,11 @@ new categories of profile settings.
 		lastUpdated =>1092930637,
                 context => q|Title of the user profile settings manager for the admin console.|
         },
+
+	'topicName' => {
+		message => q|User Profile|,
+		lastUpdated => 1128920410,
+	},
 	
 };
 

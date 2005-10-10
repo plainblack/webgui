@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Macro_FileUrl;
 
 our $I18N = {
 
+    'macroName' => {
+        message => q|File Url|,
+        lastUpdated => 1128838332,
+    },
+
     'file url title' => {
         message => q|File Url Macro|,
         lastUpdated => 1112315917,

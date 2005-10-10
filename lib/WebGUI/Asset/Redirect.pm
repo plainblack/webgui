@@ -60,7 +60,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('redirect',"Asset_Redirect"),
+		assetName=>WebGUI::International::get('assetName',"Asset_Redirect"),
 		uiLevel => 9,
 		icon=>'redirect.gif',
                 tableName=>'redirect',

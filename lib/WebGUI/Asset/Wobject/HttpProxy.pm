@@ -33,7 +33,7 @@ sub definition {
 	my $class = shift;
 	my $definition = shift;
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get(3,"Asset_HttpProxy"),
+		assetName=>WebGUI::International::get('assetName',"Asset_HttpProxy"),
 		uiLevel => 5,
 		icon=>'httpProxy.gif',
 		tableName=>'HttpProxy',

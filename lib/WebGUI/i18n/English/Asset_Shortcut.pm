@@ -138,7 +138,7 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 		lastUpdated => 1053183804
 	},
 
-	'3' => {
+	'assetName' => {
 		message => q|Shortcut|,
 		lastUpdated => 1031514049
 	},

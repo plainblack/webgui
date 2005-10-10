@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_L_loginBox;
 
 our $I18N = {
 
-    'login box title' => {
-        message => q|Login Box Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Login Box|,
+		lastUpdated => 1128839093,
+	},
+
+	'login box title' => {
+		message => q|Login Box Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'login box body' => {
 		message => q|

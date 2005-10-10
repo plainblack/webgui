@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_If;
 
 our $I18N = {
 
-    'if title' => {
-        message => q|If Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|If|,
+		lastUpdated => 1128838656,
+	},
+
+	'if title' => {
+		message => q|If Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'if body' => {
 		message => q|

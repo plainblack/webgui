@@ -166,10 +166,10 @@ The description of the collaboration system that this post is a part of.
 		lastUpdated => 1111768115,
 	},
 
-        'thread' => {
+        'assetName' => {
                 message => q|Thread|,
                 context => q|label for Asset Manager, getName|,
-                lastUpdated => 1121703197,
+                lastUpdated => 1128829674,
         },
 
 	'new file description' => {

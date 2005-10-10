@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_GroupDelete;
 
 our $I18N = {
 
-    'group delete title' => {
-        message => q|Group Delete Macro|,
-        lastUpdated => 1112466408,
-    },
+	'macroName' => {
+		message => q|Group Delete|,
+		lastUpdated => 1128838485,
+	},
+
+	'group delete title' => {
+		message => q|Group Delete Macro|,
+		lastUpdated => 1112466408,
+	},
 
 	'group delete body' => {
 		message => q|

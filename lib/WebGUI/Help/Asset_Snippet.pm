@@ -7,7 +7,7 @@ our $HELP = {
 		body => 'snippet add/edit body',
 		fields => [
                         {
-                                title => 'snippet',
+                                title => 'assetName',
                                 description => 'snippet description',
                                 namespace => 'Asset_Snippet',
                         },

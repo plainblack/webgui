@@ -2,9 +2,9 @@ package WebGUI::i18n::English::Macro_Env;
 
 our $I18N = {
 
-    'env title' => {
-        message => q|Environment Variable Macro|,
-        lastUpdated => 1112466408,
+    'macroName' => {
+        message => q|Environment Variable|,
+        lastUpdated => 1128838196,
     },
 
 	'env body' => {

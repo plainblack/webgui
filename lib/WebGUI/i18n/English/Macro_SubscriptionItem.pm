@@ -2,10 +2,15 @@ package WebGUI::i18n::English::Macro_SubscriptionItem;
 
 our $I18N = {
 
-    'subscription item title' => {
-        message => q|Subscription Item Macro|,
-        lastUpdated => 1112547248,
-    },
+	'macroName' => {
+		message => q|Subscription Item|,
+		lastUpdated => 1128919093,
+	},
+
+	'subscription item title' => {
+		message => q|Subscription Item Macro|,
+		lastUpdated => 1112547248,
+	},
 
 	'subscription item body' => {
 		message => q|
