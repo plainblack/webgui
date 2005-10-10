@@ -8,6 +8,7 @@
  - fix [ 1288783 ] Captcha picture only works with the latest ImageMagick.
  - fix [ 1306915 ] Missing label on shortcut - Metadata
  - Fixed a pagination bug in the subscription code pagination.
+ - Added a table of contents to the Help system.
 
 
 6.7.5
