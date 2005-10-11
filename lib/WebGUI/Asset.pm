@@ -507,6 +507,7 @@ sub getEditForm {
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get("asset id","Asset"),
 		-value=>$self->get("assetId")
+		-hoverHelp=>WebGUI::International::get('asset id description','Asset'),
 		);
 	$tabform->getTab("properties")->text(
 		-label=>WebGUI::International::get(99,"Asset"),
