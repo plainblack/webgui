@@ -63,7 +63,6 @@ sub _linkTOC {
 sub _getHelpName {
 	my $file = shift;
 	my $helpName;
-	WebGUI::ErrorHandler::warn("file=$file");
 	if ($file =~ /^Asset_/) {
 		$helpName = WebGUI::International::get('assetName',$file);
 	}
@@ -73,7 +72,6 @@ sub _getHelpName {
 	else {
 		$helpName = WebGUI::International::get('topicName',$file);
 	}
-	WebGUI::ErrorHandler::warn("helpName=$helpName");
 	return $helpName;
 }
 
