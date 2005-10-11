@@ -973,7 +973,7 @@ sub new {
 	my $revisionDate = shift || $session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId="
-			.quote($assetId)." and  (status='approved' or status='archived'  or tagId=".quote($session{scratch}{versionTag}).")
+			.quote($assetId)." and  (status='approved' or status='archived' or status='pending'  or tagId=".quote($session{scratch}{versionTag}).")
 			group by assetData.assetId order by assetData.revisionDate");
 		$session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'} = $revisionDate unless ($session{config}{disableCache});
 	}
@@ -1352,8 +1352,13 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 sub www_add {
 	my $self = shift;
 	my %prototypeProperties; 
+	my $class = $session{form}{class};
+	unless ($class =~ m/^[A-Za-z0-9\:]+$/) {
+		WebGUI::ErrorHandler::security("tried to call an invalid class ".$class);
+		return "";
+	}
 	if ($session{form}{'prototype'}) {
-		my $prototype = WebGUI::Asset->new($session{form}{'prototype'},$session{form}{class});
+		my $prototype = WebGUI::Asset->new($session{form}{'prototype'},$class);
 		foreach my $definition (@{$prototype->definition}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {
 				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
@@ -1374,10 +1379,10 @@ sub www_add {
 		isHidden => $self->get("isHidden"),
 		startDate => $self->get("startDate"),
 		endDate => $self->get("endDate"),
-		className=>$session{form}{class},
+		className=>$class,
 		assetId=>"new"
 		);
-	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($session{form}{class}, @{$session{config}{assetContainers}}));
+	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$session{config}{assetContainers}}));
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef(\%properties);
 	$newAsset->{_parent} = $self;
 	return WebGUI::Privilege::insufficient() unless ($newAsset->canAdd);

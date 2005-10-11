@@ -304,7 +304,7 @@ The message you wish to add to the log.
 sub security {
 	my $message = shift;
 	$Log::Log4perl::caller_depth++;
-        warn($WebGUI::Session::session{user}{username}." (".$WebGUI::Session::session{user}{userId}.") connecting from "
+        WebGUI::ErrorHandler::warn($WebGUI::Session::session{user}{username}." (".$WebGUI::Session::session{user}{userId}.") connecting from "
 		.$WebGUI::Session::session{env}{REMOTE_ADDR}." attempted to ".$message);
 	$Log::Log4perl::caller_depth--;
 }
