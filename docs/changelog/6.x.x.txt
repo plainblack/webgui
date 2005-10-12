@@ -1,5 +1,7 @@
 6.7.7
  - fix [ 1324128 ] Help: List of Available Macros not working
+ - fix [ 1315408 ] Navigation sometimes fails to use correct startpoint
+
 
 6.7.6
  - Fixed invalid i18n keys that were causing missing labels.
