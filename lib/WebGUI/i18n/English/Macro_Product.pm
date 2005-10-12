@@ -10,11 +10,11 @@ our $I18N = {
 		message => q|Available product configurations|,
 		lastUpdated => 0,
 		context => q|Message indicatin the available configurations.|
-	}
+	},
 	'macroName' => {
 		message => q|Product|,
 		lastUpdated => 1128918830,
-	}
+	},
 
 	'cannot find product' => {
 		message => q|Cannot find product|,
