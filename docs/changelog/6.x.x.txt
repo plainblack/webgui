@@ -1,3 +1,6 @@
+6.7.7
+ - fix [ 1324128 ] Help: List of Available Macros not working
+
 6.7.6
  - Fixed invalid i18n keys that were causing missing labels.
  - Fixed a bug in setToEpoch that caused dates to be improperly formatted.
