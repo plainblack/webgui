@@ -285,7 +285,7 @@ sub www_editSettings {
 	my $jscript = '<script type="text/javascript">';
 	foreach (@{$session{config}{authMethods}}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($_,1);
-		$tabform->getTab("auth")->raw('<tr id="'.$_.'"><td colspan="2" width="100%"><table border=0 cellspacing=0 cellpadding=0  width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
+		$tabform->getTab("auth")->raw('<tr id="'.$_.'"><td colspan="2" width="100%"><table border="0" cellspacing="0" cellpadding="0" width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
 		$jscript .= "document.getElementById(\"$_\").style.display='".(($_ eq $session{setting}{authMethod})?"":"none")."';";
 	}
 	$jscript .= "</script>";	

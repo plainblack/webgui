@@ -39,7 +39,7 @@ sub www_viewLoginHistory {
 	$sth->finish;
 	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewLoginHistory'));
 	$p->setDataByArrayRef(\@row);
-	$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr class="tableHeader"><td>'.WebGUI::International::get(428).'</td>';
 	$output .= '<td>'.WebGUI::International::get(434).'</td>';
 	$output .= '<td>'.WebGUI::International::get(429).'</td>';

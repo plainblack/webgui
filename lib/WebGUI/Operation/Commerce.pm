@@ -445,7 +445,7 @@ sub www_editCommerceSettings {
 		$jscript = '<script type="text/javascript">';
 		foreach $currentPlugin (@paymentPlugins) {
 			$tabform->getTab('payment')->raw('<tr id="'.$currentPlugin->namespace.'"><td colspan="2" width="100%">'.
-				'<table border=0 cellspacing=0 cellpadding=0  width="100%">'.
+				'<table border="0" cellspacing="0" cellpadding="0" width="100%">'.
 				$currentPlugin->configurationForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
 			$jscript .= "document.getElementById(\"".$currentPlugin->namespace."\").style.display='".(($currentPlugin->namespace eq $paymentPlugin)?"":"none")."';";
 		}
@@ -486,7 +486,7 @@ sub www_editCommerceSettings {
 		$jscript = '<script type="text/javascript">';
 		foreach $currentPlugin (@shippingPlugins) {
 			$tabform->getTab('shipping')->raw('<tr id="'.$currentPlugin->namespace.'"><td colspan="2" width="100%">'.
-				'<table border=0 cellspacing=0 cellpadding=0  width="100%">'.
+				'<table border="0" cellspacing="0" cellpadding="0" width="100%">'.
 				$currentPlugin->configurationForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
 			$jscript .= "document.getElementById(\"".$currentPlugin->namespace."\").style.display='".(($currentPlugin->namespace eq $shippingPlugin)?"":"none")."';";
 		}

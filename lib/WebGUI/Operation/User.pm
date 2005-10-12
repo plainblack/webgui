@@ -459,7 +459,7 @@ sub www_listUsers {
 		Deactivated	=> WebGUI::International::get(818),
 		Selfdestructed	=> WebGUI::International::get(819)
 	);
-        $output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+        $output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
         $output .= '<tr>
                 <td class="tableHeader">'.WebGUI::International::get(816).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(50).'</td>

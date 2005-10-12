@@ -161,7 +161,7 @@ sub www_listDatabaseLinks {
 	$sth->finish;
         $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listDatabaseLinks'));
 	$p->setDataByArrayRef(\@row);
-        $output .= '<table border=1 cellpadding=3 cellspacing=0 align="center">';
+        $output .= '<table border="1" cellpadding="3" cellspacing="0" align="center">';
         $output .= $p->getPage;
         $output .= '</table>';
         $output .= $p->getBarTraditional;

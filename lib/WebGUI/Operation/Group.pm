@@ -515,7 +515,7 @@ sub www_listGroups {
 		my $output = getGroupSearchForm("listGroups");
 		my ($groupCount) = WebGUI::SQL->quickArray("select count(*) from groups where isEditable=1");
         	return _submenu($output) unless ($session{form}{doit} || $groupCount<250 || $session{form}{pn} > 1);
-		$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+		$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 		$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
 			.WebGUI::International::get(85).'</td><td class="tableHeader">'
 			.WebGUI::International::get(748).'</td></tr>';
@@ -552,7 +552,7 @@ sub www_listGroups {
         	$sth->finish;
         	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listGroups'));
         	$p->setDataByArrayRef(\@row);
-        	$output .= '<table border=1 cellpadding=5 cellspacing=0 align="center">';
+        	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
         	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
                 	.WebGUI::International::get(85).'</td><td class="tableHeader">'
                 	.WebGUI::International::get(748).'</td></tr>';

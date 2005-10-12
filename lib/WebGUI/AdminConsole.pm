@@ -441,6 +441,7 @@ sub setHelp {
 	my $self = shift;
 	my $id = shift;
 	my $namespace = shift || "WebGUI";
+	$id =~ s/ /%20/g;
 	$self->{_helpUrl} = WebGUI::URL::page('op=viewHelp;hid='.$id.';namespace='.$namespace) if ($id);
 }
 
