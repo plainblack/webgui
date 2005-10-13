@@ -633,7 +633,7 @@ sub view {
         $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");
         my $layout = $session{scratch}{discussionLayout} || $session{user}{discussionLayout};
         $var->{'layout.isFlat'} = ($layout eq "flat");
-        $var->{'layout.isNested'} = ($layout eq "nested" || !$var{'layout.isFlat'});
+        $var->{'layout.isNested'} = ($layout eq "nested" || !$var->{'layout.isFlat'});
 
         $var->{'user.isSubscribed'} = $self->isSubscribed;
         $var->{'subscribe.url'} = $self->getSubscribeUrl;
