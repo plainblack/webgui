@@ -585,10 +585,10 @@ Send notifications to the thread and forum subscribers that a new post has been 
 sub notifySubscribers {
 	my $self = shift;
         my %subscribers;
-	foreach my $userId (@{WebGUI::Grouping::getUsersInGroup($self->getThread->get("subscriptionGroupId"))}) {
+	foreach my $userId (@{WebGUI::Grouping::getUsersInGroup($self->getThread->get("subscriptionGroupId"),undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
-	foreach my $userId (@{WebGUI::Grouping::getUsersInGroup($self->getThread->getParent->get("subscriptionGroupId"))}) {
+	foreach my $userId (@{WebGUI::Grouping::getUsersInGroup($self->getThread->getParent->get("subscriptionGroupId"),undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
         my %lang;

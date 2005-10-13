@@ -288,7 +288,7 @@ sub getGroupsInGroup {
 
 #-------------------------------------------------------------------
 
-=head2 getUsersInGroup ( groupId [, recursive ] )
+=head2 getUsersInGroup ( groupId [, recursive, withoutExpired ] )
 
 Returns an array reference containing a list of users that belong to the specified group.
 
@@ -300,16 +300,28 @@ A unique identifier for the group.
 
 A boolean value to determine whether the method should return the users directly in the group or to follow the entire groups of groups hierarchy. Defaults to "0".
 
+=head3 withoutExpired
+
+A boolean that if set true will return the users list minus the expired groupings.
+
 =cut
 
 sub getUsersInGroup {
-	my $clause = "groupId=".quote($_[0]);
-	if ($_[1]) {
-		my $groups = getGroupsInGroup($_[0],1);
+	my $groupId = shift;
+	my $recursive = shift;
+	my $withoutExpired = shift;
+	my $clause;
+	if ($withoutExpired) {
+		$clause = "expireDate > ".time()." and ";
+	}
+	$clause .= "(groupId=".quote($groupId);
+	if ($recursive) {
+		my $groups = getGroupsInGroup($groupId,1);
 		if ($#$groups >= 0) {
 			$clause .= " or groupId in (".quoteAndJoin($groups).")";
 		}
 	}
+	$clause .= ")";
        	return WebGUI::SQL->buildArrayRef("select userId from groupings where $clause");
 }
 

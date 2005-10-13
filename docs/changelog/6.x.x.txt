@@ -6,6 +6,7 @@
  - fix [ 1307043 ] Can't Adjust Order of Nav Menu
  - fix [ 1298896 ] 6.7.4 - reordering stops working after moving assets
  - fix [ 1324170 ] assetId has no hoverhelp.
+ - fix [ 1298851 ] forum subscribers still get notif. after subscr. expired
 
 
 6.7.6
