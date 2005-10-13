@@ -368,11 +368,6 @@ our $I18N = {
 		lastUpdated => 1109696029,
 	},
 
-	'threaded' => {
-		message => q|Threaded|,
-		lastUpdated => 1109696029,
-	},
-
 	'unlock' => {
 		message => q|Unlock|,
 		lastUpdated => 1109696029,
@@ -771,10 +766,6 @@ our $I18N = {
 
 <b>title.label</b><br>
 ^International("word","Asset_Collaboration"); "^International("title","Asset_Collaboration");".
-<p>
-
-<b>layout.threaded.label</b><br>
-^International("word","Asset_Collaboration"); "^International("threaded","Asset_Collaboration");".
 <p>
 
 <b>unlock.label</b><br>

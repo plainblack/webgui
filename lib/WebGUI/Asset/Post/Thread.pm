@@ -142,7 +142,7 @@ Formats the url to change the layout of a thread.
 
 =head3 layout
 
-A string indicating the type of layout to use. Can be flat, nested, or threaded.
+A string indicating the type of layout to use. Can be flat or nested.
 
 =cut
 
@@ -631,11 +631,9 @@ sub view {
 
         $var->{'layout.nested.url'} = $self->getLayoutUrl("nested");
         $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");
-        $var->{'layout.threaded.url'} = $self->getLayoutUrl("threaded");
         my $layout = $session{scratch}{discussionLayout} || $session{user}{discussionLayout};
         $var->{'layout.isFlat'} = ($layout eq "flat");
-        $var->{'layout.isNested'} = ($layout eq "nested");
-        $var->{'layout.isThreaded'} = ($layout eq "threaded" || !($var->{'layout.isNested'} || $var->{'layout.isFlat'}));
+        $var->{'layout.isNested'} = ($layout eq "nested" || !$var{'layout.isFlat'});
 
         $var->{'user.isSubscribed'} = $self->isSubscribed;
         $var->{'subscribe.url'} = $self->getSubscribeUrl;

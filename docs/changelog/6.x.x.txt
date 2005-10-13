@@ -9,6 +9,9 @@
  - fix [ 1298851 ] forum subscribers still get notif. after subscr. expired
  - fix [ 1305368 ] Moderation in Collaboration not working ?
  - fix [ 1306912 ] CMS Matrix - Unable to approve article's
+ - Removed the depricated threaded view in the CS for a slight performance
+   gain and simplified templates.
+ - fix [ 1312107 ] Forum Issue in "Thread" View
 
 
 6.7.6

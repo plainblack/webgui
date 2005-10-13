@@ -1673,11 +1673,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1031514049
 	},
 
-	'511' => {
-		message => q|Threaded|,
-		lastUpdated => 1031514049
-	},
-
 	'665' => {
 		message => q|Group, Delete|,
 		lastUpdated => 1031514049

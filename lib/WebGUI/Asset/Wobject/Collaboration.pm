@@ -174,7 +174,6 @@ sub appendTemplateLabels {
 	$var->{"synopsis.label"} = $i18n->get("synopsis");
 	$var->{"thumbnail.label"} = $i18n->get("thumbnail");
 	$var->{"title.label"} = $i18n->get("title");
-	$var->{"layout.threaded.label"} = $i18n->get("threaded");
 	$var->{"unlock.label"} = $i18n->get("unlock");
 	$var->{"unstick.label"} = $i18n->get("unstick");
 	$var->{"unsubscribe.label"} = $i18n->get("unsubscribe");
