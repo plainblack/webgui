@@ -150,6 +150,16 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
                      lastUpdated => 1128830333,
                    },
 
+        'add' => {
+                message => q|Add|,
+                lastUpdated => 1128575345,
+        },
+
+        'edit' => {
+                message => q|Edit|,
+                lastUpdated => 1128575345,
+        },
+
 };
 
 1;
