@@ -595,7 +595,7 @@ sub notifySubscribers {
         foreach my $userId (keys %subscribers) {
                 my $u = WebGUI::User->new($userId);
                 if ($lang{$u->profileField("language")}{message} eq "") {
-                        $lang{$u->profileField("language")}{var} = $self->getTemplateVars($lang{$u->profileField("language")}{var});
+                        $lang{$u->profileField("language")}{var} = $self->getTemplateVars();
 			$self->getThread->getParent->appendTemplateLabels($lang{$u->profileField("language")}{var});
 			$lang{$u->profileField("language")}{var}{url} = WebGUI::URL::getSiteURL().$self->getUrl;
                         $lang{$u->profileField("language")}{var}{'notify.subscription.message'} =
@@ -810,7 +810,7 @@ sub setStatusPending {
 	} else {
         	$self->update({status=>'pending'});
         	WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
-                	$self->getUrl,578,'WebGUI','pending');
+                	$self->getUrl("revision=".$self->get("revisionDate")),578,'WebGUI','pending');
 	}
 }
 

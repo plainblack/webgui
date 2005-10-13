@@ -974,7 +974,7 @@ sub new {
 	my $revisionDate = shift || $session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId="
-			.quote($assetId)." and  (status='approved' or status='archived' or status='pending'  or tagId=".quote($session{scratch}{versionTag}).")
+			.quote($assetId)." and  (status='approved' or status='archived' or tagId=".quote($session{scratch}{versionTag}).")
 			group by assetData.assetId order by assetData.revisionDate");
 		$session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'} = $revisionDate unless ($session{config}{disableCache});
 	}
@@ -1068,7 +1068,7 @@ sub newByPropertyHashRef {
 
 #-------------------------------------------------------------------
 
-=head2 newByUrl ( [url] )
+=head2 newByUrl ( [url, revisionDate] )
 
 Returns a new Asset object based upon current url, given url or defaultPage.
 
@@ -1076,11 +1076,16 @@ Returns a new Asset object based upon current url, given url or defaultPage.
 
 Optional string representing a URL. 
 
+=head3 revisionDate
+
+A specific revision to instanciate. By default we instanciate the newest published revision.
+
 =cut
 
 sub newByUrl {
 	my $class = shift;
 	my $url = shift || $session{env}{PATH_INFO};
+	my $revisionDate = shift;
 	$url = lc($url);
 	$url =~ s/\/$//;
 	$url =~ s/^\///;
@@ -1102,7 +1107,7 @@ sub newByUrl {
 				assetData.assetId
 			");
 		if ($id ne "" || $class ne "") {
-			return WebGUI::Asset->new($id, $class);
+			return WebGUI::Asset->new($id, $class, $revisionDate);
 		} else {
 			WebGUI::ErrorHandler::warn("The URL $url was requested, but does not exist in your asset tree.");
 			return undef;

@@ -88,7 +88,7 @@ sub page {
 	return _setup() if ($session{setting}{specialState} eq "init");
 	my $output = _processOperations();
 	if ($output eq "") {
-		my $asset = WebGUI::Asset->newByUrl($assetUrl);
+		my $asset = WebGUI::Asset->newByUrl($assetUrl,$session{form}{revision});
 		if (defined $asset) {
 			$session{asset} = $asset;
 			my $method = "view";

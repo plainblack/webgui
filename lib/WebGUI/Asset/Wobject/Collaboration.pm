@@ -76,10 +76,16 @@ sub appendPostListTemplateVars {
 					);
 			}
 		}
+		my $url;
+		if ($post->get("status") eq "pending" || $post->get("status") eq "denied") {
+			$url = $post->getUrl("revision=".$post->get("revisionDate"))."#".$post->getId;
+		} else {
+			$url = $post->getUrl."#".$post->getId;
+		}
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
                         "id"=>$post->getId,
-                        "url"=>$post->getUrl.'#'.$post->getId,
+                        "url"=>$url,
 			rating_loop=>\@rating_loop,
 			"content"=>$post->formatContent,
                         "status"=>$post->getStatus,
@@ -898,7 +904,7 @@ sub view {
 	$var{"subscribe.url"} = $self->getSubscribeUrl;
 	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
 	my $constraints = "(assetData.status='approved' or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1') or assetData.tagId=".quote($session{scratch}{versionTag});
-	if ($var{canModerate}) {
+	if ($var{'user.isModerator'}) {
 		$constraints .= " or assetData.status='pending'"; 
 	}
 	$constraints .= ")";

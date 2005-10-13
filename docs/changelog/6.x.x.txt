@@ -7,6 +7,8 @@
  - fix [ 1298896 ] 6.7.4 - reordering stops working after moving assets
  - fix [ 1324170 ] assetId has no hoverhelp.
  - fix [ 1298851 ] forum subscribers still get notif. after subscr. expired
+ - fix [ 1305368 ] Moderation in Collaboration not working ?
+ - fix [ 1306912 ] CMS Matrix - Unable to approve article's
 
 
 6.7.6
