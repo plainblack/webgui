@@ -3,6 +3,8 @@
  - fix [ 1315408 ] Navigation sometimes fails to use correct startpoint
  - fix [ 1305577 ] 6.7.5 Cannot insert a Link to a Page in the WebGUI page
    tree
+ - fix [ 1307043 ] Can't Adjust Order of Nav Menu
+ - fix [ 1298896 ] 6.7.4 - reordering stops working after moving assets
 
 
 6.7.6
