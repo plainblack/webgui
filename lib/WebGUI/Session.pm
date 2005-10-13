@@ -24,6 +24,7 @@ use Tie::CPHash;
 use WebGUI::Config;
 use WebGUI::ErrorHandler;
 use WebGUI::Id;
+use WebGUI::Cache;
 use WebGUI::Setting;
 use WebGUI::SQL;
 use WebGUI::User;
@@ -413,7 +414,9 @@ Refreshes the user's information from the database into this user session.
 =cut
 
 sub refreshUserInfo {
-	_setupUserInfo($_[0]);
+	my $userId = shift;
+	WebGUI::Cache->new(["user",$userId])->delete;
+	_setupUserInfo($userId);
 	$session{isInGroup} = ();
 }
 
