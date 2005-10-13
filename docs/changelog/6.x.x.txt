@@ -12,7 +12,8 @@
  - Removed the depricated threaded view in the CS for a slight performance
    gain and simplified templates.
  - fix [ 1312107 ] Forum Issue in "Thread" View
-
+ - fix [ 1318963 ] 6.7.5 None of the profile fields can be updated
+ - fix [ 1306722 ] 6.7.5 Add an event only on TODAY
 
 6.7.6
  - Fixed invalid i18n keys that were causing missing labels.
