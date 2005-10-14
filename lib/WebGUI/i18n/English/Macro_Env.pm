@@ -7,6 +7,11 @@ our $I18N = {
         lastUpdated => 1128838196,
     },
 
+    'env title' => {
+        message => q|Environment Variable Macro|,
+        lastUpdated => 1128838196,
+    },
+
 	'env body' => {
 		message => q|
 <b>&#94;Env()</b><br>
