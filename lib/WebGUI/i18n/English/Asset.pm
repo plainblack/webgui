@@ -438,6 +438,11 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 		lastUpdated => 1089039511
 	},
 
+	'Add new field description' => {
+		message => q|<p>Open up a form where new metadata fields can be added to this Asset.</p>|,
+		lastUpdated => 1129329405
+	},
+
 	'deleteConfirm' => {
 		message => q|Are you certain you want to delete this Metadata property ?|,
 		lastUpdated => 1089039511

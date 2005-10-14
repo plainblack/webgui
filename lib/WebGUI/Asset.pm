@@ -662,7 +662,7 @@ sub getEditForm {
                                         -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField;fid=new").'">'.
                                                         WebGUI::International::get('Add new field','Asset').
                                                         '</a></p>',
-                                        -hoverHelp=>WebGUI::International::get('make prototype description',"Asset"),
+                                        -hoverHelp=>WebGUI::International::get('Add new field description',"Asset"),
                 	);
 		}
         }
