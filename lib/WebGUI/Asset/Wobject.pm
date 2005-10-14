@@ -575,7 +575,7 @@ sub www_edit {
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
 	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag);
-	my $addEdit = $session{form}{func} ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
+	my $addEdit = ($session{form}{func} eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
 	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
 }
 
