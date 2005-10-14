@@ -14,6 +14,9 @@
  - fix [ 1312107 ] Forum Issue in "Thread" View
  - fix [ 1318963 ] 6.7.5 None of the profile fields can be updated
  - fix [ 1306722 ] 6.7.5 Add an event only on TODAY
+ - fix [ 1323057 ] Anchors break XHTML 1.1
+ - fixed "Fail Safe" template (admin bar doesn't overlap content anymore)
+ - fixed lots of XHTML bugs in templates and code
 
 6.7.6
  - Fixed invalid i18n keys that were causing missing labels.
