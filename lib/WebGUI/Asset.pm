@@ -1327,25 +1327,25 @@ Hash reference of properties and values to set.
 =cut
 
 sub update {
-        my $self = shift;
-        my $properties = shift;
-        foreach my $definition (@{$self->definition}) {
-                my @setPairs;
-                foreach my $property (keys %{$definition->{properties}}) {
-                        next unless (exists $properties->{$property});
-                        my $value = $properties->{$property};
-                        if (exists $definition->{properties}{$property}{filter}) {
-                                my $filter = $definition->{properties}{$property}{filter};
-                                $value = $self->$filter($value);
-                        }
-                        $self->{_properties}{$property} = $value;
-                        push(@setPairs, $property."=".quote($value));
-                }
-                if (scalar(@setPairs) > 0) {
-                        WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
-        		$self->setSize;
-                }
-        }
+	my $self = shift;
+	my $properties = shift;
+	foreach my $definition (@{$self->definition}) {
+		my @setPairs;
+		foreach my $property (keys %{$definition->{properties}}) {
+			next unless (exists $properties->{$property});
+			my $value = $properties->{$property};
+			if (exists $definition->{properties}{$property}{filter}) {
+				my $filter = $definition->{properties}{$property}{filter};
+				$value = $self->$filter($value);
+			}
+			$self->{_properties}{$property} = $value;
+			push(@setPairs, $property."=".quote($value));
+		}
+		if (scalar(@setPairs) > 0) {
+			WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
+			$self->setSize;
+		}
+	}
 	$self->purgeCache;
 }
 
