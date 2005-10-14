@@ -796,12 +796,12 @@ sub www_deleteAllResponsesConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
-        my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("survey add/edit","Asset_Survey");
-	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,'Asset_Survey'));
-}
+#sub www_edit {
+#        my $self = shift;
+#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	$self->getAdminConsole->setHelp("survey add/edit","Asset_Survey");
+#	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,'Asset_Survey'));
+#}
 
 #-------------------------------------------------------------------
 sub www_editSave {

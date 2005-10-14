@@ -572,18 +572,18 @@ sub _createRSSURLs{
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 www_edit()
+#=head2 www_edit()
 
-Sets parameters and returns a form to edit this wobject.
+#Sets parameters and returns a form to edit this wobject.
 
-=cut
+#=cut
 
-sub www_edit {
-        my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp('syndicated content add/edit','Asset_SyndicatedContent');
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('4','Asset_SyndicatedContent'));
-}
+#sub www_edit {
+#        my $self = shift;
+#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#        $self->getAdminConsole->setHelp('syndicated content add/edit','Asset_SyndicatedContent');
+#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('4','Asset_SyndicatedContent'));
+#}
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

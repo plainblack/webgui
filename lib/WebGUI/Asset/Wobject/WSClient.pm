@@ -250,12 +250,12 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
-sub www_edit {
-        my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("ws client add/edit","Asset_WSClient");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("20","Asset_WSClient"));
-}
+#sub www_edit {
+#        my $self = shift;
+#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	$self->getAdminConsole->setHelp("ws client add/edit","Asset_WSClient");
+#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("20","Asset_WSClient"));
+#}
 
 
 #-------------------------------------------------------------------

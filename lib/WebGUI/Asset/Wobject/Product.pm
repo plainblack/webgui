@@ -459,12 +459,12 @@ sub www_deleteSpecificationConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
-   my $self = shift;
-   return WebGUI::Privilege::insufficient() unless $self->canEdit;
-   $self->getAdminConsole->setHelp("product add/edit","Asset_Product");
-   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Asset_Product"));
-}
+#sub www_edit {
+#   my $self = shift;
+#   return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#   $self->getAdminConsole->setHelp("product add/edit","Asset_Product");
+#   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Asset_Product"));
+#}
 
 #-------------------------------------------------------------------
 sub www_editSave {
