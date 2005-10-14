@@ -29,6 +29,9 @@
  - fix [ 1305132 ] 6.7.5 Assets are moved to trash by runHourly
  - fix [ 1282473 ] RSS encoding (Thanks to Klaus Hertle)
  - fix Removed last references to deprecated "lastUpdated"
+ - fix [ 1234051 ] Recursive loops in addGroupsToGroups
+ - Added handling for an exception in recurring payment processing where there
+   was missing data causing a fatal error.
 
 
 6.7.6

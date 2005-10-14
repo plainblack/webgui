@@ -81,6 +81,10 @@ sub addGroupsToGroups {
 			my $recursive = isIn($toGid, @{getGroupsInGroup($gid,1)});
 			unless ($isIn || $recursive) {
 				WebGUI::SQL->write("insert into groupGroupings (groupId,inGroup) values (".quote($gid).",".quote($toGid).")");
+				my $cache = WebGUI::Cache->new("groups_in_group_".$gid);
+				$cache->delete if (defined $cache);
+				$cache = WebGUI::Cache->new("groups_in_group_".$toGid);
+				$cache->delete if (defined $cache);
 			}
 		}
 	}

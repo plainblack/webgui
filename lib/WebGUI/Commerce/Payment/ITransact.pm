@@ -535,7 +535,10 @@ sub getRecurringPaymentStatus {
 	);
 
 	my $transactionData = WebGUI::SQL->quickHashRef("select * from ITransact_recurringStatus where gatewayId=".quote($recurringId));
-	
+	unless ($transactionData->{recipe}) { # if for some reason there's no transaction data, we shouldn't calc anything
+		WebGUI::ErrorHandler::error("For some reason recurring transaction $recurringId doesn't have any recurring status transaction data. This is most likely because you don't have the Recurring Postback URL set in your ITransact virtual terminal.");
+		return undef;
+	}
         my $lastTerm = int(($transactionData->{lastTransaction} - $transactionData->{initDate}) / $resolve{$transactionData->{recipe}}) + 1;
 		
 	# Process the response

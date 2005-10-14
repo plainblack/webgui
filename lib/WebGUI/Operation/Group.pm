@@ -568,8 +568,7 @@ sub www_listGroups {
 #-------------------------------------------------------------------
 sub www_manageGroupsInGroup {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session{form}{gid}));
-	my ($output, $p, $group, $groups, $f);
-        $f = WebGUI::HTMLForm->new;
+        my $f = WebGUI::HTMLForm->new;
         $f->hidden(
 		-name => "op",
 		-value => "addGroupsToGroupSave"
@@ -578,17 +577,19 @@ sub www_manageGroupsInGroup {
 		-name => "gid",
 		-value => $session{form}{gid}
 	);
-	$groups = WebGUI::Grouping::getGroupsInGroup($session{form}{gid},1);
-	push(@$groups,$session{form}{gid});
+	my @groups;
+	my $groupsIn = WebGUI::Grouping::getGroupsInGroup($session{form}{gid},1);
+	my $groupsFor = WebGUI::Grouping::getGroupsForGroup($session{form}{gid});
+	push(@groups, @$groupsIn,@$groupsFor,$session{form}{gid});
         $f->group(
 		-name=>"groups",
-		-excludeGroups=>$groups,
+		-excludeGroups=>\@groups,
 		-label=>WebGUI::International::get(605),
 		-size=>5,
 		-multiple=>1
 		);
         $f->submit;
-        $output .= $f->print;
+        my $output = $f->print;
 	$output .= '<p />';
 	$output .= walkGroups($session{form}{gid});
 	return _submenu($output,'813');
