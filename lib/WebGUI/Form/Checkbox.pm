@@ -99,6 +99,24 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getValueFromPost ( )
+
+Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return undef.
+
+=cut
+
+sub getValueFromPost {
+	my $self = shift;
+	my $formValue = $session{cgi}->param($self->{name});
+	if (defined $formValue) {
+		return $formValue;
+	} else {
+		return undef;
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders and input tag of type checkbox.
