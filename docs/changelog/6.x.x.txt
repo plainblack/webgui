@@ -32,6 +32,8 @@
  - fix [ 1234051 ] Recursive loops in addGroupsToGroups
  - Added handling for an exception in recurring payment processing where there
    was missing data causing a fatal error.
+ - fix [ 1326687 ] Export on windows Apache server doesn't work (with quick
+   fix (Thanks to Sven Opitz)
 
 
 6.7.6

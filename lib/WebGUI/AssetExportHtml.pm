@@ -250,7 +250,7 @@ sub www_exportGenerate {
 			$filename = $index;
 		}
 		if($path) {
-			$path = $session{config}{exportPath} . $session{os}{slash} . $path;
+			$path = $session{config}{exportPath} . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
 				print "Couldn't create $path because $@ <br />\n";
@@ -258,7 +258,7 @@ sub www_exportGenerate {
 				return;
 			}
 		} 
-		$path .= $session{os}{slash}.$filename;
+		$path .= "/".$filename;
                 eval { open(FILE, "> $path") or die "$!" };
 		if ($@) {
 			print "Couldn't open $path because $@ <br />\n";
