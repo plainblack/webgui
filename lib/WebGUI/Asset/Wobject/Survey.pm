@@ -18,6 +18,7 @@ use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::Id;
+use WebGUI::Style;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -768,8 +769,8 @@ sub www_deleteSectionConfirm {
 #-------------------------------------------------------------------
 sub www_deleteResponse {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        return $_[0]->confirm(WebGUI::International::get(72,'Asset_Survey'),
-                $_[0]->getUrl('func=deleteResponseConfirm;responseId='.$session{form}{responseId}));
+        return WebGUI::Style::process($_[0]->confirm(WebGUI::International::get(72,'Asset_Survey'),
+                $_[0]->getUrl('func=deleteResponseConfirm;responseId='.$session{form}{responseId})),$_[0]->getValue("styleTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -783,8 +784,7 @@ sub www_deleteResponseConfirm {
 #-------------------------------------------------------------------
 sub www_deleteAllResponses {
 	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
-        return $_[0]->confirm(WebGUI::International::get(74,'Asset_Survey'),
-                $_[0]->getUrl('func=deleteAllResponsesConfirm'));
+	return WebGUI::Style::process($_[0]->confirm(WebGUI::International::get(74,'Asset_Survey'),$_[0]->getUrl('func=deleteAllResponsesConfirm')),$_[0]->getValue("styleTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -1235,6 +1235,18 @@ sub www_respond {
 
 
 #-------------------------------------------------------------------
+=head2 www_view ( )
+
+Overwrite www_view method and call the superclass object, passing in a 1 to disable cache
+
+=cut
+
+sub www_view {
+   my $self = shift;
+   $self->SUPER::www_view(1);
+}
+
+#-------------------------------------------------------------------
 sub www_viewGradebook {
 	my $self = shift;
         return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
@@ -1266,7 +1278,7 @@ sub www_viewGradebook {
 	}
 	$var->{response_loop} = \@responseloop;
 	$p->appendTemplateVars($var);
-	return $self->processTemplate($var,$self->getValue("gradebookTemplateId"));
+	return WebGUI::Style::process($self->processTemplate($var,$self->getValue("gradebookTemplateId")),$self->getValue("styleTemplateId"));
 #	return $self->processTemplate($self->getValue("gradebookTemplateId"),$var,"Survey/Gradebook");
 }
 
@@ -1326,7 +1338,7 @@ sub www_viewIndividualSurvey {
 	}
 	$a->finish;
 	$var->{question_loop} = \@questionloop;
-	return $self->processTemplate($var, $self->getValue("responseTemplateId"));
+	return WebGUI::Style::process($self->processTemplate($var, $self->getValue("responseTemplateId")),$self->getValue("styleTemplateId"));
 #	return $self->processTemplate($self->getValue("responseTemplateId"),$var,"Survey/Response");
 }
 
@@ -1400,7 +1412,7 @@ sub www_viewStatisticalOverview {
 	$var->{question_loop} = \@questionloop;
 	$p->appendTemplateVars($var);
 
-	return $self->processTemplate($var, $self->getValue("overviewTemplateId"));
+	return WebGUI::Style::process($self->processTemplate($var, $self->getValue("overviewTemplateId")),$self->getValue("styleTemplateId"));
 }
 
 1;

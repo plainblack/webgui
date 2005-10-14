@@ -19,6 +19,10 @@
  - fixed lots of XHTML bugs in templates and code
  - fix [ 1301604 ] Survey in 6.7.5 gamma
  - fix [ 1310360 ] WebGUI::FormProcessor::checkbox not working correctly
+ - Finally Internationalized some of the www_edit screens for wobjects, 
+   by adding a generic   www_edit generator in Wobject.pm.  
+ - Fixed a lot of the www_ methods in Survey.pm to return in styled pages
+   instead of raw <p> tags without <html><head>etc</head><body></body>
 
 
 6.7.6

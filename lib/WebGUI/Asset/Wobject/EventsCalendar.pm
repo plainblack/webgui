@@ -428,12 +428,12 @@ sub view {
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
-	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("events calendar add/edit","Asset_EventsCalendar");
-	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Asset_EventsCalendar"));
-}
+#sub www_edit {
+#	my $self = shift;
+#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	$self->getAdminConsole->setHelp("events calendar add/edit","Asset_EventsCalendar");
+#	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Asset_EventsCalendar"));
+#}
 
 
 1;

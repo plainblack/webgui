@@ -921,12 +921,12 @@ sub view {
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
-        my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->getAdminConsole->setHelp("collaboration add/edit", "Asset_Collaboration");
-        return $self->getAdminConsole->render($self->getEditForm->print,"Edit Collaboration System");
-}
+#sub www_edit {
+#        my $self = shift;
+#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	$self->getAdminConsole->setHelp("collaboration add/edit", "Asset_Collaboration");
+#        return $self->getAdminConsole->render($self->getEditForm->print,"Edit Collaboration System");
+#}
 
 #-------------------------------------------------------------------
 
