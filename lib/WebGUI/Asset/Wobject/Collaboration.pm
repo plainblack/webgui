@@ -11,7 +11,7 @@ package WebGUI::Asset::Wobject::Collaboration;
 #-------------------------------------------------------------------
 
 use strict;
-use Tie::CPHash;
+use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
@@ -526,10 +526,9 @@ sub getEditForm {
 		-label=>WebGUI::International::get('filter code', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('filter code description', 'Asset_Collaboration'),
 		);
-	$tabform->getTab("display")->selectList(
-		-name=>"sortBy",
-		-value=>[$self->getValue("sortBy")],
-		-options=>{
+	my %options;
+	tie %options, 'Tie::IxHash';
+	%options = (
 			lineage=>WebGUI::International::get('sequence', 'Asset_Collaboration'),
 			dateUpdated=>WebGUI::International::get('date updated', 'Asset_Collaboration'),
 			dateSubmitted=>WebGUI::International::get('date submitted', 'Asset_Collaboration'),
@@ -539,7 +538,11 @@ sub getEditForm {
 			userDefined3=>WebGUI::International::get('user defined 3', 'Asset_Collaboration'),
 			userDefined4=>WebGUI::International::get('user defined 4', 'Asset_Collaboration'),
 			userDefined5=>WebGUI::International::get('user defined 5', 'Asset_Collaboration'),
-			},
+			);
+	$tabform->getTab("display")->selectList(
+		-name=>"sortBy",
+		-value=>[$self->getValue("sortBy")],
+		-options=>\%options,
 		-label=>WebGUI::International::get('sort by', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('sort by description', 'Asset_Collaboration'),
 		);
