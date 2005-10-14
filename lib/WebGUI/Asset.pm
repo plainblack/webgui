@@ -42,7 +42,7 @@ use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Utility;
 our $propertyDefinitions;
-
+our $definitionArrays;
 
 =head1 NAME
 
@@ -470,30 +470,6 @@ sub getDefault {
 	my $class = shift;
 	return $class->newByDynamicClass($session{setting}{defaultPage});
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 getDefaultValue ( )
-
-Returns the defaultValue for the key for the className of the calling object instance.
-
-=cut
-
-sub getDefaultValue {
-	my $self = shift;
-	my $key = shift;
-	unless (exists $propertyDefinitions->{$self->getValue("className")}) { # check to see if the definitions have been merged and cached
-		my %properties;
-		foreach my $definition (@{$self->definition}) {
-			%properties = (%properties, %{$definition->{properties}});
-		}
-		our $propertyDefinitions;
-		$propertyDefinitions->{$self->getValue("className")} = \%properties;
-	}
-	return $propertyDefinitions->{$self->getValue("className")}->{$key}{defaultValue};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -955,10 +931,17 @@ sub getValue {
 	my $self = shift;
 	my $key = shift;
 	if (defined $key) {
-		return $session{form}{$key} if (exists $session{form}{$key});
+		#	return $session{form}{$key} if (exists $session{form}{$key}); # Security Hazard!
 		my $storedValue = $self->get($key);
 		return $storedValue if (defined $storedValue);
-		return $self->getDefaultValue($key);
+		unless (exists $self->{_propertyDefinitions}) { # check to see if the definitions have been merged and cached
+			my %properties;
+			foreach my $definition (@{$self->definition}) {
+				%properties = (%properties, %{$definition->{properties}});
+			}
+			$self->{_propertyDefinitions} = \%properties;
+		}
+		return $self->{_propertyDefinitions}{$key}{defaultValue};
 	}
 	return undef;
 }
