@@ -17,6 +17,9 @@
  - fix [ 1323057 ] Anchors break XHTML 1.1
  - fixed "Fail Safe" template (admin bar doesn't overlap content anymore)
  - fixed lots of XHTML bugs in templates and code
+ - fix [ 1301604 ] Survey in 6.7.5 gamma
+ - fix [ 1310360 ] WebGUI::FormProcessor::checkbox not working correctly
+
 
 6.7.6
  - Fixed invalid i18n keys that were causing missing labels.
