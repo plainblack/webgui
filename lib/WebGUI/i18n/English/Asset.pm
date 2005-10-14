@@ -464,25 +464,36 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 		context => q|The title of the content profiling manager for the admin console.|
 	},
 
+        'Field Name description' => {
+                message => q|The name of this metadata property.It must be unique. <br>
+It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
+the field names.</p>|,
+                lastUpdated => 1129329870,
+        },
+
+        'Metadata Description description' => {
+                message => q|An optional description for this metadata property. This text is displayed
+as mouseover text in the asset properties tab.</p>|,
+                lastUpdated => 1129329870,
+        },
+
+        'Data Type description' => {
+                message => q|Choose the type of form element for this field.</p>|,
+                lastUpdated => 1129329870,
+        },
+
+        'Possible Values description' => {
+                message => q|This field is used only for the Radio List and Select List data types. Enter
+the values you wish to appear, one per line.</p>|,
+                lastUpdated => 1129329870,
+        },
+
+
 	'metadata edit property body' => {
 		message => q|
-You may add as many Metadata properties to a Wobject as you like.<br>
-<br>
-<b>Field Name</b><br>
-The name of this metadata property.It must be unique. <br>
-It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
-the field names.
-<p><b>Description<br>
-</b>An optional description for this metadata property. This text is displayed
-as mouseover text in the asset properties tab.</p>
-<p><b>Data Type<br>
-</b>Choose the type of form element for this field.<b><br>
-<br>
-Possible Values<br>
-</b>This field is used only for the Radio List and Select List data types. Enter
-the values you wish to appear, one per line.</p>
+<p>You may add as many Metadata properties to a Wobject as you like.</p>
 |,
-		lastUpdated => 1100232327
+		lastUpdated => 1129330051
 	},
 
         'metadata manage body' => {

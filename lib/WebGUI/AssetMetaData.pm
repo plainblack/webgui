@@ -182,21 +182,25 @@ sub www_editMetaDataField {
 	$f->text(
 		-name=>"fieldName",
 		-label=>WebGUI::International::get('Field name','Asset'),
+		-hoverHelp=>WebGUI::International::get('Field Name description','Asset'),
 		-value=>$fieldInfo->{fieldName}
 	);
 	$f->textarea(
 		-name=>"description",
 		-label=>WebGUI::International::get(85,"Asset"),
+		-hoverHelp=>WebGUI::International::get('Metadata Description description',"Asset"),
 		-value=>$fieldInfo->{description});
 	$f->fieldType(
 		-name=>"fieldType",
 		-label=>WebGUI::International::get(486,"Asset"),
+		-hoverHelp=>WebGUI::International::get('Data Type description',"Asset"),
 		-value=>$fieldInfo->{fieldType} || "text",
 		-types=> [ qw /text integer yesNo selectList radioList/ ]
 	);
 	$f->textarea(
 		-name=>"possibleValues",
 		-label=>WebGUI::International::get(487,"Asset"),
+		-hoverHelp=>WebGUI::International::get('Possible Values description',"Asset"),
 		-value=>$fieldInfo->{possibleValues}
 	);
 	$f->submit();

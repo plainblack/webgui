@@ -182,6 +182,26 @@ our $HELP = {
                 title => 'metadata edit property',
                 body => 'metadata edit property body',
 		fields => [
+                        {
+                                title => 'Field name',
+                                description => 'Field Name description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => '85',
+                                description => 'Metadata Description description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => '486',
+                                description => 'Data Type description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => '487',
+                                description => 'Possible Values description',
+                                namespace => 'Asset',
+                        },
 		],
                 related => [
 			{
