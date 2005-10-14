@@ -630,8 +630,8 @@ sub processPropertiesFromFormPost {
 			);
 		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
 		if ($self->getThread->getParent->canModerate) {
-        		$self->getThread->lock if ($session{form}{'lock'});
-        		$self->getThread->stick if ($session{form}{stick});
+			$self->getThread->lock if ($session{form}{'lock'});
+			$self->getThread->stick if ($session{form}{stick});
 		}
 	}
 	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
@@ -641,9 +641,9 @@ sub processPropertiesFromFormPost {
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
 		$data{content} .= "\n\n --- (".WebGUI::International::get('Edited_on','Asset_Post')." ".WebGUI::DateTime::epochToHuman(undef,"%z %Z [GMT%O]").WebGUI::International::get('By','Asset_Post').$session{user}{alias}.") --- \n";
-	}
-	if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
-		$data{content} = '<p>'.$data{content}.'</p>';
+		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
+			$data{content} = '<p>'.$data{content}.'</p>';
+		}
 	}
 	$self->update(\%data);
         $self->getThread->subscribe if ($session{form}{subscribe});

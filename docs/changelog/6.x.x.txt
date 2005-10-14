@@ -25,6 +25,8 @@
  - Fixed a lot of the www_ methods in Survey.pm to return in styled pages
    instead of raw <p> tags without <html><head>etc</head><body></body>
  - fix [ 1293897 ] 6.7.4 - asset manager reorder by rank
+ - fix [ 1299131 ] paragraph tags added every time collaboration message change
+
 
 6.7.6
  - Fixed invalid i18n keys that were causing missing labels.
