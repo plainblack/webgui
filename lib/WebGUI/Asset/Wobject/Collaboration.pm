@@ -1129,7 +1129,7 @@ sub www_viewRSS {
         my $encTitle = _xml_encode($self->get("title"));
         my $encDescription = _xml_encode($self->get("description"));  
         my $encUrl = _xml_encode($self->getUrl);
-        my $xml = qq~<?xml version="1.0"?>
+        my $xml = qq~<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
 <channel>
 <title>$encTitle</title>

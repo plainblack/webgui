@@ -16,7 +16,7 @@ Loops through all the URLs in the SyndicatedWobjects and puts them into WebGUI::
 sub process{
 
     #In the new Wobject, "rssURL" actually can refer to more than one URL.
-    my @syndicatedWobjectURLs = WebGUI::SQL->buildArray("select rssUrl from SyndicatedContent");
+    my @syndicatedWobjectURLs = WebGUI::SQL->buildArray("select distinct SyndicatedContent.rssUrl from SyndicatedContent left join asset on SyndicatedContent.assetId=asset.assetId where asset.state='published'");
     foreach my $url(@syndicatedWobjectURLs) {
 
 	#Loop through the SyndicatedWobjects and split all the URLs they are syndicating off into

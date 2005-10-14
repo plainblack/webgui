@@ -12,7 +12,6 @@ package Hourly::TrashExpiredContent;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -20,12 +19,12 @@ use WebGUI::SQL;
 sub process {
 	my $offset = $session{config}{TrashExpiredContent_offset};
 	if ($offset ne "") {
-		my $epoch = time()-(86400*$offset);
-		my $sth = WebGUI::SQL->read("select asset.assetId,asset.className,max(assetData.revisionDate) from asset left join assetData on
-			asset.assetId=assetData.assetId where assetData.endDate<".$epoch." group by assetData.assetId");
-		while (my ($assetId, $class, $version) = $sth->array) {
-			my $asset = WebGUI::Asset->new($assetId,$class,$version);
-			$asset->trash if ($asset->get("endDate") < $epoch);
+		my $now = time();
+		$offset = 86400*$offset;
+		my $sth = WebGUI::SQL->read("select asset.assetId, asset.className from assetData left join asset on assetData.assetId=asset.assetId where asset.state='published' and assetData.endDate + $offset < $now");
+		while (my ($assetId,$class) = $sth->array) {
+			my $asset = WebGUI::Asset->new($assetId,$class);
+			$asset->trash if ($asset->get("endDate")+$offset < $now); # verify end date of most recent revision
 		}
 		$sth->finish;
 	}

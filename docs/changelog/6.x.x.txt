@@ -26,6 +26,8 @@
    instead of raw <p> tags without <html><head>etc</head><body></body>
  - fix [ 1293897 ] 6.7.4 - asset manager reorder by rank
  - fix [ 1299131 ] paragraph tags added every time collaboration message change
+ - fix [ 1305132 ] 6.7.5 Assets are moved to trash by runHourly
+ - fix [ 1282473 ] RSS encoding (Thanks to Klaus Hertle)
 
 
 6.7.6
