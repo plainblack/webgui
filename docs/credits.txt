@@ -15,11 +15,11 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Doug Collinge
                                      Flavio Curti
                                      Jeff Depons / Adaptive Dynamics
-                                     Frank Dillon / Brunswick
+                                     Frank Dillon / Plain Black
                                      Arne Dokken
-                                     Junying Du / WDI
+                                     Junying Du / Brunswick
                                      Ed Van Duinen / UNC
-                                     Greg Fast / WDI
+                                     Greg Fast / Brunswick
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
                                      Chris Jackson
@@ -41,7 +41,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Jeff Szpak / Plain Black
                                      Sean Tu / WDI
                                      Madsen Wikholm
-                                     Matt Wilson / Boomer Consulting
+                                     Matt Wilson / Plain Black
                                      Gerald Young
 
 
