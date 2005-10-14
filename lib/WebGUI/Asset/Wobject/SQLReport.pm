@@ -178,7 +178,7 @@ sub getEditForm {
 
 	   $tabform->getTab("properties")->readOnly(
 		   -value=>"<hr>",
-                   -label=>"<b>query".$nr.":</b>",
+                   -label=>join '', "<b>", WebGUI::International::get('4','Asset_SQLReport'), $nr,":</b>",
 		   ); 
 	   $tabform->getTab("properties")->yesNo(
 	  	   -name=>"preprocessMacros".$nr,
