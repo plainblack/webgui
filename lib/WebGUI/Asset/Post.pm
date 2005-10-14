@@ -229,7 +229,7 @@ Formats the URL to approve a post.
 
 sub getApproveUrl {
 	my $self = shift;
-	return $self->getUrl("func=approve;mlog=".$session{form}{mlog});
+	return $self->getUrl("revision=".$self->get("revisionDate").";func=approve;mlog=".$session{form}{mlog});
 }
 
 #-------------------------------------------------------------------
@@ -242,7 +242,7 @@ Formats the url to delete a post.
 
 sub getDeleteUrl {
 	my $self = shift;
-	return $self->getUrl("func=delete");
+	return $self->getUrl("func=delete;revision=".$self->get("revisionDate"));
 }
 
 #-------------------------------------------------------------------
@@ -255,7 +255,7 @@ Formats the url to deny a post.
 
 sub getDenyUrl {
 	my $self = shift;
-	return $self->getUrl("func=deny;mlog=".$session{form}{mlog});
+	return $self->getUrl("revision=".$self->get("revisionDate").";func=deny;mlog=".$session{form}{mlog});
 }
 
 #-------------------------------------------------------------------
@@ -268,7 +268,7 @@ Formats the url to edit a post.
 
 sub getEditUrl {
 	my $self = shift;
-	return $self->getUrl("func=edit");
+	return $self->getUrl("func=edit;revision=".$self->get("revisionDate"));
 }
 
 
