@@ -215,6 +215,7 @@ sub www_editProfileSave {
     foreach $fieldName (keys %{$profile}) {
        $u->profileField($fieldName,WebGUI::HTML::filter(${$profile}{$fieldName},"javascript"));
 	}
+	WebGUI::Session::refreshUserInfo($session{user}{userId});
 	return WebGUI::Operation::Auth::www_auth();
 }
 
