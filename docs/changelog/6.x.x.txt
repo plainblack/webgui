@@ -9,7 +9,7 @@
  - fix [ 1298851 ] forum subscribers still get notif. after subscr. expired
  - fix [ 1305368 ] Moderation in Collaboration not working ?
  - fix [ 1306912 ] CMS Matrix - Unable to approve article's
- - Removed the depricated threaded view in the CS for a slight performance
+ - Removed the deprecated threaded view in the CS for a slight performance
    gain and simplified templates.
  - fix [ 1312107 ] Forum Issue in "Thread" View
  - fix [ 1318963 ] 6.7.5 None of the profile fields can be updated
@@ -28,6 +28,7 @@
  - fix [ 1299131 ] paragraph tags added every time collaboration message change
  - fix [ 1305132 ] 6.7.5 Assets are moved to trash by runHourly
  - fix [ 1282473 ] RSS encoding (Thanks to Klaus Hertle)
+ - fix Removed last references to deprecated "lastUpdated"
 
 
 6.7.6

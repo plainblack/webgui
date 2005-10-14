@@ -300,7 +300,7 @@ sub getShortcutByCriteria {
 	
 	# Add constraint only if it has been modified.
 	$sql .= " and ".$constraint if (($constraint ne $criteria) && $constraint ne "");
-	$sql .= " order by w.lastUpdated desc";
+	$sql .= " order by assetData.revisionDate desc";
 
 	# Execute the query with an unconditional read
 	my @ids;
