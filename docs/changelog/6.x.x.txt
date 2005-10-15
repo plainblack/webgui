@@ -34,6 +34,7 @@
    was missing data causing a fatal error.
  - fix [ 1326687 ] Export on windows Apache server doesn't work (with quick
    fix (Thanks to Sven Opitz)
+ - fix [ 1327237 ] 6.7.5 Shortcuts
 
 
 6.7.6

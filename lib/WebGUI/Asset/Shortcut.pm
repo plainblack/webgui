@@ -91,10 +91,6 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $originalTemplate;
-	$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
-	$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("collaborationTemplateId")) if (ref $self->getShortcut eq "WebGUI::Asset::Wobject::Collaboration");
-	#Shortcuts of Posts and Threads and other assets without a "templateId" 
-	# are going to be ->view'ed by their original parent's settings anyway.
 	$tabform->getTab("properties")->HTMLArea(
 		-value=>$self->getValue("description"),
                 -label=>WebGUI::International::get(85, 'Asset_Shortcut'),
@@ -107,13 +103,25 @@ sub getEditForm {
                 -hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
 		-namespace=>"Shortcut"
 		);
-	$tabform->getTab("display")->template(
-		-name=>"overrideTemplateId",
-		-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
-                -label=>WebGUI::International::get('override asset template', 'Asset_Shortcut'),
-                -hoverHelp=>WebGUI::International::get('override asset template description', 'Asset_Shortcut'),
-		-namespace=>$originalTemplate->get("namespace")
-		);
+	if ($self->getShortcut->get("templateId")) {
+		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
+		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("collaborationTemplateId")) if (ref $self->getShortcut eq "WebGUI::Asset::Wobject::Collaboration");
+		#Shortcuts of Posts and Threads and other assets without a "templateId" 
+		# are going to be ->view'ed by their original parent's settings anyway.
+		$tabform->getTab("display")->template(
+			-name=>"overrideTemplateId",
+			-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
+        	        -label=>WebGUI::International::get('override asset template', 'Asset_Shortcut'),
+               	 	-hoverHelp=>WebGUI::International::get('override asset template description', 'Asset_Shortcut'),
+			-namespace=>$originalTemplate->get("namespace")
+			);
+		$tabform->getTab("display")->yesNo(
+			-name=>"overrideTemplate",
+			-value=>$self->getValue("overrideTemplate"),
+			-label=>WebGUI::International::get(10,"Asset_Shortcut"),
+			-hoverHelp=>WebGUI::International::get('10 description',"Asset_Shortcut")
+			);
+	}
 	$tabform->getTab("properties")->yesNo(
 		-name=>"overrideTitle",
 		-value=>$self->getValue("overrideTitle"),
@@ -131,12 +139,6 @@ sub getEditForm {
 		-value=>$self->getValue("overrideDescription"),
 		-label=>WebGUI::International::get(9,"Asset_Shortcut"),
 		-hoverHelp=>WebGUI::International::get('9 description',"Asset_Shortcut")
-		);
-	$tabform->getTab("display")->yesNo(
-		-name=>"overrideTemplate",
-		-value=>$self->getValue("overrideTemplate"),
-		-label=>WebGUI::International::get(10,"Asset_Shortcut"),
-		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Shortcut")
 		);
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get(1,"Asset_Shortcut"),
