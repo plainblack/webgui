@@ -23,7 +23,7 @@ Package WebGUI::AssetLineage
 
 =head1 DESCRIPTION
 
-This is a mixin package for WebGUI::Asset that contains all clipboard related functions.
+This is a mixin package for WebGUI::Asset that contains all lineage related functions.
 
 =head1 SYNOPSIS
 
