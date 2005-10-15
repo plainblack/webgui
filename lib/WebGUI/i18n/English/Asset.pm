@@ -79,6 +79,17 @@ our $I18N = {
 		context => q|Admin console label.|
 	},
 
+	'version tag name' => {
+		message => q|Version Tag Name|,
+		lastUpdated => 1129403466,
+		context => q|Admin console label.|
+	},
+
+	'version tag name description' => {
+		message => q|<p>Enter a name to tag the work you will do on this version of the asset.  The tag will be used to reference this work when it is time to commit, rollback or make further edits.</p>|,
+		lastUpdated => 1129403469,
+	},
+
 	'content versioning' => {
 		message => q|Content Versioning|,
 		lastUpdated => 0,
