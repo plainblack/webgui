@@ -27,23 +27,23 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
 sub _addFileTab {
-   my $self = shift;
-   my $tabform = $_[0];
-   my $column = $_[1];
-   my $internationalId = $_[2];
-   unless ($self->get($column)){
-      $tabform->getTab("properties")->file(
-	      -name=>$column,
-		  -label=>WebGUI::International::get($internationalId,"Asset_Product"),
+	my $self = shift;
+	my $tabform = $_[0];
+	my $column = $_[1];
+	my $internationalId = $_[2];
+	unless ($self->get($column)){
+		$tabform->getTab("properties")->file(
+		-name=>$column,
+		-label=>WebGUI::International::get($internationalId,"Asset_Product"),
 		);
-      return;
-   }
-   
-   my $file = WebGUI::Storage->get($self->get($column));
-   $tabform->getTab("properties")->readOnly(
-	      -value=>'<a href="'.$self->getUrl('func=deleteFileConfirm&file='.$column).'">'.WebGUI::International::get("deleteImage","Asset_Product").'</a>',
-	      -label=>WebGUI::International::get($internationalId,"Asset_Product"),
-	    );
+		return;
+	}
+
+	my $file = WebGUI::Storage->get($self->get($column));
+	$tabform->getTab("properties")->readOnly(
+	-value=>'<a href="'.$self->getUrl('func=deleteFileConfirm&file='.$column).'">'.WebGUI::International::get("deleteImage","Asset_Product").'</a>',
+	-label=>WebGUI::International::get($internationalId,"Asset_Product"),
+	);
 }
 
 #-------------------------------------------------------------------
@@ -60,32 +60,36 @@ sub _duplicateFile {
 
 #-------------------------------------------------------------------
 sub _save {
-   my $self = shift;
-   return "" unless ($session{form}{$_[0]});
-   my $file = WebGUI::Storage::Image->create;
-   	my $filename = $file->addFileFromFormPost($_[0]);
+	my $self = shift;
+	my $file = WebGUI::Storage::Image->create;
+	my $filename = $file->addFileFromFormPost($_[0]);
+	unless ($filename) {
+		$file->delete;
+		return "";
+	}
 	$file->generateThumbnail($filename);
-   	WebGUI::SQL->write("update Product set $_[0]=".quote($file->getId)." where assetId=".quote($self->getId));
+	WebGUI::SQL->write("update Product set $_[0]=".quote($file->getId)." where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
 }
 
 #-------------------------------------------------------------------
-        
+
 =head2 addRevision
-        
+
 Override the default method in order to deal with attachments.
 
 =cut
 
 sub addRevision {
-        my $self = shift;
-        my $newSelf = $self->SUPER::addRevision(@_);
+	my $self = shift;
+	my $newSelf = $self->SUPER::addRevision(@_);
 	foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
-        	if ($self->get($field)) {
-                	my $newStorage = WebGUI::Storage->get($self->get($field))->copy;
-                	$newSelf->update({$field=>$newStorage->getId});
-        	}
+		if ($self->get($field)) {
+			my $newStorage = WebGUI::Storage->get($self->get($field))->copy;
+			$newSelf->update({$field=>$newStorage->getId});
+			WebGUI::SQL->write("update Product set $field=".quote($newStorage->getId)." where assetId=".quote($newSelf->getId)." and revisionDate=".quote($newSelf->get("revisionDate")));
+		}
 	}
-        return $newSelf;
+	return $newSelf;
 }
 
 #-------------------------------------------------------------------
@@ -101,18 +105,42 @@ sub definition {
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000056'
-				},
+			},
 			price=>{
-			    fieldType=>"text",
-				defaultValue=>undef
-			}, 
-			productNumber=>{
-			    fieldType=>"text",
+				fieldType=>"text",
 				defaultValue=>undef
 			},
-		  }
-		});
-        return $class->SUPER::definition($definition);
+			productNumber=>{
+				fieldType=>"text",
+				defaultValue=>undef
+			},
+#			image1=>{
+#				fieldType=>"text",
+#				defaultValue=>undef
+#			},
+#			image2=>{
+#				fieldType=>"text",
+#				defaultValue=>undef
+#			},
+#			image3=>{
+#				fieldType=>"text",
+#				defaultValue=>undef
+#			},
+#			brochure=>{
+#				fieldType=>"text",
+#				defaultValue=>undef
+#			},
+#			manual=>{
+#				fieldType=>"text",
+#				defaultValue=>undef
+#			},
+#			warranty=>{
+#				fieldType=>"text",
+#				defaultValue=>undef
+#			},
+		}
+	});
+	return $class->SUPER::definition($definition);
 }
 
 #-------------------------------------------------------------------
@@ -228,45 +256,45 @@ sub getFileUrl {
 
 #-------------------------------------------------------------------
 sub getIndexerParams {
-	my $self = shift;        
+	my $self = shift;
 	my $now = shift;
 	return {
 		Product => {
-                        sql => "select Product.assetId,
-					Product.image1,
-					Product.image2,
-					Product.image3,
-					Product.brochure,
-					Product.manual,
-					Product.warranty,
-					Product.price,
-					Product.productNumber,
-					Product_benefit.benefit,
-					Product_feature.feature,
-					Product_specification.name,
-					Product_specification.value,
-					Product_specification.units,
-					asset.ownerUserId as ownerId,
-					asset.url,
-					asset.groupIdView,
-					asset.title,
-					asset.menuTitle,
-					asset.className,
-					asset.synopsis
-				from Product, asset
-					left join Product_benefit on Product_benefit.assetId=Product.assetId
-					left join Product_feature on Product_feature.assetId=Product.assetId
-					left join Product_specification on Product_specification.assetId=Product.assetId
-				where Product.assetId = asset.assetId 
-                                        and asset.startDate < $now
-                                        and asset.endDate > $now",
-                        fieldsToIndex => ["image1", "image2", "image3", "brochure", "manual", "warranty", "price", 
-                                          "productNumber", "benefit", "feature", "name", "value", "units"],
-                        contentType => 'content',
-                        url => 'WebGUI::URL::gateway($data{url})',
-                        headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
-                        bodyShortcut => 'select synopsis from asset where assetId = \'$data{asssetId}\'',
-                }
+			sql => "select Product.assetId,
+			Product.image1,
+			Product.image2,
+			Product.image3,
+			Product.brochure,
+			Product.manual,
+			Product.warranty,
+			Product.price,
+			Product.productNumber,
+			Product_benefit.benefit,
+			Product_feature.feature,
+			Product_specification.name,
+			Product_specification.value,
+			Product_specification.units,
+			asset.ownerUserId as ownerId,
+			asset.url,
+			asset.groupIdView,
+			asset.title,
+			asset.menuTitle,
+			asset.className,
+			asset.synopsis
+			from Product, asset
+			left join Product_benefit on Product_benefit.assetId=Product.assetId
+			left join Product_feature on Product_feature.assetId=Product.assetId
+			left join Product_specification on Product_specification.assetId=Product.assetId
+			where Product.assetId = asset.assetId
+			and asset.startDate < $now
+			and asset.endDate > $now",
+			fieldsToIndex => ["image1", "image2", "image3", "brochure", "manual", "warranty", "price",
+			"productNumber", "benefit", "feature", "name", "value", "units"],
+			contentType => 'content',
+			url => 'WebGUI::URL::gateway($data{url})',
+			headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
+			bodyShortcut => 'select synopsis from asset where assetId = \'$data{asssetId}\'',
+		}
 	};
 }
 
@@ -312,15 +340,15 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-sub purgeRevision {
-        my $self = shift;
-        WebGUI::Storage->get($self->get("image1"))->delete if ($self->get("image1"));
-        WebGUI::Storage->get($self->get("image2"))->delete if ($self->get("image2"));
-        WebGUI::Storage->get($self->get("image3"))->delete if ($self->get("image3"));
-        WebGUI::Storage->get($self->get("brochure"))->delete if ($self->get("brochure"));
-        WebGUI::Storage->get($self->get("manual"))->delete if ($self->get("manual"));
-        WebGUI::Storage->get($self->get("warranty"))->delete if ($self->get("warranty"));
-        return $self->SUPER::purgeRevision;
+sub	purgeRevision	{
+	my $self = shift;
+	WebGUI::Storage->get($self->get("image1"))->delete if	($self->get("image1"));
+	WebGUI::Storage->get($self->get("image2"))->delete if	($self->get("image2"));
+	WebGUI::Storage->get($self->get("image3"))->delete if	($self->get("image3"));
+	WebGUI::Storage->get($self->get("brochure"))->delete if	($self->get("brochure"));
+	WebGUI::Storage->get($self->get("manual"))->delete if	($self->get("manual"));
+	WebGUI::Storage->get($self->get("warranty"))->delete if	($self->get("warranty"));
+	return $self->SUPER::purgeRevision;
 }
 
 #-------------------------------------------------------------------
@@ -467,10 +495,9 @@ sub www_deleteSpecificationConfirm {
 #}
 
 #-------------------------------------------------------------------
-sub www_editSave {
+sub processPropertiesFromFormPost {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	$self->SUPER::www_editSave();
+	$self->SUPER::processPropertiesFromFormPost;
 	$self->_save("image1");
 	$self->_save("image2");
 	$self->_save("image3");
@@ -621,20 +648,20 @@ sub www_editSpecification {
 
 #-------------------------------------------------------------------
 sub www_editSpecificationSave {
-   my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $session{form}{name} = $session{form}{name_new} if ($session{form}{name_new} ne "");
-   $session{form}{units} = $session{form}{units_new} if ($session{form}{units_new} ne "");
-   $self->setCollateral("Product_specification", "Product_specificationId", {
-                                    Product_specificationId => $session{form}{sid},
-                                    name => $session{form}{name},
-                                    value => $session{form}{value},
-                                    units => $session{form}{units}
-                                  });
-   
-   return "" unless($session{form}{proceed});
-   $session{form}{sid} = "new";
-   return $self->www_editSpecification();
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	$session{form}{name} = $session{form}{name_new} if ($session{form}{name_new} ne "");
+	$session{form}{units} = $session{form}{units_new} if ($session{form}{units_new} ne "");
+	$self->setCollateral("Product_specification", "Product_specificationId", {
+		Product_specificationId => $session{form}{sid},
+		name => $session{form}{name},
+		value => $session{form}{value},
+		units => $session{form}{units}
+	});
+
+	return "" unless($session{form}{proceed});
+	$session{form}{sid} = "new";
+	return $self->www_editSpecification();
 }
 
 #-------------------------------------------------------------------

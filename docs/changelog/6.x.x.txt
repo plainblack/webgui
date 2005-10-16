@@ -1,5 +1,6 @@
 6.7.7
  - fix [ 1324230 ] 6.7.6 - Template, Rich Text Editor options not showing
+ - fix [ 1276593 ] 6.7.2 Product Images don't upload
  - fix [ 1324128 ] Help: List of Available Macros not working
  - fix [ 1315408 ] Navigation sometimes fails to use correct startpoint
  - fix [ 1305577 ] 6.7.5 Cannot insert a Link to a Page in the WebGUI page
