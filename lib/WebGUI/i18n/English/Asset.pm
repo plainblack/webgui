@@ -792,13 +792,34 @@ config file must be enabled for this function to be available.</p>
         },
 
 	'exporting page' => {
-		message => q|Exporting page|,
+		message => q|Exporting page %-s ......|,
 		lastUpdated => 1129420080,
 	},
 
 	'bad user privileges' => {
-		message => q|User has no privileges to view this page.|,
+		message => q|User has no privileges to view this page.<br />|,
 		lastUpdated => 1129420080,
+	},
+
+	'could not create path' => {
+		message => q|
+Couldn't create %-s because %-s <br />
+This most likely means that you have a page with the same name as folder that you're trying to create.<br />
+|,
+		lastUpdated => 1129436410,
+	},
+
+	'could not open path' => {
+		message => q|
+Couldn't open %-s because %-s <br />
+|,
+		lastUpdated => 1129436544,
+	},
+
+	'export information' => {
+		message => q|
+<p>Exported %d pages in %d seconds.</p>|,
+		lastUpdated => 1129436684,
 	},
 
 	'done' => {

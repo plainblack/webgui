@@ -230,9 +230,9 @@ sub www_exportGenerate {
 	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$session{form}{depth}});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
-		print WebGUI::International::get('exporting page', 'Asset').' '.$url."......";
+		printf WebGUI::International::get('exporting page', 'Asset'), $url;
 		unless ($asset->canView($userId)) {
-			print WebGUI::International::get('bad user privileges', 'Asset')."<br />\n";
+			print WebGUI::International::get('bad user privileges', 'Asset')."\n";
 			next;
 		}
 		my $path;
@@ -253,15 +253,14 @@ sub www_exportGenerate {
 			$path = $session{config}{exportPath} . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
-				print "Couldn't create $path because $@ <br />\n";
-				print "This most likely means that you have a page with the same name as folder that you're trying to create.<br />\n";
+				printf WebGUI::International::get('could not create path', 'Asset'), $path, $@;
 				return;
 			}
 		} 
 		$path .= "/".$filename;
                 eval { open(FILE, "> $path") or die "$!" };
 		if ($@) {
-			print "Couldn't open $path because $@ <br />\n";
+			printf WebGUI::International::get('could not open path', 'Asset'), $path, $@;
 			return;
 		} else {
 			print FILE $self->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
@@ -269,7 +268,7 @@ sub www_exportGenerate {
 		}
 		print WebGUI::International::get('done','Asset');
 	}
-	print "<p>Exported ".scalar(@{$assets})." pages in ".(time()-$startTime)." seconds.</p>";
+	printf WebGUI::International::get('export information','Asset'), scalar(@{$assets}), (time()-$startTime);
 	print '<a target="_parent" href="'.$self->getUrl.'">'.WebGUI::International::get(493,"Asset").'</a>';
 	return;
 }
