@@ -75,9 +75,9 @@ function b_up(nr) {
 
 
 	this.ftop = this.ftop - 5;
-    	this.objf.style.top=this.ftop;
+    	this.objf.style.top=(this.ftop+'px');
     	//this.objf.style.zIndex=1;
-	nr--
+	nr--;
     	if (nr>0)
       		setTimeout(this.v+'.up('+nr+');',10);
     	else
@@ -93,8 +93,8 @@ function b_down(nr) {
       		this.ftop=panelLinkTop;
       		nr=0;
     	}
-    	this.objf.style.top=this.ftop;
-    	nr--
+    	this.objf.style.top=(this.ftop+'px');
+    	nr--;
     	if (nr>0)
       		setTimeout(this.v+'.down('+nr+');',10);
     	else
@@ -149,7 +149,7 @@ function b_draw() {
 	//document.write('<div id="slidePanelBarHandle">&raquo;<br />&raquo;<br />&raquo;<br />&raquo;<br />&raquo;<br /></div>');
 
     	//slide panel .
-    	document.write('<div class="slidePanel" id='+this.name+' style="left:');
+    	document.write('<div class="slidePanel" id="'+this.name+'" style="left:');
     	document.write(this.xpos+'px; top:'+this.ypos+'px; width:'+this.width);
     	document.write('px; height:'+this.height+'px; ')
     	document.write('; clip:rect(0px,'+this.width+'px,'+this.height+'px,0px)">');
@@ -157,15 +157,15 @@ function b_draw() {
 
     	//one layer for every panel...
     	for (i=0;i<this.panels.length;i++) {
-      		document.write('<div class="panel" id='+this.name+'_panel'+i);
-      		document.write(' style="top:'+t);
+      		document.write('<div class="panel" id="'+this.name+'_panel'+i);
+      		document.write('" style="top:'+t);
       		document.write('px; width:'+this.width+'px; height:'+h+'px; clip:rect(0px, ');
       		document.write(this.width+'px, '+h+'px, 0px);">');
       		t=t+panelButtonHeight;
 
        		//one layer to host the panel links 
-      		document.write('<div class="panelLinkHolder" id='+this.name+'_panel'+i);
-      		document.write('_f style="top:'+panelLinkTop+'px; width:');
+      		document.write('<div class="panelLinkHolder" id="'+this.name+'_panel'+i);
+      		document.write('_f" style="top:'+panelLinkTop+'px; width:');
       		document.write(this.width+'px; height:');
       		document.write((this.panels[i].img.length*this.buttonspace)+'px;">');
       		mtop=0
@@ -180,7 +180,7 @@ function b_draw() {
 
       		document.write('</div>');
 
-        	document.write('<div id='+this.name+'_panel'+i+'_c class="panelButton" ');
+        	document.write('<div id="'+this.name+'_panel'+i+'_c" class="panelButton" ');
         	document.write('onClick="javascript:'+this.v+'.showPanel('+i);
         	document.write(');" style="width:');
         	document.write((this.width-c)+'px; height:'+(panelButtonHeight-c)+'px;"><a href="#" ');
@@ -190,16 +190,16 @@ function b_draw() {
         	document.write('</a></div>')
 
       		// scroll-up
-      		document.write('<div id='+this.name+'_panel'+i);
-      		document.write('_m1 class="scrollPanelUp" style="left:');
+      		document.write('<div id="'+this.name+'_panel'+i);
+      		document.write('_m1" class="scrollPanelUp" style="left:');
       		document.write((this.width-20)+'px;"><a href="#" onclick="');
       		document.write(this.panels[i].v+'.down(16);this.blur();return false;" >');
       		document.write('<img src="'+getWebguiProperty("extrasURL")+'/slidePanel/arrowup.gif" border="0px" alt="scroll up" />');
       		document.write('</a></div>');
 
 		// scroll-down
-      		document.write('<div class="scrollPanelDown" id='+this.name+'_panel'+i);
-      		document.write('_m2 style="top:');
+      		document.write('<div class="scrollPanelDown" id="'+this.name+'_panel'+i);
+      		document.write('_m2" style="top:');
       		document.write((this.height-(this.panels.length)*panelButtonHeight)+'px; left:');
       		document.write((this.width-20)+'px;"><a href="#" onclick="');
       		document.write(this.panels[i].v+'.up(16);this.blur();return false">');
@@ -249,7 +249,7 @@ function b_draw() {
 		//Added to allow support for xhtml transitional
 		var docElement = document.documentElement;
     
-		if (document.compatMode == "BackCompat") {
+		if (document.compatMode && document.compatMode == "BackCompat") {
 			docElement = document.body;
 		}
 
@@ -287,7 +287,7 @@ function createSlidePanelBar(name) {
 	//Added to allow support for xhtml transitional
 	var docElement = document.documentElement;
     
-	if (document.compatMode == "BackCompat") {
+	if (document.compatMode && document.compatMode == "BackCompat") {
 		docElement = document.body;
 	}  	
 	
