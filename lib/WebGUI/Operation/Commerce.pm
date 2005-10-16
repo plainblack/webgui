@@ -433,7 +433,7 @@ sub www_editCommerceSettings {
 		
 	# payment plugin
 	if (%paymentPlugins) {
-		$tabform->getTab('payment')->raw('<script type="text/javascript"> var activePayment="'.$paymentPlugin.'"; </script>');
+		WebGUI::Style::setRawHeadTags('<script type="text/javascript">var activePayment="'.$paymentPlugin.'";</script>');
 		$tabform->getTab("payment")->selectList(
 			-name		=> 'commercePaymentPlugin',
 			-options	=> \%paymentPlugins,
@@ -442,15 +442,12 @@ sub www_editCommerceSettings {
 			-extras		=> 'onchange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
 			);
 			
-		$jscript = '<script type="text/javascript">';
 		foreach $currentPlugin (@paymentPlugins) {
-			$tabform->getTab('payment')->raw('<tr id="'.$currentPlugin->namespace.'"><td colspan="2" width="100%">'.
+			my $style = '" style="display: none;' unless ($currentPlugin->namespace eq $paymentPlugin);
+			$tabform->getTab('payment')->raw('<tr id="'.$currentPlugin->namespace.$style.'"><td colspan="2" width="100%">'.
 				'<table border="0" cellspacing="0" cellpadding="0" width="100%">'.
 				$currentPlugin->configurationForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
-			$jscript .= "document.getElementById(\"".$currentPlugin->namespace."\").style.display='".(($currentPlugin->namespace eq $paymentPlugin)?"":"none")."';";
 		}
-		$jscript .= '</script>';	
-		$tabform->getTab('payment')->raw($jscript);
 	} else {
 		$tabform->getTab('payment')->raw('<tr><td colspan="2" align="left">'.$i18n->get('no payment plugins selected').'</td></tr>');
 	}
@@ -474,7 +471,7 @@ sub www_editCommerceSettings {
 	
 	# shipping plugin
 	if (%shippingPlugins) {
-		$tabform->getTab('shipping')->raw('<script type="text/javascript"> var activeShipping="'.$shippingPlugin.'"; </script>');
+		WebGUI::Style::setRawHeadTags('<script type="text/javascript">var activeShipping="'.$shippingPlugin.'";</script>');
 		$tabform->getTab('shipping')->selectList(
 			-name	=> 'commerceShippingPlugin',
 			-options=> \%shippingPlugins,
@@ -483,15 +480,12 @@ sub www_editCommerceSettings {
 			-extras	=> 'onchange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
 			);
 		
-		$jscript = '<script type="text/javascript">';
 		foreach $currentPlugin (@shippingPlugins) {
-			$tabform->getTab('shipping')->raw('<tr id="'.$currentPlugin->namespace.'"><td colspan="2" width="100%">'.
+			my $style = '" style="display: none;' unless ($currentPlugin->namespace eq $shippingPlugin);
+			$tabform->getTab('shipping')->raw('<tr id="'.$currentPlugin->namespace.$style.'"><td colspan="2" width="100%">'.
 				'<table border="0" cellspacing="0" cellpadding="0" width="100%">'.
 				$currentPlugin->configurationForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
-			$jscript .= "document.getElementById(\"".$currentPlugin->namespace."\").style.display='".(($currentPlugin->namespace eq $shippingPlugin)?"":"none")."';";
 		}
-		$jscript .= '</script>';	
-		$tabform->getTab('shipping')->raw($jscript);
 	} else {
 		$tabform->getTab('shipping')->raw('<tr><td colspan="2" align="left">'.$i18n->get('no shipping plugins selected').'</td></tr>');
 	}

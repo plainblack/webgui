@@ -269,7 +269,7 @@ sub www_editSettings {
         );
 # auth settings 
 	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js",{type=>"text/javascript"});
-   	$tabform->getTab("auth")->raw('<script type="text/javascript" > var active="'.$session{setting}{authMethod}.'"; </script>');
+	WebGUI::Style::setRawHeadTags('<script type="text/javascript" >var active="'.$session{setting}{authMethod}.'";</script>');
    	my $options;
    	foreach (@{$session{config}{authMethods}}) {
       		$options->{$_} = $_;
@@ -282,14 +282,11 @@ sub www_editSettings {
 		-value=>[$session{setting}{authMethod}],
 		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
-	my $jscript = '<script type="text/javascript">';
 	foreach (@{$session{config}{authMethods}}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($_,1);
-		$tabform->getTab("auth")->raw('<tr id="'.$_.'"><td colspan="2" width="100%"><table border="0" cellspacing="0" cellpadding="0" width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
-		$jscript .= "document.getElementById(\"$_\").style.display='".(($_ eq $session{setting}{authMethod})?"":"none")."';";
+		my $style = '" style="display: none;' unless ($_ eq $session{setting}{authMethod});
+		$tabform->getTab("auth")->raw('<tr id="'.$_.$style.'"><td colspan="2" width="100%"><table border="0" cellspacing="0" cellpadding="0" width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
 	}
-	$jscript .= "</script>";	
-	$tabform->getTab("auth")->raw($jscript);
 	$tabform->submit();
 	my $ac = WebGUI::AdminConsole->new("settings");
 	$ac->setHelp("settings");

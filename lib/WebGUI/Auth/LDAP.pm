@@ -107,7 +107,7 @@ sub addUserForm {
 	   }
 	   $jsArray .= 'ldapValue["0"]="'.$ldapUrl.'";'."\n";
 	   $jscript = qq|
-	   <script>
+	   <script type="text/javascript">
 	      <!--
 	        var ldapValue = new Array();
 		    $jsArray
@@ -132,7 +132,8 @@ sub addUserForm {
 		-label => WebGUI::International::get(4,'AuthLDAP'),
 		-value => $connectDN,
 	);
-	return $jscript.$f->printRowsOnly;
+	WebGUI::Style::setRawHeadTags($jscript);
+	return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
