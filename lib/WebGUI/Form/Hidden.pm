@@ -94,13 +94,13 @@ sub toHtmlAsHidden {
 
 =head2 toHtmlWithWrapper ( )
 
-A synonym for toHtmlAsHidden.
+Renders the form field to HTML as a table row. The row is not displayed because there is nothing to display, but it may not be left away because <input> may not be a child of <table> according to the XHTML standard.
 
 =cut
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	return $self->toHtmlAsHidden;
+	return '<tr style="display: none"><td></td><td>'.$self->toHtmlAsHidden.'</td></tr>';
 }
 
 

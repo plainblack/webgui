@@ -60,9 +60,13 @@ Renders a button.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixQuotes($self->{value});
+	my $value = $self->fixQuotes($self->{value});
 	$self->{extras} ||= 'onclick="this.value=\''.WebGUI::International::get(452).'\'"';
-        return '<input id="'.$self->{id}.'" type="submit" name="'.$self->{name}.'" value="'.$value.'" '.$self->{extras}.' />';
+	my $html = '<input type="submit" ';
+	$html .= 'name="'.$self->{name}.'" ' if ($self->{name});
+	$html .= 'id="'.$self->{id}.'" ' unless ($self->{id} eq "_formId");
+	$html .= 'value="'.$value.'" '.$self->{extras}.' />';
+	return $html;
 }
 
 1;

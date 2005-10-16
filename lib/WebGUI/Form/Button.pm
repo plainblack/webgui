@@ -89,7 +89,11 @@ Renders a button.
 sub toHtml {
 	my $self = shift;
  	my $value = $self->fixQuotes($self->{value});
-        return '<input type="button" name="'.$self->{name}.'" value="'.$value.'" id="'.$self->{id}.'" '.$self->{extras}.' />';
+	my $html = '<input type="button" ';
+	$html .= 'name="'.$self->{name}.'" ' if ($self->{name});
+	$html .= 'id="'.$self->{id}.'" ' unless ($self->{id} eq "_formId");
+	$html .= 'value="'.$value.'" '.$self->{extras}.' />';
+	return $html;
 }
 
 1;
