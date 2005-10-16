@@ -190,9 +190,9 @@ sub www_manageTrash {
         $ac->setHelp("trash manage");
 	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
 		$header = WebGUI::International::get(965,"Asset");
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10));
 	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), WebGUI::International::get(964),"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), WebGUI::International::get(964,"Asset"));
 		$limit = 1;
 	}
   	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});

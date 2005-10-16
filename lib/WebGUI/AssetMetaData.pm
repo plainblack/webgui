@@ -270,7 +270,7 @@ sub www_manageMetaData {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("contentProfiling");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), WebGUI::International::get("Add new field","Asset"),"Asset");
+	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), WebGUI::International::get("Add new field","Asset"));
 	my $output;
 	my $fields = $self->getMetaDataFields();
 	foreach my $fieldId (keys %{$fields}) {
