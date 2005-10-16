@@ -64,66 +64,66 @@ An array of hashes to prepend to the list
 =cut
 
 sub definition {
-        my $class = shift;
-        my $definition = shift;
+	my $class = shift;
+	my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
-        %properties = ( 
-                                description=>{
-                                        fieldType=>'HTMLArea',
-                                        defaultValue=>undef,
-					tab=>"properties",
-					label=>WebGUI::International::get(85,'Wobject'),
-					hoverHelp=>WebGUI::International::get('85 description','Wobject')
-                                        },
-                                displayTitle=>{
-                                        fieldType=>'yesNo',
-                                        defaultValue=>1,
-					tab=>"display",
-					label=>WebGUI::International::get(174,'Wobject'),
-					hoverHelp=>WebGUI::International::get('174 description','Wobject'),
-					uiLevel=>5
-                                        },
-                                cacheTimeout=>{
-                                        fieldType=>'interval',
-                                        defaultValue=>60,
-					tab=>"display",
-					label=>WebGUI::International::get(895,'Wobject'),
-					hoverHelp=>WebGUI::International::get('895 description','Wobject'),
-					uiLevel=>8
-                                        },
-                                cacheTimeoutVisitor=>{
-                                        fieldType=>'interval',
-                                        defaultValue=>600,
-					tab=>"display",
-					label=>WebGUI::International::get(896,'Wobject'),
-					hoverHelp=>WebGUI::International::get('896 description','Wobject'),
-					uiLevel=>8
-                                        },
-				styleTemplateId=>{
-					fieldType=>'template',
-					defaultValue=>undef,
-					tab=>"display",
-					label=>WebGUI::International::get(1073,'Wobject'),
-					hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
-					namespace=>'style'
-					},
-				printableStyleTemplateId=>{
-					fieldType=>'template',
-					defaultValue=>undef,
-					tab=>"display",
-					label=>WebGUI::International::get(1079,'Wobject'),
-					hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
-					namespace=>'style'
-					}
-		);
-        push(@{$definition}, {
-                tableName=>'wobject',
-                className=>'WebGUI::Asset::Wobject',
+	%properties = (
+	description=>{
+		fieldType=>'HTMLArea',
+		defaultValue=>undef,
+		tab=>"properties",
+		label=>WebGUI::International::get(85,'Wobject'),
+		hoverHelp=>WebGUI::International::get('85 description','Wobject')
+	},
+	displayTitle=>{
+		fieldType=>'yesNo',
+		defaultValue=>1,
+		tab=>"display",
+		label=>WebGUI::International::get(174,'Wobject'),
+		hoverHelp=>WebGUI::International::get('174 description','Wobject'),
+		uiLevel=>5
+	},
+	cacheTimeout=>{
+		fieldType=>'interval',
+		defaultValue=>60,
+		tab=>"display",
+		label=>WebGUI::International::get(895,'Wobject'),
+		hoverHelp=>WebGUI::International::get('895 description','Wobject'),
+		uiLevel=>8
+	},
+	cacheTimeoutVisitor=>{
+		fieldType=>'interval',
+		defaultValue=>600,
+		tab=>"display",
+		label=>WebGUI::International::get(896,'Wobject'),
+		hoverHelp=>WebGUI::International::get('896 description','Wobject'),
+		uiLevel=>8
+	},
+	styleTemplateId=>{
+		fieldType=>'template',
+		defaultValue=>undef,
+		tab=>"display",
+		label=>WebGUI::International::get(1073,'Wobject'),
+		hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
+		namespace=>'style'
+	},
+	printableStyleTemplateId=>{
+		fieldType=>'template',
+		defaultValue=>undef,
+		tab=>"display",
+		label=>WebGUI::International::get(1079,'Wobject'),
+		hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
+		namespace=>'style'
+	}
+	);
+	push(@{$definition}, {
+		tableName=>'wobject',
+		className=>'WebGUI::Asset::Wobject',
 		autoGenerateForms=>1,
 		properties => \%properties
-                });
-        return $class->SUPER::definition($definition);
+	});
+	return $class->SUPER::definition($definition);
 }
 
 
