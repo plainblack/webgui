@@ -41,8 +41,6 @@ use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::URL;
 use WebGUI::Utility;
-our $propertyDefinitions;
-our $definitionArrays;
 
 =head1 NAME
 
@@ -1618,7 +1616,7 @@ sub www_manageAssets {
 
 =head2 www_view ( )
 
-Returns "". If canView is False, returns WebGUI::Privilege::noAccess().
+Returns the view() method of the asset object if the requestor canView.
 
 =cut
 
