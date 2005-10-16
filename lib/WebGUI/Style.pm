@@ -133,7 +133,7 @@ sub process {
                         }
                 </script>
                 ';
-	if ($session{var}{adminOn}) {
+	if (WebGUI::Grouping::isInGroup(2)) {
                 # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 		$var{'head.tags'} .= '
                 	<meta http-equiv="Pragma" content="no-cache" />

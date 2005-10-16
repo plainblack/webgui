@@ -36,6 +36,7 @@
  - fix [ 1326687 ] Export on windows Apache server doesn't work (with quick
    fix (Thanks to Sven Opitz)
  - fix [ 1327237 ] 6.7.5 Shortcuts
+ - fix [ 1328105 ] Pages should contain "no-cache" tags
 
 
 6.7.6
