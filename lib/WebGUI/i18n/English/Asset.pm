@@ -791,6 +791,21 @@ config file must be enabled for this function to be available.</p>
                 context => q|Help body for Page Export operation|
         },
 
+	'exporting page' => {
+		message => q|Exporting page|,
+		lastUpdated => 1129420080,
+	},
+
+	'bad user privileges' => {
+		message => q|User has no privileges to view this page.|,
+		lastUpdated => 1129420080,
+	},
+
+	'done' => {
+		message => q|DONE<br />|,
+		lastUpdated => 1129420080,
+	},
+
 	'topicName' => {
 		message => q|Assets|,
 		lastUpdated => 1128920336,

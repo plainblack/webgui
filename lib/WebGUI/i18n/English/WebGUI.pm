@@ -889,8 +889,8 @@ to add or remove user from their groups.
 	},
 
 	'724' => {
-		message => q|Your username cannot begin or end with a space.|,
-		lastUpdated => 1031879593
+		message => q|Your username cannot begin or end with spaces or tabs.|,
+		lastUpdated => 1129431859
 	},
 
 	'432' => {
@@ -1996,8 +1996,8 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 	},
 
 	'747' => {
-		message => q|Usernames must contain only alpha-numeric characters.|,
-		lastUpdated => 1036384261
+		message => q|Usernames must contain only alpha-numeric characters, dashes, underscores, periods, commas or @ signs.|,
+		lastUpdated => 1129431985
 	},
 
 	'479' => {
@@ -3797,44 +3797,54 @@ JavaScript fields from HTML tags.</dd>
 	'glossary body' => {
 		message => q|
 
-<b>Assets</b><br>
+<p><b>Assets</b><br />
 Everything inside of WebGUI is an Asset: files, images, forums, threads in forums, posts in threads, templates, Wobjects (like Articles, DataForms, EventsCalendars) and more.
-<p>
+</p>
 
-<b>captcha</b><br>
+<p><b>captcha</b><br />
 An image displaying a message along with lines or shades that make it hard for a computer
 to do character recognition.  Used in WebGUI to prevent accounts from being created by programs or spiders.
-<p>
+</p>
 
-<b>locked</b><br>
+<p><b>locked</b><br />
 If Posts and Threads are "locked", no new posts can be added and no existing posts can be edited.
-<p>
+</p>
 
-<b>Macros</b><br>
+<p><b>Macros</b><br />
 Macros are used to create dynamic content within content that would otherwise be unchanging.  For
 example, showing today's date, or the name of the user on a page can be done with Macros.
-<p>
+</p>
 
-<b>sticky</b><br>
+<p><b>Passwords</b><br />
+The validity of a password in WebGUI depends on what kind of authentication system
+is used.  If the default, WebGUI authentication, is used, passwords may be made of
+any characters so it meets the minimum length set by the Administrator.
+</p>
+
+<p><b>sticky</b><br />
 If Posts and Threads are set to being "sticky", they will appear at the top of the Forum listing.
-<p>
+</p>
 
-<b>UI level</b><br>
+<p><b>UI level</b><br />
 For WebGUI Content Managers and Admins, the Asset and Wobject edit
 screens can be configured to make them easier to use, based on each
 user's UI level.  The UI level can be altered by Admins in the user's profile.
 Users added to the Admin group have their UI level automatically set to 9
 to give them full access to the site controls.
-<p>
+</p>
 
-<b>Wobjects</b><br>
+<p><b>Usernames</b><br />
+WebGUI usernames cannot start or begin with any kind of space (spaces, tabs, etc.) and can only be made of letters, numbers, or dashes, underscores, periods, commas or @ signs.
+</p>
+
+<p><b>Wobjects</b><br />
 If you think of Assets as "things" inside of WebGUI, then Wobject are
 "things" that "do stuff".  Articles are used to display content, DataForms
 are for collecting data from users (and optionally emailing a copy), and
 Message Boards hold forums for users.  There are many different Wobjects in WebGUI.
-
+</p>
 |,
-		lastUpdated => 1126539126,
+		lastUpdated => 1129432303,
 	},
 	'manage cache'  => {
                 message => q|Cache|,

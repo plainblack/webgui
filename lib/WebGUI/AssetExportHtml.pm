@@ -230,9 +230,9 @@ sub www_exportGenerate {
 	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$session{form}{depth}});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
-		print "Exporting page ".$url."......";
+		print WebGUI::International::get('exporting page', 'Asset').' '.$url."......";
 		unless ($asset->canView($userId)) {
-			print "User has no privileges to view.<br />\n";
+			print WebGUI::International::get('bad user privileges', 'Asset')."<br />\n";
 			next;
 		}
 		my $path;
@@ -267,7 +267,7 @@ sub www_exportGenerate {
 			print FILE $self->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
 			close(FILE);
 		}
-		print "DONE<br />";
+		print WebGUI::International::get('done','Asset');
 	}
 	print "<p>Exported ".scalar(@{$assets})." pages in ".(time()-$startTime)." seconds.</p>";
 	print '<a target="_parent" href="'.$self->getUrl.'">'.WebGUI::International::get(493,"Asset").'</a>';
