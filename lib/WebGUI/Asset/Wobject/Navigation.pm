@@ -340,6 +340,7 @@ sub view {
 	my $currentLineage = $current->get("lineage");
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
+	my %lastChildren;
 	foreach my $asset (@{$assets}) {
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->get("lineage");
@@ -419,30 +420,20 @@ sub view {
 			$pageData->{'page.parent.menuTitle'} = $parent->getMenuTitle;
 			$pageData->{'page.parent.title'} = $parent->getTitle;
 			$pageData->{"page.parent.url"} = $parent->getUrl;	
-			# these next two variables can be very inefficient, consider getting rid of them
-			my $parentsFirstChild = $parent->getFirstChild;
-			if (defined $parentsFirstChild) {
-				$pageData->{"page.isRankedFirst"} = ($asset->getId eq $parentsFirstChild->getId);
-			}
-			my $parentsLastChild = $parent->getLastChild;
-			if (defined $parentsLastChild) {
-				$pageData->{"page.isRankedLast"} = ($asset->getId eq $parentsLastChild->getId);
-			}
+			$pageData->{"page.isRankedFirst"} = 1 unless exists $lastChildren{$parent->getId};
+			$lastChildren{$parent->getId} = $asset->getId;			
 		}
 		push(@{$var->{page_loop}}, $pageData);	
 	}
+	my $counter;
+	for($counter=0 ; $counter < scalar( @{$var->{page_loop}} ) ; $counter++) {
+		@{$var->{page_loop}}[$counter]->{"page.isRankedLast"} = 1 if 
+			($lastChildren{@{$var->{page_loop}}[$counter]->{"page.parent.assetId"}} 
+				eq @{$var->{page_loop}}[$counter]->{"page.assetId"});
+	}
+	use Data::Dumper;WebGUI::ErrorHandler::warn(Dumper($var));
 	return $self->processTemplate($var,$self->get("templateId"));
 }
-
-
-#-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("navigation add/edit","Asset_Navigation");
-#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("22","Asset_Navigation"));
-#}
-
 
 #-------------------------------------------------------------------
 sub www_goBackToPage {
