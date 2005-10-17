@@ -225,7 +225,7 @@ sub view {
 	} elsif ($endMonth eq "current") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,1,0);
 	}
-	WebGUI::ErrorHandler::warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
+	#WebGUI::ErrorHandler::warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
 	my @now = WebGUI::DateTime::epochToArray(WebGUI::DateTime::time());
 	my $calHasEvent = 0;
 	#monthcount minus i is the number of months remaining to be processed.
