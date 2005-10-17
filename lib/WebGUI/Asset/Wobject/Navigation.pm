@@ -431,7 +431,7 @@ sub view {
 			($lastChildren{@{$var->{page_loop}}[$counter]->{"page.parent.assetId"}} 
 				eq @{$var->{page_loop}}[$counter]->{"page.assetId"});
 	}
-	use Data::Dumper;WebGUI::ErrorHandler::warn(Dumper($var));
+	#use Data::Dumper;WebGUI::ErrorHandler::warn(Dumper($var));
 	return $self->processTemplate($var,$self->get("templateId"));
 }
 
