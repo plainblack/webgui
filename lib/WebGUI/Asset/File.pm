@@ -196,6 +196,7 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
 	my $storage = $self->getStorageLocation;
+	delete $self->{_storageLocation};
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
 		my %data;
@@ -205,10 +206,7 @@ sub processPropertiesFromFormPost {
 		$data{menuTitle} = $filename unless ($session{form}{menuTitle});
 		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
-		$self->setSize($storage->getFileSize($filename));
-		$self->{_storageLocation} = $storage;
 	}
-	$storage->setPrivileges($self->get("ownerUserId"), $self->get("groupIdView"), $self->get("groupIdEdit"));
 }
 
 
@@ -232,6 +230,16 @@ sub purgeRevision {
 	return $self->SUPER::purgeRevision;
 }
 
+#-------------------------------------------------------------------
+sub setSize {
+	my $self = shift;
+	my $fileSize = shift || 0;
+	my $storage = $self->getStorageLocation;
+	foreach my $file (@{$storage->getFiles}) {
+		$fileSize += $storage->getFileSize($file);
+	}
+	$self->SUPER::setSize($fileSize);
+}
 
 #-------------------------------------------------------------------
 

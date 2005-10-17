@@ -45,6 +45,9 @@
  - fix [ 1328105 ] Pages should contain "no-cache" tags
  - fix [ 1216810 ] anonymous registration errors persist
  - fix [ 1323272 ] Site modifications using GET in stead of POST
+ - fix [ 1328763 ] 6.7.3 FileAsset file size has incorrect value when
+   displayed
+
 
 
 6.7.6
