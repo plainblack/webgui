@@ -402,12 +402,16 @@ sub view {
 	} else {
 		$monthLabel = WebGUI::International::get(561,"Asset_EventsCalendar");
 	}
+	$var{'pagination.previousPageUrl'} = 
+		$self->getUrl.'?calMonthStart='.$prevCalMonthStart.';calMonthEnd='.$prevCalMonthEnd;
 	$var{'pagination.previousPage'} = '<form method="GET" style="inline;" action="'.
 		$self->getUrl.'?calMonthStart='.$calMonthStart.
 		';reload='.WebGUI::Id::generate().'"><a href="'.$self->getUrl.
 		'?calMonthStart='.$prevCalMonthStart.';calMonthEnd='.$prevCalMonthEnd.'">'.
 		WebGUI::International::get(558,"Asset_EventsCalendar")." ".$monthRangeLength." ".
 		$monthLabel.'</a>';
+	$var{'pagination.nextPageUrl'} = $self->getUrl.
+		'?calMonthStart='.$nextCalMonthStart.';calMonthEnd='.$nextCalMonthEnd;
 	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.
 		'?calMonthStart='.$nextCalMonthStart.';calMonthEnd='.$nextCalMonthEnd.'">'.
 		WebGUI::International::get(559,"Asset_EventsCalendar")." ".$monthRangeLength." ".
