@@ -119,28 +119,28 @@ sub process {
 	} elsif ($session{page}{useEmptyStyle}) {
 		$templateId = 6;
 	}
-	$var{'head.tags'} = '
-		<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta http-equiv="Content-Script-Type" content="text/javascript" />
-		<meta http-equiv="Content-Style-Type" content="text/css" />
-                <script type="text/javascript">
-                        function getWebguiProperty (propName) {
-                                var props = new Array();
-                                props["extrasURL"] = "'.$session{config}{extrasURL}.'";
-                                props["pageURL"] = "'.WebGUI::URL::page(undef, undef, 1).'";
-                                return props[propName];
-                        }
-                </script>
-                ';
-	if (WebGUI::Grouping::isInGroup(2)) {
-                # This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
-		$var{'head.tags'} .= '
-                	<meta http-equiv="Pragma" content="no-cache" />
-                	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0" />
-                	<meta http-equiv="Expires" content="0" />
-			';
-        }
+$var{'head.tags'} = '
+<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<script type="text/javascript">
+function getWebguiProperty (propName) {
+var props = new Array();
+props["extrasURL"] = "'.$session{config}{extrasURL}.'";
+props["pageURL"] = "'.WebGUI::URL::page(undef, undef, 1).'";
+return props[propName];
+}
+</script>
+';
+if (WebGUI::Grouping::isInGroup(2)) {
+	# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
+	$var{'head.tags'} .= '
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0" />
+<meta http-equiv="Expires" content="0" />
+';
+}
 	$var{'head.tags'} .= generateAdditionalHeadTags();
 	$var{'head.tags'} .= "\n<!-- macro head tags -->\n";
 	my $style = WebGUI::Asset::Template->new($templateId);
