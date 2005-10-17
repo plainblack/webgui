@@ -84,6 +84,12 @@ sub page {
 	my $assetUrl = shift;
 	my $fastcgi = shift;
 	WebGUI::Session::open($webguiRoot,$configFile,$fastcgi) unless ($useExistingSession);
+	if ($session{env}{HTTP_X_MOZ} eq "prefetch") { # browser prefetch is a bad thing
+		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
+		my $output = WebGUI::HTTP::getHeader();
+		WebGUI::Session::close();
+		return $output;
+	}
 	return _upgrading($webguiRoot) if ($session{setting}{specialState} eq "upgrading");
 	return _setup() if ($session{setting}{specialState} eq "init");
 	my $output = _processOperations();
