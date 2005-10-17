@@ -1,6 +1,7 @@
 6.7.7
  - added two new template variables to the EventsCalendar - 
    pagination.previousPageUrl and pagination.nextPageUrl
+ - fix [ 1328298 ] 6.7.5 random Assets not random
  - fix [ 1288653 ] Events calendar again - moving forth/back does not work
  - fix [ 1324230 ] 6.7.6 - Template, Rich Text Editor options not showing
  - fix [ 1276593 ] 6.7.2 Product Images don't upload
