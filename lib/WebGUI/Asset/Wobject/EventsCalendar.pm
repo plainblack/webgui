@@ -225,7 +225,7 @@ sub view {
 	} elsif ($endMonth eq "current") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,1,0);
 	}
-
+	WebGUI::ErrorHandler::warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
 	my @now = WebGUI::DateTime::epochToArray(WebGUI::DateTime::time());
 	my $calHasEvent = 0;
 	#monthcount minus i is the number of months remaining to be processed.
@@ -435,6 +435,19 @@ sub view {
 #	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Asset_EventsCalendar"));
 #}
 
+
+#-------------------------------------------------------------------
+=head2 www_view ( )
+
+Overwrite www_view method and call the superclass object, passing in a 1 to disable cache
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	$self->SUPER::www_view(1);
+	
+}
 
 1;
 
