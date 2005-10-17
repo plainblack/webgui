@@ -186,10 +186,6 @@ A string containing the link to the tab-CascadingStyleSheet
 
  default = extrasPath.'/tabs/tabs.css'
 
-=head3 cancelUrl
-
-A URL to go to when the cancel button is pressed.
-	
 =cut
 
 sub new {
@@ -207,7 +203,7 @@ sub new {
 	}
 	my $cancel = WebGUI::Form::button({
 			value=>WebGUI::International::get('cancel'),
-			extras=>q|onclick="location.href='|.$cancelUrl.q|'"|
+			extras=>q|onclick="history.go(-1);"|
 			});
 	bless {	_uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }

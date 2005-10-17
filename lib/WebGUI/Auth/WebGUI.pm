@@ -177,9 +177,9 @@ sub createAccount {
 	}
    $vars->{'create.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$session{form}{"authWebGUI.username"}});
    $vars->{'create.form.username.label'} = WebGUI::International::get(50);
-   $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>$session{form}{"authWebGUI.identifier"}});
+   $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier"});
    $vars->{'create.form.password.label'} = WebGUI::International::get(51);
-   $vars->{'create.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm","value"=>$session{form}{"authWebGUI.identifierConfirm"}});
+   $vars->{'create.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm"});
    $vars->{'create.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
    $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$session{form}{confirm}});
  	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
@@ -199,14 +199,14 @@ sub createAccountSave {
    my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
    
    my $error = $self->error if(!$self->validUsername($username));
-   $error.= $self->error if(!$self->_isValidPassword($password,$passConfirm));
-   my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
-   $error .= $temp;
 	if ($session{setting}{webguiUseCaptcha}) {
 		unless ($session{form}{'authWebGUI.captcha.validation'} eq Digest::MD5::md5_base64(lc($session{form}{'authWebGUI.captcha'}))) {
 			$error .= WebGUI::International::get("captcha failure","AuthWebGUI");
 		}
 	}
+   $error.= $self->error if(!$self->_isValidPassword($password,$passConfirm));
+   my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
+   $error .= $temp;
    
    return $self->createAccount($error) unless ($error eq "");
    
