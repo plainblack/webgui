@@ -23,8 +23,7 @@ sub process {
 		my $children = $asset->getLineage(["children"]);
 		#randomize;
 		srand;
-		WebGUI::ErrorHandler::warn(rand(scalar(@{$children})));
-		my $randomAssetId = $children->[$index1];	
+		my $randomAssetId = $children->[rand(scalar(@{$children}))];	
 		my $randomAsset = WebGUI::Asset->newByDynamicClass($randomAssetId);
 		if (defined $randomAsset) {
 			$randomAsset->toggleToolbar;
