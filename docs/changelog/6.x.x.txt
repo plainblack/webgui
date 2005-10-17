@@ -37,6 +37,7 @@
    was missing data causing a fatal error.
  - fix [ 1326687 ] Export on windows Apache server doesn't work (with quick
    fix (Thanks to Sven Opitz)
+ - fix [ 1216810 ] anonymous registration errors persist
  - fix [ 1327237 ] 6.7.5 Shortcuts
  - fix [ 1328105 ] Pages should contain "no-cache" tags
 
