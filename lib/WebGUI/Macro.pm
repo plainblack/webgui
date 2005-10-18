@@ -151,8 +151,8 @@ sub process {
       			$params =~ s/(^\(|\)$)//g; # remove parenthesis
       			$params = &process($params); # recursive process params
 		}
-		if ($session{config}{macros}{$searchString} ne "") {
-      			my $cmd = "WebGUI::Macro::".$session{config}{macros}{$searchString};
+		if ($WebGUI::Session::session{config}{macros}{$searchString} ne "") {
+      			my $cmd = "WebGUI::Macro::".$WebGUI::Session::session{config}{macros}{$searchString};
 			my $load = "use ".$cmd;
 			eval($load);
 			WebGUI::ErrorHandler::error("Macro failed to compile: $cmd.".$@) if($@);

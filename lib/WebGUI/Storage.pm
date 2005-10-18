@@ -25,6 +25,7 @@ use warnings;
 use WebGUI::ErrorHandler;
 use WebGUI::Id;
 use WebGUI::Session;
+use WebGUI::URL;
 use WebGUI::Utility;
 
 =head1 NAME
