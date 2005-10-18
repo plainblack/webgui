@@ -79,8 +79,12 @@ An override for the default offset of the grouping. Specified in seconds.
 =cut
 
 sub addToGroups {
+	my $self = shift;
+	my $groups = shift;
+	my $expireOffset = shift;
+	$self->uncache;
 	require WebGUI::Grouping;
-	WebGUI::Grouping::addUsersToGroups([$_[0]->{_userId}],$_[1],$_[2]);
+	WebGUI::Grouping::addUsersToGroups([$self->userId],$groups,$expireOffset);
 }
 
 #-------------------------------------------------------------------
@@ -96,15 +100,16 @@ If specified, the authMethod is set to this value. The only valid values are "We
 =cut
 
 sub authMethod {
-        my ($class, $value);
-        $class = shift;
+        my ($self, $value);
+        $self = shift;
         $value = shift;
         if (defined $value) {
-                $class->{_user}{"authMethod"} = $value;
+		$self->uncache;
+                $self->{_user}{"authMethod"} = $value;
                 WebGUI::SQL->write("update users set authMethod=".quote($value).",
-			lastUpdated=".time()." where userId=".quote($class->{_userId}));
+			lastUpdated=".time()." where userId=".quote($self->{_userId}));
         }
-        return $class->{_user}{"authMethod"};
+        return $self->{_user}{"authMethod"};
 }
 
 #-------------------------------------------------------------------
@@ -128,17 +133,18 @@ Deletes this user.
 =cut
 
 sub delete {
-        my $class = shift;
+        my $self = shift;
+		$self->uncache;
 	require WebGUI::Operation::Auth;
-        WebGUI::SQL->write("delete from users where userId=".quote($class->{_userId}));
-        WebGUI::SQL->write("delete from userProfileData where userId=".quote($class->{_userId}));
+        WebGUI::SQL->write("delete from users where userId=".quote($self->{_userId}));
+        WebGUI::SQL->write("delete from userProfileData where userId=".quote($self->{_userId}));
 	require WebGUI::Grouping;
-	WebGUI::Grouping::deleteUsersFromGroups([$class->{_userId}],WebGUI::Grouping::getGroupsForUser($class->{_userId}));
-	WebGUI::SQL->write("delete from messageLog where userId=".quote($class->{_userId}));
+	WebGUI::Grouping::deleteUsersFromGroups([$self->{_userId}],WebGUI::Grouping::getGroupsForUser($self->{_userId}));
+	WebGUI::SQL->write("delete from messageLog where userId=".quote($self->{_userId}));
 
-	my $authMethod = WebGUI::Operation::Auth::getInstance($class->authMethod,$class->{_userId});
-	$authMethod->deleteParams($class->{_userId});
-    my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=".quote($class->{_userId}));
+	my $authMethod = WebGUI::Operation::Auth::getInstance($self->authMethod,$self->{_userId});
+	$authMethod->deleteParams($self->{_userId});
+    my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=".quote($self->{_userId}));
     while (my ($sid) = $sth->array) {
        WebGUI::Session::end($sid);
     }
@@ -158,22 +164,26 @@ An array reference containing a list of groups.
 =cut
 
 sub deleteFromGroups {
+	my $self = shift;
+	my $groups = shift;
+	$self->uncache;
 	require WebGUI::Grouping;
-	WebGUI::Grouping::deleteUsersFromGroups([$_[0]->{_userId}],$_[1]);
+	WebGUI::Grouping::deleteUsersFromGroups([$self->userId],$groups);
 }
 
 #-------------------------------------------------------------------
 # This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
 sub identifier {
-        my ($class, $value);
-        $class = shift;
+        my ($self, $value);
+        $self = shift;
         $value = shift;
         if (defined $value) {
-                $class->{_user}{"identifier"} = $value;
+		$self->uncache;
+                $self->{_user}{"identifier"} = $value;
                 WebGUI::SQL->write("update authentication set fieldData=".quote($value)."
-                        where userId=".quote($class->{_userId})." and authMethod='WebGUI' and fieldName='identifier'");
+                        where userId=".quote($self->{_userId})." and authMethod='WebGUI' and fieldName='identifier'");
         }
-        return $class->{_user}{"identifier"};
+        return $self->{_user}{"identifier"};
 }
 
 #-------------------------------------------------------------------
@@ -197,11 +207,16 @@ A description of why this user's karma was modified. For instance it could be "M
 =cut
 
 sub karma {
-	if (defined $_[1] && defined $_[2] && defined $_[3]) {
-		WebGUI::SQL->write("update users set karma=karma+".quote($_[1])." where userId=".quote($_[0]->userId));
-        	WebGUI::SQL->write("insert into karmaLog values (".quote($_[0]->userId).",$_[1],".quote($_[2]).",".quote($_[3]).",".time().")");
+	my $self = shift;
+	my $amount = shift;
+	my $source = shift;
+	my $description = shift;
+	if (defined $amount && defined $source && defined $description) {
+		$self->uncache;
+		WebGUI::SQL->write("update users set karma=karma+".quote($amount)." where userId=".quote($self->userId));
+        	WebGUI::SQL->write("insert into karmaLog values (".quote($self->userId).",$amount,".quote($source).",".quote($description).",".time().")");
 	}
-        return $_[0]->{_user}{karma};
+        return $self->{_user}{karma};
 }
 
 #-------------------------------------------------------------------
@@ -285,18 +300,19 @@ The value to set the profile field name to.
 =cut
 
 sub profileField {
-        my ($class, $fieldName, $value);
-	$class = shift;
+        my ($self, $fieldName, $value);
+	$self = shift;
         $fieldName = shift;
         $value = shift;
 	$value = WebGUI::Macro::negate($value);	
 	if (defined $value) {
-		$class->{_profile}{$fieldName} = $value;
-		WebGUI::SQL->write("delete from userProfileData where userId=".quote($class->{_userId})." and fieldName=".quote($fieldName));
-		WebGUI::SQL->write("insert into userProfileData values (".quote($class->{_userId}).", ".quote($fieldName).", ".quote($value).")");
-        	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".quote($class->{_userId}));
+		$self->uncache;
+		$self->{_profile}{$fieldName} = $value;
+		WebGUI::SQL->write("delete from userProfileData where userId=".quote($self->{_userId})." and fieldName=".quote($fieldName));
+		WebGUI::SQL->write("insert into userProfileData values (".quote($self->{_userId}).", ".quote($fieldName).", ".quote($value).")");
+        	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".quote($self->{_userId}));
 	}
-	return $class->{_profile}{$fieldName};
+	return $self->{_profile}{$fieldName};
 }
 
 #-------------------------------------------------------------------
@@ -312,15 +328,15 @@ An integer containing the unique identifier of the affiliate.
 =cut
 
 sub referringAffiliate {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_user}{"referringAffiliate"} = $value;
+		$self->uncache;
+                $self->{_user}{"referringAffiliate"} = $value;
                 WebGUI::SQL->write("update users set referringAffiliate=".quote($value).",
-                        lastUpdated=".time()." where userId=".quote($class->{_userId}));
+                        lastUpdated=".time()." where userId=".quote($self->userId));
         }
-        return $class->{_user}{"referringAffiliate"};
+        return $self->{_user}{"referringAffiliate"};
 }
 
 #-------------------------------------------------------------------
@@ -336,15 +352,29 @@ If specified, the status is set to this value.  Possible values are 'Active', 'S
 =cut
 
 sub status {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_user}{"status"} = $value;
+		$self->uncache;
+                $self->{_user}{"status"} = $value;
                 WebGUI::SQL->write("update users set status=".quote($value).",
-                        lastUpdated=".time()." where userId=".quote($class->{_userId}));
+                        lastUpdated=".time()." where userId=".quote($self->userId));
         }
-        return $class->{_user}{"status"};
+        return $self->{_user}{"status"};
+}
+
+#-------------------------------------------------------------------
+
+=head uncache ( )
+
+Deletes this user object out of the cache.
+
+=cut
+
+sub uncache {
+	my $self = shift;
+	my $cache = WebGUI::Cache->new(["user",$self->userId]);
+	$cache->delete;	
 }
 
 #-------------------------------------------------------------------
@@ -360,15 +390,15 @@ If specified, the username is set to this value.
 =cut
 
 sub username {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_user}{"username"} = $value;
+		$self->uncache;
+                $self->{_user}{"username"} = $value;
                 WebGUI::SQL->write("update users set username=".quote($value).",
-                        lastUpdated=".time()." where userId=".quote($class->{_userId}));
+                        lastUpdated=".time()." where userId=".quote($self->userId));
         }
-        return $class->{_user}{"username"};
+        return $self->{_user}{"username"};
 }
 
 #-------------------------------------------------------------------

@@ -1,3 +1,8 @@
+6.7.8
+ - Fixed a problem with Random Asset Proxy
+ - Fixed a caching bug in the user system.
+
+
 6.7.7
  - added two new template variables to the EventsCalendar - 
    pagination.previousPageUrl and pagination.nextPageUrl
