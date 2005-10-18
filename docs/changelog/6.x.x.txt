@@ -2,6 +2,7 @@
  - Fixed a problem with Random Asset Proxy
  - Fixed a caching bug in the user system.
  - Fixed a problem in the user system for negating macros on profile fields.
+ - Added a missing use statement in Storage
 
 6.7.7
  - added two new template variables to the EventsCalendar - 
