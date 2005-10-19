@@ -93,6 +93,7 @@ sub getEditForm {
 	$tabform->getTab("properties")->selectList(
 		-name=>"scope",
 		-label=>WebGUI::International::get(507,"Asset_EventsCalendar"),
+		-hoverHelp=>WebGUI::International::get('507 description',"Asset_EventsCalendar"),
 		-value=>[$self->getValue("scope")],
 		-options=>{
 			0=>WebGUI::International::get(508,"Asset_EventsCalendar"),
@@ -103,12 +104,14 @@ sub getEditForm {
  	$tabform->getTab("display")->template(
  		-name=>"templateId",
 		-label=>WebGUI::International::get(94,"Asset_EventsCalendar"),
+		-hoverHelp=>WebGUI::International::get('94 description',"Asset_EventsCalendar"),
 		-value=>$self->getValue('templateId'),
 		-namespace=>"EventsCalendar"
 	);
  	$tabform->getTab("display")->template(
  		-name=>"eventTemplateId",
 		-label=>WebGUI::International::get(80,"Asset_EventsCalendar"),
+		-hoverHelp=>WebGUI::International::get('80 description',"Asset_EventsCalendar"),
 		-value=>$self->getValue('eventTemplateId'),
 		-namespace=>"EventsCalendar/Event",
 	);
@@ -121,6 +124,7 @@ sub getEditForm {
 			"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
 		},
 		-label=>WebGUI::International::get(81,"Asset_EventsCalendar"),
+		-hoverHelp=>WebGUI::International::get('81 description',"Asset_EventsCalendar"),
 		-value=>[$self->getValue("startMonth")]
 	);
 	my %options;
@@ -137,6 +141,7 @@ sub getEditForm {
 		-name=>"endMonth",
 		-options=>\%options,
 		-label=>WebGUI::International::get(84,"Asset_EventsCalendar"),
+		-hoverHelp=>WebGUI::International::get('84 description',"Asset_EventsCalendar"),
 		-value=>[$self->getValue("endMonth")]
 	);
 	$tabform->getTab("display")->selectList(
@@ -147,11 +152,13 @@ sub getEditForm {
 			"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
 		},
 		-label=>WebGUI::International::get(90,"Asset_EventsCalendar"),
+		-hoverHelp=>WebGUI::International::get('90 description',"Asset_EventsCalendar"),
 		-value=>[$self->getValue("defaultMonth")]
 	);
 	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
 		-label=>WebGUI::International::get(19,"Asset_EventsCalendar"),
+		-hoverHelp=>WebGUI::International::get('19 description',"Asset_EventsCalendar"),
 		-value=>$self->getValue("paginateAfter")
 	);
 	return $tabform;
