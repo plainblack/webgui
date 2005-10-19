@@ -5,6 +5,41 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		fields => [
+                        {
+                                title => '507',
+                                description => '507 description',
+                                namespace => 'Asset_EventsCalendar',
+                        },
+                        {
+                                title => '94',
+                                description => '94 description',
+                                namespace => 'Asset_EventsCalendar',
+                        },
+                        {
+                                title => '80',
+                                description => '80 description',
+                                namespace => 'Asset_EventsCalendar',
+                        },
+                        {
+                                title => '81',
+                                description => '81 description',
+                                namespace => 'Asset_EventsCalendar',
+                        },
+                        {
+                                title => '84',
+                                description => '84 description',
+                                namespace => 'Asset_EventsCalendar',
+                        },
+                        {
+                                title => '90',
+                                description => '90 description',
+                                namespace => 'Asset_EventsCalendar',
+                        },
+                        {
+                                title => '19',
+                                description => '19 description',
+                                namespace => 'Asset_EventsCalendar',
+                        },
 		],
 		related => [
 			{

@@ -7,82 +7,90 @@ our $I18N = {
 		lastUpdated => 1066572488
 	},
 
-	'71' => {
-		message => q|<p>Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also, Events Calendars on consumer sites are a great way to let your customers know what events you'll be attending and what promotions you'll be having.
-<p>
+        '507 description' => {
+                message => q|Sets the scope of the events displayed by this calendar.
+<blockquote>
+<dl>
+<dt>Regular</dt>
+<dd>This calendar will display its own events.</dd>
+<dt>Global</dt>
+<dd>The calendar will display events from every calendar in the site.</dd>
+<dt>Master</dt>
+<dd>The calendar will display events from every calendar below it in the hierarchy.</dd>
+</dl>
+</blockquote>|,
+                lastUpdated => 1129668992,
+        },
 
-<b>Start Month</b><br>
-Choose the start month for your calendar.
+        '94 description' => {
+                message => q|Choose a layout for the events calendar.|,
+                lastUpdated => 1129668992,
+        },
+
+        '80 description' => {
+                message => q|Choose a layout for the individual events within the calendar.|,
+                lastUpdated => 1129668992,
+        },
+
+        '81 description' => {
+                message => q|Choose the start month for your calendar.
 <blockquote>
 <dl>
 <dt>First in the calendar</dt>
 <dd>The calendar will start at whatever the earliest date in the calendar is.</dd>
-
 <dt>Now!</dt>
 <dd>The calendar will start on the current date and time.  It will advance and not show events that have already passed.</dd>
-
 <dt>Current</dt>
 <dd>The calendar will always start on the current month.  It is similar to "Now!" but advances from month to month.  This allows events in the current month that have passed to still be displayed.</dd>
-
 <dt>January</dt>
 <dd>The calendar will always start on January of the current year.</dd>
 </dl>
-</blockquote>
+</blockquote>|,
+                lastUpdated => 1129668992,
+        },
 
-<p>
-
-<b>End Month</b><br>
-Choose the end month for your calendar.
+        '84 description' => {
+                message => q|Choose the end month for your calendar.
 <blockquote>
 <dl>
 <dt>Last in the calendar</dt>
 <dd>The calendar will end at the last date in the calendar.</dd>
-
 <dt>Show 12 months from the start</dt>
 <dt>Show 9 months from the start</dt>
 <dt>Show 6 months from the start</dt>
 <dt>Show 3 months from the start</dt>
 <dd>Show N months from the start month.  If the start month is variable, then this provides a sliding window into the events in this calendar.</dd>
-
 <dt>Current</dt>
 <dd>The calendar will always end on the current month.</dd>
-
 </dl>
-</blockquote>
-<p>
-<b>Default Month</b><br>
-Choose which month for this calendar to start on when a visitor comes to the page containing the calendar.
+</blockquote>|,
+                lastUpdated => 1129668992,
+        },
 
-<p>
-<b>Is master?</b><br>
-If set to yes then this calendar will display events from all other calendars in the system.
+        '90 description' => {
+                message => q|Choose which month for this calendar to display when it is viewed.|,
+                lastUpdated => 1129668992,
+        },
 
-<p>
-<b>Proceed to add event?</b><br>
-Leave this set to yes if you want to add events to the Events Calendar directly after creating it.
+        '19 description' => {
+                message => q|How many months of data should be shown before paginating?|,
+                lastUpdated => 1129668992,
+        },
 
-<p>
-<b>Main Template</b><br>
-Choose a layout for the events calendar.
-
-<p>
-<b>Event Template</b><br>
-Choose a layout for the individual events within the calendars.
-
-<p>
-<b>Paginate After</b><br>
-How many months of data should be shown before paginating?
+	'71' => {
+		message => q|<p>Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also, Events Calendars on consumer sites are a great way to let your customers know what events you'll be attending and what promotions you'll be having.</p>
 
 <p>
 <hr size="1">
 <i><b>Note:</b></i> The following style is specific to the Events Calendar.
+</p>
 
 <p>
-<b>.eventTitle </b><br>
+<b>.eventTitle </b><br />
 The title of an individual event.
-
+</p>
 |,
-		lastUpdated => 1100902948,
+		lastUpdated => 1129669045,
 	},
 
 
@@ -176,15 +184,88 @@ The title of an individual event.
                   },
 
 	'95' => {
-		message => q|The following template variables are available for you to customize your events calendar.
-<p/>
-<b>addevent.url</b><br/>
+		message => q|<p>The following template variables are available for you to customize your events calendar.
+</p>
+<p>
+<b>addevent.url</b><br />
 The URL to add an event to the calendar.
-<p/>
+</p>
 
-<b>addevent.label</b><br/>
+<p>
+<b>addevent.label</b><br />
 The translated label for the add event link.
-<p/>
+</p>
+
+<p>
+<b>sunday.label</b><br />
+A label representing "Sunday".
+</p>
+
+<b>monday.label</b><br>
+A label representing "Monday".
+</p>
+<p>
+
+<b>tuesday.label</b><br>
+A label representing "Tuesday".
+</p>
+<p>
+
+<b>wednesday.label</b><br>
+A label representing "Wednesday".
+</p>
+<p>
+
+<b>thursday.label</b><br>
+A label representing "Thursday".
+</p>
+<p>
+
+<b>friday.label</b><br>
+A label representing "Friday".
+</p>
+<p>
+
+<b>saturday.label</b><br>
+A label representing "Saturday".
+</p>
+<p>
+
+
+<b>sunday.label.short</b><br>
+The first initial of the label for "Sunday".
+</p>
+<p>
+
+<b>monday.label.short</b><br>
+The first initial of the label for "Monday".
+</p>
+<p>
+
+<b>tuesday.label.short</b><br>
+The first initial of the label for "Tuesday".
+</p>
+<p>
+
+<b>wednesday.label.short</b><br>
+The first initial of the label for "Wednesday".
+</p>
+<p>
+
+<b>thursday.label.short</b><br>
+The first initial of the label for "Thursday".
+</p>
+<p>
+
+<b>friday.label.short</b><br>
+The first initial of the label for "Friday".
+</p>
+<p>
+
+<b>saturday.label.short</b><br>
+The first initial of the label for "Saturday".
+</p>
+<p>
 
 <b>month_loop</b><br>
 A loop containing all the months in the calendar.
@@ -359,63 +440,6 @@ The name of this year.
 
 
 </blockquote>
-
-<b>sunday.label</b><br>
-A label representing "Sunday".
-<p>
-
-<b>monday.label</b><br>
-A label representing "Monday".
-<p>
-
-<b>tuesday.label</b><br>
-A label representing "Tuesday".
-<p>
-
-<b>wednesday.label</b><br>
-A label representing "Wednesday".
-<p>
-
-<b>thursday.label</b><br>
-A label representing "Thursday".
-<p>
-
-<b>friday.label</b><br>
-A label representing "Friday".
-<p>
-
-<b>saturday.label</b><br>
-A label representing "Saturday".
-<p>
-
-
-<b>sunday.label.short</b><br>
-The first initial of the label for "Sunday".
-<p>
-
-<b>monday.label.short</b><br>
-The first initial of the label for "Monday".
-<p>
-
-<b>tuesday.label.short</b><br>
-The first initial of the label for "Tuesday".
-<p>
-
-<b>wednesday.label.short</b><br>
-The first initial of the label for "Wednesday".
-<p>
-
-<b>thursday.label.short</b><br>
-The first initial of the label for "Thursday".
-<p>
-
-<b>friday.label.short</b><br>
-The first initial of the label for "Friday".
-<p>
-
-<b>saturday.label.short</b><br>
-The first initial of the label for "Saturday".
-<p>
 
 |,
 		lastUpdated => 1099548964
