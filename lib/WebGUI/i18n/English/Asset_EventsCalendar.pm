@@ -201,248 +201,288 @@ The translated label for the add event link.
 A label representing "Sunday".
 </p>
 
-<b>monday.label</b><br>
+<p>
+<b>monday.label</b><br />
 A label representing "Monday".
 </p>
-<p>
 
-<b>tuesday.label</b><br>
+<p>
+<b>tuesday.label</b><br />
 A label representing "Tuesday".
 </p>
-<p>
 
-<b>wednesday.label</b><br>
+<p>
+<b>wednesday.label</b><br />
 A label representing "Wednesday".
 </p>
-<p>
 
-<b>thursday.label</b><br>
+<p>
+<b>thursday.label</b><br />
 A label representing "Thursday".
 </p>
-<p>
 
-<b>friday.label</b><br>
+<p>
+<b>friday.label</b><br />
 A label representing "Friday".
 </p>
-<p>
 
-<b>saturday.label</b><br>
+<p>
+<b>saturday.label</b><br />
 A label representing "Saturday".
 </p>
+
 <p>
-
-
-<b>sunday.label.short</b><br>
+<b>sunday.label.short</b><br />
 The first initial of the label for "Sunday".
 </p>
-<p>
 
-<b>monday.label.short</b><br>
+<p>
+<b>monday.label.short</b><br />
 The first initial of the label for "Monday".
 </p>
-<p>
 
-<b>tuesday.label.short</b><br>
+<p>
+<b>tuesday.label.short</b><br />
 The first initial of the label for "Tuesday".
 </p>
-<p>
 
-<b>wednesday.label.short</b><br>
+<p>
+<b>wednesday.label.short</b><br />
 The first initial of the label for "Wednesday".
 </p>
-<p>
 
-<b>thursday.label.short</b><br>
+<p>
+<b>thursday.label.short</b><br />
 The first initial of the label for "Thursday".
 </p>
-<p>
 
-<b>friday.label.short</b><br>
+<p>
+<b>friday.label.short</b><br />
 The first initial of the label for "Friday".
 </p>
-<p>
 
-<b>saturday.label.short</b><br>
+<p>
+<b>saturday.label.short</b><br />
 The first initial of the label for "Saturday".
 </p>
-<p>
 
-<b>month_loop</b><br>
+<p>
+<b>month_loop</b><br />
 A loop containing all the months in the calendar.
-<p>
+</p>
 
 <blockquote>
 
-<b>daysInMonth</b><br>
+<p>
+<b>daysInMonth</b><br />
 The number of days in this month.
-<p>
+</p>
 
-<b>day_loop</b><br>
+<p>
+<b>day_loop</b><br />
 A loop containing all the days in the month.
-<p>
+</p>
 
 <blockquote>
 
-<b>dayOfWeek</b><br>
+<p>
+<b>dayOfWeek</b><br />
 The day number for the day in the week.
-<p>
+</p>
 
-<b>day</b><br>
+<p>
+<b>day</b><br />
 The day of the month.
-<p>
+</p>
 
-<b>isStartOfWeek</b><br>
+<p>
+<b>isStartOfWeek</b><br />
 A boolean indicating this is the first day in the week.
-<p>
+</p>
 
-<b>isEndOfWeek</b><br>
+<p>
+<b>isEndOfWeek</b><br />
 A boolean indicating this is the last day in the week.
-<p>
+</p>
 
-<b>isToday</b><br>
+<p>
+<b>isToday</b><br />
 A boolean indicating that this day is today.
-<p>
+</p>
 
-<b>event_loop</b><br>
+<p>
+<b>event_loop</b><br />
 A loop containing all of the events in this day.
-<p>
+</p>
 
 <blockquote>
 
-<b>description</b><br>
+<p>
+<b>description</b><br />
 The description or detail of this event.
-<p>
+</p>
 
-<b>name</b><br>
+<p>
+<b>name</b><br />
 The name or title of this event.
-<p>
+</p>
 
-<b>start.date.human</b><br>
+<p>
+<b>start.date.human</b><br />
 The human representation of the start date of this event.
-<p>
+</p>
 
-<b>start.time.human</b><br>
+<p>
+<b>start.time.human</b><br />
 The human representation of the start time of this event.
-<p>
+</p>
 
-<b>start.date.epoch</b><br>
+<p>
+<b>start.date.epoch</b><br />
 The epoch representation of the start date of this event.
-<p>
+</p>
 
-<b>start.year</b><br>
-The year this event starts.
 <p>
+<b>start.year</b><br />
+The 4-digit year this event starts.
+</p>
 
-<b>start.month</b><br>
-The month this event starts.
 <p>
+<b>start.month</b><br />
+The name of the month this event starts, internationalized.
+</p>
 
-<b>start.day</b><br>
+<p>
+<b>start.day</b><br />
 The day this event starts.
-<p>
+</p>
 
-<b>end.date.human</b><br>
+<p>
+<b>start.day.dayOfWeek</b><br />
+The name of the day of the week this event starts, internationalized.
+</p>
+
+<p>
+<b>end.date.human</b><br />
 The human representation of the end date of this event.
-<p>
+</p>
 
-<b>end.time.human</b><br>
+<p>
+<b>end.time.human</b><br />
 The human representation of the end time of this event.
-<p>
+</p>
 
-<b>end.date.epoch</b><br>
+<p>
+<b>end.date.epoch</b><br />
 The epoch representation of the end date of this event.
-<p>
+</p>
 
-<b>end.year</b><br>
-The year this event ends.
 <p>
+<b>end.year</b><br />
+The 4-digit year this event ends.
+</p>
 
-<b>end.month</b><br>
-The month this event ends.
 <p>
+<b>end.month</b><br />
+The name of the month this event ends, internationalized.
+</p>
 
-<b>end.day</b><br>
+<p>
+<b>end.day</b><br />
 The day this event ends.
-<p>
+</p>
 
-<b>startEndYearMatch</b><br>
+<p>
+<b>end.day.dayOfWeek</b><br />
+The name of the day of the week this event ends, internationalized.
+</p>
+
+<p>
+<b>startEndYearMatch</b><br />
 A boolean indicating whether the start and end year match.
-<p>
+</p>
 
-<b>startEndMonthMatch</b><br>
+<p>
+<b>startEndMonthMatch</b><br />
 A boolean indicating whether the start and end month match.
-<p>
+</p>
 
-<b>startEndDayMatch</b><br>
+<p>
+<b>startEndDayMatch</b><br />
 A boolean indicating whether the start and end day match.
-<p>
+</p>
 
-<b>isFirstDayOfEvent</b><br>
+<p>
+<b>isFirstDayOfEvent</b><br />
 A boolean indicating whether this day is the first day of the event.
-<p>
+</p>
 
-<b>dateIsSameAsPrevious</b><br>
+<p>
+<b>dateIsSameAsPrevious</b><br />
 A boolean indicating whether the start and end date of this event are the same as the previous event's start and end date.
-<p>
+</p>
 
-<b>daysInEvent</b><br>
+<p>
+<b>daysInEvent</b><br />
 The length of this event in days.
-<p>
+</p>
 
-<b>url</b><br>
+<p>
+<b>url</b><br />
 The URL to view this event in detail.
-<p>
-
-
+</p>
 
 </blockquote>
 
-
-<b>url</b><br>
+<p>
+<b>url</b><br />
 A URL to today's events.
-<p>
-
-
+</p>
 
 </blockquote>
 
-<b>prepad_loop</b><br>
+<p>
+<b>prepad_loop</b><br />
 A loop containing info to prepad the days in the month before the start day.
-<p>
+</p>
 
 <blockquote>
-<b>count</b><br>
-The day of the week for this pad.
-<p>
 
+<p>
+<b>count</b><br />
+The day of the week for this pad.
+</p>
 
 </blockquote>
 
-<b>postpad_loop</b><br>
+<p>
+<b>postpad_loop</b><br />
 A loop containing the info to postpad the days in the month after the last day.
-<p>
+</p>
 
 <blockquote>
-<b>count</b><br>
-The day of the week for this pad.
+
 <p>
+<b>count</b><br />
+The day of the week for this pad.
+</p>
 
 </blockquote>
 
-<b>month</b><br>
-The name of this month.
 <p>
+<b>month</b><br />
+The name of this month, internationalized.
+</p>
 
-<b>year</b><br>
-The name of this year.
 <p>
-
-
+<b>year</b><br />
+The 4 digit year in the current month of the month_loop.
+</p>
 
 </blockquote>
 
 |,
-		lastUpdated => 1099548964
+		lastUpdated => 1129765329
 	},
 
           '509' => {
