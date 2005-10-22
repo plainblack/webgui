@@ -57,17 +57,19 @@ checkModule("Tie::IxHash",1.21);
 checkModule("Tie::CPHash",1.001);
 checkModule("XML::Simple",2.09);
 checkModule("SOAP::Lite",0.60);
-checkModule("Time::HiRes",1.38);
+checkModule("DateTime",0.2901);
+checkModule("DateTime::HiRes",0.01);
+checkModule("DateTime::Cron::Simple",0.2);
 checkModule("Image::Magick",5.47,1);
 checkModule("Log::Log4perl",0.51);
 checkModule("Net::LDAP",0.25);
-checkModule("Date::Manip",5.42);
 checkModule("HTML::Highlight",0.20);
 checkModule("HTML::TagFilter",0.07);
 checkModule("HTML::Template",2.7);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
-checkModule("DBIx::FullTextSearch",0.73);
+checkModule("POE",0.3202);
+checkModule("POE::Component::IKC::Server",0.1801);
 
 ###################################
 # Checking WebGUI

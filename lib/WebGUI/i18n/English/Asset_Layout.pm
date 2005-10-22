@@ -2,50 +2,50 @@ package WebGUI::i18n::English::Asset_Layout;
 
 our $I18N = {
 	'assetName' => {
-		message => q|Page|,
+		message => q|Page / Layout|,
         	lastUpdated => 1128832065,
 		context=>q|The name of the layout asset.|
 	},
 
 	'layout add/edit title' => {
-		message => q|Page, Add/Edit|,
+		message => q|Page / Layout, Add/Edit|,
         	lastUpdated => 1106683494,
 	},
 
 	'layout add/edit body' => {
                 message => q|
-<p>Page Assets are used to display multiple Assets on the same time, much like
-Pages in version 5 of WebGUI.  The Page Asset consists of a template with
-multiple content areas, and Assets that are children of the Page can be assigned
+<p>Page / Layout Assets are used to display multiple Assets on the same time, much like
+Page / Layouts in version 5 of WebGUI.  The Page / Layout Asset consists of a template with
+multiple content areas, and Assets that are children of the Page / Layout can be assigned
 to be displayed in those areas.
 
-<p>Page Assets are Wobjects and Assets, and share the same properties of both.  Page
+<p>Page / Layout Assets are Wobjects and Assets, and share the same properties of both.  Page / Layout
 Assets also have these unique properties:</p>|,
-		context => 'Describing Page Add/Edit form specific fields',
+		context => 'Describing Page / Layout Add/Edit form specific fields',
 		lastUpdated => 1119410129,
 	},
 
         'template description' => {
-                message => q|Choose a template from the list to display the contents of the Page Asset and
+                message => q|Choose a template from the list to display the contents of the Page / Layout Asset and
 its children.
 <p/>|,
                 lastUpdated => 1119410080,
         },
 
         'assets to hide description' => {
-                message => q|This list contains one checkbox for each child Asset of the Page.  Select the
-checkbox for any Asset that you do not want displayed in the Page Asset.
+                message => q|This list contains one checkbox for each child Asset of the Page / Layout.  Select the
+checkbox for any Asset that you do not want displayed in the Page / Layout Asset.
 <p/>|,
                 lastUpdated => 1119410080,
         },
 
 	'layout template title' => {
-		message => q|Page Template|,
+		message => q|Page / Layout Template|,
         	lastUpdated => 1109987374,
 	},
 
 	'layout template body' => {
-                message => q|<p>The following variables are available in Page Templates:</p>
+                message => q|<p>The following variables are available in Page / Layout Templates:</p>
 
 <P><b>showAdmin</b><br/>
 A conditional showing if the current user has turned on Admin Mode and can edit this Asset.
