@@ -3,6 +3,7 @@
  - Fixed a caching bug in the user system.
  - Fixed a problem in the user system for negating macros on profile fields.
  - Added a missing use statement in Storage
+ - Renamed the "Page" asset to "Page Layout" for clarity.
  - fix [1329023] Doc for EventsCalendar
 
 6.7.7
