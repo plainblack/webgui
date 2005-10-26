@@ -33,8 +33,8 @@ our $I18N = {
         },
 
 	'73' => {
-		message => q||,
-		lastUpdated => 1119072931
+		message => q|<p>Event Assets are created when Events are added to an Events Calendar.</p>|,
+		lastUpdated => 1130294387
 	},
 
 	'96' => {
@@ -94,27 +94,16 @@ The URL to delete this event.
 The translated label for the delete URL.
 <p/>
 
-<b>previous.url</b><br/>
-The URL to view the event before this one.
-<p/>
-
-<b>previous.label</b><br/>
-The translated label for the previous URL.
-<p/>
-
-<b>next.label</b><br/>
-The translated label for the next URL.
-<p/>
-
-<b>next.url</b><br/>
-The URL to view the event after this one.
-<p/>
-
 <b>description</b><br/>
 The description of this event.
 <p/>
+
+<b>eventLocation</b><br/>
+Where the event will occur.
+<p/>
+
 |,
-		lastUpdated => 1099536774
+		lastUpdated => 1130293978,
 	},
 
           '519' => {
@@ -189,10 +178,6 @@ The description of this event.
                     'lastUpdated' => 1031514049,
                     'message' => 'Start Date'
                   },
-          '92' => {
-                    'lastUpdated' => 1038202281,
-                    'message' => 'Previous Event'
-                  },
           '529' => {
                      'lastUpdated' => 1108397891,
                      'message' => 'Registration Confirmation (Accept/Cancel) Template'
@@ -236,10 +221,6 @@ The description of this event.
           '77' => {
                     'lastUpdated' => 1031514049,
                     'message' => 'Delete this event <b>and</b> all of its recurrences.'
-                  },
-          '93' => {
-                    'lastUpdated' => 1038202290,
-                    'message' => 'Next Event'
                   },
           '514' => {
                      'lastUpdated' => 1108397891,
