@@ -15,9 +15,15 @@ our $I18N = {
 		context => 'Describing file add/edit form specific fields',
 		lastUpdated => 1119068839,
 	},
+
 	'file template title' => {
-		message => q|File, Template|,
-        	lastUpdated => 1109287565,
+		message => q|File Template|,
+        	lastUpdated => 1130456105,
+	},
+
+	'file template description' => {
+		message => q|File templates allow you to display information about the file, such as its filename, size or an icon representing the file type.|,
+        	lastUpdated => 1130456105,
 	},
 
 	'file template body' => {
