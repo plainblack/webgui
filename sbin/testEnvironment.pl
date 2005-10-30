@@ -69,7 +69,7 @@ checkModule("HTML::Template",2.7);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
 checkModule("POE",0.3202);
-checkModule("POE::Component::IKC::Server",0.1801);
+checkModule("POE::Component::IKC::Server",0.18);
 
 ###################################
 # Checking WebGUI
