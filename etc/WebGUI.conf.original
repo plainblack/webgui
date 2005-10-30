@@ -1,4 +1,4 @@
-# Add a comma seperated list of the names this site can use.
+# Add a comma separated list of the names this site can use.
 
 sitename = www.example.com, example.com
 
@@ -41,7 +41,7 @@ fileCacheSizeLimit=100000000
 # Support for the memcached distributed caching system.
 # See http://www.danga.com/memcached/ for details on memcached.
 # Uncomment this and point it to your memcached server(s). Use a
-# comma seperated list for multiple servers.
+# comma separated list for multiple servers.
 
 # memcached_servers = 10.0.0.6:11211
 
@@ -100,7 +100,7 @@ authMethods = LDAP, WebGUI
 
 paymentPlugins = ITransact
 
-# Lisst the shipping plugins you have installed and wish to be
+# List the shipping plugins you have installed and wish to be
 # available for configuration on the site.
 
 shippingPlugins = ByPrice, ByWeight, PerTransaction
@@ -126,7 +126,7 @@ assets = WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
 	WebGUI::Asset::Wobject::WSClient
 
-# Specifiy the list of assets you want to appear in your add
+# Specify the list of assets you want to appear in your add
 # content menus that should act as containers for other content.
 # These items are typically not content themselves, but rather
 # layout mechanisms.
@@ -151,7 +151,7 @@ utilityAssets = WebGUI::Asset::Template, \
 #	WebGUI:::Asset::Template => 4
 
 # Optionally override the default UI Level of any asset. This
-# dermines whether the current user has the appropriate UI Level
+# determines whether the current user has the appropriate UI Level
 # to add assets of that type.
 
 #assetUiLevel = WebGUI::Asset::Wobject::WSClient => 7,
@@ -159,7 +159,7 @@ utilityAssets = WebGUI::Asset::Template, \
 
 # You can override the UI Levels of any field in the edit form of
 # any asset using the following variables. Basically just take the
-# class name of the asset seperated by underscores, and append
+# class name of the asset separated by underscores, and append
 # _uiLevel to the end of it, then you can start specifying field
 # names and associated UI Level.
 
@@ -167,7 +167,7 @@ utilityAssets = WebGUI::Asset::Template, \
 #WebGUI_Asset_RichEdit = askAboutRichEdit => 7, preformatted => 3
 
 # If exportPath is defined, an "Export" toolbar icon will appear
-# which allows you to export assets to static html. This folder
+# which allows you to export assets to static HTML. This folder
 # needs to be writable by your web server.
 
 #exportPath = /path/to/export
@@ -233,7 +233,7 @@ macros=# => Hash_userId, \
         r => r_printable, \
         u => u_companyUrl
 
-# A comma seperated list of scheduler plugins that you do NOT want
+# A comma separated list of scheduler plugins that you do NOT want
 # to run. Normally there's no reason to use this option.
 
 #excludeHourly = 
