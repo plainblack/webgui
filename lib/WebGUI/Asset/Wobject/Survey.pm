@@ -73,7 +73,7 @@ sub definition {
                 properties	=> {
 			templateId => {
 				fieldType	=> 'template',
-				deafultValue	=> 'PBtmpl0000000000000061'
+				defaultValue	=> 'PBtmpl0000000000000061'
 				},
 			Survey_id => {
 				fieldType	=> 'text',
