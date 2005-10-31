@@ -6,6 +6,7 @@
  - Renamed the "Page" asset to "Page Layout" for clarity.
  - fix [1329023] Doc for EventsCalendar
  - fix [1336414] All default profile fields not protected
+ - fix [ 1343269 ] add Content Profiling field yesNo type i18n
 
 6.7.7
  - added two new template variables to the EventsCalendar - 
