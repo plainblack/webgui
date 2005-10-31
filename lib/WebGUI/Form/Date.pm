@@ -125,7 +125,12 @@ Renders a date picker control.
 
 sub toHtml {
         my $self = shift;
-	$self->{value} = WebGUI::DateTime::epochToSet($self->{value}) unless ($self->{noDate} && $self->{value} eq '');
+	if ($self->{noDate} ) {
+		$self->{value} = '';
+	}
+	else {
+		$self->{value} = WebGUI::DateTime::epochToSet($self->{value});
+	}
 	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
 	unless ($language) {
 		$language = WebGUI::International::getLanguage("English","languageAbbreviation");

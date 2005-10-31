@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.7.7
+--------------------------------------------------------------------
+ * The WebGUI::Form::Date module's noDate switch previously depended on
+   the value that was passed in as well as that switch being set to
+   clear the date.  This has been changed so that the value is blank
+   if only the switch is set.
+
 6.7.0
 --------------------------------------------------------------------
  * In order to upgrade to 6.7 you must first upgrade to 6.6.
