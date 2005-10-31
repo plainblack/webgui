@@ -231,6 +231,7 @@ sub www_edit {
 	$tabform->getTab("display")->template(
 		-value=>$self->get("templateId"),
 		-namespace=>"ImageAsset",
+		-hoverHelp=>WebGUI::International::get('image template description','Asset_Image'),
 		-defaultValue=>"PBtmpl0000000000000088"
 		);
         $self->getAdminConsole->setHelp("image add/edit","Asset_Image");
@@ -254,18 +255,24 @@ sub www_resize {
 	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
        	$f->readOnly(
 		-label=>WebGUI::International::get('image size', 'Asset_Image'),
-		-value=>$x.' x '.$y
+		-hoverHelp=>WebGUI::International::get('image size description', 'Asset_Image'),
+		-value=>$x.' x '.$y,
 		);
 	$f->integer(
 		-label=>WebGUI::International::get('new width','Asset_Image'),
-		-name=>"newWidth"
+		-hoverHelp=>WebGUI::International::get('new width description','Asset_Image'),
+		-name=>"newWidth",
+		-value=>$x,
 		);
 	$f->integer(
 		-label=>WebGUI::International::get('new height','Asset_Image'),
-		-name=>"newHeight"
+		-hoverHelp=>WebGUI::International::get('new height description','Asset_Image'),
+		-name=>"newHeight",
+		-value=>$y,
 		);
 	$f->submit;
 	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" border="1" alt="'.$self->get("filename").'" /></div>';
+        $self->getAdminConsole->setHelp("image resize","Asset_Image");
         return $self->getAdminConsole->render($f->print.$image,WebGUI::International::get("resize image","Asset_Image"));
 }
 

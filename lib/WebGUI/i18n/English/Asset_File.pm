@@ -15,32 +15,44 @@ our $I18N = {
 		context => 'Describing file add/edit form specific fields',
 		lastUpdated => 1119068839,
 	},
+
 	'file template title' => {
-		message => q|File, Template|,
-        	lastUpdated => 1109287565,
+		message => q|File Template|,
+        	lastUpdated => 1130456105,
+	},
+
+	'file template description' => {
+		message => q|File templates allow you to display information about the file, such as its filename, size or an icon representing the file type.|,
+        	lastUpdated => 1130456105,
 	},
 
 	'file template body' => {
                 message => q|<p>The following variables are available in File Templates:</p>
 
-<P><b>attachment.icon</b><br/>
+<P><b>fileIcon</b><br/>
 The icon which describes the type of file.
 
-<P><b>attachment.url</b><br/>
+<P><b>fileUrl</b><br/>
 The URL to the file.
 
-<P><b>attachment.name</b><br/>
+<P><b>controls</b><br/>
+A toolbar for working with the file.
+
+<P><b>filename</b><br/>
 The name of the file.
 
-<P><b>attachment.size</b><br/>
-The size of the file.
+<P><b>storageId</b><br/>
+The internal storage ID used for the file.
 
-<P><b>attachment.type</b><br/>
-The type of the file (PDF, etc.)
+<P><b>title</b><br/>
+The title set for the file when it was uploaded, or the filename if none was entered.
+
+<P><b>menuTitle</b><br/>
+The menu title, displayed in navigations, set for the file when it was uploaded, or the filename if none was entered.
 
 		|,
 		context => 'Describing the file template variables',
-		lastUpdated => 1109287834,
+		lastUpdated => 1130439830,
 	},
 
 

@@ -16,6 +16,11 @@ our $HELP = {
 				description => 'current file description',
 				namespace => 'Asset_File',
 			},
+                        {
+                                title => 'file template title',
+                                description => 'file template description',
+                                namespace => 'Asset_File',
+                        },
 		],
 		related => [
 			{
