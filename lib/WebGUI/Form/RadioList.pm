@@ -97,6 +97,13 @@ Renders a series of radio buttons.
 sub toHtml {
 	my $self = shift;
 	my $output;
+	my $alignment;
+	if ($self->{vertical}) {
+		$alignment = "<br />\n";
+	}
+	else {
+		$alignment = " &nbsp; &nbsp;\n";
+	}
 	foreach my $key (keys %{$self->{options}}) {
                 my $checked = 0;
                 if ($self->{value} eq $key) {
@@ -108,12 +115,7 @@ sub toHtml {
                         extras=>$self->{extras},
                         checked=>$checked
                         })->toHtml;
-                $output .= ${$self->{options}}{$key};
-                if ($self->{vertical}) {
-                        $output .= "<br />\n";
-                } else {
-                        $output .= " &nbsp; &nbsp;\n";
-                }
+                $output .= ${$self->{options}}{$key} . $alignment;
         }
         return $output;
 }
