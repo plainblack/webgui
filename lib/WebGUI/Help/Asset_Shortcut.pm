@@ -21,6 +21,11 @@ our $HELP = {
                                 namespace => 'Asset_Shortcut',
                         },
                         {
+                                title => '10',
+                                description => '10 description',
+                                namespace => 'Asset_Shortcut',
+                        },
+                        {
                                 title => '7',
                                 description => '7 description',
                                 namespace => 'Asset_Shortcut',
@@ -38,11 +43,6 @@ our $HELP = {
                         {
                                 title => '1',
                                 description => '1 description',
-                                namespace => 'Asset_Shortcut',
-                        },
-                        {
-                                title => '10',
-                                description => '10 description',
                                 namespace => 'Asset_Shortcut',
                         },
                         {
