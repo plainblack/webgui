@@ -32,6 +32,16 @@ our $HELP = {
                                 namespace => 'Asset_RichEdit',
                         },
                         {
+                                title => 'source editor height',
+                                description => 'source editor height description',
+                                namespace => 'Asset_RichEdit',
+                        },
+                        {
+                                title => 'source editor width',
+                                description => 'source editor width description',
+                                namespace => 'Asset_RichEdit',
+                        },
+                        {
                                 title => 'use br',
                                 description => 'use br description',
                                 namespace => 'Asset_RichEdit',
