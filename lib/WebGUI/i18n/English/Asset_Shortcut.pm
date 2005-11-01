@@ -59,14 +59,13 @@ our $I18N = {
 	},
 
 	'6' => {
-		message => q|With the shortcut you can mirror an asset. This is useful if you want to reuse the same content in multiple sections of your site.
-<p>
+		message => q|<p>With the Shortcut you can mirror an asset in another location. This is useful if you want to reuse the same content in multiple sections of your site.</p>
 
-<b>NOTES:</b><br/>
+<p><b>NOTES:</b><br />
 The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each Asset's toolbar.
-<p>
+</p>
 |,
-		lastUpdated => 1119905819,
+		lastUpdated => 1130878635,
 	},
 
         '85 description' => {
