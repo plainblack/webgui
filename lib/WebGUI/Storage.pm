@@ -186,6 +186,10 @@ Grabs an attachment from a form POST and saves it to this storage location.
 
 Provide the form variable name to which the file being uploaded is assigned. Note that if multiple files are uploaded with the same formVariableName then they'll all be stored in the storage location, but only the last filename will be returned. Use the getFiles() method on the storage location to get all the filenames stored.
 
+=head3 attachmentLimit
+
+Limit the number of files that will be uploaded.  If null, undef or 0, 99999 will be used as a default.
+
 =cut
 
 sub addFileFromFormPost {
