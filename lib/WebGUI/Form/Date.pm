@@ -61,7 +61,7 @@ Defaults to 10. The displayed size of the box for the date to be typed in.
 
 =head4 noDate
 
-By default a date is placed in the value field. Set this to "1" to leave it empty.
+A default date is placed in the value field. Set this to "1" to leave it empty.
 
 =head4 defaultValue
 
@@ -125,7 +125,7 @@ Renders a date picker control.
 
 sub toHtml {
         my $self = shift;
-	if ($self->{noDate} ) {
+	if ($self->{_defaulted} && $self->{noDate} ) {
 		$self->{value} = '';
 	}
 	else {
