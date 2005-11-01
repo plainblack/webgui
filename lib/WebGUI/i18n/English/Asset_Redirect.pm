@@ -18,10 +18,8 @@ our $I18N = {
 <P>The Page Redirect Asset causes the user's browser to be redirected to another page. It does this if it is viewed standalone, as part of a Page Asset, or proxied via a macro.</P>
 <P><b>NOTE:</b> The redirection will be disabled while in admin mode in order to allow editing the properties of the page.</P>
 
-<b>Redirect URL</b><br>
-The URL where the user will be redirected.
 |,
-        	lastUpdated => 1119574115,
+        	lastUpdated => 1130876050,
 		context => 'Help text for redirects',
 	},
 
