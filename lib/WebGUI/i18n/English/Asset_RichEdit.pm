@@ -372,13 +372,23 @@ option is set to Yes, then all whitespace entered into the form will be preserve
         },
 
         'editor height description' => {
-                message => q|The height of the Rich Editor, in pixels|,
-                lastUpdated => 1119584875,
+                message => q|The height of the entire Rich Editor, including editing controls, in pixels|,
+                lastUpdated => 1130878323,
         },
 
         'editor width description' => {
-                message => q|The width of the Rich Editor, in pixels|,
-                lastUpdated => 1119584875,
+                message => q|The width of the entire Rich Editor, including editing controls, in pixels|,
+                lastUpdated => 1130878326,
+        },
+
+        'source editor height description' => {
+                message => q|The height of the area in the Rich Editor where the user can enter code, in pixels|,
+                lastUpdated => 1130877981,
+        },
+
+        'source editor width description' => {
+                message => q|The width of the area in the Rich Editor where the user can enter code, in pixels|,
+                lastUpdated => 1130877982,
         },
 
         'use br description' => {
@@ -407,8 +417,9 @@ option is set to Yes, then all whitespace entered into the form will be preserve
         },
 
         'css file description' => {
-                message => q|Specifies a CSS file used to style the contents of the editor.|,
-                lastUpdated => 1119584875,
+                message => q|Specifies a CSS file used to style the contents of the editor.  If no CSS file is specified, a
+		default will be used.|,
+                lastUpdated => 1130878079,
         },
 
         'enable context menu description' => {
