@@ -80,6 +80,11 @@ The starting value for the field.
 
 If no starting value is specified, this will be used instead.
 
+=head4 _defaulted
+
+This flag indicates that the defaultValue was used.  It is used by Form types that support
+an initial blank field, instead of using a default, like WebGUI::Form::Date.pm
+
 =head4 extras
 
 Add extra attributes to the form tag like 
@@ -145,6 +150,9 @@ sub definition {
 			},
 		defaultValue=>{
 			defaultValue=>undef
+			},
+		_defaulted=>{
+			defaultValue=>0
 			},
 		label=>{
 			defaultValue=>undef
@@ -353,8 +361,11 @@ sub new {
 		}
 	}
 	# if the value field is undefined, lets use the defaultValue field instead
+	# the _defaulted field is used to tell form fields that support noDate/noValue
+	# options whether the field can be safely cleared or not.
 	unless (exists $params{value}) {
 		$params{value} = $params{defaultValue};
+		$params{_defaulted} = 1;
 	}
 	# doesn't have an id specified, so let's give it one
 	unless ($params{id}) {
