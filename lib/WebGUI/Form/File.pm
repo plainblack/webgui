@@ -100,7 +100,7 @@ sub getValueFromPost {
 	my $self = shift;
 	my $storage = WebGUI::Storage->create;
         $storage->addFileFromFormPost($self->{name});
-	my @files = $storage->getFiles;
+	my @files = @{ $storage->getFiles };
 	if (scalar(@files) < 1) {
 		$storage->delete;
 		return undef;
