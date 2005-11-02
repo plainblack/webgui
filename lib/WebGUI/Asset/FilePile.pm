@@ -141,7 +141,7 @@ sub edit {
        		);
 	$tabform->getTab("properties")->file(
 		-label=>WebGUI::International::get("upload files", "Asset_FilePile"),
-		-hoverHelp=>WebGUI::International::get("upload files", "Asset_FilePile"),
+		-hoverHelp=>WebGUI::International::get("upload files description", "Asset_FilePile"),
 		-maxAttachments=>100
 		);
         $self->getAdminConsole->setHelp("file pile add/edit","Asset_FilePile");
