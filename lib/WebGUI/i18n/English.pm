@@ -6,8 +6,8 @@ use strict;
 our $LANGUAGE = {
 	label => 'English',
 	toolbar => 'metal',
-	languageAbbreviation => 'en',
-	locale => 'US'
+	languageAbbreviation => 'en', 	# used by plugins such as javascript helpers and third-party perl modules
+	locale => 'US'			# same as above
 };
 
 sub makeUrlCompliant {

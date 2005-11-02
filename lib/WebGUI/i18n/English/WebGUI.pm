@@ -41,11 +41,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'32' => {
-		message => q|Friday|,
-		lastUpdated => 1031514049
-	},
-
 	'443' => {
 		message => q|Home Information|,
 		lastUpdated => 1031514049
@@ -127,11 +122,6 @@ our $I18N = {
 		lastUpdated => 1065356764
 	},
 
-	'31' => {
-		message => q|Thursday|,
-		lastUpdated => 1031514049
-	},
-
 	'578' => {
 		message => q|You have a pending message to approve.|,
 		lastUpdated => 1031514049
@@ -167,11 +157,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'29' => {
-		message => q|Tuesday|,
-		lastUpdated => 1031514049
-	},
-
 	'889' => {
 		message => q|Style Sheets, Tabs|,
 		lastUpdated => 1046067380
@@ -199,11 +184,6 @@ our $I18N = {
 
 	'58' => {
 		message => q|I already have an account.|,
-		lastUpdated => 1031514049
-	},
-
-	'15' => {
-		message => q|January|,
 		lastUpdated => 1031514049
 	},
 
@@ -317,11 +297,6 @@ our $I18N = {
 		lastUpdated => 1056151382
 	},
 
-	'23' => {
-		message => q|September|,
-		lastUpdated => 1031514049
-	},
-
 	'364' => {
 		message => q|Search|,
 		lastUpdated => 1031514049
@@ -395,11 +370,6 @@ Be aware that any database links you create here will be available to all conten
 	'743' => {
 		message => q|You must specify a valid email address in order to attempt to recover your password.|,
 		lastUpdated => 1035246389
-	},
-
-	'21' => {
-		message => q|July|,
-		lastUpdated => 1031514049
 	},
 
 	'523' => {
@@ -718,11 +688,6 @@ to add or remove user from their groups.
 		lastUpdated => 1037583186
 	},
 
-	'22' => {
-		message => q|August|,
-		lastUpdated => 1031514049
-	},
-
 	'42' => {
 		message => q|Please Confirm|,
 		lastUpdated => 1031514049
@@ -788,11 +753,6 @@ to add or remove user from their groups.
 		lastUpdated => 1031514049
 	},
 
-	'27' => {
-		message => q|Sunday|,
-		lastUpdated => 1031514049
-	},
-
 	'161' => {
 		message => q|Submitted By|,
 		lastUpdated => 1031514049
@@ -821,11 +781,6 @@ to add or remove user from their groups.
 	'744' => {
 		message => q|What next?|,
 		lastUpdated => 1035864828
-	},
-
-	'20' => {
-		message => q|June|,
-		lastUpdated => 1031514049
 	},
 
 	'1011' => {
@@ -938,11 +893,6 @@ That particular example will help you get good ranking on search engines.
 		lastUpdated => 1031514049
 	},
 
-	'17' => {
-		message => q|March|,
-		lastUpdated => 1031514049
-	},
-
 	'333' => {
 		message => q|Work Country|,
 		lastUpdated => 1031514049
@@ -1044,11 +994,6 @@ removed from the system after a set period of time.  That period of time is set 
 		lastUpdated => 1031514049
 	},
 
-	'33' => {
-		message => q|Saturday|,
-		lastUpdated => 1031514049
-	},
-
 	'660' => {
 		message => q|Groups, Manage|,
 		lastUpdated => 1031514049
@@ -1061,11 +1006,6 @@ removed from the system after a set period of time.  That period of time is set 
 
 	'428' => {
 		message => q|User (ID)|,
-		lastUpdated => 1031514049
-	},
-
-	'26' => {
-		message => q|December|,
 		lastUpdated => 1031514049
 	},
 
@@ -1417,11 +1357,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 		lastUpdated => 1057208065
 	},
 
-	'28' => {
-		message => q|Monday|,
-		lastUpdated => 1031514049
-	},
-
 	'40' => {
 		message => q|Vital Component|,
 		lastUpdated => 1031514049
@@ -1600,11 +1535,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	'730' => {
 		message => q|1 Novice|,
 		lastUpdated => 1033836642
-	},
-
-	'16' => {
-		message => q|February|,
-		lastUpdated => 1031514049
 	},
 
 	'1069' => {
@@ -1897,11 +1827,6 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 	'970' => {
 		message => q|set time|,
 		lastUpdated => 1053278089
-	},
-
-	'24' => {
-		message => q|October|,
-		lastUpdated => 1031514049
 	},
 
 	'858' => {
@@ -2437,11 +2362,6 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 		lastUpdated => 1031514049
 	},
 
-	'25' => {
-		message => q|November|,
-		lastUpdated => 1031514049
-	},
-        
 	'738' => {
 		message => q|9 Guru|,
 		lastUpdated => 1033836704
@@ -2661,11 +2581,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 
 	'537' => {
 		message => q|Karma|,
-		lastUpdated => 1031514049
-	},
-
-	'18' => {
-		message => q|April|,
 		lastUpdated => 1031514049
 	},
 
@@ -3130,11 +3045,6 @@ that Asset and all Assets below it.</p>
 		lastUpdated => 1031514049
 	},
 
-	'19' => {
-		message => q|May|,
-		lastUpdated => 1031514049
-	},
-
 	'54' => {
 		message => q|Create Account|,
 		lastUpdated => 1031514049
@@ -3177,11 +3087,6 @@ that Asset and all Assets below it.</p>
 
 	'141' => {
 		message => q|Not Found Page|,
-		lastUpdated => 1031514049
-	},
-
-	'30' => {
-		message => q|Wednesday|,
 		lastUpdated => 1031514049
 	},
 

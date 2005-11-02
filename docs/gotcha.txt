@@ -11,10 +11,16 @@ save you many hours of grief.
 --------------------------------------------------------------------
  * Before upgrading you must install the following new Perl modules:
 	DateTime
-	DateTime::HiRes
+	DateTime::Format::Strptime
 	DateTime::Cron::Simple
  	POE
 	POE::Component::IKC::Server
+
+ * The API has changed. Check docs/migration.txt for details.
+
+ * Due to the performance increase achieved by switching to DateTime we
+	no longer need date caching so the enableDateCache directive can
+	be removed from your config file.
 
 
 

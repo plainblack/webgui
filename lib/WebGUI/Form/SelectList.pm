@@ -22,7 +22,7 @@ use WebGUI::Session;
 
 =head1 NAME
 
-Package WebGUI::Form::selectList
+Package WebGUI::Form::SelectList
 
 =head1 DESCRIPTION
 

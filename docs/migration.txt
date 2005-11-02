@@ -481,3 +481,11 @@ by any WebGUI core package since 6.3 and wasn't really used much prior to that.
 If you were using it, just copy it's subs into your app.
 
 
+5.22 DateTime API Changed Slightly
+
+In 6.8.0, as a result of migrating the DateTime API away from Date::Manip and 
+to DateTime we've eliminated the need for several utility functions, and
+therefore removed them. This shouldn't affect almost anybody, but we're
+mentioning it just in case you're using WebGUI::DateTime in an odd mannner.
+They are: epochToDate, dateToEpoch, epochToArray, arrayToEpoch
+

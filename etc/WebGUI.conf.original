@@ -45,14 +45,6 @@ fileCacheSizeLimit=100000000
 
 # memcached_servers = 10.0.0.6:11211
 
-# If you enable date caching you can speed up your sites a little
-# bit. If you use a lot of events calendars, this is highly
-# recommended. However, note that this will likely create 
-# several hundred megabytes of cache files that are shared
-# between your various sites that have date caching enabled
-
-enableDateCache = 0
-
 # Set this to 1 to disable WebGUI's caching subsystems. This is
 # mainly useful for developers.
 

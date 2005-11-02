@@ -44,22 +44,23 @@ use Net::SMTP ();
 use Log::Log4perl ();
 use Tie::IxHash ();
 use Tie::CPHash ();
+use Time::HiRes ();
 use DateTime ();
-use DateTime::HiRes ();
+use DateTime::Format::Strptime ();
+use DateTime::TimeZone ();
 use Image::Magick ();
 use Storable;
 use XML::Simple ();
+use Compress::Zlib (); 
+use Archive::Tar ();
+use IO::Zlib ();
 
 ####
 # less commonly used so you may not want them to load into memory
 ###
-#use Compress::Zlib (); # used only by themes
-#use Archive::Tar (); # used only by themes
-#use IO::Zlib (); # used only by themes
 #use SOAP::Lite (); # used only by WS Client
 #use Net::LDAP (); # used only by LDAP authentication module
 #use XML::RSSLite (); # used only by syndicated content wobject
-#use DBIx::FullTextSearch (); #used only by search engine
 #use HTML::Highlight (); # used only by search engine
 
 
@@ -139,6 +140,7 @@ use WebGUI::i18n::English::Asset_Navigation ();
 #use WebGUI::i18n::English::AuthLDAP ();
 use WebGUI::i18n::English::AuthWebGUI ();
 use WebGUI::i18n::English::WebGUI ();
+use WebGUI::i18n::English::DateTime ();
 use WebGUI::i18n::English::WebGUIProfile ();
 
 # you can significantly reduce your memory usage by preloading the plugins used on your sites, only the most commonly used ones are preloaded by default
@@ -156,9 +158,7 @@ use WebGUI::Asset::Wobject::Collaboration ();
 
 # auth methods
 use WebGUI::Auth::WebGUI ();
-
-#use Net::LDAP ();  # used by ldap authentication
-use WebGUI::Auth::LDAP ();
+#use WebGUI::Auth::LDAP ();
 
 # macros
 use WebGUI::Macro::AdminBar ();
