@@ -160,7 +160,7 @@ Moves list of assets to trash, returns www_manageAssets() method of self if canE
 sub www_deleteList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $assetId ($session{cgi}->param("assetId")) {
+	foreach my $assetId ($session{req}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			$asset->trash;
@@ -245,7 +245,7 @@ Restores a piece of content from the trash back to it's original location.
 sub www_restoreList {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        foreach my $id ($session{cgi}->param("assetId")) {
+        foreach my $id ($session{req}->param("assetId")) {
                 my $asset = WebGUI::Asset->newByDynamicClass($id);
                 $asset->publish;
         }

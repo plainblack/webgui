@@ -112,7 +112,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::setToEpoch($session{cgi}->param($self->{name}));
+	return WebGUI::DateTime::setToEpoch($session{req}->param($self->{name}));
 }
 
 #-------------------------------------------------------------------

@@ -61,7 +61,7 @@ Returns a hex color like "#000000". Returns undef if the return value is not a v
 
 sub getValueFromPost {
 	my $self = shift;
-	my $color = $session{cgi}->param($self->{name});
+	my $color = $session{req}->param($self->{name});
         return undef unless $color =~ /\#\w{6}/;
         return $color;
 }

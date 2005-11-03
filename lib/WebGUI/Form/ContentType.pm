@@ -103,7 +103,7 @@ Returns either what's posted or if nothing comes back it returns "mixed".
 
 sub getValueFromPost {
 	my $self = shift;
-	return $session{cgi}->param($self->{name}) || "mixed";
+	return $session{req}->param($self->{name}) || "mixed";
 }
 
 #-------------------------------------------------------------------

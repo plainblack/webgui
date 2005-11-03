@@ -99,7 +99,7 @@ Returns the number of seconds since 00:00:00 on a 24 hour clock. Note, this will
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::timeToSeconds($session{cgi}->param($self->{name}))-($session{user}{timeOffset}*3600);
+	return WebGUI::DateTime::timeToSeconds($session{req}->param($self->{name}))-($session{user}{timeOffset}*3600);
 }
 
 #-------------------------------------------------------------------

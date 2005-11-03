@@ -103,7 +103,7 @@ Returns the integer from the form post, or returns 0.0 if the post result is inv
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{cgi}->param($self->{name});
+	my $value = $session{req}->param($self->{name});
 	if ($value =~ /^[\d\-\.]+$/) {
                 return $value;
         }

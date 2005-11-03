@@ -258,9 +258,9 @@ sub view {
 
 		# Deal with pagination
 		my $url = "query=".WebGUI::URL::escape($var{query});
-		map {$url .= "&users=".WebGUI::URL::escape($_)} $session{cgi}->param('users');
-		map {$url .= "&namespaces=".WebGUI::URL::escape($_)} $session{cgi}->param('namespaces');
-		map {$url .= "&contentTypes=".WebGUI::URL::escape($_)} $session{cgi}->param('contentTypes');
+		map {$url .= "&users=".WebGUI::URL::escape($_)} $session{req}->param('users');
+		map {$url .= "&namespaces=".WebGUI::URL::escape($_)} $session{req}->param('namespaces');
+		map {$url .= "&contentTypes=".WebGUI::URL::escape($_)} $session{req}->param('contentTypes');
 		$url .= "&paginateAfter=".$self->getValue("paginateAfter");
 		my $p = WebGUI::Paginator->new(WebGUI::URL::page($url), $self->getValue("paginateAfter"));
 		$p->setDataByArrayRef($results);
@@ -293,8 +293,8 @@ sub view {
 	my $namespaces = $self->_getNamespaces('restricted');
 	foreach(keys %$namespaces) {
 		my $selected = 0;
-		if (scalar $session{cgi}->param('namespaces')) {
-			$selected = isIn($_, $session{cgi}->param('namespaces'));
+		if (scalar $session{req}->param('namespaces')) {
+			$selected = isIn($_, $session{req}->param('namespaces'));
 		} else {
 			$selected = ($session{form}{namespaces} =~ /$_/);
 		}
@@ -311,8 +311,8 @@ sub view {
 	my $contentTypes = $self->_getContentTypes('restricted');
 	foreach(keys %$contentTypes) {
 		my $selected = 0;
-		if (scalar $session{cgi}->param('contentTypes')) {
-			$selected = isIn($_, $session{cgi}->param('contentTypes'));
+		if (scalar $session{req}->param('contentTypes')) {
+			$selected = isIn($_, $session{req}->param('contentTypes'));
 		} else {
 			$selected = ($session{form}{contentTypes} =~ /$_/);
 		}
@@ -335,8 +335,8 @@ sub view {
 	my $users = $self->_getUsers('restricted');
 	foreach(keys %$users) {
 		my $selected = 0;
-		if (scalar $session{cgi}->param('users')) {
-			$selected = isIn($_, $session{cgi}->param('users'));
+		if (scalar $session{req}->param('users')) {
+			$selected = isIn($_, $session{req}->param('users'));
 		} else {
 			$selected = ($session{form}{users} =~ /$_/);
 		}
@@ -346,7 +346,7 @@ sub view {
 	# Create a loop with searchable page roots
 	my $rootData;
 	my @roots = split(/\n/, $self->get('searchRoot'));
-	my %checked = map {$_=>1} $session{cgi}->param("searchRoot");
+	my %checked = map {$_=>1} $session{req}->param("searchRoot");
 	#if (isIn('any', @roots)) {
 	#	foreach $rootData (WebGUI::Page->getAnonymousRoot->daughters) {
 	#		push (@{$var{searchRoots}}, {
@@ -402,7 +402,7 @@ sub _buildPageList {
 	my ($self, @userSpecifiedRoots, @roots, @allowedRoots, $pageId, @pages);
 	$self = shift;
 
-	@userSpecifiedRoots = $session{cgi}->param("searchRoot");
+	@userSpecifiedRoots = $session{req}->param("searchRoot");
 	
 	if ((scalar(@userSpecifiedRoots) == 0)
 		|| ($self->getValue("forceSearchRoots"))
@@ -438,11 +438,11 @@ sub _buildFilter {
 #	}
 
 	# content-types
-	if($session{form}{contentTypes} && ! isIn('any', $session{cgi}->param('contentTypes'))) {
-		$filter{contentType} = [ $session{cgi}->param('contentTypes') ];
+	if($session{form}{contentTypes} && ! isIn('any', $session{req}->param('contentTypes'))) {
+		$filter{contentType} = [ $session{req}->param('contentTypes') ];
 
 		# contentType "content" is a shortcut for "page", "wobject" and "wobjectDetail"
-		if (isIn('content', $session{cgi}->param('contentTypes'))) {
+		if (isIn('content', $session{req}->param('contentTypes'))) {
 			push(@{$filter{contentType}}, qw/Asset assetDetail/);
 		}
 	} elsif ($self->getValue('contentTypes') !~ /any/i) {
@@ -450,9 +450,9 @@ sub _buildFilter {
 	}
 
 	# users
-	if($session{form}{users} && ! isIn('any', $session{cgi}->param('users'))) {
+	if($session{form}{users} && ! isIn('any', $session{req}->param('users'))) {
 		$filter{ownerId} = [];
-		foreach my $user ($session{cgi}->param('users')) {
+		foreach my $user ($session{req}->param('users')) {
 			if ($user =~ /\D/) {
 				$user =~ s/\*/%/g;
 				($user) = WebGUI::SQL->buildArray("select userId from users where username like ".quote($user));
@@ -464,8 +464,8 @@ sub _buildFilter {
 	}
 
 	# namespaces
-	if($session{form}{namespaces} && ! isIn('any', $session{cgi}->param('namespaces'))) {
-		$filter{namespace} = [ $session{cgi}->param('namespaces') ];
+	if($session{form}{namespaces} && ! isIn('any', $session{req}->param('namespaces'))) {
+		$filter{namespace} = [ $session{req}->param('namespaces') ];
 	} elsif ($self->getValue('namespaces') !~ /any/i) {
 		$filter{namespace} = [ split(/\n/, $self->getValue('namespaces')) ];
 	}

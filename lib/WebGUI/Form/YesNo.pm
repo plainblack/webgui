@@ -89,7 +89,7 @@ Returns either a 1 or 0 representing yes, no.
 
 sub yesNo {
 	my $self = shift;
-        if ($session{cgi}->param($self->{name}) > 0) {
+        if ($session{req}->param($self->{name}) > 0) {
                 return 1;
         }
 	return 0;

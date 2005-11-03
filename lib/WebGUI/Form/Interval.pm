@@ -94,7 +94,7 @@ Returns either the interval that was posted (in seconds) or if nothing comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::intervalToSeconds($session{cgi}->param($self->{name}."_interval"),$session{cgi}->param($self->{name}."_units")) || 0;
+	return WebGUI::DateTime::intervalToSeconds($session{req}->param($self->{name}."_interval"),$session{req}->param($self->{name}."_units")) || 0;
 }
 
 #-------------------------------------------------------------------

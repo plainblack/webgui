@@ -104,7 +104,7 @@ Returns either what's posted or if nothing comes back it returns "most".
 
 sub getValueFromPost {
 	my $self = shift;
-	return $session{cgi}->param($self->{name}) || "most";
+	return $session{req}->param($self->{name}) || "most";
 }
 
 #-------------------------------------------------------------------

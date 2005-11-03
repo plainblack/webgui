@@ -107,7 +107,7 @@ Retrieves a value from a form GET or POST and returns it. If the value comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $session{cgi}->param($self->{name});
+	my $formValue = $session{req}->param($self->{name});
 	if (defined $formValue) {
 		return $formValue;
 	} else {

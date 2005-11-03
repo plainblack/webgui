@@ -89,7 +89,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{cgi}->param($self->{name});
+	my $value = $session{req}->param($self->{name});
    	if ($value =~ /^[A-Z\d\s\-]+$/) {
                 return $value;
         }

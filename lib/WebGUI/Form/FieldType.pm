@@ -124,7 +124,7 @@ Returns either what's posted or if nothing comes back it returns "text".
 
 sub getValueFromPost {
         my $self = shift;
-        return $session{cgi}->param($self->{name}) || "text";
+        return $session{req}->param($self->{name}) || "text";
 }
 
 #-------------------------------------------------------------------

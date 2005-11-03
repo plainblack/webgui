@@ -199,7 +199,7 @@ sub addFileFromFormPost {
 	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
 	my $filename;
 	my $attachmentCount = 1;
-        foreach my $tempPath ($session{cgi}->upload($formVariableName)) {
+        foreach my $tempPath ($session{req}->upload($formVariableName)) {
         	last if $attachmentCount > $attachmentLimit;
                 if ($tempPath =~ /([^\/\\]+)$/) {
                         $filename = $1;

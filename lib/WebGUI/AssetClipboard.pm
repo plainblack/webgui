@@ -188,7 +188,7 @@ Copies to clipboard assets in a list, then returns self calling method www_manag
 sub www_copyList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $assetId ($session{cgi}->param("assetId")) {
+	foreach my $assetId ($session{req}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
@@ -258,7 +258,7 @@ Cuts assets in a list (removes to clipboard), then returns self calling method w
 sub www_cutList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $assetId ($session{cgi}->param("assetId")) {
+	foreach my $assetId ($session{req}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			$asset->cut;
@@ -384,7 +384,7 @@ Returns a www_manageAssets() method. Pastes a selection of assets. If canEdit is
 sub www_pasteList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $clipId ($session{cgi}->param("assetId")) {
+	foreach my $clipId ($session{req}->param("assetId")) {
 		$self->paste($clipId);
 	}
 	return $self->www_manageAssets();

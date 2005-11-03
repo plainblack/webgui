@@ -121,7 +121,7 @@ Returns either what's posted or if nothing comes back it returns "2" the ID of t
 
 sub getValueFromPost {
 	my $self = shift;
-        my @data = $session{cgi}->param($self->{name});
+        my @data = $session{req}->param($self->{name});
         if (scalar(@data)) {
 		return wantarray ? @data : join("\n",@data);
 	}

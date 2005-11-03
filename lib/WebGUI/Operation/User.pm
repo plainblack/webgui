@@ -169,8 +169,8 @@ sub www_deleteGrouping {
 	if (($session{user}{userId} eq $session{form}{uid} || $session{form}{uid} eq '3') && $session{form}{gid} eq '3') {
 		return _submenu(WebGUI::Privilege::vitalComponent());
         }
-        my @users = $session{cgi}->param('uid');
-	my @groups = $session{cgi}->param("gid");
+        my @users = $session{req}->param('uid');
+	my @groups = $session{req}->param("gid");
 	foreach my $user (@users) {
 		my $u = WebGUI::User->new($user);
 		$u->deleteFromGroups(\@groups);
@@ -323,7 +323,7 @@ sub www_editUser {
                 $previousCategory = $category;
         }
         $a->finish;
-	my @groupsToAdd = $session{cgi}->param("groupsToAdd");
+	my @groupsToAdd = $session{req}->param("groupsToAdd");
 	my @exclude = WebGUI::SQL->buildArray("select groupId from groupings where userId=".quote($u->userId));
 	@exclude = (@exclude,"1","2","7");
 	$tabform->getTab("groups")->group(
@@ -345,7 +345,7 @@ sub www_editUser {
 		}
 	}
 	push (@include, "0");
-	my @groupsToDelete = $session{cgi}->param("groupsToDelete");
+	my @groupsToDelete = $session{req}->param("groupsToDelete");
 	$tabform->getTab("groups")->selectList(
 		-name=>"groupsToDelete",
 		-options=>WebGUI::SQL->buildHashRef("select groupId, groupName from groups 
@@ -385,9 +385,9 @@ sub www_editUserSave {
                		$u->profileField($field{fieldName},WebGUI::FormProcessor::process($field{fieldName},$field{dataType}));
        		}
        		$a->finish;
-		my @groups = $session{cgi}->param("groupsToAdd");
+		my @groups = $session{req}->param("groupsToAdd");
 		$u->addToGroups(\@groups);
-		@groups = $session{cgi}->param("groupsToDelete");
+		@groups = $session{req}->param("groupsToDelete");
 		$u->deleteFromGroups(\@groups);
 	} else {
        		$error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</li></ul>';

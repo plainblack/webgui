@@ -127,7 +127,7 @@ Returns an array or a carriage return ("\n") separated scalar depending upon whe
 
 sub getValueFromPost {
         my $self = shift;
-        my @data = $session{cgi}->param($self->{name});
+        my @data = $session{req}->param($self->{name});
         return wantarray ? @data : join("\n",@data);
 }
 

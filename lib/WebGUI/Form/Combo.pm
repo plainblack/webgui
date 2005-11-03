@@ -62,8 +62,8 @@ Returns an array or a carriage return ("\n") separated scalar depending upon whe
 
 sub getValueFromPost {
 	my $self = shift;
-	if ($session{cgi}->param($self->{name}."_new")) {
-		return $session{cgi}->param($self->{name}."_new");
+	if ($session{req}->param($self->{name}."_new")) {
+		return $session{req}->param($self->{name}."_new");
         }
 	return $self->SUPER::getValueFromPost;
 }

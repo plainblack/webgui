@@ -93,7 +93,7 @@ sub www_createSubscriptionCodeBatch {
 		-options=> \%subscriptions,
 		-multiple=>1,
 		-size	=> 5,
-		-value  => [ ($session{cgi}->param('subscriptionId'))]
+		-value  => [ ($session{req}->param('subscriptionId'))]
 		);
 	$f->textarea(
 		-name	=> 'description',
@@ -136,7 +136,7 @@ sub www_createSubscriptionCodeBatchSave {
 		
 		WebGUI::SQL->write("insert into subscriptionCode (batchId, code, status, dateCreated, dateUsed, expires, usedBy)".
 			" values (".quote($batchId).",".quote($code).", 'Unused', ".quote($creationEpoch).", 0, ".quote($expires).", 0)");
-		@subscriptions = $session{cgi}->param('subscriptionId');
+		@subscriptions = $session{req}->param('subscriptionId');
 		foreach (@subscriptions) {
 			WebGUI::SQL->write("insert into subscriptionCodeSubscriptions (code, subscriptionId) values (".
 				quote($code).", ".quote($_).")");

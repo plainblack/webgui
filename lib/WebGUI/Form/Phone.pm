@@ -61,7 +61,7 @@ Returns a string filtered to allow only digits, spaces, and these special charac
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{cgi}->param($self->{name});
+	my $value = $session{req}->param($self->{name});
    	if ($value =~ /^[\d\s\-\+\(\)]+$/) {
                 return $value;
         }
