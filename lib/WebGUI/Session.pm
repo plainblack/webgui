@@ -14,8 +14,6 @@ package WebGUI::Session;
 
 =cut
 
-
-use CGI;
 use Date::Manip;
 use DBI;
 use Exporter;
@@ -30,6 +28,8 @@ use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;
 use URI::Escape;
+use Apache2::Request;
+use Apache2::Cookie;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%session);
@@ -98,17 +98,7 @@ sub _setupSessionVars {
 sub _setupUserInfo {
 	my $u = WebGUI::User->new(shift);
 	%{$session{user}} = (%{$u->{_profile}}, %{$u->{_user}});
-	if ($session{env}{MOD_PERL}) {
-		my $r;
-               	if ($mod_perl::VERSION >= 1.999023) {
-                      	$r = Apache2::RequestUtil->request;
-               	} else {
-               	 	$r = Apache->request;
-               	}
-               	if(defined($r)) {
-               		$r->user($session{user}{username});
-        	}
-       	}
+       #	$session{modperl}->user($session{user}{username});
 	$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/ || $session{user}{alias} eq "");
 }
 
@@ -143,10 +133,9 @@ sub close {
 		$slavedbh->disconnect();
 	}
 	$session{dbh}->disconnect() if (exists $session{dbh});
-	$session{cgi}->DESTROY() if (exists $session{cgi});
 	undef %session;
-	$ENV{PATH_INFO} = "/"; #work around to fix a bug in mod_perl (win32)
 }
+
 #-------------------------------------------------------------------
 sub DESTROY {
 	WebGUI::Session::close();
@@ -293,7 +282,7 @@ A pointer to a Fast CGI object.
 sub open {
 	my $webguiRoot = shift;
 	my $configFile = shift;
-	my $fastcgi = shift;
+	$session{modperl} = shift;
 	my ($key);
 	###----------------------------
 	### operating system specific things
@@ -331,28 +320,23 @@ sub open {
 	### global system settings (from settings table)
 	$session{setting} = WebGUI::Setting::get();
 	###----------------------------
-	### CGI object
-	$CGI::POST_MAX=1024 * $session{setting}{maxAttachmentSize};
-	$session{cgi} = $fastcgi || CGI->new();
-        if ($session{cgi}->cgi_error =~ /^413/) {
-		$session{http}{status} = $session{cgi}->cgi_error;
-		WebGUI::ErrorHandler::warn("File upload too big. May need to adjust Max File Size setting.");
-		$CGI::POST_MAX=-1;
-		$session{cgi} = CGI->new();
-        }
+	### Apache2::Request object
+	$session{req} = Apache2::Request->new($session{modperl}, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});
 	###----------------------------
 	### form variables
-	foreach ($session{cgi}->param) {
-		$session{form}{$_} = $session{cgi}->param($_);
+	#
+	foreach ($session{req}->param) {
+		$session{form}{$_} = $session{req}->param($_);
 	}
-	foreach ($session{cgi}->url_param) {
-		$session{form}{$_} = $session{cgi}->url_param($_) unless (defined $session{form}{$_});
-	} 
 	###----------------------------
 	### cookies
-	foreach ($session{cgi}->cookie) {
-			$session{cookie}{$_} = $session{cgi}->cookie($_);
-	}
+	my %cookies = Apache2::Cookie->fetch();
+	foreach my $key (keys %cookies) {
+		my $value = $cookies{$key};
+		$value =~ s/$key=//;	# Strange... The Apache2::Cookie value also contains the key ???? 
+					# Must be a bug in Apache2::Cookie...
+		$session{cookie}{$key} = $value;
+}
 	###----------------------------
 	### session variables 
 	if ($session{cookie}{wgSession} eq "") {
@@ -474,12 +458,7 @@ sub start {
 	$sessionId = $_[1] || _uniqueSessionId();
 	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
 		(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', ".quote($_[0]).")");
-	push @{$session{http}{cookie}}, $session{cgi}->cookie(
-                -name=>"wgSession",
-                -value=>$sessionId,
-                -expires=>'+10y',
-                -path=>'/'
-                );
+	WebGUI::HTTP::setCookie("wgSession",$sessionId);
 	refreshSessionVars($sessionId);
 	return $sessionId;
 }

@@ -666,7 +666,7 @@ sub view {
 	} else {
 		$sql .= "asset.lineage";
 	}
-	my $currentPageUrl = $session{env}{PATH_INFO};
+	my $currentPageUrl = $session{env}{SCRIPT_NAME};
 	$currentPageUrl =~ s/^\///;
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {

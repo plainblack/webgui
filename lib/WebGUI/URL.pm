@@ -267,7 +267,7 @@ sub page {
         if ($session{asset}) {
                 $pathinfo = $session{asset}->get("url");
         } else {
-                $pathinfo = $session{env}{PATH_INFO};
+                $pathinfo = $session{env}{SCRIPT_NAME};
                 $pathinfo =~ s/^\/(.*)/$1/;
         }
         $url .= $pathinfo;

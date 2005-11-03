@@ -62,14 +62,10 @@ sub getHeader {
 	return undef if ($session{http}{noHeader});	
 	my %params;
 	if (isRedirect()) {
-		%params = (
-			-location => $session{http}{location}
-			);
+		$session{modperl}->headers_out->set(Location => $session{http}{location});
+		$session{modperl}->status(301);
 	} else {
-		%params = (
-			-type => $session{http}{mimetype} || "text/html",
-			-charset => "UTF-8"
-			);
+		$session{modperl}->content_type($session{http}{mimetype} || "text/html");
 		if ($session{setting}{preventProxyCache}) {
        	        	$params{"-expires"} = "-1d";
        	 	}
@@ -79,21 +75,9 @@ sub getHeader {
 	}
 	$params{"-cookie"} = $session{http}{cookie};
 	my $status = getStatus();
-	if($session{env}{MOD_PERL}) {
-        	my $r;
-		if ($mod_perl::VERSION >= 1.999023) {
-			$r = Apache2::RequestUtil->request;
-		} else {
-			$r = Apache->request;
-		}		
-                if(defined($r)) {
-                	$r->custom_response($status, '<!-- '.$session{http}{statusDescription}.' -->' );
-                        $r->status($status);
-                }
-        } else {
-		$params{"-status"} = $status.' '.$session{http}{statusDescription};
-	}
-	return $session{cgi}->header(%params);
+        # $session{modperl}->custom_response($status, '<!-- '.$session{http}{statusDescription}.' -->' );
+        $session{modperl}->status($status);
+	return;
 }
 
 
@@ -159,12 +143,13 @@ sub setCookie {
 	my $name = shift;
 	my $value = shift;
         my $ttl = shift || '+10y';
-        push @{$session{http}{cookie}}, $session{cgi}->cookie(
-                -name=>$name,
-                -value=>$value,
-                -expires=>$ttl,
-                -path=>'/'
-                );
+	my $cookie = Apache2::Cookie->new($session{modperl},
+						-name=>$name,
+						-value=>$value,
+						-expires=>$ttl,
+						-path=>'/'
+					);
+	$cookie->bake($session{modperl});
 }
 
 

@@ -28,7 +28,32 @@ use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::PassiveProfiling;
+use Apache2::RequestRec ();
+use Apache2::RequestIO ();
+use Apache2::Const -compile => qw(OK DECLINED);
 
+our $s;
+our $r;
+
+sub handler {
+        $s = Apache2::ServerUtil->server;
+        $r = shift;
+	my $config = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
+	my $extras = $config->{extrasURL};
+	my $uploads = $config->{uploadsURL};
+	unless ($r->uri =~ m/^$extras/ || $r->uri =~ m/^$uploads/) {
+        	$r->handler('perl-script');
+        	$r->set_handlers(PerlResponseHandler => \&contentHandler);
+	}
+        return Apache2::Const::DECLINED;
+}
+
+sub contentHandler {
+	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
+	$r->print(page(undef,undef,1));	# Use existing session
+	WebGUI::Session::close();
+	return Apache2::Const::OK;
+}
 
 #-------------------------------------------------------------------	
 sub _processOperations {

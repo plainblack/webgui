@@ -13,12 +13,7 @@ package WebGUI::UploadsAccessHandler;
 our $webguiRoot;
 
 BEGIN {
-	my $s;
-        if ($mod_perl::VERSION >= 1.999023) {
-                $s = Apache2::ServerUtil->server;
-        } else {
-                $s = Apache->server;
-        }
+	my $s = Apache2::ServerUtil->server;
         $webguiRoot = $s->dir_config('WebguiRoot');
         unshift (@INC, $webguiRoot."/lib");
 }
@@ -35,15 +30,9 @@ sub handler {
 	my $r;
 	my $ok;	
 	my $notfound;
-	if ($mod_perl::VERSION >= 1.999023) {
         	$r = Apache2::RequestUtil->request;
 		$ok = Apache2::Const::OK();
 		$notfound = Apache2::Const::NOT_FOUND();
-        } else {
-                $r = Apache->request;
-		$ok = Apache::OK();
-		$notfound = Apache::NOT_FOUND();
-        }
 	if (-e $r->filename) {
 		my $path = $r->filename;
 		$path =~ s/^(\/.*\/).*$/$1/;

@@ -1083,7 +1083,7 @@ A specific revision to instanciate. By default we instanciate the newest publish
 
 sub newByUrl {
 	my $class = shift;
-	my $url = shift || $session{env}{PATH_INFO};
+	my $url = shift || $session{env}{SCRIPT_NAME};
 	my $revisionDate = shift;
 	$url = lc($url);
 	$url =~ s/\/$//;
