@@ -50,6 +50,7 @@ sub handler {
 
 sub contentHandler {
 	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
+	$session{wguri} = $r->uri;
 	$r->print(page(undef,undef,1));	# Use existing session
 	WebGUI::Session::close();
 	return Apache2::Const::OK;
@@ -133,7 +134,7 @@ sub page {
 			$method = "www_".$method;
 			$output = eval{$asset->$method()};
 			if ($@) {
-				WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{env}{PATH_INFO}." Root cause: ".$@);
+				WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{wguri}()." Root cause: ".$@);
 				$output = $asset->www_view;
 			} else {
 				if ($output eq "" && $method ne "view") {

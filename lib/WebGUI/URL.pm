@@ -178,7 +178,7 @@ sub getScriptURL {
 	if (exists $session{config}{scripturl}) {
         	$scripturl = $session{config}{scripturl};
 	} else {
-		$scripturl = $session{env}{SCRIPT_NAME};
+		$scripturl = $session{wguri};
 	}
 	$scripturl .= '/';
 	return $scripturl;
@@ -267,7 +267,7 @@ sub page {
         if ($session{asset}) {
                 $pathinfo = $session{asset}->get("url");
         } else {
-                $pathinfo = $session{env}{SCRIPT_NAME};
+                $pathinfo = $session{wguri};
                 $pathinfo =~ s/^\/(.*)/$1/;
         }
         $url .= $pathinfo;

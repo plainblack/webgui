@@ -95,7 +95,7 @@ sub www_setup {
 		WebGUI::Setting::set('companyURL',WebGUI::FormProcessor::url("companyURL"));
 		WebGUI::Setting::set('companyEmail',WebGUI::FormProcessor::email("companyEmail"));
 		WebGUI::Setting::remove('specialState');
-		WebGUI::HTTP::setRedirect($session{env}{SCRIPT_NAME});
+		WebGUI::HTTP::setRedirect($session{wguri});
 		return "";
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
