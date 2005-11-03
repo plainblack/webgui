@@ -134,7 +134,7 @@ sub page {
 			$method = "www_".$method;
 			$output = eval{$asset->$method()};
 			if ($@) {
-				WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{wguri}()." Root cause: ".$@);
+				WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{wguri}." Root cause: ".$@);
 				$output = $asset->www_view;
 			} else {
 				if ($output eq "" && $method ne "view") {
