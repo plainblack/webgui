@@ -93,41 +93,37 @@ Give this template a descriptive name so that you'll know what it is when you're
 	},
 
 	'826' => {
-		message => q|WebGUI has a powerful templating language built to give you maximum control over the layout of your content.
-<p/><b>NOTES:</b><br/>
+		message => q|<p>WebGUI has a powerful templating language built to give you maximum control over the layout of your content.</p>
+<p><b>NOTES:</b><br />
 Both the template language and template variables are case-insensitive.
-<p/>
-<b>Session Variables</b><br/>
-In addition to any variables defined in a given template, the session variables are made available to you with this syntax:
+</p>
+
 <p>
-
-&lt;tmpl_var session.<i>section</i>.<i>variable</i>&gt;
-
-<p/>
-In the examples below, please note that the words <i>foo</i> and <i>bar</i> are used as placeholders for the actual variable names that you'll use. They are not part of the template language.
-
-<p/>
-<b>Variables</b><br/>
+<b>Variables</b><br />
 Variables are the most basic of the template commands. They are used to position pieces of content.
+In the examples below, please note that the words <i>foo</i> and <i>bar</i> are used as placeholders for the actual variable names that you'll use. They are not part of the template language.</p>
 
-<p/>
+<p>
 <i>Syntax:</i> &lt;tmpl_var foo&gt; or &lt;tmpl_var name="foo"&gt;
-<p/>
+</p>
 
+<p>
 <i>Example:</i> &lt;tmpl_var name&gt;
-<p/>
+</p>
 
-<b>Conditions</b><br/>
+<p>
+<b>Conditions</b><br />
 To programmers conditions are nothing new, but to designers they can often be confusing at first. Conditions are really just true or false questions, and if you think of them that way, you'll have no trouble at all.
-<p/>
+</p>
 
-<i>Syntax:</i> &lt;tmpl_if foo&gt; &lt;tmpl_else&gt; &lt;/tmpl_if&gt;
-<br/>
+<p>
+<i>Syntax:</i> &lt;tmpl_if foo&gt; &lt;tmpl_else&gt; &lt;/tmpl_if&gt;<br />
 <i>Syntax:</i> &lt;tmpl_unless foo&gt; &lt;tmpl_else&gt; &lt;/tmpl_unless&gt;
-<p/>
+</p>
 
+<p>
 <i>Example:</i> &lt;tmpl_if isTrue&gt; It was true!&lt;tmpl_else&gt; It was false! &lt;/tmpl_if&gt;
-<p/>
+</p>
 
 <p>Truth or falsehood is determined by the following rules:
 <ul>
@@ -138,24 +134,28 @@ To programmers conditions are nothing new, but to designers they can often be co
 <li><p>All other variables are true.</p></li>
 </ul></p>
 
-<b>Loops</b><br/>
+<p><b>Loops</b><br />
 Loops iterate over a list of data output for each pass in the loop. Loops are slightly more complicated to use than plain variables, but are considerably more powerful.
-<p/>
+</p>
 
+<p>
 <i>Syntax:</i> &lt;tmpl_loop foo&gt; &lt;/tmpl_loop&gt;
-<p/>
+</p>
 
-<i>Example:</i> <br/>
-&lt;tmpl_loop users&gt; <br/>
-  &nbsp; Name: &lt;tmpl_var first_name&gt;&lt;br/&gt;<br/>
+<p>
+<i>Example:</i> <br />
+&lt;tmpl_loop users&gt; <br />
+  &nbsp; Name: &lt;tmpl_var first_name&gt;&lt;br/&gt;<br />
 &lt;/tmpl_loop&gt;
-<p/>
+</p>
 
-<b>Loop Conditions</b><br/>
+<p>
+<b>Loop Conditions</b><br />
 Loops come with special condition variables of their own. They are __FIRST__, __ODD__, __INNER__, and __LAST__.
-<p/>
+</p>
 
-<i>Examples:</i><br/>
+<p>
+<i>Examples:</i><br />
 <pre>
    &lt;TMPL_LOOP FOO&gt;
       &lt;TMPL_IF __FIRST__&gt;
@@ -180,8 +180,56 @@ Loops come with special condition variables of their own. They are __FIRST__, __
    &lt;/TMPL_LOOP&gt;
 </pre>
 
-<p/>|,
-		lastUpdated =>1106608811,
+</p>|,
+		lastUpdated =>1130959765,
+	},
+
+	'template variable title' => {
+		message => q|Template Variables|,
+		lastUpdated => 1130972019,
+	},
+
+	'template variable body' => {
+		message => q|
+<p><b>webgui.version</b><br />
+The version of WebGUI on your site.
+</p>
+
+<p><b>webgui.status</b><br />
+The release status for this version of WebGUI, stable, beta, gamma, etc.
+</p>
+
+<p>
+<b>Session Variables</b><br />
+In addition to any variables defined in a given template, the session variables are made available to you with this syntax:
+</p>
+
+<p>&lt;tmpl_var session.<i>section</i>.<i>variable</i>&gt;</p>
+
+<p>Some common, useful session variables are:</p>
+
+<p><b>session.var.adminOn</b><br />
+This variable will be true if the user is in Admin mode.
+</p>
+
+<p><b>session.var.userId</b><br />
+The userId for the current user.
+</p>
+
+<p><b>session.user.username</b><br />
+The current user's username.
+</p>
+
+<p><b>session.user.language</b><br />
+The current user's preferred language (the default is English).
+</p>
+
+<p><b>session.user.karma</b><br />
+The user's karma.
+</p>
+
+		|,
+		lastUpdated => 1130978466,
 	},
 
 };
