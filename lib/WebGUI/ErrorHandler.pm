@@ -19,6 +19,7 @@ use Log::Log4perl;
 use strict;
 use WebGUI::Session;
 use Log::Log4perl;
+use Apache2::RequestUtil;
 
 $Log::Log4perl::caller_depth++;
 
@@ -171,16 +172,10 @@ Adds a FATAL type message to the log, outputs an error message to the user, and 
 sub fatal {
 	my $message = shift;
 	my $logger = getLogger();
+	Apache2::RequestUtil->request->content_type('text/html');
+
 	$logger->fatal($message);
 	$logger->debug("Stack trace for FATAL ".$message."\n".getStackTrace());
-        my $cgi;
-	if (exists $WebGUI::Session::session{cgi}) {
-		$cgi = $WebGUI::Session::session{cgi};
-	} else {
-		use CGI;
-		$cgi = CGI->new;
-	}
-	print $cgi->header;
         unless ($WebGUI::Session::session{setting}{showDebug}) {
 		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.                
 		print "<h1>Problem With Request</h1>                        
