@@ -19,7 +19,11 @@ our $HELP = {
 			{
 				tag => 'template language',
 				namespace => 'Asset_Template'
-			}
+			},
+			{
+				tag => 'template variables',
+				namespace => 'Asset_Template'
+			},
 		]
 	},
 	'template add/edit' => {
@@ -66,6 +70,23 @@ our $HELP = {
 	'template language' => {
 		title => '825',
 		body => '826',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'templates manage',
+				namespace => 'Asset_Template'
+			},
+			{
+				tag => 'template variables',
+				namespace => 'Asset_Template'
+			},
+		]
+	},
+
+	'template variables' => {
+		title => 'template variable title',
+		body => 'template variable body',
 		fields => [
 		],
 		related => [
