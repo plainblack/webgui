@@ -5,6 +5,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::HTMLForm;
 use WebGUI::Form;
+use WebGUI::FormProcessor;
 use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::AdminConsole;
@@ -560,7 +561,7 @@ sub www_listProductVariantsSave {
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
-	my %availableVariants = map {$_ => 1} $session{req}->param('available');
+	my %availableVariants = map {$_ => 1} WebGUI::FormProcessor::selectList('available');
 
 	my $product = WebGUI::Product->new($session{form}{productId});
 	my @variants = @{$product->getVariant};

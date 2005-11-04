@@ -158,7 +158,7 @@ sub walkGroups {
 #-------------------------------------------------------------------
 sub www_addGroupsToGroupSave {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session{form}{gid}));
-        my @groups = $session{req}->param('groups');
+        my @groups = WebGUI::FormProcessor::group('groups');
 	WebGUI::Grouping::addGroupsToGroups(\@groups,[$session{form}{gid}]);
         return www_manageGroupsInGroup();
 }
@@ -166,7 +166,7 @@ sub www_addGroupsToGroupSave {
 #-------------------------------------------------------------------
 sub www_addUsersToGroupSave {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session{form}{gid}));
-        my @users = $session{req}->param('users');
+        my @users = WebGUI::FormProcessor::selectList('users');
 	WebGUI::Grouping::addUsersToGroups(\@users,[$session{form}{gid}]);
         return www_manageUsersInGroup();
 }
@@ -226,8 +226,8 @@ sub www_deleteGrouping {
         if (($session{user}{userId} eq $session{form}{uid} || $session{form}{uid} eq '3') && $session{form}{gid} eq '3') {
                 return WebGUI::Privilege::vitalComponent();
         }
-        my @users = $session{req}->param('uid');
-        my @groups = $session{req}->param("gid");
+        my @users = WebGUI::FormProcessor::selectList('uid');
+        my @groups = WebGUI::FormProcessor::group("gid");
         foreach my $user (@users) {
                 my $u = WebGUI::User->new($user);
                 $u->deleteFromGroups(\@groups);

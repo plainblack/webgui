@@ -52,7 +52,7 @@ sub _createField {
 	if (isIn($data->{type},qw(selectList checkList))) {
 		my @defaultValues;
 		if ($session{form}{$param{name}}) {
-                	@defaultValues = $session{req}->param($param{name});
+                	@defaultValues = WebGUI::FormProcessor::selectList($param{name});
                 } else {
                 	foreach (split(/\n/, $data->{value})) {
                         	s/\s+$//; # remove trailing spaces

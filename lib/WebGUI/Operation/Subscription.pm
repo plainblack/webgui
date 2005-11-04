@@ -86,6 +86,7 @@ sub www_createSubscriptionCodeBatch {
 		-hoverHelp	=> $i18n->get('codes expire description'),
 		-value	=> $session{form}{expires} || WebGUI::DateTime::intervalToSeconds(1, 'months')
 		);
+	my @sub = WebGUI::FormProcessor::selectList("subscriptionId");
 	$f->selectList(
 		-name	=> 'subscriptionId',
 		-label	=> $i18n->get('association'), 
@@ -93,7 +94,7 @@ sub www_createSubscriptionCodeBatch {
 		-options=> \%subscriptions,
 		-multiple=>1,
 		-size	=> 5,
-		-value  => [ ($session{req}->param('subscriptionId'))]
+		-value  => \@sub
 		);
 	$f->textarea(
 		-name	=> 'description',
@@ -136,7 +137,7 @@ sub www_createSubscriptionCodeBatchSave {
 		
 		WebGUI::SQL->write("insert into subscriptionCode (batchId, code, status, dateCreated, dateUsed, expires, usedBy)".
 			" values (".quote($batchId).",".quote($code).", 'Unused', ".quote($creationEpoch).", 0, ".quote($expires).", 0)");
-		@subscriptions = $session{req}->param('subscriptionId');
+		@subscriptions = WebGUI::FormProcessor::selectList('subscriptionId');
 		foreach (@subscriptions) {
 			WebGUI::SQL->write("insert into subscriptionCodeSubscriptions (code, subscriptionId) values (".
 				quote($code).", ".quote($_).")");
