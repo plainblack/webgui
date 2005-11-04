@@ -195,8 +195,8 @@ sub getStorageLocation {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	my $storage = $self->getStorageLocation;
 	delete $self->{_storageLocation};
+	my $storage = $self->getStorageLocation;
 	my $filename = $storage->addFileFromFormPost("file");
 	if (defined $filename) {
 		my %data;
