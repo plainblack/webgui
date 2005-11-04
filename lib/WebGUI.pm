@@ -33,7 +33,7 @@ use Apache2::Cookie;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED);
-
+use Apache2::ServerUtil ();
 
 #-------------------------------------------------------------------	
 sub handler {
