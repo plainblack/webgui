@@ -428,8 +428,6 @@ sub start {
 	$sessionId = $_[1] || _uniqueSessionId();
 	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
 		(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', ".quote($_[0]).")");
-	require WebGUI::HTTP;
-	WebGUI::HTTP::setCookie("wgSession",$sessionId);
 	refreshSessionVars($sessionId);
 	return $sessionId;
 }

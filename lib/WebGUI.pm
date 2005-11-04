@@ -64,16 +64,18 @@ sub contentHandler {
         }
 
 	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
+	###----------------------------
+	### Apache2::Request object
+	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});        
+
+	# Add wgSession cookie to header
+	WebGUI::HTTP::setCookie("wgSession",$session{var}{sessionId});
 	### Add Apache Request stuff to Session
 	$session{wguri} = $r->uri;
 	### check to see if client is proxied and adjust remote_addr as necessary
 	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
 		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
 	}
-	###----------------------------
-	### Apache2::Request object
-	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});
-	###----------------------------
 	### form variables
 	#
 	foreach ($session{req}->param) {
