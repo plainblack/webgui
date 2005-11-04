@@ -12,6 +12,14 @@ my $quiet;
 
 start();
 addTimeZonesToUserPreferences();
+
+#TODO (by somebody!):
+# possibly instead of deleting old user timeZone preferences, convert them.
+# MUST DO: any dates in WebGUI greater than epoch 2^32 must be reduced, because
+# the new DateTime system uses Params::Validate, which will only validate integers
+# up to 2^32 as SCALARs. :(
+
+
 finish();
 
 #-------------------------------------------------
