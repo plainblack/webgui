@@ -109,16 +109,6 @@ sub view {
        	return $self->processTemplate(\%var,$self->get("templateId"));
 }
 
-
-#-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("message board add/edit","Asset_MessageBoard");
-#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Asset_MessageBoard"));
-#}
-
-
 1;
 
 
