@@ -34,6 +34,7 @@ use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED);
 use Apache2::ServerUtil ();
+use APR::Request::Apache2;
 
 #-------------------------------------------------------------------	
 sub handler {
@@ -55,13 +56,7 @@ sub contentHandler {
 	my $r = shift;
         my $s = Apache2::ServerUtil->server;
 	
-        my %cookies = Apache2::Cookie->fetch();
-        foreach my $key (keys %cookies) {
-                my $value = $cookies{$key};
-                $value =~ s/$key=//;    # Strange... The Apache2::Cookie value also contains the key ????
-                                        # Must be a bug in Apache2::Cookie...
-                $session{cookie}{$key} = $value;
-        }
+	$session{cookie} = APR::Request::Apache2->handle($r)->jar();	
 
 	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
 	###----------------------------
