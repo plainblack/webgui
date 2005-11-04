@@ -14,7 +14,7 @@ package WebGUI::Asset::Wobject;
 
 =cut
 
-use CGI::Util qw(rearrange);
+#use CGI::Util qw(rearrange);
 use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;

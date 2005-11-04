@@ -27,6 +27,8 @@ use WebGUI::Id;
 use WebGUI::Session;
 use WebGUI::URL;
 use WebGUI::Utility;
+use Apache2::Request;
+use Apache2::Upload;
 
 =head1 NAME
 
@@ -199,35 +201,34 @@ sub addFileFromFormPost {
 	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
 	my $filename;
 	my $attachmentCount = 1;
-        foreach my $tempPath ($session{req}->upload($formVariableName)) {
-        	last if $attachmentCount > $attachmentLimit;
-                if ($tempPath =~ /([^\/\\]+)$/) {
-                        $filename = $1;
-                } else {
-                        $filename = $tempPath;
-                }
-                my $type = $self->getFileExtension($filename);
-                if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads
-                        $filename =~ s/\./\_/g;
-                        $filename .= ".txt";
-                }
-                $filename = WebGUI::URL::makeCompliant($filename);
+	foreach my $upload ($session{req}->upload($formVariableName)) {
+		last if $attachmentCount > $attachmentLimit;
+		my $tempPath = $upload->tempname();
+		$filename = $upload->filename();
+		next unless $filename;
+		my $type = $self->getFileExtension($filename);
+		if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads
+			$filename =~ s/\./\_/g;
+			$filename .= ".txt";
+		}
+		$filename = WebGUI::URL::makeCompliant($filename);
 		my $bytesread;
-                my $file = FileHandle->new(">".$self->getPath($filename));
-                $attachmentCount++;
-                if (defined $file) {
+		my $file = FileHandle->new(">".$self->getPath($filename));
+		$attachmentCount++;
+		if (defined $file) {
 			my $buffer;
-                        binmode $file;
-                        while ($bytesread=read($tempPath,$buffer,1024)) {
-                                print $file $buffer;
-                        }
-                        close($file);
-                } else {
-                        $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
-                        return undef;
-                }
-        }
-        return $filename;
+			my $sourcefh = $upload->fh;
+			binmode $file;
+			while ($bytesread=read($sourcefh,$buffer,1024)) {
+				print $file $buffer;
+			}
+			close($file);
+		} else {
+			$self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
+			return undef;
+		}
+	}
+	return $filename;
 }
 
 
