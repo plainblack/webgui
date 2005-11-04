@@ -646,6 +646,7 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 
 sub setToEpoch {
         my $set = shift;
+        return undef unless defined $set;
 	my $parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d %H:%M:%S' );
 	my $dt = $parser->parse_datetime($set);
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
