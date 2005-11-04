@@ -54,6 +54,15 @@ sub handler {
 sub contentHandler {
 	my $r = shift;
         my $s = Apache2::ServerUtil->server;
+	
+        my %cookies = Apache2::Cookie->fetch();
+        foreach my $key (keys %cookies) {
+                my $value = $cookies{$key};
+                $value =~ s/$key=//;    # Strange... The Apache2::Cookie value also contains the key ????
+                                        # Must be a bug in Apache2::Cookie...
+                $session{cookie}{$key} = $value;
+        }
+
 	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
 	### Add Apache Request stuff to Session
 	$session{wguri} = $r->uri;
@@ -69,15 +78,6 @@ sub contentHandler {
 	#
 	foreach ($session{req}->param) {
 		$session{form}{$_} = $session{req}->param($_);
-	}
-	###----------------------------
-	### cookies
-	my %cookies = Apache2::Cookie->fetch();
-	foreach my $key (keys %cookies) {
-		my $value = $cookies{$key};
-		$value =~ s/$key=//;	# Strange... The Apache2::Cookie value also contains the key ???? 
-					# Must be a bug in Apache2::Cookie...
-		$session{cookie}{$key} = $value;
 	}
 	if ($session{env}{HTTP_X_MOZ} eq "prefetch") { # browser prefetch is a bad thing
 		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
