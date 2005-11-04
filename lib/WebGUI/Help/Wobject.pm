@@ -32,23 +32,13 @@ our $HELP = {
 		body => '632',
 		fields => [
                         {
-                                title => '174',
-                                description => '174 description',
-                                namespace => 'Wobject',
-                        },
-                        {
-                                title => '1073',
-                                description => '1073 description',
-                                namespace => 'Wobject',
-                        },
-                        {
-                                title => '1079',
-                                description => '1079 description',
-                                namespace => 'Wobject',
-                        },
-                        {
                                 title => '85',
                                 description => '85 description',
+                                namespace => 'Wobject',
+                        },
+                        {
+                                title => '174',
+                                description => '174 description',
                                 namespace => 'Wobject',
                         },
                         {
@@ -59,6 +49,16 @@ our $HELP = {
                         {
                                 title => '896',
                                 description => '896 description',
+                                namespace => 'Wobject',
+                        },
+                        {
+                                title => '1073',
+                                description => '1073 description',
+                                namespace => 'Wobject',
+                        },
+                        {
+                                title => '1079',
+                                description => '1079 description',
                                 namespace => 'Wobject',
                         },
 		],

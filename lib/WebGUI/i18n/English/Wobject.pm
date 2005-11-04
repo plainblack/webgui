@@ -3,32 +3,18 @@ package WebGUI::i18n::English::Wobject;
 our $I18N = {
 
           '828' => {
-                     lastUpdated => 1053469640,
-                     message => q|Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.
+                     lastUpdated => 1131125867,
+                     message => q|<p>Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as the variables shared by all Assets and their own custom variables. The following is a list of the common template variables shared among all wobjects.</p>
 
-<p/>
-<b>title</b><br/>
-The title for this wobject.
-
-<p/>
-<b>displayTitle</b><br/>
+<p>
+<b>displayTitle</b><br />
 A conditional variable for whether or not the title should be displayed.
+</p>
 
-<p/>
-<b>description</b><br/>
+<p>
+<b>description</b><br />
 The description of this wobject.
-
-<p/>
-<b>assetId</b><br/>
-The unique identifier that WebGUI uses to control this asset.
-
-<p/>
-<b>isShortcut</b><br />
-A conditional indicating if this wobject is a shortcut to an original asset.
-
-<p />
-<b>originalURL</b><br />
-If this wobject is a shortcut, then this URL will direct you to the original asset.
+</p>
 
 |
                    },
