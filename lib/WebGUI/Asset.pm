@@ -1442,6 +1442,10 @@ sub www_editSave {
 		$session{asset} = $object->getParent;
 		return $session{asset}->www_manageAssets;
 	}
+	if ($session{form}{proceed} eq "viewParent") {
+		$session{asset} = $object->getParent;
+		return $session{asset}->www_view;
+	}
 	if ($session{form}{proceed} ne "") {
 		my $method = "www_".$session{form}{proceed};
 		$session{asset} = $object;
