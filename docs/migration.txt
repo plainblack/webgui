@@ -489,3 +489,11 @@ therefore removed them. This shouldn't affect almost anybody, but we're
 mentioning it just in case you're using WebGUI::DateTime in an odd mannner.
 They are: epochToDate, dateToEpoch, epochToArray, arrayToEpoch
 
+
+5.22 CGI No Longer
+
+As of 6.8.0 we are no longer using CGI to handle our web interactions. Instead
+we are using a native mod perl handler. If you used $session{cgi} object
+you'll now need to convert your applications to use the methods provided by
+Apache2::Request which is referenced through $session{modperl}.
+

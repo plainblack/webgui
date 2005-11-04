@@ -22,6 +22,53 @@ save you many hours of grief.
 	no longer need date caching so the enableDateCache directive can
 	be removed from your config file.
 
+ * WebGUI now requires Apache2 with mod_perl2 so CGI, FastCGI, PerlEx,
+	although never officially supported, are no longer possible.
+	Making this change gave us more than 70% performance improvement
+	and opens up even more possibilities for performance and other
+	optimizations.
+
+	You'll need to make the following changes in Apache to upgrade
+	to this release:
+
+	Install libaprereq2. You can either download and compile this
+	from the mod_perl web site, CPAN as Apache2::Request, or by
+	getting the version of the WRE 0.6.0 or higher.
+
+	Edit your httpd.conf or httpd.modperl.conf and add the following
+	directives to your global server config:
+
+  	LoadModule apreq_module modules/mod_apreq2.so
+ 	PerlSetVar WebguiRoot /data/WebGUI
+
+	You may also remove this block if you have it:
+
+	<Files ~ "\.(pl)$">
+    		SetHandler perl-script
+    		PerlHandler ModPerl::Registry::handler
+    		PerlOptions +ParseHeaders
+	</Files>
+
+	Edit each of your virtual hosts and add the following directives,
+	changing them to suit your needs:
+
+	SetHandler perl-script
+        PerlInitHandler WebGUI
+        PerlSetVar WebguiConfig www.example.com.conf
+
+	If you were using mod rewrite you'll need to adjust your rules
+	because they no longer need to remove the gateway (index.pl)
+	from the URL.
+
+	If you were using the uploadsAccessHandler.perl you no longer
+	need that as it is built in to the WebGUI handler.
+
+	For more information consult the WebGUI Done Right documentation.
+
+ * WebGUI now requires MySQL 5.0 to operate. This is due to the huge
+	number of new features afforded us in the MySQL 5.0 database,
+	which will increase performance, and add to our functionality
+	for the future.
 
 
 6.7.0

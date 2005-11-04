@@ -149,7 +149,7 @@ A string indicating the type of layout to use. Can be flat or nested.
 sub getLayoutUrl {
 	my $self = shift;
 	my $layout = shift;
-	return $session{asset}->getUrl("layout=".$layout.'#'.$session{asset}->getId) if (exists $session{asset});
+	return $session{asset}->getUrl("layout=".$layout.'#id'.$session{asset}->getId) if (exists $session{asset});
 	return $self->getUrl("layout=".$layout);
 }
 
@@ -255,7 +255,7 @@ sub getStickUrl {
 }
 
 #-------------------------------------------------------------------
-
+id
 =head2 getSubscribeUrl (  )
 
 Formats the url to subscribe to the thread

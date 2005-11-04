@@ -316,7 +316,7 @@ An integer between 1 and 5 (5 = best).
 sub getRateUrl {
 	my $self = shift;
 	my $rating = shift;
-	return $self->getUrl("func=rate;rating=".$rating."#".$self->getId);
+	return $self->getUrl("func=rate;rating=".$rating."#id".$self->getId);
 }
 
 #-------------------------------------------------------------------
@@ -399,7 +399,7 @@ sub getTemplateVars {
 	$var{"deny.url"} = $self->getDenyUrl;
 	$var{"reply.url"} = $self->getReplyUrl;
 	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
-	$var{'url'} = $self->getUrl.'#'.$self->getId;
+	$var{'url'} = $self->getUrl.'#id'.$self->getId;
 	$var{'rating.value'} = $self->get("rating")+0;
 	$var{'rate.url.1'} = $self->getRateUrl(1);
 	$var{'rate.url.2'} = $self->getRateUrl(2);

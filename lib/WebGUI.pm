@@ -32,93 +32,56 @@ use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED);
 
-our $s;
-our $r;
 
+#-------------------------------------------------------------------	
 sub handler {
-        $s = Apache2::ServerUtil->server;
-        $r = shift;
+        my $r = shift;
+        my $s = Apache2::ServerUtil->server;
 	my $config = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
 	my $extras = $config->{extrasURL};
 	my $uploads = $config->{uploadsURL};
 	unless ($r->uri =~ m/^$extras/ || $r->uri =~ m/^$uploads/) {
         	$r->handler('perl-script');
-        	$r->set_handlers(PerlResponseHandler => \&contentHandler);
+        	$r->set_handlers(PerlResponseHandler => \&contentHandler);#, PerlTransHandler => \&Apache2::Const::OK);
 	}
         return Apache2::Const::DECLINED;
 }
 
+
+#-------------------------------------------------------------------	
 sub contentHandler {
+	my $r = shift;
+        my $s = Apache2::ServerUtil->server;
 	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
 	$session{wguri} = $r->uri;
-	$r->print(page(undef,undef,1));	# Use existing session
+	if ($session{env}{HTTP_X_MOZ} eq "prefetch") { # browser prefetch is a bad thing
+		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
+		$r->print(WebGUI::HTTP::getHeader());
+	} elsif ($session{setting}{specialState} eq "upgrading") {
+		$r->print(upgrading());
+	} elsif ($session{setting}{specialState} eq "init") {
+		return $r->print(setup());
+	} else {
+		my $output = page();
+		WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
+		if (WebGUI::HTTP::isRedirect()) {
+                	$output = WebGUI::HTTP::getHeader();
+        	} else {
+                	$output = WebGUI::HTTP::getHeader().$output;
+       			if (WebGUI::ErrorHandler::canShowDebug()) {
+				$output .= WebGUI::ErrorHandler::showDebug();
+       			}
+        	}
+		$r->print($output);
+	}
 	WebGUI::Session::close();
 	return Apache2::Const::OK;
 }
 
-#-------------------------------------------------------------------	
-sub _processOperations {
-	my ($cmd, $output);
-	my $op = $session{form}{op};
-	my $opNumber = shift || 1;
-        if ($op) {
-		$output = WebGUI::Operation::execute($op);
-        }
-	$opNumber++;
-	if ($output eq "" && exists $session{form}{"op".$opNumber}) {
-		my $urlString = WebGUI::URL::unescape($session{form}{"op".$opNumber});
-		my @pairs = split(/\;/,$urlString);
-		my %form;
-		foreach my $pair (@pairs) {
-			my @param = split(/\=/,$pair);
-			$form{$param[0]} = $param[1];
-		}
-		$session{form} = \%form;
-		$output = _processOperations($opNumber);
-	}
-	return $output;
-}
-
-#-------------------------------------------------------------------
-sub _setup {
-	require WebGUI::Operation::WebGUI;
-	my $output = WebGUI::Operation::WebGUI::www_setup();
-        $output = WebGUI::HTTP::getHeader().$output;
-	WebGUI::Session::close();
-	return $output;
-}
-
-#-------------------------------------------------------------------
-sub _upgrading {
-	my $webguiRoot = shift;
-        my $output = WebGUI::HTTP::getHeader();
-	open(FILE,"<".$webguiRoot."/docs/maintenance.html");
-	while (<FILE>) {
-		$output .= $_;
-	}
-	close(FILE);
-	WebGUI::Session::close();
-	return $output;
-}
-
-
 #-------------------------------------------------------------------
 sub page {
-	my $webguiRoot = shift;
-	my $configFile = shift;
-	my $useExistingSession = shift;   # used for static page generation functions where  you may generate more than one asset at a time.
 	my $assetUrl = shift;
-	my $fastcgi = shift;
-	WebGUI::Session::open($webguiRoot,$configFile,$fastcgi) unless ($useExistingSession);
-	if ($session{env}{HTTP_X_MOZ} eq "prefetch") { # browser prefetch is a bad thing
-		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
-		my $output = WebGUI::HTTP::getHeader();
-		WebGUI::Session::close();
-		return $output;
-	}
-	return _upgrading($webguiRoot) if ($session{setting}{specialState} eq "upgrading");
-	return _setup() if ($session{setting}{specialState} eq "init");
-	my $output = _processOperations();
+	my $output = processOperations();
 	if ($output eq "") {
 		my $asset = WebGUI::Asset->newByUrl($assetUrl,$session{form}{revision});
 		if (defined $asset) {
@@ -147,21 +110,52 @@ sub page {
 			$output = $notFound->www_view;
 		}
 	}
-	WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
-	if (WebGUI::HTTP::isRedirect() && !$useExistingSession) {
-                $output = WebGUI::HTTP::getHeader();
-        } else {
-                $output = WebGUI::HTTP::getHeader().$output;
-       		if (WebGUI::ErrorHandler::canShowDebug()) {
-			$output .= WebGUI::ErrorHandler::showDebug();
-       		}
-        }
-	# This allows an operation or wobject to write directly to the browser.
-	$output = undef if ($session{page}{empty});
-	WebGUI::Session::close() unless ($useExistingSession);
 	return $output;
 }
 
+
+#-------------------------------------------------------------------	
+sub processOperations {
+	my ($cmd, $output);
+	my $op = $session{form}{op};
+	my $opNumber = shift || 1;
+        if ($op) {
+		$output = WebGUI::Operation::execute($op);
+        }
+	$opNumber++;
+	if ($output eq "" && exists $session{form}{"op".$opNumber}) {
+		my $urlString = WebGUI::URL::unescape($session{form}{"op".$opNumber});
+		my @pairs = split(/\;/,$urlString);
+		my %form;
+		foreach my $pair (@pairs) {
+			my @param = split(/\=/,$pair);
+			$form{$param[0]} = $param[1];
+		}
+		$session{form} = \%form;
+		$output = processOperations($opNumber);
+	}
+	return $output;
+}
+
+
+#-------------------------------------------------------------------
+sub setup {
+	require WebGUI::Operation::WebGUI;
+	my $output = WebGUI::Operation::WebGUI::www_setup();
+        return WebGUI::HTTP::getHeader().$output;
+}
+
+
+#-------------------------------------------------------------------
+sub upgrading {
+        my $output = WebGUI::HTTP::getHeader();
+	open(FILE,"<".$session{config}{webguiRoot}."/docs/maintenance.html");
+	while (<FILE>) {
+		$output .= $_;
+	}
+	close(FILE);
+	return $output;
+}
 
 
 

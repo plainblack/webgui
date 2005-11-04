@@ -1,7 +1,12 @@
 6.8.0
  - Switched Date::Manip to DateTime for better performance and more 
    functionality. See gotchas for details. In our benchmarks DateTime runs 
-   about 13 times faster than Date::Manip.
+   about 13 times faster than Date::Manip. Depending upon how date intensive
+   your pages are, you will see a 2% to 100% performance increase from this
+   change.
+ - Switched from Apache::Registry/CGI to a pure mod_perl2 interface, which
+   increased performance by over 70% to the entire system, and in some cases
+   as much as 100%. See gotcha.txt for details.
 
 
 6.7.7

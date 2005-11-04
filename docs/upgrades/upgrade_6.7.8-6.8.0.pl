@@ -12,20 +12,26 @@ my $quiet;
 
 start();
 addTimeZonesToUserPreferences();
-
 #TODO (by somebody!):
 # possibly instead of deleting old user timeZone preferences, convert them.
 # MUST DO: any dates in WebGUI greater than epoch 2^32 must be reduced, because
 # the new DateTime system uses Params::Validate, which will only validate integers
 # up to 2^32 as SCALARs. :(
-
-
+removeUnneededFiles();
 finish();
 
 #-------------------------------------------------
 sub addTimeZonesToUserPreferences {
+	print "\tDropping time offsets in favor of time zones.\n" unless ($quiet);
 	WebGUI::SQL->write("delete from userProfileData where fieldName='timeOffset'");
 	WebGUI::SQL->write("update userProfileField set dataValues='', fieldName='timeZone', dataType='timeZone', dataDefault=".quote("['America/Chicago']")." where fieldName='timeOffset'");
+}
+
+sub removeUnneededFiles {
+	print "\tRemoving files that are no longer needed.\n" unless ($quiet);
+	unlink("../../www/env.pl");
+	unlink("../../www/index.fpl");
+	unlink("../../www/index.pl");
 }
 
 #--- DO NOT EDIT BELOW THIS LINE
