@@ -193,6 +193,7 @@ sub duplicate {
       WebGUI::SQL->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".quote($newAsset->getId).", ".quote($data{relatedAssetId}).", $data{sequenceNumber})");
    }
    $sth->finish;
+   return $newAsset;
 }
 
 #-------------------------------------------------------------------

@@ -9,6 +9,7 @@
  - fix [ 1343269 ] add Content Profiling field yesNo type i18n
  - fix [ 1342623 ] -noDate flag in WebGUI::Form::Date not working
  - fix [ 1345261 ] addFileFromFormPost always returns 1 file uploaded
+ - fix [ 1347584 ] Wobject "Product" copy fails
 
 6.7.7
  - added two new template variables to the EventsCalendar - 
