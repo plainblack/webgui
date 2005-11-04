@@ -652,6 +652,7 @@ sub processPropertiesFromFormPost {
         } else {
                 $self->setStatusApproved;
         }
+  delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
 	my $filename;
 	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
