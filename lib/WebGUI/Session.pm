@@ -14,7 +14,6 @@ package WebGUI::Session;
 
 =cut
 
-use Date::Manip;
 use DBI;
 use Exporter;
 use strict;
@@ -28,8 +27,6 @@ use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;
 use URI::Escape;
-use Apache2::Request;
-use Apache2::Cookie;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%session);
@@ -78,15 +75,15 @@ sub _setupSessionVars {
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
 		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId=".quote($_[0]));
-		if ($vars{expires} < _time() ) { #|| $vars{lastIP} ne $session{env}{REMOTE_ADDR}) { # had to remove for revolving ip proxies
+		if ($vars{expires} < time() ) { #|| $vars{lastIP} ne $session{env}{REMOTE_ADDR}) { # had to remove for revolving ip proxies
 			%vars = ();
 			WebGUI::Session::end($_[0]);
 		}
 		if ($vars{sessionId} ne "") {
 			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
                 		where sessionId=".quote($_[0]));
-			WebGUI::SQL->write("update userSession set lastPageView="._time().", lastIP='$session{env}{REMOTE_ADDR}', 
-				expires=".(_time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
+			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$session{env}{REMOTE_ADDR}', 
+				expires=".(time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
 		} else {
 			$vars{sessionId} = start(1,$_[0]);
                 }
@@ -98,13 +95,8 @@ sub _setupSessionVars {
 sub _setupUserInfo {
 	my $u = WebGUI::User->new(shift);
 	%{$session{user}} = (%{$u->{_profile}}, %{$u->{_user}});
-       #	$session{modperl}->user($session{user}{username});
+       #	$session{req}->user($session{user}{username});
 	$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/ || $session{user}{alias} eq "");
-}
-
-#-------------------------------------------------------------------
-sub _time {
-	return &UnixDate(&ParseDate("now"),"%s");
 }
 
 
@@ -282,7 +274,6 @@ A pointer to a Fast CGI object.
 sub open {
 	my $webguiRoot = shift;
 	my $configFile = shift;
-	$session{modperl} = shift;
 	my ($key);
 	###----------------------------
 	### operating system specific things
@@ -312,31 +303,10 @@ sub open {
 	###----------------------------
 	### evironment variables from web server
 	$session{env} = \%ENV;
-	### check to see if client is proxied and adjust remote_addr as necessary
-	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
-		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
-	}
 	###----------------------------
 	### global system settings (from settings table)
 	$session{setting} = WebGUI::Setting::get();
-	###----------------------------
-	### Apache2::Request object
-	$session{req} = Apache2::Request->new($session{modperl}, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});
-	###----------------------------
-	### form variables
-	#
-	foreach ($session{req}->param) {
-		$session{form}{$_} = $session{req}->param($_);
-	}
-	###----------------------------
-	### cookies
-	my %cookies = Apache2::Cookie->fetch();
-	foreach my $key (keys %cookies) {
-		my $value = $cookies{$key};
-		$value =~ s/$key=//;	# Strange... The Apache2::Cookie value also contains the key ???? 
-					# Must be a bug in Apache2::Cookie...
-		$session{cookie}{$key} = $value;
-}
+
 	###----------------------------
 	### session variables 
 	if ($session{cookie}{wgSession} eq "") {
@@ -457,7 +427,8 @@ sub start {
 	my ($sessionId);
 	$sessionId = $_[1] || _uniqueSessionId();
 	WebGUI::SQL->write("insert into userSession values ('$sessionId', ".
-		(_time()+$session{setting}{sessionTimeout}).", "._time().", 0, '$ENV{REMOTE_ADDR}', ".quote($_[0]).")");
+		(time()+$session{setting}{sessionTimeout}).", ".time().", 0, '$ENV{REMOTE_ADDR}', ".quote($_[0]).")");
+	require WebGUI::HTTP;
 	WebGUI::HTTP::setCookie("wgSession",$sessionId);
 	refreshSessionVars($sessionId);
 	return $sessionId;

@@ -255,7 +255,7 @@ sub getStickUrl {
 }
 
 #-------------------------------------------------------------------
-id
+
 =head2 getSubscribeUrl (  )
 
 Formats the url to subscribe to the thread

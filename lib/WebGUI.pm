@@ -28,6 +28,8 @@ use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::PassiveProfiling;
+use Apache2::Request;
+use Apache2::Cookie;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED);
@@ -53,7 +55,30 @@ sub contentHandler {
 	my $r = shift;
         my $s = Apache2::ServerUtil->server;
 	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
+	### Add Apache Request stuff to Session
 	$session{wguri} = $r->uri;
+	### check to see if client is proxied and adjust remote_addr as necessary
+	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
+		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
+	}
+	###----------------------------
+	### Apache2::Request object
+	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});
+	###----------------------------
+	### form variables
+	#
+	foreach ($session{req}->param) {
+		$session{form}{$_} = $session{req}->param($_);
+	}
+	###----------------------------
+	### cookies
+	my %cookies = Apache2::Cookie->fetch();
+	foreach my $key (keys %cookies) {
+		my $value = $cookies{$key};
+		$value =~ s/$key=//;	# Strange... The Apache2::Cookie value also contains the key ???? 
+					# Must be a bug in Apache2::Cookie...
+		$session{cookie}{$key} = $value;
+	}
 	if ($session{env}{HTTP_X_MOZ} eq "prefetch") { # browser prefetch is a bad thing
 		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$r->print(WebGUI::HTTP::getHeader());
