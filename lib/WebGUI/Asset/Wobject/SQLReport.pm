@@ -293,7 +293,7 @@ sub _parsePlaceholderParams {
                 } elsif ($type =~ /^query(\d)/) {
                         $param = $self->{_query}{$1}{rowData}{$field};
                 }
-                $param = WebGUI::Macro::process($param);
+                WebGUI::Macro::process(\$param);
                 push(@placeholderParams, $param);
         }
         return \@placeholderParams;
@@ -316,7 +316,8 @@ sub _processQuery {
 	
 	# Preprocess macros
         if ($self->{_query}{$nr}{preprocessMacros}) {
-                $query = WebGUI::Macro::process($self->{_query}{$nr}{dbQuery});
+		my $query = $self->{_query}{$nr}{dbQuery};
+                WebGUI::Macro::process(\$query);
         } else {
                 $query = $self->{_query}{$nr}{dbQuery};
         }

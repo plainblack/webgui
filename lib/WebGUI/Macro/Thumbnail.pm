@@ -12,12 +12,11 @@ package WebGUI::Macro::Thumbnail;
 
 use strict;
 use WebGUI::Asset::File::Image;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my ($url) = WebGUI::Macro::getParams(shift);
+        my $url = shift;
 	if (my $image = WebGUI::Asset::File::Image->newByUrl($url)) {
 	        return $image->getThumbnailUrl;
         } else {

@@ -15,8 +15,9 @@ save you many hours of grief.
 	DateTime::Cron::Simple
  	POE
 	POE::Component::IKC::Server
+	Test::More
 
- * The API has changed. Check docs/migration.txt for details.
+ * The core API has changed. Check docs/migration.txt for details.
 
  * Due to the performance increase achieved by switching to DateTime we
 	no longer need date caching so the enableDateCache directive can
@@ -49,6 +50,8 @@ save you many hours of grief.
     		PerlOptions +ParseHeaders
 	</Files>
 
+	You also no longer need the ExecCGI directive.
+
 	Edit each of your virtual hosts and add the following directives,
 	changing them to suit your needs:
 
@@ -69,6 +72,10 @@ save you many hours of grief.
 	number of new features afforded us in the MySQL 5.0 database,
 	which will increase performance, and add to our functionality
 	for the future.
+
+ * The Macro API has been changed. If you have any third-party macros
+	installed make sure to update them prior to upgrading. See
+	docs/migration.txt for details.
 
 
 6.7.0

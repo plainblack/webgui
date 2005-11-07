@@ -14,12 +14,11 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my ($label, $templateUrl) = WebGUI::Macro::getParams(shift);
+        my ($label, $templateUrl) = @_;
 	my $home = WebGUI::Asset->getDefault;
 	if ($label ne "linkonly") {
 		my %var;

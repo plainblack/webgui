@@ -11,14 +11,13 @@ package WebGUI::Macro::SQL;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
 	my ($output, @data, $rownum, $temp);
-	my ($statement, $format) = WebGUI::Macro::getParams(shift);
+	my ($statement, $format) = @_;
 	$format = '^0;' if ($format eq "");
 	if ($statement =~ /^\s*select/i || $statement =~ /^\s*show/i || $statement =~ /^\s*describe/i) {
 		my $sth = WebGUI::SQL->unconditionalRead($statement,WebGUI::SQL->getSlave);

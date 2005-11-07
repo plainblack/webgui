@@ -150,9 +150,9 @@ if (WebGUI::Grouping::isInGroup(2)) {
 	} else {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
 	}
-	$output = WebGUI::Macro::process($output);
+	WebGUI::Macro::process(\$output);
 	my $macroHeadTags = generateAdditionalHeadTags();
-	$macroHeadTags = WebGUI::Macro::process($macroHeadTags);
+	WebGUI::Macro::process(\$macroHeadTags);
 	$output =~ s/\<\!-- macro head tags --\>/$macroHeadTags/;
 	return $output;
 }	

@@ -11,13 +11,12 @@ package WebGUI::Macro::Splat_random;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub process {
         my ($temp, @param);
-        @param = WebGUI::Macro::getParams($_[0]);
+        @param = @_;
         if ($param[0] ne "") {
         	$temp = round(rand()*$param[0]);
         } else {

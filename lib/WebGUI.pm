@@ -27,9 +27,9 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::URL;
+use WebGUI::Utility;
 use WebGUI::PassiveProfiling;
 use Apache2::Request;
-use Apache2::Cookie;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED);
@@ -41,11 +41,17 @@ sub handler {
         my $r = shift;
         my $s = Apache2::ServerUtil->server;
 	my $config = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
-	my $extras = $config->{extrasURL};
+	foreach my $url ($config->{extrasURL}, @{$config->{passthruUrls}}) {
+		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
+	}
 	my $uploads = $config->{uploadsURL};
-	unless ($r->uri =~ m/^$extras/ || $r->uri =~ m/^$uploads/) {
+	if ($r->uri =~ m/^$uploads/) {
+		$r->handler('perl-script');
+		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);	
+	} else {
         	$r->handler('perl-script');
-        	$r->set_handlers(PerlResponseHandler => \&contentHandler);#, PerlTransHandler => \&Apache2::Const::OK);
+        	$r->set_handlers(PerlResponseHandler => \&contentHandler);
+        	$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	}
         return Apache2::Const::DECLINED;
 }
@@ -55,16 +61,10 @@ sub handler {
 sub contentHandler {
 	my $r = shift;
         my $s = Apache2::ServerUtil->server;
-	
-	$session{cookie} = APR::Request::Apache2->handle($r)->jar();	
-
+	WebGUI::HTTP::getCookies();
 	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
-	###----------------------------
 	### Apache2::Request object
 	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});        
-
-	# Add wgSession cookie to header
-	WebGUI::HTTP::setCookie("wgSession",$session{var}{sessionId});
 	### Add Apache Request stuff to Session
 	$session{wguri} = $r->uri;
 	### check to see if client is proxied and adjust remote_addr as necessary
@@ -72,7 +72,6 @@ sub contentHandler {
 		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
 	}
 	### form variables
-	#
 	foreach ($session{req}->param) {
 		$session{form}{$_} = $session{req}->param($_);
 	}
@@ -165,6 +164,46 @@ sub setup {
 	require WebGUI::Operation::WebGUI;
 	my $output = WebGUI::Operation::WebGUI::www_setup();
         return WebGUI::HTTP::getHeader().$output;
+}
+
+
+#-------------------------------------------------------------------
+sub uploadsHandler {
+	my $r = shift;
+        my $s = Apache2::ServerUtil->server;
+	my $ok = Apache2::Const::OK();
+        my $notfound = Apache2::Const::NOT_FOUND();
+        if (-e $r->filename) {
+                my $path = $r->filename;
+                $path =~ s/^(\/.*\/).*$/$1/;
+                if (-e $path.".wgaccess") {
+                        my $fileContents;
+                        open(FILE,"<".$path.".wgaccess");
+                        while (<FILE>) {
+                                $fileContents .= $_;
+                        }
+                        close(FILE);
+                        my @privs = split("\n",$fileContents);
+                        unless ($privs[1] eq "7" || $privs[1] eq "1") {
+        			WebGUI::HTTP::getCookies();
+        			WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
+        			### Apache2::Request object
+        			$session{req} = $r;
+                                WebGUI::Session::refreshSessionVars($session{cookie}{wgSession});
+				my $hasPrivs = ($session{user}{userId} eq $privs[0] || WebGUI::Grouping::isInGroup($privs[1]) || WebGUI::Grouping::isInGroup($privs[2]));
+                                WebGUI::Session::close();
+				if ($hasPrivs) {
+					return $ok;
+				} else {
+					return 401;
+				}
+                        }
+                }
+                return $ok;
+        } else {
+                return $notfound;
+        }
+
 }
 
 

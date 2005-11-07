@@ -12,7 +12,6 @@ package WebGUI::Macro::LastModified;
 
 use strict;
 use WebGUI::DateTime;
-use WebGUI::Macro;
 use WebGUI::Asset;
 use WebGUI::Session;
 use WebGUI::International;
@@ -22,7 +21,7 @@ use WebGUI::SQL;
 sub process {
 	return '' unless $session{asset};
 	my ($label, $format, $time);
-	($label, $format) = WebGUI::Macro::getParams(shift);
+	($label, $format) = @_;
 	$format = '%z' if ($format eq "");
 	($time) = WebGUI::SQL->quickArray("SELECT max(revisionDate) FROM assetData where assetId=".quote($session{asset}->getId),WebGUI::SQL->getSlave);
 	return WebGUI::International::get(43,'Asset_Survey') if $time eq 0;

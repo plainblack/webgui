@@ -11,12 +11,11 @@ package WebGUI::Macro::AdminText;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams(shift);
+        my @param = @_;
         return "" unless ($session{var}{adminOn});
         return $param[0];
 }

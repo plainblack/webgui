@@ -18,7 +18,6 @@ use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::URL;
@@ -27,7 +26,7 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub process {
 	return "" unless ($session{var}{adminOn});
-	my @param = WebGUI::Macro::getParams($_[0]);
+	my @param = @_;
         my $templateId = $param[0] || "PBtmpl0000000000000090";
         my %var;
 	my (%cphash, %hash2, %hash, $r, @item, $query);

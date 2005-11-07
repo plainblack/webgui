@@ -45,6 +45,7 @@ if ($] >= 5.006) {
 checkModule("LWP",5.80);
 checkModule("HTTP::Request",1.40);
 checkModule("HTTP::Headers",1.61);
+checkModule("Test::More",0.61);
 checkModule("Digest::MD5",2.20);
 checkModule("DBI",1.40);
 checkModule("DBD::mysql",2.1021);

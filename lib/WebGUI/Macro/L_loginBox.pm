@@ -13,7 +13,6 @@ package WebGUI::Macro::L_loginBox;
 use strict;
 use WebGUI::Form;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
@@ -25,7 +24,7 @@ sub _createURL {
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
+        my @param = @_;
 	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	
         $var{'user.isVisitor'} = ($session{user}{userId} eq "1");

@@ -39,8 +39,10 @@ our @ISA = qw(WebGUI::Auth);
 
 sub _isValidPassword {
    my $self = shift;
-   my $password = WebGUI::Macro::negate(shift);
-   my $confirm = WebGUI::Macro::negate(shift);
+   my $password = shift;
+	 WebGUI::Macro::negate(\$password);
+   my $confirm = shift;
+	WebGUI::Macro::negate(\$confirm);
    my $error = "";
 
    if ($password ne $confirm) {

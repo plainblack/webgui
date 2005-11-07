@@ -16,6 +16,7 @@ package WebGUI::HTTP;
 
 
 use strict;
+use Apache2::Cookie;
 use WebGUI::Session;
 use WebGUI::Style;
 
@@ -31,6 +32,7 @@ This package allows the manipulation of HTTP protocol information.
 
  use WebGUI::HTTP;
 
+ $cookies = WebGUI::HTTP::getCookies();
  $header = WebGUI::HTTP::getHeader();
  $mimetype = WebGUI::HTTP::getMimeType();
  $code = WebGUI::HTTP::getStatus();
@@ -48,6 +50,26 @@ These subroutines are available from this package:
 
 =cut
 
+
+
+#-------------------------------------------------------------------
+
+=head2 getCookies ( )
+
+Retrieves the cookies from the HTTP header, persists them to the session, and returns a hash reference containing them.
+
+=cut
+
+sub getCookies {
+	my %cookies = Apache2::Cookie->fetch();
+        foreach my $key (keys %cookies) {
+                my $value = $cookies{$key};
+                $value =~ s/$key=//;    # Strange... The Apache2::Cookie value also contains the key ????
+                                        # Must be a bug in Apache2::Cookie...
+                $WebGUI::Session::session{cookie}{$key} = $value;
+        }
+	return $WebGUI::Session::session{cookie};
+}
 
 
 #-------------------------------------------------------------------

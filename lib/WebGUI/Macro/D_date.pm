@@ -12,12 +12,11 @@ package WebGUI::Macro::D_date;
 
 use strict;
 use WebGUI::DateTime;
-use WebGUI::Macro;
 
 #-------------------------------------------------------------------
 sub process {
         my (@param, $temp, $time);
-        @param = WebGUI::Macro::getParams($_[0]);
+        @param = @_;
 	$time = $param[1] || time();
 	$temp = epochToHuman($time,$param[0]);
 	return $temp;

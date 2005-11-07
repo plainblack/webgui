@@ -13,10 +13,9 @@ package WebGUI::Macro::If;
  
 use strict;
 use Safe;
-use WebGUI::Macro;
 
 sub process {
-        my ($expression, $true, $false) = WebGUI::Macro::getParams(shift);
+        my ($expression, $true, $false) = @_;
         my $output = $false; 
 
         # Workaround to "Safely" eval $expression

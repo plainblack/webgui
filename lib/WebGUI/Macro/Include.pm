@@ -12,12 +12,11 @@ package WebGUI::Macro::Include;
 
 use strict;
 use FileHandle;
-use WebGUI::Macro;
 
 #-------------------------------------------------------------------
 sub process {
         my (@param, $temp, $file);
-        @param = WebGUI::Macro::getParams($_[0]);
+        @param = @_;
         if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /WebGUI.conf/) {
                 $temp = "SECURITY VIOLATION";
         } else {

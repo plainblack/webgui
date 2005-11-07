@@ -287,13 +287,12 @@ sub execute {
 
 =head2 finish ( )
 
-Ends a query after calling the "read" method.
+Ends a query after calling the read() or unconditionalRead() methods. Don't use this unless you're not retrieving the full result set, or if you're using it with the unconditionalRead() method.
 
 =cut
 
 sub finish {
-        $_[0]->{_sth}->finish;
-	return "";
+        return $_[0]->{_sth}->finish;
 }
 
 

@@ -114,7 +114,10 @@ sub validateProfileData {
    $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
                            and userProfileCategory.editable=1 and userProfileField.editable=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
    while (%field = $a->hash) {
-      $data{$field{fieldName}} = WebGUI::Macro::negate(WebGUI::FormProcessor::process($field{fieldName},$field{dataType}, $field{dataDefault}));
+	my $fieldData = WebGUI::FormProcessor::process($field{fieldName},$field{dataType}, $field{dataDefault});
+	WebGUI::Macro::negate(\$fieldData);
+      $data{$field{fieldName}} = $fieldData;
+
 	  if ($field{required} && $data{$field{fieldName}} eq "") {
 	     $error .= '<li>'.(WebGUI::Operation::Shared::secureEval($field{fieldLabel})).' '.WebGUI::International::get(451).'</li>';
 	  }elsif($field{fieldName} eq "email" && isDuplicateEmail($data{$field{fieldName}})){

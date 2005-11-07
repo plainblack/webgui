@@ -15,7 +15,6 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Id;
 use WebGUI::Session;

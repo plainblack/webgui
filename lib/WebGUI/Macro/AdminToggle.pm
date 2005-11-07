@@ -13,7 +13,6 @@ package WebGUI::Macro::AdminToggle;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
@@ -22,7 +21,7 @@ use WebGUI::URL;
 sub process {
          if (WebGUI::Grouping::isInGroup(12)) {
         	my %var;
-                 my ($turnOn,$turnOff,$templateName) = WebGUI::Macro::getParams($_[0]);
+                 my ($turnOn,$turnOff,$templateName) = @_;
               $turnOn ||= WebGUI::International::get(516,'Macro_AdminToggle');
               $turnOff ||= WebGUI::International::get(517,'Macro_AdminToggle');
                  if (WebGUI::Session::isAdminOn()) {

@@ -12,13 +12,11 @@ package WebGUI::Macro::International;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	return WebGUI::International::get($param[0],$param[1]);
+	return WebGUI::International::get(shift,shift);
 }
 
 

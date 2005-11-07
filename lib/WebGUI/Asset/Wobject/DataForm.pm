@@ -461,7 +461,9 @@ sub getRecordTemplateVars {
 				$data{value} = WebGUI::DateTime::setToEpoch($data{value}) if ($data{type} eq "date");
 			}
 			if (not exists $data{value}) {
-				$data{value} = WebGUI::Macro::process($data{defaultValue});
+				my $defaultValue = $data{defaultValue};
+				WebGUI::Macro::process(\$defaultValue);
+				$data{value} = $defaultValue;
 			}
 			my $hidden = (($data{status} eq "hidden" && !$session{var}{adminOn}) || ($data{isMailField} && !$self->get("mailData")));
 			my $value = $data{value};
@@ -503,7 +505,9 @@ sub getRecordTemplateVars {
 			$data{value} = WebGUI::DateTime::setToEpoch($data{value}) if ($data{type} eq "date");
 		}
 		if (not exists $data{value}) {
-			$data{value} = WebGUI::Macro::process($data{defaultValue});
+			my $defaultValue = $data{defaultValue};
+			WebGUI::Macro::process(\$defaultValue);
+			$data{value} = $defaultValue;
 		}
 		my $hidden = (($data{status} eq "hidden" && !$session{var}{adminOn}) || ($data{isMailField} && !$self->get("mailData")));
 		my $value = $data{value};
@@ -612,7 +616,8 @@ sub purge {
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
-	my $message = WebGUI::Macro::process($self->processTemplate($var,$self->get("emailTemplateId")));
+	my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
+	WebGUI::Macro::process(\$message);
 	my ($to, $subject, $from, $bcc, $cc);
 	foreach my $row (@{$var->{field_loop}}) {
 		if ($row->{"field.name"} eq "to") {
@@ -1079,7 +1084,7 @@ sub www_process {
 		my $value = $row{defaultValue};
 		if ($row{status} eq "required" || $row{status} eq "editable") {
 			$value = WebGUI::FormProcessor::process($row{name},$row{type},$row{defaultValue});
-			$value = WebGUI::Macro::filter($value);
+			WebGUI::Macro::filter(\$value);
 		}
 		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
 			push (@errors,{
@@ -1089,7 +1094,8 @@ sub www_process {
 			delete $var->{entryId};
 		}
 		if ($row{status} eq "hidden") {
-                        $value = WebGUI::Macro::process($row{defaultValue});
+			$value = $row{defaultValue};
+                        WebGUI::Macro::process(\$value);
                 }
 		unless ($hadErrors) {
 			my ($exists) = WebGUI::SQL->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=".quote($entryId)."

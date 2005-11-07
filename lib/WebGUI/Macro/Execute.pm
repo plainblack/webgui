@@ -11,11 +11,10 @@ package WebGUI::Macro::Execute;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
+        my @param = @_;
 	if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /\.conf/) {
 		return "SECURITY VIOLATION";
 	} else {

@@ -172,8 +172,7 @@ Adds a FATAL type message to the log, outputs an error message to the user, and 
 sub fatal {
 	my $message = shift;
 	my $logger = getLogger();
-	Apache2::RequestUtil->request->content_type('text/html');
-
+	Apache2::RequestUtil->request->content_type('text/html') if ($WebGUI::Session::session{req});
 	$logger->fatal($message);
 	$logger->debug("Stack trace for FATAL ".$message."\n".getStackTrace());
         unless ($WebGUI::Session::session{setting}{showDebug}) {

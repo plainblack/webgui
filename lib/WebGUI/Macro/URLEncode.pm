@@ -11,14 +11,12 @@ package WebGUI::Macro::URLEncode;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	return WebGUI::URL::escape($param[0]);
+	return WebGUI::URL::escape(shift);
 }
 
 

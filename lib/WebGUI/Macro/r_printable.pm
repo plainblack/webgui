@@ -12,7 +12,6 @@ package WebGUI::Macro::r_printable;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
@@ -21,7 +20,7 @@ use WebGUI::Utility;
 #-------------------------------------------------------------------
 sub process {
         my ($temp, @param, $styleId);
-        @param = WebGUI::Macro::getParams($_[0]);
+        @param = @_;
 	my $append = 'op=makePrintable';
 	if ($session{env}{REQUEST_URI} =~ /op\=/) {
 		$append = 'op2='.WebGUI::URL::escape($append);

@@ -11,14 +11,12 @@ package WebGUI::Macro::StyleSheet;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Style;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($file) = WebGUI::Macro::getParams(shift);
-	WebGUI::Style::setLink($file,{
+	WebGUI::Style::setLink(shift,{
 		type=>'text/css',
 		rel=>'stylesheet'
 		});

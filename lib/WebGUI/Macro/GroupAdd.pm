@@ -13,14 +13,13 @@ package WebGUI::Macro::GroupAdd;
 use strict;
 use WebGUI::Group;
 use WebGUI::Grouping;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	my @param = WebGUI::Macro::getParams($_[0]);
+	my @param = @_;
 	return "" if ($param[0] eq "");
 	return "" if ($param[1] eq "");
 	return "" if ($session{user}{userId} eq '1');

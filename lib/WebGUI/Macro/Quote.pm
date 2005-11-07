@@ -11,13 +11,11 @@ package WebGUI::Macro::Quote;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($value) = WebGUI::Macro::getParams(shift);
-	return quote($value);
+	return quote(shift);
 	
 }
 

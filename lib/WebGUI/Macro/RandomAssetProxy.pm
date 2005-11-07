@@ -12,12 +12,11 @@ package WebGUI::Macro::RandomAssetProxy;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my ($url) = WebGUI::Macro::getParams(shift);
+        my $url = shift;
 	my $asset = WebGUI::Asset->newByUrl($url);
 	if (defined $asset) {
 		my $children = $asset->getLineage(["children"]);

@@ -33,10 +33,12 @@ B<NOTE:> This entire system is likely to be replaced in the near future.  It has
 =head1 SYNOPSIS
 
  use WebGUI::Macro;
- $html = WebGUI::Macro::filter($html);
+
  @array = WebGUI::Macro::getParams($parameterString);
- $html = WebGUI::Macro::negate($html);
- $html = WebGUI::Macro::process($html);
+
+ WebGUI::Macro::filter(\$html);
+ WebGUI::Macro::negate(\$html);
+ WebGUI::Macro::process(\$html);
 
 =head1 METHODS
 
@@ -73,42 +75,17 @@ Removes all the macros from the HTML segment.
 
 =head3 html
 
-The segment to be filtered.
+The segment to be filtered as a scalar reference.
 
 =cut
 
 sub filter {
 	my $content = shift;
-        while ($content =~ /($nestedMacro)/gs) {
-		$content =~ s/\Q$1//gs;
+        while ($$content =~ /($nestedMacro)/gs) {
+		$$content =~ s/\Q$1//gs;
 	}
-	return $content;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 getParams ( parameterString )
-
-A simple, but error prone mechanism for getting a prameter list from a string. Returns an array of parameters.
-
-=head3 parameterString
-
-A string containing a comma separated list of paramenters.
-
-=cut
-
-sub getParams {
-        my ($data, @param);
-        $data = $_[0];
-        push(@param, $+) while $data =~ m {
-                "([^\"\\]*(?:\\.[^\"\\]*)*)",?
-                |       ([^,]+),?
-                |       ,
-        }gx;
-        push(@param, undef) if substr($data,-1,1) eq ',';
-	return @param;
-}
 
 #-------------------------------------------------------------------
 
@@ -118,14 +95,13 @@ Nullifies all macros in this content segment.
 
 =head3 html
 
-A string of HTML to be processed.
+A scalar refernece of HTML to be processed.
 
 =cut
 
 sub negate {
-	my $html = $_[0];
-	$html =~ s/\^/\&\#94\;/g;
-	return $html;
+	my $html = shift;
+	$$html =~ s/\^/\&\#94\;/g;
 }
 
 
@@ -137,27 +113,34 @@ Runs all the WebGUI macros to and replaces them in the HTML with their output.
 
 =head3 html
 
-A string of HTML to be processed.
+A scalar reference of HTML to be processed.
 
 =cut
 
 sub process {
    	my $content = shift;
-   	while ($content =~ /$nestedMacro/gs) {
+   	while ($$content =~ /$nestedMacro/gs) {
       		my ($macro, $searchString, $params) = ($1, $2, $3);
       		next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
       		next if ($searchString =~ /^\-$/); # don't process ^-;
 		if ($params ne "") {
       			$params =~ s/(^\(|\)$)//g; # remove parenthesis
-      			$params = &process($params); # recursive process params
+      			&process(\$params); # recursive process params
 		}
 		if ($WebGUI::Session::session{config}{macros}{$searchString} ne "") {
       			my $cmd = "WebGUI::Macro::".$WebGUI::Session::session{config}{macros}{$searchString};
 			my $load = "use ".$cmd;
 			eval($load);
 			WebGUI::ErrorHandler::error("Macro failed to compile: $cmd.".$@) if($@);
+			my @param;
+        		push(@param, $+) while $params =~ m {
+                		"([^\"\\]*(?:\\.[^\"\\]*)*)",?
+                		|       ([^,]+),?
+                		|       ,
+        			}gx;
+        		push(@param, undef) if substr($params,-1,1) eq ',';
       			$cmd = $cmd."::process";
-			my $result = eval{&$cmd($params)};
+			my $result = eval{&$cmd(@param)};
 			if ($@) {
 				WebGUI::ErrorHandler::error("Processing failed on macro: $macro: ".$@);
 			} else {
@@ -165,14 +148,11 @@ sub process {
                                         $result = "Endless macro loop detected. Stopping recursion.";
 					WebGUI::ErrorHandler::warn($macro." : ".$result)
                                 }
-				$content =~ s/\Q$macro/$result/ges;
+				$$content =~ s/\Q$macro/$result/ges;
 			}
 		}
    	}
-   	return $content;
 }
-
-
 
 1;
 

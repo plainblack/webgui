@@ -11,14 +11,12 @@ package WebGUI::Macro::Page;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
 	if (exists $session{asset}) {
-		return $session{asset}->get($param[0]);
+		return $session{asset}->get(shift);
 	}
 	return "";
 }

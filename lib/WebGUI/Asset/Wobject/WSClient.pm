@@ -298,8 +298,10 @@ sub view {
 
    # snag our SOAP call and preprocess if needed
    if ($self->get('preprocessMacros')) {
-      $call = WebGUI::Macro::process($self->get("callMethod"));
-      $param_str = WebGUI::Macro::process($self->get("params"));
+	$call = $self->get("callMethod");
+       WebGUI::Macro::process(\$call);
+	$param_str = $self->get("params");
+      WebGUI::Macro::process(\$param_str);
     } else {
        $call        = $self->get('callMethod');
        $param_str   = $self->get('params');

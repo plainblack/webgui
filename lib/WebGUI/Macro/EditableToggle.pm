@@ -13,7 +13,6 @@ package WebGUI::Macro::EditableToggle;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
@@ -22,7 +21,7 @@ use WebGUI::URL;
 sub process {
          if (exists $session{asset} && $session{asset}->canEdit && WebGUI::Grouping::isInGroup(12)) {
         	my %var;
-              my @param = WebGUI::Macro::getParams($_[0]);
+              my @param = @_;
               my $turnOn = $param[0] || WebGUI::International::get(516,'Macro_EditableToggle');
               my $turnOff = $param[1] || WebGUI::International::get(517,'Macro_EditableToggle');
                  if ($session{var}{adminOn}) {

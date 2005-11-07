@@ -261,7 +261,9 @@ sub createAccountSave {
    
    WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$userId);
    _logLogin($userId,"success");
-   system(WebGUI::Macro::process($session{setting}{runOnRegistration})) if ($session{setting}{runOnRegistration} ne "");
+	my $command = $session{setting}{runOnRegistration};
+	WebGUI::Macro::process(\$command);
+   system($command) if ($session{setting}{runOnRegistration} ne "");
    WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
    return "";
 }
@@ -739,7 +741,8 @@ Validates the a username.
 
 sub validUsername {
    my $self = shift;
-   my $username = WebGUI::Macro::negate($_[0]);
+	my $username = shift;
+   WebGUI::Macro::negate(\$username);
    my $error = "";
    
    if($self->_isDuplicateUsername($username)){

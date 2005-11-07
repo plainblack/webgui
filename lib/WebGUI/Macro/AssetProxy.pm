@@ -14,12 +14,11 @@ use strict;
 use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::ErrorHandler;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my ($url) = WebGUI::Macro::getParams(shift);
+        my $url = shift;
 	my $t = [Time::HiRes::gettimeofday()] if (WebGUI::ErrorHandler::canShowPerformanceIndicators());
 	my $asset = WebGUI::Asset->newByUrl($url);
 	#Sorry, you cannot proxy the notfound page.

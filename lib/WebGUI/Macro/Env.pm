@@ -11,13 +11,11 @@ package WebGUI::Macro::Env;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
-	return $session{env}{$param[0]};
+	return $session{env}{shift};
 }
 
 1;

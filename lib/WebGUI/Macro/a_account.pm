@@ -12,7 +12,6 @@ package WebGUI::Macro::a_account;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
@@ -20,7 +19,7 @@ use WebGUI::URL;
 #-------------------------------------------------------------------
 sub process {
        my %var;
-         my  @param = WebGUI::Macro::getParams(shift);
+         my  @param = @_;
 	return WebGUI::URL::page("op=auth;method=init") if ($param[0] eq "linkonly");
        $var{'account.url'} = WebGUI::URL::page('op=auth;method=init');
        $var{'account.text'} = $param[0] || WebGUI::International::get(46,'Macro_a_account');

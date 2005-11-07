@@ -13,6 +13,7 @@ package WebGUI::Asset::Shortcut;
 use strict;
 use WebGUI::Asset;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -240,7 +241,7 @@ sub getShortcutByCriteria {
 	my $assetId = $self->getId;
 
 	# Parse macro's in criteria
-	$criteria = WebGUI::Macro::process($criteria);
+	WebGUI::Macro::process(\$criteria);
 
 	# Once a asset is found, we will stick to that asset, 
 	# to prevent the proxying of multiple- depth assets like Surveys and USS.

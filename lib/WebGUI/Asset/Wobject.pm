@@ -396,23 +396,6 @@ sub moveCollateralUp {
 }
 
 #-------------------------------------------------------------------
-
-=head2 processMacros ( output )
-
- Decides whether or not macros should be processed and returns the appropriate output.
-
-=head3 output
-
- An HTML blob to be processed for macros.
-
-=cut
-
-sub processMacros {
-	return WebGUI::Macro::process($_[1]);
-}
-
-
-#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;

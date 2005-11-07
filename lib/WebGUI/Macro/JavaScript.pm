@@ -11,14 +11,12 @@ package WebGUI::Macro::JavaScript;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Style;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($script) = WebGUI::Macro::getParams(shift);
-	WebGUI::Style::setScript($script,{type=>'text/javascript'});
+	WebGUI::Style::setScript(shift,{type=>'text/javascript'});
 	return "";
 }
 

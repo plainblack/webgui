@@ -12,14 +12,13 @@ package WebGUI::Macro::LoginToggle;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-        my @param = WebGUI::Macro::getParams($_[0]);
+        my @param = @_;
         my $login = $param[0] || WebGUI::International::get(716,'Macro_LoginToggle');
         my $logout = $param[1] || WebGUI::International::get(717,'Macro_LoginToggle');
 	my %var;

@@ -235,7 +235,9 @@ sub view {
 	$var{query} .= " ".join(" ",map("-".$_,split(/\s+/,$var{without}))) if ($var{without});
 	
 	# Remove macro's from query
-	$var{query} = WebGUI::Macro::negate($var{query});
+	my $query = $var{query};
+	WebGUI::Macro::negate(\$query);
+	$var{query} = $query;
  
 	# Set some standard vars
 	$var{submit} = WebGUI::Form::submit({value=>WebGUI::International::get(16, "Asset_IndexedSearch")});

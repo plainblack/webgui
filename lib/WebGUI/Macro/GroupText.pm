@@ -12,13 +12,12 @@ package WebGUI::Macro::GroupText;
 
 use strict;
 use WebGUI::Grouping;
-use WebGUI::Macro;
 use WebGUI::SQL;
 use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	my @param = WebGUI::Macro::getParams($_[0]);
+	my @param = @_;
 	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($param[0]),WebGUI::SQL->getSlave);
 	$groupId = 3 if ($groupId eq "");
 	if (WebGUI::Grouping::isInGroup($groupId)) { 

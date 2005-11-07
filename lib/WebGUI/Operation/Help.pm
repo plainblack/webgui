@@ -96,8 +96,9 @@ sub www_viewHelp {
         my $body = WebGUI::Asset::Template->new("PBtmplHelp000000000001")->process(\%vars);
     	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpIndex'),WebGUI::International::get(95));
     	$ac->addSubmenuItem(WebGUI::URL::page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
+	WebGUI::Macro::process(\$body);
     	return $ac->render(
-		WebGUI::Macro::process($body), 
+		$body, 
 		WebGUI::International::get(93).': '.$i18n->get($help->{title})
 		);
 }

@@ -23,6 +23,12 @@ uploadsURL = /uploads
 
 uploadsPath = /data/WebGUI/www/uploads
 
+# An array of URLs that WebGUI should leave alone for normal
+# processing by Apache. Anything that begins with these URLs
+# will be entirely ignored by WebGUI
+
+# passthruUrls => /icons, /documentation/pdf, /my-custom-application, /server-status, /perl-status
+
 # The scripturl tells WebGUI how to reference the gateway script 
 # when generating URLs. By default it will use the gateway
 # script's filename like /index.pl/

@@ -305,7 +305,7 @@ sub profileField {
 	$self = shift;
         $fieldName = shift;
         $value = shift;
-	$value = WebGUI::Macro::negate($value);	
+	WebGUI::Macro::negate(\$value);	
 	if (defined $value) {
 		$self->uncache;
 		$self->{_profile}{$fieldName} = $value;

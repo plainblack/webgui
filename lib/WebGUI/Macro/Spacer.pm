@@ -12,13 +12,12 @@ package WebGUI::Macro::Spacer;
 
 use strict;
 use WebGUI::Session;
-use WebGUI::Macro;
 
 #-------------------------------------------------------------------
 
 sub process {
         my ($output, @param, $width, $height);
-        @param = WebGUI::Macro::getParams($_[0]);
+        @param = @_;
         $width = $param[0] if defined $param[0];
         $height = $param[1] if defined $param[1];
         $output = '<img src="'.$session{config}{extrasURL}.'/spacer.gif"'.(defined $width?' width="'.$width.'"':'').(defined $height?' height="'.$height.'"':'').' border="0" alt="" />';

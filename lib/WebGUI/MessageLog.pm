@@ -213,7 +213,8 @@ sub addInternationalizedEntry {
                         $subject{$u->profileField("language")} = $subject{1} if ($subject{$u->profileField("language")} eq "");
                         $subject = $subject{$u->profileField("language")};
                         $message{$u->profileField("language")} = $message{1} if ($message{$u->profileField("language")} eq "");
-                        $message = WebGUI::Macro::process($message{$u->profileField("language")});
+			$message = $message{$u->profileField("language")};
+                        WebGUI::Macro::process(\$message);
                         WebGUI::SQL->write("insert into messageLog values (".quote($messageLogId).",".quote($u->userId).",
                                 ".quote($message).",".quote($url).",".time().",".quote($message).",".quote($status).")");
                         if ($url ne "") {

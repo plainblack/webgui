@@ -188,6 +188,12 @@ definitions like so:
 alter table MyTable change assetId assetId binary not null;
 
 
+1.7 processMacros() Method Removed
+
+In 6.8 the long depricated method processMacros() was removed. No one should
+be using this any longer anyway, but we thought we'd warn you anyway.
+
+
 
 2. Macro Migration
 -------------------
@@ -204,10 +210,21 @@ If you absolutely must write a navigation macro for some reason that our nav
 system does not accomodate you, then please check out the new API in
 WebGUI::Navigation.
 
-2.1 Navigation Macros Revisited
+
+2.2 Navigation Macros Revisited
 
 As of 6.3 check out lib/WebGUI/Asset/Wobject/Navigation.pm if you want to
 write custom navigation macros.
+
+
+2.3 Macro API Changed
+
+In 6.8 we modified the macro API to be more user friendly, and more
+importantly to use a lot less memory. This has two results. If you use the
+macro methods like filter(), negate(), or process() then you need to start
+passing your content in as a scalar reference instead of a regular scalar. If
+you write your own macros, you no longer need to call getParams() to retreive
+your parameters. That is automatically done for you now.
 
 
 

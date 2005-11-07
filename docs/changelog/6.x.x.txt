@@ -7,6 +7,8 @@
  - Switched from Apache::Registry/CGI to a pure mod_perl2 interface, which
    increased performance by over 70% to the entire system, and in some cases
    as much as 100%. See gotcha.txt for details.
+ - Changed macro API which cuts macro memory consumption in half. See
+   migration.txt for details.
 
 
 6.7.7

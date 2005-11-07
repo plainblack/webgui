@@ -11,14 +11,13 @@ package WebGUI::Macro::AOIHits;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub process {
 	my (@param, $temp);
-        @param = WebGUI::Macro::getParams($_[0]);
+        @param = @_;
 	my $key = $param[0];
 	my $value = $param[1];
 	my $sql = "select count from passiveProfileAOI a, metaData_properties f 

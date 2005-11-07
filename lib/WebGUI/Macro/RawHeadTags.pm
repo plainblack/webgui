@@ -11,14 +11,12 @@ package WebGUI::Macro::RawHeadTags;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::Style;
 
 #-------------------------------------------------------------------
 sub process {
-	my ($html) = WebGUI::Macro::getParams(shift);
-	WebGUI::Style::setRawHeadTags($html);
+	WebGUI::Style::setRawHeadTags(shift);
 	return "";
 }
 

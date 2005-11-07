@@ -3,6 +3,7 @@ package WebGUI::Subscription;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Grouping;
+use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::Commerce::Payment;
 use WebGUI::DateTime;
@@ -33,7 +34,9 @@ sub apply {
 	WebGUI::User->new($userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});
 
 	# Process executeOnPurchase field
-	system(WebGUI::Macro::process($self->{_properties}{executeOnSubscription})) if ($self->{_properties}{executeOnSubscription} ne "");
+	my $command = $self->{_properties}{executeOnSubscription};
+	WebGUI::Macro::process(\$command);
+	system($command) if ($self->{_properties}{executeOnSubscription} ne "");
 }
 
 #-------------------------------------------------------------------

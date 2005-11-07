@@ -99,11 +99,13 @@ sub send {
 		$message .= "Content-Type: text/plain; charset=UTF-8\n";
 	}
 	$message .= "\n";
-	$message = WebGUI::Macro::process($message);
+	WebGUI::Macro::process(\$message);
 	#body
 	$message .= $_[2]."\n";
 	#footer
-	$message .= WebGUI::Macro::process("\n".$session{setting}{mailFooter});
+	my $footer = "\n".$session{setting}{mailFooter};
+	WebGUI::Macro::process(\$footer);
+	$message .= $footer;
 	$message .= "\n\n\nThis message was intended for ".$_[0].", but was overridden in the config file.\n\n\n" if ($session{config}{emailOverride});
 	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
 		if (open(MAIL,"| $session{setting}{smtpServer} -t -oi")) {

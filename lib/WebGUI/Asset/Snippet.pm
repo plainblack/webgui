@@ -148,7 +148,8 @@ sub getToolbar {
 sub view {
 	my $self = shift;
 	my $calledAsWebMethod = shift;
-	my $output = WebGUI::Macro::process($self->get("snippet"));
+	my $output = $self->get("snippet");
+	WebGUI::Macro::process(\$output);
 	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($session{var}{adminOn} && !$calledAsWebMethod);
 	return $output unless ($self->getValue("processAsTemplate")); 
 	return WebGUI::Asset::Template->processRaw($output);

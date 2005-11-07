@@ -102,14 +102,13 @@ Choose from "all", "none", "macros", "javascript", or "most". Defaults to "most"
 =cut
 
 sub filter {
-	my ($filter, $html, $type);
-	$type = $_[1];
+	my $html = shift;
+	my $type = shift;
 	if ($type eq "all") {
-		$filter = HTML::TagFilter->new(allow=>{'none'},strip_comments=>1);
-		$html = $filter->filter($_[0]);
-		return WebGUI::Macro::negate($html);
+		my $filter = HTML::TagFilter->new(allow=>{'none'},strip_comments=>1);
+		$html = $filter->filter($html);
+		WebGUI::Macro::negate(\$html);
 	} elsif ($type eq "javascript") {
-		$html = $_[0];
 		$html =~ s/\<script.*?\/script\>//ixsg;
 		$html =~ s/(href="??)javascript\:.*?\)/$1removed/ixsg;
 		$html =~ s/onClick/removed/ixsg;
@@ -125,16 +124,17 @@ sub filter {
 		$html =~ s/onKeyDown/removed/ixsg;
 		$html =~ s/onSubmit/removed/ixsg;
 		$html =~ s/onReset/removed/ixsg;
-		$html = WebGUI::Macro::negate($html);
+		WebGUI::Macro::negate(\$html);
 	} elsif ($type eq "macros") {
-		return WebGUI::Macro::negate($_[0]);
+		WebGUI::Macro::negate(\$html);
 	} elsif ($type eq "none") {
-		return $_[0];
+		# do nothing
 	} else {
-		$filter = HTML::TagFilter->new; # defaultly strips almost everything
-		$html = $filter->filter($_[0]);
-		return WebGUI::Macro::filter($html);
+		my $filter = HTML::TagFilter->new; # defaultly strips almost everything
+		$html = $filter->filter($html);
+		WebGUI::Macro::filter(\$html);
 	}
+	return $html;
 }
 
 #-------------------------------------------------------------------

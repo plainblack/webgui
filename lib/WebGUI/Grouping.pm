@@ -20,6 +20,7 @@ use WebGUI::Cache;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::LDAPLink;
+use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -427,7 +428,9 @@ sub isInGroup {
                         my $dbh = $dbLink->dbh;
                         if (defined $dbh) {
                                 if ($group{dbQuery} =~ /select 1/i) {
-                                        $group{dbQuery} = WebGUI::Macro::process($group{dbQuery});
+					my $query = $group{dbQuery};
+					WebGUI::Macro::process(\$query);
+                                        $group{dbQuery} = $query;
                                         my $sth = WebGUI::SQL->unconditionalRead($group{dbQuery},$dbh);
                                         unless ($sth->errorCode < 1) {
                                                 WebGUI::ErrorHandler::warn("There was a problem with the database query for group ID $gid.");

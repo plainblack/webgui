@@ -2,7 +2,6 @@ package WebGUI::Macro::Product;
 
 use strict;
 use WebGUI::Session;
-use WebGUI::Macro;
 use WebGUI::Product;
 use WebGUI::Asset::Template;
 use WebGUI::SQL;
@@ -11,7 +10,7 @@ use WebGUI::International;
 sub process {
 	my (@param, $productId, $variantId, $product, $variant, $output, $templateId, @variantLoop, %var);
 	
-	@param = WebGUI::Macro::getParams(@_);
+	@param = @_;
 	
 	return 'No SKU or productId passed' unless ($_[0]);
 
