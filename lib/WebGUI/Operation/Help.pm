@@ -60,6 +60,15 @@ sub _linkTOC {
 }
 
 #-------------------------------------------------------------------
+sub _getHelpFilesList {
+        my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Help";
+        opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
+        my @files = grep { /^_Help/ } grep { /\.pm$/} readdir(DIR);
+        closedir(DIR);
+	return @files;
+}
+
+#-------------------------------------------------------------------
 sub _getHelpName {
 	my $file = shift;
 	my $helpName;
@@ -108,10 +117,7 @@ sub www_viewHelpIndex {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
         my @helpIndex;
 	my $i;
-        my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Help";
-        opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
-        my @files = grep { /\.pm$/} readdir(DIR);
-        closedir(DIR);
+	my @files = _getHelpFilesList();
         foreach my $file (@files) {
                 if ($file =~ /(.*?)\.pm$/) {
                         my $namespace = $1;
@@ -146,10 +152,7 @@ sub www_viewHelpTOC {
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
         my @helpIndex;
 	my $i;
-        my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Help";
-        opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
-        my @files = grep { /\.pm$/} readdir(DIR);
-        closedir(DIR);
+	my @files = _getHelpFilesList();
 	my $third = round(@files/3 + 0.50);
 	my @entries;
 	foreach my $file (@files) {
