@@ -9,6 +9,7 @@
    as much as 100%. See gotcha.txt for details.
  - Changed macro API which cuts macro memory consumption in half. See
    migration.txt for details.
+ - Added automated code testing framework.
 
 
 6.7.7
