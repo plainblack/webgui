@@ -17,6 +17,7 @@ package WebGUI::HTTP;
 
 use strict;
 use Apache2::Cookie;
+use APR::Request::Apache2;
 use WebGUI::Session;
 use WebGUI::Style;
 
@@ -61,13 +62,7 @@ Retrieves the cookies from the HTTP header, persists them to the session, and re
 =cut
 
 sub getCookies {
-	my %cookies = Apache2::Cookie->fetch();
-        foreach my $key (keys %cookies) {
-                my $value = $cookies{$key};
-                $value =~ s/$key=//;    # Strange... The Apache2::Cookie value also contains the key ????
-                                        # Must be a bug in Apache2::Cookie...
-                $WebGUI::Session::session{cookie}{$key} = $value;
-        }
+	$WebGUI::Session::session{cookie} = APR::Request::Apache2->handle($session{req})->jar();
 	return $WebGUI::Session::session{cookie};
 }
 

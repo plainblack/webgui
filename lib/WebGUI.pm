@@ -34,7 +34,6 @@ use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED);
 use Apache2::ServerUtil ();
-use APR::Request::Apache2;
 
 #-------------------------------------------------------------------	
 sub handler {
