@@ -433,6 +433,11 @@ our $I18N = {
 		lastUpdated => 1109698614,
 	},
 
+	'rss template' => {
+		message => q|RSS Template|,
+		lastUpdated => 1109698614,
+	},
+
 	'who moderates' => {
 		message => q|Who can moderate?|,
 		lastUpdated => 1109698614,
@@ -847,6 +852,10 @@ properties listed below:</p>
                 message => q|The template used to generate emails for users who have subscribed to this Asset.|,
                 lastUpdated => 1119070429,
         },
+        'rss template description' => {
+                message => q|The template used to generate the xml for an rss feed based on this Asset.|,
+                lastUpdated => 1119070429,
+        },
 
         'who moderates description' => {
                 message => q|The group that will moderate posts to this Asset, if moderation is enabled.|,
@@ -1252,6 +1261,64 @@ A URL for sorting and displaying the list of posts by the number of replies to t
 <p>
 <b>sortby.rating.url</b><br>
 A URL for sorting and displaying the list of posts by their ratings.
+
+                |,
+		lastUpdated => 1114467741,
+	},
+
+
+	'collaboration rss template title' => {
+		message => q|Collaboration RSS Template|,
+		lastUpdated => 1114467745,
+	},
+
+	'collaboration rss template body' => {
+		message => q|The Collaboration RSS template is available to allow configuration of the XML produced as an RSS feed for a collaboration.  To produce a valid rss feed, this template must adhere to the <a href="http://blogs.law.harvard.edu/tech/rss">RSS 2.0 Specification.</a>  These variables are available in the Collaboration RSS Template:<p>
+
+<p>
+<b>title</b><br>
+The title of the rss feed (comes from the collaboration title).
+
+<p>
+<b>link</b><br>
+The url to the collaboration.
+
+<p>
+<b>description</b><br>
+The description of the rss feed (comes from the collaboration description).
+
+<p>
+<b>generator</b><br>
+The program used to generate the rss feed, i.e. WebGUI plus version information. (optional field)
+<p>
+<b>webMaster</b><br>
+The email address of the person responsible for the technical issues relating to this rss feed. (optional field)
+<p>
+<b>docs</b><br>
+The url of documentation about the format of this file, RSS 2.0 (optional field)
+<p>
+<b>lastBuildDate</b><br>
+The date that this feed was last updated. (optional field)
+
+<p>
+<b>item_loop</b><br>
+Loops over the posts to be transmitted in this RSS feed.
+<blockquote>
+<b>title</b><br>
+The title of the item (post).
+<p>
+<b>link</b><br>
+The url to the full text of the item.
+<p>
+<b>description</b><br>
+A synopsis of the item.
+<p>
+<b>guid</b><br>
+A unique identifier for this item.
+<p>
+<b>pubDate</b><br>
+The date the item was published.
+</blockquote>
 
                 |,
 		lastUpdated => 1114467741,

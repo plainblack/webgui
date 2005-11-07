@@ -36,6 +36,11 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
+                                title => 'rss template',
+                                description => 'rss template description',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
                                 title => 'who moderates',
                                 description => 'who moderates description',
                                 namespace => 'Asset_Collaboration',
@@ -181,6 +186,19 @@ our $HELP = {
 	'collaboration search template' => {
 		title => 'collaboration search template title',
 		body => 'collaboration search template body',
+		fields => [
+		],
+		related => [
+			{
+		   		tag => 'collaboration post list template variables',
+				namespace => 'Asset_Collaboration',
+			},
+		]
+	},
+
+	'collaboration rss template' => {
+		title => 'collaboration rss template title',
+		body => 'collaboration rss template body',
 		fields => [
 		],
 		related => [

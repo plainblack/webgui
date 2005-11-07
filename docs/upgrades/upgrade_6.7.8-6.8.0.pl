@@ -26,7 +26,61 @@ addTimeZonesToUserPreferences();
 # the new DateTime system uses Params::Validate, which will only validate integers
 # up to 2^32 as SCALARs. :(
 removeUnneededFiles();
+updateCollaboration();
 finish();
+
+#-------------------------------------------------
+sub updateCollaboration {
+print "\tAdding collaboration/rss template\n" unless ($quiet);
+my $template = <<STOP;
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<rss version=\"2.0\">
+<channel>
+<title><tmpl_var title></title>
+<link><tmpl_var link></link>
+<description><tmpl_var description></description>
+<tmpl_loop item_loop>
+<item>
+<title><tmpl_var title></title>
+<link><tmpl_var link></link>
+<description><tmpl_var description></description>
+<guid isPermaLink=\"true\"><tmpl_var guid></guid>
+<pubDate><tmpl_var pubDate></pubDate>
+</item>
+</tmpl_loop>
+</channel>
+</rss>
+STOP
+# Get Template folder
+my $templateFolder = WebGUI::Asset->newByUrl('templates');
+# Add Collaboration/RSS folder beneath
+my $rssFolder = $templateFolder->addChild({
+    title=>"Collaboration/RSS",
+    menuTitle=>"Collaboration/RSS",
+    url=>"templates/collaboration/rss",
+    className=>"WebGUI::Asset::Wobject::Folder"
+    });
+$rssFolder->commit;
+# Place the Collaboration/RSS folder beneath the 
+# Collaboration/Thread folder
+my $threadFolder = WebGUI::Asset->newByUrl('templates/collaboration/thread');
+my $threadRank = $threadFolder->getRank;
+$rssFolder->setRank($threadRank + 1);
+
+$rssFolder->addChild({
+	className=>"WebGUI::Asset::Template",
+	template=>$template,
+	namespace=>"Collaboration/RSS",
+	title=>'Default Forum RSS',
+        menuTitle=>'Default Forum RSS',
+        ownerUserId=>'3',
+        groupIdView=>'7',
+        groupIdEdit=>'4',
+        isHidden=>1
+	}, 'PBtmpl0000000000000142'
+);
+
+}
 
 #-------------------------------------------------
 sub addTimeZonesToUserPreferences {
@@ -54,6 +108,7 @@ sub start {
 	);
 	WebGUI::Session::open("../..",$configFile);
 	WebGUI::Session::refreshUserInfo(3);
+	WebGUI::SQL->write("ALTER TABLE Collaboration ADD COLUMN rssTemplateId varchar(22) binary NOT NULL default 'PBtmpl0000000000000142' after notificationTemplateId");
 	WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
 }
 

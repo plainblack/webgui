@@ -359,6 +359,10 @@ sub definition {
 				fieldType=>"selectList",
 				defaultValue=>'dateUpdated'
 				},
+			rssTemplateId =>{
+				fieldType=>"template",
+				defaultValue=>'PBtmpl0000000000000142'
+				},
 			notificationTemplateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000027'
@@ -462,6 +466,13 @@ sub getEditForm {
                 -namespace=>"Collaboration/Notification",
 		-label=>WebGUI::International::get('notification template', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('notification template description', 'Asset_Collaboration'),
+                );
+        $tabform->getTab("display")->template(
+                -name=>"rssTemplateId",
+                -value=>$self->getValue("rssTemplateId"),
+                -namespace=>"Collaboration/RSS",
+		-label=>WebGUI::International::get('rss template', 'Asset_Collaboration'),
+		-hoverHelp=>WebGUI::International::get('rss template description', 'Asset_Collaboration'),
                 );
         $tabform->getTab("security")->group(
 		-name=>"moderateGroupId",
@@ -703,7 +714,7 @@ sub getUnsubscribeUrl {
 
 =head2 incrementReplies ( lastPostDate, lastPostId )
 
-Increments this forum's reply counter.
+Increments the reply counter for this forum.
 
 =head3 lastPostDate
 
@@ -1125,17 +1136,19 @@ sub www_view {
 # print out RSS 2.0 feed describing the items visible on the first page
 sub www_viewRSS {
 	my $self = shift;
+	my %var;
+
 	$self->logView() if ($session{setting}{passiveProfilingEnabled});        
-        my $encTitle = _xml_encode($self->get("title"));
-        my $encDescription = _xml_encode($self->get("description"));  
-        my $encUrl = _xml_encode($self->getUrl);
-        my $xml = qq~<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-<channel>
-<title>$encTitle</title>
-<link>$encUrl</link>
-<description>$encDescription</description>
-~;
+	# Set the required channel variables
+	$var{'title'} = _xml_encode($self->get("title"));
+	$var{'link'} = _xml_encode($self->getUrl);
+	$var{'description'} = _xml_encode($self->get("description"));
+	# Set some of the optional channel variables
+	$var{'generator'} = "WebGUI ".$WebGUI::VERSION;
+	$var{'lastBuildDate'} = _xml_encode(_get_rfc822_date($self->get("dateUpdated")));
+	$var{'webMaster'} = $WebGUI::Session::session{setting}{companyEmail};
+	$var{'docs'} = "http://blogs.law.harvard.edu/tech/rss";
+
 	my $sth = WebGUI::SQL->read("select asset.assetId, asset.className, max(assetData.revisionDate) 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
@@ -1150,36 +1163,25 @@ sub www_viewRSS {
 	my $i = 1;
         while (my ($id, $class, $version)  = $sth->array) {
 		my $post = WebGUI::Asset::Wobject::Collaboration->new($id, $class, $version);
+		my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
 
-                my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
-                my $encTitle = _xml_encode($post->get("title"));
-                my $encPubDate = _xml_encode(_get_rfc822_date($post->get("dateUpdated")));
-                my $encDescription = _xml_encode($post->get("synopsis"));
-                $xml .= qq~
-<item>
-<title>$encTitle</title>
-<link>$encUrl</link>
-<description>$encDescription</description>
-<guid isPermaLink="true">$encUrl</guid>
-<pubDate>$encPubDate</pubDate>
-</item>
-~;
+		push(@{$var{'item_loop'}}, {
+		    title => _xml_encode($post->get("title")),
+		    link => $encUrl,
+		    description => _xml_encode($post->get("synopsis")),
+		    guid => $encUrl,
+		    pubDate => _xml_encode(_get_rfc822_date($post->get("dateUpdated")))
+		    });
 		$i++;
 		last if ($i == $self->get("threadsPerPage"));
         }
 
-        $xml .=qq~
-</channel>
-</rss>
-~;
 	WebGUI::HTTP::setMimeType("text/xml");
-        return $xml;
+	return $self->processTemplate(\%var,$self->get("rssTemplateId"));
 }
 
 
 
 
 1;
-
-
 
