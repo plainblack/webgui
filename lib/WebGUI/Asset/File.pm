@@ -76,30 +76,30 @@ A hash reference passed in from a subclass definition.
 =cut
 
 sub definition {
-        my $class = shift;
-        my $definition = shift;
-        push(@{$definition}, {
+	my $class = shift;
+	my $definition = shift;
+	push(@{$definition}, {
 		assetName=>WebGUI::International::get('assetName',"Asset_File"),
-                tableName=>'FileAsset',
-                className=>'WebGUI::Asset::File',
-                properties=>{
-                                filename=>{
-					noFormPost=>1,
-                                        fieldType=>'hidden',
-                                        defaultValue=>undef
-                                        },
-				storageId=>{
-					noFormPost=>1,
-					fieldType=>'hidden',
-					defaultValue=>undef
-					},
-				templateId=>{
-					fieldType=>'template',
-					defaultValue=>'PBtmpl0000000000000024'
-					}
-                        }
-                });
-        return $class->SUPER::definition($definition);
+		tableName=>'FileAsset',
+		className=>'WebGUI::Asset::File',
+		properties=>{
+			filename=>{
+				noFormPost=>1,
+				fieldType=>'hidden',
+				defaultValue=>undef
+			},
+			storageId=>{
+				noFormPost=>1,
+				fieldType=>'hidden',
+				defaultValue=>undef
+			},
+			templateId=>{
+				fieldType=>'template',
+				defaultValue=>'PBtmpl0000000000000024'
+			}
+		}
+	});
+	return $class->SUPER::definition($definition);
 }
 
 
@@ -137,13 +137,13 @@ sub getEditForm {
 			-label=>WebGUI::International::get('current file', 'Asset_File'),
 			-hoverHelp=>WebGUI::International::get('current file description', 'Asset_File'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
-			);
-		
+		);
+
 	}
-        $tabform->getTab("properties")->file(
+	$tabform->getTab("properties")->file(
 		-label=>WebGUI::International::get('new file', 'Asset_File'),
 		-hoverHelp=>WebGUI::International::get('new file description', 'Asset_File'),
-               	);
+	);
 	return $tabform;
 }
 
@@ -250,16 +250,16 @@ We override the update method from WebGUI::Asset in order to handle file system 
 =cut
 
 sub update {
-        my $self = shift;
-        my %before = (
-                owner => $self->get("ownerUserId"),
-                view => $self->get("groupIdView"),
-                edit => $self->get("groupIdEdit")
-                );
-        $self->SUPER::update(@_);
-        if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
-                $self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
-        }
+	my $self = shift;
+	my %before = (
+		owner => $self->get("ownerUserId"),
+		view => $self->get("groupIdView"),
+		edit => $self->get("groupIdEdit")
+	);
+	$self->SUPER::update(@_);
+	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
+		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+	}
 }
 
 #-------------------------------------------------------------------
@@ -275,19 +275,20 @@ sub view {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
 		-hoverHelp=>WebGUI::International::get('file template description','Asset_Image'),
 		-namespace=>"FileAsset"
-		);
-        $self->getAdminConsole->setHelp("file add/edit", "Asset_File");
-        return $self->getAdminConsole->render($tabform->print,"Edit File");
+	);
+	$self->getAdminConsole->setHelp("file add/edit", "Asset_File");
+	my $addEdit = ($session{form}{func} eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
+	return $self->getAdminConsole->render($tabform->print,$addEdit.' '.$self->getName);
 }
 
-
+#-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
