@@ -10,6 +10,7 @@
  - Changed macro API which cuts macro memory consumption in half. See
    migration.txt for details.
  - Added automated code testing framework.
+ - Added code skeletons for the various plugins WebGUI supports.
 
 
 6.7.7
