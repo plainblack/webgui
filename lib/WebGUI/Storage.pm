@@ -153,19 +153,19 @@ sub addFileFromFilesystem {
                 if (-d $pathToFile) {
                         WebGUI::ErrorHandler::error($pathToFile." is a directory, not a file.");
                 } else {
-                        $a = FileHandle->new($pathToFile,"r");
-                        if (defined $a) {
-                                binmode($a);
-                                $b = FileHandle->new(">".$self->getPath($filename));
-                                if (defined $b) {
-                                        binmode($b);
-                                        cp($a,$b) or $self->_addError("Couldn't copy $pathToFile to ".$self->getPath($filename).": $!");
-                                        $b->close;
+                        my $source = FileHandle->new($pathToFile,"r");
+                        if (defined $source) {
+                                binmode($source);
+                                $dest = FileHandle->new(">".$self->getPath($filename));
+                                if (defined $dest) {
+                                        binmode($dest);
+                                        cp($source,$dest) or $self->_addError("Couldn't copy $pathToFile to ".$self->getPath($filename).": $!");
+                                        $dest->close;
                                 } else {
                                         $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
                                         $filename = undef;
                                 }
-                                $a->close;
+                                $source->close;
                         } else {
                                 $self->_addError("Couldn't open file ".$pathToFile." for reading due to error: ".$!);
                                 $filename = undef;
@@ -300,16 +300,16 @@ sub copy {
 	my $newStorage = WebGUI::Storage->create;
 	my $filelist = $self->getFiles;
 	foreach my $file (@{$filelist}) {	
-        	$a = FileHandle->new($self->getPath($file),"r");
-        	if (defined $a) {
-                	binmode($a);
-                	$b = FileHandle->new(">".$newStorage->getPath($file));
-                	if (defined $b) {
-                        	binmode($b);
-                        	cp($a,$b) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
-                        	$b->close;
+        	$source = FileHandle->new($self->getPath($file),"r");
+        	if (defined $source) {
+                	binmode($source);
+                	$dest = FileHandle->new(">".$newStorage->getPath($file));
+                	if (defined $dest) {
+                        	binmode($dest);
+                        	cp($source,$dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
+                        	$dest->close;
                 	}
-                	$a->close;
+                	$source->close;
         	}
 	}
 	return $newStorage;
