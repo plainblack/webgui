@@ -130,7 +130,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 sub duplicate {
-	my ($self, $newAsset, $newSurveyId, $qdata, $adata, $rdata, $a, $b, $c, $s, $sdata, $oldSectionId);
+	my ($self, $newAsset, $newSurveyId, $qdata, $adata, $rdata, $sdata, $oldSectionId);
 	
 	$self = shift;
 	
@@ -140,45 +140,45 @@ sub duplicate {
 		Survey_id=>$newSurveyId
 		});
 		
-	$s = WebGUI::SQL->read("select * from Survey_section where Survey_id=".quote($self->get("Survey_id"))
-		." order by sequenceNumber");
-	while ($sdata = $s->hashRef) {
+	my $section = WebGUI::SQL->read("select * from Survey_section where Survey_id=".quote($self->get("Survey_id"))
+			." order by sequenceNumber");
+	while ($sdata = $section->hashRef) {
 		$oldSectionId = $sdata->{Survey_sectionId};
 		$sdata->{Survey_sectionId} = "new";
 		$sdata->{Survey_Id} = $newSurveyId;
 		$sdata->{Survey_sectionId} = $newAsset->setCollateral("Survey_section", "Survey_sectionId",$sdata,1,0, "Survey_id");
 	
-	  $a = WebGUI::SQL->read("select * from Survey_question where Survey_id=".quote($self->get("Survey_id"))
-		." and Survey_sectionId=".quote($oldSectionId)." order by sequenceNumber");
-	  while ($qdata = $a->hashRef) {
-		$b = WebGUI::SQL->read("select * from Survey_answer where Survey_questionId=".quote($qdata->{Survey_questionId})
+	  my $questions = WebGUI::SQL->read("select * from Survey_question where Survey_id=".quote($self->get("Survey_id"))
+			." and Survey_sectionId=".quote($oldSectionId)." order by sequenceNumber");
+	  while ($qdata = $questions->hashRef) {
+		my $answers = WebGUI::SQL->read("select * from Survey_answer where Survey_questionId=".quote($qdata->{Survey_questionId})
 			." order by sequenceNumber");
 		$qdata->{Survey_questionId} = "new";
 		$qdata->{Survey_id} = $newSurveyId;
 		$qdata->{Survey_sectionId} = $sdata->{Survey_sectionId};
 		$qdata->{Survey_questionId} = $newAsset->setCollateral("Survey_question","Survey_questionId",$qdata,1,0,"Survey_id");
-		while ($adata = $b->hashRef) {
-			$c = WebGUI::SQL->read("select * from Survey_questionResponse where Survey_answerId=".quote($adata->{Survey_answerId}));
+		while ($adata = $answers->hashRef) {
+			$responses = WebGUI::SQL->read("select * from Survey_questionResponse where Survey_answerId=".quote($adata->{Survey_answerId}));
 			$adata->{Survey_answerId} = "new";
 			$adata->{Survey_questionId} = $qdata->{Survey_questionId};
 			$adata->{Survey_id} = $newSurveyId;
 			$adata->{Survey_answerId} = $newAsset->setCollateral("Survey_answer", "Survey_answerId", $adata, 
 				1, 0, "Survey_Id");
-			while ($rdata = $c->hashRef) {
+			while ($rdata = $responses->hashRef) {
 				$rdata->{Survey_responseId} = "new";
 				$rdata->{Survey_answerId} = $adata->{Survey_answerId};
 				$rdata->{Survey_id} = $newSurveyId;
 				$rdata->{Survey_questionId} = $qdata->{Survey_questionId};
 				$newAsset->setCollateral("Survey_response","Survey_responseId",$rdata,0,0);
 			}
-			$c->finish;
+			$responses->finish;
 		}
-		$b->finish;
+		$answers->finish;
 	  }
-	  $a->finish;
+	  $questions->finish;
 	
 	}
-	$s->finish;
+	$section->finish;
 	
 	return $newAsset;
 }
@@ -1309,10 +1309,10 @@ sub www_viewIndividualSurvey {
 	$var->{'answer.label'} = WebGUI::International::get(19,'Asset_Survey');
 	$var->{'response.label'} = WebGUI::International::get(66,'Asset_Survey');
 	$var->{'comment.label'} = WebGUI::International::get(57,'Asset_Survey');
-	my $a = WebGUI::SQL->read("select Survey_questionId,question,answerFieldType from Survey_question 
+	my $questions = WebGUI::SQL->read("select Survey_questionId,question,answerFieldType from Survey_question 
 		where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 	my @questionloop;
-	while (my $qdata = $a->hashRef) {
+	while (my $qdata = $questions->hashRef) {
 		my @aid;
 		my @answer;
 		if ($qdata->{answerFieldType} eq "radioList") {
@@ -1336,7 +1336,7 @@ sub www_viewIndividualSurvey {
 			'question.answer' => join(", ",@answer),
 			});
 	}
-	$a->finish;
+	$questions->finish;
 	$var->{question_loop} = \@questionloop;
 	return WebGUI::Style::process($self->processTemplate($var, $self->getValue("responseTemplateId")),$self->getValue("styleTemplateId"));
 #	return $self->processTemplate($self->getValue("responseTemplateId"),$var,"Survey/Response");

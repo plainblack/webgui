@@ -327,9 +327,9 @@ sub getListTemplateVars {
 	#$var->{"entryId"} = $self->getId;
 	#$var->{"delete.url"} = $self->getUrl.";func=deleteAllEntries";
 	#$var->{"delete.label"} = WebGUI::International::get(91,"Asset_DataForm");
-	my $a = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
-		where assetId=".quote($self->getId)." order by sequenceNumber");
-	while (my $field = $a->hashRef) {
+	my $fields = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
+			where assetId=".quote($self->getId)." order by sequenceNumber");
+	while (my $field = $fields->hashRef) {
 		push(@fieldLoop,{
 			"field.name"=>$field->{name},
 			"field.id"=>$field->{DataForm_fieldId},
@@ -338,17 +338,17 @@ sub getListTemplateVars {
 			"field.type"=>$field->{type},
 			});
 	}
-	$a->finish;
+	$fields->finish;
 	$var->{field_loop} = \@fieldLoop;
 	my @recordLoop;
-	$a = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
+	$entries = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
 		where assetId=".quote($self->getId)." order by submissionDate desc");
-	while (my $record = $a->hashRef) {
+	while (my $record = $entries->hashRef) {
 		my @dataLoop;
-		my $b = WebGUI::SQL->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
+		my $dloop = WebGUI::SQL->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
 			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".quote($record->{DataForm_entryId})."
 			order by b.sequenceNumber");
-		while (my $data = $b->hashRef) {
+		while (my $data = $dloop->hashRef) {
 			push(@dataLoop,{
 				"record.data.name"=>$data->{name},
 				"record.data.label"=>$data->{label},
@@ -356,7 +356,7 @@ sub getListTemplateVars {
 				"record.data.isMailField"=>$data->{isMailField}
 				});
 		}
-		$b->finish;
+		$dloop->finish;
 		push(@recordLoop,{
 			"record.ipAddress"=>$record->{ipAddress},
 			"record.edit.url"=>$self->getUrl("func=view;entryId=".$record->{DataForm_entryId}),
@@ -371,7 +371,7 @@ sub getListTemplateVars {
 			"record.data_loop"=>\@dataLoop
 			});
 	}
-	$a->finish;
+	$entries->finish;
 	$var->{record_loop} = \@recordLoop;	
 	return $var;
 }
@@ -709,7 +709,7 @@ sub www_deleteAllEntries {
 sub www_deleteAllEntriesConfirm {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit && $session{form}{entryId}==$self->getId);
-	my $a = WebGUI::SQL->write("delete from DataForm_entry where assetId=".quote($self->getId));
+	WebGUI::SQL->write("delete from DataForm_entry where assetId=".quote($self->getId));
 	return $self->www_view;
 }
 
