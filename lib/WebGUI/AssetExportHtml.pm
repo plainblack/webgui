@@ -73,7 +73,7 @@ sub checkExportPath {
 
 Executes the export and returns html content.
 
-=head3 hashref
+=head3 params
 
 A hashref containing one of the following properties:
 
