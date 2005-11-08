@@ -33,7 +33,7 @@ GetOptions(
 	'assetId:s'=>\$assetId,
 	'userId:s'=>\$userId,
 	'toFile:s'=>\$toFile,
-	'stripHTML'=>\$stripHtml,
+	'stripHtml'=>\$stripHtml,
 	'help'=>\$help,
 	'relativeUrls'=>\$relativeUrls,
 );
@@ -61,7 +61,7 @@ Options:
 	--toFile	Set the path and filename to write the
 			content to instead of standard out.
 
-	--stripHTML	A flag indicating that WebGUI should
+	--stripHtml	A flag indicating that WebGUI should
 			strip all the HTML from the document and
 			output only text. NOTE: The resulting
 			text may have formatting problems as a
