@@ -156,7 +156,7 @@ sub addFileFromFilesystem {
                         my $source = FileHandle->new($pathToFile,"r");
                         if (defined $source) {
                                 binmode($source);
-                                $dest = FileHandle->new(">".$self->getPath($filename));
+                                my $dest = FileHandle->new(">".$self->getPath($filename));
                                 if (defined $dest) {
                                         binmode($dest);
                                         cp($source,$dest) or $self->_addError("Couldn't copy $pathToFile to ".$self->getPath($filename).": $!");
@@ -300,10 +300,10 @@ sub copy {
 	my $newStorage = WebGUI::Storage->create;
 	my $filelist = $self->getFiles;
 	foreach my $file (@{$filelist}) {	
-        	$source = FileHandle->new($self->getPath($file),"r");
+        	my $source = FileHandle->new($self->getPath($file),"r");
         	if (defined $source) {
                 	binmode($source);
-                	$dest = FileHandle->new(">".$newStorage->getPath($file));
+                	my $dest = FileHandle->new(">".$newStorage->getPath($file));
                 	if (defined $dest) {
                         	binmode($dest);
                         	cp($source,$dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
