@@ -24,16 +24,16 @@ use WebGUI::Session;
 
 $|=1;
 
-my ($configFile, $pageId, $userId, $styleId, $toFile, $stripHTML, $help, $relativeUrls);
+my ($configFile, $assetId, $userId, $styleId, $toFile, $stripHtml, $help, $relativeUrls);
 
 $userId = 1;
 
 GetOptions(
 	'configFile:s'=>\$configFile,
-	'pageId:s'=>\$pageId,
+	'assetId:s'=>\$assetId,
 	'userId:s'=>\$userId,
 	'toFile:s'=>\$toFile,
-	'stripHTML'=>\$stripHTML,
+	'stripHTML'=>\$stripHtml,
 	'help'=>\$help,
 	'relativeUrls'=>\$relativeUrls,
 );
@@ -73,15 +73,12 @@ STOP
 
 # Open WebGUI session
 WebGUI::Session::open($webguiRoot,$configFile);
-WebGUI::Session::refreshUserInfo($userId,$session{dbh});
 
-
-my $asset = WebGUI::Asset->new($pageId);
+my $asset = WebGUI::Asset->newByDynamicClass($assetId);
+die "Asset not defined" unless $asset;
 $asset->{_properties}{styleTemplateId} = $styleId if ($styleId);
-my $content = $asset->www_view;
-$content = WebGUI::HTML::filter($content,"all") if ($stripHTML);
+my $content = $asset->exportAsHtml({stripHtml => $stripHtml});
 
-my $content = $e->generate;
 if ($toFile) {
         open (TOFILE, ">$toFile") or die "Can't open file $toFile for writing. $!";
 	print TOFILE $content;
@@ -95,3 +92,4 @@ WebGUI::Session::end($session{var}{sessionId});
 WebGUI::Session::close();
 
 exit;
+
