@@ -159,7 +159,7 @@ sub setCookie {
 	my $name = shift;
 	my $value = shift;
         my $ttl = shift;
-        my $ttl = (defined $ttl ? $ttl : '+10y');
+        $ttl = (defined $ttl ? $ttl : '+10y');
         push @{$session{http}{cookie}}, $session{cgi}->cookie(
                 -name=>$name,
                 -value=>$value,
