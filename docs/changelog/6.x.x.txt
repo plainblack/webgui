@@ -13,6 +13,7 @@
  - fix [ 1340614 ] page: "what next?" both choices take you to new page
  - fix [ 1350770 ] generateContent.pl fails
  - fix [ 1352362 ] can't add version tag in Content Versioning
+ - fix [ 1352647 ] WebGUI::HTTP::setCookie does not accept 0 as time to live
 
 6.7.7
  - added two new template variables to the EventsCalendar - 
