@@ -357,8 +357,8 @@ sub www_addVersionTag {
 		);
 	$f->text(
 		-name=>"name",
-		-label=>$i18n->("version tag name"),
-		-hoverHelp=>$i18n->("version tag name description"),
+		-label=>$i18n->get("version tag name"),
+		-hoverHelp=>$i18n->get("version tag name description"),
 		-value=>$tag->{name},
 		);
 	$f->submit;
