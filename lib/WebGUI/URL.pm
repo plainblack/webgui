@@ -121,7 +121,7 @@ Name value pairs to add to the URL in the form of:
 
 sub gateway {
 	$_[0] =~ s/^\///;
-        my $url = getScriptURL().$_[0];
+        my $url = '/'.$_[0];
         if ($session{setting}{preventProxyCache} == 1) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
@@ -163,25 +163,6 @@ Sets an alternate site url.
 
 sub setSiteURL {
 	$session{url}{siteURL} = shift;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getScriptURL {
-
-Returns the URL for the gateway script.
-
-=cut
-
-sub getScriptURL {
-	my $scripturl;
-	if (exists $session{config}{scripturl}) {
-        	$scripturl = $session{config}{scripturl};
-	} else {
-		$scripturl = $session{wguri};
-	}
-	$scripturl .= '/';
-	return $scripturl;
 }
 
 #-------------------------------------------------------------------
@@ -262,7 +243,7 @@ sub page {
         if ($useFullUrl) {
                 $url = getSiteURL();
         }
-        $url .= getScriptURL();
+        $url .= '/';
 	my $pathinfo;
         if ($session{asset}) {
                 $pathinfo = $session{asset}->get("url");

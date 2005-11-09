@@ -29,12 +29,6 @@ uploadsPath = /data/WebGUI/www/uploads
 
 # passthruUrls => /icons, /documentation/pdf, /my-custom-application, /server-status, /perl-status
 
-# The scripturl tells WebGUI how to reference the gateway script 
-# when generating URLs. By default it will use the gateway
-# script's filename like /index.pl/
-
-# scripturl = /
-
 # Tell WebGUI where to store cached files. Defaults to the 
 # /tmp or c:\temp folder depending upon your operating system.
 

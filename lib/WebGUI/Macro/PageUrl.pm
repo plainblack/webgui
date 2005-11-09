@@ -16,9 +16,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	my $pathinfo = $session{wguri};
-        $pathinfo =~ s#^/##;
-        return WebGUI::URL::getScriptURL().$pathinfo;
+	return $session{wguri};
 }
 
 

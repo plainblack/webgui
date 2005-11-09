@@ -11,12 +11,10 @@ package WebGUI::Macro::Slash_gatewayUrl;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	return WebGUI::URL::getScriptURL();
+	return "/";
 }
 
 

@@ -284,18 +284,20 @@
  - fix [ 1251390 ] Security tab doesn't appear for member of Admins
  - HTTP Proxy URLs can now be up to 2048 characters long.
  - The Edit Branch function now allows you to recursively set meta data.
+   (Thanks to Volvo for funding this feature.)
  - Fixed a potential problem where editing a page under rare very rare 
    conditions could destroy the not found page.
  - Added the ability to override the UI Level of any field in the edit form of
-   any asset in the WebGUI config file.
+   any asset in the WebGUI config file. (Thanks to Volvo for funding this
+feature.)
  - Translation providers can now add languageAbbreviation and locale
    properties to their translation in order to activate the translations of
    javascript helper components like the rich editor and the calendar
    date picker.
  - Added the ability to override the UI Level of an entire asset in the config
-   file.
+   file. (Thanks to Volvo for funding this feature.)
  - fix [ 1229042 ] crumbtrail should show full path...
- - Added asset versioning.
+ - Added asset versioning. (Thanks to Volvo for contributing funding to this feature.)
  - fix [ 1229188 ] typo in Help: Collaboration, Post List Template Variables
  - fix [ 1221284 ] Operation\user.pm i18n {internationalize labels}
  - All form field labels have been internationalized.

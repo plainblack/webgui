@@ -341,7 +341,7 @@ sub getListTemplateVars {
 	$fields->finish;
 	$var->{field_loop} = \@fieldLoop;
 	my @recordLoop;
-	$entries = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
+	my $entries = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
 		where assetId=".quote($self->getId)." order by submissionDate desc");
 	while (my $record = $entries->hashRef) {
 		my @dataLoop;

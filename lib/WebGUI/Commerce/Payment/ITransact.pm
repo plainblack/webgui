@@ -468,7 +468,7 @@ sub configurationForm {
 		-value	=> '<br />'
 		);
 	$f->readOnly(
-		-value	=> $i18n->get('extra info').'<br /><b>https://'.$session{config}{defaultSitename}.WebGUI::URL::getScriptURL().'?op=confirmRecurringTransaction;gateway='.$self->namespace
+		-value	=> $i18n->get('extra info').'<br /><b>https://'.$session{config}{defaultSitename}.'/?op=confirmRecurringTransaction;gateway='.$self->namespace
 		);
 		
 	return $self->SUPER::configurationForm($f->printRowsOnly);

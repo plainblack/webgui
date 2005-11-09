@@ -163,10 +163,6 @@ sub readConfig {
 	if (ref $data{shippingPlugins} ne "ARRAY") {
 		$data{shippingPlugins} = [$data{shippingPlugins}] if ($data{shippingPlugins});
 	}
-        if( defined( $data{scripturl} ) ) {
-                # get rid of leading "/" if present.
-                $data{scripturl} =~ s/^\///;
-        }
         if (ref $data{sitename} eq "ARRAY") {
                 $data{defaultSitename} = $data{sitename}[0];
         } else {
