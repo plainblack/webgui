@@ -12,6 +12,7 @@
  - fix [ 1347584 ] Wobject "Product" copy fails
  - fix [ 1340614 ] page: "what next?" both choices take you to new page
  - fix [ 1350770 ] generateContent.pl fails
+ - fix [ 1352362 ] can't add version tag in Content Versioning
 
 6.7.7
  - added two new template variables to the EventsCalendar - 
