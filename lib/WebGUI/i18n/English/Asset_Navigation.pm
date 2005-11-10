@@ -240,6 +240,8 @@ the Navigation Template to determine who can see them in the menu.</P>
 <P><STRONG>page.relDepth</STRONG><BR>The relative depth of this page (relative to starting point).</P>
 <P><STRONG>page.isSystem</STRONG><BR>A conditional indicating whether this page is a system page (Trash, Clipboard, etc).</P>
 <P><STRONG>page.isHidden</STRONG><BR>A conditional indicating whether this page is a hidden page.</P>
+<P><STRONG>page.isContainer</STRONG><BR>A conditional indicating whether this page a container asset.</P>
+<P><STRONG>page.isUtility</STRONG><BR>A conditional indicating whether this page is a utility asset.</P>
 <P><STRONG>page.isViewable</STRONG><BR>A conditional indicating whether the user has permission to view it.</P>
 <P dir=ltr><STRONG>page.url</STRONG><BR>The complete URL to this page.</P>
 <P><STRONG>page.indent</STRONG><BR>A variable containing the indent for the current page. The default indent is three spaces. Use the <STRONG>page.indent_loop</STRONG> if you need a more flexible indent.</P>

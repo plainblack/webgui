@@ -12,6 +12,8 @@
  - Added automated code testing framework.
  - Added code skeletons for the various plugins WebGUI supports.
  - Added template to Collaboration RSS feeds.
+ - Added page.isContainer and page.isUtility template variables to Navigation
+   templates.
 
 
 6.7.7

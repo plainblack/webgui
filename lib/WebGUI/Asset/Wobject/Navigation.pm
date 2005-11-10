@@ -370,6 +370,8 @@ sub view {
 		$pageData->{"page.isSystem"} = $asset->get("isSystem");
 		$pageData->{"page.isHidden"} = $asset->get("isHidden");
 		$pageData->{"page.isViewable"} = $asset->canView;
+		$pageData->{'page.isContainer'} = isIn($asset->get('className'), @{$session{config}{assetContainers}});
+  		$pageData->{'page.isUtility'} = isIn($asset->get('className'), @{$session{config}{utilityAssets}});
 		$pageData->{"page.url"} = $asset->getUrl;
 		my $indent = $pageData->{"page.relDepth"};
 		$pageData->{"page.indent_loop"} = [];
