@@ -185,6 +185,7 @@ sub www_editProfile {
 	   if ($data->{required}) {
 	      $hash{'profile.form.element.subtext'} = "*";
 	   }
+	   push(@profile,\%hash);
 	   if (($previousCategory && $category ne $previousCategory) || $counter eq $a->rows) {
           my @temp = @profile;
 		  my $hashRef;
@@ -193,7 +194,6 @@ sub www_editProfile {
 		  push(@array,$hashRef);
 		  @profile = ();
 	   }
-	   push(@profile,\%hash);
 	   $previousCategory = $category;
     }
     $a->finish;
