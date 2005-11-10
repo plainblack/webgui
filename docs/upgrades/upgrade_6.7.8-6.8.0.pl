@@ -33,8 +33,8 @@ finish();
 sub updateCollaboration {
 print "\tAdding collaboration/rss template\n" unless ($quiet);
 my $template = <<STOP;
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<rss version=\"2.0\">
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
 <channel>
 <title><tmpl_var title></title>
 <link><tmpl_var link></link>
@@ -44,7 +44,7 @@ my $template = <<STOP;
 <title><tmpl_var title></title>
 <link><tmpl_var link></link>
 <description><tmpl_var description></description>
-<guid isPermaLink=\"true\"><tmpl_var guid></guid>
+<guid isPermaLink="true"><tmpl_var guid></guid>
 <pubDate><tmpl_var pubDate></pubDate>
 </item>
 </tmpl_loop>
