@@ -1,7 +1,7 @@
 /**
- * $RCSfile$
- * $Revision$
- * $Date$
+ * $RCSfile: tiny_mce_src.js,v $
+ * $Revision: 1.8 $
+ * $Date: 2005/08/05 19:49:15 $
  *
  * @author Moxiecode
  * @copyright Copyright © 2004, Moxiecode Systems AB, All rights reserved.
