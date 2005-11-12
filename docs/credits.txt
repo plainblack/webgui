@@ -38,6 +38,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Hal Roberts / Harvard
                                      Steve Simms
                                      Ben Simpson
+                                     Steve Swanson / Plain Black
                                      Jeff Szpak / Plain Black
                                      Sean Tu / WDI
                                      Madsen Wikholm
