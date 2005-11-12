@@ -72,6 +72,7 @@ checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
 checkModule("POE",0.3202);
 checkModule("POE::Component::IKC::Server",0.18);
+checkModule("Apache2::Request");
 
 ###################################
 # Checking WebGUI
