@@ -51,6 +51,10 @@ The following additional parameters have been added via this sub class.
 
 Defaults to "0". Set to "1" if this field should be checked.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -59,7 +63,10 @@ sub definition {
 	push(@{$definition}, {
 		checked=>{
 			defaultValue=> 0
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

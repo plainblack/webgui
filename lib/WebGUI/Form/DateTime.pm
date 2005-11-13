@@ -58,6 +58,10 @@ Defaults to 19. Determines the maximum number of characters allowed in this fiel
 
 Defaults to 19. The displayed size of the box for the date to be typed in.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =head4 defaultValue
 
 If no value is specified, this will be used. Defaults to today and now.
@@ -76,7 +80,10 @@ sub definition {
 			},
 		size=>{
 			defaultValue=> 19
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

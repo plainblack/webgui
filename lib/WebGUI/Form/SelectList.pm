@@ -68,6 +68,10 @@ Boolean indicating whether the user can select multiple items from this list lik
 
 A boolean value for whether or not the values in the options hash should be sorted. Defaults to "0".
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -88,11 +92,27 @@ sub definition {
 			},
 		size=>{
 			defaultValue=>1
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 displayValue ( )
+
+Return the all options
+
+=cut
+
+sub displayValue {
+	my ($self) = @_;
+	return join ", ", @{ $self->{value} };
+}
 
 #-------------------------------------------------------------------
 

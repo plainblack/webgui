@@ -52,6 +52,10 @@ The following additional parameters have been added via this sub class.
 
 Defaults to 10. Determines the maximum number of characters allowed in this field.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -60,7 +64,10 @@ sub definition {
 	push(@{$definition}, {
 		maxlength=>{
 			defaultValue=> 10
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

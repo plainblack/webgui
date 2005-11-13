@@ -57,6 +57,10 @@ If no name is specified a default name of "file" will be used.
 
 Defaults to 1. Determines how many files the user can upload with this form control.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -68,11 +72,61 @@ sub definition {
 			},
 		maxAttachments=>{
 			defaultValue=>1
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 displayForm ( )
+
+If an image is uploaded, then return the image and a control to
+delete it.  Otherwise, display a form element to upload a file.
+
+=cut
+
+sub displayForm {
+	my ($self) = @_;
+	return $self->toHtml unless $self->{value};
+	##There are files inside here, for each one, display the image
+	##and another form control for deleting it.
+	my $location = WebGUI::Storage->get($self->{value});
+	my $id = $location->getId;
+	my $fileForm = '';
+	foreach my $file ( @{ $location->getFiles } ) {
+		$fileForm .= sprintf qq!<img src="%s" /><br />!, $location->getUrl($file);
+		my $action = join '_', '_', $self->{name}, 'delete';
+		$fileForm .= WebGUI::International::get(392)
+			  .  "&nbsp"x4
+			  . WebGUI::Form::YesNo->new({-name=>$action, -value=>0})->toHtml;
+	}
+	my $hid = $self->toHtmlAsHidden();
+	$fileForm .= $hid;
+	return $fileForm;
+}
+
+#-------------------------------------------------------------------
+
+=head2 displayValue ( )
+
+This utility method is used to format values for the Profile system.  Most
+form elements will just return their value. 
+
+=cut
+
+sub displayValue {
+	my ($self) = @_;
+	return '' unless $self->{value};
+	my $location = WebGUI::Storage->get($self->{value});
+	local $_;
+	my @files = map { sprintf qq!<img src="%s" />&nbsp;%s!, $location->getFileIconUrl($_), $_; } @{ $location->getFiles };
+	my $fileValue = join "<br />\n", @files;
+return $fileValue;
+}
 
 #-------------------------------------------------------------------
 
@@ -92,20 +146,37 @@ sub getName {
 
 =head2 getValueFromPost ( )
 
-Returns the storageId for the storage location that the file(s) got uploaded to. Returns undef if no files were uploaded.
+Returns the storageId for the storage location that the file(s) got
+uploaded to. Returns undef if no files were uploaded.  Also handles
+deleting the file if it was specified.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $storage = WebGUI::Storage->create;
-        $storage->addFileFromFormPost($self->{name});
-	my @files = @{ $storage->getFiles };
-	if (scalar(@files) < 1) {
+	my $value = $session{req}->param($self->{name});
+	if ($session{req}->param(join '_', '_', $self->{name}, 'delete')) {
+		my $storage = WebGUI::Storage->get($value);
 		$storage->delete;
-		return undef;
-	} else {
-		return $storage->getId;
+		return '';
+	}
+	else {
+		my $storage;
+		if ($value) {
+			$storage = WebGUI::Storage::Image->get($value);
+		}
+		else {
+			$storage = WebGUI::Storage::Image->create;
+		}
+		$storage->addFileFromFormPost($self->{name});
+		my @files = @{ $storage->getFiles };
+		if (scalar(@files) < 1) {
+			$storage->delete;
+			return undef;
+		} else {
+			my $id = $storage->getId;
+			return $id;
+		}
 	}
 }
 
@@ -138,19 +209,6 @@ sub toHtml {
         </script>';
         return $uploadControl;
 }
-
-#-------------------------------------------------------------------
-
-=head4 toHtmlAsHidden ( )
-
-Returns undef.
-
-=cut
-
-sub toHtmlAsHidden {
-	return undef;
-}
-
 
 1;
 

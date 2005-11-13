@@ -40,6 +40,33 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 definition ( [ additionalTerms ] )
+
+See the super class for additional details.
+
+=head3 additionalTerms
+
+The following additional parameters have been added via this sub class.
+
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
+=cut
+
+sub definition {
+	my $class = shift;
+	my $definition = shift || [];
+	push(@{$definition}, {
+		profileEnabled=>{
+			defaultValue=>1
+			}
+		});
+	return $class->SUPER::definition($definition);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getName ()
 
 Returns the human readable name or type of this form control.

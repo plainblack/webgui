@@ -55,6 +55,10 @@ Defaults to "0". Set to "1" if this field should be checked.
 
 The value returned by this field if it is checked and no value is specified. Defaults to "1".
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -65,6 +69,9 @@ sub definition {
 			defaultValue=> 0
 			},
 		defaultValue=>{
+			defaultValue=>1
+			},
+		profileEnabled=>{
 			defaultValue=>1
 			}
 		});

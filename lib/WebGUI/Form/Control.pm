@@ -17,6 +17,7 @@ package WebGUI::Form::Control;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::Session;
+use WebGUI::Operation::Shared;
 
 =head1 NAME
 
@@ -133,6 +134,10 @@ A stylesheet class assigned to each label/field pair.
 
 A text string that will pop up when the user hovers over the label when toHtmlWithWrapper() is called. This string should indicate how to use the field and is usually tied into the help system.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -183,9 +188,62 @@ sub definition {
 			},
 		idPrefix=>{
 			defaultValue=>undef
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>0
+			},
 		});
 	return $definition;
+}
+
+#-------------------------------------------------------------------
+
+=head2 displayForm ( )
+
+This utility method is used to format values for the Profile system but can
+be used in other areas as well.  Most form elements will just return toHtml. 
+
+=cut
+
+sub displayForm {
+	my ($self) = @_;
+	$self->toHtml;
+}
+
+#-------------------------------------------------------------------
+
+=head2 displayFormWithWrapper ( )
+
+This utility method is used to format values for the Profile system but can
+be used in other areas as well.  Most form elements will just return displayForm. 
+
+=cut
+
+sub displayFormWithWrapper {
+	my $self = shift;
+	if ($self->passUiLevelCheck) {
+		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
+		return '<tr'.$rowClass.'>
+				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->{label}.'</td>
+				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->displayForm().$subtext."</td>
+			</tr>\n";
+	} else {
+		return $self->toHtmlAsHidden;
+	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 displayValue ( )
+
+This utility method is used to format values for the Profile system.  Most
+form elements will just return their value. 
+
+=cut
+
+sub displayValue {
+	my ($self) = @_;
+	return $self->{value};
 }
 
 #-------------------------------------------------------------------
@@ -375,6 +433,40 @@ sub new {
 	$params{id} = $params{idPrefix}.$params{id};
 	bless \%params, $class;
 }
+#-------------------------------------------------------------------
+
+=head2 prepareWrapper ( )
+
+Common code for preparing wrappers for *WithWrapper
+
+=cut
+
+sub prepareWrapper {
+	my $self = shift;
+	my $rowClass = $self->{rowClass};
+	$rowClass = qq| class="$rowClass" | if($self->{rowClass});
+	my $labelClass = $self->{labelClass};
+	$labelClass = qq| class="$labelClass" | if($self->{labelClass});
+	my $fieldClass = $self->{fieldClass};
+	$fieldClass = qq| class="$fieldClass" | if($self->{fieldClass});
+	my $hoverHelp = $self->{hoverHelp};
+	$hoverHelp =~ s/\r/ /g;
+	$hoverHelp =~ s/\n/ /g;
+	$hoverHelp =~ s/&amp;/& amp;/g;
+	$hoverHelp =~ s/&gt;/& gt;/g;
+	$hoverHelp =~ s/&lt;/& lt;/g;
+	$hoverHelp =~ s/&/&amp;/g;
+	$hoverHelp =~ s/>/&gt;/g;
+	$hoverHelp =~ s/</&lt;/g;
+	$hoverHelp =~ s/"/&quot;/g;
+	$hoverHelp =~ s/'/\\'/g;
+	$hoverHelp =~ s/^\s+//;
+	$hoverHelp = qq| onmouseover="return escape('$hoverHelp')"| if ($hoverHelp);
+	my $subtext = $self->{subtext};
+	$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
+	return ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -412,35 +504,8 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	my $passUiLevelCheck = 0;
-	if ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}}) { # use override if it exists
-		$passUiLevelCheck = ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}} <= $session{user}{uiLevel});
-	} else { # use programmed default
-		$passUiLevelCheck = ($self->{uiLevel} <= $session{user}{uiLevel});
-	}
-	$passUiLevelCheck = WebGUI::Grouping::isInGroup(3) unless ($passUiLevelCheck); # override if in admins group
-	if ($passUiLevelCheck) {
-		my $rowClass = $self->{rowClass};
-        	$rowClass = qq| class="$rowClass" | if($self->{rowClass});
-		my $labelClass = $self->{labelClass};
-       	 	$labelClass = qq| class="$labelClass" | if($self->{labelClass});
-		my $fieldClass = $self->{fieldClass};
-	        $fieldClass = qq| class="$fieldClass" | if($self->{fieldClass});
-		my $hoverHelp = $self->{hoverHelp};
-        	$hoverHelp =~ s/\r/ /g;
-        	$hoverHelp =~ s/\n/ /g;
-        	$hoverHelp =~ s/&amp;/& amp;/g;
-        	$hoverHelp =~ s/&gt;/& gt;/g;
-        	$hoverHelp =~ s/&lt;/& lt;/g;
-        	$hoverHelp =~ s/&/&amp;/g;
-        	$hoverHelp =~ s/>/&gt;/g;
-        	$hoverHelp =~ s/</&lt;/g;
-        	$hoverHelp =~ s/"/&quot;/g;
-        	$hoverHelp =~ s/'/\\'/g;
-        	$hoverHelp =~ s/^\s+//;
-        	$hoverHelp = qq| onmouseover="return escape('$hoverHelp')"| if ($hoverHelp);
-		my $subtext = $self->{subtext};
-		$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
+	if ($self->passUiLevelCheck) {
+		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
 		return '<tr'.$rowClass.'>
 				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->{label}.'</td>
 				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->toHtml().$subtext."</td>
@@ -449,6 +514,28 @@ sub toHtmlWithWrapper {
 		return $self->toHtmlAsHidden;
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 passUiLevelCheck ( )
+
+Renders the form field to HTML as a table row complete with labels, subtext, hoverhelp, etc.
+
+=cut
+
+sub passUiLevelCheck {
+	my $self = shift;
+	my $passUiLevelCheck = 0;
+	if ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}}) { # use override if it exists
+		$passUiLevelCheck = ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}} <= $session{user}{uiLevel});
+	} else { # use programmed default
+		$passUiLevelCheck = ($self->{uiLevel} <= $session{user}{uiLevel});
+	}
+	$passUiLevelCheck = WebGUI::Grouping::isInGroup(3) unless ($passUiLevelCheck); # override if in admins group
+	return $passUiLevelCheck;
+}
+
+
 
 1;
 

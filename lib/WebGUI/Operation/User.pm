@@ -15,10 +15,11 @@ use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::DateTime;
-use WebGUI::Form;
 use WebGUI::FormProcessor;
 use WebGUI::Group;
 use WebGUI::Grouping;
+use WebGUI::Form;
+use WebGUI::Form::DynamicField;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -278,48 +279,39 @@ sub www_editUser {
                 where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
                 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
 	my $previousCategory;
-        while(my %data = $a->hash) {
-              	my $category = WebGUI::Operation::Shared::secureEval($data{categoryName});
+        while(my $data = $a->hashRef) {
+              	my $category = WebGUI::Operation::Shared::secureEval($data->{categoryName});
                 if ($category ne $previousCategory) {
                       	$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
                 }
-                my $values = WebGUI::Operation::Shared::secureEval($data{dataValues});
-                my $method = $data{dataType};
-                my $label = WebGUI::Operation::Shared::secureEval($data{fieldLabel});
+                my $values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
+                my $method = $data->{dataType};
+                my $label = WebGUI::Operation::Shared::secureEval($data->{fieldLabel});
 		my $default;
-                if ($method eq "selectList" || $method eq "checkList" || $method eq "radioList") {
-                        my $orderedValues = {};
-                        tie %{$orderedValues}, 'Tie::IxHash';
-                        foreach my $ov (sort keys %{$values}) {
-                        	$orderedValues->{$ov} = $values->{$ov};
-                        }
-                        if ($session{form}{$data{fieldName}}) {
-                      		$default = [$session{form}{$data{fieldName}}];
-                        } elsif (defined $u->profileField($data{fieldName}) && (defined($values->{$u->profileField($data{fieldName})}))) {
-                                $default = [$u->profileField($data{fieldName})];
-                        } else {
-                                $default = WebGUI::Operation::Shared::secureEval($data{dataDefault});
-                        }
-                 	$tabform->getTab("profile")->$method(
-				-name=>$data{fieldName},
-				-options=>$orderedValues,
-				-label=>$label,
-				-value=>$default
-				);
-                } elsif ($method) {
-			if ($session{form}{$data{fieldName}}) {
-                        	$default = $session{form}{$data{fieldName}};
-                        } elsif (defined $u->profileField($data{fieldName})) {
-                                $default = $u->profileField($data{fieldName});
-                        } else {
-                                $default = WebGUI::Operation::Shared::secureEval($data{dataDefault});
-                        }
-                        $tabform->getTab("profile")->$method(
-				-name=>$data{fieldName},
-				-label=>$label,
-				-value=>$default
-				);
-                }
+                my $orderedValues = {};
+		tie %{$orderedValues}, 'Tie::IxHash';
+		foreach my $ov (sort keys %{$values}) {
+			$orderedValues->{$ov} = $values->{$ov};
+		}
+		if ($session{form}{$data->{fieldName}}) {
+			$default = $session{form}{$data->{fieldName}};
+		}
+		elsif ($session{user}{$data->{fieldName}}) {
+			$default = $session{user}{$data->{fieldName}};
+		}
+		else {
+			$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
+		}
+
+		my $form = WebGUI::Form::DynamicField->new(
+			name => $data->{fieldName},
+			label => $label, 
+			value => $default,
+			options => $orderedValues,
+			fieldType => $method,
+		);
+
+		$tabform->getTab("profile")->raw($form->displayFormWithWrapper());
                 $previousCategory = $category;
         }
         $a->finish;

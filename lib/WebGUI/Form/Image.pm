@@ -1,4 +1,4 @@
-package WebGUI::Form::Codearea;
+package WebGUI::Form::Image;
 
 =head1 LEGAL
 
@@ -15,29 +15,31 @@ package WebGUI::Form::Codearea;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Textarea';
+use base 'WebGUI::Form::File';
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::Storage;
 use WebGUI::Style;
+use WebGUI::Form::YesNo;
+use WebGUI::Session;
 
 =head1 NAME
 
-Package WebGUI::Form::Codearea
+Package WebGUI::Form::Image
 
 =head1 DESCRIPTION
 
-Creates a code area form field, which is just like a text area except stretches to fit it's space and allows tabs in it's content.
+Creates a text input box form field.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Textarea.
+This is a subclass of WebGUI::Form::File, and thereform WebGUI::Form::Image.
 
 =head1 METHODS 
 
-The following methods are specifically available from this class. Check the superclass for additional methods.
+The following methods are specifically available from this class. Check the superclasses for additional methods.
 
 =cut
-
 
 #-------------------------------------------------------------------
 
@@ -49,6 +51,14 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
+=head4 name
+
+If no name is specified a default name of "file" will be used.
+
+=head4 maxAttachments
+
+Defaults to 1. Determines how many files the user can upload with this form control.
+
 =head4 profileEnabled
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
@@ -59,12 +69,39 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		name=>{
+			defaultValue=>"file"
+			},
+		maxAttachments=>{
+			defaultValue=>1
+			},
 		profileEnabled=>{
 			defaultValue=>1
-			}
+			},
 		});
 	return $class->SUPER::definition($definition);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 displayValue ( )
+
+This utility method is used to format values for the Profile system.  It
+displays each image in the storage location that is the value of the
+profile field.
+
+=cut
+
+sub displayValue {
+	my ($self) = @_;
+	return '' unless $self->{value};
+	my $location = WebGUI::Storage->get($self->{value});
+	local $_;
+	my @files = map { sprintf qq!<img src="%s" />!, $location->getUrl($_) } @{ $location->getFiles };
+	my $fileValue = join "<br />\n", @files;
+	return $fileValue;
+	}
 
 #-------------------------------------------------------------------
 
@@ -75,25 +112,9 @@ Returns the human readable name or type of this form control.
 =cut
 
 sub getName {
-        return WebGUI::International::get("codearea","WebGUI");
+        return WebGUI::International::get("image","WebGUI");
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Renders a code area field.
-
-=cut
-
-sub toHtml {
-	my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/TabFix.js',{type=>"text/javascript"});
-	$self->{extras} .= ' style="width: 99%; min-width: 440px; height: 400px" onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"';	
-	return $self->SUPER::toHtml;
-}
-
 
 1;
+
 

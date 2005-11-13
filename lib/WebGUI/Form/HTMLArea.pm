@@ -63,6 +63,10 @@ The number of columns (in characters) wide the box should be. Defaults to the se
 
 The ID of the WebGUI::Asset::RichEdit object to load. Defaults to the richEditor setting or  "PBrichedit000000000001" if that's not set.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -77,7 +81,10 @@ sub definition {
                         },
                 richEditId=>{
                         defaultValue=>$session{setting}{richEditor} || "PBrichedit000000000001"
-                        }
+                        },
+		profileEnabled=>{
+			defaultValue=>1
+			},
                 });
         return $class->SUPER::definition($definition);
 }

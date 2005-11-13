@@ -56,6 +56,10 @@ A hash reference containing key values that will be returned with the form post 
 
 Boolean representing whether the checklist should be represented vertically or horizontally. If set to "1" will be displayed vertically. Defaults to "0".
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -67,11 +71,27 @@ sub definition {
 			},
 		vertical=>{
 			defaultValue=>0
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 displayValue ( )
+
+Return the all options
+
+=cut
+
+sub displayValue {
+	my ($self) = @_;
+	return join ", ", @{ $self->{value} };
+}
 
 #-------------------------------------------------------------------
 

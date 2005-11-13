@@ -60,6 +60,10 @@ Defaults to 0. Used if no value is specified.
 
 Defaults to 11. The number of characters that will be displayed at once in this field. Usually no need to override the default.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -74,7 +78,10 @@ sub definition {
 			},
 		size=>{
 			defaultValue=>11
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

@@ -131,6 +131,11 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
+                                title => 'enable avatars',
+                                description => 'enable avatars description',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
                                 title => 'moderate',
                                 description => 'moderate description',
                                 namespace => 'Asset_Collaboration',

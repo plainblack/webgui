@@ -55,6 +55,10 @@ Defaults to 255. Determines the maximum number of characters allowed in this fie
 
 Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big of a text box to display.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -66,7 +70,10 @@ sub definition {
 			},
 		size=>{
 			defaultValue=>$session{setting}{textBoxSize} || 30
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

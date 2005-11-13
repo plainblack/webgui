@@ -22,6 +22,7 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Operation::Shared;
+use WebGUI::Form::FieldType;
 
 #-------------------------------------------------------------------
 sub _reorderCategories {
@@ -212,14 +213,24 @@ sub www_editProfileField {
 		-hoverHelp=>WebGUI::International::get('474 description',"WebGUIProfile"),
 		-value=>$data{required}
 		);
-	$f->fieldType(
+	#WebGUI::ErrorHandler::warn("type=".$data{dataType});
+	my $fieldType = WebGUI::Form::FieldType->new(
 		-name=>"dataType",
 		-label=>WebGUI::International::get(486,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('486 description',"WebGUIProfile"),
-		-value=>$data{dataType},
-		-defaultValue=>"text",
-		-types=>[qw(dateTime timeZone TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList)]
-		);
+		-value=>ucfirst $data{dataType},
+		-defaultValue=>"Text",
+	);
+	my @profileForms = ();
+	foreach my $form ( sort @{ $fieldType->{types} }) {
+		my $cmd = join '::', 'WebGUI::Form', $form;
+		eval "use $cmd";
+		my $w = eval "$cmd->new();";
+		push @profileForms, $form if $w->{profileEnabled};
+	}
+
+	$fieldType->{types} = \@profileForms;
+	$f->raw($fieldType->toHtmlWithWrapper());
 	$f->textarea(
 		-name => "dataValues",
 		-label => WebGUI::International::get(487,"WebGUIProfile"),

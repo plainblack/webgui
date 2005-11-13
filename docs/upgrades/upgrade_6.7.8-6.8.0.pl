@@ -27,11 +27,15 @@ addTimeZonesToUserPreferences();
 # up to 2^32 as SCALARs. :(
 removeUnneededFiles();
 updateCollaboration();
+addPhotoField();
+addAvatarField();
+addEnableAvatarColumn();
 finish();
 
 #-------------------------------------------------
 sub updateCollaboration {
 print "\tAdding collaboration/rss template\n" unless ($quiet);
+WebGUI::SQL->write("ALTER TABLE Collaboration ADD COLUMN rssTemplateId varchar(22) binary NOT NULL default 'PBtmpl0000000000000142' after notificationTemplateId");
 my $template = <<STOP;
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
@@ -97,6 +101,33 @@ sub removeUnneededFiles {
 	unlink("../../www/index.pl");
 }
 
+#-------------------------------------------------
+sub addPhotoField {
+	##Get profileCategoryId.
+	my ($categoryId) = WebGUI::SQL->quickArray(q!select profileCategoryId from userProfileCategory where categoryName='WebGUI::International::get(439,"WebGUI");'!);
+	##Get last sequence number
+	my ($lastField) = WebGUI::SQL->buildArray(qq!select max(sequenceNumber) from userProfileField where profileCategoryId=$categoryId!);
+	++ $lastField;
+	##Insert Photo Field
+	WebGUI::SQL->write(sprintf q!insert into userProfileField values ('photo','WebGUI::International::get("photo","WebGUI");', 1, 0, 'Image', '', '', %d, %d, 1, 1)!, $lastField, $categoryId);
+}
+
+#-------------------------------------------------
+sub addAvatarField {
+	##Get profileCategoryId.
+	my ($categoryId) = WebGUI::SQL->buildArray(q!select profileCategoryId from userProfileCategory where categoryName='WebGUI::International::get(449,"WebGUI");';!);
+	##Get last sequence number
+	my ($lastField) = WebGUI::SQL->buildArray(qq!select max(sequenceNumber) from userProfileField where profileCategoryId=$categoryId!);
+	++ $lastField;
+	##Insert Photo Field
+	WebGUI::SQL->write( sprintf q!insert into userProfileField values('avatar','WebGUI::International::get("avatar","WebGUI");', 0, 0, 'Image', '', '', %d, %d, 1, 0)!, $lastField, $categoryId );
+}
+
+#-------------------------------------------------
+sub addEnableAvatarColumn {
+	WebGUI::SQL->write('ALTER TABLE Collaboration ADD COLUMN avatarsEnabled int(11) NOT NULL DEFAULT 0');
+}
+
 #--- DO NOT EDIT BELOW THIS LINE
 
 #-------------------------------------------------
@@ -108,7 +139,6 @@ sub start {
 	);
 	WebGUI::Session::open("../..",$configFile);
 	WebGUI::Session::refreshUserInfo(3);
-	WebGUI::SQL->write("ALTER TABLE Collaboration ADD COLUMN rssTemplateId varchar(22) binary NOT NULL default 'PBtmpl0000000000000142' after notificationTemplateId");
 	WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
 }
 

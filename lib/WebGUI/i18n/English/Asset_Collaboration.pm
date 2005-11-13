@@ -1266,6 +1266,15 @@ A URL for sorting and displaying the list of posts by their ratings.
 		lastUpdated => 1114467741,
 	},
 
+	'enable avatars' => {
+		message => q|Enable Avatars?|,
+		lastUpdated => 1131432414,
+	},
+
+	'enable avatars description' => {
+		message => q|<p>Select "Yes" to display Avatars for users in the Collaboration System.  The Avatar field inthe User Profile has to be enabled, and users will need to upload an Avatar image to display.</p><p>Using Avatars will slow down the performance of Collaboration Systems.</p>|,
+		lastUpdated => 1131432717,
+	},
 
 	'collaboration rss template title' => {
 		message => q|Collaboration RSS Template|,

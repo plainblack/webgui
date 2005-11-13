@@ -367,6 +367,11 @@ Be aware that any database links you create here will be available to all conten
 		lastUpdated => 1031514049
 	},
 
+	'392' => {
+		message => q|Delete this file?|,
+		lastUpdated => 1131831533,
+	},
+
 	'743' => {
 		message => q|You must specify a valid email address in order to attempt to recover your password.|,
 		lastUpdated => 1035246389
@@ -3248,6 +3253,12 @@ that Asset and all Assets below it.</p>
                 context => q|Field type name|
         },
 
+	'image' => {
+		message => q|Image|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
 	'codearea' => {
 		message => q|Code Area|,
 		lastUpdated =>0,
@@ -3801,6 +3812,16 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 	'topicName' => {
 		message => q|WebGUI|,
 		lastUpdated => 1128919994,
+	},
+
+	'photo' => {
+		message => q|Photo|,
+		lastUpdated => 1131246503,
+	},
+
+	'avatar' => {
+		message => q|Avatar|,
+		lastUpdated => 1131246512,
 	},
 
 };

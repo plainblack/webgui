@@ -55,6 +55,10 @@ Defaults to 35. Determines the maximum number of characters allowed in this fiel
 
 Defaults to 30. Specifies how big of a text box to display.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -66,7 +70,10 @@ sub definition {
 			},
 		size=>{
 			defaultValue=>30
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

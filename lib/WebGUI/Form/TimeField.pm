@@ -59,6 +59,10 @@ Defaults to 8. Determines the maximum number of characters allowed in this field
 
 Default to 8. Determines how many characters wide the field wlll be.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -70,7 +74,10 @@ sub definition {
 			},
 		size=>{
 			defaultValue=>8
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

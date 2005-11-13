@@ -72,6 +72,10 @@ This will be used if no value is specified. Should be passed as an array referen
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -92,7 +96,10 @@ sub definition {
 			},
 		excludeGroups=>{
 			defaultValue=>[]
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

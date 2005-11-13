@@ -67,6 +67,10 @@ A default date is placed in the value field. Set this to "1" to leave it empty.
 
 If no value is specified, this will be used. Defaults to today and now.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -84,9 +88,25 @@ sub definition {
 			},
 		noDate=>{
 			defaultValue=>0
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 displayValue ( )
+
+Return the date in a human readable format for the Profile system.
+
+=cut
+
+sub displayValue {
+	my ($self) = @_;
+	return WebGUI::DateTime::epochToHuman($self->{value},"%z");
 }
 
 #-------------------------------------------------------------------

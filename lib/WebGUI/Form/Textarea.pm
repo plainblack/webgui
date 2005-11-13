@@ -59,6 +59,10 @@ The number of columns (in characters) wide the box should be. Defaults to the se
 
 The style of wrapping this form should use. Defaults to "virtual". Other possible values are "off" and "physical".
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -73,7 +77,10 @@ sub definition {
 			},
 		wrap=>{
 			defaultValue=>"virtual"
-			}
+			},
+		profileEnabled=>{
+			defaultValue=>1
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

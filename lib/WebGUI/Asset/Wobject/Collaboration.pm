@@ -82,6 +82,17 @@ sub appendPostListTemplateVars {
 		} else {
 			$url = $post->getUrl."#".$post->getId;
 		}
+		my $avatarUrl;
+		if ($self->get('avatarsEnabled')) {
+			#ownerUserId from post
+			#Create user object.
+			my $user = WebGUI::User->new($post->get('ownerUserId'));
+			#Get avatar field, storage Id.
+			my $storageId = $user->get("avatar");
+			my $avatar = WebGUI::Storage->get($storageId);
+			#Get url from storage object.
+			$avatarUrl = $avatar->getUrl;
+		}
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
                         "id"=>$post->getId,
@@ -105,6 +116,7 @@ sub appendPostListTemplateVars {
                         "isFourth"=>(($i+1)%4==0),
                         "isFifth"=>(($i+1)%5==0),
                 	"user.isPoster"=>$post->isPoster,
+                	"avatar.url"=>$post->isPoster,
 			%lastReply
                         });
 		$i++;
@@ -399,6 +411,10 @@ sub definition {
 				fieldType=>"yesNo",
 				defaultValue=>0
 				},
+			avatarsEnabled =>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
 			moderateGroupId =>{
 				fieldType=>"group",
 				defaultValue=>'4'
@@ -615,6 +631,12 @@ sub getEditForm {
 		-label=>WebGUI::International::get('use preview', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('use preview description', 'Asset_Collaboration'),
 		-value=>$self->getValue("usePreview")
+		);
+        $tabform->getTab("properties")->yesNo(
+		-name=>"avatarsEnabled",
+		-label=>WebGUI::International::get('enable avatars', 'Asset_Collaboration'),
+		-hoverHelp=>WebGUI::International::get('enable avatars description', 'Asset_Collaboration'),
+		-value=>$self->getValue("avatarsEnabled")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"moderatePosts",

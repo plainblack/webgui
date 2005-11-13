@@ -55,6 +55,10 @@ A hash reference containing name value pairs. The name of each pair will be used
 
 value and defaultValue are array referneces containing the names from the options list that should be stored.
 
+=head4 profileEnabled
+
+Flag that tells the User Profile system that this is a valid form element in a User Profile
+
 =cut
 
 sub definition {
@@ -66,7 +70,10 @@ sub definition {
                         },
                 defaultValue=>{
                         defaultValue=>[]
-                        }
+                        },
+		profileEnabled=>{
+			defaultValue=>1
+			},
                 });
         return $class->SUPER::definition($definition);
 }
