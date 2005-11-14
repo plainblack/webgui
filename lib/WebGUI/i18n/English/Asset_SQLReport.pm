@@ -30,7 +30,7 @@ SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL 
 
         'Placeholder Parameters description' => {
                 message => q|Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.<br>
-Placeholder Parameters are delimited by commas.<br>
+Placeholder Parameters are delimited a new line.<br>
 There are four input types:
 <ul><b>Integer</b><br>A simple number</ul>
 <ul><b>Form</b><br>Form fields begin with "form:".</ul>
@@ -39,7 +39,7 @@ There are four input types:
 <p>Example:
 <blockquote>
 Query: select * from some_table where some_field = ? and some_other_field < ?<br>
-Placeholder Parameters: query1:pageId,form:field1
+Placeholder Parameters: query1:pageId<br />form:field1
 </blockquote>
 In this example the first question mark will contain the field value of pageId in query1,
 while the second question mark will contain the form variable "field1".
