@@ -103,6 +103,7 @@ sub removeUnneededFiles {
 
 #-------------------------------------------------
 sub addPhotoField {
+	print "\tAdding photo field to User Profiles\n" unless ($quiet);
 	##Get profileCategoryId.
 	my ($categoryId) = WebGUI::SQL->quickArray(q!select profileCategoryId from userProfileCategory where categoryName='WebGUI::International::get(439,"WebGUI");'!);
 	##Get last sequence number
@@ -114,6 +115,7 @@ sub addPhotoField {
 
 #-------------------------------------------------
 sub addAvatarField {
+	print "\tAdding avatar field to User Profiles\n" unless ($quiet);
 	##Get profileCategoryId.
 	my ($categoryId) = WebGUI::SQL->buildArray(q!select profileCategoryId from userProfileCategory where categoryName='WebGUI::International::get(449,"WebGUI");';!);
 	##Get last sequence number
@@ -125,6 +127,7 @@ sub addAvatarField {
 
 #-------------------------------------------------
 sub addEnableAvatarColumn {
+	print "\tAdding enableAvatar column to Collaborations\n" unless ($quiet);
 	WebGUI::SQL->write('ALTER TABLE Collaboration ADD COLUMN avatarsEnabled int(11) NOT NULL DEFAULT 0');
 }
 
