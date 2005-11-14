@@ -159,7 +159,8 @@ The time that the cookie should remain in the browser. Defaults to "+10y" (10 ye
 sub setCookie {
 	my $name = shift;
 	my $value = shift;
-        my $ttl = shift || '+10y';
+        my $ttl = shift;
+        $ttl = (defined $ttl ? $ttl : '+10y');
 	if (exists $session{req}) {
 		my $cookie = Apache2::Cookie->new($session{req},
 							-name=>$name,
