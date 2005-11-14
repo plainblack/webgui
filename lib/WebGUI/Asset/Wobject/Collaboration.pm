@@ -116,7 +116,7 @@ sub appendPostListTemplateVars {
                         "isFourth"=>(($i+1)%4==0),
                         "isFifth"=>(($i+1)%5==0),
                 	"user.isPoster"=>$post->isPoster,
-                	"avatar.url"=>$post->isPoster,
+                	"avatar.url"=>$avatarUrl,
 			%lastReply
                         });
 		$i++;
