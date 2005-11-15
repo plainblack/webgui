@@ -91,7 +91,7 @@ Returns the human readable name or type of this form control.
 =cut
 
 sub getName {
-        return WebGUI::International::get("template","Asset_Template");
+        return WebGUI::International::get("assetName","Asset_Template");
 }
 
 #-------------------------------------------------------------------

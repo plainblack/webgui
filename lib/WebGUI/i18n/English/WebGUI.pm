@@ -138,8 +138,8 @@ our $I18N = {
 	},
 
 	'float' => {
-		message => q|Decimal|,
-		lastUpdated => 1089039511
+		message => q|Number (Decimal)|,
+		lastUpdated => 1132097171
 	},
 
 	'948' => {
