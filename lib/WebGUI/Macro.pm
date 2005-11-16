@@ -34,8 +34,6 @@ B<NOTE:> This entire system is likely to be replaced in the near future.  It has
 
  use WebGUI::Macro;
 
- @array = WebGUI::Macro::getParams($parameterString);
-
  WebGUI::Macro::filter(\$html);
  WebGUI::Macro::negate(\$html);
  WebGUI::Macro::process(\$html);
