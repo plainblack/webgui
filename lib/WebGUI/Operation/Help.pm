@@ -61,9 +61,15 @@ sub _linkTOC {
 
 #-------------------------------------------------------------------
 sub _getHelpFilesList {
-        my $dir = $session{config}{webguiRoot}.$session{os}{slash}."lib".$session{os}{slash}."WebGUI".$session{os}{slash}."Help";
+        my $dir = join $session{os}{slash}, $session{config}{webguiRoot},"lib","WebGUI","Help";
         opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
-        my @files = grep { /^_Help/ } grep { /\.pm$/} readdir(DIR);
+	my @files;
+	foreach my $file (readdir DIR) {
+		next unless $file =~ /.pm$/;
+		my $modName;
+		($modName = $file) =~ s/\.pm$//;
+		push @files, [ $file, $modName ];
+	}
         closedir(DIR);
 	return @files;
 }
@@ -118,16 +124,14 @@ sub www_viewHelpIndex {
         my @helpIndex;
 	my $i;
 	my @files = _getHelpFilesList();
-        foreach my $file (@files) {
-                if ($file =~ /(.*?)\.pm$/) {
-                        my $namespace = $1;
-			my $help = _load($namespace);
-			foreach my $key (keys %{$help}) {
-				push @helpIndex, [$namespace, $key,
-						WebGUI::International::get($help->{$key}{title},$namespace)];
-				$i++;
-			}
-                }
+        foreach my $fileSet (@files) {
+		my $namespace = $fileSet->[1];
+		my $help = _load($namespace);
+		foreach my $key (keys %{$help}) {
+			push @helpIndex, [$namespace, $key,
+					WebGUI::International::get($help->{$key}{title},$namespace)];
+			$i++;
+		}
         }
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
 	my $halfway = round($i/2);
@@ -155,8 +159,8 @@ sub www_viewHelpTOC {
 	my @files = _getHelpFilesList();
 	my $third = round(@files/3 + 0.50);
 	my @entries;
-	foreach my $file (@files) {
-		$file =~ s/\.pm$//;
+	foreach my $fileSet (@files) {
+		my $file = $fileSet->[1];
 		push @entries, [_getHelpName($file), $file];
 	}
 	$i = 0;
