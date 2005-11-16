@@ -116,7 +116,7 @@ sub readAllConfigs {
 	closedir(DIR);
 	my %configs;
 	foreach my $file (@files) {
-		if ($file =~ /\.conf$/ && !($file =~ /^log.conf$/)) {
+		if ($file =~ /\.conf$/ && !($file =~ /^log\.conf$/) && !($file =~ /^spectre\.conf$/)) {
 			$configs{$file} = readConfig($webguiPath,$file);
 		}
 	}

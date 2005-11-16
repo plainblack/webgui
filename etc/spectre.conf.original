@@ -1,0 +1,4 @@
+# Define a port for Spectre to run on between 1024 and 65000.
+port = 32133
+
+

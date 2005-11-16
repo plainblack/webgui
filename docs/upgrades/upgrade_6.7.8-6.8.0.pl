@@ -10,11 +10,13 @@
 
 use lib "../../lib";
 use strict;
+use FileHandle;
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Asset;
 use WebGUI::Setting;
+use WebGUI::User;
 
 my $toVersion = "6.8.0";
 my $configFile;
@@ -30,6 +32,8 @@ updateCollaboration();
 addPhotoField();
 addAvatarField();
 addEnableAvatarColumn();
+addSpectre();
+addWorkflow();
 finish();
 
 #-------------------------------------------------
@@ -130,6 +134,74 @@ sub addEnableAvatarColumn {
 	print "\tAdding enableAvatar column to Collaborations\n" unless ($quiet);
 	WebGUI::SQL->write('ALTER TABLE Collaboration ADD COLUMN avatarsEnabled int(11) NOT NULL DEFAULT 0');
 }
+
+#-------------------------------------------------
+sub addSpectre {
+	print "\tAdding Spectre\n" unless ($quiet);
+	my $user = WebGUI::User->new("new","pbuser_________spectre");
+	$user->username("Spectre");
+	$user->addToGroups([3]);
+	my $source = FileHandle->new("../../etc/spectre.conf.original","r");
+        if (defined $source) {
+        	binmode($source);
+                my $dest = FileHandle->new(">../../etc/spectre.conf");
+                if (defined $dest) {
+                	binmode($dest);
+                        cp($source,$dest);
+                        $dest->close;
+                }
+                $source->close;
+        }
+}
+
+#-------------------------------------------------
+sub addWorkflow {
+	print "\tAdding Workflow\n" unless ($quiet);
+	WebGUI::SQL->write("create table WorkflowSchedule (
+		taskId varchar(22) binary not null primary key,
+		enabled int not null default 1
+		minuteOfHour varchar(25),
+		hourOfDay varchar(25),
+		dayOfMonth varchar(25),
+		monthOfYear varchar(25),
+		dayOfWeek varchar(25),
+		workflowId binary varchar(22) not null
+		)");
+	WebGUI::SQL->write("create table WofklowInstance (
+		instanceId varchar(22) binary not null primary key,
+		workflowId varchar(22) binary not null,
+		currentActivityId varchar(22) binary not null,
+		priority int
+		)");
+	WebGUI::SQL->write("create table WorkflowInstanceData (
+		instanceId varchar(22) binary not null primary key,
+		dataName varchar(35),
+		className varchar(255),
+		methodName varchar(255),
+		parameters text
+		)");
+	WebGUI::SQL->write("create table Wofklow (
+		workflowId varchar(22) binary not null primary key,
+		title varchar(255),
+		description text
+		)");
+	WebGUI::SQL->write("create table WorkflowActivity (
+		activityId varchar(22) binary not null primary key,
+		workflowId varchar(22) binary not null,
+		title varchar(255),
+		description text,
+		previousActivityId varchar(22) binary not null,
+		dateCreated bigint,
+		className varchar(255)
+		)");
+	WebGUI::SQL->write("create table WorkflowActivityProperty (
+		propertyId varchar(22) binary not null primary key,
+		activityId varchar(22) binary not null,
+		name varchar(255),
+		value text
+		)");
+}
+
 
 #--- DO NOT EDIT BELOW THIS LINE
 

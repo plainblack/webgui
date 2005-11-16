@@ -14,6 +14,8 @@
  - Added template to Collaboration RSS feeds.
  - Added page.isContainer and page.isUtility template variables to Navigation
    templates.
+ - Added Spectre, WebGUI's new background processing engine which manages
+   things like scheduled tasks and workflow processing.
 
 
 6.7.7
