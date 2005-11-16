@@ -11,6 +11,7 @@
 use lib "../../lib";
 use strict;
 use FileHandle;
+use File::Copy qw(cp);
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::SQL;
@@ -159,13 +160,13 @@ sub addWorkflow {
 	print "\tAdding Workflow\n" unless ($quiet);
 	WebGUI::SQL->write("create table WorkflowSchedule (
 		taskId varchar(22) binary not null primary key,
-		enabled int not null default 1
+		enabled int not null default 1,
 		minuteOfHour varchar(25),
 		hourOfDay varchar(25),
 		dayOfMonth varchar(25),
 		monthOfYear varchar(25),
 		dayOfWeek varchar(25),
-		workflowId binary varchar(22) not null
+		workflowId varchar(22) binary not null
 		)");
 	WebGUI::SQL->write("create table WofklowInstance (
 		instanceId varchar(22) binary not null primary key,
