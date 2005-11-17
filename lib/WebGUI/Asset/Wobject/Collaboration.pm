@@ -89,9 +89,17 @@ sub appendPostListTemplateVars {
 			my $user = WebGUI::User->new($post->get('ownerUserId'));
 			#Get avatar field, storage Id.
 			my $storageId = $user->get("avatar");
-			my $avatar = WebGUI::Storage->get($storageId);
-			#Get url from storage object.
-			$avatarUrl = $avatar->getUrl;
+			my $avatar = WebGUI::Storage::Image->get($storageId);
+			if ($avatar) {
+				#Get url from storage object.
+				foreach my $imageName (@{$avatar->getFiles}) {
+					if ($avatar->isImage($imageName)) {
+						$avatarUrl = $avatar->getThumbnailUrl($imageName);
+						last;
+					}
+				}
+				$avatarUrl = $avatar->getUrl;
+			}
 		}
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
