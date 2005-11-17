@@ -18,6 +18,7 @@ use POE::Component::IKC::ClientLite;
 use POE::Component::IKC::Server;
 use POE::Component::IKC::Specifier;
 use WebGUI::Session;
+use WebGUI::Workflow;
 
 $|=1; # disable output buffering
 my $help;
@@ -73,13 +74,31 @@ POE::Session->create(
     inline_states => {
         _start        	=> \&serviceStart,
         _stop         	=> \&serviceStop,
-	"shutdown"	=> \&serviceStop
+	"shutdown"	=> \&serviceStop,
+	initializeWorkflowScheduler => \&initializeWorkflowScheduler,
+	loadSchedule => \&loadSchedule
       }
 );
 
 POE::Kernel->run();
 exit 0;
 
+
+#-------------------------------------------------------------------
+sub initializeWorkflowScheduler {
+	my ($kernel, $session) = @_[KERNEL, SESSION];
+	foreach my $config (keys %{WebGUI::Config::readAllConfigs("..")}) {
+		$kernel->post($session,"loadSchedule", $config);
+	}
+}
+
+#-------------------------------------------------------------------
+sub loadSchedule {
+	my ($heap, $config) = @_[HEAP, ARG0];
+	sessionOpen($config);
+	$heap->{workflowSchedules}{$config} = WebGUI::Workflow::getSchedules();
+	sessionClose();	
+}
 
 #-------------------------------------------------------------------
 sub serviceShutdown {
@@ -90,11 +109,12 @@ sub serviceShutdown {
 #-------------------------------------------------------------------
 sub serviceStart {
 	print "Starting WebGUI Spectre...";
-    	my ( $kernel, $heap ) = @_[ KERNEL, HEAP ];
+    	my ( $kernel, $heap, $session) = @_[ KERNEL, HEAP, SESSION ];
     	my $serviceName = "Spectre";
     	$kernel->alias_set($serviceName);
-    	$kernel->call( IKC => publish => $serviceName, ["shutdown"] );
+    	$kernel->call( IKC => publish => $serviceName, ["shutdown", "loadSchedule"] );
 	print "OK\n";
+	$kernel->post($session, "initializeWorkflowScheduler");
 }
 
 #-------------------------------------------------------------------
@@ -116,6 +136,7 @@ sub sessionOpen {
 
 #-------------------------------------------------------------------
 sub sessionClose {
+	WebGUI::Session::end();
 	WebGUI::Session::close();
 }
 

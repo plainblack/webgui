@@ -42,6 +42,7 @@ closedir(DIR);
 
 chdir("../t");
 my $someTestFailed = 0;
+my @failedModules;
 foreach my $file (@files) {
 	next unless $file =~ m/^(.*?)\.t$/;
 	my $testType = $1;
@@ -50,13 +51,22 @@ foreach my $file (@files) {
 	unless (system("$^X $file --configFile=$configFile")) {
 		print "All $testType tests were successful.\n";
 	} else {
-		$someTestFailed = 1;
+		push(@failedModules,$testType);
+		$someTestFailed++;
 		print "----------------------------\n";
 		print "Some $testType tests failed!\n";
 		print "----------------------------\n";
 		sleep(2);
 	}
 	print "\n";
+}
+if ($someTestFailed) {
+	print "\n\n";
+	print "---------------------------------------\n";
+	print " $someTestFailed test modules experienced failures:\n";
+	print "\t".join("\n\t",@failedModules)."\n";
+	print "---------------------------------------\n";
+	print "\n\n";
 }
 exit $someTestFailed;
 
