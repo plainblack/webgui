@@ -101,8 +101,8 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
-                                title => 'editTimeout',
-                                description => 'editTimeout description',
+                                title => 'edit timeout',
+                                description => 'edit timeout description',
                                 namespace => 'Asset_Collaboration',
                         },
                         {
@@ -116,8 +116,8 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
-                                title => 'rich edit',
-                                description => 'rich edit description',
+                                title => 'rich editor',
+                                description => 'rich editor description',
                                 namespace => 'Asset_Collaboration',
                         },
                         {

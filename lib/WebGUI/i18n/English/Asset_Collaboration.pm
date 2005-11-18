@@ -922,10 +922,10 @@ may be selected.|,
                 lastUpdated => 1119070429,
         },
 
-        'editTimeout description' => {
+        'edit timeout description' => {
                 message => q|After this timeout is reached, the Post can no longer be edited by
 the original poster.|,
-                lastUpdated => 1119070429,
+                lastUpdated => 1132355854,
         },
 
         'allow replies description' => {
@@ -938,7 +938,7 @@ the original poster.|,
                 lastUpdated => 1119070429,
         },
 
-        'rich edit description' => {
+        'rich editor description' => {
                 message => q|Select "Yes" to enable Rich Editing of content in Posts.|,
                 lastUpdated => 1119070429,
         },
