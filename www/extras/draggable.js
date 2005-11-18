@@ -181,9 +181,9 @@ function dragable_move(e){
         }
       
         dragable_adjustScrollBars(e);
-
-        z.style.left=temp1+e.clientX-x;
-        z.style.top=temp2+e.clientY-y;
+      //  alert('x is: '+ (temp1+e.clientX-x));
+        z.style.left=(temp1+e.clientX-x)+"px";
+        z.style.top=(temp2+e.clientY-y)+"px";
         return false
     }else {
                 
@@ -221,8 +221,13 @@ function dragable_dragStart(e){
 
     dragging=true
     z=fObj;
-    temp1=parseInt(z.style.left+0) 
-    temp2=parseInt(z.style.top+0)
+    temp1=z.style.left;
+    temp1=temp1.replace(/px/g,'')+0;
+    temp1=parseInt(temp1);
+    temp2=z.style.top;
+    temp2=temp2.replace(/px/g,'')+0;
+    temp2=parseInt(temp2);
+//    alert(temp1,temp2);
     x=e.clientX;
     y=e.clientY;
     return false

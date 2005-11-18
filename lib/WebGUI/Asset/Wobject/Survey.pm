@@ -158,7 +158,7 @@ sub duplicate {
 		$qdata->{Survey_sectionId} = $sdata->{Survey_sectionId};
 		$qdata->{Survey_questionId} = $newAsset->setCollateral("Survey_question","Survey_questionId",$qdata,1,0,"Survey_id");
 		while ($adata = $answers->hashRef) {
-			$responses = WebGUI::SQL->read("select * from Survey_questionResponse where Survey_answerId=".quote($adata->{Survey_answerId}));
+			my $responses = WebGUI::SQL->read("select * from Survey_questionResponse where Survey_answerId=".quote($adata->{Survey_answerId}));
 			$adata->{Survey_answerId} = "new";
 			$adata->{Survey_questionId} = $qdata->{Survey_questionId};
 			$adata->{Survey_id} = $newSurveyId;
@@ -308,7 +308,7 @@ sub getEditForm {
 		$tabform->getTab('properties')->whatNext(
 			-options=>{
 				editQuestion=>WebGUI::International::get(28,'Asset_Survey'),
-				backToPage=>WebGUI::International::get(745,'Asset_Survey')
+				viewParent=>WebGUI::International::get(745,'Asset_Survey')
 				},
 			-value=>"editQuestion",
                         -hoverHelp	=> WebGUI::International::get('what next','Asset_Survey'),
@@ -796,14 +796,6 @@ sub www_deleteAllResponsesConfirm {
 }
 
 #-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("survey add/edit","Asset_Survey");
-#	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,'Asset_Survey'));
-#}
-
-#-------------------------------------------------------------------
 sub www_editSave {
 	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
 	my $output = $_[0]->SUPER::www_editSave(); 
@@ -811,7 +803,6 @@ sub www_editSave {
 		$session{form}{qid} = "new";
 		return $_[0]->www_editQuestion;
 	}
-		
 	return $output;
 }
 

@@ -202,7 +202,7 @@ sub definition {
                                         },
                                 endDate=>{
                                         fieldType=>'dateTime',
-                                        defaultValue=>32472169200
+                                        defaultValue=>2082783600
                                         },
 				status=>{
 					noFormPost=>1,

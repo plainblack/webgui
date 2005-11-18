@@ -173,16 +173,5 @@ sub view {
 	return $self->processTemplate(\%var, $templateId);
 }
 
-
-#-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("article add/edit","Asset_Article");
-#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("12","Asset_Article"));
-#}
-
-
-
 1;
 

@@ -106,7 +106,7 @@ sub getEditForm {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{
                                	view=>WebGUI::International::get(823, 'Asset_Layout'),
-                      	 	""=>WebGUI::International::get(847, 'Asset_Layout')
+                      	 	viewParent=>WebGUI::International::get(847, 'Asset_Layout')
                               	},
 			-value=>"view"
 			);
@@ -138,7 +138,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"] });
+	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
 	my %vars;
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));
@@ -217,14 +217,6 @@ sub view {
 
 	return $self->processTemplate(\%vars,$self->get("templateId"));
 }
-
-
-#sub www_edit {
-#        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-#        $self->getAdminConsole->setHelp("layout add/edit", "Asset_Layout");
-#        return $self->getAdminConsole->render($self->getEditForm->print,"Edit Layout");
-#}
 
 sub www_setContentPositions {
 	my $self = shift;

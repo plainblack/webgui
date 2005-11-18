@@ -97,7 +97,7 @@ sub getEditForm {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{
                                	view=>WebGUI::International::get(823, "Asset_Folder"),
-                      	 	""=>WebGUI::International::get(847, "Asset_Folder")
+                      	 	"viewParent"=>WebGUI::International::get(847, "Asset_Folder")
                               	},
 			-value=>"view"
 			);
