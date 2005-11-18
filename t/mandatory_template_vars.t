@@ -53,6 +53,27 @@ my @tmplVarTable = (
 		id   => 'PBtmplHelp000000000001',
 		vars => [ qw(body fields) ],
 	},
+	## Login, account and password templates
+	{
+		id   => 'PBtmpl0000000000000010',
+		vars => [ ],
+	},
+	{
+		id   => 'PBtmpl0000000000000011',
+		vars => [ ],
+	},
+	{
+		id   => 'PBtmpl0000000000000012',
+		vars => [ ],
+	},
+	{
+		id   => 'PBtmpl0000000000000013',
+		vars => [ ],
+	},
+	{
+		id   => 'PBtmpl0000000000000014',
+		vars => [ ],
+	},
 
 );
 

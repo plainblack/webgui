@@ -14,7 +14,6 @@ use lib '../lib';
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Operation::Help;
-use File::Find;
 # ---- END DO NOT EDIT ----
 
 #The goal of this test is to verify that all entries in the lib/WebGUI/Help

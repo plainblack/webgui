@@ -14,7 +14,6 @@ use lib '../lib';
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Operation::Help;
-use File::Find;
 # ---- END DO NOT EDIT ----
 
 #The goal of this test is to verify that all entries in the lib/WebGUI/Help
@@ -43,6 +42,10 @@ my @relatedHelp = ();
 foreach my $topic ( keys %helpTable ) {
 	foreach my $entry ( keys %{ $helpTable{$topic} }) {
 		my @related = @{ $helpTable{$topic}{$entry}{related} };
+		foreach my $relHash (@related) {
+			$relHash->{parentEntry} = $entry;
+			$relHash->{parentTopic} = $topic;
+		}
 		push @relatedHelp, @related;
 		$numTests += scalar @related;
 	}
@@ -55,8 +58,8 @@ plan tests => $numTests;
 ##Each array element is a hash with two keys, tag (entry) and namespace (topic).
 
 foreach my $related (@relatedHelp) {
-	my ($topic, $entry) = @{ $related }{'namespace', 'tag'};
-	ok( exists $helpTable{$topic}{$entry}, "Help entry: $topic -> $entry");
+	my ($topic, $entry, $parentTopic, $parentEntry) = @{ $related }{'namespace', 'tag', 'parentTopic', 'parentEntry'};
+	ok( exists $helpTable{$topic}{$entry}, "Help entry: $topic -> $entry from $parentTopic -> $parentEntry");
 }
 
 # put your tests here
