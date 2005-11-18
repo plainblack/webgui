@@ -25,7 +25,7 @@ sub definition {
         my $class = shift;
         my $definition = shift;
         push(@{$definition}, {
-		icon=>'matrix.gif'
+		icon=>'matrix.gif',
                 tableName=>'Matrix',
                 className=>'WebGUI::Asset::Wobject::Matrix',
                 properties=>{
