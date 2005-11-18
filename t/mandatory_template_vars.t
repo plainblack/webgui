@@ -21,10 +21,39 @@ use File::Find;
 #variables exist in their templates.
 
 my @tmplVarTable = (
+	## Templates from WebGUI:Operation::Profile.pm
 	{
 		id   => 'PBtmpl0000000000000051',
-		vars => [ qw(profile.form.footer profile.form.header profile.form.hidden) ],
+		vars => [ qw(profile.form.footer profile.form.header profile.form.hidden profile.form.submit) ],
 	},
+	{
+		id   => 'PBtmpl0000000000000052',
+		vars => [ ],
+	},
+	## Templates from WebGUI::AdminConsole.pm
+	{
+		id   => 'PBtmpl0000000000000137',
+		vars => [ ],
+	},
+	{
+		id   => 'PBtmpl0000000000000001',
+		vars => [ qw(application_loop application.workarea) ],
+	},
+	## Templates from WebGUI::Operation::MessageLog.pm
+	{
+		id   => 'PBtmpl0000000000000050',
+		vars => [ qw(message.loop) ],
+	},
+	{
+		id   => 'PBtmpl0000000000000049',
+		vars => [ qw(message.takeAction) ],
+	},
+	## Templates from WebGUI::Operation::Help.pm
+	{
+		id   => 'PBtmplHelp000000000001',
+		vars => [ qw(body fields) ],
+	},
+
 );
 
 use Test::More; # increment this value for each test you create
