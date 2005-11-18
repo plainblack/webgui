@@ -98,8 +98,8 @@ our $HELP = {
                                 namespace => 'Subscription',
                         },
                         {
-                                title => 'code expire',
-                                description => 'code expire description',
+                                title => 'codes expire',
+                                description => 'codes expire description',
                                 namespace => 'Subscription',
                         },
                         {

@@ -47,12 +47,12 @@ they can't be edited by the user.
         },
 
 
-        '913 description' => {
+        '82 description' => {
                 message => q|Choose a template for your form.|,
-                lastUpdated => 1119071072,
+                lastUpdated => 1132354153,
         },
 
-        '81 description' => {
+        '80 description' => {
                 message => q|Choose a template for the data that will be sent via email.|,
                 lastUpdated => 1119071072,
         },
@@ -74,10 +74,15 @@ after data is entered in the form.|,
                 lastUpdated => 1119071072,
         },
 
+	'744' => {
+		message => q|What next?|,
+		lastUpdated => 1132354852
+	},
+
         '744 description' => {
-                message => q|After creating the Data Form, you may either begin to add fields to it
-or to return to the page where the it was created.|,
-                lastUpdated => 1119071072,
+                message => q|After creating the Data Form, you can either begin to add fields to it
+or return to the page where the it was created.|,
+                lastUpdated => 1132354848,
         },
 
         '76 description' => {

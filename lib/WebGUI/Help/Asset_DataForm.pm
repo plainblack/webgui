@@ -6,23 +6,13 @@ our $HELP = {
 		body => '71',
 		fields => [
                         {
-                                title => '16',
-                                description => '16 description',
+                                title => '82',
+                                description => '82 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
-                                title => '74',
-                                description => '74 description',
-                                namespace => 'Asset_DataForm',
-                        },
-                        {
-                                title => '913',
-                                description => '913 description',
-                                namespace => 'Asset_DataForm',
-                        },
-                        {
-                                title => '81',
-                                description => '81 description',
+                                title => '80',
+                                description => '80 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {
@@ -38,6 +28,16 @@ our $HELP = {
                         {
                                 title => 'defaultView',
                                 description => 'defaultView description',
+                                namespace => 'Asset_DataForm',
+                        },
+                        {
+                                title => '16',
+                                description => '16 description',
+                                namespace => 'Asset_DataForm',
+                        },
+                        {
+                                title => '74',
+                                description => '74 description',
                                 namespace => 'Asset_DataForm',
                         },
                         {

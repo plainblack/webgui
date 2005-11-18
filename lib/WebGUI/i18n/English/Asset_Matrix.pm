@@ -680,6 +680,6 @@ our $I18N = {
 		Select a template to be used to show the listing comparison data.
 		</p>|
         },
-}
+};
 
 1;
