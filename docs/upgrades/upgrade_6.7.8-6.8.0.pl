@@ -13,11 +13,13 @@ use strict;
 use FileHandle;
 use File::Copy qw(cp);
 use Getopt::Long;
+use Parse::PlainConfig;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Asset;
 use WebGUI::Setting;
 use WebGUI::User;
+use WebGUI::Utility;
 
 my $toVersion = "6.8.0";
 my $configFile;
@@ -36,7 +38,25 @@ addEnableAvatarColumn();
 addSpectre();
 addWorkflow();
 addMatrix();
+updateConfigFile();
 finish();
+
+#-------------------------------------------------
+sub updateConfigFile {
+        print "\tUpdating config file.\n" unless ($quiet);
+        my $pathToConfig = '../../etc/'.$configFile;
+        my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig, 'PURGE'=>1);
+        my %newConfig;
+        foreach my $key ($conf->directives) { # delete unwanted stuff
+                unless (isIn($key,qw(enableDateCache scripturl))) {
+                        $newConfig{$key} = $conf->get($key);
+                }
+        }
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::Matrix");	
+        $conf->purge;
+        $conf->set(%newConfig);
+        $conf->write;
+}
 
 #-------------------------------------------------
 sub addMatrix {

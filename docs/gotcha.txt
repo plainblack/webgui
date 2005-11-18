@@ -19,10 +19,6 @@ save you many hours of grief.
 
  * The core API has changed. Check docs/migration.txt for details.
 
- * Due to the performance increase achieved by switching to DateTime we
-	no longer need date caching so the enableDateCache directive can
-	be removed from your config file.
-
  * WebGUI now requires Apache2 with mod_perl2 so CGI, FastCGI, PerlEx,
 	although never officially supported, are no longer possible.
 	Making this change gave us more than 70% performance improvement
