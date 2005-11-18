@@ -12,6 +12,7 @@ my $quiet;
 
 start();
 protectUserProfileFields();
+correctEditProfileTemplate();
 finish();
 
 #-------------------------------------------------
@@ -28,7 +29,18 @@ sub start {
 
 #-------------------------------------------------
 sub protectUserProfileFields {
+        print "\tProtecting all default user fields.\n" unless ($quiet);
 	WebGUI::SQL->write("update userProfileField set protected=1 where fieldName in ('discussionLayout','INBOXNotifications','alias','signature','publicProfile','publicEmail','toolbar')");
+}
+
+#-------------------------------------------------
+sub correctEditProfileTemplate {
+        print "\tFixing Edit Profile template.\n" unless ($quiet);
+	my $tmplAsset = WebGUI::Asset->newByDynamicClass("PBtmpl0000000000000051");
+	my $template = $tmplAsset->get('template');
+	$template =~ s/create.form.footer/profile.form.footer/;
+	$tmplAsset->addRevision({ template=>$template });
+	$tmplAsset->commit;
 }
 
 #-------------------------------------------------
