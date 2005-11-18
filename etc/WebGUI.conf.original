@@ -111,6 +111,7 @@ assets = WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Wobject::IndexedSearch, \
 	WebGUI::Asset::Wobject::MessageBoard, \
 	WebGUI::Asset::Wobject::Navigation, \
+	WebGUI::Asset::Wobject::Matrix, \
 	WebGUI::Asset::Wobject::Poll, \
 	WebGUI::Asset::Wobject::Product, \
 	WebGUI::Asset::Wobject::SQLReport, \
