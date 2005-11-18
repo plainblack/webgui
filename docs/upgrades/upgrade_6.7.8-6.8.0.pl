@@ -753,7 +753,7 @@ sub addWorkflow {
 		dayOfWeek varchar(25),
 		workflowId varchar(22) binary not null
 		)");
-	WebGUI::SQL->write("create table WofklowInstance (
+	WebGUI::SQL->write("create table WorkflowInstance (
 		instanceId varchar(22) binary not null primary key,
 		workflowId varchar(22) binary not null,
 		currentActivityId varchar(22) binary not null,
@@ -766,7 +766,7 @@ sub addWorkflow {
 		methodName varchar(255),
 		parameters text
 		)");
-	WebGUI::SQL->write("create table Wofklow (
+	WebGUI::SQL->write("create table Workflow (
 		workflowId varchar(22) binary not null primary key,
 		title varchar(255),
 		description text
