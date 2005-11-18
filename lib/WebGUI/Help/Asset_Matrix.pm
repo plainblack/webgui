@@ -1,7 +1,7 @@
 package WebGUI::Help::Asset_Matrix;
 
 our $HELP = {
-	'add/edit' => {
+	'matrix add/edit' => {
 		title => 'add/edit help title',
 		body => 'add/edit help body',
 		related => [
@@ -32,7 +32,7 @@ our $HELP = {
 		body => 'search template help body',
 		related => [
 			{
-				tag => 'add/edit',
+				tag => 'matrix add/edit',
 				namespace => 'Asset_Matrix'
 			},
 			{
@@ -58,7 +58,7 @@ our $HELP = {
 		body => 'compare template help body',
 		related => [
 			{
-				tag => 'add/edit',
+				tag => 'matrix add/edit',
 				namespace => 'Asset_Matrix'
 			},
 			{
@@ -84,7 +84,7 @@ our $HELP = {
 		body => 'ratings detail template help body',
 		related => [
 			{
-				tag => 'add/edit',
+				tag => 'matrix add/edit',
 				namespace => 'Asset_Matrix'
 			},
 			{
@@ -110,7 +110,7 @@ our $HELP = {
 		body => 'matrix template help body',
 		related => [
 			{
-				tag => 'add/edit',
+				tag => 'matrix add/edit',
 				namespace => 'Asset_Matrix'
 			},
 			{
@@ -136,7 +136,7 @@ our $HELP = {
 		body => 'detail template help body',
 		related => [
 			{
-				tag => 'add/edit',
+				tag => 'matrix add/edit',
 				namespace => 'Asset_Matrix'
 			},
 			{

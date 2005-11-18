@@ -4,6 +4,9 @@ package WebGUI::Help::_Help; ## Be sure to change the package name to match your
 
 our $HELP = {  ##hashref of hashes
 	'help article' => {	#name of article, used as a reference by other articles
+				#note, all Assets should have an "assetName add/edit" entry if
+				#you want them automatically listed in Asset, List of Available
+
 		title => 'help article title',  #The title and body are looked up in the
 		body => 'help article title',	#i18n file of the same name
 		fields => [	#This array is used to list hover help for form fields.
@@ -25,6 +28,7 @@ our $HELP = {  ##hashref of hashes
 			},
 		],
 	},
+
 };
 
 1;  ##All perl modules must return true
