@@ -66,7 +66,7 @@ our $HELP = {
                                 namespace => 'Asset_Survey',
                         },
                         {
-                                title => 'what next',
+                                title => '744',
                                 description => 'what next description',
                                 namespace => 'Asset_Survey',
                         },
@@ -135,7 +135,7 @@ our $HELP = {
                                 namespace => 'Asset_Survey',
                         },
                         {
-                                title => 'what next question',
+                                title => '744',
                                 description => 'what next question description',
                                 namespace => 'Asset_Survey',
                         },

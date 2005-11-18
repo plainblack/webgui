@@ -778,11 +778,11 @@ default is 1.
                 lastUpdated => 1119849705,
         },
 
-        'what next' => {
+        'what next description' => {
                 message => q|After creating a new Survey, you may either starting adding questions or go back to the page where
 the survey was added.
 <p/>|,
-                lastUpdated => 1119849705,
+                lastUpdated => 1132357041,
         },
 
 
@@ -1131,8 +1131,8 @@ A comment.
 	},
 
         'question add/edit body' => {
-		message => q||,
-		lastUpdated => 1119851165,
+		message => q|WebGUI's Survey Wobject supplies you with many kinds of questions, such as multiple choice, boolean (a or b, such as Yes/No, True/False, etc.), and various kinds of essay answers.  The order of the questions can also be changed after they are entered.|,
+		lastUpdated => 1132357445,
 	},
 
         '14 description' => {
@@ -1173,9 +1173,14 @@ is set to "response".
                 lastUpdated => 1119982880,
         },
 
+	'744' => {
+		message => q|What next?|,
+		lastUpdated => 1035864828
+	},
+
 	'answer add/edit body' => {
-                message => q||,
-                lastUpdated => 1119993979,
+                message => q|Depending on the type of question, you may be able to supply more than one answer for each question.|,
+                lastUpdated => 1132356704,
 	},
 
         '19 description' => {
