@@ -7,8 +7,8 @@ our $HELP = {
 		body => 'layout add/edit body',
 		fields => [
                         {
-                                title => 'Template',
-                                description => 'Template description',
+                                title => 'layout template title',
+                                description => 'template description',
                                 namespace => 'Asset_Layout',
                         },
                         {
@@ -17,8 +17,8 @@ our $HELP = {
                                 namespace => 'Asset_FilePile',
                         },
                         {
-                                title => 'Assets to Hide',
-                                description => 'Assets to Hide description',
+                                title => 'assets to hide',
+                                description => 'assets to hide description',
                                 namespace => 'Asset_Layout',
                         },
 		],
