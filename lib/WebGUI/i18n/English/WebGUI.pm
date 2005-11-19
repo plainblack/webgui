@@ -617,9 +617,9 @@ Be aware that any database links you create here will be available to all conten
 
         '977 description' => {
                 message => q|Set this to yes to make this user a secondary admin.  Secondary admins have the ability
-to add or remove user from their groups.
+to add or remove users from their groups.
 		|,
-                lastUpdated => 1122088999,
+                lastUpdated => 1132359856,
         },
 
 
@@ -1805,8 +1805,8 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 
 
 	'622' => {
-		message => q||,
-		lastUpdated => 1120448740
+		message => q|Here you will define a new group or edit an existing group.  Group membership is very flexible.  You can allow group inclusion via membership in an LDAP group or database query, or restrict users to be in a certain range of IP addresses.  Groups can also be setup to that users can add or remove themselves from the group, although it is strongly recommended that you not allow user to add themselves to default WebGUI groups such a Admin or Content Manager.|,
+		lastUpdated => 1132360148
 	},
 
 	'361' => {
@@ -3081,8 +3081,8 @@ that Asset and all Assets below it.</p>
 	},
 
 	'manage users in group body' => {
-		message => q||,
-		lastUpdated => 1122094683
+		message => q|Use this form to add or remove users in bulk from a group.|,
+		lastUpdated => 1132359408
 	},
 
 	'1009' => {

@@ -74,7 +74,7 @@ our $HELP = {
 		fields => [
                         {
                                 title => '50',
-                                description => '50 description groupings',
+                                description => '50 description',
                                 namespace => 'WebGUI',
                         },
                         {
