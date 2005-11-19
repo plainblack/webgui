@@ -51,12 +51,16 @@ if ($help){
         print <<STOP;
 
 
-Usage: perl $0 
+Usage: perl $0 --doit
 
 Options:
 
 	--backupDir	The folder where backups should be
 			created. Defaults to '/data/backups'.
+
+	--doit		This flag is required. You MUST include this
+			flag in your command line or the upgrade
+                        will not run.
 
         --help          Display this help message and exit.
 
@@ -93,29 +97,23 @@ unless ($doit) {
 
 +--------------------------------------------------------------------+
 |                                                                    |
-| For more information about this utility type:                      |
-|                                                                    |
-| perl upgrade.pl --help                                             |
-|                                                                    |
-+--------------------------------------------------------------------+
-|                                                                    |
 |                         W  A  R  N  I  N  G                        |
 |                                                                    |
 | There are no guarantees of any kind provided with this software.   |
 | This utility has been tested rigorously, and has performed without |
 | error or consequence in our labs, and on our production servers    |
-| for more than a year. However, there is no substitute for a good   |
-| backup of your software and data before performing any kind of     |
-| upgrade.                                                           |
+| for many years. However, there is no substitute for a good backup  |
+| of your software and data before performing any kind of upgrade.   |
 |                                                                    |
-| NOTE: This utility will work on MySQL databases only. Any          |
-| configs using non-MySQL databases will be skipped.                 |
+| BEFORE YOU UPGRADE you should definitely read docs/gotcha.txt to   |
+| find out what things you should know about that will affect your   |
+| upgrade.                                                           |
 |                                                                    |
 +--------------------------------------------------------------------+
 |                                                                    |
-| You must include the command line argument "--doit" in your        |
-| command in order to bypass this message. The upgrade will not run  |
-| without the "--doit" flag.                                         |
+| For more information about this utility type:                      |
+|                                                                    |
+| perl upgrade.pl --help                                             |
 |                                                                    |
 +--------------------------------------------------------------------+
 
