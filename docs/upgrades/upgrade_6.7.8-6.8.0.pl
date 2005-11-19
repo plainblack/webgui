@@ -35,11 +35,68 @@ updateCollaboration();
 addPhotoField();
 addAvatarField();
 addEnableAvatarColumn();
-addSpectre();
-addWorkflow();
+#addSpectre();
+#addWorkflow();
 addMatrix();
 updateConfigFile();
+addInOuutBoard();
+addZipArchive();
 finish();
+
+#-------------------------------------------------
+sub addZipArchive {
+        print "\nAdding Zip Archive Asset\n" unless ($quiet);
+	WebGUI::SQL->write("create table ZipArchiveAsset (
+   assetId varchar(22) binary not null,
+   templateId varchar(22) binary not null default '',
+   showPage varchar(255) not null default 'index.html',
+   revisionDate bigint not null,
+   primary key (assetId,revisionDate)
+)");
+ 	my $import = WebGUI::Asset->getImportNode;
+        my $folder = $import->addChild({
+                title=>"Zip Archive Templates",
+                menuTitle=>"Zip Archive Templates",
+                className=>"WebGUI::Asset::Wobject::Folder",
+                url=>"ziparchive-templates",
+                });
+        my $template = <<STOP;
+#assetId=ZipArchiveTMPL00000001
+#title=Default Zip Archive Template
+#namespace=ZipArchiveAsset
+
+<tmpl_if session.var.adminOn>
+   <tmpl_if controls>
+      <p><tmpl_var controls></p>
+   </tmpl_if>
+</tmpl_if>
+
+<tmpl_if error>
+<ul>
+  <li><tmpl_var error></li>
+</ul>
+</tmpl_if>
+
+<tmpl_if fileUrl>
+   <a href="<tmpl_var fileUrl>"><tmpl_var title></a>
+<tmpl_else>
+  <tmpl_if pageError>
+      Error:  No initial page specified
+  <tmpl_else>
+      Error:  No file specified
+  </tmpl_if>
+</tmpl_if>	
+	STOP
+        my $newAsset = $folder->addChild({
+                title=>"Default Zip Archive Template",
+                menuTitle=>"Default Zip Archive Template",
+                namespace=>"ZipArchiveAsset",
+                url=>"zip-archive-template",
+                className=>"WebGUI::Asset::Template",
+                template=>$template
+                }, "ZipArchiveTMPL00000001");
+        $newAsset->commit;
+}
 
 #-------------------------------------------------
 sub updateConfigFile {
@@ -53,9 +110,134 @@ sub updateConfigFile {
                 }
         }
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::Matrix");	
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::InOutBoard");	
         $conf->purge;
         $conf->set(%newConfig);
         $conf->write;
+}
+
+#-------------------------------------------------
+sub addInOutBoard {
+	print "\tAdding In/Out Board Asset\n" unless ($quiet);
+	WebGUI::SQL->write("create table InOutBoard ( 
+        assetId varchar(22) binary not null primary key,
+	revisionDate bigint,
+        statusList text,
+        reportViewerGroup varchar(22) binary not null default '3',
+        inOutGroup varchar(22) binary not null default '2',
+        inOutTemplateId varchar(22) binary not null default 'IOB0000000000000000001',
+        reportTemplateId varchar(22) binary not null default 'IOB0000000000000000002',
+        paginateAfter int not null default 50,
+        reportPaginateAfter int not null default 50
+	)");
+	WebGUI::SQL->write("create table InOutBoard_status (
+        assetId varchar(22) binary  not null,
+        userId varchar(22) binary not null,
+        status varchar(255),
+        dateStamp int not null,
+        message text
+	)");
+	WebGUI::SQL->write("create table InOutBoard_statusLog (
+        assetId varchar(22) binary not null,
+        userId varchar(22) binary not null,
+        status varchar(255),
+        dateStamp int not null,
+        message text
+	)");
+	WebGUI::SQl->write("insert into userProfileField (fieldName,fieldLabel,visible,dataType,dataValues,dataDefault,sequenceNumber,profileCategoryId,editable) values ('department',".quote("'Department'").",1,'selectList',".quote("{'IT'=>'IT','HR'=>'HR','Regular Staff'=>'Regular Staff'}").",".quote("['Regular Staff']").",8,'6',1)");
+	my $import = WebGUI::Asset->getImportNode;
+	my $folder = $import->addChild({
+		title=>"In/Out Board Templates",
+		menuTitle=>"In/Out Board Templates",
+		className=>"WebGUI::Asset::Wobject::Folder",
+		url=>"iob-templates",
+		});
+	my $template = <<STOP;
+<h1>In/Out Board Report</h1>
+   <tmpl_var form><br />
+   <tmpl_if showReport>
+   <table width=100% cellpadding=3 cellspacing=0 border=1>
+   <tr>
+   <th><tmpl_var username.label></th>
+   <th><tmpl_var status.label></th>
+   <th><tmpl_var date.label></th>
+   <th><tmpl_var message.label></th>
+   <th><tmpl_var updatedBy.label></th>
+   </tr>
+   <tmpl_loop rows_loop>
+   <tmpl_if deptHasChanged>
+   <tr><td colspan=5><b><tmpl_var department></b></td></tr>
+   </tmpl_if>
+   <tr>
+   <td><tmpl_var username></td>
+   <td><tmpl_var status></td>
+   <td><tmpl_var dateStamp></td>
+   <td><tmpl_var message></td>
+   <td><tmpl_var createdBy></td>
+   </tr>
+   </tmpl_loop>
+   <tr><td colspan=5><tmpl_var paginateBar></td></tr>
+   </table>
+   </tmpl_if>
+STOP
+	my $newAsset = $folder->addChild({
+		title=>"Default InOutBoard Report Template",
+		menuTitle=>"Default InOutBoard Report Template",
+		namespace=>"InOutBoard/Report",
+		url=>"iob-report-template",
+		className=>"WebGUI::Asset::Template",
+		template=>$template
+		}, "IOB0000000000000000002");
+	$newAsset->commit;
+	my $template = <<STOP;
+<a name="<tmpl_var id>"></a>
+<tmpl_if session.var.adminOn>
+   <p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle> 
+   <h1><tmpl_var title></h1> 
+</tmpl_if> 
+
+<tmpl_var description>
+
+<tmpl_if selectDelegatesURL>
+   <a href="<tmpl_var selectDelegatesURL>">Select delegates</a>
+</tmpl_if>
+<tmpl_if canViewReport>
+   <tmpl_if selectDelegatesURL>
+      &nbsp;&middot;&nbsp;
+   </tmpl_if>
+   <a href="<tmpl_var viewReportURL>">View Report</a>
+</tmpl_if>
+<tmpl_if displayForm>
+   <tmpl_var form><br />
+</tmpl_if>
+   
+   <table width=100% cellpadding=3 cellspacing=0 border=1>
+   <tmpl_loop rows_loop>
+   <tmpl_if deptHasChanged>
+   <tr><td colspan=4><b><tmpl_var department></b></td></tr>
+   </tmpl_if>
+   <tr>
+   <td><tmpl_var username></td>
+   <td><tmpl_var status></td>
+   <td><tmpl_var dateStamp></td>
+   <td><tmpl_var message></td>
+   </tr>
+   </tmpl_loop>
+   <tr><td colspan=4><tmpl_var paginateBar></td></tr>
+   </table>
+STOP
+	my $newAsset = $folder->addChild({
+		title=>"Default InOutBoard Template",
+		menuTitle=>"Default InOutBoard Template",
+		namespace=>"InOutBoard",
+		url=>"iob-template",
+		className=>"WebGUI::Asset::Template",
+		template=>$template
+		}, "IOB0000000000000000001");
+	$newAsset->commit;
 }
 
 #-------------------------------------------------

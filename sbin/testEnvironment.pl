@@ -52,6 +52,7 @@ checkModule("DBI",1.40);
 checkModule("DBD::mysql",2.1021);
 checkModule("HTML::Parser",3.36);
 checkModule("Archive::Tar",1.05);
+checkModule("Archive::Zip",1.16);
 checkModule("IO::Zlib",1.01);
 checkModule("Compress::Zlib",1.34);
 checkModule("Net::SMTP",2.24);
@@ -61,7 +62,7 @@ checkModule("XML::Simple",2.09);
 checkModule("SOAP::Lite",0.60);
 checkModule("DateTime",0.2901);
 checkModule("Time::HiRes",1.38);
-checkModule("DateTime::Format::Strptime");
+checkModule("DateTime::Format::Strptime",1.0601);
 checkModule("DateTime::Cron::Simple",0.2);
 checkModule("Image::Magick",5.47,1);
 checkModule("Log::Log4perl",0.51);
@@ -71,8 +72,9 @@ checkModule("HTML::TagFilter",0.07);
 checkModule("HTML::Template",2.7);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
-checkModule("POE",0.3202);
-checkModule("POE::Component::IKC::Server",0.18);
+#checkModule("POE",0.3202);
+#checkModule("POE::Component::IKC::Server",0.18);
+#checkModule("POE::Component::JobQueue",0.5402);
 checkModule("Apache2::Request",2.06);
 
 ###################################

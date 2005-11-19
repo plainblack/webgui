@@ -18,6 +18,7 @@ use POE qw(Session);
 use POE::Component::IKC::ClientLite;
 use POE::Component::IKC::Server;
 use POE::Component::IKC::Specifier;
+use POE::Component::JobQueue;
 use WebGUI::Session;
 use WebGUI::Workflow;
 
@@ -67,27 +68,36 @@ fork and exit;
 
 
 create_ikc_server(
-    port => 32133,
-    name => 'Spectre',
-);
+    	port => 32133,
+    	name => 'Spectre',
+	);
 
 POE::Session->create(
-    inline_states => {
-        _start        	=> \&initializeScheduler,
-        _stop         	=> \&shutdown,
-	"shutdown"	=> \&shutdown,
-	loadSchedule => \&loadSchedule,
-	checkSchedule => \&checkSchedule,
-	checkEvent => \&checkEvent,
-      }
-);
+    	inline_states => {
+        	_start => \&initializeScheduler,
+        	_stop => \&shutdown,
+		"shutdown" => \&shutdown,
+		loadSchedule => \&loadSchedule,
+		checkSchedule => \&checkSchedule,
+		checkEvent => \&checkEvent,
+      		}
+	);
 
 POE::Session->create(
-    inline_states => {
-        _start        	=> \&initializeJobQueue,
-        _stop         	=> \&shutdown,
-      }
-);
+    	inline_states => {
+        	_start => \&initializeJobQueue,
+        	_stop => \&shutdown,
+      		}
+	);
+
+POE::Component::JobQueue->spawn ( 
+	Alias => 'queuer',
+      	WorkerLimit => 10, 
+      	Worker => \&spawnWorker, 
+      	Passive => { 
+		Prioritizer => \&prioritizeJobs, 
+      		},
+   	);
 
 POE::Kernel->run();
 exit 0;
@@ -122,6 +132,9 @@ sub initializeJobQueue {
     	$kernel->alias_set($serviceName);
     	$kernel->call( IKC => publish => $serviceName, ["shutdown"] );
 	print "OK\n";
+	foreach my $config (keys %{WebGUI::Config::readAllConfigs("..")}) {
+		$kernel->yield("loadJobs", $config);
+	}
 }
 
 #-------------------------------------------------------------------
@@ -139,11 +152,39 @@ sub initializeScheduler {
 }
 
 #-------------------------------------------------------------------
+sub loadJobs {
+	my ($heap, $config) = @_[HEAP, ARG0];
+	sessionOpen($config);
+}
+
+#-------------------------------------------------------------------
 sub loadSchedule {
 	my ($heap, $config) = @_[HEAP, ARG0];
 	sessionOpen($config);
 	$heap->{workflowSchedules}{$config} = WebGUI::Workflow::getSchedules();
 	sessionClose();	
+}
+
+#-------------------------------------------------------------------
+sub performJob {
+	
+}
+
+#-------------------------------------------------------------------
+sub prioritizeJobs {
+	return 1; # FIFO queue, but let's add priorities at some point
+}
+
+#-------------------------------------------------------------------
+sub sessionOpen {
+	WebGUI::Session::open("..",shift);
+	WebGUI::Session::refreshUserInfo("pbuser_________spectre");
+}
+
+#-------------------------------------------------------------------
+sub sessionClose {
+	WebGUI::Session::end();
+	WebGUI::Session::close();
 }
 
 #-------------------------------------------------------------------
@@ -158,15 +199,32 @@ sub shutdown {
 }
 
 #-------------------------------------------------------------------
-sub sessionOpen {
-	WebGUI::Session::open("..",shift);
-	WebGUI::Session::refreshUserInfo("pbuser_________spectre");
+sub spawnWorker {
+ 	my ($postback, @jobParams) = @_; 
+    	POE::Session->create ( 
+		inline_states => {
+			_start => \&startWorker,
+			_stop => \&stopWorker,
+			performJob => \&performJob
+			},
+        	args => [ 
+			$postback,   
+                        @jobParams, 
+                        ],
+      		);
 }
 
 #-------------------------------------------------------------------
-sub sessionClose {
-	WebGUI::Session::end();
-	WebGUI::Session::close();
+sub startWorker {
+
 }
+
+#-------------------------------------------------------------------
+sub stopWorker {
+
+}
+
+
+
 
 

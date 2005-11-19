@@ -13,9 +13,16 @@ save you many hours of grief.
 	DateTime
 	DateTime::Format::Strptime
 	DateTime::Cron::Simple
- 	POE
-	POE::Component::IKC::Server
+	Archive::Zip
+
+   And optionally, these:
+
 	Test::More
+        Pod::Coverage
+
+ * If you have previously installed the community contributed version
+	of the In/Out Board (IOB) then you will need to completely
+	uninstall it before you can proceed with this upgrade.
 
  * The core API has changed. Check docs/migration.txt for details.
 

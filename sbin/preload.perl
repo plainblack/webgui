@@ -53,6 +53,7 @@ use Storable;
 use XML::Simple ();
 use Compress::Zlib (); 
 use Archive::Tar ();
+use Archive::Zip ();
 use IO::Zlib ();
 
 ####
