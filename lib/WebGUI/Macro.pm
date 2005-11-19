@@ -93,7 +93,7 @@ Nullifies all macros in this content segment.
 
 =head3 html
 
-A scalar refernece of HTML to be processed.
+A scalar reference of HTML to be processed.
 
 =cut
 
