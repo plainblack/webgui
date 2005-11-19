@@ -54,8 +54,8 @@ our $HELP = {
 		],
 	},
 	'compare template' => {
-		title => 'compare template help title',
-		body => 'compare template help body',
+		title => 'comparison template help title',
+		body => 'comparison template help body',
 		related => [
 			{
 				tag => 'matrix add/edit',
