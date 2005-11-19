@@ -7,17 +7,17 @@ our $HELP = {
 		body => 'image add/edit body',
 		fields => [
                         {
-                                title => 'Thumbnail size',
+                                title => 'thumbnail size',
                                 description => 'Thumbnail size description',
                                 namespace => 'Asset_Image',
                         },
                         {
-                                title => 'Parameters',
+                                title => 'parameters',
                                 description => 'Parameters description',
                                 namespace => 'Asset_Image',
                         },
                         {
-                                title => 'Thumbnail',
+                                title => 'thumbnail',
                                 description => 'Thumbnail description',
                                 namespace => 'Asset_Image',
                         },
