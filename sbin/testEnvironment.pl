@@ -45,7 +45,8 @@ if ($] >= 5.006) {
 checkModule("LWP",5.80);
 checkModule("HTTP::Request",1.40);
 checkModule("HTTP::Headers",1.61);
-checkModule("Test::More",0.61);
+checkModule("Test::More",0.61,1);
+checkModule("Pod::Coverage",0.17,1);
 checkModule("Digest::MD5",2.20);
 checkModule("DBI",1.40);
 checkModule("DBD::mysql",2.1021);
@@ -72,7 +73,7 @@ checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
 checkModule("POE",0.3202);
 checkModule("POE::Component::IKC::Server",0.18);
-checkModule("Apache2::Request");
+checkModule("Apache2::Request",2.06);
 
 ###################################
 # Checking WebGUI
