@@ -82,7 +82,7 @@ Returns the human readable name or type of this form control.
 =cut
 
 sub getName {
-        return WebGUI::International::get("482","WebGUI");
+        return WebGUI::International::get("483","WebGUI");
 }
 
 
