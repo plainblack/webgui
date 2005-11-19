@@ -69,7 +69,7 @@ function FileUploadControl_swapImage(firedobj) {
 	var imgPath = this.images["unknown"];
 	
 	if (parts.length !=1) {
-			var extension = parts[parts.length -1];
+			var extension = parts[parts.length -1].toLowerCase();
 			if (this.images[extension]) {
 				imgPath = this.images[extension];
 			}
