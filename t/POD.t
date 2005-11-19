@@ -22,30 +22,30 @@ use Test::More;
 
 initialize();  # this line is required
 
-my $moduleCount = 0;
+my @modules = ();
 find(\&countModules, "../lib/WebGUI");
+my $moduleCount = scalar(@modules);
 diag("Planning on running $moduleCount tests\n");
 plan tests => $moduleCount;
-find(\&checkPod, "../lib/WebGUI");
-
-cleanup(); # this line is required
-
-sub countModules {
-	my $filename = $_;
-	return unless $filename =~ m/\.pm$/;
-	$moduleCount++;
-}
-
-sub checkPod {
-	my $filename = $File::Find::dir."/".$_;
-	return unless $filename =~ m/\.pm$/;
-	my $package = $filename;
-	$package =~ s/^\.\.\/lib\/(.*)\.pm$/$1/;
-	$package =~ s/\//::/g;
+foreach my $package (@modules) {
 	my $pc = Pod::Coverage->new(package=>$package);
 	print $package.":".$pc->coverage.$pc->why_unrated."\n";
 	#ok($pc->coverage, $package);
 }
+
+cleanup(); # this line is required
+
+sub countModules {
+	my $filename = $File::Find::dir."/".$_;
+	return unless $filename =~ m/\.pm$/;
+	return if $filename =~ m/WebGUI\/i18n/;
+	return if $filename =~ m/WebGUI\/Help/;
+	my $package = $filename;
+	$package =~ s/^\.\.\/lib\/(.*)\.pm$/$1/;
+	$package =~ s/\//::/g;
+	push(@modules,$package);
+}
+
 
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
