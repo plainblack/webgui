@@ -202,7 +202,7 @@ sub addFileFromFormPost {
 	my $filename;
 	my $attachmentCount = 1;
 	foreach my $upload ($session{req}->upload($formVariableName)) {
-		last if $attachmentCount > $attachmentLimit;
+		return $filename if $attachmentCount > $attachmentLimit;
 		my $tempPath = $upload->tempname();
 		$filename = $upload->filename();
 		next unless $filename;

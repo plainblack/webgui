@@ -17,6 +17,7 @@ use Tie::CPHash;
 use WebGUI::Affiliate;
 use WebGUI::Asset;
 use WebGUI::Cache;
+use WebGUI::Config;
 use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
 use WebGUI::HTTP;
@@ -24,6 +25,7 @@ use WebGUI::International;
 use WebGUI::Operation;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::Setting;
 use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::URL;
@@ -32,13 +34,13 @@ use WebGUI::PassiveProfiling;
 use Apache2::Request;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
-use Apache2::Const -compile => qw(OK DECLINED);
+use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
 use Apache2::ServerUtil ();
 
 #-------------------------------------------------------------------	
 sub handler {
-        my $r = shift;
-        my $s = Apache2::ServerUtil->server;
+	my $r = shift;
+	my $s = Apache2::ServerUtil->server;
 	my $config = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
 	foreach my $url ($config->{extrasURL}, @{$config->{passthruUrls}}) {
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
@@ -46,24 +48,42 @@ sub handler {
 	my $uploads = $config->{uploadsURL};
 	if ($r->uri =~ m/^$uploads/) {
 		$r->handler('perl-script');
-		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);	
+		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
 	} else {
-        	$r->handler('perl-script');
-        	$r->set_handlers(PerlResponseHandler => \&contentHandler);
-        	$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
+		$r->handler('perl-script');
+		$r->set_handlers(PerlResponseHandler => \&contentHandler);
+		$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	}
-        return Apache2::Const::DECLINED;
+	return Apache2::Const::DECLINED;
 }
 
 
 #-------------------------------------------------------------------	
 sub contentHandler {
+	
+	### The following items must be in precisely the following order
+	#   because each line depends on something from the previous line.
+	
+	### inherit Apache request.
 	my $r = shift;
-        my $s = Apache2::ServerUtil->server;
-	WebGUI::HTTP::getCookies();
-	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
+	### Instantiate the API for this httpd instance.
+	my $s = Apache2::ServerUtil->server;
+	### Open new or existing user session based on user-agent's cookie.
+	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),0);
 	### Apache2::Request object
-	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});        
+	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});
+	### Sets $session{cookie} as a hashref of the cookies.
+	WebGUI::HTTP::getCookies();
+	### Change current user to user specified in wgSession cookie.
+	if ($session{cookie}{wgSession} eq "") {
+		WebGUI::Session::start(1); #setting up a visitor session
+	} else {
+		WebGUI::Session::setupSessionVars($session{cookie}{wgSession});
+	}
+	### current user's account and profile information (from users and userProfileData tables)
+	WebGUI::Session::setupUserInfo($session{var}{userId});
+	### Add wgSession cookie to header iff it's not already on the client.
+	WebGUI::HTTP::setCookie("wgSession",$session{var}{sessionId}) unless ($session{var}{sessionId} eq $session{cookie}{wgSession});   
 	### Add Apache Request stuff to Session
 	$session{wguri} = $r->uri;
 	### check to see if client is proxied and adjust remote_addr as necessary
@@ -85,13 +105,13 @@ sub contentHandler {
 		my $output = page();
 		WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
 		if (WebGUI::HTTP::isRedirect()) {
-                	$output = WebGUI::HTTP::getHeader();
-        	} else {
-                	$output = WebGUI::HTTP::getHeader().$output;
-       			if (WebGUI::ErrorHandler::canShowDebug()) {
+			$output = WebGUI::HTTP::getHeader();
+		} else {
+			$output = WebGUI::HTTP::getHeader().$output;
+			if (WebGUI::ErrorHandler::canShowDebug()) {
 				$output .= WebGUI::ErrorHandler::showDebug();
-       			}
-        	}
+			}
+		}
 		$r->print($output);
 	}
 	WebGUI::Session::close();
@@ -134,14 +154,14 @@ sub page {
 }
 
 
-#-------------------------------------------------------------------	
+#-------------------------------------------------------------------
 sub processOperations {
 	my ($cmd, $output);
 	my $op = $session{form}{op};
 	my $opNumber = shift || 1;
-        if ($op) {
+	if ($op) {
 		$output = WebGUI::Operation::execute($op);
-        }
+	}
 	$opNumber++;
 	if ($output eq "" && exists $session{form}{"op".$opNumber}) {
 		my $urlString = WebGUI::URL::unescape($session{form}{"op".$opNumber});
@@ -162,47 +182,51 @@ sub processOperations {
 sub setup {
 	require WebGUI::Operation::WebGUI;
 	my $output = WebGUI::Operation::WebGUI::www_setup();
-        return WebGUI::HTTP::getHeader().$output;
+	return WebGUI::HTTP::getHeader().$output;
 }
 
 
 #-------------------------------------------------------------------
 sub uploadsHandler {
 	my $r = shift;
-        my $s = Apache2::ServerUtil->server;
+	my $s = Apache2::ServerUtil->server;
 	my $ok = Apache2::Const::OK();
-        my $notfound = Apache2::Const::NOT_FOUND();
-        if (-e $r->filename) {
-                my $path = $r->filename;
-                $path =~ s/^(\/.*\/).*$/$1/;
-                if (-e $path.".wgaccess") {
-                        my $fileContents;
-                        open(FILE,"<".$path.".wgaccess");
-                        while (<FILE>) {
-                                $fileContents .= $_;
-                        }
-                        close(FILE);
-                        my @privs = split("\n",$fileContents);
-                        unless ($privs[1] eq "7" || $privs[1] eq "1") {
-        			WebGUI::HTTP::getCookies();
-        			WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r);
-        			### Apache2::Request object
-        			$session{req} = $r;
-                                WebGUI::Session::refreshSessionVars($session{cookie}{wgSession});
-				my $hasPrivs = ($session{user}{userId} eq $privs[0] || WebGUI::Grouping::isInGroup($privs[1]) || WebGUI::Grouping::isInGroup($privs[2]));
-                                WebGUI::Session::close();
+	my $notfound = Apache2::Const::NOT_FOUND();
+	if (-e $r->filename) {
+		my $path = $r->filename;
+		$path =~ s/^(\/.*\/).*$/$1/;
+		if (-e $path.".wgaccess") {
+			my $fileContents;
+			open(FILE,"<".$path.".wgaccess");
+			while (<FILE>) {
+				$fileContents .= $_;
+			}
+			close(FILE);
+			my @privs = split("\n",$fileContents);
+			unless ($privs[1] eq "7" || $privs[1] eq "1") {
+				### Apache2::Request object
+				$session{req} = Apache2::Request->new($r);;
+				WebGUI::HTTP::getCookies();
+				WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),0);
+				if ($session{cookie}{wgSession} eq "") {
+					WebGUI::Session::start(1); #setting up a visitor session
+				} else {
+					WebGUI::Session::setupSessionVars($session{cookie}{wgSession});
+				}
+				$session{req}->user($session{var}{username}) if $session{req};
+				my $hasPrivs = ($session{var}{userId} eq $privs[0] || WebGUI::Grouping::isInGroup($privs[1]) || WebGUI::Grouping::isInGroup($privs[2]));
+				WebGUI::Session::close();
 				if ($hasPrivs) {
 					return $ok;
 				} else {
 					return 401;
 				}
-                        }
-                }
-                return $ok;
-        } else {
-                return $notfound;
-        }
-
+			}
+		}
+		return $ok;
+	} else {
+		return $notfound;
+	}
 }
 
 

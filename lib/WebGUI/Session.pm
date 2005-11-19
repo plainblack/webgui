@@ -44,7 +44,7 @@ This package is the heart and lifeblood of WebGUI. Without it WebGUI could not e
 
 B<NOTE:> It is important to distinguish the difference between a WebGUI session and a user session. A user session is attached to a WebGUI session. A WebGUI session is all of the basic data the WebGUI needs to operate.
 
-TIP: The $session variable is a case-insensitive hash. The contents of the has vary, but can be seen by adding debug=1 to the end of any WebGUI URL while logged in as an admin user.
+TIP: The $session variable is a case-insensitive hash. The contents of the hash vary, but can be seen by enabling debug output in the Settings.
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ These subroutines are available from this package:
 
 
 #-------------------------------------------------------------------
-sub _setupSessionVars {
+sub setupSessionVars {
 	my (%vars, $uid);
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
@@ -81,21 +81,21 @@ sub _setupSessionVars {
 		}
 		if ($vars{sessionId} ne "") {
 			$session{scratch} = WebGUI::SQL->buildHashRef("select name,value from userSessionScratch
-                		where sessionId=".quote($_[0]));
-			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$session{env}{REMOTE_ADDR}', 
+			where sessionId=".quote($_[0]));
+			WebGUI::SQL->write("update userSession set lastPageView=".time().", lastIP='$session{env}{REMOTE_ADDR}',
 				expires=".(time()+$session{setting}{sessionTimeout})." where sessionId='$_[0]'");
 		} else {
 			$vars{sessionId} = start(1,$_[0]);
-                }
+		}
 	}
 	$session{var} = \%vars;
 }
 
 #-------------------------------------------------------------------
-sub _setupUserInfo {
+sub setupUserInfo {
 	my $u = WebGUI::User->new(shift);
 	%{$session{user}} = (%{$u->{_profile}}, %{$u->{_user}});
-       #	$session{req}->user($session{user}{username});
+	$session{req}->user($session{user}{username}) if $session{req};
 	$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/ || $session{user}{alias} eq "");
 }
 
@@ -253,7 +253,7 @@ sub isAdminOn {
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot, configFile [ , fastcgi ] )
+=head2 open ( webguiRoot, configFile [, instantiateUser ] )
 
 Opens a closed ( or new ) WebGUI session.
 
@@ -265,16 +265,22 @@ The path to the WebGUI files.
 
 The filename of the config file that WebGUI should operate from.
 
-=head3 fastcgi
+=head4 instantiateUser
 
-A pointer to a Fast CGI object.
+Whether or not this session should instantiate the user.  Defaults to yes.
+Is set to "no" (0) by WebGUI::contentHandler().
 
 =cut
 
 sub open {
 	my $webguiRoot = shift;
 	my $configFile = shift;
-	my ($key);
+	my $instantiateUser = shift || 1;
+	
+	###----------------------------
+	### config variables
+	$session{config} = WebGUI::Config::getConfig($webguiRoot,$configFile);
+
 	###----------------------------
 	### operating system specific things
 	$session{os}{name} = $^O;
@@ -286,10 +292,8 @@ sub open {
 		$session{os}{slash} = "/";
 	}
 	###----------------------------
-	### config variables
-	$session{config} = WebGUI::Config::getConfig($webguiRoot,$configFile);
-	###----------------------------
 	### default database handler object
+	# use of Apache::DBI is recommended, but is not guaranteed here.
 	$session{dbh} = DBI->connect($session{config}{dsn},$session{config}{dbuser},$session{config}{dbpass},{ RaiseError=>0,AutoCommit=>1 });
 	if ( $session{config}{dsn} =~ /Oracle/ ) { # Set Oracle specific attributes
 		$session{dbh}->{LongReadLen} = 512 * 1024;
@@ -301,22 +305,25 @@ sub open {
 		}
 	}
 	###----------------------------
-	### evironment variables from web server
+	### environment variables from web server
 	$session{env} = \%ENV;
+	
 	###----------------------------
 	### global system settings (from settings table)
 	$session{setting} = WebGUI::Setting::get();
+
+	return 1 unless $instantiateUser;
 
 	###----------------------------
 	### session variables 
 	if ($session{cookie}{wgSession} eq "") {
 		start(1); #setting up a visitor session
 	} else {
-		_setupSessionVars($session{cookie}{wgSession});
+		setupSessionVars($session{cookie}{wgSession});
 	}
 	###----------------------------
 	### current user's account and profile information (from users and userProfileData tables)
-	_setupUserInfo($session{var}{userId});
+	setupUserInfo($session{var}{userId});
 }
 
 #-------------------------------------------------------------------
@@ -351,7 +358,7 @@ The session id to update.
 =cut
 
 sub refreshSessionVars {
-	_setupSessionVars($_[0]);
+	setupSessionVars($_[0]);
 	refreshUserInfo($session{var}{userId});
 }
 
@@ -370,7 +377,7 @@ Refreshes the user's information from the database into this user session.
 sub refreshUserInfo {
 	my $userId = shift;
 	WebGUI::Cache->new(["user",$userId])->delete;
-	_setupUserInfo($userId);
+	setupUserInfo($userId);
 	$session{isInGroup} = ();
 }
 
