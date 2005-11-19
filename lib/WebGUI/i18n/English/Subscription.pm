@@ -332,7 +332,7 @@ characters long.<p>|,
 
         'codes expire description' => {
                 message => q|The code must be used before this date.<p>|,
-                :astUpdated => 1132353871,
+                lastUpdated => 1132353871,
         },
 
         'association description' => {
