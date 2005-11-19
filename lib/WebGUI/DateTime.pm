@@ -649,6 +649,10 @@ sub setToEpoch {
         return undef unless defined $set;
 	my $parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d %H:%M:%S' );
 	my $dt = $parser->parse_datetime($set);
+	unless ($dt) {
+		$parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d' );
+		$dt = $parser->parse_datetime($set);
+	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
 	$dt->set_time_zone($session{user}{timeZone}); # assign the user's timezone
 	my $u = WebGUI::User->new(1);
