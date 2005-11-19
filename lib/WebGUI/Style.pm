@@ -141,7 +141,6 @@ if (WebGUI::Grouping::isInGroup(2)) {
 <meta http-equiv="Expires" content="0" />
 ';
 }
-	$var{'head.tags'} .= generateAdditionalHeadTags();
 	$var{'head.tags'} .= "\n<!-- macro head tags -->\n";
 	my $style = WebGUI::Asset::Template->new($templateId);
 	my $output;
