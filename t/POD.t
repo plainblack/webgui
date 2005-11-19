@@ -29,8 +29,7 @@ diag("Planning on running $moduleCount tests\n");
 plan tests => $moduleCount;
 foreach my $package (@modules) {
 	my $pc = Pod::Coverage->new(package=>$package);
-	print $package.":".$pc->coverage.$pc->why_unrated."\n";
-	#ok($pc->coverage, $package);
+	ok($pc->coverage, $package);
 }
 
 cleanup(); # this line is required
