@@ -33,7 +33,7 @@ This package provides an object-oriented way of managing WebGUI groups and group
 =head1 SYNOPSIS
 
  use WebGUI::Group;
- $g = WebGUI::Group->new(3); or  $g = WebGUI::User->new("new");
+ $g = WebGUI::Group->new(3); or  $g = WebGUI::Group->new("new");
  $g = WebGUI::Group->find("Registered Users");
 
  $boolean =    	$g->autoAdd(1);
