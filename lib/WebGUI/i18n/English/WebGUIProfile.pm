@@ -69,8 +69,16 @@ to validate any input that the user may supply.|,
         },
 
         '487 description' => {
-                message => q|This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.|,
-                lastUpdated => 1122316558,
+                message => q|<p>This field is used for the list types (like Checkbox List and Select List).  Enter the value and key pairs, one per line, surrounded by curly braces.  See the example below:</p>
+<pre>
+	{
+	"database value 1" => "form label 1",
+	"database value 2" => "form label 2",
+	"database value 3" => "form label 3",
+	}
+</pre>
+|,
+                lastUpdated => 1132542146,
         },
 
         '488 description' => {
