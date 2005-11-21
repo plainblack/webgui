@@ -45,7 +45,7 @@ finish();
 
 #-------------------------------------------------
 sub addZipArchive {
-        print "\nAdding Zip Archive Asset\n" unless ($quiet);
+        print "\tAdding Zip Archive Asset\n" unless ($quiet);
 	WebGUI::SQL->write("create table ZipArchiveAsset (
    assetId varchar(22) binary not null,
    templateId varchar(22) binary not null default '',
@@ -144,7 +144,7 @@ sub addInOutBoard {
         dateStamp int not null,
         message text
 	)");
-	WebGUI::SQl->write("insert into userProfileField (fieldName,fieldLabel,visible,dataType,dataValues,dataDefault,sequenceNumber,profileCategoryId,editable) values ('department',".quote("'Department'").",1,'selectList',".quote("{'IT'=>'IT','HR'=>'HR','Regular Staff'=>'Regular Staff'}").",".quote("['Regular Staff']").",8,'6',1)");
+	WebGUI::SQL->write("insert into userProfileField (fieldName,fieldLabel,visible,dataType,dataValues,dataDefault,sequenceNumber,profileCategoryId,editable) values ('department',".quote("'Department'").",1,'selectList',".quote("{'IT'=>'IT','HR'=>'HR','Regular Staff'=>'Regular Staff'}").",".quote("['Regular Staff']").",8,'6',1)");
 	my $import = WebGUI::Asset->getImportNode;
 	my $folder = $import->addChild({
 		title=>"In/Out Board Templates",
