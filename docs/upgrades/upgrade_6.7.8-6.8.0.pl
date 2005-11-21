@@ -39,7 +39,7 @@ addEnableAvatarColumn();
 #addWorkflow();
 addMatrix();
 updateConfigFile();
-addInOuutBoard();
+addInOutBoard();
 addZipArchive();
 finish();
 
