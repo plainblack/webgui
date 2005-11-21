@@ -223,6 +223,7 @@ sub www_editProfileField {
 	);
 	my @profileForms = ();
 	foreach my $form ( sort @{ $fieldType->{types} }) {
+		next if $form eq 'DynamicField';
 		my $cmd = join '::', 'WebGUI::Form', $form;
 		eval "use $cmd";
 		my $w = eval "$cmd->new();";
