@@ -111,6 +111,7 @@ sub updateConfigFile {
         }
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::Matrix");	
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::InOutBoard");	
+	push(@{$newConfig{assets}}, "WebGUI::Asset::File::ZipArchive");	
         $conf->purge;
         $conf->set(%newConfig);
         $conf->write;
