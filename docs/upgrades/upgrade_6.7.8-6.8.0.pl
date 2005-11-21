@@ -86,7 +86,7 @@ sub addZipArchive {
       Error:  No file specified
   </tmpl_if>
 </tmpl_if>	
-	STOP
+STOP
         my $newAsset = $folder->addChild({
                 title=>"Default Zip Archive Template",
                 menuTitle=>"Default Zip Archive Template",
@@ -189,7 +189,7 @@ STOP
 		template=>$template
 		}, "IOB0000000000000000002");
 	$newAsset->commit;
-	my $template = <<STOP;
+	$template = <<STOP;
 <a name="<tmpl_var id>"></a>
 <tmpl_if session.var.adminOn>
    <p><tmpl_var controls></p>
@@ -229,7 +229,7 @@ STOP
    <tr><td colspan=4><tmpl_var paginateBar></td></tr>
    </table>
 STOP
-	my $newAsset = $folder->addChild({
+	$newAsset = $folder->addChild({
 		title=>"Default InOutBoard Template",
 		menuTitle=>"Default InOutBoard Template",
 		namespace=>"InOutBoard",
