@@ -68,6 +68,7 @@ sub definition {
         push(@{$definition}, {
                 tableName=>'InOutBoard',
                 className=>'WebGUI::Asset::Wobject::InOutBoard',
+		icon=>'iob.gif',
                 properties=>{
 			statusList => {
 				defaultValue => WebGUI::International::get(10, "Asset_InOutBoard")."\n"
