@@ -41,6 +41,7 @@ addMatrix();
 updateConfigFile();
 addInOutBoard();
 addZipArchive();
+updateUserProfileDayLabels();
 finish();
 
 #-------------------------------------------------
@@ -971,6 +972,11 @@ sub addWorkflow {
 		)");
 }
 
+#-------------------------------------------------
+sub updateUserProfileDayLabels {
+        print "\tUpdating day labels in User Profile firstDayOfWeek.\n" unless ($quiet);
+	WebGUI::SQL->write(q!update userProfileField set dataValues='{0=>WebGUI::International::get(\"sunday\",\"DateTime\"),1=>WebGUI::International::get(\"monday\",\"DateTime\")}' where fieldName='firstDayOfWeek'!);
+}
 
 #--- DO NOT EDIT BELOW THIS LINE
 
