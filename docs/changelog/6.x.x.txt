@@ -11,6 +11,7 @@
  - fix [ 1345261 ] addFileFromFormPost always returns 1 file uploaded
  - fix [ 1347584 ] Wobject "Product" copy fails
  - fix [ 1340614 ] page: "what next?" both choices take you to new page
+ - fix [ 1350687 ] 6.7.7 editProfile doesn't work...
  - fix [ 1350770 ] generateContent.pl fails
  - fix [ 1352362 ] can't add version tag in Content Versioning
  - fix [ 1352647 ] WebGUI::HTTP::setCookie does not accept 0 as time to live
