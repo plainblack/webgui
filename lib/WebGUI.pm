@@ -146,6 +146,7 @@ sub page {
 			}
 		} else {
 			my $notFound = WebGUI::Asset->getNotFound;
+			WebGUI::HTTP::setStatus("404","Page Not Found");
 			$session{asset} = $notFound;
 			$output = $notFound->www_view;
 		}
