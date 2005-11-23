@@ -49,41 +49,12 @@ foreach my $helpSet (@helpFileSet) {
 ##	namespace -> which help file it is form
 ##	label -> which help file it is form
 
-my @helpLabels = ();
-foreach my $topic ( keys %helpTable ) {
-	foreach my $entry ( keys %{ $helpTable{$topic} }) {
-		##Check the title and body data
-		foreach my $tag ('title','body') {
-			push @helpLabels, {
-				topic=>$topic,
-				entry=>$entry,
-				tag=>$tag,
-				namespace=>$topic, ##default
-				label=>$helpTable{$topic}{$entry}{$tag},
-			};
-		}
+my @helpLabels = getHelpLabels();
 
-		##Add all labels in the fields array
-		foreach my $field (@{ $helpTable{$topic}{$entry}{fields} }) {
-			push @helpLabels, {
-				topic=>$topic,
-				entry=>$entry,
-				tag=>'fields',
-				namespace=>$field->{namespace},
-				label=>$field->{title},
-			},
-			{
-				topic=>$topic,
-				entry=>$entry,
-				tag=>'fields',
-				namespace=>$field->{namespace},
-				label=>$field->{description},
-			},;
-		}
-	}
-}
+my @sqlLabels = getSQLLabels();
 
-$numTests = scalar @helpLabels;
+$numTests = scalar(@helpLabels)
+	  + scalar(@sqlLabels);
 
 diag("Planning on running $numTests tests\n");
 
@@ -96,6 +67,11 @@ foreach my $i18n ( @helpLabels ) {
 	sprintf "label: %s->%s inside %s->%s->%s", @{ $i18n }{'namespace', 'label', 'topic', 'entry', 'tag', });
 }
 
+foreach my $i18n ( @sqlLabels ) {
+	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
+	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
+}
+
 cleanup(); # this line is required
 
 sub label_finder_pm {
@@ -103,6 +79,66 @@ sub label_finder_pm {
 	next unless /\.pm/;
 }
 
+sub getHelpLabels {
+	my @helpLabels = ();
+	foreach my $topic ( keys %helpTable ) {
+		foreach my $entry ( keys %{ $helpTable{$topic} }) {
+			##Check the title and body data
+			foreach my $tag ('title','body') {
+				push @helpLabels, {
+					topic=>$topic,
+					entry=>$entry,
+					tag=>$tag,
+					namespace=>$topic, ##default
+					label=>$helpTable{$topic}{$entry}{$tag},
+				};
+			}
+
+			##Add all labels in the fields array
+			foreach my $field (@{ $helpTable{$topic}{$entry}{fields} }) {
+				push @helpLabels, {
+					topic=>$topic,
+					entry=>$entry,
+					tag=>'fields',
+					namespace=>$field->{namespace},
+					label=>$field->{title},
+				},
+				{
+					topic=>$topic,
+					entry=>$entry,
+					tag=>'fields',
+					namespace=>$field->{namespace},
+					label=>$field->{description},
+				},;
+			}
+		}
+	}
+	return @helpLabels;
+}
+
+sub getSQLLabels {
+	my @sqlLabels = ();
+	foreach my $file (qw/create.sql previousVersion.sql/) {
+		my $file2 = join $session{os}{slash}, '..', 'docs', $file;
+		open my $fh, $file2 or
+			die "Unable to open $file2: $!\n";
+		local $/;
+		my $sql = <$fh>;
+		while ($sql =~ /WebGUI::International::get\(([^\)]+)\)/gs) {
+			my $args;
+			($args = $1) =~ tr{\\"}{}d;
+			my ($label,$namespace) = split ',', $args;
+			$namespace = "WebGUI" unless $namespace;
+			push @sqlLabels, {
+						label => $label,
+						namespace => $namespace,
+						file => $file,
+					};
+		}
+		close $fh;
+	}
+	return @sqlLabels;
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
