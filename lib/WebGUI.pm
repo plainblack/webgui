@@ -123,9 +123,11 @@ sub page {
 	my $assetUrl = shift;
 	my $output = processOperations();
 	if ($output eq "") {
-		my $asset = WebGUI::Asset->newByUrl($assetUrl,$session{form}{revision});
+		my $asset = eval{WebGUI::Asset->newByUrl($assetUrl,$session{form}{revision})};
+		if ($@) {
+			WebGUI::ErrorHandler::warn("Couldn't instantiate asset for url: ".$session{wguri}." Root cause: ".$@);
+		}
 		if (defined $asset) {
-			$session{asset} = $asset;
 			my $method = "view";
 			if (exists $session{form}{func}) {
 				$method = $session{form}{func};
@@ -134,21 +136,17 @@ sub page {
 					$method = "view";
 				}
 			}
-			$method = "www_".$method;
-			$output = eval{$asset->$method()};
-			if ($@) {
-				WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for ".$session{wguri}." Root cause: ".$@);
-				$output = $asset->www_view;
-			} else {
-				if ($output eq "" && $method ne "view") {
-					$output = $asset->www_view;
-				}
-			}
+			$output = tryAssetMethod($asset,$method);
+		}
+	}
+	if ($output eq "") {
+		WebGUI::HTTP::setStatus("404","Page Not Found");
+		my $notFound = WebGUI::Asset->getNotFound;
+		if (defined $notFound) {
+			$output = tryAssetMethod($notFound,'view');
 		} else {
-			my $notFound = WebGUI::Asset->getNotFound;
-			WebGUI::HTTP::setStatus("404","Page Not Found");
-			$session{asset} = $notFound;
-			$output = $notFound->www_view;
+			WebGUI::ErrorHandler::warn("The notFound page failed to be created!");
+			$output = "An error was encountered while processing your request.";
 		}
 	}
 	return $output;
@@ -188,11 +186,25 @@ sub setup {
 
 
 #-------------------------------------------------------------------
+sub tryAssetMethod {
+	my $asset = shift;
+	my $method = shift;
+	$session{asset} = $asset;
+	my $methodToTry = "www_".$method;
+	my $output = eval{$asset->$methodToTry()};
+	if ($@) {
+		WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for url: ".$session{wguri}." Root cause: ".$@);
+		$output = tryAssetMethod($asset,'view') if ($method ne "view");
+	}
+	return $output;
+}
+
+#-------------------------------------------------------------------
 sub uploadsHandler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
-	my $ok = Apache2::Const::OK();
-	my $notfound = Apache2::Const::NOT_FOUND();
+	my $ok = Apache2::Const::OK;
+	my $notfound = Apache2::Const::NOT_FOUND;
 	if (-e $r->filename) {
 		my $path = $r->filename;
 		$path =~ s/^(\/.*\/).*$/$1/;
