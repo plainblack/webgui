@@ -69,7 +69,7 @@ The synopsis when previewing a post.
 The content when previewing a post.
 <p>
 
-<b>preview.userDefined.<i>N</i></b><br>
+<b>preview.userDefined<i>N</i></b><br>
 The contents of user defined fields for the Post without WebGUI Macros being processed, where N is from 1 to 5.
 <p>
 
@@ -93,7 +93,7 @@ A conditional indicating if the current user is a visitor.
 A form where the user can enter their name.
 <p>
 
-<b>userDefined.<i>N</i>.{form,yesNo,textarea,htmlarea}</b><br>
+<b>userDefined<i>N</i>.{form,form.yesNo,form.textarea,form.htmlarea}</b><br>
 For each of the 5 User Defined fields, form widgets for a single line of text, a yes/no
 field, a text area, or a WYSIWIG HTML area.
 <p>
@@ -142,7 +142,7 @@ A form that will set when the post stops being available.
 <p>
 
 |,
-		lastUpdated => 1111692741,
+		lastUpdated => 1132758282,
 	},
 
 	'post template variables title' => {

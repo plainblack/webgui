@@ -16,6 +16,7 @@
    templates.
  - Added Matrix asset.
  - Added In/Out Board asset.
+ - Page not found page returns a 404 error code now.
 
 
 6.7.7
