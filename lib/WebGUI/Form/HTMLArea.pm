@@ -130,7 +130,7 @@ sub toHtml {
 	$self->{extras} .= ' onblur="fixChars(this.form.'.$self->{name}.')" mce_editable="true" ';	
 	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->{richEditId})->getRichEditor($self->{id});
 	my $richEdit = WebGUI::Asset::RichEdit->new($self->{richEditId});
-        if ($defined) {
+        if (defined $richEdit) {
                 return $self->SUPER::toHtml.$richEdit->getRichEditor($self->{id});
         } else {
 		return WebGUI::International::get('rich editor load error','Form_HTMLArea');
