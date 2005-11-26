@@ -52,7 +52,10 @@ Remove content from the filesystem cache.
 
 sub delete {
 	my $self = shift;
-	rmtree($self->getFolder());
+	my $folder = $self->getFolder;
+	if (-e $folder) {
+		rmtree($folder);
+	}
 }
 
 #-------------------------------------------------------------------
@@ -69,8 +72,10 @@ A partial composite key to remove.
 
 sub deleteChunk {
 	my $self = shift;
-	my $key = $self->parseKey(shift);
-	rmtree($self->getNamespaceRoot()."/".$key);
+	my $folder = $self->getNamespaceRoot."/".$self->parseKey(shift);
+	if (-e $folder) {
+		rmtree($folder);
+	}
 }
 
 #-------------------------------------------------------------------
@@ -84,7 +89,10 @@ Remove all objects from the filecache system.
 sub flush {
 	my $self = shift;
 	$self->SUPER::flush();
-	rmtree($self->getNamespaceRoot);
+	my $folder = $self->getNamespaceRoot;
+	if (-e $folder) {
+		rmtree($folder);
+	}
 }
 
 #-------------------------------------------------------------------
@@ -170,7 +178,9 @@ sub getNamespaceSize {
                                         my $expires = <FILE>;
                                         close(FILE);
                                         if ($expires < time()+$expiresModifier) {
-                                                rmtree($path); 
+						if (-e $path) {
+                                                	rmtree($path); 
+						}
                                         } else {
                                                 my (@attributes) = stat($path.'/'.$file);
                                                 $filesRemaining += $attributes[7];
