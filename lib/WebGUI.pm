@@ -107,14 +107,11 @@ sub contentHandler {
 	} elsif ($session{setting}{specialState} eq "init") {
 		return $r->print(setup());
 	} else {
-		my $output;
+		my $output = page();
 		if (WebGUI::ErrorHandler::canShowPerformanceIndicators()) {
 			my $t = [Time::HiRes::gettimeofday()];
-			$output = page();
 			$t = Time::HiRes::tv_interval($t) ;
 			$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
-		} else {
-			$output = page();
 		}
 		WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
 		if (WebGUI::HTTP::isRedirect()) {
