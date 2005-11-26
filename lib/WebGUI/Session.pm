@@ -75,7 +75,7 @@ sub setupSessionVars {
 	tie %vars, 'Tie::CPHash';
 	if ($_[0] ne "") {
 		%vars = WebGUI::SQL->quickHash("select * from userSession where sessionId=".quote($_[0]));
-		if ($vars{expires} < time() ) { #|| $vars{lastIP} ne $session{env}{REMOTE_ADDR}) { # had to remove for revolving ip proxies
+		if (($vars{expires}) && ($vars{expires} < time()) ) { #|| $vars{lastIP} ne $session{env}{REMOTE_ADDR}) { # had to remove for revolving ip proxies
 			%vars = ();
 			WebGUI::Session::end($_[0]);
 		}
@@ -275,11 +275,11 @@ Is set to "no" (0) by WebGUI::contentHandler().
 sub open {
 	my $webguiRoot = shift;
 	my $configFile = shift;
-	my $instantiateUser = shift || 1;
+	my $instantiateUser = shift || "true";
 	
 	###----------------------------
 	### config variables
-	$session{config} = WebGUI::Config::getConfig($webguiRoot,$configFile);
+	$session{config} = WebGUI::Config::getConfig($webguiRoot,$configFile) unless ($configFile eq 'modperl');
 
 	###----------------------------
 	### operating system specific things
@@ -312,7 +312,7 @@ sub open {
 	### global system settings (from settings table)
 	$session{setting} = WebGUI::Setting::get();
 
-	return 1 unless $instantiateUser;
+	return 1 unless($instantiateUser eq "true");
 
 	###----------------------------
 	### session variables 

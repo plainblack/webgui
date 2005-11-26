@@ -14,6 +14,7 @@ our $STATUS = "beta";
 
 use strict qw(vars subs);
 use Tie::CPHash;
+use Time::HiRes;
 use WebGUI::Affiliate;
 use WebGUI::Asset;
 use WebGUI::Cache;
@@ -37,16 +38,20 @@ use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
 use Apache2::ServerUtil ();
 
-#-------------------------------------------------------------------	
+#-------------------------------------------------------------------
+
 sub handler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
-	my $config = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
-	foreach my $url ($config->{extrasURL}, @{$config->{passthruUrls}}) {
-		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
+	$session{wguri} = $r->uri;
+	$session{site} = $r->dir_config('WebguiConfig');
+	$session{config} = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$session{site});
+	### Add Apache Request stuff to global session.  Yes, I know the global hash will eventually be deprecated.
+	foreach my $url ($session{config}{extrasURL}, @{$session{config}{passthruUrls}}) {
+		return Apache2::Const::DECLINED if ($session{wguri} =~ m/^$url/);
 	}
-	my $uploads = $config->{uploadsURL};
-	if ($r->uri =~ m/^$uploads/) {
+	my $uploads = $session{config}{uploadsURL};
+	if ($session{wguri} =~ m/^$uploads/) {
 		$r->handler('perl-script');
 		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
 	} else {
@@ -69,23 +74,23 @@ sub contentHandler {
 	### Instantiate the API for this httpd instance.
 	my $s = Apache2::ServerUtil->server;
 	### Open new or existing user session based on user-agent's cookie.
-	WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),0);
+	WebGUI::Session::open($s->dir_config('WebguiRoot'),'modperl',"false");
 	### Apache2::Request object
 	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});
 	### Sets $session{cookie} as a hashref of the cookies.
-	WebGUI::HTTP::getCookies();
+	$session{cookie} = WebGUI::HTTP::getCookies();
 	### Change current user to user specified in wgSession cookie.
 	if ($session{cookie}{wgSession} eq "") {
-		WebGUI::Session::start(1); #setting up a visitor session
-	} else {
+		# setting up a visitor session
+		$session{var}{sessionId} = WebGUI::Session::start(1);
+	} else {  # load previous session
+		### populate $session{env} and $session{setting}
 		WebGUI::Session::setupSessionVars($session{cookie}{wgSession});
 	}
 	### current user's account and profile information (from users and userProfileData tables)
 	WebGUI::Session::setupUserInfo($session{var}{userId});
 	### Add wgSession cookie to header iff it's not already on the client.
-	WebGUI::HTTP::setCookie("wgSession",$session{var}{sessionId}) unless ($session{var}{sessionId} eq $session{cookie}{wgSession});   
-	### Add Apache Request stuff to Session
-	$session{wguri} = $r->uri;
+	WebGUI::HTTP::setCookie("wgSession",$session{var}{sessionId}) unless ($session{var}{sessionId} eq $session{cookie}{wgSession});
 	### check to see if client is proxied and adjust remote_addr as necessary
 	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
 		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
@@ -102,7 +107,15 @@ sub contentHandler {
 	} elsif ($session{setting}{specialState} eq "init") {
 		return $r->print(setup());
 	} else {
-		my $output = page();
+		my $output;
+		if (WebGUI::ErrorHandler::canShowPerformanceIndicators()) {
+			my $t = [Time::HiRes::gettimeofday()];
+			$output = page();
+			$t = Time::HiRes::tv_interval($t) ;
+			$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
+		} else {
+			$output = page();
+		}
 		WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
 		if (WebGUI::HTTP::isRedirect()) {
 			$output = WebGUI::HTTP::getHeader();
@@ -220,7 +233,7 @@ sub uploadsHandler {
 				### Apache2::Request object
 				$session{req} = Apache2::Request->new($r);;
 				WebGUI::HTTP::getCookies();
-				WebGUI::Session::open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),0);
+				WebGUI::Session::open($s->dir_config('WebguiRoot'),'modperl',"false");
 				if ($session{cookie}{wgSession} eq "") {
 					WebGUI::Session::start(1); #setting up a visitor session
 				} else {
