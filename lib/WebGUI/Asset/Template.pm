@@ -327,6 +327,7 @@ sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("template add/edit","Asset_Template");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),WebGUI::International::get("style wizard","Asset_Template")) if ($self->get("namespace") eq "style");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Asset_Template'));
 }
 
@@ -347,6 +348,180 @@ sub www_manage {
 
 
 
+
+#-------------------------------------------------------------------
+
+sub www_styleWizard {
+	my $self = shift;
+        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $output = "";
+	if ($session{form}{step} == 2) {
+		my $f = WebGUI::HTMLForm->new({action=>$self->getUrl});
+		$f->hidden(name=>"func", value=>"styleWizard");
+		$f->hidden(name=>"proceed", value=>"manageAssets") if ($session{form}{proceed});
+		$f->hidden(name=>"step", value=>3);
+		$f->hidden(name=>"layout", value=>$session{form}{layout});
+		$f->text(name=>"heading", value=>"My Site", label=>"Site Name");
+		$f->file(name=>"logo", label=>"Logo", subtext=>"<br />JPEG, GIF, or PNG thats less than 200 pixels wide and 100 pixels tall");
+		$f->color(name=>"pageBackgroundColor", value=>"#ccccdd", label=>"Page Background Color");
+		$f->color(name=>"headingBackgroundColor", value=>"#ffffff", label=>"Header Background Color");
+		$f->color(name=>"headingForegroundColor", value=>"#000000", label=>"Header Text Color");
+		$f->color(name=>"bodyBackgroundColor", value=>"#ffffff", label=>"Body Background Color");
+		$f->color(name=>"bodyForegroundColor", value=>"#000000", label=>"Body Text Color");
+		$f->color(name=>"menuBackgroundColor", value=>"#eeeeee", label=>"Menu Background Color");
+		$f->color(name=>"linkColor", value=>"#0000ff", label=>"Link Color");
+		$f->color(name=>"visitedLinkColor", value=>"#ff00ff", label=>"Visited Link Color");
+		$f->submit;
+		$output = $f->print;
+	} elsif ($session{form}{step} == 3) {
+		my $storage = WebGUI::Storage::Image->get(WebGUI::FormProcessor::file("logo"));
+		my $logo = $self->addChild({
+			className=>"WebGUI::Asset::File::Image",
+			title=>WebGUI::FormProcessor::text("heading")." Logo",
+			menuTitle=>WebGUI::FormProcessor::text("heading")." Logo",
+			url=>WebGUI::FormProcessor::text("heading")." Logo",
+			storageId=>$storage->getId,
+			filename=>@{$storage->getFiles}[0],
+			templateId=>"PBtmpl0000000000000088"
+			});
+		$logo->generateThumbnail if ($logo->get("filename"));
+my $style = '<html>
+<head>
+	<tmpl_var head.tags>
+	<title>^Page(title); - ^c;</title>
+	<style type="text/css">
+	.siteFunctions {
+		float: right;
+		font-size: 12px;
+	}
+	.copyright {
+		font-size: 12px;
+	}
+	body {
+		background-color: '.WebGUI::FormProcessor::color("pageBackgroundColor").';
+		font-family: helvetica;
+		font-size: 14px;
+	}
+	.heading {
+		background-color: '.WebGUI::FormProcessor::color("headingBackgroundColor").';
+		color: '.WebGUI::FormProcessor::color("headingForegroundColor").';
+		font-size: 25px;
+		margin-left: 10%;
+		margin-right: 10%;
+		vertical-align: middle;
+	}
+	.logo {
+		width: 200px; 
+		float: left;
+		text-align: center;
+	}
+	.endFloat {
+		clear: both;
+	}
+	.padding {
+		padding: 5px;
+	}
+	.content {
+		background-color: '.WebGUI::FormProcessor::color("bodyBackgroundColor").';
+		color: '.WebGUI::FormProcessor::color("bodyForegroundColor").';
+		width: 55%; ';
+if ($session{form}{layout} == 1) {
+	$style .= '
+		float: left;
+		margin-right: 10%;
+		';
+} else {
+	$style .= '
+		width: 80%;
+		margin-left: 10%;
+		margin-right: 10%;
+		';
+}
+	$style .= '
+	}
+	.menu {
+		background-color: '.WebGUI::FormProcessor::color("menuBackgroundColor").';
+		width: 25%; ';
+if ($session{form}{layout} == 1) {
+	$style .= '
+		margin-left: 10%;
+		height: 75%;
+		float: left;
+		';
+} else {
+	$style .= '
+		width: 80%;
+		text-align: center;
+		margin-left: 10%;
+		margin-right: 10%;
+		';
+}
+	$style .= '
+	}
+	a {
+		color: '.WebGUI::FormProcessor::color("linkColor").';
+	}
+	a:visited {
+		color: '.WebGUI::FormProcessor::color("visitedLinkColor").';
+	}
+	</style>
+</head>
+<body>
+^AdminBar;
+<div class="heading">
+	<div class="padding">
+		<div class="logo">^AssetProxy('.$logo->get("url").');</div>
+		'.WebGUI::FormProcessor::text("heading").'
+		<div class="endFloat"></div>
+	</div>
+</div>
+<div class="menu">
+	<div class="padding">^AssetProxy('.($session{form}{layout} == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
+</div>
+<div class="content">
+	<div class="padding"><tmpl_var body.content></div>
+</div>';
+if ($session{form}{layout} == 1) {
+	$style .= '<div class="endFloat"></div>';
+}
+$style .= '
+<div class="heading">
+	<div class="padding">
+		<div class="siteFunctions">^a(^@;); ^AdminToggle;</div>
+		<div class="copyright">&copy; ^D(%y); ^c;</div>
+	<div class="endFloat"></div>
+	</div>
+</div>
+</body>
+</html>';
+		return $self->addRevision({
+			template=>$style
+			})->www_edit;
+	} else {
+		$output = WebGUI::Form::formHeader({action=>$self->getUrl}).WebGUI::Form::hidden({name=>"func", value=>"styleWizard"});
+		$output .= WebGUI::Form::hidden({name=>"proceed", value=>"manageAssets"}) if ($session{form}{proceed});
+		$output .= '<style type="text/css">
+			.chooser { float: left; width: 150px; height: 150px; } 
+			.representation, .representation td { font-size: 12px; width: 120px; border: 1px solid black; } 
+			.representation { height: 130px; }
+			</style>';
+		$output .= "<p>Choose a layout for this style:</p>";
+		$output .= WebGUI::Form::hidden({name=>"step", value=>2});
+		$output .= '<div class="chooser">'.WebGUI::Form::radio({name=>"layout", value=>1, checked=>1}).q|<table class="representation"><tbody>
+			<tr><td>Logo</td><td>Heading</td></tr>
+			<tr><td>Menu</td><td>Body content goes here.</td></tr>
+			</tbody></table></div>|;
+		$output .= '<div class="chooser">'.WebGUI::Form::radio({name=>"layout", value=>2}).q|<table class="representation"><tbody>
+			<tr><td>Logo</td><td>Heading</td></tr>
+			<tr><td style="text-align: center;" colspan="2">Menu</td></tr>
+			<tr><td colspan="2">Body content goes here.</td></tr>
+			</tbody></table></div>|;
+		$output .= WebGUI::Form::submit();
+		$output .= WebGUI::Form::formFooter();
+	}
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit template","Asset_Template")) if ($self->get("url"));
+        return $self->getAdminConsole->render($output,WebGUI::International::get('style wizard', 'Asset_Template'));
+}
 
 #-------------------------------------------------------------------
 sub www_view {

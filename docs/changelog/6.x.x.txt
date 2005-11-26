@@ -17,6 +17,9 @@
  - Added Matrix asset.
  - Added In/Out Board asset.
  - Page not found page returns a 404 error code now.
+ - Added more error trapping in caching system.
+ - Fixed some layout and control bugs in the color picker form element.
+ - Added a simple Style Wizard.
 
 
 6.7.7

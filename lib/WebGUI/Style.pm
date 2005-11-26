@@ -34,7 +34,6 @@ This package contains utility methods for WebGUI's style system.
 =head1 SYNOPSIS
 
  use WebGUI::Style;
- $template = WebGUI::Style::getTemplate();
  $html = WebGUI::Style::process($content);
 
  $html = generateAdditionalHeadTags();

@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset_Template;
 
 our $I18N = {
+	'style wizard' => {
+		message => q|Style Wizard|,
+		context => q|Label for link to engage the style wizard.|,
+		lastUpdated => 0,
+	},
+
 	'namespace' => {
 		message => q|Namespace|,
 		context => q|label for Template Add/Edit Form|,
