@@ -57,13 +57,12 @@ These subroutines are available from this package:
 
 =head2 getCookies ( )
 
-Retrieves the cookies from the HTTP header, persists them to the session, and returns a hash reference containing them.
+Retrieves the cookies from the HTTP header and returns a hash reference containing them.
 
 =cut
 
 sub getCookies {
-	$WebGUI::Session::session{cookie} = APR::Request::Apache2->handle($session{req})->jar();
-	return $WebGUI::Session::session{cookie};
+	return APR::Request::Apache2->handle($session{req})->jar();
 }
 
 
