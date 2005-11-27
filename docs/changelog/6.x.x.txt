@@ -20,6 +20,8 @@
  - Added more error trapping in caching system.
  - Fixed some layout and control bugs in the color picker form element.
  - Added a simple Style Wizard.
+ - Updated preload.perl to automatically preload all WebGUI related modules,
+   which increased shared memory usage by 30%.
 
 
 6.7.7

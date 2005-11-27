@@ -80,6 +80,13 @@ save you many hours of grief.
 	installed make sure to update them prior to upgrading. See
 	docs/migration.txt for details.
 
+ * You may now optionally create sbin/preload.exclude with a carriage
+	return seperated list of modules you don't want to be preloaded.
+	This file requires each line to contain exactly one full module
+	name such as "WebGUI::Asset::Wobject::WSClient" (without the
+	quotes) per line. No spaces or additional formatting can be
+	present.
+
 
 6.7.0
 --------------------------------------------------------------------

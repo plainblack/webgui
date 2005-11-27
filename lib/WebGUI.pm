@@ -39,7 +39,6 @@ use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
 use Apache2::ServerUtil ();
 
 #-------------------------------------------------------------------
-
 sub handler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
@@ -107,11 +106,14 @@ sub contentHandler {
 	} elsif ($session{setting}{specialState} eq "init") {
 		return $r->print(setup());
 	} else {
-		my $output = page();
+		my $output = "";
 		if (WebGUI::ErrorHandler::canShowPerformanceIndicators()) {
 			my $t = [Time::HiRes::gettimeofday()];
+			$output = page();
 			$t = Time::HiRes::tv_interval($t) ;
 			$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
+		} else {
+			$output = page();
 		}
 		WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
 		if (WebGUI::HTTP::isRedirect()) {
