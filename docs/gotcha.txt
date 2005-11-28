@@ -35,7 +35,7 @@ save you many hours of grief.
 	You'll need to make the following changes in Apache to upgrade
 	to this release:
 
-	Install libaprereq2. You can either download and compile this
+	Install libapreq2. You can either download and compile this
 	from the mod_perl web site, CPAN as Apache2::Request, or by
 	getting the version of the WRE 0.6.0 or higher.
 
