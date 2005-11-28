@@ -374,17 +374,21 @@ sub www_styleWizard {
 		$f->submit;
 		$output = $f->print;
 	} elsif ($session{form}{step} == 3) {
-		my $storage = WebGUI::Storage::Image->get(WebGUI::FormProcessor::file("logo"));
-		my $logo = $self->addChild({
-			className=>"WebGUI::Asset::File::Image",
-			title=>WebGUI::FormProcessor::text("heading")." Logo",
-			menuTitle=>WebGUI::FormProcessor::text("heading")." Logo",
-			url=>WebGUI::FormProcessor::text("heading")." Logo",
-			storageId=>$storage->getId,
-			filename=>@{$storage->getFiles}[0],
-			templateId=>"PBtmpl0000000000000088"
-			});
-		$logo->generateThumbnail if ($logo->get("filename"));
+		my $storageId = WebGUI::FormProcessor::file("logo");
+		my $logo;
+		if ($storageId) {
+			my $storage = WebGUI::Storage::Image->get(WebGUI::FormProcessor::file("logo"));
+			$logo = $self->addChild({
+				className=>"WebGUI::Asset::File::Image",
+				title=>WebGUI::FormProcessor::text("heading")." Logo",
+				menuTitle=>WebGUI::FormProcessor::text("heading")." Logo",
+				url=>WebGUI::FormProcessor::text("heading")." Logo",
+				storageId=>$storage->getId,
+				filename=>@{$storage->getFiles}[0],
+				templateId=>"PBtmpl0000000000000088"
+				});
+			$logo->generateThumbnail;
+		}
 my $style = '<html>
 <head>
 	<tmpl_var head.tags>
@@ -405,7 +409,7 @@ my $style = '<html>
 	.heading {
 		background-color: '.WebGUI::FormProcessor::color("headingBackgroundColor").';
 		color: '.WebGUI::FormProcessor::color("headingForegroundColor").';
-		font-size: 25px;
+		font-size: 30px;
 		margin-left: 10%;
 		margin-right: 10%;
 		vertical-align: middle;
@@ -415,19 +419,23 @@ my $style = '<html>
 		float: left;
 		text-align: center;
 	}
+	.logo img {
+		border: 0px;
+	}
 	.endFloat {
 		clear: both;
 	}
 	.padding {
 		padding: 5px;
 	}
-	.content {
+	.bodyContent {
 		background-color: '.WebGUI::FormProcessor::color("bodyBackgroundColor").';
 		color: '.WebGUI::FormProcessor::color("bodyForegroundColor").';
 		width: 55%; ';
 if ($session{form}{layout} == 1) {
 	$style .= '
 		float: left;
+		height: 75%;
 		margin-right: 10%;
 		';
 } else {
@@ -470,7 +478,11 @@ if ($session{form}{layout} == 1) {
 ^AdminBar;
 <div class="heading">
 	<div class="padding">
-		<div class="logo">^AssetProxy('.$logo->get("url").');</div>
+';
+	if (defined $logo) {
+		$style .= '<div class="logo"><a href="^H(linkonly);">^AssetProxy('.$logo->get("url").');</a></div>';
+	}
+	$style .= '
 		'.WebGUI::FormProcessor::text("heading").'
 		<div class="endFloat"></div>
 	</div>
@@ -478,7 +490,7 @@ if ($session{form}{layout} == 1) {
 <div class="menu">
 	<div class="padding">^AssetProxy('.($session{form}{layout} == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
 </div>
-<div class="content">
+<div class="bodyContent">
 	<div class="padding"><tmpl_var body.content></div>
 </div>';
 if ($session{form}{layout} == 1) {
