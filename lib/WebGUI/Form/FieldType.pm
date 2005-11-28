@@ -19,6 +19,7 @@ use base 'WebGUI::Form::Control';
 use WebGUI::Form::SelectList;
 use WebGUI::International;
 use WebGUI::Session;
+use Tie::IxHash;
 
 =head1 NAME
 
@@ -138,6 +139,7 @@ Renders a question selector asking the user where they want to go.
 sub toHtml {
 	my $self = shift;
 	my %options;
+	tie %options, "Tie::IxHash";
 	foreach my $type (@{$self->{types}}) {
 		my $class = "WebGUI::Form::".ucfirst($type);
 		my $cmd = "use ".$class;
