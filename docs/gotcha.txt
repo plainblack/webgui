@@ -85,7 +85,17 @@ save you many hours of grief.
 	This file requires each line to contain exactly one full module
 	name such as "WebGUI::Asset::Wobject::WSClient" (without the
 	quotes) per line. No spaces or additional formatting can be
-	present.
+	present. You may, for example, just copy sbin/preload.exclude.example
+	to sbin/preload.exclude and save yourself about 5MB of memory
+	because that will eliminate some of the least commonly used
+	components. 
+
+	If you mistakenly exclude modules that WebGUI actually needs
+	to run, it will load them at run time, and just use more RAM,
+	so you don't need to worry about breaking WebGUI. However, this
+	doesn't mean you should just exclude everything because doing
+	runtime loading will likely use 5-10 times more RAM than just
+	preloading them to begin with.
 
 
 6.7.0
