@@ -17,6 +17,7 @@ package WebGUI::DateTime;
 use DateTime;
 use DateTime::Format::Strptime;
 use DateTime::TimeZone;
+use Tie::IxHash;
 use Exporter;
 use strict;
 use WebGUI::International;
@@ -440,6 +441,7 @@ Returns a hash reference containing name/value pairs both with the list of time 
 
 sub getTimeZones {
 	my %zones;
+	tie %zones, 'Tie::IxHash';
 	foreach my $zone (@{DateTime::TimeZone::all_names()}) {
 		my $zoneLabel = $zone;
 		$zoneLabel =~ s/\_/ /g;
@@ -465,6 +467,7 @@ sub humanToEpoch {
 	my ($dateString,$timeString) = split(/ /,shift);
 	my @date = split(/-/,$dateString);
 	my @time = split(/:/,$timeString);
+	$time[0] = 0 if $time[0] == 24;
 	my $dt = DateTime->new(year => $date[0], month=> $date[1], day=> $date[2], hour=> $time[0], minute => $time[1], second => $time[2]);
 	return $dt->epoch;
 } 
@@ -655,8 +658,8 @@ sub setToEpoch {
 	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
 	$dt->set_time_zone($session{user}{timeZone}); # assign the user's timezone
-	my $u = WebGUI::User->new(1);
-	$dt->set_time_zone($u->profileField("timeZone")); # convert to the visitor's or default time zone
+#	my $u = WebGUI::User->new(1);
+#	$dt->set_time_zone($u->profileField("timeZone")); # convert to the visitor's or default time zone
 	return $dt->epoch;
 }
 
