@@ -66,7 +66,8 @@ sub getConfig {
 	if (exists $config{$filename}) {
 		return $config{$filename};
 	} else {
-		return readConfig($webguiPath,$filename);
+		$config{$filename} = readConfig($webguiPath,$filename);
+		return $config{$filename};
 	}
 }
 
