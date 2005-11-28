@@ -1,4 +1,4 @@
-package WebGUI::Form::SelectList;
+package WebGUI::Form::TimeZone;
 
 =head1 LEGAL
 
