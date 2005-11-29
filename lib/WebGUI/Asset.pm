@@ -1389,7 +1389,6 @@ sub www_add {
 				$prototypeProperties{$property} = $prototype->get($property);
 			}
 		}
-		
 	}
 	my %properties = (
 		%prototypeProperties,

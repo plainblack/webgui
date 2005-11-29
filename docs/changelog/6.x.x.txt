@@ -22,6 +22,17 @@
  - Added a simple Style Wizard.
  - Updated preload.perl to automatically preload all WebGUI related modules,
    which increased shared memory usage by 30%.
+ - Added StockData asset.
+ - Added WeatherData asset.
+ - Added MultiSearch asset.  Will eventually be re-merged with the 
+   existing search wobject for the release of 6.9.0.
+ - Extended the Shortcut asset to allow fully extensible admin overrides,
+   which can be pulled from user preferences also attached to a Shortcut.
+ - Added Dashboard asset, which uses personalized Shortcuts to allow 
+   personalization of any asset on your site to create a "portal" or 
+   "dashboard".  You can create more than one dashboard per site.
+   Assets that come with templates for the Dashboard:
+     StockData, WeatherData, SearchBox, SyndicatedContent
 
 
 6.7.7

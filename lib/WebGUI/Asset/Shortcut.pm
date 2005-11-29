@@ -12,6 +12,7 @@ package WebGUI::Asset::Shortcut;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Privilege;
@@ -20,6 +21,148 @@ use WebGUI::SQL;
 
 our @ISA = qw(WebGUI::Asset);
 
+#-------------------------------------------------------------------
+sub _drawQueryBuilder {
+	my $self = shift;
+	# Initialize operators
+	my @textFields = qw|text yesNo selectList radioList|;
+	my %operator;
+	foreach (@textFields) {
+		$operator{$_} = {
+			"=" => WebGUI::International::get("is","Asset_Shortcut"),
+			"!=" => WebGUI::International::get("isnt","Asset_Shortcut")
+		};
+	}
+	$operator{integer} = {
+		"=" => WebGUI::International::get("equal to","Asset_Shortcut"),
+		"!=" => WebGUI::International::get("not equal to","Asset_Shortcut"),
+		"<" => WebGUI::International::get("less than","Asset_Shortcut"),
+		">" => WebGUI::International::get("greater than","Asset_Shortcut")
+	};
+
+	# Get the fields and count them
+	my $fields = $self->getMetaDataFields();
+	my $fieldCount = scalar(keys %$fields);
+
+	unless ($fieldCount) {	# No fields found....
+		return 'No metadata defined yet.
+		<a href="'.WebGUI::URL::page('func=manageMetaData').
+		'">Click here</a> to define metadata attributes.';
+	}
+
+	# Static form fields
+	my $shortcutCriteriaField = WebGUI::Form::textarea({
+		name=>"shortcutCriteria",
+		value=>$self->getValue("shortcutCriteria"),
+		extras=>'style="width: 100%" '.$self->{_disabled}
+	});
+	my $conjunctionField = WebGUI::Form::selectList({
+		name=>"conjunction",
+		options=>{
+			"AND" => WebGUI::International::get("AND","Asset_Shortcut"),
+			"OR" => WebGUI::International::get("OR","Asset_Shortcut")},
+			value=>["OR"],
+			extras=>'class="qbselect"',
+		}
+	);
+
+	# html
+	my $output;
+	$output .= '<script type="text/javascript" src="'.
+	$session{config}{extrasURL}.'/wobject/Shortcut/querybuilder.js"></script>';
+	$output .= '<link href="'.$session{config}{extrasURL}.
+	'/wobject/Shortcut/querybuilder.css" type="text/css" rel="stylesheet">';
+	$output .= qq|<table cellspacing="0" cellpadding="0" border="0"><tr><td colspan="5" align="right">$shortcutCriteriaField</td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright">$conjunctionField</td></tr>|;
+
+	# Here starts the field loop
+	my $i = 1;
+	foreach my $field (keys %$fields) {
+		my $fieldLabel = $fields->{$field}{fieldName};
+		my $fieldType = $fields->{$field}{fieldType} || "text";
+
+		# The operator select field
+		my $opFieldName = "op_field".$i;
+		my $opField = WebGUI::Form::selectList({
+			name=>$opFieldName,
+			uiLevel=>5,
+			options=>$operator{$fieldType},
+			extras=>'class="qbselect"'
+		});
+		# The value select field
+		my $valFieldName = "val_field".$i;
+		my $valueField = WebGUI::Form::dynamicField(
+			fieldType=>$fieldType,
+			name=>$valFieldName,
+			uiLevel=>5,
+			extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
+			possibleValues=>$fields->{$field}{possibleValues},
+		);
+		# An empty row
+		$output .= qq|<tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr>|;
+
+		# Table row with field info
+		$output .= qq|
+		<tr>
+		<td class="qbtdleft"><p class="qbfieldLabel">$fieldLabel</p></td>
+		<td class="qbtd">
+		$opField
+		</td>
+		<td class="qbtd">
+		<span class="qbText">$valueField</span>
+		</td>
+		<td class="qbtd"></td>
+		<td class="qbtdright">
+		<input class="qbButton" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
+		</tr>
+		|;
+		$i++;
+	}
+	# Close the table
+	$output .= "</table>";
+
+	return $output;
+}
+
+#-------------------------------------------------------------------
+sub _isUserPref {
+	my $self = shift;
+	my $thing = shift;
+	my $isUserPref = ($session{form}{isUserPref} eq '1');
+	return $isUserPref unless $thing;
+	if ($thing eq 'url') {
+		return $isUserPref ? ';isUserPref=1' : '';
+	} elsif ($thing eq 'titleHeader') {
+		return $isUserPref ? 'Manage User Preference Fields' : 'Manage Administrative Override Fields';
+	} elsif ($thing eq 'name') {
+		return $isUserPref ? 'User Preference Field' : 'Administrative Override Field';
+	}
+}
+
+#-------------------------------------------------------------------
+sub _submenu {
+	my $self = shift;
+	my $workarea = shift;
+	my $title = shift;
+	my $help = shift;
+	my $ac = WebGUI::AdminConsole->new("shortcutmanager");
+	$ac->setHelp($help) if ($help);
+	$ac->setIcon($self->getIcon);
+	$ac->addSubmenuItem($self->getUrl('func=edit'), "Back to Edit Shortcut");
+	return $ac->render($workarea, $title);
+}
+
+#-------------------------------------------------------------------
+sub canEdit {
+	my $self = shift;
+return 1 if ($self->SUPER::canEdit || (ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard' && $self->getParent->canManage));
+	return 0;
+}
+
+#-------------------------------------------------------------------
+sub canManage {
+	my $self = shift;
+	return $self->canEdit;
+}
 
 #-------------------------------------------------------------------
 sub definition {
@@ -36,26 +179,26 @@ sub definition {
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
-			overrideTitle=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			overrideTemplate=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			overrideDisplayTitle=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			overrideDescription=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			overrideTemplateId=>{
-				fieldType=>"template",
-				defaultValue=>undef
-				},
+#			overrideTitle=>{
+#				fieldType=>"yesNo",
+#				defaultValue=>0
+#				},
+#			overrideTemplate=>{
+#				fieldType=>"yesNo",
+#				defaultValue=>0
+#				},
+#			overrideDisplayTitle=>{
+#				fieldType=>"yesNo",
+#				defaultValue=>0
+#				},
+#			overrideDescription=>{
+#				fieldType=>"yesNo",
+#				defaultValue=>0
+#				},
+#			overrideTemplateId=>{
+#				fieldType=>"template",
+#				defaultValue=>undef
+#				},
 			shortcutByCriteria=>{
 				fieldType=>"yesNo",
 				defaultValue=>0,
@@ -92,55 +235,55 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $originalTemplate;
-	$tabform->getTab("properties")->HTMLArea(
-		-value=>$self->getValue("description"),
-                -label=>WebGUI::International::get(85, 'Asset_Shortcut'),
-                -hoverHelp=>WebGUI::International::get('85 description', 'Asset_Shortcut'),
-		-name=>"description"
-		);
-	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
-                -label=>WebGUI::International::get('shortcut template title', 'Asset_Shortcut'),
-                -hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
-		-namespace=>"Shortcut"
-		);
-	if ($self->getShortcut->get("templateId")) {
-		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
-		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("collaborationTemplateId")) if (ref $self->getShortcut eq "WebGUI::Asset::Wobject::Collaboration");
-		#Shortcuts of Posts and Threads and other assets without a "templateId" 
-		# are going to be ->view'ed by their original parent's settings anyway.
-		$tabform->getTab("display")->template(
-			-name=>"overrideTemplateId",
-			-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
-        	        -label=>WebGUI::International::get('override asset template', 'Asset_Shortcut'),
-               	 	-hoverHelp=>WebGUI::International::get('override asset template description', 'Asset_Shortcut'),
-			-namespace=>$originalTemplate->get("namespace")
-			);
-		$tabform->getTab("display")->yesNo(
-			-name=>"overrideTemplate",
-			-value=>$self->getValue("overrideTemplate"),
-			-label=>WebGUI::International::get(10,"Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get('10 description',"Asset_Shortcut")
-			);
-	}
-	$tabform->getTab("properties")->yesNo(
-		-name=>"overrideTitle",
-		-value=>$self->getValue("overrideTitle"),
-		-label=>WebGUI::International::get(7,"Asset_Shortcut"),
-		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Shortcut")
-		);
-	$tabform->getTab("display")->yesNo(
-		-name=>"overrideDisplayTitle",
-		-value=>$self->getValue("overrideDisplayTitle"),
-		-label=>WebGUI::International::get(8,"Asset_Shortcut"),
-		-hoverHelp=>WebGUI::International::get('8 description',"Asset_Shortcut")
-		);
-	$tabform->getTab("properties")->yesNo(
-		-name=>"overrideDescription",
-		-value=>$self->getValue("overrideDescription"),
-		-label=>WebGUI::International::get(9,"Asset_Shortcut"),
-		-hoverHelp=>WebGUI::International::get('9 description',"Asset_Shortcut")
-		);
+#	$tabform->getTab("properties")->HTMLArea(
+#		-value=>$self->getValue("description"),
+#                -label=>WebGUI::International::get(85, 'Asset_Shortcut'),
+#                -hoverHelp=>WebGUI::International::get('85 description', 'Asset_Shortcut'),
+#		-name=>"description"
+#		);
+#	$tabform->getTab("display")->template(
+#		-value=>$self->getValue("templateId"),
+#                -label=>WebGUI::International::get('shortcut template title', 'Asset_Shortcut'),
+#                -hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
+#		-namespace=>"Shortcut"
+#		);
+#	if ($self->getShortcut->get("templateId")) {
+#		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
+#		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("collaborationTemplateId")) if (ref $self->getShortcut eq "WebGUI::Asset::Wobject::Collaboration");
+#		#Shortcuts of Posts and Threads and other assets without a "templateId" 
+#		# are going to be ->view'ed by their original parent's settings anyway.
+#		$tabform->getTab("display")->template(
+#			-name=>"overrideTemplateId",
+#			-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
+#        	        -label=>WebGUI::International::get('override asset template', 'Asset_Shortcut'),
+#               	 	-hoverHelp=>WebGUI::International::get('override asset template description', 'Asset_Shortcut'),
+#			-namespace=>$originalTemplate->get("namespace")
+#			);
+#		$tabform->getTab("display")->yesNo(
+#			-name=>"overrideTemplate",
+#			-value=>$self->getValue("overrideTemplate"),
+#			-label=>WebGUI::International::get(10,"Asset_Shortcut"),
+#			-hoverHelp=>WebGUI::International::get('10 description',"Asset_Shortcut")
+#			);
+#	}
+#	$tabform->getTab("properties")->yesNo(
+#		-name=>"overrideTitle",
+#		-value=>$self->getValue("overrideTitle"),
+#		-label=>WebGUI::International::get(7,"Asset_Shortcut"),
+#		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Shortcut")
+#		);
+#	$tabform->getTab("display")->yesNo(
+#		-name=>"overrideDisplayTitle",
+#		-value=>$self->getValue("overrideDisplayTitle"),
+#		-label=>WebGUI::International::get(8,"Asset_Shortcut"),
+#		-hoverHelp=>WebGUI::International::get('8 description',"Asset_Shortcut")
+#		);
+#	$tabform->getTab("properties")->yesNo(
+#		-name=>"overrideDescription",
+#		-value=>$self->getValue("overrideDescription"),
+#		-label=>WebGUI::International::get(9,"Asset_Shortcut"),
+#		-hoverHelp=>WebGUI::International::get('9 description',"Asset_Shortcut")
+#		);
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get(1,"Asset_Shortcut"),
 		-hoverHelp=>WebGUI::International::get('1 description',"Asset_Shortcut"),
@@ -152,7 +295,7 @@ sub getEditForm {
 			-value=>$self->getValue("shortcutByCriteria"),
 			-label=>WebGUI::International::get("Shortcut by alternate criteria","Asset_Shortcut"),
 			-hoverHelp=>WebGUI::International::get("Shortcut by alternate criteria description","Asset_Shortcut"),
-			-extras=>q|Onchange="
+			-extras=>q|onchange="
 				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
 					this.form.shortcutCriteria.disabled=false;
@@ -188,6 +331,8 @@ sub getEditForm {
 		        -hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut")
 	        );
 	}
+	$tabform->addTab('overrides','Custom Fields');
+#	$tabform->getTab('overrides');
 	return $tabform;
 }
 
@@ -205,6 +350,57 @@ sub getExtraHeadTags {
 	return $self->get("extraHeadTags")."\n".$self->getShortcut->get("extraHeadTags");
 }
 
+#-------------------------------------------------------------------
+sub getFields {
+	my $self = shift;
+	my $fielden = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Field"],returnObjects=>1});
+	#WebGUI::ErrorHandler::warn("There are ".(scalar @$fielden)." fields.");
+	return $fielden;
+}
+
+#-------------------------------------------------------------------
+sub getFieldsList {
+	my $self = shift;
+	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field'.$self->_isUserPref('url')).'" class="formLink">Add '.$self->_isUserPref('name').'</a><br /><br />';
+	my @fielden;
+	if ($self->_isUserPref) {
+		@fielden = $self->getUserPrefs;
+	} else {
+		@fielden = $self->getOverrides;
+	}
+	return $output unless scalar @fielden > 0;
+	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
+	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td></tr>';
+	foreach my $field (@fielden) {
+		$output .= '<tr>';
+		$output .= '<td class="tableData"><a href="'.$field->getUrl('func=edit').'">'.$field->get("fieldName").'</a></td>';
+		$output .= '<td class="tableData">';
+		$output .= WebGUI::Icon::editIcon($field->getUrl('func=edit'));
+		$output .= WebGUI::Icon::deleteIcon($field->getUrl('func=delete'));
+		$output .= '</td>';
+		$output .= '</tr>';
+	}
+	$output .= '</table>';
+	return $output;
+}
+
+
+#-------------------------------------------------------------------
+sub getOverrides {
+	my $self = shift;
+	my $fielden = $self->getFields;
+	my @overrides;
+	my $i = 0;
+	#use Data::Dumper;
+	#WebGUI::ErrorHandler::warn(Dumper($fielden));
+	foreach my $field (@{$fielden}) {
+		unless ($field->get("isUserPref")) {
+			@overrides[$i] = $field;
+			$i++;
+		}
+	}
+	return  @overrides;
+}
 
 #-------------------------------------------------------------------
 sub getShortcut {
@@ -216,11 +412,12 @@ sub getShortcut {
 			$self->{_shortcut} = $self->getShortcutDefault;
 		}
 	}
-	$self->{_shortcut}{_properties}{templateId} = $self->get("overrideTemplateId") if ($self->get("overrideTemplate"));
-	$self->{_shortcut}{_properties}{collaborationTemplateId} = $self->get("overrideTemplateId") if ($self->get("overrideTemplate"));
-	$self->{_shortcut}{_properties}{title} = $self->get("title") if ($self->get("overrideTitle"));
-	$self->{_shortcut}{_properties}{description} = $self->get("description") if ($self->get("overrideDescription"));
-	$self->{_shortcut}{_properties}{title} = $self->get("displayTitle") if ($self->get("overrideDisplayTitle"));
+	$self->{_shortcut}{_properties}{displayTitle} = undef;
+	# Hide title by default.  If you want, you can create an override
+	# to display it.  But it's being shown in the dragheader by default.
+	foreach my $override ($self->getOverrides) {
+		$self->{_shortcut}{_properties}{$override->getFieldName} = $override->getFieldValue;
+	}
 	return $self->{_shortcut};
 }
 
@@ -340,6 +537,21 @@ sub getShortcutDefault {
 }
 
 #-------------------------------------------------------------------
+sub getUserPrefs {
+	my $self = shift;
+	my $fielden = $self->getFields;
+	my @userPrefs;
+	my $i = 0;
+	foreach my $field (@{$fielden}) {
+		if ($field->get("isUserPref")) {
+			@userPrefs[$i] = $field;
+			$i++;
+		}
+	}
+	return @userPrefs;
+}
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -348,171 +560,115 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+
+sub purge {
+	my $self = shift;
+	# delete and purge all associated FieldIds and their preferences.
+	return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+sub purgeRevision {
+	my $self = shift;
+	return $self->SUPER::purgeRevision;
+}
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my $content;
+	my $shortcut = $self->getShortcut;
 	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
 		$content = "Displaying this shortcut would cause a feedback loop.";
 	} else {
-		$content = $self->getShortcut->view;
+		$content = $shortcut->view;
 	}
 	my %var = (
 		isShortcut => 1,
 		'shortcut.content' => $content,
 		'shortcut.label' => WebGUI::International::get('3',"Asset_Shortcut"),
-		originalURL => $self->getShortcut->getUrl
+		originalURL => $shortcut->getUrl
 		);
 	return $self->processTemplate(\%var,$self->getValue("templateId"));
 }
 
-
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageFields;isUserPref=0"),"Manage Shortcut Overrides");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageFields;isUserPref=1"),"Manage User Preferences");
+	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
 }
 
 #-------------------------------------------------------------------
-sub _drawQueryBuilder {
+sub www_getUserPrefsForm {
+	#This is a form retrieved by "ajax".
 	my $self = shift;
-	# Initialize operators
-	my @textFields = qw|text yesNo selectList radioList|;
-	my %operator;
-	foreach (@textFields) {
-		$operator{$_} = {
-				"=" => WebGUI::International::get("is","Asset_Shortcut"),
-				"!=" => WebGUI::International::get("isnt","Asset_Shortcut")
-			};
+	return '' unless $self->getParent->canPersonalize;
+	my @fielden = $self->getUserPrefs;
+	my $f = WebGUI::HTMLForm->new(extras=>' onSubmit="submitForm(this,\''.'form_'.$self->getId.'\');return false;"');
+	$f->hidden(  
+		-name => 'func', 
+		-value => 'saveUserPrefs'
+	);
+	foreach my $field (@fielden) {
+		my $fieldType = $field->get("fieldType") || "text";
+		my $options;
+		# Add a "Select..." option on top of a select list to prevent from
+		# saving the value on top of the list when no choice is made.
+		if($fieldType eq "selectList") {
+			$options = {"", WebGUI::International::get("Select","Asset")};
+		}
+		$f->dynamicField(
+			name=>$field->getId,
+			label=>$field->get("fieldName"),
+			uiLevel=>5,
+			value=>$field->getUserPref($field->getId),
+			extras=>'',
+			possibleValues=>$field->get("possibleValues"),
+			options=>$options,
+			fieldType=>$fieldType
+		);
 	}
-	$operator{integer} = {
-				"=" => WebGUI::International::get("equal to","Asset_Shortcut"),
-                                "!=" => WebGUI::International::get("not equal to","Asset_Shortcut"),
-				"<" => WebGUI::International::get("less than","Asset_Shortcut"),
-				">" => WebGUI::International::get("greater than","Asset_Shortcut")
-			};
+	$f->submit;
+	return $f->print;
+}
 
-	# Get the fields and count them	
-	my $fields = $self->getMetaDataFields();
-	my $fieldCount = scalar(keys %$fields);
-	
-	unless ($fieldCount) {	# No fields found....
-		return 'No metadata defined yet.
-			<a href="'.WebGUI::URL::page('op=manageMetaData').
-			'">Click here</a> to define metadata attributes.';
+#-------------------------------------------------------------------
+sub www_manageFields {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $output = $self->getFieldsList;
+	return $self->_submenu($output,$self->_isUserPref('titleHeader'));
+}
+
+#-------------------------------------------------------------------
+sub www_saveUserPrefs {
+	my $self = shift;
+	return '' unless $self->getParent->canPersonalize;
+	my @fellowFields = $self->getUserPrefs;
+	foreach my $fieldId (keys %{$session{form}}) {
+		my $field = WebGUI::Asset->newByDynamicClass($fieldId);
+		next unless $field;
+		return 0 unless $field->setUserPref($fieldId,$session{form}{$fieldId});
 	}
-
-	# Static form fields
-	my $shortcutCriteriaField = WebGUI::Form::textarea({
-	                	        name=>"shortcutCriteria",
-        	                	value=>$self->getValue("shortcutCriteria"),
-					extras=>'style="width: 100%" '.$self->{_disabled}
-                	        });
-	my $conjunctionField = WebGUI::Form::selectList({
-					name=>"conjunction",
-					options=>{
-						"AND" => WebGUI::International::get("AND","Asset_Shortcut"),
-						"OR" => WebGUI::International::get("OR","Asset_Shortcut")},
-					value=>["OR"],
-					extras=>'class="qbselect"',
-				});
-	
-	# html
-	my $output;
-	$output .= '<script type="text/javascript" src="'.
-		$session{config}{extrasURL}.'/wobject/Shortcut/querybuilder.js"></script>';
-	$output .= '<link href="'.$session{config}{extrasURL}.
-			'/wobject/Shortcut/querybuilder.css" type="text/css" rel="stylesheet">';
-
-	$output .= qq|<table cellspacing="0" cellpadding="0" border="0">
-			  <tr>
-			    <td colspan="5" align="right">$shortcutCriteriaField</td>
-			  </tr>
-			  <tr>
-			    <td></td>
-			    <td></td>
-			    <td></td>
-			    <td></td>
-			    <td class="qbtdright">
-			    </td>
-			  </tr>
-			  <tr>
-			    <td></td>
-			    <td></td>
-			    <td></td>
-			    <td></td>
-			    <td class="qbtdright">
-				$conjunctionField
-			    </td>
-			  </tr>
-	|;
-
-	# Here starts the field loop
-	my $i = 1;
-	foreach my $field (keys %$fields) {
-		my $fieldLabel = $fields->{$field}{fieldName};
-		my $fieldType = $fields->{$field}{fieldType} || "text";
-
-		# The operator select field
-		my $opFieldName = "op_field".$i;
-		my $opField = WebGUI::Form::selectList({
-						name=>$opFieldName,
-						uiLevel=>5,
-						options=>$operator{$fieldType},
-						extras=>'class="qbselect"'
-					});	
-		# The value select field
-		my $valFieldName = "val_field".$i;
-		my $valueField = WebGUI::Form::dynamicField(
-						fieldType=>$fieldType,
-                                                name=>$valFieldName,
-                                                uiLevel=>5,
-                                                extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
-                                                possibleValues=>$fields->{$field}{possibleValues},
-					);
-		# An empty row
-		$output .= qq|
-                          <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="qbtdright"></td>
-                          </tr>
-			|;
-		
-		# Table row with field info
-		$output .= qq|
-			  <tr>
-			    <td class="qbtdleft"><p class="qbfieldLabel">$fieldLabel</p></td>
-			    <td class="qbtd">
-				$opField
-			    </td>
-			    <td class="qbtd">
-				<span class="qbText">$valueField</span>
-			    </td>
-			    <td class="qbtd"></td>
-			    <td class="qbtdright">
-				<input class="qbButton" type=button value=Add onclick="addCriteria('$fieldLabel', this.form.$opFieldName, this.form.$valFieldName)"></td>
-			  </tr>
-			|;
-		$i++;
-	}
-	# Close the table
-	$output .= "</table>";
-
-	return $output;
+	return 1;
 }
 
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	return $self->getShortcut->www_view;
+	if (ref($self->getParent) eq 'WebGUI::Asset::Wobject::Dashboard') {
+		return WebGUI::Privilege::noAccess() unless $self->canView;
+		$session{asset} = $self->getParent;
+		return $session{asset}->www_view;
+	} else {
+		return $self->getShortcut->www_view;
+	}
 }
 
-
 1;
-
-
 

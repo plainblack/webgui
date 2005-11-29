@@ -27,9 +27,7 @@ my $quiet;
 
 start();
 addTimeZonesToUserPreferences();
-# MUST DO: any dates in WebGUI greater than epoch 2^32 must be reduced, because
-# the new DateTime system uses Params::Validate, which will only validate integers
-# up to 2^32 as SCALARs. :(
+fixVeryLateDates();
 removeUnneededFiles();
 updateCollaboration();
 addPhotoField();
@@ -40,6 +38,7 @@ addEnableAvatarColumn();
 addMatrix();
 updateConfigFile();
 addInOutBoard();
+addDashboardStuff();
 addZipArchive();
 updateUserProfileDayLabels();
 finish();
@@ -100,22 +99,757 @@ STOP
 }
 
 #-------------------------------------------------
+sub addDashboardStuff {
+	print "\tAdding Dashboard tables and templates.\n" unless ($quiet);
+	WebGUI::SQL->write("CREATE TABLE `Dashboard` (
+		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`revisionDate` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`adminsGroupId` VARCHAR(22) BINARY NOT NULL DEFAULT '4',
+		`usersGroupId` VARCHAR(22) BINARY NOT NULL DEFAULT '2',
+		`templateId` VARCHAR(22) BINARY NOT NULL DEFAULT 'DashboardViewTmpl00001',
+		`mapFieldId` VARCHAR(22) DEFAULT '',
+		PRIMARY KEY(`assetId`, `revisionDate`)
+	)");
+#	WebGUI::SQL->write("CREATE TABLE `Dashlet` (
+#		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+#		`revisionDate` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+#		`proxiedAssetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+#		PRIMARY KEY(`assetId`)
+#	)");
+# Convert Shortcuts to Dashlortcuts.
+	WebGUI::SQL->write("CREATE TABLE `WeatherData` (
+		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`revisionDate` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+		`templateId` VARCHAR(22) BINARY NOT NULL DEFAULT 'WeatherDataTmpl0000001',
+		`locations` TEXT DEFAULT '',
+		PRIMARY KEY(`assetId`, `revisionDate`)
+	)");
+	WebGUI::SQL->write("CREATE TABLE `MultiSearch` (
+		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`revisionDate` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+		`templateId` VARCHAR(22) BINARY NOT NULL DEFAULT 'MultiSearchTmpl0000001',
+		`predefinedSearches` TEXT DEFAULT '',
+		PRIMARY KEY(`assetId`, `revisionDate`)
+	)");
+	WebGUI::SQL->write("CREATE TABLE `wgField` (
+		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`revisionDate` VARCHAR(22) NOT NULL DEFAULT '',
+		`formTemplateId` VARCHAR(22) BINARY DEFAULT '',
+		`valueTemplateId` VARCHAR(22) BINARY DEFAULT '',
+		`isUserPref` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+		`fieldName` VARCHAR(255) DEFAULT '',
+		`fieldLabel` VARCHAR(255) DEFAULT '',
+		`fieldDescription` TEXT DEFAULT '',
+		`fieldType` VARCHAR(50) DEFAULT '',
+		`overrideForm` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+		`overrideValue` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+		`possibleValues` TEXT DEFAULT '',
+		`defaultValue` TEXT NOT NULL DEFAULT '',
+		PRIMARY KEY(`assetId`, `revisionDate`)
+	)");
+	WebGUI::SQL->write("CREATE TABLE `wgFieldUserData` (
+		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`userId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`userValue` TEXT DEFAULT '',
+		PRIMARY KEY(`assetId`, `userId`)
+	)");
+	
+	WebGUI::SQL->write("create table StockData (
+   assetId varchar(22) binary not null,
+   templateId varchar(22) binary not null default 'StockListTMPL000000001',
+   displayTemplateId varchar(22) binary not null default 'StockListTMPL000000002',
+   defaultStocks text,
+   source varchar(50) default 'usa',
+   failover integer default 1,
+   revisionDate integer not null,
+   primary key(assetId,revisionDate)
+)");
+	
+	my $template = <<STOP;
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>^Page(title); - <tmpl_var session.setting.companyName></title>
+	<link rel="icon" href="^Extras;favicon.png" type="image/png" />
+	<link rel="shortcut icon" href="^Extras;favicon.ico" />
+	<tmpl_var head.tags>
+<style>
+body {
+	margin: 0;
+	margin-top: 0;
+  padding: 0;
+}
+</style>
+</head>
+<body>
+^AdminBar("PBtmpl0000000000000090");
+<tmpl_var body.content>
+</body>
+</html>
+STOP
+my $folder = WebGUI::Asset->newByUrl('templates') || WebGUI::Asset->getImportNode;
+my $newAsset = $folder->addChild({
+	className=>"WebGUI::Asset::Template",
+	template=>$template,
+	namespace=>"style",
+	title=>'WebGUI 6 Blank Style',
+	menuTitle=>'WebGUI 6 Blank Style',
+	ownerUserId=>'3',
+	groupIdView=>'4',
+	groupIdEdit=>'4',
+	isHidden=>1
+}, 'PBtmplBlankStyle000001');
+$newAsset->commit;
+$template = <<STOP;
+
+<style type="text/css">
+
+table.dashboardColumn  {
+width: 100%;
+background: none;
+background-color:transparent;
+}
+.availableDashlet { 
+}
+div#dashboardContainer {
+font:       11px Lucida Grande, Verdana, Arial, Helvetica, sans serif;
+background: url(^Extras;wobject/Dashboard/background.gif) repeat-x #fff;
+}
+table#dashboardChooserContainer {
+margin:0px;
+padding:0px;
+border:0px;
+
+}
+
+tbody.availableDashlet * div.content { display: none;  }
+div#availableDashlets * td {width:100px;}
+div#availableDashlets * div.content {width:100px; overflow-x:hidden;}
+div#columnsContainerDiv {
+margin:6px;
+}
+td {vertical-align: top;}
+h1 {
+font:       15px Lucida Grande, Verdana, Arial, Helvetica, sans serif;
+}
+</style>
+<div id="dashboardContainer">
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>">
+</a>
+<table id="dashboardChooserContainer" width="100%">
+<tr>
+<td>
+<div style="display:none;cursor: hand;" id="hideNewContentButton" onclick="makeInactive(this);makeInactive(document.getElementById('availableDashlets'));makeActive(document.getElementById('showNewContentButton'));">Hide New Content List</div>
+<div id="availableDashlets" style="display:none;">
+<table cellpadding="0" cellspacing="0" border="0" id="position1" class="dashboardColumn" width="100px">
+<tbody class="availableDashlet" width="100px">
+<tmpl_loop position1_loop>
+<tr id="td<tmpl_var id>">
+<td>
+<div id="td<tmpl_var id>_div" class="dragable">
+<div class="dragTrigger"><tmpl_var dashletTitle>
+</div>
+<div class="content"><tmpl_var content>
+</div>
+</div>
+</td>
+</tr>
+</tmpl_loop>
+</tbody>
+</table>
+</div>
+</td>
+<td>
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr><td>			<div id="showNewContentButton" style="cursor: hand;" onclick="makeInactive(this);makeActive(document.getElementById('availableDashlets'));makeActive(document.getElementById('hideNewContentButton'));">Add New Content</div></td><td>
+<tmpl_if showAdmin>
+<p>
+<tmpl_var controls>
+</p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+<h1 style="text-align:center">
+<tmpl_var title>
+</h1>
+</tmpl_if>
+
+
+
+<tmpl_if description>
+<p>
+<tmpl_var description>
+</p>
+</tmpl_if>
+</td><td valign="top" class="login">^L("17","","PBtmpl0000000000000092"); ^AdminToggle(Modify the Default User's Perspective,Leave Default User Perspective (Admin Mode));</td></tr></table>
+<script language="javascript" src="^Extras;js/at/AjaxRequest.js"></script>
+<script language="javascript">
+function submitForm(theform,idToReplace) {
+
+var status = AjaxRequest.submit(
+theform
+,{
+'parameters':{
+},
+'onSuccess':function(req){
+var myArray = req.responseText.split(/div/mg,1);
+document.getElementById(idToReplace).innerHTML = myArray[0];
+	}
+	}
+);
+return status;
+	}
+function makeActive(o) { o.style.display = "inline"; }
+function makeInactive(o) { o.style.display = "none"; }
+function AjaxRequestBegin() {  }
+function AjaxRequestEnd() {  }
+</script>
+<div id="columnsContainerDiv">
+<table cellpadding="0" cellspacing="8" border="0" id="columnsContainerTable" width="100%">
+<tr>
+<td width="33%">
+<table cellpadding="0" cellspacing="0" border="0" id="position2" class="dashboardColumn" width="100%">
+<tbody>
+<tmpl_loop position2_loop>
+<tr id="td<tmpl_var id>">
+<td>
+<div id="td<tmpl_var id>_div" class="dragable">
+<div class="dragTrigger"><tmpl_var dashletTitle>
+</div>
+<div class="content">
+<tmpl_var content>
+</div>
+</div>
+</td>
+</tr>
+</tmpl_loop>
+</tbody>
+</table>
+</td>
+<td width="2px" bgcolor="gray">
+</td>
+<td width="33%">
+<table cellpadding="0" cellspacing="0" border="0" id="position3" class="dashboardColumn" width="100%">
+<tbody>
+<tmpl_loop position3_loop>
+<tr id="td<tmpl_var id>">
+<td>
+<div id="td<tmpl_var id>_div" class="dragable">
+<div class="dragTrigger">
+<tmpl_var dashletTitle>
+</div>
+<div class="content">
+<tmpl_var content>
+</div>
+</div>
+</td>
+</tr>
+</tmpl_loop>
+</tbody>
+</table>
+</td>
+<td width="2px" bgcolor="gray"></td>
+<td width="33%">
+<table cellpadding="0" cellspacing="0" border="0" id="position4" class="dashboardColumn" width="100%">
+<tbody>
+<tmpl_loop position4_loop>
+<tr id="td<tmpl_var id>">
+	<td>
+<div id="td<tmpl_var id>_div" class="dragable">
+<div class="dragTrigger">
+<tmpl_var dashletTitle>
+</div>
+<div class="content"><tmpl_var content>
+</div>
+</div>
+</td>
+</tr>
+</tmpl_loop>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<table>
+<tr id="blank" class="hidden">
+<td>
+<div>
+<div class="empty">&nbsp;
+</div>
+</div>
+</td>
+</tr>
+</table>
+<tmpl_var dragger.init>
+</td>
+</tr>
+</table>
+</div>
+STOP
+$newAsset = $folder->addChild({
+	title=>"Dashboard Default View",
+	menuTitle=>"Dashboard Default View",
+	namespace=>"Dashboard",
+	url=>"dashboard-default-view-template",
+	className=>"WebGUI::Asset::Template",
+	template=>$template
+	}, "DashboardViewTmpl00001");
+$newAsset->commit;
+$template = <<STOP;
+<a name="<tmpl_var assetId>"></a> 
+ 
+<tmpl_if session.var.adminOn> 
+   <p><tmpl_var controls></p> 
+</tmpl_if>
+
+<tmpl_if displayTitle>
+    <h1><tmpl_var title></h1>
+</tmpl_if>
+
+<tmpl_if description>
+    <tmpl_var description><p />
+</tmpl_if>
+
+<tmpl_loop locations.loop>
+<table border="0" width="100%">
+<tr>
+	<td rowspan="3" width="55"><img src="<tmpl_var iconUrl>" /></td>
+	<td bgcolor="#0072D6">
+		<div class="weatherTitle">
+			<div style="float:left;">&#160;<tmpl_var cityState></div>
+
+			<div style="float:right;margin-right:1px;margin-top:2px;">
+				<a href="#"><img src="/extras/wobject/Dashboard/weather_delete.gif" border="0" /></a>
+			</div>
+		</div>
+	</td>
+</tr>
+<tr>
+	<td>
+		<tmpl_var sky><br /><tmpl_var tempF>&deg;F<br />
+	</td>
+</tr>
+<tr>
+	<td></td>
+</tr>
+<br />
+</table>
+
+</tmpl_loop>
+STOP
+WebGUI::Asset->getImportNode;
+my $newAsset = $folder->addChild({
+	className=>"WebGUI::Asset::Template",
+	template=>$template,
+	namespace=>"WeatherData",
+	title=>'WeatherData Default View',
+	menuTitle=>'WeatherData Default View',
+	ownerUserId=>'3',
+	groupIdView=>'4',
+	groupIdEdit=>'4',
+	isHidden=>1
+	}, 'WeatherDataTmpl0000001');
+$newAsset->commit;
+$template = <<STOP;
+
+<head>
+<style>
+	.qmmt_tab
+	{
+	    background-color: #eeeeee;
+	    border-top-color: #cccccc;
+	    border-right: 1px solid #cccccc;	    
+	}
+	.qmmt_tabactive
+	{
+	    border-right: 1px solid #cccccc;	    
+	}
+</style>
+<link rel="stylesheet" type="text/css" href="<tmpl_var extrasFolder>/tools.css" />
+</head>
+<body bgcolor="#f1f1f1" text="#000000" link="#0000cc" vlink="#0000cc" alink="#FF0000">
+<a name="<tmpl_var assetId>"></a> 
+<script type="text/javascript">
+   var symbol = "<tmpl_var stocks.symbol>";
+   function isIE() {
+      var ua = navigator.userAgent.toLowerCase();
+	  var isIE = ( (ua.indexOf("msie") != -1) && (ua.indexOf("opera") == -1) && (ua.indexOf("webtv") == -1) );
+	  return (isIE);      
+   }
+   
+   function enableTab(obj, scale){    
+      for (i=0; i < 7; i++)    {        
+	     document.getElementById('qm_ch_tab' + i + '_9350').className = (i == obj) ? 'qmmt_tabactive' : 'qmmt_tab';
+		 document.getElementById('qm_ch_tab' + i + '_9350').style.cursor = (i == obj) ? 'default' : (isIE()) ? 'hand': 'pointer';
+		 document.getElementById('qm_ch_tab' + i + '_9350').style.borderTop = (i == obj) ? '0px' : '1px solid';    
+	  }
+	  document.getElementById('chartimg').src = "http://ichart.finance.yahoo.com/z?s=" + symbol + "&t=" + scale + "&q=l&l=off&z=s&p=s";
+   }
+</script>
+
+<table cellpadding="0" cellspacing="0" border="0" class="qmmt_main" width="650"> 
+  <tr>  
+     <td style="text-align: center;">  
+	    <div class="qmmt_header_bar" style="padding-bottom: 1px; border-bottom-width: 1px; ">  
+		   <table cellpadding="0" cellspacing="0" border="0" width="100%">   
+		      <tr>    
+			     <td><span class="qmmt_header_text" style="padding-left:5px;"><tmpl_var stocks.name> (<tmpl_var stocks.symbol>)</span></td>    
+				 <td align="right" style="padding-right:3px;">
+				    <span class="qmmt_header_text" style="text-align: right; font-weight:normal;">
+					<div nowrap id="qm_textChange_5920">1:23 PM EDT</div>
+					<script type="text/javascript">
+					   function qm_UpdateText_5920(phase){    
+					      switch (phase)    {        
+						     case 1: 
+							    document.getElementById('qm_textChange_5920').innerHTML = '<span class="qmmt_header_text" style="font-weight:normal;">Delayed</span>'; 
+                                setTimeout("qm_UpdateText_5920(2)", 5000); 
+								break;        
+						     case 2: 
+							    document.getElementById('qm_textChange_5920').innerHTML = '<span class="qmmt_header_text" style="font-weight:normal;">1:23 PM EDT</span>'; 
+                                setTimeout("qm_UpdateText_5920(3)", 5000); 
+								break;        
+							 case 3: 
+							    document.getElementById('qm_textChange_5920').innerHTML = '<a href="http://finance.yahoo.com/" target="_top" style="text-decoration:none;"><span class="qmmt_header_text" style="font-weight:normal;">Yahoo Finance</span></a>'; 
+                                 setTimeout("qm_UpdateText_5920(1)", 5000); 
+								 break;            
+						  }        
+					   }
+					   qm_UpdateText_5920(2);
+				    </script>    
+					</span>
+				 </td>
+			  </tr>  
+		   </table>
+		</div>
+     </td>
+  </tr> 
+  <tr>  
+     <td style="text-align: center;">  
+	    <table cellpadding="2" cellspacing="0" border="0" width="100%">   
+		   <tr>
+		      <td style="text-align: center;" width="40%">    
+			     <img align="center" id="chartimg" width="350" height="205" src="http://ichart.finance.yahoo.com/z?s=<tmpl_var stocks.symbol>&t=1d&q=l&l=off&z=s&p=s">    
+                     <table cellpadding="0" cellspacing="0" border="0" width="100%">  
+					    <tr>
+						   <td width="14%" id="qm_ch_tab0_9350" class="qmmt_tabactive" onclick="enableTab('0', '1d')" style="cursor: default; border-left: 0px; border-bottom: 0px; border-top: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;">Today</td>
+                           <td width="14%" id="qm_ch_tab1_9350" class="qmmt_tab" onclick="enableTab('1', '5d')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;">5d</td>
+                           <td width="14%" id="qm_ch_tab2_9350" class="qmmt_tab" onclick="enableTab('2', '1m')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;">1m</td>
+                           <td width="14%" id="qm_ch_tab3_9350" class="qmmt_tab" onclick="enableTab('3', '3m')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;">3m</td>
+                           <td width="14%" id="qm_ch_tab4_9350" class="qmmt_tab" onclick="enableTab('4', '1y')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;">1y</td>
+                           <td width="14%" id="qm_ch_tab5_9350" class="qmmt_tab" onclick="enableTab('5', '5y')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;">5y</td>
+						   <td width="14%" id="qm_ch_tab6_9350" class="qmmt_tab" onclick="enableTab('6', 'my')" style="cursor: default; border-right: 0px; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;">20y</td>
+                        </tr>
+					 </table>    
+			      </td>
+				  <td align="center" width="30%">
+				     <table cellpadding="2" cellspacing="0" border="0" width="95%">
+					    <tr class="qmmt_main">
+						   <td class="qmmt_text">Last Price</td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.last></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Market Cap </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.cap></td>
+						</tr>           
+						<tr class="qmmt_main"><td class="qmmt_text"> Change </td>
+						   <td class="qmmt_text<tmpl_if stocks.net.isUp>_up<tmpl_else><tmpl_if stocks.net.isDown>_down</tmpl_if></tmpl_if>" style="text-align: right; font-weight: bold;">
+						      <img align='center' src='<tmpl_var extrasFolder>/<tmpl_var stocks.net.icon>'> <tmpl_var stocks.net>
+						   </td>
+                        </tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Open </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.open></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Day High </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.high></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text">Bid</td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.bid></td>
+						</tr>    
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> 52 Wk High </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.year_high></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> E.P.S. </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.eps></td>
+						</tr>    
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Ex-Div Date </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.ex_div></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Yield </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.yield></td>
+						</tr>
+				     </table>
+				  </td>
+				  <td align="center" width="30%">
+				     <table cellpadding="2" cellspacing="0" border="0" width="95%">
+					    <tr class="qmmt_main">
+						   <td class="qmmt_text"> Last Trade </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var lastUpdate.us></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Volume </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.volume.millions> m</td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text">% Change </td>
+						   <td class="qmmt_text<tmpl_if stocks.net.isUp>_up<tmpl_else><tmpl_if stocks.net.isDown>_down</tmpl_if></tmpl_if>"  style="text-align: right; font-weight: bold;"><tmpl_var stocks.p_change>%</td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Prev Close </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.close></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Day Low </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.low></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Ask </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.ask></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> 52 Wk Low </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.year_low></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> P/E Ratio </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.pe></td>
+						</tr>    
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Dividend </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.div></td>
+						</tr>     
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Exchange </td> 
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.exchange></td>
+						</tr>
+				     </table>
+				  </td>
+			   </tr>
+			</table>
+	     </td>
+	  </tr>
+   </table>
+   
+<div align="center">
+<table cellpadding="0" cellspacing="0" border="0" width="650">
+<tr>
+   <td>
+      <div class="qmmt_text" align="right"><br><a href="javascript:window.close()" style="color:#0000cc">CLOSE</a></div>
+   </td>
+</tr>
+</table>
+</div>
+</body>
+STOP
+WebGUI::Asset->getImportNode;
+my $newAsset = $folder->addChild({
+	className=>"WebGUI::Asset::Template",
+	template=>$template,
+	namespace=>"StockData/Display",
+	title=>'StockData Default Display',
+	menuTitle=>'StockData Default Display',
+	ownerUserId=>'3',
+	groupIdView=>'4',
+	groupIdEdit=>'4',
+	isHidden=>1
+	}, 'StockDataTMPL000000002');
+$newAsset->commit;
+$template = <<STOP;
+<a name="<tmpl_var assetId>"></a> 
+ 
+<tmpl_if session.var.adminOn> 
+   <p><tmpl_var controls></p> 
+</tmpl_if>
+
+<tmpl_if displayTitle>
+    <h1><tmpl_var title></h1>
+</tmpl_if>
+
+<tmpl_if description>
+    <tmpl_var description><p />
+</tmpl_if>
+
+
+<link rel="stylesheet" type="text/css" href="<tmpl_var extrasFolder>/tools.css" />
+<table cellpadding="0" cellspacing="0" border="0" class="qmmt_main" width="100%">
+   <tr>
+      <td colspan="3" style="text-align: left">  
+	     <div class="qmmt_header_bar" style="padding-top: 1px; padding-bottom: 1px; border-bottom-width: 1px;">
+		    <table cellpadding="0" cellspacing="0" border="0" width="100%">   
+			  <tr>
+			     <td class="qmmt_header_text">Stock Watch</td>
+				 <td class="qmmt_header_text" style="text-align: right; padding-right: 3px; font-weight: normal;">
+				    <div id="qm_textChange_7310">
+					   <span class="qmmt_header_text" style="font-weight:normal;"><b>Last Update: </b> <tmpl_var lastUpdate.default> EDT</span></div>
+					      <script type="text/javascript">
+						     function qm_UpdateText_7310(phase){    
+							   switch (phase)    {        
+							      case 1: document.getElementById('qm_textChange_7310').innerHTML = '<span class="qmmt_header_text" style="font-weight:normal;">delayed 20 minutes</span>'; 
+                                   setTimeout("qm_UpdateText_7310(2)", 5000); 
+								   break;        
+								  case 2: document.getElementById('qm_textChange_7310').innerHTML = '<span class="qmmt_header_text" style="font-weight:normal;"><b>Last Update:&nbsp;</b> <tmpl_var lastUpdate.default> EDT</span>'; 
+                                   setTimeout("qm_UpdateText_7310(3)", 5000); 
+								   break;        
+								  case 3: document.getElementById('qm_textChange_7310').innerHTML = '<a href="http://www.quotemedia.com/" target="_top" style="text-decoration:none;"><span class="qmmt_header_text" style="font-weight:normal;">Yahoo Finance</span></a>';
+                                   setTimeout("qm_UpdateText_7310(1)", 5000); 
+								   break;        
+								}        
+							 }
+							 qm_UpdateText_7310(2);
+						 </script>      
+				  </td>       
+				</tr>  
+		     </table>  
+	      </div>  
+	   </td> 
+	</tr>  
+	<tr>  
+	   <td>       
+	      <script type="text/javascript"> 
+		     function openDetail_2961(symbol) {     
+			    var w = 670;   
+				var h = 286;   
+				var winl = (screen.width - w) / 2;   
+				var wint = (screen.height - h) / 2;   
+			    var winprops ='height='+h+',width='+w+',top='+wint+',left='+winl+',toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=0,resizable=1';   
+				win = window.open("<tmpl_var stock.display.url>" + escape(symbol), "DetailedQuote", winprops);
+				if (parseInt(navigator.appVersion) >= 4) {       
+				   win.window.focus();   
+				}   
+		      }
+		   </script>    
+		   <table cellpadding="0" cellspacing="0" style="padding: 2px;" width="100%">   
+		      <tr class="qmmt_main">
+			     <td nowrap class="qmmt_text" style="font-weight: bold; text-align: left; padding-left: 3px;"> Name </td>        
+				 <td nowrap class="qmmt_text" style="font-weight: bold; text-align: left; padding-left: 3px;" width="8%">Symbol</td>    
+				 <td nowrap class="qmmt_text" style="font-weight: bold; text-align: right" width="9%">Last</td>
+				 <td nowrap class="qmmt_text" style="font-weight: bold; text-align: center" width="4%">Tick</td>        
+				 <td nowrap class="qmmt_text" style="font-weight: bold; text-align: right" width="7%">Chg</td>         
+	          </tr>
+			  <tmpl_loop stocks.loop>
+			     <tr class='<tmpl_if __ODD__>qmmt_cycle<tmpl_else>qmmt_main</tmpl_if>'>            
+			        <td nowrap class="qmmt_text" style="padding-left: 3px;"><tmpl_var stocks.name></td>
+				    <td nowrap class="qmmt_text" style="text-align: left; padding-left: 3px;">
+				       <a class="qmmt" style="text-decoration: none;" href="javascript:openDetail_2961('<tmpl_var stocks.symbol>')"/><tmpl_var stocks.symbol></a>
+			        </td>        
+				    <td nowrap class="qmmt_text" style="text-align: right"><tmpl_var stocks.last></td>
+				    <td nowrap class="qmmt_text" style="text-align: center;">
+					   <img align='right' src='<tmpl_var extrasFolder>/<tmpl_var stocks.net.icon>'>            
+				    </td>
+				    <td class="qmmt_text<tmpl_if stocks.net.isUp>_up<tmpl_else><tmpl_if stocks.net.isDown>_down</tmpl_if></tmpl_if>" style="text-align: right" nowrap><tmpl_var stocks.net></td>
+			     </tr>          
+			  </tmpl_loop>  
+			</table>      
+	     </td> 
+	  </tr>
+  </table>
+STOP
+WebGUI::Asset->getImportNode;
+my $newAsset = $folder->addChild({
+	className=>"WebGUI::Asset::Template",
+	template=>$template,
+	namespace=>"StockData",
+	title=>'StockData Default View',
+	menuTitle=>'StockData Default View',
+	ownerUserId=>'3',
+	groupIdView=>'4',
+	groupIdEdit=>'4',
+	isHidden=>1
+	}, 'StockDataTMPL000000001');
+$newAsset->commit;
+$template = <<STOP;
+<a name="<tmpl_var assetId>"></a> 
+ 
+<tmpl_if session.var.adminOn> 
+   <p><tmpl_var controls></p> 
+</tmpl_if>
+
+<tmpl_if displayTitle>
+    <h1><tmpl_var title></h1>
+</tmpl_if>
+
+<tmpl_if description>
+    <tmpl_var description><p />
+</tmpl_if>
+<script type="text/javascript">
+function domultisearch() {
+var sf=document.multisearchform;
+var submitto = sf.sengines.options[sf.sengines.selectedIndex].value + escape(sf.searchterms.value);
+window.open(submitto);
+return false;
+}
+</script>
+<div style="width:100%">
+<form name="multisearchform" onSubmit="return domultisearch();">
+<table border="1" cellpadding="10" cellspacing="0" bgcolor="#F2F2F2">
+<tr>
+<td align="center"><div style="position:float;width=40%;">
+Search:&nbsp;
+<select name="sengines">
+<option value="http://www.google.com/search?q=" selected>Google</option>
+<option value="http://news.google.com/news?q=">Google News</option>
+<option value="http://www.flickr.com/photos/tags/">Flickr Photos</option>
+<option value="http://www.digg.com/search?submit=Submit&search=">Digg.com</option>
+<option value="http://www.altavista.com/web/results?q=">Alta Vista</option>
+<option value="http://search.yahoo.com/search?p=">Yahoo!</option>
+</select></div><div style="position:float;width=40%;">
+&nbsp;&nbsp;For:&nbsp;
+<input type="text" name="searchterms">
+<input type="submit" name="SearchSubmit" value="Search"></div>
+</td>
+</tr>
+</table>
+</form>
+</div>
+STOP
+WebGUI::Asset->getImportNode;
+my $newAsset = $folder->addChild({
+	className=>"WebGUI::Asset::Template",
+	template=>$template,
+	namespace=>"MultiSearch",
+	title=>'MultiSearch Default Display',
+	menuTitle=>'MultiSearch Default Display',
+	ownerUserId=>'3',
+	groupIdView=>'4',
+	groupIdEdit=>'4',
+	isHidden=>1
+	}, 'MultiSearchTmpl0000001');
+$newAsset->commit;
+}
+
+#-------------------------------------------------
+sub fixVeryLateDates {
+	WebGUI::SQL->write("update assetdata set endDate='2082783600' where endDate>=4294967294");
+}
+
+#-------------------------------------------------
 sub updateConfigFile {
-        print "\tUpdating config file.\n" unless ($quiet);
-        my $pathToConfig = '../../etc/'.$configFile;
-        my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig, 'PURGE'=>1);
-        my %newConfig;
-        foreach my $key ($conf->directives) { # delete unwanted stuff
-                unless (isIn($key,qw(enableDateCache scripturl))) {
-                        $newConfig{$key} = $conf->get($key);
-                }
-        }
-	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::Matrix");	
-	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::InOutBoard");	
-	push(@{$newConfig{assets}}, "WebGUI::Asset::File::ZipArchive");	
-        $conf->purge;
-        $conf->set(%newConfig);
-        $conf->write;
+	print "\tUpdating config file.\n" unless ($quiet);
+	my $pathToConfig = '../../etc/'.$configFile;
+	my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $pathToConfig, 'PURGE'=>1);
+	my %newConfig;
+	foreach my $key ($conf->directives) { # delete unwanted stuff
+		unless (isIn($key,qw(enableDateCache scripturl))) {
+			$newConfig{$key} = $conf->get($key);
+		}
+	}
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::Matrix") unless isIn("WebGUI::Asset::Wobject::Matrix",@{$newConfig{assets}});
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::InOutBoard") unless isIn("WebGUI::Asset::Wobject::InOutBoard",@{$newConfig{assets}});
+	push(@{$newConfig{assets}}, "WebGUI::Asset::File::ZipArchive") unless isIn("WebGUI::Asset::File::ZipArchive",@{$newConfig{assets}});
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::StockData") unless isIn("WebGUI::Asset::Wobject::StockData",@{$newConfig{assets}});
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::WeatherData") unless isIn("WebGUI::Asset::Wobject::WeatherData",@{$newConfig{assets}});
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::MultiSearch") unless isIn("WebGUI::Asset::Wobject::MultiSearch",@{$newConfig{assets}});
+	$conf->purge;
+	$conf->set(%newConfig);
+	$conf->write;
 }
 
 #-------------------------------------------------
@@ -830,9 +1564,9 @@ my $template = <<STOP;
 </rss>
 STOP
 # Get Template folder
-my $templateFolder = WebGUI::Asset->newByUrl('templates');
+my $folder = WebGUI::Asset->newByUrl('templates') || WebGUI::Asset->getImportNode;
 # Add Collaboration/RSS folder beneath
-my $rssFolder = $templateFolder->addChild({
+my $rssFolder = $folder->addChild({
     title=>"Collaboration/RSS",
     menuTitle=>"Collaboration/RSS",
     url=>"templates/collaboration/rss",
@@ -840,8 +1574,8 @@ my $rssFolder = $templateFolder->addChild({
     });
 $rssFolder->commit;
 # Place the Collaboration/RSS folder beneath the 
-# Collaboration/Thread folder
-my $threadFolder = WebGUI::Asset->newByUrl('templates/collaboration/thread');
+# Collaboration/Thread folder if it exists.
+my $threadFolder = WebGUI::Asset->newByUrl('templates/collaboration/thread') || WebGUI::Asset->getImportNode;
 my $threadRank = $threadFolder->getRank;
 $rssFolder->setRank($threadRank + 1);
 
@@ -864,7 +1598,7 @@ $rssFolder->addChild({
 sub addTimeZonesToUserPreferences {
 	print "\tDropping time offsets in favor of time zones.\n" unless ($quiet);
 	WebGUI::SQL->write("delete from userProfileData where fieldName='timeOffset'");
-	WebGUI::SQL->write("update userProfileField set dataValues='', fieldName='timeZone', dataType='timeZone', dataDefault=".quote("['America/Chicago']")." where fieldName='timeOffset'");
+	WebGUI::SQL->write("update userProfileField set dataValues='', fieldName='timeZone', dataType='timeZone', fieldLabel=".quote('WebGUI::International::get("timezone","DateTime");').",dataDefault=".quote("['America/Chicago']")." where fieldName='timeOffset'");
 	WebGUI::SQL->write("insert into userProfileData values ('1','timeZone','America/Chicago')");
 }
 
