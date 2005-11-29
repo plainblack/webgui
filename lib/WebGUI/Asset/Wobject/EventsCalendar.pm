@@ -15,7 +15,6 @@ use Tie::CPHash;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
 use WebGUI::International;
-use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Id;
 use WebGUI::Session;
@@ -354,6 +353,7 @@ sub view {
 				isStartOfWeek=>($dayOfWeekCounter==1),
 				isEndOfWeek=>($dayOfWeekCounter==7),
 				isToday=>($date[0]."-".$date[1]."-".$dayCounter eq $now[0]."-".$now[1]."-".$now[2]),
+				hasEvents=>(exists $events{$dayCounter}),
 				event_loop=>\@{$events{$dayCounter}},
 				url=>$events{$dayCounter}->[0]->{url}
 			});

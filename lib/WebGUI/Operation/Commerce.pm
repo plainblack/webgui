@@ -10,6 +10,7 @@ use WebGUI::Commerce::Payment;
 use WebGUI::Commerce::Shipping;
 use WebGUI::AdminConsole;
 use WebGUI::TabForm;
+use WebGUI::Setting;
 use WebGUI::Style;
 use WebGUI::Commerce;
 use WebGUI::Operation;
@@ -512,7 +513,7 @@ sub www_editCommerceSettingsSave {
 				fieldValue	=> $session{form}{$_}
 			});
 		} elsif ($_ ne 'op') {
-			WebGUI::SQL->write('update settings set value='.quote($session{form}{$_}).' where name='.quote($_));
+			WebGUI::Setting::set($_,$session{form}{$_});
 		}
 	}
 	
