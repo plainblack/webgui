@@ -21,6 +21,7 @@ use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
+use WebGUI::SQL;
 use WebGUI::Style;
 use WebGUI::URL;
 use WebGUI::Asset;
@@ -200,7 +201,6 @@ sub setParent {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
 	my ($output, $event, $id);
 	my %var = $self->get;
 	$event = $self;
@@ -216,9 +216,21 @@ sub view {
 	$var{"edit.label"} = WebGUI::International::get(575,"Asset_Event");
 	$var{"delete.url"} = WebGUI::URL::page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
 	$var{"delete.label"} = WebGUI::International::get(576,"Asset_Event");
-	#get parent so we can get the parent's style.  Hopefully the parent is an EventsCalendar.  If not, oh well.
-	my $parent = $self->getParent;
-	return WebGUI::Style::process($self->processTemplate(\%var,$self->getValue("templateId")),$parent->getValue("styleTemplateId"));
+	my @others;
+	my ($start, $garbage) = WebGUI::DateTime::dayStartEnd($self->get("eventStartDate"));
+	my ($garbage, $end) = WebGUI::DateTime::dayStartEnd($self->get("eventEndDate"));
+	my $sth = WebGUI::SQL->read("select assetId from EventsCalendar_event where ((eventStartDate >= $start and eventStartDate <= $end) or (eventEndDate >= $start and eventEndDate <= $end)) and assetId<>".quote($self->getId));
+	while (my ($assetId) = $sth->array) {
+		my $asset = WebGUI::Asset::Event->new($assetId);
+		# deal with multiple versions of the same event with conflicting dates
+		next unless (($asset->get("eventStartDate") >= $start && $asset->get("eventStartDate") <= $end) || ($asset->get("eventEndDate") >= $start && $asset->get("eventEndDate") <= $end));
+		push(@others,{
+			url=>$asset->getUrl,
+			title=>$asset->getTitle,
+			});
+	}
+	$var{others_loop} = \@others;
+	return $self->processTemplate(\%var,$self->getValue("templateId"));
 }
 
 
@@ -262,6 +274,13 @@ sub www_edit {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("event add/edit","Asset_Event");
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('13', 'Asset_Event'));
+}
+
+#-------------------------------------------------------------------
+sub www_view {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless ($self->canView);
+	return WebGUI::Style::process($self->view,$self->getParent->getValue("styleTemplateId"));
 }
 
 

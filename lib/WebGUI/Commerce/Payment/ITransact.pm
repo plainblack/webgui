@@ -707,13 +707,13 @@ my	%transactionData = %{$self->{_transactionParams}};
 "    <EmailText>
       <EmailTextItem>".$self->get('emailMessage')."</EmailTextItem>
       <EmailTextItem>ID: $transactionData{ORGID}</EmailTextItem>
-    </EmailText>\n";
+    </EmailText>
+    <OrderItems>\n";
 
 	$items = WebGUI::Commerce::Transaction->new($transactionData{ORGID})->getItems;
 	foreach (@{$items}) {
 		$xml .= 
-"    <OrderItems>
-      <Item>
+"   <Item>
         <Description>".$_->{itemName}."</Description>
 	<Cost>".$_->{amount}."</Cost>
 	<Qty>".$_->{quantity}."</Qty>
