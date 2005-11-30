@@ -159,7 +159,9 @@ sub checkModule {
         unless (defined $afterinstall) { $afterinstall = 0; }
         printTest("Checking for module $module");
         my $statement = "require ".$module.";";
-        if (eval($statement)) {
+        if ($afterinstall == 1) {
+                failAndExit("Install of $module failed!");
+        } elsif (eval($statement)) {
 		$statement = '$'.$module."::VERSION";
 		my $currentVersion = eval($statement);
 		if ($currentVersion >= $version) {
@@ -179,8 +181,6 @@ sub checkModule {
 				failAndExit("Aborting test, not all modules available, and you're not root so I can't install them.");
 			}
 		}
-        } elsif ($afterinstall == 1) {
-                failAndExit("Install of $module failed!");
         } else {
                 printResult("Not Installed");
 		return if $skipInstall;

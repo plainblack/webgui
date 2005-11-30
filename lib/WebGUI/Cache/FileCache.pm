@@ -18,6 +18,7 @@ package WebGUI::Cache::FileCache;
 use Storable qw(nstore retrieve);
 use WebGUI::Session;
 use File::Path;
+use File::Find;
 
 our @ISA = qw(WebGUI::Cache);
 
@@ -166,34 +167,33 @@ Returns the size (in bytes) of the current cache under this namespace. Consequen
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 getNamespaceSize ( )
+
+Returns the size (in bytes) of the current cache under this namespace. Consequently it also cleans up expired cache items.
+
+=cut
+
 sub getNamespaceSize {
         my $self = shift;
         my $expiresModifier = shift || 0;
-        my $path = shift || $self->getNamespaceRoot;
-        my $filesRemaining = 0;
-        if (opendir(DIR,$path)) {
-                my @files = readdir(DIR);
-                foreach my $file (@files) {
-                        unless ($file eq "." || $file eq "..") {
-                                if (open(FILE,"<".$path."/expires")) {
+        $session{cacheSize} = 0;
+        File::Find::find({no_chdir=>1, wanted=> sub {
+                                return unless $File::Find::name =~ m/^(.*)expires$/;
+                                my $dir = $1;
+                                if (open(FILE,"<".$dir."/expires")) {
                                         my $expires = <FILE>;
                                         close(FILE);
                                         if ($expires < time()+$expiresModifier) {
-						if (-e $path) {
-                                                	rmtree($path); 
-						}
+                                                rmtree($dir);
                                         } else {
-                                                my (@attributes) = stat($path.'/'.$file);
-                                                $filesRemaining += $attributes[7];
+                                                $session{cacheSize} += -s $dir.'cache';
                                         }
-                                } else {
-                                        $filesRemaining += $self->getNamespaceSize($expiresModifier,$path."/".$file);
                                 }
                         }
-                }
-                closedir(DIR);
-        }
-        return $filesRemaining;
+                }, $self->getNamespaceRoot);
+        return $session{cacheSize};
 }
 
 #-------------------------------------------------------------------

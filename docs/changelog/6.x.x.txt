@@ -34,6 +34,37 @@
    Assets that come with templates for the Dashboard:
      StockData, WeatherData, SearchBox, SyndicatedContent
 
+6.7.8
+ - fix [ 1364895 ] Error in ITransact Commerce Module
+ - fix [ 1365033 ] Commerce Templates not saving to settings
+ - fix [ 1358317 ] Upgrade from 6.6.0 to 6.7.x does not work
+ - fix [ 1339611 ] Sm Calendar: date links broke, unusable for >1 event per
+   day
+ - Fixed a problem with Random Asset Proxy
+ - Fixed a caching bug in the user system.
+ - Fixed a problem in the user system for negating macros on profile fields.
+ - Added a missing use statement in Storage
+ - Renamed the "Page" asset to "Page Layout" for clarity.
+ - fix [1329023] Doc for EventsCalendar
+ - fix [1336414] All default profile fields not protected
+ - fix [ 1343269 ] add Content Profiling field yesNo type i18n
+ - fix [ 1342623 ] -noDate flag in WebGUI::Form::Date not working
+ - fix [ 1345261 ] addFileFromFormPost always returns 1 file uploaded
+ - fix [ 1347584 ] Wobject "Product" copy fails
+ - fix [ 1340614 ] page: "what next?" both choices take you to new page
+ - fix [ 1350687 ] 6.7.7 editProfile doesn't work...
+ - fix [ 1350770 ] generateContent.pl fails
+ - fix [ 1352362 ] can't add version tag in Content Versioning
+ - fix [ 1352647 ] WebGUI::HTTP::setCookie does not accept 0 as time to live
+ - fix [ 1358547 ] Syntax Error in Default Edit Profile Template
+ - fix [ 1304479 ] CS Content Approval Request Email Link Issue
+ - fix [ 1358264 ] syncprofiletoldap bug
+ - fix [ 1324000 ] SyncProfilesToLDAP does not work
+ - Fixed a documentation error related to SQL Report placeholder parameters.
+ - fix [ 1328951 ] someone screwed up RandomAssetProxy.pm
+ - fix [ 1333572 ] testEnvironment - broken loop
+ - fix [ 1341004 ] ArchiveOldPosts isn't fully versioned
+
 
 6.7.7
  - added two new template variables to the EventsCalendar - 
