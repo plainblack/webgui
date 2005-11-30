@@ -20,7 +20,13 @@
  - fix [ 1352362 ] can't add version tag in Content Versioning
  - fix [ 1352647 ] WebGUI::HTTP::setCookie does not accept 0 as time to live
  - fix [ 1358547 ] Syntax Error in Default Edit Profile Template
+ - fix [ 1304479 ] CS Content Approval Request Email Link Issue
+ - fix [ 1358264 ] syncprofiletoldap bug
+ - fix [ 1324000 ] SyncProfilesToLDAP does not work
  - Fixed a documentation error related to SQL Report placeholder parameters.
+ - fix [ 1328951 ] someone screwed up RandomAssetProxy.pm
+ - fix [ 1333572 ] testEnvironment - broken loop
+ - fix [ 1341004 ] ArchiveOldPosts isn't fully versioned
 
 6.7.7
  - added two new template variables to the EventsCalendar - 
