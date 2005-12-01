@@ -170,7 +170,7 @@ sub getUserPref {
 	my $returnDataType = shift || 'string';
 	my $returnDataFormat = shift || 'raw';
 	my $sql = "select userValue from wgFieldUserData where assetId=".quote($fieldId)." and userId=".quote($userId);
-	#WebGUI::ErrorHandler::warn($sql);
+	WebGUI::ErrorHandler::warn($sql);
 	my ($userValue) = WebGUI::SQL->quickArray($sql);
 	unless ($userValue) {
 		return '' if $fieldId eq 'skipThisRequest';
@@ -199,9 +199,9 @@ sub setUserPref {
 	my $returnDataType = shift || 'string';
 	my $returnDataFormat = shift || 'raw';
 	my $sql = "delete from wgFieldUserData where assetId=".quote($fieldId)." and userId=".quote($userId);
-	#WebGUI::ErrorHandler::warn($sql);
 	WebGUI::SQL->write($sql);
 	my $sql2 = "insert into wgFieldUserData values (".quote($fieldId).",".quote($userId).",".quote($valueToSet).")";
+	WebGUI::ErrorHandler::warn($sql2);
 	return WebGUI::SQL->write($sql2);
 }
 

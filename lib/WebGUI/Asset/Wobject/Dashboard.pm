@@ -53,11 +53,11 @@ sub definition {
 		},
 		adminsGroupId =>{
 			fieldType=>"group",
-			defaultValue=>4
+			defaultValue=>'4'
 		},
 		usersGroupId =>{
 			fieldType=>"group",
-			defaultValue=>2
+			defaultValue=>'2'
 		},
 		mapFieldId =>{
 			fieldType=>"text",
@@ -96,13 +96,13 @@ sub getEditForm {
 		-name=>"adminsGroupId",
 		-label=>$i18n->get('dashboard adminsGroupId field label'),
 		-hoverHelp=>$i18n->get('dashboard adminsGroupId description'),
-		-value=>[$self->get("adminsGroupId")]
+		-value=>[$self->getValue("adminsGroupId")]
 	);
 	$tabform->getTab("security")->group(
 		-name=>"usersGroupId",
 		-label=>$i18n->get('dashboard usersGroupId field label'),
 		-hoverHelp=>$i18n->get('dashboard usersGroupId description'),
-		-value=>[$self->get("usersGroupId")]
+		-value=>[$self->getValue("usersGroupId")]
 	);
 	return $tabform;
 }
@@ -230,6 +230,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_setContentPositions {
 	my $self = shift;
+	return 'Visitors cannot save settings' if $session{user}{userId} == 1;
 	return WebGUI::Privilege::insufficient() unless ($self->canPersonalize);
 	return '' unless $self->get("mapFieldId");
 	my $success = WebGUI::Asset::Field->setUserPref($self->get("mapFieldId"),$session{form}{map});

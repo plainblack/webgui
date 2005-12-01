@@ -371,6 +371,7 @@ function dragable_postNewContentMap() {
       ,'method':'POST'
       ,'map':dragable_getContentMap()
       ,'func':'setContentPositions'
+ //     ,'onSuccess':function(req){ alert(req.responseText); }
     }
   );
 }

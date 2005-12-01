@@ -96,6 +96,7 @@ sub setupUserInfo {
 	my $u = WebGUI::User->new(shift);
 	%{$session{user}} = (%{$u->{_profile}}, %{$u->{_user}});
 	$session{req}->user($session{user}{username}) if $session{req};
+	$session{user}{userId} = $u->userId;
 	$session{user}{alias} = $session{user}{username} if ($session{user}{alias} =~ /^\W+$/ || $session{user}{alias} eq "");
 }
 

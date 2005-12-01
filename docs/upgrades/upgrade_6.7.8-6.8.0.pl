@@ -1513,8 +1513,9 @@ $rssFolder->addChild({
 sub addTimeZonesToUserPreferences {
 	print "\tDropping time offsets in favor of time zones.\n" unless ($quiet);
 	WebGUI::SQL->write("delete from userProfileData where fieldName='timeOffset'");
-	WebGUI::SQL->write("update userProfileField set dataValues='', fieldName='timeZone', dataType='timeZone', fieldLabel=".quote('WebGUI::International::get("timezone","DateTime");').",dataDefault=".quote("['America/Chicago']")." where fieldName='timeOffset'");
+	WebGUI::SQL->write("update userProfileField set dataValues='', fieldName='timeZone', dataType='timeZone', fieldLabel=".quote('WebGUI::International::get("timezone","DateTime");').",dataDefault='America/Chicago' where fieldName='timeOffset'");
 	WebGUI::SQL->write("insert into userProfileData values ('1','timeZone','America/Chicago')");
+	WebGUI::SQL->write("insert into userProfileData values ('3','timeZone','America/Chicago')");
 }
 
 sub removeUnneededFiles {

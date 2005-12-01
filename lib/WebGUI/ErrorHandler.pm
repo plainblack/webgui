@@ -15,7 +15,7 @@ package WebGUI::ErrorHandler;
 =cut
 
 use FileHandle;
-use Log::Log4perl;
+#use Log::Log4perl;
 use strict;
 use WebGUI::Session;
 use Log::Log4perl;
@@ -217,28 +217,28 @@ Returns a text message containing all of the session variables.
 
 sub getSessionVars {
 	my $data;
-       	while (my ($section, $hash) = each %WebGUI::Session::session) {
+	while (my ($section, $hash) = each %WebGUI::Session::session) {
 		if ($section eq "debug") {
 			next;
 		} elsif (ref $hash eq 'HASH') {
-                        while (my ($key, $value) = each %$hash) {
-                               if (ref $value eq 'ARRAY') {
-                                        $value = '['.join(', ',@$value).']';
-                                } elsif (ref $value eq 'HASH') {
-                                        $value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
-                                }
-                                unless (lc($key) eq "password" || lc($key) eq "identifier") {
-                                        $data .= "\t".$section.'.'.$key.' = '.$value."\n";
-                                }
-                        }
-                } elsif (ref $hash eq 'ARRAY') {
-                        my $i = 1;
-                        foreach (@$hash) {
-                                $data .= "\t".$section.'.'.$i.' = '.$_."\n";
-                                $i++;
-                        }
-                }
-       	}
+			while (my ($key, $value) = each %$hash) {
+				if (ref $value eq 'ARRAY') {
+					$value = '['.join(', ',@$value).']';
+				} elsif (ref $value eq 'HASH') {
+					$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
+				}
+				unless (lc($key) eq "password" || lc($key) eq "identifier") {
+					$data .= "\t".$section.'.'.$key.' = '.$value."\n";
+				}
+			}
+		} elsif (ref $hash eq 'ARRAY') {
+			my $i = 1;
+			foreach (@$hash) {
+				$data .= "\t".$section.'.'.$i.' = '.$_."\n";
+				$i++;
+			}
+		}
+	}
 	return $data;
 }
 
@@ -279,7 +279,7 @@ sub info {
 	my $message = shift;
 	my $logger = getLogger();
 	$logger->info($message);
-        $WebGUI::Session::session{debug}{'info'} .= $message."\n";
+	$WebGUI::Session::session{debug}{'info'} .= $message."\n";
 }
 
 
@@ -349,7 +349,7 @@ sub warn {
 	my $message = shift;
 	my $logger = getLogger();
 	$logger->warn($message);
-        $WebGUI::Session::session{debug}{'warn'} .= $message."\n";
+	$WebGUI::Session::session{debug}{'warn'} .= $message."\n";
 }
 
 

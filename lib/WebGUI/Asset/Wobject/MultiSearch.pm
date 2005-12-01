@@ -84,7 +84,7 @@ sub view {
 	my %var = $self->get();
 	#Set some template variables
 
-	#Build list of stocks as an array
+	#Build list of searches as an array
 	my $defaults = $self->getValue("predefinedSearches");
 
 	return $self->processTemplate(\%var, $self->get("templateId"));
