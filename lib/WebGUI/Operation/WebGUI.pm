@@ -96,7 +96,6 @@ sub www_setup {
 		WebGUI::Setting::set('companyEmail',WebGUI::FormProcessor::email("companyEmail"));
 		WebGUI::HTTP::setRedirect(WebGUI::URL::gateway());
 		return "";
-		#$output .= '<a href="'.WebGUI::URL::gateway().'">Configuration complete. Click here to go to your new site.</a>';
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
 		my $u = WebGUI::User->new('3');
