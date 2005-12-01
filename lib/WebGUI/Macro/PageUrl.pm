@@ -16,7 +16,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub process {
-	return $session{wguri};
+	return WebGUI::URL::page();
 }
 
 

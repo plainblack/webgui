@@ -97,7 +97,7 @@ The string to escape.
 =cut
 
 sub escape {
-	return uri_escape($_[0]);
+	return uri_escape(shift);
 }
 
 
@@ -105,11 +105,11 @@ sub escape {
 
 =head2 gateway ( pageURL [ , pairs ] )
 
-Generate a URL based on WebGUI's gateway script.
+Generate a URL based on WebGUI's location directive.
 
 =head3 pageURL
 
-The urlized title of a page that you wish to create a URL for.
+The url of an asset that you wish to create a fully qualified URL for.
 
 =head3 pairs
 
@@ -120,13 +120,17 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
-	$_[0] =~ s/^\///;
-        my $url = '/'.$_[0];
+	my $pageUrl = shift;
+	my $pairs = shift;
+	$pageUrl =~ s/^\///;
+        my $url = $session{config}{gateway};
+	$url .= '/' unless ($url =~ m/\/$/);
+	$url .= $pageUrl;
         if ($session{setting}{preventProxyCache} == 1) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
-	if ($_[1]) {
-		$url = append($url,$_[1]);
+	if ($pairs) {
+		$url = append($url,$pairs);
 	}
         return $url;
 }
@@ -169,8 +173,7 @@ sub setSiteURL {
 
 =head2 getSiteURL ( )
 
-Returns a constructed site url. The returned
-value can be overridden using the setSiteURL function.
+Returns a constructed site url. The returned value can be overridden using the setSiteURL function.
 
 =cut
 
@@ -222,7 +225,7 @@ Returns the URL of the current page.
 =head3 pairs
 
 Name value pairs to add to the URL in the form of:
-
+gateway()
  name1=value1;name2=value2;name3=value3
 
 =head3 useSiteUrl
@@ -243,15 +246,12 @@ sub page {
         if ($useFullUrl) {
                 $url = getSiteURL();
         }
-        $url .= '/';
-	my $pathinfo;
+	$url .= gateway();
         if ($session{asset}) {
-                $pathinfo = $session{asset}->get("url");
+                $url .= $session{asset}->get("url");
         } else {
-                $pathinfo = $session{wguri};
-                $pathinfo =~ s/^\/(.*)/$1/;
+                $url .= $session{requestedUrl};
         }
-        $url .= $pathinfo;
         if ($session{setting}{preventProxyCache} == 1 && !$skipPreventProxyCache) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
@@ -276,7 +276,7 @@ The string to unescape.
 =cut
 
 sub unescape {
-	return uri_unescape($_[0]);
+	return uri_unescape(shift);
 }
 
 #-------------------------------------------------------------------
@@ -293,7 +293,7 @@ Returns a url that is safe for WebGUI pages.
 
 sub urlize {
 	my ($value);
-        $value = lc($_[0]);		#lower cases whole string
+        $value = lc(shift);		#lower cases whole string
 	$value = makeCompliant($value);
 	$value =~ s/\/$//;
         return $value;

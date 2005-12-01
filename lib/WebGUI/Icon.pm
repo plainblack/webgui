@@ -101,7 +101,7 @@ The URL to any page. Defaults to the current page.
 
 sub copyIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'copy.gif" align="middle" border="0" alt="'.WebGUI::International::get('Copy','Icon').'" title="'.WebGUI::International::get('Copy','Icon').'" /></a>';
         return $output;
@@ -125,7 +125,7 @@ The URL to any page. Defaults to the current page.
 
 sub cutIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'cut.gif" align="middle" border="0" alt="'.WebGUI::International::get('Cut','Icon').'" title="'.WebGUI::International::get('Cut','Icon').'" /></a>';
         return $output;
@@ -158,7 +158,7 @@ sub deleteIcon {
 		$confirmText = qq| onclick="return confirm('$confirmText')" |;
 	}
 	
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
 	
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'" '.$confirmText.'>';
 	$output .= '<img src="'._getBaseURL().'delete.gif" align="middle" border="0" alt="'.WebGUI::International::get('Delete','Icon').'" title="'.WebGUI::International::get('Delete','Icon').'" /></a>';
@@ -195,7 +195,7 @@ The URL to any page. Defaults to the current page.
 
 sub editIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'edit.gif" align="middle" border="0" alt="'.WebGUI::International::get('Edit','Icon').'" title="'.WebGUI::International::get('Edit','Icon').'" /></a>';
         return $output;
@@ -219,7 +219,7 @@ The URL to any page. Defaults to the current page.
 
 sub exportIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
 	# TODO Change icon to Jeffs export icon
         $output .= '<img src="'._getBaseURL().'export.gif" align="middle" border="0" alt="'.WebGUI::International::get('Export','Icon').'" title="'.WebGUI::International::get('Export','Icon').'" /></a>';
@@ -292,7 +292,7 @@ The URL to any page. Defaults to the current page.
 
 sub lockedIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'locked.gif" align="middle" border="0" alt="'.WebGUI::International::get('locked','Icon').'" title="'.WebGUI::International::get('locked','Icon').'" /></a>';
         return $output;
@@ -316,7 +316,7 @@ The URL to any page. Defaults to the current page.
 
 sub manageIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'manage.gif" align="middle" border="0" alt="'.WebGUI::International::get('Manage','Icon').'" title="'.WebGUI::International::get('Manage','Icon').'" /></a>';
         return $output;
@@ -340,7 +340,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveBottomIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveBottom.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move To Bottom','Icon').'" title="'.WebGUI::International::get('Move To Bottom','Icon').'" /></a>';
         return $output;
@@ -364,7 +364,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveDownIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveDown.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Down','Icon').'" title="'.WebGUI::International::get('Move Down','Icon').'" /></a>';
         return $output;
@@ -388,7 +388,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveLeftIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveLeft.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Left','Icon').'" title="'.WebGUI::International::get('Move Left','Icon').'" /></a>';
         return $output;
@@ -412,7 +412,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveRightIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveRight.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Right','Icon').'" title="'.WebGUI::International::get('Move Right','Icon').'" /></a>';
         return $output;
@@ -436,7 +436,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveTopIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveTop.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move To Top','Icon').'" title="'.WebGUI::International::get('Move To Top','Icon').'" /></a>';
         return $output;
@@ -460,7 +460,7 @@ The URL to any page. Defaults to the current page.
 
 sub moveUpIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'moveUp.gif" align="middle" border="0" alt="'.WebGUI::International::get('Move Up','Icon').'" title="'.WebGUI::International::get('Move Up','Icon').'" /></a>';
         return $output;
@@ -496,7 +496,7 @@ The URL to any page. Defaults to the current page.
 
 sub pasteIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'paste.gif" align="middle" border="0" alt="'.WebGUI::International::get('Paste','Icon').'" title="'.WebGUI::International::get('Paste','Icon').'" /></a>';
         return $output;
@@ -520,7 +520,7 @@ The URL to any page. Defaults to the current page.
 
 sub shortcutIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'shortcut.gif" align="middle" border="0" alt="'.WebGUI::International::get('Create Shortcut','Icon').'" title="'.WebGUI::International::get('Create Shortcut','Icon').'" /></a>';
         return $output;
@@ -544,7 +544,7 @@ The URL to any page. Defaults to the current page.
 
 sub viewIcon {
         my ($output, $pageURL);
-        $pageURL = $_[1] || $session{wguri};
+        $pageURL = $_[1] || $session{requestedUrl};
         $output = '<a href="'.WebGUI::URL::gateway($pageURL,$_[0]).'">';
         $output .= '<img src="'._getBaseURL().'view.gif" align="middle" border="0" alt="'.WebGUI::International::get('View','Icon').'" title="'.WebGUI::International::get('View','Icon').'" /></a>';
         return $output;

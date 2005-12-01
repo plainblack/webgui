@@ -383,7 +383,7 @@ sub displayLogin {
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
 	unless ($session{form}{op} eq "auth") {
-	   	WebGUI::Session::setScratch("redirectAfterLogin",WebGUI::URL::gateway($session{wguri},$session{env}{QUERY_STRING}));
+	   	WebGUI::Session::setScratch("redirectAfterLogin",WebGUI::URL::page($session{env}{QUERY_STRING}));
 	}
 	$vars->{title} = WebGUI::International::get(66);
 	my $action;

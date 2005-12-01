@@ -759,9 +759,11 @@ sub updateConfigFile {
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::Matrix") unless isIn("WebGUI::Asset::Wobject::Matrix",@{$newConfig{assets}});
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::InOutBoard") unless isIn("WebGUI::Asset::Wobject::InOutBoard",@{$newConfig{assets}});
 	push(@{$newConfig{assets}}, "WebGUI::Asset::File::ZipArchive") unless isIn("WebGUI::Asset::File::ZipArchive",@{$newConfig{assets}});
+	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::Dashboard") unless isIn("WebGUI::Asset::Wobject::Dashboard",@{$newConfig{assets}});
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::StockData") unless isIn("WebGUI::Asset::Wobject::StockData",@{$newConfig{assets}});
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::WeatherData") unless isIn("WebGUI::Asset::Wobject::WeatherData",@{$newConfig{assets}});
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::MultiSearch") unless isIn("WebGUI::Asset::Wobject::MultiSearch",@{$newConfig{assets}});
+	$newConfig{location} = "/";
 	$conf->purge;
 	$conf->set(%newConfig);
 	$conf->write;

@@ -38,6 +38,7 @@ use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
 use Apache2::ServerUtil ();
 
+
 #-------------------------------------------------------------------
 sub handler {
 	my $r = shift;
@@ -54,6 +55,9 @@ sub handler {
 		$r->handler('perl-script');
 		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
 	} else {
+		$session{requestedUrl} = $session{wguri};
+		my $gateway = $session{config}{gateway};
+		$session{requestedUrl} =~ s/^$gateway(.*)$/$1/;
 		$r->handler('perl-script');
 		$r->set_handlers(PerlResponseHandler => \&contentHandler);
 		$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
@@ -137,7 +141,7 @@ sub page {
 	if ($output eq "") {
 		my $asset = eval{WebGUI::Asset->newByUrl($assetUrl,$session{form}{revision})};
 		if ($@) {
-			WebGUI::ErrorHandler::warn("Couldn't instantiate asset for url: ".$session{wguri}." Root cause: ".$@);
+			WebGUI::ErrorHandler::warn("Couldn't instantiate asset for url: ".$session{requestedUrl}." Root cause: ".$@);
 		}
 		if (defined $asset) {
 			my $method = "view";
@@ -205,7 +209,7 @@ sub tryAssetMethod {
 	my $methodToTry = "www_".$method;
 	my $output = eval{$asset->$methodToTry()};
 	if ($@) {
-		WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for url: ".$session{wguri}." Root cause: ".$@);
+		WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for url: ".$session{requestedUrl}." Root cause: ".$@);
 		$output = tryAssetMethod($asset,'view') if ($method ne "view");
 	}
 	return $output;

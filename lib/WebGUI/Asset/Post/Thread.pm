@@ -666,8 +666,7 @@ sub view {
 	} else {
 		$sql .= "asset.lineage";
 	}
-	my $currentPageUrl = $session{wguri};
-	$currentPageUrl =~ s/^\///;
+	my $currentPageUrl = $session{requestedUrl};
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		next unless ($dataSet->{className} eq "WebGUI::Asset::Post" || $dataSet->{className} eq "WebGUI::Asset::Post::Thread"); #handle non posts!
