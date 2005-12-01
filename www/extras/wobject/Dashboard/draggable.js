@@ -365,14 +365,14 @@ function dragable_dragStop(e) {
 }
 
 function dragable_postNewContentMap() {
-//		AjaxRequest.get(
- //   {
-//      'url':pageURL
-//      ,'method':'POST'
-//      ,'map':dragable_getContentMap()
-//      ,'func':'setContentPositions'
-//    }
-//  );
+		AjaxRequest.get(
+    {
+      'url':pageURL
+      ,'method':'POST'
+      ,'map':dragable_getContentMap()
+      ,'func':'setContentPositions'
+    }
+  );
 }
 
 //gets the element children of a dom object
