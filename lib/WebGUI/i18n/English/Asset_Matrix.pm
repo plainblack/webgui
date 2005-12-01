@@ -483,6 +483,25 @@ our $I18N = {
 		<b>best.updated.name</b><br />
 		The name of the listing that was most recently updated.
 		</p>
+		
+		<p>
+		<b>last_update_loop</b><br />
+		A loop containing the 20 most recently updated listings.
+		<blockquote>
+			<p>
+			<b>url</b><br />
+			The URL to view this listing.
+			</p>
+			<p>
+			<b>name</b><br />
+			The name of the product.
+			</p>
+			<p>
+			<b>lastUpdated</b><br />
+			The date this listing was updated.
+			</p>
+		</blockquote>
+		</p>
 
 		<p>
 		<b>user.count</b><br />

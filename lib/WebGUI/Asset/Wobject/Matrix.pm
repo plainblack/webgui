@@ -906,6 +906,16 @@ sub view {
 	$var{'ratings.details.url'} = $self->getUrl("func=viewRatingDetails");
 	my $data = WebGUI::SQL->quickHashRef("select lastUpdated, productName, listingId from Matrix_listing 
 		where assetId=".quote($self->getId)." and status='approved'  order by lastUpdated desc limit 1");
+	my @lastUpdated;
+        my $sth = WebGUI::SQL->read("select listingId,lastUpdated,productName from Matrix_listing order by lastUpdated desc limit 20");
+        while (my ($listingId, $lastUpdated, $productName) = $sth->array) {
+                push(@lastUpdated, {
+                        url => $self->formatURL("viewDetail",$listingId),
+                        name=>$productName,
+                        lastUpdated=>WebGUI::DateTime::epochToHuman($lastUpdated,"%z")
+                        });
+        }
+        $var{'last_updated_loop'} = \@lastUpdated;
 	$var{'best.updated.url'} = $self->formatURL("viewDetail",$data->{listingId});
 	$var{'best.updated.date'} = WebGUI::DateTime::epochToHuman($data->{lastUpdated},"%z");; 
 	$var{'best.updated.name'} = $data->{productName}; 
