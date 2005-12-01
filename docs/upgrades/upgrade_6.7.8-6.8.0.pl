@@ -205,23 +205,32 @@ $template = <<STOP;
 <style type="text/css"> \@import "^Extras;wobject/Dashboard/draggable.css"; </style>
 <style type="text/css"> \@import "^Extras;wobject/Dashboard/dashboard.css"; </style>
 <script src="^Extras;wobject/Dashboard/draggable.js" type="text/javascript"></script>
+<!--[if IE]>
+<style type="text/css">
+div.dragTitle
+{
+	overflow-x:hidden;
+}
+</style>
+<![endif]-->
+
 <div id="dashboardContainer">
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>">
 </a>
 <table id="dashboardChooserContainer" width="100%" border="0">
 <tr>
-<td>
+<td id="leftBox">
 <div style="display:none;cursor: hand;" id="hideNewContentButton" onclick="makeInactive(this);makeInactive(document.getElementById('availableBox'));makeActive(document.getElementById('showNewContentButton'));">Hide New Content List</div>
 <div id="availableBox"><div id="availableBox2">
 <div id="availableDashlets">
 <table cellpadding="0" cellspacing="0" border="0" id="position1" class="dashboardColumn">
 <tbody class="availableDashlet">
-<tmpl_loop position1_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
-<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
+<tmpl_loop position1_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle" id="hdrtd<tmpl_var id>_span"><tmpl_var dashletTitle></span></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><tmpl_if canEditUserPrefs><a onclick="dashboard_toggleEditForm(event,'<tmpl_var id>','<tmpl_var shortcutUrl>')"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a></tmpl_if><a onclick="dragable_deleteContent(event,this<tmpl_if canPersonalize>,'true'</tmpl_if>);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content" id="ct<tmpl_var id>_div"><tmpl_var content></div></div></td></tr></tmpl_loop>
 </tbody></table>
 </div></div></div>
 </td>
-<td>
+<td id="rightBox">
 <table cellpadding="0" cellspacing="0" border="0" width="100%">
 <tr><td style="width:80px;">			<div id="showNewContentButton"  onclick="makeInactive(this);makeActive(document.getElementById('availableBox'));makeActive(document.getElementById('hideNewContentButton'));">Add New Content</div></td><td>
 <tmpl_if showAdmin>
@@ -244,9 +253,9 @@ $template = <<STOP;
 </p>
 </tmpl_if>
 </td><td valign="top" class="login">^L("17","","PBtmpl0000000000000092"); ^AdminToggle(Modify the Default User's Perspective,Leave Default User Perspective (Admin Mode));</td></tr></table>
-<script language="javascript" src="^Extras;js/at/AjaxRequest.js"></script>
-<script language="javascript">
-function submitForm(theform,idToReplace) {
+<script type="text/javascript" src="^Extras;js/at/AjaxRequest.js"></script>
+<script type="text/javascript">
+function submitForm(theform,idToReplace,shortcutUrl) {
 
 var status = AjaxRequest.submit(
 theform
@@ -254,8 +263,22 @@ theform
 'parameters':{
 },
 'onSuccess':function(req){
-var myArray = req.responseText.split(/div/mg,1);
-document.getElementById(idToReplace).innerHTML = myArray[0];
+var myArray = req.responseText.split(/beginDebug/mg,1);
+document.getElementById("ct" + idToReplace + "_div").innerHTML = myArray[0];
+var existingForm = document.getElementById("form" + idToReplace + "_div");
+throwAway = existingForm.parentNode.removeChild(existingForm);
+var hoopla = AjaxRequest.get(
+		{
+			'url':shortcutUrl
+			,'parameters':{
+				'func':"getNewTitle"
+			}
+			,'onSuccess':function(req){
+				var myArr557 = req.responseText.split(/beginDebug/mg,1);
+				document.getElementById("hdrtd" + idToReplace + "_span").innerHTML = myArr557[0];
+			}
+		}
+	);
 	}
 	}
 );
@@ -272,27 +295,27 @@ function AjaxRequestEnd() {  }
 <td width="33%">
 <table cellpadding="0" cellspacing="0" border="0" id="position2" class="dashboardColumn" width="100%">
 <tbody>
-<tmpl_loop position2_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
-<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
+<tmpl_loop position2_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle" id="hdrtd<tmpl_var id>_span"><tmpl_var dashletTitle></span></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><tmpl_if canEditUserPrefs><a onclick="dashboard_toggleEditForm(event,'<tmpl_var id>','<tmpl_var shortcutUrl>')"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a></tmpl_if><a onclick="dragable_deleteContent(event,this<tmpl_if canPersonalize>,'true'</tmpl_if>);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content" id="ct<tmpl_var id>_div"><tmpl_var content></div></div></td></tr></tmpl_loop>
 </tbody>
 </table>
 </td>
-<td width="2px" bgcolor="gray">
+<td width="2px" bgcolor="gray" height="500px">
 </td>
 <td width="33%">
 <table cellpadding="0" cellspacing="0" border="0" id="position3" class="dashboardColumn" width="100%">
 <tbody>
-<tmpl_loop position3_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
-<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
+<tmpl_loop position3_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><span class="headerTitle" id="hdrtd<tmpl_var id>_span"><tmpl_var dashletTitle></span></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><tmpl_if canEditUserPrefs><a onclick="dashboard_toggleEditForm(event,'<tmpl_var id>','<tmpl_var shortcutUrl>')"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a></tmpl_if><a onclick="dragable_deleteContent(event,this<tmpl_if canPersonalize>,'true'</tmpl_if>);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content" id="ct<tmpl_var id>_div"><tmpl_var content></div></div></td></tr></tmpl_loop>
 </tbody>
 </table>
 </td>
-<td width="2px" bgcolor="gray"></td>
+<td width="2px" bgcolor="gray" height="500px"></td>
 <td width="33%">
 <table cellpadding="0" cellspacing="0" border="0" id="position4" class="dashboardColumn" width="100%">
 <tbody>
-<tmpl_loop position4_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
-<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
+<tmpl_loop position4_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><span class="headerTitle" id="hdrtd<tmpl_var id>_span"><tmpl_var dashletTitle></span></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><tmpl_if canEditUserPrefs><a onclick="dashboard_toggleEditForm(event,'<tmpl_var id>','<tmpl_var shortcutUrl>')"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a></tmpl_if><a onclick="dragable_deleteContent(event,this<tmpl_if canPersonalize>,'true'</tmpl_if>);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content" id="ct<tmpl_var id>_div"><tmpl_var content></div></div></td></tr></tmpl_loop>
 </tbody>
 </table>
 </td>
@@ -302,6 +325,7 @@ function AjaxRequestEnd() {  }
 <table class="blankTable"><tr id="blank" class="hidden"><td class="blankColumn"><div><div class="empty">&nbsp;</div></div></td></tr></table>
 <tmpl_var dragger.init>
 </td></tr></table></div>
+
 STOP
 $newAsset = $folder->addChild({
 	title=>"Dashboard Default View",
@@ -327,7 +351,7 @@ $template = <<STOP;
     <tmpl_var description><p />
 </tmpl_if>
 
-<tmpl_loop locations.loop>
+<tmpl_loop ourLocations.loop>
 <table border="0" width="100%">
 <tr>
 	<td rowspan="3" width="55"><img src="<tmpl_var iconUrl>" /></td>

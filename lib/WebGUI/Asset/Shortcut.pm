@@ -375,8 +375,8 @@ sub getFieldsList {
 		$output .= '<tr>';
 		$output .= '<td class="tableData"><a href="'.$field->getUrl('func=edit').'">'.$field->get("fieldName").'</a></td>';
 		$output .= '<td class="tableData">';
-		$output .= WebGUI::Icon::editIcon($field->getUrl('func=edit'));
-		$output .= WebGUI::Icon::deleteIcon($field->getUrl('func=delete'));
+		$output .= editIcon('func=edit',$field->getUrl());
+		$output .= deleteIcon('func=delete',$field->getUrl());
 		$output .= '</td>';
 		$output .= '</tr>';
 	}
@@ -607,9 +607,9 @@ sub www_edit {
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self = shift;
-	return '' unless $self->getParent->canPersonalize;
+	return 'nuhuh' unless $self->getParent->canPersonalize;
 	my @fielden = $self->getUserPrefs;
-	my $f = WebGUI::HTMLForm->new(extras=>' onSubmit="submitForm(this,\''.'form_'.$self->getId.'\');return false;"');
+	my $f = WebGUI::HTMLForm->new(extras=>' onSubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
 	$f->hidden(  
 		-name => 'func', 
 		-value => 'saveUserPrefs'
@@ -653,9 +653,18 @@ sub www_saveUserPrefs {
 	foreach my $fieldId (keys %{$session{form}}) {
 		my $field = WebGUI::Asset->newByDynamicClass($fieldId);
 		next unless $field;
-		return 0 unless $field->setUserPref($fieldId,$session{form}{$fieldId});
+		$field->setUserPref($fieldId,$session{form}{$fieldId});
 	}
-	return 1;
+	return $self->view;
+}
+
+#-------------------------------------------------------------------
+sub www_getNewTitle {
+	my $self = shift;
+	return '' unless $self->getParent->canPersonalize;
+	my $foo = $self->getShortcut;
+	my $title = $foo->{_properties}{title};
+	return $title;
 }
 
 #-------------------------------------------------------------------

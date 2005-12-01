@@ -607,9 +607,10 @@ The database handler. Defaults to the WebGUI database handler.
 =cut
 
 sub quote {
-        my $value = shift; 
+	my $value = shift; 
+	return "''" unless $value;
 	my $dbh = shift || _getDefaultDb();
-        return $dbh->quote($value);
+	return $dbh->quote($value);
 }
 
 #-------------------------------------------------------------------

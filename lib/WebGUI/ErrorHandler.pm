@@ -315,7 +315,7 @@ Creates an HTML formatted string
 sub showDebug {
 	my $text = $WebGUI::Session::session{debug}{'error'};
 	$text =~  s/\n/\<br \/\>\n/g;
-	my $output = '<div style="background-color: #800000;color: #ffffff;">'.$text."</div>\n";
+	my $output = 'beginDebug<br /><div style="background-color: #800000;color: #ffffff;">'.$text."</div>\n";
 	$text = $WebGUI::Session::session{debug}{'warn'};
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="background-color: #ffdddd;color: #000000;">'.$text."</div>\n";

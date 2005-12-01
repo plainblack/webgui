@@ -124,7 +124,7 @@ function dragable_init(url) {
     //window.scroll(10,500);
     //set up event handlers
     document.onmouseup=dragable_dragStop;
-    document.onkeydown=dragable_checkKeyEvent;
+ //   document.onkeydown=dragable_checkKeyEvent;
     document.onmousemove=dragable_move;
     
     //fill the draggableObject list
@@ -216,7 +216,8 @@ function dragable_dragStart(e){
 
     //set the start td        
     startTD=document.getElementById(fObj.id.substr(0,fObj.id.indexOf("_div")));
-
+  //  alert("hdr" + fObj.id.substr(0,fObj.id.indexOf("_div")) + "_span");
+    document.getElementById("hdr" + fObj.id.substr(0,fObj.id.indexOf("_div")) + "_span").style.overflowX="visible";
     fObj.className="dragging";        
   //  fObj.style.opacity = '0.6';
   //  fObj.style.filter = 'alpha(opacity=' + 60 + ')';
@@ -403,13 +404,13 @@ function dragable_appendBlankRow(parent) {
 
 
 // deletes a dashlet (moves it from its current location to the bottom of position 1)
-function dragable_deleteContent(e,from) {
+function dragable_deleteContent(e,from,postNewContentMap) {
 	from = dragable_getObjectByClass(from,"dragable");
 	from = document.getElementById(from.id.substr(0,from.id.indexOf("_div")));
 	dragable_moveContent(from,document.getElementById('position1').rows[document.getElementById('position1').rows.length - 1],"bottom");
 //	e.preventDefault();
 //	e.stopPropagation();
-	dragable_postNewContentMap();
+	 if (postNewContentMap) {dragable_postNewContentMap();} // This will help avoid meaningless web server hits.
 }
 
 //moves a table row from one table to another. from and to are table row objects
@@ -478,3 +479,30 @@ function dragable_getContentMap() {
     return contentMap;
 }
 
+function dashboard_toggleEditForm(event,shortcutId,shortcutUrl) {
+	//discover if form is there.
+	var existingForm = document.getElementById("form" + shortcutId + "_div");
+	if (existingForm) {
+		var throwAway = existingForm.parentNode.removeChild(existingForm);
+		return;
+	}
+	// Create the new form element.
+	formDiv = document.createElement("div");
+	formDiv.id = "form" + shortcutId + "_div";
+	formDiv.className = "userPrefsForm";
+	parentDiv = document.getElementById("td" + shortcutId + "_div");
+	contentDiv = document.getElementById("ct" + shortcutId + "_div");
+	parentDiv.insertBefore(formDiv,contentDiv);
+	var hooha = AjaxRequest.get(
+		{
+			'url':shortcutUrl
+			,'parameters':{
+				'func':"getUserPrefsForm"
+			}
+			,'onSuccess':function(req){
+				var myArr558 = req.responseText.split(/beginDebug/mg,1);
+				formDiv.innerHTML = myArr558[0];
+			}
+		}
+	);
+}

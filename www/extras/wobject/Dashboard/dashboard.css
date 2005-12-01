@@ -11,6 +11,9 @@ table.dashboardColumn
 	background: none;
 	background-color:transparent;
 }
+.dashboardColumn td {
+	width:100%;
+}
 
 #dashboardContainer 
 {
@@ -23,6 +26,7 @@ table.dashboardColumn
 	margin:0px;
 	padding:0px;
 	border:0px;
+	width:100%;
 }
 
 #position1 {
@@ -43,13 +47,11 @@ tbody.availableDashlet * div.content {
 #availableDashlets * td {
 	width:200px;
 	max-width:200px;
-	width:expression("200px");
 }
 
 #availableDashlets * div.content {
 	width:200px;
 	max-width:200px;
-	width:expression("200px");
 	height:30px;
 	display:none;
 	overflow-x:hidden;
@@ -96,13 +98,12 @@ div.weatherTitle
 
 div.content
 {
-	
+	overflow-x:hidden;
 	border-bottom:solid orange 1px;
 	border-top:solid orange 1px;
 	border-left:solid orange 1px;
 	border-right:solid orange 1px;	
 	margin-bottom:10px;
-	width:auto;	
 	padding:5px;
 	padding-top:10px;
 	background: #fff url('content_bg.gif') no-repeat top right;	
@@ -142,6 +143,7 @@ div.dragTitle
 
 span.headerTitle
 {
+	overflow-x:visible;
 	display:block;
 	float:left;
 	z-index:999;
@@ -196,29 +198,38 @@ div#availableDashlets * div.dragTrigger {
 }
 #availableBox {
 	display:none;
+/*	width:200px;
+	max-width:200px;
+	width:expression("200px");*/
 }
 #availableBox2 {
 	padding-top:40px;
 	border:solid navy 2px;
 	height: 600px;
-	width:200px;
+/*	width:200px;
 	max-width:200px;
-	width:expression("200px");
+	width:expression("200px");*/
 }
 
 #availableDashlets {
-	width:200px;
+/*	width:200px;
 	max-width:200px;
-	width:expression("200px");
+	width:expression("200px");*/
 }
 
 .availableDashlet 
 {
-	width:200px;
+/*	width:200px;
 	max-width:200px;
-	width:expression("200px");
+	width:expression("200px");*/
 }
 
 #availableDashlets tbody {
 	height: 0px;
+}
+#leftBox {
+	width:210px;
+}
+#rightBox {
+	width:100%;
 }

@@ -52,13 +52,13 @@ sub handler {
 	}
 	my $uploads = $session{config}{uploadsURL};
 	if ($session{wguri} =~ m/^$uploads/) {
-		$r->handler('perl-script');
+#		$r->handler('perl-script');
 		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
 	} else {
 		$session{requestedUrl} = $session{wguri};
 		my $gateway = $session{config}{gateway};
 		$session{requestedUrl} =~ s/^$gateway(.*)$/$1/;
-		$r->handler('perl-script');
+#		$r->handler('perl-script');
 		$r->set_handlers(PerlResponseHandler => \&contentHandler);
 		$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	}
@@ -153,6 +153,7 @@ sub page {
 				}
 			}
 			$output = tryAssetMethod($asset,$method);
+			$output = tryAssetMethod($asset,"view") unless ($method eq "view" || $output);
 		}
 	}
 	if ($output eq "") {

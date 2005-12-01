@@ -179,18 +179,24 @@ sub view {
 						my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
 						my $view = $child->view;
 						$view .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
-						$child->{_properties}{title} = $child->getShortcut->get("title") if ref $child eq 'WebGUI::Asset::Shortcut';
+						$child->{_properties}{title} = $child->getShortcut->get("title") if (ref $child eq 'WebGUI::Asset::Shortcut');
 						if ($i > $numPositions) {
 							push(@{$vars{"position1_loop"}},{
 								id=>$child->getId,
 								content=>$view,
-								dashletTitle=>$child->get("title")
+								dashletTitle=>$child->get("title"),
+								shortcutUrl=>$child->getUrl,
+								canPersonalize=>$self->canPersonalize,
+								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
 							});
 						} else {
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
 								content=>$view,
-								dashletTitle=>$child->get("title")
+								dashletTitle=>$child->get("title"),
+								shortcutUrl=>$child->getUrl,
+								canPersonalize=>$self->canPersonalize,
+								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
 							});
 						}
 					}
@@ -207,10 +213,14 @@ sub view {
 				my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
 				my $view = $child->view;
 				$view .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
+				$child->{_properties}{title} = $child->getShortcut->get("title") if (ref $child eq 'WebGUI::Asset::Shortcut');
 				push(@{$vars{"position1_loop"}},{
 					id=>$child->getId,
 					content=>$view,
-					dashletTitle=>$child->get("title")
+					dashletTitle=>$child->get("title"),
+					shortcutUrl=>$child->getUrl,
+					canPersonalize=>$self->canPersonalize,
+					canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
 				});
 			}
 		}
@@ -230,9 +240,9 @@ sub view {
 #-------------------------------------------------------------------
 sub www_setContentPositions {
 	my $self = shift;
-	return 'Visitors cannot save settings' if $session{user}{userId} == 1;
+	return 'Visitors cannot save settings' if($session{user}{userId} eq '1');
 	return WebGUI::Privilege::insufficient() unless ($self->canPersonalize);
-	return '' unless $self->get("mapFieldId");
+	return 'empty' unless $self->get("mapFieldId");
 	my $success = WebGUI::Asset::Field->setUserPref($self->get("mapFieldId"),$session{form}{map});
 	return "Map set: ".$session{form}{map} if $success;
 	return "Map failed to set.";

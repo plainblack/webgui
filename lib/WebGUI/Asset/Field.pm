@@ -74,7 +74,7 @@ sub definition {
 		#	overrideForm=>{fieldType=>'yesNo',defaultValue=>0},
 		#	overrideValue=>{fieldType=>'yesNo',defaultValue=>0},
 			possibleValues=>{fieldType=>'textarea',defaultValue=>'',label=>'Possible values for this Field.  Only applies to selectList and checkList.'},
-			defaultValue=>{fieldType=>'text',defaultValue=>'',label=>'Default Value for this field.'}
+			defaultValue=>{fieldType=>'textarea',defaultValue=>'',label=>'Default Value for this field.'}
 		);
 
 	push(@{$definition}, {
@@ -170,13 +170,19 @@ sub getUserPref {
 	my $returnDataType = shift || 'string';
 	my $returnDataFormat = shift || 'raw';
 	my $sql = "select userValue from wgFieldUserData where assetId=".quote($fieldId)." and userId=".quote($userId);
-	WebGUI::ErrorHandler::warn($sql);
+#	WebGUI::ErrorHandler::warn($sql);
 	my ($userValue) = WebGUI::SQL->quickArray($sql);
 	unless ($userValue) {
 		return '' if $fieldId eq 'skipThisRequest';
 		$field = WebGUI::Asset->newByDynamicClass($fieldId) unless $field;
 		return '' unless $field;
-		$userValue = $field->get("defaultValue");
+		if ($userId eq '1') {
+			$userValue = $field->get("defaultValue");
+			# fall back to wobject defaults if this is blank.
+			$userValue = WebGUI::Asset->newByDynamicClass($field->getParent->get("shortcutToAssetId"))->get($field->get("fieldName")) if (ref $field->getParent eq 'WebGUI::Asset::Shortcut' && !($userValue) && !($field->get("isUserPref")));
+		} else {
+			$userValue = WebGUI::Asset::Field->getUserPref($fieldId,1);
+		}
 	}
 	if ($returnDataType eq 'string' && $returnDataFormat eq 'raw') {
 		return $userValue;
