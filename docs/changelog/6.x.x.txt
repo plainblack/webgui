@@ -4,6 +4,7 @@
    about 13 times faster than Date::Manip. Depending upon how date intensive
    your pages are, you will see a 2% to 100% performance increase from this
    change.
+ - Added RandomThread macro thanks to Wouter Vijvers.
  - Switched from Apache::Registry/CGI to a pure mod_perl2 interface, which
    increased performance by over 70% to the entire system, and in some cases
    as much as 100%. See gotcha.txt for details.

@@ -224,6 +224,7 @@ macros=# => Hash_userId, \
         PageTitle => PageTitle, \
         PageUrl => PageUrl, \
         RandomAssetProxy => RandomAssetProxy, \
+	RandomThread => RandomThread, \
         RawHeadTags => RawHeadTags, \
         RootTitle => RootTitle, \
         Spacer => Spacer, \
