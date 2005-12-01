@@ -18,6 +18,7 @@ use WebGUI::HTTP;
 use WebGUI::Session;
 use WebGUI::Setting;
 use WebGUI::Style;
+use WebGUI::URL;
 use WebGUI::User;
 
 #-------------------------------------------------------------------
@@ -40,19 +41,17 @@ sub www_genesis {
 
 #-------------------------------------------------------------------
 sub www_setup {
+	return "" unless ($session{setting}{specialState} eq "init");
 	my $i18n = WebGUI::International->new("WebGUI");
-	unless ($session{setting}{specialState} eq "init") {
-		if (rand(10)>5) {
-			return www_genesis();
-		} else {
-			return www_theWg();
-		}
-	}
 	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>WebGUI Initial Configuration</title>
+		<style type="text/css">
+		a { color: black; }
+		a:visited { color: black;}
+		</style>
 	</head>
 	<body><div style="font-family: georgia, helvetica, arial, sans-serif; color: white; z-index: 10; width: 550px; height: 400px; top: 20%; left: 20%; position: absolute;"><h1>WebGUI Initial Configuration</h1><fieldset>';
 	if ($session{form}{step} eq "2") {
@@ -61,7 +60,7 @@ sub www_setup {
 		$u->username(WebGUI::FormProcessor::process("username","text","Admin"));
 		$u->profileField("email",WebGUI::FormProcessor::email("email"));
 		$u->identifier(Digest::MD5::md5_base64(WebGUI::FormProcessor::process("identifier","password","123qwe")));
-		my $f = WebGUI::HTMLForm->new;
+		my $f = WebGUI::HTMLForm->new(action=>WebGUI::URL::gateway());
 		$f->hidden(
 			-name=>"op",
 			-value=>"setup"
@@ -91,16 +90,17 @@ sub www_setup {
 		$f->submit;
 		$output .= $f->print;
 	} elsif ($session{form}{step} eq "3") {
+		WebGUI::Setting::remove('specialState');
 		WebGUI::Setting::set('companyName',WebGUI::FormProcessor::text("companyName"));
 		WebGUI::Setting::set('companyURL',WebGUI::FormProcessor::url("companyURL"));
 		WebGUI::Setting::set('companyEmail',WebGUI::FormProcessor::email("companyEmail"));
-		WebGUI::Setting::remove('specialState');
-		WebGUI::HTTP::setRedirect("/");
+		WebGUI::HTTP::setRedirect(WebGUI::URL::gateway());
 		return "";
+		#$output .= '<a href="'.WebGUI::URL::gateway().'">Configuration complete. Click here to go to your new site.</a>';
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
 		my $u = WebGUI::User->new('3');
-		my $f = WebGUI::HTMLForm->new;
+		my $f = WebGUI::HTMLForm->new(action=>WebGUI::URL::gateway());
 		$f->hidden(
 			-name=>"op",
 			-value=>"setup"

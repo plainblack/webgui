@@ -38,30 +38,29 @@ use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
 use Apache2::ServerUtil ();
 
-
 #-------------------------------------------------------------------
 sub handler {
 	my $r = shift;
+	$session{site} = shift || $r->dir_config('WebguiConfig');
 	my $s = Apache2::ServerUtil->server;
 	$session{wguri} = $r->uri;
-	$session{site} = $r->dir_config('WebguiConfig');
 	$session{config} = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$session{site});
 	### Add Apache Request stuff to global session.  Yes, I know the global hash will eventually be deprecated.
-	foreach my $url ($session{config}{extrasURL}, @{$session{config}{passthruUrls}}) {
-		return Apache2::Const::DECLINED if ($session{wguri} =~ m/^$url/);
-	}
-	my $uploads = $session{config}{uploadsURL};
-	if ($session{wguri} =~ m/^$uploads/) {
+#	foreach my $url ($session{config}{extrasURL}, @{$session{config}{passthruUrls}}) {
+#		return Apache2::Const::DECLINED if ($session{wguri} =~ m/^$url/);
+#	}
+#	my $uploads = $session{config}{uploadsURL};
+#	if ($session{wguri} =~ m/^$uploads/) {
 #		$r->handler('perl-script');
-		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
-	} else {
+#		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
+#	} else {
 		$session{requestedUrl} = $session{wguri};
 		my $gateway = $session{config}{gateway};
 		$session{requestedUrl} =~ s/^$gateway(.*)$/$1/;
 #		$r->handler('perl-script');
 		$r->set_handlers(PerlResponseHandler => \&contentHandler);
 		$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
-	}
+#	}
 	return Apache2::Const::DECLINED;
 }
 
