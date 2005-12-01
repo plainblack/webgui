@@ -13,6 +13,7 @@ save you many hours of grief.
 	DateTime
 	DateTime::Format::Strptime
 	DateTime::Cron::Simple
+	JSON
 	Archive::Zip
 
    And optionally, these:

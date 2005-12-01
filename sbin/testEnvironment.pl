@@ -72,6 +72,7 @@ checkModule("HTML::TagFilter",0.07);
 checkModule("HTML::Template",2.7);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
+checkModule("JSON",0.991);
 #checkModule("POE",0.3202);
 #checkModule("POE::Component::IKC::Server",0.18);
 #checkModule("POE::Component::JobQueue",0.5402);
