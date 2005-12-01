@@ -48,7 +48,7 @@ sub definition {
 				defaultValue=>'http://'
 				}, 
 			timeout=>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>30
 				}, 
 			removeStyle=>{
@@ -149,7 +149,7 @@ sub getEditForm {
 		-name=>"filterHtml",
 		-value=>$self->getValue("filterHtml")
 		);
-        $tabform->getTab("properties")->selectList(
+        $tabform->getTab("properties")->selectBox(
 		-name=>"timeout", 
 		-options=>\%hash, 
 		-label=>WebGUI::International::get(4,"Asset_HttpProxy"),

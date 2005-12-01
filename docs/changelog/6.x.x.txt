@@ -21,6 +21,9 @@
  - Added more error trapping in caching system.
  - Fixed some layout and control bugs in the color picker form element.
  - Added a simple Style Wizard.
+ - Removed $session{os}{slash} since it is no longer needed.
+ - Reworked the form system to use inheritance and added a new master form
+   class for lists called List.  See migration.txt for details
  - Updated preload.perl to automatically preload all WebGUI related modules,
    which increased shared memory usage by 30%.
  - Added StockData asset.
@@ -34,6 +37,10 @@
    "dashboard".  You can create more than one dashboard per site.
    Assets that come with templates for the Dashboard:
      StockData, WeatherData, SearchBox, SyndicatedContent
+- [ 1361669 ] editUserProfileField causes huge memory consumption, loop
+- [ 1354464 ] Dynamic Field does not work correctly
+- [ 1354467 ] WebGUI::Form::Group is implemented incorrectly
+
 
 6.7.8
  - fix [ 1364895 ] Error in ITransact Commerce Module

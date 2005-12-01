@@ -114,7 +114,7 @@ sub _makePath {
 	my $self = shift;
 	my $node = $session{config}{uploadsPath};
 	foreach my $folder ($self->{_part1}, $self->{_part2}, $self->{_id}) {
-		$node .= $session{os}{slash}.$folder;
+		$node .= '/'.$folder;
 		unless (-e $node) { # check to see if it already exists
 			unless (mkdir($node)) { # check to see if there was an error during creation
 				$self->_addError("Couldn't create storage location: $node : $!");
@@ -482,7 +482,7 @@ sub getFileIconUrl {
 	my $self = shift;
 	my $filename = shift;
 	my $extension = $self->getFileExtension($filename);	
-	my $path = $session{config}{extrasPath}.$session{os}{slash}."fileIcons".$session{os}{slash}.$extension.".gif";
+	my $path = $session{config}{extrasPath}.'/fileIcons/'.$extension.".gif";
 	if (-e $path) {
 		return $session{config}{extrasURL}."/fileIcons/".$extension.".gif";
 	}
@@ -600,11 +600,11 @@ sub getPath {
 		return undef;
 	}
         my $path = $session{config}{uploadsPath}
-		.$session{os}{slash}.$self->{_part1}
-		.$session{os}{slash}.$self->{_part2}
-		.$session{os}{slash}.$self->getId;
+		.'/'.$self->{_part1}
+		.'/'.$self->{_part2}
+		.'/'.$self->getId;
         if (defined $file) {
-                $path .= $session{os}{slash}.$file;
+                $path .= '/'.$file;
         }
         return $path;
 }

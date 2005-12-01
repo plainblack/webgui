@@ -15,7 +15,7 @@ package WebGUI::Form::RadioList;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
+use base 'WebGUI::Form::List';
 use WebGUI::Form::Radio;
 use WebGUI::International;
 use WebGUI::Session;
@@ -30,13 +30,24 @@ Creates a series of radio button form fields.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control. Also take a look ath WebGUI::Form::checkbox as this class creates a list of checkboxes.
+This is a subclass of WebGUI::Form::List. Also take a look at WebGUI::Form::Radio as this class creates a list of radio buttons.
 
 =head1 METHODS 
 
 The following methods are specifically available from this class. Check the superclass for additional methods.
 
 =cut
+
+##-------------------------------------------------------------------
+
+=head2 correctValues ( )
+
+Override method from master class since RadioList only supports a single value
+
+=cut
+
+sub correctValues { }
+
 
 #-------------------------------------------------------------------
 
@@ -47,10 +58,6 @@ See the super class for additional details.
 =head3 additionalTerms
 
 The following additional parameters have been added via this sub class.
-
-=head4 options
-
-A hash reference containing key values that will be returned with the form post and displayable text pairs. Defaults to an empty hash reference.
 
 =head4 vertical
 
@@ -66,8 +73,8 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		options=>{
-			defaultValue=>{}
+		formName=>{
+			defaultValue=>WebGUI::International::get("942","WebGUI")
 			},
 		vertical=>{
 			defaultValue=>0
@@ -82,32 +89,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 displayValue ( )
-
-Return the all options
-
-=cut
-
-sub displayValue {
-	my ($self) = @_;
-	return join ", ", @{ $self->{value} };
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("942","WebGUI");
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 toHtml ( )
 
 Renders a series of radio buttons.
@@ -117,14 +98,11 @@ Renders a series of radio buttons.
 sub toHtml {
 	my $self = shift;
 	my $output;
-	my $alignment;
-	if ($self->{vertical}) {
-		$alignment = "<br />\n";
-	}
-	else {
-		$alignment = " &nbsp; &nbsp;\n";
-	}
-	foreach my $key (keys %{$self->{options}}) {
+	my $alignment = $self->alignmentSeparator;
+        my %options;
+        tie %options, 'Tie::IxHash';
+        %options = $self->orderedHash;
+	foreach my $key (keys %options) {
                 my $checked = 0;
                 if ($self->{value} eq $key) {
                         $checked = 1;

@@ -18,7 +18,6 @@ use FileHandle;
 #use Log::Log4perl;
 use strict;
 use WebGUI::Session;
-use Log::Log4perl;
 use Apache2::RequestUtil;
 
 $Log::Log4perl::caller_depth++;
@@ -202,7 +201,7 @@ Returns a reference to the logger.
 =cut
 
 sub getLogger {
-	Log::Log4perl::init_once($WebGUI::Session::session{config}{webguiRoot}.$WebGUI::Session::session{os}{slash}.'etc'.$WebGUI::Session::session{os}{slash}."log.conf");
+	Log::Log4perl::init_once($WebGUI::Session::session{config}{webguiRoot}."/etc/log.conf");
 	return Log::Log4perl->get_logger($WebGUI::Session::session{config}{configFile});
 }
 

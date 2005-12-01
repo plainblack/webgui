@@ -77,7 +77,7 @@ Flushes the caching system. Must be overridden.
 =cut
 
 sub flush {
-	rmtree($WebGUI::Session::session{config}{uploadsPath}.$WebGUI::Session::session{os}{slash}."temp");
+	rmtree($WebGUI::Session::session{config}{uploadsPath}."/temp");
 }
 
 #-------------------------------------------------------------------

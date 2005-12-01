@@ -69,6 +69,9 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("971","WebGUI")
+			},
 		maxlength=>{
 			defaultValue=>8
 			},
@@ -81,20 +84,6 @@ sub definition {
 		});
 	return $class->SUPER::definition($definition);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("971","WebGUI");
-}
-
 
 #-------------------------------------------------------------------
 

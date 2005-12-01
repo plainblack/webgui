@@ -56,7 +56,7 @@ sub _drawQueryBuilder {
 		value=>$self->getValue("shortcutCriteria"),
 		extras=>'style="width: 100%" '.$self->{_disabled}
 	});
-	my $conjunctionField = WebGUI::Form::selectList({
+	my $conjunctionField = WebGUI::Form::selectBox({
 		name=>"conjunction",
 		options=>{
 			"AND" => WebGUI::International::get("AND","Asset_Shortcut"),
@@ -208,7 +208,7 @@ sub definition {
 				defaultValue=>0
 				},
 			resolveMultiples=>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>"mostRecent",
 				},
 			shortcutCriteria=>{
@@ -313,7 +313,7 @@ sub getEditForm {
 		if ($self->getValue("shortcutByCriteria") == 0) {
 			$self->{_disabled} = 'disabled=true';
 		}
-		$tabform->getTab("properties")->selectList(
+		$tabform->getTab("properties")->selectBox(
 			-name=>"resolveMultiples",
 			-value=>[ $self->getValue("resolveMultiples") ],
 			-label=>WebGUI::International::get("Resolve Multiples","Asset_Shortcut"),

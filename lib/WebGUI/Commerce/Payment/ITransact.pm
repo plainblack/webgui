@@ -386,7 +386,7 @@ sub checkoutForm {
 'Zambia' => 'Zambia',
 'Zimbabwe' => 'Zimbabwe'
 );
-	$f->selectList(
+	$f->selectBox(
 		-name=>"country",
 		-label=>$i18n->get("country"),
 		-value=>[$session{form}{country}],
@@ -416,9 +416,9 @@ sub checkoutForm {
 	$f->readOnly(
 		-label	=> $i18n->get('expiration date'),
 		-value	=> 
-		WebGUI::Form::selectList({name => 'expMonth', options => \%months, value => [$session{form}{expMonth}]}).
+		WebGUI::Form::selectBox({name => 'expMonth', options => \%months, value => [$session{form}{expMonth}]}).
 		" / ".
-		WebGUI::Form::selectList({name => 'expYear', options => \%years, value => [$session{form}{expYear}]})
+		WebGUI::Form::selectBox({name => 'expYear', options => \%years, value => [$session{form}{expYear}]})
 	);
 	$f->integer(
 		-name	=> 'cvv2',

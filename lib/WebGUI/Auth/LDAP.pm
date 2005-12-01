@@ -113,7 +113,7 @@ sub addUserForm {
 		    $jsArray
 	      //-->
 	   </script>|;
-	   $f->selectList(
+	   $f->selectBox(
 	                -name=>"authLDAP_ldapConnection",
 					-label=>WebGUI::International::get("ldapConnection",'AuthLDAP'),
 					-hoverHelp=>WebGUI::International::get("ldapConnection description",'AuthLDAP'),
@@ -217,7 +217,7 @@ sub createAccount {
 	$vars->{'create.form.ldapConnection.label'} = WebGUI::International::get("ldapConnection","AuthLDAP");
 	
 	my $url = WebGUI::URL::page("op=auth;method=createAccount;connection=");
-	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectList({
+	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectBox({
 	                name=>"ldapConnection",
 					options=>WebGUI::LDAPLink::getList(),
 					value=>[$connection->{ldapLinkId}],
@@ -361,7 +361,7 @@ sub editUserFormSave {
 sub editUserSettingsForm {
    my $self = shift;
    my $f = WebGUI::HTMLForm->new;
-   my $ldapConnection = WebGUI::Form::selectList({
+   my $ldapConnection = WebGUI::Form::selectBox({
 	                name=>"ldapConnection",
 					options=>WebGUI::LDAPLink::getList(),
 					value=>[$session{setting}{ldapConnection}]

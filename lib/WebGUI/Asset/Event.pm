@@ -115,7 +115,7 @@ sub getEditForm {
 				name=>"interval",
 				defaultValue=>1
 				})
-				.WebGUI::Form::selectList({
+				.WebGUI::Form::selectBox({
 					name=>"recursEvery",
 					options=>\%recursEvery
 					})

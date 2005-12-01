@@ -15,9 +15,8 @@ package WebGUI::Form::DatabaseLink;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::DatabaseLink;
-use WebGUI::Form::SelectList;
 use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -34,7 +33,7 @@ Creates a database connection chooser control.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -78,8 +77,11 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("1075","WebGUI")
+			},
 		label=>{
-			defaultValue=>$class->getName()
+			defaultValue=>WebGUI::International::get("1075","WebGUI")
 			},
 		name=>{
 			defaultValue=>"databaseLinkId"
@@ -99,18 +101,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("1075","WebGUI");
-}
-
-#-------------------------------------------------------------------
-
 =head2 toHtml ( )
 
 Renders a database connection picker control.
@@ -119,13 +109,8 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	return WebGUI::Form::SelectList->new(
-		id=>$self->{id},
-		name=>$self->{name},
-		options=>WebGUI::DatabaseLink::getList(),
-		value=>[$self->{value}],
-		extras=>$self->{extras}
-		)->toHtml;
+	$self->{options} = WebGUI::DatabaseLink::getList(); 
+	return $self->SUPER::toHtml();
 }
 
 #-------------------------------------------------------------------

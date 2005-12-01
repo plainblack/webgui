@@ -151,7 +151,7 @@ sub www_export {
 			-name=>"depth",
 			-value=>99,
 		);
-	$f->selectList(
+	$f->selectBox(
 			-label=>WebGUI::International::get('Export as user',"Asset"),
 			-hoverHelp=>WebGUI::International::get('Export as user description',"Asset"),
 			-name=>"userId",

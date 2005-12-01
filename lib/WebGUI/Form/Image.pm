@@ -69,6 +69,9 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("image","WebGUI")
+			},
 		name=>{
 			defaultValue=>"file"
 			},
@@ -103,18 +106,4 @@ sub displayValue {
 	return $fileValue;
 	}
 
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("image","WebGUI");
-}
-
 1;
-
-

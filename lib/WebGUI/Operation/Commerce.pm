@@ -435,11 +435,11 @@ sub www_editCommerceSettings {
 	# payment plugin
 	if (%paymentPlugins) {
 		WebGUI::Style::setRawHeadTags('<script type="text/javascript">var activePayment="'.$paymentPlugin.'";</script>');
-		$tabform->getTab("payment")->selectList(
+		$tabform->getTab("payment")->selectBox(
 			-name		=> 'commercePaymentPlugin',
 			-options	=> \%paymentPlugins,
 			-label		=> $i18n->get('payment form'),
-			-value		=> [$paymentPlugin],
+			-value		=> $paymentPlugin,
 			-extras		=> 'onchange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
 			);
 			
@@ -473,11 +473,11 @@ sub www_editCommerceSettings {
 	# shipping plugin
 	if (%shippingPlugins) {
 		WebGUI::Style::setRawHeadTags('<script type="text/javascript">var activeShipping="'.$shippingPlugin.'";</script>');
-		$tabform->getTab('shipping')->selectList(
+		$tabform->getTab('shipping')->selectBox(
 			-name	=> 'commerceShippingPlugin',
 			-options=> \%shippingPlugins,
 			-label	=> $i18n->get('shipping plugin label'),
-			-value	=> [$shippingPlugin],
+			-value	=> $shippingPlugin,
 			-extras	=> 'onchange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
 			);
 		
@@ -593,12 +593,12 @@ sub www_listTransactions {
 	$output .= '</tr><tr>';
 	$output .= '<td></td>';
 	$output .= '<td align="left">'.$i18n->get('transaction status').'</td>';
-	$output .= '<td>'.WebGUI::Form::selectList({name => 'tStatus', value => [$session{form}{tStatus}], options => $transactionOptions});
+	$output .= '<td>'.WebGUI::Form::selectBox({name => 'tStatus', value => [$session{form}{tStatus}], options => $transactionOptions});
 	$output .= '</tr><tr>';
 	
 	$output .= '<td></td>';
 	$output .= '<td align="left">'.$i18n->get('shipping status').'</td>';
-	$output .= '<td>'.WebGUI::Form::selectList({name => 'sStatus', value => [$session{form}{sStatus}], options => $shippingOptions});
+	$output .= '<td>'.WebGUI::Form::selectBox({name => 'sStatus', value => [$session{form}{sStatus}], options => $shippingOptions});
 	$output .= '</tr><tr>';
 
 	$output .= '<td></td>';

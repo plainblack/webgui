@@ -92,6 +92,10 @@ Add extra attributes to the form tag like
 
   onmouseover='doSomething()'
 
+=head4 formName
+
+The internationalized form name.
+
 =head4 label
 
 A text label that will be displayed if toHtmlWithWrapper() is called.
@@ -144,6 +148,9 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>'A name for this form was not supplied'
+			},
 		name=>{
 			defaultValue=>undef
 			},
@@ -273,7 +280,9 @@ Returns a human readable name for this form control type. You MUST override this
 =cut
 
 sub getName {
-	return "Form control not properly created."
+	my $self = shift;
+	my $definition = $self->definition;
+	return $definition->[0]->{formName}->{defaultValue};
 }
 
 
@@ -358,18 +367,23 @@ sub fixTags {
 
 =head2 getValueFromPost ( )
 
-Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.
+Retrieves a value from a form GET or POST and returns it. If the value
+comes back as undef, this method will return the defaultValue instead.
+It also handles return data in list or scalar contexts.  If a Form
+field that supports multiple select requests its values in scalar
+context, it will return a newline "\n" separated scalar.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $session{req}->param($self->{name});
-	if (defined $formValue) {
-		return $formValue;
-	} else {
-		return $self->{defaultValue};
+	my @formValues = $session{req}->param($self->{name});
+	unless (@formValues) {
+		@formValues = (ref $self->{defaultValue} eq "ARRAY")
+				? @{$self->{defaultValue} }
+				: ( $self->{defaultValue} );
 	}
+        return wantarray ? @formValues : join("\n",@formValues);
 }
 
 #-------------------------------------------------------------------
@@ -466,7 +480,6 @@ sub prepareWrapper {
 	$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
 	return ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext);
 }
-
 
 #-------------------------------------------------------------------
 

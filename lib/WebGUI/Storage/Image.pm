@@ -116,7 +116,7 @@ sub generateThumbnail {
                 $image->Scale(width=>($x/$r),height=>($y/$r));
 		$image->Sharpen('0.0x1.0');
         }
-        $error = $image->Write($self->getPath.$session{os}{slash}.'thumb-'.$filename);
+        $error = $image->Write($self->getPath.'/'.'thumb-'.$filename);
 	if ($error) {
 		WebGUI::ErrorHandler::error("Couldn't create thumbnail: ".$error);
 		return 0;

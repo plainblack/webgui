@@ -249,7 +249,7 @@ sub www_editProfileField {
 	foreach $key (keys %hash) {
 		$hash{$key} = WebGUI::Operation::Shared::secureEval($hash{$key});
 	}
-	$f->selectList(
+	$f->selectBox(
 		-name=>"profileCategoryId",
 		-options=>\%hash,
 		-label=>WebGUI::International::get(489,"WebGUIProfile"),

@@ -229,7 +229,7 @@ sub process {
 	return $self->processRaw($self->get("template"),$vars);
 # skip all the junk below here for now until we have time to bring it inline with the new system
 	my $file = _getTemplateFile($self->get("templateId"));
-	my $fileCacheDir = $session{config}{uploadsPath}.$session{os}{slash}."temp".$session{os}{slash}."templatecache";
+	my $fileCacheDir = $session{config}{uploadsPath}.'/temp/templatecache';
 	my %params = (
 		filename=>$file->getPath,
 		global_vars=>1,

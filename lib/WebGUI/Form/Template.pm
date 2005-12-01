@@ -15,9 +15,8 @@ package WebGUI::Form::Template;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::Asset::Template;
-use WebGUI::Form::SelectList;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Session;
@@ -33,7 +32,7 @@ Creates a template chooser control.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -69,8 +68,11 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("assetName","Asset_Template")
+			},
 		label=>{
-			defaultValue=>$class->getName()
+			defaultValue=>WebGUI::International::get("assetName","Asset_Template")
 			},
 		name=>{
 			defaultValue=>"templateId"
@@ -80,18 +82,6 @@ sub definition {
 			},
 		});
 	return $class->SUPER::definition($definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("assetName","Asset_Template");
 }
 
 #-------------------------------------------------------------------
@@ -112,17 +102,8 @@ sub toHtml {
             		delete $templateList->{$assetId};
           	}
         }
-	# not sure why, but for some reason this fails under certain circumstances unless defined
-	# in this manner. The syndicated content asset is an example where it fails.
-	my $cmd = "WebGUI::Form::SelectList";
-	my $selectList = $cmd->new(
-		id=>$self->{id},
-		name=>$self->{name},
-		options=>$templateList,
-		value=>[$self->{value}],
-		extras=>$self->{extras}
-		);
-	return $selectList->toHtml;
+	$self->{options} = $templateList;
+	return $self->SUPER::toHtml();
 }
 
 #-------------------------------------------------------------------

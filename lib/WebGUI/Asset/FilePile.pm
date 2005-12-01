@@ -115,7 +115,7 @@ sub edit {
                	$clause = "userId=".quote($self->get("ownerUserId"));
        	}
        	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-       	$tabform->getTab("security")->selectList(
+       	$tabform->getTab("security")->selectBox(
        		-name=>"ownerUserId",
               	-options=>$users,
        	       	-label=>WebGUI::International::get(108,"Asset_FilePile"),

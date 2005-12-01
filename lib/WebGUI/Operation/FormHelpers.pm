@@ -53,7 +53,7 @@ sub www_richEditPageTree {
 		-label=>WebGUI::International::get(104),
 		-hoverHelp=>WebGUI::International::get('104 description'),
 		);
-	$f->selectList(
+	$f->selectBox(
 		-name=>"target",
 		-label=>WebGUI::International::get('target'),
 		-hoverHelp=>WebGUI::International::get('target description'),

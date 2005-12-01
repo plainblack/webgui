@@ -40,6 +40,7 @@ addInOutBoard();
 addDashboardStuff();
 addZipArchive();
 updateUserProfileDayLabels();
+changeSelectListToSelectBox();
 fixVeryLateDates();
 finish();
 
@@ -1654,6 +1655,20 @@ sub updateUserProfileDayLabels {
         print "\tUpdating day labels in User Profile firstDayOfWeek.\n" unless ($quiet);
 	WebGUI::SQL->write(q!update userProfileField set dataValues='{0=>WebGUI::International::get(\"sunday\",\"DateTime\"),1=>WebGUI::International::get(\"monday\",\"DateTime\")}' where fieldName='firstDayOfWeek'!);
 }
+
+#-------------------------------------------------
+sub changeSelectListToSelectBox {
+        print "\tChanging all selectLists to selectBox's in userProfileField.\n" unless ($quiet);
+	WebGUI::SQL->write(q!update userProfileField set dataType='selectBox' where dataType='selectList'!);
+	my $sql = q!select fieldName,dataDefault from userProfileField where dataType IN ('selectBox','timeZone')!;
+	my $sth = WebGUI::SQL->read($sql);
+	while (my $hash = $sth->hashRef) {
+		$hash->{dataDefault} =~ tr/][//d;
+		WebGUI::SQL->write(sprintf q!update userProfileField set dataDefault=%s where fieldName=%s!, quote($hash->{dataDefault}), quote($hash->{fieldName}) );
+	}
+}
+
+();
 
 #--- DO NOT EDIT BELOW THIS LINE
 

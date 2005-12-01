@@ -105,7 +105,7 @@ sub www_editBranch {
                 -label=>WebGUI::International::get(104,"Asset"),
                 -uiLevel=>9,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_url"}),
-		-value=>WebGUI::Form::selectList({
+		-value=>WebGUI::Form::selectBox({
                 	name=>"baseUrlBy",
 			extras=>'onchange="toggleSpecificBaseUrl()"',
 			id=>"baseUrlBy",
@@ -114,7 +114,7 @@ sub www_editBranch {
 				specifiedBase=>"Specified Base",
 				none=>"None"
 				}
-			}).'<span id="baseUrl"></span> / '.WebGUI::Form::selectList({
+			}).'<span id="baseUrl"></span> / '.WebGUI::Form::selectBox({
 				name=>"endOfUrl",
 				options=>{
 					menuTitle=>WebGUI::International::get(411,"Asset"),
@@ -221,7 +221,7 @@ sub www_editBranch {
                 $clause = "userId=".quote($self->get("ownerUserId"));
         }
         my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-        $tabform->getTab("security")->selectList(
+        $tabform->getTab("security")->selectBox(
                -name=>"ownerUserId",
                -options=>$users,
                -label=>WebGUI::International::get(108,"Asset"),
@@ -302,16 +302,16 @@ sub www_editBranchSave {
 	$data{encryptPage} = WebGUI::FormProcessor::yesNo("encryptPage") if (WebGUI::FormProcessor::yesNo("change_encryptPage"));
 	$data{startDate} = WebGUI::FormProcessor::dateTime("startDate") if (WebGUI::FormProcessor::yesNo("change_startDate"));
 	$data{endDate} = WebGUI::FormProcessor::dateTime("endDate") if (WebGUI::FormProcessor::yesNo("change_endDate"));
-	$data{ownerUserId} = WebGUI::FormProcessor::selectList("ownerUserId") if (WebGUI::FormProcessor::yesNo("change_ownerUserId"));
+	$data{ownerUserId} = WebGUI::FormProcessor::selectBox("ownerUserId") if (WebGUI::FormProcessor::yesNo("change_ownerUserId"));
 	$data{groupIdView} = WebGUI::FormProcessor::group("groupIdView") if (WebGUI::FormProcessor::yesNo("change_groupIdView"));
 	$data{groupIdEdit} = WebGUI::FormProcessor::group("groupIdEdit") if (WebGUI::FormProcessor::yesNo("change_groupIdEdit"));
 	$data{extraHeadTags} = WebGUI::FormProcessor::group("extraHeadTags") if (WebGUI::FormProcessor::yesNo("change_extraHeadTags"));
 	my ($urlBaseBy, $urlBase, $endOfUrl);
 	my $changeUrl = WebGUI::FormProcessor::yesNo("change_url");
 	if ($changeUrl) {
-		$urlBaseBy = WebGUI::FormProcessor::selectList("baseUrlBy");
+		$urlBaseBy = WebGUI::FormProcessor::selectBox("baseUrlBy");
 		$urlBase = WebGUI::FormProcessor::text("baseUrl");
-		$endOfUrl = WebGUI::FormProcessor::selectList("endOfUrl");
+		$endOfUrl = WebGUI::FormProcessor::selectBox("endOfUrl");
 	}
 	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
 	foreach my $descendant (@{$descendants}) {

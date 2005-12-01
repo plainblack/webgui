@@ -15,8 +15,7 @@ package WebGUI::Form::SelectList;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
-use WebGUI::Form::HiddenList;
+use base 'WebGUI::Form::List';
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -26,11 +25,11 @@ Package WebGUI::Form::SelectList
 
 =head1 DESCRIPTION
 
-Creates a select list, aka dropdown list form control.
+Creates a select list, aka dropdown list form control with multiple select.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::List.
 
 =head1 METHODS 
 
@@ -48,25 +47,13 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
-=head4 options
-
-A hash reference containing key values that will be returned with the form post and displayable text pairs. Defaults to an empty hash reference.
-
-=head4 defaultValue
-
-An array reference of the items to be checked if no value is specified. Defaults to an empty array reference.
-
 =head4 size
 
-The number of characters tall this list should be. Defaults to '1'.
+The number of characters tall this list should be. Defaults to '5'.
 
 =head4 multiple
 
-Boolean indicating whether the user can select multiple items from this list like a checkList. Defaults to "0".
-
-=head4 sortByValue
-
-A boolean value for whether or not the values in the options hash should be sorted. Defaults to "0".
+A boolean indicating whether the user can select multiple items from this list like a checkList. Defaults to "1".
 
 =head4 profileEnabled
 
@@ -78,67 +65,20 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		options=>{
-			defaultValue=>{}
-			},
-		defaultValue=>{
-			defaultValue=>[],
+		formName=>{
+			defaultValue=>WebGUI::International::get("484","WebGUI"),
 			},
 		multiple=>{
-			defaultValue=>0
-			},
-		sortByValue=>{
-			defaultValue=>0
+			defaultValue=>1
 			},
 		size=>{
-			defaultValue=>1
+			defaultValue=>5
 			},
 		profileEnabled=>{
 			defaultValue=>1
 			},
 		});
 	return $class->SUPER::definition($definition);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 displayValue ( )
-
-Return the all options
-
-=cut
-
-sub displayValue {
-	my ($self) = @_;
-	return join ", ", @{ $self->{value} };
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("484","WebGUI");
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getValueFromPost ( )
-
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
-
-=cut
-
-sub getValueFromPost {
-	my $self = shift;
-	my @data = $session{req}->param($self->{name});
-        return wantarray ? @data : join("\n",@data);
 }
 
 #-------------------------------------------------------------------
@@ -151,46 +91,23 @@ Renders a select list form control.
 
 sub toHtml {
 	my $self = shift;
-        my $multiple = ' multiple="1"' if ($self->{multiple});
-        my $output = '<select name="'.$self->{name}.'" size="'.$self->{size}.'" id="'.$self->{id}.'" '.$self->{extras}.$multiple.'>';
-        my %options;
-        tie %options, 'Tie::IxHash';
-        if ($self->{sortByValue}) {
-                foreach my $optionKey (sort {"\L${$self->{options}}{$a}" cmp "\L${$self->{options}}{$b}" } keys %{$self->{options}}) {
-                         $options{$optionKey} = $self->{options}{$optionKey};
-                }
-        } else {
-                %options = %{$self->{options}};
-        }
+	my $multiple = ' multiple="1"' if ($self->{multiple});
+	my $output = '<select name="'.$self->{name}.'" size="'.$self->{size}.'" id="'.$self->{id}.'" '.$self->{extras}.$multiple.'>';
+	my %options;
+	tie %options, 'Tie::IxHash';
+	%options = $self->orderedHash;
+	my @values = $self->getValues();
         foreach my $key (keys %options) {
-                $output .= '<option value="'.$key.'"';
-                 foreach my $item (@{$self->{value}}) {
-                        if ($item eq $key) {
-                                $output .= ' selected="selected"';
-                        }
-                }
-                $output .= '>'.${$self->{options}}{$key}.'</option>';
+		$output .= '<option value="'.$key.'"';
+		foreach my $item (@values) {
+			if ($item eq $key) {
+				$output .= ' selected="selected"';
+			}
+		}
+		$output .= '>'.${$self->{options}}{$key}.'</option>';
         }
-        $output .= '</select>'."\n";
-        return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlAsHidden ( )
-
-Creates a series of hidden fields representing the data in the list.
-
-=cut
-
-sub toHtmlAsHidden {
-	my $self = shift;
-	return WebGUI::Form::HiddenList->new(
-		value=>$self->{value},
-		defaultValue=>$self->{defaultValue},
-		name=>$self->{name},
-		options=>$self->{options}
-		)->toHtmlAsHidden;
+	$output .= '</select>'."\n";
+	return $output;
 }
 
 1;

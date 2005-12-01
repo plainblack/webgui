@@ -287,10 +287,8 @@ sub open {
 	$session{os}{name} = $^O;
 	if ($session{os}{name} =~ /MSWin32/i || $session{os}{name} =~ /^Win/i) {
 		$session{os}{type} = "Windowsish";
-		$session{os}{slash} = "\\";
 	} else {
 		$session{os}{type} = "Linuxish";
-		$session{os}{slash} = "/";
 	}
 	###----------------------------
 	### default database handler object

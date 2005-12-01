@@ -799,7 +799,7 @@ sub www_editField {
 			-value=>$field{sequenceNumber}
 		);	
 	}
-	$f->selectList(
+	$f->selectBox(
 		-name=>"tid",
 		-options=>$tab,
 		-label=>WebGUI::International::get(104,"Asset_DataForm"),
@@ -812,7 +812,7 @@ sub www_editField {
                 -label=>WebGUI::International::get(79,"Asset_DataForm"),
                 -hoverHelp=>WebGUI::International::get('79 description',"Asset_DataForm"),
                 );
-        $f->selectList(
+        $f->selectBox(
 		-name=>"status",
 		-options=>\%fieldStatus,
 		-label=>WebGUI::International::get(22,"Asset_DataForm"),

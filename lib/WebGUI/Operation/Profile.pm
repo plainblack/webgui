@@ -47,35 +47,25 @@ sub getRequiredProfileFields {
 		$method = $data->{dataType};
 		$label = WebGUI::Operation::Shared::secureEval($data->{fieldLabel});
 		$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
-		if ($method eq "selectList") {
-			$values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
-			# note: this big if statement doesn't look elegant, but doing regular ORs caused problems with the array reference.
-			if ($session{form}{$data->{fieldName}}) {
-				$default = [$session{form}{$data->{fieldName}}];
-			}
-			elsif ($session{user}{$data->{fieldName}}) {
-				$default = [$session{user}{$data->{fieldName}}];
-			} 
-			$hash{'profile.formElement'} = WebGUI::Form::selectList({
-								"name"=>$data->{fieldName},
-								"options"=>$values,
-								"value"=>$default
-								});
+		$values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
+		my $default;
+		if ($session{form}{$data->{fieldName}}) {
+			$default = $session{form}{$data->{fieldName}};
 		}
+		elsif ($session{user}{$data->{fieldName}}) {
+			$default = $session{user}{$data->{fieldName}};
+		} 
 		else {
-			if ($session{form}{$data->{fieldName}}) {
-				$default = $session{form}{$data->{fieldName}};
-			}
-			elsif (exists $session{user}{$data->{fieldName}}) {
-				$default = $session{user}{$data->{fieldName}};
-			}
-			else {
-				$default = $data->{dataDefault};
-			}
-
-			my $cmd = 'WebGUI::Form::'.$method.'({"name"=>$data->{fieldName},"value"=>$default})';
-			$hash{'profile.formElement'} = eval($cmd);
+			$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
 		}
+		my $form = WebGUI::Form::DynamicField->new(
+			name => $data->{fieldName},
+			value => $default,
+			options => $values,
+			fieldType => $method,
+		);
+
+		$hash{'profile.form.element'} = $form->displayForm();
 		$hash{'profile.formElement.label'} = $label;
 		push(@array,\%hash)
 	}
@@ -184,6 +174,7 @@ sub www_editProfile {
 		if ($data->{required}) {
 			$hash{'profile.form.element.subtext'} = "*";
 		}
+		push(@profile,\%hash);
 		if (($previousCategory && $category ne $previousCategory) || $counter eq $a->rows) {
 			my @temp = @profile;
 			my $hashRef;
@@ -193,7 +184,6 @@ sub www_editProfile {
 			@profile = ();
 		}
 		$previousCategory = $category;
-		push(@profile,\%hash);
 	}
 	$a->finish;
 

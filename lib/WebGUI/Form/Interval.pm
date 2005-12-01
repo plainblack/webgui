@@ -19,9 +19,9 @@ use warnings;
 use base qw(WebGUI::Form::Control);
 use Tie::IxHash;
 use WebGUI::DateTime;
+use WebGUI::Form::SelectBox;
 use WebGUI::Form::Hidden;
 use WebGUI::Form::Integer;
-use WebGUI::Form::SelectList;
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -67,6 +67,9 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("interval","WebGUI"),
+			},
 		defaultValue=>{
 			defaultValue=>1,
 			},
@@ -76,20 +79,6 @@ sub definition {
 		});
 	return $class->SUPER::definition($definition);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("interval","WebGUI");
-}
-
 
 #-------------------------------------------------------------------
 
@@ -133,7 +122,7 @@ sub toHtml {
 		extras=>$self->{extras},
 		id=>$self->{id}."_interval",
 		)->toHtml;
-	$cmd = "WebGUI::Form::SelectList";
+	$cmd = "WebGUI::Form::SelectBox";
 	$out .= $cmd->new(
 		options=>\%units,
 		name=>$self->{name}."_units",

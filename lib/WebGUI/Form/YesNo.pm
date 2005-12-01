@@ -22,7 +22,7 @@ use WebGUI::Session;
 
 =head1 NAME
 
-Package WebGUI::Form::yesNo
+Package WebGUI::Form::YesNo
 
 =head1 DESCRIPTION
 
@@ -62,6 +62,9 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("483","WebGUI")
+			},
 		defaultValue=>{
 			defaultValue=>0
 			},
@@ -71,20 +74,6 @@ sub definition {
 		});
 	return $class->SUPER::definition($definition);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("483","WebGUI");
-}
-
 
 #-------------------------------------------------------------------
 

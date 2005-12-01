@@ -1,4 +1,4 @@
-package WebGUI::Form::HiddenList;
+package WebGUI::Form::SelectBox;
 
 =head1 LEGAL
 
@@ -21,11 +21,11 @@ use WebGUI::Session;
 
 =head1 NAME
 
-Package WebGUI::Form::HiddenList
+Package WebGUI::Form::SelectBox
 
 =head1 DESCRIPTION
 
-Creates a list of hidden fields. 
+Creates a select list, aka dropdown list form control with single select.
 
 =head1 SEE ALSO
 
@@ -47,13 +47,9 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
-=head4 options
+=head4 size
 
-A hash reference containing name value pairs. The name of each pair will be used to fill the value attribute of the hidden field. Defaults to an empty hash reference.
-
-=head4 defaultValue
-
-value and defaultValue are array referneces containing the names from the options list that should be stored.
+The number of characters tall this list should be. Defaults to '1'.
 
 =head4 profileEnabled
 
@@ -62,45 +58,47 @@ Flag that tells the User Profile system that this is a valid form element in a U
 =cut
 
 sub definition {
-        my $class = shift;
-        my $definition = shift || [];
-        push(@{$definition}, {
-                formName=>{
-                        defaultValue=>WebGUI::International::get("hidden list","WebGUI"),
-                        },
-		profileEnabled=>{
-			defaultValue=>1
+	my $class = shift;
+	my $definition = shift || [];
+	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("487","WebGUI"),
 			},
-                });
-        return $class->SUPER::definition($definition);
+		size=>{
+			defaultValue=>1,
+			},
+		profileEnabled=>{
+			defaultValue=>1,
+			},
+		});
+	return $class->SUPER::definition($definition);
 }
 
 #-------------------------------------------------------------------
 
 =head2 toHtml ( )
 
-A synonym for toHtmlAsHidden.
+Renders a select list form control.
 
 =cut
 
 sub toHtml {
 	my $self = shift;
-	return $self->toHtmlAsHidden;
+	my $output = '<select name="'.$self->{name}.'" size="'.$self->{size}.'" id="'.$self->{id}.'" '.$self->{extras}.'>';
+	my %options;
+	tie %options, 'Tie::IxHash';
+	%options = $self->orderedHash;
+	my ($value) = $self->getValues();
+        foreach my $key (keys %options) {
+		$output .= '<option value="'.$key.'"';
+		if ($value eq $key) {
+			$output .= ' selected="selected"';
+		}
+		$output .= '>'.${$self->{options}}{$key}.'</option>';
+        }
+	$output .= '</select>'."\n";
+	return $output;
 }
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlWithWrapper ( )
-
-A synonym for toHtmlAsHidden.
-
-=cut
-
-sub toHtmlWithWrapper {
-	my $self = shift;
-	return $self->toHtmlAsHidden;
-}
-
 
 1;
 

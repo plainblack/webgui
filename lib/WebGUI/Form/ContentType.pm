@@ -15,8 +15,7 @@ package WebGUI::Form::ContentType;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
-use WebGUI::Form::SelectList;
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -30,7 +29,7 @@ Creates a content type selector which can be used in conjunction with WebGUI::HT
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -66,8 +65,11 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("1007","WebGUI")
+			},
 		label=>{
-			defaultValue=>$class->getName()
+			defaultValue=>WebGUI::International::get("1007","WebGUI")
 			},
 		types=>{
 			defaultValue=>[qw(mixed html code text)]
@@ -77,33 +79,6 @@ sub definition {
 			}
 		});
 	return $class->SUPER::definition($definition);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("1007","WebGUI");
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getValueFromPost ( )
-
-Returns either what's posted or if nothing comes back it returns "mixed".
-
-=cut
-
-sub getValueFromPost {
-	my $self = shift;
-	return $session{req}->param($self->{name}) || "mixed";
 }
 
 #-------------------------------------------------------------------
@@ -128,18 +103,8 @@ sub toHtml {
                         $types{html} = WebGUI::International::get(1009);
                 }
         }
-	return WebGUI::Form::SelectList->new(
-		options=>\%types,
-		id=>$self->{id},
-		name=>$self->{name},
-		value=>[$self->{value}],
-		extras=>$self->{extras},
-		defaultValue=>[$self->{defaultValue}]
-		)->toHtml;
-
+	$self->{options} = \%types,
+	return $self->SUPER::toHtml();
 }
 
-
-
 1;
-

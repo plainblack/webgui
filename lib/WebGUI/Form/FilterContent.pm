@@ -15,9 +15,8 @@ package WebGUI::Form::FilterContent;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
+use base 'WebGUI::Form::SelectBox';
 use Tie::IxHash;
-use WebGUI::Form::SelectList;
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -31,7 +30,7 @@ Creates a select list containing the content filter options. This is for use wit
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -53,13 +52,13 @@ The following additional parameters have been added via this sub class.
 
 The name of this field to be passed through the URI. Defaults to "filterContent".
 
+=head4 defaultValue
+
+Defaults to "most". Possible values are "none", "macros", "javascript", "most" and "all".
+
 =head4 hoverHelp
 
 A tooltip for what to do with this field. Defaults to a general explaination of content filters.
-
-=head4 label
-
-A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
 
 =cut
 
@@ -67,32 +66,21 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		label=>{
-			defaultValue=>$class->getName()
+		formName=>{
+			defaultValue=>WebGUI::International::get("418","WebGUI")
 			},
 		name=>{
 			defaultValue=>"filterContent"
 			},
 		hoverHelp=>{
-			defaultValue=>WebGUI::International::get('418 description')
-			}
+			defaultValue=>WebGUI::International::get('418 description', 'WebGUI')
+			},
+		defaultValue=>{
+			defaultValue=>"most",
+			},
 		});
 	return $class->SUPER::definition($definition);
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("418","WebGUI");
-}
-
 
 #-------------------------------------------------------------------
 
@@ -126,17 +114,8 @@ sub toHtml {
                 'most'=>WebGUI::International::get(421),
                 'all'=>WebGUI::International::get(419)
                 );
-	return WebGUI::Form::SelectList->new(
-		id=>$self->{id},
-		options=>\%filter,
-		name=>$self->{name},
-		value=>[$self->{value}],
-		extras=>$self->{extras},
-		defaultValue=>[$self->{defaultValue}]
-		)->toHtml;
-
+	$self->{options} = \%filter;
+	return $self->SUPER::toHtml();
 }
 
-
 1;
-

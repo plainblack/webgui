@@ -184,7 +184,7 @@ sub view {
 		$nameHash{""} = WebGUI::International::get('myself',"Asset_InOutBoard");
 		%nameHash = WebGUI::Utility::sortHash(%nameHash);
 
-		$f->selectList(
+		$f->selectBox(
 			-name=>"delegate",
 			-options=>\%nameHash,
 			-value=>[ $session{scratch}{userId} ],
@@ -412,7 +412,7 @@ sub www_viewReport {
 	my $departmentSQLclause = ($defaultDepartment eq WebGUI::International::get('all departments', 'Asset_InOutBoard'))
 	                        ? ''
 				: 'and c.fieldData='.quote($defaultDepartment);
-	$f->selectList(
+	$f->selectBox(
 		-name=>"selectDepartment",
 		-options=>\%depHash,
 		-value=>[ $defaultDepartment ],
@@ -422,7 +422,7 @@ sub www_viewReport {
 	tie %paginHash, "Tie::IxHash"; ##Because default sort order is alpha
 	%paginHash = (50 => 50, 100 => 100, 300 => 300, 500 => 500, 1000 => 1000, 10_000 => 10_000,);
 	my $pageReportAfter = $session{form}{reportPagination} || 50;
-	$f->selectList(
+	$f->selectBox(
 		-name=>"reportPagination",
 		-options=>\%paginHash,
 		-value=>[ $pageReportAfter ],

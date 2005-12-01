@@ -15,9 +15,8 @@ package WebGUI::Form::TimeZone;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::DateTime;
-use WebGUI::Form::SelectList;
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -31,7 +30,7 @@ Creates a template chooser control.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -41,14 +40,24 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
-=head2 getName ()
+=head2 definition ( )
 
-Returns the human readable name or type of this form control.
+See the super class for additional details.
 
 =cut
 
-sub getName {
-        return WebGUI::International::get("timezone","DateTime");
+sub definition {
+	my $class = shift;
+	my $definition = shift || [];
+	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("timezone","DateTime")
+			},
+		value=>{
+			defaultValue=>undef
+			},
+		});
+	return $class->SUPER::definition($definition);
 }
 
 #-------------------------------------------------------------------
@@ -61,15 +70,8 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	my $cmd = "WebGUI::Form::SelectList";
-	my $selectList = $cmd->new(
-		id=>$self->{id},
-		name=>$self->{name},
-		options=>WebGUI::DateTime::getTimeZones(),
-		value=>[$self->{value}],
-		extras=>$self->{extras}
-		);
-	return $selectList->toHtml;
+	$self->{options} = WebGUI::DateTime::getTimeZones();
+	return $self->SUPER::toHtml();
 }
 
 

@@ -65,7 +65,7 @@ sub unzip {
 	  }
 	  $zip->extractTree();  
    } elsif($filename =~ m/\.tar/i){
-      Archive::Tar->extract_archive($filepath.$session{os}{slash}.$filename,1);
+      Archive::Tar->extract_archive($filepath.'/'.$filename,1);
 	  if (Archive::Tar->error){
          WebGUI::ErrorHandler::warn(Archive::Tar->error);
 	     return 0;

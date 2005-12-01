@@ -40,16 +40,22 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
-=head2 getName ()
+=head2 definition ( )
 
-Returns the human readable name or type of this form control.
+See the super class for additional details.
 
 =cut
 
-sub getName {
-        return WebGUI::International::get("color","WebGUI");
+sub definition {
+	my $class = shift;
+	my $definition = shift || [];
+	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("color","WebGUI")
+			},
+		});
+	return $class->SUPER::definition($definition);
 }
-
 
 #-------------------------------------------------------------------
 

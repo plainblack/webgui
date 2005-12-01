@@ -117,9 +117,9 @@ sub getGroupSearchForm {
                 -name=>"doit",
                 -value=>1
                 );
-        $f->selectList(
+        $f->selectBox(
                 -name=>"modifier",
-                -value=>([$session{scratch}{groupSearchModifier} || WebGUI::International::get("contains") ]),
+                -value=>($session{scratch}{groupSearchModifier} || WebGUI::International::get("contains") ),
                 -options=>{
                         startsWith=>WebGUI::International::get("starts with"),
                         contains=>WebGUI::International::get("contains"),

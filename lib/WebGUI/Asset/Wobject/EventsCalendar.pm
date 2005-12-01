@@ -58,19 +58,19 @@ sub definition {
 				defaultValue=>'PBtmpl0000000000000023'
 			},
 			scope =>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>'0'
 			},
 			startMonth=>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>"current"
 			},
 			endMonth=>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>"after12"
 			},
 			defaultMonth=>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>"current"
 			},
 			paginateAfter=>{
@@ -89,7 +89,7 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	$tabform->getTab("properties")->selectList(
+	$tabform->getTab("properties")->selectBox(
 		-name=>"scope",
 		-label=>WebGUI::International::get(507,"Asset_EventsCalendar"),
 		-hoverHelp=>WebGUI::International::get('507 description',"Asset_EventsCalendar"),
@@ -114,7 +114,7 @@ sub getEditForm {
 		-value=>$self->getValue('eventTemplateId'),
 		-namespace=>"EventsCalendar/Event",
 	);
-	$tabform->getTab("display")->selectList(
+	$tabform->getTab("display")->selectBox(
 		-name=>"startMonth",
 		-options=>{
 			"january"=>WebGUI::International::get('january','Asset_EventsCalendar'),
@@ -136,14 +136,14 @@ sub getEditForm {
 		"after3"=>WebGUI::International::get(89,"Asset_EventsCalendar"),
 		"current"=>WebGUI::International::get(82,"Asset_EventsCalendar")
 	);
-	$tabform->getTab("display")->selectList(
+	$tabform->getTab("display")->selectBox(
 		-name=>"endMonth",
 		-options=>\%options,
 		-label=>WebGUI::International::get(84,"Asset_EventsCalendar"),
 		-hoverHelp=>WebGUI::International::get('84 description',"Asset_EventsCalendar"),
 		-value=>[$self->getValue("endMonth")]
 	);
-	$tabform->getTab("display")->selectList(
+	$tabform->getTab("display")->selectBox(
 		-name=>"defaultMonth",
 		-options=>{
 			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),

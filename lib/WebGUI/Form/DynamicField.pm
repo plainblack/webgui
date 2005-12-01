@@ -38,7 +38,6 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
-
 #-------------------------------------------------------------------
 
 =head2 definition ( [ additionalTerms ] )
@@ -59,26 +58,15 @@ sub definition {
         my $class = shift;
         my $definition = shift || [];
         push(@{$definition}, {
+                formName=>{
+                        defaultValue=>WebGUI::International::get("475","WebGUI"),
+                        },
                 fieldType=>{
                         defaultValue=> "Text"
                         },
                 });
         return $class->SUPER::definition($definition);
 }
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("475","WebGUI");
-}
-
-
 
 #-------------------------------------------------------------------
 
@@ -98,33 +86,19 @@ sub new {
 	my $param = \%raw;
         my $fieldType = ucfirst($param->{fieldType});
 	delete $param->{fieldType};
-        # Set options for fields that use a list.
-        if (isIn($fieldType,qw(SelectList CheckList RadioList))) {
-                delete $param->{size};
-                my %options;
-                tie %options, 'Tie::IxHash';
-                foreach (split(/\n/, $param->{possibleValues})) {
-                        s/\s+$//; # remove trailing spaces
-                        $options{$_} = $_;
-                }
-                if (exists $param->{options} && ref($param->{options}) eq "HASH") {
-                        %options = (%{$param->{options}} , %options);
-                }
-                $param->{options} = \%options;
-        }
-        # Convert value to list for selectList / checkList
-        if (isIn($fieldType,qw(SelectList CheckList)) && ref $param->{value} ne "ARRAY") {
-                my @defaultValues;
-                foreach (split(/\n/, $param->{value})) {
-                                s/\s+$//; # remove trailing spaces
-                                push(@defaultValues, $_);
-                }
-                $param->{value} = \@defaultValues;
-        }
-
+	my $size;
+	if (exists $param->{size}) {
+		$size = $param->{size};
+		delete $param->{size};
+	}
         # Return the appropriate field object.
 	if ($fieldType eq "") {
 		WebGUI::ErrorHandler::warn("Something is trying to create a dynamic field called ".$param->{name}.", but didn't pass in a field type.");
+		$fieldType = "Text";
+	}
+	##No infinite loops, please
+	elsif ($fieldType eq 'DynamicField') {
+		WebGUI::ErrorHandler::warn("Something is trying to create a DynamicField via DynamicField.");
 		$fieldType = "Text";
 	}
         no strict 'refs';
@@ -135,8 +109,19 @@ sub new {
                 WebGUI::ErrorHandler::error("Couldn't compile form control: ".$fieldType.". Root cause: ".$@);
                 return undef;
         }
-        return $cmd->new($param);
+	my $formObj = $cmd->new($param);
+	##Fix up methods for List type forms and restore the size to all Forms *except*
+	##List type forms
+	if ($formObj->isa('WebGUI::Form::List')) {
+		$formObj->correctValues($param->{value});
+		$formObj->correctOptions($param->{possibleValues});
+	}
+	elsif ($size) {
+		$formObj->{size} = $size;
+	}
+        return $formObj;
 }
+
 
 1;
 

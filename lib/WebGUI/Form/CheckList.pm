@@ -15,9 +15,8 @@ package WebGUI::Form::CheckList;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
+use base 'WebGUI::Form::List';
 use WebGUI::Form::Checkbox;
-use WebGUI::Form::HiddenList;
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -31,7 +30,7 @@ Creates a series of check box form fields.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control. Also take a look ath WebGUI::Form::Checkbox as this class creates a list of checkboxes.
+This is a subclass of WebGUI::Form::List. Also take a look at WebGUI::Form::Checkbox as this class creates a list of checkboxes.
 
 =head1 METHODS 
 
@@ -49,14 +48,6 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
-=head4 options
-
-A hash reference containing key values that will be returned with the form post and displayable text pairs. Defaults to an empty hash reference.
-
-=head4 defaultValue
-
-An array reference of the items to be checked if no value is specified. Defaults to an empty array reference.
-
 =head4 vertical
 
 Boolean representing whether the checklist should be represented vertically or horizontally. If set to "1" will be displayed vertically. Defaults to "0".
@@ -71,11 +62,8 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		options=>{
-			defaultValue=>{}
-			},
-		defaultValue=>{
-			defaultValue=>[],
+		formName=>{
+			defaultValue=>WebGUI::International::get("941","WebGUI"),
 			},
 		vertical=>{
 			defaultValue=>0
@@ -85,47 +73,6 @@ sub definition {
 			}
 		});
 	return $class->SUPER::definition($definition);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 displayValue ( )
-
-Return the all options
-
-=cut
-
-sub displayValue {
-	my ($self) = @_;
-	return join ", ", @{ $self->{value} };
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("941","WebGUI");
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getValueFromPost ( )
-
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
-
-=cut
-
-sub getValueFromPost {
-	my $self = shift;
-	my @data = $session{req}->param($self->{name});
-        return wantarray ? @data : join("\n",@data);
 }
 
 #-------------------------------------------------------------------
@@ -139,14 +86,11 @@ Renders a series of checkboxes.
 sub toHtml {
 	my $self = shift;
 	my $output;
-	my $alignment;
-	if ($self->{vertical}) {
-		$alignment = "<br />\n";
-	}
-	else {
-		$alignment = " &nbsp; &nbsp;\n";
-	}
-	foreach my $key (keys %{$self->{options}}) {
+	my $alignment = $self->alignmentSeparator;
+        my %options;
+        tie %options, 'Tie::IxHash';
+	%options = $self->orderedHash();
+	foreach my $key (keys %options) {
                 my $checked = 0;
                 foreach my $item (@{$self->{value}}) {
                         if ($item eq $key) {
@@ -162,24 +106,6 @@ sub toHtml {
                 $output .= ${$self->{options}}{$key} . $alignment;
         }
         return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlAsHidden ( )
-
-Creates a series of hidden fields representing the data in the list.
-
-=cut
-
-sub toHtmlAsHidden {
-        my $self = shift;
-        return WebGUI::Form::HiddenList->new(
-                value=>$self->{value},
-                defaultValue=>$self->{defaultValue},
-                name=>$self->{name},
-                options=>$self->{options}
-                )->toHtmlAsHidden;
 }
 
 1;

@@ -15,10 +15,8 @@ package WebGUI::Form::LdapLink;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
+use base 'WebGUI::Form::SelectList';
 use WebGUI::LDAPLink;
-use WebGUI::Form::SelectList;
-use WebGUI::Form::HiddenList;
 use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -35,7 +33,7 @@ Creates an LDAP connection chooser control.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectList.
 
 =head1 METHODS 
 
@@ -57,6 +55,14 @@ The following additional parameters have been added via this sub class.
 
 The identifier for this field. Defaults to "ldapLinkId".
 
+=head4 size 
+
+The number of characters tall this list should be. Defaults to '1'.
+
+=head4 multiple 
+
+Boolean indicating whether the user can select multiple items from this list like a checkList. Defaults to "0".
+
 =head4 defaultValue
 
 An LDAP link id. Defaults to "0", which is nothing.
@@ -64,14 +70,6 @@ An LDAP link id. Defaults to "0", which is nothing.
 =head4 afterEdit
 
 A URL that will be acted upon after editing an LDAP link. 
-
-=head4 size 
-        
-The number of characters tall this list should be. Defaults to '1'.
-                         
-=head4 multiple 
-        
-Boolean indicating whether the user can select multiple items from this list like a checkList. Defaults to "0".
 
 =head4 label
 
@@ -83,14 +81,11 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("LDAPLink_1075","AuthLDAP")
+			},
 		label=>{
-			defaultValue=>$class->getName()
-			},
-		name=>{
-			defaultValue=>"ldapLinkId"
-			},
-		defaultValue=>{
-			defaultValue=>[0]
+			defaultValue=>WebGUI::International::get("LDAPLink_1075","AuthLDAP")
 			},
 		size=>{
 			defaultValue=>1
@@ -98,37 +93,17 @@ sub definition {
 		multiple=>{
 			defaultValue=>0
 			},
+		name=>{
+			defaultValue=>"ldapLinkId"
+			},
+		defaultValue=>{
+			defaultValue=>[0]
+			},
 		afterEdit=>{
 			defaultValue=>undef
 			}
 		});
 	return $class->SUPER::definition($definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("LDAPLink_1075","AuthLDAP");
-}
-
-#-------------------------------------------------------------------
-
-=head2 getValueFromPost ( )
-
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
-
-=cut
-
-sub getValueFromPost {
-        my $self = shift;
-        my @data = $session{req}->param($self->{name});
-        return wantarray ? @data : join("\n",@data);
 }
 
 #-------------------------------------------------------------------
@@ -141,15 +116,8 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	return WebGUI::Form::SelectList->new(
-		name=>$self->{name},
-		id=>$self->{id},
-		options=>WebGUI::LDAPLink::getList(),
-		value=>$self->{value},
-		multiple=>$self->{multiple},
-		size=>$self->{size},
-		extras=>$self->{extras}
-		)->toHtml;
+	$self->{options} = WebGUI::LDAPLink::getList();
+	return $self->SUPER::toHtml();
 }
 
 #-------------------------------------------------------------------
@@ -162,11 +130,8 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
         my $self = shift;
-        return WebGUI::Form::HiddenList->new(
-                value=>$self->{value},
-                name=>$self->{name},
-                options=>WebGUI::LDAPLink::getList()
-                )->toHtmlAsHidden;
+	$self->{options} = WebGUI::LDAPLink::getList();
+        return $self->SUPER::toHtmlAsHidden();
 }
 
 #-------------------------------------------------------------------

@@ -193,7 +193,7 @@ sub definition {
                                         defaultValue=>'7'
                                         },
                                 ownerUserId=>{
-                                        fieldType=>'selectList',
+                                        fieldType=>'selectBox',
                                         defaultValue=>'3'
                                         },
                                 startDate=>{
@@ -580,7 +580,7 @@ sub getEditForm {
                 $clause = "userId=".quote($self->get("ownerUserId"));
         }
         my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
-        $tabform->getTab("security")->selectList(
+        $tabform->getTab("security")->selectBox(
                -name=>"ownerUserId",
                -options=>$users,
                -label=>WebGUI::International::get(108,"Asset"),

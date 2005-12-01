@@ -118,7 +118,7 @@ sub www_editSettings {
                 -value=>$session{setting}{metaDataEnabled}
         	);
 # user interface settings
-	$tabform->getTab("ui")->selectList(
+	$tabform->getTab("ui")->selectBox(
 		-name=>"richEditor",
 		-label=>$i18n->get("default rich editor"),
 		-hoverHelp=>$i18n->get("default rich editor description"),
@@ -207,7 +207,7 @@ sub www_editSettings {
 		-hoverHelp=>$i18n->get('show performance indicators description'),
 		-value=>$session{setting}{showPerformanceIndicators}
 		);
-	$tabform->getTab("misc")->selectList(
+	$tabform->getTab("misc")->selectBox(
 		-name=>"hostToUse",
 		-value=>[$session{setting}{hostToUse}],
 		-options=>{
@@ -274,7 +274,7 @@ sub www_editSettings {
    	foreach (@{$session{config}{authMethods}}) {
       		$options->{$_} = $_;
    	}
-   	$tabform->getTab("auth")->selectList(
+   	$tabform->getTab("auth")->selectBox(
             	-name=>"authMethod",
 		-options=>$options,
 		-label=>$i18n->get(164),

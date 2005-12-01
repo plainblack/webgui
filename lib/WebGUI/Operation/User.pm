@@ -125,9 +125,9 @@ sub getUserSearchForm {
 		-name=>"doit",
 		-value=>1
 		)
-	.WebGUI::Form::selectList(
+	.WebGUI::Form::selectBox(
 		-name=>"modifier",
-		-value=>([$session{scratch}{userSearchModifier} || "contains"]),
+		-value=>($session{scratch}{userSearchModifier} || "contains"),
 		-options=>{
 			startsWith=>WebGUI::International::get("starts with"),
 			contains=>WebGUI::International::get("contains"),
@@ -139,9 +139,9 @@ sub getUserSearchForm {
 		-value=>$session{scratch}{userSearchKeyword},
 		-size=>15
 		)
-	.WebGUI::Form::selectList(
+	.WebGUI::Form::selectBox(
 		-name	=> "status",
-		-value	=> [$session{scratch}{userSearchStatus} || "users.status like '%'"],
+		-value	=> ($session{scratch}{userSearchStatus} || "users.status like '%'"),
 		-options=> { 
 			""		=> WebGUI::International::get(821),
 			Active		=> WebGUI::International::get(817),
@@ -252,22 +252,22 @@ sub www_editUser {
 			-value => $u->status
 			);
 	} else {
-		$tabform->getTab("account")->selectList(
+		$tabform->getTab("account")->selectBox(
 			-name => "status",
 			-options => \%status,
 			-label => $i18n->get(816),
-			-value => [$u->status]
+			-value => $u->status
 			);
 	}
 	my $options;
 	foreach (@{$session{config}{authMethods}}) {
 		$options->{$_} = $_;
 	}
-	$tabform->getTab("account")->selectList(
+	$tabform->getTab("account")->selectBox(
 	        -name=>"authMethod",
 		-options=>$options,
 		-label=>$i18n->get(164),
-		-value=>[$u->authMethod],
+		-value=>$u->authMethod,
 		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
 	foreach (@{$session{config}{authMethods}}) {

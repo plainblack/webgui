@@ -4,7 +4,7 @@ use WebGUI::Session;
 use WebGUI::International;
 
 ##Get list of all macros by namespace/module name
-my $dir = join $session{os}{slash}, $session{config}{webguiRoot},"lib","WebGUI","Macro";
+my $dir = join '/', $session{config}{webguiRoot},"lib","WebGUI","Macro";
 opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Macro directory: $dir!");
 my @macros = map { s/Macro_//; s/\.pm//; $_; }
              grep { /\.pm$/ }

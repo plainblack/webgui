@@ -61,7 +61,7 @@ sub _linkTOC {
 
 #-------------------------------------------------------------------
 sub _getHelpFilesList {
-        my $dir = join $session{os}{slash}, $session{config}{webguiRoot},"lib","WebGUI","Help";
+        my $dir = join '/', $session{config}{webguiRoot},"lib","WebGUI","Help";
         opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Help directory!");
 	my @files;
 	foreach my $file (readdir DIR) {

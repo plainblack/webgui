@@ -15,10 +15,10 @@ package WebGUI::Form::FieldType;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
-use WebGUI::Form::SelectList;
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::Utility;
 use Tie::IxHash;
 
 =head1 NAME
@@ -31,7 +31,7 @@ Creates a form control that will allow you to select a form control type.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -49,10 +49,6 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
-=head4 size
-
-Defaults to 1. How many characters tall should this control be represented.
-
 =head4 types
 
 An array reference containing the form control types to be selectable. Defaults to all available types.
@@ -67,11 +63,11 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		label=>{
-			defaultValue=>$class->getName()
+		formName=>{
+			defaultValue=>WebGUI::International::get("fieldtype","WebGUI")
 			},
-		size=>{
-			defaultValue=>1
+		label=>{
+			defaultValue=>WebGUI::International::get("fieldtype","WebGUI")
 			},
 		types=>{
 			defaultValue=>$class->getTypes
@@ -82,21 +78,12 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("744","WebGUI");
-}
-
-#-------------------------------------------------------------------
-
 =head2 getTypes ( )
 
-A class method that returns an array reference of all the form control types present in the system.
+A class method that returns an array reference of all the valid form
+control types present in the system.  Invalid form types include
+Control.pm, the form master class and List, the list form master class
+and DynamicField, the form class dispatcher.
 
 =cut
 
@@ -108,7 +95,7 @@ sub getTypes {
 	my @types;
 	foreach my $type (@rawTypes) {
 		if ($type =~ /^(.*)\.pm$/) {
-			next if ($1 eq "Control");
+			next if (isIn($1, qw/Control List DynamicField/));
 			push(@types,$1);
 		}
 	}
@@ -150,14 +137,9 @@ sub toHtml {
         	} 
 		$options{$type} = $class->getName;
 	}
-	return WebGUI::Form::SelectList->new(
-		id=>$self->{id},
-		name=>$self->{name},
-		options=>\%options,
-		value=>[$self->{value}],
-		extras=>$self->{extras},
-		size=>$self->{size}
-		)->toHtml;
+	$self->{options} = \%options;
+
+	return $self->SUPER::toHtml();
 }
 
 

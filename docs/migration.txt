@@ -281,7 +281,7 @@ dates then you will notice no side effects from the format change. If you are
 not, then you should convert your plugin to use WebGUI::FormProcessor.
 
 In addition to the format change above, we also made one related API change.
-WebGUI::Form::dateTime() and WebGUI::HTMLForm->dateTime() no longer have
+WebGUI::Form::DateTime() and WebGUI::HTMLForm->dateTime() no longer have
 "dateExtras" and "timeExtras", but rather just "extras" properties. This is
 because there is only one field to represent both the date and the time,
 unlike before.
@@ -348,6 +348,9 @@ http://www.plainblack.com/translations/translations
 
 5.8 WebGUI::Session Changes
 
+In 6.8 we removed $session{os}{slash}.  This is due to requiring Windows 2000
+or higher.
+
 In 6.1 we changed the session API to remove functions that didn't really
 belong in WebGUI::Session. The main changes of interest are that you no longer
 do HTTP redirects and set cookies via session. Take a look at WebGUI::HTTP for
@@ -388,6 +391,38 @@ to convert your content, if necessary.
 
 
 5.13 Form Changes 
+
+The following form changes were made in 6.8:
+
+All forms types now use inheritance to build List type forms.  This is
+what the class hierarchy looks like:
+
+List
+	CheckList
+	RadioList
+	HiddenList
+	SelectList
+		Group
+		LdapLink
+	SelectBox
+		ComboBox
+		ContentType
+		DatabaseLink
+		FilterContent
+		Template
+		TimeZone
+		WhatNext
+
+The new SelectBox class behaves exactly like a SelectList but only supports single
+select instead of multiple select and defaults to being 1 character high.  By
+default, all SelectLists are not 5 characters high.  The size setting can
+be used to override the defaults in all List type forms.
+
+All List type forms now also have a sortByValue property which defaults
+to 0 (off).  This made automatic testing of the Forms easy.
+
+getName is now in the Form::Control base class.  It retreives whatever
+is stored in the formName field of the definition field structure.
 
 The following form changes were made in 6.3:
 

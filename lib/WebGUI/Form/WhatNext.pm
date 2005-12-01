@@ -15,8 +15,7 @@ package WebGUI::Form::WhatNext;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
-use WebGUI::Form::SelectList;
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
 use WebGUI::Session;
 
@@ -30,7 +29,7 @@ Creates a what next question field. This is used to allow users direct the flow 
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -52,18 +51,6 @@ The following additional parameters have been added via this sub class.
 
 The identifier for this field. Defaults to "proceed".
 
-=head4 defaultValue
-
-A database link id. Defaults to "0", which is the WebGUI database.
-
-=head4 afterEdit
-
-A URL that will be acted upon after editing a database link. 
-
-=head4 hoverHelp
-
-A tooltip to tell the user what to do with the field. Defaults a standard piece of help for Database Links.
-
 =head4 label
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
@@ -74,29 +61,17 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("744","WebGUI")
+			},
 		label=>{
-			defaultValue=>$class->getName()
+			defaultValue=>WebGUI::International::get("744","WebGUI")
 			},
 		name=>{
 			defaultValue=>"proceed"
 			},
-		options=>{
-			defaultValue=>{}
-			}
 		});
 	return $class->SUPER::definition($definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("744","WebGUI");
 }
 
 #-------------------------------------------------------------------
@@ -109,16 +84,7 @@ Renders a question selector asking the user where they want to go.
 
 sub toHtml {
 	my $self = shift;
-	return WebGUI::Form::SelectList->new(
-		id=>$self->{id},
-		name=>$self->{name},
-		options=>$self->{options},
-		value=>[$self->{value}],
-		extras=>$self->{extras}
-		)->toHtml;
+	return $self->SUPER::toHtml();
 }
 
-
-
 1;
-

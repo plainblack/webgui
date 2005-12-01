@@ -46,7 +46,7 @@ sub definition {
 				defaultValue=>"descendants"
 				},
 			startType=>{
-				fieldType=>'selectList',
+				fieldType=>'selectBox',
 				defaultValue=>"relativeToCurrentUrl"
 				},
 			startPoint=>{
@@ -54,11 +54,11 @@ sub definition {
 				defaultValue=>0
 				},
 			ancestorEndPoint=>{
-				fieldType=>'selectList',
+				fieldType=>'selectBox',
 				defaultValue=>55
 				},
 			descendantEndPoint=>{
-				fieldType=>'selectList',
+				fieldType=>'selectBox',
 				defaultValue=>55
 				},
 			showSystemPages=>{
@@ -110,7 +110,7 @@ sub getEditForm {
 			$pedigreeChecked = 1;
 		}
 	}
-	$tabform->getTab("properties")->selectList(
+	$tabform->getTab("properties")->selectBox(
 		-name=>"startType",
 		-options=>{
 			specificUrl=>$i18n->get('Specific URL'),
@@ -140,7 +140,7 @@ sub getEditForm {
 		);
 	$tabform->getTab("properties")->raw(
 		'</tbody><tbody id="navAncestorEnd"><tr><td class="formDescription">'.$i18n->get("Ancestor End Point").'</td><td>'
-		.WebGUI::Form::selectList({
+		.WebGUI::Form::selectBox({
 			name=>"ancestorEndPoint",
 			value=>[$self->getValue("ancestorEndPoint")],
 			options=>\%options
@@ -190,7 +190,7 @@ sub getEditForm {
 		);
 	$tabform->getTab("properties")->raw(
 		'</tbody><tbody id="navDescendantEnd"><tr><td class="formDescription">'.$i18n->get('Descendant End Point').'</td><td>'
-		.WebGUI::Form::selectList({
+		.WebGUI::Form::selectBox({
 			name=>"descendantEndPoint",
 			value=>[$self->getValue("descendantEndPoint")],
 			options=>\%options

@@ -365,7 +365,7 @@ sub www_addAccessory {
    @usedAccessories = WebGUI::SQL->buildArray("select accessoryAssetId from Product_accessory where assetId=".quote($self->getId));
    push(@usedAccessories,$self->getId);
    $accessory = WebGUI::SQL->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Wobject::Product' and asset.assetId not in (".quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).") group by assetData.assetId");
-   $f->selectList(
+   $f->selectBox(
 		-name => "accessoryAccessId",
 		-options => $accessory,
 		-label => WebGUI::International::get(17,'Asset_Product'),
@@ -404,7 +404,7 @@ sub www_addRelated {
    @usedRelated = WebGUI::SQL->buildArray("select relatedAssetId from Product_related where assetId=".quote($self->getId));
    push(@usedRelated,$self->getId);
    $related = WebGUI::SQL->buildHashRef("select assetId,title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".quoteAndJoin(\@usedRelated).")");
-   $f->selectList(
+   $f->selectBox(
 		-name => "relatedAssetId",
 		-options => $related,
 		-label => WebGUI::International::get(20,'Asset_Product'),

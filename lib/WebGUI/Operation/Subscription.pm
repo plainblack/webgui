@@ -230,7 +230,7 @@ sub www_editSubscription {
 		-hoverHelp	=> $i18n->get('subscription group description'),
 		-value	=> [$properties->{subscriptionGroup} || 2]
 		);
-	$f->selectList(
+	$f->selectBox(
 		-name	=> 'duration',
 		-label	=> $i18n->get('subscription duration'),
 		-hoverHelp	=> $i18n->get('subscription duration description'),

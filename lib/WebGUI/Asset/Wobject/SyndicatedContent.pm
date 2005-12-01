@@ -98,7 +98,7 @@ sub definition {
 				},
 			displayMode=>{
 				tab=>"display",
-				fieldType=>'selectList',
+				fieldType=>'selectBox',
 				defaultValue=>'interleaved',
 				options=>{
                         		'interleaved'=>WebGUI::International::get('interleaved','Asset_SyndicatedContent'),

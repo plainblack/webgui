@@ -246,7 +246,7 @@ sub getEditForm {
 		-afterEdit	=> 'func=edit'
 		);
 
-	$tabform->getTab('display')->selectList(
+	$tabform->getTab('display')->selectBox(
 		-name		=> "questionOrder",
 		-options	=> {
 			sequential => WebGUI::International::get(5,'Asset_Survey'),
@@ -264,7 +264,7 @@ sub getEditForm {
 		-label		=> WebGUI::International::get(83,'Asset_Survey'),
 		-hoverHelp	=> WebGUI::International::get('83 description','Asset_Survey')
 		);
-        $tabform->getTab('properties')->selectList(
+        $tabform->getTab('properties')->selectBox(
                 -name	=> "mode",
                 -options	=> {
 			survey => WebGUI::International::get(9,'Asset_Survey'),
@@ -854,7 +854,7 @@ sub www_editAnswer {
 		$question = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 		$question = { ('-1' => WebGUI::International::get(82,'Asset_Survey'),%$question) };
-		$f->selectList(
+		$f->selectBox(
 			-name=>"gotoQuestion",
 			-options=>$question,
 			-value=>[$answer->{gotoQuestion}],
@@ -956,7 +956,7 @@ sub www_editQuestion {
 	my $sectionList = WebGUI::SQL->buildHashRef("select Survey_sectionId,sectionName
 			  from Survey_section where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 			  
-	$f->selectList(
+	$f->selectBox(
 			-name	=> "section",
 			-options=> $sectionList,
 			-value	=> [$question->{Survey_sectionId}],
@@ -967,7 +967,7 @@ sub www_editQuestion {
 		my $ql = WebGUI::SQL->buildHashRef("select Survey_questionId,question 
 			from Survey_question where Survey_id=".quote($self->get("Survey_id"))." order by sequenceNumber");
 		$ql = { ('-1' => WebGUI::International::get(82,'Asset_Survey'),%$ql) };
-		$f->selectList(
+		$f->selectBox(
 			-name	=> "gotoQuestion",
 			-options=> $ql,
 			-value	=> [$question->{gotoQuestion}],

@@ -15,6 +15,7 @@ print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
 # Database connectivity.
 #----------------------------------------
 #use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on servers with many sites, or those using db slaves.
+use Log::Log4perl ();
 use DBI ();
 DBI->install_driver("mysql"); # Change to match your database driver.
 

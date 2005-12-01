@@ -477,7 +477,7 @@ sub www_editListing {
 		-label=>"Description"
 		);
         if ($self->canEdit) {
-		$f->selectList(
+		$f->selectBox(
 			-name=>"maintainerId",
 			-value=>[$listing->{maintainerId}],
 			-label=>"Listing Maintainer",
@@ -507,7 +507,7 @@ sub www_editListing {
 					);
 			} elsif ($field->{fieldType} eq "goodBad") {
 				my $value = ($field->{value} || $field->{defaultValue} || "No");
-				$f->selectList(
+				$f->selectBox(
 					-name=>$field->{name},
 					-value=>[$value],
 					-label=>$field->{label},
@@ -617,7 +617,7 @@ sub www_editListingSave {
 	while (my ($id, $name, $type) = $a->array) {
 		my $value;
 		if ($type eq "goodBad") {
-			$value = WebGUI::FormProcessor::selectList($name);
+			$value = WebGUI::FormProcessor::selectBox($name);
 		} else {
 			$value = WebGUI::FormProcessor::process($name,$type);
 		}
@@ -652,7 +652,7 @@ sub www_editField {
 		-value=>$field->{label},
 		-label=>"Label"
 		);
-	$f->selectList(
+	$f->selectBox(
 		-name=>"fieldType",
 		-value=>[$field->{fieldType}],
 		-label=>"Type",
@@ -678,7 +678,7 @@ sub www_editField {
 	foreach my $category ($self->getCategories) {
 		$cats{$category} = $category;
 	}
-	$f->selectList(
+	$f->selectBox(
 		-name=>"category",
 		-value=>[$field->{category}],
 		-label=>"Category",
@@ -982,7 +982,7 @@ sub www_viewDetail {
 		-value=>$session{user}{email},
 		-label=>"Your Email Address"
 		);
-	$f->selectList(
+	$f->selectBox(
 		-name=>"subject",
 		-extras=>'class="content"',
 		-options=>{
@@ -1051,7 +1051,7 @@ sub www_viewDetail {
 		my ($mean,$median,$count) = WebGUI::SQL->quickArray("select meanValue, medianValue, countValue from Matrix_ratingSummary
 			where listingId=".quote($listingId)." and category=".quote($category));
 		$ratingsTable .= '<tr><th>'.$category.'</th><td>'.$mean.'</td><td>'.$median.'</td><td>'.$count.'</td></tr>';
-		$f->selectList(
+		$f->selectBox(
 			-name=>$category,
 			-label=>$category,
 			-value=>[5],

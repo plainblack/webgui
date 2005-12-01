@@ -352,7 +352,7 @@ sub definition {
 				defaultValue=>'javascript'
 				},
 			richEditor =>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>"PBrichedit000000000002"
 				},
 			attachmentsPerPost =>{
@@ -372,11 +372,11 @@ sub definition {
 				defaultValue=>1
 				},
 			sortOrder =>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>'desc'
 				},
 			sortBy =>{
-				fieldType=>"selectList",
+				fieldType=>"selectBox",
 				defaultValue=>'dateUpdated'
 				},
 			rssTemplateId =>{
@@ -574,14 +574,14 @@ sub getEditForm {
 			userDefined4=>WebGUI::International::get('user defined 4', 'Asset_Collaboration'),
 			userDefined5=>WebGUI::International::get('user defined 5', 'Asset_Collaboration'),
 			);
-	$tabform->getTab("display")->selectList(
+	$tabform->getTab("display")->selectBox(
 		-name=>"sortBy",
 		-value=>[$self->getValue("sortBy")],
 		-options=>\%options,
 		-label=>WebGUI::International::get('sort by', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('sort by description', 'Asset_Collaboration'),
 		);
-	$tabform->getTab("display")->selectList(
+	$tabform->getTab("display")->selectBox(
 		-name=>"sortOrder",
 		-value=>[$self->getValue("sortOrder")],
 		-options=>{
@@ -621,7 +621,7 @@ sub getEditForm {
 		-hoverHelp=>WebGUI::International::get('edit stamp description', 'Asset_Collaboration'),
 		-value=>$self->getValue("addEditStampToPosts")
 		);
-        $tabform->getTab("display")->selectList(
+        $tabform->getTab("display")->selectBox(
 		-name=>"richEditor",
 		-label=>WebGUI::International::get('rich editor', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('rich editor description', 'Asset_Collaboration'),
@@ -1015,7 +1015,7 @@ sub www_search {
         tie %results, 'Tie::IxHash';
         %results = (10=>'10', 25=>'25', 50=>'50', 100=>'100');
         my $numResults = $session{scratch}{$self->getId."_numResults"} || $self->get("threadsPerPage");
-        $var{'results.form'} = WebGUI::Form::selectList({
+        $var{'results.form'} = WebGUI::Form::selectBox({
                 name=>"numResults",
                 options=>\%results,
                 value=>[$numResults]

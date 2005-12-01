@@ -15,7 +15,7 @@ package WebGUI::Form::Combo;
 =cut
 
 use strict;
-use base 'WebGUI::Form::SelectList';
+use base 'WebGUI::Form::SelectBox';
 use WebGUI::Form::Text;
 use WebGUI::International;
 use WebGUI::Session;
@@ -30,7 +30,7 @@ Creates a select list merged with a text box form control.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::SelectList.
+This is a subclass of WebGUI::Form::SelectBox.
 
 =head1 METHODS 
 
@@ -59,25 +59,15 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
+		formName=>{
+			defaultValue=>WebGUI::International::get("combobox","WebGUI")
+			},
 		profileEnabled=>{
 			defaultValue=>1
 			}
 		});
 	return $class->SUPER::definition($definition);
 }
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("combobox","WebGUI");
-}
-
 
 #-------------------------------------------------------------------
 

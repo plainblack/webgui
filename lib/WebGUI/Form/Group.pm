@@ -15,9 +15,7 @@ package WebGUI::Form::Group;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Control';
-use WebGUI::Form::HiddenList;
-use WebGUI::Form::SelectList;
+use base 'WebGUI::Form::SelectList';
 use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
@@ -26,7 +24,7 @@ use WebGUI::SQL;
 
 =head1 NAME
 
-Package WebGUI::Form::group
+Package WebGUI::Form::Group
 
 =head1 DESCRIPTION
 
@@ -34,7 +32,7 @@ Creates a group chooser field.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::SelectList.
 
 =head1 METHODS 
 
@@ -68,10 +66,6 @@ An array reference containing a list of groups to exclude from the list. Default
 
 This will be used if no value is specified. Should be passed as an array reference. Defaults to 7 (Everyone).
 
-=head4 label
-
-A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
-
 =head4 profileEnabled
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
@@ -82,17 +76,17 @@ sub definition {
 	my $class = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		label=>{
-			defaultValue=>$class->getName()
+		formName=>{
+			defaultValue=>WebGUI::International::get("group","WebGUI")
 			},
 		size=>{
 			defaultValue=>1
 			},
-		defaultValue=>{
-			defaultValue=>[7]
-			},
 		multiple=>{
 			defaultValue=>0
+			},
+		defaultValue=>{
+			defaultValue=>[7]
 			},
 		excludeGroups=>{
 			defaultValue=>[]
@@ -102,37 +96,6 @@ sub definition {
 			},
 		});
 	return $class->SUPER::definition($definition);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getName ()
-
-Returns the human readable name or type of this form control.
-
-=cut
-
-sub getName {
-        return WebGUI::International::get("group","WebGUI");
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getValueFromPost ( )
-
-Returns either what's posted or if nothing comes back it returns "2" the ID of the Registered Users group.
-
-=cut
-
-sub getValueFromPost {
-	my $self = shift;
-        my @data = $session{req}->param($self->{name});
-        if (scalar(@data)) {
-		return wantarray ? @data : join("\n",@data);
-	}
-	return wantarray ? @{[2]} : 2;
 }
 
 #-------------------------------------------------------------------
@@ -149,17 +112,8 @@ sub toHtml {
 	if ($self->{excludeGroups}[0] ne "") {
 		$where = "and groupId not in (".quoteAndJoin($self->{excludeGroups}).")";
 	}
-	return WebGUI::Form::SelectList->new(
-		options=>WebGUI::SQL->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName"),
-		name=>$self->{name},
-		id=>$self->{id},
-		value=>$self->{value},
-		extras=>$self->{extras},
-		size=>$self->{size},
-		multiple=>$self->{multiple},
-		defaultValue=>$self->{defaultValue}
-		)->toHtml;
-
+	$self->{options} = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName");
+	return $self->SUPER::toHtml();
 }
 
 #-------------------------------------------------------------------
@@ -172,12 +126,8 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
         my $self = shift;
-        return WebGUI::Form::HiddenList->new(
-                value=>$self->{value},
-                defaultValue=>$self->{defaultValue},
-                name=>$self->{name},
-                options=>WebGUI::SQL->buildHashRef("select groupId,groupName from groups")
-                )->toHtmlAsHidden;
+	$self->{options} = WebGUI::SQL->buildHashRef("select groupId,groupName from groups");
+        return $self->SUPER::toHtmlAsHidden();
 }
 
 #-------------------------------------------------------------------

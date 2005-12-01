@@ -13,6 +13,7 @@ our $STATUS = "beta";
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
+use trace;
 use Tie::CPHash;
 use Time::HiRes;
 use WebGUI::Affiliate;

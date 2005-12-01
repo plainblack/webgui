@@ -108,11 +108,11 @@ sub definition {
                                 defaultValue=>0
                                 },
  			directionality=>{
-                        	fieldType=>'selectList',
+                        	fieldType=>'selectBox',
                                 defaultValue=>'ltr'
                                 },
  			toolbarLocation=>{
-                        	fieldType=>'selectList',
+                        	fieldType=>'selectBox',
                                 defaultValue=>'bottom'
                                 },
  			cssFile=>{
@@ -120,15 +120,15 @@ sub definition {
                                 defaultValue=>undef
                                 },
  			toolbarRow1=>{
-                        	fieldType=>'checkList',
+                        	fieldType=>'checkBox',
                                 defaultValue=>undef
                                 },
  			toolbarRow2=>{
-                        	fieldType=>'checkList',
+                        	fieldType=>'checkBox',
                                 defaultValue=>undef
                                 },
  			toolbarRow3=>{
-                        	fieldType=>'checkList',
+                        	fieldType=>'checkBox',
                                 defaultValue=>undef
                                 },
 			enableContextMenu => {
@@ -332,7 +332,7 @@ sub getEditForm {
 		-name=>"nowrap",
                 -uiLevel=>9
                 );
-        $tabform->getTab("properties")->selectList(
+        $tabform->getTab("properties")->selectBox(
                 -value=>[$self->getValue("directionality")],
 		-label=>WebGUI::International::get('directionality', 'Asset_RichEdit'),
 		-hoverHelp=>WebGUI::International::get('directionality description', 'Asset_RichEdit'),
@@ -342,7 +342,7 @@ sub getEditForm {
 			rtl=>WebGUI::International::get('right to left', 'Asset_RichEdit'),
 			}
                 );
-        $tabform->getTab("display")->selectList(
+        $tabform->getTab("display")->selectBox(
                 -value=>[$self->getValue("toolbarLocation")],
 		-label=>WebGUI::International::get('toolbar location', 'Asset_RichEdit'),
 		-hoverHelp=>WebGUI::International::get('toolbar location description', 'Asset_RichEdit'),

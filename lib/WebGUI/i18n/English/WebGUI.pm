@@ -362,6 +362,16 @@ Be aware that any database links you create here will be available to all conten
 		lastUpdated => 1031514049
 	},
 
+	'486' => {
+		message => q|List|,
+		lastUpdated => 1133087205
+	},
+
+	'487' => {
+		message => q|Select Box|,
+		lastUpdated => 1133087205
+	},
+
 	'391' => {
 		message => q|Delete attached file.|,
 		lastUpdated => 1031514049
@@ -3219,6 +3229,12 @@ that Asset and all Assets below it.</p>
 
 	'combobox' => {
 		message => q|Combo Box|,
+		lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+	'fieldtype' => {
+		message => q|Field Type|,
 		lastUpdated =>0,
                 context => q|Field type name|
         },
