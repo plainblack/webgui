@@ -1,7 +1,7 @@
 //Confugration
 //sets the drag accruacy 
 //a value of 0 is most accurate.  The number can be raised to improve performance.
-var accuracy = 2;
+var accuracy = 4;
 
 //list of the content item names.  Could be searched for, but hard coded for performance
 var draggableObjectList=new Array();
@@ -185,15 +185,15 @@ function dragable_move(e){
         z.style.left=(temp1+e.clientX-x)+"px";
         z.style.top=(temp2+e.clientY-y)+"px";
         return false
-    }else {
+ //   }else {
                 
-        tmp = dragable_spy(dom? e.pageX: (e.clientX + docElement.scrollLeft),dom? e.pageY: (e.clientY + docElement.scrollTop));
+ //       tmp = dragable_spy(dom? e.pageX: (e.clientX + docElement.scrollLeft),dom? e.pageY: (e.clientY + docElement.scrollTop));
         
-        if (tmp.length == 0) {
-            currentDiv = null;
-        }else {
-            currentDiv = tmp[0];
-        }
+ //       if (tmp.length == 0) {
+ //           currentDiv = null;
+ //       }else {
+ //           currentDiv = tmp[0];
+ //       }
         
     }
 }
@@ -202,7 +202,11 @@ function dragable_dragStart(e){
     e=dom? e : event;
     var fObj=dom? e.target : e.srcElement
 
-    if (fObj.className != "dragTrigger") {
+    if (fObj.nodeName=='IMG') { return;}
+
+    fObj2 = dragable_getObjectByClass(fObj,"dragTrigger");  
+
+    if (!fObj2) {
         return;
     }
 
@@ -250,12 +254,12 @@ function dragable_spy(x, y) {
         td = draggableObjectList[i];    
         
         //this is a hack
-        if (td == null || td == startTD) continue;
-
+      if (td == null || td == startTD || !td.parentNode || !td.parentNode.parentNode) { continue; }
         var fObj=td;
 
         y1=0;
-        x1=0
+        x1=0;
+			var gap = (td.className=='blank' || (td.parentNode.parentNode.rows.length == td.rowIndex + 1)) ? 500 : 0
 
         while (fObj!=null && fObj.tagName!=topelement){
             y1+=fObj.offsetTop;   
@@ -268,7 +272,7 @@ function dragable_spy(x, y) {
                     returnArray[0] = td;
                     returnArray[1] = "top";
                     return returnArray;
-            }else if (y> y1 && y< (y1 + td.offsetHeight)) {
+            }else if (y> y1 && y< (y1 + td.offsetHeight + gap)) {
                     returnArray[0] = td;
                     returnArray[1] = "bottom";
                     return returnArray;
@@ -330,31 +334,24 @@ function dragable_dragStop(e) {
                     divName=endTD.id + "_div";
                     document.getElementById(divName).className="dragable";
                //     document.getElementById(divName).style.opacity = null;
-               //     document.getElementById(divName).style.filter = null;
+   //                 document.getElementById(divName).style.filter = null;
                 }
-		AjaxRequest.get(
-    {
-      'url':pageURL
-      ,'method':'POST'
-      ,'map':dragable_getContentMap()
-      ,'func':'setContentPositions'
-    }
-  );
+                dragable_postNewContentMap();
             }                        
 
             for(i=0;i<dragableList.length;i++) {
-                dragableList[i].style.top=0;
-                dragableList[i].style.left=0;
+                dragableList[i].style.top='0px';
+                dragableList[i].style.left='0px';
                 dragableList[i].className="dragable";    
             }
         
             //this is a ie hack for a render bug
             for(i=0;i<draggableObjectList.length;i++) {
                 if (draggableObjectList[i]) {                                    
-                    draggableObjectList[i].style.top=1;
-                    draggableObjectList[i].style.left=1;                    
-                    draggableObjectList[i].style.top=0;
-                    draggableObjectList[i].style.left=0;                    
+                    draggableObjectList[i].style.top='1px';
+                    draggableObjectList[i].style.left='1px';                    
+                    draggableObjectList[i].style.top='0px';
+                    draggableObjectList[i].style.left='0px';                    
                 }
             }
         }
@@ -366,7 +363,17 @@ function dragable_dragStop(e) {
             endTD=null;
         }
 }
- 
+
+function dragable_postNewContentMap() {
+//		AjaxRequest.get(
+ //   {
+//      'url':pageURL
+//      ,'method':'POST'
+//      ,'map':dragable_getContentMap()
+//      ,'func':'setContentPositions'
+//    }
+//  );
+}
 
 //gets the element children of a dom object
 function dragable_getElementChildren(obj) {
@@ -388,14 +395,24 @@ function dragable_appendBlankRow(parent) {
     blankClone.id = "blank" + new Date().getTime() + blankCount++;
     draggableObjectList[draggableObjectList.length] = blankClone;
     parent.appendChild(blankClone);
-    blankClone.style.top=0;
-    blankClone.style.left=0;
+    blankClone.style.top='0px';
+    blankClone.style.left='0px';
     blank.className="hidden";
 }
 
 
+// deletes a dashlet (moves it from its current location to the bottom of position 1)
+function dragable_deleteContent(e,from) {
+	from = dragable_getObjectByClass(from,"dragable");
+	from = document.getElementById(from.id.substr(0,from.id.indexOf("_div")));
+	dragable_moveContent(from,document.getElementById('position1').rows[document.getElementById('position1').rows.length - 1],"bottom");
+//	e.preventDefault();
+//	e.stopPropagation();
+	dragable_postNewContentMap();
+}
+
 //moves a table row from one table to another. from and to are table row objects
-//if the last row is remvoed from a table, id blank is placed in the table
+//if the last row is removed from a table, id blank is placed in the table
 function dragable_moveContent(from, to,position) {
     if (from!=to && from && to) {    
         var fromParent = from.parentNode;

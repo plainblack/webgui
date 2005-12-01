@@ -27,7 +27,6 @@ my $quiet;
 
 start();
 addTimeZonesToUserPreferences();
-fixVeryLateDates();
 removeUnneededFiles();
 updateCollaboration();
 addPhotoField();
@@ -41,6 +40,7 @@ addInOutBoard();
 addDashboardStuff();
 addZipArchive();
 updateUserProfileDayLabels();
+fixVeryLateDates();
 finish();
 
 #-------------------------------------------------
@@ -202,67 +202,28 @@ my $newAsset = $folder->addChild({
 }, 'PBtmplBlankStyle000001');
 $newAsset->commit;
 $template = <<STOP;
-
-<style type="text/css">
-
-table.dashboardColumn  {
-width: 100%;
-background: none;
-background-color:transparent;
-}
-.availableDashlet { 
-}
-div#dashboardContainer {
-font:       11px Lucida Grande, Verdana, Arial, Helvetica, sans serif;
-background: url(^Extras;wobject/Dashboard/background.gif) repeat-x #fff;
-}
-table#dashboardChooserContainer {
-margin:0px;
-padding:0px;
-border:0px;
-
-}
-
-tbody.availableDashlet * div.content { display: none;  }
-div#availableDashlets * td {width:100px;}
-div#availableDashlets * div.content {width:100px; overflow-x:hidden;}
-div#columnsContainerDiv {
-margin:6px;
-}
-td {vertical-align: top;}
-h1 {
-font:       15px Lucida Grande, Verdana, Arial, Helvetica, sans serif;
-}
-</style>
+<style type="text/css"> \@import "^Extras;wobject/Dashboard/draggable.css"; </style>
+<style type="text/css"> \@import "^Extras;wobject/Dashboard/dashboard.css"; </style>
+<script src="^Extras;wobject/Dashboard/draggable.js" type="text/javascript"></script>
 <div id="dashboardContainer">
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>">
 </a>
-<table id="dashboardChooserContainer" width="100%">
+<table id="dashboardChooserContainer" width="100%" border="0">
 <tr>
 <td>
-<div style="display:none;cursor: hand;" id="hideNewContentButton" onclick="makeInactive(this);makeInactive(document.getElementById('availableDashlets'));makeActive(document.getElementById('showNewContentButton'));">Hide New Content List</div>
-<div id="availableDashlets" style="display:none;">
-<table cellpadding="0" cellspacing="0" border="0" id="position1" class="dashboardColumn" width="100px">
-<tbody class="availableDashlet" width="100px">
-<tmpl_loop position1_loop>
-<tr id="td<tmpl_var id>">
-<td>
-<div id="td<tmpl_var id>_div" class="dragable">
-<div class="dragTrigger"><tmpl_var dashletTitle>
-</div>
-<div class="content"><tmpl_var content>
-</div>
-</div>
-</td>
-</tr>
-</tmpl_loop>
-</tbody>
-</table>
-</div>
+<div style="display:none;cursor: hand;" id="hideNewContentButton" onclick="makeInactive(this);makeInactive(document.getElementById('availableBox'));makeActive(document.getElementById('showNewContentButton'));">Hide New Content List</div>
+<div id="availableBox"><div id="availableBox2">
+<div id="availableDashlets">
+<table cellpadding="0" cellspacing="0" border="0" id="position1" class="dashboardColumn">
+<tbody class="availableDashlet">
+<tmpl_loop position1_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
+</tbody></table>
+</div></div></div>
 </td>
 <td>
 <table cellpadding="0" cellspacing="0" border="0" width="100%">
-<tr><td>			<div id="showNewContentButton" style="cursor: hand;" onclick="makeInactive(this);makeActive(document.getElementById('availableDashlets'));makeActive(document.getElementById('hideNewContentButton'));">Add New Content</div></td><td>
+<tr><td style="width:80px;">			<div id="showNewContentButton"  onclick="makeInactive(this);makeActive(document.getElementById('availableBox'));makeActive(document.getElementById('hideNewContentButton'));">Add New Content</div></td><td>
 <tmpl_if showAdmin>
 <p>
 <tmpl_var controls>
@@ -311,19 +272,8 @@ function AjaxRequestEnd() {  }
 <td width="33%">
 <table cellpadding="0" cellspacing="0" border="0" id="position2" class="dashboardColumn" width="100%">
 <tbody>
-<tmpl_loop position2_loop>
-<tr id="td<tmpl_var id>">
-<td>
-<div id="td<tmpl_var id>_div" class="dragable">
-<div class="dragTrigger"><tmpl_var dashletTitle>
-</div>
-<div class="content">
-<tmpl_var content>
-</div>
-</div>
-</td>
-</tr>
-</tmpl_loop>
+<tmpl_loop position2_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
 </tbody>
 </table>
 </td>
@@ -332,20 +282,8 @@ function AjaxRequestEnd() {  }
 <td width="33%">
 <table cellpadding="0" cellspacing="0" border="0" id="position3" class="dashboardColumn" width="100%">
 <tbody>
-<tmpl_loop position3_loop>
-<tr id="td<tmpl_var id>">
-<td>
-<div id="td<tmpl_var id>_div" class="dragable">
-<div class="dragTrigger">
-<tmpl_var dashletTitle>
-</div>
-<div class="content">
-<tmpl_var content>
-</div>
-</div>
-</td>
-</tr>
-</tmpl_loop>
+<tmpl_loop position3_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
 </tbody>
 </table>
 </td>
@@ -353,40 +291,17 @@ function AjaxRequestEnd() {  }
 <td width="33%">
 <table cellpadding="0" cellspacing="0" border="0" id="position4" class="dashboardColumn" width="100%">
 <tbody>
-<tmpl_loop position4_loop>
-<tr id="td<tmpl_var id>">
-	<td>
-<div id="td<tmpl_var id>_div" class="dragable">
-<div class="dragTrigger">
-<tmpl_var dashletTitle>
-</div>
-<div class="content"><tmpl_var content>
-</div>
-</div>
-</td>
-</tr>
-</tmpl_loop>
+<tmpl_loop position4_loop><tr id="td<tmpl_var id>"><td><div id="td<tmpl_var id>_div" class="dragable"><div class="dragTrigger"><div class="dragTitle"><span class="headerTitle"><tmpl_var dashletTitle></span><span class="options" onmouseover="this.className='options optionsHoverIE'" onmouseout="this.className='options'"><a href="#"><img src="^Extras;wobject/Dashboard/edit_btn.jpg" border="0"></a><a href="#" onclick="dragable_deleteContent(event,this);this.parentNode.onmouseout();"><img src="^Extras;wobject/Dashboard/delete_btn.jpg" border="0"></a><br /></span></div></div>
+<div class="content"><tmpl_var content></div></div></td></tr></tmpl_loop>
 </tbody>
 </table>
 </td>
 </tr>
 </table>
 </div>
-<table>
-<tr id="blank" class="hidden">
-<td>
-<div>
-<div class="empty">&nbsp;
-</div>
-</div>
-</td>
-</tr>
-</table>
+<table class="blankTable"><tr id="blank" class="hidden"><td class="blankColumn"><div><div class="empty">&nbsp;</div></div></td></tr></table>
 <tmpl_var dragger.init>
-</td>
-</tr>
-</table>
-</div>
+</td></tr></table></div>
 STOP
 $newAsset = $folder->addChild({
 	title=>"Dashboard Default View",

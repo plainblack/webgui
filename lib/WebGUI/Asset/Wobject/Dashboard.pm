@@ -216,8 +216,8 @@ sub view {
 		}
 	}
 	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);
-		WebGUI::Style::setScript($session{config}{extrasURL}."/wobject/Dashboard/draggable.js",{ type=>"text/javascript" });
-		WebGUI::Style::setLink($session{config}{extrasURL}."/wobject/Dashboard/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+#		WebGUI::Style::setScript($session{config}{extrasURL}."/wobject/Dashboard/draggable.js",{ type=>"text/javascript" });
+#		WebGUI::Style::setLink($session{config}{extrasURL}."/wobject/Dashboard/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
 		$vars{"dragger.init"} = '
 			<script type="text/javascript">
 				dragable_init("'.$self->getUrl.'");

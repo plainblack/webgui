@@ -98,16 +98,14 @@ sub _getLocationData {
 		$document =~ m!<hr>\s<div\salign="center">\s(.*?)<br>.*?<br>.*?<br>.*?<br>\s(.*?):\s(.*?) &deg;F<br>!;
 		$locData = {
 			query => $location,
-			cityState => $1,
-			sky => $2,
-			tempF => $3,
+			cityState => $1 || $location,
+			sky => $2 || 'N/A',
+			tempF => $3 || 'N/A',
 			iconUrl => $session{config}{extrasURL}.'/wobject/WeatherData/'.$self->_chooseWeatherConditionsIcon($2).'.jpg'
 		};
-	$cache->set($locData, 60*60) if $locData->{cityState};
+	$cache->set($locData, 60*60) if $locData->{sky} ne 'NULL';
 	}
 	return $locData;
-
-#	return $cityState.'<br />'.$sky.'<br />'.$ftemp.'&deg;F<br /><img src="'.$iconUrl.'" />';
 }
 
 #-------------------------------------------------------------------
@@ -121,6 +119,7 @@ largely from http://www.weather.gov/data/current_obs/weather.php
 sub _chooseWeatherConditionsIcon {
 	my $self = shift;
 	my $currCond = shift;
+	if (isIn($currCond,'','N/A','NULL')) {return 'unknown';}
 if (isIn($currCond,'Mostly Cloudy','Mostly Cloudy with Haze','Mostly Cloudy and Breezy')) {return 'bkn';}
 if (isIn($currCond,'Fair','Clear','Fair with Haze','Clear with Haze','Fair and Breezy','Clear and Breezy')) {return 'skc';}
 if (isIn($currCond,'A Few Clouds','A Few Clouds with Haze','A Few Clouds and Breezy')) {return 'few';}

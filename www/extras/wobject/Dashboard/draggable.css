@@ -1,57 +1,94 @@
-div.dragable:hover {
+div.dragable:hover 
+{
 	border: 1px dashed #aaaaaa;
 }
-.dragable{
-  	position: relative;
-	border: 1px dotted #cccccc; 
+
+.dragable
+{
+  position: relative;
+	border: 1px solid #fff; 
 }
-div.dragTrigger{
+
+div.dragTrigger
+{
 	position: relative;
 	top:0px;
 	left:0px;
-  cursor: move;
-  width:100%;
+	cursor: move;
+	width:100%;
+	font-size:10pt;
+	font-weight:bold;
+	font-face:verdana;
+	color:white;
+	height:22px;
 }
-.dragging{
-  position: relative;
-  width: auto;
-   opacity:0.6;
-   -moz-opacity:0.6;
-   filter: alpha(opacity=60);
-  cursor: hand;
-  z-index: 2000; 
-  border: 1px dotted #cccccc; 
+
+div.dragging
+{
+	position: relative;
+	width: auto;
+	filter:alpha(opacity=60);
+	opacity:.60;
+	cursor: pointer; cursor: hand;
+	z-index: 2000; 
+	border: 1px dotted #cccccc; 
 }
+
+div.dragging div.content
+{
+	opacity:.60;
+	filter: alpha(opacity=60);
+}
+
 .draggedOverTop{
   position: relative;
-  border: 1px dotted #aaaaaa;
-  border-top: 8px #aaaaaa dotted;
+  border: 1px dotted white; 
+	margin-top: -1px;
+  border-top: 50px #dddddd solid;
 }
+
 .draggedOverBottom {
   position: relative;
-  border: 1px dotted #aaaaaa;
-  border-bottom: 8px #aaaaaa dotted;
+  border: 1px dotted white;
+	margin-bottom: -1px;
+  border-bottom: 50px #dddddd solid;
 }
-.hidden{
-  display: none;
+
+.hidden
+{
+	display: none;
 }
-.blank {
-  position: relative;
-   opacity:0.5;
-   -moz-opacity:0.5;
-   filter: alpha(opacity=50);
-  cursor: hand;
-  background-color: white;
+
+.blank 
+{
+	position: relative;
+	opacity:0.5;
+	-moz-opacity:0.5;
+	filter: alpha(opacity=50);
+	cursor: pointer; cursor: hand;
+	background-color: white;
+	width:100%;
 }
-.blankOver {
-  position: relative;
-  cursor: hand;
-  background-color: #eeeeee;
+
+.blankOver 
+{
+	position: relative;
+	cursor: pointer; cursor: hand;
+	background-color: #eeeeee;
 }
-.empty {
-  position: relative;
-  padding: 0px;
-  margin: 3px;
-  width: 100%;
-  height: 250px; 
+
+.empty 
+{
+	position: relative;
+	padding: 0px;
+	margin: 3px;
+	width: 100%;
+	height: 250px; 
+}
+
+.blankTable {
+	width:100%;
+}
+.blankColumn {
+	width:100%;
 }
