@@ -332,10 +332,8 @@ sub getEditForm {
 	$tabform->addTab('overrides','Overrides');
 	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
 	my %overrides = $self->getOverrides;
-		$output .= '<table cellspacing="0" cellpadding="3" border="1">';
-		$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td><td>Original Value</td><td>New Value</td><td>Replacement value</td></tr>';
-		my %props = %{$self->getShortcutOriginal->{_properties}};
-		use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper(\%props).'</pre>');
+	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
+	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td><td>Original Value</td><td>New Value</td><td>Replacement value</td></tr>';
 	foreach my $definition (@{$self->definition}) {
 		foreach my $prop (keys %{$definition->{properties}}) {
 			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
@@ -376,6 +374,32 @@ sub getExtraHeadTags {
 
 #-------------------------------------------------------------------
 sub getFieldsList {
+	my $self = shift;
+	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field'.$self->_isUserPref('url')).'" class="formLink">Add '.$self->_isUserPref('name').'</a><br /><br />';
+	my @fielden;
+	if ($self->_isUserPref) {
+		@fielden = $self->getUserPrefs;
+	} else {
+		@fielden = $self->getOverrides;
+	}
+	return $output unless scalar @fielden > 0;
+	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
+	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td></tr>';
+	foreach my $field (@fielden) {
+		$output .= '<tr>';
+		$output .= '<td class="tableData"><a href="'.$field->getUrl('func=edit').'">'.$field->get("fieldName").'</a></td>';
+		$output .= '<td class="tableData">';
+		$output .= editIcon('func=edit',$field->getUrl());
+		$output .= deleteIcon('func=delete',$field->getUrl());
+		$output .= '</td>';
+		$output .= '</tr>';
+	}
+	$output .= '</table>';
+	return $output;
+}
+
+#-------------------------------------------------------------------
+sub getOverridesList {
 	my $self = shift;
 	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field'.$self->_isUserPref('url')).'" class="formLink">Add '.$self->_isUserPref('name').'</a><br /><br />';
 	my @fielden;
@@ -694,7 +718,7 @@ sub www_manageUserPrefs {
 }
 
 #-------------------------------------------------------------------
-sub www_manageOverrides {
+sub www_deleteOverride {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
