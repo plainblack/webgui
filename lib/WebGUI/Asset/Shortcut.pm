@@ -330,31 +330,7 @@ sub getEditForm {
 	        );
 	}
 	$tabform->addTab('overrides','Overrides');
-	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
-	my %overrides = $self->getOverrides;
-	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
-	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td><td>Original Value</td><td>New Value</td><td>Replacement value</td></tr>';
-	foreach my $definition (@{$self->definition}) {
-		foreach my $prop (keys %{$definition->{properties}}) {
-			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
-			$output .= '<tr>';
-			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">'.$prop.'</a></td>';
-			$output .= '<td class="tableData">';
-			$output .= editIcon('func=editOverride;fieldName='.$prop,$self->getUrl());
-			$output .= deleteIcon('func=deleteOverride;fieldName='.$prop,$self->getUrl()) if exists $overrides{overrides}{$prop};
-			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{origValue};
-			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{newValue};
-			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{parsedValue};
-			$output .= '</td></tr>';
-		}
-	}
-	$output .= '</table>';
-	
-	
-	$tabform->getTab('overrides')->raw($output);
+	$tabform->getTab('overrides')->raw($self->getOverridesList);
 	return $tabform;
 }
 
@@ -401,27 +377,28 @@ sub getFieldsList {
 #-------------------------------------------------------------------
 sub getOverridesList {
 	my $self = shift;
-	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field'.$self->_isUserPref('url')).'" class="formLink">Add '.$self->_isUserPref('name').'</a><br /><br />';
-	my @fielden;
-	if ($self->_isUserPref) {
-		@fielden = $self->getUserPrefs;
-	} else {
-		@fielden = $self->getOverrides;
-	}
-	return $output unless scalar @fielden > 0;
+	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
+	my %overrides = $self->getOverrides;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
-	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td></tr>';
-	foreach my $field (@fielden) {
-		$output .= '<tr>';
-		$output .= '<td class="tableData"><a href="'.$field->getUrl('func=edit').'">'.$field->get("fieldName").'</a></td>';
-		$output .= '<td class="tableData">';
-		$output .= editIcon('func=edit',$field->getUrl());
-		$output .= deleteIcon('func=delete',$field->getUrl());
-		$output .= '</td>';
-		$output .= '</tr>';
+	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td><td>Original Value</td><td>New Value</td><td>Replacement value</td></tr>';
+	foreach my $definition (@{$self->getShortcutOriginal->definition}) {
+		foreach my $prop (keys %{$definition->{properties}}) {
+			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
+			$output .= '<tr>';
+			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">'.$prop.'</a></td>';
+			$output .= '<td class="tableData">';
+			$output .= editIcon('func=editOverride;fieldName='.$prop,$self->getUrl());
+			$output .= deleteIcon('func=deleteOverride;fieldName='.$prop,$self->getUrl()) if exists $overrides{overrides}{$prop};
+			$output .= '</td><td>';
+			$output .= $overrides{overrides}{$prop}{origValue};
+			$output .= '</td><td>';
+			$output .= $overrides{overrides}{$prop}{newValue};
+			$output .= '</td><td>';
+			$output .= $overrides{overrides}{$prop}{parsedValue};
+			$output .= '</td></tr>';
+		}
 	}
 	$output .= '</table>';
-	return $output;
 }
 
 
