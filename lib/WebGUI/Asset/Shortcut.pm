@@ -330,7 +330,33 @@ sub getEditForm {
 	        );
 	}
 	$tabform->addTab('overrides','Overrides');
-#	$tabform->getTab('overrides');
+	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
+	my %overrides = $self->getOverrides;
+		$output .= '<table cellspacing="0" cellpadding="3" border="1">';
+		$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td><td>Original Value</td><td>New Value</td><td>Replacement value</td></tr>';
+		my %props = %{$self->getShortcutOriginal->{_properties}};
+		use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper(\%props).'</pre>');
+	foreach my $definition (@{$self->definition}) {
+		foreach my $prop (keys %{$definition->{properties}}) {
+			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
+			$output .= '<tr>';
+			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">'.$prop.'</a></td>';
+			$output .= '<td class="tableData">';
+			$output .= editIcon('func=editOverride;fieldName='.$prop,$self->getUrl());
+			$output .= deleteIcon('func=deleteOverride;fieldName='.$prop,$self->getUrl()) if exists $overrides{overrides}{$prop};
+			$output .= '</td><td>';
+			$output .= $overrides{overrides}{$prop}{origValue};
+			$output .= '</td><td>';
+			$output .= $overrides{overrides}{$prop}{newValue};
+			$output .= '</td><td>';
+			$output .= $overrides{overrides}{$prop}{parsedValue};
+			$output .= '</td></tr>';
+		}
+	}
+	$output .= '</table>';
+	
+	
+	$tabform->getTab('overrides')->raw($output);
 	return $tabform;
 }
 
@@ -411,7 +437,6 @@ sub getOverrides {
 			foreach my $overr (keys %{$overrides{overrides}}) {
 				$overrides{overrides}{$fieldName}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/g;
 			}
-			$overrides{overrides}{$fieldName}{parsedValue} = $fieldValue unless (exists $overrides{overrides}{$fieldName});
 		}
 		$cache->set(\%overrides, 60*60);
 		$overridesRef = \%overrides;
@@ -434,6 +459,9 @@ sub getShortcut {
 		my %overrides = %{$overhash{overrides}};
 		foreach my $override (keys %overrides) {
 			$self->{_shortcut}{_properties}{$override} = $overrides{$override}{parsedValue};
+		}
+		foreach my $userPref ($self->getUserPrefs) {
+			$self->{_shortcut}{_properties}{$userPref->getFieldName} = $userPref->getUserPref($userPref->getId) unless (exists $overrides{$userPref->getFieldName});
 		}
 	}
 	return $self->{_shortcut};
@@ -658,12 +686,39 @@ sub www_getUserPrefsForm {
 }
 
 #-------------------------------------------------------------------
-sub www_manageFields {
+sub www_manageUserPrefs {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $output = $self->getFieldsList;
 	return $self->_submenu($output,$self->_isUserPref('titleHeader'));
 }
+
+#-------------------------------------------------------------------
+sub www_manageOverrides {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
+	my %fielden = $self->getOverrides;
+#	unless (scalar (keys %fielden)) {
+		$output .= '<table cellspacing="0" cellpadding="3" border="1">';
+		$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td></tr>';
+		my %props = %{$self->getShortcutOriginal->{_properties}};
+		use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper(\%props).'</pre>');
+		foreach my $prop (keys %{$self->getShortcutOriginal->{_properties}}) {
+			next if $prop->{fieldType} eq 'hidden';
+			$output .= '<tr>';
+			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">Add$prop</a></td>';
+			$output .= '<td class="tableData">';
+			$output .= editIcon('func=editOverride;fieldName='.$prop,$self->getUrl());
+			$output .= deleteIcon('func=delete;fieldName='.$prop,$self->getUrl());
+			$output .= '</td>';
+			$output .= '</tr>';
+		}
+		$output .= '</table>';
+#	}
+	return $self->_submenu($output,'Manage Overrides');
+}
+
 
 #-------------------------------------------------------------------
 sub www_saveUserPrefs {
