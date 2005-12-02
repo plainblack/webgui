@@ -122,10 +122,8 @@ Name value pairs to add to the URL in the form of:
 sub gateway {
 	my $pageUrl = shift;
 	my $pairs = shift;
-	$pageUrl =~ s/^\///;
-        my $url = $session{config}{gateway};
-	$url .= '/' unless ($url =~ m/\/$/);
-	$url .= $pageUrl;
+        my $url = $session{config}{gateway}.'/'.$pageUrl;
+	$url =~ s/\/+/\//g;
         if ($session{setting}{preventProxyCache} == 1) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }
@@ -246,12 +244,7 @@ sub page {
         if ($useFullUrl) {
                 $url = getSiteURL();
         }
-	$url .= gateway();
-        if ($session{asset}) {
-                $url .= $session{asset}->get("url");
-        } else {
-                $url .= $session{requestedUrl};
-        }
+	$url .= gateway($session{asset} ? $session{asset}->get("url") : $session{requestedUrl});
         if ($session{setting}{preventProxyCache} == 1 && !$skipPreventProxyCache) {
                 $url = append($url,"noCache=".randint(0,1000).';'.time());
         }

@@ -786,7 +786,7 @@ sub updateConfigFile {
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::StockData") unless isIn("WebGUI::Asset::Wobject::StockData",@{$newConfig{assets}});
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::WeatherData") unless isIn("WebGUI::Asset::Wobject::WeatherData",@{$newConfig{assets}});
 	push(@{$newConfig{assets}}, "WebGUI::Asset::Wobject::MultiSearch") unless isIn("WebGUI::Asset::Wobject::MultiSearch",@{$newConfig{assets}});
-	$newConfig{macros}{RandomThread}{RandomThread};
+	$newConfig{macros}{RandomThread} = "RandomThread";
 	$newConfig{gateway} = "/";
 	$conf->purge;
 	$conf->set(%newConfig);
