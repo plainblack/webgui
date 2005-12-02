@@ -121,7 +121,6 @@ sub initializeDashletFields {
 		groupIdEdit=>$self->get("groupIdEdit"),
 		groupIdView=>$self->get("groupIdView"),
 		url=>'Dashboard User Preference - Content Positions',
-		isUserPref=>1,
 		fieldName=>'contentPositions'
 	});
 	$self->update({mapFieldId=>$child->getId});
@@ -226,14 +225,11 @@ sub view {
 		}
 	}
 	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);
-#		WebGUI::Style::setScript($session{config}{extrasURL}."/wobject/Dashboard/draggable.js",{ type=>"text/javascript" });
-#		WebGUI::Style::setLink($session{config}{extrasURL}."/wobject/Dashboard/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
-		$vars{"dragger.init"} = '
-			<script type="text/javascript">
-				dragable_init("'.$self->getUrl.'");
-			</script>
-			';
-
+	$vars{"dragger.init"} = '
+		<script type="text/javascript">
+			dragable_init("'.$self->getUrl.'");
+		</script>
+	';
 	return $self->processTemplate(\%vars, $templateId);
 }
 

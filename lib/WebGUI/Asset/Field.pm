@@ -66,7 +66,7 @@ sub definition {
 	%properties = (
 		#	formTemplateId=>{fieldType=>'template',defaultValue=>''},
 		#	valueTemplateId=>{fieldType=>'template',defaultValue=>''},
-			isUserPref=>{fieldType=>'hidden',defaultValue=>$session{form}{isUserPref},label=>'Is This Field a User Preference?'},
+		#	isUserPref=>{fieldType=>'hidden',defaultValue=>$session{form}{isUserPref},label=>'Is This Field a User Preference?'},
 			fieldName=>{fieldType=>'text',defaultValue=>'',label=>$fieldName},
 			fieldLabel=>{fieldType=>'text',defaultValue=>'',label=>'Label for This Field.'},
 			fieldDescription=>{fieldType=>'HTMLArea',defaultValue=>'',label=>'Hover Help (Description) for this Field.'},
@@ -125,40 +125,31 @@ sub getFieldName {
 }
 
 #-------------------------------------------------------------------
-sub getFieldValue {
-	my $self = shift;
-	my $value;
-	if ($self->get("isUserPref")) {
-		
-	} else {
-		#is an override proper
-		$value = $self->get("defaultValue");
-	}
-	#This returns the user preference value, whether it's an admin override or a user preference,
-	#and whether or not it's template processed.  
-	#process for fieldNames so people don't have to type the FieldIds into the getUserPrefValue macro
-	my $dashlet = $self->getParent;
-	if (ref $dashlet eq 'WebGUI::Asset::Shortcut') {
-		my @fellowFields = $dashlet->getUserPrefs;
-		foreach my $field (@fellowFields) {
-			my $id = $field->getId;
-			my $fieldName = $field->getFieldName;
-			my $fieldValue = $self->getUserPref($id);
-			unless ($self->getId eq $id) {
-				$value =~ s/\<tmpl_var\sshortcut\.field\.${fieldName}\.value\>/$fieldValue/g;
-				#prevent macro loops.  A Field cannot be self referential.
-			} else {
-				$value =~ s/\<tmpl_var\sshortcut\.field\.${fieldName}\.value\>//g;
-			}
-		}
-	}
-	$value = WebGUI::Asset::Template->processRaw($value);
-	return $value;
-}
+#sub getFieldValue {
+#	my $self = shift;
+#	my $value;
+#	my $dashlet = $self->getParent;
+#	if (ref $dashlet eq 'WebGUI::Asset::Shortcut') {
+#		my @fellowFields = $dashlet->getUserPrefs;
+#		foreach my $field (@fellowFields) {
+#			my $id = $field->getId;
+#			my $fieldName = $field->getFieldName;
+#			my $fieldValue = $self->getUserPref($id);
+#			unless ($self->getId eq $id) {
+#				$value =~ s/\<tmpl_var\sshortcut\.field\.${fieldName}\.value\>/$fieldValue/g;
+#				#prevent macro loops.  A Field cannot be self referential.
+#			} else {
+#				$value =~ s/\<tmpl_var\sshortcut\.field\.${fieldName}\.value\>//g;
+#			}
+#		}
+#	}
+#	$value = WebGUI::Asset::Template->processRaw($value);
+#	return $value;
+#}
 
 #-------------------------------------------------------------------
 sub getUserPref {
-	#This is a class method.  Is called from the getDashletUserPref macro
+	#This is a class method.  Can be called from the getDashletUserPref macro
 	my $class = shift; #ignored when called from within this package/module.
 	my $fieldId = shift;
 	my $userId = shift || 'autoDerive';
@@ -179,7 +170,7 @@ sub getUserPref {
 		if ($userId eq '1') {
 			$userValue = $field->get("defaultValue");
 			# fall back to wobject defaults if this is blank.
-			$userValue = WebGUI::Asset->newByDynamicClass($field->getParent->get("shortcutToAssetId"))->get($field->get("fieldName")) if (ref $field->getParent eq 'WebGUI::Asset::Shortcut' && !($userValue) && !($field->get("isUserPref")));
+	#		$userValue = WebGUI::Asset->newByDynamicClass($field->getParent->get("shortcutToAssetId"))->get($field->get("fieldName")) if (ref $field->getParent eq 'WebGUI::Asset::Shortcut' && !($userValue) && !($field->get("isUserPref")));
 		} else {
 			$userValue = WebGUI::Asset::Field->getUserPref($fieldId,1);
 		}
@@ -191,7 +182,6 @@ sub getUserPref {
 
 #-------------------------------------------------------------------
 sub setUserPref {
-	#This is a class method.  Is called from the getDashletUserPref macro
 	my $class = shift; #ignored when called from within this package/module.
 	my $fieldId = shift;
 	my $valueToSet = shift;
@@ -207,7 +197,7 @@ sub setUserPref {
 	my $sql = "delete from wgFieldUserData where assetId=".quote($fieldId)." and userId=".quote($userId);
 	WebGUI::SQL->write($sql);
 	my $sql2 = "insert into wgFieldUserData values (".quote($fieldId).",".quote($userId).",".quote($valueToSet).")";
-	WebGUI::ErrorHandler::warn($sql2);
+#	WebGUI::ErrorHandler::warn($sql2);
 	return WebGUI::SQL->write($sql2);
 }
 

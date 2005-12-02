@@ -111,13 +111,12 @@ sub addDashboardStuff {
 		`mapFieldId` VARCHAR(22) DEFAULT '',
 		PRIMARY KEY(`assetId`, `revisionDate`)
 	)");
-#	WebGUI::SQL->write("CREATE TABLE `Dashlet` (
-#		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
-#		`revisionDate` VARCHAR(22) BINARY NOT NULL DEFAULT '',
-#		`proxiedAssetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
-#		PRIMARY KEY(`assetId`)
-#	)");
-# Convert Shortcuts to Dashlortcuts.
+	WebGUI::SQL->write("CREATE TABLE `Shortcut_overrides` (
+		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
+		`fieldName` VARCHAR(255) DEFAULT '',
+		`newValue` TEXT,
+		PRIMARY KEY(`assetId`, `fieldName`)
+	)");
 	WebGUI::SQL->write("CREATE TABLE `WeatherData` (
 		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
 		`revisionDate` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
@@ -137,7 +136,6 @@ sub addDashboardStuff {
 		`revisionDate` VARCHAR(22) NOT NULL DEFAULT '',
 		`formTemplateId` VARCHAR(22) BINARY DEFAULT '',
 		`valueTemplateId` VARCHAR(22) BINARY DEFAULT '',
-		`isUserPref` TINYINT UNSIGNED NOT NULL DEFAULT 0,
 		`fieldName` VARCHAR(255) DEFAULT '',
 		`fieldLabel` VARCHAR(255) DEFAULT '',
 		`fieldDescription` TEXT DEFAULT '',

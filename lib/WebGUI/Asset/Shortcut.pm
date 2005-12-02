@@ -123,18 +123,16 @@ sub _drawQueryBuilder {
 	return $output;
 }
 
-#-------------------------------------------------------------------
-sub _isUserPref {
+sub parseOverride {
 	my $self = shift;
-	my $thing = shift;
-	my $isUserPref = ($session{form}{isUserPref} eq '1');
-	return $isUserPref unless $thing;
-	if ($thing eq 'url') {
-		return $isUserPref ? ';isUserPref=1' : '';
-	} elsif ($thing eq 'titleHeader') {
-		return $isUserPref ? 'Manage User Preference Fields' : 'Manage Administrative Override Fields';
-	} elsif ($thing eq 'name') {
-		return $isUserPref ? 'User Preference Field' : 'Administrative Override Field';
+	my $value = shift;
+	my @userPrefs = $self->getUserPrefs;
+	foreach my $field (@userPrefs) {
+		my $id = $field->getId;
+		my $fieldName = $field->getFieldName;
+		use WebGUI::Asset::Field;
+		my $fieldValue = WebGUI::Asset::Field->getUserPref($id);
+		$value =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/g;
 	}
 }
 
@@ -331,7 +329,7 @@ sub getEditForm {
 		        -hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut")
 	        );
 	}
-	$tabform->addTab('overrides','Custom Fields');
+	$tabform->addTab('overrides','Overrides');
 #	$tabform->getTab('overrides');
 	return $tabform;
 }
@@ -348,14 +346,6 @@ Returns the extraHeadTags stored in the asset.  Called in WebGUI::Style::generat
 sub getExtraHeadTags {
 	my $self = shift;
 	return $self->get("extraHeadTags")."\n".$self->getShortcut->get("extraHeadTags");
-}
-
-#-------------------------------------------------------------------
-sub getFields {
-	my $self = shift;
-	my $fielden = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Field"],returnObjects=>1});
-	#WebGUI::ErrorHandler::warn("There are ".(scalar @$fielden)." fields.");
-	return $fielden;
 }
 
 #-------------------------------------------------------------------
@@ -388,35 +378,63 @@ sub getFieldsList {
 #-------------------------------------------------------------------
 sub getOverrides {
 	my $self = shift;
-	my $fielden = $self->getFields;
-	my @overrides;
 	my $i = 0;
-	#use Data::Dumper;
-	#WebGUI::ErrorHandler::warn(Dumper($fielden));
-	foreach my $field (@{$fielden}) {
-		unless ($field->get("isUserPref")) {
-			@overrides[$i] = $field;
-			$i++;
+	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
+	my $cache = WebGUI::Cache->new(["shortcutOverrides",$self->getId,$session{user}{userId},$session{var}{adminOn}]);
+	my $overridesRef = $cache->get;
+	unless ($overridesRef->{cacheNotExpired}) {
+		my %overrides;
+		my $orig = $self->getShortcutOriginal;
+		unless (exists $orig->{_propertyDefinitions}) {
+			my %properties;
+			foreach my $definition (@{$orig->definition}) {
+				%properties = (%properties, %{$definition->{properties}});
+			}
+			$orig->{_propertyDefinitions} = \%properties;
 		}
+		$overrides{cacheNotExpired} = 1;
+		my $sth = WebGUI::SQL->read("select fieldName, newValue from Shortcut_overrides where assetId=".quote($self->getId)." order by fieldName");
+		while (my ($fieldName, $newValue) = $sth->array) {
+			$overrides{overrides}{$fieldName}{fieldType} = $orig->{_propertyDefinitions}{$fieldName}{fieldType};
+			$overrides{overrides}{$fieldName}{origValue} = $self->getShortcutOriginal->get($fieldName);
+			$overrides{overrides}{$fieldName}{newValue} = $newValue;
+			$overrides{overrides}{$fieldName}{parsedValue} = $newValue;
+		}
+		$sth->finish;
+		my @userPrefs = $self->getUserPrefs;
+		foreach my $field (@userPrefs) {
+			my $id = $field->getId;
+			my $fieldName = $field->getFieldName;
+			my $fieldValue = $field->getUserPref($id);
+			$overrides{userPrefs}{$fieldName}{value} = $fieldValue;
+			#  'myTemplateId is ##userPref:myTemplateId##', for example.
+			foreach my $overr (keys %{$overrides{overrides}}) {
+				$overrides{overrides}{$fieldName}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/g;
+			}
+			$overrides{overrides}{$fieldName}{parsedValue} = $fieldValue unless (exists $overrides{overrides}{$fieldName});
+		}
+		$cache->set(\%overrides, 60*60);
+		$overridesRef = \%overrides;
+	#	use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper($overridesRef).'</pre>');
 	}
-	return  @overrides;
+	return %$overridesRef;
 }
 
 #-------------------------------------------------------------------
 sub getShortcut {
 	my $self = shift;
 	unless ($self->{_shortcut}) {
-		if ($self->get("shortcutByCriteria")) {
-			$self->{_shortcut} = $self->getShortcutByCriteria;
-		} else {
-			$self->{_shortcut} = $self->getShortcutDefault;
-		}
+		$self->{_shortcut} = $self->getShortcutOriginal;
 	}
-	$self->{_shortcut}{_properties}{displayTitle} = undef;
+	$self->{_shortcut}{_properties}{displayTitle} = undef if (ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard');
 	# Hide title by default.  If you want, you can create an override
 	# to display it.  But it's being shown in the dragheader by default.
-	foreach my $override ($self->getOverrides) {
-		$self->{_shortcut}{_properties}{$override->getFieldName} = $override->getFieldValue;
+	my %overhash = $self->getOverrides;
+	if (exists $overhash{overrides}) {
+		my %overrides = %{$overhash{overrides}};
+		foreach my $override (keys %overrides) {
+			$self->{_shortcut}{_properties}{$override} = $overrides{$override}{parsedValue};
+		}
 	}
 	return $self->{_shortcut};
 }
@@ -537,18 +555,20 @@ sub getShortcutDefault {
 }
 
 #-------------------------------------------------------------------
+sub getShortcutOriginal {
+	my $self = shift;
+	if ($self->get("shortcutByCriteria")) {
+		return $self->getShortcutByCriteria;
+	} else {
+		return $self->getShortcutDefault;
+	}
+}
+
+#-------------------------------------------------------------------
 sub getUserPrefs {
 	my $self = shift;
-	my $fielden = $self->getFields;
-	my @userPrefs;
-	my $i = 0;
-	foreach my $field (@{$fielden}) {
-		if ($field->get("isUserPref")) {
-			@userPrefs[$i] = $field;
-			$i++;
-		}
-	}
-	return @userPrefs;
+	my $bibibib = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Field"],returnObjects=>1});
+	return @$bibibib;
 }
 
 #-------------------------------------------------------------------
@@ -663,8 +683,7 @@ sub www_getNewTitle {
 	my $self = shift;
 	return '' unless $self->getParent->canPersonalize;
 	my $foo = $self->getShortcut;
-	my $title = $foo->{_properties}{title};
-	return $title;
+	return $foo->{_properties}{title};
 }
 
 #-------------------------------------------------------------------
