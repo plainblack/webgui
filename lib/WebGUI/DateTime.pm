@@ -207,7 +207,7 @@ sub epochToHuman {
 	my $locale = $language->{languageAbbreviation} || "en";
 	$locale .= "_".$language->{locale} if ($language->{locale});
 	my $timeZone = $session{user}{timeZone} || "America/Chicago";
-        my $dt = DateTime->from_epoch( epoch=>shift||time(), time_zone=>$timeZone, locale=>$locale );
+	my $dt = DateTime->from_epoch( epoch=>shift||time(), time_zone=>$timeZone, locale=>$locale );
 	my $output = shift || "%z %Z";
 	my $temp;
   #---date format preference
@@ -268,7 +268,8 @@ A boolean indicating that the time should be added to the output, thust turning 
 =cut
 
 sub epochToSet {
-	my $dt = DateTime->from_epoch( epoch =>shift, time_zone=>$session{user}{timeZone});
+	my $timeZone = $session{user}{timeZone} || "America/Chicago";
+	my $dt = DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone);
 	my $withTime = shift;
 	if ($withTime) {
 		return $dt->strftime("%Y-%m-%d %H:%M:%S");
@@ -658,7 +659,7 @@ sub setToEpoch {
 		$dt = $parser->parse_datetime($set);
 	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
-	$dt->set_time_zone($session{user}{timeZone}); # assign the user's timezone
+	$dt->set_time_zone($session{user}{timeZone}|| "America/Chicago"); # assign the user's timezone
 #	my $u = WebGUI::User->new(1);
 #	$dt->set_time_zone($u->profileField("timeZone")); # convert to the visitor's or default time zone
 	return $dt->epoch;
