@@ -377,7 +377,7 @@ sub getFieldsList {
 #-------------------------------------------------------------------
 sub getOverridesList {
 	my $self = shift;
-	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
+	my $output = '';
 	my %overrides = $self->getOverrides;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
 	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td><td>Original Value</td><td>New Value</td><td>Replacement value</td></tr>';
@@ -399,6 +399,7 @@ sub getOverridesList {
 		}
 	}
 	$output .= '</table>';
+	return $output;
 }
 
 
@@ -624,6 +625,13 @@ sub purgeRevision {
 }
 
 #-------------------------------------------------------------------
+
+sub uncacheOverrides {
+	my $self = shift;
+	WebGUI::Cache->new(["shortcutOverrides",$self->getId])->delete;
+}
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my $content;
@@ -647,8 +655,7 @@ sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageFields;isUserPref=0"),"Manage Shortcut Overrides");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageFields;isUserPref=1"),"Manage User Preferences");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),"Manage Shortcut Overrides");
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
 }
 
@@ -695,31 +702,28 @@ sub www_manageUserPrefs {
 }
 
 #-------------------------------------------------------------------
+sub www_manageOverrides {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->_submenu($self->getOverridesList,'Manage Overrides');
+}
+
+#-------------------------------------------------------------------
+sub www_purgeOverrideCache {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	$self->uncacheOverrides;
+	return $self->www_manageOverrides;
+}
+
+#-------------------------------------------------------------------
 sub www_deleteOverride {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $output = '<a href="'.$self->getUrl('func=addOverride').'" class="formLink">Add Override</a><br /><br />';
-	my %fielden = $self->getOverrides;
-#	unless (scalar (keys %fielden)) {
-		$output .= '<table cellspacing="0" cellpadding="3" border="1">';
-		$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td></tr>';
-		my %props = %{$self->getShortcutOriginal->{_properties}};
-		use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper(\%props).'</pre>');
-		foreach my $prop (keys %{$self->getShortcutOriginal->{_properties}}) {
-			next if $prop->{fieldType} eq 'hidden';
-			$output .= '<tr>';
-			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">Add$prop</a></td>';
-			$output .= '<td class="tableData">';
-			$output .= editIcon('func=editOverride;fieldName='.$prop,$self->getUrl());
-			$output .= deleteIcon('func=delete;fieldName='.$prop,$self->getUrl());
-			$output .= '</td>';
-			$output .= '</tr>';
-		}
-		$output .= '</table>';
-#	}
-	return $self->_submenu($output,'Manage Overrides');
+	WebGUI::SQL->write('delete from Shortcut_overrides where assetId='.quote($self->getId).' and fieldName='.quote($session{form}{fieldName}));
+	$self->uncacheOverrides;
+	return $self->www_manageOverrides;
 }
-
 
 #-------------------------------------------------------------------
 sub www_saveUserPrefs {
@@ -740,6 +744,45 @@ sub www_getNewTitle {
 	return '' unless $self->getParent->canPersonalize;
 	my $foo = $self->getShortcut;
 	return $foo->{_properties}{title};
+}
+
+#-------------------------------------------------------------------
+sub www_editOverride {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $fieldName = $session{form}{fieldName};
+	my %overrides = $self->getOverrides;
+	my $output = '';
+	my %props;
+	foreach my $def (@{$self->getShortcutOriginal->definition}) {
+		%props = (%props,%{$def->{properties}});
+	}
+	$output .= '</table>';
+  my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+  $f->hidden(-name=>"func",-value=>"saveOverride");
+  $f->hidden(-name=>"fieldName",-value=>$session{form}{fieldName});
+  $f->readOnly(-label=>"Field Name",-value=>$session{form}{fieldName});
+  $f->readOnly(-label=>"Original Value",-value=>$overrides{overrides}{$fieldName}{origValue});
+  my %params;
+  foreach my $key (keys %{$props{$fieldName}}) {
+		next if ($key eq "tab");
+			$params{$key} = $props{$fieldName}{$key};
+		}
+	$params{value} = $overrides{overrides}{$fieldName}{origValue};
+	$params{name} = $fieldName;
+	$params{label} = $params{label} || "Edit Field Using the Generated Form Type";
+#	use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper(\%params).'</pre>');
+	$f->dynamicField(%params);
+	$f->textarea(
+		-name=>"newValueText",
+		-label=>"New Override Value",
+		-value=>$overrides{overrides}{$fieldName}{newValue},
+		-hoverHelp=>"Place something in this box if you don't want to use the automatically generated field."
+	);
+	$f->readOnly(-label=>"Replacement Value",-value=>$overrides{overrides}{$fieldName}{parsedValue});
+  $f->submit;
+  $output .= $f->print;
+	return $self->_submenu($output,'Edit Override');
 }
 
 #-------------------------------------------------------------------
