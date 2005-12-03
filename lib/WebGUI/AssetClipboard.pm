@@ -211,7 +211,9 @@ sub www_copyList {
 
 sub www_createShortcut () {
 	my $self = shift;
-	my $child = $self->addChild({
+	my $isOnDashboard = ref $self->getParent == 'WebGUI::Asset::Wobject::Dashboard';
+	my $target = $isOnDashboard ? $self->getParent : $self;
+	my $child = $target->addChild({
 		className=>'WebGUI::Asset::Shortcut',
 		shortcutToAssetId=>$self->getId,
 		title=>$self->getTitle,
@@ -225,10 +227,14 @@ sub www_createShortcut () {
 		groupIdView=>$self->get("groupIdView"),
 		url=>$self->get("title"),
 		templateId=>'PBtmpl0000000000000140'
-		});
-	$child->cut;
-	return $self->getContainer->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
-	return $self->getContainer->www_view;
+	});
+	if ($isOnDashboard) {
+		return $target->www_view;
+	} else {
+		$child->cut;
+		return $self->getContainer->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
+		return $self->getContainer->www_view;
+	}
 }
 
 #-------------------------------------------------------------------

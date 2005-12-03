@@ -401,6 +401,7 @@ sub definition {
 				},
 			collaborationTemplateId =>{
 				fieldType=>"template",
+				namespace=>'Collaboration',
 				defaultValue=>'PBtmpl0000000000000026'
 				},
 			karmaPerPost =>{

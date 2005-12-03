@@ -119,7 +119,7 @@ sub getValueFromPost {
 
 =head2 toHtml ( )
 
-Renders a question selector asking the user where they want to go.
+Renders a fieldType selector.
 
 =cut
 

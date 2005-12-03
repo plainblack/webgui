@@ -157,6 +157,13 @@ sub view {
 	my @hidden = split("\n",$self->get("assetsToHide"));
 	foreach my $child (@{$children}) {
 		push(@hidden,$child->get('shortcutToAssetId')) if ref $child eq 'WebGUI::Asset::Shortcut';
+		#the following loop will initially place just-shortcutted assets.
+		for (my $i = 0; $i < scalar(@positions); $i++) {
+			next unless isIn($child->get('shortcutToAssetId'),@hidden);
+			my $newChildId = $child->getId;
+			my $oldChildId = $child->get('shortcutToAssetId');
+			$positions[$i] =~ s/${oldChildId}/${newChildId}/g;
+		}
 	}
 	my $i = 1;
 	my $templateAsset = WebGUI::Asset->newByDynamicClass($templateId) || WebGUI::Asset->getImportNode;

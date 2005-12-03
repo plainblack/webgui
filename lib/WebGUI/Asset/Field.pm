@@ -70,7 +70,7 @@ sub definition {
 			fieldName=>{fieldType=>'text',defaultValue=>'',label=>$fieldName},
 			fieldLabel=>{fieldType=>'text',defaultValue=>'',label=>'Label for This Field.'},
 			fieldDescription=>{fieldType=>'HTMLArea',defaultValue=>'',label=>'Hover Help (Description) for this Field.'},
-			fieldType=>{fieldType=>'fieldType',defaultValue=>'',label=>'Type of Field'},
+			fieldType=>{fieldType=>'fieldType',defaultValue=>'',label=>'Type of Field',types=>['text','textarea','checkList','selectList']},
 		#	overrideForm=>{fieldType=>'yesNo',defaultValue=>0},
 		#	overrideValue=>{fieldType=>'yesNo',defaultValue=>0},
 			possibleValues=>{fieldType=>'textarea',defaultValue=>'',label=>'Possible values for this Field.  Only applies to selectList and checkList.'},

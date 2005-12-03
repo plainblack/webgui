@@ -351,13 +351,9 @@ sub getExtraHeadTags {
 #-------------------------------------------------------------------
 sub getFieldsList {
 	my $self = shift;
-	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field'.$self->_isUserPref('url')).'" class="formLink">Add '.$self->_isUserPref('name').'</a><br /><br />';
+	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field').'" class="formLink">Add Preference Field</a><br /><br />';
 	my @fielden;
-	if ($self->_isUserPref) {
-		@fielden = $self->getUserPrefs;
-	} else {
-		@fielden = $self->getOverrides;
-	}
+	@fielden = $self->getUserPrefs;
 	return $output unless scalar @fielden > 0;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
 	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td></tr>';
@@ -673,13 +669,7 @@ sub www_getUserPrefsForm {
 	foreach my $field (@fielden) {
 		my $fieldType = $field->get("fieldType") || "text";
 		my $options;
-		# Add a "Select..." option on top of a select list to prevent from
-		# saving the value on top of the list when no choice is made.
-		if($fieldType eq "selectList") {
-			$options = {"", WebGUI::International::get("Select","Asset")};
-		}
-		$f->dynamicField(
-			name=>$field->getId,
+		my $params = {name=>$field->getId,
 			label=>$field->get("fieldName"),
 			uiLevel=>5,
 			value=>$field->getUserPref($field->getId),
@@ -687,7 +677,12 @@ sub www_getUserPrefsForm {
 			possibleValues=>$field->get("possibleValues"),
 			options=>$options,
 			fieldType=>$fieldType
-		);
+		};
+		if ($fieldType eq 'Textarea') {
+			$params->{rows} = 4;
+			$params->{columns} = 20;
+		}
+		$f->dynamicField(%$params);
 	}
 	$f->submit;
 	return $f->print;
@@ -698,7 +693,7 @@ sub www_manageUserPrefs {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $output = $self->getFieldsList;
-	return $self->_submenu($output,$self->_isUserPref('titleHeader'));
+	return $self->_submenu($output,"Manage Preferences");
 }
 
 #-------------------------------------------------------------------
