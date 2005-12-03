@@ -65,7 +65,7 @@ sub getRequiredProfileFields {
 			fieldType => $method,
 		);
 
-		$hash{'profile.form.element'} = $form->displayForm();
+		$hash{'profile.formElement'} = $form->displayForm();
 		$hash{'profile.formElement.label'} = $label;
 		push(@array,\%hash)
 	}
