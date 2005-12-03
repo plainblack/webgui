@@ -850,7 +850,7 @@ foreach my $hash (@overrides) {
 #-------------------------------------------------
 sub fixVeryLateDates {
 	print "\tFixing very late endDates.\n" unless ($quiet);
-	WebGUI::SQL->write("update assetdata set endDate='2082783600' where endDate>=4294967294");
+	WebGUI::SQL->write("update assetData set endDate='2082783600' where endDate>=4294967294");
 }
 
 #-------------------------------------------------
