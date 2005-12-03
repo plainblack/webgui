@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::Asset_Article;
+package WebGUI::i18n::English::Asset_WeatherData;
 
 our $I18N = {
 
@@ -22,10 +22,33 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
+	'weather data add/edit title' => {
+		message => q|WeatherData Add/Edit|,
+		lastUpdated => 1133619940,
+	},
+
+	'weather data add/edit body' => {
+		message => q|The WeatherData wobject is useful for displaying current weather conditions about a city/state or zipcode, or a series of locations.|,
+		lastUpdated => 1133619940,
+	},
+
 	'WeatherData' => {
 		message => q|WeatherData|,
 		lastUpdated => 1133619940,
 	},
+
+
+	'WeatherData template title' => {
+		message => q|WeatherData Template|,
+		lastUpdated => 1133619940,
+	},
+
+
+	'WeatherData template description' => {
+		message => q|The wobject generates a loops of locations - tmpl_loop ourLocations.|,
+		lastUpdated => 1133619940,
+	},
+
 
 
 };

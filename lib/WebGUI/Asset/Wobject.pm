@@ -555,9 +555,10 @@ sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my ($tag) = ($self->get("className") =~ /::(\w+)$/);
+	my $tag2 = $tag;
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
-	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag);
+	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
 	my $addEdit = ($session{form}{func} eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
 	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
 }

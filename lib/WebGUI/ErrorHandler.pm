@@ -20,7 +20,7 @@ use strict;
 use WebGUI::Session;
 use Apache2::RequestUtil;
 
-$Log::Log4perl::caller_depth++;
+$Log::Log4perl::caller_depth = 1;
 
 =head1 NAME 
 

@@ -241,6 +241,12 @@ sub getEditForm {
 		-hoverHelp=>WebGUI::International::get('1 description',"Asset_Shortcut"),
 		-value=>'<a href="'.$self->getShortcut->getUrl.'">'.$self->getShortcut->get('title').'</a> ('.$self->getShortcut->getId.')'
 		);
+	$tabform->getTab("display")->template(
+		-value=>$self->getValue("templateId"),
+		-label=>WebGUI::International::get('shortcut template title', 'Asset_Shortcut'),
+		-hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
+		-namespace=>"Shortcut"
+	);
 	if($session{setting}{metaDataEnabled}) {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"shortcutByCriteria",
@@ -634,7 +640,7 @@ sub www_getUserPrefsForm {
 			options=>$options,
 			fieldType=>$fieldType
 		};
-		if ($fieldType eq 'Textarea') {
+		if (lc($fieldType) eq 'textarea') {
 			$params->{rows} = 4;
 			$params->{columns} = 20;
 		}

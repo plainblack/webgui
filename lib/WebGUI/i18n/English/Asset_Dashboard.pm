@@ -64,6 +64,24 @@ our $I18N = {
 
 
 
+	'dashboard add/edit title' => {
+		message => q|Dashboard Add/Edit|,
+		lastUpdated => 1133619940
+	},
+	'dashboard add/edit body' => {
+		message => q|The dashboard is a new container wobject.  It acts like a portal.  When in Admin mode, the dashboard admin is actually editing the Visitor's (default) view.  When not in admin mode, the dashboard admin is editing their own personalized view.  Shortcuts are the main source of functionality for the Dashboard.  See the Shortcut add/edit documentation for details.|,
+		lastUpdated => 1133619940
+	},
+	'dashboard template field label' => {
+		message => q|Dashboard Template|,
+		lastUpdated => 1133619940
+	},
+	'dashboard template field label' => {
+		message => q|Dashboard Template|,
+		lastUpdated => 1133619940
+	},
+
+
 };
 
 1;

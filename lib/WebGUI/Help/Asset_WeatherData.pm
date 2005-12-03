@@ -1,35 +1,20 @@
-package WebGUI::Help::Asset_Article;
+package WebGUI::Help::Asset_WeatherData;
 
 our $HELP = {
-	'article add/edit' => {
-		title => '61',
-		body => '71',
+	'weather data add/edit' => {
+		title => 'weather data add/edit title',
+		body => 'weather data add/edit body',
 		fields => [
-                        {
-                                title => '72',
-                                description => 'article template description',
-                                namespace => 'Asset_Article',
-                        },
-                        {
-                                title => '7',
-                                description => 'link title description',
-                                namespace => 'Asset_Article',
-                        },
-                        {
-                                title => '8',
-                                description => 'link url description',
-                                namespace => 'Asset_Article',
-                        },
-                        {
-                                title => '10',
-                                description => 'carriage return description',
-                                namespace => 'Asset_Article',
-                        },
+			{
+				title => 'Default Locations',
+				description => 'Your list of default weather locations',
+				namespace => 'Asset_WeatherData',
+			},
 		],
 		related => [
 			{
-				tag => 'article template',
-				namespace => 'Asset_Article'
+				tag => 'weatherdata template',
+				namespace => 'Asset_WeatherData'
 			},
 			{
 				tag => 'wobjects using',
@@ -41,19 +26,15 @@ our $HELP = {
 			},
 		],
 	},
-	'article template' => {
-		title => '72',
-		body => '73',
+	'weatherdata template' => {
+		title => 'WeatherData template title',
+		body => 'WeatherData template description',
 		fields => [
 		],
 		related => [
 			{
-				tag => 'article add/edit',
-				namespace => 'Asset_Article'
-			},
-			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
+				tag => 'weather data add/edit',
+				namespace => 'Asset_WeatherData'
 			},
 			{
 				tag => 'wobject template',

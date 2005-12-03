@@ -171,8 +171,7 @@ sub setUserPref {
 	my $sql = "delete from wgFieldUserData where assetId=".quote($fieldId)." and userId=".quote($userId);
 	WebGUI::SQL->write($sql);
 	my $sql2 = "insert into wgFieldUserData values (".quote($fieldId).",".quote($userId).",".quote($valueToSet).")";
-#	WebGUI::ErrorHandler::warn($sql2);
-	$field->getParent->uncacheOverrides;
+	$field->getParent->uncacheOverrides if ref $field->getParent eq 'WebGUI::Asset::Shortcut';
 	return WebGUI::SQL->write($sql2);
 }
 

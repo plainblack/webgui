@@ -1,38 +1,38 @@
 package WebGUI::Help::StockData;
 
 our $HELP = {
-	'stock_list_add_edit' => {
+	'stock data add/edit' => {
 		title => 'help_add_edit_stocklist_title',
 		body => 'help_add_edit_stocklist_body',
 		fields => [
-                        {
-                                title => 'template_label',
-                                description => 'template_label_description',
-                                namespace => 'StockList',
-                        },
-                        {
-                                title => 'display_template_label',
-                                description => 'display_template_label_description',
-                                namespace => 'StockList',
-                        },
-                        {
-                                title => 'default_stock_label',
-                                description => 'default_stock_label_description',
-                                namespace => 'StockList',
-                        },
-                        {
-                                title => 'stock_source',
-                                description => 'stock_source_description',
-                                namespace => 'StockList',
-                        },
-						{
-                                title => 'failover_label',
-                                description => 'failover_label_description',
-                                namespace => 'StockList',
-                        },
+			{
+				title => 'template_label',
+				description => 'template_label_description',
+				namespace => 'StockList',
+			},
+			{
+				title => 'display_template_label',
+				description => 'display_template_label_description',
+				namespace => 'StockList',
+			},
+			{
+				title => 'default_stock_label',
+				description => 'default_stock_label_description',
+				namespace => 'StockList',
+			},
+			{
+				title => 'stock_source',
+				description => 'stock_source_description',
+				namespace => 'StockList',
+			},
+			{
+				title => 'failover_label',
+				description => 'failover_label_description',
+				namespace => 'StockList',
+			},
 		],
 		related => [
-		    {
+			{
 				tag => 'stock list user edit',
 				namespace => 'StockList'
 			},
@@ -58,11 +58,11 @@ our $HELP = {
 		title => 'help_add_edit_stock_title',
 		body => 'help_add_edit_stock_description',
 		fields => [
-		   {
-                title => 'symbol_label',
-                description => 'symbol_label_description',
-                namespace => 'StockList',
-           },
+			{
+				title => 'symbol_label',
+				description => 'symbol_label_description',
+				namespace => 'StockList',
+			},
 		],
 		related => [
 			{

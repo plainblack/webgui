@@ -447,19 +447,19 @@ sub www_displayStock {
 }
 
 #-------------------------------------------------------------------
-=head2 www_edit ( )
+#=head2 www_edit ( )
 
-Web facing method which is the default edit page
+#Web facing method which is the default edit page
 
-=cut
+#=cut
 
-sub www_edit {
-   my $self = shift;
-   return WebGUI::Privilege::insufficient() unless $self->canEdit;
-   $self->getAdminConsole->setHelp("stock_list_add_edit","Asset_StockData");
-   return $self->getAdminConsole->render($self->getEditForm->print,
-                  WebGUI::International::get("edit_title","Asset_StockData"));
-}
+#sub www_edit {
+#   my $self = shift;
+#   return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#   $self->getAdminConsole->setHelp("stock list add/edit","Asset_StockData");
+#   return $self->getAdminConsole->render($self->getEditForm->print,
+#                  WebGUI::International::get("edit_title","Asset_StockData"));
+#}
 
 #-------------------------------------------------------------------
 =head2 www_view ( )

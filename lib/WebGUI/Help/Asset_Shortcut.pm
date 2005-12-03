@@ -15,31 +15,6 @@ our $HELP = {
 				description => 'shortcut template title description',
 				namespace => 'Asset_Shortcut',
 			},
-#			{
-#				title => 'override asset template',
-#				description => 'override asset template description',
-#				namespace => 'Asset_Shortcut',
-#			},
-			{
-				title => '10',
-				description => '10 description',
-				namespace => 'Asset_Shortcut',
-			},
-			{
-				title => '7',
-				description => '7 description',
-				namespace => 'Asset_Shortcut',
-			},
-			{
-				title => '8',
-				description => '8 description',
-				namespace => 'Asset_Shortcut',
-			},
-			{
-				title => '9',
-				description => '9 description',
-				namespace => 'Asset_Shortcut',
-			},
 			{
 				title => '1',
 				description => '1 description',
@@ -75,6 +50,10 @@ our $HELP = {
 				tag => 'metadata manage',
 				namespace => 'Asset'
 			},
+			{
+				tag => 'dashboard add/edit',
+				namespace => 'Asset_Dashboard'
+			},
 
 		]
 	},
@@ -93,13 +72,11 @@ our $HELP = {
 				tag => 'template language',
 				namespace => 'Asset_Template'
 			},
-
 		]
 	},
-
 	'field add/edit' => {
-		title => 'shortcut template title',
-		body => 'shortcut template body',
+		title => 'field add/edit title',
+		body => 'field add/edit body',
 		fields => [
 		],
 		related => [
