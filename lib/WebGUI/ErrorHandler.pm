@@ -15,7 +15,7 @@ package WebGUI::ErrorHandler;
 =cut
 
 use FileHandle;
-#use Log::Log4perl;
+use Log::Log4perl;
 use strict;
 use WebGUI::Session;
 use Apache2::RequestUtil;
