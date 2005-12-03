@@ -765,8 +765,9 @@ sub www_editOverride {
 		}
 	$params{value} = $overrides{overrides}{$fieldName}{origValue};
 	$params{name} = $fieldName;
-	$params{label} = $params{label} || "Edit Field Using the Generated Form Type";
-#	use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper(\%params).'</pre>');
+	$params{label} = $params{label} || "Edit Field Directly";
+	$params{hoverhelp} = $params{hoverhelp} || "Use this field to edit the override using the native form handler for this field type.";
+	if ($fieldName eq 'templateId') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($overrides{overrides}{templateId}{origValue})->get("namespace");}
 	$f->dynamicField(%params);
 	$f->textarea(
 		-name=>"newOverrideValueText",
