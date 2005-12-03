@@ -144,7 +144,7 @@ if (isIn($currCond,'Light Rain','Drizzle','Light Drizzle','Heavy Drizzle','Light
 if (isIn($currCond,'Rain','Heavy Rain','Rain Fog/Mist','Heavy Rain Fog/Mist','Rain Fog','Heavy Rain Fog')) {return 'ra';}
 if (isIn($currCond,'Funnel Cloud','Funnel Cloud in Vicinity','Tornado/Water Spout')) {return 'nsvrtsra';}
 if (isIn($currCond,'Dust','Low Drifting Dust','Blowing Dust','Sand','Blowing Sand','Low Drifting Sand','Dust/Sand Whirls','Dust/Sand Whirls in Vicinity','Dust Storm','Heavy Dust Storm','Dust Storm in Vicinity','Sand Storm','Heavy Sand Storm','Sand Storm in Vicinity')) {return 'dust';}
-if (isIn($currCond,'Haze')) {return 'mist.jpg';}
+if (isIn($currCond,'Haze')) {return 'mist';}
 }
 
 #-------------------------------------------------------------------
