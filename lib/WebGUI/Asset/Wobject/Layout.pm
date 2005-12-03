@@ -137,7 +137,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"] });
 	my %vars;
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));
