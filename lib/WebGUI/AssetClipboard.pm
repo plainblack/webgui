@@ -211,7 +211,7 @@ sub www_copyList {
 
 sub www_createShortcut () {
 	my $self = shift;
-	my $isOnDashboard = ref $self->getParent == 'WebGUI::Asset::Wobject::Dashboard';
+	my $isOnDashboard = ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard';
 	my $target = $isOnDashboard ? $self->getParent : $self;
 	my $child = $target->addChild({
 		className=>'WebGUI::Asset::Shortcut',
