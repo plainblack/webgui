@@ -149,7 +149,7 @@ sub addDashboardStuff {
 	WebGUI::SQL->write("CREATE TABLE `wgFieldUserData` (
 		`assetId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
 		`userId` VARCHAR(22) BINARY NOT NULL DEFAULT '',
-		`userValue` TEXT DEFAULT '',
+		`userValue` TEXT,
 		PRIMARY KEY(`assetId`, `userId`)
 	)");
 	
@@ -761,10 +761,29 @@ my $newAsset = $folder->addChild({
 	isHidden=>1
 	}, 'MultiSearchTmpl0000001');
 $newAsset->commit;
+print "\tConverting Shortcut overrides.\n" unless ($quiet);
+my $a = WebGUI::SQL->read("select assetId from asset where className='WebGUI::Asset::Shortcut'");
+my @overrides;
+while (my ($assetId) = $a->array) {
+	my $sc = WebGUI::Asset->newByDynamicClass($assetId);
+	push(@overrides,{assetId=>$sc->getId,fieldName=>'title',newValue=>$sc->get("title")}) if $sc->get("overrideTitle");
+	if ($sc->get("overrideTemplate")) {
+		my $fieldName = ref $sc->getShortcutOriginal eq 'WebGUI::Asset::Wobject::Collaboration' ? 'collaborationTemplateId' : 'templateId';
+		push(@overrides,{assetId=>$sc->getId,fieldName=>$fieldName,newValue=>$sc->get("overrideTemplateId")});
+	}
+	push(@overrides,{assetId=>$sc->getId,fieldName=>'displayTitle',newValue=>$sc->get("displayTitle")}) if $sc->get("overrideDisplayTitle");
+	push(@overrides,{assetId=>$sc->getId,fieldName=>'description',newValue=>$sc->get("description")}) if $sc->get("overrideDescription");
+}
+$a->finish;
+foreach my $hash (@overrides) {
+	WebGUI::SQL->write("insert into Shortcut_overrides values (".quote($hash->{assetId}).",".quote($hash->{fieldName}).",".quote($hash->{newValue}).")");
+}
+
 }
 
 #-------------------------------------------------
 sub fixVeryLateDates {
+	print "\tFixing very late endDates.\n" unless ($quiet);
 	WebGUI::SQL->write("update assetdata set endDate='2082783600' where endDate>=4294967294");
 }
 
