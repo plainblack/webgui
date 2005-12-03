@@ -40,6 +40,7 @@
 - [ 1361669 ] editUserProfileField causes huge memory consumption, loop
 - [ 1354464 ] Dynamic Field does not work correctly
 - [ 1354467 ] WebGUI::Form::Group is implemented incorrectly
+- [ 1372045 ] Required user profile field not show when create login
 
 
 6.7.8
