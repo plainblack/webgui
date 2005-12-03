@@ -98,7 +98,7 @@ sub contentHandler {
 	}
 	### form variables
 	foreach ($session{req}->param) {
-		$session{form}{$_} = $session{req}->param($_);
+		$session{form}{$_} = $session{req}->body($_) || $session{req}->param($_);
 	}
 	if ($session{env}{HTTP_X_MOZ} eq "prefetch") { # browser prefetch is a bad thing
 		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
