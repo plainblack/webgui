@@ -760,7 +760,7 @@ sub www_editOverride {
 	$output .= '</table>';
   my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
   $f->hidden(-name=>"func",-value=>"saveOverride");
-  $f->hidden(-name=>"fieldName",-value=>$session{form}{fieldName});
+  $f->hidden(-name=>"overrideFieldName",-value=>$session{form}{fieldName});
   $f->readOnly(-label=>"Field Name",-value=>$session{form}{fieldName});
   $f->readOnly(-label=>"Original Value",-value=>$overrides{overrides}{$fieldName}{origValue});
   my %params;
@@ -774,7 +774,7 @@ sub www_editOverride {
 #	use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper(\%params).'</pre>');
 	$f->dynamicField(%params);
 	$f->textarea(
-		-name=>"newValueText",
+		-name=>"newOverrideValueText",
 		-label=>"New Override Value",
 		-value=>$overrides{overrides}{$fieldName}{newValue},
 		-hoverHelp=>"Place something in this box if you don't want to use the automatically generated field."
@@ -783,6 +783,26 @@ sub www_editOverride {
   $f->submit;
   $output .= $f->print;
 	return $self->_submenu($output,'Edit Override');
+}
+
+#-------------------------------------------------------------------
+sub www_saveOverride {
+	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $fieldName = $session{form}{overrideFieldName};
+	my %overrides = $self->getOverrides;
+	my $output = '';
+	my %props;
+	foreach my $def (@{$self->getShortcutOriginal->definition}) {
+		%props = (%props,%{$def->{properties}});
+	}
+	my $fieldType = $props{$fieldName}{fieldType};
+	my $value = WebGUI::FormProcessor::process($fieldName,$fieldType);
+	$value = $session{form}{newOverrideValueText} || $value;
+	WebGUI::SQL->write("delete from Shortcut_overrides where assetId=".quote($self->getId)." and fieldName=".quote($fieldName));
+	WebGUI::SQL->write("insert into Shortcut_overrides values (".quote($self->getId).",".quote($fieldName).",".quote($value).")");
+	$self->uncacheOverrides;
+	return $self->www_manageOverrides;
 }
 
 #-------------------------------------------------------------------
