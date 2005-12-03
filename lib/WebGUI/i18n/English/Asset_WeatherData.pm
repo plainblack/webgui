@@ -22,6 +22,11 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
+	'WeatherData' => {
+		message => q|WeatherData|,
+		lastUpdated => 1133619940,
+	},
+
 
 };
 
