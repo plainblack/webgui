@@ -226,20 +226,17 @@ The word "Shortcut".</p>
 		lastUpdated => 1133619940,
 	},
 
-
-# -----------------------------------------------
-
 	'Label for This Field.' => {
 		message => q|Label for This Field.|,
 		lastUpdated => 1133619940,
 	},
 
-	'Possible values for this Field.  Only applies to selectList and checkList.' => {
-		message => q|Possible values for this Field.  Only applies to selectList and checkList.|,
+	'Possible Values' => {
+		message => q|Possible Values|,
 		lastUpdated => 1133619940,
 	},
 
-	'Default Value for this field.' => {
+	'Default Value for this field' => {
 		message => q|Default Value for this field.|,
 		lastUpdated => 1133619940,
 	},
@@ -266,6 +263,107 @@ The word "Shortcut".</p>
 
 	'Edit User Preference Field' => {
 		message => q|Edit User Preference Field|,
+		lastUpdated => 1133619940,
+	},
+
+	'Back to Edit Shortcut' => {
+		message => q|Back to Edit Shortcut|,
+		lastUpdated => 1133619940,
+	},
+
+
+	'Overrides' => {
+		message => q|Overrides|,
+		lastUpdated => 1133619940,
+	},
+
+	'Add Preference Field' => {
+		message => q|Add Preference Field|,
+		lastUpdated => 1133619940,
+	},
+
+	'fieldName' => {
+		message => q|Field Name|,
+		lastUpdated => 1133619940,
+	},
+
+	'edit delete fieldname' => {
+		message => q|Edit/Delete Fieldname|,
+		lastUpdated => 1133619940,
+	},
+
+	'Original Value' => {
+		message => q|Original Value|,
+		lastUpdated => 1133619940,
+	},
+
+	'Replacement value' => {
+		message => q|Replacement value|,
+		lastUpdated => 1133619940,
+	},
+
+	'New value' => {
+		message => q|New value|,
+		lastUpdated => 1133619940,
+	},
+
+	'Displaying this shortcut would cause a feedback loop' => {
+		message => q|Displaying this shortcut would cause a feedback loop.|,
+		lastUpdated => 1133619940,
+	},
+
+	'Manage Shortcut Overrides' => {
+		message => q|Manage Shortcut Overrides|,
+		lastUpdated => 1133619940,
+	},
+
+	'Manage User Preferences' => {
+		message => q|Manage User Preferences|,
+		lastUpdated => 1133619940,
+	},
+
+	'Edit Field Directly' => {
+		message => q|Edit Field Directly|,
+		lastUpdated => 1133619940,
+	},
+
+	'Use this field to edit the override using the native form handler for this field type' => {
+		message => q|Use this field to edit the override using the native form handler for this field type|,
+		lastUpdated => 1133619940,
+	},
+
+	'New Override Value' => {
+		message => q|New Override Value|,
+		lastUpdated => 1133619940,
+	},
+
+	'Place something in this box if you dont want to use the automatically generated field' => {
+		message => q|Place something in this box if you don't want to use the automatically generated field.  You may also insert user preference values into this field by using the following syntax: if you wanted it to display "My Favorite color is blue.", and you have a user preference field called myFavColor, in this box you would put: My Favorite color is ##userPref:myFavColor##.|,
+		lastUpdated => 1133619940,
+	},
+
+	'Replacement Value' => {
+		message => q|Replacement Value|,
+		lastUpdated => 1133619940,
+	},
+
+	'Edit Override' => {
+		message => q|Edit Override|,
+		lastUpdated => 1133619940,
+	},
+
+	'Possible values for this Field Only applies to selectList and checkList' => {
+		message => q|Possible values for this Field.  Only applies to selectList and checkList.|,
+		lastUpdated => 1133619940,
+	},
+
+	'Label for This Field' => {
+		message => q|Label for This Field|,
+		lastUpdated => 1133619940,
+	},
+
+	'Label for This Field' => {
+		message => q|Label for This Field|,
 		lastUpdated => 1133619940,
 	},
 

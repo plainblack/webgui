@@ -71,8 +71,8 @@ sub definition {
 			fieldType=>{fieldType=>'fieldType',defaultValue=>'',label=>$i18n->get('Type of Field'),types=>['text','textarea','checkList','selectList']},
 		#	overrideForm=>{fieldType=>'yesNo',defaultValue=>0},
 		#	overrideValue=>{fieldType=>'yesNo',defaultValue=>0},
-			possibleValues=>{fieldType=>'textarea',defaultValue=>'',label=>$i18n->get('Possible values for this Field.  Only applies to selectList and checkList.')},
-			defaultValue=>{fieldType=>'textarea',defaultValue=>'',label=>$i18n->get('Default Value for this field.')}
+			possibleValues=>{fieldType=>'textarea',defaultValue=>'',label=>$i18n->get('Possible values'),hoverHelp=>$i18n->get('Possible values for this Field Only applies to selectList and checkList')},
+			defaultValue=>{fieldType=>'textarea',defaultValue=>'',label=>$i18n->get('Default Value for this field')}
 		);
 
 	push(@{$definition}, {

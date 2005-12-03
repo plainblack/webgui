@@ -45,27 +45,28 @@ defines wobject properties for WeatherData instances
 sub definition {
 	my $class = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new("Asset_WeatherData");
 	my $properties = {
 		templateId =>{
 			fieldType=>"template",
 			tab=>"display",
 			defaultValue=>'WeatherDataTmpl0000001',
 			namespace=>"WeatherData",
-			hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
-			label=>WebGUI::International::get(72,"Asset_Article")
+			hoverHelp=>$i18n->get("Current Weather Conditions Template to use"),
+			label=>$i18n->get("Template")
 		},
 		locations=>{
 			fieldType=>"textarea",
 			defaultValue=>"Grayslake,IL",
 			tab=>"properties",
-			hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
-			label=>WebGUI::International::get(72,"Asset_Article")
+			hoverHelp=>$i18n->get("Your list of default weather locations"),
+			label=>$i18n->get("Default Locations")
 		},
 	};
 	push(@{$definition}, {
 		tableName=>'WeatherData',
 		className=>'WebGUI::Asset::Wobject::WeatherData',
-		assetName=>'WeatherData',
+		assetName=>$i18n->get("WeatherData"),
 		icon=>'weatherData.gif',
 		autoGenerateForms=>1,
 		properties=>$properties

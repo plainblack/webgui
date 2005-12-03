@@ -145,7 +145,9 @@ sub _submenu {
 	my $ac = WebGUI::AdminConsole->new("shortcutmanager");
 	$ac->setHelp($help) if ($help);
 	$ac->setIcon($self->getIcon);
-	$ac->addSubmenuItem($self->getUrl('func=edit'), "Back to Edit Shortcut");
+	$ac->addSubmenuItem($self->getUrl('func=edit'), WebGUI::International::get("Back to Edit Shortcut","Asset_Shortcut"));
+	$ac->addSubmenuItem($self->getUrl("func=manageOverrides"),WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
+	$ac->addSubmenuItem($self->getUrl("func=manageUserPrefs"),WebGUI::International::get("Manage User Preferences","Asset_Shortcut"));
 	return $ac->render($workarea, $title);
 }
 
@@ -220,10 +222,10 @@ sub definition {
 			description=>{
 				fieldType=>"HTMLArea",
 				defaultValue=>undef
-				},
-                        }
-                });
-        return $class->SUPER::definition($definition);
+			},
+		}
+	});
+	return $class->SUPER::definition($definition);
 }
 
 
@@ -233,55 +235,7 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $originalTemplate;
-#	$tabform->getTab("properties")->HTMLArea(
-#		-value=>$self->getValue("description"),
-#                -label=>WebGUI::International::get(85, 'Asset_Shortcut'),
-#                -hoverHelp=>WebGUI::International::get('85 description', 'Asset_Shortcut'),
-#		-name=>"description"
-#		);
-#	$tabform->getTab("display")->template(
-#		-value=>$self->getValue("templateId"),
-#                -label=>WebGUI::International::get('shortcut template title', 'Asset_Shortcut'),
-#                -hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
-#		-namespace=>"Shortcut"
-#		);
-#	if ($self->getShortcut->get("templateId")) {
-#		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("templateId"));
-#		$originalTemplate = WebGUI::Asset::Template->new($self->getShortcut->get("collaborationTemplateId")) if (ref $self->getShortcut eq "WebGUI::Asset::Wobject::Collaboration");
-#		#Shortcuts of Posts and Threads and other assets without a "templateId" 
-#		# are going to be ->view'ed by their original parent's settings anyway.
-#		$tabform->getTab("display")->template(
-#			-name=>"overrideTemplateId",
-#			-value=>$self->getValue("overrideTemplateId") || $originalTemplate->getId,
-#        	        -label=>WebGUI::International::get('override asset template', 'Asset_Shortcut'),
-#               	 	-hoverHelp=>WebGUI::International::get('override asset template description', 'Asset_Shortcut'),
-#			-namespace=>$originalTemplate->get("namespace")
-#			);
-#		$tabform->getTab("display")->yesNo(
-#			-name=>"overrideTemplate",
-#			-value=>$self->getValue("overrideTemplate"),
-#			-label=>WebGUI::International::get(10,"Asset_Shortcut"),
-#			-hoverHelp=>WebGUI::International::get('10 description',"Asset_Shortcut")
-#			);
-#	}
-#	$tabform->getTab("properties")->yesNo(
-#		-name=>"overrideTitle",
-#		-value=>$self->getValue("overrideTitle"),
-#		-label=>WebGUI::International::get(7,"Asset_Shortcut"),
-#		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Shortcut")
-#		);
-#	$tabform->getTab("display")->yesNo(
-#		-name=>"overrideDisplayTitle",
-#		-value=>$self->getValue("overrideDisplayTitle"),
-#		-label=>WebGUI::International::get(8,"Asset_Shortcut"),
-#		-hoverHelp=>WebGUI::International::get('8 description',"Asset_Shortcut")
-#		);
-#	$tabform->getTab("properties")->yesNo(
-#		-name=>"overrideDescription",
-#		-value=>$self->getValue("overrideDescription"),
-#		-label=>WebGUI::International::get(9,"Asset_Shortcut"),
-#		-hoverHelp=>WebGUI::International::get('9 description',"Asset_Shortcut")
-#		);
+	my $i18n = WebGUI::International->new("Asset_Shortcut");
 	$tabform->getTab("properties")->readOnly(
 		-label=>WebGUI::International::get(1,"Asset_Shortcut"),
 		-hoverHelp=>WebGUI::International::get('1 description',"Asset_Shortcut"),
@@ -329,7 +283,7 @@ sub getEditForm {
 		        -hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut")
 	        );
 	}
-	$tabform->addTab('overrides','Overrides');
+	$tabform->addTab('overrides',$i18n->get('Overrides'));
 	$tabform->getTab('overrides')->raw($self->getOverridesList);
 	return $tabform;
 }
@@ -351,12 +305,13 @@ sub getExtraHeadTags {
 #-------------------------------------------------------------------
 sub getFieldsList {
 	my $self = shift;
-	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field').'" class="formLink">Add Preference Field</a><br /><br />';
+	my $i18n = WebGUI::International->new("Asset_Shortcut");
+	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field').'" class="formLink">'.$i18n->get('Add Preference Field').'</a><br /><br />';
 	my @fielden;
 	@fielden = $self->getUserPrefs;
 	return $output unless scalar @fielden > 0;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
-	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td></tr>';
+	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td></tr>';
 	foreach my $field (@fielden) {
 		$output .= '<tr>';
 		$output .= '<td class="tableData"><a href="'.$field->getUrl('func=edit').'">'.$field->get("fieldName").'</a></td>';
@@ -374,9 +329,10 @@ sub getFieldsList {
 sub getOverridesList {
 	my $self = shift;
 	my $output = '';
+	my $i18n = WebGUI::International->new("Asset_Shortcut");
 	my %overrides = $self->getOverrides;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
-	$output .= '<tr class="tableHeader"><td>fieldName</td><td>Edit/Delete</td><td>Original Value</td><td>New Value</td><td>Replacement value</td></tr>';
+	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td><td>'.$i18n->get('Original Value').'</td><td>'.$i18n->get('New value').'</td><td>'.$i18n->get('Replacement value').'</td></tr>';
 	foreach my $definition (@{$self->getShortcutOriginal->definition}) {
 		foreach my $prop (keys %{$definition->{properties}}) {
 			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
@@ -438,7 +394,6 @@ sub getOverrides {
 		}
 		$cache->set(\%overrides, 60*60);
 		$overridesRef = \%overrides;
-	#	use Data::Dumper;WebGUI::ErrorHandler::warn('<pre>'.Dumper($overridesRef).'</pre>');
 	}
 	return %$overridesRef;
 }
@@ -633,7 +588,7 @@ sub view {
 	my $content;
 	my $shortcut = $self->getShortcut;
 	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
-		$content = "Displaying this shortcut would cause a feedback loop.";
+		$content = WebGUI::International::get("Displaying this shortcut would cause a feedback loop","Asset_Shortcut");
 	} else {
 		$content = $shortcut->view;
 	}
@@ -651,7 +606,8 @@ sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),"Manage Shortcut Overrides");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageUserPrefs"),WebGUI::International::get("Manage User Preferences","Asset_Shortcut"));
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
 }
 
@@ -693,14 +649,14 @@ sub www_manageUserPrefs {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $output = $self->getFieldsList;
-	return $self->_submenu($output,"Manage Preferences");
+	return $self->_submenu($output,WebGUI::International::get("Manage User Preferences","Asset_Shortcut"));
 }
 
 #-------------------------------------------------------------------
 sub www_manageOverrides {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	return $self->_submenu($self->getOverridesList,'Manage Overrides');
+	return $self->_submenu($self->getOverridesList,WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
 }
 
 #-------------------------------------------------------------------
@@ -745,6 +701,7 @@ sub www_getNewTitle {
 sub www_editOverride {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new("Asset_Shortcut");
 	my $fieldName = $session{form}{fieldName};
 	my %overrides = $self->getOverrides;
 	my $output = '';
@@ -756,8 +713,8 @@ sub www_editOverride {
   my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
   $f->hidden(-name=>"func",-value=>"saveOverride");
   $f->hidden(-name=>"overrideFieldName",-value=>$session{form}{fieldName});
-  $f->readOnly(-label=>"Field Name",-value=>$session{form}{fieldName});
-  $f->readOnly(-label=>"Original Value",-value=>$overrides{overrides}{$fieldName}{origValue});
+  $f->readOnly(-label=>$i18n->get("Field Name"),-value=>$session{form}{fieldName});
+  $f->readOnly(-label=>$i18n->get("Original Value"),-value=>$overrides{overrides}{$fieldName}{origValue});
   my %params;
   foreach my $key (keys %{$props{$fieldName}}) {
 		next if ($key eq "tab");
@@ -765,20 +722,20 @@ sub www_editOverride {
 		}
 	$params{value} = $overrides{overrides}{$fieldName}{origValue};
 	$params{name} = $fieldName;
-	$params{label} = $params{label} || "Edit Field Directly";
-	$params{hoverhelp} = $params{hoverhelp} || "Use this field to edit the override using the native form handler for this field type.";
+	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
+	$params{hoverhelp} = $params{hoverhelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
 	if ($fieldName eq 'templateId') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($overrides{overrides}{templateId}{origValue})->get("namespace");}
 	$f->dynamicField(%params);
 	$f->textarea(
 		-name=>"newOverrideValueText",
-		-label=>"New Override Value",
+		-label=>$i18n->get("New Override Value"),
 		-value=>$overrides{overrides}{$fieldName}{newValue},
-		-hoverHelp=>"Place something in this box if you don't want to use the automatically generated field."
+		-hoverHelp=>$i18n->get("Place something in this box if you dont want to use the automatically generated field")
 	);
-	$f->readOnly(-label=>"Replacement Value",-value=>$overrides{overrides}{$fieldName}{parsedValue});
+	$f->readOnly(-label=>$i18n->get("Replacement Value"),-value=>$overrides{overrides}{$fieldName}{parsedValue},-hoverHelp=>$i18n->get("This is the example output of the field when parsed for user preference macros"));
   $f->submit;
   $output .= $f->print;
-	return $self->_submenu($output,'Edit Override');
+	return $self->_submenu($output,$i18n->get('Edit Override'));
 }
 
 #-------------------------------------------------------------------

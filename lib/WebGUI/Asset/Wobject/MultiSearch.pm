@@ -86,7 +86,7 @@ sub view {
 	#Set some template variables
 
 	#Build list of searches as an array
-	my $defaults = $self->getValue("predefinedSearches");
+#	my $defaults = $self->getValue("predefinedSearches");
 
 	return $self->processTemplate(\%var, $self->get("templateId"));
 }
