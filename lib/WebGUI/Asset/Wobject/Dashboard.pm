@@ -140,6 +140,9 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	if ($session{form}{assetId} eq "new" && $session{form}{class} eq 'WebGUI::Asset::Wobject::Dashboard') {
 		$self->initializeDashletFields;
+		if (ref $self->getParent eq 'WebGUI::Asset::Wobject::Layout') {
+			$self->getParent->update({assetsToHide=>$self->getParent->get("assetsToHide")."\n".$self->getId});
+		}
 		$self->update({styleTemplateId=>'PBtmplBlankStyle000001'});
 	}
 }
