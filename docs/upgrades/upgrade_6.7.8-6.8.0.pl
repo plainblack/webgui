@@ -821,6 +821,11 @@ sub addInOutBoard {
         dateStamp int not null,
         message text
 	)");
+	WebGUI::SQL->write("create table InOutBoard_delegates (
+		userId varchar(22) binary not null,
+		delegateUserId varchar(22) binary not null,
+		assetId varchar(22) binary not null
+	)");
 	WebGUI::SQL->write("insert into userProfileField (fieldName,fieldLabel,visible,dataType,dataValues,dataDefault,sequenceNumber,profileCategoryId,editable) values ('department',".quote("'Department'").",1,'selectList',".quote("{'IT'=>'IT','HR'=>'HR','Regular Staff'=>'Regular Staff'}").",".quote("['Regular Staff']").",8,'6',1)");
 	my $import = WebGUI::Asset->getImportNode;
 	my $folder = $import->addChild({

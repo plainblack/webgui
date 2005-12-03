@@ -131,6 +131,12 @@ assets = WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Wobject::SyndicatedContent, \
 	WebGUI::Asset::Wobject::WSClient
 
+# Specify the list assets that are used for utility purposes only
+# and are not typically used as a normal part of content
+# management.
+
+utilityAssets = WebGUI::Asset::Template, WebGUI::Asset::RichEdit, WebGUI::Asset::File::Image, WebGUI::Asset::File
+
 # Specify the list of assets you want to appear in your add
 # content menus that should act as containers for other content.
 # These items are typically not content themselves, but rather
@@ -138,15 +144,6 @@ assets = WebGUI::Asset::Snippet, \
 
 assetContainers = WebGUI::Asset::Wobject::Layout, \
 	WebGUI::Asset::Wobject::Folder
-
-# Specify the list assets that are used for utility purposes only
-# and are not typically used as a normal part of content
-# management.
-
-utilityAssets = WebGUI::Asset::Template, \
-		WebGUI::Asset::RichEdit, \ 
-		WebGUI::Asset::File::Image, \
-		WebGUI::Asset::File
 
 # Optionally specify a group id for assets to tell WebGUI what
 # group a user needs to be part of in order to add that type of
