@@ -58,27 +58,25 @@ A hash reference passed in from a subclass definition.
 sub definition {
 	my $class = shift;
 	my $definition = shift;
-	my $fieldName;
-	unless ($session{form}{isUserPref} eq '1') {
-		$fieldName = 'The unique name of the field in the asset that you are overriding.'; } else { $fieldName = 'The unique name of a user preference parameter you are inventing.';}
+	my $i18n = WebGUI::International->new("Asset_Shortcut");
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
 		#	formTemplateId=>{fieldType=>'template',defaultValue=>''},
 		#	valueTemplateId=>{fieldType=>'template',defaultValue=>''},
 		#	isUserPref=>{fieldType=>'hidden',defaultValue=>$session{form}{isUserPref},label=>'Is This Field a User Preference?'},
-			fieldName=>{fieldType=>'text',defaultValue=>'',label=>$fieldName},
-			fieldLabel=>{fieldType=>'text',defaultValue=>'',label=>'Label for This Field.'},
-			fieldDescription=>{fieldType=>'HTMLArea',defaultValue=>'',label=>'Hover Help (Description) for this Field.'},
-			fieldType=>{fieldType=>'fieldType',defaultValue=>'',label=>'Type of Field',types=>['text','textarea','checkList','selectList']},
+			fieldName=>{fieldType=>'text',defaultValue=>'',label=>$i18n->get('The unique name of a user preference parameter you are inventing')},
+			fieldLabel=>{fieldType=>'text',defaultValue=>'',label=>$i18n->get('Label for This Field')},
+			fieldDescription=>{fieldType=>'HTMLArea',defaultValue=>'',label=>$i18n->get('Hover Help Description for this Field')},
+			fieldType=>{fieldType=>'fieldType',defaultValue=>'',label=>$i18n->get('Type of Field'),types=>['text','textarea','checkList','selectList']},
 		#	overrideForm=>{fieldType=>'yesNo',defaultValue=>0},
 		#	overrideValue=>{fieldType=>'yesNo',defaultValue=>0},
-			possibleValues=>{fieldType=>'textarea',defaultValue=>'',label=>'Possible values for this Field.  Only applies to selectList and checkList.'},
-			defaultValue=>{fieldType=>'textarea',defaultValue=>'',label=>'Default Value for this field.'}
+			possibleValues=>{fieldType=>'textarea',defaultValue=>'',label=>$i18n->get('Possible values for this Field.  Only applies to selectList and checkList.')},
+			defaultValue=>{fieldType=>'textarea',defaultValue=>'',label=>$i18n->get('Default Value for this field.')}
 		);
 
 	push(@{$definition}, {
-		assetName=>"Field",
+		assetName=>$i18n->get("Field"),
 		tableName=>'wgField',
 		autoGenerateForms=>1,
 		className=>'WebGUI::Asset::Field',
@@ -125,29 +123,6 @@ sub getFieldName {
 }
 
 #-------------------------------------------------------------------
-#sub getFieldValue {
-#	my $self = shift;
-#	my $value;
-#	my $dashlet = $self->getParent;
-#	if (ref $dashlet eq 'WebGUI::Asset::Shortcut') {
-#		my @fellowFields = $dashlet->getUserPrefs;
-#		foreach my $field (@fellowFields) {
-#			my $id = $field->getId;
-#			my $fieldName = $field->getFieldName;
-#			my $fieldValue = $self->getUserPref($id);
-#			unless ($self->getId eq $id) {
-#				$value =~ s/\<tmpl_var\sshortcut\.field\.${fieldName}\.value\>/$fieldValue/g;
-#				#prevent macro loops.  A Field cannot be self referential.
-#			} else {
-#				$value =~ s/\<tmpl_var\sshortcut\.field\.${fieldName}\.value\>//g;
-#			}
-#		}
-#	}
-#	$value = WebGUI::Asset::Template->processRaw($value);
-#	return $value;
-#}
-
-#-------------------------------------------------------------------
 sub getUserPref {
 	#This is a class method.  Can be called from the getDashletUserPref macro
 	my $class = shift; #ignored when called from within this package/module.
@@ -187,9 +162,8 @@ sub setUserPref {
 	my $valueToSet = shift;
 	return 0 unless $valueToSet;
 	my $userId = shift || 'autoDerive';
-	my $field;
+	my $field = WebGUI::Asset->newByDynamicClass($fieldId);
 	if ($userId eq 'autoDerive') {
-		$field = WebGUI::Asset->newByDynamicClass($fieldId);
 		$userId = ($field->canManage && WebGUI::Session::isAdminOn()) ? '1' : $session{user}{userId};
 	}
 	my $returnDataType = shift || 'string';
@@ -198,6 +172,7 @@ sub setUserPref {
 	WebGUI::SQL->write($sql);
 	my $sql2 = "insert into wgFieldUserData values (".quote($fieldId).",".quote($userId).",".quote($valueToSet).")";
 #	WebGUI::ErrorHandler::warn($sql2);
+	$field->getParent->uncacheOverrides;
 	return WebGUI::SQL->write($sql2);
 }
 
@@ -206,7 +181,7 @@ sub www_edit {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canManage;
 	$self->getAdminConsole->setHelp("field add/edit","Asset_Shortcut");
-	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
+	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('Edit User Preference Field',"Asset_Shortcut"));
 }
 
 #-------------------------------------------------------------------

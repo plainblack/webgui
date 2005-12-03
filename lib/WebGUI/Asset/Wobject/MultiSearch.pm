@@ -43,28 +43,29 @@ defines wobject properties for MultiSearch instances
 sub definition {
 	my $class = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new("Asset_MultiSearch");
 	my $properties = {
 		templateId =>{
 			fieldType=>"template",
 			tab=>"display",
 			defaultValue=>'MultiSearchTmpl0000001',
 			namespace=>"MultiSearch",
-			hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
-			label=>WebGUI::International::get(72,"Asset_Article")
+			hoverHelp=>$i18n->get('MultiSearch Template'),
+			label=>$i18n->get('MultiSearch Template')
 		},
-		predefinedSearches=>{
-			fieldType=>"textarea",
-			defaultValue=>"WebGUI",
-			tab=>"properties",
-			hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
-			label=>WebGUI::International::get(72,"Asset_Article")
-		},
+#		predefinedSearches=>{
+#			fieldType=>"textarea",
+#			defaultValue=>"WebGUI",
+#			tab=>"properties",
+#			hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
+#			label=>WebGUI::International::get(72,"Asset_Article")
+#		},
 	};
 	push(@{$definition}, {
 		tableName=>'MultiSearch',
 		className=>'WebGUI::Asset::Wobject::MultiSearch',
-		assetName=>'MultiSearch',
-	#	icon=>'MultiSearch.gif',
+		assetName=>$i18n->get('MultiSearch'),
+		icon=>'MultiSearch.gif',
 		autoGenerateForms=>1,
 		properties=>$properties
 	});

@@ -221,6 +221,54 @@ The word "Shortcut".</p>
 		lastUpdated => 1109525761,
 	},
 
+	'The unique name of a user preference parameter you are inventing' => {
+		message => q|The unique name of a user preference parameter you are inventing.|,
+		lastUpdated => 1133619940,
+	},
+
+
+# -----------------------------------------------
+
+	'Label for This Field.' => {
+		message => q|Label for This Field.|,
+		lastUpdated => 1133619940,
+	},
+
+	'Possible values for this Field.  Only applies to selectList and checkList.' => {
+		message => q|Possible values for this Field.  Only applies to selectList and checkList.|,
+		lastUpdated => 1133619940,
+	},
+
+	'Default Value for this field.' => {
+		message => q|Default Value for this field.|,
+		lastUpdated => 1133619940,
+	},
+
+	'Field' => {
+		message => q|Field|,
+		lastUpdated => 1133619940,
+	},
+
+	'shortcut template title' => {
+		message => q|Shortcut Template|,
+		lastUpdated => 1133619940,
+	},
+
+	'Hover Help Description for this Field' => {
+		message => q|Hover Help (Description) for this Field.|,
+		lastUpdated => 1133619940,
+	},
+
+	'Type of Field' => {
+		message => q|Type of Field|,
+		lastUpdated => 1133619940,
+	},
+
+	'Edit User Preference Field' => {
+		message => q|Edit User Preference Field|,
+		lastUpdated => 1133619940,
+	},
+
 };
 
 1;

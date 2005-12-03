@@ -1,4 +1,4 @@
-package WebGUI::Help::StockList;
+package WebGUI::Help::StockData;
 
 our $HELP = {
 	'stock_list_add_edit' => {
