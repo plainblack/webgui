@@ -206,7 +206,8 @@ sub epochToHuman {
 	my $language = WebGUI::International::get($session{user}{language});
 	my $locale = $language->{languageAbbreviation} || "en";
 	$locale .= "_".$language->{locale} if ($language->{locale});
-	my $dt = DateTime->from_epoch( epoch=>shift||time(), time_zone=>$session{user}{timeZone}, locale=>$locale );
+	my $timeZone = $session{user}{timeZone} || "America/Chicago";
+        my $dt = DateTime->from_epoch( epoch=>shift||time(), time_zone=>$timeZone, locale=>$locale );
 	my $output = shift || "%z %Z";
 	my $temp;
   #---date format preference
