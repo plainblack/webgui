@@ -65,7 +65,7 @@ sub definition {
 		tableName=>'MultiSearch',
 		className=>'WebGUI::Asset::Wobject::MultiSearch',
 		assetName=>$i18n->get('MultiSearch'),
-		icon=>'MultiSearch.gif',
+		icon=>'multiSearch.gif',
 		autoGenerateForms=>1,
 		properties=>$properties
 	});
