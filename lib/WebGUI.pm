@@ -105,7 +105,7 @@ sub contentHandler {
 	} elsif ($session{setting}{specialState} eq "upgrading") {
 		$r->print(upgrading());
 	} elsif ($session{setting}{specialState} eq "init") {
-		return $r->print(setup());
+		$r->print(setup());
 	} else {
 		my $output = "";
 		if (WebGUI::ErrorHandler::canShowPerformanceIndicators()) {
