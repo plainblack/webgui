@@ -37,6 +37,16 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+##-------------------------------------------------------------------
+
+=head2 correctValues ( )
+
+Override method from master class since SelectBox only support a single value
+
+=cut
+
+sub correctValues { }
+
 #-------------------------------------------------------------------
 
 =head2 definition ( [ additionalTerms ] )

@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Asset_EventsCalendar;
 
 our $I18N = {
 
+	'january' => {
+		message => q|January|,
+		lastUpdated => 1133711787
+	},
+
 	'61' => {
 		message => q|Events Calendar, Add/Edit|,
 		lastUpdated => 1066572488

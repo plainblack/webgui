@@ -111,9 +111,10 @@ sub new {
         }
 	my $formObj = $cmd->new($param);
 	##Fix up methods for List type forms and restore the size to all Forms *except*
-	##List type forms
+	##List type forms.  Historically, dynamically created forms have always
+	##used the default size.
 	if ($formObj->isa('WebGUI::Form::List')) {
-		$formObj->correctValues($param->{value});
+		$formObj->correctValues();
 		$formObj->correctOptions($param->{possibleValues});
 	}
 	elsif ($size) {

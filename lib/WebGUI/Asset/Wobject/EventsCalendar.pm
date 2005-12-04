@@ -117,7 +117,7 @@ sub getEditForm {
 	$tabform->getTab("display")->selectBox(
 		-name=>"startMonth",
 		-options=>{
-			"january"=>WebGUI::International::get('january','Asset_EventsCalendar'),
+			"january"=>WebGUI::International::get('january','DateTime'),
 			"now"=>WebGUI::International::get(98,"Asset_EventsCalendar"),
 			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
 			"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")

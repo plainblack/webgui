@@ -91,8 +91,8 @@ method.
 =cut
 
 sub correctValues {
-	my ($self, $value) = @_;
-	return unless defined $value;
+	my ($self) = @_;
+	return unless defined $self->{value};
 	my @defaultValues;
 	foreach (split(/\n/, $self->{value})) {
 			s/\s+$//; # remove trailing spaces
@@ -185,7 +185,8 @@ sub displayValue {
 
 =head2 getValues ( )
 
-Handle returning an array regardless of whether the form values are a scalar or array.
+Safely handle returning values whether the stored data is scalar or an array
+ref.
 
 =cut
 
