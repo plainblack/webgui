@@ -96,12 +96,8 @@ The number of seconds since January 1, 1970.
 =cut
 
 sub epochToArray {
-	my $timeZone = $session{user}{timeZone} || "America/Chicago";
 	use DateTime;
-	my $dt = DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone);
-	my @date = split / /, $dt->strftime("%Y %m %d %H %M %S");
-	@date = map {$_ += 0} @date;
-	return @date;
+	return split / /, DateTime->from_epoch( epoch =>shift, time_zone=>{$session{user}{timeZone} || "America/Chicago"})->strftime("%Y %m %d %H %M %S");
 }
 
 
