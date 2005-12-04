@@ -29,6 +29,20 @@ initialize();  # this line is required
 
 # put your tests here
 
+my $digits  = qr/(\d+)/;
+my $bareword  = qr/(\w+)/;
+my $quotelike = qr/((['"])$bareword(['"]))/;
+my $subscript = qr/([\[{]\w+[\]\}])/;
+my $variable  = qr/(\$\w+($subscript)*)/;
+my $sub_args  = qr/(($quotelike|$digits),?)+/;
+my $subroutine = qr/
+			  WebGUI::International::get
+			  \(			##Opening paren for optional arguments
+			    ($sub_args)
+			  \)			##Closing paren
+		    /x;
+
+
 my %helpTable;
 
 my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList();
@@ -53,12 +67,18 @@ my @helpLabels = getHelpLabels();
 
 my @sqlLabels = getSQLLabels();
 
+my @libLabels;
+find(\&label_finder_pm, '../lib/');
+
+diag ("Checking ". scalar(@helpLabels). " help labels");
+diag ("Checking ". scalar(@sqlLabels). " SQL labels");
+diag ("Checking ". scalar(@libLabels). " library code labels");
+
 $numTests = scalar(@helpLabels)
-	  + scalar(@sqlLabels);
+	  + scalar(@sqlLabels)
+	  + scalar(@libLabels);
 
 diag("Planning on running $numTests tests\n");
-
-#find(\&label_finder_pm, '../');
 
 plan tests => $numTests;
 
@@ -72,11 +92,31 @@ foreach my $i18n ( @sqlLabels ) {
 	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
 }
 
+foreach my $i18n ( @libLabels ) {
+	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
+	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
+}
+
 cleanup(); # this line is required
 
 sub label_finder_pm {
-	local $_;
-	next unless /\.pm/;
+	next unless /\.pm$/;
+	open my $pmf, $_
+		or die "unable to open file $File::Find::name: $!\n";
+	my $libFile = '';
+	{
+		local $/;
+		$libFile = <$pmf>;
+	}
+	close $pmf;
+	while ($libFile =~ m/$subroutine/gc) {
+		my ($label, $namespace) = split /,/, $1;
+		push @libLabels, {
+					file=>$File::Find::name,
+					label=>$label,
+					namespace=>$namespace || 'WebGUI',
+				};
+	}
 }
 
 sub getHelpLabels {
@@ -119,7 +159,7 @@ sub getHelpLabels {
 sub getSQLLabels {
 	my @sqlLabels = ();
 	foreach my $file (qw/create.sql previousVersion.sql/) {
-		my $file2 = join $session{os}{slash}, '..', 'docs', $file;
+		my $file2 = join '/', '..', 'docs', $file;
 		open my $fh, $file2 or
 			die "Unable to open $file2: $!\n";
 		local $/;
