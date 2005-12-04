@@ -37,10 +37,12 @@
    "dashboard".  You can create more than one dashboard per site.
    See the help documention for how to use Shortcut overrides and the
    new user preference fields.
-- [ 1361669 ] editUserProfileField causes huge memory consumption, loop
-- [ 1354464 ] Dynamic Field does not work correctly
-- [ 1354467 ] WebGUI::Form::Group is implemented incorrectly
-- [ 1372045 ] Required user profile field not show when create login
+ - [ 1361669 ] editUserProfileField causes huge memory consumption, loop
+ - [ 1354464 ] Dynamic Field does not work correctly
+ - [ 1354467 ] WebGUI::Form::Group is implemented incorrectly
+ - [ 1372045 ] Required user profile field not show when create login
+ - Added an option for multiple IP addresses (space seperated) for debug
+   output
 
 
 6.7.8

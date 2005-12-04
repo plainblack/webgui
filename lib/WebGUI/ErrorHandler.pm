@@ -87,14 +87,17 @@ Returns true if the user meets the condition to see debugging information and de
 =cut
 
 sub canShowDebug {
-       		return (
-				(
-					$WebGUI::Session::session{setting}{showDebug}
-				) && (
-					$WebGUI::Session::session{env}{REMOTE_ADDR} =~ /^$WebGUI::Session::session{setting}{debugIp}/ || 
-					$WebGUI::Session::session{setting}{debugIp} eq ""
-				)
-			);
+		return 0 unless ($WebGUI::Session::session{setting}{showDebug});
+		return 1 if ($WebGUI::Session::session{setting}{debugIp} eq "");
+		my @ips = split(" ",$WebGUI::Session::session{setting}{debugIp});
+		my $ok = 0;
+		foreach my $ip (@ips) {
+			if ($WebGUI::Session::session{env}{REMOTE_ADDR} =~ /^$ip/) {
+				$ok = 1;
+				last;
+			}	
+		}
+		return $ok;
 }
 
 #-------------------------------------------------------------------
