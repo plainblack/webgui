@@ -12,6 +12,13 @@ print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
 
 
 #----------------------------------------
+# Logger
+#----------------------------------------
+use Log::Log4perl;
+Log::Log4perl->init( $webguiRoot."/etc/log.conf" );   
+
+
+#----------------------------------------
 # Database connectivity.
 #----------------------------------------
 #use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on servers with many sites, or those using db slaves.

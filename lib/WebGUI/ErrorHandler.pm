@@ -14,13 +14,14 @@ package WebGUI::ErrorHandler;
 
 =cut
 
+
+use strict;
 use FileHandle;
 use Log::Log4perl;
-use strict;
 use WebGUI::Session;
 use Apache2::RequestUtil;
 
-$Log::Log4perl::caller_depth = 1;
+$Log::Log4perl::caller_depth++;
 
 =head1 NAME 
 
@@ -204,7 +205,9 @@ Returns a reference to the logger.
 =cut
 
 sub getLogger {
-	Log::Log4perl::init_once($WebGUI::Session::session{config}{webguiRoot}."/etc/log.conf");
+	unless (Log::Log4perl->initialized()) {
+ 		Log::Log4perl->init( $WebGUI::Session::session{config}{webguiRoot}."/etc/log.conf" );   
+	}
 	return Log::Log4perl->get_logger($WebGUI::Session::session{config}{configFile});
 }
 
