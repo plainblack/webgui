@@ -61,7 +61,8 @@ sub definition {
 		},
 		mapFieldId =>{
 			fieldType=>"text",
-			defaultValue=>''
+			defaultValue=>'',
+			noFormPost=>1,
 		}
 	);
 	push(@{$definition}, {
@@ -87,6 +88,7 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm;
 	my $i18n = WebGUI::International->new("Asset_Dashboard");
 	$tabform->getTab("display")->template(
+		-name=>"templateId",
 		-value=>$self->getValue('templateId'),
 		-namespace=>"Dashboard",
 		-label=>$i18n->get('dashboard template field label'),
@@ -177,6 +179,7 @@ sub view {
 	}
 
 	my @found;
+	my $newStuff;
 	my $showPerformance = WebGUI::ErrorHandler::canShowPerformanceIndicators();
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
@@ -185,24 +188,24 @@ sub view {
 				if ($asset eq $child->getId) {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
 						WebGUI::Style::setRawHeadTags($child->getExtraHeadTags);
-						my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
-						my $view = $child->view;
-						$view .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
-						$child->{_properties}{title} = $child->getShortcut->get("title") if (ref $child eq 'WebGUI::Asset::Shortcut');
-						if ($i > $numPositions) {
+						$child->{_properties}{title} = $child->getTitle;
+						$child->{_properties}{title} = $child->getShortcut->getTitle if (ref $child eq 'WebGUI::Asset::Shortcut');
+						if ($i == 1 || $i > $numPositions) {
 							push(@{$vars{"position1_loop"}},{
 								id=>$child->getId,
-								content=>$view,
-								dashletTitle=>$child->get("title"),
+								content=>'', #so things in the New Content bar don't display.
+								dashletTitle=>$child->{_properties}{title},
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
 							});
+							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
+
 						} else {
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
-								content=>$view,
-								dashletTitle=>$child->get("title"),
+								content=>$child->view,
+								dashletTitle=>$child->{_properties}{title},
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
@@ -219,14 +222,11 @@ sub view {
 	foreach my $child (@{$children}) {
 		unless (isIn($child->getId, @found)||isIn($child->getId,@hidden)) {
 			if ($child->canView) {
-				my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
-				my $view = $child->view;
-				$view .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
 				$child->{_properties}{title} = $child->getShortcut->get("title") if (ref $child eq 'WebGUI::Asset::Shortcut');
 				push(@{$vars{"position1_loop"}},{
 					id=>$child->getId,
-					content=>$view,
-					dashletTitle=>$child->get("title"),
+					content=>'',
+					dashletTitle=>$child->getTitle,
 					shortcutUrl=>$child->getUrl,
 					canPersonalize=>$self->canPersonalize,
 					canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
@@ -238,6 +238,8 @@ sub view {
 	$vars{"dragger.init"} = '
 		<script type="text/javascript">
 			dragable_init("'.$self->getUrl.'");
+		var available_dashlets= new Array();
+		'.$newStuff.'
 		</script>
 	';
 	return $self->processTemplate(\%vars, $templateId);

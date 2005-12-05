@@ -43,6 +43,10 @@ our $HELP = {
 		],
 		related => [
 			{
+				tag => 'field add/edit',
+				namespace => 'Asset_Shortcut'
+			},
+			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
 			},
@@ -67,6 +71,10 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
+			},
+			{
+				tag => 'shortcut add/edit',
+				namespace => 'Asset_Shortcut'
 			},
 			{
 				tag => 'template language',

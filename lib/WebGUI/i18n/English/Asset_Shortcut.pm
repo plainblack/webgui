@@ -360,13 +360,13 @@ The word "Shortcut".</p>
 		lastUpdated => 1133619940,
 	},
 
-	'Label for This Field' => {
-		message => q|Label for This Field|,
+	'field add/edit title' => {
+		message => q|Add/Edit User Preference|,
 		lastUpdated => 1133619940,
 	},
 
-	'Label for This Field' => {
-		message => q|Label for This Field|,
+	'field add/edit body' => {
+		message => q|<p>User Preferences are the key to personalization of a Shortcut, and the key to creating a personalized dashboard.  You can create a user preference field of one of four types: text, textArea, checkList, and selectList.  If yours is a list type, you can put the possible choices in the Possible Choices box, and each one will be its own entry in a list of that type (select: choose one, or check: choose none or any or all).  </p><p>You can use a user preference field to generate a list of templates from which the user can pick, a choice of some kind of other preference, such as US or metric units format, or any other kind of user preference.  User Preference fields are asset-(shortcut-)specific, whereas user profile fields are site-wide.  The user preference fields will be exposed to your override fields in the format ##userPref:myUserPrefField##, and will be exposed everywhere else as normal template variables (<tmpl_var myUserPrefField>).</p>|,
 		lastUpdated => 1133619940,
 	},
 

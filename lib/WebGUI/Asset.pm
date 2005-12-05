@@ -1414,6 +1414,21 @@ sub www_add {
 
 #-------------------------------------------------------------------
 
+=head2 www_ajaxInlineView ( )
+
+Returns the view() method of the asset object if the requestor canView.
+
+=cut
+
+sub www_ajaxInlineView {
+	my $self = shift;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->view;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_edit ( )
 
 Renders an AdminConsole EditForm, unless canEdit returns False.

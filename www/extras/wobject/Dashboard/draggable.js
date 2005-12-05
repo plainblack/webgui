@@ -216,11 +216,9 @@ function dragable_dragStart(e){
 
     //set the start td        
     startTD=document.getElementById(fObj.id.substr(0,fObj.id.indexOf("_div")));
-  //  alert("hdr" + fObj.id.substr(0,fObj.id.indexOf("_div")) + "_span");
-    document.getElementById("hdr" + fObj.id.substr(0,fObj.id.indexOf("_div")) + "_span").style.overflowX="visible";
+
     fObj.className="dragging";        
-  //  fObj.style.opacity = '0.6';
-  //  fObj.style.filter = 'alpha(opacity=' + 60 + ')';
+
     //set the page height and width in a var since IE changes them when scrolling
     pageHeight = docElement.scrollHeight;
     pageWidth = docElement.scrollWidth;
@@ -326,7 +324,33 @@ function dragable_dragStop(e) {
         if (z) {
             
             if (endTD !=null && startTD!=null) {
-                dragable_moveContent(startTD,endTD,endTDPos);
+            	    fObj2 = dragable_getObjectByClass(startTD,"availableDashlet");  
+
+      dragable_moveContent(startTD,endTD,endTDPos);
+
+                    if (fObj2) {
+                    	var replId = startTD.id;
+                    	replId = replId.replace(/^td/gi,'');
+  //  	alert(replId);
+    	var replUrl = available_dashlets[replId];
+ // 		alert(replUrl);
+  			contentDiv = document.getElementById("ct" + replId + "_div");
+				var hoopla = AjaxRequest.get(
+					{
+						'url':replUrl
+						,'parameters':{
+							'func':"ajaxInlineView"
+						}
+						,'onSuccess':function(req){
+							var myArr528 = req.responseText.split(/beginDebug/mg,1);
+							contentDiv.innerHTML = myArr528[0];
+						}
+					}
+				);
+
+   //   tdn6p_3ZAFRtB9WiyKnrwryg
+   // 	ctn6p_3ZAFRtB9WiyKnrwryg_div
+    }
                 startTD=null;        
                 
                 if (dragable_isBlank(endTD)) {
@@ -338,6 +362,8 @@ function dragable_dragStop(e) {
    //                 document.getElementById(divName).style.filter = null;
                 }
                 dragable_postNewContentMap();
+                
+
             }                        
 
             for(i=0;i<dragableList.length;i++) {
@@ -363,6 +389,7 @@ function dragable_dragStop(e) {
             endTD.position = null;
             endTD=null;
         }
+        
 }
 
 function dragable_postNewContentMap() {

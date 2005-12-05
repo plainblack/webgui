@@ -143,9 +143,10 @@ div.dragTitle
 
 span.headerTitle
 {
-	overflow-x:visible;
+	height:22px;
 	display:block;
 	float:left;
+	line-height:18px;
 	z-index:999;
 	margin-right:10px;
 	padding-left:9px;
@@ -180,12 +181,32 @@ div#availableDashlets * span.options:hover {
 div#availableDashlets * span.options {
 	display:none;
 	opacity:0;
-	top:50px;
+	top:500px;
 	filter:alpha(opacity=0);
 }
 div#availableDashlets * div.dragTrigger {
 	background: none;
+	float:none;
+	height:auto;;
+	height:auto;
 }
+div#availableDashlets * div.dragTitle {
+	background:none;
+	height:100%;
+	height:auto;
+	float:none;
+	background-color: #eeeeee;
+	border: solid #bbbbbb 1px;
+	color: black;
+}
+div#availableDashlets * span.headerTitle {
+	display:block;
+	width:100%;
+	line-height:auto;
+	height:auto;
+	background: none;
+}
+
 #hideNewContentButton,#showNewContentButton {
 /*	position:absolute;*/
 	color: #465D94;

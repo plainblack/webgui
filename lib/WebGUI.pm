@@ -162,6 +162,7 @@ sub page {
 			WebGUI::ErrorHandler::warn("The notFound page failed to be created!");
 			$output = "An error was encountered while processing your request.";
 		}
+		$output = "An error was encountered while processing your request." unless $output ne '';
 	}
 	return $output;
 }

@@ -296,8 +296,8 @@ sub www_editUser {
 		if ($session{form}{$data->{fieldName}}) {
 			$default = $session{form}{$data->{fieldName}};
 		}
-		elsif ($session{user}{$data->{fieldName}}) {
-			$default = $session{user}{$data->{fieldName}};
+		elsif ($u->profileField($data->{fieldName})) {
+			$default = $u->profileField($data->{fieldName});
 		}
 		else {
 			$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
