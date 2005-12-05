@@ -13,10 +13,11 @@ use strict;
 use lib '../lib';
 use Getopt::Long;
 use WebGUI::Session;
+use Data::Dumper;
 # ---- END DO NOT EDIT ----
 
 
-use Test::More tests => 31; # increment this value for each test you create
+use Test::More tests => 33; # increment this value for each test you create
 use WebGUI::SQL;
 
 initialize();  # this line is required
@@ -36,7 +37,8 @@ ok($columnNames[0] eq "name" && $columnNames[1] eq "value", "geColumnNames()");
 is(scalar($sth->hash), "2/8", "hash()");
 
 # hashRef
-is(scalar(%{$sth->hashRef}), "2/8", "hashRef()");
+my %hash = %{ $sth->hashRef };
+is(scalar(%hash), "2/8", "hashRef()");
 
 # rows
 ok($sth->rows > 1, "rows()");
@@ -51,12 +53,14 @@ ok(my $sth = WebGUI::SQL->unconditionalRead("select * from tableThatDoesntExist"
 is($sth->errorCode, "1146" ,"errorCode()");
 
 # errorMessage
-ok($sth->errorMessage =~ m/Table .*\.tablethatdoesntexist. doesn.t exist/ , "errorMessage()");
+like ($sth->errorMessage, qr/Table [^.]*\.tableThatDoesntExist' doesn't exist/ , "errorMessage()");
 
 $sth->finish;
 
 # quote
 is(quote("that's great"), "'that\\\'s great'", "quote()");
+is(quote(0), "'0'", "quote(0)");
+is(quote(''), "''", "quote('')");
 
 # quoteAndJoin
 my @quoteAndJoin = ("that's great", '"Howdy partner!"');
