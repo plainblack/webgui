@@ -231,6 +231,7 @@ sub view {
 					canPersonalize=>$self->canPersonalize,
 					canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
 				});
+				$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 			}
 		}
 	}
