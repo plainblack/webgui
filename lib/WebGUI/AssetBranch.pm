@@ -78,7 +78,7 @@ Returns 1. Purges self and all descendants.
 
 sub purgeBranch {
 	my $self = shift;
-	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1, statesToInclude=>['published', 'cliboard', 'clipboard-limbo','trash','trash-limbo']});
+	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
 	foreach my $descendant (@{$descendants}) {
 		$descendant->purge;
 	}
