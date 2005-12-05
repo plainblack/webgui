@@ -311,7 +311,7 @@ sub getEditForm {
 				viewParent=>WebGUI::International::get(745,'Asset_Survey')
 				},
 			-value=>"editQuestion",
-                        -hoverHelp	=> WebGUI::International::get('what next','Asset_Survey'),
+                        -hoverHelp	=> WebGUI::International::get('what next description','Asset_Survey'),
 			);
 	}
 

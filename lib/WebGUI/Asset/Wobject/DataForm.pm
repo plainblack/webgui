@@ -943,7 +943,7 @@ sub www_editTab {
                 );
         $f->textarea(
 		-name=>"subtext",
-		-label=>WebGUI::International::get(102,"Asset_DataForm"),
+		-label=>WebGUI::International::get(79,"Asset_DataForm"),
 		-value=>$tab{subtext},
 		-subtext=>""
 		);

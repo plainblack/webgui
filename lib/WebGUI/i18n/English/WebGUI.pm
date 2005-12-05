@@ -1168,6 +1168,11 @@ The following fields make up a Database Link.
 		lastUpdated => 1056151382
 	},
 
+	'991 description' => {
+		message => q|A unique identifier for this database link used internally by WebGUI.|,
+		lastUpdated => 1133810998
+	},
+
 	'167' => {
 		message => q|Are you certain you want to delete this user? Be warned that all this user's information will be lost permanently if you choose to proceed.|,
 		lastUpdated => 1031514049

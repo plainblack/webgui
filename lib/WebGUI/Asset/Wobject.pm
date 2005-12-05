@@ -442,7 +442,7 @@ Defaults to "assetId". This is used to define which data set to reorder.
 
 =head3 setValue
 
-Used to define which data set to reorder. Defaults to the assetId for this instance. Defaults to the value of "setName" in the wobject properties.
+Used to define which data set to reorder. Defaults to the value of setName (default "assetId", see above) in the wobject properties.
 
 =cut
 

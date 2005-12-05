@@ -111,11 +111,6 @@ or return to the page where the it was created.|,
 		lastUpdated => 1127958354
 	},
 
-	'102' => {
-		message => q|Subtext|,
-		lastUpdated => 1052048005
-	},
-
 	'7' => {
 		message => q|Edit Data Form|,
 		lastUpdated => 1052045309
@@ -173,9 +168,9 @@ page.|,
                 lastUpdated => 1119156590,
         },
 
-        '102 description' => {
-                message => q|An extension of the label, this is a description of what should go in the field or optional instructions for the field.|,
-                lastUpdated => 1119156590,
+        '79 description' => {
+                message => q|An extension of the label, this is additional information such as a description of what should go in the field or optional instructions for the field.|,
+                lastUpdated => 1133811301,
         },
 
         '21 description' => {
@@ -819,6 +814,10 @@ A conditional indicating whether this field exists for the mail subsystem of the
 	'Field Position' => {
 		message =>q|Field Position|,
 		lastUpdated=>1095701013,
+	},
+	'Field Position description' => {
+		message =>q|This allows you to set the position of the field directly, as opposed to using the field editing icons|,
+		lastUpdated=>1133821586,
 	},
 	'Delete entry confirmation' => {
                 message => q|Are you certain that you wish to delete this data entry?|,
