@@ -52,7 +52,7 @@ tbody.availableDashlet * div.content {
 #availableDashlets * div.content {
 	width:200px;
 	max-width:200px;
-	height:30px;
+	height:0px;
 	display:none;
 	overflow-x:hidden;
 	overflow-y:hidden;
@@ -144,6 +144,8 @@ div.dragTitle
 span.headerTitle
 {
 	height:22px;
+	clip:rect(auto,auto,auto,auto);
+	overflow:hidden;
 	display:block;
 	float:left;
 	line-height:18px;
@@ -187,13 +189,13 @@ div#availableDashlets * span.options {
 div#availableDashlets * div.dragTrigger {
 	background: none;
 	float:none;
-	height:auto;;
-	height:auto;
+	margin-bottom:0px;
+/*	height:auto;*/
 }
 div#availableDashlets * div.dragTitle {
 	background:none;
-	height:100%;
-	height:auto;
+/*	height:auto;*/
+	overflow:hidden;
 	float:none;
 	background-color: #eeeeee;
 	border: solid #bbbbbb 1px;
@@ -203,7 +205,7 @@ div#availableDashlets * span.headerTitle {
 	display:block;
 	width:100%;
 	line-height:auto;
-	height:auto;
+/*	height:22px;*/
 	background: none;
 }
 
