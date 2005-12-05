@@ -393,9 +393,11 @@ sub getOverrides {
 			my $fieldName = $field->getFieldName;
 			my $fieldValue = $field->getUserPref($id);
 			$overrides{userPrefs}{$fieldName}{value} = $fieldValue;
+			$overrides{overrides}{$fieldName}{parsedValue} = $fieldValue;
 			#  'myTemplateId is ##userPref:myTemplateId##', for example.
 			foreach my $overr (keys %{$overrides{overrides}}) {
-				$overrides{overrides}{$fieldName}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/g;
+				$overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
+				
 			}
 		}
 		$cache->set(\%overrides, 60*60);
