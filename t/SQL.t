@@ -53,7 +53,7 @@ ok(my $sth = WebGUI::SQL->unconditionalRead("select * from tableThatDoesntExist"
 is($sth->errorCode, "1146" ,"errorCode()");
 
 # errorMessage
-like ($sth->errorMessage, qr/Table [^.]*\.tableThatDoesntExist' doesn't exist/ , "errorMessage()");
+like ($sth->errorMessage, qr/Table [^.]*\.tableThatDoesntExist' doesn't exist/i , "errorMessage()");
 
 $sth->finish;
 
