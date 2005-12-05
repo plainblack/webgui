@@ -7,7 +7,8 @@
  - Added RandomThread macro thanks to Wouter Vijvers.
  - Switched from Apache::Registry/CGI to a pure mod_perl2 interface, which
    increased performance by over 70% to the entire system, and in some cases
-   as much as 100%. See gotcha.txt for details.
+   as much as 100%. See gotcha.txt for details. This increase is not seen in
+   raw speed, but rather capacity. You can serve 70% more requests per second.
  - Changed macro API which cuts macro memory consumption in half. See
    migration.txt for details.
  - Added automated code testing framework.
