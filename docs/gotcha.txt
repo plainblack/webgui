@@ -10,6 +10,12 @@ save you many hours of grief.
 6.8.0
 --------------------------------------------------------------------
  * Before upgrading you must install the following new Perl modules:
+	Data::Structure::Util
+
+
+6.8.0
+--------------------------------------------------------------------
+ * Before upgrading you must install the following new Perl modules:
 	DateTime
 	DateTime::Format::Strptime
 	DateTime::Cron::Simple
@@ -77,6 +83,8 @@ save you many hours of grief.
 	number of new features afforded us in the MySQL 5.0 database,
 	which will increase performance, and add to our functionality
 	for the future.
+
+ * WebGUI now requires Perl 5.8 to operate.
 
  * The Macro API has been changed. If you have any third-party macros
 	installed make sure to update them prior to upgrading. See

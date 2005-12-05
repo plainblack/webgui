@@ -77,6 +77,7 @@ checkModule("Finance::Quote",1.08);
 #checkModule("POE",0.3202);
 #checkModule("POE::Component::IKC::Server",0.18);
 #checkModule("POE::Component::JobQueue",0.5402);
+checkModule("Data::Structure::Util",0.11);
 checkModule("Apache2::Request",2.06);
 
 ###################################

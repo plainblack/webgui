@@ -1,6 +1,7 @@
 package WebGUI::Asset::Wobject::WSClient;
 
 use strict;
+use Data::Structure::Util;
 use Data::Dumper;
 use Digest::MD5;
 use SOAP::Lite;
@@ -14,30 +15,6 @@ use WebGUI::Paginator;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Asset::Wobject;
-
-my ($hasUnblessAcme, $hasUnblessData, $hasUtf8, $utf8FieldType);
-
-# we really would like to be able to unbless references and strip utf8 data,
-# but that requires non-standard and possibly difficult to install modules
-BEGIN {
-
-   # check for Data::Structure::Util, which requires perl 5.8.0 :-P
-   eval { require Data::Structure::Util; };
-   if ($@) {
-
-      $utf8FieldType = 'hidden';
-
-      # try Acme::Damn as partial fallback
-      eval { require Acme::Damn; };
-      $hasUnblessAcme = 1 if !$@;
-
-   } else {
-
-      $utf8FieldType = 'yesNo';
-      $hasUnblessData = 1;
-      $hasUtf8        = 1 if $] >= 5.008;
-   }
-}
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -113,7 +90,7 @@ my $httpHeaderFieldType;
             defaultValue  => $session{'config'}{'soapuri'}
          },
          decodeUtf8       => {
-            fieldType     => $utf8FieldType,
+            fieldType     => "yesNo",
             defaultValue  => 0,
          },
          httpHeader       => {
@@ -214,20 +191,12 @@ sub getEditForm {
       -hoverHelp => WebGUI::International::get('9 description', "Asset_WSClient"),
       -value => $self->get('debugMode'),
    );
-   if ($utf8FieldType eq 'yesNo') {
       $tabform->getTab("properties")->yesNo (
          -name  => 'decodeUtf8',
          -label => WebGUI::International::get(15, "Asset_WSClient"),
          -hoverHelp => WebGUI::International::get('15 description', "Asset_WSClient"),
          -value => $self->get('decodeUtf8'),
       );
-   } else {
-      $tabform->getTab("properties")->hidden (
-         -name  => 'decodeUtf8',
-         -label => WebGUI::International::get(15, "Asset_WSClient"),
-         -value => $self->get('decodeUtf8'),
-      );
-   }
    my $cacheopts = {
 	0 => WebGUI::International::get(29, "Asset_WSClient"),
 	1 => WebGUI::International::get(19, "Asset_WSClient"),
@@ -403,13 +372,8 @@ sub view {
             } elsif (ref $return eq 'HASH') {
                @result = $return;
 
-            # blessed object, to be stripped with Acme::Damn
-            } elsif ($hasUnblessAcme && ref $return) {
-               WebGUI::ErrorHandler::warn("Acme::Damn::unbless($return)");
-               @result = Acme::Damn::unbless($return);
-
             # blessed object, to be stripped with Data::Structure::Util
-            } elsif ($hasUnblessData && ref $return) {
+            } elsif ( ref $return) {
                WebGUI::ErrorHandler::warn("Data::Structure::Util::unbless($return)");
                @result = Data::Structure::Util::unbless($return);
 
@@ -442,7 +406,7 @@ sub view {
 
       # Do we need to decode utf8 data?  Will only decode if modules were
       # loaded and the wobject requests it
-      if ($self->{'decodeUtf8'} && $hasUtf8) {
+      if ($self->{'decodeUtf8'}) {
          if (Data::Structure::Util::has_utf8(\@result)) {
             @result = @{Data::Structure::Util::utf8_off(\@result)};
          }

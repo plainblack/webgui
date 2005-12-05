@@ -1,6 +1,8 @@
 6.8.1
  - Upgraded TinyMCE to 2.0.1, which allows the rich editor to work with
    Firefox 1.5.
+ - Now that we're requiring Perl 5.8, don't need to do the hackery for WS
+   Client to work any longer.
 
 6.8.0
  - Switched Date::Manip to DateTime for better performance and more 
