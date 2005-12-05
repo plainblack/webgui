@@ -397,7 +397,6 @@ sub getOverrides {
 			#  'myTemplateId is ##userPref:myTemplateId##', for example.
 			foreach my $overr (keys %{$overrides{overrides}}) {
 				$overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
-				
 			}
 		}
 		$cache->set(\%overrides, 60*60);
