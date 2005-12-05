@@ -1,3 +1,7 @@
+6.8.1
+ - Upgraded TinyMCE to 2.0.1, which allows the rich editor to work with
+   Firefox 1.5.
+
 6.8.0
  - Switched Date::Manip to DateTime for better performance and more 
    functionality. See gotchas for details. In our benchmarks DateTime runs 
