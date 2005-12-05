@@ -7,6 +7,11 @@ our $I18N = {
         	lastUpdated => 1115139736,
 	},
 
+	'toolbar buttons description' => {
+		message => q|Shows which toolbar buttons will be used in the editor.|,
+        	lastUpdated => 1133760935,
+	},
+
 	'using rich edit' => {
 		message => q|Ask user about using rich edit?|,
         	lastUpdated => 1115139819,

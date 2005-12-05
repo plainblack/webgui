@@ -350,73 +350,73 @@ sub getEditForm {
         my $tabform = $self->SUPER::getEditForm();
 	$tabform->getTab("properties")->textarea(
 			-name=>"categories",
-			-label=>"Categories",
+			-label=>WebGUI::International::get('categories', 'Asset_Matrix'),
 			-value=>$self->getValue("categories"),
 			-subtext=>"<br />Enter one per line in the order you want them to appear. Be sure to watch leading and trailing whitespace."
 			);
 	$tabform->getTab("properties")->integer(
 			-name=>"maxComparisons",
-			-label=>"Maximum Comparisons",
+			-label=>WebGUI::International::get("max comparisons","Asset_Matrix"),
 			-value=>$self->getValue("maxComparisons")
 			);
 	$tabform->getTab("properties")->integer(
 			-name=>"maxComparisonsPrivileged",
-			-label=>"Maximum Comparisons (For Privileged Users)",
+			-label=>WebGUI::International::get("max comparisons privileged","Asset_Matrix"),
 			-value=>$self->getValue("maxComparisonsPrivileged")
 			);
 	$tabform->getTab("properties")->interval(
 			-name=>"ratingTimeout",
-			-label=>"Time Required Between Ratings",
+			-label=>WebGUI::International::get("rating timeout","Asset_Matrix"),
 			-value=>$self->getValue("ratingTimeout")
 			);
 	$tabform->getTab("properties")->interval(
 			-name=>"ratingTimeoutPrivileged",
-			-label=>"Time Required Between Ratings (For Privileged Users)",
+			-label=>WebGUI::International::get("rating timeout privileged","Asset_Matrix"),
 			-value=>$self->getValue("ratingTimeoutPrivileged")
 			);
 	$tabform->getTab("security")->group(
 			-name=>"groupToAdd",
-			-label=>"Who can add listings?",
+			-label=>WebGUI::International::get("group to add","Asset_Matrix"),
 			-value=>[$self->getValue("groupToAdd")]
 			);
 	$tabform->getTab("security")->group(
 			-name=>"privilegedGroup",
-			-label=>"Who should have privileged rights?",
+			-label=>WebGUI::International::get("privileged group","Asset_Matrix"),
 			-value=>[$self->getValue("privilegedGroup")]
 			);
 	$tabform->getTab("security")->group(
 			-name=>"groupToRate",
-			-label=>"Who can rate listings?",
+			-label=>WebGUI::International::get("rating group","Asset_Matrix"),
 			-value=>[$self->getValue("groupToRate")]
 			);
 	$tabform->getTab("display")->template(
 			-name=>"templateId",
 			-value=>$self->getValue("templateId"),
-			-label=>"Main Template",
+			-label=>WebGUI::International::get("main template","Asset_Matrix"),
 			-namespace=>"Matrix"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"detailTemplateId",
 			-value=>$self->getValue("detailTemplateId"),
-			-label=>"Detail Template",
+			-label=>WebGUI::International::get("detail template","Asset_Matrix"),
 			-namespace=>"Matrix/Detail"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"ratingDetailTemplateId",
 			-value=>$self->getValue("ratingDetailTemplateId"),
-			-label=>"Rating Detail Template",
+			-label=>WebGUI::International::get("rating detail template","Asset_Matrix"),
 			-namespace=>"Matrix/RatingDetail"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"searchTemplateId",
 			-value=>$self->getValue("searchTemplateId"),
-			-label=>"Search Template",
+			-label=>WebGUI::International::get("search template","Asset_Matrix"),
 			-namespace=>"Matrix/Search"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"compareTemplateId",
 			-value=>$self->getValue("compareTemplateId"),
-			-label=>"Compare Template",
+			-label=>WebGUI::International::get("compare template","Asset_Matrix"),
 			-namespace=>"Matrix/Compare"
 			);
 	return $tabform;

@@ -699,6 +699,72 @@ our $I18N = {
 		Select a template to be used to show the listing comparison data.
 		</p>|
         },
+
+	'categories' => {
+		message => q|Categories|,
+		lastUpdated => 1133758944,
+	},
+
+	'max comparisons' => {
+		message => q|Maximum Comparisons|,
+		lastUpdated => 1133758944,
+	},
+
+	'max comparisons privileged' => {
+		message => q|Maximum Comparisons (For Privileged Users)|,
+		lastUpdated => 1133758944,
+	},
+
+	'rating timeout' => {
+		message => q|Time Required Between Ratings|,
+		lastUpdated => 1133758944,
+	},
+
+	'rating timeout privileged' => {
+		message => q|Time Required Between Ratings (For Privileged Users)|,
+		lastUpdated => 1133758944,
+	},
+
+	'group to add' => {
+		message => q|Who can add listings?|,
+		lastUpdated => 1133758944,
+	},
+
+	'privileged group' => {
+		message => q|Who should have privileged rights?|,
+		lastUpdated => 1133758944,
+	},
+
+	'rating group' => {
+		message => q|Who can rate listings?|,
+		lastUpdated => 1133758944,
+	},
+
+	'main template' => {
+		message => q|Main Template|,
+		lastUpdated => 1133758944,
+	},
+
+	'detail template' => {
+		message => q|Detail Template|,
+		lastUpdated => 1133758944,
+	},
+
+	'rating detail template' => {
+		message => q|Rating Detail Template|,
+		lastUpdated => 1133758944,
+	},
+
+	'search template' => {
+		message => q|Search Template|,
+		lastUpdated => 1133758944,
+	},
+
+	'compare template' => {
+		message => q|Compare Template|,
+		lastUpdated => 1133758944,
+	},
+
 };
 
 1;

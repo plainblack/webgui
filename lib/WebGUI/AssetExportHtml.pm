@@ -177,7 +177,7 @@ sub www_export {
                         -value=>$session{config}{uploadsURL}
                 );
         $f->submit;
-        $self->getAdminConsole->render($self->checkExportPath.$f->print,WebGUI::International::get('Export Page'),"Asset");
+        $self->getAdminConsole->render($self->checkExportPath.$f->print,WebGUI::International::get('Export Page',"Asset"));
 }
 
 
