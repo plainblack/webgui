@@ -286,7 +286,7 @@ sub www_edit {
    return WebGUI::Privilege::insufficient() unless $self->canEdit;
    $self->getAdminConsole->setHelp("zip archive add/edit", "Asset_ZipArchive");
    return $self->getAdminConsole->render($self->getEditForm->print,
-              WebGUI::International::get('edit asset',"Asset_ZipArchive"));
+              WebGUI::International::get('zip archive add/edit title',"Asset_ZipArchive"));
 }
 
 #-------------------------------------------------------------------

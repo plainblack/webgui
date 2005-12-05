@@ -131,7 +131,7 @@ sub getEditForm {
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
 			-label=>WebGUI::International::get('thumbnail', 'Asset_Image'),
-			-hoverHelp=>WebGUI::International::get('thumbnail description', 'Asset_Image'),
+			-hoverHelp=>WebGUI::International::get('Thumbnail description', 'Asset_Image'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.time().'" alt="thumbnail" /></a>'
 			);
 		my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));

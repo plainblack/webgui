@@ -280,7 +280,7 @@ sub www_edit {
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
-		-hoverHelp=>WebGUI::International::get('file template description','Asset_Image'),
+		-hoverHelp=>WebGUI::International::get('file template description','Asset_File'),
 		-namespace=>"FileAsset"
 	);
 	$self->getAdminConsole->setHelp("file add/edit", "Asset_File");
