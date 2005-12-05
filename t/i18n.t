@@ -31,10 +31,8 @@ initialize();  # this line is required
 
 my $digits  = qr/(\d+)/;
 my $bareword  = qr/(\w+)/;
-my $quotelike = qr/((['"])$bareword(['"]))/;
-my $subscript = qr/([\[{]\w+[\]\}])/;
-my $variable  = qr/(\$\w+($subscript)*)/;
-my $sub_args  = qr/(($quotelike|$digits),?)+/;
+my $quotelike = qr/((['"])($bareword\s*)+(['"]))/;
+my $sub_args  = qr/(($quotelike|$digits)(,\s*)?)+/;
 my $subroutine = qr/
 			  WebGUI::International::get
 			  \(			##Opening paren for optional arguments
@@ -110,7 +108,7 @@ sub label_finder_pm {
 	}
 	close $pmf;
 	while ($libFile =~ m/$subroutine/gc) {
-		my ($label, $namespace) = split /,/, $1;
+		my ($label, $namespace) = split /,\s*/, $1;
 		push @libLabels, {
 					file=>$File::Find::name,
 					label=>$label,
