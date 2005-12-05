@@ -12,6 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::SQL;
 
 
 my $toVersion = "0.0.0"; # make this match what version you're going to

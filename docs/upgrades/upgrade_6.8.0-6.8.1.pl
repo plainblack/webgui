@@ -13,6 +13,7 @@ use strict;
 use Getopt::Long;
 use WebGUI::Session;
 use File::Path;
+use WebGUI::SQL;
 
 my $toVersion = "6.8.1"; # make this match what version you're going to
 my $quiet; # this line required
