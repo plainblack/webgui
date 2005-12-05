@@ -210,7 +210,7 @@ sub purgeRevision {
 		$self->purgeCache;
 		$self->updateHistory("purged revision ".$self->get("revisionDate"));
 	} else {
-		$self->purge;
+		$self->purgeBranch;
 	}
 }
 
