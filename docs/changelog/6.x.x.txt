@@ -10,6 +10,7 @@
    (Roy Johnson / Ocean View Web Creations) 
  - Now that we're requiring Perl 5.8, don't need to do the hackery for WS
    Client to work any longer.
+ - Converted User Preference fields to user profile fields.
  - Fixed a major versioning system bug where when purging the last revision of
    an asset, if it had children, the children were not purged with it. This
    may have caused problems in some people's databases. If it has all you
