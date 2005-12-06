@@ -233,7 +233,7 @@ foreach my $filename (keys %config) {
 		unless ($skipBackup) {
 			print "\n".$config{$filename}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
 			print "\tBacking up $config{$filename}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
-			my $cmd = $dumpcmd." -u".$config{$filename}{dbuser}." -p".$config{$filename}{dbpass};
+			my $cmd = qq!$dumpcmd -u"$config{$filename}{dbuser}" -p"$config{$filename}{dbpass}"!;
 			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
 			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
 			$cmd .= " --add-drop-table --databases ".$config{$filename}{db}." > "
@@ -247,7 +247,7 @@ foreach my $filename (keys %config) {
 		}
 		if ($upgrade{$upgrade}{sql} ne "") {
 			print "\tUpgrading to ".$upgrade{$upgrade}{to}."..." unless ($quiet);
-			my $cmd = $clicmd." -u".$config{$filename}{dbuser}." -p".$config{$filename}{dbpass};
+			my $cmd = qq!$clicmd -u"$config{$filename}{dbuser}" -p"$config{$filename}{dbpass}"!;
 			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
 			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
 			$cmd .= " --database=".$config{$filename}{db}." < ".$upgrade{$upgrade}{sql};
