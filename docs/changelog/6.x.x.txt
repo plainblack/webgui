@@ -16,6 +16,7 @@
    need to do to fix it is upgrade to this release and then run
    sbin/rebuildLineage.pl
  - fix [ 1356544 ] FAQ template in collaboration has wrong anchors
+ - fix [ 1373493 ] Upgrade script fails because parameters are not quoted
 
 6.8.0
  - Switched Date::Manip to DateTime for better performance and more 
