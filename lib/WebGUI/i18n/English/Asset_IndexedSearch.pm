@@ -252,9 +252,9 @@ the last page.</P>|,
 		lastUpdated => 1066766053
 	},
 
-	'edit-forceSearchRoots-label' => {
+	'force search roots' => {
 		message => q|Force users to use the selected roots|,
-		lastUpdated => 1090580644
+		lastUpdated => 1133844716
 	},
 
 	'19' => {

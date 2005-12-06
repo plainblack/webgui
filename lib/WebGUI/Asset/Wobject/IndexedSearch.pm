@@ -136,7 +136,7 @@ sub getEditForm {
 	#			);
 	$tabform->getTab("properties")->yesNo(
 					-name=>'forceSearchRoots',
-						-label=>WebGUI::International::get('edit-forceSearchRoots-label',"Asset_IndexedSearch"),
+						-label=>WebGUI::International::get('force search roots',"Asset_IndexedSearch"),
 						-value=>$self->getValue("forceSearchRoots")
 				);
 	# Content of specific user
