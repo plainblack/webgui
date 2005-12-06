@@ -274,7 +274,7 @@ order by department, lastName, firstName";
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("Edit In/Out Board","Asset_InOutBoard"));
+        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("18","Asset_InOutBoard"));
 }
 
 #-------------------------------------------------------------------
@@ -489,11 +489,11 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 	  }
 	  $var{rows_loop} = \@rows;
 	  $var{'paginateBar'} = $p->getBarTraditional();
-	  $var{'username.label'}  = WebGUI::International::get('username.label','Asset_InOutBoard');
+	  $var{'username.label'}  = WebGUI::International::get('username label','Asset_InOutBoard');
 	  $var{'status.label'}    = WebGUI::International::get(5,'Asset_InOutBoard');
-	  $var{'date.label'}      = WebGUI::International::get('date.label','Asset_InOutBoard');
-	  $var{'message.label'}   = WebGUI::International::get('message.label','Asset_InOutBoard');
-	  $var{'updatedBy.label'} = WebGUI::International::get('updatedBy.label','Asset_InOutBoard');
+	  $var{'date.label'}      = WebGUI::International::get('date label','Asset_InOutBoard');
+	  $var{'message.label'}   = WebGUI::International::get('message label','Asset_InOutBoard');
+	  $var{'updatedBy.label'} = WebGUI::International::get('updatedBy label','Asset_InOutBoard');
 	  $p->appendTemplateVars(\%var);
 	}
 	else { $var{showReport} = 0; }

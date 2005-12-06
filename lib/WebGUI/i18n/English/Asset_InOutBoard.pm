@@ -194,22 +194,22 @@ A variable that returns the HTML necessary to create a Traditional Pagination Ba
 		lastUpdated =>1091624565
 	},
 
-	'username.label' => {
+	'username label' => {
 		message => q|Username|,
 		lastUpdated =>1123199740
 	},
 
-	'date.label' => {
+	'date label' => {
 		message => q|Date|,
 		lastUpdated =>1123199740
 	},
 
-	'message.label' => {
+	'message label' => {
 		message => q|Message|,
 		lastUpdated =>1123199740
 	},
 
-	'updatedBy.label' => {
+	'updatedBy label' => {
 		message => q|Updated By|,
 		lastUpdated =>1123199740
 	},
