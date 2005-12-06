@@ -14,6 +14,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use File::Path;
 use WebGUI::SQL;
+use WebGUI::Asset;
 
 my $toVersion = "6.8.1"; # make this match what version you're going to
 my $quiet; # this line required
@@ -22,6 +23,7 @@ my $quiet; # this line required
 start(); # this line required
 
 upgradeRichEditor();
+fixCSFaqTemplateAnchors();
 
 finish(); # this line required
 
@@ -32,6 +34,16 @@ sub upgradeRichEditor {
 	rmtree("../../www/extras/tinymce");
 }
 
+#-------------------------------------------------
+sub fixCSFaqTemplateAnchors {
+	print "\tFix Anchors in the CS FAQ Template\n" unless ($quiet);
+	my $asset = WebGUI::Asset->new("PBtmpl0000000000000080","WebGUI::Asset::Template");
+	if (defined $asset) {  ##Can't update what doesn't exist
+		my $template = $asset->get("template");
+		$template =~ s/(<a href="#)(<tmpl_var assetId>)/${1}id${2}/;
+		$asset->addRevision({template=>$template})->commit;
+	}
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
