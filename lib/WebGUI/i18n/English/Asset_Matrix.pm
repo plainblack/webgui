@@ -765,6 +765,96 @@ our $I18N = {
 		lastUpdated => 1133758944,
 	},
 
+	'product name' => {
+		message => q|Product Name|,
+		lastUpdated => 1133758944,
+	},
+
+	'version number' => {
+		message => q|Version/Model Number|,
+		lastUpdated => 1133758944,
+	},
+
+	'manufacturer name' => {
+		message => q|Manufacturer Name|,
+		lastUpdated => 1133758944,
+	},
+
+	'manufacturer url' => {
+		message => q|Manufacturer URL|,
+		lastUpdated => 1133758944,
+	},
+
+	'description' => {
+		message => q|Description|,
+		lastUpdated => 1133758944,
+	},
+
+	'listing maintainer' => {
+		message => q|Listing Maintainer|,
+		lastUpdated => 1133758944,
+	},
+
+	'name' => {
+		message => q|Name|,
+		lastUpdated => 1133758944,
+	},
+
+	'label' => {
+		message => q|Label|,
+		lastUpdated => 1133758944,
+	},
+
+	'type' => {
+		message => q|Type|,
+		lastUpdated => 1133758944,
+	},
+
+	'default value' => {
+		message => q|Default Value|,
+		lastUpdated => 1133758944,
+	},
+
+	'category' => {
+		message => q|Category|,
+		lastUpdated => 1133758944,
+	},
+
+	'your email' => {
+		message => q|Your Email Address|,
+		lastUpdated => 1133758944,
+	},
+
+	'report error' => {
+		message => q|Report an error.|,
+		lastUpdated => 1133758944,
+	},
+
+	'general comment' => {
+		message => q|General comment.|,
+		lastUpdated => 1133758944,
+	},
+
+	'request type' => {
+		message => q|Type of Request|,
+		lastUpdated => 1133758944,
+	},
+
+	'comment' => {
+		message => q|Comment|,
+		lastUpdated => 1133758944,
+	},
+
+	'show ratings' => {
+		message => q|Show Ratings|,
+		lastUpdated => 1133758944,
+	},
+
+	'no copy' => {
+		message => q|This asset may not be copied.|,
+		lastUpdated => 1133758944,
+	},
+
 };
 
 1;

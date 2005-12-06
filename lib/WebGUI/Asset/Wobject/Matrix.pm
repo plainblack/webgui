@@ -314,7 +314,7 @@ sub www_compare {
 
 #-------------------------------------------------------------------
 sub www_copy {
-	return "This asset may not be copied.";
+	return WebGUI::International::get('no copy','Asset_Matrix');
 }
 
 #-------------------------------------------------------------------
@@ -448,13 +448,13 @@ sub www_editListing {
 	$f->text(
 		-name=>"productName",
 		-value=>$listing->{productName},
-		-label=>"Product Name",
+		-label=>WebGUI::International::get('product name','Asset_Matrix'),
 		-maxLength=>25
 		);
 	$f->text(
 		-name=>"versionNumber",
 		-value=>$listing->{versionNumber},
-		-label=>"Version/Model Number"
+		-label=>WebGUI::International::get('version number','Asset_Matrix'),
 		);
 	$f->url(
 		-name=>"productUrl",
@@ -464,23 +464,23 @@ sub www_editListing {
 	$f->text(
 		-name=>"manufacturerName",
 		-value=>$listing->{manufacturerName},
-		-label=>"Manufacturer Name"
+		-label=>WebGUI::International::get('manufacturer name','Asset_Matrix'),
 		);
 	$f->url(
 		-name=>"manufacturerUrl",
 		-value=>$listing->{manufacturerUrl},
-		-label=>"Manufacturer URL"
+		-label=>WebGUI::International::get('manufacturer url','Asset_Matrix'),
 		);
 	$f->textarea(
 		-name=>"description",
 		-value=>$listing->{description},
-		-label=>"Description"
+		-label=>WebGUI::International::get('description','Asset_Matrix'),
 		);
         if ($self->canEdit) {
 		$f->selectBox(
 			-name=>"maintainerId",
 			-value=>[$listing->{maintainerId}],
-			-label=>"Listing Maintainer",
+			-label=>WebGUI::International::get('listing maintainer','Asset_Matrix'),
 			-options=>WebGUI::SQL->buildHashRef("select userId,username from users order by username")
 			);
 	}
@@ -645,17 +645,17 @@ sub www_editField {
 	$f->text(
 		-name=>"name",
 		-value=>$field->{name},
-		-label=>"Name"
+		-label=>WebGUI::International::get('name','Asset_Matrix'),
 		);
 	$f->text(
 		-name=>"label",
 		-value=>$field->{label},
-		-label=>"Label"
+		-label=>WebGUI::International::get('label','Asset_Matrix'),
 		);
 	$f->selectBox(
 		-name=>"fieldType",
 		-value=>[$field->{fieldType}],
-		-label=>"Type",
+		-label=>WebGUI::International::get('type','Asset_Matrix'),
 		-options=>{
 			goodBad=>"Good Bad",
 			text=>"Text",
@@ -667,12 +667,12 @@ sub www_editField {
 	$f->textarea(
 		-name=>"description",
 		-value=>$field->{description},
-		-label=>"Description"
+		-label=>WebGUI::International::get('description','Asset_Matrix'),
 		);
 	$f->text(
 		-name=>"defaultValue",
 		-value=>$field->{defaultValue},
-		-label=>"Default Value"
+		-label=>WebGUI::International::get('default value','Asset_Matrix'),
 		);
 	my %cats;
 	foreach my $category ($self->getCategories) {
@@ -681,7 +681,7 @@ sub www_editField {
 	$f->selectBox(
 		-name=>"category",
 		-value=>[$field->{category}],
-		-label=>"Category",
+		-label=>WebGUI::International::get('category','Asset_Matrix'),
 		-options=>\%cats
 		);
 	$f->submit;
@@ -990,23 +990,23 @@ sub www_viewDetail {
 		-extras=>'class="content"',
 		-name=>"from",
 		-value=>$session{user}{email},
-		-label=>"Your Email Address"
+		-label=>WebGUI::International::get('your email','Asset_Matrix'),
 		);
 	$f->selectBox(
 		-name=>"subject",
 		-extras=>'class="content"',
 		-options=>{
-			"Report an error."=>"Report an error.",
-			"General comment."=>"General comment."
+			WebGUI::International::get('report error','Asset_Matrix')=>"Report an error.",
+			WebGUI::International::get('general comment','Asset_Matrix')=>"General comment.",
 			},
-		-label=>"Type of Request"
+		-label=>WebGUI::International::get('request type','Asset_Matrix'),
 		);
 	$f->textarea(
 		-rows=>4,
 		-extras=>'class="content"',
 		-columns=>35,
 		-name=>"body",
-		-label=>"Comment"
+		-label=>WebGUI::International::get('comment','Asset_Matrix'),
 		);
 	$f->submit(
 		-extras=>'class="content"',
@@ -1073,7 +1073,7 @@ sub www_viewDetail {
 	$f->submit(
 		-extras=>'class="ratingForm"',
 		-value=>"Rate",
-		-label=>'<a href="'.$self->formatURL("rate",$listingId).'">Show Ratings</a>'
+		-label=>'<a href="'.$self->formatURL("rate",$listingId).'">'.WebGUI::International::get('show ratings','Asset_Matrix').'</A>'
 		);
 	if ($hasRated) {
 		$var{'ratings'} = $ratingsTable;
