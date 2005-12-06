@@ -1,6 +1,11 @@
 6.8.1
  - Upgraded TinyMCE to 2.0.1, which allows the rich editor to work with
    Firefox 1.5.
+ - Added test class for User.pm (Roy Johnson / Ocean View Web Creations)
+ - Fixed bugs in User.pm not updating _user{lastUpdated} (Roy Johnson /
+   Ocean View Web Creations)
+ - Fixed bugs in User.pm not updating _user{karma} when karma method called
+   (Roy Johnson / Ocean View Web Creations) 
  - Now that we're requiring Perl 5.8, don't need to do the hackery for WS
    Client to work any longer.
  - Fixed a major versioning system bug where when purging the last revision of

@@ -107,6 +107,7 @@ sub authMethod {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"authMethod"} = $value;
+                $self->{_user}{"lastUpdated"} = time();
                 WebGUI::SQL->write("update users set authMethod=".quote($value).",
 			lastUpdated=".time()." where userId=".quote($self->{_userId}));
         }
@@ -214,6 +215,7 @@ sub karma {
 	my $description = shift;
 	if (defined $amount && defined $source && defined $description) {
 		$self->uncache;
+		$self->{_user}{karma} += $amount;
 		WebGUI::SQL->write("update users set karma=karma+".quote($amount)." where userId=".quote($self->userId));
         	WebGUI::SQL->write("insert into karmaLog values (".quote($self->userId).",$amount,".quote($source).",".quote($description).",".time().")");
 	}
@@ -315,6 +317,7 @@ sub profileField {
 		WebGUI::SQL->write("delete from userProfileData where userId=".quote($self->{_userId})." and fieldName=".quote($fieldName));
 		warn("insert into userProfileData values (".quote($self->{_userId}).", ".quote($fieldName).", ".quote($value).")");
 		WebGUI::SQL->write("insert into userProfileData values (".quote($self->{_userId}).", ".quote($fieldName).", ".quote($value).")");
+		$self->{_user}{"lastUpdated"} = time();
         	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".quote($self->{_userId}));
 	}
 	return $self->{_profile}{$fieldName};
@@ -338,6 +341,7 @@ sub referringAffiliate {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"referringAffiliate"} = $value;
+                $self->{_user}{"lastUpdated"} = time();
                 WebGUI::SQL->write("update users set referringAffiliate=".quote($value).",
                         lastUpdated=".time()." where userId=".quote($self->userId));
         }
@@ -362,6 +366,7 @@ sub status {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"status"} = $value;
+                $self->{_user}{"lastUpdated"} = time();
                 WebGUI::SQL->write("update users set status=".quote($value).",
                         lastUpdated=".time()." where userId=".quote($self->userId));
         }
@@ -400,6 +405,7 @@ sub username {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"username"} = $value;
+                $self->{_user}{"lastUpdated"} = time();
                 WebGUI::SQL->write("update users set username=".quote($value).",
                         lastUpdated=".time()." where userId=".quote($self->userId));
         }
