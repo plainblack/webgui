@@ -1,4 +1,6 @@
 6.8.1
+ - Removed duplicate processing of metadata.
+ - fix [ 1373649 ] Username isn't populated in 6.8.0 Discussions
  - Upgraded TinyMCE to 2.0.1, which allows the rich editor to work with
    Firefox 1.5.
  - Added test class for User.pm (Roy Johnson / Ocean View Web Creations)

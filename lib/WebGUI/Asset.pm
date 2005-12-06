@@ -1168,27 +1168,6 @@ sub processPropertiesFromFormPost {
 	}
 	WebGUI::SQL->beginTransaction;
 	$self->update(\%data);
-	foreach my $form (keys %{$session{form}}) {
-		if ($form =~ /^metadata_(.*)$/) {
-			my $fieldId = $1; 
-			my ($exists) = WebGUI::SQL->quickArray("select count(*) from metaData_values
-							where assetId = ".quote($self->getId)."
-							and fieldId = ".quote($fieldId));
-			if(! $exists && $session{form}{$form} ne "") {
-				WebGUI::SQL->write("insert into metaData_values (fieldId, assetId)
-							values (".quote($fieldId).",".quote($self->getId).")");
-			}
-			if($session{form}{$form} eq "") {
-				# Keep it clean
-				WebGUI::SQL->write("delete from metaData_values where assetId = ".
-							quote($self->getId)." and fieldId = ".quote($fieldId));
-			} else {
-				WebGUI::SQL->write("update metaData_values set value = ".quote($session{form}{$form})."
-							where assetId = ".quote($self->getId)." and fieldId = ".
-							quote($fieldId));
-			}
-		}
-	}
 	WebGUI::SQL->commit;
 }
 

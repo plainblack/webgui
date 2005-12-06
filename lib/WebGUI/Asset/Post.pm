@@ -625,6 +625,7 @@ sub processPropertiesFromFormPost {
 		}
 		%data = (
 			ownerUserId => $session{user}{userId},
+			username => $session{form}{visitorName} || $session{user}{alias} || $session{user}{username},
 			isHidden => 1,
 			dateSubmitted=>time()
 			);
