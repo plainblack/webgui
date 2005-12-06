@@ -31,7 +31,7 @@ initialize();  # this line is required
 
 my $digits  = qr/(\d+)/;
 my $bareword  = qr/(\w+)/;
-my $quotelike = qr/((['"])($bareword\s*)+(['"]))/;
+my $quotelike = qr/((['"])([^'"\s]+\s*)+(['"]))/;
 my $sub_args  = qr/(($quotelike|$digits)(,\s*)?)+/;
 my $subroutine = qr/
 			  WebGUI::International::get
