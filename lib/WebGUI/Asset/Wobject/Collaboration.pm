@@ -1197,9 +1197,9 @@ sub www_viewRSS {
 		my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
 
 		my @attachmentLoop = ();
-		unless ($self->get("storageId") eq "") {
-			my $storage = $self->getStorageLocation;
-			foreach my $filename (@{ $storage->getFile }) {
+		unless ($post->get("storageId") eq "") {
+			my $storage = $post->getStorageLocation;
+			foreach my $filename (@{ $storage->getFiles }) {
 				push @attachmentLoop, {
 					'attachment.url' => $storage->getUrl($filename),
 					'attachment.path' =>  $storage->getPath($filename),
@@ -1221,7 +1221,9 @@ sub www_viewRSS {
         }
 
 	WebGUI::HTTP::setMimeType("text/xml");
-	return $self->processTemplate(\%var,$self->get("rssTemplateId"));
+	my $output = $self->processTemplate(\%var,$self->get("rssTemplateId"));
+	WebGUI::Macro::process(\$output);
+	return $output;
 }
 
 
