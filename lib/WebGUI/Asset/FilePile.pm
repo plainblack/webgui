@@ -179,6 +179,7 @@ sub editSave {
 		delete $newAsset->{_storageLocation};
 		$newAsset->setSize($storage->getFileSize($filename));
 		$newAsset->generateThumbnail if ($className eq "WebGUI::Asset::File::Image");
+		$newAsset->commit;
 	}
 	$tempStorage->delete;
 	return $class->getParent->www_manageAssets if ($session{form}{proceed} eq "manageAssets");

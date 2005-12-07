@@ -320,10 +320,16 @@ sub getUsersInGroup {
 		$clause = "expireDate > ".time()." and ";
 	}
 	$clause .= "(groupId=".quote($groupId);
-	if ($recursive) {
+ 	if ($recursive) {
 		my $groups = getGroupsInGroup($groupId,1);
 		if ($#$groups >= 0) {
-			$clause .= " or groupId in (".quoteAndJoin($groups).")";
+			if ($withoutExpired) {
+				foreach my $groupId (@$groups) {
+					$clause .= " OR (groupId = ".quote($groupId)." AND expireDate > ".time().") ";
+				}
+			} else {
+				$clause .= " OR groupId IN (".quoteAndJoin(',',@$groups).")";
+			}
 		}
 	}
 	$clause .= ")";

@@ -14,6 +14,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Richard Clark
                                      Doug Collinge
                                      Flavio Curti
+                                     Michele Dell'Aquila / CSU
                                      Jeff Depons / Adaptive Dynamics
                                      Frank Dillon / Plain Black
                                      Arne Dokken
@@ -23,7 +24,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
                                      Chris Jackson
-                                     Roy Johnson / Ocean View Creations
+                                     Roy Johnson / Ocean View Web Creations
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / ProcoliX
                                      Christian Kocourek
