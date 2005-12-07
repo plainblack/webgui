@@ -29,6 +29,7 @@
    and to allow the dashboard to use user profile fields as preferences rather
    than having a seperate asset type for it. This mechanism is more efficient,
    and thusly increases the performance of the dashboard.
+ - Removed some debug code that was spewing garbage into apache log file.
 
 6.8.0
  - Switched Date::Manip to DateTime for better performance and more 

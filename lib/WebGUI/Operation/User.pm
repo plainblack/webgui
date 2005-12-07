@@ -275,46 +275,12 @@ sub www_editUser {
 		my $style = '" style="display: none;' unless ($_ eq $u->authMethod);
 		$tabform->getTab("account")->raw('<tr id="'.$_.$style.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
 	}
-        my $a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory
-                where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
-                order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
-	my $previousCategory;
-        while(my $data = $a->hashRef) {
-              	my $category = WebGUI::Operation::Shared::secureEval($data->{categoryName});
-                if ($category ne $previousCategory) {
-                      	$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category.'</td></tr>');
-                }
-                my $values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
-                my $method = $data->{dataType};
-                my $label = WebGUI::Operation::Shared::secureEval($data->{fieldLabel});
-		my $default;
-                my $orderedValues = {};
-		tie %{$orderedValues}, 'Tie::IxHash';
-		foreach my $ov (sort keys %{$values}) {
-			$orderedValues->{$ov} = $values->{$ov};
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+		$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category->getLabel.'</td></tr>');
+		foreach my $field (@{$category->getFields}) {
+			$tabform->getTab("profile")->raw($field->formField(undef,1));
 		}
-		if ($session{form}{$data->{fieldName}}) {
-			$default = $session{form}{$data->{fieldName}};
-		}
-		elsif ($u->profileField($data->{fieldName})) {
-			$default = $u->profileField($data->{fieldName});
-		}
-		else {
-			$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
-		}
-
-		my $form = WebGUI::Form::DynamicField->new(
-			name => $data->{fieldName},
-			label => $label, 
-			value => $default,
-			options => $orderedValues,
-			fieldType => $method,
-		);
-
-		$tabform->getTab("profile")->raw($form->displayFormWithWrapper());
-                $previousCategory = $category;
-        }
-        $a->finish;
+	}
 	my @groupsToAdd = WebGUI::FormProcessor::group("groupsToAdd");
 	my @exclude = WebGUI::SQL->buildArray("select groupId from groupings where userId=".quote($u->userId));
 	@exclude = (@exclude,"1","2","7");
@@ -370,13 +336,9 @@ sub www_editUserSave {
 	      		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
 	      		$authInstance->editUserFormSave;
        		}
-		my %field;
-      		tie %field, 'Tie::CPHash';
-      		my $a = WebGUI::SQL->read("select fieldName,dataType from userProfileField");
-      		while (%field = $a->hash) {
-               		$u->profileField($field{fieldName},WebGUI::FormProcessor::process($field{fieldName},$field{dataType}));
-       		}
-       		$a->finish;
+		foreach my $field (@{WebGUI::ProfileField->getFields}) {
+			$u->profileField($field->getId,$field->formProcess);
+		}
 		my @groups = WebGUI::FormProcessor::group("groupsToAdd");
 		$u->addToGroups(\@groups);
 		@groups = WebGUI::FormProcessor::group("groupsToDelete");

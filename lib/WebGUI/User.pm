@@ -17,7 +17,6 @@ package WebGUI::User;
 use strict;
 use WebGUI::Cache;
 use WebGUI::Id;
-use WebGUI::Macro;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -307,9 +306,6 @@ sub profileField {
 	$self = shift;
         $fieldName = shift;
         $value = shift;
-	warn "value 0: $value\n";
-	WebGUI::Macro::negate(\$value);	
-	warn "value 1: $value\n";
 	if (defined $value) {
 		warn "storing: $value\n";
 		$self->uncache;

@@ -22,7 +22,7 @@ use WebGUI::SQL;
 use WebGUI::Form;
 use WebGUI::FormProcessor;
 use WebGUI::Operation::Shared;
-use WebGUI::Macro;
+use WebGUI::HTML;
 
 
 =head1 NAME
@@ -105,7 +105,7 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 formField ( formProperties )
+=head2 formField ( [ formProperties, withWrapper] )
 
 Returns an HTMLified form field element.
 
@@ -113,11 +113,16 @@ Returns an HTMLified form field element.
 
 Optionally pass in a list of properties to override the default properties of any form element. You cannot override the pieces specified as part of the form field like field type, label, options, etc.
 
+=head3 withWrapper
+
+A boolean indicating whether to return just the field, or the field with a table label wrapper.
+
 =cut
 
 sub formField {
 	my $self = shift;
 	my $properties = shift;
+	my $withWrapper = shift;
 	$properties->{label} = $self->getLabel;
 	$properties->{fieldType} = $self->get("fieldType");
 	$properties->{name} = $self->getId;
@@ -137,7 +142,11 @@ sub formField {
 		$default = WebGUI::Operation::Shared::secureEval($properties->{dataDefault});
 	}
 	$properties->{value} = $default;
-	return WebGUI::Form::DynamicField->new($properties)->displayForm;
+	if ($withWrapper) {
+		return WebGUI::Form::DynamicField->new($properties)->displayFormWithWrapper;
+	} else {
+		return WebGUI::Form::DynamicField->new($properties)->displayForm;
+	}
 }
 
 
@@ -151,7 +160,7 @@ Returns the value retrieved from a form post.
 
 sub formProcess {
 	my $self = shift;
-	return WebGUI::Macro::negate(WebGUI::FormProcessor::process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("possibleValues"))));
+	return WebGUI::HTML::filter(WebGUI::FormProcessor::process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("possibleValues"))), "javascript");
 }
 
 #-------------------------------------------------------------------
