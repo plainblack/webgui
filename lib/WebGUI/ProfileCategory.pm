@@ -19,6 +19,7 @@ use strict;
 use WebGUI::ProfileField;
 use WebGUI::Session;
 use WebGUI::SQL;
+use WebGUI::Operation::Shared;
 
 
 =head1 NAME
@@ -155,6 +156,19 @@ Returns the unique ID for this category.
 sub getId {
 	my $self = shift;
 	return $self->get("profileCategoryId");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLabel ()
+
+Returns the eval'd label for this category.
+
+=cut
+
+sub getLabel {
+        my $self = shift;
+        return WebGUI::Operation::Shared::secureEval($self->get("label"));
 }
 
 #-------------------------------------------------------------------

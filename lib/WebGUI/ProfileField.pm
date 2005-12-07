@@ -21,6 +21,7 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Form;
 use WebGUI::FormProcessor;
+use WebGUI::Operation::Shared;
 
 
 =head1 NAME
@@ -116,7 +117,7 @@ Optionally pass in a list of properties to override the default properties of an
 sub formField {
 	my $self = shift;
 	my $properties = shift;
-        $properties->{label} = WebGUI::Operation::Shared::secureEval($self->get("label"));
+        $properties->{label} = $self->getLabel;
         $properties->{fieldType} = $self->get("fieldType");
 	$properties->{name} = $self->getId;
         my $values = WebGUI::Operation::Shared::secureEval($self->get("possibleValues"));
@@ -200,6 +201,19 @@ B<NOTE:> This method is named getId for consistency amongst other packages even 
 sub getId {
         my $self = shift;
         return $self->get("fieldName");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLabel ()
+
+Returns the eval'd label for this field.
+
+=cut    
+        
+sub getLabel {
+        my $self = shift;
+        return WebGUI::Operation::Shared::secureEval($self->get("label"));
 }
 
 #-------------------------------------------------------------------

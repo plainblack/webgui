@@ -31,6 +31,8 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::ProfileField;
+use WebGUI::ProfileCategory;
 use WebGUI::Operation::Shared;
 
 #-------------------------------------------------------------------
