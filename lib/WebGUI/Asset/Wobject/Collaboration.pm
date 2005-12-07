@@ -1196,12 +1196,25 @@ sub www_viewRSS {
 		my $post = WebGUI::Asset::Wobject::Collaboration->new($id, $class, $version);
 		my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
 
+		my @attachmentLoop = ();
+		unless ($self->get("storageId") eq "") {
+			my $storage = $self->getStorageLocation;
+			foreach my $filename (@{ $storage->getFile }) {
+				push @attachmentLoop, {
+					attachment.url = $storage->getUrl($filename),
+					attachment.path =  $storage->getPath($filename),
+					attachment.length = $storage->getFileSize($filename),
+				};
+			}
+		}
 		push(@{$var{'item_loop'}}, {
+		    author => _xml_encode($post->get('username')),
 		    title => _xml_encode($post->get("title")),
 		    link => $encUrl,
 		    description => _xml_encode($post->get("synopsis")),
 		    guid => $encUrl,
-		    pubDate => _xml_encode(_get_rfc822_date($post->get("dateUpdated")))
+		    pubDate => _xml_encode(_get_rfc822_date($post->get("dateUpdated"))),
+		    attachmentLoop => \@attachmentLoop,
 		    });
 		$i++;
 		last if ($i == $self->get("threadsPerPage"));
