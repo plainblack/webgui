@@ -85,7 +85,7 @@ sub create {
         my $id = WebGUI::SQL->setRow("userProfileField","fieldName",{fieldName=>"new"},undef,$fieldName);
         my $self = $class->new($id);
 	$self->setCategory($categoryId || "1");
-        $self->update($properties);
+        $self->set($properties);
         return $self;
 }
 
