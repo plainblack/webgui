@@ -121,12 +121,12 @@ A boolean indicating whether to return just the field, or the field with a table
 
 sub formField {
 	my $self = shift;
-	my $properties = shift;
+	my $properties = shift || {};
 	my $withWrapper = shift;
 	$properties->{label} = $self->getLabel;
 	$properties->{fieldType} = $self->get("fieldType");
 	$properties->{name} = $self->getId;
-	my $values = WebGUI::Operation::Shared::secureEval($self->get("possibleValues"));
+	my $values = WebGUI::Operation::Shared::secureEval($self->get("possibleValues")) || {};
 	my $orderedValues = {};
 	tie %{$orderedValues}, 'Tie::IxHash';
 	foreach my $ov (sort keys %{$values}) {
@@ -134,18 +134,18 @@ sub formField {
 	}
 	$properties->{options} = $orderedValues;
 	my $default;
-	if ($session{form}{$properties->{fieldName}}) {
-		$default = $session{form}{$properties->{fieldName}};
-	} elsif ($session{user}{$properties->{fieldName}}) {
-		$default = $session{user}{$properties->{fieldName}};
+	if ($session{form}{$properties->{name}}) {
+		$default = $session{form}{$properties->{name}};
+	} elsif ($session{user}{$properties->{name}}) {
+		$default = $session{user}{$properties->{name}};
 	} else {
 		$default = WebGUI::Operation::Shared::secureEval($properties->{dataDefault});
 	}
 	$properties->{value} = $default;
 	if ($withWrapper) {
-		return WebGUI::Form::DynamicField->new($properties)->displayFormWithWrapper;
+		return WebGUI::Form::DynamicField->new(%{$properties})->displayFormWithWrapper;
 	} else {
-		return WebGUI::Form::DynamicField->new($properties)->displayForm;
+		return WebGUI::Form::DynamicField->new(%{$properties})->displayForm;
 	}
 }
 
