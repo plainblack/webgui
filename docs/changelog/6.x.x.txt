@@ -23,6 +23,8 @@
    sbin/rebuildLineage.pl
  - fix [ 1356544 ] FAQ template in collaboration has wrong anchors
  - fix [ 1373493 ] Upgrade script fails because parameters are not quoted
+ - Upgrade now uses --results-file parameter on mysqldump because some
+   operating system don't handle UTF-8 characters through their pipes.
 
 6.8.0
  - Switched Date::Manip to DateTime for better performance and more 

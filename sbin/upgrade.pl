@@ -28,8 +28,8 @@ my $help;
 my $history;
 my $override;
 my $quiet;
-my $mysql = "/usr/bin/mysql";
-my $mysqldump = "/usr/bin/mysqldump";
+my $mysql = "mysql";
+my $mysqldump = "mysqldump";
 my $backupDir = "/tmp/backups";
 my $skipBackup;
 my $doit;
@@ -56,7 +56,7 @@ Usage: perl $0 --doit
 Options:
 
 	--backupDir	The folder where backups should be
-			created. Defaults to '/data/backups'.
+			created. Defaults to '$backupDir'.
 
 	--doit		This flag is required. You MUST include this
 			flag in your command line or the upgrade
@@ -69,10 +69,10 @@ Options:
 			flag will NOT run the upgrade.
 
 	--mysql		The path to your mysql client executable.
-			Defaults to '/usr/bin/mysql'.
+			Defaults to '$mysqldump'.
 
 	--mysqldump	The path to your mysqldump executable.
-			Defaults to '/usr/bin/mysqldump'.
+			Defaults to '$mysql'.
 
         --override      This utility is designed to be run as
                         a privileged user on Linux style systems.
@@ -236,7 +236,7 @@ foreach my $filename (keys %config) {
 			my $cmd = qq!$dumpcmd -u"$config{$filename}{dbuser}" -p"$config{$filename}{dbpass}"!;
 			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
 			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
-			$cmd .= " --add-drop-table --databases ".$config{$filename}{db}." > "
+			$cmd .= " --add-drop-table --databases ".$config{$filename}{db}." --result-file="
 				.$backupTo.$slash.$config{$filename}{db}."_".$upgrade{$upgrade}{from}.".sql";
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);
