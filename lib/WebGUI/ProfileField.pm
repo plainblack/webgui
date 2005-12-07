@@ -83,7 +83,7 @@ sub create {
         my $id = WebGUI::SQL->setRow("userProfileField","fieldName",{fieldName=>"new"},undef,$fieldName);
         my $self = $class->new($id);
 	$self->setCategory($categoryId || "1");
-        $self->update($properties);
+        $self->set($properties);
         return $self;
 }
 
@@ -312,17 +312,17 @@ sub set {
 	$properties->{editable} = 0 unless ($properties->{editable} == 1);
 	$properties->{protected} = 0 unless ($properties->{protected} == 1);
 	$properties->{required} = 0 unless ($properties->{required} == 1);
-	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
-	$properties->{fieldType} = 'text' unless ($properties->{fieldType});
-	if ($properties->{defaultValues} && $properties->{fieldType}=~/List$/) {
-                unless ($properties->{defaultValues} =~ /^\[/) {
-                        $properties->{defaultValues} = "[".$properties->{defaultValues};
+	$properties->{fieldLabel} = 'Undefined' if ($properties->{fieldLabel} =~ /^[\"\']*$/);
+	$properties->{dataType} = 'text' unless ($properties->{dataType});
+	if ($properties->{defaultValues} && $properties->{dataType}=~/List$/) {
+                unless ($properties->{dataValues} =~ /^\[/) {
+                        $properties->{dataValues} = "[".$properties->{defaultValues};
                 }
-                unless ($properties->{defaultValues} =~ /\]$/) {
-                        $properties->{defaultValues} .= "]";
+                unless ($properties->{dataValues} =~ /\]$/) {
+                        $properties->{dataValues} .= "]";
                 }
         }
-	WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",$properties);
+	WebGUI::SQL->setRow("userProfileField","profileCategoryId",$properties);
 	foreach my $key (keys %{$properties}) {
 		$self->{_property}{$key} = $properties->{$key};
 	}
