@@ -328,7 +328,7 @@ sub getUsersInGroup {
 					$clause .= " OR (groupId = ".quote($groupId)." AND expireDate > ".time().") ";
 				}
 			} else {
-				$clause .= " OR groupId IN (".quoteAndJoin(',',@$groups).")";
+				$clause .= " OR groupId IN (".quoteAndJoin($groups).")";
 			}
 		}
 	}
