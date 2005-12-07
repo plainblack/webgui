@@ -239,6 +239,36 @@ sub commit {
 
 #-------------------------------------------------------------------
 
+=head2 deleteRow ( table, key, keyValue [, dbh ] )
+
+Deletes a row of data from the specified table.
+
+=head3 table
+
+The name of the table to delete the row of data from.
+
+=head3 key
+
+The name of the column to use as the key. Should be a primary or unique key in the table.
+
+=head3 keyValue
+
+The value to search for in the key column.
+
+=head3 dbh
+
+A database handler to use. Defaults to the WebGUI database handler.
+
+=cut
+
+sub deleteRow {
+        my ($self, $table, $key, $keyValue, $dbh) = @_;
+        WebGUI::SQL->write("delete from $table where ".$key."=".quote($keyValue), $dbh);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 errorCode {
 
 Returns an error code for the current handler.

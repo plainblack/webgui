@@ -16,8 +16,9 @@ package WebGUI::ProfileCategory;
 =cut
 
 use strict;
-use WebGUI::Id;
+use WebGUI::ProfileField;
 use WebGUI::Session;
+use WebGUI::SQL;
 
 
 =head1 NAME
@@ -39,6 +40,17 @@ These methods are available from this package:
 =cut
 
 #-------------------------------------------------------------------
+sub _reorderCategories {
+        my ($sth, $i, $id);
+        $sth = WebGUI::SQL->read("select profileCategoryId from userProfileCategory order by sequenceNumber");
+        while (($id) = $sth->array) {
+                $i++;
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber='$i' where profileCategoryId=".quote($id));
+        }       
+        $sth->finish;
+}  
+
+#-------------------------------------------------------------------
 
 =head2 create ( [ properties] ) 
 
@@ -53,9 +65,8 @@ A hash reference containing the properties of this field. See the set() method f
 sub create {
 	my $class = shift;
 	my $properties = shift;
- 	my $id = WebGUI::Id::generate();
         my ($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
-        WebGUI::SQL->write("insert into userProfileCategory (profileCategoryId,sequenceNumber) values (".quote($id).", ".($sequenceNumber+1).")");
+ 	my $id = WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",{profileCategoryId=>"new", sequenceNumber=>$sequenceNumber+1});
 	my $self = $class->new($id);
 	$self->update($properties);
 	return $self;
@@ -74,7 +85,7 @@ sub delete {
 	foreach my $field (@{$self->getFields}) {
 		$field->delete;
 	}
-	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=".quote($self->getId));
+	WebGUI::SQL->deleteRow("userProfileCategory","profileCategoryId",$self->getId);
 }
 
 #-------------------------------------------------------------------
@@ -107,7 +118,12 @@ Returns an array reference of all WebGUI::ProfileCategory objects in order of se
 =cut
 
 sub getCategories {
-
+	my $self = shift;
+	my @categories = ();
+ 	foreach my $id (WebGUI::SQL->buildArray("select profileCategoryId from userProfileCategory order by sequenceNumber")) {
+		push(@categories,WebGUI::ProfileCategory->new($id));
+	}
+	return \@categories;
 }
 
 
@@ -120,7 +136,12 @@ Returns an array reference of all WebGUI::ProfileField objects that are part of 
 =cut
 
 sub getFields {
-
+	my $self = shift;
+	my @fields = ();
+	foreach my $fieldName (WebGUI::SQL->buildArray("select fieldName from userProfileField where profileCategoryId=".quote($self->getId)." order by sequenceNumber")){
+		push(@fields,WebGUI::ProfileField->new($fieldName));
+	}
+	return \@fields;
 }
 
 #-------------------------------------------------------------------
@@ -133,7 +154,7 @@ Returns the unique ID for this category.
 
 sub getId {
 	my $self = shift;
-	return $self->{_id};
+	return $self->get("profileCategoryId");
 }
 
 #-------------------------------------------------------------------
@@ -145,7 +166,15 @@ Moves this category down one position.
 =cut
 
 sub moveDown {
-
+	my $self = shift;
+        my ($id, $thisSeq);
+        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($self->getId));
+        ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq+1");
+        if ($id ne "") {
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($self->getId));
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($id));
+                _reorderCategories();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -157,7 +186,15 @@ Moves this field up one position.
 =cut
 
 sub moveUp {
-
+	my $self = shift;
+	my ($id, $thisSeq);
+        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($self->getId));
+        ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq-1");
+        if ($id ne "") {
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($self->getId));
+                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($id));
+                _reorderCategories();
+        }
 }
 
 #-------------------------------------------------------------------
@@ -174,6 +211,10 @@ The unique id of this category.
 
 sub new {
 	my $class = shift;
+	my $id = shift;
+	return undef unless ($id);
+	my $properties = WebGUI::SQL->getRow("userProfileCategory","profileCategoryId",$id);
+	bless {_properties=>$properties}, $class;
 }
 
 
@@ -193,14 +234,21 @@ A perl structure that will return a scalar. Defaults to 'Undefined'.
 
 =head4 visible
 
-A boolean indicating whether this field should be visible when a user views a user's profile.
+A boolean indicating whether the fields in this category should be visible when a user views a user's profile.
 
 =head4 editable
+
+A boolean indicating whether the user can edit the fields under this category.
 
 =cut
 
 sub set {
-
+	my $self = shift;
+	my $properties = shift;
+	$properties->{visible} = 0 unless ($properties->{visible} == 1);
+	$properties->{editable} = 0 unless ($properties->{editable} == 1);
+	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
+	WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",$properties);
 }
 
 
