@@ -83,6 +83,31 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getCategories ()
+
+Returns an array reference of all WebGUI::ProfileCategory objects in order of sequence. This is a class method.
+
+=cut
+
+sub getCategories {
+
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getFields ()
+
+Returns an array reference of all WebGUI::ProfileField objects that are part of this category in order of sequence.
+
+=cut
+
+sub getFields {
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 moveDown ()
 
 Moves this category down one position.

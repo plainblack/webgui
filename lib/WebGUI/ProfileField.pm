@@ -112,6 +112,19 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getCategory ()
+
+Returns a WebGUI::ProfileCategory object for the category that this profile field belongs to.
+
+=cut
+
+sub getCategory {
+
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 moveDown ()
 
 Moves this field down one position within it's category.
@@ -149,6 +162,8 @@ The unique name of this field.
 
 sub new {
 	my $class = shift;
+	my $fieldName = shift;
+	bless {_fieldName=>$fieldName}, $class;
 }
 
 #-------------------------------------------------------------------
