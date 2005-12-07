@@ -19,7 +19,6 @@ use WebGUI::Grouping;
 use WebGUI::Privilege;
 use WebGUI::ErrorHandler;
 use Time::HiRes;
-use WebGUI::Asset::Field;
 use WebGUI::Style;
 use WebGUI::Asset::Wobject;
 
@@ -37,7 +36,6 @@ sub canPersonalize {
 	my $self = shift;
 	return WebGUI::Grouping::isInGroup($self->get("usersGroupId"));
 }
-
 
 #-------------------------------------------------------------------
 sub definition {
@@ -59,10 +57,14 @@ sub definition {
 			fieldType=>"group",
 			defaultValue=>'2'
 		},
-		mapFieldId =>{
-			fieldType=>"text",
-			defaultValue=>'',
+		isInitialized =>{
+			fieldType=>"yesNo",
+			defaultValue=>0,
 			noFormPost=>1,
+		},
+		assetsToHide => {
+			defaultValue=>undef,
+			fieldType=>"checkList"
 		}
 	);
 	push(@{$definition}, {
@@ -78,8 +80,15 @@ sub definition {
 #-------------------------------------------------------------------
 sub getContentPositions {
 	my $self = shift;
-	my $dummy = $self->initializeDashletFields unless $self->get("mapFieldId");
-	return WebGUI::Asset::Field->getUserPref($self->get("mapFieldId"));
+	my $dummy = $self->initialize unless $self->get("isInitialized");
+	my $u = WebGUI::User->new($self->discernUserId);
+	return $u->profileField($self->getId.'contentPositions');
+}
+
+#-------------------------------------------------------------------
+sub discernUserId {
+	my $self = shift;
+	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $session{user}{userId};
 }
 
 #-------------------------------------------------------------------
@@ -106,28 +115,39 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('dashboard usersGroupId description'),
 		-value=>[$self->getValue("usersGroupId")]
 	);
+	if ($session{form}{func} ne "add") {
+		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
+		my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
+		my %childIds;
+		foreach my $child (@{$children}) {
+			$childIds{$child->getId} = $child->getTitle.' ['.ref($child).']';	
+		}
+		$tabform->getTab("display")->checkList(
+			-name=>"assetsToHide",
+			-value=>\@assetsToHide,
+			-options=>\%childIds,
+			-label=>WebGUI::International::get('assets to hide', 'Asset_Layout'),
+			-hoverHelp=>WebGUI::International::get('assets to hide description', 'Asset_Layout'),
+			-vertical=>1,
+			-uiLevel=>9
+		);
+	}
 	return $tabform;
 }
 
 #-------------------------------------------------------------------
-sub initializeDashletFields {
+sub initialize {
 	my $self = shift;
-	my $child = $self->addChild({
-		className=>'WebGUI::Asset::Field',
-		title=>'Dashboard User Preference - Content Positions',
-		menuTitle=>'Dashboard User Preference - Content Positions',
-		isHidden=>1,
-		startDate=>$self->get("startDate"),
-		endDate=>$self->get("endDate"),
-		ownerUserId=>$self->get("ownerUserId"),
-		groupIdEdit=>$self->get("groupIdEdit"),
-		groupIdView=>$self->get("groupIdView"),
-		url=>'Dashboard User Preference - Content Positions',
-		fieldName=>'contentPositions'
+	my $userPrefField = WebGUI::ProfileField::addProfileField({
+		label=>'\'Dashboard User Preference - Content Positions\'',
+		visible=>1,
+		isProtected=>1,
+		editable=>0,
+		dataType=>'text',
+		fieldName=>$self->getId.'contentPositions'
 	});
-	$self->update({mapFieldId=>$child->getId});
+	$self->update({isInitialized=>1});
 }
-
 
 #-------------------------------------------------------------------
 sub isManaging {
@@ -141,7 +161,7 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
 	if ($session{form}{assetId} eq "new" && $session{form}{class} eq 'WebGUI::Asset::Wobject::Dashboard') {
-		$self->initializeDashletFields;
+		$self->initialize;
 		if (ref $self->getParent eq 'WebGUI::Asset::Wobject::Layout') {
 			$self->getParent->update({assetsToHide=>$self->getParent->get("assetsToHide")."\n".$self->getId});
 		}
@@ -149,13 +169,12 @@ sub processPropertiesFromFormPost {
 	}
 }
 
-
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my %vars = $self->get();
 	my $templateId = $self->get("templateId");
-	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Field","WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
 	my %vars;
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->getContentPositions);
@@ -252,12 +271,13 @@ sub www_setContentPositions {
 	my $self = shift;
 	return 'Visitors cannot save settings' if($session{user}{userId} eq '1');
 	return WebGUI::Privilege::insufficient() unless ($self->canPersonalize);
-	return 'empty' unless $self->get("mapFieldId");
-	my $success = WebGUI::Asset::Field->setUserPref($self->get("mapFieldId"),$session{form}{map});
+	return 'empty' unless $self->get("isInitialized");
+	my $dummy = $self->initialize unless $self->get("isInitialized");
+	my $u = WebGUI::User->new($self->discernUserId);
+	my $success = $u->profileField($self->getId.'contentPositions',$session{form}{map}) eq $session{form}{map};
 	return "Map set: ".$session{form}{map} if $success;
 	return "Map failed to set.";
 }
-
 
 #-------------------------------------------------------------------
 

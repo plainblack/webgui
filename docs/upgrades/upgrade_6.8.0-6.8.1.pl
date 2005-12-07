@@ -24,6 +24,7 @@ start(); # this line required
 
 upgradeRichEditor();
 fixCSFaqTemplateAnchors();
+convertDashboardPrefs();
 
 finish(); # this line required
 
@@ -32,6 +33,22 @@ finish(); # this line required
 sub upgradeRichEditor {
 	print "\tUpgrade rich editor\n" unless ($quiet);
 	rmtree("../../www/extras/tinymce");
+}
+
+#-------------------------------------------------
+sub convertDashboardPrefs {
+	print "\tConverting Dashboard preferences\n" unless ($quiet);
+	#purge all Fields.
+	my $a = WebGUI::SQL->read("select assetId from asset where className='WebGUI::Asset::Field'");
+	while (my ($assetId) = $a->array) {
+		WebGUI::Asset::Field->new($assetId)->purge;
+	}
+	unlink("../../lib/WebGUI/Asset/Field.pm");
+	WebGUI::SQL->write("DROP TABLE `wgField`");
+	WebGUI::SQL->write("ALERT TABLE `Dashboard` DROP COLUMN mapFieldId");
+	WebGUI::SQL->write("ALERT TABLE `Dashboard` ADD COLUMN `isInitialized` TINYINT UNSIGNED NOT NULL DEFAULT 0");
+	WebGUI::SQL->write("ALERT TABLE `Dashboard` ADD COLUMN `assetsToHide` TEXT");
+	WebGUI::SQL->write("ALERT TABLE `Shortcut` ADD COLUMN `prefFieldsToShow` TEXT");
 }
 
 #-------------------------------------------------
