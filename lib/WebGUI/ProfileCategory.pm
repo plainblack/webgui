@@ -69,7 +69,7 @@ sub create {
         my ($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
  	my $id = WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",{profileCategoryId=>"new", sequenceNumber=>$sequenceNumber+1});
 	my $self = $class->new($id);
-	$self->update($properties);
+	$self->set($properties);
 	return $self;
 }
 

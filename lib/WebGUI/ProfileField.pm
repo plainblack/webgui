@@ -79,12 +79,12 @@ sub create {
         my $class = shift;
 	my $fieldName = shift;
         my $properties = shift;
-	my $categoryId = shift;
-	my ($fieldName) = WebGUI::SQL->quickArray("select count(*) from userProfileField where fieldName=".quote($fieldName));
-	return undef if ($fieldName);
+	my $categoryId = shift || "1";
+	my ($fieldNameExists) = WebGUI::SQL->quickArray("select count(*) from userProfileField where fieldName=".quote($fieldName));
+	return undef if ($fieldNameExists);
         my $id = WebGUI::SQL->setRow("userProfileField","fieldName",{fieldName=>"new"},undef,$fieldName);
         my $self = $class->new($id);
-	$self->setCategory($categoryId || "1");
+	$self->setCategory($categoryId);
         $self->set($properties);
         return $self;
 }

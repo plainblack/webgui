@@ -116,11 +116,11 @@ sub www_editProfileCategory {
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my %data = {
+	my %data = (
 		label=>WebGUI::FormProcessor::text("label"),
 		visible=>WebGUI::FormProcessor::yesNo("visible"),
 		editable=>WebGUI::FormProcessor::yesNo("editable"),
-		};
+		);
 	if ($session{form}{cid} eq "new") {
 		my $category = WebGUI::ProfileCategory->create(\%data);
 		$session{form}{cid} = $category->getId;
@@ -186,7 +186,7 @@ sub www_editProfileField {
 		-value=>$data->{required}
 		);
 	my $fieldType = WebGUI::Form::FieldType->new(
-		-name=>"dataType",
+		-name=>"fieldType",
 		-label=>WebGUI::International::get(486,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('486 description',"WebGUIProfile"),
 		-value=>ucfirst $data->{fieldType},
@@ -204,7 +204,7 @@ sub www_editProfileField {
 	$fieldType->{types} = \@profileForms;
 	$f->raw($fieldType->toHtmlWithWrapper());
 	$f->textarea(
-		-name => "dataValues",
+		-name => "possibleValues",
 		-label => WebGUI::International::get(487,"WebGUIProfile"),
 		-hoverHelp => WebGUI::International::get('487 description',"WebGUIProfile"),
 		-value => $data->{possibleValues},
@@ -242,11 +242,14 @@ sub www_editProfileFieldSave {
 		dataDefault=>WebGUI::FormProcessor::textarea("dataDefault"),
 		fieldType=>WebGUI::FormProcessor::fieldType("fieldType"),
 		);
+	my $categoryId = WebGUI::FormProcessor::selectBox("profileCategoryId");
 	if ($session{form}{new}) {
-		my $field = WebGUI::ProfileField->create(WebGUI::FormProcessor::text("fieldName"), \%data, WebGUI::FormProcessor::selectBox("profileCategoryId"));
+		my $field = WebGUI::ProfileField->create(WebGUI::FormProcessor::text("fid"), \%data, $categoryId);
 		$session{form}{fid} = $field->getId;
 	} else {
-		WebGUI::ProfileField->new($session{form}{fid})->set(\%data);
+		my $field = WebGUI::ProfileField->new($session{form}{fid});
+		$field->set(\%data);
+		$field->setCategory($categoryId);
 	}
 	return www_editProfileSettings();
 }
@@ -261,7 +264,7 @@ sub www_editProfileSettings {
 		$output .= moveUpIcon('op=moveProfileCategoryUp;cid='.$category->getId); 
 		$output .= moveDownIcon('op=moveProfileCategoryDown;cid='.$category->getId); 
 		$output .= ' <b>'.$category->getLabel.'</b><br />';
-		foreach my $field ($category->getFields) {
+		foreach my $field (@{$category->getFields}) {
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                         $output .= deleteIcon('op=deleteProfileFieldConfirm;fid='.$field->getId,'',WebGUI::International::get(467,"WebGUIProfile"));
        	                $output .= editIcon('op=editProfileField;fid='.$field->getId);
