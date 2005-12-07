@@ -155,11 +155,11 @@ sub www_viewProfile {
 
 	my @array = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
-		next unless ($category->get("visible");
+		next unless ($category->get("visible"));
 		push(@array, {'profile.category' => $category->getLabel});
 		foreach my $field (@{$category->getFields}) {
 			next unless ($field->get("visible"));
-			next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail")
+			next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail"));
 			push(@array, {
 				'profile.label' => $field->getLabel,
 				'profile.value' => $u->profileField($field->getId)

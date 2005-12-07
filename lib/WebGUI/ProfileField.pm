@@ -400,7 +400,7 @@ A scalar indicating the type of field this will be when generated as a form elem
 
 A scalar containing a hash reference declaration of possible values. Only used for list type fields.
 
-=head4 defaultValues
+=head4 defaultValue
 
 A scalar containing an array reference or scalar declaration of defaultly selected value(s). 
 
@@ -415,12 +415,12 @@ sub set {
 	$properties->{required} = 0 unless ($properties->{required} == 1);
 	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
 	$properties->{fieldType} = 'text' unless ($properties->{fieldType});
-	if ($properties->{defaultValues} && $properties->{fieldType}=~/List$/) {
-                unless ($properties->{defaultValues} =~ /^\[/) {
-                        $properties->{defaultValues} = "[".$properties->{defaultValues};
+	if ($properties->{defaultValue} && $properties->{fieldType}=~/List$/) {
+                unless ($properties->{defaultValue} =~ /^\[/) {
+                        $properties->{defaultValue} = "[".$properties->{defaultValue};
                 }
-                unless ($properties->{defaultValues} =~ /\]$/) {
-                        $properties->{defaultValues} .= "]";
+                unless ($properties->{defaultValue} =~ /\]$/) {
+                        $properties->{defaultValue} .= "]";
                 }
         }
 	$properties->{fieldName} = $self->getId;

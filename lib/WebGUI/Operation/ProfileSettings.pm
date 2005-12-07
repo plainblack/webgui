@@ -23,28 +23,8 @@ use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Operation::Shared;
 use WebGUI::Form::FieldType;
-
-#-------------------------------------------------------------------
-sub _reorderCategories {
-        my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select profileCategoryId from userProfileCategory order by sequenceNumber");
-        while (($id) = $sth->array) {
-                $i++;
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber='$i' where profileCategoryId=".quote($id));
-        }
-        $sth->finish;
-}
-
-#-------------------------------------------------------------------
-sub _reorderFields {
-        my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select fieldName from userProfileField where profileCategoryId=".quote($_[0])." order by sequenceNumber");
-        while (($id) = $sth->array) {
-                $i++;
-                WebGUI::SQL->write("update userProfileField set sequenceNumber='$i' where fieldName=".quote($id));
-        }
-        $sth->finish;
-}
+use WebGUI::ProfileField;
+use WebGUI::ProfileCategory;
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -75,6 +55,7 @@ sub _submenu {
 sub www_deleteProfileCategoryConfirm {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         return WebGUI::AdminConsole->new("userProfiling")->render(WebGUI::Privilege::vitalComponent()) if (length($session{form}{cid}) != 22 &&  $session{form}{cid} < 1000 && $session{form}{cid} > 0);
+	
 	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
 	WebGUI::SQL->write("update userProfileField set profileCategoryId='1' where profileCategoryId=".quote($session{form}{cid}));
         return www_editProfileSettings();
