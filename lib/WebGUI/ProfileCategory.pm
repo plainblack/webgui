@@ -262,6 +262,7 @@ sub set {
 	$properties->{visible} = 0 unless ($properties->{visible} == 1);
 	$properties->{editable} = 0 unless ($properties->{editable} == 1);
 	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
+	$properties->{profileCategoryId} = $self->getId;
 	WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",$properties);
 }
 

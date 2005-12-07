@@ -362,7 +362,8 @@ sub set {
                         $properties->{defaultValues} .= "]";
                 }
         }
-	WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",$properties);
+	$properties->{fieldName} = $self->getId;
+	WebGUI::SQL->setRow("userProfileField","fieldName",$properties);
 	foreach my $key (keys %{$properties}) {
 		$self->{_property}{$key} = $properties->{$key};
 	}
