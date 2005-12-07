@@ -1201,9 +1201,9 @@ sub www_viewRSS {
 			my $storage = $self->getStorageLocation;
 			foreach my $filename (@{ $storage->getFile }) {
 				push @attachmentLoop, {
-					attachment.url = $storage->getUrl($filename),
-					attachment.path =  $storage->getPath($filename),
-					attachment.length = $storage->getFileSize($filename),
+					'attachment.url' => $storage->getUrl($filename),
+					'attachment.path' =>  $storage->getPath($filename),
+					'attachment.length' => $storage->getFileSize($filename),
 				};
 			}
 		}
