@@ -16,6 +16,7 @@ package WebGUI::ProfileCategory;
 =cut
 
 use strict;
+use WebGUI::Id;
 use WebGUI::Session;
 
 
@@ -50,7 +51,14 @@ A hash reference containing the properties of this field. See the set() method f
 =cut
 
 sub create {
-
+	my $class = shift;
+	my $properties = shift;
+ 	my $id = WebGUI::Id::generate();
+        my ($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
+        WebGUI::SQL->write("insert into userProfileCategory (profileCategoryId,sequenceNumber) values (".quote($id).", ".($sequenceNumber+1).")");
+	my $self = $class->new($id);
+	$self->update($properties);
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -62,7 +70,11 @@ Deletes this category and all fields attached to it.
 =cut
 
 sub delete {
-
+	my $self = shift;
+	foreach my $field (@{$self->getFields}) {
+		$field->delete;
+	}
+	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=".quote($self->getId));
 }
 
 #-------------------------------------------------------------------
@@ -78,7 +90,12 @@ If specified, the value of an individual property is returned.
 =cut
 
 sub get {
-
+        my $self = shift;
+        my $propertyName = shift;
+        if (defined $propertyName) {
+                return $self->{_properties}{$propertyName};
+        }
+        return $self->{_properties};
 }
 
 #-------------------------------------------------------------------
@@ -104,6 +121,19 @@ Returns an array reference of all WebGUI::ProfileField objects that are part of 
 
 sub getFields {
 
+}
+
+#-------------------------------------------------------------------
+
+=head2 getId ()
+
+Returns the unique ID for this category.
+
+=cut
+
+sub getId {
+	my $self = shift;
+	return $self->{_id};
 }
 
 #-------------------------------------------------------------------

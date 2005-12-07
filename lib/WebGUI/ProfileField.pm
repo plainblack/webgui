@@ -107,7 +107,12 @@ If specified, the value of an individual property is returned.
 =cut
 
 sub get {
-
+        my $self = shift;
+        my $propertyName = shift;
+        if (defined $propertyName) {
+                return $self->{_properties}{$propertyName};
+        }
+        return $self->{_properties};
 }
 
 #-------------------------------------------------------------------
