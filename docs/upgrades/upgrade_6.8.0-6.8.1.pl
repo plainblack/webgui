@@ -56,10 +56,10 @@ sub convertDashboardPrefs {
 	}
 	unlink("../../lib/WebGUI/Asset/Field.pm");
 	WebGUI::SQL->write("DROP TABLE `wgField`");
-	WebGUI::SQL->write("ALERT TABLE `Dashboard` DROP COLUMN mapFieldId");
-	WebGUI::SQL->write("ALERT TABLE `Dashboard` ADD COLUMN `isInitialized` TINYINT UNSIGNED NOT NULL DEFAULT 0");
-	WebGUI::SQL->write("ALERT TABLE `Dashboard` ADD COLUMN `assetsToHide` TEXT");
-	WebGUI::SQL->write("ALERT TABLE `Shortcut` ADD COLUMN `prefFieldsToShow` TEXT");
+	WebGUI::SQL->write("ALTER TABLE `Dashboard` DROP COLUMN mapFieldId");
+	WebGUI::SQL->write("ALTER TABLE `Dashboard` ADD COLUMN `isInitialized` TINYINT UNSIGNED NOT NULL DEFAULT 0");
+	WebGUI::SQL->write("ALTER TABLE `Dashboard` ADD COLUMN `assetsToHide` TEXT");
+	WebGUI::SQL->write("ALTER TABLE `Shortcut` ADD COLUMN `prefFieldsToShow` TEXT");
 }
 
 #-------------------------------------------------
