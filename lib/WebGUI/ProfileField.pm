@@ -22,6 +22,7 @@ use WebGUI::SQL;
 use WebGUI::Form;
 use WebGUI::FormProcessor;
 use WebGUI::Operation::Shared;
+use WebGUI::Macro;
 
 
 =head1 NAME
@@ -150,7 +151,7 @@ Returns the value retrieved from a form post.
 
 sub formProcess {
 	my $self = shift;
-	return WebGUI::FormProcessor::process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("possibleValues")));
+	return WebGUI::Macro::negate(WebGUI::FormProcessor::process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("possibleValues"))));
 }
 
 #-------------------------------------------------------------------
@@ -190,6 +191,40 @@ sub getCategory {
 
 #-------------------------------------------------------------------
 
+=head2 getEditableFields ()
+
+Returns an array reference of WebGUI::ProfileField objects that are marked "editable" or "required". This is a class method.
+
+=cut
+
+sub getEditableFields {
+        my $self = shift;
+        my @fields = ();
+        foreach my $fieldName (WebGUI::SQL->buildArray("select fieldName from userProfileField where required=1 or editable=1 order by sequenceNumber")) {
+                push(@fields,WebGUI::ProfileField->new($fieldName));
+        }
+        return \@fields;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getFields ()
+
+Returns an array reference of WebGUI::ProfileField objects. This is a class method.
+
+=cut
+
+sub getFields {
+        my $self = shift;
+        my @fields = ();
+        foreach my $fieldName (WebGUI::SQL->buildArray("select fieldName from userProfileField order by sequenceNumber")) {
+                push(@fields,WebGUI::ProfileField->new($fieldName));
+        }
+        return \@fields;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ()
 
 Returns the unique fieldName for this field. 
@@ -214,6 +249,23 @@ Returns the eval'd label for this field.
 sub getLabel {
         my $self = shift;
         return WebGUI::Operation::Shared::secureEval($self->get("label"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 getRequiredFields ()
+
+Returns an array reference of WebGUI::ProfileField objects that are marked "required". This is a class method.
+
+=cut
+
+sub getRequiredFields {
+        my $self = shift;
+        my @fields = ();
+        foreach my $fieldName (WebGUI::SQL->buildArray("select fieldName from userProfileField where required=1 order by sequenceNumber")) {
+                push(@fields,WebGUI::ProfileField->new($fieldName));
+        }
+        return \@fields;
 }
 
 #-------------------------------------------------------------------

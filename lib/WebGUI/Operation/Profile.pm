@@ -38,40 +38,13 @@ use WebGUI::Operation::Shared;
 #-------------------------------------------------------------------
 # Builds Extra form requirements for anonymous registration. 
 sub getRequiredProfileFields {
-   my ($f,$a,$method,$label,$default,$values,$data,@array);
-
-   #$f = WebGUI::HTMLForm->new();
-
-   $a = WebGUI::SQL->read("select * from userProfileField, userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId and 
-                                userProfileField.required=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber",WebGUI::SQL->getSlave);
-	while($data = $a->hashRef) {
-		my %hash = ();
-		$method = $data->{dataType};
-		$label = WebGUI::Operation::Shared::secureEval($data->{fieldLabel});
-		$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
-		$values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
-		my $default;
-		if ($session{form}{$data->{fieldName}}) {
-			$default = $session{form}{$data->{fieldName}};
-		}
-		elsif ($session{user}{$data->{fieldName}}) {
-			$default = $session{user}{$data->{fieldName}};
-		} 
-		else {
-			$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
-		}
-		my $form = WebGUI::Form::DynamicField->new(
-			name => $data->{fieldName},
-			value => $default,
-			options => $values,
-			fieldType => $method,
-		);
-
-		$hash{'profile.formElement'} = $form->displayForm();
-		$hash{'profile.formElement.label'} = $label;
-		push(@array,\%hash)
-	}
-	$a->finish;
+	my @array;
+	foreach my $field (@{WebGUI::ProfileField->getRequiredFields}) {
+		push(@array, {
+			'profile.formElement' => $field->formField,
+			'profile.formElement.label' => $field->getLabel
+			});
+	}	
 	return \@array;
 }
 
@@ -105,90 +78,46 @@ sub saveProfileFields {
 
 #-------------------------------------------------------------------
 sub validateProfileData {
-	my (%data, $error, $a, %field, $warning);
-	tie %field, 'Tie::CPHash';
-	$a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
-		   and userProfileCategory.editable=1 and userProfileField.editable=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
-	while (%field = $a->hash) {
-		my $holder = WebGUI::FormProcessor::process($field{fieldName},$field{dataType}, $field{dataDefault});
-		WebGUI::Macro::negate(\$holder);
-		$data{$field{fieldName}} = $holder;
-		if ($field{required} && !($data{$field{fieldName}})) {
-			$error .= '<li>'.(WebGUI::Operation::Shared::secureEval($field{fieldLabel})).' '.WebGUI::International::get(451).'</li>';
-		}
-		elsif($field{fieldName} eq "email" && isDuplicateEmail($data{$field{fieldName}})){
+	my %data = ();
+	my $error = "";
+	my $warning = "";
+	foreach my $field (@{WebGUI::ProfileField->getEditableFields}) {
+		$data{$field->getId} = $field->formProcess;
+		if ($field->get("required") && !$data{$field->getId}) {
+			$error .= '<li>'.$field->getLabel.' '.WebGUI::International::get(451).'</li>';
+		} elsif ($field->getId eq "email" && isDuplicateEmail($data{$field->getId})) {
 			$warning .= '<li>'.WebGUI::International::get(1072).'</li>';
 		}
 	}
-	$a->finish;
 	return (\%data, $error, $warning);
 }
 
 #-------------------------------------------------------------------
 sub www_editProfile {
-	my ($a, $data, $previousCategory, $subtext, $vars, @profile, @array);
 	return WebGUI::Operation::Auth::www_auth("init") if($session{user}{userId} eq '1');
-
+	my $vars = {};
 	$vars->{displayTitle} .= '<h1>'.WebGUI::International::get(338).'</h1>';
-
 	$vars->{'profile.message'} = $_[0] if($_[0]);
 	$vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader({});
 	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter();
 
 	$vars->{'profile.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"editProfileSave"});
 	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session{user}{userId}});
-
-	$a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
-		and userProfileCategory.editable=1 and userProfileField.editable=1 order by userProfileCategory.sequenceNumber,userProfileField.sequenceNumber");
-	my $counter = 0;
-	while($data = $a->hashRef) {
-		$counter++;
-		my %hash = ();
-		my $category = WebGUI::Operation::Shared::secureEval($data->{categoryName});
-		my $label = WebGUI::Operation::Shared::secureEval($data->{fieldLabel});
-		my $values = WebGUI::Operation::Shared::secureEval($data->{dataValues});
-		my $method = $data->{dataType};
-		my $orderedValues = {};
-		tie %{$orderedValues}, 'Tie::IxHash';
-		foreach my $ov (sort keys %{$values}) {
-			$orderedValues->{$ov} = $values->{$ov};
+	my @array = ();
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+		my @temp = ();
+		foreach my $field (@{$category->getFields}) {
+			push(@temp, {
+				'profile.form.element' => $field->formField,
+				'profile.form.element.label' => $field->getLabel,
+				'profile.form.element.subtext' => $field->get("required") ? "*" : undef
+				});
 		}
-		my $default;
-		if ($session{form}{$data->{fieldName}}) {
-			$default = $session{form}{$data->{fieldName}};
-		}
-		elsif ($session{user}{$data->{fieldName}}) {
-			$default = $session{user}{$data->{fieldName}};
-		} 
-		else {
-			$default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
-		}
-		my $form = WebGUI::Form::DynamicField->new(
-			name => $data->{fieldName},
-			value => $default,
-			options => $orderedValues,
-			fieldType => $method,
-		);
-
-		$hash{'profile.form.element'} = $form->displayForm();
-		$hash{'profile.form.element.label'} = $label;
-
-		if ($data->{required}) {
-			$hash{'profile.form.element.subtext'} = "*";
-		}
-		push(@profile,\%hash);
-		if (($previousCategory && $category ne $previousCategory) || $counter eq $a->rows) {
-			my @temp = @profile;
-			my $hashRef;
-			$hashRef->{'profile.form.category'} = $previousCategory;
-			$hashRef->{'profile.form.category.loop'} = \@temp;
-			push(@array,$hashRef);
-			@profile = ();
-		}
-		$previousCategory = $category;
+		push(@array, {
+			'profile.form.category' => $category->getLabel,
+                        'profile.form.category.loop' => \@temp
+			});
 	}
-	$a->finish;
-
 	$vars->{'profile.form.elements'} = \@array;
 	$vars->{'profile.form.submit'} = WebGUI::Form::submit({});
 	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
@@ -215,59 +144,29 @@ sub www_editProfileSave {
 
 #-------------------------------------------------------------------
 sub www_viewProfile {
-	my ($a, %data, $category, $label, $value, $previousCategory, $u, $vars, @array);
-	$u = WebGUI::User->new($session{form}{uid});
+	my $u = WebGUI::User->new($session{form}{uid});
+	my $vars = {};
 	$vars->{displayTitle} = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
 
 	return WebGUI::Privilege::notMember() if($u->username eq "");
 
 	return WebGUI::Operation::Shared::userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session{user}{userId} ne $session{form}{uid} || WebGUI::Grouping::isInGroup(3)));
-
 	return WebGUI::Privilege::insufficient() if(!WebGUI::Grouping::isInGroup(2));
 
-	$a = WebGUI::SQL->read("select * from userProfileField,userProfileCategory where userProfileField.profileCategoryId=userProfileCategory.profileCategoryId
-		and userProfileCategory.visible=1 and userProfileField.visible=1 order by userProfileCategory.sequenceNumber,
-		userProfileField.sequenceNumber",WebGUI::SQL->getSlave);
-
-	while (%data = $a->hash) {
-
-		$category = WebGUI::Operation::Shared::secureEval($data{categoryName});
-		if ($category ne $previousCategory) {
-			my $header;
-			$header->{'profile.category'} = $category;
-			push(@array,$header);
-			$previousCategory = $category;
+	my @array = ();
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+		next unless ($category->get("visible");
+		push(@array, {'profile.category' => $category->getLabel});
+		foreach my $field (@{$category->getFields}) {
+			next unless ($field->get("visible"));
+			next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail")
+			push(@array, {
+				'profile.label' => $field->getLabel,
+				'profile.value' => $u->profileField($field->getId)
+				});
 		}
-
-		next if ($data{fieldName} eq "email" and $u->profileField("publicEmail"));
-
-		$label = WebGUI::Operation::Shared::secureEval($data{fieldLabel});
-
-		##If the form field has multiple selections, only display the one the user
-		##currently has selected.
-		if ($data{dataValues}) {
-			$value = WebGUI::Operation::Shared::secureEval($data{dataValues});
-			$value = ${$value}{$u->profileField($data{fieldName})};
-		}
-		else {
-			$value = $u->profileField($data{fieldName});
-		}
-
-		my $form = WebGUI::Form::DynamicField->new(
-			value => $value,
-			fieldType => $data{dataType},
-		);
-
-		$value = $form->displayValue();
-
-		my $hash;
-
-		$hash->{'profile.label'} = $label;
-		$hash->{'profile.value'} = $value;
-		push(@array,$hash);
 	}
 	$vars->{'profile.elements'} = \@array;
-	$a->finish;
 	if ($session{user}{userId} eq $session{form}{uid}) {
 		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
