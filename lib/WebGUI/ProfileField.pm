@@ -103,14 +103,39 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 formField ()
+=head2 formField ( formProperties )
 
 Returns an HTMLified form field element.
+
+=head3 formProperties
+
+Optionally pass in a list of properties to override the default properties of any form element. You cannot override the pieces specified as part of the form field like field type, label, options, etc.
 
 =cut
 
 sub formField {
-
+	my $self = shift;
+	my $properties = shift;
+        $properties->{label} = WebGUI::Operation::Shared::secureEval($self->get("label"));
+        $properties->{fieldType} = $self->get("fieldType");
+	$properties->{name} = $self->getId;
+        my $values = WebGUI::Operation::Shared::secureEval($self->get("possibleValues"));
+        my $orderedValues = {};
+        tie %{$orderedValues}, 'Tie::IxHash';
+        foreach my $ov (sort keys %{$values}) {
+        	$orderedValues->{$ov} = $values->{$ov};
+        }
+	$properties->{options} = $orderedValues;
+        my $default;
+        if ($session{form}{$data->{fieldName}}) {
+        	$default = $session{form}{$data->{fieldName}};
+        } elsif ($session{user}{$data->{fieldName}}) {
+        	$default = $session{user}{$data->{fieldName}};
+        } else {
+                $default = WebGUI::Operation::Shared::secureEval($data->{dataDefault});
+        }
+	$properties->{value} = $default;
+	return WebGUI::Form::DynamicField->new($properties)->displayForm;
 }
 
 
@@ -123,7 +148,8 @@ Returns the value retrieved from a form post.
 =cut
 
 sub formProcess {
-
+	my $self = shift;
+	return WebGUI::FormProcessor::process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("possibleValues")));
 }
 
 #-------------------------------------------------------------------

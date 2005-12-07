@@ -24,10 +24,21 @@ start(); # this line required
 
 upgradeRichEditor();
 fixCSFaqTemplateAnchors();
+updateProfileSystem();
 convertDashboardPrefs();
 
 finish(); # this line required
 
+
+#-------------------------------------------------
+sub updateProfileSystem {
+	print "\tUpdating user profile system.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table userProfileField change fieldLabel label varchar(255) not null default 'Undefined'");
+	WebGUI::SQL->write("alter table userProfileField change dataType fieldType varchar(128) not null default 'text'");
+	WebGUI::SQL->write("alter table userProfileField change dataValues possibleValues text");
+	WebGUI::SQL->write("alter table userProfileField change dataDefault defaultValues text");
+	WebGUI::SQL->write("alter table userProfileCategory change categoryName label varchar(255) not null default 'Undefined'");
+}
 
 #-------------------------------------------------
 sub upgradeRichEditor {
