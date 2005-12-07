@@ -189,7 +189,7 @@ sub fatal {
         } else {
 	        print "<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n"; 
 		print "<p>".$message."</p>\n";
-		print showDebug();
+		print showDebug() if (canShowDebug());
 	}
 	WebGUI::Session::close();
         exit;
@@ -206,7 +206,8 @@ Returns a reference to the logger.
 
 sub getLogger {
 	unless (Log::Log4perl->initialized()) {
- 		Log::Log4perl->init( $WebGUI::Session::session{config}{webguiRoot}."/etc/log.conf" );   
+ 		#Log::Log4perl->init( $WebGUI::Session::session{config}{webguiRoot}."/etc/log.conf" );   
+ 		Log::Log4perl->init( "/data/WebGUI/etc/log.conf" );   
 	}
 	return Log::Log4perl->get_logger($WebGUI::Session::session{config}{configFile});
 }
@@ -232,7 +233,7 @@ sub getSessionVars {
 				} elsif (ref $value eq 'HASH') {
 					$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
 				}
-				unless (lc($key) eq "password" || lc($key) eq "identifier") {
+				unless (lc($key) eq "password" || lc($key) eq "identifier" || lc($key) eq "dbpass") {
 					$data .= "\t".$section.'.'.$key.' = '.$value."\n";
 				}
 			}
