@@ -16,19 +16,13 @@ use WebGUI::Asset::Template;
 use WebGUI::Operation::Auth;
 use WebGUI::DateTime;
 use WebGUI::ErrorHandler;
-use WebGUI::FormProcessor;
-use WebGUI::Form::DynamicField;
 use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Macro;
-use WebGUI::Mail;
-use WebGUI::MessageLog;
 use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::ProfileField;
@@ -83,7 +77,7 @@ sub validateProfileData {
 	my $warning = "";
 	foreach my $field (@{WebGUI::ProfileField->getEditableFields}) {
 		$data{$field->getId} = $field->formProcess;
-		if ($field->get("required") && !$data{$field->getId}) {
+		if ($field->isRequired && !$data{$field->getId}) {
 			$error .= '<li>'.$field->getLabel.' '.WebGUI::International::get(451).'</li>';
 		} elsif ($field->getId eq "email" && isDuplicateEmail($data{$field->getId})) {
 			$warning .= '<li>'.WebGUI::International::get(1072).'</li>';
@@ -105,12 +99,14 @@ sub www_editProfile {
 	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session{user}{userId}});
 	my @array = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+		next unless $category->isEditable;
 		my @temp = ();
 		foreach my $field (@{$category->getFields}) {
+			next unless ($field->isEditable);
 			push(@temp, {
 				'profile.form.element' => $field->formField,
 				'profile.form.element.label' => $field->getLabel,
-				'profile.form.element.subtext' => $field->get("required") ? "*" : undef
+				'profile.form.element.subtext' => $field->isRequired ? "*" : undef
 				});
 		}
 		push(@array, {

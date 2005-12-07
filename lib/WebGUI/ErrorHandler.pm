@@ -178,7 +178,7 @@ sub fatal {
 	Apache2::RequestUtil->request->content_type('text/html') if ($WebGUI::Session::session{req});
 	$logger->fatal($message);
 	$logger->debug("Stack trace for FATAL ".$message."\n".getStackTrace());
-        unless ($WebGUI::Session::session{setting}{showDebug}) {
+        unless (canShowDebug()) {
 		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.                
 		print "<h1>Problem With Request</h1>                        
 			We have encountered a problem with your request. Please use your back button and try again.                         
@@ -189,7 +189,7 @@ sub fatal {
         } else {
 	        print "<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n"; 
 		print "<p>".$message."</p>\n";
-		print showDebug() if (canShowDebug());
+		print showDebug();
 	}
 	WebGUI::Session::close();
         exit;
@@ -206,8 +206,7 @@ Returns a reference to the logger.
 
 sub getLogger {
 	unless (Log::Log4perl->initialized()) {
- 		#Log::Log4perl->init( $WebGUI::Session::session{config}{webguiRoot}."/etc/log.conf" );   
- 		Log::Log4perl->init( "/data/WebGUI/etc/log.conf" );   
+ 		Log::Log4perl->init( $WebGUI::Session::session{config}{webguiRoot}."/etc/log.conf" );   
 	}
 	return Log::Log4perl->get_logger($WebGUI::Session::session{config}{configFile});
 }

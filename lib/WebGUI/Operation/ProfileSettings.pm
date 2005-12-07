@@ -16,12 +16,9 @@ use WebGUI::AdminConsole;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::Icon;
-use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::Operation::Shared;
 use WebGUI::Form::FieldType;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
@@ -54,30 +51,26 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_deleteProfileCategoryConfirm {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        return WebGUI::AdminConsole->new("userProfiling")->render(WebGUI::Privilege::vitalComponent()) if (length($session{form}{cid}) != 22 &&  $session{form}{cid} < 1000 && $session{form}{cid} > 0);
-	
-	WebGUI::SQL->write("delete from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
-	WebGUI::SQL->write("update userProfileField set profileCategoryId='1' where profileCategoryId=".quote($session{form}{cid}));
+	my $category = WebGUI::ProfileCategory->new($session{form}{cid});
+        return WebGUI::AdminConsole->new("userProfiling")->render(WebGUI::Privilege::vitalComponent()) if ($category->isProtected);
+	$category->delete;	
         return www_editProfileSettings();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteProfileFieldConfirm {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($protected);
-	($protected) = WebGUI::SQL->quickArray("select protected from userProfileField where fieldname=".quote($session{form}{fid}));
-        return WebGUI::AdminConsole->new("userProfiling")->render(WebGUI::Privilege::vitalComponent()) if ($protected);
-	WebGUI::SQL->write("delete from userProfileField where fieldName=".quote($session{form}{fid}));
-	WebGUI::SQL->write("delete from userProfileData where fieldName=".quote($session{form}{fid}));
+	my $field = WebGUI::ProfileField->new($session{form}{fid});
+        return WebGUI::AdminConsole->new("userProfiling")->render(WebGUI::Privilege::vitalComponent()) if ($field->isProtected);
+	$field->delete;
         return www_editProfileSettings(); 
 }
 
 #-------------------------------------------------------------------
 sub www_editProfileCategory {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($output, $f, %data);
-	tie %data, 'Tie::CPHash';
-	$f = WebGUI::HTMLForm->new;
+	my $data = {};
+	my $f = WebGUI::HTMLForm->new;
 	$f->hidden(
 		-name => "op",
 		-value => "editProfileCategorySave",
@@ -91,7 +84,7 @@ sub www_editProfileCategory {
 			-name => $session{form}{cid},
 			-label => WebGUI::International::get(469,"WebGUIProfile"),
 		);
-		%data = WebGUI::SQL->quickHash("select * from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
+		$data = WebGUI::ProfileCategory->new($session{form}{cid})->get;
 	} else {
                 $f->hidden(
 			-name => "cid",
@@ -99,55 +92,53 @@ sub www_editProfileCategory {
 		);
 	}
 	$f->text(
-		-name => "categoryName",
+		-name => "label",
 		-label => WebGUI::International::get(470,"WebGUIProfile"),
 		-hoverHelp => WebGUI::International::get('470 description',"WebGUIProfile"),
-		-value => $data{categoryName},
+		-value => $data->{label},
 	);
 	$f->yesNo(
                 -name=>"visible",
                 -label=>WebGUI::International::get(473,"WebGUIProfile"),
                 -hoverHelp=>WebGUI::International::get('473 description',"WebGUIProfile"),
-                -value=>$data{visible}
+                -value=>$data->{visible}
                 );
 	$f->yesNo(
 		-name=>"editable",
-		-value=>$data{editable},
+		-value=>$data->{editable},
 		-label=>WebGUI::International::get(897,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('897 description',"WebGUIProfile"),
 		);
 	$f->submit;
-	$output .= $f->print;
-	return _submenu($output,'468','user profile category add/edit','WebGUIProfile');
+	return _submenu($f->print,'468','user profile category add/edit','WebGUIProfile');
 }
 
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($sequenceNumber, $test);
-	$session{form}{categoryName} = 'Unamed' if ($session{form}{categoryName} eq "" || $session{form}{categoryName} eq "''");
+	my %data = {
+		label=>WebGUI::FormProcessor::text("label"),
+		visible=>WebGUI::FormProcessor::yesNo("visible"),
+		editable=>WebGUI::FormProcessor::yesNo("editable"),
+		};
 	if ($session{form}{cid} eq "new") {
-		$session{form}{cid} = WebGUI::Id::generate();
-		($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
-		WebGUI::SQL->write("insert into userProfileCategory (profileCategoryId,sequenceNumber) values (".quote($session{form}{cid}).", "
-			.($sequenceNumber+1).")");
+		my $category = WebGUI::ProfileCategory->create(\%data);
+		$session{form}{cid} = $category->getId;
+	} else {
+		WebGUI::ProfileCategory->new($session{form}{cid})->set(\%data);
 	}
-	WebGUI::SQL->write("update userProfileCategory set categoryName=".quote($session{form}{categoryName}).", 
-		editable=".$session{form}{editable}.", visible=".$session{form}{visible}." 
-		where profileCategoryId=".quote($session{form}{cid}));
 	return www_editProfileSettings();
 }
 
 #-------------------------------------------------------------------
 sub www_editProfileField {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($output, $f, %data, %hash, $key);
-	tie %data, 'Tie::CPHash';
-        $f = WebGUI::HTMLForm->new;
+        my $f = WebGUI::HTMLForm->new;
         $f->hidden(
 		-name => "op",
 		-value => "editProfileFieldSave",
         );
+	my $data = {};
 	if ($session{form}{fid} ne 'new') {
               	$f->hidden(
 			-name => "fid",
@@ -158,7 +149,7 @@ sub www_editProfileField {
 			-label => WebGUI::International::get(475,"WebGUIProfile"),
 			-hoverHelp => WebGUI::International::get('475 description',"WebGUIProfile"),
 		);
-		%data = WebGUI::SQL->quickHash("select * from userProfileField where fieldName=".quote($session{form}{fid}));
+		$data = WebGUI::ProfileField->new($session{form}{fid})->get;
 	} else {
                	$f->hidden(
 			-name => "new",
@@ -171,20 +162,20 @@ sub www_editProfileField {
                	);
 	}
 	$f->text(
-		-name => "fieldLabel",
+		-name => "label",
 		-label => WebGUI::International::get(472,"WebGUIProfile"),
 		-hoverHelp => WebGUI::International::get('472 description',"WebGUIProfile"),
-		-value => $data{fieldLabel},
+		-value => $data->{label},
 	);
 	$f->yesNo(
 		-name=>"visible",
 		-label=>WebGUI::International::get(473,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('473 description',"WebGUIProfile"),
-		-value=>$data{visible}
+		-value=>$data->{visible}
 		);
 	$f->yesNo(
                 -name=>"editable",
-                -value=>$data{editable},
+                -value=>$data->{editable},
                 -label=>WebGUI::International::get(897,"WebGUIProfile"),
                 -hoverHelp=>WebGUI::International::get('897 description',"WebGUIProfile"),
                 );
@@ -192,14 +183,13 @@ sub www_editProfileField {
 		-name=>"required",
 		-label=>WebGUI::International::get(474,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('474 description',"WebGUIProfile"),
-		-value=>$data{required}
+		-value=>$data->{required}
 		);
-	#WebGUI::ErrorHandler::warn("type=".$data{dataType});
 	my $fieldType = WebGUI::Form::FieldType->new(
 		-name=>"dataType",
 		-label=>WebGUI::International::get(486,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('486 description',"WebGUIProfile"),
-		-value=>ucfirst $data{dataType},
+		-value=>ucfirst $data->{fieldType},
 		-defaultValue=>"Text",
 	);
 	my @profileForms = ();
@@ -217,160 +207,99 @@ sub www_editProfileField {
 		-name => "dataValues",
 		-label => WebGUI::International::get(487,"WebGUIProfile"),
 		-hoverHelp => WebGUI::International::get('487 description',"WebGUIProfile"),
-		-value => $data{dataValues},
+		-value => $data->{possibleValues},
 	);
 	$f->textarea(
 		-name => "dataDefault",
 		-label => WebGUI::International::get(488,"WebGUIProfile"),
 		-hoverHelp => WebGUI::International::get('488 description',"WebGUIProfile"),
-		-value => $data{dataDefault},
+		-value => $data->{dataDefault},
 	);
-	tie %hash, 'Tie::CPHash';
-	%hash = WebGUI::SQL->buildHash("select profileCategoryId,categoryName from userProfileCategory order by categoryName");
-	foreach $key (keys %hash) {
-		$hash{$key} = WebGUI::Operation::Shared::secureEval($hash{$key});
+	my %hash;
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+		$hash{$category->getId} = $category->getLabel;
 	}
 	$f->selectBox(
 		-name=>"profileCategoryId",
 		-options=>\%hash,
 		-label=>WebGUI::International::get(489,"WebGUIProfile"),
 		-hoverHelp=>WebGUI::International::get('489 description',"WebGUIProfile"),
-		-value=>[$data{profileCategoryId}]
+		-value=>$data->{profileCategoryId}
 		);
         $f->submit;
-        $output .= $f->print;
-	return _submenu($output,'471','profile settings edit',"WebGUIProfile");
+	return _submenu($f->print,'471','profile settings edit',"WebGUIProfile");
 }
 
 #-------------------------------------------------------------------
 sub www_editProfileFieldSave {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($sequenceNumber, $fieldName, $test);
-        $session{form}{fieldLabel} = 'Unamed' if ($session{form}{fieldLabel} eq "" || $session{form}{fieldLabel} eq "''");
-	if ($session{form}{dataDefault} && $session{form}{dataType}=~/List$/) {
-                unless ($session{form}{dataDefault} =~ /^\[/) {
-                        $session{form}{dataDefault} = "[".$session{form}{dataDefault};
-                }
-                unless ($session{form}{dataDefault} =~ /\]$/) {
-                        $session{form}{dataDefault} .= "]";
-                }
-        }
+	my %data = (
+		label=>WebGUI::FormProcessor::text("label"),
+		editable=>WebGUI::FormProcessor::yesNo("editable"),
+		visible=>WebGUI::FormProcessor::yesNo("visible"),
+		required=>WebGUI::FormProcessor::yesNo("required"),
+		possibleValues=>WebGUI::FormProcessor::textarea("possibleValues"),
+		dataDefault=>WebGUI::FormProcessor::textarea("dataDefault"),
+		fieldType=>WebGUI::FormProcessor::fieldType("fieldType"),
+		);
 	if ($session{form}{new}) {
-		($fieldName) = WebGUI::SQL->quickArray("select count(*) from userProfileField 
-			where fieldName=".quote($session{form}{fid}));
-		if ($fieldName) {
-			$session{form}{fid} .= '2';	
-		}
-		($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) 
-			from userProfileField where profileCategoryId=".quote($session{form}{profileCategoryId}));
-		WebGUI::SQL->write("insert into userProfileField (fieldName, sequenceNumber, protected)
-			values (".quote($session{form}{fid}).", ".($sequenceNumber+1).", 0)");
+		my $field = WebGUI::ProfileField->create(WebGUI::FormProcessor::text("fieldName"), \%data, WebGUI::FormProcessor::selectBox("profileCategoryId"));
+		$session{form}{fid} = $field->getId;
+	} else {
+		WebGUI::ProfileField->new($session{form}{fid})->set(\%data);
 	}
-	WebGUI::SQL->setRow("userProfileField","fieldName",{
-			fieldLabel=>$session{form}{fieldLabel},
-			visible=>$session{form}{visible},
-			required=>$session{form}{required},
-			editable=>$session{form}{editable},
-			dataType=>$session{form}{dataType},
-			dataValues=>$session{form}{dataValues},
-			dataDefault=>$session{form}{dataDefault},
-			profileCategoryId=>$session{form}{profileCategoryId},
-			fieldName=>$session{form}{fid}
-			});
 	return www_editProfileSettings();
 }
 
 #-------------------------------------------------------------------
 sub www_editProfileSettings {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my ($output, $a, %category, %field, $b);
-	tie %category, 'Tie::CPHash';
-	tie %field, 'Tie::CPHash';
-	$a = WebGUI::SQL->read("select * from userProfileCategory order by sequenceNumber");
-	while (%category = $a->hash) {
-		$output .= deleteIcon('op=deleteProfileCategoryConfirm;cid='.$category{profileCategoryId},'',WebGUI::International::get(466,"WebGUIProfile")); 
-		$output .= editIcon('op=editProfileCategory;cid='.$category{profileCategoryId}); 
-		$output .= moveUpIcon('op=moveProfileCategoryUp;cid='.$category{profileCategoryId}); 
-		$output .= moveDownIcon('op=moveProfileCategoryDown;cid='.$category{profileCategoryId}); 
-		$output .= ' <b>';
-		$output .= WebGUI::Operation::Shared::secureEval($category{categoryName});
-		$output .= '</b><br />';
-		$b = WebGUI::SQL->read("select * from userProfileField where 
-			profileCategoryId=".quote($category{profileCategoryId})." order by sequenceNumber");
-		while (%field = $b->hash) {
+	my $output = "";
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+		$output .= deleteIcon('op=deleteProfileCategoryConfirm;cid='.$category->getId,'',WebGUI::International::get(466,"WebGUIProfile")); 
+		$output .= editIcon('op=editProfileCategory;cid='.$category->getId); 
+		$output .= moveUpIcon('op=moveProfileCategoryUp;cid='.$category->getId); 
+		$output .= moveDownIcon('op=moveProfileCategoryDown;cid='.$category->getId); 
+		$output .= ' <b>'.$category->getLabel.'</b><br />';
+		foreach my $field ($category->getFields) {
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        $output .= deleteIcon('op=deleteProfileFieldConfirm;fid='.$field{fieldName},'',WebGUI::International::get(467,"WebGUIProfile"));
-       	                $output .= editIcon('op=editProfileField;fid='.$field{fieldName});
-               	        $output .= moveUpIcon('op=moveProfileFieldUp;fid='.$field{fieldName});
-                       	$output .= moveDownIcon('op=moveProfileFieldDown;fid='.$field{fieldName});
-                       	$output .= ' ';
-			$output .= WebGUI::Operation::Shared::secureEval($field{fieldLabel});
-			$output .= '<br />';
+                        $output .= deleteIcon('op=deleteProfileFieldConfirm;fid='.$field->getId,'',WebGUI::International::get(467,"WebGUIProfile"));
+       	                $output .= editIcon('op=editProfileField;fid='.$field->getId);
+               	        $output .= moveUpIcon('op=moveProfileFieldUp;fid='.$field->getId);
+                       	$output .= moveDownIcon('op=moveProfileFieldDown;fid='.$field->getId);
+                       	$output .= ' '.$field->getLabel.'<br />';
 		}
-		$b->finish;
 	}
-	$a->finish;
 	return _submenu($output,undef,"profile settings edit",'WebGUIProfile');
 }
 
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryDown {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($id, $thisSeq);
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
-        ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq+1");
-        if ($id ne "") {
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($session{form}{cid}));
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($id));
-                _reorderCategories();
-        }
+	WebGUI::ProfileCategory->new($session{form}{cid})->moveDown;
         return www_editProfileSettings();
 }
 
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryUp {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($id, $thisSeq);
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($session{form}{cid}));
-        ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq-1");
-        if ($id ne "") {
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($session{form}{cid}));
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($id));
-                _reorderCategories();
-        }
+	WebGUI::ProfileCategory->new($session{form}{cid})->moveUp;
         return www_editProfileSettings();
 }
 
 #-------------------------------------------------------------------
 sub www_moveProfileFieldDown {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($id, $thisSeq, $profileCategoryId);
-        ($thisSeq,$profileCategoryId) = WebGUI::SQL->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".quote($session{form}{fid}));
-        ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=".quote($profileCategoryId)." and sequenceNumber=$thisSeq+1");
-        if ($id ne "") {
-                WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".quote($session{form}{fid}));
-                WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".quote($id));
-                _reorderFields($profileCategoryId);
-        }
+	WebGUI::ProfileField->new($session{form}{fid})->moveDown;
         return www_editProfileSettings();
 }
 
 #-------------------------------------------------------------------
 sub www_moveProfileFieldUp {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        my ($id, $thisSeq, $profileCategoryId);
-        ($thisSeq,$profileCategoryId) = WebGUI::SQL->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".quote($session{form}{fid}));
-        ($id) = WebGUI::SQL->quickArray("select fieldName from userProfileField where profileCategoryId=".quote($profileCategoryId)." and sequenceNumber=$thisSeq-1");
-        if ($id ne "") {
-                WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".quote($session{form}{fid}));
-                WebGUI::SQL->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".quote($id));
-                _reorderFields($profileCategoryId);
-        }
+	WebGUI::ProfileField->new($session{form}{fid})->moveUp;
         return www_editProfileSettings();
 }
-
-
-
 
 
 1;

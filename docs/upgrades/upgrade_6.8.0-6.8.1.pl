@@ -37,6 +37,8 @@ sub updateProfileSystem {
 	WebGUI::SQL->write("alter table userProfileField change dataType fieldType varchar(128) not null default 'text'");
 	WebGUI::SQL->write("alter table userProfileField change dataValues possibleValues text");
 	WebGUI::SQL->write("alter table userProfileCategory change categoryName label varchar(255) not null default 'Undefined'");
+	WebGUI::SQL->write("alter table userProfileCategory add column protected int not null default 0");
+	WebGUI::SQL->write("update userProfileCategory set protected=1 where profileCategoryId in ('1','2','3','4','5','6','7')");
 }
 
 #-------------------------------------------------

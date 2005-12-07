@@ -173,6 +173,47 @@ sub getLabel {
 
 #-------------------------------------------------------------------
 
+=head2 isEditable ()
+
+Returns a boolean indicating whether the category's fields may be edited by a user.
+
+=cut
+
+sub isEditable {
+	my $self = shift;
+	return $self->get("editable");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isProtected ()
+
+Returns a boolean indicating whether the category may be deleted.
+
+=cut
+
+sub isProtected {
+	my $self = shift;
+	return $self->get("protected");
+}
+
+#-------------------------------------------------------------------
+
+=head2 isViewable ()
+
+Returns a boolean indicating whether the category's fields may be viewed by a user.
+
+=cut
+
+sub isViewable {
+	my $self = shift;
+	return $self->get("viewable");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 moveDown ()
 
 Moves this category down one position.
@@ -254,6 +295,10 @@ A boolean indicating whether the fields in this category should be visible when 
 
 A boolean indicating whether the user can edit the fields under this category.
 
+=head4 protected
+
+A boolean indicating whether the category can be deleted.
+
 =cut
 
 sub set {
@@ -261,6 +306,7 @@ sub set {
 	my $properties = shift;
 	$properties->{visible} = 0 unless ($properties->{visible} == 1);
 	$properties->{editable} = 0 unless ($properties->{editable} == 1);
+	$properties->{protected} = 0 unless ($properties->{protected} == 1);
 	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
 	$properties->{profileCategoryId} = $self->getId;
 	WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",$properties);

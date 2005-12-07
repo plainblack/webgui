@@ -279,6 +279,59 @@ sub getRequiredFields {
 
 #-------------------------------------------------------------------
 
+=head2 isEditable ()
+
+Returns a boolean indicating whether this field may be editable by a user.
+
+=cut
+
+sub isEditable {
+        my $self = shift;
+        return $self->get("editable") || $self->isRequired;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isProtected ()
+
+Returns a boolean indicating whether this field may be deleted.
+
+=cut
+
+sub isProtected {
+        my $self = shift;
+        return $self->get("protected");
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRequired ()
+
+Returns a boolean indicating whether this field is required when a user creates an account or updates their account.
+
+=cut
+
+sub isRequired {
+        my $self = shift;
+        return $self->get("required");
+}
+
+#-------------------------------------------------------------------
+
+=head2 isViewable ()
+
+Returns a boolean indicating whether this field may be viewed by a user.
+
+=cut
+
+sub isViewable {
+        my $self = shift;
+        return $self->get("viewable");
+}
+
+#-------------------------------------------------------------------
+
 =head2 moveDown ()
 
 Moves this field down one position within it's category.
