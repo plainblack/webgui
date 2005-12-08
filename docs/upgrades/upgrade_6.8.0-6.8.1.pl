@@ -67,8 +67,8 @@ sub convertDashboardPrefs {
 	#purge all Fields.
 	my $a = WebGUI::SQL->read("select assetId from asset where className='WebGUI::Asset::Field'");
 	while (my ($assetId) = $a->array) {
-		WebGUI::SQL->write("delete from asset where assetId=.quote($assetId)");
-		WebGUI::SQL->write("delete from assetData where assetId=.quote($assetId)");
+		WebGUI::SQL->write("delete from asset where assetId=".quote($assetId));
+		WebGUI::SQL->write("delete from assetData where assetId=".quote($assetId));
 	}
 	unlink("../../lib/WebGUI/Asset/Field.pm");
 	WebGUI::SQL->write("DROP TABLE `wgField`");
