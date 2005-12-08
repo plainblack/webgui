@@ -1,4 +1,6 @@
 6.8.1
+ - fix [ 1364965 ] Assets in Trash give Permission Denied in stead of Not
+   Found
  - Removed duplicate processing of metadata.
  - fix [ 1373649 ] Username isn't populated in 6.8.0 Discussions
  - fix [ 1373707 ] File Pile not uploading images

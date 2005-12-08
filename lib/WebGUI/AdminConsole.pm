@@ -187,7 +187,7 @@ sub getAdminFunction {
 			},
 			icon=>"trash.gif",
 			func=>"manageTrash",
-			group=>"4"
+			group=>"12"
 		},
 		"databases"=>{
 			title=>{

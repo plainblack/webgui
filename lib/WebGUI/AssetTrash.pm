@@ -185,7 +185,7 @@ Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is Fal
 sub www_manageTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("trash");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my ($header, $limit);
         $ac->setHelp("trash manage");
 	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {

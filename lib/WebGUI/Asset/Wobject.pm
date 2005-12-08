@@ -574,7 +574,20 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 sub www_view {
 	my $self = shift;
 	my $disableCache = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
+	unless ($self->canView) {
+		if ($self->get("state") eq "published") { # no privileges, make em log in
+			return WebGUI::Privilege::noAccess();
+		} elsif ($session{var}{adminOn} && $self->get("state") =~ /^trash/) { # show em trash
+			WebGUI::HTTP::setRedirect($self->getUrl("func=manageTrash"));
+			return "";
+		} elsif ($session{var}{adminOn} && $self->get("state") =~ /^clipboard/) { # show em clipboard
+			WebGUI::HTTP::setRedirect($self->getUrl("func=manageClipboard"));
+			return "";
+		} else { # tell em it doesn't exist anymore
+			WebGUI::HTTP::setStatus("410");
+			return WebGUI::Asset->getNotFound->www_view;
+		}
+	}
 	if ($self->get("encryptPage") && $session{env}{HTTPS} ne "on") {
                 WebGUI::HTTP::setRedirect($self->getUrl);
                 return "";
