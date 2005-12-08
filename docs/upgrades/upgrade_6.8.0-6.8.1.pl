@@ -27,9 +27,16 @@ fixCSFaqTemplateAnchors();
 updateProfileSystem();
 convertDashboardPrefs();
 fixPosts();
+fixIOB();
 
 finish(); # this line required
 
+
+#-------------------------------------------------
+sub fixIOB  {
+	print "\tFixing IOB.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table InOutBoard_statusLog add column createdBy varchar(22) binary");
+}
 
 #-------------------------------------------------
 sub fixPosts {

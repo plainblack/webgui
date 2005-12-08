@@ -229,12 +229,14 @@ InOutBoard_status.status,
 InOutBoard_status.dateStamp, 
 c.fieldData as department, 
 groupings.groupId
-from users, InOutBoard, groupings
+from users 
+left join groupings on  groupings.userId=users.userId
+left join InOutBoard on groupings.groupId=InOutBoard.inOutGroup
 left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
 left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
 left join userProfileData c on users.userId=c.userId and c.fieldName='department'
 left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=".quote($self->getId())."
-where users.userId<>'1' and groupings.groupId=InOutBoard.inOutGroup and groupings.userId=users.userId and InOutBoard.inOutGroup=".quote($self->get("inOutGroup"))."
+where users.userId<>'1' and InOutBoard.inOutGroup=".quote($self->get("inOutGroup"))."
 group by userId
 order by department, lastName, firstName";
 
@@ -447,7 +449,8 @@ InOutBoard_statusLog.dateStamp,
 InOutBoard_statusLog.createdBy, 
 c.fieldData as department,
 groupings.groupId
-from users, InOutBoard, groupings
+from users
+left join groupings on groupings.userId=users.userId
 left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
 left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
 left join userProfileData c on users.userId=c.userId and c.fieldName='department'
