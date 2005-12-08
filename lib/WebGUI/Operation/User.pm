@@ -278,6 +278,7 @@ sub www_editUser {
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
 		$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category->getLabel.'</td></tr>');
 		foreach my $field (@{$category->getFields}) {
+			next if $field->getId =~ /contentPositions/;
 			$tabform->getTab("profile")->raw($field->formField(undef,1));
 		}
 	}
@@ -337,6 +338,7 @@ sub www_editUserSave {
 	      		$authInstance->editUserFormSave;
        		}
 		foreach my $field (@{WebGUI::ProfileField->getFields}) {
+			next if $field->getId =~ /contentPositions/;
 			$u->profileField($field->getId,$field->formProcess);
 		}
 		my @groups = WebGUI::FormProcessor::group("groupsToAdd");

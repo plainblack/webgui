@@ -75,7 +75,7 @@ Generates an HTTP header.
 =cut
 
 sub getHeader {
-	return undef if ($session{http}{noHeader});	
+	return undef if ($session{http}{noHeader});
 	my %params;
 	if (isRedirect()) {
 		$session{req}->headers_out->set(Location => $session{http}{location});
@@ -83,16 +83,14 @@ sub getHeader {
 	} else {
 		$session{req}->content_type($session{http}{mimetype} || "text/html");
 		if ($session{setting}{preventProxyCache}) {
-       	        	$params{"-expires"} = "-1d";
-       	 	}
+			$params{"-expires"} = "-1d";
+		}
 		if ($session{http}{filename}) {
 			$params{"-attachment"} = $session{http}{filename};
 		}
 	}
 	$params{"-cookie"} = $session{http}{cookie};
-	my $status = getStatus();
-        # $session{req}->custom_response($status, '<!-- '.$session{http}{statusDescription}.' -->' );
-        $session{req}->status($status);
+	$session{req}->status_line(getStatus().' '.$session{http}{statusDescription}) if $session{req};
 	return;
 }
 
@@ -119,6 +117,7 @@ Returns the current HTTP status code, if one has been set.
 =cut
 
 sub getStatus {
+	$session{http}{statusDescription} = $session{http}{statusDescription} || "OK";
 	return $session{http}{status} || "200";
 }
 

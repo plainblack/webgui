@@ -11,9 +11,13 @@ package WebGUI::Asset::Shortcut;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Icon;
 use WebGUI::International;
+use WebGUI::Operation::Profile;
+use WebGUI::ProfileField;
+use WebGUI::ProfileCategory;
 use WebGUI::Macro;
 use WebGUI::Privilege;
 use WebGUI::Session;
@@ -123,19 +127,6 @@ sub _drawQueryBuilder {
 	return $output;
 }
 
-sub parseOverride {
-	my $self = shift;
-	my $value = shift;
-	my @userPrefs = $self->getUserPrefs;
-	foreach my $field (@userPrefs) {
-		my $id = $field->getId;
-		my $fieldName = $field->getFieldName;
-		use WebGUI::Asset::Field;
-		my $fieldValue = WebGUI::Asset::Field->getUserPref($id);
-		$value =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/g;
-	}
-}
-
 #-------------------------------------------------------------------
 sub _submenu {
 	my $self = shift;
@@ -147,14 +138,13 @@ sub _submenu {
 	$ac->setIcon($self->getIcon);
 	$ac->addSubmenuItem($self->getUrl('func=edit'), WebGUI::International::get("Back to Edit Shortcut","Asset_Shortcut"));
 	$ac->addSubmenuItem($self->getUrl("func=manageOverrides"),WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
-	$ac->addSubmenuItem($self->getUrl("func=manageUserPrefs"),WebGUI::International::get("Manage User Preferences","Asset_Shortcut"));
 	return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-return 1 if ($self->SUPER::canEdit || (ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard' && $self->getParent->canManage));
+return 1 if ($self->SUPER::canEdit || ($self->isDashlet && $self->getParent->canManage));
 	return 0;
 }
 
@@ -166,69 +156,61 @@ sub canManage {
 
 #-------------------------------------------------------------------
 sub definition {
-        my $class = shift;
-        my $definition = shift;
-        push(@{$definition}, {
+	my $class = shift;
+	my $definition = shift;
+	push(@{$definition}, {
 		assetName=>WebGUI::International::get('assetName',"Asset_Shortcut"),
 		icon=>'shortcut.gif',
-                tableName=>'Shortcut',
-                className=>'WebGUI::Asset::Shortcut',
-                properties=>{
-                        shortcutToAssetId=>{
+		tableName=>'Shortcut',
+		className=>'WebGUI::Asset::Shortcut',
+		properties=>{
+			shortcutToAssetId=>{
 				noFormPost=>1,
 				fieldType=>"hidden",
 				defaultValue=>undef
-				},
-#			overrideTitle=>{
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			overrideTemplate=>{
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			overrideDisplayTitle=>{
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			overrideDescription=>{
-#				fieldType=>"yesNo",
-#				defaultValue=>0
-#				},
-#			overrideTemplateId=>{
-#				fieldType=>"template",
-#				defaultValue=>undef
-#				},
+			},
 			shortcutByCriteria=>{
 				fieldType=>"yesNo",
 				defaultValue=>0,
-				},
+			},
 			disableContentLock=>{
 				fieldType=>"yesNo",
 				defaultValue=>0
-				},
+			},
 			resolveMultiples=>{
 				fieldType=>"selectBox",
 				defaultValue=>"mostRecent",
-				},
+			},
 			shortcutCriteria=>{
 				fieldType=>"textarea",
 				defaultValue=>"",
-				},
+			},
 			templateId=>{
 				fieldType=>"template",
 				defaultValue=>"PBtmpl0000000000000140"
-				},
+			},
 			description=>{
 				fieldType=>"HTMLArea",
 				defaultValue=>undef
 			},
+			prefFieldsToShow=>{
+				fieldType=>"checkList",
+				defaultValue=>undef
+			},
+			prefFieldsToImport=>{
+				fieldType=>"checkList",
+				defaultValue=>undef
+			}
 		}
 	});
 	return $class->SUPER::definition($definition);
 }
 
-
+#-------------------------------------------------------------------
+sub discernUserId {
+	my $self = shift;
+	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $session{user}{userId};
+}
 
 #-------------------------------------------------------------------
 sub getEditForm {
@@ -291,6 +273,10 @@ sub getEditForm {
 	}
 	$tabform->addTab('overrides',$i18n->get('Overrides'));
 	$tabform->getTab('overrides')->raw($self->getOverridesList);
+	if ($self->isDashlet) {
+		$tabform->addTab('preferences',$i18n->get('Preferences'));
+		$tabform->getTab('preferences')->raw($self->getFieldsList);
+	}
 	return $tabform;
 }
 
@@ -312,22 +298,37 @@ sub getExtraHeadTags {
 sub getFieldsList {
 	my $self = shift;
 	my $i18n = WebGUI::International->new("Asset_Shortcut");
-	my $output = '<a href="'.$self->getUrl('func=add;class=WebGUI::Asset::Field').'" class="formLink">'.$i18n->get('Add Preference Field').'</a><br /><br />';
-	my @fielden;
-	@fielden = $self->getUserPrefs;
-	return $output unless scalar @fielden > 0;
-	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
-	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td></tr>';
-	foreach my $field (@fielden) {
-		$output .= '<tr>';
-		$output .= '<td class="tableData"><a href="'.$field->getUrl('func=edit').'">'.$field->get("fieldName").'</a></td>';
-		$output .= '<td class="tableData">';
-		$output .= editIcon('func=edit',$field->getUrl());
-		$output .= deleteIcon('func=delete',$field->getUrl());
-		$output .= '</td>';
-		$output .= '</tr>';
+	my $output = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
+	my %fieldNames;
+	tie %fieldNames, 'Tie::IxHash';
+	foreach my $field (@{WebGUI::ProfileField->getFields}) {
+		my $fieldId = $field->getId;
+		next if $fieldId =~ /contentPositions/;
+		$fieldNames{$fieldId} = $field->getLabel.' ['.$fieldId.']';
 	}
-	$output .= '</table>';
+	$output .= '<table cellspacing="0" cellpadding="3" border="1"><tr><td><table cellspacing="0" cellpadding="3" border="0">';
+	my @prefFieldsToShow = split("\n",$self->getValue("prefFieldsToShow"));
+	$output .= WebGUI::Form::CheckList->new(
+		-name=>"prefFieldsToShow",
+		-value=>\@prefFieldsToShow,
+		-options=>\%fieldNames,
+		-label=>$i18n->get('pref fields to show'),
+		-hoverHelp=>$i18n->get('pref fields to show description'),
+		-vertical=>1,
+		-uiLevel=>9
+	)->toHtmlWithWrapper;
+	$output .= '</table></td><td><table cellspacing="0" cellpadding="3" border="0">';
+	my @prefFieldsToImport = split("\n",$self->getValue("prefFieldsToImport"));
+	$output .= WebGUI::Form::CheckList->new(
+		-name=>"prefFieldsToImport",
+		-value=>\@prefFieldsToImport,
+		-options=>\%fieldNames,
+		-label=>$i18n->get('pref fields to import'),
+		-hoverHelp=>$i18n->get('pref fields to import description'),
+		-vertical=>1,
+		-uiLevel=>9
+	)->toHtmlWithWrapper;
+	$output .= '</table></td></tr></table>';
 	return $output;
 }
 
@@ -387,16 +388,20 @@ sub getOverrides {
 			$overrides{overrides}{$fieldName}{parsedValue} = $newValue;
 		}
 		$sth->finish;
-		my @userPrefs = $self->getUserPrefs;
-		foreach my $field (@userPrefs) {
-			my $id = $field->getId;
-			my $fieldName = $field->getFieldName;
-			my $fieldValue = $field->getUserPref($id);
-			$overrides{userPrefs}{$fieldName}{value} = $fieldValue;
-			$overrides{overrides}{$fieldName}{parsedValue} = $fieldValue;
-			#  'myTemplateId is ##userPref:myTemplateId##', for example.
-			foreach my $overr (keys %{$overrides{overrides}}) {
-				$overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
+		if ($self->isDashlet) {
+			my $u = WebGUI::User->new($self->discernUserId);
+			my @userPrefs = $self->getPrefFieldsToImport;
+			foreach my $fieldId (@userPrefs) {
+				my $field = WebGUI::ProfileField->new($fieldId);
+				next unless $field;
+				my $fieldName = $field->getId;
+				my $fieldValue = $u->profileField($field->getId);
+				$overrides{userPrefs}{$fieldName}{value} = $fieldValue;
+				$overrides{overrides}{$fieldName}{parsedValue} = $fieldValue;
+				#  'myTemplateId is ##userPref:myTemplateId##', for example.
+				foreach my $overr (keys %{$overrides{overrides}}) {
+					$overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
+				}
 			}
 		}
 		$cache->set(\%overrides, 60*60);
@@ -411,7 +416,7 @@ sub getShortcut {
 	unless ($self->{_shortcut}) {
 		$self->{_shortcut} = $self->getShortcutOriginal;
 	}
-	$self->{_shortcut}{_properties}{displayTitle} = undef if (ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard');
+	$self->{_shortcut}{_properties}{displayTitle} = undef if ($self->isDashlet);
 	# Hide title by default.  If you want, you can create an override
 	# to display it.  But it's being shown in the dragheader by default.
 	my %overhash = $self->getOverrides;
@@ -419,9 +424,6 @@ sub getShortcut {
 		my %overrides = %{$overhash{overrides}};
 		foreach my $override (keys %overrides) {
 			$self->{_shortcut}{_properties}{$override} = $overrides{$override}{parsedValue};
-		}
-		foreach my $userPref ($self->getUserPrefs) {
-			$self->{_shortcut}{_properties}{$userPref->getFieldName} = $userPref->getUserPref($userPref->getId) unless (exists $overrides{$userPref->getFieldName});
 		}
 	}
 	return $self->{_shortcut};
@@ -553,10 +555,22 @@ sub getShortcutOriginal {
 }
 
 #-------------------------------------------------------------------
-sub getUserPrefs {
+sub getPrefFieldsToShow {
 	my $self = shift;
-	my $bibibib = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Field"],returnObjects=>1});
-	return @$bibibib;
+	return split("\n",$self->getValue("prefFieldsToShow"));
+}
+
+#-------------------------------------------------------------------
+sub getPrefFieldsToImport {
+	my $self = shift;
+	return split("\n",$self->getValue("prefFieldsToImport"));
+}
+
+#-------------------------------------------------------------------
+sub isDashlet {
+	my $self = shift;
+	return 1 if ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard';
+	return 0;
 }
 
 #-------------------------------------------------------------------
@@ -565,21 +579,6 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	my $scratchId = "Shortcut_" . $self->getId;
 	WebGUI::Session::deleteAllScratch($scratchId);
-}
-
-#-------------------------------------------------------------------
-
-sub purge {
-	my $self = shift;
-	# delete and purge all associated FieldIds and their preferences.
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-
-sub purgeRevision {
-	my $self = shift;
-	return $self->SUPER::purgeRevision;
 }
 
 #-------------------------------------------------------------------
@@ -614,7 +613,6 @@ sub www_edit {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageUserPrefs"),WebGUI::International::get("Manage User Preferences","Asset_Shortcut"));
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
 }
 
@@ -622,41 +620,41 @@ sub www_edit {
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self = shift;
-	return 'nuhuh' unless $self->getParent->canPersonalize;
-	my @fielden = $self->getUserPrefs;
+	return 'You are no longer logged in' if $session{user}{userId} eq '1';
+	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
+	my $output;
+	my @fielden = $self->getPrefFieldsToShow;
 	my $f = WebGUI::HTMLForm->new(extras=>' onSubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
+	$f->raw('<table cellspacing="0" cellpadding="3" border="0">');
 	$f->hidden(  
 		-name => 'func', 
 		-value => 'saveUserPrefs'
 	);
-	foreach my $field (@fielden) {
-		my $fieldType = $field->get("fieldType") || "text";
-		my $options;
-		my $params = {name=>$field->getId,
-			label=>$field->get("fieldName"),
-			uiLevel=>5,
-			value=>$field->getUserPref($field->getId),
-			extras=>'',
-			possibleValues=>$field->get("possibleValues"),
-			options=>$options,
-			fieldType=>$fieldType
-		};
-		if (lc($fieldType) eq 'textarea') {
+	foreach my $fieldId (@fielden) {
+		my $field = WebGUI::ProfileField->new($fieldId);
+		next unless $field;
+		my $params = {};
+		if (lc($field->get("fieldType")) eq 'textarea') {
 			$params->{rows} = 4;
 			$params->{columns} = 20;
 		}
-		$f->dynamicField(%$params);
+		if (lc($field->get("fieldType")) eq 'text') {
+			$params->{size} = 20;
+		}
+		$f->raw($field->formField($params,1));
 	}
-	$f->submit;
-	return $f->print;
-}
-
-#-------------------------------------------------------------------
-sub www_manageUserPrefs {
-	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $output = $self->getFieldsList;
-	return $self->_submenu($output,WebGUI::International::get("Manage User Preferences","Asset_Shortcut"));
+	$f->submit({extras=>'className="nothing"'});
+	$f->raw('</table>');
+	my $tags;
+	foreach my $tag (@{$session{page}{head}{javascript}}) {
+		$tags .= '<script';
+		foreach my $name (keys %{$tag}) {
+			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
+		}
+		$tags .= '></script>'."\n";
+	}
+	$output .= $tags.$f->print;
+	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -687,11 +685,21 @@ sub www_deleteOverride {
 sub www_saveUserPrefs {
 	my $self = shift;
 	return '' unless $self->getParent->canPersonalize;
-	my @fellowFields = $self->getUserPrefs;
+	my @fellowFields = $self->getPrefFieldsToShow;
+	my %data = ();
+	$self->uncacheOverrides;
+	my $u = WebGUI::User->new($self->discernUserId);
 	foreach my $fieldId (keys %{$session{form}}) {
-		my $field = WebGUI::Asset->newByDynamicClass($fieldId);
+		my $field = WebGUI::ProfileField->new($fieldId);
 		next unless $field;
-		$field->setUserPref($fieldId,$session{form}{$fieldId});
+		$data{$field->getId} = $field->formProcess;
+		if ($field->getId eq 'email' && WebGUI::Operation::Profile::isDuplicateEmail($data{$field->getId})) {
+			return '<li>'.WebGUI::International::get(1072).'</li>';
+		}
+		if ($field->isRequired && !$data{$field->getId}) {
+			return '<li>'.$field->getLabel.' '.WebGUI::International::get(451).'</li>';
+		}
+		$u->profileField($field->getId,$data{$field->getId});
 	}
 	return $self->view;
 }
@@ -739,7 +747,7 @@ sub www_editOverride {
 		-value=>$overrides{overrides}{$fieldName}{newValue},
 		-hoverHelp=>$i18n->get("Place something in this box if you dont want to use the automatically generated field")
 	);
-	$f->readOnly(-label=>$i18n->get("Replacement Value"),-value=>$overrides{overrides}{$fieldName}{parsedValue},-hoverHelp=>$i18n->get("This is the example output of the field when parsed for user preference macros"));
+	$f->readOnly(-label=>$i18n->get("Replacement Value"),-value=>$overrides{overrides}{$fieldName}{parsedValue},-hoverHelp=>$i18n->get("This is the example output of the field when parsed for user preference macros")) if $self->isDashlet;
   $f->submit;
   $output .= $f->print;
 	return $self->_submenu($output,$i18n->get('Edit Override'));
@@ -768,7 +776,7 @@ sub www_saveOverride {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	if (ref($self->getParent) eq 'WebGUI::Asset::Wobject::Dashboard') {
+	if ($self->isDashlet) {
 		return WebGUI::Privilege::noAccess() unless $self->canView;
 		$session{asset} = $self->getParent;
 		return $session{asset}->www_view;

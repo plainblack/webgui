@@ -103,6 +103,7 @@ sub www_editProfile {
 		my @temp = ();
 		foreach my $field (@{$category->getFields}) {
 			next unless ($field->isEditable);
+			next if $field->getId =~ /contentPositions/;
 			push(@temp, {
 				'profile.form.element' => $field->formField,
 				'profile.form.element.label' => $field->getLabel,

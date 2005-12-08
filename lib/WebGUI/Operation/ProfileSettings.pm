@@ -265,6 +265,7 @@ sub www_editProfileSettings {
 		$output .= moveDownIcon('op=moveProfileCategoryDown;cid='.$category->getId); 
 		$output .= ' <b>'.$category->getLabel.'</b><br />';
 		foreach my $field (@{$category->getFields}) {
+			next if $field->getId =~ /contentPositions/;
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                         $output .= deleteIcon('op=deleteProfileFieldConfirm;fid='.$field->getId,'',WebGUI::International::get(467,"WebGUIProfile"));
        	                $output .= editIcon('op=editProfileField;fid='.$field->getId);

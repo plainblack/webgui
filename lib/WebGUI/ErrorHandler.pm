@@ -174,25 +174,26 @@ Adds a FATAL type message to the log, outputs an error message to the user, and 
 
 sub fatal {
 	my $message = shift;
+	WebGUI::HTTP::setStatus("500","Server Error");
 	my $logger = getLogger();
 	Apache2::RequestUtil->request->content_type('text/html') if ($WebGUI::Session::session{req});
 	$logger->fatal($message);
 	$logger->debug("Stack trace for FATAL ".$message."\n".getStackTrace());
-        unless (canShowDebug()) {
-		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.                
-		print "<h1>Problem With Request</h1>                        
-			We have encountered a problem with your request. Please use your back button and try again.                         
-			If this problem persists, please contact us with what you were trying to do and the time and date of the problem.";
-                print '<br />'.$WebGUI::Session::session{setting}{companyName};
-                print '<br />'.$WebGUI::Session::session{setting}{companyEmail};
-                print '<br />'.$WebGUI::Session::session{setting}{companyURL};
-        } else {
-	        print "<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n"; 
+	unless (canShowDebug()) {
+		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
+		print "<h1>Problem With Request</h1>
+		We have encountered a problem with your request. Please use your back button and try again.
+		If this problem persists, please contact us with what you were trying to do and the time and date of the problem.";
+		print '<br />'.$WebGUI::Session::session{setting}{companyName};
+		print '<br />'.$WebGUI::Session::session{setting}{companyEmail};
+		print '<br />'.$WebGUI::Session::session{setting}{companyURL};
+	} else {
+		print "<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n";
 		print "<p>".$message."</p>\n";
 		print showDebug();
 	}
 	WebGUI::Session::close();
-        exit;
+	exit; #this is bad under mod_perl.  restarts that httpd instance.
 }
 
 
@@ -303,9 +304,9 @@ The message you wish to add to the log.
 sub security {
 	my $message = shift;
 	$Log::Log4perl::caller_depth++;
-        WebGUI::ErrorHandler::warn($WebGUI::Session::session{user}{username}." (".$WebGUI::Session::session{user}{userId}.") connecting from "
-		.$WebGUI::Session::session{env}{REMOTE_ADDR}." attempted to ".$message);
-	$Log::Log4perl::caller_depth--;
+	WebGUI::ErrorHandler::warn($WebGUI::Session::session{user}{username}." (".$WebGUI::Session::session{user}{userId}.") connecting from "
+	.$WebGUI::Session::session{env}{REMOTE_ADDR}." attempted to ".$message);
+	$log::Log4perl::caller_depth--;
 }
 
 

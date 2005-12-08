@@ -263,10 +263,10 @@ sub new {
 		my %profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
 			userProfileData.userId=".quote($user{userId}));
-        	my %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField where profileCategoryId=4");
+        	my %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField");
         	foreach my $key (keys %default) {
 			my $value;
-        		if ($profile{$key} eq "") {
+        		if ($profile{$key} eq "" && $default{$key}) {
                 		$value = eval($default{$key});
                         	if (ref $value eq "ARRAY") {
                         	$profile{$key} = $$value[0];

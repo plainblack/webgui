@@ -23,6 +23,7 @@ use WebGUI::Form;
 use WebGUI::FormProcessor;
 use WebGUI::Operation::Shared;
 use WebGUI::HTML;
+use WebGUI::User;
 
 
 =head1 NAME
@@ -226,7 +227,7 @@ Returns an array reference of WebGUI::ProfileField objects. This is a class meth
 sub getFields {
         my $self = shift;
         my @fields = ();
-        foreach my $fieldName (WebGUI::SQL->buildArray("select fieldName from userProfileField order by sequenceNumber")) {
+        foreach my $fieldName (WebGUI::SQL->buildArray("select fieldName from userProfileField order by profileCategoryId, sequenceNumber")) {
                 push(@fields,WebGUI::ProfileField->new($fieldName));
         }
         return \@fields;

@@ -62,7 +62,7 @@ sub execute {
 		$output = eval($cmd);
 		WebGUI::ErrorHandler::error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
 	} else {
-                        WebGUI::ErrorHandler::security("execute an invalid operation: ".$op);
+		WebGUI::ErrorHandler::security("execute an invalid operation: ".$op);
 	}
 	return $output;
 }

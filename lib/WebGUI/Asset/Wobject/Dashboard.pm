@@ -17,6 +17,7 @@ use WebGUI::Utility;
 use WebGUI::Session;
 use WebGUI::Grouping;
 use WebGUI::Privilege;
+use WebGUI::ProfileField;
 use WebGUI::ErrorHandler;
 use Time::HiRes;
 use WebGUI::Style;
@@ -28,12 +29,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub canManage {
 	my $self = shift;
+	return 0 if $session{user}{userId} == 1;
 	return WebGUI::Grouping::isInGroup($self->get("adminsGroupId"));
 }
 
 #-------------------------------------------------------------------
 sub canPersonalize {
 	my $self = shift;
+	return 0 if $session{user}{userId} == 1;
 	return WebGUI::Grouping::isInGroup($self->get("usersGroupId"));
 }
 
@@ -65,7 +68,8 @@ sub definition {
 		assetsToHide => {
 			defaultValue=>undef,
 			fieldType=>"checkList"
-		}
+		},
+		
 	);
 	push(@{$definition}, {
 		assetName=>WebGUI::International::get('assetName',"Asset_Dashboard"),
@@ -138,13 +142,13 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub initialize {
 	my $self = shift;
-	my $userPrefField = WebGUI::ProfileField::addProfileField({
+	my $userPrefField = WebGUI::ProfileField->create($self->getId.'contentPositions',{
 		label=>'\'Dashboard User Preference - Content Positions\'',
-		visible=>1,
-		isProtected=>1,
+		visible=>0,
+		protected=>1,
 		editable=>0,
-		dataType=>'text',
-		fieldName=>$self->getId.'contentPositions'
+		required=>0,
+		fieldType=>'text'
 	});
 	$self->update({isInitialized=>1});
 }
@@ -181,7 +185,7 @@ sub view {
 	my @hidden = split("\n",$self->get("assetsToHide"));
 	foreach my $child (@{$children}) {
 		push(@hidden,$child->get('shortcutToAssetId')) if ref $child eq 'WebGUI::Asset::Shortcut';
-		#the following loop will initially place just-shortcutted assets.
+		#the following loop will initially place just-dashletted assets.
 		for (my $i = 0; $i < scalar(@positions); $i++) {
 			next unless isIn($child->get('shortcutToAssetId'),@hidden);
 			my $newChildId = $child->getId;
@@ -216,7 +220,7 @@ sub view {
 								dashletTitle=>$child->{_properties}{title},
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
-								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
+								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 
@@ -227,7 +231,7 @@ sub view {
 								dashletTitle=>$child->{_properties}{title},
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
-								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
+								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 						}
@@ -249,7 +253,7 @@ sub view {
 					dashletTitle=>$child->getTitle,
 					shortcutUrl=>$child->getUrl,
 					canPersonalize=>$self->canPersonalize,
-					canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getUserPrefs) > 0))
+					canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 				});
 				$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 			}
