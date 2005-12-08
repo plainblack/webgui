@@ -220,6 +220,7 @@ sub view {
 								dashletTitle=>$child->{_properties}{title},
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
+								showReloadIcon=>$child->{_properties}{showReloadIcon},
 								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
@@ -231,6 +232,7 @@ sub view {
 								dashletTitle=>$child->{_properties}{title},
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
+								showReloadIcon=>$child->{_properties}{showReloadIcon},
 								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
@@ -252,6 +254,7 @@ sub view {
 					content=>'',
 					dashletTitle=>$child->getTitle,
 					shortcutUrl=>$child->getUrl,
+					showReloadIcon=>$child->{_properties}{showReloadIcon},
 					canPersonalize=>$self->canPersonalize,
 					canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 				});

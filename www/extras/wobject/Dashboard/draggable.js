@@ -533,3 +533,27 @@ function dashboard_toggleEditForm(event,shortcutId,shortcutUrl) {
 		}
 	);
 }
+
+function dashboard_reloadDashlet(event,shortcutId,shortcutUrl) {
+	//discover if form is there.
+	var existingForm = document.getElementById("form" + shortcutId + "_div");
+	if (existingForm) {
+		var throwAway = existingForm.parentNode.removeChild(existingForm);
+		return;
+	}
+	// Reload the content div.
+	contentDiv = document.getElementById("ct" + shortcutId + "_div");
+	var hooha = AjaxRequest.get(
+		{
+			'url':shortcutUrl
+			,'parameters':{
+				'func':"ajaxInlineView"
+			}
+			,'onSuccess':function(req){
+				var myArr558 = req.responseText.split(/beginDebug/mg,1);
+				contentDiv.innerHTML = myArr558[0];
+			}
+		}
+	);
+}
+

@@ -395,6 +395,16 @@ The word "Shortcut".</p>
 		lastUpdated => 1133619940,
 	},
 
+	'show reload icon' => {
+		message => q|Show Reload Icon?|,
+		lastUpdated => 1133619940,
+	},
+
+	'show reload icon description' => {
+		message => q|Whether or not to show the yellow reload dashlet icon on this Shortcut/Dashlet.|,
+		lastUpdated => 1133619940,
+	},
+
 
 
 

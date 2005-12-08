@@ -200,6 +200,10 @@ sub definition {
 			prefFieldsToImport=>{
 				fieldType=>"checkList",
 				defaultValue=>undef
+			},
+			showReloadIcon=>{
+				fieldType=>"yesNo",
+				defaultValue=>1
 			}
 		}
 	});
@@ -264,18 +268,23 @@ sub getEditForm {
 			},
 			-extras=>$self->{_disabled}
 		);
-
-		 $tabform->getTab("properties")->readOnly(
-        		-value=>$self->_drawQueryBuilder(),
-		        -label=>WebGUI::International::get("Criteria","Asset_Shortcut"),
-		        -hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut")
-	        );
+		$tabform->getTab("properties")->readOnly(
+			-value=>$self->_drawQueryBuilder(),
+			-label=>WebGUI::International::get("Criteria","Asset_Shortcut"),
+			-hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut")
+		);
 	}
 	$tabform->addTab('overrides',$i18n->get('Overrides'));
 	$tabform->getTab('overrides')->raw($self->getOverridesList);
 	if ($self->isDashlet) {
 		$tabform->addTab('preferences',$i18n->get('Preferences'));
 		$tabform->getTab('preferences')->raw($self->getFieldsList);
+		$tabform->getTab("properties")->yesNo(
+			-value=>$self->getValue("showReloadIcon"),
+			-name=>"showReloadIcon",
+			-label=>WebGUI::International::get("show reload icon","Asset_Shortcut"),
+			-hoverHelp=>WebGUI::International::get("show reload icon description","Asset_Shortcut")
+		);
 	}
 	return $tabform;
 }
@@ -425,6 +434,7 @@ sub getShortcut {
 		foreach my $override (keys %overrides) {
 			$self->{_shortcut}{_properties}{$override} = $overrides{$override}{parsedValue};
 		}
+		$self->{_shortcut}{_properties}{showReloadIcon} = $self->get("showReloadIcon");
 	}
 	return $self->{_shortcut};
 }
