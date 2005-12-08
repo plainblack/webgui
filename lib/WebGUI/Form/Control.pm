@@ -378,6 +378,7 @@ context, it will return a newline "\n" separated scalar.
 sub getValueFromPost {
 	my $self = shift;
 	my @formValues = $session{req}->param($self->{name});
+	return undef if ($formValues[0] eq "");
 	unless (@formValues) {
 		@formValues = (ref $self->{defaultValue} eq "ARRAY")
 				? @{$self->{defaultValue} }

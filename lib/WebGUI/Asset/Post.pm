@@ -627,7 +627,6 @@ sub processPropertiesFromFormPost {
 			ownerUserId => $session{user}{userId},
 			username => $session{form}{visitorName} || $session{user}{alias} || $session{user}{username},
 			isHidden => 1,
-			dateSubmitted=>time()
 			);
 		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
 		if ($self->getThread->getParent->canModerate) {
