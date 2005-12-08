@@ -68,6 +68,7 @@ sub convertDashboardPrefs {
 	WebGUI::SQL->write("ALTER TABLE `Dashboard` ADD COLUMN `isInitialized` TINYINT UNSIGNED NOT NULL DEFAULT 0");
 	WebGUI::SQL->write("ALTER TABLE `Dashboard` ADD COLUMN `assetsToHide` TEXT");
 	WebGUI::SQL->write("ALTER TABLE `Shortcut` ADD COLUMN `prefFieldsToShow` TEXT");
+	WebGUI::SQL->write("ALTER TABLE `Shortcut` ADD COLUMN `prefFieldsToImport` TEXT");
 }
 
 #-------------------------------------------------
