@@ -190,6 +190,7 @@ sub getSiteURL {
                 $site = $session{env}{HTTP_HOST} || $session{config}{defaultSitename};
         }
         my $proto = "http://";
+	# $r->subprocess_env('HTTPS')
         if ($session{env}{HTTPS} eq "on") {
                 $proto = "https://";
         }
