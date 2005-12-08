@@ -26,9 +26,16 @@ upgradeRichEditor();
 fixCSFaqTemplateAnchors();
 updateProfileSystem();
 convertDashboardPrefs();
+fixPosts();
 
 finish(); # this line required
 
+
+#-------------------------------------------------
+sub fixPosts {
+	print "\tFixing posts.\n" unless ($quiet);
+	WebGUI::SQL->write("update Post set dateUpdated=".time()." where dateUpdated=0");
+}
 
 #-------------------------------------------------
 sub updateProfileSystem {

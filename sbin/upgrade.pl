@@ -164,11 +164,16 @@ foreach my $filename (keys %{$configs}) {
 			order by dateApplied desc, webguiVersion desc limit 1",$dbh);
 		unless ($history) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
-				WebGUI::Session::open($webguiRoot,$filename);
-				WebGUI::Setting::remove('specialState');
-				WebGUI::Setting::add('specialState','upgrading');
-				WebGUI::Session::close();
-				rmtree($configs->{$filename}{uploadsPath}.$slash."temp");
+			WebGUI::Session::open($webguiRoot,$filename);
+			WebGUI::Setting::remove('specialState');
+			WebGUI::Setting::add('specialState','upgrading');
+			WebGUI::Session::close();
+			print "\tDeleting temp files.\n" unless ($quiet);
+			my $path = $configs->{$filename}{uploadsPath}.$slash."temp";
+			rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
+			print "\tDeleting file cache.\n" unless ($quiet);
+			$path = $configs->{$filename}{fileCacheRoot}||"/tmp/WebGUICache";
+			rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
 		}
 		$dbh->disconnect;
 	} else {

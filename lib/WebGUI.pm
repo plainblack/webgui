@@ -43,6 +43,7 @@ sub handler {
 	my $r = shift;
 	$session{site} = shift || $r->dir_config('WebguiConfig');
 	my $s = Apache2::ServerUtil->server;
+	$s->add_version_component("WebGUI/".$WebGUI::VERSION);
 	$session{wguri} = $r->uri;
 	$session{config} = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$session{site});
 	### Add Apache Request stuff to global session.  Yes, I know the global hash will eventually be deprecated.

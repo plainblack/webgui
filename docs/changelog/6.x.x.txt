@@ -1,6 +1,7 @@
 6.8.1
  - fix [ 1364965 ] Assets in Trash give Permission Denied in stead of Not
    Found
+ - fix [ 1372680 ] dashboard needs hide option
  - Removed duplicate processing of metadata.
  - fix [ 1373649 ] Username isn't populated in 6.8.0 Discussions
  - fix [ 1373707 ] File Pile not uploading images
@@ -24,6 +25,8 @@
    need to do to fix it is upgrade to this release and then run
    sbin/rebuildLineage.pl
  - fix [ 1356544 ] FAQ template in collaboration has wrong anchors
+ - The upgrade script now wipes out the file cache in case it would cause
+   any conflicts.
  - fix [ 1373493 ] Upgrade script fails because parameters are not quoted
  - Upgrade now uses --results-file parameter on mysqldump because some
    operating system don't handle UTF-8 characters through their pipes.
