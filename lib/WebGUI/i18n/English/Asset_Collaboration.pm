@@ -1313,6 +1313,9 @@ The date that this feed was last updated. (optional field)
 <b>item_loop</b><br>
 Loops over the posts to be transmitted in this RSS feed.
 <blockquote>
+<b>author</b><br>
+The username of the person who submitted the post.
+<p>
 <b>title</b><br>
 The title of the item (post).
 <p>
@@ -1327,10 +1330,24 @@ A unique identifier for this item.
 <p>
 <b>pubDate</b><br>
 The date the item was published.
+<p>
+<b>attachmentLoop</b><br>
+A loop containg all attachements to this item (post).
+<blockquote>
+<p>
+<b>attachment.url</b><br>
+The URL to this attachment.
+<p>
+<b>attachment.path</b><br>
+The path in the filesystem to this attachment.
+<p>
+<b>attachment.length</b><br>
+The length in this attachment, in bytes.
+</blockquote>
 </blockquote>
 
                 |,
-		lastUpdated => 1114467741,
+		lastUpdated => 1134101927,
 	},
 
 
