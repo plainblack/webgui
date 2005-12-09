@@ -36,7 +36,10 @@ use WebGUI ();
 use WebGUI::Utility ();
 use File::Find ();
 my @modules = ();
-my @excludes = ();
+##The Automated_Information module includes code that requires that $session be active when it is
+##called.  By preloading it before $session is defined, it causes all of the generated information
+#to be empty
+my @excludes = qw(WebGUI::i18n::English::Automated_Information);
 open(FILE,"<".$webguiRoot."/sbin/preload.exclude");
 while (<FILE>) {
 	chomp;
