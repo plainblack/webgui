@@ -612,8 +612,14 @@ sub view {
 		isShortcut => 1,
 		'shortcut.content' => $content,
 		'shortcut.label' => WebGUI::International::get('assetName',"Asset_Shortcut"),
-		originalURL => $shortcut->getUrl
+		originalURL => $shortcut->getUrl,
+		'shortcut.url'=>$self->getUrl
 		);
+	foreach my $prop (keys %{$self->{_shortcut}{_properties}}) {
+		next if ($prop eq 'content' || $prop eq 'label' || $prop eq 'url');
+		$var{'shortcut.'.$prop} = $self->{_shortcut}{_properties}{$prop};
+	WebGUI::ErrorHandler::warn($prop.' = '.$self->{_shortcut}{_properties}{$prop});
+	}
 	return $self->processTemplate(\%var,$self->getValue("templateId"));
 }
 

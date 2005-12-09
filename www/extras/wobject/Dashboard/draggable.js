@@ -25,6 +25,8 @@ var pageHeight=0;
 var pageWidth=0;
 var scrollJump=50;
 var blankCount=1;
+// var getScript = s/<script>(.*)?<\/script>/$1/m;
+var reloadIntervals = new Array();
 
 //checks the key Events for copy and paste operations
 //ctrlC ctrlV shiftP shiftY
@@ -527,20 +529,19 @@ function dashboard_toggleEditForm(event,shortcutId,shortcutUrl) {
 				'func':"getUserPrefsForm"
 			}
 			,'onSuccess':function(req){
-				var myArr558 = req.responseText.split(/beginDebug/mg,1);
-				formDiv.innerHTML = myArr558[0];
+				var myHtml = req.responseText.split(/beginDebug/mg,1)[0];
+				var myScript = myHtml.split(/\<script\>/mg)[1];
+				if (myScript) {
+					myScript = myScript.split(/\<\/script\>/mg)[0];
+					eval(myScript);
+				}
+				formDiv.innerHTML = myHtml;
 			}
 		}
 	);
 }
 
 function dashboard_reloadDashlet(event,shortcutId,shortcutUrl) {
-	//discover if form is there.
-	var existingForm = document.getElementById("form" + shortcutId + "_div");
-	if (existingForm) {
-		var throwAway = existingForm.parentNode.removeChild(existingForm);
-		return;
-	}
 	// Reload the content div.
 	contentDiv = document.getElementById("ct" + shortcutId + "_div");
 	var hooha = AjaxRequest.get(
@@ -550,8 +551,13 @@ function dashboard_reloadDashlet(event,shortcutId,shortcutUrl) {
 				'func':"ajaxInlineView"
 			}
 			,'onSuccess':function(req){
-				var myArr558 = req.responseText.split(/beginDebug/mg,1);
-				contentDiv.innerHTML = myArr558[0];
+				var myHtml = req.responseText.split(/beginDebug/mg,1)[0];
+				var myScript = myHtml.split(/\<script\>/mg)[1];
+				if (myScript) {
+					myScript = myScript.split(/\<\/script\>/mg)[0];
+					eval(myScript);
+				}
+				contentDiv.innerHTML = myHtml;
 			}
 		}
 	);
