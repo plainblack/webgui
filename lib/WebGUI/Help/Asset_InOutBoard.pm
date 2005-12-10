@@ -11,11 +11,11 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject add/edit',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},
@@ -29,11 +29,11 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Asset_Template'
 			},
 			{
 				tag => 'wobject template',
-				namespace => 'WebGUI'
+				namespace => 'Wobject'
 			}
 		]
 	},
@@ -51,7 +51,7 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'WebGUI'
+				namespace => 'Asset_Template'
 			}
 		]
 	},
