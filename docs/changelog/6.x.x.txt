@@ -1,3 +1,6 @@
+6.8.2
+ - Added macro to return the MIME type to a file, FetchMimeType.
+
 6.8.1
  - fix [ 1364965 ] Assets in Trash give Permission Denied in stead of Not
    Found

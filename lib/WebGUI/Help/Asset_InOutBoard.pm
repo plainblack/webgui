@@ -1,7 +1,7 @@
 package WebGUI::Help::Asset_InOutBoard;
 
 our $HELP = {
-	'1' => {
+	'in out board add/edit' => {
 		title => '18',
 		body => '19',
 		related => [
@@ -24,7 +24,7 @@ our $HELP = {
 		body => '21',
 		related => [
 			{
-				tag => '1',
+				tag => 'in out board add/edit',
 				namespace => 'Asset_InOutBoard'
 			},
 			{
@@ -42,7 +42,7 @@ our $HELP = {
 		body => '23',
 		related => [
 			{
-				tag => '1',
+				tag => 'in out board add/edit',
 				namespace => 'Asset_InOutBoard'
 			},
 			{

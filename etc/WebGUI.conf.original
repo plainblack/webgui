@@ -211,6 +211,7 @@ macros=# => Hash_userId, \
         D => D_date, \
         EditableToggle => EditableToggle, \
         Extras => Extras, \
+        FetchMimeType => FetchMimeType, \
         FileUrl => FileUrl, \
         GroupAdd => GroupAdd, \
         GroupDelete => GroupDelete, \

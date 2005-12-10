@@ -1,4 +1,4 @@
-package WebGUI::Help::StockData;
+package WebGUI::Help::Asset_StockData;
 
 our $HELP = {
 	'stock data add/edit' => {
@@ -8,41 +8,41 @@ our $HELP = {
 			{
 				title => 'template_label',
 				description => 'template_label_description',
-				namespace => 'StockList',
+				namespace => 'Asset_StockData',
 			},
 			{
 				title => 'display_template_label',
 				description => 'display_template_label_description',
-				namespace => 'StockList',
+				namespace => 'Asset_StockData',
 			},
 			{
 				title => 'default_stock_label',
 				description => 'default_stock_label_description',
-				namespace => 'StockList',
+				namespace => 'Asset_StockData',
 			},
 			{
 				title => 'stock_source',
 				description => 'stock_source_description',
-				namespace => 'StockList',
+				namespace => 'Asset_StockData',
 			},
 			{
 				title => 'failover_label',
 				description => 'failover_label_description',
-				namespace => 'StockList',
+				namespace => 'Asset_StockData',
 			},
 		],
 		related => [
 			{
 				tag => 'stock list user edit',
-				namespace => 'StockList'
+				namespace => 'Asset_StockData'
 			},
 			{
 				tag => 'stock list template',
-				namespace => 'StockList'
+				namespace => 'Asset_StockData'
 			},
 			{
 				tag => 'stock list display template',
-				namespace => 'StockList'
+				namespace => 'Asset_StockData'
 			},
 			{
 				tag => 'wobjects using',
@@ -61,13 +61,13 @@ our $HELP = {
 			{
 				title => 'symbol_label',
 				description => 'symbol_label_description',
-				namespace => 'StockList',
+				namespace => 'Asset_StockData',
 			},
 		],
 		related => [
 			{
 				tag => 'stock list display template',
-				namespace => 'StockList'
+				namespace => 'Asset_StockData'
 			},
 		]
 	},
@@ -79,7 +79,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'stock list display template',
-				namespace => 'StockList'
+				namespace => 'Asset_StockData'
 			},
 			{
 				tag => 'pagination template variables',
@@ -99,7 +99,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'stock list template',
-				namespace => 'StockList'
+				namespace => 'Asset_StockData'
 			},
 			{
 				tag => 'pagination template variables',
