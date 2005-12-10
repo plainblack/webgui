@@ -307,11 +307,9 @@ sub profileField {
         $fieldName = shift;
         $value = shift;
 	if (defined $value) {
-		warn "storing: $value\n";
 		$self->uncache;
 		$self->{_profile}{$fieldName} = $value;
 		WebGUI::SQL->write("delete from userProfileData where userId=".quote($self->{_userId})." and fieldName=".quote($fieldName));
-		warn("insert into userProfileData values (".quote($self->{_userId}).", ".quote($fieldName).", ".quote($value).")");
 		WebGUI::SQL->write("insert into userProfileData values (".quote($self->{_userId}).", ".quote($fieldName).", ".quote($value).")");
 		$self->{_user}{"lastUpdated"} = time();
         	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".quote($self->{_userId}));

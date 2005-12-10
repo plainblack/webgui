@@ -242,7 +242,7 @@ sub getToolbarOptions {
         opendir (DIR,$dir) or WebGUI::ErrorHandler::warn("Can't open toolbar directory!");
         my @files = readdir(DIR);
         foreach my $file (@files) {
-                if ($file ne ".." && $file ne ".") {
+                if (substr($file,0,1) ne ".") {
                         $options{$file} = $file;
                 }
         }
