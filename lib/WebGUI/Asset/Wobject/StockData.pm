@@ -178,7 +178,7 @@ sub _convertToEpoch {
       $hour += 12;
    }
    $hour = $self->_appendZero($hour);
-   $minute - $self->_appendZero($minute);
+   $minute = $self->_appendZero($minute);
    return WebGUI::DateTime::humanToEpoch("$year-$month-$day $hour:$minute:00");
 }
 
