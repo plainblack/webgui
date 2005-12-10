@@ -139,7 +139,7 @@ A variable that returns the HTML necessary to create a Traditional Pagination Ba
 		lastUpdated =>1091624565
 	},
 
-	'9' => {
+	'assetName' => {
 		message => q|In/Out Board|,
 		lastUpdated =>1091624565
 	},

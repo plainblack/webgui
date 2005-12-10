@@ -106,7 +106,7 @@ sub definition {
    my $class = shift;
    my $definition = shift;
    push(@{$definition}, {
-      assetName=>WebGUI::International::get('asset label',"Asset_ZipArchive"),
+      assetName=>WebGUI::International::get('assetName',"Asset_ZipArchive"),
       tableName=>'ZipArchiveAsset',
       className=>'WebGUI::Asset::File',
       properties=>{

@@ -303,7 +303,7 @@ sub definition {
 		tableName=>'StockData',
 		className=>'WebGUI::Asset::Wobject::StockData',
 		icon=>'stockData.gif',
-		assetName=>WebGUI::International::get("app_name","Asset_StockData"),
+		assetName=>WebGUI::International::get("assetName","Asset_StockData"),
 		properties=>$properties
 	});
 	return $class->SUPER::definition($definition);

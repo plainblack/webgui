@@ -21,7 +21,7 @@ our $I18N = {
 		lastUpdated => 1067346336
 	},
 
-	'17' => {
+	'assetName' => {
 		message => q|Search|,
 		lastUpdated => 1066593262
 	},

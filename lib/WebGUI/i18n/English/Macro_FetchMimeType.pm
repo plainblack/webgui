@@ -18,6 +18,11 @@ to the file is required.  A URL to the file will not work.
 		lastUpdated => 1134252720,
 	},
 
+	'macroName' => {
+		message => q|FetchMimeType|,
+		lastUpdated => 1134256852
+	},
+
 };
 
 1;

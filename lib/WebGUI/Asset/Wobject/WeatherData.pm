@@ -66,7 +66,7 @@ sub definition {
 	push(@{$definition}, {
 		tableName=>'WeatherData',
 		className=>'WebGUI::Asset::Wobject::WeatherData',
-		assetName=>$i18n->get("WeatherData"),
+		assetName=>$i18n->get("assetName"),
 		icon=>'weatherData.gif',
 		autoGenerateForms=>1,
 		properties=>$properties

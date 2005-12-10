@@ -12,7 +12,7 @@ our $I18N = {
 		lastUpdated => 1121703035,
 	},
 
-	'app_name' => {
+	'assetName' => {
 		message => q|Stock Data|,
 		lastUpdated => 1119068745
 	},

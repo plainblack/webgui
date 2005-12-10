@@ -79,15 +79,15 @@ sub _getHelpName {
 	my $file = shift;
 	my $helpName;
 	if ($file =~ /^Asset_/) {
-		$helpName = WebGUI::International::get('assetName',$file);
+		$helpName = 'assetName';
 	}
 	elsif ($file =~ /^Macro_/) {
-		$helpName = WebGUI::International::get('macroName',$file);
+		$helpName = 'macroName';
 	}
 	else {
-		$helpName = WebGUI::International::get('topicName',$file);
+		$helpName = 'topicName';
 	}
-	return $helpName;
+	return WebGUI::International::get($helpName,$file);
 }
 
 #-------------------------------------------------------------------

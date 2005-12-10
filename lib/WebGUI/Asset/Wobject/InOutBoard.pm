@@ -68,6 +68,7 @@ sub definition {
         push(@{$definition}, {
                 tableName=>'InOutBoard',
                 className=>'WebGUI::Asset::Wobject::InOutBoard',
+                assetName=>WebGUI::International::get('assetName',"Asset_InOutBoard"),
 		icon=>'iob.gif',
                 properties=>{
 			statusList => {
@@ -141,11 +142,6 @@ sub getEditForm {
     return $tabform;
 }
 
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(9,"Asset_InOutBoard");
-}
 
 #-------------------------------------------------------------------
 sub view {

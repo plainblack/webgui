@@ -64,7 +64,7 @@ sub definition {
 	push(@{$definition}, {
 		tableName=>'MultiSearch',
 		className=>'WebGUI::Asset::Wobject::MultiSearch',
-		assetName=>$i18n->get('MultiSearch'),
+		assetName=>$i18n->get('assetName'),
 		icon=>'multiSearch.gif',
 		autoGenerateForms=>1,
 		properties=>$properties

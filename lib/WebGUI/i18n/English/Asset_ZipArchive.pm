@@ -30,11 +30,11 @@ our $I18N = {
 		lastUpdated => 1106762088
 	 },
 
-	'asset label' => {
-         message => q|Zip Archive|,
-         context => q|label for Asset Manager, getName|,
-         lastUpdated => 1121703035,
-     },
+	'assetName' => {
+		message => q|Zip Archive|,
+		context => q|label for Asset Manager, getName|,
+		lastUpdated => 1121703035,
+	},
                                                                                                                               
 	'show page description' => {
 		message => q|Enter the name of the file which serves as the "base" file for this archive.  This is the page which will initially be served up|,

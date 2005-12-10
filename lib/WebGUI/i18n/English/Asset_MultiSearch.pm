@@ -7,7 +7,7 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
-	'MultiSearch' => {
+	'assetName' => {
 		message => q|MultiSearch|,
 		lastUpdated => 1133619940,
 	},

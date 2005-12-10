@@ -24,6 +24,7 @@ sub definition {
 	push (@{$definition}, {
 		tableName=>'IndexedSearch',
 		className=>'WebGUI::Asset::Wobject::IndexedSearch',
+		assetName=>WebGUI::International::get('assetName',"Asset_IndexedSearch"),
 		properties=>{
 			templateId=>{
 				fieldType=>"template",
@@ -211,11 +212,6 @@ sub getIcon {
         my $small = shift;
         return $session{config}{extrasURL}.'/assets/small/search.gif' if ($small);
         return $session{config}{extrasURL}.'/assets/search.gif';
-}
-
-#-------------------------------------------------------------------
-sub getName {
-        return WebGUI::International::get(17,"Asset_IndexedSearch");
 }
 
 #-------------------------------------------------------------------
