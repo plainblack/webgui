@@ -183,6 +183,20 @@ sub displayValue {
 
 #-------------------------------------------------------------------
 
+=head2 getValueFromPost ( )
+
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
+
+=cut
+
+sub getValueFromPost {
+	my $self = shift;
+	my @data = $session{req}->param($self->{name});
+        return wantarray ? @data : join("\n",@data);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValues ( )
 
 Safely handle returning values whether the stored data is scalar or an array

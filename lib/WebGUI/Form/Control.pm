@@ -367,24 +367,18 @@ sub fixTags {
 
 =head2 getValueFromPost ( )
 
-Retrieves a value from a form GET or POST and returns it. If the value
-comes back as undef, this method will return the defaultValue instead.
-It also handles return data in list or scalar contexts.  If a Form
-field that supports multiple select requests its values in scalar
-context, it will return a newline "\n" separated scalar.
+Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my @formValues = $session{req}->param($self->{name});
-	return undef if ($formValues[0] eq "");
-	unless (@formValues) {
-		@formValues = (ref $self->{defaultValue} eq "ARRAY")
-				? @{$self->{defaultValue} }
-				: ( $self->{defaultValue} );
+	my $formValue = $session{req}->param($self->{name});
+	if (defined $formValue) {
+		return $formValue;
+	} else {
+		return $self->{defaultValue};
 	}
-        return wantarray ? @formValues : join("\n",@formValues);
 }
 
 #-------------------------------------------------------------------
