@@ -12,6 +12,15 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1131394072,
 		context => q|Provide some context to let the translator know what this message is used for.|
 	},
+
+	#If the help file documents an Asset, it must include an assetName key
+	#If the help file documents an Macro, it must include an macroName key
+	#For all other types, use topicName
+	'assetName' => {
+		message => q|My Asset|,
+		lastUpdated => 1131394072,
+	},
+
 };
 
 1;
