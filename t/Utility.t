@@ -33,6 +33,7 @@ is(WebGUI::Utility::formatBytes(1700000), '2 MB', 'formatBytes() - megabytes');
 
 # isBetween 
 ok(WebGUI::Utility::isBetween(0,-1,1), 'isBetween() - negative and positive range'); 
+ok(WebGUI::Utility::isBetween(0,1,-1), 'isBetween() - negative and positive range, reversed'); 
 ok(WebGUI::Utility::isBetween(11,1,15), 'isBetween() - positive range'); 
 ok(WebGUI::Utility::isBetween(-5,-10,-2), 'isBetween() - negative range'); 
 

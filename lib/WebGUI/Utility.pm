@@ -125,9 +125,7 @@ sub isBetween {
 	my $first = shift;
 	my $second = shift;
 	if ($first > $second) {
-		my $temp = $first;
-		$first = $second;
-		$second = $temp;
+		($first,$second) = ($second,$first);
 	}
 	if ($value >= $first && $value <= $second) {
 		return 1;
