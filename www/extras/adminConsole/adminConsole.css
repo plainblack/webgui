@@ -3,6 +3,7 @@ body{
 	background-repeat: repeat-x;
 	border: 5px #4E8AAB solid;
 	margin:0px;
+	padding:0px;
 	min-height: 700px;
 }
 

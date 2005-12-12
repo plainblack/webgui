@@ -6,6 +6,7 @@
  - fix [ 1378333 ] [WG 6.7.8] Mail Form template doesn't mark required fields
  - fix [ 1377276 ] Calendar Pop up issue
  - fix [ 1328728 ] Export exports root page n times
+ - fix [ 1338306 ] adminConsoleHelpIcon displayed at wrong position
  - fix 
 [ 1365822 ] makePrintable does not work in Collaboration System
  - fix [ 1376621 ] dateSubmitted not updated on posts
