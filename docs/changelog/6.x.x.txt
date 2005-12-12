@@ -25,6 +25,9 @@
  - Fixed bug/rfe where it was not obvious when hovering over the rank
    column in the Asset Manager that you can drag rows up and down.
    Added cursor:move to the td's style.
+ - Fixed a bug where in the Edit User profile tab that required fields were
+   not marked with an asterisk.
+  
 
 6.8.1
  - fix [ 1364965 ] Assets in Trash give Permission Denied in stead of Not
