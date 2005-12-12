@@ -74,6 +74,10 @@ my @tmplVarTable = (
 		id   => 'PBtmpl0000000000000014',
 		vars => [ ],
 	},
+	{
+		id   => 'PBtmpl0000000000000020',
+		vars => [ qw(field.isRequired) ],
+	},
 
 );
 
