@@ -204,9 +204,9 @@ sub www_exportStatus {
 
 #-------------------------------------------------------------------
 
-=head2 www_exportPageGenerate
+=head2 www_exportGenerate
 
-Executes the export process and displays real time status. This operation is displayed by exportPageStatus in an IFRAME.
+Executes the export process and displays real time status. This operation is displayed by exportStatus in an IFRAME.
 
 =cut
 
@@ -263,7 +263,7 @@ sub www_exportGenerate {
 			printf WebGUI::International::get('could not open path', 'Asset'), $path, $@;
 			return;
 		} else {
-			print FILE $self->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
+			print FILE $asset->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
 			close(FILE);
 		}
 		print WebGUI::International::get('done','Asset');
