@@ -257,7 +257,7 @@ sub www_deleteEventConfirm {
 	if (($session{form}{rid} ne "") and ($session{form}{rid} ne "0")) {
 		my $series = $self->getParent->getLineage(["descendants"],{returnObjects=>1});
 		foreach my $event (@{$series}) {
-			$event->trash if $trashedEvent->get("EventsCalendar_recurringId") eq $session{form}{rid};
+			$event->trash if $event->get("EventsCalendar_recurringId") eq $session{form}{rid};
 		}
 	} else {
 		$self->trash;
