@@ -76,7 +76,13 @@ sub validateProfileData {
 	my $error = "";
 	my $warning = "";
 	foreach my $field (@{WebGUI::ProfileField->getEditableFields}) {
-		$data{$field->getId} = $field->formProcess;
+		my $fieldValue = $field->formProcess;
+		use Data::Dumper;print $field->getLabel.' : '.Dumper($fieldValue);
+		if (ref $fieldValue eq "ARRAY") {
+			$data{$field->getId} = $$fieldValue[0];
+		} else {
+			$data{$field->getId} = $fieldValue;
+		}
 		if ($field->isRequired && !$data{$field->getId}) {
 			$error .= '<li>'.$field->getLabel.' '.WebGUI::International::get(451).'</li>';
 		} elsif ($field->getId eq "email" && isDuplicateEmail($data{$field->getId})) {

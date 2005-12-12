@@ -114,7 +114,7 @@ sub getAssetsInClipboard {
         my $sth = WebGUI::SQL->read("
                 select 
                         asset.assetId, 
-                        max(assetData.revisionDate),
+                        assetData.revisionDate,
                         asset.className
                 from 
                         asset                 
@@ -122,6 +122,7 @@ sub getAssetsInClipboard {
                         assetData on asset.assetId=assetData.assetId 
                 where 
 			asset.state='clipboard'
+			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
 			$limit
 		group by
 			assetData.assetId

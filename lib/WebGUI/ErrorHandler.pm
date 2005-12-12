@@ -179,6 +179,7 @@ sub fatal {
 	Apache2::RequestUtil->request->content_type('text/html') if ($WebGUI::Session::session{req});
 	$logger->fatal($message);
 	$logger->debug("Stack trace for FATAL ".$message."\n".getStackTrace());
+	print WebGUI::HTTP::getHeader if ($WebGUI::Session::session{req});
 	unless (canShowDebug()) {
 		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
 		print "<h1>Problem With Request</h1>
@@ -224,7 +225,7 @@ Returns a text message containing all of the session variables.
 sub getSessionVars {
 	my $data;
 	while (my ($section, $hash) = each %WebGUI::Session::session) {
-		if ($section eq "debug") {
+		if ($section eq "debug" || $section eq 'replacements') {
 			next;
 		} elsif (ref $hash eq 'HASH') {
 			while (my ($key, $value) = each %$hash) {

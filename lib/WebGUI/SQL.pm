@@ -469,10 +469,8 @@ sub prepare {
 	my $class = shift;
 	my $sql = shift;
 	my $dbh = shift || _getDefaultDb();
-	if (WebGUI::ErrorHandler::canShowDebug()) {
-		push(@{$WebGUI::Session::session{SQLquery}},$sql);
-	}
-        my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatal("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
+	push(@{$WebGUI::Session::session{SQLquery}},$sql);
+	my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatal("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
 	bless ({_sth => $sth, _sql => $sql}, $class);
 }
 
@@ -638,7 +636,6 @@ The database handler. Defaults to the WebGUI database handler.
 
 sub quote {
 	my $value = shift; 
-	return "''" unless defined $value;
 	my $dbh = shift || _getDefaultDb();
 	return $dbh->quote($value);
 }

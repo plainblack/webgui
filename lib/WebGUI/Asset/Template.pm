@@ -199,7 +199,8 @@ Specify the namespace to build the list for.
 sub getList {
 	my $class = shift;
 	my $namespace = shift;
-	my $sth = WebGUI::SQL->read("select asset.assetId, max(assetData.revisionDate) from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".quote($namespace)." and template.showInForms=1 and asset.state='published' and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).") group by assetData.assetId order by assetData.title",WebGUI::SQL->getSlave);
+my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).")) order by assetData.title";
+	my $sth = WebGUI::SQL->read($sql,WebGUI::SQL->getSlave);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {

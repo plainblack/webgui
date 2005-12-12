@@ -18,6 +18,7 @@ use WebGUI::Auth;
 use WebGUI::DateTime;
 use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
+use WebGUI::HTTP;
 use WebGUI::Macro;
 use WebGUI::Mail;
 use WebGUI::Session;
@@ -472,6 +473,7 @@ sub getPasswordRecoveryTemplateId {
 sub login {
    my $self = shift;
    if(!$self->authenticate($session{form}{username},$session{form}{identifier})){
+      WebGUI::HTTP::setStatus("401","Incorrect Credentials");
       WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
 	  return $self->displayLogin("<h1>".WebGUI::International::get(70)."</h1>".$self->error);
    }

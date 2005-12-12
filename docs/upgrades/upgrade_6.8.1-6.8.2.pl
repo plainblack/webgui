@@ -24,9 +24,16 @@ start(); # this line required
 
 fixPosts();
 fixDataFormMailForm();
+fixTZGoof();
 
 finish(); # this line required
 
+
+#-------------------------------------------------
+sub fixTZGoof {
+	print "\tFixing default timezone.\n" unless ($quiet);
+	WebGUI::SQL->write("update userProfileField set dataDefault='\\\'America/Chicago\\\'' where fieldName='timeZone'");
+}
 
 #-------------------------------------------------
 sub fixPosts {

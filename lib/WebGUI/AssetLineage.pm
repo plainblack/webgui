@@ -338,7 +338,8 @@ sub getLineage {
 		$where .= ' and ('.$rules->{whereClause}.')';
 	}
 	# based upon all available criteria, let's get some assets
-	my $columns = "asset.assetId, asset.className, asset.parentId, max(assetData.revisionDate)";
+	my $columns = "asset.assetId, asset.className, asset.parentId, assetData.revisionDate";
+	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).")) ";
 	my $sortOrder = ($rules->{invertTree}) ? "asset.lineage desc" : "asset.lineage asc"; 
 	if (exists $rules->{orderByClause}) {
 		$sortOrder = $rules->{orderByClause};

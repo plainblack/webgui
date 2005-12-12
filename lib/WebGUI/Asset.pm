@@ -409,10 +409,10 @@ sub getAssetAdderLinks {
 	} else {
 		$constraint = quoteAndJoin($session{config}{assets});
 	}
-	my $sth = WebGUI::SQL->read("select asset.className,asset.assetId,max(assetData.revisionDate) from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) group by assetData.assetId");
+	my $sth = WebGUI::SQL->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
 	while (my ($class,$id,$date) = $sth->array) {
-		my $asset = WebGUI::Asset->new($id,$class);
-		next unless ($asset->get("isPrototype") eq '1' && $asset->canView && $asset->canAdd && $asset->getUiLevel <= $session{user}{uiLevel});
+		my $asset = WebGUI::Asset->new($id,$class,$date);
+		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $session{user}{uiLevel});
 		my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
 		$links{$asset->getTitle}{url} = $url;

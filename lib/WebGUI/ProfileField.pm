@@ -163,7 +163,17 @@ Returns the value retrieved from a form post.
 
 sub formProcess {
 	my $self = shift;
-	return WebGUI::HTML::filter(WebGUI::FormProcessor::process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("possibleValues"))), "javascript");
+	my $result = WebGUI::FormProcessor::process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("dataDefault")));
+	if (ref $result eq "ARRAY") {
+		my @results = @$result;
+		for (my $count=0;$count<scalar(@results);$count++) {
+			$results[$count] = 	WebGUI::HTML::filter($results[$count], "javascript");
+		}
+		$result = \@results;
+	} else {
+		$result = WebGUI::HTML::filter($result, "javascript");
+	}
+	return $result;
 }
 
 #-------------------------------------------------------------------

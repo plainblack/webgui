@@ -648,17 +648,18 @@ sub view {
         $var->{'unlock.url'} = $self->getUnlockUrl;
 
         my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
-	my $sql = "select asset.assetId, asset.className, max(assetData.revisionDate) as revisionDate from asset 
+	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate from asset 
 		left join assetData on assetData.assetId=asset.assetId
 		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 		where asset.lineage like ".quote($self->get("lineage").'%')
 		."	and asset.state='published'
+		and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId
 			and (
 				assetData.status in ('approved','archived')
 						 or assetData.tagId=".quote($session{scratch}{versionTag});
 	$sql .= "		or assetData.status='pending'" if ($self->getParent->canModerate);
 	$sql .= "		or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
-				)
+			))
 		group by assetData.assetId
 		order by ";
 	if ($layout eq "flat") {

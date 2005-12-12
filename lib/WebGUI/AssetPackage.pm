@@ -47,27 +47,22 @@ Returns an array of hashes containing title, assetId, and className for all asse
 sub getPackageList {
 	my $self = shift;
 	my @assets;
-	my $sth = WebGUI::SQL->read("
+	my $sql = "
 		select 
 			asset.assetId, 
-			max(assetData.revisionDate),
+			assetData.revisionDate,
 			asset.className
 		from 
 			asset 
 		left join 
 			assetData on asset.assetId=assetData.assetId 
 		where 
-			assetData.isPackage=1 and
-			( 
-				assetData.status='approved' or
-  				assetData.tagId=".quote($session{scratch}{versionTag})."
-			) and
-			asset.state='published'	
-		group by
-			assetData.assetId
-		order by 
-			assetData.title desc
-			");
+			assetData.isPackage=1
+			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and
+				(assetData.status='approved'";
+			$sql .= " or assetData.tagId=".quote($session{scratch}{versionTag}) if ($session{scratch}{versionTag});
+			$sql .= ")) and asset.state='published' group by assetData.assetId order by assetData.title desc";
+	my $sth = WebGUI::SQL->read($sql);
 	while (my ($id, $date, $class) = $sth->array) {
 		my $asset = WebGUI::Asset->new($id,$class);
 		push(@assets, $asset) if ($asset->get("isPackage"));

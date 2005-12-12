@@ -41,7 +41,7 @@ sub appendPostListTemplateVars {
 	my $page = $p->getPageData;
 	my $i = 0;
 	foreach my $row (@$page) {
-		my $post = WebGUI::Asset::Wobject::Collaboration->new($row->{assetId}, $row->{className}, $row->{revisionDate});
+		my $post = WebGUI::Asset->new($row->{assetId}, $row->{className}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
 		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("url"));
 		if ($self->get("sortBy") eq "lineage") {
@@ -952,26 +952,18 @@ sub view {
 		$constraints .= " or assetData.status='pending'"; 
 	}
 	$constraints .= ")";
-	my $sql = "select asset.assetId,asset.className,max(assetData.revisionDate) as revisionDate
+	my $sql = "select asset.assetId,asset.className,assetData.revisionDate as revisionDate
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate
 		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
-		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and $constraints 
+		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) and $constraints 
 		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);
 	return $self->processTemplate(\%var,$self->get("collaborationTemplateId"));
 }
-
-#-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("collaboration add/edit", "Asset_Collaboration");
-#        return $self->getAdminConsole->render($self->getEditForm->print,"Edit Collaboration System");
-#}
 
 #-------------------------------------------------------------------
 
