@@ -155,6 +155,7 @@ sub toHtml {
                                 inputField : "'.$self->{id}.'", 
                                 ifFormat : "%Y-%m-%d", 
                                 showsTime : false, 
+                                step : 1,
                                 timeFormat : "12",
                                 mondayFirst : '.$mondayFirst.'
                                 }); 

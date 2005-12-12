@@ -3,6 +3,7 @@
  - fix [ 1378493 ] 6.7.8 collab post edits (images)
  - Fixed bug where viewProfile did not show pretty printed values
  - fix [ 1344146 ] deleting recurring events doesn't work
+ - fix [ 1377276 ] Calendar Pop up issue
  - Fixed bug/rfe where it was not obvious when hovering over the rank
    column in the Asset Manager that you can drag rows up and down.
    Added cursor:move to the td's style.
