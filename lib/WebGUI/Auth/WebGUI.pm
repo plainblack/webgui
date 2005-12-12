@@ -200,13 +200,14 @@ sub createAccountSave {
    my $password = $session{form}{'authWebGUI.identifier'};
    my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
    
-   my $error = $self->error if(!$self->validUsername($username));
+   my $error;
+   $error = $self->error unless($self->validUsername($username));
 	if ($session{setting}{webguiUseCaptcha}) {
 		unless ($session{form}{'authWebGUI.captcha.validation'} eq Digest::MD5::md5_base64(lc($session{form}{'authWebGUI.captcha'}))) {
 			$error .= WebGUI::International::get("captcha failure","AuthWebGUI");
 		}
 	}
-   $error.= $self->error if(!$self->_isValidPassword($password,$passConfirm));
+   $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));
    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
    $error .= $temp;
    
