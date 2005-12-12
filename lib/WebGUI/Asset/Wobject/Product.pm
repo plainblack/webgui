@@ -256,51 +256,6 @@ sub getFileUrl {
 }
 
 #-------------------------------------------------------------------
-sub getIndexerParams {
-	my $self = shift;
-	my $now = shift;
-	return {
-		Product => {
-			sql => "select Product.assetId,
-			Product.image1,
-			Product.image2,
-			Product.image3,
-			Product.brochure,
-			Product.manual,
-			Product.warranty,
-			Product.price,
-			Product.productNumber,
-			Product_benefit.benefit,
-			Product_feature.feature,
-			Product_specification.name,
-			Product_specification.value,
-			Product_specification.units,
-			asset.ownerUserId as ownerId,
-			asset.url,
-			asset.groupIdView,
-			asset.title,
-			asset.menuTitle,
-			asset.className,
-			asset.synopsis
-			from Product, asset
-			left join Product_benefit on Product_benefit.assetId=Product.assetId
-			left join Product_feature on Product_feature.assetId=Product.assetId
-			left join Product_specification on Product_specification.assetId=Product.assetId
-			where Product.assetId = asset.assetId
-			and asset.startDate < $now
-			and asset.endDate > $now",
-			fieldsToIndex => ["image1", "image2", "image3", "brochure", "manual", "warranty", "price",
-			"productNumber", "benefit", "feature", "name", "value", "units"],
-			contentType => 'content',
-			url => 'WebGUI::URL::gateway($data{url})',
-			headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
-			bodyShortcut => 'select synopsis from asset where assetId = \'$data{asssetId}\'',
-		}
-	};
-}
-
-
-#-------------------------------------------------------------------
 sub getThumbnailFilename {
    my $self = shift;
    my $filestore = $_[0];

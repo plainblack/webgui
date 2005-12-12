@@ -71,7 +71,7 @@ sub definition {
 		className=>'WebGUI::Asset::Wobject::Article',
 		properties=>\%properties
 		});
-        return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($definition);
 }
 
 #-------------------------------------------------------------------

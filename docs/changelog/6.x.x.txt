@@ -1,6 +1,7 @@
 6.8.2
  - Converted all the max((assetData.)revisionDate) calls to use mysql5/(4.1)
    nested queries.
+ - Added some more skeletons (newWobject, newAsset, changelog(!))
  - fix [ 1323184 ] CS Submissions Not Sorting on multiple sites
  - fixed some major oversights in the new profile system.
  - Added macro to return the MIME type to a file, FetchMimeType.
@@ -14,8 +15,7 @@
  - fix [ 1338306 ] adminConsoleHelpIcon displayed at wrong position
  - fix [ 1216810 ] anonymous registration errors persist (fixed for real!)
  - fix [ 1237406 ] HTTP Proxy caches results
- - fix 
-[ 1365822 ] makePrintable does not work in Collaboration System
+ - fix [ 1365822 ] makePrintable does not work in Collaboration System
  - fix [ 1376621 ] dateSubmitted not updated on posts
  - fix [ 1344111 ] promote/demote swap with non-"published" assets
  - fix [ 1372630 ] Syndicated encode "&" also if belong to a HTML entity
