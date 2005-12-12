@@ -1146,7 +1146,10 @@ sub processPropertiesFromFormPost {
 	my %data;
 	foreach my $definition (@{$self->definition}) {
 		foreach my $property (keys %{$definition->{properties}}) {
-			next if ($definition->{properties}{$property}{noFormPost});
+			if ($definition->{properties}{$property}{noFormPost}) {
+				$data{$property} = $definition->{properties}{$property}{defaultValue};
+				next;
+			}
 			$data{$property} = WebGUI::FormProcessor::process(
 				$property,
 				$definition->{properties}{$property}{fieldType},

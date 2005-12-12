@@ -129,7 +129,7 @@ sub definition {
 			dateSubmitted => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>undef
+				defaultValue=>time()
 				},
 			dateUpdated => {
 				fieldType=>"hidden",
