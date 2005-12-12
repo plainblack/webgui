@@ -5,6 +5,10 @@
  - fix [ 1344146 ] deleting recurring events doesn't work
  - fix [ 1378333 ] [WG 6.7.8] Mail Form template doesn't mark required fields
  - fix [ 1377276 ] Calendar Pop up issue
+ - fix [ 1344111 ] promote/demote swap with non-"published" assets
+ - removed server version tag appending.  Could re-add as an setting later.
+   (along with the Style.pm header tag version number insertion).
+ - fixed poll's editForm so an option only showed up at the proper time.
  - Fixed bug/rfe where it was not obvious when hovering over the rank
    column in the Asset Manager that you can drag rows up and down.
    Added cursor:move to the td's style.

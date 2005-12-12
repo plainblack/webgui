@@ -116,7 +116,7 @@ sub demote {
 	my $self = shift;
 	my ($sisterLineage) = WebGUI::SQL->quickArray("select min(lineage) from asset 
 		where parentId=".quote($self->get("parentId"))." 
-		and lineage>".quote($self->get("lineage")));
+		and state='published' and lineage>".quote($self->get("lineage")));
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage);
 		$self->{_properties}{lineage} = $sisterLineage;
@@ -529,7 +529,7 @@ sub promote {
 	my $self = shift;
 	my ($sisterLineage) = WebGUI::SQL->quickArray("select max(lineage) from asset 
 		where parentId=".quote($self->get("parentId"))." 
-		and lineage<".quote($self->get("lineage")));
+		and state='published' and lineage<".quote($self->get("lineage")));
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage);
 		$self->{_properties}{lineage} = $sisterLineage;
