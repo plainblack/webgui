@@ -113,6 +113,12 @@ sub process {
 	my $templateId = shift;
 	if ($session{page}{makePrintable} && exists $session{asset}) {
 		$templateId = $session{asset}->get("printableStyleTemplateId");
+		my $currAsset = $session{asset};
+		until ($templateId) {
+			# some assets don't have this property.  But at least one ancestor should....
+			$currAsset = $currAsset->getParent;
+			$templateId = $currAsset->get("printableStyleTemplateId");
+		}
 	} elsif ($session{scratch}{personalStyleId} ne "") {
 		$templateId = $session{scratch}{personalStyleId};
 	} elsif ($session{page}{useEmptyStyle}) {
