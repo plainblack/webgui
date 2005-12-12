@@ -760,7 +760,7 @@ sub setStatusApproved {
         $self->commit;
         $self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if $self->isReply;
         unless ($self->isPoster) {
-                WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',WebGUI::URL::getSiteUrl().'/'.$self->getUrl,579);
+                WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',WebGUI::URL::getSiteURL().'/'.$self->getUrl,579);
         }
         $self->notifySubscribers unless ($session{form}{func} eq 'add');
 }
