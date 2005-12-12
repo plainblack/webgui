@@ -156,6 +156,9 @@ sub _strip_html {
                         $_[0] =~ s/\&lt;/</g;
                         $_[0] =~ s/\&gt;/>/g;
                         $_[0] = WebGUI::HTML::filter($_[0], 'all');
+			##Unencode double encoded entities.  This is usually done
+			##by passing XML::RSSLite an already encoded entity.
+			$_[0] =~ s/\&amp;(?=(#[0-9]+|#x[0-9a-fA-F]+|\w+);)/&/g;
                 }
         }
         

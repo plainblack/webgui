@@ -7,6 +7,7 @@
  - fix [ 1377276 ] Calendar Pop up issue
  - fix [ 1376621 ] dateSubmitted not updated on posts
  - fix [ 1344111 ] promote/demote swap with non-"published" assets
+ - fix [ 1372630 ] Syndicated encode "&" also if belong to a HTML entity
  - removed server version tag appending.  Could re-add as an setting later.
    (along with the Style.pm header tag version number insertion).
  - fixed poll's editForm so an option only showed up at the proper time.
