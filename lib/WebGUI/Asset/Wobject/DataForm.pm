@@ -275,49 +275,6 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
-sub getIndexerParams {
-	my $self = shift;        
-	my $now = shift;
-	return {
-		DataForm_field => {
-                        sql => "select DataForm_field.label as label,
-                                        DataForm_field.subtext as subtext,
-                                        DataForm_field.possibleValues as possibleValues,
-                                        DataForm_field.assetId as assetId,
-                                        DataForm_field.DataForm_fieldId as fid,
-                                        asset.ownerUserId as ownerId,
-                                        asset.url as url,
-                                        asset.groupIdView as groupIdView
-                                        from DataForm_field, asset
-                                        where DataForm_field.assetId = asset.assetId
-					and asset.startDate < $now
-					and asset.endDate > $now",
-                        fieldsToIndex => ["label", "subtext", "possibleValues"],
-                        contentType => 'content',
-                        url => 'WebGUI::URL::gateway($data{url})',
-                        headerShortcut => 'select label from DataForm_field where DataForm_fieldId = \'$data{fid}\'',
-                        bodyShortcut => 'select subtext, possibleValues from DataForm_field where DataForm_fieldId = \'$data{fid}\'',
-                },
-        DataForm_entryData => {
-                        sql => "select distinct(DataForm_entryData.assetId) as assetId,
-                                        asset.ownerUserId as ownerId,
-                                        asset.url as url,
-                                        asset.groupIdView as groupIdView,
-                                        asset.groupIdEdit as special_groupIdView
-                                        from DataForm_entryData, asset
-                                        where DataForm_entryData.assetId = asset.assetId
-					and asset.startDate < $now
-					and asset.endDate > $now",
-                        fieldsToIndex => ['select distinct(value) from DataForm_entryData where assetId = \'$data{assetId}\''],
-                        contentType => 'assetDetail',
-                        url => 'WebGUI::URL::append($data{url}, "func=viewList}")',
-                        headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
-                }
-	};
-}
-
-
-#-------------------------------------------------------------------
 sub getListTemplateVars {
 	my $self = shift;
 	my $var = shift;

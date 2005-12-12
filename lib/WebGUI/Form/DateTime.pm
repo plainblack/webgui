@@ -138,7 +138,7 @@ sub toHtml {
                                 showsTime : true, 
                                 step : 1,
                                 timeFormat : "12",
-                                mondayFirst : '.$mondayFirst.'
+                                firstDay : '.$session{user}{firstDayOfWeek}.'
                                 }); 
                         </script>';
 }

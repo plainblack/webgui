@@ -149,7 +149,6 @@ sub toHtml {
         WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
         WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ type=>'text/javascript' });
         WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
-	my $mondayFirst = $session{user}{firstDayOfWeek} ? "true" : "false";
         return $self->SUPER::toHtml. '<script type="text/javascript"> 
                         Calendar.setup({ 
                                 inputField : "'.$self->{id}.'", 
@@ -157,7 +156,7 @@ sub toHtml {
                                 showsTime : false, 
                                 step : 1,
                                 timeFormat : "12",
-                                mondayFirst : '.$mondayFirst.'
+                                firstDay : '.$session{user}{firstDayOfWeek}.'
                                 }); 
                         </script>';
 }

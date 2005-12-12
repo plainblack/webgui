@@ -74,43 +74,6 @@ sub definition {
         return $class->SUPER::definition($definition);
 }
 
-
-
-#-------------------------------------------------------------------
-sub getIndexerParams {
-        my $self = shift;
-        my $now = shift;
-        return {
-                Article => {
-                        sql => "select Article.assetId,
-					Article.linkTitle,
-					Article.linkURL,
-					assetData.title,
-					assetData.menuTitle,
-					assetData.url,
-					asset.className,
-					assetData.ownerUserId,
-					assetData.groupIdView,
-					assetData.synopsis,
-					wobject.description
-				from asset, Article
-				left join wobject on wobject.assetId = asset.assetId
-				left join assetData asset.assetId=assetData.assetId
-				where asset.assetId = Article.assetId
-                                        and assetData.startDate < $now
-                                        and assetData.endDate > $now",
-                        fieldsToIndex => ["linkTitle" ,"linkURL","title","menuTitle","url","synopsis","description" ],
-                        contentType => 'content',
-                        url => 'WebGUI::URL::gateway($data{url})',
-                        headerShortcut => 'select title from asset where assetId = \'$data{assetId}\'',
-                        bodyShortcut => 'select description from wobject where assetId = \'$data{assetId}\'',
-                }
-
-        };
-}
-
-
-
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
