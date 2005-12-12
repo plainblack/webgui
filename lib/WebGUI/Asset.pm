@@ -1495,7 +1495,7 @@ sub www_manageAssets {
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('&nbsp;','','center','');
-         assetManager.AddColumn('".$i18n->get("rank")."','','right','numeric');
+         assetManager.AddColumn('".$i18n->get("rank")."','style=\"cursor:move\"','right','numeric');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');

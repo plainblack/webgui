@@ -1,5 +1,9 @@
 6.8.2
  - Added macro to return the MIME type to a file, FetchMimeType.
+ - Fixed bug where viewProfile did not show pretty printed values
+ - Fixed bug/rfe where it was not obvious when hovering over the rank
+   column in the Asset Manager that you can drag rows up and down.
+   Added cursor:move to the td's style.
 
 6.8.1
  - fix [ 1364965 ] Assets in Trash give Permission Denied in stead of Not

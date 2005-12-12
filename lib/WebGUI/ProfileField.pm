@@ -116,7 +116,7 @@ Optionally pass in a list of properties to override the default properties of an
 
 =head3 withWrapper
 
-A boolean indicating whether to return just the field, or the field with a table label wrapper.
+An integer indicating whether to return just the field's form input, or the field with a table label wrapper (1), or just the field value (2).
 
 =cut
 
@@ -143,8 +143,10 @@ sub formField {
 		$default = WebGUI::Operation::Shared::secureEval($properties->{dataDefault});
 	}
 	$properties->{value} = $default;
-	if ($withWrapper) {
+	if ($withWrapper == 1) {
 		return WebGUI::Form::DynamicField->new(%{$properties})->displayFormWithWrapper;
+	} elsif ($withWrapper == 2) {
+		return WebGUI::Form::DynamicField->new(%{$properties})->displayValue;
 	} else {
 		return WebGUI::Form::DynamicField->new(%{$properties})->displayForm;
 	}
