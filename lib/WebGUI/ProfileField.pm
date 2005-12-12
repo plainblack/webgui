@@ -124,7 +124,7 @@ sub formField {
 	my $self = shift;
 	my $properties = shift || {};
 	my $withWrapper = shift;
-	$properties->{label} = $self->getLabel;
+	$properties->{label} = $self->getLabel unless $properties->{label};
 	$properties->{fieldType} = $self->get("fieldType");
 	$properties->{name} = $self->getId;
 	my $values = WebGUI::Operation::Shared::secureEval($self->get("possibleValues")) || {};

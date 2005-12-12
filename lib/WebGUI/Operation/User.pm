@@ -279,7 +279,8 @@ sub www_editUser {
 		$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category->getLabel.'</td></tr>');
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
-			$tabform->getTab("profile")->raw($field->formField(undef,1));
+			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
+			$tabform->getTab("profile")->raw($field->formField({label=>$label},1));
 		}
 	}
 	my @groupsToAdd = WebGUI::FormProcessor::group("groupsToAdd");
