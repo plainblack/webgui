@@ -8,6 +8,7 @@
  - fix [ 1328728 ] Export exports root page n times
  - fix [ 1338306 ] adminConsoleHelpIcon displayed at wrong position
  - fix [ 1216810 ] anonymous registration errors persist (fixed for real!)
+ - fix [ 1237406 ] HTTP Proxy caches results
  - fix 
 [ 1365822 ] makePrintable does not work in Collaboration System
  - fix [ 1376621 ] dateSubmitted not updated on posts

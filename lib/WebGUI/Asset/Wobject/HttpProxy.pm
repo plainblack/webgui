@@ -326,9 +326,10 @@ sub view {
       } else {
           $ttl = $session{page}{cacheTimeout};
       }
-
-   $cachedContent->set($var{content},$ttl);
-   $cachedHeader->set($var{header},$ttl);
+		unless ($self->get("cacheTimeoutVisitor") <= 1 && $self->get("cacheTimeout") <= 1) {
+	   $cachedContent->set($var{content},$ttl);
+	   $cachedHeader->set($var{header},$ttl);
+	  }
    }
 
    if($var{header} ne "text/html") {
