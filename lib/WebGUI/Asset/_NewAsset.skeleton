@@ -1,0 +1,278 @@
+package WebGUI::Asset::NewAsset;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2005 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+use strict;
+use Tie::IxHash;
+use WebGUI::Asset;
+use WebGUI::HTMLForm;
+use WebGUI::HTTP;
+use WebGUI::Session;
+use WebGUI::Utility;
+
+our @ISA = qw(WebGUI::Asset);
+
+
+=head1 NAME
+
+Package WebGUI::Asset::NewAsset
+
+=head1 DESCRIPTION
+
+Describe your New Asset's functionality and features here.
+
+=head1 SYNOPSIS
+
+use WebGUI::Asset::NewAsset;
+
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+
+
+#-------------------------------------------------------------------
+
+=head2 addRevision
+
+   This method exists for demonstration purposes only.  The superclass
+   handles revisions to NewAsset Assets.
+
+=cut
+
+sub addRevision {
+	my $self = shift;
+	my $newSelf = $self->SUPER::addRevision(@_);
+	return $newSelf;
+}
+
+#-------------------------------------------------------------------
+=head2 definition ( definition )
+
+defines asset properties for New Asset instances.  You absolutely need 
+this method in your new Assets. 
+
+=head3 definition
+
+A hash reference passed in from a subclass definition.
+
+=cut
+
+sub definition {
+	my $class = shift;
+	my $definition = shift;
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
+		templateId =>{
+			
+			#See the list of field/control types in /lib/WebGUI/Form/
+			fieldType=>"template",  
+			
+			defaultValue=>'NewAssetTmpl0000000001',
+			tab=>"display",
+			
+			#www_editSave will ignore anyone's attempts to update this field if this is set to 1
+			noFormPost=>0,  
+			
+			#This is an option specific to the template fieldType.
+			namespace=>"NewAsset", 
+			
+			#This is what will appear when the user hovers the mouse over the label 
+			# of your form field.
+			hoverHelp=>WebGUI::International::get('templateId label description','Asset_NewAsset'),
+			
+			# This is the text that will appear to the left of your form field.
+			label=>WebGUI::International::get('templateId label,"Asset_NewAsset")
+		}
+	);
+	push(@{$definition}, {
+		assetName=>WebGUI::International::get('assetName',"Asset_NewAsset"),
+		icon=>'NewAsset.gif',
+		tableName=>'NewAsset',
+		className=>'WebGUI::Asset::NewAsset',
+		properties=>\%properties
+	});
+	return $class->SUPER::definition($definition);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 duplicate
+
+   This method exists for demonstration purposes only.  The superclass
+   handles duplicating NewAsset Assets.  This method will be called 
+   whenever a copy action is executed
+
+=cut
+
+sub duplicate {
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate(shift);
+	return $newAsset;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getEditForm ()
+
+Returns the TabForm object that will be used in generating the edit page for this asset.
+
+=cut
+
+sub getEditForm {
+   my $self = shift;
+   my $tabform = $self->SUPER::getEditForm();
+   $tabform->getTab("display")->template(
+      -value=>$self->getValue("templateId"),
+	  -label=>WebGUI::International::get('template label', 'Asset_NewAsset'),,
+	  -namespace=>"NewAssetAsset"
+   );
+   $tabform->getTab("properties")->text (
+      -name=>"showPage",
+      -label=>WebGUI::International::get('show page', 'Asset_NewAsset'),
+	  -value=>$self->getValue("showPage"),
+	  -hoverHelp=>WebGUI::International::get('show page description', 'Asset_NewAsset'),
+   );
+   return $tabform;
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 getIcon ( small )
+
+Usually, you should leave out this method.  Use it if you want to override
+the default actions of WebGUI::Asset::getIcon().
+
+=cut
+sub getIcon {
+	my $self = shift;
+	my $small = shift;
+	if ($small && ref($self) eq '') {
+		return $session{config}{extrasURL}.'/assets/small/newAsset.gif';
+	} elsif ($small) {
+		return 'nothing.gif';	
+	}
+	return $session{config}{extrasURL}.'/assets/newAsset.gif';
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+Used to process properties from the form posted.  Do custom things with
+noFormPost fields here, or do whatever you want.  This method is called
+when /yourAssetUrl?func=editSave is requested/posted.
+
+=cut
+
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+This method is called when data is purged by the system.
+removes collateral data associated with a NewAsset when the system
+purges it's data.  This method is unnecessary, but if you have 
+auxiliary, ancillary, or "collateral" data or files related to your 
+asset instances, you will need to purge them here.
+
+=cut
+
+sub purge {
+	my $self = shift;
+	return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+This method is called when data is purged by the system.
+
+=cut
+
+sub purgeRevision {
+	my $self = shift;
+	return $self->SUPER::purgeRevision;
+}
+
+#-------------------------------------------------------------------
+=head2 view ( )
+
+method called by the container www_view method. 
+
+=cut
+
+sub view {
+	my $self = shift;
+	my $var = $self->get; # $var is a hash reference.
+	$var->{controls} = $self->getToolbar;
+	$var->{fileUrl} = $self->getFileUrl;
+	$var->{fileIcon} = $self->getFileIconUrl;
+	return $self->processTemplate($var,$self->getValue("templateId"));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Web facing method which is the default edit page
+
+=cut
+
+sub www_edit {
+   my $self = shift;
+   return WebGUI::Privilege::insufficient() unless $self->canEdit;   
+   $self->getAdminConsole->setHelp("New Asset add/edit", "New Asset");
+   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit asset',"Asset_NewAsset"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+Web facing method which is the default view page.  This method does a 
+302 redirect to the "showPage" file in the storage location.
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	return WebGUI::Privilege::noAccess() unless $self->canView;
+	if ($session{var}{adminOn}) {
+		return $self->getContainer->www_view;
+	}
+	WebGUI::HTTP::setRedirect($self->getFileUrl($self->getValue("showPage")));
+	return "";
+}
+
+
+1;
+
