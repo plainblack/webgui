@@ -77,7 +77,6 @@ sub validateProfileData {
 	my $warning = "";
 	foreach my $field (@{WebGUI::ProfileField->getEditableFields}) {
 		my $fieldValue = $field->formProcess;
-		use Data::Dumper;print $field->getLabel.' : '.Dumper($fieldValue);
 		if (ref $fieldValue eq "ARRAY") {
 			$data{$field->getId} = $$fieldValue[0];
 		} else {
