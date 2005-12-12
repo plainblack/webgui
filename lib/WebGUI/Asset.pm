@@ -1147,7 +1147,7 @@ sub processPropertiesFromFormPost {
 	foreach my $definition (@{$self->definition}) {
 		foreach my $property (keys %{$definition->{properties}}) {
 			if ($definition->{properties}{$property}{noFormPost}) {
-				$data{$property} = $definition->{properties}{$property}{defaultValue} if $session{form}{func} eq 'editSave';
+				$data{$property} = $definition->{properties}{$property}{defaultValue} if $session{form}{assetId} eq "new";
 				next;
 			}
 			$data{$property} = WebGUI::FormProcessor::process(
