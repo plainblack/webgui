@@ -293,7 +293,7 @@ sub www_listSubscriptionCodeBatches {
 	
 	$output = $i18n->get('no subscription code batches') unless (@{$batches});
 
-	return _submenu($output, 'Manage subscription code batches', 'manage batch');
+	return _submenu($output, 'manage batches', 'manage batch');
 }
 
 #-------------------------------------------------------------------
