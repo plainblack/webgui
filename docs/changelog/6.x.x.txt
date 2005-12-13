@@ -1,9 +1,9 @@
 6.8.3
+
+6.8.2
  - fix [ 1378871 ] become this user doesn't work
  - fix [ 1378909 ] (SVN 300) Unable to add user
  - fix [ 1378787 ] Unable to add new group to user
-
-6.8.2
  - Converted all the max((assetData.)revisionDate) calls to use mysql5/(4.1)
    nested queries.
  - Added some more skeletons (newWobject, newAsset, changelog(!))
