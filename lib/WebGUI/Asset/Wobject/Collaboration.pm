@@ -88,7 +88,7 @@ sub appendPostListTemplateVars {
 			#Create user object.
 			my $user = WebGUI::User->new($post->get('ownerUserId'));
 			#Get avatar field, storage Id.
-			my $storageId = $user->get("avatar");
+			my $storageId = $user->profileField("avatar");
 			my $avatar = WebGUI::Storage::Image->get($storageId);
 			if ($avatar) {
 				#Get url from storage object.
