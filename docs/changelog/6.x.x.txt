@@ -1,3 +1,5 @@
+6.8.3
+
 6.8.2
  - Converted all the max((assetData.)revisionDate) calls to use mysql5/(4.1)
    nested queries.
