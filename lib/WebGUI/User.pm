@@ -369,7 +369,7 @@ sub status {
 
 #-------------------------------------------------------------------
 
-=head uncache ( )
+=head2 uncache ( )
 
 Deletes this user object out of the cache.
 
