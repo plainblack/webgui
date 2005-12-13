@@ -159,8 +159,7 @@ sub getUserSearchForm {
 #-------------------------------------------------------------------
 sub www_becomeUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        WebGUI::Session::end($session{var}{sessionId});
-	WebGUI::Session::start($session{form}{uid});
+	WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$session{form}{uid});
 	return "";
 }
 
