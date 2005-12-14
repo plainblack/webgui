@@ -345,6 +345,11 @@ The word "Shortcut".</p>
 		lastUpdated => 1133619940,
 	},
 
+	'This is the example output of the field when parsed for user preference macros' => {
+		message => q|This is the example output of the field when parsed for user preference macros|,
+		lastUpdated => 1133619940,
+	},
+
 	'Replacement Value' => {
 		message => q|Replacement Value|,
 		lastUpdated => 1133619940,

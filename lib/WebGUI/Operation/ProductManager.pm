@@ -234,7 +234,7 @@ sub www_editProductParameterSave {
 
 	$parameterId = $session{form}{parameterId};
 	
-	push (@error, $i18n->get('edit parameter error name')) unless $session{form}{name};
+	push (@error, $i18n->get('edit parameter name error')) unless $session{form}{name};
 	push (@error, $i18n->get('edit parameter productId error')) unless $session{form}{productId};
 
 	return "<ul><li>".join('</li><li>', @error)."</li></ul>".WebGUI::Operation::execute('editProductParameter') if (@error);

@@ -744,7 +744,7 @@ sub www_editOverride {
   my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
   $f->hidden(-name=>"func",-value=>"saveOverride");
   $f->hidden(-name=>"overrideFieldName",-value=>$session{form}{fieldName});
-  $f->readOnly(-label=>$i18n->get("Field Name"),-value=>$session{form}{fieldName});
+  $f->readOnly(-label=>$i18n->get("fieldName"),-value=>$session{form}{fieldName});
   $f->readOnly(-label=>$i18n->get("Original Value"),-value=>$overrides{overrides}{$fieldName}{origValue});
   my %params;
   foreach my $key (keys %{$props{$fieldName}}) {

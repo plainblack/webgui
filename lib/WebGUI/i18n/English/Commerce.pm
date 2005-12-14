@@ -468,10 +468,15 @@ A radio button tied to this plugin.<br>
 		lastUpdated => 0,
 		context => q|The formlabel for the 'select shipping method template' option in the commerce part of the admin console.|
 	},
+	'view shopping cart template' => {
+		message => q|Select view shopping cart template|,
+		lastUpdated => 1134599960,
+		context => q|The formlabel for the 'view shopping cart template' option in the commerce part of the admin console.|
+	},
 	'shopping cart empty' => {
 		message => q|Your shopping cart is empty.|,
-		lastUpdated => 0,
-		context => q|A message indicating that te shopping cart is empty.|
+		lastUpdated => 1134599958,
+		context => q|A message indicating that the shopping cart is empty.|
 	},
 	'update cart' => {
 		message => q|Update cart|,

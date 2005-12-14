@@ -358,7 +358,7 @@ sub www_listSubscriptionCodes {
 	$output .= '<br />';
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr>';
-	$output .= '<th>'.$i18n->get('batchId').'</th><th>'.$i18n->get('code').'</th><th>'.$i18n->get('creation date').
+	$output .= '<th>'.$i18n->get('batch id').'</th><th>'.$i18n->get('code').'</th><th>'.$i18n->get('creation date').
 		'</th><th>'.$i18n->get('dateUsed').'</th><th>'.$i18n->get('status').'</th>';	$output .= '</tr>';
 	foreach (@{$codes}) {
 		$output .= '<tr>';
