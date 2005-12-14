@@ -279,6 +279,8 @@ sub www_editUser {
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
+			# hack to get op=editUser to display the correct stuff.
+			$session{form}{$field->getId} = $u->profileField($field->getId);
 			$tabform->getTab("profile")->raw($field->formField({label=>$label},1));
 		}
 	}
