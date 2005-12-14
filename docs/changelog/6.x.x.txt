@@ -1,6 +1,7 @@
 6.8.3
  - fixed a problem with enabling Avatars in the Collaboration System.
- - fix [ 1379595 ] http proxy broken
+ - fixed a problem with op=editUser where it would use profile field
+   values of the current user.
 
 6.8.2
  - fix [ 1378871 ] become this user doesn't work
