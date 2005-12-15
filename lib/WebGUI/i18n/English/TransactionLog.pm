@@ -121,6 +121,12 @@ A loop containing the transactions in the transaction history. Within this loop 
 		context => q|List transaction workarea title.|
 	},
 
+	'selection message' => {
+		message => q|Use the form below to select which transactions you want to view.|,
+		lastUpdated => 1134665021,
+		context => q|List transaction message.|
+	},
+
 	'topicName' => {
 		message => q|Transaction Log|,
 		lastUpdated => 1128920040,
