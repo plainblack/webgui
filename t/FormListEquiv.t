@@ -31,7 +31,7 @@ use Test::More; # increment this value for each test you create
 #	getName set for direct
 #	compare output of toHtml from both objects
 #	compare output of toHtmlWithWrapper from both objects
-my $numTests = 8*13;
+my $numTests = 8*14;
 
 initialize();  # this line is required
 
@@ -204,6 +204,35 @@ is($direct->{sortByValue}, 1, 'direct Group was assigned sortByValue');
 is($dynamic->toHtml, $direct->toHtml, "matching Group output, toHtml");
 is($dynamic->toHtmlWithWrapper, $direct->toHtmlWithWrapper, "matching Group output, toHtmlWithWrapper");
 is($dynamic->toHtmlAsHidden, $direct->toHtmlAsHidden, "matching Group output, toHtmlAsHidden");
+
+diag("Group, simple equivalency, no default values");
+
+$dynamic = WebGUI::Form::DynamicField->new(
+	fieldType => 'Group',
+	name => 'myGroup',
+	label => 'list of groups',
+	sortByValue => 1,
+	value => '',
+);
+$direct = WebGUI::Form::Group->new({
+	name => 'myGroup',
+	label => 'list of groups',
+	sortByValue => 1,
+	value => '',
+});
+
+#diag("direct" . Dumper($direct));
+#diag("dynamic" . Dumper($dynamic));
+
+is(ref $dynamic, "WebGUI::Form::Group", 'checking dynamic Group');
+is(ref $direct, "WebGUI::Form::Group", 'checking direct Group');
+is($direct->getName, WebGUI::International::get('group','WebGUI'), 'Group getName');
+is($dynamic->{sortByValue}, 1, 'dynamic Group was assigned sortByValue');
+is($direct->{sortByValue}, 1, 'direct Group was assigned sortByValue');
+is($dynamic->toHtml, $direct->toHtml, "matching Group output, toHtml");
+is($dynamic->toHtmlWithWrapper, $direct->toHtmlWithWrapper, "matching Group output, toHtmlWithWrapper");
+is($dynamic->toHtmlAsHidden, $direct->toHtmlAsHidden, "matching Group output, toHtmlAsHidden");
+
 
 diag("TimeZone, simple equivalency");
 
