@@ -15,7 +15,7 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
-	return $session{form}{shift};
+	return $session{req}->param(shift) if ($session{req});
 }
 
 

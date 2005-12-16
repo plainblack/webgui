@@ -5,6 +5,10 @@
  - fix [ 1381551 ] epochToHuman for foreign languages
  - fix [ 1381305 ] SQLReports report nothing!!!
  - fix [ 1381873 ] Matrix missing toolbar
+ - fix [ 1381694 ] Unable to reset votes on poll
+ - fix [ 1381309 ] FormParam macro returns always undef
+ - fix [ 1379595 ] http proxy broken
+ - fix [ 1379060 ] Unable to view subscription codes
 
 
 6.8.2

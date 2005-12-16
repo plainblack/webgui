@@ -14,6 +14,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Asset;
+use Parse::PlainConfig;
 
 my $toVersion = "6.8.3"; # make this match what version you're going to
 my $quiet; # this line required

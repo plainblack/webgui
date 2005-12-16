@@ -238,7 +238,7 @@ sub getEditForm {
 		-name=>"resetVotes",
 		-label=>WebGUI::International::get(10,"Asset_Poll"),
 		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Poll")
-		) if $session{form}{func} eq 'add';
+		) if $session{form}{func} ne 'add';
 	return $tabform;
 }
 

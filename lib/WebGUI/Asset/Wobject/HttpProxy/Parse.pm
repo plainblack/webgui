@@ -37,6 +37,11 @@ my %tag_attr = (
 	"script src" => 1
 	);
 
+sub DESTROY {
+	my $self = shift;
+	$self = undef;
+}
+
 sub new {
   	my $pack = shift;
   	my $self = $pack->SUPER::new();

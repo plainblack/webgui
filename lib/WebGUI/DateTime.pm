@@ -130,7 +130,9 @@ The number of seconds to add to the epoch.
 =cut
 
 sub addToTime {
-	my $date		= DateTime->from_epoch( epoch =>shift);
+	my $epoch = shift;
+	return undef unless $epoch;
+	my $date		= DateTime->from_epoch( epoch =>$epoch);
 	my $hours 		= shift || 0;
 	my $mins	 	= shift || 0;
 	my $secs	 	= shift || 0;
