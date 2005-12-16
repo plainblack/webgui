@@ -91,10 +91,10 @@ method.
 =cut
 
 sub correctValues {
-	my ($self) = @_;
-	return unless defined $self->{value};
+	my ($self, $value) = @_;
+	return unless defined $value;
 	my @defaultValues;
-	foreach (split(/\n/, $self->{value})) {
+	foreach (split(/\n/, $value)) {
 			s/\s+$//; # remove trailing spaces
 			push(@defaultValues, $_);
 	}
