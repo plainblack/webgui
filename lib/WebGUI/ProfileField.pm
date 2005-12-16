@@ -106,7 +106,7 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 formField ( [ formProperties, withWrapper] )
+=head2 formField ( [ formProperties, withWrapper, userObject ] )
 
 Returns an HTMLified form field element.
 
@@ -117,6 +117,10 @@ Optionally pass in a list of properties to override the default properties of an
 =head3 withWrapper
 
 An integer indicating whether to return just the field's form input, or the field with a table label wrapper (1), or just the field value (2).
+
+=head3 userObject
+
+A WebGUI::User object reference to use instead of the currently logged in user.
 
 =cut
 
@@ -137,7 +141,9 @@ sub formField {
 	my $default;
 	if ($session{form}{$properties->{name}}) {
 		$default = $session{form}{$properties->{name}};
-	} elsif ($session{user}{$properties->{name}}) {
+	} elsif (defined $u && $u->profileField($properties->{name})) {
+		$default = $u->profileField($properties->{name});
+	} elsif (!defined $u && $session{user}{$properties->{name}}) {
 		$default = $session{user}{$properties->{name}};
 	} else {
 		$default = WebGUI::Operation::Shared::secureEval($properties->{dataDefault});

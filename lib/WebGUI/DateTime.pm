@@ -653,7 +653,7 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 
 sub setToEpoch {
         my $set = shift;
-        return undef unless defined $set;
+        return undef unless $set;
 	my $parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d %H:%M:%S' );
 	my $dt = $parser->parse_datetime($set);
 	unless ($dt) {
@@ -662,8 +662,6 @@ sub setToEpoch {
 	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
 	$dt->set_time_zone($session{user}{timeZone}|| "America/Chicago"); # assign the user's timezone
-#	my $u = WebGUI::User->new(1);
-#	$dt->set_time_zone($u->profileField("timeZone")); # convert to the visitor's or default time zone
 	return $dt->epoch;
 }
 

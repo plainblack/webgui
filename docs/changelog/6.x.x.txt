@@ -1,7 +1,7 @@
 6.8.3
  - fixed a problem with enabling Avatars in the Collaboration System.
- - fixed a problem with op=editUser where it would use profile field
-   values of the current user.
+ - Fixed a problem where profile data would be mixed between the current user
+   and the user your viewing the profile of.
  - fix [ 1381551 ] epochToHuman for foreign languages
  - fix [ 1381305 ] SQLReports report nothing!!!
  - fix [ 1381873 ] Matrix missing toolbar

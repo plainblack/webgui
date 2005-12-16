@@ -164,7 +164,7 @@ sub www_viewProfile {
 			next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail"));
 			push(@array, {
 				'profile.label' => $field->getLabel,
-				'profile.value' => $field->formField({dataDefault => $u->profileField($field->getId)},2)
+				'profile.value' => $field->formField(undef,2,$u)
 				});
 		}
 	}
