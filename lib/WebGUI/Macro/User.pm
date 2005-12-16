@@ -13,6 +13,21 @@ package WebGUI::Macro::User;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::User
+
+=head1 DESCRIPTION
+
+Macro for displaying information from the current User's profile.
+
+=head2 process( field )
+
+process takes a single parameter, the name of a field in the User's User Profile from
+the data stored in $session .  If the field does not exist, undef is returned.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	return  $session{user}{shift};

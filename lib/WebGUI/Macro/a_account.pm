@@ -16,6 +16,29 @@ use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::a_account
+
+=head1 DESCRIPTION
+
+Macro for displaying a url to the current User's account page.
+
+=head2 process ( [text,template ] )
+
+process takes two optional parameters for customizing the content and layout
+of the account link.
+
+=head3 text
+
+The text of the link.  If no text is displayed an internationalized default will be used.
+
+=head3 template
+
+A template to use for formatting the link.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
        my %var;

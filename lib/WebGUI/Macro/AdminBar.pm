@@ -23,6 +23,26 @@ use WebGUI::SQL;
 use WebGUI::URL;
 use WebGUI::Utility;
 
+=head1 NAME
+
+Package WebGUI::Macro::AdminBar
+
+=head1 DESCRIPTION
+
+Macro for displaying administrative functions to a user with Admin turned on.
+
+=head2 process ( [template ] )
+
+process takes one optional parameters for customizing the layout
+of the Admin bar.
+
+=head3 template
+
+A template to use for formatting the link.  The default template creates the sliding
+Admin bar to the left of the screen.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	return "" unless ($session{var}{adminOn});
