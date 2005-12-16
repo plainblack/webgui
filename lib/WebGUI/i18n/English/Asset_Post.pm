@@ -37,6 +37,10 @@ The synopsis of the Post that is being replied to.
 The content of the Post that is being replied to.
 <p>
 
+<b>reply.userDefined<i>N</i></b><br>
+The contents of user defined fields for the Post that is being replied to, where N is from 1 to 5.
+<p>
+
 <b>subscribe.form</b><br>
 A yes/no button to allow the user to subscribe to the thread this post belongs to.
 <p>
@@ -94,7 +98,7 @@ A form where the user can enter their name.
 <p>
 
 <b>userDefined<i>N</i>.{form,form.yesNo,form.textarea,form.htmlarea}</b><br>
-For each of the 5 User Defined fields, form widgets for a single line of text, a yes/no
+For each of the 5 User Defined fields, which can be form widgets for a single line of text, a yes/no
 field, a text area, or a WYSIWIG HTML area.
 <p>
 
@@ -142,7 +146,7 @@ A form that will set when the post stops being available.
 <p>
 
 |,
-		lastUpdated => 1132758282,
+		lastUpdated => 1134670945,
 	},
 
 	'post template variables title' => {
@@ -232,6 +236,10 @@ URLs that are used to rate this post.  N goes from 1 to 5.
 A conditional that is true if the user has already rated this Post.
 <p>
 
+<b>isMarkedRead</b><br>
+A conditional that is true if the post has been marked as read by the user.
+<p>
+
 <b>image.url</b><br>
 The URL to the first image attached to the Post.
 <p>
@@ -240,16 +248,16 @@ The URL to the first image attached to the Post.
 A thumbnail for the image attached to the Post.
 <p>
 
-<b>attachment.name</b><br>
-The name of the first attachment found on the Post.
-<p>
-
 <b>attachment.url</b><br>
 The URL to download the first attachment attached to the Post.
 <p>
 
 <b>attachment.icon</b><br>
 An icon showing the file type of this attachment.
+<p>
+
+<b>attachment.name</b><br>
+The name of the first attachment found on the Post.
 <p>
 
 <b>attachment_loop</b><br>
@@ -316,6 +324,10 @@ The type of content in the post, typically "code", "text", "HTML", "mixed".
 The contents of the user defined properties, from 1 to 5.
 <p>
 
+<b>content</b><br>
+The content, or body, of the Post.
+<p>
+
 <b>title</b><br>
 The title of the Post.
 <p>
@@ -373,7 +385,7 @@ A conditional indicating whether this Post should be opened in a new window.
 <p>
 
 |,
-		lastUpdated => 1111602134,
+		lastUpdated => 1134670360,
 	},
 
 	'approved' => {

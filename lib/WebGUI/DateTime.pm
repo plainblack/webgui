@@ -203,7 +203,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 =cut
 
 sub epochToHuman {
-	my $language = WebGUI::International::get($session{user}{language});
+	my $language = WebGUI::International::getLanguage($session{user}{language});
 	my $locale = $language->{languageAbbreviation} || "en";
 	$locale .= "_".$language->{locale} if ($language->{locale});
 	my $timeZone = $session{user}{timeZone} || "America/Chicago";

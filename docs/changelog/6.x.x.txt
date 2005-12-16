@@ -2,6 +2,7 @@
  - fixed a problem with enabling Avatars in the Collaboration System.
  - fixed a problem with op=editUser where it would use profile field
    values of the current user.
+ - fix [ 1381551 ] epochToHuman for foreign languages
 
 6.8.2
  - fix [ 1378871 ] become this user doesn't work

@@ -32,6 +32,10 @@ our $HELP = {
 				tag => 'zip archive template',
 				namespace => 'Asset_ZipArchive',
 			},
+			{
+				tag => 'file add/edit',
+				namespace => 'Asset_File',
+			},
 		]
 	},
 
@@ -41,10 +45,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'file add/edit',
-				namespace => 'Asset_File',
-			},
 			{
 				tag => 'template language',
 				namespace => 'Asset_Template',
