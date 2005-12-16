@@ -9,6 +9,11 @@
  - fix [ 1381309 ] FormParam macro returns always undef
  - fix [ 1379595 ] http proxy broken
  - fix [ 1379060 ] Unable to view subscription codes
+ - fix [ 1379407 ] All collaboration systems show up as same username
+ - Fixed a syntax error in Post.pm
+ - fix [ 1382675 ] File Path Wrong - Uploads are difficult
+ - fix [ 1380368 ] Snippets should not contain debugging info
+ - fix [ 1377668 ] Unescaped double quote in Syndacate title cause problems
 
 
 6.8.2

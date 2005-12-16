@@ -158,6 +158,9 @@ if (WebGUI::Grouping::isInGroup(2)) {
 	my $macroHeadTags = generateAdditionalHeadTags();
 	WebGUI::Macro::process(\$macroHeadTags);
 	$output =~ s/\<\!-- macro head tags --\>/$macroHeadTags/;
+	if (WebGUI::ErrorHandler::canShowDebug()) {
+		$output .= WebGUI::ErrorHandler::showDebug();
+	}
 	return $output;
 }	
 

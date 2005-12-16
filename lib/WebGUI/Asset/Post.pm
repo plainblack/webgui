@@ -793,7 +793,7 @@ Sets the status of this post to denied.
 sub setStatusDenied {
         my ($self) = @_;
         $self->update({status=>'denied'});
-        WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',WebGUI::URL::getSiteUrl().'/'.$self->getUrl,580);
+        WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',WebGUI::URL::getSiteURL().'/'.$self->getUrl,580);
 }
 
 #-------------------------------------------------------------------
@@ -811,7 +811,7 @@ sub setStatusPending {
 	} else {
         	$self->update({status=>'pending'});
         	WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
-                	WebGUI::URL::getSiteUrl().'/'.$self->getUrl("revision=".$self->get("revisionDate")),578,'WebGUI','pending');
+                	WebGUI::URL::getSiteURL().'/'.$self->getUrl("revision=".$self->get("revisionDate")),578,'WebGUI','pending');
 	}
 }
 

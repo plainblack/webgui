@@ -532,6 +532,8 @@ sub view {
 sub _constructRSSHeadTitleLink{
     my($var,$rssTitle)=@_;
     my $rssFeedSuffix=WebGUI::International::get('RSS Feed Title Suffix','Asset_SyndicatedContent');
+    my $title = ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix;
+	$title =~ s/\"/&quot;/g;
     WebGUI::Style::setLink($var->{'rss.url'},
 			   { rel=>	'alternate', 
 			     type=>	'application/rss+xml', 

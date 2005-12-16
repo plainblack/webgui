@@ -104,7 +104,7 @@ sub contentHandler {
 		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$r->print(WebGUI::HTTP::getHeader());
 	} elsif ($session{setting}{specialState} eq "upgrading") {
-		$r->print(upgrading());
+		upgrading($r);
 	} elsif ($session{setting}{specialState} eq "init") {
 		$r->print(setup());
 	} else {
@@ -117,16 +117,9 @@ sub contentHandler {
 		} else {
 			$output = page();
 		}
+		$r->print(WebGUI::HTTP::getHeader());
+		$r->print($output) unless (WebGUI::HTTP::isRedirect());
 		WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
-		if (WebGUI::HTTP::isRedirect()) {
-			$output = WebGUI::HTTP::getHeader();
-		} else {
-			$output = WebGUI::HTTP::getHeader().$output;
-			if (WebGUI::ErrorHandler::canShowDebug()) {
-				$output .= WebGUI::ErrorHandler::showDebug();
-			}
-		}
-		$r->print($output);
 	}
 	WebGUI::Session::close();
 	return Apache2::Const::OK;
@@ -261,13 +254,13 @@ sub uploadsHandler {
 
 #-------------------------------------------------------------------
 sub upgrading {
-        my $output = WebGUI::HTTP::getHeader();
+	my $r = shift;
+        $r->print(WebGUI::HTTP::getHeader());
 	open(FILE,"<".$session{config}{webguiRoot}."/docs/maintenance.html");
 	while (<FILE>) {
-		$output .= $_;
+		$r->print($_);
 	}
 	close(FILE);
-	return $output;
 }
 
 
