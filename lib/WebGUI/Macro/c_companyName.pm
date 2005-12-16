@@ -13,6 +13,20 @@ package WebGUI::Macro::c_companyName;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::c_companyName
+
+=head1 DESCRIPTION
+
+Macro for displaying the Company Name entered into the WebGUI site settings
+
+=head2 process ( )
+
+returns the companyName from the session variable.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
         return $session{setting}{companyName};
