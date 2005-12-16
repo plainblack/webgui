@@ -316,7 +316,7 @@ sub _processQuery {
 	
 	# Preprocess macros
         if ($self->{_query}{$nr}{preprocessMacros}) {
-		my $query = $self->{_query}{$nr}{dbQuery};
+		$query = $self->{_query}{$nr}{dbQuery};
                 WebGUI::Macro::process(\$query);
         } else {
                 $query = $self->{_query}{$nr}{dbQuery};

@@ -3,6 +3,7 @@
  - fixed a problem with op=editUser where it would use profile field
    values of the current user.
  - fix [ 1381551 ] epochToHuman for foreign languages
+ - fix [ 1381305 ] SQLReports report nothing!!!
 
 6.8.2
  - fix [ 1378871 ] become this user doesn't work
