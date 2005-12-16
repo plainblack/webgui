@@ -13,6 +13,23 @@ package WebGUI::Macro::AdminText;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::AdminText
+
+=head1 DESCRIPTION
+
+Macro for displaying a text message to user's with Admin turned on.
+
+=head2 process ( [text] )
+
+=head3 text
+
+The text to be displayed to the user.  If the user is not in Admin mode the empty
+string is returned.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
         my @param = @_;

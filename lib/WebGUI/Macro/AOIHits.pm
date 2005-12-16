@@ -14,6 +14,27 @@ use strict;
 use WebGUI::Session;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Macro::AOIHits
+
+=head1 DESCRIPTION
+
+Macro for displaying the number of times a key,value pair occurs in the
+metadata for content viewed by the current user.
+
+=head2 process ( key, value )
+
+=head3 key
+
+The metadata property that will be looked up.
+
+=head3 value
+
+The value for the key that will be looked up.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	my (@param, $temp);

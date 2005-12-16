@@ -15,6 +15,27 @@ use Time::HiRes;
 use WebGUI::Asset;
 use WebGUI::ErrorHandler;
 use WebGUI::Session;
+use WebGUI::International;
+
+=head1 NAME
+
+Package WebGUI::Macro::AssetProxy
+
+=head1 DESCRIPTION
+
+Macro for displaying the output of an Asset in another location.
+
+=head2 process ( url )
+
+=head3 url
+
+The URL of the Asset whose output will be returned.  If no Asset with that URL
+can be found, an internationalized error message will be returned instead.
+
+No editing controls (toolbar) will be displayed in the Asset output, even if
+Admin is turned on.
+
+=cut
 
 #-------------------------------------------------------------------
 sub process {
@@ -28,7 +49,7 @@ sub process {
 		$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if (WebGUI::ErrorHandler::canShowPerformanceIndicators());
 		return $output;
 	} else {
-		return "Invalid Asset URL";
+		return WebGUI::International::get('invalid url', 'Macro_AssetProxy');
 	}
 }
 

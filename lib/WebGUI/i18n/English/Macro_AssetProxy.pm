@@ -12,6 +12,11 @@ our $I18N = {
         lastUpdated => 1112315917,
     },
 
+    'invalid url' => {
+        message => q|Invalid Asset URL|,
+        lastUpdated => 1134769012,
+    },
+
     'asset proxy body' => {
         message => q|
 <P><B>&#94;AssetProxy</B>(<i>Asset URL</i>);<BR>

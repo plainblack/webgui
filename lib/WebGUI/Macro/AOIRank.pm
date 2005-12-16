@@ -14,6 +14,27 @@ use strict;
 use WebGUI::Session;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Macro::AOIRank
+
+=head1 DESCRIPTION
+
+Macro for displaying the value for a metadata property by rank.
+
+=head2 process ( key, [ rank ] )
+
+=head3 key
+
+The metadata property that will be looked up.
+
+=head3 rank
+
+Define which value, by it's ranking, will be displayed.  The highest ranking is
+1.  If the rank is omitted, a default of 1 will be used.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	my (@param, $temp);
