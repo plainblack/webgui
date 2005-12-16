@@ -13,6 +13,25 @@ package WebGUI::Macro::CanEditText;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::CanEditText
+
+=head1 DESCRIPTION
+
+Macro for displaying a message to a User who can edit the Asset
+containing the Macro.  This macro should not be used outside
+of an Asset as it will yield unpredictable results.
+
+=head2 process ( text )
+
+=head3 text
+
+The text that will be shown to the user.  If the user cannot edit
+this asset, an empty string will be returned.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	my @param = @_;

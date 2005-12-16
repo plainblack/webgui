@@ -13,6 +13,18 @@ package WebGUI::Macro::At_username;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::At_username
+
+=head1 DESCRIPTION
+
+Macro for displaying the current User's username.
+
+=head2 process
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	return $session{user}{username};
