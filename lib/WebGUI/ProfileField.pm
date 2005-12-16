@@ -128,6 +128,7 @@ sub formField {
 	my $self = shift;
 	my $properties = shift || {};
 	my $withWrapper = shift;
+	my $u = shift;
 	$properties->{label} = $self->getLabel unless $properties->{label};
 	$properties->{fieldType} = $self->get("fieldType");
 	$properties->{name} = $self->getId;
