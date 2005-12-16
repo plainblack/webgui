@@ -24,59 +24,153 @@ my @tmplVarTable = (
 	## Templates from WebGUI:Operation::Profile.pm
 	{
 		id   => 'PBtmpl0000000000000051',
-		vars => [ qw(profile.form.footer profile.form.header profile.form.hidden profile.form.submit) ],
+		var  => [ qw(profile.form.footer profile.form.header profile.form.hidden profile.form.submit) ],
 	},
 	{
 		id   => 'PBtmpl0000000000000052',
-		vars => [ ],
+		var  => [ ],
 	},
 	## Templates from WebGUI::AdminConsole.pm
 	{
 		id   => 'PBtmpl0000000000000137',
-		vars => [ ],
+		var  => [ ],
 	},
 	{
 		id   => 'PBtmpl0000000000000001',
-		vars => [ qw(application_loop application.workarea) ],
+		var  => [ qw(application.workarea) ],
+		loop => [ qw(application_loop)]
 	},
 	## Templates from WebGUI::Operation::MessageLog.pm
 	{
 		id   => 'PBtmpl0000000000000050',
-		vars => [ qw(message.loop) ],
+		loop => [ qw(message.loop) ],
 	},
 	{
-		id   => 'PBtmpl0000000000000049',
-		vars => [ qw(message.takeAction) ],
+		id  => 'PBtmpl0000000000000049',
+		var => [ qw(message.takeAction) ],
 	},
 	## Templates from WebGUI::Operation::Help.pm
 	{
 		id   => 'PBtmplHelp000000000001',
-		vars => [ qw(body fields) ],
+		var  => [ qw(body) ],
+		loop => [ qw(fields) ],
+		if   => [ qw(fields) ],
 	},
 	## Login, account and password templates
 	{
 		id   => 'PBtmpl0000000000000010',
-		vars => [ ],
+		var => [ ],
 	},
 	{
 		id   => 'PBtmpl0000000000000011',
-		vars => [ ],
+		var  => [ ],
 	},
 	{
 		id   => 'PBtmpl0000000000000012',
-		vars => [ ],
+		var  => [ ],
 	},
 	{
 		id   => 'PBtmpl0000000000000013',
-		vars => [ ],
+		var  => [ ],
 	},
 	{
 		id   => 'PBtmpl0000000000000014',
-		vars => [ ],
+		var  => [ ],
 	},
 	{
 		id   => 'PBtmpl0000000000000020',
-		vars => [ qw(field.isRequired) ],
+		if   => [ qw(field.isRequired) ],
+	},
+	## Templates with editing toolbars
+	###Matrix Default View
+	{
+		id   => 'matrixtmpl000000000001',
+		var  => [ qw(controls) ],
+	},
+	###Article
+	{
+		id   => 'PBtmpl0000000000000002',
+		var  => [ qw(controls) ],
+	},
+	###Dashboard
+	{
+		id   => 'DashboardViewTmpl00001',
+		var  => [ qw(controls) ],
+	},
+	###DataForm
+	{
+		id   => 'PBtmpl0000000000000141',
+		var  => [ qw(controls) ],
+	},
+	###EventsCalendar
+	{
+		id   => 'PBtmpl0000000000000022',
+		var  => [ qw(controls) ],
+	},
+	###Folder
+	{
+		id   => 'PBtmpl0000000000000078',
+		var  => [ qw(controls) ],
+	},
+	###HttpProxy
+	{
+		id   => 'PBtmpl0000000000000033',
+		var  => [ qw(controls) ],
+	},
+	###Layout
+	{
+		id   => 'PBtmpl0000000000000054',
+		var  => [ qw(controls) ],
+	},
+	###MessageBoard
+	{
+		id   => 'PBtmpl0000000000000047',
+		var  => [ qw(controls) ],
+	},
+	###MultiSearch
+	{
+		id   => 'MultiSearchTmpl0000001',
+		var  => [ qw(controls) ],
+	},
+	###Navigation
+	{
+		id   => 'PBtmpl0000000000000048',
+		var  => [ qw(controls) ],
+	},
+	###Poll
+	{
+		id   => 'PBtmpl0000000000000055',
+		var  => [ qw(controls) ],
+	},
+	###SQL Report
+	{
+		id   => 'PBtmpl0000000000000059',
+		var  => [ qw(controls) ],
+	},
+	###Stock Data
+	{
+		id   => 'StockDataTMPL000000001',
+		var  => [ qw(controls) ],
+	},
+	###Survey
+	{
+		id   => 'PBtmpl0000000000000061',
+		var  => [ qw(controls) ],
+	},
+	###SyndicatedContent
+	{
+		id   => 'PBtmpl0000000000000065',
+		var  => [ qw(controls) ],
+	},
+	###Weather Data
+	{
+		id   => 'WeatherDataTmpl0000001',
+		var  => [ qw(controls) ],
+	},
+	###WS Client
+	{
+		id   => 'PBtmpl0000000000000069',
+		var  => [ qw(controls) ],
 	},
 
 );
@@ -86,9 +180,15 @@ my $numTests = 0;
 
 initialize();  # this line is required
 
+my @varTypes = qw( var loop if );
+
 foreach my $tmpl (@tmplVarTable) {
 	++$numTests; #Check for template existance
-	$numTests += scalar @{ $tmpl->{vars} }; #Check for each mandatory variable
+	foreach my $varType (@varTypes) {
+		next unless exists $tmpl->{$varType};
+		$tmpl->{numTests} += scalar @{ $tmpl->{$varType} };
+	}
+	$numTests += $tmpl->{numTests};
 }
 
 # put your tests here
@@ -102,11 +202,13 @@ foreach my $tmpl ( @tmplVarTable ) {
 	my $tmplAsset = WebGUI::Asset->newByDynamicClass($tmplId);
 	my $tmplExists = is(ref($tmplAsset), 'WebGUI::Asset::Template', "$tmplId exists");
 	SKIP: {
-		skip("$tmplId could not be found", scalar @{ $tmpl->{vars} }) unless $tmplExists;
+		skip("$tmplId could not be found",  $tmpl->{numTests} ) unless $tmplExists;
 		my $tmplName = $tmplAsset->get('title');
 		my $template = $tmplAsset->get('template');
-		foreach my $var ( @{ $tmpl->{vars} }) {
-			ok( $template=~qr/$var/, "Checking for $var in $tmplName, id=$tmplId");
+		foreach my $varType ( @varTypes ) {
+			foreach my $var ( @{ $tmpl->{$varType} }) {
+				ok( $template=~qr/(?i)<tmpl_$varType\s+$var/, "Checking for $var of type $varType in $tmplName, id=$tmplId");
+			}
 		}
 	}
 }
