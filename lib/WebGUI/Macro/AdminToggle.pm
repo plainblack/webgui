@@ -27,7 +27,7 @@ Macro for displaying a url to the user for turning Admin mode on and off.
 
 =head2 process ( [turnOn,turnOff,template ] )
 
-process takes two optional parameters for customizing the content and layout
+process takes three optional parameters for customizing the content and layout
 of the account link.
 
 =head3 turnOn
@@ -42,7 +42,7 @@ Turn On Admin group.  If this is blank an internationalized default is used.
 
 =head3 template
 
-A template to use for formatting the link.
+A template from the Macro/AdminToggle namespace to use for formatting the link.
 
 =cut
 

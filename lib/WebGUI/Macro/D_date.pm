@@ -13,6 +13,29 @@ package WebGUI::Macro::D_date;
 use strict;
 use WebGUI::DateTime;
 
+=head1 NAME
+
+Package WebGUI::Macro::D_date
+
+=head1 DESCRIPTION
+
+Macro for displaying dates formatted for reading by people using WebGUI::DateTime::epochToHuman().
+
+=head2 process ( format string, [ date ] )
+
+=head3 format string
+
+A string specifying how to format the date using codes similar to those used by
+sprintf.  See L<WebGUI::DateTime/"epochToHuman"> for a list of codes.
+
+=head3 date
+
+An optional date in epoch format.  If the date is omitted, then the present
+time is used instead.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
         my (@param, $temp, $time);

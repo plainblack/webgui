@@ -13,6 +13,23 @@ package WebGUI::Macro::Env;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::Env
+
+=head1 DESCRIPTION
+
+Macro for displaying fields from the Session env hash.
+
+=head2 process ( key )
+
+=head3 key
+
+The key from the Session env hash to display.  If the key doesn't exist,
+then undef will be returned.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	return $session{env}{shift};
