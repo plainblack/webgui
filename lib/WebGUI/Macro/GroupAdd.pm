@@ -17,6 +17,33 @@ use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::GroupAdd
+
+=head1 DESCRIPTION
+
+Macro that allows users to add themselves to a group.
+
+=head2 process ( groupId, text, [ template ] )
+
+=head3 groupId
+
+The ID of a group.  The group must exist and be set up for auto adds for the link
+to be shown.
+
+=head3 text
+
+The text that will be displayed to the user in the link for adding themselves
+to the group.
+
+=head3 template
+
+An optional template for formatting the text and link.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
 	my @param = @_;
@@ -27,9 +54,9 @@ sub process {
 	return "" if ($g->groupId eq "");
 	return "" unless ($g->autoAdd);
 	return "" if (WebGUI::Grouping::isInGroup($g->groupId));
-       my %var = ();
-       $var{'group.url'} = WebGUI::URL::page("op=autoAddToGroup;groupId=".$g->groupId);
-       $var{'group.text'} = $param[1];
+	my %var = ();
+	$var{'group.url'} = WebGUI::URL::page("op=autoAddToGroup;groupId=".$g->groupId);
+	$var{'group.text'} = $param[1];
 	if ($param[2]) {
 		return  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
 	} else {

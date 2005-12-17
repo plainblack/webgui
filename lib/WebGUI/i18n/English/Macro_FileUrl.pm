@@ -21,6 +21,11 @@ This macro is used to return a filesystem URL to an File, Image or Snippet Asset
         lastUpdated => 1112315914,
     },
 
+    'invalid url' => {
+        message => q|Invalid Asset URL|,
+        lastUpdated => 1134855446,
+    },
+
 };
 
 1;

@@ -25,11 +25,17 @@ The URL with the action to add the user to the group.
 The supplied text string for the user to click on.
 
 <p>
-<b>NOTE:</b> If the user is not logged in, or or already belongs to the group, or the group is not set to allow auto adds, then no link will be displayed.
+<b>NOTE:</b> All these conditions must be met for the link to be displayed:
+<ul>
+<li>User must be logged in.</li>
+<li>User must not already belong to the group.</li>
+<li>The group must exist.</li>
+<li>The group must be set up to allow auto adds.</li>
+</ul>
 <p>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1134856680,
 	},
 };
 
