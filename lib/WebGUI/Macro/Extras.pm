@@ -13,6 +13,20 @@ package WebGUI::Macro::Extras;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::Extras
+
+=head1 DESCRIPTION
+
+Macro for returning the extrasURL set up in the site's WebGUI.conf
+file.
+=head2 process
+
+Returns the extrasURL.  A trailing slash '/' is appended to the URL.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
         return $session{config}{extrasURL}."/";

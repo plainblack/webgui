@@ -14,6 +14,26 @@ use strict;
 use WebGUI::Session;
 use LWP::MediaTypes qw(guess_media_type);
 
+=head1 NAME
+
+Package WebGUI::Macro::FetchMimeType
+
+=head1 DESCRIPTION
+
+Macro for determining the MIME type for a file.
+
+=head2 process ( filepath )
+
+Returns the MIME type for a file, as determined by
+LWP::MediaTypes::guess_media_type.
+
+=head3 filepath
+
+A path to a file
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
 	my $path = shift;

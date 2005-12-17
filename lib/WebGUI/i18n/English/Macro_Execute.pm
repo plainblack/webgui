@@ -7,6 +7,11 @@ our $I18N = {
         lastUpdated => 1128838230,
     },
 
+    'execute error' => {
+        message => q|SECURITY VIOLATION|,
+        lastUpdated => 1134850023,
+    },
+
     'execute title' => {
         message => q|Execute Macro|,
         lastUpdated => 1112466408,

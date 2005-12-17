@@ -16,7 +16,7 @@ our $I18N = {
 		message => q|
 
 <b>&#94;EditableToggle; or &#94;EditableToggle();</b><br>
-Exactly the same as AdminToggle, except that the toggle is only displayed if the user has the rights to edit the current page. This macro takes up to three parameters. The first is a label for "Turn Admin On", the second is a label for "Turn Admin Off", and the third is the name of a template in the Macro/EditableToggle namespace to replace the default template.
+Exactly the same as AdminToggle, except that the toggle is only displayed if the user has the rights to edit the current Asset. This macro takes up to three parameters. The first is a label for "Turn Admin On", the second is a label for "Turn Admin Off", and the third is the name of a template in the Macro/EditableToggle namespace to replace the default template.
 <p>
 The following variables are available in the template:
 <p/>
@@ -28,7 +28,7 @@ The Internationalized label for turning on or off Admin (depending on the state 
 <p/>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1134799755,
 	},
 
 	'516' => {
