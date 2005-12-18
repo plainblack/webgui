@@ -169,8 +169,8 @@ assetContainers = WebGUI::Asset::Wobject::Layout, WebGUI::Asset::Wobject::Folder
 # _uiLevel to the end of it, then you can start specifying field
 # names and associated UI Level.
 
-#WebGUI_Asset_Wobject_Article = menuTitle => 9, url => 8
-#WebGUI_Asset_RichEdit = askAboutRichEdit => 7, preformatted => 3
+#WebGUI_Asset_Wobject_Article_uiLevel = menuTitle => 9, url => 8
+#WebGUI_Asset_RichEdit_uiLevel = askAboutRichEdit => 7, preformatted => 3
 
 # If exportPath is defined, an "Export" toolbar icon will appear
 # which allows you to export assets to static HTML. This folder
