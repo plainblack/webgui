@@ -15,6 +15,33 @@ use WebGUI::Grouping;
 use WebGUI::SQL;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::GroupText
+
+=head1 DESCRIPTION
+
+Macro for displaying a text message to user's in a certain group.
+
+=head2 process ( groupName, member, nonMember )
+
+Either the member or nonMember texts can be blank.
+
+=head3 groupName
+
+The name of the group whose members will be shown the message.
+
+=head3 member
+
+The text to be displayed to someone in the group.
+
+=head3 nonMember
+
+Text to be shown to someone not in the group.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
 	my @param = @_;

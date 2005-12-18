@@ -17,6 +17,33 @@ use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::GroupDelete
+
+=head1 DESCRIPTION
+
+Macro that allows users to remove themselves to a group.
+
+=head2 process ( groupName, text, [ template ] )
+
+=head3 groupName
+
+The name of a group.  The group must exist and be set up for auto deletes for the link
+to be shown.
+
+=head3 text
+
+The text that will be displayed to the user in the link for removing themselves
+to the group.
+
+=head3 template
+
+An optional template for formatting the text and link.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
 	my @param = @_;

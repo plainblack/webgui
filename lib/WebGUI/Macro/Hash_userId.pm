@@ -13,6 +13,21 @@ package WebGUI::Macro::Hash_userId;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::Hash_userId
+
+=head1 DESCRIPTION
+
+Macro for userId of the current user.
+
+=head2 process
+
+Returns the userId from the session variable for the current user.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
         return $session{user}{userId};

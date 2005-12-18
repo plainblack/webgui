@@ -25,11 +25,11 @@ Package WebGUI::Macro::GroupAdd
 
 Macro that allows users to add themselves to a group.
 
-=head2 process ( groupId, text, [ template ] )
+=head2 process ( groupName, text, [ template ] )
 
-=head3 groupId
+=head3 groupName
 
-The ID of a group.  The group must exist and be set up for auto adds for the link
+The name of a group.  The group must exist and be set up for auto adds for the link
 to be shown.
 
 =head3 text

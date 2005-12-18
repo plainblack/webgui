@@ -24,13 +24,17 @@ The URL with the action to add the user to the group.
 <b>group.text</b><br/>
 The supplied text string for the user to click on.
 
-
 <p>
-<b>NOTE:</b> If the user is not logged in or the user does not belong to the group, or the group is not set to allow auto deletes, then no link will be displayed.
-<p>
+<b>NOTE:</b> All these conditions must be met for the link to be displayed:
+<ul>
+<li>User must be logged in.</li>
+<li>User must be a member of the group.</li>
+<li>The group must exist.</li>
+<li>The group must be set up to allow auto deletes.</li>
+</ul>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1134866717,
 	},
 };
 
