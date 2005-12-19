@@ -11,6 +11,7 @@
 # ---- BEGIN DO NOT EDIT ----
 use strict;
 use lib '../lib';
+use Text::Balanced qw(extract_codeblock);
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Operation::Help;
@@ -61,36 +62,58 @@ foreach my $helpSet (@helpFileSet) {
 ##	namespace -> which help file it is form
 ##	label -> which help file it is form
 
+diag("Getting Help labels");
 my @helpLabels = getHelpLabels();
 
+diag("Getting SQL labels");
 my @sqlLabels = getSQLLabels();
 
 my @libLabels;
+diag("Getting subroutine labels");
 find(\&label_finder_pm, '../lib/');
+
+my @objLabels;
+diag("Getting object labels");
+find(\&obj_finder_pm, '../lib/');
 
 diag ("Checking ". scalar(@helpLabels). " help labels");
 diag ("Checking ". scalar(@sqlLabels). " SQL labels");
 diag ("Checking ". scalar(@libLabels). " library code labels");
+diag ("Checking ". scalar(@objLabels). " library code labels via object");
 
 $numTests = scalar(@helpLabels)
 	  + scalar(@sqlLabels)
-	  + scalar(@libLabels);
+	  + scalar(@libLabels)
+	  + scalar(@objLabels);
 
 diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
+
+diag("Help Label tests\n");
 
 foreach my $i18n ( @helpLabels ) {
 	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
 	sprintf "label: %s->%s inside %s->%s->%s", @{ $i18n }{'namespace', 'label', 'topic', 'entry', 'tag', });
 }
 
+diag("SQL Label tests\n");
+
 foreach my $i18n ( @sqlLabels ) {
 	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
 	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
 }
 
+diag("Subroutine Call Label tests\n");
+
 foreach my $i18n ( @libLabels ) {
+	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
+	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
+}
+
+diag("Object Method Label tests\n");
+
+foreach my $i18n ( @objLabels ) {
 	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
 	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
 }
@@ -114,6 +137,30 @@ sub label_finder_pm {
 					label=>$label,
 					namespace=>$namespace || 'WebGUI',
 				};
+	}
+}
+
+sub obj_finder_pm {
+	next unless /\.pm$/;
+	open my $pmf, $_
+		or die "unable to open file $File::Find::name: $!\n";
+	my $libFile = '';
+	{
+		local $/;
+		$libFile = <$pmf>;
+	}
+	close $pmf;
+	##Advance pos to first subroutine
+	while ( my $subBody = extract_codeblock($libFile, '{}', qr/(?ms).*?^sub (\w+)\s*/) ) {
+		next unless $subBody =~ /(\w+)\s*=\s*WebGUI::International->new\(($quotelike)\)/;
+		my ($obj, $namespace) = ($1,$2);
+		while ( $subBody =~ /$obj\->get\(($sub_args)\)/msgc ) {
+			push @objLabels, {
+				file=>$File::Find::name,
+				label=>$1,
+				namespace=>$namespace || 'WebGUI',
+			};
+		}
 	}
 }
 
