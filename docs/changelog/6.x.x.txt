@@ -1,5 +1,5 @@
 6.9.0
-
+ - fix [ 1379384 ] image uploads to non-public pages
 
 6.8.3
  - fixed a problem with enabling Avatars in the Collaboration System.
