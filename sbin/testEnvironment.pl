@@ -47,6 +47,7 @@ checkModule("HTTP::Request",1.40);
 checkModule("HTTP::Headers",1.61);
 checkModule("Test::More",0.61,1);
 checkModule("Pod::Coverage",0.17,1);
+checkModule("Text::Balanced",1.95,1);
 checkModule("Digest::MD5",2.20);
 checkModule("DBI",1.40);
 checkModule("DBD::mysql",2.1021);
