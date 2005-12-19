@@ -211,7 +211,6 @@ sub tryAssetMethod {
 #-------------------------------------------------------------------
 sub uploadsHandler {
 	my $r = shift;
-	my $s = Apache2::ServerUtil->server;
 	my $ok = Apache2::Const::OK;
 	my $notfound = Apache2::Const::NOT_FOUND;
 	if (-e $r->filename) {
@@ -226,10 +225,9 @@ sub uploadsHandler {
 			close(FILE);
 			my @privs = split("\n",$fileContents);
 			unless ($privs[1] eq "7" || $privs[1] eq "1") {
-				### Apache2::Request object
-				$session{req} = Apache2::Request->new($r);;
-				WebGUI::HTTP::getCookies();
+				my $s = Apache2::ServerUtil->server;
 				WebGUI::Session::open($s->dir_config('WebguiRoot'),'modperl',"false");
+				$session{cookie} = APR::Request::Apache2->handle($r)->jar();
 				if ($session{cookie}{wgSession} eq "") {
 					WebGUI::Session::start(1); #setting up a visitor session
 				} else {
