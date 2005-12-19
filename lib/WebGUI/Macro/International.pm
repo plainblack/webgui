@@ -14,6 +14,31 @@ use strict;
 use WebGUI::International;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::International
+
+=head1 DESCRIPTION
+
+Macro for displaying an internationalized label from WebGUI's internationalization system.
+
+=head2 process ( label, namespace )
+
+Note that a particular language cannot be specified.  It uses either the
+current User's setting or the default language for the site.  English is
+always used as a fallback.
+
+=head3 label
+
+The label to pull.
+
+=head3 namespace
+
+The namespace to pull the label from.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
 	return WebGUI::International::get(shift,shift);

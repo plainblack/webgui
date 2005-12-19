@@ -12,13 +12,34 @@ package WebGUI::Macro::Include;
 
 use strict;
 use FileHandle;
+use WebGUI::International;
+
+=head1 NAME
+
+Package WebGUI::Macro::Include
+
+=head1 DESCRIPTION
+
+Macro for returning the contents of a file from the filesystem.
+
+=head2 process ( filename )
+
+process will return internationalized error messages if an illegal file
+is read (password, group of config file) or if the file could not be found.
+
+=head3 filename
+
+The complete path to a file in the local filesystem.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub process {
         my (@param, $temp, $file);
         @param = @_;
         if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /WebGUI.conf/) {
-                $temp = "SECURITY VIOLATION";
+                $temp = WebGUI::International::get('security','Macro_Include');
         } else {
                 $file = FileHandle->new($param[0],"r");
                 if ($file) {
@@ -27,7 +48,7 @@ sub process {
                         }
                         $file->close;
                 } else {
-                        $temp = "INCLUDED FILE DOES NOT EXIST";
+			$temp = WebGUI::International::get('not found','Macro_Include');
                 }
         }
         return $temp;
