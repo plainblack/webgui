@@ -7,6 +7,12 @@ our $I18N = {
 		lastUpdated => 1128838656,
 	},
 
+	'eval error' => {
+		message => q|<p><b>If Macro failed:</b> %s <p>Expression: %s
+		<br />Display if true: %s<br />Display if false: %s|,
+		lastUpdated => 1134967651,
+	},
+
 	'if title' => {
 		message => q|If Macro|,
 		lastUpdated => 1112466408,

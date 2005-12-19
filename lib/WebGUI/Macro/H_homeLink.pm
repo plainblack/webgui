@@ -16,6 +16,31 @@ use WebGUI::Asset::Template;
 use WebGUI::International;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::H_homeLink
+
+=head1 DESCRIPTION
+
+Returns a templated link for the default page, determined by the WebGUI settings.
+
+=head2 process ( [label, templateUrl] )
+
+=head3 label
+
+The text to present to the user as a link to the home page.  If left blank, an
+internationalized label will be used.  If the label is the word "linkonly",
+the macro will just return the bare link, with no templating.
+
+=head3 templateUrl
+
+A URL for a template to use to style the link.  This can be used to add
+images or other stuff.  If left blank, a default template will
+be used.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
         my ($label, $templateUrl) = @_;

@@ -31,14 +31,14 @@ Package WebGUI::Macro::AdminBar
 
 Macro for displaying administrative functions to a user with Admin turned on.
 
-=head2 process ( [template ] )
+=head2 process ( [templateId ] )
 
 process takes one optional parameters for customizing the layout
 of the Admin bar.
 
-=head3 template
+=head3 templateId
 
-A template to use for formatting the link.  The default template creates the sliding
+The ID for a template to use for formatting the link.  The default template creates the sliding
 Admin bar to the left of the screen.
 
 =cut
