@@ -21,6 +21,7 @@ Package WebGUI::Macro::Extras
 
 Macro for returning the extrasURL set up in the site's WebGUI.conf
 file.
+
 =head2 process
 
 Returns the extrasURL.  A trailing slash '/' is appended to the URL.

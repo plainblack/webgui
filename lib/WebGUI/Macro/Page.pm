@@ -13,6 +13,25 @@ package WebGUI::Macro::Page;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::Page
+
+=head1 DESCRIPTION
+
+Macro for pulling information from the Asset in which it's embedded.
+
+=head2 process ( property )
+
+If the macro is called from outside of an Asset, or if there's no asset in
+session variable, returns a single space.
+
+=head3 property
+
+The name of the property to retrieve from the assset via $session{asset}->get()
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	if (exists $session{asset}) {

@@ -13,6 +13,22 @@ package WebGUI::Macro::PageTitle;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::PageTitle
+
+=head1 DESCRIPTION
+
+Macro for returning the title of the current Asset.
+
+=head2 process ( )
+
+Returns the title of the current Asset.  If a WebGUI operation or function
+is active, then the title is returned as a link to the Asset.  If there's
+no asset cached in the session variable, nothing is returned.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	if (exists $session{asset}) {

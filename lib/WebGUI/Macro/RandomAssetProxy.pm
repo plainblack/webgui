@@ -13,6 +13,25 @@ package WebGUI::Macro::RandomAssetProxy;
 use strict;
 use WebGUI::Asset;
 use WebGUI::Session;
+use WebGUI::International;
+
+=head1 NAME
+
+Package WebGUI::Macro::RandomAssetProxy
+
+=head1 DESCRIPTION
+
+Macro for displaying a random asset.
+
+=head2 process ( url )
+
+=head3 url
+
+The URL of an asset from the site.  A random asset will be chosen
+from among that asset's children.  Error message will be returned
+if no asset exists at that url, or if the asset has no children.
+
+=cut
 
 #-------------------------------------------------------------------
 sub process {
@@ -28,10 +47,10 @@ sub process {
 			$randomAsset->toggleToolbar;
 			return $randomAsset->canView ? $randomAsset->view() : undef;
 		} else {
-			return "Asset has no children.";
+			return WebGUI::International::get('childless','Macro_RandomAssetProxy');
 		}
 	} else {
-		return "Invalid asset URL.";
+		return WebGUI::International::get('invalid url','Macro_RandomAssetProxy');
 	}
 }
 

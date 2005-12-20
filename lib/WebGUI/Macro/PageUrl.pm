@@ -14,6 +14,20 @@ use strict;
 use WebGUI::Session;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::Page
+
+=head1 DESCRIPTION
+
+Macro for displaying the url for the current asset.
+
+=head2 process ( )
+
+process is really a wrapper around WebGUI::URL::page();
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	return WebGUI::URL::page();
