@@ -13,6 +13,25 @@ package WebGUI::Macro::Splat_random;
 use strict;
 use WebGUI::Utility;
 
+=head1 NAME
+
+Package WebGUI::Macro::Splat_random
+
+=head1 DESCRIPTION
+
+Macro for returning a bounded, integer random number.
+
+=head2 process ( max )
+
+Random numbers are rounded, not truncated.
+
+=head3 max
+
+The maximum random number.  If omitted, 1_000_000_000 is
+used as a default.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
         my ($temp, @param);

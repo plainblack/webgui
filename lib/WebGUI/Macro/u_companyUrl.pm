@@ -13,6 +13,21 @@ package WebGUI::Macro::u_companyUrl;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::u_companyUrl
+
+=head1 DESCRIPTION
+
+Macro for displaying the Company URL entered into the WebGUI site settings
+
+=head2 process ( )
+
+returns the companyURL from the session variable.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
         return $session{setting}{companyURL};

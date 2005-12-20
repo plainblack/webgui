@@ -17,6 +17,38 @@ use WebGUI::Asset::Template;
 use WebGUI::URL;
 use WebGUI::Utility;
 
+=head1 NAME
+
+Package WebGUI::Macro::r_printable
+
+=head1 DESCRIPTION
+
+Macro for displaying a link to the user to change the page's style template
+to one more suitable for printing.
+
+=head2 process ( [text,styleId,template] )
+
+process takes two optional parameters for customizing the content and layout
+of the account link.
+
+=head3 text
+
+The text of the link.  If no text is displayed an internationalized
+default will be used.  If the text equals 'linkonly', then only the
+URL for the link will be returned instead of the templated output.
+
+=head3 styleId
+
+The default style to make the page printable is "Make Page Printable".  The
+styleId argument can be used to override this default.
+
+=head3 template
+
+The URL to a template to use for formatting the link.  If omitted, a default
+is used.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
         my ($temp, @param, $styleId);

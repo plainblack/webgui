@@ -7,12 +7,33 @@ use WebGUI::Asset::Template;
 use WebGUI::SQL;
 use WebGUI::International;
 
+=head1 NAME
+
+Package WebGUI::Macro::Product
+
+=head1 DESCRIPTION
+
+This macro looks up a Product in the Product Manager 
+
+=head2 process ( ID/SKU [,templateId] )
+
+=head3 productId or SKU
+
+The productId or SKU of the project to look up.
+
+=head3 templateId
+
+An alternate template to use for formatting the link, referenced by templateId.  If this
+is left blank, a default template from the Macro/Product namespace will be used.
+
+=cut
+
 sub process {
 	my (@param, $productId, $variantId, $product, $variant, $output, $templateId, @variantLoop, %var);
 	
 	@param = @_;
 	
-	return 'No SKU or productId passed' unless ($_[0]);
+	return WebGUI::International::get('no sku or id') unless ($_[0]);
 
 	($productId, $variantId) = WebGUI::SQL->quickArray("select productId, variantId from productVariants where sku=".quote($_[0]));
 	($productId) = WebGUI::SQL->quickArray("select productId from products where sku=".quote($_[0])) unless ($productId);

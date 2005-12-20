@@ -14,6 +14,23 @@ use strict;
 use WebGUI::Asset::File::Image;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::Thumbnail
+
+=head1 DESCRIPTION
+
+Macro for returning a thumbnail to an Image Asset.
+
+=head2 process ( url )
+
+=head3 url
+
+A URL to the Image Asset whose thumbnail you want to display.  If no
+Image Asset can be found with that URL, then undef will be returned.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
         my $url = shift;

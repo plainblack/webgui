@@ -16,6 +16,11 @@ our $I18N = {
 		lastUpdated => 1128918830,
 	},
 
+	'no sku or id' => {
+		message => q|No SKU or productId passed|,
+		lastUpdated => 1135117939,
+	},
+
 	'cannot find product' => {
 		message => q|Cannot find product|,
 		lastUpdated => 1128976376,
@@ -32,10 +37,10 @@ our $I18N = {
 <p>
 <b>&#94;Product(<i>SKU or productId</i>, [<i>templateId</i>]);</b><br>
 This macro looks up a Product in the Product Manager by SKU or productId and
-allows information about i to be displayed.  If the SKU or productId cannot
+allows information about it to be displayed.  If the SKU or productId cannot
 be found, the message ^International("cannot find product","Macro_Product"); will
 be displayed.</p>
-<p>The macro may take one optional argument, an alternate template in the Macro/Product namespace for formatting information about the Product.  The following variables are available in the template:</p>
+<p>The macro takes one optional argument, an alternate template in the Macro/Product namespace for formatting information about the Product.  The following variables are available in the template:</p>
 
 <p><b>variants.message</b><br />
 The internationalized text "^International("available product configurations","Macro_Product");"

@@ -15,6 +15,29 @@ use WebGUI::Session;
 
 #-------------------------------------------------------------------
 
+=head1 NAME
+
+Package WebGUI::Macro::Spacer
+
+=head1 DESCRIPTION
+
+Macro for outputting a spacer graphic.
+
+=head2 process ( [width, height] )
+
+process takes returns an IMG tag pointing to the spacer gif in the WebGUI
+extras directory.
+
+=head3 width
+
+Set the width of the spacer.
+
+=head3 height
+
+Set the height of the spacer.
+
+=cut
+
 sub process {
         my ($output, @param, $width, $height);
         @param = @_;

@@ -14,6 +14,25 @@ use strict;
 use WebGUI::Session;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::URLEncode
+
+=head1 DESCRIPTION
+
+Macro for URL encoding text.
+
+=head2 process ( text )
+
+process is really a wrapper around WebGUI::URL::escape;
+of the account link.
+
+=head3 text
+
+The text to URL encode.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	return WebGUI::URL::escape(shift);
