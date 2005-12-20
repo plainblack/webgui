@@ -14,6 +14,20 @@ use strict;
 use WebGUI::Session;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::Slash_gatewayUrl
+
+=head1 DESCRIPTION
+
+Macro for returning the gateway URL (defined in the WebGUI config file) to the site.
+
+=head2 process ( )
+
+process is really a wrapper around WebGUI::URL::gateway();
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	return WebGUI::URL::gateway();

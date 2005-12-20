@@ -24,6 +24,17 @@ A one line SQL report. Sometimes you just need to pull something back from the d
 |,
 		lastUpdated => 1112466919,
 	},
+
+	'illegal query' => {
+		message => q|Cannot execute this type of query.|,
+		lastUpdated => 1135105884,
+	},
+
+	'sql error' => {
+		message => q|<p><b>SQL Macro Failed:</b>%s<p>|,
+		lastUpdated => 1135105919,
+	},
+
 };
 
 1;

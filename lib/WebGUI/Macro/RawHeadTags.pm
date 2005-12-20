@@ -14,6 +14,24 @@ use strict;
 use WebGUI::Session;
 use WebGUI::Style;
 
+=head1 NAME
+
+Package WebGUI::Macro::RawHeadTags
+
+=head1 DESCRIPTION
+
+Macro for adding
+
+=head2 process ( tags )
+
+process is a wrapper for WebGUI::Style::setRawHeadTags();
+
+=head3 text
+
+Text that will be added to the HEAD tags for this page.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	WebGUI::Style::setRawHeadTags(shift);

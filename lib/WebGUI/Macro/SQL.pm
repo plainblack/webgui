@@ -14,6 +14,30 @@ use strict;
 use WebGUI::Session;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Macro::SQL
+
+=head1 DESCRIPTION
+
+Macro for executing SQL select-type statements and returning formatted output.
+
+=head2 process ( SQL, format )
+
+=head3 SQL
+
+The SQL statement to execute.  If the statement is not something that
+returns data (select, show, describe), an error message is returned.  If
+there is an error executing the SQL, an error message will be returned.
+
+=head3 format
+
+Describes how to format the results of the SQL statement.  For each
+term in in a select-type statement, a numeric macro (^0, ^1, etc.)can
+be used to position its output in the format.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	my ($output, @data, $rownum, $temp);
@@ -22,7 +46,7 @@ sub process {
 	if ($statement =~ /^\s*select/i || $statement =~ /^\s*show/i || $statement =~ /^\s*describe/i) {
 		my $sth = WebGUI::SQL->unconditionalRead($statement,WebGUI::SQL->getSlave);
 		unless ($sth->errorCode < 1) { 
-			return '<p><b>SQL Macro Failed:</b> '.$sth->errorMessage.'<p>';
+			return sprintf WebGUI::International::get('sql error','Macro_SQL'), $sth->errorMessage;
 		} else {
 			while (@data = $sth->array) {
                 		$temp = $format; 
@@ -35,7 +59,7 @@ sub process {
 			return $output;
 		}
 	} else {
-		return "Cannot execute this type of query.";
+		return WebGUI::International::get('illegal query','Macro_SQL');
 	}
 }
 

@@ -24,7 +24,7 @@ Macro for returning the title of the current Asset.
 =head2 process ( )
 
 Returns the title of the current Asset.  If a WebGUI operation or function
-is active, then the title is returned as a link to the Asset.  If there's
+is active, then the title is returned as a link to the Asset.  If there is
 no asset cached in the session variable, nothing is returned.
 
 =cut

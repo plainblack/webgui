@@ -14,6 +14,22 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Macro::RootTitle
+
+=head1 DESCRIPTION
+
+Macro for returning the title of the root for this page.
+
+=head2 process ( )
+
+If an asset exists in the session variable cache and and it's
+topmost parent (root) can be found the title for that asset
+is returned.  Otherwise a space is returned.
+
+=cut
+
 #-------------------------------------------------------------------
 sub process {
 	if (exists $session{asset}) {
