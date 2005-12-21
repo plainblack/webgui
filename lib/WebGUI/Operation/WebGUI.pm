@@ -22,6 +22,13 @@ use WebGUI::URL;
 use WebGUI::User;
 
 #-------------------------------------------------------------------
+
+=head2 www_genesis ( )
+
+The beginning of WebGUI.
+
+=cut
+
 sub www_genesis {
 	$session{page}{useEmptyStyle} = 1;
 	my $output = '<html><head><title>About WebGUI</title>
@@ -38,6 +45,14 @@ sub www_genesis {
 	</body></html>';
 	return $output;
 }
+
+=head2 www_setup ( )
+
+Initial setup for a brand new WebGUI install.  Sets the administrator name,
+password and email address, as well as some other WebGUI settings.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_setup {
@@ -136,6 +151,14 @@ sub www_setup {
 </html>';
 	return $output;
 }
+
+
+=head2 theWg ( )
+
+The core WebGUI function.  All WebGUI Assets, Operations and functions require this
+to work, even superseding the session variable.
+
+=cut
 
 
 #-------------------------------------------------------------------

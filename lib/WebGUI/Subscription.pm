@@ -8,6 +8,25 @@ use WebGUI::Utility;
 use WebGUI::Commerce::Payment;
 use WebGUI::DateTime;
 
+=head1 NAME
+
+Package WebGUI::Subscription
+
+=head1 DESCRIPTION
+
+Base class for subscriptions
+
+=head2 _getDuration ( $duration )
+
+Internal utility function for calculating when a subscription expires.
+Returns the date in epoch format when it expires.
+
+=head3 $duration
+
+Text description of how long the subscription lasts.
+
+=cut
+
 sub _getDuration {
 	my $duration = shift;
 	
@@ -21,8 +40,23 @@ sub _getDuration {
 }
 
 #-------------------------------------------------------------------
+
+=head2 apply ( [ $userId ] )
+
+Method for subscribing a user.  Adds user to the proper group and sets the expiration date,
+adds karma to the user for purchasing a subscription, and then runs any external commands
+as specified by the executeOnSubscription property.  Macros in executeOnSubscription are
+expanded before the command is executed.
+
+=head3 userId
+
+ID of the user purchasing the subscription.  If omitted, uses the current user as
+specified by the session variable.
+
+=cut
+
 sub apply {
-	my ($self, $userId, $groupId, $expirationDate);
+	my ($self, $userId, $groupId);
 	$self = shift;
 	$userId = shift || $session{user}{userId};
 	$groupId = $self->{_properties}{subscriptionGroup};
@@ -40,6 +74,14 @@ sub apply {
 }
 
 #-------------------------------------------------------------------
+
+=head2 delete 
+
+Method for deleting a subscription.  Marks the subscription as deleted in the database
+but does not remove it from the database.
+
+=cut
+
 sub delete {
 	my ($self);
 	$self = shift;
@@ -49,6 +91,19 @@ sub delete {
 }
 	
 #-------------------------------------------------------------------
+
+=head2 get ( $key )
+
+Generic assessor method for Subscription objects.
+
+=head3 key
+
+Returns only the requested property.  Returns undef if the key does not exist
+in the object properties.  Returns the entire property hash if the key is
+false (0, undef, '');
+
+=cut
+
 sub get {
 	my ($self, $key) = @_;
 	return $self->{_properties}{$key} if ($key);
@@ -56,6 +111,19 @@ sub get {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new ( $subscriptionId )
+
+Object creation method.
+
+=head3 subscriptionId
+
+ID of the subscription to create.  If this subscriptionId exists in the
+database, the object created will be fully populated with properties
+from the database.
+
+=cut
+
 sub new {
 	my ($class, $subscriptionId, %properties);
 	$class = shift;
@@ -72,6 +140,23 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+
+=head2 set ( $properties )
+
+Returns the date in epoch format when it expires.
+
+=head3 $properties
+
+A hashref containing properties to set in the object.  Only valid properties will be
+set.  Also updates the subscription record in the database with properties that have
+been set.
+
+=head3 Valid Object properties
+
+name price description subscriptionGroup duration executeOnSubscribe karma
+
+=cut
+
 sub set {
 	my ($self, $properties, @fieldsToUpdate);
 	$self = shift;
