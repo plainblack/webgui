@@ -21,7 +21,26 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Operations::ActiveSessions
+
+=head1 DESCRIPTION
+
+Operation handler for displaying and killing active sessions.
+
+=cut
+
 #-------------------------------------------------------------------
+
+=head2 www_killSession ( )
+
+This method can be called directly, but is usually called
+from www_viewActiveSessions. It ends the active session in
+$session{form}{sid}.  Afterwards, it calls www_viewActiveSessions.
+
+=cut
+
 sub www_killSession {
 	return www_viewActiveSessions() if $session{form}{sid} eq $session{var}{sessionId};
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
@@ -30,6 +49,14 @@ sub www_killSession {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_viewActiveSessions ( )
+
+Display a list of all active user sessions, along with an icon to
+delete (kill) each one via www_killSession
+
+=cut
+
 sub www_viewActiveSessions {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);

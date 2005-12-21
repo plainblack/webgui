@@ -21,6 +21,51 @@ use WebGUI::Asset::Wobject;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
+=head1 NAME
+
+Package WebGUI::Asset::Wobject::Article
+
+=head1 DESCRIPTION
+
+Asset to display content to the user.  Most content in WebGUI sites
+will be Articles.
+
+Articles are Wobjects, so they inherit all the methods and properties of
+Wobjects.
+
+=head2 definition ( $class, $definition )
+
+This method defines all properties of an Article and is used to autogenerate
+most methods used by the Article.
+
+=head3 $class
+
+$class is used to make sure that inheritance works on Assets and Wobjects.
+
+=head3 $definition
+
+Definition hashref from subclasses.
+
+=head3 Article specific properties
+
+=over 4
+
+=item templateId
+
+ID of a tempate from the Article namespace to display the contents of the Article.
+
+=item linkTitle
+
+The text displayed to the user as a hyperlink to the linkURL.
+
+=item convertCarriageReturns
+
+A boolean.  If set to true, all newlines will be converted to Break tags so that simple
+text will come out formatted as paragraphs.
+
+=back
+
+=cut
 
 #-------------------------------------------------------------------
 sub definition {
@@ -75,6 +120,14 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view ( )
+
+view defines all template variables, processes the template and
+returns the output.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my %var;

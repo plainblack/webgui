@@ -18,7 +18,34 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Form;
 
+=head1 NAME
+
+Package WebGUI::Operation::Cache
+
+=head1 DESCRIPTION
+
+Operational handler for caching functions.
+
+=cut
+
 #-------------------------------------------------------------------
+
+=head2 _submenu ( $workarea [,$title ] )
+
+Internal subroutine for rendering output with an Admin Console.  Returns
+the rendered output.
+
+=head3 $workarea
+
+The output that should be wrapped with an Admin Console.
+
+=head3 $title
+
+An optional title for the Admin Console.  If it evaluates to true,  the title
+is looked up in the i18n table in the WebGUI namespace.
+
+=cut
+
 sub _submenu {
 	my $workarea = shift;
 	my $title = shift;
@@ -32,6 +59,20 @@ sub _submenu {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_flushCache ( duration )
+
+
+This method can be called directly, but is usually called from
+www_manageCache. It flushes the cache.  Afterwards, it calls
+www_manageCache.
+
+=head3 duration
+
+Text description of how long the subscription lasts.
+
+=cut
+
 sub www_flushCache {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $cache = WebGUI::Cache->new();
@@ -40,6 +81,14 @@ sub www_flushCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageCache ( )
+
+Display information about the current cache type and cache statistics.  Also
+provides an option to clear the cache.
+
+=cut
+
 sub www_manageCache {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);

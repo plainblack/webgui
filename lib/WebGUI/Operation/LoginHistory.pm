@@ -20,15 +20,30 @@ use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Operation::LoginHistory
+
+=cut
 
 #-------------------------------------------------------------------
+
+=head2 www_viewLoginHistory ( )
+
+Display the login history for all users by when they logged in.
+The login history is a table of username, userId, status, login date,
+IP address they logged in from and what browser (really userAgent)
+they used.
+
+=cut
+
 sub www_viewLoginHistory {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$sth = WebGUI::SQL->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
 	while (%data = $sth->hash) {
-		$data{username} = 'unknown user' if ($data{userId} eq "0");
+		$data{username} = WebGUI::International::get('unknown user') if ($data{userId} eq "0");
 		$row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
 		$row[$i] .= '<td>'.$data{status}.'</td>';
 		$row[$i] .= '<td>'.epochToHuman($data{timeStamp},"%H:%n%p %M/%D/%y").'</td>';

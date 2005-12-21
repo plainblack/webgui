@@ -49,6 +49,16 @@ sub getInstance {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_auth ( )
+
+This subroutine does authentication dispatch.  It looks up the authentication method for
+the current user, makes sure that it supports the operation that has been requested,
+and then executes it.  If an illegal method was requested, then an error message
+is returned.
+
+=cut
+
 sub www_auth {
    my $auth;
    ($auth) = WebGUI::SQL->quickArray("select authMethod from users where username=".quote($session{form}{username})) if($session{form}{username});

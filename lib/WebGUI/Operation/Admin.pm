@@ -15,7 +15,24 @@ use WebGUI::AdminConsole;
 use WebGUI::Grouping;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Operation::Admin
+
+=head1 DESCRIPTION
+
+Operation handler for admin functions
+
+=cut
+
 #-------------------------------------------------------------------
+
+=head2 www_adminConsole ( )
+
+If the current user is in the Turn On Admin Group, then return an Admin Console.
+
+=cut
+
 sub www_adminConsole {
 	return "" unless (WebGUI::Grouping::isInGroup(12));
 	my $ac = WebGUI::AdminConsole->new;
@@ -23,6 +40,15 @@ sub www_adminConsole {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_switchOffAdmin ( )
+
+If the current user is in the Turn On Admin Group, then allow them to turn off Admin mode
+via WebGUI::Session::switchAdminOff()
+
+
+=cut
+
 sub www_switchOffAdmin {
 	return "" unless (WebGUI::Grouping::isInGroup(12));
 	WebGUI::Session::switchAdminOff();
@@ -30,6 +56,14 @@ sub www_switchOffAdmin {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_adminConsole ( )
+
+If the current user is in the Turn On Admin Group, then allow them to turn on Admin mode.
+via WebGUI::Session::switchAdminOn()
+
+=cut
+
 sub www_switchOnAdmin {
 	return "" unless (WebGUI::Grouping::isInGroup(12));
 	WebGUI::Session::switchAdminOn();

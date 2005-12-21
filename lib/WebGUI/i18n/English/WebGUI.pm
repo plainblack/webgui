@@ -3845,6 +3845,11 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 1131246512,
 	},
 
+	'unknown user' => {
+		message => q|unknown user|,
+		lastUpdated => 1135205716,
+	},
+
 };
 
 1;

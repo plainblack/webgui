@@ -13,13 +13,41 @@ package WebGUI::Operation::Scratch;
 use strict;
 use WebGUI::Session;
 
+=head1 NAME
+
+Package WebGUI::Operation::Scratch
+
+=head1 DESCRIPTION
+
+Operations that provide access to the scratch area of the session variable.
+
+=cut
+
 #-------------------------------------------------------------------
+
+=head2 www_deleteScratch ( )
+
+Delete a variable from the session scratch area by setting a form
+variable, scratchName.
+
+=cut
+
 sub www_deleteScratch {
 	WebGUI::Session::deleteScratch("www_".$session{form}{scratchName});
 	return "";
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteScratch ( )
+
+
+Delete a variable from the session scratch area by setting forms
+variables, scratchName, the name of the variable to set, and scratchValue,
+the value the variable should take.
+
+=cut
+
 sub www_setScratch {
 	WebGUI::Session::setScratch("www_".$session{form}{scratchName},$session{form}{scratchValue});
 	return "";
