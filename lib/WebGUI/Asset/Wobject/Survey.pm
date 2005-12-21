@@ -1163,6 +1163,7 @@ sub www_respond {
 	my $varname = $self->getResponseIdString;
 	return "" unless ($session{scratch}{$varname});
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($session{user}{userId}),0,8) : $session{user}{userId};
+	my $terminate = 0;
 	foreach my $key (keys %{$session{form}}) {
 		if ($key =~ /^answerId_(.+)$/) {
 			my $id = $1;
@@ -1170,6 +1171,9 @@ sub www_respond {
 				where Survey_answerId=".quote($session{form}{"answerId_".$id})." and Survey_responseId=".quote($session{scratch}{$varname}));
 			next if ($previousResponse);
 			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$session{form}{"answerId_".$id});
+			if ($self->get("questionOrder") eq "response" && $answer->{gotoQuestion} eq "") {
+				$terminate = 1;
+			}
 			my $response = $session{form}{"textResponse_".$id} || $answer->{answer};
 			WebGUI::SQL->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
 				".quote($answer->{Survey_answerId}).", ".quote($answer->{Survey_questionId}).", ".quote($session{scratch}{$varname}).", ".quote($answer->{Survey_id}).",
@@ -1177,7 +1181,7 @@ sub www_respond {
 		}
 	}
 	my $responseCount = $self->getQuestionResponseCount($session{scratch}{$varname}); 
-	if ($responseCount >= $self->getValue("questionsPerResponse") || $responseCount >= $self->getQuestionCount) {
+	if ($terminate || $responseCount >= $self->getValue("questionsPerResponse") || $responseCount >= $self->getQuestionCount) {
 		WebGUI::SQL->setRow("Survey_response","Survey_responseId",{
 			isComplete=>1,
 			endDate=>WebGUI::DateTime::time(),
