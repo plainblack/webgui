@@ -17,12 +17,49 @@ use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::AOIHits
+
+=head1 DESCRIPTION
+
+Macro for displaying either a login box and registration link to the
+user, or, if they're logged in, a link to access their account and log out.
+
+=head2 _createURL ( text )
+
+internal utility sub for wrapping text in a link.
+
+=head3 text
+
+text to wrap in a link for logging out.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _createURL {
 	return '<a href="'.WebGUI::URL::page("op=auth;method=logout").'">'.$_[0].'</a>';
 }
 
 #-------------------------------------------------------------------
+
+=head2 process ( boxSize, text, templateId )
+
+=head3 boxSize
+
+The size of the login box.  Defaults to 12.
+
+=head3 text
+
+A custom text message, processed for embedded text surrounded by percent signs
+to turn into links to logout.
+
+=head3 templateId
+
+The ID of a template for custom layout of the login box and text.
+
+=cut
+
 sub process {
         my @param = @_;
 	my $templateId = $param[2] || "PBtmpl0000000000000044";

@@ -16,6 +16,35 @@ use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
+=head1 NAME
+
+Package WebGUI::Macro::LoginToggle
+
+=head1 DESCRIPTION
+
+Macro for a login or logout message with link to the user depending on whether they are logged in or now.
+
+=head2 process ( [ loginText, logoutText, templateId ] )
+
+Note, if loginText = 'linkonly', then only the link will be returned.
+
+=head3 loginText
+
+Text that will be displayed to the user if they are not logged in.  If blank, an
+internationalized message will be used.
+
+=head3 logoutText
+
+Text that will be displayed to the user if they are logged in.  If blank, an
+internationalized message will be used.
+
+=head3 templateId
+
+The ID of a template for custom layout of the link and text.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
         my @param = @_;
