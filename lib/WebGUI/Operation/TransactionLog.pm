@@ -10,7 +10,28 @@ use WebGUI::Form;
 use WebGUI::Privilege;
 use WebGUI::Grouping;
 
+=head1 NAME
+
+Package WebGUI::Operation::TransactionLog
+
+=head1 DESCRIPTION
+
+Operations for dealing with transactions from the WebGUI Commerce System.
+
+=cut
 #-------------------------------------------------------------------
+
+=head2 www_viewPurchaseHistory ( errorMessage )
+
+Templated output of all Commerce transactions by this user.  Allows the user to cancel any recurring
+transactions.
+
+=head3 errorMessage
+
+This error message will be added to the template variables.
+
+=cut
+
 sub www_viewPurchaseHistory {
 	my (@history, @historyLoop, %var, %properties);
 
@@ -35,6 +56,15 @@ sub www_viewPurchaseHistory {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_cancelRecurringTransaction ( )
+
+Cancels a transaction if it is recurring.  If not, an error message is returned.
+The transaction to cancel is passed in via a form field entry in the session variable,
+$session{form}{tid}.
+
+=cut
+
 sub www_cancelRecurringTransaction {
 	my ($transaction, $error, $message);
 	
@@ -52,6 +82,14 @@ sub www_cancelRecurringTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteTransaction ( )
+
+Deletes a transaction, as specified by $session{form}{tid}.
+Afterward, it calls www_listTransactions
+
+=cut
+
 sub www_deleteTransaction {
 	my $transactionId;
 

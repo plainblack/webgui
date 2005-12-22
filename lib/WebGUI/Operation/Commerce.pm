@@ -357,7 +357,7 @@ sub www_deleteCartItem {
 
 #-------------------------------------------------------------------
 sub www_editCommerceSettings {
-	my (%tabs, $tabform, $jscript, $currentPlugin, $ac, $jscript, $i18n, 
+	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
 		$paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin,
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
@@ -561,16 +561,16 @@ sub www_listTransactions {
 	my $i18n = WebGUI::International->new('TransactionLog');
 
 	my $transactionOptions = {
-		''		=> 'Any',
-		'Pending'	=> 'Pending',
-		'Completed'	=> 'Completed',
+		''		=> $i18n->get('any'),
+		'Pending'	=> $i18n->get('pending'),
+		'Completed'	=> $i18n->get('completed'),
 	};
 
 	my $shippingOptions = {
-		''		=> 'Any',
-		'Shipped'	=> 'Shipped',
-		'NotShipped'	=> 'Not yet shipped',
-		'Delivered'	=> 'Delivered',
+		''		=> $i18n->get('any'),
+		'Shipped'	=> $i18n->get('shipped'),
+		'NotShipped'	=> $i18n->get('not shipped'),
+		'Delivered'	=> $i18n->get('delivered'),
 	};
 	
 	my $initStart = WebGUI::FormProcessor::date('initStart');

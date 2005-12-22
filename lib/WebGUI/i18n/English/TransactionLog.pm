@@ -132,6 +132,30 @@ A loop containing the transactions in the transaction history. Within this loop 
 		lastUpdated => 1128920040,
 		context => q|An error message that's shown when an attempt is made to cancel a non recurring transaction.|
 	},
+	'pending' => {
+		message => q|Pending|,
+		lastUpdated => 1135291532,
+	},
+	'completed' => {
+		message => q|Completed|,
+		lastUpdated => 1135291540,
+	},
+	'shipped' => {
+		message => q|Shipped|,
+		lastUpdated => 1135291545,
+	},
+	'not shipped' => {
+		message => q|Not Shipped|,
+		lastUpdated => 1135291589,
+	},
+	'any' => {
+		message => q|Any|,
+		lastUpdated => 1135291967,
+	},
+	'delivered' => {
+		message => q|Delivered|,
+		lastUpdated => 1135291969,
+	},
 	
 };
 
