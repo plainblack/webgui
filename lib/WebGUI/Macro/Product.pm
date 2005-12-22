@@ -33,7 +33,7 @@ sub process {
 	
 	@param = @_;
 	
-	return WebGUI::International::get('no sku or id') unless ($_[0]);
+	return WebGUI::International::get('no sku or id','Macro_Product') unless ($_[0]);
 
 	($productId, $variantId) = WebGUI::SQL->quickArray("select productId, variantId from productVariants where sku=".quote($_[0]));
 	($productId) = WebGUI::SQL->quickArray("select productId from products where sku=".quote($_[0])) unless ($productId);

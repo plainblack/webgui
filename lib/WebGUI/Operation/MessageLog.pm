@@ -25,12 +25,36 @@ use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
 
+=head1 NAME
+
+Package WebGUI::Operation::MessageLog
+
+=head1 DESCRIPTION
+
+Operations for viewing message logs and individual messages.
+
+=cut
+
 #-------------------------------------------------------------------
+
+=head2 _status ( )
+
+returns a hashref with internationalized values for message status.
+
+=cut
+
 sub _status {
    return {"notice"=>WebGUI::International::get(551),"pending"=>WebGUI::International::get(552),"completed"=>WebGUI::International::get(350)};
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_viewMessageLog ( )
+
+Templated display all messages for the current user.
+
+=cut
+
 sub www_viewMessageLog {
    my (@msg, $vars);
    return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
@@ -68,6 +92,13 @@ sub www_viewMessageLog {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_viewMessageLog ( )
+
+Templated display of a single message for the user.
+
+=cut
+
 sub www_viewMessageLogMessage {
    my ($data, $vars);
    return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
