@@ -120,15 +120,15 @@ sub definition {
                                 defaultValue=>undef
                                 },
  			toolbarRow1=>{
-                        	fieldType=>'checkBox',
+                        	fieldType=>'checkList',
                                 defaultValue=>undef
                                 },
  			toolbarRow2=>{
-                        	fieldType=>'checkBox',
+                        	fieldType=>'checkList',
                                 defaultValue=>undef
                                 },
  			toolbarRow3=>{
-                        	fieldType=>'checkBox',
+                        	fieldType=>'checkList',
                                 defaultValue=>undef
                                 },
 			enableContextMenu => {
