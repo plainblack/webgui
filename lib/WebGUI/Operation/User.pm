@@ -34,8 +34,35 @@ use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
 
+=head1 NAME
 
+Package WebGUI::Operation::User
+
+=head1 DESCRIPTION
+
+Operation for creating, deleting, editing and many other user related functions.
+
+=cut
 #-------------------------------------------------------------------
+
+=head2 _submenu ( $workarea [, $title, $help] )
+
+Internal utility routine for setting up the Admin Console for User functions.
+
+=head3 $workarea
+
+The form and information to display to the administrator using the function.
+
+=head3 $title
+
+Internationalized title for the Admin Console, looked up in the WebGUI namespace if it exists.
+
+=head3 $help
+
+Help topic.  If set, then a Help icon will be displayed as a link to that topic.
+
+=cut
+
 sub _submenu {
         my $workarea = shift;
         my $title = shift;
@@ -62,7 +89,25 @@ sub _submenu {
 	}
         return $ac->render($workarea, $title);
 }
-                                                                                                                                                       
+
+=head2 doUserSearch ( $op, $returnPaginator, $userFilter )
+
+Subroutine that actually performs the SQL search for users.
+
+=head3 $op
+
+The name of the calling operation, passed so that pagination links work correctly.
+
+=head3 $returnPaginator
+
+A boolean.  If true, a paginator object is returned.  Otherwise, a WebGUI::SQL
+statement handler is returned.
+
+=head3 $userFilter
+
+Array reference, used to screen out user names via a SQL "not in ()" clause.
+
+=cut
 
 #-------------------------------------------------------------------
 sub doUserSearch {
@@ -101,6 +146,19 @@ sub doUserSearch {
 	}
 }
 
+=head2 doUserSearchForm ( $op, $params )
+
+Form front-end and display for searching for users.
+
+=head3 $op
+
+The name of the calling operation, passed so that pagination links work correctly.
+
+=head3 $params
+
+Hashref.  A set of key,value pairs that will be hidden in the user search form.
+
+=cut
 
 #-------------------------------------------------------------------
 sub getUserSearchForm {
@@ -157,6 +215,15 @@ sub getUserSearchForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_becomeUser ( )
+
+A wrapper around WebGUI::Session::convertVisitorToUser(), so that you can assume the UID
+for a different user in the current session.  Uses $session{form}{uid} to supply the
+UID of the user to become.
+
+=cut
+
 sub www_becomeUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$session{form}{uid});
@@ -164,24 +231,16 @@ sub www_becomeUser {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteGrouping {
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	if (($session{user}{userId} eq $session{form}{uid} || $session{form}{uid} eq '3') && $session{form}{gid} eq '3') {
-		return _submenu(WebGUI::Privilege::vitalComponent());
-        }
-        my @users = WebGUI::FormProcessor::selectList('uid');
-	my @groups = WebGUI::FormProcessor::group("gid");
-	foreach my $user (@users) {
-		my $u = WebGUI::User->new($user);
-		$u->deleteFromGroups(\@groups);
-	}
-	if ($session{form}{return} eq "manageUsersInGroup") {
-		return WebGUI::Operation::Group::www_manageUsersInGroup();
-	}
-	return www_editUserGroup(); 
-}
 
-#-------------------------------------------------------------------
+=head2 www_deleteUser ( )
+
+Confirmation form for deleting a user. Only Admins are allowed to
+delete users.  The WebGUI uses Visitor and Admin may not be deleted.
+If the Admin confirms, then www_deleteUserConfirm is called.  The UID
+of the user to delete is expected in a URL param names 'uid'.
+
+=cut
+
 sub www_deleteUser {
         my ($output);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
@@ -198,10 +257,19 @@ sub www_deleteUser {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteUserConfirm ( )
+
+Deletes a user.  Only Admins are allowed to delete users.  The UID of the user
+to delete is expected in a URL param named 'uid'.  www_listUsers is called
+after this.
+
+=cut
+
 sub www_deleteUserConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
-        if ($session{form}{uid} eq '1' || $session{form}{uid} eq '') {
+        if ($session{form}{uid} eq '1' || $session{form}{uid} eq '3') {
 	   return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::vitalComponent());
     } else {
 	   $u = WebGUI::User->new($session{form}{uid});

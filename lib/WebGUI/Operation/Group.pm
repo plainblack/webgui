@@ -221,6 +221,16 @@ sub www_deleteGroupGrouping {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteGrouping ( )
+
+Deletes a set of users from a set of groups.  Only Admins may perform this function.
+The user and group lists are expected to
+be found in form fields names uid and gid, respectively.  Visitors are not allowed to
+perform this operation, and the 
+
+=cut
+
 sub www_deleteGrouping {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session{form}{gid}));
         if (($session{user}{userId} eq $session{form}{uid} || $session{form}{uid} eq '3') && $session{form}{gid} eq '3') {
