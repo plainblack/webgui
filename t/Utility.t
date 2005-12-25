@@ -16,7 +16,7 @@ use Getopt::Long;
 use WebGUI::Session;
 # ---- END DO NOT EDIT ----
 
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 21; # increment this value for each test you create
 
 initialize();  # this line is required
 

@@ -27,7 +27,7 @@ find(\&countModules, "../lib/WebGUI");
 my $moduleCount = scalar(@modules);
 diag("Planning on running $moduleCount tests\n");
 plan tests => $moduleCount;
-foreach my $package (@modules) {
+foreach my $package (sort @modules) {
 	my $pc = Pod::Coverage->new(package=>$package);
 	ok($pc->coverage, $package);
 }
