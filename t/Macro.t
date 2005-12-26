@@ -14,16 +14,53 @@ use lib '../lib';
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Macro;
+use WebGUI::SQL;
+use Data::Dumper;
 # ---- END DO NOT EDIT ----
+
+initialize();  # this line is required
 
 #This test is to verify bugs with respect to Macros:
 # - [ 1364838 ] ^GroupText Macro cannot execute other macros
+#
+# It also checks some macros which pull data out of the setting table.
+
+my @settingMacros = (
+	{
+		settingKey => 'companyEmail',
+		macro => 'e_companyEmail'
+	},
+	{
+		settingKey => 'companyName',
+		macro => 'c_companyName'
+	},
+	{
+		settingKey => 'companyURL',
+		macro => 'u_companyUrl'
+	},
+);
+
+##Build a reverse hash of the macro settings in the session var so that
+##we can lookup the aliases for each macro.
+
+my %macroNames = reverse %{ $session{config}{macros} };
+
+my $settingMacros = 0;
+
+foreach my $macro ( @settingMacros ) {
+	++$settingMacros;
+	if (exists $macroNames{ $macro->{macro} }) {
+		$macro->{shortcut} = $macroNames{ $macro->{macro} };
+		$macro->{skip} = 0;
+	}
+	else {
+		$macro->{skip} = 1;
+	}
+}
 
 use Test::More; # increment this value for each test you create
 
-my $numTests = 3;
-
-initialize();  # this line is required
+my $numTests = 3 + $settingMacros;
 
 plan tests => $numTests;
 
@@ -46,6 +83,25 @@ $output = $macroText;
 WebGUI::Macro::process(\$output);
 
 like($output, qr/If you're reading this/, 'GroupText, nesting, in group');
+
+diag("Begin setting macro tests");
+
+my $sth = WebGUI::SQL->prepare('select value from settings where name=?');
+
+foreach my $macro ( @settingMacros ) {
+	SKIP: {
+		skip("Unable to lookup macro: $macro->{macro}",1) if $macro->{skip};
+		my ($value) = WebGUI::SQL->quickArray(
+			sprintf "select value from settings where name=%s",
+				quote($macro->{settingKey})
+		);
+		my $macroVal = sprintf "^%s();", $macro->{shortcut};
+		WebGUI::Macro::process(\$macroVal);
+		is($value, $macroVal, sprintf "Testing %s", $macro->{macro});
+	}
+}
+
+$sth->finish();
 
 cleanup(); # this line is required
 
