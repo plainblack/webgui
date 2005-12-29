@@ -234,6 +234,35 @@ sub getApproveUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getAvatarUrl (  )
+
+Returns a URL to the owner's avatar.
+
+=cut
+
+sub getAvatarUrl {
+	my $self = shift;
+	my $avatarUrl;
+	return $avatarUrl unless
+		$self->getThread->getParent->getValue("avatarsEnabled");
+	my $user = WebGUI::User->new($self->get('ownerUserId'));
+	#Get avatar field, storage Id.
+	my $storageId = $user->profileField("avatar");
+	my $avatar = WebGUI::Storage::Image->get($storageId);
+	if ($avatar) {
+		#Get url from storage object.
+		foreach my $imageName (@{$avatar->getFiles}) {
+			if ($avatar->isImage($imageName)) {
+				$avatarUrl = $avatar->getUrl($imageName);
+				last;
+			}
+		}
+	}
+	return $avatarUrl;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getDeleteUrl (  )
 
 Formats the url to delete a post.
@@ -386,6 +415,7 @@ sub getTemplateVars {
 	my %var = %{$self->get};
 	$var{"userId"} = $self->get("ownerUserId");
 	$var{"user.isPoster"} = $self->isPoster;
+	$var{"avatar.url"} = $self->getAvatarUrl;
 	$var{"userProfile.url"} = $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
 	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
 	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));

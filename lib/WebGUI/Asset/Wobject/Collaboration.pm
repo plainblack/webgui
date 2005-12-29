@@ -82,25 +82,6 @@ sub appendPostListTemplateVars {
 		} else {
 			$url = $post->getUrl."#".$post->getId;
 		}
-		my $avatarUrl;
-		if ($self->get('avatarsEnabled')) {
-			#ownerUserId from post
-			#Create user object.
-			my $user = WebGUI::User->new($post->get('ownerUserId'));
-			#Get avatar field, storage Id.
-			my $storageId = $user->profileField("avatar");
-			my $avatar = WebGUI::Storage::Image->get($storageId);
-			if ($avatar) {
-				#Get url from storage object.
-				foreach my $imageName (@{$avatar->getFiles}) {
-					if ($avatar->isImage($imageName)) {
-						$avatarUrl = $avatar->getThumbnailUrl($imageName);
-						last;
-					}
-				}
-				$avatarUrl = $avatar->getUrl;
-			}
-		}
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
                         "id"=>$post->getId,
@@ -124,7 +105,7 @@ sub appendPostListTemplateVars {
                         "isFourth"=>(($i+1)%4==0),
                         "isFifth"=>(($i+1)%5==0),
                 	"user.isPoster"=>$post->isPoster,
-                	"avatar.url"=>$avatarUrl,
+                	"avatar.url"=>$post->getAvatarUrl,
 			%lastReply
                         });
 		$i++;
@@ -444,8 +425,6 @@ sub duplicate {
 	$newAsset->createSubscriptionGroup;
 	return $newAsset;
 }
-
-
 
 #-------------------------------------------------------------------
 sub getEditForm {
