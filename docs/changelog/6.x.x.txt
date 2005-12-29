@@ -2,6 +2,13 @@
  - fix [ 1379384 ] image uploads to non-public pages
  - fixed a problem with SynchFileToLDAP hourly script.
 
+
+6.8.4
+ - fix [ 1379384 ] image uploads to non-public pages (Len Kranendonk /
+   ilance.nl)
+ - fix [ 1379915 ] Survey can only be completed once per user
+
+
 6.8.3
  - fixed a problem with enabling Avatars in the Collaboration System.
  - Fixed a problem where profile data would be mixed between the current user
