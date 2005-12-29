@@ -312,6 +312,11 @@ The name of the user who last updated or submitted the Post.
 Another name for <b>rating.value</b>
 <p>
 
+<p>
+<b>avatar.url</b><br>
+A URL to the avatar for the owner of the Post, if avatars are enabled in the parent
+Collaboration System and the user has an avatar.
+
 <b>views</b><br>
 The number of times that this post has been viewed.
 <p>

@@ -22,6 +22,7 @@ my $quiet; # this line required
 start(); # this line required
 
 fixDefaultThreadTemplate();
+enableAvatarProfileField();
 
 finish(); # this line required
 
@@ -272,6 +273,13 @@ sub start {
 	WebGUI::Session::open("../..",$configFile);
 	WebGUI::Session::refreshUserInfo(3);
 	WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
+}
+
+#-------------------------------------------------
+sub enableAvatarProfileField {
+	print "\tMake user profile Avatar field visible and editable.\n" unless ($quiet);
+	WebGUI::SQL->write("update userProfileField set visible=1 where fieldName='avatar'");
+	WebGUI::SQL->write("update userProfileField set editable=1 where fieldName='avatar'");
 }
 
 #-------------------------------------------------

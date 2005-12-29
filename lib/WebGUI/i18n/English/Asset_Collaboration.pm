@@ -1073,6 +1073,11 @@ A conditional indicating that is true if this Post is the fifth in this Collabor
 A conditional indicating that is true if the current user submitted this Post.
 
 <p>
+<b>avatar.url</b><br>
+A URL to the avatar for the owner of the Post, if avatars are enabled and the
+user has an avatar.
+
+<p>
 <b>lastReply.*</b><br>
 These variables are only defined if the <b>Display last reply</b> property is set to true
 in the Collaboration Asset.
