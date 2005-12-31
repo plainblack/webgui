@@ -109,7 +109,7 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	$self->{options} = WebGUI::DatabaseLink::getList(); 
+	$self->get("options") = WebGUI::DatabaseLink::getList(); 
 	return $self->SUPER::toHtml();
 }
 
@@ -125,11 +125,11 @@ sub toHtmlWithWrapper {
 	my $self = shift;
 	if (WebGUI::Grouping::isInGroup(3)) {
 		my $subtext;
-		if ($self->{afterEdit}) {
-			$subtext = editIcon("op=editDatabaseLink;lid=".$self->{value}.";afterEdit=".WebGUI::URL::escape($self->{afterEdit}));
+		if ($self->get("afterEdit")) {
+			$subtext = editIcon("op=editDatabaseLink;lid=".$self->get("value").";afterEdit=".WebGUI::URL::escape($self->get("afterEdit")));
 		}
 		$subtext .= manageIcon("op=listDatabaseLinks");
-		$self->{subtext} = $subtext . $self->{subtext};
+		$self->get("subtext") = $subtext . $self->get("subtext");
 	}
 	return $self->SUPER::toHtmlWithWrapper;
 }

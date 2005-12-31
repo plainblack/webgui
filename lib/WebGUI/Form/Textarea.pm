@@ -73,10 +73,10 @@ sub definition {
 			defaultValue=>WebGUI::International::get("476","WebGUI")
 			},
 		rows=>{
-			defaultValue=> $session{setting}{textAreaRows} || 5
+			defaultValue=> $self->session->setting->get("textAreaRows") || 5
 			},
 		columns=>{
-			defaultValue=> $session{setting}{textAreaCols} || 50
+			defaultValue=> $self->session->setting->get("textAreaCols") || 50
 			},
 		wrap=>{
 			defaultValue=>"virtual"
@@ -98,9 +98,9 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->{value})));
-	return '<textarea id="'.$self->{id}.'" name="'.$self->{name}.'" cols="'.$self->{columns}.'" rows="'.$self->{rows}.'" wrap="'.
-                $self->{wrap}.'" '.$self->{extras}.'>'.$value.'</textarea>';
+ 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
+	return '<textarea id="'.$self->{id}.'" name="'.$self->get("name").'" cols="'.$self->get("columns").'" rows="'.$self->get("rows").'" wrap="'.
+                $self->get("wrap").'" '.$self->get("extras").'>'.$value.'</textarea>';
 }
 
 

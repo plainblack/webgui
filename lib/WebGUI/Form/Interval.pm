@@ -90,7 +90,7 @@ Returns either the interval that was posted (in seconds) or if nothing comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::intervalToSeconds($session{req}->param($self->{name}."_interval"),$session{req}->param($self->{name}."_units")) || 0;
+	return WebGUI::DateTime::intervalToSeconds($self->session->request->param($self->get("name")."_interval"),$self->session->request->param($self->get("name")."_units")) || 0;
 }
 
 #-------------------------------------------------------------------
@@ -112,20 +112,20 @@ sub toHtml {
                 'weeks'=>WebGUI::International::get(701),
                 'months'=>WebGUI::International::get(702),
                 'years'=>WebGUI::International::get(703));
-        my ($interval, $units) = WebGUI::DateTime::secondsToInterval($self->{value});
+        my ($interval, $units) = WebGUI::DateTime::secondsToInterval($self->get("value"));
 	# not sure why, but these things need to be defined like this or
 	# they fail under some circumstnaces 
 	my $cmd = "WebGUI::Form::Integer";
 	my $out = $cmd->new(
-		name=>$self->{name}."_interval",
+		name=>$self->get("name")."_interval",
 		value=>$interval,
-		extras=>$self->{extras},
+		extras=>$self->get("extras"),
 		id=>$self->{id}."_interval",
 		)->toHtml;
 	$cmd = "WebGUI::Form::SelectBox";
 	$out .= $cmd->new(
 		options=>\%units,
-		name=>$self->{name}."_units",
+		name=>$self->get("name")."_units",
 		id=>$self->{id}."_units",
 		value=>[$units]
 		)->toHtml;
@@ -143,13 +143,13 @@ Returns the field as hidden controls rather than displayable controls.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-        my ($interval, $units) = WebGUI::DateTime::secondsToInterval($self->{value});
+        my ($interval, $units) = WebGUI::DateTime::secondsToInterval($self->get("value"));
         return WebGUI::Form::Hidden->new(
-                        name=>$self->{name}.'_interval',
+                        name=>$self->get("name").'_interval',
                         value=>$interval
                         )->toHtmlAsHidden
         	.WebGUI::Form::Hidden->new(
-                        name=>$self->{name}.'_units',
+                        name=>$self->get("name").'_units',
                         value=>$units
                         )->toHtmlAsHidden;
 }

@@ -92,18 +92,18 @@ sub toHtml {
 	%options = $self->orderedHash();
 	foreach my $key (keys %options) {
                 my $checked = 0;
-                foreach my $item (@{$self->{value}}) {
+                foreach my $item (@{$self->get("value}")) {
                         if ($item eq $key) {
                                 $checked = 1;
                         }
                 }
                 $output .= WebGUI::Form::Checkbox->new({
-                        name=>$self->{name},
+                        name=>$self->get("name"),
                         value=>$key,
-                        extras=>$self->{extras},
+                        extras=>$self->get("extras"),
                         checked=>$checked
                         })->toHtml;
-                $output .= ${$self->{options}}{$key} . $alignment;
+                $output .= ${$self->get("options}"){$key} . $alignment;
         }
         return $output;
 }

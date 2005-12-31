@@ -11,7 +11,6 @@ package WebGUI::Macro::e_companyEmail;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -29,7 +28,8 @@ returns the companyEmail from the session variable.
 
 #-------------------------------------------------------------------
 sub process {
-        return $session{setting}{companyEmail};
+	my $session = shift;
+        return $session->setting->get("companyEmail");
 }
 
 1;

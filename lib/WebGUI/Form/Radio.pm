@@ -97,10 +97,10 @@ Renders and input tag of type radio.
 
 sub toHtml {
 	my $self = shift;
-	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->{value})));
-	my $checkedText = ' checked="checked"' if ($self->{checked});
+	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value"))));
+	my $checkedText = ' checked="checked"' if ($self->get("checked"));
 	my $idText = ' id="'.$self->{id}.'" ' if ($self->{id});
-	return '<input type="radio" name="'.$self->{name}.'" value="'.$value.'"'.$idText.$checkedText.' '.$self->{extras}.' />';
+	return '<input type="radio" name="'.$self->get("name").'" value="'.$value.'"'.$idText.$checkedText.' '.$self->get("extras").' />';
 }
 
 

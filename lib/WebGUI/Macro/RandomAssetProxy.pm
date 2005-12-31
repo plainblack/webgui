@@ -12,7 +12,6 @@ package WebGUI::Macro::RandomAssetProxy;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::Session;
 use WebGUI::International;
 
 =head1 NAME
@@ -35,14 +34,15 @@ if no asset exists at that url, or if the asset has no children.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my $url = shift;
-	my $asset = WebGUI::Asset->newByUrl($url);
+	my $asset = WebGUI::Asset->newByUrl($session, $url);
 	if (defined $asset) {
 		my $children = $asset->getLineage(["children"]);
 		#randomize;
 		srand;
 		my $randomAssetId = $children->[rand(scalar(@{$children}))];	
-		my $randomAsset = WebGUI::Asset->newByDynamicClass($randomAssetId);
+		my $randomAsset = WebGUI::Asset->newByDynamicClass($session,$randomAssetId);
 		if (defined $randomAsset) {
 			$randomAsset->toggleToolbar;
 			return $randomAsset->canView ? $randomAsset->view() : undef;

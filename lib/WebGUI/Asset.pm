@@ -27,19 +27,13 @@ use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::DateTime;
-use WebGUI::ErrorHandler;
 use WebGUI::Form;
-use WebGUI::FormProcessor;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::Id;
 use WebGUI::Privilege;
-use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::TabForm;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -411,7 +405,7 @@ sub getAssetAdderLinks {
 	}
 	my $sth = WebGUI::SQL->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
 	while (my ($class,$id,$date) = $sth->array) {
-		my $asset = WebGUI::Asset->new($id,$class,$date);
+		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
 		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $session{user}{uiLevel});
 		my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
 		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
@@ -458,15 +452,20 @@ sub getContainer {
 
 #-------------------------------------------------------------------
 
-=head2 getDefault ( )
+=head2 getDefault ( session )
 
-Returns the default object, which is also known by some as the "Home Page". The default object is set in the settings.
+Constructor. Returns the default object, which is also known by some as the "Home Page". The default object is set in the settings.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub getDefault {
 	my $class = shift;
-	return $class->newByDynamicClass($session{setting}{defaultPage});
+	my $session = shift;
+	return $class->newByDynamicClass($session, $session->setting->get("defaultPage"));
 }
 
 #-------------------------------------------------------------------
@@ -719,14 +718,20 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getImportNode ()
+=head2 getImportNode ( session )
 
-Returns the import node asset object. This is where developers will templates, files, etc to the asset tree that have no other obvious attachment point.
+Constructor. Returns the import node asset object. This is where developers will templates, files, etc to the asset tree that have no other obvious attachment point.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub getImportNode {
-	return WebGUI::Asset->newByDynamicClass("PBasset000000000000002");
+	my $class = shift;
+	my $session = shift;
+	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000002");
 }
 
 #-------------------------------------------------------------------
@@ -777,45 +782,57 @@ sub getName {
 
 #-------------------------------------------------------------------
 
-=head2 getNotFound ( )
+=head2 getNotFound ( session )
 
-Returns the not found object. The not found object is set in the settings.
+Constructor. Returns the not found object. The not found object is set in the settings.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub getNotFound {
-	if ($session{requestedUrl} eq "*give-credit-where-credit-is-due*") {
+	my $class = shift;
+	my $session = shift;
+	if ($session->url->getRequestedUrl eq "*give-credit-where-credit-is-due*") {
 		my $content = "";
-		open(FILE,"<".$session{config}{webguiRoot}."/docs/credits.txt");
+		open(FILE,"<".$session->config->getWebguiRoot."/docs/credits.txt");
 		while (<FILE>) {
 			$content .= $_;
 		}
 		close(FILE);
-		return WebGUI::Asset->newByPropertyHashRef({
+		return WebGUI::Asset->newByPropertyHashRef($session,{
 			className=>"WebGUI::Asset::Snippet",
 			snippet=> '<pre>'.$content.'</pre>'
 			});
-	} elsif ($session{requestedUrl} eq "abcdefghijklmnopqrstuvwxyz") {
-		return WebGUI::Asset->newByPropertyHashRef({
+	} elsif ($session->url->getRequestedUrl eq "abcdefghijklmnopqrstuvwxyz") {
+		return WebGUI::Asset->newByPropertyHashRef($session,{
 			className=>"WebGUI::Asset::Snippet",
 			snippet=>q|<div style="width: 600px; padding: 200px;">&#87;&#104;&#121;&#32;&#119;&#111;&#117;&#108;&#100;&#32;&#121;&#111;&#117;&#32;&#116;&#121;&#112;&#101;&#32;&#105;&#110;&#32;&#116;&#104;&#105;&#115;&#32;&#85;&#82;&#76;&#63;&#32;&#82;&#101;&#97;&#108;&#108;&#121;&#46;&#32;&#87;&#104;&#97;&#116;&#32;&#119;&#101;&#114;&#101;&#32;&#121;&#111;&#117;&#32;&#101;&#120;&#112;&#101;&#99;&#116;&#105;&#110;&#103;&#32;&#116;&#111;&#32;&#115;&#101;&#101;&#32;&#104;&#101;&#114;&#101;&#63;&#32;&#89;&#111;&#117;&#32;&#114;&#101;&#97;&#108;&#108;&#121;&#32;&#110;&#101;&#101;&#100;&#32;&#116;&#111;&#32;&#103;&#101;&#116;&#32;&#97;&#32;&#108;&#105;&#102;&#101;&#46;&#32;&#65;&#114;&#101;&#32;&#121;&#111;&#117;&#32;&#115;&#116;&#105;&#108;&#108;&#32;&#104;&#101;&#114;&#101;&#63;&#32;&#83;&#101;&#114;&#105;&#111;&#117;&#115;&#108;&#121;&#44;&#32;&#121;&#111;&#117;&#32;&#110;&#101;&#101;&#100;&#32;&#116;&#111;&#32;&#103;&#111;&#32;&#100;&#111;&#32;&#115;&#111;&#109;&#101;&#116;&#104;&#105;&#110;&#103;&#32;&#101;&#108;&#115;&#101;&#46;&#32;&#73;&#32;&#116;&#104;&#105;&#110;&#107;&#32;&#121;&#111;&#117;&#114;&#32;&#98;&#111;&#115;&#115;&#32;&#105;&#115;&#32;&#99;&#97;&#108;&#108;&#105;&#110;&#103;&#46;</div>|
 			});
 	} else {
-		return WebGUI::Asset->newByDynamicClass($session{setting}{notFoundPage});
+		return WebGUI::Asset->newByDynamicClass($session, $session->setting->get("notFoundPage"));
 	}
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getRoot ()
+=head2 getRoot ( session )
 
-Returns the root asset object.
+Constructor. Returns the root asset object.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub getRoot {
-	return WebGUI::Asset->new("PBasset000000000000001");
+	my $class = shift;
+	my $session = shift;
+	return WebGUI::Asset->new($session, "PBasset000000000000001");
 }
 
 
@@ -965,9 +982,13 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
-=head2 new ( assetId [, className, revisionDate ] )
+=head2 new ( session, assetId [, className, revisionDate ] )
 
 Constructor. This does not create an asset. Returns a new object if it can, otherwise returns undef.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 assetId
 
@@ -985,27 +1006,31 @@ An epoch date that represents a specific version of an asset. By default the mos
 
 sub new {
 	my $class = shift;
+	my $session = shift;
 	my $assetId = shift;
 	return undef unless ($assetId);
 	my $className = shift;
-	my $revisionDate = shift || $session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'};
+	my $assetRevision = $session->stow->get("assetRevision");
+	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
-		($revisionDate) = WebGUI::SQL->quickArray("select max(revisionDate) from assetData where assetId="
-			.quote($assetId)." and  (status='approved' or status='archived' or tagId=".quote($session{scratch}{versionTag}).")
+		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId="
+			.$session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
+			.$session->db->quote($session->scratch->get("versionTag")).")
 			group by assetData.assetId order by assetData.revisionDate");
-		$session{assetRevision}{$assetId}{$session{scratch}{versionTag}||'_'} = $revisionDate unless ($session{config}{disableCache});
+		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
+		$session->stow("assetRevision",$assetRevision);
 	}
 	return undef unless ($revisionDate);
         if ($className) {
 		my $cmd = "use ".$className;
         	eval ($cmd);
 		if ($@) {
-        		WebGUI::ErrorHandler::error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+        		$session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
 			return undef;
 		}
 		$class = $className;
 	}
-	my $cache = WebGUI::Cache->new(["asset",$assetId,$revisionDate]);
+	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
 		# got properties from cache
@@ -1015,13 +1040,13 @@ sub new {
 			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
 				.$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
 		}
-		$sql .= " where asset.assetId=".quote($assetId);
-		$properties = WebGUI::SQL->quickHashRef($sql);
+		$sql .= " where asset.assetId=".$session->db->quote($assetId);
+		$properties = $session->db->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
 		$cache->set($properties,60*60*24);
 	}
 	if (defined $properties) {
-		my $object = { _properties => $properties };
+		my $object = { _session=>$session, _properties => $properties };
 		bless $object, $class;
 		return $object;
 	}	
@@ -1030,9 +1055,13 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 newByDynamicClass ( assetId [ , revisionDate ] )
+=head2 newByDynamicClass ( session, assetId [ , revisionDate ] )
 
 Similar to new() except that it will look up the classname of an asset rather than making you specify it. Returns undef if it can't find the classname.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 assetId
 
@@ -1046,24 +1075,31 @@ A specific revision date for the asset to retrieve. If not specified, the most r
 
 sub newByDynamicClass {
 	my $class = shift;
+	my $session = shift;
 	my $assetId = shift;
 	my $revisionDate = shift;
 	return undef unless defined $assetId;
-	my $className = $session{assetClass}{$assetId};
+	my $assetClass = $session->stow->get("assetClass");
+	my $className = $assetClass->{$assetId};
 	unless ($className) {
-       		($className) = WebGUI::SQL->quickArray("select className from asset where assetId=".quote($assetId));
-		$session{assetClass}{$assetId} = $className unless ($session{config}{disableCache});
+       		($className) = $session->db->quickArray("select className from asset where assetId=".$session->db->quote($assetId));
+		$assetClass->{$assetId} = $className;
+		$session->stow->set("assetClass",$assetClass);
 	}
 	return undef unless ($className);
-	return WebGUI::Asset->new($assetId,$className,$revisionDate);
+	return WebGUI::Asset->new($session,$assetId,$className,$revisionDate);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 newByPropertyHashRef ( properties )
+=head2 newByPropertyHashRef ( session,  properties )
 
 Constructor. 
+
+=head3 session
+
+A reference to the current session.
 
 =head3 properties
 
@@ -1073,21 +1109,26 @@ A properties hash reference. The className of the properties hash must be valid.
 
 sub newByPropertyHashRef {
 	my $class = shift;
+	my $session = shift;
 	my $properties = shift;
 	return undef unless defined $properties;
 	return undef unless exists $properties->{className};
 	my $className = $properties->{className};
 	my $cmd = "use ".$className;
         eval ($cmd);
-        WebGUI::ErrorHandler::fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
-	bless {_properties => $properties}, $className;
+        $session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+	bless {_session=>$session, _properties => $properties}, $className;
 }
 
 #-------------------------------------------------------------------
 
-=head2 newByUrl ( [url, revisionDate] )
+=head2 newByUrl ( session, [url, revisionDate] )
 
 Returns a new Asset object based upon current url, given url or defaultPage.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 url
 
@@ -1101,7 +1142,8 @@ A specific revision to instanciate. By default we instanciate the newest publish
 
 sub newByUrl {
 	my $class = shift;
-	my $url = shift || $session{requestedUrl};
+	my $session = shift;
+	my $url = shift || $session->url->getRequestedUrl;
 	my $revisionDate = shift;
 	$url = lc($url);
 	$url =~ s/\/$//;
@@ -1110,7 +1152,7 @@ sub newByUrl {
 	$url =~ s/\"//;
 	my $asset;
 	if ($url ne "") {
-		my ($id, $class) = WebGUI::SQL->quickArray("
+		my ($id, $class) = $session->db->quickArray("
 			select 
 				asset.assetId, 
 				asset.className
@@ -1119,18 +1161,18 @@ sub newByUrl {
 			left join
 				assetData on asset.assetId=assetData.assetId
 			where 
-				assetData.url=".quote($url)." 
+				assetData.url=".$session->db->quote($url)." 
 			group by
 				assetData.assetId
 			");
 		if ($id ne "" || $class ne "") {
-			return WebGUI::Asset->new($id, $class, $revisionDate);
+			return WebGUI::Asset->new($session,$id, $class, $revisionDate);
 		} else {
-			WebGUI::ErrorHandler::warn("The URL $url was requested, but does not exist in your asset tree.");
+			$session->errorHandler->warn("The URL $url was requested, but does not exist in your asset tree.");
 			return undef;
 		}
 	}
-	return WebGUI::Asset->getDefault;
+	return WebGUI::Asset->getDefault($session);
 }
 
 #-------------------------------------------------------------------
@@ -1204,7 +1246,7 @@ sub processTemplate {
 		%{$self->{_properties}},
 		%{$var}
 		);
-	my $template = WebGUI::Asset->new($templateId,"WebGUI::Asset::Template");
+	my $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template");
 	if (defined $template) {
 		return $template->process(\%vars);
 	} else {
@@ -1252,6 +1294,18 @@ sub purgeCache {
 	WebGUI::Cache->new(["asset",$self->getId,$self->get("revisionDate")])->deleteChunk(["asset",$self->getId]);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	return $self->{_session};
+}
 
 #-------------------------------------------------------------------
 
@@ -1363,7 +1417,7 @@ sub www_add {
 		return "";
 	}
 	if ($session{form}{'prototype'}) {
-		my $prototype = WebGUI::Asset->new($session{form}{'prototype'},$class);
+		my $prototype = WebGUI::Asset->new($self->session->form->process("prototype"),$class);
 		foreach my $definition (@{$prototype->definition}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {
 				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
@@ -1387,7 +1441,7 @@ sub www_add {
 		assetId=>"new"
 		);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$session{config}{assetContainers}}));
-	my $newAsset = WebGUI::Asset->newByPropertyHashRef(\%properties);
+	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 	return WebGUI::Privilege::insufficient() unless ($newAsset->canAdd);
 	return $newAsset->www_edit();

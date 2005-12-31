@@ -109,10 +109,10 @@ Returns a group pull-down field. A group pull down provides a select list that p
 sub toHtml {
 	my $self = shift;
 	my $where;
-	if ($self->{excludeGroups}[0] ne "") {
-		$where = "and groupId not in (".quoteAndJoin($self->{excludeGroups}).")";
+	if ($self->get("excludeGroups")[0] ne "") {
+		$where = "and groupId not in (".$self->session->db->quoteAndJoin($self->get("excludeGroups")).")";
 	}
-	$self->{options} = WebGUI::SQL->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName");
+	$self->get("options") = $self->session->db->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName");
 	return $self->SUPER::toHtml();
 }
 
@@ -126,7 +126,7 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
         my $self = shift;
-	$self->{options} = WebGUI::SQL->buildHashRef("select groupId,groupName from groups");
+	$self->get("options") = $self->session->db->buildHashRef("select groupId,groupName from groups");
         return $self->SUPER::toHtmlAsHidden();
 }
 
@@ -142,7 +142,7 @@ sub toHtmlWithWrapper {
         my $self = shift;
         if (WebGUI::Grouping::isInGroup(3)) {
                 my $subtext = manageIcon("op=listGroups");
-                $self->{subtext} = $subtext . $self->{subtext};
+                $self->get("subtext") = $subtext . $self->get("subtext");
         }
         return $self->SUPER::toHtmlWithWrapper;
 }

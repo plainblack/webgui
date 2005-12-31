@@ -19,7 +19,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
 use WebGUI::URL;
 
@@ -57,18 +56,19 @@ Creates tags that were set using setLink, setMeta, setScript, extraHeadTags, and
 =cut
 
 sub generateAdditionalHeadTags {
+	my $self = shift;
 	# generate additional raw tags
-	my $tags = $session{page}{head}{raw};
+	my $tags = $self->{_raw};
         # generate additional link tags
-	foreach my $url (keys %{$session{page}{head}{link}}) {
+	foreach my $url (keys %{$self->{_link}}) {
 		$tags .= '<link href="'.$url.'"';
-		foreach my $name (keys %{$session{page}{head}{link}{$url}}) {
-			$tags .= ' '.$name.'="'.$session{page}{head}{link}{$url}{$name}.'"';
+		foreach my $name (keys %{$self->{_link}{$url}}) {
+			$tags .= ' '.$name.'="'.$self->{_link}{$url}{$name}.'"';
 		}
 		$tags .= ' />'."\n";
 	}
 	# generate additional javascript tags
-	foreach my $tag (@{$session{page}{head}{javascript}}) {
+	foreach my $tag (@{$self->{_javascript}}) {
 		$tags .= '<script';
 		foreach my $name (keys %{$tag}) {
 			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
@@ -76,7 +76,7 @@ sub generateAdditionalHeadTags {
 		$tags .= '></script>'."\n";
 	}
 	# generate additional meta tags
-	foreach my $tag (@{$session{page}{head}{meta}}) {
+	foreach my $tag (@{$self->{_meta}}) {
 		$tags .= '<meta';
 		foreach my $name (keys %{$tag}) {
 			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
@@ -84,12 +84,50 @@ sub generateAdditionalHeadTags {
 		$tags .= ' />'."\n";
 	}
 	# append extraHeadTags
-	$tags .= $session{asset}->getExtraHeadTags."\n" if ($session{asset});
-	
-	delete $session{page}{head};
+	$tags .= $self->session->asset->getExtraHeadTags."\n" if ($self->session->asset);
+	delete $self->{_meta};
+	delete $self->{_raw};
+	delete $self->{_javascript};
+	delete $self->{_link};
 	return $tags;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 makePrintable ( boolean ) 
+
+Tells the system to use the make printable style instead of the normal style.
+
+=head3 boolean
+
+If set to 1 then the printable style will be used, otherwise the regular style will be used.
+
+=cut
+
+sub makePrintable {
+	my $self = shift;
+	$self->{_makePrintable} = shift;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( session ) 
+
+Constructor.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	bless {_session=>$session}, $class;
+}
 
 #-------------------------------------------------------------------
 
@@ -108,20 +146,21 @@ The unique identifier for the template to retrieve.
 =cut
 
 sub process {
+	my $self = shift;
 	my %var;
 	$var{'body.content'} = shift;
 	my $templateId = shift;
-	if ($session{page}{makePrintable} && exists $session{asset}) {
-		$templateId = $session{asset}->get("printableStyleTemplateId");
-		my $currAsset = $session{asset};
+	if ($self->{_makePrintable} && exists $self->session->asset) {
+		$templateId = $self->session->asset->get("printableStyleTemplateId");
+		my $currAsset = $self->session->asset;
 		until ($templateId) {
 			# some assets don't have this property.  But at least one ancestor should....
 			$currAsset = $currAsset->getParent;
 			$templateId = $currAsset->get("printableStyleTemplateId");
 		}
-	} elsif ($session{scratch}{personalStyleId} ne "") {
-		$templateId = $session{scratch}{personalStyleId};
-	} elsif ($session{page}{useEmptyStyle}) {
+	} elsif ($self->session->scratch->get("personalStyleId") ne "") {
+		$templateId = $self->session->scratch->get("personalStyleId");
+	} elsif ($self->{_useEmptyStyle}) {
 		$templateId = 6;
 	}
 $var{'head.tags'} = '
@@ -132,7 +171,7 @@ $var{'head.tags'} = '
 <script type="text/javascript">
 function getWebguiProperty (propName) {
 var props = new Array();
-props["extrasURL"] = "'.$session{config}{extrasURL}.'";
+props["extrasURL"] = "'.$self->session->config->get("extrasURL").'";
 props["pageURL"] = "'.WebGUI::URL::page(undef, undef, 1).'";
 return props[propName];
 }
@@ -167,6 +206,19 @@ if (WebGUI::Grouping::isInGroup(2)) {
 
 #-------------------------------------------------------------------
 
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
 =head2 setLink ( url, params )
 
 Sets a <link> tag into the <head> of this rendered page for this page view. This is typically used for dynamically adding references to CSS and RSS documents.
@@ -182,9 +234,10 @@ A hash reference containing the other parameters to be included in the link tag,
 =cut
 
 sub setLink {
+	my $self = shift;
 	my $url = shift;
 	my $params = shift;
-	$session{page}{head}{link}{$url} = $params;
+	$self->{_link}{$url} = $params;
 }
 
 
@@ -202,8 +255,9 @@ A hash reference containing the parameters of the meta tag.
 =cut
 
 sub setMeta {
+	my $self = shift;
 	my $params = shift;
-	push(@{$session{page}{head}{meta}},$params);
+	push(@{$self->{_meta}},$params);
 }
 
 
@@ -221,8 +275,9 @@ A raw string containing tags. This is just a raw string so you must actually pas
 =cut
 
 sub setRawHeadTags {
+	my $self = shift;
 	my $tags = shift;
-	$session{page}{head}{raw} .= $tags;
+	$self->{_raw} .= $tags;
 }
 
 
@@ -243,14 +298,32 @@ A hash reference containing the additional parameters to include in the script t
 =cut
 
 sub setScript {
+	my $self = shift;
 	my $url = shift;
 	my $params = shift;
 	$params->{src} = $url;
 	my $found = 0;
-	foreach my $script (@{$session{page}{head}{javascript}}) {
+	foreach my $script (@{$self->{_javascript}}) {
 		$found = 1 if ($script->{src} eq $url);
 	}
-	push(@{$session{page}{head}{javascript}},$params) unless ($found);	
+	push(@{$self->{_javascript}},$params) unless ($found);	
+}
+
+#-------------------------------------------------------------------
+
+=head2 useEmptyStyle ( boolean ) 
+
+Tells the style system to use an empty style rather than outputing the normal style. This is useful when you want your code to dynamically generate a style.
+
+=head3 boolean
+
+If set to 1 it will use an empty style, if set to 0 it will use the regular style. Defaults to 0.
+
+=cut
+
+sub useEmptyStyle {
+	my $self = shift;
+	$self->{_useEmptyStyle} = shift;
 }
 
 

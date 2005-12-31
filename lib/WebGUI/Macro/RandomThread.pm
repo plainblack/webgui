@@ -16,9 +16,6 @@ package WebGUI::Macro::RandomThread;
 use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
-use WebGUI::ErrorHandler;
-use WebGUI::Macro;
-use WebGUI::Session;
 use WebGUI::Utility;
 
 =head1 NAME 
@@ -60,6 +57,7 @@ URL of the template to use to display the random thread. Must be a valid URL wit
 =cut
 
 sub process {
+	my $session = shift;
 	my ($startURL, $relatives, $templateURL) = @_;
 	# Seed the randomizer:
 	srand;
@@ -70,33 +68,33 @@ sub process {
 	my $numberOfTries = 2; # try this many times in case we select a thread the user cannot view
 
 	# Sanity check of parameters:
-	my $startAsset = WebGUI::Asset->newByUrl($startURL);
+	my $startAsset = WebGUI::Asset->newByUrl($session, $startURL);
 	unless ($startAsset) {
-		WebGUI::ErrorHandler::warn('Error: invalid startURL. Check parameters of macro on page '.$session{asset}->get('url'));
+		$session->errorHandler->warn('Error: invalid startURL. Check parameters of macro on page '.$session->asset->get('url'));
 		return '';
 	}
 
 	$relatives = lc($relatives);
 	unless ( isIn($relatives, ('siblings','children','ancestors','self','descendants','pedigree')) ) {
-		WebGUI::ErrorHandler::warn('Error: invalid relatives specified. Must be one of siblings, children, ancestors, self, descendants, pedigree. Check parameters of macro on page '.$session{asset}->get('url'));
+		$session->errorHandler->warn('Error: invalid relatives specified. Must be one of siblings, children, ancestors, self, descendants, pedigree. Check parameters of macro on page '.$session->asset->get('url'));
 		return '';
 	}
 
-	my $template = $templateURL ? WebGUI::Asset::Template->newByUrl($templateURL) : WebGUI::Asset::Template->new('WVtmpl0000000000000001');
+	my $template = $templateURL ? WebGUI::Asset::Template->newByUrl($session,$templateURL) : WebGUI::Asset::Template->new($session,'WVtmpl0000000000000001');
 	unless ($template) {
-		WebGUI::ErrorHandler::warn('Error: invalid template URL. Check parameters of macro on page '.$session{asset}->get('url'));
+		$session->errorHandler->warn('Error: invalid template URL. Check parameters of macro on page '.$session->asset->get('url'));
 		return '';
 	}
 
 	# Get all CS's that we'll use to pick a thread from:
 	my $lineage = $startAsset->getLineage([$relatives],{includeOnlyClasses => ['WebGUI::Asset::Wobject::Collaboration']});
 	unless ( scalar(@{$lineage}) ) {
-		WebGUI::ErrorHandler::warn('Error: no Collaboration Systems found with current parameters. Check parameters of macro on page '.$session{asset}->get('url'));
+		$session->errorHandler->warn('Error: no Collaboration Systems found with current parameters. Check parameters of macro on page '.$session->asset->get('url'));
 		return '';
 	}
 
 	# Try to get a random thread that the user can see:
-	my $randomThread = _getRandomThread($lineage);
+	my $randomThread = _getRandomThread($session, $lineage);
 	my $i = 0;
 	while ($i < $numberOfTries) {
 		if($randomThread->canView()) {
@@ -105,20 +103,24 @@ sub process {
 			return $template->process($var);
 		} else {
 			# Keep trying until we find a thread we can actually view:
-			$randomThread = _getRandomThread($lineage);
+			$randomThread = _getRandomThread($session, $lineage);
 			$i++;
 		}
 	}
 	# If we reach this point, we had no success in finding an asset the user can view:
-	WebGUI::ErrorHandler::warn("Could not find a random thread that was viewable by the user $session{user}{username} after $numberOfTries tries. Check parameters of macro on page ".$session{asset}->get('url'));
+	$session->errorHandler->warn("Could not find a random thread that was viewable by the user $session->user->profileField("username") after $numberOfTries tries. Check parameters of macro on page ".$session->asset->get('url'));
 	return '';
 }
 
 #-------------------------------------------------------------------
 
-=head2 _getRandomThread ( lineage )
+=head2 _getRandomThread ( session, lineage )
 
 Helper function that returns a random thread.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 lineage
 
@@ -127,18 +129,19 @@ Reference to an array with lineage of Collaboration Systems to select a random t
 =cut
 
 sub _getRandomThread {
+	my $session = shift;
 	my $lineage = shift;
 
 	# Get random CS:
 	my $randomIndex = int(rand(scalar(@{$lineage})));
 	my $randomCSId = $lineage->[$randomIndex];
-	my $randomCS = WebGUI::Asset->new($randomCSId,'WebGUI::Asset::Wobject::Collaboration');
+	my $randomCS = WebGUI::Asset->new($session,$randomCSId,'WebGUI::Asset::Wobject::Collaboration');
 
 	# Get random thread in that CS:
 	$lineage = $randomCS->getLineage(['children'],{includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
 	$randomIndex = int(rand(scalar(@{$lineage})));
 	my $randomThreadId = $lineage->[$randomIndex];
-	return WebGUI::Asset->new($randomThreadId,'WebGUI::Asset::Post::Thread');
+	return WebGUI::Asset->new($session,$randomThreadId,'WebGUI::Asset::Post::Thread');
 }
 
 1;

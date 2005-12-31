@@ -34,6 +34,7 @@ used as a default.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my ($temp, @param);
         @param = @_;
         if ($param[0] ne "") {

@@ -13,9 +13,7 @@ package WebGUI::Macro::LastModified;
 use strict;
 use WebGUI::DateTime;
 use WebGUI::Asset;
-use WebGUI::Session;
 use WebGUI::International;
-use WebGUI::SQL;
 
 =head1 NAME
 
@@ -42,11 +40,12 @@ sprintf.  See L<WebGUI::DateTime/"epochToHuman"> for a list of codes.  Uses
 
 #-------------------------------------------------------------------
 sub process {
-	return '' unless $session{asset};
+	my $session = shift;
+	return '' unless $session->asset;
 	my ($label, $format, $time);
 	($label, $format) = @_;
 	$format = '%z' if ($format eq "");
-	($time) = WebGUI::SQL->quickArray("SELECT max(revisionDate) FROM assetData where assetId=".quote($session{asset}->getId),WebGUI::SQL->getSlave);
+	($time) = $session->dbSlave->quickArray("SELECT max(revisionDate) FROM assetData where assetId=".$session->db->quote($session->asset->getId));
 	return WebGUI::International::get('never','Macro_LastModified') if $time eq 0;
 	return $label.epochToHuman($time,$format) if ($time);
 }

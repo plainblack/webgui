@@ -43,32 +43,59 @@ These subroutines are available from this package:
 =cut
 
 
-
 #-------------------------------------------------------------------
 
-=head2 getConfig ( webguiRoot , configFile )
+=head2 get ( param ) 
 
-Returns a hash reference containing the configuration data. It tries to get the data out of the memory cache first, but reads the config file directly if necessary.
+Returns the value of a particular parameter from the config file.
 
-=head3 webguiRoot
+=head3 param
 
-The path to the WebGUI installation.
-
-=head3 configFile
-
-The filename of the config file to read.
+The name of the parameter to return.
 
 =cut
 
-sub getConfig {
-	my $webguiPath = shift;
-	my $filename = shift;
-	if (exists $config{$filename}) {
-		return $config{$filename};
-	} else {
-		$config{$filename} = readConfig($webguiPath,$filename);
-		return $config{$filename};
+sub get {
+	my $self = shift;
+	my $param = shift;
+	my $value = $self->{_config}->get($param);
+	if (isIn($param, qw(assets utilityAssets assetContainers authMethods shippingPlugins paymentPlugins))) {
+		if (ref $value ne "ARRAY") {
+                        $value = [$value];
+                }
+	} elsif (isIn($param, qw(assetAddPrivilege macros))) {
+		if (ref $value ne "HASH") {
+                        $value = {};
+                }
 	}
+	return $value;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getFilename ( )
+
+Returns the filename for this config.
+
+=cut
+
+sub getFilename {
+	my $self = shift;
+	return $self->{_configFile};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getWebguiRoot ( )
+
+Returns the path to the WebGUI installation.
+
+=cut
+
+sub getWebguiRoot {
+	my $self = shift;
+	return $self->{_webguiRoot};
 }
 
 
@@ -76,7 +103,7 @@ sub getConfig {
 
 =head2 loadAllConfigs ( webguiRoot )
 
-Reads all the config file data for all defined sites into an in-memory cache.
+Reads all the config file data for all defined sites into an in-memory cache. This is a class method.
 
 =head3 webguiRoot
 
@@ -85,6 +112,7 @@ The path to the WebGUI installation.
 =cut
 
 sub loadAllConfigs {
+	my $class = shift;
 	my $webguiPath = shift;
 	my $configs = readAllConfigs($webguiPath);
 	foreach my $filename (keys %{$configs}) {
@@ -98,38 +126,9 @@ sub loadAllConfigs {
 
 #-------------------------------------------------------------------
 
-=head2 readAllConfigs ( webguiRoot )
+=head2 new ( webguiRoot , configFile )
 
-Reads all the config file data for all defined sites and returns a hash reference containing the resulting data by config file name.
-
-Example: $configs->{$filename};
-
-=head3 webguiRoot
-
-The path to the WebGUI installation.
-
-=cut
-
-sub readAllConfigs {
-	my $webguiPath = shift;
-	opendir(DIR,$webguiPath."/etc");
-	my @files = readdir(DIR);
-	closedir(DIR);
-	my %configs;
-	foreach my $file (@files) {
-		if ($file =~ /\.conf$/ && !($file =~ /^log\.conf$/) && !($file =~ /^spectre\.conf$/)) {
-			$configs{$file} = readConfig($webguiPath,$file);
-		}
-	}
-	return \%configs;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 readConfig ( webguiRoot , configFile )
-
-Returns a hash reference containing the configuration data. It reads the config data directly from the file.
+Returns a hash reference containing the configuration data. It tries to get the data out of the memory cache first, but reads the config file directly if necessary.
 
 =head3 webguiRoot
 
@@ -141,37 +140,49 @@ The filename of the config file to read.
 
 =cut
 
-sub readConfig {
+sub new {
+	my $class = shift;
 	my $webguiPath = shift;
 	my $filename = shift;
-	my $config = Parse::PlainConfig->new('DELIM' => '=', 
-                'FILE' => $webguiPath.'/etc/'.$filename,
-                'PURGE' => 1);
-	my %data;
-        foreach my $key ($config->directives) {
-                $data{$key} = $config->get($key);
-        }
-	foreach my $directive (qw(assets utilityAssets assetContainers authMethods paymentPlugins)) {
-	        if (ref $data{$directive} ne "ARRAY") {
-        	        $data{$directive} = [$data{$directive}];
-        	}
+	if (exists $config{$filename}) {
+		return $config{$filename};
+	} else {
+		my $config = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $webguiPath.'/etc/'.$filename, 'PURGE' => 1);
+		my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$config};
+		bless $self, $class;
+		$config{$filename} = $self;
+		return $self;
 	}
-	foreach my $directive (qw(assetAddPrivilege macros)) {
-	        if (ref $data{$directive} ne "HASH") {
-        	        $data{$directive} = {};
-        	}
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 readAllConfigs ( webguiRoot )
+
+Reads all the config file data for all defined sites and returns a hash reference containing WebGUI::Config objects keyed by filename. This is a class method.
+
+Example: $configs->{$filename};
+
+=head3 webguiRoot
+
+The path to the WebGUI installation.
+
+=cut
+
+sub readAllConfigs {
+	my $class = shift;
+	my $webguiPath = shift;
+	opendir(DIR,$webguiPath."/etc");
+	my @files = readdir(DIR);
+	closedir(DIR);
+	my %configs;
+	foreach my $file (@files) {
+		if ($file =~ /\.conf$/ && !($file =~ /^log\.conf$/) && !($file =~ /^spectre\.conf$/)) {
+			$configs{$file} = WebGUI::Config->new($webguiPath,$file);
+		}
 	}
-	if (ref $data{shippingPlugins} ne "ARRAY") {
-		$data{shippingPlugins} = [$data{shippingPlugins}] if ($data{shippingPlugins});
-	}
-        if (ref $data{sitename} eq "ARRAY") {
-                $data{defaultSitename} = $data{sitename}[0];
-        } else {
-                $data{defaultSitename} = $data{sitename};
-        }
-	$data{webguiRoot} = $webguiPath;
-	$data{configFile} = $filename;
-	return \%data;
+	return \%configs;
 }
 
 

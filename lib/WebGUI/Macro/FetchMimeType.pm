@@ -11,7 +11,6 @@ package WebGUI::Macro::FetchMimeType; # edit this line to match your own macro n
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 use LWP::MediaTypes qw(guess_media_type);
 
 =head1 NAME
@@ -36,6 +35,7 @@ A path to a file
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
 	my $path = shift;
 	return guess_media_type($path);
 }

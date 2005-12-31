@@ -33,21 +33,23 @@ This package allows the manipulation of HTTP protocol information.
 
  use WebGUI::HTTP;
 
- $cookies = WebGUI::HTTP::getCookies();
- $header = WebGUI::HTTP::getHeader();
- $mimetype = WebGUI::HTTP::getMimeType();
- $code = WebGUI::HTTP::getStatus();
- $boolean = WebGUI::HTTP::isRedirect();
+ my $http = WebGUI::HTTP->new($session);
+
+ $cookies = $http->getCookies();
+ $header = $http->getHeader();
+ $mimetype = $http->getMimeType();
+ $code = $http->getStatus();
+ $boolean = $http->isRedirect();
  
- WebGUI::HTTP::setCookie($name,$value);
- WebGUI::HTTP::setFilename($filename,$mimetype);
- WebGUI::HTTP::setMimeType($mimetype);
- WebGUI::HTTP::setNoHeader($bool);
- WebGUI::HTTP::setRedirect($url);
+ $http->setCookie($name,$value);
+ $http->setFilename($filename,$mimetype);
+ $http->setMimeType($mimetype);
+ $http->setNoHeader($bool);
+ $http->setRedirect($url);
 
 =head1 METHODS
 
-These subroutines are available from this package:
+These methods are available from this package:
 
 =cut
 
@@ -62,7 +64,8 @@ Retrieves the cookies from the HTTP header and returns a hash reference containi
 =cut
 
 sub getCookies {
-	return APR::Request::Apache2->handle($session{req})->jar();
+	my $self = shift;
+	return APR::Request::Apache2->handle($self->session->request)->jar();
 }
 
 
@@ -75,22 +78,23 @@ Generates an HTTP header.
 =cut
 
 sub getHeader {
-	return undef if ($session{http}{noHeader});
+	my $self = shift;
+	return undef if ($self->{_http}{noHeader});
 	my %params;
-	if (isRedirect()) {
-		$session{req}->headers_out->set(Location => $session{http}{location});
-		$session{req}->status(301);
+	if ($self->isRedirect()) {
+		$self->session->request->headers_out->set(Location => $self->{_http}{location});
+		$self->session->request->status(301);
 	} else {
-		$session{req}->content_type($session{http}{mimetype} || "text/html");
-		if ($session{setting}{preventProxyCache}) {
+		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
+		if ($self->session->setting->get("preventProxyCache")) {
 			$params{"-expires"} = "-1d";
 		}
 		if ($session{http}{filename}) {
-			$params{"-attachment"} = $session{http}{filename};
+			$params{"-attachment"} = $self->{_http}{filename};
 		}
 	}
-	$params{"-cookie"} = $session{http}{cookie};
-	$session{req}->status_line(getStatus().' '.$session{http}{statusDescription}) if $session{req};
+	$params{"-cookie"} = $self->{_http}{cookie};
+	$self->session->request->status_line($self->getStatus().' '.$self->{_http}{statusDescription}) if $self->session->request;
 	return;
 }
 
@@ -104,7 +108,8 @@ Returns the current mime type of the document to be returned.
 =cut
 
 sub getMimeType {
-	return $session{http}{mimetype} || "text/html";
+	my $self = shift;
+	return $self->{_http}{mimetype} || "text/html";
 }
 
 
@@ -117,8 +122,9 @@ Returns the current HTTP status code, if one has been set.
 =cut
 
 sub getStatus {
-	$session{http}{statusDescription} = $session{http}{statusDescription} || "OK";
-	return $session{http}{status} || "200";
+	my $self = shift;
+	$self->{_http}{statusDescription} = $self->{_http}{statusDescription} || "OK";
+	return $self->{_http}{status} || "200";
 }
 
 
@@ -131,7 +137,41 @@ Returns a boolean value indicating whether the current page will redirect to som
 =cut
 
 sub isRedirect {
-	return (getStatus() eq "302");
+	my $self = shift;
+	return ($self->getStatus() eq "302");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( session )
+
+Constructor. 
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	bless {_session=>$session}, $class;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns the reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 #-------------------------------------------------------------------
@@ -155,19 +195,20 @@ The time that the cookie should remain in the browser. Defaults to "+10y" (10 ye
 =cut
 
 sub setCookie {
+	my $self = shift;
 	my $name = shift;
 	my $value = shift;
 	my $ttl = shift;
 	$ttl = (defined $ttl ? $ttl : '+10y');
-	if (exists $session{req}) {
-		my $cookie = Apache2::Cookie->new($session{req},
+	if (exists $self->session->request) {
+		my $cookie = Apache2::Cookie->new($self->session->request,
 			-name=>$name,
 			-value=>$value,
 	#		-domain=>'.'.$session{env}{HTTP_HOST},
 			-expires=>$ttl,
 			-path=>'/'
 		);
-		$cookie->bake($session{req});
+		$cookie->bake($self->session->request);
 	}
 }
 
@@ -189,9 +230,10 @@ The mimetype for this file. Defaults to "application/octet-stream".
 =cut
 
 sub setFilename {
-	$session{http}{filename} = shift;
+	my $self = shift;
+	$self->{_http}{filename} = shift;
 	my $mimetype = shift || "application/octet-stream";
-	setMimeType($mimetype);
+	$self->setMimeType($mimetype);
 }
 
 
@@ -211,7 +253,8 @@ The mime type for the document.
 =cut
 
 sub setMimeType {
-	$session{http}{mimetype} = shift;
+	my $self = shift;
+	$self->{_http}{mimetype} = shift;
 }
 
 #-------------------------------------------------------------------
@@ -228,7 +271,8 @@ Any value other than 0 will disable header printing.
 =cut
 
 sub setNoHeader {
-        $session{http}{noHeader} = shift;
+	my $self = shift;
+        $self->{_http}{noHeader} = shift;
 }
 
 #-------------------------------------------------------------------
@@ -244,9 +288,10 @@ The URL to redirect to.
 =cut
 
 sub setRedirect {
-	$session{http}{location} = shift;
-	setStatus("302", "Redirect");
-	WebGUI::Style::setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$session{http}{location}});
+	my $self = shift;
+	$self->{_http}{location} = shift;
+	$self->setStatus("302", "Redirect");
+	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$self->{_http}{location}});
 }
 
 
@@ -267,8 +312,10 @@ An HTTP status code description. It is a little one line of text that describes 
 =cut
 
 sub setStatus {
-	$session{http}{status} = shift;
-	$session{http}{statusDescription} = shift;
+	my $self = shift;
+	$self->{_http}{status} = shift;
+	$self->{_http}{statusDescription} = shift;
 }
 
 1;
+

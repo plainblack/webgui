@@ -1,10 +1,8 @@
 package WebGUI::Macro::Product;
 
 use strict;
-use WebGUI::Session;
 use WebGUI::Product;
 use WebGUI::Asset::Template;
-use WebGUI::SQL;
 use WebGUI::International;
 
 =head1 NAME
@@ -29,15 +27,16 @@ is left blank, a default template from the Macro/Product namespace will be used.
 =cut
 
 sub process {
+	my $session = shift;
 	my (@param, $productId, $variantId, $product, $variant, $output, $templateId, @variantLoop, %var);
 	
 	@param = @_;
 	
 	return WebGUI::International::get('no sku or id','Macro_Product') unless ($_[0]);
 
-	($productId, $variantId) = WebGUI::SQL->quickArray("select productId, variantId from productVariants where sku=".quote($_[0]));
-	($productId) = WebGUI::SQL->quickArray("select productId from products where sku=".quote($_[0])) unless ($productId);
-	($productId) = WebGUI::SQL->quickArray("select productId from products where productId=".quote($_[0])) unless ($productId);
+	($productId, $variantId) = $session->db->quickArray("select productId, variantId from productVariants where sku=".$session->db->quote($_[0]));
+	($productId) = $session->db->quickArray("select productId from products where sku=".$session->db->quote($_[0])) unless ($productId);
+	($productId) = $session->db->quickArray("select productId from products where productId=".$session->db->quote($_[0])) unless ($productId);
 	
 	return WebGUI::International::get('cannot find product','Macro_Product') unless ($productId);
 
@@ -75,7 +74,7 @@ sub process {
 	$var{'variants.message'} = WebGUI::International::get('available product configurations', 'Macro_Product');
 	$templateId = $_[1] || $product->get('templateId');
 	
-	return WebGUI::Asset::Template->new($templateId)->process(\%var);
+	return WebGUI::Asset::Template->new($ssession,$templateId)->process(\%var);
 }
 
 1;

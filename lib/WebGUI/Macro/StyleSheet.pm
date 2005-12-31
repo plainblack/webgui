@@ -11,8 +11,6 @@ package WebGUI::Macro::StyleSheet;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 
@@ -24,7 +22,7 @@ Macro for dynamically adding references to CSS documents to use in this page.
 
 =head2 process ( url )
 
-process is a wrapper around WebGUI::Style::setLink().
+process is a wrapper around $session->style->setLink().
 
 =head3 url
 
@@ -34,7 +32,8 @@ The URL to the CSS document.
 
 #-------------------------------------------------------------------
 sub process {
-	WebGUI::Style::setLink(shift,{
+	my $session = shift;
+	$session->style->setLink(shift,{
 		type=>'text/css',
 		rel=>'stylesheet'
 		});

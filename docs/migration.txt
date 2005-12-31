@@ -549,6 +549,113 @@ we are using a native mod perl handler. If you used $session{cgi} object
 you'll now need to convert your applications to use the methods provided by
 Apache2::Request which is referenced through $session{modperl} and $session{req}.
 
+
+5.23 Session System Replaced
+
+As of 6.9.0 we've removed the old global session system and replaced it with a
+newer, safer, more modern, object oriented session system. Because session is
+the glue that holds WebGUI together, it has basically affected every API in
+the system. Here's a (hopefully complete) list of what's been changed and how
+it affects you.
+
+%session no longer exists, so you can no longer do things like
+$session{user}{userId}. Instead, you'll know have a $session object that will
+be accessible in whatever plug-in environment you're working on. So to
+retrieve the current user's userId you'd call $session->user->userId because
+session loads the current user's user object, and then you can call the userId
+method on that object. If you're working in an asset environment, you may
+instead be calling something like $self->session->user->userId.
+
+Please see the WebGUI::Session API for details on what objects are available
+through WebGUI::Session. The following unix command line tricks should fix 70%
+of the things you need to change in your custom assets. You will need to
+modify them slightly for other types of plugins (run these in order):
+
+Fix $session{config}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{config}{webguiRoot}!\$self->session->config->getWebguiRoot!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{config}{configFile}!\$self->session->config->getFilename!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{config}{(\w+)}!\$self->session->config->get("$1")!g' {} \;
+
+Fix $session{setting}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{setting}{(\w+)}!\$self->session->setting->get("$1")!g' {} \;
+
+Fix $session{user}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{user}{([username|userId])}!\$self->session->user->$1!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{user}{(\w+)}!\$self->session->user->profileField("$1")!g' {} \;
+
+Fix $session{env}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{env}{(\w+)}!\$self->session->env->get("$1")!g' {} \;
+
+Fix $session{os}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{os}{(\w+)}!\$self->session->os->get("$1")!g' {} \;
+
+Fix $session{var}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{var}{(\w+)}!\$self->session->var->get("$1")!g' {} \;
+
+Fix $session{req}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{req}!\$self->session->request!g' {} \;
+
+Fix $session{asset}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{asset}!\$self->session->asset!g' {} \;
+
+
+5.23.1 WebGUI::SQL API Refactored
+
+The SQL API has been made more object oriented in 6.9, so it now handles database
+connections for you. You can get the default database connection via
+$session->db or a random slave via $session->dbSlave or you can create your
+own by my $db = WebGUI::SQL->connect($session, $dsn, $user, $pass);
+
+The following command line tricks should fix most of your database queries
+(provided your querying the WebGUI database):
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:SQL\-\>!\$self->session->db->!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!quoteAndJoin\(!\$self->session->db->quoteAndJoin(!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!quote\(!\$self->session->db->quote(!g' {} \;
+
+
+5.23.2 WebGUI::FormProcessor API Refactored
+
+Instead of accessing $session{form} or WebGUI::FormProcessor getting form data
+is done through the new session system via $session->form->process("param","Text");
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{form}{(\w+)}!\$self->session->form->process("$1")!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:FormProcessor\:\:!\$self->session->form->!g' {} \;
+
+
+5.23.3 WebGUI::ErrorHandler API Refactored
+
+As of 6.9 WebGUI::ErrorHandler is now accessed through session.
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:ErrorHandler\:\:!\$self->session->errorHandler->!g' {} \;
+
+
+5.23.4 WebGUI::Style API Refactored
+
+As of 6.9 the WebGUI::Style API has been convereted to OO and is accessed
+through session. The following command line tricks will help you convert your
+assets.
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{useEmptyStyle} = (\d+);!\$self->session->style->useEmptyStyle("$1")!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{makePrintable} = (\d+);!\$self->session->style->makePrintable("$1")!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Style\:\:!\$self->session->style->!g' {} \;
+
+
+5.23.5 Lots of APIs Refactored
+
+Lots of other API's have been refactored in 6.9 to conform to the new OO based
+session system. You should look at the API docs for individual details.
+
+
+
 6.  Automatic list of Assets in Help System.
 -------------------------------------
 6.1 Starting in WebGUI 6.7, there is now an automatic list of all Assets

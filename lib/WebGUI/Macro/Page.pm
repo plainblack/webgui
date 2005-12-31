@@ -11,7 +11,6 @@ package WebGUI::Macro::Page;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -28,14 +27,15 @@ session variable, returns a single space.
 
 =head3 property
 
-The name of the property to retrieve from the assset via $session{asset}->get()
+The name of the property to retrieve from the assset via $session->asset->get()
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
-	if (exists $session{asset}) {
-		return $session{asset}->get(shift);
+	my $session = shift;
+	if ($session->asset) {
+		return $session->asset->get(shift);
 	}
 	return "";
 }

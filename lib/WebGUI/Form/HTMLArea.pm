@@ -77,13 +77,13 @@ sub definition {
                         defaultValue=>WebGUI::International::get("477","WebGUI")
                         },
                 rows=>{
-                        defaultValue=> $session{setting}{textAreaRows}+20
+                        defaultValue=> $self->session->setting->get("textAreaRows")+20
                         },
                 columns=>{
-                        defaultValue=> $session{setting}{textAreaCols}+10
+                        defaultValue=> $self->session->setting->get("textAreaCols")+10
                         },
                 richEditId=>{
-                        defaultValue=>$session{setting}{richEditor} || "PBrichedit000000000001"
+                        defaultValue=>$self->session->setting->get("richEditor") || "PBrichedit000000000001"
                         },
 		profileEnabled=>{
 			defaultValue=>1
@@ -116,10 +116,10 @@ Renders an HTML area field.
 
 sub toHtml {
 	my $self = shift;
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/textFix.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onblur="fixChars(this.form.'.$self->{name}.')" mce_editable="true" ';	
-	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->{richEditId})->getRichEditor($self->{id});
-	my $richEdit = WebGUI::Asset::RichEdit->new($self->{richEditId});
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/textFix.js',{ type=>'text/javascript' });
+	$self->get("extras") .= ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ';	
+	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->get("richEditId"))->getRichEditor($self->{id});
+	my $richEdit = WebGUI::Asset::RichEdit->new($self->get("richEditId"));
         if (defined $richEdit) {
                 return $self->SUPER::toHtml.$richEdit->getRichEditor($self->{id});
         } else {

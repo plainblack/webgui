@@ -11,8 +11,6 @@ package WebGUI::Macro::URLEncode;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -35,6 +33,7 @@ The text to URL encode.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
 	return WebGUI::URL::escape(shift);
 }
 

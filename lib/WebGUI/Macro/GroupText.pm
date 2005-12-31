@@ -12,8 +12,6 @@ package WebGUI::Macro::GroupText;
 
 use strict;
 use WebGUI::Grouping;
-use WebGUI::SQL;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -44,8 +42,9 @@ Text to be shown to someone not in the group.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
 	my @param = @_;
-	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($param[0]),WebGUI::SQL->getSlave);
+	my ($groupId) = $session->dbSlave->quickArray("select groupId from groups where groupName=".$session->db->quote($param[0]));
 	$groupId = 3 if ($groupId eq "");
 	if (WebGUI::Grouping::isInGroup($groupId)) { 
 		return $param[1];

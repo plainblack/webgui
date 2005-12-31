@@ -98,8 +98,8 @@ profile field.
 
 sub displayValue {
 	my ($self) = @_;
-	return '' unless $self->{value};
-	my $location = WebGUI::Storage->get($self->{value});
+	return '' unless $self->get("value");
+	my $location = WebGUI::Storage->get($self->get("value"));
 	local $_;
 	my @files = map { sprintf qq!<img src="%s" />!, $location->getUrl($_) } @{ $location->getFiles };
 	my $fileValue = join "<br />\n", @files;

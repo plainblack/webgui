@@ -54,6 +54,7 @@ sub _alias {
 sub process {
 	my (@date, $userId, $u, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
 	@date = WebGUI::DateTime::localtime(WebGUI::DateTime::time());
+print $date[3];
 	if ($date[3] == $session{config}{SyncProfilesToLDAP_hour}) {
 		$a = WebGUI::SQL->read("select userId from users where authMethod='LDAP'");
 		while (($userId) = $a->array) {

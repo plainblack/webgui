@@ -258,8 +258,7 @@ sub createAccountSave {
       $authInfo .= "\n\n";
       WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),$self->getSetting("welcomeMessage").$authInfo);
    }
-   
-   WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$userId);
+  $session->user({user=>$u});  
    _logLogin($userId,"success");
 	my $command = $session{setting}{runOnRegistration};
 	WebGUI::Macro::process(\$command);
@@ -559,7 +558,7 @@ sub login {
    #Create a new user
    $uid = $self->userId;
    $u = WebGUI::User->new($uid);
-   WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$uid);
+   $session->user({user=>$u});
    $u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
    _logLogin($uid,"success");
    

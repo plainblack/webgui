@@ -13,9 +13,7 @@ package WebGUI::Macro::AdminToggle;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -48,6 +46,7 @@ A template from the Macro/AdminToggle namespace to use for formatting the link.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
          if (WebGUI::Grouping::isInGroup(12)) {
         	my %var;
                  my ($turnOn,$turnOff,$templateName) = @_;
@@ -61,9 +60,9 @@ sub process {
                       $var{'toggle.text'} = $turnOn;
                  }
 		if ($templateName) {
-         		return  WebGUI::Asset::Template->newByUrl($templateName)->process(\%var);
+         		return  WebGUI::Asset::Template->newByUrl($session,$templateName)->process(\%var);
 		} else {
-         		return  WebGUI::Asset::Template->new("PBtmpl0000000000000036")->process(\%var);
+         		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000036")->process(\%var);
 		}
 	}
        return "";

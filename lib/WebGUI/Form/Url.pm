@@ -85,7 +85,7 @@ Parses the posted value and tries to make corrections if necessary.
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{req}->param($self->{name});
+	my $value = $self->session->request->param($self->get("name"));
      	if ($value =~ /mailto:/) {
                 return $value;
         } elsif ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
@@ -106,8 +106,8 @@ Renders a URL field.
 
 sub toHtml {
         my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/addHTTP.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onBlur="addHTTP(this.form.'.$self->{name}.')"';
+	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/addHTTP.js',{ type=>'text/javascript' });
+	$self->get("extras") .= ' onBlur="addHTTP(this.form.'.$self->get("name").')"';
 	return $self->SUPER::toHtml;
 }
 

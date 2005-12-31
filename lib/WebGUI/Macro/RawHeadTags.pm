@@ -11,8 +11,6 @@ package WebGUI::Macro::RawHeadTags;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 
@@ -24,7 +22,7 @@ Macro for adding
 
 =head2 process ( tags )
 
-process is a wrapper for WebGUI::Style::setRawHeadTags();
+process is a wrapper for $session->style->setRawHeadTags();
 
 =head3 text
 
@@ -34,7 +32,8 @@ Text that will be added to the HEAD tags for this page.
 
 #-------------------------------------------------------------------
 sub process {
-	WebGUI::Style::setRawHeadTags(shift);
+	my $session = shift;
+	$session->style->setRawHeadTags(shift);
 	return "";
 }
 

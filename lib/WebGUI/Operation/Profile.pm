@@ -140,7 +140,7 @@ sub www_editProfileSave {
 	foreach $fieldName (keys %{$profile}) {
 		$u->profileField($fieldName,$profile->{$fieldName});
 	}
-	WebGUI::Session::refreshUserInfo($session{user}{userId});
+	$session->user({user=>$u});
 	return WebGUI::Operation::Auth::www_auth();
 }
 

@@ -94,15 +94,15 @@ Renders a template picker control.
 
 sub toHtml {
 	my $self = shift;
-        my $templateList = WebGUI::Asset::Template->getList($self->{namespace});
+        my $templateList = WebGUI::Asset::Template->getList($self->get("namespace"));
         #Remove entries from template list that the user does not have permission to view.
         for my $assetId ( keys %{$templateList} ) {
           	my $asset = WebGUI::Asset::Template->new($assetId);
-          	if (!$asset->canView($session{user}{userId})) {
+          	if (!$asset->canView($self->session->user->profileField("userId"))) {
             		delete $templateList->{$assetId};
           	}
         }
-	$self->{options} = $templateList;
+	$self->get("options") = $templateList;
 	$self->setManageIcons();
 	return $self->SUPER::toHtml();
 }
@@ -132,15 +132,15 @@ editing the template show up if the user is allowed to do that.
 
 sub setManageIcons {
 	my $self = shift;
-	my $template = WebGUI::Asset::Template->new($self->{value});
+	my $template = WebGUI::Asset::Template->new($self->get("value"));
         if (defined $template && $template->canEdit) {
                 my $returnUrl;
-                if (exists $session{asset}) {
-                        $returnUrl = ";proceed=goBackToPage;returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);
+                if (exists $self->session->asset) {
+                        $returnUrl = ";proceed=goBackToPage;returnUrl=".WebGUI::URL::escape($self->session->asset->getUrl);
                 }
                 my $buttons = editIcon("func=edit".$returnUrl,$template->get("url"));
                 $buttons .= manageIcon("func=manageAssets",$template->getParent->get("url"));
-		$self->{subtext} = $buttons . $self->{subtext};
+		$self->get("subtext") = $buttons . $self->get("subtext");
 	}
 }
 

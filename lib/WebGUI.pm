@@ -41,22 +41,16 @@ use Apache2::ServerUtil ();
 #-------------------------------------------------------------------
 sub handler {
 	my $r = shift;
-	$session{site} = shift || $r->dir_config('WebguiConfig');
 	my $s = Apache2::ServerUtil->server;
-	$s->add_version_component("WebGUI/".$WebGUI::VERSION); # had to remove b/c it was appending on every request for that instance of httpd.  :(
-	$session{wguri} = $r->uri;
-	$session{config} = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$session{site});
-	### Add Apache Request stuff to global session.  Yes, I know the global hash will eventually be deprecated.
-	foreach my $url ($session{config}{extrasURL}, @{$session{config}{passthruUrls}}) {
-		return Apache2::Const::DECLINED if ($session{wguri} =~ m/^$url/);
+	$s->add_version_component("WebGUI/".$WebGUI::VERSION);
+	$config = WebGUI::Config->new($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
+	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {
+		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
 	}
-	my $uploads = $session{config}{uploadsURL};
-	if ($session{wguri} =~ m/^$uploads/) {
+	my $uploads = $config->get("uploadsURL");
+	if ($r->uri =~ m/^$uploads/) {
 		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
 	} else {
-		$session{requestedUrl} = $session{wguri};
-		my $gateway = $session{config}{gateway};
-		$session{requestedUrl} =~ s/^$gateway(.*)$/$1/;
 		$r->set_handlers(PerlResponseHandler => \&contentHandler);
 		$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	}
@@ -66,80 +60,57 @@ sub handler {
 
 #-------------------------------------------------------------------	
 sub contentHandler {
-	
-	### The following items must be in precisely the following order
-	#   because each line depends on something from the previous line.
-	
 	### inherit Apache request.
 	my $r = shift;
 	### Instantiate the API for this httpd instance.
 	my $s = Apache2::ServerUtil->server;
 	### Open new or existing user session based on user-agent's cookie.
-	WebGUI::Session::open($s->dir_config('WebguiRoot'),'modperl',"false");
-	### Apache2::Request object
-	$session{req} = Apache2::Request->new($r, POST_MAX => 1024 * $session{setting}{maxAttachmentSize});
-	### Sets $session{cookie} as a hashref of the cookies.
-	$session{cookie} = WebGUI::HTTP::getCookies();
-	### Change current user to user specified in wgSession cookie.
-	if ($session{cookie}{wgSession} eq "") {
-		# setting up a visitor session
-		$session{var}{sessionId} = WebGUI::Session::start(1);
-	} else {  # load previous session
-		### populate $session{env} and $session{setting}
-		WebGUI::Session::setupSessionVars($session{cookie}{wgSession});
-	}
-	### current user's account and profile information (from users and userProfileData tables)
-	WebGUI::Session::setupUserInfo($session{var}{userId});
-	### Add wgSession cookie to header iff it's not already on the client.
-	WebGUI::HTTP::setCookie("wgSession",$session{var}{sessionId}) unless ($session{var}{sessionId} eq $session{cookie}{wgSession});
-	### check to see if client is proxied and adjust remote_addr as necessary
-	if ($ENV{HTTP_X_FORWARDED_FOR} ne "") {
-		$session{env}{REMOTE_ADDR} = $ENV{HTTP_X_FORWARDED_FOR};
-	}
+	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
 	### form variables
 	foreach ($session{req}->param) {
 		$session{form}{$_} = $session{req}->body($_) || $session{req}->param($_);
 	}
-	if ($session{env}{HTTP_X_MOZ} eq "prefetch") { # browser prefetch is a bad thing
-		WebGUI::HTTP::setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
-		$r->print(WebGUI::HTTP::getHeader());
-	} elsif ($session{setting}{specialState} eq "upgrading") {
+	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
+		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
+		$r->print($session->http->getHeader);
+	} elsif ($session->setting->get("specialState") eq "upgrading") {
 		upgrading($r);
-	} elsif ($session{setting}{specialState} eq "init") {
+	} elsif ($session->setting->get("specialState") eq "init") {
 		$r->print(setup());
 	} else {
 		my $output = "";
-		if (WebGUI::ErrorHandler::canShowPerformanceIndicators()) {
+		if ($session->errorHandler->canShowPerformanceIndicators) {
 			my $t = [Time::HiRes::gettimeofday()];
-			$output = page();
+			$output = page($session);
 			$t = Time::HiRes::tv_interval($t) ;
 			$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
 		} else {
-			$output = page();
+			$output = page($session);
 		}
-		$r->print(WebGUI::HTTP::getHeader());
-		$r->print($output) unless (WebGUI::HTTP::isRedirect());
-		WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
+		$r->print($session->http->getHeader());
+		$r->print($output) unless ($session->http->isRedirect());
+		#WebGUI::Affiliate::grabReferral();	# process affilliate tracking request
 	}
-	WebGUI::Session::close();
+	$session->close;
 	return Apache2::Const::OK;
 }
 
 #-------------------------------------------------------------------
 sub page {
+	my $session = shift;
 	my $assetUrl = shift;
 	my $output = processOperations();
 	if ($output eq "") {
-		my $asset = eval{WebGUI::Asset->newByUrl($assetUrl,$session{form}{revision})};
+		my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session{form}{revision})};
 		if ($@) {
-			WebGUI::ErrorHandler::warn("Couldn't instantiate asset for url: ".$session{requestedUrl}." Root cause: ".$@);
+			$session->errorHandler->warn("Couldn't instantiate asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
 		}
 		if (defined $asset) {
 			my $method = "view";
 			if (exists $session{form}{func}) {
 				$method = $session{form}{func};
 				unless ($method =~ /^[A-Za-z]+$/) {
-					WebGUI::ErrorHandler::security("tried to call a non-existent method $method on $assetUrl");
+					$session->security("tried to call a non-existent method $method on $assetUrl");
 					$method = "view";
 				}
 			}
@@ -148,12 +119,12 @@ sub page {
 		}
 	}
 	if ($output eq "") {
-		WebGUI::HTTP::setStatus("404","Page Not Found");
-		my $notFound = WebGUI::Asset->getNotFound;
+		$session->http->setStatus("404","Page Not Found");
+		my $notFound = WebGUI::Asset->getNotFound($session);
 		if (defined $notFound) {
 			$output = tryAssetMethod($notFound,'view');
 		} else {
-			WebGUI::ErrorHandler::warn("The notFound page failed to be created!");
+			$session->errorHandler->error("The notFound page failed to be created!");
 			$output = "An error was encountered while processing your request.";
 		}
 		$output = "An error was encountered while processing your request." unless $output ne '';

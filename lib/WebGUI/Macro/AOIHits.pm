@@ -11,8 +11,6 @@ package WebGUI::Macro::AOIHits;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::SQL;
 
 =head1 NAME
 
@@ -37,16 +35,15 @@ The value for the key that will be looked up.
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, $temp);
-        @param = @_;
-	my $key = $param[0];
-	my $value = $param[1];
+	my $session = shift;
+	my $key = shift; 
+	my $value = shift;
 	my $sql = "select count from passiveProfileAOI a, metaData_properties f 
 			where a.fieldId=f.fieldId 
-			and userId=".quote($session{user}{userId})." 
-			and fieldName=".quote($key)." 
-			and value=".quote($value);
-	my ($count) = WebGUI::SQL->buildArray($sql);
+			and userId=".$session->db->$session->db->quote($session->user->userId)." 
+			and fieldName=".$session->db->$session->db->quote($key)." 
+			and value=".$session->db->$session->db->quote($value);
+	my ($count) = $session->db->buildArray($sql);
 	return $count;
 }
 

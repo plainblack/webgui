@@ -70,7 +70,7 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	$self->{options} = WebGUI::DateTime::getTimeZones();
+	$self->get("options") = WebGUI::DateTime::getTimeZones();
 	return $self->SUPER::toHtml();
 }
 

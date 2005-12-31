@@ -1,7 +1,6 @@
 package WebGUI::Macro::SubscriptionItemPurchaseUrl;
 
 use strict;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -23,6 +22,7 @@ The ID of the subscription item to purchase.
 =cut
 
 sub process {
+	my $session = shift;
 	return WebGUI::URL::page('op=purchaseSubscription;sid='.shift);
 }
 

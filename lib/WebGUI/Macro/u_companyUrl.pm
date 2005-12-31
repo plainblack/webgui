@@ -11,7 +11,6 @@ package WebGUI::Macro::u_companyUrl;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -30,7 +29,8 @@ returns the companyURL from the session variable.
 
 #-------------------------------------------------------------------
 sub process {
-        return $session{setting}{companyURL};
+	my $session = shift;
+        return $session->setting->get("companyURL");
 }
 
 1;

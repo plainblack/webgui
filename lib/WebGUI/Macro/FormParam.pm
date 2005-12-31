@@ -11,7 +11,6 @@ package WebGUI::Macro::FormParam;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -33,7 +32,8 @@ The name of the field to pull from the session variable.
 
 #-------------------------------------------------------------------
 sub process {
-	return $session{req}->param(shift) if ($session{req});
+	my $session = shift;
+	return $session->form->process(shift);
 }
 
 

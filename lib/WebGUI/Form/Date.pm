@@ -109,7 +109,7 @@ Return the date in a human readable format for the Profile system.
 
 sub displayValue {
 	my ($self) = @_;
-	return WebGUI::DateTime::epochToHuman($self->{value},"%z");
+	return WebGUI::DateTime::epochToHuman($self->get("value"),"%z");
 }
 
 #-------------------------------------------------------------------
@@ -122,7 +122,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::setToEpoch($session{req}->param($self->{name}));
+	return WebGUI::DateTime::setToEpoch($self->session->request->param($self->get("name")));
 }
 
 #-------------------------------------------------------------------
@@ -135,20 +135,20 @@ Renders a date picker control.
 
 sub toHtml {
         my $self = shift;
-	if ($self->{_defaulted} && $self->{noDate} ) {
-		$self->{value} = '';
+	if ($self->get("_defaulted") && $self->get("noDate") ) {
+		$self->get("value") = '';
 	}
 	else {
-		$self->{value} = WebGUI::DateTime::epochToSet($self->{value});
+		$self->get("value") = WebGUI::DateTime::epochToSet($self->get("value"));
 	}
-	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
+	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
 		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
 	}
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ type=>'text/javascript' });
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ type=>'text/javascript' });
-        WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/calendar.js',{ type=>'text/javascript' });
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/calendar-setup.js',{ type=>'text/javascript' });
+        WebGUI::Style::setLink($self->session->config->get("extrasURL").'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
         return $self->SUPER::toHtml. '<script type="text/javascript"> 
                         Calendar.setup({ 
                                 inputField : "'.$self->{id}.'", 
@@ -156,7 +156,7 @@ sub toHtml {
                                 showsTime : false, 
                                 step : 1,
                                 timeFormat : "12",
-                                firstDay : '.$session{user}{firstDayOfWeek}.'
+                                firstDay : '.$self->session->user->profileField("firstDayOfWeek").'
                                 }); 
                         </script>';
 }
@@ -172,8 +172,8 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 sub toHtmlAsHidden {
         my $self = shift;
         return WebGUI::Form::Hidden->new(
-                name=>$self->{name},
-                value=>WebGUI::DateTime::epochToSet($self->{value})
+                name=>$self->get("name"),
+                value=>WebGUI::DateTime::epochToSet($self->get("value"))
                 )->toHtmlAsHidden;
 }
 

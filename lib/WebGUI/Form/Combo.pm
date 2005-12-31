@@ -79,8 +79,8 @@ Returns an array or a carriage return ("\n") separated scalar depending upon whe
 
 sub getValueFromPost {
 	my $self = shift;
-	if ($session{req}->param($self->{name}."_new")) {
-		return $session{req}->param($self->{name}."_new");
+	if ($self->session->request->param($self->get("name")."_new")) {
+		return $self->session->request->param($self->get("name")."_new");
         }
 	return $self->SUPER::getValueFromPost;
 }
@@ -95,12 +95,12 @@ Renders a combo box form control.
 
 sub toHtml {
 	my $self = shift;
-	$self->{options}->{''} = '['.WebGUI::International::get(582).']';
-        $self->{options}->{_new_} = WebGUI::International::get(581).'-&gt;';
+	$self->get("options")->{''} = '['.WebGUI::International::get(582).']';
+        $self->get("options")->{_new_} = WebGUI::International::get(581).'-&gt;';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Text->new(
-			size=>$session{setting}{textBoxSize}-5,
-			name=>$self->{name}."_new",
+			size=>$self->session->setting->get("textBoxSize")-5,
+			name=>$self->get("name")."_new",
 			id=>$self->{id}."_new"
 			)->toHtml;
 }

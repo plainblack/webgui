@@ -11,7 +11,6 @@ package WebGUI::Macro::Extras;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -30,7 +29,8 @@ Returns the extrasURL.  A trailing slash '/' is appended to the URL.
 
 #-------------------------------------------------------------------
 sub process {
-        return $session{config}{extrasURL}."/";
+	my $session = shift;
+        return $session->config->get("extrasURL")."/";
 }
 
 1;

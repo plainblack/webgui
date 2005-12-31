@@ -13,9 +13,7 @@ package WebGUI::Macro::L_loginBox;
 use strict;
 use WebGUI::Form;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -38,7 +36,9 @@ text to wrap in a link for logging out.
 
 #-------------------------------------------------------------------
 sub _createURL {
-	return '<a href="'.WebGUI::URL::page("op=auth;method=logout").'">'.$_[0].'</a>';
+	my $session = shift;
+	my $text = shift;
+	return '<a href="'.WebGUI::URL::page("op=auth;method=logout").'">'.$text.'</a>';
 }
 
 #-------------------------------------------------------------------
@@ -61,23 +61,24 @@ The ID of a template for custom layout of the login box and text.
 =cut
 
 sub process {
+	my $self = shift;
         my @param = @_;
 	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	
-        $var{'user.isVisitor'} = ($session{user}{userId} eq "1");
+        $var{'user.isVisitor'} = ($session->user->profileField("userId") eq "1");
 	$var{'customText'} = $param[1];
-	$var{'customText'} =~ s/%(.*?)%/_createURL($1)/ge;
+	$var{'customText'} =~ s/%(.*?)%/_createURL($session,$1)/ge;
 	$var{'hello.label'} = WebGUI::International::get(48,'Macro_L_loginBox');
 	$var{'logout.url'} = WebGUI::URL::page("op=auth;method=logout");
 	$var{'account.display.url'} = WebGUI::URL::page('op=auth;method=displayAccount');
         $var{'logout.label'} = WebGUI::International::get(49,'Macro_L_loginBox');
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
-        if (index(lc($ENV{HTTP_USER_AGENT}),"msie") < 0) {
+        if (index(lc($session->env->get("HTTP_USER_AGENT")),"msie") < 0) {
         	$boxSize = int($boxSize=$boxSize*2/3);
         }
 	my $action;
-        if ($session{setting}{encryptLogin}) {
+        if ($session->setting->get("encryptLogin")) {
                 $action = WebGUI::URL::page(undef,1);
                 $action =~ s/http:/https:/;
         }
@@ -109,7 +110,7 @@ sub process {
         $var{'account.create.url'} = WebGUI::URL::page('op=auth;method=createAccount');
 	$var{'account.create.label'} = WebGUI::International::get(407);
 	$var{'form.footer'} = WebGUI::Form::formFooter();
-        return WebGUI::Asset::Template->new($templateId)->process(\%var); 
+        return WebGUI::Asset::Template->new($session,$templateId)->process(\%var); 
 }
 
 1;

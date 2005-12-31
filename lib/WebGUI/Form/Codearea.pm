@@ -79,8 +79,8 @@ Renders a code area field.
 
 sub toHtml {
 	my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/TabFix.js',{type=>"text/javascript"});
-	$self->{extras} .= ' style="width: 99%; min-width: 440px; height: 400px" onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"';	
+	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/TabFix.js',{type=>"text/javascript"});
+	$self->get("extras") .= ' style="width: 99%; min-width: 440px; height: 400px" onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"';	
 	return $self->SUPER::toHtml;
 }
 

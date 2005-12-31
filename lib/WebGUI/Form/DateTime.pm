@@ -101,7 +101,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::setToEpoch($session{req}->param($self->{name}));
+	return WebGUI::DateTime::setToEpoch($self->session->request->param($self->get("name")));
 }
 
 #-------------------------------------------------------------------
@@ -114,23 +114,23 @@ Renders a date picker control.
 
 sub toHtml {
         my $self = shift;
-	my $value = WebGUI::DateTime::epochToSet($self->{value},1);
-	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
+	my $value = WebGUI::DateTime::epochToSet($self->get("value"),1);
+	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
 		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
 	}
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar.js',{ type=>'text/javascript' });
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/calendar/calendar-setup.js',{ type=>'text/javascript' });
-        WebGUI::Style::setLink($session{config}{extrasURL}.'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
-	my $mondayFirst = $session{user}{firstDayOfWeek} ? "true" : "false";
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/calendar.js',{ type=>'text/javascript' });
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/calendar-setup.js',{ type=>'text/javascript' });
+        WebGUI::Style::setLink($self->session->config->get("extrasURL").'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
+	my $mondayFirst = $self->session->user->profileField("firstDayOfWeek") ? "true" : "false";
         return WebGUI::Form::Text->new(
-                name=>$self->{name},
+                name=>$self->get("name"),
                 value=>$value,
-                size=>$self->{size},
-                extras=>$self->{extras},
+                size=>$self->get("size"),
+                extras=>$self->get("extras"),
 		id=>$self->{id},
-                maxlength=>$self->{maxlength}
+                maxlength=>$self->get("maxlength")
                 )->toHtml . '<script type="text/javascript"> 
                         Calendar.setup({ 
                                 inputField : "'.$self->{id}.'", 
@@ -138,7 +138,7 @@ sub toHtml {
                                 showsTime : true, 
                                 step : 1,
                                 timeFormat : "12",
-                                firstDay : '.$session{user}{firstDayOfWeek}.'
+                                firstDay : '.$self->session->user->profileField("firstDayOfWeek").'
                                 }); 
                         </script>';
 }
@@ -154,8 +154,8 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 sub toHtmlAsHidden {
         my $self = shift;
 	return WebGUI::Form::Hidden->new(
-		name=>$self->{name},
-		value=>WebGUI::DateTime::epochToSet($self->{value},1)	
+		name=>$self->get("name"),
+		value=>WebGUI::DateTime::epochToSet($self->get("value"),1)	
 		)->toHtmlAsHidden;
 }
 

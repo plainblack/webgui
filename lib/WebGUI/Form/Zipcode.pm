@@ -85,7 +85,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{req}->param($self->{name});
+	my $value = $self->session->request->param($self->get("name"));
    	if ($value =~ /^[A-Z\d\s\-]+$/) {
                 return $value;
         }
@@ -102,8 +102,8 @@ Renders a zip code field.
 
 sub toHtml {
         my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onkeyup="doInputCheck(this.form.'.$self->{name}.',\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')"';
+	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
+	$self->get("extras") .= ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')"';
 	return $self->SUPER::toHtml;
 }
 

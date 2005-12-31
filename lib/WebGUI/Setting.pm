@@ -30,8 +30,15 @@ This package stores and retrieves settings. It is generally only used internally
 
  use WebGUI::Setting;
 
- WebGUI::Setting::set($name,$value);
- $hashRef = WebGUI::Setting::get();
+ $settings = WebGUI::Settings->new;
+
+ $settings->set($name, $value);
+ $value = $settings->get($name);
+
+ $settings->add($name, $value);
+ $settings->remove($name);
+
+ $session = $settings->session;
 
 =head1 FUNCTIONS
 
@@ -58,11 +65,11 @@ The initial value of the setting.
 =cut
 
 sub add {
+	my $self = shift;
 	my $name = shift;
 	my $value = shift;
-	$WebGUI::Session::session{setting}{$name} = $value;
-	WebGUI::SQL->write("insert into settings  values (".quote($name).",".quote($value).")");
-	WebGUI::Cache->new("settings")->delete;
+	$self->{_settings}{$name} = $value;
+	$self->session->db->write("insert into settings (name,value) values (".quote($name).",".quote($value).")");
 }
 
 
@@ -75,13 +82,29 @@ Returns a hash reference containing all the settings.
 =cut
 
 sub get {
-	my $cache = WebGUI::Cache->new("settings");
-	my $settings = $cache->get;
-	unless (defined $settings) {
-		$settings = WebGUI::SQL->buildHashRef("select * from settings");
-		$cache->set($settings,60*60*24);
-	}
-	return $settings;
+	my $self = shift;
+	my $param = shift;
+	return $self->{_settings}{$param};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( session ) 
+
+Constructor.
+
+=head3 session
+
+A reference to the current WebGUI::Session.
+
+=cut
+
+sub new {
+	my $class = shift	
+	my $session = shift;
+	my $settings = $session->db->buildHashRef("select * from settings");
+	bless {_settings=>$settings, _session=>$session}, $class;
 }
 
 
@@ -98,9 +121,24 @@ The name of the setting to set.
 =cut
 
 sub remove {
+	my $self = shift;
 	my $name = shift;
-	WebGUI::SQL->write("delete from settings where name=".quote($name));
-	WebGUI::Cache->new("settings")->delete;
+	delete $self->{_settings}{$name};
+	$self->session->db->write("delete from settings where name=".quote($name));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the WebGUI::Session object.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 
@@ -123,9 +161,8 @@ The value of the setting.
 sub set {
 	my $name = shift;
 	my $value = shift;
-	$WebGUI::Session::session{setting}{$name} = $value;
-	WebGUI::SQL->write("update settings set value=".quote($value)." where name=".quote($name));
-	WebGUI::Cache->new("settings")->delete;
+	$self->{_settings}{$name} = $value;
+	$self->session->db->write("update settings set value=".quote($value)." where name=".quote($name));
 }
 
 

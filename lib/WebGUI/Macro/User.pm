@@ -11,7 +11,6 @@ package WebGUI::Macro::User;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -30,7 +29,8 @@ the data stored in $session .  If the field does not exist, undef is returned.
 
 #-------------------------------------------------------------------
 sub process {
-	return  $session{user}{shift};
+	my $session = shift;
+	return  $session->user->profileField(shift);
 }
 
 

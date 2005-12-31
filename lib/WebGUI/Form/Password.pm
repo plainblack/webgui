@@ -91,9 +91,9 @@ Renders an input tag of type password.
 
 sub toHtml {
 	my $self = shift;
-	my $html = '<input type="password" name="'.$self->{name}.'" value="'.$self->fixQuotes($self->{value}).'" size="'.$self->{size}.'" id="'.$self->{id}.'" ';
-	$html .= 'maxlength="'.$self->{maxLength}.'" ' if ($self->{maxLength});
-	$html .= $self->{extras}.' />';
+	my $html = '<input type="password" name="'.$self->get("name").'" value="'.$self->fixQuotes($self->get("value")).'" size="'.$self->get("size").'" id="'.$self->{id}.'" ';
+	$html .= 'maxlength="'.$self->get("maxLength").'" ' if ($self->get("maxLength"));
+	$html .= $self->get("extras").' />';
 	return $html;
 }
 

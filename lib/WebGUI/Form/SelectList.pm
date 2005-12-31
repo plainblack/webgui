@@ -91,8 +91,8 @@ Renders a select list form control.
 
 sub toHtml {
 	my $self = shift;
-	my $multiple = ' multiple="1"' if ($self->{multiple});
-	my $output = '<select name="'.$self->{name}.'" size="'.$self->{size}.'" id="'.$self->{id}.'" '.$self->{extras}.$multiple.'>';
+	my $multiple = ' multiple="1"' if ($self->get("multiple"));
+	my $output = '<select name="'.$self->get("name").'" size="'.$self->get("size").'" id="'.$self->{id}.'" '.$self->get("extras").$multiple.'>';
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = $self->orderedHash;
@@ -104,7 +104,7 @@ sub toHtml {
 				$output .= ' selected="selected"';
 			}
 		}
-		$output .= '>'.${$self->{options}}{$key}.'</option>';
+		$output .= '>'.${$self->get("options}"){$key}.'</option>';
         }
 	$output .= '</select>'."\n";
 	return $output;

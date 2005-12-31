@@ -12,7 +12,6 @@ package WebGUI::Macro::International;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -41,6 +40,7 @@ The namespace to pull the label from.
 
 #-------------------------------------------------------------------
 sub process {
+	my $self = shift;
 	return WebGUI::International::get(shift,shift);
 }
 

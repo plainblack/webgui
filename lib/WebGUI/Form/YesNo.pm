@@ -85,7 +85,7 @@ Returns either a 1 or 0 representing yes, no.
 
 sub yesNo {
 	my $self = shift;
-        if ($session{req}->param($self->{name}) > 0) {
+        if ($self->session->request->param($self->get("name")) > 0) {
                 return 1;
         }
 	return 0;
@@ -102,24 +102,24 @@ Renders a yes/no question field.
 sub toHtml {
 	my $self = shift;
         my ($checkYes, $checkNo);
-        if ($self->{value}) {
+        if ($self->get("value")) {
                 $checkYes = 1;
         } else {
                 $checkNo = 1;
         }
         my $output = WebGUI::Form::Radio->new(
                 checked=>$checkYes,
-                name=>$self->{name},
+                name=>$self->get("name"),
                 value=>1,
-                extras=>$self->{extras}
+                extras=>$self->get("extras")
                 )->toHtml;
         $output .= WebGUI::International::get(138);
         $output .= '&nbsp;&nbsp;&nbsp;';
         $output .= WebGUI::Form::Radio->new(
                 checked=>$checkNo,
-                name=>$self->{name},
+                name=>$self->get("name"),
                 value=>0,
-                extras=>$self->{extras}
+                extras=>$self->get("extras")
                 )->toHtml;
         $output .= WebGUI::International::get(139);
         return $output;

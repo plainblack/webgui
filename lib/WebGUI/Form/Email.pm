@@ -78,7 +78,7 @@ Returns a validated email address. If the result does not pass validation, it re
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{req}->param($self->{name});
+	my $value = $self->session->request->param($self->get("name"));
 
 	if ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
 		return $value;
@@ -96,8 +96,8 @@ Renders an email address field.
 
 sub toHtml {
         my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/emailCheck.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onchange="emailCheck(this.value)" ';
+	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/emailCheck.js',{ type=>'text/javascript' });
+	$self->get("extras") .= ' onchange="emailCheck(this.value)" ';
 	return $self->SUPER::toHtml;
 }
 

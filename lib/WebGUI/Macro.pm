@@ -16,8 +16,6 @@ package WebGUI::Macro;
 
 
 use strict qw(vars subs);
-use WebGUI::ErrorHandler;
-use WebGUI::Session;
 
 
 =head1 NAME
@@ -105,9 +103,13 @@ sub negate {
 
 #-------------------------------------------------------------------
 
-=head2 process ( html )
+=head2 process ( session, html )
 
 Runs all the WebGUI macros to and replaces them in the HTML with their output.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 html
 
@@ -116,6 +118,7 @@ A scalar reference of HTML to be processed.
 =cut
 
 sub process {
+	my $session = shift;
    	my $content = shift;
    	while ($$content =~ /$nestedMacro/gs) {
       		my ($macro, $searchString, $params) = ($1, $2, $3);
@@ -125,11 +128,12 @@ sub process {
       			$params =~ s/(^\(|\)$)//g; # remove parenthesis
       			&process(\$params); # recursive process params
 		}
-		if ($WebGUI::Session::session{config}{macros}{$searchString} ne "") {
-      			my $cmd = "WebGUI::Macro::".$WebGUI::Session::session{config}{macros}{$searchString};
+		my $macros = $session->config->get("macros");
+		if ($macros->{$searchString} ne "") {
+      			my $cmd = "WebGUI::Macro::".$macros->{$searchString};
 			my $load = "use ".$cmd;
 			eval($load);
-			WebGUI::ErrorHandler::error("Macro failed to compile: $cmd.".$@) if($@);
+			$session->errorHandler->error("Macro failed to compile: $cmd.".$@) if($@);
 			my @param;
         		push(@param, $+) while $params =~ m {
                 		"([^\"\\]*(?:\\.[^\"\\]*)*)",?
@@ -138,13 +142,13 @@ sub process {
         			}gx;
         		push(@param, undef) if substr($params,-1,1) eq ',';
       			$cmd = $cmd."::process";
-			my $result = eval{&$cmd(@param)};
+			my $result = eval{&$cmd($session,@param)};
 			if ($@) {
-				WebGUI::ErrorHandler::error("Processing failed on macro: $macro: ".$@);
+				$session->errorHandler->error("Processing failed on macro: $macro: ".$@);
 			} else {
 				if ($result =~ /\Q$macro/) {
                                         $result = "Endless macro loop detected. Stopping recursion.";
-					WebGUI::ErrorHandler::warn($macro." : ".$result)
+					$session->errorHandler->warn($macro." : ".$result)
                                 }
 				$$content =~ s/\Q$macro/$result/ges;
 			}

@@ -94,15 +94,15 @@ delete it.  Otherwise, display a form element to upload a file.
 
 sub displayForm {
 	my ($self) = @_;
-	return $self->toHtml unless $self->{value};
+	return $self->toHtml unless $self->get("value");
 	##There are files inside here, for each one, display the image
 	##and another form control for deleting it.
-	my $location = WebGUI::Storage->get($self->{value});
+	my $location = WebGUI::Storage->get($self->get("value"));
 	my $id = $location->getId;
 	my $fileForm = '';
 	foreach my $file ( @{ $location->getFiles } ) {
 		$fileForm .= sprintf qq!<img src="%s" /><br />!, $location->getUrl($file);
-		my $action = join '_', '_', $self->{name}, 'delete';
+		my $action = join '_', '_', $self->get("name"), 'delete';
 		$fileForm .= WebGUI::International::get(392)
 			  .  "&nbsp"x4
 			  . WebGUI::Form::YesNo->new({-name=>$action, -value=>0})->toHtml;
@@ -123,8 +123,8 @@ form elements will just return their value.
 
 sub displayValue {
 	my ($self) = @_;
-	return '' unless $self->{value};
-	my $location = WebGUI::Storage->get($self->{value});
+	return '' unless $self->get("value");
+	my $location = WebGUI::Storage->get($self->get("value"));
 	local $_;
 	my @files = map { sprintf qq!<img src="%s" />&nbsp;%s!, $location->getFileIconUrl($_), $_; } @{ $location->getFiles };
 	my $fileValue = join "<br />\n", @files;
@@ -143,8 +143,8 @@ deleting the file if it was specified.
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{req}->param($self->{name});
-	if ($session{req}->param(join '_', '_', $self->{name}, 'delete')) {
+	my $value = $self->session->request->param($self->get("name"));
+	if ($self->session->request->param(join '_', '_', $self->get("name"), 'delete')) {
 		my $storage = WebGUI::Storage->get($value);
 		$storage->delete;
 		return '';
@@ -157,7 +157,7 @@ sub getValueFromPost {
 		else {
 			$storage = WebGUI::Storage::Image->create;
 		}
-		$storage->addFileFromFormPost($self->{name});
+		$storage->addFileFromFormPost($self->get("name"));
 		my @files = @{ $storage->getFiles };
 		if (scalar(@files) < 1) {
 			$storage->delete;
@@ -179,21 +179,21 @@ Renders a file upload control.
 
 sub toHtml {
 	my $self = shift;
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/FileUploadControl.js',{type=>"text/javascript"});
+        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/FileUploadControl.js',{type=>"text/javascript"});
         my $uploadControl = '<script type="text/javascript">
                 var fileIcons = new Array();
                 ';
-        opendir(DIR,$session{config}{extrasPath}.'/fileIcons');
+        opendir(DIR,$self->session->config->get("extrasPath").'/fileIcons');
         my @files = readdir(DIR);
         closedir(DIR);
         foreach my $file (@files) {
                 unless ($file eq "." || $file eq "..") {
                         my $ext = $file;
                         $ext =~ s/(.*?)\.gif/$1/;
-                        $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
+                        $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->config->get("extrasURL").'/fileIcons/'.$file.'";'."\n";
                 }
         }
-        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->{name}.'", fileIcons, "'.WebGUI::International::get('removeLabel','WebGUI').'","'.$self->{maxAttachments}.'");
+        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->get("name").'", fileIcons, "'.WebGUI::International::get('removeLabel','WebGUI').'","'.$self->get("maxAttachments").'");
         uploader.addRow();
         </script>';
         return $uploadControl;

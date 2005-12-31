@@ -104,7 +104,7 @@ Retrieves a value from a form GET or POST and returns it. If the value comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $session{req}->param($self->{name});
+	my $formValue = $self->session->request->param($self->get("name"));
 	if (defined $formValue) {
 		return $formValue;
 	} else {
@@ -122,10 +122,10 @@ Renders and input tag of type checkbox.
 
 sub toHtml {
 	my $self = shift;
-	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->{value})));
-	my $checkedText = ' checked="checked"' if ($self->{checked});
+	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value"))));
+	my $checkedText = ' checked="checked"' if ($self->get("checked"));
 	my $idText = ' id="'.$self->{id}.'" ' if ($self->{id});
-	return '<input type="checkbox" name="'.$self->{name}.'" value="'.$value.'"'.$idText.$checkedText.' '.$self->{extras}.' />';
+	return '<input type="checkbox" name="'.$self->get("name").'" value="'.$value.'"'.$idText.$checkedText.' '.$self->get("extras").' />';
 }
 
 

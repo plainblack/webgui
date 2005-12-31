@@ -12,7 +12,6 @@ package WebGUI::Macro::RootTitle;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -32,10 +31,11 @@ is returned.  Otherwise a space is returned.
 
 #-------------------------------------------------------------------
 sub process {
-	if (exists $session{asset}) {
-		my $lineage = $session{asset}->get("lineage");
+	my $session = shift;
+	if ($session->asset) {
+		my $lineage = $session->asset->get("lineage");
 		$lineage = substr($lineage,0,6);
-		my $root = WebGUI::Asset->newByLineage($lineage);
+		my $root = WebGUI::Asset->newByLineage($session,$lineage);
 		if (defined $root) {
 			return $root->get("title");	
 		}

@@ -11,7 +11,6 @@ package WebGUI::Macro::CanEditText;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -34,8 +33,9 @@ this asset, an empty string will be returned.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
 	my @param = @_;
-	if (exists $session{asset} && $session{asset}->canEdit) { 
+	if ($session->asset && $session->asset->canEdit) { 
 		return $param[0];
 	} else {
 		return "";

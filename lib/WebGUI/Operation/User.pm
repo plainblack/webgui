@@ -218,15 +218,13 @@ sub getUserSearchForm {
 
 =head2 www_becomeUser ( )
 
-A wrapper around WebGUI::Session::convertVisitorToUser(), so that you can assume the UID
-for a different user in the current session.  Uses $session{form}{uid} to supply the
-UID of the user to become.
+Allows an administrator to assume another user.
 
 =cut
 
 sub www_becomeUser {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::Session::convertVisitorToUser($session{var}{sessionId},$session{form}{uid});
+	$session->user({userId=>$session{form}{uid}});
 	return "";
 }
 

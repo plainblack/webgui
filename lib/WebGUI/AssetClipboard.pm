@@ -15,7 +15,6 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 

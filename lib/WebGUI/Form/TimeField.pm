@@ -95,7 +95,7 @@ Returns the number of seconds since 00:00:00 on a 24 hour clock. Note, this will
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::timeToSeconds($session{req}->param($self->{name}))-($session{user}{timeOffset}*3600);
+	return WebGUI::DateTime::timeToSeconds($self->session->request->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
 }
 
 #-------------------------------------------------------------------
@@ -108,13 +108,13 @@ Renders a time field.
 
 sub toHtml {
         my $self = shift;
-	my $value = WebGUI::DateTime::secondsToTime($self->{value});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onkeyup="doInputCheck(this.form.'.$self->{name}.',\'0123456789:\')"';
+	my $value = WebGUI::DateTime::secondsToTime($self->get("value"));
+	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
+	$self->get("extras") .= ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789:\')"';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new(
 			id=>$self->{id},
-			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->{name}.';clockSet = window.open(\''.$session{config}{extrasURL}. '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
+			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->config->get("extrasURL"). '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>WebGUI::International::get(970)
 			)->toHtml;
 }
@@ -130,8 +130,8 @@ Renders the field as a hidden field.
 sub toHtmlAsHidden {
 	my $self = shift;
 	return WebGUI::Form::Hidden->new(
-		name=>$self->{name},
-		value=>secondsToTime($self->{value})
+		name=>$self->get("name"),
+		value=>secondsToTime($self->get("value"))
 		)->toHtmlAsHidden;
 }
 

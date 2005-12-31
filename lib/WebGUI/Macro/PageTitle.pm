@@ -11,7 +11,6 @@ package WebGUI::Macro::PageTitle;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -31,11 +30,12 @@ no asset cached in the session variable, nothing is returned.
 
 #-------------------------------------------------------------------
 sub process {
-	if (exists $session{asset}) {
-		if ($session{form}{op} || $session{form}{func}) {
-	        	return '<a href="'.$session{asset}->getUrl.'">'.$session{asset}->get("title").'</a>';
+	my $self = shift;
+	if ($session->asset) {
+		if ($session->form->process("op") || $session->form->process("func")) {
+	        	return '<a href="'.$session->asset->getUrl.'">'.$session->asset->get("title").'</a>';
 		} else {
-			return $session{asset}->get("title");
+			return $session->asset->get("title");
 		}
 	}
 }

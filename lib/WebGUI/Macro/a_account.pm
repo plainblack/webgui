@@ -12,9 +12,7 @@ package WebGUI::Macro::a_account;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -41,15 +39,16 @@ A template to use for formatting the link.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
        my %var;
          my  @param = @_;
 	return WebGUI::URL::page("op=auth;method=init") if ($param[0] eq "linkonly");
        $var{'account.url'} = WebGUI::URL::page('op=auth;method=init');
        $var{'account.text'} = $param[0] || WebGUI::International::get(46,'Macro_a_account');
 	if ($param[1]) {
-		return  WebGUI::Asset::Template->newByUrl($param[1])->process(\%var);
+		return  WebGUI::Asset::Template->newByUrl($session,$param[1])->process(\%var);
 	} else {
-		return  WebGUI::Asset::Template->new("PBtmpl0000000000000037")->process(\%var);
+		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000037")->process(\%var);
 	}
 }
 

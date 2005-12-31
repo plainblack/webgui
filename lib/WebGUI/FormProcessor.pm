@@ -30,13 +30,16 @@ This is a convenience package to the individual form controls. It allows you to 
 =head1 SYNOPSIS
 
  use WebGUI::FormProcessor;
- $value = WebGUI::FormProcessor::process("favoriteColor","selectList","black");
 
- $value = WebGUI::FormProcessor::someFormControlType("fieldName");
+ my $fp = WebGUI::FormProcessor->new($session);
+
+ $value = $fp->process("favoriteColor", "selectList", "black");
+
+ $value = $fp->someFormControlType("fieldName");
 
  Example:
 
- $value WebGUI::FormProcessor::text("title");
+ $value = $fp->text("title");
 
 =head1 METHODS
 
@@ -55,18 +58,38 @@ Dynamically creates functions on the fly for all the different form control type
 
 sub AUTOLOAD {
         our $AUTOLOAD;
+	my $self = shift;
         my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
 	my $fieldName = shift;
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
         if ($@) {
-                WebGUI::ErrorHandler::error("Couldn't compile form control: ".$name.". Root cause: ".$@);
+                $self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
                 return undef;
         }
         my $class = "WebGUI::Form::".$name;
-        return $class->new({name=>$fieldName})->getValueFromPost;
+        return $class->new($self->session, {name=>$fieldName})->getValueFromPost;
 }
 
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( session )
+
+Constructor.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	bless {_session=>$session}, $class;
+}
 
 
 #-------------------------------------------------------------------
@@ -90,12 +113,11 @@ The default value for this variable. If the variable is undefined then the defau
 =cut
 
 sub process {
-
-	my ($name, $type, $default) = @_;
+	my ($self, $name, $type, $default) = @_;
 	my $value;
 	$type = ucfirst($type);
 	$type = "Text" if ($type eq "");
-	$value = &$type($name);
+	$value = $self->$type($self->session,$name);
 	unless (defined $value) {
 		return $default;
 	}
@@ -105,6 +127,16 @@ sub process {
 	return $value;
 }
 
+#-------------------------------------------------------------------
+
+=head2 session
+
+=cut
+
+sub session
+	my $self = shift;
+	return $self->{_session};
+}
 
 1;
 

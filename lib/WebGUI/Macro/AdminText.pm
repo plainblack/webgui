@@ -11,7 +11,6 @@ package WebGUI::Macro::AdminText;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -31,9 +30,10 @@ string is returned.
 =cut
 
 #-------------------------------------------------------------------
-sub process {
+sub process {	
+	my $session = shift;
         my @param = @_;
-        return "" unless ($session{var}{adminOn});
+        return "" unless ($session->var->get("adminOn"));
         return $param[0];
 }
 

@@ -92,7 +92,7 @@ Renders a select list form control.
 sub toHtml {
 	my $self = shift;
 	my %types;
-	foreach my $type (@{$self->{types}}) {
+	foreach my $type (@{$self->get("types}")) {
                 if ($type eq "text") {
                         $types{text} = WebGUI::International::get(1010);
                 } elsif ($type eq "mixed") {
@@ -103,7 +103,7 @@ sub toHtml {
                         $types{html} = WebGUI::International::get(1009);
                 }
         }
-	$self->{options} = \%types,
+	$self->get("options") = \%types,
 	return $self->SUPER::toHtml();
 }
 

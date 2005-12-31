@@ -72,7 +72,7 @@ sub definition {
 			defaultValue=> 255
 			},
 		size=>{
-			defaultValue=>$session{setting}{textBoxSize} || 30
+			defaultValue=>$self->session->setting->get("textBoxSize") || 30
 			},
 		profileEnabled=>{
 			defaultValue=>1
@@ -91,8 +91,8 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->{value})));
-        return '<input id="'.$self->{id}.'" type="text" name="'.$self->{name}.'" value="'.$value.'" size="'.$self->{size}.'" maxlength="'.$self->{maxlength}.'" '.$self->{extras}.' />';
+ 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value"))));
+        return '<input id="'.$self->{id}.'" type="text" name="'.$self->get("name").'" value="'.$value.'" size="'.$self->get("size").'" maxlength="'.$self->get("maxlength").'" '.$self->get("extras").' />';
 }
 
 1;

@@ -12,9 +12,7 @@ package WebGUI::Macro::r_printable;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -51,15 +49,16 @@ is used.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my ($temp, @param, $styleId);
         @param = @_;
 	my $append = 'op=makePrintable';
-	if ($session{env}{REQUEST_URI} =~ /op\=/) {
+	if ($session->env->get("REQUEST_URI") =~ /op\=/) {
 		$append = 'op2='.WebGUI::URL::escape($append);
 	}
 	$temp = WebGUI::URL::page($append);
         $temp =~ s/\/\//\//;
-        $temp = WebGUI::URL::append($temp,$session{env}{QUERY_STRING});
+        $temp = WebGUI::URL::append($temp,$session->env->get("QUERY_STRING"));
 	if ($param[1] ne "") {
 		$temp = WebGUI::URL::append($temp,'styleId='.$param[1]);
 	}
@@ -72,9 +71,9 @@ sub process {
                		$var{'printable.text'} = WebGUI::International::get(53,'Macro_r_printable');
        		}
 		if ($param[2]) {
-         		$temp =  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
+         		$temp =  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
 		} else {
-         		$temp =  WebGUI::Asset::Template->new("PBtmpl0000000000000045")->process(\%var);
+         		$temp =  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000045")->process(\%var);
 		}
 	}
 	return $temp;

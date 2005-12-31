@@ -11,7 +11,6 @@ package WebGUI::Macro::Env;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -32,7 +31,8 @@ then undef will be returned.
 
 #-------------------------------------------------------------------
 sub process {
-	return $session{env}{shift};
+	my $session = shift;
+	return $session->env->get(shift);
 }
 
 1;

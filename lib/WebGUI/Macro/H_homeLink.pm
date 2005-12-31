@@ -14,7 +14,6 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -43,8 +42,9 @@ be used.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my ($label, $templateUrl) = @_;
-	my $home = WebGUI::Asset->getDefault;
+	my $home = WebGUI::Asset->getDefault($session);
 	if ($label ne "linkonly") {
 		my %var;
        		$var{'homelink.url'} = $home->getUrl;
@@ -54,9 +54,9 @@ sub process {
                		$var{'homeLink.text'} = WebGUI::International::get(47,'Macro_H_homeLink');
        		}
 		if ($templateUrl) {
-         		return WebGUI::Asset::Template->newByUrl($templateUrl)->process(\%var);
+         		return WebGUI::Asset::Template->newByUrl($session,$templateUrl)->process(\%var);
 		} else {
-         		return WebGUI::Asset::Template->new("PBtmpl0000000000000042")->process(\%var);
+         		return WebGUI::Asset::Template->new($session,"PBtmpl0000000000000042")->process(\%var);
 		}
 	}
 	return $home->getUrl;

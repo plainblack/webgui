@@ -1,4 +1,6 @@
 6.9.0
+ - Converted WebGUI to use a new object oriented session system. More details
+   in migation.txt.
  - fix [ 1379384 ] image uploads to non-public pages
  - fixed a problem with SynchFileToLDAP hourly script.
 

@@ -15,7 +15,6 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Session;
 use WebGUI::Paginator;
 
 =head1 NAME

@@ -38,38 +38,34 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
 
  use WebGUI::SQL;
 
- my $sth = WebGUI::SQL->prepare($sql);
- $sth->execute([ @values ]);
+ $db = WebGUI::SQL->connect($dsn, $user, $pass, $session);
+ $db->disconnect;
+ 
+ $sth = $db->prepare($sql);
+ $sth = $db->read($sql);
+ $sth = $db->unconditionalRead($sql);
 
- $sth = WebGUI::SQL->read($sql);
- $sth = WebGUI::SQL->unconditionalRead($sql);
- @arr = $sth->array;
- @arr = $sth->getColumnNames;
- %hash = $sth->hash;
- $hashRef = $sth->hashRef;
- $num = $sth->rows;
- $sth->finish;
+ $db->write($sql);
 
- WebGUI::SQL->write($sql);
+ $db->beginTransaction;
+ $db->commit;
+ $db->rollback;
 
- WebGUI::SQL->beginTransaction;
- WebGUI::SQL->commit;
- WebGUI::SQL->rollback;
+ @arr = $db->buildArray($sql);
+ $arrayRef = $db->buildArrayRef($sql);
+ %hash = $db->buildHash($sql);
+ $hashRef = $db->buildHashRef($sql);
+ @arr = $db->quickArray($sql);
+ $text = $db->quickCSV($sql);
+ %hash = $db->quickHash($sql);
+ $hashRef = $db->quickHashRef($sql);
+ $text = $db->quickTab($sql);
 
- @arr = WebGUI::SQL->buildArray($sql);
- $arrayRef = WebGUI::SQL->buildArrayRef($sql);
- %hash = WebGUI::SQL->buildHash($sql);
- $hashRef = WebGUI::SQL->buildHashRef($sql);
- @arr = WebGUI::SQL->quickArray($sql);
- $text = WebGUI::SQL->quickCSV($sql);
- %hash = WebGUI::SQL->quickHash($sql);
- $hashRef = WebGUI::SQL->quickHashRef($sql);
- $text = WebGUI::SQL->quickTab($sql);
+ $dbh = $db->getSlave;
 
- $dbh = WebGUI::SQL->getSlave;
-
- $id = getNextId("someId");
- $string = quote($string);
+ $id = $db->getNextId("someId");
+ $string = $db->quote($string);
+ $string = $db->quoteAndJoin(\@array);
 
 =head1 METHODS
 
@@ -79,46 +75,22 @@ These methods are available from this package:
 
 
 #-------------------------------------------------------------------
-sub _getDefaultDb {
-	return $WebGUI::Session::session{dbh};
-}
 
-
-#-------------------------------------------------------------------
-
-=head2 array ( )
-
-Returns the next row of data as an array.
-
-=cut
-
-sub array {
-        return $_[0]->{_sth}->fetchrow_array() or WebGUI::ErrorHandler::fatal("Couldn't fetch array. ".$_[0]->{_sth}->errstr);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 beginTransaction ( [ dbh ])
+=head2 beginTransaction ( )
 
 Starts a transaction sequence. To be used with commit and rollback. Any writes after this point will not be applied to the database until commit is called.
-
-=head3 dbh
-
-A database handler. Defaults to the WebGUI default database handler.
 
 =cut
 
 sub beginTransaction {
-	my $class = shift;
-	my $dbh = shift || _getDefaultDb();
-	$dbh->begin_work;
+	my $self = shift;
+	$self->dbh->begin_work;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 buildArray ( sql [, dbh ] )
+=head2 buildArray ( sql )
 
 Builds an array of data from a series of rows.
 
@@ -126,15 +98,13 @@ Builds an array of data from a series of rows.
 
 An SQL query. The query must select only one column of data.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub buildArray {
+	my $self = shift;
+	my $sql = shift;
         my ($sth, $data, @array, $i);
-        $sth = WebGUI::SQL->read($_[1],$_[2]);
+        $sth = $self->read($sql);
 	$i=0;
         while (($data) = $sth->array) {
                 $array[$i] = $data;
@@ -144,9 +114,10 @@ sub buildArray {
         return @array;
 }
 
+
 #-------------------------------------------------------------------
 
-=head2 buildArrayRef ( sql [, dbh ] )
+=head2 buildArrayRef ( sql )
 
 Builds an array reference of data from a series of rows.
 
@@ -154,20 +125,19 @@ Builds an array reference of data from a series of rows.
 
 An SQL query. The query must select only one column of data.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub buildArrayRef {
-	my @array = $_[0]->buildArray($_[1],$_[2]);
+	my $self = shift;
+	my $sql = shift;
+	my @array = $self->buildArray($sql);
 	return \@array;
 }
 
+
 #-------------------------------------------------------------------
 
-=head2 buildHash ( sql [, dbh ] )
+=head2 buildHash ( sql )
 
 Builds a hash of data from a series of rows.
 
@@ -175,16 +145,14 @@ Builds a hash of data from a series of rows.
 
 An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by a colon ":" to form a complex key.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub buildHash {
+	my $self = shift;
+	my $sql = shift;
 	my ($sth, %hash, @data);
 	tie %hash, "Tie::IxHash";
-        $sth = WebGUI::SQL->read($_[1],$_[2]);
+        $sth = $self->read($sql);
         while (@data = $sth->array) {
 		my $value = pop @data;
 		my $key = join(":",@data);	
@@ -197,7 +165,7 @@ sub buildHash {
 
 #-------------------------------------------------------------------
 
-=head2 buildHashRef ( sql [, dbh ] )
+=head2 buildHashRef ( sql )
 
 Builds a hash reference of data from a series of rows.
 
@@ -205,41 +173,87 @@ Builds a hash reference of data from a series of rows.
 
 An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by an underscore "_" to form a complex key.
 
-=head3 dbh
-
- By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub buildHashRef {
+	my $self = shift;
+	my $sql = shift;
         my ($sth, %hash);
         tie %hash, "Tie::IxHash";
-	%hash = $_[0]->buildHash($_[1],$_[2]);
+	%hash = $self->buildHash($sql);
         return \%hash;
 }
+
                                                                                                                                                              
 #-------------------------------------------------------------------
 
-=head2 commit ( [ dbh ])
+=head2 commit ( )
 
 Ends a transaction sequence. To be used with beginTransaction. Applies all of the writes since beginTransaction to the database.
-
-=head3 dbh
-
-A database handler. Defaults to the WebGUI default database handler.
 
 =cut
 
 sub commit {
-	my $class = shift;
-	my $dbh = shift || _getDefaultDb();
-	$dbh->commit;
+	my $self = shift;
+	$self->dbh->commit;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 deleteRow ( table, key, keyValue [, dbh ] )
+=head2 connect ( dsn, user, pass, session )
+
+Constructor. Connects to the database using DBI.
+
+=head2 dsn
+
+The Database Service Name of the database  you wish to connect to. It looks like 'DBI:mysql:dbname;host=localhost'.
+
+=head2 user
+
+The username to use to connect to the database defined by dsn.
+
+=head2 pass
+
+The password to use to connect to the database defined by dsn.
+
+=head2 session
+
+A reference to the active WebGUI::Session object.
+
+=cut
+
+sub connect {
+	my $class = shift;
+	my $dsn = shift;
+	my $user = shift;
+	my $pass = shift;
+	my $session = shift;
+	my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError=>0,AutoCommit=>1 }) or $session->errorHandler->fatal("Couldn't connect to database.");
+	if ( $dsn =~ /Oracle/ ) { # Set Oracle specific attributes
+		$dbh->{LongReadLen} = 512 * 1024;
+		$dbh->{LongTruncOk} = 1;
+	}
+	bless {_dbh=>$dbh, _session=>$session}, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 dbh ( )
+
+Returns a reference to the working DBI database handler for this WebGUI::SQL object.
+
+=cut
+
+sub dbh {
+	my $self = shift;
+	return $self->{_dbh};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 deleteRow ( table, key, keyValue )
 
 Deletes a row of data from the specified table.
 
@@ -255,15 +269,26 @@ The name of the column to use as the key. Should be a primary or unique key in t
 
 The value to search for in the key column.
 
-=head3 dbh
-
-A database handler to use. Defaults to the WebGUI database handler.
-
 =cut
 
 sub deleteRow {
-        my ($self, $table, $key, $keyValue, $dbh) = @_;
-        WebGUI::SQL->write("delete from $table where ".$key."=".quote($keyValue), $dbh);
+        my ($self, $table, $key, $keyValue) = @_;
+        WebGUI::SQL->write("delete from $table where ".$key."=".$self->quote($keyValue));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 disconnect ( )
+
+Disconnects from the database. And destroys the object.
+
+=cut
+
+sub disconnect {
+	my $self = shift;
+	$self->dbh->disconnect;
+	undef $self;
 }
 
 
@@ -276,7 +301,7 @@ Returns an error code for the current handler.
 =cut
 
 sub errorCode {
-        return $_[0]->{_sth}->err;
+        return $self->dbh->err;
 }
 
 
@@ -289,53 +314,7 @@ Returns a text error message for the current handler.
 =cut
 
 sub errorMessage {
-        return $_[0]->{_sth}->errstr;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 execute ( [ placeholders ] )
-
-Executes a prepared SQL statement.
-
-=head3 placeholders 
-
-An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
-
-=cut
-
-sub execute {
-	my $self = shift;
-	my $placeholders = shift || [];
-	my $sql = $self->{_sql};
-	$self->{_sth}->execute(@{$placeholders}) or WebGUI::ErrorHandler::fatal("Couldn't execute prepared statement: $sql  Root cause: ". DBI->errstr);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 finish ( )
-
-Ends a query after calling the read() or unconditionalRead() methods. Don't use this unless you're not retrieving the full result set, or if you're using it with the unconditionalRead() method.
-
-=cut
-
-sub finish {
-        return $_[0]->{_sth}->finish;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getColumnNames {
-
-Returns an array of column names. Use with a "read" method.
-
-=cut
-
-sub getColumnNames {
-        return @{$_[0]->{_sth}->{NAME}} if (ref $_[0]->{_sth}->{NAME} eq 'ARRAY');
+        return $self->dbh->errstr;
 }
 
 
@@ -354,15 +333,19 @@ Specify the name of one of the incrementers in the incrementer table.
 =cut
 
 sub getNextId {
+	my $self = shift;
+	my $name = shift;
         my ($id);
-        ($id) = WebGUI::SQL->quickArray("select nextValue from incrementer where incrementerId='$_[0]'");
-        WebGUI::SQL->write("update incrementer set nextValue=nextValue+1 where incrementerId='$_[0]'");
+	$self->beginTransaction;
+        ($id) = $self->quickArray("select nextValue from incrementer where incrementerId='$name'");
+        $self->write("update incrementer set nextValue=nextValue+1 where incrementerId='$name'");
+	$self->commit;
         return $id;
 }
 
 #-------------------------------------------------------------------
 
-=head2 getRow ( table, key, keyValue [, dbh ] )
+=head2 getRow ( table, key, keyValue )
 
 Returns a row of data as a hash reference from the specified table.
 
@@ -378,107 +361,36 @@ The name of the column to use as the retrieve key. Should be a primary or unique
 
 The value to search for in the key column.
 
-=head3 dbh
-
-A database handler to use. Defaults to the WebGUI database handler.
-
 =cut
 
 sub getRow {
-        my ($self, $table, $key, $keyValue, $dbh) = @_;
-        my $row = WebGUI::SQL->quickHashRef("select * from $table where ".$key."=".quote($keyValue), $dbh);
+        my ($self, $table, $key, $keyValue) = @_;
+        my $row = WebGUI::SQL->quickHashRef("select * from $table where ".$key."=".$self->quote($keyValue));
         return $row;
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 getSlave ( ) 
+=head2 prepare ( sql ) {
 
-Returns a random slave database handler, if one is defined, otherwise it returns undef. Likewise if admin mode is on it returns undef.
-
-=cut
-
-sub getSlave {
-	if ($WebGUI::Session::session{var}{adminOn}) {
-		return undef;
-	} else {
-		return $WebGUI::Session::session{slave}->[rand @{$WebGUI::Session::session{slave}}];
-	}
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 hash ( )
-
-Returns the next row of data in the form of a hash. Must be executed on a statement handler returned by the "read" method.
-
-=cut
-
-sub hash {
-	my ($hashRef);
-        $hashRef = $_[0]->{_sth}->fetchrow_hashref();
-	if (defined $hashRef) {
-        	return %{$hashRef};
-	} else {
-		return ();
-	}
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 hashRef ( )
-
-Returns the next row of data in the form of a hash reference. Must be executed on a statement handler returned by the "read" method.
-
-=cut
-
-sub hashRef {
-	my ($hashRef, %hash);
-        $hashRef = $_[0]->{_sth}->fetchrow_hashref();
-	tie %hash, 'Tie::CPHash';
-        if (defined $hashRef) {
-		%hash = %{$hashRef};
-                return \%hash;
-        } else {
-                return $hashRef;
-        }
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 prepare ( sql [, dbh ] ) {
-
-Returns a statement handler. To be used in creating prepared statements. Use with the execute method.
+This is a wrapper for WebGUI::SQL::ResultSet->prepare()
 
 =head3 sql
 
-An SQL statement. Can use the "?" placeholder for maximum performance on multiple statements with the execute method.
-
-=head3 dbh
-
-A database handler. Defaults to the WebGUI default database handler.
+An SQL statement. 
 
 =cut
 
 sub prepare {
-	my $class = shift;
+	my $self = shift;
 	my $sql = shift;
-	my $dbh = shift || _getDefaultDb();
-	push(@{$WebGUI::Session::session{SQLquery}},$sql);
-	my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::fatal("Couldn't prepare statement: ".$sql." : ". DBI->errstr);
-	bless ({_sth => $sth, _sql => $sql}, $class);
+	return WebGUI::SQL::ResultSet->prepare($sql, $self);
 }
-
 
 
 #-------------------------------------------------------------------
 
-=head2 quickArray ( sql [, dbh ] )
+=head2 quickArray ( sql )
 
 Executes a query and returns a single row of data as an array.
 
@@ -486,15 +398,13 @@ Executes a query and returns a single row of data as an array.
 
 An SQL query.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub quickArray {
+	my $self = shift;
+	my $sql = shift;
 	my ($sth, @data);
-        $sth = WebGUI::SQL->read($_[1],$_[2]);
+        $sth = $self->read($sql);
 	@data = $sth->array;
 	$sth->finish;
 	return @data;
@@ -503,7 +413,7 @@ sub quickArray {
 
 #-------------------------------------------------------------------
 
-=head2 quickCSV ( sql [, dbh ] )
+=head2 quickCSV ( sql )
 
 Executes a query and returns a comma delimited text blob with column headers.
 
@@ -511,15 +421,13 @@ Executes a query and returns a comma delimited text blob with column headers.
 
 An SQL query.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub quickCSV {
+	my $self = shift;
+	my $sql = shift;
         my ($sth, $output, @data);
-        $sth = WebGUI::SQL->read($_[1],$_[2]);
+        $sth = $self->read($sql);
         $output = join(",",$sth->getColumnNames)."\n";
         while (@data = $sth->array) {
                 makeArrayCommaSafe(\@data);
@@ -532,7 +440,7 @@ sub quickCSV {
 
 #-------------------------------------------------------------------
 
-=head2 quickHash ( sql [, dbh ] )
+=head2 quickHash ( sql )
 
 Executes a query and returns a single row of data as a hash.
 
@@ -540,15 +448,13 @@ Executes a query and returns a single row of data as a hash.
 
 An SQL query.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub quickHash {
+	my $self = shift;
+	my $sql = shift;
         my ($sth, $data);
-        $sth = WebGUI::SQL->read($_[1],$_[2]);
+        $sth = $self->read($sql);
         $data = $sth->hashRef;
         $sth->finish;
 	if (defined $data) {
@@ -560,7 +466,7 @@ sub quickHash {
 
 #-------------------------------------------------------------------
 
-=head2 quickHashRef ( sql [, dbh ] )
+=head2 quickHashRef ( sql )
 
 Executes a query and returns a single row of data as a hash reference.
 
@@ -568,17 +474,12 @@ Executes a query and returns a single row of data as a hash reference.
 
 An SQL query.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub quickHashRef {
 	my $self = shift;
 	my $sql = shift;
-	my $dbh = shift;
-        my $sth = WebGUI::SQL->read($sql,$dbh);
+        my $sth = $self->read($sql);
         my $data = $sth->hashRef;
         $sth->finish;
         if (defined $data) {
@@ -590,7 +491,7 @@ sub quickHashRef {
 
 #-------------------------------------------------------------------
 
-=head2 quickTab ( sql [, dbh ] )
+=head2 quickTab ( sql )
 
 Executes a query and returns a tab delimited text blob with column headers.
 
@@ -598,15 +499,13 @@ Executes a query and returns a tab delimited text blob with column headers.
 
 An SQL query.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub quickTab {
+	my $self = shift;
+	my $sql = shift;
         my ($sth, $output, @data);
-        $sth = WebGUI::SQL->read($_[1],$_[2]);
+        $sth = $self->read($sql);
 	$output = join("\t",$sth->getColumnNames)."\n";
 	while (@data = $sth->array) {
                 makeArrayTabSafe(\@data);
@@ -618,7 +517,7 @@ sub quickTab {
 
 #-------------------------------------------------------------------
 
-=head2 quote ( string [ , dbh ] ) 
+=head2 quote ( string ) 
 
 Returns a string quoted and ready for insert into the database.  
 
@@ -628,21 +527,17 @@ B<NOTE:> This is not a regular method, but is an exported subroutine.
 
 Any scalar variable that needs to be escaped to be inserted into the database.
 
-=head3 dbh
-
-The database handler. Defaults to the WebGUI database handler.
-
 =cut
 
 sub quote {
-	my $value = shift; 
-	my $dbh = shift || _getDefaultDb();
-	return $dbh->quote($value);
+	my $self = shift;
+	my $value = shift;
+	return $self->dbh->quote($value);
 }
 
 #-------------------------------------------------------------------
 
-=head2 quoteAndJoin ( arrayRef [ , dbh ] ) 
+=head2 quoteAndJoin ( arrayRef ) 
 
 Returns a comma seperated string quoted and ready for insert/select into/from the database.  This is typically used for a statement like "select * from someTable where field in (".quoteAndJoin(\@strings).")".
 
@@ -652,18 +547,14 @@ B<NOTE:> This is not a regular method, but is an exported subroutine.
 
 An array reference containing strings to be quoted.
 
-=head3 dbh
-
-The database handler. Defaults to the WebGUI database handler.
-
 =cut
 
 sub quoteAndJoin {
+	my $self = shift;
         my $arrayRef = shift;
-	my $dbh = shift || _getDefaultDb();
 	my @newArray;
 	foreach my $value (@$arrayRef) {
- 		push(@newArray,$dbh->quote($value));
+ 		push(@newArray,$self->quote($value));
 	}
 	return join(",",@newArray);
 }
@@ -671,17 +562,13 @@ sub quoteAndJoin {
 
 #-------------------------------------------------------------------
 
-=head2 read ( sql [, dbh, placeholders ] )
+=head2 read ( sql [ , placeholders ] )
 
-Returns a statement handler. This is a utility method that runs both a prepare and execute all in one.
+This is a convenience method for WebGUI::SQL::ResultSet->read().
 
 =head3 sql
 
 An SQL query. Can use the "?" placeholder for maximum performance on multiple statements with the execute method.
-
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
 
 =head3 placeholders
 
@@ -690,19 +577,16 @@ An array reference containing a list of values to be used in the placeholders de
 =cut
 
 sub read {
-	my $class = shift;
+	my $self = shift;
 	my $sql = shift;
-	my $dbh = shift;
 	my $placeholders = shift;
-	my $sth = WebGUI::SQL->prepare($sql, $dbh);
-	$sth->execute($placeholders);
-	return $sth;
+	return WebGUI::SQL::ResultSet->read($sql,$self);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 rollback ( [ dbh ])
+=head2 rollback ( )
 
 Ends a transaction sequence. To be used with beginTransaction. Cancels all of the writes since beginTransaction.
 
@@ -713,28 +597,28 @@ A database handler. Defaults to the WebGUI default database handler.
 =cut
 
 sub rollback {
-	my $class = shift;
-	my $dbh = shift || _getDefaultDb();
-	$dbh->rollback;
+	my $self = shift;
+	$self->dbh->rollback;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 rows ( )
+=head2 session ( )
 
-Returns the number of rows in a statement handler created by the "read" method.
+Returns the session object reference.
 
 =cut
 
-sub rows {
-        return $_[0]->{_sth}->rows;
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 setRow ( table, key, data [, dbh, id ] )
+=head2 setRow ( table, key, data [ ,id ] )
 
 Inserts/updates a row of data into the database. Returns the value of the key.
 
@@ -750,10 +634,6 @@ The name of the primary key of the table.
 
 A hash reference containing column names and values to be set. If the field matching the key parameter is set to "new" then a new row will be created.
 
-=head3 dbh
-
-A database handler to use. Defaults to the WebGUI database handler.
-
 =head3 id
 
 Use this ID to create a new row. Same as setting the key value to "new" except that we'll use this passed in id instead.
@@ -761,19 +641,19 @@ Use this ID to create a new row. Same as setting the key value to "new" except t
 =cut
 
 sub setRow {
-        my ($self, $table, $keyColumn, $data, $dbh, $id) = @_;
+        my ($self, $table, $keyColumn, $data, $id) = @_;
         if ($data->{$keyColumn} eq "new" || $id) {
                 $data->{$keyColumn} = $id || WebGUI::Id::generate();
-                WebGUI::SQL->write("insert into $table ($keyColumn) values (".quote($data->{$keyColumn}).")", $dbh);
+                $self->write("insert into $table ($keyColumn) values (".$self->quote($data->{$keyColumn}).")", $dbh);
         }
         my (@pairs);
         foreach my $key (keys %{$data}) {
                 unless ($key eq $keyColumn) {
-                        push(@pairs, $key.'='.quote($data->{$key}));
+                        push(@pairs, $key.'='.$self->quote($data->{$key}));
                 }
         }
 	if ($pairs[0] ne "") {
-        	WebGUI::SQL->write("update $table set ".join(", ", @pairs)." where ".$keyColumn."=".quote($data->{$keyColumn}), $dbh);
+        	$self->write("update $table set ".join(", ", @pairs)." where ".$keyColumn."=".$self->quote($data->{$keyColumn}), $dbh);
 	}
 	return $data->{$keyColumn};
 }
@@ -781,17 +661,13 @@ sub setRow {
 
 #-------------------------------------------------------------------
 
-=head2 unconditionalRead ( sql [, dbh, placeholders ] )
+=head2 unconditionalRead ( sql [, placeholders ] )
 
-An alias of the "read" method except that it will not cause a fatal error in WebGUI if the query is invalid. This is useful for user generated queries such as those in the SQL Report. Returns a statement handler.
+A convenience method that is an alias of WebGUI::SQL::ResultSet->unconditionalRead()
 
 =head3 sql
 
 An SQL query.
-
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
 
 =head3 placeholders
 
@@ -800,24 +676,16 @@ An array reference containing a list of values to be used in the placeholders de
 =cut
 
 sub unconditionalRead {
-	my $class = shift;
+	my $self = shift;
 	my $sql = shift;
-	my $dbh = shift || _getDefaultDb();
 	my $placeholders = shift;
-	if (WebGUI::ErrorHandler::canShowDebug()) {
-		push(@{$WebGUI::Session::session{SQLquery}},$sql);
-	}
-        my $sth = $dbh->prepare($sql) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
-        if ($sth) {
-        	$sth->execute(@$placeholders) or WebGUI::ErrorHandler::warn("Unconditional read failed: ".$sql." : ".DBI->errstr);
-        	bless ({_sth => $sth} , $class);
-        }       
+	return WebGUI::SQL::ResultSet->unconditionalRead($sql, $self);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 write ( sql [, dbh ] )
+=head2 write ( sql )
 
 A method specifically designed for writing to the database in an efficient manner. 
 
@@ -825,20 +693,13 @@ A method specifically designed for writing to the database in an efficient manne
 
 An SQL insert or update.
 
-=head3 dbh
-
-By default this method uses the WebGUI database handler. However, you may choose to pass in your own if you wish.
-
 =cut
 
 sub write {
-	my $class = shift;
+	my $self = shift;
 	my $sql = shift;
-	my $dbh = shift || _getDefaultDb();
-	if (WebGUI::ErrorHandler::canShowDebug()) {
-		push(@{$WebGUI::Session::session{SQLquery}},$sql);
-	}
-     	$dbh->do($sql) or WebGUI::ErrorHandler::fatal("Couldn't write to the database: ".$sql." : ". DBI->errstr);
+	$self->session->errorHandler->debug("query: ".$sql);
+     	$self->dbh->do($sql) or $self->session->errorHandler->fatal("Couldn't write to the database: ".$sql." : ". $self->dbh->errstr);
 }
 
 

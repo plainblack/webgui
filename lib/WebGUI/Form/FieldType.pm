@@ -89,7 +89,7 @@ and DynamicField, the form class dispatcher.
 
 sub getTypes {
 	my $class = shift;
-	opendir(DIR,$session{config}{webguiRoot}."/lib/WebGUI/Form/");
+	opendir(DIR,$self->session->config->getWebguiRoot."/lib/WebGUI/Form/");
 	my @rawTypes = readdir(DIR);
 	closedir(DIR);
 	my @types;
@@ -112,7 +112,7 @@ Returns either what's posted or if nothing comes back it returns "text".
 
 sub getValueFromPost {
         my $self = shift;
-        return $session{req}->param($self->{name}) || "text";
+        return $self->session->request->param($self->get("name")) || "text";
 }
 
 #-------------------------------------------------------------------
@@ -127,7 +127,7 @@ sub toHtml {
 	my $self = shift;
 	my %options;
 	tie %options, "Tie::IxHash";
-	foreach my $type (@{$self->{types}}) {
+	foreach my $type (@{$self->get("types}")) {
 		my $class = "WebGUI::Form::".ucfirst($type);
 		my $cmd = "use ".$class;
         	eval ($cmd);    
@@ -137,7 +137,7 @@ sub toHtml {
         	} 
 		$options{$type} = $class->getName;
 	}
-	$self->{options} = \%options;
+	$self->get("options") = \%options;
 
 	return $self->SUPER::toHtml();
 }

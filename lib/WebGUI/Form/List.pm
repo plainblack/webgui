@@ -48,7 +48,7 @@ of radio/check boxes.
 
 sub alignmentSeparator {
 	my ($self) = @_;
-	if ($self->{vertical}) {
+	if ($self->get("vertical")) {
 		return "<br />\n";
 	}
 	else {
@@ -72,10 +72,10 @@ sub correctOptions {
 		s/\s+$//; # remove trailing spaces
 		$options{$_} = $_;
 	}
-	if (exists $self->{options} && ref($self->{options}) eq "HASH") {
-		%options = (%{$self->{options}} , %options);
+	if (exists $self->get("options") && ref($self->get("options")) eq "HASH") {
+		%options = (%{$self->get("options}") , %options);
 	}
-	$self->{options} = \%options;
+	$self->get("options") = \%options;
 }
 
 
@@ -98,7 +98,7 @@ sub correctValues {
 			s/\s+$//; # remove trailing spaces
 			push(@defaultValues, $_);
 	}
-	$self->{value} = \@defaultValues;
+	$self->get("value") = \@defaultValues;
 }
 
 
@@ -191,7 +191,7 @@ Returns an array or a carriage return ("\n") separated scalar depending upon whe
 
 sub getValueFromPost {
 	my $self = shift;
-	my @data = $session{req}->param($self->{name});
+	my @data = $self->session->request->param($self->get("name"));
         return wantarray ? @data : join("\n",@data);
 }
 
@@ -207,11 +207,11 @@ ref.
 sub getValues {
 	my $self = shift;
 	my @values = ();
-	if (ref $self->{value} eq 'ARRAY') {
-		@values = @{ $self->{value} };
+	if (ref $self->get("value") eq 'ARRAY') {
+		@values = @{ $self->get("value") };
 	}
 	else {
-		push @values, $self->{value};
+		push @values, $self->get("value");
 	}
         return @values;
 }
@@ -230,12 +230,12 @@ sub orderedHash {
 	my ($self) = @_;
         my %options;
         tie %options, 'Tie::IxHash';
-        if ($self->{sortByValue}) {
-                foreach my $optionKey (sort {"\L${$self->{options}}{$a}" cmp "\L${$self->{options}}{$b}" } keys %{$self->{options}}) {
-                         $options{$optionKey} = $self->{options}{$optionKey};
+        if ($self->get("sortByValue")) {
+                foreach my $optionKey (sort {"\L${$self->get("options}"){$a}" cmp "\L${$self->get("options}"){$b}" } keys %{$self->get("options}")) {
+                         $options{$optionKey} = $self->get("options"){$optionKey};
                 }
         } else {
-                %options = %{$self->{options}};
+                %options = %{$self->get("options}");
         }
         return %options;
 }
@@ -259,7 +259,7 @@ sub toHtmlAsHidden {
                 foreach my $item (@values) {
                         if ($item eq $key) {
                                 $output .= WebGUI::Form::Hidden->(
-                                        name=>$self->{name},
+                                        name=>$self->get("name"),
                                         value=>$key
                                         );
                         }

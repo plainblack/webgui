@@ -92,7 +92,7 @@ Returns either what's posted or if nothing comes back it returns "most".
 
 sub getValueFromPost {
 	my $self = shift;
-	return $session{req}->param($self->{name}) || "most";
+	return $self->session->request->param($self->get("name")) || "most";
 }
 
 #-------------------------------------------------------------------
@@ -114,7 +114,7 @@ sub toHtml {
                 'most'=>WebGUI::International::get(421),
                 'all'=>WebGUI::International::get(419)
                 );
-	$self->{options} = \%filter;
+	$self->get("options") = \%filter;
 	return $self->SUPER::toHtml();
 }
 

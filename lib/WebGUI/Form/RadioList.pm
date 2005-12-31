@@ -104,16 +104,16 @@ sub toHtml {
         %options = $self->orderedHash;
 	foreach my $key (keys %options) {
                 my $checked = 0;
-                if ($self->{value} eq $key) {
+                if ($self->get("value") eq $key) {
                         $checked = 1;
                 }
                 $output .= WebGUI::Form::Radio->new({
-                        name=>$self->{name},
+                        name=>$self->get("name"),
                         value=>$key,
-                        extras=>$self->{extras},
+                        extras=>$self->get("extras"),
                         checked=>$checked
                         })->toHtml;
-                $output .= ${$self->{options}}{$key} . $alignment;
+                $output .= ${$self->get("options}"){$key} . $alignment;
         }
         return $output;
 }

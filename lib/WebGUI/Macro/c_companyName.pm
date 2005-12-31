@@ -11,7 +11,6 @@ package WebGUI::Macro::c_companyName;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -29,7 +28,8 @@ returns the companyName from the session variable.
 
 #-------------------------------------------------------------------
 sub process {
-        return $session{setting}{companyName};
+	my $session = shift;
+        return $session->setting->get("companyName");
 }
 
 1;

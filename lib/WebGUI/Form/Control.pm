@@ -231,7 +231,7 @@ sub displayFormWithWrapper {
 	if ($self->passUiLevelCheck) {
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
 		return '<tr'.$rowClass.'>
-				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->{label}.'</td>
+				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->get("label").'</td>
 				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->displayForm().$subtext."</td>
 			</tr>\n";
 	} else {
@@ -250,7 +250,7 @@ form elements will just return their value.
 
 sub displayValue {
 	my ($self) = @_;
-	return $self->{value};
+	return $self->get("value");
 }
 
 #-------------------------------------------------------------------
@@ -269,6 +269,25 @@ sub generateIdParameter {
 	my $class = shift;
 	my $name = shift;
 	return $name."_formId"; 
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 get ( var )
+
+Returns a property of this form object.
+
+=head3 var
+
+The variable name of the value to return.
+
+=cut
+
+sub get {
+	my $self = shift;
+	my $var = shift;
+	return $self->{_params}{$var};
 }
 
 #-------------------------------------------------------------------
@@ -373,19 +392,23 @@ Retrieves a value from a form GET or POST and returns it. If the value comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $session{req}->param($self->{name});
+	my $formValue = $self->session->request->param($self->get("name"));
 	if (defined $formValue) {
 		return $formValue;
 	} else {
-		return $self->{defaultValue};
+		return $self->get("defaultValue");
 	}
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( parameters )
+=head2 new ( session, parameters )
 
 Constructor. Creates a new form field object.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 parameters
 
@@ -402,6 +425,7 @@ Please note that an id attribute is automatically added to every form element wi
 
 sub new {
 	my $class = shift;
+	my $session = shift;
 	my %raw;
 	# deal with a hash reference full of properties
 	if (ref $_[0] eq "HASH") {
@@ -440,8 +464,10 @@ sub new {
 	}
 	# preventing ID collisions
 	$params{id} = $params{idPrefix}.$params{id};
-	bless \%params, $class;
+	bless {_session=>$session, _params=>\%params}, $class;
 }
+
+
 #-------------------------------------------------------------------
 
 =head2 prepareWrapper ( )
@@ -452,13 +478,13 @@ Common code for preparing wrappers for *WithWrapper
 
 sub prepareWrapper {
 	my $self = shift;
-	my $rowClass = $self->{rowClass};
-	$rowClass = qq| class="$rowClass" | if($self->{rowClass});
-	my $labelClass = $self->{labelClass};
-	$labelClass = qq| class="$labelClass" | if($self->{labelClass});
-	my $fieldClass = $self->{fieldClass};
-	$fieldClass = qq| class="$fieldClass" | if($self->{fieldClass});
-	my $hoverHelp = $self->{hoverHelp};
+	my $rowClass = $self->get("rowClass");
+	$rowClass = qq| class="$rowClass" | if($self->get("rowClass"));
+	my $labelClass = $self->get("labelClass");
+	$labelClass = qq| class="$labelClass" | if($self->get("labelClass"));
+	my $fieldClass = $self->get("fieldClass");
+	$fieldClass = qq| class="$fieldClass" | if($self->get("fieldClass"));
+	my $hoverHelp = $self->get("hoverHelp");
 	$hoverHelp =~ s/\r/ /g;
 	$hoverHelp =~ s/\n/ /g;
 	$hoverHelp =~ s/&amp;/& amp;/g;
@@ -471,10 +497,25 @@ sub prepareWrapper {
 	$hoverHelp =~ s/'/\\'/g;
 	$hoverHelp =~ s/^\s+//;
 	$hoverHelp = qq| onmouseover="return escape('$hoverHelp')"| if ($hoverHelp);
-	my $subtext = $self->{subtext};
+	my $subtext = $self->get("subtext");
 	$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
 	return ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -486,7 +527,7 @@ Renders the form field to HTML. This method should be overridden by all subclass
 
 sub toHtml {
 	my $self = shift;
-	return $self->{value};
+	return $self->get("value");
 }
 
 #-------------------------------------------------------------------
@@ -499,7 +540,7 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 
 sub toHtmlAsHidden {
 	my $self = shift;
-        return '<input type="hidden" name="'.$self->{name}.'" value="'.$self->fixQuotes($self->fixMacros($self->fixSpecialCharacters($self->{value}))).'" />'."\n";
+        return '<input type="hidden" name="'.$self->get("name").'" value="'.$self->fixQuotes($self->fixMacros($self->fixSpecialCharacters($self->get("value")))).'" />'."\n";
 }
 
 #-------------------------------------------------------------------
@@ -515,7 +556,7 @@ sub toHtmlWithWrapper {
 	if ($self->passUiLevelCheck) {
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
 		return '<tr'.$rowClass.'>
-				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->{label}.'</td>
+				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;">'.$self->get("label").'</td>
 				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->toHtml().$subtext."</td>
 			</tr>\n";
 	} else {
@@ -534,10 +575,11 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub passUiLevelCheck {
 	my $self = shift;
 	my $passUiLevelCheck = 0;
-	if ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}}) { # use override if it exists
-		$passUiLevelCheck = ($session{config}{$self->{uiLevelOverride}."_uiLevel"}{$self->{name}} <= $session{user}{uiLevel});
+	my $override = $self->session->config->get($self->get("uiLevelOverride")."_uiLevel")
+	if (defined $override && $override->{$self->get("name")}) { # use override if it exists
+		$passUiLevelCheck = ($override->{$self->get("name")} <= $self->session->user->profileField("uiLevel"));
 	} else { # use programmed default
-		$passUiLevelCheck = ($self->{uiLevel} <= $session{user}{uiLevel});
+		$passUiLevelCheck = ($self->get("uiLevel") <= $self->session->user->profileField("uiLevel"));
 	}
 	$passUiLevelCheck = WebGUI::Grouping::isInGroup(3) unless ($passUiLevelCheck); # override if in admins group
 	return $passUiLevelCheck;

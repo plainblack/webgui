@@ -99,7 +99,7 @@ Returns the integer from the form post, or returns 0.0 if the post result is inv
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $session{req}->param($self->{name});
+	my $value = $self->session->request->param($self->get("name"));
 	if ($value =~ /^[\d\-\.]+$/) {
                 return $value;
         }
@@ -116,8 +116,8 @@ Renders a floating point field.
 
 sub toHtml {
         my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/inputCheck.js',{ type=>'text/javascript' });
-	$self->{extras} .= ' onkeyup="doInputCheck(this.form.'.$self->{name}.',\'0123456789-.\')"';
+	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
+	$self->get("extras") .= ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789-.\')"';
 	return $self->SUPER::toHtml;
 }
 

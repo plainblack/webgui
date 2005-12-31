@@ -11,7 +11,6 @@ package WebGUI::Macro::At_username;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -27,7 +26,8 @@ Macro for displaying the current User's username.
 
 #-------------------------------------------------------------------
 sub process {
-	return $session{user}{username};
+	my $session = shift;
+	return $session->user->profileField("username");
 }
 
 

@@ -11,10 +11,10 @@ package WebGUI::Macro::MacroSkeleton; # edit this line to match your own macro n
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
 	my $somePassedInParameter = shift;
 	my $someOtherPassedInParameter = shift;
 	my $output = ""; # do some stuff

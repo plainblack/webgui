@@ -11,8 +11,6 @@ package WebGUI::Macro::JavaScript;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 
@@ -20,7 +18,7 @@ Package WebGUI::Macro::JavaScript
 
 =head1 DESCRIPTION
 
-This Macro is a wrapper for WebGUI::Style::setScript, which puts a script
+This Macro is a wrapper for $session->style->setScript, which puts a script
 tag into the head of the current page with the contents of the javascript
 found at the url that is passed in.
 
@@ -35,7 +33,8 @@ URL to the javascript to include in the page's header tags.
 
 #-------------------------------------------------------------------
 sub process {
-	WebGUI::Style::setScript(shift,{type=>'text/javascript'});
+	my $session = shift;
+	$session->style->setScript(shift,{type=>'text/javascript'});
 	return "";
 }
 

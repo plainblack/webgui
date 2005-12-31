@@ -15,7 +15,6 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -494,9 +493,13 @@ sub hasChildren {
 
 #-------------------------------------------------------------------
 
-=head2 newByLineage ( lineage )
+=head2 newByLineage ( session, lineage )
 
-Returns an Asset object based upon given lineage.
+Constructor. Returns an Asset object based upon given lineage.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 lineage
 
@@ -505,16 +508,19 @@ Lineage string.
 =cut
 
 sub newByLineage {
-	my $self = shift;
+	my $class = shift;
+	my $session = shift;
         my $lineage = shift;
-	my $id = $session{assetLineage}{$lineage}{id};
-	my $class = $session{assetLineage}{$lineage}{class};
+	my $assetLineage = $session->stow->get("assetLineage");
+	my $id = $assetLineage->{$lineage}{id};
+	$class = $assetLineage->{$lineage}{class};
         unless ($id && $class) {
-		($id,$class) = WebGUI::SQL->quickArray("select assetId, className from asset where lineage=".quote($lineage));
-		$session{assetLineage}{$lineage}{id} = $id unless ($session{config}{disableCache});
-		$session{assetLineage}{$lineage}{class} = $class unless ($session{config}{disableCache});
+		($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".quote($lineage));
+		$assetLineage->{$lineage}{id} = $id;
+		$assetLineage->{$lineage}{class} = $class;
+		$session->stow->set("assetLineage",$assetLineage);
 	}
-	return WebGUI::Asset->new($id, $class);
+	return WebGUI::Asset->new($session, $id, $class);
 }
 
 

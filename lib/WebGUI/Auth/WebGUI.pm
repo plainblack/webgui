@@ -683,7 +683,7 @@ sub updateAccount {
       }
    }
    $self->saveParams($u->userId,$self->authMethod,$properties);
-   WebGUI::Session::refreshUserInfo($u->userId);
+   $session->user({user=>$u});
    
   return $self->displayAccount($display);
 }

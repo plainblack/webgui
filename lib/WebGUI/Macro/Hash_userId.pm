@@ -11,7 +11,6 @@ package WebGUI::Macro::Hash_userId;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -30,7 +29,8 @@ Returns the userId from the session variable for the current user.
 
 #-------------------------------------------------------------------
 sub process {
-        return $session{user}{userId};
+	my $session = shift;
+        return $session->user->userId;
 }
 
 

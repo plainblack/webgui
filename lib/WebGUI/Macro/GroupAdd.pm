@@ -13,9 +13,7 @@ package WebGUI::Macro::GroupAdd;
 use strict;
 use WebGUI::Group;
 use WebGUI::Grouping;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -47,9 +45,10 @@ An optional template for formatting the text and link.
 #-------------------------------------------------------------------
 sub process {
 	my @param = @_;
+	my $session = shift;
 	return "" if ($param[0] eq "");
 	return "" if ($param[1] eq "");
-	return "" if ($session{user}{userId} eq '1');
+	return "" if ($session->user->userId eq '1');
 	my $g = WebGUI::Group->find($param[0]);
 	return "" if ($g->groupId eq "");
 	return "" unless ($g->autoAdd);
@@ -58,9 +57,9 @@ sub process {
 	$var{'group.url'} = WebGUI::URL::page("op=autoAddToGroup;groupId=".$g->groupId);
 	$var{'group.text'} = $param[1];
 	if ($param[2]) {
-		return  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
+		return  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
 	} else {
-		return  WebGUI::Asset::Template->new("PBtmpl0000000000000040")->process(\%var);
+		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000040")->process(\%var);
 	}
 }
 

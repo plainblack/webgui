@@ -11,8 +11,6 @@ package WebGUI::Macro::PageUrl;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -30,6 +28,7 @@ process is really a wrapper around WebGUI::URL::page();
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
 	return WebGUI::URL::page();
 }
 

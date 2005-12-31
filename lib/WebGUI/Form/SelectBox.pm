@@ -94,11 +94,11 @@ Retrieves a value from a form GET or POST and returns it. If the value comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $session{req}->param($self->{name});
+	my $formValue = $self->session->request->param($self->get("name"));
 	if (defined $formValue) {
 		return $formValue;
 	} else {
-		return $self->{defaultValue};
+		return $self->get("defaultValue");
 	}
 }
 
@@ -112,7 +112,7 @@ Renders a select list form control.
 
 sub toHtml {
 	my $self = shift;
-	my $output = '<select name="'.$self->{name}.'" size="'.$self->{size}.'" id="'.$self->{id}.'" '.$self->{extras}.'>';
+	my $output = '<select name="'.$self->get("name").'" size="'.$self->get("size").'" id="'.$self->{id}.'" '.$self->get("extras").'>';
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = $self->orderedHash;
@@ -122,7 +122,7 @@ sub toHtml {
 		if ($value eq $key) {
 			$output .= ' selected="selected"';
 		}
-		$output .= '>'.${$self->{options}}{$key}.'</option>';
+		$output .= '>'.${$self->get("options}"){$key}.'</option>';
         }
 	$output .= '</select>'."\n";
 	return $output;

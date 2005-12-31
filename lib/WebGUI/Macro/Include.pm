@@ -36,6 +36,7 @@ The complete path to a file in the local filesystem.
 
 #-------------------------------------------------------------------
 sub process {
+	my $self = shift;
         my (@param, $temp, $file);
         @param = @_;
         if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /WebGUI.conf/) {

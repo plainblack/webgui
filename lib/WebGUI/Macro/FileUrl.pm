@@ -12,7 +12,6 @@ package WebGUI::Macro::FileUrl;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::International;
 
@@ -41,8 +40,9 @@ The URL to the Asset.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my $url = shift;
-	my $asset = WebGUI::Asset->newByUrl($url);
+	my $asset = WebGUI::Asset->newByUrl($session,$url);
 	if (defined $asset) {
 		my $storage = WebGUI::Storage->get($asset->get("storageId"));
 		return $storage->getUrl($asset->get("filename"));

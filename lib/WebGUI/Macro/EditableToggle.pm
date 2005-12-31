@@ -13,9 +13,7 @@ package WebGUI::Macro::EditableToggle;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -51,12 +49,13 @@ A template from the Macro/EditableToggle namespace to use for formatting the lin
 
 #-------------------------------------------------------------------
 sub process {
-         if (exists $session{asset} && $session{asset}->canEdit && WebGUI::Grouping::isInGroup(12)) {
+	my $session = shift;
+         if (exists $session->asset && $session->asset->canEdit && WebGUI::Grouping::isInGroup(12)) {
         	my %var;
               my @param = @_;
               my $turnOn = $param[0] || WebGUI::International::get(516,'Macro_EditableToggle');
               my $turnOff = $param[1] || WebGUI::International::get(517,'Macro_EditableToggle');
-                 if ($session{var}{adminOn}) {
+                 if ($session->var->get("adminOn")) {
                       $var{'toggle.url'} = WebGUI::URL::page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;
                  } else {
@@ -64,9 +63,9 @@ sub process {
                       $var{'toggle.text'} = $turnOn;
                  }
 		if ($param[2]) {
-         		return  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
+         		return  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
 		} else {
-         		return  WebGUI::Asset::Template->new("PBtmpl0000000000000038")->process(\%var);
+         		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000038")->process(\%var);
                 }
        }
        return "";

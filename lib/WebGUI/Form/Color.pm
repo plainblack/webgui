@@ -67,7 +67,7 @@ Returns a hex color like "#000000". Returns undef if the return value is not a v
 
 sub getValueFromPost {
 	my $self = shift;
-	my $color = $session{req}->param($self->{name});
+	my $color = $self->session->request->param($self->get("name"));
         return undef unless $color =~ /\#\w{6}/;
         return $color;
 }
@@ -82,8 +82,8 @@ Renders a color picker control.
 
 sub toHtml {
 	my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/colorPicker.js',{ type=>'text/javascript' });
-        return '<script type="text/javascript">initColorPicker("'.$self->{name}.'","'.($self->{value}).'");</script>';
+	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/colorPicker.js',{ type=>'text/javascript' });
+        return '<script type="text/javascript">initColorPicker("'.$self->get("name").'","'.($self->get("value")).'");</script>';
 }
 
 1;

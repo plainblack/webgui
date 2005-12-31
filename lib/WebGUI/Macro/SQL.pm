@@ -11,8 +11,6 @@ package WebGUI::Macro::SQL;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::SQL;
 
 =head1 NAME
 
@@ -40,11 +38,12 @@ be used to position its output in the format.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = @_;
 	$format = '^0;' if ($format eq "");
 	if ($statement =~ /^\s*select/i || $statement =~ /^\s*show/i || $statement =~ /^\s*describe/i) {
-		my $sth = WebGUI::SQL->unconditionalRead($statement,WebGUI::SQL->getSlave);
+		my $sth = $session->dbSlave->unconditionalRead($statement);
 		unless ($sth->errorCode < 1) { 
 			return sprintf WebGUI::International::get('sql error','Macro_SQL'), $sth->errorMessage;
 		} else {

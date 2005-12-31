@@ -13,8 +13,6 @@ package WebGUI::Macro::AssetProxy;
 use strict;
 use Time::HiRes;
 use WebGUI::Asset;
-use WebGUI::ErrorHandler;
-use WebGUI::Session;
 use WebGUI::International;
 
 =head1 NAME
@@ -39,14 +37,15 @@ Admin is turned on.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my $url = shift;
-	my $t = [Time::HiRes::gettimeofday()] if (WebGUI::ErrorHandler::canShowPerformanceIndicators());
-	my $asset = WebGUI::Asset->newByUrl($url);
+	my $t = [Time::HiRes::gettimeofday()] if ($session->errorHandler->canShowPerformanceIndicators());
+	my $asset = WebGUI::Asset->newByUrl($session,$url);
 	#Sorry, you cannot proxy the notfound page.
-	if (defined $asset && $asset->getId ne $session{setting}{notFoundPage}) {
+	if (defined $asset && $asset->getId ne $session->setting->get("notFoundPage")) {
 		$asset->toggleToolbar;
 		my $output = $asset->canView ? $asset->view : undef;
-		$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if (WebGUI::ErrorHandler::canShowPerformanceIndicators());
+		$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if ($session->errorHandler->canShowPerformanceIndicators());
 		return $output;
 	} else {
 		return WebGUI::International::get('invalid url', 'Macro_AssetProxy');

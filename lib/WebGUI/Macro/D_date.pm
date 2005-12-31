@@ -38,6 +38,7 @@ time is used instead.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my (@param, $temp, $time);
         @param = @_;
 	$time = $param[1] || time();

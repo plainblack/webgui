@@ -11,7 +11,6 @@ package WebGUI::Macro::Quote;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::SQL;
 
 =head1 NAME
 
@@ -23,7 +22,7 @@ Macro for quoting data to make it safe for use in SQL queries.
 
 =head2 process ( text )
 
-process is really a wrapper around WebGUI::SQL::quote();
+process is really a wrapper around WebGUI::SQL::$session->db->quote();
 
 =head3 text
 
@@ -33,7 +32,8 @@ The text to quote.
 
 #-------------------------------------------------------------------
 sub process {
-	return quote(shift);
+	my $session = shift;
+	return $session->db->quote(shift);
 	
 }
 

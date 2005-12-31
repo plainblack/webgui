@@ -1,4 +1,4 @@
-package WebGUI::URL;
+package WebGUI::Session::Url;
 
 =head1 LEGAL
 
@@ -19,7 +19,6 @@ use strict;
 use URI;
 use URI::Escape;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Utility;
 
 
@@ -133,6 +132,14 @@ sub gateway {
         return $url;
 }
 
+#must deal with converting this
+sub getRequestedUrl {
+		$session{requestedUrl} = $session{wguri};
+		my $gateway = $session{config}{gateway};
+		$session{requestedUrl} =~ s/^$gateway(.*)$/$1/;
+}
+
+
 #-------------------------------------------------------------------
                                                                                                                              
 =head2 makeAbsolute ( url , [ baseURL ] )
@@ -154,6 +161,38 @@ sub makeAbsolute {
 	my $baseURL = shift || page();
 	return URI->new_abs($url,$baseURL);
 }
+
+#-------------------------------------------------------------------
+
+=head2 new ( session ) 
+
+Constructor.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	bless {_session=>$session}, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -184,6 +223,15 @@ sub getSiteURL {
         } else {
                 push(@sitenames,$session{config}{sitename});
         }
+#figure this in from the config somehow
+
+if (ref $data{sitename} eq "ARRAY") {
+                $data{defaultSitename} = $data{sitename}[0];
+        } else {
+                $data{defaultSitename} = $data{sitename};
+        }
+
+
         if ($session{setting}{hostToUse} eq "sitename" || !isIn($session{env}{HTTP_HOST},@sitenames)) {
                 $site = $session{config}{defaultSitename};
         } else {

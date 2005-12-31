@@ -12,7 +12,6 @@ package WebGUI::Macro::Thumbnail;
 
 use strict;
 use WebGUI::Asset::File::Image;
-use WebGUI::Session;
 
 =head1 NAME
 
@@ -33,8 +32,9 @@ Image Asset can be found with that URL, then undef will be returned.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my $url = shift;
-	if (my $image = WebGUI::Asset::File::Image->newByUrl($url)) {
+	if (my $image = WebGUI::Asset::File::Image->newByUrl($session,$url)) {
 	        return $image->getThumbnailUrl;
         } else {
                 return undef;

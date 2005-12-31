@@ -11,8 +11,6 @@ package WebGUI::Macro::AOIRank;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
-use WebGUI::SQL;
 
 =head1 NAME
 
@@ -37,16 +35,15 @@ Define which value, by it's ranking, will be displayed.  The highest ranking is
 
 #-------------------------------------------------------------------
 sub process {
-	my (@param, $temp);
-        @param = @_;
-	my $key = $param[0];
-	my $rank = $param[1] || 1; # 1 is highest rank
+	my $session = shift;
+	my $key = shift;
+	my $rank = shift || 1; # 1 is highest rank
 	$rank--;	# Rank is zero based
 	my $sql = "select value from passiveProfileAOI a, metaData_properties f 
 			where a.fieldId=f.fieldId 
-			and userId=".quote($session{user}{userId})." 
-			and fieldName=".quote($key)." order by a.count desc";
-	my @values = WebGUI::SQL->buildArray($sql);
+			and userId=".$session->db->$session->db->quote($session->user->userId)." 
+			and fieldName=".$session->db->$session->db->quote($key)." order by a.count desc";
+	my @values = $session->db->buildArray($sql);
 	return $values[$rank];
 }
 

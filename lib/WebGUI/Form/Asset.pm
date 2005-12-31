@@ -95,22 +95,22 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-        my $asset = WebGUI::Asset->newByDynamicClass($self->{value}) || WebGUI::Asset->getRoot;
+        my $asset = WebGUI::Asset->newByDynamicClass($self->get("value")) || WebGUI::Asset->getRoot;
         return WebGUI::Form::Hidden->new(
-                        name=>$self->{name},
-                        extras=>$self->{extras},
+                        name=>$self->get("name"),
+                        extras=>$self->get("extras"),
                         value=>$asset->getId,
 			id=>$self->{id}
                         )->toHtml
                 .WebGUI::Form::Text->new(
-                        name=>$self->{name}."_display",
+                        name=>$self->get("name")."_display",
                         extras=>' readonly="1" ',
                         value=>$asset->get("title"),
 			id=>$self->{id}."_display"
                         )->toHtml
                 .WebGUI::Form::Button->new(
                         value=>"...",
-                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree;classLimiter=".$self->{class}.";formId=".$self->{id}).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree;classLimiter=".$self->get("class").";formId=".$self->{id}).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;
 }
 

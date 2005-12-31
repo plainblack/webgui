@@ -15,7 +15,6 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use WebGUI::Session;
 use File::Path;
 
 =head1 NAME
@@ -107,7 +106,7 @@ sub exportAsHtml {
 	my %oldSession = %session;
 
 	# Change the stuff we need to change to do the export
-	WebGUI::Session::refreshUserInfo($userId) unless ($userId == $session{user}{userId});
+	$session->user({userId=>$userId}) unless ($userId == $session{user}{userId});
 	delete $session{form}; 
 	$session{var}{adminOn} = $self->get('adminOn');
 	$self->WebGUI::Session::refreshPageInfo;

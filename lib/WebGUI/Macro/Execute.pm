@@ -33,6 +33,7 @@ be blocked and an error message returned instead.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my @param = @_;
 	if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /\.conf/) {
 		return WebGUI::International::get('execute error', 'Macro_Execute');

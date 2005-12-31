@@ -51,7 +51,7 @@ sub process {
         my $login = $param[0] || WebGUI::International::get(716,'Macro_LoginToggle');
         my $logout = $param[1] || WebGUI::International::get(717,'Macro_LoginToggle');
 	my %var;
-        if ($session{user}{userId} eq '1') {
+        if ($session->user->profileField("userId") eq '1') {
 		return WebGUI::URL::page("op=auth;method=init") if ($param[0] eq "linkonly");
         	$var{'toggle.url'} = WebGUI::URL::page('op=auth;method=init');
                	$var{'toggle.text'} = $login;
