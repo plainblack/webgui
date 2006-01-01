@@ -56,10 +56,10 @@ sub process {
               my $turnOn = $param[0] || WebGUI::International::get(516,'Macro_EditableToggle');
               my $turnOff = $param[1] || WebGUI::International::get(517,'Macro_EditableToggle');
                  if ($session->var->get("adminOn")) {
-                      $var{'toggle.url'} = WebGUI::URL::page('op=switchOffAdmin');
+                      $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;
                  } else {
-                      $var{'toggle.url'} = WebGUI::URL::page('op=switchOnAdmin');
+                      $var{'toggle.url'} = $session->url->page('op=switchOnAdmin');
                       $var{'toggle.text'} = $turnOn;
                  }
 		if ($param[2]) {

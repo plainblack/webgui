@@ -22,14 +22,14 @@ Macro for displaying the url for the current asset.
 
 =head2 process ( )
 
-process is really a wrapper around WebGUI::URL::page();
+process is really a wrapper around $session->url->page();
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return WebGUI::URL::page();
+	return $session->url->page();
 }
 
 

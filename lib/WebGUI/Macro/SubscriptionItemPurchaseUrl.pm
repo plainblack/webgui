@@ -23,7 +23,7 @@ The ID of the subscription item to purchase.
 
 sub process {
 	my $session = shift;
-	return WebGUI::URL::page('op=purchaseSubscription;sid='.shift);
+	return $session->url->page('op=purchaseSubscription;sid='.shift);
 }
 
 1;

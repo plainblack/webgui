@@ -12,9 +12,7 @@ package WebGUI::Macro::LoginToggle;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -52,12 +50,12 @@ sub process {
         my $logout = $param[1] || WebGUI::International::get(717,'Macro_LoginToggle');
 	my %var;
         if ($session->user->profileField("userId") eq '1') {
-		return WebGUI::URL::page("op=auth;method=init") if ($param[0] eq "linkonly");
-        	$var{'toggle.url'} = WebGUI::URL::page('op=auth;method=init');
+		return $session->url->page("op=auth;method=init") if ($param[0] eq "linkonly");
+        	$var{'toggle.url'} = $session->url->page('op=auth;method=init');
                	$var{'toggle.text'} = $login;
         } else {
-		return WebGUI::URL::page("op=auth;method=logout") if ($param[0] eq "linkonly");
-                $var{'toggle.url'} = WebGUI::URL::page('op=auth;method=logout');
+		return $session->url->page("op=auth;method=logout") if ($param[0] eq "linkonly");
+                $var{'toggle.url'} = $session->url->page('op=auth;method=logout');
                	$var{'toggle.text'} = $logout;
         }
 	if ($param[2]) {

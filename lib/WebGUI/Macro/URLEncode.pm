@@ -22,7 +22,7 @@ Macro for URL encoding text.
 
 =head2 process ( text )
 
-process is really a wrapper around WebGUI::URL::escape;
+process is really a wrapper around $session->url->escape;
 of the account link.
 
 =head3 text
@@ -34,7 +34,7 @@ The text to URL encode.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return WebGUI::URL::escape(shift);
+	return $session->url->escape(shift);
 }
 
 

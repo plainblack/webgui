@@ -54,13 +54,13 @@ sub process {
         @param = @_;
 	my $append = 'op=makePrintable';
 	if ($session->env->get("REQUEST_URI") =~ /op\=/) {
-		$append = 'op2='.WebGUI::URL::escape($append);
+		$append = 'op2='.$session->url->escape($append);
 	}
-	$temp = WebGUI::URL::page($append);
+	$temp = $session->url->page($append);
         $temp =~ s/\/\//\//;
-        $temp = WebGUI::URL::append($temp,$session->env->get("QUERY_STRING"));
+        $temp = $session->url->append($temp,$session->env->get("QUERY_STRING"));
 	if ($param[1] ne "") {
-		$temp = WebGUI::URL::append($temp,'styleId='.$param[1]);
+		$temp = $session->url->append($temp,'styleId='.$param[1]);
 	}
 	if ($param[0] ne "linkonly") {
 		my %var;

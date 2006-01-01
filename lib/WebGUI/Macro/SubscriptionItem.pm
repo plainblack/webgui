@@ -32,7 +32,7 @@ sub process {
 	my ($subscriptionId, $templateId, %var);
 	($subscriptionId, $templateId) = @_;
 	%var = $session->db->quickHash('select * from subscription where subscriptionId='.$session->db->quote($subscriptionId));
-	$var{url} = WebGUI::URL::page('op=purchaseSubscription;sid='.$subscriptionId);
+	$var{url} = $session->url->page('op=purchaseSubscription;sid='.$subscriptionId);
 	return WebGUI::Asset::Template->new($session,$templateId || "PBtmpl0000000000000046")->process(\%var);
 }
 

@@ -22,14 +22,14 @@ Macro for returning the gateway URL (defined in the WebGUI config file) to the s
 
 =head2 process ( )
 
-process is really a wrapper around WebGUI::URL::gateway();
+process is really a wrapper around $session->url->gateway();
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return WebGUI::URL::gateway();
+	return $session->url->gateway();
 }
 
 

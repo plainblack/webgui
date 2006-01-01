@@ -42,8 +42,8 @@ sub process {
 	my $session = shift;
        my %var;
          my  @param = @_;
-	return WebGUI::URL::page("op=auth;method=init") if ($param[0] eq "linkonly");
-       $var{'account.url'} = WebGUI::URL::page('op=auth;method=init');
+	return $session->url->page("op=auth;method=init") if ($param[0] eq "linkonly");
+       $var{'account.url'} = $session->url->page('op=auth;method=init');
        $var{'account.text'} = $param[0] || WebGUI::International::get(46,'Macro_a_account');
 	if ($param[1]) {
 		return  WebGUI::Asset::Template->newByUrl($session,$param[1])->process(\%var);

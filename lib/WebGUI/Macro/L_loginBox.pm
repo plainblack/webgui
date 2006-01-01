@@ -38,7 +38,7 @@ text to wrap in a link for logging out.
 sub _createURL {
 	my $session = shift;
 	my $text = shift;
-	return '<a href="'.WebGUI::URL::page("op=auth;method=logout").'">'.$text.'</a>';
+	return '<a href="'.$session->url->page("op=auth;method=logout").'">'.$text.'</a>';
 }
 
 #-------------------------------------------------------------------
@@ -69,8 +69,8 @@ sub process {
 	$var{'customText'} = $param[1];
 	$var{'customText'} =~ s/%(.*?)%/_createURL($session,$1)/ge;
 	$var{'hello.label'} = WebGUI::International::get(48,'Macro_L_loginBox');
-	$var{'logout.url'} = WebGUI::URL::page("op=auth;method=logout");
-	$var{'account.display.url'} = WebGUI::URL::page('op=auth;method=displayAccount');
+	$var{'logout.url'} = $session->url->page("op=auth;method=logout");
+	$var{'account.display.url'} = $session->url->page('op=auth;method=displayAccount');
         $var{'logout.label'} = WebGUI::International::get(49,'Macro_L_loginBox');
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
@@ -79,7 +79,7 @@ sub process {
         }
 	my $action;
         if ($session->setting->get("encryptLogin")) {
-                $action = WebGUI::URL::page(undef,1);
+                $action = $session->url->page(undef,1);
                 $action =~ s/http:/https:/;
         }
 	$var{'form.header'} = WebGUI::Form::formHeader({action=>$action})
@@ -107,7 +107,7 @@ sub process {
 		value=>WebGUI::International::get(52),
 		extras=>'class="loginBoxButton"'
 		});
-        $var{'account.create.url'} = WebGUI::URL::page('op=auth;method=createAccount');
+        $var{'account.create.url'} = $session->url->page('op=auth;method=createAccount');
 	$var{'account.create.label'} = WebGUI::International::get(407);
 	$var{'form.footer'} = WebGUI::Form::formFooter();
         return WebGUI::Asset::Template->new($session,$templateId)->process(\%var); 

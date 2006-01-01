@@ -17,14 +17,19 @@ package WebGUI::Session;
 use strict;
 use Apache2::Request;
 use WebGUI::Config;
-use WebGUI::ErrorHandler;
-use WebGUI::Id;
-use WebGUI::Cache;
-use WebGUI::Setting;
 use WebGUI::SQL;
 use WebGUI::User;
-use WebGUI::Utility;
-use URI::Escape;
+use WebGUI::Session::Env;
+use WebGUI::Session::ErrorHandler;
+use WebGUI::Session::Form;
+use WebGUI::Session::Http;
+use WebGUI::Session::Os;
+use WebGUI::Session::Scratch;
+use WebGUI::Session::Setting;
+use WebGUI::Session::Stow;
+use WebGUI::Session::Style;
+use WebGUI::Session::Url;
+use WebGUI::Session::Var;
 
 
 
@@ -197,7 +202,7 @@ Returns a WebGUI::ErrorHandler object.
 sub errorHandler {
 	my $self = shift;
 	unless (exists $self->{_errorHandler}) {
-		$self->{_errorHandler}  = WebGUI::ErrorHandler->new($self);
+		$self->{_errorHandler}  = WebGUI::Session::ErrorHandler->new($self);
 	}
 	return $self-{_errorHandler};
 }
@@ -226,7 +231,7 @@ Returns a reference to the WebGUI::HTTP object.
 sub http {
 	my $self = shift;
 	unless ($self->{_http}) {
-		$self->{_http} = WebGUI::HTTP->new($session);
+		$self->{_http} = WebGUI::Session::Http->new($session);
 	}
 	return $self->{_http};
 }
@@ -344,7 +349,7 @@ Returns a WebGUI::Session object.
 sub setting {
 	my $self = shift;
 	unless (exists $self->{_setting}) {
-		$self->{_setting} = WebGUI::Setting->new($self);
+		$self->{_setting} = WebGUI::Session::Setting->new($self);
 	}
 	return $self->{_setting};
 }
@@ -377,7 +382,7 @@ Returns a WebGUI::Style object.
 sub style {
 	my $self = shift;	
 	unless (exists $self->{_style}) {
-		$self->{_style} = WebGUI::Style->new($self);
+		$self->{_style} = WebGUI::Session::Style->new($self);
 	}
 	return $self->{_style}
 }

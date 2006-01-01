@@ -52,11 +52,11 @@ sub process {
                  my ($turnOn,$turnOff,$templateName) = @_;
               $turnOn ||= WebGUI::International::get(516,'Macro_AdminToggle');
               $turnOff ||= WebGUI::International::get(517,'Macro_AdminToggle');
-                 if (WebGUI::Session::isAdminOn()) {
-                      $var{'toggle.url'} = WebGUI::URL::page('op=switchOffAdmin');
+                 if ($session->var->isAdminOn) {
+                      $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;
                  } else {
-                      $var{'toggle.url'} = WebGUI::URL::page('op=switchOnAdmin');
+                      $var{'toggle.url'} = $session->url->page('op=switchOnAdmin');
                       $var{'toggle.text'} = $turnOn;
                  }
 		if ($templateName) {

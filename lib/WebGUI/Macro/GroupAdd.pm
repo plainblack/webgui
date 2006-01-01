@@ -54,7 +54,7 @@ sub process {
 	return "" unless ($g->autoAdd);
 	return "" if (WebGUI::Grouping::isInGroup($g->groupId));
 	my %var = ();
-	$var{'group.url'} = WebGUI::URL::page("op=autoAddToGroup;groupId=".$g->groupId);
+	$var{'group.url'} = $session->url->page("op=autoAddToGroup;groupId=".$g->groupId);
 	$var{'group.text'} = $param[1];
 	if ($param[2]) {
 		return  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
