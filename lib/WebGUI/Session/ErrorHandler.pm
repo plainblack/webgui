@@ -1,4 +1,4 @@
-package WebGUI::ErrorHandler;
+package WebGUI::Session::ErrorHandler;
 
 =head1 LEGAL
 
@@ -23,7 +23,7 @@ $Log::Log4perl::caller_depth++;
 
 =head1 NAME 
 
-Package WebGUI::ErrorHandler
+Package WebGUI::Session::ErrorHandler
 
 =head1 DESCRIPTION
 
@@ -31,7 +31,7 @@ This package provides simple but effective error handling, debugging,  and loggi
 
 =head1 SYNOPSIS
 
- use WebGUI::ErrorHandler;
+ use WebGUI::Session::ErrorHandler;
 
  my $errorHandler = WebGUI::ErrorHandler->new($session);
 

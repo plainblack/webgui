@@ -1,4 +1,4 @@
-package WebGUI::Style;
+package WebGUI::Session::Style;
 
 =head1 LEGAL
 
@@ -20,11 +20,10 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
-Package WebGUI::Style
+Package WebGUI::Session::Style
 
 =head1 DESCRIPTION
 
@@ -32,18 +31,24 @@ This package contains utility methods for WebGUI's style system.
 
 =head1 SYNOPSIS
 
- use WebGUI::Style;
- $html = WebGUI::Style::process($content);
+ use WebGUI::Session::Style;
+ $style = WebGUI::Session::Style->new($session);
 
- $html = generateAdditionalHeadTags();
- setLink($url,\%params);
- setMeta(\%params);
- setRawHeadTags($html);
- setScript($url, \%params);
+ $html = $style->generateAdditionalHeadTags();
+ $html = $style->process($content);
 
-=head1 SUBROUTINES 
+ $session = $style->session;
+ 
+ $style->makePrintable(1);
+ $style->setLink($url,\%params);
+ $style->setMeta(\%params);
+ $style->setRawHeadTags($html);
+ $style->setScript($url, \%params);
+ $style->useEmptyStyle(1);
 
-These subroutines are available from this package:
+=head1 METHODS
+
+These methods are available from this class:
 
 =cut
 

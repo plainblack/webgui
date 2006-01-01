@@ -1,4 +1,4 @@
-package WebGUI::Setting;
+package WebGUI::Session::Setting;
 
 =head1 LEGAL
 
@@ -15,12 +15,10 @@ package WebGUI::Setting;
 =cut
 
 use strict;
-use WebGUI::Session;
-use WebGUI::SQL;
 
 =head1 NAME
 
-Package WebGUI::Setting;
+Package WebGUI::Session::Setting
 
 =head1 DESCRIPTION
 
@@ -28,9 +26,9 @@ This package stores and retrieves settings. It is generally only used internally
 
 =head1 SYNOPSIS
 
- use WebGUI::Setting;
+ use WebGUI::Session::Setting;
 
- $settings = WebGUI::Settings->new;
+ $settings = WebGUI::Session::Setting->new;
 
  $settings->set($name, $value);
  $value = $settings->get($name);

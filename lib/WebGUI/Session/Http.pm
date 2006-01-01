@@ -1,4 +1,4 @@
-package WebGUI::HTTP;
+package WebGUI::Session::HTTP;
 
 =head1 LEGAL
 
@@ -18,12 +18,10 @@ package WebGUI::HTTP;
 use strict;
 use Apache2::Cookie;
 use APR::Request::Apache2;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 
-Package WebGUI::HTTP
+Package WebGUI::Session::Http
 
 =head1 DESCRIPTION
 
@@ -31,9 +29,9 @@ This package allows the manipulation of HTTP protocol information.
 
 =head1 SYNOPSIS
 
- use WebGUI::HTTP;
+ use WebGUI::Session::Http;
 
- my $http = WebGUI::HTTP->new($session);
+ my $http = WebGUI::Session::Http->new($session);
 
  $cookies = $http->getCookies();
  $header = $http->getHeader();

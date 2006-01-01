@@ -24,7 +24,7 @@ use WebGUI::Utility;
 
 =head1 NAME
 
-Package WebGUI::URL
+Package WebGUI::Session::Url
 
 =head1 DESCRIPTION
 
@@ -32,17 +32,23 @@ This package provides URL writing functionality. It is important that all WebGUI
 
 =head1 SYNOPSIS
 
- use WebGUI::URL;
- $url = WebGUI::URL::append($url,$pairs);
- $string = WebGUI::URL::escape($string);
- $url = WebGUI::URL::gateway($url,$pairs);
- $url = WebGUI::URL::getSiteURL();
- WebGUI::URL::setSiteURL($url);
- $url = WebGUI::URL::makeCompliant($string);
- $url = WebGUI::URL::makeAbsolute($url);
- $url = WebGUI::URL::page($url,$pairs);
- $string = WebGUI::URL::unescape($string);
- $url = WebGUI::URL::urlize($string);
+ use WebGUI::Session::Url;
+
+ $url = WebGUI::Session::Url->new($session);
+
+ $string = $url->append($base, $pairs);
+ $string = $url->escape($string);
+ $string = $url->gateway($pageUrl, $pairs);
+ $string = $url->getRequestedUrl;
+ $string = $url->getSiteURL;
+ $string = $url->makeCompliant($string);
+ $string = $url->makeAbsolute($string);
+ $string = $url->page($string, $pairs);
+ $string = $url->unescape($string);
+ $string = $url->urlize($string); 
+
+ $url->setSiteURL($string);
+
 
 =head1 METHODS
 
@@ -71,6 +77,7 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub append {
+	my $self = shift;
 	my ($url);
 	$url = $_[0];
 	if ($url =~ /\?/) {
@@ -96,6 +103,7 @@ The string to escape.
 =cut
 
 sub escape {
+	my $self = shift;
 	return uri_escape(shift);
 }
 
@@ -119,24 +127,65 @@ Name value pairs to add to the URL in the form of:
 =cut
 
 sub gateway {
+	my $self = shift;
 	my $pageUrl = shift;
 	my $pairs = shift;
-        my $url = $session{config}{gateway}.'/'.$pageUrl;
+        my $url = $self->session->config->get("gateway").'/'.$pageUrl;
 	$url =~ s/\/+/\//g;
-        if ($session{setting}{preventProxyCache} == 1) {
-                $url = append($url,"noCache=".randint(0,1000).';'.time());
+        if ($self->session->setting->get("preventProxyCache") == 1) {
+                $url = $self->append($url,"noCache=".randint(0,1000).';'.time());
         }
 	if ($pairs) {
-		$url = append($url,$pairs);
+		$url = $self->append($url,$pairs);
 	}
         return $url;
 }
 
-#must deal with converting this
+#-------------------------------------------------------------------
+
+=head2 getRequestedUrl ( )
+
+Returns the URL of the page requested (no gateway, no query params, just the page url).
+
+=cut 
+
 sub getRequestedUrl {
-		$session{requestedUrl} = $session{wguri};
-		my $gateway = $session{config}{gateway};
-		$session{requestedUrl} =~ s/^$gateway(.*)$/$1/;
+	my $self = shift;
+	return undef unless ($self->session->request);
+	unless ($self->{_requestedUrl}) {
+		$self->{_requestedUrl} = $self->session->request->uri;
+		my $gateway = $self->session->config->get("gateway");
+		$self->{_requestedUrl} =~ s/^$gateway(.*)$/$1/;
+	}
+	return $self->{_requestedUrl};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getSiteURL ( )
+
+Returns a constructed site url. The returned value can be overridden using the setSiteURL function.
+
+=cut
+
+sub getSiteURL { 
+	my $self = shift;
+	unless ($self->{_siteUrl}) {
+		my $site = "";
+		my $sitenames = $self->session->config->get("sitename");
+        	if ($self->session->setting->get("hostToUse") eq "sitename" || !isIn($self->session->env->get("HTTP_HOST"),@{$sitenames})) {
+                	$site = $sitenames->[0];
+        	} else {
+                	$site = $session{env}{HTTP_HOST} || $sitenames->[0];
+        	}
+        	my $proto = "http://";
+        	if ($session{env}{HTTPS} eq "on") {
+               	 	$proto = "https://";
+        	}
+        	$self->{_siteUrl} = $proto.$site;
+	}
+	return $self->{_siteUrl};
 }
 
 
@@ -157,9 +206,28 @@ The base URL to use. This defaults to current page url.
 =cut
                                                                                                                              
 sub makeAbsolute {
+	my $self = shift;
 	my $url = shift;
-	my $baseURL = shift || page();
+	my $baseURL = shift || $self->page();
 	return URI->new_abs($url,$baseURL);
+}
+
+#-------------------------------------------------------------------
+
+=head2 makeCompliant ( string )
+
+Returns a string that has made into a WebGUI compliant URL based upon the language being submitted.
+
+=head3 string
+
+The string to make compliant. This is usually a page title or a filename.
+
+=cut 
+
+sub makeCompliant {
+	my $self = shift;
+	my $url = shift;
+	return WebGUI::International::makeUrlCompliant($url);
 }
 
 #-------------------------------------------------------------------
@@ -178,89 +246,6 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	bless {_session=>$session}, $class;
-}
-
-#-------------------------------------------------------------------
-
-=head2 session ( )
-
-Returns a reference to the current session.
-
-=cut
-
-sub session {
-	my $self = shift;
-	return $self->{_session};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 setSiteURL ( )
-
-Sets an alternate site url. 
-
-=cut
-
-sub setSiteURL {
-	$session{url}{siteURL} = shift;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getSiteURL ( )
-
-Returns a constructed site url. The returned value can be overridden using the setSiteURL function.
-
-=cut
-
-sub getSiteURL { 
-	return $session{url}{siteURL} if (defined $session{url}{siteURL});
-        my $site;
-        my @sitenames;
-        if (ref $session{config}{sitename} eq "ARRAY") {
-                @sitenames = @{$session{config}{sitename}};
-        } else {
-                push(@sitenames,$session{config}{sitename});
-        }
-#figure this in from the config somehow
-
-if (ref $data{sitename} eq "ARRAY") {
-                $data{defaultSitename} = $data{sitename}[0];
-        } else {
-                $data{defaultSitename} = $data{sitename};
-        }
-
-
-        if ($session{setting}{hostToUse} eq "sitename" || !isIn($session{env}{HTTP_HOST},@sitenames)) {
-                $site = $session{config}{defaultSitename};
-        } else {
-                $site = $session{env}{HTTP_HOST} || $session{config}{defaultSitename};
-        }
-        my $proto = "http://";
-	# $r->subprocess_env('HTTPS')
-        if ($session{env}{HTTPS} eq "on") {
-                $proto = "https://";
-        }
-        return $proto.$site;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 makeCompliant ( string )
-
-Returns a string that has made into a WebGUI compliant URL based upon the language being submitted.
-
-=head3 string
-
-The string to make compliant. This is usually a page title or a filename.
-
-=cut 
-
-sub makeCompliant {
-	my $url = shift;
-	return WebGUI::International::makeUrlCompliant($url);
 }
 
 #-------------------------------------------------------------------
@@ -286,21 +271,49 @@ If set to "1" we'll skip adding the prevent proxy cache code to the url.
 =cut
 
 sub page {
+	my $self = shift;
 	my $pairs = shift;
         my $useFullUrl = shift;
 	my $skipPreventProxyCache = shift;
         my $url;
         if ($useFullUrl) {
-                $url = getSiteURL();
+                $url = $self->getSiteURL();
         }
-	$url .= gateway($session{asset} ? $session{asset}->get("url") : $session{requestedUrl});
-        if ($session{setting}{preventProxyCache} == 1 && !$skipPreventProxyCache) {
-                $url = append($url,"noCache=".randint(0,1000).';'.time());
+	$url .= $self->gateway($self->session->asset ? $self->session->asset->get("url") : $self->getRequestedUrl);
+        if ($self->session->setting->get("preventProxyCache") == 1 && !$skipPreventProxyCache) {
+                $url = $self->append($url,"noCache=".randint(0,1000).';'.time());
         }
         if ($pairs) {
-                $url = append($url,$pairs);
+                $url = $self->append($url,$pairs);
         }
         return $url;
+}
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setSiteURL ( )
+
+Sets an alternate site url. 
+
+=cut
+
+sub setSiteURL {
+	my $self = shift;
+	$self->{_siteUrl} = shift;
 }
 
 #-------------------------------------------------------------------
@@ -318,6 +331,7 @@ The string to unescape.
 =cut
 
 sub unescape {
+	my $self = shift;
 	return uri_unescape(shift);
 }
 
@@ -334,9 +348,10 @@ Returns a url that is safe for WebGUI pages.
 =cut
 
 sub urlize {
+	my $self = shift;
 	my ($value);
         $value = lc(shift);		#lower cases whole string
-	$value = makeCompliant($value);
+	$value = $self->makeCompliant($value);
 	$value =~ s/\/$//;
         return $value;
 }

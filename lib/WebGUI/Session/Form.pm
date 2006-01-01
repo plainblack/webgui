@@ -1,4 +1,4 @@
-package WebGUI::FormProcessor;
+package WebGUI::Session::Form;
 
 =head1 LEGAL
 
@@ -17,11 +17,10 @@ package WebGUI::FormProcessor;
 use strict qw(vars subs);
 use WebGUI::DateTime;
 use WebGUI::HTML;
-use WebGUI::Session;
 
 =head1 NAME
 
-Package WebGUI::FormProcessor;
+Package WebGUI::Session::Form
 
 =head1 DESCRIPTION
 
@@ -29,9 +28,9 @@ This is a convenience package to the individual form controls. It allows you to 
 
 =head1 SYNOPSIS
 
- use WebGUI::FormProcessor;
+ use WebGUI::Session::Form;
 
- my $fp = WebGUI::FormProcessor->new($session);
+ my $fp = WebGUI::Session::Form->new($session);
 
  $value = $fp->process("favoriteColor", "selectList", "black");
 
