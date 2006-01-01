@@ -167,6 +167,17 @@ sub incrementCounter {
 }
 
 #-------------------------------------------------------------------
+sub purge {
+       my $self = shift;
+       WebGUI::SQL->write("delete from Matrix_listing where assetId=".quote($self->getId));
+       WebGUI::SQL->write("delete from Matrix_listingData where assetId=".quote($self->getId));
+       WebGUI::SQL->write("delete from Matrix_field where assetId=".quote($self->getId));
+       WebGUI::SQL->write("delete from Matrix_rating where assetId=".quote($self->getId));
+       WebGUI::SQL->write("delete from Matrix_ratingSummary where assetId=".quote($self->getId));
+       $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
 sub setRatings { 
 	my $self = shift;
 	my $listingId = shift;
