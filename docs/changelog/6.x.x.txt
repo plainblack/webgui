@@ -5,6 +5,7 @@
  - fix [ 1379915 ] Survey can only be completed once per user
  - fix [ 1389371 ] Pictures & Avatars Don't Work
  - The avatar user profile field is now visible and editable by default.
+ - fix [ 1392277 ] Stock Quote Template error
 
 6.8.3
  - fixed a problem with enabling Avatars in the Collaboration System.
