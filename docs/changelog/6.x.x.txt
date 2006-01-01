@@ -6,6 +6,7 @@
  - fix [ 1389371 ] Pictures & Avatars Don't Work
  - The avatar user profile field is now visible and editable by default.
  - fix [ 1392277 ] Stock Quote Template error
+ - fix [ 1387505 ] Hover help not working on Matrix
 
 6.8.3
  - fixed a problem with enabling Avatars in the Collaboration System.

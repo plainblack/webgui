@@ -4,6 +4,73 @@ our $HELP = {
 	'matrix add/edit' => {
 		title => 'add/edit help title',
 		body => 'add/edit help body',
+		fields => [
+                        {
+                                title => 'categories',
+                                description => 'categories description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'max comparisons',
+                                description => 'max comparisons description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'max comparisons privileged',
+                                description => 'max comparisons privileged description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'detail template',
+                                description => 'detail template description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'rating timeout',
+                                description => 'rating timeout description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'rating timeout privileged',
+                                description => 'rating timeout privileged description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'group to add',
+                                description => 'group to add description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'privileged group',
+                                description => 'privileged group description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'rating group',
+                                description => 'rating group description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'main template',
+                                description => 'main template description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'rating detail template',
+                                description => 'rating detail template description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'search template',
+                                description => 'search template description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'compare template',
+                                description => 'compare template description',
+                                namespace => 'Asset_Matrix',
+                        },
+		],
 		related => [
 			{
 				tag => 'search template',

@@ -669,37 +669,80 @@ our $I18N = {
         },
 
         'add/edit help body' => {
-                lastUpdated => 0,
+                lastUpdated => 1135271513,
                 message => q|<p>The Matrix allows you to set up a really powerful comparison system for any manner of item or service.</p>
-
-		<p>
-		<b>Categories</b><br />
-
-		Specify one category per line here to define the categories for this matrix. Categories are used to subdivide fields and also represent the things users can rate each listing on.
-		</p>
-
-		<p>
-		<b>Detail Template</b><br />
-		Select a template to be used to display the detailed information about a listing.
-		</p>
-
-		<p>
-		<b>Rating Detail Template</b><br />
-
-		Select a template to be used to display the detailed ratings information.
-		</p>
-
-		<p>
-		<b>Search Template</b><br />
-		Select a template to be used to display the search engine interface.
-		</p>
-
-		<p>
-		<b>Compare Template</b><br />
-		Select a template to be used to show the listing comparison data.
-		</p>|
+|
         },
 
+	'categories description' => {
+                message => q|Specify one category per line here to define the categories for this matrix. Categories are used to subdivide fields and also represent the things users can rate each listing on.|,
+                lastUpdated => 1135271460,
+        },
+
+	'categories subtext' => {
+                message => q|<br />Enter one per line in the order you want them to appear. Be sure to watch leading and trailing whitespace.|,
+                lastUpdated => 1135271460,
+        },
+
+        'max comparisons description' => {
+                message => q|Specifies how many comparisons are allowed in searches and comparisons.|,
+                lastUpdated => 1135271460,
+        },
+
+        'max comparisons privileged description' => {
+                message => q|Specifies how many comparisons are allowed in searches and comparisons for users in the privileged group.|,
+                lastUpdated => 1135271460,
+        },
+
+        'rating timeout description' => {
+                message => q|Set a timeout so that users are prevented from rating a given listing too often.|,
+                lastUpdated => 1135271460,
+        },
+
+        'rating timeout privileged description' => {
+                message => q|Privileged users may have a different rating timeout than general users who are allowed to rate.|,
+                lastUpdated => 1135271460,
+        },
+
+        'group to add description' => {
+                message => q|This group will be allowed to add or edit listings|,
+                lastUpdated => 1135271460,
+        },
+
+        'privileged group description' => {
+                message => q|This group will have special privileges with respect to the maximum number of comparisons allowed and frequency of rating|,
+                lastUpdated => 1135271460,
+        },
+
+        'rating group description' => {
+                message => q|This group will be allowed to rate listings in the Matrix.|,
+                lastUpdated => 1135271460,
+        },
+
+        'main template description' => {
+                message => q|Select a template to be used to display the default view of the Matrix.|,
+                lastUpdated => 1135271460,
+        },
+
+        'detail template description' => {
+                message => q|Select a template to be used to display the detailed information about a listing.|,
+                lastUpdated => 1135271460,
+        },
+
+        'rating detail template description' => {
+                message => q|Select a template to be used to display the detailed ratings information.|,
+                lastUpdated => 1135271460,
+        },
+
+        'search template description' => {
+                message => q|Select a template to be used to display the search engine interface.|,
+                lastUpdated => 1135271460,
+        },
+
+        'compare template description' => {
+                message => q|Select a template to be used to show the listing comparison data.|,
+                lastUpdated => 1135271460,
+        },
 	'categories' => {
 		message => q|Categories|,
 		lastUpdated => 1133758944,
@@ -773,6 +816,11 @@ our $I18N = {
 	'version number' => {
 		message => q|Version/Model Number|,
 		lastUpdated => 1133758944,
+	},
+
+	'product url' => {
+		message => q|Product URL|,
+		lastUpdated => 1135279964,
 	},
 
 	'manufacturer name' => {
@@ -855,9 +903,96 @@ our $I18N = {
 		lastUpdated => 1133758944,
 	},
 
+	'no edit rights' => {
+		message => q|You don't have the rights to edit this listing.|,
+		lastUpdated => 1133758944,
+	},
+
         'assetName' => {
                 lastUpdated => 1134256651,
                 message => q|Matrix|
+        },
+
+        'edit matrix' => {
+                lastUpdated => 1135279558,
+                message => q|Edit Matrix|
+        },
+
+        'edit listing' => {
+                lastUpdated => 1135279558,
+                message => q|<h1>Edit Listing</h1>|
+        },
+
+        'edit field' => {
+                lastUpdated => 1135279558,
+                message => q|<h1>Edit Field</h1>|
+        },
+
+        'good bad' => {
+                lastUpdated => 1135279558,
+                message => q|Good Bad|
+        },
+
+        'text' => {
+                lastUpdated => 1135279558,
+                message => q|Text|
+        },
+
+        'url' => {
+                lastUpdated => 1135279558,
+                message => q|URL|
+        },
+
+        'text area' => {
+                lastUpdated => 1135279558,
+                message => q|Text Area|,
+        },
+
+        'combo' => {
+                lastUpdated => 1135279558,
+                message => q|Combo|,
+        },
+
+        'delete listing confirmation' => {
+                lastUpdated => 1135289632,
+                message => q|<h1>Confirm Delete</h1>
+	Are you absolutely sure you wish to delete this listing? This operation cannot be undone.
+	<p>
+	<a href="%s">Yes!</a>
+	<p>
+	<a href="%s">No, I made a mistake.</a>|,
+        },
+
+        'list fields' => {
+                lastUpdated => 1135289632,
+                message => q|<h1>Field List</h1>
+		<a href="%s">Add new field.</a>
+		<p />|,
+        },
+
+        'yes' => {
+                lastUpdated => 1135279558,
+                message => q|Yes|
+        },
+
+        'no' => {
+                lastUpdated => 1135279558,
+                message => q|No|
+        },
+
+        'free' => {
+                lastUpdated => 1135279558,
+                message => q|Free Add On|
+        },
+
+        'extra' => {
+                lastUpdated => 1135279558,
+                message => q|Costs Extra|
+        },
+
+        'limited' => {
+                lastUpdated => 1135279558,
+                message => q|Limited|
         },
 
 };
