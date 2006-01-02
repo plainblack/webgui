@@ -9,11 +9,6 @@ save you many hours of grief.
 
 6.9.0
 --------------------------------------------------------------------
- * The If macro has been removed because it's far too dangerous and
-	error prone. If you use the If macro you may continue to use
-	it at your own risk, maintenance, and support cost, but it
-	is no longer supported by Plain Black.
-
  * The session system has been replaced by a new object-oriented one,
 	which has caused massive API changes. Please consult
 	migration.txt to bring your custom code up to date with the
