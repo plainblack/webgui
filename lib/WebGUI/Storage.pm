@@ -203,13 +203,10 @@ sub addFileFromFormPost {
 	my $attachmentCount = 1;
 	foreach my $upload ($session{req}->upload($formVariableName)) {
 		return $filename if $attachmentCount > $attachmentLimit;
-		my $tempPath = $upload->filename();
-		if ($tempPath =~ /([^\/\\]+)$/) {
-                        $filename = $1;
-                } else {
-                        $filename = $tempPath;
-                }
+		my $tempPath = $upload->tempname();
+		$filename = $upload->filename();
 		next unless $filename;
+		$filename = $1 if ($filename =~ /([^\/\\]+)$/);
 		my $type = $self->getFileExtension($filename);
 		if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads
 			$filename =~ s/\./\_/g;
