@@ -606,6 +606,14 @@ Fix $session{asset}
 
 find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{asset}!\$self->session->asset!g' {} \;
 
+Fix $session{scratch}
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteAllScratch!\$self->session->scratch->deleteAll!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteScratch!\$self->session->scratch->delete!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:setScratch!\$self->session->scratch->set!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:getScratch!\$self->session->scratch->get!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{scratch}{(\w+)}!\$self->session->scratch->get("$1")!g' {} \;
+
 
 5.23.1 WebGUI::SQL API Refactored
 
@@ -647,6 +655,12 @@ assets.
 find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{useEmptyStyle} = (\d+);!\$self->session->style->useEmptyStyle("$1")!g' {} \;
 find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{makePrintable} = (\d+);!\$self->session->style->makePrintable("$1")!g' {} \;
 find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Style\:\:!\$self->session->style->!g' {} \;
+
+5.23.5 WebGUI::URL API Refactored
+
+As of 6.9 WebGUI::URL is now accessed through session like $session->url
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:URL\:\:!\$self->session->url->!g' {} \;
 
 
 5.23.5 Lots of APIs Refactored

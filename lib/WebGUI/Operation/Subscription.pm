@@ -19,6 +19,7 @@ use WebGUI::International;
 
 #-------------------------------------------------------------------
 sub _generateCode {
+	my $session = shift;
 	my ($codeLength, @codeElements, $code, $i);
 	$codeLength = shift || 64;
 	@codeElements = ('A'..'Z', 'a'..'z', 0..9, '-');
@@ -32,6 +33,7 @@ sub _generateCode {
 
 #-------------------------------------------------------------------
 sub _submenu {
+	my $session = shift;
 	my $i18n = WebGUI::International->new("Subscription");
 
 	my $workarea = shift;
@@ -42,16 +44,17 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help, 'Subscription');
         }
-	$ac->addSubmenuItem(WebGUI::URL::page('op=editSubscription;sid=new'), $i18n->get('add subscription'));
-	$ac->addSubmenuItem(WebGUI::URL::page('op=createSubscriptionCodeBatch'), $i18n->get('generate batch')); 
-	$ac->addSubmenuItem(WebGUI::URL::page('op=listSubscriptionCodes'), $i18n->get('manage codes'));
-	$ac->addSubmenuItem(WebGUI::URL::page('op=listSubscriptionCodeBatches'), $i18n->get('manage batches'));
-	$ac->addSubmenuItem(WebGUI::URL::page('op=listSubscriptions'), 'Manage Subscriptions');
+	$ac->addSubmenuItem($session->url->page('op=editSubscription;sid=new'), $i18n->get('add subscription'));
+	$ac->addSubmenuItem($session->url->page('op=createSubscriptionCodeBatch'), $i18n->get('generate batch')); 
+	$ac->addSubmenuItem($session->url->page('op=listSubscriptionCodes'), $i18n->get('manage codes'));
+	$ac->addSubmenuItem($session->url->page('op=listSubscriptionCodeBatches'), $i18n->get('manage batches'));
+	$ac->addSubmenuItem($session->url->page('op=listSubscriptions'), 'Manage Subscriptions');
         return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatch {
+	my $session = shift;
 	my (%subscriptions, $f, $error, $errorMessage);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
@@ -61,7 +64,7 @@ sub www_createSubscriptionCodeBatch {
 	$errorMessage = $i18n->get('create batch error').'<ul><li>'.join('</li><li>', @{$error}).'</li></ul>' if ($error);
 	
 	tie %subscriptions, "Tie::IxHash";
-	%subscriptions = WebGUI::SQL->buildHash("select subscriptionId, name from subscription where deleted != 1 order by name");
+	%subscriptions = $session->db->buildHash("select subscriptionId, name from subscription where deleted != 1 order by name");
 	
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden(
@@ -72,21 +75,21 @@ sub www_createSubscriptionCodeBatch {
 		-name	=> 'noc',
 		-label	=> $i18n->get('noc'),
 		-hoverHelp	=> $i18n->get('noc description'),
-		-value	=> $session{form}{noc} || 1
+		-value	=> $session->form->process("noc") || 1
 		);
 	$f->integer(
 		-name	=> 'codeLength',
 		-label	=> $i18n->get('code length'),
 		-hoverHelp	=> $i18n->get('code length description'),
-		-value	=> $session{form}{codeLength} || 64
+		-value	=> $session->form->process("codeLength") || 64
 		);
 	$f->interval(
 		-name	=> 'expires',
 		-label	=> $i18n->get('codes expire'),
 		-hoverHelp	=> $i18n->get('codes expire description'),
-		-value	=> $session{form}{expires} || WebGUI::DateTime::intervalToSeconds(1, 'months')
+		-value	=> $session->form->process("expires") || WebGUI::DateTime::intervalToSeconds(1, 'months')
 		);
-	my @sub = WebGUI::FormProcessor::selectList("subscriptionId");
+	my @sub = $session->form->selectList("subscriptionId");
 	$f->selectList(
 		-name	=> 'subscriptionId',
 		-label	=> $i18n->get('association'), 
@@ -100,7 +103,7 @@ sub www_createSubscriptionCodeBatch {
 		-name	=> 'description',
 		-label	=> $i18n->get('batch description'),
 		-hoverHelp	=> $i18n->get('batch description description'),
-		-value	=> $session{form}{description}
+		-value	=> $session->form->process("description")
 		);
 	$f->submit;
 
@@ -109,38 +112,39 @@ sub www_createSubscriptionCodeBatch {
 	
 #-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatchSave {
+	my $session = shift;
 	my ($numberOfCodes, $description, $expires, $batchId, @codeElements, $currentCode, $code, $i, @subscriptions, 
 		@error, $creationEpoch);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");	
 	
-	$numberOfCodes = $session{form}{noc};
-	$description = $session{form}{description};
-	$expires = WebGUI::FormProcessor::interval('expires');
+	$numberOfCodes = $session->form->process("noc");
+	$description = $session->form->process("description");
+	$expires = $session->form->interval('expires');
 	$batchId = WebGUI::Id::generate;
 
 	push(@error, $i18n->get('no description error')) unless ($description);
-	push(@error, $i18n->get('no association error')) unless ($session{form}{subscriptionId});
-	push(@error, $i18n->get('code length error')) unless ($session{form}{codeLength} >= 10 && $session{form}{codeLength} <= 64 && $session{form}{codeLength} =~ m/^\d\d$/);
+	push(@error, $i18n->get('no association error')) unless ($session->form->process("subscriptionId"));
+	push(@error, $i18n->get('code length error')) unless ($session->form->process("codeLength") >= 10 && $session->form->process("codeLength") <= 64 && $session->form->process("codeLength") =~ m/^\d\d$/);
 
 	return www_createSubscriptionCodeBatch(\@error) if (@error);
 
 	$creationEpoch = time();
 	
-	WebGUI::SQL->write("insert into subscriptionCodeBatch (batchId, description) values (".
-		quote($batchId).", ".quote($description).")");
+	$session->db->write("insert into subscriptionCodeBatch (batchId, description) values (".
+		$session->db->quote($batchId).", ".$session->db->quote($description).")");
 
 	for ($currentCode=0; $currentCode < $numberOfCodes; $currentCode++) {
-		$code = _generateCode($session{form}{codeLength});
-		$code = _generateCode($session{form}{codeLength}) while (WebGUI::SQL->quickArray("select code from subscriptionCode where code=".quote($code)));
+		$code = _generateCode($session->form->process("codeLength"));
+		$code = _generateCode($session->form->process("codeLength")) while ($session->db->quickArray("select code from subscriptionCode where code=".$session->db->quote($code)));
 		
-		WebGUI::SQL->write("insert into subscriptionCode (batchId, code, status, dateCreated, dateUsed, expires, usedBy)".
-			" values (".quote($batchId).",".quote($code).", 'Unused', ".quote($creationEpoch).", 0, ".quote($expires).", 0)");
-		@subscriptions = WebGUI::FormProcessor::selectList('subscriptionId');
+		$session->db->write("insert into subscriptionCode (batchId, code, status, dateCreated, dateUsed, expires, usedBy)".
+			" values (".$session->db->quote($batchId).",".$session->db->quote($code).", 'Unused', ".$session->db->quote($creationEpoch).", 0, ".$session->db->quote($expires).", 0)");
+		@subscriptions = $session->form->selectList('subscriptionId');
 		foreach (@subscriptions) {
-			WebGUI::SQL->write("insert into subscriptionCodeSubscriptions (code, subscriptionId) values (".
-				quote($code).", ".quote($_).")");
+			$session->db->write("insert into subscriptionCodeSubscriptions (code, subscriptionId) values (".
+				$session->db->quote($code).", ".$session->db->quote($_).")");
 		}
 	}
 	
@@ -149,32 +153,35 @@ sub www_createSubscriptionCodeBatchSave {
 
 #-------------------------------------------------------------------
 sub www_deleteSubscription {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
-	WebGUI::Subscription->new($session{form}{sid})->delete;
+	WebGUI::Subscription->new($session->form->process("sid"))->delete;
 	return www_listSubscriptions();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodeBatch {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
-	WebGUI::SQL->write("delete from subscriptionCodeBatch where batchId=".quote($session{form}{bid}));
-	WebGUI::SQL->write("delete from subscriptionCode where batchId=".quote($session{form}{bid}));
+	$session->db->write("delete from subscriptionCodeBatch where batchId=".$session->db->quote($session->form->process("bid")));
+	$session->db->write("delete from subscriptionCode where batchId=".$session->db->quote($session->form->process("bid")));
 	
 	return www_listSubscriptionCodeBatches();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodes {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
-	if ($session{form}{selection} eq 'dc') {
-		WebGUI::SQL->write("delete from subscriptionCode where dateCreated >= ".quote($session{form}{dcStart}).
-			' and dateCreated <= '.quote($session{form}{dcStop}));
-	} elsif ($session{form}{selection} eq 'du') {
-		WebGUI::SQL->write("delete from subscriptionCode where dateUsed >= ".quote($session{form}{duStart}).
-			' and dateUsed <= '.quote($session{form}{duStop}));
+	if ($session->form->process("selection") eq 'dc') {
+		$session->db->write("delete from subscriptionCode where dateCreated >= ".$session->db->quote($session->form->process("dcStart")).
+			' and dateCreated <= '.$session->db->quote($session->form->process("dcStop")));
+	} elsif ($session->form->process("selection") eq 'du') {
+		$session->db->write("delete from subscriptionCode where dateUsed >= ".$session->db->quote($session->form->process("duStart")).
+			' and dateUsed <= '.$session->db->quote($session->form->process("duStop")));
 	}
 
 	return www_listSubscriptionCodes();
@@ -182,16 +189,17 @@ sub www_deleteSubscriptionCodes {
 
 #-------------------------------------------------------------------
 sub www_editSubscription {
+	my $session = shift;
 	my ($properties, $subscriptionId, $durationInterval, $durationUnits, $f);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	unless ($session{form}{sid} eq 'new') {
-		$properties = WebGUI::Subscription->new($session{form}{sid})->get;
+	unless ($session->form->process("sid") eq 'new') {
+		$properties = WebGUI::Subscription->new($session->form->process("sid"))->get;
 	}
 
-	$subscriptionId = $session{form}{sid} || 'new';
+	$subscriptionId = $session->form->process("sid") || 'new';
 
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden(
@@ -243,7 +251,7 @@ sub www_editSubscription {
 		-hoverHelp	=> $i18n->get('execute on subscription description'),
 		-value	=> $properties->{executeOnSubscription}
 		);
-	if ($session{setting}{useKarma}) {
+	if ($session->setting->get("useKarma")) {
 		$f->integer(
 			-name	=> 'karma',
 			-label	=> $i18n->get('subscription karma'),
@@ -258,38 +266,40 @@ sub www_editSubscription {
 
 #-------------------------------------------------------------------
 sub www_editSubscriptionSave {
+	my $session = shift;
 	my (@relevantFields);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
-	WebGUI::Subscription->new($session{form}{sid})->set({map {$_ => $session{form}{$_}} @relevantFields});
+	WebGUI::Subscription->new($session->form->process("sid"))->set({map {$_ => $session{form}{$_}} @relevantFields});
 		
 	return www_listSubscriptions();
 }
 
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodeBatches {
+	my $session = shift;
 	my ($p, $batches, $output);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listSubscriptionCodeBatches'));
+	$p = WebGUI::Paginator->new($session->url->page('op=listSubscriptionCodeBatches'));
 	$p->setDataByQuery("select * from subscriptionCodeBatch");
 
 	$batches = $p->getPageData;
 
-	$output = $p->getBarTraditional($session{form}{pn});
+	$output = $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach (@{$batches}) {
 		$output .= '<tr><td>';		
 		$output .= deleteIcon('op=deleteSubscriptionCodeBatch;bid='.$_->{batchId}, undef, $i18n->get('delete batch confirm'));
 		$output .= '<td>'.$_->{description}.'</td>';
-		$output .= '<td><a href="'.WebGUI::URL::page('op=listSubscriptionCodes;selection=b;bid='.$_->{batchId}).'">'.$i18n->get('list codes in batch').'</a></td>';
+		$output .= '<td><a href="'.$session->url->page('op=listSubscriptionCodes;selection=b;bid='.$_->{batchId}).'">'.$i18n->get('list codes in batch').'</a></td>';
 		$output .= '</tr>';
 	}
 	$output .= '</table>';
-	$output .= $p->getBarTraditional($session{form}{pn});
+	$output .= $p->getBarTraditional($session->form->process("pn"));
 	
 	$output = $i18n->get('no subscription code batches') unless (@{$batches});
 
@@ -298,33 +308,34 @@ sub www_listSubscriptionCodeBatches {
 
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodes {
+	my $session = shift;
 	my ($p, $codes, $output, $where, $ops, $delete);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	my $dcStart = WebGUI::FormProcessor::date('dcStart');
-	my $dcStop  = WebGUI::DateTime::addToTime(WebGUI::FormProcessor::date('dcStop'),23,59);
-	my $duStart = WebGUI::FormProcessor::date('duStart');
-	my $duStop  = WebGUI::DateTime::addToTime(WebGUI::FormProcessor::date('duStop'),23,59);
-	my $batches = WebGUI::SQL->buildHashRef("select batchId, description from subscriptionCodeBatch");	
+	my $dcStart = $session->form->date('dcStart');
+	my $dcStop  = WebGUI::DateTime::addToTime($session->form->date('dcStop'),23,59);
+	my $duStart = $session->form->date('duStart');
+	my $duStop  = WebGUI::DateTime::addToTime($session->form->date('duStop'),23,59);
+	my $batches = $session->db->buildHashRef("select batchId, description from subscriptionCodeBatch");	
 
 	$output .= $i18n->get('selection message');
 	
 	$output .= WebGUI::Form::formHeader;
 	$output .= WebGUI::Form::hidden({name=>'op', value=>'listSubscriptionCodes'});
 	$output .= '<table>';
-	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'du', checked=>($session{form}{selection} eq 'du')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'du', checked=>($session->form->process("selection") eq 'du')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('selection used').'</td>';
 	$output .= '<td>'.WebGUI::Form::date({name=>'duStart', value=>$duStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'duStop', value=>$duStop}).'</td>';
 	$output .= '</tr><tr>';
-	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'dc', checked=>($session{form}{selection} eq 'dc')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'dc', checked=>($session->form->process("selection") eq 'dc')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('selection created').'</td>';
 	$output .= '<td>'.WebGUI::Form::date({name=>'dcStart', value=>$dcStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'dcStop', value=>$dcStop}).'</td>';
 	$output .= '</tr><tr>';
-	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'b', checked=>($session{form}{selection} eq 'b')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'b', checked=>($session->form->process("selection") eq 'b')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('selection batch id').'</td>';
-	$output .= '<td>'.WebGUI::Form::selectList({name => 'bid', value => [$session{form}{bid}], options => $batches});
+	$output .= '<td>'.WebGUI::Form::selectList({name => 'bid', value => [$session->form->process("bid")], options => $batches});
 	$output .= '</tr><tr>';
 	$output .= '<td></td>';
 	$output .= '<td>'.WebGUI::Form::submit({value=>$i18n->get('select')}).'</td>';
@@ -332,29 +343,29 @@ sub www_listSubscriptionCodes {
 	$output .= '</table>';
 	$output .= WebGUI::Form::formFooter;
 	
-	if ($session{form}{selection} eq 'du') {
-		$where = " and dateUsed >= ".quote($duStart)." and dateUsed <= ".quote($duStop);
+	if ($session->form->process("selection") eq 'du') {
+		$where = " and dateUsed >= ".$session->db->quote($duStart)." and dateUsed <= ".$session->db->quote($duStop);
 		$ops = ';duStart='.$duStart.';duStop='.$duStop.';selection=du';
-		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodes'.$ops).'">'.$i18n->get('delete codes').'</a>';
-	} elsif ($session{form}{selection} eq 'dc') {
-		$where = " and dateCreated >= ".quote($dcStart)." and dateCreated <= ".quote($dcStop);
+		$delete = '<a href="'.$session->url->page('op=deleteSubscriptionCodes'.$ops).'">'.$i18n->get('delete codes').'</a>';
+	} elsif ($session->form->process("selection") eq 'dc') {
+		$where = " and dateCreated >= ".$session->db->quote($dcStart)." and dateCreated <= ".$session->db->quote($dcStop);
 		$ops = ';dcStart='.$dcStart.';dcStop='.$dcStop.';selection=dc';
-		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodes'.$ops).'">'.$i18n->get('delete codes').'</a>';
-	} elsif ($session{form}{selection} eq 'b') {
-		$where = " and t1.batchId=".quote($session{form}{bid});
-		$ops = ';bid='.$session{form}{bid}.';selection=b';
-		$delete = '<a href="'.WebGUI::URL::page('op=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
+		$delete = '<a href="'.$session->url->page('op=deleteSubscriptionCodes'.$ops).'">'.$i18n->get('delete codes').'</a>';
+	} elsif ($session->form->process("selection") eq 'b') {
+		$where = " and t1.batchId=".$session->db->quote($session->form->process("bid"));
+		$ops = ';bid='.$session->form->process("bid").';selection=b';
+		$delete = '<a href="'.$session->url->page('op=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} else {
 		return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
 	}
 	
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listSubscriptionCodes'.$ops));
+	$p = WebGUI::Paginator->new($session->url->page('op=listSubscriptionCodes'.$ops));
 	$p->setDataByQuery("select t1.*, t2.* from subscriptionCode as t1, subscriptionCodeBatch as t2 where t1.batchId=t2.batchId ".$where);
 
 	$codes = $p->getPageData;
 
 	$output .= '<br />'.$delete.'<br />' if ($delete);
-	$output .= $p->getBarTraditional($session{form}{pn});
+	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<br />';
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr>';
@@ -372,23 +383,24 @@ sub www_listSubscriptionCodes {
 		$output .= '</tr>';
 	}
 	$output .= '</table>';
-	$output .= $p->getBarTraditional($session{form}{pn});
+	$output .= $p->getBarTraditional($session->form->process("pn"));
 
 	return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
 }
 
 #-------------------------------------------------------------------
 sub www_listSubscriptions {
+	my $session = shift;
 	my ($p, $subscriptions, $output);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listSubscriptions'));
+	$p = WebGUI::Paginator->new($session->url->page('op=listSubscriptions'));
 	$p->setDataByQuery('select subscriptionId, name from subscription where deleted != 1');
 	$subscriptions = $p->getPageData;
 
-	$output = $p->getBarTraditional($session{form}{pn});
+	$output = $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach (@{$subscriptions}) {
 		$output .= '<tr>';
@@ -398,7 +410,7 @@ sub www_listSubscriptions {
 		$output .= '</tr>';
 	}
 	$output .= '</table>';
-	$output .= $p->getBarTraditional($session{form}{pn});
+	$output .= $p->getBarTraditional($session->form->process("pn"));
 	
 	$output = $i18n->get('no subscriptions') unless (@{$subscriptions});
 	
@@ -407,29 +419,31 @@ sub www_listSubscriptions {
 
 #-------------------------------------------------------------------
 sub www_purchaseSubscription {
-	WebGUI::Commerce::ShoppingCart->new->add($session{form}{sid}, 'Subscription');
+	my $session = shift;
+	WebGUI::Commerce::ShoppingCart->new->add($session->form->process("sid"), 'Subscription');
 	
-	return WebGUI::HTTP::setRedirect(WebGUI::URL::page('op=checkout'));
+	return WebGUI::HTTP::setRedirect($session->url->page('op=checkout'));
 }
 
 #-------------------------------------------------------------------
 sub www_redeemSubscriptionCode {
+	my $session = shift;
 	my (%codeProperties, @subscriptions, %var, $f);
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	if ($session{form}{code}) {
-		%codeProperties = WebGUI::SQL->quickHash("select * from subscriptionCode as t1, subscriptionCodeBatch as t2 where ".
-			"t1.batchId = t2.batchId and t1.code=".quote($session{form}{code})." and (t1.dateCreated + t1.expires) > ".quote(time));
+	if ($session->form->process("code")) {
+		%codeProperties = $session->db->quickHash("select * from subscriptionCode as t1, subscriptionCodeBatch as t2 where ".
+			"t1.batchId = t2.batchId and t1.code=".$session->db->quote($session->form->process("code"))." and (t1.dateCreated + t1.expires) > ".$session->db->quote(time));
 
 		if ($codeProperties{status} eq 'Unused') {
 			# Code is ok
-			@subscriptions = WebGUI::SQL->buildArray("select subscriptionId from subscriptionCodeSubscriptions where code=".quote($session{form}{code}));
+			@subscriptions = $session->db->buildArray("select subscriptionId from subscriptionCodeSubscriptions where code=".$session->db->quote($session->form->process("code")));
 			foreach (@subscriptions) {
 				WebGUI::Subscription->new($_)->apply;
 			}
 
 			# Set code to Used
-			WebGUI::SQL->write("update subscriptionCode set status='Used', dateUsed=".quote(time)." where code=".quote($session{form}{code}));
+			$session->db->write("update subscriptionCode set status='Used', dateUsed=".$session->db->quote(time)." where code=".$session->db->quote($session->form->process("code")));
 
 			$var{batchDescription} = $codeProperties{description};
 			$var{message} = $i18n->get('redeem code success');

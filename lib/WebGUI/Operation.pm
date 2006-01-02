@@ -49,6 +49,7 @@ The name of the operation to execute.
 =cut
 
 sub execute {
+	my $session = shift;
 	my $op = shift;
 	my ($output, $cmd);
 	my $operation = getOperations();
@@ -56,13 +57,13 @@ sub execute {
 		# Load the module
 		$cmd = 'use '.$operation->{$op};
 		eval ($cmd);
-		WebGUI::ErrorHandler::error("Couldn't compile operation: ".$operation->{$op}.". Root cause: ".$@) if ($@);
+		$session->error("Couldn't compile operation: ".$operation->{$op}.". Root cause: ".$@) if ($@);
 		# Call the method
 		$cmd = $operation->{$op} . '::www_'.$op;
-		$output = eval($cmd);
-		WebGUI::ErrorHandler::error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
+		$output = eval{&$cmd($session)};
+		$session->error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
 	} else {
-		WebGUI::ErrorHandler::security("execute an invalid operation: ".$op);
+		$session->security("execute an invalid operation: ".$op);
 	}
 	return $output;
 }

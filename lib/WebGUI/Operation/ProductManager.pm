@@ -18,6 +18,7 @@ use WebGUI::Grouping;
 
 #-------------------------------------------------------------------
 sub _submenu {
+	my $session = shift;
 	my $i18n = WebGUI::International->new("ProductManager");
 
 	my $workarea = shift;
@@ -29,19 +30,20 @@ sub _submenu {
 		$ac->setHelp($help, 'ProductManager');
         }
 
-	my $productId = $session{form}{productId} || WebGUI::Session::getScratch('managingProduct');
+	my $productId = $session->form->process("productId") || WebGUI::Session::getScratch('managingProduct');
 	undef $productId if ($productId eq 'new');
-	$ac->addSubmenuItem(WebGUI::URL::page('op=editProduct;productId=new'), $i18n->get('add product'));
-	$ac->addSubmenuItem(WebGUI::URL::page('op=listProducts'), $i18n->get('list products'));
-	$ac->addSubmenuItem(WebGUI::URL::page('op=manageProduct;productId='.$productId), $i18n->get('manage product')) if ($productId);
-	$ac->addSubmenuItem(WebGUI::URL::page('op=listProductVariants;productId='.$productId), $i18n->get('list variants')) if ($productId);
+	$ac->addSubmenuItem($session->url->page('op=editProduct;productId=new'), $i18n->get('add product'));
+	$ac->addSubmenuItem($session->url->page('op=listProducts'), $i18n->get('list products'));
+	$ac->addSubmenuItem($session->url->page('op=manageProduct;productId='.$productId), $i18n->get('manage product')) if ($productId);
+	$ac->addSubmenuItem($session->url->page('op=listProductVariants;productId='.$productId), $i18n->get('list variants')) if ($productId);
 
 	return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
 sub www_deleteProductParameterOption {
-	my $optionId = $session{form}{optionId};
+	my $session = shift;
+	my $optionId = $session->form->process("optionId");
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
@@ -52,7 +54,8 @@ sub www_deleteProductParameterOption {
 
 #-------------------------------------------------------------------
 sub www_deleteProductParameter {
-	my $parameterId = $session{form}{parameterId};
+	my $session = shift;
+	my $parameterId = $session->form->process("parameterId");
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
@@ -63,7 +66,8 @@ sub www_deleteProductParameter {
 
 #-------------------------------------------------------------------
 sub www_deleteProduct {
-	my $productId = $session{form}{productId};
+	my $session = shift;
+	my $productId = $session->form->process("productId");
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
@@ -74,12 +78,13 @@ sub www_deleteProduct {
 
 #-------------------------------------------------------------------
 sub www_editProduct {
+	my $session = shift;
 	my ($productId, $product, $f, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 
 	$i18n = WebGUI::International->new('ProductManager');	
-	$productId = $session{form}{productId};
+	$productId = $session->form->process("productId");
 	
 	unless ($productId eq 'new') {
 		$product = WebGUI::Product->new($productId)->get;
@@ -98,48 +103,48 @@ sub www_editProduct {
 		-name		=> 'title',
 		-label		=> $i18n->get('title'),
 		-hoverHelp	=> $i18n->get('title description'),
-		-value		=> $session{form}{title} || $product->{title},
+		-value		=> $session->form->process("title") || $product->{title},
 		-maxlength	=> 255,
 	);
 	$f->textarea(
 		-name		=> 'description',
 		-label		=> $i18n->get('description'),
 		-hoverHelp	=> $i18n->get('description description'),
-		-value		=> $session{form}{decsription} || $product->{description},
+		-value		=> $session->form->process("decsription") || $product->{description},
 	);
 	$f->float(
 		-name		=> 'price',
 		-label		=> $i18n->get('price'),
 		-hoverHelp	=> $i18n->get('price description'),
-		-value		=> $session{form}{price} || $product->{price},
+		-value		=> $session->form->process("price") || $product->{price},
 		-maxlength	=> 13,
 	);
 	$f->float(
 		-name		=> 'weight',
 		-label		=> $i18n->get('weight'),
 		-hoverHelp	=> $i18n->get('weight description'),
-		-value		=> $session{form}{weight} || $product->{weight},
+		-value		=> $session->form->process("weight") || $product->{weight},
 		-maxlength	=> 9,
 	);
 	$f->text(
 		-name		=> 'sku',
 		-label		=> $i18n->get('sku'),
 		-hoverHelp	=> $i18n->get('sku description'),
-		-value		=> $session{form}{sku} || $product->{SKU},
+		-value		=> $session->form->process("sku") || $product->{SKU},
 		-maxlength	=> 64,
 	);
 	$f->template(
 		-name		=> 'templateId',
 		-label		=> $i18n->get('template'),
 		-hoverHelp	=> $i18n->get('template description'),
-		-value		=> $session{form}{templateId} || $product->{templateId},
+		-value		=> $session->form->process("templateId") || $product->{templateId},
 		-namespace	=> 'Commerce/Product',
 	);
 	$f->text(
 		-name		=> 'skuTemplate',
 		-label		=> $i18n->get('sku template'),
 		-hoverHelp	=> $i18n->get('sku template description'),
-		-value		=> $session{form}{skuTemplate} || $product->{skuTemplate},
+		-value		=> $session->form->process("skuTemplate") || $product->{skuTemplate},
 		-maxlength	=> 255,
 	);
 	$f->submit;
@@ -149,45 +154,47 @@ sub www_editProduct {
 
 #-------------------------------------------------------------------
 sub www_editProductSave {
+	my $session = shift;
 	my ($self, @error, $productId, $product, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 
 	$i18n = WebGUI::International->new('ProductManager');
 	
-	push(@error, $i18n->get('edit product title error')) unless $session{form}{title};
-	push(@error, $i18n->get('edit product price error')) unless ($session{form}{price} && $session{form}{price} =~ /^\d+(\.\d+)?$/);
-	push(@error, $i18n->get('edit product weight error')) unless (defined $session{form}{weight} && $session{form}{price} =~ /^\d+(\.\d+)?$/);
-	push(@error, $i18n->get('edit product sku error')) unless ($session{form}{sku});
+	push(@error, $i18n->get('edit product title error')) unless $session->form->process("title");
+	push(@error, $i18n->get('edit product price error')) unless ($session->form->process("price") && $session->form->process("price") =~ /^\d+(\.\d+)?$/);
+	push(@error, $i18n->get('edit product weight error')) unless (defined $session->form->process("weight") && $session->form->process("price") =~ /^\d+(\.\d+)?$/);
+	push(@error, $i18n->get('edit product sku error')) unless ($session->form->process("sku"));
 	
 	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);	
 
-	$productId = $session{form}{productId};
+	$productId = $session->form->process("productId");
 	$product = WebGUI::Product->new($productId);
 	$product->set({
-		title		=> $session{form}{title},
-		description	=> $session{form}{description},
-		price		=> $session{form}{price},
-		weight		=> $session{form}{weight},
-		sku		=> $session{form}{sku},
-		templateId	=> $session{form}{templateId},
-		skuTemplate	=> $session{form}{skuTemplate},
+		title		=> $session->form->process("title"),
+		description	=> $session->form->process("description"),
+		price		=> $session->form->process("price"),
+		weight		=> $session->form->process("weight"),
+		sku		=> $session->form->process("sku"),
+		templateId	=> $session->form->process("templateId"),
+		skuTemplate	=> $session->form->process("skuTemplate"),
 	});
 	
-	$session{form}{productId} = $product->get('productId');
+	$session->form->process("productId") = $product->get('productId');
 	return WebGUI::Operation::execute('manageProduct');
 }
 		
 #-------------------------------------------------------------------
 sub www_editProductParameter {
+	my $session = shift;
 	my ($parameterId, $product, $productId, $parameter, $f, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
 	$i18n = WebGUI::International->new('ProductManager');
 	
-	$parameterId = $session{form}{parameterId};
-	$productId = $session{form}{productId};
+	$parameterId = $session->form->process("parameterId");
+	$productId = $session->form->process("productId");
 	
 	unless ($parameterId eq 'new') {
 		$product = WebGUI::Product->getByParameterId($parameterId);
@@ -216,7 +223,7 @@ sub www_editProductParameter {
 		-name		=> 'name',
 		-label		=> $i18n->get('edit parameter name'),
 		-hoverHelp	=> $i18n->get('edit parameter name description'),
-		-value		=> $session{form}{name} || $parameter->{name},
+		-value		=> $session->form->process("name") || $parameter->{name},
 		-maxlength	=> 64,
 	);
 	$f->submit;
@@ -226,27 +233,28 @@ sub www_editProductParameter {
 
 #-------------------------------------------------------------------
 sub www_editProductParameterSave {
+	my $session = shift;
 	my (@error, $parameterId, $product, $i18n, $skuTemplate, $oldName, $newName);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
 	$i18n = WebGUI::International->new('ProductManager');
 
-	$parameterId = $session{form}{parameterId};
+	$parameterId = $session->form->process("parameterId");
 	
-	push (@error, $i18n->get('edit parameter name error')) unless $session{form}{name};
-	push (@error, $i18n->get('edit parameter productId error')) unless $session{form}{productId};
+	push (@error, $i18n->get('edit parameter name error')) unless $session->form->process("name");
+	push (@error, $i18n->get('edit parameter productId error')) unless $session->form->process("productId");
 
 	return "<ul><li>".join('</li><li>', @error)."</li></ul>".WebGUI::Operation::execute('editProductParameter') if (@error);
 	
-	$product = WebGUI::Product->new($session{form}{productId});
+	$product = WebGUI::Product->new($session->form->process("productId"));
 	$skuTemplate = $product->get('skuTemplate');
 
 	if ($parameterId eq 'new') {
 		$parameterId = $product->addParameter;
 	} else {
 		($oldName = $product->getParameter($parameterId)->{name}) =~ s/[ ><]/\./g;
-		($newName = $session{form}{name}) =~ s/[ ><]/\./g;
+		($newName = $session->form->process("name")) =~ s/[ ><]/\./g;
 		$skuTemplate = $product->get('skuTemplate');
 		$skuTemplate =~ s/< *?tmpl_var *?param\.$oldName *?>/<tmpl_var param.$newName>/i;
 		$product->set({
@@ -255,22 +263,23 @@ sub www_editProductParameterSave {
 	}
 	
 	$product->setParameter($parameterId, {
-		name		=> $session{form}{name}
+		name		=> $session->form->process("name")
 		});
 	
-	return WebGUI::Operation::execute('editSkuTemplate') if ($session{form}{parameterId} eq 'new');
+	return WebGUI::Operation::execute('editSkuTemplate') if ($session->form->process("parameterId") eq 'new');
 	return WebGUI::Operation::execute('manageProduct');
 }
 
 #-------------------------------------------------------------------
 sub www_editProductParameterOption {
+	my $session = shift;
 	my ($self, $optionId, $option, $f, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
 	$i18n = WebGUI::International->new('ProductManager');
 	
-	$optionId = $session{form}{optionId};
+	$optionId = $session->form->process("optionId");
 	unless ($optionId eq 'new') {
 		$option = WebGUI::Product->getByOptionId($optionId)->getOption($optionId);
 	}
@@ -286,7 +295,7 @@ sub www_editProductParameterOption {
 	);
 	$f->hidden(
 		-name => 'parameterId',
-		-value => $session{form}{parameterId},
+		-value => $session->form->process("parameterId"),
 	);
 	$f->readOnly(
 		-label		=> $i18n->get('option ID'),
@@ -296,28 +305,28 @@ sub www_editProductParameterOption {
 		-name		=> 'value',
 		-label		=> $i18n->get('edit option value'),
 		-hoverHelp	=> $i18n->get('edit option value description'),
-		-value		=> $session{form}{value} || $option->{value},
+		-value		=> $session->form->process("value") || $option->{value},
 		-maxlength	=> 64,
 	);
 	$f->float(
 		-name		=> 'priceModifier',
 		-label		=> $i18n->get('edit option price modifier'),
 		-hoverHelp	=> $i18n->get('edit option price modifier description'),
-		-value		=> $session{form}{priceModifier} || $option->{priceModifier},
+		-value		=> $session->form->process("priceModifier") || $option->{priceModifier},
 		-maxlength	=> 11,
 	);
 	$f->float(
 		-name		=> 'weightModifier',
 		-label		=> $i18n->get('edit option weight modifier'),
 		-hoverHelp	=> $i18n->get('edit option weight modifier description'),
-		-value		=> $session{form}{weightModifier} || $option->{weightModifier},
+		-value		=> $session->form->process("weightModifier") || $option->{weightModifier},
 		-maxlength	=> 7,
 	);
 	$f->text(
 		-name		=> 'skuModifier',
 		-label		=> $i18n->get('edit option sku modifier'),
 		-hoverHelp	=> $i18n->get('edit option sku modifier description'),
-		-value		=> $session{form}{skuModifier} || $option->{skuModifier},
+		-value		=> $session->form->process("skuModifier") || $option->{skuModifier},
 		-maxlength	=> 64,
 	);
 	$f->submit;
@@ -327,25 +336,26 @@ sub www_editProductParameterOption {
 
 #-------------------------------------------------------------------
 sub www_editProductParameterOptionSave {
+	my $session = shift;
 	my ($self, @error, $optionId, $product, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
 	$i18n = WebGUI::International->new('ProductManager');
 
-	push (@error, $i18n->get('edit option value error')) unless ($session{form}{value});
-	push (@error, $i18n->get('edit option parameterId error')) unless ($session{form}{parameterId});
+	push (@error, $i18n->get('edit option value error')) unless ($session->form->process("value"));
+	push (@error, $i18n->get('edit option parameterId error')) unless ($session->form->process("parameterId"));
 
 	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);
 
-	$product = WebGUI::Product->getByParameterId($session{form}{parameterId});
-	$optionId = $session{form}{optionId};
-	$optionId = $product->addOptionToParameter($session{form}{parameterId}) if ($optionId eq 'new');
+	$product = WebGUI::Product->getByParameterId($session->form->process("parameterId"));
+	$optionId = $session->form->process("optionId");
+	$optionId = $product->addOptionToParameter($session->form->process("parameterId")) if ($optionId eq 'new');
 	$product->setOption($optionId, {
-		value		=> $session{form}{value},
-		priceModifier	=> $session{form}{priceModifier},
-		weightModifier	=> $session{form}{weightModifier},
-		skuModifier	=> $session{form}{skuModifier}
+		value		=> $session->form->process("value"),
+		priceModifier	=> $session->form->process("priceModifier"),
+		weightModifier	=> $session->form->process("weightModifier"),
+		skuModifier	=> $session->form->process("skuModifier")
 		});
 
 	return WebGUI::Operation::execute('manageProduct');
@@ -353,13 +363,14 @@ sub www_editProductParameterOptionSave {
 
 #-------------------------------------------------------------------
 sub www_editProductVariant {
+	my $session = shift;
 	my ($variantId, $variant, $f, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 
 	$i18n = WebGUI::International->new("ProductManager");
 	
-	$variantId = $session{form}{variantId};
+	$variantId = $session->form->process("variantId");
 	$variant = WebGUI::Product->getByVariantId($variantId)->getVariant($variantId);
 	
 	$f = WebGUI::HTMLForm->new;
@@ -406,7 +417,8 @@ sub www_editProductVariant {
 
 #-------------------------------------------------------------------
 sub www_editProductVariantSave {
-my	$variantId = $session{form}{variantId};
+	my $session = shift;
+my	$variantId = $session->form->process("variantId");
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 
@@ -417,13 +429,14 @@ my	$variantId = $session{form}{variantId};
 
 #-------------------------------------------------------------------
 sub www_editSkuTemplate {
+	my $session = shift;
 	my ($product, $productId, $output, $f, $name, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
 	$i18n = WebGUI::International->new("ProductManager");
 	
-	$productId = $session{form}{productId};
+	$productId = $session->form->process("productId");
 	$product = WebGUI::Product->new($productId);
 	
 	$output .= "Available are: <br />\n";
@@ -456,12 +469,13 @@ sub www_editSkuTemplate {
 
 #-------------------------------------------------------------------
 sub www_editSkuTemplateSave {
-	my ($productId) = $session{form}{productId};
+	my $session = shift;
+	my ($productId) = $session->form->process("productId");
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
 	WebGUI::Product->new($productId)->set({
-		skuTemplate	=> $session{form}{skuTemplate},
+		skuTemplate	=> $session->form->process("skuTemplate"),
 		});
 
 	return WebGUI::Operation::execute('manageProduct');
@@ -469,6 +483,7 @@ sub www_editSkuTemplateSave {
 
 #-------------------------------------------------------------------
 sub www_listProducts {
+	my $session = shift;
 	my ($self, $sth, $output, $row, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
@@ -477,7 +492,7 @@ sub www_listProducts {
 	
 	WebGUI::Session::setScratch('managingProduct', '-delete-');
 	
-	$sth = WebGUI::SQL->read('select * from products order by title');
+	$sth = $session->db->read('select * from products order by title');
 
 	$output .= '<table>';
 	while ($row = $sth->hashRef) {
@@ -496,13 +511,14 @@ sub www_listProducts {
 
 #-------------------------------------------------------------------
 sub www_listProductVariants {
+	my $session = shift;
 	my ($productId, $product, @variants, %parameters, %options, $output, %composition, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 
 	$i18n = WebGUI::International->new("ProductManager");
 	
-	$productId = $session{form}{productId} || WebGUI::Session::getScratch('managingProduct');
+	$productId = $session->form->process("productId") || WebGUI::Session::getScratch('managingProduct');
 
 	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
 	
@@ -558,12 +574,13 @@ sub www_listProductVariants {
 
 #-------------------------------------------------------------------
 sub www_listProductVariantsSave {
+	my $session = shift;
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 	
-	my %availableVariants = map {$_ => 1} WebGUI::FormProcessor::selectList('available');
+	my %availableVariants = map {$_ => 1} $session->form->selectList('available');
 
-	my $product = WebGUI::Product->new($session{form}{productId});
+	my $product = WebGUI::Product->new($session->form->process("productId"));
 	my @variants = @{$product->getVariant};
 	
 	foreach (@variants) {
@@ -576,13 +593,14 @@ sub www_listProductVariantsSave {
 
 #-------------------------------------------------------------------
 sub www_manageProduct {
+	my $session = shift;
 	my ($productId, $product, $output, $parameter, $option, $optionId, $i18n);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(14));
 
 	$i18n = WebGUI::International->new("ProductManager");
 	
-	$productId = $session{form}{productId} || WebGUI::Session::getScratch('managingProduct');
+	$productId = $session->form->process("productId") || WebGUI::Session::getScratch('managingProduct');
 	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
 	WebGUI::Session::setScratch('managingProduct', $productId);
 
@@ -599,14 +617,14 @@ sub www_manageProduct {
 	$output .= "</table>";
 	
 	$output .= "<h2>Parameters</h2>";
-	$output .= '<a href="'.WebGUI::URL::page('op=editProductParameter;parameterId=new;productId='.$product->get('productId')).'">'.
+	$output .= '<a href="'.$session->url->page('op=editProductParameter;parameterId=new;productId='.$product->get('productId')).'">'.
 		$i18n->get('add parameter').'</a><br />';
 	foreach $parameter (@{$product->getParameter}) {
 		$output .= deleteIcon('op=deleteProductParameter;parameterId='.$parameter->{parameterId}).
 			editIcon('op=editProductParameter;parameterId='.$parameter->{parameterId});
 		$output .= '<span style="margin-left: 10px"><b>'.$parameter->{name}.'</b></span><br />';
 		$output .= '<a style="margin-left: 20px" href="'.
-			WebGUI::URL::page('op=editProductParameterOption;optionId=new;parameterId='.$parameter->{parameterId}).'">'.
+			$session->url->page('op=editProductParameterOption;optionId=new;parameterId='.$parameter->{parameterId}).'">'.
 			$i18n->get('add option').'</a><br />';
 		foreach $optionId (@{$parameter->{options}}) {
 			$option = $product->getOption($optionId);

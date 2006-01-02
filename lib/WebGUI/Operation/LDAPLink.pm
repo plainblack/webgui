@@ -26,6 +26,7 @@ use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _submenu {
+	my $session = shift;
    my $workarea = shift;
    my $title = shift;
    $title = WebGUI::International::get($title,"AuthLDAP") if ($title);
@@ -35,47 +36,50 @@ sub _submenu {
       $ac->setHelp($help,"AuthLDAP");
    }
    my $returnUrl = "";
-   if($session{form}{returnUrl}) {
-      $returnUrl = ";returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
+   if($session->form->process("returnUrl")) {
+      $returnUrl = ";returnUrl=".$session->url->escape($session->form->process("returnUrl"));
    }
-   $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink;llid=new'.$returnUrl), WebGUI::International::get("LDAPLink_982","AuthLDAP"));
-   if ($session{form}{op} eq "editLDAPLink" && $session{form}{llid} ne "new") {
-      $ac->addSubmenuItem(WebGUI::URL::page('op=editLDAPLink;llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_983","AuthLDAP"));
-      $ac->addSubmenuItem(WebGUI::URL::page('op=copyLDAPLink;llid='.$session{form}{llid}.$returnUrl), WebGUI::International::get("LDAPLink_984","AuthLDAP"));
-	  $ac->addSubmenuItem(WebGUI::URL::page('op=deleteLDAPLink;llid='.$session{form}{llid}), WebGUI::International::get("LDAPLink_985","AuthLDAP"));
-	  $ac->addSubmenuItem(WebGUI::URL::page('op=listLDAPLinks'.$returnUrl), WebGUI::International::get("LDAPLink_986","AuthLDAP"));
+   $ac->addSubmenuItem($session->url->page('op=editLDAPLink;llid=new'.$returnUrl), WebGUI::International::get("LDAPLink_982","AuthLDAP"));
+   if ($session->form->process("op") eq "editLDAPLink" && $session->form->process("llid") ne "new") {
+      $ac->addSubmenuItem($session->url->page('op=editLDAPLink;llid='.$session->form->process("llid").$returnUrl), WebGUI::International::get("LDAPLink_983","AuthLDAP"));
+      $ac->addSubmenuItem($session->url->page('op=copyLDAPLink;llid='.$session->form->process("llid").$returnUrl), WebGUI::International::get("LDAPLink_984","AuthLDAP"));
+	  $ac->addSubmenuItem($session->url->page('op=deleteLDAPLink;llid='.$session->form->process("llid")), WebGUI::International::get("LDAPLink_985","AuthLDAP"));
+	  $ac->addSubmenuItem($session->url->page('op=listLDAPLinks'.$returnUrl), WebGUI::International::get("LDAPLink_986","AuthLDAP"));
    }
    return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
 sub www_copyLDAPLink {
+	my $session = shift;
    return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
    my (%db);
    tie %db, 'Tie::CPHash';
-   %db = WebGUI::SQL->quickHash("select * from ldapLink where ldapLinkId=".quote($session{form}{llid}));
+   %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    $db{ldapLinkId} = "new";
    $db{ldapLinkName} = "Copy of ".$db{ldapLinkName};
-   WebGUI::SQL->setRow("ldapLink","ldapLinkId",\%db);
-   #WebGUI::SQL->write("insert into databaseLink (databaseLinkId,title,DSN,username,identifier) values (".quote(WebGUI::Id::generate()).", ".quote($db{title}." (copy)").", ".quote($db{DSN}).", ".quote($db{username}).", ".quote($db{identifier}).")");
-   $session{form}{op} = "listLDAPLinks";
+   $session->db->setRow("ldapLink","ldapLinkId",\%db);
+   #$session->db->write("insert into databaseLink (databaseLinkId,title,DSN,username,identifier) values (".$session->db->quote(WebGUI::Id::generate()).", ".$session->db->quote($db{title}." (copy)").", ".$session->db->quote($db{DSN}).", ".$session->db->quote($db{username}).", ".$session->db->quote($db{identifier}).")");
+   $session->form->process("op") = "listLDAPLinks";
    return www_listLDAPLinks();
 }
 
 #-------------------------------------------------------------------
 sub www_deleteLDAPLink {
+	my $session = shift;
    return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
-   WebGUI::SQL->write("delete from ldapLink where ldapLinkId=".quote($session{form}{llid}));
-   $session{form}{op} = "listLDAPLinks";
+   $session->db->write("delete from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
+   $session->form->process("op") = "listLDAPLinks";
    return www_listLDAPLinks();
 }
 
 #-------------------------------------------------------------------
 sub www_editLDAPLink {
+	my $session = shift;
    return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
    my ($output, %db, $f);
    tie %db, 'Tie::CPHash';
-   %db = WebGUI::SQL->quickHash("select * from ldapLink where ldapLinkId=".quote($session{form}{llid}));
+   %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    
    $f = WebGUI::HTMLForm->new( -extras=>'autocomplete="off"' );
    $f->hidden(
@@ -84,15 +88,15 @@ sub www_editLDAPLink {
 	     );
    $f->hidden(
    		-name => "llid",
-		-value => $session{form}{llid},
+		-value => $session->form->process("llid"),
 	     );
    $f->hidden(
    		-name => "returnUrl",
-		-value => $session{form}{returnUrl},
+		-value => $session->form->process("returnUrl"),
 	     );
    $f->readOnly(
 		-label => WebGUI::International::get("LDAPLink_991","AuthLDAP"),
-   		-value => $session{form}{llid},
+   		-value => $session->form->process("llid"),
 	       );
    $f->text(
    		-name  => "ldapLinkName",
@@ -183,43 +187,45 @@ sub www_editLDAPLink {
 
 #-------------------------------------------------------------------
 sub www_editLDAPLinkSave {
+	my $session = shift;
    return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
    my $properties = {};
-   $properties->{ldapLinkId} = $session{form}{llid};
-   $properties->{ldapLinkName} = $session{form}{ldapLinkName};
-   $properties->{ldapUrl} = $session{form}{ldapUrl};
-   $properties->{connectDn} = $session{form}{connectDn};
-   $properties->{identifier} = $session{form}{ldapIdentifier};
-   $properties->{ldapUserRDN} = $session{form}{ldapUserRDN};
-   $properties->{ldapIdentity} = $session{form}{ldapIdentity};
-   $properties->{ldapIdentityName} = $session{form}{ldapIdentityName};
-   $properties->{ldapPasswordName} = $session{form}{ldapPasswordName};
-   $properties->{ldapSendWelcomeMessage} = WebGUI::FormProcessor::yesNo("ldapSendWelcomeMessage");
-   $properties->{ldapWelcomeMessage} = WebGUI::FormProcessor::textarea("ldapWelcomeMessage");
-   $properties->{ldapAccountTemplate} = WebGUI::FormProcessor::template("ldapAccountTemplate");
-   $properties->{ldapCreateAccountTemplate} = WebGUI::FormProcessor::template("ldapCreateAccountTemplate");
-   $properties->{ldapLoginTemplate} = WebGUI::FormProcessor::template("ldapLoginTemplate");
-   WebGUI::SQL->setRow("ldapLink","ldapLinkId",$properties);
-   if($session{form}{returnUrl}) {
-      WebGUI::HTTP::setRedirect($session{form}{returnUrl});
+   $properties->{ldapLinkId} = $session->form->process("llid");
+   $properties->{ldapLinkName} = $session->form->process("ldapLinkName");
+   $properties->{ldapUrl} = $session->form->process("ldapUrl");
+   $properties->{connectDn} = $session->form->process("connectDn");
+   $properties->{identifier} = $session->form->process("ldapIdentifier");
+   $properties->{ldapUserRDN} = $session->form->process("ldapUserRDN");
+   $properties->{ldapIdentity} = $session->form->process("ldapIdentity");
+   $properties->{ldapIdentityName} = $session->form->process("ldapIdentityName");
+   $properties->{ldapPasswordName} = $session->form->process("ldapPasswordName");
+   $properties->{ldapSendWelcomeMessage} = $session->form->yesNo("ldapSendWelcomeMessage");
+   $properties->{ldapWelcomeMessage} = $session->form->textarea("ldapWelcomeMessage");
+   $properties->{ldapAccountTemplate} = $session->form->template("ldapAccountTemplate");
+   $properties->{ldapCreateAccountTemplate} = $session->form->template("ldapCreateAccountTemplate");
+   $properties->{ldapLoginTemplate} = $session->form->template("ldapLoginTemplate");
+   $session->db->setRow("ldapLink","ldapLinkId",$properties);
+   if($session->form->process("returnUrl")) {
+      WebGUI::HTTP::setRedirect($session->form->process("returnUrl"));
    }
    return www_listLDAPLinks();
 }
 
 #-------------------------------------------------------------------
 sub www_listLDAPLinks {
+	my $session = shift;
    return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
    my ($output, $p, $sth, $data, @row, $i);
    my $returnUrl = "";
-   if($session{form}{returnUrl}) {
-      $returnUrl = ";returnUrl=".WebGUI::URL::escape($session{form}{returnUrl});
+   if($session->form->process("returnUrl")) {
+      $returnUrl = ";returnUrl=".$session->url->escape($session->form->process("returnUrl"));
    }
-   $sth = WebGUI::SQL->read("select * from ldapLink order by ldapLinkName");
+   $sth = $session->db->read("select * from ldapLink order by ldapLinkName");
    $row[$i] = '<tr><td valign="top" class="tableData">&nbsp;</td><td valign="top" class="tableData">'.WebGUI::International::get("LDAPLink_1076","AuthLDAP").'</td><td>'.WebGUI::International::get("LDAPLink_1077","AuthLDAP").'</td></tr>';
    $i++;
    while ($data = $sth->hashRef) {
       $row[$i] = '<tr><td valign="top" class="tableData">'
-	        .deleteIcon('op=deleteLDAPLink;llid='.$data->{ldapLinkId},WebGUI::URL::page(),WebGUI::International::get("LDAPLink_988","AuthLDAP"))
+	        .deleteIcon('op=deleteLDAPLink;llid='.$data->{ldapLinkId},$session->url->page(),WebGUI::International::get("LDAPLink_988","AuthLDAP"))
 			.editIcon('op=editLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
 			.copyIcon('op=copyLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
 			.'</td>';
@@ -230,7 +236,7 @@ sub www_listLDAPLinks {
 	  if($ldapLink->bind) {
 	     $status = WebGUI::International::get("LDAPLink_1079","AuthLDAP");
 	  }else{
-	     WebGUI::ErrorHandler::warn($ldapLink->getErrorMessage());
+	     $session->errorHandler->warn($ldapLink->getErrorMessage());
 	  }
 	  $ldapLink->unbind;
 	  $row[$i] .= '<td valign="top" class="tableData">'.$status.'</td>';
@@ -238,7 +244,7 @@ sub www_listLDAPLinks {
       $i++;
    }
    $sth->finish;
-   $p = WebGUI::Paginator->new(WebGUI::URL::page('op=listLDAPLinks'));
+   $p = WebGUI::Paginator->new($session->url->page('op=listLDAPLinks'));
    $p->setDataByArrayRef(\@row);
    $output .= '<table border="1" cellpadding="3" cellspacing="0" align="center">';
    $output .= $p->getPage;

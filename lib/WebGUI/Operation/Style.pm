@@ -31,16 +31,17 @@ Operation for overriding styles in Assets.
 
 =head2 www_makePrintable (  )
 
-Copy $session{form}{styleId} to printableStyleId and set the makePrintable flag so that
+Copy $session->form->process("styleId") to printableStyleId and set the makePrintable flag so that
 the printableStyleId is used instead of the normal styleId for the page.
 
 =cut
 
 sub www_makePrintable {
-	if ($session{form}{styleId} ne "") {
-		$session{page}{printableStyleId} = $session{form}{styleId};
+	my $session = shift;
+	if ($session->form->process("styleId") ne "") {
+		$session{page}{printableStyleId} = $session->form->process("styleId");
 	}
-	$session{page}{makePrintable} = 1;
+	$session->style->makePrintable("1")
 	return "";
 }
 
@@ -55,7 +56,8 @@ overriding the style without setting a printable style and on a per user basis.
 =cut
 
 sub www_setPersonalStyle {
-	WebGUI::Session::setScratch("personalStyleId",$session{form}{styleId});
+	my $session = shift;
+	WebGUI::Session::setScratch("personalStyleId",$session->form->process("styleId"));
 	return "";
 }
 
@@ -68,6 +70,7 @@ Clears the personalStyleId from the scratch area of the session variable.
 =cut
 
 sub www_unsetPersonalStyle {
+	my $session = shift;
 	WebGUI::Session::deleteScratch("personalStyleId");
 	return "";
 }

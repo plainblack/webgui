@@ -21,12 +21,13 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _submenu {
+	my $session = shift;
 	my $workarea = shift;
 	my $title = shift;
 	$title = WebGUI::International::get($title) if ($title);
 	my $ac = WebGUI::AdminConsole->new("statistics");
-	if ($session{setting}{trackPageStatistics}) {
-		$ac->addSubmenuItem( WebGUI::URL::page('op=viewStatistics'), WebGUI::International::get(144));
+	if ($session->setting->get("trackPageStatistics")) {
+		$ac->addSubmenuItem( $session->url->page('op=viewStatistics'), WebGUI::International::get(144));
 	}
         return $ac->render($workarea, $title);
 }
@@ -34,6 +35,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_viewStatistics {
+	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);
 	my $url = "http://www.plainblack.com/downloads/latest-version.txt";
@@ -51,17 +53,17 @@ sub www_viewStatistics {
 		$version = '<a href="http://files.plainblack.com/downloads/'.$rev[0].'.x.x/webgui-'.$version.'.tar.gz">'.$version.'</a>';
 	}
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(349).':</td><td class="tableData">'.$version.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from asset where state='published'");
+	($data) = $session->db->quickArray("select count(*) from asset where state='published'");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(147).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(distinct assetId) from assetData where isPackage=1");
+	($data) = $session->db->quickArray("select count(distinct assetId) from assetData where isPackage=1");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(794).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from template");
+	($data) = $session->db->quickArray("select count(*) from template");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(792).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from userSession");
+	($data) = $session->db->quickArray("select count(*) from userSession");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(146).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from users");
+	($data) = $session->db->quickArray("select count(*) from users");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(149).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = WebGUI::SQL->quickArray("select count(*) from groups");
+	($data) = $session->db->quickArray("select count(*) from groups");
 	$output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get(89).':</td><td class="tableData">'.$data.'</td></tr>';
 	$output .= '</table>';
         return _submenu($output);

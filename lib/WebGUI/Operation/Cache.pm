@@ -47,12 +47,13 @@ is looked up in the i18n table in the WebGUI namespace.
 =cut
 
 sub _submenu {
+	my $session = shift;
 	my $workarea = shift;
 	my $title = shift;
 	$title = WebGUI::International::get($title) if ($title);
 	my $ac = WebGUI::AdminConsole->new("cache");
-	if ($session{setting}{trackPageStatistics}) {
-		$ac->addSubmenuItem( WebGUI::URL::page('op=manageCache'), WebGUI::International::get('manage cache'));
+	if ($session->setting->get("trackPageStatistics")) {
+		$ac->addSubmenuItem( $session->url->page('op=manageCache'), WebGUI::International::get('manage cache'));
 	}
         return $ac->render($workarea, $title);
 }
@@ -74,6 +75,7 @@ Text description of how long the subscription lasts.
 =cut
 
 sub www_flushCache {
+	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $cache = WebGUI::Cache->new();
 	$cache->flush;
@@ -90,10 +92,11 @@ provides an option to clear the cache.
 =cut
 
 sub www_manageCache {
+	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);
 	my $cache = WebGUI::Cache->new();
-	my $flushURL =  WebGUI::URL::page('op=flushCache');
+	my $flushURL =  $session->url->page('op=flushCache');
         $output .= '<table>';
         $output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get('cache type').':</td><td class="tableData">'.ref($cache).'</td></tr>';
         $output .= '<tr><td align="right" valign="top" class="tableHeader">'.WebGUI::International::get('cache statistics').':</td><td class="tableData"><pre>'.$cache->stats.'</pre></td></tr>';

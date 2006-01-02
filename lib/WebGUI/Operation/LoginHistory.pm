@@ -38,10 +38,11 @@ they used.
 =cut
 
 sub www_viewLoginHistory {
+	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
-	$sth = WebGUI::SQL->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
+	$sth = $session->db->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
 	while (%data = $sth->hash) {
 		$data{username} = WebGUI::International::get('unknown user') if ($data{userId} eq "0");
 		$row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
@@ -52,7 +53,7 @@ sub www_viewLoginHistory {
 		$i++;
 	}
 	$sth->finish;
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewLoginHistory'));
+	$p = WebGUI::Paginator->new($session->url->page('op=viewLoginHistory'));
 	$p->setDataByArrayRef(\@row);
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr class="tableHeader"><td>'.WebGUI::International::get(428).'</td>';
@@ -60,9 +61,9 @@ sub www_viewLoginHistory {
 	$output .= '<td>'.WebGUI::International::get(429).'</td>';
 	$output .= '<td>'.WebGUI::International::get(431).'</td>';
 	$output .= '<td>'.WebGUI::International::get(433).'</td></tr>';
-        $output .= $p->getPage($session{form}{pn});
+        $output .= $p->getPage($session->form->process("pn"));
         $output .= '</table>';
-        $output .= $p->getBar($session{form}{pn});
+        $output .= $p->getBar($session->form->process("pn"));
 	return WebGUI::AdminConsole->new("loginHistory")->render($output);
 }
 

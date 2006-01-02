@@ -33,11 +33,12 @@ This error message will be added to the template variables.
 =cut
 
 sub www_viewPurchaseHistory {
+	my $session = shift;
 	my (@history, @historyLoop, %var, %properties);
 
 	$var{errorMessage} = shift;
 	
-	@history = @{WebGUI::Commerce::Transaction->transactionsByUser($session{user}{userId})};
+	@history = @{WebGUI::Commerce::Transaction->transactionsByUser($session->user->profileField("userId"))};
 	foreach (@history) {
 		%properties = %{$_->get};
 		$properties{initDate} = WebGUI::DateTime::epochToHuman($properties{initDate});
@@ -45,7 +46,7 @@ sub www_viewPurchaseHistory {
 		push(@historyLoop, {
 			(%properties),
 			itemLoop 	=> $_->getItems,
-			cancelUrl 	=> WebGUI::URL::page('op=cancelRecurringTransaction;tid='.$properties{transactionId}),
+			cancelUrl 	=> $session->url->page('op=cancelRecurringTransaction;tid='.$properties{transactionId}),
 			canCancel 	=> ($properties{recurring} && ($properties{status} eq 'Completed')),
 			});
 	}
@@ -61,16 +62,17 @@ sub www_viewPurchaseHistory {
 
 Cancels a transaction if it is recurring.  If not, an error message is returned.
 The transaction to cancel is passed in via a form field entry in the session variable,
-$session{form}{tid}.
+$session->form->process("tid").
 
 =cut
 
 sub www_cancelRecurringTransaction {
+	my $session = shift;
 	my ($transaction, $error, $message);
 	
 	my $i18n = WebGUI::International->new("TransactionLog");
 	
-	$transaction = WebGUI::Commerce::Transaction->new($session{form}{tid});
+	$transaction = WebGUI::Commerce::Transaction->new($session->form->process("tid"));
 	if ($transaction->isRecurring) {
 		$error = $transaction->cancelTransaction;
 		$message = $i18n->get('cancel error').$error if ($error);
@@ -85,17 +87,18 @@ sub www_cancelRecurringTransaction {
 
 =head2 www_deleteTransaction ( )
 
-Deletes a transaction, as specified by $session{form}{tid}.
+Deletes a transaction, as specified by $session->form->process("tid").
 Afterward, it calls www_listTransactions
 
 =cut
 
 sub www_deleteTransaction {
+	my $session = shift;
 	my $transactionId;
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 
-	$transactionId = $session{form}{tid};
+	$transactionId = $session->form->process("tid");
 
 	WebGUI::Commerce::Transaction->new($transactionId)->delete;
 
@@ -104,9 +107,10 @@ sub www_deleteTransaction {
 
 #-------------------------------------------------------------------
 sub www_deleteTransactionItem {
+	my $session = shift;
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
 	
-	WebGUI::Commerce::Transaction->new($session{form}{tid})->deleteItem($session{form}{iid}, $session{form}{itype});
+	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));
 
 	return WebGUI::Operation::execute('listTransactions');
 }

@@ -37,14 +37,15 @@ Operation handler for displaying and killing active sessions.
 
 This method can be called directly, but is usually called
 from www_viewActiveSessions. It ends the active session in
-$session{form}{sid}.  Afterwards, it calls www_viewActiveSessions.
+$session->form->process("sid").  Afterwards, it calls www_viewActiveSessions.
 
 =cut
 
 sub www_killSession {
-	return www_viewActiveSessions() if $session{form}{sid} eq $session{var}{sessionId};
+	my $session = shift;
+	return www_viewActiveSessions() if $session->form->process("sid") eq $session->var->get("sessionId");
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::Session::end($session{form}{sid});
+	WebGUI::Session::end($session->form->process("sid"));
 	return www_viewActiveSessions();
 }
 
@@ -58,10 +59,11 @@ delete (kill) each one via www_killSession
 =cut
 
 sub www_viewActiveSessions {
+	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
-	$sth = WebGUI::SQL->read("select users.username,users.userId,userSession.sessionId,userSession.expires,
+	$sth = $session->db->read("select users.username,users.userId,userSession.sessionId,userSession.expires,
 		userSession.lastPageView,userSession.lastIP from users,userSession where users.userId=userSession.userId
 		and users.userId<>1 order by users.username,userSession.lastPageView desc");
 	while (%data = $sth->hash) {
@@ -74,7 +76,7 @@ sub www_viewActiveSessions {
                 $i++;
 	}
 	$sth->finish;
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewActiveSessions'));
+	$p = WebGUI::Paginator->new($session->url->page('op=viewActiveSessions'));
 	$p->setDataByArrayRef(\@row);
         $output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
         $output .= '<tr class="tableHeader"><td>'.WebGUI::International::get(428).'</td>';
@@ -83,9 +85,9 @@ sub www_viewActiveSessions {
         $output .= '<td>'.WebGUI::International::get(430).'</td>';
         $output .= '<td>'.WebGUI::International::get(431).'</td>';
 	$output .= '<td>'.WebGUI::International::get(436).'</td></tr>';
-        $output .= $p->getPage($session{form}{pn});
+        $output .= $p->getPage($session->form->process("pn"));
         $output .= '</table>';
-        $output .= $p->getBarTraditional($session{form}{pn});
+        $output .= $p->getBarTraditional($session->form->process("pn"));
 	return WebGUI::AdminConsole->new("activeSessions")->render($output);
 }
 

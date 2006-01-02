@@ -27,6 +27,7 @@ use WebGUI::Icon;
 
 #-------------------------------------------------------------------
 sub _submenu {
+	my $session = shift;
 	my $i18n = WebGUI::International->new("Commerce");
 
 	my $workarea = shift;
@@ -37,30 +38,34 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help, 'Commerce');
         }
-	$ac->addSubmenuItem(WebGUI::URL::page('op=editCommerceSettings'), $i18n->get('manage commerce settings'));
-	$ac->addSubmenuItem(WebGUI::URL::page('op=listTransactions'), $i18n->get('list transactions')); 
+	$ac->addSubmenuItem($session->url->page('op=editCommerceSettings'), $i18n->get('manage commerce settings'));
+	$ac->addSubmenuItem($session->url->page('op=listTransactions'), $i18n->get('list transactions')); 
         return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
 sub _clearCheckoutScratch {
+	my $session = shift;
 	_clearShippingScratch();
 	_clearPaymentScratch();
 }
 
 #-------------------------------------------------------------------
 sub _clearPaymentScratch {
+	my $session = shift;
 	WebGUI::Session::setScratch('paymentGateway', '-delete-');
 }
 
 #-------------------------------------------------------------------
 sub _clearShippingScratch {
+	my $session = shift;
 	WebGUI::Session::setScratch('shippingMethod', '-delete-');
 	WebGUI::Session::setScratch('shippingOptions', '-delete-');
 }
 
 #-------------------------------------------------------------------
 sub _paymentSelected {
+	my $session = shift;
 	return 0 unless (WebGUI::Session::getScratch('paymentGateway'));
 	my $plugin = WebGUI::Commerce::Payment->load(WebGUI::Session::getScratch('paymentGateway'));
 	return 1 if ($plugin && $plugin->enabled);
@@ -69,6 +74,7 @@ sub _paymentSelected {
 
 #-------------------------------------------------------------------
 sub _shippingSelected {
+	my $session = shift;
 	return 0 unless (WebGUI::Session::getScratch('shippingMethod'));
 
 	my $plugin = WebGUI::Commerce::Shipping->load(WebGUI::Session::getScratch('shippingMethod'));
@@ -82,28 +88,31 @@ sub _shippingSelected {
 
 #-------------------------------------------------------------------
 sub www_addToCart {
-	WebGUI::Commerce::ShoppingCart->new->add($session{form}{itemId}, $session{form}{itemType}, $session{form}{quantity});
+	my $session = shift;
+	WebGUI::Commerce::ShoppingCart->new->add($session->form->process("itemId"), $session->form->process("itemType"), $session->form->process("quantity"));
 
 	return WebGUI::Operation::execute('viewCart');
 }
 
 #-------------------------------------------------------------------
 sub www_cancelTransaction {
+	my $session = shift;
 	my ($transaction, %var);
 	
-	$transaction = WebGUI::Commerce::Transaction->new($session{form}{tid});
+	$transaction = WebGUI::Commerce::Transaction->new($session->form->process("tid"));
 	unless ($transaction->status eq 'Completed') {
 		$transaction->cancelTransaction;
 	}
 
 	$var{message} = WebGUI::International::get('checkout canceled message', 'Commerce');
 	
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceCheckoutCanceledTemplateId})->process(\%var));
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceCheckoutCanceledTemplateId"))->process(\%var));
 }
 
 # This operation is here for easier future extensions to the commerce system.
 #-------------------------------------------------------------------
 sub www_checkout {
+	my $session = shift;
 	return WebGUI::Operation::execute('selectShippingMethod') unless (_shippingSelected);
 
 	return WebGUI::Operation::execute('selectPaymentGateway') unless (_paymentSelected);
@@ -113,14 +122,15 @@ sub www_checkout {
 
 #-------------------------------------------------------------------
 sub www_checkoutConfirm {
+	my $session = shift;
 	my ($plugin, $f, %var, $errors, $i18n, $shoppingCart, $normal, $recurring, $shipping, $total);
 	$errors = shift;
 	
 	$i18n = WebGUI::International->new('Commerce');
 	
 	# If the user isn't logged in yet, let him do so or have him create an account
-	if ($session{user}{userId} == 1) {
-		WebGUI::Session::setScratch('redirectAfterLogin', WebGUI::URL::page('op=checkout'));
+	if ($session->user->profileField("userId") == 1) {
+		WebGUI::Session::setScratch('redirectAfterLogin', $session->url->page('op=checkout'));
 		return WebGUI::Operation::execute('auth');
 	}
 	
@@ -180,18 +190,19 @@ sub www_checkoutConfirm {
 	$var{form} = $f->print;
 	$var{title} = $i18n->get('checkout confirm title');
 	
-	$var{'changePayment.url'} = WebGUI::URL::page('op=selectPaymentGateway');
+	$var{'changePayment.url'} = $session->url->page('op=selectPaymentGateway');
 	$var{'changePayment.label'} = $i18n->get('change payment gateway');
-	$var{'changeShipping.url'} = WebGUI::URL::page('op=selectShippingMethod');
+	$var{'changeShipping.url'} = $session->url->page('op=selectShippingMethod');
 	$var{'changeShipping.label'} = $i18n->get('change shipping method');
-	$var{'viewShoppingCart.url'} = WebGUI::URL::page('op=viewCart');
+	$var{'viewShoppingCart.url'} = $session->url->page('op=viewCart');
 	$var{'viewShoppingCart.label'} = $i18n->get('view shopping cart');
 
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceConfirmCheckoutTemplateId})->process(\%var));
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceConfirmCheckoutTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
 sub www_checkoutSubmit {
+	my $session = shift;
 	my ($plugin, $shoppingCart, $transaction, $var, $amount, @cartItems, $i18n, @transactions, 
 		@normal, $currentPurchase, $checkoutError, @resultLoop, %param, $normal, $recurring, 
 		$formError, $shipping, $shippingCost, $shippingDescription);
@@ -199,8 +210,8 @@ sub www_checkoutSubmit {
 	$i18n = WebGUI::International->new('Commerce');
 
 	# check if user has already logged in
-	if ($session{user}{userId} == 1) {
-		WebGUI::Session::setScratch('redirectAfterLogin', WebGUI::URL::page('op=checkout'));
+	if ($session->user->profileField("userId") == 1) {
+		WebGUI::Session::setScratch('redirectAfterLogin', $session->url->page('op=checkout'));
 		return WebGUI::Operation::execute('displayLogin');
 	}
 
@@ -218,7 +229,7 @@ sub www_checkoutSubmit {
 
 	# Check if shoppingcart contains any items. If not the user probably clicked reload, so we redirect to the current page.
 	unless (@$normal || @$recurring) {
-		WebGUI::HTTP::setRedirect(WebGUI::URL::page);
+		WebGUI::HTTP::setRedirect($session->url->page);
 		return '';
 	}
 
@@ -316,23 +327,25 @@ sub www_checkoutSubmit {
 	return WebGUI::Operation::execute('viewPurchaseHistory') unless ($checkoutError);
 
 	# If an error has occurred show the template errorlog
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceTransactionErrorTemplateId})->process(\%param));
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
 }
 
 #-------------------------------------------------------------------
 sub www_completePendingTransaction {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 
-	WebGUI::Commerce::Transaction->new($session{form}{tid})->completeTransaction;
+	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->completeTransaction;
 
 	return WebGUI::Operation::execute('listPendingTransactions');
 }
 
 #-------------------------------------------------------------------
 sub www_confirmRecurringTransaction {
+	my $session = shift;
 	my($plugin, %var);
 	
-	$plugin = WebGUI::Commerce::Payment->load($session{form}{gateway});
+	$plugin = WebGUI::Commerce::Payment->load($session->form->process("gateway"));
 	if ($plugin) {
 		$plugin->confirmRecurringTransaction;
 	}
@@ -340,8 +353,9 @@ sub www_confirmRecurringTransaction {
 
 #-------------------------------------------------------------------
 sub www_confirmTransaction {
+	my $session = shift;
 	my($plugin, %var);
-	$plugin = WebGUI::Commerce::Payment->load($session{form}{pg});
+	$plugin = WebGUI::Commerce::Payment->load($session->form->process("pg"));
 
 	if ($plugin->confirmTransaction) {
 		WebGUI::Commerce::Transaction->new($plugin->getTransactionId)->completeTransaction;
@@ -350,13 +364,15 @@ sub www_confirmTransaction {
 
 #-------------------------------------------------------------------
 sub www_deleteCartItem {
-	WebGUI::Commerce::ShoppingCart->new->delete($session{form}{itemId}, $session{form}{itemType});
+	my $session = shift;
+	WebGUI::Commerce::ShoppingCart->new->delete($session->form->process("itemId"), $session->form->process("itemType"));
 
 	return WebGUI::Operation::execute('viewCart');
 }
 
 #-------------------------------------------------------------------
 sub www_editCommerceSettings {
+	my $session = shift;
 	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
 		$paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin,
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
@@ -371,8 +387,8 @@ sub www_editCommerceSettings {
 		shipping=>{label=>$i18n->get('shipping tab')},
         );
 
-	$paymentPlugin = $session{config}{paymentPlugins}->[0];
-	$shippingPlugin = $session{config}{shippingPlugins}->[0];
+	$paymentPlugin = $session->config->get("paymentPlugins")->[0];
+	$shippingPlugin = $session->config->get("shippingPlugins")->[0];
 	
 	$tabform = WebGUI::TabForm->new(\%tabs);
 	$tabform->hidden({name => 'op', value => 'editCommerceSettingsSave'});
@@ -381,48 +397,48 @@ sub www_editCommerceSettings {
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceConfirmCheckoutTemplateId',
 		-label		=> $i18n->get('confirm checkout template'),
-		-value		=> $session{setting}{commerceConfirmCheckoutTemplateId},
+		-value		=> $session->setting->get("commerceConfirmCheckoutTemplateId"),
 		-namespace	=> 'Commerce/ConfirmCheckout'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceTransactionErrorTemplateId',
 		-label		=> $i18n->get('transaction error template'),
-		-value		=> $session{setting}{commerceTransactionPendingTemplateId},
+		-value		=> $session->setting->get("commerceTransactionPendingTemplateId"),
 		-namespace	=> 'Commerce/TransactionError'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceCheckoutCanceledTemplateId',
 		-label		=> $i18n->get('checkout canceled template'),
-		-value		=> $session{setting}{commerceCheckoutCanceledTemplateId},
+		-value		=> $session->setting->get("commerceCheckoutCanceledTemplateId"),
 		-namespace	=> 'Commerce/CheckoutCanceled'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceSelectPaymentGatewayTemplateId',
 		-label		=> $i18n->get('checkout select payment template'),
-		-value		=> $session{setting}{commerceSelectPaymentGatewayTemplateId},
+		-value		=> $session->setting->get("commerceSelectPaymentGatewayTemplateId"),
 		-namespace	=> 'Commerce/SelectPaymentGateway'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceSelectShippingMethodTemplateId',
 		-label		=> $i18n->get('checkout select shipping template'),
-		-value		=> $session{setting}{commerceSelectShippingMethodTemplateId},
+		-value		=> $session->setting->get("commerceSelectShippingMethodTemplateId"),
 		-namespace	=> 'Commerce/SelectShippingMethod'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceViewShoppingCartTemplateId',
 		-label		=> $i18n->get('view shopping cart template'),
-		-value		=> $session{setting}{commerceViewShoppingCartTemplateId},
+		-value		=> $session->setting->get("commerceViewShoppingCartTemplateId"),
 		-namespace	=> 'Commerce/ViewShoppingCart'
 		);
 
 	$tabform->getTab('general')->email(
 		-name		=> 'commerceSendDailyReportTo',
 		-label		=> $i18n->get('daily report email'),
-		-value		=> $session{setting}{commerceSendDailyReportTo}
+		-value		=> $session->setting->get("commerceSendDailyReportTo")
 		);
 
 	# Check which payment plugins will compile, and load them.
-	foreach (@{$session{config}{paymentPlugins}}) {
+	foreach (@{$session->config->get("paymentPlugins")}) {
 		$plugin = WebGUI::Commerce::Payment->load($_);
 		if ($plugin) {
 			push(@paymentPlugins, $plugin);
@@ -434,7 +450,7 @@ sub www_editCommerceSettings {
 		
 	# payment plugin
 	if (%paymentPlugins) {
-		WebGUI::Style::setRawHeadTags('<script type="text/javascript">var activePayment="'.$paymentPlugin.'";</script>');
+		$session->style->setRawHeadTags('<script type="text/javascript">var activePayment="'.$paymentPlugin.'";</script>');
 		$tabform->getTab("payment")->selectBox(
 			-name		=> 'commercePaymentPlugin',
 			-options	=> \%paymentPlugins,
@@ -460,7 +476,7 @@ sub www_editCommerceSettings {
 
 # Shipping plugins...
 	# Check which payment plugins will compile, and load them.
-	foreach (@{$session{config}{shippingPlugins}}) {
+	foreach (@{$session->config->get("shippingPlugins")}) {
 		$plugin = WebGUI::Commerce::Shipping->load($_);
 		if ($plugin) {
 			push(@shippingPlugins, $plugin);
@@ -472,7 +488,7 @@ sub www_editCommerceSettings {
 	
 	# shipping plugin
 	if (%shippingPlugins) {
-		WebGUI::Style::setRawHeadTags('<script type="text/javascript">var activeShipping="'.$shippingPlugin.'";</script>');
+		$session->style->setRawHeadTags('<script type="text/javascript">var activeShipping="'.$shippingPlugin.'";</script>');
 		$tabform->getTab('shipping')->selectBox(
 			-name	=> 'commerceShippingPlugin',
 			-options=> \%shippingPlugins,
@@ -493,13 +509,14 @@ sub www_editCommerceSettings {
 
 	$tabform->submit;
 
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/swapLayers.js',{type=>"text/javascript"});
+	$session->style->setScript($session->config->get("extrasURL").'/swapLayers.js',{type=>"text/javascript"});
 	
 	return _submenu($tabform->print, 'edit commerce settings title', 'commerce manage');
 }
 
 #-------------------------------------------------------------------
 sub www_editCommerceSettingsSave {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	foreach (keys(%{$session{form}})) {
@@ -522,17 +539,18 @@ sub www_editCommerceSettingsSave {
 
 #-------------------------------------------------------------------
 sub www_listPendingTransactions {
+	my $session = shift;
 	my ($p, $transactions, $output, $properties, $i18n);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	$i18n = WebGUI::International->new("Commerce");
 
-	$p = WebGUI::Paginator->new(WebGUI::URL::page('op=listPendingTransactions'));
+	$p = WebGUI::Paginator->new($session->url->page('op=listPendingTransactions'));
 	$p->setDataByArrayRef(WebGUI::Commerce::Transaction->pendingTransactions);
 	
 	$transactions = $p->getPageData;
 
-	$output = $p->getBarTraditional($session{form}{pn});
+	$output = $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr><th>'.$i18n->get('transactionId').'</th><th>'.$i18n->get('gateway').'</th>'.
 		'<th>'.$i18n->get('gatewayId').'</th><th>'.$i18n->get('init date').'</th></tr>';
@@ -543,17 +561,18 @@ sub www_listPendingTransactions {
 		$output .= '<td>'.$properties->{gatewayId}.'</td>';
 		$output .= '<td>'.$properties->{gateway}.'</td>';
 		$output .= '<td>'.WebGUI::DateTime::epochToHuman($properties->{initDate}).'</td>';
-		$output .= '<td><a href="'.WebGUI::URL::page('op=completePendingTransaction;tid='.$properties->{transactionId}).'">'.$i18n->get('complete pending transaction').'</a></td>';
+		$output .= '<td><a href="'.$session->url->page('op=completePendingTransaction;tid='.$properties->{transactionId}).'">'.$i18n->get('complete pending transaction').'</a></td>';
 		$output .= '</tr>';
 	}
 	$output .= '</table>';
-	$output .= $p->getBarTraditional($session{form}{pn});
+	$output .= $p->getBarTraditional($session->form->process("pn"));
 
 	_submenu($output, 'list pending transactions', 'list pending transactions');
 }
 
 #-------------------------------------------------------------------
 sub www_listTransactions {
+	my $session = shift;
 	my ($output, %criteria, $transaction, @transactions);
 
 	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
@@ -573,32 +592,32 @@ sub www_listTransactions {
 		'Delivered'	=> $i18n->get('delivered'),
 	};
 	
-	my $initStart = WebGUI::FormProcessor::date('initStart');
-	my $initStop  = WebGUI::DateTime::addToTime(WebGUI::FormProcessor::date('initStop'),23,59);
-	my $completionStart = WebGUI::FormProcessor::date('completionStart');
-	my $completionStop  = WebGUI::DateTime::addToTime(WebGUI::FormProcessor::date('completionStop'),23,59);
+	my $initStart = $session->form->date('initStart');
+	my $initStop  = WebGUI::DateTime::addToTime($session->form->date('initStop'),23,59);
+	my $completionStart = $session->form->date('completionStart');
+	my $completionStop  = WebGUI::DateTime::addToTime($session->form->date('completionStop'),23,59);
 
 	$output .= $i18n->get('selection message');
 	
 	$output .= WebGUI::Form::formHeader;
 	$output .= WebGUI::Form::hidden({name=>'op', value=>'listTransactions'});
 	$output .= '<table>';
-	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'init', checked=>($session{form}{selection} eq 'init')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'init', checked=>($session->form->process("selection") eq 'init')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('init date').'</td>';
 	$output .= '<td>'.WebGUI::Form::date({name=>'initStart', value=>$initStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'initStop', value=>$initStop}).'</td>';
 	$output .= '</tr><tr>';
-	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'completion', checked=>($session{form}{selection} eq 'completion')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'completion', checked=>($session->form->process("selection") eq 'completion')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('completion date').'</td>';
 	$output .= '<td>'.WebGUI::Form::date({name=>'completionStart', value=>$completionStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'completionStop', value=>$completionStop}).'</td>';
 	$output .= '</tr><tr>';
 	$output .= '<td></td>';
 	$output .= '<td align="left">'.$i18n->get('transaction status').'</td>';
-	$output .= '<td>'.WebGUI::Form::selectBox({name => 'tStatus', value => [$session{form}{tStatus}], options => $transactionOptions});
+	$output .= '<td>'.WebGUI::Form::selectBox({name => 'tStatus', value => [$session->form->process("tStatus")], options => $transactionOptions});
 	$output .= '</tr><tr>';
 	
 	$output .= '<td></td>';
 	$output .= '<td align="left">'.$i18n->get('shipping status').'</td>';
-	$output .= '<td>'.WebGUI::Form::selectBox({name => 'sStatus', value => [$session{form}{sStatus}], options => $shippingOptions});
+	$output .= '<td>'.WebGUI::Form::selectBox({name => 'sStatus', value => [$session->form->process("sStatus")], options => $shippingOptions});
 	$output .= '</tr><tr>';
 
 	$output .= '<td></td>';
@@ -607,12 +626,12 @@ sub www_listTransactions {
 	$output .= '</table>';
 	$output .= WebGUI::Form::formFooter;
 
-	$criteria{initStart} = WebGUI::FormProcessor::date('initStart') if ($session{form}{initStart} && ($session{form}{selection} eq 'init'));
-	$criteria{initStop} = WebGUI::FormProcessor::date('initStop') if ($session{form}{initStop} && ($session{form}{selection} eq 'init'));
-	$criteria{completionStart} = WebGUI::FormProcessor::date('completionStart') if ($session{form}{completionStart} && ($session{form}{selection} eq 'completion'));
-	$criteria{completionStop} = WebGUI::FormProcessor::date('completionStop') if ($session{form}{completionStop} && ($session{form}{selection} eq 'completion'));
-	$criteria{shippingStatus} = $session{form}{sStatus} if ($session{form}{sStatus});
-	$criteria{paymentStatus} = $session{form}{tStatus} if ($session{form}{tStatus});
+	$criteria{initStart} = $session->form->date('initStart') if ($session->form->process("initStart") && ($session->form->process("selection") eq 'init'));
+	$criteria{initStop} = $session->form->date('initStop') if ($session->form->process("initStop") && ($session->form->process("selection") eq 'init'));
+	$criteria{completionStart} = $session->form->date('completionStart') if ($session->form->process("completionStart") && ($session->form->process("selection") eq 'completion'));
+	$criteria{completionStop} = $session->form->date('completionStop') if ($session->form->process("completionStop") && ($session->form->process("selection") eq 'completion'));
+	$criteria{shippingStatus} = $session->form->process("sStatus") if ($session->form->process("sStatus"));
+	$criteria{paymentStatus} = $session->form->process("tStatus") if ($session->form->process("tStatus"));
 	
 	@transactions = WebGUI::Commerce::Transaction->getTransactions(\%criteria);
 
@@ -649,6 +668,7 @@ sub www_listTransactions {
 
 #-------------------------------------------------------------------
 sub www_selectPaymentGateway {
+	my $session = shift;
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
 
 	_clearPaymentScratch;
@@ -664,7 +684,7 @@ sub www_selectPaymentGateway {
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
-		$session{form}{paymentGateway} = $plugins->[0]->namespace;
+		$session->form->process("paymentGateway") = $plugins->[0]->namespace;
 		return WebGUI::Operation::execute('selectPaymentGatewaySave');
 	}
 	
@@ -676,13 +696,14 @@ sub www_selectPaymentGateway {
 	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('payment gateway select')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceSelectPaymentGatewayTemplateId})->process(\%var));
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectPaymentGatewayTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
 sub www_selectPaymentGatewaySave {
-	if (WebGUI::Commerce::Payment->load($session{form}{paymentGateway})->enabled) {
-		WebGUI::Session::setScratch('paymentGateway', $session{form}{paymentGateway});
+	my $session = shift;
+	if (WebGUI::Commerce::Payment->load($session->form->process("paymentGateway"))->enabled) {
+		WebGUI::Session::setScratch('paymentGateway', $session->form->process("paymentGateway"));
 	} else {
 		WebGUI::Session::setScratch('paymentGateway', '-delete-');
 	}
@@ -692,6 +713,7 @@ sub www_selectPaymentGatewaySave {
 
 #-------------------------------------------------------------------
 sub www_selectShippingMethod {
+	my $session = shift;
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
 
 	_clearShippingScratch;
@@ -708,7 +730,7 @@ sub www_selectShippingMethod {
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
-		$session{form}{shippingMethod} = $plugins->[0]->namespace;
+		$session->form->process("shippingMethod") = $plugins->[0]->namespace;
 		return WebGUI::Operation::execute("selectShippingMethodSave");
 	}
 	
@@ -720,12 +742,13 @@ sub www_selectShippingMethod {
 	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('shipping select button')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceSelectShippingMethodTemplateId})->process(\%var));
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectShippingMethodTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
 sub www_selectShippingMethodSave {
-	my $shipping = WebGUI::Commerce::Shipping->load($session{form}{shippingMethod});
+	my $session = shift;
+	my $shipping = WebGUI::Commerce::Shipping->load($session->form->process("shippingMethod"));
 	
 	$shipping->processOptionsForm;
 	return WebGUI::Operation::execute('selectShipping') unless ($shipping->optionsOk);
@@ -742,11 +765,13 @@ sub www_selectShippingMethodSave {
 
 #-------------------------------------------------------------------
 sub www_transactionComplete {
+	my $session = shift;
 	return WebGUI::Operation::execute('viewPurchaseHistory');	
 }
 
 #-------------------------------------------------------------------
 sub www_updateCart {
+	my $session = shift;
 my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 
 	foreach my $formElement (keys(%{$session{form}})) {
@@ -760,6 +785,7 @@ my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 
 #-------------------------------------------------------------------
 sub www_viewCart {
+	my $session = shift;
 	my ($shoppingCart, $normal, $recurring, %var, $total, $i18n);
 
 	$i18n = WebGUI::International->new('Commerce');
@@ -806,7 +832,7 @@ sub www_viewCart {
 	
 	$var{total} = sprintf('%.2f', $total);
 
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session{setting}{commerceViewShoppingCartTemplateId})->process(\%var));
+	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceViewShoppingCartTemplateId"))->process(\%var));
 }
 
 1;

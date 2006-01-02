@@ -30,7 +30,8 @@ The beginning of WebGUI.
 =cut
 
 sub www_genesis {
-	$session{page}{useEmptyStyle} = 1;
+	my $session = shift;
+	$session->style->useEmptyStyle("1")
 	my $output = '<html><head><title>About WebGUI</title>
 	<style>.big {font-size: 23px;}</style>
 	</head><body bgcolor="#ef4200" text="black" link="white" vlink="white">
@@ -56,7 +57,8 @@ password and email address, as well as some other WebGUI settings.
 
 #-------------------------------------------------------------------
 sub www_setup {
-	return "" unless ($session{setting}{specialState} eq "init");
+	my $session = shift;
+	return "" unless ($session->setting->get("specialState") eq "init");
 	my $i18n = WebGUI::International->new("WebGUI");
 	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -69,13 +71,13 @@ sub www_setup {
 		</style>
 	</head>
 	<body><div style="font-family: georgia, helvetica, arial, sans-serif; color: white; z-index: 10; width: 550px; height: 400px; top: 20%; left: 20%; position: absolute;"><h1>WebGUI Initial Configuration</h1><fieldset>';
-	if ($session{form}{step} eq "2") {
+	if ($session->form->process("step") eq "2") {
 		$output .= '<legend align="left">Company Information</legend>';
 		my $u = WebGUI::User->new("3");
-		$u->username(WebGUI::FormProcessor::process("username","text","Admin"));
-		$u->profileField("email",WebGUI::FormProcessor::email("email"));
-		$u->identifier(Digest::MD5::md5_base64(WebGUI::FormProcessor::process("identifier","password","123qwe")));
-		my $f = WebGUI::HTMLForm->new(action=>WebGUI::URL::gateway());
+		$u->username($session->form->process("username","text","Admin"));
+		$u->profileField("email",$session->form->email("email"));
+		$u->identifier(Digest::MD5::md5_base64($session->form->process("identifier","password","123qwe")));
+		my $f = WebGUI::HTMLForm->new(action=>$session->url->gateway());
 		$f->hidden(
 			-name=>"op",
 			-value=>"setup"
@@ -86,35 +88,35 @@ sub www_setup {
 			);
 		$f->text(
 			-name=>"companyName",
-			-value=>$session{setting}{companyName},
+			-value=>$session->setting->get("companyName"),
 			-label=>$i18n->get(125),
 			-hoverHelp=>$i18n->get('125 description'),
 			);
 		$f->email(
 			-name=>"companyEmail",
-			-value=>$session{setting}{companyEmail},
+			-value=>$session->setting->get("companyEmail"),
 			-label=>$i18n->get(126),
 			-hoverHelp=>$i18n->get('126 description'),
 			);
 		$f->url(
 			-name=>"companyURL",
-			-value=>$session{setting}{companyURL},
+			-value=>$session->setting->get("companyURL"),
 			-label=>$i18n->get(127),
 			-hoverHelp=>$i18n->get('127 description'),
 			);
 		$f->submit;
 		$output .= $f->print;
-	} elsif ($session{form}{step} eq "3") {
+	} elsif ($session->form->process("step") eq "3") {
 		WebGUI::Setting::remove('specialState');
-		WebGUI::Setting::set('companyName',WebGUI::FormProcessor::text("companyName"));
-		WebGUI::Setting::set('companyURL',WebGUI::FormProcessor::url("companyURL"));
-		WebGUI::Setting::set('companyEmail',WebGUI::FormProcessor::email("companyEmail"));
-		WebGUI::HTTP::setRedirect(WebGUI::URL::gateway());
+		WebGUI::Setting::set('companyName',$session->form->text("companyName"));
+		WebGUI::Setting::set('companyURL',$session->form->url("companyURL"));
+		WebGUI::Setting::set('companyEmail',$session->form->email("companyEmail"));
+		WebGUI::HTTP::setRedirect($session->url->gateway());
 		return "";
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
 		my $u = WebGUI::User->new('3');
-		my $f = WebGUI::HTMLForm->new(action=>WebGUI::URL::gateway());
+		my $f = WebGUI::HTMLForm->new(action=>$session->url->gateway());
 		$f->hidden(
 			-name=>"op",
 			-value=>"setup"
@@ -146,7 +148,7 @@ sub www_setup {
 		$output .= $f->print; 
 	}
 	$output .= '</fieldset></div>
-		<img src="'.$session{config}{extrasURL}.'/background.jpg" border="0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
+		<img src="'.$session->config->get("extrasURL").'/background.jpg" border="0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
 	</body>
 </html>';
 	return $output;
@@ -163,7 +165,8 @@ to work, even superseding the session variable.
 
 #-------------------------------------------------------------------
 sub www_theWg {
-	$session{page}{useEmptyStyle} = 1;
+	my $session = shift;
+	$session->style->useEmptyStyle("1")
 	my $output = '<html><head><title>WebGUI</title></head><body BGCOLOR="black"><center>
 <nobr><font SIZE="1" FACE="Courier New, Courier"><font COLOR="white"></font><font COLOR="#1A1108">p</font><font COLOR="#24130C">a</font><font COLOR="#5C2605">c</font><font COLOR="#642206">kageW</font><font COLOR="#5C1F04">e</font><font COLOR="#642206">bGUI;ou</font><font COLOR="#5C2605">r</font><font COLOR="#642206">$VERSION="5.5.0</font><font COLOR="#5C2605">"</font><font COLOR="#642206">;usestr</font><font COLOR="#5C1F04">i</font><font COLOR="#642206">ctqw(v</font><font COLOR="#68290C">a</font><font COLOR="#5C1F04">r</font><font COLOR="#5C2605">s</font><font COLOR="#642206">s</font><font COLOR="#541604">u</font><font COLOR="#481404">b</font><font COLOR="#380B04">s</font><font COLOR="#0B0204">);useTie::CPHash;useW
 
@@ -175,7 +178,7 @@ sub www_theWg {
 
 <br>s</font><font COLOR="#180204">e</font><font COLOR="#843619">W</font><font COLOR="#C45327">e</font><font COLOR="#E4460A">b</font><font COLOR="#F44304">G</font><font COLOR="#EC4404">U</font><font COLOR="#D44C14">I</font><font COLOR="#FCD4A6">:</font><font COLOR="#FCF5ED">:</font><font COLOR="#FCFDFA">URL;</font><font COLOR="#FCF5ED">u</font><font COLOR="#FCFDFA">seW</font><font COLOR="#FCF5ED">e</font><font COLOR="#FCFDFA">bGUI:</font><font COLOR="#FCF5ED">:</font><font COLOR="#FCFDFA">Utility;sub</font><font COLOR="#FCF5ED">_</font><font COLOR="#FCFDFA">gen</font><font COLOR="#FCF5ED">e</font><font COLOR="#FCFDFA">rateDe</font><font COLOR="#FCF5ED">bu</font><font COLOR="#FCFDFA">g{if(</font><font COLOR="#FCF5E2">$s</font><font COLOR="#FCD9CC">e</font><font COLOR="#DC9D83">s</font><font COLOR="#E49C7E">s</font><font COLOR="#C15B32">i</font><font COLOR="#CC4D14">o</font><font COLOR="#E14A0C">n</font><font COLOR="#EC4404">{s</font><font COLOR="#EC3E04">e</font><font COLOR="#E4460A">t</font><font COLOR="#D44309">t</font><font COLOR="#C04D1F">i</font><font COLOR="#771504">n</font><font COLOR="#380304">g</font><font COLOR="#280204">}</font><font COLOR="#180204">{</font><font COLOR="#0B0204">sho
 
-<br>w</font><font COLOR="#180204">D</font><font COLOR="#542110">e</font><font COLOR="#B45833">b</font><font COLOR="#DC4A14">u</font><font COLOR="#F44304">g</font><font COLOR="#EC4404">}</font><font COLOR="#DC4A14">|</font><font COLOR="#FCBEA2">|</font><font COLOR="#FCF5E2">(</font><font COLOR="#FCFDFA">$session{form}{debug}==1&&WebGUI::Privilege::isIn</font><font COLOR="#FCE5D9">G</font><font COLOR="#DA957C">r</font><font COLOR="#E49274">o</font><font COLOR="#CC5D30">u</font><font COLOR="#D44C14">p</font><font COLOR="#DC460A">(</font><font COLOR="#EC4404">3))</font><font COLOR="#E4460A">)</font><font COLOR="#B42604">{</font><font COLOR="#A72A04">r</font><font COLOR="#480204">e</font><font COLOR="#180204">t</font><font COLOR="#0B0204">ur
+<br>w</font><font COLOR="#180204">D</font><font COLOR="#542110">e</font><font COLOR="#B45833">b</font><font COLOR="#DC4A14">u</font><font COLOR="#F44304">g</font><font COLOR="#EC4404">}</font><font COLOR="#DC4A14">|</font><font COLOR="#FCBEA2">|</font><font COLOR="#FCF5E2">(</font><font COLOR="#FCFDFA">$session->form->process("debug")==1&&WebGUI::Privilege::isIn</font><font COLOR="#FCE5D9">G</font><font COLOR="#DA957C">r</font><font COLOR="#E49274">o</font><font COLOR="#CC5D30">u</font><font COLOR="#D44C14">p</font><font COLOR="#DC460A">(</font><font COLOR="#EC4404">3))</font><font COLOR="#E4460A">)</font><font COLOR="#B42604">{</font><font COLOR="#A72A04">r</font><font COLOR="#480204">e</font><font COLOR="#180204">t</font><font COLOR="#0B0204">ur
 
 <br>nW</font><font COLOR="#290E07">e</font><font COLOR="#A45E43">b</font><font COLOR="#D44C14">G</font><font COLOR="#F44304">UI</font><font COLOR="#E4460A">:</font><font COLOR="#FC9367">:</font><font COLOR="#FCECD6">E</font><font COLOR="#FCF5ED">r</font><font COLOR="#FCFDFA">r</font><font COLOR="#FCF5ED">o</font><font COLOR="#FAECE6">r</font><font COLOR="#D4764F">H</font><font COLOR="#FC9C75">a</font><font COLOR="#F49E7C">n</font><font COLOR="#FCF5E2">d</font><font COLOR="#FCFDFA">ler</font><font COLOR="#FCF5ED">::</font><font COLOR="#A49A9C">s</font><font COLOR="#FCF5ED">ho</font><font COLOR="#FCFDFA">wDebug</font><font COLOR="#C98367">(</font><font COLOR="#FCE4B7">)</font><font COLOR="#FAECE6">;</font><font COLOR="#FCFDFA">}ret</font><font COLOR="#F4F3F4">u</font><font COLOR="#FAECE6">r</font><font COLOR="#DCB6AC">n</font><font COLOR="#DA957C">"</font><font COLOR="#EF9574">"</font><font COLOR="#D46D41">;}</font><font COLOR="#D46434">s</font><font COLOR="#D45D2C">ub_</font><font COLOR="#D46434">g</font><font COLOR="#F07D4F">e</font><font COLOR="#E47A51">n</font><font COLOR="#F4A68A">e</font><font COLOR="#FCD4B9">r</font><font COLOR="#F4DAD3">a</font><font COLOR="#FCFDFA">tePag</font><font COLOR="#FCF5ED">e{</font><font COLOR="#FCECD6">my</font><font COLOR="#DA8663">(</font><font COLOR="#DC4A14">$</font><font COLOR="#F44304">c</font><font COLOR="#EC4404">anE</font><font COLOR="#DC4A14">d</font><font COLOR="#CC440E">i</font><font COLOR="#AC4C28">t</font><font COLOR="#481404">,
 

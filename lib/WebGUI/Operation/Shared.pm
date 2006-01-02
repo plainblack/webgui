@@ -25,46 +25,47 @@ our @EXPORT = qw(&menuWrapper);
 
 #-------------------------------------------------------------------
  sub accountOptions {
+	my $session = shift;
 	my @array;
 	if (WebGUI::Grouping::isInGroup(12)) {
 		my %hash;
-		if ($session{var}{adminOn}) {
-			$hash{'options.display'} .= '<a href="'.WebGUI::URL::page('op=switchOffAdmin').'">'.WebGUI::International::get(12).'</a>';
+		if ($session->var->get("adminOn")) {
+			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOffAdmin').'">'.WebGUI::International::get(12).'</a>';
 		} else {
-			$hash{'options.display'} .= '<a href="'.WebGUI::URL::page('op=switchOnAdmin').'">'.WebGUI::International::get(63).'</a>';
+			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOnAdmin').'">'.WebGUI::International::get(63).'</a>';
 		}
 	    push(@array,\%hash);
 	}
-	unless ($session{form}{op} eq "displayAccount"){
+	unless ($session->form->process("op") eq "displayAccount"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=auth;method=init').'">'.WebGUI::International::get(342).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=init').'">'.WebGUI::International::get(342).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session{form}{op} eq "editProfile"){
+	unless ($session->form->process("op") eq "editProfile"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=editProfile').'">'.WebGUI::International::get(341).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=editProfile').'">'.WebGUI::International::get(341).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session{form}{op} eq "viewProfile"){
+	unless ($session->form->process("op") eq "viewProfile"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewProfile;uid='.$session{user}{userId}).'">'.WebGUI::International::get(343).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->profileField("userId")).'">'.WebGUI::International::get(343).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session{form}{op} eq "viewMessageLog"){
+	unless ($session->form->process("op") eq "viewMessageLog"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session{form}{op} eq "redeemSubscriptionCode") {
-		push(@array, {'options.display' => '<a href="'.WebGUI::URL::page('op=redeemSubscriptionCode').'">'.WebGUI::International::get('redeem code', 'Subscription').'</a>'});
+	unless ($session->form->process("op") eq "redeemSubscriptionCode") {
+		push(@array, {'options.display' => '<a href="'.$session->url->page('op=redeemSubscriptionCode').'">'.WebGUI::International::get('redeem code', 'Subscription').'</a>'});
 	}
 		
 	my %logout;
-	$logout{'options.display'} = '<a href="'.WebGUI::URL::page('op=auth;method=logout').'">'.WebGUI::International::get(64).'</a>'; 
+	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.WebGUI::International::get(64).'</a>'; 
 	push(@array,\%logout);
-	if ($session{setting}{selfDeactivation} && !WebGUI::Grouping::isInGroup(3)){
+	if ($session->setting->get("selfDeactivation") && !WebGUI::Grouping::isInGroup(3)){
 	   my %hash;
-	   $hash{'options.display'} = '<a href="'.WebGUI::URL::page('op=auth;method=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
+	   $hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
 	   push(@array,\%hash);
 	}
 	return \@array;
@@ -72,6 +73,7 @@ our @EXPORT = qw(&menuWrapper);
 
 #-------------------------------------------------------------------
 sub menuWrapper {
+	my $session = shift;
         my ($output, $key);
 	$session{page}{useAdminStyle} = 1;
         $output = '<table width="100%" border="0" cellpadding="5" cellspacing="0">
@@ -81,16 +83,17 @@ sub menuWrapper {
 	foreach $key (keys %{$_[1]}) {
         	$output .= '<li><a href="'.$key.'">'.$_[1]->{$key}.'</a></li>';
 	}
-        $output .= '<li><a href="'.WebGUI::URL::page().'">'.WebGUI::International::get(493).'</a></li>';
+        $output .= '<li><a href="'.$session->url->page().'">'.WebGUI::International::get(493).'</a></li>';
         $output .= '</td></tr></table>';
         return $output;
 }
 
 #-------------------------------------------------------------------
 sub userStyle {
+	my $session = shift;
 	my $output = shift;
 	if ($output) {
-		return WebGUI::Style::process($output,$session{setting}{userFunctionStyleId});
+		return $session->style->process($output,$session->setting->get("userFunctionStyleId"));
 	} else {
 		return undef;
 	}
@@ -99,6 +102,7 @@ sub userStyle {
 #-------------------------------------------------------------------
 # This function is here to replace the dangerous eval calls in the User Profile System.
 sub secureEval {
+	my $session = shift;
 	my $code = shift;
 
 	# Handle WebGUI function calls

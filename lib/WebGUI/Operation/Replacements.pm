@@ -22,6 +22,7 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _submenu {
+	my $session = shift;
         my $workarea = shift;
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
@@ -30,23 +31,25 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->addSubmenuItem(WebGUI::URL::page("op=editReplacement;replacementId=new"), WebGUI::International::get(1047));
-        $ac->addSubmenuItem(WebGUI::URL::page("op=listReplacements"), WebGUI::International::get("content filters"));
+        $ac->addSubmenuItem($session->url->page("op=editReplacement;replacementId=new"), WebGUI::International::get(1047));
+        $ac->addSubmenuItem($session->url->page("op=listReplacements"), WebGUI::International::get("content filters"));
         return $ac->render($workarea, $title);
 }
 
 
 #-------------------------------------------------------------------
 sub www_deleteReplacement {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::SQL->write("delete from replacements where replacementId=".quote($session{form}{replacementId}));
+	$session->db->write("delete from replacements where replacementId=".$session->db->quote($session->form->process("replacementId")));
 	return www_listReplacements();
 }
 
 #-------------------------------------------------------------------
 sub www_editReplacement {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my $data = WebGUI::SQL->getRow("replacements","replacementId",$session{form}{replacementId});
+	my $data = $session->db->getRow("replacements","replacementId",$session->form->process("replacementId"));
 	my $f = WebGUI::HTMLForm->new;
 	$f->hidden(
 		-name=>"op",
@@ -54,11 +57,11 @@ sub www_editReplacement {
 		);
 	$f->hidden(
 		-name=>"replacementId",
-		-value=>$session{form}{replacementId}
+		-value=>$session->form->process("replacementId")
 		);
 	$f->readOnly(
 		-label=>WebGUI::International::get(1049),
-		-value=>$session{form}{replacementId}
+		-value=>$session->form->process("replacementId")
 		);
 	$f->text(
 		-name=>"searchFor",
@@ -78,21 +81,23 @@ sub www_editReplacement {
 
 #-------------------------------------------------------------------
 sub www_editReplacementSave {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	WebGUI::SQL->setRow("replacements","replacementId",{
-		replacementId=>$session{form}{replacementId},
-		searchFor=>$session{form}{searchFor},
-		replaceWith=>$session{form}{replaceWith}
+	$session->db->setRow("replacements","replacementId",{
+		replacementId=>$session->form->process("replacementId"),
+		searchFor=>$session->form->process("searchFor"),
+		replaceWith=>$session->form->process("replaceWith")
 		});
 	return www_listReplacements();
 }
 
 #-------------------------------------------------------------------
 sub www_listReplacements {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $output = '<table>';
 	$output .= '<tr><td></td><td class="tableHeader">'.WebGUI::International::get(1050).'</td><td class="tableHeader">'.WebGUI::International::get(1051).'</td></tr>';
-	my $sth = WebGUI::SQL->read("select replacementId,searchFor,replaceWith from replacements order by searchFor");
+	my $sth = $session->db->read("select replacementId,searchFor,replaceWith from replacements order by searchFor");
 	while (my $data = $sth->hashRef) {
 		$output .= '<tr><td>'.deleteIcon("op=deleteReplacement;replacementId=".$data->{replacementId})
 			.editIcon("op=editReplacement;replacementId=".$data->{replacementId}).'</td>';

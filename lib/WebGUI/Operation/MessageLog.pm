@@ -44,6 +44,7 @@ returns a hashref with internationalized values for message status.
 =cut
 
 sub _status {
+	my $session = shift;
    return {"notice"=>WebGUI::International::get(551),"pending"=>WebGUI::International::get(552),"completed"=>WebGUI::International::get(350)};
 }
 
@@ -56,11 +57,12 @@ Templated display all messages for the current user.
 =cut
 
 sub www_viewMessageLog {
+	my $session = shift;
    my (@msg, $vars);
-   return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
+   return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session->user->profileField("userId")));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
-   my $p = WebGUI::Paginator->new(WebGUI::URL::page('op=viewMessageLog'));
-   my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=".quote($session{user}{userId})." order by dateOfEntry desc";
+   my $p = WebGUI::Paginator->new($session->url->page('op=viewMessageLog'));
+   my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=".$session->db->quote($session->user->profileField("userId"))." order by dateOfEntry desc";
    $p->setDataByQuery($query);
    
    $vars->{'message.subject.label'} = WebGUI::International::get(351);
@@ -70,9 +72,9 @@ sub www_viewMessageLog {
    my $messages = $p->getPageData;
    foreach my $message (@$messages) {   
       my $hash;
-      $hash->{'message.subject'} =  '<a href="'.WebGUI::URL::page('op=viewMessageLogMessage;mlog='.$message->{messageLogId}).'">'.$message->{subject}.'</a>';
+      $hash->{'message.subject'} =  '<a href="'.$session->url->page('op=viewMessageLogMessage;mlog='.$message->{messageLogId}).'">'.$message->{subject}.'</a>';
       my $status = _status->{$message->{status}};
-      $status = '<a href="'.WebGUI::URL::append($message->{url},'mlog='.$message->{messageLogId}).'">'.$status.'</a>' if ($message->{url} ne "");
+      $status = '<a href="'.$session->url->append($message->{url},'mlog='.$message->{messageLogId}).'">'.$status.'</a>' if ($message->{url} ne "");
       $hash->{'message.status'} = $status;
 	  $hash->{'message.dateOfEntry'} = epochToHuman($message->{dateOfEntry});
 	  push(@msg,$hash);
@@ -100,19 +102,20 @@ Templated display of a single message for the user.
 =cut
 
 sub www_viewMessageLogMessage {
+	my $session = shift;
    my ($data, $vars);
-   return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session{user}{userId}));
+   return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(2,$session->user->profileField("userId")));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
    
-   $data = WebGUI::SQL->quickHashRef("select * from messageLog where messageLogId=".quote($session{form}{mlog})." and userId=".quote($session{user}{userId}));
+   $data = $session->db->quickHashRef("select * from messageLog where messageLogId=".$session->db->quote($session->form->process("mlog"))." and userId=".$session->db->quote($session->user->profileField("userId")));
    
    $vars->{'message.subject'} = $data->{subject};
    $vars->{'message.dateOfEntry'} = epochToHuman($data->{dateOfEntry});
    
    my $status = _status->{$data->{status}}; 
    if ($data->{url} ne "" && $data->{status} eq 'pending'){
-      $status = '<a href="'.WebGUI::URL::append($data->{url},'mlog='.$data->{messageLogId}).'">'.$status.'</a>';
-      $vars->{'message.takeAction'} = '<a href="'.WebGUI::URL::append($data->{url},'mlog='.$data->{messageLogId}).'">'.WebGUI::International::get(554).'</a>'
+      $status = '<a href="'.$session->url->append($data->{url},'mlog='.$data->{messageLogId}).'">'.$status.'</a>';
+      $vars->{'message.takeAction'} = '<a href="'.$session->url->append($data->{url},'mlog='.$data->{messageLogId}).'">'.WebGUI::International::get(554).'</a>'
    }
    $vars->{'message.status'} = $status;
    

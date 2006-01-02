@@ -18,28 +18,29 @@ use WebGUI::Style;
 
 #-------------------------------------------------------------------
 sub www_formAssetTree {
+	my $session = shift;
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
-		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree;classLimiter=".$session{form}{classLimiter}.";formId="
-                        .$session{form}{formId}).'">'.$ancestor->get("menuTitle").'</a>');
+		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree;classLimiter=".$session->form->process("classLimiter").";formId="
+                        .$session->form->process("formId")).'">'.$ancestor->get("menuTitle").'</a>');
 	}	
 	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
-		if ($child->get("className") =~ /^$session{form}{classLimiter}/) {
-			$output .= '<a href="#" onclick="window.opener.document.getElementById(\''.$session{form}{formId}
+		if ($child->get("className") =~ /^$session->form->process("classLimiter")/) {
+			$output .= '<a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId")
 				.'\').value=\''.$child->getId.'\';window.opener.document.getElementById(\''.
-				$session{form}{formId}.'_display\').value=\''.$child->get("title").'\';window.close();">(&bull;)</a> ';
+				$session->form->process("formId").'_display\').value=\''.$child->get("title").'\';window.close();">(&bull;)</a> ';
 		} else {
 			$output .= "(&bull;) ";
 		}
-		$output .= '<a href="'.$child->getUrl("op=formAssetTree;classLimiter=".$session{form}{classLimiter}.";formId="
-			.$session{form}{formId}).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+		$output .= '<a href="'.$child->getUrl("op=formAssetTree;classLimiter=".$session->form->process("classLimiter").";formId="
+			.$session->form->process("formId")).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$session{page}{useEmptyStyle} = 1;
+	$session->style->useEmptyStyle("1")
 	return $output;
 }
 
@@ -47,6 +48,7 @@ sub www_formAssetTree {
 #-------------------------------------------------------------------
 
 sub www_richEditPageTree {
+	my $session = shift;
 	my $f = WebGUI::HTMLForm->new(-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
 		-name=>"url",
@@ -64,7 +66,7 @@ sub www_richEditPageTree {
 		-value=>WebGUI::International::get('done'),
 		-extras=>'onclick="createLink()"'
 		);
-	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
+	$session->style->setScript($session->config->get("extrasURL")."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
 	my $output = '<fieldset><legend>Insert A Link</legend>
 		<fieldset><legend>Link Settings</legend>'.$f->print.'</fieldset>
 	<script type="text/javascript">
@@ -91,7 +93,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 		next unless $child->canView;
 		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$session{page}{useEmptyStyle} = 1;
+	$session->style->useEmptyStyle("1")
 	return $output.'</fieldset></fieldset>';
 }
 
@@ -99,6 +101,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 
 #-------------------------------------------------------------------
 sub www_richEditImageTree {
+	my $session = shift;
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
@@ -116,15 +119,16 @@ sub www_richEditImageTree {
 		}
 		$output .= '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$session{page}{useEmptyStyle} = 1;
+	$session->style->useEmptyStyle("1")
 	return $output;
 }
 
 
 #-------------------------------------------------------------------
 sub www_richEditViewThumbnail {
+	my $session = shift;
 	my $image = WebGUI::Asset->newByUrl;
-	$session{page}{useEmptyStyle} = 1;
+	$session->style->useEmptyStyle("1")
 	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {
 		my $output = '<div align="center">';
 		$output .= '<img src="'.$image->getThumbnailUrl.'" border="0" alt="Preview">';
@@ -141,7 +145,7 @@ sub www_richEditViewThumbnail {
     		    </script>\n";
 		return $output;
 	}
-	return '<div align="center"><img src="'.$session{config}{extrasURL}.'/tinymce/images/icon.gif" border="0" alt="Image Manager"></div>';
+	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce/images/icon.gif" border="0" alt="Image Manager"></div>';
 }
 
 

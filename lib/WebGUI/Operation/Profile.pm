@@ -32,6 +32,7 @@ use WebGUI::Operation::Shared;
 #-------------------------------------------------------------------
 # Builds Extra form requirements for anonymous registration. 
 sub getRequiredProfileFields {
+	my $session = shift;
 	my @array;
 	foreach my $field (@{WebGUI::ProfileField->getRequiredFields}) {
 		push(@array, {
@@ -55,13 +56,15 @@ sub getRequiredProfileFields {
 =cut
 
 sub isDuplicateEmail {
+	my $session = shift;
 	my $email = shift;
-	my ($otherEmail) = WebGUI::SQL->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".quote($email)." and userId <> ".quote($session{user}{userId}));
+	my ($otherEmail) = $session->db->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".$session->db->quote($email)." and userId <> ".$session->db->quote($session->user->profileField("userId")));
 	return ($otherEmail > 0);
 }
 
 #-------------------------------------------------------------------
 sub saveProfileFields {
+	my $session = shift;
    my $u = shift;
    my $profile = shift;
    
@@ -72,6 +75,7 @@ sub saveProfileFields {
 
 #-------------------------------------------------------------------
 sub validateProfileData {
+	my $session = shift;
 	my %data = ();
 	my $error = "";
 	my $warning = "";
@@ -93,7 +97,8 @@ sub validateProfileData {
 
 #-------------------------------------------------------------------
 sub www_editProfile {
-	return WebGUI::Operation::Auth::www_auth("init") if($session{user}{userId} eq '1');
+	my $session = shift;
+	return WebGUI::Operation::Auth::www_auth("init") if($session->user->profileField("userId") eq '1');
 	my $vars = {};
 	$vars->{displayTitle} .= '<h1>'.WebGUI::International::get(338).'</h1>';
 	$vars->{'profile.message'} = $_[0] if($_[0]);
@@ -101,7 +106,7 @@ sub www_editProfile {
 	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter();
 
 	$vars->{'profile.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"editProfileSave"});
-	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session{user}{userId}});
+	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session->user->profileField("userId")});
 	my @array = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
 		next unless $category->isEditable;
@@ -128,15 +133,16 @@ sub www_editProfile {
 
 #-------------------------------------------------------------------
 sub www_editProfileSave {
+	my $session = shift;
 	my ($profile, $fieldName, $error, $u, $warning);
-	return WebGUI::Operation::Auth::www_auth("init") if ($session{user}{userId} eq '1');
+	return WebGUI::Operation::Auth::www_auth("init") if ($session->user->profileField("userId") eq '1');
 	
 	($profile, $error, $warning) = validateProfileData();
 	$error .= $warning;
     
 	return www_editProfile('<ul>'.$error.'</ul>') if($error ne "");
     
-	$u = WebGUI::User->new($session{user}{userId});
+	$u = WebGUI::User->new($session->user->profileField("userId"));
 	foreach $fieldName (keys %{$profile}) {
 		$u->profileField($fieldName,$profile->{$fieldName});
 	}
@@ -146,13 +152,14 @@ sub www_editProfileSave {
 
 #-------------------------------------------------------------------
 sub www_viewProfile {
-	my $u = WebGUI::User->new($session{form}{uid});
+	my $session = shift;
+	my $u = WebGUI::User->new($session->form->process("uid"));
 	my $vars = {};
 	$vars->{displayTitle} = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
 
 	return WebGUI::Privilege::notMember() if($u->username eq "");
 
-	return WebGUI::Operation::Shared::userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session{user}{userId} ne $session{form}{uid} || WebGUI::Grouping::isInGroup(3)));
+	return WebGUI::Operation::Shared::userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || WebGUI::Grouping::isInGroup(3)));
 	return WebGUI::Privilege::insufficient() if(!WebGUI::Grouping::isInGroup(2));
 
 	my @array = ();
@@ -169,7 +176,7 @@ sub www_viewProfile {
 		}
 	}
 	$vars->{'profile.elements'} = \@array;
-	if ($session{user}{userId} eq $session{form}{uid}) {
+	if ($session->user->profileField("userId") eq $session->form->process("uid")) {
 		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
 	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars));

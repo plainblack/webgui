@@ -64,6 +64,7 @@ Help topic.  If set, then a Help icon will be displayed as a link to that topic.
 =cut
 
 sub _submenu {
+	my $session = shift;
         my $workarea = shift;
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
@@ -73,19 +74,19 @@ sub _submenu {
                 $ac->setHelp($help);
         }
 	if (WebGUI::Grouping::isInGroup(11)) {
-		$ac->addSubmenuItem(WebGUI::URL::page("op=editUser;uid=new"), WebGUI::International::get(169));
+		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), WebGUI::International::get(169));
 	}
 	if (WebGUI::Grouping::isInGroup(3)) {
-		unless ($session{form}{op} eq "listUsers" 
-			|| $session{form}{op} eq "deleteUserConfirm") {
-			$ac->addSubmenuItem(WebGUI::URL::page("op=editUser;uid=".$session{form}{uid}), WebGUI::International::get(457));
-			$ac->addSubmenuItem(WebGUI::URL::page('op=becomeUser;uid='.$session{form}{uid}), WebGUI::International::get(751));
-			$ac->addSubmenuItem(WebGUI::URL::page('op=deleteUser;uid='.$session{form}{uid}), WebGUI::International::get(750));
-			if ($session{setting}{useKarma}) {
-				$ac->addSubmenuItem(WebGUI::URL::page("op=editUserKarma;uid=".$session{form}{uid}), WebGUI::International::get(555));
+		unless ($session->form->process("op") eq "listUsers" 
+			|| $session->form->process("op") eq "deleteUserConfirm") {
+			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->form->process("uid")), WebGUI::International::get(457));
+			$ac->addSubmenuItem($session->url->page('op=becomeUser;uid='.$session->form->process("uid")), WebGUI::International::get(751));
+			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$session->form->process("uid")), WebGUI::International::get(750));
+			if ($session->setting->get("useKarma")) {
+				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=".$session->form->process("uid")), WebGUI::International::get(555));
 			}
 		}
-		$ac->addSubmenuItem(WebGUI::URL::page("op=listUsers"), WebGUI::International::get(456));
+		$ac->addSubmenuItem($session->url->page("op=listUsers"), WebGUI::International::get(456));
 	}
         return $ac->render($workarea, $title);
 }
@@ -111,6 +112,7 @@ Array reference, used to screen out user names via a SQL "not in ()" clause.
 
 #-------------------------------------------------------------------
 sub doUserSearch {
+	my $session = shift;
 	my $op = shift;
 	my $returnPaginator = shift;
 	my $userFilter = shift;
@@ -129,19 +131,19 @@ sub doUserSearch {
 	} else {
 		$keyword = "%".$keyword;
 	}
-	$keyword = quote($keyword);
+	$keyword = $session->db->quote($keyword);
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
                 email.fieldData as email from users 
                 left join userProfileData email on users.userId=email.userId and email.fieldName='email'
                 left join userProfileData useralias on users.userId=useralias.userId and useralias.fieldName='alias'
                 where $selectedStatus  and (users.username like ".$keyword." or useralias.fieldData like ".$keyword." or email.fieldData like ".$keyword.") 
-                and users.userId not in (".quoteAndJoin($userFilter).")  order by users.username";
+                and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
-        	my $p = WebGUI::Paginator->new(WebGUI::URL::page("op=".$op));
+        	my $p = WebGUI::Paginator->new($session->url->page("op=".$op));
 		$p->setDataByQuery($sql);
 		return $p;
 	} else {
-		my $sth = WebGUI::SQL->read($sql);
+		my $sth = $session->db->read($sql);
 		return $sth;
 	}
 }
@@ -162,11 +164,12 @@ Hashref.  A set of key,value pairs that will be hidden in the user search form.
 
 #-------------------------------------------------------------------
 sub getUserSearchForm {
+	my $session = shift;
 	my $op = shift;
 	my $params = shift;
-	WebGUI::Session::setScratch("userSearchKeyword",$session{form}{keyword});
-	WebGUI::Session::setScratch("userSearchStatus",$session{form}{status});
-	WebGUI::Session::setScratch("userSearchModifier",$session{form}{modifier});
+	WebGUI::Session::setScratch("userSearchKeyword",$session->form->process("keyword"));
+	WebGUI::Session::setScratch("userSearchStatus",$session->form->process("status"));
+	WebGUI::Session::setScratch("userSearchModifier",$session->form->process("modifier"));
 	my $output = '<div align="center">'
 		.WebGUI::Form::formHeader()
 		.WebGUI::Form::hidden(
@@ -223,8 +226,9 @@ Allows an administrator to assume another user.
 =cut
 
 sub www_becomeUser {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	$session->user({userId=>$session{form}{uid}});
+	$session->user({userId=>$session->form->process("uid")});
 	return "";
 }
 
@@ -240,15 +244,16 @@ of the user to delete is expected in a URL param names 'uid'.
 =cut
 
 sub www_deleteUser {
+	my $session = shift;
         my ($output);
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-        if ($session{form}{uid} eq '1' || $session{form}{uid} eq '3') {
+        if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 		return _submenu(WebGUI::Privilege::vitalComponent());
         } else {
                 $output .= WebGUI::International::get(167).'<p>';
-                $output .= '<div align="center"><a href="'.WebGUI::URL::page('op=deleteUserConfirm;uid='.$session{form}{uid}).
+                $output .= '<div align="center"><a href="'.$session->url->page('op=deleteUserConfirm;uid='.$session->form->process("uid")).
 			'">'.WebGUI::International::get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.WebGUI::URL::page('op=listUsers').'">'.
+                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listUsers').'">'.
 			WebGUI::International::get(45).'</a></div>'; 
 		return _submenu($output,'42',"user delete");
         }
@@ -265,12 +270,13 @@ after this.
 =cut
 
 sub www_deleteUserConfirm {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
-        if ($session{form}{uid} eq '1' || $session{form}{uid} eq '3') {
+        if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 	   return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::vitalComponent());
     } else {
-	   $u = WebGUI::User->new($session{form}{uid});
+	   $u = WebGUI::User->new($session->form->process("uid"));
 	   $u->delete;
        return www_listUsers();
     }
@@ -278,6 +284,7 @@ sub www_deleteUserConfirm {
 
 #-------------------------------------------------------------------
 sub www_editUser {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(11));
 	my $error = shift;
 	my $i18n = WebGUI::International->new("WebGUI");
@@ -289,20 +296,20 @@ sub www_editUser {
 		"groups"=> { label=>$i18n->get('89')},
 		);
 	my $tabform = WebGUI::TabForm->new(\%tabs);
-	my $u = WebGUI::User->new(($session{form}{uid} eq 'new') ? '' : $session{form}{uid});
-	WebGUI::Style::setScript($session{config}{extrasURL}."/swapLayers.js", {type=>"text/javascript"});
-	WebGUI::Style::setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
+	my $u = WebGUI::User->new(($session->form->process("uid") eq 'new') ? '' : $session->form->process("uid"));
+	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
+	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
-    	$tabform->hidden({name=>"uid",value=>$session{form}{uid}});
+    	$tabform->hidden({name=>"uid",value=>$session->form->process("uid")});
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
-	$tabform->getTab("account")->readOnly(value=>$session{form}{uid},label=>$i18n->get(378));
-    	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session{setting}{useKarma});
+	$tabform->getTab("account")->readOnly(value=>$session->form->process("uid"),label=>$i18n->get(378));
+    	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
     	$tabform->getTab("account")->readOnly(value=>epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
     	$tabform->getTab("account")->readOnly(value=>epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
     	$tabform->getTab("account")->text(
 		-name=>"username",
 		-label=>$i18n->get(50),
-		-value=>$session{form}{username}|| $u->username
+		-value=>$session->form->process("username")|| $u->username
 		);
 	my %status;
 	tie %status, 'Tie::IxHash';
@@ -311,7 +318,7 @@ sub www_editUser {
 		Deactivated	=>$i18n->get(818),
 		Selfdestructed	=>$i18n->get(819)
 		);
-	if ($u->userId eq $session{user}{userId}) {
+	if ($u->userId eq $session->user->profileField("userId")) {
 		$tabform->getTab("account")->hidden(
 			-name => "status",
 			-value => $u->status
@@ -325,7 +332,7 @@ sub www_editUser {
 			);
 	}
 	my $options;
-	foreach (@{$session{config}{authMethods}}) {
+	foreach (@{$session->config->get("authMethods")}) {
 		$options->{$_} = $_;
 	}
 	$tabform->getTab("account")->selectBox(
@@ -335,7 +342,7 @@ sub www_editUser {
 		-value=>$u->authMethod,
 		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
-	foreach (@{$session{config}{authMethods}}) {
+	foreach (@{$session->config->get("authMethods")}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
 		my $style = '" style="display: none;' unless ($_ eq $u->authMethod);
 		$tabform->getTab("account")->raw('<tr id="'.$_.$style.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
@@ -348,8 +355,8 @@ sub www_editUser {
 			$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
 		}
 	}
-	my @groupsToAdd = WebGUI::FormProcessor::group("groupsToAdd");
-	my @exclude = WebGUI::SQL->buildArray("select groupId from groupings where userId=".quote($u->userId));
+	my @groupsToAdd = $session->form->group("groupsToAdd");
+	my @exclude = $session->db->buildArray("select groupId from groupings where userId=".$session->db->quote($u->userId));
 	@exclude = (@exclude,"1","2","7");
 	$tabform->getTab("groups")->group(
 		-name=>"groupsToAdd",
@@ -363,18 +370,18 @@ sub www_editUser {
 	foreach my $group (@exclude) {
 		unless (
 			$group eq "1" || $group eq "2" || $group eq "7" # can't remove user from magic groups 
-			|| ($session{user}{userId} eq $u->userId  && $group eq 3) # cannot remove self from admin
+			|| ($session->user->profileField("userId") eq $u->userId  && $group eq 3) # cannot remove self from admin
 			|| ($u->userId eq "3" && $group eq "3") # admin user cannot be remove from admin
 			) {
 			push(@include,$group);
 		}
 	}
 	push (@include, "0");
-	my @groupsToDelete = WebGUI::FormProcessor::group("groupsToDelete");
+	my @groupsToDelete = $session->form->group("groupsToDelete");
 	$tabform->getTab("groups")->selectList(
 		-name=>"groupsToDelete",
-		-options=>WebGUI::SQL->buildHashRef("select groupId, groupName from groups 
-			where groupId in (".quoteAndJoin(\@include).") and showInForms=1 order by groupName"),
+		-options=>$session->db->buildHashRef("select groupId, groupName from groups 
+			where groupId in (".$session->db->quoteAndJoin(\@include).") and showInForms=1 order by groupName"),
 		-label=>$i18n->get("groups to delete"),
 		-multiple=>1,
 		-size=>15,
@@ -384,22 +391,23 @@ sub www_editUser {
 }
 
 #-------------------------------------------------------------------
-sub www_editUserSave {	
+sub www_editUserSave {
+	my $session = shift;	
 	my $isAdmin = WebGUI::Grouping::isInGroup(3);
 	my $isSecondary;
 	unless ($isAdmin) {
-		$isSecondary = (WebGUI::Grouping::isInGroup(11) && $session{form}{uid} eq "new");
+		$isSecondary = (WebGUI::Grouping::isInGroup(11) && $session->form->process("uid") eq "new");
 	}
 	return WebGUI::Privilege::adminOnly() unless ($isAdmin || $isSecondary);
-	my ($uid) = WebGUI::SQL->quickArray("select userId from users where username=".quote($session{form}{username}));
+	my ($uid) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
 	my $error;
-	if (($uid eq $session{form}{uid} || $uid eq "") && $session{form}{username} ne '') {
-	   	my $u = WebGUI::User->new($session{form}{uid});
-		$session{form}{uid} = $u->userId unless ($isSecondary);
-	   	$u->username($session{form}{username});
-	   	$u->authMethod($session{form}{authMethod});
-	   	$u->status($session{form}{status});
-	   	foreach (@{$session{config}{authMethods}}) {
+	if (($uid eq $session->form->process("uid") || $uid eq "") && $session->form->process("username") ne '') {
+	   	my $u = WebGUI::User->new($session->form->process("uid"));
+		$session->form->process("uid") = $u->userId unless ($isSecondary);
+	   	$u->username($session->form->process("username"));
+	   	$u->authMethod($session->form->process("authMethod"));
+	   	$u->status($session->form->process("status"));
+	   	foreach (@{$session->config->get("authMethods")}) {
 	      		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
 	      		$authInstance->editUserFormSave;
        		}
@@ -407,12 +415,12 @@ sub www_editUserSave {
 			next if $field->getId =~ /contentPositions/;
 			$u->profileField($field->getId,$field->formProcess);
 		}
-		my @groups = WebGUI::FormProcessor::group("groupsToAdd");
+		my @groups = $session->form->group("groupsToAdd");
 		$u->addToGroups(\@groups);
-		@groups = WebGUI::FormProcessor::group("groupsToDelete");
+		@groups = $session->form->group("groupsToDelete");
 		$u->deleteFromGroups(\@groups);
 	} else {
-       		$error = '<ul><li>'.WebGUI::International::get(77).' '.$session{form}{username}.'Too or '.$session{form}{username}.'02</li></ul>';
+       		$error = '<ul><li>'.WebGUI::International::get(77).' '.$session->form->process("username").'Too or '.$session->form->process("username").'02</li></ul>';
 	}
 	if ($isSecondary) {
 		return _submenu(WebGUI::International::get(978));
@@ -423,6 +431,7 @@ sub www_editUserSave {
 
 #-------------------------------------------------------------------
 sub www_editUserKarma {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         $f = WebGUI::HTMLForm->new;
@@ -432,7 +441,7 @@ sub www_editUserKarma {
         );
         $f->hidden(
 		-name => "uid",
-		-value => $session{form}{uid},
+		-value => $session->form->process("uid"),
         );
 	$f->integer(
 		-name => "amount",
@@ -451,26 +460,28 @@ sub www_editUserKarma {
 
 #-------------------------------------------------------------------
 sub www_editUserKarmaSave {
+	my $session = shift;
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($u);
-        $u = WebGUI::User->new($session{form}{uid});
-        $u->karma($session{form}{amount},$session{user}{username}." (".$session{user}{userId}.")",$session{form}{description});
+        $u = WebGUI::User->new($session->form->process("uid"));
+        $u->karma($session->form->process("amount"),$session->user->profileField("username")." (".$session->user->profileField("userId").")",$session->form->process("description"));
         return www_editUser();
 }
 
 #-------------------------------------------------------------------
 sub www_listUsers {
+	my $session = shift;
 	unless (WebGUI::Grouping::isInGroup(3)) {
 		if (WebGUI::Grouping::isInGroup(11)) {
-			$session{form}{uid} = "new";
+			$session->form->process("uid") = "new";
 			return www_editUser();
 		}
 		return WebGUI::Privilege::adminOnly();
 	}
 	my %status;
 	my $output = getUserSearchForm("listUsers");
-	my ($userCount) = WebGUI::SQL->quickArray("select count(*) from users");
-	return _submenu($output) unless ($session{form}{doit} || $userCount<250 || $session{form}{pn} > 1);
+	my ($userCount) = $session->db->quickArray("select count(*) from users");
+	return _submenu($output) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
 	tie %status, 'Tie::IxHash';
 	%status = (
 		Active		=> WebGUI::International::get(817),
@@ -491,13 +502,13 @@ sub www_listUsers {
 	foreach my $data (@{$p->getPageData}) {
 		$output .= '<tr class="tableData">';
 		$output .= '<td>'.$status{$data->{status}}.'</td>';
-		$output .= '<td><a href="'.WebGUI::URL::page('op=editUser;uid='.$data->{userId})
+		$output .= '<td><a href="'.$session->url->page('op=editUser;uid='.$data->{userId})
 			.'">'.$data->{username}.'</a></td>';
 		$output .= '<td class="tableData">'.$data->{email}.'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{dateCreated},"%z").'</td>';
 		$output .= '<td class="tableData">'.epochToHuman($data->{lastUpdated},"%z").'</td>';
-		my ($lastLoginStatus, $lastLogin) = WebGUI::SQL->quickArray("select status,timeStamp from userLoginLog where 
-                        userId=".quote($data->{userId})." order by timeStamp DESC");
+		my ($lastLoginStatus, $lastLogin) = $session->db->quickArray("select status,timeStamp from userLoginLog where 
+                        userId=".$session->db->quote($data->{userId})." order by timeStamp DESC");
                 if ($lastLogin) {
                         $output .= '<td class="tableData">'.epochToHuman($lastLogin).'</td>';
                 } else {

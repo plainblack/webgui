@@ -32,19 +32,20 @@ Get the instance of this object or create a new instance if none exists
 
 =cut
 
-sub getInstance {   
+sub getInstance {
+	my $session = shift;   
    	#Get Auth Settings
-	my $authMethod = $session{user}{authMethod} || $session{setting}{authMethod};
-	$authMethod = $session{setting}{authMethod} if($session{user}{userId} eq '1');
-	$authMethod = $_[0] if($_[0] && isIn($_[0], @{$session{config}{authMethods}}));
+	my $authMethod = $session->user->profileField("authMethod") || $session->setting->get("authMethod");
+	$authMethod = $session->setting->get("authMethod") if($session->user->profileField("userId") eq '1');
+	$authMethod = $_[0] if($_[0] && isIn($_[0], @{$session->config->get("authMethods")}));
 	my $userId = $_[1];
 	#Create Auth Object
 	my $cmd = "WebGUI::Auth::".$authMethod;
 	my $load = "use ".$cmd;
 	eval($load);
-	WebGUI::ErrorHandler::fatal("Authentication module failed to compile: $cmd.".$@) if($@);
+	$session->errorHandler->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
     my $auth = eval{$cmd->new($authMethod,$userId)};
-    WebGUI::ErrorHandler::fatal("Couldn't instantiate authentication module: $authMethod. Root cause: ".$@) if($@);
+    $session->errorHandler->fatal("Couldn't instantiate authentication module: $authMethod. Root cause: ".$@) if($@);
 	return $auth;
 }
 
@@ -60,12 +61,13 @@ is returned.
 =cut
 
 sub www_auth {
+	my $session = shift;
    my $auth;
-   ($auth) = WebGUI::SQL->quickArray("select authMethod from users where username=".quote($session{form}{username})) if($session{form}{username});
+   ($auth) = $session->db->quickArray("select authMethod from users where username=".$session->db->quote($session->form->process("username"))) if($session->form->process("username"));
    my $authMethod = getInstance($auth);
-   my $methodCall = shift || $session{form}{method} || "init";
+   my $methodCall = shift || $session->form->process("method") || "init";
    if(!$authMethod->isCallable($methodCall)){
-      WebGUI::ErrorHandler::security("access uncallable auth method on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
+      $session->errorHandler->security("access uncallable auth method on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
 	  return WebGUI::International::get(1077);
    }
    return WebGUI::Operation::Shared::userStyle($authMethod->$methodCall);   
