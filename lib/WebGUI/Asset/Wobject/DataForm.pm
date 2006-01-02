@@ -508,6 +508,7 @@ sub processPropertiesFromFormPost {
 	if ($self->session->form->process("assetId") eq "new") {
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
+			DataForm_tabId=>0,
 			name=>"from",
 			label=>WebGUI::International::get(10,"Asset_DataForm"),
 			status=>"editable",
@@ -517,6 +518,7 @@ sub processPropertiesFromFormPost {
 			});
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
+			DataForm_tabId=>0,
 			name=>"to",
 			label=>WebGUI::International::get(11,"Asset_DataForm"),
 			status=>"hidden",
@@ -527,6 +529,7 @@ sub processPropertiesFromFormPost {
 			});
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
+			DataForm_tabId=>0,
 			name=>"cc",
 			label=>WebGUI::International::get(12,"Asset_DataForm"),
 			status=>"hidden",
@@ -536,6 +539,7 @@ sub processPropertiesFromFormPost {
 			});
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
+			DataForm_tabId=>0,
 			name=>"bcc",
 			label=>WebGUI::International::get(13,"Asset_DataForm"),
 			status=>"hidden",
@@ -545,6 +549,7 @@ sub processPropertiesFromFormPost {
 			});
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
+			DataForm_tabId=>0,
 			name=>"subject",
 			label=>WebGUI::International::get(14,"Asset_DataForm"),
 			status=>"editable",
