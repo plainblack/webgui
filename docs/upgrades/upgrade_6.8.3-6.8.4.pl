@@ -23,13 +23,14 @@ start(); # this line required
 
 fixDefaultThreadTemplate();
 enableAvatarProfileField();
+updateDataFormEmailFields();
 
 finish(); # this line required
 
 
 #-------------------------------------------------
 sub fixDefaultThreadTemplate {
-	print "\Add avatar to default thread template.\n" unless ($quiet);
+	print "\Enable Avatars in the default Thread template.\n" unless ($quiet);
 my $template = <<EOT1;
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a> 
 
@@ -259,6 +260,24 @@ EOT1
 }
 
 
+#-------------------------------------------------
+sub enableAvatarProfileField {
+	print "\tMake user profile Avatar field visible and editable.\n" unless ($quiet);
+	WebGUI::SQL->write("update userProfileField set visible=1 where fieldName='avatar'");
+	WebGUI::SQL->write("update userProfileField set editable=1 where fieldName='avatar'");
+}
+
+#-------------------------------------------------
+sub updateDataFormEmailFields {
+	print "\tFix default email tabId's.\n" unless ($quiet);
+	WebGUI::SQL->write("alter table DataForm_field alter DataForm_tabId set default 0;");
+	my $sth = WebGUI::SQL->read('select DataForm_fieldId,DataForm_tabId from DataForm_field');
+	my $wrh = WebGUI::SQL->prepare('update DataForm_field set DataForm_tabId=0 where DataForm_fieldId=?');
+	while (my %hash = $sth->hash) {
+		$wrh->execute([$hash{DataForm_fieldId}]) unless $hash{DataForm_tabId};
+	}
+}
+
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
@@ -273,13 +292,6 @@ sub start {
 	WebGUI::Session::open("../..",$configFile);
 	WebGUI::Session::refreshUserInfo(3);
 	WebGUI::SQL->write("insert into webguiVersion values (".quote($toVersion).",'upgrade',".time().")");
-}
-
-#-------------------------------------------------
-sub enableAvatarProfileField {
-	print "\tMake user profile Avatar field visible and editable.\n" unless ($quiet);
-	WebGUI::SQL->write("update userProfileField set visible=1 where fieldName='avatar'");
-	WebGUI::SQL->write("update userProfileField set editable=1 where fieldName='avatar'");
 }
 
 #-------------------------------------------------

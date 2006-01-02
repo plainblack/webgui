@@ -11,6 +11,8 @@
  - The avatar user profile field is now visible and editable by default.
  - fix [ 1392277 ] Stock Quote Template error
  - fix [ 1387505 ] Hover help not working on Matrix
+ - fix [ 1393867 ] Data Form Not Emailing
+ - fix [ 1392643 ] 2006 Calendar dates are not correct?
  - Removed the If macro, since it was scheduled for removal in 6.8.0.
 
 6.8.3

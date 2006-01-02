@@ -353,7 +353,7 @@ sub view {
 		my $firstDayInFirstWeek = WebGUI::DateTime::getFirstDayInMonthPosition($thisMonth);
 		my $daysInMonth = WebGUI::DateTime::getDaysInMonth($thisMonth);
 		my @prepad;
-		while ($dayOfWeekCounter < $firstDayInFirstWeek) {
+		while (($dayOfWeekCounter <= $firstDayInFirstWeek) and $firstDayInFirstWeek != 7) {
 			push(@prepad,{
 				count => $dayOfWeekCounter
 			});
