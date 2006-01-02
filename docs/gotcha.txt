@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.8.4
+--------------------------------------------------------------------
+ * The If macro has been removed because it's far too dangerous and
+	error prone. If you use the If macro you may continue to use
+	it at your own risk, maintenance, and support cost, but it
+	is no longer supported by Plain Black.
+
 6.8.1
 --------------------------------------------------------------------
  * Before upgrading you must install the following new Perl modules:
