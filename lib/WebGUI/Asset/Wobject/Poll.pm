@@ -27,9 +27,9 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub _hasVoted {
 	my $self = shift;
-	my ($hasVoted) = WebGUI::SQL->quickArray("select count(*) from Poll_answer 
-		where assetId=".quote($self->getId)." and ((userId=".quote($session{user}{userId})."
-		and userId<>'1') or (userId=".quote($session{user}{userId})." and ipAddress='$session{env}{REMOTE_ADDR}'))");
+	my ($hasVoted) = $self->session->db->quickArray("select count(*) from Poll_answer 
+		where assetId=".$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->profileField("userId"))."
+		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and ipAddress='$self->session->env->get("REMOTE_ADDR")'))");
 	return $hasVoted;
 }
 
@@ -160,7 +160,7 @@ sub definition {
 sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(shift);
-	my $sth = WebGUI::SQL->read("select * from Poll_answer where assetId=".quote($self->getId));
+	my $sth = $self->session->db->read("select * from Poll_answer where assetId=".$self->session->db->quote($self->getId));
 	while (my $data = $sth->hashRef) {
 		$newAsset->setVote($data->{answer}, $data->{userId}, $data->{ipAddress});
 	}
@@ -196,7 +196,7 @@ sub getEditForm {
 		-hoverHelp=>WebGUI::International::get('4 description',"Asset_Poll"),
 		-value=>[$self->getValue("voteGroup")]
 		);
-	if ($session{setting}{useKarma}) {
+	if ($self->session->setting->get("useKarma")) {
 		$tabform->getTab("properties")->integer(
 			-name=>"karmaPerVote",
 			-label=>WebGUI::International::get(20,"Asset_Poll"),
@@ -238,7 +238,7 @@ sub getEditForm {
 		-name=>"resetVotes",
 		-label=>WebGUI::International::get(10,"Asset_Poll"),
 		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Poll")
-		) if $session{form}{func} ne 'add';
+		) if $self->session->form->process("func") ne 'add';
 	return $tabform;
 }
 
@@ -247,19 +247,19 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
 	my (@answer, $i, $property);
-	@answer = split("\n",$session{form}{answers});
+	@answer = split("\n",$self->session->form->process("answers"));
         for ($i=1; $i<=20; $i++) {
              	$property->{'a'.$i} = $answer[($i-1)];
         }
 	$self->update($property);
-	WebGUI::SQL->write("delete from Poll_answer where assetId=".quote($self->getId)) if ($session{form}{resetVotes});
+	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId)) if ($self->session->form->process("resetVotes"));
 }
 
 
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
-	WebGUI::SQL->write("delete from Poll_answer where assetId=".quote($self->getId));
+	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId));
 	$self->SUPER::purge();
 }	
 
@@ -269,8 +269,8 @@ sub setVote {
 	my $answer = shift;
 	my $userId = shift;
 	my $ip = shift;
-       	WebGUI::SQL->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (".quote($self->getId).", 
-		".quote($answer).", ".quote($userId).", '$ip')");
+       	$self->session->db->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (".$self->session->db->quote($self->getId).", 
+		".$self->session->db->quote($answer).", ".$self->session->db->quote($userId).", '$ip')");
 }
 
 #-------------------------------------------------------------------
@@ -280,7 +280,7 @@ sub view {
         $var{question} = $self->get("question");
 	if ($self->get("active") eq "0") {
 		$showPoll = 0;
-	} elsif (WebGUI::Grouping::isInGroup($self->get("voteGroup"),$session{user}{userId})) {
+	} elsif (WebGUI::Grouping::isInGroup($self->get("voteGroup"),$self->session->user->profileField("userId"))) {
 		if ($self->_hasVoted()) {
 			$showPoll = 0;
 		} else {
@@ -290,7 +290,7 @@ sub view {
 		$showPoll = 0;
 	}
 	$var{canVote} = $showPoll;
-        my ($totalResponses) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where assetId=".quote($self->getId));
+        my ($totalResponses) = $self->session->db->quickArray("select count(*) from Poll_answer where assetId=".$self->session->db->quote($self->getId));
 	$var{"responses.label"} = WebGUI::International::get(12,"Asset_Poll");
 	$var{"responses.total"} = $totalResponses;
 	$var{"form.start"} = WebGUI::Form::formHeader({action=>$self->getUrl});
@@ -300,8 +300,8 @@ sub view {
 	$totalResponses = 1 if ($totalResponses < 1);
         for (my $i=1; $i<=20; $i++) {
         	if ($self->get('a'.$i) =~ /\C/) {
-                        my ($tally) = WebGUI::SQL->quickArray("select count(*) from Poll_answer where answer='a"
-				.$i."' and assetId=".quote($self->getId)." group by answer");
+                        my ($tally) = $self->session->db->quickArray("select count(*) from Poll_answer where answer='a"
+				.$i."' and assetId=".$self->session->db->quote($self->getId)." group by answer");
                 	push(@answers,{
 				"answer.form"=>WebGUI::Form::radio({name=>"answer",value=>"a".$i}),
 				"answer.text"=>$self->get('a'.$i),
@@ -330,10 +330,10 @@ sub view {
 sub www_vote {
 	my $self = shift;
 	my $u;
-        if ($session{form}{answer} ne "" && WebGUI::Grouping::isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
-        	$self->setVote($session{form}{answer},$session{user}{userId},$session{env}{REMOTE_ADDR});
-		if ($session{setting}{useKarma}) {
-			$u = WebGUI::User->new($session{user}{userId});
+        if ($self->session->form->process("answer") ne "" && WebGUI::Grouping::isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
+        	$self->setVote($self->session->form->process("answer"),$self->session->user->profileField("userId"),$self->session->env->get("REMOTE_ADDR"));
+		if ($self->session->setting->get("useKarma")) {
+			$u = WebGUI::User->new($self->session->user->profileField("userId"));
 			$u->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
 		}
 		$self->deletePageCache;

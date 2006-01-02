@@ -60,18 +60,18 @@ sub unzip {
    if($filename =~ m/\.zip/i){
 	  my $zip = Archive::Zip->new();
 	  unless ($zip->read($filename) == $zip->AZ_OK){
-	     WebGUI::ErrorHandler::warn(WebGUI::International::get("zip_error","Asset_ZipArchive"));
+	     $self->session->errorHandler->warn(WebGUI::International::get("zip_error","Asset_ZipArchive"));
 		 return 0;
 	  }
 	  $zip->extractTree();  
    } elsif($filename =~ m/\.tar/i){
       Archive::Tar->extract_archive($filepath.'/'.$filename,1);
 	  if (Archive::Tar->error){
-         WebGUI::ErrorHandler::warn(Archive::Tar->error);
+         $self->session->errorHandler->warn(Archive::Tar->error);
 	     return 0;
 	  }
    } else{
-      WebGUI::ErrorHandler::warn(WebGUI::International::get("bad_archive","Asset_ZipArchive"));
+      $self->session->errorHandler->warn(WebGUI::International::get("bad_archive","Asset_ZipArchive"));
    }
    
    return 1;
@@ -179,8 +179,8 @@ If this evaluates to True, then the smaller icon is returned.
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/ziparchive.gif' unless ($small);
-    return $session{config}{extrasURL}.'/assets/small/ziparchive.gif';
+	return $self->session->config->get("extrasURL").'/assets/ziparchive.gif' unless ($small);
+    return $self->session->config->get("extrasURL").'/assets/small/ziparchive.gif';
 }
 
 
@@ -201,22 +201,22 @@ sub processPropertiesFromFormPost {
 	my $file = $self->get("filename");
 	
 	#return unless $file;
-    unless($session{form}{showPage}) {
+    unless($self->session->form->process("showPage")) {
 	   $storage->delete;
-	   WebGUI::SQL->write("update FileAsset set filename=NULL where assetId=".quote($self->getId));
-	   WebGUI::Session::setScratch("za_error",WebGUI::International::get("za_show_error","Asset_ZipArchive"));
+	   $self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
+	   $self->session->scratch->set("za_error",WebGUI::International::get("za_show_error","Asset_ZipArchive"));
 	   return;
 	}
 	
 	unless($file =~ m/\.tar/i || $file =~ m/\.zip/i) {
 	   $storage->delete;
-	   WebGUI::SQL->write("update FileAsset set filename=NULL where assetId=".quote($self->getId));
-	   WebGUI::Session::setScratch("za_error",WebGUI::International::get("za_error","Asset_ZipArchive"));
+	   $self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
+	   $self->session->scratch->set("za_error",WebGUI::International::get("za_error","Asset_ZipArchive"));
 	   return;
 	}
 	
 	unless ($self->unzip($storage,$self->get("filename"))) {
-	   WebGUI::ErrorHandler::warn(WebGUI::International::get("unzip_error","Asset_ZipArchive"));
+	   $self->session->errorHandler->warn(WebGUI::International::get("unzip_error","Asset_ZipArchive"));
 	}
 }
 
@@ -256,12 +256,12 @@ used to show the file to administrators.
 sub view {
 	my $self = shift;
 	my %var = %{$self->get};
-	#WebGUI::ErrorHandler::warn($self->getId);
+	#$self->session->errorHandler->warn($self->getId);
 	$var{controls} = $self->getToolbar;
-	if($session{scratch}{za_error}) {
-	   $var{error} = $session{scratch}{za_error};
+	if($self->session->scratch->get("za_error")) {
+	   $var{error} = $self->session->scratch->get("za_error");
 	}
-	WebGUI::Session::deleteScratch("za_error");
+	$self->session->scratch->delete("za_error");
 	my $storage = $self->getStorageLocation;
 	if($self->get("filename") ne "") {
 	   $var{fileUrl} = $storage->getUrl($self->get("showPage"));

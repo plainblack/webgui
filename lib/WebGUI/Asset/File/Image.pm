@@ -70,7 +70,7 @@ sub definition {
                 properties=>{
                                 thumbnailSize=>{
                                         fieldType=>'integer',
-                                        defaultValue=>$session{setting}{thumbnailSize}
+                                        defaultValue=>$self->session->setting->get("thumbnailSize")
                                         },
 				parameters=>{
 					fieldType=>'textarea',
@@ -148,7 +148,7 @@ sub getEditForm {
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	return $session{config}{extrasURL}.'/assets/image.gif' unless ($small);
+	return $self->session->config->get("extrasURL").'/assets/image.gif' unless ($small);
 	$self->SUPER::getIcon(1);
 }
 
@@ -196,10 +196,10 @@ sub processPropertiesFromFormPost {
 		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
 	}
 	my $storage = $self->getStorageLocation;
-	$self->generateThumbnail($session{setting}{maxImageSize});
+	$self->generateThumbnail($self->session->setting->get("maxImageSize"));
 	$storage->deleteFile($self->get("filename"));
 	$storage->renameFile('thumb-'.$self->get("filename"),$self->get("filename"));
-	$self->generateThumbnail($session{form}{thumbnailSize});
+	$self->generateThumbnail($self->session->form->process("thumbnailSize"));
 }
 
 #-------------------------------------------------------------------
@@ -242,8 +242,8 @@ sub www_edit {
 sub www_resize {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	if ($session{form}{newWidth} || $session{form}{newHeight}) {
-		$self->getStorageLocation->resize($self->get("filename"),$session{form}{newWidth},$session{form}{newHeight});
+	if ($self->session->form->process("newWidth") || $self->session->form->process("newHeight")) {
+		$self->getStorageLocation->resize($self->get("filename"),$self->session->form->process("newWidth"),$self->session->form->process("newHeight"));
 		$self->setSize($self->getStorageLocation->getFileSize($self->get("filename")));
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit image","Asset_Image"));
@@ -286,7 +286,7 @@ A web executable method that redirects the user to the specified page, or displa
 
 sub www_view {
 	my $self = shift;
-	if ($session{var}{adminOn}) {
+	if ($self->session->var->get("adminOn")) {
 		return $self->www_edit;
 	}
 	my $storage = $self->getStorageLocation;

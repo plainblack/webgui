@@ -145,8 +145,8 @@ Clears the session variables from session used by the stock list edit form
 
 sub _clearStockEditSession {
    my $self = shift;
-   $session{form}{symbol} = "";
-   $session{form}{stockId} = "";
+   $self->session->form->process("symbol") = "";
+   $self->session->form->process("stockId") = "";
 }
 
 #-------------------------------------------------------------------
@@ -381,9 +381,9 @@ sub view {
 	my $self = shift;
     my $var = {};
 	#Set some template variables
-	$var->{'extrasFolder'} = $session{config}{extrasURL}."/wobject/StockData";
+	$var->{'extrasFolder'} = $self->session->config->get("extrasURL")."/wobject/StockData";
 	$var->{'editUrl'} = $self->getUrl("func=editStocks");
-	$var->{'isVisitor'} = $session{user}{userId} eq 1;
+	$var->{'isVisitor'} = $self->session->user->profileField("userId") eq 1;
 	$var->{'stock.display.url'} = $self->getUrl("func=displayStock&symbol=");
 	
 	#Build list of stocks as an array
@@ -430,9 +430,9 @@ sub www_displayStock {
    my $var = {};
    return WebGUI::Privilege::noAccess() unless $self->canView();
    
-   $var->{'extrasFolder'} = $session{config}{extrasURL}."/wobject/StockData";
+   $var->{'extrasFolder'} = $self->session->config->get("extrasURL")."/wobject/StockData";
    
-   my $symbol = $session{form}{symbol};
+   my $symbol = $self->session->form->process("symbol");
    my $data = $self->_getStocks([$symbol]);
    #Append Template Variables for stock symbol
    $self->_appendStockVars($var,$data,$symbol);
@@ -442,7 +442,7 @@ sub www_displayStock {
    $var->{'lastUpdate.intl'} = WebGUI::DateTime::epochToHuman($luEpoch,"%y-%m-%d");
    $var->{'lastUpdate.us'} = WebGUI::DateTime::epochToHuman($luEpoch,"%m/%d/%y");
    
-   $session{setting}{showDebug} = 0;
+   $self->session->setting->get("showDebug") = 0;
    return $self->processTemplate($var, $self->get("displayTemplateId"));
 }
 

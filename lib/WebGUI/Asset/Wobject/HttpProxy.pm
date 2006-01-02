@@ -183,17 +183,17 @@ sub purge {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $cookiebox = WebGUI::URL::escape($session{var}{sessionId});
+	my $cookiebox = $self->session->url->escape($self->session->var->get("sessionId"));
    	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
    	$cookiebox .= '.cookie';
    	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);
    my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request, $ttl);
 
-   if($session{form}{func}!~/editSave/i) {
-      $proxiedUrl = $session{form}{FormAction} || $session{form}{proxiedUrl} || $self->get("proxiedUrl") ;
+   if($self->session->form->process("func")!~/editSave/i) {
+      $proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $self->get("proxiedUrl") ;
    } else {
       $proxiedUrl = $self->get("proxiedUrl");
-      $session{env}{REQUEST_METHOD}='GET';
+      $self->session->env->get("REQUEST_METHOD")='GET';
    }
 
    $redirect=0; 
@@ -204,11 +204,11 @@ sub view {
    my $cachedHeader = WebGUI::Cache->new($proxiedUrl,"HEADER");
    $var{header} = $cachedHeader->get;
    $var{content} = $cachedContent->get;
-   unless ($var{content} && $session{env}{REQUEST_METHOD}=~/GET/i) {
+   unless ($var{content} && $self->session->env->get("REQUEST_METHOD")=~/GET/i) {
       $redirect=0; 
       until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
       $userAgent = new LWP::UserAgent;
-      $userAgent->agent($session{env}{HTTP_USER_AGENT});
+      $userAgent->agent($self->session->env->get("HTTP_USER_AGENT"));
       $userAgent->timeout($self->get("timeout"));
       $userAgent->env_proxy;
 
@@ -226,13 +226,13 @@ sub view {
       $header = new HTTP::Headers;
 	$header->referer($self->get("proxiedUrl")); # To get around referrer blocking
 
-      if($session{env}{REQUEST_METHOD}=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
+      if($self->session->env->get("REQUEST_METHOD")=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
                                						# not posting the same data over and over again.
          if($redirect == 0) {
             foreach my $input_name (keys %{$session{form}}) {
                next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
                $input_name =~ s/^HttpProxy_//;
-               $proxiedUrl=WebGUI::URL::append($proxiedUrl,"$input_name=$session{form}{'HttpProxy_'.$input_name}");
+               $proxiedUrl=$self->session->url->append($proxiedUrl,"$input_name=$session{form}{'HttpProxy_'.$input_name}");
             }
          }
          $request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
@@ -245,7 +245,7 @@ sub view {
    	 next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
    	 $input_name =~ s/^HttpProxy_//;
    
-            my $uploadFile = $session{req}->tmpFileName($session{form}{'HttpProxy_'.$input_name});
+            my $uploadFile = $self->session->request->tmpFileName($session{form}{'HttpProxy_'.$input_name});
             if(-r $uploadFile) { # Found uploaded file
       	       @formUpload=($uploadFile, qq/$session{form}{'HttpProxy_'.$input_name}/);
    	       $formdata{$input_name}=\@formUpload;
@@ -321,7 +321,7 @@ sub view {
       $var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }
-   if ($session{user}{userId} eq '1') {
+   if ($self->session->user->profileField("userId") eq '1') {
       $ttl = $session{page}{cacheTimeoutVisitor};
       } else {
           $ttl = $session{page}{cacheTimeout};

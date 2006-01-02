@@ -68,7 +68,7 @@ sub _save {
 		return "";
 	}
 	$file->generateThumbnail($filename);
-	WebGUI::SQL->write("update Product set $_[0]=".quote($file->getId)." where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
+	$self->session->db->write("update Product set $_[0]=".$self->session->db->quote($file->getId)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
 }
 
 #-------------------------------------------------------------------
@@ -86,7 +86,7 @@ sub addRevision {
 		if ($self->get($field)) {
 			my $newStorage = WebGUI::Storage->get($self->get($field))->copy;
 			$newSelf->update({$field=>$newStorage->getId});
-			WebGUI::SQL->write("update Product set $field=".quote($newStorage->getId)." where assetId=".quote($newSelf->getId)." and revisionDate=".quote($newSelf->get("revisionDate")));
+			$self->session->db->write("update Product set $field=".$self->session->db->quote($newStorage->getId)." where assetId=".$self->session->db->quote($newSelf->getId)." and revisionDate=".$self->session->db->quote($newSelf->get("revisionDate")));
 		}
 	}
 	return $newSelf;
@@ -158,7 +158,7 @@ sub duplicate {
    $self->_duplicateFile($newAsset,"brochure");
    $self->_duplicateFile($newAsset,"warranty");
   
-   $sth = WebGUI::SQL->read("select * from Product_feature where assetId=".quote($self->getId));
+   $sth = $self->session->db->read("select * from Product_feature where assetId=".$self->session->db->quote($self->getId));
    while ($row = $sth->hashRef) {
       $row->{"Product_featureId"} = "new";
 	  $row->{"assetId"} = $newAsset->getId; 
@@ -166,7 +166,7 @@ sub duplicate {
    }
    $sth->finish;
    
-   $sth = WebGUI::SQL->read("select * from Product_benefit where assetId=".quote($self->getId));
+   $sth = $self->session->db->read("select * from Product_benefit where assetId=".$self->session->db->quote($self->getId));
    while ($row = $sth->hashRef) {
       $row->{"Product_benefitId"} = "new";
 	  $row->{"assetId"} = $newAsset->getId; 
@@ -174,7 +174,7 @@ sub duplicate {
    }
    $sth->finish;
    
-   $sth = WebGUI::SQL->read("select * from Product_specification where assetId=".quote($self->getId));
+   $sth = $self->session->db->read("select * from Product_specification where assetId=".$self->session->db->quote($self->getId));
    while ($row = $sth->hashRef) {
       $row->{"Product_specificationId"} = "new";
 	  $row->{"assetId"} = $newAsset->getId; 
@@ -182,15 +182,15 @@ sub duplicate {
    }
    $sth->finish;
    
-   $sth = WebGUI::SQL->read("select * from Product_accessory where assetId=".quote($self->getId));
+   $sth = $self->session->db->read("select * from Product_accessory where assetId=".$self->session->db->quote($self->getId));
    while (%data = $sth->hash) {
-      WebGUI::SQL->write("insert into Product_accessory (assetId,accessoryAssetId,sequenceNumber) values (".quote($newAsset->getId).", ".quote($data{accessoryAssetId}).", $data{sequenceNumber})");
+      $self->session->db->write("insert into Product_accessory (assetId,accessoryAssetId,sequenceNumber) values (".$self->session->db->quote($newAsset->getId).", ".$self->session->db->quote($data{accessoryAssetId}).", $data{sequenceNumber})");
    }
    $sth->finish;
 
-   $sth = WebGUI::SQL->read("select * from Product_related where assetId=".quote($self->getId));
+   $sth = $self->session->db->read("select * from Product_related where assetId=".$self->session->db->quote($self->getId));
    while (%data = $sth->hash) {
-      WebGUI::SQL->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".quote($newAsset->getId).", ".quote($data{relatedAssetId}).", $data{sequenceNumber})");
+      $self->session->db->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".$self->session->db->quote($newAsset->getId).", ".$self->session->db->quote($data{relatedAssetId}).", $data{sequenceNumber})");
    }
    $sth->finish;
    return $newAsset;
@@ -278,7 +278,7 @@ sub getThumbnailUrl {
 #-------------------------------------------------------------------
 sub purge {
    	my $self = shift;
-   	my $sth = WebGUI::SQL->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".quote($self->getId));
+   	my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".$self->session->db->quote($self->getId));
 	while (my @array = $sth->array) {
    		foreach my $id (@array){
       			next if ($id eq "");
@@ -286,11 +286,11 @@ sub purge {
    		}
 	}
 	$sth->finish;
-   	WebGUI::SQL->write("delete from Product_accessory where assetId=".quote($self->getId)." or accessoryAssetId=".quote($self->getId));
-   	WebGUI::SQL->write("delete from Product_related where assetId=".quote($self->getId)." or relatedAssetId=".quote($self->getId));
-   	WebGUI::SQL->write("delete from Product_benefit where assetId=".quote($self->getId));
-   	WebGUI::SQL->write("delete from Product_feature where assetId=".quote($self->getId));
-   	WebGUI::SQL->write("delete from Product_specification where assetId=".quote($self->getId));
+   	$self->session->db->write("delete from Product_accessory where assetId=".$self->session->db->quote($self->getId)." or accessoryAssetId=".$self->session->db->quote($self->getId));
+   	$self->session->db->write("delete from Product_related where assetId=".$self->session->db->quote($self->getId)." or relatedAssetId=".$self->session->db->quote($self->getId));
+   	$self->session->db->write("delete from Product_benefit where assetId=".$self->session->db->quote($self->getId));
+   	$self->session->db->write("delete from Product_feature where assetId=".$self->session->db->quote($self->getId));
+   	$self->session->db->write("delete from Product_specification where assetId=".$self->session->db->quote($self->getId));
    	$self->SUPER::purge();
 }
 
@@ -317,9 +317,9 @@ sub www_addAccessory {
 		-name => "func",
 		-value => "addAccessorySave",
    );
-   @usedAccessories = WebGUI::SQL->buildArray("select accessoryAssetId from Product_accessory where assetId=".quote($self->getId));
+   @usedAccessories = $self->session->db->buildArray("select accessoryAssetId from Product_accessory where assetId=".$self->session->db->quote($self->getId));
    push(@usedAccessories,$self->getId);
-   $accessory = WebGUI::SQL->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Wobject::Product' and asset.assetId not in (".quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).") group by assetData.assetId");
+   $accessory = $self->session->db->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Wobject::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") group by assetData.assetId");
    $f->selectBox(
 		-name => "accessoryAccessId",
 		-options => $accessory,
@@ -339,10 +339,10 @@ sub www_addAccessory {
 sub www_addAccessorySave {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   return "" unless ($session{form}{accessoryAccessId});
-   my ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_accessory where assetId=".quote($self->getId()));
-   WebGUI::SQL->write("insert into Product_accessory (assetId,accessoryAssetId,sequenceNumber) values (".quote($self->getId()).",".quote($session{form}{accessoryAccessId}).",".($seq+1).")");
-   return "" unless($session{form}{proceed});
+   return "" unless ($self->session->form->process("accessoryAccessId"));
+   my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from Product_accessory where assetId=".$self->session->db->quote($self->getId()));
+   $self->session->db->write("insert into Product_accessory (assetId,accessoryAssetId,sequenceNumber) values (".$self->session->db->quote($self->getId()).",".$self->session->db->quote($self->session->form->process("accessoryAccessId")).",".($seq+1).")");
+   return "" unless($self->session->form->process("proceed"));
    return $self->www_addAccessory();
 }
 
@@ -356,9 +356,9 @@ sub www_addRelated {
 		-name => "func",
 		-value => "addRelatedSave",
    );
-   @usedRelated = WebGUI::SQL->buildArray("select relatedAssetId from Product_related where assetId=".quote($self->getId));
+   @usedRelated = $self->session->db->buildArray("select relatedAssetId from Product_related where assetId=".$self->session->db->quote($self->getId));
    push(@usedRelated,$self->getId);
-   $related = WebGUI::SQL->buildHashRef("select assetId,title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".quoteAndJoin(\@usedRelated).")");
+   $related = $self->session->db->buildHashRef("select assetId,title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).")");
    $f->selectBox(
 		-name => "relatedAssetId",
 		-options => $related,
@@ -378,10 +378,10 @@ sub www_addRelated {
 sub www_addRelatedSave {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   return "" unless ($session{form}{relatedAssetId});
-   my ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from Product_related where assetId=".quote($self->getId));
-   WebGUI::SQL->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".quote($self->getId).",".quote($session{form}{relatedAssetId}).",".($seq+1).")");
-   return "" unless($session{form}{proceed});
+   return "" unless ($self->session->form->process("relatedAssetId"));
+   my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from Product_related where assetId=".$self->session->db->quote($self->getId));
+   $self->session->db->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($self->session->form->process("relatedAssetId")).",".($seq+1).")");
+   return "" unless($self->session->form->process("proceed"));
    return $self->www_addRelated();
 }
 
@@ -389,7 +389,7 @@ sub www_addRelatedSave {
 sub www_deleteAccessoryConfirm {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   WebGUI::SQL->write("delete from Product_accessory where assetId=".quote($self->getId())." and accessoryAssetId=".quote($session{form}{aid}));
+   $self->session->db->write("delete from Product_accessory where assetId=".$self->session->db->quote($self->getId())." and accessoryAssetId=".$self->session->db->quote($self->session->form->process("aid")));
    $self->reorderCollateral("Product_accessory","accessoryAssetId");
    return "";
 }
@@ -398,7 +398,7 @@ sub www_deleteAccessoryConfirm {
 sub www_deleteBenefitConfirm {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->deleteCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
+   $self->deleteCollateral("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    $self->reorderCollateral("Product_benefit","Product_benefitId");
    return "";
 }
@@ -407,7 +407,7 @@ sub www_deleteBenefitConfirm {
 sub www_deleteFeatureConfirm {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->deleteCollateral("Product_feature","Product_featureId",$session{form}{fid});
+   $self->deleteCollateral("Product_feature","Product_featureId",$self->session->form->process("fid"));
    $self->reorderCollateral("Product_feature","Product_featureId");
    return "";
 }
@@ -415,7 +415,7 @@ sub www_deleteFeatureConfirm {
 #-------------------------------------------------------------------
 sub www_deleteFileConfirm {
    my $self = shift;
-   my $column = $session{form}{file};
+   my $column = $self->session->form->process("file");
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
    my $store = $self->get($column);
    my $file = WebGUI::Storage->get($store);
@@ -428,7 +428,7 @@ sub www_deleteFileConfirm {
 sub www_deleteRelatedConfirm {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   WebGUI::SQL->write("delete from Product_related where assetId=".quote($self->getId)." and relatedAssetId=".quote($session{form}{rid}));
+   $self->session->db->write("delete from Product_related where assetId=".$self->session->db->quote($self->getId)." and relatedAssetId=".$self->session->db->quote($self->session->form->process("rid")));
    $self->reorderCollateral("Product_related","relatedAssetId");
    return "";
 }
@@ -437,7 +437,7 @@ sub www_deleteRelatedConfirm {
 sub www_deleteSpecificationConfirm {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->deleteCollateral("Product_specification","Product_specificationId",$session{form}{sid});
+   $self->deleteCollateral("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    $self->reorderCollateral("Product_specification","Product_specificationId");
    return "";
 }
@@ -468,7 +468,7 @@ sub www_editBenefit {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
    my ($data, $f, $benefits);
-   $data = $self->getCollateral("Product_benefit","Product_benefitId",$session{form}{bid});
+   $data = $self->getCollateral("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
    $f->hidden(
 		-name => "bid",
@@ -478,7 +478,7 @@ sub www_editBenefit {
 		-name => "func",
 		-value => "editBenefitSave",
    );
-   $benefits = WebGUI::SQL->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
+   $benefits = $self->session->db->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
    $f->combo(
 		-name => "benefit",
 		-options => $benefits,
@@ -499,14 +499,14 @@ sub www_editBenefit {
 sub www_editBenefitSave {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $session{form}{benefit} = $session{form}{benefit_new} if ($session{form}{benefit_new} ne "");
+   $self->session->form->process("benefit") = $self->session->form->process("benefit_new") if ($self->session->form->process("benefit_new") ne "");
    $self->setCollateral("Product_benefit", "Product_benefitId", {
-		                                          Product_benefitId => $session{form}{bid},
-		                                          benefit => $session{form}{benefit}
+		                                          Product_benefitId => $self->session->form->process("bid"),
+		                                          benefit => $self->session->form->process("benefit")
 		                                        });
    
-   return "" unless($session{form}{proceed});
-   $session{form}{bid} = "new";
+   return "" unless($self->session->form->process("proceed"));
+   $self->session->form->process("bid") = "new";
    return $self->www_editBenefit();
 }
 
@@ -515,7 +515,7 @@ sub www_editFeature {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
    my ($data, $f, $features);
-   $data = $self->getCollateral("Product_feature","Product_featureId",$session{form}{fid});
+   $data = $self->getCollateral("Product_feature","Product_featureId",$self->session->form->process("fid"));
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
    $f->hidden(
 		-name => "fid",
@@ -525,7 +525,7 @@ sub www_editFeature {
 		-name => "func",
 		-value => "editFeatureSave",
    );
-   $features = WebGUI::SQL->buildHashRef("select feature,feature from Product_feature order by feature");
+   $features = $self->session->db->buildHashRef("select feature,feature from Product_feature order by feature");
    $f->combo(
 		-name => "feature",
 		-options => $features,
@@ -546,13 +546,13 @@ sub www_editFeature {
 sub www_editFeatureSave {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $session{form}{feature} = $session{form}{feature_new} if ($session{form}{feature_new} ne "");
+   $self->session->form->process("feature") = $self->session->form->process("feature_new") if ($self->session->form->process("feature_new") ne "");
    $self->setCollateral("Product_feature", "Product_featureId", {
-                                              Product_featureId => $session{form}{fid},
-                                              feature => $session{form}{feature}
+                                              Product_featureId => $self->session->form->process("fid"),
+                                              feature => $self->session->form->process("feature")
                                              });
-   return "" unless($session{form}{proceed});
-   $session{form}{fid} = "new";
+   return "" unless($self->session->form->process("proceed"));
+   $self->session->form->process("fid") = "new";
    return $self->www_editFeature();
 }
 
@@ -561,7 +561,7 @@ sub www_editSpecification {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
    my ($data, $f, $hashRef);
-   $data = $self->getCollateral("Product_specification","Product_specificationId",$session{form}{sid});
+   $data = $self->getCollateral("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
    $f->hidden(
 		-name => "sid",
@@ -571,7 +571,7 @@ sub www_editSpecification {
 		-name => "func",
 		-value => "editSpecificationSave",
    );
-   $hashRef = WebGUI::SQL->buildHashRef("select name,name from Product_specification order by name");
+   $hashRef = $self->session->db->buildHashRef("select name,name from Product_specification order by name");
    $f->combo(
 		-name => "name",
 		-options => $hashRef,
@@ -585,7 +585,7 @@ sub www_editSpecification {
 		-hoverHelp => WebGUI::International::get('27 description','Asset_Product'),
 		-value => $data->{value},
    );
-   $hashRef = WebGUI::SQL->buildHashRef("select units,units from Product_specification order by units");
+   $hashRef = $self->session->db->buildHashRef("select units,units from Product_specification order by units");
    $f->combo(
 		-name => "units",
 		-options => $hashRef,
@@ -606,17 +606,17 @@ sub www_editSpecification {
 sub www_editSpecificationSave {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	$session{form}{name} = $session{form}{name_new} if ($session{form}{name_new} ne "");
-	$session{form}{units} = $session{form}{units_new} if ($session{form}{units_new} ne "");
+	$self->session->form->process("name") = $self->session->form->process("name_new") if ($self->session->form->process("name_new") ne "");
+	$self->session->form->process("units") = $self->session->form->process("units_new") if ($self->session->form->process("units_new") ne "");
 	$self->setCollateral("Product_specification", "Product_specificationId", {
-		Product_specificationId => $session{form}{sid},
-		name => $session{form}{name},
-		value => $session{form}{value},
-		units => $session{form}{units}
+		Product_specificationId => $self->session->form->process("sid"),
+		name => $self->session->form->process("name"),
+		value => $self->session->form->process("value"),
+		units => $self->session->form->process("units")
 	});
 
-	return "" unless($session{form}{proceed});
-	$session{form}{sid} = "new";
+	return "" unless($self->session->form->process("proceed"));
+	$self->session->form->process("sid") = "new";
 	return $self->www_editSpecification();
 }
 
@@ -624,7 +624,7 @@ sub www_editSpecificationSave {
 sub www_moveAccessoryDown {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralDown("Product_accessory","accessoryAssetId",$session{form}{aid});
+   $self->moveCollateralDown("Product_accessory","accessoryAssetId",$self->session->form->process("aid"));
    return "";
 }
 
@@ -632,7 +632,7 @@ sub www_moveAccessoryDown {
 sub www_moveAccessoryUp {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralUp("Product_accessory","accessoryAssetId",$session{form}{aid});
+   $self->moveCollateralUp("Product_accessory","accessoryAssetId",$self->session->form->process("aid"));
    return "";
 }
 
@@ -640,7 +640,7 @@ sub www_moveAccessoryUp {
 sub www_moveBenefitDown {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralDown("Product_benefit","Product_benefitId",$session{form}{bid});
+   $self->moveCollateralDown("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    return "";
 }
 
@@ -648,7 +648,7 @@ sub www_moveBenefitDown {
 sub www_moveBenefitUp {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralUp("Product_benefit","Product_benefitId",$session{form}{bid});
+   $self->moveCollateralUp("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    return "";
 }
 
@@ -656,7 +656,7 @@ sub www_moveBenefitUp {
 sub www_moveFeatureDown {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralDown("Product_feature","Product_featureId",$session{form}{fid});
+   $self->moveCollateralDown("Product_feature","Product_featureId",$self->session->form->process("fid"));
    return "";
 }
 
@@ -664,7 +664,7 @@ sub www_moveFeatureDown {
 sub www_moveFeatureUp {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	$self->moveCollateralUp("Product_feature","Product_featureId",$session{form}{fid});
+	$self->moveCollateralUp("Product_feature","Product_featureId",$self->session->form->process("fid"));
 	return "";
 }
 
@@ -672,7 +672,7 @@ sub www_moveFeatureUp {
 sub www_moveRelatedDown {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralDown("Product_related","relatedAssetId",$session{form}{rid});
+   $self->moveCollateralDown("Product_related","relatedAssetId",$self->session->form->process("rid"));
    return "";
 }
 
@@ -680,7 +680,7 @@ sub www_moveRelatedDown {
 sub www_moveRelatedUp {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralUp("Product_related","relatedAssetId",$session{form}{rid});
+   $self->moveCollateralUp("Product_related","relatedAssetId",$self->session->form->process("rid"));
    return "";
 }
 
@@ -688,7 +688,7 @@ sub www_moveRelatedUp {
 sub www_moveSpecificationDown {
    my $self = shift;
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralDown("Product_specification","Product_specificationId",$session{form}{sid});
+   $self->moveCollateralDown("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    return "";
 }
 
@@ -696,14 +696,14 @@ sub www_moveSpecificationDown {
 sub www_moveSpecificationUp {
    my $self = shift;   
    return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-   $self->moveCollateralUp("Product_specification","Product_specificationId",$session{form}{sid});
+   $self->moveCollateralUp("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    return "";
 }
 
 #-------------------------------------------------------------------
 sub view {
    my $self = shift;
-   $self->logView() if ($session{setting}{passiveProfilingEnabled});
+   $self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
    my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
    tie %data, 'Tie::CPHash';
 	my $brochure = $self->get("brochure");
@@ -755,7 +755,7 @@ sub view {
    #---features 
    $var{"addFeature.url"} = $self->getUrl('func=editFeature&fid=new');
    $var{"addFeature.label"} = WebGUI::International::get(34,'Asset_Product');
-   $sth = WebGUI::SQL->read("select feature,Product_featureId from Product_feature where assetId=".quote($self->getId)." order by sequenceNumber");
+   $sth = $self->session->db->read("select feature,Product_featureId from Product_feature where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
       $segment = deleteIcon('func=deleteFeatureConfirm&fid='.$data{Product_featureId},$self->get("url"),WebGUI::International::get(3,'Asset_Product'))
                  .editIcon('func=editFeature&fid='.$data{Product_featureId},$self->get("url"))
@@ -772,7 +772,7 @@ sub view {
    #---benefits 
    $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&fid=new');
    $var{"addBenefit.label"} = WebGUI::International::get(55,'Asset_Product');
-   $sth = WebGUI::SQL->read("select benefit,Product_benefitId from Product_benefit where assetId=".quote($self->getId)." order by sequenceNumber");
+   $sth = $self->session->db->read("select benefit,Product_benefitId from Product_benefit where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
       $segment = deleteIcon('func=deleteBenefitConfirm&bid='.$data{Product_benefitId},$self->get("url"),WebGUI::International::get(48,'Asset_Product'))
                  .editIcon('func=editBenefit&bid='.$data{Product_benefitId},$self->get("url"))
@@ -789,7 +789,7 @@ sub view {
    #---specifications 
    $var{"addSpecification.url"} = $self->getUrl('func=editSpecification&sid=new');
    $var{"addSpecification.label"} = WebGUI::International::get(35,'Asset_Product');
-   $sth = WebGUI::SQL->read("select name,value,units,Product_specificationId from Product_specification where assetId=".quote($self->getId)." order by sequenceNumber");
+   $sth = $self->session->db->read("select name,value,units,Product_specificationId from Product_specification where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
       $segment = deleteIcon('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),WebGUI::International::get(5,'Asset_Product'))
                  .editIcon('func=editSpecification&sid='.$data{Product_specificationId},$self->get("url"))
@@ -808,8 +808,8 @@ sub view {
 	#---accessories 
    $var{"addaccessory.url"} = $self->getUrl('func=addAccessory');
    $var{"addaccessory.label"} = WebGUI::International::get(36,'Asset_Product');
-   $sth = WebGUI::SQL->read("select Product_accessory.accessoryAssetId from   Product_accessory
-		                     where Product_accessory.assetId=".quote($self->getId)." 
+   $sth = $self->session->db->read("select Product_accessory.accessoryAssetId from   Product_accessory
+		                     where Product_accessory.assetId=".$self->session->db->quote($self->getId)." 
 		                     order by Product_accessory.sequenceNumber");
    while (my ($id) = $sth->array) {
       $segment = deleteIcon('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),WebGUI::International::get(2,'Asset_Product'))
@@ -828,9 +828,9 @@ sub view {
    #---related
    $var{"addrelatedproduct.url"} = $self->getUrl('func=addRelated');
    $var{"addrelatedproduct.label"} = WebGUI::International::get(37,'Asset_Product');
-   $sth = WebGUI::SQL->read("select Product_related.relatedAssetId 
+   $sth = $self->session->db->read("select Product_related.relatedAssetId 
 		                     from Product_related 
-		                     where Product_related.assetId=".quote($self->getId)." 
+		                     where Product_related.assetId=".$self->session->db->quote($self->getId)." 
 		                     order by Product_related.sequenceNumber");
    while (my ($id) = $sth->array) {
       $segment = deleteIcon('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),WebGUI::International::get(4,'Asset_Product'))

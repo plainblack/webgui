@@ -247,7 +247,7 @@ sub _get_rss_data {
                 my $ua = LWP::UserAgent->new(timeout => 5);
                 my $response = $ua->get($url);
                 if (!$response->is_success()) {
-                        WebGUI::ErrorHandler::warn("Error retrieving url '$url': " . 
+                        $self->session->errorHandler->warn("Error retrieving url '$url': " . 
                              $response->status_line());
                         return undef;
                 }
@@ -260,7 +260,7 @@ sub _get_rss_data {
 			my $encoding = 'utf8';
 			if (lc($xmlEncoding) ne lc($encoding)) {
 				eval {	from_to($xml, $xmlEncoding, $encoding) };
-				WebGUI::ErrorHandler::warn($@) if ($@);
+				$self->session->errorHandler->warn($@) if ($@);
 			}
 				
 		}
@@ -270,7 +270,7 @@ sub _get_rss_data {
                         XML::RSSLite::parseXML($rss_lite, \$xml);
                 };
                 if ($@) {
-                        WebGUI::ErrorHandler::warn("error parsing rss for url $url :".$@);
+                        $self->session->errorHandler->warn("error parsing rss for url $url :".$@);
 			#Returning undef on a parse failure is a change from previous behaviour,
 			#but it SHOULDN'T have a major effect.
 			return undef;
@@ -285,10 +285,10 @@ sub _get_rss_data {
                 $rss_lite = {channel => $rss_lite};
                 if (!($rss->{channel} = 
                       _find_record($rss_lite, qr/^channel$/))) {
-                        WebGUI::ErrorHandler::warn("unable to find channel info for url $url");
+                        $self->session->errorHandler->warn("unable to find channel info for url $url");
                 }
                 if (!($rss->{items} = _find_record($rss_lite, qr/^items?$/))) {
-                        WebGUI::ErrorHandler::warn("unable to find item info for url $url");
+                        $self->session->errorHandler->warn("unable to find item info for url $url");
                         $rss->{items} = [];
 		}
                 
@@ -482,7 +482,7 @@ Returns the rendered output of the wobject.
 sub view {
 	my $self = shift;
 	my $rssFlavor = shift;
-	$self->logView() if ($session{setting}{passiveProfilingEnabled});
+	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
 
         my $maxHeadlines = $self->get('maxHeadlines') || 1000000;
         my @urls = split(/\s+/,$self->get('rssUrl'));
@@ -517,7 +517,7 @@ sub view {
 
 	    #Looks like a kludge, but what this does is put in the proper
 	    #XSLT stylesheet so the RSS doesn't look like total ass.
-	    my $siteURL=WebGUI::URL::getSiteURL().WebGUI::URL::gateway();
+	    my $siteURL=$self->session->url->getSiteURL().$self->session->url->gateway();
 	    $rss=~s|<\?xml version="1\.0" encoding="UTF\-8"\?>|<\?xml version="1\.0" encoding="UTF\-8"\?>\n<?xml\-stylesheet type="text/xsl" href="${siteURL}xslt/rss$rssFlavor.xsl"\?>\n|;
 	    return $rss;
 
@@ -534,7 +534,7 @@ sub _constructRSSHeadTitleLink{
     my $rssFeedSuffix=WebGUI::International::get('RSS Feed Title Suffix','Asset_SyndicatedContent');
     my $title = ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix;
 	$title =~ s/\"/&quot;/g;
-    WebGUI::Style::setLink($var->{'rss.url'},
+    $self->session->style->setLink($var->{'rss.url'},
 			   { rel=>	'alternate', 
 			     type=>	'application/rss+xml', 
 			     title=> ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix }
@@ -548,7 +548,7 @@ sub _constructRSS{
     #They've chosen to emit this as an RSS feed, in one of the four flavors we support.
     $rssObject->channel(
 			title=>$var->{'channel.title'} || $self->get('title'),
-			link=>WebGUI::URL::page('',1),
+			link=>$self->session->url->page('',1),
 			description=>$var->{'channel.description'} || ''
 		       );
     foreach my $item (@{$var->{item_loop}}) {

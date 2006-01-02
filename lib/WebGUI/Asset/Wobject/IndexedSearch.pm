@@ -96,7 +96,7 @@ sub getEditForm {
 	tie my %searchRoot, 'Tie::IxHash';
 
 	# Unconditional read to catch intallation errors.
-	my $sth = WebGUI::SQL->unconditionalRead("select distinct(indexName), indexName from IndexedSearch_docInfo");
+	my $sth = $self->session->db->unconditionalRead("select distinct(indexName), indexName from IndexedSearch_docInfo");
 	unless ($sth->errorCode < 1) { 
 		return "<p><b>" . WebGUI::International::get(1,"Asset_IndexedSearch") . $sth->errorMessage."</b></p>";
 	}
@@ -126,7 +126,7 @@ sub getEditForm {
 	# Page roots
 	#%searchRoot = (	'any'=>WebGUI::International::get(15,"Asset_IndexedSearch"), 
 	#			$session{page}{pageId}=>WebGUI::International::get(4,"Asset_IndexedSearch"),
-	#			WebGUI::SQL->buildHash("select pageId,title from page where parentId='0' and isSystem<>1 order by title")
+	#			$self->session->db->buildHash("select pageId,title from page where parentId='0' and isSystem<>1 order by title")
 	#		);
 	#$tabform->getTab("properties")->checkList (	-name=>'searchRoot',
 	#					-options=>\%searchRoot, 
@@ -187,7 +187,7 @@ sub getEditForm {
 
 	# Color picker for highlight colors
 	$tabform->getTab("display")->raw 	(	-value=>'
-				<script type="text/javascript" src="'.$session{config}{extrasURL}.'/wobject/IndexedSearch/ColorPicker2.js"></script>
+				<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wobject/IndexedSearch/ColorPicker2.js"></script>
 				<script type="text/javascript">
 				var cp = new ColorPicker("window");
 				</script>'
@@ -210,8 +210,8 @@ sub getEditForm {
 sub getIcon {
         my $self = shift;
         my $small = shift;
-        return $session{config}{extrasURL}.'/assets/small/search.gif' if ($small);
-        return $session{config}{extrasURL}.'/assets/search.gif';
+        return $self->session->config->get("extrasURL").'/assets/small/search.gif' if ($small);
+        return $self->session->config->get("extrasURL").'/assets/search.gif';
 }
 
 #-------------------------------------------------------------------
@@ -220,11 +220,11 @@ sub view {
 	my (%var, @resultsLoop);
 
 	# Do some query handling
-	$var{exactPhrase} = $session{form}{exactPhrase};
-	$var{allWords} = $session{form}{allWords};
-	$var{atLeastOne} = $session{form}{atLeastOne};
-	$var{without} = $session{form}{without};
-	$var{query} = $session{form}{query};
+	$var{exactPhrase} = $self->session->form->process("exactPhrase");
+	$var{allWords} = $self->session->form->process("allWords");
+	$var{atLeastOne} = $self->session->form->process("atLeastOne");
+	$var{without} = $self->session->form->process("without");
+	$var{query} = $self->session->form->process("query");
 	$var{query} .= qq/ +"$var{exactPhrase}"/ if ($var{exactPhrase});
 	$var{query} .= " ".join(" ",map("+".$_,split(/\s+/,$var{allWords}))) if ($var{allWords});
 	$var{query} .= qq{ $var{atLeastOne}} if ($var{atLeastOne});
@@ -255,16 +255,16 @@ sub view {
 		$var{numberOfResults} = scalar(@$results);
 
 		# Deal with pagination
-		my $url = "query=".WebGUI::URL::escape($var{query});
-		map {$url .= "&users=".WebGUI::URL::escape($_)} $session{req}->param('users');
-		map {$url .= "&namespaces=".WebGUI::URL::escape($_)} $session{req}->param('namespaces');
-		map {$url .= "&contentTypes=".WebGUI::URL::escape($_)} $session{req}->param('contentTypes');
+		my $url = "query=".$self->session->url->escape($var{query});
+		map {$url .= "&users=".$self->session->url->escape($_)} $self->session->request->param('users');
+		map {$url .= "&namespaces=".$self->session->url->escape($_)} $self->session->request->param('namespaces');
+		map {$url .= "&contentTypes=".$self->session->url->escape($_)} $self->session->request->param('contentTypes');
 		$url .= "&paginateAfter=".$self->getValue("paginateAfter");
-		my $p = WebGUI::Paginator->new(WebGUI::URL::page($url), $self->getValue("paginateAfter"));
+		my $p = WebGUI::Paginator->new($self->session->url->page($url), $self->getValue("paginateAfter"));
 		$p->setDataByArrayRef($results);
 		$var{startNr} = 1;
-		if($session{form}{pn}) {
-			$var{startNr} = (($session{form}{pn} - 1) * $self->getValue("paginateAfter")) + 1;
+		if($self->session->form->process("pn")) {
+			$var{startNr} = (($self->session->form->process("pn") - 1) * $self->getValue("paginateAfter")) + 1;
 		}
 
 		my @highlightColors = map { $self->getValue("highlight_$_") } (1..5);
@@ -291,10 +291,10 @@ sub view {
 	my $namespaces = $self->_getNamespaces('restricted');
 	foreach(keys %$namespaces) {
 		my $selected = 0;
-		if (scalar $session{req}->param('namespaces')) {
-			$selected = isIn($_, $session{req}->param('namespaces'));
+		if (scalar $self->session->request->param('namespaces')) {
+			$selected = isIn($_, $self->session->request->param('namespaces'));
 		} else {
-			$selected = ($session{form}{namespaces} =~ /$_/);
+			$selected = ($self->session->form->process("namespaces") =~ /$_/);
 		}
 		push(@{$var{namespaces}}, { value => $_, name => $namespaces->{$_}, selected => $selected });
 	} 
@@ -309,10 +309,10 @@ sub view {
 	my $contentTypes = $self->_getContentTypes('restricted');
 	foreach(keys %$contentTypes) {
 		my $selected = 0;
-		if (scalar $session{req}->param('contentTypes')) {
-			$selected = isIn($_, $session{req}->param('contentTypes'));
+		if (scalar $self->session->request->param('contentTypes')) {
+			$selected = isIn($_, $self->session->request->param('contentTypes'));
 		} else {
-			$selected = ($session{form}{contentTypes} =~ /$_/);
+			$selected = ($self->session->form->process("contentTypes") =~ /$_/);
 		}
 		unless(/^content$/) {	# No shortcut in the detailed contentType list
 			push(@{$var{contentTypes}}, { value => $_, 
@@ -333,10 +333,10 @@ sub view {
 	my $users = $self->_getUsers('restricted');
 	foreach(keys %$users) {
 		my $selected = 0;
-		if (scalar $session{req}->param('users')) {
-			$selected = isIn($_, $session{req}->param('users'));
+		if (scalar $self->session->request->param('users')) {
+			$selected = isIn($_, $self->session->request->param('users'));
 		} else {
-			$selected = ($session{form}{users} =~ /$_/);
+			$selected = ($self->session->form->process("users") =~ /$_/);
 		}
 		push(@{$var{users}}, { value => $_, name => $users->{$_}, selected => $selected });
 	}
@@ -344,7 +344,7 @@ sub view {
 	# Create a loop with searchable page roots
 	my $rootData;
 	my @roots = split(/\n/, $self->get('searchRoot'));
-	my %checked = map {$_=>1} $session{req}->param("searchRoot");
+	my %checked = map {$_=>1} $self->session->request->param("searchRoot");
 	#if (isIn('any', @roots)) {
 	#	foreach $rootData (WebGUI::Page->getAnonymousRoot->daughters) {
 	#		push (@{$var{searchRoots}}, {
@@ -400,7 +400,7 @@ sub _buildPageList {
 	my ($self, @userSpecifiedRoots, @roots, @allowedRoots, $pageId, @pages);
 	$self = shift;
 
-	@userSpecifiedRoots = $session{req}->param("searchRoot");
+	@userSpecifiedRoots = $self->session->request->param("searchRoot");
 	
 	if ((scalar(@userSpecifiedRoots) == 0)
 		|| ($self->getValue("forceSearchRoots"))
@@ -436,11 +436,11 @@ sub _buildFilter {
 #	}
 
 	# content-types
-	if($session{form}{contentTypes} && ! isIn('any', $session{req}->param('contentTypes'))) {
-		$filter{contentType} = [ $session{req}->param('contentTypes') ];
+	if($self->session->form->process("contentTypes") && ! isIn('any', $self->session->request->param('contentTypes'))) {
+		$filter{contentType} = [ $self->session->request->param('contentTypes') ];
 
 		# contentType "content" is a shortcut for "page", "wobject" and "wobjectDetail"
-		if (isIn('content', $session{req}->param('contentTypes'))) {
+		if (isIn('content', $self->session->request->param('contentTypes'))) {
 			push(@{$filter{contentType}}, qw/Asset assetDetail/);
 		}
 	} elsif ($self->getValue('contentTypes') !~ /any/i) {
@@ -448,22 +448,22 @@ sub _buildFilter {
 	}
 
 	# users
-	if($session{form}{users} && ! isIn('any', $session{req}->param('users'))) {
+	if($self->session->form->process("users") && ! isIn('any', $self->session->request->param('users'))) {
 		$filter{ownerId} = [];
-		foreach my $user ($session{req}->param('users')) {
+		foreach my $user ($self->session->request->param('users')) {
 			if ($user =~ /\D/) {
 				$user =~ s/\*/%/g;
-				($user) = WebGUI::SQL->buildArray("select userId from users where username like ".quote($user));
+				($user) = $self->session->db->buildArray("select userId from users where username like ".$self->session->db->quote($user));
 			}
-			push(@{$filter{ownerId}}, quote($user)) if ($user =~ /^\d+$/);
+			push(@{$filter{ownerId}}, $self->session->db->quote($user)) if ($user =~ /^\d+$/);
 		}
 	} elsif ($self->getValue('users') !~ /any/i) {
 		$filter{ownerId} = [ split(/\n/, $self->getValue('users')) ];
 	}
 
 	# namespaces
-	if($session{form}{namespaces} && ! isIn('any', $session{req}->param('namespaces'))) {
-		$filter{namespace} = [ $session{req}->param('namespaces') ];
+	if($self->session->form->process("namespaces") && ! isIn('any', $self->session->request->param('namespaces'))) {
+		$filter{namespace} = [ $self->session->request->param('namespaces') ];
 	} elsif ($self->getValue('namespaces') !~ /any/i) {
 		$filter{namespace} = [ split(/\n/, $self->getValue('namespaces')) ];
 	}
@@ -479,11 +479,11 @@ sub _buildFilter {
 sub _getNamespaces {
 	my ($self, $restricted) = @_;
 	my %international;
-	foreach my $class (@{$session{config}{assets}}) {
+	foreach my $class (@{$self->session->config->get("assets")}) {
 		my $load = 'use '.$class;
 		eval($load);
                 if ($@) {
-                        WebGUI::ErrorHandler::warn("Couldn't compile ".$class." because ".$@);
+                        $self->session->errorHandler->warn("Couldn't compile ".$class." because ".$@);
                 } else {
 			$international{$class} = eval{$class->getName()};
                 }
@@ -496,7 +496,7 @@ sub _getNamespaces {
 		}
 	} else {
 		$namespaces{any} = WebGUI::International::get(18,"Asset_IndexedSearch");
-		foreach (WebGUI::SQL->buildArray("select distinct(namespace) from IndexedSearch_docInfo order by namespace")) {
+		foreach ($self->session->db->buildArray("select distinct(namespace) from IndexedSearch_docInfo order by namespace")) {
 			$namespaces{$_} = $international{$_} ||ucfirst($_);
 		}
 	}
@@ -525,7 +525,7 @@ sub _getContentTypes {
 		%contentTypes = (	'any' =>  $international{any},
 					'content' => $international{content},	# shortcut for page, wobject and wobjectDetail
 				);
-		foreach (WebGUI::SQL->buildArray("select distinct(contentType) from IndexedSearch_docInfo order by contentType")) {
+		foreach ($self->session->db->buildArray("select distinct(contentType) from IndexedSearch_docInfo order by contentType")) {
 			$contentTypes{$_} = $international{$_} || ucfirst($_);
 		}
 	}
@@ -536,7 +536,7 @@ sub _getContentTypes {
 sub _getSearchablePages {
 	my $searchRoot = shift;
 	my %pages;
-	my $sth = WebGUI::SQL->read("select assetId from asset where parentId = ".quote($searchRoot));
+	my $sth = $self->session->db->read("select assetId from asset where parentId = ".$self->session->db->quote($searchRoot));
 	while (my %data = $sth->hash) {
 		$pages{$data{assetId}} = 1;
 		%pages = (%pages, _getSearchablePages($data{assetId}) );
@@ -555,7 +555,7 @@ sub _getUsers {
 		}
 	} else {
 		%users = (	'any' =>  WebGUI::International::get(25,"Asset_IndexedSearch"),
-				WebGUI::SQL->buildHash("select userId, username from users order by username")
+				$self->session->db->buildHash("select userId, username from users order by username")
 			);
 	}
 	return \%users;

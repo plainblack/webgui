@@ -459,12 +459,12 @@ sub getRichEditor {
 			$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
 		}
 	}
-	my $language  = WebGUI::International::getLanguage($session{user}{language},"languageAbbreviation");
+	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
 		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
 	}
 	$config{language} = $language;
-	$config{content_css} = $self->getValue("cssFile") || $session{config}{extrasURL}.'/tinymce2/defaultcontent.css';
+	$config{content_css} = $self->getValue("cssFile") || $self->session->config->get("extrasURL").'/tinymce2/defaultcontent.css';
 	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
 	$config{plugins} = join(",",@plugins);
@@ -476,8 +476,8 @@ sub getRichEditor {
 			push(@directives,$key." : '".$config{$key}."'");
 		}
 	}
-	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce2/jscripts/tiny_mce/tiny_mce.js",{type=>"text/javascript"});
-	WebGUI::Style::setScript($session{config}{extrasURL}."/tinymce2/jscripts/webgui.js",{type=>"text/javascript"});
+	$self->session->style->setScript($self->session->config->get("extrasURL")."/tinymce2/jscripts/tiny_mce/tiny_mce.js",{type=>"text/javascript"});
+	$self->session->style->setScript($self->session->config->get("extrasURL")."/tinymce2/jscripts/webgui.js",{type=>"text/javascript"});
 	return '<script type="text/javascript">
 		tinyMCE.init({
 			'.join(",\n    ",@directives).'
@@ -489,7 +489,7 @@ sub getRichEditor {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	return '<p>'.$self->getToolbar.'</p>' if ($session{var}{adminOn});
+	return '<p>'.$self->getToolbar.'</p>' if ($self->session->var->get("adminOn"));
 	return undef;
 }
 

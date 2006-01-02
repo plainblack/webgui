@@ -77,7 +77,7 @@ sub _execute {
 		$t->param("webgui.status"=>$WebGUI::STATUS);
 		return $t->output;
 	} else {
-		WebGUI::ErrorHandler::error("Error in template. ".$@);
+		$self->session->errorHandler->error("Error in template. ".$@);
 		return WebGUI::International::get('template error', 'Asset_Template').$@;
 	}
 }
@@ -140,17 +140,17 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	$tabform->hidden({
 		name=>"returnUrl",
-		value=>$session{form}{returnUrl}
+		value=>$self->session->form->process("returnUrl")
 		});
 	if ($self->getValue("namespace") eq "") {
-		my $namespaces = WebGUI::SQL->buildHashRef("select distinct(namespace),namespace 
+		my $namespaces = $self->session->db->buildHashRef("select distinct(namespace),namespace 
 			from template order by namespace");
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
 			-options=>$namespaces,
 			-label=>WebGUI::International::get('namespace','Asset_Template'),
 			-hoverHelp=>WebGUI::International::get('namespace description','Asset_Template'),
-			-value=>[$session{form}{namespace}] 
+			-value=>[$self->session->form->process("namespace")] 
 			);
 	} else {
 		$tabform->getTab("meta")->readOnly(
@@ -199,8 +199,8 @@ Specify the namespace to build the list for.
 sub getList {
 	my $class = shift;
 	my $namespace = shift;
-my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).")) order by assetData.title";
-	my $sth = WebGUI::SQL->read($sql,WebGUI::SQL->getSlave);
+my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$self->session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) order by assetData.title";
+	my $sth = $self->session->db->read($sql,$self->session->db->getSlave);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {
@@ -230,7 +230,7 @@ sub process {
 	return $self->processRaw($self->get("template"),$vars);
 # skip all the junk below here for now until we have time to bring it inline with the new system
 	my $file = _getTemplateFile($self->get("templateId"));
-	my $fileCacheDir = $session{config}{uploadsPath}.'/temp/templatecache';
+	my $fileCacheDir = $self->session->config->get("uploadsPath").'/temp/templatecache';
 	my %params = (
 		filename=>$file->getPath,
 		global_vars=>1,
@@ -241,34 +241,34 @@ sub process {
 		strict=>0
 		);
 	my $error=0;
-        if ($session{config}{templateCacheType} =~ /file/) {
+        if ($self->session->config->get("templateCacheType") =~ /file/) {
                 eval { mkpath($fileCacheDir) };
                 if($@) {
-                        WebGUI::ErrorHandler::error("Could not create dir $fileCacheDir: $@\nTemplate file caching disabled");
+                        $self->session->errorHandler->error("Could not create dir $fileCacheDir: $@\nTemplate file caching disabled");
 			$error++;
 		}
 		if(not -w $fileCacheDir) {
-			WebGUI::ErrorHandler::error("Directory $fileCacheDir is not writable. Template file caching is disabled");
+			$self->session->errorHandler->error("Directory $fileCacheDir is not writable. Template file caching is disabled");
 			$error++;
 		}
 	}
-	if ($session{config}{templateCacheType} eq "file" && not $error) {
+	if ($self->session->config->get("templateCacheType") eq "file" && not $error) {
 	# disabled until we can figure out what's wrong with it
 	#	$params{file_cache} = 1;
-	} elsif ($session{config}{templateCacheType} eq "memory") {
+	} elsif ($self->session->config->get("templateCacheType") eq "memory") {
 		$params{cache} = 1;
-	} elsif ($session{config}{templateCacheType} eq "ipc") {
+	} elsif ($self->session->config->get("templateCacheType") eq "ipc") {
 		$params{shared_cache} = 1;
-	} elsif ($session{config}{templateCacheType} eq "memory-ipc") {
+	} elsif ($self->session->config->get("templateCacheType") eq "memory-ipc") {
 		$params{double_cache} = 1;
-	} elsif ($session{config}{templateCacheType} eq "memory-file" && not $error) {
+	} elsif ($self->session->config->get("templateCacheType") eq "memory-file" && not $error) {
 		$params{double_file_cache} = 1;
 	}
 	my $template;
 	unless (-e $file->getPath) {
 		$file->saveFromScalar($self->get("template"));
 		unless (-e $file->getPath) {
-	                WebGUI::ErrorHandler::error("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
+	                $self->session->errorHandler->error("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
         	        $params{scalarref} = \$template;
 			delete $params{filename};
         	}
@@ -335,7 +335,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_goBackToPage {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($session{form}{returnUrl}) if ($session{form}{returnUrl});
+	WebGUI::HTTP::setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
 	return "";
 }
 
@@ -356,12 +356,12 @@ sub www_styleWizard {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $output = "";
-	if ($session{form}{step} == 2) {
+	if ($self->session->form->process("step") == 2) {
 		my $f = WebGUI::HTMLForm->new({action=>$self->getUrl});
 		$f->hidden(name=>"func", value=>"styleWizard");
-		$f->hidden(name=>"proceed", value=>"manageAssets") if ($session{form}{proceed});
+		$f->hidden(name=>"proceed", value=>"manageAssets") if ($self->session->form->process("proceed"));
 		$f->hidden(name=>"step", value=>3);
-		$f->hidden(name=>"layout", value=>$session{form}{layout});
+		$f->hidden(name=>"layout", value=>$self->session->form->process("layout"));
 		$f->text(name=>"heading", value=>"My Site", label=>"Site Name");
 		$f->file(name=>"logo", label=>"Logo", subtext=>"<br />JPEG, GIF, or PNG thats less than 200 pixels wide and 100 pixels tall");
 		$f->color(name=>"pageBackgroundColor", value=>"#ccccdd", label=>"Page Background Color");
@@ -374,16 +374,16 @@ sub www_styleWizard {
 		$f->color(name=>"visitedLinkColor", value=>"#ff00ff", label=>"Visited Link Color");
 		$f->submit;
 		$output = $f->print;
-	} elsif ($session{form}{step} == 3) {
-		my $storageId = WebGUI::FormProcessor::file("logo");
+	} elsif ($self->session->form->process("step") == 3) {
+		my $storageId = $self->session->form->file("logo");
 		my $logo;
 		if ($storageId) {
-			my $storage = WebGUI::Storage::Image->get(WebGUI::FormProcessor::file("logo"));
+			my $storage = WebGUI::Storage::Image->get($self->session->form->file("logo"));
 			$logo = $self->addChild({
 				className=>"WebGUI::Asset::File::Image",
-				title=>WebGUI::FormProcessor::text("heading")." Logo",
-				menuTitle=>WebGUI::FormProcessor::text("heading")." Logo",
-				url=>WebGUI::FormProcessor::text("heading")." Logo",
+				title=>$self->session->form->text("heading")." Logo",
+				menuTitle=>$self->session->form->text("heading")." Logo",
+				url=>$self->session->form->text("heading")." Logo",
 				storageId=>$storage->getId,
 				filename=>@{$storage->getFiles}[0],
 				templateId=>"PBtmpl0000000000000088"
@@ -403,13 +403,13 @@ my $style = '<html>
 		font-size: 12px;
 	}
 	body {
-		background-color: '.WebGUI::FormProcessor::color("pageBackgroundColor").';
+		background-color: '.$self->session->form->color("pageBackgroundColor").';
 		font-family: helvetica;
 		font-size: 14px;
 	}
 	.heading {
-		background-color: '.WebGUI::FormProcessor::color("headingBackgroundColor").';
-		color: '.WebGUI::FormProcessor::color("headingForegroundColor").';
+		background-color: '.$self->session->form->color("headingBackgroundColor").';
+		color: '.$self->session->form->color("headingForegroundColor").';
 		font-size: 30px;
 		margin-left: 10%;
 		margin-right: 10%;
@@ -430,10 +430,10 @@ my $style = '<html>
 		padding: 5px;
 	}
 	.bodyContent {
-		background-color: '.WebGUI::FormProcessor::color("bodyBackgroundColor").';
-		color: '.WebGUI::FormProcessor::color("bodyForegroundColor").';
+		background-color: '.$self->session->form->color("bodyBackgroundColor").';
+		color: '.$self->session->form->color("bodyForegroundColor").';
 		width: 55%; ';
-if ($session{form}{layout} == 1) {
+if ($self->session->form->process("layout") == 1) {
 	$style .= '
 		float: left;
 		height: 75%;
@@ -449,9 +449,9 @@ if ($session{form}{layout} == 1) {
 	$style .= '
 	}
 	.menu {
-		background-color: '.WebGUI::FormProcessor::color("menuBackgroundColor").';
+		background-color: '.$self->session->form->color("menuBackgroundColor").';
 		width: 25%; ';
-if ($session{form}{layout} == 1) {
+if ($self->session->form->process("layout") == 1) {
 	$style .= '
 		margin-left: 10%;
 		height: 75%;
@@ -468,10 +468,10 @@ if ($session{form}{layout} == 1) {
 	$style .= '
 	}
 	a {
-		color: '.WebGUI::FormProcessor::color("linkColor").';
+		color: '.$self->session->form->color("linkColor").';
 	}
 	a:visited {
-		color: '.WebGUI::FormProcessor::color("visitedLinkColor").';
+		color: '.$self->session->form->color("visitedLinkColor").';
 	}
 	</style>
 </head>
@@ -484,17 +484,17 @@ if ($session{form}{layout} == 1) {
 		$style .= '<div class="logo"><a href="^H(linkonly);">^AssetProxy('.$logo->get("url").');</a></div>';
 	}
 	$style .= '
-		'.WebGUI::FormProcessor::text("heading").'
+		'.$self->session->form->text("heading").'
 		<div class="endFloat"></div>
 	</div>
 </div>
 <div class="menu">
-	<div class="padding">^AssetProxy('.($session{form}{layout} == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
+	<div class="padding">^AssetProxy('.($self->session->form->process("layout") == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
 </div>
 <div class="bodyContent">
 	<div class="padding"><tmpl_var body.content></div>
 </div>';
-if ($session{form}{layout} == 1) {
+if ($self->session->form->process("layout") == 1) {
 	$style .= '<div class="endFloat"></div>';
 }
 $style .= '
@@ -512,7 +512,7 @@ $style .= '
 			})->www_edit;
 	} else {
 		$output = WebGUI::Form::formHeader({action=>$self->getUrl}).WebGUI::Form::hidden({name=>"func", value=>"styleWizard"});
-		$output .= WebGUI::Form::hidden({name=>"proceed", value=>"manageAssets"}) if ($session{form}{proceed});
+		$output .= WebGUI::Form::hidden({name=>"proceed", value=>"manageAssets"}) if ($self->session->form->process("proceed"));
 		$output .= '<style type="text/css">
 			.chooser { float: left; width: 150px; height: 150px; } 
 			.representation, .representation td { font-size: 12px; width: 120px; border: 1px solid black; } 

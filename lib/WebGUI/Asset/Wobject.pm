@@ -137,7 +137,7 @@ Deletes the rendered page cache for this wobject.
 
 sub deletePageCache {
 	my $self = shift;
-        WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
+        WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
 }
 
 #-------------------------------------------------------------------
@@ -165,7 +165,7 @@ sub deleteCollateral {
 	my $table = shift;
 	my $keyName = shift;
 	my $keyValue = shift;
-        WebGUI::SQL->write("delete from $table where $keyName=".quote($keyValue));
+        $self->session->db->write("delete from $table where $keyName=".$self->session->db->quote($keyValue));
 	$self->updateHistory("deleted collateral item ".$keyName." ".$keyValue);
 }
 
@@ -234,7 +234,7 @@ sub getCollateral {
 	if ($keyValue eq "new" || $keyValue eq "") {
 		return {$keyName=>"new"};
 	} else {
-		return WebGUI::SQL->quickHashRef("select * from $table where $keyName=".quote($keyValue),WebGUI::SQL->getSlave);
+		return $self->session->db->quickHashRef("select * from $table where $keyName=".$self->session->db->quote($keyValue),$self->session->db->getSlave);
 	}
 }
 
@@ -280,7 +280,7 @@ Logs the view of the wobject to the passive profiling mechanism.
 
 sub logView {
 	my $self = shift;
-	if ($session{setting}{passiveProfilingEnabled}) {
+	if ($self->session->setting->get("passiveProfilingEnabled")) {
 		WebGUI::PassiveProfiling::add($self->get("assetId"));
 # not sure what this will do in the new model
 #		WebGUI::PassiveProfiling::addPage();	# add wobjects on asset to passive profile log
@@ -330,14 +330,14 @@ sub moveCollateralDown {
 	unless (defined $setValue) {
 		$setValue = $self->get($setName);
 	}
-	WebGUI::SQL->beginTransaction;
-        my ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $table where $keyName=".quote($keyValue)." and $setName=".quote($setValue));
-        my ($id) = WebGUI::SQL->quickArray("select $keyName from $table where $setName=".quote($setValue)." and sequenceNumber=$seq+1");
+	$self->session->db->beginTransaction;
+        my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
+        my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)." and sequenceNumber=$seq+1");
         if ($id ne "") {
-                WebGUI::SQL->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".quote($keyValue)." and $setName=" .quote($setValue));
-                WebGUI::SQL->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".quote($id)." and $setName=" .quote($setValue));
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($keyValue)." and $setName=" .$self->session->db->quote($setValue));
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($id)." and $setName=" .$self->session->db->quote($setValue));
          }
-	WebGUI::SQL->commit;
+	$self->session->db->commit;
 }
 
 
@@ -382,17 +382,17 @@ sub moveCollateralUp {
 	unless (defined $setValue) {
 		$setValue = $self->get($setName);
 	}
-	WebGUI::SQL->beginTransaction;
-        my ($seq) = WebGUI::SQL->quickArray("select sequenceNumber from $table where $keyName=".quote($keyValue)." and $setName=".quote($setValue));
-        my ($id) = WebGUI::SQL->quickArray("select $keyName from $table where $setName=".quote($setValue)
+	$self->session->db->beginTransaction;
+        my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
+        my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)
 		." and sequenceNumber=$seq-1");
         if ($id ne "") {
-                WebGUI::SQL->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".quote($keyValue)." and $setName="
-			.quote($setValue));
-                WebGUI::SQL->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".quote($id)." and $setName="
-			.quote($setValue));
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($keyValue)." and $setName="
+			.$self->session->db->quote($setValue));
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($id)." and $setName="
+			.$self->session->db->quote($setValue));
         }
-	WebGUI::SQL->commit;
+	$self->session->db->commit;
 }
 
 #-------------------------------------------------------------------
@@ -418,7 +418,7 @@ An HTML blob to be parsed into the current style.
 sub processStyle {
 	my $self = shift;
 	my $output = shift;
-	return WebGUI::Style::process($output,$self->get("styleTemplateId"));
+	return $self->session->style->process($output,$self->get("styleTemplateId"));
 }
 
 
@@ -453,9 +453,9 @@ sub reorderCollateral {
 	my $setName = shift || "assetId";
 	my $setValue = shift || $self->get($setName);
 	my $i = 1;
-        my $sth = WebGUI::SQL->read("select $keyName from $table where $setName=".quote($setValue)." order by sequenceNumber");
+        my $sth = $self->session->db->read("select $keyName from $table where $setName=".$self->session->db->quote($setValue)." order by sequenceNumber");
         while (my ($id) = $sth->array) {
-                WebGUI::SQL->write("update $table set sequenceNumber=$i where $setName=".quote($setValue)." and $keyName=".quote($id));
+                $self->session->db->write("update $table set sequenceNumber=$i where $setName=".$self->session->db->quote($setValue)." and $keyName=".$self->session->db->quote($id));
                 $i++;
         }
         $sth->finish;
@@ -517,7 +517,7 @@ sub setCollateral {
      		my $dbvalues = "";
 		unless ($useSequence eq "0") {
 			unless (exists $properties->{sequenceNumber}) {
-				my ($seq) = WebGUI::SQL->quickArray("select max(sequenceNumber) from $table where $setName=".quote($setValue));
+				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from $table where $setName=".$self->session->db->quote($setValue));
 				$properties->{sequenceNumber} = $seq+1;
 			}
 		} 
@@ -530,7 +530,7 @@ sub setCollateral {
 				$dbvalues .= ',';
 			}
 			$dbkeys .= $key;
-			$dbvalues .= quote($properties->{$key});
+			$dbvalues .= $self->session->db->quote($properties->{$key});
 		}
 		$sql .= $dbkeys.') values ('.$dbvalues.')';
 		$self->updateHistory("added collateral item ".$table." ".$properties->{$keyName});
@@ -539,13 +539,13 @@ sub setCollateral {
 		foreach my $key (keys %{$properties}) {
 			unless ($key eq "sequenceNumber") {
 				$sql .= ',' if ($counter++ > 0);
-				$sql .= $key."=".quote($properties->{$key});
+				$sql .= $key."=".$self->session->db->quote($properties->{$key});
 			}
 		}
-		$sql .= " where $keyName=".quote($properties->{$keyName});
+		$sql .= " where $keyName=".$self->session->db->quote($properties->{$keyName});
 		$self->updateHistory("edited collateral item ".$table." ".$properties->{$keyName});
 	}
-  	WebGUI::SQL->write($sql);
+  	$self->session->db->write($sql);
 	$self->reorderCollateral($table,$keyName,$setName,$setValue) if ($properties->{sequenceNumber} < 0);
 	return $properties->{$keyName};
 }
@@ -559,7 +559,7 @@ sub www_edit {
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
 	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
-	my $addEdit = ($session{form}{func} eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
+	my $addEdit = ($self->session->form->process("func") eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
 	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
 }
 
@@ -577,10 +577,10 @@ sub www_view {
 	unless ($self->canView) {
 		if ($self->get("state") eq "published") { # no privileges, make em log in
 			return WebGUI::Privilege::noAccess();
-		} elsif ($session{var}{adminOn} && $self->get("state") =~ /^trash/) { # show em trash
+		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
 			WebGUI::HTTP::setRedirect($self->getUrl("func=manageTrash"));
 			return "";
-		} elsif ($session{var}{adminOn} && $self->get("state") =~ /^clipboard/) { # show em clipboard
+		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
 			WebGUI::HTTP::setRedirect($self->getUrl("func=manageClipboard"));
 			return "";
 		} else { # tell em it doesn't exist anymore
@@ -588,7 +588,7 @@ sub www_view {
 			return WebGUI::Asset->getNotFound->www_view;
 		}
 	}
-	if ($self->get("encryptPage") && $session{env}{HTTPS} ne "on") {
+	if ($self->get("encryptPage") && $self->session->env->get("HTTPS") ne "on") {
                 WebGUI::HTTP::setRedirect($self->getUrl);
                 return "";
         }
@@ -596,21 +596,21 @@ sub www_view {
 	my $cache;
 	my $output;
         my $useCache = (
-		$session{form}{op} eq "" && $session{form}{pn} eq "" 
+		$self->session->form->process("op") eq "" && $self->session->form->process("pn") eq "" 
 		&& (
-			( $self->get("cacheTimeout") > 10 && $session{user}{userId} ne '1') 
-			|| ( $self->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} eq '1')
+			( $self->get("cacheTimeout") > 10 && $self->session->user->profileField("userId") ne '1') 
+			|| ( $self->get("cacheTimeoutVisitor") > 10 && $self->session->user->profileField("userId") eq '1')
 		) 
-		&& !( $session{var}{adminOn} || $disableCache)
+		&& !( $self->session->var->get("adminOn") || $disableCache)
 	);
 	if ($useCache) {
-               	$cache = WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId});
+               	$cache = WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"));
            	$output = $cache->get;
 	}
 	unless ($output) {
 		$output = $self->processStyle($self->view);
 		my $ttl;
-		if ($session{user}{userId} eq '1') {
+		if ($self->session->user->profileField("userId") eq '1') {
 			$ttl = $self->get("cacheTimeoutVisitor");
 		} else {
 			$ttl = $self->get("cacheTimeout");

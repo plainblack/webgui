@@ -168,11 +168,11 @@ sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	if ($small && ref($self) eq '') {
-		return $session{config}{extrasURL}.'/assets/small/file.gif';
+		return $self->session->config->get("extrasURL").'/assets/small/file.gif';
 	} elsif ($small) {
 		return $self->getFileIconUrl;	
 	}
-	return $session{config}{extrasURL}.'/assets/file.gif';
+	return $self->session->config->get("extrasURL").'/assets/file.gif';
 }
 
 
@@ -202,9 +202,9 @@ sub processPropertiesFromFormPost {
 		my %data;
 		$data{filename} = $filename;
 		$data{storageId} = $storage->getId;
-		$data{title} = $filename unless ($session{form}{title});
-		$data{menuTitle} = $filename unless ($session{form}{menuTitle});
-		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
+		$data{title} = $filename unless ($self->session->form->process("title"));
+		$data{menuTitle} = $filename unless ($self->session->form->process("menuTitle"));
+		$data{url} = $self->getParent->get('url').'/'.$filename unless ($self->session->form->process("url"));
 		$self->update(\%data);
 	}
 }
@@ -214,7 +214,7 @@ sub processPropertiesFromFormPost {
 
 sub purge {
 	my $self = shift;
-	my $sth = WebGUI::SQL->read("select storageId from FileAsset where assetId=".quote($self->getId));
+	my $sth = $self->session->db->read("select storageId from FileAsset where assetId=".$self->session->db->quote($self->getId));
 	while (my ($storageId) = $sth->array) {
 		WebGUI::Storage->get($storageId)->delete;
 	}
@@ -284,7 +284,7 @@ sub www_edit {
 		-namespace=>"FileAsset"
 	);
 	$self->getAdminConsole->setHelp("file add/edit", "Asset_File");
-	my $addEdit = ($session{form}{func} eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
+	my $addEdit = ($self->session->form->process("func") eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
 	return $self->getAdminConsole->render($tabform->print,$addEdit.' '.$self->getName);
 }
 
@@ -292,7 +292,7 @@ sub www_edit {
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
-	if ($session{var}{adminOn}) {
+	if ($self->session->var->get("adminOn")) {
 		return $self->getContainer->www_view;
 	}
 	WebGUI::HTTP::setRedirect($self->getFileUrl);

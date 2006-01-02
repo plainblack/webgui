@@ -66,7 +66,7 @@ sub canAdd {
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-	return (($session{form}{func} eq "add" || ($session{form}{assetId} eq "new" && $session{form}{func} eq "editSave" && $session{form}{class} eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
+	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
 		($self->isPoster && $self->getThread->getParent->get("editTimeout") > (WebGUI::DateTime::time() - $self->get("dateUpdated"))) ||
 		$self->getThread->getParent->canModerate;
@@ -137,7 +137,7 @@ sub definition {
 				},
 			username => {
 				fieldType=>"hidden",
-				defaultValue=>$session{form}{visitorUsername} || $session{user}{alias} || $session{user}{username}
+				defaultValue=>$self->session->form->process("visitorUsername") || $self->session->user->profileField("alias") || $self->session->user->profileField("username")
 				},
 			rating => {
 				noFormPost=>1,
@@ -229,7 +229,7 @@ Formats the URL to approve a post.
 
 sub getApproveUrl {
 	my $self = shift;
-	return $self->getUrl("revision=".$self->get("revisionDate").";func=approve;mlog=".$session{form}{mlog});
+	return $self->getUrl("revision=".$self->get("revisionDate").";func=approve;mlog=".$self->session->form->process("mlog"));
 }
 
 #-------------------------------------------------------------------
@@ -284,7 +284,7 @@ Formats the url to deny a post.
 
 sub getDenyUrl {
 	my $self = shift;
-	return $self->getUrl("revision=".$self->get("revisionDate").";func=deny;mlog=".$session{form}{mlog});
+	return $self->getUrl("revision=".$self->get("revisionDate").";func=deny;mlog=".$self->session->form->process("mlog"));
 }
 
 #-------------------------------------------------------------------
@@ -398,8 +398,8 @@ sub getStorageLocation {
 #-------------------------------------------------------------------
 sub getSynopsisAndContentFromFormPost {
 	my $self = shift;
-	my $synopsis = $session{form}{synopsis};
-	my $body = $session{form}{content};
+	my $synopsis = $self->session->form->process("synopsis");
+	my $body = $self->session->form->process("content");
 	unless ($synopsis) {
         	$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
        	 	my @content = split(/\^\-\;/,$body);
@@ -526,9 +526,9 @@ Returns a boolean indicating whether this user has already rated this post.
 sub hasRated {	
 	my $self = shift;
         return 1 if $self->isPoster;
-        my ($flag) = WebGUI::SQL->quickArray("select count(*) from Post_rating where assetId="
-                .quote($self->getId)." and ((userId=".quote($session{user}{userId})." and userId<>'1') or (userId='1' and
-                ipAddress=".quote($session{env}{REMOTE_ADDR})."))");
+        my ($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId="
+                .$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and userId<>'1') or (userId='1' and
+                ipAddress=".$self->session->db->quote($self->session->env->get("REMOTE_ADDR"))."))");
         return $flag;
 }
 
@@ -556,7 +556,7 @@ Returns a boolean indicating whether this post is marked read for the user.
 sub isMarkedRead {
         my $self = shift;
 	return 1 if $self->isPoster;
-        my ($isRead) = WebGUI::SQL->quickArray("select count(*) from Post_read where userId=".quote($session{user}{userId})." and postId=".quote($self->getId));
+        my ($isRead) = $self->session->db->quickArray("select count(*) from Post_read where userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and postId=".$self->session->db->quote($self->getId));
         return $isRead;
 }
 
@@ -570,7 +570,7 @@ Returns a boolean that is true if the current user created this post and is not 
 
 sub isPoster {
 	my $self = shift;
-	return ($session{user}{userId} ne "1" && $session{user}{userId} eq $self->get("ownerUserId"));
+	return ($self->session->user->profileField("userId") ne "1" && $self->session->user->profileField("userId") eq $self->get("ownerUserId"));
 }
 
 
@@ -599,8 +599,8 @@ Marks this post read for this user.
 sub markRead {
 	my $self = shift;
         unless ($self->isMarkedRead) {
-                WebGUI::SQL->write("insert into Post_read (userId, postId, threadId, readDate) values (".quote($session{user}{userId}).",
-                        ".quote($self->getId).", ".quote($self->get("threadId")).", ".WebGUI::DateTime::time().")");
+                $self->session->db->write("insert into Post_read (userId, postId, threadId, readDate) values (".$self->session->db->quote($self->session->user->profileField("userId")).",
+                        ".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->get("threadId")).", ".WebGUI::DateTime::time().")");
         }
 }
 
@@ -627,7 +627,7 @@ sub notifySubscribers {
                 if ($lang{$u->profileField("language")}{message} eq "") {
                         $lang{$u->profileField("language")}{var} = $self->getTemplateVars();
 			$self->getThread->getParent->appendTemplateLabels($lang{$u->profileField("language")}{var});
-			$lang{$u->profileField("language")}{var}{url} = WebGUI::URL::getSiteURL().$self->getUrl;
+			$lang{$u->profileField("language")}{var}{url} = $self->session->url->getSiteURL().$self->getUrl;
                         $lang{$u->profileField("language")}{var}{'notify.subscription.message'} =
                                          WebGUI::International::get(875,"Asset_Post",$u->profileField("language"));
                         $lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"Asset_Post",$u->profileField("language"));
@@ -643,40 +643,40 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
 	my %data;
-	if ($session{form}{assetId} eq "new") {
+	if ($self->session->form->process("assetId") eq "new") {
 		if ($self->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
 			$self->update({threadId=>$self->getId});
 		} else {
 			$self->update({threadId=>$self->getParent->get("threadId")});
 		}
-		if ($session{setting}{enableKarma} && $self->getThread->getParent->get("karmaPerPost")) {
-			my $u = WebGUI::User->new($session{user}{userId});
+		if ($self->session->setting->get("enableKarma") && $self->getThread->getParent->get("karmaPerPost")) {
+			my $u = WebGUI::User->new($self->session->user->profileField("userId"));
 			$u->addKarma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
 		}
 		%data = (
-			ownerUserId => $session{user}{userId},
-			username => $session{form}{visitorName} || $session{user}{alias} || $session{user}{username},
+			ownerUserId => $self->session->user->profileField("userId"),
+			username => $self->session->form->process("visitorName") || $self->session->user->profileField("alias") || $self->session->user->profileField("username"),
 			isHidden => 1,
 			);
 		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
 		if ($self->getThread->getParent->canModerate) {
 			$self->getThread->lock if ($session{form}{'lock'});
-			$self->getThread->stick if ($session{form}{stick});
+			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
 	}
 	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
 	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
-	$data{startDate} = $self->getThread->getParent->get("startDate") unless ($session{form}{startDate});
-	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($session{form}{endDate});
+	$data{startDate} = $self->getThread->getParent->get("startDate") unless ($self->session->form->process("startDate"));
+	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($self->session->form->process("endDate"));
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
-		$data{content} .= "\n\n --- (".WebGUI::International::get('Edited_on','Asset_Post')." ".WebGUI::DateTime::epochToHuman(undef,"%z %Z [GMT%O]").WebGUI::International::get('By','Asset_Post').$session{user}{alias}.") --- \n";
+		$data{content} .= "\n\n --- (".WebGUI::International::get('Edited_on','Asset_Post')." ".WebGUI::DateTime::epochToHuman(undef,"%z %Z [GMT%O]").WebGUI::International::get('By','Asset_Post').$self->session->user->profileField("alias").") --- \n";
 		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
 			$data{content} = '<p>'.$data{content}.'</p>';
 		}
 	}
 	$self->update(\%data);
-        $self->getThread->subscribe if ($session{form}{subscribe});
+        $self->getThread->subscribe if ($self->session->form->process("subscribe"));
         if ($self->getThread->getParent->get("moderatePosts")) {
                 $self->setStatusPending;
         } else {
@@ -691,17 +691,17 @@ sub processPropertiesFromFormPost {
 		$self->setSize($storage->getFileSize($filename));
 		foreach my $file (@{$storage->getFiles}) {
 			if ($storage->isImage($file)) {
-				$storage->generateThumbnail($file,$session{setting}{maxImageSize});
+				$storage->generateThumbnail($file,$self->session->setting->get("maxImageSize"));
 				$storage->deleteFile($file);
 				$storage->renameFile('thumb-'.$file,$file);
 				$storage->generateThumbnail($file);
 			}
 		}
 	}
-	$session{form}{proceed} = "redirectToParent";
+	$self->session->form->process("proceed") = "redirectToParent";
 	# clear some cache
-	WebGUI::Cache->new("wobject_".$self->getThread->getParent->getId."_".$session{user}{userId})->delete;
-	WebGUI::Cache->new("cspost_".($self->getParent->getId)."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_1")->delete;
+	WebGUI::Cache->new("wobject_".$self->getThread->getParent->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Cache->new("cspost_".($self->getParent->getId)."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_1")->delete;
 }
 
 
@@ -709,13 +709,13 @@ sub processPropertiesFromFormPost {
 
 sub purge {
         my $self = shift;
-        my $sth = WebGUI::SQL->read("select storageId from Post where assetId=".quote($self->getId));
+        my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
         while (my ($storageId) = $sth->array) {
                 WebGUI::Storage->get($storageId)->delete;
         }
         $sth->finish;
-	WebGUI::SQL->write("delete from Post_rating where assetId=".quote($self->getId));
-	WebGUI::SQL->write("delete from Post_read where postId=".quote($self->getId));
+	$self->session->db->write("delete from Post_rating where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->write("delete from Post_read where postId=".$self->session->db->quote($self->getId));
         return $self->SUPER::purge;
 }
 
@@ -745,12 +745,12 @@ sub rate {
 	my $self = shift;
 	my $rating = shift || 3;
 	unless ($self->hasRated) {
-        	WebGUI::SQL->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-                	.quote($self->getId).", ".quote($session{user}{userId}).", ".quote($session{env}{REMOTE_ADDR}).", 
-			".WebGUI::DateTime::time().", ".quote($rating).")");
-        	my ($count) = WebGUI::SQL->quickArray("select count(*) from Post_rating where assetId=".quote($self->getId));
+        	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
+                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).", 
+			".WebGUI::DateTime::time().", ".$self->session->db->quote($rating).")");
+        	my ($count) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=".$self->session->db->quote($self->getId));
         	$count = $count || 1;
-        	my ($sum) = WebGUI::SQL->quickArray("select sum(rating) from Post_rating where assetId=".quote($self->getId));
+        	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=".$self->session->db->quote($self->getId));
         	my $average = WebGUI::Utility::round($sum/$count);
         	$self->update({rating=>$average});
 		$self->getThread->rate($rating);
@@ -790,9 +790,9 @@ sub setStatusApproved {
         $self->commit;
         $self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if $self->isReply;
         unless ($self->isPoster) {
-                WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',WebGUI::URL::getSiteURL().'/'.$self->getUrl,579);
+                WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->session->url->getSiteURL().'/'.$self->getUrl,579);
         }
-        $self->notifySubscribers unless ($session{form}{func} eq 'add');
+        $self->notifySubscribers unless ($self->session->form->process("func") eq 'add');
 }
 
 
@@ -823,7 +823,7 @@ Sets the status of this post to denied.
 sub setStatusDenied {
         my ($self) = @_;
         $self->update({status=>'denied'});
-        WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',WebGUI::URL::getSiteURL().'/'.$self->getUrl,580);
+        WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->session->url->getSiteURL().'/'.$self->getUrl,580);
 }
 
 #-------------------------------------------------------------------
@@ -841,7 +841,7 @@ sub setStatusPending {
 	} else {
         	$self->update({status=>'pending'});
         	WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
-                	WebGUI::URL::getSiteURL().'/'.$self->getUrl("revision=".$self->get("revisionDate")),578,'WebGUI','pending');
+                	$self->session->url->getSiteURL().'/'.$self->getUrl("revision=".$self->get("revisionDate")),578,'WebGUI','pending');
 	}
 }
 
@@ -860,12 +860,12 @@ sub trash {
         $self->getThread->decrementReplies if ($self->isReply);
         if ($self->getThread->get("lastPostId") eq $self->getId) {
                 my $threadLineage = $self->getThread->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($threadLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
+                my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($threadLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
                 $self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
         }
         if ($self->getThread->getParent->get("lastPostId") eq $self->getId) {
                 my $forumLineage = $self->getThread->getParent->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($forumLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
+                my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($forumLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
                 $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
         }
 }
@@ -880,7 +880,7 @@ Negates the markRead method.
 
 sub unmarkRead {
 	my $self = shift;
-        WebGUI::SQL->write("delete from forumRead where userId=".quote($session{user}{userId})." and postId=".quote($self->getId));
+        $self->session->db->write("delete from forumRead where userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and postId=".$self->session->db->quote($self->getId));
 }
 
 #-------------------------------------------------------------------
@@ -931,7 +931,7 @@ sub www_approve {
 #-------------------------------------------------------------------
 sub www_deleteFile {
 	my $self = shift;
-	$self->getStorageLocation->deleteFile($session{form}{filename}) if $self->canEdit;
+	$self->getStorageLocation->deleteFile($self->session->form->process("filename")) if $self->canEdit;
 	return $self->www_edit;
 }
 
@@ -956,7 +956,7 @@ sub www_edit {
 	my %var;
 	my $content;
 	my $title;
-	if ($session{form}{func} eq "add") { # new post
+	if ($self->session->form->process("func") eq "add") { # new post
         	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getParent->getUrl})
 			.WebGUI::Form::hidden({
                 		name=>"func",
@@ -968,12 +968,12 @@ sub www_edit {
 				})
 			.WebGUI::Form::hidden({
 				name=>"class",
-				value=>$session{form}{class}
+				value=>$self->session->form->process("class")
 				});
         	$var{'isNewPost'} = 1;
-		$content = $session{form}{content};
-		$title = $session{form}{title};
-		if ($session{form}{class} eq "WebGUI::Asset::Post") { # new reply
+		$content = $self->session->form->process("content");
+		$title = $self->session->form->process("title");
+		if ($self->session->form->process("class") eq "WebGUI::Asset::Post") { # new reply
 			$self->{_thread} = $self->getParent->getThread;
 			return WebGUI::Privilege::insufficient() unless ($self->getThread->canReply);
 			$var{isReply} = 1;
@@ -983,22 +983,22 @@ sub www_edit {
 			for my $i (1..5) {	
 				$var{'reply.userDefined'.$i} = WebGUI::HTML::filter($self->getParent->get('userDefined'.$i),"macros");
 			}
-			unless ($session{form}{content} || $session{form}{title}) {
-                		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($session{form}{withQuote});
+			unless ($self->session->form->process("content") || $self->session->form->process("title")) {
+                		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($self->session->form->process("withQuote"));
                 		$title = $self->getParent->get("title");
                 		$title = "Re: ".$title unless ($title =~ /^Re:/);
 			}
 			$var{'subscribe.form'} = WebGUI::Form::yesNo({
 				name=>"subscribe",
-				value=>$session{form}{subscribe}
+				value=>$self->session->form->process("subscribe")
 				});
-		} elsif ($session{form}{class} eq "WebGUI::Asset::Post::Thread") { # new thread
+		} elsif ($self->session->form->process("class") eq "WebGUI::Asset::Post::Thread") { # new thread
 			return WebGUI::Privilege::insufficient() unless ($self->getThread->getParent->canPost);
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canModerate) {
                         	$var{'sticky.form'} = WebGUI::Form::yesNo({
                                 	name=>'stick',
-                                	value=>$session{form}{stick}
+                                	value=>$self->session->form->process("stick")
                                 	});
                         	$var{'lock.form'} = WebGUI::Form::yesNo({
                        	         	name=>'lock',
@@ -1007,10 +1007,10 @@ sub www_edit {
 			}
 			$var{'subscribe.form'} = WebGUI::Form::yesNo({
 				name=>"subscribe",
-				value=>$session{form}{subscribe} || 1
+				value=>$self->session->form->process("subscribe") || 1
 				});
 		}
-                $content .= "\n\n".$session{user}{signature} if ($session{user}{signature} && !$session{form}{content});
+                $content .= "\n\n".$self->session->user->profileField("signature") if ($self->session->user->profileField("signature") && !$self->session->form->process("content"));
 	} else { # edit
 		return WebGUI::Privilege::insufficient() unless ($self->canEdit);
         	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
@@ -1030,10 +1030,10 @@ sub www_edit {
 		$content = $self->getValue("content");
 		$title = $self->getValue("title");
 	}
-	if ($session{form}{title} || $session{form}{content} || $session{form}{synopsis}) {
-		$var{'preview.title'} = WebGUI::HTML::filter($session{form}{title},"all");
+	if ($self->session->form->process("title") || $self->session->form->process("content") || $self->session->form->process("synopsis")) {
+		$var{'preview.title'} = WebGUI::HTML::filter($self->session->form->process("title"),"all");
 		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContentFromFormPost;
-		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$session{form}{contentType});
+		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$self->session->form->process("contentType"));
 		for my $i (1..5) {	
 			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($session{form}{'userDefined'.$i},"macros");
 		}
@@ -1041,7 +1041,7 @@ sub www_edit {
 	$var{'form.footer'} = WebGUI::Form::formFooter();
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
-	$var{'user.isVisitor'} = ($session{user}{userId} eq '1');
+	$var{'user.isVisitor'} = ($self->session->user->profileField("userId") eq '1');
 	$var{'visitorName.form'} = WebGUI::Form::text({
 		name=>"visitorName",
 		value=>$self->getValue("visitorName")
@@ -1095,13 +1095,13 @@ sub www_edit {
                 value=>$self->getValue("contentType") || "mixed"
                 });
 	my $startDate = $self->get("startDate");
-	$startDate = WebGUI::DateTime::setToEpoch($session{form}{startDate}) if ($session{form}{startDate});
+	$startDate = WebGUI::DateTime::setToEpoch($self->session->form->process("startDate")) if ($self->session->form->process("startDate"));
 	$var{'startDate.form'} = WebGUI::Form::dateTime({
 		name  => 'startDate',
 		value => $startDate
 		});
 	my $endDate = $self->get("endDate");
-	$endDate = WebGUI::DateTime::setToEpoch($session{form}{endDate}) if ($session{form}{endDate});
+	$endDate = WebGUI::DateTime::setToEpoch($self->session->form->process("endDate")) if ($self->session->form->process("endDate"));
 	$var{'endDate.form'} = WebGUI::Form::dateTime({
 		name  => 'endDate',
 		value => $endDate
@@ -1121,7 +1121,7 @@ The web method to rate a post.
 
 sub www_rate {	
 	my $self = shift;
-	$self->WebGUI::Asset::Post::rate($session{form}{rating}) if ($self->canView && !$self->hasRated);
+	$self->WebGUI::Asset::Post::rate($self->session->form->process("rating")) if ($self->canView && !$self->hasRated);
 	$self->www_view;
 }
 

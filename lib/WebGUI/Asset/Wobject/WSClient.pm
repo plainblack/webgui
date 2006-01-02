@@ -27,7 +27,7 @@ sub _create_cache_key {
    $cache_key = $_[0]->get('sharedCache')
       ? Digest::MD5::md5_hex($call, $param_str)
       : Digest::MD5::md5_hex($call, $param_str, $session{'var'}{'sessionId'});
-   WebGUI::ErrorHandler::warn(($_[0]->get('sharedCache')?'shared':'session')
+   $self->session->errorHandler->warn(($_[0]->get('sharedCache')?'shared':'session')
       . " cache_key=$cache_key md5_hex($call, $param_str)");
    return $cache_key;
 }
@@ -258,11 +258,11 @@ sub view {
     @seen{@exclude_params} = ();
     for (keys %{$session{'form'}}) {
        unless (exists $seen{$_}) {
-          $query_string .= WebGUI::URL::escape($_) . '='
-             . WebGUI::URL::escape($session{'form'}{$_}) . ';';
+          $query_string .= $self->session->url->escape($_) . '='
+             . $self->session->url->escape($session{'form'}{$_}) . ';';
        }
     }
-    $url = WebGUI::URL::page($query_string);
+    $url = $self->session->url->page($query_string);
 
 
    # snag our SOAP call and preprocess if needed
@@ -282,7 +282,7 @@ sub view {
         ($session{'form'}{'disableWobjects'} && grep /^$call$/,
          $session{'form'}{'disableWobjects'})) {
                                                                                 
-      WebGUI::ErrorHandler::warn("disabling soap call $call");
+      $self->session->errorHandler->warn("disabling soap call $call");
       $var{'disableWobject'} = 1;
       return $self->processTemplate(\%var,$self->get("templateId"));
    }
@@ -302,9 +302,9 @@ sub view {
          && grep /^$call$/, @targetWobjects) {
 
          $cache_key = $session{'form'}{'cache'};
-         WebGUI::ErrorHandler::warn("passed a cache_key for $call");
+         $self->session->errorHandler->warn("passed a cache_key for $call");
       } else {
-         WebGUI::ErrorHandler::warn("cache_key not applicable to $call ");
+         $self->session->errorHandler->warn("cache_key not applicable to $call ");
          $cache_key = _create_cache_key($self, $call, $param_str);
       }
    } else {
@@ -326,7 +326,7 @@ sub view {
       # the solution is to normalize all params to another table
       eval "\$arr_ref = [$param_str];";
       eval { @params = @$arr_ref; };
-      WebGUI::ErrorHandler::debug(WebGUI::International::get(22, "Asset_WSClient")) if $@ && $self->get('debugMode');
+      $self->session->errorHandler->debug(WebGUI::International::get(22, "Asset_WSClient")) if $@ && $self->get('debugMode');
 
       if ($self->get('execute_by_default') || grep /^$call$/,
          @targetWobjects) {
@@ -335,12 +335,12 @@ sub view {
          # valid looking uri, but I haven't hunted for the relevant RFC yet
          if ($self->get("uri") =~ m!.+/.+!) {
 
-            WebGUI::ErrorHandler::debug('uri=' . $self->get("uri"))
+            $self->session->errorHandler->debug('uri=' . $self->get("uri"))
                if $self->get('debugMode');
             $soap = $self->_instantiate_soap;
 
          } else {
-            WebGUI::ErrorHandler::debug(WebGUI::International::get(23, "Asset_WSClient")) if $self->get('debugMode');
+            $self->session->errorHandler->debug(WebGUI::International::get(23, "Asset_WSClient")) if $self->get('debugMode');
          }
       }
    }
@@ -355,14 +355,14 @@ sub view {
             # otherwise)".  That "not stated otherwise" bit is important.
             my $return = $soap->$call(@params);
          
-            WebGUI::ErrorHandler::debug("$call(" . (join ',', @params) . ')')
+            $self->session->errorHandler->debug("$call(" . (join ',', @params) . ')')
                if $self->get('debugMode');
 
             # The possible return types I've come across include a SOAP object,
             # a hash reference, a blessed object or a simple scalar.  Each type
             # requires different handling (woohoo!) before being passed to the
             # template system
-            WebGUI::ErrorHandler::debug(WebGUI::International::get(24, "Asset_WSClient") .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
+            $self->session->errorHandler->debug(WebGUI::International::get(24, "Asset_WSClient") .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
 
             # SOAP object
             if ((ref $return) =~ /SOAP/i) {
@@ -374,7 +374,7 @@ sub view {
 
             # blessed object, to be stripped with Data::Structure::Util
             } elsif ( ref $return) {
-               WebGUI::ErrorHandler::warn("Data::Structure::Util::unbless($return)");
+               $self->session->errorHandler->warn("Data::Structure::Util::unbless($return)");
                @result = Data::Structure::Util::unbless($return);
 
             # scalar value, we hope
@@ -390,18 +390,18 @@ sub view {
 
          # did the soap call fault?
          if ($@) {
-            WebGUI::ErrorHandler::debug($@) if $self->get('debugMode');
+            $self->session->errorHandler->debug($@) if $self->get('debugMode');
             $var{'soapError'} = $@;
-            WebGUI::ErrorHandler::debug(WebGUI::International::get(25, "Asset_WSClient") . $var{'soapError'})
+            $self->session->errorHandler->debug(WebGUI::International::get(25, "Asset_WSClient") . $var{'soapError'})
                if $self->get('debugMode');
          }
 
       # cached data was found
       } else {
-         WebGUI::ErrorHandler::warn("Using cached data");
+         $self->session->errorHandler->warn("Using cached data");
       }
 
-        WebGUI::ErrorHandler::debug(Dumper(@result)) if     
+        $self->session->errorHandler->debug(Dumper(@result)) if     
            $self->get('debugMode');
 
       # Do we need to decode utf8 data?  Will only decode if modules were
@@ -475,7 +475,7 @@ sub view {
 
 
    } else {
-      WebGUI::ErrorHandler::debug(WebGUI::International::get(26, "Asset_WSClient") . $@) if $self->get('debugMode');
+      $self->session->errorHandler->debug(WebGUI::International::get(26, "Asset_WSClient") . $@) if $self->get('debugMode');
    }
 
    # did they request a funky http header?
@@ -483,7 +483,7 @@ sub view {
       $self->get("httpHeader")) {
 
       WebGUI::HTTP::setMimeType($self->get("httpHeader"));
-      WebGUI::ErrorHandler::warn("changed mimetype: " .  $session{'header'}{'mimetype'});
+      $self->session->errorHandler->warn("changed mimetype: " .  $session{'header'}{'mimetype'});
    }
 
    # Note, we still process our template below even though it will never
@@ -507,7 +507,7 @@ sub _instantiate_soap {
    # we don't use fault handling with wsdls becuase they seem to behave 
    # differently.  Not sure if that is by design.
      if ( ($self->get("uri") =~ m/\.wsdl\s*$/i) || ($self->get("uri") =~ m/\.\w*\?wsdl\s*$/i) ) {
-      WebGUI::ErrorHandler::debug('wsdl=' . $self->get('uri'))
+      $self->session->errorHandler->debug('wsdl=' . $self->get('uri'))
          if $self->get('debugMode');
 
       # instantiate SOAP service
@@ -515,7 +515,7 @@ sub _instantiate_soap {
                                                                                 
    # standard uri namespace
    } else {
-      WebGUI::ErrorHandler::debug('uri=' . $self->get('uri'))
+      $self->session->errorHandler->debug('uri=' . $self->get('uri'))
          if $self->get('debugMode');
 
       # instantiate SOAP service, with fault handling
@@ -529,7 +529,7 @@ sub _instantiate_soap {
       # proxy the call if requested
       if ($self->get("proxy") && $soap) {
 
-         WebGUI::ErrorHandler::debug('proxy=' . $self->get('proxy'))
+         $self->session->errorHandler->debug('proxy=' . $self->get('proxy'))
             if $self->get('debugMode');
          $soap->proxy($self->get('proxy'),
             options => {compress_threshold => 10000});

@@ -173,7 +173,7 @@ sub view {
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
 	my $p = WebGUI::Paginator->new($self->getUrl,1);
-	if ($session{form}{makePrintable} || $var{description} eq "") {
+	if ($self->session->form->process("makePrintable") || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
 	} else {
@@ -183,8 +183,8 @@ sub view {
 	}
 	$p->appendTemplateVars(\%var);
 	my $templateId = $self->get("templateId");
-        if ($session{form}{overrideTemplateId} ne "") {
-                $templateId = $session{form}{overrideTemplateId};
+        if ($self->session->form->process("overrideTemplateId") ne "") {
+                $templateId = $self->session->form->process("overrideTemplateId");
         }
 	return $self->processTemplate(\%var, $templateId);
 }

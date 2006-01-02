@@ -331,8 +331,8 @@ sub _processQuery {
                         my $url = $self->getUrl('func=view');
                         foreach (keys %{$session{form}}) {
                                 unless ($_ eq "pn" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
-                                        $url = WebGUI::URL::append($url, WebGUI::URL::escape($_)
-                                                .'='.WebGUI::URL::escape($session{form}{$_}));
+                                        $url = $self->session->url->append($url, $self->session->url->escape($_)
+                                                .'='.$self->session->url->escape($session{form}{$_}));
                                 }
                         }
 			my $paginateAfter = $self->get("paginateAfter");
@@ -340,7 +340,7 @@ sub _processQuery {
                         my $p = WebGUI::Paginator->new($url,$paginateAfter);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
-                                WebGUI::ErrorHandler::warn("There was a problem with the query: ".$error);
+                                $self->session->errorHandler->warn("There was a problem with the query: ".$error);
                                 push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(11,"Asset_SQLReport")." ".$error});
                         } else {
                                 my $first = 1;
@@ -390,12 +390,12 @@ sub _processQuery {
                         }
                 } else {
                         push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(10,"Asset_SQLReport")});
-                        WebGUI::ErrorHandler::warn("SQLReport [".$self->getId."] The SQL query is improperly formatted.");
+                        $self->session->errorHandler->warn("SQLReport [".$self->getId."] The SQL query is improperly formatted.");
                 }
                 $dbLink->disconnect;
         } else {
                 push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(12,"Asset_SQLReport")});
-                WebGUI::ErrorHandler::warn("SQLReport [".$self->getId."] Could not connect to database.");
+                $self->session->errorHandler->warn("SQLReport [".$self->getId."] Could not connect to database.");
         }
 	return \%var;
 }

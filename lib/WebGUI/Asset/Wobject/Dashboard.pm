@@ -29,14 +29,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub canManage {
 	my $self = shift;
-	return 0 if $session{user}{userId} == 1;
+	return 0 if $self->session->user->profileField("userId") == 1;
 	return WebGUI::Grouping::isInGroup($self->get("adminsGroupId"));
 }
 
 #-------------------------------------------------------------------
 sub canPersonalize {
 	my $self = shift;
-	return 0 if $session{user}{userId} == 1;
+	return 0 if $self->session->user->profileField("userId") == 1;
 	return WebGUI::Grouping::isInGroup($self->get("usersGroupId"));
 }
 
@@ -92,7 +92,7 @@ sub getContentPositions {
 #-------------------------------------------------------------------
 sub discernUserId {
 	my $self = shift;
-	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $session{user}{userId};
+	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $self->session->user->profileField("userId");
 }
 
 #-------------------------------------------------------------------
@@ -119,7 +119,7 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('dashboard usersGroupId description'),
 		-value=>[$self->getValue("usersGroupId")]
 	);
-	if ($session{form}{func} ne "add") {
+	if ($self->session->form->process("func") ne "add") {
 		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
 		my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
 		my %childIds;
@@ -164,7 +164,7 @@ sub isManaging {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	if ($session{form}{assetId} eq "new" && $session{form}{class} eq 'WebGUI::Asset::Wobject::Dashboard') {
+	if ($self->session->form->process("assetId") eq "new" && $self->session->form->process("class") eq 'WebGUI::Asset::Wobject::Dashboard') {
 		$self->initialize;
 		if (ref $self->getParent eq 'WebGUI::Asset::Wobject::Layout') {
 			$self->getParent->update({assetsToHide=>$self->getParent->get("assetsToHide")."\n".$self->getId});
@@ -203,14 +203,14 @@ sub view {
 
 	my @found;
 	my $newStuff;
-	my $showPerformance = WebGUI::ErrorHandler::canShowPerformanceIndicators();
+	my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
 		foreach my $asset (@assets) {
 			foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
-						WebGUI::Style::setRawHeadTags($child->getExtraHeadTags);
+						$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 						$child->{_properties}{title} = $child->getTitle;
 						$child->{_properties}{title} = $child->getShortcut->getTitle if (ref $child eq 'WebGUI::Asset::Shortcut');
 						if ($i == 1 || $i > $numPositions) {
@@ -221,7 +221,7 @@ sub view {
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+								canEditUserPrefs=>(($self->session->user->profileField("userId") ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 
@@ -233,7 +233,7 @@ sub view {
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+								canEditUserPrefs=>(($self->session->user->profileField("userId") ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 						}
@@ -256,13 +256,13 @@ sub view {
 					shortcutUrl=>$child->getUrl,
 					showReloadIcon=>$child->{_properties}{showReloadIcon},
 					canPersonalize=>$self->canPersonalize,
-					canEditUserPrefs=>(($session{user}{userId} ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+					canEditUserPrefs=>(($self->session->user->profileField("userId") ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 				});
 				$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 			}
 		}
 	}
-	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);
+	$vars{showAdmin} = ($self->session->var->get("adminOn") && $self->canEdit);
 	$vars{"dragger.init"} = '
 		<script type="text/javascript">
 			dragable_init("'.$self->getUrl.'");
@@ -276,13 +276,13 @@ sub view {
 #-------------------------------------------------------------------
 sub www_setContentPositions {
 	my $self = shift;
-	return 'Visitors cannot save settings' if($session{user}{userId} eq '1');
+	return 'Visitors cannot save settings' if($self->session->user->profileField("userId") eq '1');
 	return WebGUI::Privilege::insufficient() unless ($self->canPersonalize);
 	return 'empty' unless $self->get("isInitialized");
 	my $dummy = $self->initialize unless $self->get("isInitialized");
 	my $u = WebGUI::User->new($self->discernUserId);
-	my $success = $u->profileField($self->getId.'contentPositions',$session{form}{map}) eq $session{form}{map};
-	return "Map set: ".$session{form}{map} if $success;
+	my $success = $u->profileField($self->getId.'contentPositions',$self->session->form->process("map")) eq $self->session->form->process("map");
+	return "Map set: ".$self->session->form->process("map") if $success;
 	return "Map failed to set.";
 }
 

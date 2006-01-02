@@ -91,7 +91,7 @@ sub _getLocationData {
 		my $ua = LWP::UserAgent->new;
 		$ua->timeout(10);
 		$oldagent = $ua->agent();
-		$ua->agent($session{env}{HTTP_USER_AGENT}); # Act as a proxy.
+		$ua->agent($self->session->env->get("HTTP_USER_AGENT")); # Act as a proxy.
 		my $response = $ua->get('http://www.srh.noaa.gov/port/port_zc.php?inputstring='.$location);
 		my $document = $response->content;
 		$document =~ s/\n/ /g;
@@ -102,7 +102,7 @@ sub _getLocationData {
 			cityState => $1 || $location,
 			sky => $2 || 'N/A',
 			tempF => $3 || 'N/A',
-			iconUrl => $session{config}{extrasURL}.'/wobject/WeatherData/'.$self->_chooseWeatherConditionsIcon($2).'.jpg'
+			iconUrl => $self->session->config->get("extrasURL").'/wobject/WeatherData/'.$self->_chooseWeatherConditionsIcon($2).'.jpg'
 		};
 	$cache->set($locData, 60*60) if $locData->{sky} ne 'NULL';
 	}

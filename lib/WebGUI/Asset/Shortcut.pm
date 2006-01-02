@@ -50,7 +50,7 @@ sub _drawQueryBuilder {
 
 	unless ($fieldCount) {	# No fields found....
 		return 'No metadata defined yet.
-		<a href="'.WebGUI::URL::page('func=manageMetaData').
+		<a href="'.$self->session->url->page('func=manageMetaData').
 		'">Click here</a> to define metadata attributes.';
 	}
 
@@ -73,8 +73,8 @@ sub _drawQueryBuilder {
 	# html
 	my $output;
 	$output .= '<script type="text/javascript" src="'.
-	$session{config}{extrasURL}.'/wobject/Shortcut/querybuilder.js"></script>';
-	$output .= '<link href="'.$session{config}{extrasURL}.
+	$self->session->config->get("extrasURL").'/wobject/Shortcut/querybuilder.js"></script>';
+	$output .= '<link href="'.$self->session->config->get("extrasURL").
 	'/wobject/Shortcut/querybuilder.css" type="text/css" rel="stylesheet">';
 	$output .= qq|<table cellspacing="0" cellpadding="0" border="0"><tr><td colspan="5" align="right">$shortcutCriteriaField</td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright">$conjunctionField</td></tr>|;
 
@@ -213,7 +213,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub discernUserId {
 	my $self = shift;
-	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $session{user}{userId};
+	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $self->session->user->profileField("userId");
 }
 
 #-------------------------------------------------------------------
@@ -233,7 +233,7 @@ sub getEditForm {
 		-hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
 		-namespace=>"Shortcut"
 	);
-	if($session{setting}{metaDataEnabled}) {
+	if($self->session->setting->get("metaDataEnabled")) {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"shortcutByCriteria",
 			-value=>$self->getValue("shortcutByCriteria"),
@@ -294,7 +294,7 @@ sub getEditForm {
 
 =head2 getExtraHeadTags (  )
 
-Returns the extraHeadTags stored in the asset.  Called in WebGUI::Style::generateAdditionalHeadTags if this asset is the $session{asset}.  Also called in WebGUI::Layout::view for its child assets.  Overriden here in Shortcut.pm.
+Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Layout::view for its child assets.  Overriden here in Shortcut.pm.
 
 =cut
 
@@ -376,7 +376,7 @@ sub getOverrides {
 	my $self = shift;
 	my $i = 0;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	my $cache = WebGUI::Cache->new(["shortcutOverrides",$self->getId,$session{user}{userId},$session{var}{adminOn}]);
+	my $cache = WebGUI::Cache->new(["shortcutOverrides",$self->getId,$self->session->user->profileField("userId"),$self->session->var->get("adminOn")]);
 	my $overridesRef = $cache->get;
 	unless ($overridesRef->{cacheNotExpired}) {
 		my %overrides;
@@ -389,7 +389,7 @@ sub getOverrides {
 			$orig->{_propertyDefinitions} = \%properties;
 		}
 		$overrides{cacheNotExpired} = 1;
-		my $sth = WebGUI::SQL->read("select fieldName, newValue from Shortcut_overrides where assetId=".quote($self->getId)." order by fieldName");
+		my $sth = $self->session->db->read("select fieldName, newValue from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." order by fieldName");
 		while (my ($fieldName, $newValue) = $sth->array) {
 			$overrides{overrides}{$fieldName}{fieldType} = $orig->{_propertyDefinitions}{$fieldName}{fieldType};
 			$overrides{overrides}{$fieldName}{origValue} = $self->getShortcutOriginal->get($fieldName);
@@ -464,7 +464,7 @@ sub getShortcutByCriteria {
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
 		if($session{scratch}{$scratchId} && !$self->getValue("disableContentLock")) {
-			return $session{scratch}{$scratchId} unless ($session{var}{adminOn});
+			return $session{scratch}{$scratchId} unless ($self->session->var->get("adminOn"));
 		}
 	}
 
@@ -495,10 +495,10 @@ sub getShortcutByCriteria {
 		my $quotedField = $field;
 		my $quotedValue = $value;
 		unless ($field =~ /^\s*['"].*['"]\s*/) {
-			$quotedField = quote($field);
+			$quotedField = $self->session->db->quote($field);
 		}
                 unless ($value =~ /^\s*['"].*['"]\s*/) {
-                        $quotedValue = quote($value);
+                        $quotedValue = $self->session->db->quote($value);
                 }
 		
 		# transform replacement from "State = Wisconsin" to 
@@ -513,7 +513,7 @@ sub getShortcutByCriteria {
 			from metaData_values d, metaData_properties f, asset w 
 			where f.fieldId = d.fieldId
 				and w.assetId = d.assetId
-				and w.className=".quote($self->getShortcutDefault->get("className"));
+				and w.className=".$self->session->db->quote($self->getShortcutDefault->get("className"));
 
 	
 	# Add constraint only if it has been modified.
@@ -523,7 +523,7 @@ sub getShortcutByCriteria {
 
 	# Execute the query with an unconditional read
 	my @ids;
-        my $sth = WebGUI::SQL->unconditionalRead($sql);
+        my $sth = $self->session->db->unconditionalRead($sql);
         while (my ($data) = $sth->array) {
 		push (@ids, $data);
         }
@@ -543,7 +543,7 @@ sub getShortcutByCriteria {
 	}
 
 	# Store the matching assetId in user scratch. 
-	WebGUI::Session::setScratch($scratchId,$id) if ($scratchId);
+	$self->session->scratch->set($scratchId,$id) if ($scratchId);
 
 	return WebGUI::Asset->newByDynamicClass($id);		
 }
@@ -588,7 +588,7 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
 	my $scratchId = "Shortcut_" . $self->getId;
-	WebGUI::Session::deleteAllScratch($scratchId);
+	$self->session->scratch->deleteAll($scratchId);
 }
 
 #-------------------------------------------------------------------
@@ -618,7 +618,7 @@ sub view {
 	foreach my $prop (keys %{$self->{_shortcut}{_properties}}) {
 		next if ($prop eq 'content' || $prop eq 'label' || $prop eq 'url');
 		$var{'shortcut.'.$prop} = $self->{_shortcut}{_properties}{$prop};
-	WebGUI::ErrorHandler::warn($prop.' = '.$self->{_shortcut}{_properties}{$prop});
+	$self->session->errorHandler->warn($prop.' = '.$self->{_shortcut}{_properties}{$prop});
 	}
 	return $self->processTemplate(\%var,$self->getValue("templateId"));
 }
@@ -636,7 +636,7 @@ sub www_edit {
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self = shift;
-	return 'You are no longer logged in' if $session{user}{userId} eq '1';
+	return 'You are no longer logged in' if $self->session->user->profileField("userId") eq '1';
 	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;
@@ -692,7 +692,7 @@ sub www_purgeOverrideCache {
 sub www_deleteOverride {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	WebGUI::SQL->write('delete from Shortcut_overrides where assetId='.quote($self->getId).' and fieldName='.quote($session{form}{fieldName}));
+	$self->session->db->write('delete from Shortcut_overrides where assetId='.$self->session->db->quote($self->getId).' and fieldName='.$self->session->db->quote($self->session->form->process("fieldName")));
 	$self->uncacheOverrides;
 	return $self->www_manageOverrides;
 }
@@ -733,7 +733,7 @@ sub www_editOverride {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new("Asset_Shortcut");
-	my $fieldName = $session{form}{fieldName};
+	my $fieldName = $self->session->form->process("fieldName");
 	my %overrides = $self->getOverrides;
 	my $output = '';
 	my %props;
@@ -743,8 +743,8 @@ sub www_editOverride {
 	$output .= '</table>';
   my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
   $f->hidden(-name=>"func",-value=>"saveOverride");
-  $f->hidden(-name=>"overrideFieldName",-value=>$session{form}{fieldName});
-  $f->readOnly(-label=>$i18n->get("fieldName"),-value=>$session{form}{fieldName});
+  $f->hidden(-name=>"overrideFieldName",-value=>$self->session->form->process("fieldName"));
+  $f->readOnly(-label=>$i18n->get("fieldName"),-value=>$self->session->form->process("fieldName"));
   $f->readOnly(-label=>$i18n->get("Original Value"),-value=>$overrides{overrides}{$fieldName}{origValue});
   my %params;
   foreach my $key (keys %{$props{$fieldName}}) {
@@ -773,7 +773,7 @@ sub www_editOverride {
 sub www_saveOverride {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $fieldName = $session{form}{overrideFieldName};
+	my $fieldName = $self->session->form->process("overrideFieldName");
 	my %overrides = $self->getOverrides;
 	my $output = '';
 	my %props;
@@ -781,10 +781,10 @@ sub www_saveOverride {
 		%props = (%props,%{$def->{properties}});
 	}
 	my $fieldType = $props{$fieldName}{fieldType};
-	my $value = WebGUI::FormProcessor::process($fieldName,$fieldType);
-	$value = $session{form}{newOverrideValueText} || $value;
-	WebGUI::SQL->write("delete from Shortcut_overrides where assetId=".quote($self->getId)." and fieldName=".quote($fieldName));
-	WebGUI::SQL->write("insert into Shortcut_overrides values (".quote($self->getId).",".quote($fieldName).",".quote($value).")");
+	my $value = $self->session->form->process($fieldName,$fieldType);
+	$value = $self->session->form->process("newOverrideValueText") || $value;
+	$self->session->db->write("delete from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." and fieldName=".$self->session->db->quote($fieldName));
+	$self->session->db->write("insert into Shortcut_overrides values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($fieldName).",".$self->session->db->quote($value).")");
 	$self->uncacheOverrides;
 	return $self->www_manageOverrides;
 }
@@ -794,8 +794,8 @@ sub www_view {
 	my $self = shift;
 	if ($self->isDashlet) {
 		return WebGUI::Privilege::noAccess() unless $self->canView;
-		$session{asset} = $self->getParent;
-		return $session{asset}->www_view;
+		$self->session->asset = $self->getParent;
+		return $self->session->asset->www_view;
 	} else {
 		return $self->getShortcut->www_view;
 	}

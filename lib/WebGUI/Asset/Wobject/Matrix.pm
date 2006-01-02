@@ -131,9 +131,9 @@ sub getCompareForm {
 			name=>"listingId",
 			vertical=>1,
 			value=>\@ids,
-			options=>WebGUI::SQL->buildHashRef("select listingId, concat('<a href=\\\"".
+			options=>$self->session->db->buildHashRef("select listingId, concat('<a href=\\\"".
 				$self->getUrl("func=viewDetail")."&amp;listingId=',listingId,'\\\">', productName,'</a>') from Matrix_listing 
-				where assetId=".quote($self->getId)." and status='approved' order by productName")
+				where assetId=".$self->session->db->quote($self->getId)." and status='approved' order by productName")
 			})
 		."<br />"
 		.WebGUI::Form::submit({
@@ -150,9 +150,9 @@ sub hasRated {
 	my $listingId = shift;
 	return 1 unless (WebGUI::Grouping::isInGroup($self->get("groupToRate")));
 	my $ratingTimeout = WebGUI::Grouping::isInGroup($self->get("privilegedGroup")) ? $self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
-	my ($hasRated) = WebGUI::SQL->quickArray("select count(*) from Matrix_rating where 
-		((userId=".quote($session{user}{userId})." and userId<>'1') or (userId='1' and ipAddress=".quote($session{env}{HTTP_X_FORWARDED_FOR}).")) and 
-		listingId=".quote($listingId)." and timeStamp>".(WebGUI::DateTime::time()-$ratingTimeout));
+	my ($hasRated) = $self->session->db->quickArray("select count(*) from Matrix_rating where 
+		((userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and userId<>'1') or (userId='1' and ipAddress=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).")) and 
+		listingId=".$self->session->db->quote($listingId)." and timeStamp>".(WebGUI::DateTime::time()-$ratingTimeout));
 	return $hasRated;
 }
 
@@ -160,20 +160,20 @@ sub hasRated {
 sub incrementCounter {
 	my $listingId = shift;
 	my $counter = shift;
-	my ($lastIp) = WebGUI::SQL->quickArray("select ".$counter."LastIp from Matrix_listing where listingId = ".quote($listingId));
-	unless ($lastIp eq $session{env}{HTTP_X_FORWARDED_FOR}) {
-		WebGUI::SQL->write("update Matrix_listing set $counter=$counter+1, ".$counter."LastIp=".quote($session{env}{HTTP_X_FORWARDED_FOR})." where listingId=".quote($listingId));
+	my ($lastIp) = $self->session->db->quickArray("select ".$counter."LastIp from Matrix_listing where listingId = ".$self->session->db->quote($listingId));
+	unless ($lastIp eq $self->session->env->get("HTTP_X_FORWARDED_FOR")) {
+		$self->session->db->write("update Matrix_listing set $counter=$counter+1, ".$counter."LastIp=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR"))." where listingId=".$self->session->db->quote($listingId));
 	}
 }
 
 #-------------------------------------------------------------------
 sub purge {
        my $self = shift;
-       WebGUI::SQL->write("delete from Matrix_listing where assetId=".quote($self->getId));
-       WebGUI::SQL->write("delete from Matrix_listingData where assetId=".quote($self->getId));
-       WebGUI::SQL->write("delete from Matrix_field where assetId=".quote($self->getId));
-       WebGUI::SQL->write("delete from Matrix_rating where assetId=".quote($self->getId));
-       WebGUI::SQL->write("delete from Matrix_ratingSummary where assetId=".quote($self->getId));
+       $self->session->db->write("delete from Matrix_listing where assetId=".$self->session->db->quote($self->getId));
+       $self->session->db->write("delete from Matrix_listingData where assetId=".$self->session->db->quote($self->getId));
+       $self->session->db->write("delete from Matrix_field where assetId=".$self->session->db->quote($self->getId));
+       $self->session->db->write("delete from Matrix_rating where assetId=".$self->session->db->quote($self->getId));
+       $self->session->db->write("delete from Matrix_ratingSummary where assetId=".$self->session->db->quote($self->getId));
        $self->SUPER::purge;
 }
 
@@ -184,18 +184,18 @@ sub setRatings {
 	my $ratings = shift;
 	foreach my $category ($self->getCategories) {
 		if ($ratings->{$category}) {
-			WebGUI::SQL->write("insert into Matrix_rating (userId, category, rating, timeStamp, listingId,ipAddress, assetId) values (
-				".quote($session{user}{userId}).", ".quote($category).", ".quote($ratings->{$category}).", ".WebGUI::DateTime::time()
-				.", ".quote($listingId).", ".quote($session{env}{HTTP_X_FORWARDED_FOR}).",".quote($self->getId).")");
+			$self->session->db->write("insert into Matrix_rating (userId, category, rating, timeStamp, listingId,ipAddress, assetId) values (
+				".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($category).", ".$self->session->db->quote($ratings->{$category}).", ".WebGUI::DateTime::time()
+				.", ".$self->session->db->quote($listingId).", ".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).",".$self->session->db->quote($self->getId).")");
 		}
-		my $sql = "from Matrix_rating where listingId=".quote($listingId)." and category=".quote($category);
-		my ($sum) = WebGUI::SQL->quickArray("select sum(rating) $sql");
-		my ($count) = WebGUI::SQL->quickArray("select count(*) $sql");
+		my $sql = "from Matrix_rating where listingId=".$self->session->db->quote($listingId)." and category=".$self->session->db->quote($category);
+		my ($sum) = $self->session->db->quickArray("select sum(rating) $sql");
+		my ($count) = $self->session->db->quickArray("select count(*) $sql");
 		my $half = round($count/2);
 		my $mean = $sum / ($count || 1);
-		my ($median) = WebGUI::SQL->quickArray("select rating $sql limit $half,$half");
-		WebGUI::SQL->write("replace into Matrix_ratingSummary  (listingId, category, meanValue, medianValue, countValue,assetId) values (
-			".quote($listingId).", ".quote($category).", $mean, ".quote($median).", $count, ".quote($self->getId).")");
+		my ($median) = $self->session->db->quickArray("select rating $sql limit $half,$half");
+		$self->session->db->write("replace into Matrix_ratingSummary  (listingId, category, meanValue, medianValue, countValue,assetId) values (
+			".$self->session->db->quote($listingId).", ".$self->session->db->quote($category).", $mean, ".$self->session->db->quote($median).", $count, ".$self->session->db->quote($self->getId).")");
 	}
 }
 
@@ -203,11 +203,11 @@ sub setRatings {
 sub www_approveListing {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless($self->canEdit);
-	my $listing = WebGUI::SQL->getRow("Matrix_listing","listingId",$session{form}{listingId});
-	WebGUI::SQL->write("update Matrix_listing set status='approved' where listingId=".quote($session{form}{listingId}));
+	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
+	$self->session->db->write("update Matrix_listing set status='approved' where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	WebGUI::MessageLog::addEntry($listing->{maintainerId},"","New Listing Approved","Your new listing, ".$listing->{productName}.", has been approved.",
-		$self->formatURL("viewDetail",$session{form}{listingId}),"notice");
-	WebGUI::MessageLog::completeEntry($session{form}{mlog});
+		$self->formatURL("viewDetail",$self->session->form->process("listingId")),"notice");
+	WebGUI::MessageLog::completeEntry($self->session->form->process("mlog"));
 	return $self->www_viewDetail;
 }
 
@@ -215,9 +215,9 @@ sub www_approveListing {
 #-------------------------------------------------------------------
 sub www_click {
 	my $self = shift;
-	incrementCounter($session{form}{listingId},"clicks");
-	my $listing = WebGUI::SQL->getRow("Matrix_listing","listingId",$session{form}{listingId});
-	if ($session{form}{m}) {
+	incrementCounter($self->session->form->process("listingId"),"clicks");
+	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
+	if ($self->session->form->process("m")) {
 		WebGUI::HTTP::setRedirect($listing->{manufacturerUrl});
 	} else {
 		WebGUI::HTTP::setRedirect($listing->{productUrl});
@@ -231,7 +231,7 @@ sub www_compare {
 	my $self = shift;
 	my @cmsList = @_;
 	unless (scalar(@cmsList)) {
-		@cmsList = WebGUI::FormProcessor::checkList("listingId");
+		@cmsList = $self->session->form->checkList("listingId");
 	}
 	my ( %var, @prodcol, @datecol);
 	my $max = WebGUI::Grouping::isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
@@ -243,8 +243,8 @@ sub www_compare {
 	}
 	foreach my $cms (@cmsList) {
 		incrementCounter($cms,"compares");
-		my $data = WebGUI::SQL->quickHashRef("select listingId, productName, versionNumber, lastUpdated
-			from Matrix_listing where listingId=".quote($cms));
+		my $data = $self->session->db->quickHashRef("select listingId, productName, versionNumber, lastUpdated
+			from Matrix_listing where listingId=".$self->session->db->quote($cms));
 		push(@prodcol, {
 			name=>$data->{productName} || "__untitled__",
 			version=>$data->{versionNumber},
@@ -265,10 +265,10 @@ sub www_compare {
 		foreach my $cms (@cmsList) {
 			$select .= ", ".$tableCount.".value";
 			$from .= " left join Matrix_listingData ".$tableCount." on a.fieldId="
-				.$tableCount.".fieldId and ".$tableCount.".listingId=".quote($cms);
+				.$tableCount.".fieldId and ".$tableCount.".listingId=".$self->session->db->quote($cms);
 			$tableCount++;
 		}
-		my $sth = WebGUI::SQL->read("$select $from where a.category=".quote($category)." order by a.label");
+		my $sth = $self->session->db->read("$select $from where a.category=".$self->session->db->quote($category)." order by a.label");
 		while (my @row = $sth->array) {
 			my @columnloop;
 			my $first = 1;
@@ -316,8 +316,8 @@ sub www_copy {
 sub www_deleteListing {
 	my $self = shift;
 	my $output = sprintf WebGUI::International::get('delete listing confirmation','Asset_Matrix'),
-		$self->getUrl("func=deleteListingConfirm&listingId=".$session{form}{listingId}),
-		$self->formatURL("viewDetail",$session{form}{listingId});
+		$self->getUrl("func=deleteListingConfirm&listingId=".$self->session->form->process("listingId")),
+		$self->formatURL("viewDetail",$self->session->form->process("listingId"));
 	return $self->processStyle($output);
 }
 
@@ -325,14 +325,14 @@ sub www_deleteListing {
 sub www_deleteListingConfirm {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless($self->canEdit);
-	my $listing = WebGUI::SQL->getRow("Matrix_listing","listingId",$session{form}{listingId});
+	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	WebGUI::Asset::Wobject::Collaboration->new($listing->{forumId})->purge;
-	WebGUI::SQL->write("delete from Matrix_listing where listingId=".quote($session{form}{listingId}));
-	WebGUI::SQL->write("delete from Matrix_listingData where listingId=".quote($session{form}{listingId}));
-	WebGUI::SQL->write("delete from Matrix_rating where listingId=".quote($session{form}{listingId}));
-	WebGUI::SQL->write("delete from Matrix_ratingSummary where listingId=".quote($session{form}{listingId}));
+	$self->session->db->write("delete from Matrix_listing where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
+	$self->session->db->write("delete from Matrix_listingData where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
+	$self->session->db->write("delete from Matrix_rating where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
+	$self->session->db->write("delete from Matrix_ratingSummary where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	WebGUI::MessageLog::addEntry($listing->{maintainerId},"","Listing Deleted","Your listing, ".$listing->{productName}.", has been deleted from the matrix.","","notice");
-	WebGUI::MessageLog::completeEntry($session{form}{mlog});
+	WebGUI::MessageLog::completeEntry($self->session->form->process("mlog"));
 	return "";
 }
 
@@ -440,8 +440,8 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_editListing {
         my $self = shift;
-        my $listing= WebGUI::SQL->getRow("Matrix_listing","listingId",$session{form}{listingId});
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($session{form}{listingId} eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $session{user}{userId} eq $listing->{maintainerId} || $self->canEdit);
+        my $listing= $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
+	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
@@ -449,7 +449,7 @@ sub www_editListing {
                 );
         $f->hidden(
                 -name=>"listingId",
-                -value=>$session{form}{listingId}
+                -value=>$self->session->form->process("listingId")
                 );
 	$f->text(
 		-name=>"productName",
@@ -487,7 +487,7 @@ sub www_editListing {
 			-name=>"maintainerId",
 			-value=>[$listing->{maintainerId}],
 			-label=>WebGUI::International::get('listing maintainer','Asset_Matrix'),
-			-options=>WebGUI::SQL->buildHashRef("select userId,username from users order by username")
+			-options=>$self->session->db->buildHashRef("select userId,username from users order by username")
 			);
 	}
 	my %goodBad = (
@@ -500,14 +500,14 @@ sub www_editListing {
 	foreach my $category ($self->getCategories()) {
 		$f->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
 		my $a;
-		if ($session{form}{listingId} ne "new") {
-			$a = WebGUI::SQL->read("select a.name, a.fieldType, a.defaultValue, a.description, a.label, b.value, a.fieldId
+		if ($self->session->form->process("listingId") ne "new") {
+			$a = $self->session->db->read("select a.name, a.fieldType, a.defaultValue, a.description, a.label, b.value, a.fieldId
 				from Matrix_field a left join Matrix_listingData b on a.fieldId=b.fieldId and 
-				listingId=".quote($session{form}{listingId})."  where 
-				a.category=".quote($category)." order by a.label");
+				listingId=".$self->session->db->quote($self->session->form->process("listingId"))."  where 
+				a.category=".$self->session->db->quote($category)." order by a.label");
 		} else {
-			$a = WebGUI::SQL->read("select name, fieldType, defaultValue, description, label, fieldId
-				from Matrix_field where category=".quote($category)." and  assetId=".quote($self->getId));
+			$a = $self->session->db->read("select name, fieldType, defaultValue, description, label, fieldId
+				from Matrix_field where category=".$self->session->db->quote($category)." and  assetId=".$self->session->db->quote($self->getId));
 		}
 		while (my $field = $a->hashRef) {
 			if ($field->{fieldType} eq "text") {
@@ -546,9 +546,9 @@ sub www_editListing {
 					-name=>$field->{name},
 					-value=>[$value],
 					-label=>$field->{label},
-					-options=>WebGUI::SQL->buildHashRef("select distinct value,value from Matrix_listingData 
-						where fieldId=".quote($field->{fieldId})." and
-						 assetId=".quote($self->getId)." order by value"),
+					-options=>$self->session->db->buildHashRef("select distinct value,value from Matrix_listingData 
+						where fieldId=".$self->session->db->quote($field->{fieldId})." and
+						 assetId=".$self->session->db->quote($self->getId)." order by value"),
 					-subtext=>"<br />".$field->{description}
 					);
 			}
@@ -564,26 +564,26 @@ sub www_editListing {
 #-------------------------------------------------------------------
 sub www_editListingSave {
         my $self = shift;
-        my $listing = WebGUI::SQL->getRow("Matrix_listing","listingId",$session{form}{listingId});
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($session{form}{listingId} eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $session{user}{userId} eq $listing->{maintainerId} || $self->canEdit);
+        my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
+	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
 	my %data = (
-		listingId => $session{form}{listingId},
+		listingId => $self->session->form->process("listingId"),
 		lastUpdated => WebGUI::DateTime::time(),
-		productName => $session{form}{productName},
-		productUrl => $session{form}{productUrl},
-		manufacturerName => $session{form}{manufacturerName},
-		manufacturerUrl => $session{form}{manufacturerUrl},
-		description => $session{form}{description},
-		versionNumber=>$session{form}{versionNumber}
+		productName => $self->session->form->process("productName"),
+		productUrl => $self->session->form->process("productUrl"),
+		manufacturerName => $self->session->form->process("manufacturerName"),
+		manufacturerUrl => $self->session->form->process("manufacturerUrl"),
+		description => $self->session->form->process("description"),
+		versionNumber=>$self->session->form->process("versionNumber")
 		);
 	my $isNew = 0;
-	if ($session{form}{listingId} eq "new") {
-		$data{maintainerId} = $session{user}{userId} if ($session{form}{listingId} eq "new");
+	if ($self->session->form->process("listingId") eq "new") {
+		$data{maintainerId} = $self->session->user->profileField("userId") if ($self->session->form->process("listingId") eq "new");
 		my $forum = $self->addChild({
 			className=>"WebGUI::Asset::Wobject::Collaboration",
-			title=>$session{form}{productName},
-			menuTitle=>$session{form}{productName},
-			url=>$session{form}{productName},
+			title=>$self->session->form->process("productName"),
+			menuTitle=>$self->session->form->process("productName"),
+			url=>$self->session->form->process("productName"),
 			groupIdView=>7,
 			groupIdEdit=>3,
 			startDate=>time(),
@@ -618,23 +618,23 @@ sub www_editListingSave {
 		$data{status} = "pending";
 		$isNew = 1;
 	}
-	$data{maintainerId} = $session{form}{maintainerId} if ($self->canEdit);
+	$data{maintainerId} = $self->session->form->process("maintainerId") if ($self->canEdit);
 	$data{assetId} = $self->getId;
-	$session{form}{listingId} = WebGUI::SQL->setRow("Matrix_listing","listingId",\%data);
+	$self->session->form->process("listingId") = $self->session->db->setRow("Matrix_listing","listingId",\%data);
 	if ($data{status} eq "pending") {
 		WebGUI::MessageLog::addEntry($self->get("ownerUserId"),$self->get("groupIdEdit"),"New Listing Added","A new listing, ".$data{productName}.", is waiting to be added.",
-			WebGUI::URL::getSiteURL()."/".$self->formatURL("viewDetail",$session{form}{listingId}),"pending");
+			$self->session->url->getSiteURL()."/".$self->formatURL("viewDetail",$self->session->form->process("listingId")),"pending");
 	}
-	my $a = WebGUI::SQL->read("select fieldId, name, fieldType from Matrix_field");
+	my $a = $self->session->db->read("select fieldId, name, fieldType from Matrix_field");
 	while (my ($id, $name, $type) = $a->array) {
 		my $value;
 		if ($type eq "goodBad") {
-			$value = WebGUI::FormProcessor::selectBox($name);
+			$value = $self->session->form->selectBox($name);
 		} else {
-			$value = WebGUI::FormProcessor::process($name,$type);
+			$value = $self->session->form->process($name,$type);
 		}
-		WebGUI::SQL->write("replace into Matrix_listingData (assetId, listingId, fieldId, value) values (
-			".quote($self->getId).", ".quote($session{form}{listingId}).", ".quote($id).", ".quote($value).")");
+		$self->session->db->write("replace into Matrix_listingData (assetId, listingId, fieldId, value) values (
+			".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->form->process("listingId")).", ".$self->session->db->quote($id).", ".$self->session->db->quote($value).")");
 	}
 	$a->finish;
         return $self->www_viewDetail;
@@ -644,7 +644,7 @@ sub www_editListingSave {
 sub www_editField {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless($self->canEdit);
-        my $field = WebGUI::SQL->getRow("Matrix_field","fieldId",$session{form}{fieldId});
+        my $field = $self->session->db->getRow("Matrix_field","fieldId",$self->session->form->process("fieldId"));
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
@@ -652,7 +652,7 @@ sub www_editField {
                 );
         $f->hidden(
                 -name=>"fieldId",
-                -value=>$session{form}{fieldId}
+                -value=>$self->session->form->process("fieldId")
 		);
 	$f->text(
 		-name=>"name",
@@ -705,14 +705,14 @@ sub www_editField {
 sub www_editFieldSave {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless($self->canEdit);
-	WebGUI::SQL->setRow("Matrix_field","fieldId",{
-		fieldId=>$session{form}{fieldId},
-		name=>$session{form}{name},
-		label=>$session{form}{label},
-		fieldType=>$session{form}{fieldType},
-		description=>$session{form}{description},
-		defaultValue=>$session{form}{defaultValue},
-		category=>$session{form}{category},
+	$self->session->db->setRow("Matrix_field","fieldId",{
+		fieldId=>$self->session->form->process("fieldId"),
+		name=>$self->session->form->process("name"),
+		label=>$self->session->form->process("label"),
+		fieldType=>$self->session->form->process("fieldType"),
+		description=>$self->session->form->process("description"),
+		defaultValue=>$self->session->form->process("defaultValue"),
+		category=>$self->session->form->process("category"),
 		assetId=>$self->getId
 		});
 	return $self->www_listFields();
@@ -724,7 +724,7 @@ sub www_listFields {
         return WebGUI::Privilege::insufficient() unless($self->canEdit);
 	my $output = sprintf WebGUI::International::get('list fields','Asset_Matrix'),
 				$self->getUrl("func=editField&amp;fieldId=new");
-	my $sth = WebGUI::SQL->read("select fieldId, label from Matrix_field where assetId=".quote($self->getId)." order by label");
+	my $sth = $self->session->db->read("select fieldId, label from Matrix_field where assetId=".$self->session->db->quote($self->getId)." order by label");
 	while (my ($id, $label) = $sth->array) {
 		$output .= '<a href="'.$self->getUrl("func=editField&amp;fieldId=".$id).'">'.$label.'</a><br />';
 	}
@@ -736,7 +736,7 @@ sub www_listFields {
 #-------------------------------------------------------------------
 sub www_rate {
 	my $self = shift;
-	my $hasRated = $self->hasRated($session{form}{listingId});
+	my $hasRated = $self->hasRated($self->session->form->process("listingId"));
 	my $sameRating = 1;
 	my $first = 1;
 	my $lastRating;
@@ -751,7 +751,7 @@ sub www_rate {
 		$lastRating = $session{form}{$category};
 	} 
 	return $self->www_viewDetail("",1) if ($hasRated || $sameRating); # Throw out ratings that are all the same number, or if the user rates twice.
-	$self->setRatings($session{form}{listingId},$session{form});
+	$self->setRatings($self->session->form->process("listingId"),$session{form});
 	return $self->www_viewDetail;	
 }
 
@@ -759,31 +759,31 @@ sub www_rate {
 sub www_search {
 	my $self = shift;
 	my %var;
-	my @list = WebGUI::SQL->buildArray("select listingId from Matrix_listing");
-	if ($session{form}{doit}) {
+	my @list = $self->session->db->buildArray("select listingId from Matrix_listing");
+	if ($self->session->form->process("doit")) {
 		my $count;
 		my $keyword;
-		if ($session{form}{keyword}) {
-			$keyword = " and (a.value like ".quote('%'.$session{form}{keyword}.'%')." or a.value='Any')";
+		if ($self->session->form->process("keyword")) {
+			$keyword = " and (a.value like ".$self->session->db->quote('%'.$self->session->form->process("keyword").'%')." or a.value='Any')";
 		}
-		my $sth = WebGUI::SQL->read("select name,fieldType from Matrix_field");	
+		my $sth = $self->session->db->read("select name,fieldType from Matrix_field");	
 		while (my ($name,$fieldType) = $sth->array) {
 			next unless ($session{form}{$name});
 			push(@list,0);	
 			my $where;
 			if ($fieldType ne "goodBad") {
                                 $where = "("
-					."a.value like ".quote("%".$session{form}{$name}."%")
+					."a.value like ".$self->session->db->quote("%".$session{form}{$name}."%")
 					." or a.value='Any'"
-                                        #." or a.value<".quote($session{form}{$name})
+                                        #." or a.value<".$self->session->db->quote($session{form}{$name})
 					." or a.value='Free'"
 					.")";
 			} else {
 				$where = "a.value<>'no'";
 			}
-			@list = WebGUI::SQL->buildArray("select a.listingId from Matrix_listingData a left join Matrix_field b 
+			@list = $self->session->db->buildArray("select a.listingId from Matrix_listingData a left join Matrix_field b 
 				on (a.fieldId=b.fieldId)
-				where a.listingId in (".quoteAndJoin(\@list).") and $where and b.name=".quote($name));
+				where a.listingId in (".$self->session->db->quoteAndJoin(\@list).") and $where and b.name=".$self->session->db->quote($name));
 			$count = scalar(@list);
 			last unless ($count > 0);
 		}
@@ -811,13 +811,13 @@ sub www_search {
 	$var{'form.footer'} = "</form>";
 	$var{'form.keyword'} = WebGUI::Form::text({
 		name=>"keyword",
-		value=>$session{form}{keyword}
+		value=>$self->session->form->process("keyword")
 		});
 	$var{'form.submit'} = WebGUI::Form::submit({
 		value=>"search"
 		});
 	foreach my $category ($self->getCategories()) {
-		my $sth = WebGUI::SQL->read("select name, fieldType, label, description from Matrix_field where category = ".quote($category)." order by label");	
+		my $sth = $self->session->db->read("select name, fieldType, label, description from Matrix_field where category = ".$self->session->db->quote($category)." order by label");	
 		my @loop;
 		while (my $data = $sth->hashRef) {
 			$data->{description} =~ s/\n//g;
@@ -839,7 +839,7 @@ sub www_search {
 			push(@loop,$data);
 		}
 		$sth->finish;
-		$var{WebGUI::URL::urlize($category)."_loop"} = \@loop;
+		$var{$self->session->url->urlize($category)."_loop"} = \@loop;
 	}
 	return $self->processStyle($self->processTemplate(\%var,$self->get("searchTemplateId")));
 }
@@ -851,22 +851,22 @@ sub view {
         my (%var);
 	$var{'compare.form'} = $self->getCompareForm;
 	$var{'search.url'} = $self->getUrl("func=search");
-	$var{'isLoggedIn'} = ($session{user}{userId} ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->profileField("userId") ne "1");
 	$var{'field.list.url'} = $self->getUrl('func=listFields');	
 	$var{'listing.add.url'} = $self->formatURL("editListing","new");
 
-	my $data = WebGUI::SQL->quickHashRef("select views, productName, listingId from Matrix_listing 
-		 where assetId=".quote($self->getId)." and status='approved' order by views desc limit 1");
+	my $data = $self->session->db->quickHashRef("select views, productName, listingId from Matrix_listing 
+		 where assetId=".$self->session->db->quote($self->getId)." and status='approved' order by views desc limit 1");
 	$var{'best.views.url'} = $self->formatURL("viewDetail",$data->{listingId});
 	$var{'best.views.count'} = $data->{views}; 
 	$var{'best.views.name'} = $data->{productName}; 
-	my $data = WebGUI::SQL->quickHashRef("select compares, productName, listingId from Matrix_listing 
-		where assetId=".quote($self->getId)." and status='approved'  order by compares desc limit 1");
+	my $data = $self->session->db->quickHashRef("select compares, productName, listingId from Matrix_listing 
+		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by compares desc limit 1");
 	$var{'best.compares.url'} = $self->formatURL("viewDetail",$data->{listingId});
 	$var{'best.compares.count'} = $data->{compares}; 
 	$var{'best.compares.name'} = $data->{productName}; 
-	my $data = WebGUI::SQL->quickHashRef("select clicks, productName, listingId from Matrix_listing 
-		where assetId=".quote($self->getId)." and status='approved'  order by clicks desc limit 1");
+	my $data = $self->session->db->quickHashRef("select clicks, productName, listingId from Matrix_listing 
+		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by clicks desc limit 1");
 	$var{'best.clicks.url'} = $self->formatURL("viewDetail",$data->{listingId});
 	$var{'best.clicks.count'} = $data->{clicks}; 
 	$var{'best.clicks.name'} = $data->{productName}; 
@@ -885,15 +885,15 @@ sub view {
 				Matrix_ratingSummary
 			on
 				Matrix_listing.listingId=Matrix_ratingSummary.listingId and
-				Matrix_ratingSummary.category=".quote($category)."
+				Matrix_ratingSummary.category=".$self->session->db->quote($category)."
 			where 
-				Matrix_listing.assetId=".quote($self->getId)." and 
+				Matrix_listing.assetId=".$self->session->db->quote($self->getId)." and 
 				Matrix_listing.status='approved' and
 				Matrix_ratingSummary.countValue > 0
 			order by 
 				Matrix_ratingSummary.meanValue
 			";
-		my $data = WebGUI::SQL->quickHashRef($sql." desc limit 1");
+		my $data = $self->session->db->quickHashRef($sql." desc limit 1");
 		push(@best,{
 			url=>$self->formatURL("viewDetail",$data->{listingId}),
 			category=>$category,
@@ -902,7 +902,7 @@ sub view {
 			median=>$data->{medianValue},
 			count=>$data->{countValue}
 			});
-		$data = WebGUI::SQL->quickHashRef($sql." asc limit 1");
+		$data = $self->session->db->quickHashRef($sql." asc limit 1");
 		push(@worst,{
 			url=>$self->formatURL("viewDetail",$data->{listingId}),
 			category=>$category,
@@ -915,10 +915,10 @@ sub view {
 	$var{'best_rating_loop'} = \@best;
 	$var{'worst_rating_loop'} = \@worst;
 	$var{'ratings.details.url'} = $self->getUrl("func=viewRatingDetails");
-	my $data = WebGUI::SQL->quickHashRef("select lastUpdated, productName, listingId from Matrix_listing 
-		where assetId=".quote($self->getId)." and status='approved'  order by lastUpdated desc limit 1");
+	my $data = $self->session->db->quickHashRef("select lastUpdated, productName, listingId from Matrix_listing 
+		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by lastUpdated desc limit 1");
 	my @lastUpdated;
-        my $sth = WebGUI::SQL->read("select listingId,lastUpdated,productName from Matrix_listing order by lastUpdated desc limit 20");
+        my $sth = $self->session->db->read("select listingId,lastUpdated,productName from Matrix_listing order by lastUpdated desc limit 20");
         while (my ($listingId, $lastUpdated, $productName) = $sth->array) {
                 push(@lastUpdated, {
                         url => $self->formatURL("viewDetail",$listingId),
@@ -932,10 +932,10 @@ sub view {
 	$var{'best.updated.name'} = $data->{productName}; 
 
 	# site stats
-	($var{'user.count'}) = WebGUI::SQL->quickArray("select count(*) from users");
-	($var{'current.user.count'}) = WebGUI::SQL->quickArray("select count(*)+0 from userSession where lastPageView>".(WebGUI::DateTime::time()-600));
-	($var{'listing.count'}) = WebGUI::SQL->quickArray("select count(*) from Matrix_listing where status = 'approved' and assetId=".quote($self->getId));
-        my $sth = WebGUI::SQL->read("select listingId,productName from Matrix_listing where status='pending'");
+	($var{'user.count'}) = $self->session->db->quickArray("select count(*) from users");
+	($var{'current.user.count'}) = $self->session->db->quickArray("select count(*)+0 from userSession where lastPageView>".(WebGUI::DateTime::time()-600));
+	($var{'listing.count'}) = $self->session->db->quickArray("select count(*) from Matrix_listing where status = 'approved' and assetId=".$self->session->db->quote($self->getId));
+        my $sth = $self->session->db->read("select listingId,productName from Matrix_listing where status='pending'");
         while (my ($id,$name) = $sth->array) {
                 push(@{$var{pending_list}},{
                         url=>$self->formatURL("viewDetail",$id),
@@ -949,16 +949,16 @@ sub view {
 #-------------------------------------------------------------------
 sub www_viewDetail {
 	my $self = shift;
-	my $listingId = shift || $session{form}{listingId};
+	my $listingId = shift || $self->session->form->process("listingId");
 	my $hasRated = shift || $self->hasRated($listingId);
 	my %var;
-	my $listing = WebGUI::SQL->getRow("Matrix_listing","listingId",$listingId);
+	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$listingId);
 	my $forum = WebGUI::Asset::Wobject::Collaboration->new($listing->{forumId});
 	$var{"discussion"} = $forum->view;
-	if ($session{form}{do} eq "sendEmail") {
-		if ($session{form}{body} ne "") {
+	if ($self->session->form->process("do") eq "sendEmail") {
+		if ($self->session->form->process("body") ne "") {
 			my $u = WebGUI::User->new($listing->{maintainerId});
-			WebGUI::Mail::send($u->profileField("email"),$listing->{productName}." - ".$session{form}{subject},$session{form}{body},"",$session{form}{from});
+			WebGUI::Mail::send($u->profileField("email"),$listing->{productName}." - ".$self->session->form->process("subject"),$self->session->form->process("body"),"",$self->session->form->process("from"));
 		}
 		$var{'email.wasSent'} = 1;
 	} else {
@@ -966,10 +966,10 @@ sub www_viewDetail {
 	}
 	$var{'edit.url'} = $self->formatURL("editListing",$listingId);
 	$var{id} = $listingId;
-	$var{'user.canEdit'} = ($session{user}{userId} eq $listing->{maintainerId} || $self->canEdit);
+	$var{'user.canEdit'} = ($self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
 	$var{'user.canApprove'} = $self->canEdit;
-	$var{'approve.url'} = $self->getUrl("func=approveListing&listingId=".$listingId."&mlog=".$session{form}{mlog});
-	$var{'delete.url'} = $self->getUrl("func=deleteListing&listingId=".$listingId."&mlog=".$session{form}{mlog});
+	$var{'approve.url'} = $self->getUrl("func=approveListing&listingId=".$listingId."&mlog=".$self->session->form->process("mlog"));
+	$var{'delete.url'} = $self->getUrl("func=deleteListing&listingId=".$listingId."&mlog=".$self->session->form->process("mlog"));
 	$var{'isPending'} = ($listing->{status} eq "pending");
 	$var{'lastUpdated.epoch'} = $listing->{lastupdated};
 	$var{'lastUpdated.date'} = WebGUI::DateTime::epochToHuman($listing->{lastUpdated},"%z");
@@ -1000,7 +1000,7 @@ sub www_viewDetail {
 	$f->email(
 		-extras=>'class="content"',
 		-name=>"from",
-		-value=>$session{user}{email},
+		-value=>$self->session->user->profileField("email"),
 		-label=>WebGUI::International::get('your email','Asset_Matrix'),
 		);
 	$f->selectBox(
@@ -1027,8 +1027,8 @@ sub www_viewDetail {
 	$var{views} = $listing->{views};
 	$var{compares} = $listing->{compares};
 	$var{clicks} = $listing->{clicks};
-	my $sth = WebGUI::SQL->read("select a.value, b.name, b.label, b.description, category from Matrix_listingData a left join 
-		Matrix_field b on a.fieldId=b.fieldId where listingId=".quote($listingId)." order by b.label");	
+	my $sth = $self->session->db->read("select a.value, b.name, b.label, b.description, category from Matrix_listingData a left join 
+		Matrix_field b on a.fieldId=b.fieldId where listingId=".$self->session->db->quote($listingId)." order by b.label");	
 	while (my $data = $sth->hashRef) {
 		$data->{description} =~ s/\n//g;
 		$data->{description} =~ s/\r//g;
@@ -1037,7 +1037,7 @@ sub www_viewDetail {
 		$data->{class} = lc($data->{value});
 		$data->{class} =~ s/\s/_/g;
 		$data->{class} =~ s/\W//g;
-		my $cat = WebGUI::URL::urlize($data->{category})."_loop";
+		my $cat = $self->session->url->urlize($data->{category})."_loop";
 		push(@{$var{$cat}},$data);
 	}
 	$sth->finish;
@@ -1069,8 +1069,8 @@ sub www_viewDetail {
 		-value=>"rate"
 		);
 	foreach my $category ($self->getCategories) {
-		my ($mean,$median,$count) = WebGUI::SQL->quickArray("select meanValue, medianValue, countValue from Matrix_ratingSummary
-			where listingId=".quote($listingId)." and category=".quote($category));
+		my ($mean,$median,$count) = $self->session->db->quickArray("select meanValue, medianValue, countValue from Matrix_ratingSummary
+			where listingId=".$self->session->db->quote($listingId)." and category=".$self->session->db->quote($category));
 		$ratingsTable .= '<tr><th>'.$category.'</th><td>'.$mean.'</td><td>'.$median.'</td><td>'.$count.'</td></tr>';
 		$f->selectBox(
 			-name=>$category,
@@ -1115,15 +1115,15 @@ sub www_viewRatingDetails {
 				Matrix_ratingSummary
 			on
 				Matrix_listing.listingId=Matrix_ratingSummary.listingId and
-				Matrix_ratingSummary.category=".quote($category)."
+				Matrix_ratingSummary.category=".$self->session->db->quote($category)."
 			where 
-				Matrix_listing.assetId=".quote($self->getId)." and 
+				Matrix_listing.assetId=".$self->session->db->quote($self->getId)." and 
 				Matrix_listing.status='approved' and
 				Matrix_ratingSummary.countValue > 0
 			order by 
 				Matrix_ratingSummary.meanValue desc
 			";
-		my $sth = WebGUI::SQL->read($sql);
+		my $sth = $self->session->db->read($sql);
 		while (my $data = $sth->hashRef) {
 			push(@detailloop,{
 				url=>$self->formatURL("viewDetail",$data->{listingId}),

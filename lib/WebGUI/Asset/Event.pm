@@ -98,7 +98,7 @@ sub getEditForm {
                 -hoverHelp=>WebGUI::International::get('515 description',"Asset_Event"),
 		-value=>$self->getValue("eventLocation")
 		);
-	if ($session{form}{func} eq "add") {
+	if ($self->session->form->process("func") eq "add") {
 		my %recursEvery;
 		tie %recursEvery, 'Tie::IxHash';
 		%recursEvery = (
@@ -142,12 +142,12 @@ sub getEditForm {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	if ($session{form}{assetId} eq "new") {
+	if ($self->session->form->process("assetId") eq "new") {
 		$self->update({eventEndDate=>$self->get("eventStartDate")}) unless ($self->get("eventEndDate") >= $self->get("eventStartDate"));
-		if ($session{form}{recursEvery} && $session{form}{recursEvery} ne "never") {
-			my $until = WebGUI::DateTime::setToEpoch($session{form}{until});
+		if ($self->session->form->process("recursEvery") && $self->session->form->process("recursEvery") ne "never") {
+			my $until = WebGUI::DateTime::setToEpoch($self->session->form->process("until"));
 			$until = $self->get("eventEndDate") unless ($until >= $self->get("eventEndDate"));
-			my $interval = ($session{form}{interval} < 1) ? 1 : $session{form}{interval};
+			my $interval = ($self->session->form->process("interval") < 1) ? 1 : $self->session->form->process("interval");
 			my $recurringEventId = WebGUI::Id::generate();
 			$self->update({EventsCalendar_recurringId=>$recurringEventId});
 			my $start = $self->get("eventStartDate");
@@ -155,16 +155,16 @@ sub processPropertiesFromFormPost {
 			my $i = 0;
 			while ($start < $until) {
 				$i++;
-				if ($session{form}{recursEvery} eq "day") {
+				if ($self->session->form->process("recursEvery") eq "day") {
 					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,0,($i*$interval));
 					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,0,($i*$interval));
-				} elsif ($session{form}{recursEvery} eq "week") {
+				} elsif ($self->session->form->process("recursEvery") eq "week") {
 					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,0,(7*$i*$interval));
 					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,0,(7*$i*$interval));
-				} elsif ($session{form}{recursEvery} eq "month") {
+				} elsif ($self->session->form->process("recursEvery") eq "month") {
 					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,($i*$interval),0);
 					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,($i*$interval),0);
-				} elsif ($session{form}{recursEvery} eq "year") {
+				} elsif ($self->session->form->process("recursEvery") eq "year") {
 					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),($i*$interval),0,0);
 					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),($i*$interval),0,0);
 				}
@@ -212,14 +212,14 @@ sub view {
 	$var{"end.date"} = epochToHuman($self->getValue("eventEndDate"),"%z");
 	$var{"end.time"} = epochToHuman($self->getValue("eventEndDate"),"%Z");
 	$var{canEdit} = $self->canEdit;
-	$var{"edit.url"} = WebGUI::URL::page('func=edit');
+	$var{"edit.url"} = $self->session->url->page('func=edit');
 	$var{"edit.label"} = WebGUI::International::get(575,"Asset_Event");
-	$var{"delete.url"} = WebGUI::URL::page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
+	$var{"delete.url"} = $self->session->url->page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
 	$var{"delete.label"} = WebGUI::International::get(576,"Asset_Event");
 	my @others;
 	my ($start, $garbage) = WebGUI::DateTime::dayStartEnd($self->get("eventStartDate"));
 	my ($garbage, $end) = WebGUI::DateTime::dayStartEnd($self->get("eventEndDate"));
-	my $sth = WebGUI::SQL->read("select assetId from EventsCalendar_event where ((eventStartDate >= $start and eventStartDate <= $end) or (eventEndDate >= $start and eventEndDate <= $end)) and assetId<>".quote($self->getId));
+	my $sth = $self->session->db->read("select assetId from EventsCalendar_event where ((eventStartDate >= $start and eventStartDate <= $end) or (eventEndDate >= $start and eventEndDate <= $end)) and assetId<>".$self->session->db->quote($self->getId));
 	while (my ($assetId) = $sth->array) {
 		my $asset = WebGUI::Asset::Event->new($assetId);
 		# deal with multiple versions of the same event with conflicting dates
@@ -241,12 +241,12 @@ sub www_deleteEvent {
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(42,"Asset_Event").'</h1>';
 	$output .= WebGUI::International::get(75,"Asset_Event").'<p><blockquote>';
-	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm').'">'.WebGUI::International::get(76,"Asset_Event").'</a><p>';
-	$output .= '<a href="'.WebGUI::URL::page('func=deleteEventConfirm;rid='.$session{form}{rid}).'">'
-		.WebGUI::International::get(77,"Asset_Event").'</a><p>' if (($session{form}{rid} ne "") and ($session{form}{rid} ne "0"));
+	$output .= '<a href="'.$self->session->url->page('func=deleteEventConfirm').'">'.WebGUI::International::get(76,"Asset_Event").'</a><p>';
+	$output .= '<a href="'.$self->session->url->page('func=deleteEventConfirm;rid='.$self->session->form->process("rid")).'">'
+		.WebGUI::International::get(77,"Asset_Event").'</a><p>' if (($self->session->form->process("rid") ne "") and ($self->session->form->process("rid") ne "0"));
 	$output .= '<a href="'.$self->getUrl.'">'.WebGUI::International::get(78,"Asset_Event").'</a>';
 	$output .= '</blockquote>';
-	return WebGUI::Style::process($output,$self->getParent->getValue("styleTemplateId"));
+	return $self->session->style->process($output,$self->getParent->getValue("styleTemplateId"));
 }
 
 
@@ -254,10 +254,10 @@ sub www_deleteEvent {
 sub www_deleteEventConfirm {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
-	if (($session{form}{rid} ne "") and ($session{form}{rid} ne "0")) {
+	if (($self->session->form->process("rid") ne "") and ($self->session->form->process("rid") ne "0")) {
 		my $series = $self->getParent->getLineage(["descendants"],{returnObjects=>1});
 		foreach my $event (@{$series}) {
-			$event->trash if $event->get("EventsCalendar_recurringId") eq $session{form}{rid};
+			$event->trash if $event->get("EventsCalendar_recurringId") eq $self->session->form->process("rid");
 		}
 	} else {
 		$self->trash;
@@ -278,7 +278,7 @@ sub www_edit {
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canView);
-	return WebGUI::Style::process($self->view,$self->getParent->getValue("styleTemplateId"));
+	return $self->session->style->process($self->view,$self->getParent->getValue("styleTemplateId"));
 }
 
 

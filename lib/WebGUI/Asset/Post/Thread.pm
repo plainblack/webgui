@@ -35,7 +35,7 @@ sub canReply {
 #-------------------------------------------------------------------
 sub canSubscribe {
 	my $self = shift;
-	return ($session{user}{userId} ne "1" && $self->canView);
+	return ($self->session->user->profileField("userId") ne "1" && $self->canView);
 }
 
 #-------------------------------------------------------------------
@@ -149,7 +149,7 @@ A string indicating the type of layout to use. Can be flat or nested.
 sub getLayoutUrl {
 	my $self = shift;
 	my $layout = shift;
-	return $session{asset}->getUrl("layout=".$layout.'#id'.$session{asset}->getId) if (exists $session{asset});
+	return $self->session->asset->getUrl("layout=".$layout.'#id'.$self->session->asset->getId) if (exists $self->session->asset);
 	return $self->getUrl("layout=".$layout);
 }
 
@@ -179,24 +179,24 @@ sub getNextThread {
 	my $self = shift;
         unless (defined $self->{_next}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		my ($id, $class, $version) = WebGUI::SQL->quickArray("
+		my ($id, $class, $version) = $self->session->db->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
 				left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
-				where asset.parentId=".quote($self->get("parentId"))." 
+				where asset.parentId=".$self->session->db->quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$sortBy.">".quote($self->get($sortBy))." 
+					and ".$sortBy.">".$self->session->db->quote($self->get($sortBy))." 
 					and (
 						assetData.status in ('approved','archived')
-						 or assetData.tagId=".quote($session{scratch}{versionTag})."
-						or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
+						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."
+						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->profileField("userId"))." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
 				order by ".$sortBy." asc 
-				",WebGUI::SQL->getSlave);
+				",$self->session->db->getSlave);
 		$self->{_next} = WebGUI::Asset->new($id,$class,$version);
 	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
@@ -217,23 +217,23 @@ sub getPreviousThread {
 	my $self = shift;
         unless (defined $self->{_previous}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		my ($id, $class, $version) = WebGUI::SQL->quickArray("
+		my ($id, $class, $version) = $self->session->db->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
 				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
 				left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
-				where asset.parentId=".quote($self->get("parentId"))." 
+				where asset.parentId=".$self->session->db->quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$sortBy."<".quote($self->get($sortBy))." 
+					and ".$sortBy."<".$self->session->db->quote($self->get($sortBy))." 
 					and (
 						assetData.status in ('approved','archived')
-						 or assetData.tagId=".quote($session{scratch}{versionTag})."
-						or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
+						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."
+						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->profileField("userId"))." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
-				order by ".$sortBy." desc, assetData.revisionDate desc ",WebGUI::SQL->getSlave);
+				order by ".$sortBy." desc, assetData.revisionDate desc ",$self->session->db->getSlave);
 		$self->{_previous} = WebGUI::Asset::Post::Thread->new($id,$class,$version);
 	#	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
@@ -375,7 +375,7 @@ Returns a boolean indicating whether this thread is marked read for the user.
 sub isMarkedRead {
         my $self = shift;
 	return 1 if $self->isPoster;
-      my ($isRead) = WebGUI::SQL->quickArray("select count(*) from Post_read where userId=".quote($session{user}{userId})." and threadId=".quote($self->getId)." and postId=".quote($self->get("lastPostId")));
+      my ($isRead) = $self->session->db->quickArray("select count(*) from Post_read where userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and threadId=".$self->session->db->quote($self->getId)." and postId=".$self->session->db->quote($self->get("lastPostId")));
         return $isRead;
 }
 
@@ -446,18 +446,18 @@ sub rate {
 	my $self = shift;
 	my $rating = shift;
 	unless ($self->hasRated) {
-		WebGUI::SQL->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-			.quote($self->getId).", ".quote($session{user}{userId}).", ".quote($session{env}{REMOTE_ADDR}).",
-		".WebGUI::DateTime::time().", ".quote($rating).")");
-		my ($count) = WebGUI::SQL->quickArray("select count(*) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".quote($self->getId)." and Post.rating>0");
+		$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
+			.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",
+		".WebGUI::DateTime::time().", ".$self->session->db->quote($rating).")");
+		my ($count) = $self->session->db->quickArray("select count(*) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".$self->session->db->quote($self->getId)." and Post.rating>0");
 		$count = $count || 1;
-		my ($sum) = WebGUI::SQL->quickArray("select sum(Post.rating) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".quote($self->getId)." and Post.rating>0");
+		my ($sum) = $self->session->db->quickArray("select sum(Post.rating) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".$self->session->db->quote($self->getId)." and Post.rating>0");
 		my $average = round($sum/$count);
 		$self->update({rating=>$average});
-		if ($session{setting}{useKarma}) {
+		if ($self->session->setting->get("useKarma")) {
 			my $poster = WebGUI::User->new($self->get("ownerUserId"));
 			$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
-			my $rater = WebGUI::User->new($session{user}{userId});
+			my $rater = WebGUI::User->new($self->session->user->profileField("userId"));
 			$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId);
 		}
 		$self->getParent->recalculateRating;
@@ -549,8 +549,8 @@ Subscribes the user to this thread.
 sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
-  WebGUI::Cache->new("cspost_".$self->getId."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_".$session{form}{pn})->delete;
-  WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
+  WebGUI::Cache->new("cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
+  WebGUI::Grouping::addUsersToGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 #-------------------------------------------------------------------
@@ -567,7 +567,7 @@ sub trash {
         $self->getParent->decrementThreads;
         if ($self->getParent->get("lastPostId") eq $self->getId) {
                 my $parentLineage = $self->getThread->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($parentLineage.'%')." and Post.assetId<>".quote($self->getId)." and Post.assetId=asset.assetId and asset.state='published' order by Post.dateSubmitted desc");
+                my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($parentLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and Post.assetId=asset.assetId and asset.state='published' order by Post.dateSubmitted desc");
                 $self->getParent->setLastPost('','') ? $self->getParent->setLastPost($id,$date) : $id;
         }
 }
@@ -609,8 +609,8 @@ Negates the subscribe method.
 
 sub unsubscribe {
 	my $self = shift;
-  WebGUI::Cache->new("cspost_".$self->getId."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_".$session{form}{pn})->delete;
-  WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
+  WebGUI::Cache->new("cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
+  WebGUI::Grouping::deleteUsersFromGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 
@@ -618,12 +618,12 @@ sub unsubscribe {
 sub view {
 	my $self = shift;
         $self->markRead;
-        $self->incrementViews unless ($session{form}{func} eq 'rate');
-        WebGUI::Session::setScratch("discussionLayout",$session{form}{layout});
+        $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
+        $self->session->scratch->set("discussionLayout",$self->session->form->process("layout"));
         my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
 
-        $var->{'user.isVisitor'} = ($session{user}{userId} eq '1');
+        $var->{'user.isVisitor'} = ($self->session->user->profileField("userId") eq '1');
         $var->{'user.isModerator'} = $self->getParent->canModerate;
         $var->{'user.canPost'} = $self->getParent->canPost;
         $var->{'user.canReply'} = $self->canReply;
@@ -631,7 +631,7 @@ sub view {
 
         $var->{'layout.nested.url'} = $self->getLayoutUrl("nested");
         $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");
-        my $layout = $session{scratch}{discussionLayout} || $session{user}{discussionLayout};
+        my $layout = $self->session->scratch->get("discussionLayout") || $self->session->user->profileField("discussionLayout");
         $var->{'layout.isFlat'} = ($layout eq "flat");
         $var->{'layout.isNested'} = ($layout eq "nested" || !$var->{'layout.isFlat'});
 
@@ -651,14 +651,14 @@ sub view {
 	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate from asset 
 		left join assetData on assetData.assetId=asset.assetId
 		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
-		where asset.lineage like ".quote($self->get("lineage").'%')
+		where asset.lineage like ".$self->session->db->quote($self->get("lineage").'%')
 		."	and asset.state='published'
 		and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId
 			and (
 				assetData.status in ('approved','archived')
-						 or assetData.tagId=".quote($session{scratch}{versionTag});
+						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
 	$sql .= "		or assetData.status='pending'" if ($self->getParent->canModerate);
-	$sql .= "		or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
+	$sql .= "		or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->profileField("userId"))." and assetData.ownerUserId<>'1')
 			))
 		group by assetData.assetId
 		order by ";
@@ -794,23 +794,23 @@ sub www_view {
 	my $cache;
 	my $output;
         my $useCache = (
-		$session{form}{op} eq "" && 
-		$session{form}{func} eq "" && 
-		$session{form}{layout} eq "" && 
+		$self->session->form->process("op") eq "" && 
+		$self->session->form->process("func") eq "" && 
+		$self->session->form->process("layout") eq "" && 
 		(
-			( $self->getParent->get("cacheTimeout") > 10 && $session{user}{userId} ne '1') || 
-			( $self->getParent->get("cacheTimeoutVisitor") > 10 && $session{user}{userId} eq '1')
+			( $self->getParent->get("cacheTimeout") > 10 && $self->session->user->profileField("userId") ne '1') || 
+			( $self->getParent->get("cacheTimeoutVisitor") > 10 && $self->session->user->profileField("userId") eq '1')
 		) && 
-		not $session{var}{adminOn}
+		not $self->session->var->get("adminOn")
 	);
 	if ($useCache) {
-               	$cache = WebGUI::Cache->new("cspost_".($postId||$self->getId)."_".$session{user}{userId}."_".$session{scratch}{discussionLayout}."_".$session{form}{pn});
+               	$cache = WebGUI::Cache->new("cspost_".($postId||$self->getId)."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"));
            	$output = $cache->get;
 	}
 	unless ($output) {
 		$output = $self->getParent->processStyle($self->view);
 		my $ttl;
-		if ($session{user}{userId} eq '1') {
+		if ($self->session->user->profileField("userId") eq '1') {
 			$ttl = $self->getParent->get("cacheTimeoutVisitor");
 		} else {
 			$ttl = $self->getParent->get("cacheTimeout");

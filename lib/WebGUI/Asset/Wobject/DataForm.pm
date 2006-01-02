@@ -52,7 +52,7 @@ sub _createField {
 	if (isIn($data->{type},qw(selectList checkList))) {
 		my @defaultValues;
 		if ($session{form}{$param{name}}) {
-                	@defaultValues = WebGUI::FormProcessor::selectList($param{name});
+                	@defaultValues = $self->session->form->selectList($param{name});
                 } else {
                 	foreach (split(/\n/, $data->{value})) {
                         	s/\s+$//; # remove trailing spaces
@@ -118,7 +118,7 @@ sub _tonull {
 #-------------------------------------------------------------------
 sub _createTabInit {
 	my $id = shift;
-	my @tabCount = WebGUI::SQL->quickArray("select count(DataForm_tabId) from DataForm_tab where assetId=".quote($id));
+	my @tabCount = $self->session->db->quickArray("select count(DataForm_tabId) from DataForm_tab where assetId=".$self->session->db->quote($id));
 	my $output = '<script type="text/javascript">var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
 	return $output;
 }
@@ -181,9 +181,9 @@ sub duplicate {
        my (%dataField, %dataTab, $sthField, $sthTab, $newTabId);
        tie %dataTab, 'Tie::CPHash';
        tie %dataField, 'Tie::CPHash';
-       $sthTab = WebGUI::SQL->read("select * from DataForm_tab where assetId=".quote($self->getId));
+       $sthTab = $self->session->db->read("select * from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
        while (%dataTab = $sthTab->hash) {
-               $sthField = WebGUI::SQL->read("select * from DataForm_field where assetId=".quote($self->getId)." AND DataForm_tabId=".quote($dataTab{DataForm_tabId}));
+               $sthField = $self->session->db->read("select * from DataForm_field where assetId=".$self->session->db->quote($self->getId)." AND DataForm_tabId=".$self->session->db->quote($dataTab{DataForm_tabId}));
                $dataTab{DataForm_tabId} = "new";
                $newTabId = $newAsset->setCollateral("DataForm_tab","DataForm_tabId",\%dataTab);
                while (%dataField = $sthField->hash) {
@@ -193,7 +193,7 @@ sub duplicate {
                }
                $sthField->finish;
        }
-       $sthField = WebGUI::SQL->read("select * from DataForm_field where assetId=".quote($self->getId)." AND DataForm_tabId='0'");
+       $sthField = $self->session->db->read("select * from DataForm_field where assetId=".$self->session->db->quote($self->getId)." AND DataForm_tabId='0'");
        while (%dataField = $sthField->hash) {
                $dataField{DataForm_fieldId} = "new";
                $newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
@@ -260,7 +260,7 @@ sub getEditForm {
 		-hoverHelp=>WebGUI::International::get('74 description',"Asset_DataForm"),
 		-value=>$self->getValue("mailData")
 		);
-	if ($self->getId eq "new" && $session{form}{proceed} ne "manageAssets") {
+	if ($self->getId eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
         	$tabform->getTab("properties")->whatNext(
 			-options=>{
 				editField=>WebGUI::International::get(76,"Asset_DataForm"),
@@ -284,8 +284,8 @@ sub getListTemplateVars {
 	#$var->{"entryId"} = $self->getId;
 	#$var->{"delete.url"} = $self->getUrl.";func=deleteAllEntries";
 	#$var->{"delete.label"} = WebGUI::International::get(91,"Asset_DataForm");
-	my $fields = WebGUI::SQL->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
-			where assetId=".quote($self->getId)." order by sequenceNumber");
+	my $fields = $self->session->db->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
+			where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
 	while (my $field = $fields->hashRef) {
 		push(@fieldLoop,{
 			"field.name"=>$field->{name},
@@ -298,12 +298,12 @@ sub getListTemplateVars {
 	$fields->finish;
 	$var->{field_loop} = \@fieldLoop;
 	my @recordLoop;
-	my $entries = WebGUI::SQL->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
-		where assetId=".quote($self->getId)." order by submissionDate desc");
+	my $entries = $self->session->db->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
+		where assetId=".$self->session->db->quote($self->getId)." order by submissionDate desc");
 	while (my $record = $entries->hashRef) {
 		my @dataLoop;
-		my $dloop = WebGUI::SQL->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
-			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".quote($record->{DataForm_entryId})."
+		my $dloop = $self->session->db->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
+			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".$self->session->db->quote($record->{DataForm_entryId})."
 			order by b.sequenceNumber");
 		while (my $data = $dloop->hashRef) {
 			push(@dataLoop,{
@@ -340,10 +340,10 @@ sub getFormUrl {
         my $params = shift;
         my $url = $self->getUrl;
         unless ($self->defaultViewForm) {
-                $url = WebGUI::URL::append($url, 'mode=form');
+                $url = $self->session->url->append($url, 'mode=form');
         }
         if ($params) {
-                $url = WebGUI::URL::append($url, $params);
+                $url = $self->session->url->append($url, $params);
         }
         return $url;
 }
@@ -355,10 +355,10 @@ sub getListUrl {
         my $params = shift;
         my $url = $self->getUrl;
         if ($self->defaultViewForm) {
-                $url = WebGUI::URL::append($url, 'mode=list');
+                $url = $self->session->url->append($url, 'mode=list');
         }
         if ($params) {
-                $url = WebGUI::URL::append($url, $params);
+                $url = $self->session->url->append($url, $params);
         }
         return $url;
 }
@@ -389,7 +389,7 @@ sub getRecordTemplateVars {
 	my @tabs;
 	my $select = "select a.name, a.DataForm_fieldId, a.DataForm_tabId,a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows, a.extras, a.vertical";
 	my $join;
-	my $where = "where a.assetId=".quote($self->getId);
+	my $where = "where a.assetId=".$self->session->db->quote($self->getId);
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden({name=>"entryId",value=>$var->{entryId}});
 		my $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
@@ -399,7 +399,7 @@ sub getRecordTemplateVars {
 		$var->{date} = WebGUI::DateTime::epochToHuman($entry->{submissionDate});
 		$var->{epoch} = $entry->{submissionDate};
 		$var->{"edit.URL"} = $self->getFormUrl('entryId='.$var->{entryId});
-		$where .= " and b.DataForm_entryId=".quote($var->{entryId});
+		$where .= " and b.DataForm_entryId=".$self->session->db->quote($var->{entryId});
 		$join = "left join DataForm_entryData as b on a.DataForm_fieldId=b.DataForm_fieldId";
 		$select .= ", b.value";
 	}
@@ -407,13 +407,13 @@ sub getRecordTemplateVars {
 	tie %data, 'Tie::CPHash';
 	my %tab;
 	tie %tab, 'Tie::CPHash';
-	my $tabsth = WebGUI::SQL->read("select * from DataForm_tab where assetId=".quote($self->getId)." order by sequenceNumber");
+	my $tabsth = $self->session->db->read("select * from DataForm_tab where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
 	while (%tab = $tabsth->hash) {
 		my @fields;
-		my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where and a.DataForm_tabId=".quote($tab{DataForm_tabId})." order by a.sequenceNumber");
+		my $sth = $self->session->db->read("$select from DataForm_field as a $join $where and a.DataForm_tabId=".$self->session->db->quote($tab{DataForm_tabId})." order by a.sequenceNumber");
 		while (%data = $sth->hash) {
 			my $formValue = $session{form}{$data{name}};
-			if ((not exists $data{value}) && $session{form}{func} ne "editSave" && $session{form}{func} ne "editFieldSave" && defined $formValue) {
+			if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
 				$data{value} = $formValue;
 				$data{value} = WebGUI::DateTime::setToEpoch($data{value}) if ($data{type} eq "date");
 			}
@@ -422,7 +422,7 @@ sub getRecordTemplateVars {
 				WebGUI::Macro::process(\$defaultValue);
 				$data{value} = $defaultValue;
 			}
-			my $hidden = (($data{status} eq "hidden" && !$session{var}{adminOn}) || ($data{isMailField} && !$self->get("mailData")));
+			my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
 			my $value = $data{value};
 			$value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
 			$value = WebGUI::DateTime::epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
@@ -454,10 +454,10 @@ sub getRecordTemplateVars {
 	}
 	
 	my @fields;
-	my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where and a.DataForm_tabId = 0 order by a.sequenceNumber");
+	my $sth = $self->session->db->read("$select from DataForm_field as a $join $where and a.DataForm_tabId = 0 order by a.sequenceNumber");
 	while (%data = $sth->hash) {
 		my $formValue = $session{form}{$data{name}};
-		if ((not exists $data{value}) && $session{form}{func} ne "editSave" && $session{form}{func} ne "editFieldSave" && defined $formValue) {
+		if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
 			$data{value} = $formValue;
 			$data{value} = WebGUI::DateTime::setToEpoch($data{value}) if ($data{type} eq "date");
 		}
@@ -466,7 +466,7 @@ sub getRecordTemplateVars {
 			WebGUI::Macro::process(\$defaultValue);
 			$data{value} = $defaultValue;
 		}
-		my $hidden = (($data{status} eq "hidden" && !$session{var}{adminOn}) || ($data{isMailField} && !$self->get("mailData")));
+		my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
 		my $value = $data{value};
 		$value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
 		$value = WebGUI::DateTime::epochToHuman($value) if ($data{type} eq "dateTime");
@@ -505,7 +505,7 @@ sub getRecordTemplateVars {
 sub processPropertiesFromFormPost {	
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	if ($session{form}{assetId} eq "new") {
+	if ($self->session->form->process("assetId") eq "new") {
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
 			name=>"from",
@@ -523,7 +523,7 @@ sub processPropertiesFromFormPost {
 			isMailField=>1,
 			width=>0,
 			type=>"email",
-			defaultValue=>$session{setting}{companyEmail}
+			defaultValue=>$self->session->setting->get("companyEmail")
 			});
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
@@ -554,18 +554,18 @@ sub processPropertiesFromFormPost {
 			defaultValue=>WebGUI::International::get(2,"Asset_DataForm")
 			});
 	}
-	if ($session{form}{fid} eq "new") { # hack to get proceed to work.
-		$session{whatNext} = $session{form}{proceed};
+	if ($self->session->form->process("fid") eq "new") { # hack to get proceed to work.
+		$session{whatNext} = $self->session->form->process("proceed");
 	} else { $session{whatNext} = "nothing"; }
 }
 
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
-    	WebGUI::SQL->write("delete from DataForm_field where assetId=".quote($self->getId));
-    	WebGUI::SQL->write("delete from DataForm_entry where assetId=".quote($self->getId));
-    	WebGUI::SQL->write("delete from DataForm_entryData where assetId=".quote($self->getId));
-	WebGUI::SQL->write("delete from DataForm_tab where assetId=".quote($self->getId));
+    	$self->session->db->write("delete from DataForm_field where assetId=".$self->session->db->quote($self->getId));
+    	$self->session->db->write("delete from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
+    	$self->session->db->write("delete from DataForm_entryData where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->write("delete from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
     	$self->SUPER::purge();
 }
 
@@ -592,14 +592,14 @@ sub sendEmail {
 	if ($to =~ /\@/) {
 		WebGUI::Mail::send($to, $subject, $message, $cc, $from, $bcc);
 	} else {
-                my ($userId) = WebGUI::SQL->quickArray("select userId from users where username=".quote($to));
+                my ($userId) = $self->session->db->quickArray("select userId from users where username=".$self->session->db->quote($to));
                 my $groupId;
                 # if no user is found, try finding a matching group
                 unless ($userId) {
-                        ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($to));
+                        ($groupId) = $self->session->db->quickArray("select groupId from groups where groupName=".$self->session->db->quote($to));
                 }
                 unless ($userId || $groupId) {
-                        WebGUI::ErrorHandler::warn($self->getId.": Unable to send message, no user or group found.");
+                        $self->session->errorHandler->warn($self->getId.": Unable to send message, no user or group found.");
                 } else {
                         WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message, "", "", $from);
 			if ($cc) {
@@ -618,10 +618,10 @@ sub view {
 	my $passedVars = shift;
 	my $var;
         ##Priority encoding
-        if ( $session{form}{mode} eq "form") {
+        if ( $self->session->form->process("mode") eq "form") {
                 $self->viewForm($passedVars);
         }
-        elsif ( $session{form}{mode} eq "list") {
+        elsif ( $self->session->form->process("mode") eq "list") {
                 $self->viewList;
         }
 	elsif( $self->defaultViewForm ) {
@@ -644,10 +644,10 @@ sub viewList {
 sub viewForm {
 	my $self = shift;
 	my $passedVars = shift;
-	WebGUI::Style::setLink($session{config}{extrasURL}.'/tabs/tabs.css', {"type"=>"text/css"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js', {"type"=>"text/javascript"});
+	$self->session->style->setLink($self->session->config->get("extrasURL").'/tabs/tabs.css', {"type"=>"text/css"});
+	$self->session->style->setScript($self->session->config->get("extrasURL").'/tabs/tabs.js', {"type"=>"text/javascript"});
 	my $var;
-	$var->{entryId} = $session{form}{entryId} if ($self->canEdit);
+	$var->{entryId} = $self->session->form->process("entryId") if ($self->canEdit);
 	$var = $passedVars || $self->getRecordTemplateVars($var);
 	return $self->processTemplate($var,$self->get("templateId"));
 }
@@ -656,17 +656,17 @@ sub viewForm {
 sub www_deleteAllEntries {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        my $assetId = $session{form}{entryId};
+        my $assetId = $self->session->form->process("entryId");
 	$self->deleteCollateral("DataForm_entry","assetId",$assetId);
-        $session{form}{entryId} = 'list';
+        $self->session->form->process("entryId") = 'list';
         return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteAllEntriesConfirm {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit && $session{form}{entryId}==$self->getId);
-	WebGUI::SQL->write("delete from DataForm_entry where assetId=".quote($self->getId));
+	return WebGUI::Privilege::insufficient() unless ($self->canEdit && $self->session->form->process("entryId")==$self->getId);
+	$self->session->db->write("delete from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
 	return $self->www_view;
 }
 
@@ -675,9 +675,9 @@ sub www_deleteAllEntriesConfirm {
 sub www_deleteEntry {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        my $entryId = $session{form}{entryId};
+        my $entryId = $self->session->form->process("entryId");
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
-        $session{form}{entryId} = 'list';
+        $self->session->form->process("entryId") = 'list';
         return "";
 }
 
@@ -685,7 +685,7 @@ sub www_deleteEntry {
 sub www_deleteFieldConfirm {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->deleteCollateral("DataForm_field","DataForm_fieldId",$session{form}{fid});
+	$self->deleteCollateral("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"));
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId");
        	return "";
 }
@@ -694,8 +694,8 @@ sub www_deleteFieldConfirm {
 sub www_deleteTabConfirm {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->deleteCollateral("DataForm_tab","DataForm_tabId",$session{form}{tid});
-	$self->deleteCollateral("DataForm_field","DataForm_tabId",$session{form}{tid});
+	$self->deleteCollateral("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
+	$self->deleteCollateral("DataForm_field","DataForm_tabId",$self->session->form->process("tid"));
 	$self->reorderCollateral("DataForm_tab","DataForm_tabId");
        	return "";
 }
@@ -721,16 +721,16 @@ sub www_editField {
 		"editable" => WebGUI::International::get(6, "Asset_DataForm"),
 		"required" => WebGUI::International::get(75, "Asset_DataForm") 
 		);
-        $session{form}{fid} = "new" if ($session{form}{fid} eq "");
-	unless ($session{form}{fid} eq "new") {	
-        	%field = WebGUI::SQL->quickHash("select * from DataForm_field where DataForm_fieldId=".quote($session{form}{fid}));
+        $self->session->form->process("fid") = "new" if ($self->session->form->process("fid") eq "");
+	unless ($self->session->form->process("fid") eq "new") {	
+        	%field = $self->session->db->quickHash("select * from DataForm_field where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
 	}
-	$tab = WebGUI::SQL->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".quote($self->getId));
+	$tab = $self->session->db->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
 	$tab->{0} = WebGUI::International::get("no tab","Asset_DataForm");
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
 		-name => "fid",
-		-value => $session{form}{fid}
+		-value => $self->session->form->process("fid")
 	);
         $f->hidden(
 		-name => "func",
@@ -823,7 +823,7 @@ sub www_editField {
 		-value=>$field{defaultValue},
 		-subtext=>'<br />'.WebGUI::International::get(85,"Asset_DataForm")
 		);
-	if ($session{form}{fid} eq "new" && $session{form}{proceed} ne "manageAssets") {
+	if ($self->session->form->process("fid") eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
         	$f->whatNext(
 			-options=>{
 				"editField"=>WebGUI::International::get(76,"Asset_DataForm"),
@@ -842,33 +842,33 @@ sub www_editField {
 sub www_editFieldSave {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
-	$session{form}{tid} = "0" if ($session{form}{tid} eq "");
-	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
-        $session{form}{name} =~ s/\-//g;
-        $session{form}{name} =~ s/\///g;
+	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
+	$self->session->form->process("tid") = "0" if ($self->session->form->process("tid") eq "");
+	$self->session->form->process("name") = $self->session->url->urlize($self->session->form->process("name"));
+        $self->session->form->process("name") =~ s/\-//g;
+        $self->session->form->process("name") =~ s/\///g;
 	$self->setCollateral("DataForm_field","DataForm_fieldId",{
-		DataForm_fieldId=>$session{form}{fid},
-		width=>$session{form}{width},
-		name=>$session{form}{name},
-		label=>$session{form}{label},
-		DataForm_tabId=>$session{form}{tid},
-		status=>$session{form}{status},
-		type=>$session{form}{type},
-		possibleValues=>$session{form}{possibleValues},
-		defaultValue=>$session{form}{defaultValue},
-		subtext=>$session{form}{subtext},
-		rows=>$session{form}{rows},
-		vertical=>$session{form}{vertical},
-		extras=>$session{form}{extras},
-		}, "1","1", _tonull("DataForm_tabId",$session{form}{tid}));
-	if($session{form}{position}) {
-		WebGUI::SQL->write("update DataForm_field set sequenceNumber=".quote($session{form}{position}).
-					" where DataForm_fieldId=".quote($session{form}{fid}));
+		DataForm_fieldId=>$self->session->form->process("fid"),
+		width=>$self->session->form->process("width"),
+		name=>$self->session->form->process("name"),
+		label=>$self->session->form->process("label"),
+		DataForm_tabId=>$self->session->form->process("tid"),
+		status=>$self->session->form->process("status"),
+		type=>$self->session->form->process("type"),
+		possibleValues=>$self->session->form->process("possibleValues"),
+		defaultValue=>$self->session->form->process("defaultValue"),
+		subtext=>$self->session->form->process("subtext"),
+		rows=>$self->session->form->process("rows"),
+		vertical=>$self->session->form->process("vertical"),
+		extras=>$self->session->form->process("extras"),
+		}, "1","1", _tonull("DataForm_tabId",$self->session->form->process("tid")));
+	if($self->session->form->process("position")) {
+		$self->session->db->write("update DataForm_field set sequenceNumber=".$self->session->db->quote($self->session->form->process("position")).
+					" where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
 	}
-	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
-        if ($session{whatNext} eq "editField" || $session{form}{proceed} eq "editField") {
-            $session{form}{fid} = "new";
+	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$self->session->form->process("tid"))) if ($self->session->form->process("fid") ne "new");
+        if ($session{whatNext} eq "editField" || $self->session->form->process("proceed") eq "editField") {
+            $self->session->form->process("fid") = "new";
             return $self->www_editField;
         }
         return "";
@@ -880,14 +880,14 @@ sub www_editTab {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
     	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
-        $session{form}{tid} = "new" if ($session{form}{tid} eq "");
-	unless ($session{form}{tid} eq "new") {	
-        	%tab = WebGUI::SQL->quickHash("select * from DataForm_tab where DataForm_tabId=".quote($session{form}{tid}));
+        $self->session->form->process("tid") = "new" if ($self->session->form->process("tid") eq "");
+	unless ($self->session->form->process("tid") eq "new") {	
+        	%tab = $self->session->db->quickHash("select * from DataForm_tab where DataForm_tabId=".$self->session->db->quote($self->session->form->process("tid")));
 	}
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
 		-name => "tid",
-		-value => $session{form}{tid}
+		-value => $self->session->form->process("tid")
 	);
         $f->hidden(
 		-name => "func",
@@ -904,7 +904,7 @@ sub www_editTab {
 		-value=>$tab{subtext},
 		-subtext=>""
 		);
-	if ($session{form}{tid} eq "new") {
+	if ($self->session->form->process("tid") eq "new") {
         	$f->whatNext(
 			-options=>{
 				editTab=>WebGUI::International::get(103,"Asset_DataForm"),
@@ -923,17 +923,17 @@ sub www_editTab {
 sub www_editTabSave {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
-	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
-        $session{form}{name} =~ s/\-//g;
-        $session{form}{name} =~ s/\///g;
+	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
+	$self->session->form->process("name") = $self->session->url->urlize($self->session->form->process("name"));
+        $self->session->form->process("name") =~ s/\-//g;
+        $self->session->form->process("name") =~ s/\///g;
 	$self->setCollateral("DataForm_tab","DataForm_tabId",{
-		DataForm_tabId=>$session{form}{tid},
-		label=>$session{form}{label},
-		subtext=>$session{form}{subtext}
+		DataForm_tabId=>$self->session->form->process("tid"),
+		label=>$self->session->form->process("label"),
+		subtext=>$self->session->form->process("subtext")
 		});
-        if ($session{form}{proceed} eq "editTab") {
-            $session{form}{tid} = "new";
+        if ($self->session->form->process("proceed") eq "editTab") {
+            $self->session->form->process("tid") = "new";
             return $self->www_editTab;
         }
         return "";
@@ -944,10 +944,10 @@ sub www_exportTab {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
         WebGUI::HTTP::setFilename($self->get("url").".tab","text/plain");
-        my %fields = WebGUI::SQL->buildHash("select DataForm_fieldId,name from DataForm_field where
-                assetId=".quote($self->getId)." order by sequenceNumber");
+        my %fields = $self->session->db->buildHash("select DataForm_fieldId,name from DataForm_field where
+                assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
         my @data;
-        my $entries = WebGUI::SQL->read("select * from DataForm_entry where assetId=".quote($self->getId));
+        my $entries = $self->session->db->read("select * from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
         my $i;
         my $noMailData = ($self->get("mailData") == 0);
         while (my $entryData = $entries->hashRef) {
@@ -958,8 +958,8 @@ sub www_exportTab {
                         userId => $entryData->{userId},
                         submissionDate => WebGUI::DateTime::epochToHuman($entryData->{submissionDate}),
                         };
-                my $values = WebGUI::SQL->read("select value,DataForm_fieldId from DataForm_entryData where
-                        DataForm_entryId=".quote($entryData->{DataForm_entryId}));
+                my $values = $self->session->db->read("select value,DataForm_fieldId from DataForm_entryData where
+                        DataForm_entryId=".$self->session->db->quote($entryData->{DataForm_entryId}));
                 while (my ($value, $fieldId) = $values->array) {
                         next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
                         $data[$i]{$fields{$fieldId}} = $value;
@@ -993,7 +993,7 @@ sub www_exportTab {
 sub www_moveFieldDown {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->moveCollateralDown("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
+	$self->moveCollateralDown("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"),_tonull("DataForm_tabId",$self->session->form->process("tid")));
 	return "";
 }
 
@@ -1001,7 +1001,7 @@ sub www_moveFieldDown {
 sub www_moveFieldUp {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->moveCollateralUp("DataForm_field","DataForm_fieldId",$session{form}{fid},_tonull("DataForm_tabId",$session{form}{tid}));
+	$self->moveCollateralUp("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"),_tonull("DataForm_tabId",$self->session->form->process("tid")));
 	return "";
 }
 
@@ -1009,7 +1009,7 @@ sub www_moveFieldUp {
 sub www_moveTabRight {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->moveCollateralDown("DataForm_tab","DataForm_tabId",$session{form}{tid});
+	$self->moveCollateralDown("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
 	return "";
 }
 
@@ -1017,7 +1017,7 @@ sub www_moveTabRight {
 sub www_moveTabLeft {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->moveCollateralUp("DataForm_tab","DataForm_tabId",$session{form}{tid});
+	$self->moveCollateralUp("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
 	return "";
 }
 
@@ -1025,22 +1025,22 @@ sub www_moveTabLeft {
 sub www_process {
 	my $self = shift;
 	my $entryId = $self->setCollateral("DataForm_entry","DataForm_entryId",{
-		DataForm_entryId=>$session{form}{entryId},
+		DataForm_entryId=>$self->session->form->process("entryId"),
                 assetId=>$self->getId,
-                userId=>$session{user}{userId},
-                username=>$session{user}{username},
-                ipAddress=>$session{env}{REMOTE_ADDR},
+                userId=>$self->session->user->profileField("userId"),
+                username=>$self->session->user->profileField("username"),
+                ipAddress=>$self->session->env->get("REMOTE_ADDR"),
                 submissionDate=>time()
 		},0);
 	my ($var, %row, @errors, $updating, $hadErrors);
 	$var->{entryId} = $entryId;
 	tie %row, "Tie::CPHash";
-	my $sth = WebGUI::SQL->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
-		where assetId=".quote($self->getId)." order by sequenceNumber");
+	my $sth = $self->session->db->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
+		where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
 	while (%row = $sth->hash) {
 		my $value = $row{defaultValue};
 		if ($row{status} eq "required" || $row{status} eq "editable") {
-			$value = WebGUI::FormProcessor::process($row{name},$row{type},$row{defaultValue});
+			$value = $self->session->form->process($row{name},$row{type},$row{defaultValue});
 			WebGUI::Macro::filter(\$value);
 		}
 		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
@@ -1055,15 +1055,15 @@ sub www_process {
                         WebGUI::Macro::process(\$value);
                 }
 		unless ($hadErrors) {
-			my ($exists) = WebGUI::SQL->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=".quote($entryId)."
-				and DataForm_fieldId=".quote($row{DataForm_fieldId}));
+			my ($exists) = $self->session->db->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=".$self->session->db->quote($entryId)."
+				and DataForm_fieldId=".$self->session->db->quote($row{DataForm_fieldId}));
 			if ($exists) {
-				WebGUI::SQL->write("update DataForm_entryData set value=".quote($value)."
-					where DataForm_entryId=".quote($entryId)." and DataForm_fieldId=".quote($row{DataForm_fieldId}));
+				$self->session->db->write("update DataForm_entryData set value=".$self->session->db->quote($value)."
+					where DataForm_entryId=".$self->session->db->quote($entryId)." and DataForm_fieldId=".$self->session->db->quote($row{DataForm_fieldId}));
 				$updating = 1;
 			} else {
-				WebGUI::SQL->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,assetId,value) values
-					(".quote($entryId).", ".quote($row{DataForm_fieldId}).", ".quote($self->getId).", ".quote($value).")");
+				$self->session->db->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,assetId,value) values
+					(".$self->session->db->quote($entryId).", ".$self->session->db->quote($row{DataForm_fieldId}).", ".$self->session->db->quote($self->getId).", ".$self->session->db->quote($value).")");
 			}
 		}
 	}
@@ -1071,12 +1071,12 @@ sub www_process {
 	$var->{error_loop} = \@errors;
 	$var = $self->getRecordTemplateVars($var);
 	if ($hadErrors && !$updating) {
-		WebGUI::SQL->write("delete from DataForm_entryData where DataForm_entryId=".quote($entryId));
+		$self->session->db->write("delete from DataForm_entryData where DataForm_entryId=".$self->session->db->quote($entryId));
 		$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
 		$self->processStyle($self->view($var));
 	} else {
 		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
-		return WebGUI::Style::process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
+		return $self->session->style->process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
 	}
 }
 

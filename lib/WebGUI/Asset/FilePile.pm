@@ -64,10 +64,10 @@ sub edit {
 		name=>"class",
 		value=>"WebGUI::Asset::FilePile"
 		});
-	if ($session{form}{proceed}) {
+	if ($self->session->form->process("proceed")) {
 		$tabform->hidden({
 			name=>"proceed",
-			value=>$session{form}{proceed}
+			value=>$self->session->form->process("proceed")
 			});
 	}
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
@@ -109,12 +109,12 @@ sub edit {
        	my $clause;
        	if (WebGUI::Grouping::isInGroup(3)) {
                	my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
-                push (@$contentManagers, $session{user}{userId});
-       	        $clause = "userId in (".quoteAndJoin($contentManagers).")";
+                push (@$contentManagers, $self->session->user->profileField("userId"));
+       	        $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
        	} else {
-               	$clause = "userId=".quote($self->get("ownerUserId"));
+               	$clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));
        	}
-       	my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
+       	my $users = $self->session->db->buildHashRef("select userId,username from users where $clause order by username");
        	$tabform->getTab("security")->selectBox(
        		-name=>"ownerUserId",
               	-options=>$users,
@@ -162,7 +162,7 @@ sub editSave {
 		$className = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
 		foreach my $definition (@{$className->definition}) {
 			foreach my $property (keys %{$definition->{properties}}) {
-				$data{$property} = WebGUI::FormProcessor::process(
+				$data{$property} = $self->session->form->process(
 					$property,
 					$definition->{properties}{$property}{fieldType},
 					$definition->{properties}{$property}{defaultValue}
@@ -182,7 +182,7 @@ sub editSave {
 		$newAsset->commit;
 	}
 	$tempStorage->delete;
-	return $class->getParent->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
+	return $class->getParent->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 	return $class->getParent->www_view;
 }
 
@@ -191,9 +191,9 @@ sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	if ($small) {
-		return $session{config}{extrasURL}.'/assets/small/filePile.gif';
+		return $self->session->config->get("extrasURL").'/assets/small/filePile.gif';
 	}
-	return $session{config}{extrasURL}.'/assets/filePile.gif';
+	return $self->session->config->get("extrasURL").'/assets/filePile.gif';
 }
 
 
@@ -214,7 +214,7 @@ sub getName {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
-	unless ($session{form}{doit}) {
+	unless ($self->session->form->process("doit")) {
 		return $self->edit;
 	} else {
 		return $self->editSave;

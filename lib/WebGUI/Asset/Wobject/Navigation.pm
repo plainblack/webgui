@@ -91,7 +91,7 @@ sub getEditForm {
    		);
 	$tabform->hidden({
 		name=>"returnUrl",
-		value=>$session{form}{returnUrl}
+		value=>$self->session->form->process("returnUrl")
 		});
 	my ($descendantsChecked, $ancestorsChecked, $selfChecked, $pedigreeChecked, $siblingsChecked);
 	my @assetsToInclude = split("\n",$self->getValue("assetsToInclude"));
@@ -282,11 +282,11 @@ sub getToolbar {
 	my $self = shift;
 	if ($self->getToolbarState) {
 		my $returnUrl;
-		if (exists $session{asset}) {
-			$returnUrl = ";proceed=goBackToPage;returnUrl=".WebGUI::URL::escape($session{asset}->getUrl);	
+		if (exists $self->session->asset) {
+			$returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);	
 		}
 		my $toolbar;
-		if (!$self->isLocked || $self->get("isLockedBy") eq $session{user}{userId}) {
+		if (!$self->isLocked || $self->get("isLockedBy") eq $self->session->user->profileField("userId")) {
 			$toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
 		}
 		my $i18n = WebGUI::International->new("Asset");
@@ -308,8 +308,8 @@ sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
 	my $start;
-	$session{asset} = WebGUI::Asset->newByUrl unless (exists $session{asset});
-	my $current = $session{asset};
+	$self->session->asset = WebGUI::Asset->newByUrl unless (exists $self->session->asset);
+	my $current = $self->session->asset;
 	if ($self->get("startType") eq "specificUrl") {
 		$start = WebGUI::Asset->newByUrl($self->get("startPoint"));
 	} elsif ($self->get("startType") eq "relativeToRoot") {
@@ -334,7 +334,7 @@ sub view {
 	}
 	$var->{'currentPage.menuTitle'} = $current->getMenuTitle;
 	$var->{'currentPage.title'} = $current->getTitle;
-	$var->{'currentPage.isHome'} = ($current->getId eq $session{setting}{defaultPage});
+	$var->{'currentPage.isHome'} = ($current->getId eq $self->session->setting->get("defaultPage"));
 	$var->{'currentPage.url'} = $current->getUrl;
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
 	my $currentLineage = $current->get("lineage");
@@ -370,8 +370,8 @@ sub view {
 		$pageData->{"page.isSystem"} = $asset->get("isSystem");
 		$pageData->{"page.isHidden"} = $asset->get("isHidden");
 		$pageData->{"page.isViewable"} = $asset->canView;
-		$pageData->{'page.isContainer'} = isIn($asset->get('className'), @{$session{config}{assetContainers}});
-  		$pageData->{'page.isUtility'} = isIn($asset->get('className'), @{$session{config}{utilityAssets}});
+		$pageData->{'page.isContainer'} = isIn($asset->get('className'), @{$self->session->config->get("assetContainers")});
+  		$pageData->{'page.isUtility'} = isIn($asset->get('className'), @{$self->session->config->get("utilityAssets")});
 		$pageData->{"page.url"} = $asset->getUrl;
 		my $indent = $pageData->{"page.relDepth"};
 		$pageData->{"page.indent_loop"} = [];
@@ -433,14 +433,14 @@ sub view {
 			($lastChildren{@{$var->{page_loop}}[$counter]->{"page.parent.assetId"}} 
 				eq @{$var->{page_loop}}[$counter]->{"page.assetId"});
 	}
-	#use Data::Dumper;WebGUI::ErrorHandler::warn(Dumper($var));
+	#use Data::Dumper;$self->session->errorHandler->warn(Dumper($var));
 	return $self->processTemplate($var,$self->get("templateId"));
 }
 
 #-------------------------------------------------------------------
 sub www_goBackToPage {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($session{form}{returnUrl}) if ($session{form}{returnUrl});
+	WebGUI::HTTP::setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
 	return "";
 }
 
@@ -449,16 +449,16 @@ sub www_goBackToPage {
 # we eventually should reaadd this
 sub www_preview {
 	my $self = shift;
-	$session{var}{adminOn} = 0;
+	$self->session->var->get("adminOn") = 0;
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
-	my $nav = WebGUI::Navigation->new(	depth=>$session{form}{depth},
-						method=>$session{form}{method},
-						startAt=>$session{form}{startAt},
-						stopAtLevel=>$session{form}{stopAtLevel},
-						templateId=>$session{form}{templateId},
-						showSystemPages=>$session{form}{showSystemPages},
-						showHiddenPages=>$session{form}{showHiddenPages},
-						showUnprivilegedPages=>$session{form}{showUnprivilegedPages},
+	my $nav = WebGUI::Navigation->new(	depth=>$self->session->form->process("depth"),
+						method=>$self->session->form->process("method"),
+						startAt=>$self->session->form->process("startAt"),
+						stopAtLevel=>$self->session->form->process("stopAtLevel"),
+						templateId=>$self->session->form->process("templateId"),
+						showSystemPages=>$self->session->form->process("showSystemPages"),
+						showHiddenPages=>$self->session->form->process("showHiddenPages"),
+						showUnprivilegedPages=>$self->session->form->process("showUnprivilegedPages"),
 	                       			'reverse'=>$session{form}{'reverse'},
                                 );
 	my $output = qq(
@@ -468,22 +468,22 @@ sub www_preview {
 		</td><td class="tableHeader" valign="top">Output</td></tr>
 		<tr><td class="tableHeader" valign="top">
 		<font size=1>
-			Identifier: $session{form}{identifier}<br />
-			startAt: $session{form}{startAt}<br />
-			method: $session{form}{method}<br />
-			stopAtLevel: $session{form}{stopAtLevel}<br />
-			depth: $session{form}{depth}<br />
-			templateId: $session{form}{templateId}<br />
+			Identifier: $self->session->form->process("identifier")<br />
+			startAt: $self->session->form->process("startAt")<br />
+			method: $self->session->form->process("method")<br />
+			stopAtLevel: $self->session->form->process("stopAtLevel")<br />
+			depth: $self->session->form->process("depth")<br />
+			templateId: $self->session->form->process("templateId")<br />
 			reverse: $session{form}{'reverse'}<br />
-			showSystemPages: $session{form}{showSystemPages}<br />
-			showHiddenPages: $session{form}{showHiddenPages}<br />
-			showUnprivilegedPages: $session{form}{showUnprivilegedPages}<br />
+			showSystemPages: $self->session->form->process("showSystemPages")<br />
+			showHiddenPages: $self->session->form->process("showHiddenPages")<br />
+			showUnprivilegedPages: $self->session->form->process("showUnprivilegedPages")<br />
 		</font>
 		</td><td class="tableData" valign="top">
 		) . $nav->build . qq(</td></tr></table>);
 	
 	# Because of the way the system is set up, the preview is cached. So let's remove it again...
-	WebGUI::Cache->new($nav->{_identifier}."$session{page}{pageId}", "Navigation-".$session{config}{configFile})->delete;
+	WebGUI::Cache->new($nav->{_identifier}."$session{page}{pageId}", "Navigation-".$self->session->config->getFilename)->delete;
 	
 	return _submenu($output,"preview"); 
 }

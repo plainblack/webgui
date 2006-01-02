@@ -188,7 +188,7 @@ sub appendTemplateLabels {
 #-------------------------------------------------------------------
 sub canEdit {
         my $self = shift;
-        return ((($session{form}{func} eq "add" || ($session{form}{assetId} eq "new" && $session{form}{func} eq "editSave" && $session{form}{class} eq "WebGUI::Asset::Post::Thread")) && $self->canPost) || # account for new posts
+        return ((($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class") eq "WebGUI::Asset::Post::Thread")) && $self->canPost) || # account for new posts
                 $self->SUPER::canEdit());
 }
 
@@ -208,7 +208,7 @@ sub canPost {
 #-------------------------------------------------------------------
 sub canSubscribe {
         my $self = shift;
-        return ($session{user}{userId} ne "1" && $self->canView);
+        return ($self->session->user->profileField("userId") ne "1" && $self->canView);
 }
 
 #-------------------------------------------------------------------
@@ -502,7 +502,7 @@ sub getEditForm {
 		-hoverHelp=>WebGUI::International::get('posts/page description', 'Asset_Collaboration'),
 		-value=>$self->getValue("postsPerPage")
 		);
-        if ($session{setting}{useKarma}) {
+        if ($self->session->setting->get("useKarma")) {
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaPerPost",
 			-label=>WebGUI::International::get('karma/post', 'Asset_Collaboration'),
@@ -605,7 +605,7 @@ sub getEditForm {
 		-name=>"richEditor",
 		-label=>WebGUI::International::get('rich editor', 'Asset_Collaboration'),
 		-hoverHelp=>WebGUI::International::get('rich editor description', 'Asset_Collaboration'),
-		-options=>WebGUI::SQL->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title"),
+		-options=>$self->session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title"),
 		-value=>[$self->getValue("richEditor")]
 		);
         $tabform->getTab("display")->yesNo(
@@ -791,7 +791,7 @@ sub isSubscribed {
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
-        my $updatePrivs = ($session{form}{groupIdView} ne $self->get("groupIdView") || $session{form}{moderateGroupId} ne $self->get("moderateGroupId"));
+        my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->get("groupIdView") || $self->session->form->process("moderateGroupId") ne $self->get("moderateGroupId"));
 	$self->SUPER::processPropertiesFromFormPost;
 	if ($self->get("subscriptionGroupId") eq "") {
 		$self->createSubscriptionGroup;
@@ -804,8 +804,8 @@ sub processPropertiesFromFormPost {
                                 });
                 }
         }
-	WebGUI::Session::deleteScratch($self->getId."_sortBy");
-        WebGUI::Session::deleteScratch($self->getId."_sortDir");
+	$self->session->scratch->delete($self->getId."_sortBy");
+        $self->session->scratch->delete($self->getId."_sortDir");
 }
 
 
@@ -827,11 +827,11 @@ Calculates the rating of this forum from its threads and stores the new value in
 
 sub recalculateRating {
         my $self = shift;
-        my ($count) = WebGUI::SQL->quickArray("select count(*) from Thread left join asset on Thread.assetId=asset.assetId 
-		left join Post on Thread.assetId=Post.assetId where asset.parentId=".quote($self->getId)." and Post.rating>0");
+        my ($count) = $self->session->db->quickArray("select count(*) from Thread left join asset on Thread.assetId=asset.assetId 
+		left join Post on Thread.assetId=Post.assetId where asset.parentId=".$self->session->db->quote($self->getId)." and Post.rating>0");
         $count = $count || 1;
-        my ($sum) = WebGUI::SQL->quickArray("select sum(Post.rating) from Thread left join asset on Thread.assetId=asset.assetId 
-		left join Post on Thread.assetId=Post.assetId where asset.parentId=".quote($self->getId)." and Post.rating>0");
+        my ($sum) = $self->session->db->quickArray("select sum(Post.rating) from Thread left join asset on Thread.assetId=asset.assetId 
+		left join Post on Thread.assetId=Post.assetId where asset.parentId=".$self->session->db->quote($self->getId)." and Post.rating>0");
         my $average = round($sum/$count);
         $self->update({rating=>$average});
 }
@@ -870,8 +870,8 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
-	WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
-	WebGUI::Grouping::addUsersToGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
+	WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Grouping::addUsersToGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 #-------------------------------------------------------------------
@@ -884,8 +884,8 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
-	WebGUI::Cache->new("wobject_".$self->getId."_".$session{user}{userId})->delete;
-	WebGUI::Grouping::deleteUsersFromGroups([$session{user}{userId}],[$self->get("subscriptionGroupId")]);
+	WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Grouping::deleteUsersFromGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 
@@ -894,17 +894,17 @@ sub view {
 	my $self = shift;
 	my $scratchSortBy = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
-	my $sortBy = $session{form}{sortBy} || $session{scratch}{$scratchSortBy} || $self->get("sortBy");
+	my $sortBy = $self->session->form->process("sortBy") || $session{scratch}{$scratchSortBy} || $self->get("sortBy");
 	my $sortOrder = $session{scratch}{$scratchSortOrder} || $self->get("sortOrder");
-	if ($sortBy ne $session{scratch}{$scratchSortBy} && $session{form}{func} ne "editSave") {
-		WebGUI::Session::setScratch($scratchSortBy,$session{form}{sortBy});
-	} elsif ($session{form}{sortBy} && $session{form}{func} ne "editSave") {
+	if ($sortBy ne $session{scratch}{$scratchSortBy} && $self->session->form->process("func") ne "editSave") {
+		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
+	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
                 if ($sortOrder eq "asc") {
                         $sortOrder = "desc";
                 } else {
                         $sortOrder = "asc";
                 }
-                WebGUI::Session::setScratch($scratchSortOrder, $sortOrder);
+                $self->session->scratch->set($scratchSortOrder, $sortOrder);
 	}
 	$sortBy ||= "dateUpdated";
 	$sortOrder ||= "desc";
@@ -913,7 +913,7 @@ sub view {
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
         $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($session{user}{userId} eq '1');
+        $var{'user.isVisitor'} = ($self->session->user->profileField("userId") eq '1');
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
@@ -922,11 +922,11 @@ sub view {
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");
 	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
 	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
-	WebGUI::Style::setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
+	$self->session->style->setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	$var{"search.url"} = $self->getSearchUrl;
 	$var{"subscribe.url"} = $self->getSubscribeUrl;
 	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
-	my $constraints = "(assetData.status='approved' or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1') or assetData.tagId=".quote($session{scratch}{versionTag});
+	my $constraints = "(assetData.status='approved' or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->profileField("userId"))." and assetData.ownerUserId<>'1') or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
 	if ($var{'user.isModerator'}) {
 		$constraints .= " or assetData.status='pending'"; 
 	}
@@ -936,7 +936,7 @@ sub view {
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate
 		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
-		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) and $constraints 
+		where asset.parentId=".$self->session->db->quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) and $constraints 
 		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
@@ -954,11 +954,11 @@ The web method to display and use the forum search interface.
 
 sub www_search {
 	my $self = shift;
-        WebGUI::Session::setScratch($self->getId."_all",$session{form}{all});
-        WebGUI::Session::setScratch($self->getId."_atLeastOne",$session{form}{atLeastOne});
-        WebGUI::Session::setScratch($self->getId."_exactPhrase",$session{form}{exactPhrase});
-        WebGUI::Session::setScratch($self->getId."_without",$session{form}{without});
-        WebGUI::Session::setScratch($self->getId."_numResults",$session{form}{numResults});
+        $self->session->scratch->set($self->getId."_all",$self->session->form->process("all"));
+        $self->session->scratch->set($self->getId."_atLeastOne",$self->session->form->process("atLeastOne"));
+        $self->session->scratch->set($self->getId."_exactPhrase",$self->session->form->process("exactPhrase"));
+        $self->session->scratch->set($self->getId."_without",$self->session->form->process("without"));
+        $self->session->scratch->set($self->getId."_numResults",$self->session->form->process("numResults"));
         my %var;
         $var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
          	.WebGUI::Form::hidden({ name=>"func", value=>"search" })
@@ -966,22 +966,22 @@ sub www_search {
         $var{'all.form'} = WebGUI::Form::text({
                 name=>'all',
                 value=>$session{scratch}{$self->getId."_all"},
-                size=>($session{setting}{textBoxSize}-5)
+                size=>($self->session->setting->get("textBoxSize")-5)
                 });
         $var{'exactphrase.form'} = WebGUI::Form::text({
                 name=>'exactPhrase',
                 value=>$session{scratch}{$self->getId."_exactPhrase"},
-                size=>($session{setting}{textBoxSize}-5)
+                size=>($self->session->setting->get("textBoxSize")-5)
                 });
         $var{'atleastone.form'} = WebGUI::Form::text({
                 name=>'atLeastOne',
                 value=>$session{scratch}{$self->getId."_atLeastOne"},
-                size=>($session{setting}{textBoxSize}-5)
+                size=>($self->session->setting->get("textBoxSize")-5)
                 });
         $var{'without.form'} = WebGUI::Form::text({
                 name=>'without',
                 value=>$session{scratch}{$self->getId."_without"},
-                size=>($session{setting}{textBoxSize}-5)
+                size=>($self->session->setting->get("textBoxSize")-5)
                 });
         my %results;
         tie %results, 'Tie::IxHash';
@@ -996,8 +996,8 @@ sub www_search {
         $var{'form.footer'} = WebGUI::Form::formFooter();
         $var{'back.url'} = $self->getUrl;
 	$self->appendTemplateLabels(\%var);
-        $var{doit} = $session{form}{doit};
-        if ($session{form}{doit}) {
+        $var{doit} = $self->session->form->process("doit");
+        if ($self->session->form->process("doit")) {
                 my @fieldsToSearch = qw(assetData.title assetData.synopsis Post.content Post.username Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5);
 		my $all;
 		if ($session{scratch}{$self->getId."_all"} ne "") {
@@ -1010,7 +1010,7 @@ sub www_search {
 				my $allSub;
 				foreach my $field (@fieldsToSearch) {
 					$allSub .= " or " if ($allSub ne "");
-					$allSub .= " $field like ".quote("%".$word."%");
+					$allSub .= " $field like ".$self->session->db->quote("%".$word."%");
 				}
 				$all .= $allSub;
 				$allSub = "";
@@ -1021,7 +1021,7 @@ sub www_search {
 	        if ($session{scratch}{$self->getId."_exactPhrase"} ne "") {
 			foreach my $field (@fieldsToSearch) {
 				$exactPhrase .= " or " if ($exactPhrase ne "");
-       		         	$exactPhrase .= " $field like ".quote("%".$session{scratch}{$self->getId."_exactPhrase"}."%");
+       		         	$exactPhrase .= " $field like ".$self->session->db->quote("%".$session{scratch}{$self->getId."_exactPhrase"}."%");
 			}
      	  	}
 		my $atLeastOne;
@@ -1032,7 +1032,7 @@ sub www_search {
                 	foreach my $word (@words) {
 				foreach my $field (@fieldsToSearch) {
                         		$atLeastOne .= " or " if ($atLeastOne ne "");
-                        		$atLeastOne .= " $field like ".quote("%".$word."%");
+                        		$atLeastOne .= " $field like ".$self->session->db->quote("%".$word."%");
 				}
                 	}
         	}
@@ -1044,7 +1044,7 @@ sub www_search {
                 	foreach my $word (@words) {
 				foreach my $field (@fieldsToSearch) {
                         		$without .= " and " if ($without ne "");
-                        		$without .= " $field not like ".quote("%".$word."%");
+                        		$without .= " $field not like ".$self->session->db->quote("%".$word."%");
 				}
                 	}
         	}
@@ -1055,13 +1055,13 @@ sub www_search {
 			left join assetData on assetData.assetId=asset.assetId
 			left join Post on Post.assetId=assetData.assetId and assetData.revisionDate = Post.revisionDate
 			where (asset.className='WebGUI::Asset::Post' or asset.className='WebGUI::Asset::Post::Thread')
-				and asset.lineage  like ".quote($self->get("lineage").'%')."
-				and asset.assetId<>".quote($self->getId)."
+				and asset.lineage  like ".$self->session->db->quote($self->get("lineage").'%')."
+				and asset.assetId<>".$self->session->db->quote($self->getId)."
 				and (
 					assetData.status in ('approved','archived')
-				 or assetData.tagId=".quote($session{scratch}{versionTag});
+				 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
 		$sql .= "		or assetData.status='pending'" if ($self->canModerate);
-		$sql .= "		or (assetData.ownerUserId=".quote($session{user}{userId})." and assetData.ownerUserId<>'1')
+		$sql .= "		or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->profileField("userId"))." and assetData.ownerUserId<>'1')
 					) ";
 		$sql .= " and ($all) " if ($all ne "");
 		$sql .= " and " if ($sql ne "" && $exactPhrase ne "");
@@ -1129,7 +1129,7 @@ sub _xml_encode {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	my $disableCache = ($session{form}{sortBy} ne "");
+	my $disableCache = ($self->session->form->process("sortBy") ne "");
 	return $self->SUPER::www_view($disableCache);
 }
 
@@ -1140,7 +1140,7 @@ sub www_viewRSS {
 	my $self = shift;
 	my %var;
 
-	$self->logView() if ($session{setting}{passiveProfilingEnabled});        
+	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));        
 	# Set the required channel variables
 	$var{'title'} = _xml_encode($self->get("title"));
 	$var{'link'} = _xml_encode($self->getUrl);
@@ -1151,21 +1151,21 @@ sub www_viewRSS {
 	$var{'webMaster'} = $WebGUI::Session::session{setting}{companyEmail};
 	$var{'docs'} = "http://blogs.law.harvard.edu/tech/rss";
 
-	my $sth = WebGUI::SQL->read("select asset.assetId, asset.className, max(assetData.revisionDate) 
+	my $sth = $self->session->db->read("select asset.assetId, asset.className, max(assetData.revisionDate) 
 		from Thread
 		left join asset on Thread.assetId=asset.assetId
 		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate=Post.revisionDate
 		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate=assetData.revisionDate
-		where asset.parentId=".quote($self->getId)." and asset.state='published' 
+		where asset.parentId=".$self->session->db->quote($self->getId)." and asset.state='published' 
 			and asset.className='WebGUI::Asset::Post::Thread' 
 			and (assetData.status='approved'
-			 or assetData.tagId=".quote($session{scratch}{versionTag}).")
+			 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")
 		group by assetData.assetId
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $i = 1;
         while (my ($id, $class, $version)  = $sth->array) {
 		my $post = WebGUI::Asset::Wobject::Collaboration->new($id, $class, $version);
-		my $encUrl = _xml_encode(WebGUI::URL::getSiteURL().$post->getUrl);
+		my $encUrl = _xml_encode($self->session->url->getSiteURL().$post->getUrl);
 
 		my @attachmentLoop = ();
 		unless ($post->get("storageId") eq "") {

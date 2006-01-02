@@ -29,7 +29,7 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 #sub canManage {
 #	my $self = shift;
-#	my $userId = shift || $session{user}{userId};
+#	my $userId = shift || $self->session->user->profileField("userId");
 #	if ($userId eq $self->getValue("ownerUserId")) {
 #		return 1;
 #	}
@@ -96,7 +96,7 @@ The number of seconds since January 1, 1970.
 =cut
 
 sub epochToArray {
-	my $timeZone = $session{user}{timeZone} || "America/Chicago";
+	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
 	use DateTime;
 	return map {$_ += 0} split / /, DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone)->strftime("%Y %m %d %H %M %S");
 }
@@ -194,9 +194,9 @@ sub view {
 	$monthRangeLength = 72 if ($monthRangeLength > 72);
 	#monthRangeLength is the number of months the user wishes to view
 	# or the default number of the months per page the wobject is set to display.
-	my $calMonthStart = $session{form}{calMonthStart} || 1;
+	my $calMonthStart = $self->session->form->process("calMonthStart") || 1;
 	$calMonthStart = int($calMonthStart);
-	my $calMonthEnd = $session{form}{calMonthEnd} || ($calMonthStart + $monthRangeLength - 1);
+	my $calMonthEnd = $self->session->form->process("calMonthEnd") || ($calMonthStart + $monthRangeLength - 1);
 	$calMonthEnd = int($calMonthEnd);
 	$calMonthEnd =  ($calMonthStart + 72) if ($calMonthStart < $calMonthEnd - 72);
 	$calMonthEnd = $calMonthStart if ($calMonthEnd < $calMonthStart);
@@ -249,7 +249,7 @@ sub view {
 	} elsif ($endMonth eq "current") {
 		$maxDate = WebGUI::DateTime::addToDate($minDate,0,1,0);
 	}
-	#WebGUI::ErrorHandler::warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
+	#$self->session->errorHandler->warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
 	my @now = epochToArray(WebGUI::DateTime::time());
 	my $calHasEvent = 0;
 	#monthcount minus i is the number of months remaining to be processed.

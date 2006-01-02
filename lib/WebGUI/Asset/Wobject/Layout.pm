@@ -149,14 +149,14 @@ sub view {
 		$numPositions = $j if $template =~ m/position${j}\_loop/;
 	}
 	my @found;
-	my $showPerformance = WebGUI::ErrorHandler::canShowPerformanceIndicators();
+	my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
 		foreach my $asset (@assets) {
 			foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
-						WebGUI::Style::setRawHeadTags($child->getExtraHeadTags);
+						$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 						my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
 						my $view = $child->view;
 						$view .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
@@ -192,22 +192,22 @@ sub view {
 			}
 		}
 	}
-	$vars{showAdmin} = ($session{var}{adminOn} && $self->canEdit);
+	$vars{showAdmin} = ($self->session->var->get("adminOn") && $self->canEdit);
 	if ($vars{showAdmin}) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
-		WebGUI::Style::setScript($session{config}{extrasURL}."/draggable.js",{ type=>"text/javascript" });
-		WebGUI::Style::setLink($session{config}{extrasURL}."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
-		WebGUI::Style::setRawHeadTags('
+		$self->session->style->setScript($self->session->config->get("extrasURL")."/draggable.js",{ type=>"text/javascript" });
+		$self->session->style->setLink($self->session->config->get("extrasURL")."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+		$self->session->style->setRawHeadTags('
 			<style type="text/css">
 			.dragging, .empty {
-				  background-image: url("'.$session{config}{extrasURL}.'/opaque.gif");
+				  background-image: url("'.$self->session->config->get("extrasURL").'/opaque.gif");
 			}
 			</style>
 			');
 		$vars{"dragger.icon"} = WebGUI::Icon::dragIcon();
 		$vars{"dragger.init"} = '
-			<iframe id="dragSubmitter" style="display: none;" src="'.$session{config}{extrasURL}.'/spacer.gif"></iframe>
+			<iframe id="dragSubmitter" style="display: none;" src="'.$self->session->config->get("extrasURL").'/spacer.gif"></iframe>
 			<script type="text/javascript">
 				dragable_init("'.$self->getUrl("func=setContentPositions;map=").'");
 			</script>
@@ -221,9 +221,9 @@ sub www_setContentPositions {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	$self->addRevision({
-		contentPositions=>$session{form}{map}
+		contentPositions=>$self->session->form->process("map")
 		});
-	return "Map set: ".$session{form}{map};
+	return "Map set: ".$self->session->form->process("map");
 }
 
 

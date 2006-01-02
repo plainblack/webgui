@@ -117,7 +117,7 @@ A web executable method that redirects the user to the specified page, or displa
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
-	if ($session{var}{adminOn}) {
+	if ($self->session->var->get("adminOn")) {
 		return $self->getContainer->www_view;
 	}
 	my $url = $self->get("redirectUrl");

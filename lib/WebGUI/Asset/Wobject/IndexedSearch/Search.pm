@@ -66,12 +66,12 @@ These methods are available from this package:
 sub _recurseCrumbTrail {
         my ($sth, %data, $output);
         tie %data, 'Tie::CPHash';
-        %data = WebGUI::SQL->quickHash("select asset.assetId,asset.parentId,assetData.menuTitle,asset.url from asset left join assetData on asset.assetId=assetData.assetId where asset.assetId=".quote($_[0])." group by assetData.assetId order by assetData.revisionDate desc");
+        %data = $self->session->db->quickHash("select asset.assetId,asset.parentId,assetData.menuTitle,asset.url from asset left join assetData on asset.assetId=assetData.assetId where asset.assetId=".$self->session->db->quote($_[0])." group by assetData.assetId order by assetData.revisionDate desc");
         if ($data{assetId}) {
                 $output .= _recurseCrumbTrail($data{parentId});
         }
         if ($data{assetId} ne "PBasset000000000000001" && $data{menuTitle}) {
-                $output .= '<a class="crumbTrail" href="'.WebGUI::URL::gateway($data{url})
+                $output .= '<a class="crumbTrail" href="'.$self->session->url->gateway($data{url})
                         .'">'.$data{menuTitle}.'</a> &gt; ';
         }
         return $output;
@@ -113,7 +113,7 @@ sub create {
 	if($options{stemmer}) {
 		eval "use Lingua::Stem";
 		if ($@) {
-			WebGUI::ErrorHandler::warn("IndexedSearch: Can't use stemmer: $@");
+			$self->session->errorHandler->warn("IndexedSearch: Can't use stemmer: $@");
 			delete $options{stemmer};
 		}
 	}
@@ -125,7 +125,7 @@ sub create {
 	}		
 	$self->{_fts} = DBIx::FullTextSearch->create($self->getDbh, $self->getIndexName, %options);
 	if (not defined $self->{_fts}) {
-		WebGUI::ErrorHandler::error("IndexedSearch: Unable to create index.\n$DBIx::FullTextSearch::errstr");
+		$self->session->errorHandler->error("IndexedSearch: Unable to create index.\n$DBIx::FullTextSearch::errstr");
 		return undef;
 	}
 	$self->{_docId} = 1;
@@ -146,7 +146,7 @@ The name of table.
 
 sub existsTable {
         my ($self, $table) = @_;
-	return isIn($table, WebGUI::SQL->buildArray("show tables"));
+	return isIn($table, $self->session->db->buildArray("show tables"));
 }
 
 #-------------------------------------------------------------------
@@ -175,23 +175,23 @@ A reference to an array of CSS color identificators.
 
 sub getDetails {
 	my ($self, $docIdList, %options) = @_;
-	my $docIds = quoteAndJoin($docIdList);
+	my $docIds = $self->session->db->quoteAndJoin($docIdList);
 	my (@searchDetails);
-	my $sql = "select * from IndexedSearch_docInfo where docId in ($docIds) and indexName = ".quote($self->getIndexName) ; 
+	my $sql = "select * from IndexedSearch_docInfo where docId in ($docIds) and indexName = ".$self->session->db->quote($self->getIndexName) ; 
 	$sql .= " ORDER BY FIELD(docId, $docIds)";  # Maintain $docIdList order
-	my $sth = WebGUI::SQL->read($sql);
+	my $sth = $self->session->db->read($sql);
 	while (my %data = $sth->hash) {
 		if ($data{ownerId}) {
-			($data{username}) = WebGUI::SQL->quickArray("select username from users where userId = ".quote($data{ownerId}));
-			$data{userProfile} = WebGUI::URL::page("op=viewProfile&uid=$data{ownerId}");
+			($data{username}) = $self->session->db->quickArray("select username from users where userId = ".$self->session->db->quote($data{ownerId}));
+			$data{userProfile} = $self->session->url->page("op=viewProfile&uid=$data{ownerId}");
 		}
 		if ($data{bodyShortcut} =~ /^\s*select /i) {
-			$data{body} = (WebGUI::SQL->quickArray($data{bodyShortcut}))[0];
+			$data{body} = ($self->session->db->quickArray($data{bodyShortcut}))[0];
 		} else {
 			$data{body} = $data{bodyShortcut};
 		}
 		if ($data{headerShortcut} =~ /^\s*select /i) {
-			$data{header} = (WebGUI::SQL->quickArray($data{headerShortcut}))[0];
+			$data{header} = ($self->session->db->quickArray($data{headerShortcut}))[0];
 		} else {
 			$data{header} = $data{headerShortcut};
 		}
@@ -207,7 +207,7 @@ sub getDetails {
 			$data{header} = WebGUI::Macro::filter($data{header});
 			$data{header} = WebGUI::HTML::filter($data{header},'all');
 			$data{header} = $self->highlight($data{header},undef, $options{highlightColors}) if ($options{highlight});
-			$data{location} = WebGUI::URL::gateway($data{location});
+			$data{location} = $self->session->url->gateway($data{location});
 		}
 		$data{crumbTrail} = _recurseCrumbTrail($data{assetId});
 		$data{crumbTrail} =~ s/\s*\&gt;\s*$//;
@@ -401,7 +401,7 @@ sub indexDocument {
 	my ($self, $document) = @_;
 	$self->{_fts}->index_document($document->{docId} || $self->{_docId}, $document->{text});
 	my $docId = ($document->{docId} || $self->{_docId});
-	WebGUI::SQL->write("insert into IndexedSearch_docInfo (			docId, 
+	$self->session->db->write("insert into IndexedSearch_docInfo (			docId, 
 										indexName,
 										assetId,
 										groupIdView,
@@ -414,17 +414,17 @@ sub indexDocument {
 										ownerId,
 										dateIndexed  ) 
                                       values (	".
-							quote($docId).", ". 
-							quote($self->getIndexName).", ".
-							quote($document->{assetId}).", ". 
-							quote($document->{groupIdView} || "7").", ". 
-							quote($document->{special_groupIdView} || "7").", ". 
-							quote($document->{namespace} || 'WebGUI')." , ".
-							quote($document->{location}).", ".
-							quote($document->{headerShortcut})." ,".
-							quote($document->{bodyShortcut})." ,".
-							quote($document->{contentType})." ,".
-							quote($document->{ownerId} || 3).",
+							$self->session->db->quote($docId).", ". 
+							$self->session->db->quote($self->getIndexName).", ".
+							$self->session->db->quote($document->{assetId}).", ". 
+							$self->session->db->quote($document->{groupIdView} || "7").", ". 
+							$self->session->db->quote($document->{special_groupIdView} || "7").", ". 
+							$self->session->db->quote($document->{namespace} || 'WebGUI')." , ".
+							$self->session->db->quote($document->{location}).", ".
+							$self->session->db->quote($document->{headerShortcut})." ,".
+							$self->session->db->quote($document->{bodyShortcut})." ,".
+							$self->session->db->quote($document->{contentType})." ,".
+							$self->session->db->quote($document->{ownerId} || 3).",
 							".WebGUI::DateTime::time()." )"
 				);
 	$self->{_docId}++;
@@ -471,10 +471,10 @@ sub open {
 	my ($self) = @_;
 	$self->{_fts} = DBIx::FullTextSearch->open($self->getDbh, $self->getIndexName);
 	if (not defined $self->{_fts}) {
-		WebGUI::ErrorHandler::error("IndexedSearch: Unable to open index.\n$DBIx::FullTextSearch::errstr");
+		$self->session->errorHandler->error("IndexedSearch: Unable to open index.\n$DBIx::FullTextSearch::errstr");
 		return undef;
 	}
-	($self->{_docId}) = WebGUI::SQL->quickArray("select max(docId) from IndexedSearch_docInfo where indexName = ".quote($self->getIndexName)); 
+	($self->{_docId}) = $self->session->db->quickArray("select max(docId) from IndexedSearch_docInfo where indexName = ".$self->session->db->quote($self->getIndexName)); 
 	$self->{_docId}++;
 	return $self->{_fts};
 }
@@ -552,7 +552,7 @@ sub recreate {
 		$self->{_fts}->drop;
 	}
 	$self->{_fts} = $self->create($self->getIndexName, $self->getDbh, %options);
-	WebGUI::SQL->write("delete from IndexedSearch_docInfo where indexName = ".quote($self->getIndexName));
+	$self->session->db->write("delete from IndexedSearch_docInfo where indexName = ".$self->session->db->quote($self->getIndexName));
 	return $self->{_fts};
 }
 
@@ -591,18 +591,18 @@ sub search {
 	my $noFtsSearch = ($query =~ /^\s*\*\s*$/); # query = '*', no full text search
 	my @fts_docIds = $self->{_fts}->search($query) unless $noFtsSearch ;
 	if(@fts_docIds || $noFtsSearch) {
-		my $groups = quoteAndJoin($self->_getGroups);
-		my $docIds = quoteAndJoin(\@fts_docIds);
-		my $sql = "select docId from IndexedSearch_docInfo where indexName = ".quote($self->getIndexName);
+		my $groups = $self->session->db->quoteAndJoin($self->_getGroups);
+		my $docIds = $self->session->db->quoteAndJoin(\@fts_docIds);
+		my $sql = "select docId from IndexedSearch_docInfo where indexName = ".$self->session->db->quote($self->getIndexName);
 		$sql .= " and docId in ($docIds)" unless $noFtsSearch;
 		$sql .= " and groupIdView in ($groups)";
 		$sql .= " and special_groupIdView in ($groups)";
 		foreach my $filterElement (keys %{$filter}) {
-			$sql .= " AND $filterElement in (".quoteAndJoin($filter->{$filterElement}).")";
+			$sql .= " AND $filterElement in (".$self->session->db->quoteAndJoin($filter->{$filterElement}).")";
 		}
 		# Keep @fts_docIds list order
 		$sql .= " ORDER BY FIELD(docID,$docIds)" unless $noFtsSearch;
-		my $filteredDocIds = WebGUI::SQL->buildArrayRef($sql);
+		my $filteredDocIds = $self->session->db->buildArrayRef($sql);
 		return $filteredDocIds if (ref $filteredDocIds eq 'ARRAY' and @{$filteredDocIds});
 	}
 	return undef;
@@ -618,7 +618,7 @@ Returns an array reference containing all groupIds of groups the user is in.
 
 sub _getGroups {
 	my @groups;
-	foreach my $groupId (WebGUI::SQL->buildArray("select groupId from groups")) {
+	foreach my $groupId ($self->session->db->buildArray("select groupId from groups")) {
 		push(@groups, $groupId) if (WebGUI::Grouping::isInGroup($groupId));
 	}
 	return \@groups;
