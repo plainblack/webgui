@@ -57,7 +57,7 @@ overriding the style without setting a printable style and on a per user basis.
 
 sub www_setPersonalStyle {
 	my $session = shift;
-	WebGUI::Session::setScratch("personalStyleId",$session->form->process("styleId"));
+	$session->scratch->set("personalStyleId",$session->form->process("styleId"));
 	return "";
 }
 
@@ -71,7 +71,7 @@ Clears the personalStyleId from the scratch area of the session variable.
 
 sub www_unsetPersonalStyle {
 	my $session = shift;
-	WebGUI::Session::deleteScratch("personalStyleId");
+	$session->scratch->delete("personalStyleId");
 	return "";
 }
 

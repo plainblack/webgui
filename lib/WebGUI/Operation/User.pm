@@ -118,15 +118,15 @@ sub doUserSearch {
 	my $userFilter = shift;
 	push(@{$userFilter},0);
 	my $selectedStatus;
-	if ($session{scratch}{userSearchStatus}) {
-		$selectedStatus = "status='".$session{scratch}{userSearchStatus}."'";
+	if ($session->scratch->get("userSearchStatus")) {
+		$selectedStatus = "status='".$session->scratch->get("userSearchStatus")."'";
 	} else {
 		$selectedStatus = "status like '%'";
 	}
-	my $keyword = $session{scratch}{userSearchKeyword};
-	if ($session{scratch}{userSearchModifier} eq "startsWith") {
+	my $keyword = $session->scratch->get("userSearchKeyword");
+	if ($session->scratch->get("userSearchModifier") eq "startsWith") {
 		$keyword .= "%";
-	} elsif ($session{scratch}{userSearchModifier} eq "contains") {
+	} elsif ($session->scratch->get("userSearchModifier") eq "contains") {
 		$keyword = "%".$keyword."%";
 	} else {
 		$keyword = "%".$keyword;
@@ -167,9 +167,9 @@ sub getUserSearchForm {
 	my $session = shift;
 	my $op = shift;
 	my $params = shift;
-	WebGUI::Session::setScratch("userSearchKeyword",$session->form->process("keyword"));
-	WebGUI::Session::setScratch("userSearchStatus",$session->form->process("status"));
-	WebGUI::Session::setScratch("userSearchModifier",$session->form->process("modifier"));
+	$session->scratch->set("userSearchKeyword",$session->form->process("keyword"));
+	$session->scratch->set("userSearchStatus",$session->form->process("status"));
+	$session->scratch->set("userSearchModifier",$session->form->process("modifier"));
 	my $output = '<div align="center">'
 		.WebGUI::Form::formHeader()
 		.WebGUI::Form::hidden(
@@ -188,7 +188,7 @@ sub getUserSearchForm {
 		)
 	.WebGUI::Form::selectBox(
 		-name=>"modifier",
-		-value=>($session{scratch}{userSearchModifier} || "contains"),
+		-value=>($session->scratch->get("userSearchModifier") || "contains"),
 		-options=>{
 			startsWith=>WebGUI::International::get("starts with"),
 			contains=>WebGUI::International::get("contains"),
@@ -197,12 +197,12 @@ sub getUserSearchForm {
 		)
 	.WebGUI::Form::text(
 		-name=>"keyword",
-		-value=>$session{scratch}{userSearchKeyword},
+		-value=>$session->scratch->get("userSearchKeyword"),
 		-size=>15
 		)
 	.WebGUI::Form::selectBox(
 		-name	=> "status",
-		-value	=> ($session{scratch}{userSearchStatus} || "users.status like '%'"),
+		-value	=> ($session->scratch->get("userSearchStatus") || "users.status like '%'"),
 		-options=> { 
 			""		=> WebGUI::International::get(821),
 			Active		=> WebGUI::International::get(817),

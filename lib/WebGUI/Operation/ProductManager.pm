@@ -30,7 +30,7 @@ sub _submenu {
 		$ac->setHelp($help, 'ProductManager');
         }
 
-	my $productId = $session->form->process("productId") || WebGUI::Session::getScratch('managingProduct');
+	my $productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
 	undef $productId if ($productId eq 'new');
 	$ac->addSubmenuItem($session->url->page('op=editProduct;productId=new'), $i18n->get('add product'));
 	$ac->addSubmenuItem($session->url->page('op=listProducts'), $i18n->get('list products'));
@@ -490,7 +490,7 @@ sub www_listProducts {
 	
 	$i18n = WebGUI::International->new('ProductManager');
 	
-	WebGUI::Session::setScratch('managingProduct', '-delete-');
+	$session->scratch->set('managingProduct', '-delete-');
 	
 	$sth = $session->db->read('select * from products order by title');
 
@@ -518,7 +518,7 @@ sub www_listProductVariants {
 
 	$i18n = WebGUI::International->new("ProductManager");
 	
-	$productId = $session->form->process("productId") || WebGUI::Session::getScratch('managingProduct');
+	$productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
 
 	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
 	
@@ -600,9 +600,9 @@ sub www_manageProduct {
 
 	$i18n = WebGUI::International->new("ProductManager");
 	
-	$productId = $session->form->process("productId") || WebGUI::Session::getScratch('managingProduct');
+	$productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
 	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
-	WebGUI::Session::setScratch('managingProduct', $productId);
+	$session->scratch->set('managingProduct', $productId);
 
 	$product = WebGUI::Product->new($productId);
 	

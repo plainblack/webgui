@@ -76,10 +76,10 @@ sub doGroupSearch {
         my $returnPaginator = shift;
         my $groupFilter = shift;
         push(@{$groupFilter},0);
-        my $keyword = $session{scratch}{groupSearchKeyword};
-        if ($session{scratch}{groupSearchModifier} eq "startsWith") {
+        my $keyword = $session->scratch->get("groupSearchKeyword");
+        if ($session->scratch->get("groupSearchModifier") eq "startsWith") {
                 $keyword .= "%";
-        } elsif ($session{scratch}{groupSearchModifier} eq "contains") {
+        } elsif ($session->scratch->get("groupSearchModifier") eq "contains") {
                 $keyword = "%".$keyword."%";
         } else {
                 $keyword = "%".$keyword;
@@ -103,8 +103,8 @@ sub getGroupSearchForm {
 	my $session = shift;
 	my $op = shift;
 	my $params = shift;
-	WebGUI::Session::setScratch("groupSearchKeyword",$session->form->process("keyword"));
-        WebGUI::Session::setScratch("groupSearchModifier",$session->form->process("modifier"));
+	$session->scratch->set("groupSearchKeyword",$session->form->process("keyword"));
+        $session->scratch->set("groupSearchModifier",$session->form->process("modifier"));
 	my $output = '<div align="center">';
 	my $f = WebGUI::HTMLForm->new(1);
 	foreach my $key (keys %{$params}) {
@@ -123,7 +123,7 @@ sub getGroupSearchForm {
                 );
         $f->selectBox(
                 -name=>"modifier",
-                -value=>($session{scratch}{groupSearchModifier} || WebGUI::International::get("contains") ),
+                -value=>($session->scratch->get("groupSearchModifier") || WebGUI::International::get("contains") ),
                 -options=>{
                         startsWith=>WebGUI::International::get("starts with"),
                         contains=>WebGUI::International::get("contains"),
@@ -132,7 +132,7 @@ sub getGroupSearchForm {
                 );
         $f->text(
                 -name=>"keyword",
-                -value=>$session{scratch}{groupSearchKeyword},
+                -value=>$session->scratch->get("groupSearchKeyword"),
                 -size=>15
                 );
         $f->submit(value=>WebGUI::International::get(170));

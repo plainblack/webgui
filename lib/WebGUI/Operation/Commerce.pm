@@ -53,21 +53,21 @@ sub _clearCheckoutScratch {
 #-------------------------------------------------------------------
 sub _clearPaymentScratch {
 	my $session = shift;
-	WebGUI::Session::setScratch('paymentGateway', '-delete-');
+	$session->scratch->set('paymentGateway', '-delete-');
 }
 
 #-------------------------------------------------------------------
 sub _clearShippingScratch {
 	my $session = shift;
-	WebGUI::Session::setScratch('shippingMethod', '-delete-');
-	WebGUI::Session::setScratch('shippingOptions', '-delete-');
+	$session->scratch->set('shippingMethod', '-delete-');
+	$session->scratch->set('shippingOptions', '-delete-');
 }
 
 #-------------------------------------------------------------------
 sub _paymentSelected {
 	my $session = shift;
-	return 0 unless (WebGUI::Session::getScratch('paymentGateway'));
-	my $plugin = WebGUI::Commerce::Payment->load(WebGUI::Session::getScratch('paymentGateway'));
+	return 0 unless ($session->scratch->get('paymentGateway'));
+	my $plugin = WebGUI::Commerce::Payment->load($session->scratch->get('paymentGateway'));
 	return 1 if ($plugin && $plugin->enabled);
 	return 0;
 }
@@ -75,11 +75,11 @@ sub _paymentSelected {
 #-------------------------------------------------------------------
 sub _shippingSelected {
 	my $session = shift;
-	return 0 unless (WebGUI::Session::getScratch('shippingMethod'));
+	return 0 unless ($session->scratch->get('shippingMethod'));
 
-	my $plugin = WebGUI::Commerce::Shipping->load(WebGUI::Session::getScratch('shippingMethod'));
+	my $plugin = WebGUI::Commerce::Shipping->load($session->scratch->get('shippingMethod'));
 	if ($plugin) {
-		$plugin->setOptions(Storable::thaw(WebGUI::Session::getScratch('shippingOptions'))) if (WebGUI::Session::getScratch('shippingOptions'));
+		$plugin->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 		return 1 if ($plugin->enabled && $plugin->optionsOk);
 	}
 	
@@ -130,7 +130,7 @@ sub www_checkoutConfirm {
 	
 	# If the user isn't logged in yet, let him do so or have him create an account
 	if ($session->user->profileField("userId") == 1) {
-		WebGUI::Session::setScratch('redirectAfterLogin', $session->url->page('op=checkout'));
+		$session->scratch->set('redirectAfterLogin', $session->url->page('op=checkout'));
 		return WebGUI::Operation::execute('auth');
 	}
 	
@@ -169,15 +169,15 @@ sub www_checkoutConfirm {
 
 	$var{subTotal} = sprintf('%.2f', $total);
 
-	$shipping = WebGUI::Commerce::Shipping->load(WebGUI::Session::getScratch('shippingMethod'));
-	$shipping->setOptions(Storable::thaw(WebGUI::Session::getScratch('shippingOptions'))) if (WebGUI::Session::getScratch('shippingOptions'));
+	$shipping = WebGUI::Commerce::Shipping->load($session->scratch->get('shippingMethod'));
+	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 
 	$var{shippingName} = $shipping->name;
 	$var{shippingCost} = sprintf('%.2f', $shipping->calc);
 
 	$var{total} = sprintf('%.2f', $total + $shipping->calc);
 	
-	$plugin = WebGUI::Commerce::Payment->load(WebGUI::Session::getScratch('paymentGateway'));
+	$plugin = WebGUI::Commerce::Payment->load($session->scratch->get('paymentGateway'));
 
 	$f = WebGUI::HTMLForm->new;
 	$f->hidden(
@@ -211,7 +211,7 @@ sub www_checkoutSubmit {
 
 	# check if user has already logged in
 	if ($session->user->profileField("userId") == 1) {
-		WebGUI::Session::setScratch('redirectAfterLogin', $session->url->page('op=checkout'));
+		$session->scratch->set('redirectAfterLogin', $session->url->page('op=checkout'));
 		return WebGUI::Operation::execute('displayLogin');
 	}
 
@@ -219,11 +219,11 @@ sub www_checkoutSubmit {
 	return WebGUI::Operation::execute('checkout') unless (_paymentSelected && _shippingSelected);
 
 	# Load shipping plugin.
-	$shipping = WebGUI::Commerce::Shipping->load(WebGUI::Session::getScratch('shippingMethod'));
-	$shipping->setOptions(Storable::thaw(WebGUI::Session::getScratch('shippingOptions'))) if (WebGUI::Session::getScratch('shippingOptions'));
+	$shipping = WebGUI::Commerce::Shipping->load($session->scratch->get('shippingMethod'));
+	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 	
 	# Load payment plugin.
-	$plugin = WebGUI::Commerce::Payment->load(WebGUI::Session::getScratch('paymentGateway'));
+	$plugin = WebGUI::Commerce::Payment->load($session->scratch->get('paymentGateway'));
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 	($normal, $recurring) = $shoppingCart->getItems;
 
@@ -703,9 +703,9 @@ sub www_selectPaymentGateway {
 sub www_selectPaymentGatewaySave {
 	my $session = shift;
 	if (WebGUI::Commerce::Payment->load($session->form->process("paymentGateway"))->enabled) {
-		WebGUI::Session::setScratch('paymentGateway', $session->form->process("paymentGateway"));
+		$session->scratch->set('paymentGateway', $session->form->process("paymentGateway"));
 	} else {
-		WebGUI::Session::setScratch('paymentGateway', '-delete-');
+		$session->scratch->set('paymentGateway', '-delete-');
 	}
 
 	return WebGUI::Operation::execute('checkout');
@@ -754,10 +754,10 @@ sub www_selectShippingMethodSave {
 	return WebGUI::Operation::execute('selectShipping') unless ($shipping->optionsOk);
 	
 	if ($shipping->enabled) {
-		WebGUI::Session::setScratch('shippingMethod', $shipping->namespace);
-		WebGUI::Session::setScratch('shippingOptions', Storable::freeze($shipping->getOptions));
+		$session->scratch->set('shippingMethod', $shipping->namespace);
+		$session->scratch->set('shippingOptions', Storable::freeze($shipping->getOptions));
 	} else {
-		WebGUI::Session::setScratch('shippingMethod', '-delete-');
+		$session->scratch->set('shippingMethod', '-delete-');
 	}
 
 	return WebGUI::Operation::execute('checkout');
