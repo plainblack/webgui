@@ -32,7 +32,9 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Utility;
 
-
+# TB : Get the time as soon as possible. Use $now as global variable.
+# $now is used for skipOlderThan feature.
+my $now = time;
 
 my $configFile;
 my $owner = 3;
@@ -45,71 +47,132 @@ my $quiet;
 my $webUser = 'apache';
 my $assetId;
 my $parentAssetId;
+my $skipOlderThan = 999999999;
+my $findByExt = "";
+my $recursive = '';
+my $overwrite = '';
+my $ignoreExtInName = '';
 
 GetOptions(
 	'configFile=s'=>\$configFile,
 	'owner=s'=>\$owner,
 	'groupToView=s'=>\$groupToView,
 	'groupToEdit=s'=>\$groupToEdit,
-        'help'=>\$help,
+	'help'=>\$help,
 	'override'=>$override,
 	'pathToFiles=s'=>\$pathToFiles,
-        'quiet'=>\$quiet,
+	'quiet'=>\$quiet,
 	'webUser=s'=>\$webUser,
-	'parentAssetId=s'=>\$parentAssetId
+	'parentAssetId=s'=>\$parentAssetId,
+	'skipOlderThan=i'=>\$skipOlderThan,
+	'findByExt=s'=>\$findByExt,
+	'recursive'=>\$recursive,
+	'overwrite'=>\$overwrite,
+	'ignoreExtInName'=>\$ignoreExtInName
 );
 
 
-if ($help || $configFile eq "" || $pathToFiles eq "" || $parentAssetId eq ""){
-        print <<STOP;
+if ($configFile eq "" || $pathToFiles eq "" || $parentAssetId eq "") {
+	&printHelp;
+	exit 4;
+};
+
+if ($help) {
+	&printHelp;
+	exit 1;
+}
+
+sub printHelp {
+	print <<STOP;
 
 
 Usage: perl $0 --pathToFiles=<pathToImportFiles> --configfile=<webguiConfig> --parentAssetId=<assetId>
 
-        --configFile	WebGUI config file.
+	--configFile		WebGUI config file.
 
-        --pathToFiles	Folder containing files to import.
+	--pathToFiles		Folder containing files to import.
 
-	--parentAssetId	The asset ID of the asset you wish
-			to attach these files to.
+	--parentAssetId		The asset ID of the asset you wish
+				to attach these files to.
 
 
 Options:
 
-	--groupToEdit	The group ID of the group that should
-			have the privileges to edit these
-			files. Defaults to '4' (Content Managers).
+	--groupToEdit		The group ID of the group that should
+				have the privileges to edit these
+				files. Defaults to '4' (Content Managers).
 
-	--groupToView	The group ID of the group that should
-			have the privileges to view these
-			files. Defaults to '7' (Everybody).
+	--groupToView		The group ID of the group that should
+				have the privileges to view these
+				files. Defaults to '7' (Everybody).
 
-        --help		Display this help message and exit.
+	--help			Display this help message and exit.
 
-	--owner		The user ID of the user that should
-			have the privileges to modify these
-			files. Defaults to '3' (Admin).
+	--owner			The user ID of the user that should
+				have the privileges to modify these
+				files. Defaults to '3' (Admin).
 
-	--override	This utility is designed to be run as
-			a privileged user on Linux style systems.
-			If you wish to run this utility without
-			being the super user, then use this flag,
-			but note that it may not work as
-			intended.
+	--override		This utility is designed to be run as
+				a privileged user on Linux style systems.
+				If you wish to run this utility without
+				being the super user, then use this flag,
+				but note that it may not work as
+				intended.
 
-	--quiet		Disable output unless there's an error.
+	--quiet			Disable output unless there's an error.
 
-	--webUser	The user that your web server runs as.
-			Defaults to 'apache'.
+	--webUser		The user that your web server runs as.
+				Defaults to 'apache'.
+
+	--skipOlderThan		An interval defined in second to skip file older than.
+				Defaults "nothing skip".
+
+	--findByExt		Import only files files with an extension matching 
+				one of the exensions.
+				Defaults "import all files".
+
+	--recursive		Import the files recursivelly from the folder --pathToFiles
+				Defaults "don't run recursivelly"
+
+	--overwrite		Overwrite any matching file URL with the new file rather
+				than creating a new Asset for the file.
+				Instanciate the existing asset and replace the file.
+
+	--ignoreExtInName	Title and menuTitle database fields should not contain the
+				extension of the filename.
+
+
+EXIT STATUS
+
+  The following exit values are returned:
+
+  0
+	Successful execution.
+
+  1
+	For Windows User, stop the script if not super user.
+
+  2
+	A folder can't be open for reading.
+
+  3
+	In recursive mode, if two files has the same name and are selected to be imported. Return this error.
+
+  4
+	Error during invocation of the command.
+
+
 
 STOP
-	exit;
 }
 
+# TB : Unable to use $session{os}{slash} variable.
+# Define $slash variable local for the script.
+my $slash = ($^O =~ /Win/i) ? "\\" : "/";
 
 if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
-        print "You must be the super user to use this utility.\n";
-        exit;
+	print "You must be the super user to use this utility.\n";
+	exit 1;
 }
 
 
@@ -118,64 +181,84 @@ WebGUI::Session::open($webguiRoot,$configFile);
 WebGUI::Session::refreshUserInfo(3);
 print "OK\n" unless ($quiet);
 
-addFiles(buildFileList($pathToFiles));
+# TB : wrap buildFileList in buildFileListWrap function for recursive search.
+&addFiles(buildFileListWrap($pathToFiles));
 setPrivileges();
 
 print "Cleaning up..." unless ($quiet);
 WebGUI::Session::end($session{var}{sessionId});
 WebGUI::Session::close();
 print "OK\n" unless ($quiet);
+exit 0;
 
 #-----------------------------------------
 # addFiles(dbHandler, filelistHashRef, webguiSettingsHashRef, pathToCopyFrom)
 #-----------------------------------------
 sub addFiles {
 	my $filelist = shift;
-  	print "Adding files...\n" unless ($quiet);
+	print "Adding files...\n" unless ($quiet);
 	my $parent = WebGUI::Asset::File->newByDynamicClass($parentAssetId);
-    	if (defined $parent) {
+	if (defined $parent) {
 		foreach my $file (@{$filelist}) {
-        		print "\tAdding ".$file->{filename}." to the database.\n" unless ($quiet);
 			my $class = 'WebGUI::Asset::File';
+			# TB : add the path relative to $pathToFile in the message.
+			print "\tAdding ".$file->{relpath}.$slash.$file->{filename}." to the database.\n" unless ($quiet);
 			my $templateId = 'PBtmpl0000000000000024';
 			if (isIn($file->{ext},@nailable)) {
 				$class = 'WebGUI::Asset::File::Image';
 				$templateId = 'PBtmpl0000000000000088'
 			}
 			my $url = $parent->getUrl.'/'.$file->{filename};
-			my $storage = WebGUI::Storage->create;
-			my $filename = $storage->addFileFromFilesystem($pathToFiles.$session{os}{slash}.$file->{filename});
-			my $newAsset = $parent->addChild({
-				className=>$class,
-				title=>$filename,
-				menuTitle=>$filename,
-				filename=>$filename,
-				storageId=>$storage->getId,
-				isHidden=>1,
-				url=>$url,
-				groupIdView=>$groupToView,
-				groupIdEdit=>$groupToEdit,
-				templateId=>$templateId,
-				endDate=>32472169200,
-				ownerUserId=>$owner
+
+			# TB : Possibly detect if the Asset exists already.
+			my ($replaceAsset, $replaceAssetId, $child) = (0,"","");
+			($replaceAsset, $replaceAssetId, $child) = &checkAssetExists($parent,$url) if ($overwrite);
+
+			if ($replaceAsset == 1) {
+				# TB : If the Asset exists, just copy the file.
+				# To be check.
+				my $storage = WebGUI::Storage->get($replaceAssetId);
+				my $filename = $storage->addFileFromFilesystem("$pathToFiles$slash$file->{relpath}$slash$file->{filename}");
+				$child->generateThumbnail if ($class eq 'WebGUI::Asset::File::Image');
+				$child->setSize($storage->getFileSize($filename));
+			} else {
+				my $storage = WebGUI::Storage->create;
+				my $filename = $storage->addFileFromFilesystem("$pathToFiles$slash$file->{relpath}$slash$file->{filename}");
+				# TB : possibly remove the extension if the ignoreExtInName feature enabled.
+				my $filenameTitle = $filename;
+				$filenameTitle =~ s/\.$file->{ext}// if ($ignoreExtInName);
+				my $newAsset = $parent->addChild({
+					className=>$class,
+					title=>$filename,
+					menuTitle=>$filenameTitle,
+					filename=>$filenameTitle,
+					storageId=>$storage->getId,
+					isHidden=>1,
+					url=>$url,
+					groupIdView=>$groupToView,
+					groupIdEdit=>$groupToEdit,
+					templateId=>$templateId,
+					endDate=>32472169200,
+					ownerUserId=>$owner
 				});
-			$newAsset->generateThumbnail if ($class eq 'WebGUI::Asset::File::Image');
-			$newAsset->setSize($storage->getFileSize($filename));
+				$newAsset->generateThumbnail if ($class eq 'WebGUI::Asset::File::Image');
+	 			$newAsset->setSize($storage->getFileSize($filename));
+	 		}
 		}
-    	} else {
-      		print "Warning: Parent asset '".$parentAssetId."' does not exist. Cannot import files.\n";
-  	}
-  	print "Finished adding.\n" unless ($quiet);
+	} else {
+		print "Warning: Parent asset '".$parentAssetId."' does not exist. Cannot import files.\n";
+	}
+	print "Finished adding.\n" unless ($quiet);
 }
 
 #-----------------------------------------
 # setPrivileges()
 #-----------------------------------------
 sub setPrivileges {
-  	print "Setting filesystem privileges.\n" unless ($quiet);
+	print "Setting filesystem privileges.\n" unless ($quiet);
 	if ($session{os}{type} = "Linuxish") {
 		unless (system("chown -R ".$webUser." ".$session{config}{uploadsPath})) {
-  			print "Privileges set.\n" unless ($quiet);
+			print "Privileges set.\n" unless ($quiet);
 		} else {
 			print "Could not set privileges.\n";
 		}
@@ -185,43 +268,142 @@ sub setPrivileges {
 }
 
 #-----------------------------------------
-# buildFileList(pathToImportFiles)
+# buildFileListWrap(pathToImportFiles)
 #-----------------------------------------
-sub buildFileList {
-        print "Building file list.\n" unless ($quiet);
-        my (@filelist, @files, $file, $filename, $ext);
-        if (opendir(FILES,$_[0])) {
-                @files = readdir(FILES);
-                foreach $file (@files) {
-                        unless ($file eq "." || $file eq "..") {
-                                $file =~ /(.*?)\.(.*?)$/;
-                                $filename = $1;
-                                $ext = $2;
-				push(@filelist,{ext=>$ext, filename=>$file});
-                                print "Found file $file.\n" unless ($quiet);
-                        }
-                }
-                closedir(FILES);
-                print "File list complete.\n" unless ($quiet);
-                return \@filelist;
-        } else {
-                print "Error: Could not open folder.\n";
-                exit;
-        }
+sub buildFileListWrap {
+	my ($path) = @_;
+	my (@filelist);
+	print "Building file list.\n" unless ($quiet);
+	@filelist = &buildFileList($now,$path);
+	# TB : check is the filelist doesn't contains two times the same file (file with the same name)
+	# due to recursive call, this can happen.
+	&filelistCheck(@filelist);
+	print "File list complete.\n" unless ($quiet);
+	return \@filelist;
 }
 
+#-----------------------------------------
+# buildFileList(time,pathToImportFiles)
+#-----------------------------------------
+sub buildFileList {
+	my ($now,$path) = @_;
+	my (@filelist, @files, $file, $filename, $ext);
+	if (opendir(FILES,$path)) {
+		@files = readdir(FILES);
+		foreach $file (@files) {
+			next if ($file eq "." || $file eq "..");
+			my $fullpathfile = "$path$slash$file";
+			if (-f "$fullpathfile") {
+				$file =~ /(.*?)\.(.*?)$/;
+				$filename = $1;
+				$ext = $2;
+				# TB : filter process : skip files due to options : skipOlderThan and findByExt
+				next if (&skipFilter($fullpathfile,$ext,$now));
+				# TB : due to recursive search. Not really nice.
+				my $relpath = &trailFile("$path");
+				push(@filelist,{ext=>$ext, filename=>$file, relpath=>$relpath});
+				print "Found file $file.\n" unless ($quiet);
+	 		}
+			# TB : the recursive call
+			push(@filelist,&buildFileList($now,"$fullpathfile")) if ((-d "$fullpathfile") && $recursive);
+		}
+		closedir(FILES);
+		return @filelist;
+	} else {
+		print "Error: Could not open folder $path.\n" unless ($quiet);
+		exit 2;
+	}
+}
 
 #-----------------------------------------
 # getType(filename)
 #-----------------------------------------
 sub getType {
-  	my ($extension);
-  	$extension = $_[0];
-  	$extension =~ s/.*\.(.*?)$/$1/;
-  	return $extension;
+	my ($extension);
+	$extension = $_[0];
+	$extension =~ s/.*\.(.*?)$/$1/;
+	return $extension;
 }
 
 
+#-----------------------------------------
+# skipFilter(file,ext,time)
+#-----------------------------------------
+sub skipFilter {
+	my ($file,$ext,$now) = @_;
+	# TB : stat in Windows has a strange behaviour relativelly to Unix
+	# the output of stat si an array of array.
+	# to be check on Unix if this work correctly.
+	my @dev = stat "$file";
+	# TB : option skipOlderThan
+	if ($now - $dev[0][9] > $skipOlderThan) {
+		print "Found file $file.\n\tBut older than $skipOlderThan. Skip it.\n" unless ($quiet);
+		return 1;
+	}
+	# TB : option findByExt
+	if (($findByExt ne "") && ($findByExt !~ /(^|,)$ext(,|$)/)) {
+		print "Found file in $file.\n\tBut Extension doesn't match findByExt tag. Skip it.\n" unless ($quiet);
+		return 1;
+	}
+	return 0;
+}
 
 
+#-----------------------------------------
+# trailFile(path)
+#-----------------------------------------
+sub trailFile {
+	# TB : this is ugly, but unable to find a better way to do it.
+	# this is supposed to find the relative path to pathToFiles
+	my ($path) = @_;
+	my $pathToFiles_temp = $pathToFiles;
+	if ($^O =~ /Win/) { 
+		$pathToFiles_temp =~ s/\\/\\\\/g; 
+	} else {
+		$pathToFiles_temp =~ s/\//\\\//g;
+	}
+	$path =~ s/$pathToFiles_temp//;
+	$path =~ s/.//;
+	$path = "." if ($path eq "");
+	return $path;
+}
 
+
+#-----------------------------------------
+# checkAssetExists(self,url)
+#-----------------------------------------
+sub checkAssetExists {
+	my ($parent,$url) = @_;
+	my $replaceAsset = 0;
+	my $replaceAssetId = "";
+	my $child;
+	my @allelement = $parent->getLineage();
+	foreach ( @{$allelement[0]} ) {
+		$child = WebGUI::Asset::File->newByDynamicClass($_);
+		if ((defined $child) && ($child->getUrl eq $url)) {
+			$replaceAsset = 1;
+			$replaceAssetId = $child->getId;
+			last;
+		}
+	}
+	return($replaceAsset, $replaceAssetId, $child);
+}
+
+#-----------------------------------------
+# filelistCheck(filelist)
+#-----------------------------------------
+sub filelistCheck {
+	my (@filelist) = @_;
+	my @filelistcopy = @filelist;
+	foreach my $file (@filelist) {
+		foreach my $filecopy (@filelistcopy) {
+			next if ($file->{relpath} eq $filecopy->{relpath});
+			if ($file->{filename} eq $filecopy->{filename}) {
+				print "Error: file \"$file->{filename}\" exists at several localtions.
+       Both \"$file->{relpath}\" and \"$filecopy->{relpath}\" contains it.
+       Exit at the first error of this type.\n" unless ($quiet);
+				exit 2;
+			}
+		}
+	}
+}
