@@ -299,7 +299,7 @@ Copies a storage location and it's contents. Returns a new storage location obje
 sub copy {
 	my $self = shift;
 	my $newStorage = WebGUI::Storage->create;
-	my $filelist = $self->getFiles;
+	my $filelist = $self->getFiles(1);
 	foreach my $file (@{$filelist}) {	
         	my $source = FileHandle->new($self->getPath($file),"r");
         	if (defined $source) {
@@ -509,20 +509,25 @@ sub getFileSize {
 
 #-------------------------------------------------------------------
 
-=head2 getFiles ( )
+=head2 getFiles ( showAll )
 
 Returns an array reference of the files in this storage location.
+
+=head3 showAll
+
+Whether or not to return all files, including ones with initial periods.
 
 =cut
 
 sub getFiles {
 	my $self = shift;
+	my $showAll = shift;
 	my @list;
 	if (opendir (DIR,$self->getPath)) {
         	my @files = readdir(DIR);
         	closedir(DIR);
         	foreach my $file (@files) {
-                	unless ($file =~ m/^\./) { # don't show files starting with a dot
+                	if ($showAll || $file !~ m/^\./) { # don't show files starting with a dot, unless we're supposed to show all files.
 				push(@list,$file);
 			}
                 }
