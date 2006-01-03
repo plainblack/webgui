@@ -198,13 +198,13 @@ sub processPropertiesFromFormPost {
 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
 	my $filename = $storage->addFileFromFormPost("file",1);
-	if (defined $filename) {
+	if (defined $filename && $filename ne $self->get("filename")) {
 		my %data;
 		$data{filename} = $filename;
 		$data{storageId} = $storage->getId;
-		$data{title} = $filename unless ($self->session->form->process("title"));
-		$data{menuTitle} = $filename unless ($self->session->form->process("menuTitle"));
-		$data{url} = $self->getParent->get('url').'/'.$filename unless ($self->session->form->process("url"));
+		$data{title} = $filename unless ($session{form}{title});
+		$data{menuTitle} = $filename unless ($session{form}{menuTitle});
+		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
 	}
 }

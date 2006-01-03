@@ -39,7 +39,7 @@ Package WebGUI::Session
 
 =head1 DESCRIPTION
 
-This package is the heart and lifeblood of WebGUI; it is the glue that holds WebGUI together. When you create a session object, you'll immidiately have access to all sorts of other objects. By passing the session object around in code you'll have access to the default database connection, error handler, user and more without having to create it each time. The lends much speed to WebGUI.
+This package is the heart and lifeblood of WebGUI; it is the glue that holds WebGUI together. When you create a session object, you'll immediately have access to all sorts of other objects. By passing the session object around in code you'll have access to the default database connection, error handler, user and more without having to create it each time. The lends much speed to WebGUI.
 
 B<NOTE:> It is important to distinguish the difference between a WebGUI session and a user session. A user session is just part of a WebGUI session. A WebGUI session is all of the basic data the WebGUI needs to operate.
 
@@ -204,7 +204,7 @@ sub errorHandler {
 	unless (exists $self->{_errorHandler}) {
 		$self->{_errorHandler}  = WebGUI::Session::ErrorHandler->new($self);
 	}
-	return $self-{_errorHandler};
+	return $self->{_errorHandler};
 }
 
 #-------------------------------------------------------------------

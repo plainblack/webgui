@@ -1,8 +1,6 @@
 6.9.0
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
- - fix [ 1379384 ] image uploads to non-public pages
- - fixed a problem with SynchFileToLDAP hourly script.
 
 
 6.8.4
@@ -10,7 +8,7 @@
    ilance.nl)
  - fix [ 1379915 ] Survey can only be completed once per user
  - Fixed broken UI Level examples in the config file.
- - fixed a bug in SyncProfilesToLDAP
+ - fixed a bug in SyncProfilesToLDAP script
  - fix [ 1387242 ] uploadsHandler fails 
  - fix [ 1389086 ] 6.8.3 RichEdit buttons disappear
  - fix [ 1379915 ] Survey can only be completed once per user
@@ -20,6 +18,7 @@
  - fix [ 1387505 ] Hover help not working on Matrix
  - fix [ 1393867 ] Data Form Not Emailing
  - fix [ 1392643 ] 2006 Calendar dates are not correct?
+ - fix [ 1384794 ] editSave on an existing File or Image asset loses storageId.
  - Removed the If macro, since it was scheduled for removal in 6.8.0.
 
 

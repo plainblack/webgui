@@ -18,7 +18,6 @@ use DBI;
 use Exporter;
 use strict;
 use Tie::IxHash;
-use WebGUI::ErrorHandler;
 use WebGUI::Id;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -301,7 +300,8 @@ Returns an error code for the current handler.
 =cut
 
 sub errorCode {
-        return $self->dbh->err;
+	my $self = shift;
+	return $self->dbh->err;
 }
 
 
@@ -314,7 +314,8 @@ Returns a text error message for the current handler.
 =cut
 
 sub errorMessage {
-        return $self->dbh->errstr;
+	my $self = shift;
+	return $self->dbh->errstr;
 }
 
 
@@ -644,7 +645,7 @@ sub setRow {
         my ($self, $table, $keyColumn, $data, $id) = @_;
         if ($data->{$keyColumn} eq "new" || $id) {
                 $data->{$keyColumn} = $id || WebGUI::Id::generate();
-                $self->write("insert into $table ($keyColumn) values (".$self->quote($data->{$keyColumn}).")", $dbh);
+                $self->write("insert into $table ($keyColumn) values (".$self->quote($data->{$keyColumn}).")");
         }
         my (@pairs);
         foreach my $key (keys %{$data}) {
@@ -653,7 +654,7 @@ sub setRow {
                 }
         }
 	if ($pairs[0] ne "") {
-        	$self->write("update $table set ".join(", ", @pairs)." where ".$keyColumn."=".$self->quote($data->{$keyColumn}), $dbh);
+        	$self->write("update $table set ".join(", ", @pairs)." where ".$keyColumn."=".$self->quote($data->{$keyColumn}));
 	}
 	return $data->{$keyColumn};
 }

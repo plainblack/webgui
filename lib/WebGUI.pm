@@ -67,8 +67,8 @@ sub contentHandler {
 	### Open new or existing user session based on user-agent's cookie.
 	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
 	### form variables
-	foreach ($session{req}->param) {
-		$session{form}{$_} = $session{req}->body($_) || $session{req}->param($_);
+	foreach ($session->{_request}->param) {
+		$session{form}{$_} = $session->{_request}->body($_) || $session->{_request}->param($_);
 	}
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
@@ -114,8 +114,8 @@ sub page {
 					$method = "view";
 				}
 			}
-			$output = tryAssetMethod($asset,$method);
-			$output = tryAssetMethod($asset,"view") unless ($method eq "view" || $output);
+			$output = tryAssetMethod($session,$asset,$method);
+			$output = tryAssetMethod($session,$asset,"view") unless ($method eq "view" || $output);
 		}
 	}
 	if ($output eq "") {
@@ -167,14 +167,15 @@ sub setup {
 
 #-------------------------------------------------------------------
 sub tryAssetMethod {
+	my $session = shift;
 	my $asset = shift;
 	my $method = shift;
 	$session{asset} = $asset;
 	my $methodToTry = "www_".$method;
 	my $output = eval{$asset->$methodToTry()};
 	if ($@) {
-		WebGUI::ErrorHandler::warn("Couldn't call method ".$method." on asset for url: ".$session{requestedUrl}." Root cause: ".$@);
-		$output = tryAssetMethod($asset,'view') if ($method ne "view");
+		$session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session{requestedUrl}." Root cause: ".$@);
+		$output = tryAssetMethod($session,$asset,'view') if ($method ne "view");
 	}
 	return $output;
 }
