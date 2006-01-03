@@ -198,7 +198,7 @@ sub processPropertiesFromFormPost {
 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
 	my $filename = $storage->addFileFromFormPost("file",1);
-	if (defined $filename) {
+	if (defined $filename && $filename ne $self->get("filename")) {
 		my %data;
 		$data{filename} = $filename;
 		$data{storageId} = $storage->getId;
