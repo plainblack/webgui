@@ -19,7 +19,7 @@ use strict;
 use WebGUI::ProfileCategory;
 use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Form;
+use WebGUI::Form::DynamicField;
 use WebGUI::FormProcessor;
 use WebGUI::Operation::Shared;
 use WebGUI::HTML;

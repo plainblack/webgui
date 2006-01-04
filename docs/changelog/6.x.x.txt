@@ -20,6 +20,7 @@
  - fix [ 1392643 ] 2006 Calendar dates are not correct?
  - fix [ 1384794 ] editSave on an existing File or Image asset loses storageId.
  - Removed the If macro, since it was scheduled for removal in 6.8.0.
+ - fix [ 1396620 ] Package WebGUI::Form::DynamicField
 
 
 6.8.3
