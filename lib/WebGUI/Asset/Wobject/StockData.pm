@@ -321,12 +321,14 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
    	
 	$tabform->getTab("display")->template(
+       -name=>"templateId",
        -value=>$self->get("templateId"),
        -label=>WebGUI::International::get("template_label","Asset_StockData"),
        -namespace=>"StockData"
     );
 	
 	$tabform->getTab("display")->template(
+       -name=>"displayTemplateId",
        -value=>$self->get("displayTemplateId"),
        -label=>WebGUI::International::get("display_template_label","Asset_StockData"),
        -namespace=>"StockData/Display"
