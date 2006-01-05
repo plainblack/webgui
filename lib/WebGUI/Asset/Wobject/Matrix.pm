@@ -662,17 +662,20 @@ sub www_editField {
 	$f->text(
 		-name=>"name",
 		-value=>$field->{name},
-		-label=>WebGUI::International::get('name','Asset_Matrix'),
+		-label=>WebGUI::International::get('field name','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('field name description','Asset_Matrix'),
 		);
 	$f->text(
 		-name=>"label",
 		-value=>$field->{label},
-		-label=>WebGUI::International::get('label','Asset_Matrix'),
+		-label=>WebGUI::International::get('field label','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('field label description','Asset_Matrix'),
 		);
 	$f->selectBox(
 		-name=>"fieldType",
 		-value=>[$field->{fieldType}],
-		-label=>WebGUI::International::get('type','Asset_Matrix'),
+		-label=>WebGUI::International::get('field type','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('field type description','Asset_Matrix'),
 		-options=>{
 			'goodBad'  => WebGUI::International::get('good bad','Asset_Matrix'),
 			'text'     => WebGUI::International::get('text','Asset_Matrix'),
@@ -684,12 +687,14 @@ sub www_editField {
 	$f->textarea(
 		-name=>"description",
 		-value=>$field->{description},
-		-label=>WebGUI::International::get('description','Asset_Matrix'),
+		-label=>WebGUI::International::get('field description','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('field description description','Asset_Matrix'),
 		);
 	$f->text(
 		-name=>"defaultValue",
 		-value=>$field->{defaultValue},
 		-label=>WebGUI::International::get('default value','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('default value description','Asset_Matrix'),
 		);
 	my %cats;
 	foreach my $category ($self->getCategories) {
@@ -699,6 +704,7 @@ sub www_editField {
 		-name=>"category",
 		-value=>[$field->{category}],
 		-label=>WebGUI::International::get('category','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('category description','Asset_Matrix'),
 		-options=>\%cats
 		);
 	$f->submit;

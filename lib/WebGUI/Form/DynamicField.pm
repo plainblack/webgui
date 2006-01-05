@@ -76,7 +76,21 @@ Creates the object for the appropriate field type.
 
 =head3 params
 
-The normal params you'd pass in to the field. Included in this list must be one element called "fieldType" which specifies what type of field to dynamically render.
+The normal params you'd pass in to the field. Included in this list
+must be one element called "fieldType" which specifies what type of
+field to dynamically render.  List-type forms, however, can take
+two additional parameters:
+
+=head4 possibleValues
+
+This is a newline delimited set of values.  A hash will be set by splitting the string
+on newlines and making the key and value of each hash entry equal.
+
+=head4 value
+
+For List-type forms which support multiple select, this is normally an arrayref holding all pre-selected
+values.  However, if it is a scalar string, the string will be split on newlines and the resulting
+array will be used.
 
 =cut
 

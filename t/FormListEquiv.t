@@ -31,7 +31,7 @@ use Test::More; # increment this value for each test you create
 #	getName set for direct
 #	compare output of toHtml from both objects
 #	compare output of toHtmlWithWrapper from both objects
-my $numTests = 8*14;
+my $numTests = 8*16;
 
 initialize();  # this line is required
 
@@ -71,6 +71,76 @@ is($direct->{sortByValue}, 1, 'direct CheckList was assigned sortByValue');
 is($dynamic->toHtml, $direct->toHtml, "matching output, toHtml");
 is($dynamic->toHtmlWithWrapper, $direct->toHtmlWithWrapper, "matching SelectList output, toHtmlWithWrapper");
 is($dynamic->toHtmlAsHidden, $direct->toHtmlAsHidden, "matching SelectList output, toHtmlAsHidden");
+
+diag("SelectList, simple equivalency with arrayref values");
+
+my ($direct, $dynamic);
+
+$dynamic = WebGUI::Form::DynamicField->new(
+	fieldType => 'SelectList',
+	name => 'mySelectList',
+	label => 'list of selections',
+	possibleValues => join("\n", qw(a b c d e f g h)),
+	value => [ qw(a c e g) ],
+	sortByValue => 1,
+	multiple => 1,
+);
+$direct = WebGUI::Form::SelectList->new({
+	name => 'mySelectList',
+	label => 'list of selections',
+	options => { a=>'a', b=>'b', c=>'c', d=>'d', e=>'e', f=>'f', g=>'g', h=>'h', },
+	value => [ qw(a c e g) ],
+	sortByValue => 1,
+	multiple => 1,
+});
+
+#diag("direct" . Dumper($direct));
+#diag("dynamic" . Dumper($dynamic));
+
+is(ref $dynamic, "WebGUI::Form::SelectList", 'checking dynamic SelectList');
+is(ref $direct, "WebGUI::Form::SelectList", 'checking direct SelectList');
+is($direct->getName, WebGUI::International::get('484','WebGUI'), 'Check getName');
+is($dynamic->{sortByValue}, 1, 'dynamic CheckList was assigned sortByValue');
+is($direct->{sortByValue}, 1, 'direct CheckList was assigned sortByValue');
+is($dynamic->toHtml, $direct->toHtml, "matching output, toHtml");
+is($dynamic->toHtmlWithWrapper, $direct->toHtmlWithWrapper, "matching SelectList output, toHtmlWithWrapper");
+is($dynamic->toHtmlAsHidden, $direct->toHtmlAsHidden, "matching SelectList output, toHtmlAsHidden");
+
+diag("SelectList, simple equivalency with options instead of possible values");
+
+my ($direct, $dynamic);
+
+$dynamic = WebGUI::Form::DynamicField->new(
+	fieldType => 'SelectList',
+	name => 'mySelectList',
+	label => 'list of selections',
+	options => { a=>'a', b=>'b', c=>'c', d=>'d', e=>'e', f=>'f', g=>'g', h=>'h', },
+	value => [ qw(a c e g) ],
+	sortByValue => 1,
+	multiple => 1,
+);
+$direct = WebGUI::Form::SelectList->new({
+	name => 'mySelectList',
+	label => 'list of selections',
+	options => { a=>'a', b=>'b', c=>'c', d=>'d', e=>'e', f=>'f', g=>'g', h=>'h', },
+	value => [ qw(a c e g) ],
+	sortByValue => 1,
+	multiple => 1,
+});
+
+#diag("direct" . Dumper($direct));
+#diag("dynamic" . Dumper($dynamic));
+
+
+is(ref $dynamic, "WebGUI::Form::SelectList", 'checking dynamic SelectList');
+is(ref $direct, "WebGUI::Form::SelectList", 'checking direct SelectList');
+is($direct->getName, WebGUI::International::get('484','WebGUI'), 'Check getName');
+is($dynamic->{sortByValue}, 1, 'dynamic CheckList was assigned sortByValue');
+is($direct->{sortByValue}, 1, 'direct CheckList was assigned sortByValue');
+is($dynamic->toHtml, $direct->toHtml, "matching output, toHtml");
+is($dynamic->toHtmlWithWrapper, $direct->toHtmlWithWrapper, "matching SelectList output, toHtmlWithWrapper");
+is($dynamic->toHtmlAsHidden, $direct->toHtmlAsHidden, "matching SelectList output, toHtmlAsHidden");
+
 
 diag("CheckList, simple equivalency");
 

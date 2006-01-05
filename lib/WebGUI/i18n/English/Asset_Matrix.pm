@@ -676,7 +676,7 @@ our $I18N = {
 
 	'categories description' => {
                 message => q|Specify one category per line here to define the categories for this matrix. Categories are used to subdivide fields and also represent the things users can rate each listing on.|,
-                lastUpdated => 1135271460,
+                lastUpdated => 1136503559,
         },
 
 	'categories subtext' => {
@@ -843,19 +843,19 @@ our $I18N = {
 		lastUpdated => 1133758944,
 	},
 
-	'name' => {
-		message => q|Name|,
-		lastUpdated => 1133758944,
+	'field name' => {
+		message => q|Field Name|,
+		lastUpdated => 1136499280,
 	},
 
-	'label' => {
-		message => q|Label|,
-		lastUpdated => 1133758944,
+	'field label' => {
+		message => q|Field Label|,
+		lastUpdated => 1136499282,
 	},
 
-	'type' => {
-		message => q|Type|,
-		lastUpdated => 1133758944,
+	'field type' => {
+		message => q|Field Type|,
+		lastUpdated => 1136499283,
 	},
 
 	'default value' => {
@@ -1050,6 +1050,66 @@ our $I18N = {
         'matrix specific fields' => {
                 lastUpdated => 1135279558,
                 message => q|Matrix Specific Fields|
+        },
+
+        'field add/edit help title' => {
+                lastUpdated => 1136488382,
+                message => q|Matrix Field, Add/Edit|
+        },
+
+        'field add/edit help body' => {
+                lastUpdated => 1135279558,
+                message => q|In this form, you may add a field to the Matrix.  This will define a new feature or performance criterion that will be used to rate all products in the Matrix.  This is very similar to adding fields to a DataForm Asset.|
+        },
+
+        'field name description' => {
+                lastUpdated => 1135279558,
+                message => q|The name of the field that you are creating.  It is case sensitive and must be unique.|
+        },
+
+        'field label description' => {
+                lastUpdated => 1135279558,
+                message => q|The name of the field that you are creating.  It is case sensitive and must be unique.|
+        },
+
+        'field type description' => {
+                lastUpdated => 1135279558,
+                message => q|<p>The type of field you are creating.  Please select the type from the following options in the drop-down list.</p>
+		<dl>
+		<dt>Good Bad</dt>
+		<dd>Defines availability of a feature, has it, doesn't have it, limited functionality, free add on, etc.</dd>
+		<dt>Text</dt>
+		<dd>A single line of text, like a short description or title.</dd>
+		<dt>TextaArea</dt>
+		<dd>Multiple lines of text.</dd>
+		<dt>URL</dt>
+		<dd>A URL.</dd>
+		<dt>Combo</dt>
+		<dd>A combination Text box and drop down list.</dd>
+		</dl>|
+        },
+
+        'field description' => {
+                lastUpdated => 1135279558,
+                message => q|Field Description|
+        },
+
+        'field description description' => {
+                lastUpdated => 1135279558,
+                message => q|Please give a general description of the field.|
+        },
+
+        'default value description' => {
+                translatorsNote => q|Please do not translate the GoodBad field values, as described below|,
+                lastUpdated => 1135279558,
+                message => q|<p>Enter in a default value for the field that will be used if the user leaves the field blank.</p>
+		<p>For the GoodBad field, the possible values are "No", "Yes", "Free Add On", "Costs Extra", "Limited".  While the displayed labels are internationalized, these values are not.</p>
+		<p>For the Combo field, you may only enter in 1 value, but the user will be allowed to select any value entered in by other users.  In other words, the drop-down list will contain all values entered in by users who enter unique data into this field.|
+        },
+
+        'category description' => {
+                lastUpdated => 1136503500,
+                message => q|Select the category which this field falls into.|
         },
 
 };

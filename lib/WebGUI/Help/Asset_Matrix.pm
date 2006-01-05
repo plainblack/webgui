@@ -144,8 +144,46 @@ our $HELP = {
 				tag => 'matrix add/edit',
 				namespace => 'Asset_Matrix'
 			},
+		],
+	},
+	'field add/edit' => {
+		title => 'field add/edit help title',
+		body => 'field add/edit help body',
+		fields => [
+                        {
+                                title => 'field name',
+                                description => 'field name description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'field label',
+                                description => 'field label description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'field type',
+                                description => 'field type description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'field description',
+                                description => 'field description description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'default value',
+                                description => 'default value description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'category',
+                                description => 'category description',
+                                namespace => 'Asset_Matrix',
+                        },
+		],
+		related => [
 			{
-				tag => 'listing detail template',
+				tag => 'matrix add/edit',
 				namespace => 'Asset_Matrix'
 			},
 		],

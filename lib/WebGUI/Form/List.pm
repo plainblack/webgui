@@ -94,9 +94,14 @@ sub correctValues {
 	my ($self, $value) = @_;
 	return unless defined $value;
 	my @defaultValues;
-	foreach (split(/\n/, $value)) {
-			s/\s+$//; # remove trailing spaces
-			push(@defaultValues, $_);
+	if (ref $value eq "ARRAY") {
+		@defaultValues = @{ $value };
+	}
+	else {
+		foreach (split(/\n/, $value)) {
+				s/\s+$//; # remove trailing spaces
+				push(@defaultValues, $_);
+		}
 	}
 	$self->{value} = \@defaultValues;
 }
