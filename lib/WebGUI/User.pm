@@ -274,7 +274,7 @@ sub new {
                         	}
                 	}
 		}
-		$profile{alias} = $user{username} if ($profile{alias}} =~ /^\W+$/ || $profile{alias} eq "");
+		$profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
 		$userData = {
 			_userId => $userId,
 			_user => \%user,
