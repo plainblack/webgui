@@ -218,10 +218,12 @@ sub addFiles {
 				# TB : If the Asset exists, just copy the file.
 				# To be check.
 				my $storage = WebGUI::Storage->get($replaceAssetId);
+				print "\t\tAsset exists already. Replace the file.\n" unless ($quiet);
 				my $filename = $storage->addFileFromFilesystem("$pathToFiles$slash$file->{relpath}$slash$file->{filename}");
 				$child->generateThumbnail if ($class eq 'WebGUI::Asset::File::Image');
 				$child->setSize($storage->getFileSize($filename));
 			} else {
+				print "\t\tCreate the new asset.\n" unless ($quiet);
 				my $storage = WebGUI::Storage->create;
 				my $filename = $storage->addFileFromFilesystem("$pathToFiles$slash$file->{relpath}$slash$file->{filename}");
 				# TB : possibly remove the extension if the ignoreExtInName feature enabled.
