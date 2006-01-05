@@ -526,6 +526,7 @@ The number of seconds since January 1, 1970. Defaults to now.
 
 sub localtime {
 	my $dt = DateTime->from_epoch( epoch => shift || time() );
+	$dt->set_time_zone($session{user}{timeZone}|| "America/Chicago"); # assign the user's timezone
 	return ( $dt->year, $dt->month, $dt->day, $dt->hour, $dt->minute, $dt->second, $dt->day_of_year, $dt->day_of_week, $dt->is_dst );
 }
 

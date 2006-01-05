@@ -16,6 +16,8 @@
  - fix [ 1384794 ] editSave on an existing File or Image asset loses storageId.
  - Removed the If macro, since it was scheduled for removal in 6.8.0.
  - fix [ 1396620 ] Package WebGUI::Form::DynamicField
+ - fix[ 1386505 ] time off by 6 hours
+ - fix [ 1397275 ] Rich Text Editor Settings Dissapear (6.8.3-gamma)
 
 6.8.3
  - fixed a problem with enabling Avatars in the Collaboration System.
