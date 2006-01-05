@@ -94,6 +94,62 @@ our $HELP = {
 			},
 		],
 	},
+	'listing add/edit' => {
+		title => 'listing add/edit help title',
+		body => 'listing add/edit help body',
+		fields => [
+                        {
+                                title => 'product name',
+                                description => 'product name description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'version number',
+                                description => 'version number description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'product url',
+                                description => 'product url description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'manufacturer name',
+                                description => 'manufacturer name description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'manufacturer url',
+                                description => 'manufacturer url description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'description',
+                                description => 'description description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'listing maintainer',
+                                description => 'listing maintainer description',
+                                namespace => 'Asset_Matrix',
+                        },
+                        {
+                                title => 'matrix specific fields',
+                                description => 'matrix specific fields description',
+                                namespace => 'Asset_Matrix',
+                        },
+		],
+		related => [
+			{
+				tag => 'matrix add/edit',
+				namespace => 'Asset_Matrix'
+			},
+			{
+				tag => 'listing detail template',
+				namespace => 'Asset_Matrix'
+			},
+		],
+	},
 	'search template' => {
 		title => 'search template help title',
 		body => 'search template help body',
