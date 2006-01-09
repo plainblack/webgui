@@ -24,7 +24,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Chris Gebhardt / OpenServe
                                      Andy Grundman
                                      Chris Jackson
-                                     Roy Johnson / Ocean View Web Creations
+                                     Roy Johnson / Plain Black
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / ProcoliX
                                      Christian Kocourek
