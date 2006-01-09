@@ -54,15 +54,15 @@ The assetId to add.
 =cut
 
 sub add {
-	return unless ($session{setting}{passiveProfilingEnabled});
+	return unless ($self->session->setting->get("passiveProfilingEnabled"));
 	my $assetId = shift;
 	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry)
-		     values (".quote(WebGUI::Id::generate()).",".
-				quote($session{user}{userId}).",".
-				quote($session{var}{sessionId}).",".
-				quote($assetId).",".
-				quote(WebGUI::DateTime::time()).")";
-	WebGUI::SQL->write($sql);
+		     values (".$self->session->db->quote(WebGUI::Id::generate()).",".
+				$self->session->db->quote($self->session->user->profileField("userId")).",".
+				$self->session->db->quote($self->session->var->get("sessionId")).",".
+				$self->session->db->quote($assetId).",".
+				$self->session->db->quote(WebGUI::DateTime::time()).")";
+	$self->session->db->write($sql);
 	return;
 }
 
@@ -80,9 +80,9 @@ The pageId of the page you want to log.
 =cut
 
 sub addPage {
-	return unless ($session{setting}{passiveProfilingEnabled});
+	return unless ($self->session->setting->get("passiveProfilingEnabled"));
 	my $pageId = shift || $session{page}{pageId};
-	my @wids = WebGUI::SQL->buildArray("select * from wobject where pageId=".quote($pageId));
+	my @wids = $self->session->db->buildArray("select * from wobject where pageId=".$self->session->db->quote($pageId));
 	foreach my $wid (@wids) {
 		add($wid);
 	}
@@ -112,28 +112,28 @@ sub summarizeAOI {
 			d.value 
 		from metaData_values d , metaData_properties f 
 		where f.fieldId = d.fieldId 
-			and d.assetId = ".quote($data->{assetId});
+			and d.assetId = ".$self->session->db->quote($data->{assetId});
 
-        my $sth = WebGUI::SQL->read($sql);
+        my $sth = $self->session->db->read($sql);
         while (my $field = $sth->hashRef) {
-		my $aoi = WebGUI::SQL->quickHashRef("select * from passiveProfileAOI 
-						where userId=".quote($data->{userId})."
-						and fieldId=".quote($field->{fieldId})." and
-						value=".quote($field->{value}));
+		my $aoi = $self->session->db->quickHashRef("select * from passiveProfileAOI 
+						where userId=".$self->session->db->quote($data->{userId})."
+						and fieldId=".$self->session->db->quote($field->{fieldId})." and
+						value=".$self->session->db->quote($field->{value}));
 		if(not exists $aoi->{userId}) {
 			# Add record to DB
-			WebGUI::SQL->write("insert into passiveProfileAOI (userId, fieldId, value)
-						values (".quote($data->{userId}).",".
-							quote($field->{fieldId}).",".
-							quote($field->{value}).")");
+			$self->session->db->write("insert into passiveProfileAOI (userId, fieldId, value)
+						values (".$self->session->db->quote($data->{userId}).",".
+							$self->session->db->quote($field->{fieldId}).",".
+							$self->session->db->quote($field->{value}).")");
 		}
 		my $count = $aoi->{count};
 		$count++;
 
-		WebGUI::SQL->write("update passiveProfileAOI set count=".quote($count)."
-					where userId=".quote($data->{userId})."
-                                        and fieldId=".quote($field->{fieldId})." and
-                                        value=".quote($field->{value})); 
+		$self->session->db->write("update passiveProfileAOI set count=".$self->session->db->quote($count)."
+					where userId=".$self->session->db->quote($data->{userId})."
+                                        and fieldId=".$self->session->db->quote($field->{fieldId})." and
+                                        value=".$self->session->db->quote($field->{value})); 
 	}
 	$sth->finish;
 }

@@ -77,14 +77,14 @@ sub addGroupsToGroups {
 	foreach my $gid (@{$_[0]}) {
 		next if ($gid eq '1');
 		foreach my $toGid (@{$_[1]}) {
-			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupGroupings 
-				where groupId=".quote($gid)." and inGroup=".quote($toGid));
+			my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings 
+				where groupId=".$self->session->db->quote($gid)." and inGroup=".$self->session->db->quote($toGid));
 			my $recursive = isIn($toGid, @{getGroupsInGroup($gid,1)});
 			unless ($isIn || $recursive) {
-				WebGUI::SQL->write("insert into groupGroupings (groupId,inGroup) values (".quote($gid).",".quote($toGid).")");
-				my $cache = WebGUI::Cache->new("groups_in_group_".$gid);
+				$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (".$self->session->db->quote($gid).",".$self->session->db->quote($toGid).")");
+				my $cache = WebGUI::Cache->new($self->session,"groups_in_group_".$gid);
 				$cache->delete if (defined $cache);
-				$cache = WebGUI::Cache->new("groups_in_group_".$toGid);
+				$cache = WebGUI::Cache->new($self->session,"groups_in_group_".$toGid);
 				$cache->delete if (defined $cache);
 			}
 		}
@@ -119,14 +119,14 @@ sub addUsersToGroups {
 		if ($_[2]) {
 			$expireOffset = $_[2];
 		} else { 
-        		($expireOffset) = WebGUI::SQL->quickArray("select expireOffset from groups where groupId=".quote($gid));
+        		($expireOffset) = $self->session->db->quickArray("select expireOffset from groups where groupId=".$self->session->db->quote($gid));
 		}
 		foreach my $uid (@{$_[0]}) {
 			next if ($uid eq '1');
-			my ($isIn) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote($gid)." and userId=".quote($uid));
+			my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=".$self->session->db->quote($gid)." and userId=".$self->session->db->quote($uid));
 			unless ($isIn) {
-                		WebGUI::SQL->write("insert into groupings (groupId,userId,expireDate) 
-					values (".quote($gid).", ".quote($uid).", ".(WebGUI::DateTime::time()+$expireOffset).")");
+                		$self->session->db->write("insert into groupings (groupId,userId,expireDate) 
+					values (".$self->session->db->quote($gid).", ".$self->session->db->quote($uid).", ".(WebGUI::DateTime::time()+$expireOffset).")");
 			} else {
                         	if ($_[2]) {
                                 	userGroupExpireDate($uid,$gid,(WebGUI::DateTime::time()+$expireOffset));
@@ -156,8 +156,8 @@ sub deleteGroupsFromGroups {
 	delete $session{isInGroup};
         foreach my $gid (@{$_[0]}) {
 		foreach my $fromGid (@{$_[1]}) {
-			WebGUI::Cache->new("groups_in_group_".$fromGid)->delete;
-        		WebGUI::SQL->write("delete from groupGroupings where groupId=".quote($gid)." and inGroup=".quote($fromGid));
+			WebGUI::Cache->new($self->session,"groups_in_group_".$fromGid)->delete;
+        		$self->session->db->write("delete from groupGroupings where groupId=".$self->session->db->quote($gid)." and inGroup=".$self->session->db->quote($fromGid));
 		}
         }
 }
@@ -183,7 +183,7 @@ sub deleteUsersFromGroups {
 	delete $session{isInGroup};
         foreach my $gid (@{$_[1]}) {
 		foreach my $uid (@{$_[0]}) {
-                	WebGUI::SQL->write("delete from groupings where groupId=".quote($gid)." and userId=".quote($uid));
+                	$self->session->db->write("delete from groupings where groupId=".$self->session->db->quote($gid)." and userId=".$self->session->db->quote($uid));
 		}
         }
 }
@@ -202,7 +202,7 @@ A unique identifier for the group.
 =cut
 
 sub getGroupsForGroup {
-	return WebGUI::SQL->buildArrayRef("select inGroup from groupGroupings where groupId=".quote($_[0]));
+	return $self->session->db->buildArrayRef("select inGroup from groupGroupings where groupId=".$self->session->db->quote($_[0]));
 }
 
 
@@ -231,11 +231,11 @@ sub getGroupsForUser {
         } elsif (exists $session{gotGroupsForUser}{$userId}) {
 		return $session{gotGroupsForUser}{$userId};
         } else {
-                my @groups = WebGUI::SQL->buildArray("select groupId from groupings where userId=".quote($userId)." $clause");
+                my @groups = $self->session->db->buildArray("select groupId from groupings where userId=".$self->session->db->quote($userId)." $clause");
 		foreach my $gid (@groups) {
 			$session{isInGroup}{$userId}{$gid} = 1;
 		}
-		$session{gotGroupsForUser}{$userId} = \@groups unless ($session{config}{disableCache});
+		$session{gotGroupsForUser}{$userId} = \@groups unless ($self->session->config->get("disableCache"));
 		return \@groups;
         }
 }
@@ -267,15 +267,15 @@ sub getGroupsInGroup {
 	} elsif (exists $session{gotGroupsInGroup}{recursive}{$groupId}) {
 		return $session{gotGroupsInGroup}{direct}{$groupId};
 	}
-	my $groups = WebGUI::Cache->new("groups_in_group_".$groupId)->get;
+	my $groups = WebGUI::Cache->new($self->session,"groups_in_group_".$groupId)->get;
 	unless (defined $groups) {
-        	$groups = WebGUI::SQL->buildArrayRef("select groupId from groupGroupings where inGroup=".quote($groupId));
-		WebGUI::Cache->new("groups_in_group_".$groupId)->set($groups);
+        	$groups = $self->session->db->buildArrayRef("select groupId from groupGroupings where inGroup=".$self->session->db->quote($groupId));
+		WebGUI::Cache->new($self->session,"groups_in_group_".$groupId)->set($groups);
 	}
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
-                        WebGUI::ErrorHandler::fatal("Endless recursive loop detected while determining".
+                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining".
                                 " groups in group.\nRequested groupId: ".$groupId."\nGroups in that group: ".join(",",@$groups));
                 }
                 my @groupsOfGroups = @$groups;
@@ -283,7 +283,7 @@ sub getGroupsInGroup {
                         my $gog = getGroupsInGroup($group,1,$loopCount);
                         push(@groupsOfGroups, @$gog);
                 }
-		$session{gotGroupsInGroup}{recursive}{$groupId} = \@groupsOfGroups  unless ($session{config}{disableCache});
+		$session{gotGroupsInGroup}{recursive}{$groupId} = \@groupsOfGroups  unless ($self->session->config->get("disableCache"));
                 return \@groupsOfGroups;
 	}
 	$session{gotGroupsInGroup}{direct}{$groupId} = $groups;
@@ -319,21 +319,21 @@ sub getUsersInGroup {
 	if ($withoutExpired) {
 		$clause = "expireDate > ".time()." and ";
 	}
-	$clause .= "(groupId=".quote($groupId);
+	$clause .= "(groupId=".$self->session->db->quote($groupId);
  	if ($recursive) {
 		my $groups = getGroupsInGroup($groupId,1);
 		if ($#$groups >= 0) {
 			if ($withoutExpired) {
 				foreach my $groupId (@$groups) {
-					$clause .= " OR (groupId = ".quote($groupId)." AND expireDate > ".time().") ";
+					$clause .= " OR (groupId = ".$self->session->db->quote($groupId)." AND expireDate > ".time().") ";
 				}
 			} else {
-				$clause .= " OR groupId IN (".quoteAndJoin($groups).")";
+				$clause .= " OR groupId IN (".$self->session->db->quoteAndJoin($groups).")";
 			}
 		}
 	}
 	$clause .= ")";
-       	return WebGUI::SQL->buildArrayRef("select userId from groupings where $clause");
+       	return $self->session->db->buildArrayRef("select userId from groupings where $clause");
 }
 
 
@@ -357,7 +357,7 @@ sub isInGroup {
         my (@data, %group, $groupId);
         my ($gid, $uid, $secondRun) = @_;
         $gid = 3 unless (defined $gid);
-        $uid = $session{user}{userId} if ($uid eq "");
+        $uid = $self->session->user->profileField("userId") if ($uid eq "");
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         return 1 if ($gid eq '7');		# everyone is in the everyone group
         return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
@@ -374,7 +374,7 @@ sub isInGroup {
 	unless ($secondRun) {			# don't look up user groups if we've already done it once.
 	        my $groups = WebGUI::Grouping::getGroupsForUser($uid,1);
 	        foreach (@{$groups}) {
-	                $session{isInGroup}{$uid}{$_} = 1 unless ($session{config}{disableCache});
+	                $session{isInGroup}{$uid}{$_} = 1 unless ($self->session->config->get("disableCache"));
         	}
         	if ($session{isInGroup}{$uid}{$gid} eq '1') {
                 	return 1;
@@ -382,7 +382,7 @@ sub isInGroup {
 	}
         ### Get data for auxillary checks.
         tie %group, 'Tie::CPHash';
-        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout,ldapGroup,ldapGroupProperty,ldapRecursiveProperty from groups where groupId=".quote($gid));
+        %group = $self->session->db->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout,ldapGroup,ldapGroupProperty,ldapRecursiveProperty from groups where groupId=".$self->session->db->quote($gid));
         ### Check IP Address
         if ($group{ipFilter} ne "") {
                 $group{ipFilter} =~ s/\t//g;
@@ -392,8 +392,8 @@ sub isInGroup {
                 $group{ipFilter} =~ s/\./\\\./g;
                 my @ips = split(";",$group{ipFilter});
                 foreach my $ip (@ips) {
-                        if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
-                                $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
+                        if ($self->session->env->get("REMOTE_ADDR") =~ /^$ip/) {
+                                $session{isInGroup}{$uid}{$gid} = 1 unless ($self->session->config->get("disableCache"));
                                 return 1;
                         }
                 }
@@ -408,21 +408,21 @@ sub isInGroup {
                 foreach my $var (@vars) {
                         my ($name, $value) = split(/\=/,$var);
                         if ($session{scratch}{$name} eq $value) {
-                                $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
+                                $session{isInGroup}{$uid}{$gid} = 1 unless ($self->session->config->get("disableCache"));
                                 return 1;
                         }
                 }
         }
         ### Check karma levels.
-        if ($session{setting}{useKarma}) {
+        if ($self->session->setting->get("useKarma")) {
                 my $karma;
-                if ($uid eq $session{user}{userId}) {
-                        $karma = $session{user}{karma};
+                if ($uid eq $self->session->user->profileField("userId")) {
+                        $karma = $self->session->user->profileField("karma");
                 } else {
-                        ($karma) = WebGUI::SQL->quickHash("select karma from users where userId=".quote($uid));
+                        ($karma) = $self->session->db->quickHash("select karma from users where userId=".$self->session->db->quote($uid));
                 }
                 if ($karma >= $group{karmaThreshold}) {
-                        $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
+                        $session{isInGroup}{$uid}{$gid} = 1 unless ($self->session->config->get("disableCache"));
                         return 1;
                 }
         }
@@ -430,32 +430,32 @@ sub isInGroup {
         if ($group{dbQuery} ne "" && $group{databaseLinkId}) {
                 # skip if not logged in and query contains a User macro
                 unless ($group{dbQuery} =~ /\^User/i && $uid eq '1') {
-                        my $dbLink = WebGUI::DatabaseLink->new($group{databaseLinkId});
+                        my $dbLink = WebGUI::DatabaseLink->new($session,$group{databaseLinkId});
                         my $dbh = $dbLink->dbh;
                         if (defined $dbh) {
                                 if ($group{dbQuery} =~ /select 1/i) {
 					my $query = $group{dbQuery};
-					WebGUI::Macro::process(\$query);
+					WebGUI::Macro::process($self->session,\$query);
                                         $group{dbQuery} = $query;
-                                        my $sth = WebGUI::SQL->unconditionalRead($group{dbQuery},$dbh);
+                                        my $sth = $self->session->db->unconditionalRead($group{dbQuery},$dbh);
                                         unless ($sth->errorCode < 1) {
-                                                WebGUI::ErrorHandler::warn("There was a problem with the database query for group ID $gid.");
+                                                $self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
                                         } else {
                                                 my ($result) = $sth->array;
                                                 if ($result == 1) {
-                                                        $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
+                                                        $session{isInGroup}{$uid}{$gid} = 1 unless ($self->session->config->get("disableCache"));
                                                         if ($group{dbCacheTimeout} > 0) {
                                                                 WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
                                                                 WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
                                                         }
                                                 } else {
-                                                        $session{isInGroup}{$uid}{$gid} = 0 unless ($session{config}{disableCache});
+                                                        $session{isInGroup}{$uid}{$gid} = 0 unless ($self->session->config->get("disableCache"));
                                                         WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 0);
                                                 }
                                         }
                                         $sth->finish;
                                 } else {
-                                        WebGUI::ErrorHandler::warn("Database query for group ID $gid must use 'select 1'");
+                                        $self->session->errorHandler->warn("Database query for group ID $gid must use 'select 1'");
                                 }
                                 $dbLink->disconnect;
                                 return 1 if ($session{isInGroup}{$uid}{$gid});
@@ -482,13 +482,13 @@ sub isInGroup {
 					}
 					 
 				    if(isIn($params->{connectDN},@{$people})) {
-					   $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
+					   $session{isInGroup}{$uid}{$gid} = 1 unless ($self->session->config->get("disableCache"));
                        if ($group{dbCacheTimeout} > 10) {
                           WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]);
                           WebGUI::Grouping::addUsersToGroups([$uid],[$gid],$group{dbCacheTimeout});
                        }
 					} else {
-					   $session{isInGroup}{$uid}{$gid} = 0 unless ($session{config}{disableCache});
+					   $session{isInGroup}{$uid}{$gid} = 0 unless ($self->session->config->get("disableCache"));
                        WebGUI::Grouping::deleteUsersFromGroups([$uid],[$gid]) if ($group{dbCacheTimeout} > 10);
 					}
 					$ldapLink->unbind;
@@ -503,11 +503,11 @@ sub isInGroup {
         foreach (@{$groups}) {
                 $session{isInGroup}{$uid}{$_} = isInGroup($_, $uid, 1);
                 if ($session{isInGroup}{$uid}{$_}) {
-                        $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache}); # cache current group also so we don't have to do the group in group check again
+                        $session{isInGroup}{$uid}{$gid} = 1 unless ($self->session->config->get("disableCache")); # cache current group also so we don't have to do the group in group check again
                         return 1;
                 }
         }
-        $session{isInGroup}{$uid}{$gid} = 0 unless ($session{config}{disableCache});
+        $session{isInGroup}{$uid}{$gid} = 0 unless ($self->session->config->get("disableCache"));
         return 0;
 }
 
@@ -537,10 +537,10 @@ If specified the admin flag will be set to this value.
 
 sub userGroupAdmin {
 	if ($_[2] ne "") {
-		WebGUI::SQL->write("update groupings set groupAdmin=".quote($_[2])." where groupId=".quote($_[1])." and userId=".quote($_[0]));
+		$self->session->db->write("update groupings set groupAdmin=".$self->session->db->quote($_[2])." where groupId=".$self->session->db->quote($_[1])." and userId=".$self->session->db->quote($_[0]));
 		return $_[2];
 	} else {
-		my ($admin) = WebGUI::SQL->quickArray("select groupAdmin from groupings where groupId=".quote($_[1])." and userId=".quote($_[0]));
+		my ($admin) = $self->session->db->quickArray("select groupAdmin from groupings where groupId=".$self->session->db->quote($_[1])." and userId=".$self->session->db->quote($_[0]));
 		return $admin;
 	}
 }	
@@ -567,10 +567,10 @@ If specified the expire date will be set to this value.
 
 sub userGroupExpireDate {
 	if ($_[2]) {
-		WebGUI::SQL->write("update groupings set expireDate=".quote($_[2])." where groupId=".quote($_[1])." and userId=".quote($_[0]));
+		$self->session->db->write("update groupings set expireDate=".$self->session->db->quote($_[2])." where groupId=".$self->session->db->quote($_[1])." and userId=".$self->session->db->quote($_[0]));
 		return $_[2];
 	} else {
-		my ($expireDate) = WebGUI::SQL->quickArray("select expireDate from groupings where groupId=".quote($_[1])." and userId=".quote($_[0]));
+		my ($expireDate) = $self->session->db->quickArray("select expireDate from groupings where groupId=".$self->session->db->quote($_[1])." and userId=".$self->session->db->quote($_[0]));
 		return $expireDate;
 	}
 }	

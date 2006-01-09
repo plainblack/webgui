@@ -27,7 +27,7 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new("contentFilters");
+        my $ac = WebGUI::AdminConsole->new($session,"contentFilters");
         if ($help) {
                 $ac->setHelp($help);
         }

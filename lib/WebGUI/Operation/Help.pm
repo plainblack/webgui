@@ -100,7 +100,7 @@ sub _getHelpName {
 sub www_viewHelp {
 	my $session = shift;
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(7));
-	my $ac = WebGUI::AdminConsole->new("help");
+	my $ac = WebGUI::AdminConsole->new($session,"help");
 	my $namespace = $session->form->process("namespace") || "WebGUI";
         my $i18n = WebGUI::International->new($namespace);
 	my $help = _get($session->form->process("hid"),$namespace);
@@ -118,7 +118,7 @@ sub www_viewHelp {
         my $body = WebGUI::Asset::Template->new("PBtmplHelp000000000001")->process(\%vars);
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),WebGUI::International::get(95));
     	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
-	WebGUI::Macro::process(\$body);
+	WebGUI::Macro::process($session,\$body);
     	return $ac->render(
 		$body, 
 		WebGUI::International::get(93).': '.$i18n->get($help->{title})
@@ -154,7 +154,7 @@ sub www_viewHelpIndex {
                 }	
 	}
 	$output .= '</td></tr></table>';
-	my $ac = WebGUI::AdminConsole->new("help");
+	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
 	return $ac->render($output, join ': ',WebGUI::International::get(93), WebGUI::International::get('help index'));
 }
@@ -184,7 +184,7 @@ sub www_viewHelpTOC {
                 }	
 	}
 	$output .= '</td></tr></table>';
-	my $ac = WebGUI::AdminConsole->new("help");
+	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),WebGUI::International::get(95));
 	return $ac->render($output, join ': ',WebGUI::International::get(93), WebGUI::International::get('help toc'));
 }
@@ -200,7 +200,7 @@ sub www_viewHelpChapter {
         foreach my $id (@entries) {
                 $output .= '<p><a href="'._link($id,$namespace).'">'.WebGUI::International::get($help->{$id}{title},$namespace).'</a></p>';
 	}
-	my $ac = WebGUI::AdminConsole->new("help");
+	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),WebGUI::International::get(95));
     	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
 	return $ac->render($output, join ': ',WebGUI::International::get(93), _getHelpName($namespace));

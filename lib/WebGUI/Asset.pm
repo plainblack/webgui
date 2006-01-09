@@ -77,9 +77,9 @@ Only developers extending this method should use this parameter. By default WebG
 
 sub canAdd {
 	my $className = shift;
-	my $userId = shift || $session{user}{userId};
+	my $userId = shift || $self->session->user->profileField("userId");
 	my $subclassGroupId = shift;
-	my $groupId = $session{config}{assetAddPrivilege}{$className} || $subclassGroupId || '12';
+	my $groupId = $self->session->config->get("assetAddPrivilege"){$className} || $subclassGroupId || '12';
         return WebGUI::Grouping::isInGroup($groupId,$userId);
 }
 
@@ -98,7 +98,7 @@ Unique hash identifier for a user. If not supplied, current user.
 
 sub canEdit {
 	my $self = shift;
-	my $userId = shift || $session{user}{userId};
+	my $userId = shift || $self->session->user->profileField("userId");
  	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
 	}
@@ -123,7 +123,7 @@ Unique hash identifier for a user. If not specified, uses current userId.
 
 sub canView {
 	my $self = shift;
-	my $userId = shift || $session{user}{userId};
+	my $userId = shift || $self->session->user->profileField("userId");
 	return 0 unless ($self->get("state") eq "published");
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
@@ -267,8 +267,8 @@ Any text string. Most likely will have been the Asset's name or title.
 
 sub fixUrl {
 	my $self = shift;
-	my $url = WebGUI::URL::urlize(shift);
-	my @badUrls = ($session{config}{extrasURL}, $session{config}{uploadsURL});
+	my $url = $self->session->url->urlize(shift);
+	my @badUrls = ($self->session->config->get("extrasURL"), $self->session->config->get("uploadsURL"));
 	foreach my $badUrl (@badUrls) {
 		if ($badUrl =~ /^http/) {
 			$badUrl =~ s/^http.*\/(.*)$/$1/;
@@ -282,13 +282,13 @@ sub fixUrl {
 	if (length($url) > 250) {
 		$url = substr($url,220);
 	}
-	if ($session{setting}{urlExtension} ne "" #don't add an extension if one isn't set
+	if ($self->session->setting->get("urlExtension") ne "" #don't add an extension if one isn't set
 		&& !($url =~ /\./) #don't add an extension of the url already contains a dot
 		&& $self->get("url") eq $self->getId # only add it if we're creating a new url
 		) {
-		$url .= ".".$session{setting}{urlExtension};
+		$url .= ".".$self->session->setting->get("urlExtension");
 	}
-	my ($test) = WebGUI::SQL->quickArray("select url from assetData where assetId<>".quote($self->getId)." and url=".quote($url));
+	my ($test) = $self->session->db->quickArray("select url from assetData where assetId<>".$self->session->db->quote($self->getId)." and url=".$self->session->db->quote($url));
         if ($test) {
                 my @parts = split(/\./,$url);
                 if ($parts[0] =~ /(.*)(\d+$)/) {
@@ -337,7 +337,7 @@ Returns a reference to a WebGUI::AdminConsole object.
 sub getAdminConsole {
 	my $self = shift;
 	unless (exists $self->{_adminConsole}) {
-		$self->{_adminConsole} = WebGUI::AdminConsole->new("assets");
+		$self->{_adminConsole} = WebGUI::AdminConsole->new($self->session,"assets");
 	}
 	$self->{_adminConsole}->setIcon($self->getIcon);
 	return $self->{_adminConsole};
@@ -369,26 +369,26 @@ sub getAssetAdderLinks {
 		my $load = "use ".$class;
 		eval ($load);
 		if ($@) {
-			WebGUI::ErrorHandler::error("Couldn't compile ".$class." because ".$@);
+			$self->session->errorHandler->error("Couldn't compile ".$class." because ".$@);
 		} else {
 			my $uiLevel = eval{$class->getUiLevel()};
 			if ($@) {
-				WebGUI::ErrorHandler::error("Couldn't get UI level of ".$class." because ".$@);
+				$self->session->errorHandler->error("Couldn't get UI level of ".$class." because ".$@);
 			} else {
-				next if ($uiLevel > $session{user}{uiLevel} && !WebGUI::Grouping::isInGroup(3));
+				next if ($uiLevel > $self->session->user->profileField("uiLevel") && !WebGUI::Grouping::isInGroup(3));
 			}
 			my $canAdd = eval{$class->canAdd()};
 			if ($@) {
-				WebGUI::ErrorHandler::error("Couldn't determine if user can add ".$class." because ".$@);
+				$self->session->errorHandler->error("Couldn't determine if user can add ".$class." because ".$@);
 			} else {
 				next unless ($canAdd);
 			}
 			my $label = eval{$class->getName()};
 			if ($@) {
-				WebGUI::ErrorHandler::error("Couldn't get the name of ".$class." because ".$@);
+				$self->session->errorHandler->error("Couldn't get the name of ".$class." because ".$@);
 			} else {
 				my $url = $self->getUrl("func=add;class=".$class);
-				$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
+				$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
 				$links{$label}{url} = $url;
 				$links{$label}{icon} = $class->getIcon;
 				$links{$label}{'icon.small'} = $class->getIcon(1);
@@ -397,18 +397,18 @@ sub getAssetAdderLinks {
 	}
 	my $constraint;
 	if ($type eq "assetContainers") {
-		$constraint = quoteAndJoin($session{config}{assetContainers});
+		$constraint = $self->session->db->quoteAndJoin($self->session->config->get("assetContainers"));
 	} elsif ($type eq "utilityAssets") {
-		$constraint = quoteAndJoin($session{config}{utilityAssets});
+		$constraint = $self->session->db->quoteAndJoin($self->session->config->get("utilityAssets"));
 	} else {
-		$constraint = quoteAndJoin($session{config}{assets});
+		$constraint = $self->session->db->quoteAndJoin($self->session->config->get("assets"));
 	}
-	my $sth = WebGUI::SQL->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
+	my $sth = $self->session->db->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
 	while (my ($class,$id,$date) = $sth->array) {
 		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
-		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $session{user}{uiLevel});
+		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $self->session->user->profileField("uiLevel"));
 		my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
-		$url = WebGUI::URL::append($url,$addToUrl) if ($addToUrl);
+		$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
 		$links{$asset->getTitle}{url} = $url;
 		$links{$asset->getTitle}{icon} = $asset->getIcon;
 		$links{$asset->getTitle}{'icon.small'} = $asset->getIcon(1);
@@ -441,10 +441,10 @@ Returns a reference to the container asset. If this asset is a container it retu
 
 sub getContainer {
 	my $self = shift;
-	if (WebGUI::Utility::isIn($self->get("className"), @{$session{config}{assetContainers}})) {
+	if (WebGUI::Utility::isIn($self->get("className"), @{$self->session->config->get("assetContainers")})) {
 		return $self;
 	} else {
-		$session{asset} = $self->getParent;
+		$self->session->asset = $self->getParent;
 		return $self->getParent;
 	}
 }
@@ -492,13 +492,13 @@ sub getEditForm {
 			});
 		$tabform->hidden({
 			name=>"class",
-			value=>$session{form}{class}
+			value=>$self->session->form->process("class")
 			});
 	}
-	if ($session{form}{proceed}) {
+	if ($self->session->form->process("proceed")) {
 		$tabform->hidden({
 			name=>"proceed",
-			value=>$session{form}{proceed}
+			value=>$self->session->form->process("proceed")
 			});
 	}
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
@@ -573,12 +573,12 @@ sub getEditForm {
         my $clause;
         if (WebGUI::Grouping::isInGroup(3)) {
                 my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
-                push (@$contentManagers, $session{user}{userId});
-                $clause = "userId in (".quoteAndJoin($contentManagers).")";
+                push (@$contentManagers, $self->session->user->profileField("userId"));
+                $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
-                $clause = "userId=".quote($self->get("ownerUserId"));
+                $clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));
         }
-        my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
+        my $users = $self->session->db->buildHashRef("select userId,username from users where $clause order by username");
         $tabform->getTab("security")->selectBox(
                -name=>"ownerUserId",
                -options=>$users,
@@ -632,7 +632,7 @@ sub getEditForm {
 		-value=>$self->getValue("isPrototype"),
 		-uiLevel=>9
 		);
-        if ($session{setting}{metaDataEnabled}) {
+        if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
                         my $fieldType = $meta->{$field}{fieldType} || "text";
@@ -656,7 +656,7 @@ sub getEditForm {
 		if (WebGUI::Grouping::isInGroup(3)) {
                 	# Add a quick link to add field
                 	$tabform->getTab("meta")->readOnly(
-                                        -value=>'<p><a href="'.WebGUI::URL::page("func=editMetaDataField;fid=new").'">'.
+                                        -value=>'<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.
                                                         WebGUI::International::get('Add new field','Asset').
                                                         '</a></p>',
                                         -hoverHelp=>WebGUI::International::get('Add new field description',"Asset"),
@@ -671,7 +671,7 @@ sub getEditForm {
 
 =head2 getExtraHeadTags (  )
 
-Returns the extraHeadTags stored in the asset.  Called in WebGUI::Style::generateAdditionalHeadTags if this asset is the $session{asset}.  Also called in WebGUI::Layout::view for its child assets.  Overriden in Shortcut.pm.
+Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Layout::view for its child assets.  Overriden in Shortcut.pm.
 
 =cut
 
@@ -698,8 +698,8 @@ sub getIcon {
 	my $small = shift;
 	my $definition = $self->definition;
 	my $icon = $definition->[0]{icon} || "assets.gif";
-	return $session{config}{extrasURL}.'/assets/small/'.$icon if ($small);
-	return $session{config}{extrasURL}.'/assets/'.$icon;
+	return $self->session->config->get("extrasURL").'/assets/small/'.$icon if ($small);
+	return $self->session->config->get("extrasURL").'/assets/'.$icon;
 }
 
 #-------------------------------------------------------------------
@@ -866,7 +866,7 @@ sub getToolbar {
 	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"));
 	my $commit;
 	my $i18n = WebGUI::International->new("Asset");
-	if (($self->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId")) || !$self->isLocked) {
+	if (($self->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId")) || !$self->isLocked) {
         	$toolbar .= editIcon('func=edit',$self->get("url"));
 	} else {
 		$toolbar .= lockedIcon('func=manageRevisions',$self->get("url"));
@@ -875,9 +875,9 @@ sub getToolbar {
         $toolbar .= cutIcon('func=cut',$self->get("url"))
             	.copyIcon('func=copy',$self->get("url"));
         $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
-	$toolbar .= exportIcon('func=export',$self->get("url")) if defined ($session{config}{exportPath});
-	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
+	$toolbar .= exportIcon('func=export',$self->get("url")) if defined ($self->session->config->get("exportPath"));
+	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
+	$self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	return '<script type="text/javascript">
 		//<![CDATA[
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
@@ -918,7 +918,7 @@ Returns the UI Level specified in the asset definition or from the config file i
 sub getUiLevel {
         my $self = shift;
         my $definition = $self->definition;
-        return $session{config}{assetUiLevel}{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1;
+        return $self->session->config->get("assetUiLevel"){$definition->[0]{className}} || $definition->[0]{uiLevel} || 1;
 }  
 
 
@@ -940,9 +940,9 @@ sub getUrl {
 	my $self = shift;
 	my $params = shift;
 	my $url = $self->get("url");
-	$url = WebGUI::URL::gateway($url,$params);
+	$url = $self->session->url->gateway($url,$params);
 	if ($self->get("encryptPage")) {
-		$url = WebGUI::URL::getSiteURL().$url;
+		$url = $self->session->url->getSiteURL().$url;
 		$url =~ s/http:/https:/;
 	}
 	return $url;
@@ -1014,8 +1014,8 @@ sub new {
 	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId="
-			.$session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
-			.$session->db->quote($session->scratch->get("versionTag")).")
+			.$session->db->$self->session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
+			.$session->db->$self->session->db->quote($session->scratch->get("versionTag")).")
 			group by assetData.assetId order by assetData.revisionDate");
 		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
 		$session->stow("assetRevision",$assetRevision);
@@ -1030,7 +1030,7 @@ sub new {
 		}
 		$class = $className;
 	}
-	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
+	my $cache = WebGUI::Cache->new($self->session,$session, ["asset",$assetId,$revisionDate]);
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
 		# got properties from cache
@@ -1040,7 +1040,7 @@ sub new {
 			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
 				.$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
 		}
-		$sql .= " where asset.assetId=".$session->db->quote($assetId);
+		$sql .= " where asset.assetId=".$session->db->$self->session->db->quote($assetId);
 		$properties = $session->db->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
 		$cache->set($properties,60*60*24);
@@ -1082,7 +1082,7 @@ sub newByDynamicClass {
 	my $assetClass = $session->stow->get("assetClass");
 	my $className = $assetClass->{$assetId};
 	unless ($className) {
-       		($className) = $session->db->quickArray("select className from asset where assetId=".$session->db->quote($assetId));
+       		($className) = $session->db->quickArray("select className from asset where assetId=".$session->db->$self->session->db->quote($assetId));
 		$assetClass->{$assetId} = $className;
 		$session->stow->set("assetClass",$assetClass);
 	}
@@ -1161,7 +1161,7 @@ sub newByUrl {
 			left join
 				assetData on asset.assetId=assetData.assetId
 			where 
-				assetData.url=".$session->db->quote($url)." 
+				assetData.url=".$session->db->$self->session->db->quote($url)." 
 			group by
 				assetData.assetId
 			");
@@ -1189,10 +1189,10 @@ sub processPropertiesFromFormPost {
 	foreach my $definition (@{$self->definition}) {
 		foreach my $property (keys %{$definition->{properties}}) {
 			if ($definition->{properties}{$property}{noFormPost}) {
-				$data{$property} = $definition->{properties}{$property}{defaultValue} if $session{form}{assetId} eq "new";
+				$data{$property} = $definition->{properties}{$property}{defaultValue} if $self->session->form->process("assetId") eq "new";
 				next;
 			}
-			$data{$property} = WebGUI::FormProcessor::process(
+			$data{$property} = $self->session->form->process(
 				$property,
 				$definition->{properties}{$property}{fieldType},
 				$definition->{properties}{$property}{defaultValue}
@@ -1211,9 +1211,9 @@ sub processPropertiesFromFormPost {
 		$data{url} =~ s/(.*)\..*/$1/;
 		$data{url} .= '/'.$data{menuTitle};
 	}
-	WebGUI::SQL->beginTransaction;
+	$self->session->db->beginTransaction;
 	$self->update(\%data);
-	WebGUI::SQL->commit;
+	$self->session->db->commit;
 }
 
 
@@ -1237,7 +1237,7 @@ sub processTemplate {
 	my $self = shift;
 	my $var = shift;
 	my $templateId = shift;
-        my $meta = $self->getMetaDataFields() if ($session{setting}{metaDataEnabled});
+        my $meta = $self->getMetaDataFields() if ($self->session->setting->get("metaDataEnabled"));
         foreach my $field (keys %$meta) {
 		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
 	}
@@ -1250,7 +1250,7 @@ sub processTemplate {
 	if (defined $template) {
 		return $template->process(\%vars);
 	} else {
-		WebGUI::ErrorHandler::error("Can't instantiate template $templateId for asset ".$self->getId);
+		$self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
 		return "Error: Can't instantiate template ".$templateId;
 	}
 }
@@ -1266,9 +1266,9 @@ Sets an asset and it's descendants to a state of 'published' regardless of it's 
 
 sub publish {
 	my $self = shift;
-	my $assetIds = WebGUI::SQL->buildArrayRef("select assetId from asset where lineage like ".quote($self->get("lineage").'%'));
-        my $idList = quoteAndJoin($assetIds);
-        WebGUI::SQL->write("update asset set state='published', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId in (".$idList.")");
+	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
+        my $idList = $self->session->db->quoteAndJoin($assetIds);
+        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".time()." where assetId in (".$idList.")");
 	my $cache = WebGUI::Cache->new;
         foreach my $id (@{$assetIds}) {
         	# we do the purge directly cuz it's a lot faster than instantiating all these assets
@@ -1291,7 +1291,7 @@ sub purgeCache {
 	delete $session{assetLineage};
 	delete $session{assetClass};
 	delete $session{assetRevision};
-	WebGUI::Cache->new(["asset",$self->getId,$self->get("revisionDate")])->deleteChunk(["asset",$self->getId]);
+	WebGUI::Cache->new($self->session,["asset",$self->getId,$self->get("revisionDate")])->deleteChunk(["asset",$self->getId]);
 }
 
 
@@ -1326,7 +1326,7 @@ sub setSize {
 	foreach my $key (keys %{$self->get}) {
 		$sizetest .= $self->get($key);
 	}
-	WebGUI::SQL->write("update assetData set assetSize=".(length($sizetest)+$extra)." where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
+	$self->session->db->write("update assetData set assetSize=".(length($sizetest)+$extra)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
 	$self->purgeCache;
 }
 	
@@ -1374,10 +1374,10 @@ sub update {
 				$value = $self->$filter($value);
 			}
 			$self->{_properties}{$property} = $value;
-			push(@setPairs, $property."=".quote($value));
+			push(@setPairs, $property."=".$self->session->db->quote($value));
 		}
 		if (scalar(@setPairs) > 0) {
-			WebGUI::SQL->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
+			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
 			$self->setSize;
 		}
 	}
@@ -1396,7 +1396,7 @@ Returns "".
 sub view {
 	my $self = shift;
 	WebGUI::HTTP::setRedirect($self->getDefault->getUrl) if ($self->getId eq "PBasset000000000000001");
-	return $self->getToolbar if ($session{var}{adminOn});
+	return $self->getToolbar if ($self->session->var->get("adminOn"));
 	return undef;
 }
 
@@ -1411,9 +1411,9 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 sub www_add {
 	my $self = shift;
 	my %prototypeProperties; 
-	my $class = $session{form}{class};
+	my $class = $self->session->form->process("class");
 	unless ($class =~ m/^[A-Za-z0-9\:]+$/) {
-		WebGUI::ErrorHandler::security("tried to call an invalid class ".$class);
+		$self->session->errorHandler->security("tried to call an invalid class ".$class);
 		return "";
 	}
 	if ($session{form}{'prototype'}) {
@@ -1440,7 +1440,7 @@ sub www_add {
 		className=>$class,
 		assetId=>"new"
 		);
-	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$session{config}{assetContainers}}));
+	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 	return WebGUI::Privilege::insufficient() unless ($newAsset->canAdd);
@@ -1491,11 +1491,11 @@ sub www_editSave {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $object;
-	unless($session{setting}{autoCommit} || $session{scratch}{versionTag}) {
+	unless($self->session->setting->get("autoCommit") || $self->session->scratch->get("versionTag")) {
 		$self->addVersionTag;
 	}
-	if ($session{form}{assetId} eq "new") {
-		$object = $self->addChild({className=>$session{form}{class}});	
+	if ($self->session->form->process("assetId") eq "new") {
+		$object = $self->addChild({className=>$self->session->form->process("class")});	
 		$object->{_parent} = $self;
 	} else {
 		if ($self->canEditIfLocked || !$self->isLocked) {
@@ -1506,21 +1506,21 @@ sub www_editSave {
 	}
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
-	if ($session{form}{proceed} eq "manageAssets") {
-		$session{asset} = $object->getParent;
-		return $session{asset}->www_manageAssets;
+	if ($self->session->form->process("proceed") eq "manageAssets") {
+		$self->session->asset = $object->getParent;
+		return $self->session->asset->www_manageAssets;
 	}
-	if ($session{form}{proceed} eq "viewParent") {
-		$session{asset} = $object->getParent;
-		return $session{asset}->www_view;
+	if ($self->session->form->process("proceed") eq "viewParent") {
+		$self->session->asset = $object->getParent;
+		return $self->session->asset->www_view;
 	}
-	if ($session{form}{proceed} ne "") {
-		my $method = "www_".$session{form}{proceed};
-		$session{asset} = $object;
-		return $session{asset}->$method();
+	if ($self->session->form->process("proceed") ne "") {
+		my $method = "www_".$self->session->form->process("proceed");
+		$self->session->asset = $object;
+		return $self->session->asset->$method();
 	}
-	$session{asset} = $object->getContainer;
-	return $session{asset}->www_view;
+	$self->session->asset = $object->getContainer;
+	return $self->session->asset->www_view;
 }
 
 
@@ -1535,10 +1535,10 @@ Main page to manage assets. Renders an AdminConsole with a list of assets. If ca
 sub www_manageAssets {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-  	WebGUI::Style::setLink($session{config}{extrasURL}.'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/contextMenu/contextMenu.js', {type=>"text/javascript"});
-  	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
+  	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
+  	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
 	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
         my @crumbtrail;
@@ -1557,7 +1557,7 @@ sub www_manageAssets {
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');\n";
-         $output .= "assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n" unless ($session{setting}{autoCommit});
+         $output .= "assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n" unless ($self->session->setting->get("autoCommit"));
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
 		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
@@ -1571,13 +1571,13 @@ sub www_manageAssets {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId"));
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
-			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
-		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($session{setting}{autoCommit});
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($self->session->setting->get("autoCommit"));
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
 				name=>'assetId',

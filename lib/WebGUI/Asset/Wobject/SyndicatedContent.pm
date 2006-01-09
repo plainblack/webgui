@@ -238,7 +238,7 @@ sub _normalize_items {
 sub _get_rss_data {
         my $url = shift;
         
-	my $cache = WebGUI::Cache->new('url:' . $url, 'RSS');
+	my $cache = WebGUI::Cache->new($self->session,'url:' . $url, 'RSS');
         my $rss_serial = $cache->get;
         my $rss = {};
         if ($rss_serial) {
@@ -320,7 +320,7 @@ sub _assign_rss_dates {
         for my $item (@{$items}) {
                 my $key = 'dates:' . ($item->{guid} || $item->{title} || 
                                       $item->{description} || $item->{link});
-                my $cache = WebGUI::Cache->new($key, 'RSS');
+                my $cache = WebGUI::Cache->new($self->session,$key, 'RSS');
                 if (my $date = $cache->get()) {
                         $item->{date} = $date;
                 } else {
@@ -440,7 +440,7 @@ sub _get_items {
 	
 	my $key=join(':',('aggregate', $displayMode,$hasTermsRegex,$maxHeadlines,$self->get('rssUrl')));
 
-        my $cache = WebGUI::Cache->new($key, 'RSS');
+        my $cache = WebGUI::Cache->new($self->session,$key, 'RSS');
         my $items = Storable::thaw($cache->get());
 	my @rss_feeds;
         if (!$items) {

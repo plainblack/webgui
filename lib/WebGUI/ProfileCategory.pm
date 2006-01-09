@@ -43,10 +43,10 @@ These methods are available from this package:
 #-------------------------------------------------------------------
 sub _reorderCategories {
         my ($sth, $i, $id);
-        $sth = WebGUI::SQL->read("select profileCategoryId from userProfileCategory order by sequenceNumber");
+        $sth = $self->session->db->read("select profileCategoryId from userProfileCategory order by sequenceNumber");
         while (($id) = $sth->array) {
                 $i++;
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber='$i' where profileCategoryId=".quote($id));
+                $self->session->db->write("update userProfileCategory set sequenceNumber='$i' where profileCategoryId=".$self->session->db->quote($id));
         }       
         $sth->finish;
 }  
@@ -66,8 +66,8 @@ A hash reference containing the properties of this field. See the set() method f
 sub create {
 	my $class = shift;
 	my $properties = shift;
-        my ($sequenceNumber) = WebGUI::SQL->quickArray("select max(sequenceNumber) from userProfileCategory");
- 	my $id = WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",{profileCategoryId=>"new", sequenceNumber=>$sequenceNumber+1});
+        my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileCategory");
+ 	my $id = $self->session->db->setRow("userProfileCategory","profileCategoryId",{profileCategoryId=>"new", sequenceNumber=>$sequenceNumber+1});
 	my $self = $class->new($id);
 	$self->set($properties);
 	return $self;
@@ -86,7 +86,7 @@ sub delete {
 	foreach my $field (@{$self->getFields}) {
 		$field->delete;
 	}
-	WebGUI::SQL->deleteRow("userProfileCategory","profileCategoryId",$self->getId);
+	$self->session->db->deleteRow("userProfileCategory","profileCategoryId",$self->getId);
 }
 
 #-------------------------------------------------------------------
@@ -121,7 +121,7 @@ Returns an array reference of all WebGUI::ProfileCategory objects in order of se
 sub getCategories {
 	my $self = shift;
 	my @categories = ();
- 	foreach my $id (WebGUI::SQL->buildArray("select profileCategoryId from userProfileCategory order by sequenceNumber")) {
+ 	foreach my $id ($self->session->db->buildArray("select profileCategoryId from userProfileCategory order by sequenceNumber")) {
 		push(@categories,WebGUI::ProfileCategory->new($id));
 	}
 	return \@categories;
@@ -139,7 +139,7 @@ Returns an array reference of all WebGUI::ProfileField objects that are part of 
 sub getFields {
 	my $self = shift;
 	my @fields = ();
-	foreach my $fieldName (WebGUI::SQL->buildArray("select fieldName from userProfileField where profileCategoryId=".quote($self->getId)." order by sequenceNumber")){
+	foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($self->getId)." order by sequenceNumber")){
 		push(@fields,WebGUI::ProfileField->new($fieldName));
 	}
 	return \@fields;
@@ -223,11 +223,11 @@ Moves this category down one position.
 sub moveDown {
 	my $self = shift;
         my ($id, $thisSeq);
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($self->getId));
-        ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq+1");
+        ($thisSeq) = $self->session->db->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".$self->session->db->quote($self->getId));
+        ($id) = $self->session->db->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq+1");
         if ($id ne "") {
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($self->getId));
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($id));
+                $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".$self->session->db->quote($self->getId));
+                $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".$self->session->db->quote($id));
                 _reorderCategories();
         }
 }
@@ -243,11 +243,11 @@ Moves this field up one position.
 sub moveUp {
 	my $self = shift;
 	my ($id, $thisSeq);
-        ($thisSeq) = WebGUI::SQL->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".quote($self->getId));
-        ($id) = WebGUI::SQL->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq-1");
+        ($thisSeq) = $self->session->db->quickArray("select sequenceNumber from userProfileCategory where profileCategoryId=".$self->session->db->quote($self->getId));
+        ($id) = $self->session->db->quickArray("select profileCategoryId from userProfileCategory where sequenceNumber=$thisSeq-1");
         if ($id ne "") {
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".quote($self->getId));
-                WebGUI::SQL->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".quote($id));
+                $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".$self->session->db->quote($self->getId));
+                $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".$self->session->db->quote($id));
                 _reorderCategories();
         }
 }
@@ -268,7 +268,7 @@ sub new {
 	my $class = shift;
 	my $id = shift;
 	return undef unless ($id);
-	my $properties = WebGUI::SQL->getRow("userProfileCategory","profileCategoryId",$id);
+	my $properties = $self->session->db->getRow("userProfileCategory","profileCategoryId",$id);
 	bless {_properties=>$properties}, $class;
 }
 
@@ -309,7 +309,7 @@ sub set {
 	$properties->{protected} = 0 unless ($properties->{protected} == 1);
 	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
 	$properties->{profileCategoryId} = $self->getId;
-	WebGUI::SQL->setRow("userProfileCategory","profileCategoryId",$properties);
+	$self->session->db->setRow("userProfileCategory","profileCategoryId",$properties);
 }
 
 

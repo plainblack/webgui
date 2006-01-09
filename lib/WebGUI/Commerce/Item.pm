@@ -55,7 +55,7 @@ This returns the description of the item. This must be implemented by an item pl
 =cut
 
 sub description {
-	return WebGUI::ErrorHandler::fatal('The description method of WebGUI::Commerce::Item must be overridden.');
+	return $self->session->errorHandler->fatal('The description method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------
@@ -95,7 +95,7 @@ by an item plugin.
 =cut
 
 sub id {
-	return WebGUI::ErrorHandler::fatal('The id method of WebGUI::Commerce::Item must be overridden.');
+	return $self->session->errorHandler->fatal('The id method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------
@@ -120,7 +120,7 @@ Returns the name of the item. This must be implemented by an item plugin.
 =cut
 
 sub name {
-	return WebGUI::ErrorHandler::fatal('The name method of WebGUI::Commerce::Item must be overridden.');
+	return $self->session->errorHandler->fatal('The name method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------
@@ -160,15 +160,15 @@ sub new {
 	$id = shift;
 	$namespace = shift;
 	
-	WebGUI::ErrorHandler::fatal('No namespace') unless ($namespace);
-	WebGUI::ErrorHandler::fatal('No ID') unless ($id);
+	$self->session->errorHandler->fatal('No namespace') unless ($namespace);
+	$self->session->errorHandler->fatal('No ID') unless ($id);
 	
     	$cmd = "WebGUI::Commerce::Item::$namespace";
 	$load = "use $cmd";
 	eval($load);
-	WebGUI::ErrorHandler::warn("Item plugin failed to compile: $cmd.".$@) if($@);
+	$self->session->errorHandler->warn("Item plugin failed to compile: $cmd.".$@) if($@);
 	$plugin = eval($cmd."->new('$id', '$namespace')");
-	WebGUI::ErrorHandler::warn("Couldn't instantiate Item plugin: $cmd.".$@) if($@);
+	$self->session->errorHandler->warn("Couldn't instantiate Item plugin: $cmd.".$@) if($@);
 	return $plugin;
 }
 
@@ -182,7 +182,7 @@ term price. This must be implemented by an item plugin.
 =cut
 
 sub price {
-	return WebGUI::ErrorHandler::fatalError('The price method of WebGUI::Commerce::Item must be overridden.');
+	return $self->session->errorHandler->fatalError('The price method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------
@@ -194,7 +194,7 @@ Returns the type (namespace) of the item.
 =cut 
 
 sub type {
-	return WebGUI::ErrorHandler::fatalError('The type method of WebGUI::Commerce::Item must be overridden.');
+	return $self->session->errorHandler->fatalError('The type method of WebGUI::Commerce::Item must be overridden.');
 }
 
 #-------------------------------------------------------------------

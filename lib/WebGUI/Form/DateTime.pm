@@ -119,10 +119,10 @@ sub toHtml {
 	unless ($language) {
 		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
 	}
-        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/calendar.js',{ type=>'text/javascript' });
-        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
-        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/calendar/calendar-setup.js',{ type=>'text/javascript' });
-        WebGUI::Style::setLink($self->session->config->get("extrasURL").'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/calendar.js',{ type=>'text/javascript' });
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/calendar-setup.js',{ type=>'text/javascript' });
+        $self->session->style->setLink($self->session->config->get("extrasURL").'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	my $mondayFirst = $self->session->user->profileField("firstDayOfWeek") ? "true" : "false";
         return WebGUI::Form::Text->new(
                 name=>$self->get("name"),

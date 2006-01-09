@@ -122,25 +122,25 @@ sub addEntry {
 	$message = $_[3];
 	$url = $_[4];
 	if ($url  && !$url =~ /^http/) {
-		$url = WebGUI::URL::getSiteURL().$url;
+		$url = $self->session->url->getSiteURL().$url;
 	}
 	if ($url && !($url =~ /func=/ || $url =~ /op=/)) {
-                $url = WebGUI::URL::append($url, "op=viewMessageLogMessage");
+                $url = $self->session->url->append($url, "op=viewMessageLogMessage");
         }
 	$status = $_[5];
 	$from = $_[6];
 	if ($groupId ne "") {
-		@users = WebGUI::SQL->buildArray("select userId from groupings where groupId=".quote($groupId));
+		@users = $self->session->db->buildArray("select userId from groupings where groupId=".$self->session->db->quote($groupId));
 	}
 	@users = ($userId,@users) if ($userId ne "" && !isIn($userId, @users));
 	foreach $user (@users) {
 		$u = WebGUI::User->new($user);
 		if ($u->userId ne "") {
-			WebGUI::SQL->write("insert into messageLog (messageLogId, userId, message, url, dateOfEntry,
-				subject, status) values (".quote($messageLogId).",".quote($u->userId).",
-				".quote($message).",".quote($url).",".time().",".quote($subject).", ".quote($status).")");
+			$self->session->db->write("insert into messageLog (messageLogId, userId, message, url, dateOfEntry,
+				subject, status) values (".$self->session->db->quote($messageLogId).",".$self->session->db->quote($u->userId).",
+				".$self->session->db->quote($message).",".$self->session->db->quote($url).",".time().",".$self->session->db->quote($subject).", ".$self->session->db->quote($status).")");
 			if ($url ne "") {
-				$message .= "\n".WebGUI::URL::append($url,'mlog='.$messageLogId);
+				$message .= "\n".$self->session->url->append($url,'mlog='.$messageLogId);
 			}
 			_notify($u,$subject,$message,$from);
 		}
@@ -190,10 +190,10 @@ sub addInternationalizedEntry {
 	$groupId = $_[1];
 	$url = $_[2];
 	if ($url  && !$url =~ /^http/) {
-		$url = WebGUI::URL::getSiteURL().$url;
+		$url = $self->session->url->getSiteURL().$url;
 	}
 	if  ($url && !($url =~ /func=/ || $url =~ /op=/)) {
-                $url = WebGUI::URL::append($url, "op=viewMessageLogMessage");
+                $url = $self->session->url->append($url, "op=viewMessageLogMessage");
         }
 	$internationalId = $_[3];
         $namespace = $_[4] || "WebGUI";
@@ -204,7 +204,7 @@ sub addInternationalizedEntry {
 		$subject{$language} = WebGUI::International::get(523,"WebGUI",$language);
 	}
         if ($groupId ne "") {
-                @users = WebGUI::SQL->buildArray("select userId from groupings where groupId=".quote($groupId));
+                @users = $self->session->db->buildArray("select userId from groupings where groupId=".$self->session->db->quote($groupId));
         }
 	@users = ($userId,@users) if ($userId ne "" && !isIn($userId, @users));
         foreach $user (@users) {
@@ -214,11 +214,11 @@ sub addInternationalizedEntry {
                         $subject = $subject{$u->profileField("language")};
                         $message{$u->profileField("language")} = $message{1} if ($message{$u->profileField("language")} eq "");
 			$message = $message{$u->profileField("language")};
-                        WebGUI::Macro::process(\$message);
-                        WebGUI::SQL->write("insert into messageLog values (".quote($messageLogId).",".quote($u->userId).",
-                                ".quote($message).",".quote($url).",".time().",".quote($message).",".quote($status).")");
+                        WebGUI::Macro::process($self->session,\$message);
+                        $self->session->db->write("insert into messageLog values (".$self->session->db->quote($messageLogId).",".$self->session->db->quote($u->userId).",
+                                ".$self->session->db->quote($message).",".$self->session->db->quote($url).",".time().",".$self->session->db->quote($message).",".$self->session->db->quote($status).")");
                         if ($url ne "") {
-                                $message .= "\n".WebGUI::URL::append($url,'mlog='.$messageLogId);
+                                $message .= "\n".$self->session->url->append($url,'mlog='.$messageLogId);
                         }
 			_notify($u,$subject,$message);
                 }
@@ -238,7 +238,7 @@ The id of the message to complete.
 =cut
 
 sub completeEntry {
-	WebGUI::SQL->write("update messageLog set status='completed', dateOfEntry=".time()." where messageLogId=".quote($_[0]));
+	$self->session->db->write("update messageLog set status='completed', dateOfEntry=".time()." where messageLogId=".$self->session->db->quote($_[0]));
 }
 
 

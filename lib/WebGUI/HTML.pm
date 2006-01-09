@@ -282,7 +282,7 @@ sub makeAbsolute {
 				next;
 			}
 			if ($tag_attr{"$tagname $_"}) {	# make this absolute
-				$attr->{$_} = WebGUI::URL::makeAbsolute($attr->{$_}, $baseURL);
+				$attr->{$_} = $self->session->url->makeAbsolute($attr->{$_}, $baseURL);
 			}
 			$session{temp}{makeAbsolute}{html} .= qq' $_="$attr->{$_}"';
 		}
@@ -318,7 +318,7 @@ sub processReplacements {
 			$content =~ s/\Q$searchFor/$replaceWith/gs;
 		}
 	} else {
-		my $sth = WebGUI::SQL->read("select searchFor,replaceWith from replacements",WebGUI::SQL->getSlave);
+		my $sth = $self->session->db->read("select searchFor,replaceWith from replacements",$self->session->db->getSlave);
         	while (my ($searchFor,$replaceWith) = $sth->array) {
 			$session{replacements}{$searchFor} = $replaceWith;
         		$content =~ s/\Q$searchFor/$replaceWith/gs;

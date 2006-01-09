@@ -191,8 +191,8 @@ A string containing the link to the tab-CascadingStyleSheet
 sub new {
 	my $class = shift;
 	my $startingTabs = shift;
-	my $css = shift || $session{config}{extrasURL}.'/tabs/tabs.css';
-	my $cancelUrl = shift || WebGUI::URL::page();
+	my $css = shift || $self->session->config->get("extrasURL").'/tabs/tabs.css';
+	my $cancelUrl = shift || $self->session->url->page();
 	my $uiLevelOverride = shift;
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
@@ -219,8 +219,8 @@ Returns an HTML string with all the necessary components to draw the tab form.
 
 sub print {
 	my $self = shift;
-	WebGUI::Style::setScript($session{config}{extrasURL}.'/tabs/tabs.js',{type=>"text/javascript"});
-	WebGUI::Style::setLink($self->{_css},{rel=>"stylesheet", rev=>"stylesheet",type=>"text/css"});
+	$self->session->style->setScript($self->session->config->get("extrasURL").'/tabs/tabs.js',{type=>"text/javascript"});
+	$self->session->style->setLink($self->{_css},{rel=>"stylesheet", rev=>"stylesheet",type=>"text/css"});
 	my $output = $self->{_form};
 	$output .= $self->{_hidden};
 	my $i = 1;
@@ -228,7 +228,7 @@ sub print {
 	my $form;	
 	foreach my $key (keys %{$self->{_tab}}) {
 		$tabs .= '<span onclick="toggleTab('.$i.')" id="tab'.$i.'" class="tab"';
-                if ($self->{_tab}->{$key}{uiLevel} > $session{user}{uiLevel}) {
+                if ($self->{_tab}->{$key}{uiLevel} > $self->session->user->profileField("uiLevel")) {
                         $tabs .= 'style="display: none;"';
                 }
                 $tabs .= '>'.$self->{_tab}{$key}{label}.'</span> ';
@@ -241,7 +241,7 @@ sub print {
 	$output .= $form;
 	$output .= WebGUI::Form::formFooter();
 	$output .= '<script type="text/javascript">var numberOfTabs = '.($i-1).'; initTabs();</script>';
-	$output .= '<script type="text/javascript" src="'.$session{config}{extrasURL}.'/wz_tooltip.js"></script>';
+	$output .= '<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wz_tooltip.js"></script>';
 	return $output;
 }
 

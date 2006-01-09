@@ -7,15 +7,15 @@ use WebGUI::Session;
 use WebGUI::International;
 
 ##Get list of all macros by namespace/module name
-my $dir = join '/', $session{config}{webguiRoot},"lib","WebGUI","Macro";
-opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open Macro directory: $dir!");
+my $dir = join '/', $self->session->config->getWebguiRoot,"lib","WebGUI","Macro";
+opendir (DIR,$dir) or $self->session->errorHandler->fatal("Can't open Macro directory: $dir!");
 my @macros = map { s/Macro_//; s/\.pm//; $_; }
              grep { /\.pm$/ }
              readdir(DIR);  ##list of namespaces
 closedir(DIR);
 
 ##Build list of enabled macros, by namespace by reversing session hash:
-my %macros = reverse %{ $session{config}{macros} };
+my %macros = reverse %{ $self->session->config->get("macros") };
 
 $macro_table =
         join "\n", 

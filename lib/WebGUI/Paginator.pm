@@ -16,8 +16,6 @@ package WebGUI::Paginator;
 
 use strict;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -221,7 +219,7 @@ sub getFirstPageLink {
         $text = '|&lt;'.WebGUI::International::get(404);
         if ($pn > 1) {
                 return '<a href="'.
-			WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'=1'))
+			$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'=1'))
 			.'">'.$text.'</a>';
         } else {
                 return $text;
@@ -243,7 +241,7 @@ sub getLastPageLink {
         $text = WebGUI::International::get(405).'&gt;|';
         if ($pn != $_[0]->getNumberOfPages) {
                 return '<a href="'.
-			WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.$_[0]->getNumberOfPages))
+			$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'='.$_[0]->getNumberOfPages))
 			.'">'.$text.'</a>';
         } else {
                 return $text;
@@ -264,7 +262,7 @@ sub getNextPageLink {
 	$pn = $_[0]->getPageNumber;
         $text = WebGUI::International::get(92).'&raquo;';
         if ($pn < $_[0]->getNumberOfPages) {
-                return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn+1))).'">'.$text.'</a>';
+                return '<a href="'.$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn+1))).'">'.$text.'</a>';
         } else {
                 return $text;
         }
@@ -365,7 +363,7 @@ sub getPageLinks {
 		if ($i+1 == $pn) {
 			push(@pages,($i+1));
 		} else {
-			push(@pages,'<a href="'.WebGUI::URL::append($self->{_url},($self->{_formVar}.'='.($i+1))).'">'.($i+1).'</a>');
+			push(@pages,'<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'">'.($i+1).'</a>');
 		}
 	}
 	if ($limit) {
@@ -401,7 +399,7 @@ sub getPreviousPageLink {
 	$pn = $_[0]->getPageNumber;
 	$text = '&laquo;'.WebGUI::International::get(91);
 	if ($pn > 1) {
-		return '<a href="'.WebGUI::URL::append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn-1))).'">'.$text.'</a>';
+		return '<a href="'.$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn-1))).'">'.$text.'</a>';
         } else {
         	return $text;
         }
@@ -437,7 +435,7 @@ The number of rows to display per page. If left blank it defaults to 50.
 
 =head3 pageNumber 
 
-By default the page number will be determined by looking at $session{form}{pn}. If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
+By default the page number will be determined by looking at $self->session->form->process("pn"). If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
 
 =head3 formVar
 
@@ -511,12 +509,12 @@ A value to match the dynamicPageNumberKey.
 sub setDataByQuery {
 	my ($sth, $rowCount, @row);
 	my ($self, $sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
-	$dbh ||= WebGUI::SQL->getSlave;
+	$dbh ||= $self->session->db->getSlave;
 	if ($unconditional) {
-		$sth = WebGUI::SQL->unconditionalRead($sql,$dbh,$placeholders);
+		$sth = $self->session->db->unconditionalRead($sql,$dbh,$placeholders);
 		return $sth->errorMessage if ($sth->errorCode > 0);
 	} else {
-		$sth = WebGUI::SQL->read($sql,$dbh,$placeholders);
+		$sth = $self->session->db->read($sql,$dbh,$placeholders);
 	}
 	my $defaultPageNumber = $self->getPageNumber;
 	$self->{_totalRows} = $sth->rows;

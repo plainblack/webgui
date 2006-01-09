@@ -95,7 +95,7 @@ Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insu
 
 sub www_editBranch {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("assets");
+	my $ac = WebGUI::AdminConsole->new($self->session,"assets");
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my $tabform = WebGUI::TabForm->new;
 	$tabform->hidden({name=>"func",value=>"editBranchSave"});
@@ -158,7 +158,7 @@ sub www_editBranch {
 		-label=>WebGUI::International::get(1073,"Asset"),
 		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
-		-afterEdit=>'op=editPage;npp='.$session{form}{npp},
+		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_styleTemplateId"})
 		);
          $tabform->getTab("display")->template(
@@ -166,7 +166,7 @@ sub www_editBranch {
 		-label=>WebGUI::International::get(1079,"Asset"),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
-		-afterEdit=>'op=editPage;npp='.$session{form}{npp},
+		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_printableStyleTemplateId"})
 		);
         $tabform->getTab("display")->interval(
@@ -214,12 +214,12 @@ sub www_editBranch {
         my $clause;
         if (WebGUI::Grouping::isInGroup(3)) {
                 my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
-                push (@$contentManagers, $session{user}{userId});
-                $clause = "userId in (".quoteAndJoin($contentManagers).")";
+                push (@$contentManagers, $self->session->user->profileField("userId"));
+                $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
-                $clause = "userId=".quote($self->get("ownerUserId"));
+                $clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));
         }
-        my $users = WebGUI::SQL->buildHashRef("select userId,username from users where $clause order by username");
+        my $users = $self->session->db->buildHashRef("select userId,username from users where $clause order by username");
         $tabform->getTab("security")->selectBox(
                -name=>"ownerUserId",
                -options=>$users,
@@ -253,7 +253,7 @@ sub www_editBranch {
                 -uiLevel=>5,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_extraHeadTags"})
                 );
-        if ($session{setting}{metaDataEnabled}) {
+        if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
                         my $fieldType = $meta->{$field}{fieldType} || "text";
@@ -291,26 +291,26 @@ sub www_editBranchSave {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
 	my %data;
-	$data{isHidden} = WebGUI::FormProcessor::yesNo("isHidden") if (WebGUI::FormProcessor::yesNo("change_isHidden"));
-	$data{newWindow} = WebGUI::FormProcessor::yesNo("newWindow") if (WebGUI::FormProcessor::yesNo("change_newWindow"));
-	$data{displayTitle} = WebGUI::FormProcessor::yesNo("displayTitle") if (WebGUI::FormProcessor::yesNo("change_displayTitle"));
-	$data{styleTemplateId} = WebGUI::FormProcessor::template("styleTemplateId") if (WebGUI::FormProcessor::yesNo("change_styleTemplateId"));
-	$data{printableStyleTemplateId} = WebGUI::FormProcessor::template("printableStyleTemplateId") if (WebGUI::FormProcessor::yesNo("change_printableStyleTemplateId"));
-	$data{cacheTimeout} = WebGUI::FormProcessor::interval("cacheTimeout") if (WebGUI::FormProcessor::yesNo("change_cacheTimeout"));
-	$data{cacheTimeoutVisitor} = WebGUI::FormProcessor::interval("cacheTimeoutVisitor") if (WebGUI::FormProcessor::yesNo("change_cacheTimeoutVisitor"));
-	$data{encryptPage} = WebGUI::FormProcessor::yesNo("encryptPage") if (WebGUI::FormProcessor::yesNo("change_encryptPage"));
-	$data{startDate} = WebGUI::FormProcessor::dateTime("startDate") if (WebGUI::FormProcessor::yesNo("change_startDate"));
-	$data{endDate} = WebGUI::FormProcessor::dateTime("endDate") if (WebGUI::FormProcessor::yesNo("change_endDate"));
-	$data{ownerUserId} = WebGUI::FormProcessor::selectBox("ownerUserId") if (WebGUI::FormProcessor::yesNo("change_ownerUserId"));
-	$data{groupIdView} = WebGUI::FormProcessor::group("groupIdView") if (WebGUI::FormProcessor::yesNo("change_groupIdView"));
-	$data{groupIdEdit} = WebGUI::FormProcessor::group("groupIdEdit") if (WebGUI::FormProcessor::yesNo("change_groupIdEdit"));
-	$data{extraHeadTags} = WebGUI::FormProcessor::group("extraHeadTags") if (WebGUI::FormProcessor::yesNo("change_extraHeadTags"));
+	$data{isHidden} = $self->session->form->yesNo("isHidden") if ($self->session->form->yesNo("change_isHidden"));
+	$data{newWindow} = $self->session->form->yesNo("newWindow") if ($self->session->form->yesNo("change_newWindow"));
+	$data{displayTitle} = $self->session->form->yesNo("displayTitle") if ($self->session->form->yesNo("change_displayTitle"));
+	$data{styleTemplateId} = $self->session->form->template("styleTemplateId") if ($self->session->form->yesNo("change_styleTemplateId"));
+	$data{printableStyleTemplateId} = $self->session->form->template("printableStyleTemplateId") if ($self->session->form->yesNo("change_printableStyleTemplateId"));
+	$data{cacheTimeout} = $self->session->form->interval("cacheTimeout") if ($self->session->form->yesNo("change_cacheTimeout"));
+	$data{cacheTimeoutVisitor} = $self->session->form->interval("cacheTimeoutVisitor") if ($self->session->form->yesNo("change_cacheTimeoutVisitor"));
+	$data{encryptPage} = $self->session->form->yesNo("encryptPage") if ($self->session->form->yesNo("change_encryptPage"));
+	$data{startDate} = $self->session->form->dateTime("startDate") if ($self->session->form->yesNo("change_startDate"));
+	$data{endDate} = $self->session->form->dateTime("endDate") if ($self->session->form->yesNo("change_endDate"));
+	$data{ownerUserId} = $self->session->form->selectBox("ownerUserId") if ($self->session->form->yesNo("change_ownerUserId"));
+	$data{groupIdView} = $self->session->form->group("groupIdView") if ($self->session->form->yesNo("change_groupIdView"));
+	$data{groupIdEdit} = $self->session->form->group("groupIdEdit") if ($self->session->form->yesNo("change_groupIdEdit"));
+	$data{extraHeadTags} = $self->session->form->group("extraHeadTags") if ($self->session->form->yesNo("change_extraHeadTags"));
 	my ($urlBaseBy, $urlBase, $endOfUrl);
-	my $changeUrl = WebGUI::FormProcessor::yesNo("change_url");
+	my $changeUrl = $self->session->form->yesNo("change_url");
 	if ($changeUrl) {
-		$urlBaseBy = WebGUI::FormProcessor::selectBox("baseUrlBy");
-		$urlBase = WebGUI::FormProcessor::text("baseUrl");
-		$endOfUrl = WebGUI::FormProcessor::selectBox("endOfUrl");
+		$urlBaseBy = $self->session->form->selectBox("baseUrlBy");
+		$urlBase = $self->session->form->text("baseUrl");
+		$endOfUrl = $self->session->form->selectBox("endOfUrl");
 	}
 	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
 	foreach my $descendant (@{$descendants}) {
@@ -336,14 +336,14 @@ sub www_editBranchSave {
 		foreach my $form (keys %{$session{form}}) {
                 	if ($form =~ /^metadata_(.*)$/) {
 				my $fieldName = $1;
-				if (WebGUI::FormProcessor::yesNo("change_metadata_".$fieldName)) {
+				if ($self->session->form->yesNo("change_metadata_".$fieldName)) {
                         		$newRevision->updateMetaData($fieldName,$session{form}{$form});
 				}
                 	}
         	}
 	}
 	delete $self->{_parent};
-	$session{asset} = $self->getParent;
+	$self->session->asset = $self->getParent;
 	return $self->getParent->www_manageAssets;
 }
 

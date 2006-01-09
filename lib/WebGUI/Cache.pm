@@ -14,7 +14,6 @@ package WebGUI::Cache;
 
 =cut
 
-use WebGUI::Session;
 use File::Path;
 use HTTP::Headers;
 use HTTP::Request;
@@ -77,7 +76,8 @@ Flushes the caching system. Must be overridden.
 =cut
 
 sub flush {
-	rmtree($WebGUI::Session::session{config}{uploadsPath}."/temp");
+	my $self = shift;
+	rmtree($self->session->config->get("uploadsPath")."/temp");
 }
 
 #-------------------------------------------------------------------
@@ -95,9 +95,13 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 new ( key, [ namepsace ] )
+=head2 new ( session, key, [ namepsace ] )
 
 The new method will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 key
 
@@ -112,12 +116,13 @@ A subdivider to store this cache under. When building your own cache plug-in def
 sub new {
 	my $cache;
 	my $class = shift;
-	if($WebGUI::Session::session{config}{memcached_servers}) {
+	my $session = shift;
+	if($session->config->get("memcached_servers")) {
 		require WebGUI::Cache::Memcached;
-		return WebGUI::Cache::Memcached->new(@_);
+		return WebGUI::Cache::Memcached->new($session,@_);
 	} else {
 		require WebGUI::Cache::FileCache;
-		return WebGUI::Cache::FileCache->new(@_);
+		return WebGUI::Cache::FileCache->new($session,@_);
 	}
 }
 
@@ -150,6 +155,19 @@ sub parseKey {
                 $key =~ s/\//-/g;
 		return $key;
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 session ( ) 
+
+Returns a reference session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 #-------------------------------------------------------------------
@@ -197,13 +215,13 @@ sub setByHTTP {
         $userAgent->agent("WebGUI/".$WebGUI::VERSION);
         $userAgent->timeout(30);
         my $header = new HTTP::Headers;
-        my $referer = "http://webgui.http.request/".$WebGUI::Session::session{env}{SERVER_NAME}.$WebGUI::Session::session{env}{REQUEST_URI};
+        my $referer = "http://webgui.http.request/".$self->session->env->get("SERVER_NAME").$self->session->env->get("REQUEST_URI");
         chomp $referer;
         $header->referer($referer);
         my $request = new HTTP::Request (GET => $url, $header);
         my $response = $userAgent->request($request);
         if ($response->is_error) {
-                WebGUI::ErrorHandler::error($url." could not be retrieved.");
+                $self->session->errorHandler->error($url." could not be retrieved.");
         } else {
                 $self->set($response->content,$ttl);
         }

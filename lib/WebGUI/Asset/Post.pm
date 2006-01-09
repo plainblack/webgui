@@ -700,8 +700,8 @@ sub processPropertiesFromFormPost {
 	}
 	$self->session->form->process("proceed") = "redirectToParent";
 	# clear some cache
-	WebGUI::Cache->new("wobject_".$self->getThread->getParent->getId."_".$self->session->user->profileField("userId"))->delete;
-	WebGUI::Cache->new("cspost_".($self->getParent->getId)."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_1")->delete;
+	WebGUI::Cache->new($self->session,"wobject_".$self->getThread->getParent->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Cache->new($self->session,"cspost_".($self->getParent->getId)."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_1")->delete;
 }
 
 

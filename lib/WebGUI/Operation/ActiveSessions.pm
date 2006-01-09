@@ -88,7 +88,7 @@ sub www_viewActiveSessions {
         $output .= $p->getPage($session->form->process("pn"));
         $output .= '</table>';
         $output .= $p->getBarTraditional($session->form->process("pn"));
-	return WebGUI::AdminConsole->new("activeSessions")->render($output);
+	return WebGUI::AdminConsole->new($session,"activeSessions")->render($output);
 }
 
 1;

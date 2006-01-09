@@ -115,17 +115,22 @@ A web executable method that redirects the user to the specified page, or displa
 =cut
 
 sub www_view {
-	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
-	if ($self->session->var->get("adminOn")) {
-		return $self->getContainer->www_view;
-	}
-	my $url = $self->get("redirectUrl");
-	WebGUI::Macro::process(\$url);
-	WebGUI::HTTP::setRedirect($url) unless $self->get("redirectUrl") eq $self->get("url");
-	return "Redirect is self-referential";
+        my $self = shift;
+        return WebGUI::Privilege::noAccess() unless $self->canView;
+        if ($self->session->var->isAdminOn() && $self->canEdit) {
+                my $i18n = WebGUI::International->new("Asset_Redirect");
+                return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
+                        <ul>
+                        <li><a href="'.$self->get("redirectUrl").'">'.$i18n->get("go to the redirect url").'</a></li>
+                        <li><a href="'.$self->getUrl("func=edit").'">'.$i18n->get("edit the redirect properties").'</a></li>
+                        <li><a href="'.$self->getParent->getUrl.'">'.$i18n->get("go to the redirect parent page").'</a></li>
+                        </ul>',$i18n->get("assetName"));
+        }
+        my $url = $self->get("redirectUrl");
+        WebGUI::Macro::process(\$url);
+        $self->session->http->setRedirect($url) unless $self->get("redirectUrl") eq $self->get("url");
+        return "Redirect is self-referential";
 }
-
 
 1;
 

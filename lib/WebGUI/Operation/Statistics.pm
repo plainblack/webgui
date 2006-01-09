@@ -25,7 +25,7 @@ sub _submenu {
 	my $workarea = shift;
 	my $title = shift;
 	$title = WebGUI::International::get($title) if ($title);
-	my $ac = WebGUI::AdminConsole->new("statistics");
+	my $ac = WebGUI::AdminConsole->new($session,"statistics");
 	if ($session->setting->get("trackPageStatistics")) {
 		$ac->addSubmenuItem( $session->url->page('op=viewStatistics'), WebGUI::International::get(144));
 	}
@@ -39,7 +39,7 @@ sub www_viewStatistics {
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);
 	my $url = "http://www.plainblack.com/downloads/latest-version.txt";
-	my $cache = WebGUI::Cache->new($url,"URL");
+	my $cache = WebGUI::Cache->new($session,$url,"URL");
 	my $version = $cache->get;
 	if (not defined $version) {
 		$version = $cache->setByHTTP($url,43200);

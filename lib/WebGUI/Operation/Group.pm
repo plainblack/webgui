@@ -13,7 +13,6 @@ package WebGUI::Operation::Group;
 use strict;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
-use WebGUI::DatabaseLink;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
@@ -46,7 +45,7 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new("groups");
+        my $ac = WebGUI::AdminConsole->new($session,"groups");
         if ($help) {
                 $ac->setHelp($help);
         }
@@ -181,7 +180,7 @@ sub www_addUsersToGroupSave {
 #-------------------------------------------------------------------
 sub www_autoAddToGroup {
 	my $session = shift;
-        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::insufficient()) unless ($session->user->profileField("userId") ne 1);
+        return WebGUI::AdminConsole->new($session,"groups")->render(WebGUI::Privilege::insufficient()) unless ($session->user->profileField("userId") ne 1);
 	my $group = WebGUI::Group->new($session->form->process("groupId"));
 	if ($group->autoAdd) {
 		WebGUI::Grouping::addUsersToGroups([$session->user->profileField("userId")],[$session->form->process("groupId")]);
@@ -192,7 +191,7 @@ sub www_autoAddToGroup {
 #-------------------------------------------------------------------
 sub www_autoDeleteFromGroup {
 	my $session = shift;
-        return WebGUI::AdminConsole->new("groups")->render(WebGUI::Privilege::insufficient()) unless ($session->user->profileField("userId") ne 1);
+        return WebGUI::AdminConsole->new($session,"groups")->render(WebGUI::Privilege::insufficient()) unless ($session->user->profileField("userId") ne 1);
 	my $group = WebGUI::Group->new($session->form->process("groupId"));
 	if ($group->autoDelete) {
 		WebGUI::Grouping::deleteUsersFromGroups([$session->user->profileField("userId")],[$session->form->process("groupId")]);

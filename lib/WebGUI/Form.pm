@@ -69,7 +69,7 @@ sub AUTOLOAD {
 	my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
         if ($@) {
-        	WebGUI::ErrorHandler::error("Couldn't compile form control: ".$name.". Root cause: ".$@);
+        	$self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
                 return undef;
         }
 	my $class = "WebGUI::Form::".$name;
@@ -116,7 +116,7 @@ If you want to add anything special to the form header like javascript actions o
 
 sub formHeader {
 	my $params = shift;
-        my $action = $params->{action} || WebGUI::URL::page();
+        my $action = $params->{action} || $self->session->url->page();
 	my $hidden;
 	if ($action =~ /\?/) {
 		my ($path,$query) = split(/\?/,$action);

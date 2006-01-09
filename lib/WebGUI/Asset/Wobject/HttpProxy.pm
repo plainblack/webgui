@@ -200,8 +200,8 @@ sub view {
 
    return $self->processTemplate({},$self->get("templateId")) unless ($proxiedUrl ne "");
    
-   my $cachedContent = WebGUI::Cache->new($proxiedUrl,"URL");
-   my $cachedHeader = WebGUI::Cache->new($proxiedUrl,"HEADER");
+   my $cachedContent = WebGUI::Cache->new($self->session,$proxiedUrl,"URL");
+   my $cachedHeader = WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER");
    $var{header} = $cachedHeader->get;
    $var{content} = $cachedContent->get;
    unless ($var{content} && $self->session->env->get("REQUEST_METHOD")=~/GET/i) {

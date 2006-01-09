@@ -110,7 +110,7 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 
 sub close {
 	my $self = shift;
-	$session{asset}->DESTROY() if (exists $session{asset} && $session{asset} ne "");
+	$self->session->asset->DESTROY() if (exists $self->session->asset && $self->session->asset ne "");
 	foreach my $slavedbh (@{$self->{_slave}}) {
 		$slavedbh->disconnect();
 	}
@@ -143,7 +143,7 @@ Returns a WebGUI::SQL object, which is connected to the WebGUI database.
 sub db {
 	my $self = shift;
 	if (exists $self->{_db}) {
-		$self->{_db} = WebGUI::SQL->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"), $self);
+		$self->{_db} = $self->session->db->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"), $self);
 	}
 	return $self->{_db};
 }
@@ -162,7 +162,7 @@ sub dbSlave {
 		foreach (1..3) {
 			my $slave = $self->config->get("dbslave".$_);
 			if (exists $slave->{dsn}) {
-				push(@{$self->{_slave}},WebGUI::SQL->connect($slave->{dsn},$slave->{user},$slave->{pass}, $self));
+				push(@{$self->{_slave}},$self->session->db->connect($slave->{dsn},$slave->{user},$slave->{pass}, $self));
 			}
 		}
 	}
@@ -431,7 +431,7 @@ sub user {
 		$self->{_var}{userId} = $option->{userId} || $option->{user}->userId; 
 		$self->db-setRow("userSession","sessionId", $self->{_var});
 		if ($self->setting("passiveProfilingEnabled")) {
-			$self->db->write("update passiveProfileLog set userId = ".quote($self->{_var}{userId})." where sessionId = ".quote($self->getId));
+			$self->db->write("update passiveProfileLog set userId = ".$self->session->db->quote($self->{_var}{userId})." where sessionId = ".$self->session->db->quote($self->getId));
 		}	
 		delete $self->{_stow};
 		$self->{_user} = $option->{user} || WebGUI::User->new($session, $self->{_var}{userId});

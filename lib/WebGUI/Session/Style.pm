@@ -177,7 +177,7 @@ $var{'head.tags'} = '
 function getWebguiProperty (propName) {
 var props = new Array();
 props["extrasURL"] = "'.$self->session->config->get("extrasURL").'";
-props["pageURL"] = "'.WebGUI::URL::page(undef, undef, 1).'";
+props["pageURL"] = "'.$self->session->url->page(undef, undef, 1).'";
 return props[propName];
 }
 </script>
@@ -202,8 +202,8 @@ if (WebGUI::Grouping::isInGroup(2)) {
 	my $macroHeadTags = generateAdditionalHeadTags();
 	WebGUI::Macro::process(\$macroHeadTags);
 	$output =~ s/\<\!-- macro head tags --\>/$macroHeadTags/;
-	if (WebGUI::ErrorHandler::canShowDebug()) {
-		$output .= WebGUI::ErrorHandler::showDebug();
+	if ($self->session->errorHandler->canShowDebug()) {
+		$output .= $self->session->errorHandler->showDebug();
 	}
 	return $output;
 }	

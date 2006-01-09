@@ -34,7 +34,7 @@ B<NOTE:> This entire system is likely to be replaced in the near future.  It has
 
  WebGUI::Macro::filter(\$html);
  WebGUI::Macro::negate(\$html);
- WebGUI::Macro::process(\$html);
+ WebGUI::Macro::process($self->session,\$html);
 
 =head1 METHODS
 

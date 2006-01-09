@@ -19,20 +19,15 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::DateTime;
-use WebGUI::ErrorHandler;
-use WebGUI::FormProcessor;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
 use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 use WebGUI::Utility;
+use WebGUI::User;
 use WebGUI::Operation::Shared;
 use WebGUI::Operation::Profile;
 
@@ -61,8 +56,8 @@ sub _isDuplicateUsername {
 	my $self = shift;
 	my $username = shift;
 	#Return false if the user is already logged in, but not changing their username.
-	return 0 if($self->userId ne "1" && $session{user}{username} eq $username);
-	my ($otherUser) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($username));
+	return 0 if($self->userId ne "1" && $self->session->user->username eq $username);
+	my ($otherUser) = $self->session->db->quickArray("select count(*) from users where username=".$self->session->db->quote($username));
 	return 0 if !$otherUser;
 	$self->error('<li>'.WebGUI::International::get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"'.'</li>');
 	return 1;
@@ -81,7 +76,7 @@ sub _isValidUsername {
    my $username = shift;
    my $error = "";
    
-   return 1 if($self->userId ne "1" && $session{user}{username} eq $username);
+   return 1 if($self->userId ne "1" && $self->session->user->username eq $username);
    
    if ($username =~ /^\s/ || $username =~ /\s$/) {
       $error .= '<li>'.WebGUI::International::get(724).'</li>';
@@ -98,8 +93,9 @@ sub _isValidUsername {
 
 #-------------------------------------------------------------------
 sub _logLogin {
-   WebGUI::SQL->write("insert into userLoginLog values (".quote($_[0]).",".quote($_[1]).",".time().","
-	.quote($session{env}{REMOTE_ADDR}).",".quote($session{env}{HTTP_USER_AGENT}).")");
+	my $self = shift;
+   $self->session->db->write("insert into userLoginLog values (".$self->session->db->$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).",".time().","
+	.$self->session->db->$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",".$self->session->db->$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
 }
 
 #-------------------------------------------------------------------
@@ -138,7 +134,7 @@ Superclass method that performs standard login routines.  This method should ret
 sub authenticate {
    my $self = shift;
    my $username = shift;
-   my $user = WebGUI::SQL->quickHashRef("select userId,authMethod,status from users where username=".quote($username));
+   my $user = $self->session->db->quickHashRef("select userId,authMethod,status from users where username=".$self->session->db->$self->session->db->quote($username));
    my $uid = $user->{userId};
    #If userId does not exist or is not active, fail login
    if(!$uid){
@@ -146,12 +142,12 @@ sub authenticate {
 	  return 0;
    } elsif($user->{status} ne 'Active'){
       $self->error(WebGUI::International::get(820));
-	  _logLogin($uid, "failure");
+	  $self->_logLogin($uid, "failure");
 	  return 0;
    }
    
    #Set User Id
-   $self->user(WebGUI::User->new($uid));
+   $self->user(WebGUI::User->new($self->session,$uid));
    return 1;
 }
 
@@ -205,10 +201,10 @@ sub createAccount {
 	$vars->{'create.form.submit'} = WebGUI::Form::submit({});
     $vars->{'create.form.footer'} = WebGUI::Form::formFooter();
 	
-    $vars->{'login.url'} = WebGUI::URL::page('op=auth;method=init');
+    $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
-	return WebGUI::Asset::Template->new($self->getCreateAccountTemplateId)->process($vars);
+	return WebGUI::Asset::Template->new($self->session,$self->getCreateAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -243,12 +239,12 @@ sub createAccountSave {
    my $profile = $_[3];
    
       
-   my $u = WebGUI::User->new("new");
+   my $u = WebGUI::User->new($self->session,"new");
    $self->user($u);
    my $userId = $u->userId;
    $u->username($username);
    $u->authMethod($self->authMethod);
-   $u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
+   $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
    WebGUI::Operation::Profile::saveProfileFields($u,$profile) if($profile);
    $self->saveParams($userId,$self->authMethod,$properties);
    
@@ -259,11 +255,11 @@ sub createAccountSave {
       WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),$self->getSetting("welcomeMessage").$authInfo);
    }
   $session->user({user=>$u});  
-   _logLogin($userId,"success");
-	my $command = $session{setting}{runOnRegistration};
-	WebGUI::Macro::process(\$command);
-   system($command) if ($session{setting}{runOnRegistration} ne "");
-   WebGUI::MessageLog::addInternationalizedEntry('',$session{setting}{onNewUserAlertGroup},'',536) if ($session{setting}{alertOnNewUser});
+   $self->_logLogin($userId,"success");
+	my $command = $self->session->setting->get("runOnRegistration");
+	WebGUI::Macro::process($self->session,\$command);
+   system($command) if ($self->session->setting->get("runOnRegistration") ne "");
+   WebGUI::MessageLog::addInternationalizedEntry('',$self->session->setting->get("onNewUserAlertGroup"),'',536) if ($self->session->setting->get("alertOnNewUser"));
    return "";
 }
 
@@ -283,15 +279,15 @@ sub deactivateAccount {
    my $self = shift;
    my $method = $_[0];
    return WebGUI::Privilege::vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
-   return WebGUI::Privilege::adminOnly() if(!$session{setting}{selfDeactivation});
+   return WebGUI::Privilege::adminOnly() if(!$self->session->setting->get("selfDeactivation"));
    my %var; 
   	$var{title} = WebGUI::International::get(42);
    	$var{question} =  WebGUI::International::get(60);
-   	$var{'yes.url'} = WebGUI::URL::page('op=auth;method='.$method);
+   	$var{'yes.url'} = $self->session->url->page('op=auth;method='.$method);
 	$var{'yes.label'} = WebGUI::International::get(44);
-   	$var{'no.url'} = WebGUI::URL::page();
+   	$var{'no.url'} = $self->session->url->page();
 	$var{'no.label'} = WebGUI::International::get(45);
-	return WebGUI::Asset::Template->new("PBtmpl0000000000000057")->process(\%var);
+	return WebGUI::Asset::Template->new($self->session,"PBtmpl0000000000000057")->process(\%var);
 }
 
 #-------------------------------------------------------------------
@@ -307,8 +303,8 @@ sub deactivateAccountConfirm {
    return WebGUI::Privilege::vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
    my $u = $self->user;
    $u->status("Selfdestructed");
-   WebGUI::Session::end($session{var}{sessionId});
-   WebGUI::Session::start(1);   
+   $self->session->var->end();
+   $self->session->var->start(1);   
 }
 
 #-------------------------------------------------------------------
@@ -321,7 +317,7 @@ Removes the user's authentication parameters from the database for all authentic
 
 sub deleteParams {
    my $self = shift;
-   WebGUI::SQL->write("delete from authentication where userId=".quote($self->userId));
+   $self->session->db->write("delete from authentication where userId=".$self->session->db->$self->session->db->quote($self->userId));
 }
 
 #-------------------------------------------------------------------
@@ -350,15 +346,15 @@ sub displayAccount {
    $vars->{'account.form.header'} = WebGUI::Form::formHeader({});
    $vars->{'account.form.header'} .= WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
    $vars->{'account.form.header'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
-   if($session{setting}{useKarma}){
-      $vars->{'account.form.karma'} = $session{user}{karma};
+   if($self->session->setting->get("useKarma")){
+      $vars->{'account.form.karma'} = $self->session->user->karma;
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
    $vars->{'account.form.submit'} = WebGUI::Form::submit({});
    $vars->{'account.form.footer'} = WebGUI::Form::formFooter();
    
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
-   return WebGUI::Asset::Template->new($self->getAccountTemplateId)->process($vars);
+   return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -381,13 +377,13 @@ sub displayLogin {
     	my $self = shift;
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
-	unless ($session{form}{op} eq "auth") {
-	   	WebGUI::Session::setScratch("redirectAfterLogin",WebGUI::URL::page($session{env}{QUERY_STRING}));
+	unless ($self->session->form->get("op") eq "auth") {
+	   	$self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
 	}
 	$vars->{title} = WebGUI::International::get(66);
 	my $action;
-        if ($session{setting}{encryptLogin}) {
-                $action = WebGUI::URL::page(undef,1);
+        if ($self->session->setting->get("encryptLogin")) {
+                $action = $self->session->url->page(undef,1);
                 $action =~ s/http:/https:/;
         }
 	$vars->{'login.form.header'} = WebGUI::Form::formHeader({action=>$action});
@@ -399,10 +395,10 @@ sub displayLogin {
     	$vars->{'login.form.password.label'} = WebGUI::International::get(51);
 	$vars->{'login.form.submit'} = WebGUI::Form::submit({"value"=>WebGUI::International::get(52)});
 	$vars->{'login.form.footer'} = WebGUI::Form::formFooter();
-	$vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
-	$vars->{'createAccount.url'} = WebGUI::URL::page('op=auth;method=createAccount');
+	$vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
+	$vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
 	$vars->{'createAccount.label'} = WebGUI::International::get(67);
-	return WebGUI::Asset::Template->new($self->getLoginTemplateId)->process($vars);
+	return WebGUI::Asset::Template->new($self->session,$self->getLoginTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -492,7 +488,7 @@ sub getParams {
     my $self = shift;
 	my $userId = $_[0] || $self->userId;
 	my $authMethod = $_[1] || $self->authMethod;
-	return WebGUI::SQL->buildHashRef("select fieldName, fieldData from authentication where userId=".quote($userId)." and authMethod=".quote($authMethod));
+	return $self->session->db->buildHashRef("select fieldName, fieldData from authentication where userId=".$self->session->db->quote($userId)." and authMethod=".$self->session->db->quote($authMethod));
 }
 
 #-------------------------------------------------------------------
@@ -511,7 +507,7 @@ sub getSetting {
 	my $self = shift;
 	my $setting = $_[0];
 	$setting = lc($self->authMethod).ucfirst($setting);
-	return $session{setting}{$setting};
+	return $self->session->setting->get("$setting");
 }
 
 #-------------------------------------------------------------------
@@ -559,12 +555,12 @@ sub login {
    $uid = $self->userId;
    $u = WebGUI::User->new($uid);
    $session->user({user=>$u});
-   $u->karma($session{setting}{karmaPerLogin},"Login","Just for logging in.") if ($session{setting}{useKarma});
-   _logLogin($uid,"success");
+   $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
+   $self->_logLogin($uid,"success");
    
-   if ($session{scratch}{redirectAfterLogin}) {
-		WebGUI::HTTP::setRedirect($session{scratch}{redirectAfterLogin});
-	  	WebGUI::Session::deleteScratch("redirectAfterLogin");
+   if ($self->session->scratch->get("redirectAfterLogin")) {
+		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
+	  	$self->session->scratch->delete("redirectAfterLogin");
    }
    return "";
 }
@@ -579,18 +575,20 @@ Superclass method that performs standard logout routines.
 
 sub logout {
 	my $self = shift;
-   WebGUI::Session::end($session{var}{sessionId});
-   WebGUI::Session::start(1);
-	my $u = WebGUI::User->new(1);
+   $self->session->var->end($self->session->var->get("sessionId"));
+   $self->session->var->start(1);
+	my $u = WebGUI::User->new($self->session,1);
 	$self->{user} = $u;
    return "";
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( authMethod [,userId,callable] )
+=head2 new ( session, authMethod [,userId,callable] )
 
 Constructor.
+
+=head3 session
 
 =head3 authMethod
   
@@ -598,7 +596,7 @@ This object's authentication method
   
 =head3 userId
 
-userId for the user requesting authentication.  This defaults to $session{user}{userId}
+userId for the user requesting authentication.  This defaults to $self->session->user->profileField("userId")
   
 =head3 callable
 
@@ -608,19 +606,17 @@ Array reference of methods allowed to be called externally;
 
 sub new {
 	my $self = {};
-	shift;
-	
-	#Initialize data
-	$self->{authMethod} = $_[0];
-	my $userId = $_[1] || $session{user}{userId};
-	my $u = WebGUI::User->new($userId);
-	$self->{user} = $u;
+	my $class = shift;
+	my $self->{_session} = shift;
+	$self->{authMethod} = shift;
+	my $userId = shift || $self->{_session}->user->userId;
+	$self->{user} = $self->{_session}->user;
 	$self->{error} = "";
 	$self->{profile} = ();
 	$self->{warning} = "";
-	my @callable = ('init', @{$_[2]});
+	my @callable = ('init', @{shift});
 	$self->{callable} = \@callable;
-	bless($self);
+	bless $self, $class;
 	return $self;
 }
 
@@ -639,6 +635,13 @@ sub profile {
 }
 
 
+
+#-------------------------------------------------------------------
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
 
 #-------------------------------------------------------------------
 
@@ -683,8 +686,8 @@ sub saveParams {
     my $self = shift;
 	my ($uid, $authMethod, $data) = @_;
 	foreach (keys %{$data}) {
-       WebGUI::SQL->write("delete from authentication where userId=".quote($uid)." and authMethod=".quote($authMethod)." and fieldName=".quote($_));
-   	   WebGUI::SQL->write("insert into authentication (userId,authMethod,fieldData,fieldName) values (".quote($uid).",".quote($authMethod).",".quote($data->{$_}).",".quote($_).")");
+       $self->session->db->write("delete from authentication where userId=".$self->session->db->quote($uid)." and authMethod=".$self->session->db->quote($authMethod)." and fieldName=".$self->session->db->quote($_));
+   	   $self->session->db->write("insert into authentication (userId,authMethod,fieldData,fieldName) values (".$self->session->db->quote($uid).",".$self->session->db->quote($authMethod).",".$self->session->db->quote($data->{$_}).",".$self->session->db->quote($_).")");
     }
 }
 

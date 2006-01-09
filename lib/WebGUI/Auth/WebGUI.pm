@@ -16,13 +16,9 @@ use URI;
 use WebGUI::Asset::Template;
 use WebGUI::Auth;
 use WebGUI::DateTime;
-use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
 use WebGUI::Macro;
 use WebGUI::Mail;
-use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Storage::Image;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -70,7 +66,7 @@ sub _isValidPassword {
 =cut
 
 sub _logSecurityMessage {
-    WebGUI::ErrorHandler::security("change password.  Password changed successfully");
+    $self->session->errorHandler->security("change password.  Password changed successfully");
 }
 
 #-------------------------------------------------------------------
@@ -94,9 +90,9 @@ sub addUserForm {
 	-name=>"authWebGUI.passwordTimeout",
 	-label=>WebGUI::International::get(16,'AuthWebGUI'),
 	-value=>$userData->{passwordTimeout},
-	-defaultValue=>$session{setting}{webguiPasswordTimeout}
+	-defaultValue=>$self->session->setting->get("webguiPasswordTimeout")
 	);
-   my $userChange = $session{setting}{webguiChangeUsername};
+   my $userChange = $self->session->setting->get("webguiChangeUsername");
    if($userChange || $userChange eq "0"){
       $userChange = $userData->{changeUsername};
    }
@@ -105,7 +101,7 @@ sub addUserForm {
                 -value=>$userChange,
                 -label=>WebGUI::International::get(21,'AuthWebGUI')
              );
-   my $passwordChange = $session{setting}{webguiChangePassword};
+   my $passwordChange = $self->session->setting->get("webguiChangePassword");
    if($passwordChange || $passwordChange eq "0"){
       $passwordChange = $userData->{changePassword};
    }
@@ -128,14 +124,14 @@ sub addUserForm {
 sub addUserFormSave {
    my $self = shift;
    my $properties;
-   unless ($session{form}{'authWebGUI.identifier'} eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($session{form}{'authWebGUI.identifier'});
+   unless ($self->session->form->get('authWebGUI.identifier') eq "password") {
+      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->get('authWebGUI.identifier'));
    }
-   $properties->{changeUsername} = $session{form}{'authWebGUI.changeUsername'};
-   $properties->{changePassword} = $session{form}{'authWebGUI.changePassword'};
-   $properties->{passwordTimeout} =  WebGUI::FormProcessor::interval('authWebGUI.passwordTimeout');
+   $properties->{changeUsername} = $self->session->form->get('authWebGUI.changeUsername');
+   $properties->{changePassword} = $self->session->form->get('authWebGUI.changePassword');
+   $properties->{passwordTimeout} =  $self->session->form->interval('authWebGUI.passwordTimeout');
    $properties->{passwordLastUpdated} = time();
-   if($session{setting}{webguiExpirePasswordOnCreation}){
+   if($self->session->setting->get("webguiExpirePasswordOnCreation")){
       $properties->{passwordLastUpdated} = time() - $properties->{passwordTimeout};   
    }
    $self->SUPER::addUserFormSave($properties);
@@ -154,7 +150,7 @@ sub authenticate {
 	if ((Digest::MD5::md5_base64($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
 		return 1;
 	} 
-	$self->user(WebGUI::User->new(1));
+	$self->user(WebGUI::User->new($self->session,1));
 	$self->error(WebGUI::International::get(68));
 	return 0;
 }
@@ -163,15 +159,15 @@ sub authenticate {
 sub createAccount {
    my $self = shift;
    my $vars;
-   if ($session{user}{userId} ne "1") {
+   if ($self->session->user->profileField("userId") ne "1") {
       return $self->displayAccount;
-   } elsif (!$session{setting}{anonymousRegistration}) {
+   } elsif (!$self->session->setting->get("anonymousRegistration")) {
  	  return $self->displayLogin;
    } 
    $vars->{'create.message'} = $_[0] if ($_[0]);
 	my $storage = WebGUI::Storage::Image->createTemp;
 	my ($filename, $challenge) = $storage->addFileFromCaptcha;
-	$vars->{useCaptcha} = $session{setting}{webguiUseCaptcha};
+	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
 	if ($vars->{useCaptcha}) {
    		$vars->{'create.form.captcha'} = WebGUI::Form::text({"name"=>"authWebGUI.captcha", size=>6, maxlength=>6})
 			.WebGUI::Form::hidden({name=>"authWebGUI.captcha.validation", value=>Digest::MD5::md5_base64(lc($challenge))})
@@ -184,9 +180,9 @@ sub createAccount {
    $vars->{'create.form.password.label'} = WebGUI::International::get(51);
    $vars->{'create.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm"});
    $vars->{'create.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
-   $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$session{form}{confirm}});
+   $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$self->session->form->process("confirm")});
  	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
-	   $vars->{'recoverPassword.url'} = WebGUI::URL::page('op=auth;method=recoverPassword');
+	   $vars->{'recoverPassword.url'} = $self->session->url->page('op=auth;method=recoverPassword');
 	   $vars->{'recoverPassword.label'} = WebGUI::International::get(59);
    return $self->SUPER::createAccount("createAccountSave",$vars);
 }
@@ -195,16 +191,16 @@ sub createAccount {
 sub createAccountSave {
    my $self = shift;
    
-   return $self->displayAccount if ($session{user}{userId} ne "1");
+   return $self->displayAccount if ($self->session->user->profileField("userId") ne "1");
    
-   my $username = $session{form}{'authWebGUI.username'};
-   my $password = $session{form}{'authWebGUI.identifier'};
-   my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
+   my $username = $self->session->form->get('authWebGUI.username');
+   my $password = $self->session->form->get('authWebGUI.identifier');
+   my $passConfirm = $self->session->form->get('authWebGUI.identifierConfirm');
    
    my $error;
    $error = $self->error unless($self->validUsername($username));
-	if ($session{setting}{webguiUseCaptcha}) {
-		unless ($session{form}{'authWebGUI.captcha.validation'} eq Digest::MD5::md5_base64(lc($session{form}{'authWebGUI.captcha'}))) {
+	if ($self->session->setting->get("webguiUseCaptcha")) {
+		unless ($self->session->form->get('authWebGUI.captcha.validation') eq Digest::MD5::md5_base64(lc($self->session->form->get('authWebGUI.captcha')))) {
 			$error .= WebGUI::International::get("captcha failure","AuthWebGUI");
 		}
 	}
@@ -215,31 +211,31 @@ sub createAccountSave {
    return $self->createAccount($error) unless ($error eq "");
    
    #If Email address is not unique, a warning is displayed
-   if($warning ne "" && !$session{form}{confirm}){
-      $session{form}{confirm} = 1;
+   if($warning ne "" && !$self->session->form->process("confirm")){
+      $self->session->form->process("confirm") = 1;
       return $self->createAccount('<li>'.WebGUI::International::get(1078).'</li>');
    }
 
    my $properties;
-   $properties->{changeUsername} = $session{setting}{webguiChangeUsername};
-   $properties->{changePassword} = $session{setting}{webguiChangePassword};   
+   $properties->{changeUsername} = $self->session->setting->get("webguiChangeUsername");
+   $properties->{changePassword} = $self->session->setting->get("webguiChangePassword");   
    $properties->{identifier} = Digest::MD5::md5_base64($password);
    $properties->{passwordLastUpdated} = time();
-   $properties->{passwordTimeout} = $session{setting}{webguiPasswordTimeout};
-   $properties->{status} = 'Deactivated' if ($session{setting}{webguiValidateEmail});
+   $properties->{passwordTimeout} = $self->session->setting->get("webguiPasswordTimeout");
+   $properties->{status} = 'Deactivated' if ($self->session->setting->get("webguiValidateEmail"));
    $self->SUPER::createAccountSave($username,$properties,$password,$profile);
-   	if ($session{setting}{webguiValidateEmail}) {
+   	if ($self->session->setting->get("webguiValidateEmail")) {
 		my $key = WebGUI::Id::generate();
 		$self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
    		WebGUI::Mail::send(
 			$profile->{email},
 			WebGUI::International::get('email address validation email subject','AuthWebGUI'),
-			WebGUI::International::get('email address validation email body','AuthWebGUI')."\n\n".WebGUI::URL::getSiteURL().WebGUI::URL::page("op=auth;method=validateEmail;key=".$key),
+			WebGUI::International::get('email address validation email body','AuthWebGUI')."\n\n".$self->session->url->getSiteURL().$self->session->url->page("op=auth;method=validateEmail;key=".$key),
 			);
 		$self->user->status("Deactivated");
-		WebGUI::Session::end($session{var}{sessionId});
-		WebGUI::Session::start(1);
-		my $u = WebGUI::User->new(1);
+		$self->session->var->end($self->session->var->get("sessionId"));
+		$self->session->var->start(1);
+		my $u = WebGUI::User->new($self->session,1);
 		$self->{user} = $u;
 		$self->logout;
 		return $self->displayLogin(WebGUI::International::get('check email for validation','AuthWebGUI'));
@@ -257,7 +253,7 @@ sub deactivateAccount {
 #-------------------------------------------------------------------
 sub deactivateAccountConfirm {
    my $self = shift;
-   return $self->displayLogin unless ($session{setting}{selfDeactivation});
+   return $self->displayLogin unless ($self->session->setting->get("selfDeactivation"));
    return $self->SUPER::deactivateAccountConfirm;
 }
 
@@ -269,12 +265,12 @@ sub displayAccount {
    my $userData = $self->getParams;
    $vars->{'account.message'} = $_[0] if ($_[0]);
    $vars->{'account.noform'} = 1;
-   if($userData->{changeUsername}  || (!defined $userData->{changeUsername} && $session{setting}{webguiChangeUsername})){
+   if($userData->{changeUsername}  || (!defined $userData->{changeUsername} && $self->session->setting->get("webguiChangeUsername"))){
       $vars->{'account.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$self->username});
       $vars->{'account.form.username.label'} = WebGUI::International::get(50);
       $vars->{'account.noform'} = 0;
    }
-   if($userData->{changePassword} || (!defined $userData->{changePassword} && $session{setting}{webguiChangePassword})){
+   if($userData->{changePassword} || (!defined $userData->{changePassword} && $self->session->setting->get("webguiChangePassword"))){
       $vars->{'account.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>"password"});
       $vars->{'account.form.password.label'} = WebGUI::International::get(51);
       $vars->{'account.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm","value"=>"password"});
@@ -299,7 +295,7 @@ sub displayLogin {
    	return $self->displayAccount($_[0]) if ($self->userId ne "1");
    	$vars->{'login.message'} = $_[0] if ($_[0]);
    	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
-   	$vars->{'recoverPassword.url'} = WebGUI::URL::page('op=auth;method=recoverPassword');
+   	$vars->{'recoverPassword.url'} = $self->session->url->page('op=auth;method=recoverPassword');
    	$vars->{'recoverPassword.label'} = WebGUI::International::get(59);
    	return $self->SUPER::displayLogin("login",$vars);
 }
@@ -329,15 +325,15 @@ sub editUserFormSave {
    my $self = shift;
    my $properties;
    my $userData = $self->getParams;
-   unless (!$session{form}{'authWebGUI.identifier'} || $session{form}{'authWebGUI.identifier'} eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($session{form}{'authWebGUI.identifier'});
+   unless (!$self->session->form->get('authWebGUI.identifier') || $self->session->form->get('authWebGUI.identifier') eq "password") {
+      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->get('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
 	     $properties->{passwordLastUpdated} = time();
       }
    }
-   $properties->{passwordTimeout} = WebGUI::FormProcessor::interval('authWebGUI.passwordTimeout');
-   $properties->{changeUsername} = $session{form}{'authWebGUI.changeUsername'};
-   $properties->{changePassword} = $session{form}{'authWebGUI.changePassword'};
+   $properties->{passwordTimeout} = $self->session->form->interval('authWebGUI.passwordTimeout');
+   $properties->{changeUsername} = $self->session->form->get('authWebGUI.changeUsername');
+   $properties->{changePassword} = $self->session->form->get('authWebGUI.changePassword');
    
    $self->SUPER::editUserFormSave($properties);
 }
@@ -355,7 +351,7 @@ sub editUserSettingsForm {
    my $f = WebGUI::HTMLForm->new;
    $f->text(
 	         -name=>"webguiPasswordLength",
-			 -value=>$session{setting}{webguiPasswordLength},
+			 -value=>$self->session->setting->get("webguiPasswordLength"),
 			 -label=>WebGUI::International::get(15,'AuthWebGUI'),
 			 -size=>5,
 			 -maxLength=>5,
@@ -363,80 +359,80 @@ sub editUserSettingsForm {
    $f->interval(
 	-name=>"webguiPasswordTimeout",
 	-label=>WebGUI::International::get(16,'AuthWebGUI'),
-	-value=>$session{setting}{webguiPasswordTimeout}
+	-value=>$self->session->setting->get("webguiPasswordTimeout")
 	);
    $f->yesNo(
              -name=>"webguiExpirePasswordOnCreation",
-             -value=>$session{setting}{webguiExpirePasswordOnCreation},
+             -value=>$self->session->setting->get("webguiExpirePasswordOnCreation"),
              -label=>WebGUI::International::get(9,'AuthWebGUI')
              );
    $f->yesNo(
              -name=>"webguiSendWelcomeMessage",
-             -value=>$session{setting}{webguiSendWelcomeMessage},
+             -value=>$self->session->setting->get("webguiSendWelcomeMessage"),
              -label=>WebGUI::International::get(868)
              );
    $f->textarea(
                 -name=>"webguiWelcomeMessage",
-                -value=>$session{setting}{webguiWelcomeMessage},
+                -value=>$self->session->setting->get("webguiWelcomeMessage"),
                 -label=>WebGUI::International::get(869)
                );
    $f->yesNo(
                 -name=>"webguiChangeUsername",
-                -value=>$session{setting}{webguiChangeUsername},
+                -value=>$self->session->setting->get("webguiChangeUsername"),
                 -label=>WebGUI::International::get(19,'AuthWebGUI')
              );
    $f->yesNo(
                 -name=>"webguiChangePassword",
-                -value=>$session{setting}{webguiChangePassword},
+                -value=>$self->session->setting->get("webguiChangePassword"),
                 -label=>WebGUI::International::get(18,'AuthWebGUI')
              );
    $f->yesNo(
 	         -name=>"webguiPasswordRecovery",
-             -value=>$session{setting}{webguiPasswordRecovery},
+             -value=>$self->session->setting->get("webguiPasswordRecovery"),
              -label=>WebGUI::International::get(6,'AuthWebGUI')
              );
    $f->textarea(
 		-name=>"webguiRecoverPasswordEmail",
 		-label=>WebGUI::International::get(134),
-		-value=>$session{setting}{webguiRecoverPasswordEmail}
+		-value=>$self->session->setting->get("webguiRecoverPasswordEmail")
 		);
    	$f->yesNo(
 		-name=>"webguiValidateEmail",
-             	-value=>$session{setting}{webguiValidateEmail},
+             	-value=>$self->session->setting->get("webguiValidateEmail"),
              	-label=>WebGUI::International::get('validate email','AuthWebGUI')
              	);
    	$f->yesNo(
 	     	-name=>"webguiUseCaptcha",
-             	-value=>$session{setting}{webguiUseCaptcha},
+             	-value=>$self->session->setting->get("webguiUseCaptcha"),
              	-label=>WebGUI::International::get('use captcha','AuthWebGUI')
              	);
 	$f->template(
 		-name=>"webguiAccountTemplate",
-		-value=>$session{setting}{webguiAccountTemplate},
+		-value=>$self->session->setting->get("webguiAccountTemplate"),
 		-namespace=>"Auth/WebGUI/Account",
 		-label=>WebGUI::International::get("account template","AuthWebGUI")
 		);
 	$f->template(
 		-name=>"webguiCreateAccountTemplate",
-		-value=>$session{setting}{webguiCreateAccountTemplate},
+		-value=>$self->session->setting->get("webguiCreateAccountTemplate"),
 		-namespace=>"Auth/WebGUI/Create",
 		-label=>WebGUI::International::get("create account template","AuthWebGUI")
 		);
 	$f->template(
 		-name=>"webguiExpiredPasswordTemplate",
-		-value=>$session{setting}{webguiExpiredPasswordTemplate},
+		-value=>$self->session->setting->get("webguiExpiredPasswordTemplate"),
 		-namespace=>"Auth/WebGUI/Expired",
 		-label=>WebGUI::International::get("expired password template","AuthWebGUI")
 		);
 	$f->template(
 		-name=>"webguiLoginTemplate",
-		-value=>$session{setting}{webguiLoginTemplate},
+		-value=>$self->session->setting->get("webguiLoginTemplate"),
 		-namespace=>"Auth/WebGUI/Login",
 		-label=>WebGUI::International::get("login template","AuthWebGUI")
 		);
 	$f->template(
 		-name=>"webguiPasswordRecoveryTemplate",
-		-value=>$session{setting}{webguiPasswordRecoveryTemplate},
+		-value=>$self->session->setting->get("webguiPasswordRecoveryTemplate"),
 		-namespace=>"Auth/WebGUI/Recovery",
 		-label=>WebGUI::International::get("password recovery template","AuthWebGUI")
 		);
@@ -445,36 +441,36 @@ sub editUserSettingsForm {
 
 #-------------------------------------------------------------------
 sub getAccountTemplateId {
-	return $session{setting}{webguiAccountTemplate} || "PBtmpl0000000000000010";
+	return $self->session->setting->get("webguiAccountTemplate") || "PBtmpl0000000000000010";
 }
 
 #-------------------------------------------------------------------
 sub getCreateAccountTemplateId {
-	return $session{setting}{webguiCreateAccountTemplate} || "PBtmpl0000000000000011";
+	return $self->session->setting->get("webguiCreateAccountTemplate") || "PBtmpl0000000000000011";
 }
 
 #-------------------------------------------------------------------
 sub getExpiredPasswordTemplateId {
-	return $session{setting}{webguiExpiredPasswordTemplate} || "PBtmpl0000000000000012";
+	return $self->session->setting->get("webguiExpiredPasswordTemplate") || "PBtmpl0000000000000012";
 }
 
 #-------------------------------------------------------------------
 sub getLoginTemplateId {
-	return $session{setting}{webguiLoginTemplate} || "PBtmpl0000000000000013";
+	return $self->session->setting->get("webguiLoginTemplate") || "PBtmpl0000000000000013";
 }
 
 #-------------------------------------------------------------------
 sub getPasswordRecoveryTemplateId {
-	return $session{setting}{webguiPasswordRecoveryTemplate} || "PBtmpl0000000000000014";
+	return $self->session->setting->get("webguiPasswordRecoveryTemplate") || "PBtmpl0000000000000014";
 }
 
 
 #-------------------------------------------------------------------
 sub login {
    my $self = shift;
-   if(!$self->authenticate($session{form}{username},$session{form}{identifier})){
-      WebGUI::HTTP::setStatus("401","Incorrect Credentials");
-      WebGUI::ErrorHandler::security("login to account ".$session{form}{username}." with invalid information.");
+   if(!$self->authenticate($self->session->form->process("username"),$self->session->form->process("identifier"))){
+      $self->session->http->setStatus("401","Incorrect Credentials");
+      $self->session->errorHandler->security("login to account ".$self->session->form->process("username")." with invalid information.");
 	  return $self->displayLogin("<h1>".WebGUI::International::get(70)."</h1>".$self->error);
    }
    
@@ -482,7 +478,7 @@ sub login {
    if($self->getSetting("passwordTimeout") && $userData->{passwordTimeout}){
       my $expireTime = $userData->{passwordLastUpdated} + $userData->{passwordTimeout};
       if(time() >= $expireTime){
-         $session{form}{uid} = $self->userId;
+         $self->session->form->process("uid") = $self->userId;
 		 $self->logout;
    	     return $self->resetExpiredPassword;
       }  
@@ -497,7 +493,7 @@ sub new {
    my $authMethod = $_[0];
    my $userId = $_[1];
    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');
-   my $self = WebGUI::Auth->new($authMethod,$userId,\@callable);
+   my $self = WebGUI::Auth->new($self->session,$authMethod,$userId,\@callable);
    bless $self, $class;
 }
 
@@ -515,30 +511,30 @@ sub recoverPassword {
 
    $vars->{'recover.form.submit'} = WebGUI::Form::submit({});
    $vars->{'recover.form.footer'} = WebGUI::Form::formFooter();
-    $vars->{'login.url'} = WebGUI::URL::page('op=auth;method=init');
+    $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
-	     $vars->{'anonymousRegistration.isAllowed'} = ($session{setting}{anonymousRegistration});
-           $vars->{'createAccount.url'} = WebGUI::URL::page('op=auth=;method=createAccount');
+	     $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
+           $vars->{'createAccount.url'} = $self->session->url->page('op=auth=;method=createAccount');
            $vars->{'createAccount.label'} = WebGUI::International::get(67);
    $vars->{'recover.message'} = $_[0] if ($_[0]);
    $vars->{'recover.form.email'} = WebGUI::Form::text({"name"=>"email"});
    $vars->{'recover.form.email.label'} = WebGUI::International::get(56);
-   return WebGUI::Asset::Template->new($self->getPasswordRecoveryTemplateId)->process($vars);
+   return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
 sub recoverPasswordFinish {
    my $self = shift;
-   return $self->recoverPassword('<ul><li>'.WebGUI::International::get(743).'</li></ul>') if ($session{form}{email} eq "");
-   return $self->displayLogin unless ($session{setting}{webguiPasswordRecovery});
+   return $self->recoverPassword('<ul><li>'.WebGUI::International::get(743).'</li></ul>') if ($self->session->form->process("email") eq "");
+   return $self->displayLogin unless ($self->session->setting->get("webguiPasswordRecovery"));
    
    my($sth,$username,$userId,$password,$flag,$message,$output,$encryptedPassword,$authMethod);
-   $sth = WebGUI::SQL->read("select users.username,users.userId from users, userProfileData where users.userId=userProfileData.userId and 
-                             users.authMethod='WebGUI' and userProfileData.fieldName='email' and userProfileData.fieldData=".quote($session{form}{email}));
+   $sth = $self->session->db->read("select users.username,users.userId from users, userProfileData where users.userId=userProfileData.userId and 
+                             users.authMethod='WebGUI' and userProfileData.fieldName='email' and userProfileData.fieldData=".$self->session->db->quote($self->session->form->process("email")));
    $flag = 0;
    while (($username,$userId) = $sth->array) {
-	   my $len = $session{setting}{webguiPasswordLength} || 6;
+	   my $len = $self->session->setting->get("webguiPasswordLength") || 6;
 	   $password = "";
 	   for(my $i = 0; $i < $len; $i++) {
           $password .= chr(ord('A') + randint(32));
@@ -546,11 +542,11 @@ sub recoverPasswordFinish {
    	   $encryptedPassword = Digest::MD5::md5_base64($password);
 	   $self->saveParams($userId,"WebGUI",{identifier=>$encryptedPassword});
 	   _logSecurityMessage();
-	   WebGUI::ErrorHandler::security("recover a password.  Password emailed to: ".$session{form}{email});
-	   $message = $session{setting}{webguiRecoverPasswordEmail};
+	   $self->session->errorHandler->security("recover a password.  Password emailed to: ".$self->session->form->process("email"));
+	   $message = $self->session->setting->get("webguiRecoverPasswordEmail");
 	   $message .= "\n".WebGUI::International::get(50).": ".$username."\n";
 	   $message .= WebGUI::International::get(51).": ".$password."\n";
-	   WebGUI::Mail::send($session{form}{email},WebGUI::International::get(74),$message);
+	   WebGUI::Mail::send($self->session->form->process("email"),WebGUI::International::get(74),$message);
 	   $flag++;
 	}
 	$sth->finish();
@@ -569,7 +565,7 @@ sub resetExpiredPassword {
     $vars->{'expired.form.header'} = "\n\n".WebGUI::Form::formHeader({});
     $vars->{'expired.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
 	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>"resetExpiredPasswordSave"});
-   	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session{form}{uid}});
+   	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$self->session->form->process("uid")});
     
     $vars->{'expired.form.oldPassword'} = WebGUI::Form::password({"name"=>"oldPassword"});
     $vars->{'expired.form.oldPassword.label'} = WebGUI::International::get(10,'AuthWebGUI');
@@ -580,7 +576,7 @@ sub resetExpiredPassword {
     $vars->{'expired.form.submit'} = WebGUI::Form::submit({});
     $vars->{'expired.form.footer'} = WebGUI::Form::formFooter();
 	
-	return WebGUI::Asset::Template->new($self->getExpiredPasswordTemplateId)->process($vars);
+	return WebGUI::Asset::Template->new($self->session,$self->getExpiredPasswordTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -588,17 +584,17 @@ sub resetExpiredPasswordSave {
    my $self = shift;
    my ($error,$u,$properties,$msg);
    
-   $u = WebGUI::User->new($session{form}{uid});
-   $session{form}{username} = $u->username;
+   $u = WebGUI::User->new($self->session,$self->session->form->process("uid"));
+   $self->session->form->process("username") = $u->username;
    
-   $error .= $self->error if(!$self->authenticate($u->username,$session{form}{oldPassword}));
-   $error .= '<li>'.WebGUI::International::get(5,'AuthWebGUI').'</li>' if($session{form}{identifier} eq "password");
-   $error .= '<li>'.WebGUI::International::get(12,'AuthWebGUI').'</li>' if ($session{form}{oldPassword} eq $session{form}{identifier});
-   $error .= $self->error if(!$self->_isValidPassword($session{form}{identifier},$session{form}{identifierConfirm}));
+   $error .= $self->error if(!$self->authenticate($u->username,$self->session->form->process("oldPassword")));
+   $error .= '<li>'.WebGUI::International::get(5,'AuthWebGUI').'</li>' if($self->session->form->process("identifier") eq "password");
+   $error .= '<li>'.WebGUI::International::get(12,'AuthWebGUI').'</li>' if ($self->session->form->process("oldPassword") eq $self->session->form->process("identifier"));
+   $error .= $self->error if(!$self->_isValidPassword($self->session->form->process("identifier"),$self->session->form->process("identifierConfirm")));
    
    return $self->resetExpiredPassword("<h1>".WebGUI::International::get(70)."</h1>".$error) if($error ne "");
    
-   $properties->{identifier} = Digest::MD5::md5_base64($session{form}{identifier});
+   $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process("identifier"));
    $properties->{passwordLastUpdated} = time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
@@ -614,7 +610,7 @@ sub resetExpiredPasswordSave {
 #-------------------------------------------------------------------
 sub validateEmail {
 	my $self = shift;
-	my ($userId) = WebGUI::SQL->quickArray("select userId from authentication where fieldData=".quote($session{form}{key})." and fieldName='emailValidationKey' and authMethod='WebGUI'");
+	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=".$self->session->db->quote($self->session->form->process("key"))." and fieldName='emailValidationKey' and authMethod='WebGUI'");
 	if (defined $userId) {
 		my $u = WebGUI::User->new($userId);
 		$u->status("Active");
@@ -634,9 +630,9 @@ sub validateEmail {
 sub updateAccount {
    my $self = shift;
    
-   my $username = $session{form}{'authWebGUI.username'};
-   my $password = $session{form}{'authWebGUI.identifier'};
-   my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
+   my $username = $self->session->form->get('authWebGUI.username');
+   my $password = $self->session->form->get('authWebGUI.identifier');
+   my $passConfirm = $self->session->form->get('authWebGUI.identifierConfirm');
    my $display = '<li>'.WebGUI::International::get(81).'</li>';
    my $error = "";
    
@@ -669,7 +665,7 @@ sub updateAccount {
    if(!$error){
       if($username){
 	     $u->username($username);
-         $session{form}{uid} = $u->userId;
+         $self->session->form->process("uid") = $u->userId;
 	  }
 	  if($password){
 	     my $userData = $self->getParams;

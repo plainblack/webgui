@@ -16,7 +16,6 @@ package WebGUI::Cache::Memcached;
 
 use Cache::Memcached;
 use Digest::MD5;
-use WebGUI::Session;
 
 our @ISA = qw(WebGUI::Cache);
 
@@ -89,15 +88,19 @@ Retrieve content from the filesystem cache.
 =cut
 
 sub get {
-		return undef if ($WebGUI::Session::session{config}{disableCache});
+		return undef if ($_[0]->session->get("disableCache"));
                 return $_[0]->{_cache}->get($_[0]->{_key});
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( key [, namespace ]  )
+=head2 new ( session, key [, namespace ]  )
 
 Constructor.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 key 
 
@@ -112,15 +115,16 @@ Defaults to the config filename for the current site. The only reason to overrid
 sub new {
 	my $cache;
 	my $class = shift;
+	my $session = shift;
 	my $key = $class->parseKey(shift);
-	my $namespace = shift || $WebGUI::Session::session{config}{configFile};
+	my $namespace = shift || $session->config->getFilename;
 
 	# Overcome maximum key length of 255 characters 
 	if(length($key.$namespace) > 255) {
 		$key = Digest::MD5::md5_base64($key); 
 	}
 
-	my $servers = $WebGUI::Session::session{config}{memcached_servers};
+	my $servers = $session->config->get("memcached_servers");
 	$servers = [ $servers ] unless (ref $servers);
 
 	my %options = (
@@ -129,7 +133,7 @@ sub new {
 		);
 
 	$cache = new Cache::Memcached(\%options);
-	bless {_cache => $cache, _key => $key}, $class;
+	bless {_session=>$session, _cache => $cache, _key => $key}, $class;
 }
 
 

@@ -61,7 +61,7 @@ sub cancelRecurringPayment {
 #			print "FIRST PAGE SUCCESS!\n";
 #			print "(".$response->base.")\n";
 		} else {
-			WebGUI::ErrorHandler::fatalError(
+			$self->session->errorHandler->fatalError(
 				'Connection Error while trying to cancel transaction '.$recurring->{transaction}->transactionId." \n".
 				"Could not reach login page.\n".
 				"(".$response->base.")\n".
@@ -84,7 +84,7 @@ sub cancelRecurringPayment {
 #			print "CANCELATION PAGE SUCCESS!\n";
 #			print "(".$response->base.")\n";
 		} else {
-			WebGUI::ErrorHandler::fatalError(
+			$self->session->errorHandler->fatalError(
 				'Connection Error while trying to cancel transaction '.$recurring->{transaction}->transactionId." \n".
 				"(".$response->base.")\n".
 				$response->status_line. "\n");
@@ -108,38 +108,38 @@ sub checkoutForm {
 	
 	$i18n = WebGUI::International->new('CommercePaymentITransact');
 
-	$u = WebGUI::User->new($session{user}{userId});
+	$u = WebGUI::User->new($self->session->user->profileField("userId"));
 
 	$f = WebGUI::HTMLForm->new;
 	$f->text(
 		-name	=> 'firstName',
 		-label	=> $i18n->get('firstName'),
-		-value	=> $session{form}{firstName} || $u->profileField('firstName')
+		-value	=> $self->session->form->process("firstName") || $u->profileField('firstName')
 	);
 	$f->text(
 		-name	=> 'lastName',
 		-label	=> $i18n->get('lastName'),
-		-value	=> $session{form}{lastName} || $u->profileField('lastName')
+		-value	=> $self->session->form->process("lastName") || $u->profileField('lastName')
 	);
 	$f->text(
 		-name	=> 'address',
 		-label	=> $i18n->get('address'),
-		-value	=> $session{form}{address} || $u->profileField('homeAddress')
+		-value	=> $self->session->form->process("address") || $u->profileField('homeAddress')
 	);
 	$f->text(
 		-name	=> 'city',
 		-label	=> $i18n->get('city'),
-		-value	=> $session{form}{city} || $u->profileField('homeCity')
+		-value	=> $self->session->form->process("city") || $u->profileField('homeCity')
 	);
 	$f->text(
 		-name	=> 'state',
 		-label	=> $i18n->get('state'),
-		-value	=> $session{form}{state} || $u->profileField('homeState')
+		-value	=> $self->session->form->process("state") || $u->profileField('homeState')
 	);
 	$f->zipcode(
 		-name	=> 'zipcode',
 		-label	=> $i18n->get('zipcode'),
-		-value	=> $session{form}{zipcode} || $u->profileField('homeZip')
+		-value	=> $self->session->form->process("zipcode") || $u->profileField('homeZip')
 	);
 	my %countries;
 	tie %countries, 'Tie::IxHash';
@@ -389,25 +389,25 @@ sub checkoutForm {
 	$f->selectBox(
 		-name=>"country",
 		-label=>$i18n->get("country"),
-		-value=>[$session{form}{country}],
+		-value=>[$self->session->form->process("country")],
 		-defaultValue=>[$u->profileField("homeCountry")],
 		-options=>\%countries
 		);
 	$f->phone(
 		-name=>"phone",
 		-label=>$i18n->get("phone"),
-		-value=>$session{form}{phone},
+		-value=>$self->session->form->process("phone"),
 		-defaultValue=>$u->profileField("homePhone")
 	);
 	$f->email(
 		-name	=> 'email',
 		-label	=> $i18n->get('email'),
-		-value	=> $session{form}{email} || $u->profileField('email')
+		-value	=> $self->session->form->process("email") || $u->profileField('email')
 	);
 	$f->text(
 		-name	=> 'cardNumber',
 		-label	=> $i18n->get('cardNumber'),
-		-value	=> $session{form}{cardNumber}
+		-value	=> $self->session->form->process("cardNumber")
 	);
 	tie %months, "Tie::IxHash";
 	%months = map {sprintf('%02d',$_) => sprintf('%02d',$_)} 1..12;
@@ -416,14 +416,14 @@ sub checkoutForm {
 	$f->readOnly(
 		-label	=> $i18n->get('expiration date'),
 		-value	=> 
-		WebGUI::Form::selectBox({name => 'expMonth', options => \%months, value => [$session{form}{expMonth}]}).
+		WebGUI::Form::selectBox({name => 'expMonth', options => \%months, value => [$self->session->form->process("expMonth")]}).
 		" / ".
-		WebGUI::Form::selectBox({name => 'expYear', options => \%years, value => [$session{form}{expYear}]})
+		WebGUI::Form::selectBox({name => 'expYear', options => \%years, value => [$self->session->form->process("expYear")]})
 	);
 	$f->integer(
 		-name	=> 'cvv2',
 		-label	=> $i18n->get('cvv2'),
-		-value  => $session{form}{cvv2}
+		-value  => $self->session->form->process("cvv2")
 	) if ($self->get('useCVV2'));
 
 	return $f->printRowsOnly;	
@@ -468,7 +468,7 @@ sub configurationForm {
 		-value	=> '<br />'
 		);
 	$f->readOnly(
-		-value	=> $i18n->get('extra info').'<br /><b>https://'.$session{config}{defaultSitename}.'/?op=confirmRecurringTransaction;gateway='.$self->namespace
+		-value	=> $i18n->get('extra info').'<br /><b>https://'.$self->session->config->get("defaultSitename").'/?op=confirmRecurringTransaction;gateway='.$self->namespace
 		);
 		
 	return $self->SUPER::configurationForm($f->printRowsOnly);
@@ -480,18 +480,18 @@ sub confirmRecurringTransaction {
 	my $self = shift;
 	
 	my $form = $session{form};
-	my $transaction = WebGUI::Commerce::Transaction->getByGatewayId($session{form}{orig_xid}, $self->namespace);
+	my $transaction = WebGUI::Commerce::Transaction->getByGatewayId($self->session->form->process("orig_xid"), $self->namespace);
 	my $itemProperties = $transaction->getItems->[0];
 	my $item = WebGUI::Commerce::Item->new($itemProperties->{itemId}, $itemProperties->{itemType});
 	
 	my $startEpoch = WebGUI::DateTime::setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{start_date})));
 	my $currentEpoch = WebGUI::DateTime::setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{when})));
 	
-	WebGUI::SQL->write("delete from ITransact_recurringStatus where gatewayId=".quote($form->{orig_xid}));
-	WebGUI::SQL->write("insert into ITransact_recurringStatus ".
+	$self->session->db->write("delete from ITransact_recurringStatus where gatewayId=".$self->session->db->quote($form->{orig_xid}));
+	$self->session->db->write("insert into ITransact_recurringStatus ".
 		"(gatewayId, initDate, lastTransaction, status, errorMessage, recipe) values ".
-		"(".quote($form->{orig_xid}).", $startEpoch, $currentEpoch, ".quote($form->{status}).", ".quote($form->{error_message}).
-		", ".quote($form->{recipe_name}).")");
+		"(".$self->session->db->quote($form->{orig_xid}).", $startEpoch, $currentEpoch, ".$self->session->db->quote($form->{status}).", ".$self->session->db->quote($form->{error_message}).
+		", ".$self->session->db->quote($form->{recipe_name}).")");
 }
 
 #-------------------------------------------------------------------
@@ -534,9 +534,9 @@ sub getRecurringPaymentStatus {
 		yearly		=> 365*3600*24
 	);
 
-	my $transactionData = WebGUI::SQL->quickHashRef("select * from ITransact_recurringStatus where gatewayId=".quote($recurringId));
+	my $transactionData = $self->session->db->quickHashRef("select * from ITransact_recurringStatus where gatewayId=".$self->session->db->quote($recurringId));
 	unless ($transactionData->{recipe}) { # if for some reason there's no transaction data, we shouldn't calc anything
-		WebGUI::ErrorHandler::error("For some reason recurring transaction $recurringId doesn't have any recurring status transaction data. This is most likely because you don't have the Recurring Postback URL set in your ITransact virtual terminal.");
+		$self->session->errorHandler->error("For some reason recurring transaction $recurringId doesn't have any recurring status transaction data. This is most likely because you don't have the Recurring Postback URL set in your ITransact virtual terminal.");
 		return undef;
 	}
         my $lastTerm = int(($transactionData->{lastTransaction} - $transactionData->{initDate}) / $resolve{$transactionData->{recipe}}) + 1;
@@ -691,7 +691,7 @@ my	%transactionData = %{$self->{_transactionParams}};
   <TransactionData>
     <VendorId>".$self->get('vendorId')."</VendorId>
     <VendorPassword>".$self->get('password')."</VendorPassword>
-    <HomePage>".$session{setting}{companyURL}."</HomePage>";
+    <HomePage>".$self->session->setting->get("companyURL")."</HomePage>";
 
 	if ($self->{_recurring}) {
 		$xml .=
@@ -804,44 +804,44 @@ sub validateFormData {
 
 	$i18n = WebGUI::International->new('CommercePaymentITransact');
 
-	push (@error, $i18n->get('invalid firstName')) unless ($session{form}{firstName});
-	push (@error, $i18n->get('invalid lastName')) unless ($session{form}{lastName});
-	push (@error, $i18n->get('invalid address')) unless ($session{form}{address});
-	push (@error, $i18n->get('invalid city')) unless ($session{form}{city});
-	push (@error, $i18n->get('invalid zip')) if ($session{form}{zipcode} eq "" && $session{form}{country} eq "United States");
-	push (@error, $i18n->get('invalid email')) unless ($session{form}{email});
+	push (@error, $i18n->get('invalid firstName')) unless ($self->session->form->process("firstName"));
+	push (@error, $i18n->get('invalid lastName')) unless ($self->session->form->process("lastName"));
+	push (@error, $i18n->get('invalid address')) unless ($self->session->form->process("address"));
+	push (@error, $i18n->get('invalid city')) unless ($self->session->form->process("city"));
+	push (@error, $i18n->get('invalid zip')) if ($self->session->form->process("zipcode") eq "" && $self->session->form->process("country") eq "United States");
+	push (@error, $i18n->get('invalid email')) unless ($self->session->form->process("email"));
 	
-	push (@error, $i18n->get('invalid card number')) unless ($session{form}{cardNumber} =~ /^\d+$/);	
-	push (@error, $i18n->get('invalid cvv2')) if ($session{form}{cvv2} !~ /^\d+$/ && $self->get('useCVV2'));
+	push (@error, $i18n->get('invalid card number')) unless ($self->session->form->process("cardNumber") =~ /^\d+$/);	
+	push (@error, $i18n->get('invalid cvv2')) if ($self->session->form->process("cvv2") !~ /^\d+$/ && $self->get('useCVV2'));
 
 	($currentYear, $currentMonth) = WebGUI::DateTime::localtime;
 
 	# Check if expDate and expYear have sane values
-	unless (($session{form}{expMonth} =~ /^(0[1-9]|1[0-2])$/) && ($session{form}{expYear} =~ /^\d\d\d\d$/)) {
+	unless (($self->session->form->process("expMonth") =~ /^(0[1-9]|1[0-2])$/) && ($self->session->form->process("expYear") =~ /^\d\d\d\d$/)) {
 		push (@error, $i18n->get('invalid expiration date'));
-	} elsif (($session{form}{expYear} < $currentYear) || 
-		(($session{form}{expYear} == $currentYear) && ($session{form}{expMonth} < $currentMonth))) {
+	} elsif (($self->session->form->process("expYear") < $currentYear) || 
+		(($self->session->form->process("expYear") == $currentYear) && ($self->session->form->process("expMonth") < $currentMonth))) {
 		push (@error, $i18n->get('invalid expiration date'));
 	}
 
 	unless (@error) {
 		$self->{_cardData} = {
-			ACCT		=> $session{form}{cardNumber},
-			EXPMONTH	=> $session{form}{expMonth},
-			EXPYEAR		=> $session{form}{expYear},
-			CVV2		=> $session{form}{cvv2},
+			ACCT		=> $self->session->form->process("cardNumber"),
+			EXPMONTH	=> $self->session->form->process("expMonth"),
+			EXPYEAR		=> $self->session->form->process("expYear"),
+			CVV2		=> $self->session->form->process("cvv2"),
 		};	
 		
 		$self->{_userData} = {
-			STREET		=> $session{form}{address},
-			ZIP		=> $session{form}{zipcode},
-			CITY		=> $session{form}{city},
-			FIRSTNAME	=> $session{form}{firstName},
-			LASTNAME	=> $session{form}{lastName},
-			EMAIL		=> $session{form}{email},
-			STATE		=> $session{form}{state},
-			COUNTRY		=> $session{form}{country},
-			PHONE		=> $session{form}{phone},
+			STREET		=> $self->session->form->process("address"),
+			ZIP		=> $self->session->form->process("zipcode"),
+			CITY		=> $self->session->form->process("city"),
+			FIRSTNAME	=> $self->session->form->process("firstName"),
+			LASTNAME	=> $self->session->form->process("lastName"),
+			EMAIL		=> $self->session->form->process("email"),
+			STATE		=> $self->session->form->process("state"),
+			COUNTRY		=> $self->session->form->process("country"),
+			PHONE		=> $self->session->form->process("phone"),
 		};
 
 		return 0;

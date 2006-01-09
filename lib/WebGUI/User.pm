@@ -55,7 +55,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _create {
 	my $userId = shift || WebGUI::Id::generate();
-	WebGUI::SQL->write("insert into users (userId,dateCreated) values (".quote($userId).",".time().")");
+	$self->session->db->write("insert into users (userId,dateCreated) values (".$self->session->db->quote($userId).",".time().")");
 	require WebGUI::Grouping;
 	WebGUI::Grouping::addUsersToGroups([$userId],[2,7]);
         return $userId;
@@ -106,8 +106,8 @@ sub authMethod {
 		$self->uncache;
                 $self->{_user}{"authMethod"} = $value;
                 $self->{_user}{"lastUpdated"} = time();
-                WebGUI::SQL->write("update users set authMethod=".quote($value).",
-			lastUpdated=".time()." where userId=".quote($self->{_userId}));
+                $self->session->db->write("update users set authMethod=".$self->session->db->quote($value).",
+			lastUpdated=".time()." where userId=".$self->session->db->quote($self->{_userId}));
         }
         return $self->{_user}{"authMethod"};
 }
@@ -136,15 +136,15 @@ sub delete {
         my $self = shift;
 		$self->uncache;
 	require WebGUI::Operation::Auth;
-        WebGUI::SQL->write("delete from users where userId=".quote($self->{_userId}));
-        WebGUI::SQL->write("delete from userProfileData where userId=".quote($self->{_userId}));
+        $self->session->db->write("delete from users where userId=".$self->session->db->quote($self->{_userId}));
+        $self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId}));
 	require WebGUI::Grouping;
 	WebGUI::Grouping::deleteUsersFromGroups([$self->{_userId}],WebGUI::Grouping::getGroupsForUser($self->{_userId}));
-	WebGUI::SQL->write("delete from messageLog where userId=".quote($self->{_userId}));
+	$self->session->db->write("delete from messageLog where userId=".$self->session->db->quote($self->{_userId}));
 
 	my $authMethod = WebGUI::Operation::Auth::getInstance($self->authMethod,$self->{_userId});
 	$authMethod->deleteParams($self->{_userId});
-    my $sth = WebGUI::SQL->read("select sessionId from userSession where userId=".quote($self->{_userId}));
+    my $sth = $self->session->db->read("select sessionId from userSession where userId=".$self->session->db->quote($self->{_userId}));
     while (my ($sid) = $sth->array) {
        WebGUI::Session::end($sid);
     }
@@ -180,8 +180,8 @@ sub identifier {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"identifier"} = $value;
-                WebGUI::SQL->write("update authentication set fieldData=".quote($value)."
-                        where userId=".quote($self->{_userId})." and authMethod='WebGUI' and fieldName='identifier'");
+                $self->session->db->write("update authentication set fieldData=".$self->session->db->quote($value)."
+                        where userId=".$self->session->db->quote($self->{_userId})." and authMethod='WebGUI' and fieldName='identifier'");
         }
         return $self->{_user}{"identifier"};
 }
@@ -214,8 +214,8 @@ sub karma {
 	if (defined $amount && defined $source && defined $description) {
 		$self->uncache;
 		$self->{_user}{karma} += $amount;
-		WebGUI::SQL->write("update users set karma=karma+".quote($amount)." where userId=".quote($self->userId));
-        	WebGUI::SQL->write("insert into karmaLog values (".quote($self->userId).",$amount,".quote($source).",".quote($description).",".time().")");
+		$self->session->db->write("update users set karma=karma+".$self->session->db->quote($amount)." where userId=".$self->session->db->quote($self->userId));
+        	$self->session->db->write("insert into karmaLog values (".$self->session->db->quote($self->userId).",$amount,".$self->session->db->quote($source).",".$self->session->db->quote($description).",".time().")");
 	}
         return $self->{_user}{karma};
 }
@@ -253,16 +253,16 @@ sub new {
         my $userId = shift || 1;
 	my $overrideId = shift;
         $userId = _create($overrideId) if ($userId eq "new");
-	my $cache = WebGUI::Cache->new(["user",$userId]);
+	my $cache = WebGUI::Cache->new($self->session,["user",$userId]);
 	my $userData = $cache->get;
 	unless ($userData->{_userId} && $userData->{_user}{username}) {
 		my %user;
 		tie %user, 'Tie::CPHash';
-		%user = WebGUI::SQL->quickHash("select * from users where userId=".quote($userId));
-		my %profile = WebGUI::SQL->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
+		%user = $self->session->db->quickHash("select * from users where userId=".$self->session->db->quote($userId));
+		my %profile = $self->session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
-			userProfileData.userId=".quote($user{userId}));
-        	my %default = WebGUI::SQL->buildHash("select fieldName, dataDefault from userProfileField");
+			userProfileData.userId=".$self->session->db->quote($user{userId}));
+        	my %default = $self->session->db->buildHash("select fieldName, dataDefault from userProfileField");
         	foreach my $key (keys %default) {
 			my $value;
         		if ($profile{$key} eq "" && $default{$key}) {
@@ -309,10 +309,10 @@ sub profileField {
 	if (defined $value) {
 		$self->uncache;
 		$self->{_profile}{$fieldName} = $value;
-		WebGUI::SQL->write("delete from userProfileData where userId=".quote($self->{_userId})." and fieldName=".quote($fieldName));
-		WebGUI::SQL->write("insert into userProfileData values (".quote($self->{_userId}).", ".quote($fieldName).", ".quote($value).")");
+		$self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId})." and fieldName=".$self->session->db->quote($fieldName));
+		$self->session->db->write("insert into userProfileData values (".$self->session->db->quote($self->{_userId}).", ".$self->session->db->quote($fieldName).", ".$self->session->db->quote($value).")");
 		$self->{_user}{"lastUpdated"} = time();
-        	WebGUI::SQL->write("update users set lastUpdated=".time()." where userId=".quote($self->{_userId}));
+        	$self->session->db->write("update users set lastUpdated=".time()." where userId=".$self->session->db->quote($self->{_userId}));
 	}
 	return $self->{_profile}{$fieldName};
 }
@@ -336,8 +336,8 @@ sub referringAffiliate {
 		$self->uncache;
                 $self->{_user}{"referringAffiliate"} = $value;
                 $self->{_user}{"lastUpdated"} = time();
-                WebGUI::SQL->write("update users set referringAffiliate=".quote($value).",
-                        lastUpdated=".time()." where userId=".quote($self->userId));
+                $self->session->db->write("update users set referringAffiliate=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"referringAffiliate"};
 }
@@ -361,8 +361,8 @@ sub status {
 		$self->uncache;
                 $self->{_user}{"status"} = $value;
                 $self->{_user}{"lastUpdated"} = time();
-                WebGUI::SQL->write("update users set status=".quote($value).",
-                        lastUpdated=".time()." where userId=".quote($self->userId));
+                $self->session->db->write("update users set status=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"status"};
 }
@@ -377,7 +377,7 @@ Deletes this user object out of the cache.
 
 sub uncache {
 	my $self = shift;
-	my $cache = WebGUI::Cache->new(["user",$self->userId]);
+	my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
 	$cache->delete;	
 }
 
@@ -400,8 +400,8 @@ sub username {
 		$self->uncache;
                 $self->{_user}{"username"} = $value;
                 $self->{_user}{"lastUpdated"} = time();
-                WebGUI::SQL->write("update users set username=".quote($value).",
-                        lastUpdated=".time()." where userId=".quote($self->userId));
+                $self->session->db->write("update users set username=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"username"};
 }

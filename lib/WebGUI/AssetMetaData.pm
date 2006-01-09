@@ -50,10 +50,10 @@ The fieldId to be deleted.
 sub deleteMetaDataField {
 	my $self = shift;
 	my $fieldId = shift;
-	WebGUI::SQL->beginTransaction;
-        WebGUI::SQL->write("delete from metaData_properties where fieldId = ".quote($fieldId));
-        WebGUI::SQL->write("delete from metaData_values where fieldId = ".quote($fieldId));
-	WebGUI::SQL->commit;
+	$self->session->db->beginTransaction;
+        $self->session->db->write("delete from metaData_properties where fieldId = ".$self->session->db->quote($fieldId));
+        $self->session->db->write("delete from metaData_values where fieldId = ".$self->session->db->quote($fieldId));
+	$self->session->db->commit;
 }
 
 
@@ -81,14 +81,14 @@ sub getMetaDataFields {
 			f.possibleValues,
 			d.value
 		from metaData_properties f
-		left join metaData_values d on f.fieldId=d.fieldId and d.assetId=".quote($self->getId);
-	$sql .= " where f.fieldId = ".quote($fieldId) if ($fieldId);
+		left join metaData_values d on f.fieldId=d.fieldId and d.assetId=".$self->session->db->quote($self->getId);
+	$sql .= " where f.fieldId = ".$self->session->db->quote($fieldId) if ($fieldId);
 	$sql .= " order by f.fieldName";
 	if ($fieldId) {
-		return WebGUI::SQL->quickHashRef($sql);	
+		return $self->session->db->quickHashRef($sql);	
 	} else {
 		tie my %hash, 'Tie::IxHash';
-		my $sth = WebGUI::SQL->read($sql);
+		my $sth = $self->session->db->read($sql);
 	        while( my $h = $sth->hashRef) {
 			foreach(keys %$h) {
 				$hash{$h->{fieldId}}{$_} = $h->{$_};
@@ -120,14 +120,14 @@ sub updateMetaData {
 	my $self = shift;
 	my $fieldName = shift;
 	my $value = shift;
-	my ($exists) = WebGUI::SQL->quickArray("select count(*) from metaData_values where assetId = ".quote($self->getId)." and fieldId = ".quote($fieldName));
+	my ($exists) = $self->session->db->quickArray("select count(*) from metaData_values where assetId = ".$self->session->db->quote($self->getId)." and fieldId = ".$self->session->db->quote($fieldName));
         if (!$exists && $value ne "") {
-        	WebGUI::SQL->write("insert into metaData_values (fieldId, assetId) values (".quote($fieldName).",".quote($self->getId).")");
+        	$self->session->db->write("insert into metaData_values (fieldId, assetId) values (".$self->session->db->quote($fieldName).",".$self->session->db->quote($self->getId).")");
         }
         if ($value  eq "") { # Keep it clean
-                WebGUI::SQL->write("delete from metaData_values where assetId = ".quote($self->getId)." and fieldId = ".quote($fieldName));
+                $self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId)." and fieldId = ".$self->session->db->quote($fieldName));
         } else {
-                WebGUI::SQL->write("update metaData_values set value = ".quote($value)." where assetId = ".quote($self->getId)." and fieldId=".quote($fieldName));
+                $self->session->db->write("update metaData_values set value = ".$self->session->db->quote($value)." where assetId = ".$self->session->db->quote($self->getId)." and fieldId=".$self->session->db->quote($fieldName));
         }
 }
 
@@ -143,7 +143,7 @@ Deletes a MetaDataField and returns www_manageMetaData on self, if user isInGrou
 sub www_deleteMetaDataField {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	$self->deleteMetaDataField($session{form}{fid});
+	$self->deleteMetaDataField($self->session->form->process("fid"));
 	return $self->www_manageMetaData;
 }
 
@@ -158,13 +158,13 @@ Returns a rendered page to edit MetaData.  Will return an insufficient Privilege
 
 sub www_editMetaDataField {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("contentProfiling");
+	my $ac = WebGUI::AdminConsole->new($self->session,"contentProfiling");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my $fieldInfo;
-	if($session{form}{fid} && $session{form}{fid} ne "new") {
-		$fieldInfo = $self->getMetaDataFields($session{form}{fid});
+	if($self->session->form->process("fid") && $self->session->form->process("fid") ne "new") {
+		$fieldInfo = $self->getMetaDataFields($self->session->form->process("fid"));
 	}
-	my $fid = $session{form}{fid} || "new";
+	my $fid = $self->session->form->process("fid") || "new";
 	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
 	$f->hidden(
 		-name => "func",
@@ -217,40 +217,40 @@ Verifies that MetaData fields aren't duplicated or blank, assigns default values
 
 sub www_editMetaDataFieldSave {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("content profiling");
+	my $ac = WebGUI::AdminConsole->new($self->session,"content profiling");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$ac->setHelp("metadata edit property","Asset");
 	# Check for duplicate field names
 	my $sql = "select count(*) from metaData_properties where fieldName = ".
-                                quote($session{form}{fieldName});
-	if ($session{form}{fid} ne "new") {
-		$sql .= " and fieldId <> ".quote($session{form}{fid});
+                                $self->session->db->quote($self->session->form->process("fieldName"));
+	if ($self->session->form->process("fid") ne "new") {
+		$sql .= " and fieldId <> ".$self->session->db->quote($self->session->form->process("fid"));
 	}
-	my ($isDuplicate) = WebGUI::SQL->buildArray($sql);
+	my ($isDuplicate) = $self->session->db->buildArray($sql);
 	if($isDuplicate) {
 		my $error = WebGUI::International::get("duplicateField", "Asset");
-		$error =~ s/\%field\%/$session{form}{fieldName}/;
+		$error =~ s/\%field\%/$self->session->form->process("fieldName")/;
 		return $ac->render($error,WebGUI::International::get('Edit Metadata',"Asset"));
 	}
-	if($session{form}{fieldName} eq "") {
+	if($self->session->form->process("fieldName") eq "") {
 		return $ac->render(WebGUI::International::get("errorEmptyField", "Asset"),WebGUI::International::get('Edit Metadata',"Asset"));
 	}
-	if($session{form}{fid} eq 'new') {
-		$session{form}{fid} = WebGUI::Id::generate();
-		WebGUI::SQL->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
-					quote($session{form}{fid}).",".
-					quote($session{form}{fieldName}).",".
-					quote($session{form}{defaultValue}).",".
-					quote($session{form}{description}).",".
-					quote($session{form}{fieldType}).",".
-					quote($session{form}{possibleValues}).")");
+	if($self->session->form->process("fid") eq 'new') {
+		$self->session->form->process("fid") = WebGUI::Id::generate();
+		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
+					$self->session->db->quote($self->session->form->process("fid")).",".
+					$self->session->db->quote($self->session->form->process("fieldName")).",".
+					$self->session->db->quote($self->session->form->process("defaultValue")).",".
+					$self->session->db->quote($self->session->form->process("description")).",".
+					$self->session->db->quote($self->session->form->process("fieldType")).",".
+					$self->session->db->quote($self->session->form->process("possibleValues")).")");
 	} else {
-                WebGUI::SQL->write("update metaData_properties set fieldName = ".quote($session{form}{fieldName}).", ".
-					"defaultValue = ".quote($session{form}{defaultValue}).", ".
-					"description = ".quote($session{form}{description}).", ".
-					"fieldType = ".quote($session{form}{fieldType}).", ".
-					"possibleValues = ".quote($session{form}{possibleValues}).
-					" where fieldId = ".quote($session{form}{fid}));
+                $self->session->db->write("update metaData_properties set fieldName = ".$self->session->db->quote($self->session->form->process("fieldName")).", ".
+					"defaultValue = ".$self->session->db->quote($self->session->form->process("defaultValue")).", ".
+					"description = ".$self->session->db->quote($self->session->form->process("description")).", ".
+					"fieldType = ".$self->session->db->quote($self->session->form->process("fieldType")).", ".
+					"possibleValues = ".$self->session->db->quote($self->session->form->process("possibleValues")).
+					" where fieldId = ".$self->session->db->quote($self->session->form->process("fid")));
 	}
 
 	return $self->www_manageMetaData; 
@@ -267,7 +267,7 @@ Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, r
 
 sub www_manageMetaData {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("contentProfiling");
+	my $ac = WebGUI::AdminConsole->new($self->session,"contentProfiling");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), WebGUI::International::get("Add new field","Asset"));
 	my $output;

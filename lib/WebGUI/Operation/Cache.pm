@@ -51,7 +51,7 @@ sub _submenu {
 	my $workarea = shift;
 	my $title = shift;
 	$title = WebGUI::International::get($title) if ($title);
-	my $ac = WebGUI::AdminConsole->new("cache");
+	my $ac = WebGUI::AdminConsole->new($session,"cache");
 	if ($session->setting->get("trackPageStatistics")) {
 		$ac->addSubmenuItem( $session->url->page('op=manageCache'), WebGUI::International::get('manage cache'));
 	}
@@ -77,7 +77,7 @@ Text description of how long the subscription lasts.
 sub www_flushCache {
 	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
-	my $cache = WebGUI::Cache->new();
+	my $cache = WebGUI::Cache->new($session,);
 	$cache->flush;
 	return www_manageCache();
 }
@@ -95,7 +95,7 @@ sub www_manageCache {
 	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);
-	my $cache = WebGUI::Cache->new();
+	my $cache = WebGUI::Cache->new($session,);
 	my $flushURL =  $session->url->page('op=flushCache');
         $output .= '<table>';
         $output .= '<tr><td align="right" class="tableHeader">'.WebGUI::International::get('cache type').':</td><td class="tableData">'.ref($cache).'</td></tr>';

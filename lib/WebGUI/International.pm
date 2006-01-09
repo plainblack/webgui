@@ -74,11 +74,11 @@ sub get {
 	if (ref($_[0]) eq "WebGUI::International") {
 		$id = $_[1];
 		$namespace = $_[2] || $_[0]->{_namespace} || "WebGUI";
-		$language = $_[3] || $_[0]->{_language} || $session{user}{language} || "English";
+		$language = $_[3] || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
 	} else {
 		$id = $_[0];
 		$namespace = $_[1] || "WebGUI";
-		$language = $_[2] || $session{user}{language} || "English";
+		$language = $_[2] || $self->session->user->profileField("language") || "English";
 	}
 	$id =~ s/[^\w\d\s\/]//g;
 	$language =~ s/[^\w\d\s\/]//g;
@@ -86,10 +86,10 @@ sub get {
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
 	my $load = "use ".$cmd;
 	eval($load);
-	WebGUI::ErrorHandler::warn($cmd." failed to compile because ".$@) if ($@);
+	$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
 	$cmd = "\$".$cmd."::I18N->{'".$id."'}{message}";
 	my $output = eval($cmd);	
-	WebGUI::ErrorHandler::warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
+	$self->session->errorHandler->warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
 	$output = get($id,$namespace,"English") if ($output eq "" && $language ne "English");
 	return $output;
 }
@@ -120,14 +120,14 @@ sub getLanguage {
 	unless ($@) {
 		$cmd = "\$".$cmd."::LANGUAGE";
 		my $hashRef = eval($cmd);	
-		WebGUI::ErrorHandler::warn("Failed to retrieve language properties because ".$@) if ($@);
+		$self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
 		if ($property) {
 			return $hashRef->{$property};
 		} else {
 			return $hashRef;
 		}
 	} else {
-		WebGUI::ErrorHandler::warn("Language failed to compile: $language. ".$@);
+		$self->session->errorHandler->warn("Language failed to compile: $language. ".$@);
 	}
 }
 
@@ -142,8 +142,8 @@ Returns a hash reference to the languages (languageId/lanugage) installed on thi
 
 sub getLanguages {
         my ($hashRef);
-	my $dir = $session{config}{webguiRoot}."/lib/WebGUI/i18n";
-	opendir (DIR,$dir) or WebGUI::ErrorHandler::fatal("Can't open I18N directory! ".$dir);
+	my $dir = $self->session->config->getWebguiRoot."/lib/WebGUI/i18n";
+	opendir (DIR,$dir) or $self->session->errorHandler->fatal("Can't open I18N directory! ".$dir);
 	my @files = readdir(DIR);
 	closedir(DIR);
 	foreach my $file (@files) {
@@ -176,18 +176,18 @@ sub makeUrlCompliant {
         my ($language, $url);
 	if (ref($_[0]) eq "WebGUI::International") {
 		$url = $_[1];
-		$language = $_[2] || $_[0]->{_language} || $session{user}{language} || "English";
+		$language = $_[2] || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
 	} else {
 		$url = $_[0];
-		$language = $_[1] || $session{user}{language} || "English";
+		$language = $_[1] || $self->session->user->profileField("language") || "English";
 	}
 	my $cmd = "WebGUI::i18n::".$language;
 	my $load = "use ".$cmd;
 	eval($load);
-	WebGUI::ErrorHandler::warn($cmd." failed to compile because ".$@) if ($@);
+	$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
 	$cmd = $cmd."::makeUrlCompliant";
 	my $output = eval{&$cmd($url)};	
-	WebGUI::ErrorHandler::fatal("Couldn't execute ".$cmd." because ".$@.". Maybe your languagepack misses the makeUrlCompliant method?") if ($@);
+	$self->session->errorHandler->fatal("Couldn't execute ".$cmd." because ".$@.". Maybe your languagepack misses the makeUrlCompliant method?") if ($@);
 	return $output;
 }
 

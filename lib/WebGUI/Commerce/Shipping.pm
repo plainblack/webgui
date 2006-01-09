@@ -134,7 +134,7 @@ Returns a reference to an array of all enabled instantiated payment plugins.
 
 sub getEnabledPlugins {
 	my (@enabledPlugins, $plugin, @plugins);
-	@enabledPlugins = WebGUI::SQL->buildArray("select namespace from commerceSettings where type='Shipping' and fieldName='enabled' and fieldValue='1'");
+	@enabledPlugins = $self->session->db->buildArray("select namespace from commerceSettings where type='Shipping' and fieldName='enabled' and fieldValue='1'");
 
 	foreach (@enabledPlugins) {
 		$plugin = WebGUI::Commerce::Shipping->load($_);
@@ -161,9 +161,9 @@ sub init {
 	$class = shift;
 	$namespace = shift;
 
-	WebGUI::ErrorHandler::fatal('No namespace passed to init.') unless ($namespace);
+	$self->session->errorHandler->fatal('No namespace passed to init.') unless ($namespace);
 	
-	$properties = WebGUI::SQL->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".quote($namespace)." and type='Shipping'");
+	$properties = $self->session->db->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".$self->session->db->quote($namespace)." and type='Shipping'");
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 
 	bless {_properties=>$properties, 
@@ -204,14 +204,14 @@ sub load {
     	$class = shift;
 	$namespace = shift;
 
-	WebGUI::ErrorHandler::fatal('No namespace passed to load.') unless ($namespace);
+	$self->session->errorHandler->fatal('No namespace passed to load.') unless ($namespace);
 	
     	$cmd = "WebGUI::Commerce::Shipping::$namespace";
 	$load = "use $cmd";
 	eval($load);
-	WebGUI::ErrorHandler::warn("Shipping plugin failed to compile: $cmd.".$@) if($@);
+	$self->session->errorHandler->warn("Shipping plugin failed to compile: $cmd.".$@) if($@);
 	$plugin = eval($cmd."->init");
-	WebGUI::ErrorHandler::warn("Couldn't instantiate shipping plugin: $cmd.".$@) if($@);
+	$self->session->errorHandler->warn("Couldn't instantiate shipping plugin: $cmd.".$@) if($@);
 	return $plugin;
 }
 
@@ -224,7 +224,7 @@ Returns the (display) name of the plugin. You must override this method.
 =cut
 
 sub name {
-	return WebGUI::ErrorHandler::fatal("You must override the name method in the shipping plugin.");
+	return $self->session->errorHandler->fatal("You must override the name method in the shipping plugin.");
 }
 
 #-------------------------------------------------------------------

@@ -14,10 +14,6 @@ package WebGUI::Affiliate;
 
 =cut
 
-use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::User;
-
 =head1 NAME
 
 Package WebGUI::Affiliate
@@ -42,24 +38,26 @@ These functions are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 grabReferral ( )
+=head2 grabReferral ( session )
 
-Grabs referral information out of the session and adds it to the user's
-account if possible.
+Grabs referral information out of the session and adds it to the user's account if possible.
+
+=head2 session
+
+A reference to the current session.
 
 =cut
 
 sub grabReferral {
-	if ($session{user}{userId} ne "1" && $session{user}{referringAffiliate}) {
+	my $session = shift;
+	if ($session->user->userId ne "1" && $session->user->referringAffiliate) {
 		return "";
-	} elsif ($session{user}{userId} ne "1" && (($session{user}{referringAffiliate} eq "0" && $session{scratch}{referringAffiliate}) || $session{form}{affiliateId})) {
-		my $u = WebGUI::User->new($session{user}{userId});
-		$u->referringAffiliate($session{scratch}{referringAffiliate});
-	} elsif ($session{user}{userId} != 1) {
-		my $u = WebGUI::User->new($session{user}{userId});
-		$u->referringAffiliate(1);
-	} elsif ($session{form}{affiliateId} ne "") {
-		WebGUI::Session::setScratch("referringAffiliate",$session{form}{affiliateId});
+	} elsif ($session->user->userId ne "1" && (($session->user->referringAffiliate eq "0" && $session->scratch->get("referringAffiliate")) || $session->form->get("affiliateId"))) {
+		$session->user->referringAffiliate($session->scratch->get("referringAffiliate"));
+	} elsif ($session->user->userId ne "1") {
+		$session->user->referringAffiliate(1);
+	} elsif ($session->form->get("affiliateId") ne "") {
+		$session->scratch->set("referringAffiliate",$session->form->get("affiliateId"));
 	}
 }
 

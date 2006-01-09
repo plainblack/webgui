@@ -96,7 +96,7 @@ sub _addError {
 	my $self = shift;
 	my $errorMessage = shift;
 	push(@{$self->{_errors}},$errorMessage);
-	WebGUI::ErrorHandler::error($errorMessage);
+	$self->session->errorHandler->error($errorMessage);
 }
 
 
@@ -112,7 +112,7 @@ NOTE: This is a private method and should never be called except internally to t
 
 sub _makePath {
 	my $self = shift;
-	my $node = $session{config}{uploadsPath};
+	my $node = $self->session->config->get("uploadsPath");
 	foreach my $folder ($self->{_part1}, $self->{_part2}, $self->{_id}) {
 		$node .= '/'.$folder;
 		unless (-e $node) { # check to see if it already exists
@@ -149,9 +149,9 @@ sub addFileFromFilesystem {
                         $filename =~ s/\./\_/g;
                         $filename .= ".txt";
                 }
-                $filename = WebGUI::URL::makeCompliant($filename);
+                $filename = $self->session->url->makeCompliant($filename);
                 if (-d $pathToFile) {
-                        WebGUI::ErrorHandler::error($pathToFile." is a directory, not a file.");
+                        $self->session->errorHandler->error($pathToFile." is a directory, not a file.");
                 } else {
                         my $source = FileHandle->new($pathToFile,"r");
                         if (defined $source) {
@@ -201,7 +201,7 @@ sub addFileFromFormPost {
 	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
 	my $filename;
 	my $attachmentCount = 1;
-	foreach my $upload ($session{req}->upload($formVariableName)) {
+	foreach my $upload ($self->session->request->upload($formVariableName)) {
 		return $filename if $attachmentCount > $attachmentLimit;
 		$filename = $upload->filename();
 		next unless $filename;
@@ -211,7 +211,7 @@ sub addFileFromFormPost {
 			$filename =~ s/\./\_/g;
 			$filename .= ".txt";
 		}
-		$filename = WebGUI::URL::makeCompliant($filename);
+		$filename = $self->session->url->makeCompliant($filename);
 		my $bytesread;
 		my $file = FileHandle->new(">".$self->getPath($filename));
 		$attachmentCount++;
@@ -251,7 +251,7 @@ A hash reference containing the data you wish to persist to the filesystem.
                                                                                                                                                        
 sub addFileFromHashref {
 	my $self = shift;
-	my $filename = WebGUI::URL::makeCompliant(shift);
+	my $filename = $self->session->url->makeCompliant(shift);
 	my $hashref = shift;
 	bless $hashref;
         nstore $hashref, $self->getPath($filename) or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
@@ -276,7 +276,7 @@ The content to write to the file.
 
 sub addFileFromScalar {
 	my $self = shift;
-	my $filename = WebGUI::URL::makeCompliant(shift);
+	my $filename = $self->session->url->makeCompliant(shift);
 	my $content = shift;
 	if (open(FILE,">".$self->getPath($filename))) {
 		print FILE $content;
@@ -483,11 +483,11 @@ sub getFileIconUrl {
 	my $self = shift;
 	my $filename = shift;
 	my $extension = $self->getFileExtension($filename);	
-	my $path = $session{config}{extrasPath}.'/fileIcons/'.$extension.".gif";
+	my $path = $self->session->config->get("extrasPath").'/fileIcons/'.$extension.".gif";
 	if (-e $path) {
-		return $session{config}{extrasURL}."/fileIcons/".$extension.".gif";
+		return $self->session->config->get("extrasURL")."/fileIcons/".$extension.".gif";
 	}
-	return $session{config}{extrasURL}."/fileIcons/unknown.gif";
+	return $self->session->config->get("extrasURL")."/fileIcons/unknown.gif";
 }
 
 
@@ -601,11 +601,11 @@ If specified, we'll return a path to the file rather than the storage location.
 sub getPath {
 	my $self = shift;	
 	my $file = shift;
-	unless ($session{config}{uploadsPath} && $self->{_part1} && $self->{_part2} && $self->getId) {
+	unless ($self->session->config->get("uploadsPath") && $self->{_part1} && $self->{_part2} && $self->getId) {
 		$self->_addError("storage object malformed");
 		return undef;
 	}
-        my $path = $session{config}{uploadsPath}
+        my $path = $self->session->config->get("uploadsPath")
 		.'/'.$self->{_part1}
 		.'/'.$self->{_part2}
 		.'/'.$self->getId;
@@ -631,7 +631,7 @@ If specified, we'll return a URL to the file rather than the storage location.
 sub getUrl {
 	my $self = shift;
 	my $file = shift;
-	my $url = $session{config}{uploadsURL}.'/'.$self->{_part1}.'/'.$self->{_part2}.'/'.$self->getId;
+	my $url = $self->session->config->get("uploadsURL").'/'.$self->{_part1}.'/'.$self->{_part2}.'/'.$self->getId;
 	if (defined $file) {
 		$url .= '/'.$file;
 	}

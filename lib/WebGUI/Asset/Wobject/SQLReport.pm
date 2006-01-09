@@ -293,7 +293,7 @@ sub _parsePlaceholderParams {
                 } elsif ($type =~ /^query(\d)/) {
                         $param = $self->{_query}{$1}{rowData}{$field};
                 }
-                WebGUI::Macro::process(\$param);
+                WebGUI::Macro::process($self->session,\$param);
                 push(@placeholderParams, $param);
         }
         return \@placeholderParams;
@@ -317,15 +317,15 @@ sub _processQuery {
 	# Preprocess macros
         if ($self->{_query}{$nr}{preprocessMacros}) {
 		$query = $self->{_query}{$nr}{dbQuery};
-                WebGUI::Macro::process(\$query);
+                WebGUI::Macro::process($self->session,\$query);
         } else {
                 $query = $self->{_query}{$nr}{dbQuery};
         }
 	
         push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get(17,"Asset_SQLReport").$query});
         push(@{$self->{_debug_loop}},{'debug.output'=>WebGUI::International::get('debug placeholder parameters',"Asset_SQLReport").join(",",@$placeholderParams)});
-        my $dbLink = WebGUI::DatabaseLink->new($self->{_query}{$nr}{databaseLinkId});
-        my $dbh = $dbLink->dbh;
+        my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId});
+        my $dbh = $dbLink->db;
         if (defined $dbh) {
                 if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
                         my $url = $self->getUrl('func=view');

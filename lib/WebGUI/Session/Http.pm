@@ -202,7 +202,7 @@ sub setCookie {
 		my $cookie = Apache2::Cookie->new($self->session->request,
 			-name=>$name,
 			-value=>$value,
-	#		-domain=>'.'.$session{env}{HTTP_HOST},
+	#		-domain=>'.'.$self->session->env->get("HTTP_HOST"),
 			-expires=>$ttl,
 			-path=>'/'
 		);

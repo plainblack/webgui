@@ -69,7 +69,7 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new("users");
+        my $ac = WebGUI::AdminConsole->new($session,"users");
         if ($help) {
                 $ac->setHelp($help);
         }
@@ -274,7 +274,7 @@ sub www_deleteUserConfirm {
 	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
-	   return WebGUI::AdminConsole->new("users")->render(WebGUI::Privilege::vitalComponent());
+	   return WebGUI::AdminConsole->new($session,"users")->render(WebGUI::Privilege::vitalComponent());
     } else {
 	   $u = WebGUI::User->new($session->form->process("uid"));
 	   $u->delete;

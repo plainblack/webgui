@@ -132,7 +132,7 @@ sub toHtml {
 		my $cmd = "use ".$class;
         	eval ($cmd);    
         	if ($@) { 
-                	WebGUI::ErrorHandler::error("Couldn't compile form control: ".$type.". Root cause: ".$@);
+                	$self->session->errorHandler->error("Couldn't compile form control: ".$type.". Root cause: ".$@);
 			next;
         	} 
 		$options{$type} = $class->getName;

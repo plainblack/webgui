@@ -65,7 +65,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _uiLevelChecksOut {
-	if ($_[0] <= $session{user}{uiLevel}) {
+	if ($_[0] <= $self->session->user->profileField("uiLevel")) {
 		return 1;
 	} else {
 		return 0;
@@ -90,7 +90,7 @@ sub AUTOLOAD {
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);    
         if ($@) {
-                WebGUI::ErrorHandler::error("Couldn't compile form control: ".$name.". Root cause: ".$@);
+                $self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
                 return undef;
         }       
         my $class = "WebGUI::Form::".$name;
@@ -168,7 +168,7 @@ Returns the HTML for this form object.
 =cut
 
 sub print {
-        return $_[0]->{_header}.$_[0]->{_data}.$_[0]->{_footer}.'<script type="text/javascript" src="'.$session{config}{extrasURL}.'/wz_tooltip.js"></script>';
+        return $_[0]->{_header}.$_[0]->{_data}.$_[0]->{_footer}.'<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wz_tooltip.js"></script>';
 }
 
 #-------------------------------------------------------------------

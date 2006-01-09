@@ -268,9 +268,9 @@ sub view {
    # snag our SOAP call and preprocess if needed
    if ($self->get('preprocessMacros')) {
 	$call = $self->get("callMethod");
-       WebGUI::Macro::process(\$call);
+       WebGUI::Macro::process($self->session,\$call);
 	$param_str = $self->get("params");
-      WebGUI::Macro::process(\$param_str);
+      WebGUI::Macro::process($self->session,\$param_str);
     } else {
        $call        = $self->get('callMethod');
        $param_str   = $self->get('params');
@@ -310,7 +310,7 @@ sub view {
    } else {
       $cache_key = _create_cache_key($self, $call, $param_str);
    }
-   $cache = WebGUI::Cache->new($cache_key,
+   $cache = WebGUI::Cache->new($self->session,$cache_key,
       WebGUI::International::get(4, "Asset_WSClient"));
 
    # passing a form param WSClient_skipCache lets us ignore even good caches

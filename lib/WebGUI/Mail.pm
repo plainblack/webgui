@@ -80,17 +80,17 @@ sub send {
 		if(${$option}) {
 			if (${$option} =~ /(?:From|To|Date|X-Mailer|Subject|Received|Message-Id)\s*:/is) {
 				use WebGUI::ErrorHandler;
-				return WebGUI::ErrorHandler::security("pass a malicious value to the mail header.");
+				return $self->session->errorHandler->security("pass a malicious value to the mail header.");
 			}
 		}
 	}
-	$from = $_[4] || $session{setting}{companyEmail};
+	$from = $_[4] || $self->session->setting->get("companyEmail");
 	#header
-	my $to = $session{config}{emailOverride} || $_[0];
+	my $to = $self->session->config->get("emailOverride") || $_[0];
 	$message = "To: $to\n";
 	$message .= "From: $from\n";
-	$message .= "CC: $_[3]\n" if ($_[3] && !$session{config}{emailOverride});
-	$message .= "BCC: $_[5]\n" if ($_[5] && !$session{config}{emailOverride});
+	$message .= "CC: $_[3]\n" if ($_[3] && !$self->session->config->get("emailOverride"));
+	$message .= "BCC: $_[5]\n" if ($_[5] && !$self->session->config->get("emailOverride"));
 	$message .= "Subject: ".$_[1]."\n";
 	$message .= "Date: ".WebGUI::DateTime::epochToHuman("","%W, %d %C %y %j:%n:%s %O")."\n";
 	if (($_[2] =~ m/<html>/i) || ($_[2] =~ m/<a\sname=/i)) {
@@ -99,34 +99,34 @@ sub send {
 		$message .= "Content-Type: text/plain; charset=UTF-8\n";
 	}
 	$message .= "\n";
-	WebGUI::Macro::process(\$message);
+	WebGUI::Macro::process($self->session,\$message);
 	#body
 	$message .= $_[2]."\n";
 	#footer
-	my $footer = "\n".$session{setting}{mailFooter};
-	WebGUI::Macro::process(\$footer);
+	my $footer = "\n".$self->session->setting->get("mailFooter");
+	WebGUI::Macro::process($self->session,\$footer);
 	$message .= $footer;
-	$message .= "\n\n\nThis message was intended for ".$_[0].", but was overridden in the config file.\n\n\n" if ($session{config}{emailOverride});
-	if ($session{setting}{smtpServer} =~ /\/sendmail/) {
-		if (open(MAIL,"| $session{setting}{smtpServer} -t -oi")) {
+	$message .= "\n\n\nThis message was intended for ".$_[0].", but was overridden in the config file.\n\n\n" if ($self->session->config->get("emailOverride"));
+	if ($self->session->setting->get("smtpServer") =~ /\/sendmail/) {
+		if (open(MAIL,"| $self->session->setting->get("smtpServer") -t -oi")) {
 			print MAIL $message;
-			close(MAIL) or WebGUI::ErrorHandler::warn("Couldn't close connection to mail server: ".$session{setting}{smtpServer});
+			close(MAIL) or $self->session->errorHandler->warn("Couldn't close connection to mail server: ".$self->session->setting->get("smtpServer"));
 		} else {
-			WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
+			$self->session->errorHandler->warn("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
 		}
 	} else {
-		$smtp = Net::SMTP->new($session{setting}{smtpServer}); # connect to an SMTP server
+		$smtp = Net::SMTP->new($self->session->setting->get("smtpServer")); # connect to an SMTP server
 		if (defined $smtp) {
 			$smtp->mail($from);     # use the sender's address here
 			$smtp->to($to);             # recipient's address
-			$smtp->cc($_[3]) if ($_[3] && !$session{config}{emailOverride});
-			$smtp->bcc($_[5]) if ($_[5] && !$session{config}{emailOverride});
+			$smtp->cc($_[3]) if ($_[3] && !$self->session->config->get("emailOverride"));
+			$smtp->bcc($_[5]) if ($_[5] && !$self->session->config->get("emailOverride"));
 			$smtp->data();              # Start the mail
 			$smtp->datasend($message);
 			$smtp->dataend();           # Finish sending the mail
 			$smtp->quit;                # Close the SMTP connection
 		} else {
-			WebGUI::ErrorHandler::warn("Couldn't connect to mail server: ".$session{setting}{smtpServer});
+			$self->session->errorHandler->warn("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
 		}
 	}
 }

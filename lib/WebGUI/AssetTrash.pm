@@ -54,13 +54,13 @@ If not specified, uses current user.
 sub getAssetsInTrash {
 	my $self = shift;
 	my $limitToUser = shift;
-	my $userId = shift || $session{user}{userId};
+	my $userId = shift || $self->session->user->profileField("userId");
 	my @assets;
 	my $limit;
 	if ($limitToUser) {
-		$limit = "and asset.stateChangedBy=".quote($userId);
+		$limit = "and asset.stateChangedBy=".$self->session->db->quote($userId);
 	}
-	my $sth = WebGUI::SQL->read("
+	my $sth = $self->session->db->read("
                 select 
                         asset.assetId, 
                         assetData.revisionDate,
@@ -96,14 +96,14 @@ Deletes an asset from tables and removes anything bound to that asset.
 
 sub purge {
 	my $self = shift;
-	return undef if ($self->getId eq $session{setting}{defaultPage} || $self->getId eq $session{setting}{notFoundPage});
-	WebGUI::SQL->beginTransaction;
+	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+	$self->session->db->beginTransaction;
 	foreach my $definition (@{$self->definition}) {
-		WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId));
+		$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId));
 	}
-	WebGUI::SQL->write("delete from metaData_values where assetId = ".quote($self->getId));
-	WebGUI::SQL->write("delete from asset where assetId=".quote($self->getId));
-	WebGUI::SQL->commit;
+	$self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId));
+	$self->session->db->write("delete from asset where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->commit;
 	$self->purgeCache;
 	WebGUI::Cache->new->deleteChunk(["asset",$self->getId]);
 	$self->updateHistory("purged");
@@ -121,11 +121,11 @@ Removes asset from lineage, places it in trash state. The "gap" in the lineage i
 
 sub trash {
 	my $self = shift;
-	return undef if ($self->getId eq $session{setting}{defaultPage} || $self->getId eq $session{setting}{notFoundPage});
-	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='trash-limbo' where lineage like ".quote($self->get("lineage").'%'));
-	WebGUI::SQL->write("update asset set state='trash', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId=".quote($self->getId));
-	WebGUI::SQL->commit;
+	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+	$self->session->db->beginTransaction;
+	$self->session->db->write("update asset set state='trash-limbo' where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
+	$self->session->db->write("update asset set state='trash', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".time()." where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->commit;
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
 	$self->purgeCache;
@@ -143,9 +143,9 @@ Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise r
 sub www_delete {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	return WebGUI::Privilege::vitalComponent() if (isIn($self->getId, $session{setting}{defaultPage}, $session{setting}{notFoundPage}));
+	return WebGUI::Privilege::vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
 	$self->trash;
-	$session{asset} = $self->getParent;
+	$self->session->asset = $self->getParent;
 	return $self->getParent->www_view;
 }
 
@@ -160,14 +160,14 @@ Moves list of assets to trash, returns www_manageAssets() method of self if canE
 sub www_deleteList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $assetId ($session{req}->param("assetId")) {
+	foreach my $assetId ($self->session->request->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			$asset->trash;
 		}
 	}
-	if ($session{form}{proceed} ne "") {
-                my $method = "www_".$session{form}{proceed};
+	if ($self->session->form->process("proceed") ne "") {
+                my $method = "www_".$self->session->form->process("proceed");
                 return $self->$method();
         }
 	return $self->www_manageAssets();
@@ -184,19 +184,19 @@ Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is Fal
 
 sub www_manageTrash {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("trash");
+	my $ac = WebGUI::AdminConsole->new($self->session,"trash");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my ($header, $limit);
         $ac->setHelp("trash manage");
-	if ($session{form}{systemTrash} && WebGUI::Grouping::isInGroup(3)) {
+	if ($self->session->form->process("systemTrash") && WebGUI::Grouping::isInGroup(3)) {
 		$header = WebGUI::International::get(965,"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10));
 	} else {
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), WebGUI::International::get(964,"Asset"));
 		$limit = 1;
 	}
-  	WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
+  	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
 	my $output = "
    <script type=\"text/javascript\">
@@ -245,12 +245,12 @@ Restores a piece of content from the trash back to it's original location.
 sub www_restoreList {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
-        foreach my $id ($session{req}->param("assetId")) {
+        foreach my $id ($self->session->request->param("assetId")) {
                 my $asset = WebGUI::Asset->newByDynamicClass($id);
                 $asset->publish;
         }
-        if ($session{form}{proceed} ne "") {
-                my $method = "www_".$session{form}{proceed};
+        if ($self->session->form->process("proceed") ne "") {
+                my $method = "www_".$self->session->form->process("proceed");
                 return $self->$method();
         }
         return $self->www_manageTrash();

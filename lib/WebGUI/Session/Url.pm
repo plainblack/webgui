@@ -94,7 +94,7 @@ sub append {
 
 Encodes a string to make it safe to pass in a URL.
 
-B<NOTE:> See WebGUI::URL::unescape()
+B<NOTE:> See $self->session->url->unescape()
 
 =head3 string
 
@@ -177,10 +177,10 @@ sub getSiteURL {
         	if ($self->session->setting->get("hostToUse") eq "sitename" || !isIn($self->session->env->get("HTTP_HOST"),@{$sitenames})) {
                 	$site = $sitenames->[0];
         	} else {
-                	$site = $session{env}{HTTP_HOST} || $sitenames->[0];
+                	$site = $self->session->env->get("HTTP_HOST") || $sitenames->[0];
         	}
         	my $proto = "http://";
-        	if ($session{env}{HTTPS} eq "on") {
+        	if ($self->session->env->get("HTTPS") eq "on") {
                	 	$proto = "https://";
         	}
         	$self->{_siteUrl} = $proto.$site;
@@ -322,7 +322,7 @@ sub setSiteURL {
 
 Decodes a string that was URL encoded.
 
-B<NOTE:> See WebGUI::URL::escape()
+B<NOTE:> See $self->session->url->escape()
 
 =head3 string
 

@@ -133,7 +133,7 @@ sub _submenu {
 	my $workarea = shift;
 	my $title = shift;
 	my $help = shift;
-	my $ac = WebGUI::AdminConsole->new("shortcutmanager");
+	my $ac = WebGUI::AdminConsole->new($self->session,"shortcutmanager");
 	$ac->setHelp($help) if ($help);
 	$ac->setIcon($self->getIcon);
 	$ac->addSubmenuItem($self->getUrl('func=edit'), WebGUI::International::get("Back to Edit Shortcut","Asset_Shortcut"));
@@ -376,7 +376,7 @@ sub getOverrides {
 	my $self = shift;
 	my $i = 0;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	my $cache = WebGUI::Cache->new(["shortcutOverrides",$self->getId,$self->session->user->profileField("userId"),$self->session->var->get("adminOn")]);
+	my $cache = WebGUI::Cache->new($self->session,["shortcutOverrides",$self->getId,$self->session->user->profileField("userId"),$self->session->var->get("adminOn")]);
 	my $overridesRef = $cache->get;
 	unless ($overridesRef->{cacheNotExpired}) {
 		my %overrides;
@@ -456,7 +456,7 @@ sub getShortcutByCriteria {
 	my $assetId = $self->getId;
 
 	# Parse macro's in criteria
-	WebGUI::Macro::process(\$criteria);
+	WebGUI::Macro::process($self->session,\$criteria);
 
 	# Once a asset is found, we will stick to that asset, 
 	# to prevent the proxying of multiple- depth assets like Surveys and USS.
@@ -595,7 +595,7 @@ sub processPropertiesFromFormPost {
 
 sub uncacheOverrides {
 	my $self = shift;
-	WebGUI::Cache->new(["shortcutOverrides",$self->getId])->delete;
+	WebGUI::Cache->new($self->session,["shortcutOverrides",$self->getId])->delete;
 }
 
 #-------------------------------------------------------------------

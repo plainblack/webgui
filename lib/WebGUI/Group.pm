@@ -71,8 +71,8 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _create {
         my $groupId = WebGUI::Id::generate();
-        WebGUI::SQL->write("insert into groups (groupId,dateCreated,expireOffset,karmaThreshold) values 
-		(".quote($groupId).",".time().",314496000,1000000000)");
+        $self->session->db->write("insert into groups (groupId,dateCreated,expireOffset,karmaThreshold) values 
+		(".$self->session->db->quote($groupId).",".time().",314496000,1000000000)");
 	WebGUI::Grouping::addGroupsToGroups([3],[$groupId]);
         return $groupId;
 }
@@ -127,8 +127,8 @@ sub autoAdd {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"autoAdd"} = $value;
-                WebGUI::SQL->write("update groups set autoAdd=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set autoAdd=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"autoAdd"};
 }
@@ -152,8 +152,8 @@ sub autoDelete {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"autoDelete"} = $value;
-                WebGUI::SQL->write("update groups set autoDelete=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set autoDelete=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"autoDelete"};
 }
@@ -181,9 +181,9 @@ Deletes this group and all references to it.
 =cut
 
 sub delete {
-        WebGUI::SQL->write("delete from groups where groupId=".quote($_[0]->{_groupId}));
-        WebGUI::SQL->write("delete from groupings where groupId=".quote($_[0]->{_groupId}));
-        WebGUI::SQL->write("delete from groupGroupings where inGroup=".quote($_[0]->{_groupId})." or groupId=".quote($_[0]->{_groupId}));
+        $self->session->db->write("delete from groups where groupId=".$self->session->db->quote($_[0]->{_groupId}));
+        $self->session->db->write("delete from groupings where groupId=".$self->session->db->quote($_[0]->{_groupId}));
+        $self->session->db->write("delete from groupGroupings where inGroup=".$self->session->db->quote($_[0]->{_groupId})." or groupId=".$self->session->db->quote($_[0]->{_groupId}));
 }
 
 #-------------------------------------------------------------------
@@ -237,8 +237,8 @@ sub deleteOffset {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"deleteOffset"} = $value;
-                WebGUI::SQL->write("update groups set deleteOffset=$value,
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set deleteOffset=$value,
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"deleteOffset"};
 }
@@ -262,8 +262,8 @@ sub description {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"description"} = $value;
-                WebGUI::SQL->write("update groups set description=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set description=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"description"};
 }
@@ -287,8 +287,8 @@ sub expireNotify {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"expireNotify"} = $value;
-                WebGUI::SQL->write("update groups set expireNotify=$value,
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set expireNotify=$value,
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"expireNotify"};
 }
@@ -312,8 +312,8 @@ sub expireNotifyMessage {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"expireNotifyMessage"} = $value;
-                WebGUI::SQL->write("update groups set expireNotifyMessage=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set expireNotifyMessage=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"expireNotifyMessage"};
 }
@@ -338,8 +338,8 @@ sub expireNotifyOffset {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"expireNotifyOffset"} = $value;
-                WebGUI::SQL->write("update groups set expireNotifyOffset=$value,
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set expireNotifyOffset=$value,
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"expireNotifyOffset"};
 }
@@ -362,8 +362,8 @@ sub expireOffset {
         my $value = shift;
         if (defined $value) {
                 $class->{_group}{"expireOffset"} = $value;
-                WebGUI::SQL->write("update groups set expireOffset=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set expireOffset=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"expireOffset"};
 }
@@ -384,7 +384,7 @@ The name of the group you wish to instantiate.
 sub find {
 	my $class = shift;
 	my $name = shift;
-	my ($groupId) = WebGUI::SQL->quickArray("select groupId from groups where groupName=".quote($name));
+	my ($groupId) = $self->session->db->quickArray("select groupId from groups where groupName=".$self->session->db->quote($name));
 	return WebGUI::Group->new($groupId);
 }
 
@@ -420,8 +420,8 @@ sub karmaThreshold {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"karmaThreshold"} = $value;
-                WebGUI::SQL->write("update groups set karmaThreshold=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set karmaThreshold=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"karmaThreshold"};
 }
@@ -445,8 +445,8 @@ sub ipFilter {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"ipFilter"} = $value;
-                WebGUI::SQL->write("update groups set ipFilter=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set ipFilter=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"ipFilter"};
 }
@@ -470,8 +470,8 @@ sub isEditable {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"isEditable"} = $value;
-                WebGUI::SQL->write("update groups set isEditable=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set isEditable=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"isEditable"};
 }
@@ -508,8 +508,8 @@ sub name {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"groupName"} = $value;
-                WebGUI::SQL->write("update groups set groupName=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set groupName=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"groupName"};
 }
@@ -543,7 +543,7 @@ sub new {
 		$group{databaseLinkId} = 0;
 		$group{dbCacheTimeout} = 3600;
 	} else {
-        	%group = WebGUI::SQL->quickHash("select * from groups where groupId=".quote($groupId));
+        	%group = $self->session->db->quickHash("select * from groups where groupId=".$self->session->db->quote($groupId));
 	}
         bless {_groupId => $groupId, _group => \%group }, $class;
 }
@@ -566,8 +566,8 @@ sub scratchFilter {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"scratchFilter"} = $value;
-                WebGUI::SQL->write("update groups set scratchFilter=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set scratchFilter=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"scratchFilter"};
 }
@@ -590,8 +590,8 @@ sub showInForms {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"showInForms"} = $value;
-                WebGUI::SQL->write("update groups set showInForms=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set showInForms=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"showInForms"};
 }
@@ -617,8 +617,8 @@ sub dbQuery {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"dbQuery"} = $value;
-                WebGUI::SQL->write("update groups set dbQuery=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set dbQuery=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"dbQuery"};
 }
@@ -641,8 +641,8 @@ sub databaseLinkId {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"databaseLinkId"} = $value;
-                WebGUI::SQL->write("update groups set databaseLinkId=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set databaseLinkId=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"databaseLinkId"};
 }
@@ -665,8 +665,8 @@ sub dbCacheTimeout {
         $value = shift;
         if (defined $value) {
                 $class->{_group}{"dbCacheTimeout"} = $value;
-                WebGUI::SQL->write("update groups set dbCacheTimeout=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+                $self->session->db->write("update groups set dbCacheTimeout=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"dbCacheTimeout"};
 }
@@ -689,8 +689,8 @@ sub ldapGroup {
         $value = shift;
         if (defined $value) {
            $class->{_group}{"ldapGroup"} = $value;
-           WebGUI::SQL->write("update groups set ldapGroup=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+           $self->session->db->write("update groups set ldapGroup=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"ldapGroup"};
 }
@@ -713,8 +713,8 @@ sub ldapGroupProperty {
         $value = shift;
         if (defined $value) {
            $class->{_group}{"ldapGroupProperty"} = $value;
-           WebGUI::SQL->write("update groups set ldapGroupProperty=".quote($value).",
-                        lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+           $self->session->db->write("update groups set ldapGroupProperty=".$self->session->db->quote($value).",
+                        lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
         }
         return $class->{_group}{"ldapGroupProperty"};
 }
@@ -737,7 +737,7 @@ sub ldapRecursiveProperty {
    $value = shift;
    if (defined $value) {
       $class->{_group}{"ldapRecursiveProperty"} = $value;
-      WebGUI::SQL->write("update groups set ldapRecursiveProperty=".quote($value).", lastUpdated=".time()." where groupId=".quote($class->{_groupId}));
+      $self->session->db->write("update groups set ldapRecursiveProperty=".$self->session->db->quote($value).", lastUpdated=".time()." where groupId=".$self->session->db->quote($class->{_groupId}));
    }
    return $class->{_group}{"ldapRecursiveProperty"};
 }

@@ -40,7 +40,7 @@ sub _submenu {
         my $title = shift;
         $title = $i18n->get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new("subscriptions");
+        my $ac = WebGUI::AdminConsole->new($session,"subscriptions");
         if ($help) {
                 $ac->setHelp($help, 'Subscription');
         }

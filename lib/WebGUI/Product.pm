@@ -29,9 +29,9 @@ sub addOptionToParameter {
 	
 	$optionId = WebGUI::Id::generate;
 
-	WebGUI::SQL->write("insert into productParameterOptions ".
+	$self->session->db->write("insert into productParameterOptions ".
 		"(optionId, parameterId) values ".
-		"(".quote($optionId).", ".quote($parameterId).")");
+		"(".$self->session->db->quote($optionId).", ".$self->session->db->quote($parameterId).")");
 
 	$self->{_options}->{$optionId} = { 
 		%$properties, 
@@ -54,8 +54,8 @@ sub addParameter {
 
 	$parameterId = WebGUI::Id::generate;
 
-	WebGUI::SQL->write("insert into productParameters (parameterId, productId) values ".
-		"(".quote($parameterId).", ".quote($self->get('productId')).")");
+	$self->session->db->write("insert into productParameters (parameterId, productId) values ".
+		"(".$self->session->db->quote($parameterId).", ".$self->session->db->quote($self->get('productId')).")");
 
 	$self->{_parameters}->{$parameterId}->{parameterId} = $parameterId;
 	$self->{_parameters}->{$parameterId}->{options} = [];
@@ -68,12 +68,12 @@ sub delete {
 	my ($self) = shift;
 
 	foreach (@{$self->getParameter}) {
-		WebGUI::SQL->write("delete from productParameterOptions where parameterId=".quote($_->{parameterId}));
+		$self->session->db->write("delete from productParameterOptions where parameterId=".$self->session->db->quote($_->{parameterId}));
 	}
 	
-	WebGUI::SQL->write("delete from productParameters where productId=".quote($self->get('productId')));
-	WebGUI::SQL->write("delete from productVariants where productId=".quote($self->get('productId')));
-	WebGUI::SQL->write("delete from products where productId=".quote($self->get('productId')));
+	$self->session->db->write("delete from productParameters where productId=".$self->session->db->quote($self->get('productId')));
+	$self->session->db->write("delete from productVariants where productId=".$self->session->db->quote($self->get('productId')));
+	$self->session->db->write("delete from products where productId=".$self->session->db->quote($self->get('productId')));
 
 	return undef;
 }
@@ -84,8 +84,8 @@ sub deleteParameter {
 	$self = shift;
 	$parameterId = shift;
 
-	WebGUI::SQL->write("delete from productParameterOptions where parameterId=".quote($parameterId));
-	WebGUI::SQL->write("delete from productParameters where parameterId=".quote($parameterId));
+	$self->session->db->write("delete from productParameterOptions where parameterId=".$self->session->db->quote($parameterId));
+	$self->session->db->write("delete from productParameters where parameterId=".$self->session->db->quote($parameterId));
 
 	$self->updateVariants;
 
@@ -98,7 +98,7 @@ sub deleteOption {
 	$self = shift;
 	$optionId = shift;
 	
-	WebGUI::SQL->write("delete from productParameterOptions where optionId=".quote($optionId));
+	$self->session->db->write("delete from productParameterOptions where optionId=".$self->session->db->quote($optionId));
 
 	$parameterId = $self->{_options}->{$optionId}->{parameterId};
 
@@ -134,8 +134,8 @@ sub getByOptionId {
 	$optionId = shift;
 	
 
-	($productId) = WebGUI::SQL->quickArray("select productId from productParameters as t1, productParameterOptions as t2 ".
-		"where t1.parameterId=t2.parameterId and t2.optionId=".quote($optionId));
+	($productId) = $self->session->db->quickArray("select productId from productParameters as t1, productParameterOptions as t2 ".
+		"where t1.parameterId=t2.parameterId and t2.optionId=".$self->session->db->quote($optionId));
 	
 	return undef unless ($productId);
 
@@ -148,7 +148,7 @@ sub getByParameterId {
 	$class = shift;
 	$parameterId = shift;
 	
-	($productId) = WebGUI::SQL->quickArray("select productId from productParameters where parameterId=".quote($parameterId));
+	($productId) = $self->session->db->quickArray("select productId from productParameters where parameterId=".$self->session->db->quote($parameterId));
 
 	return WebGUI::Product->new($productId);
 }
@@ -159,7 +159,7 @@ sub getByVariantId {
 	$class = shift;
 	$variantId = shift;
 
-	($productId) = WebGUI::SQL->quickArray("select productId from productVariants where variantId=".quote($variantId));
+	($productId) = $self->session->db->quickArray("select productId from productVariants where variantId=".$self->session->db->quote($variantId));
 
 	return WebGUI::Product->new($productId);
 }
@@ -203,7 +203,7 @@ sub new {
 	$class = shift;
 	$productId = shift;
 	
-	WebGUI::ErrorHandler::fatal('no productId') unless ($productId);
+	$self->session->errorHandler->fatal('no productId') unless ($productId);
 
 	$parameters = {};
 	$variants = {};
@@ -212,13 +212,13 @@ sub new {
 	if ($productId eq 'new') {
 		$productId = WebGUI::Id::generate;
 		$properties = {productId => $productId};
-		WebGUI::SQL->write("insert into products (productId) values (".quote($productId).")");
+		$self->session->db->write("insert into products (productId) values (".$self->session->db->quote($productId).")");
 	} else {
-		$properties = WebGUI::SQL->quickHashRef("select * from products where productId=".quote($productId));
+		$properties = $self->session->db->quickHashRef("select * from products where productId=".$self->session->db->quote($productId));
 		
 		# fetch parameters and options
-		$sth = WebGUI::SQL->read("select opt.*, param.* from productParameters as param left join productParameterOptions as opt ".
-			"on param.parameterId=opt.parameterId where param.productId=".quote($productId));
+		$sth = $self->session->db->read("select opt.*, param.* from productParameters as param left join productParameterOptions as opt ".
+			"on param.parameterId=opt.parameterId where param.productId=".$self->session->db->quote($productId));
 		while (%row = $sth->hash) {
 			$parameters->{$row{parameterId}} = {
 				name		=> $row{name},
@@ -240,7 +240,7 @@ sub new {
 		}
 
 		# fetch variants
-		$sth = WebGUI::SQL->read("select * from productVariants where productId=".quote($productId));
+		$sth = $self->session->db->read("select * from productVariants where productId=".$self->session->db->quote($productId));
 		while (%row = $sth->hash) {
 			$variants->{$row{variantId}} = {%row};
 		}
@@ -257,8 +257,8 @@ sub set {
 	$self = shift;
 	$properties = shift;
 		
-	WebGUI::SQL->write("update products set ".join(', ', map {$_."=".quote($properties->{$_})} keys(%$properties)).
-		" where productId=".quote($self->get('productId')));
+	$self->session->db->write("update products set ".join(', ', map {$_."=".$self->session->db->quote($properties->{$_})} keys(%$properties)).
+		" where productId=".$self->session->db->quote($self->get('productId')));
 
 	foreach (keys(%$properties)) {
 		$self->{_properties}->{$_} = $properties->{$_};
@@ -274,8 +274,8 @@ sub setParameter {
 	$parameterId = shift;
 	$properties = shift;
 	
-	WebGUI::SQL->write("update productParameters set ".join(', ', map {$_."=".quote($properties->{$_})} keys(%$properties)).
-		" where parameterId=".quote($parameterId));
+	$self->session->db->write("update productParameters set ".join(', ', map {$_."=".$self->session->db->quote($properties->{$_})} keys(%$properties)).
+		" where parameterId=".$self->session->db->quote($parameterId));
 
 	map {$self->{_parameter}->{$parameterId}->{$_} = $properties->{$_}} keys %$properties;
 }
@@ -287,8 +287,8 @@ sub setOption {
 	$optionId = shift;
 	$properties = shift;
 
-	WebGUI::SQL->write("update productParameterOptions set ".join(', ', map {$_."=".quote($properties->{$_})} keys(%$properties)).
-		" where optionId=".quote($optionId));
+	$self->session->db->write("update productParameterOptions set ".join(', ', map {$_."=".$self->session->db->quote($properties->{$_})} keys(%$properties)).
+		" where optionId=".$self->session->db->quote($optionId));
 
 	foreach (keys(%$properties)) {
 		$self->{_options}->{$optionId}->{$_} = $properties->{$_};
@@ -321,29 +321,29 @@ my		$currentOption = $self->getOption($_);
 
 	if (defined $properties->{price}) {
 		if ($properties->{price} ne '') {
-			push(@pairs, 'price='.quote($properties->{price}).', priceOverride=1');
+			push(@pairs, 'price='.$self->session->db->quote($properties->{price}).', priceOverride=1');
 		} else {
-			push(@pairs, 'price='.quote($original->{price}).', priceOverride=0');
+			push(@pairs, 'price='.$self->session->db->quote($original->{price}).', priceOverride=0');
 		}
 	}
 	if (defined $properties->{weight}) {
 		if ($properties->{weight} ne '') {
-			push(@pairs, 'weight='.quote($properties->{weight}).', weightOverride=1');
+			push(@pairs, 'weight='.$self->session->db->quote($properties->{weight}).', weightOverride=1');
 		} else {
-			push(@pairs, 'weight='.quote($original->{weight}).', weightOverride=0');
+			push(@pairs, 'weight='.$self->session->db->quote($original->{weight}).', weightOverride=0');
 		}
 	}
 	if (defined $properties->{sku}) {
 		if ($properties->{sku} ne '') {
-			push(@pairs, 'sku='.quote($properties->{sku}).', skuOverride=1');
+			push(@pairs, 'sku='.$self->session->db->quote($properties->{sku}).', skuOverride=1');
 		} else {
-			push(@pairs, 'sku='.quote($original->{sku}).', skuOverride=0');
+			push(@pairs, 'sku='.$self->session->db->quote($original->{sku}).', skuOverride=0');
 		}
 	}
 	
-	push(@pairs, 'available='.quote($properties->{available})) if (defined $properties->{available});
+	push(@pairs, 'available='.$self->session->db->quote($properties->{available})) if (defined $properties->{available});
 
-	WebGUI::SQL->write("update productVariants set ".join(', ', @pairs)." where variantId=".quote($variantId)) if (@pairs);
+	$self->session->db->write("update productVariants set ".join(', ', @pairs)." where variantId=".$self->session->db->quote($variantId)) if (@pairs);
 
 	$self->{_variants}->{$variantId} = {%{$self->{_variants}->{$variantId}}, %$properties};
 }
@@ -407,11 +407,11 @@ sub updateVariants {
 		$newVariants{$var{variantId}} = {%var};
 	}
 
-	WebGUI::SQL->write("delete from productVariants where productId=".quote($self->get('productId')));
+	$self->session->db->write("delete from productVariants where productId=".$self->session->db->quote($self->get('productId')));
 	foreach (values %newVariants) {
-		WebGUI::SQL->write("insert into productVariants (variantId, productId, composition, price, weight, sku, available) values ".
-			"(".quote($_->{variantId}).", ".quote($_->{productId}).", ".quote($_->{composition}).", ".quote($_->{price}).
-			", ".quote($_->{weight}).", ".quote($_->{sku}).", ".quote($_->{available}).")");
+		$self->session->db->write("insert into productVariants (variantId, productId, composition, price, weight, sku, available) values ".
+			"(".$self->session->db->quote($_->{variantId}).", ".$self->session->db->quote($_->{productId}).", ".$self->session->db->quote($_->{composition}).", ".$self->session->db->quote($_->{price}).
+			", ".$self->session->db->quote($_->{weight}).", ".$self->session->db->quote($_->{sku}).", ".$self->session->db->quote($_->{available}).")");
 	}
 
 	$self->{_variants} = \%newVariants;

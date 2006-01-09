@@ -289,7 +289,7 @@ sub www_editSettings {
 		$tabform->getTab("auth")->raw('<tr id="'.$_.$style.'"><td colspan="2" width="100%"><table border="0" cellspacing="0" cellpadding="0" width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
 	}
 	$tabform->submit();
-	my $ac = WebGUI::AdminConsole->new("settings");
+	my $ac = WebGUI::AdminConsole->new($session,"settings");
 	$ac->setHelp("settings");
 	return $ac->render($tabform->print);
 }

@@ -16,13 +16,8 @@ use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
 use WebGUI::Grouping;
 use WebGUI::Icon;
-use WebGUI::Id;
 use WebGUI::International;
-use WebGUI::Paginator;
 use WebGUI::Privilege;
-use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -31,7 +26,7 @@ sub _submenu {
         my $title = shift;
         $title = WebGUI::International::get($title) if ($title);
         my $help = shift;
-        my $ac = WebGUI::AdminConsole->new("databases");
+        my $ac = WebGUI::AdminConsole->new($session,"databases");
         if ($help) {
                 $ac->setHelp($help);
         }
@@ -49,11 +44,7 @@ sub _submenu {
 sub www_copyDatabaseLink {
 	my $session = shift;
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
-	my (%db);
-	tie %db, 'Tie::CPHash';
-	%db = $session->db->quickHash("select * from databaseLink where databaseLinkId=".$session->db->quote($session->form->process("dlid")));
-        $session->db->write("insert into databaseLink (databaseLinkId,title,DSN,username,identifier) values (".$session->db->quote(WebGUI::Id::generate()).", 
-		".$session->db->quote($db{title}." (copy)").", ".$session->db->quote($db{DSN}).", ".$session->db->quote($db{username}).", ".$session->db->quote($db{identifier}).")");
+	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->copy;
         return www_listDatabaseLinks();
 }
 
@@ -75,7 +66,7 @@ sub www_deleteDatabaseLink {
 sub www_deleteDatabaseLinkConfirm {
 	my $session = shift;
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
-        $session->db->write("delete from databaseLink where databaseLinkId=".$session->db->quote($session->form->process("dlid")));
+	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->delete;
         return www_listDatabaseLinks();
 }
 
@@ -88,7 +79,7 @@ sub www_editDatabaseLink {
 	if ($session->form->process("dlid") eq "new") {
 
 	} else {
-               	%db = $session->db->quickHash("select * from databaseLink where databaseLinkId=".$session->db->quote($session->form->process("dlid")));
+               	%db = %{WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->get}; 
 	}
 	$f = WebGUI::HTMLForm->new(
 		-extras=>'autocomplete="off"'
@@ -139,12 +130,17 @@ sub www_editDatabaseLink {
 sub www_editDatabaseLinkSave {
 	my $session = shift;
         return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+	my $params = {
+		title=>$session->form->process("title"),
+		username=>$session->form->process("dbusername"),
+		identifier=>$session->form->process("dbidentifier")
+		DSN=>$session->form->process("DSN")
+		});
 	if ($session->form->process("dlid") eq "new") {
-		$session->form->process("dlid") = WebGUI::Id::generate();
-		$session->db->write("insert into databaseLink (databaseLinkId) values (".$session->db->quote($session->form->process("dlid")).")");
+		WebGUI::DatabaseLink->create($session,$params);
+	} else {
+		WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->set($params);
 	}
-	    $session->db->write("update databaseLink set title=".$session->db->quote($session->form->process("title")).", DSN=".$session->db->quote($session->form->process("DSN")).",
-		username=".$session->db->quote($session->form->process("dbusername")).", identifier=".$session->db->quote($session->form->process("dbidentifier"))." where databaseLinkId=".$session->db->quote($session->form->process("dlid")));
         return www_listDatabaseLinks();
 }
 
@@ -152,26 +148,18 @@ sub www_editDatabaseLinkSave {
 sub www_listDatabaseLinks {
 	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
-        my ($output, $p, $sth, %data, @row, $i);
-        $sth = $session->db->read("select * from databaseLink order by title");
-	$row[$i] = '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';
-	$i++;
-        while (%data = $sth->hash) {
-                $row[$i] = '<tr><td valign="top" class="tableData">'
-			.deleteIcon('op=deleteDatabaseLink;dlid='.$data{databaseLinkId})
-			.editIcon('op=editDatabaseLink;dlid='.$data{databaseLinkId})
-			.copyIcon('op=copyDatabaseLink;dlid='.$data{databaseLinkId})
+	my $links = WebGUI::DatabaseLinks->getList($session);
+        my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
+	foreach my $id (keys %{$links}) {
+		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';
+                $output = '<tr><td valign="top" class="tableData">'
+			.deleteIcon('op=deleteDatabaseLink;dlid='.$id)
+			.editIcon('op=editDatabaseLink;dlid='.$id)
+			.copyIcon('op=copyDatabaseLink;dlid='.$id)
 			.'</td>';
-                $row[$i] .= '<td valign="top" class="tableData">'.$data{title}.'</td></tr>';
-                $i++;
+                $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td></tr>';
         }
-	$sth->finish;
-        $p = WebGUI::Paginator->new($session->url->page('op=listDatabaseLinks'));
-	$p->setDataByArrayRef(\@row);
-        $output .= '<table border="1" cellpadding="3" cellspacing="0" align="center">';
-        $output .= $p->getPage;
         $output .= '</table>';
-        $output .= $p->getBarTraditional;
         return _submenu($output,"database links manage");
 }
 

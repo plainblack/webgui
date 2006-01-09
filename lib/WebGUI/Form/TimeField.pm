@@ -109,7 +109,7 @@ Renders a time field.
 sub toHtml {
         my $self = shift;
 	my $value = WebGUI::DateTime::secondsToTime($self->get("value"));
-	WebGUI::Style::setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
 	$self->get("extras") .= ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789:\')"';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new(

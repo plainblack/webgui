@@ -179,7 +179,7 @@ Renders a file upload control.
 
 sub toHtml {
 	my $self = shift;
-        WebGUI::Style::setScript($self->session->config->get("extrasURL").'/FileUploadControl.js',{type=>"text/javascript"});
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/FileUploadControl.js',{type=>"text/javascript"});
         my $uploadControl = '<script type="text/javascript">
                 var fileIcons = new Array();
                 ';

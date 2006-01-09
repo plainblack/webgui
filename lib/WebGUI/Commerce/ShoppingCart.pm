@@ -74,10 +74,10 @@ sub add {
 		quantity	=> $self->{_items}{$itemId."_".$itemType}{quantity} + $quantity
 		};
 		
-	WebGUI::SQL->write("delete from shoppingCart where sessionId=".quote($self->{_sessionId})." and itemId=".quote($itemId)." and itemType=".quote($itemType));
-	WebGUI::SQL->write("insert into shoppingCart ".
+	$self->session->db->write("delete from shoppingCart where sessionId=".$self->session->db->quote($self->{_sessionId})." and itemId=".$self->session->db->quote($itemId)." and itemType=".$self->session->db->quote($itemType));
+	$self->session->db->write("insert into shoppingCart ".
 		"(sessionId, itemId, itemType, quantity) values ".
-		"(".quote($self->{_sessionId}).",".quote($itemId).",".quote($itemType).",".$self->{_items}{$itemId."_".$itemType}{quantity}.")");
+		"(".$self->session->db->quote($self->{_sessionId}).",".$self->session->db->quote($itemId).",".$self->session->db->quote($itemType).",".$self->{_items}{$itemId."_".$itemType}{quantity}.")");
 }
 
 #-------------------------------------------------------------------
@@ -103,8 +103,8 @@ sub delete {
 	$itemId = shift;
 	$itemType = shift;
 
-	WebGUI::SQL->write("delete from shoppingCart where sessionId=".quote($self->{_sessionId}).
-		" and itemId=".quote($itemId)." and itemType=".quote($itemType));
+	$self->session->db->write("delete from shoppingCart where sessionId=".$self->session->db->quote($self->{_sessionId}).
+		" and itemId=".$self->session->db->quote($itemId)." and itemType=".$self->session->db->quote($itemType));
 	
 	delete $self->{_items}{$itemId."_".$itemType};
 }
@@ -143,14 +143,14 @@ sub setQuantity {
 	$itemType = shift;
 	$quantity = shift;
 
-	WebGUI::ErrorHandler::fatal('No quantity or quantity is not a number: ('.$quantity.')') unless ($quantity =~ /^-?\d+$/);
+	$self->session->errorHandler->fatal('No quantity or quantity is not a number: ('.$quantity.')') unless ($quantity =~ /^-?\d+$/);
 
 	return $self->delete($itemId, $itemType) if ($quantity <= 0);
 	
 	$self->{_items}{$itemId."_".$itemType}->{quantity} = $quantity;
 
-	WebGUI::SQL->write("update shoppingCart set quantity=".quote($quantity).
-		" where sessionId=".quote($self->{_sessionId})." and itemId=".quote($itemId)." and itemType=".quote($itemType));
+	$self->session->db->write("update shoppingCart set quantity=".$self->session->db->quote($quantity).
+		" where sessionId=".$self->session->db->quote($self->{_sessionId})." and itemId=".$self->session->db->quote($itemId)." and itemType=".$self->session->db->quote($itemType));
 }
 
 #-------------------------------------------------------------------
@@ -165,7 +165,7 @@ sub empty {
 	my ($self);
 	$self = shift;
 	
-	WebGUI::SQL->write("delete from shoppingCart where sessionId=".quote($self->{_sessionId}));
+	$self->session->db->write("delete from shoppingCart where sessionId=".$self->session->db->quote($self->{_sessionId}));
 }
 
 #-------------------------------------------------------------------
@@ -246,9 +246,9 @@ of the current user.
 sub new {
 	my ($class, $sessionId, $sth, $row, %items);
 	$class = shift;
-	$sessionId = shift || $session{var}{sessionId};
+	$sessionId = shift || $self->session->var->get("sessionId");
 
-	$sth = WebGUI::SQL->read("select * from shoppingCart where sessionId=".quote($sessionId));
+	$sth = $self->session->db->read("select * from shoppingCart where sessionId=".$self->session->db->quote($sessionId));
 	while ($row = $sth->hashRef) {
 		$items{$row->{itemId}."_".$row->{itemType}} = $row;
 	}

@@ -419,7 +419,7 @@ sub getRecordTemplateVars {
 			}
 			if (not exists $data{value}) {
 				my $defaultValue = $data{defaultValue};
-				WebGUI::Macro::process(\$defaultValue);
+				WebGUI::Macro::process($self->session,\$defaultValue);
 				$data{value} = $defaultValue;
 			}
 			my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
@@ -463,7 +463,7 @@ sub getRecordTemplateVars {
 		}
 		if (not exists $data{value}) {
 			my $defaultValue = $data{defaultValue};
-			WebGUI::Macro::process(\$defaultValue);
+			WebGUI::Macro::process($self->session,\$defaultValue);
 			$data{value} = $defaultValue;
 		}
 		my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
@@ -579,7 +579,7 @@ sub sendEmail {
 	my $self = shift;
 	my $var = shift;
 	my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
-	WebGUI::Macro::process(\$message);
+	WebGUI::Macro::process($self->session,\$message);
 	my ($to, $subject, $from, $bcc, $cc);
 	foreach my $row (@{$var->{field_loop}}) {
 		if ($row->{"field.name"} eq "to") {
@@ -1057,7 +1057,7 @@ sub www_process {
 		}
 		if ($row{status} eq "hidden") {
 			$value = $row{defaultValue};
-                        WebGUI::Macro::process(\$value);
+                        WebGUI::Macro::process($self->session,\$value);
                 }
 		unless ($hadErrors) {
 			my ($exists) = $self->session->db->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=".$self->session->db->quote($entryId)."

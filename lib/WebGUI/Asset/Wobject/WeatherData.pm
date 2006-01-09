@@ -84,7 +84,7 @@ Accepts an array ref of locations, and returns
 sub _getLocationData {
 	my $self = shift;
 	my $location = shift;
-	my $cache = WebGUI::Cache->new(["weatherLocation",$location]);
+	my $cache = WebGUI::Cache->new($self->session,["weatherLocation",$location]);
 	my $locData = $cache->get;
 	unless ($locData->{cityState}) {
 		my $oldagent;

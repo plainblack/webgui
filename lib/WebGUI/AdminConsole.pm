@@ -17,10 +17,7 @@ package WebGUI::AdminConsole;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::Style;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -66,17 +63,17 @@ sub _formatFunction {
 	my $function = shift;
 	my $url;
 	if (exists $function->{func}) {
-		$url = WebGUI::URL::page("func=".$function->{func});
+		$url = $self->session->url->page("func=".$function->{func});
 	} else {
-		$url = WebGUI::URL::page("op=".$function->{op});
+		$url = $self->session->url->page("op=".$function->{op});
 	}
 	return {
 		title=>WebGUI::International::get($function->{title}{id}, $function->{title}{namespace}),
-		icon=>$session{config}{extrasURL}."/adminConsole/".$function->{icon},
-		'icon.small'=>$session{config}{extrasURL}."/adminConsole/small/".$function->{icon},
+		icon=>$self->session->config->get("extrasURL")."/adminConsole/".$function->{icon},
+		'icon.small'=>$self->session->config->get("extrasURL")."/adminConsole/small/".$function->{icon},
 		url=>$url,
 		canUse=>WebGUI::Grouping::isInGroup($function->{group}),
-		isCurrentOpFunc=>($session{form}{op} eq $function->{op} || $session{form}{func} eq $function->{func})
+		isCurrentOpFunc=>($self->session->form->get("op") eq $function->{op} || $self->session->form->get("func") eq $function->{func})
 	};
 }
 
@@ -121,10 +118,11 @@ Returns a Hash of title, url, canUse, and icon. title is the Internationalizatio
 =cut
 
 sub getAdminConsoleParams {
+	my $self = shift;
 	return { 'title' => WebGUI::International::get("admin console","AdminConsole"),
-		url => WebGUI::URL::page("op=adminConsole"),
+		url => $self->session->url->page("op=adminConsole"),
 		canUse => WebGUI::Grouping::isInGroup("12"),
-		icon => $session{config}{extrasURL}."/adminConsole/adminConsole.gif"
+		icon => $self->session->config->get("extrasURL")."/adminConsole/adminConsole.gif"
 		};
 }
 
@@ -353,9 +351,13 @@ sub getAdminFunction {
 
 #-------------------------------------------------------------------
 
-=head2 new ( [id] )
+=head2 new ( session, [id] )
 
 Constructor.
+
+=head2 session
+
+A reference to the current session.
 
 =head3 id
 
@@ -365,9 +367,11 @@ If supplied, updates the _function of the AdminFunction.
 
 sub new {
 	my $class = shift;
+	my $session = shift;
 	my $id = shift;
 	my %self;
 	$self{_function} = $class->getAdminFunction($id) if ($id);
+	$self{_session} = $session;
 	bless \%self, $class;
 }
 
@@ -405,20 +409,20 @@ sub render {
 	$var{"console.canUse"} = $acParams->{canUse};
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
-	if (exists $session{asset}) {
-		my $importNode = $session{asset}->getImportNode;
+	if (exists $self->session->asset) {
+		my $importNode = $self->session->asset->getImportNode;
 		my $importNodeLineage = $importNode->get("lineage");
-		my $assetLineage = $session{asset}->get("lineage");
+		my $assetLineage = $self->session->asset->get("lineage");
 		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001") {
-			$var{"backtosite.url"} = $session{asset}->getDefault->getUrl;
+			$var{"backtosite.url"} = $self->session->asset->getDefault->getUrl;
 		} else {
-			$var{"backtosite.url"} = $session{asset}->getContainer->getUrl;
+			$var{"backtosite.url"} = $self->session->asset->getContainer->getUrl;
 		}
 	} else {
-		$var{"backtosite.url"} = WebGUI::URL::page();
+		$var{"backtosite.url"} = $self->session->url->page();
 	}
 	$var{"application_loop"} = $self->getAdminFunction;
-	return WebGUI::Style::process(WebGUI::Asset::Template->new($session{setting}{AdminConsoleTemplate})->process(\%var),"PBtmpl0000000000000137");
+	return $self->session->style->:process(WebGUI::Asset::Template->new($self->session,$self->session->setting->get("AdminConsoleTemplate"))->process(\%var),"PBtmpl0000000000000137");
 }
 
 #-------------------------------------------------------------------
@@ -442,7 +446,14 @@ sub setHelp {
 	my $id = shift;
 	my $namespace = shift || "WebGUI";
 	$id =~ s/ /%20/g;
-	$self->{_helpUrl} = WebGUI::URL::page('op=viewHelp;hid='.$id.';namespace='.$namespace) if ($id);
+	$self->{_helpUrl} = $self->session->url->page('op=viewHelp;hid='.$id.';namespace='.$namespace) if ($id);
+}
+
+#-------------------------------------------------------------------
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 #-------------------------------------------------------------------

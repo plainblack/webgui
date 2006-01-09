@@ -483,7 +483,7 @@ sub www_preview {
 		) . $nav->build . qq(</td></tr></table>);
 	
 	# Because of the way the system is set up, the preview is cached. So let's remove it again...
-	WebGUI::Cache->new($nav->{_identifier}."$session{page}{pageId}", "Navigation-".$self->session->config->getFilename)->delete;
+	WebGUI::Cache->new($self->session,$nav->{_identifier}."$session{page}{pageId}", "Navigation-".$self->session->config->getFilename)->delete;
 	
 	return _submenu($output,"preview"); 
 }

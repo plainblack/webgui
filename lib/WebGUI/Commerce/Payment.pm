@@ -173,7 +173,7 @@ Returns a reference to an array of all enabled instantiated payment plugins.
 
 sub getEnabledPlugins {
 	my (@enabledPlugins, $plugin, @plugins);
-	@enabledPlugins = WebGUI::SQL->buildArray("select namespace from commerceSettings where type='Payment' and fieldName='enabled' and fieldValue='1'");
+	@enabledPlugins = $self->session->db->buildArray("select namespace from commerceSettings where type='Payment' and fieldName='enabled' and fieldValue='1'");
 
 	foreach (@enabledPlugins) {
 		$plugin = WebGUI::Commerce::Payment->load($_);
@@ -200,7 +200,7 @@ sub init {
 	$class = shift;
 	$namespace = shift;
 	
-	$properties = WebGUI::SQL->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".quote($namespace)." and type='Payment'");
+	$properties = $self->session->db->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".$self->session->db->quote($namespace)." and type='Payment'");
 
 	bless {_properties=>$properties, _namespace=>$namespace, _enabled=>$properties->{enabled}}, $class;
 }
@@ -214,7 +214,7 @@ Returns the gatewayId of the transaction. You must override this method.
 =cut
 
 sub gatewayId {
-	return WebGUI::ErrorHandler::fatal("You must override the gatewayId method in your Payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the gatewayId method in your Payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -252,7 +252,7 @@ Returns the error code of the last submission.
 =cut
 
 sub errorCode {
-	return WebGUI::ErrorHandler::fatal("You must override thie errorCode method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override thie errorCode method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -276,9 +276,9 @@ sub load {
     	$cmd = "WebGUI::Commerce::Payment::$namespace";
 	$load = "use $cmd";
 	eval($load);
-	WebGUI::ErrorHandler::warn("Payment plugin failed to compile: $cmd.".$@) if($@);
+	$self->session->errorHandler->warn("Payment plugin failed to compile: $cmd.".$@) if($@);
 	$plugin = eval($cmd."->init");
-	WebGUI::ErrorHandler::warn("Couldn't instantiate payment plugin: $cmd.".$@) if($@);
+	$self->session->errorHandler->warn("Couldn't instantiate payment plugin: $cmd.".$@) if($@);
 	return $plugin;
 }
 
@@ -291,7 +291,7 @@ Returns the (display) name of the plugin. You must override this method.
 =cut
 
 sub name {
-	return WebGUI::ErrorHandler::fatal("You must override the name method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the name method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -362,7 +362,7 @@ Returns the result code of the transaction. You must override this method.
 =cut
 
 sub resultCode {
-	return WebGUI::ErrorHandler::fatal("You must override the resultCode method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the resultCode method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -374,7 +374,7 @@ Returns the result message of the transaction. You must override this method.
 =cut
 
 sub resultMessage {
-	return WebGUI::ErrorHandler::fatal("You must override the resultMessage method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the resultMessage method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -449,7 +449,7 @@ The amaount of money that's being charged for shipping.
 =cut
 
 sub shippingCost {
-	return WebGUI::ErrorHandler::fatal("You must override the shippingCost method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the shippingCost method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -466,7 +466,7 @@ The description of the shiping cost.
 =cut
 
 sub shippingDescription {
-	return WebGUI::ErrorHandler::fatal("You must override the shippingDescription method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the shippingDescription method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -483,7 +483,7 @@ You must override this method.
 =cut
 
 sub supports {
-	return WebGUI::ErrorHandler::fatal("You must override the supports method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the supports method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -495,7 +495,7 @@ A boolean indicating whether the payment has been finished or not. You must over
 =cut
 
 sub transactionCompleted {
-	return WebGUI::ErrorHandler::fatal("You must override the transactionCompleted method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the transactionCompleted method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -507,7 +507,7 @@ Returns an error message if a transaction error has occurred. You must override 
 =cut
 
 sub transactionError {
-	return WebGUI::ErrorHandler::fatal("You must override the transactionError method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the transactionError method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -519,7 +519,7 @@ A boolean indicating whether the payment is pending or not. You must override th
 =cut
 
 sub transactionPending {
-	return WebGUI::ErrorHandler::fatal("You must override the transactionPending method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the transactionPending method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -533,7 +533,7 @@ undef. You must override this method.
 =cut
 
 sub validateFormData {
-	return WebGUI::ErrorHandler::fatal("You must override the validateFormData method in the payment plugin.");
+	return $self->session->errorHandler->fatal("You must override the validateFormData method in the payment plugin.");
 }
 
 1;

@@ -137,7 +137,7 @@ Returns a hash reference  containing all ldap links.  The format is:
 sub getList {
     my %list;
 	tie %list, "Tie::IxHash";
-	%list = WebGUI::SQL->buildHash("select ldapLinkId, ldapLinkName from ldapLink order by ldapLinkName");
+	%list = $self->session->db->buildHash("select ldapLinkId, ldapLinkName from ldapLink order by ldapLinkName");
 	return \%list;
 }
 
@@ -156,7 +156,7 @@ A valid ldapLinkId
 sub get {
    my %hash;
    tie %hash, 'Tie::CPHash';
-   %hash = WebGUI::SQL->quickHash("select * from ldapLink where ldapLinkId=".quote($_[0]));
+   %hash = $self->session->db->quickHash("select * from ldapLink where ldapLinkId=".$self->session->db->quote($_[0]));
    return \%hash;
 }
 

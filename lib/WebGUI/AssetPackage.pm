@@ -59,9 +59,9 @@ sub getPackageList {
 			assetData.isPackage=1
 			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and
 				(assetData.status='approved'";
-			$sql .= " or assetData.tagId=".quote($session{scratch}{versionTag}) if ($session{scratch}{versionTag});
+			$sql .= " or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")) if ($self->session->scratch->get("versionTag"));
 			$sql .= ")) and asset.state='published' group by assetData.assetId order by assetData.title desc";
-	my $sth = WebGUI::SQL->read($sql);
+	my $sth = $self->session->db->read($sql);
 	while (my ($id, $date, $class) = $sth->array) {
 		my $asset = WebGUI::Asset->new($id,$class);
 		push(@assets, $asset) if ($asset->get("isPackage"));
@@ -82,7 +82,7 @@ Returns "". Deploys a Package. If canEdit is Fales, renders an insufficient Priv
 sub www_deployPackage {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $packageMasterAssetId = $session{form}{assetId};
+	my $packageMasterAssetId = $self->session->form->process("assetId");
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);
 		my $masterLineage = $packageMasterAsset->get("lineage");

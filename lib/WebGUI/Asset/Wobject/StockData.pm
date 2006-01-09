@@ -242,7 +242,7 @@ sub _submenu {
    my $workarea = shift;
    my $title = shift;
    my $help = shift;
-   my $ac = WebGUI::AdminConsole->new("editstocks");
+   my $ac = WebGUI::AdminConsole->new($self->session,"editstocks");
    $ac->setHelp($help) if ($help);
    $ac->setIcon($self->getIcon);
    return $ac->render($workarea, $title);

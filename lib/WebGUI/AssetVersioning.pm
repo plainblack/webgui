@@ -56,20 +56,20 @@ sub addRevision {
         my $self = shift;
         my $properties = shift;
 	my $now = shift || time();
-	my $versionTag = $session{scratch}{versionTag} || 'pbversion0000000000002';
-	my $status = $session{setting}{autoCommit} ? 'approved' : 'pending';
-	WebGUI::SQL->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
-		ownerUserId, groupIdEdit, groupIdView) values (".quote($self->getId).",".$now.", ".quote($session{user}{userId}).", 
-		".quote($versionTag).", ".quote($status).", ".quote($self->getId).", 997995720, 32472169200,'3','3','7')");
+	my $versionTag = $self->session->scratch->get("versionTag") || 'pbversion0000000000002';
+	my $status = $self->session->setting->get("autoCommit") ? 'approved' : 'pending';
+	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
+		ownerUserId, groupIdEdit, groupIdView) values (".$self->session->db->quote($self->getId).",".$now.", ".$self->session->db->quote($self->session->user->profileField("userId")).", 
+		".$self->session->db->quote($versionTag).", ".$self->session->db->quote($status).", ".$self->session->db->quote($self->getId).", 997995720, 32472169200,'3','3','7')");
         foreach my $definition (@{$self->definition}) {
                 unless ($definition->{tableName} eq "assetData") {
-                        WebGUI::SQL->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".quote($self->getId).",".$now.")");
+                        $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".$self->session->db->quote($self->getId).",".$now.")");
                 }
         }               
         my $newVersion = WebGUI::Asset->new($self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
-	$newVersion->setVersionLock unless ($session{setting}{autoCommit});
+	$newVersion->setVersionLock unless ($self->session->setting->get("autoCommit"));
         $newVersion->update($properties) if (defined $properties);
         return $newVersion;
 }
@@ -88,14 +88,14 @@ The name of the version tag. If not specified, one will be generated using the c
 
 sub addVersionTag {
 	my $class = shift;
-	my $name = shift || "Autotag created ".WebGUI::DateTime::epochToHuman()." by ".$session{user}{username};
-	my $tagId = WebGUI::SQL->setRow("assetVersionTag","tagId",{
+	my $name = shift || "Autotag created ".WebGUI::DateTime::epochToHuman()." by ".$self->session->user->profileField("username");
+	my $tagId = $self->session->db->setRow("assetVersionTag","tagId",{
 		tagId=>"new",
 		name=>$name,
 		creationDate=>time(),
-		createdBy=>$session{user}{userId}
+		createdBy=>$self->session->user->profileField("userId")
 		});
-	WebGUI::Session::setScratch("versionTag",$tagId);
+	$self->session->scratch->set("versionTag",$tagId);
 	return $tagId;
 } 
 
@@ -111,7 +111,7 @@ Returns a boolean indicating whether this asset is locked and if the current use
 sub canEditIfLocked {
 	my $self = shift;
 	return 0 unless ($self->isLocked);
-	return ($self->get("isLockedBy") eq $session{user}{userId});
+	return ($self->get("isLockedBy") eq $self->session->user->profileField("userId"));
 }
 
 
@@ -145,13 +145,13 @@ The unique id of the tag to be committed.
 sub commitVersionTag {
 	my $class = shift;
 	my $tagId = shift;
-	my $sth = WebGUI::SQL->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=".quote($tagId));
+	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=".$self->session->db->quote($tagId));
 	while (my ($id,$class,$version) = $sth->array) {
 		WebGUI::Asset->new($id,$class,$version)->commit;
 	}
 	$sth->finish;
-	WebGUI::SQL->write("update assetVersionTag set isCommitted=1, commitDate=".time().", committedBy=".quote($session{user}{userId})." where tagId=".quote($tagId));
-	WebGUI::SQL->write("delete from userSessionScratch where name='versionTag' and value=".quote($tagId));
+	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate=".time().", committedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where tagId=".$self->session->db->quote($tagId));
+	$self->session->db->write("delete from userSessionScratch where name='versionTag' and value=".$self->session->db->quote($tagId));
 }
 
 
@@ -170,8 +170,8 @@ Optionally specify to get the count based upon the status of the revisions. Opti
 sub getRevisionCount {
 	my $self = shift;
 	my $status = shift;
-	my $statusClause = " and status=".quote($status) if ($status);
-	my ($count) = WebGUI::SQL->quickArray("select count(*) from assetData where assetId=".quote($self->getId).$statusClause);
+	my $statusClause = " and status=".$self->session->db->quote($status) if ($status);
+	my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=".$self->session->db->quote($self->getId).$statusClause);
 	return $count;
 }
 
@@ -201,11 +201,11 @@ Deletes a revision of an asset. If it's the last revision, it purges the asset a
 sub purgeRevision {
 	my $self = shift;
 	if ($self->getRevisionCount > 1) {
-		WebGUI::SQL->beginTransaction;
+		$self->session->db->beginTransaction;
         	foreach my $definition (@{$self->definition}) {                
-			WebGUI::SQL->write("delete from ".$definition->{tableName}." where assetId=".quote($self->getId)." and revisionDate=".quote($self->get("revisionDate")));
+			$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
         	}       
-        	WebGUI::SQL->commit;
+        	$self->session->db->commit;
 		$self->purgeCache;
 		$self->updateHistory("purged revision ".$self->get("revisionDate"));
 	} else {
@@ -231,9 +231,9 @@ sub rollbackToTime {
 	my $toTime = shift;
  	unless ($toTime) {	
 		return 0;
-		WebGUI::ErrorHandler::warn("You must specify a time when you call rollbackSiteToTime().");
+		$self->session->errorHandler->warn("You must specify a time when you call rollbackSiteToTime().");
 	}
-	my $sth = WebGUI::SQL->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.revisionDate > ".$toTime." order by assetData.revisionDate desc");
+	my $sth = $self->session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.revisionDate > ".$toTime." order by assetData.revisionDate desc");
 	while (my ($class, $id, $revisionDate) = $sth->array) {
 		my $revision = WebGUI::Asset->new($id, $class, $revisionDate);
 		$revision->purgeRevision;
@@ -259,20 +259,20 @@ sub rollbackVersionTag {
 	my $tagId = shift;
  	unless ($tagId) {	
 		return 0;
-		WebGUI::ErrorHandler::warn("You must specify a tag ID when you call rollbackVersionTag().");
+		$self->session->errorHandler->warn("You must specify a tag ID when you call rollbackVersionTag().");
 	}
 	if ($tagId eq "pbversion0000000000001" || $tagId eq "pbversion0000000000002") {
 		return 0;
-		WebGUI::ErrorHandler::warn("You cannot rollback a tag that is required for the system to operate.");	
+		$self->session->errorHandler->warn("You cannot rollback a tag that is required for the system to operate.");	
 	}
-	my $sth = WebGUI::SQL->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ".quote($tagId)." order by assetData.revisionDate desc");
+	my $sth = $self->session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ".$self->session->db->quote($tagId)." order by assetData.revisionDate desc");
 	while (my ($class, $id, $revisionDate) = $sth->array) {
 		my $revision = WebGUI::Asset->new($id, $class, $revisionDate);
 		$revision->purgeRevision;
 	}
 	$sth->finish;
-	WebGUI::SQL->write("delete from assetVersionTag where tagId=".quote($tagId));
-	WebGUI::SQL->write("delete from userSessionScratch where name='versionTag' and value=".quote($tagId));
+	$self->session->db->write("delete from assetVersionTag where tagId=".$self->session->db->quote($tagId));
+	$self->session->db->write("delete from userSessionScratch where name='versionTag' and value=".$self->session->db->quote($tagId));
 	return 1;
 }
 
@@ -287,7 +287,7 @@ Sets the versioning lock to "on" so that this piece of content may not be edited
 
 sub setVersionLock {
 	my $self = shift;
-	WebGUI::SQL->write("update asset set isLockedBy=".quote($session{user}{userId})." where assetId=".quote($self->getId));
+	$self->session->db->write("update asset set isLockedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where assetId=".$self->session->db->quote($self->getId));
 	$self->updateHistory("locked");
 	$self->purgeCache;
 }
@@ -303,7 +303,7 @@ Sets the versioning lock to "off" so that this piece of content may be edited on
 
 sub unsetVersionLock {
 	my $self = shift;
-	WebGUI::SQL->write("update asset set isLockedBy=NULL where assetId=".quote($self->getId));
+	$self->session->db->write("update asset set isLockedBy=NULL where assetId=".$self->session->db->quote($self->getId));
 	$self->updateHistory("unlocked");
 	$self->purgeCache;
 }
@@ -328,9 +328,9 @@ If not specified, current user is used.
 sub updateHistory {
 	my $self = shift;
 	my $action = shift;
-	my $userId = shift || $session{user}{userId} || '3';
+	my $userId = shift || $self->session->user->profileField("userId") || '3';
 	my $dateStamp = time();
-	WebGUI::SQL->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".quote($self->getId).", ".quote($userId).", ".quote($action).", ".$dateStamp.")");
+	$self->session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($userId).", ".$self->session->db->quote($action).", ".$dateStamp.")");
 }
 
 
@@ -344,12 +344,12 @@ Displays the add version tag form.
 
 sub www_addVersionTag {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("versions");
+	my $ac = WebGUI::AdminConsole->new($self->session,"versions");
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my $i18n = WebGUI::International->new("Asset");
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
 	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
-	my $tag = WebGUI::SQL->getRow("assetVersionTag","tagId",$session{form}{tagId});
+	my $tag = $self->session->db->getRow("assetVersionTag","tagId",$self->session->form->process("tagId"));
 	$f->hidden(
 		-name=>"func",
 		-value=>"addVersionTagSave"
@@ -376,7 +376,7 @@ Adds a version tag and sets the user's default version tag to that.
 sub www_addVersionTagSave {
 	my $self = shift;
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
-	$self->addVersionTag($session{form}{name});
+	$self->addVersionTag($self->session->form->process("name"));
 	return $self->www_manageVersions();
 }
 
@@ -387,7 +387,7 @@ sub www_commitRevision {
 	my $self = shift;
 	return WebGUI::Privilege::adminOnly() unless $self->canEdit;
 	$self->commit;
-	return $self->getContainer->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
+	return $self->getContainer->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 	return $self->getContainer->www_view;
 }
 #-------------------------------------------------------------------
@@ -395,7 +395,7 @@ sub www_commitRevision {
 sub www_commitVersionTag {
 	my $self = shift;
 	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
-	my $tagId = $session{form}{tagId};
+	my $tagId = $self->session->form->process("tagId");
 	if ($tagId) {
 		$self->commitVersionTag($tagId);
 	}
@@ -412,7 +412,7 @@ Shows a list of the currently available asset version tags.
 
 sub www_manageCommittedVersions {
         my $self = shift;
-        my $ac = WebGUI::AdminConsole->new("versions");
+        my $ac = WebGUI::AdminConsole->new($self->session,"versions");
         return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
         my $i18n = WebGUI::International->new("Asset");
 	my $rollback = $i18n->get('rollback');
@@ -421,7 +421,7 @@ sub www_manageCommittedVersions {
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
         <tr><th>Tag Name</th><th>Committed On</th><th>Committed By</th><th></th></tr> ';
-        my $sth = WebGUI::SQL->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
+        my $sth = $self->session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
         while (my ($id,$name,$date,$by) = $sth->array) {
                 my $u = WebGUI::User->new($by);
                 $output .= '<tr>
@@ -451,9 +451,9 @@ sub www_manageRevisions {
         my $i18n = WebGUI::International->new("Asset");
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Revision Date</th><th>Revised By</th><th>Tag Name</th></tr> ';
-        my $sth = WebGUI::SQL->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData 
+        my $sth = $self->session->db->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData 
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
-		where assetData.assetId=".quote($self->getId));
+		where assetData.assetId=".$self->session->db->quote($self->getId));
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
                 $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td><a href="'.$self->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
@@ -483,7 +483,7 @@ sub www_manageVersions {
 	$ac->setHelp("versions manage");
 	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
-	my ($tag) = WebGUI::SQL->quickArray("select name from assetVersionTag where tagId=".quote($session{scratch}{versionTag}));
+	my ($tag) = $self->session->db->quickArray("select name from assetVersionTag where tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")));
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
 	my $commit = $i18n->get("commit");
@@ -492,7 +492,7 @@ sub www_manageVersions {
 	my $commitPrompt = $i18n->get("commit version tag confirm");
 	my $output = '<p>You are currently working under a tag called: <b>'.$tag.'</b>.</p><table width=100% class="content">
 	<tr><th></th><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
-	my $sth = WebGUI::SQL->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
+	my $sth = $self->session->db->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
 	while (my ($id,$name,$date,$by) = $sth->array) {
 		my $u = WebGUI::User->new($by);
 		$output .= '<tr>
@@ -522,21 +522,21 @@ sub www_manageRevisionsInTag {
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Title</th><th>Type</th><th>Revision Date</th><th>Revised By</th></tr> ';
-	my $p = WebGUI::Paginator->new($self->getUrl("func=manageRevisionsInTag;tagId=".$session{form}{tagId}));
+	my $p = WebGUI::Paginator->new($self->getUrl("func=manageRevisionsInTag;tagId=".$self->session->form->process("tagId")));
 	$p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
 		left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
-		where assetData.tagId=".quote($session{form}{tagId}));
+		where assetData.tagId=".$self->session->db->quote($self->session->form->process("tagId")));
 	foreach my $row (@{$p->getPageData}) {
         	my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
 		my $asset = WebGUI::Asset->new($id,$class,$date);
-                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$session{form}{tagId}.";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
+                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$self->session->form->process("tagId").";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td>'.$asset->getTitle.'</td>
 			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
 			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
 			<td>'.$by.'</td></tr>';
         }
         $output .= '</table>'.$p->getBarSimple;
-	my $tag = WebGUI::SQL->getRow("assetVersionTag","tagId",$session{form}{tagId});
+	my $tag = $self->session->db->getRow("assetVersionTag","tagId",$self->session->form->process("tagId"));
         return $ac->render($output,$i18n->get("revisions in tag").": ".$tag->{name});
 }
 
@@ -546,10 +546,10 @@ sub www_manageRevisionsInTag {
 sub www_purgeRevision {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $revisionDate = $session{form}{revisionDate};
+	my $revisionDate = $self->session->form->process("revisionDate");
 	return undef unless $revisionDate;
 	WebGUI::Asset->new($self->getId,$self->get("className"),$revisionDate)->purgeRevision;
-	if ($session{form}{proceed} eq "manageRevisionsInTag") {
+	if ($self->session->form->process("proceed") eq "manageRevisionsInTag") {
 		return $self->www_manageRevisionsInTag;
 	}
 	return $self->www_manageRevisions;
@@ -561,12 +561,12 @@ sub www_purgeRevision {
 sub www_rollbackVersionTag {
 	my $self = shift;
 	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
-	return WebGUI::Privilege::vitalComponent() if ($session{form}{tagId} eq "pbversion0000000000001" || $session{form}{tagId} eq "pbversion0000000000002");
-	my $tagId = $session{form}{tagId};
+	return WebGUI::Privilege::vitalComponent() if ($self->session->form->process("tagId") eq "pbversion0000000000001" || $self->session->form->process("tagId") eq "pbversion0000000000002");
+	my $tagId = $self->session->form->process("tagId");
 	if ($tagId) {
 		$self->rollbackVersionTag($tagId);
 	}
-	if ($session{form}{proceed} eq "manageCommittedVersions") {
+	if ($self->session->form->process("proceed") eq "manageCommittedVersions") {
 		return $self->www_manageCommittedVersions;
 	}
 	return $self->www_manageVersions;
@@ -592,7 +592,7 @@ Sets the current user's working version tag.
 sub www_setVersionTag () {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless WebGUI::Grouping::isInGroup(12);
-	WebGUI::Session::setScratch("versionTag",$session{form}{tagId});
+	$self->session->scratch->set("versionTag",$self->session->form->process("tagId"));
 	return $self->www_manageVersions();
 }
 
@@ -601,7 +601,7 @@ sub www_setVersionTag () {
 
 sub www_viewRevision {
 	my $self = shift;
-	my $otherSelf = WebGUI::Asset->new($self->getId,$self->get("className"),$session{form}{revisionDate});
+	my $otherSelf = WebGUI::Asset->new($self->getId,$self->get("className"),$self->session->form->process("revisionDate"));
 	return (defined $otherSelf) ? $otherSelf->www_view : undef;
 }
 

@@ -31,7 +31,7 @@ sub _submenu {
         my $help = shift;
 	my $namespace = shift;
         $title = WebGUI::International::get($title,$namespace) if ($title);
-        my $ac = WebGUI::AdminConsole->new("userProfiling");
+        my $ac = WebGUI::AdminConsole->new($session,"userProfiling");
         if ($help) {
                 $ac->setHelp($help,"WebGUIProfile");
         }
@@ -54,7 +54,7 @@ sub www_deleteProfileCategoryConfirm {
 	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $category = WebGUI::ProfileCategory->new($session->form->process("cid"));
-        return WebGUI::AdminConsole->new("userProfiling")->render(WebGUI::Privilege::vitalComponent()) if ($category->isProtected);
+        return WebGUI::AdminConsole->new($session,"userProfiling")->render(WebGUI::Privilege::vitalComponent()) if ($category->isProtected);
 	$category->delete;	
         return www_editProfileSettings();
 }
@@ -64,7 +64,7 @@ sub www_deleteProfileFieldConfirm {
 	my $session = shift;
         return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $field = WebGUI::ProfileField->new($session->form->process("fid"));
-        return WebGUI::AdminConsole->new("userProfiling")->render(WebGUI::Privilege::vitalComponent()) if ($field->isProtected);
+        return WebGUI::AdminConsole->new($session,"userProfiling")->render(WebGUI::Privilege::vitalComponent()) if ($field->isProtected);
 	$field->delete;
         return www_editProfileSettings(); 
 }

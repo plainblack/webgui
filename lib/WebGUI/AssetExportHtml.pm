@@ -46,16 +46,16 @@ Returns a descriptive error message (HTML) if the export path is not writable, d
 
 sub checkExportPath {
 	my $error;
-	if(defined $session{config}{exportPath}) {
-		if(-d $session{config}{exportPath}) {
-			unless (-w $session{config}{exportPath}) {
-				$error .= 'Error: The export path '.$session{config}{exportPath}.' is not writable.<br />
+	if(defined $self->session->config->get("exportPath")) {
+		if(-d $self->session->config->get("exportPath")) {
+			unless (-w $self->session->config->get("exportPath")) {
+				$error .= 'Error: The export path '.$self->session->config->get("exportPath").' is not writable.<br />
 						Make sure that the webserver has permissions to write to that directory';
 			}
 		} else {
-			eval {mkpath($session{config}{exportPath},0)};
+			eval {mkpath($self->session->config->get("exportPath"),0)};
                 	if ($@) {
-                        	$error .= 'Error: The export path '.$session{config}{exportPath}.' does not exist, and couldn\'t create it because '.$@;
+                        	$error .= 'Error: The export path '.$self->session->config->get("exportPath").' does not exist, and couldn\'t create it because '.$@;
                 	}
 		}
 	} else {
@@ -97,8 +97,8 @@ The unique id of the user to become when exporting this page. Defaults to '1' (V
 sub exportAsHtml {
 	my $self = shift;
 	my $params = shift;
-	my $uploadsUrl = $params->{uploadsUrl} || $session{config}{uploadsUrl};
-	my $extrasUrl = $params->{extrasUrl} || $session{config}{extrasUrl};
+	my $uploadsUrl = $params->{uploadsUrl} || $self->session->config->get("uploadsUrl");
+	my $extrasUrl = $params->{extrasUrl} || $self->session->config->get("extrasUrl");
 	my $userId = $params->{userId} || 1;
 	my $stripHtml = $params->{stripHtml} || undef;
 
@@ -106,13 +106,13 @@ sub exportAsHtml {
 	my %oldSession = %session;
 
 	# Change the stuff we need to change to do the export
-	$session->user({userId=>$userId}) unless ($userId == $session{user}{userId});
+	$session->user({userId=>$userId}) unless ($userId == $self->session->user->profileField("userId"));
 	delete $session{form}; 
-	$session{var}{adminOn} = $self->get('adminOn');
+	$self->session->var->get("adminOn") = $self->get('adminOn');
 	$self->WebGUI::Session::refreshPageInfo;
 	$self->{_properties}{cacheTimeout} = $self->{_properties}{cacheTimeoutVisitor} = 1;
-	$session{config}{uploadsURL} = $uploadsUrl;
-	$session{config}{extrasURL} = $extrasUrl;
+	$self->session->config->get("uploadsURL") = $uploadsUrl;
+	$self->session->config->get("extrasURL") = $extrasUrl;
 
 	# Generate the page
 	my $content = $self->www_view;
@@ -154,7 +154,7 @@ sub www_export {
 			-label=>WebGUI::International::get('Export as user',"Asset"),
 			-hoverHelp=>WebGUI::International::get('Export as user description',"Asset"),
 			-name=>"userId",
-			-options=>WebGUI::SQL->buildHashRef("select userId, username from users"),
+			-options=>$self->session->db->buildHashRef("select userId, username from users"),
 			-value=>[1],
 		);
 	$f->text(
@@ -167,13 +167,13 @@ sub www_export {
 			-label=>WebGUI::International::get('Extras URL',"Asset"),
 			-hoverHelp=>WebGUI::International::get('Extras URL description',"Asset"),
 			-name=>"extrasURL",
-			-value=>$session{config}{extrasURL}
+			-value=>$self->session->config->get("extrasURL")
 		);
 	$f->text(
                         -label=>WebGUI::International::get('Uploads URL',"Asset"),
                         -hoverHelp=>WebGUI::International::get('Uploads URL description',"Asset"),
                         -name=>"uploadsURL",
-                        -value=>$session{config}{uploadsURL}
+                        -value=>$self->session->config->get("uploadsURL")
                 );
         $f->submit;
         $self->getAdminConsole->render($self->checkExportPath.$f->print,WebGUI::International::get('Export Page',"Asset"));
@@ -192,11 +192,11 @@ sub www_exportStatus {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
 	my $iframeUrl = $self->getUrl('func=exportGenerate');
-	$iframeUrl = WebGUI::URL::append($iframeUrl, 'index='.$session{form}{index});
-	$iframeUrl = WebGUI::URL::append($iframeUrl, 'depth='.$session{form}{depth});
-	$iframeUrl = WebGUI::URL::append($iframeUrl, 'userId='.$session{form}{userId});
-	$iframeUrl = WebGUI::URL::append($iframeUrl, 'extrasURL='.$session{form}{extrasURL});
-	$iframeUrl = WebGUI::URL::append($iframeUrl, 'uploadsURL='.$session{form}{uploadsURL});
+	$iframeUrl = $self->session->url->append($iframeUrl, 'index='.$self->session->form->process("index"));
+	$iframeUrl = $self->session->url->append($iframeUrl, 'depth='.$self->session->form->process("depth"));
+	$iframeUrl = $self->session->url->append($iframeUrl, 'userId='.$self->session->form->process("userId"));
+	$iframeUrl = $self->session->url->append($iframeUrl, 'extrasURL='.$self->session->form->process("extrasURL"));
+	$iframeUrl = $self->session->url->append($iframeUrl, 'uploadsURL='.$self->session->form->process("uploadsURL"));
 	my $output = '<iframe src="'.$iframeUrl.'" title="'.WebGUI::International::get('Page Export Status',"Asset").'" width="410" height="200"></iframe>';
         $self->getAdminConsole->render($output,WebGUI::International::get('Page Export Status',"Asset"),"Asset");
 }
@@ -222,11 +222,11 @@ sub www_exportGenerate {
 		print $error;
 		return;
 	}
-	my $userId = $session{form}{userId};
-	my $extrasURL = $session{form}{extrasURL};
-	my $uploadsURL = $session{form}{uploadsURL};
-	my $index = $session{form}{index};
-	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$session{form}{depth}});
+	my $userId = $self->session->form->process("userId");
+	my $extrasURL = $self->session->form->process("extrasURL");
+	my $uploadsURL = $self->session->form->process("uploadsURL");
+	my $index = $self->session->form->process("index");
+	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$self->session->form->process("depth")});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
 		printf WebGUI::International::get('exporting page', 'Asset'), $url;
@@ -249,7 +249,7 @@ sub www_exportGenerate {
 			$filename = $index;
 		}
 		if($path) {
-			$path = $session{config}{exportPath} . "/" . $path;
+			$path = $self->session->config->get("exportPath") . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
 				printf WebGUI::International::get('could not create path', 'Asset'), $path, $@;

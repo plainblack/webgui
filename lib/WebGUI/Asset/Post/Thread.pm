@@ -549,7 +549,7 @@ Subscribes the user to this thread.
 sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
-  WebGUI::Cache->new("cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
+  WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
   WebGUI::Grouping::addUsersToGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
@@ -609,7 +609,7 @@ Negates the subscribe method.
 
 sub unsubscribe {
 	my $self = shift;
-  WebGUI::Cache->new("cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
+  WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
   WebGUI::Grouping::deleteUsersFromGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
@@ -804,7 +804,7 @@ sub www_view {
 		not $self->session->var->get("adminOn")
 	);
 	if ($useCache) {
-               	$cache = WebGUI::Cache->new("cspost_".($postId||$self->getId)."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"));
+               	$cache = WebGUI::Cache->new($self->session,"cspost_".($postId||$self->getId)."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"));
            	$output = $cache->get;
 	}
 	unless ($output) {

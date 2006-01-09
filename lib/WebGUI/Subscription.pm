@@ -58,7 +58,7 @@ specified by the session variable.
 sub apply {
 	my ($self, $userId, $groupId);
 	$self = shift;
-	$userId = shift || $session{user}{userId};
+	$userId = shift || $self->session->user->profileField("userId");
 	$groupId = $self->{_properties}{subscriptionGroup};
 
 	# Make user part of the right group
@@ -69,7 +69,7 @@ sub apply {
 
 	# Process executeOnPurchase field
 	my $command = $self->{_properties}{executeOnSubscription};
-	WebGUI::Macro::process(\$command);
+	WebGUI::Macro::process($self->session,\$command);
 	system($command) if ($self->{_properties}{executeOnSubscription} ne "");
 }
 
@@ -86,7 +86,7 @@ sub delete {
 	my ($self);
 	$self = shift;
 	
-	WebGUI::SQL->write("update subscription set deleted=1 where subscriptionId=".quote($self->{_subscriptionId}));
+	$self->session->db->write("update subscription set deleted=1 where subscriptionId=".$self->session->db->quote($self->{_subscriptionId}));
 	$self->{_properties}{deleted} = 1;
 }
 	
@@ -131,10 +131,10 @@ sub new {
 
 	if ($subscriptionId eq 'new') {
 		$subscriptionId = WebGUI::Id::generate;
-		WebGUI::SQL->write("insert into subscription (subscriptionId) values (".quote($subscriptionId).")");
+		$self->session->db->write("insert into subscription (subscriptionId) values (".$self->session->db->quote($subscriptionId).")");
 	}
 	
-	%properties = WebGUI::SQL->quickHash("select * from subscription where subscriptionId=".quote($subscriptionId));
+	%properties = $self->session->db->quickHash("select * from subscription where subscriptionId=".$self->session->db->quote($subscriptionId));
 	
 	bless {_subscriptionId => $subscriptionId, _properties => \%properties}, $class;
 }
@@ -169,9 +169,9 @@ sub set {
 		}
 	}
 
-	WebGUI::SQL->write("update subscription set ".
-		join(',', map {"$_=".quote($properties->{$_})} @fieldsToUpdate).
-		" where subscriptionId=".quote($self->{_subscriptionId}));
+	$self->session->db->write("update subscription set ".
+		join(',', map {"$_=".$self->session->db->quote($properties->{$_})} @fieldsToUpdate).
+		" where subscriptionId=".$self->session->db->quote($self->{_subscriptionId}));
 }
 
 1;

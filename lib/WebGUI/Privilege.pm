@@ -88,7 +88,7 @@ Returns a message stating that the user does not have the privileges necessary t
 
 sub noAccess {
 	WebGUI::HTTP::setStatus("401", "No Access");
-   	if ($session{user}{userId} eq '1') {
+   	if ($self->session->user->profileField("userId") eq '1') {
       		return WebGUI::Operation::Auth::www_auth("init");
    	} else {
       		my $output = '<h1>'.WebGUI::International::get(37).'</h1>';

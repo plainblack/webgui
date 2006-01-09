@@ -656,17 +656,43 @@ find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{useEmptyStyle} = (\
 find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{makePrintable} = (\d+);!\$self->session->style->makePrintable("$1")!g' {} \;
 find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Style\:\:!\$self->session->style->!g' {} \;
 
-5.23.5 WebGUI::URL API Refactored
+5.23.5 WebGUI::Macro API Refactored
+
+You now need to pass in a reference to $session to the process function.
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Macro\:\:process\((.*)\)!WebGUI::Macro::process(\$self->session,$1)!g' {} \;
+
+
+5.23.6 WebGUI::URL API Refactored
 
 As of 6.9 WebGUI::URL is now accessed through session like $session->url
 
 find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:URL\:\:!\$self->session->url->!g' {} \;
 
 
-5.23.5 Lots of APIs Refactored
+5.23.7 WebGUI::Cache API Refactored
 
-Lots of other API's have been refactored in 6.9 to conform to the new OO based
-session system. You should look at the API docs for individual details.
+As of 6.9 WebGUI::Cache requires you to pass in a reference to $session into
+the constructor.
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Cache\-\>new\(!WebGUI::Cache->new(\$self->session,!g' {} \;
+
+
+5.23.8 WebGUI::AdminConsole Refactored
+
+As of 6.9 WebGUI::AdminConsole requires you to pass a reference to $session
+into the constructor.
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:AdminConsole\-\>new\(!WebGUI::AdminConsole->new(\$self->session,!g' {} \;
+
+
+5.23.9 WebGUI::DatabaseLink API Refactored
+
+As of 6.9 WebGUI::DatabaseLink requires  you to pass in a reference to
+$session into the constructor. Also, the API has been heavily refactored to be
+more complete. Please see it's API docs for more info.
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:DatabaseLink\-\>new\(!WebGUI::DatabaseLink->new(\$self->session,!g' {} \;
 
 
 

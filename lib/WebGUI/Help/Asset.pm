@@ -239,9 +239,9 @@ our $HELP = {
 				   namespace => $namespace }
 			     }
                              grep { $_ } ##Filter out empty entries
-                                     @{ $session{config}{assets} },
-                                     @{ $session{config}{assetContainers} },
-                                     @{ $session{config}{utilityAssets} },
+                                     @{ $self->session->config->get("assets") },
+                                     @{ $self->session->config->get("assetContainers") },
+                                     @{ $self->session->config->get("utilityAssets") },
 			   ],
 	},
 

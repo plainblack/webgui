@@ -20,8 +20,6 @@ use WebGUI::DatabaseLink;
 use WebGUI::Grouping;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -109,7 +107,7 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	$self->get("options") = WebGUI::DatabaseLink::getList(); 
+	$self->get("options") = WebGUI::DatabaseLink->getList($self->session); 
 	return $self->SUPER::toHtml();
 }
 

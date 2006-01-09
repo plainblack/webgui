@@ -93,12 +93,12 @@ sub new {
 	}
         # Return the appropriate field object.
 	if ($fieldType eq "") {
-		WebGUI::ErrorHandler::warn("Something is trying to create a dynamic field called ".$param->{name}.", but didn't pass in a field type.");
+		$self->session->errorHandler->warn("Something is trying to create a dynamic field called ".$param->{name}.", but didn't pass in a field type.");
 		$fieldType = "Text";
 	}
 	##No infinite loops, please
 	elsif ($fieldType eq 'DynamicField') {
-		WebGUI::ErrorHandler::warn("Something is trying to create a DynamicField via DynamicField.");
+		$self->session->errorHandler->warn("Something is trying to create a DynamicField via DynamicField.");
 		$fieldType = "Text";
 	}
         no strict 'refs';
@@ -106,7 +106,7 @@ sub new {
 	my $load = "use ".$cmd;
 	eval ($load);
 	if ($@) {
-                WebGUI::ErrorHandler::error("Couldn't compile form control: ".$fieldType.". Root cause: ".$@);
+                $self->session->errorHandler->error("Couldn't compile form control: ".$fieldType.". Root cause: ".$@);
                 return undef;
         }
 	my $formObj = $cmd->new($param);

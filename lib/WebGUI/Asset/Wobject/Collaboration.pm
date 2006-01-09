@@ -870,7 +870,7 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
-	WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
 	WebGUI::Grouping::addUsersToGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
@@ -884,7 +884,7 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
-	WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
 	WebGUI::Grouping::deleteUsersFromGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
@@ -1193,7 +1193,7 @@ sub www_viewRSS {
 
 	WebGUI::HTTP::setMimeType("text/xml");
 	my $output = $self->processTemplate(\%var,$self->get("rssTemplateId"));
-	WebGUI::Macro::process(\$output);
+	WebGUI::Macro::process($self->session,\$output);
 	return $output;
 }
 

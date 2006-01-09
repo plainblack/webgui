@@ -56,15 +56,15 @@ sub addChild {
 	my $id = shift || WebGUI::Id::generate();
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
-	WebGUI::SQL->beginTransaction;
+	$self->session->db->beginTransaction;
 	my $now = time();
-	WebGUI::SQL->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".quote($id).",".quote($self->getId).", ".quote($lineage).", ".$now.", ".quote($session{user}{userId}).", ".quote($properties->{className}).", 'published')");
+	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".$self->session->db->quote($id).",".$self->session->db->quote($self->getId).", ".$self->session->db->quote($lineage).", ".$now.", ".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($properties->{className}).", 'published')");
 	my $temp = WebGUI::Asset->newByPropertyHashRef({
 		assetId=>$id,
 		className=>$properties->{className}
 		});
 	my $newAsset = $temp->addRevision($properties,$now);
-	WebGUI::SQL->commit;
+	$self->session->db->commit;
 	$self->updateHistory("added child ".$id);
 	return $newAsset;
 }
@@ -91,8 +91,8 @@ sub cascadeLineage {
         my $newLineage = shift;
         my $oldLineage = shift || $self->get("lineage");
 	my $now = time();
-        my $prepared = WebGUI::SQL->prepare("update asset set lineage=? where assetId=?");
-	my $descendants = WebGUI::SQL->read("select assetId,lineage from asset where lineage like ".quote($oldLineage.'%'));
+        my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
+	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ".$self->session->db->quote($oldLineage.'%'));
 	my $cache = WebGUI::Cache->new;
 	while (my ($assetId, $lineage) = $descendants->array) {
 		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
@@ -113,9 +113,9 @@ Swaps lineage with sister below. Returns 1 if there is a sister to swap. Otherwi
 
 sub demote {
 	my $self = shift;
-	my ($sisterLineage) = WebGUI::SQL->quickArray("select min(lineage) from asset 
-		where parentId=".quote($self->get("parentId"))." 
-		and state='published' and lineage>".quote($self->get("lineage")));
+	my ($sisterLineage) = $self->session->db->quickArray("select min(lineage) from asset 
+		where parentId=".$self->session->db->quote($self->get("parentId"))." 
+		and state='published' and lineage>".$self->session->db->quote($self->get("lineage")));
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage);
 		$self->{_properties}{lineage} = $sisterLineage;
@@ -155,8 +155,8 @@ sub getFirstChild {
 	unless (exists $self->{_firstChild}) {
 		my $lineage = $session{assetLineage}{firstChild}{$self->getId};
 		unless ($lineage) {
-			($lineage) = WebGUI::SQL->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
-			$session{assetLineage}{firstChild}{$self->getId} = $lineage unless ($session{config}{disableCache});
+			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=".$self->session->db->quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+			$session{assetLineage}{firstChild}{$self->getId} = $lineage unless ($self->session->config->get("disableCache"));
 		}
 		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
 	}
@@ -177,7 +177,7 @@ sub getLastChild {
 	unless (exists $self->{_lastChild}) {
 		my $lineage = $session{assetLineage}{lastChild}{$self->getId};
 		unless ($lineage) {
-			($lineage) = WebGUI::SQL->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=".quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+			($lineage) = $self->session->db->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=".$self->session->db->quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
 			$session{assetLineage}{lastChild}{$self->getId} = $lineage;
 		}
 		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
@@ -249,7 +249,7 @@ sub getLineage {
 	my @whereModifiers;
 	# let's get those siblings
 	if (isIn("siblings",@{$relatives})) {
-		push(@whereModifiers, " (asset.parentId=".quote($self->get("parentId"))." and asset.assetId<>".quote($self->getId).")");
+		push(@whereModifiers, " (asset.parentId=".$self->session->db->quote($self->get("parentId"))." and asset.assetId<>".$self->session->db->quote($self->getId).")");
 	}
 	# ancestors too
 	my @specificFamilyMembers = ();
@@ -267,11 +267,11 @@ sub getLineage {
 		push(@specificFamilyMembers,$self->get("lineage"));
 	}
 	if (scalar(@specificFamilyMembers) > 0) {
-		push(@whereModifiers,"(asset.lineage in (".quoteAndJoin(\@specificFamilyMembers)."))");
+		push(@whereModifiers,"(asset.lineage in (".$self->session->db->quoteAndJoin(\@specificFamilyMembers)."))");
 	}
 	# we need to include descendants
 	if (isIn("descendants",@{$relatives})) {
-		my $mod = "(asset.lineage like ".quote($lineage.'%')." and asset.lineage<>".quote($lineage); 
+		my $mod = "(asset.lineage like ".$self->session->db->quote($lineage.'%')." and asset.lineage<>".$self->session->db->quote($lineage); 
 		if (exists $rules->{endingLineageLength}) {
 			$mod .= " and length(asset.lineage) <= ".($rules->{endingLineageLength}*6);
 		}
@@ -280,7 +280,7 @@ sub getLineage {
 	}
 	# we need to include children
 	if (isIn("children",@{$relatives})) {
-		push(@whereModifiers,"(asset.parentId=".quote($self->getId).")");
+		push(@whereModifiers,"(asset.parentId=".$self->session->db->quote($self->getId).")");
 	}
 	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
 	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
@@ -289,7 +289,7 @@ sub getLineage {
 		my $length = $rules->{assetToPedigree}->getLineageLength;
 		for (my $i = $length; $i > 0; $i--) {
 			my $line = substr($lineage,0,$i*6);
-			push(@mods,"( asset.lineage like ".quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
+			push(@mods,"( asset.lineage like ".$self->session->db->quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
 			last if ($self->getLineageLength == $i);
 		}
 		push(@whereModifiers, "(".join(" or ",@mods).")") if (scalar(@mods));
@@ -300,7 +300,7 @@ sub getLineage {
 		my $className = $rules->{joinClass};
 		my $cmd = "use ".$className;
 		eval ($cmd);
-		WebGUI::ErrorHandler::fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+		$self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
 		foreach my $definition (@{$className->definition}) {
 			unless ($definition->{tableName} eq "asset") {
 				my $tableName = $definition->{tableName};
@@ -313,23 +313,23 @@ sub getLineage {
 	my $where;
 	## custom states
 	if (exists $rules->{statesToInclude}) {
-		$where = "asset.state in (".quoteAndJoin($rules->{statesToInclude}).")";
+		$where = "asset.state in (".$self->session->db->quoteAndJoin($rules->{statesToInclude}).")";
 	} else {
 		$where = "asset.state='published'";
 	}
 	## get only approved items or those that i'm currently working on
-	$where .= " and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).")";
+	$where .= " and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")";
 	## class exclusions
 	if (exists $rules->{excludeClasses}) {
 		my @set;
 		foreach my $className (@{$rules->{excludeClasses}}) {
-			push(@set,"asset.className not like ".quote($className.'%'));
+			push(@set,"asset.className not like ".$self->session->db->quote($className.'%'));
 		}
 		$where .= ' and ('.join(" and ",@set).')';
 	}
 	## class inclusions
 	if (exists $rules->{includeOnlyClasses}) {
-		$where .= ' and (asset.className in ('.quoteAndJoin($rules->{includeOnlyClasses}).'))';
+		$where .= ' and (asset.className in ('.$self->session->db->quoteAndJoin($rules->{includeOnlyClasses}).'))';
 	}
 	## finish up our where clause
 	$where .= ' and ('.join(" or ",@whereModifiers).')' if (scalar(@whereModifiers));
@@ -338,7 +338,7 @@ sub getLineage {
 	}
 	# based upon all available criteria, let's get some assets
 	my $columns = "asset.assetId, asset.className, asset.parentId, assetData.revisionDate";
-	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".quote($session{scratch}{versionTag}).")) ";
+	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) ";
 	my $sortOrder = ($rules->{invertTree}) ? "asset.lineage desc" : "asset.lineage asc"; 
 	if (exists $rules->{orderByClause}) {
 		$sortOrder = $rules->{orderByClause};
@@ -346,7 +346,7 @@ sub getLineage {
 	my $sql = "select $columns from $tables where $where group by assetData.assetId order by $sortOrder";
 	my @lineage;
 	my %relativeCache;
-	my $sth = WebGUI::SQL->read($sql);
+	my $sth = $self->session->db->read($sql);
 	while (my ($id, $class, $parentId, $version) = $sth->array) {
 		# create whatever type of object was requested
 		my $asset;
@@ -399,11 +399,11 @@ Returns a 6 digit number with leading zeros of the next rank a child will get.
 
 sub getNextChildRank {
 	my $self = shift;	
-	my ($lineage) = WebGUI::SQL->quickArray("select max(lineage) from asset where parentId=".quote($self->getId));
+	my ($lineage) = $self->session->db->quickArray("select max(lineage) from asset where parentId=".$self->session->db->quote($self->getId));
 	my $rank;
 	if (defined $lineage) {
 		$rank = $self->getRank($lineage);
-		WebGUI::ErrorHandler::fatal("Asset ".$self->getId." has too many children.") if ($rank >= 999998);
+		$self->session->errorHandler->fatal("Asset ".$self->getId." has too many children.") if ($rank >= 999998);
 		$rank++;
 	} else {
 		$rank = 1;
@@ -483,7 +483,7 @@ sub hasChildren {
 		} elsif (exists $self->{_lastChild}) {
 			$self->{_hasChildren} = 1;
 		} else {
-			my ($hasChildren) = WebGUI::SQL->quickArray("select count(*) from asset where parentId=".quote($self->getId));
+			my ($hasChildren) = $self->session->db->quickArray("select count(*) from asset where parentId=".$self->session->db->quote($self->getId));
 			$self->{_hasChildren} = $hasChildren;
 		}
 	}
@@ -515,7 +515,7 @@ sub newByLineage {
 	my $id = $assetLineage->{$lineage}{id};
 	$class = $assetLineage->{$lineage}{class};
         unless ($id && $class) {
-		($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".quote($lineage));
+		($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".$self->session->db->quote($lineage));
 		$assetLineage->{$lineage}{id} = $id;
 		$assetLineage->{$lineage}{class} = $class;
 		$session->stow->set("assetLineage",$assetLineage);
@@ -534,9 +534,9 @@ Keeps the same rank of lineage, swaps with sister above. Returns 1 if there is a
 
 sub promote {
 	my $self = shift;
-	my ($sisterLineage) = WebGUI::SQL->quickArray("select max(lineage) from asset 
-		where parentId=".quote($self->get("parentId"))." 
-		and state='published' and lineage<".quote($self->get("lineage")));
+	my ($sisterLineage) = $self->session->db->quickArray("select max(lineage) from asset 
+		where parentId=".$self->session->db->quote($self->get("parentId"))." 
+		and state='published' and lineage<".$self->session->db->quote($self->get("lineage")));
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage);
 		$self->{_properties}{lineage} = $sisterLineage;
@@ -568,10 +568,10 @@ sub setParent {
 		my $oldLineage = $self->get("lineage");
 		my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
 		return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
-		WebGUI::SQL->beginTransaction;
-		WebGUI::SQL->write("update asset set parentId=".quote($newParent->getId)." where assetId=".quote($self->getId));
+		$self->session->db->beginTransaction;
+		$self->session->db->write("update asset set parentId=".$self->session->db->quote($newParent->getId)." where assetId=".$self->session->db->quote($self->getId));
 		$self->cascadeLineage($lineage);
-		WebGUI::SQL->commit;
+		$self->session->db->commit;
 		$self->updateHistory("moved to parent ".$newParent->getId);
 		$self->{_properties}{lineage} = $lineage;
 		$self->purgeCache;
@@ -604,7 +604,7 @@ sub setRank {
 		@{$siblings} = reverse @{$siblings};
 	}
 	my $previous = $self->get("lineage");
-	WebGUI::SQL->beginTransaction;
+	$self->session->db->beginTransaction;
 	$self->cascadeLineage($temp);
 	foreach my $sibling (@{$siblings}) {
 		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
@@ -614,7 +614,7 @@ sub setRank {
 	}
 	$self->cascadeLineage($previous,$temp);
 	$self->{_properties}{lineage} = $previous;
-	WebGUI::SQL->commit;
+	$self->session->db->commit;
 	$self->purgeCache;
 	$self->updateHistory("changed rank");
 	return 1;
@@ -637,11 +637,11 @@ sub swapRank {
 	my $second = shift;
 	my $first = shift || $self->get("lineage");
 	my $temp = substr(WebGUI::Id::generate(),0,6); # need a temp in order to do the swap
-	WebGUI::SQL->beginTransaction;
+	$self->session->db->beginTransaction;
 	$self->cascadeLineage($temp,$first);
 	$self->cascadeLineage($first,$second);
 	$self->cascadeLineage($second,$temp);
-	WebGUI::SQL->commit;
+	$self->session->db->commit;
 	$self->updateHistory("swapped lineage between ".$first." and ".$second);
 	return 1;
 }
@@ -690,7 +690,7 @@ Returns a www_manageAssets() method. Sets a new parent via the results of a form
 sub www_setParent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $newParent = WebGUI::Asset->newByDynamicClass($session{form}{assetId});
+	my $newParent = WebGUI::Asset->newByDynamicClass($self->session->form->process("assetId"));
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
 
@@ -707,9 +707,9 @@ Returns a www_manageAssets() method. Sets a new rank via the results of a form. 
 sub www_setRank {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	my $newRank = $session{form}{rank};
+	my $newRank = $self->session->form->process("rank");
 	$self->setRank($newRank) if (defined $newRank);
-	$session{asset} = $self->getParent;
+	$self->session->asset = $self->getParent;
 	return $self->getParent->www_manageAssets();
 }
 

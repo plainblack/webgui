@@ -34,7 +34,7 @@ our $HELP = {
 				 { tag => $tag,
 				   namespace => $namespace }
 			     }
-		             values %{ $session{config}{macros} }
+		             values %{ $self->session->config->get("macros") }
 			   ],
         },
 

@@ -48,11 +48,11 @@ Removes asset from lineage, places it in clipboard state. The "gap" in the linea
 
 sub cut {
 	my $self = shift;
-	return undef if ($self->getId eq $session{setting}{defaultPage} || $self->getId eq $session{setting}{notFoundPage});
-	WebGUI::SQL->beginTransaction;
-	WebGUI::SQL->write("update asset set state='clipboard-limbo' where lineage like ".quote($self->get("lineage").'%')." and state='published'");
-	WebGUI::SQL->write("update asset set state='clipboard', stateChangedBy=".quote($session{user}{userId}).", stateChanged=".time()." where assetId=".quote($self->getId));
-	WebGUI::SQL->commit;
+	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+	$self->session->db->beginTransaction;
+	$self->session->db->write("update asset set state='clipboard-limbo' where lineage like ".$self->session->db->quote($self->get("lineage").'%')." and state='published'");
+	$self->session->db->write("update asset set state='clipboard', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".time()." where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->commit;
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
 	$self->purgeCache;
@@ -75,10 +75,10 @@ sub duplicate {
         my $self = shift;
         my $assetToDuplicate = shift || $self;
         my $newAsset = $self->addChild($assetToDuplicate->get);
-        my $sth = WebGUI::SQL->read("select * from metaData_values where assetId = ".quote($assetToDuplicate->getId));
+        my $sth = $self->session->db->read("select * from metaData_values where assetId = ".$self->session->db->quote($assetToDuplicate->getId));
         while( my $h = $sth->hashRef) {
-                WebGUI::SQL->write("insert into metaData_values (fieldId, assetId, value) values (".
-                                        quote($h->{fieldId}).",".quote($newAsset->getId).",".quote($h->{value}).")");
+                $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (".
+                                        $self->session->db->quote($h->{fieldId}).",".$self->session->db->quote($newAsset->getId).",".$self->session->db->quote($h->{value}).")");
         }
         $sth->finish;
         return $newAsset;
@@ -104,13 +104,13 @@ If not specified, uses current user.
 sub getAssetsInClipboard {
 	my $self = shift;
 	my $limitToUser = shift;
-	my $userId = shift || $session{user}{userId};
+	my $userId = shift || $self->session->user->profileField("userId");
 	my @assets;
 	my $limit;
 	if ($limitToUser) {
-		$limit = "and asset.stateChangedBy=".quote($userId);
+		$limit = "and asset.stateChangedBy=".$self->session->db->quote($userId);
 	}
-        my $sth = WebGUI::SQL->read("
+        my $sth = $self->session->db->read("
                 select 
                         asset.assetId, 
                         assetData.revisionDate,
@@ -188,7 +188,7 @@ Copies to clipboard assets in a list, then returns self calling method www_manag
 sub www_copyList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $assetId ($session{req}->param("assetId")) {
+	foreach my $assetId ($self->session->request->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
@@ -196,8 +196,8 @@ sub www_copyList {
 			$newAsset->cut;
 		}
 	}
-	if ($session{form}{proceed} ne "") {
-                my $method = "www_".$session{form}{proceed};
+	if ($self->session->form->process("proceed") ne "") {
+                my $method = "www_".$self->session->form->process("proceed");
                 return $self->$method();
         }
 	return $self->www_manageAssets();
@@ -232,7 +232,7 @@ sub www_createShortcut () {
 		return $target->www_view;
 	} else {
 		$child->cut;
-		return $self->getContainer->www_manageAssets if ($session{form}{proceed} eq "manageAssets");
+		return $self->getContainer->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 		return $self->getContainer->www_view;
 	}
 }
@@ -249,7 +249,7 @@ sub www_cut {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	$self->cut;
-	$session{asset} = $self->getParent;
+	$self->session->asset = $self->getParent;
 	return $self->getParent->www_view;
 }
 
@@ -264,14 +264,14 @@ Cuts assets in a list (removes to clipboard), then returns self calling method w
 sub www_cutList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $assetId ($session{req}->param("assetId")) {
+	foreach my $assetId ($self->session->request->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
 			$asset->cut;
 		}
 	}
-	if ($session{form}{proceed} ne "") {
-                my $method = "www_".$session{form}{proceed};
+	if ($self->session->form->process("proceed") ne "") {
+                my $method = "www_".$self->session->form->process("proceed");
                 return $self->$method();
         }
 	return $self->www_manageAssets();
@@ -287,9 +287,9 @@ Moves assets in clipboard to trash. Returns www_manageClipboard() when finished.
 
 sub www_emptyClipboard {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("clipboard");
+	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	foreach my $asset (@{$self->getAssetsInClipboard(!($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)))}) {
+	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && WebGUI::Grouping::isInGroup(3)))}) {
 		$asset->trash;
 	}
 	return $self->www_manageClipboard();
@@ -306,11 +306,11 @@ Returns an AdminConsole to deal with assets in the Clipboard. If isInGroup(12) i
 
 sub www_manageClipboard {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("clipboard");
+	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
 	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
-	if ($session{form}{systemClipboard} && WebGUI::Grouping::isInGroup(3)) {
+	if ($self->session->form->process("systemClipboard") && WebGUI::Grouping::isInGroup(3)) {
 		$header = WebGUI::International::get(966,"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949,"Asset"));
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), WebGUI::International::get(959,"Asset"), 
@@ -321,8 +321,8 @@ sub www_manageClipboard {
 			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
 		$limit = 1;
 	}
-WebGUI::Style::setLink($session{config}{extrasURL}.'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-        WebGUI::Style::setScript($session{config}{extrasURL}.'/assetManager/assetManager.js', {type=>"text/javascript"});
+$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
         my $i18n = WebGUI::International->new("Asset");
         my $output = "
    <script type=\"text/javascript\">
@@ -375,7 +375,7 @@ Returns "". Pastes an asset. If canEdit is False, returns an insufficient privil
 sub www_paste {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	$self->paste($session{form}{assetId});
+	$self->paste($self->session->form->process("assetId"));
 	return "";
 }
 
@@ -390,7 +390,7 @@ Returns a www_manageAssets() method. Pastes a selection of assets. If canEdit is
 sub www_pasteList {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	foreach my $clipId ($session{req}->param("assetId")) {
+	foreach my $clipId ($self->session->request->param("assetId")) {
 		$self->paste($clipId);
 	}
 	return $self->www_manageAssets();

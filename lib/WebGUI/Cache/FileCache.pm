@@ -106,7 +106,7 @@ Retrieve content from the filesystem cache.
 
 sub get {
 	my $self = shift;
-	return undef if ($WebGUI::Session::session{config}{disableCache});
+	return undef if ($self->session->config->get("disableCache"));
 	my $folder = $self->getFolder;
 	if (-e $folder."/expires" && -e $folder."/cache" && open(FILE,"<".$folder."/expires")) {
 		my $expires = <FILE>;
@@ -146,10 +146,10 @@ Figures out what the cache root for this namespace should be. A class method.
 
 sub getNamespaceRoot {
 	my $self = shift;
-	my $root = $WebGUI::Session::session{config}{fileCacheRoot};
+	my $root = $self->session->config->get("fileCacheRoot");
 	unless ($root) {
-		if ($WebGUI::Session::session{os}{windowsish}) {
-			$root = $WebGUI::Session::session{env}{TEMP} || $WebGUI::Session::session{env}{TMP} || "/temp";
+		if ($self->session->os->get("windowsish")) {
+			$root = $self->session->env->get("TEMP") || $self->session->env->get("TMP") || "/temp";
 		} else {
 			$root = "/tmp";
 		}
@@ -167,18 +167,10 @@ Returns the size (in bytes) of the current cache under this namespace. Consequen
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 getNamespaceSize ( )
-
-Returns the size (in bytes) of the current cache under this namespace. Consequently it also cleans up expired cache items.
-
-=cut
-
 sub getNamespaceSize {
         my $self = shift;
         my $expiresModifier = shift || 0;
-        $session{cacheSize} = 0;
+        $self->session->stow->set("cacheSize", 0);
         File::Find::find({no_chdir=>1, wanted=> sub {
                                 return unless $File::Find::name =~ m/^(.*)expires$/;
                                 my $dir = $1;
@@ -188,19 +180,23 @@ sub getNamespaceSize {
                                         if ($expires < time()+$expiresModifier) {
                                                 rmtree($dir);
                                         } else {
-                                                $session{cacheSize} += -s $dir.'cache';
+                                                $self->session->stow->set("cacheSize", $self->session->stow->get("cacheSize") + -s $dir.'cache');
                                         }
                                 }
                         }
                 }, $self->getNamespaceRoot);
-        return $session{cacheSize};
+        return $self->session->stow->get("cacheSize");
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( key [, namespace ]  )
+=head2 new ( session, key [, namespace ]  )
 
 Constructor.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 key 
 
@@ -215,9 +211,10 @@ Defaults to the config filename for the current site. The only reason to overrid
 sub new {
 	my $cache;
 	my $class = shift;
+	my $session = shift;
 	my $key = $class->parseKey(shift);
-	my $namespace = shift || $WebGUI::Session::session{config}{configFile};
-	bless {_key=>$key, _namespace=>$namespace}, $class;
+	my $namespace = shift || $session->config->getFilename;
+	bless {_session=>$session, _key=>$key, _namespace=>$namespace}, $class;
 }
 
 
@@ -247,7 +244,7 @@ sub set {
 	unless (-e $path) {
 		eval {mkpath($path,0)};
 		if ($@) {
-			WebGUI::ErrorHandler::error("Couldn't create cache folder: ".$path." : ".$@);
+			$self->session->errorHandler->error("Couldn't create cache folder: ".$path." : ".$@);
 			return;
 		}
 	}

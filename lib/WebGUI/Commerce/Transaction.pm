@@ -28,12 +28,12 @@ sub addItem {
 	$item = shift;
 	$quantity = shift;
 	
-	WebGUI::SQL->write("insert into transactionItem ".
+	$self->session->db->write("insert into transactionItem ".
 		"(transactionId, itemName, amount, quantity, itemId, itemType) values ".
-		"(".quote($self->{_transactionId}).",".quote($item->name).",".quote($item->price).",".quote($quantity).",".
-		quote($item->id).",".quote($item->type).")");
+		"(".$self->session->db->quote($self->{_transactionId}).",".$self->session->db->quote($item->name).",".$self->session->db->quote($item->price).",".$self->session->db->quote($quantity).",".
+		$self->session->db->quote($item->id).",".$self->session->db->quote($item->type).")");
 	# Adjust total amount in the transaction table.
-	WebGUI::SQL->write("update transaction set amount=amount+".($item->price * $quantity)." where transactionId=".quote($self->{_transactionId}));
+	$self->session->db->write("update transaction set amount=amount+".($item->price * $quantity)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	$self->{_properties}{amount} += ($item->price * $quantity);
 	push @{$self->{_items}}, {
 		transactionId	=> $self->{_transactionId},
@@ -107,8 +107,8 @@ Deletes the transaction from the database;
 sub delete {
 	my ($self) = shift;
 
-	WebGUI::SQL->write("delete from transaction where transactionId=".quote($self->{_transactionId}));
-	WebGUI::SQL->write("delete from transactionItem where transactionId=".quote($self->{_transactionId}));
+	$self->session->db->write("delete from transaction where transactionId=".$self->session->db->quote($self->{_transactionId}));
+	$self->session->db->write("delete from transactionItem where transactionId=".$self->session->db->quote($self->{_transactionId}));
 
 	undef $self;
 }
@@ -144,8 +144,8 @@ sub deleteItem {
 	$itemId = shift;
 	$itemType = shift;
 
-	WebGUI::ErrorHandler::fatal('No itemId') unless ($itemId);
-	WebGUI::ErrorHandler::fatal('No itemType') unless ($itemType);
+	$self->session->errorHandler->fatal('No itemId') unless ($itemId);
+	$self->session->errorHandler->fatal('No itemType') unless ($itemType);
 	
 	$amount = $self->get('amount');
 	
@@ -158,10 +158,10 @@ sub deleteItem {
 		}			
 	}
 	
-	WebGUI::SQL->write("delete from transactionItem where transactionId=".quote($self->get('transactionId')).
-		" and itemId=".quote($itemId)." and itemType=".quote($itemType));
+	$self->session->db->write("delete from transactionItem where transactionId=".$self->session->db->quote($self->get('transactionId')).
+		" and itemId=".$self->session->db->quote($itemId)." and itemType=".$self->session->db->quote($itemType));
 
-	WebGUI::SQL->write("update transaction set amount=".quote($amount)." where transactionId=".quote($self->get('transactionId')));
+	$self->session->db->write("update transaction set amount=".$self->session->db->quote($amount)." where transactionId=".$self->session->db->quote($self->get('transactionId')));
 	
 	$self->{_properties}{amount} = $amount;
 
@@ -187,7 +187,7 @@ sub gateway {
 
 	if ($gateway) {
 		$self->{_properties}{gateway} = $gateway;
-		WebGUI::SQL->write("update transaction set gateway=".quote($gateway)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set gateway=".$self->session->db->quote($gateway)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{gateway};
@@ -212,7 +212,7 @@ sub gatewayId {
 
 	if ($gatewayId) {
 		$self->{_properties}{gatewayId} = $gatewayId;
-		WebGUI::SQL->write("update transaction set gatewayId=".quote($gatewayId)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set gatewayId=".$self->session->db->quote($gatewayId)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{gatewayId};
@@ -263,8 +263,8 @@ sub getByGatewayId {
 	$gatewayId = shift;
 	$paymentGateway = shift;
 
-	($transactionId) = WebGUI::SQL->quickArray("select transactionId from transaction where gatewayId=".quote($gatewayId).
-		" and gateway=".quote($paymentGateway));
+	($transactionId) = $self->session->db->quickArray("select transactionId from transaction where gatewayId=".$self->session->db->quote($gatewayId).
+		" and gateway=".$self->session->db->quote($paymentGateway));
 
 	return WebGUI::Commerce::Transaction->new($transactionId) if $transactionId;
 	return undef;
@@ -320,17 +320,17 @@ sub getTransactions {
 	$self = shift;
 	$criteria = shift;
 	
-	push (@constraints, 'initDate >= '.quote($criteria->{initStart})) if (defined $criteria->{initStart});
-	push (@constraints, 'initDate <= '.quote($criteria->{initStop})) if (defined $criteria->{initStop});
-	push (@constraints, 'completionDate >= '.quote($criteria->{completionStart})) if (defined $criteria->{completionStart});
-	push (@constraints, 'completionDate <= '.quote($criteria->{completionStop})) if (defined $criteria->{completionStop});
-	push (@constraints, 'status='.quote($criteria->{paymentStatus})) if (defined $criteria->{paymentStatus});
-	push (@constraints, 'shippingStatus='.quote($criteria->{shippingStatus})) if (defined $criteria->{shippingStatus});
+	push (@constraints, 'initDate >= '.$self->session->db->quote($criteria->{initStart})) if (defined $criteria->{initStart});
+	push (@constraints, 'initDate <= '.$self->session->db->quote($criteria->{initStop})) if (defined $criteria->{initStop});
+	push (@constraints, 'completionDate >= '.$self->session->db->quote($criteria->{completionStart})) if (defined $criteria->{completionStart});
+	push (@constraints, 'completionDate <= '.$self->session->db->quote($criteria->{completionStop})) if (defined $criteria->{completionStop});
+	push (@constraints, 'status='.$self->session->db->quote($criteria->{paymentStatus})) if (defined $criteria->{paymentStatus});
+	push (@constraints, 'shippingStatus='.$self->session->db->quote($criteria->{shippingStatus})) if (defined $criteria->{shippingStatus});
 	
 	$sql = 'select transactionId from transaction';
 	$sql .= ' where '.join(' and ', @constraints) if (@constraints);
 	
-	@transactionIds = WebGUI::SQL->buildArray($sql);
+	@transactionIds = $self->session->db->buildArray($sql);
 
 	foreach (@transactionIds) {
 		push(@transactions, WebGUI::Commerce::Transaction->new($_));
@@ -360,7 +360,7 @@ sub isRecurring {
 	
 	if (defined $recurring) {
 		$self->{_properties}{recurring} = $recurring;
-		WebGUI::SQL->write("update transaction set recurring=".quote($recurring)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set recurring=".$self->session->db->quote($recurring)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 	
 	return $self->{_properties}{recurring};
@@ -385,7 +385,7 @@ sub lastPayedTerm {
 	
 	if (defined $lastPayedTerm) {
 		$self->{_properties}{lastPayedTerm} = $lastPayedTerm;
-		WebGUI::SQL->write("update transaction set lastPayedTerm=".quote($lastPayedTerm)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set lastPayedTerm=".$self->session->db->quote($lastPayedTerm)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 	
 	return $self->{_properties}{lastPayedTerm};
@@ -418,18 +418,18 @@ sub new {
 	$class = shift;
 	$transactionId = shift;
 	$gatewayId = shift;
-	$userId = shift || $session{user}{userId};
+	$userId = shift || $self->session->user->profileField("userId");
 	
 	if ($transactionId eq 'new') {
 		$transactionId = WebGUI::Id::generate;
 
-		WebGUI::SQL->write("insert into transaction ".
+		$self->session->db->write("insert into transaction ".
 			"(transactionId, userId, amount, gatewayId, initDate, completionDate, status) values ".
-			"(".quote($transactionId).",".quote($userId).",0,".quote($gatewayId).",".quote(time).",NULL,'Pending')");
+			"(".$self->session->db->quote($transactionId).",".$self->session->db->quote($userId).",0,".$self->session->db->quote($gatewayId).",".$self->session->db->quote(time).",NULL,'Pending')");
 	}
 
-	$properties = WebGUI::SQL->quickHashRef("select * from transaction where transactionId=".quote($transactionId));
-	$sth = WebGUI::SQL->read("select * from transactionItem where transactionId=".quote($transactionId));
+	$properties = $self->session->db->quickHashRef("select * from transaction where transactionId=".$self->session->db->quote($transactionId));
+	$sth = $self->session->db->read("select * from transactionItem where transactionId=".$self->session->db->quote($transactionId));
 	while ($row = $sth->hashRef) {
 		push(@items, $row);
 	}
@@ -447,7 +447,7 @@ Returns a reference to an array which contains transaction objects of all pendin
 
 sub pendingTransactions {
 	my (@transactionIds, @transactions);
-	@transactionIds = WebGUI::SQL->buildArray("select transactionId from transaction where status = 'Pending'");
+	@transactionIds = $self->session->db->buildArray("select transactionId from transaction where status = 'Pending'");
 
 	foreach (@transactionIds) {
 		push(@transactions, WebGUI::Commerce::Transaction->new($_));
@@ -475,7 +475,7 @@ sub shippingCost {
 
 	if ($shippingCost) {
 		$self->{_properties}{shippingCost} = $shippingCost;
-		WebGUI::SQL->write("update transaction set shippingCost=".quote($shippingCost)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set shippingCost=".$self->session->db->quote($shippingCost)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{shippingCost};
@@ -500,7 +500,7 @@ sub shippingMethod {
 
 	if ($shippingMethod) {
 		$self->{_properties}{shippingMethod} = $shippingMethod;
-		WebGUI::SQL->write("update transaction set shippingMethod=".quote($shippingMethod)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set shippingMethod=".$self->session->db->quote($shippingMethod)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{shippingMethod};
@@ -526,7 +526,7 @@ sub shippingOptions {
 
 	if ($shippingOptions) {
 		$self->{_properties}{shippingOptions} = $shippingOptions;
-		WebGUI::SQL->write("update transaction set shippingOptions=".quote($shippingOptions)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set shippingOptions=".$self->session->db->quote($shippingOptions)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{shippingOptions};
@@ -551,7 +551,7 @@ sub shippingStatus {
 
 	if ($shippingStatus) {
 		$self->{_properties}{shippingStatus} = $shippingStatus;
-		WebGUI::SQL->write("update transaction set shippingStatus=".quote($shippingStatus)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set shippingStatus=".$self->session->db->quote($shippingStatus)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{shippingStatus};
@@ -576,7 +576,7 @@ sub status {
 
 	if ($status) {
 		$self->{_properties}{status} = $status;
-		WebGUI::SQL->write("update transaction set status=".quote($status)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set status=".$self->session->db->quote($status)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{status};
@@ -602,7 +602,7 @@ sub trackingNumber {
 
 	if ($trackingNumber) {
 		$self->{_properties}{trackingNumber} = $trackingNumber;
-		WebGUI::SQL->write("update transaction set trackingNumber=".quote($trackingNumber)." where transactionId=".quote($self->{_transactionId}));
+		$self->session->db->write("update transaction set trackingNumber=".$self->session->db->quote($trackingNumber)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	}
 
 	return $self->{_properties}{trackingNumber};
@@ -638,7 +638,7 @@ sub transactionsByUser {
 	my $self = shift;
 	my $userId = shift;
 
-	@transactionIds = WebGUI::SQL->buildArray("select transactionId from transaction where userId =".quote($userId));
+	@transactionIds = $self->session->db->buildArray("select transactionId from transaction where userId =".$self->session->db->quote($userId));
 	foreach (@transactionIds) {
 		push (@transactions, WebGUI::Commerce::Transaction->new($_));
 	}

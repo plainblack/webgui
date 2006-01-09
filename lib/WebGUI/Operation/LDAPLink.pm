@@ -31,7 +31,7 @@ sub _submenu {
    my $title = shift;
    $title = WebGUI::International::get($title,"AuthLDAP") if ($title);
    my $help = shift;
-   my $ac = WebGUI::AdminConsole->new("ldapconnections");
+   my $ac = WebGUI::AdminConsole->new($session,"ldapconnections");
    if ($help) {
       $ac->setHelp($help,"AuthLDAP");
    }

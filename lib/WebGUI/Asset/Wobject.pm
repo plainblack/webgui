@@ -137,7 +137,7 @@ Deletes the rendered page cache for this wobject.
 
 sub deletePageCache {
 	my $self = shift;
-        WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+        WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
 }
 
 #-------------------------------------------------------------------
@@ -604,7 +604,7 @@ sub www_view {
 		&& !( $self->session->var->get("adminOn") || $disableCache)
 	);
 	if ($useCache) {
-               	$cache = WebGUI::Cache->new("wobject_".$self->getId."_".$self->session->user->profileField("userId"));
+               	$cache = WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"));
            	$output = $cache->get;
 	}
 	unless ($output) {
