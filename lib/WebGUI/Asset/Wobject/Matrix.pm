@@ -455,22 +455,26 @@ sub www_editListing {
 		-name=>"productName",
 		-value=>$listing->{productName},
 		-label=>WebGUI::International::get('product name','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('product name description','Asset_Matrix'),
 		-maxLength=>25
 		);
 	$f->text(
 		-name=>"versionNumber",
 		-value=>$listing->{versionNumber},
 		-label=>WebGUI::International::get('version number','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('version number description','Asset_Matrix'),
 		);
 	$f->url(
 		-name=>"productUrl",
 		-value=>$listing->{productUrl},
 		-label=>WebGUI::International::get('product url','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('product url description','Asset_Matrix'),
 		);
 	$f->text(
 		-name=>"manufacturerName",
 		-value=>$listing->{manufacturerName},
 		-label=>WebGUI::International::get('manufacturer name','Asset_Matrix'),
+		-hoverHelp=>WebGUI::International::get('manufacturer name description','Asset_Matrix'),
 		);
 	$f->url(
 		-name=>"manufacturerUrl",
@@ -488,6 +492,7 @@ sub www_editListing {
 			-value=>[$listing->{maintainerId}],
 			-label=>WebGUI::International::get('listing maintainer','Asset_Matrix'),
 			-options=>$self->session->db->buildHashRef("select userId,username from users order by username")
+			-hoverHelp=>WebGUI::International::get('listing maintainer description','Asset_Matrix'),
 			);
 	}
 	my %goodBad = (
@@ -518,7 +523,7 @@ sub www_editListing {
 					-subtext=>"<br />".$field->{description}
 					);
 			} elsif ($field->{fieldType} eq "goodBad") {
-				my $value = ($field->{value} || $field->{defaultValue} || "No");
+				my $value = ($field->{value} || $field->{defaultValue} || WebGUI::International::get("no",'Asset_Matrix'));
 				$f->selectBox(
 					-name=>$field->{name},
 					-value=>[$value],

@@ -995,6 +995,63 @@ our $I18N = {
                 message => q|Limited|
         },
 
+        'listing add/edit help title' => {
+                lastUpdated => 1136488382,
+                message => q|Matrix Listing, Add/Edit|
+        },
+
+        'listing add/edit help body' => {
+                lastUpdated => 1135279558,
+                message => q|In this form, you may add a listing in the Matrix for a new product or edit the listing for an existing product.|
+        },
+
+        'product name description' => {
+                lastUpdated => 1135279558,
+                message => q|Enter the name of the product.  If there are entries for the product with different revisions, it would be best to make sure the names are the same.|
+        },
+
+        'version number description' => {
+                lastUpdated => 1135279558,
+                message => q|Enter the release or version number for the product.|
+        },
+
+        'product url description' => {
+                lastUpdated => 1135279558,
+                message => q|If the product has its own website, enter the complete URL for it here.|
+        },
+
+        'manufacturer name description' => {
+                lastUpdated => 1135279558,
+                message => q|Enter the manufacturer of the product.|
+        },
+
+        'manufacturer url description' => {
+                lastUpdated => 1135279558,
+                message => q|If the manufacturer has a website, enter the complete URL for it here.|
+        },
+
+        'description description' => {
+                lastUpdated => 1135279558,
+                message => q|Please give a general description of the product.  Specific details can be rated in the form fields below.|
+        },
+
+        'listing maintainer description' => {
+                lastUpdated => 1136488950,
+                message => q|If left blank, this will be the name of the user who created this product listing.  The
+		listing maintainer is allowed to edit this listing, even if they are not members of the group
+		to add or edit listings.|
+        },
+
+        'matrix specific fields description' => {
+                lastUpdated => 1135279558,
+                message => q|Each matrix is configured to compare the features and performance of various products.  These features and performance criteria are displayed for you to rate on an item by item basis.|
+        },
+
+        'matrix specific fields' => {
+                lastUpdated => 1135279558,
+                message => q|Matrix Specific Fields|
+        },
+
 };
 
 1;
