@@ -170,7 +170,7 @@ Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit
 
 sub www_copy {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $newAsset = $self->duplicate;
 	$newAsset->update({ title=>$self->getTitle.' (copy)'});
 	$newAsset->cut;
@@ -187,7 +187,7 @@ Copies to clipboard assets in a list, then returns self calling method www_manag
 
 sub www_copyList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $assetId ($self->session->request->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -247,7 +247,7 @@ Cuts (removes to clipboard) self, returns the www_view of the Parent if canEdit.
 
 sub www_cut {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->cut;
 	$self->session->asset = $self->getParent;
 	return $self->getParent->www_view;
@@ -263,7 +263,7 @@ Cuts assets in a list (removes to clipboard), then returns self calling method w
 
 sub www_cutList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $assetId ($self->session->request->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -288,7 +288,7 @@ Moves assets in clipboard to trash. Returns www_manageClipboard() when finished.
 sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && WebGUI::Grouping::isInGroup(3)))}) {
 		$asset->trash;
 	}
@@ -307,7 +307,7 @@ Returns an AdminConsole to deal with assets in the Clipboard. If isInGroup(12) i
 sub www_manageClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
 	if ($self->session->form->process("systemClipboard") && WebGUI::Grouping::isInGroup(3)) {
@@ -374,7 +374,7 @@ Returns "". Pastes an asset. If canEdit is False, returns an insufficient privil
 
 sub www_paste {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->paste($self->session->form->process("assetId"));
 	return "";
 }
@@ -389,7 +389,7 @@ Returns a www_manageAssets() method. Pastes a selection of assets. If canEdit is
 
 sub www_pasteList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $clipId ($self->session->request->param("assetId")) {
 		$self->paste($clipId);
 	}

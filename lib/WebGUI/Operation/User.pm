@@ -227,7 +227,7 @@ Allows an administrator to assume another user.
 
 sub www_becomeUser {
 	my $session = shift;
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	$session->user({userId=>$session->form->process("uid")});
 	return "";
 }
@@ -246,9 +246,9 @@ of the user to delete is expected in a URL param names 'uid'.
 sub www_deleteUser {
 	my $session = shift;
         my ($output);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
-		return _submenu(WebGUI::Privilege::vitalComponent());
+		return _submenu($session->privilege->vitalComponent());
         } else {
                 $output .= WebGUI::International::get(167).'<p>';
                 $output .= '<div align="center"><a href="'.$session->url->page('op=deleteUserConfirm;uid='.$session->form->process("uid")).
@@ -271,10 +271,10 @@ after this.
 
 sub www_deleteUserConfirm {
 	my $session = shift;
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($u);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
-	   return WebGUI::AdminConsole->new($session,"users")->render(WebGUI::Privilege::vitalComponent());
+	   return WebGUI::AdminConsole->new($session,"users")->render($session->privilege->vitalComponent());
     } else {
 	   $u = WebGUI::User->new($session->form->process("uid"));
 	   $u->delete;
@@ -285,7 +285,7 @@ sub www_deleteUserConfirm {
 #-------------------------------------------------------------------
 sub www_editUser {
 	my $session = shift;
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(11));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(11));
 	my $error = shift;
 	my $i18n = WebGUI::International->new("WebGUI");
 	my %tabs;
@@ -398,7 +398,7 @@ sub www_editUserSave {
 	unless ($isAdmin) {
 		$isSecondary = (WebGUI::Grouping::isInGroup(11) && $session->form->process("uid") eq "new");
 	}
-	return WebGUI::Privilege::adminOnly() unless ($isAdmin || $isSecondary);
+	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
 	my ($uid) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
 	my $error;
 	if (($uid eq $session->form->process("uid") || $uid eq "") && $session->form->process("username") ne '') {
@@ -432,7 +432,7 @@ sub www_editUserSave {
 #-------------------------------------------------------------------
 sub www_editUserKarma {
 	my $session = shift;
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         $f = WebGUI::HTMLForm->new;
         $f->hidden(
@@ -461,7 +461,7 @@ sub www_editUserKarma {
 #-------------------------------------------------------------------
 sub www_editUserKarmaSave {
 	my $session = shift;
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($u);
         $u = WebGUI::User->new($session->form->process("uid"));
         $u->karma($session->form->process("amount"),$session->user->profileField("username")." (".$session->user->profileField("userId").")",$session->form->process("description"));
@@ -476,7 +476,7 @@ sub www_listUsers {
 			$session->form->process("uid") = "new";
 			return www_editUser();
 		}
-		return WebGUI::Privilege::adminOnly();
+		return $session->privilege->adminOnly();
 	}
 	my %status;
 	my $output = getUserSearchForm("listUsers");

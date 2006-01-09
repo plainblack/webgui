@@ -1443,7 +1443,7 @@ sub www_add {
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
-	return WebGUI::Privilege::insufficient() unless ($newAsset->canAdd);
+	return $self->session->privilege->insufficient() unless ($newAsset->canAdd);
 	return $newAsset->www_edit();
 }
 
@@ -1458,7 +1458,7 @@ Returns the view() method of the asset object if the requestor canView.
 
 sub www_ajaxInlineView {
 	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->session->privilege->noAccess() unless $self->canView;
 	return $self->view;
 }
 
@@ -1473,7 +1473,7 @@ Renders an AdminConsole EditForm, unless canEdit returns False.
 
 sub www_edit {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	return $self->getAdminConsole->render($self->getEditForm->print);
 }
 
@@ -1489,7 +1489,7 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $object;
 	unless($self->session->setting->get("autoCommit") || $self->session->scratch->get("versionTag")) {
 		$self->addVersionTag;
@@ -1534,7 +1534,7 @@ Main page to manage assets. Renders an AdminConsole with a list of assets. If ca
 
 sub www_manageAssets {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
   	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
   	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
@@ -1694,7 +1694,7 @@ Returns the view() method of the asset object if the requestor canView.
 
 sub www_view {
 	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->session->privilege->noAccess() unless $self->canView;
 	return $self->view;
 }
 

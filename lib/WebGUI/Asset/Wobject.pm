@@ -195,7 +195,7 @@ A comparison expression to be used when checking whether the action should be al
 =cut
 
 sub confirm {
-        return WebGUI::Privilege::vitalComponent() if ($_[4]);
+        return $self->session->privilege->vitalComponent() if ($_[4]);
 	my $noURL = $_[3] || $_[0]->getUrl;
         my $output = '<h1>'.WebGUI::International::get(42,'Wobject').'</h1>';
         $output .= $_[1].'<p>';
@@ -553,7 +553,7 @@ sub setCollateral {
 
 sub www_edit {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my ($tag) = ($self->get("className") =~ /::(\w+)$/);
 	my $tag2 = $tag;
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
@@ -576,7 +576,7 @@ sub www_view {
 	my $disableCache = shift;
 	unless ($self->canView) {
 		if ($self->get("state") eq "published") { # no privileges, make em log in
-			return WebGUI::Privilege::noAccess();
+			return $self->session->privilege->noAccess();
 		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
 			WebGUI::HTTP::setRedirect($self->getUrl("func=manageTrash"));
 			return "";

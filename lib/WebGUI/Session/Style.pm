@@ -331,5 +331,26 @@ sub useEmptyStyle {
 	$self->{_useEmptyStyle} = shift;
 }
 
+#-------------------------------------------------------------------
+
+=head2 userStyle ( content )
+
+Wrapper's the content in the user style defined in the settings.
+
+=head3 content
+
+The content to be wrappered.
+
+=cut
+
+sub userStyle {
+	my $self = shift;
+        my $output = shift;
+        if ($output) {
+                return $self->process($output,$self->session->setting->get("userFunctionStyleId"));
+        } else {
+                return undef;
+        }       
+}  
 
 1;

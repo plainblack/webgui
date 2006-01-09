@@ -283,7 +283,7 @@ Web facing method which is the default edit page
 
 sub www_edit {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless $self->canEdit;
+   return $self->session->privilege->insufficient() unless $self->canEdit;
    $self->getAdminConsole->setHelp("zip archive add/edit", "Asset_ZipArchive");
    return $self->getAdminConsole->render($self->getEditForm->print,
               WebGUI::International::get('zip archive add/edit title',"Asset_ZipArchive"));
@@ -299,7 +299,7 @@ Web facing method which is the default view page.  This method does a
 
 sub www_view {
 	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->session->privilege->noAccess() unless $self->canView;
 	if (WebGUI::Session::isAdminOn()) {
 		return $self->getContainer->www_view;
 	}

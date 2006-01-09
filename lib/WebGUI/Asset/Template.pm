@@ -326,7 +326,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("template add/edit","Asset_Template");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),WebGUI::International::get("style wizard","Asset_Template")) if ($self->get("namespace") eq "style");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Asset_Template'));
@@ -354,7 +354,7 @@ sub www_manage {
 
 sub www_styleWizard {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $output = "";
 	if ($self->session->form->process("step") == 2) {
 		my $f = WebGUI::HTMLForm->new({action=>$self->getUrl});

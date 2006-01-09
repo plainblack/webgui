@@ -76,7 +76,7 @@ Text description of how long the subscription lasts.
 
 sub www_flushCache {
 	my $session = shift;
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my $cache = WebGUI::Cache->new($session,);
 	$cache->flush;
 	return www_manageCache();
@@ -93,7 +93,7 @@ provides an option to clear the cache.
 
 sub www_manageCache {
 	my $session = shift;
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
         my ($output, $data);
 	my $cache = WebGUI::Cache->new($session,);
 	my $flushURL =  $session->url->page('op=flushCache');

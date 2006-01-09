@@ -344,7 +344,7 @@ sub view {
 #-------------------------------------------------------------------
 #sub www_edit {
 #        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	return $self->session->privilege->insufficient() unless $self->canEdit;
 #	$self->getAdminConsole->setHelp("http proxy add/edit","Asset_HttpProxy");
 #        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("2","Asset_HttpProxy"));
 #}
@@ -354,7 +354,7 @@ sub view {
 sub www_view {
         my $self = shift;
         my $output = $self->view;
-        return WebGUI::Privilege::noAccess() unless $self->canView;
+        return $self->session->privilege->noAccess() unless $self->canView;
         # this is s a stop gap. we need to do something here that deals with the real www_view and caching, etc.
         if (WebGUI::HTTP::getMimeType() ne "text/html") {
                 return $output;

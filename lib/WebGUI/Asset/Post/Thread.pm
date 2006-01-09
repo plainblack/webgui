@@ -790,7 +790,7 @@ sub www_unsubscribe {
 sub www_view {
 	my $self = shift;
 	my $postId = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->session->privilege->noAccess() unless $self->canView;
 	my $cache;
 	my $output;
         my $useCache = (

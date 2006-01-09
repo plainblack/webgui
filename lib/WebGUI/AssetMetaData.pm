@@ -142,7 +142,7 @@ Deletes a MetaDataField and returns www_manageMetaData on self, if user isInGrou
 
 sub www_deleteMetaDataField {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$self->deleteMetaDataField($self->session->form->process("fid"));
 	return $self->www_manageMetaData;
 }
@@ -159,7 +159,7 @@ Returns a rendered page to edit MetaData.  Will return an insufficient Privilege
 sub www_editMetaDataField {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"contentProfiling");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(4));
         my $fieldInfo;
 	if($self->session->form->process("fid") && $self->session->form->process("fid") ne "new") {
 		$fieldInfo = $self->getMetaDataFields($self->session->form->process("fid"));
@@ -218,7 +218,7 @@ Verifies that MetaData fields aren't duplicated or blank, assigns default values
 sub www_editMetaDataFieldSave {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"content profiling");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$ac->setHelp("metadata edit property","Asset");
 	# Check for duplicate field names
 	my $sql = "select count(*) from metaData_properties where fieldName = ".
@@ -268,7 +268,7 @@ Returns an AdminConsole to deal with MetaDataFields. If isInGroup(4) is False, r
 sub www_manageMetaData {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"contentProfiling");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(4));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(4));
 	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), WebGUI::International::get("Add new field","Asset"));
 	my $output;
 	my $fields = $self->getMetaDataFields();

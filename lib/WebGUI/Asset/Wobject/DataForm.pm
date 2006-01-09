@@ -671,7 +671,7 @@ sub viewForm {
 #-------------------------------------------------------------------
 sub www_deleteAllEntries {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
         my $assetId = $self->session->form->process("entryId");
 	$self->deleteCollateral("DataForm_entry","assetId",$assetId);
         $self->session->form->process("entryId") = 'list';
@@ -681,7 +681,7 @@ sub www_deleteAllEntries {
 #-------------------------------------------------------------------
 sub www_deleteAllEntriesConfirm {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit && $self->session->form->process("entryId")==$self->getId);
+	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->form->process("entryId")==$self->getId);
 	$self->session->db->write("delete from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
 	return $self->www_view;
 }
@@ -690,7 +690,7 @@ sub www_deleteAllEntriesConfirm {
 #-------------------------------------------------------------------
 sub www_deleteEntry {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
         my $entryId = $self->session->form->process("entryId");
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
         $self->session->form->process("entryId") = 'list';
@@ -700,7 +700,7 @@ sub www_deleteEntry {
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->deleteCollateral("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"));
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId");
        	return "";
@@ -709,7 +709,7 @@ sub www_deleteFieldConfirm {
 #-------------------------------------------------------------------
 sub www_deleteTabConfirm {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->deleteCollateral("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
 	$self->deleteCollateral("DataForm_field","DataForm_tabId",$self->session->form->process("tid"));
 	$self->reorderCollateral("DataForm_tab","DataForm_tabId");
@@ -719,7 +719,7 @@ sub www_deleteTabConfirm {
 #-------------------------------------------------------------------
 #sub www_edit {
 #        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	return $self->session->privilege->insufficient() unless $self->canEdit;
 #	$self->getAdminConsole->setHelp("data form add/edit","Asset_DataForm");
 #        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("7","Asset_DataForm"));
 #}
@@ -727,7 +727,7 @@ sub www_deleteTabConfirm {
 #-------------------------------------------------------------------
 sub www_editField {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
     	my (%field, $f, %fieldStatus,$tab);
     	tie %field, 'Tie::CPHash';
     	tie %fieldStatus, 'Tie::IxHash';
@@ -857,7 +857,7 @@ sub www_editField {
 #-------------------------------------------------------------------
 sub www_editFieldSave {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
 	$self->session->form->process("tid") = "0" if ($self->session->form->process("tid") eq "");
 	$self->session->form->process("name") = $self->session->url->urlize($self->session->form->process("name"));
@@ -893,7 +893,7 @@ sub www_editFieldSave {
 #-------------------------------------------------------------------
 sub www_editTab {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
     	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
         $self->session->form->process("tid") = "new" if ($self->session->form->process("tid") eq "");
@@ -938,7 +938,7 @@ sub www_editTab {
 #-------------------------------------------------------------------
 sub www_editTabSave {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
 	$self->session->form->process("name") = $self->session->url->urlize($self->session->form->process("name"));
         $self->session->form->process("name") =~ s/\-//g;
@@ -958,7 +958,7 @@ sub www_editTabSave {
 #-------------------------------------------------------------------
 sub www_exportTab {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
         WebGUI::HTTP::setFilename($self->get("url").".tab","text/plain");
         my %fields = $self->session->db->buildHash("select DataForm_fieldId,name from DataForm_field where
                 assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
@@ -1008,7 +1008,7 @@ sub www_exportTab {
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->moveCollateralDown("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"),_tonull("DataForm_tabId",$self->session->form->process("tid")));
 	return "";
 }
@@ -1016,7 +1016,7 @@ sub www_moveFieldDown {
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->moveCollateralUp("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"),_tonull("DataForm_tabId",$self->session->form->process("tid")));
 	return "";
 }
@@ -1024,7 +1024,7 @@ sub www_moveFieldUp {
 #-------------------------------------------------------------------
 sub www_moveTabRight {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->moveCollateralDown("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
 	return "";
 }
@@ -1032,7 +1032,7 @@ sub www_moveTabRight {
 #-------------------------------------------------------------------
 sub www_moveTabLeft {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->moveCollateralUp("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
 	return "";
 }

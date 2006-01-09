@@ -695,7 +695,7 @@ sub view {
 
 #-------------------------------------------------------------------
 sub www_deleteAnswerConfirm {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         my ($answerCount) = $self->session->db->quickArray("select count(*) from Survey_answer where Survey_questionId=".$self->session->db->quote($self->session->form->process("qid")));
 	return $_[0]->i18n("cannot delete the last answer") unless($answerCount);
         $self->session->db->write("delete from Survey_questionResponse where Survey_answerId=".$self->session->db->quote($self->session->form->process("aid")));
@@ -706,7 +706,7 @@ sub www_deleteAnswerConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteQuestionConfirm {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
 	$self->session->db->write("delete from Survey_answer where Survey_questionId=".$self->session->db->quote($self->session->form->process("qid")));
 	$self->session->db->write("delete from Survey_questionResponse where Survey_questionId=".$self->session->db->quote($self->session->form->process("qid")));
         $_[0]->deleteCollateral("Survey_question","Survey_questionId",$self->session->form->process("qid"));
@@ -716,12 +716,12 @@ sub www_deleteQuestionConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteSectionConfirm {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         my $none = WebGUI::International::get(107, 'Asset_Survey');
         my ($sectionName) = $self->session->db->quickArray("select sectionName from Survey_section where Survey_sectionId="
         		.$self->session->db->quote($self->session->form->process("sid")));
         if ($sectionName =~ /$none/) {
-	  return WebGUI::Privilege::vitalComponent();
+	  return $self->session->privilege->vitalComponent();
 	}
         
 	$self->session->db->write("delete from Survey_section where Survey_sectionId=".$self->session->db->quote($self->session->form->process("sid")));
@@ -761,7 +761,7 @@ sub www_deleteAllResponsesConfirm {
 
 #-------------------------------------------------------------------
 sub www_editSave {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
 	my $output = $_[0]->SUPER::www_editSave(); 
 	if ($self->session->form->process("proceed") eq "addQuestion") {
 		$self->session->form->process("qid") = "new";
@@ -775,7 +775,7 @@ sub www_editAnswer {
         my ($question, $f, $answer, $self);
 	$self = shift;
 	
-        return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+        return $self->session->privilege->insufficient() unless ($self->canEdit);
         
 	$answer = $self->getCollateral("Survey_answer","Survey_answerId",$self->session->form->process("aid"));
         $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -850,7 +850,7 @@ sub www_editAnswer {
 
 #-------------------------------------------------------------------
 sub www_editAnswerSave {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         $_[0]->setCollateral("Survey_answer", "Survey_answerId", {
                 Survey_answerId => $self->session->form->process("aid"),
                 Survey_questionId => $self->session->form->process("qid"),
@@ -875,7 +875,7 @@ sub www_editQuestion {
 	my ($f, $question, $answerFieldType, $sth, %data, $self);
 	$self = shift;
 
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 
 	tie %data, 'Tie::CPHash';
 	$question = $self->getCollateral("Survey_question","Survey_questionId",$self->session->form->process("qid"));
@@ -988,7 +988,7 @@ sub www_editQuestion {
 
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
 		
 	$self->session->form->process("qid") = $_[0]->setCollateral("Survey_question", "Survey_questionId", {
                 question=>$self->session->form->process("question"),
@@ -1041,11 +1041,11 @@ sub www_editSection {
 	my ($f, $section, $sectionName, $self);
 	$self = shift;
 	my $none = WebGUI::International::get(107, 'Asset_Survey');
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	$section = $self->getCollateral("Survey_section","Survey_sectionId",$self->session->form->process("sid"));
 	
 	if ($section->{sectionName} =~ /$none/) {
-	  return WebGUI::Privilege::vitalComponent;
+	  return $self->session->privilege->vitalComponent;
 	}
 	
 	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -1074,7 +1074,7 @@ sub www_editSection {
 
 #-------------------------------------------------------------------
 sub www_editSectionSave {
-	return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+	return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
 	$self->session->form->process("sid") = $_[0]->setCollateral("Survey_section", "Survey_sectionId", {
                 sectionName => $self->session->form->process("sectionName"),
         	Survey_sectionId=>$self->session->form->process("sid"),
@@ -1116,42 +1116,42 @@ sub www_exportResponses {
 
 #-------------------------------------------------------------------
 sub www_moveAnswerDown {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Survey_answer","Survey_answerId",$self->session->form->process("aid"),"Survey_id");
         return $_[0]->www_editQuestion;
 }
 
 #-------------------------------------------------------------------
 sub www_moveAnswerUp {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Survey_answer","Survey_answerId",$self->session->form->process("aid"),"Survey_id");
         return $_[0]->www_editQuestion;
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionDown {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Survey_question","Survey_questionId",$self->session->form->process("qid"),"Survey_id");
         return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveQuestionUp {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Survey_question","Survey_questionId",$self->session->form->process("qid"),"Survey_id");
         return ""; 
 }
 
 #-------------------------------------------------------------------
 sub www_moveSectionDown {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralDown("Survey_section","Survey_sectionId",$self->session->form->process("sid"),"Survey_id");
         return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveSectionUp {
-        return WebGUI::Privilege::insufficient() unless ($_[0]->canEdit);
+        return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
         $_[0]->moveCollateralUp("Survey_section","Survey_sectionId",$self->session->form->process("sid"),"Survey_id");
         return ""; 
 }

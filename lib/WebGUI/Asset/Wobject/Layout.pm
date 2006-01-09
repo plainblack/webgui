@@ -219,7 +219,7 @@ sub view {
 
 sub www_setContentPositions {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	$self->addRevision({
 		contentPositions=>$self->session->form->process("map")
 		});

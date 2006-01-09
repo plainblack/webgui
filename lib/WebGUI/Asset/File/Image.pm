@@ -225,7 +225,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),WebGUI::International::get("resize image","Asset_Image")) if ($self->get("filename"));
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
@@ -241,7 +241,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_resize {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
 	if ($self->session->form->process("newWidth") || $self->session->form->process("newHeight")) {
 		$self->getStorageLocation->resize($self->get("filename"),$self->session->form->process("newWidth"),$self->session->form->process("newHeight"));
 		$self->setSize($self->getStorageLocation->getFileSize($self->get("filename")));

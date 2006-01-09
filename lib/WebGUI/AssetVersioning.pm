@@ -345,7 +345,7 @@ Displays the add version tag form.
 sub www_addVersionTag {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"versions");
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+        return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my $i18n = WebGUI::International->new("Asset");
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
 	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -375,7 +375,7 @@ Adds a version tag and sets the user's default version tag to that.
 
 sub www_addVersionTagSave {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+        return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	$self->addVersionTag($self->session->form->process("name"));
 	return $self->www_manageVersions();
 }
@@ -385,7 +385,7 @@ sub www_addVersionTagSave {
 
 sub www_commitRevision {
 	my $self = shift;
-	return WebGUI::Privilege::adminOnly() unless $self->canEdit;
+	return $self->session->privilege->adminOnly() unless $self->canEdit;
 	$self->commit;
 	return $self->getContainer->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 	return $self->getContainer->www_view;
@@ -394,7 +394,7 @@ sub www_commitRevision {
 
 sub www_commitVersionTag {
 	my $self = shift;
-	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
+	return $self->session->privilege->adminOnly() unless WebGUI::Grouping::isInGroup(3);
 	my $tagId = $self->session->form->process("tagId");
 	if ($tagId) {
 		$self->commitVersionTag($tagId);
@@ -413,7 +413,7 @@ Shows a list of the currently available asset version tags.
 sub www_manageCommittedVersions {
         my $self = shift;
         my $ac = WebGUI::AdminConsole->new($self->session,"versions");
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+        return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(3));
         my $i18n = WebGUI::International->new("Asset");
 	my $rollback = $i18n->get('rollback');
 	my $rollbackPrompt = $i18n->get('rollback version tag confirm');
@@ -447,7 +447,7 @@ Shows a list of the revisions for this asset.
 sub www_manageRevisions {
         my $self = shift;
         my $ac = WebGUI::AdminConsole->new("versions");
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+        return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(3));
         my $i18n = WebGUI::International->new("Asset");
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Revision Date</th><th>Revised By</th><th>Tag Name</th></tr> ';
@@ -478,7 +478,7 @@ Shows a list of the currently available asset version tags.
 sub www_manageVersions {
 	my $self = shift;
         my $ac = WebGUI::AdminConsole->new("versions");
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+        return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(3));
 	my $i18n = WebGUI::International->new("Asset");
 	$ac->setHelp("versions manage");
 	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
@@ -515,7 +515,7 @@ sub www_manageVersions {
 sub www_manageRevisionsInTag {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new("versions");
-        return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(3));
+        return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(3));
         my $i18n = WebGUI::International->new("Asset");
 	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
@@ -545,7 +545,7 @@ sub www_manageRevisionsInTag {
 
 sub www_purgeRevision {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $revisionDate = $self->session->form->process("revisionDate");
 	return undef unless $revisionDate;
 	WebGUI::Asset->new($self->getId,$self->get("className"),$revisionDate)->purgeRevision;
@@ -560,8 +560,8 @@ sub www_purgeRevision {
 
 sub www_rollbackVersionTag {
 	my $self = shift;
-	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
-	return WebGUI::Privilege::vitalComponent() if ($self->session->form->process("tagId") eq "pbversion0000000000001" || $self->session->form->process("tagId") eq "pbversion0000000000002");
+	return $self->session->privilege->adminOnly() unless WebGUI::Grouping::isInGroup(3);
+	return $self->session->privilege->vitalComponent() if ($self->session->form->process("tagId") eq "pbversion0000000000001" || $self->session->form->process("tagId") eq "pbversion0000000000002");
 	my $tagId = $self->session->form->process("tagId");
 	if ($tagId) {
 		$self->rollbackVersionTag($tagId);
@@ -576,7 +576,7 @@ sub www_rollbackVersionTag {
 
 sub www_rollbackSiteToTime {
 	my $self = shift;
-	return WebGUI::Privilege::adminOnly() unless WebGUI::Grouping::isInGroup(3);
+	return $self->session->privilege->adminOnly() unless WebGUI::Grouping::isInGroup(3);
 
 }
 
@@ -591,7 +591,7 @@ Sets the current user's working version tag.
 
 sub www_setVersionTag () {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless WebGUI::Grouping::isInGroup(12);
+	return $self->session->privilege->insufficient() unless WebGUI::Grouping::isInGroup(12);
 	$self->session->scratch->set("versionTag",$self->session->form->process("tagId"));
 	return $self->www_manageVersions();
 }

@@ -277,7 +277,7 @@ sub view {
 sub www_setContentPositions {
 	my $self = shift;
 	return 'Visitors cannot save settings' if($self->session->user->profileField("userId") eq '1');
-	return WebGUI::Privilege::insufficient() unless ($self->canPersonalize);
+	return $self->session->privilege->insufficient() unless ($self->canPersonalize);
 	return 'empty' unless $self->get("isInitialized");
 	my $dummy = $self->initialize unless $self->get("isInitialized");
 	my $u = WebGUI::User->new($self->discernUserId);

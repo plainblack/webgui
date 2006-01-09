@@ -271,7 +271,7 @@ order by department, lastName, firstName";
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("18","Asset_InOutBoard"));
 }
 

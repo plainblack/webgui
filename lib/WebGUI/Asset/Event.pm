@@ -237,7 +237,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_deleteEvent {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(42,"Asset_Event").'</h1>';
 	$output .= WebGUI::International::get(75,"Asset_Event").'<p><blockquote>';
@@ -253,7 +253,7 @@ sub www_deleteEvent {
 #-------------------------------------------------------------------
 sub www_deleteEventConfirm {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	if (($self->session->form->process("rid") ne "") and ($self->session->form->process("rid") ne "0")) {
 		my $series = $self->getParent->getLineage(["descendants"],{returnObjects=>1});
 		foreach my $event (@{$series}) {
@@ -269,7 +269,7 @@ sub www_deleteEventConfirm {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("event add/edit","Asset_Event");
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('13', 'Asset_Event'));
 }
@@ -277,7 +277,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canView);
+	return $self->session->privilege->insufficient() unless ($self->canView);
 	return $self->session->style->process($self->view,$self->getParent->getValue("styleTemplateId"));
 }
 

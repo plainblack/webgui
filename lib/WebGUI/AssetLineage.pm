@@ -657,7 +657,7 @@ Demotes self and returns www_view method of getContainer of self if canEdit, oth
 
 sub www_demote {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->demote;
 	return $self->getContainer->www_view; 
 }
@@ -673,7 +673,7 @@ Returns www_view method of getContainer of self. Promotes self. If canEdit is Fa
 
 sub www_promote {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->promote;
 	return $self->getContainer->www_view;
 }
@@ -689,7 +689,7 @@ Returns a www_manageAssets() method. Sets a new parent via the results of a form
 
 sub www_setParent {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $newParent = WebGUI::Asset->newByDynamicClass($self->session->form->process("assetId"));
 	$self->setParent($newParent) if (defined $newParent);
 	return $self->www_manageAssets();
@@ -706,7 +706,7 @@ Returns a www_manageAssets() method. Sets a new rank via the results of a form. 
 
 sub www_setRank {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $newRank = $self->session->form->process("rank");
 	$self->setRank($newRank) if (defined $newRank);
 	$self->session->asset = $self->getParent;

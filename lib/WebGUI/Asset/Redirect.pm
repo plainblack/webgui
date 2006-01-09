@@ -101,7 +101,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("redirect add/edit", "Asset_Redirect");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('redirect add/edit title', 'Asset_Redirect'));
 }
@@ -116,7 +116,7 @@ A web executable method that redirects the user to the specified page, or displa
 
 sub www_view {
         my $self = shift;
-        return WebGUI::Privilege::noAccess() unless $self->canView;
+        return $self->session->privilege->noAccess() unless $self->canView;
         if ($self->session->var->isAdminOn() && $self->canEdit) {
                 my $i18n = WebGUI::International->new("Asset_Redirect");
                 return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'

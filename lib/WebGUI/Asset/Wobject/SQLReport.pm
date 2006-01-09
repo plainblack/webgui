@@ -256,7 +256,7 @@ sub view {
 #-------------------------------------------------------------------
 #sub www_edit {
 #        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	return $self->session->privilege->insufficient() unless $self->canEdit;
 #	$self->getAdminConsole->setHelp("sql report add/edit", "Asset_SQLReport");
 #        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("8","Asset_SQLReport"));
 #}

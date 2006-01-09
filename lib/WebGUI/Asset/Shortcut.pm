@@ -626,7 +626,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
 	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
@@ -676,14 +676,14 @@ sub www_getUserPrefsForm {
 #-------------------------------------------------------------------
 sub www_manageOverrides {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	return $self->_submenu($self->getOverridesList,WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
 }
 
 #-------------------------------------------------------------------
 sub www_purgeOverrideCache {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->uncacheOverrides;
 	return $self->www_manageOverrides;
 }
@@ -691,7 +691,7 @@ sub www_purgeOverrideCache {
 #-------------------------------------------------------------------
 sub www_deleteOverride {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->session->db->write('delete from Shortcut_overrides where assetId='.$self->session->db->quote($self->getId).' and fieldName='.$self->session->db->quote($self->session->form->process("fieldName")));
 	$self->uncacheOverrides;
 	return $self->www_manageOverrides;
@@ -731,7 +731,7 @@ sub www_getNewTitle {
 #-------------------------------------------------------------------
 sub www_editOverride {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new("Asset_Shortcut");
 	my $fieldName = $self->session->form->process("fieldName");
 	my %overrides = $self->getOverrides;
@@ -772,7 +772,7 @@ sub www_editOverride {
 #-------------------------------------------------------------------
 sub www_saveOverride {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $fieldName = $self->session->form->process("overrideFieldName");
 	my %overrides = $self->getOverrides;
 	my $output = '';
@@ -793,7 +793,7 @@ sub www_saveOverride {
 sub www_view {
 	my $self = shift;
 	if ($self->isDashlet) {
-		return WebGUI::Privilege::noAccess() unless $self->canView;
+		return $self->session->privilege->noAccess() unless $self->canView;
 		$self->session->asset = $self->getParent;
 		return $self->session->asset->www_view;
 	} else {

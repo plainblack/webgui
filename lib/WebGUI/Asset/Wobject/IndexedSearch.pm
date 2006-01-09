@@ -380,7 +380,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("search add/edit", "Asset_IndexedSearch");
 	my $form = $self->getEditForm;
 	my $output = $form;

@@ -585,7 +585,7 @@ sub _createRSSURLs{
 
 #sub www_edit {
 #        my $self = shift;
-#	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#	return $self->session->privilege->insufficient() unless $self->canEdit;
 #        $self->getAdminConsole->setHelp('syndicated content add/edit','Asset_SyndicatedContent');
 #        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('4','Asset_SyndicatedContent'));
 #}

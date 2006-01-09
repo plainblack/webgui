@@ -89,17 +89,6 @@ sub menuWrapper {
 }
 
 #-------------------------------------------------------------------
-sub userStyle {
-	my $session = shift;
-	my $output = shift;
-	if ($output) {
-		return $session->style->process($output,$session->setting->get("userFunctionStyleId"));
-	} else {
-		return undef;
-	}
-}
-
-#-------------------------------------------------------------------
 # This function is here to replace the dangerous eval calls in the User Profile System.
 sub secureEval {
 	my $session = shift;

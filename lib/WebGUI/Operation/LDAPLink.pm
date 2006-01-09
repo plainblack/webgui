@@ -52,7 +52,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_copyLDAPLink {
 	my $session = shift;
-   return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+   return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
    my (%db);
    tie %db, 'Tie::CPHash';
    %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
@@ -67,7 +67,7 @@ sub www_copyLDAPLink {
 #-------------------------------------------------------------------
 sub www_deleteLDAPLink {
 	my $session = shift;
-   return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+   return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
    $session->db->write("delete from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    $session->form->process("op") = "listLDAPLinks";
    return www_listLDAPLinks();
@@ -76,7 +76,7 @@ sub www_deleteLDAPLink {
 #-------------------------------------------------------------------
 sub www_editLDAPLink {
 	my $session = shift;
-   return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+   return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
    my ($output, %db, $f);
    tie %db, 'Tie::CPHash';
    %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
@@ -188,7 +188,7 @@ sub www_editLDAPLink {
 #-------------------------------------------------------------------
 sub www_editLDAPLinkSave {
 	my $session = shift;
-   return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+   return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
    my $properties = {};
    $properties->{ldapLinkId} = $session->form->process("llid");
    $properties->{ldapLinkName} = $session->form->process("ldapLinkName");
@@ -214,7 +214,7 @@ sub www_editLDAPLinkSave {
 #-------------------------------------------------------------------
 sub www_listLDAPLinks {
 	my $session = shift;
-   return WebGUI::Privilege::adminOnly() unless(WebGUI::Grouping::isInGroup(3));
+   return $session->privilege->adminOnly() unless(WebGUI::Grouping::isInGroup(3));
    my ($output, $p, $sth, $data, @row, $i);
    my $returnUrl = "";
    if($session->form->process("returnUrl")) {

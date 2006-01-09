@@ -96,7 +96,7 @@ Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insu
 sub www_editBranch {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"assets");
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	my $tabform = WebGUI::TabForm->new;
 	$tabform->hidden({name=>"func",value=>"editBranchSave"});
 	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"),9);
@@ -289,7 +289,7 @@ Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets me
 
 sub www_editBranchSave {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	my %data;
 	$data{isHidden} = $self->session->form->yesNo("isHidden") if ($self->session->form->yesNo("change_isHidden"));
 	$data{newWindow} = $self->session->form->yesNo("newWindow") if ($self->session->form->yesNo("change_newWindow"));

@@ -310,7 +310,7 @@ sub	purgeRevision	{
 #-------------------------------------------------------------------
 sub www_addAccessory {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($f, $accessory, @usedAccessories);
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
    $f->hidden(
@@ -338,7 +338,7 @@ sub www_addAccessory {
 #-------------------------------------------------------------------
 sub www_addAccessorySave {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    return "" unless ($self->session->form->process("accessoryAccessId"));
    my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from Product_accessory where assetId=".$self->session->db->quote($self->getId()));
    $self->session->db->write("insert into Product_accessory (assetId,accessoryAssetId,sequenceNumber) values (".$self->session->db->quote($self->getId()).",".$self->session->db->quote($self->session->form->process("accessoryAccessId")).",".($seq+1).")");
@@ -349,7 +349,7 @@ sub www_addAccessorySave {
 #-------------------------------------------------------------------
 sub www_addRelated {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($f, $related, @usedRelated);
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
    $f->hidden(
@@ -377,7 +377,7 @@ sub www_addRelated {
 #-------------------------------------------------------------------
 sub www_addRelatedSave {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    return "" unless ($self->session->form->process("relatedAssetId"));
    my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from Product_related where assetId=".$self->session->db->quote($self->getId));
    $self->session->db->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($self->session->form->process("relatedAssetId")).",".($seq+1).")");
@@ -388,7 +388,7 @@ sub www_addRelatedSave {
 #-------------------------------------------------------------------
 sub www_deleteAccessoryConfirm {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->session->db->write("delete from Product_accessory where assetId=".$self->session->db->quote($self->getId())." and accessoryAssetId=".$self->session->db->quote($self->session->form->process("aid")));
    $self->reorderCollateral("Product_accessory","accessoryAssetId");
    return "";
@@ -397,7 +397,7 @@ sub www_deleteAccessoryConfirm {
 #-------------------------------------------------------------------
 sub www_deleteBenefitConfirm {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->deleteCollateral("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    $self->reorderCollateral("Product_benefit","Product_benefitId");
    return "";
@@ -406,7 +406,7 @@ sub www_deleteBenefitConfirm {
 #-------------------------------------------------------------------
 sub www_deleteFeatureConfirm {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->deleteCollateral("Product_feature","Product_featureId",$self->session->form->process("fid"));
    $self->reorderCollateral("Product_feature","Product_featureId");
    return "";
@@ -416,7 +416,7 @@ sub www_deleteFeatureConfirm {
 sub www_deleteFileConfirm {
    my $self = shift;
    my $column = $self->session->form->process("file");
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    my $store = $self->get($column);
    my $file = WebGUI::Storage->get($store);
    $file->delete;
@@ -427,7 +427,7 @@ sub www_deleteFileConfirm {
 #-------------------------------------------------------------------
 sub www_deleteRelatedConfirm {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->session->db->write("delete from Product_related where assetId=".$self->session->db->quote($self->getId)." and relatedAssetId=".$self->session->db->quote($self->session->form->process("rid")));
    $self->reorderCollateral("Product_related","relatedAssetId");
    return "";
@@ -436,7 +436,7 @@ sub www_deleteRelatedConfirm {
 #-------------------------------------------------------------------
 sub www_deleteSpecificationConfirm {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->deleteCollateral("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    $self->reorderCollateral("Product_specification","Product_specificationId");
    return "";
@@ -445,7 +445,7 @@ sub www_deleteSpecificationConfirm {
 #-------------------------------------------------------------------
 #sub www_edit {
 #   my $self = shift;
-#   return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#   return $self->session->privilege->insufficient() unless $self->canEdit;
 #   $self->getAdminConsole->setHelp("product add/edit","Asset_Product");
 #   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Asset_Product"));
 #}
@@ -466,7 +466,7 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub www_editBenefit {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $benefits);
    $data = $self->getCollateral("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -498,7 +498,7 @@ sub www_editBenefit {
 #-------------------------------------------------------------------
 sub www_editBenefitSave {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->session->form->process("benefit") = $self->session->form->process("benefit_new") if ($self->session->form->process("benefit_new") ne "");
    $self->setCollateral("Product_benefit", "Product_benefitId", {
 		                                          Product_benefitId => $self->session->form->process("bid"),
@@ -513,7 +513,7 @@ sub www_editBenefitSave {
 #-------------------------------------------------------------------
 sub www_editFeature {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $features);
    $data = $self->getCollateral("Product_feature","Product_featureId",$self->session->form->process("fid"));
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -545,7 +545,7 @@ sub www_editFeature {
 #-------------------------------------------------------------------
 sub www_editFeatureSave {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->session->form->process("feature") = $self->session->form->process("feature_new") if ($self->session->form->process("feature_new") ne "");
    $self->setCollateral("Product_feature", "Product_featureId", {
                                               Product_featureId => $self->session->form->process("fid"),
@@ -559,7 +559,7 @@ sub www_editFeatureSave {
 #-------------------------------------------------------------------
 sub www_editSpecification {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $hashRef);
    $data = $self->getCollateral("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
@@ -605,7 +605,7 @@ sub www_editSpecification {
 #-------------------------------------------------------------------
 sub www_editSpecificationSave {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	$self->session->form->process("name") = $self->session->form->process("name_new") if ($self->session->form->process("name_new") ne "");
 	$self->session->form->process("units") = $self->session->form->process("units_new") if ($self->session->form->process("units_new") ne "");
 	$self->setCollateral("Product_specification", "Product_specificationId", {
@@ -623,7 +623,7 @@ sub www_editSpecificationSave {
 #-------------------------------------------------------------------
 sub www_moveAccessoryDown {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralDown("Product_accessory","accessoryAssetId",$self->session->form->process("aid"));
    return "";
 }
@@ -631,7 +631,7 @@ sub www_moveAccessoryDown {
 #-------------------------------------------------------------------
 sub www_moveAccessoryUp {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralUp("Product_accessory","accessoryAssetId",$self->session->form->process("aid"));
    return "";
 }
@@ -639,7 +639,7 @@ sub www_moveAccessoryUp {
 #-------------------------------------------------------------------
 sub www_moveBenefitDown {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralDown("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    return "";
 }
@@ -647,7 +647,7 @@ sub www_moveBenefitDown {
 #-------------------------------------------------------------------
 sub www_moveBenefitUp {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralUp("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
    return "";
 }
@@ -655,7 +655,7 @@ sub www_moveBenefitUp {
 #-------------------------------------------------------------------
 sub www_moveFeatureDown {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralDown("Product_feature","Product_featureId",$self->session->form->process("fid"));
    return "";
 }
@@ -663,7 +663,7 @@ sub www_moveFeatureDown {
 #-------------------------------------------------------------------
 sub www_moveFeatureUp {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	$self->moveCollateralUp("Product_feature","Product_featureId",$self->session->form->process("fid"));
 	return "";
 }
@@ -671,7 +671,7 @@ sub www_moveFeatureUp {
 #-------------------------------------------------------------------
 sub www_moveRelatedDown {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralDown("Product_related","relatedAssetId",$self->session->form->process("rid"));
    return "";
 }
@@ -679,7 +679,7 @@ sub www_moveRelatedDown {
 #-------------------------------------------------------------------
 sub www_moveRelatedUp {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralUp("Product_related","relatedAssetId",$self->session->form->process("rid"));
    return "";
 }
@@ -687,7 +687,7 @@ sub www_moveRelatedUp {
 #-------------------------------------------------------------------
 sub www_moveSpecificationDown {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralDown("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    return "";
 }
@@ -695,7 +695,7 @@ sub www_moveSpecificationDown {
 #-------------------------------------------------------------------
 sub www_moveSpecificationUp {
    my $self = shift;   
-   return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+   return $self->session->privilege->insufficient() unless ($self->canEdit);
    $self->moveCollateralUp("Product_specification","Product_specificationId",$self->session->form->process("sid"));
    return "";
 }

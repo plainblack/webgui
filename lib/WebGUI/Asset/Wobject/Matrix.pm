@@ -202,7 +202,7 @@ sub setRatings {
 #-------------------------------------------------------------------
 sub www_approveListing {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless($self->canEdit);
+        return $self->session->privilege->insufficient() unless($self->canEdit);
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	$self->session->db->write("update Matrix_listing set status='approved' where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	WebGUI::MessageLog::addEntry($listing->{maintainerId},"","New Listing Approved","Your new listing, ".$listing->{productName}.", has been approved.",
@@ -324,7 +324,7 @@ sub www_deleteListing {
 #-------------------------------------------------------------------
 sub www_deleteListingConfirm {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless($self->canEdit);
+        return $self->session->privilege->insufficient() unless($self->canEdit);
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	WebGUI::Asset::Wobject::Collaboration->new($listing->{forumId})->purge;
 	$self->session->db->write("delete from Matrix_listing where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
@@ -430,7 +430,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub www_edit {  
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
         return $self->getAdminConsole->render($self->getEditForm->print,
 					WebGUI::International::get("edit matrix",'Asset_Matrix'));
 }
@@ -643,7 +643,7 @@ sub www_editListingSave {
 #-------------------------------------------------------------------
 sub www_editField {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless($self->canEdit);
+        return $self->session->privilege->insufficient() unless($self->canEdit);
         my $field = $self->session->db->getRow("Matrix_field","fieldId",$self->session->form->process("fieldId"));
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
@@ -704,7 +704,7 @@ sub www_editField {
 #-------------------------------------------------------------------
 sub www_editFieldSave {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless($self->canEdit);
+        return $self->session->privilege->insufficient() unless($self->canEdit);
 	$self->session->db->setRow("Matrix_field","fieldId",{
 		fieldId=>$self->session->form->process("fieldId"),
 		name=>$self->session->form->process("name"),
@@ -721,7 +721,7 @@ sub www_editFieldSave {
 #-------------------------------------------------------------------
 sub www_listFields {
 	my $self = shift;
-        return WebGUI::Privilege::insufficient() unless($self->canEdit);
+        return $self->session->privilege->insufficient() unless($self->canEdit);
 	my $output = sprintf WebGUI::International::get('list fields','Asset_Matrix'),
 				$self->getUrl("func=editField&amp;fieldId=new");
 	my $sth = $self->session->db->read("select fieldId, label from Matrix_field where assetId=".$self->session->db->quote($self->getId)." order by label");

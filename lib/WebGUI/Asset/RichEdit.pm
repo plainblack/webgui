@@ -496,7 +496,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("rich edit edit config","Asset_RichEdit"));
 }
 

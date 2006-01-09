@@ -70,7 +70,7 @@ sub www_auth {
       $session->errorHandler->security("access uncallable auth method on page '".$session{page}{title}."' [".$session{page}{pageId}."].");
 	  return WebGUI::International::get(1077);
    }
-   return WebGUI::Operation::Shared::userStyle($authMethod->$methodCall);   
+   return $session->style->userStyle($authMethod->$methodCall);   
 }
 
 

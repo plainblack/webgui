@@ -44,7 +44,7 @@ $session->form->process("sid").  Afterwards, it calls www_viewActiveSessions.
 sub www_killSession {
 	my $session = shift;
 	return www_viewActiveSessions() if $session->form->process("sid") eq $session->var->get("sessionId");
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	WebGUI::Session::end($session->form->process("sid"));
 	return www_viewActiveSessions();
 }
@@ -60,7 +60,7 @@ delete (kill) each one via www_killSession
 
 sub www_viewActiveSessions {
 	my $session = shift;
-        return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$sth = $session->db->read("select users.username,users.userId,userSession.sessionId,userSession.expires,

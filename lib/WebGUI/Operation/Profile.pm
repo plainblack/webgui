@@ -128,7 +128,7 @@ sub www_editProfile {
 	$vars->{'profile.form.elements'} = \@array;
 	$vars->{'profile.form.submit'} = WebGUI::Form::submit({});
 	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000051")->process($vars));
+	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000051")->process($vars));
 }
 
 #-------------------------------------------------------------------
@@ -157,10 +157,10 @@ sub www_viewProfile {
 	my $vars = {};
 	$vars->{displayTitle} = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
 
-	return WebGUI::Privilege::notMember() if($u->username eq "");
+	return $session->privilege->notMember() if($u->username eq "");
 
-	return WebGUI::Operation::Shared::userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || WebGUI::Grouping::isInGroup(3)));
-	return WebGUI::Privilege::insufficient() if(!WebGUI::Grouping::isInGroup(2));
+	return $session->style->userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || WebGUI::Grouping::isInGroup(3)));
+	return $session->privilege->insufficient() if(!WebGUI::Grouping::isInGroup(2));
 
 	my @array = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
@@ -179,7 +179,7 @@ sub www_viewProfile {
 	if ($session->user->profileField("userId") eq $session->form->process("uid")) {
 		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars));
+	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars));
 }
 
 1;

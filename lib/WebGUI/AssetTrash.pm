@@ -142,8 +142,8 @@ Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise r
 
 sub www_delete {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
-	return WebGUI::Privilege::vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
 	$self->trash;
 	$self->session->asset = $self->getParent;
 	return $self->getParent->www_view;
@@ -159,7 +159,7 @@ Moves list of assets to trash, returns www_manageAssets() method of self if canE
 
 sub www_deleteList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $assetId ($self->session->request->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
 		if ($asset->canEdit) {
@@ -185,7 +185,7 @@ Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is Fal
 sub www_manageTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"trash");
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(12));
 	my ($header, $limit);
         $ac->setHelp("trash manage");
 	if ($self->session->form->process("systemTrash") && WebGUI::Grouping::isInGroup(3)) {
@@ -244,7 +244,7 @@ Restores a piece of content from the trash back to it's original location.
 
 sub www_restoreList {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
         foreach my $id ($self->session->request->param("assetId")) {
                 my $asset = WebGUI::Asset->newByDynamicClass($id);
                 $asset->publish;

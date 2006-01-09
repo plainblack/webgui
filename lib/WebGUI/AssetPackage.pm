@@ -81,7 +81,7 @@ Returns "". Deploys a Package. If canEdit is Fales, renders an insufficient Priv
 
 sub www_deployPackage {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $packageMasterAssetId = $self->session->form->process("assetId");
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);

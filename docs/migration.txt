@@ -655,6 +655,7 @@ assets.
 find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{useEmptyStyle} = (\d+);!\$self->session->style->useEmptyStyle("$1")!g' {} \;
 find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{makePrintable} = (\d+);!\$self->session->style->makePrintable("$1")!g' {} \;
 find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Style\:\:!\$self->session->style->!g' {} \;
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Operation\:\:Shared\:\:userStyle\(!\$self->session->style->userStyle(!g' {} \;
 
 5.23.5 WebGUI::Macro API Refactored
 
@@ -693,6 +694,14 @@ $session into the constructor. Also, the API has been heavily refactored to be
 more complete. Please see it's API docs for more info.
 
 find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:DatabaseLink\-\>new\(!WebGUI::DatabaseLink->new(\$self->session,!g' {} \;
+
+
+5.23.10 WebGUI::Privilege API Refactored
+
+WebGUI::Privilege is now accessed through session like $session->privilege as
+of 6.9.
+
+find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Privilege\:\:!\$self->session->privilege->!g' {} \;
 
 
 

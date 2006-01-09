@@ -53,7 +53,7 @@ sub www_viewPurchaseHistory {
 
 	$var{purchaseHistoryLoop} = \@historyLoop;
 
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000019")->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000019")->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -96,7 +96,7 @@ sub www_deleteTransaction {
 	my $session = shift;
 	my $transactionId;
 
-	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
 
 	$transactionId = $session->form->process("tid");
 
@@ -108,7 +108,7 @@ sub www_deleteTransaction {
 #-------------------------------------------------------------------
 sub www_deleteTransactionItem {
 	my $session = shift;
-	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
 	
 	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));
 

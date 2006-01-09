@@ -1,4 +1,4 @@
-package WebGUI::Privilege;
+package WebGUI::Session::Privilege;
 
 =head1 LEGAL
 
@@ -15,14 +15,11 @@ package WebGUI::Privilege;
 =cut
 
 use strict;
-use WebGUI::HTTP;
 use WebGUI::International;
-use WebGUI::Operation::Shared;
-use WebGUI::Session;
 
 =head1 NAME
 
-Package WebGUI::Privilege
+Package WebGUI::Session::Privilege
 
 =head1 DESCRIPTION
 
@@ -30,16 +27,22 @@ This package provides access to the WebGUI security system and security messages
 
 =head1 SYNOPSIS
 
- use WebGUI::Privilege;
- $html =	WebGUI::Privilege::adminOnly();
- $html =	WebGUI::Privilege::insufficient();
- $html =	WebGUI::Privilege::noAccess();
- $html =	WebGUI::Privilege::notMember();
- $html =	WebGUI::Privilege::vitalComponent();
+
+
+ use WebGUI::Session::Privilege;
+
+ $privilege = $session->privilege;
+ $privilege = WebGUI::Session::Privilege->new($session);
+ 
+ $html = $privilege->adminOnly();
+ $html = $privilege->insufficient();
+ $html = $privilege->noAccess();
+ $html = $privilege->notMember();
+ $html = $privilege->vitalComponent();
 
 =head1 METHODS 
 
-These functions are available from this package:
+These methods are available from this class:
 
 =cut
 
@@ -52,11 +55,12 @@ Returns a message stating that this functionality can only be used by administra
 =cut
 
 sub adminOnly {
-	WebGUI::HTTP::setStatus("401", "Admin Only");
+	my $self = shift;
+	$self->session->http->setStatus("401", "Admin Only");
 	my ($output, $sth, @data);
         $output = '<h1>'.WebGUI::International::get(35).'</h1>';
 	$output .= WebGUI::International::get(36);
-	return WebGUI::Operation::Shared::userStyle($output);
+	return $self->session->style->userStyle($output);
 }
 
 
@@ -69,12 +73,32 @@ Returns a message stating that the user does not have the required privileges to
 =cut
 
 sub insufficient {
-	WebGUI::HTTP::setStatus("401", "Insufficient Privileges");
+	my $self = shift;
+	$self->session->http->setStatus("401", "Insufficient Privileges");
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
 	$output .= WebGUI::International::get(38);
 	$output .= '<p>';
-	return WebGUI::Operation::Shared::userStyle($output);
+	return $self->session->style->userStyle($output);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( session )
+
+Constructor.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	bless {_session=>$session}, $class;
 }
 
 
@@ -87,14 +111,15 @@ Returns a message stating that the user does not have the privileges necessary t
 =cut
 
 sub noAccess {
-	WebGUI::HTTP::setStatus("401", "No Access");
+	my $self = shift;
+	$self->session->http->setStatus("401", "No Access");
    	if ($self->session->user->profileField("userId") eq '1') {
       		return WebGUI::Operation::Auth::www_auth("init");
    	} else {
       		my $output = '<h1>'.WebGUI::International::get(37).'</h1>';
       		$output .= WebGUI::International::get(39);
       		$output .= '<p>';
-		return WebGUI::Operation::Shared::userStyle($output);
+		return $self->session->style->userStyle($output);
    	}
 }
 
@@ -107,13 +132,28 @@ Returns a message stating that the user they requested information about is no l
 =cut
 
 sub notMember {
-	WebGUI::HTTP::setStatus("400", "Not A Member");
+	my $self = shift;
+	$self->session->http->setStatus("400", "Not A Member");
 	my ($output);
 	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
 	$output .= WebGUI::International::get(346);
 	$output .= '<p>';
-	return WebGUI::Operation::Shared::userStyle($output);
+	return $self->session->style->userStyle($output);
 }
+
+#-------------------------------------------------------------------
+
+=head2 session 
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -124,12 +164,13 @@ Returns a message stating that the user made a request to delete something that 
 =cut
 
 sub vitalComponent {
-	WebGUI::HTTP::setStatus("403", "Vital Component");
+	my $self = shift;
+	$self->session->http->setStatus("403", "Vital Component");
 	my ($output);
         $output = '<h1>'.WebGUI::International::get(40).'</h1>';
 	$output .= WebGUI::International::get(41);
 	$output .= '<p>';
-	return WebGUI::Operation::Shared::userStyle($output);
+	return $self->session->style->userStyle($output);
 }
 
 

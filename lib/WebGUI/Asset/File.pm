@@ -276,7 +276,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
@@ -291,7 +291,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
+	return $self->session->privilege->noAccess() unless $self->canView;
 	if ($self->session->var->get("adminOn")) {
 		return $self->getContainer->www_view;
 	}

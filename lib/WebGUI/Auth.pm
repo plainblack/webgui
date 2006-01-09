@@ -278,8 +278,8 @@ Auth method that the form for creating users should call
 sub deactivateAccount {
    my $self = shift;
    my $method = $_[0];
-   return WebGUI::Privilege::vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
-   return WebGUI::Privilege::adminOnly() if(!$self->session->setting->get("selfDeactivation"));
+   return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
+   return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
    my %var; 
   	$var{title} = WebGUI::International::get(42);
    	$var{question} =  WebGUI::International::get(60);
@@ -300,7 +300,7 @@ Superclass method that performs general functionality for deactivating accounts.
 
 sub deactivateAccountConfirm {
    my $self = shift;
-   return WebGUI::Privilege::vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
+   return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
    my $u = $self->user;
    $u->status("Selfdestructed");
    $self->session->var->end();

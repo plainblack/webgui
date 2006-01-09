@@ -975,7 +975,7 @@ sub www_edit {
 		$title = $self->session->form->process("title");
 		if ($self->session->form->process("class") eq "WebGUI::Asset::Post") { # new reply
 			$self->{_thread} = $self->getParent->getThread;
-			return WebGUI::Privilege::insufficient() unless ($self->getThread->canReply);
+			return $self->session->privilege->insufficient() unless ($self->getThread->canReply);
 			$var{isReply} = 1;
 			$var{'reply.title'} = $self->getParent->get("title");
 			$var{'reply.synopsis'} = $self->getParent->get("synopsis");
@@ -993,7 +993,7 @@ sub www_edit {
 				value=>$self->session->form->process("subscribe")
 				});
 		} elsif ($self->session->form->process("class") eq "WebGUI::Asset::Post::Thread") { # new thread
-			return WebGUI::Privilege::insufficient() unless ($self->getThread->getParent->canPost);
+			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canModerate) {
                         	$var{'sticky.form'} = WebGUI::Form::yesNo({
@@ -1012,7 +1012,7 @@ sub www_edit {
 		}
                 $content .= "\n\n".$self->session->user->profileField("signature") if ($self->session->user->profileField("signature") && !$self->session->form->process("content"));
 	} else { # edit
-		return WebGUI::Privilege::insufficient() unless ($self->canEdit);
+		return $self->session->privilege->insufficient() unless ($self->canEdit);
         	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
 			.WebGUI::Form::hidden({
                 		name=>"func",

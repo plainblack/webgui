@@ -106,7 +106,7 @@ sub www_cancelTransaction {
 
 	$var{message} = WebGUI::International::get('checkout canceled message', 'Commerce');
 	
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceCheckoutCanceledTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceCheckoutCanceledTemplateId"))->process(\%var));
 }
 
 # This operation is here for easier future extensions to the commerce system.
@@ -197,7 +197,7 @@ sub www_checkoutConfirm {
 	$var{'viewShoppingCart.url'} = $session->url->page('op=viewCart');
 	$var{'viewShoppingCart.label'} = $i18n->get('view shopping cart');
 
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceConfirmCheckoutTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceConfirmCheckoutTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -327,13 +327,13 @@ sub www_checkoutSubmit {
 	return WebGUI::Operation::execute('viewPurchaseHistory') unless ($checkoutError);
 
 	# If an error has occurred show the template errorlog
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
 }
 
 #-------------------------------------------------------------------
 sub www_completePendingTransaction {
 	my $session = shift;
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 
 	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->completeTransaction;
 
@@ -376,7 +376,7 @@ sub www_editCommerceSettings {
 	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
 		$paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin,
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	$i18n = WebGUI::International->new('Commerce');
 	
@@ -517,7 +517,7 @@ sub www_editCommerceSettings {
 #-------------------------------------------------------------------
 sub www_editCommerceSettingsSave {
 	my $session = shift;
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	foreach (keys(%{$session{form}})) {
 		# Store the plugin confiuration data in a special table for security and the general settings in the
@@ -541,7 +541,7 @@ sub www_editCommerceSettingsSave {
 sub www_listPendingTransactions {
 	my $session = shift;
 	my ($p, $transactions, $output, $properties, $i18n);
-	return WebGUI::Privilege::adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
 	
 	$i18n = WebGUI::International->new("Commerce");
 
@@ -575,7 +575,7 @@ sub www_listTransactions {
 	my $session = shift;
 	my ($output, %criteria, $transaction, @transactions);
 
-	return WebGUI::Privilege::insufficient unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
 
 	my $i18n = WebGUI::International->new('TransactionLog');
 
@@ -696,7 +696,7 @@ sub www_selectPaymentGateway {
 	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('payment gateway select')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectPaymentGatewayTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectPaymentGatewayTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -742,7 +742,7 @@ sub www_selectShippingMethod {
 	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('shipping select button')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectShippingMethodTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectShippingMethodTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -832,7 +832,7 @@ sub www_viewCart {
 	
 	$var{total} = sprintf('%.2f', $total);
 
-	return WebGUI::Operation::Shared::userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceViewShoppingCartTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceViewShoppingCartTemplateId"))->process(\%var));
 }
 
 1;

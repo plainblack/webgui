@@ -430,7 +430,7 @@ Web facing method which allows users to view details about their stocks
 sub www_displayStock {
    my $self = shift;
    my $var = {};
-   return WebGUI::Privilege::noAccess() unless $self->canView();
+   return $self->session->privilege->noAccess() unless $self->canView();
    
    $var->{'extrasFolder'} = $self->session->config->get("extrasURL")."/wobject/StockData";
    
@@ -457,7 +457,7 @@ sub www_displayStock {
 
 #sub www_edit {
 #   my $self = shift;
-#   return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#   return $self->session->privilege->insufficient() unless $self->canEdit;
 #   $self->getAdminConsole->setHelp("stock list add/edit","Asset_StockData");
 #   return $self->getAdminConsole->render($self->getEditForm->print,
 #                  WebGUI::International::get("edit_title","Asset_StockData"));

@@ -158,7 +158,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("snippet add/edit","Asset_Snippet");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('snippet add/edit title',"Asset_Snippet"));
 }

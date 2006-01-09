@@ -137,7 +137,7 @@ Displays the export page administrative interface
 
 sub www_export {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(13));
         $self->getAdminConsole->setHelp("page export", "Asset");
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
@@ -190,7 +190,7 @@ Displays the export status page
 
 sub www_exportStatus {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(13));
 	my $iframeUrl = $self->getUrl('func=exportGenerate');
 	$iframeUrl = $self->session->url->append($iframeUrl, 'index='.$self->session->form->process("index"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'depth='.$self->session->form->process("depth"));
@@ -211,7 +211,7 @@ Executes the export process and displays real time status. This operation is dis
 
 sub www_exportGenerate {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup(13));
+	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(13));
 	# This routine is called in an IFRAME and prints status output directly to the browser.
 	$|++;				# Unbuffered data output
         $session{page}{empty} = 1;      # Write directly to the browser
