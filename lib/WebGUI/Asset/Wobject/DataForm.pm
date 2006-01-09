@@ -16,6 +16,7 @@ use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::FormProcessor;
+use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
 use WebGUI::Icon;
@@ -575,6 +576,16 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+sub sanitizeUserInput {
+	my $self = shift;
+	my $content = shift;
+	my $contentType = shift || "text";
+	my $msg = WebGUI::HTML::format($content, $contentType);
+	
+	return $msg;
+}
+
+#-------------------------------------------------------------------
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
@@ -1047,6 +1058,7 @@ sub www_process {
 		if ($row{status} eq "required" || $row{status} eq "editable") {
 			$value = $self->session->form->process($row{name},$row{type},$row{defaultValue});
 			WebGUI::Macro::filter(\$value);
+			$value = $self->sanitizeUserInput($value) unless ($row{type} eq "HTMLArea");
 		}
 		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
 			push (@errors,{
