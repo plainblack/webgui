@@ -13,6 +13,7 @@ package WebGUI::Asset::Wobject::Collaboration;
 use strict;
 use Tie::IxHash;
 use WebGUI::DateTime;
+use WebGUI::ErrorHandler;
 use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::HTML;
@@ -938,6 +939,7 @@ sub view {
 		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
 		where asset.parentId=".quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) and $constraints 
 		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
+	WebGUI::ErrorHandler::warn($sortBy);
 	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);
