@@ -76,7 +76,7 @@ sub www_viewMessageLog {
       my $status = _status->{$message->{status}};
       $status = '<a href="'.$session->url->append($message->{url},'mlog='.$message->{messageLogId}).'">'.$status.'</a>' if ($message->{url} ne "");
       $hash->{'message.status'} = $status;
-	  $hash->{'message.dateOfEntry'} = epochToHuman($message->{dateOfEntry});
+	  $hash->{'message.dateOfEntry'} =$session->datetime->epochToHuman($message->{dateOfEntry});
 	  push(@msg,$hash);
    }
    $vars->{'message.loop'} = \@msg;
@@ -110,7 +110,7 @@ sub www_viewMessageLogMessage {
    $data = $session->db->quickHashRef("select * from messageLog where messageLogId=".$session->db->quote($session->form->process("mlog"))." and userId=".$session->db->quote($session->user->profileField("userId")));
    
    $vars->{'message.subject'} = $data->{subject};
-   $vars->{'message.dateOfEntry'} = epochToHuman($data->{dateOfEntry});
+   $vars->{'message.dateOfEntry'} =$session->datetime->epochToHuman($data->{dateOfEntry});
    
    my $status = _status->{$data->{status}}; 
    if ($data->{url} ne "" && $data->{status} eq 'pending'){

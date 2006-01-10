@@ -127,8 +127,8 @@ sub canView {
 	return 0 unless ($self->get("state") eq "published");
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
-        } elsif ( $self->get("startDate") < time() && 
-		$self->get("endDate") > time() && 
+        } elsif ( $self->get("startDate") <$self->session->datetime->time() && 
+		$self->get("endDate") >$self->session->datetime->time() && 
 		WebGUI::Grouping::isInGroup($self->get("groupIdView"),$userId)) {
                 return 1;
         }
@@ -1268,7 +1268,7 @@ sub publish {
 	my $self = shift;
 	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
         my $idList = $self->session->db->quoteAndJoin($assetIds);
-        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".time()." where assetId in (".$idList.")");
+        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged="$self->session->datetime->time()." where assetId in (".$idList.")");
 	my $cache = WebGUI::Cache->new;
         foreach my $id (@{$assetIds}) {
         	# we do the purge directly cuz it's a lot faster than instantiating all these assets
@@ -1587,7 +1587,7 @@ sub www_manageAssets {
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
-			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
+			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');

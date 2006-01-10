@@ -98,7 +98,7 @@ sub secureEval {
 	my %trusted = (
 		'WebGUI::International::get' => sub {WebGUI::International::get(@_)},
 		'WebGUI::International::getLanguages' => sub { WebGUI::International::getLanguages(@_) },
-		'WebGUI::DateTime::epochToHuman' => sub { WebGUI::DateTime::epochToHuman(@_) },
+		'$session->datetime->epochToHuman' => sub { $session->datetime->epochToHuman(@_) },
 		'WebGUI::Icon::getToolbarOptions' => sub { WebGUI::Icon::getToolbarOptions(@_) },		
 	);
 	foreach my $function (keys %trusted ) {

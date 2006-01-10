@@ -324,7 +324,7 @@ sub getListTemplateVars {
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},
-			"record.submissionDate.human"=>WebGUI::DateTime::epochToHuman($record->{submissionDate}),
+			"record.submissionDate.human"=>$self->session->datetime->epochToHuman($record->{submissionDate}),
 			"record.entryId"=>$record->{DataForm_entryId},
 			"record.data_loop"=>\@dataLoop
 			});
@@ -397,7 +397,7 @@ sub getRecordTemplateVars {
 		$var->{ipAddress} = $entry->{ipAddress};
 		$var->{username} = $entry->{username};
 		$var->{userId} = $entry->{userId};
-		$var->{date} = WebGUI::DateTime::epochToHuman($entry->{submissionDate});
+		$var->{date} = $self->session->datetime->epochToHuman($entry->{submissionDate});
 		$var->{epoch} = $entry->{submissionDate};
 		$var->{"edit.URL"} = $self->getFormUrl('entryId='.$var->{entryId});
 		$where .= " and b.DataForm_entryId=".$self->session->db->quote($var->{entryId});
@@ -416,7 +416,7 @@ sub getRecordTemplateVars {
 			my $formValue = $session{form}{$data{name}};
 			if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
 				$data{value} = $formValue;
-				$data{value} = WebGUI::DateTime::setToEpoch($data{value}) if ($data{type} eq "date");
+				$data{value} = $self->session->datetime->setToEpoch($data{value}) if ($data{type} eq "date");
 			}
 			if (not exists $data{value}) {
 				my $defaultValue = $data{defaultValue};
@@ -425,8 +425,8 @@ sub getRecordTemplateVars {
 			}
 			my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
 			my $value = $data{value};
-			$value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
-			$value = WebGUI::DateTime::epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
+			$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
+			$value = $self->session->datetime->epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
 			push(@fields, {
 				"tab.field.form" => _createField(\%data),
 				"tab.field.name" => $data{name},
@@ -460,7 +460,7 @@ sub getRecordTemplateVars {
 		my $formValue = $session{form}{$data{name}};
 		if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
 			$data{value} = $formValue;
-			$data{value} = WebGUI::DateTime::setToEpoch($data{value}) if ($data{type} eq "date");
+			$data{value} = $self->session->datetime->setToEpoch($data{value}) if ($data{type} eq "date");
 		}
 		if (not exists $data{value}) {
 			my $defaultValue = $data{defaultValue};
@@ -469,8 +469,8 @@ sub getRecordTemplateVars {
 		}
 		my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
 		my $value = $data{value};
-		$value = WebGUI::DateTime::epochToHuman($value,"%z") if ($data{type} eq "date");
-		$value = WebGUI::DateTime::epochToHuman($value) if ($data{type} eq "dateTime");
+		$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
+		$value = $self->session->datetime->epochToHuman($value) if ($data{type} eq "dateTime");
 		my %fieldProperties = (
 			"form" => _createField(\%data),
 			"name" => $data{name},
@@ -972,7 +972,7 @@ sub www_exportTab {
                         ipAddress => $entryData->{ipAddress},
                         username => $entryData->{username},
                         userId => $entryData->{userId},
-                        submissionDate => WebGUI::DateTime::epochToHuman($entryData->{submissionDate}),
+                        submissionDate => $self->session->datetime->epochToHuman($entryData->{submissionDate}),
                         };
                 my $values = $self->session->db->read("select value,DataForm_fieldId from DataForm_entryData where
                         DataForm_entryId=".$self->session->db->quote($entryData->{DataForm_entryId}));
@@ -1046,7 +1046,7 @@ sub www_process {
                 userId=>$self->session->user->profileField("userId"),
                 username=>$self->session->user->profileField("username"),
                 ipAddress=>$self->session->env->get("REMOTE_ADDR"),
-                submissionDate=>time()
+                submissionDate=$self->session->datetime->time()
 		},0);
 	my ($var, %row, @errors, $updating, $hadErrors);
 	$var->{entryId} = $entryId;

@@ -138,13 +138,13 @@ sub new {
                 $self->start(1);
         } else {
                 $self->{_var} = $self->db->quickHashRef("select * from userSession where sessionId=".$self->db->quote($sessionId));
-                if ($self->{_var}{expires} && $self->{_var}{expires} < time()) {
+                if ($self->{_var}{expires} && $self->{_var}{expires} <$self->session->datetime->time()) {
                         $self->end;
                 }
                 if ($self->{_var}{sessionId} ne "") {
-                        $self->{_var}{lastPageView} = time();
+                        $self->{_var}{lastPageView} =$self->session->datetime->time();
                         $self->{_var}{lastIP} = $self->env("REMOTE_ADDR");
-                        $self->{_var}{expires} = time() + $self->setting->get("sessionTimeout");
+                        $self->{_var}{expires} =$self->session->datetime->time() + $self->setting->get("sessionTimeout");
                         $self->db->setRow("userSession","sessionId",$self->{_var});
                 } else {
                         $self->start(1,$sessionId);
@@ -190,8 +190,8 @@ sub start {
         my $sessionId = shift;
         $self->{_var} = {
                 sessionId=>"new",
-                expires=> time() + $self->session->setting->get("sessionTimeout"),
-                lastPageView=> time(),
+                expires=>$self->session->datetime->time() + $self->session->setting->get("sessionTimeout"),
+                lastPageView=>$self->session->datetime->time(),
                 lastIP => $self->env("REMOTE_ADDR"),
                 adminOn => 0,
                 userId => $userId       

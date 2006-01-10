@@ -197,7 +197,7 @@ sub generateResponseId {
 		userId=>$userId,
 		ipAddress=>$ipAddress,
 		username=>$self->session->user->profileField("username"),
-		startDate=>WebGUI::DateTime::time(),
+		startDate=>$self->session->datetime->time(),
 		'Survey_id'=>$self->get("Survey_id")
 		});
 	$self->session->scratch->set($varname,$responseId);
@@ -1177,14 +1177,14 @@ sub www_respond {
 			my $response = $session{form}{"textResponse_".$id} || $answer->{answer};
 			$self->session->db->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
 				".$self->session->db->quote($answer->{Survey_answerId}).", ".$self->session->db->quote($answer->{Survey_questionId}).", ".$self->session->db->quote($session{scratch}{$varname}).", ".$self->session->db->quote($answer->{Survey_id}).",
-				".$self->session->db->quote($session{form}{"comment_".$id}).", ".$self->session->db->quote($response).", ".WebGUI::DateTime::time().")");
+				".$self->session->db->quote($session{form}{"comment_".$id}).", ".$self->session->db->quote($response).", ".$self->session->datetime->time().")");
 		}
 	}
 	my $responseCount = $self->getQuestionResponseCount($session{scratch}{$varname}); 
 	if ($terminate || $responseCount >= $self->getValue("questionsPerResponse") || $responseCount >= $self->getQuestionCount) {
 		$self->session->db->setRow("Survey_response","Survey_responseId",{
 			isComplete=>1,
-			endDate=>WebGUI::DateTime::time(),
+			endDate=>$self->session->datetime->time(),
 			Survey_responseId=>$session{scratch}{$varname}
 			});
 	}
@@ -1254,12 +1254,12 @@ sub www_viewIndividualSurvey {
 	my $response = $self->session->db->getRow("Survey_response","Survey_responseId",$self->session->form->process("responseId"));
 	$var->{'start.date.label'} = WebGUI::International::get(76,'Asset_Survey');
 	$var->{'start.date.epoch'} = $response->{startDate};
-	$var->{'start.date.human'} = epochToHuman($response->{startDate},"%z");
-	$var->{'start.time.human'} = epochToHuman($response->{startDate},"%Z");
+	$var->{'start.date.human'} =$self->session->datetime->epochToHuman($response->{startDate},"%z");
+	$var->{'start.time.human'} =$self->session->datetime->epochToHuman($response->{startDate},"%Z");
 	$var->{'end.date.label'} = WebGUI::International::get(77,'Asset_Survey');
 	$var->{'end.date.epoch'} = $response->{endDate};
-	$var->{'end.date.human'} = epochToHuman($response->{endDate},"%z");
-	$var->{'end.time.human'} = epochToHuman($response->{endDate},"%Z");
+	$var->{'end.date.human'} =$self->session->datetime->epochToHuman($response->{endDate},"%z");
+	$var->{'end.time.human'} =$self->session->datetime->epochToHuman($response->{endDate},"%Z");
 	$var->{'duration.label'} = WebGUI::International::get(78,'Asset_Survey');
 	$var->{'duration.minutes'} = int(($response->{end} - $response->{start})/60);
 	$var->{'duration.minutes.label'} = WebGUI::International::get(79,'Asset_Survey');

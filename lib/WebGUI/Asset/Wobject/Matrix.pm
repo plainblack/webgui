@@ -152,7 +152,7 @@ sub hasRated {
 	my $ratingTimeout = WebGUI::Grouping::isInGroup($self->get("privilegedGroup")) ? $self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
 	my ($hasRated) = $self->session->db->quickArray("select count(*) from Matrix_rating where 
 		((userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and userId<>'1') or (userId='1' and ipAddress=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).")) and 
-		listingId=".$self->session->db->quote($listingId)." and timeStamp>".(WebGUI::DateTime::time()-$ratingTimeout));
+		listingId=".$self->session->db->quote($listingId)." and timeStamp>".($self->session->datetime->time()-$ratingTimeout));
 	return $hasRated;
 }
 
@@ -185,7 +185,7 @@ sub setRatings {
 	foreach my $category ($self->getCategories) {
 		if ($ratings->{$category}) {
 			$self->session->db->write("insert into Matrix_rating (userId, category, rating, timeStamp, listingId,ipAddress, assetId) values (
-				".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($category).", ".$self->session->db->quote($ratings->{$category}).", ".WebGUI::DateTime::time()
+				".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($category).", ".$self->session->db->quote($ratings->{$category}).", ".$self->session->datetime->time()
 				.", ".$self->session->db->quote($listingId).", ".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).",".$self->session->db->quote($self->getId).")");
 		}
 		my $sql = "from Matrix_rating where listingId=".$self->session->db->quote($listingId)." and category=".$self->session->db->quote($category);
@@ -251,7 +251,7 @@ sub www_compare {
 			url=>$self->formatURL("viewDetail",$cms)
 			});
 		push(@datecol, {
-			lastUpdated=>WebGUI::DateTime::epochToHuman($data->{lastUpdated},"%z")
+			lastUpdated=>$self->session->datetime->epochToHuman($data->{lastUpdated},"%z")
 			});
 	}
 	$var{product_loop} = \@prodcol;
@@ -573,7 +573,7 @@ sub www_editListingSave {
 	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
 	my %data = (
 		listingId => $self->session->form->process("listingId"),
-		lastUpdated => WebGUI::DateTime::time(),
+		lastUpdated => $self->session->datetime->time(),
 		productName => $self->session->form->process("productName"),
 		productUrl => $self->session->form->process("productUrl"),
 		manufacturerName => $self->session->form->process("manufacturerName"),
@@ -591,8 +591,8 @@ sub www_editListingSave {
 			url=>$self->session->form->process("productName"),
 			groupIdView=>7,
 			groupIdEdit=>3,
-			startDate=>time(),
-			endDate=>time()+60*60*24*365*15,
+			startDate=$self->session->datetime->time(),
+			endDate=$self->session->datetime->time()+60*60*24*365*15,
                         displayLastReply => 0,
                         allowReplies => 1,
                         threadsPerPage => 30,
@@ -928,17 +928,17 @@ sub view {
                 push(@lastUpdated, {
                         url => $self->formatURL("viewDetail",$listingId),
                         name=>$productName,
-                        lastUpdated=>WebGUI::DateTime::epochToHuman($lastUpdated,"%z")
+                        lastUpdated=>$self->session->datetime->epochToHuman($lastUpdated,"%z")
                         });
         }
         $var{'last_updated_loop'} = \@lastUpdated;
 	$var{'best.updated.url'} = $self->formatURL("viewDetail",$data->{listingId});
-	$var{'best.updated.date'} = WebGUI::DateTime::epochToHuman($data->{lastUpdated},"%z");; 
+	$var{'best.updated.date'} = $self->session->datetime->epochToHuman($data->{lastUpdated},"%z");; 
 	$var{'best.updated.name'} = $data->{productName}; 
 
 	# site stats
 	($var{'user.count'}) = $self->session->db->quickArray("select count(*) from users");
-	($var{'current.user.count'}) = $self->session->db->quickArray("select count(*)+0 from userSession where lastPageView>".(WebGUI::DateTime::time()-600));
+	($var{'current.user.count'}) = $self->session->db->quickArray("select count(*)+0 from userSession where lastPageView>".($self->session->datetime->time()-600));
 	($var{'listing.count'}) = $self->session->db->quickArray("select count(*) from Matrix_listing where status = 'approved' and assetId=".$self->session->db->quote($self->getId));
         my $sth = $self->session->db->read("select listingId,productName from Matrix_listing where status='pending'");
         while (my ($id,$name) = $sth->array) {
@@ -977,7 +977,7 @@ sub www_viewDetail {
 	$var{'delete.url'} = $self->getUrl("func=deleteListing&listingId=".$listingId."&mlog=".$self->session->form->process("mlog"));
 	$var{'isPending'} = ($listing->{status} eq "pending");
 	$var{'lastUpdated.epoch'} = $listing->{lastupdated};
-	$var{'lastUpdated.date'} = WebGUI::DateTime::epochToHuman($listing->{lastUpdated},"%z");
+	$var{'lastUpdated.date'} = $self->session->datetime->epochToHuman($listing->{lastUpdated},"%z");
 	$var{description} = $listing->{description};
 	$var{productName} = $listing->{productName};
 	$var{productUrl} = $listing->{productUrl};

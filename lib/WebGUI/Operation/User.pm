@@ -304,8 +304,8 @@ sub www_editUser {
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
 	$tabform->getTab("account")->readOnly(value=>$session->form->process("uid"),label=>$i18n->get(378));
     	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
-    	$tabform->getTab("account")->readOnly(value=>epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
-    	$tabform->getTab("account")->readOnly(value=>epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
+    	$tabform->getTab("account")->readOnly(value=$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
+    	$tabform->getTab("account")->readOnly(value=$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
     	$tabform->getTab("account")->text(
 		-name=>"username",
 		-label=>$i18n->get(50),
@@ -505,12 +505,12 @@ sub www_listUsers {
 		$output .= '<td><a href="'.$session->url->page('op=editUser;uid='.$data->{userId})
 			.'">'.$data->{username}.'</a></td>';
 		$output .= '<td class="tableData">'.$data->{email}.'</td>';
-		$output .= '<td class="tableData">'.epochToHuman($data->{dateCreated},"%z").'</td>';
-		$output .= '<td class="tableData">'.epochToHuman($data->{lastUpdated},"%z").'</td>';
+		$output .= '<td class="tableData">'$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
+		$output .= '<td class="tableData">'$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
 		my ($lastLoginStatus, $lastLogin) = $session->db->quickArray("select status,timeStamp from userLoginLog where 
                         userId=".$session->db->quote($data->{userId})." order by timeStamp DESC");
                 if ($lastLogin) {
-                        $output .= '<td class="tableData">'.epochToHuman($lastLogin).'</td>';
+                        $output .= '<td class="tableData">'$session->datetime->epochToHuman($lastLogin).'</td>';
                 } else {
                         $output .= '<td class="tableData"> - </td>';
                 }

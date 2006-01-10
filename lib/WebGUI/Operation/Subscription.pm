@@ -87,7 +87,7 @@ sub www_createSubscriptionCodeBatch {
 		-name	=> 'expires',
 		-label	=> $i18n->get('codes expire'),
 		-hoverHelp	=> $i18n->get('codes expire description'),
-		-value	=> $session->form->process("expires") || WebGUI::DateTime::intervalToSeconds(1, 'months')
+		-value	=> $session->form->process("expires") || $session->datetime->intervalToSeconds(1, 'months')
 		);
 	my @sub = $session->form->selectList("subscriptionId");
 	$f->selectList(
@@ -130,7 +130,7 @@ sub www_createSubscriptionCodeBatchSave {
 
 	return www_createSubscriptionCodeBatch(\@error) if (@error);
 
-	$creationEpoch = time();
+	$creationEpoch =$session->datetime->time();
 	
 	$session->db->write("insert into subscriptionCodeBatch (batchId, description) values (".
 		$session->db->quote($batchId).", ".$session->db->quote($description).")");
@@ -315,9 +315,9 @@ sub www_listSubscriptionCodes {
 	my $i18n = WebGUI::International->new("Subscription");
 	
 	my $dcStart = $session->form->date('dcStart');
-	my $dcStop  = WebGUI::DateTime::addToTime($session->form->date('dcStop'),23,59);
+	my $dcStop  = $session->datetime->addToTime($session->form->date('dcStop'),23,59);
 	my $duStart = $session->form->date('duStart');
-	my $duStop  = WebGUI::DateTime::addToTime($session->form->date('duStop'),23,59);
+	my $duStop  = $session->datetime->addToTime($session->form->date('duStop'),23,59);
 	my $batches = $session->db->buildHashRef("select batchId, description from subscriptionCodeBatch");	
 
 	$output .= $i18n->get('selection message');
@@ -375,9 +375,9 @@ sub www_listSubscriptionCodes {
 		$output .= '<tr>';
 		$output .= '<td>'.$_->{batchId}.'</td>';
 		$output .= '<td>'.$_->{code}.'</td>';
-		$output .= '<td>'.WebGUI::DateTime::epochToHuman($_->{dateCreated}).'</td>';
+		$output .= '<td>'.$session->datetime->epochToHuman($_->{dateCreated}).'</td>';
 		$output .= '<td>';
-		$output .= WebGUI::DateTime::epochToHuman($_->{dateUsed}) if ($_->{dateUsed});
+		$output .= $session->datetime->epochToHuman($_->{dateUsed}) if ($_->{dateUsed});
 		$output .= '</td>';
 		$output .= '<td>'.$_->{status}.'</td>';
 		$output .= '</tr>';

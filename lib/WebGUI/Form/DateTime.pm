@@ -76,7 +76,7 @@ sub definition {
                         defaultValue=>WebGUI::International::get("972","WebGUI")
                         },
 		defaultValue=>{
-                        defaultValue=>time()
+                        defaultValue=$self->session->datetime->time()
                         },
 		maxlength=>{
 			defaultValue=> 19
@@ -101,7 +101,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::setToEpoch($self->session->request->param($self->get("name")));
+	return $self->session->datetime->setToEpoch($self->session->request->param($self->get("name")));
 }
 
 #-------------------------------------------------------------------
@@ -114,7 +114,7 @@ Renders a date picker control.
 
 sub toHtml {
         my $self = shift;
-	my $value = WebGUI::DateTime::epochToSet($self->get("value"),1);
+	my $value = $self->session->datetime->epochToSet($self->get("value"),1);
 	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
 		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
@@ -155,7 +155,7 @@ sub toHtmlAsHidden {
         my $self = shift;
 	return WebGUI::Form::Hidden->new(
 		name=>$self->get("name"),
-		value=>WebGUI::DateTime::epochToSet($self->get("value"),1)	
+		value=>$self->session->datetime->epochToSet($self->get("value"),1)	
 		)->toHtmlAsHidden;
 }
 

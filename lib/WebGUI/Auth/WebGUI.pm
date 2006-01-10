@@ -130,9 +130,9 @@ sub addUserFormSave {
    $properties->{changeUsername} = $self->session->form->get('authWebGUI.changeUsername');
    $properties->{changePassword} = $self->session->form->get('authWebGUI.changePassword');
    $properties->{passwordTimeout} =  $self->session->form->interval('authWebGUI.passwordTimeout');
-   $properties->{passwordLastUpdated} = time();
+   $properties->{passwordLastUpdated} =$self->session->datetime->time();
    if($self->session->setting->get("webguiExpirePasswordOnCreation")){
-      $properties->{passwordLastUpdated} = time() - $properties->{passwordTimeout};   
+      $properties->{passwordLastUpdated} =$self->session->datetime->time() - $properties->{passwordTimeout};   
    }
    $self->SUPER::addUserFormSave($properties);
 }
@@ -220,7 +220,7 @@ sub createAccountSave {
    $properties->{changeUsername} = $self->session->setting->get("webguiChangeUsername");
    $properties->{changePassword} = $self->session->setting->get("webguiChangePassword");   
    $properties->{identifier} = Digest::MD5::md5_base64($password);
-   $properties->{passwordLastUpdated} = time();
+   $properties->{passwordLastUpdated} =$self->session->datetime->time();
    $properties->{passwordTimeout} = $self->session->setting->get("webguiPasswordTimeout");
    $properties->{status} = 'Deactivated' if ($self->session->setting->get("webguiValidateEmail"));
    $self->SUPER::createAccountSave($username,$properties,$password,$profile);
@@ -328,7 +328,7 @@ sub editUserFormSave {
    unless (!$self->session->form->get('authWebGUI.identifier') || $self->session->form->get('authWebGUI.identifier') eq "password") {
       $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->get('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
-	     $properties->{passwordLastUpdated} = time();
+	     $properties->{passwordLastUpdated} =$self->session->datetime->time();
       }
    }
    $properties->{passwordTimeout} = $self->session->form->interval('authWebGUI.passwordTimeout');
@@ -477,7 +477,7 @@ sub login {
    my $userData = $self->getParams;
    if($self->getSetting("passwordTimeout") && $userData->{passwordTimeout}){
       my $expireTime = $userData->{passwordLastUpdated} + $userData->{passwordTimeout};
-      if(time() >= $expireTime){
+      if$self->session->datetime->time() >= $expireTime){
          $self->session->form->process("uid") = $self->userId;
 		 $self->logout;
    	     return $self->resetExpiredPassword;
@@ -595,7 +595,7 @@ sub resetExpiredPasswordSave {
    return $self->resetExpiredPassword("<h1>".WebGUI::International::get(70)."</h1>".$error) if($error ne "");
    
    $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process("identifier"));
-   $properties->{passwordLastUpdated} = time();
+   $properties->{passwordLastUpdated} =$self->session->datetime->time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
    _logSecurityMessage();
@@ -673,7 +673,7 @@ sub updateAccount {
             $properties->{identifier} = Digest::MD5::md5_base64($password);
 			_logSecurityMessage();
 	        if($userData->{identifier} ne $properties->{identifier}){
-	           $properties->{passwordLastUpdated} = time();
+	           $properties->{passwordLastUpdated} =$self->session->datetime->time();
             }
          }
       }

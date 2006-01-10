@@ -55,7 +55,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _create {
 	my $userId = shift || WebGUI::Id::generate();
-	$self->session->db->write("insert into users (userId,dateCreated) values (".$self->session->db->quote($userId).",".time().")");
+	$self->session->db->write("insert into users (userId,dateCreated) values (".$self->session->db->quote($userId).","$self->session->datetime->time().")");
 	require WebGUI::Grouping;
 	WebGUI::Grouping::addUsersToGroups([$userId],[2,7]);
         return $userId;
@@ -105,9 +105,9 @@ sub authMethod {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"authMethod"} = $value;
-                $self->{_user}{"lastUpdated"} = time();
+                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
                 $self->session->db->write("update users set authMethod=".$self->session->db->quote($value).",
-			lastUpdated=".time()." where userId=".$self->session->db->quote($self->{_userId}));
+			lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
         }
         return $self->{_user}{"authMethod"};
 }
@@ -215,7 +215,7 @@ sub karma {
 		$self->uncache;
 		$self->{_user}{karma} += $amount;
 		$self->session->db->write("update users set karma=karma+".$self->session->db->quote($amount)." where userId=".$self->session->db->quote($self->userId));
-        	$self->session->db->write("insert into karmaLog values (".$self->session->db->quote($self->userId).",$amount,".$self->session->db->quote($source).",".$self->session->db->quote($description).",".time().")");
+        	$self->session->db->write("insert into karmaLog values (".$self->session->db->quote($self->userId).",$amount,".$self->session->db->quote($source).",".$self->session->db->quote($description).","$self->session->datetime->time().")");
 	}
         return $self->{_user}{karma};
 }
@@ -311,8 +311,8 @@ sub profileField {
 		$self->{_profile}{$fieldName} = $value;
 		$self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId})." and fieldName=".$self->session->db->quote($fieldName));
 		$self->session->db->write("insert into userProfileData values (".$self->session->db->quote($self->{_userId}).", ".$self->session->db->quote($fieldName).", ".$self->session->db->quote($value).")");
-		$self->{_user}{"lastUpdated"} = time();
-        	$self->session->db->write("update users set lastUpdated=".time()." where userId=".$self->session->db->quote($self->{_userId}));
+		$self->{_user}{"lastUpdated"} =$self->session->datetime->time();
+        	$self->session->db->write("update users set lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
 	}
 	return $self->{_profile}{$fieldName};
 }
@@ -335,9 +335,9 @@ sub referringAffiliate {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"referringAffiliate"} = $value;
-                $self->{_user}{"lastUpdated"} = time();
+                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
                 $self->session->db->write("update users set referringAffiliate=".$self->session->db->quote($value).",
-                        lastUpdated=".time()." where userId=".$self->session->db->quote($self->userId));
+                        lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"referringAffiliate"};
 }
@@ -360,9 +360,9 @@ sub status {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"status"} = $value;
-                $self->{_user}{"lastUpdated"} = time();
+                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
                 $self->session->db->write("update users set status=".$self->session->db->quote($value).",
-                        lastUpdated=".time()." where userId=".$self->session->db->quote($self->userId));
+                        lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"status"};
 }
@@ -399,9 +399,9 @@ sub username {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"username"} = $value;
-                $self->{_user}{"lastUpdated"} = time();
+                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
                 $self->session->db->write("update users set username=".$self->session->db->quote($value).",
-                        lastUpdated=".time()." where userId=".$self->session->db->quote($self->userId));
+                        lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"username"};
 }

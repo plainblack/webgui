@@ -81,7 +81,7 @@ sub definition {
 			defaultValue=>WebGUI::International::get("479","WebGUI")
 			},
 		defaultValue=>{
-			defaultValue=>time()
+			defaultValue=$self->session->datetime->time()
 			},
 		maxlength=>{
 			defaultValue=> 10
@@ -109,7 +109,7 @@ Return the date in a human readable format for the Profile system.
 
 sub displayValue {
 	my ($self) = @_;
-	return WebGUI::DateTime::epochToHuman($self->get("value"),"%z");
+	return $self->session->datetime->epochToHuman($self->get("value"),"%z");
 }
 
 #-------------------------------------------------------------------
@@ -122,7 +122,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::DateTime::setToEpoch($self->session->request->param($self->get("name")));
+	return $self->session->datetime->setToEpoch($self->session->request->param($self->get("name")));
 }
 
 #-------------------------------------------------------------------
@@ -139,7 +139,7 @@ sub toHtml {
 		$self->get("value") = '';
 	}
 	else {
-		$self->get("value") = WebGUI::DateTime::epochToSet($self->get("value"));
+		$self->get("value") = $self->session->datetime->epochToSet($self->get("value"));
 	}
 	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
@@ -173,7 +173,7 @@ sub toHtmlAsHidden {
         my $self = shift;
         return WebGUI::Form::Hidden->new(
                 name=>$self->get("name"),
-                value=>WebGUI::DateTime::epochToSet($self->get("value"))
+                value=>$self->session->datetime->epochToSet($self->get("value"))
                 )->toHtmlAsHidden;
 }
 

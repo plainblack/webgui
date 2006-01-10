@@ -69,8 +69,8 @@ sub www_viewActiveSessions {
 	while (%data = $sth->hash) {
                 $row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
                 $row[$i] .= '<td>'.$data{sessionId}.'</td>';
-                $row[$i] .= '<td>'.epochToHuman($data{expires}).'</td>';
-                $row[$i] .= '<td>'.epochToHuman($data{lastPageView}).'</td>';
+                $row[$i] .= '<td>'$session->datetime->epochToHuman($data{expires}).'</td>';
+                $row[$i] .= '<td>'$session->datetime->epochToHuman($data{lastPageView}).'</td>';
                 $row[$i] .= '<td>'.$data{lastIP}.'</td>';
 		$row[$i] .= '<td align="center">'.deleteIcon("op=killSession;sid=$data{sessionId}").'</td></tr>';
                 $i++;

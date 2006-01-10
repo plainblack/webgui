@@ -569,50 +569,51 @@ instead be calling something like $self->session->user->userId.
 Please see the WebGUI::Session API for details on what objects are available
 through WebGUI::Session. The following unix command line tricks should fix 70%
 of the things you need to change in your custom assets. You will need to
-modify them slightly for other types of plugins (run these in order):
+modify them slightly for other types of plugins (run these in order, and
+replace fileNameGoesHere with the file you wish to run the command on):
 
 Fix $session{config}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{config}{webguiRoot}!\$self->session->config->getWebguiRoot!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{config}{configFile}!\$self->session->config->getFilename!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{config}{(\w+)}!\$self->session->config->get("$1")!g' {} \;
+perl -pi.bak -e 's!\$session{config}{webguiRoot}!\$self->session->config->getWebguiRoot!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{config}{configFile}!\$self->session->config->getFilename!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{config}{(\w+)}!\$self->session->config->get("$1")!g' fileNameGoesHere
 
 Fix $session{setting}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{setting}{(\w+)}!\$self->session->setting->get("$1")!g' {} \;
+perl -pi.bak -e 's!\$session{setting}{(\w+)}!\$self->session->setting->get("$1")!g' fileNameGoesHere
 
 Fix $session{user}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{user}{([username|userId])}!\$self->session->user->$1!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{user}{(\w+)}!\$self->session->user->profileField("$1")!g' {} \;
+perl -pi.bak -e 's!\$session{user}{([username|userId])}!\$self->session->user->$1!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{user}{(\w+)}!\$self->session->user->profileField("$1")!g' fileNameGoesHere
 
 Fix $session{env}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{env}{(\w+)}!\$self->session->env->get("$1")!g' {} \;
+perl -pi.bak -e 's!\$session{env}{(\w+)}!\$self->session->env->get("$1")!g' fileNameGoesHere
 
 Fix $session{os}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{os}{(\w+)}!\$self->session->os->get("$1")!g' {} \;
+perl -pi.bak -e 's!\$session{os}{(\w+)}!\$self->session->os->get("$1")!g' fileNameGoesHere
 
 Fix $session{var}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{var}{(\w+)}!\$self->session->var->get("$1")!g' {} \;
+perl -pi.bak -e 's!\$session{var}{(\w+)}!\$self->session->var->get("$1")!g' fileNameGoesHere
 
 Fix $session{req}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{req}!\$self->session->request!g' {} \;
+perl -pi.bak -e 's!\$session{req}!\$self->session->request!g' fileNameGoesHere
 
 Fix $session{asset}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{asset}!\$self->session->asset!g' {} \;
+perl -pi.bak -e 's!\$session{asset}!\$self->session->asset!g' fileNameGoesHere
 
 Fix $session{scratch}
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteAllScratch!\$self->session->scratch->deleteAll!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteScratch!\$self->session->scratch->delete!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:setScratch!\$self->session->scratch->set!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Session\:\:getScratch!\$self->session->scratch->get!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{scratch}{(\w+)}!\$self->session->scratch->get("$1")!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteAllScratch!\$self->session->scratch->deleteAll!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteScratch!\$self->session->scratch->delete!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Session\:\:setScratch!\$self->session->scratch->set!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Session\:\:getScratch!\$self->session->scratch->get!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{scratch}{(\w+)}!\$self->session->scratch->get("$1")!g' fileNameGoesHere
 
 
 5.23.1 WebGUI::SQL API Refactored
@@ -625,9 +626,9 @@ own by my $db = WebGUI::SQL->connect($session, $dsn, $user, $pass);
 The following command line tricks should fix most of your database queries
 (provided your querying the WebGUI database):
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:SQL\-\>!\$self->session->db->!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!quoteAndJoin\(!\$self->session->db->quoteAndJoin(!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!quote\(!\$self->session->db->quote(!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:SQL\-\>!\$self->session->db->!g' fileNameGoesHere
+perl -pi.bak -e 's!quoteAndJoin\(!\$self->session->db->quoteAndJoin(!g' fileNameGoesHere
+perl -pi.bak -e 's!quote\(!\$self->session->db->quote(!g' fileNameGoesHere
 
 
 5.23.2 WebGUI::FormProcessor API Refactored
@@ -635,15 +636,15 @@ find . -name '*.pm' -exec perl -pi.bak -e 's!quote\(!\$self->session->db->quote(
 Instead of accessing $session{form} or WebGUI::FormProcessor getting form data
 is done through the new session system via $session->form->process("param","Text");
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{form}{(\w+)}!\$self->session->form->process("$1")!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:FormProcessor\:\:!\$self->session->form->!g' {} \;
+perl -pi.bak -e 's!\$session{form}{(\w+)}!\$self->session->form->process("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:FormProcessor\:\:!\$self->session->form->!g' fileNameGoesHere
 
 
 5.23.3 WebGUI::ErrorHandler API Refactored
 
 As of 6.9 WebGUI::ErrorHandler is now accessed through session.
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:ErrorHandler\:\:!\$self->session->errorHandler->!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:ErrorHandler\:\:!\$self->session->errorHandler->!g' fileNameGoesHere
 
 
 5.23.4 WebGUI::Style API Refactored
@@ -652,23 +653,23 @@ As of 6.9 the WebGUI::Style API has been convereted to OO and is accessed
 through session. The following command line tricks will help you convert your
 assets.
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{useEmptyStyle} = (\d+);!\$self->session->style->useEmptyStyle("$1")!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!\$session{page}{makePrintable} = (\d+);!\$self->session->style->makePrintable("$1")!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Style\:\:!\$self->session->style->!g' {} \;
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Operation\:\:Shared\:\:userStyle\(!\$self->session->style->userStyle(!g' {} \;
+perl -pi.bak -e 's!\$session{page}{useEmptyStyle} = (\d+);!\$self->session->style->useEmptyStyle("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{page}{makePrintable} = (\d+);!\$self->session->style->makePrintable("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Style\:\:!\$self->session->style->!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Operation\:\:Shared\:\:userStyle\(!\$self->session->style->userStyle(!g' fileNameGoesHere
 
 5.23.5 WebGUI::Macro API Refactored
 
 You now need to pass in a reference to $session to the process function.
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Macro\:\:process\((.*)\)!WebGUI::Macro::process(\$self->session,$1)!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:Macro\:\:process\((.*)\)!WebGUI::Macro::process(\$self->session,$1)!g' fileNameGoesHere
 
 
 5.23.6 WebGUI::URL API Refactored
 
 As of 6.9 WebGUI::URL is now accessed through session like $session->url
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:URL\:\:!\$self->session->url->!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:URL\:\:!\$self->session->url->!g' fileNameGoesHere
 
 
 5.23.7 WebGUI::Cache API Refactored
@@ -676,7 +677,7 @@ find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:URL\:\:!\$self->session->
 As of 6.9 WebGUI::Cache requires you to pass in a reference to $session into
 the constructor.
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Cache\-\>new\(!WebGUI::Cache->new(\$self->session,!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:Cache\-\>new\(!WebGUI::Cache->new(\$self->session,!g' fileNameGoesHere
 
 
 5.23.8 WebGUI::AdminConsole Refactored
@@ -684,7 +685,7 @@ find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Cache\-\>new\(!WebGUI::Ca
 As of 6.9 WebGUI::AdminConsole requires you to pass a reference to $session
 into the constructor.
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:AdminConsole\-\>new\(!WebGUI::AdminConsole->new(\$self->session,!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:AdminConsole\-\>new\(!WebGUI::AdminConsole->new(\$self->session,!g' fileNameGoesHere
 
 
 5.23.9 WebGUI::DatabaseLink API Refactored
@@ -693,7 +694,7 @@ As of 6.9 WebGUI::DatabaseLink requires  you to pass in a reference to
 $session into the constructor. Also, the API has been heavily refactored to be
 more complete. Please see it's API docs for more info.
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:DatabaseLink\-\>new\(!WebGUI::DatabaseLink->new(\$self->session,!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:DatabaseLink\-\>new\(!WebGUI::DatabaseLink->new(\$self->session,!g' fileNameGoesHere
 
 
 5.23.10 WebGUI::Privilege API Refactored
@@ -701,8 +702,23 @@ find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:DatabaseLink\-\>new\(!Web
 WebGUI::Privilege is now accessed through session like $session->privilege as
 of 6.9.
 
-find . -name '*.pm' -exec perl -pi.bak -e 's!WebGUI\:\:Privilege\:\:!\$self->session->privilege->!g' {} \;
+perl -pi.bak -e 's!WebGUI\:\:Privilege\:\:!\$self->session->privilege->!g' fileNameGoesHere
 
+
+5.23.10 WebGUI::DateTime API Refactored
+
+WebGUI::DateTime is now accessed through $session.
+
+perl -pi.bak -e 's![^\:]monthStartEnd\(!\$self->session->datetime->monthStartEnd(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]setToEpoch\(!\$self->session->datetime->setToEpoch(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]humanToEpoch\(!\$self->session->datetime->humanToEpoch(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]epochToSet\(!\$self->session->datetime->epochToSet(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]epochToHuman\(!\$self->session->datetime->epochToHuman(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]addToDate\(!\$self->session->datetime->addToDate(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]addToTime\(!\$self->session->datetime->addToTime(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]localtime\(!\$self->session->datetime->localtime(!g' fileNameGoesHere
+perl -pi.bak -e 's![^\:]time\(!\$self->session->datetime->time(!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:DateTime\:\:!\$self->session->datetime->!g' fileNameGoesHere
 
 
 6.  Automatic list of Assets in Help System.

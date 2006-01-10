@@ -425,7 +425,7 @@ sub indexDocument {
 							$self->session->db->quote($document->{bodyShortcut})." ,".
 							$self->session->db->quote($document->{contentType})." ,".
 							$self->session->db->quote($document->{ownerId} || 3).",
-							".WebGUI::DateTime::time()." )"
+							".$self->session->datetime->time()." )"
 				);
 	$self->{_docId}++;
 }

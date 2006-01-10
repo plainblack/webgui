@@ -216,7 +216,7 @@ sub www_exportGenerate {
 	$|++;				# Unbuffered data output
         $session{page}{empty} = 1;      # Write directly to the browser
 	print WebGUI::HTTP::getHeader();
-	my $startTime = time();	
+	my $startTime =$self->session->datetime->time();	
 	my $error = $self->checkExportPath();
 	if ($error) {
 		print $error;
@@ -267,7 +267,7 @@ sub www_exportGenerate {
 		}
 		print WebGUI::International::get('done','Asset');
 	}
-	printf WebGUI::International::get('export information','Asset'), scalar(@{$assets}), (time()-$startTime);
+	printf WebGUI::International::get('export information','Asset'), scalar(@{$assets}), $self->session->datetime->time()-$startTime);
 	print '<a target="_parent" href="'.$self->getUrl.'">'.WebGUI::International::get(493,"Asset").'</a>';
 	return;
 }

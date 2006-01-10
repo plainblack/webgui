@@ -30,13 +30,13 @@ Text description of how long the subscription lasts.
 sub _getDuration {
 	my $duration = shift;
 	
-	return addToDate(0,0,0,7) if $duration eq 'Weekly';
-	return addToDate(0,0,0,14) if $duration eq 'BiWeekly';
-	return addToDate(0,0,0,28) if $duration eq 'FourWeekly';
-	return addToDate(0,0,1,0) if $duration eq 'Monthly';
-	return addToDate(0,0,3,0) if $duration eq 'Quarterly';
-	return addToDate(0,0,6,0) if $duration eq 'HalfYearly';
-	return addToDate(0,1,0,0) if $duration eq 'Yearly';
+	return$self->session->datetime->addToDate(0,0,0,7) if $duration eq 'Weekly';
+	return$self->session->datetime->addToDate(0,0,0,14) if $duration eq 'BiWeekly';
+	return$self->session->datetime->addToDate(0,0,0,28) if $duration eq 'FourWeekly';
+	return$self->session->datetime->addToDate(0,0,1,0) if $duration eq 'Monthly';
+	return$self->session->datetime->addToDate(0,0,3,0) if $duration eq 'Quarterly';
+	return$self->session->datetime->addToDate(0,0,6,0) if $duration eq 'HalfYearly';
+	return$self->session->datetime->addToDate(0,1,0,0) if $duration eq 'Yearly';
 }
 
 #-------------------------------------------------------------------

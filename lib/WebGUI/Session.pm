@@ -19,11 +19,13 @@ use Apache2::Request;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
+use WebGUI::Session::DateTime;
 use WebGUI::Session::Env;
 use WebGUI::Session::ErrorHandler;
 use WebGUI::Session::Form;
 use WebGUI::Session::Http;
 use WebGUI::Session::Os;
+use WebGUI::Session::Privilege;
 use WebGUI::Session::Scratch;
 use WebGUI::Session::Setting;
 use WebGUI::Session::Stow;
@@ -131,6 +133,22 @@ sub config {
 	return $self->{_config};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 datetime ()
+
+Returns a WebGUI::Session::DateTime object.
+
+=cut
+
+sub datetime {
+	my $self = shift;
+	if (exists $self->{_datetime}) {
+		$self->{_datetime} = WebGUI::Session::DateTime->new($session);
+	}
+	return $self->{_datetime};
+}
 
 #-------------------------------------------------------------------
 
@@ -295,6 +313,22 @@ sub os {
 	return $self->{_os};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 privilege ( )
+
+Returns a WebGUI::Session::Privilege object.
+
+=cut
+
+sub privilege {
+	my $self = shift;
+	unless (exists $self->{_privilege}) {
+		$self->{_privilege} = WebGUI::Session::Privilege->new($session);
+	}
+	return $self->{_privilege};
+}
 
 #-------------------------------------------------------------------
 

@@ -124,7 +124,7 @@ sub trash {
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
 	$self->session->db->beginTransaction;
 	$self->session->db->write("update asset set state='trash-limbo' where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
-	$self->session->db->write("update asset set state='trash', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".time()." where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->write("update asset set state='trash', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged="$self->session->datetime->time()." where assetId=".$self->session->db->quote($self->getId));
 	$self->session->db->commit;
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
@@ -217,7 +217,7 @@ sub www_manageTrash {
 				})
 			."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
-			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
+			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."');\n";
          	$output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";

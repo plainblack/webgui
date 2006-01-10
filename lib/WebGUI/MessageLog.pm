@@ -138,7 +138,7 @@ sub addEntry {
 		if ($u->userId ne "") {
 			$self->session->db->write("insert into messageLog (messageLogId, userId, message, url, dateOfEntry,
 				subject, status) values (".$self->session->db->quote($messageLogId).",".$self->session->db->quote($u->userId).",
-				".$self->session->db->quote($message).",".$self->session->db->quote($url).",".time().",".$self->session->db->quote($subject).", ".$self->session->db->quote($status).")");
+				".$self->session->db->quote($message).",".$self->session->db->quote($url).","$self->session->datetime->time().",".$self->session->db->quote($subject).", ".$self->session->db->quote($status).")");
 			if ($url ne "") {
 				$message .= "\n".$self->session->url->append($url,'mlog='.$messageLogId);
 			}
@@ -216,7 +216,7 @@ sub addInternationalizedEntry {
 			$message = $message{$u->profileField("language")};
                         WebGUI::Macro::process($self->session,\$message);
                         $self->session->db->write("insert into messageLog values (".$self->session->db->quote($messageLogId).",".$self->session->db->quote($u->userId).",
-                                ".$self->session->db->quote($message).",".$self->session->db->quote($url).",".time().",".$self->session->db->quote($message).",".$self->session->db->quote($status).")");
+                                ".$self->session->db->quote($message).",".$self->session->db->quote($url).","$self->session->datetime->time().",".$self->session->db->quote($message).",".$self->session->db->quote($status).")");
                         if ($url ne "") {
                                 $message .= "\n".$self->session->url->append($url,'mlog='.$messageLogId);
                         }
@@ -238,7 +238,7 @@ The id of the message to complete.
 =cut
 
 sub completeEntry {
-	$self->session->db->write("update messageLog set status='completed', dateOfEntry=".time()." where messageLogId=".$self->session->db->quote($_[0]));
+	$self->session->db->write("update messageLog set status='completed', dateOfEntry="$self->session->datetime->time()." where messageLogId=".$self->session->db->quote($_[0]));
 }
 
 

@@ -19,7 +19,7 @@ Package WebGUI::Macro::D_date
 
 =head1 DESCRIPTION
 
-Macro for displaying dates formatted for reading by people using WebGUI::DateTime::epochToHuman().
+Macro for displaying dates formatted for reading by people using $session->datetime->epochToHuman().
 
 =head2 process ( format string, [ date ] )
 
@@ -41,8 +41,8 @@ sub process {
 	my $session = shift;
         my (@param, $temp, $time);
         @param = @_;
-	$time = $param[1] || time();
-	$temp = epochToHuman($time,$param[0]);
+	$time = $param[1] ||$session->datetime->time();
+	$temp =$session->datetime->epochToHuman($time,$param[0]);
 	return $temp;
 }
 

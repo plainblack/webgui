@@ -324,7 +324,7 @@ sub _assign_rss_dates {
                 if (my $date = $cache->get()) {
                         $item->{date} = $date;
                 } else {
-                        $item->{date} = time();
+                        $item->{date} =$self->session->datetime->time();
                         $cache->set($item->{date}, '1 year');
                 }
         }

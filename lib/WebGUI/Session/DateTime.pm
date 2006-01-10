@@ -1,4 +1,4 @@
-package WebGUI::DateTime;
+package WebGUI::Session::DateTime;
 
 =head1 LEGAL
 
@@ -13,25 +13,21 @@ package WebGUI::DateTime;
  -------------------------------------------------------------------
 
 =cut
+use strict;
 
 use DateTime;
 use DateTime::Format::Strptime;
 use DateTime::TimeZone;
 use Tie::IxHash;
-use Exporter;
-use strict;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Utility;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&localtime &time &addToTime &addToDate &epochToHuman &epochToSet &humanToEpoch &setToEpoch &monthStartEnd);
 
 
 
 =head1 NAME
 
-Package WebGUI::DateTime
+Package WebGUI::Session::DateTime
 
 =head1 DESCRIPTION
 
@@ -39,32 +35,37 @@ This package provides easy to use date math functions, which are normally a comp
 
 =head1 SYNOPSIS
 
- use WebGUI::DateTime;
- $epoch = WebGUI::DateTime::addToDate($epoch, $years, $months, $days);
- $epoch = WebGUI::DateTime::addToTime($epoch, $hours, $minutes, $seconds);
- ($startEpoch, $endEpoch) = WebGUI::DateTime::dayStartEnd($epoch);
- $dateString = WebGUI::DateTime::epochToHuman($epoch, $formatString);
- $setString = WebGUI::DateTime::epochToSet($epoch);
- $day = WebGUI::DateTime::getDayName($dayInteger);
- $integer = WebGUI::DateTime::getDaysInMonth($epoch);
- $integer = WebGUI::DateTime::getDaysInInterval($start, $end);
- $integer = WebGUI::DateTime::getFirstDayInMonthPosition($epoch);
- $month = WebGUI::DateTime::getMonthName($monthInteger);
- $seconds = WebGUI::DateTime::getSecondsFromEpoch($seconds);
- $zones = WebGUI::DateTime::getTimeZones();
- $epoch = WebGUI::DateTime::humanToEpoch($dateString);
- $seconds = WebGUI::DateTime::intervalToSeconds($interval, $units);
- @date = WebGUI::DateTime::localtime($epoch);
- ($startEpoch, $endEpoch) = WebGUI::DateTime::monthStartEnd($epoch);
- ($interval, $units) = WebGUI::DateTime::secondsToInterval($seconds);
- $timeString = WebGUI::DateTime::secondsToTime($seconds);
- $epoch = WebGUI::DateTime::setToEpoch($setString);
- $epoch = WebGUI::DateTime::time();
- $seconds = WebGUI::DateTime::timeToSeconds($timeString);
+ use WebGUI::Session::DateTime;
+
+ $dt = $session->datetime;
+ $dt = WebGUI::Session::DateTime->new($session);
+ $session = $dt->session;
+
+ $epoch = $dt-$self->session->datetime->addToDate($epoch, $years, $months, $days);
+ $epoch = $dt-$self->session->datetime->addToTime($epoch, $hours, $minutes, $seconds);
+ ($startEpoch, $endEpoch) = $dt->dayStartEnd($epoch);
+ $dateString = $dt-$self->session->datetime->epochToHuman($epoch, $formatString);
+ $setString = $dt-$self->session->datetime->epochToSet($epoch);
+ $day = $dt->getDayName($dayInteger);
+ $integer = $dt->getDaysInMonth($epoch);
+ $integer = $dt->getDaysInInterval($start, $end);
+ $integer = $dt->getFirstDayInMonthPosition($epoch);
+ $month = $dt->getMonthName($monthInteger);
+ $seconds = $dt->getSecondsFromEpoch($seconds);
+ $zones = $dt->getTimeZones();
+ $epoch = $dt-$self->session->datetime->humanToEpoch($dateString);
+ $seconds = $dt->intervalToSeconds($interval, $units);
+ @date = $dt-$self->session->datetime->loca$self->session->datetime->time($epoch);
+ ($startEpoch, $endEpoch) = $dt-$self->session->datetime->monthStartEnd($epoch);
+ ($interval, $units) = $dt->secondsToInterval($seconds);
+ $timeString = $dt->secondsToTime($seconds);
+ $epoch = $dt-$self->session->datetime->setToEpoch($setString);
+ $epoch = $dt-$self->session->datetime->time();
+ $seconds = $dt->timeToSeconds($timeString);
 
 =head1 METHODS
 
-These functions are available from this package:
+These methods are available from this class:
 
 =cut
 
@@ -94,6 +95,7 @@ The number of days to add to the epoch.
 =cut
 
 sub addToDate {
+	my $self = shift;
 	my $date		= DateTime->from_epoch( epoch =>shift);
 	my $years 		= shift || 0;
 	my $months 	= shift || 0;
@@ -130,6 +132,7 @@ The number of seconds to add to the epoch.
 =cut
 
 sub addToTime {
+	my $self = shift;
 	my $epoch = shift;
 	return undef unless $epoch;
 	my $date		= DateTime->from_epoch( epoch =>$epoch);
@@ -153,6 +156,7 @@ The number of seconds since January 1, 1970.
 =cut
 
 sub dayStartEnd {
+	my $self = shift;
 	my $dt = DateTime->from_epoch( epoch => shift);
 	my $end = $dt->clone;	
 	$dt->set_hour(0);
@@ -205,11 +209,12 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 =cut
 
 sub epochToHuman {
+	my $self = shift;
 	my $language = WebGUI::International::getLanguage($self->session->user->profileField("language"));
 	my $locale = $language->{languageAbbreviation} || "en";
 	$locale .= "_".$language->{locale} if ($language->{locale});
 	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
-	my $dt = DateTime->from_epoch( epoch=>shift||time(), time_zone=>$timeZone, locale=>$locale );
+	my $dt = DateTime->from_epoch( epoch=>shift|$self->session->datetime->time(), time_zone=>$timeZone, locale=>$locale );
 	my $output = shift || "%z %Z";
 	my $temp;
   #---date format preference
@@ -246,7 +251,7 @@ sub epochToHuman {
 		$output =~ s/\~$key/\%$replacement/g;
 	}
   #--- %M
-	$output = $dt->strftime($output);
+	$output = $dt->str$self->session->datetime->time($output);
 	$temp = int($dt->month);
 	$output =~ s/\%_varmonth_/$temp/g;
   #--- return
@@ -270,13 +275,14 @@ A boolean indicating that the time should be added to the output, thust turning 
 =cut
 
 sub epochToSet {
+	my $self = shift;
 	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
 	my $dt = DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone);
 	my $withTime = shift;
 	if ($withTime) {
-		return $dt->strftime("%Y-%m-%d %H:%M:%S");
+		return $dt->str$self->session->datetime->time("%Y-%m-%d %H:%M:%S");
 	}
-	return $dt->strftime("%Y-%m-%d");
+	return $dt->str$self->session->datetime->time("%Y-%m-%d");
 }
 
 #-------------------------------------------------------------------
@@ -292,6 +298,7 @@ An integer ranging from 1-7 representing the day of the week (Sunday is 1 and Sa
 =cut
 
 sub getDayName {
+	my $self = shift;
 	my $day = $_[0];
         if ($day == 7) {
                 return WebGUI::International::get('sunday','DateTime');
@@ -323,6 +330,7 @@ An epoch date.
 =cut
 
 sub getDaysInMonth {
+	my $self = shift;
 	my $dt = DateTime->from_epoch( epoch =>shift);
 	my $last = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);
 	return $last->day;
@@ -346,6 +354,7 @@ An epoch date.
 =cut
 
 sub getDaysInInterval {
+	my $self = shift;
 	my $start = DateTime->from_epoch( epoch =>shift);
 	my $end = DateTime->from_epoch( epoch =>shift);
 	my $duration = $end - $start;
@@ -366,6 +375,7 @@ An epoch date.
 =cut
 
 sub getFirstDayInMonthPosition {
+	my $self = shift;
 	my $dt = DateTime->from_epoch( epoch => shift );
 	$dt->set_day(1);
 	return $dt->day_of_week;
@@ -385,6 +395,7 @@ An integer ranging from 1-12 representing the month.
 =cut
 
 sub getMonthName {
+	my $self = shift;
         if ($_[0] == 1) {
                 return WebGUI::International::get('january','DateTime');
         } elsif ($_[0] == 2) {
@@ -425,6 +436,7 @@ The number of seconds since January 1, 1970 00:00:00.
 =cut
 
 sub getSecondsFromEpoch {
+	my $self = shift;
 	my $dt = DateTime->from_epoch( epoch => shift );
 	my $start = $dt->clone;
 	$start->set_hour(0);
@@ -444,6 +456,7 @@ Returns a hash reference containing name/value pairs both with the list of time 
 =cut
 
 sub getTimeZones {
+	my $self = shift;
 	my %zones;
 	tie %zones, 'Tie::IxHash';
 	foreach my $zone (@{DateTime::TimeZone::all_names()}) {
@@ -468,6 +481,7 @@ The human date string. YYYY-MM-DD HH:MM:SS
 =cut
 
 sub humanToEpoch {
+	my $self = shift;
 	my ($dateString,$timeString) = split(/ /,shift);
 	my @date = split(/-/,$dateString);
 	my @time = split(/:/,$timeString);
@@ -493,6 +507,7 @@ A string which represents the units of the interval. The string must be 'years',
 =cut
 
 sub intervalToSeconds {
+	my $self = shift;
 	my $interval = shift;
 	my $units = shift;
 	if ($units eq "years") {
@@ -525,7 +540,8 @@ The number of seconds since January 1, 1970. Defaults to now.
 =cut
 
 sub localtime {
-	my $dt = DateTime->from_epoch( epoch => shift || time() );
+	my $self = shift;
+	my $dt = DateTime->from_epoch( epoch => shift ||$self->session->datetime->time() );
 	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
 	return ( $dt->year, $dt->month, $dt->day, $dt->hour, $dt->minute, $dt->second, $dt->day_of_year, $dt->day_of_week, $dt->is_dst );
 }
@@ -546,6 +562,7 @@ An epoch datestamp corresponding to the last month.
 =cut
 
 sub monthCount {
+	my $self = shift;
 	my $start = DateTime->from_epoch( epoch => shift );
 	my $end = DateTime->from_epoch( epoch => shift );
 	my $duration = $end - $start;
@@ -566,6 +583,7 @@ The number of seconds since January 1, 1970.
 =cut
 
 sub monthStartEnd {
+	my $self = shift;
 	my $dt = DateTime->from_epoch( epoch => shift);
 	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);	
 	$dt->set_hour(0);
@@ -575,6 +593,23 @@ sub monthStartEnd {
 	$end->set_minute(59);
 	$end->set_second(59);
         return ($dt->epoch, $end->epoch);
+}
+
+#-------------------------------------------------------------------
+
+=head2 new ( session )
+
+Constructor.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	bless {_session=>shift}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -590,6 +625,7 @@ The number of seconds in the interval.
 =cut
 
 sub secondsToInterval {
+	my $self = shift;
 	my $seconds = shift;
 	my ($interval, $units);
 	if ($seconds >= 31536000) {
@@ -630,6 +666,7 @@ A number of seconds.
 =cut
 
 sub secondsToTime {
+	my $self = shift;
 	my $seconds = shift;
 	my $timeString = sprintf("%02d",int($seconds / 3600)).":";
 	$seconds = $seconds % 3600;	
@@ -639,6 +676,19 @@ sub secondsToTime {
 	return $timeString;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
 
 #-------------------------------------------------------------------
 
@@ -653,13 +703,14 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 =cut
 
 sub setToEpoch {
+	my $self = shift;
         my $set = shift;
         return undef unless $set;
 	my $parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d %H:%M:%S' );
-	my $dt = $parser->parse_datetime($set);
+	my $dt = $parser->parse_dat$self->session->datetime->time($set);
 	unless ($dt) {
 		$parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d' );
-		$dt = $parser->parse_datetime($set);
+		$dt = $parser->parse_dat$self->session->datetime->time($set);
 	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
 	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
@@ -675,7 +726,8 @@ Returns an epoch date for now.
 =cut
 
 sub time {
-	return time();
+	my $self = shift;
+	return$self->session->datetime->time();
 }
 
 #-------------------------------------------------------------------
@@ -691,6 +743,7 @@ A string that looks similar to this: 15:05:32
 =cut
 
 sub timeToSeconds {
+	my $self = shift;
 	my ($hour,$min,$sec) = split(/:/,$_[0]);
 	return ($hour*60*60+$min*60+$sec);
 }

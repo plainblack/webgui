@@ -179,7 +179,7 @@ sub _convertToEpoch {
    }
    $hour = $self->_appendZero($hour);
    $minute = $self->_appendZero($minute);
-   return WebGUI::DateTime::humanToEpoch("$year-$month-$day $hour:$minute:00");
+   return $self->session->datetime->humanToEpoch("$year-$month-$day $hour:$minute:00");
 }
 
 #-------------------------------------------------------------------
@@ -409,9 +409,9 @@ sub view {
 	   #Create last update date formats
 	   unless ($var->{'lastUpdate.default'}) {
           my $luEpoch = $self->_convertToEpoch($hash->{'stocks.date'},$hash->{'stocks.time'});
-	      $var->{'lastUpdate.intl'} = WebGUI::DateTime::epochToHuman($luEpoch,"%y-%m-%d %j:%n");
-	      $var->{'lastUpdate.us'} = WebGUI::DateTime::epochToHuman($luEpoch,"%m/%d/%y %h:%n %p");
-          $var->{'lastUpdate.default'} = WebGUI::DateTime::epochToHuman($luEpoch,"%C %d %H:%n %P");
+	      $var->{'lastUpdate.intl'} = $self->session->datetime->epochToHuman($luEpoch,"%y-%m-%d %j:%n");
+	      $var->{'lastUpdate.us'} = $self->session->datetime->epochToHuman($luEpoch,"%m/%d/%y %h:%n %p");
+          $var->{'lastUpdate.default'} = $self->session->datetime->epochToHuman($luEpoch,"%C %d %H:%n %P");
        }
 	   
 	   push (@stocks, $hash);
@@ -441,8 +441,8 @@ sub www_displayStock {
    
    #Configure last update dates
    my $luEpoch = $self->_convertToEpoch($var->{'stocks.date'},$var->{'stocks.time'});
-   $var->{'lastUpdate.intl'} = WebGUI::DateTime::epochToHuman($luEpoch,"%y-%m-%d");
-   $var->{'lastUpdate.us'} = WebGUI::DateTime::epochToHuman($luEpoch,"%m/%d/%y");
+   $var->{'lastUpdate.intl'} = $self->session->datetime->epochToHuman($luEpoch,"%y-%m-%d");
+   $var->{'lastUpdate.us'} = $self->session->datetime->epochToHuman($luEpoch,"%m/%d/%y");
    
    $self->session->setting->get("showDebug") = 0;
    return $self->processTemplate($var, $self->get("displayTemplateId"));

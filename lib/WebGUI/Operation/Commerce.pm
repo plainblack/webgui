@@ -560,7 +560,7 @@ sub www_listPendingTransactions {
 		$output .= '<td>'.$properties->{transactionId}.'</td>';
 		$output .= '<td>'.$properties->{gatewayId}.'</td>';
 		$output .= '<td>'.$properties->{gateway}.'</td>';
-		$output .= '<td>'.WebGUI::DateTime::epochToHuman($properties->{initDate}).'</td>';
+		$output .= '<td>'.$session->datetime->epochToHuman($properties->{initDate}).'</td>';
 		$output .= '<td><a href="'.$session->url->page('op=completePendingTransaction;tid='.$properties->{transactionId}).'">'.$i18n->get('complete pending transaction').'</a></td>';
 		$output .= '</tr>';
 	}
@@ -593,9 +593,9 @@ sub www_listTransactions {
 	};
 	
 	my $initStart = $session->form->date('initStart');
-	my $initStop  = WebGUI::DateTime::addToTime($session->form->date('initStop'),23,59);
+	my $initStop  = $session->datetime->addToTime($session->form->date('initStop'),23,59);
 	my $completionStart = $session->form->date('completionStart');
-	my $completionStop  = WebGUI::DateTime::addToTime($session->form->date('completionStop'),23,59);
+	my $completionStop  = $session->datetime->addToTime($session->form->date('completionStop'),23,59);
 
 	$output .= $i18n->get('selection message');
 	
@@ -640,8 +640,8 @@ sub www_listTransactions {
 	foreach $transaction (@transactions) {
 		$output .= '<tr bgcolor="#ddd">';
 		$output .= '<td>'.deleteIcon('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';
-		$output .= '<td>'.WebGUI::DateTime::epochToHuman($transaction->get('initDate')).'</td>';
-		$output .= '<td>'.WebGUI::DateTime::epochToHuman($transaction->get('completionDate')).'</td>';
+		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('initDate')).'</td>';
+		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('completionDate')).'</td>';
 		$output .= '<td>'.$transaction->get('amount').'</td>';
 		$output .= '<td>'.$transaction->get('shippingCost').'</td>';
 		$output .= '<td>'.$transaction->get('status').'</td>';

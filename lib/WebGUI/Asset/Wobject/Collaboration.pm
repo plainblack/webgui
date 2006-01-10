@@ -52,7 +52,7 @@ sub appendPostListTemplateVars {
 			}
 		}
 		my $inDateRange;
-		if ($post->get("startDate") < WebGUI::DateTime::time() && $post->get("endDate") > WebGUI::DateTime::time()) {
+		if ($post->get("startDate") < $self->session->datetime->time() && $post->get("endDate") > $self->session->datetime->time()) {
 		  	$inDateRange = 1;
 		} else { 
 			$inDateRange = 0; 
@@ -71,8 +71,8 @@ sub appendPostListTemplateVars {
                         		"lastReply.user.isVisitor"=>$lastPost->get("ownerUserId") eq "1",
                         		"lastReply.username"=>$lastPost->get("username"),
                        	 		"lastReply.userProfile.url"=>$lastPost->WebGUI::Asset::Post::getPosterProfileUrl(),
-                        		"lastReply.dateSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%z"),
-                        		"lastReply.timeSubmitted.human"=>epochToHuman($lastPost->get("dateSubmitted"),"%Z")
+                        		"lastReply.dateSubmitted.human"=$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%z"),
+                        		"lastReply.timeSubmitted.human"=$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%Z")
 					);
 			}
 		}
@@ -91,10 +91,10 @@ sub appendPostListTemplateVars {
                         "status"=>$post->getStatus,
                         "thumbnail"=>$post->getThumbnailUrl,
                         "image.url"=>$post->getImageUrl,
-                        "dateSubmitted.human"=>epochToHuman($post->get("dateSubmitted"),"%z"),
-                        "dateUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%z"),
-                        "timeSubmitted.human"=>epochToHuman($post->get("dateSubmitted"),"%Z"),
-                        "timeUpdated.human"=>epochToHuman($post->get("dateUpdated"),"%Z"),
+                        "dateSubmitted.human"=$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%z"),
+                        "dateUpdated.human"=$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%z"),
+                        "timeSubmitted.human"=$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%Z"),
+                        "timeUpdated.human"=$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%Z"),
                         "userProfile.url"=>$post->getPosterProfileUrl,
                         "user.isVisitor"=>$post->get("ownerUserId") eq "1",
         		"edit.url"=>$post->getEditUrl,
@@ -1110,7 +1110,7 @@ sub www_unsubscribe {
 my @_months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 sub _get_rfc822_date {
         my ($time) = @_;
-        my ($year, $mon, $mday, $hour, $min, $sec) = WebGUI::DateTime::localtime($time);
+        my ($year, $mon, $mday, $hour, $min, $sec) = $self->session->datetime->loca$self->session->datetime->time($time);
         my $month = $_months[$mon - 1];
         return sprintf("%02d %s %04d %02d:%02d:%02d GMT", 
                        $mday, $month, $year, $hour, $min, $sec);

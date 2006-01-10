@@ -59,7 +59,7 @@ sub _isDuplicateUsername {
 	return 0 if($self->userId ne "1" && $self->session->user->username eq $username);
 	my ($otherUser) = $self->session->db->quickArray("select count(*) from users where username=".$self->session->db->quote($username));
 	return 0 if !$otherUser;
-	$self->error('<li>'.WebGUI::International::get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.WebGUI::DateTime::epochToHuman(time(),"%y").'"'.'</li>');
+	$self->error('<li>'.WebGUI::International::get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.$self->session->datetime->epochToHuman$self->session->datetime->time(),"%y").'"'.'</li>');
 	return 1;
 }
 
@@ -94,7 +94,7 @@ sub _isValidUsername {
 #-------------------------------------------------------------------
 sub _logLogin {
 	my $self = shift;
-   $self->session->db->write("insert into userLoginLog values (".$self->session->db->$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).",".time().","
+   $self->session->db->write("insert into userLoginLog values (".$self->session->db->$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).","$self->session->datetime->time().","
 	.$self->session->db->$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",".$self->session->db->$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
 }
 

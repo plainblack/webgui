@@ -48,14 +48,14 @@ A hash reference containing a list of properties to associate with the child.
         
 =head3 revisionDate
 
-An epoch date representing the date/time stamp that this revision was created. Defaults to time().
+An epoch date representing the date/time stamp that this revision was created. Defaults to$self->session->datetime->time().
         
 =cut    
         
 sub addRevision {
         my $self = shift;
         my $properties = shift;
-	my $now = shift || time();
+	my $now = shift ||$self->session->datetime->time();
 	my $versionTag = $self->session->scratch->get("versionTag") || 'pbversion0000000000002';
 	my $status = $self->session->setting->get("autoCommit") ? 'approved' : 'pending';
 	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
@@ -88,11 +88,11 @@ The name of the version tag. If not specified, one will be generated using the c
 
 sub addVersionTag {
 	my $class = shift;
-	my $name = shift || "Autotag created ".WebGUI::DateTime::epochToHuman()." by ".$self->session->user->profileField("username");
+	my $name = shift || "Autotag created ".$self->session->datetime->epochToHuman()." by ".$self->session->user->profileField("username");
 	my $tagId = $self->session->db->setRow("assetVersionTag","tagId",{
 		tagId=>"new",
 		name=>$name,
-		creationDate=>time(),
+		creationDate=$self->session->datetime->time(),
 		createdBy=>$self->session->user->profileField("userId")
 		});
 	$self->session->scratch->set("versionTag",$tagId);
@@ -150,7 +150,7 @@ sub commitVersionTag {
 		WebGUI::Asset->new($id,$class,$version)->commit;
 	}
 	$sth->finish;
-	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate=".time().", committedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where tagId=".$self->session->db->quote($tagId));
+	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate="$self->session->datetime->time().", committedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where tagId=".$self->session->db->quote($tagId));
 	$self->session->db->write("delete from userSessionScratch where name='versionTag' and value=".$self->session->db->quote($tagId));
 }
 
@@ -329,7 +329,7 @@ sub updateHistory {
 	my $self = shift;
 	my $action = shift;
 	my $userId = shift || $self->session->user->profileField("userId") || '3';
-	my $dateStamp = time();
+	my $dateStamp =$self->session->datetime->time();
 	$self->session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($userId).", ".$self->session->db->quote($action).", ".$dateStamp.")");
 }
 
@@ -426,7 +426,7 @@ sub www_manageCommittedVersions {
                 my $u = WebGUI::User->new($by);
                 $output .= '<tr>
 			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
-			<td>'.WebGUI::DateTime::epochToHuman($date).'</td>
+			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
 			<td><a href="'.$self->getUrl("proceed=manageCommittedVersions;func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
         }
@@ -456,7 +456,7 @@ sub www_manageRevisions {
 		where assetData.assetId=".$self->session->db->quote($self->getId));
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
                 $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")).'</td>
-			<td><a href="'.$self->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
+			<td><a href="'.$self->getUrl("func=viewRevision;revisionDate=".$date).'">'.$self->session->datetime->epochToHuman($date).'</a></td>
 			<td>'.$by.'</td>
 			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$tagId).'">'.$tag.'</a></td>
 			</tr>';
@@ -498,7 +498,7 @@ sub www_manageVersions {
 		$output .= '<tr>
 			<td>'.WebGUI::Icon::deleteIcon("func=rollbackVersionTag;tagId=".$id,$self->get("url"),$rollbackPrompt).'</td>
 			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
-			<td>'.WebGUI::DateTime::epochToHuman($date).'</td>
+			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
 			<td>
 			<a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$setTag.'</a> |
@@ -532,7 +532,7 @@ sub www_manageRevisionsInTag {
                 $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$self->session->form->process("tagId").";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td>'.$asset->getTitle.'</td>
 			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
-			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.WebGUI::DateTime::epochToHuman($date).'</a></td>
+			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.$self->session->datetime->epochToHuman($date).'</a></td>
 			<td>'.$by.'</td></tr>';
         }
         $output .= '</table>'.$p->getBarSimple;

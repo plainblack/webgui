@@ -47,7 +47,7 @@ sub www_viewLoginHistory {
 		$data{username} = WebGUI::International::get('unknown user') if ($data{userId} eq "0");
 		$row[$i] = '<tr class="tableData"><td>'.$data{username}.' ('.$data{userId}.')</td>';
 		$row[$i] .= '<td>'.$data{status}.'</td>';
-		$row[$i] .= '<td>'.epochToHuman($data{timeStamp},"%H:%n%p %M/%D/%y").'</td>';
+		$row[$i] .= '<td>'$session->datetime->epochToHuman($data{timeStamp},"%H:%n%p %M/%D/%y").'</td>';
 		$row[$i] .= '<td>'.$data{ipAddress}.'</td>';
 		$row[$i] .= '<td>'.$data{userAgent}.'</td></tr>';
 		$i++;

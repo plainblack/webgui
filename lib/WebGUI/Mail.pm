@@ -92,7 +92,7 @@ sub send {
 	$message .= "CC: $_[3]\n" if ($_[3] && !$self->session->config->get("emailOverride"));
 	$message .= "BCC: $_[5]\n" if ($_[5] && !$self->session->config->get("emailOverride"));
 	$message .= "Subject: ".$_[1]."\n";
-	$message .= "Date: ".WebGUI::DateTime::epochToHuman("","%W, %d %C %y %j:%n:%s %O")."\n";
+	$message .= "Date: ".$self->session->datetime->epochToHuman("","%W, %d %C %y %j:%n:%s %O")."\n";
 	if (($_[2] =~ m/<html>/i) || ($_[2] =~ m/<a\sname=/i)) {
 		$message .= "Content-Type: text/html; charset=UTF-8\n";
 	} else {

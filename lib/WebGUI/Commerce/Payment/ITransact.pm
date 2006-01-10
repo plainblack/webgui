@@ -484,8 +484,8 @@ sub confirmRecurringTransaction {
 	my $itemProperties = $transaction->getItems->[0];
 	my $item = WebGUI::Commerce::Item->new($itemProperties->{itemId}, $itemProperties->{itemType});
 	
-	my $startEpoch = WebGUI::DateTime::setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{start_date})));
-	my $currentEpoch = WebGUI::DateTime::setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{when})));
+	my $startEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{start_date})));
+	my $currentEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{when})));
 	
 	$self->session->db->write("delete from ITransact_recurringStatus where gatewayId=".$self->session->db->quote($form->{orig_xid}));
 	$self->session->db->write("insert into ITransact_recurringStatus ".
@@ -605,11 +605,11 @@ sub recurringTransaction {
 
 	if ($recurring) {
 		# initial amount = (daysInMonth - dayInMonth) / daysInMonth * amount
-		$initialAmount = (WebGUI::DateTime::getDaysInMonth(time) - (WebGUI::DateTime::localtime)[2])*$recurring->{amount}/WebGUI::DateTime::getDaysInMonth(time);
+		$initialAmount = ($self->session->datetime->getDaysInMonth(time) - ($self->session->datetime->localtime)[2])*$recurring->{amount}/$self->session->datetime->getDaysInMonth(time);
 		$initialAmount = $recurring->{amount} if ($initialAmount < 1);
 		$self->{_recurring} = 1;
 		$self->{_transactionParams} = {
-			START		=> $recurring->{start} || WebGUI::DateTime::epochToHuman(WebGUI::DateTime::addToDate(time, 0, 0, 1), '%m%d%y'),
+			START		=> $recurring->{start} || $self->session->datetime->epochToHuman($self->session->datetime->addToDate(time, 0, 0, 1), '%m%d%y'),
 			AMT		=> sprintf('%.2f', $recurring->{amount}),
 			INITIALAMT	=> sprintf('%.2f', $initialAmount),
 			TERM		=> $recurring->{term} || 9999,
@@ -814,7 +814,7 @@ sub validateFormData {
 	push (@error, $i18n->get('invalid card number')) unless ($self->session->form->process("cardNumber") =~ /^\d+$/);	
 	push (@error, $i18n->get('invalid cvv2')) if ($self->session->form->process("cvv2") !~ /^\d+$/ && $self->get('useCVV2'));
 
-	($currentYear, $currentMonth) = WebGUI::DateTime::localtime;
+	($currentYear, $currentMonth) = $self->session->datetime->localtime;
 
 	# Check if expDate and expYear have sane values
 	unless (($self->session->form->process("expMonth") =~ /^(0[1-9]|1[0-2])$/) && ($self->session->form->process("expYear") =~ /^\d\d\d\d$/)) {

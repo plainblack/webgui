@@ -126,10 +126,10 @@ sub addUsersToGroups {
 			my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=".$self->session->db->quote($gid)." and userId=".$self->session->db->quote($uid));
 			unless ($isIn) {
                 		$self->session->db->write("insert into groupings (groupId,userId,expireDate) 
-					values (".$self->session->db->quote($gid).", ".$self->session->db->quote($uid).", ".(WebGUI::DateTime::time()+$expireOffset).")");
+					values (".$self->session->db->quote($gid).", ".$self->session->db->quote($uid).", ".($self->session->datetime->time()+$expireOffset).")");
 			} else {
                         	if ($_[2]) {
-                                	userGroupExpireDate($uid,$gid,(WebGUI::DateTime::time()+$expireOffset));
+                                	userGroupExpireDate($uid,$gid,($self->session->datetime->time()+$expireOffset));
                         	}
 			}
                 }
@@ -225,7 +225,7 @@ If set to "1" then the listing will not include expired groupings. Defaults to "
 sub getGroupsForUser {
 	my $userId = shift;
 	my $withoutExpired = shift;
-	my $clause = "and expireDate>".time() if ($withoutExpired);
+	my $clause = "and expireDate>"$self->session->datetime->time() if ($withoutExpired);
 	if ($userId eq "") {
                 return [];
         } elsif (exists $session{gotGroupsForUser}{$userId}) {
@@ -317,7 +317,7 @@ sub getUsersInGroup {
 	my $withoutExpired = shift;
 	my $clause;
 	if ($withoutExpired) {
-		$clause = "expireDate > ".time()." and ";
+		$clause = "expireDate > "$self->session->datetime->time()." and ";
 	}
 	$clause .= "(groupId=".$self->session->db->quote($groupId);
  	if ($recursive) {
@@ -325,7 +325,7 @@ sub getUsersInGroup {
 		if ($#$groups >= 0) {
 			if ($withoutExpired) {
 				foreach my $groupId (@$groups) {
-					$clause .= " OR (groupId = ".$self->session->db->quote($groupId)." AND expireDate > ".time().") ";
+					$clause .= " OR (groupId = ".$self->session->db->quote($groupId)." AND expireDate > "$self->session->datetime->time().") ";
 				}
 			} else {
 				$clause .= " OR groupId IN (".$self->session->db->quoteAndJoin($groups).")";

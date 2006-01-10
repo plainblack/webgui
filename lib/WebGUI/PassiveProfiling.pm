@@ -61,7 +61,7 @@ sub add {
 				$self->session->db->quote($self->session->user->profileField("userId")).",".
 				$self->session->db->quote($self->session->var->get("sessionId")).",".
 				$self->session->db->quote($assetId).",".
-				$self->session->db->quote(WebGUI::DateTime::time()).")";
+				$self->session->db->quote($self->session->datetime->time()).")";
 	$self->session->db->write($sql);
 	return;
 }

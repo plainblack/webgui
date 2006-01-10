@@ -57,7 +57,7 @@ sub addChild {
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	$self->session->db->beginTransaction;
-	my $now = time();
+	my $now =$self->session->datetime->time();
 	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".$self->session->db->quote($id).",".$self->session->db->quote($self->getId).", ".$self->session->db->quote($lineage).", ".$now.", ".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($properties->{className}).", 'published')");
 	my $temp = WebGUI::Asset->newByPropertyHashRef({
 		assetId=>$id,
@@ -90,7 +90,7 @@ sub cascadeLineage {
         my $self = shift;
         my $newLineage = shift;
         my $oldLineage = shift || $self->get("lineage");
-	my $now = time();
+	my $now =$self->session->datetime->time();
         my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
 	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ".$self->session->db->quote($oldLineage.'%'));
 	my $cache = WebGUI::Cache->new;

@@ -69,8 +69,8 @@ sub view {
 		if (defined $lastPost) {
 			%lastPostVars = (
 				'forum.lastPost.url' => $lastPost->getUrl,
-				'forum.lastPost.date' => WebGUI::DateTime::epochToHuman($lastPost->get("dateSubmitted"),"%z"),
-				'forum.lastPost.time' => WebGUI::DateTime::epochToHuman($lastPost->get("dateSubmitted"),"%Z"),
+				'forum.lastPost.date' => $self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%z"),
+				'forum.lastPost.time' => $self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%Z"),
 				'forum.lastPost.epoch' => $lastPost->get("dateSubmitted"),
 				'forum.lastPost.subject' => $lastPost->get("title"),
 				'forum.lastPost.user.id' => $lastPost->get("ownerUserId"),

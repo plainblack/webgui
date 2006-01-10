@@ -98,7 +98,7 @@ The number of seconds since January 1, 1970.
 sub epochToArray {
 	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
 	use DateTime;
-	return map {$_ += 0} split / /, DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone)->strftime("%Y %m %d %H %M %S");
+	return map {$_ += 0} split / /, DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone)->str$self->session->datetime->time("%Y %m %d %H %M %S");
 }
 
 
@@ -222,42 +222,42 @@ sub view {
 	#define range of allowed months from the wobject settings.
 	if ($startMonth eq "first") {
 		#Don't really do anything - leading months will not be pushed if there are no events.
-		$minDate = WebGUI::DateTime::time();
+		$minDate = $self->session->datetime->time();
 	} elsif ($startMonth eq "january") {
-		$minDate = WebGUI::DateTime::humanToEpoch(WebGUI::DateTime::epochToHuman("","%y")."-01-01 00:00:00");
+		$minDate = $self->session->datetime->humanToEpoch($self->session->datetime->epochToHuman("","%y")."-01-01 00:00:00");
 	} else {
-		$minDate = WebGUI::DateTime::time();
+		$minDate = $self->session->datetime->time();
 	}
 	my $startsNow = 0;
 	unless ($self->get("startMonth") eq "now") {
-		($minDate,$junk) = WebGUI::DateTime::monthStartEnd($minDate);
+		($minDate,$junk) = $self->session->datetime->monthStartEnd($minDate);
 	} else { $startsNow = 1;}
 	tie %previous, 'Tie::CPHash'; 
 	#This merely limits the months to publish.  Month's processing is skipped if 
 	#the month is after the maxDate.
 	my $endMonth = $self->getValue("endMonth");
 	if ($endMonth eq "last") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,99,0,0);
+		$maxDate = $self->session->datetime->addToDate($minDate,99,0,0);
 	} elsif ($endMonth eq "after12") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,1,0,0); 
+		$maxDate = $self->session->datetime->addToDate($minDate,1,0,0); 
 	} elsif ($endMonth eq "after9") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,9,0); 
+		$maxDate = $self->session->datetime->addToDate($minDate,0,9,0); 
 	} elsif ($endMonth eq "after6") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,6,0); 
+		$maxDate = $self->session->datetime->addToDate($minDate,0,6,0); 
 	} elsif ($endMonth eq "after3") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,3,0);
+		$maxDate = $self->session->datetime->addToDate($minDate,0,3,0);
 	} elsif ($endMonth eq "current") {
-		$maxDate = WebGUI::DateTime::addToDate($minDate,0,1,0);
+		$maxDate = $self->session->datetime->addToDate($minDate,0,1,0);
 	}
 	#$self->session->errorHandler->warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
-	my @now = epochToArray(WebGUI::DateTime::time());
+	my @now = epochToArray($self->session->datetime->time());
 	my $calHasEvent = 0;
 	#monthcount minus i is the number of months remaining to be processed.
 	for (my $i=$calMonthStart;$i<=$calMonthEnd;$i++) {
 		#for each month, do the following....
 		my $monthHasEvent = 0;
-		my $thisMonth = WebGUI::DateTime::addToDate($minDate,0,($i-1),0);
-		my ($monthStart, $monthEnd) = WebGUI::DateTime::monthStartEnd($thisMonth);
+		my $thisMonth = $self->session->datetime->addToDate($minDate,0,($i-1),0);
+		my ($monthStart, $monthEnd) = $self->session->datetime->monthStartEnd($thisMonth);
 		my @thisMonthDate = epochToArray($thisMonth);
 		#Check month to see if it is in the allowed month range. End loop if it's not.
 		if ($thisMonth > $maxDate) {
@@ -282,31 +282,31 @@ sub view {
 				next if (($eventEndDate < $minDate) && $startsNow);
 				#Hide this event unless we are allowed to see it.  Funny that each event has 4 date/time pairs.
 				next unless $event->canView; 
-				my $eventLength = WebGUI::DateTime::getDaysInInterval($eventStartDate,$eventEndDate);
+				my $eventLength = $self->session->datetime->getDaysInInterval($eventStartDate,$eventEndDate);
 				my ($startYear, $startMonth, $startDay, $startDate, $startTime, $startAmPm, $startDayOfWeek) = split " ", 
-					WebGUI::DateTime::epochToHuman($eventStartDate, "%y %c %D %z %Z %w");
+					$self->session->datetime->epochToHuman($eventStartDate, "%y %c %D %z %Z %w");
 				my ($endYear, $endMonth, $endDay, $endDate, $endTime, $endAmPm, $endDayOfWeek) = split " ", 
-					WebGUI::DateTime::epochToHuman($eventEndDate, "%y %c %D %z %Z %w");
+					$self->session->datetime->epochToHuman($eventEndDate, "%y %c %D %z %Z %w");
 				my $eventCycleStart = 0;
 				# Fast-Forward Event Cycle to this month (for events spanning multiple months)
-				$eventCycleStart = (WebGUI::DateTime::getDaysInInterval($eventStartDate,$monthStart) - 1) if ($eventStartDate < $monthStart);
+				$eventCycleStart = ($self->session->datetime->getDaysInInterval($eventStartDate,$monthStart) - 1) if ($eventStartDate < $monthStart);
 				# also, skip leading days of this event if $startsNow is true.  Doesn't work in Events List.  Oh well.
-		#		$eventCycleStart = (WebGUI::DateTime::getDaysInInterval($eventStartDate,time)) if (($eventStartDate < time) && ($startsNow));
+		#		$eventCycleStart = ($self->session->datetime->getDaysInInterval($eventStartDate,time)) if (($eventStartDate < time) && ($startsNow));
 				# by default, stop processing this event at the end of its length.
 				my $eventCycleStop = ($eventLength);
 				#cycle through each day in the event, pushing the event's day listing into the proper day.
 				for (my $i=$eventCycleStart; $i<=$eventCycleStop; $i++) {
 					#create an array for the specific day in the event.
-					my @date = epochToArray(WebGUI::DateTime::addToDate($eventStartDate,0,0,$i));
+					my @date = epochToArray($self->session->datetime->addToDate($eventStartDate,0,0,$i));
 					# if the event goes past the end of this month, halt the loop.  
 					# No need to continue processing days that aren't in this month.
-					if ($monthEnd < (WebGUI::DateTime::addToDate($eventStartDate,0,0,$i) - 1)) {
+					if ($monthEnd < ($self->session->datetime->addToDate($eventStartDate,0,0,$i) - 1)) {
 						$i = ($eventCycleStop + 2);
 						next;
 					}
 					#this conditional used to only test if we are in the proper month... 
 					#Now also test to see if we're at the maxDate yet and after the minDate.
-					if (($date[1] == $thisMonthDate[1])  && (WebGUI::DateTime::addToDate($eventStartDate,0,0,$i) <= ($maxDate + 2678400))){
+					if (($date[1] == $thisMonthDate[1])  && ($self->session->datetime->addToDate($eventStartDate,0,0,$i) <= ($maxDate + 2678400))){
 						push(@{$events{$date[2]}}, {
 							description=>$event->get("description"),
 							name=>$event->get("title"),
@@ -350,8 +350,8 @@ sub view {
 	#		next unless $monthHasEvent;
 	#	}
 		my $dayOfWeekCounter = 1;
-		my $firstDayInFirstWeek = WebGUI::DateTime::getFirstDayInMonthPosition($thisMonth);
-		my $daysInMonth = WebGUI::DateTime::getDaysInMonth($thisMonth);
+		my $firstDayInFirstWeek = $self->session->datetime->getFirstDayInMonthPosition($thisMonth);
+		my $daysInMonth = $self->session->datetime->getDaysInMonth($thisMonth);
 		my @prepad;
 		while (($dayOfWeekCounter <= $firstDayInFirstWeek) and $firstDayInFirstWeek != 7) {
 			push(@prepad,{
@@ -393,7 +393,7 @@ sub view {
 			'day_loop'=>\@dayloop,
 			'prepad_loop'=>\@prepad,
 			'postpad_loop'=>\@postpad,
-			'month'=>WebGUI::DateTime::getMonthName($date[1]),
+			'month'=>$self->session->datetime->getMonthName($date[1]),
 			'year'=>$date[0]
 		});
 	}
@@ -401,22 +401,22 @@ sub view {
 	$var{month_loop} = \@$monthloop;
 	$var{"addevent.url"} = $self->getUrl().'?func=add;class=WebGUI::Asset::Event';
 	$var{"addevent.label"} = WebGUI::International::get(20,"Asset_EventsCalendar");
-	$var{'sunday.label'} = WebGUI::DateTime::getDayName(7);
-	$var{'monday.label'} = WebGUI::DateTime::getDayName(1);
-	$var{'tuesday.label'} = WebGUI::DateTime::getDayName(2);
-	$var{'wednesday.label'} = WebGUI::DateTime::getDayName(3);
-	$var{'thursday.label'} = WebGUI::DateTime::getDayName(4);
-	$var{'friday.label'} = WebGUI::DateTime::getDayName(5);
-	$var{'saturday.label'} = WebGUI::DateTime::getDayName(6);
-	$var{'sunday.label.short'} = substr(WebGUI::DateTime::getDayName(7),0,1);
-	$var{'monday.label.short'} = substr(WebGUI::DateTime::getDayName(1),0,1);
-	$var{'tuesday.label.short'} = substr(WebGUI::DateTime::getDayName(2),0,1);
-	$var{'wednesday.label.short'} = substr(WebGUI::DateTime::getDayName(3),0,1);
-	$var{'thursday.label.short'} = substr(WebGUI::DateTime::getDayName(4),0,1);
-	$var{'friday.label.short'} = substr(WebGUI::DateTime::getDayName(5),0,1);
-	$var{'saturday.label.short'} = substr(WebGUI::DateTime::getDayName(6),0,1);
+	$var{'sunday.label'} = $self->session->datetime->getDayName(7);
+	$var{'monday.label'} = $self->session->datetime->getDayName(1);
+	$var{'tuesday.label'} = $self->session->datetime->getDayName(2);
+	$var{'wednesday.label'} = $self->session->datetime->getDayName(3);
+	$var{'thursday.label'} = $self->session->datetime->getDayName(4);
+	$var{'friday.label'} = $self->session->datetime->getDayName(5);
+	$var{'saturday.label'} = $self->session->datetime->getDayName(6);
+	$var{'sunday.label.short'} = substr($self->session->datetime->getDayName(7),0,1);
+	$var{'monday.label.short'} = substr($self->session->datetime->getDayName(1),0,1);
+	$var{'tuesday.label.short'} = substr($self->session->datetime->getDayName(2),0,1);
+	$var{'wednesday.label.short'} = substr($self->session->datetime->getDayName(3),0,1);
+	$var{'thursday.label.short'} = substr($self->session->datetime->getDayName(4),0,1);
+	$var{'friday.label.short'} = substr($self->session->datetime->getDayName(5),0,1);
+	$var{'saturday.label.short'} = substr($self->session->datetime->getDayName(6),0,1);
 	# Create pagination variables.
-	$var{'pagination.pageCount.isMultiple'} = 1 if (($calMonthStart > 1) || ($maxDate > WebGUI::DateTime::addToDate($minDate,0,($monthRangeLength-1),0)));
+	$var{'pagination.pageCount.isMultiple'} = 1 if (($calMonthStart > 1) || ($maxDate > $self->session->datetime->addToDate($minDate,0,($monthRangeLength-1),0)));
 	my $prevCalMonthStart = $calMonthStart - $monthRangeLength;
 	my $nextCalMonthStart = $calMonthStart + $monthRangeLength;
 	my $prevCalMonthEnd = $calMonthEnd - $monthRangeLength;

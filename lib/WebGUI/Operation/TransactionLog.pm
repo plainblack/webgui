@@ -41,8 +41,8 @@ sub www_viewPurchaseHistory {
 	@history = @{WebGUI::Commerce::Transaction->transactionsByUser($session->user->profileField("userId"))};
 	foreach (@history) {
 		%properties = %{$_->get};
-		$properties{initDate} = WebGUI::DateTime::epochToHuman($properties{initDate});
-		$properties{completionDate} = WebGUI::DateTime::epochToHuman($properties{completionDate}) if ($properties{completionDate});
+		$properties{initDate} = $session->datetime->epochToHuman($properties{initDate});
+		$properties{completionDate} = $session->datetime->epochToHuman($properties{completionDate}) if ($properties{completionDate});
 		push(@historyLoop, {
 			(%properties),
 			itemLoop 	=> $_->getItems,

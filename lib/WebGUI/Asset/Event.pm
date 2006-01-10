@@ -45,11 +45,11 @@ sub definition {
 			},
 			eventStartDate => {
 				fieldType=>"dateTime",
-				defaultValue=>time()
+				defaultValue=$self->session->datetime->time()
 			},
 			eventEndDate => {
 				fieldType=>"dateTime",
-				defaultValue=>time()
+				defaultValue=$self->session->datetime->time()
 			},
 			EventsCalendar_recurringId => {
 				fieldType=>"hidden",
@@ -145,7 +145,7 @@ sub processPropertiesFromFormPost {
 	if ($self->session->form->process("assetId") eq "new") {
 		$self->update({eventEndDate=>$self->get("eventStartDate")}) unless ($self->get("eventEndDate") >= $self->get("eventStartDate"));
 		if ($self->session->form->process("recursEvery") && $self->session->form->process("recursEvery") ne "never") {
-			my $until = WebGUI::DateTime::setToEpoch($self->session->form->process("until"));
+			my $until = $self->session->datetime->setToEpoch($self->session->form->process("until"));
 			$until = $self->get("eventEndDate") unless ($until >= $self->get("eventEndDate"));
 			my $interval = ($self->session->form->process("interval") < 1) ? 1 : $self->session->form->process("interval");
 			my $recurringEventId = WebGUI::Id::generate();
@@ -156,17 +156,17 @@ sub processPropertiesFromFormPost {
 			while ($start < $until) {
 				$i++;
 				if ($self->session->form->process("recursEvery") eq "day") {
-					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,0,($i*$interval));
-					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,0,($i*$interval));
+					$start = $self->session->datetime->addToDate($self->get("eventStartDate"),0,0,($i*$interval));
+					$end = $self->session->datetime->addToDate($self->get("eventEndDate"),0,0,($i*$interval));
 				} elsif ($self->session->form->process("recursEvery") eq "week") {
-					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,0,(7*$i*$interval));
-					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,0,(7*$i*$interval));
+					$start = $self->session->datetime->addToDate($self->get("eventStartDate"),0,0,(7*$i*$interval));
+					$end = $self->session->datetime->addToDate($self->get("eventEndDate"),0,0,(7*$i*$interval));
 				} elsif ($self->session->form->process("recursEvery") eq "month") {
-					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),0,($i*$interval),0);
-					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),0,($i*$interval),0);
+					$start = $self->session->datetime->addToDate($self->get("eventStartDate"),0,($i*$interval),0);
+					$end = $self->session->datetime->addToDate($self->get("eventEndDate"),0,($i*$interval),0);
 				} elsif ($self->session->form->process("recursEvery") eq "year") {
-					$start = WebGUI::DateTime::addToDate($self->get("eventStartDate"),($i*$interval),0,0);
-					$end = WebGUI::DateTime::addToDate($self->get("eventEndDate"),($i*$interval),0,0);
+					$start = $self->session->datetime->addToDate($self->get("eventStartDate"),($i*$interval),0,0);
+					$end = $self->session->datetime->addToDate($self->get("eventEndDate"),($i*$interval),0,0);
 				}
 				my $newEvent = $self->getParent->duplicate($self);
 				$newEvent->update({
@@ -206,19 +206,19 @@ sub view {
 	$event = $self;
 	$var{title} = $event->getValue("title");
 	$var{"start.label"} =  WebGUI::International::get(14,"Asset_Event");
-	$var{"start.date"} = epochToHuman($self->getValue("eventStartDate"),"%z");
-	$var{"start.time"} = epochToHuman($self->getValue("eventStartDate"),"%Z");
+	$var{"start.date"} =$self->session->datetime->epochToHuman($self->getValue("eventStartDate"),"%z");
+	$var{"start.time"} =$self->session->datetime->epochToHuman($self->getValue("eventStartDate"),"%Z");
 	$var{"end.label"} = WebGUI::International::get(15,"Asset_Event");
-	$var{"end.date"} = epochToHuman($self->getValue("eventEndDate"),"%z");
-	$var{"end.time"} = epochToHuman($self->getValue("eventEndDate"),"%Z");
+	$var{"end.date"} =$self->session->datetime->epochToHuman($self->getValue("eventEndDate"),"%z");
+	$var{"end.time"} =$self->session->datetime->epochToHuman($self->getValue("eventEndDate"),"%Z");
 	$var{canEdit} = $self->canEdit;
 	$var{"edit.url"} = $self->session->url->page('func=edit');
 	$var{"edit.label"} = WebGUI::International::get(575,"Asset_Event");
 	$var{"delete.url"} = $self->session->url->page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
 	$var{"delete.label"} = WebGUI::International::get(576,"Asset_Event");
 	my @others;
-	my ($start, $garbage) = WebGUI::DateTime::dayStartEnd($self->get("eventStartDate"));
-	my ($garbage, $end) = WebGUI::DateTime::dayStartEnd($self->get("eventEndDate"));
+	my ($start, $garbage) = $self->session->datetime->dayStartEnd($self->get("eventStartDate"));
+	my ($garbage, $end) = $self->session->datetime->dayStartEnd($self->get("eventEndDate"));
 	my $sth = $self->session->db->read("select assetId from EventsCalendar_event where ((eventStartDate >= $start and eventStartDate <= $end) or (eventEndDate >= $start and eventEndDate <= $end)) and assetId<>".$self->session->db->quote($self->getId));
 	while (my ($assetId) = $sth->array) {
 		my $asset = WebGUI::Asset::Event->new($assetId);

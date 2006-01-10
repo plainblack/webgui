@@ -51,7 +51,7 @@ sub cut {
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
 	$self->session->db->beginTransaction;
 	$self->session->db->write("update asset set state='clipboard-limbo' where lineage like ".$self->session->db->quote($self->get("lineage").'%')." and state='published'");
-	$self->session->db->write("update asset set state='clipboard', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".time()." where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->write("update asset set state='clipboard', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged="$self->session->datetime->time()." where assetId=".$self->session->db->quote($self->getId));
 	$self->session->db->commit;
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
@@ -344,7 +344,7 @@ $self->session->style->setLink($self->session->config->get("extrasURL").'/assetM
                                 })
                         ."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
                         ."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
-                        ."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
+                        ."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
                         ."','".formatBytes($child->get("assetSize"))."');\n";
                 $output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
                         ."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";

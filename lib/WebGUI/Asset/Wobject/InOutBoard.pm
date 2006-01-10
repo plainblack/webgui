@@ -256,7 +256,7 @@ order by department, lastName, firstName";
 		}
 		
 		$row{'status'} = ($data->{status}||WebGUI::International::get(15, "Asset_InOutBoard"));
-		$row{'dateStamp'} = WebGUI::DateTime::epochToHuman($data->{dateStamp});
+		$row{'dateStamp'} = $self->session->datetime->epochToHuman($data->{dateStamp});
 		$row{'message'} = ($data->{message}||"&nbsp;");
 		
 		push (@rows, \%row);
@@ -357,9 +357,9 @@ sub www_setStatus {
 		$self->session->scratch->delete("userId");
 		$self->session->db->write("delete from InOutBoard_status where userId=".$self->session->db->quote($sessionUserId)." and  assetId=".$self->session->db->quote($self->getId));
 		$self->session->db->write("insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).","
-			.$self->session->db->quote($self->session->form->process("status")).",".WebGUI::DateTime::time().",".$self->session->db->quote($self->session->form->process("message")).")");
+			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
 		$self->session->db->write("insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).",".$self->session->db->quote($self->session->user->profileField("userId")).","
-			.$self->session->db->quote($self->session->form->process("status")).",".WebGUI::DateTime::time().",".$self->session->db->quote($self->session->form->process("message")).")");
+			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
 	}
 	else {
 		#$self->session->errorHandler->warn("Set scratch, redisplay\n");
@@ -389,7 +389,7 @@ sub www_viewReport {
 		-name=>"doit",
 		-value=>"1"
 		);
-	my $startDate = WebGUI::DateTime::addToDate(WebGUI::DateTime::time(),0,0,-15);
+	my $startDate = $self->session->datetime->addToDate($self->session->datetime->time(),0,0,-15);
 	$startDate = $self->session->form->date("startDate") if ($self->session->form->process("doit")); 
 	$f->date(
 		-name=>"startDate",
@@ -431,7 +431,7 @@ sub www_viewReport {
 	my $url = $self->getUrl("func=viewReport&selectDepartment=$self->session->form->process("selectDepartment")&reportPagination=$self->session->form->process("reportPagination")&startDate=$self->session->form->process("startDate")&endDate=$self->session->form->process("endDate")&doit=1");
 	if ($self->session->form->process("doit")) {
 	  $var{showReport} = 1;
-	  $endDate = WebGUI::DateTime::addToTime($endDate,24,0,0);
+	  $endDate = $self->session->datetime->addToTime($endDate,24,0,0);
 	  my $lastDepartment = "_none_";
 	  my $p = WebGUI::Paginator->new($url, $pageReportAfter);
 	  
@@ -476,7 +476,7 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 		$row{'username'} = _defineUsername($data);
 
 		$row{'status'} = ($data->{status}||WebGUI::International::get(15, "Asset_InOutBoard"));
-		$row{'dateStamp'} = WebGUI::DateTime::epochToHuman($data->{dateStamp});
+		$row{'dateStamp'} = $self->session->datetime->epochToHuman($data->{dateStamp});
 		$row{'message'} = ($data->{message}||"&nbsp;");
 		if (! exists $changedBy{ $data->{createdBy} }) {
 			my %whoChanged = _fetchNames($data->{createdBy});

@@ -68,7 +68,7 @@ sub canEdit {
 	my $self = shift;
 	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
-		($self->isPoster && $self->getThread->getParent->get("editTimeout") > (WebGUI::DateTime::time() - $self->get("dateUpdated"))) ||
+		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("dateUpdated"))) ||
 		$self->getThread->getParent->canModerate;
 
 }
@@ -129,11 +129,11 @@ sub definition {
 			dateSubmitted => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>time()
+				defaultValue=$self->session->datetime->time()
 				},
 			dateUpdated => {
 				fieldType=>"hidden",
-				defaultValue=>time()
+				defaultValue=$self->session->datetime->time()
 				},
 			username => {
 				fieldType=>"hidden",
@@ -417,8 +417,8 @@ sub getTemplateVars {
 	$var{"user.isPoster"} = $self->isPoster;
 	$var{"avatar.url"} = $self->getAvatarUrl;
 	$var{"userProfile.url"} = $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
-	$var{"dateSubmitted.human"} = epochToHuman($self->get("dateSubmitted"));
-	$var{"dateUpdated.human"} = epochToHuman($self->get("dateUpdated"));
+	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->get("dateSubmitted"));
+	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->get("dateUpdated"));
 	$var{'title.short'} = $self->chopTitle;
 	$var{content} = $self->formatContent if ($self->getThread);
 	$var{'user.canEdit'} = $self->canEdit if ($self->getThread);
@@ -600,7 +600,7 @@ sub markRead {
 	my $self = shift;
         unless ($self->isMarkedRead) {
                 $self->session->db->write("insert into Post_read (userId, postId, threadId, readDate) values (".$self->session->db->quote($self->session->user->profileField("userId")).",
-                        ".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->get("threadId")).", ".WebGUI::DateTime::time().")");
+                        ".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->get("threadId")).", ".$self->session->datetime->time().")");
         }
 }
 
@@ -670,7 +670,7 @@ sub processPropertiesFromFormPost {
 	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($self->session->form->process("endDate"));
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
-		$data{content} .= "\n\n --- (".WebGUI::International::get('Edited_on','Asset_Post')." ".WebGUI::DateTime::epochToHuman(undef,"%z %Z [GMT%O]").WebGUI::International::get('By','Asset_Post').$self->session->user->profileField("alias").") --- \n";
+		$data{content} .= "\n\n --- (".WebGUI::International::get('Edited_on','Asset_Post')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]").WebGUI::International::get('By','Asset_Post').$self->session->user->profileField("alias").") --- \n";
 		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
 			$data{content} = '<p>'.$data{content}.'</p>';
 		}
@@ -747,7 +747,7 @@ sub rate {
 	unless ($self->hasRated) {
         	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
                 	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).", 
-			".WebGUI::DateTime::time().", ".$self->session->db->quote($rating).")");
+			".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
         	my ($count) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=".$self->session->db->quote($self->getId));
         	$count = $count || 1;
         	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=".$self->session->db->quote($self->getId));
@@ -1095,13 +1095,13 @@ sub www_edit {
                 value=>$self->getValue("contentType") || "mixed"
                 });
 	my $startDate = $self->get("startDate");
-	$startDate = WebGUI::DateTime::setToEpoch($self->session->form->process("startDate")) if ($self->session->form->process("startDate"));
+	$startDate = $self->session->datetime->setToEpoch($self->session->form->process("startDate")) if ($self->session->form->process("startDate"));
 	$var{'startDate.form'} = WebGUI::Form::dateTime({
 		name  => 'startDate',
 		value => $startDate
 		});
 	my $endDate = $self->get("endDate");
-	$endDate = WebGUI::DateTime::setToEpoch($self->session->form->process("endDate")) if ($self->session->form->process("endDate"));
+	$endDate = $self->session->datetime->setToEpoch($self->session->form->process("endDate")) if ($self->session->form->process("endDate"));
 	$var{'endDate.form'} = WebGUI::Form::dateTime({
 		name  => 'endDate',
 		value => $endDate
