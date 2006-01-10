@@ -117,7 +117,7 @@ sub getCategories {
 sub getCompareForm {
 	my $self = shift;
 	my @ids = @_;
-	my $form = WebGUI::Form::formHeader({action=>$self->getUrl})
+	my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::submit({
 			value=>"compare"
 			})
@@ -804,7 +804,7 @@ sub www_search {
 		}
 	}
 	$var{'compare.form'} = $self->getCompareForm(@list);
-	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
+	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::hidden({
 			name=>"doit",
 			value=>"1"

@@ -385,14 +385,14 @@ sub getRecordTemplateVars {
 	$var->{"addTab.label"}=  WebGUI::International::get(105,"Asset_DataForm");;
 	$var->{"addTab.url"}= $self->getUrl('func=editTab');
 	$var->{"tab.init"}= _createTabInit($self->getId);
-	$var->{"form.start"} = WebGUI::Form::formHeader({action=>$self->getUrl})
-		.WebGUI::Form::hidden({name=>"func",value=>"process"});
+	$var->{"form.start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+		.WebGUI::Form::hidden($self->session,{name=>"func",value=>"process"});
 	my @tabs;
 	my $select = "select a.name, a.DataForm_fieldId, a.DataForm_tabId,a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows, a.extras, a.vertical";
 	my $join;
 	my $where = "where a.assetId=".$self->session->db->quote($self->getId);
 	if ($var->{entryId}) {
-		$var->{"form.start"} .= WebGUI::Form::hidden({name=>"entryId",value=>$var->{entryId}});
+		$var->{"form.start"} .= WebGUI::Form::hidden($self->session,{name=>"entryId",value=>$var->{entryId}});
 		my $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
 		$var->{ipAddress} = $entry->{ipAddress};
 		$var->{username} = $entry->{username};
@@ -494,9 +494,9 @@ sub getRecordTemplateVars {
 	$var->{field_loop} = \@fields;
 	$tabsth->finish;
 	$var->{tab_loop} = \@tabs;
-	$var->{"form.send"} = WebGUI::Form::submit({value=>WebGUI::International::get(73, "Asset_DataForm")});
-	$var->{"form.save"} = WebGUI::Form::submit();
-	$var->{"form.end"} = WebGUI::Form::formFooter();
+	$var->{"form.send"} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(73, "Asset_DataForm")});
+	$var->{"form.save"} = WebGUI::Form::submit($self->session,);
+	$var->{"form.end"} = WebGUI::Form::formFooter($self->session,);
 	return $var;
 }
 

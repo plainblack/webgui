@@ -566,8 +566,8 @@ sub www_listProductVariants {
 		$output .= "</tr>";
 	}
 	$output .= "</table>";
-	$output .= WebGUI::Form::submit();
-	$output .= WebGUI::Form::formFooter();
+	$output .= WebGUI::Form::submit($session,);
+	$output .= WebGUI::Form::formFooter($session,);
 
 	return _submenu($output, 'list variants label', 'list variants', 'ProductManager');
 }

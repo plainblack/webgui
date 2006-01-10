@@ -508,7 +508,7 @@ sub getUploadControl {
 		}
 		return $uploadControl unless ($i < $maxAttachments);
 	}
-	$uploadControl .= WebGUI::Form::file(
+	$uploadControl .= WebGUI::Form::file($self->session,
 		maxAttachments=>$maxAttachments
 		);
 	return $uploadControl;
@@ -957,7 +957,7 @@ sub www_edit {
 	my $content;
 	my $title;
 	if ($self->session->form->process("func") eq "add") { # new post
-        	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getParent->getUrl})
+        	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getParent->getUrl})
 			.WebGUI::Form::hidden({
                 		name=>"func",
 				value=>"add"
@@ -1013,7 +1013,7 @@ sub www_edit {
                 $content .= "\n\n".$self->session->user->profileField("signature") if ($self->session->user->profileField("signature") && !$self->session->form->process("content"));
 	} else { # edit
 		return $self->session->privilege->insufficient() unless ($self->canEdit);
-        	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
+        	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			.WebGUI::Form::hidden({
                 		name=>"func",
 				value=>"edit"
@@ -1038,7 +1038,7 @@ sub www_edit {
 			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($session{form}{'userDefined'.$i},"macros");
 		}
 	}
-	$var{'form.footer'} = WebGUI::Form::formFooter();
+	$var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
 	$var{'user.isVisitor'} = ($self->session->user->profileField("userId") eq '1');

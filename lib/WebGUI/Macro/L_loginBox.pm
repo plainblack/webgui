@@ -82,7 +82,7 @@ sub process {
                 $action = $session->url->page(undef,1);
                 $action =~ s/http:/https:/;
         }
-	$var{'form.header'} = WebGUI::Form::formHeader({action=>$action})
+	$var{'form.header'} = WebGUI::Form::formHeader($session,{action=>$action})
 		.WebGUI::Form::hidden({
 			name=>"op",
 			value=>"auth"
@@ -109,7 +109,7 @@ sub process {
 		});
         $var{'account.create.url'} = $session->url->page('op=auth;method=createAccount');
 	$var{'account.create.label'} = WebGUI::International::get(407);
-	$var{'form.footer'} = WebGUI::Form::formFooter();
+	$var{'form.footer'} = WebGUI::Form::formFooter($session,);
         return WebGUI::Asset::Template->new($session,$templateId)->process(\%var); 
 }
 

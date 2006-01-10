@@ -94,7 +94,7 @@ sub _drawQueryBuilder {
 		});
 		# The value select field
 		my $valFieldName = "val_field".$i;
-		my $valueField = WebGUI::Form::dynamicField(
+		my $valueField = WebGUI::Form::dynamicField($self->session,
 			fieldType=>$fieldType,
 			name=>$valFieldName,
 			uiLevel=>5,

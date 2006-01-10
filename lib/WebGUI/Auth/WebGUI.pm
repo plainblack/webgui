@@ -169,18 +169,18 @@ sub createAccount {
 	my ($filename, $challenge) = $storage->addFileFromCaptcha;
 	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
 	if ($vars->{useCaptcha}) {
-   		$vars->{'create.form.captcha'} = WebGUI::Form::text({"name"=>"authWebGUI.captcha", size=>6, maxlength=>6})
-			.WebGUI::Form::hidden({name=>"authWebGUI.captcha.validation", value=>Digest::MD5::md5_base64(lc($challenge))})
+   		$vars->{'create.form.captcha'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.captcha", size=>6, maxlength=>6})
+			.WebGUI::Form::hidden($self->session,{name=>"authWebGUI.captcha.validation", value=>Digest::MD5::md5_base64(lc($challenge))})
 			.'<img src="'.$storage->getUrl($filename).'" border="0" alt="captcha" align="middle" />';
    		$vars->{'create.form.captcha.label'} = WebGUI::International::get("captcha label","AuthWebGUI");
 	}
-   $vars->{'create.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$session{form}{"authWebGUI.username"}});
+   $vars->{'create.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$session{form}{"authWebGUI.username"}});
    $vars->{'create.form.username.label'} = WebGUI::International::get(50);
-   $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier"});
+   $vars->{'create.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authWebGUI.identifier"});
    $vars->{'create.form.password.label'} = WebGUI::International::get(51);
-   $vars->{'create.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm"});
+   $vars->{'create.form.passwordConfirm'} = WebGUI::Form::password($self->session,{"name"=>"authWebGUI.identifierConfirm"});
    $vars->{'create.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
-   $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$self->session->form->process("confirm")});
+   $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$self->session->form->process("confirm")});
  	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
 	   $vars->{'recoverPassword.url'} = $self->session->url->page('op=auth;method=recoverPassword');
 	   $vars->{'recoverPassword.label'} = WebGUI::International::get(59);
@@ -266,14 +266,14 @@ sub displayAccount {
    $vars->{'account.message'} = $_[0] if ($_[0]);
    $vars->{'account.noform'} = 1;
    if($userData->{changeUsername}  || (!defined $userData->{changeUsername} && $self->session->setting->get("webguiChangeUsername"))){
-      $vars->{'account.form.username'} = WebGUI::Form::text({"name"=>"authWebGUI.username","value"=>$self->username});
+      $vars->{'account.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$self->username});
       $vars->{'account.form.username.label'} = WebGUI::International::get(50);
       $vars->{'account.noform'} = 0;
    }
    if($userData->{changePassword} || (!defined $userData->{changePassword} && $self->session->setting->get("webguiChangePassword"))){
-      $vars->{'account.form.password'} = WebGUI::Form::password({"name"=>"authWebGUI.identifier","value"=>"password"});
+      $vars->{'account.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authWebGUI.identifier","value"=>"password"});
       $vars->{'account.form.password.label'} = WebGUI::International::get(51);
-      $vars->{'account.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"authWebGUI.identifierConfirm","value"=>"password"});
+      $vars->{'account.form.passwordConfirm'} = WebGUI::Form::password($self->session,{"name"=>"authWebGUI.identifierConfirm","value"=>"password"});
       $vars->{'account.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
       $vars->{'account.noform'} = 0;
    }
@@ -505,12 +505,12 @@ sub recoverPassword {
    my $template = 'Auth/WebGUI/Recovery';
    my $vars;
    $vars->{title} = WebGUI::International::get(71);
-   $vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader({});
-   $vars->{'recover.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-   $vars->{'recover.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>"recoverPasswordFinish"});
+   $vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader($self->session,{});
+   $vars->{'recover.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+   $vars->{'recover.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>"recoverPasswordFinish"});
 
-   $vars->{'recover.form.submit'} = WebGUI::Form::submit({});
-   $vars->{'recover.form.footer'} = WebGUI::Form::formFooter();
+   $vars->{'recover.form.submit'} = WebGUI::Form::submit($self->session,{});
+   $vars->{'recover.form.footer'} = WebGUI::Form::formFooter($self->session,);
     $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
 
@@ -518,7 +518,7 @@ sub recoverPassword {
            $vars->{'createAccount.url'} = $self->session->url->page('op=auth=;method=createAccount');
            $vars->{'createAccount.label'} = WebGUI::International::get(67);
    $vars->{'recover.message'} = $_[0] if ($_[0]);
-   $vars->{'recover.form.email'} = WebGUI::Form::text({"name"=>"email"});
+   $vars->{'recover.form.email'} = WebGUI::Form::text($self->session,{"name"=>"email"});
    $vars->{'recover.form.email.label'} = WebGUI::International::get(56);
    return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
 }
@@ -562,19 +562,19 @@ sub resetExpiredPassword {
 	
 	$vars->{displayTitle} = '<h3>'.WebGUI::International::get(8,'AuthWebGUI').'</h3>';
     $vars->{'expired.message'} = $_[0] if($_[0]);
-    $vars->{'expired.form.header'} = "\n\n".WebGUI::Form::formHeader({});
-    $vars->{'expired.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>"resetExpiredPasswordSave"});
-   	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$self->session->form->process("uid")});
+    $vars->{'expired.form.header'} = "\n\n".WebGUI::Form::formHeader($self->session,{});
+    $vars->{'expired.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>"resetExpiredPasswordSave"});
+   	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"uid","value"=>$self->session->form->process("uid")});
     
-    $vars->{'expired.form.oldPassword'} = WebGUI::Form::password({"name"=>"oldPassword"});
+    $vars->{'expired.form.oldPassword'} = WebGUI::Form::password($self->session,{"name"=>"oldPassword"});
     $vars->{'expired.form.oldPassword.label'} = WebGUI::International::get(10,'AuthWebGUI');
-    $vars->{'expired.form.password'} = WebGUI::Form::password({"name"=>"identifier"});
+    $vars->{'expired.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
     $vars->{'expired.form.password.label'} = WebGUI::International::get(11,'AuthWebGUI');
-    $vars->{'expired.form.passwordConfirm'} = WebGUI::Form::password({"name"=>"identifierConfirm"});
+    $vars->{'expired.form.passwordConfirm'} = WebGUI::Form::password($self->session,{"name"=>"identifierConfirm"});
     $vars->{'expired.form.passwordConfirm.label'} = WebGUI::International::get(2,'AuthWebGUI');
-    $vars->{'expired.form.submit'} = WebGUI::Form::submit({});
-    $vars->{'expired.form.footer'} = WebGUI::Form::formFooter();
+    $vars->{'expired.form.submit'} = WebGUI::Form::submit($self->session,{});
+    $vars->{'expired.form.footer'} = WebGUI::Form::formFooter($self->session,);
 	
 	return WebGUI::Asset::Template->new($self->session,$self->getExpiredPasswordTemplateId)->process($vars);
 }

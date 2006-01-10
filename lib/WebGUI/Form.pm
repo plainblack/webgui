@@ -19,12 +19,7 @@ use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::RichEdit;
 use WebGUI::Asset::Template;
-use WebGUI::DateTime;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::Style;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -39,14 +34,14 @@ This is a convenience package which provides a simple interface to use all of th
 
  use WebGUI::Form;
 
- $html = WebGUI::Form::formFooter();
- $html = WebGUI::Form::formHeader();
+ $html = WebGUI::Form::formFooter($self->session,);
+ $html = WebGUI::Form::formHeader($self->session,);
 
- $html = WebGUI::Form::anyFieldType(%properties);
+ $html = WebGUI::Form::anyFieldType($self->session,%properties);
 
  Example:
 
- $html = WebGUI::Form::text(%properties);
+ $html = WebGUI::Form::text($self->session,%properties);
 
 =head1 METHODS 
 
@@ -65,23 +60,28 @@ Dynamically creates functions on the fly for all the different form control type
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);	
+	my $session = shift;
 	my @params = @_;
 	my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
         if ($@) {
-        	$self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
+        	$session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
                 return undef;
         }
 	my $class = "WebGUI::Form::".$name;
-	return $class->new(@params)->toHtml;
+	return $class->new($session,@params)->toHtml;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 formFooter ( )
+=head2 formFooter ( session )
 
 Returns a form footer.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
@@ -92,31 +92,40 @@ sub formFooter {
 
 #-------------------------------------------------------------------
 
-=head2 formHeader ( hashRef )
+=head2 formHeader ( session, hashRef )
 
 Returns a form header.
 
-=head3 action
+=head3 session
+
+A reference to the current session.
+
+=head3 hashRef
+
+A hash reference that contains one or more of the following parameters.
+
+=head4 action
 
 The form action. Defaults to the current page.
 
-=head3 method
+=head4 method
 
 The form method. Defaults to "post".
 
-=head3 enctype
+=head4 enctype
 
 The form enctype. Defaults to "multipart/form-data".
 
-=head3 extras
+=head4 extras
 
 If you want to add anything special to the form header like javascript actions or stylesheet info, then use this.
 
 =cut
 
 sub formHeader {
+	my $session = shift;
 	my $params = shift;
-        my $action = $params->{action} || $self->session->url->page();
+        my $action = $params->{action} || $session->url->page();
 	my $hidden;
 	if ($action =~ /\?/) {
 		my ($path,$query) = split(/\?/,$action);
@@ -125,7 +134,7 @@ sub formHeader {
 		foreach my $param (@params) {
 			$param =~ s/amp;(.*)/$1/;
 			my ($name,$value) = split(/\=/,$param);
-			$hidden .= hidden({name=>$name,value=>$value});
+			$hidden .= hidden($session,{name=>$name,value=>$value});
 		}
 	}
         my $method = $params->{method} || "post";

@@ -960,9 +960,9 @@ sub www_search {
         $self->session->scratch->set($self->getId."_without",$self->session->form->process("without"));
         $self->session->scratch->set($self->getId."_numResults",$self->session->form->process("numResults"));
         my %var;
-        $var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
-         	.WebGUI::Form::hidden({ name=>"func", value=>"search" })
-        	.WebGUI::Form::hidden({ name=>"doit", value=>1 });
+        $var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+         	.WebGUI::Form::hidden($self->session,{ name=>"func", value=>"search" })
+        	.WebGUI::Form::hidden($self->session,{ name=>"doit", value=>1 });
         $var{'all.form'} = WebGUI::Form::text({
                 name=>'all',
                 value=>$session{scratch}{$self->getId."_all"},
@@ -992,8 +992,8 @@ sub www_search {
                 options=>\%results,
                 value=>[$numResults]
                 });
-        $var{'form.search'} = WebGUI::Form::submit({value=>WebGUI::International::get(170)});
-        $var{'form.footer'} = WebGUI::Form::formFooter();
+        $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(170)});
+        $var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
         $var{'back.url'} = $self->getUrl;
 	$self->appendTemplateLabels(\%var);
         $var{doit} = $self->session->form->process("doit");

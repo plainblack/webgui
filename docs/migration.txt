@@ -705,7 +705,7 @@ of 6.9.
 perl -pi.bak -e 's!WebGUI\:\:Privilege\:\:!\$self->session->privilege->!g' fileNameGoesHere
 
 
-5.23.10 WebGUI::DateTime API Refactored
+5.23.11 WebGUI::DateTime API Refactored
 
 WebGUI::DateTime is now accessed through $session.
 
@@ -719,6 +719,15 @@ perl -pi.bak -e 's![^\:]addToTime\(!\$self->session->datetime->addToTime(!g' fil
 perl -pi.bak -e 's![^\:]localtime\(!\$self->session->datetime->localtime(!g' fileNameGoesHere
 perl -pi.bak -e 's![^\:]time\(!\$self->session->datetime->time(!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:DateTime\:\:!\$self->session->datetime->!g' fileNameGoesHere
+
+
+5.23.12 WebGUI::Form API Refactored
+
+In 6.9 the WebGUI::Form API was refactored to accept $session as the first
+parameter to each method.
+
+perl -pi.bak -e 's!WebGUI\:\:Form\:\:(\w+)\((.*)\)!WebGUI::Form::$1(\$self->session,$2)!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Form\:\:(\w+)\($!WebGUI::Form::$1(\$self->session,!g' fileNameGoesHere
 
 
 6.  Automatic list of Assets in Help System.

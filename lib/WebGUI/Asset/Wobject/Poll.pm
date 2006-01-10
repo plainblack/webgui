@@ -293,17 +293,17 @@ sub view {
         my ($totalResponses) = $self->session->db->quickArray("select count(*) from Poll_answer where assetId=".$self->session->db->quote($self->getId));
 	$var{"responses.label"} = WebGUI::International::get(12,"Asset_Poll");
 	$var{"responses.total"} = $totalResponses;
-	$var{"form.start"} = WebGUI::Form::formHeader({action=>$self->getUrl});
-        $var{"form.start"} .= WebGUI::Form::hidden({name=>'func',value=>'vote'});
-	$var{"form.submit"} = WebGUI::Form::submit({value=>WebGUI::International::get(11,"Asset_Poll")});
-	$var{"form.end"} = WebGUI::Form::formFooter();
+	$var{"form.start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl});
+        $var{"form.start"} .= WebGUI::Form::hidden($self->session,{name=>'func',value=>'vote'});
+	$var{"form.submit"} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(11,"Asset_Poll")});
+	$var{"form.end"} = WebGUI::Form::formFooter($self->session,);
 	$totalResponses = 1 if ($totalResponses < 1);
         for (my $i=1; $i<=20; $i++) {
         	if ($self->get('a'.$i) =~ /\C/) {
                         my ($tally) = $self->session->db->quickArray("select count(*) from Poll_answer where answer='a"
 				.$i."' and assetId=".$self->session->db->quote($self->getId)." group by answer");
                 	push(@answers,{
-				"answer.form"=>WebGUI::Form::radio({name=>"answer",value=>"a".$i}),
+				"answer.form"=>WebGUI::Form::radio($self->session,{name=>"answer",value=>"a".$i}),
 				"answer.text"=>$self->get('a'.$i),
 				"answer.graphWidth"=>round($self->get("graphWidth")*$tally/$totalResponses),
 				"answer.number"=>$i,

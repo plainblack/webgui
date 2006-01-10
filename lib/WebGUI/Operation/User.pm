@@ -171,22 +171,22 @@ sub getUserSearchForm {
 	$session->scratch->set("userSearchStatus",$session->form->process("status"));
 	$session->scratch->set("userSearchModifier",$session->form->process("modifier"));
 	my $output = '<div align="center">'
-		.WebGUI::Form::formHeader()
-		.WebGUI::Form::hidden(
+		.WebGUI::Form::formHeader($session,)
+		.WebGUI::Form::hidden($session,
 			name => "op",
 			value => $op
 			);
 	foreach my $key (keys %{$params}) {
-		$output .= WebGUI::Form::hidden(
+		$output .= WebGUI::Form::hidden($session,
 			name=>$key,
 			value=>$params->{$key}
 			);
 	}
-	$output .= WebGUI::Form::hidden(
+	$output .= WebGUI::Form::hidden($session,
 		-name=>"doit",
 		-value=>1
 		)
-	.WebGUI::Form::selectBox(
+	.WebGUI::Form::selectBox($session,
 		-name=>"modifier",
 		-value=>($session->scratch->get("userSearchModifier") || "contains"),
 		-options=>{
@@ -195,12 +195,12 @@ sub getUserSearchForm {
 			endsWith=>WebGUI::International::get("ends with")
 			}
 		)
-	.WebGUI::Form::text(
+	.WebGUI::Form::text($session,
 		-name=>"keyword",
 		-value=>$session->scratch->get("userSearchKeyword"),
 		-size=>15
 		)
-	.WebGUI::Form::selectBox(
+	.WebGUI::Form::selectBox($session,
 		-name	=> "status",
 		-value	=> ($session->scratch->get("userSearchStatus") || "users.status like '%'"),
 		-options=> { 
@@ -210,8 +210,8 @@ sub getUserSearchForm {
 			Selfdestructed	=> WebGUI::International::get(819)
 			}
 	)
-	.WebGUI::Form::submit(value=>WebGUI::International::get(170))
-	.WebGUI::Form::formFooter();
+	.WebGUI::Form::submit($session,value=>WebGUI::International::get(170))
+	.WebGUI::Form::formFooter($session,);
 	$output .= '</div>';
 	return $output;
 }

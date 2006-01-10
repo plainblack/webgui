@@ -1550,7 +1550,7 @@ sub www_manageAssets {
    <script type=\"text/javascript\">
    //<![CDATA[
      var assetManager = new AssetManager();
-         assetManager.AddColumn('".WebGUI::Form::checkbox({extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
+         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('&nbsp;','','center','');
          assetManager.AddColumn('".$i18n->get("rank")."','style=\"cursor:move\"','right','numeric');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
@@ -1640,14 +1640,14 @@ sub www_manageAssets {
         }
 	if ($hasClips) {
 		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082,"Asset").'</legend>'
-			.WebGUI::Form::formHeader()
-			.WebGUI::Form::hidden({name=>"func",value=>"pasteList"})
-			.WebGUI::Form::checkbox({extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
+			.WebGUI::Form::formHeader($self->session,)
+			.WebGUI::Form::hidden($self->session,{name=>"func",value=>"pasteList"})
+			.WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
 			.' '.WebGUI::International::get("select all","Asset").'<br />'
-			.WebGUI::Form::checkList({name=>"assetId",vertical=>1,options=>\%options})
+			.WebGUI::Form::checkList($self->session,{name=>"assetId",vertical=>1,options=>\%options})
 			.'<br />'
-			.WebGUI::Form::submit({value=>"Paste"})
-			.WebGUI::Form::formFooter()
+			.WebGUI::Form::submit($self->session,{value=>"Paste"})
+			.WebGUI::Form::formFooter($self->session,)
 			.' </fieldset></div> '
 			.'<script type="text/javascript">
 			//<![CDATA[

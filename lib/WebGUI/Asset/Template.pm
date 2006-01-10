@@ -511,26 +511,26 @@ $style .= '
 			template=>$style
 			})->www_edit;
 	} else {
-		$output = WebGUI::Form::formHeader({action=>$self->getUrl}).WebGUI::Form::hidden({name=>"func", value=>"styleWizard"});
-		$output .= WebGUI::Form::hidden({name=>"proceed", value=>"manageAssets"}) if ($self->session->form->process("proceed"));
+		$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden({name=>"func", value=>"styleWizard"});
+		$output .= WebGUI::Form::hidden($self->session,{name=>"proceed", value=>"manageAssets"}) if ($self->session->form->process("proceed"));
 		$output .= '<style type="text/css">
 			.chooser { float: left; width: 150px; height: 150px; } 
 			.representation, .representation td { font-size: 12px; width: 120px; border: 1px solid black; } 
 			.representation { height: 130px; }
 			</style>';
 		$output .= "<p>Choose a layout for this style:</p>";
-		$output .= WebGUI::Form::hidden({name=>"step", value=>2});
-		$output .= '<div class="chooser">'.WebGUI::Form::radio({name=>"layout", value=>1, checked=>1}).q|<table class="representation"><tbody>
+		$output .= WebGUI::Form::hidden($self->session,{name=>"step", value=>2});
+		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>1, checked=>1}).q|<table class="representation"><tbody>
 			<tr><td>Logo</td><td>Heading</td></tr>
 			<tr><td>Menu</td><td>Body content goes here.</td></tr>
 			</tbody></table></div>|;
-		$output .= '<div class="chooser">'.WebGUI::Form::radio({name=>"layout", value=>2}).q|<table class="representation"><tbody>
+		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>2}).q|<table class="representation"><tbody>
 			<tr><td>Logo</td><td>Heading</td></tr>
 			<tr><td style="text-align: center;" colspan="2">Menu</td></tr>
 			<tr><td colspan="2">Body content goes here.</td></tr>
 			</tbody></table></div>|;
-		$output .= WebGUI::Form::submit();
-		$output .= WebGUI::Form::formFooter();
+		$output .= WebGUI::Form::submit($self->session,);
+		$output .= WebGUI::Form::formFooter($self->session,);
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit template","Asset_Template")) if ($self->get("url"));
         return $self->getAdminConsole->render($output,WebGUI::International::get('style wizard', 'Asset_Template'));

@@ -600,28 +600,28 @@ sub www_listTransactions {
 	$output .= $i18n->get('selection message');
 	
 	$output .= WebGUI::Form::formHeader;
-	$output .= WebGUI::Form::hidden({name=>'op', value=>'listTransactions'});
+	$output .= WebGUI::Form::hidden($session,{name=>'op', value=>'listTransactions'});
 	$output .= '<table>';
-	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'init', checked=>($session->form->process("selection") eq 'init')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::radio($session,{name=>'selection', value => 'init', checked=>($session->form->process("selection") eq 'init')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('init date').'</td>';
-	$output .= '<td>'.WebGUI::Form::date({name=>'initStart', value=>$initStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'initStop', value=>$initStop}).'</td>';
+	$output .= '<td>'.WebGUI::Form::date($session,{name=>'initStart', value=>$initStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'initStop', value=>$initStop}).'</td>';
 	$output .= '</tr><tr>';
-	$output .= '<td>'.WebGUI::Form::radio({name=>'selection', value => 'completion', checked=>($session->form->process("selection") eq 'completion')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::radio($session,{name=>'selection', value => 'completion', checked=>($session->form->process("selection") eq 'completion')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('completion date').'</td>';
-	$output .= '<td>'.WebGUI::Form::date({name=>'completionStart', value=>$completionStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'completionStop', value=>$completionStop}).'</td>';
+	$output .= '<td>'.WebGUI::Form::date($session,{name=>'completionStart', value=>$completionStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'completionStop', value=>$completionStop}).'</td>';
 	$output .= '</tr><tr>';
 	$output .= '<td></td>';
 	$output .= '<td align="left">'.$i18n->get('transaction status').'</td>';
-	$output .= '<td>'.WebGUI::Form::selectBox({name => 'tStatus', value => [$session->form->process("tStatus")], options => $transactionOptions});
+	$output .= '<td>'.WebGUI::Form::selectBox($session,{name => 'tStatus', value => [$session->form->process("tStatus")], options => $transactionOptions});
 	$output .= '</tr><tr>';
 	
 	$output .= '<td></td>';
 	$output .= '<td align="left">'.$i18n->get('shipping status').'</td>';
-	$output .= '<td>'.WebGUI::Form::selectBox({name => 'sStatus', value => [$session->form->process("sStatus")], options => $shippingOptions});
+	$output .= '<td>'.WebGUI::Form::selectBox($session,{name => 'sStatus', value => [$session->form->process("sStatus")], options => $shippingOptions});
 	$output .= '</tr><tr>';
 
 	$output .= '<td></td>';
-	$output .= '<td>'.WebGUI::Form::submit({value=>$i18n->get('select')}).'</td>';
+	$output .= '<td>'.WebGUI::Form::submit($session,{value=>$i18n->get('select')}).'</td>';
 	$output .= '</tr>';
 	$output .= '</table>';
 	$output .= WebGUI::Form::formFooter;
@@ -680,7 +680,7 @@ sub www_selectPaymentGateway {
 			push(@pluginLoop, {
 				name		=> $_->name,
 				namespace	=> $_->namespace,
-				formElement	=> WebGUI::Form::radio({name=>'paymentGateway', value=>$_->namespace})
+				formElement	=> WebGUI::Form::radio($session,{name=>'paymentGateway', value=>$_->namespace})
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
@@ -692,8 +692,8 @@ sub www_selectPaymentGateway {
 	$var{message} = $i18n->get('select payment gateway');
 	$var{pluginsAvailable} = @$plugins;
 	$var{noPluginsMessage} = $i18n->get('no payment gateway');
-	$var{formHeader} = WebGUI::Form::formHeader.WebGUI::Form::hidden({name=>'op', value=>'selectPaymentGatewaySave'});
-	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('payment gateway select')});
+	$var{formHeader} = WebGUI::Form::formHeader.WebGUI::Form::hidden($session,{name=>'op', value=>'selectPaymentGatewaySave'});
+	$var{formSubmit} = WebGUI::Form::submit($session,{value=>$i18n->get('payment gateway select')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectPaymentGatewayTemplateId"))->process(\%var));
@@ -726,7 +726,7 @@ sub www_selectShippingMethod {
 			push(@pluginLoop, {
 				name		=> $_->name,
 				namespace	=> $_->namespace,
-				formElement	=> WebGUI::Form::radio({name=>'shippingMethod', value=>$_->namespace})
+				formElement	=> WebGUI::Form::radio($session,{name=>'shippingMethod', value=>$_->namespace})
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
@@ -738,8 +738,8 @@ sub www_selectShippingMethod {
 	$var{message} = $i18n->get('select shipping method');
 	$var{pluginsAvailable} = @$plugins;
 	$var{noPluginsMessage} = $i18n->get('no shipping methods available');
-	$var{formHeader} = WebGUI::Form::formHeader.WebGUI::Form::hidden({name=>'op', value=>'selectShippingMethodSave'});
-	$var{formSubmit} = WebGUI::Form::submit({value=>$i18n->get('shipping select button')});
+	$var{formHeader} = WebGUI::Form::formHeader.WebGUI::Form::hidden($session,{name=>'op', value=>'selectShippingMethodSave'});
+	$var{formSubmit} = WebGUI::Form::submit($session,{value=>$i18n->get('shipping select button')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectShippingMethodTemplateId"))->process(\%var));
@@ -816,13 +816,13 @@ sub www_viewCart {
 	$var{'cartEmpty'} = !(scalar(@$normal) || scalar(@$recurring));
 	$var{'cartEmpty.message'} = $i18n->get('shopping cart empty');
 	
-	$var{'updateForm.header'} = WebGUI::Form::formHeader().
-		WebGUI::Form::hidden({name => 'op', value => 'updateCart'});
-	$var{'updateForm.button'} = WebGUI::Form::submit({value => $i18n->get('update cart')});
+	$var{'updateForm.header'} = WebGUI::Form::formHeader($session,).
+		WebGUI::Form::hidden($session,{name => 'op', value => 'updateCart'});
+	$var{'updateForm.button'} = WebGUI::Form::submit($session,{value => $i18n->get('update cart')});
 	$var{'updateForm.footer'} = WebGUI::Form::formFooter;
-	$var{'checkoutForm.header'} = WebGUI::Form::formHeader().
-		WebGUI::Form::hidden({name => 'op', value => 'checkout'});
-	$var{'checkoutForm.button'} = WebGUI::Form::submit({value => $i18n->get('checkout')});
+	$var{'checkoutForm.header'} = WebGUI::Form::formHeader($session,).
+		WebGUI::Form::hidden($session,{name => 'op', value => 'checkout'});
+	$var{'checkoutForm.button'} = WebGUI::Form::submit($session,{value => $i18n->get('checkout')});
 	$var{'checkoutForm.footer'} = WebGUI::Form::formFooter;
 	
 	$var{normalItemsLoop} = $normal;

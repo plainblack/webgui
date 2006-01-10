@@ -629,7 +629,7 @@ sub www_manageGroupsInGroup {
 sub www_manageUsersInGroup {
 	my $session = shift;
         return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3) || _hasSecondaryPrivilege($session->form->process("gid")));
-	my $output = WebGUI::Form::formHeader()
+	my $output = WebGUI::Form::formHeader($session,)
 		.WebGUI::Form::hidden({
 			name=>"gid",
 			value=>$session->form->process("gid")
@@ -658,7 +658,7 @@ sub www_manageUsersInGroup {
                 $output .= '<td class="tableData"><a href="'.$session->url->page('op=editUser;uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';
                 $output .= '<td class="tableData">'$session->datetime->epochToHuman($row->{expireDate},"%z").'</td></tr>';
         }
-        $output .= '</table>'.WebGUI::Form::formFooter();
+        $output .= '</table>'.WebGUI::Form::formFooter($session,);
 	$output .= $p->getBarTraditional;
 	$output .= '<p><h1>'.WebGUI::International::get(976).'</h1>';
 	$output .= WebGUI::Operation::User::getUserSearchForm("manageUsersInGroup",{gid=>$session->form->process("gid")});

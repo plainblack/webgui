@@ -236,7 +236,7 @@ sub view {
 	$var{query} = $query;
  
 	# Set some standard vars
-	$var{submit} = WebGUI::Form::submit({value=>WebGUI::International::get(16, "Asset_IndexedSearch")});
+	$var{submit} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(16, "Asset_IndexedSearch")});
 	$var{actionURL} = $self->getUrl;
 	$var{"int.search"} = WebGUI::International::get(16,"Asset_IndexedSearch");
 	$var{numberOfResults} = '0';

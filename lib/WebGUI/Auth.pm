@@ -191,15 +191,15 @@ sub createAccount {
 	my $vars = $_[1];
 	$vars->{title} = WebGUI::International::get(54);
    	
-	$vars->{'create.form.header'} = WebGUI::Form::formHeader({});
-	$vars->{'create.form.header'} .= WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-    $vars->{'create.form.header'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
+	$vars->{'create.form.header'} = WebGUI::Form::formHeader($self->session,{});
+	$vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+    $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
 	
 	#User Defined Options
     $vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields();
 	
-	$vars->{'create.form.submit'} = WebGUI::Form::submit({});
-    $vars->{'create.form.footer'} = WebGUI::Form::formFooter();
+	$vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
+    $vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
 	
     $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
     $vars->{'login.label'} = WebGUI::International::get(58);
@@ -343,15 +343,15 @@ sub displayAccount {
    
    $vars->{title} = WebGUI::International::get(61);
    
-   $vars->{'account.form.header'} = WebGUI::Form::formHeader({});
-   $vars->{'account.form.header'} .= WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-   $vars->{'account.form.header'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
+   $vars->{'account.form.header'} = WebGUI::Form::formHeader($self->session,{});
+   $vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+   $vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
    if($self->session->setting->get("useKarma")){
       $vars->{'account.form.karma'} = $self->session->user->karma;
 	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
    }
-   $vars->{'account.form.submit'} = WebGUI::Form::submit({});
-   $vars->{'account.form.footer'} = WebGUI::Form::formFooter();
+   $vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
+   $vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
    
    $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
    return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
@@ -386,15 +386,15 @@ sub displayLogin {
                 $action = $self->session->url->page(undef,1);
                 $action =~ s/http:/https:/;
         }
-	$vars->{'login.form.header'} = WebGUI::Form::formHeader({action=>$action});
-    	$vars->{'login.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"auth"});
-	$vars->{'login.form.hidden'} .= WebGUI::Form::hidden({"name"=>"method","value"=>$method});
-	$vars->{'login.form.username'} = WebGUI::Form::text({"name"=>"username"});
+	$vars->{'login.form.header'} = WebGUI::Form::formHeader($self->session,{action=>$action});
+    	$vars->{'login.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+	$vars->{'login.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
+	$vars->{'login.form.username'} = WebGUI::Form::text($self->session,{"name"=>"username"});
     	$vars->{'login.form.username.label'} = WebGUI::International::get(50);
-    	$vars->{'login.form.password'} = WebGUI::Form::password({"name"=>"identifier"});
+    	$vars->{'login.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
     	$vars->{'login.form.password.label'} = WebGUI::International::get(51);
-	$vars->{'login.form.submit'} = WebGUI::Form::submit({"value"=>WebGUI::International::get(52)});
-	$vars->{'login.form.footer'} = WebGUI::Form::formFooter();
+	$vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>WebGUI::International::get(52)});
+	$vars->{'login.form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
 	$vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
 	$vars->{'createAccount.label'} = WebGUI::International::get(67);

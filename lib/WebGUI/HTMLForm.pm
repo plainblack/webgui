@@ -155,7 +155,7 @@ sub new {
 		});
 	$header .= "\n<table ".$param{tableExtras}.'><tbody>';
 	$footer = "</tbody></table>\n" ;
-	$footer .= WebGUI::Form::formFooter();
+	$footer .= WebGUI::Form::formFooter($self->session,);
         bless {_uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;
 }
 

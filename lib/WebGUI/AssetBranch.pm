@@ -103,7 +103,7 @@ sub www_editBranch {
         $tabform->getTab("properties")->readOnly(
                 -label=>WebGUI::International::get(104,"Asset"),
                 -uiLevel=>9,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_url"}),
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_url"}),
 		-value=>WebGUI::Form::selectBox({
                 	name=>"baseUrlBy",
 			extras=>'onchange="toggleSpecificBaseUrl()"',
@@ -137,21 +137,21 @@ sub www_editBranch {
                 -value=>$self->get("isHidden"),
                 -label=>WebGUI::International::get(886,"Asset"),
                 -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_isHidden"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_isHidden"})
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"newWindow",
                 -value=>$self->get("newWindow"),
                 -label=>WebGUI::International::get(940,"Asset"),
                 -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_newWindow"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_newWindow"})
                 );
 	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
                 -label=>WebGUI::International::get(174,"Asset"),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_displayTitle"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_displayTitle"})
                 );
          $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
@@ -159,7 +159,7 @@ sub www_editBranch {
 		-value=>$self->getValue("styleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_styleTemplateId"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_styleTemplateId"})
 		);
          $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
@@ -167,21 +167,21 @@ sub www_editBranch {
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_printableStyleTemplateId"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_printableStyleTemplateId"})
 		);
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeout",
                 -label=>WebGUI::International::get(895,"Asset"),
                 -value=>$self->getValue("cacheTimeout"),
                 -uiLevel=>8,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeout"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_cacheTimeout"})
                 );
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeoutVisitor",
                 -label=>WebGUI::International::get(896,"Asset"),
                 -value=>$self->getValue("cacheTimeoutVisitor"),
                 -uiLevel=>8,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeoutVisitor"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_cacheTimeoutVisitor"})
                 );
 	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
         $tabform->getTab("security")->yesNo(
@@ -189,21 +189,21 @@ sub www_editBranch {
                 -value=>$self->get("encryptPage"),
                 -label=>WebGUI::International::get('encrypt page',"Asset"),
                 -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_encryptPage"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_encryptPage"})
                 );
 	$tabform->getTab("security")->dateTime(
                 -name=>"startDate",
                 -label=>WebGUI::International::get(497,"Asset"),
                 -value=>$self->get("startDate"),
                 -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_startDate"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_startDate"})
                 );
         $tabform->getTab("security")->dateTime(
                 -name=>"endDate",
                 -label=>WebGUI::International::get(498,"Asset"),
                 -value=>$self->get("endDate"),
                 -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_endDate"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_endDate"})
                 );
 	my $subtext;
         if (WebGUI::Grouping::isInGroup(3)) {
@@ -227,14 +227,14 @@ sub www_editBranch {
                -value=>[$self->get("ownerUserId")],
                -subtext=>$subtext,
                -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_ownerUserId"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_ownerUserId"})
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdView",
                -label=>WebGUI::International::get(872,"Asset"),
                -value=>[$self->get("groupIdView")],
                -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_groupIdView"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_groupIdView"})
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdEdit",
@@ -242,7 +242,7 @@ sub www_editBranch {
                -value=>[$self->get("groupIdEdit")],
                -excludeGroups=>[1,7],
                -uiLevel=>6,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_groupIdEdit"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_groupIdEdit"})
 		);
         $tabform->addTab("meta",WebGUI::International::get("Metadata","Asset"),3);
         $tabform->getTab("meta")->textarea(
@@ -251,7 +251,7 @@ sub www_editBranch {
                 -hoverHelp=>WebGUI::International::get('extra head tags description',"Asset"),
                 -value=>$self->get("extraHeadTags"),
                 -uiLevel=>5,
-		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_extraHeadTags"})
+		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_extraHeadTags"})
                 );
         if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
@@ -271,7 +271,7 @@ sub www_editBranch {
                                  extras=>qq/title="$meta->{$field}{description}"/,
                                  possibleValues=>$meta->{$field}{possibleValues},
                                  options=>$options,
-				 subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_metadata_".$meta->{$field}{fieldId}}),
+				 subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo($self->session,{name=>"change_metadata_".$meta->{$field}{fieldId}}),
 				fieldType=>$fieldType
                                 );
                 }

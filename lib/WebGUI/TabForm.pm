@@ -109,14 +109,14 @@ sub addTab {
 
 Replaces the default form header with a new definition.
 
-B<NOTE:> This uses the same syntax of the WebGUI::Form::formHeader() method.
+B<NOTE:> This uses the same syntax of the WebGUI::Form::formHeader($self->session,) method.
 
 =cut
 
 sub formHeader {
 	my $self = shift;
 	my $form = shift;
-        $self->{_form} = WebGUI::Form::formHeader($form);
+        $self->{_form} = WebGUI::Form::formHeader($self->session,$form);
 }
 
 
@@ -145,14 +145,14 @@ sub getTab {
 
 Adds a hidden field to the form.
 
-B<NOTE:> This uses the same syntax of the WebGUI::Form::hidden() method.
+B<NOTE:> This uses the same syntax of the WebGUI::Form::hidden($self->session,) method.
 
 =cut
 
 sub hidden {
 	my $self = shift;
 	my $params = shift;
-	$self->{_hidden} .= WebGUI::Form::Hidden($params);
+	$self->{_hidden} .= WebGUI::Form::Hidden($self->session,$params);
 }
 
 
@@ -205,7 +205,7 @@ sub new {
 			value=>WebGUI::International::get('cancel'),
 			extras=>q|onclick="history.go(-1);"|
 			});
-	bless {	_uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit(), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
+	bless {	_uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit($self->session,), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
 
 
@@ -239,7 +239,7 @@ sub print {
 	}
 	$output .= '<div class="tabs">'.$tabs.$self->{_submit}."&nbsp;&nbsp;".$self->{_cancel}.'</div>';
 	$output .= $form;
-	$output .= WebGUI::Form::formFooter();
+	$output .= WebGUI::Form::formFooter($self->session,);
 	$output .= '<script type="text/javascript">var numberOfTabs = '.($i-1).'; initTabs();</script>';
 	$output .= '<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wz_tooltip.js"></script>';
 	return $output;
@@ -252,14 +252,14 @@ sub print {
 
 Replaces the default submit button with a new definition.
 
-B<NOTE:> This uses the same syntax of the WebGUI::Form::submit() method.
+B<NOTE:> This uses the same syntax of the WebGUI::Form::submit($self->session,) method.
 
 =cut
 
 sub submit {
 	my $self = shift;
 	my $submit = shift;
-	$self->{_submit} = WebGUI::Form::Submit($submit);
+	$self->{_submit} = WebGUI::Form::Submit($self->session,$submit);
 }
 
 

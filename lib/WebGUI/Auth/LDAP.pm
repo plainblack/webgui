@@ -222,12 +222,12 @@ sub createAccount {
 					value=>[$connection->{ldapLinkId}],
 					extras=>qq|onchange="location.href='$url'+this.options[this.selectedIndex].value"|
 				  });
-    $vars->{'create.form.ldapId'} = WebGUI::Form::text({"name"=>"authLDAP_ldapId","value"=>$session{form}{"authLDAP_ldapId"}});
+    $vars->{'create.form.ldapId'} = WebGUI::Form::text($self->session,{"name"=>"authLDAP_ldapId","value"=>$session{form}{"authLDAP_ldapId"}});
     $vars->{'create.form.ldapId.label'} = $connection->{ldapIdentityName};
-    $vars->{'create.form.password'} = WebGUI::Form::password({"name"=>"authLDAP_identifier","value"=>$session{form}{"authLDAP_identifier"}});
+    $vars->{'create.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authLDAP_identifier","value"=>$session{form}{"authLDAP_identifier"}});
     $vars->{'create.form.password.label'} = $connection->{ldapPasswordName};
     
-    $vars->{'create.form.hidden'} = WebGUI::Form::hidden({"name"=>"confirm","value"=>$self->session->form->process("confirm")});
+    $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$self->session->form->process("confirm")});
     return $self->SUPER::createAccount("createAccountSave",$vars);
 }
 

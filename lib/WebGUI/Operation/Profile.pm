@@ -102,11 +102,11 @@ sub www_editProfile {
 	my $vars = {};
 	$vars->{displayTitle} .= '<h1>'.WebGUI::International::get(338).'</h1>';
 	$vars->{'profile.message'} = $_[0] if($_[0]);
-	$vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader({});
-	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter();
+	$vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader($session,{});
+	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter($session,);
 
-	$vars->{'profile.form.hidden'} = WebGUI::Form::hidden({"name"=>"op","value"=>"editProfileSave"});
-	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden({"name"=>"uid","value"=>$session->user->profileField("userId")});
+	$vars->{'profile.form.hidden'} = WebGUI::Form::hidden($session,{"name"=>"op","value"=>"editProfileSave"});
+	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden($session,{"name"=>"uid","value"=>$session->user->profileField("userId")});
 	my @array = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
 		next unless $category->isEditable;
@@ -126,7 +126,7 @@ sub www_editProfile {
 			});
 	}
 	$vars->{'profile.form.elements'} = \@array;
-	$vars->{'profile.form.submit'} = WebGUI::Form::submit({});
+	$vars->{'profile.form.submit'} = WebGUI::Form::submit($session,{});
 	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000051")->process($vars));
 }

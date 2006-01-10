@@ -670,12 +670,12 @@ sub view {
 			$var->{question_loop} = $self->getQuestionsLoop($var->{'response.Id'});
 		}
 	}
-	$var->{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
+	$var->{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::hidden({
 			name=>'func',
 			value=>'respond'
 			});
-	$var->{'form.footer'} = WebGUI::Form::formFooter();
+	$var->{'form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$var->{'form.submit'} = WebGUI::Form::submit({
 			value=>WebGUI::International::get(50,'Asset_Survey')
 			});
