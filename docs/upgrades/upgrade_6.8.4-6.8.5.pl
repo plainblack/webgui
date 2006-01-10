@@ -23,15 +23,16 @@ start(); # this line required
 
 # upgrade functions go here
 
+modifyDataFormSecurity();
+
 finish(); # this line required
 
-
-##-------------------------------------------------
-#sub exampleFunction {
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
-
+#-------------------------------------------------
+sub modifyDataFormSecurity {
+	print "\tAdding Who Can View Form Entries property to DataForm Wobject.\n" unless ($quiet);
+	my $sql = "alter table DataForm add column (groupToViewEntries varchar(22) not null default '7')";
+	WebGUI::SQL->write($sql);
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

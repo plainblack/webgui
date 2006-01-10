@@ -16,6 +16,7 @@ use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::FormProcessor;
+use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
@@ -169,7 +170,11 @@ sub definition {
 			defaultView=>{
 				defaultValue=>0,
 				fieldType=>"integer"
-				}
+				},
+			groupToViewEntries=>{
+				defaultValue=>7,
+				fieldType=>"group"
+				},
 			}
 		});
         return $class->SUPER::definition($definition);
@@ -260,6 +265,12 @@ sub getEditForm {
 		-label=>WebGUI::International::get(74,"Asset_DataForm"),
 		-hoverHelp=>WebGUI::International::get('74 description',"Asset_DataForm"),
 		-value=>$self->getValue("mailData")
+		);
+	$tabform->getTab("security")->group(
+		-name=>"groupToViewEntries",
+		-label=>WebGUI::International::get('group to view entries', "Asset_DataForm"),
+		-hoverHelp=>WebGUI::International::get('group to view entries description',"Asset_DataForm"),
+		-value=>$self->getValue("groupToViewEntries")
 		);
 	if ($self->getId eq "new" && $session{form}{proceed} ne "manageAssets") {
         	$tabform->getTab("properties")->whatNext(
@@ -652,6 +663,7 @@ sub view {
 
 sub viewList {
 	my $self = shift;
+	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup($self->get("groupToViewEntries")));
         return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
 }
 
