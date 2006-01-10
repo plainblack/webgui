@@ -14,6 +14,15 @@ save you many hours of grief.
 	migration.txt to bring your custom code up to date with the
 	new API.
 
+6.8.4
+--------------------------------------------------------------------
+ * The If macro has been removed because it's far too dangerous and
+   	error prone. If you use the If macro you may continue to use
+        it at your own risk, maintenance, and support cost, but it
+        is no longer supported by Plain Black.
+
+
+
 
 6.8.1
 --------------------------------------------------------------------
