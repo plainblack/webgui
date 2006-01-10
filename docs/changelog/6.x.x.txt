@@ -4,7 +4,6 @@
 
 
 6.8.4
-=======
  - fix [ 1395371 ] XSS Vulnerability in DataForm Entries
  - When working with a redirect in admin mode, you're now presented with a
    decision page regarding the redirect to help make working with redirects a
@@ -13,8 +12,8 @@
    ilance.nl)
  - fix [ 1379915 ] Survey can only be completed once per user
  - Fixed broken UI Level examples in the config file.
- - fixed a bug in SyncProfilesToLDAP script
- - fix [ 1387242 ] uploadsHandler fails 
+ - fixed a bug in SyncProfilesToLDAP
+ - fix [ 1387242 ] uploadsHandler fails
  - fix [ 1389086 ] 6.8.3 RichEdit buttons disappear
  - fix [ 1379915 ] Survey can only be completed once per user
  - fix [ 1389371 ] Pictures & Avatars Don't Work
@@ -23,9 +22,12 @@
  - fix [ 1387505 ] Hover help not working on Matrix
  - fix [ 1393867 ] Data Form Not Emailing
  - fix [ 1392643 ] 2006 Calendar dates are not correct?
- - fix [ 1384794 ] editSave on an existing File or Image asset loses storageId.
+ - fix [ 1384794 ] editSave on an existing File or Image asset loses
+   storageId.
  - Removed the If macro, since it was scheduled for removal in 6.8.0.
  - fix [ 1396620 ] Package WebGUI::Form::DynamicField
+ - fix[ 1386505 ] time off by 6 hours
+ - fix [ 1397275 ] Rich Text Editor Settings Dissapear (6.8.3-gamma)
 
 
 6.8.3

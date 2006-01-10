@@ -30,7 +30,7 @@ finish(); # this line required
 
 #-------------------------------------------------
 sub fixDefaultThreadTemplate {
-	print "\Enable Avatars in the default Thread template.\n" unless ($quiet);
+	print "\tEnable Avatars in the default Thread template.\n" unless ($quiet);
 my $template = <<EOT1;
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a> 
 
