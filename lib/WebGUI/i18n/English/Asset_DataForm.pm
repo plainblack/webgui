@@ -1,6 +1,16 @@
 package WebGUI::i18n::English::Asset_DataForm;
 
 our $I18N = {
+        'group to view entries' => {
+                message => q|Group To View DataForm Entries|,
+                lastUpdated => 1057208065
+        },
+        
+        'group to view entries description' => {
+                message => q|Members of this group will have the ability to view data submitted to this DataForm Asset.|,
+                lastUpdated => 1057208065
+        },
+        
 	'90' => {
 		message => q|Delete this entry.|,
 		lastUpdated => 1057208065
