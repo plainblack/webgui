@@ -214,7 +214,7 @@ sub formatContent {
         my $msg = WebGUI::HTML::filter($content,$self->getThread->getParent->get("filterCode"));
         $msg = WebGUI::HTML::format($msg, $contentType);
         if ($self->getThread->getParent->get("useContentFilter")) {
-                $msg = WebGUI::HTML::processReplacements($msg);
+                $msg = WebGUI::HTML::processReplacements($self->session,$msg);
         }
         return $msg;
 }

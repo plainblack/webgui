@@ -17,10 +17,7 @@ package WebGUI::HTML;
 use HTML::TagFilter;
 use strict;
 use WebGUI::Macro;
-use WebGUI::Session;
-use WebGUI::SQL;
 use HTML::Parser;
-use WebGUI::URL;
 
 =head1 NAME
 
@@ -37,8 +34,8 @@ A package for manipulating and massaging HTML.
  $html = WebGUI::HTML::filter($html);
  $html = WebGUI::HTML::format($content, $contentType);
  $html = WebGUI::HTML::html2text($html);
- $html = WebGUI::HTML::makeAbsolute($html);
- $html = WebGUI::HTML::processReplacements($html);
+ $html = WebGUI::HTML::makeAbsolute($session, $html);
+ $html = WebGUI::HTML::processReplacements($session, $html);
 
 =head1 METHODS
 
@@ -189,22 +186,25 @@ The html segment you want to convert to text.
 
 =cut
 
+# for recursive function
+my $text = "";
+my $inside = {};
+
 sub html2text {
 	my $html = shift;
-	$session{temp}{html2text}{text} = "";
-	delete($session{temp}{html2text}{inside});
-
+	$text = "";
+	$inside = {};
 	my $tagHandler = sub {
 		my($tag, $num) = @_;
-		$session{temp}{html2text}{inside}{$tag} += $num;
+		$inside->{$tag} += $num;
 		if($tag eq "br" || $tag eq "p") {
-			$session{temp}{html2text}{text} .= "\n";
+			$text .= "\n";
 		}
 	};
 	my $textHandler = sub {
-		return if $session{temp}{html2text}{inside}{script} || $session{temp}{html2text}{inside}{style};
+		return if $inside->{script} || $inside->{style};
 		if ($_[0] =~ /\S+/) {
-			$session{temp}{html2text}{text} .= $_[0];
+			$text .= $_[0];
 		}
 	};
 
@@ -216,14 +216,18 @@ sub html2text {
 		  marked_sections => 1,
 	)->parse($html);
 
-	return $session{temp}{html2text}{text};
+	return $text;
 }
 
 #-------------------------------------------------------------------
                                                                                                                              
-=head2 makeAbsolute ( html , [ baseURL ] )
+=head2 makeAbsolute ( session, html , [ baseURL ] )
                                                                                                                              
 Returns html with all relative links converted to absolute.
+
+=head3 session
+
+A reference to the current session.
                                                                                                                              
 =head3 html
                                                                                                                              
@@ -234,12 +238,15 @@ The html to be made absolute.
 The base URL to use. Defaults to current page's url.                                                                                      
 
 =cut
-                                                                                                                             
+
+my $absolute = "";
+                                                                                                 
 sub makeAbsolute {
+	my $session = shift;
 	my $html = shift;
 	my $baseURL = shift; 
 
-	$session{temp}{makeAbsolute}{html} = "";
+	$absolute = "";
 
 	my $linkParser = sub {
 		my ($tagname, $attr, $text) = @_;
@@ -261,7 +268,7 @@ sub makeAbsolute {
 		);
 
 		if(not exists $linkElements{$tagname}) {	# no need to touch this tag
-			$session{temp}{makeAbsolute}{html} .= $text;
+			$absolute .= $text;
 			return;
 		}
 		
@@ -274,34 +281,38 @@ sub makeAbsolute {
 			}
 		}
 
-		$session{temp}{makeAbsolute}{html} .= "<".$tagname;
+		$absolute .= "<".$tagname;
 
 		foreach (keys %$attr) {
 			if($_ eq '/') {
-				$session{temp}{makeAbsolute}{html} .= '/';
+				$absolute .= '/';
 				next;
 			}
 			if ($tag_attr{"$tagname $_"}) {	# make this absolute
-				$attr->{$_} = $self->session->url->makeAbsolute($attr->{$_}, $baseURL);
+				$attr->{$_} = $session->url->makeAbsolute($attr->{$_}, $baseURL);
 			}
-			$session{temp}{makeAbsolute}{html} .= qq' $_="$attr->{$_}"';
+			$absolute .= qq' $_="$attr->{$_}"';
 		}
 	
-		$session{temp}{makeAbsolute}{html} .= '>';
+		$absolute .= '>';
 	};
 	HTML::Parser->new(
-			default_h => [ sub { $session{temp}{makeAbsolute}{html} .= shift }, 'text' ],
+			default_h => [ sub { $absolute .= shift }, 'text' ],
 			start_h   => [ $linkParser , 'tagname, attr, text' ],
 		)->parse($html);
 
-	return $session{temp}{makeAbsolute}{html};
+	return $absolute;
 }
 
 #-------------------------------------------------------------------
 
-=head2 processReplacements ( content ) 
+=head2 processReplacements ( session, content ) 
 
 Processes text using the WebGUI replacements system.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 content
 
@@ -310,20 +321,22 @@ The content to be processed through the replacements filter.
 =cut
 
 sub processReplacements {
+	my $session = shift;
 	my ($content) = @_;
-	if (exists $session{replacements}) {
-		my $replacements = $session{replacements};
+	my $replacements = $session->stow->get("replacements");
+	if (defined $replacements) {
 		foreach my $searchFor (keys %{$replacements}) {
 			my $replaceWith = $replacements->{$searchFor};
 			$content =~ s/\Q$searchFor/$replaceWith/gs;
 		}
 	} else {
-		my $sth = $self->session->db->read("select searchFor,replaceWith from replacements",$self->session->db->getSlave);
+		my $sth = $session->db->read("select searchFor,replaceWith from replacements",$session->db->getSlave);
         	while (my ($searchFor,$replaceWith) = $sth->array) {
-			$session{replacements}{$searchFor} = $replaceWith;
+			$replacements->{$searchFor} = $replaceWith;
         		$content =~ s/\Q$searchFor/$replaceWith/gs;
         	}
         	$sth->finish;
+		$session->stow->set("replacements",$replacements);
 	}
 	return $content;
 }
