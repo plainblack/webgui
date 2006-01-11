@@ -19,17 +19,10 @@ use WebGUI::Affiliate;
 use WebGUI::Asset;
 use WebGUI::Cache;
 use WebGUI::Config;
-use WebGUI::ErrorHandler;
-use WebGUI::Grouping;
-use WebGUI::HTTP;
 use WebGUI::International;
 use WebGUI::Operation;
 use WebGUI::Privilege;
 use WebGUI::Session;
-use WebGUI::Setting;
-use WebGUI::SQL;
-use WebGUI::Style;
-use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::PassiveProfiling;
 use Apache2::Request;
@@ -74,9 +67,9 @@ sub contentHandler {
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$r->print($session->http->getHeader);
 	} elsif ($session->setting->get("specialState") eq "upgrading") {
-		upgrading($r);
+		upgrading($session);
 	} elsif ($session->setting->get("specialState") eq "init") {
-		$r->print(setup());
+		setup($session);
 	} else {
 		my $output = "";
 		if ($session->errorHandler->canShowPerformanceIndicators) {
@@ -99,7 +92,7 @@ sub contentHandler {
 sub page {
 	my $session = shift;
 	my $assetUrl = shift;
-	my $output = processOperations();
+	my $output = processOperations($session);
 	if ($output eq "") {
 		my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session{form}{revision})};
 		if ($@) {
@@ -122,7 +115,7 @@ sub page {
 		$session->http->setStatus("404","Page Not Found");
 		my $notFound = WebGUI::Asset->getNotFound($session);
 		if (defined $notFound) {
-			$output = tryAssetMethod($notFound,'view');
+			$output = tryAssetMethod($session,$notFound,'view');
 		} else {
 			$session->errorHandler->error("The notFound page failed to be created!");
 			$output = "An error was encountered while processing your request.";
@@ -135,15 +128,16 @@ sub page {
 
 #-------------------------------------------------------------------
 sub processOperations {
+	my $session = shift;
 	my ($cmd, $output);
 	my $op = $session{form}{op};
 	my $opNumber = shift || 1;
 	if ($op) {
-		$output = WebGUI::Operation::execute($op);
+		$output = WebGUI::Operation::execute($session,$op);
 	}
 	$opNumber++;
 	if ($output eq "" && exists $session{form}{"op".$opNumber}) {
-		my $urlString = WebGUI::URL::unescape($session{form}{"op".$opNumber});
+		my $urlString = $session->url->unescape($session->form->get("op".$opNumber));
 		my @pairs = split(/\;/,$urlString);
 		my %form;
 		foreach my $pair (@pairs) {
@@ -151,7 +145,7 @@ sub processOperations {
 			$form{$param[0]} = $param[1];
 		}
 		$session{form} = \%form;
-		$output = processOperations($opNumber);
+		$output = processOperations($session,$opNumber);
 	}
 	return $output;
 }
@@ -159,9 +153,9 @@ sub processOperations {
 
 #-------------------------------------------------------------------
 sub setup {
+	my $session = shift;
 	require WebGUI::Operation::WebGUI;
-	my $output = WebGUI::Operation::WebGUI::www_setup();
-	return WebGUI::HTTP::getHeader().$output;
+	$session->request->print(WebGUI::Operation::WebGUI::www_setup($session));
 }
 
 
@@ -170,7 +164,7 @@ sub tryAssetMethod {
 	my $session = shift;
 	my $asset = shift;
 	my $method = shift;
-	$session{asset} = $asset;
+	$session->asset($asset);
 	my $methodToTry = "www_".$method;
 	my $output = eval{$asset->$methodToTry()};
 	if ($@) {
@@ -198,16 +192,9 @@ sub uploadsHandler {
 			my @privs = split("\n",$fileContents);
 			unless ($privs[1] eq "7" || $privs[1] eq "1") {
 				my $s = Apache2::ServerUtil->server;
-				WebGUI::Session::open($s->dir_config('WebguiRoot'),'modperl',"false");
-				$session{cookie} = APR::Request::Apache2->handle($r)->jar();
-				if ($session{cookie}{wgSession} eq "") {
-					WebGUI::Session::start(1); #setting up a visitor session
-				} else {
-					WebGUI::Session::setupSessionVars($session{cookie}{wgSession});
-				}
-				$session{req}->user($session{var}{username}) if $session{req};
-				my $hasPrivs = ($session{var}{userId} eq $privs[0] || WebGUI::Grouping::isInGroup($privs[1]) || WebGUI::Grouping::isInGroup($privs[2]));
-				WebGUI::Session::close();
+				my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
+				my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
+				$session->close();
 				if ($hasPrivs) {
 					return $ok;
 				} else {
@@ -224,11 +211,11 @@ sub uploadsHandler {
 
 #-------------------------------------------------------------------
 sub upgrading {
-	my $r = shift;
-        $r->print(WebGUI::HTTP::getHeader());
-	open(FILE,"<".$session{config}{webguiRoot}."/docs/maintenance.html");
+	my $session = shift;
+        $session->request->print($session->http->getHeader());
+	open(FILE,"<".$session->config->getWebguiRoot."/docs/maintenance.html");
 	while (<FILE>) {
-		$r->print($_);
+		$session->request->print($_);
 	}
 	close(FILE);
 }
