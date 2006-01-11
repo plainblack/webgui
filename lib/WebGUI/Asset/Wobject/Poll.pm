@@ -280,7 +280,7 @@ sub view {
         $var{question} = $self->get("question");
 	if ($self->get("active") eq "0") {
 		$showPoll = 0;
-	} elsif (WebGUI::Grouping::isInGroup($self->get("voteGroup"),$self->session->user->profileField("userId"))) {
+	} elsif ($self->session->user->isInGroup($self->get("voteGroup"),$self->session->user->profileField("userId"))) {
 		if ($self->_hasVoted()) {
 			$showPoll = 0;
 		} else {
@@ -330,7 +330,7 @@ sub view {
 sub www_vote {
 	my $self = shift;
 	my $u;
-        if ($self->session->form->process("answer") ne "" && WebGUI::Grouping::isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
+        if ($self->session->form->process("answer") ne "" && $self->session->user->isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
         	$self->setVote($self->session->form->process("answer"),$self->session->user->profileField("userId"),$self->session->env->get("REMOTE_ADDR"));
 		if ($self->session->setting->get("useKarma")) {
 			$u = WebGUI::User->new($self->session->user->profileField("userId"));

@@ -49,7 +49,7 @@ sub createSubscriptionGroup {
 	$group->showInForms(0);
 	$group->deleteGroups(['3']); # admins don't want to be auto subscribed to this thing
 	$self->update({
-		subscriptionGroupId=>$group->groupId
+		subscriptionGroupId=>$group->getId
 		});
 }
 
@@ -403,7 +403,7 @@ Returns a boolean indicating whether the user is subscribed to this thread.
 
 sub isSubscribed {
 	my $self = shift;
-	return WebGUI::Grouping::isInGroup($self->get("subscriptionGroupId"));
+	return $self->session->user->isInGroup($self->get("subscriptionGroupId"));
 }
 
 #-------------------------------------------------------------------
@@ -550,7 +550,7 @@ sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
   WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
-  WebGUI::Grouping::addUsersToGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
+  $group->addUsers([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 #-------------------------------------------------------------------
@@ -610,7 +610,7 @@ Negates the subscribe method.
 sub unsubscribe {
 	my $self = shift;
   WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
-  WebGUI::Grouping::deleteUsersFromGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
+  $group->deleteUsers([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 

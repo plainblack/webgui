@@ -182,7 +182,7 @@ return props[propName];
 }
 </script>
 ';
-if (WebGUI::Grouping::isInGroup(2)) {
+if ($self->session->user->isInGroup(2)) {
 	# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 	$var{'head.tags'} .= '
 <meta http-equiv="Pragma" content="no-cache" />

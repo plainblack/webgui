@@ -101,14 +101,14 @@ sub edit {
                	-uiLevel=>6
                	);
 	my $subtext;
-       	if (WebGUI::Grouping::isInGroup(3)) {
+       	if ($self->session->user->isInGroup(3)) {
                	 $subtext = manageIcon('op=listUsers');
         } else {
        	         $subtext = "";
        	}
        	my $clause;
-       	if (WebGUI::Grouping::isInGroup(3)) {
-               	my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
+       	if ($self->session->user->isInGroup(3)) {
+               	my $contentManagers = $group->getUsers(4,1);
                 push (@$contentManagers, $self->session->user->profileField("userId"));
        	        $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
        	} else {

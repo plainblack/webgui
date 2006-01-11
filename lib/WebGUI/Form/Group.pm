@@ -140,7 +140,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
         my $self = shift;
-        if (WebGUI::Grouping::isInGroup(3)) {
+        if ($self->session->user->isInGroup(3)) {
                 my $subtext = manageIcon("op=listGroups");
                 $self->get("subtext") = $subtext . $self->get("subtext");
         }

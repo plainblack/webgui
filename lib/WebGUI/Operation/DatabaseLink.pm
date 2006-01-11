@@ -43,7 +43,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_copyDatabaseLink {
 	my $session = shift;
-        return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->copy;
         return www_listDatabaseLinks();
 }
@@ -51,7 +51,7 @@ sub www_copyDatabaseLink {
 #-------------------------------------------------------------------
 sub www_deleteDatabaseLink {
 	my $session = shift;
-        return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
         my ($output);
         $output .= WebGUI::International::get(988).'<p>';
         $output .= '<p><div align="center"><a href="'.
@@ -65,7 +65,7 @@ sub www_deleteDatabaseLink {
 #-------------------------------------------------------------------
 sub www_deleteDatabaseLinkConfirm {
 	my $session = shift;
-        return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->delete;
         return www_listDatabaseLinks();
 }
@@ -73,7 +73,7 @@ sub www_deleteDatabaseLinkConfirm {
 #-------------------------------------------------------------------
 sub www_editDatabaseLink {
 	my $session = shift;
-        return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
         my ($output, %db, $f);
 	tie %db, 'Tie::CPHash';
 	if ($session->form->process("dlid") eq "new") {
@@ -129,7 +129,7 @@ sub www_editDatabaseLink {
 #-------------------------------------------------------------------
 sub www_editDatabaseLinkSave {
 	my $session = shift;
-        return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 	my $params = {
 		title=>$session->form->process("title"),
 		username=>$session->form->process("dbusername"),
@@ -147,7 +147,7 @@ sub www_editDatabaseLinkSave {
 #-------------------------------------------------------------------
 sub www_listDatabaseLinks {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless(WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->adminOnly() unless($session->user->isInGroup(3));
 	my $links = WebGUI::DatabaseLinks->getList($session);
         my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
 	foreach my $id (keys %{$links}) {

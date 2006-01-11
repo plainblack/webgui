@@ -159,8 +159,8 @@ sub www_viewProfile {
 
 	return $session->privilege->notMember() if($u->username eq "");
 
-	return $session->style->userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || WebGUI::Grouping::isInGroup(3)));
-	return $session->privilege->insufficient() if(!WebGUI::Grouping::isInGroup(2));
+	return $session->style->userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || $session->user->isInGroup(3)));
+	return $session->privilege->insufficient() if(!$session->user->isInGroup(2));
 
 	my @array = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {

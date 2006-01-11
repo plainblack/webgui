@@ -149,7 +149,7 @@ sub view {
 	my %var;
 	my $url = $self->getUrl('func=view');
 	
-	if (WebGUI::Grouping::isInGroup($self->getValue("reportViewerGroup"))) {
+	if ($self->session->user->isInGroup($self->getValue("reportViewerGroup"))) {
 	  $var{'viewReportURL'} = $self->getUrl("func=viewReport");
 	  $var{canViewReport} = 1;
 	}
@@ -377,7 +377,7 @@ sub www_view {
 #-------------------------------------------------------------------
 sub www_viewReport {
 	my $self = shift;
-	return "" unless (WebGUI::Grouping::isInGroup($self->getValue("reportViewerGroup")));
+	return "" unless ($self->session->user->isInGroup($self->getValue("reportViewerGroup")));
 	my %var;
 	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl, -method=>"GET");
 	my %changedBy = ();

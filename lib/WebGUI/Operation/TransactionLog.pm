@@ -96,7 +96,7 @@ sub www_deleteTransaction {
 	my $session = shift;
 	my $transactionId;
 
-	return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 
 	$transactionId = $session->form->process("tid");
 
@@ -108,7 +108,7 @@ sub www_deleteTransaction {
 #-------------------------------------------------------------------
 sub www_deleteTransactionItem {
 	my $session = shift;
-	return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 	
 	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));
 

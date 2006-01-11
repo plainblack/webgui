@@ -41,6 +41,7 @@ This package provides an object-oriented way of managing WebGUI users as well as
  $referringAffiliate =	$u->referringAffiliate;
  $status =		$u->status("somestatus");
  $username = 		$u->username("jonboy");
+ $arrayRef =  $u->getGroups;
 
  $u->addToGroups(\@arr);
  $u->deleteFromGroups(\@arr);
@@ -57,7 +58,7 @@ sub _create {
 	my $userId = shift || WebGUI::Id::generate();
 	$self->session->db->write("insert into users (userId,dateCreated) values (".$self->session->db->quote($userId).","$self->session->datetime->time().")");
 	require WebGUI::Grouping;
-	WebGUI::Grouping::addUsersToGroups([$userId],[2,7]);
+	$group->addUsers([$userId],[2,7]);
         return $userId;
 }
 
@@ -83,7 +84,7 @@ sub addToGroups {
 	my $expireOffset = shift;
 	$self->uncache;
 	require WebGUI::Grouping;
-	WebGUI::Grouping::addUsersToGroups([$self->userId],$groups,$expireOffset);
+	$group->addUsers([$self->userId],$groups,$expireOffset);
 }
 
 #-------------------------------------------------------------------
@@ -139,7 +140,7 @@ sub delete {
         $self->session->db->write("delete from users where userId=".$self->session->db->quote($self->{_userId}));
         $self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId}));
 	require WebGUI::Grouping;
-	WebGUI::Grouping::deleteUsersFromGroups([$self->{_userId}],WebGUI::Grouping::getGroupsForUser($self->{_userId}));
+	$group->deleteUsers([$self->{_userId}],$self->session->user->getGroups($self->{_userId}));
 	$self->session->db->write("delete from messageLog where userId=".$self->session->db->quote($self->{_userId}));
 
 	my $authMethod = WebGUI::Operation::Auth::getInstance($self->authMethod,$self->{_userId});
@@ -168,7 +169,39 @@ sub deleteFromGroups {
 	my $groups = shift;
 	$self->uncache;
 	require WebGUI::Grouping;
-	WebGUI::Grouping::deleteUsersFromGroups([$self->userId],$groups);
+	$group->deleteUsers([$self->userId],$groups);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getGroups ( [ withoutExpired ] )
+
+Returns an array reference containing a list of groups this user is in.
+
+=head3 withoutExpired
+
+If set to "1" then the listing will not include expired groupings. Defaults to "0".
+
+=cut
+
+sub getGroups {
+	my $self = shift;
+        my $withoutExpired = shift;
+        my $clause = "and expireDate>"$self->session->datetime->time() if ($withoutExpired);
+	my $gotGroupsForUser = $self->session->stow->get("gotGroupsForUser");
+        if (exists $gotGroupsForUser->{$self->userId}) {
+                return $gotGroupsForUser->{$self->userId};
+        } else {
+                my @groups = $self->session->db->buildArray("select groupId from groupings where userId=".$self->session->db->quote($userId)." $clause");
+		my $isInGroup = $self->session->stow("isInGroup");
+                foreach my $gid (@groups) {	
+                        $isInGroup->{$self->userId}{$gid} = 1;
+                }
+		$self->session->stow("isInGroup",$isInGroup);
+                $gotGroupsForUser->{$userId} = \@groups;
+		$self->session->stow("gotGroupsForUser",$gotGroupsForUser);
+                return \@groups;
+        }
 }
 
 #-------------------------------------------------------------------
@@ -185,6 +218,172 @@ sub identifier {
         }
         return $self->{_user}{"identifier"};
 }
+
+#-------------------------------------------------------------------
+
+=head2 isInGroup ( [ groupId ] )
+
+Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins.
+
+=head3 groupId
+
+The group that you wish to verify against the user. Defaults to group with Id 3 (the Admin group).
+
+=cut
+
+sub isInGroup {
+        my (@data, $groupId);
+        my ($gid, $secondRun) = @_;
+        $gid = 3 unless (defined $gid);
+        $uid = $self->userId;
+        ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
+        return 1 if ($gid eq '7');		# everyone is in the everyone group
+        return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
+        return 0 if ($uid eq '1');  #Visitor is in no other groups
+        return 1 if ($uid eq '3');  #Admin is in every group
+        return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
+        ### Look to see if we've already looked up this group. 
+	my $isInGroup = $self->session->stow->get("isInGroup");
+        if ($isInGroup->{$uid}{$gid} eq '1') {
+                return 1;
+        } elsif ($isInGroup->{$uid}{$gid} eq "0") {
+                return 0;
+        }
+        ### Lookup the actual groupings.
+	unless ($secondRun) {			# don't look up user groups if we've already done it once.
+	        my $groups = $self->getGroups(1);
+	        foreach (@{$groups}) {
+	                $isInGroup->{$uid}{$_} = 1;
+        	}
+        	if ($isInGroup->{$uid}{$gid} eq '1') {
+			$self->session->stow->set("isInGroup",$isInGroup);
+                	return 1;
+        	}
+	}
+        ### Get data for auxillary checks.
+	my $group = WebGUI::Group->new($gid);
+        ### Check IP Address
+        if ($group->get("ipFilter")) {
+		my $ipFilter = $group->get("ipFilter");
+                $ipFilter =~ s/\s//g;
+                $ipFilter =~ s/\./\\\./g;
+                my @ips = split(";",$ipFilter);
+                foreach my $ip (@ips) {
+                        if ($self->session->env->get("REMOTE_ADDR") =~ /^$ip/) {
+                                $isInGroup->{$uid}{$gid} = 1;
+				$self->session->stow->set("isInGroup",$isInGroup);
+                                return 1;
+                        }
+                }
+        }
+        ### Check Scratch Variables 
+        if ($group->get("scratchFilter")) {
+		my $scratchFilter = $group->get("scratchFilter");
+                $scratchFilter =~ s/\s//g;
+                my @vars = split(";",$scratchFilter);
+                foreach my $var (@vars) {
+                        my ($name, $value) = split(/\=/,$var);
+                        if ($self->session->scratch->get($name) eq $value) {
+                                $isInGroup->{$uid}{$gid} = 1;
+				$self->session->stow->set("isInGroup",$isInGroup);
+                                return 1;
+                        }
+                }
+        }
+        ### Check karma levels.
+        if ($self->session->setting->get("useKarma")) {
+                if ($self->karma >= $group->get("karmaThreshold")) {
+                        $isInGroup->{$uid}{$gid} = 1;
+			$self->session->stow->set("isInGroup",$isInGroup);
+                        return 1;
+                }
+        }
+        ### Check external database
+        if ($group->get("dbQuery") && $group->get("databaseLinkId")) {
+                # skip if not logged in and query contains a User macro
+                unless ($group->get("dbQuery") =~ /\^User/i && $uid eq '1') {
+                        my $dbLink = WebGUI::DatabaseLink->new($self->session,$group->get("databaseLinkId"));
+                        my $dbh = $dbLink->dbh;
+                        if (defined $dbh) {
+                                if ($group->get("dbQuery") =~ /select 1/i) {
+					my $query = $group->group("dbQuery");
+					WebGUI::Macro::process($self->session,\$query);
+                                        my $sth = $dbh->unconditionalRead($query);
+                                        unless ($sth->errorCode < 1) {
+                                                $self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
+                                        } else {
+                                                my ($result) = $sth->array;
+                                                if ($result == 1) {
+                                                        $isInGroup->{$uid}{$gid} = 1;
+                                                        if ($group->get("dbCacheTimeout") > 0) {
+                                                                $group->deleteUsers([$uid]);
+                                                                $group->addUsers([$uid],$group->get("dbCacheTimeout"));
+                                                        }
+                                                } else {
+                                                        $isInGroup->{$uid}{$gid} = 0;
+                                                        $group->deleteUsers([$uid]) if ($group->get("dbCacheTimeout") > 0);
+                                                }
+                                        }
+                                        $sth->finish;
+                                } else {
+                                        $self->session->errorHandler->warn("Database query for group ID $gid must use 'select 1'");
+                                }
+                                $dbLink->disconnect;
+				$self->session->stow->set("isInGroup",$isInGroup);
+                                return 1 if ($isInGroup->{$uid}{$gid});
+                        }
+                }
+        }
+	 ### Check ldap
+        if ($group->get("ldapGroup") && $group->get("ldapGroupProperty")) {
+		   # skip if not logged in
+		   unless($uid eq '1') {
+			  # skip if user is not set to LDAP
+			  if($self->authMethod eq "LDAP") {
+			     my $auth = WebGUI::Auth->new($session,"LDAP",$uid);
+				 my $params = $auth->getParams();
+				 my $ldapLink = WebGUI::LDAPLink->new($session,$params->{ldapConnection});
+				 if($ldapLink ne "") {
+					my $people = [];
+					if($group->get("ldapRecursiveProperty")) {
+					   $ldapLink->recurseProperty($group->get("ldapGroup"),$people,$group->get("ldapGroupProperty"),$group->get("ldapRecursiveProperty"));
+					} else {
+					   $people = $ldapLink->getProperty($group->get("ldapGroup"),$group->get("ldapGroupProperty"));
+					}
+					 
+				    if(isIn($params->{connectDN},@{$people})) {
+					   $isInGroup->{$uid}{$gid} = 1;
+                       if ($group{dbCacheTimeout} > 10) {
+                          $group->deleteUsers([$uid]);
+                          $group->addUsers([$uid],$group->get("dbCacheTimeout"));
+                       }
+					} else {
+					   $isInGroup->{$uid}{$gid} = 0;
+                       			   $group->deleteUsers([$uid]) if ($group->get("dbCacheTimeout") > 10);
+					}
+					$ldapLink->unbind;
+					$self->session->stow->set("isInGroup",$isInGroup);
+				    return 1 if ($isInGroup->{$uid}{$gid});
+				 }
+			  }
+		   }
+		}
+		
+        ### Check for groups of groups.
+        my $groups = $group->getGroupsIn(1);
+        foreach (@{$groups}) {
+                $isInGroup->{$uid}{$_} = $self->isInGroup($_, 1);
+                if ($isInGroup->{$uid}{$_}) {
+                        $isInGroup->{$uid}{$gid} = 1; # cache current group also so we don't have to do the group in group check again
+			$self->session->stow->set("isInGroup",$isInGroup);
+                        return 1;
+                }
+        }
+        $isInGroup->{$uid}{$gid} = 0;
+	$self->session->stow->set("isInGroup",$isInGroup);
+        return 0;
+}
+
 
 #-------------------------------------------------------------------
 

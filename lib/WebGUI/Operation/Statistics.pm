@@ -36,7 +36,7 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub www_viewStatistics {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $data);
 	my $url = "http://www.plainblack.com/downloads/latest-version.txt";
 	my $cache = WebGUI::Cache->new($session,$url,"URL");

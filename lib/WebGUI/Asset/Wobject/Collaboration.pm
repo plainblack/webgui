@@ -195,13 +195,13 @@ sub canEdit {
 #-------------------------------------------------------------------
 sub canModerate {
 	my $self = shift;
-	return WebGUI::Grouping::isInGroup($self->get("moderateGroupId"));
+	return $self->session->user->isInGroup($self->get("moderateGroupId"));
 }
 
 #-------------------------------------------------------------------
 sub canPost {
 	my $self = shift;
-	return WebGUI::Grouping::isInGroup($self->get("postGroupId")) || $self->canModerate;
+	return $self->session->user->isInGroup($self->get("postGroupId")) || $self->canModerate;
 }
 
 
@@ -227,7 +227,7 @@ sub createSubscriptionGroup {
 	$group->showInForms(0);
 	$group->deleteGroups([3]); # admins don't want to be auto subscribed to this thing
 	$self->update({
-		subscriptionGroupId=>$group->groupId
+		subscriptionGroupId=>$group->getId
 		});
 }
 
@@ -785,7 +785,7 @@ Returns a boolean indicating whether the user is subscribed to the forum.
 
 sub isSubscribed {
         my $self = shift;
-	return WebGUI::Grouping::isInGroup($self->get("subscriptionGroupId"));	
+	return $self->session->user->isInGroup($self->get("subscriptionGroupId"));	
 }
 
 #-------------------------------------------------------------------
@@ -871,7 +871,7 @@ Subscribes a user to this collaboration system.
 sub subscribe {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
-	WebGUI::Grouping::addUsersToGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
+	$group->addUsers([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 #-------------------------------------------------------------------
@@ -885,7 +885,7 @@ Unsubscribes a user from this collaboration system
 sub unsubscribe {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
-	WebGUI::Grouping::deleteUsersFromGroups([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
+	$group->deleteUsers([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
 

@@ -50,11 +50,11 @@ sub process {
 	return "" if ($param[1] eq "");
 	return "" if ($session->user->userId eq '1');
 	my $g = WebGUI::Group->find($param[0]);
-	return "" if ($g->groupId eq "");
+	return "" if ($g->getId eq "");
 	return "" unless ($g->autoAdd);
-	return "" if (WebGUI::Grouping::isInGroup($g->groupId));
+	return "" if ($session->user->isInGroup($g->getId));
 	my %var = ();
-	$var{'group.url'} = $session->url->page("op=autoAddToGroup;groupId=".$g->groupId);
+	$var{'group.url'} = $session->url->page("op=autoAddToGroup;groupId=".$g->getId);
 	$var{'group.text'} = $param[1];
 	if ($param[2]) {
 		return  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);

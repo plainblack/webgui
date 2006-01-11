@@ -47,7 +47,7 @@ A template from the Macro/AdminToggle namespace to use for formatting the link.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-         if (WebGUI::Grouping::isInGroup(12)) {
+         if ($session->user->isInGroup(12)) {
         	my %var;
                  my ($turnOn,$turnOff,$templateName) = @_;
               $turnOn ||= WebGUI::International::get(516,'Macro_AdminToggle');

@@ -27,7 +27,7 @@ our @EXPORT = qw(&menuWrapper);
  sub accountOptions {
 	my $session = shift;
 	my @array;
-	if (WebGUI::Grouping::isInGroup(12)) {
+	if ($session->user->isInGroup(12)) {
 		my %hash;
 		if ($session->var->get("adminOn")) {
 			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOffAdmin').'">'.WebGUI::International::get(12).'</a>';
@@ -63,7 +63,7 @@ our @EXPORT = qw(&menuWrapper);
 	my %logout;
 	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.WebGUI::International::get(64).'</a>'; 
 	push(@array,\%logout);
-	if ($session->setting->get("selfDeactivation") && !WebGUI::Grouping::isInGroup(3)){
+	if ($session->setting->get("selfDeactivation") && !$session->user->isInGroup(3)){
 	   my %hash;
 	   $hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
 	   push(@array,\%hash);

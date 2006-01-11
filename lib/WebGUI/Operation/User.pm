@@ -73,10 +73,10 @@ sub _submenu {
         if ($help) {
                 $ac->setHelp($help);
         }
-	if (WebGUI::Grouping::isInGroup(11)) {
+	if ($session->user->isInGroup(11)) {
 		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), WebGUI::International::get(169));
 	}
-	if (WebGUI::Grouping::isInGroup(3)) {
+	if ($session->user->isInGroup(3)) {
 		unless ($session->form->process("op") eq "listUsers" 
 			|| $session->form->process("op") eq "deleteUserConfirm") {
 			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->form->process("uid")), WebGUI::International::get(457));
@@ -227,7 +227,7 @@ Allows an administrator to assume another user.
 
 sub www_becomeUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	$session->user({userId=>$session->form->process("uid")});
 	return "";
 }
@@ -246,7 +246,7 @@ of the user to delete is expected in a URL param names 'uid'.
 sub www_deleteUser {
 	my $session = shift;
         my ($output);
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 		return _submenu($session->privilege->vitalComponent());
         } else {
@@ -271,7 +271,7 @@ after this.
 
 sub www_deleteUserConfirm {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($u);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 	   return WebGUI::AdminConsole->new($session,"users")->render($session->privilege->vitalComponent());
@@ -285,7 +285,7 @@ sub www_deleteUserConfirm {
 #-------------------------------------------------------------------
 sub www_editUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(11));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(11));
 	my $error = shift;
 	my $i18n = WebGUI::International->new("WebGUI");
 	my %tabs;
@@ -393,10 +393,10 @@ sub www_editUser {
 #-------------------------------------------------------------------
 sub www_editUserSave {
 	my $session = shift;	
-	my $isAdmin = WebGUI::Grouping::isInGroup(3);
+	my $isAdmin = $session->user->isInGroup(3);
 	my $isSecondary;
 	unless ($isAdmin) {
-		$isSecondary = (WebGUI::Grouping::isInGroup(11) && $session->form->process("uid") eq "new");
+		$isSecondary = ($session->user->isInGroup(11) && $session->form->process("uid") eq "new");
 	}
 	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
 	my ($uid) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
@@ -432,7 +432,7 @@ sub www_editUserSave {
 #-------------------------------------------------------------------
 sub www_editUserKarma {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
         $f = WebGUI::HTMLForm->new;
         $f->hidden(
@@ -461,7 +461,7 @@ sub www_editUserKarma {
 #-------------------------------------------------------------------
 sub www_editUserKarmaSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($u);
         $u = WebGUI::User->new($session->form->process("uid"));
         $u->karma($session->form->process("amount"),$session->user->profileField("username")." (".$session->user->profileField("userId").")",$session->form->process("description"));
@@ -471,8 +471,8 @@ sub www_editUserKarmaSave {
 #-------------------------------------------------------------------
 sub www_listUsers {
 	my $session = shift;
-	unless (WebGUI::Grouping::isInGroup(3)) {
-		if (WebGUI::Grouping::isInGroup(11)) {
+	unless ($session->user->isInGroup(3)) {
+		if ($session->user->isInGroup(11)) {
 			$session->form->process("uid") = "new";
 			return www_editUser();
 		}

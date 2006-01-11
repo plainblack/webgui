@@ -34,7 +34,7 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #		return 1;
 #	}
 #	return 0 unless $self->canView($userId);
-#	return WebGUI::Grouping::isInGroup($self->getValue("groupIdManage"),$userId);
+#	return $self->session->user->isInGroup($self->getValue("groupIdManage"),$userId);
 #}
 
 

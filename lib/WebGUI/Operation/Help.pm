@@ -99,7 +99,7 @@ sub _getHelpName {
 #-------------------------------------------------------------------
 sub www_viewHelp {
 	my $session = shift;
-	return $session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(7));
+	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new($session,"help");
 	my $namespace = $session->form->process("namespace") || "WebGUI";
         my $i18n = WebGUI::International->new($namespace);
@@ -128,7 +128,7 @@ sub www_viewHelp {
 #-------------------------------------------------------------------
 sub www_viewHelpIndex {
 	my $session = shift;
-	return $session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(7));
+	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
         my @helpIndex;
 	my $i;
 	my @files = _getHelpFilesList();
@@ -162,7 +162,7 @@ sub www_viewHelpIndex {
 #-------------------------------------------------------------------
 sub www_viewHelpTOC {
 	my $session = shift;
-	return $session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(7));
+	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
         my @helpIndex;
 	my $i;
 	my @files = _getHelpFilesList();
@@ -192,7 +192,7 @@ sub www_viewHelpTOC {
 #-------------------------------------------------------------------
 sub www_viewHelpChapter {
 	my $session = shift;
-	return $session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(7));
+	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $namespace = $session->form->process("namespace");
 	my $help = _load($namespace);
 	my @entries = sort keys %{ $help };

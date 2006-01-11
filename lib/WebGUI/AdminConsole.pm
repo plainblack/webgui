@@ -72,7 +72,7 @@ sub _formatFunction {
 		icon=>$self->session->config->get("extrasURL")."/adminConsole/".$function->{icon},
 		'icon.small'=>$self->session->config->get("extrasURL")."/adminConsole/small/".$function->{icon},
 		url=>$url,
-		canUse=>WebGUI::Grouping::isInGroup($function->{group}),
+		canUse=>$self->session->user->isInGroup($function->{group}),
 		isCurrentOpFunc=>($self->session->form->get("op") eq $function->{op} || $self->session->form->get("func") eq $function->{func})
 	};
 }
@@ -121,7 +121,7 @@ sub getAdminConsoleParams {
 	my $self = shift;
 	return { 'title' => WebGUI::International::get("admin console","AdminConsole"),
 		url => $self->session->url->page("op=adminConsole"),
-		canUse => WebGUI::Grouping::isInGroup("12"),
+		canUse => $self->session->user->isInGroup("12"),
 		icon => $self->session->config->get("extrasURL")."/adminConsole/adminConsole.gif"
 		};
 }

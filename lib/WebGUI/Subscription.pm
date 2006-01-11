@@ -62,7 +62,7 @@ sub apply {
 	$groupId = $self->{_properties}{subscriptionGroup};
 
 	# Make user part of the right group
-	WebGUI::Grouping::addUsersToGroups([$userId], [$groupId], _getDuration($self->{_properties}{duration}));
+	$group->addUsers([$userId], [$groupId], _getDuration($self->{_properties}{duration}));
 
 	# Add karma
 	WebGUI::User->new($userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});

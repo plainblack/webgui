@@ -46,7 +46,7 @@ sub process {
 	my @param = @_;
 	my ($groupId) = $session->dbSlave->quickArray("select groupId from groups where groupName=".$session->db->quote($param[0]));
 	$groupId = 3 if ($groupId eq "");
-	if (WebGUI::Grouping::isInGroup($groupId)) { 
+	if ($session->user->isInGroup($groupId)) { 
 		return $param[1];
 	} else {
 		return $param[2];

@@ -615,10 +615,10 @@ Send notifications to the thread and forum subscribers that a new post has been 
 sub notifySubscribers {
 	my $self = shift;
         my %subscribers;
-	foreach my $userId (@{WebGUI::Grouping::getUsersInGroup($self->getThread->get("subscriptionGroupId"),undef,1)}) {
+	foreach my $userId (@{$group->getUsers($self->getThread->get("subscriptionGroupId"),undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
-	foreach my $userId (@{WebGUI::Grouping::getUsersInGroup($self->getThread->getParent->get("subscriptionGroupId"),undef,1)}) {
+	foreach my $userId (@{$group->getUsers($self->getThread->getParent->get("subscriptionGroupId"),undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
         my %lang;
@@ -836,7 +836,7 @@ Sets the status of this post to pending.
 
 sub setStatusPending {
         my ($self) = @_;
-	if (WebGUI::Grouping::isInGroup($self->getThread->getParent->get("moderateGroupId"))) {
+	if ($self->session->user->isInGroup($self->getThread->getParent->get("moderateGroupId"))) {
 		$self->setStatusApproved;
 	} else {
         	$self->update({status=>'pending'});

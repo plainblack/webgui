@@ -148,8 +148,8 @@ sub getCompareForm {
 sub hasRated {
 	my $self = shift;
 	my $listingId = shift;
-	return 1 unless (WebGUI::Grouping::isInGroup($self->get("groupToRate")));
-	my $ratingTimeout = WebGUI::Grouping::isInGroup($self->get("privilegedGroup")) ? $self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
+	return 1 unless ($self->session->user->isInGroup($self->get("groupToRate")));
+	my $ratingTimeout = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
 	my ($hasRated) = $self->session->db->quickArray("select count(*) from Matrix_rating where 
 		((userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and userId<>'1') or (userId='1' and ipAddress=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).")) and 
 		listingId=".$self->session->db->quote($listingId)." and timeStamp>".($self->session->datetime->time()-$ratingTimeout));
@@ -234,7 +234,7 @@ sub www_compare {
 		@cmsList = $self->session->form->checkList("listingId");
 	}
 	my ( %var, @prodcol, @datecol);
-	my $max = WebGUI::Grouping::isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
+	my $max = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
 	$var{isTooMany} = (scalar(@cmsList)>$max);
 	$var{isTooFew} = (scalar(@cmsList)<2);
 	$var{'compare.form'} = $self->getCompareForm(@cmsList);
@@ -441,7 +441,7 @@ sub www_edit {
 sub www_editListing {
         my $self = shift;
         my $listing= $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
+	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
@@ -570,7 +570,7 @@ sub www_editListing {
 sub www_editListingSave {
         my $self = shift;
         my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
+	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
 	my %data = (
 		listingId => $self->session->form->process("listingId"),
 		lastUpdated => $self->session->datetime->time(),
@@ -798,7 +798,7 @@ sub www_search {
 		} elsif ($count == 1) {
 			return $self->www_viewDetail($list[0]);
 		} else {
-			my $max = WebGUI::Grouping::isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
+			my $max = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
 			$var{isTooMany} = ($count>$max);
 			$var{isTooFew} = ($count<2);
 		}

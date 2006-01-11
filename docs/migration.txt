@@ -729,6 +729,25 @@ parameter to each method.
 perl -pi.bak -e 's!WebGUI\:\:Form\:\:(\w+)\((.*)\)!WebGUI::Form::$1(\$self->session,$2)!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:Form\:\:(\w+)\($!WebGUI::Form::$1(\$self->session,!g' fileNameGoesHere
 
+5.23.13 WebGUI::Group and WebGUI::Grouping API Refactored
+
+WebGUI::Grouping has been merged into WebGUI::Group and WebGUI::User.
+WebGUI::Group has also been refactored to use the new session system.
+
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:isInGroup!\$self->session->user->isInGroup!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:getGroupsForUser!\$self->session->user->getGroups!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:addGroupsToGroups!\$group->addGroups!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:addUsersToGroups!\$group->addUsers!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:deleteGroupsFromGroups!\$group->deleteGroups!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:deleteUsersFromGroups!\$group->deleteUsers!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:getGroupsForGroup!\$group->getGroupsFor!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:getGroupsInGroup!\$group->getGroupsIn!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:getUsersInGroup!\$group->getUsers!g' fileNameGoesHere
+perl -pi.bak -e 's!\-\>groupId!->getId!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:userGroupAdmin!\$group->userIsAdmin!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Grouping\:\:userGroupExpireDate!\$group->userGroupExpireDate!g' fileNameGoesHere
+
+
 
 6.  Automatic list of Assets in Help System.
 -------------------------------------

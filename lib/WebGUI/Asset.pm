@@ -80,7 +80,7 @@ sub canAdd {
 	my $userId = shift || $self->session->user->profileField("userId");
 	my $subclassGroupId = shift;
 	my $groupId = $self->session->config->get("assetAddPrivilege"){$className} || $subclassGroupId || '12';
-        return WebGUI::Grouping::isInGroup($groupId,$userId);
+        return $self->session->user->isInGroup($groupId,$userId);
 }
 
 
@@ -102,7 +102,7 @@ sub canEdit {
  	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
 	}
-        return WebGUI::Grouping::isInGroup($self->get("groupIdEdit"),$userId);
+        return $self->session->user->isInGroup($self->get("groupIdEdit"),$userId);
 }
 
 
@@ -129,7 +129,7 @@ sub canView {
                 return 1;
         } elsif ( $self->get("startDate") <$self->session->datetime->time() && 
 		$self->get("endDate") >$self->session->datetime->time() && 
-		WebGUI::Grouping::isInGroup($self->get("groupIdView"),$userId)) {
+		$self->session->user->isInGroup($self->get("groupIdView"),$userId)) {
                 return 1;
         }
         return $self->canEdit($userId);
@@ -375,7 +375,7 @@ sub getAssetAdderLinks {
 			if ($@) {
 				$self->session->errorHandler->error("Couldn't get UI level of ".$class." because ".$@);
 			} else {
-				next if ($uiLevel > $self->session->user->profileField("uiLevel") && !WebGUI::Grouping::isInGroup(3));
+				next if ($uiLevel > $self->session->user->profileField("uiLevel") && !$self->session->user->isInGroup(3));
 			}
 			my $canAdd = eval{$class->canAdd()};
 			if ($@) {
@@ -565,14 +565,14 @@ sub getEditForm {
                 -uiLevel=>6
                 );
 	my $subtext;
-        if (WebGUI::Grouping::isInGroup(3)) {
+        if ($self->session->user->isInGroup(3)) {
                  $subtext = manageIcon('op=listUsers');
         } else {
                  $subtext = "";
         }
         my $clause;
-        if (WebGUI::Grouping::isInGroup(3)) {
-                my $contentManagers = WebGUI::Grouping::getUsersInGroup(4,1);
+        if ($self->session->user->isInGroup(3)) {
+                my $contentManagers = $group->getUsers(4,1);
                 push (@$contentManagers, $self->session->user->profileField("userId"));
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
@@ -653,7 +653,7 @@ sub getEditForm {
 						fieldType=>$fieldType
                                 );
                 }
-		if (WebGUI::Grouping::isInGroup(3)) {
+		if ($self->session->user->isInGroup(3)) {
                 	# Add a quick link to add field
                 	$tabform->getTab("meta")->readOnly(
                                         -value=>'<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.

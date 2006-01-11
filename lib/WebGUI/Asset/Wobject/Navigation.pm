@@ -450,7 +450,7 @@ sub www_goBackToPage {
 sub www_preview {
 	my $self = shift;
 	$self->session->var->get("adminOn") = 0;
-	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(3));
+	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
 	my $nav = WebGUI::Navigation->new(	depth=>$self->session->form->process("depth"),
 						method=>$self->session->form->process("method"),
 						startAt=>$self->session->form->process("startAt"),

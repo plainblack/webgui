@@ -59,7 +59,7 @@ Templated display all messages for the current user.
 sub www_viewMessageLog {
 	my $session = shift;
    my (@msg, $vars);
-   return $session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(2,$session->user->profileField("userId")));
+   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->profileField("userId")));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
    my $p = WebGUI::Paginator->new($session->url->page('op=viewMessageLog'));
    my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=".$session->db->quote($session->user->profileField("userId"))." order by dateOfEntry desc";
@@ -104,7 +104,7 @@ Templated display of a single message for the user.
 sub www_viewMessageLogMessage {
 	my $session = shift;
    my ($data, $vars);
-   return $session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(2,$session->user->profileField("userId")));
+   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->profileField("userId")));
    $vars->{displayTitle} = '<h1>'.WebGUI::International::get(159).'</h1>';
    
    $data = $session->db->quickHashRef("select * from messageLog where messageLogId=".$session->db->quote($session->form->process("mlog"))." and userId=".$session->db->quote($session->user->profileField("userId")));

@@ -619,7 +619,7 @@ Returns an array reference containing all groupIds of groups the user is in.
 sub _getGroups {
 	my @groups;
 	foreach my $groupId ($self->session->db->buildArray("select groupId from groups")) {
-		push(@groups, $groupId) if (WebGUI::Grouping::isInGroup($groupId));
+		push(@groups, $groupId) if ($self->session->user->isInGroup($groupId));
 	}
 	return \@groups;
 }

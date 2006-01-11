@@ -30,14 +30,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 sub canManage {
 	my $self = shift;
 	return 0 if $self->session->user->profileField("userId") == 1;
-	return WebGUI::Grouping::isInGroup($self->get("adminsGroupId"));
+	return $self->session->user->isInGroup($self->get("adminsGroupId"));
 }
 
 #-------------------------------------------------------------------
 sub canPersonalize {
 	my $self = shift;
 	return 0 if $self->session->user->profileField("userId") == 1;
-	return WebGUI::Grouping::isInGroup($self->get("usersGroupId"));
+	return $self->session->user->isInGroup($self->get("usersGroupId"));
 }
 
 #-------------------------------------------------------------------

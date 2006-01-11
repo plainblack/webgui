@@ -28,7 +28,7 @@ use WebGUI::URL;
 #-------------------------------------------------------------------
 sub www_editSettings {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new("WebGUI");
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
@@ -297,7 +297,7 @@ sub www_editSettings {
 #-------------------------------------------------------------------
 sub www_saveSettings {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($key, $value);
 	foreach $key (keys %{$session{form}}) {
 		$value = $session{form}{$key};

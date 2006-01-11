@@ -333,7 +333,7 @@ sub www_checkoutSubmit {
 #-------------------------------------------------------------------
 sub www_completePendingTransaction {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 
 	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->completeTransaction;
 
@@ -376,7 +376,7 @@ sub www_editCommerceSettings {
 	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
 		$paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin,
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	$i18n = WebGUI::International->new('Commerce');
 	
@@ -517,7 +517,7 @@ sub www_editCommerceSettings {
 #-------------------------------------------------------------------
 sub www_editCommerceSettingsSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	foreach (keys(%{$session{form}})) {
 		# Store the plugin confiuration data in a special table for security and the general settings in the
@@ -541,7 +541,7 @@ sub www_editCommerceSettingsSave {
 sub www_listPendingTransactions {
 	my $session = shift;
 	my ($p, $transactions, $output, $properties, $i18n);
-	return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	$i18n = WebGUI::International->new("Commerce");
 
@@ -575,7 +575,7 @@ sub www_listTransactions {
 	my $session = shift;
 	my ($output, %criteria, $transaction, @transactions);
 
-	return $session->privilege->insufficient unless (WebGUI::Grouping::isInGroup(3));
+	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 
 	my $i18n = WebGUI::International->new('TransactionLog');
 

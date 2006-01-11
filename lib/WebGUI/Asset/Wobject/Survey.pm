@@ -329,7 +329,7 @@ sub getIp {
 sub getMenuVars {
 	my $self = shift;
 	my %var;
-	$var{'user.canViewReports'} = (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
+	$var{'user.canViewReports'} = ($self->session->user->isInGroup($self->get("groupToViewReports")));
 	$var{'delete.all.responses.url'} = $self->getUrl('func=deleteAllResponses');
 	$var{'delete.all.responses.label'} = WebGUI::International::get(73,'Asset_Survey');
 	$var{'export.answers.url'} = $self->getUrl('func=exportAnswers');
@@ -650,7 +650,7 @@ sub view {
 	}
 	$sth->finish;
 		
-	$var->{'user.canTakeSurvey'} = WebGUI::Grouping::isInGroup($self->get("groupToTakeSurvey"));
+	$var->{'user.canTakeSurvey'} = $self->session->user->isInGroup($self->get("groupToTakeSurvey"));
 	if ($var->{'user.canTakeSurvey'}) {
 		$var->{'response.Id'} = $self->getResponseId();
 		$var->{'response.Count'} = $self->getResponseCount;
@@ -732,14 +732,14 @@ sub www_deleteSectionConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteResponse {
-	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
         return $self->session->style->process($_[0]->confirm(WebGUI::International::get(72,'Asset_Survey'),
                 $_[0]->getUrl('func=deleteResponseConfirm;responseId='.$self->session->form->process("responseId"))),$_[0]->getValue("styleTemplateId"));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteResponseConfirm {
-	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
         $self->session->db->write("delete from Survey_response where Survey_responseId=".$self->session->db->quote($self->session->form->process("responseId")));
         $self->session->db->write("delete from Survey_questionResponse where Survey_responseId=".$self->session->db->quote($self->session->form->process("responseId")));
         return $_[0]->www_viewGradebook;
@@ -747,13 +747,13 @@ sub www_deleteResponseConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteAllResponses {
-	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
 	return $self->session->style->process($_[0]->confirm(WebGUI::International::get(74,'Asset_Survey'),$_[0]->getUrl('func=deleteAllResponsesConfirm')),$_[0]->getValue("styleTemplateId"));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteAllResponsesConfirm {
-	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
         $self->session->db->write("delete from Survey_response where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id"))); 
         $self->session->db->write("delete from Survey_questionResponse where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id"))); 
         return "";
@@ -1085,14 +1085,14 @@ sub www_editSectionSave {
 
 #-------------------------------------------------------------------
 sub www_exportAnswers {
-        return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+        return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
 	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_answers.tab"),"text/tab");
         return $self->session->db->quickTab("select * from Survey_answer where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id")));
 }
 
 #-------------------------------------------------------------------
 sub www_exportComposite {
-	return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+	return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
 	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_composite.tab"),"text/tab");
 	return $self->session->db->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
 		left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
@@ -1102,14 +1102,14 @@ sub www_exportComposite {
 
 #-------------------------------------------------------------------
 sub www_exportQuestions {
-        return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+        return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
 	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_questions.tab"),"text/tab");
         return $self->session->db->quickTab("select * from Survey_question where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id")));
 }
 
 #-------------------------------------------------------------------
 sub www_exportResponses {
-        return "" unless (WebGUI::Grouping::isInGroup($_[0]->get("groupToViewReports")));
+        return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
 	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_responses.tab"),"text/tab");
         return $self->session->db->quickTab("select * from Survey_response where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id")));
 }
@@ -1159,7 +1159,7 @@ sub www_moveSectionUp {
 #-------------------------------------------------------------------
 sub www_respond {
 	my $self = shift;
-	return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToTakeSurvey")));
+	return "" unless ($self->session->user->isInGroup($self->get("groupToTakeSurvey")));
 	my $varname = $self->getResponseIdString;
 	return "" unless ($session{scratch}{$varname});
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->profileField("userId")),0,8) : $self->session->user->profileField("userId");
@@ -1208,7 +1208,7 @@ sub www_view {
 #-------------------------------------------------------------------
 sub www_viewGradebook {
 	my $self = shift;
-        return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
+        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
 	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
 	my $var = $self->getMenuVars;
 	$var->{title} = WebGUI::International::get(71,'Asset_Survey');
@@ -1245,7 +1245,7 @@ sub www_viewGradebook {
 #-------------------------------------------------------------------
 sub www_viewIndividualSurvey {
 	my $self = shift;
-        return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
+        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
 	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
 	my $var = $self->getMenuVars;
 	$var->{'title'} = WebGUI::International::get(70,'Asset_Survey');
@@ -1304,7 +1304,7 @@ sub www_viewIndividualSurvey {
 #-------------------------------------------------------------------
 sub www_viewStatisticalOverview {
 	my $self = shift;
-        return "" unless (WebGUI::Grouping::isInGroup($self->get("groupToViewReports")));
+        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
 	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
 	my $var = $self->getMenuVars;
 	$var->{title} = WebGUI::International::get(58,'Asset_Survey');

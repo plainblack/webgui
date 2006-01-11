@@ -288,8 +288,8 @@ Moves assets in clipboard to trash. Returns www_manageClipboard() when finished.
 sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
-	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(4));
-	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && WebGUI::Grouping::isInGroup(3)))}) {
+	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
+	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)))}) {
 		$asset->trash;
 	}
 	return $self->www_manageClipboard();
@@ -307,10 +307,10 @@ Returns an AdminConsole to deal with assets in the Clipboard. If isInGroup(12) i
 sub www_manageClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
-	return $self->session->privilege->insufficient() unless (WebGUI::Grouping::isInGroup(12));
+	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
-	if ($self->session->form->process("systemClipboard") && WebGUI::Grouping::isInGroup(3)) {
+	if ($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)) {
 		$header = WebGUI::International::get(966,"Asset");
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949,"Asset"));
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), WebGUI::International::get(959,"Asset"), 

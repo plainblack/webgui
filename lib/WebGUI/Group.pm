@@ -16,11 +16,12 @@ package WebGUI::Group;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::DateTime;
+use WebGUI::Auth;
 use WebGUI::Id;
-use WebGUI::Grouping;
-use WebGUI::Session;
-use WebGUI::SQL;
+use WebGUI::LDAPLink;
+use WebGUI::Macro;
+use WebGUI::Utility;
+
 
 =head1 NAME
 
@@ -45,7 +46,7 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $integer = 	$g->expireNotifyMessage("You're outta here!");
  $integer =	$g->expireNotifyOffset(-14);
  $integer =    	$g->expireOffset(360000);
- $integer =    	$g->groupId;
+ $integer =    	$g->getId;
  $boolean = 	$g->isEditable(1);
  $integer =   	$g->karmaThreshold(5000);
  $string =     	$g->ipFilter("10.;192.168.1.");
@@ -61,6 +62,18 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $g->deleteUsers(\@arr);
  $g->delete;
 
+ $group->addGroups(\@groups, \@toGroups);
+ $group->addUsers(\@users, \@toGroups);
+ $group->deleteGroups(\@groups, \@fromGroups);
+ $group->deleteUsers(\@users, \@fromGroups);
+ $arrayRef = $group->getGroupsFor($groupId);
+ $arrayRef = $self->session->user->getGroups($userId);
+ $arrayRef = $group->getGroupsIn($groupId);
+ $arrayRef = $group->getUsers($groupId);
+ $boolean = $self->session->user->isInGroup($groupId, $userId);
+ $boolean = $group->userIsAdmin($userId,$groupId);
+ $epoch = $group->userGroupExpireDate($userId,$groupId);
+
 =head1 METHODS
 
 These methods are available from this class:
@@ -70,12 +83,23 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-        my $groupId = WebGUI::Id::generate();
-        $self->session->db->write("insert into groups (groupId,dateCreated,expireOffset,karmaThreshold) values 
-		(".$self->session->db->quote($groupId).","$self->session->datetime->time().",314496000,1000000000)");
-	WebGUI::Grouping::addGroupsToGroups([3],[$groupId]);
-        return $groupId;
+	my $self = shift;
+	$self->{_groupId} = $self->session->db->setRow("groups","groupId",{
+		groupId=>"new",
+		dateCreated=>$self->session->datetime->time(),
+		expireOffset=>314496000,
+		karmaThreshold=>1000000000,
+		groupName=>"New Group",
+		expireNotifyOffset=>-14,
+		deleteOffset=>14,
+		expireNotify=>0,
+		databaseLinkId=>0,
+		dbCacheTimeout=>3600,
+		lastUpdated=>$self->session->datetime->time()
+		});
+	$self->addGroups([3]);
 }
+
 
 #-------------------------------------------------------------------
 
@@ -85,28 +109,55 @@ Adds groups to this group.
 
 =head3 groups
 
-An array reference containing the list of group ids to add to this group.
+An array reference containing the list of group ids to add.
 
 =cut
 
 sub addGroups {
-	WebGUI::Grouping::addGroupsToGroups($_[1],[$_[0]->{_groupId}]);
+	my $self = shift;
+	my $groups = shift;
+	$self->session->stow->delete("isInGroup");
+	foreach my $gid (@{$groups}) {
+		next if ($gid eq '1');
+		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=".$self->session->db->quote($gid)." and inGroup=".$self->session->db->quote($self->getId));
+		my $recursive = isIn($self->getId, @{$self->getGroupsIn($gid,1)});
+		unless ($isIn || $recursive) {
+			$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (".$self->session->db->quote($gid).",".$self->session->db->quote($self->getId).")");
+		}
+	}
 }
+
 
 #-------------------------------------------------------------------
 
-=head2 addUsers ( users )
+=head2 addUsers ( users [, expireOffset ] )
 
 Adds users to this group.
 
-=head3 users
+=head3 users 
 
-An array reference containing the list of user ids to add to this group.
+An array reference containing a list of users.
+
+=head3 expireOffset
+
+An override for the default offset of the grouping. Specified in seconds.
 
 =cut
 
 sub addUsers {
-	WebGUI::Grouping::addUsersToGroups($_[1],[$_[0]->{_groupId}]);
+	my $self = shift;
+	my $users = shift;
+	$self->session->stow->delete("isInGroup");
+	my $expireOffset = shift || $self->get("expireOffset");
+	foreach my $uid (@{$users}) {
+		next if ($uid eq '1');
+		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($uid));
+		unless ($isIn) {
+                	$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($uid).", ".($self->session->datetime->time()+$expireOffset).")");
+		} else {
+                       	$self->userGroupExpireDate($uid,($self->session->datetime->time()+$expireOffset));
+		}
+        }
 }
 
 #-------------------------------------------------------------------
@@ -122,15 +173,12 @@ If specified, the autoAdd is set to this value.
 =cut
 
 sub autoAdd {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"autoAdd"} = $value;
-                $self->session->db->write("update groups set autoAdd=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->set("autoAdd",$value);
         }
-        return $class->{_group}{"autoAdd"};
+        return $self->get("autoAdd");
 }
 
 
@@ -147,15 +195,12 @@ If specified, the autoDelete is set to this value.
 =cut
 
 sub autoDelete {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"autoDelete"} = $value;
-                $self->session->db->write("update groups set autoDelete=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->set("autoDelete",$value);
         }
-        return $class->{_group}{"autoDelete"};
+        return $self->get("autoDelete");
 }
 
 
@@ -168,7 +213,8 @@ Returns the epoch for when this group was created.
 =cut
 
 sub dateCreated {
-        return $_[0]->{_group}{dateCreated};
+	my $self = shift;
+        return $self->get("dateCreated");
 }
 
 
@@ -181,9 +227,11 @@ Deletes this group and all references to it.
 =cut
 
 sub delete {
-        $self->session->db->write("delete from groups where groupId=".$self->session->db->quote($_[0]->{_groupId}));
-        $self->session->db->write("delete from groupings where groupId=".$self->session->db->quote($_[0]->{_groupId}));
-        $self->session->db->write("delete from groupGroupings where inGroup=".$self->session->db->quote($_[0]->{_groupId})." or groupId=".$self->session->db->quote($_[0]->{_groupId}));
+	my $self = shift;
+        $self->session->db->write("delete from groups where groupId=".$self->session->db->quote($self->getId));
+        $self->session->db->write("delete from groupings where groupId=".$self->session->db->quote($self->getId));
+        $self->session->db->write("delete from groupGroupings where inGroup=".$self->session->db->quote($self->getId)." or groupId=".$self->session->db->quote($self->getId));
+	undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -194,30 +242,44 @@ Deletes groups from this group.
 
 =head3 groups
 
-An array reference containing the list of group ids to delete from this group.
+An array reference containing the list of group ids to delete.
+
+=head3 fromGroups 
+
+An array reference containing the list of group ids to delete from.
 
 =cut
 
 sub deleteGroups {
-	WebGUI::Grouping::deleteGroupsFromGroups($_[1],[$_[0]->{_groupId}]);
+	my $self = shift;
+	my $groups = shift;
+	$self->session->stow->delete("isInGroup");
+        foreach my $gid (@{$groups}) {
+        	$self->session->db->write("delete from groupGroupings where groupId=".$self->session->db->quote($gid)." and inGroup=".$self->session->db->quote($self->getId));
+        }
 }
+
 
 #-------------------------------------------------------------------
 
 =head2 deleteUsers ( users )
 
-Deletes users from this group.
+Deletes a list of users from the specified groups.
 
 =head3 users
 
-An array reference containing the list of user ids to delete from this group.
+An array reference containing a list of users.
 
 =cut
 
 sub deleteUsers {
-	WebGUI::Grouping::deleteUsersFromGroups($_[1],[$_[0]->{_groupId}]);
+	my $self = shift;
+	my $users = shift;
+	$self->session->stow->delete("isInGroup");
+	foreach my $uid (@{$users}) {
+               	$self->session->db->write("delete from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($uid));
+	}
 }
-
 
 #-------------------------------------------------------------------
 
@@ -232,15 +294,12 @@ If specified, deleteOffset is set to this value. Defaults to "-14".
 =cut
 
 sub deleteOffset {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"deleteOffset"} = $value;
-                $self->session->db->write("update groups set deleteOffset=$value,
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("deleteOffset",$value);
         }
-        return $class->{_group}{"deleteOffset"};
+        return $self->get("deleteOffset");
 }
 
 
@@ -257,15 +316,12 @@ If specified, the description is set to this value.
 =cut
 
 sub description {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"description"} = $value;
-                $self->session->db->write("update groups set description=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->set("description",$value);
         }
-        return $class->{_group}{"description"};
+        return $self->get("description");
 }
 
 
@@ -282,15 +338,12 @@ If specified, expireNotify is set to this value.
 =cut
 
 sub expireNotify {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"expireNotify"} = $value;
-                $self->session->db->write("update groups set expireNotify=$value,
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("expireNotify", $value);
         }
-        return $class->{_group}{"expireNotify"};
+        return $self->get("expireNotify");
 }
 
 
@@ -307,15 +360,12 @@ If specified, expireNotifyMessage is set to this value.
 =cut
 
 sub expireNotifyMessage {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"expireNotifyMessage"} = $value;
-                $self->session->db->write("update groups set expireNotifyMessage=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->set("expireNotifyMessage",$value);
         }
-        return $class->{_group}{"expireNotifyMessage"};
+        return $self->get("expireNotifyMessage");
 }
 
 
@@ -333,15 +383,12 @@ If specified, expireNotifyOffset is set to this value.
 =cut
 
 sub expireNotifyOffset {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"expireNotifyOffset"} = $value;
-                $self->session->db->write("update groups set expireNotifyOffset=$value,
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->get("expireNotifyOffset",$value);
         }
-        return $class->{_group}{"expireNotifyOffset"};
+        return $self->get("expireNotifyOffset");
 }
 
 
@@ -358,22 +405,24 @@ If specified, expireOffset is set to this value.
 =cut
 
 sub expireOffset {
-        my $class = shift;
+        my $self = shift;
         my $value = shift;
         if (defined $value) {
-                $class->{_group}{"expireOffset"} = $value;
-                $self->session->db->write("update groups set expireOffset=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->set("expireOffset",$value);
         }
-        return $class->{_group}{"expireOffset"};
+        return $self->get("expireOffset");
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 find ( name )
+=head2 find ( session, name )
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 name
 
@@ -383,22 +432,146 @@ The name of the group you wish to instantiate.
 
 sub find {
 	my $class = shift;
+	my $session = shift;
 	my $name = shift;
 	my ($groupId) = $self->session->db->quickArray("select groupId from groups where groupName=".$self->session->db->quote($name));
-	return WebGUI::Group->new($groupId);
+	return WebGUI::Group->new($session,$groupId);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 groupId ( )
+=head2 get ( name ) 
+
+Returns the value the specified property.
+
+=head3 name
+
+The name of the property to retrieve.
+
+=cut
+
+sub get {
+	my $self = shift;	
+	my $name = shift;
+	unless ($self->{_group}) {
+		$self->{_group} = $self->session->db->getRow("groups","groupId",$self->getId);
+	}
+	return $self->{_group}{$name};
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 getGroupsFor ( )
+
+Returns an array reference containing a list of groups this group is in.
+
+=cut
+
+sub getGroupsFor {
+	my $self = shift;
+	return $self->session->db->buildArrayRef("select inGroup from groupGroupings where groupId=".$self->session->db->quote($self->getId));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getGroupsIn ( [ recursive ] )
+
+Returns an array reference containing a list of groups that belong to this group.
+
+=head3 recursive
+
+A boolean value to determine whether the method should return the groups directly in the group, or to follow the entire groups of groups hierarchy. Defaults to "0".
+
+=cut
+
+
+sub getGroupsIn {
+	my $self = shift;
+        my $isRecursive = shift;
+        my $loopCount = shift;
+	my $gotGroupsInGroup = $self->session->stow->get("gotGroupsInGroup");
+	if ($isRecursive && exists $gotGroupsInGroup->{recursive}{$self->getId}) {
+		return $gotGroupsInGroup->{recursive}{$self->getId};
+	} elsif (exists $gotGroupsInGroup->{recursive}{$self->getId}) {
+		return $gotGroupsInGroup->{direct}{$self->getId};
+	}
+        my $groups = $self->session->db->buildArrayRef("select groupId from groupGroupings where inGroup=".$self->session->db->quote($self->getId));
+        if ($isRecursive) {
+                $loopCount++;
+                if ($loopCount > 99) {
+                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining".  " groups in group.\nRequested groupId: ".$self->getId."\nGroups in that group: ".join(",",@$groups));
+                }
+                my @groupsOfGroups = @$groups;
+                foreach my $group (@$groups) {
+                        my $gog = WebGUI::Group->new($group)->getGroupsIn(1,$loopCount);
+                        push(@groupsOfGroups, @$gog);
+                }
+		$gotGroupsInGroup->{recursive}{$self->getId} = \@groupsOfGroups;
+                return \@groupsOfGroups;
+	}
+	$gotGroupsInGroup->{direct}{$self->getId} = $groups;
+	$self->session->stow->set("gotGroupsInGroup",$gotGroupsInGroup);
+        return $groups;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getUsers ( [ recursive, withoutExpired ] )
+
+Returns an array reference containing a list of users that belong to this group.
+
+=head3 recursive
+
+A boolean value to determine whether the method should return the users directly in the group or to follow the entire groups of groups hierarchy. Defaults to "0".
+
+=head3 withoutExpired
+
+A boolean that if set true will return the users list minus the expired groupings.
+
+=cut
+
+sub getUsersInGroup {
+	my $self = shift;
+	my $recursive = shift;
+	my $withoutExpired = shift;
+	my $clause;
+	if ($withoutExpired) {
+		$clause = "expireDate > "$self->session->datetime->time()." and ";
+	}
+	$clause .= "(groupId=".$self->session->db->quote($groupId);
+ 	if ($recursive) {
+		my $groups = $self->getGroupsIn(1);
+		if ($#$groups >= 0) {
+			if ($withoutExpired) {
+				foreach my $groupId (@$groups) {
+					$clause .= " OR (groupId = ".$self->session->db->quote($groupId)." AND expireDate > ".$self->session->datetime->time().") ";
+				}
+			} else {
+				$clause .= " OR groupId IN (".$self->session->db->quoteAndJoin($groups).")";
+			}
+		}
+	}
+	$clause .= ")";
+       	return $self->session->db->buildArrayRef("select userId from groupings where $clause");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getId ( )
 
 Returns the groupId for this group.
 
 =cut
 
-sub groupId {
-        return $_[0]->{_groupId};
+sub getId {
+	my $self = shift;
+        return $self->{_groupId};
 }
 
 
@@ -415,15 +588,12 @@ If specified, the karma threshold is set to this value.
 =cut
 
 sub karmaThreshold {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"karmaThreshold"} = $value;
-                $self->session->db->write("update groups set karmaThreshold=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->set("karmaThreshold",$value);	
         }
-        return $class->{_group}{"karmaThreshold"};
+        return $self->get("karmaThreshold");
 }
 
 
@@ -440,15 +610,12 @@ If specified, the ipFilter is set to this value.
 =cut
 
 sub ipFilter {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"ipFilter"} = $value;
-                $self->session->db->write("update groups set ipFilter=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+		$self->set("ipFilter",$value);
         }
-        return $class->{_group}{"ipFilter"};
+        return $self->get("ipFilter");
 }
 
 
@@ -465,15 +632,12 @@ If specified, isEditable is set to this value.
 =cut
 
 sub isEditable {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"isEditable"} = $value;
-                $self->session->db->write("update groups set isEditable=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("isEditable",$value);
         }
-        return $class->{_group}{"isEditable"};
+        return $self->get("isEditable");
 }
 
 
@@ -486,7 +650,8 @@ Returns the epoch for when this group was last modified.
 =cut
 
 sub lastUpdated {
-        return $_[0]->{_group}{lastUpdated};
+	my $self = shift;
+        return $self->get("lastUpdated");
 }
 
 
@@ -503,23 +668,24 @@ If specified, the name is set to this value.
 =cut
 
 sub name {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"groupName"} = $value;
-                $self->session->db->write("update groups set groupName=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("groupName",$value);
         }
-        return $class->{_group}{"groupName"};
+        return $self->get("groupName");
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 new ( groupId )
+=head2 new ( session, groupId )
 
 Constructor.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 groupId
 
@@ -531,21 +697,12 @@ sub new {
         my ($class, $groupId, %default, $value, $key, %group, %profile);
         tie %group, 'Tie::CPHash';
         $class = shift;
-	$groupId = shift;
-        $groupId = _create() if ($groupId eq "new");
-	if ($groupId eq "") {
-		$group{expireOffset} = 314496000;
-		$group{karmaThreshold} = 1000000000;
-		$group{groupName} = "New Group";
-		$group{expireNotifyOffset} = -14;
-		$group{deleteOffset} = 14;
-		$group{expireNotify} = 0;
-		$group{databaseLinkId} = 0;
-		$group{dbCacheTimeout} = 3600;
-	} else {
-        	%group = $self->session->db->quickHash("select * from groups where groupId=".$self->session->db->quote($groupId));
-	}
-        bless {_groupId => $groupId, _group => \%group }, $class;
+	my $self = {};
+	$self->{_session} = shift;
+	$self->{_groupId} = shift;
+	bless $self, $class;
+        $self->_create() if ($self->{_groupId} eq "new");
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -561,15 +718,12 @@ If specified, the name is set to this value.
 =cut
 
 sub scratchFilter {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"scratchFilter"} = $value;
-                $self->session->db->write("update groups set scratchFilter=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("scratchFilter",$value);
         }
-        return $class->{_group}{"scratchFilter"};
+        return $self->get("scratchFilter");
 }
 
 #-------------------------------------------------------------------
@@ -585,15 +739,12 @@ If specified, showInForms is set to this value.
 =cut
 
 sub showInForms {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"showInForms"} = $value;
-                $self->session->db->write("update groups set showInForms=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("showInForms",$value);
         }
-        return $class->{_group}{"showInForms"};
+        return $self->get("showInForms");
 }
 
 
@@ -612,15 +763,12 @@ If specified, the dbQuery is set to this value.
 =cut
 
 sub dbQuery {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"dbQuery"} = $value;
-                $self->session->db->write("update groups set dbQuery=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("dbQuery",$value);
         }
-        return $class->{_group}{"dbQuery"};
+        return $self->get("dbQuery");
 }
 
 #-------------------------------------------------------------------
@@ -636,15 +784,12 @@ If specified, the databaseLinkId is set to this value.
 =cut
 
 sub databaseLinkId {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"databaseLinkId"} = $value;
-                $self->session->db->write("update groups set databaseLinkId=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("databaseLinkId",$value);
         }
-        return $class->{_group}{"databaseLinkId"};
+        return $self->get("databaseLinkId");
 }
 
 #-------------------------------------------------------------------
@@ -660,15 +805,12 @@ If specified, the dbCacheTimeout is set to this value.
 =cut
 
 sub dbCacheTimeout {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-                $class->{_group}{"dbCacheTimeout"} = $value;
-                $self->session->db->write("update groups set dbCacheTimeout=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+                $self->set("dbCacheTimeout",$value);
         }
-        return $class->{_group}{"dbCacheTimeout"};
+        return $self->get("dbCacheTimeout");
 }
 
 #-------------------------------------------------------------------
@@ -684,15 +826,12 @@ If specified, the ldapGroup is set to this value.
 =cut
 
 sub ldapGroup {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-           $class->{_group}{"ldapGroup"} = $value;
-           $self->session->db->write("update groups set ldapGroup=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+           $self->set("ldapGroup",$value);
         }
-        return $class->{_group}{"ldapGroup"};
+        return $self->get("ldapGroup");
 }
 
 #-------------------------------------------------------------------
@@ -708,15 +847,12 @@ If specified, the ldapGroupProperty is set to this value.
 =cut
 
 sub ldapGroupProperty {
-        my ($class, $value);
-        $class = shift;
-        $value = shift;
+        my $self = shift;
+        my $value = shift;
         if (defined $value) {
-           $class->{_group}{"ldapGroupProperty"} = $value;
-           $self->session->db->write("update groups set ldapGroupProperty=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
+           $self->set("ldapGroupProperty", $value);
         }
-        return $class->{_group}{"ldapGroupProperty"};
+        return $self->get("ldapGroupProperty");
 }
 
 #-------------------------------------------------------------------
@@ -732,14 +868,113 @@ If specified, the ldapRecursiveProperty is set to this value.
 =cut
 
 sub ldapRecursiveProperty {
-   my ($class, $value);
-   $class = shift;
-   $value = shift;
-   if (defined $value) {
-      $class->{_group}{"ldapRecursiveProperty"} = $value;
-      $self->session->db->write("update groups set ldapRecursiveProperty=".$self->session->db->quote($value).", lastUpdated="$self->session->datetime->time()." where groupId=".$self->session->db->quote($class->{_groupId}));
-   }
-   return $class->{_group}{"ldapRecursiveProperty"};
+   	my $self = shift;
+   	my $value = shift;
+   	if (defined $value) {
+      		$self->set("ldapRecursiveProperty",$value);
+   	}
+   	return $self->get("ldapRecursiveProperty");
 }
 
+
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
+=head2 set ( name, value )
+
+Sets a property of this group.
+
+=head3 name
+
+The name of a property to set.
+
+=head3 value
+
+THe value of a property to set.
+
+=cut
+
+sub set {
+	my $self = shift;
+	my $name = shift;
+	my $value = shift;
+	$self->get("groupId") unless ($self->{_group}); # precache group stuff
+	$self->{_group}{$name} = $value;
+	$self->session->db->setRow("groups","groupId",{groupId=>$self->getId, $name=>$value, lastUpdated=>$self->session->datetime->time()});
+}
+
+#-------------------------------------------------------------------
+
+=head2 userIsAdmin ( [ userId, value ] )
+
+Returns a 1 or 0 depending upon whether the user is a sub-admin for this group.
+
+=head3 userId
+
+A guid that is the unique identifier for a user. Defaults to the currently logged in user.
+
+=head3 value
+
+If specified the admin flag will be set to this value.
+
+=cut
+
+sub userIsAdmin {
+	my $self = shift;
+	my $userId = shift || $self->session->user->userId;
+	my $value = shift;
+	if ($value ne "") {
+		$self->session->db->write("update groupings set groupAdmin=".$self->session->db->quote($value)." where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		return $value;
+	} else {
+		my ($admin) = $self->session->db->quickArray("select groupAdmin from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		return $admin;
+	}
+}	
+
+#-------------------------------------------------------------------
+
+=head2 userGroupExpireDate ( userId [, epoch ] )
+
+Returns the epoch date that this grouping will expire.
+
+=head3 userId
+
+A guid that is the unique identifier for a user.
+
+=head3 epoch
+
+If specified the expire date will be set to this value.
+
+=cut
+
+sub userGroupExpireDate {
+	my $self = shift;
+	my $userId = shift;
+	my $epoch = shift;
+	if ($epoch) {
+		$self->session->db->write("update groupings set expireDate=".$self->session->db->quote($epoch)." where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		return $epoch;
+	} else {
+		my ($expireDate) = $self->session->db->quickArray("select expireDate from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		return $expireDate;
+	}
+}	
+
+
+
 1;
+

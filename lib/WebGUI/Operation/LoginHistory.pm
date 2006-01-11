@@ -39,7 +39,7 @@ they used.
 
 sub www_viewLoginHistory {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless (WebGUI::Grouping::isInGroup(3));
+        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$sth = $session->db->read("select * from users,userLoginLog where users.userId=userLoginLog.userId order by userLoginLog.timeStamp desc");	
