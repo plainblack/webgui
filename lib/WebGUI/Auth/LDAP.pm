@@ -368,9 +368,9 @@ sub editUserSettingsForm {
    my $ldapConnectionLabel = WebGUI::International::get("ldapConnection",'AuthLDAP'); 
    my $buttons = "";
    if($self->session->setting->get("ldapConnection")) {
-      $buttons = editIcon("op=editLDAPLink;returnUrl=".$self->session->url->escape($self->session->url->page("op=editSettings")).";llid=".$self->session->setting->get("ldapConnection"));
+      $buttons = $self->session->icon->edit("op=editLDAPLink;returnUrl=".$self->session->url->escape($self->session->url->page("op=editSettings")).";llid=".$self->session->setting->get("ldapConnection"));
    }
-   $buttons .= manageIcon("op=listLDAPLinks;returnUrl=".$self->session->url->escape($self->session->url->page("op=editSettings")));
+   $buttons .= $self->session->icon->manage("op=listLDAPLinks;returnUrl=".$self->session->url->escape($self->session->url->page("op=editSettings")));
    $f->raw(qq|<tr><td class="formDescription" valign="top" style="width: 25%;">$ldapConnectionLabel</td><td class="tableData" style="width: 75%;">$ldapConnection&nbsp;$buttons</td></tr>|);
    return $f->printRowsOnly;
 }

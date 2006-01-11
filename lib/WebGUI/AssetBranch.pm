@@ -207,7 +207,7 @@ sub www_editBranch {
                 );
 	my $subtext;
         if ($self->session->user->isInGroup(3)) {
-                 $subtext = manageIcon('op=listUsers');
+                 $subtext = $self->session->icon->manage('op=listUsers');
         } else {
                  $subtext = "";
         }

@@ -72,7 +72,7 @@ sub www_viewActiveSessions {
                 $row[$i] .= '<td>'$session->datetime->epochToHuman($data{expires}).'</td>';
                 $row[$i] .= '<td>'$session->datetime->epochToHuman($data{lastPageView}).'</td>';
                 $row[$i] .= '<td>'.$data{lastIP}.'</td>';
-		$row[$i] .= '<td align="center">'.deleteIcon("op=killSession;sid=$data{sessionId}").'</td></tr>';
+		$row[$i] .= '<td align="center">'.$session->icon->delete("op=killSession;sid=$data{sessionId}").'</td></tr>';
                 $i++;
 	}
 	$sth->finish;

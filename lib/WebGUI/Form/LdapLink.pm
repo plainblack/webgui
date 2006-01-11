@@ -147,9 +147,9 @@ sub toHtmlWithWrapper {
 	if ($self->session->user->isInGroup(3)) {
 		my $subtext;
 		if ($self->get("afterEdit")) {
-			$subtext = editIcon("op=editLDAPLink;llid=".$self->get("value").";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
+			$subtext = $self->session->icon->edit("op=editLDAPLink;llid=".$self->get("value").";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
 		}
-         	$subtext .= manageIcon("op=listLDAPLinks");
+         	$subtext .= $self->session->icon->manage("op=listLDAPLinks");
 		$self->get("subtext") = $subtext . $self->get("subtext");
 	}
 	return $self->SUPER::toHtmlWithWrapper;

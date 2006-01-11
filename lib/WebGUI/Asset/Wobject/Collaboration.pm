@@ -43,12 +43,12 @@ sub appendPostListTemplateVars {
 	foreach my $row (@$page) {
 		my $post = WebGUI::Asset->new($row->{assetId}, $row->{className}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
-		my $controls = deleteIcon('func=delete',$post->get("url"),"Delete").editIcon('func=edit',$post->get("url"));
+		my $controls = $self->session->icon->delete('func=delete',$post->get("url"),"Delete").$self->session->icon->edit('func=edit',$post->get("url"));
 		if ($self->get("sortBy") eq "lineage") {
 			if ($self->get("sortOrder") eq "desc") {
-				$controls .= moveUpIcon('func=demote',$post->get("url")).moveDownIcon('func=promote',$post->get("url"));
+				$controls .= $self->session->icon->moveUp('func=demote',$post->get("url")).$self->session->icon->moveDown('func=promote',$post->get("url"));
 			} else {
-				$controls .= moveUpIcon('func=promote',$post->get("url")).moveDownIcon('func=demote',$post->get("url"));
+				$controls .= $self->session->icon->moveUp('func=promote',$post->get("url")).$self->session->icon->moveDown('func=demote',$post->get("url"));
 			}
 		}
 		my $inDateRange;

@@ -566,7 +566,7 @@ sub getEditForm {
                 );
 	my $subtext;
         if ($self->session->user->isInGroup(3)) {
-                 $subtext = manageIcon('op=listUsers');
+                 $subtext = $self->session->icon->manage('op=listUsers');
         } else {
                  $subtext = "";
         }
@@ -863,19 +863,19 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	my $toolbar = deleteIcon('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"));
+	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"));
 	my $commit;
 	my $i18n = WebGUI::International->new("Asset");
 	if (($self->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId")) || !$self->isLocked) {
-        	$toolbar .= editIcon('func=edit',$self->get("url"));
+        	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url"));
 	} else {
-		$toolbar .= lockedIcon('func=manageRevisions',$self->get("url"));
+		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"));
 	}
 	$commit = 'contextMenu.addLink("'.$self->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($self->canEditIfLocked);
-        $toolbar .= cutIcon('func=cut',$self->get("url"))
-            	.copyIcon('func=copy',$self->get("url"));
-        $toolbar .= shortcutIcon('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
-	$toolbar .= exportIcon('func=export',$self->get("url")) if defined ($self->session->config->get("exportPath"));
+        $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
+            	.$self->session->icon->copy('func=copy',$self->get("url"));
+        $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
+	$toolbar .= $self->session->icon->export('func=export',$self->get("url")) if defined ($self->session->config->get("exportPath"));
 	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	return '<script type="text/javascript">
@@ -1613,21 +1613,21 @@ sub www_manageAssets {
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= editIcon("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '</fieldset></div>'; 
@@ -1665,7 +1665,7 @@ sub www_manageAssets {
         foreach my $asset (@{$self->getPackageList}) {
               	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
 			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
-			.editIcon("func=edit;proceed=manageAssets",$asset->get("url"))
+			.$self->session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
 			.'<br />';
 		$hasPackages = 1;
         }

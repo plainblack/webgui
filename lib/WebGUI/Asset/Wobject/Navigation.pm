@@ -287,7 +287,7 @@ sub getToolbar {
 		}
 		my $toolbar;
 		if (!$self->isLocked || $self->get("isLockedBy") eq $self->session->user->profileField("userId")) {
-			$toolbar = editIcon('func=edit'.$returnUrl,$self->get("url"));
+			$toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->get("url"));
 		}
 		my $i18n = WebGUI::International->new("Asset");
 		return '<script type="text/javascript">

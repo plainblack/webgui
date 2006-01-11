@@ -267,18 +267,18 @@ sub www_editProfileSettings {
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $output = "";
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
-		$output .= deleteIcon('op=deleteProfileCategoryConfirm;cid='.$category->getId,'',WebGUI::International::get(466,"WebGUIProfile")); 
-		$output .= editIcon('op=editProfileCategory;cid='.$category->getId); 
-		$output .= moveUpIcon('op=moveProfileCategoryUp;cid='.$category->getId); 
-		$output .= moveDownIcon('op=moveProfileCategoryDown;cid='.$category->getId); 
+		$output .= $session->icon->delete('op=deleteProfileCategoryConfirm;cid='.$category->getId,'',WebGUI::International::get(466,"WebGUIProfile")); 
+		$output .= $session->icon->edit('op=editProfileCategory;cid='.$category->getId); 
+		$output .= $session->icon->moveUp('op=moveProfileCategoryUp;cid='.$category->getId); 
+		$output .= $session->icon->moveDown('op=moveProfileCategoryDown;cid='.$category->getId); 
 		$output .= ' <b>'.$category->getLabel.'</b><br />';
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        $output .= deleteIcon('op=deleteProfileFieldConfirm;fid='.$field->getId,'',WebGUI::International::get(467,"WebGUIProfile"));
-       	                $output .= editIcon('op=editProfileField;fid='.$field->getId);
-               	        $output .= moveUpIcon('op=moveProfileFieldUp;fid='.$field->getId);
-                       	$output .= moveDownIcon('op=moveProfileFieldDown;fid='.$field->getId);
+                        $output .= $session->icon->delete('op=deleteProfileFieldConfirm;fid='.$field->getId,'',WebGUI::International::get(467,"WebGUIProfile"));
+       	                $output .= $session->icon->edit('op=editProfileField;fid='.$field->getId);
+               	        $output .= $session->icon->moveUp('op=moveProfileFieldUp;fid='.$field->getId);
+                       	$output .= $session->icon->moveDown('op=moveProfileFieldDown;fid='.$field->getId);
                        	$output .= ' '.$field->getLabel.'<br />';
 		}
 	}

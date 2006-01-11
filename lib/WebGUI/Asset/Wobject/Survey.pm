@@ -625,10 +625,10 @@ sub view {
 		while (my %data = $sth2->hash) {
 		  push(@edit,{
 			'question.edit.controls'=>
-				deleteIcon('func=deleteQuestionConfirm;qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Asset_Survey')).
-				editIcon('func=editQuestion;qid='.$data{Survey_questionId}, $self->get("url")).
-				moveUpIcon('func=moveQuestionUp;qid='.$data{Survey_questionId}, $self->get("url")).
-				moveDownIcon('func=moveQuestionDown;qid='.$data{Survey_questionId}, $self->get("url")),
+				$self->session->icon->delete('func=deleteQuestionConfirm;qid='.$data{Survey_questionId}, $self->get("url"), WebGUI::International::get(44,'Asset_Survey')).
+				$self->session->icon->edit('func=editQuestion;qid='.$data{Survey_questionId}, $self->get("url")).
+				$self->session->icon->moveUp('func=moveQuestionUp;qid='.$data{Survey_questionId}, $self->get("url")).
+				$self->session->icon->moveDown('func=moveQuestionDown;qid='.$data{Survey_questionId}, $self->get("url")),
 			'question.edit.question'=>$data{question},
 			'question.edit.id'=>$data{Survey_questionId}
 		  });
@@ -637,10 +637,10 @@ sub view {
 	
 		push(@sectionEdit,{
 			'section.edit.controls'=>
-				deleteIcon('func=deleteSectionConfirm;sid='.$sectionData{Survey_sectionId}, $self->get("url"), WebGUI::International::get(105,'Asset_Survey')).
-				editIcon('func=editSection;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
-				moveUpIcon('func=moveSectionUp;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
-				moveDownIcon('func=moveSectionDown;sid='.$sectionData{Survey_sectionId}, $self->get("url")),
+				$self->session->icon->delete('func=deleteSectionConfirm;sid='.$sectionData{Survey_sectionId}, $self->get("url"), WebGUI::International::get(105,'Asset_Survey')).
+				$self->session->icon->edit('func=editSection;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
+				$self->session->icon->moveUp('func=moveSectionUp;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
+				$self->session->icon->moveDown('func=moveSectionDown;sid='.$sectionData{Survey_sectionId}, $self->get("url")),
 			'section.edit.sectionName'=>$sectionData{sectionName},
 			'section.edit.id'=>$sectionData{Survey_sectionId},
 			'section.questions_loop'=>\@edit
@@ -973,11 +973,11 @@ sub www_editQuestion {
 			where Survey_questionId=".$self->session->db->quote($question->{Survey_questionId})." order by sequenceNumber");
 		while (%data = $sth->hash) {
 			$output .= 
-				deleteIcon('func=deleteAnswerConfirm;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, 
+				$self->session->icon->delete('func=deleteAnswerConfirm;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, 
 					$self->get("url"),WebGUI::International::get(45,'Asset_Survey')).
-                                editIcon('func=editAnswer;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
-                                moveUpIcon('func=moveAnswerUp'.';qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
-                                moveDownIcon('func=moveAnswerDown;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
+                                $self->session->icon->edit('func=editAnswer;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
+                                $self->session->icon->moveUp('func=moveAnswerUp'.';qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
+                                $self->session->icon->moveDown('func=moveAnswerDown;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
                                 ' '.$data{answer}.'<br />';
 		}
 		$sth->finish;

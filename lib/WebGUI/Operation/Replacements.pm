@@ -99,8 +99,8 @@ sub www_listReplacements {
 	$output .= '<tr><td></td><td class="tableHeader">'.WebGUI::International::get(1050).'</td><td class="tableHeader">'.WebGUI::International::get(1051).'</td></tr>';
 	my $sth = $session->db->read("select replacementId,searchFor,replaceWith from replacements order by searchFor");
 	while (my $data = $sth->hashRef) {
-		$output .= '<tr><td>'.deleteIcon("op=deleteReplacement;replacementId=".$data->{replacementId})
-			.editIcon("op=editReplacement;replacementId=".$data->{replacementId}).'</td>';
+		$output .= '<tr><td>'.$session->icon->delete("op=deleteReplacement;replacementId=".$data->{replacementId})
+			.$session->icon->edit("op=editReplacement;replacementId=".$data->{replacementId}).'</td>';
 		$data->{replaceWith} =~ s/\&/\&amp\;/g;
 		$data->{replaceWith} =~ s/\</\&lt\;/g;
         	$data->{replaceWith} =~ s/\>/\&gt\;/g;

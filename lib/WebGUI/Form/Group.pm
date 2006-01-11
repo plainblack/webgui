@@ -141,7 +141,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub toHtmlWithWrapper {
         my $self = shift;
         if ($self->session->user->isInGroup(3)) {
-                my $subtext = manageIcon("op=listGroups");
+                my $subtext = $self->session->icon->manage("op=listGroups");
                 $self->get("subtext") = $subtext . $self->get("subtext");
         }
         return $self->SUPER::toHtmlWithWrapper;

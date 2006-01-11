@@ -273,8 +273,8 @@ sub www_manageMetaData {
 	my $output;
 	my $fields = $self->getMetaDataFields();
 	foreach my $fieldId (keys %{$fields}) {
-		$output .= deleteIcon("func=deleteMetaDataField;fid=".$fieldId,$self->get("url"),WebGUI::International::get('deleteConfirm','Asset'));
-		$output .= editIcon("func=editMetaDataField;fid=".$fieldId,$self->get("url"));
+		$output .= $self->session->icon->delete("func=deleteMetaDataField;fid=".$fieldId,$self->get("url"),WebGUI::International::get('deleteConfirm','Asset'));
+		$output .= $self->session->icon->edit("func=editMetaDataField;fid=".$fieldId,$self->get("url"));
 		$output .= " <b>".$fields->{$fieldId}{fieldName}."</b><br />";
 	}	
         $ac->setHelp("metadata manage","Asset");

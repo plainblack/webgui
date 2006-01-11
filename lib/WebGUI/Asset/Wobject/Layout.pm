@@ -205,7 +205,7 @@ sub view {
 			}
 			</style>
 			');
-		$vars{"dragger.icon"} = WebGUI::Icon::dragIcon();
+		$vars{"dragger.icon"} = $self->session->icon->drag();
 		$vars{"dragger.init"} = '
 			<iframe id="dragSubmitter" style="display: none;" src="'.$self->session->config->get("extrasURL").'/spacer.gif"></iframe>
 			<script type="text/javascript">

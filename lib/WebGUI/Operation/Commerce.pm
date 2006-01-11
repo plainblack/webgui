@@ -144,7 +144,7 @@ sub www_checkoutConfirm {
 	($normal, $recurring) = $shoppingCart->getItems;
 
 	foreach (@$normal) {
-		$_->{deleteIcon} = deleteIcon('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
+		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
 		$_->{'quantity.form'} = WebGUI::Form::integer({
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
@@ -153,7 +153,7 @@ sub www_checkoutConfirm {
 		$total += $_->{totalPrice};
 	}
 	foreach (@$recurring) {
-		$_->{deleteIcon} = deleteIcon('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
+		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
 		$_->{'quantity.form'} = WebGUI::Form::integer({
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
@@ -639,7 +639,7 @@ sub www_listTransactions {
 	$output .= '<tr><th></th><th>Init Date</th><th>Completion Date</th><th>Amount</th><th>Shipping Cost</th><th>Status</th><th>Shipping Status</th></tr>';
 	foreach $transaction (@transactions) {
 		$output .= '<tr bgcolor="#ddd">';
-		$output .= '<td>'.deleteIcon('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';
+		$output .= '<td>'.$session->icon->delete('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';
 		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('initDate')).'</td>';
 		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('completionDate')).'</td>';
 		$output .= '<td>'.$transaction->get('amount').'</td>';
@@ -653,7 +653,7 @@ sub www_listTransactions {
 			$output .= '<tr>';
 			$output .= '<td></td>';
 			$output .= '<td colspan="3">'.
-				deleteIcon('op=deleteTransactionItem;tid='.$transaction->get('transactionId').';iid='.$_->{itemId}.';itype='.$_->{itemType}).
+				$session->icon->delete('op=deleteTransactionItem;tid='.$transaction->get('transactionId').';iid='.$_->{itemId}.';itype='.$_->{itemType}).
 				$_->{itemName}.'</td>';
 			$output .= '<td>'.$_->{quantity}.'</td>';
 			$output .= '<td> x </td>';
@@ -795,7 +795,7 @@ sub www_viewCart {
 	($normal, $recurring) = $shoppingCart->getItems;
 
 	foreach (@$normal) {
-		$_->{deleteIcon} = deleteIcon('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
+		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
 		$_->{'quantity.form'} = WebGUI::Form::integer({
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
@@ -804,7 +804,7 @@ sub www_viewCart {
 		$total += $_->{totalPrice};
 	}
 	foreach (@$recurring) {
-		$_->{deleteIcon} = deleteIcon('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
+		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
 		$_->{'quantity.form'} = WebGUI::Form::integer({
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},

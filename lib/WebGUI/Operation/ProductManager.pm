@@ -498,8 +498,8 @@ sub www_listProducts {
 	while ($row = $sth->hashRef) {
 		$output .= '<tr>';
 		$output .= '<td>';
-		$output .= deleteIcon('op=deleteProduct;productId='.$row->{productId});
-		$output .= editIcon('op=manageProduct;productId='.$row->{productId});
+		$output .= $session->icon->delete('op=deleteProduct;productId='.$row->{productId});
+		$output .= $session->icon->edit('op=manageProduct;productId='.$row->{productId});
 		$output .= '</td>';
 		$output .= '<td>'.$row->{title}.'</td>';
 		$output .= '</tr>';
@@ -562,7 +562,7 @@ sub www_listProductVariants {
 			name	=> 'available',
 			value	=> $_->{variantId},
 			checked	=> $_->{available},
-			}).editIcon('op=editProductVariant;variantId='.$_->{variantId})."</td>";
+			}).$session->icon->edit('op=editProductVariant;variantId='.$_->{variantId})."</td>";
 		$output .= "</tr>";
 	}
 	$output .= "</table>";
@@ -607,7 +607,7 @@ sub www_manageProduct {
 	$product = WebGUI::Product->new($productId);
 	
 	$output .= "<h1>".$product->get('title')."</h1>";
-	$output .= "<h2>".$i18n->get('properties').editIcon('op=editProduct;productId='.$productId)."</h2>";
+	$output .= "<h2>".$i18n->get('properties').$session->icon->edit('op=editProduct;productId='.$productId)."</h2>";
 	$output .= "<table>";
 	$output .= "<tr><td>".$i18n->get('price')."</td><td>".$product->get('price')."</td></tr>";
 	$output .= "<tr><td>".$i18n->get('weight')."</td><td>".$product->get('weight')."</td></tr>";
@@ -620,8 +620,8 @@ sub www_manageProduct {
 	$output .= '<a href="'.$session->url->page('op=editProductParameter;parameterId=new;productId='.$product->get('productId')).'">'.
 		$i18n->get('add parameter').'</a><br />';
 	foreach $parameter (@{$product->getParameter}) {
-		$output .= deleteIcon('op=deleteProductParameter;parameterId='.$parameter->{parameterId}).
-			editIcon('op=editProductParameter;parameterId='.$parameter->{parameterId});
+		$output .= $session->icon->delete('op=deleteProductParameter;parameterId='.$parameter->{parameterId}).
+			$session->icon->edit('op=editProductParameter;parameterId='.$parameter->{parameterId});
 		$output .= '<span style="margin-left: 10px"><b>'.$parameter->{name}.'</b></span><br />';
 		$output .= '<a style="margin-left: 20px" href="'.
 			$session->url->page('op=editProductParameterOption;optionId=new;parameterId='.$parameter->{parameterId}).'">'.
@@ -629,8 +629,8 @@ sub www_manageProduct {
 		foreach $optionId (@{$parameter->{options}}) {
 			$option = $product->getOption($optionId);
 			$output .= '<span style="margin-left: 20px">'.
-				deleteIcon('op=deleteProductParameterOption;optionId='.$option->{optionId}).
-				editIcon('op=editProductParameterOption;parameterId='.$parameter->{parameterId}.';optionId='.$option->{optionId}).$option->{value}.'</span><br />';
+				$session->icon->delete('op=deleteProductParameterOption;optionId='.$option->{optionId}).
+				$session->icon->edit('op=editProductParameterOption;parameterId='.$parameter->{parameterId}.';optionId='.$option->{optionId}).$option->{value}.'</span><br />';
 		}
 		$output .= '<br />';
 	}

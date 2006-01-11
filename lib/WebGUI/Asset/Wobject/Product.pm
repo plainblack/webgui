@@ -757,10 +757,10 @@ sub view {
    $var{"addFeature.label"} = WebGUI::International::get(34,'Asset_Product');
    $sth = $self->session->db->read("select feature,Product_featureId from Product_feature where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteFeatureConfirm&fid='.$data{Product_featureId},$self->get("url"),WebGUI::International::get(3,'Asset_Product'))
-                 .editIcon('func=editFeature&fid='.$data{Product_featureId},$self->get("url"))
-                 .moveUpIcon('func=moveFeatureUp&&fid='.$data{Product_featureId},$self->get("url"))
-                 .moveDownIcon('func=moveFeatureDown&&fid='.$data{Product_featureId},$self->get("url"));
+      $segment = $self->session->icon->delete('func=deleteFeatureConfirm&fid='.$data{Product_featureId},$self->get("url"),WebGUI::International::get(3,'Asset_Product'))
+                 .$self->session->icon->edit('func=editFeature&fid='.$data{Product_featureId},$self->get("url"))
+                 .$self->session->icon->moveUp('func=moveFeatureUp&&fid='.$data{Product_featureId},$self->get("url"))
+                 .$self->session->icon->moveDown('func=moveFeatureDown&&fid='.$data{Product_featureId},$self->get("url"));
 	  push(@featureloop,{
 			              "feature.feature"=>$data{feature},
 			              "feature.controls"=>$segment
@@ -774,10 +774,10 @@ sub view {
    $var{"addBenefit.label"} = WebGUI::International::get(55,'Asset_Product');
    $sth = $self->session->db->read("select benefit,Product_benefitId from Product_benefit where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteBenefitConfirm&bid='.$data{Product_benefitId},$self->get("url"),WebGUI::International::get(48,'Asset_Product'))
-                 .editIcon('func=editBenefit&bid='.$data{Product_benefitId},$self->get("url"))
-                 .moveUpIcon('func=moveBenefitUp&bid='.$data{Product_benefitId},$self->get("url"))
-                 .moveDownIcon('func=moveBenefitDown&bid='.$data{Product_benefitId},$self->get("url"));
+      $segment = $self->session->icon->delete('func=deleteBenefitConfirm&bid='.$data{Product_benefitId},$self->get("url"),WebGUI::International::get(48,'Asset_Product'))
+                 .$self->session->icon->edit('func=editBenefit&bid='.$data{Product_benefitId},$self->get("url"))
+                 .$self->session->icon->moveUp('func=moveBenefitUp&bid='.$data{Product_benefitId},$self->get("url"))
+                 .$self->session->icon->moveDown('func=moveBenefitDown&bid='.$data{Product_benefitId},$self->get("url"));
 	  push(@benefitloop,{
 			              "benefit.benefit"=>$data{benefit},
 			              "benefit.controls"=>$segment
@@ -791,10 +791,10 @@ sub view {
    $var{"addSpecification.label"} = WebGUI::International::get(35,'Asset_Product');
    $sth = $self->session->db->read("select name,value,units,Product_specificationId from Product_specification where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
    while (%data = $sth->hash) {
-      $segment = deleteIcon('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),WebGUI::International::get(5,'Asset_Product'))
-                 .editIcon('func=editSpecification&sid='.$data{Product_specificationId},$self->get("url"))
-                 .moveUpIcon('func=moveSpecificationUp&sid='.$data{Product_specificationId},$self->get("url"))
-                 .moveDownIcon('func=moveSpecificationDown&sid='.$data{Product_specificationId},$self->get("url"));
+      $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),WebGUI::International::get(5,'Asset_Product'))
+                 .$self->session->icon->edit('func=editSpecification&sid='.$data{Product_specificationId},$self->get("url"))
+                 .$self->session->icon->moveUp('func=moveSpecificationUp&sid='.$data{Product_specificationId},$self->get("url"))
+                 .$self->session->icon->moveDown('func=moveSpecificationDown&sid='.$data{Product_specificationId},$self->get("url"));
       push(@specificationloop,{
 			                      "specification.controls"=>$segment,
 			                      "specification.specification"=>$data{value},
@@ -812,9 +812,9 @@ sub view {
 		                     where Product_accessory.assetId=".$self->session->db->quote($self->getId)." 
 		                     order by Product_accessory.sequenceNumber");
    while (my ($id) = $sth->array) {
-      $segment = deleteIcon('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),WebGUI::International::get(2,'Asset_Product'))
-                 .moveUpIcon('func=moveAccessoryUp&aid='.$id,$self->get("url"))
-                 .moveDownIcon('func=moveAccessoryDown&aid='.$id,$self->get("url"));
+      $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),WebGUI::International::get(2,'Asset_Product'))
+                 .$self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get("url"))
+                 .$self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get("url"));
 		my $accessory = WebGUI::Asset->newByDynamicClass($id);
 	  push(@accessoryloop,{
 			               "accessory.URL"=>$accessory->getUrl,
@@ -833,9 +833,9 @@ sub view {
 		                     where Product_related.assetId=".$self->session->db->quote($self->getId)." 
 		                     order by Product_related.sequenceNumber");
    while (my ($id) = $sth->array) {
-      $segment = deleteIcon('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),WebGUI::International::get(4,'Asset_Product'))
-                 .moveUpIcon('func=moveRelatedUp&rid='.$id,$self->get("url"))
-                 .moveDownIcon('func=moveRelatedDown&rid='.$id,$self->get("url"));
+      $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),WebGUI::International::get(4,'Asset_Product'))
+                 .$self->session->icon->moveUp('func=moveRelatedUp&rid='.$id,$self->get("url"))
+                 .$self->session->icon->moveDown('func=moveRelatedDown&rid='.$id,$self->get("url"));
 		my $related = WebGUI::Asset->newByDynamicClass($id);
       push(@relatedloop,{
 			              "relatedproduct.URL"=>$related->getUrl,

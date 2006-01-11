@@ -293,7 +293,7 @@ sub www_listSubscriptionCodeBatches {
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach (@{$batches}) {
 		$output .= '<tr><td>';		
-		$output .= deleteIcon('op=deleteSubscriptionCodeBatch;bid='.$_->{batchId}, undef, $i18n->get('delete batch confirm'));
+		$output .= $session->icon->delete('op=deleteSubscriptionCodeBatch;bid='.$_->{batchId}, undef, $i18n->get('delete batch confirm'));
 		$output .= '<td>'.$_->{description}.'</td>';
 		$output .= '<td><a href="'.$session->url->page('op=listSubscriptionCodes;selection=b;bid='.$_->{batchId}).'">'.$i18n->get('list codes in batch').'</a></td>';
 		$output .= '</tr>';
@@ -404,8 +404,8 @@ sub www_listSubscriptions {
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach (@{$subscriptions}) {
 		$output .= '<tr>';
-		$output .= '<td>'.editIcon('op=editSubscription;sid='.$_->{subscriptionId});
-		$output .= deleteIcon('op=deleteSubscription;sid='.$_->{subscriptionId}, undef, $i18n->get('delete subscription confirm')).'</td>';
+		$output .= '<td>'.$session->icon->edit('op=editSubscription;sid='.$_->{subscriptionId});
+		$output .= $session->icon->delete('op=deleteSubscription;sid='.$_->{subscriptionId}, undef, $i18n->get('delete subscription confirm')).'</td>';
 		$output .= '<td>'.$_->{name}.'</td>';
 		$output .= '</tr>';
 	}

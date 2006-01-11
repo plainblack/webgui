@@ -355,8 +355,8 @@ sub getOverridesList {
 			$output .= '<tr>';
 			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">'.$prop.'</a></td>';
 			$output .= '<td class="tableData">';
-			$output .= editIcon('func=editOverride;fieldName='.$prop,$self->get("url"));
-			$output .= deleteIcon('func=deleteOverride;fieldName='.$prop,$self->get("url")) if exists $overrides{overrides}{$prop};
+			$output .= $self->session->icon->edit('func=editOverride;fieldName='.$prop,$self->get("url"));
+			$output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$prop,$self->get("url")) if exists $overrides{overrides}{$prop};
 			$output .= '</td><td>';
 			$output .= $overrides{overrides}{$prop}{origValue};
 			$output .= '</td><td>';

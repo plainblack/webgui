@@ -91,10 +91,10 @@ sub _fieldAdminIcons {
 	my $tid = shift;
 	my $cantDelete = shift;
 	my $output;
-	$output = deleteIcon('func=deleteFieldConfirm;fid='.$fid.';tid='.$tid,$self->get("url"),WebGUI::International::get(19,"Asset_DataForm")) unless ($cantDelete);
-	$output .= editIcon('func=editField;fid='.$fid.';tid='.$tid,$self->get("url"))
-		.moveUpIcon('func=moveFieldUp;fid='.$fid.';tid='.$tid,$self->get("url"))
-		.moveDownIcon('func=moveFieldDown;fid='.$fid.';tid='.$tid,$self->get("url"));
+	$output = $self->session->icon->delete('func=deleteFieldConfirm;fid='.$fid.';tid='.$tid,$self->get("url"),WebGUI::International::get(19,"Asset_DataForm")) unless ($cantDelete);
+	$output .= $self->session->icon->edit('func=editField;fid='.$fid.';tid='.$tid,$self->get("url"))
+		.$self->session->icon->moveUp('func=moveFieldUp;fid='.$fid.';tid='.$tid,$self->get("url"))
+		.$self->session->icon->moveDown('func=moveFieldDown;fid='.$fid.';tid='.$tid,$self->get("url"));
 	return $output;
 }
 #-------------------------------------------------------------------
@@ -103,10 +103,10 @@ sub _tabAdminIcons {
 	my $tid = shift;
 	my $cantDelete = shift;
 	my $output;
-	$output = deleteIcon('func=deleteTabConfirm;tid='.$tid,$self->get("url"),WebGUI::International::get(100,"Asset_DataForm")) unless ($cantDelete);
-	$output .= editIcon('func=editTab;tid='.$tid,$self->get("url"))
-		.moveLeftIcon('func=moveTabLeft;tid='.$tid,$self->get("url"))
-		.moveRightIcon('func=moveTabRight;tid='.$tid,$self->get("url"));
+	$output = $self->session->icon->delete('func=deleteTabConfirm;tid='.$tid,$self->get("url"),WebGUI::International::get(100,"Asset_DataForm")) unless ($cantDelete);
+	$output .= $self->session->icon->edit('func=editTab;tid='.$tid,$self->get("url"))
+		.$self->session->icon->moveLeft('func=moveTabLeft;tid='.$tid,$self->get("url"))
+		.$self->session->icon->moveRight('func=moveTabRight;tid='.$tid,$self->get("url"));
 	return $output;
 }
 
@@ -331,9 +331,9 @@ sub getListTemplateVars {
 		push(@recordLoop,{
 			"record.ipAddress"=>$record->{ipAddress},
 			"record.edit.url"=>$self->getUrl("func=view;entryId=".$record->{DataForm_entryId}),
-			"record.edit.icon"=>editIcon("func=view;entryId=".$record->{DataForm_entryId}, $self->getUrl),
+			"record.edit.icon"=>$self->session->icon->edit("func=view;entryId=".$record->{DataForm_entryId}, $self->getUrl),
 			"record.delete.url"=>$self->getUrl("func=deleteEntry;entryId=".$record->{DataForm_entryId}),
-			"record.delete.icon"=>deleteIcon("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"Asset_DataForm")),
+			"record.delete.icon"=>$self->session->icon->delete("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"Asset_DataForm")),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},

@@ -153,9 +153,9 @@ sub www_listDatabaseLinks {
 	foreach my $id (keys %{$links}) {
 		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';
                 $output = '<tr><td valign="top" class="tableData">'
-			.deleteIcon('op=deleteDatabaseLink;dlid='.$id)
-			.editIcon('op=editDatabaseLink;dlid='.$id)
-			.copyIcon('op=copyDatabaseLink;dlid='.$id)
+			.$session->icon->delete('op=deleteDatabaseLink;dlid='.$id)
+			.$session->icon->edit('op=editDatabaseLink;dlid='.$id)
+			.$session->icon->copy('op=copyDatabaseLink;dlid='.$id)
 			.'</td>';
                 $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td></tr>';
         }

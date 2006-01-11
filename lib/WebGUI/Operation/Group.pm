@@ -150,8 +150,8 @@ sub walkGroups {
         my $sth = $session->db->read("select groups.groupId, groups.groupName from groupGroupings left join groups on groups.groupId=groupGroupings.groupId where groupGroupings.inGroup=".$session->db->quote($parentId));
         while (my ($id, $name) = $sth->array) {
 		$output .= $indent
-			.deleteIcon('op=deleteGroupGrouping;gid='.$parentId.';delete='.$id)
-			.editIcon('op=editGroup;gid='.$id)
+			.$session->icon->delete('op=deleteGroupGrouping;gid='.$parentId.';delete='.$id)
+			.$session->icon->edit('op=editGroup;gid='.$id)
 			.' '.$name.'<br />';
                 $output .= walkGroups($id,$indent."&nbsp; &nbsp; ");
         }
@@ -652,8 +652,8 @@ sub www_manageUsersInGroup {
 				name=>"uid",
 				value=>$row->{userId}
 				})
-                        .deleteIcon('op=deleteGrouping;uid='.$row->{userId}.';gid='.$session->form->process("gid"))
-                        .editIcon('op=editGrouping;uid='.$row->{userId}.';gid='.$session->form->process("gid"))
+                        .$session->icon->delete('op=deleteGrouping;uid='.$row->{userId}.';gid='.$session->form->process("gid"))
+                        .$session->icon->edit('op=editGrouping;uid='.$row->{userId}.';gid='.$session->form->process("gid"))
                         .'</td>';
                 $output .= '<td class="tableData"><a href="'.$session->url->page('op=editUser;uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';
                 $output .= '<td class="tableData">'$session->datetime->epochToHuman($row->{expireDate},"%z").'</td></tr>';

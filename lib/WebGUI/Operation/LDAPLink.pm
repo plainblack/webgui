@@ -225,9 +225,9 @@ sub www_listLDAPLinks {
    $i++;
    while ($data = $sth->hashRef) {
       $row[$i] = '<tr><td valign="top" class="tableData">'
-	        .deleteIcon('op=deleteLDAPLink;llid='.$data->{ldapLinkId},$session->url->page(),WebGUI::International::get("LDAPLink_988","AuthLDAP"))
-			.editIcon('op=editLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
-			.copyIcon('op=copyLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
+	        .$session->icon->delete('op=deleteLDAPLink;llid='.$data->{ldapLinkId},$session->url->page(),WebGUI::International::get("LDAPLink_988","AuthLDAP"))
+			.$session->icon->edit('op=editLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
+			.$session->icon->copy('op=copyLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
 			.'</td>';
       $row[$i] .= '<td valign="top" class="tableData">'.$data->{ldapLinkName}.'</td>';
 	  

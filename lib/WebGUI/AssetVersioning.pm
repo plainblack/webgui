@@ -455,7 +455,7 @@ sub www_manageRevisions {
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
 		where assetData.assetId=".$self->session->db->quote($self->getId));
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
-                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")).'</td>
+                $output .= '<tr><td>'.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td><a href="'.$self->getUrl("func=viewRevision;revisionDate=".$date).'">'.$self->session->datetime->epochToHuman($date).'</a></td>
 			<td>'.$by.'</td>
 			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$tagId).'">'.$tag.'</a></td>
@@ -496,7 +496,7 @@ sub www_manageVersions {
 	while (my ($id,$name,$date,$by) = $sth->array) {
 		my $u = WebGUI::User->new($by);
 		$output .= '<tr>
-			<td>'.WebGUI::Icon::deleteIcon("func=rollbackVersionTag;tagId=".$id,$self->get("url"),$rollbackPrompt).'</td>
+			<td>'.$self->session->icon->delete("func=rollbackVersionTag;tagId=".$id,$self->get("url"),$rollbackPrompt).'</td>
 			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
 			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
@@ -529,7 +529,7 @@ sub www_manageRevisionsInTag {
 	foreach my $row (@{$p->getPageData}) {
         	my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
 		my $asset = WebGUI::Asset->new($id,$class,$date);
-                $output .= '<tr><td>'.WebGUI::Icon::deleteIcon("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$self->session->form->process("tagId").";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
+                $output .= '<tr><td>'.$self->session->icon->delete("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$self->session->form->process("tagId").";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td>'.$asset->getTitle.'</td>
 			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
 			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.$self->session->datetime->epochToHuman($date).'</a></td>

@@ -584,7 +584,7 @@ perl -pi.bak -e 's!\$session{setting}{(\w+)}!\$self->session->setting->get("$1")
 
 Fix $session{user}
 
-perl -pi.bak -e 's!\$session{user}{([username|userId])}!\$self->session->user->$1!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{user}{(username|userId)}!\$self->session->user->$1!g' fileNameGoesHere
 perl -pi.bak -e 's!\$session{user}{(\w+)}!\$self->session->user->profileField("$1")!g' fileNameGoesHere
 
 Fix $session{env}
@@ -756,12 +756,21 @@ processReplacements functions.
 perl -pi.bak -e 's!WebGUI\:\:HTML\:\:makeAbsolute\(!WebGUI::HTML::makeAbsolute(\$self->session,!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:HTML\:\:processReplacements\(!WebGUI::HTML::processReplacements(\$self->session,!g' fileNameGoesHere
 
+
 5.23.15 WebGUI::HTMLForm API Refactored
 
 You now need to pass in a reference to session to the constructor.
 
 perl -pi.bak -e 's!WebGUI\:\:HTMLForm\-\>new\(!WebGUI::HTMLForm->new(\$self->session,!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:HTMLForm\-\>new\;!WebGUI::HTMLForm->new(\$self->session);!g' fileNameGoesHere
+
+
+5.23.15 WebGUI::Icon API Refactored
+
+WebGUI::Icon is now accessible through $session->icon.
+
+perl -pi.bak -e 's!WebGUI\:\:Icon\:\:(\w+)Icon\(!\$self->session->icon->$1(!g' fileNameGoesHere
+perl -pi.bak -e 's!(help|become|cut|copy|delete|edit|manage|moveBottom|moveDown|moveLeft|moveRight|moveTop|moveUp|locked|drag|shortcut|paste|view|export)Icon\(!\$self->session->icon->$1(!g' fileNameGoesHere 
 
 
 

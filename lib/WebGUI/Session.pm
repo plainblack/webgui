@@ -24,6 +24,7 @@ use WebGUI::Session::Env;
 use WebGUI::Session::ErrorHandler;
 use WebGUI::Session::Form;
 use WebGUI::Session::Http;
+use WebGUI::Session::Icon;
 use WebGUI::Session::Os;
 use WebGUI::Session::Privilege;
 use WebGUI::Session::Scratch;
@@ -242,7 +243,7 @@ sub getId {
 
 =head2 http ( )
 
-Returns a reference to the WebGUI::HTTP object.
+Returns a reference to the WebGUI::Session::Http object.
 
 =cut
 
@@ -252,6 +253,23 @@ sub http {
 		$self->{_http} = WebGUI::Session::Http->new($session);
 	}
 	return $self->{_http};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 icon ( )
+
+Returns a WebGUI::Session::Icon object.
+
+=cut
+
+sub icon {
+	my $self = shift;
+	unless ($self->{_icon}) {
+		$self->{_icon} = WebGUI::Session::Icon->new($session);
+	}
+	return $self->{_icon};
 }
 
 

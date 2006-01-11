@@ -138,8 +138,8 @@ sub setManageIcons {
                 if (exists $self->session->asset) {
                         $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
                 }
-                my $buttons = editIcon("func=edit".$returnUrl,$template->get("url"));
-                $buttons .= manageIcon("func=manageAssets",$template->getParent->get("url"));
+                my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$template->get("url"));
+                $buttons .= $self->session->icon->manage("func=manageAssets",$template->getParent->get("url"));
 		$self->get("subtext") = $buttons . $self->get("subtext");
 	}
 }
