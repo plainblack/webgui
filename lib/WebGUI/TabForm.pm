@@ -98,7 +98,7 @@ sub addTab {
 	my $name = shift;
 	my $label = shift;
 	my $uiLevel = shift || 0;
-	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new(uiLevelOverride=>$self->{_uiLevelOverride});
+	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new($self->session,uiLevelOverride=>$self->{_uiLevelOverride});
 	$self->{_tab}{$name}{label} = $label;
 	$self->{_tab}{$name}{uiLevel} = $uiLevel;
 }
@@ -197,7 +197,7 @@ sub new {
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
-		$tabs{$key}{form} = WebGUI::HTMLForm->new(uiLevelOverride=>$uiLevelOverride);
+		$tabs{$key}{form} = WebGUI::HTMLForm->new($self->session,uiLevelOverride=>$uiLevelOverride);
 		$tabs{$key}{label} = $startingTabs->{$key}->{label};
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}

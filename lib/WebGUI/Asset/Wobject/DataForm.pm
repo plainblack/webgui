@@ -757,7 +757,7 @@ sub www_editField {
 	}
 	$tab = $self->session->db->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
 	$tab->{0} = WebGUI::International::get("no tab","Asset_DataForm");
-        $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "fid",
 		-value => $self->session->form->process("fid")
@@ -914,7 +914,7 @@ sub www_editTab {
 	unless ($self->session->form->process("tid") eq "new") {	
         	%tab = $self->session->db->quickHash("select * from DataForm_tab where DataForm_tabId=".$self->session->db->quote($self->session->form->process("tid")));
 	}
-        $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "tid",
 		-value => $self->session->form->process("tid")

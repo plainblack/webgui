@@ -172,7 +172,7 @@ sub view {
 	##Find all the users for which I am a delegate
 	my @users = $self->session->db->buildArray("select userId from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and delegateUserId=".$self->session->db->quote($self->session->user->profileField("userId")));
 
-	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	if (@users) {
 		my %nameHash;
 		tie %nameHash, "Tie::IxHash";
@@ -311,7 +311,7 @@ group by userId", $self->session->db->quote($self->getId), $self->session->db->q
 	$sql = sprintf "select delegateUserId from InOutBoard_delegates where userId=%s and assetId=%s",
 	                $self->session->db->quote($self->session->user->profileField("userId")), $self->session->db->quote($self->getId);
 	my $delegates = $self->session->db->buildArrayRef($sql);
-        my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 	    -name => "func",
 	    -value => "selectDelegatesEditSave"
@@ -379,7 +379,7 @@ sub www_viewReport {
 	my $self = shift;
 	return "" unless ($self->session->user->isInGroup($self->getValue("reportViewerGroup")));
 	my %var;
-	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl, -method=>"GET");
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -method=>"GET");
 	my %changedBy = ();
 	$f->hidden(
 		-name=>"func",

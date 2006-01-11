@@ -640,7 +640,7 @@ sub www_getUserPrefsForm {
 	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;
-	my $f = WebGUI::HTMLForm->new(extras=>' onSubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
+	my $f = WebGUI::HTMLForm->new($self->session,extras=>' onSubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
 	$f->raw('<table cellspacing="0" cellpadding="3" border="0">');
 	$f->hidden(  
 		-name => 'func', 
@@ -741,7 +741,7 @@ sub www_editOverride {
 		%props = (%props,%{$def->{properties}});
 	}
 	$output .= '</table>';
-  my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+  my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
   $f->hidden(-name=>"func",-value=>"saveOverride");
   $f->hidden(-name=>"overrideFieldName",-value=>$self->session->form->process("fieldName"));
   $f->readOnly(-label=>$i18n->get("fieldName"),-value=>$self->session->form->process("fieldName"));

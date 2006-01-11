@@ -434,7 +434,7 @@ sub www_editUserKarma {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
-        $f = WebGUI::HTMLForm->new;
+        $f = WebGUI::HTMLForm->new($session);
         $f->hidden(
 		-name => "op",
 		-value => "editUserKarmaSave",

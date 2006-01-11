@@ -80,7 +80,7 @@ sub _logSecurityMessage {
 sub addUserForm {
    my $self = shift;
    my $userData = $self->getParams;
-   my $f = WebGUI::HTMLForm->new;
+   my $f = WebGUI::HTMLForm->new($self->session);
    $f->password(
 	name=>"authWebGUI.identifier",
 	label=>WebGUI::International::get(51),
@@ -348,7 +348,7 @@ sub editUserFormSave {
 
 sub editUserSettingsForm {
    my $self = shift;
-   my $f = WebGUI::HTMLForm->new;
+   my $f = WebGUI::HTMLForm->new($self->session);
    $f->text(
 	         -name=>"webguiPasswordLength",
 			 -value=>$self->session->setting->get("webguiPasswordLength"),

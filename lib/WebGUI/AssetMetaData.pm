@@ -165,7 +165,7 @@ sub www_editMetaDataField {
 		$fieldInfo = $self->getMetaDataFields($self->session->form->process("fid"));
 	}
 	my $fid = $self->session->form->process("fid") || "new";
-	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	$f->hidden(
 		-name => "func",
 		-value => "editMetaDataFieldSave"

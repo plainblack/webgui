@@ -312,7 +312,7 @@ sub www_addAccessory {
    my $self = shift;
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($f, $accessory, @usedAccessories);
-   $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+   $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
 		-name => "func",
 		-value => "addAccessorySave",
@@ -351,7 +351,7 @@ sub www_addRelated {
    my $self = shift;
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($f, $related, @usedRelated);
-   $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+   $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
 		-name => "func",
 		-value => "addRelatedSave",
@@ -469,7 +469,7 @@ sub www_editBenefit {
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $benefits);
    $data = $self->getCollateral("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
-   $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+   $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
 		-name => "bid",
 		-value => $data->{Product_benefitId},
@@ -516,7 +516,7 @@ sub www_editFeature {
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $features);
    $data = $self->getCollateral("Product_feature","Product_featureId",$self->session->form->process("fid"));
-   $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+   $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
 		-name => "fid",
 		-value => $data->{Product_featureId},
@@ -562,7 +562,7 @@ sub www_editSpecification {
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $hashRef);
    $data = $self->getCollateral("Product_specification","Product_specificationId",$self->session->form->process("sid"));
-   $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+   $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
 		-name => "sid",
 		-value => $data->{Product_specificationId},

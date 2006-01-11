@@ -179,7 +179,7 @@ sub www_checkoutConfirm {
 	
 	$plugin = WebGUI::Commerce::Payment->load($session->scratch->get('paymentGateway'));
 
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => 'op', 
 		-value => 'checkoutSubmit'

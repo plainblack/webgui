@@ -50,7 +50,7 @@ sub www_editReplacement {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $data = $session->db->getRow("replacements","replacementId",$session->form->process("replacementId"));
-	my $f = WebGUI::HTMLForm->new;
+	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name=>"op",
 		-value=>"editReplacementSave"

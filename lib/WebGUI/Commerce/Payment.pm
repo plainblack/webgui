@@ -81,7 +81,7 @@ sub configurationForm {
 	$self = shift;
 	$form = shift;
 
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($self->session);
 	$f->yesNo(
 		-name	=> $self->prepend('enabled'),
 		-value	=> $self->enabled,
@@ -386,7 +386,7 @@ the database. Use it on all fields in the configurationForm method.
 
 For instance:
 
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($self->session);
 	$f->text(
 		-name	=> $self->prepend('MyField');
 		-label	=> 'MyField'

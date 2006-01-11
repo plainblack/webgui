@@ -81,7 +81,7 @@ sub www_editDatabaseLink {
 	} else {
                	%db = %{WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->get}; 
 	}
-	$f = WebGUI::HTMLForm->new(
+	$f = WebGUI::HTMLForm->new($session,
 		-extras=>'autocomplete="off"'
 		);
         $f->hidden(

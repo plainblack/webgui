@@ -778,7 +778,7 @@ sub www_editAnswer {
         return $self->session->privilege->insufficient() unless ($self->canEdit);
         
 	$answer = $self->getCollateral("Survey_answer","Survey_answerId",$self->session->form->process("aid"));
-        $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "assetId",
 		-value => $self->session->form->process("assetId")
@@ -881,7 +881,7 @@ sub www_editQuestion {
 	$question = $self->getCollateral("Survey_question","Survey_questionId",$self->session->form->process("qid"));
 	$answerFieldType = $question->{answerFieldType} || "radioList";
 	
-	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	$f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	$f->hidden(
 		-name => "assetId",
 		-value => $self->get("assetId")
@@ -1048,7 +1048,7 @@ sub www_editSection {
 	  return $self->session->privilege->vitalComponent;
 	}
 	
-	$f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	$f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	$f->hidden(
 		-name => "assetId",
 		-value => $self->get("assetId")

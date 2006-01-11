@@ -442,7 +442,7 @@ sub www_editListing {
         my $self = shift;
         my $listing= $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
-        my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
                 -value=>"editListingSave"
@@ -650,7 +650,7 @@ sub www_editField {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless($self->canEdit);
         my $field = $self->session->db->getRow("Matrix_field","fieldId",$self->session->form->process("fieldId"));
-        my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
                 -value=>"editFieldSave"
@@ -986,7 +986,7 @@ sub www_viewDetail {
 	$var{manufacturerUrl} = $listing->{manufacturerUrl};
 	$var{'manufacturerUrl.click'} = $self->getUrl("m=1&amp;func=click&amp;listingId=".$listingId);
 	$var{versionNumber} = $listing->{versionNumber};
-	my $f = WebGUI::HTMLForm->new(
+	my $f = WebGUI::HTMLForm->new($self->session,
 		-extras=>'class="content"',
 		-tableExtras=>'class="content"'
 		);
@@ -1061,7 +1061,7 @@ sub www_viewDetail {
                 10=>"10 - Best"
 		);
 	my $ratingsTable = '<table class="ratingForm"><tbody><tr><th></th><th>Mean</th><th>Median</th><th>Count</th></tr>';
-	$f = WebGUI::HTMLForm->new(
+	$f = WebGUI::HTMLForm->new($self->session,
 		-extras=>'class="ratingForm"',
 		-tableExtras=>'class="ratingForm"'
 		);

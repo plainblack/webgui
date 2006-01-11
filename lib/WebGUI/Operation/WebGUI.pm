@@ -77,7 +77,7 @@ sub www_setup {
 		$u->username($session->form->process("username","text","Admin"));
 		$u->profileField("email",$session->form->email("email"));
 		$u->identifier(Digest::MD5::md5_base64($session->form->process("identifier","password","123qwe")));
-		my $f = WebGUI::HTMLForm->new(action=>$session->url->gateway());
+		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden(
 			-name=>"op",
 			-value=>"setup"
@@ -116,7 +116,7 @@ sub www_setup {
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
 		my $u = WebGUI::User->new('3');
-		my $f = WebGUI::HTMLForm->new(action=>$session->url->gateway());
+		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden(
 			-name=>"op",
 			-value=>"setup"

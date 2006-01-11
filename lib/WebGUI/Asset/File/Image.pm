@@ -247,7 +247,7 @@ sub www_resize {
 		$self->setSize($self->getStorageLocation->getFileSize($self->get("filename")));
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit image","Asset_Image"));
-	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	$f->hidden(
 		-name=>"func",
 		-value=>"resize"

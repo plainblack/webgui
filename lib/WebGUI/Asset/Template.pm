@@ -357,7 +357,7 @@ sub www_styleWizard {
         return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $output = "";
 	if ($self->session->form->process("step") == 2) {
-		my $f = WebGUI::HTMLForm->new({action=>$self->getUrl});
+		my $f = WebGUI::HTMLForm->new($self->session,{action=>$self->getUrl});
 		$f->hidden(name=>"func", value=>"styleWizard");
 		$f->hidden(name=>"proceed", value=>"manageAssets") if ($self->session->form->process("proceed"));
 		$f->hidden(name=>"step", value=>3);

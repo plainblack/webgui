@@ -23,7 +23,7 @@ sub configurationForm {
 	my ($self, $f);
 	$self = shift;
 	
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($self->session);
 	$f->float(
 		-name	=> $self->prepend('pricePerUnitWeight'),
 		-label	=> WebGUI::International::get('price per weight', 'CommerceShippingByWeight'),

@@ -16,13 +16,9 @@ package WebGUI::HTMLForm;
 
 use CGI::Util qw(rearrange);
 use strict qw(vars refs);
-use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Grouping;
-use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -36,7 +32,7 @@ Package that makes HTML forms typed data and significantly reduces the code need
 =head1 SYNOPSIS
 
  use WebGUI::HTMLForm;
- $f = WebGUI::HTMLForm->new;
+ $f = WebGUI::HTMLForm->new($self->session);
 
  $f->someFormControlType(
 	name=>"someName",
@@ -65,6 +61,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _uiLevelChecksOut {
+	my $self = shift;
 	if ($_[0] <= $self->session->user->profileField("uiLevel")) {
 		return 1;
 	} else {
@@ -146,17 +143,18 @@ If you want to add anything special to the form's table like a name or styleshee
 sub new {
 	my ($header, $footer);
 	my $class = shift;
+	my $session = shift;
 	my %param = @_;
-	$header = "\n\n".WebGUI::Form::formHeader({
-		action=>($param{action} || $param{'-action'}),
+	$header = "\n\n".WebGUI::Form::formHeader($session,{
+		action=>($param{action} || $param{'-action'} || $session->url->page),
 		extras=>($param{extras} || $param{'-extras'}),
 		method=>($param{method} || $param{'-method'}),
 		enctype=>($param{enctype} || $param{'-enctype'})
 		});
 	$header .= "\n<table ".$param{tableExtras}.'><tbody>';
 	$footer = "</tbody></table>\n" ;
-	$footer .= WebGUI::Form::formFooter($self->session,);
-        bless {_uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;
+	$footer .= WebGUI::Form::formFooter($session);
+        bless {_session=>$session, _uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -168,7 +166,8 @@ Returns the HTML for this form object.
 =cut
 
 sub print {
-        return $_[0]->{_header}.$_[0]->{_data}.$_[0]->{_footer}.'<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wz_tooltip.js"></script>';
+	my $self = shift;
+        return $self->{_header}.$self->{_data}.$self->{_footer}.'<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wz_tooltip.js"></script>';
 }
 
 #-------------------------------------------------------------------
@@ -206,6 +205,19 @@ sub raw {
         $self->{_data} .= $output;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
 
 #-------------------------------------------------------------------
 

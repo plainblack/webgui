@@ -81,7 +81,7 @@ sub www_editLDAPLink {
    tie %db, 'Tie::CPHash';
    %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    
-   $f = WebGUI::HTMLForm->new( -extras=>'autocomplete="off"' );
+   $f = WebGUI::HTMLForm->new($session, -extras=>'autocomplete="off"' );
    $f->hidden(
    		-name => "op",
 		-value => "editLDAPLinkSave",

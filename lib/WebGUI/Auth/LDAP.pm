@@ -96,7 +96,7 @@ sub addUserForm {
 	my $connectDN = $session{form}{'authLDAP_connectDN'} || $userData->{connectDN};
 	my $ldapConnection = $session{form}{'authLDAP_ldapConnection'} || $userData->{ldapConnection};
 	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
-	my $f = WebGUI::HTMLForm->new;
+	my $f = WebGUI::HTMLForm->new($self->session);
 	my $jscript = "";
 	if(scalar(keys %{$ldapLinks}) > 0) {
 	   my $jsArray = "";
@@ -359,7 +359,7 @@ sub editUserFormSave {
 
 sub editUserSettingsForm {
    my $self = shift;
-   my $f = WebGUI::HTMLForm->new;
+   my $f = WebGUI::HTMLForm->new($self->session);
    my $ldapConnection = WebGUI::Form::selectBox({
 	                name=>"ldapConnection",
 					options=>WebGUI::LDAPLink::getList(),

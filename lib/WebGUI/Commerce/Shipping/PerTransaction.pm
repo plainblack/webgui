@@ -19,7 +19,7 @@ sub configurationForm {
 	my ($self, $f);
 	$self = shift;
 	
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($self->session);
 	$f->float(
 		-name	=> $self->prepend('pricePerTransaction'),
 		-label	=> WebGUI::International::get('price', 'CommerceShippingPerTransaction'),

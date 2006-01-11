@@ -348,7 +348,7 @@ sub www_addVersionTag {
         return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my $i18n = WebGUI::International->new("Asset");
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
-	my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	my $tag = $self->session->db->getRow("assetVersionTag","tagId",$self->session->form->process("tagId"));
 	$f->hidden(
 		-name=>"func",

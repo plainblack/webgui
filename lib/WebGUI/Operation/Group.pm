@@ -105,7 +105,7 @@ sub getGroupSearchForm {
 	$session->scratch->set("groupSearchKeyword",$session->form->process("keyword"));
         $session->scratch->set("groupSearchModifier",$session->form->process("modifier"));
 	my $output = '<div align="center">';
-	my $f = WebGUI::HTMLForm->new(1);
+	my $f = WebGUI::HTMLForm->new($session,1);
 	foreach my $key (keys %{$params}) {
                 $f->hidden(
                         -name=>$key,
@@ -268,7 +268,7 @@ sub www_editGroup {
 	} else {
 		$g = WebGUI::Group->new($session->form->process("gid"));
 	}
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($session);
         $f->hidden(
 		-name => "op",
 		-value => "editGroupSave",
@@ -435,7 +435,7 @@ sub www_editGroupSave {
 sub www_editGrouping {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session->form->process("gid")));
-	my $f = WebGUI::HTMLForm->new;
+	my $f = WebGUI::HTMLForm->new($session);
         $f->hidden(
 		-name => "op",
 		-value => "editGroupingSave"
@@ -490,7 +490,7 @@ sub www_emailGroup {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session->form->process("gid")));
 	my ($output,$f);
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => "op",
 		-value => "emailGroupSend"
@@ -598,7 +598,7 @@ sub www_listGroups {
 sub www_manageGroupsInGroup {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session->form->process("gid")));
-        my $f = WebGUI::HTMLForm->new;
+        my $f = WebGUI::HTMLForm->new($session);
         $f->hidden(
 		-name => "op",
 		-value => "addGroupsToGroupSave"
@@ -664,7 +664,7 @@ sub www_manageUsersInGroup {
 	$output .= WebGUI::Operation::User::getUserSearchForm("manageUsersInGroup",{gid=>$session->form->process("gid")});
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
 	return _submenu($output) unless ($session->form->process("doit") || $userCount < 250 || $session->form->process("pn") > 1);
-	my $f = WebGUI::HTMLForm->new;
+	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")

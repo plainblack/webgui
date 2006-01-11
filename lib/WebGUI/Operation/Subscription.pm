@@ -66,7 +66,7 @@ sub www_createSubscriptionCodeBatch {
 	tie %subscriptions, "Tie::IxHash";
 	%subscriptions = $session->db->buildHash("select subscriptionId, name from subscription where deleted != 1 order by name");
 	
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => 'op', 
 		-value => 'createSubscriptionCodeBatchSave'
@@ -201,7 +201,7 @@ sub www_editSubscription {
 
 	$subscriptionId = $session->form->process("sid") || 'new';
 
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => 'op', 
 		-value => 'editSubscriptionSave'
@@ -454,7 +454,7 @@ sub www_redeemSubscriptionCode {
 		$var{message} = $i18n->get('redeem code ask for code');
 	}
 	
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => 'op',
 		-value => 'redeemSubscriptionCode'

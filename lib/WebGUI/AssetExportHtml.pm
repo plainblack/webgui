@@ -139,7 +139,7 @@ sub www_export {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
         $self->getAdminConsole->setHelp("page export", "Asset");
-        my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
+        my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "func",
 		-value => "exportStatus"

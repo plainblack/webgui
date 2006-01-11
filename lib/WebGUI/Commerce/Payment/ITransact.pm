@@ -110,7 +110,7 @@ sub checkoutForm {
 
 	$u = WebGUI::User->new($self->session->user->profileField("userId"));
 
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($self->session);
 	$f->text(
 		-name	=> 'firstName',
 		-label	=> $i18n->get('firstName'),
@@ -435,7 +435,7 @@ sub configurationForm {
 	$self = shift;
  	$i18n = WebGUI::International->new('CommercePaymentITransact');
 
-	$f = WebGUI::HTMLForm->new;
+	$f = WebGUI::HTMLForm->new($self->session);
 	$f->text(
 		-name	=> $self->prepend('vendorId'),
 		-label	=> $i18n->get('vendorId'),

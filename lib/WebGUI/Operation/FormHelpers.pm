@@ -49,7 +49,7 @@ sub www_formAssetTree {
 
 sub www_richEditPageTree {
 	my $session = shift;
-	my $f = WebGUI::HTMLForm->new(-action=>"#",-extras=>'name"linkchooser"');
+	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
 		-name=>"url",
 		-label=>WebGUI::International::get(104),

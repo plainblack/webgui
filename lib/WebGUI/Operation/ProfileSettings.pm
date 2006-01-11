@@ -74,7 +74,7 @@ sub www_editProfileCategory {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $data = {};
-	my $f = WebGUI::HTMLForm->new;
+	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => "op",
 		-value => "editProfileCategorySave",
@@ -139,7 +139,7 @@ sub www_editProfileCategorySave {
 sub www_editProfileField {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-        my $f = WebGUI::HTMLForm->new;
+        my $f = WebGUI::HTMLForm->new($session);
         $f->hidden(
 		-name => "op",
 		-value => "editProfileFieldSave",
