@@ -148,7 +148,7 @@ sub processPropertiesFromFormPost {
 			my $until = $self->session->datetime->setToEpoch($self->session->form->process("until"));
 			$until = $self->get("eventEndDate") unless ($until >= $self->get("eventEndDate"));
 			my $interval = ($self->session->form->process("interval") < 1) ? 1 : $self->session->form->process("interval");
-			my $recurringEventId = WebGUI::Id::generate();
+			my $recurringEventId = $self->session->id->generate();
 			$self->update({EventsCalendar_recurringId=>$recurringEventId});
 			my $start = $self->get("eventStartDate");
 			my $end = $self->get("eventEndDate");

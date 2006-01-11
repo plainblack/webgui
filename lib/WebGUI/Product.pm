@@ -27,7 +27,7 @@ sub addOptionToParameter {
 	$parameterId = shift;
 	$properties = shift || {};
 	
-	$optionId = WebGUI::Id::generate;
+	$optionId = $self->session->id->generate;
 
 	$self->session->db->write("insert into productParameterOptions ".
 		"(optionId, parameterId) values ".
@@ -52,7 +52,7 @@ sub addParameter {
 	$self = shift;
 	$properties = shift;
 
-	$parameterId = WebGUI::Id::generate;
+	$parameterId = $self->session->id->generate;
 
 	$self->session->db->write("insert into productParameters (parameterId, productId) values ".
 		"(".$self->session->db->quote($parameterId).", ".$self->session->db->quote($self->get('productId')).")");
@@ -210,7 +210,7 @@ sub new {
 	$options = {};
 	
 	if ($productId eq 'new') {
-		$productId = WebGUI::Id::generate;
+		$productId = $self->session->id->generate;
 		$properties = {productId => $productId};
 		$self->session->db->write("insert into products (productId) values (".$self->session->db->quote($productId).")");
 	} else {
@@ -400,7 +400,7 @@ sub updateVariants {
 		if (exists $variants{$var{composition}}) {
 			$var{variantId} = $variants{$var{composition}}{variantId},
 		} else {
-			$var{variantId} = WebGUI::Id::generate;
+			$var{variantId} = $self->session->id->generate;
 		}
 
 		push (@newVariants, {%var});

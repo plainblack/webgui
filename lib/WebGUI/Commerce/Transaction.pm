@@ -421,7 +421,7 @@ sub new {
 	$userId = shift || $self->session->user->profileField("userId");
 	
 	if ($transactionId eq 'new') {
-		$transactionId = WebGUI::Id::generate;
+		$transactionId = $self->session->id->generate;
 
 		$self->session->db->write("insert into transaction ".
 			"(transactionId, userId, amount, gatewayId, initDate, completionDate, status) values ".

@@ -63,7 +63,7 @@ sub addFileFromCaptcha {
 	my $challenge;
 	srand;
 	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
-	my $filename = "captcha.".WebGUI::Id::generate().".png";
+	my $filename = "captcha.".$self->session->id->generate().".png";
 	my $image = Image::Magick->new();
 	$image->Set(size=>'105x26');
 	$image->ReadImage('xc:white');

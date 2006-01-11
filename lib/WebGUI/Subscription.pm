@@ -130,7 +130,7 @@ sub new {
 	$subscriptionId = shift;
 
 	if ($subscriptionId eq 'new') {
-		$subscriptionId = WebGUI::Id::generate;
+		$subscriptionId = $self->session->id->generate;
 		$self->session->db->write("insert into subscription (subscriptionId) values (".$self->session->db->quote($subscriptionId).")");
 	}
 	

@@ -135,7 +135,7 @@ sub duplicate {
 	$self = shift;
 	
 	$newAsset = $self->SUPER::duplicate(shift);
-	$newSurveyId = WebGUI::Id::generate();
+	$newSurveyId = $self->session->id->generate();
 	$newAsset->update({
 		Survey_id=>$newSurveyId
 		});
@@ -211,7 +211,7 @@ sub getEditForm {
 
 	$tabform->getTab('properties')->hidden(
 		-name => "Survey_id",
-		-value => ($self->get("Survey_id") || WebGUI::Id::generate())
+		-value => ($self->get("Survey_id") || $self->session->id->generate())
 	);
 	$tabform->getTab('display')->template(
 		-name		=> 'templateId',

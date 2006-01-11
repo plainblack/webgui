@@ -113,7 +113,7 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 
 sub close {
 	my $self = shift;
-	$self->session->asset->DESTROY() if (exists $self->session->asset && $self->session->asset ne "");
+	$self->asset->DESTROY() if (exists $self->asset && $self->asset ne "");
 	foreach my $slavedbh (@{$self->{_slave}}) {
 		$slavedbh->disconnect();
 	}
@@ -146,7 +146,7 @@ Returns a WebGUI::Session::DateTime object.
 sub datetime {
 	my $self = shift;
 	if (exists $self->{_datetime}) {
-		$self->{_datetime} = WebGUI::Session::DateTime->new($session);
+		$self->{_datetime} = WebGUI::Session::DateTime->new($self);
 	}
 	return $self->{_datetime};
 }
@@ -162,7 +162,7 @@ Returns a WebGUI::SQL object, which is connected to the WebGUI database.
 sub db {
 	my $self = shift;
 	if (exists $self->{_db}) {
-		$self->{_db} = $self->session->db->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"), $self);
+		$self->{_db} = $self->db->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"), $self);
 	}
 	return $self->{_db};
 }
@@ -181,7 +181,7 @@ sub dbSlave {
 		foreach (1..3) {
 			my $slave = $self->config->get("dbslave".$_);
 			if (exists $slave->{dsn}) {
-				push(@{$self->{_slave}},$self->session->db->connect($slave->{dsn},$slave->{user},$slave->{pass}, $self));
+				push(@{$self->{_slave}},$self->db->connect($slave->{dsn},$slave->{user},$slave->{pass}, $self));
 			}
 		}
 	}
@@ -250,7 +250,7 @@ Returns a reference to the WebGUI::Session::Http object.
 sub http {
 	my $self = shift;
 	unless ($self->{_http}) {
-		$self->{_http} = WebGUI::Session::Http->new($session);
+		$self->{_http} = WebGUI::Session::Http->new($self);
 	}
 	return $self->{_http};
 }
@@ -267,9 +267,26 @@ Returns a WebGUI::Session::Icon object.
 sub icon {
 	my $self = shift;
 	unless ($self->{_icon}) {
-		$self->{_icon} = WebGUI::Session::Icon->new($session);
+		$self->{_icon} = WebGUI::Session::Icon->new($self);
 	}
 	return $self->{_icon};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 id ( )
+
+Returns a reference to the WebGUI::Session::Id object.
+
+=cut
+
+sub id {
+	my $self = shift;
+	unless ($self->{_id}) {
+		$self->{_id} = WebGUI::Session::Id->new($self);
+	}
+	return $self->{_id};
 }
 
 
@@ -483,7 +500,7 @@ sub user {
 		$self->{_var}{userId} = $option->{userId} || $option->{user}->userId; 
 		$self->db-setRow("userSession","sessionId", $self->{_var});
 		if ($self->setting("passiveProfilingEnabled")) {
-			$self->db->write("update passiveProfileLog set userId = ".$self->session->db->quote($self->{_var}{userId})." where sessionId = ".$self->session->db->quote($self->getId));
+			$self->db->write("update passiveProfileLog set userId = ".$self->db->quote($self->{_var}{userId})." where sessionId = ".$self->db->quote($self->getId));
 		}	
 		delete $self->{_stow};
 		$self->{_user} = $option->{user} || WebGUI::User->new($session, $self->{_var}{userId});

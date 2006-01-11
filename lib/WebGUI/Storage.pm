@@ -326,7 +326,7 @@ Creates a new storage location on the file system.
 
 sub create {
 	my $class = shift;
-	my $id = WebGUI::Id::generate();
+	my $id = $self->session->id->generate();
 	my $self = $class->get($id); 
 	$self->_makePath;
 	return $self; 
@@ -341,7 +341,7 @@ Creates a temporary storage location on the file system.
 
 sub createTemp {
 	my $class = shift;
-	my $id = WebGUI::Id::generate();
+	my $id = $self->session->id->generate();
 	$id =~ m/^(.{2})/;
 	my $self = {_id => $id, _part1 => 'temp', _part2 => $1};
 	bless $self, ref($class)||$class;

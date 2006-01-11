@@ -122,7 +122,7 @@ sub www_createSubscriptionCodeBatchSave {
 	$numberOfCodes = $session->form->process("noc");
 	$description = $session->form->process("description");
 	$expires = $session->form->interval('expires');
-	$batchId = WebGUI::Id::generate;
+	$batchId = $session->id->generate;
 
 	push(@error, $i18n->get('no description error')) unless ($description);
 	push(@error, $i18n->get('no association error')) unless ($session->form->process("subscriptionId"));

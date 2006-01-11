@@ -55,7 +55,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-	my $userId = shift || WebGUI::Id::generate();
+	my $userId = shift || $self->session->id->generate();
 	$self->session->db->write("insert into users (userId,dateCreated) values (".$self->session->db->quote($userId).","$self->session->datetime->time().")");
 	require WebGUI::Grouping;
 	$group->addUsers([$userId],[2,7]);

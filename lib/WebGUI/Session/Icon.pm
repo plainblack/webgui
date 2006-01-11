@@ -473,6 +473,25 @@ sub moveUp {
 
 #-------------------------------------------------------------------
 
+=head2 new ( session )
+
+Constructor.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	bless {_session=>$session}, $class;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 paste ( urlParameters [, pageURL ] )
 
 Generates a button with the word "Paste" printed on it.
@@ -495,6 +514,20 @@ sub paste {
         $output .= '<img src="'.$self->_getBaseURL().'paste.gif" align="middle" border="0" alt="'.WebGUI::International::get('Paste','Icon').'" title="'.WebGUI::International::get('Paste','Icon').'" /></a>';
         return $output;
 }
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 

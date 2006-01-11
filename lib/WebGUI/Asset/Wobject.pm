@@ -511,7 +511,7 @@ sub setCollateral {
 	my $counter = 0;
 	my $sql;
 	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
-		$properties->{$keyName} = WebGUI::Id::generate();
+		$properties->{$keyName} = $self->session->id->generate();
 		$sql = "insert into $table (";
 		my $dbkeys = "";
      		my $dbvalues = "";

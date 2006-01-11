@@ -53,7 +53,7 @@ A unique 22 character ID.  By default WebGUI will generate this and you should a
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
-	my $id = shift || WebGUI::Id::generate();
+	my $id = shift || $self->session->id->generate();
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	$self->session->db->beginTransaction;
@@ -599,7 +599,7 @@ sub setRank {
 	return 1 if ($newRank == $currentRank); # do nothing if we're moving to ourself
 	my $parentLineage = $self->getParentLineage;
 	my $siblings = $self->getLineage(["siblings"],{returnObjects=>1});
-	my $temp = substr(WebGUI::Id::generate(),0,6);
+	my $temp = substr($self->session->id->generate(),0,6);
 	if ($newRank < $currentRank) { # have to do the ordering in reverse when the new rank is above the old rank
 		@{$siblings} = reverse @{$siblings};
 	}
@@ -636,7 +636,7 @@ sub swapRank {
 	my $self = shift;
 	my $second = shift;
 	my $first = shift || $self->get("lineage");
-	my $temp = substr(WebGUI::Id::generate(),0,6); # need a temp in order to do the swap
+	my $temp = substr($self->session->id->generate(),0,6); # need a temp in order to do the swap
 	$self->session->db->beginTransaction;
 	$self->cascadeLineage($temp,$first);
 	$self->cascadeLineage($first,$second);

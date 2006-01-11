@@ -236,7 +236,7 @@ sub www_editMetaDataFieldSave {
 		return $ac->render(WebGUI::International::get("errorEmptyField", "Asset"),WebGUI::International::get('Edit Metadata',"Asset"));
 	}
 	if($self->session->form->process("fid") eq 'new') {
-		$self->session->form->process("fid") = WebGUI::Id::generate();
+		$self->session->form->process("fid") = $self->session->id->generate();
 		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
 					$self->session->db->quote($self->session->form->process("fid")).",".
 					$self->session->db->quote($self->session->form->process("fieldName")).",".

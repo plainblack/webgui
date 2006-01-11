@@ -57,7 +57,7 @@ sub add {
 	return unless ($self->session->setting->get("passiveProfilingEnabled"));
 	my $assetId = shift;
 	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry)
-		     values (".$self->session->db->quote(WebGUI::Id::generate()).",".
+		     values (".$self->session->db->quote($self->session->id->generate()).",".
 				$self->session->db->quote($self->session->user->profileField("userId")).",".
 				$self->session->db->quote($self->session->var->get("sessionId")).",".
 				$self->session->db->quote($assetId).",".

@@ -1,4 +1,4 @@
-package WebGUI::Id;
+package WebGUI::Session::Id;
 
 
 =head1 LEGAL
@@ -15,14 +15,10 @@ package WebGUI::Id;
 
 =cut
 
-use Digest::MD5;
 use strict;
+use Digest::MD5;
 use Time::HiRes qw( gettimeofday usleep );
-use WebGUI::Session;
 
-BEGIN {
-	srand;
-}
 
 
 =head1 NAME
@@ -37,13 +33,13 @@ B<NOTE:> There is no such thing as perfectly unique ID's, but the chances of a d
 
 =head1 SYNOPSIS
 
- use WebGUI::Id;
+ use WebGUI::Session::Id;
 
- my $id = WebGUI::Id::generate();
+ my $id = $session->id->generate();
 
-=head1 FUNCTIONS
+=head1 METHODS
 
-These subroutines are available from this package:
+These methods are available from this class:
 
 =cut
 
@@ -56,13 +52,47 @@ This function generates a global unique id.
 =cut
 
 sub generate {
+	my $self = shift;
   	my($s,$us)=gettimeofday();
-  	my($v)=sprintf("%09d%06d%10d%06d%255s",rand(999999999),$us,$s,$$,$WebGUI::Session::session{config}{defaultSiteName});
+  	my($v)=sprintf("%09d%06d%10d%06d%255s",rand(999999999),$us,$s,$$,$self->session->config->getFilename);
 	my $id = Digest::MD5::md5_base64($v);
 	$id =~ s/\+/_/g;
 	$id =~ s/\//-/g;
 	return $id;
 }
+
+#-------------------------------------------------------------------
+
+=head2 new ( session )
+
+Constructor.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	srand;
+	bless {_session=>$session}, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 session ( ) 
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 1;
 

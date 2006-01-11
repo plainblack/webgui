@@ -225,7 +225,7 @@ sub createAccountSave {
    $properties->{status} = 'Deactivated' if ($self->session->setting->get("webguiValidateEmail"));
    $self->SUPER::createAccountSave($username,$properties,$password,$profile);
    	if ($self->session->setting->get("webguiValidateEmail")) {
-		my $key = WebGUI::Id::generate();
+		my $key = $self->session->id->generate();
 		$self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
    		WebGUI::Mail::send(
 			$profile->{email},

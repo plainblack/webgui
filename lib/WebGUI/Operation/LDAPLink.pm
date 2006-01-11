@@ -59,7 +59,6 @@ sub www_copyLDAPLink {
    $db{ldapLinkId} = "new";
    $db{ldapLinkName} = "Copy of ".$db{ldapLinkName};
    $session->db->setRow("ldapLink","ldapLinkId",\%db);
-   #$session->db->write("insert into databaseLink (databaseLinkId,title,DSN,username,identifier) values (".$session->db->quote(WebGUI::Id::generate()).", ".$session->db->quote($db{title}." (copy)").", ".$session->db->quote($db{DSN}).", ".$session->db->quote($db{username}).", ".$session->db->quote($db{identifier}).")");
    $session->form->process("op") = "listLDAPLinks";
    return www_listLDAPLinks();
 }

@@ -115,7 +115,7 @@ The addressee email address. Defaults to company email.
 
 sub addEntry {
         my ($u, @users, $messageLogId, $sth, $userId, $groupId, $subject, $message, $url, $status, $user, $from);
-	$messageLogId = WebGUI::Id::generate();
+	$messageLogId = $self->session->id->generate();
 	$userId = $_[0];
 	$groupId = $_[1];
 	$subject = $_[2];
@@ -185,7 +185,7 @@ Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
 
 sub addInternationalizedEntry {
         my ($u, $userId, $url, $groupId, $internationalId, @users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace, $status);
-        $messageLogId = WebGUI::Id::generate();
+        $messageLogId = $self->session->id->generate();
 	$userId = $_[0];
 	$groupId = $_[1];
 	$url = $_[2];
