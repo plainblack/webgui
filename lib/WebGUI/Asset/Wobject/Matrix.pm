@@ -441,7 +441,7 @@ sub www_edit {
 sub www_editListing {
         my $self = shift;
         my $listing= WebGUI::SQL->getRow("Matrix_listing","listingId",$session{form}{listingId});
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($session{form}{listingId} eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $session{user}{userId} eq $listing->{maintainerId} || $self->canEdit);
+	return WebGUI::International::get('no edit rights','Asset_Matrix') unless (($session{form}{listingId} eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $session{user}{userId} eq $listing->{maintainerId} || $self->canEdit);
         my $f = WebGUI::HTMLForm->new(-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
@@ -570,7 +570,7 @@ sub www_editListing {
 sub www_editListingSave {
         my $self = shift;
         my $listing = WebGUI::SQL->getRow("Matrix_listing","listingId",$session{form}{listingId});
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($session{form}{listingId} eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $session{user}{userId} eq $listing->{maintainerId} || $self->canEdit);
+	return WebGUI::International::get('no edit rights','Asset_Matrix') unless (($session{form}{listingId} eq "new" && WebGUI::Grouping::isInGroup($self->get("groupToAdd"))) || $session{user}{userId} eq $listing->{maintainerId} || $self->canEdit);
 	my %data = (
 		listingId => $session{form}{listingId},
 		lastUpdated => WebGUI::DateTime::time(),
