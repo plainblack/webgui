@@ -53,7 +53,9 @@ These functions/methods are available from this package:
 
 =head2 get ( internationalId [ , namespace, language ] )
 
-Returns the internationalized message string for the user's language.  If there is no internationalized message, this method will return the English string.
+Returns the internationalized message string for the user's language.
+If there is no internationalized message, this method will return
+the English string.
 
 =head3 internationalId
 
@@ -73,8 +75,8 @@ my $safeRe = qr/[^\w\d\s\/]/;
 
 sub get {
 	my ($self, $id, $namespace, $language) = @_;
-	$namespace = $namespace || $_[0]->{_namespace} || "WebGUI";
-	$language = $language || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
+	$namespace = $namespace || $self->{_namespace} || "WebGUI";
+	$language = $language || $self->{_language} || $self->session->user->profileField("language") || "English";
 	$id =~ s/$safeRe//g;
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
@@ -170,7 +172,7 @@ Specify a default language. Defaults to user preference or "English".
 
 sub makeUrlCompliant {
 	my ($self, $url, $language) = @_;
-	$language = $language || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
+	$language = $language || $self->{_language} || $self->session->user->profileField("language") || "English";
 	my $cmd = "WebGUI::i18n::".$language;
 	my $load = "use ".$cmd;
 	eval($load);
@@ -184,9 +186,11 @@ sub makeUrlCompliant {
 
 #-------------------------------------------------------------------
 
-=head2 new ( [ namespace, language ] ) 
+=head2 new ( session, [ namespace, language ] ) 
 
-The constructor for the International function if using it in OO mode.
+The constructor for the International function if using it in OO mode.  Note
+that namespace and languages are defaults; they may be overridden in
+all accessor methods, (get, getLanguage).
 
 =head3 session
 

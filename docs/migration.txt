@@ -836,6 +836,29 @@ perl -pi.bak -e 's!WebGUI\:\:Subscription\-\>new\(!WebGUI::Subscription->new(\$s
 perl -pi.bak -e 's!WebGUI\:\:TabForm\-\>new\(!WebGUI::TabForm->new(\$self->session,!g' fileNameGoesHere
 
 
+5.23.24 WebGUI::International API Refactored
+
+The WebGUI::Paginator API was changed to use the session API, and was
+changed to be solely object oriented, where before it would work in
+either subroutine or OO modes.  The latter change precludes writing
+a script to make the changes.
+
+The changes are summarized here.  For complete details, please read the POD
+documentation in lib/WebGUI/International.pm
+
+WebGUI::International::get('key','namespace');
+	my $i18n = WebGUI::International->new($session, 'namespace');
+	$i18n->get('key');
+
+WebGUI::International::getLanguage('English', 'property');
+	my $i18n = WebGUI::International->new($session);
+	$i18n->getLanguage('key');
+
+WebGUI::International::getLanguages();
+	my $i18n = WebGUI::International->new($session);
+	$i18n->getLanguages();
+
+
 
 6.  Automatic list of Assets in Help System.
 -------------------------------------
