@@ -12,7 +12,6 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
-use WebGUI::Session;
 use File::Find;
 # ---- END DO NOT EDIT ----
 
@@ -34,11 +33,11 @@ foreach my $package (@modules) {
 	is($returnVal, 0, "syntax check for $package");
 }
 
-initialize();  # this line is required
+my $session = initialize();  # this line is required
 
 # put your tests here
 
-cleanup(); # this line is required
+cleanup($session); # this line is required
 
 #----------------------------------------
 sub getWebGUIModules {
@@ -49,16 +48,17 @@ sub getWebGUIModules {
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
 sub initialize {
-	$|=1; # disable output buffering
-	my $configFile;
-	GetOptions(
-        	'configFile=s'=>\$configFile
-	);
-	exit 1 unless ($configFile);
-	WebGUI::Session::open("..",$configFile);
+        $|=1; # disable output buffering
+        my $configFile;
+        GetOptions(
+                'configFile=s'=>\$configFile
+        );
+        exit 1 unless ($configFile);
+        my $session = WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
-	WebGUI::Session::close();
+        my $session = shift;
+        $session->close();
 }
 

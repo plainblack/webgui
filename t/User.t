@@ -12,7 +12,6 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
-use WebGUI::Session;
 use WebGUI::Utility;
 # ---- END DO NOT EDIT ----
 
@@ -20,7 +19,7 @@ use WebGUI::User;
 use WebGUI::SQL;
 use Test::More tests => 33; # increment this value for each test you create
 
-initialize();  # this line is required
+my $session = initialize();  # this line is required
 
 # put your tests here
 my $user;
@@ -152,22 +151,23 @@ SKIP: {
   ok(undef, "uncache");
 }
 
-cleanup(); # this line is required
+cleanup($session); # this line is required
 
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
 sub initialize {
-	$|=1; # disable output buffering
-	my $configFile;
-	GetOptions(
-        	'configFile=s'=>\$configFile
-	);
-	exit 1 unless ($configFile);
-	WebGUI::Session::open("..",$configFile);
+        $|=1; # disable output buffering
+        my $configFile;
+        GetOptions(
+                'configFile=s'=>\$configFile
+        );
+        exit 1 unless ($configFile);
+        my $session = WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
-	WebGUI::Session::close();
+        my $session = shift;
+        $session->close();
 }
 

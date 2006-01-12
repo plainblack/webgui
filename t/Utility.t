@@ -13,12 +13,11 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
-use WebGUI::Session;
 # ---- END DO NOT EDIT ----
 
 use Test::More tests => 21; # increment this value for each test you create
 
-initialize();  # this line is required
+my $session = initialize();  # this line is required
 
 
 # commify
@@ -88,23 +87,23 @@ SKIP: {
 	}
 
 
-cleanup(); # this line is required
+cleanup($session); # this line is required
 
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
 sub initialize {
-	$|=1; # disable output buffering
+        $|=1; # disable output buffering
         my $configFile;
         GetOptions(
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        WebGUI::Session::open("..",$configFile);
+        my $session = WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
-        WebGUI::Session::close();
+        my $session = shift;
+        $session->close();
 }
-
 

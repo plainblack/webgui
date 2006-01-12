@@ -12,7 +12,6 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
-use WebGUI::Session;
 use WebGUI::Form::FieldType;
 use WebGUI::Form::DynamicField;
 # ---- END DO NOT EDIT ----
@@ -27,7 +26,7 @@ use Test::More; # increment this value for each test you create
 
 my $numTests = 0;
 
-initialize();  # this line is required
+my $session = initialize();  # this line is required
 
 # put your tests here
 
@@ -57,21 +56,22 @@ my $name = WebGUI::Form::DynamicField->getName();
 
 ok($name, 'did not inherit default form name');
 
-cleanup(); # this line is required
+cleanup($session); # this line is required
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
 sub initialize {
-	$|=1; # disable output buffering
-	my $configFile;
-	GetOptions(
-        	'configFile=s'=>\$configFile
-	);
-	exit 1 unless ($configFile);
-	WebGUI::Session::open("..",$configFile);
+        $|=1; # disable output buffering
+        my $configFile;
+        GetOptions(
+                'configFile=s'=>\$configFile
+        );
+        exit 1 unless ($configFile);
+        my $session = WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
-	WebGUI::Session::close();
+        my $session = shift;
+        $session->close();
 }
 

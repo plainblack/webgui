@@ -14,13 +14,12 @@ use lib '../lib';
 use Getopt::Long;
 use Pod::Coverage;
 use File::Find;
-use WebGUI::Session;
 # ---- END DO NOT EDIT ----
 
 
 use Test::More;
 
-initialize();  # this line is required
+my $session = initialize();  # this line is required
 
 my @modules = ();
 find(\&countModules, "../lib/WebGUI");
@@ -32,7 +31,7 @@ foreach my $package (sort @modules) {
 	ok($pc->coverage, $package);
 }
 
-cleanup(); # this line is required
+cleanup($session); # this line is required
 
 sub countModules {
 	my $filename = $File::Find::dir."/".$_;
@@ -50,16 +49,17 @@ sub countModules {
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
 sub initialize {
-	$|=1; # disable output buffering
-	my $configFile;
-	GetOptions(
-        	'configFile=s'=>\$configFile
-	);
-	exit 1 unless ($configFile);
-	WebGUI::Session::open("..",$configFile);
+        $|=1; # disable output buffering
+        my $configFile;
+        GetOptions(
+                'configFile=s'=>\$configFile
+        );
+        exit 1 unless ($configFile);
+        my $session = WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
-	WebGUI::Session::close();
+        my $session = shift;
+        $session->close();
 }
 

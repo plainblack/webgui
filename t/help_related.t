@@ -12,7 +12,6 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
-use WebGUI::Session;
 use WebGUI::Operation::Help;
 # ---- END DO NOT EDIT ----
 
@@ -24,7 +23,7 @@ use WebGUI::Operation::Help;
 use Test::More;
 my $numTests = 0;
 
-initialize();  # this line is required
+my $session = initialize();  # this line is required
 
 my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList();
 
@@ -64,22 +63,24 @@ foreach my $related (@relatedHelp) {
 
 # put your tests here
 
-cleanup(); # this line is required
+cleanup($session); # this line is required
 
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
 sub initialize {
-	$|=1; # disable output buffering
-	my $configFile;
-	GetOptions(
-        	'configFile=s'=>\$configFile
-	);
-	exit 1 unless ($configFile);
-	WebGUI::Session::open("..",$configFile);
+        $|=1; # disable output buffering
+        my $configFile;
+        GetOptions(
+                'configFile=s'=>\$configFile
+        );
+        exit 1 unless ($configFile);
+        my $session = WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
-	WebGUI::Session::close();
+        my $session = shift;
+        $session->close();
 }
+
 
