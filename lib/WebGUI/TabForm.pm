@@ -19,8 +19,6 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
-use WebGUI::Session;
-use WebGUI::Style;
 
 
 =head1 NAME
@@ -48,7 +46,7 @@ Package that makes creating tab-based forms simple through an object-oriented AP
 		}
 	);
 
- $tabform = WebGUI::TabForm->new(\%tabs);
+ $tabform = WebGUI::TabForm->new($self->session,\%tabs);
 
  $tabform->hidden($name, $value);
  $tabform->submit(\%params);
@@ -158,9 +156,13 @@ sub hidden {
 
 #-------------------------------------------------------------------
 
-=head2 new ( tabHashRef , cssString)
+=head2 new ( session, tabHashRef , cssString)
 
 Constructor.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 tabHashRef
 
@@ -190,23 +192,24 @@ A string containing the link to the tab-CascadingStyleSheet
 
 sub new {
 	my $class = shift;
+	my $session = shift;
 	my $startingTabs = shift;
-	my $css = shift || $self->session->config->get("extrasURL").'/tabs/tabs.css';
-	my $cancelUrl = shift || $self->session->url->page();
+	my $css = shift || $session->config->get("extrasURL").'/tabs/tabs.css';
+	my $cancelUrl = shift || $session->url->page();
 	my $uiLevelOverride = shift;
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
-		$tabs{$key}{form} = WebGUI::HTMLForm->new($self->session,uiLevelOverride=>$uiLevelOverride);
+		$tabs{$key}{form} = WebGUI::HTMLForm->new($session,uiLevelOverride=>$uiLevelOverride);
 		$tabs{$key}{label} = $startingTabs->{$key}->{label};
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
-	my $i18n = WebGU::International::get($session);
-	my $cancel = WebGUI::Form::button({
+	my $i18n = WebGU::International->new($session);
+	my $cancel = WebGUI::Form::button($session,{
 			value=>$i18n->get('cancel'),
 			extras=>q|onclick="history.go(-1);"|
 			});
-	bless {	_uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit($self->session,), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
+	bless {	_session=>$session, _uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit($self->session), _form=>WebGUI::Form::formHeader($session), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
 
 
@@ -244,6 +247,20 @@ sub print {
 	$output .= '<script type="text/javascript">var numberOfTabs = '.($i-1).'; initTabs();</script>';
 	$output .= '<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wz_tooltip.js"></script>';
 	return $output;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 

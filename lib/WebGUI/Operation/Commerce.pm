@@ -391,7 +391,7 @@ sub www_editCommerceSettings {
 	$paymentPlugin = $session->config->get("paymentPlugins")->[0];
 	$shippingPlugin = $session->config->get("shippingPlugins")->[0];
 	
-	$tabform = WebGUI::TabForm->new(\%tabs);
+	$tabform = WebGUI::TabForm->new($session,\%tabs);
 	$tabform->hidden({name => 'op', value => 'editCommerceSettingsSave'});
 	
 	# general

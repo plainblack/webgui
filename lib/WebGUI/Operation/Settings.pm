@@ -41,7 +41,7 @@ sub www_editSettings {
         	user=>{ label=>$i18n->get("user") },
         	auth=>{ label=>$i18n->get("authentication") },
         );
- 	my $tabform = WebGUI::TabForm->new(\%tabs);
+ 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	$tabform->hidden({
 		name=>"op",
 		value=>"saveSettings"});

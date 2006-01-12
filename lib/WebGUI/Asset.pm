@@ -483,7 +483,7 @@ sub getEditForm {
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $uiLevelOverride = $self->get("className");
 	$uiLevelOverride =~ s/\:\:/_/g;
-	my $tabform = WebGUI::TabForm->new(undef,undef,$self->getUrl(),$uiLevelOverride);
+	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl(),$uiLevelOverride);
 	$tabform->hidden({
 		name=>"func",
 		value=>"editSave"

@@ -51,7 +51,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub edit {
 	my $self = shift;
-	my $tabform = WebGUI::TabForm->new();
+	my $tabform = WebGUI::TabForm->new($self->session,);
 	$tabform->hidden({
 		name=>"func",
 		value=>"add"

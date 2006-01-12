@@ -831,6 +831,11 @@ perl -pi.bak -e 's!WebGUI\:\:Storage\:\:Image\-\>createTemp\(!WebGUI::Storage::I
 perl -pi.bak -e 's!WebGUI\:\:Subscription\-\>new\(!WebGUI::Subscription->new(\$self->session,!g' fileNameGoesHere
 
 
+5.23.23 WebGUI::TabForm API Refactored
+
+perl -pi.bak -e 's!WebGUI\:\:TabForm\-\>new\(!WebGUI::TabForm->new(\$self->session,!g' fileNameGoesHere
+
+
 
 6.  Automatic list of Assets in Help System.
 -------------------------------------

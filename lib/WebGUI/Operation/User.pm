@@ -298,7 +298,7 @@ sub www_editUser {
 		"profile"=> { label=>$i18n->get("profile")},
 		"groups"=> { label=>$i18n->get('89')},
 		);
-	my $tabform = WebGUI::TabForm->new(\%tabs);
+	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	my $u = WebGUI::User->new(($session->form->process("uid") eq 'new') ? '' : $session->form->process("uid"));
 	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
 	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
