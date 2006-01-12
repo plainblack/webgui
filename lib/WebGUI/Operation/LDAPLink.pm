@@ -230,7 +230,7 @@ sub www_listLDAPLinks {
 			.'</td>';
       $row[$i] .= '<td valign="top" class="tableData">'.$data->{ldapLinkName}.'</td>';
 	  
-	  my $ldapLink = WebGUI::LDAPLink->new($data->{ldapLinkId});
+	  my $ldapLink = WebGUI::LDAPLink->new($session,$data->{ldapLinkId});
 	  my $status = WebGUI::International::get("LDAPLink_1078","AuthLDAP");
 	  if($ldapLink->bind) {
 	     $status = WebGUI::International::get("LDAPLink_1079","AuthLDAP");

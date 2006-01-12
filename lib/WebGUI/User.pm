@@ -342,7 +342,7 @@ sub isInGroup {
 			  if($self->authMethod eq "LDAP") {
 			     my $auth = WebGUI::Auth->new($session,"LDAP",$uid);
 				 my $params = $auth->getParams();
-				 my $ldapLink = WebGUI::LDAPLink->new($session,$params->{ldapConnection});
+				 my $ldapLink = WebGUI::LDAPLink->new($self->session,$session,$params->{ldapConnection});
 				 if($ldapLink ne "") {
 					my $people = [];
 					if($group->get("ldapRecursiveProperty")) {

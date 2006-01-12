@@ -18,8 +18,6 @@ package WebGUI::LDAPLink;
 use strict;
 use Tie::CPHash;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::SQL;
 use Net::LDAP;
 
 =head1 NAME
@@ -33,10 +31,10 @@ This package contains utility methods for WebGUI's ldap link system.
 =head1 SYNOPSIS
 
  use WebGUI::LDAPLink;
- $hashRef = WebGUI::LDAPLink::getList();
- %ldapLink = WebGUI::LDAPLink::get($ldapLinkId);
+ $hashRef = WebGUI::LDAPLink->getList($self->session,);
+ %ldapLink = WebGUI::LDAPLink->new($self->session,$ldapLinkId)->get;
  
- $ldapLink = WebGUI::LDAPLink->new($ldapLinkId);
+ $ldapLink = WebGUI::LDAPLink->new($self->session,$ldapLinkId);
  $connection = $ldapLink->authenticate();
  $ldapLink->disconnect;
 
@@ -57,52 +55,66 @@ cannot be established
 =cut
 
 sub bind {
-	my $class = shift;
+	my $self = shift;
 	my ($uri, $ldap, $auth, $result, $error);
 	
-	if (defined $class->{_connection}) {
-		return $class->{_connection};
+	if (defined $self->{_connection}) {
+		return $self->{_connection};
 	}
 	
-	my $ldapUrl = $class->{_ldapLink}->{ldapUrl};
-	my $connectDn = $class->{_ldapLink}->{connectDn};
-	my $identifier = $class->{_ldapLink}->{identifier};
+	my $ldapUrl = $self->{_ldapLink}->{ldapUrl};
+	my $connectDn = $self->{_ldapLink}->{connectDn};
+	my $identifier = $self->{_ldapLink}->{identifier};
 		
 	if($ldapUrl eq "") {
-	   $class->{_error} = 100;
+	   $self->{_error} = 100;
 	   return 0;
 	} elsif ($connectDn eq "") {
-	   $class->{_error} = 101;
+	   $self->{_error} = 101;
 	   return 0;
 	} elsif ($identifier eq "") {
-	   $class->{_error} = 102;
+	   $self->{_error} = 102;
 	   return 0;
 	}
 	
 	if($uri = URI->new($ldapUrl)) {
 	   unless($ldap = Net::LDAP->new($uri->host, (port=>($uri->port || 389)))){
-	      $class->{_error} = 103;
+	      $self->{_error} = 103;
 		  return 0;
 	   }
 	   
 	   $auth = $ldap->bind(dn=>$connectDn, password=>$identifier);
        if ($auth->code == 48 || $auth->code == 49){
-		  $class->{_error} = 104;
+		  $self->{_error} = 104;
 	   }elsif($auth->code > 0){
-	      $class->{_error} = $auth->code;
+	      $self->{_error} = $auth->code;
 	   }
-	   $class->{_connection} = $ldap;
+	   $self->{_connection} = $ldap;
 	}else{
-	   $class->{_error} = 105;
+	   $self->{_error} = 105;
 	   return 0;
 	}
-	return $class->{_connection};
+	return $self->{_connection};
 }
 
 #-------------------------------------------------------------------
 sub DESTROY {
-   my $class = shift;
-   $class->unbind;
+   my $self = shift;
+   $self->unbind;
+	undef $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 get ( )
+
+Returns the list of LDAP connection properties.
+
+=cut
+
+sub get {
+	my $self = shift;
+	return $self->{_ldapLink};
 }
 
 #-------------------------------------------------------------------
@@ -118,8 +130,8 @@ A valid ldap error code.
 =cut
 
 sub getErrorMessage {
-   my $class = shift;
-   my $errorCode = $_[0] || $class->{_error};
+   my $self = shift;
+   my $errorCode = $_[0] || $self->{_error};
    return "" unless $errorCode;
    my $i18nCode = "LDAPLink_".$errorCode;
    return WebGUI::International::get($i18nCode,"AuthLDAP");
@@ -127,37 +139,23 @@ sub getErrorMessage {
 
 #-------------------------------------------------------------------
 
-=head2 getList ( )
+=head2 getList ( session )
 
-Returns a hash reference  containing all ldap links.  The format is:
-	ldapLinkId => ldapLinkName
+Returns a hash reference  containing all ldap links.  The format is: ldapLinkId => ldapLinkName. This is a class method.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub getList {
+	my $class = shift;
+	my $session = shift;
     my %list;
 	tie %list, "Tie::IxHash";
-	%list = $self->session->db->buildHash("select ldapLinkId, ldapLinkName from ldapLink order by ldapLinkName");
+	%list = $session->db->buildHash("select ldapLinkId, ldapLinkName from ldapLink order by ldapLinkName");
 	return \%list;
-}
-
-#-------------------------------------------------------------------
-
-=head2 get ( ldapLinkId )
-
-Returns a hashRef containing a single ldap link.
-
-=head3 ldapLinkId
-
-A valid ldapLinkId
-
-=cut
-
-sub get {
-   my %hash;
-   tie %hash, 'Tie::CPHash';
-   %hash = $self->session->db->quickHash("select * from ldapLink where ldapLinkId=".$self->session->db->quote($_[0]));
-   return \%hash;
 }
 
 #-------------------------------------------------------------------
@@ -169,19 +167,23 @@ Disconnect cleanly from the current databaseLink.
 =cut
 
 sub unbind {
-	my ($class, $value);
-	$class = shift;
+	my ($self, $value);
+	$self = shift;
 	$value = shift;
-	if (defined $class->{_connection}) {
-		$class->{_connection}->unbind;
+	if (defined $self->{_connection}) {
+		$self->{_connection}->unbind;
 	}
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( ldapLinkId )
+=head2 new ( session, ldapLinkId )
 
 Constructor.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 ldapLinkId
 
@@ -190,12 +192,13 @@ The ldapLinkId of the ldapLink you're creating an object reference for.
 =cut
 
 sub new {
-    my ($class, $ldapLinkId, $ldapLink);
-    $class = shift;
+    my ( $ldapLinkId, $ldapLink);
+    my $class = shift;
+	my $session = shift;
 	$ldapLinkId = shift;
 	return undef unless $ldapLinkId;
-	$ldapLink = get($ldapLinkId);
-	bless {_ldapLinkId => $ldapLinkId, _ldapLink => $ldapLink }, $class;
+	$ldapLink = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($ldapLinkId));
+	bless {_session=>$session, _ldapLinkId => $ldapLinkId, _ldapLink => $ldapLink }, $class;
 }
 
 #-------------------------------------------------------------------
@@ -217,8 +220,8 @@ sub new {
 sub getProperty {
    my $self = shift;
    my $ldap = $self->bind;
-   my $dn = $_[0];
-   my $property = $_[1];
+   my $dn = shift;
+   my $property = shift;
    return [] unless($ldap && $dn && $property);
    my $results = [];
    my $msg = $ldap->search( 

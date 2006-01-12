@@ -116,7 +116,7 @@ sub addUserForm {
 	                -name=>"authLDAP_ldapConnection",
 					-label=>WebGUI::International::get("ldapConnection",'AuthLDAP'),
 					-hoverHelp=>WebGUI::International::get("ldapConnection description",'AuthLDAP'),
-					-options=>WebGUI::LDAPLink::getList(),
+					-options=>WebGUI::LDAPLink->getList($self->session,),
 					-value=>[$ldapConnection],
 					-extras=>q|onchange="this.form.authLDAP_ldapUrl.value=ldapValue[this.options[this.selectedIndex].value];"|
 				  );
@@ -209,7 +209,7 @@ sub createAccount {
 	
 	if($self->session->form->process("connection")) {
 	   $self->session->scratch->set("ldapConnection",$self->session->form->process("connection"));
-	   $self->{_connection} = WebGUI::LDAPLink::get($self->session->form->process("connection")); 
+	   $self->{_connection} = WebGUI::LDAPLink->new($self->session,$self->session->form->process("connection"))->get; 
 	}
 	my $connection = $self->{_connection};
 	$vars->{'create.message'} = $_[0] if ($_[0]);
@@ -218,7 +218,7 @@ sub createAccount {
 	my $url = $self->session->url->page("op=auth;method=createAccount;connection=");
 	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectBox({
 	                name=>"ldapConnection",
-					options=>WebGUI::LDAPLink::getList(),
+					options=>WebGUI::LDAPLink->getList($self->session,),
 					value=>[$connection->{ldapLinkId}],
 					extras=>qq|onchange="location.href='$url'+this.options[this.selectedIndex].value"|
 				  });
@@ -362,7 +362,7 @@ sub editUserSettingsForm {
    my $f = WebGUI::HTMLForm->new($self->session);
    my $ldapConnection = WebGUI::Form::selectBox({
 	                name=>"ldapConnection",
-					options=>WebGUI::LDAPLink::getList(),
+					options=>WebGUI::LDAPLink->getList($self->session,),
 					value=>[$self->session->setting->get("ldapConnection")]
 				  });
    my $ldapConnectionLabel = WebGUI::International::get("ldapConnection",'AuthLDAP'); 
@@ -411,7 +411,7 @@ sub new {
    my $userId = $_[1];
    my @callable = ('createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','createAccountSave','deactivateAccountConfirm');
    my $self = WebGUI::Auth->new($authMethod,$userId,\@callable);
-   $self->{_connection} = WebGUI::LDAPLink::get(($self->session->scratch->get("ldapConnection") || $self->session->setting->get("ldapConnection")));
+   $self->{_connection} = WebGUI::LDAPLink->new($self->session,($self->session->scratch->get("ldapConnection") || $self->session->setting->get("ldapConnection")))->get;
    bless $self, $class;
 }
 
