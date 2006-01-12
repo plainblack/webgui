@@ -40,7 +40,7 @@ sub _addFileTab {
 		return;
 	}
 
-	my $file = WebGUI::Storage->get($self->get($column));
+	my $file = WebGUI::Storage->get($self->session,$self->get($column));
 	$tabform->getTab("properties")->readOnly(
 	-value=>'<a href="'.$self->getUrl('func=deleteFileConfirm&file='.$column).'">'.$i18n->get("deleteImage").'</a>',
 	-label=>$i18n->get($internationalId),
@@ -53,7 +53,7 @@ sub _duplicateFile {
    my $newAsset = $_[0];
    my $column = $_[1];
    if($self->get($column)){
-      my $file = WebGUI::Storage->get($self->get($column));
+      my $file = WebGUI::Storage->get($self->session,$self->get($column));
 	  my $newstore = $file->copy;
 	  $newAsset->update({ $column=>$newstore->getId });
    }
@@ -85,7 +85,7 @@ sub addRevision {
 	my $newSelf = $self->SUPER::addRevision(@_);
 	foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
 		if ($self->get($field)) {
-			my $newStorage = WebGUI::Storage->get($self->get($field))->copy;
+			my $newStorage = WebGUI::Storage->get($self->session,$self->get($field))->copy;
 			$newSelf->update({$field=>$newStorage->getId});
 			$self->session->db->write("update Product set $field=".$self->session->db->quote($newStorage->getId)." where assetId=".$self->session->db->quote($newSelf->getId)." and revisionDate=".$self->session->db->quote($newSelf->get("revisionDate")));
 		}
@@ -286,7 +286,7 @@ sub purge {
 	while (my @array = $sth->array) {
    		foreach my $id (@array){
       			next if ($id eq "");
-	  		WebGUI::Storage->get($id)->delete; 
+	  		WebGUI::Storage->get($self->session,$id)->delete; 
    		}
 	}
 	$sth->finish;
@@ -302,12 +302,12 @@ sub purge {
 
 sub	purgeRevision	{
 	my $self = shift;
-	WebGUI::Storage->get($self->get("image1"))->delete if	($self->get("image1"));
-	WebGUI::Storage->get($self->get("image2"))->delete if	($self->get("image2"));
-	WebGUI::Storage->get($self->get("image3"))->delete if	($self->get("image3"));
-	WebGUI::Storage->get($self->get("brochure"))->delete if	($self->get("brochure"));
-	WebGUI::Storage->get($self->get("manual"))->delete if	($self->get("manual"));
-	WebGUI::Storage->get($self->get("warranty"))->delete if	($self->get("warranty"));
+	WebGUI::Storage->get($self->session,$self->get("image1"))->delete if	($self->get("image1"));
+	WebGUI::Storage->get($self->session,$self->get("image2"))->delete if	($self->get("image2"));
+	WebGUI::Storage->get($self->session,$self->get("image3"))->delete if	($self->get("image3"));
+	WebGUI::Storage->get($self->session,$self->get("brochure"))->delete if	($self->get("brochure"));
+	WebGUI::Storage->get($self->session,$self->get("manual"))->delete if	($self->get("manual"));
+	WebGUI::Storage->get($self->session,$self->get("warranty"))->delete if	($self->get("warranty"));
 	return $self->SUPER::purgeRevision;
 }
 
@@ -424,7 +424,7 @@ sub www_deleteFileConfirm {
    my $column = $self->session->form->process("file");
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my $store = $self->get($column);
-   my $file = WebGUI::Storage->get($store);
+   my $file = WebGUI::Storage->get($self->session,$store);
    $file->delete;
 	$self->update({$column => ''});
    return $self->www_edit;
@@ -724,40 +724,40 @@ sub view {
    #---brochure
 	my $i18n = WebGUI::International->new($self->session,'Asset_Product');
    if ($brochure) {
-      $file = WebGUI::Storage->get($brochure);
+      $file = WebGUI::Storage->get($self->session,$brochure);
       $var{"brochure.icon"} = $self->getFileIconUrl($file);
 	  $var{"brochure.label"} = $i18n->get(13);
 	  $var{"brochure.URL"} = $self->getFileUrl($file);
    }
 	#---manual
    if ($manual) {
-      $file = WebGUI::Storage->get($manual);
+      $file = WebGUI::Storage->get($self->session,$manual);
 	  $var{"manual.icon"} = $self->getFileIconUrl($file);
 	  $var{"manual.label"} = $i18n->get(14);
       $var{"manual.URL"} = $self->getFileUrl($file);
    }
    #---warranty
    if ($warranty) {
-      $file = WebGUI::Storage->get($warranty);
+      $file = WebGUI::Storage->get($self->session,$warranty);
       $var{"warranty.icon"} = $self->getFileIconUrl($file);
 	  $var{"warranty.label"} = $i18n->get(15);
 	  $var{"warranty.URL"} = $self->getFileUrl($file);
    }
    #---image1
    if ($image1) {
-      $file = WebGUI::Storage->get($image1);
+      $file = WebGUI::Storage->get($self->session,$image1);
       $var{thumbnail1} = $self->getThumbnailUrl($file);
 	  $var{image1} = $self->getFileUrl($file);
    }
    #---image2
    if ($image2) {
-      $file = WebGUI::Storage->get($image2);
+      $file = WebGUI::Storage->get($self->session,$image2);
       $var{thumbnail2} = $self->getThumbnailUrl($file);
       $var{image2} = $self->getFileUrl($file);
    }
    #---image3
    if ($image3) {
-      $file = WebGUI::Storage->get($image3);
+      $file = WebGUI::Storage->get($self->session,$image3);
       $var{thumbnail3} = $self->getThumbnailUrl($file);
       $var{image3} = $self->getFileUrl($file);
    }

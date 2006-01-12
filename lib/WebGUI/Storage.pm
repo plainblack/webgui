@@ -22,10 +22,6 @@ use POSIX;
 use Storable qw(nstore retrieve);
 use strict;
 use warnings;
-use WebGUI::ErrorHandler;
-use WebGUI::Id;
-use WebGUI::Session;
-use WebGUI::URL;
 use WebGUI::Utility;
 use Apache2::Request;
 use Apache2::Upload;
@@ -42,7 +38,7 @@ This package provides a mechanism for storing and retrieving files that are not 
 
  use WebGUI::Storage;
  $store = WebGUI::Storage->create;
- $store = WebGUI::Storage->get($id);
+ $store = WebGUI::Storage->get($self->session,$id);
 
  $filename = $store->addFileFromFilesystem($pathToFile);
  $filename = $store->addFileFromFormPost($formVarName);
@@ -318,32 +314,44 @@ sub copy {
 
 #-------------------------------------------------------------------
 
-=head2 create ( )
+=head2 create ( session )
  
 Creates a new storage location on the file system.
+
+=head3 session
+
+A reference to the current session;
 
 =cut
 
 sub create {
 	my $class = shift;
-	my $id = $self->session->id->generate();
-	my $self = $class->get($id); 
+	my $session = shift;
+	my $id = $session->id->generate();
+	my $self = $class->get($session,$id); 
 	$self->_makePath;
 	return $self; 
 }
+
+
 #-------------------------------------------------------------------
 
-=head2 createTemp ( )
+=head2 createTemp ( session )
  
 Creates a temporary storage location on the file system.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub createTemp {
 	my $class = shift;
+	my $session = shift;
 	my $id = $self->session->id->generate();
 	$id =~ m/^(.{2})/;
-	my $self = {_id => $id, _part1 => 'temp', _part2 => $1};
+	my $self = {_session=>$session, _id => $id, _part1 => 'temp', _part2 => $1};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self; 
@@ -385,9 +393,13 @@ sub deleteFile {
 
 #-------------------------------------------------------------------
 
-=head2 get ( id )
+=head2 get ( session, id )
 
 Returns a WebGUI::Storage object.
+
+=head3 session
+
+A reference to the current sesion.
 
 =head3 id 
 
@@ -397,10 +409,11 @@ The unique identifier for this file system storage location.
 
 sub get {
 	my $class = shift;
+	my $session = shift;
 	my $id = shift;
 	return undef unless $id;
 	$id =~ m/^(.{2})(.{2})/;
-	my $self = {_id => $id, _part1 => $1, _part2 => $2};
+	my $self = {_session=>$session, _id => $id, _part1 => $1, _part2 => $2};
 	bless $self, ref($class)||$class;
 	$self->_makePath unless (-e $self->getPath); # create the folder in case it got deleted somehow
 	return $self;
@@ -660,6 +673,20 @@ sub renameFile {
 	my $filename = shift;
 	my $newFilename = shift;
         rename $self->getPath($filename), $self->getPath($newFilename);
+}
+
+
+#-------------------------------------------------------------------
+
+=head3 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 

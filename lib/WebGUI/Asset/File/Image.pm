@@ -163,7 +163,7 @@ sub getStorageLocation {
 			$self->{_storageLocation} = WebGUI::Storage::Image->create;
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
-			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->get("storageId"));
+			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
 		}
 	}
 	return $self->{_storageLocation};

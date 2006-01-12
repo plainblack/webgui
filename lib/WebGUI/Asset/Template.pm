@@ -381,7 +381,7 @@ sub www_styleWizard {
 		my $storageId = $self->session->form->file("logo");
 		my $logo;
 		if ($storageId) {
-			my $storage = WebGUI::Storage::Image->get($self->session->form->file("logo"));
+			my $storage = WebGUI::Storage::Image->get($self->session,$self->session->form->file("logo"));
 			$logo = $self->addChild({
 				className=>"WebGUI::Asset::File::Image",
 				title=>$self->session->form->text("heading")." Logo",

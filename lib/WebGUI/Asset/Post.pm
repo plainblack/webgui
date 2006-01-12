@@ -51,7 +51,7 @@ sub addRevision {
         my $self = shift;
         my $newSelf = $self->SUPER::addRevision(@_);
         if ($self->get("storageId")) {
-                my $newStorage = WebGUI::Storage->get($self->get("storageId"))->copy;
+                my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
                 $newSelf->update({storageId=>$newStorage->getId});
         }       
         return $newSelf;
@@ -249,7 +249,7 @@ sub getAvatarUrl {
 	my $user = WebGUI::User->new($self->get('ownerUserId'));
 	#Get avatar field, storage Id.
 	my $storageId = $user->profileField("avatar");
-	my $avatar = WebGUI::Storage::Image->get($storageId);
+	my $avatar = WebGUI::Storage::Image->get($self->session,$storageId);
 	if ($avatar) {
 		#Get url from storage object.
 		foreach my $imageName (@{$avatar->getFiles}) {
@@ -391,7 +391,7 @@ sub getStorageLocation {
 			$self->{_storageLocation} = WebGUI::Storage::Image->create;
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
-			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->get("storageId"));
+			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
 		}
 	}
 	return $self->{_storageLocation};
@@ -716,7 +716,7 @@ sub purge {
         my $self = shift;
         my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
         while (my ($storageId) = $sth->array) {
-                WebGUI::Storage->get($storageId)->delete;
+                WebGUI::Storage->get($self->session,$storageId)->delete;
         }
         $sth->finish;
 	$self->session->db->write("delete from Post_rating where assetId=".$self->session->db->quote($self->getId));

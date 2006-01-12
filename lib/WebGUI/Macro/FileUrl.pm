@@ -44,7 +44,7 @@ sub process {
         my $url = shift;
 	my $asset = WebGUI::Asset->newByUrl($session,$url);
 	if (defined $asset) {
-		my $storage = WebGUI::Storage->get($asset->get("storageId"));
+		my $storage = WebGUI::Storage->get($session,$asset->get("storageId"));
 		return $storage->getUrl($asset->get("filename"));
 	} else {
 		my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');

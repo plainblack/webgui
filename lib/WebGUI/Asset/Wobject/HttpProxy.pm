@@ -99,7 +99,7 @@ sub getCookieJar {
 		$storage = WebGUI::Storage->create;
 		$self->update({cookieJarStorageId=>$storage->getId});
 	} else {
-		$storage = WebGUI::Storage->get($self->get("cookieJarStorageId"));
+		$storage = WebGUI::Storage->get($self->session,$self->get("cookieJarStorageId"));
 	}
 	return $storage;
 }

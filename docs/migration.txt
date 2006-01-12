@@ -813,6 +813,18 @@ perl -pi.bak -e 's!WebGUI\:\:ProfileField\-\>new\(!WebGUI::ProfileField->new(\$s
 perl -pi.bak -e 's!WebGUI\:\:ProfileField\-\>create\(!WebGUI::ProfileField->create(\$self->session,!g' fileNameGoesHere
 
 
+5.23.21 WebGUI::Storage API Refactored
+
+The WebGUI::Storage API has been refactored to accept $session in it's
+constructors.
+
+perl -pi.bak -e 's!WebGUI\:\:Storage\-\>get\(!WebGUI::Storage->get(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Storage\-\>create\(!WebGUI::Storage->create(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Storage\:\:Image\-\>get\(!WebGUI::Storage::Image->get(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Storage\:\:Image\-\>create\(!WebGUI::Storage::Image->create(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Storage\-\>createTemp\(!WebGUI::Storage->createTemp(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Storage\:\:Image\-\>createTemp\(!WebGUI::Storage::Image->createTemp(\$self->session,!g' fileNameGoesHere
+
 
 
 6.  Automatic list of Assets in Help System.

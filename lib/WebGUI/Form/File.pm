@@ -99,7 +99,7 @@ sub displayForm {
 	return $self->toHtml unless $self->get("value");
 	##There are files inside here, for each one, display the image
 	##and another form control for deleting it.
-	my $location = WebGUI::Storage->get($self->get("value"));
+	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
 	my $id = $location->getId;
 	my $fileForm = '';
 	foreach my $file ( @{ $location->getFiles } ) {
@@ -126,7 +126,7 @@ form elements will just return their value.
 sub displayValue {
 	my ($self) = @_;
 	return '' unless $self->get("value");
-	my $location = WebGUI::Storage->get($self->get("value"));
+	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
 	local $_;
 	my @files = map { sprintf qq!<img src="%s" />&nbsp;%s!, $location->getFileIconUrl($_), $_; } @{ $location->getFiles };
 	my $fileValue = join "<br />\n", @files;
@@ -147,14 +147,14 @@ sub getValueFromPost {
 	my $self = shift;
 	my $value = $self->session->request->param($self->get("name"));
 	if ($self->session->request->param(join '_', '_', $self->get("name"), 'delete')) {
-		my $storage = WebGUI::Storage->get($value);
+		my $storage = WebGUI::Storage->get($self->session,$value);
 		$storage->delete;
 		return '';
 	}
 	else {
 		my $storage;
 		if ($value) {
-			$storage = WebGUI::Storage::Image->get($value);
+			$storage = WebGUI::Storage::Image->get($self->session,$value);
 		}
 		else {
 			$storage = WebGUI::Storage::Image->create;
