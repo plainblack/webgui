@@ -14,13 +14,9 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
-use WebGUI::Session;
 use WebGUI::Grouping;
-use WebGUI::Privilege;
 use WebGUI::ProfileField;
-use WebGUI::ErrorHandler;
 use Time::HiRes;
-use WebGUI::Style;
 use WebGUI::Asset::Wobject;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

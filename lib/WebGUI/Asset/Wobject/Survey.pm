@@ -12,18 +12,10 @@ package WebGUI::Asset::Wobject::Survey;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
-use WebGUI::Icon;
-use WebGUI::Id;
-use WebGUI::Style;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use Digest::MD5 qw(md5_hex);

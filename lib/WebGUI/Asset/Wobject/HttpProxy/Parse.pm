@@ -15,7 +15,6 @@ package WebGUI::Asset::Wobject::HttpProxy::Parse;
 use HTML::Parser;
 use HTML::Entities;
 use URI::URL;
-use WebGUI::URL;  
 use vars qw(@ISA);
 @ISA = qw(HTML::Parser);
 

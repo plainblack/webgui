@@ -1,13 +1,10 @@
 package WebGUI::Operation::TransactionLog;
 
 use strict;
-use WebGUI::Session;
 use WebGUI::Commerce::Transaction;
 use WebGUI::Asset::Template;
-use WebGUI::DateTime;
 use WebGUI::Operation;
 use WebGUI::Form;
-use WebGUI::Privilege;
 use WebGUI::Grouping;
 
 =head1 NAME

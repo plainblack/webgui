@@ -15,11 +15,8 @@ package WebGUI::Operation::Auth;
 
 use strict qw(vars subs);
 use URI;
-use WebGUI::ErrorHandler;
 use WebGUI::Operation::Shared;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
 

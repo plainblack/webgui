@@ -17,7 +17,6 @@ package WebGUI::Form::CheckList;
 use strict;
 use base 'WebGUI::Form::List';
 use WebGUI::Form::Checkbox;
-use WebGUI::Session;
 
 =head1 NAME
 

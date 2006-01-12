@@ -15,14 +15,9 @@ use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::LDAPLink;
 use WebGUI::Grouping;
-use WebGUI::Icon;
-use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub _submenu {

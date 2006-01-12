@@ -18,8 +18,6 @@ use DBI;
 use Exporter;
 use strict;
 use Tie::IxHash;
-use WebGUI::Id;
-use WebGUI::Session;
 use WebGUI::Utility;
 
 our @ISA = qw(Exporter);

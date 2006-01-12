@@ -13,17 +13,10 @@ package WebGUI::Operation::Settings;
 use strict qw(vars subs);
 use Tie::IxHash;
 use WebGUI::AdminConsole;
-use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::TabForm;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
-use WebGUI::Setting;
-use WebGUI::Style;
 use WebGUI::SQL;
-use WebGUI::URL;
 
 #-------------------------------------------------------------------
 sub www_editSettings {

@@ -13,21 +13,15 @@ package WebGUI::Operation::Group;
 use strict;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
-use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::Form;
-use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Mail;
 use WebGUI::Operation::User;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------

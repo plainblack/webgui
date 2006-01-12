@@ -26,13 +26,9 @@ use strict;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::Cache;
-use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
-use WebGUI::Icon;
-use WebGUI::Id;
-use WebGUI::Privilege;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 

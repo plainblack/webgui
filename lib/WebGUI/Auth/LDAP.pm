@@ -12,10 +12,8 @@ package WebGUI::Auth::LDAP;
 
 use strict;
 use WebGUI::Auth;
-use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Form;
-use WebGUI::Icon;
 use WebGUI::LDAPLink;
 use WebGUI::Mail;
 use WebGUI::Utility;

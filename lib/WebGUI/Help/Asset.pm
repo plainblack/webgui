@@ -1,6 +1,5 @@
 package WebGUI::Help::Asset;
 
-use WebGUI::Session;
 
 our $HELP = {
 

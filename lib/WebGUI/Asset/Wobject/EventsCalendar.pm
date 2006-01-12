@@ -12,14 +12,8 @@ package WebGUI::Asset::Wobject::EventsCalendar;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::DateTime;
-use WebGUI::ErrorHandler;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Id;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 

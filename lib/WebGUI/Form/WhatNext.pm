@@ -17,7 +17,6 @@ package WebGUI::Form::WhatNext;
 use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

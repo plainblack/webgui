@@ -17,9 +17,7 @@ package WebGUI::Form::File;
 use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Storage;
-use WebGUI::Style;
 
 =head1 NAME
 

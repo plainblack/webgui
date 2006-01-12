@@ -17,7 +17,6 @@ package WebGUI::Form::Submit;
 use strict;
 use base 'WebGUI::Form::Button';
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

@@ -12,19 +12,12 @@ package WebGUI::Asset::Wobject::Collaboration;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Grouping;
 use WebGUI::HTML;
-use WebGUI::HTTP;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Style;
-use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 

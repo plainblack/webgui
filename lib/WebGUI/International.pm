@@ -16,7 +16,6 @@ package WebGUI::International;
 
 
 use strict qw(vars subs);
-use WebGUI::Session;
 
 
 =head1 NAME

@@ -3,18 +3,12 @@ package WebGUI::Asset::Wobject::InOutBoard;
 $VERSION = "0.5.3";
 
 use strict;
-use WebGUI::DateTime;
-use WebGUI::FormProcessor;
 use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Asset::Wobject;
-use WebGUI::ErrorHandler;
 use Data::Dumper;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

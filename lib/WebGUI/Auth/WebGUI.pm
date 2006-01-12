@@ -15,7 +15,6 @@ use strict;
 use URI;
 use WebGUI::Asset::Template;
 use WebGUI::Auth;
-use WebGUI::DateTime;
 use WebGUI::HTMLForm;
 use WebGUI::Macro;
 use WebGUI::Mail;

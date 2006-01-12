@@ -16,8 +16,6 @@ package WebGUI::Asset::File;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::HTTP;
-use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::SQL;
 

@@ -17,11 +17,8 @@ package WebGUI::Form::Image;
 use strict;
 use base 'WebGUI::Form::File';
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Storage;
-use WebGUI::Style;
 use WebGUI::Form::YesNo;
-use WebGUI::Session;
 
 =head1 NAME
 

@@ -1,15 +1,10 @@
 package WebGUI::Operation::Subscription;
 
 use strict;
-use WebGUI::DateTime;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::HTMLForm;
-use WebGUI::Id;
 use Tie::IxHash;
 use WebGUI::Paginator;
-use WebGUI::Icon;
-use WebGUI::FormProcessor;
 use WebGUI::Subscription;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::AdminConsole;

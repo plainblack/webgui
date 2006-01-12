@@ -17,7 +17,6 @@ package WebGUI::HTMLForm;
 use CGI::Util qw(rearrange);
 use strict qw(vars refs);
 use WebGUI::Form;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Utility;
 

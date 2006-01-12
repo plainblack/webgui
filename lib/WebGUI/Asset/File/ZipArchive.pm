@@ -17,8 +17,6 @@ package WebGUI::Asset::File::ZipArchive;
 use strict;
 use WebGUI::Asset::File;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
 

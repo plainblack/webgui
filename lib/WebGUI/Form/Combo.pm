@@ -18,7 +18,6 @@ use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::Form::Text;
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

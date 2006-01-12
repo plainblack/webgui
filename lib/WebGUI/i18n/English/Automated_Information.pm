@@ -3,7 +3,6 @@ package WebGUI::i18n::English::Automated_Information;
 ##This module must not be preloaded, since it requires that $session
 ##be populated when the module is use'ed.
 
-use WebGUI::Session;
 use WebGUI::International;
 my $i18n = WebGUI::International->new($session, 'Macros');
 

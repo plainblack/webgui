@@ -16,16 +16,11 @@ package WebGUI::Asset::Wobject::IndexedSearch::Search;
 
 use strict;
 use DBIx::FullTextSearch;
-use WebGUI::DateTime;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::HTML;
-use WebGUI::ErrorHandler;
 use WebGUI::Grouping;
 use DBIx::FullTextSearch::StopList;
 use WebGUI::Utility;
-use WebGUI::Session;
-use WebGUI::Privilege;
 use HTML::Highlight;
 use WebGUI::Macro;
 

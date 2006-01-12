@@ -18,8 +18,6 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
-use WebGUI::HTTP;
-use WebGUI::Session;
 
 our @ISA = qw(WebGUI::Asset);
 

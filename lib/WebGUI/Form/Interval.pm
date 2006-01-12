@@ -18,12 +18,10 @@ use strict;
 use warnings;
 use base qw(WebGUI::Form::Control);
 use Tie::IxHash;
-use WebGUI::DateTime;
 use WebGUI::Form::SelectBox;
 use WebGUI::Form::Hidden;
 use WebGUI::Form::Integer;
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

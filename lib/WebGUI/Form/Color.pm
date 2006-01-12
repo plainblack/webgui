@@ -17,8 +17,6 @@ package WebGUI::Form::Color;
 use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 

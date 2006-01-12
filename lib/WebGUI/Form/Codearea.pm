@@ -17,8 +17,6 @@ package WebGUI::Form::Codearea;
 use strict;
 use base 'WebGUI::Form::Textarea';
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 

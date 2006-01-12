@@ -17,7 +17,6 @@ package WebGUI::Group;
 use strict;
 use Tie::CPHash;
 use WebGUI::Auth;
-use WebGUI::Id;
 use WebGUI::LDAPLink;
 use WebGUI::Macro;
 use WebGUI::Utility;

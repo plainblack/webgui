@@ -1,11 +1,9 @@
 package WebGUI::Commerce::Payment::ITransact;
 
 use strict;
-use WebGUI::Session;
 use WebGUI::HTMLForm;
 use WebGUI::Commerce::Payment;
 use WebGUI::Commerce::Item;
-use WebGUI::URL;
 use Tie::IxHash;
 use WebGUI::International;
 use LWP::UserAgent;

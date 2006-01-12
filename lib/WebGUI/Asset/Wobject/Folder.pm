@@ -16,8 +16,6 @@ package WebGUI::Asset::Wobject::Folder;
 
 use strict;
 use WebGUI::Asset::Wobject;
-use WebGUI::Icon;
-use WebGUI::Session;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

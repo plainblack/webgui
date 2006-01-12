@@ -12,15 +12,11 @@ package WebGUI::Operation::MessageLog;
 
 use strict qw(vars subs);
 use URI;
-use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Asset::Template;
-use WebGUI::URL;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;

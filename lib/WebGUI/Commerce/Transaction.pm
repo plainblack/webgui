@@ -1,8 +1,6 @@
 package WebGUI::Commerce::Transaction;
 
 use strict;
-use WebGUI::Session;
-use WebGUI::Id;
 use WebGUI::SQL;
 use WebGUI::Commerce::Payment;
 

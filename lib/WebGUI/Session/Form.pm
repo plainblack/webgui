@@ -15,7 +15,6 @@ package WebGUI::Session::Form;
 =cut
 
 use strict qw(vars subs);
-use WebGUI::DateTime;
 use WebGUI::HTML;
 
 =head1 NAME

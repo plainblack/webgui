@@ -13,14 +13,11 @@ package WebGUI::Asset::Shortcut;
 use strict;
 use Tie::IxHash;
 use WebGUI::Asset;
-use WebGUI::Icon;
 use WebGUI::International;
 use WebGUI::Operation::Profile;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 use WebGUI::Macro;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(WebGUI::Asset);

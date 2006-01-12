@@ -1,28 +1,21 @@
 package WebGUI::Operation::Commerce;
 
 use strict;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::ErrorHandler;
 use WebGUI::Commerce::Transaction;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::Commerce::Payment;
 use WebGUI::Commerce::Shipping;
 use WebGUI::AdminConsole;
 use WebGUI::TabForm;
-use WebGUI::Setting;
-use WebGUI::Style;
 use WebGUI::Commerce;
 use WebGUI::Operation;
 use WebGUI::Operation::Shared;
-use WebGUI::URL;
 use WebGUI::International;
 use WebGUI::Asset::Template;
-use WebGUI::HTTP;
 use WebGUI::Paginator;
 use WebGUI::Form;
 use Storable;
-use WebGUI::Icon;
 
 
 #-------------------------------------------------------------------

@@ -12,14 +12,10 @@ package WebGUI::Asset::Wobject::SQLReport;
 
 use strict;
 use WebGUI::DatabaseLink;
-use WebGUI::ErrorHandler;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 

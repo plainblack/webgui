@@ -1,19 +1,14 @@
 package WebGUI::Operation::ProductManager;
 
 use strict;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::HTMLForm;
 use WebGUI::Form;
-use WebGUI::FormProcessor;
-use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::AdminConsole;
 use Tie::IxHash;
 use WebGUI::Product;
-use WebGUI::Icon;
 use WebGUI::HTML;
-use WebGUI::Privilege;
 use WebGUI::Grouping;
 
 #-------------------------------------------------------------------

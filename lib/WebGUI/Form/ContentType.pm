@@ -17,7 +17,6 @@ package WebGUI::Form::ContentType;
 use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

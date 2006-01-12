@@ -13,9 +13,6 @@ package WebGUI::Operation::Style;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
-use WebGUI::URL;
 
 =head1 NAME
 

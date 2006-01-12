@@ -13,7 +13,6 @@ package WebGUI::Operation::Admin;
 use strict;
 use WebGUI::AdminConsole;
 use WebGUI::Grouping;
-use WebGUI::Session;
 
 =head1 NAME
 

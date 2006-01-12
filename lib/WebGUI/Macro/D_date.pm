@@ -11,7 +11,6 @@ package WebGUI::Macro::D_date;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::DateTime;
 
 =head1 NAME
 

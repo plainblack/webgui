@@ -20,7 +20,6 @@ use WebGUI::Asset;
 use WebGUI::Form::Button;
 use WebGUI::Form::Hidden;
 use WebGUI::Form::Text;
-use WebGUI::Session;
 
 =head1 NAME
 

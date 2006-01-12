@@ -18,10 +18,7 @@ use strict;
 use base 'WebGUI::Form::SelectList';
 use WebGUI::LDAPLink;
 use WebGUI::Grouping;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::URL;
 
 =head1 NAME
 

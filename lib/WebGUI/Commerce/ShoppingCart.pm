@@ -1,7 +1,6 @@
 package WebGUI::Commerce::ShoppingCart;
 
 use strict;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Commerce::Item;
 use WebGUI::Commerce::Payment;

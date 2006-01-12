@@ -18,7 +18,6 @@ use strict;
 use base 'WebGUI::Form::List';
 use WebGUI::Form::Radio;
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

@@ -16,7 +16,6 @@ package WebGUI::Form::Control;
 
 use strict;
 use WebGUI::Grouping;
-use WebGUI::Session;
 use WebGUI::Operation::Shared;
 use WebGUI::International;
 

@@ -16,9 +16,6 @@ package WebGUI::Asset::Wobject::Layout;
 
 use strict;
 use WebGUI::Asset::Wobject;
-use WebGUI::ErrorHandler;
-use WebGUI::Icon;
-use WebGUI::Session;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

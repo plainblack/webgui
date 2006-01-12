@@ -16,8 +16,6 @@ use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
-use WebGUI::Session;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------

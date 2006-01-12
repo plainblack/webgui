@@ -17,10 +17,7 @@ package WebGUI::Form::DateTime;
 use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::Form::Hidden;
-use WebGUI::DateTime;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 

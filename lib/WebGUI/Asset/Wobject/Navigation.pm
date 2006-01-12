@@ -13,15 +13,10 @@ package WebGUI::Asset::Wobject::Navigation;
 use strict;
 use Tie::IxHash;
 use WebGUI::Asset::Wobject;
-use WebGUI::ErrorHandler;
 use WebGUI::Form;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::TabForm;
-use WebGUI::URL;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

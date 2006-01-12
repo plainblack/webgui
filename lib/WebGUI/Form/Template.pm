@@ -17,10 +17,7 @@ package WebGUI::Form::Template;
 use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::Asset::Template;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::URL;
 
 =head1 NAME
 

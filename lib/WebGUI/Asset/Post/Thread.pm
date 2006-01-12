@@ -13,13 +13,10 @@ package WebGUI::Asset::Post::Thread;
 use strict;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
-use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::MessageLog;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Utility;
 

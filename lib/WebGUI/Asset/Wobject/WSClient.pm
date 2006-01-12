@@ -7,13 +7,9 @@ use Digest::MD5;
 use SOAP::Lite;
 use Storable;
 use WebGUI::Cache;
-use WebGUI::ErrorHandler;
-use WebGUI::HTTP;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::Asset::Wobject;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

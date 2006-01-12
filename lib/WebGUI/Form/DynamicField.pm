@@ -17,7 +17,6 @@ package WebGUI::Form::DynamicField;
 use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Utility;
 
 =head1 NAME

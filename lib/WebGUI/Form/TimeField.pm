@@ -16,12 +16,9 @@ package WebGUI::Form::TimeField;
 
 use strict;
 use base 'WebGUI::Form::Text';
-use WebGUI::DateTime;
 use WebGUI::Form::Button;
 use WebGUI::Form::Hidden;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 

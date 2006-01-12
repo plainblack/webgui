@@ -19,13 +19,8 @@ use DBI;
 use strict qw(subs vars);
 use Tie::IxHash;
 use WebGUI::Asset;
-use WebGUI::DateTime;
-use WebGUI::Id;
 use WebGUI::International;
 use WebGUI::Macro;
-use WebGUI::Privilege;
-use WebGUI::Session;
-use WebGUI::Style;
 use WebGUI::SQL;
 use WebGUI::Utility;
 

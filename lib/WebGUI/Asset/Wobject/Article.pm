@@ -12,11 +12,8 @@ package WebGUI::Asset::Wobject::Article;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::DateTime;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::Asset::Wobject;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

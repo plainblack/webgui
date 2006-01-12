@@ -17,7 +17,6 @@ package WebGUI::ProfileCategory;
 
 use strict;
 use WebGUI::ProfileField;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::Operation::Shared;
 

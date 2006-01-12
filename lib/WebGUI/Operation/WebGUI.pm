@@ -12,13 +12,7 @@ package WebGUI::Operation::WebGUI;
 
 use Digest::MD5;
 use strict;
-use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
-use WebGUI::Session;
-use WebGUI::Setting;
-use WebGUI::Style;
-use WebGUI::URL;
 use WebGUI::User;
 
 #-------------------------------------------------------------------

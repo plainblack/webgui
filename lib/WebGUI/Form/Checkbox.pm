@@ -16,7 +16,6 @@ package WebGUI::Form::Checkbox;
 
 use strict;
 use base 'WebGUI::Form::Control';
-use WebGUI::Session;
 
 =head1 NAME
 

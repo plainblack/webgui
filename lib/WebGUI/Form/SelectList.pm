@@ -17,7 +17,6 @@ package WebGUI::Form::SelectList;
 use strict;
 use base 'WebGUI::Form::List';
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

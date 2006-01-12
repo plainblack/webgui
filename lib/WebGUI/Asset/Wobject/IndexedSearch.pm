@@ -7,7 +7,6 @@ use WebGUI::HTMLForm;
 use WebGUI::HTML;
 use WebGUI::Macro;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::SQL;
 use Tie::IxHash;
 use WebGUI::Utility;

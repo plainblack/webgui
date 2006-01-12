@@ -16,9 +16,7 @@ package WebGUI::Form::TimeZone;
 
 use strict;
 use base 'WebGUI::Form::SelectBox';
-use WebGUI::DateTime;
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

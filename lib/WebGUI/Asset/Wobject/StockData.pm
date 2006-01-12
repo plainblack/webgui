@@ -11,13 +11,8 @@ package WebGUI::Asset::Wobject::StockData;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::ErrorHandler;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 

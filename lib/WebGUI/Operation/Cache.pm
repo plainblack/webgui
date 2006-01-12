@@ -14,8 +14,6 @@ use strict;
 use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::Form;
 
 =head1 NAME

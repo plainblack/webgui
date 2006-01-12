@@ -16,7 +16,6 @@ package WebGUI::User;
 
 use strict;
 use WebGUI::Cache;
-use WebGUI::Id;
 use WebGUI::SQL;
 
 

@@ -16,8 +16,6 @@ package WebGUI::Storage::Image;
 
 use Image::Magick;
 use strict;
-use WebGUI::Id;
-use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Utility;
 

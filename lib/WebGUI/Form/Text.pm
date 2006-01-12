@@ -17,7 +17,6 @@ package WebGUI::Form::Text;
 use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

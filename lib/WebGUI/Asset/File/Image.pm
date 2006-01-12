@@ -18,8 +18,6 @@ use strict;
 use WebGUI::Asset::File;
 use WebGUI::Storage::Image;
 use WebGUI::HTMLForm;
-use WebGUI::HTTP;
-use WebGUI::Session;
 use WebGUI::Utility;
 
 

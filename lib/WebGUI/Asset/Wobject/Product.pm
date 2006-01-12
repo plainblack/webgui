@@ -13,12 +13,8 @@ package WebGUI::Asset::Wobject::Product;
 use strict;
 use Tie::CPHash;
 use WebGUI::HTMLForm;
-use WebGUI::Icon;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::Storage::Image;
 use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 

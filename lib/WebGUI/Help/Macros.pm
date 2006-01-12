@@ -1,6 +1,5 @@
 package WebGUI::Help::Macros;
 
-use WebGUI::Session;
 
 our $HELP = {
 

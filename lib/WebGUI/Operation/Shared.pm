@@ -15,9 +15,7 @@ use Exporter;
 use strict;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Style;
 use Safe;
 
 our @ISA = qw(Exporter);

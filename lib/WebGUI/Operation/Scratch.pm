@@ -11,7 +11,6 @@ package WebGUI::Operation::Scratch;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Session;
 
 =head1 NAME
 

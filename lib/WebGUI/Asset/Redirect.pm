@@ -16,9 +16,7 @@ package WebGUI::Asset::Redirect;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::HTTP;
 use WebGUI::Macro;
-use WebGUI::Session;
 
 our @ISA = qw(WebGUI::Asset);
 

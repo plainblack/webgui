@@ -13,10 +13,7 @@ package WebGUI::Asset::Wobject::MessageBoard;
 use strict;
 use Tie::IxHash;
 use WebGUI::Asset::Wobject;
-use WebGUI::DateTime;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

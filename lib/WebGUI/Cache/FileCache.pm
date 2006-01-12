@@ -16,7 +16,6 @@ package WebGUI::Cache::FileCache;
 
 
 use Storable qw(nstore retrieve);
-use WebGUI::Session;
 use File::Path;
 use File::Find;
 

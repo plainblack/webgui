@@ -17,7 +17,6 @@ package WebGUI::Form::FieldType;
 use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::Utility;
 use Tie::IxHash;
 

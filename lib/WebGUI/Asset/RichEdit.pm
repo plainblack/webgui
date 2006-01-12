@@ -17,7 +17,6 @@ package WebGUI::Asset::RichEdit;
 use strict;
 use WebGUI::Asset;
 use WebGUI::Form;
-use WebGUI::Session;
 use WebGUI::Utility;
 use WebGUI::International;
 

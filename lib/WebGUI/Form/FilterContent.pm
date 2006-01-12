@@ -18,7 +18,6 @@ use strict;
 use base 'WebGUI::Form::SelectBox';
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Session;
 
 =head1 NAME
 

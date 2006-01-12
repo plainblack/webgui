@@ -15,9 +15,7 @@ use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
 use WebGUI::Grouping;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Privilege;
 
 #-------------------------------------------------------------------
 sub _submenu {

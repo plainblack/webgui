@@ -11,7 +11,6 @@ package WebGUI::Operation;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::ErrorHandler;
 
 =head1 NAME
 

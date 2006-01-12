@@ -19,8 +19,6 @@ use base 'WebGUI::Form::Textarea';
 use WebGUI::Asset::RichEdit;
 use WebGUI::HTML;
 use WebGUI::International;
-use WebGUI::Session;
-use WebGUI::Style;
 
 =head1 NAME
 

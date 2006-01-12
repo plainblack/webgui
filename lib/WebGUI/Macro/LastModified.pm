@@ -11,7 +11,6 @@ package WebGUI::Macro::LastModified;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::DateTime;
 use WebGUI::Asset;
 use WebGUI::International;
 

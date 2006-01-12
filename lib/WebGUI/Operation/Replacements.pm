@@ -13,11 +13,8 @@ package WebGUI::Operation::Replacements;
 use strict;
 use WebGUI::AdminConsole;
 use WebGUI::Grouping;
-use WebGUI::Icon;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------

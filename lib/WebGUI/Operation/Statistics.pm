@@ -15,8 +15,6 @@ use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 
 #-------------------------------------------------------------------

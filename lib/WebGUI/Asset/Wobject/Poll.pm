@@ -15,8 +15,6 @@ use strict;
 use WebGUI::Form;
 use WebGUI::Grouping;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;

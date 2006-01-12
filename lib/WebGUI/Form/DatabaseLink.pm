@@ -18,7 +18,6 @@ use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::DatabaseLink;
 use WebGUI::Grouping;
-use WebGUI::Icon;
 use WebGUI::International;
 
 =head1 NAME

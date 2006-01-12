@@ -12,12 +12,9 @@ package WebGUI::Operation::LoginHistory;
 
 use strict;
 use WebGUI::AdminConsole;
-use WebGUI::DateTime;
 use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Paginator;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
 
 =head1 NAME

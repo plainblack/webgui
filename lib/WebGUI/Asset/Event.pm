@@ -12,18 +12,11 @@ package WebGUI::Asset::Event;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::DateTime;
 use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
-use WebGUI::Icon;
-use WebGUI::Id;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
 use WebGUI::SQL;
-use WebGUI::Style;
-use WebGUI::URL;
 use WebGUI::Asset;
 
 our @ISA = qw(WebGUI::Asset);

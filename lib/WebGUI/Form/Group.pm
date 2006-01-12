@@ -17,9 +17,7 @@ package WebGUI::Form::Group;
 use strict;
 use base 'WebGUI::Form::SelectList';
 use WebGUI::Grouping;
-use WebGUI::Icon;
 use WebGUI::International;
-use WebGUI::Session;
 use WebGUI::SQL;
 
 =head1 NAME

@@ -13,8 +13,6 @@ package WebGUI::Operation::FormHelpers;
 use strict;
 use WebGUI::Asset;
 use WebGUI::HTMLForm;
-use WebGUI::Session;
-use WebGUI::Style;
 
 #-------------------------------------------------------------------
 sub www_formAssetTree {
