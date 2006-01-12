@@ -156,7 +156,7 @@ sub www_deleteSubscription {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	WebGUI::Subscription->new($session->form->process("sid"))->delete;
+	WebGUI::Subscription->new($session,$session->form->process("sid"))->delete;
 	return www_listSubscriptions();
 }
 
@@ -196,7 +196,7 @@ sub www_editSubscription {
 	my $i18n = WebGUI::International->new($session, "Subscription");
 	
 	unless ($session->form->process("sid") eq 'new') {
-		$properties = WebGUI::Subscription->new($session->form->process("sid"))->get;
+		$properties = WebGUI::Subscription->new($session,$session->form->process("sid"))->get;
 	}
 
 	$subscriptionId = $session->form->process("sid") || 'new';
@@ -271,7 +271,7 @@ sub www_editSubscriptionSave {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
-	WebGUI::Subscription->new($session->form->process("sid"))->set({map {$_ => $session->form->process("$_}} @relevantFields"));
+	WebGUI::Subscription->new($session,$session->form->process("sid"))->set({map {$_ => $session->form->process("$_}} @relevantFields"));
 		
 	return www_listSubscriptions();
 }
@@ -439,7 +439,7 @@ sub www_redeemSubscriptionCode {
 			# Code is ok
 			@subscriptions = $session->db->buildArray("select subscriptionId from subscriptionCodeSubscriptions where code=".$session->db->quote($session->form->process("code")));
 			foreach (@subscriptions) {
-				WebGUI::Subscription->new($_)->apply;
+				WebGUI::Subscription->new($session,$_)->apply;
 			}
 
 			# Set code to Used

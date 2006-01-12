@@ -1,12 +1,8 @@
 package WebGUI::Subscription;
 
-use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::Grouping;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::Commerce::Payment;
-use WebGUI::DateTime;
 
 =head1 NAME
 
@@ -28,15 +24,15 @@ Text description of how long the subscription lasts.
 =cut
 
 sub _getDuration {
+	my $self = shift;
 	my $duration = shift;
-	
-	return$self->session->datetime->addToDate(0,0,0,7) if $duration eq 'Weekly';
-	return$self->session->datetime->addToDate(0,0,0,14) if $duration eq 'BiWeekly';
-	return$self->session->datetime->addToDate(0,0,0,28) if $duration eq 'FourWeekly';
-	return$self->session->datetime->addToDate(0,0,1,0) if $duration eq 'Monthly';
-	return$self->session->datetime->addToDate(0,0,3,0) if $duration eq 'Quarterly';
-	return$self->session->datetime->addToDate(0,0,6,0) if $duration eq 'HalfYearly';
-	return$self->session->datetime->addToDate(0,1,0,0) if $duration eq 'Yearly';
+	return $self->session->datetime->addToDate(0,0,0,7) if $duration eq 'Weekly';
+	return $self->session->datetime->addToDate(0,0,0,14) if $duration eq 'BiWeekly';
+	return $self->session->datetime->addToDate(0,0,0,28) if $duration eq 'FourWeekly';
+	return $self->session->datetime->addToDate(0,0,1,0) if $duration eq 'Monthly';
+	return $self->session->datetime->addToDate(0,0,3,0) if $duration eq 'Quarterly';
+	return $self->session->datetime->addToDate(0,0,6,0) if $duration eq 'HalfYearly';
+	return $self->session->datetime->addToDate(0,1,0,0) if $duration eq 'Yearly';
 }
 
 #-------------------------------------------------------------------
@@ -62,7 +58,7 @@ sub apply {
 	$groupId = $self->{_properties}{subscriptionGroup};
 
 	# Make user part of the right group
-	$group->addUsers([$userId], [$groupId], _getDuration($self->{_properties}{duration}));
+	$group->addUsers([$userId], [$groupId], $self->_getDuration($self->{_properties}{duration}));
 
 	# Add karma
 	WebGUI::User->new($userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});
@@ -112,9 +108,13 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 new ( $subscriptionId )
+=head2 new ( session, subscriptionId )
 
 Object creation method.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 subscriptionId
 
@@ -127,16 +127,30 @@ from the database.
 sub new {
 	my ($class, $subscriptionId, %properties);
 	$class = shift;
+	my $session = shift;
 	$subscriptionId = shift;
 
 	if ($subscriptionId eq 'new') {
-		$subscriptionId = $self->session->id->generate;
-		$self->session->db->write("insert into subscription (subscriptionId) values (".$self->session->db->quote($subscriptionId).")");
+		$subscriptionId = $session->id->generate;
+		$session->db->write("insert into subscription (subscriptionId) values (".$session->db->quote($subscriptionId).")");
 	}
 	
-	%properties = $self->session->db->quickHash("select * from subscription where subscriptionId=".$self->session->db->quote($subscriptionId));
+	%properties = $session->db->quickHash("select * from subscription where subscriptionId=".$session->db->quote($subscriptionId));
 	
-	bless {_subscriptionId => $subscriptionId, _properties => \%properties}, $class;
+	bless {_session=>$session, _subscriptionId => $subscriptionId, _properties => \%properties}, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 #-------------------------------------------------------------------

@@ -43,7 +43,7 @@ sub new {
 	$subscriptionId = shift;
 	$type = shift;
 	
-	$subscription = WebGUI::Subscription->new($subscriptionId);
+	$subscription = WebGUI::Subscription->new($self->session,$subscriptionId);
 	bless {_subscription => $subscription, _subscriptionId => $subscriptionId}, $class;
 }
 
