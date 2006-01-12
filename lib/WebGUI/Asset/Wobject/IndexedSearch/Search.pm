@@ -18,7 +18,6 @@ use strict;
 use DBIx::FullTextSearch;
 use WebGUI::SQL;
 use WebGUI::HTML;
-use WebGUI::Grouping;
 use DBIx::FullTextSearch::StopList;
 use WebGUI::Utility;
 use HTML::Highlight;

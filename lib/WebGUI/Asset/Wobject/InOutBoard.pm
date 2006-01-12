@@ -3,7 +3,6 @@ package WebGUI::Asset::Wobject::InOutBoard;
 $VERSION = "0.5.3";
 
 use strict;
-use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Paginator;

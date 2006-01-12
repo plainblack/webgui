@@ -16,7 +16,6 @@ use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post::Thread;
 use WebGUI::Cache;
-use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;

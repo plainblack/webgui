@@ -15,7 +15,6 @@ package WebGUI::Form::Control;
 =cut
 
 use strict;
-use WebGUI::Grouping;
 use WebGUI::Operation::Shared;
 use WebGUI::International;
 

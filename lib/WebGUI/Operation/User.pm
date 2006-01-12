@@ -15,7 +15,6 @@ use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::Group;
-use WebGUI::Grouping;
 use WebGUI::Form;
 use WebGUI::Form::DynamicField;
 use WebGUI::HTMLForm;

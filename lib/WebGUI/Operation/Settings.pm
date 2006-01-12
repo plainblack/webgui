@@ -13,7 +13,6 @@ package WebGUI::Operation::Settings;
 use strict qw(vars subs);
 use Tie::IxHash;
 use WebGUI::AdminConsole;
-use WebGUI::Grouping;
 use WebGUI::TabForm;
 use WebGUI::International;
 use WebGUI::SQL;

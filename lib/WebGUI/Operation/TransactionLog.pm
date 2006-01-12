@@ -5,7 +5,6 @@ use WebGUI::Commerce::Transaction;
 use WebGUI::Asset::Template;
 use WebGUI::Operation;
 use WebGUI::Form;
-use WebGUI::Grouping;
 
 =head1 NAME
 

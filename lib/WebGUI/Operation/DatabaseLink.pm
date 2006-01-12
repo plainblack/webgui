@@ -14,7 +14,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
-use WebGUI::Grouping;
 use WebGUI::International;
 
 #-------------------------------------------------------------------

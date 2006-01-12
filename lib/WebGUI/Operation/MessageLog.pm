@@ -12,7 +12,6 @@ package WebGUI::Operation::MessageLog;
 
 use strict qw(vars subs);
 use URI;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;

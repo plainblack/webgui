@@ -13,7 +13,6 @@ package WebGUI::Asset::Wobject::Poll;
 
 use strict;
 use WebGUI::Form;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::User;

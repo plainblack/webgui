@@ -11,7 +11,6 @@ package WebGUI::Operation::Style;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Grouping;
 use WebGUI::Paginator;
 
 =head1 NAME

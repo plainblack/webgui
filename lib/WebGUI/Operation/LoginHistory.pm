@@ -12,7 +12,6 @@ package WebGUI::Operation::LoginHistory;
 
 use strict;
 use WebGUI::AdminConsole;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;

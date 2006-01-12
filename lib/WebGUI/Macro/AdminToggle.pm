@@ -11,7 +11,6 @@ package WebGUI::Macro::AdminToggle;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Asset::Template;
 

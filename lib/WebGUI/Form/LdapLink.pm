@@ -17,7 +17,6 @@ package WebGUI::Form::LdapLink;
 use strict;
 use base 'WebGUI::Form::SelectList';
 use WebGUI::LDAPLink;
-use WebGUI::Grouping;
 use WebGUI::International;
 
 =head1 NAME

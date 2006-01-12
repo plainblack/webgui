@@ -17,7 +17,6 @@ package WebGUI::Form::DatabaseLink;
 use strict;
 use base 'WebGUI::Form::SelectBox';
 use WebGUI::DatabaseLink;
-use WebGUI::Grouping;
 use WebGUI::International;
 
 =head1 NAME

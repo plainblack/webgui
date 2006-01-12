@@ -14,7 +14,6 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
-use WebGUI::Grouping;
 use WebGUI::ProfileField;
 use Time::HiRes;
 use WebGUI::Asset::Wobject;

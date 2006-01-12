@@ -14,7 +14,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::Group;
-use WebGUI::Grouping;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::International;

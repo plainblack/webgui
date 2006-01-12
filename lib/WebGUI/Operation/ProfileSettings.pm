@@ -13,7 +13,6 @@ package WebGUI::Operation::ProfileSettings;
 use strict;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
-use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Form::FieldType;

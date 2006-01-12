@@ -12,7 +12,6 @@ package WebGUI::Operation::Replacements;
 
 use strict;
 use WebGUI::AdminConsole;
-use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::SQL;

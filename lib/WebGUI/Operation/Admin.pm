@@ -12,7 +12,6 @@ package WebGUI::Operation::Admin;
 
 use strict;
 use WebGUI::AdminConsole;
-use WebGUI::Grouping;
 
 =head1 NAME
 

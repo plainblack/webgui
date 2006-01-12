@@ -14,7 +14,6 @@ use strict qw(vars subs);
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::Form;
-use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;

@@ -16,7 +16,6 @@ use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Utility;
 

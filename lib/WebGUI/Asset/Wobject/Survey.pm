@@ -12,7 +12,6 @@ package WebGUI::Asset::Wobject::Survey;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::Grouping;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::SQL;

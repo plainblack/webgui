@@ -13,7 +13,6 @@ package WebGUI::Operation::Shared;
 
 use Exporter;
 use strict;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::SQL;
 use Safe;

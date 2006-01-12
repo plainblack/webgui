@@ -14,7 +14,6 @@ use strict;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::LDAPLink;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;

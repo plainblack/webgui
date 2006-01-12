@@ -12,10 +12,8 @@ package WebGUI::Asset::Wobject::StockData;
 
 use strict;
 use WebGUI::International;
-use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
-
 use Finance::Quote;
 
 our @ISA = qw(WebGUI::Asset::Wobject);

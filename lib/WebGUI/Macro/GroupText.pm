@@ -11,7 +11,6 @@ package WebGUI::Macro::GroupText;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Grouping;
 
 =head1 NAME
 

@@ -13,7 +13,6 @@ package WebGUI::Asset::Post::Thread;
 use strict;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::MessageLog;
 use WebGUI::Paginator;

@@ -14,7 +14,6 @@ use strict qw(vars subs);
 use URI;
 use WebGUI::Asset::Template;
 use WebGUI::Operation::Auth;
-use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;

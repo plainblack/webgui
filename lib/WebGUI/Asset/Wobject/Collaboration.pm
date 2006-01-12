@@ -13,7 +13,6 @@ package WebGUI::Asset::Wobject::Collaboration;
 use strict;
 use Tie::IxHash;
 use WebGUI::Group;
-use WebGUI::Grouping;
 use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Paginator;

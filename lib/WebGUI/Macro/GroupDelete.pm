@@ -12,7 +12,6 @@ package WebGUI::Macro::GroupDelete;
 
 use strict;
 use WebGUI::Group;
-use WebGUI::Grouping;
 use WebGUI::Asset::Template;
 
 =head1 NAME

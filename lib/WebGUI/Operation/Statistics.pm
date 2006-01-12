@@ -13,7 +13,6 @@ package WebGUI::Operation::Statistics;
 use strict;
 use WebGUI::AdminConsole;
 use WebGUI::Cache;
-use WebGUI::Grouping;
 use WebGUI::International;
 use WebGUI::SQL;
 

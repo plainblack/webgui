@@ -9,7 +9,6 @@ use WebGUI::AdminConsole;
 use Tie::IxHash;
 use WebGUI::Product;
 use WebGUI::HTML;
-use WebGUI::Grouping;
 
 #-------------------------------------------------------------------
 sub _submenu {
