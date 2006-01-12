@@ -534,7 +534,7 @@ A boolean that if set true will return the users list minus the expired grouping
 
 =cut
 
-sub getUsersInGroup {
+sub getUsers {
 	my $self = shift;
 	my $recursive = shift;
 	my $withoutExpired = shift;

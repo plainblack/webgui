@@ -214,7 +214,7 @@ sub www_editBranch {
         }
         my $clause;
         if ($self->session->user->isInGroup(3)) {
-                my $contentManagers = $group->getUsers(4,1);
+                my $contentManagers = WebGUI::Group->new(4)->getUsers(1);
                 push (@$contentManagers, $self->session->user->profileField("userId"));
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
@@ -334,7 +334,7 @@ sub www_editBranchSave {
 			}
 		}
 		my $newRevision = $descendant->addRevision(\%data);
-		foreach my $form (keys %{$session{form}}) {
+		foreach my $form ($self->session->request->param) {
                 	if ($form =~ /^metadata_(.*)$/) {
 				my $fieldName = $1;
 				if ($self->session->form->yesNo("change_metadata_".$fieldName)) {

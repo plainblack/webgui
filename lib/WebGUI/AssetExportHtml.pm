@@ -45,6 +45,7 @@ Returns a descriptive error message (HTML) if the export path is not writable, d
 =cut
 
 sub checkExportPath {
+	my $self = shift;
 	my $error;
 	if(defined $self->session->config->get("exportPath")) {
 		if(-d $self->session->config->get("exportPath")) {
@@ -76,17 +77,9 @@ Executes the export and returns html content.
 
 A hashref containing one of the following properties:
 
-=head4 extrasUrl
-
-The URL where the page will be able to find the WebGUI extras folder. Defaults to the extrasURL in the config file.
-
 =head4 stripHtml
 
 A boolean indicating whether the resulting output should be stripped of HTML tags.
-
-=head4 uploadsUrl
-
-The URL where the page will be able to find the files uploaded to WebGUI. Defaults to the uploadsURL in the config file.
 
 =head4 userId
 
@@ -97,22 +90,13 @@ The unique id of the user to become when exporting this page. Defaults to '1' (V
 sub exportAsHtml {
 	my $self = shift;
 	my $params = shift;
-	my $uploadsUrl = $params->{uploadsUrl} || $self->session->config->get("uploadsUrl");
-	my $extrasUrl = $params->{extrasUrl} || $self->session->config->get("extrasUrl");
 	my $userId = $params->{userId} || 1;
 	my $stripHtml = $params->{stripHtml} || undef;
 
-	# Save current session information because we need to restore current session after the export has finished.
-	my %oldSession = %session;
-
 	# Change the stuff we need to change to do the export
-	$session->user({userId=>$userId}) unless ($userId == $self->session->user->profileField("userId"));
-	delete $session{form}; 
-	$self->session->var->get("adminOn") = $self->get('adminOn');
-	$self->WebGUI::Session::refreshPageInfo;
+	my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+	$session->user({userId=>$userId}) unless ($userId eq $self->session->user->profileField("userId"));
 	$self->{_properties}{cacheTimeout} = $self->{_properties}{cacheTimeoutVisitor} = 1;
-	$self->session->config->get("uploadsURL") = $uploadsUrl;
-	$self->session->config->get("extrasURL") = $extrasUrl;
 
 	# Generate the page
 	my $content = $self->www_view;
@@ -120,9 +104,6 @@ sub exportAsHtml {
 		$content = WebGUI::HTML::html2text($content);
 	}
 
-	# Restore session
-	%session = %oldSession;
-	delete $session{page}{noHttpHeader};
 	return $content;
 }
 
@@ -216,12 +197,11 @@ sub www_exportGenerate {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
 	# This routine is called in an IFRAME and prints status output directly to the browser.
 	$|++;				# Unbuffered data output
-        $session{page}{empty} = 1;      # Write directly to the browser
-	print WebGUI::HTTP::getHeader();
+	$self->session->request->print($self->session->http->getHeader());
 	my $startTime =$self->session->datetime->time();	
 	my $error = $self->checkExportPath();
 	if ($error) {
-		print $error;
+		$self->session->request->print($error);
 		return;
 	}
 	my $i18n = WebGUI::International->new($self->session);
@@ -232,9 +212,9 @@ sub www_exportGenerate {
 	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$self->session->form->process("depth")});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
-		printf $i18n->get('exporting page'), $url;
+		$self->session->request->printf( $i18n->get('exporting page'), $url);
 		unless ($asset->canView($userId)) {
-			print $i18n->get('bad user privileges')."\n";
+			$self->session->request->print ($i18n->get('bad user privileges')."\n");
 			next;
 		}
 		my $path;
@@ -255,28 +235,23 @@ sub www_exportGenerate {
 			$path = $self->session->config->get("exportPath") . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
-				printf $i18n->get('could not create path'), $path, $@;
+				$self->session->request->printf($i18n->get('could not create path'), $path, $@);
 				return;
 			}
 		} 
 		$path .= "/".$filename;
                 eval { open(FILE, "> $path") or die "$!" };
 		if ($@) {
-			printf $i18n->get('could not open path'), $path, $@;
+			$self->session->request->printf($i18n->get('could not open path'), $path, $@);
 			return;
 		} else {
 			print FILE $asset->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
 			close(FILE);
 		}
-		print $i18n->get('done');
+		$self->session->request->print($i18n->get('done'));
 	}
-<<<<<<< .mine
-	printf $i18n->get('export information'), scalar(@{$assets}), (time()-$startTime);
-	print '<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493).'</a>';
-=======
-	printf WebGUI::International::get('export information','Asset'), scalar(@{$assets}), $self->session->datetime->time()-$startTime);
-	print '<a target="_parent" href="'.$self->getUrl.'">'.WebGUI::International::get(493,"Asset").'</a>';
->>>>>>> .r425
+	$self->session->request->printf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime));
+	$self->session->request->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493).'</a>');
 	return;
 }
 
