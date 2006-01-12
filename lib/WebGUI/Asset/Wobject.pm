@@ -283,9 +283,8 @@ Logs the view of the wobject to the passive profiling mechanism.
 sub logView {
 	my $self = shift;
 	if ($self->session->setting->get("passiveProfilingEnabled")) {
-		WebGUI::PassiveProfiling::add($self->get("assetId"));
-# not sure what this will do in the new model
-#		WebGUI::PassiveProfiling::addPage();	# add wobjects on asset to passive profile log
+		WebGUI::PassiveProfiling::add($session,$self->get("assetId"));
+		WebGUI::PassiveProfiling::addPage($session,$self->get("assetId"));	# add wobjects on asset to passive profile log
 	}
 	return;
 }
