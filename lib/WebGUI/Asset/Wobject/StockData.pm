@@ -324,6 +324,7 @@ sub getEditForm {
        -name=>"templateId",
        -value=>$self->get("templateId"),
        -label=>WebGUI::International::get("template_label","Asset_StockData"),
+       -hoverHelp=>WebGUI::International::get("template_label_description","Asset_StockData"),
        -namespace=>"StockData"
     );
 	
@@ -331,12 +332,14 @@ sub getEditForm {
        -name=>"displayTemplateId",
        -value=>$self->get("displayTemplateId"),
        -label=>WebGUI::International::get("display_template_label","Asset_StockData"),
+       -hoverHelp=>WebGUI::International::get("display_template_label_description","Asset_StockData"),
        -namespace=>"StockData/Display"
     );
 	
 	$tabform->getTab("properties")->textarea(
 	    -name => "defaultStocks",
 		-label=> WebGUI::International::get("default_stock_label","Asset_StockData"),
+		-hoverHelp=> WebGUI::International::get("default_stock_label_description","Asset_StockData"),
 		-value=> $self->getValue("defaultStocks") 
 	);
 	
