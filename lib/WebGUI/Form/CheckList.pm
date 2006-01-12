@@ -17,7 +17,6 @@ package WebGUI::Form::CheckList;
 use strict;
 use base 'WebGUI::Form::List';
 use WebGUI::Form::Checkbox;
-use WebGUI::International;
 use WebGUI::Session;
 
 =head1 NAME
@@ -60,10 +59,12 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($self->session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("941","WebGUI"),
+			defaultValue=>$i18n->get("941"),
 			},
 		vertical=>{
 			defaultValue=>0
@@ -72,7 +73,7 @@ sub definition {
 			defaultValue=>1
 			}
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

@@ -227,7 +227,8 @@ The string to make compliant. This is usually a page title or a filename.
 sub makeCompliant {
 	my $self = shift;
 	my $url = shift;
-	return WebGUI::International::makeUrlCompliant($url);
+	my $i18n = WebGUI::International->new($self->session);
+	return $i18n->makeUrlCompliant($url);
 }
 
 #-------------------------------------------------------------------

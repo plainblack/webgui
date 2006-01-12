@@ -24,9 +24,10 @@ sub configurationForm {
 	$self = shift;
 	
 	$f = WebGUI::HTMLForm->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingByPrice');
 	$f->float(
 		-name	=> $self->prepend('percentageOfPrice'),
-		-label	=> WebGUI::International::get('percentage of price', 'CommerceShippingByPrice'),
+		-label	=> $i18n->get('percentage of price'),
 		-value	=> $self->get('percentageOfPrice')
 		);
 
@@ -45,7 +46,8 @@ sub init {
 
 #-------------------------------------------------------------------
 sub name {
-	return WebGUI::International::get('title', 'CommerceShippingByPrice');
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingByPrice');
+	return $i18n->get('title');
 }
 
 1;

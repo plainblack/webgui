@@ -63,8 +63,9 @@ A hash reference passed in from a subclass definition.
 sub definition {
         my $class = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Image"),
+		assetName=>$i18n->get('assetName'),
                 tableName=>'ImageAsset',
                 className=>'WebGUI::Asset::File::Image',
                 properties=>{
@@ -116,27 +117,28 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
         $tabform->getTab("properties")->integer(
                	-name=>"thumbnailSize",
-		-label=>WebGUI::International::get('thumbnail size', 'Asset_Image'),
-		-hoverHelp=>WebGUI::International::get('Thumbnail size description', 'Asset_Image'),
+		-label=>$i18n->get('thumbnail size'),
+		-hoverHelp=>$i18n->get('Thumbnail size description'),
 		-value=>$self->getValue("thumbnailSize")
                	);
 	$tabform->getTab("properties")->textarea(
 		-name=>"parameters",
-		-label=>WebGUI::International::get('parameters', 'Asset_Image'),
-		-hoverHelp=>WebGUI::International::get('Parameters description', 'Asset_Image'),
+		-label=>$i18n->get('parameters'),
+		-hoverHelp=>$i18n->get('Parameters description'),
 		-value=>$self->getValue("parameters")
 		);
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('thumbnail', 'Asset_Image'),
-			-hoverHelp=>WebGUI::International::get('Thumbnail description', 'Asset_Image'),
+			-label=>$i18n->get('thumbnail'),
+			-hoverHelp=>$i18n->get('Thumbnail description'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='$self->session->datetime->time().'" alt="thumbnail" /></a>'
 			);
 		my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
         	$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('image size', 'Asset_Image'),
+			-label=>$i18n->get('image size'),
 			-value=>$x.' x '.$y
 			);
 	}
@@ -226,16 +228,17 @@ sub view {
 sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),WebGUI::International::get("resize image","Asset_Image")) if ($self->get("filename"));
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Image');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),$i18n->get("resize image")) if ($self->get("filename"));
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->get("templateId"),
 		-namespace=>"ImageAsset",
-		-hoverHelp=>WebGUI::International::get('image template description','Asset_Image'),
+		-hoverHelp=>$i18n->get('image template description'),
 		-defaultValue=>"PBtmpl0000000000000088"
 		);
         $self->getAdminConsole->setHelp("image add/edit","Asset_Image");
-        return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("edit image","Asset_Image"));
+        return $self->getAdminConsole->render($tabform->print,$i18n->get("edit image"));
 }
 
 #-------------------------------------------------------------------
@@ -246,7 +249,8 @@ sub www_resize {
 		$self->getStorageLocation->resize($self->get("filename"),$self->session->form->process("newWidth"),$self->session->form->process("newHeight"));
 		$self->setSize($self->getStorageLocation->getFileSize($self->get("filename")));
 	}
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit image","Asset_Image"));
+	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	$f->hidden(
 		-name=>"func",
@@ -254,26 +258,26 @@ sub www_resize {
 		);
 	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
        	$f->readOnly(
-		-label=>WebGUI::International::get('image size', 'Asset_Image'),
-		-hoverHelp=>WebGUI::International::get('image size description', 'Asset_Image'),
+		-label=>$i18n->get('image size'),
+		-hoverHelp=>$i18n->get('image size description'),
 		-value=>$x.' x '.$y,
 		);
 	$f->integer(
-		-label=>WebGUI::International::get('new width','Asset_Image'),
-		-hoverHelp=>WebGUI::International::get('new width description','Asset_Image'),
+		-label=>$i18n->get('new width'),
+		-hoverHelp=>$i18n->get('new width description'),
 		-name=>"newWidth",
 		-value=>$x,
 		);
 	$f->integer(
-		-label=>WebGUI::International::get('new height','Asset_Image'),
-		-hoverHelp=>WebGUI::International::get('new height description','Asset_Image'),
+		-label=>$i18n->get('new height'),
+		-hoverHelp=>$i18n->get('new height description'),
 		-name=>"newHeight",
 		-value=>$y,
 		);
 	$f->submit;
 	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" border="1" alt="'.$self->get("filename").'" /></div>';
         $self->getAdminConsole->setHelp("image resize","Asset_Image");
-        return $self->getAdminConsole->render($f->print.$image,WebGUI::International::get("resize image","Asset_Image"));
+        return $self->getAdminConsole->render($f->print.$image,$i18n->get("resize image"));
 }
 
 #-------------------------------------------------------------------

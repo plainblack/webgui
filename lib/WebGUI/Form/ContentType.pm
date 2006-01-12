@@ -63,13 +63,15 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("1007","WebGUI")
+			defaultValue=>$i18n->get("1007")
 			},
 		label=>{
-			defaultValue=>WebGUI::International::get("1007","WebGUI")
+			defaultValue=>$i18n->get("1007")
 			},
 		types=>{
 			defaultValue=>[qw(mixed html code text)]
@@ -78,7 +80,7 @@ sub definition {
 			defaultValue=>"mixed",
 			}
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

@@ -79,6 +79,7 @@ sub validateProfileData {
 	my %data = ();
 	my $error = "";
 	my $warning = "";
+	my $i18n = WebGUI::International->new($session);
 	foreach my $field (@{WebGUI::ProfileField->getEditableFields}) {
 		my $fieldValue = $field->formProcess;
 		if (ref $fieldValue eq "ARRAY") {
@@ -87,9 +88,9 @@ sub validateProfileData {
 			$data{$field->getId} = $fieldValue;
 		}
 		if ($field->isRequired && !$data{$field->getId}) {
-			$error .= '<li>'.$field->getLabel.' '.WebGUI::International::get(451).'</li>';
+			$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
 		} elsif ($field->getId eq "email" && isDuplicateEmail($data{$field->getId})) {
-			$warning .= '<li>'.WebGUI::International::get(1072).'</li>';
+			$warning .= '<li>'.$i18n->get(1072).'</li>';
 		}
 	}
 	return (\%data, $error, $warning);
@@ -99,8 +100,9 @@ sub validateProfileData {
 sub www_editProfile {
 	my $session = shift;
 	return WebGUI::Operation::Auth::www_auth("init") if($session->user->profileField("userId") eq '1');
+	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
-	$vars->{displayTitle} .= '<h1>'.WebGUI::International::get(338).'</h1>';
+	$vars->{displayTitle} .= '<h1>'.$i18n->get(338).'</h1>';
 	$vars->{'profile.message'} = $_[0] if($_[0]);
 	$vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader($session,{});
 	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter($session,);
@@ -154,12 +156,13 @@ sub www_editProfileSave {
 sub www_viewProfile {
 	my $session = shift;
 	my $u = WebGUI::User->new($session->form->process("uid"));
+	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
-	$vars->{displayTitle} = '<h1>'.WebGUI::International::get(347).' '.$u->username.'</h1>';
+	$vars->{displayTitle} = '<h1>'.$i18n->get(347).' '.$u->username.'</h1>';
 
 	return $session->privilege->notMember() if($u->username eq "");
 
-	return $session->style->userStyle($vars->{displayTitle}.WebGUI::International::get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || $session->user->isInGroup(3)));
+	return $session->style->userStyle($vars->{displayTitle}.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || $session->user->isInGroup(3)));
 	return $session->privilege->insufficient() if(!$session->user->isInGroup(2));
 
 	my @array = ();

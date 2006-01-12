@@ -26,46 +26,47 @@ our @EXPORT = qw(&menuWrapper);
 #-------------------------------------------------------------------
  sub accountOptions {
 	my $session = shift;
+	my $i18n = WebGUI::International->new($session);
 	my @array;
 	if ($session->user->isInGroup(12)) {
 		my %hash;
 		if ($session->var->get("adminOn")) {
-			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOffAdmin').'">'.WebGUI::International::get(12).'</a>';
+			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOffAdmin').'">'.$i18n->get(12).'</a>';
 		} else {
-			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOnAdmin').'">'.WebGUI::International::get(63).'</a>';
+			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOnAdmin').'">'.$i18n->get(63).'</a>';
 		}
 	    push(@array,\%hash);
 	}
 	unless ($session->form->process("op") eq "displayAccount"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=init').'">'.WebGUI::International::get(342).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=init').'">'.$i18n->get(342).'</a>';
 		push(@array,\%hash);
 	}
 	unless ($session->form->process("op") eq "editProfile"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=editProfile').'">'.WebGUI::International::get(341).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=editProfile').'">'.$i18n->get(341).'</a>';
 		push(@array,\%hash);
 	}
 	unless ($session->form->process("op") eq "viewProfile"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->profileField("userId")).'">'.WebGUI::International::get(343).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->profileField("userId")).'">'.$i18n->get(343).'</a>';
 		push(@array,\%hash);
 	}
 	unless ($session->form->process("op") eq "viewMessageLog"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewMessageLog').'">'.WebGUI::International::get(354).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewMessageLog').'">'.$i18n->get(354).'</a>';
 		push(@array,\%hash);
 	}
 	unless ($session->form->process("op") eq "redeemSubscriptionCode") {
-		push(@array, {'options.display' => '<a href="'.$session->url->page('op=redeemSubscriptionCode').'">'.WebGUI::International::get('redeem code', 'Subscription').'</a>'});
+		push(@array, {'options.display' => '<a href="'.$session->url->page('op=redeemSubscriptionCode').'">'.$i18n->get('redeem code', 'Subscription').'</a>'});
 	}
 		
 	my %logout;
-	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.WebGUI::International::get(64).'</a>'; 
+	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.$i18n->get(64).'</a>'; 
 	push(@array,\%logout);
 	if ($session->setting->get("selfDeactivation") && !$session->user->isInGroup(3)){
 	   my %hash;
-	   $hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=deactivateAccount').'">'.WebGUI::International::get(65).'</a>';
+	   $hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=deactivateAccount').'">'.$i18n->get(65).'</a>';
 	   push(@array,\%hash);
 	}
 	return \@array;
@@ -75,6 +76,7 @@ our @EXPORT = qw(&menuWrapper);
 sub menuWrapper {
 	my $session = shift;
         my ($output, $key);
+	my $i18n = WebGUI::International->new($session);
 	$session{page}{useAdminStyle} = 1;
         $output = '<table width="100%" border="0" cellpadding="5" cellspacing="0">
 		<tr><td width="70%" class="tableData" valign="top">';
@@ -83,7 +85,7 @@ sub menuWrapper {
 	foreach $key (keys %{$_[1]}) {
         	$output .= '<li><a href="'.$key.'">'.$_[1]->{$key}.'</a></li>';
 	}
-        $output .= '<li><a href="'.$session->url->page().'">'.WebGUI::International::get(493).'</a></li>';
+        $output .= '<li><a href="'.$session->url->page().'">'.$i18n->get(493).'</a></li>';
         $output .= '</td></tr></table>';
         return $output;
 }
@@ -95,9 +97,10 @@ sub secureEval {
 	my $code = shift;
 
 	# Handle WebGUI function calls
+	my $i18n = WebGUI::International->new($session);
 	my %trusted = (
-		'WebGUI::International::get' => sub {WebGUI::International::get(@_)},
-		'WebGUI::International::getLanguages' => sub { WebGUI::International::getLanguages(@_) },
+		'WebGUI::International::get' => sub {$i18n->get(@_)},
+		'WebGUI::International::getLanguages' => sub { $i18n->getLanguages(@_) },
 		'$session->datetime->epochToHuman' => sub { $session->datetime->epochToHuman(@_) },
 		'WebGUI::Icon::getToolbarOptions' => sub { WebGUI::Icon::getToolbarOptions(@_) },		
 	);

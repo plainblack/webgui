@@ -30,18 +30,19 @@ sub _drawQueryBuilder {
 	my $self = shift;
 	# Initialize operators
 	my @textFields = qw|text yesNo selectList radioList|;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	my %operator;
 	foreach (@textFields) {
 		$operator{$_} = {
-			"=" => WebGUI::International::get("is","Asset_Shortcut"),
-			"!=" => WebGUI::International::get("isnt","Asset_Shortcut")
+			"=" => $i18n->get("is"),
+			"!=" => $i18n->get("isnt")
 		};
 	}
 	$operator{integer} = {
-		"=" => WebGUI::International::get("equal to","Asset_Shortcut"),
-		"!=" => WebGUI::International::get("not equal to","Asset_Shortcut"),
-		"<" => WebGUI::International::get("less than","Asset_Shortcut"),
-		">" => WebGUI::International::get("greater than","Asset_Shortcut")
+		"=" => $i18n->get("equal to"),
+		"!=" => $i18n->get("not equal to"),
+		"<" => $i18n->get("less than"),
+		">" => $i18n->get("greater than")
 	};
 
 	# Get the fields and count them
@@ -63,8 +64,8 @@ sub _drawQueryBuilder {
 	my $conjunctionField = WebGUI::Form::selectBox({
 		name=>"conjunction",
 		options=>{
-			"AND" => WebGUI::International::get("AND","Asset_Shortcut"),
-			"OR" => WebGUI::International::get("OR","Asset_Shortcut")},
+			"AND" => $i18n->get("AND"),
+			"OR" => $i18n->get("OR")},
 			value=>["OR"],
 			extras=>'class="qbselect"',
 		}
@@ -136,8 +137,9 @@ sub _submenu {
 	my $ac = WebGUI::AdminConsole->new($self->session,"shortcutmanager");
 	$ac->setHelp($help) if ($help);
 	$ac->setIcon($self->getIcon);
-	$ac->addSubmenuItem($self->getUrl('func=edit'), WebGUI::International::get("Back to Edit Shortcut","Asset_Shortcut"));
-	$ac->addSubmenuItem($self->getUrl("func=manageOverrides"),WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
+	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
+	$ac->addSubmenuItem($self->getUrl('func=edit'), $i18n->get("Back to Edit Shortcut"));
+	$ac->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
 	return $ac->render($workarea, $title);
 }
 
@@ -158,8 +160,9 @@ sub canManage {
 sub definition {
 	my $class = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Shortcut"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'shortcut.gif',
 		tableName=>'Shortcut',
 		className=>'WebGUI::Asset::Shortcut',
@@ -221,24 +224,24 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $originalTemplate;
-	my $i18n = WebGUI::International->new("Asset_Shortcut");
+	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	$tabform->getTab("properties")->readOnly(
-		-label=>WebGUI::International::get(1,"Asset_Shortcut"),
-		-hoverHelp=>WebGUI::International::get('1 description',"Asset_Shortcut"),
+		-label=>$i18n->get(1),
+		-hoverHelp=>$i18n->get('1 description'),
 		-value=>'<a href="'.$self->getShortcut->getUrl.'">'.$self->getShortcut->get('title').'</a> ('.$self->getShortcut->getId.')'
 		);
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
-		-label=>WebGUI::International::get('shortcut template title', 'Asset_Shortcut'),
-		-hoverHelp=>WebGUI::International::get('shortcut template title description', 'Asset_Shortcut'),
+		-label=>$i18n->get('shortcut template title'),
+		-hoverHelp=>$i18n->get('shortcut template title description'),
 		-namespace=>"Shortcut"
 	);
 	if($self->session->setting->get("metaDataEnabled")) {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"shortcutByCriteria",
 			-value=>$self->getValue("shortcutByCriteria"),
-			-label=>WebGUI::International::get("Shortcut by alternate criteria","Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get("Shortcut by alternate criteria description","Asset_Shortcut"),
+			-label=>$i18n->get("Shortcut by alternate criteria"),
+			-hoverHelp=>$i18n->get("Shortcut by alternate criteria description"),
 			-extras=>q|onchange="
 				if (this.form.shortcutByCriteria[0].checked) { 
  					this.form.resolveMultiples.disabled=false;
@@ -251,8 +254,8 @@ sub getEditForm {
 		$tabform->getTab("properties")->yesNo(
 			-name=>"disableContentLock",
 			-value=>$self->getValue("disableContentLock"),
-			-label=>WebGUI::International::get("disable content lock","Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get("disable content lock description","Asset_Shortcut")
+			-label=>$i18n->get("disable content lock"),
+			-hoverHelp=>$i18n->get("disable content lock description")
 			);
 		if ($self->getValue("shortcutByCriteria") == 0) {
 			$self->{_disabled} = 'disabled=true';
@@ -260,18 +263,18 @@ sub getEditForm {
 		$tabform->getTab("properties")->selectBox(
 			-name=>"resolveMultiples",
 			-value=>[ $self->getValue("resolveMultiples") ],
-			-label=>WebGUI::International::get("Resolve Multiples","Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get("Resolve Multiples description","Asset_Shortcut"),
+			-label=>$i18n->get("Resolve Multiples"),
+			-hoverHelp=>$i18n->get("Resolve Multiples description"),
 			-options=>{
-				mostRecent=>WebGUI::International::get("Most Recent","Asset_Shortcut"),
-				random=>WebGUI::International::get("Random","Asset_Shortcut"),
+				mostRecent=>$i18n->get("Most Recent"),
+				random=>$i18n->get("Random"),
 			},
 			-extras=>$self->{_disabled}
 		);
 		$tabform->getTab("properties")->readOnly(
 			-value=>$self->_drawQueryBuilder(),
-			-label=>WebGUI::International::get("Criteria","Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get("Criteria description","Asset_Shortcut")
+			-label=>$i18n->get("Criteria"),
+			-hoverHelp=>$i18n->get("Criteria description")
 		);
 	}
 	$tabform->addTab('overrides',$i18n->get('Overrides'));
@@ -282,8 +285,8 @@ sub getEditForm {
 		$tabform->getTab("properties")->yesNo(
 			-value=>$self->getValue("showReloadIcon"),
 			-name=>"showReloadIcon",
-			-label=>WebGUI::International::get("show reload icon","Asset_Shortcut"),
-			-hoverHelp=>WebGUI::International::get("show reload icon description","Asset_Shortcut")
+			-label=>$i18n->get("show reload icon"),
+			-hoverHelp=>$i18n->get("show reload icon description")
 		);
 	}
 	return $tabform;
@@ -306,7 +309,7 @@ sub getExtraHeadTags {
 #-------------------------------------------------------------------
 sub getFieldsList {
 	my $self = shift;
-	my $i18n = WebGUI::International->new("Asset_Shortcut");
+	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my $output = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
 	my %fieldNames;
 	tie %fieldNames, 'Tie::IxHash';
@@ -345,7 +348,7 @@ sub getFieldsList {
 sub getOverridesList {
 	my $self = shift;
 	my $output = '';
-	my $i18n = WebGUI::International->new("Asset_Shortcut");
+	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my %overrides = $self->getOverrides;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
 	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td><td>'.$i18n->get('Original Value').'</td><td>'.$i18n->get('New value').'</td><td>'.$i18n->get('Replacement value').'</td></tr>';
@@ -602,16 +605,17 @@ sub uncacheOverrides {
 sub view {
 	my $self = shift;
 	my $content;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	my $shortcut = $self->getShortcut;
 	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
-		$content = WebGUI::International::get("Displaying this shortcut would cause a feedback loop","Asset_Shortcut");
+		$content = $i18n->get("Displaying this shortcut would cause a feedback loop");
 	} else {
 		$content = $shortcut->view;
 	}
 	my %var = (
 		isShortcut => 1,
 		'shortcut.content' => $content,
-		'shortcut.label' => WebGUI::International::get('assetName',"Asset_Shortcut"),
+		'shortcut.label' => $i18n->get('assetName'),
 		originalURL => $shortcut->getUrl,
 		'shortcut.url'=>$self->getUrl
 		);
@@ -627,8 +631,9 @@ sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
-	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get(2,"Asset_Shortcut"));
+	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
+	return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get(2));
 }
 
 #-------------------------------------------------------------------
@@ -676,7 +681,8 @@ sub www_getUserPrefsForm {
 sub www_manageOverrides {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->_submenu($self->getOverridesList,WebGUI::International::get("Manage Shortcut Overrides","Asset_Shortcut"));
+	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
+	return $self->_submenu($self->getOverridesList,$i18n->get("Manage Shortcut Overrides"));
 }
 
 #-------------------------------------------------------------------
@@ -703,16 +709,17 @@ sub www_saveUserPrefs {
 	my @fellowFields = $self->getPrefFieldsToShow;
 	my %data = ();
 	$self->uncacheOverrides;
+	my $i18n = WebGUI::International->new($self->session);
 	my $u = WebGUI::User->new($self->discernUserId);
 	foreach my $fieldId (keys %{$session{form}}) {
 		my $field = WebGUI::ProfileField->new($fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;
 		if ($field->getId eq 'email' && WebGUI::Operation::Profile::isDuplicateEmail($data{$field->getId})) {
-			return '<li>'.WebGUI::International::get(1072).'</li>';
+			return '<li>'.$i18n->get(1072).'</li>';
 		}
 		if ($field->isRequired && !$data{$field->getId}) {
-			return '<li>'.$field->getLabel.' '.WebGUI::International::get(451).'</li>';
+			return '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
 		}
 		$u->profileField($field->getId,$data{$field->getId});
 	}
@@ -731,7 +738,7 @@ sub www_getNewTitle {
 sub www_editOverride {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $i18n = WebGUI::International->new("Asset_Shortcut");
+	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my $fieldName = $self->session->form->process("fieldName");
 	my %overrides = $self->getOverrides;
 	my $output = '';

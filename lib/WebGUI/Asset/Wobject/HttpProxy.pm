@@ -31,9 +31,11 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_HttpProxy");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_HttpProxy"),
+		assetName=>$i18n->get('assetName'),
 		uiLevel => 5,
 		icon=>'httpProxy.gif',
 		tableName=>'HttpProxy',
@@ -86,7 +88,7 @@ sub definition {
                                 }
 			}
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -105,11 +107,12 @@ sub getCookieJar {
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
 	my $tabform = $self->SUPER::getEditForm();
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
-                -label=>WebGUI::International::get('http proxy template title',"Asset_HttpProxy"),
-                -hoverHelp=>WebGUI::International::get('http proxy template title description',"Asset_HttpProxy"),
+                -label=>$i18n->get('http proxy template title'),
+                -hoverHelp=>$i18n->get('http proxy template title description'),
       		-namespace=>"HttpProxy"
    		);
 	my %hash;
@@ -117,32 +120,32 @@ sub getEditForm {
 	%hash=(5=>5,10=>10,20=>20,30=>30,60=>60);
         $tabform->getTab("properties")->url(
 		-name=>"proxiedUrl", 
-		-label=>WebGUI::International::get(1,"Asset_HttpProxy"),
-		-hoverHelp=>WebGUI::International::get('1 description',"Asset_HttpProxy"),
+		-label=>$i18n->get(1),
+		-hoverHelp=>$i18n->get('1 description'),
 		-value=>$self->getValue("proxiedUrl")
 		);
         $tabform->getTab("security")->yesNo(
         	-name=>"followExternal",
-                -label=>WebGUI::International::get(5,"Asset_HttpProxy"),
-                -hoverHelp=>WebGUI::International::get('5 description',"Asset_HttpProxy"),
+                -label=>$i18n->get(5),
+                -hoverHelp=>$i18n->get('5 description'),
                 -value=>$self->getValue("followExternal")
                 );
         $tabform->getTab("security")->yesNo(
                 -name=>"followRedirect",
-                -label=>WebGUI::International::get(8,"Asset_HttpProxy"),
-                -hoverHelp=>WebGUI::International::get('8 description',"Asset_HttpProxy"),
+                -label=>$i18n->get(8),
+                -hoverHelp=>$i18n->get('8 description'),
                 -value=>$self->getValue("followRedirect")
                 );
         $tabform->getTab("properties")->yesNo(
                 -name=>"rewriteUrls",
-                -label=>WebGUI::International::get(12,"Asset_HttpProxy"),
-                -hoverHelp=>WebGUI::International::get('12 description',"Asset_HttpProxy"),
+                -label=>$i18n->get(12),
+                -hoverHelp=>$i18n->get('12 description'),
                 -value=>$self->getValue("rewriteUrls")
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"removeStyle",
-                -label=>WebGUI::International::get(6,"Asset_HttpProxy"),
-                -hoverHelp=>WebGUI::International::get('6 description',"Asset_HttpProxy"),
+                -label=>$i18n->get(6),
+                -hoverHelp=>$i18n->get('6 description'),
                 -value=>$self->getValue("removeStyle")
                 );
 	$tabform->getTab("display")->filterContent(
@@ -152,20 +155,20 @@ sub getEditForm {
         $tabform->getTab("properties")->selectBox(
 		-name=>"timeout", 
 		-options=>\%hash, 
-		-label=>WebGUI::International::get(4,"Asset_HttpProxy"),
-		-hoverHelp=>WebGUI::International::get('4 description',"Asset_HttpProxy"),
+		-label=>$i18n->get(4),
+		-hoverHelp=>$i18n->get('4 description'),
 		-value=>[$self->getValue("timeout")]
 		);
         $tabform->getTab("display")->text(
                 -name=>"searchFor",
-                -label=>WebGUI::International::get(13,"Asset_HttpProxy"),
-                -hoverHelp=>WebGUI::International::get('13 description',"Asset_HttpProxy"),
+                -label=>$i18n->get(13),
+                -hoverHelp=>$i18n->get('13 description'),
                 -value=>$self->getValue("searchFor")
                 );
         $tabform->getTab("display")->text(
                 -name=>"stopAt",
-                -label=>WebGUI::International::get(14,"Asset_HttpProxy"),
-                -hoverHelp=>WebGUI::International::get('14 description',"Asset_HttpProxy"),
+                -label=>$i18n->get(14),
+                -hoverHelp=>$i18n->get('14 description'),
                 -value=>$self->getValue("stopAt")
                 );
 	return $tabform;

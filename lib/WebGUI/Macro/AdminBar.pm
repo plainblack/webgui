@@ -51,10 +51,11 @@ sub process {
 	tie %hash, "Tie::IxHash";
 	tie %hash2, "Tie::IxHash";
 	tie %cphash, "Tie::CPHash";
+	my $i18n = WebGUI::International->new($session,'Macro_AdminBar');
 	$var{'packages.canAdd'} = ($session->user->profileField("uiLevel") >= 7);
-	$var{'packages.label'} = WebGUI::International::get(376,'Macro_AdminBar');
-	$var{'contentTypes.label'} = WebGUI::International::get(1083,'Macro_AdminBar');
-	$var{'clipboard.label'} = WebGUI::International::get(1082,'Macro_AdminBar');
+	$var{'packages.label'} = $i18n->get(376);
+	$var{'contentTypes.label'} = $i18n->get(1083);
+	$var{'clipboard.label'} = $i18n->get(1082);
 	if ($session->asset) {
 		foreach my $package (@{$session->asset->getPackageList}) {
 			my $title = $package->getTitle;
@@ -82,7 +83,7 @@ sub process {
    #--admin functions
 	$var{adminConsole_loop} = WebGUI::AdminConsole->getAdminFunction;
 	return WebGUI::Asset::Template->new($session,$templateId)->process(\%var);
-#		'http://validator.w3.org/check?uri=referer'=>WebGUI::International::get(399,'Macro_AdminBar'),
+#		'http://validator.w3.org/check?uri=referer'=>$i18n->get(399),
 }
 
 

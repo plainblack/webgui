@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Grouping;
 use WebGUI::Session;
 use WebGUI::Operation::Shared;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -51,9 +52,13 @@ The following methods are available via this package.
 
 #-------------------------------------------------------------------
 
-=head2 definition ( [ additionalTerms ] )
+=head2 definition ( $session, [ additionalTerms ] )
 
 Defines the schema or parameters for a form field.
+
+=head3 session
+
+The session object, usually for internationalization.
 
 =head3 additionalTerms
 
@@ -94,7 +99,7 @@ Add extra attributes to the form tag like
 
 =head4 formName
 
-The internationalized form name.
+The key to look up for the form name.
 
 =head4 label
 
@@ -146,6 +151,7 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
 		formName=>{
@@ -300,7 +306,8 @@ Returns a human readable name for this form control type. You MUST override this
 
 sub getName {
 	my $self = shift;
-	my $definition = $self->definition;
+	my $session = shift;
+	my $definition = $self->definition($session);
 	return $definition->[0]->{formName}->{defaultValue};
 }
 

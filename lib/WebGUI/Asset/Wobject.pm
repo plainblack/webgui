@@ -66,6 +66,7 @@ An array of hashes to prepend to the list
 sub definition {
 	my $class = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,'Wobject');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -73,47 +74,47 @@ sub definition {
 		fieldType=>'HTMLArea',
 		defaultValue=>undef,
 		tab=>"properties",
-		label=>WebGUI::International::get(85,'Wobject'),
-		hoverHelp=>WebGUI::International::get('85 description','Wobject')
+		label=>$i18n->get(85),
+		hoverHelp=>$i18n->get('85 description')
 	},
 	displayTitle=>{
 		fieldType=>'yesNo',
 		defaultValue=>1,
 		tab=>"display",
-		label=>WebGUI::International::get(174,'Wobject'),
-		hoverHelp=>WebGUI::International::get('174 description','Wobject'),
+		label=>$i18n->get(174),
+		hoverHelp=>$i18n->get('174 description'),
 		uiLevel=>5
 	},
 	cacheTimeout=>{
 		fieldType=>'interval',
 		defaultValue=>60,
 		tab=>"display",
-		label=>WebGUI::International::get(895,'Wobject'),
-		hoverHelp=>WebGUI::International::get('895 description','Wobject'),
+		label=>$i18n->get(895),
+		hoverHelp=>$i18n->get('895 description'),
 		uiLevel=>8
 	},
 	cacheTimeoutVisitor=>{
 		fieldType=>'interval',
 		defaultValue=>600,
 		tab=>"display",
-		label=>WebGUI::International::get(896,'Wobject'),
-		hoverHelp=>WebGUI::International::get('896 description','Wobject'),
+		label=>$i18n->get(896),
+		hoverHelp=>$i18n->get('896 description'),
 		uiLevel=>8
 	},
 	styleTemplateId=>{
 		fieldType=>'template',
 		defaultValue=>undef,
 		tab=>"display",
-		label=>WebGUI::International::get(1073,'Wobject'),
-		hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
+		label=>$i18n->get(1073),
+		hoverHelp=>$i18n->get('1073 description'),
 		namespace=>'style'
 	},
 	printableStyleTemplateId=>{
 		fieldType=>'template',
 		defaultValue=>undef,
 		tab=>"display",
-		label=>WebGUI::International::get(1079,'Wobject'),
-		hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
+		label=>$i18n->get(1079),
+		hoverHelp=>$i18n->get('1079 description'),
 		namespace=>'style'
 	}
 	);
@@ -197,10 +198,11 @@ A comparison expression to be used when checking whether the action should be al
 sub confirm {
         return $self->session->privilege->vitalComponent() if ($_[4]);
 	my $noURL = $_[3] || $_[0]->getUrl;
-        my $output = '<h1>'.WebGUI::International::get(42,'Wobject').'</h1>';
+	my $i18n = WebGUI::International->new($self->session,'Wobject');
+        my $output = '<h1>'.$i18n->get(42).'</h1>';
         $output .= $_[1].'<p>';
-        $output .= '<div align="center"><a href="'.$_[2].'">'.WebGUI::International::get(44,'Wobject').'</a>';
-        $output .= ' &nbsp; <a href="'.$noURL.'">'.WebGUI::International::get(45,'Wobject').'</a></div>';
+        $output .= '<div align="center"><a href="'.$_[2].'">'.$i18n->get(44).'</a>';
+        $output .= ' &nbsp; <a href="'.$noURL.'">'.$i18n->get(45).'</a></div>';
         return $output;
 }
 
@@ -559,7 +561,8 @@ sub www_edit {
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
 	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
-	my $addEdit = ($self->session->form->process("func") eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
+	my $i18n = WebGUI::International->new($self->session,'Wobject');
+	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
 	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
 }
 

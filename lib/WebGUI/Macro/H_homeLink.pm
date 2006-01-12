@@ -51,7 +51,8 @@ sub process {
        		if ($label ne "") {
                		$var{'homeLink.text'} = $label;
        		} else {
-               		$var{'homeLink.text'} = WebGUI::International::get(47,'Macro_H_homeLink');
+			my $i18n = WebGUI::International->new($session,'Macro_H_homeLink');
+               		$var{'homeLink.text'} = $i18n->get(47);
        		}
 		if ($templateUrl) {
          		return WebGUI::Asset::Template->newByUrl($session,$templateUrl)->process(\%var);

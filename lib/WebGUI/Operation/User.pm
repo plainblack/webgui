@@ -67,26 +67,27 @@ sub _submenu {
 	my $session = shift;
         my $workarea = shift;
         my $title = shift;
-        $title = WebGUI::International::get($title) if ($title);
+	my $i18n = WebGUI::International->new($session);
+        $title = $i18n->get($title) if ($title);
         my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"users");
         if ($help) {
                 $ac->setHelp($help);
         }
 	if ($session->user->isInGroup(11)) {
-		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), WebGUI::International::get(169));
+		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), $i18n->get(169));
 	}
 	if ($session->user->isInGroup(3)) {
 		unless ($session->form->process("op") eq "listUsers" 
 			|| $session->form->process("op") eq "deleteUserConfirm") {
-			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->form->process("uid")), WebGUI::International::get(457));
-			$ac->addSubmenuItem($session->url->page('op=becomeUser;uid='.$session->form->process("uid")), WebGUI::International::get(751));
-			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$session->form->process("uid")), WebGUI::International::get(750));
+			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->form->process("uid")), $i18n->get(457));
+			$ac->addSubmenuItem($session->url->page('op=becomeUser;uid='.$session->form->process("uid")), $i18n->get(751));
+			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$session->form->process("uid")), $i18n->get(750));
 			if ($session->setting->get("useKarma")) {
-				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=".$session->form->process("uid")), WebGUI::International::get(555));
+				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=".$session->form->process("uid")), $i18n->get(555));
 			}
 		}
-		$ac->addSubmenuItem($session->url->page("op=listUsers"), WebGUI::International::get(456));
+		$ac->addSubmenuItem($session->url->page("op=listUsers"), $i18n->get(456));
 	}
         return $ac->render($workarea, $title);
 }
@@ -170,6 +171,7 @@ sub getUserSearchForm {
 	$session->scratch->set("userSearchKeyword",$session->form->process("keyword"));
 	$session->scratch->set("userSearchStatus",$session->form->process("status"));
 	$session->scratch->set("userSearchModifier",$session->form->process("modifier"));
+	my $i18n = WebGUI::International->new($session);
 	my $output = '<div align="center">'
 		.WebGUI::Form::formHeader($session,)
 		.WebGUI::Form::hidden($session,
@@ -190,9 +192,9 @@ sub getUserSearchForm {
 		-name=>"modifier",
 		-value=>($session->scratch->get("userSearchModifier") || "contains"),
 		-options=>{
-			startsWith=>WebGUI::International::get("starts with"),
-			contains=>WebGUI::International::get("contains"),
-			endsWith=>WebGUI::International::get("ends with")
+			startsWith=>$i18n->get("starts with"),
+			contains=>$i18n->get("contains"),
+			endsWith=>$i18n->get("ends with")
 			}
 		)
 	.WebGUI::Form::text($session,
@@ -204,13 +206,13 @@ sub getUserSearchForm {
 		-name	=> "status",
 		-value	=> ($session->scratch->get("userSearchStatus") || "users.status like '%'"),
 		-options=> { 
-			""		=> WebGUI::International::get(821),
-			Active		=> WebGUI::International::get(817),
-			Deactivated	=> WebGUI::International::get(818),
-			Selfdestructed	=> WebGUI::International::get(819)
+			""		=> $i18n->get(821),
+			Active		=> $i18n->get(817),
+			Deactivated	=> $i18n->get(818),
+			Selfdestructed	=> $i18n->get(819)
 			}
 	)
-	.WebGUI::Form::submit($session,value=>WebGUI::International::get(170))
+	.WebGUI::Form::submit($session,value=>$i18n->get(170))
 	.WebGUI::Form::formFooter($session,);
 	$output .= '</div>';
 	return $output;
@@ -247,14 +249,15 @@ sub www_deleteUser {
 	my $session = shift;
         my ($output);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	my $i18n = WebGUI::International->new($session);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 		return _submenu($session->privilege->vitalComponent());
         } else {
-                $output .= WebGUI::International::get(167).'<p>';
+                $output .= $i18n->get(167).'<p>';
                 $output .= '<div align="center"><a href="'.$session->url->page('op=deleteUserConfirm;uid='.$session->form->process("uid")).
-			'">'.WebGUI::International::get(44).'</a>';
+			'">'.$i18n->get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listUsers').'">'.
-			WebGUI::International::get(45).'</a></div>'; 
+			$i18n->get(45).'</a></div>'; 
 		return _submenu($output,'42',"user delete");
         }
 }
@@ -287,7 +290,7 @@ sub www_editUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(11));
 	my $error = shift;
-	my $i18n = WebGUI::International->new("WebGUI");
+	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	%tabs = (
@@ -399,6 +402,7 @@ sub www_editUserSave {
 		$isSecondary = ($session->user->isInGroup(11) && $session->form->process("uid") eq "new");
 	}
 	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
+	my $i18n = WebGUI::International->new($session);
 	my ($uid) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
 	my $error;
 	if (($uid eq $session->form->process("uid") || $uid eq "") && $session->form->process("username") ne '') {
@@ -420,10 +424,10 @@ sub www_editUserSave {
 		@groups = $session->form->group("groupsToDelete");
 		$u->deleteFromGroups(\@groups);
 	} else {
-       		$error = '<ul><li>'.WebGUI::International::get(77).' '.$session->form->process("username").'Too or '.$session->form->process("username").'02</li></ul>';
+       		$error = '<ul><li>'.$i18n->get(77).' '.$session->form->process("username").'Too or '.$session->form->process("username").'02</li></ul>';
 	}
 	if ($isSecondary) {
-		return _submenu(WebGUI::International::get(978));
+		return _submenu($i18n->get(978));
 	} else {
 		return www_editUser($error);
 	}
@@ -434,6 +438,7 @@ sub www_editUserKarma {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
+	my $i18n = WebGUI::International->new($session);
         $f = WebGUI::HTMLForm->new($session);
         $f->hidden(
 		-name => "op",
@@ -445,13 +450,13 @@ sub www_editUserKarma {
         );
 	$f->integer(
 		-name => "amount",
-		-label => WebGUI::International::get(556),
-		-hoverHelp => WebGUI::International::get('556 description'),
+		-label => $i18n->get(556),
+		-hoverHelp => $i18n->get('556 description'),
 	);
 	$f->text(
 		-name => "description",
-		-label => WebGUI::International::get(557),
-		-hoverHelp => WebGUI::International::get('557 description'),
+		-label => $i18n->get(557),
+		-hoverHelp => $i18n->get('557 description'),
 	);
         $f->submit;
         $output .= $f->print;
@@ -479,24 +484,25 @@ sub www_listUsers {
 		return $session->privilege->adminOnly();
 	}
 	my %status;
+	my $i18n = WebGUI::International->new($session);
 	my $output = getUserSearchForm("listUsers");
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
 	return _submenu($output) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
 	tie %status, 'Tie::IxHash';
 	%status = (
-		Active		=> WebGUI::International::get(817),
-		Deactivated	=> WebGUI::International::get(818),
-		Selfdestructed	=> WebGUI::International::get(819)
+		Active		=> $i18n->get(817),
+		Deactivated	=> $i18n->get(818),
+		Selfdestructed	=> $i18n->get(819)
 	);
         $output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
         $output .= '<tr>
-                <td class="tableHeader">'.WebGUI::International::get(816).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(50).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(56).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(453).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(454).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(429).'</td>
-                <td class="tableHeader">'.WebGUI::International::get(434).'</td>
+                <td class="tableHeader">'.$i18n->get(816).'</td>
+                <td class="tableHeader">'.$i18n->get(50).'</td>
+                <td class="tableHeader">'.$i18n->get(56).'</td>
+                <td class="tableHeader">'.$i18n->get(453).'</td>
+                <td class="tableHeader">'.$i18n->get(454).'</td>
+                <td class="tableHeader">'.$i18n->get(429).'</td>
+                <td class="tableHeader">'.$i18n->get(434).'</td>
 		</tr>';
 	my $p = doUserSearch("listUsers",1);
 	foreach my $data (@{$p->getPageData}) {

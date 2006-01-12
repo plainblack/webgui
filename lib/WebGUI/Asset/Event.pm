@@ -33,8 +33,9 @@ our @ISA = qw(WebGUI::Asset);
 sub definition {
 	my $class = shift;
   my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
   push(@{$definition}, {
-	assetName=>WebGUI::International::get('assetName',"Asset_Event"),
+	assetName=>$i18n->get('assetName'),
 	icon=>'calendar.gif',
     tableName=>'EventsCalendar_event',
     className=>'WebGUI::Asset::Event',
@@ -72,45 +73,46 @@ sub definition {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
 	$tabform->getTab("properties")->HTMLArea(
 		-name=>"description",
-                -label=>WebGUI::International::get(512,"Asset_Event"),
-                -hoverHelp=>WebGUI::International::get('Description description',"Asset_Event"),
+                -label=>$i18n->get(512),
+                -hoverHelp=>$i18n->get('Description description'),
 		-value=>$self->getValue("description")
 		);
 	$tabform->getTab("properties")->dateTime(
 		-name=>"eventStartDate",
-                -label=>WebGUI::International::get(513,"Asset_Event"),
-                -hoverHelp=>WebGUI::International::get('Start Date description',"Asset_Event"),
+                -label=>$i18n->get(513),
+                -hoverHelp=>$i18n->get('Start Date description'),
 		-extras=>'onBlur="this.form.eventEndDate.value=this.form.eventStartDate.value;this.form.until.value=this.form.eventStartDate.value;"',
 		-value=>$self->getValue("eventStartDate")
 		);
 	$tabform->getTab("properties")->dateTime(
 		-name=>"eventEndDate",
-                -label=>WebGUI::International::get(514,"Asset_Event"),
-                -hoverHelp=>WebGUI::International::get('End Date description',"Asset_Event"),
+                -label=>$i18n->get(514),
+                -hoverHelp=>$i18n->get('End Date description'),
 		-extras=>'onBlur="this.form.until.value=this.form.eventEndDate.value;"',
 		-value=>$self->getValue("eventEndDate")
 		);
 	$tabform->getTab("properties")->text(
 		-name=>"eventLocation",
-                -label=>WebGUI::International::get(515,"Asset_Event"),
-                -hoverHelp=>WebGUI::International::get('515 description',"Asset_Event"),
+                -label=>$i18n->get(515),
+                -hoverHelp=>$i18n->get('515 description'),
 		-value=>$self->getValue("eventLocation")
 		);
 	if ($self->session->form->process("func") eq "add") {
 		my %recursEvery;
 		tie %recursEvery, 'Tie::IxHash';
 		%recursEvery = (
-			'never'=>WebGUI::International::get(4,"Asset_Event"),
-			'day'=>WebGUI::International::get(700,"Asset_Event"),
-			'week'=>WebGUI::International::get(701,"Asset_Event"),
-			'month'=>WebGUI::International::get(702,"Asset_Event"),
-			'year'=>WebGUI::International::get(703,"Asset_Event"),
+			'never'=>$i18n->get(4),
+			'day'=>$i18n->get(700),
+			'week'=>$i18n->get(701),
+			'month'=>$i18n->get(702),
+			'year'=>$i18n->get(703),
 		);
 		$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get(8,"Asset_Event"),
-			-hoverHelp=>WebGUI::International::get('Recurs every description',"Asset_Event"),
+			-label=>$i18n->get(8),
+			-hoverHelp=>$i18n->get('Recurs every description'),
 			-value=>WebGUI::Form::integer({
 				name=>"interval",
 				defaultValue=>1
@@ -119,7 +121,7 @@ sub getEditForm {
 					name=>"recursEvery",
 					options=>\%recursEvery
 					})
-				.' '.WebGUI::International::get(9,"Asset_Event").' '
+				.' '.$i18n->get(9).' '
 				.WebGUI::Form::date({
 					name=>"until"
 					})
@@ -129,8 +131,8 @@ sub getEditForm {
     -name=>"templateId",
     -value=>$self->getValue("templateId"),
     -namespace=>"EventsCalendar/Event",
-    -label=>WebGUI::International::get(530,"Asset_Event"),
-    -hoverHelp=>WebGUI::International::get('530 description',"Asset_Event"),
+    -label=>$i18n->get(530),
+    -hoverHelp=>$i18n->get('530 description'),
     );
 	return $tabform;
 }
@@ -203,19 +205,20 @@ sub view {
 	my $self = shift;
 	my ($output, $event, $id);
 	my %var = $self->get;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
 	$event = $self;
 	$var{title} = $event->getValue("title");
-	$var{"start.label"} =  WebGUI::International::get(14,"Asset_Event");
+	$var{"start.label"} =  $i18n->get(14);
 	$var{"start.date"} =$self->session->datetime->epochToHuman($self->getValue("eventStartDate"),"%z");
 	$var{"start.time"} =$self->session->datetime->epochToHuman($self->getValue("eventStartDate"),"%Z");
-	$var{"end.label"} = WebGUI::International::get(15,"Asset_Event");
+	$var{"end.label"} = $i18n->get(15);
 	$var{"end.date"} =$self->session->datetime->epochToHuman($self->getValue("eventEndDate"),"%z");
 	$var{"end.time"} =$self->session->datetime->epochToHuman($self->getValue("eventEndDate"),"%Z");
 	$var{canEdit} = $self->canEdit;
 	$var{"edit.url"} = $self->session->url->page('func=edit');
-	$var{"edit.label"} = WebGUI::International::get(575,"Asset_Event");
+	$var{"edit.label"} = $i18n->get(575);
 	$var{"delete.url"} = $self->session->url->page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
-	$var{"delete.label"} = WebGUI::International::get(576,"Asset_Event");
+	$var{"delete.label"} = $i18n->get(576);
 	my @others;
 	my ($start, $garbage) = $self->session->datetime->dayStartEnd($self->get("eventStartDate"));
 	my ($garbage, $end) = $self->session->datetime->dayStartEnd($self->get("eventEndDate"));
@@ -238,13 +241,14 @@ sub view {
 sub www_deleteEvent {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
+	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
 	my ($output);
-	$output = '<h1>'.WebGUI::International::get(42,"Asset_Event").'</h1>';
-	$output .= WebGUI::International::get(75,"Asset_Event").'<p><blockquote>';
-	$output .= '<a href="'.$self->session->url->page('func=deleteEventConfirm').'">'.WebGUI::International::get(76,"Asset_Event").'</a><p>';
+	$output = '<h1>'.$i18n->get(42).'</h1>';
+	$output .= $i18n->get(75).'<p><blockquote>';
+	$output .= '<a href="'.$self->session->url->page('func=deleteEventConfirm').'">'.$i18n->get(76).'</a><p>';
 	$output .= '<a href="'.$self->session->url->page('func=deleteEventConfirm;rid='.$self->session->form->process("rid")).'">'
-		.WebGUI::International::get(77,"Asset_Event").'</a><p>' if (($self->session->form->process("rid") ne "") and ($self->session->form->process("rid") ne "0"));
-	$output .= '<a href="'.$self->getUrl.'">'.WebGUI::International::get(78,"Asset_Event").'</a>';
+		.$i18n->get(77).'</a><p>' if (($self->session->form->process("rid") ne "") and ($self->session->form->process("rid") ne "0"));
+	$output .= '<a href="'.$self->getUrl.'">'.$i18n->get(78).'</a>';
 	$output .= '</blockquote>';
 	return $self->session->style->process($output,$self->getParent->getValue("styleTemplateId"));
 }
@@ -271,7 +275,8 @@ sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("event add/edit","Asset_Event");
-	return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('13', 'Asset_Event'));
+	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
+	return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('13'));
 }
 
 #-------------------------------------------------------------------

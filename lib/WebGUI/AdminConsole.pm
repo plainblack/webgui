@@ -67,8 +67,9 @@ sub _formatFunction {
 	} else {
 		$url = $self->session->url->page("op=".$function->{op});
 	}
+	my $i18n = WebGUI::International->new($self->session);
 	return {
-		title=>WebGUI::International::get($function->{title}{id}, $function->{title}{namespace}),
+		title=>$i18n->($function->{title}{id}, $function->{title}{namespace}),
 		icon=>$self->session->config->get("extrasURL")."/adminConsole/".$function->{icon},
 		'icon.small'=>$self->session->config->get("extrasURL")."/adminConsole/small/".$function->{icon},
 		url=>$url,
@@ -119,7 +120,8 @@ Returns a Hash of title, url, canUse, and icon. title is the Internationalizatio
 
 sub getAdminConsoleParams {
 	my $self = shift;
-	return { 'title' => WebGUI::International::get("admin console","AdminConsole"),
+	my $i18n = WebGUI::International->new($self->session);
+	return { 'title' => $i18n->get("admin console","AdminConsole"),
 		url => $self->session->url->page("op=adminConsole"),
 		canUse => $self->session->user->isInGroup("12"),
 		icon => $self->session->config->get("extrasURL")."/adminConsole/adminConsole.gif"
@@ -394,9 +396,10 @@ sub render {
 	my %var;
 	$var{"application.workarea"} = shift;
 	$var{"application.title"} = shift || $self->{_function}{title};
-	$var{"backtosite.label"} = WebGUI::International::get("493");
-	$var{"toggle.on.label"} = WebGUI::International::get("toggle on", "AdminConsole");
-	$var{"toggle.off.label"} = WebGUI::International::get("toggle off","AdminConsole");
+	my $i18n = WebGUI::International->new($self->session, "AdminConsole");
+	$var{"backtosite.label"} = $i18n->get("493", "WebGUI");
+	$var{"toggle.on.label"} = $i18n->get("toggle on");
+	$var{"toggle.off.label"} = $i18n->get("toggle off");
 	$var{"application.icon"} = $self->{_function}{icon};
 	$var{"application.canUse"} = $self->{_function}{canUse};
 	$var{"application.url"} = $self->{_function}{url};

@@ -59,7 +59,8 @@ sub _isDuplicateUsername {
 	return 0 if($self->userId ne "1" && $self->session->user->username eq $username);
 	my ($otherUser) = $self->session->db->quickArray("select count(*) from users where username=".$self->session->db->quote($username));
 	return 0 if !$otherUser;
-	$self->error('<li>'.WebGUI::International::get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.$self->session->datetime->epochToHuman$self->session->datetime->time(),"%y").'"'.'</li>');
+	my $i18n = $i18n->get($self->session);
+	$self->error('<li>'.$i18n->get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.$self->session->datetime->epochToHuman$self->session->datetime->time(),"%y").'"'.'</li>');
 	return 1;
 }
 
@@ -77,15 +78,17 @@ sub _isValidUsername {
    my $error = "";
    
    return 1 if($self->userId ne "1" && $self->session->user->username eq $username);
+
+   my $i18n = WebGUI::International->new($self->session);
    
    if ($username =~ /^\s/ || $username =~ /\s$/) {
-      $error .= '<li>'.WebGUI::International::get(724).'</li>';
+      $error .= '<li>'.$i18n->get(724).'</li>';
    }
    if ($username eq "") {
-      $error .= '<li>'.WebGUI::International::get(725).'</li>';
+      $error .= '<li>'.$i18n->get(725).'</li>';
    }
    unless ($username =~ /^[A-Za-z0-9\-\_\.\,\@]+$/) {
-   	  $error .= '<li>'.WebGUI::International::get(747).'</li>';
+   	  $error .= '<li>'.$i18n->get(747).'</li>';
    }
    $self->error($error);
    return $error eq "";
@@ -134,14 +137,15 @@ Superclass method that performs standard login routines.  This method should ret
 sub authenticate {
    my $self = shift;
    my $username = shift;
+   my $i18n = WebGUI::International->new($self->session);
    my $user = $self->session->db->quickHashRef("select userId,authMethod,status from users where username=".$self->session->db->$self->session->db->quote($username));
    my $uid = $user->{userId};
    #If userId does not exist or is not active, fail login
    if(!$uid){
-      $self->error(WebGUI::International::get(68));
+      $self->error($i18n->get(68));
 	  return 0;
    } elsif($user->{status} ne 'Active'){
-      $self->error(WebGUI::International::get(820));
+      $self->error($i18n->get(820));
 	  $self->_logLogin($uid, "failure");
 	  return 0;
    }
@@ -186,23 +190,27 @@ Array ref of template vars from subclass
 =cut
 
 sub createAccount {
-    my $self = shift;
+	my $self = shift;
 	my $method = $_[0];
 	my $vars = $_[1];
-	$vars->{title} = WebGUI::International::get(54);
+	my $i18n = WebGUI::International->new($self->session);
+	$vars->{title} = $i18n->get(54);
    	
 	$vars->{'create.form.header'} = WebGUI::Form::formHeader($self->session,{});
 	$vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
     $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
 	
 	#User Defined Options
-    $vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields();
+	$vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields();
 	
 	$vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
     $vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
 	
     $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
-    $vars->{'login.label'} = WebGUI::International::get(58);
+    $vars->{'login.label'} = $i18n->get(58);
+
+	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
+	$vars->{'login.label'} = $i18n->get(58);
 
 	return WebGUI::Asset::Template->new($self->session,$self->getCreateAccountTemplateId)->process($vars);
 }
@@ -238,6 +246,8 @@ sub createAccountSave {
    my $password = $_[2];
    my $profile = $_[3];
    
+	my $i18n = WebGUI::International->new($self->session);
+	
       
    my $u = WebGUI::User->new($self->session,"new");
    $self->user($u);
@@ -249,10 +259,10 @@ sub createAccountSave {
    $self->saveParams($userId,$self->authMethod,$properties);
    
    if ($self->getSetting("sendWelcomeMessage")){
-      my $authInfo = "\n\n".WebGUI::International::get(50).": ".$username;
-      $authInfo .= "\n".WebGUI::International::get(51).": ".$password if($password);
+      my $authInfo = "\n\n".$i18n->get(50).": ".$username;
+      $authInfo .= "\n".$i18n->get(51).": ".$password if($password);
       $authInfo .= "\n\n";
-      WebGUI::MessageLog::addEntry($self->userId,"",WebGUI::International::get(870),$self->getSetting("welcomeMessage").$authInfo);
+      WebGUI::MessageLog::addEntry($self->userId,"",$i18n->get(870),$self->getSetting("welcomeMessage").$authInfo);
    }
   $session->user({user=>$u});  
    $self->_logLogin($userId,"success");
@@ -276,17 +286,18 @@ Auth method that the form for creating users should call
 =cut
 
 sub deactivateAccount {
-   my $self = shift;
-   my $method = $_[0];
-   return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
-   return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
-   my %var; 
-  	$var{title} = WebGUI::International::get(42);
-   	$var{question} =  WebGUI::International::get(60);
+	my $self = shift;
+	my $method = $_[0];
+	return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
+	return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
+	my $i18n = WebGUI::International->new($self->session);
+	my %var; 
+  	$var{title} = $i18n->get(42);
+   	$var{question} =  $i18n->get(60);
    	$var{'yes.url'} = $self->session->url->page('op=auth;method='.$method);
-	$var{'yes.label'} = WebGUI::International::get(44);
+	$var{'yes.label'} = $i18n->get(44);
    	$var{'no.url'} = $self->session->url->page();
-	$var{'no.label'} = WebGUI::International::get(45);
+	$var{'no.label'} = $i18n->get(45);
 	return WebGUI::Asset::Template->new($self->session,"PBtmpl0000000000000057")->process(\%var);
 }
 
@@ -341,14 +352,15 @@ sub displayAccount {
    my $method = $_[0];
    my $vars = $_[1];
    
-   $vars->{title} = WebGUI::International::get(61);
+	my $i18n = WebGUI::International->new($self->session);
+   $vars->{title} = $i18n->get(61);
    
    $vars->{'account.form.header'} = WebGUI::Form::formHeader($self->session,{});
    $vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
    $vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
    if($self->session->setting->get("useKarma")){
-      $vars->{'account.form.karma'} = $self->session->user->karma;
-	  $vars->{'account.form.karma.label'} = WebGUI::International::get(537);
+	$vars->{'account.form.karma'} = $self->session->user->karma;
+	$vars->{'account.form.karma.label'} = $i18n->get(537);
    }
    $vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
    $vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
@@ -380,7 +392,8 @@ sub displayLogin {
 	unless ($self->session->form->get("op") eq "auth") {
 	   	$self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
 	}
-	$vars->{title} = WebGUI::International::get(66);
+	my $i18n = WebGUI::International->new($self->session);
+	$vars->{title} = $i18n->get(66);
 	my $action;
         if ($self->session->setting->get("encryptLogin")) {
                 $action = $self->session->url->page(undef,1);
@@ -390,14 +403,14 @@ sub displayLogin {
     	$vars->{'login.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
 	$vars->{'login.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
 	$vars->{'login.form.username'} = WebGUI::Form::text($self->session,{"name"=>"username"});
-    	$vars->{'login.form.username.label'} = WebGUI::International::get(50);
+    	$vars->{'login.form.username.label'} = $i18n->get(50);
     	$vars->{'login.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
-    	$vars->{'login.form.password.label'} = WebGUI::International::get(51);
-	$vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>WebGUI::International::get(52)});
+    	$vars->{'login.form.password.label'} = $i18n->get(51);
+	$vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>$i18n->get(52)});
 	$vars->{'login.form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
 	$vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
-	$vars->{'createAccount.label'} = WebGUI::International::get(67);
+	$vars->{'createAccount.label'} = $i18n->get(67);
 	return WebGUI::Asset::Template->new($self->session,$self->getLoginTemplateId)->process($vars);
 }
 

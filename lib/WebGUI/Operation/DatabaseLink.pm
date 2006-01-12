@@ -24,18 +24,19 @@ sub _submenu {
 	my $session = shift;
         my $workarea = shift;
         my $title = shift;
-        $title = WebGUI::International::get($title) if ($title);
+	my $i18n = WebGUI::International->new($session);
+        $title = $i18n->get($title) if ($title);
         my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"databases");
         if ($help) {
                 $ac->setHelp($help);
         }
-	$ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid=new'), WebGUI::International::get(982));
+	$ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid=new'), $i18n->get(982));
 	if (($session->form->process("op") eq "editDatabaseLink" && $session->form->process("dlid") ne "new") || $session->form->process("op") eq "deleteDatabaseLink") {
-                $ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid='.$session->form->process("dlid")), WebGUI::International::get(983));
-                $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$session->form->process("dlid")), WebGUI::International::get(984));
-		$ac->addSubmenuItem($session->url->page('op=deleteDatabaseLink;dlid='.$session->form->process("dlid")), WebGUI::International::get(985));
-		$ac->addSubmenuItem($session->url->page('op=listDatabaseLinks'), WebGUI::International::get(986));
+                $ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid='.$session->form->process("dlid")), $i18n->get(983));
+                $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$session->form->process("dlid")), $i18n->get(984));
+		$ac->addSubmenuItem($session->url->page('op=deleteDatabaseLink;dlid='.$session->form->process("dlid")), $i18n->get(985));
+		$ac->addSubmenuItem($session->url->page('op=listDatabaseLinks'), $i18n->get(986));
 	}
         return $ac->render($workarea, $title);
 }
@@ -52,13 +53,14 @@ sub www_copyDatabaseLink {
 sub www_deleteDatabaseLink {
 	my $session = shift;
         return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	my $i18n = WebGUI::International->new($session);
         my ($output);
-        $output .= WebGUI::International::get(988).'<p>';
+        $output .= $i18n->get(988).'<p>';
         $output .= '<p><div align="center"><a href="'.
 		$session->url->page('op=deleteDatabaseLinkConfirm;dlid='.$session->form->process("dlid"))
-		.'">'.WebGUI::International::get(44).'</a>';
+		.'">'.$i18n->get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listDatabaseLinks').
-		'">'.WebGUI::International::get(45).'</a></div>';
+		'">'.$i18n->get(45).'</a></div>';
         return _submenu($output,"987","database link delete");
 }
 
@@ -81,6 +83,7 @@ sub www_editDatabaseLink {
 	} else {
                	%db = %{WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->get}; 
 	}
+	my $i18n = WebGUI::International->new($session);
 	$f = WebGUI::HTMLForm->new($session,
 		-extras=>'autocomplete="off"'
 		);
@@ -94,31 +97,31 @@ sub www_editDatabaseLink {
         );
 	$f->readOnly(
 		-value => $session->form->process("dlid"),
-		-label => WebGUI::International::get(991),
-		-hoverHelp => WebGUI::International::get('991 description'),
+		-label => $i18n->get(991),
+		-hoverHelp => $i18n->get('991 description'),
 	);
         $f->text(
 		-name => "title",
-		-label => WebGUI::International::get(992),
-		-hoverHelp => WebGUI::International::get('992 description'),
+		-label => $i18n->get(992),
+		-hoverHelp => $i18n->get('992 description'),
 		-value => $db{title},
         );
         $f->text(
 		-name => "DSN",
-		-label => WebGUI::International::get(993),
-		-hoverHelp => WebGUI::International::get('993 description'),
+		-label => $i18n->get(993),
+		-hoverHelp => $i18n->get('993 description'),
 		-value => $db{DSN},
         );
         $f->text(
 		-name => "dbusername",
-		-label => WebGUI::International::get(994),
-		-hoverHelp => WebGUI::International::get('994 description'),
+		-label => $i18n->get(994),
+		-hoverHelp => $i18n->get('994 description'),
 		-value => $db{username},
         );
         $f->password(
 		-name => "dbidentifier",
-		-label => WebGUI::International::get(995),
-		-hoverHelp => WebGUI::International::get('995 description'),
+		-label => $i18n->get(995),
+		-hoverHelp => $i18n->get('995 description'),
 		-value => $db{identifier},
         );
         $f->submit;
@@ -150,8 +153,9 @@ sub www_listDatabaseLinks {
         return $session->privilege->adminOnly() unless($session->user->isInGroup(3));
 	my $links = WebGUI::DatabaseLinks->getList($session);
         my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
+	my $i18n = WebGUI::International->new($session);
 	foreach my $id (keys %{$links}) {
-		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.WebGUI::International::get(1076).'</td></tr>';
+		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.$i18n->get(1076).'</td></tr>';
                 $output = '<tr><td valign="top" class="tableData">'
 			.$session->icon->delete('op=deleteDatabaseLink;dlid='.$id)
 			.$session->icon->edit('op=editDatabaseLink;dlid='.$id)

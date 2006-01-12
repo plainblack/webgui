@@ -57,9 +57,11 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
+	my $session = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Folder");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get("assetName","Asset_Folder"),
+		assetName=>$i18n->get("assetName"),
 		uiLevel => 5,
 		icon=>'folder.gif',
                 tableName=>'Folder',
@@ -71,7 +73,7 @@ sub definition {
 				}
                         }
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -87,17 +89,18 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
-      		-label=>WebGUI::International::get('folder template title', "Asset_Folder"),
-      		-hoverHelp=>WebGUI::International::get('folder template description', "Asset_Folder"),
+      		-label=>$i18n->get('folder template title'),
+      		-hoverHelp=>$i18n->get('folder template description'),
       		-namespace=>"Folder"
    		);
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{
-                               	view=>WebGUI::International::get(823, "Asset_Folder"),
-                      	 	"viewParent"=>WebGUI::International::get(847, "Asset_Folder")
+                               	view=>$i18n->get(823),
+                      	 	"viewParent"=>$i18n->get(847)
                               	},
 			-value=>"view"
 			);

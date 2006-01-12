@@ -94,9 +94,14 @@ sub correctValues {
 	my ($self, $value) = @_;
 	return unless defined $value;
 	my @defaultValues;
-	foreach (split(/\n/, $value)) {
-			s/\s+$//; # remove trailing spaces
-			push(@defaultValues, $_);
+	if (ref $value eq "ARRAY") {
+		@defaultValues = @{ $value };
+	}
+	else {
+		foreach (split(/\n/, $value)) {
+				s/\s+$//; # remove trailing spaces
+				push(@defaultValues, $_);
+		}
 	}
 	$self->get("value") = \@defaultValues;
 }
@@ -140,10 +145,12 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("486","WebGUI"),
+			defaultValue=>$i18n->get("486"),
 			},
 		options=>{
 			defaultValue=>{}
@@ -164,7 +171,7 @@ sub definition {
 			defaultValue=>0
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 

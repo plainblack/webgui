@@ -39,8 +39,9 @@ sub process {
 	my $self = shift;
         my (@param, $temp, $file);
         @param = @_;
+	my $i18n = WebGUI::International->new($session,'Macro_Include');
         if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /WebGUI.conf/) {
-                $temp = WebGUI::International::get('security','Macro_Include');
+                $temp = $i18n->get('security');
         } else {
                 $file = FileHandle->new($param[0],"r");
                 if ($file) {
@@ -49,7 +50,7 @@ sub process {
                         }
                         $file->close;
                 } else {
-			$temp = WebGUI::International::get('not found','Macro_Include');
+			$temp = $i18n->get('not found');
                 }
         }
         return $temp;

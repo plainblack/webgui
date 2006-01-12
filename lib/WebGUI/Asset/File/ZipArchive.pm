@@ -57,10 +57,11 @@ sub unzip {
    my $filepath = $storage->getPath();
    chdir $filepath;
    
+	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
    if($filename =~ m/\.zip/i){
 	  my $zip = Archive::Zip->new();
 	  unless ($zip->read($filename) == $zip->AZ_OK){
-	     $self->session->errorHandler->warn(WebGUI::International::get("zip_error","Asset_ZipArchive"));
+	     $self->session->errorHandler->warn($i18n->get("zip_error"));
 		 return 0;
 	  }
 	  $zip->extractTree();  
@@ -71,7 +72,7 @@ sub unzip {
 	     return 0;
 	  }
    } else{
-      $self->session->errorHandler->warn(WebGUI::International::get("bad_archive","Asset_ZipArchive"));
+      $self->session->errorHandler->warn($i18n->get("bad_archive"));
    }
    
    return 1;
@@ -105,8 +106,9 @@ A hash reference passed in from a subclass definition.
 sub definition {
    my $class = shift;
    my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
    push(@{$definition}, {
-      assetName=>WebGUI::International::get('assetName',"Asset_ZipArchive"),
+      assetName=>$i18n->get('assetName'),
       tableName=>'ZipArchiveAsset',
       className=>'WebGUI::Asset::File',
       properties=>{
@@ -150,16 +152,17 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
    my $self = shift;
    my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
    $tabform->getTab("display")->template(
       -value=>$self->getValue("templateId"),
-	  -label=>WebGUI::International::get('template label', 'Asset_ZipArchive'),
+	  -label=>$i18n->get('template label'),
 	  -namespace=>"ZipArchiveAsset"
    );
    $tabform->getTab("properties")->text (
       -name=>"showPage",
-      -label=>WebGUI::International::get('show page', 'Asset_ZipArchive'),
+      -label=$i18n->get('show page'),
 	  -value=>$self->getValue("showPage"),
-	  -hoverHelp=>WebGUI::International::get('show page description', 'Asset_ZipArchive'),
+	  -hoverHelp=>$i18n->get('show page description'),
    );
    return $tabform;
 }
@@ -201,22 +204,23 @@ sub processPropertiesFromFormPost {
 	my $file = $self->get("filename");
 	
 	#return unless $file;
+	my $i18n = WebGUI::International->new($self->session, 'Asset_ZipArchive');
     unless($self->session->form->process("showPage")) {
 	   $storage->delete;
 	   $self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
-	   $self->session->scratch->set("za_error",WebGUI::International::get("za_show_error","Asset_ZipArchive"));
+	   $self->session->scratch->set("za_error",$i18n->get("za_show_error"));
 	   return;
 	}
 	
 	unless($file =~ m/\.tar/i || $file =~ m/\.zip/i) {
 	   $storage->delete;
 	   $self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
-	   $self->session->scratch->set("za_error",WebGUI::International::get("za_error","Asset_ZipArchive"));
+	   $self->session->scratch->set("za_error",$i18n->get("za_error"));
 	   return;
 	}
 	
 	unless ($self->unzip($storage,$self->get("filename"))) {
-	   $self->session->errorHandler->warn(WebGUI::International::get("unzip_error","Asset_ZipArchive"));
+	   $self->session->errorHandler->warn($i18n->get("unzip_error"));
 	}
 }
 
@@ -285,8 +289,9 @@ sub www_edit {
    my $self = shift;
    return $self->session->privilege->insufficient() unless $self->canEdit;
    $self->getAdminConsole->setHelp("zip archive add/edit", "Asset_ZipArchive");
+	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
    return $self->getAdminConsole->render($self->getEditForm->print,
-              WebGUI::International::get('zip archive add/edit title',"Asset_ZipArchive"));
+              $i18n->get('zip archive add/edit title'));
 }
 
 #-------------------------------------------------------------------

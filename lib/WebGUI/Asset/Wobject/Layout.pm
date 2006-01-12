@@ -58,9 +58,11 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
+	my $session = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Layout");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get("assetName","Asset_Layout"),
+		assetName=>$i18n->get("assetName"),
 		icon=>'layout.gif',
                 tableName=>'Layout',
                 className=>'WebGUI::Asset::Wobject::Layout',
@@ -80,7 +82,7 @@ sub definition {
 				}
                         }
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -95,17 +97,18 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,"Asset_Layout");
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
-      		-label=>WebGUI::International::get('layout template title', 'Asset_Layout'),
-      		-hoverHelp=>WebGUI::International::get('template description', 'Asset_Layout'),
+      		-label=>$i18n->get('layout template title'),
+      		-hoverHelp=>$i18n->get('template description'),
       		-namespace=>"Layout"
    		);
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{
-                               	view=>WebGUI::International::get(823, 'Asset_Layout'),
-                      	 	viewParent=>WebGUI::International::get(847, 'Asset_Layout')
+                               	view=>$i18n->get(823),
+                      	 	viewParent=>$i18n->get(847)
                               	},
 			-value=>"view"
 			);
@@ -120,8 +123,8 @@ sub getEditForm {
 			-name=>"assetsToHide",
 			-value=>\@assetsToHide,
 			-options=>\%childIds,
-			-label=>WebGUI::International::get('assets to hide', 'Asset_Layout'),
-			-hoverHelp=>WebGUI::International::get('assets to hide description', 'Asset_Layout'),
+			-label=>$i18n->get('assets to hide'),
+			-hoverHelp=>$i18n->get('assets to hide description'),
 			-vertical=>1,
 			-uiLevel=>9
 			);

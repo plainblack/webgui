@@ -66,13 +66,15 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("assetName","Asset_Template")
+			defaultValue=>$i18n->get("assetName")
 			},
 		label=>{
-			defaultValue=>WebGUI::International::get("assetName","Asset_Template")
+			defaultValue=>$i18n->get("assetName")
 			},
 		name=>{
 			defaultValue=>"templateId"
@@ -81,7 +83,7 @@ sub definition {
 			defaultValue=>undef
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

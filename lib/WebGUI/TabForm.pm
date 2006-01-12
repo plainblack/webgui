@@ -201,8 +201,9 @@ sub new {
 		$tabs{$key}{label} = $startingTabs->{$key}->{label};
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
+	my $i18n = WebGU::International::get($session);
 	my $cancel = WebGUI::Form::button({
-			value=>WebGUI::International::get('cancel'),
+			value=>$i18n->get('cancel'),
 			extras=>q|onclick="history.go(-1);"|
 			});
 	bless {	_uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit($self->session,), _form=>WebGUI::Form::formHeader(), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;

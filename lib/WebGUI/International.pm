@@ -51,7 +51,7 @@ These functions/methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 get ( internationalId [ , namespace, languageId ] )
+=head2 get ( internationalId [ , namespace, language ] )
 
 Returns the internationalized message string for the user's language.  If there is no internationalized message, this method will return the English string.
 
@@ -63,26 +63,21 @@ An integer that relates to a message in the international table in the WebGUI da
 
 A string that relates to the namespace field in the international table in the WebGUI database. Defaults to 'WebGUI'.
 
-=head3 languageId
+=head3 language
 
-An integer that specifies the language that the user should see.  Defaults to the user's defined language. If the user hasn't specified a default language it defaults to '1' (English).
+A string that specifies the language that the user should see.  Defaults to the user's defined language. If the user hasn't specified a default language it defaults to 'English'.
 
 =cut
 
+my $safeRe = qr/[^\w\d\s\/]/;
+
 sub get {
-        my ($id, $language, $namespace);
-	if (ref($_[0]) eq "WebGUI::International") {
-		$id = $_[1];
-		$namespace = $_[2] || $_[0]->{_namespace} || "WebGUI";
-		$language = $_[3] || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
-	} else {
-		$id = $_[0];
-		$namespace = $_[1] || "WebGUI";
-		$language = $_[2] || $self->session->user->profileField("language") || "English";
-	}
-	$id =~ s/[^\w\d\s\/]//g;
-	$language =~ s/[^\w\d\s\/]//g;
-	$namespace =~ s/[^\w\d\s\/]//g;
+	my ($self, $id, $namespace, $language) = @_;
+	$namespace = $namespace || $_[0]->{_namespace} || "WebGUI";
+	$language = $language || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
+	$id =~ s/$safeRe//g;
+	$language =~ s/$safeRe//g;
+	$namespace =~ s/$safeRe//g;
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
 	my $load = "use ".$cmd;
 	eval($load);
@@ -90,18 +85,18 @@ sub get {
 	$cmd = "\$".$cmd."::I18N->{'".$id."'}{message}";
 	my $output = eval($cmd);	
 	$self->session->errorHandler->warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
-	$output = get($id,$namespace,"English") if ($output eq "" && $language ne "English");
+	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
 	return $output;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getLanguage ( [ languageId , propertyName] )
+=head2 getLanguage ( [ language , propertyName] )
 
 Returns a hash reference to a particular language's properties.
 
-=head3 languageId
+=head3 language
 
 Defaults to "English". The language to retrieve the properties for.
 
@@ -112,8 +107,8 @@ If this is specified, only the value of the property will be returned, instead o
 =cut
 
 sub getLanguage {
-	my $language = shift || "English";
-	my $property = shift;
+	my ($self, $language, $property) = @_;
+	$language = $language || $self->{_language} || "English";
 	my $cmd = "WebGUI::i18n::".$language;
 	my $load = "use ".$cmd;
 	eval($load);
@@ -136,11 +131,12 @@ sub getLanguage {
 
 =head2 getLanguages ( )
 
-Returns a hash reference to the languages (languageId/lanugage) installed on this WebGUI system.  
+Returns a hash reference to the languages installed on this WebGUI system.  
 
 =cut
 
 sub getLanguages {
+	my ($self) = @_;
         my ($hashRef);
 	my $dir = $self->session->config->getWebguiRoot."/lib/WebGUI/i18n";
 	opendir (DIR,$dir) or $self->session->errorHandler->fatal("Can't open I18N directory! ".$dir);
@@ -166,21 +162,15 @@ Manipulates a URL to make sure it will work on the internet. It removes things l
 
 The URL to manipulate.
 
-=head3 languageId
+=head3 language
 
-Specify a default language. Defaults to user preference.
+Specify a default language. Defaults to user preference or "English".
 
 =cut
 
 sub makeUrlCompliant {
-        my ($language, $url);
-	if (ref($_[0]) eq "WebGUI::International") {
-		$url = $_[1];
-		$language = $_[2] || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
-	} else {
-		$url = $_[0];
-		$language = $_[1] || $self->session->user->profileField("language") || "English";
-	}
+	my ($self, $url, $language) = @_;
+	$language = $language || $_[0]->{_language} || $self->session->user->profileField("language") || "English";
 	my $cmd = "WebGUI::i18n::".$language;
 	my $load = "use ".$cmd;
 	eval($load);
@@ -194,27 +184,44 @@ sub makeUrlCompliant {
 
 #-------------------------------------------------------------------
 
-=head2 new ( [ namespace, languageId ] ) 
+=head2 new ( [ namespace, language ] ) 
 
 The constructor for the International function if using it in OO mode.
+
+=head3 session
+
+The current user's session variable
 
 =head3 namespace
 
 Specify a default namespace. Defaults to "WebGUI".
 
-=head3 languageId
+=head3 language
 
-Specify a default language. Defaults to user preference.
+Specify a default language. Defaults to user preference or "English".
 
 =cut
 
 sub new {
-	my $class = shift;
-	my $namespace = shift;
-	my $language = shift;
-	bless({_namespace=>$namespace,_language=>$language},$class);
+	my ($class, $session, $namespace, $language) = @_;
+	bless( {
+		_session   => $session,
+		_namespace => $namespace,
+		_language  => $language,
+	},$class);
 }
 
+#-------------------------------------------------------------------
+
+=head2 session ( ) 
+
+Returns the internally stored session variable
+
+=cut
+
+sub session {
+	return $_[0]->{_session};
+}
 
 1;
 

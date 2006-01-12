@@ -71,8 +71,9 @@ sub decrementReplies {
 sub definition {
 	my $class = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Thread");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Thread"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'thread.gif',
                 tableName=>'Thread',
                 className=>'WebGUI::Asset::Post::Thread',

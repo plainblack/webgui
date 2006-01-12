@@ -23,12 +23,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub definition {
         my $class = shift;
+	my $session = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Matrix");
         push(@{$definition}, {
 		icon=>'matrix.gif',
                 tableName=>'Matrix',
                 className=>'WebGUI::Asset::Wobject::Matrix',
-		assetName=>WebGUI::International::get('assetName',"Asset_Matrix"),
+		assetName=>$i18n->get('assetName'),
                 properties=>{
 			categories=>{
                                 defaultValue=>"Features\nBenefits",
@@ -84,7 +86,7 @@ sub definition {
 				}
                         }
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -309,13 +311,15 @@ sub www_compare {
 
 #-------------------------------------------------------------------
 sub www_copy {
-	return WebGUI::International::get('no copy','Asset_Matrix');
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+	return $i18n->get('no copy');
 }
 
 #-------------------------------------------------------------------
 sub www_deleteListing {
 	my $self = shift;
-	my $output = sprintf WebGUI::International::get('delete listing confirmation','Asset_Matrix'),
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+	my $output = sprintf $i18n->get('delete listing confirmation'),
 		$self->getUrl("func=deleteListingConfirm&listingId=".$self->session->form->process("listingId")),
 		$self->formatURL("viewDetail",$self->session->form->process("listingId"));
 	return $self->processStyle($output);
@@ -340,88 +344,89 @@ sub www_deleteListingConfirm {
 sub getEditForm {
         my $self = shift;
         my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	$tabform->getTab("properties")->textarea(
 			-name=>"categories",
-			-label=>WebGUI::International::get('categories', 'Asset_Matrix'),
-			-hoverHelp=>WebGUI::International::get('categories description', 'Asset_Matrix'),
+			-label=>$i18n->get('categories'),
+			-hoverHelp=>$i18n->get('categories description'),
 			-value=>$self->getValue("categories"),
-			-subtext=>WebGUI::International::get('categories subtext', 'Asset_Matrix'),
+			-subtext=>$i18n->get('categories subtext'),
 			);
 	$tabform->getTab("properties")->integer(
 			-name=>"maxComparisons",
-			-label=>WebGUI::International::get("max comparisons","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("max comparisons description","Asset_Matrix"),
+			-label=>$i18n->get("max comparisons"),
+			-hoverHelp=>$i18n->get("max comparisons description"),
 			-value=>$self->getValue("maxComparisons")
 			);
 	$tabform->getTab("properties")->integer(
 			-name=>"maxComparisonsPrivileged",
-			-label=>WebGUI::International::get("max comparisons privileged","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("max comparisons privileged description","Asset_Matrix"),
+			-label=>$i18n->get("max comparisons privileged"),
+			-hoverHelp=>$i18n->get("max comparisons privileged description"),
 			-value=>$self->getValue("maxComparisonsPrivileged")
 			);
 	$tabform->getTab("properties")->interval(
 			-name=>"ratingTimeout",
-			-label=>WebGUI::International::get("rating timeout","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("rating timeout description","Asset_Matrix"),
+			-label=>$i18n->get("rating timeout"),
+			-hoverHelp=>$i18n->get("rating timeout description"),
 			-value=>$self->getValue("ratingTimeout")
 			);
 	$tabform->getTab("properties")->interval(
 			-name=>"ratingTimeoutPrivileged",
-			-label=>WebGUI::International::get("rating timeout privileged","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("rating timeout privileged description","Asset_Matrix"),
+			-label=>$i18n->get("rating timeout privileged"),
+			-hoverHelp=>$i18n->get("rating timeout privileged description"),
 			-value=>$self->getValue("ratingTimeoutPrivileged")
 			);
 	$tabform->getTab("security")->group(
 			-name=>"groupToAdd",
-			-label=>WebGUI::International::get("group to add","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("group to add description","Asset_Matrix"),
+			-label=>$i18n->get("group to add"),
+			-hoverHelp=>$i18n->get("group to add description"),
 			-value=>[$self->getValue("groupToAdd")]
 			);
 	$tabform->getTab("security")->group(
 			-name=>"privilegedGroup",
-			-label=>WebGUI::International::get("privileged group","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("privileged group description","Asset_Matrix"),
+			-label=>$i18n->get("privileged group"),
+			-hoverHelp=>$i18n->get("privileged group description"),
 			-value=>[$self->getValue("privilegedGroup")]
 			);
 	$tabform->getTab("security")->group(
 			-name=>"groupToRate",
-			-label=>WebGUI::International::get("rating group","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("rating group description","Asset_Matrix"),
+			-label=>$i18n->get("rating group"),
+			-hoverHelp=>$i18n->get("rating group description"),
 			-value=>[$self->getValue("groupToRate")]
 			);
 	$tabform->getTab("display")->template(
 			-name=>"templateId",
 			-value=>$self->getValue("templateId"),
-			-label=>WebGUI::International::get("main template","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("main template description","Asset_Matrix"),
+			-label=>$i18n->get("main template"),
+			-hoverHelp=>$i18n->get("main template description"),
 			-namespace=>"Matrix"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"detailTemplateId",
 			-value=>$self->getValue("detailTemplateId"),
-			-label=>WebGUI::International::get("detail template","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("detail template description","Asset_Matrix"),
+			-label=>$i18n->get("detail template"),
+			-hoverHelp=>$i18n->get("detail template description"),
 			-namespace=>"Matrix/Detail"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"ratingDetailTemplateId",
 			-value=>$self->getValue("ratingDetailTemplateId"),
-			-label=>WebGUI::International::get("rating detail template","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("rating detail template description","Asset_Matrix"),
+			-label=>$i18n->get("rating detail template"),
+			-hoverHelp=>$i18n->get("rating detail template description"),
 			-namespace=>"Matrix/RatingDetail"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"searchTemplateId",
 			-value=>$self->getValue("searchTemplateId"),
-			-label=>WebGUI::International::get("search template","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("search template description","Asset_Matrix"),
+			-label=>$i18n->get("search template"),
+			-hoverHelp=>$i18n->get("search template description"),
 			-namespace=>"Matrix/Search"
 			);
 	$tabform->getTab("display")->template(
 			-name=>"compareTemplateId",
 			-value=>$self->getValue("compareTemplateId"),
-			-label=>WebGUI::International::get("compare template","Asset_Matrix"),
-			-hoverHelp=>WebGUI::International::get("compare template description","Asset_Matrix"),
+			-label=>$i18n->get("compare template"),
+			-hoverHelp=>$i18n->get("compare template description"),
 			-namespace=>"Matrix/Compare"
 			);
 	return $tabform;
@@ -431,8 +436,9 @@ sub getEditForm {
 sub www_edit {  
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
         return $self->getAdminConsole->render($self->getEditForm->print,
-					WebGUI::International::get("edit matrix",'Asset_Matrix'));
+					$i18n->get("edit matrix"));
 }
 
 
@@ -441,7 +447,8 @@ sub www_edit {
 sub www_editListing {
         my $self = shift;
         my $listing= $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
@@ -454,53 +461,53 @@ sub www_editListing {
 	$f->text(
 		-name=>"productName",
 		-value=>$listing->{productName},
-		-label=>WebGUI::International::get('product name','Asset_Matrix'),
-		-hoverHelp=>WebGUI::International::get('product name description','Asset_Matrix'),
+		-label=>$i18n->get('product name'),
+		-hoverHelp=>$i18n->get('product name description'),
 		-maxLength=>25
 		);
 	$f->text(
 		-name=>"versionNumber",
 		-value=>$listing->{versionNumber},
-		-label=>WebGUI::International::get('version number','Asset_Matrix'),
-		-hoverHelp=>WebGUI::International::get('version number description','Asset_Matrix'),
+		-label=>$i18n->get('version number'),
+		-hoverHelp=>$i18n->get('version number description'),
 		);
 	$f->url(
 		-name=>"productUrl",
 		-value=>$listing->{productUrl},
-		-label=>WebGUI::International::get('product url','Asset_Matrix'),
-		-hoverHelp=>WebGUI::International::get('product url description','Asset_Matrix'),
+		-label=>$i18n->get('product url'),
+		-hoverHelp=>$i18n->get('product url description'),
 		);
 	$f->text(
 		-name=>"manufacturerName",
 		-value=>$listing->{manufacturerName},
-		-label=>WebGUI::International::get('manufacturer name','Asset_Matrix'),
-		-hoverHelp=>WebGUI::International::get('manufacturer name description','Asset_Matrix'),
+		-label=>$i18n->get('manufacturer name'),
+		-hoverHelp=>$i18n->get('manufacturer name description'),
 		);
 	$f->url(
 		-name=>"manufacturerUrl",
 		-value=>$listing->{manufacturerUrl},
-		-label=>WebGUI::International::get('manufacturer url','Asset_Matrix'),
+		-label=>$i18n->get('manufacturer url'),
 		);
 	$f->textarea(
 		-name=>"description",
 		-value=>$listing->{description},
-		-label=>WebGUI::International::get('description','Asset_Matrix'),
+		-label=>$i18n->get('description'),
 		);
         if ($self->canEdit) {
 		$f->selectBox(
 			-name=>"maintainerId",
 			-value=>[$listing->{maintainerId}],
-			-label=>WebGUI::International::get('listing maintainer','Asset_Matrix'),
+			-label=>$i18n->get('listing maintainer'),
 			-options=>$self->session->db->buildHashRef("select userId,username from users order by username")
-			-hoverHelp=>WebGUI::International::get('listing maintainer description','Asset_Matrix'),
+			-hoverHelp=>$i18n->get('listing maintainer description'),
 			);
 	}
 	my %goodBad = (
-		"No"          => WebGUI::International::get("no",'Asset_Matrix'),
-		"Yes"         => WebGUI::International::get("yes",'Asset_Matrix'),
-		"Free Add On" => WebGUI::International::get("free",'Asset_Matrix'),
-		"Costs Extra" => WebGUI::International::get("extra",'Asset_Matrix'),
-		"Limited"     => WebGUI::International::get("limited",'Asset_Matrix'),
+		"No"          => $i18n->get("no"),
+		"Yes"         => $i18n->get("yes"),
+		"Free Add On" => $i18n->get("free"),
+		"Costs Extra" => $i18n->get("extra"),
+		"Limited"     => $i18n->get("limited"),
 	);
 	foreach my $category ($self->getCategories()) {
 		$f->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
@@ -523,7 +530,7 @@ sub www_editListing {
 					-subtext=>"<br />".$field->{description}
 					);
 			} elsif ($field->{fieldType} eq "goodBad") {
-				my $value = ($field->{value} || $field->{defaultValue} || WebGUI::International::get("no",'Asset_Matrix'));
+				my $value = ($field->{value} || $field->{defaultValue} || $i18n->get("no"));
 				$f->selectBox(
 					-name=>$field->{name},
 					-value=>[$value],
@@ -562,7 +569,7 @@ sub www_editListing {
 		$a->finish;
 	}
         $f->submit;
-        return $self->processStyle(WebGUI::International::get('edit listing','Asset_Matrix').$f->print);
+        return $self->processStyle($i18n->get('edit listing').$f->print);
 }
  
  
@@ -570,7 +577,8 @@ sub www_editListing {
 sub www_editListingSave {
         my $self = shift;
         my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	return WebGUI::International('no edit rights','Asset_Matrix') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
 	my %data = (
 		listingId => $self->session->form->process("listingId"),
 		lastUpdated => $self->session->datetime->time(),
@@ -649,6 +657,7 @@ sub www_editListingSave {
 sub www_editField {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless($self->canEdit);
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
         my $field = $self->session->db->getRow("Matrix_field","fieldId",$self->session->form->process("fieldId"));
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
@@ -662,34 +671,39 @@ sub www_editField {
 	$f->text(
 		-name=>"name",
 		-value=>$field->{name},
-		-label=>WebGUI::International::get('name','Asset_Matrix'),
+		-label=>$i18n->get('field name'),
+		-hoverHelp=>$i18n->get('field name description'),
 		);
 	$f->text(
 		-name=>"label",
 		-value=>$field->{label},
-		-label=>WebGUI::International::get('label','Asset_Matrix'),
+		-label=>$i18n->get('field label'),
+		-hoverHelp=>$i18n->get('field label description'),
 		);
 	$f->selectBox(
 		-name=>"fieldType",
 		-value=>[$field->{fieldType}],
-		-label=>WebGUI::International::get('type','Asset_Matrix'),
+		-label=>$i18n->get('field type'),
+		-hoverHelp=>$i18n->get('field type description'),
 		-options=>{
-			'goodBad'  => WebGUI::International::get('good bad','Asset_Matrix'),
-			'text'     => WebGUI::International::get('text','Asset_Matrix'),
-			'url'      => WebGUI::International::get('url','Asset_Matrix'),
-			'textarea' => WebGUI::International::get('text area','Asset_Matrix'),
-			'combo'    => WebGUI::International::get('combo','Asset_Matrix'),
+			'goodBad'  => $i18n->get('good bad'),
+			'text'     => $i18n->get('text'),
+			'url'      => $i18n->get('url'),
+			'textarea' => $i18n->get('text area'),
+			'combo'    => $i18n->get('combo'),
 			}
 		);
 	$f->textarea(
 		-name=>"description",
 		-value=>$field->{description},
-		-label=>WebGUI::International::get('description','Asset_Matrix'),
+		-label=>$i18n->get('field description'),
+		-hoverHelp=>$i18n->get('field description description'),
 		);
 	$f->text(
 		-name=>"defaultValue",
 		-value=>$field->{defaultValue},
-		-label=>WebGUI::International::get('default value','Asset_Matrix'),
+		-label=>$i18n->get('default value'),
+		-hoverHelp=>$i18n->get('default value description'),
 		);
 	my %cats;
 	foreach my $category ($self->getCategories) {
@@ -698,11 +712,12 @@ sub www_editField {
 	$f->selectBox(
 		-name=>"category",
 		-value=>[$field->{category}],
-		-label=>WebGUI::International::get('category','Asset_Matrix'),
+		-label=>$i18n->get('category'),
+		-hoverHelp=>$i18n->get('category description'),
 		-options=>\%cats
 		);
 	$f->submit;
-	return $self->processStyle(WebGUI::International::get('edit field','Asset_Matrix').$f->print);
+	return $self->processStyle($i18n->get('edit field').$f->print);
 }
 
 
@@ -727,7 +742,8 @@ sub www_editFieldSave {
 sub www_listFields {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless($self->canEdit);
-	my $output = sprintf WebGUI::International::get('list fields','Asset_Matrix'),
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+	my $output = sprintf $i18n->get('list fields'),
 				$self->getUrl("func=editField&amp;fieldId=new");
 	my $sth = $self->session->db->read("select fieldId, label from Matrix_field where assetId=".$self->session->db->quote($self->getId)." order by label");
 	while (my ($id, $label) = $sth->array) {
@@ -957,6 +973,7 @@ sub www_viewDetail {
 	my $listingId = shift || $self->session->form->process("listingId");
 	my $hasRated = shift || $self->hasRated($listingId);
 	my %var;
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$listingId);
 	my $forum = WebGUI::Asset::Wobject::Collaboration->new($listing->{forumId});
 	$var{"discussion"} = $forum->view;
@@ -1006,23 +1023,23 @@ sub www_viewDetail {
 		-extras=>'class="content"',
 		-name=>"from",
 		-value=>$self->session->user->profileField("email"),
-		-label=>WebGUI::International::get('your email','Asset_Matrix'),
+		-label=>$i18n->get('your email'),
 		);
 	$f->selectBox(
 		-name=>"subject",
 		-extras=>'class="content"',
 		-options=>{
-			WebGUI::International::get('report error','Asset_Matrix')=>"Report an error.",
-			WebGUI::International::get('general comment','Asset_Matrix')=>"General comment.",
+			$i18n->get('report error')=>"Report an error.",
+			$i18n->get('general comment')=>"General comment.",
 			},
-		-label=>WebGUI::International::get('request type','Asset_Matrix'),
+		-label=>$i18n->get('request type'),
 		);
 	$f->textarea(
 		-rows=>4,
 		-extras=>'class="content"',
 		-columns=>35,
 		-name=>"body",
-		-label=>WebGUI::International::get('comment','Asset_Matrix'),
+		-label=>$i18n->get('comment'),
 		);
 	$f->submit(
 		-extras=>'class="content"',
@@ -1089,7 +1106,7 @@ sub www_viewDetail {
 	$f->submit(
 		-extras=>'class="ratingForm"',
 		-value=>"Rate",
-		-label=>'<a href="'.$self->formatURL("rate",$listingId).'">'.WebGUI::International::get('show ratings','Asset_Matrix').'</A>'
+		-label=>'<a href="'.$self->formatURL("rate",$listingId).'">'.$i18n->get('show ratings').'</A>'
 		);
 	if ($hasRated) {
 		$var{'ratings'} = $ratingsTable;

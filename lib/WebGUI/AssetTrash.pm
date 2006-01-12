@@ -185,19 +185,19 @@ Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is Fal
 sub www_manageTrash {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"trash");
+	my $i18n = WebGUI::International->new($self->session,"Asset");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my ($header, $limit);
         $ac->setHelp("trash manage");
 	if ($self->session->form->process("systemTrash") && $self->session->user->isInGroup(3)) {
-		$header = WebGUI::International::get(965,"Asset");
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), WebGUI::International::get(10));
+		$header = $i18n->get(965);
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->(10,"WebGUI"));
 	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), WebGUI::International::get(964,"Asset"));
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), $i18n->get(964));
 		$limit = 1;
 	}
   	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
-        my $i18n = WebGUI::International->new("Asset");
 	my $output = "
    <script type=\"text/javascript\">
      var assetManager = new AssetManager();

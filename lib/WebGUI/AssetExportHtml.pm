@@ -139,44 +139,45 @@ sub www_export {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
         $self->getAdminConsole->setHelp("page export", "Asset");
+	my $i18n = WebGUI::International->new($self->session);
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "func",
 		-value => "exportStatus"
 		);
 	$f->integer(
-			-label=>WebGUI::International::get('Depth',"Asset"),
-			-hoverHelp=>WebGUI::International::get('Depth description',"Asset"),
+			-label=>$i18n->get('Depth'),
+			-hoverHelp=>$i18n->get('Depth description'),
 			-name=>"depth",
 			-value=>99,
 		);
 	$f->selectBox(
-			-label=>WebGUI::International::get('Export as user',"Asset"),
-			-hoverHelp=>WebGUI::International::get('Export as user description',"Asset"),
+			-label=>$i18n->get('Export as user'),
+			-hoverHelp=>$i18n->get('Export as user description'),
 			-name=>"userId",
 			-options=>$self->session->db->buildHashRef("select userId, username from users"),
 			-value=>[1],
 		);
 	$f->text(
-			-label=>WebGUI::International::get("directory index","Asset"),
-			-hoverHelp=>WebGUI::International::get("directory index description","Asset"),
+			-label=>$i18n->get("directory index"),
+			-hoverHelp=>$i18n->get("directory index description"),
 			-name=>"index",
 			-value=>"index.html"
 		);
 	$f->text(
-			-label=>WebGUI::International::get('Extras URL',"Asset"),
-			-hoverHelp=>WebGUI::International::get('Extras URL description',"Asset"),
+			-label=>$i18n->get('Extras URL'),
+			-hoverHelp=>$i18n->get('Extras URL description'),
 			-name=>"extrasURL",
 			-value=>$self->session->config->get("extrasURL")
 		);
 	$f->text(
-                        -label=>WebGUI::International::get('Uploads URL',"Asset"),
-                        -hoverHelp=>WebGUI::International::get('Uploads URL description',"Asset"),
+                        -label=>$i18n->get('Uploads URL'),
+                        -hoverHelp=>$i18n->get('Uploads URL description'),
                         -name=>"uploadsURL",
                         -value=>$self->session->config->get("uploadsURL")
                 );
         $f->submit;
-        $self->getAdminConsole->render($self->checkExportPath.$f->print,WebGUI::International::get('Export Page',"Asset"));
+        $self->getAdminConsole->render($self->checkExportPath.$f->print,$i18n->get('Export Page'));
 }
 
 
@@ -191,14 +192,15 @@ Displays the export status page
 sub www_exportStatus {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
+	my $i18n = WebGUI::International->new($self->session);
 	my $iframeUrl = $self->getUrl('func=exportGenerate');
 	$iframeUrl = $self->session->url->append($iframeUrl, 'index='.$self->session->form->process("index"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'depth='.$self->session->form->process("depth"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'userId='.$self->session->form->process("userId"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'extrasURL='.$self->session->form->process("extrasURL"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'uploadsURL='.$self->session->form->process("uploadsURL"));
-	my $output = '<iframe src="'.$iframeUrl.'" title="'.WebGUI::International::get('Page Export Status',"Asset").'" width="410" height="200"></iframe>';
-        $self->getAdminConsole->render($output,WebGUI::International::get('Page Export Status',"Asset"),"Asset");
+	my $output = '<iframe src="'.$iframeUrl.'" title="'.$i18n->get('Page Export Status').'" width="410" height="200"></iframe>';
+        $self->getAdminConsole->render($output,$i18n->get('Page Export Status'),"Asset");
 }
 
 #-------------------------------------------------------------------
@@ -222,6 +224,7 @@ sub www_exportGenerate {
 		print $error;
 		return;
 	}
+	my $i18n = WebGUI::International->new($self->session);
 	my $userId = $self->session->form->process("userId");
 	my $extrasURL = $self->session->form->process("extrasURL");
 	my $uploadsURL = $self->session->form->process("uploadsURL");
@@ -229,9 +232,9 @@ sub www_exportGenerate {
 	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$self->session->form->process("depth")});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
-		printf WebGUI::International::get('exporting page', 'Asset'), $url;
+		printf $i18n->get('exporting page'), $url;
 		unless ($asset->canView($userId)) {
-			print WebGUI::International::get('bad user privileges', 'Asset')."\n";
+			print $i18n->get('bad user privileges')."\n";
 			next;
 		}
 		my $path;
@@ -252,23 +255,28 @@ sub www_exportGenerate {
 			$path = $self->session->config->get("exportPath") . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
-				printf WebGUI::International::get('could not create path', 'Asset'), $path, $@;
+				printf $i18n->get('could not create path'), $path, $@;
 				return;
 			}
 		} 
 		$path .= "/".$filename;
                 eval { open(FILE, "> $path") or die "$!" };
 		if ($@) {
-			printf WebGUI::International::get('could not open path', 'Asset'), $path, $@;
+			printf $i18n->get('could not open path'), $path, $@;
 			return;
 		} else {
 			print FILE $asset->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
 			close(FILE);
 		}
-		print WebGUI::International::get('done','Asset');
+		print $i18n->get('done');
 	}
+<<<<<<< .mine
+	printf $i18n->get('export information'), scalar(@{$assets}), (time()-$startTime);
+	print '<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493).'</a>';
+=======
 	printf WebGUI::International::get('export information','Asset'), scalar(@{$assets}), $self->session->datetime->time()-$startTime);
 	print '<a target="_parent" href="'.$self->getUrl.'">'.WebGUI::International::get(493,"Asset").'</a>';
+>>>>>>> .r425
 	return;
 }
 

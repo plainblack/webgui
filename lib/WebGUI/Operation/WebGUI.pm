@@ -59,7 +59,7 @@ password and email address, as well as some other WebGUI settings.
 sub www_setup {
 	my $session = shift;
 	return "" unless ($session->setting->get("specialState") eq "init");
-	my $i18n = WebGUI::International->new("WebGUI");
+	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

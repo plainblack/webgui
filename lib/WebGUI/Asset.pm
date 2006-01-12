@@ -150,9 +150,11 @@ An array reference containing additional information to include with the default
 
 sub definition {
         my $class = shift;
+        my $session = shift;
         my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session, "Asset");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get("asset","Asset"),
+		assetName=>->get("asset"),
                 tableName=>'assetData',
                 className=>'WebGUI::Asset',
 		icon=>'assets.gif',
@@ -478,6 +480,7 @@ Creates and returns a tabform to edit parameters of an Asset.
 
 sub getEditForm {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $uiLevelOverride = $self->get("className");
 	$uiLevelOverride =~ s/\:\:/_/g;
 	my $tabform = WebGUI::TabForm->new(undef,undef,$self->getUrl(),$uiLevelOverride);
@@ -501,66 +504,66 @@ sub getEditForm {
 			value=>$self->session->form->process("proceed")
 			});
 	}
-	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
+	$tabform->addTab("properties",$i18n->get("properties"));
 	$tabform->getTab("properties")->readOnly(
-		-label=>WebGUI::International::get("asset id","Asset"),
+		-label=>$i18n->get("asset id"),
 		-value=>$self->get("assetId"),
-		-hoverHelp=>WebGUI::International::get('asset id description','Asset'),
+		-hoverHelp=>$i18n->get('asset id description'),
 		);
 	$tabform->getTab("properties")->text(
-		-label=>WebGUI::International::get(99,"Asset"),
+		-label=>$i18n->get(99),
 		-name=>"title",
-		-hoverHelp=>WebGUI::International::get('99 description','Asset'),
+		-hoverHelp=>$i18n->get('99 description'),
 		-value=>$self->get("title")
 		);
 	$tabform->getTab("properties")->text(
-		-label=>WebGUI::International::get(411,"Asset"),
+		-label=>$i18n->get(411),
 		-name=>"menuTitle",
 		-value=>$self->get("menuTitle"),
-		-hoverHelp=>WebGUI::International::get('411 description',"Asset"),
+		-hoverHelp=>$i18n->get('411 description'),
 		-uiLevel=>1
 		);
         $tabform->getTab("properties")->text(
                 -name=>"url",
-                -label=>WebGUI::International::get(104,"Asset"),
+                -label=>$i18n->get(104),
                 -value=>$self->get("url"),
-		-hoverHelp=>WebGUI::International::get('104 description',"Asset"),
+		-hoverHelp=>$i18n->get('104 description'),
                 -uiLevel=>3
                 );
-	$tabform->addTab("display",WebGUI::International::get(105,"Asset"),5);
+	$tabform->addTab("display",$i18n->get(105),5);
 	$tabform->getTab("display")->yesNo(
                 -name=>"isHidden",
                 -value=>$self->get("isHidden"),
-                -label=>WebGUI::International::get(886,"Asset"),
-		-hoverHelp=>WebGUI::International::get('886 description',"Asset"),
+                -label=>$i18n->get(886),
+		-hoverHelp=>$i18n->get('886 description'),
                 -uiLevel=>6
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"newWindow",
                 -value=>$self->get("newWindow"),
-                -label=>WebGUI::International::get(940,"Asset"),
-		-hoverHelp=>WebGUI::International::get('940 description',"Asset"),
+                -label=>$i18n->get(940),
+		-hoverHelp=>$i18n->get('940 description'),
                 -uiLevel=>6
                 );
-	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
+	$tabform->addTab("security",$i18n->get(107),6);
         $tabform->getTab("security")->yesNo(
                 -name=>"encryptPage",
                 -value=>$self->get("encryptPage"),
-                -label=>WebGUI::International::get('encrypt page',"Asset"),
-		-hoverHelp=>WebGUI::International::get('encrypt page description',"Asset"),
+                -label=>$i18n->get('encrypt page'),
+		-hoverHelp=>$i18n->get('encrypt page description'),
                 -uiLevel=>6
                 );
 	$tabform->getTab("security")->dateTime(
                 -name=>"startDate",
-                -label=>WebGUI::International::get(497,"Asset"),
-		-hoverHelp=>WebGUI::International::get('497 description',"Asset"),
+                -label=>$i18n->get(497),
+		-hoverHelp=>$i18n->get('497 description'),
                 -value=>$self->get("startDate"),
                 -uiLevel=>6
                 );
         $tabform->getTab("security")->dateTime(
                 -name=>"endDate",
-                -label=>WebGUI::International::get(498,"Asset"),
-		-hoverHelp=>WebGUI::International::get('498 description',"Asset"),
+                -label=>$i18n->get(498),
+		-hoverHelp=>$i18n->get('498 description'),
                 -value=>$self->get("endDate"),
                 -uiLevel=>6
                 );
@@ -582,53 +585,53 @@ sub getEditForm {
         $tabform->getTab("security")->selectBox(
                -name=>"ownerUserId",
                -options=>$users,
-               -label=>WebGUI::International::get(108,"Asset"),
-		-hoverHelp=>WebGUI::International::get('108 description',"Asset"),
+               -label=>$i18n->get(108),
+		-hoverHelp=>$i18n->get('108 description'),
                -value=>[$self->get("ownerUserId")],
                -subtext=>$subtext,
                -uiLevel=>6
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdView",
-               -label=>WebGUI::International::get(872,"Asset"),
-		-hoverHelp=>WebGUI::International::get('872 description',"Asset"),
+               -label=>$i18n->get(872),
+		-hoverHelp=>$i18n->get('872 description'),
                -value=>[$self->get("groupIdView")],
                -uiLevel=>6
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdEdit",
-               -label=>WebGUI::International::get(871,"Asset"),
-		-hoverHelp=>WebGUI::International::get('871 description',"Asset"),
+               -label=>$i18n->get(871),
+		-hoverHelp=>$i18n->get('871 description'),
                -value=>[$self->get("groupIdEdit")],
                -excludeGroups=>[1,7],
                -uiLevel=>6
                );
-	$tabform->addTab("meta",WebGUI::International::get("Metadata","Asset"),3);
+	$tabform->addTab("meta",$i18n->get("Metadata"),3);
         $tabform->getTab("meta")->textarea(
                 -name=>"synopsis",
-                -label=>WebGUI::International::get(412,"Asset"),
-		-hoverHelp=>WebGUI::International::get('412 description',"Asset"),
+                -label=>$i18n->get(412),
+		-hoverHelp=>$i18n->get('412 description'),
                 -value=>$self->get("synopsis"),
                 -uiLevel=>3
                 );
         $tabform->getTab("meta")->textarea(
                 -name=>"extraHeadTags",
-		-label=>WebGUI::International::get("extra head tags","Asset"),
-		-hoverHelp=>WebGUI::International::get('extra head tags description',"Asset"),
+		-label=>$i18n->get("extra head tags"),
+		-hoverHelp=>$i18n->get('extra head tags description'),
                 -value=>$self->get("extraHeadTags"),
                 -uiLevel=>5
                 );
 	$tabform->getTab("meta")->yesNo(
 		-name=>"isPackage",
-		-label=>WebGUI::International::get("make package","Asset"),
-		-hoverHelp=>WebGUI::International::get('make package description',"Asset"),
+		-label=>$i18n->get("make package"),
+		-hoverHelp=>$i18n->get('make package description'),
 		-value=>$self->getValue("isPackage"),
 		-uiLevel=>7
 		);
 	$tabform->getTab("meta")->yesNo(
 		-name=>"isPrototype",
-		-label=>WebGUI::International::get("make prototype","Asset"),
-		-hoverHelp=>WebGUI::International::get('make prototype description',"Asset"),
+		-label=>$i18n->get("make prototype"),
+		-hoverHelp=>$i18n->get('make prototype description'),
 		-value=>$self->getValue("isPrototype"),
 		-uiLevel=>9
 		);
@@ -640,7 +643,7 @@ sub getEditForm {
                         # Add a "Select..." option on top of a select list to prevent from
                         # saving the value on top of the list when no choice is made.
                         if($fieldType eq "selectList") {
-                                $options = {"", WebGUI::International::get("Select","Asset")};
+                                $options = {"", $i18n->get("Select")};
                         }
                         $tabform->getTab("meta")->dynamicField(
                                                 name=>"metadata_".$meta->{$field}{fieldId},
@@ -657,9 +660,9 @@ sub getEditForm {
                 	# Add a quick link to add field
                 	$tabform->getTab("meta")->readOnly(
                                         -value=>'<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.
-                                                        WebGUI::International::get('Add new field','Asset').
+                                                        $i18n->get('Add new field').
                                                         '</a></p>',
-                                        -hoverHelp=>WebGUI::International::get('Add new field description',"Asset"),
+                                        -hoverHelp=>$i18n->get('Add new field description'),
                 	);
 		}
         }
@@ -696,7 +699,7 @@ If this evaluates to True, then the smaller extras/adminConsole/small/assets.gif
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	my $definition = $self->definition;
+	my $definition = $self->definition($self->session);
 	my $icon = $definition->[0]{icon} || "assets.gif";
 	return $self->session->config->get("extrasURL").'/assets/small/'.$icon if ($small);
 	return $self->session->config->get("extrasURL").'/assets/'.$icon;
@@ -775,7 +778,7 @@ Returns the internationalization of the word "Asset".
 
 sub getName {
 	my $self = shift;
-	my $definition = $self->definition;
+	my $definition = $self->definition($self->session);
 	return $definition->[0]{assetName};
 }
 
@@ -863,9 +866,9 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url"),WebGUI::International::get(43,"Asset"));
+	my $i18n = WebGUI::International->new($self->session, "Asset");
+	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url")$i18n->get(43));
 	my $commit;
-	my $i18n = WebGUI::International->new("Asset");
 	if (($self->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId")) || !$self->isLocked) {
         	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url"));
 	} else {
@@ -917,7 +920,7 @@ Returns the UI Level specified in the asset definition or from the config file i
         
 sub getUiLevel {
         my $self = shift;
-        my $definition = $self->definition;
+        my $definition = $self->definition($self->session);
         return $self->session->config->get("assetUiLevel"){$definition->[0]{className}} || $definition->[0]{uiLevel} || 1;
 }  
 
@@ -969,7 +972,7 @@ sub getValue {
 		return $storedValue if (defined $storedValue);
 		unless (exists $self->{_propertyDefinitions}) { # check to see if the definitions have been merged and cached
 			my %properties;
-			foreach my $definition (@{$self->definition}) {
+			foreach my $definition (@{$self->definition($self->session)}) {
 				%properties = (%properties, %{$definition->{properties}});
 			}
 			$self->{_propertyDefinitions} = \%properties;
@@ -1036,7 +1039,7 @@ sub new {
 		# got properties from cache
 	} else { 
 		my $sql = "select * from asset";
-		foreach my $definition (@{$class->definition}) {
+		foreach my $definition (@{$class->definition($session)}) {
 			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
 				.$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
 		}
@@ -1186,7 +1189,7 @@ Updates current Asset with data from Form.
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	my %data;
-	foreach my $definition (@{$self->definition}) {
+	foreach my $definition (@{$self->definition($self->session)}) {
 		foreach my $property (keys %{$definition->{properties}}) {
 			if ($definition->{properties}{$property}{noFormPost}) {
 				$data{$property} = $definition->{properties}{$property}{defaultValue} if $self->session->form->process("assetId") eq "new";
@@ -1364,7 +1367,7 @@ Hash reference of properties and values to set.
 sub update {
 	my $self = shift;
 	my $properties = shift;
-	foreach my $definition (@{$self->definition}) {
+	foreach my $definition (@{$self->definition($self->session)}) {
 		my @setPairs;
 		foreach my $property (keys %{$definition->{properties}}) {
 			next unless (exists $properties->{$property});
@@ -1418,7 +1421,7 @@ sub www_add {
 	}
 	if ($self->session->form->process("'prototype'")) {
 		my $prototype = WebGUI::Asset->new($self->session->form->process("prototype"),$class);
-		foreach my $definition (@{$prototype->definition}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
+		foreach my $definition (@{$prototype->definition($self->session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {
 				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
 				next if ($definition->{properties}{$property}{noFormPost});
@@ -1539,7 +1542,7 @@ sub www_manageAssets {
         $self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
   	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
-        my $i18n = WebGUI::International->new("Asset");
+        my $i18n = WebGUI::International->new($session, "Asset");
 	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
         my @crumbtrail;
         foreach my $ancestor (@{$ancestors}) {
@@ -1609,7 +1612,7 @@ sub www_manageAssets {
 		</script> <div class="adminConsoleSpacer">
             &nbsp;
         </div>
-		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.WebGUI::International::get(1083,"Asset").'</legend>';
+		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.$i18n->get(1083).'</legend>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
@@ -1639,11 +1642,11 @@ sub www_manageAssets {
 		$hasClips = 1;
         }
 	if ($hasClips) {
-		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.WebGUI::International::get(1082,"Asset").'</legend>'
+		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.$i18n->get(1082).'</legend>'
 			.WebGUI::Form::formHeader($self->session,)
 			.WebGUI::Form::hidden($self->session,{name=>"func",value=>"pasteList"})
 			.WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
-			.' '.WebGUI::International::get("select all","Asset").'<br />'
+			.' '.$i18n->get("select all").'<br />'
 			.WebGUI::Form::checkList($self->session,{name=>"assetId",vertical=>1,options=>\%options})
 			.'<br />'
 			.WebGUI::Form::submit($self->session,{value=>"Paste"})
@@ -1671,7 +1674,7 @@ sub www_manageAssets {
         }
 	if ($hasPackages) {
 		$output .= '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset>
-			<legend>'.WebGUI::International::get("packages","Asset").'</legend>
+			<legend>'.$i18n->get("packages").'</legend>
 			'.$packages.' </fieldset></div> ';
 	}
 	$output .= '

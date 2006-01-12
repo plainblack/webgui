@@ -60,8 +60,9 @@ A hash reference passed in from a subclass definition.
 sub definition {
         my $class = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset_RichEdit');
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName','Asset_RichEdit'),
+		assetName=>$i18n->get('assetName'),
 		icon=>'richEdit.gif',
 		uiLevel => 5,
                 tableName=>'RichEdit',
@@ -153,64 +154,65 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,'Asset_RichEdit');
 	my %buttons;
 	tie %buttons, "Tie::IxHash";
 	%buttons = (
-		'search' => WebGUI::International::get('search', 'Asset_RichEdit'),
-		'replace' => WebGUI::International::get('replace', 'Asset_RichEdit'),
-		'cut' => WebGUI::International::get('cut', 'Asset_RichEdit'),
-		'copy' => WebGUI::International::get('copy', 'Asset_RichEdit'),
-		'paste' => WebGUI::International::get('paste', 'Asset_RichEdit'),
-		'pastetext' => WebGUI::International::get('pastetext', 'Asset_RichEdit'),
-		'pasteword' => WebGUI::International::get('pasteword', 'Asset_RichEdit'),
-		'undo' => WebGUI::International::get('undo', 'Asset_RichEdit'),
-		'redo' => WebGUI::International::get('redo', 'Asset_RichEdit'),
-		'bold' => WebGUI::International::get('bold', 'Asset_RichEdit'),
-		'italic' => WebGUI::International::get('italic', 'Asset_RichEdit'),
-		'underline' => WebGUI::International::get('underline', 'Asset_RichEdit'),
-		'strikethrough' => WebGUI::International::get('strikethrough', 'Asset_RichEdit'),
-		'justifyleft' => WebGUI::International::get('justifyleft', 'Asset_RichEdit'),
-		'justifycenter' => WebGUI::International::get('justifycenter', 'Asset_RichEdit'),
-		'justifyright' => WebGUI::International::get('justifyright', 'Asset_RichEdit'),
-		'justifyfull' => WebGUI::International::get('justifyfull', 'Asset_RichEdit'),
-		'bullist' => WebGUI::International::get('bullist', 'Asset_RichEdit'),
-		'numlist' => WebGUI::International::get('numlist', 'Asset_RichEdit'),
-		'outdent' => WebGUI::International::get('outdent', 'Asset_RichEdit'),
-		'indent' => WebGUI::International::get('indent', 'Asset_RichEdit'),
-		'sub' => WebGUI::International::get('sub', 'Asset_RichEdit'),
-		'sup' => WebGUI::International::get('sup', 'Asset_RichEdit'),
-		'styleselect' => WebGUI::International::get('styleselect', 'Asset_RichEdit'),
-		'formatselect' => WebGUI::International::get('formatselect', 'Asset_RichEdit'),
-		'fontselect' => WebGUI::International::get('fontselect', 'Asset_RichEdit'),
-		'fontsizeselect' => WebGUI::International::get('fontsizeselect', 'Asset_RichEdit'),
-		'forecolor' => WebGUI::International::get('forecolor', 'Asset_RichEdit'),
-		'backcolor' => WebGUI::International::get('backcolor', 'Asset_RichEdit'),
-		'link' => WebGUI::International::get('link', 'Asset_RichEdit'),
-		'pagetree' => WebGUI::International::get('pagetree', 'Asset_RichEdit'),
-		'anchor' => WebGUI::International::get('anchor', 'Asset_RichEdit'),
-		'unlink' => WebGUI::International::get('unlink', 'Asset_RichEdit'),
-		'tablecontrols' => WebGUI::International::get('tablecontrols', 'Asset_RichEdit'),
-		'visualaid' => WebGUI::International::get('visualaid', 'Asset_RichEdit'),
-		'hr' => WebGUI::International::get('hr', 'Asset_RichEdit'),
-		'advhr' => WebGUI::International::get('advhr', 'Asset_RichEdit'),
-		'inserttime' => WebGUI::International::get('inserttime', 'Asset_RichEdit'),
-		'insertdate' => WebGUI::International::get('insertdate', 'Asset_RichEdit'),
-		'image' => WebGUI::International::get('image', 'Asset_RichEdit'),
-		'insertImage' => WebGUI::International::get('insertImage', 'Asset_RichEdit'),
-		'flash' => WebGUI::International::get('flash', 'Asset_RichEdit'),
-		'charmap' => WebGUI::International::get('charmap', 'Asset_RichEdit'),
-		'collateral' => WebGUI::International::get('collateral', 'Asset_RichEdit'),
-		'emotions' => WebGUI::International::get('emotions', 'Asset_RichEdit'),
-		'help' => WebGUI::International::get('help', 'Asset_RichEdit'),
-		'iespell' => WebGUI::International::get('iespell', 'Asset_RichEdit'),
-		'removeformat' => WebGUI::International::get('removeformat', 'Asset_RichEdit'),
-		'code' => WebGUI::International::get('code', 'Asset_RichEdit'),
-		'cleanup' => WebGUI::International::get('cleanup', 'Asset_RichEdit'),
-		'save' => WebGUI::International::get('save', 'Asset_RichEdit'),
-		'preview' => WebGUI::International::get('preview', 'Asset_RichEdit'),
-		'fullscreen' => WebGUI::International::get('fullscreen', 'Asset_RichEdit'),
-		'zoom' => WebGUI::International::get('zoom', 'Asset_RichEdit'),
-		'print' => WebGUI::International::get('print', 'Asset_RichEdit'),
+		'search' => $i18n->get('search'),
+		'replace' => $i18n->get('replace'),
+		'cut' => $i18n->get('cut'),
+		'copy' => $i18n->get('copy'),
+		'paste' => $i18n->get('paste'),
+		'pastetext' => $i18n->get('pastetext'),
+		'pasteword' => $i18n->get('pasteword'),
+		'undo' => $i18n->get('undo'),
+		'redo' => $i18n->get('redo'),
+		'bold' => $i18n->get('bold'),
+		'italic' => $i18n->get('italic'),
+		'underline' => $i18n->get('underline'),
+		'strikethrough' => $i18n->get('strikethrough'),
+		'justifyleft' => $i18n->get('justifyleft'),
+		'justifycenter' => $i18n->get('justifycenter'),
+		'justifyright' => $i18n->get('justifyright'),
+		'justifyfull' => $i18n->get('justifyfull'),
+		'bullist' => $i18n->get('bullist'),
+		'numlist' => $i18n->get('numlist'),
+		'outdent' => $i18n->get('outdent'),
+		'indent' => $i18n->get('indent'),
+		'sub' => $i18n->get('sub'),
+		'sup' => $i18n->get('sup'),
+		'styleselect' => $i18n->get('styleselect'),
+		'formatselect' => $i18n->get('formatselect'),
+		'fontselect' => $i18n->get('fontselect'),
+		'fontsizeselect' => $i18n->get('fontsizeselect'),
+		'forecolor' => $i18n->get('forecolor'),
+		'backcolor' => $i18n->get('backcolor'),
+		'link' => $i18n->get('link'),
+		'pagetree' => $i18n->get('pagetree'),
+		'anchor' => $i18n->get('anchor'),
+		'unlink' => $i18n->get('unlink'),
+		'tablecontrols' => $i18n->get('tablecontrols'),
+		'visualaid' => $i18n->get('visualaid'),
+		'hr' => $i18n->get('hr'),
+		'advhr' => $i18n->get('advhr'),
+		'inserttime' => $i18n->get('inserttime'),
+		'insertdate' => $i18n->get('insertdate'),
+		'image' => $i18n->get('image'),
+		'insertImage' => $i18n->get('insertImage'),
+		'flash' => $i18n->get('flash'),
+		'charmap' => $i18n->get('charmap'),
+		'collateral' => $i18n->get('collateral'),
+		'emotions' => $i18n->get('emotions'),
+		'help' => $i18n->get('help'),
+		'iespell' => $i18n->get('iespell'),
+		'removeformat' => $i18n->get('removeformat'),
+		'code' => $i18n->get('code'),
+		'cleanup' => $i18n->get('cleanup'),
+		'save' => $i18n->get('save'),
+		'preview' => $i18n->get('preview'),
+		'fullscreen' => $i18n->get('fullscreen'),
+		'zoom' => $i18n->get('zoom'),
+		'print' => $i18n->get('print'),
 #		'advlink' => "Advanced Link",
 #		'spacer' => "Toolbar Spacer", 
 #		'separator' => "Toolbar Separator", 
@@ -224,10 +226,10 @@ sub getEditForm {
 			<td>%s</td>
 			<td>%s</td>
 		</tr>!,
-		WebGUI::International::get('button','Asset_RichEdit'),
-		WebGUI::International::get('row 1','Asset_RichEdit'),
-		WebGUI::International::get('row 2','Asset_RichEdit'),
-		WebGUI::International::get('row 3','Asset_RichEdit');
+		$i18n->get('button'),
+		$i18n->get('row 1'),
+		$i18n->get('row 2'),
+		$i18n->get('row 3');
 	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));
 	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));
 	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));
@@ -260,108 +262,108 @@ sub getEditForm {
 	}
 	$buttonGrid .= "</table>";
 	$tabform->getTab("properties")->readOnly(
-		-label=>WebGUI::International::get('toolbar buttons', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('toolbar buttons description', 'Asset_RichEdit'),
+		-label=>$i18n->get('toolbar buttons'),
+		-hoverHelp=>$i18n->get('toolbar buttons description'),
 		-value=>$buttonGrid
 		);
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("askAboutRichEdit"),
-		-label=>WebGUI::International::get('using rich edit', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('using rich edit description', 'Asset_RichEdit'),
+		-label=>$i18n->get('using rich edit'),
+		-hoverHelp=>$i18n->get('using rich edit description'),
 		-name=>"askAboutRichEdit"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("preformatted"),
-		-label=>WebGUI::International::get('preformatted', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('preformatted description', 'Asset_RichEdit'),
+		-label=>$i18n->get('preformatted'),
+		-hoverHelp=>$i18n->get('preformatted description'),
 		-name=>"preformatted",
                 -uiLevel=>9
                 );
 	$tabform->getTab("security")->textarea(
 		-value=>$self->getValue("validElements"),
 		-name=>"validElements",
-		-label=>WebGUI::International::get('elements', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('elements description', 'Asset_RichEdit'),
-		-subtext=>WebGUI::International::get('elements subtext', 'Asset_RichEdit'),
+		-label=>$i18n->get('elements'),
+		-hoverHelp=>$i18n->get('elements description'),
+		-subtext=>$i18n->get('elements subtext'),
 		-uiLevel=>9
 		);
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("editorHeight"),
-		-label=>WebGUI::International::get('editor height', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('editor height description', 'Asset_RichEdit'),
+		-label=>$i18n->get('editor height'),
+		-hoverHelp=>$i18n->get('editor height description'),
 		-name=>"editorHeight",
                 -uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("editorWidth"),
-		-label=>WebGUI::International::get('editor width', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('editor width description', 'Asset_RichEdit'),
+		-label=>$i18n->get('editor width'),
+		-hoverHelp=>$i18n->get('editor width description'),
 		-name=>"editorWidth",
 		-uiLevel=>9
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("sourceEditorHeight"),
-		-label=>WebGUI::International::get('source editor height', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('source editor height description', 'Asset_RichEdit'),
+		-label=>$i18n->get('source editor height'),
+		-hoverHelp=>$i18n->get('source editor height description'),
 		-name=>"sourceEditorHeight"
                 );
         $tabform->getTab("display")->integer(
                 -value=>$self->getValue("sourceEditorWidth"),
-		-label=>WebGUI::International::get('source editor width', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('source editor width description', 'Asset_RichEdit'),
+		-label=>$i18n->get('source editor width'),
+		-hoverHelp=>$i18n->get('source editor width description'),
 		-name=>"sourceEditorWidth"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("useBr"),
-		-label=>WebGUI::International::get('use br', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('use br description', 'Asset_RichEdit'),
+		-label=>$i18n->get('use br'),
+		-hoverHelp=>$i18n->get('use br description'),
 		-name=>"useBr",
                 -uiLevel=>9
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("removeLineBreaks"),
-		-label=>WebGUI::International::get('remove line breaks', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('remove line breaks description', 'Asset_RichEdit'),
+		-label=>$i18n->get('remove line breaks'),
+		-hoverHelp=>$i18n->get('remove line breaks description'),
 		-name=>"removeLineBreaks",
                 -uiLevel=>9
                 );
         $tabform->getTab("display")->yesNo(
                 -value=>$self->getValue("nowrap"),
-		-label=>WebGUI::International::get('no wrap', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('no wrap description', 'Asset_RichEdit'),
+		-label=>$i18n->get('no wrap'),
+		-hoverHelp=>$i18n->get('no wrap description'),
 		-name=>"nowrap",
                 -uiLevel=>9
                 );
         $tabform->getTab("properties")->selectBox(
                 -value=>[$self->getValue("directionality")],
-		-label=>WebGUI::International::get('directionality', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('directionality description', 'Asset_RichEdit'),
+		-label=>$i18n->get('directionality'),
+		-hoverHelp=>$i18n->get('directionality description'),
 		-name=>"directionality",
 		-options=>{
-			ltr=>WebGUI::International::get('left to right', 'Asset_RichEdit'),
-			rtl=>WebGUI::International::get('right to left', 'Asset_RichEdit'),
+			ltr=>$i18n->get('left to right'),
+			rtl=>$i18n->get('right to left'),
 			}
                 );
         $tabform->getTab("display")->selectBox(
                 -value=>[$self->getValue("toolbarLocation")],
-		-label=>WebGUI::International::get('toolbar location', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('toolbar location description', 'Asset_RichEdit'),
+		-label=>$i18n->get('toolbar location'),
+		-hoverHelp=>$i18n->get('toolbar location description'),
 		-name=>"toolbarLocation",
 		-options=>{
-			top=>WebGUI::International::get('top', 'Asset_RichEdit'),
-			bottom=>WebGUI::International::get('bottom', 'Asset_RichEdit'),
+			top=>$i18n->get('top'),
+			bottom=>$i18n->get('bottom'),
 			}
                 );
         $tabform->getTab("properties")->text(
                 -value=>$self->getValue("cssFile"),
-		-label=>WebGUI::International::get('css file', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('css file description', 'Asset_RichEdit'),
+		-label=>$i18n->get('css file'),
+		-hoverHelp=>$i18n->get('css file description'),
 		-name=>"cssFile"
                 );
         $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("enableContextMenu"),
-		-label=>WebGUI::International::get('enable context menu', 'Asset_RichEdit'),
-		-hoverHelp=>WebGUI::International::get('enable context menu description', 'Asset_RichEdit'),
+		-label=>$i18n->get('enable context menu'),
+		-hoverHelp=>$i18n->get('enable context menu description'),
 		-name=>"enableContextMenu"
                 );
 	return $tabform;
@@ -395,6 +397,7 @@ sub getRichEditor {
 	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));	
 	my @toolbarButtons = (@toolbarRow1,@toolbarRow2,@toolbarRow3);
 	my @plugins;
+	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
 	my %config = (
 		mode => "exact",
 		elements => $nameId,
@@ -459,9 +462,9 @@ sub getRichEditor {
 			$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
 		}
 	}
-	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
+	my $language  = $i18n->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
-		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
+		$language = $i18n->getLanguage("English","languageAbbreviation");
 	}
 	$config{language} = $language;
 	$config{content_css} = $self->getValue("cssFile") || $self->session->config->get("extrasURL").'/tinymce2/defaultcontent.css';
@@ -497,7 +500,8 @@ sub view {
 sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("rich edit edit config","Asset_RichEdit"));
+	my $i18n = WebGUI::International->new($self->session,"Asset_RichEdit");
+        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("rich edit edit config"));
 }
 
 

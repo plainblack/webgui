@@ -24,9 +24,10 @@ sub configurationForm {
 	$self = shift;
 	
 	$f = WebGUI::HTMLForm->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingByWeight');
 	$f->float(
 		-name	=> $self->prepend('pricePerUnitWeight'),
-		-label	=> WebGUI::International::get('price per weight', 'CommerceShippingByWeight'),
+		-label	=> $i18n->get('price per weight'),
 		-value	=> $self->get('pricePerUnitWeight')
 		);
 
@@ -45,7 +46,8 @@ sub init {
 
 #-------------------------------------------------------------------
 sub name {
-	return WebGUI::International::get('title', 'CommerceShippingByWeight');
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingByWeight');
+	return $i18n->get('title');
 }
 
 1;

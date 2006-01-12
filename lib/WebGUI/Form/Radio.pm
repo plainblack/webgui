@@ -59,10 +59,12 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("radio","WebGUI")
+			defaultValue=>$i18n->get("radio")
 			},
 		checked=>{
 			defaultValue=> 0
@@ -71,7 +73,7 @@ sub definition {
 			defaultValue=>1
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 

@@ -5,6 +5,7 @@ package WebGUI::i18n::English::Automated_Information;
 
 use WebGUI::Session;
 use WebGUI::International;
+my $i18n = WebGUI::International->new($session, 'Macros');
 
 ##Get list of all macros by namespace/module name
 my $dir = join '/', $self->session->config->getWebguiRoot,"lib","WebGUI","Macro";
@@ -17,7 +18,7 @@ closedir(DIR);
 ##Build list of enabled macros, by namespace by reversing session hash:
 my %macros = reverse %{ $self->session->config->get("macros") };
 
-$macro_table =
+my $macro_table =
         join "\n", 
         map { join '', '<tr><td>', $_, '</td><td>',
               ($macros{$_} ? ('&#94;', $macros{$_}, '();') : '&nbsp;'), 
@@ -27,9 +28,9 @@ $macro_table =
 $macro_table =
         join("\n", 
          '<table border="1" cellpadding="3">',
-        '<tr><th>',WebGUI::International::get('macro name', 'Macros'),
+        '<tr><th>',$i18n->get('macro name'),
         '</th><th>',
-        WebGUI::International::get('macro shortcut', 'Macros'),
+        $i18n->get('macro shortcut'),
         '</th></tr>',$macro_table,'</table>');
 
 our $I18N = {

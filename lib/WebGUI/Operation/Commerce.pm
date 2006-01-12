@@ -28,7 +28,7 @@ use WebGUI::Icon;
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
-	my $i18n = WebGUI::International->new("Commerce");
+	my $i18n = WebGUI::International->new($session, "Commerce");
 
 	my $workarea = shift;
         my $title = shift;
@@ -104,7 +104,8 @@ sub www_cancelTransaction {
 		$transaction->cancelTransaction;
 	}
 
-	$var{message} = WebGUI::International::get('checkout canceled message', 'Commerce');
+	my $i18n = WebGUI::International->new($session, 'Commerce');
+	$var{message} = $i18n->get('checkout canceled message');
 	
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceCheckoutCanceledTemplateId"))->process(\%var));
 }
@@ -126,7 +127,7 @@ sub www_checkoutConfirm {
 	my ($plugin, $f, %var, $errors, $i18n, $shoppingCart, $normal, $recurring, $shipping, $total);
 	$errors = shift;
 	
-	$i18n = WebGUI::International->new('Commerce');
+	$i18n = WebGUI::International->new($session, 'Commerce');
 	
 	# If the user isn't logged in yet, let him do so or have him create an account
 	if ($session->user->profileField("userId") == 1) {
@@ -207,7 +208,7 @@ sub www_checkoutSubmit {
 		@normal, $currentPurchase, $checkoutError, @resultLoop, %param, $normal, $recurring, 
 		$formError, $shipping, $shippingCost, $shippingDescription);
 	
-	$i18n = WebGUI::International->new('Commerce');
+	$i18n = WebGUI::International->new($session, 'Commerce');
 
 	# check if user has already logged in
 	if ($session->user->profileField("userId") == 1) {
@@ -378,7 +379,7 @@ sub www_editCommerceSettings {
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	$i18n = WebGUI::International->new('Commerce');
+	$i18n = WebGUI::International->new($session, 'Commerce');
 	
 	tie %tabs, 'Tie::IxHash';
  	%tabs = (
@@ -543,7 +544,7 @@ sub www_listPendingTransactions {
 	my ($p, $transactions, $output, $properties, $i18n);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	$i18n = WebGUI::International->new("Commerce");
+	$i18n = WebGUI::International->new($session, "Commerce");
 
 	$p = WebGUI::Paginator->new($session,$session->url->page('op=listPendingTransactions'));
 	$p->setDataByArrayRef(WebGUI::Commerce::Transaction->pendingTransactions);
@@ -577,7 +578,7 @@ sub www_listTransactions {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 
-	my $i18n = WebGUI::International->new('TransactionLog');
+	my $i18n = WebGUI::International->new($session, 'TransactionLog');
 
 	my $transactionOptions = {
 		''		=> $i18n->get('any'),
@@ -673,7 +674,7 @@ sub www_selectPaymentGateway {
 
 	_clearPaymentScratch;
 	
-	$i18n = WebGUI::International->new('Commerce');
+	$i18n = WebGUI::International->new($session, 'Commerce');
 	$plugins = WebGUI::Commerce::Payment->getEnabledPlugins;
 	if (scalar(@$plugins) > 1) {
 		foreach (@$plugins) {
@@ -718,7 +719,7 @@ sub www_selectShippingMethod {
 
 	_clearShippingScratch;
 	
-	$i18n = WebGUI::International->new('Commerce');
+	$i18n = WebGUI::International->new($session, 'Commerce');
 	$plugins = WebGUI::Commerce::Shipping->getEnabledPlugins;
 	
 	if (scalar(@$plugins) > 1) {
@@ -788,7 +789,7 @@ sub www_viewCart {
 	my $session = shift;
 	my ($shoppingCart, $normal, $recurring, %var, $total, $i18n);
 
-	$i18n = WebGUI::International->new('Commerce');
+	$i18n = WebGUI::International->new($session, 'Commerce');
 	
 	# Put contents of cart in template vars
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;

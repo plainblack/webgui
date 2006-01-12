@@ -70,7 +70,9 @@ text will come out formatted as paragraphs.
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,'Asset_Article');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -79,44 +81,44 @@ sub definition {
 				defaultValue=>'PBtmpl0000000000000002',	
 				tab=>"display",
 				namespace=>"Article",
-                		hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
-                		label=>WebGUI::International::get(72,"Asset_Article")
+                		hoverHelp=>$i18n->get('article template description'),
+                		label=>$i18n->get(72)
 				},
 			linkURL=>{
 				tab=>"properties",
 				fieldType=>'url',
 				defaultValue=>undef,
-				label=>WebGUI::International::get(8,"Asset_Article"),
-                		hoverHelp=>WebGUI::International::get('link url description','Asset_Article'),
+				label=>$i18n->get(8),
+                		hoverHelp=>$i18n->get('link url description'),
                 		uiLevel=>3
 				},
 			linkTitle=>{
 				tab=>"properties",
 				fieldType=>'text',
 				defaultValue=>undef,
-				label=>WebGUI::International::get(7,"Asset_Article"),
-                		hoverHelp=>WebGUI::International::get('link title description','Asset_Article'),
+				label=>$i18n->get(7),
+                		hoverHelp=>$i18n->get('link title description'),
                 		uiLevel=>3
 				},
 			convertCarriageReturns=>{
 				tab=>"display",
 				fieldType=>'yesNo',
 				defaultValue=>0,
-				label=>WebGUI::International::get(10,"Asset_Article"),
-                		subtext=>' &nbsp; <span style="font-size: 8pt;">'.WebGUI::International::get(11,"Asset_Article").'</span>',
-                		hoverHelp=>WebGUI::International::get('carriage return description','Asset_Article'),
+				label=>$i18n->get(10),
+                		subtext=>' &nbsp; <span style="font-size: 8pt;">'.$i18n->get(11).'</span>',
+                		hoverHelp=>$i18n->get('carriage return description'),
                 		uiLevel=>5
 				}
 		);
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Article"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'article.gif',
 		autoGenerateForms=>1,
 		tableName=>'Article',
 		className=>'WebGUI::Asset::Wobject::Article',
 		properties=>\%properties
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

@@ -50,8 +50,9 @@ sub process {
          if ($session->user->isInGroup(12)) {
         	my %var;
                  my ($turnOn,$turnOff,$templateName) = @_;
-              $turnOn ||= WebGUI::International::get(516,'Macro_AdminToggle');
-              $turnOff ||= WebGUI::International::get(517,'Macro_AdminToggle');
+	my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
+              $turnOn ||= $i18n->get(516);
+              $turnOff ||= $i18n->get(517);
                  if ($session->var->isAdminOn) {
                       $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;

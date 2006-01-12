@@ -59,19 +59,21 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("744","WebGUI")
+			defaultValue=>$i18n->get("744")
 			},
 		label=>{
-			defaultValue=>WebGUI::International::get("744","WebGUI")
+			defaultValue=>$i18n->get("744")
 			},
 		name=>{
 			defaultValue=>"proceed"
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

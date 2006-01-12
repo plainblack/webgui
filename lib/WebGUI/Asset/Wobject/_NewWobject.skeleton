@@ -36,7 +36,9 @@ getEditForm method is unnecessary/redundant/useless.
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, 'NewWobject');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -56,21 +58,21 @@ sub definition {
 			
 			#This is what will appear when the user hovers the mouse over the label 
 			# of your form field.
-			hoverHelp=>WebGUI::International::get('templateId label description','Asset_NewWobject'),
+			hoverHelp=>$i18n->get('templateId label description'),
 			
 			# This is the text that will appear to the left of your form field.
-			label=>WebGUI::International::get('templateId label,"Asset_NewWobject")
+			label=>$i18n->get('templateId label)
 		}
 	);
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_NewWobject"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'newWobject.gif',
 		autoGenerateForms=>1,
 		tableName=>'NewWobject',
 		className=>'WebGUI::Asset::Wobject::NewWobject',
 		properties=>\%properties
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 

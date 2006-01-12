@@ -41,9 +41,11 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_EventsCalendar");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_EventsCalendar"),
+		assetName=>$i18n->get('assetName'),
 		uiLevel => 9,
 		icon=>'calendar.gif',
 		tableName=>'EventsCalendar',
@@ -79,7 +81,7 @@ sub definition {
 			}
 		}
 	});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -107,75 +109,76 @@ sub epochToArray {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,"Asset_EventsCalendar");
 	$tabform->getTab("properties")->selectBox(
 		-name=>"scope",
-		-label=>WebGUI::International::get(507,"Asset_EventsCalendar"),
-		-hoverHelp=>WebGUI::International::get('507 description',"Asset_EventsCalendar"),
+		-label=>$i18n->get(507),
+		-hoverHelp=>$i18n->get('507 description'),
 		-value=>[$self->getValue("scope")],
 		-options=>{
-			0=>WebGUI::International::get(508,"Asset_EventsCalendar"),
-			1=>WebGUI::International::get(510,"Asset_EventsCalendar"),
-			2=>WebGUI::International::get(509,"Asset_EventsCalendar"),
+			0=>$i18n->get(508),
+			1=>$i18n->get(510),
+			2=>$i18n->get(509),
 		}
 	);
  	$tabform->getTab("display")->template(
  		-name=>"templateId",
-		-label=>WebGUI::International::get(94,"Asset_EventsCalendar"),
-		-hoverHelp=>WebGUI::International::get('94 description',"Asset_EventsCalendar"),
+		-label=>$i18n->get(94),
+		-hoverHelp=>$i18n->get('94 description'),
 		-value=>$self->getValue('templateId'),
 		-namespace=>"EventsCalendar"
 	);
  	$tabform->getTab("display")->template(
  		-name=>"eventTemplateId",
-		-label=>WebGUI::International::get(80,"Asset_EventsCalendar"),
-		-hoverHelp=>WebGUI::International::get('80 description',"Asset_EventsCalendar"),
+		-label=>$i18n->get(80),
+		-hoverHelp=>$i18n->get('80 description'),
 		-value=>$self->getValue('eventTemplateId'),
 		-namespace=>"EventsCalendar/Event",
 	);
 	$tabform->getTab("display")->selectBox(
 		-name=>"startMonth",
 		-options=>{
-			"january"=>WebGUI::International::get('january','DateTime'),
-			"now"=>WebGUI::International::get(98,"Asset_EventsCalendar"),
-			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
-			"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
+			"january"=>$i18n->get('january'),
+			"now"=>$i18n->get(98),
+			"current"=>$i18n->get(82),
+			"first"=>$i18n->get(83)
 		},
-		-label=>WebGUI::International::get(81,"Asset_EventsCalendar"),
-		-hoverHelp=>WebGUI::International::get('81 description',"Asset_EventsCalendar"),
+		-label=>$i18n->get(81),
+		-hoverHelp=>$i18n->get('81 description'),
 		-value=>[$self->getValue("startMonth")]
 	);
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = (
-		"last"=>WebGUI::International::get(85,"Asset_EventsCalendar"),
-		"after12"=>WebGUI::International::get(86,"Asset_EventsCalendar"),
-		"after9"=>WebGUI::International::get(87,"Asset_EventsCalendar"),
-		"after6"=>WebGUI::International::get(88,"Asset_EventsCalendar"),
-		"after3"=>WebGUI::International::get(89,"Asset_EventsCalendar"),
-		"current"=>WebGUI::International::get(82,"Asset_EventsCalendar")
+		"last"=>$i18n->get(85),
+		"after12"=>$i18n->get(86),
+		"after9"=$i18n->get(87),
+		"after6"=>$i18n->get(88),
+		"after3"=>$i18n->get(89),
+		"current"=>$i18n->get(82)
 	);
 	$tabform->getTab("display")->selectBox(
 		-name=>"endMonth",
 		-options=>\%options,
-		-label=>WebGUI::International::get(84,"Asset_EventsCalendar"),
-		-hoverHelp=>WebGUI::International::get('84 description',"Asset_EventsCalendar"),
+		-label=>$i18n->get(84),
+		-hoverHelp=>$i18n->get('84 description'),
 		-value=>[$self->getValue("endMonth")]
 	);
 	$tabform->getTab("display")->selectBox(
 		-name=>"defaultMonth",
 		-options=>{
-			"current"=>WebGUI::International::get(82,"Asset_EventsCalendar"),
-			"last"=>WebGUI::International::get(85,"Asset_EventsCalendar"),
-			"first"=>WebGUI::International::get(83,"Asset_EventsCalendar")
+			"current"=>$i18n->get(82),
+			"last"=>$i18n->get(85),
+			"first"=>$i18n->get(83)
 		},
-		-label=>WebGUI::International::get(90,"Asset_EventsCalendar"),
-		-hoverHelp=>WebGUI::International::get('90 description',"Asset_EventsCalendar"),
+		-label=>$i18n->get(90),
+		-hoverHelp=>$i18n->get('90 description'),
 		-value=>[$self->getValue("defaultMonth")]
 	);
 	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
-		-label=>WebGUI::International::get(19,"Asset_EventsCalendar"),
-		-hoverHelp=>WebGUI::International::get('19 description',"Asset_EventsCalendar"),
+		-label=>$i18n->get(19),
+		-hoverHelp=>$i18n->get('19 description'),
 		-value=>$self->getValue("paginateAfter")
 	);
 	return $tabform;
@@ -186,6 +189,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;  
+	my $i18n = WebGUI::International->new($self->session,"Asset_EventsCalendar");
 	#define default view month range.  Note that this could be different from 
 	#the range a user is allowed to view - set by the events calendar limitations.
 	my $monthRangeLength = int($self->get("paginateAfter"));
@@ -400,7 +404,7 @@ sub view {
 	my %var;
 	$var{month_loop} = \@$monthloop;
 	$var{"addevent.url"} = $self->getUrl().'?func=add;class=WebGUI::Asset::Event';
-	$var{"addevent.label"} = WebGUI::International::get(20,"Asset_EventsCalendar");
+	$var{"addevent.label"} = $i18n->get(20);
 	$var{'sunday.label'} = $self->session->datetime->getDayName(7);
 	$var{'monday.label'} = $self->session->datetime->getDayName(1);
 	$var{'tuesday.label'} = $self->session->datetime->getDayName(2);
@@ -423,9 +427,9 @@ sub view {
 	my $nextCalMonthEnd = $calMonthEnd + $monthRangeLength;
 	my $monthLabel;
 	if ($monthRangeLength == 1) {
-		$monthLabel = WebGUI::International::get(560,"Asset_EventsCalendar");
+		$monthLabel = $i18n->get(560);
 	} else {
-		$monthLabel = WebGUI::International::get(561,"Asset_EventsCalendar");
+		$monthLabel = $i18n->get(561);
 	}
 	$var{'pagination.previousPageUrl'} = 
 		$self->getUrl.'?calMonthStart='.$prevCalMonthStart.';calMonthEnd='.$prevCalMonthEnd;
@@ -433,22 +437,22 @@ sub view {
 		$self->getUrl.'?calMonthStart='.$calMonthStart.
 		';reload='.$self->session->id->generate().'"><a href="'.$self->getUrl.
 		'?calMonthStart='.$prevCalMonthStart.';calMonthEnd='.$prevCalMonthEnd.'">'.
-		WebGUI::International::get(558,"Asset_EventsCalendar")." ".$monthRangeLength." ".
+		$i18n->get(558)." ".$monthRangeLength." ".
 		$monthLabel.'</a>';
 	$var{'pagination.nextPageUrl'} = $self->getUrl.
 		'?calMonthStart='.$nextCalMonthStart.';calMonthEnd='.$nextCalMonthEnd;
 	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.
 		'?calMonthStart='.$nextCalMonthStart.';calMonthEnd='.$nextCalMonthEnd.'">'.
-		WebGUI::International::get(559,"Asset_EventsCalendar")." ".$monthRangeLength." ".
+		$i18n->get(559)." ".$monthRangeLength." ".
 		$monthLabel.'</a></form>';
 	$var{'pagination.pageList.upTo20'} = '<select size="1" name="calMonthEnd">
-		<option value="'.($calMonthStart).'">1 '.WebGUI::International::get(560,"Asset_EventsCalendar").'</option>
-		<option value="'.(1+$calMonthStart).'">2 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
-		<option value="'.(2+$calMonthStart).'">3 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
-		<option value="'.(3+$calMonthStart).'">4 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
-		<option value="'.(5+$calMonthStart).'">6 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
-		<option value="'.(8+$calMonthStart).'">9 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option>
-		<option value="'.(11+$calMonthStart).'">12 '.WebGUI::International::get(561,"Asset_EventsCalendar").'</option></select>
+		<option value="'.($calMonthStart).'">1 '.$i18n->get(560).'</option>
+		<option value="'.(1+$calMonthStart).'">2 '.$i18n->get(561).'</option>
+		<option value="'.(2+$calMonthStart).'">3 '.$i18n->get(561).'</option>
+		<option value="'.(3+$calMonthStart).'">4 '.$i18n->get(561).'</option>
+		<option value="'.(5+$calMonthStart).'">6 '.$i18n->get(561).'</option>
+		<option value="'.(8+$calMonthStart).'">9 '.$i18n->get(561).'</option>
+		<option value="'.(11+$calMonthStart).'">12 '.$i18n->get(561).'</option></select>
 		<input type="submit" value="Go" name="Go" />';
 	#use Data::Dumper; return '<pre>'.Dumper(\%var).'</pre>';
 	my $vars = \%var;

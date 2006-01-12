@@ -93,7 +93,8 @@ sub _getHelpName {
 	else {
 		$helpName = 'topicName';
 	}
-	return WebGUI::International::get($helpName,$file);
+	my $i18n = WebGUI::International->new($session);
+	return $i18n->get($helpName,$file);
 }
 
 #-------------------------------------------------------------------
@@ -102,26 +103,26 @@ sub www_viewHelp {
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new($session,"help");
 	my $namespace = $session->form->process("namespace") || "WebGUI";
-        my $i18n = WebGUI::International->new($namespace);
+        my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session->form->process("hid"),$namespace);
 	foreach my $row (@{$help->{related}}) {
 		my $relatedHelp = _get($row->{tag},$row->{namespace});
-		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),WebGUI::International::get($relatedHelp->{title},$row->{namespace}));
+		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
 	}
         my %vars;
         $vars{body} = $i18n->get($help->{body});
         foreach my $row (@{ $help->{fields} }) {
                 push @{ $vars{fields} }, 
-                        { 'title' =>       WebGUI::International::get($row->{title},$row->{namespace}),
-                          'description' => WebGUI::International::get($row->{description},$row->{namespace}), }
+                        { 'title' =>       $i18n->get($row->{title},$row->{namespace}),
+                          'description' => $i18n->get($row->{description},$row->{namespace}), }
         }
         my $body = WebGUI::Asset::Template->new("PBtmplHelp000000000001")->process(\%vars);
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),WebGUI::International::get(95));
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
+    	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95, 'WebGUI'));
+    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents', 'WebGUI'));
 	WebGUI::Macro::process($session,\$body);
     	return $ac->render(
 		$body, 
-		WebGUI::International::get(93).': '.$i18n->get($help->{title})
+		$i18n->get(93, 'WebGUI').': '.$i18n->get($help->{title})
 		);
 }
 
@@ -129,6 +130,7 @@ sub www_viewHelp {
 sub www_viewHelpIndex {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
+	my $i18n = WebGUI::International->new($session);
         my @helpIndex;
 	my $i;
 	my @files = _getHelpFilesList();
@@ -137,7 +139,7 @@ sub www_viewHelpIndex {
 		my $help = _load($namespace);
 		foreach my $key (keys %{$help}) {
 			push @helpIndex, [$namespace, $key,
-					WebGUI::International::get($help->{$key}{title},$namespace)];
+					$i18n->get($help->{$key}{title},$namespace)];
 			$i++;
 		}
         }
@@ -155,8 +157,8 @@ sub www_viewHelpIndex {
 	}
 	$output .= '</td></tr></table>';
 	my $ac = WebGUI::AdminConsole->new($session,"help");
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
-	return $ac->render($output, join ': ',WebGUI::International::get(93), WebGUI::International::get('help index'));
+    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents'));
+	return $ac->render($output, join ': ',$i18n->get(93), $i18n->get('help index'));
 }
 
 #-------------------------------------------------------------------
@@ -184,9 +186,10 @@ sub www_viewHelpTOC {
                 }	
 	}
 	$output .= '</td></tr></table>';
+	my $i18n = WebGUI::International->new($session);
 	my $ac = WebGUI::AdminConsole->new($session,"help");
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),WebGUI::International::get(95));
-	return $ac->render($output, join ': ',WebGUI::International::get(93), WebGUI::International::get('help toc'));
+    	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));
+	return $ac->render($output, join ': ',$i18n->get(93), $i18n->get('help toc'));
 }
 
 #-------------------------------------------------------------------
@@ -197,13 +200,14 @@ sub www_viewHelpChapter {
 	my $help = _load($namespace);
 	my @entries = sort keys %{ $help };
 	my $output = '';
+	my $i18n = WebGUI::International->new($session);
         foreach my $id (@entries) {
-                $output .= '<p><a href="'._link($id,$namespace).'">'.WebGUI::International::get($help->{$id}{title},$namespace).'</a></p>';
+                $output .= '<p><a href="'._link($id,$namespace).'">'.$i18n->get($help->{$id}{title},$namespace).'</a></p>';
 	}
 	my $ac = WebGUI::AdminConsole->new($session,"help");
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),WebGUI::International::get(95));
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),WebGUI::International::get('help contents'));
-	return $ac->render($output, join ': ',WebGUI::International::get(93), _getHelpName($namespace));
+    	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));
+    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents'));
+	return $ac->render($output, join ': ',$i18n->get(93), _getHelpName($namespace));
 }
 
 1;

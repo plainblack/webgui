@@ -36,6 +36,7 @@ sub _create_cache_key {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
 my $httpHeaderFieldType;
    if ($session{'config'}{'soapHttpHeaderOverride'}) {
@@ -43,8 +44,9 @@ my $httpHeaderFieldType;
    } else {
       $httpHeaderFieldType = 'hidden';
    }
+	my $i18n = WebGUI::International->new($session, "Asset_WSClient");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName', "Asset_WSClient"),
+		assetName=>$i18n->get('assetName'),
 		uiLevel=>9,
 		icon=>'web_services.gif',
 		tableName=>'WSClient',
@@ -107,7 +109,7 @@ my $httpHeaderFieldType;
          }
 		}
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -116,102 +118,103 @@ my $httpHeaderFieldType;
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session, "Asset_WSClient");
    $tabform->getTab("display")->template(
       -name      => 'templateId',
       -value     => $self->getValue('templateId'),
       -namespace => "WSClient",
-      -label => WebGUI::International::get(72, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('72 description', "Asset_WSClient"),
+      -label => WebG$i18n->get(72),
+      -hoverHelp => $i18n->get('72 description'),
    );
    $tabform->getTab("display")->yesNo (
       -name  => 'preprocessMacros',
-      -label => WebGUI::International::get(8, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('8 description', "Asset_WSClient"),
+      -label => $i18n->get(8),
+      -hoverHelp => $i18n->get('8 description'),
       -value => $self->get('preprocessMacros'),
    );
   	$tabform->getTab("display")->integer(
       -name  => 'paginateAfter',
-      -label => WebGUI::International::get(13, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('13 description', "Asset_WSClient"),
+      -label => $i18n->get(13),
+      -hoverHelp => $i18n->get('13 description'),
       -value => $self->getValue("paginateAfter")
    );
    $tabform->getTab("display")->text (
       -name  => 'paginateVar',
-      -label => WebGUI::International::get(14, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('14 description', "Asset_WSClient"),
+      -label => $i18n->get(14),
+      -hoverHelp => $i18n->get('14 description'),
       -value => $self->get('paginateVar'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'uri',
-      -label => WebGUI::International::get(2, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('2 description', "Asset_WSClient"),
+      -label => $i18n->get(2),
+      -hoverHelp => $i18n->get('2 description'),
       -value => $self->get('uri'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'proxy',
-      -label => WebGUI::International::get(3, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('3 description', "Asset_WSClient"),
+      -label => $i18n->get(3),
+      -hoverHelp => $i18n->get('3 description'),
       -value => $self->get('proxy'),
    );
    $tabform->getTab("properties")->text (
       -name  => 'callMethod',
-      -label => WebGUI::International::get(4, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('4 description', "Asset_WSClient"),
+      -label => $i18n->get(4),
+      -hoverHelp => $i18n->get('4 description'),
       -value => $self->get('callMethod'),
    );
    $tabform->getTab("properties")->textarea ( 
       -name  => 'params',
-      -label => WebGUI::International::get(5, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('5 description', "Asset_WSClient"),
+      -label => $i18n->get(5),
+      -hoverHelp => $i18n->get('5 description'),
       -value => $self->get('params'),
    );
    if ($session{'config'}{'soapHttpHeaderOverride'}) {
       $tabform->getTab("properties")->text (
          -name  => 'httpHeader',
-         -label => WebGUI::International::get(16, "Asset_WSClient"),
-         -hoverHelp => WebGUI::International::get('16 description', "Asset_WSClient"),
+         -label => $i18n->get(16),
+         -hoverHelp => $i18n->get('16 description'),
          -value => $self->get('httpHeader'),
       );
    } else {
       $tabform->getTab("properties")->hidden (
          -name  => 'httpHeader',
-         -label => WebGUI::International::get(16, "Asset_WSClient"),
+         -label => $i18n->get(16),
          -value => $self->get('httpHeader'),
       );
    }
    $tabform->getTab("properties")->yesNo (
       -name  => 'execute_by_default',
-      -label => WebGUI::International::get(11, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('11 description', "Asset_WSClient"),
+      -label => $i18n->get(11),
+      -hoverHelp => $i18n->get('11 description'),
       -value => $self->get('execute_by_default'),
    );
    $tabform->getTab("properties")->yesNo (
       -name  => 'debugMode',
-      -label => WebGUI::International::get(9, "Asset_WSClient"),
-      -hoverHelp => WebGUI::International::get('9 description', "Asset_WSClient"),
+      -label => $i18n->get(9),
+      -hoverHelp => $i18n->get('9 description'),
       -value => $self->get('debugMode'),
    );
       $tabform->getTab("properties")->yesNo (
          -name  => 'decodeUtf8',
-         -label => WebGUI::International::get(15, "Asset_WSClient"),
-         -hoverHelp => WebGUI::International::get('15 description', "Asset_WSClient"),
+         -label => $i18n->get(15),
+         -hoverHelp => $i18n->get('15 description'),
          -value => $self->get('decodeUtf8'),
       );
    my $cacheopts = {
-	0 => WebGUI::International::get(29, "Asset_WSClient"),
-	1 => WebGUI::International::get(19, "Asset_WSClient"),
+	0 => $i18n->get(29),
+	1 => $i18n->get(19),
    };
    $tabform->getTab("properties")->radioList (
       -name    => 'sharedCache',
       -options => $cacheopts,
-      -label   => WebGUI::International::get(28, "Asset_WSClient"),
-      -hoverHelp   => WebGUI::International::get('28 description', "Asset_WSClient"),
+      -label   => $i18n->get(28),
+      -hoverHelp   => $i18n->get('28 description'),
       -value   => $self->get('sharedCache'),
    );
    $tabform->getTab("properties")->interval (
       -name     => 'cacheTTL',
-      -label    => WebGUI::International::get(27, "Asset_WSClient"),
-      -hoverHelp    => WebGUI::International::get('27 description', "Asset_WSClient"),
+      -label    => $i18n->get(27),
+      -hoverHelp    => $i18n->get('27 description'),
       -value    => $self->get('cacheTTL'),
    );
 	return $tabform;
@@ -248,6 +251,7 @@ sub view {
    my $self= shift;
    # this page, with important params
    $url = $self->getUrl("func=view");
+	my $i18n = WebGUI::International->new($self->session, "Asset_WSClient");
 
     # This could belong up towards the top of the script, but it's nice to
     # have it down right close to the impacted code.  Add to this list params
@@ -311,7 +315,7 @@ sub view {
       $cache_key = _create_cache_key($self, $call, $param_str);
    }
    $cache = WebGUI::Cache->new($self->session,$cache_key,
-      WebGUI::International::get(4, "Asset_WSClient"));
+      $i18n->get(4));
 
    # passing a form param WSClient_skipCache lets us ignore even good caches
    if (!$session{'form'}{'WSClient_skipCache'}) {
@@ -326,7 +330,7 @@ sub view {
       # the solution is to normalize all params to another table
       eval "\$arr_ref = [$param_str];";
       eval { @params = @$arr_ref; };
-      $self->session->errorHandler->debug(WebGUI::International::get(22, "Asset_WSClient")) if $@ && $self->get('debugMode');
+      $self->session->errorHandler->debug($i18n->get(22)) if $@ && $self->get('debugMode');
 
       if ($self->get('execute_by_default') || grep /^$call$/,
          @targetWobjects) {
@@ -340,7 +344,7 @@ sub view {
             $soap = $self->_instantiate_soap;
 
          } else {
-            $self->session->errorHandler->debug(WebGUI::International::get(23, "Asset_WSClient")) if $self->get('debugMode');
+            $self->session->errorHandler->debug($i18n->get(23)) if $self->get('debugMode');
          }
       }
    }
@@ -362,7 +366,7 @@ sub view {
             # a hash reference, a blessed object or a simple scalar.  Each type
             # requires different handling (woohoo!) before being passed to the
             # template system
-            $self->session->errorHandler->debug(WebGUI::International::get(24, "Asset_WSClient") .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
+            $self->session->errorHandler->debug($i18n->get(24) .  (ref $return ? ref $return : 'scalar')) if $self->get('debugMode');
 
             # SOAP object
             if ((ref $return) =~ /SOAP/i) {
@@ -392,7 +396,7 @@ sub view {
          if ($@) {
             $self->session->errorHandler->debug($@) if $self->get('debugMode');
             $var{'soapError'} = $@;
-            $self->session->errorHandler->debug(WebGUI::International::get(25, "Asset_WSClient") . $var{'soapError'})
+            $self->session->errorHandler->debug($i18n->get(25) . $var{'soapError'})
                if $self->get('debugMode');
          }
 
@@ -475,7 +479,7 @@ sub view {
 
 
    } else {
-      $self->session->errorHandler->debug(WebGUI::International::get(26, "Asset_WSClient") . $@) if $self->get('debugMode');
+      $self->session->errorHandler->debug($i18n->get(26) . $@) if $self->get('debugMode');
    }
 
    # did they request a funky http header?

@@ -65,13 +65,14 @@ sub process {
         my @param = @_;
 	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	
+	my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
         $var{'user.isVisitor'} = ($session->user->profileField("userId") eq "1");
 	$var{'customText'} = $param[1];
 	$var{'customText'} =~ s/%(.*?)%/_createURL($session,$1)/ge;
-	$var{'hello.label'} = WebGUI::International::get(48,'Macro_L_loginBox');
+	$var{'hello.label'} = $i18n->get(48);
 	$var{'logout.url'} = $session->url->page("op=auth;method=logout");
 	$var{'account.display.url'} = $session->url->page('op=auth;method=displayAccount');
-        $var{'logout.label'} = WebGUI::International::get(49,'Macro_L_loginBox');
+        $var{'logout.label'} = $i18n->get(49);
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
         if (index(lc($session->env->get("HTTP_USER_AGENT")),"msie") < 0) {
@@ -91,24 +92,24 @@ sub process {
 			name=>"method",
 			value=>"login"
 			});
-	$var{'username.label'} = WebGUI::International::get(50);
+	$var{'username.label'} = $i18n->get(50, 'WebGUI');
 	$var{'username.form'} = WebGUI::Form::text({
 		name=>"username",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
 		});
-        $var{'password.label'} = WebGUI::International::get(51);
+        $var{'password.label'} = $i18n->get(51, 'WebGUI');
         $var{'password.form'} = WebGUI::Form::password({
 		name=>"identifier",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
 		});
         $var{'form.login'} = WebGUI::Form::submit({
-		value=>WebGUI::International::get(52),
+		value=>$i18n->get(52, 'WebGUI'),
 		extras=>'class="loginBoxButton"'
 		});
         $var{'account.create.url'} = $session->url->page('op=auth;method=createAccount');
-	$var{'account.create.label'} = WebGUI::International::get(407);
+	$var{'account.create.label'} = $i18n->get(407, 'WebGUI');
 	$var{'form.footer'} = WebGUI::Form::formFooter($session,);
         return WebGUI::Asset::Template->new($session,$templateId)->process(\%var); 
 }

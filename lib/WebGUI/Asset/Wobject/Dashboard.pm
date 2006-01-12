@@ -43,6 +43,7 @@ sub canPersonalize {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+        return $class->SUPER::definition($definition);
 	my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
@@ -71,14 +72,15 @@ sub definition {
 		},
 		
 	);
+	my $i18n = WebGUI::International->new($session,"Asset_Dashboard");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Dashboard"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'dashboard.gif',
 		tableName=>'Dashboard',
 		className=>'WebGUI::Asset::Wobject::Dashboard',
 		properties=>\%properties
 	});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -99,7 +101,7 @@ sub discernUserId {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
-	my $i18n = WebGUI::International->new("Asset_Dashboard");
+	my $i18n = WebGUI::International->new($self->session, "Asset_Dashboard");
 	$tabform->getTab("display")->template(
 		-name=>"templateId",
 		-value=>$self->getValue('templateId'),
@@ -130,8 +132,8 @@ sub getEditForm {
 			-name=>"assetsToHide",
 			-value=>\@assetsToHide,
 			-options=>\%childIds,
-			-label=>WebGUI::International::get('assets to hide', 'Asset_Layout'),
-			-hoverHelp=>WebGUI::International::get('assets to hide description', 'Asset_Layout'),
+			-label=>$i18n->get('assets to hide', 'Asset_Layout'),
+			-hoverHelp=>$i18n->get('assets to hide description', 'Asset_Layout'),
 			-vertical=>1,
 			-uiLevel=>9
 		);

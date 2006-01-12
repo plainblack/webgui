@@ -60,8 +60,9 @@ A hash reference passed in from a subclass definition.
 sub definition {
         my $class = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Snippet");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Snippet"),
+		assetName=>$i18n->get('assetName'),
 		uiLevel => 5,
 		icon=>'snippet.gif',
                 tableName=>'snippet',
@@ -104,20 +105,20 @@ sub getEditForm {
 	} 
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
-                -label=>WebGUI::International::get('assetName', 'Asset_Snippet'),
-                -hoverHelp=>WebGUI::International::get('snippet description', 'Asset_Snippet'),
+                -label=>$i18n->get('assetName'),
+                -hoverHelp=>$i18n->get('snippet description'),
                 -value=>$self->getValue("snippet")
                 );
         $tabform->getTab("properties")->yesNo(
                 -name=>"processAsTemplate",
-                -label=>WebGUI::International::get('process as template', 'Asset_Snippet'),
-                -hoverHelp=>WebGUI::International::get('process as template description', 'Asset_Snippet'),
+                -label=>$i18n->get('process as template'),
+                -hoverHelp=>$i18n->get('process as template description'),
                 -value=>$self->getValue("processAsTemplate")
                 );
         $tabform->getTab("properties")->combo(
                 -name=>"mimeType",
-                -label=>WebGUI::International::get('mimeType', 'Asset_Snippet'),
-                -hoverHelp=>WebGUI::International::get('mimeType description', 'Asset_Snippet'),
+                -label=>$i18n->get('mimeType'),
+                -hoverHelp=>$i18n->get('mimeType description'),
                 -value=>[$self->getValue('mimeType')],
 		-options=>\%mimeTypes
                 );
@@ -160,7 +161,8 @@ sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("snippet add/edit","Asset_Snippet");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('snippet add/edit title',"Asset_Snippet"));
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Snippet');
+        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('snippet add/edit title'));
 }
 
 #-------------------------------------------------------------------

@@ -20,11 +20,13 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_IndexedSearch");
 	push (@{$definition}, {
 		tableName=>'IndexedSearch',
 		className=>'WebGUI::Asset::Wobject::IndexedSearch',
-		assetName=>WebGUI::International::get('assetName',"Asset_IndexedSearch"),
+		assetName=>$i18n->get('assetName'),
 		properties=>{
 			templateId=>{
 				fieldType=>"template",
@@ -80,7 +82,7 @@ sub definition {
 				},
            	      }
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -96,23 +98,24 @@ sub getEditForm {
 	tie my %searchRoot, 'Tie::IxHash';
 
 	# Unconditional read to catch intallation errors.
+	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
 	my $sth = $self->session->db->unconditionalRead("select distinct(indexName), indexName from IndexedSearch_docInfo");
 	unless ($sth->errorCode < 1) { 
-		return "<p><b>" . WebGUI::International::get(1,"Asset_IndexedSearch") . $sth->errorMessage."</b></p>";
+		return "<p><b>" . $i18n->get(1) . $sth->errorMessage."</b></p>";
 	}
 	while (@data = $sth->array) {
 		$indexName{$data[0]} = $data[1];
 	}
 	$sth->finish;
 	unless(%indexName) {
-		return "<p><b>" . WebGUI::International::get(2,"Asset_IndexedSearch") .
-			 "<p>" . WebGUI::International::get(3,"Asset_IndexedSearch") . "</p></b></p>";
+		return "<p><b>" . $i18n->get(2) .
+			 "<p>" . $i18n->get(3) . "</p></b></p>";
 	}
 	
 	# Index to use
 #	$tabform->getTab("properties")->radioList(	-name=>'indexName',
 #					-options=>\%indexName,
-#					-label=>WebGUI::International::get(5,"Asset_IndexedSearch"),
+#					-label=>$i18n->get(5),
 #					-value=>$self->getValue("indexName"),
 #					-vertical=>1
 #				);
@@ -124,26 +127,26 @@ sub getEditForm {
 		);
 
 	# Page roots
-	#%searchRoot = (	'any'=>WebGUI::International::get(15,"Asset_IndexedSearch"), 
-	#			$session{page}{pageId}=>WebGUI::International::get(4,"Asset_IndexedSearch"),
+	#%searchRoot = (	'any'=>$i18n->get(15), 
+	#			$session{page}{pageId}=>$i18n->get(4),
 	#			$self->session->db->buildHash("select pageId,title from page where parentId='0' and isSystem<>1 order by title")
 	#		);
 	#$tabform->getTab("properties")->checkList (	-name=>'searchRoot',
 	#					-options=>\%searchRoot, 
-	#					-label=>WebGUI::International::get(6,"Asset_IndexedSearch"),
+	#					-label=>$i18n->get(6),
 	#					-value=>[ split("\n", $self->getValue("searchRoot")) ],
 	#					-multiple=>1,
 	#					-vertical=>1,
 	#			);
 	$tabform->getTab("properties")->yesNo(
 					-name=>'forceSearchRoots',
-						-label=>WebGUI::International::get('force search roots',"Asset_IndexedSearch"),
+						-label=>$i18n->get('force search roots'),
 						-value=>$self->getValue("forceSearchRoots")
 				);
 	# Content of specific user
 	$tabform->getTab("properties")->selectList (	-name=>'users',
 						-options=>$self->_getUsers(),
-						-label=>WebGUI::International::get(7,"Asset_IndexedSearch"),
+						-label=>$i18n->get(7),
 						-value=>[ split("\n", $self->getValue("users")) ],
 						-multiple=>1,
 						-size=>5
@@ -152,7 +155,7 @@ sub getEditForm {
 	# Content in specific namespaces
 	$tabform->getTab("properties")->selectList (	-name=>'namespaces',
 						-options=>$self->_getNamespaces,
-						-label=>WebGUI::International::get(8,"Asset_IndexedSearch"),
+						-label=>$i18n->get(8),
 						-value=>[ split("\n", $self->getValue("namespaces")) ],
 						-multiple=>1,
 						-size=>5
@@ -163,7 +166,7 @@ sub getEditForm {
 	delete $contentTypes->{content};
 	$tabform->getTab("properties")->checkList (	-name=>'contentTypes',
 						-options=>$contentTypes,
-						-label=>WebGUI::International::get(10,"Asset_IndexedSearch"),
+						-label=>$i18n->get(10),
 						-value=>[ split("\n", $self->getValue("contentTypes")) ],
 						-multiple=>1,
 						-vertical=>1,
@@ -173,15 +176,15 @@ sub getEditForm {
 					-namespace=>"IndexedSearch"
 		);
 	$tabform->getTab("display")->integer (	-name=>'paginateAfter',
-					-label=>WebGUI::International::get(11,"Asset_IndexedSearch"),
+					-label=>$i18n->get(11),
 					-value=>$self->getValue("paginateAfter"),
 				);
 	$tabform->getTab("display")->integer        (       -name=>'previewLength',
-                                        -label=>WebGUI::International::get(12,"Asset_IndexedSearch"),
+                                        -label=>$i18n->get(12),
                                         -value=>$self->getValue("previewLength"),
                                 );
 	$tabform->getTab("display")->yesNo	(	-name=>'highlight',
-					-label=>WebGUI::International::get(13,"Asset_IndexedSearch"),
+					-label=>$i18n->get(13),
 					-value=>$self->getValue("highlight"),
 				);
 
@@ -195,7 +198,7 @@ sub getEditForm {
 	for (1..5) {
 		my $highlight = "highlight_$_";
 		$tabform->getTab("display")->text	(	-name=>$highlight,
-					-label=>WebGUI::International::get(14,"Asset_IndexedSearch") ." $_:",
+					-label=>$i18n->get(14) ." $_:",
 					-size=>7,
 					-value=>$self->getValue($highlight),
 					-subtext=>qq{
@@ -236,9 +239,10 @@ sub view {
 	$var{query} = $query;
  
 	# Set some standard vars
-	$var{submit} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(16, "Asset_IndexedSearch")});
+	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
+	$var{submit} = WebGUI::Form::submit($self->session,{value=>$i18n->get(16)});
 	$var{actionURL} = $self->getUrl;
-	$var{"int.search"} = WebGUI::International::get(16,"Asset_IndexedSearch");
+	$var{"int.search"} = $i18n->get(16);
 	$var{numberOfResults} = '0';
 	$var{"select_".$self->getValue("paginateAfter")} = "selected";
 
@@ -385,7 +389,8 @@ sub www_edit {
 	my $form = $self->getEditForm;
 	my $output = $form;
 	$output = $form->print unless $form =~ /^<p><b/;
-	return $self->getAdminConsole->render($output,WebGUI::International::get("26","Asset_IndexedSearch"));
+	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
+	return $self->getAdminConsole->render($output,$i18n->get("26"));
 }
 
 #-------------------------------------------------------------------
@@ -488,14 +493,15 @@ sub _getNamespaces {
 			$international{$class} = eval{$class->getName()};
                 }
         }
+	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
 	tie my %namespaces, 'Tie::IxHash';
 	if ($restricted and $self->get('namespaces') !~ /any/i) {
-		$namespaces{any} = WebGUI::International::get(18,"Asset_IndexedSearch");
+		$namespaces{any} = $i18n->get(18);
 		foreach (split/\n/, $self->get('namespaces')) {
 			$namespaces{$_} = $international{$_} || ucfirst($_);
 		}
 	} else {
-		$namespaces{any} = WebGUI::International::get(18,"Asset_IndexedSearch");
+		$namespaces{any} = $i18n->get(18);
 		foreach ($self->session->db->buildArray("select distinct(namespace) from IndexedSearch_docInfo order by namespace")) {
 			$namespaces{$_} = $international{$_} ||ucfirst($_);
 		}
@@ -506,13 +512,14 @@ sub _getNamespaces {
 #-------------------------------------------------------------------
 sub _getContentTypes {
 	my ($self, $restricted) = @_;
-	my %international = (	'page' => WebGUI::International::get('page',"Asset_IndexedSearch"),
-					'wobject' => WebGUI::International::get(19,"Asset_IndexedSearch"),
-					'wobjectDetail' => WebGUI::International::get(20,"Asset_IndexedSearch"),
-					'content' => WebGUI::International::get(21,"Asset_IndexedSearch"),
-					'discussion' => WebGUI::International::get('discussion',"Asset_IndexedSearch"),
-					'profile' => WebGUI::International::get(22,"Asset_IndexedSearch"),
-					'any' => WebGUI::International::get(23,"Asset_IndexedSearch"),
+	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
+	my %international = (	'page' => $i18n->get('page'),
+					'wobject' => $i18n->get(19),
+					'wobjectDetail' => $i18n->get(20),
+					'content' =>$i18n->get(21),
+					'discussion' => $i18n->get('discussion'),
+					'profile' => $i18n->get(22),
+					'any' => $i18n->get(23),
 				);
 	tie my %contentTypes, 'Tie::IxHash';
 	if ($restricted and $self->get('contentTypes') !~ /any/i) {
@@ -548,13 +555,14 @@ sub _getSearchablePages {
 sub _getUsers {
 	my ($self, $restricted) = @_;
 	tie my %users, 'Tie::IxHash';
+	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
 	if ($restricted and $self->get('users') !~ /any/i) {
-		$users{any} = WebGUI::International::get(25,"Asset_IndexedSearch");
+		$users{any} = $i18n->get(25);
 		foreach (split/\n/, $self->get('users')) {
 			$users{$_} = $_;
 		}
 	} else {
-		%users = (	'any' =>  WebGUI::International::get(25,"Asset_IndexedSearch"),
+		%users = (	'any' =>  $i18n->get(25),
 				$self->session->db->buildHash("select userId, username from users order by username")
 			);
 	}

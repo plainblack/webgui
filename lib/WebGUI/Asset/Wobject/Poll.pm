@@ -36,9 +36,11 @@ sub _hasVoted {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	return $class->SUPER::definition($definition);
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Poll");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Poll"),
+		assetName=>$i18n->get('assetName'),
 		tableName=>'Poll',
 		icon=>'poll.gif',
 		className=>'WebGUI::Asset::Wobject::Poll',
@@ -153,7 +155,7 @@ sub definition {
                                 } 
 			}
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -172,11 +174,12 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm; 
+	my $i18n = WebGUI::International->new($self->session,"Asset_Poll");
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Poll",
-		-label=>WebGUI::International::get(73,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('73 description',"Asset_Poll"),
+		-label=>$i18n->get(73),
+		-hoverHelp=>$i18n->get('73 description'),
    		);
         my ($i, $answers);
 	for ($i=1; $i<=20; $i++) {
@@ -186,21 +189,21 @@ sub getEditForm {
         }
 	$tabform->getTab("security")->yesNo(
 		-name=>"active",
-		-label=>WebGUI::International::get(3,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('3 description',"Asset_Poll"),
+		-label=>$i18n->get(3),
+		-hoverHelp=>$i18n->get('3 description'),
 		-value=>$self->getValue("active")
 		);
         $tabform->getTab("security")->group(
 		-name=>"voteGroup",
-		-label=>WebGUI::International::get(4,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('4 description',"Asset_Poll"),
+		-label=>$i18n->get(4),
+		-hoverHelp=>$i18n->get('4 description'),
 		-value=>[$self->getValue("voteGroup")]
 		);
 	if ($self->session->setting->get("useKarma")) {
 		$tabform->getTab("properties")->integer(
 			-name=>"karmaPerVote",
-			-label=>WebGUI::International::get(20,"Asset_Poll"),
-			-hoverHelp=>WebGUI::International::get('20 description',"Asset_Poll"),
+			-label=>$i18n->get(20),
+			-hoverHelp=>$i18n->get('20 description'),
 			-value=>$self->getValue("karmaPerVote")
 			);
 	} else {
@@ -211,33 +214,33 @@ sub getEditForm {
 	}
 	$tabform->getTab("display")->integer(
 		-name=>"graphWidth",
-		-label=>WebGUI::International::get(5,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('5 description',"Asset_Poll"),
+		-label=>$i18n->get(5),
+		-hoverHelp=>$i18n->get('5 description'),
 		-value=>$self->getValue("graphWidth")
 		);
 	$tabform->getTab("properties")->text(
 		-name=>"question",
-		-label=>WebGUI::International::get(6,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('6 description',"Asset_Poll"),
+		-label=>$i18n->get(6),
+		-hoverHelp=>$i18n->get('6 description'),
 		-value=>$self->getValue("question")
 		);
         $tabform->getTab("properties")->textarea(
 		-name=>"answers",
-		-label=>WebGUI::International::get(7,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('7 description',"Asset_Poll"),
-		-subtext=>('<span class="formSubtext"><br />'.WebGUI::International::get(8,"Asset_Poll").'</span>'),
+		-label=>$i18n->get(7),
+		-hoverHelp=>$i18n->get('7 description'),
+		-subtext=>('<span class="formSubtext"><br />'.$i18n->get(8).'</span>'),
 		-value=>$answers
 		);
 	$tabform->getTab("display")->yesNo(
 		-name=>"randomizeAnswers",
-		-label=>WebGUI::International::get(72,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('72 description',"Asset_Poll"),
+		-label=>$i18n->get(72),
+		-hoverHelp=>$i18n->get('72 description'),
 		-value=>$self->getValue("randomizeAnswers")
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"resetVotes",
-		-label=>WebGUI::International::get(10,"Asset_Poll"),
-		-hoverHelp=>WebGUI::International::get('10 description',"Asset_Poll")
+		-label=>$i18n->get(10),
+		-hoverHelp=>$i18n->get('10 description')
 		) if $self->session->form->process("func") ne 'add';
 	return $tabform;
 }
@@ -291,11 +294,12 @@ sub view {
 	}
 	$var{canVote} = $showPoll;
         my ($totalResponses) = $self->session->db->quickArray("select count(*) from Poll_answer where assetId=".$self->session->db->quote($self->getId));
-	$var{"responses.label"} = WebGUI::International::get(12,"Asset_Poll");
+	my $i18n = WebGUI::International->new($self->session,"Asset_Poll");
+	$var{"responses.label"} = $i18n->get(12);
 	$var{"responses.total"} = $totalResponses;
 	$var{"form.start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl});
         $var{"form.start"} .= WebGUI::Form::hidden($self->session,{name=>'func',value=>'vote'});
-	$var{"form.submit"} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(11,"Asset_Poll")});
+	$var{"form.submit"} = WebGUI::Form::submit($self->session,{value=>$i18n->get(11)});
 	$var{"form.end"} = WebGUI::Form::formFooter($self->session,);
 	$totalResponses = 1 if ($totalResponses < 1);
         for (my $i=1; $i<=20; $i++) {

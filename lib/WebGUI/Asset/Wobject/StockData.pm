@@ -276,6 +276,7 @@ defines wobject properties for Stock Data instances
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
 	my $properties = {
 		templateId =>{
@@ -299,14 +300,15 @@ sub definition {
 			defaultValue=>undef
 		}
 	};
+	my $i18n = WebGUI::International->new($session,"Asset_StockData");
 	push(@{$definition}, {
 		tableName=>'StockData',
 		className=>'WebGUI::Asset::Wobject::StockData',
 		icon=>'stockData.gif',
-		assetName=>WebGUI::International::get("assetName","Asset_StockData"),
+		assetName=>$i18n->get("assetName"),
 		properties=>$properties
 	});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -319,40 +321,41 @@ returns the tabform object that will be used in generating the edit page for Sto
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session,"Asset_StockData");
    	
 	$tabform->getTab("display")->template(
        -name=>"templateId",
        -value=>$self->get("templateId"),
-       -label=>WebGUI::International::get("template_label","Asset_StockData"),
+       -label=>$i18n->get("template_label"),
        -namespace=>"StockData"
     );
 	
 	$tabform->getTab("display")->template(
        -name=>"displayTemplateId",
        -value=>$self->get("displayTemplateId"),
-       -label=>WebGUI::International::get("display_template_label","Asset_StockData"),
+       -label=>$i18n->get("display_template_label"),
        -namespace=>"StockData/Display"
     );
 	
 	$tabform->getTab("properties")->textarea(
 	    -name => "defaultStocks",
-		-label=> WebGUI::International::get("default_stock_label","Asset_StockData"),
+		-label=> $i18n->get("default_stock_label"),
 		-value=> $self->getValue("defaultStocks") 
 	);
 	
 	$tabform->getTab("properties")->selectList(
 	    -name => "source",
-		-label=> WebGUI::International::get("stock_source","Asset_StockData"),
+		-label=> $i18n->get("stock_source"),
 		-options=>$self->_getStockSources(),
 		-value=> [$self->getValue("source")],
-		-hoverHelp=>WebGUI::International::get("stock_source_description","Asset_StockData")
+		-hoverHelp=>$i18n->get("stock_source_description")
 	);
 	
 	$tabform->getTab("properties")->yesNo(
 	    -name=> "failover",
-		-label=> WebGUI::International::get("failover_label","Asset_StockData"),
+		-label=> $i18n->get("failover_label"),
 		-value=>$self->getValue("failover"),
-		-hoverHelp=> WebGUI::International::get("failover_description","Asset_StockData")
+		-hoverHelp=> $i18n->get("failover_description")
 	);
 
 	return $tabform;

@@ -110,8 +110,9 @@ sub chopTitle {
 sub definition {
 	my $class = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Post");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Post"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'post.gif',
                 tableName=>'Post',
                 className=>'WebGUI::Asset::Post',
@@ -370,14 +371,15 @@ sub getReplyUrl {
 sub getStatus {
 	my $self = shift;
 	my $status = $self->get("status");
+	my $i18n = WebGUI::International->new($self->session,"Asset_Post");
         if ($status eq "approved") {
-                return WebGUI::International::get('approved','Asset_Post');
+                return $i18n->get('approved');
         } elsif ($status eq "denied") {
-                return WebGUI::International::get('denied','Asset_Post');
+                return $i18n->get('denied');
         } elsif ($status eq "pending") {
-                return WebGUI::International::get('pending','Asset_Post');
+                return $i18n->get('pending');
         } elsif ($status eq "archived") {
-                return WebGUI::International::get('archived','Asset_Post');
+                return $i18n->get('archived');
         }
 }
 
@@ -498,10 +500,11 @@ sub getUploadControl {
 	my $maxAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
 	my $uploadControl;
 	return undef unless ($maxAttachments);
+	my $i18n = WebGUI::International->new($self->session);
 	if ($self->get("storageId")) {
 		my $i;
 		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
-			$uploadControl .= $self->session->icon->delete("func=deleteFile;filename=".$filename,$self->get("url"),WebGUI::International::get("delete file warning","Asset_Collaboration"))	
+			$uploadControl .= $self->session->icon->delete("func=deleteFile;filename=".$filename,$self->get("url"),$i18n->get("delete file warning"))	
 				.' <a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a>'
 				.'<br />';
 			$i++;
@@ -622,6 +625,7 @@ sub notifySubscribers {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
         my %lang;
+	my $i18n = WebGUI::International->new($self->session);
         foreach my $userId (keys %subscribers) {
                 my $u = WebGUI::User->new($userId);
                 if ($lang{$u->profileField("language")}{message} eq "") {
@@ -629,8 +633,8 @@ sub notifySubscribers {
 			$self->getThread->getParent->appendTemplateLabels($lang{$u->profileField("language")}{var});
 			$lang{$u->profileField("language")}{var}{url} = $self->session->url->getSiteURL().$self->getUrl;
                         $lang{$u->profileField("language")}{var}{'notify.subscription.message'} =
-                                         WebGUI::International::get(875,"Asset_Post",$u->profileField("language"));
-                        $lang{$u->profileField("language")}{subject} = WebGUI::International::get(523,"Asset_Post",$u->profileField("language"));
+                                         $i18n->get(875,"Asset_Post",$u->profileField("language"));
+                        $lang{$u->profileField("language")}{subject} = $i18n->get(523,"Asset_Post",$u->profileField("language"));
                         $lang{$u->profileField("language")}{message} = $self->processTemplate($lang{$u->profileField("language")}{var}, $self->getThread->getParent->get("notificationTemplateId"));
                 }
                 WebGUI::MessageLog::addEntry($userId,"",$lang{$u->profileField("language")}{subject},$lang{$u->profileField("language")}{message});
@@ -642,6 +646,7 @@ sub notifySubscribers {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
+	my $i18n = WebGUI::International->new($self->session);
 	my %data;
 	if ($self->session->form->process("assetId") eq "new") {
 		if ($self->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
@@ -670,7 +675,7 @@ sub processPropertiesFromFormPost {
 	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($self->session->form->process("endDate"));
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
-		$data{content} .= "\n\n --- (".WebGUI::International::get('Edited_on','Asset_Post')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]").WebGUI::International::get('By','Asset_Post').$self->session->user->profileField("alias").") --- \n";
+		$data{content} .= "\n\n --- (".$i18n->get('Edited_on','Asset_Post')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]").$i18n->get('By','Asset_Post').$self->session->user->profileField("alias").") --- \n";
 		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
 			$data{content} = '<p>'.$data{content}.'</p>';
 		}
@@ -956,6 +961,7 @@ sub www_edit {
 	my %var;
 	my $content;
 	my $title;
+	my $i18n = WebGUI::International->new($self->session);
 	if ($self->session->form->process("func") eq "add") { # new post
         	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getParent->getUrl})
 			.WebGUI::Form::hidden({
@@ -1084,10 +1090,10 @@ sub www_edit {
 		richEditId=>$self->getThread->getParent->get("richEditor")
 		});
 	$var{'form.submit'} = WebGUI::Form::submit({
-		extras=>"onclick=\"this.value='".WebGUI::International::get(452)."'; this.form.func.value='editSave'; this.form.submit();return false;\""
+		extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave'; this.form.submit();return false;\""
 		});
 	$var{'form.preview'} = WebGUI::Form::submit({
-		value=>WebGUI::International::get("preview","Asset_Collaboration")
+		value=>$i18n->get("preview","Asset_Collaboration")
 		});
 	$var{'attachment.form'} = $self->getUploadControl;
         $var{'contentType.form'} = WebGUI::Form::contentType({

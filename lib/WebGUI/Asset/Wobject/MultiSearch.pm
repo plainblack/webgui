@@ -42,8 +42,9 @@ defines wobject properties for MultiSearch instances
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new("Asset_MultiSearch");
+	my $i18n = WebGUI::International->new($session, "Asset_MultiSearch");
 	my $properties = {
 		templateId =>{
 			fieldType=>"template",
@@ -57,8 +58,8 @@ sub definition {
 #			fieldType=>"textarea",
 #			defaultValue=>"WebGUI",
 #			tab=>"properties",
-#			hoverHelp=>WebGUI::International::get('article template description','Asset_Article'),
-#			label=>WebGUI::International::get(72,"Asset_Article")
+#			hoverHelp=>$i18n->get('article template description','Asset_Article'),
+#			label=>$i18n->get(72,"Asset_Article")
 #		},
 	};
 	push(@{$definition}, {
@@ -69,7 +70,7 @@ sub definition {
 		autoGenerateForms=>1,
 		properties=>$properties
 	});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

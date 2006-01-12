@@ -36,6 +36,7 @@ if no asset exists at that url, or if the asset has no children.
 sub process {
 	my $session = shift;
         my $url = shift;
+	my $i18n = WebGUI::International->new($session,'Macro_RandomAssetProxy');
 	my $asset = WebGUI::Asset->newByUrl($session, $url);
 	if (defined $asset) {
 		my $children = $asset->getLineage(["children"]);
@@ -47,10 +48,10 @@ sub process {
 			$randomAsset->toggleToolbar;
 			return $randomAsset->canView ? $randomAsset->view() : undef;
 		} else {
-			return WebGUI::International::get('childless','Macro_RandomAssetProxy');
+			return $i18n->get('childless');
 		}
 	} else {
-		return WebGUI::International::get('invalid url','Macro_RandomAssetProxy');
+		return $i18n->get('invalid url');
 	}
 }
 

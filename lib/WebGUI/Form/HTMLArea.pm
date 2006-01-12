@@ -71,25 +71,27 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
         my $class = shift;
+	my $session = shift;
         my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
         push(@{$definition}, {
                 formName=>{
-                        defaultValue=>WebGUI::International::get("477","WebGUI")
+                        defaultValue=>$i18n->get("477")
                         },
                 rows=>{
-                        defaultValue=> $self->session->setting->get("textAreaRows")+20
+                        defaultValue=> $session->setting->get("textAreaRows")+20
                         },
                 columns=>{
-                        defaultValue=> $self->session->setting->get("textAreaCols")+10
+                        defaultValue=> $session->setting->get("textAreaCols")+10
                         },
                 richEditId=>{
-                        defaultValue=>$self->session->setting->get("richEditor") || "PBrichedit000000000001"
+                        defaultValue=>$session->setting->get("richEditor") || "PBrichedit000000000001"
                         },
 		profileEnabled=>{
 			defaultValue=>1
 			},
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

@@ -194,7 +194,8 @@ A reference to the current session.
 sub getList {
 	my $session = shift;
 	my $list = $session->db->buildHashRef("select databaseLinkId, title from databaseLink order by title");
-	$list->{'0'} = WebGUI::International::get(1076);
+	my $i18n = WebGUI::International->new($self->session);
+	$list->{'0'} = $i18n->get(1076);
 	return $list;
 }
 

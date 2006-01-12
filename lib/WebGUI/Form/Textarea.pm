@@ -67,16 +67,18 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("476","WebGUI")
+			defaultValue=>$i18n->get("476")
 			},
 		rows=>{
-			defaultValue=> $self->session->setting->get("textAreaRows") || 5
+			defaultValue=> $session->setting->get("textAreaRows") || 5
 			},
 		columns=>{
-			defaultValue=> $self->session->setting->get("textAreaCols") || 50
+			defaultValue=> $session->setting->get("textAreaCols") || 50
 			},
 		wrap=>{
 			defaultValue=>"virtual"
@@ -85,7 +87,7 @@ sub definition {
 			defaultValue=>1
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

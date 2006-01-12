@@ -68,7 +68,8 @@ sub process {
        		if ($param[0] ne "") {
                		$var{'printable.text'} = $param[0];
        		} else {
-               		$var{'printable.text'} = WebGUI::International::get(53,'Macro_r_printable');
+			my $i18n = WebGUI::International->new($session,'Macro_r_printable');
+               		$var{'printable.text'} = $i18n->get(53);
        		}
 		if ($param[2]) {
          		$temp =  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);

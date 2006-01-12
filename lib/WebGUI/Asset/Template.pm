@@ -78,7 +78,8 @@ sub _execute {
 		return $t->output;
 	} else {
 		$self->session->errorHandler->error("Error in template. ".$@);
-		return WebGUI::International::get('template error', 'Asset_Template').$@;
+		my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+		return $i18n->get('template error').$@;
 	}
 }
 
@@ -98,8 +99,9 @@ A hash reference passed in from a subclass definition.
 sub definition {
         my $class = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Template"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'template.gif',
                 tableName=>'template',
                 className=>'WebGUI::Asset::Template',
@@ -148,14 +150,14 @@ sub getEditForm {
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
 			-options=>$namespaces,
-			-label=>WebGUI::International::get('namespace','Asset_Template'),
-			-hoverHelp=>WebGUI::International::get('namespace description','Asset_Template'),
+			-label=>$i18n->get('namespace'),
+			-hoverHelp=>$i18n->get('namespace description'),
 			-value=>[$self->session->form->process("namespace")] 
 			);
 	} else {
 		$tabform->getTab("meta")->readOnly(
-			-label=>WebGUI::International::get('namespace','Asset_Template'),
-			-hoverHelp=>WebGUI::International::get('namespace description','Asset_Template'),
+			-label=>$i18n->get('namespace'),
+			-hoverHelp=>$i18n->get('namespace description'),
 			-value=>$self->getValue("namespace")
 			);	
 		$tabform->getTab("meta")->hidden(
@@ -166,13 +168,13 @@ sub getEditForm {
 	$tabform->getTab("display")->yesNo(
 		-name=>"showInForms",
 		-value=>$self->getValue("showInForms"),
-		-label=>WebGUI::International::get('show in forms', 'Asset_Template'),
-		-hoverHelp=>WebGUI::International::get('show in forms description', 'Asset_Template'),
+		-label=>$i18n->get('show in forms'),
+		-hoverHelp=>$i18n->get('show in forms description'),
 		);
         $tabform->getTab("properties")->codearea(
 		-name=>"template",
-		-label=>WebGUI::International::get('assetName', 'Asset_Template'),
-		-hoverHelp=>WebGUI::International::get('template description', 'Asset_Template'),
+		-label=>$i18n->get('assetName'),
+		-hoverHelp=>$i18n->get('template description'),
 		-value=>$self->getValue("template")
 		);
 	return $tabform;
@@ -328,8 +330,9 @@ sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->getAdminConsole->setHelp("template add/edit","Asset_Template");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),WebGUI::International::get("style wizard","Asset_Template")) if ($self->get("namespace") eq "style");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit template', 'Asset_Template'));
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
+        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit template'));
 }
 
 #-------------------------------------------------------------------
@@ -532,8 +535,9 @@ $style .= '
 		$output .= WebGUI::Form::submit($self->session,);
 		$output .= WebGUI::Form::formFooter($self->session,);
 	}
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),WebGUI::International::get("edit template","Asset_Template")) if ($self->get("url"));
-        return $self->getAdminConsole->render($output,WebGUI::International::get('style wizard', 'Asset_Template'));
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit template")) if ($self->get("url"));
+        return $self->getAdminConsole->render($output,$i18n->get('style wizard'));
 }
 
 #-------------------------------------------------------------------

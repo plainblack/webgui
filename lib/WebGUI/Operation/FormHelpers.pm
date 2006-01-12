@@ -49,21 +49,22 @@ sub www_formAssetTree {
 
 sub www_richEditPageTree {
 	my $session = shift;
+	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
 		-name=>"url",
-		-label=>WebGUI::International::get(104),
-		-hoverHelp=>WebGUI::International::get('104 description'),
+		-label=>$i18n->get(104),
+		-hoverHelp=>$i18n->get('104 description'),
 		);
 	$f->selectBox(
 		-name=>"target",
-		-label=>WebGUI::International::get('target'),
-		-hoverHelp=>WebGUI::International::get('target description'),
-		-options=>{"_self"=>WebGUI::International::get('link in same window'),
-		           "_blank"=>WebGUI::International::get('link in new window')},
+		-label=>$i18n->get('target'),
+		-hoverHelp=>$i18n->get('target description'),
+		-options=>{"_self"=>$i18n->get('link in same window'),
+		           "_blank"=>$i18n->get('link in new window')},
 		);
 	$f->button(
-		-value=>WebGUI::International::get('done'),
+		-value=>$i18n->get('done'),
 		-extras=>'onclick="createLink()"'
 		);
 	$session->style->setScript($session->config->get("extrasURL")."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
@@ -73,7 +74,7 @@ sub www_richEditPageTree {
 function createLink() {
     if (window.opener) {        
         if (document.getElementById("url_formId").value == "") {
-           alert("'.WebGUI::International::get("link enter alert").'");
+           alert("'.$i18n->get("link enter alert").'");
            document.getElementById("url_formId").focus();
         }
 window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_formId").value,document.getElementById("target_formId").value);

@@ -216,7 +216,8 @@ Returns a link to the first page's data.
 sub getFirstPageLink {
         my ($text, $pn);
 	$pn = $_[0]->getPageNumber;
-        $text = '|&lt;'.WebGUI::International::get(404);
+	my $i18n = WebGUI::International->new($self->session);
+        $text = '|&lt;'.$i18n->get(404);
         if ($pn > 1) {
                 return '<a href="'.
 			$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'=1'))
@@ -238,7 +239,8 @@ Returns a link to the last page's data.
 sub getLastPageLink {
         my ($text, $pn);
 	$pn = $_[0]->getPageNumber;
-        $text = WebGUI::International::get(405).'&gt;|';
+	my $i18n = WebGUI::International->new($self->session);
+        $text = $i18n->get(405).'&gt;|';
         if ($pn != $_[0]->getNumberOfPages) {
                 return '<a href="'.
 			$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'='.$_[0]->getNumberOfPages))
@@ -260,7 +262,8 @@ Returns a link to the next page's data.
 sub getNextPageLink {
         my ($text, $pn);
 	$pn = $_[0]->getPageNumber;
-        $text = WebGUI::International::get(92).'&raquo;';
+	my $i18n = WebGUI::International->new($self->session);
+        $text = $i18n->get(92).'&raquo;';
         if ($pn < $_[0]->getNumberOfPages) {
                 return '<a href="'.$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn+1))).'">'.$text.'</a>';
         } else {
@@ -397,7 +400,8 @@ Returns a link to the previous page's data.
 sub getPreviousPageLink {
 	my ($text, $pn);
 	$pn = $_[0]->getPageNumber;
-	$text = '&laquo;'.WebGUI::International::get(91);
+	my $i18n = WebGUI::International->new($self->session);
+	$text = '&laquo;'.$i18n->get(91);
 	if ($pn > 1) {
 		return '<a href="'.$self->session->url->append($_[0]->{_url},($_[0]->{_formVar}.'='.($pn-1))).'">'.$text.'</a>';
         } else {

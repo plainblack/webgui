@@ -79,13 +79,15 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("LDAPLink_1075","AuthLDAP")
+			defaultValue=>$i18n->get("LDAPLink_1075","AuthLDAP")
 			},
 		label=>{
-			defaultValue=>WebGUI::International::get("LDAPLink_1075","AuthLDAP")
+			defaultValue=>$i18n->get("LDAPLink_1075","AuthLDAP")
 			},
 		size=>{
 			defaultValue=>1
@@ -103,7 +105,7 @@ sub definition {
 			defaultValue=>undef
 			}
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

@@ -27,9 +27,10 @@ use WebGUI::URL;
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
-   my $workarea = shift;
-   my $title = shift;
-   $title = WebGUI::International::get($title,"AuthLDAP") if ($title);
+	my $workarea = shift;
+	my $title = shift;
+	my $i18n = WebGUI::International->new($session,"AuthLDAP");
+   $title = $i18n->get($title) if ($title);
    my $help = shift;
    my $ac = WebGUI::AdminConsole->new($session,"ldapconnections");
    if ($help) {
@@ -39,12 +40,12 @@ sub _submenu {
    if($session->form->process("returnUrl")) {
       $returnUrl = ";returnUrl=".$session->url->escape($session->form->process("returnUrl"));
    }
-   $ac->addSubmenuItem($session->url->page('op=editLDAPLink;llid=new'.$returnUrl), WebGUI::International::get("LDAPLink_982","AuthLDAP"));
+   $ac->addSubmenuItem($session->url->page('op=editLDAPLink;llid=new'.$returnUrl), $i18n->get("LDAPLink_982"));
    if ($session->form->process("op") eq "editLDAPLink" && $session->form->process("llid") ne "new") {
-      $ac->addSubmenuItem($session->url->page('op=editLDAPLink;llid='.$session->form->process("llid").$returnUrl), WebGUI::International::get("LDAPLink_983","AuthLDAP"));
-      $ac->addSubmenuItem($session->url->page('op=copyLDAPLink;llid='.$session->form->process("llid").$returnUrl), WebGUI::International::get("LDAPLink_984","AuthLDAP"));
-	  $ac->addSubmenuItem($session->url->page('op=deleteLDAPLink;llid='.$session->form->process("llid")), WebGUI::International::get("LDAPLink_985","AuthLDAP"));
-	  $ac->addSubmenuItem($session->url->page('op=listLDAPLinks'.$returnUrl), WebGUI::International::get("LDAPLink_986","AuthLDAP"));
+      $ac->addSubmenuItem($session->url->page('op=editLDAPLink;llid='.$session->form->process("llid").$returnUrl), $i18n->get("LDAPLink_983"));
+      $ac->addSubmenuItem($session->url->page('op=copyLDAPLink;llid='.$session->form->process("llid").$returnUrl), $i18n->get("LDAPLink_984"));
+	  $ac->addSubmenuItem($session->url->page('op=deleteLDAPLink;llid='.$session->form->process("llid")), $i18n->get("LDAPLink_985"));
+	  $ac->addSubmenuItem($session->url->page('op=listLDAPLinks'.$returnUrl), $i18n->get("LDAPLink_986"));
    }
    return $ac->render($workarea, $title);
 }
@@ -80,6 +81,7 @@ sub www_editLDAPLink {
    tie %db, 'Tie::CPHash';
    %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    
+	my $i18n = WebGUI::International->new($session,"AuthLDAP");
    $f = WebGUI::HTMLForm->new($session, -extras=>'autocomplete="off"' );
    $f->hidden(
    		-name => "op",
@@ -94,89 +96,89 @@ sub www_editLDAPLink {
 		-value => $session->form->process("returnUrl"),
 	     );
    $f->readOnly(
-		-label => WebGUI::International::get("LDAPLink_991","AuthLDAP"),
+		-label => $i18n->get("LDAPLink_991"),
    		-value => $session->form->process("llid"),
 	       );
    $f->text(
    		-name  => "ldapLinkName",
-		-label => WebGUI::International::get("LDAPLink_992","AuthLDAP"),
-		-hoverHelp => WebGUI::International::get("LDAPLink_992 description","AuthLDAP"),
+		-label => $i18n->get("LDAPLink_992"),
+		-hoverHelp => $i18n->get("LDAPLink_992 description"),
 		-value => $db{ldapLinkName},
 	   );
    $f->text(
    		-name => "ldapUrl",
-		-label => WebGUI::International::get("LDAPLink_993","AuthLDAP"),
-		-hoverHelp => WebGUI::International::get("LDAPLink_993 description","AuthLDAP"),
+		-label => $i18n->get("LDAPLink_993"),
+		-hoverHelp => $i18n->get("LDAPLink_993 description"),
 		-value => $db{ldapUrl},
 	   );
    $f->text(
    		-name => "connectDn",
-		-label => WebGUI::International::get("LDAPLink_994","AuthLDAP"),
-		-hoverHelp => WebGUI::International::get("LDAPLink_994 description","AuthLDAP"),
+		-label => $i18n->get("LDAPLink_994"),
+		-hoverHelp => $i18n->get("LDAPLink_994 description"),
 		-value => $db{connectDn},
 	   );
    $f->password(
    		-name => "ldapIdentifier",
-		-label => WebGUI::International::get("LDAPLink_995","AuthLDAP"),
-		-hoverHelp => WebGUI::International::get("LDAPLink_995 description","AuthLDAP"),
+		-label => $i18n->get("LDAPLink_995"),
+		-hoverHelp => $i18n->get("LDAPLink_995 description"),
 		-value => $db{identifier},
 		);
    $f->text(
    		-name => "ldapUserRDN",
-		-label => WebGUI::International::get(9,'AuthLDAP'),
-		-hoverHelp => WebGUI::International::get('9 description','AuthLDAP'),
+		-label => $i18n->get(9),
+		-hoverHelp => $i18n->get('9 description'),
 		-value => $db{ldapUserRDN},
 	   );
    $f->text(
 		-name => "ldapIdentity",
-		-label => WebGUI::International::get(6,'AuthLDAP'),
-		-hoverHelp => WebGUI::International::get('6 description','AuthLDAP'),
+		-label => $i18n->get(6),
+		-hoverHelp => $i18n->get('6 description'),
 		-value => $db{ldapIdentity},
    );
    $f->text(
 		-name => "ldapIdentityName",
-		-label => WebGUI::International::get(7,'AuthLDAP'),
-		-hoverHelp => WebGUI::International::get('7 description','AuthLDAP'),
+		-label => $i18n->get(7),
+		-hoverHelp => $i18n->get('7 description'),
 		-value => $db{ldapIdentityName},
    );
    $f->text(
 		-name => "ldapPasswordName",
-		-label => WebGUI::International::get(8,'AuthLDAP'),
-		-hoverHelp => WebGUI::International::get('8 description','AuthLDAP'),
+		-label => $i18n->get(8),
+		-hoverHelp => $i18n->get('8 description'),
 		-value => $db{ldapPasswordName},
    );
    $f->yesNo(
              -name=>"ldapSendWelcomeMessage",
              -value=>$db{ldapSendWelcomeMessage},
-             -label=>WebGUI::International::get(868,"AuthLDAP"),
-             -hoverHelp=>WebGUI::International::get('868 description',"AuthLDAP"),
+             -label=>$i18n->get(868),
+             -hoverHelp=>$i18n->get('868 description'),
              );
    $f->textarea(
                 -name=>"ldapWelcomeMessage",
                 -value=>$db{ldapWelcomeMessage},
-                -label=>WebGUI::International::get(869,"AuthLDAP"),
-                -hoverHelp=>WebGUI::International::get('869 description',"AuthLDAP"),
+                -label=>$i18n->get(869),
+                -hoverHelp=>$i18n->get('869 description'),
                );
 	$f->template(
 		-name=>"ldapAccountTemplate",
 		-value=>$db{ldapAccountTemplate},
 		-namespace=>"Auth/LDAP/Account",
-		-label=>WebGUI::International::get("account template","AuthLDAP"),
-		-hoverHelp=>WebGUI::International::get("account template description","AuthLDAP"),
+		-label=>$i18n->get("account template"),
+		-hoverHelp=>$i18n->get("account template description"),
 		);
 	$f->template(
 		-name=>"ldapCreateAccountTemplate",
 		-value=>$db{ldapCreateAccountTemplate},
 		-namespace=>"Auth/LDAP/Create",
-		-label=>WebGUI::International::get("create account template","AuthLDAP"),
-		-hoverHelp=>WebGUI::International::get("create account template description","AuthLDAP"),
+		-label=>$i18n->get("create account template"),
+		-hoverHelp=>$i18n->get("create account template description"),
 		);
 	$f->template(
 		-name=>"ldapLoginTemplate",
 		-value=>$db{ldapLoginTemplate},
 		-namespace=>"Auth/LDAP/Login",
-		-label=>WebGUI::International::get("login template","AuthLDAP"),
-		-hoverHelp=>WebGUI::International::get("login template description","AuthLDAP"),
+		-label=>$i18n->get("login template"),
+		-hoverHelp=>$i18n->get("login template description"),
 		);
    
    $f->submit;
@@ -215,25 +217,26 @@ sub www_listLDAPLinks {
 	my $session = shift;
    return $session->privilege->adminOnly() unless($session->user->isInGroup(3));
    my ($output, $p, $sth, $data, @row, $i);
+	my $i18n = WebGUI::International->new($session,"AuthLDAP");
    my $returnUrl = "";
    if($session->form->process("returnUrl")) {
       $returnUrl = ";returnUrl=".$session->url->escape($session->form->process("returnUrl"));
    }
    $sth = $session->db->read("select * from ldapLink order by ldapLinkName");
-   $row[$i] = '<tr><td valign="top" class="tableData">&nbsp;</td><td valign="top" class="tableData">'.WebGUI::International::get("LDAPLink_1076","AuthLDAP").'</td><td>'.WebGUI::International::get("LDAPLink_1077","AuthLDAP").'</td></tr>';
+   $row[$i] = '<tr><td valign="top" class="tableData">&nbsp;</td><td valign="top" class="tableData">'.$i18n->get("LDAPLink_1076").'</td><td>'.$i18n->get("LDAPLink_1077").'</td></tr>';
    $i++;
    while ($data = $sth->hashRef) {
       $row[$i] = '<tr><td valign="top" class="tableData">'
-	        .$session->icon->delete('op=deleteLDAPLink;llid='.$data->{ldapLinkId},$session->url->page(),WebGUI::International::get("LDAPLink_988","AuthLDAP"))
+	        .$session->icon->delete('op=deleteLDAPLink;llid='.$data->{ldapLinkId},$session->url->page(),$i18n->get("LDAPLink_988"))
 			.$session->icon->edit('op=editLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
 			.$session->icon->copy('op=copyLDAPLink;llid='.$data->{ldapLinkId}.$returnUrl)
 			.'</td>';
       $row[$i] .= '<td valign="top" class="tableData">'.$data->{ldapLinkName}.'</td>';
 	  
 	  my $ldapLink = WebGUI::LDAPLink->new($session,$data->{ldapLinkId});
-	  my $status = WebGUI::International::get("LDAPLink_1078","AuthLDAP");
+	  my $status = $i18n->get("LDAPLink_1078");
 	  if($ldapLink->bind) {
-	     $status = WebGUI::International::get("LDAPLink_1079","AuthLDAP");
+	     $status = $i18n->get("LDAPLink_1079");
 	  }else{
 	     $session->errorHandler->warn($ldapLink->getErrorMessage());
 	  }

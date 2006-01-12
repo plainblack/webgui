@@ -25,7 +25,9 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	return $class->SUPER::definition($definition);
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_MessageBoard");
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -34,19 +36,19 @@ sub definition {
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000047',	
 				namespace=>"MessageBoard",
-                		label=>WebGUI::International::get(73,"Asset_MessageBoard"),
-                		hoverHelp=>WebGUI::International::get('73 description',"Asset_MessageBoard")
+                		label=>$i18n->get(73),
+                		hoverHelp=>$i18n->get('73 description')
 				}
 		);
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_MessageBoard"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'messageBoard.gif',
 		tableName=>'MessageBoard',
 		className=>'WebGUI::Asset::Wobject::MessageBoard',
 		autoGenerateForms=>1,
 		properties=>\%properties
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -57,6 +59,7 @@ sub view {
 	my $count;
 	my $first;
 	my @forum_loop;
+	my $i18n = WebGUI::International->new($self->session,"Asset_MessageBoard");
 	my $children = $self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Wobject::Collaboration"],returnObjects=>1});
 	foreach my $child (@{$children}) {
 		$count++;
@@ -97,13 +100,13 @@ sub view {
 	}
 	$var{'default.listing'} = $first->view if ($count == 1 && defined $first);
 	$var{'forum.add.url'} = $self->getUrl("func=add;class=WebGUI::Asset::Wobject::Collaboration");
-	$var{'forum.add.label'} = WebGUI::International::get(75,"Asset_MessageBoard");
-	$var{'title.label'} = WebGUI::International::get('title','Asset_MessageBoard');
-	$var{'views.label'} = WebGUI::International::get('views',,'Asset_MessageBoard');
-	$var{'rating.label'} = WebGUI::International::get('rating','Asset_MessageBoard');
-	$var{'threads.label'} = WebGUI::International::get('threads','Asset_MessageBoard');
-	$var{'replies.label'} = WebGUI::International::get('replies','Asset_MessageBoard');
-	$var{'lastpost.label'} = WebGUI::International::get('lastpost','Asset_MessageBoard');
+	$var{'forum.add.label'} = $i18n->get(75);
+	$var{'title.label'} = $i18n->get('title');
+	$var{'views.label'} = $i18n->get('views');
+	$var{'rating.label'} = $i18n->get('rating');
+	$var{'threads.label'} = $i18n->get('threads');
+	$var{'replies.label'} = $i18n->get('replies');
+	$var{'lastpost.label'} = $i18n->get('lastpost');
 	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
        	return $self->processTemplate(\%var,$self->get("templateId"));

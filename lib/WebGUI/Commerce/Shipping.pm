@@ -48,10 +48,11 @@ sub configurationForm {
 	$form = shift;
 
 	$f = WebGUI::HTMLForm->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, 'Commerce');
 	$f->yesNo(
 		-name	=> $self->prepend('enabled'),
 		-value	=> $self->enabled,
-		-label	=> WebGUI::International::get('enable', 'Commerce'),
+		-label	=> $i18n->get('enable'),
 		);
 	$f->raw($form);
 

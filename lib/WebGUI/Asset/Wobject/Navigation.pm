@@ -30,9 +30,11 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Navigation");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get("assetName","Asset_Navigation"),
+		assetName=>$i18n->get("assetName"),
 		icon=>'navigation.gif',
 		tableName=>'Navigation',
 		className=>'WebGUI::Asset::Wobject::Navigation',
@@ -75,14 +77,14 @@ sub definition {
 				}
 			}
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
-	my $i18n = WebGUI::International->new("Asset_Navigation");
+	my $i18n = WebGUI::International->new($self->session, "Asset_Navigation");
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-namespace=>"Navigation",
@@ -258,8 +260,8 @@ sub getEditForm {
                           #      this.form.func.value='preview';
                           #      this.form.target = 'navPreview';
                           #      this.form.submit()">};
-	my $saveButton = ' <input type="button" value="'.WebGUI::International::get(62).'" onclick="
-		this.value=\''.WebGUI::International::get(452).'\';
+	my $saveButton = ' <input type="button" value="'.$i18n->get(62,'WebGUI').'" onclick="
+		this.value=\''.$i18n->get(452,'WebGUI').'\';
 		this.form.func.value=\'editSave\';
 		this.form.target=\'_self\';
 		this.form.submit();
@@ -289,7 +291,7 @@ sub getToolbar {
 		if (!$self->isLocked || $self->get("isLockedBy") eq $self->session->user->profileField("userId")) {
 			$toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->get("url"));
 		}
-		my $i18n = WebGUI::International->new("Asset");
+		my $i18n = WebGUI::International->new($self->session, "Asset");
 		return '<script type="text/javascript">
                 var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
                 contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("copy").'");

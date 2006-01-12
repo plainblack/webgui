@@ -41,11 +41,12 @@ sub process {
 	my $session = shift;
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = @_;
+	my $i18n = WebGUI::International->new($session,'Macro_SQL');
 	$format = '^0;' if ($format eq "");
 	if ($statement =~ /^\s*select/i || $statement =~ /^\s*show/i || $statement =~ /^\s*describe/i) {
 		my $sth = $session->dbSlave->unconditionalRead($statement);
 		unless ($sth->errorCode < 1) { 
-			return sprintf WebGUI::International::get('sql error','Macro_SQL'), $sth->errorMessage;
+			return sprintf $i18n->get('sql error'), $sth->errorMessage;
 		} else {
 			while (@data = $sth->array) {
                 		$temp = $format; 
@@ -58,7 +59,7 @@ sub process {
 			return $output;
 		}
 	} else {
-		return WebGUI::International::get('illegal query','Macro_SQL');
+		return $i18n->get('illegal query');
 	}
 }
 

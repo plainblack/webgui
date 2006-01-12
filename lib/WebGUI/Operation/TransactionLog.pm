@@ -70,7 +70,7 @@ sub www_cancelRecurringTransaction {
 	my $session = shift;
 	my ($transaction, $error, $message);
 	
-	my $i18n = WebGUI::International->new("TransactionLog");
+	my $i18n = WebGUI::International->new($session, "TransactionLog");
 	
 	$transaction = WebGUI::Commerce::Transaction->new($session->form->process("tid"));
 	if ($transaction->isRecurring) {

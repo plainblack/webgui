@@ -29,7 +29,7 @@ use WebGUI::URL;
 sub www_editSettings {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-	my $i18n = WebGUI::International->new("WebGUI");
+	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
  	%tabs = (
@@ -109,7 +109,7 @@ sub www_editSettings {
 		);
 	 $tabform->getTab("content")->yesNo(
                 -name=>"autoCommit",
-                -label=>WebGUI::International::get("enable autocommit of asset versioning","Asset"),
+                -label=>$i18n->get("enable autocommit of asset versioning","Asset"),
                 -value=>$session->setting->get("autoCommit")
         	);
 	 $tabform->getTab("content")->yesNo(

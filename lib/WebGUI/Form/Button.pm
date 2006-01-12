@@ -55,16 +55,18 @@ The default text to appear on the button. Defaults to an internationalized versi
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session,"WebGUI");
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("button","WebGUI")
+			defaultValue=>"button"
 			},
 		defaultValue=>{
-			defaultValue=>WebGUI::International::get(62,"WebGUI")
+			defaultValue=>$i18n->get(62)
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

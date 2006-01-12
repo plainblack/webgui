@@ -90,8 +90,9 @@ sub _fieldAdminIcons {
 	my $fid = shift;
 	my $tid = shift;
 	my $cantDelete = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	my $output;
-	$output = $self->session->icon->delete('func=deleteFieldConfirm;fid='.$fid.';tid='.$tid,$self->get("url"),WebGUI::International::get(19,"Asset_DataForm")) unless ($cantDelete);
+	$output = $self->session->icon->delete('func=deleteFieldConfirm;fid='.$fid.';tid='.$tid,$self->get("url"),$i18n->get(19)) unless ($cantDelete);
 	$output .= $self->session->icon->edit('func=editField;fid='.$fid.';tid='.$tid,$self->get("url"))
 		.$self->session->icon->moveUp('func=moveFieldUp;fid='.$fid.';tid='.$tid,$self->get("url"))
 		.$self->session->icon->moveDown('func=moveFieldDown;fid='.$fid.';tid='.$tid,$self->get("url"));
@@ -102,8 +103,9 @@ sub _tabAdminIcons {
 	my $self = shift;
 	my $tid = shift;
 	my $cantDelete = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	my $output;
-	$output = $self->session->icon->delete('func=deleteTabConfirm;tid='.$tid,$self->get("url"),WebGUI::International::get(100,"Asset_DataForm")) unless ($cantDelete);
+	$output = $self->session->icon->delete('func=deleteTabConfirm;tid='.$tid,$self->get("url"),$i18n->get(100)) unless ($cantDelete);
 	$output .= $self->session->icon->edit('func=editTab;tid='.$tid,$self->get("url"))
 		.$self->session->icon->moveLeft('func=moveTabLeft;tid='.$tid,$self->get("url"))
 		.$self->session->icon->moveRight('func=moveTabRight;tid='.$tid,$self->get("url"));
@@ -135,9 +137,11 @@ sub defaultViewForm {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_DataForm");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_DataForm"),
+		assetName=>$i18n->get('assetName'),
 		uiLevel => 5,
                 tableName=>'DataForm',
 		icon=>'dataForm.gif',
@@ -177,7 +181,7 @@ sub definition {
 				},
 			}
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -212,13 +216,14 @@ sub duplicate {
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	my $tabform = $self->SUPER::getEditForm;
 	$tabform->getTab("display")->template(
 		-name=>"templateId",
       		-value=>$self->getValue("templateId"),
       		-namespace=>"DataForm",
-                -label=>WebGUI::International::get(82,"Asset_DataForm"),
-                -hoverHelp=>WebGUI::International::get('82 description',"Asset_DataForm"),
+                -label=>$i18n->get(82),
+                -hoverHelp=>$i18n->get('82 description'),
 		-afterEdit=>'func=edit',
 		-defaultValue=>"PBtmpl0000000000000141"
    		);
@@ -226,59 +231,59 @@ sub getEditForm {
                 -name=>"emailTemplateId",
                 -value=>$self->getValue("emailTemplateId"),
                 -namespace=>"DataForm",
-                -label=>WebGUI::International::get(80,"Asset_DataForm"),
-                -hoverHelp=>WebGUI::International::get('80 description',"Asset_DataForm"),
+                -label=>$i18n->get(80),
+                -hoverHelp=>$i18n->get('80 description'),
                 -afterEdit=>'func=edit'
                 );
         $tabform->getTab("display")->template(
                 -name=>"acknowlegementTemplateId",
                 -value=>$self->getValue("acknowlegementTemplateId"),
                 -namespace=>"DataForm",
-                -label=>WebGUI::International::get(81,"Asset_DataForm"),
-                -hoverHelp=>WebGUI::International::get('81 description',"Asset_DataForm"),
+                -label=>$i18n->get(81),
+                -hoverHelp=>$i18n->get('81 description'),
                 -afterEdit=>'func=edit'
                 );
         $tabform->getTab("display")->template(
                 -name=>"listTemplateId",
                 -value=>$self->getValue("listTemplateId"),
                 -namespace=>"DataForm/List",
-                -label=>WebGUI::International::get(87,"Asset_DataForm"),
-                -hoverHelp=>WebGUI::International::get('87 description',"Asset_DataForm"),
+                -label=>$i18n->get(87),
+                -hoverHelp=>$i18n->get('87 description'),
                 -afterEdit=>'func=edit'
                 );
 	$tabform->getTab("display")->radioList(
 		-name=>"defaultView",
-                -options=>{ 0 => WebGUI::International::get('data form','Asset_DataForm'),
-                            1 => WebGUI::International::get('data list','Asset_DataForm'),},
-		-label=>WebGUI::International::get('defaultView',"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('defaultView description',"Asset_DataForm"),
+                -options=>{ 0 => $i18n->get('data form'),
+                            1 => $i18n->get('data list'),},
+		-label=>$i18n->get('defaultView'),
+		-hoverHelp=>$i18n->get('defaultView description'),
 		-value=>$self->getValue("defaultView"),
 		);
 	$tabform->getTab("properties")->HTMLArea(
 		-name=>"acknowledgement",
-		-label=>WebGUI::International::get(16, "Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('16 description', "Asset_DataForm"),
-		-value=>($self->get("acknowledgement") || WebGUI::International::get(3, "Asset_DataForm"))
+		-label=>$i18n->get(16),
+		-hoverHelp=>$i18n->get('16 description'),
+		-value=>($self->get("acknowledgement") || $i18n->get(3))
 		);
 	$tabform->getTab("properties")->yesNo(
 		-name=>"mailData",
-		-label=>WebGUI::International::get(74,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('74 description',"Asset_DataForm"),
+		-label=>$i18n->get(74),
+		-hoverHelp=>$i18n->get('74 description'),
 		-value=>$self->getValue("mailData")
 		);
 
 	$tabform->getTab("security")->group(
 		-name=>"groupToViewEntries",
-		-label=>WebGUI::International::get('group to view entries', "Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('group to view entries description',"Asset_DataForm"),
+		-label=>$i18n->get('group to view entries'),
+		-hoverHelp=>$i18n->get('group to view entries description'),
 		-value=>$self->getValue("groupToViewEntries")
 		);
 
 	if ($self->getId eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
         	$tabform->getTab("properties")->whatNext(
 			-options=>{
-				editField=>WebGUI::International::get(76,"Asset_DataForm"),
-				""=>WebGUI::International::get(745,"Asset_DataForm")
+				editField=>$i18n->get(76),
+				""=>$i18n->get(745)
 				},
 			-value=>"editField"
 			);
@@ -292,12 +297,13 @@ sub getEditForm {
 sub getListTemplateVars {
 	my $self = shift;
 	my $var = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	my @fieldLoop;
 	$var->{"back.url"} = $self->getFormUrl;
-	$var->{"back.label"} = WebGUI::International::get('go to form',"Asset_DataForm");
+	$var->{"back.label"} = $i18n->get('go to form');
 	#$var->{"entryId"} = $self->getId;
 	#$var->{"delete.url"} = $self->getUrl.";func=deleteAllEntries";
-	#$var->{"delete.label"} = WebGUI::International::get(91,"Asset_DataForm");
+	#$var->{"delete.label"} = $i18n->get(91);
 	my $fields = $self->session->db->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
 			where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
 	while (my $field = $fields->hashRef) {
@@ -333,7 +339,7 @@ sub getListTemplateVars {
 			"record.edit.url"=>$self->getUrl("func=view;entryId=".$record->{DataForm_entryId}),
 			"record.edit.icon"=>$self->session->icon->edit("func=view;entryId=".$record->{DataForm_entryId}, $self->getUrl),
 			"record.delete.url"=>$self->getUrl("func=deleteEntry;entryId=".$record->{DataForm_entryId}),
-			"record.delete.icon"=>$self->session->icon->delete("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, WebGUI::International::get('Delete entry confirmation',"Asset_DataForm")),
+			"record.delete.icon"=>$self->session->icon->delete("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, $i18n->get('Delete entry confirmation')),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},
@@ -381,21 +387,22 @@ sub getListUrl {
 sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{canEdit} = ($self->canEdit);
 	#$var->{"entryList.url"} = $self->getUrl('func=view;entryId=list');
 	$var->{"entryList.url"} = $self->getListUrl;
-	$var->{"entryList.label"} = WebGUI::International::get(86,"Asset_DataForm");
+	$var->{"entryList.label"} = $i18n->get(86);
 	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
-	$var->{"export.tab.label"} = WebGUI::International::get(84,"Asset_DataForm");
+	$var->{"export.tab.label"} = $i18n->get(84);
 	$var->{"delete.url"} = $self->getUrl('func=deleteEntry;entryId='.$var->{entryId});
-	$var->{"delete.label"} = WebGUI::International::get(90,"Asset_DataForm");
+	$var->{"delete.label"} = $i18n->get(90);
 	$var->{"back.url"} = $self->getUrl;
-	$var->{"back.label"} = WebGUI::International::get(18,"Asset_DataForm");
+	$var->{"back.label"} = $i18n->get(18);
 	$var->{"addField.url"} = $self->getUrl('func=editField');
-	$var->{"addField.label"} = WebGUI::International::get(76,"Asset_DataForm");
+	$var->{"addField.label"} = $i18n->get(76);
 	# add Tab label, url, header and init
-	$var->{"addTab.label"}=  WebGUI::International::get(105,"Asset_DataForm");;
+	$var->{"addTab.label"}=  $i18n->get(105);;
 	$var->{"addTab.url"}= $self->getUrl('func=editTab');
 	$var->{"tab.init"}= _createTabInit($self->getId);
 	$var->{"form.start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
@@ -507,7 +514,7 @@ sub getRecordTemplateVars {
 	$var->{field_loop} = \@fields;
 	$tabsth->finish;
 	$var->{tab_loop} = \@tabs;
-	$var->{"form.send"} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(73, "Asset_DataForm")});
+	$var->{"form.send"} = WebGUI::Form::submit($self->session,{value=>$i18n->get(73)});
 	$var->{"form.save"} = WebGUI::Form::submit($self->session,);
 	$var->{"form.end"} = WebGUI::Form::formFooter($self->session,);
 	return $var;
@@ -519,12 +526,13 @@ sub getRecordTemplateVars {
 sub processPropertiesFromFormPost {	
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
+	my $i18n = WebGUI::International->new($self->session, "Asset_DataForm");
 	if ($self->session->form->process("assetId") eq "new") {
 		$self->setCollateral("DataForm_field","DataForm_fieldId",{
 			DataForm_fieldId=>"new",
 			DataForm_tabId=>0,
 			name=>"from",
-			label=>WebGUI::International::get(10,"Asset_DataForm"),
+			label=>$i18n->get(10),
 			status=>"editable",
 			isMailField=>1,
 			width=>0,
@@ -534,7 +542,7 @@ sub processPropertiesFromFormPost {
 			DataForm_fieldId=>"new",
 			DataForm_tabId=>0,
 			name=>"to",
-			label=>WebGUI::International::get(11,"Asset_DataForm"),
+			label=>$i18n->get(11),
 			status=>"hidden",
 			isMailField=>1,
 			width=>0,
@@ -545,7 +553,7 @@ sub processPropertiesFromFormPost {
 			DataForm_fieldId=>"new",
 			DataForm_tabId=>0,
 			name=>"cc",
-			label=>WebGUI::International::get(12,"Asset_DataForm"),
+			label=>$i18n->get(12),
 			status=>"hidden",
 			isMailField=>1,
 			width=>0,
@@ -555,7 +563,7 @@ sub processPropertiesFromFormPost {
 			DataForm_fieldId=>"new",
 			DataForm_tabId=>0,
 			name=>"bcc",
-			label=>WebGUI::International::get(13,"Asset_DataForm"),
+			label=>$i18n->get(13),
 			status=>"hidden",
 			isMailField=>1,
 			width=>0,
@@ -565,12 +573,12 @@ sub processPropertiesFromFormPost {
 			DataForm_fieldId=>"new",
 			DataForm_tabId=>0,
 			name=>"subject",
-			label=>WebGUI::International::get(14,"Asset_DataForm"),
+			label=>$i18n->get(14),
 			status=>"editable",
 			isMailField=>1,
 			width=>0,
 			type=>"text",
-			defaultValue=>WebGUI::International::get(2,"Asset_DataForm")
+			defaultValue=>$i18n->get(2)
 			});
 	}
 	if ($self->session->form->process("fid") eq "new") { # hack to get proceed to work.
@@ -742,21 +750,22 @@ sub www_deleteTabConfirm {
 sub www_editField {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     	my (%field, $f, %fieldStatus,$tab);
     	tie %field, 'Tie::CPHash';
     	tie %fieldStatus, 'Tie::IxHash';
 	%fieldStatus = ( 
-		"hidden" => WebGUI::International::get(4, "Asset_DataForm"),
-		"visible" => WebGUI::International::get(5, "Asset_DataForm"),
-		"editable" => WebGUI::International::get(6, "Asset_DataForm"),
-		"required" => WebGUI::International::get(75, "Asset_DataForm") 
+		"hidden" => $i18n->get(4),
+		"visible" => $i18n->get(5),
+		"editable" => $i18n->get(6),
+		"required" => $i18n->get(75) 
 		);
         $self->session->form->process("fid") = "new" if ($self->session->form->process("fid") eq "");
 	unless ($self->session->form->process("fid") eq "new") {	
         	%field = $self->session->db->quickHash("select * from DataForm_field where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
 	}
 	$tab = $self->session->db->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
-	$tab->{0} = WebGUI::International::get("no tab","Asset_DataForm");
+	$tab->{0} = $i18n->get("no tab");
         $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "fid",
@@ -768,96 +777,96 @@ sub www_editField {
 	);
 	$f->text(
                 -name=>"label",
-                -label=>WebGUI::International::get(77,"Asset_DataForm"),
-                -hoverHelp=>WebGUI::International::get('77 description',"Asset_DataForm"),
+                -label=>$i18n->get(77),
+                -hoverHelp=>$i18n->get('77 description'),
                 -value=>$field{label}
                 );
         $f->text(
 		-name=>"name",
-		-label=>WebGUI::International::get(21,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('21 description',"Asset_DataForm"),
+		-label=>$i18n->get(21),
+		-hoverHelp=>$i18n->get('21 description'),
 		-value=>$field{name}
 		);
 	if($field{sequenceNumber} && ! $field{isMailField}) {
 		$f->integer(
 			-name=>"position",
-			-label=>WebGUI::International::get('Field Position',"Asset_DataForm"),
-			-hoverHelp=>WebGUI::International::get('Field Position description',"Asset_DataForm"),
+			-label=>$i18n->get('Field Position'),
+			-hoverHelp=>$i18n->get('Field Position description'),
 			-value=>$field{sequenceNumber}
 		);	
 	}
 	$f->selectBox(
 		-name=>"tid",
 		-options=>$tab,
-		-label=>WebGUI::International::get(104,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('104 description',"Asset_DataForm"),
+		-label=>$i18n->get(104),
+		-hoverHelp=>$i18n->get('104 description'),
 		-value=>[ $field{DataForm_tabId} || 0 ]
 		); 
         $f->text(
                 -name=>"subtext",
                 -value=>$field{subtext},
-                -label=>WebGUI::International::get(79,"Asset_DataForm"),
-                -hoverHelp=>WebGUI::International::get('79 description',"Asset_DataForm"),
+                -label=>$i18n->get(79),
+                -hoverHelp=>$i18n->get('79 description'),
                 );
         $f->selectBox(
 		-name=>"status",
 		-options=>\%fieldStatus,
-		-label=>WebGUI::International::get(22,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('22 description',"Asset_DataForm"),
+		-label=>$i18n->get(22),
+		-hoverHelp=>$i18n->get('22 description'),
 		-value=> [ $field{status} || "editable" ] ,
 		); 
 	$f->fieldType(
 		-name=>"type",
-		-label=>WebGUI::International::get(23,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('23 description',"Asset_DataForm"),
+		-label=>$i18n->get(23),
+		-hoverHelp=>$i18n->get('23 description'),
 		-value=>$field{type} || "text",
 		-types=>[qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList)]
 		);
 	$f->integer(
 		-name=>"width",
-		-label=>WebGUI::International::get(8,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('8 description',"Asset_DataForm"),
+		-label=>$i18n->get(8),
+		-hoverHelp=>$i18n->get('8 description'),
 		-value=>($field{width} || 0)
 		);
 	$f->integer(
                 -name=>"rows",
 		-value=>$field{rows} || 0,
-		-label=>WebGUI::International::get(27,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('27 description',"Asset_DataForm"),
-		-subtext=>WebGUI::International::get(28,"Asset_DataForm"),
+		-label=>$i18n->get(27),
+		-hoverHelp=>$i18n->get('27 description'),
+		-subtext=>$i18n->get(28),
 		);
 	$f->yesNo(
 		-name=>"vertical",
 		-value=>$field{vertical},
-		-label=>WebGUI::International::get('editField vertical label', "Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('editField vertical label description', "Asset_DataForm"),
-		-subtext=>WebGUI::International::get('editField vertical subtext', "Asset_DataForm")
+		-label=>$i18n->get('editField vertical label'),
+		-hoverHelp=>$i18n->get('editField vertical label description'),
+		-subtext=>$i18n->get('editField vertical subtext')
 		);
 	$f->text(
 		-name=>"extras",
 		-value=>$field{extras},
-		-label=>WebGUI::International::get('editField extras label', "Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('editField extras label description', "Asset_DataForm"),
+		-label=>$i18n->get('editField extras label'),
+		-hoverHelp=>$i18n->get('editField extras label description'),
 		);
         $f->textarea(
 		-name=>"possibleValues",
-		-label=>WebGUI::International::get(24,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('24 description',"Asset_DataForm"),
+		-label=>$i18n->get(24),
+		-hoverHelp=>$i18n->get('24 description'),
 		-value=>$field{possibleValues},
-		-subtext=>'<br />'.WebGUI::International::get(85,"Asset_DataForm")
+		-subtext=>'<br />'.$i18n->get(85)
 		);
         $f->textarea(
 		-name=>"defaultValue",
-		-label=>WebGUI::International::get(25,"Asset_DataForm"),
-		-hoverHelp=>WebGUI::International::get('25 description',"Asset_DataForm"),
+		-label=>$i18n->get(25),
+		-hoverHelp=>$i18n->get('25 description'),
 		-value=>$field{defaultValue},
-		-subtext=>'<br />'.WebGUI::International::get(85,"Asset_DataForm")
+		-subtext=>'<br />'.$i18n->get(85)
 		);
 	if ($self->session->form->process("fid") eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
         	$f->whatNext(
 			-options=>{
-				"editField"=>WebGUI::International::get(76,"Asset_DataForm"),
-				"viewDataForm"=>WebGUI::International::get(745,"Asset_DataForm")
+				"editField"=>$i18n->get(76),
+				"viewDataForm"=>$i18n->get(745)
 				},
 			-value=>"editField"
 			);
@@ -865,7 +874,7 @@ sub www_editField {
         $f->submit;
 	my $ac = $self->getAdminConsole;
 	$ac->setHelp("data form fields add/edit","Asset_DataForm");
-        return $ac->render($f->print,WebGUI::International::get('20',"Asset_DataForm"));
+        return $ac->render($f->print,$i18n->get('20'));
 }
 
 #-------------------------------------------------------------------
@@ -908,6 +917,7 @@ sub www_editFieldSave {
 sub www_editTab {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
         $self->session->form->process("tid") = "new" if ($self->session->form->process("tid") eq "");
@@ -925,20 +935,20 @@ sub www_editTab {
 	);
 	$f->text(
                 -name=>"label",
-		-label=>WebGUI::International::get(101,"Asset_DataForm"),
+		-label=>$i18n->get(101),
                 -value=>$tab{label}
                 );
         $f->textarea(
 		-name=>"subtext",
-		-label=>WebGUI::International::get(79,"Asset_DataForm"),
+		-label=>$i18n->get(79),
 		-value=>$tab{subtext},
 		-subtext=>""
 		);
 	if ($self->session->form->process("tid") eq "new") {
         	$f->whatNext(
 			-options=>{
-				editTab=>WebGUI::International::get(103,"Asset_DataForm"),
-				""=>WebGUI::International::get(745,"Asset_DataForm")
+				editTab=>$i18n->get(103),
+				""=>$i18n->get(745)
 				},
 			-value=>"editTab"
 			);
@@ -946,7 +956,7 @@ sub www_editTab {
         $f->submit;
 	my $ac = $self->getAdminConsole;
 	$ac->setHelp("data form fields add/edit","Asset_DataForm");
-        return $ac->render($f->print,WebGUI::International::get('20',"Asset_DataForm"));
+        return $ac->render($f->print,$i18n->get('20'));
 }
 
 #-------------------------------------------------------------------
@@ -1064,6 +1074,7 @@ sub www_process {
 		},0);
 	my ($var, %row, @errors, $updating, $hadErrors);
 	$var->{entryId} = $entryId;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	tie %row, "Tie::CPHash";
 	my $sth = $self->session->db->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
 		where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
@@ -1076,7 +1087,7 @@ sub www_process {
 		}
 		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
 			push (@errors,{
-				"error.message"=>$row{label}." ".WebGUI::International::get(29,"Asset_DataForm").".",
+				"error.message"=>$row{label}." ".$i18n->get(29).".",
 				});
 			$hadErrors = 1;
 			delete $var->{entryId};

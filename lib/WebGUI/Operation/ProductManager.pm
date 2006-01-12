@@ -19,7 +19,7 @@ use WebGUI::Grouping;
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
-	my $i18n = WebGUI::International->new("ProductManager");
+	my $i18n = WebGUI::International->new($session, "ProductManager");
 
 	my $workarea = shift;
         my $title = shift;
@@ -83,7 +83,7 @@ sub www_editProduct {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
-	$i18n = WebGUI::International->new('ProductManager');	
+	$i18n = WebGUI::International->new($session, 'ProductManager');	
 	$productId = $session->form->process("productId");
 	
 	unless ($productId eq 'new') {
@@ -159,7 +159,7 @@ sub www_editProductSave {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
-	$i18n = WebGUI::International->new('ProductManager');
+	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
 	push(@error, $i18n->get('edit product title error')) unless $session->form->process("title");
 	push(@error, $i18n->get('edit product price error')) unless ($session->form->process("price") && $session->form->process("price") =~ /^\d+(\.\d+)?$/);
@@ -191,7 +191,7 @@ sub www_editProductParameter {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	$i18n = WebGUI::International->new('ProductManager');
+	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
 	$parameterId = $session->form->process("parameterId");
 	$productId = $session->form->process("productId");
@@ -238,7 +238,7 @@ sub www_editProductParameterSave {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	$i18n = WebGUI::International->new('ProductManager');
+	$i18n = WebGUI::International->new($session, 'ProductManager');
 
 	$parameterId = $session->form->process("parameterId");
 	
@@ -277,7 +277,7 @@ sub www_editProductParameterOption {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	$i18n = WebGUI::International->new('ProductManager');
+	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
 	$optionId = $session->form->process("optionId");
 	unless ($optionId eq 'new') {
@@ -341,7 +341,7 @@ sub www_editProductParameterOptionSave {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	$i18n = WebGUI::International->new('ProductManager');
+	$i18n = WebGUI::International->new($session, 'ProductManager');
 
 	push (@error, $i18n->get('edit option value error')) unless ($session->form->process("value"));
 	push (@error, $i18n->get('edit option parameterId error')) unless ($session->form->process("parameterId"));
@@ -368,7 +368,7 @@ sub www_editProductVariant {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
-	$i18n = WebGUI::International->new("ProductManager");
+	$i18n = WebGUI::International->new($session, "ProductManager");
 	
 	$variantId = $session->form->process("variantId");
 	$variant = WebGUI::Product->getByVariantId($variantId)->getVariant($variantId);
@@ -434,7 +434,7 @@ sub www_editSkuTemplate {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	$i18n = WebGUI::International->new("ProductManager");
+	$i18n = WebGUI::International->new($session, "ProductManager");
 	
 	$productId = $session->form->process("productId");
 	$product = WebGUI::Product->new($productId);
@@ -488,7 +488,7 @@ sub www_listProducts {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	$i18n = WebGUI::International->new('ProductManager');
+	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
 	$session->scratch->set('managingProduct', '-delete-');
 	
@@ -516,7 +516,7 @@ sub www_listProductVariants {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
-	$i18n = WebGUI::International->new("ProductManager");
+	$i18n = WebGUI::International->new($session, "ProductManager");
 	
 	$productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
 
@@ -598,7 +598,7 @@ sub www_manageProduct {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
-	$i18n = WebGUI::International->new("ProductManager");
+	$i18n = WebGUI::International->new($session, "ProductManager");
 	
 	$productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
 	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);

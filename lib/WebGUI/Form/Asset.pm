@@ -20,7 +20,6 @@ use WebGUI::Asset;
 use WebGUI::Form::Button;
 use WebGUI::Form::Hidden;
 use WebGUI::Form::Text;
-use WebGUI::International;
 use WebGUI::Session;
 
 =head1 NAME
@@ -67,22 +66,24 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("asset","Asset")
+			defaultValue=>$i18n->get("asset");
 			},
 		label=>{
-			defaultValue=>WebGUI::International::get("asset","Asset")
+			defaultValue=>$i18n->get("asset");
 			},
 		name=>{
-			defaultValue=> "asset"
+			defaultValue=>"asset";
 			},
 		class=>{
 			defaultValue=> undef
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

@@ -70,56 +70,58 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
         my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
+	my $i18n = WebGUI::International->new($session,'Asset_SyndicatedContent');
 	%properties = (
 			templateId =>{
 				tab=>"display",
 				fieldType=>'template',
 				defaultValue=>'PBtmpl0000000000000065',
 				namespace=>'SyndicatedContent',
-               	 		label=>WebGUI::International::get(72,'Asset_SyndicatedContent'),
-                		hoverHelp=>WebGUI::International::get('72 description','Asset_SyndicatedContent')
+               	 		label=>$i18n->get(72),
+                		hoverHelp=>$i18n->get('72 description')
 				},
 			rssUrl=>{
 				tab=>"properties",
 				defaultValue=>undef,
 				fieldType=>'textarea',
-				label=>WebGUI::International::get(1,'Asset_SyndicatedContent'),
-                		hoverHelp=>WebGUI::International::get('1 description','Asset_SyndicatedContent')
+				label=>$i18n->get(1),
+                		hoverHelp=>$i18n->get('1 description')
 				},
                         maxHeadlines=>{
 				tab=>"properties",
 				fieldType=>'integer',
 				defaultValue=>10,
-				label=>WebGUI::International::get(3,'Asset_SyndicatedContent'),
-                		hoverHelp=>WebGUI::International::get('3 description','Asset_SyndicatedContent')
+				label=>$i18n->get(3),
+                		hoverHelp=>$i18n->get('3 description')
 				},
 			displayMode=>{
 				tab=>"display",
 				fieldType=>'selectBox',
 				defaultValue=>'interleaved',
 				options=>{
-                        		'interleaved'=>WebGUI::International::get('interleaved','Asset_SyndicatedContent'),
-                        		'grouped'=>WebGUI::International::get('grouped','Asset_SyndicatedContent'),
+                        		'interleaved'=>$i18n->get('interleaved'),
+                        		'grouped'=>$i18n->get('grouped'),
                          		},
                 		sortByValue=>1,
-                		label=>WebGUI::International::get('displayModeLabel','Asset_SyndicatedContent'),
-                		hoverHelp=>WebGUI::International::get('displayModeLabel description','Asset_SyndicatedContent'),
-                		subtext=>WebGUI::International::get('displayModeSubtext','Asset_SyndicatedContent')
+                		label=>$i18n->get('displayModeLabel'),
+                		hoverHelp=>$i18n->get('displayModeLabel description'),
+                		subtext=>$i18n->get('displayModeSubtext')
 				},
 			hasTerms=>{
 				tab=>"properties",
 				fieldType=>'text',
 				defaultValue=>'',
-				label=>WebGUI::International::get('hasTermsLabel','Asset_SyndicatedContent'),
-                		hoverHelp=>WebGUI::International::get('hasTermsLabel description','Asset_SyndicatedContent'),
+				label=>$i18n->get('hasTermsLabel'),
+                		hoverHelp=>$i18n->get('hasTermsLabel description'),
                 		maxlength=>255
 				}
 		);
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName','Asset_SyndicatedContent'),
+		assetName=>$i18n->get('assetName'),
 		uiLevel=>6,
 		autoGenerateForms=>1,
 		icon=>'syndicatedContent.gif',
@@ -127,7 +129,7 @@ sub definition {
                 className=>'WebGUI::Asset::Wobject::SyndicatedContent',
                 properties=>\%properties
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -531,7 +533,8 @@ sub view {
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _constructRSSHeadTitleLink{
     my($var,$rssTitle)=@_;
-    my $rssFeedSuffix=WebGUI::International::get('RSS Feed Title Suffix','Asset_SyndicatedContent');
+	my $i18n = WebGUI::International->new($self->session,'Asset_SyndicatedContent');
+    my $rssFeedSuffix=$i18n->get('RSS Feed Title Suffix');
     my $title = ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix;
 	$title =~ s/\"/&quot;/g;
     $self->session->style->setLink($var->{'rss.url'},

@@ -36,7 +36,8 @@ sub process {
 	my $session = shift;
         my @param = @_;
 	if ($param[0] =~ /passwd/ || $param[0] =~ /shadow/ || $param[0] =~ /\.conf/) {
-		return WebGUI::International::get('execute error', 'Macro_Execute');
+		my $i18n = WebGUI::International->new($session, 'Macro_Execute');
+		return $i18n->get('execute error');
 	} else {
        		return `$param[0]`;
 	}

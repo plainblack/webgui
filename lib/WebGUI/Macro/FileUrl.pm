@@ -47,7 +47,8 @@ sub process {
 		my $storage = WebGUI::Storage->get($asset->get("storageId"));
 		return $storage->getUrl($asset->get("filename"));
 	} else {
-		return WebGUI::International::get('invalid url', 'Macro_FileUrl');
+		my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
+		return $i18n->get('invalid url');
 	}
 }
 

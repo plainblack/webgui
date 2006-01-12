@@ -34,7 +34,7 @@ sub _generateCode {
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
-	my $i18n = WebGUI::International->new("Subscription");
+	my $i18n = WebGUI::International->new($session, "Subscription");
 
 	my $workarea = shift;
         my $title = shift;
@@ -59,7 +59,7 @@ sub www_createSubscriptionCodeBatch {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	$error = shift;
-	my $i18n = WebGUI::International->new("Subscription");
+	my $i18n = WebGUI::International->new($session, "Subscription");
 
 	$errorMessage = $i18n->get('create batch error').'<ul><li>'.join('</li><li>', @{$error}).'</li></ul>' if ($error);
 	
@@ -117,7 +117,7 @@ sub www_createSubscriptionCodeBatchSave {
 		@error, $creationEpoch);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	my $i18n = WebGUI::International->new("Subscription");	
+	my $i18n = WebGUI::International->new($session, "Subscription");	
 	
 	$numberOfCodes = $session->form->process("noc");
 	$description = $session->form->process("description");
@@ -193,7 +193,7 @@ sub www_editSubscription {
 	my ($properties, $subscriptionId, $durationInterval, $durationUnits, $f);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	my $i18n = WebGUI::International->new("Subscription");
+	my $i18n = WebGUI::International->new($session, "Subscription");
 	
 	unless ($session->form->process("sid") eq 'new') {
 		$properties = WebGUI::Subscription->new($session->form->process("sid"))->get;
@@ -282,7 +282,7 @@ sub www_listSubscriptionCodeBatches {
 	my ($p, $batches, $output);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	my $i18n = WebGUI::International->new("Subscription");
+	my $i18n = WebGUI::International->new($session, "Subscription");
 	
 	$p = WebGUI::Paginator->new($session,$session->url->page('op=listSubscriptionCodeBatches'));
 	$p->setDataByQuery("select * from subscriptionCodeBatch");
@@ -312,7 +312,7 @@ sub www_listSubscriptionCodes {
 	my ($p, $codes, $output, $where, $ops, $delete);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 
-	my $i18n = WebGUI::International->new("Subscription");
+	my $i18n = WebGUI::International->new($session, "Subscription");
 	
 	my $dcStart = $session->form->date('dcStart');
 	my $dcStop  = $session->datetime->addToTime($session->form->date('dcStop'),23,59);
@@ -394,7 +394,7 @@ sub www_listSubscriptions {
 	my ($p, $subscriptions, $output);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	my $i18n = WebGUI::International->new("Subscription");
+	my $i18n = WebGUI::International->new($session, "Subscription");
 	
 	$p = WebGUI::Paginator->new($session,$session->url->page('op=listSubscriptions'));
 	$p->setDataByQuery('select subscriptionId, name from subscription where deleted != 1');
@@ -429,7 +429,7 @@ sub www_purchaseSubscription {
 sub www_redeemSubscriptionCode {
 	my $session = shift;
 	my (%codeProperties, @subscriptions, %var, $f);
-	my $i18n = WebGUI::International->new("Subscription");
+	my $i18n = WebGUI::International->new($session, "Subscription");
 	
 	if ($session->form->process("code")) {
 		%codeProperties = $session->db->quickHash("select * from subscriptionCode as t1, subscriptionCodeBatch as t2 where ".

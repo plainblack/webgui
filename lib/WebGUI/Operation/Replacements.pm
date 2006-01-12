@@ -25,14 +25,15 @@ sub _submenu {
 	my $session = shift;
         my $workarea = shift;
         my $title = shift;
-        $title = WebGUI::International::get($title) if ($title);
+	my $i18n = WebGUI::International->new($session);
+        $title = $i18n->get($title) if ($title);
         my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"contentFilters");
         if ($help) {
                 $ac->setHelp($help);
         }
-        $ac->addSubmenuItem($session->url->page("op=editReplacement;replacementId=new"), WebGUI::International::get(1047));
-        $ac->addSubmenuItem($session->url->page("op=listReplacements"), WebGUI::International::get("content filters"));
+        $ac->addSubmenuItem($session->url->page("op=editReplacement;replacementId=new"), $i18n->get(1047));
+        $ac->addSubmenuItem($session->url->page("op=listReplacements"), $i18n->get("content filters"));
         return $ac->render($workarea, $title);
 }
 
@@ -50,6 +51,7 @@ sub www_editReplacement {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $data = $session->db->getRow("replacements","replacementId",$session->form->process("replacementId"));
+	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name=>"op",
@@ -60,18 +62,18 @@ sub www_editReplacement {
 		-value=>$session->form->process("replacementId")
 		);
 	$f->readOnly(
-		-label=>WebGUI::International::get(1049),
+		-label=>$i18n->get(1049),
 		-value=>$session->form->process("replacementId")
 		);
 	$f->text(
 		-name=>"searchFor",
-		-label=>WebGUI::International::get(1050),
-		-hoverHelp=>WebGUI::International::get('1050 description'),
+		-label=>$i18n->get(1050),
+		-hoverHelp=>$i18n->get('1050 description'),
 		-value=>$data->{searchFor}
 		);
 	$f->textarea(
-		-label=>WebGUI::International::get(1051),
-		-hoverHelp=>WebGUI::International::get('1051 description'),
+		-label=>$i18n->get(1051),
+		-hoverHelp=>$i18n->get('1051 description'),
 		-name=>"replaceWith",
 		-value=>$data->{replaceWith}
 		);
@@ -95,8 +97,9 @@ sub www_editReplacementSave {
 sub www_listReplacements {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	my $i18n = WebGUI::International->new($session);
 	my $output = '<table>';
-	$output .= '<tr><td></td><td class="tableHeader">'.WebGUI::International::get(1050).'</td><td class="tableHeader">'.WebGUI::International::get(1051).'</td></tr>';
+	$output .= '<tr><td></td><td class="tableHeader">'.$i18n->get(1050).'</td><td class="tableHeader">'.$i18n->get(1051).'</td></tr>';
 	my $sth = $session->db->read("select replacementId,searchFor,replaceWith from replacements order by searchFor");
 	while (my $data = $sth->hashRef) {
 		$output .= '<tr><td>'.$session->icon->delete("op=deleteReplacement;replacementId=".$data->{replacementId})

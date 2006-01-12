@@ -178,8 +178,8 @@ Defaults to 'notice'. Can be 'pending', 'notice', or 'completed'.
 =cut
 
 sub addInternationalizedEntry {
- #       my ($u, $userId, $url, $groupId, $internationalId, @users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace, $status);
- #       $messageLogId = $self->session->id->generate();
+#       my ($u, $userId, $url, $groupId, $internationalId, @users, $messageLogId,$sth, $user, %message, %subject, $message, $subject, $namespace, $status);
+#       $messageLogId = $self->session->id->generate();
 #	$userId = $_[0];
 #	$groupId = $_[1];
 #	$url = $_[2];

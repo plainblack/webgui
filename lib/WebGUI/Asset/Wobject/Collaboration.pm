@@ -117,7 +117,7 @@ sub appendPostListTemplateVars {
 sub appendTemplateLabels {
 	my $self = shift;
 	my $var = shift;
-	my $i18n = WebGUI::International->new("Asset_Collaboration");
+	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
 	$var->{"add.label"} = $i18n->get("add");
 	$var->{"addlink.label"} = $i18n->get("addlink");
 	$var->{"addquestion.label"} = $i18n->get("addquestion");
@@ -262,9 +262,11 @@ sub decrementThreads {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Collaboration");
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Collaboration"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'collaboration.gif',
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',
@@ -415,7 +417,7 @@ sub definition {
 				}
 			}
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -430,95 +432,96 @@ sub duplicate {
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
    	$tabform->getTab("display")->yesNo(
       		-value=>$self->getValue('displayLastReply'),
-		-label=>WebGUI::International::get('display last reply', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('display last reply description', 'Asset_Collaboration'),
+		-label=>$i18n->get('display last reply'),
+		-hoverHelp=>$i18n->get('display last reply description'),
 		-name=>"displayLastReply"
    		);
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('collaborationTemplateId'),
       		-namespace=>"Collaboration",
-		-label=>WebGUI::International::get('system template', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('system template description', 'Asset_Collaboration'),
+		-label=>$i18n->get('system template'),
+		-hoverHelp=>$i18n->get('system template description'),
 		-name=>"collaborationTemplateId"
    		);
         $tabform->getTab("display")->template(
                 -name=>"threadTemplateId",
                 -value=>$self->getValue("threadTemplateId"),
                 -namespace=>"Collaboration/Thread",
-		-label=>WebGUI::International::get('thread template', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('thread template description', 'Asset_Collaboration'),
+		-label=>$i18n->get('thread template'),
+		-hoverHelp=>$i18n->get('thread template description'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"postFormTemplateId",
                 -value=>$self->getValue("postFormTemplateId"),
                 -namespace=>"Collaboration/PostForm",
-		-label=>WebGUI::International::get('post template', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('post template description', 'Asset_Collaboration'),
+		-label=>$i18n->get('post template'),
+		-hoverHelp=>$i18n->get('post template description'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"searchTemplateId",
                 -value=>$self->getValue("SearchTemplateId"),
                 -namespace=>"Collaboration/Search",
-		-label=>WebGUI::International::get('search template', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('search template description', 'Asset_Collaboration'),
+		-label=>$i18n->get('search template'),
+		-hoverHelp=>$i18n->get('search template description'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"notificationTemplateId",
                 -value=>$self->getValue("notificationTemplateId"),
                 -namespace=>"Collaboration/Notification",
-		-label=>WebGUI::International::get('notification template', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('notification template description', 'Asset_Collaboration'),
+		-label=>$i18n->get('notification template'),
+		-hoverHelp=>$i18n->get('notification template description'),
                 );
         $tabform->getTab("display")->template(
                 -name=>"rssTemplateId",
                 -value=>$self->getValue("rssTemplateId"),
                 -namespace=>"Collaboration/RSS",
-		-label=>WebGUI::International::get('rss template', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('rss template description', 'Asset_Collaboration'),
+		-label=>$i18n->get('rss template'),
+		-hoverHelp=>$i18n->get('rss template description'),
                 );
         $tabform->getTab("security")->group(
 		-name=>"moderateGroupId",
-		-label=>WebGUI::International::get('who moderates', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('who moderates description', 'Asset_Collaboration'),
+		-label=>$i18n->get('who moderates'),
+		-hoverHelp=>$i18n->get('who moderates description'),
 		-value=>[$self->getValue("moderateGroupId")]
 		);
         $tabform->getTab("security")->group(
 		-name=>"postGroupId",
-		-label=>WebGUI::International::get('who posts', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('who posts description', 'Asset_Collaboration'),
+		-label=>$i18n->get('who posts'),
+		-hoverHelp=>$i18n->get('who posts description'),
 		-value=>[$self->getValue("postGroupId")]
 		);
         $tabform->getTab("display")->integer(
 		-name=>"threadsPerPage",
-		-label=>WebGUI::International::get('threads/page', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('threads/page description', 'Asset_Collaboration'),
+		-label=>$i18n->get('threads/page'),
+		-hoverHelp=>$i18n->get('threads/page description'),
 		-value=>$self->getValue("threadsPerPage")
 		);
         $tabform->getTab("display")->integer(
 		-name=>"postsPerPage",
-		-label=>WebGUI::International::get('posts/page', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('posts/page description', 'Asset_Collaboration'),
+		-label=>$i18n->get('posts/page'),
+		-hoverHelp=>$i18n->get('posts/page description'),
 		-value=>$self->getValue("postsPerPage")
 		);
         if ($self->session->setting->get("useKarma")) {
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaPerPost",
-			-label=>WebGUI::International::get('karma/post', 'Asset_Collaboration'),
-			-hoverHelp=>WebGUI::International::get('karma/post description', 'Asset_Collaboration'),
+			-label=>$i18n->get('karma/post'),
+			-hoverHelp=>$i18n->get('karma/post description'),
 			-value=>$self->getValue("karmaPerPost")
 			);
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaSpentToRate",
-			-label=>WebGUI::International::get('karma spent to rate', 'Asset_Collaboration'),
-			-hoverHelp=>WebGUI::International::get('karma spent to rate description', 'Asset_Collaboration'),
+			-label=>$i18n->get('karma spent to rate'),
+			-hoverHelp=>$i18n->get('karma spent to rate description'),
 			-value=>$self->getValue("karmaSpentToRate")
 			);
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaRatingMultiplier",
-			-label=>WebGUI::International::get('karma rating multiplier', 'Asset_Collaboration'),
-			-hoverHelp=>WebGUI::International::get('karma rating multiplier description', 'Asset_Collaboration'),
+			$i18n->get('karma rating multiplier'),
+			-hoverHelp=>$i18n->get('karma rating multiplier description'),
 			-value=>$self->getValue("karmaRatingMultiplier")
 			);
         } else {
@@ -538,98 +541,98 @@ sub getEditForm {
 	$tabform->getTab("security")->filterContent(
 		-value=>$self->getValue("filterCode"),
 		-name=>"filterCode",
-		-label=>WebGUI::International::get('filter code', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('filter code description', 'Asset_Collaboration'),
+		-label=>$i18n->get('filter code'),
+		-hoverHelp=>$i18n->get('filter code description'),
 		);
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = (
-			lineage=>WebGUI::International::get('sequence', 'Asset_Collaboration'),
-			dateUpdated=>WebGUI::International::get('date updated', 'Asset_Collaboration'),
-			dateSubmitted=>WebGUI::International::get('date submitted', 'Asset_Collaboration'),
-			title=>WebGUI::International::get('title', 'Asset_Collaboration'),
-			userDefined1=>WebGUI::International::get('user defined 1', 'Asset_Collaboration'),
-			userDefined2=>WebGUI::International::get('user defined 2', 'Asset_Collaboration'),
-			userDefined3=>WebGUI::International::get('user defined 3', 'Asset_Collaboration'),
-			userDefined4=>WebGUI::International::get('user defined 4', 'Asset_Collaboration'),
-			userDefined5=>WebGUI::International::get('user defined 5', 'Asset_Collaboration'),
+			lineage=>$i18n->get('sequence'),
+			dateUpdated=>$i18n->get('date updated'),
+			dateSubmitted=>$i18n->get('date submitted'),
+			title=>$i18n->get('title'),
+			userDefined1=>$i18n->get('user defined 1'),
+			userDefined2=>$i18n->get('user defined 2'),
+			userDefined3=>$i18n->get('user defined 3'),
+			userDefined4=>$i18n->get('user defined 4'),
+			userDefined5=>$i18n->get('user defined 5'),
 			);
 	$tabform->getTab("display")->selectBox(
 		-name=>"sortBy",
 		-value=>[$self->getValue("sortBy")],
 		-options=>\%options,
-		-label=>WebGUI::International::get('sort by', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('sort by description', 'Asset_Collaboration'),
+		-label=>$i18n->get('sort by'),
+		-hoverHelp=>$i18n->get('sort by description'),
 		);
 	$tabform->getTab("display")->selectBox(
 		-name=>"sortOrder",
 		-value=>[$self->getValue("sortOrder")],
 		-options=>{
-			asc=>WebGUI::International::get('ascending', 'Asset_Collaboration'),
-			desc=>WebGUI::International::get('descending', 'Asset_Collaboration'),
+			asc=>$i18n->get('ascending'),
+			desc=>$i18n->get('descending'),
 			},
-		-label=>WebGUI::International::get('sort order', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('sort order description', 'Asset_Collaboration'),
+		-label=>$i18n->get('sort order'),
+		-hoverHelp=>$i18n->get('sort order description'),
 		);
         $tabform->getTab("properties")->interval(
 		-name=>"archiveAfter",
-		-label=>WebGUI::International::get('archive after', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('archive after description', 'Asset_Collaboration'),
+		-label=>$i18n->get('archive after'),
+		-hoverHelp=>$i18n->get('archive after description'),
 		-value=>$self->getValue("archiveAfter")
 		);
         $tabform->getTab("properties")->integer(
 		-name=>"attachmentsPerPost",
-		-label=>WebGUI::International::get('attachments/post', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('attachments/post description', 'Asset_Collaboration'),
+		-label=>$i18n->get('attachments/post'),
+		-hoverHelp=>$i18n->get('attachments/post description'),
 		-value=>$self->getValue("attachmentsPerPost")
 		);
         $tabform->getTab("security")->interval(
 		-name=>"editTimeout",
-		-label=>WebGUI::International::get('edit timeout', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('edit timeout description', 'Asset_Collaboration'),
+		-label=>$i18n->get('edit timeout'),
+		-hoverHelp=>$i18n->get('edit timeout description'),
 		-value=>$self->getValue("editTimeout")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"allowReplies",
-		-label=>WebGUI::International::get('allow replies', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('allow replies description', 'Asset_Collaboration'),
+		-label=>$i18n->get('allow replies'),
+		-hoverHelp=>$i18n->get('allow replies description'),
 		-value=>$self->getValue("allowReplies")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"addEditStampToPosts",
-		-label=>WebGUI::International::get('edit stamp', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('edit stamp description', 'Asset_Collaboration'),
+		-label=>$i18n->get('edit stamp'),
+		-hoverHelp=>$i18n->get('edit stamp description'),
 		-value=>$self->getValue("addEditStampToPosts")
 		);
         $tabform->getTab("display")->selectBox(
 		-name=>"richEditor",
-		-label=>WebGUI::International::get('rich editor', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('rich editor description', 'Asset_Collaboration'),
+		-label=>$i18n->get('rich editor'),
+		-hoverHelp=>$i18n->get('rich editor description'),
 		-options=>$self->session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title"),
 		-value=>[$self->getValue("richEditor")]
 		);
         $tabform->getTab("display")->yesNo(
 		-name=>"useContentFilter",
-		-label=>WebGUI::International::get('content filter', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('content filter description', 'Asset_Collaboration'),
+		-label=>$i18n->get('content filter'),
+		-hoverHelp=>$i18n->get('content filter description'),
 		-value=>$self->getValue("useContentFilter")
 		);
         $tabform->getTab("properties")->yesNo(
 		-name=>"usePreview",
-		-label=>WebGUI::International::get('use preview', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('use preview description', 'Asset_Collaboration'),
+		-label=>$i18n->get('use preview'),
+		-hoverHelp=>$i18n->get('use preview description'),
 		-value=>$self->getValue("usePreview")
 		);
         $tabform->getTab("properties")->yesNo(
 		-name=>"avatarsEnabled",
-		-label=>WebGUI::International::get('enable avatars', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('enable avatars description', 'Asset_Collaboration'),
+		-label=>$i18n->get('enable avatars'),
+		-hoverHelp=>$i18n->get('enable avatars description'),
 		-value=>$self->getValue("avatarsEnabled")
 		);
         $tabform->getTab("security")->yesNo(
 		-name=>"moderatePosts",
-		-label=>WebGUI::International::get('moderate', 'Asset_Collaboration'),
-		-hoverHelp=>WebGUI::International::get('moderate description', 'Asset_Collaboration'),
+		-label=>$i18n->get('moderate'),
+		-hoverHelp=>$i18n->get('moderate description'),
 		-value=>$self->getValue("moderatePosts")
 		);
 	return $tabform;
@@ -959,6 +962,7 @@ sub www_search {
         $self->session->scratch->set($self->getId."_exactPhrase",$self->session->form->process("exactPhrase"));
         $self->session->scratch->set($self->getId."_without",$self->session->form->process("without"));
         $self->session->scratch->set($self->getId."_numResults",$self->session->form->process("numResults"));
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
         my %var;
         $var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
          	.WebGUI::Form::hidden($self->session,{ name=>"func", value=>"search" })
@@ -992,7 +996,7 @@ sub www_search {
                 options=>\%results,
                 value=>[$numResults]
                 });
-        $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>WebGUI::International::get(170)});
+        $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>$i18n->get(170)});
         $var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
         $var{'back.url'} = $self->getUrl;
 	$self->appendTemplateLabels(\%var);

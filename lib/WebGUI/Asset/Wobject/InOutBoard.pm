@@ -64,16 +64,18 @@ sub _fetchDepartments {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_InOutBoard");
         push(@{$definition}, {
                 tableName=>'InOutBoard',
                 className=>'WebGUI::Asset::Wobject::InOutBoard',
-                assetName=>WebGUI::International::get('assetName',"Asset_InOutBoard"),
+                assetName=>$i18n->get('assetName'),
 		icon=>'iob.gif',
                 properties=>{
 			statusList => {
-				defaultValue => WebGUI::International::get(10, "Asset_InOutBoard")."\n"
-						.WebGUI::International::get(11, "Asset_InOutBoard")."\n",
+				defaultValue => $i18n->get(10)."\n"
+						.$i18n->get(11)."\n",
 				fieldType=>"textarea"
 				},
 			reportViewerGroup => {
@@ -98,7 +100,7 @@ sub definition {
 				},
   			}
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -106,38 +108,39 @@ sub definition {
 sub getEditForm {
         my $self = shift;
         my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
 	$tabform->getTab("properties")->textarea(
 		-name=>"statusList",
-		-label=>WebGUI::International::get(1, "Asset_InOutBoard"),
+		-label=>$i18n->get(1),
 		-value=>$self->getValue("statusList"),
-		-subtext=>WebGUI::International::get(2, "Asset_InOutBoard"),
+		-subtext=>$i18n->get(2),
 		);
 	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
-		-label=>WebGUI::International::get(12, "Asset_InOutBoard"),
+		-label=>$i18n->get(12),
 		-value=>$self->getValue("paginateAfter")
 		);
 	$tabform->getTab("display")->template (
 	    -name => "inOutTemplateId",
 	    -value => $self->getValue("inOutTemplateId"),
-	    -label => WebGUI::International::get("In Out Template", "Asset_InOutBoard"),
+	    -label => $i18n->get("In Out Template"),
 	    -namespace => "InOutBoard"
 	    );
 	$tabform->getTab("display")->template (
 	    -name => "reportTemplateId",
 	    -value => $self->getValue("reportTemplateId"),
-	    -label => WebGUI::International::get(13, "Asset_InOutBoard"),
+	    -label => $i18n->get(13),
 	    -namespace => "InOutBoard/Report"
 	    );
 	$tabform->getTab("security")->group(
 		-name=>"reportViewerGroup",
 		-value=>[$self->getValue("reportViewerGroup")],
-		-label=>WebGUI::International::get(3, "Asset_InOutBoard")
+		-label=>$i18n->get(3)
 		);
    $tabform->getTab("security")->group(
 		-name=>"inOutGroup",
 		-value=>[$self->getValue("inOutGroup")],
-		-label=>WebGUI::International::get('inOutGroup', "Asset_InOutBoard")
+		-label=>$i18n->get('inOutGroup')
 		);
     return $tabform;
 }
@@ -149,6 +152,7 @@ sub view {
 	my %var;
 	my $url = $self->getUrl('func=view');
 	
+	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
 	if ($self->session->user->isInGroup($self->getValue("reportViewerGroup"))) {
 	  $var{'viewReportURL'} = $self->getUrl("func=viewReport");
 	  $var{canViewReport} = 1;
@@ -177,14 +181,14 @@ sub view {
 		my %nameHash;
 		tie %nameHash, "Tie::IxHash";
 		%nameHash = _fetchNames(@users);
-		$nameHash{""} = WebGUI::International::get('myself',"Asset_InOutBoard");
+		$nameHash{""} = $i18n->get('myself');
 		%nameHash = WebGUI::Utility::sortHash(%nameHash);
 
 		$f->selectBox(
 			-name=>"delegate",
 			-options=>\%nameHash,
 			-value=>[ $self->session->scratch->get("userId") ],
-			-label=>WebGUI::International::get('delegate', "Asset_InOutBoard"),
+			-label=>$i18n->get('delegate'),
 			-extras=>q|onchange="this.form.submit();"|,
 		);
 	}
@@ -192,11 +196,11 @@ sub view {
 		-name=>"status",
 		-value=>$status,
 		-options=>$statusListHashRef,
-		-label=>WebGUI::International::get(5, "Asset_InOutBoard")
+		-label=>$i18n->get(5)
 		);
 	$f->text(
 		-name=>"message",
-		-label=>WebGUI::International::get(6, "Asset_InOutBoard")
+		-label=>$i18n->get(6)
 		);
 	$f->hidden(
 		-name=>"func",
@@ -243,7 +247,7 @@ order by department, lastName, firstName";
 		my %row;
 		if ($lastDepartment ne $data->{department}) {
 		  $row{deptHasChanged} = 1;
-		  $row{'department'} = ($data->{department}||WebGUI::International::get(7, "Asset_InOutBoard"));
+		  $row{'department'} = ($data->{department}||$i18n->get(7));
 		  $lastDepartment = $data->{department};
 		}
 		else { $row{deptHasChanged} = 0; }
@@ -255,7 +259,7 @@ order by department, lastName, firstName";
 		  $row{'username'} = $data->{username};
 		}
 		
-		$row{'status'} = ($data->{status}||WebGUI::International::get(15, "Asset_InOutBoard"));
+		$row{'status'} = ($data->{status}||$i18n->get(15));
 		$row{'dateStamp'} = $self->session->datetime->epochToHuman($data->{dateStamp});
 		$row{'message'} = ($data->{message}||"&nbsp;");
 		
@@ -272,7 +276,8 @@ order by department, lastName, firstName";
 sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("18","Asset_InOutBoard"));
+	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
+        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("18"));
 }
 
 #-------------------------------------------------------------------
@@ -311,6 +316,7 @@ group by userId", $self->session->db->quote($self->getId), $self->session->db->q
 	$sql = sprintf "select delegateUserId from InOutBoard_delegates where userId=%s and assetId=%s",
 	                $self->session->db->quote($self->session->user->profileField("userId")), $self->session->db->quote($self->getId);
 	my $delegates = $self->session->db->buildArrayRef($sql);
+	my $i18n = WebGUI::International->new($self->session,"Asset_InOutBoard");
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 	    -name => "func",
@@ -318,18 +324,18 @@ group by userId", $self->session->db->quote($self->getId), $self->session->db->q
 	);
         $f->selectList(
 	    -name => "delegates",
-	    -label => WebGUI::International::get('in/out status delegates','Asset_InOutBoard'),
+	    -label => $i18n->get('in/out status delegates'),
 	    -options => \%userNames,
 	    -multiple => 1,        ##Multiple select
 	    -size => 10,        ##Multiple select
 	    -sortByValue => 1,
 	    -value => $delegates,  ##My current delegates, if any
-	    -subtext => WebGUI::International::get('in/out status delegates subtext','Asset_InOutBoard'),
+	    -subtext => $i18n->get('in/out status delegates subtext'),
 	);
 	$f->submit;
 	my $ac = $self->getAdminConsole;
 	return $ac->render($f->print,
-	                   WebGUI::International::get('select delegate','Asset_InOutBoard'));
+	                   $i18n->get('select delegate'));
 }
 
 #-------------------------------------------------------------------
@@ -379,6 +385,7 @@ sub www_viewReport {
 	my $self = shift;
 	return "" unless ($self->session->user->isInGroup($self->getValue("reportViewerGroup")));
 	my %var;
+	my $i18n = WebGUI::International->new($self->session,'Asset_InOutBoard');
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -method=>"GET");
 	my %changedBy = ();
 	$f->hidden(
@@ -393,28 +400,28 @@ sub www_viewReport {
 	$startDate = $self->session->form->date("startDate") if ($self->session->form->process("doit")); 
 	$f->date(
 		-name=>"startDate",
-		-label=>WebGUI::International::get(16, "Asset_InOutBoard"),
+		-label=>$i18n->get(16),
 		-value=>$startDate
 		);
 	my $endDate = $self->session->form->date("endDate");
 	$f->date(
 		-name=>"endDate",
-		-label=>WebGUI::International::get(17, "Asset_InOutBoard"),
+		-label=>$i18n->get(17),
 		-value=>$endDate
 		);
 	my %depHash;
 	%depHash = map { $_ => $_ } (_fetchDepartments(),
-				     WebGUI::International::get('all departments', 'Asset_InOutBoard'));
+				     $i18n->get('all departments'));
 	my $defaultDepartment =  $self->session->form->process("selectDepartment")
-	                      || WebGUI::International::get('all departments', 'Asset_InOutBoard');
-	my $departmentSQLclause = ($defaultDepartment eq WebGUI::International::get('all departments', 'Asset_InOutBoard'))
+	                      || $i18n->get('all departments');
+	my $departmentSQLclause = ($defaultDepartment eq $i18n->get('all departments'))
 	                        ? ''
 				: 'and c.fieldData='.$self->session->db->quote($defaultDepartment);
 	$f->selectBox(
 		-name=>"selectDepartment",
 		-options=>\%depHash,
 		-value=>[ $defaultDepartment ],
-		-label=>WebGUI::International::get('filter departments', "Asset_InOutBoard"),
+		-label=>$i18n->get('filter departments'),
 	);
 	my %paginHash;
 	tie %paginHash, "Tie::IxHash"; ##Because default sort order is alpha
@@ -424,7 +431,7 @@ sub www_viewReport {
 		-name=>"reportPagination",
 		-options=>\%paginHash,
 		-value=>[ $pageReportAfter ],
-		-label=>WebGUI::International::get(14, "Asset_InOutBoard"),
+		-label=>$i18n->get(14),
 	);
 	$f->submit(-value=>"Search");
 	$var{'form'} = $f->print;
@@ -468,14 +475,14 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 		
 		if ($lastDepartment ne $data->{department}) {
 		  $row{deptHasChanged} = 1;
-		  $row{'department'} = ($data->{department}||WebGUI::International::get(7, "Asset_InOutBoard"));
+		  $row{'department'} = ($data->{department}||$i18n->get(7));
 		  $lastDepartment = $data->{department};
 		}
 		else { $row{deptHasChanged} = 0; }
 
 		$row{'username'} = _defineUsername($data);
 
-		$row{'status'} = ($data->{status}||WebGUI::International::get(15, "Asset_InOutBoard"));
+		$row{'status'} = ($data->{status}||$i18n->get(15));
 		$row{'dateStamp'} = $self->session->datetime->epochToHuman($data->{dateStamp});
 		$row{'message'} = ($data->{message}||"&nbsp;");
 		if (! exists $changedBy{ $data->{createdBy} }) {
@@ -488,11 +495,11 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 	  }
 	  $var{rows_loop} = \@rows;
 	  $var{'paginateBar'} = $p->getBarTraditional();
-	  $var{'username.label'}  = WebGUI::International::get('username label','Asset_InOutBoard');
-	  $var{'status.label'}    = WebGUI::International::get(5,'Asset_InOutBoard');
-	  $var{'date.label'}      = WebGUI::International::get('date label','Asset_InOutBoard');
-	  $var{'message.label'}   = WebGUI::International::get('message label','Asset_InOutBoard');
-	  $var{'updatedBy.label'} = WebGUI::International::get('updatedBy label','Asset_InOutBoard');
+	  $var{'username.label'}  = $i18n->get('username label');
+	  $var{'status.label'}    = $i18n->get(5);
+	  $var{'date.label'}      = $i18n->get('date label');
+	  $var{'message.label'}   = $i18n->get('message label');
+	  $var{'updatedBy.label'} = $i18n->get('updatedBy label');
 	  $p->appendTemplateVars(\%var);
 	}
 	else { $var{showReport} = 0; }

@@ -56,10 +56,11 @@ Returns a message stating that this functionality can only be used by administra
 
 sub adminOnly {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
 	$self->session->http->setStatus("401", "Admin Only");
 	my ($output, $sth, @data);
-        $output = '<h1>'.WebGUI::International::get(35).'</h1>';
-	$output .= WebGUI::International::get(36);
+        $output = '<h1>'.$i18n->get(35).'</h1>';
+	$output .= $i18n->get(36);
 	return $self->session->style->userStyle($output);
 }
 
@@ -74,10 +75,11 @@ Returns a message stating that the user does not have the required privileges to
 
 sub insufficient {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
 	$self->session->http->setStatus("401", "Insufficient Privileges");
 	my ($output);
-	$output = '<h1>'.WebGUI::International::get(37).'</h1>';
-	$output .= WebGUI::International::get(38);
+	$output = '<h1>'.$i18n->get(37).'</h1>';
+	$output .= $i18n->get(38);
 	$output .= '<p>';
 	return $self->session->style->userStyle($output);
 }
@@ -116,8 +118,9 @@ sub noAccess {
    	if ($self->session->user->profileField("userId") eq '1') {
       		return WebGUI::Operation::Auth::www_auth("init");
    	} else {
-      		my $output = '<h1>'.WebGUI::International::get(37).'</h1>';
-      		$output .= WebGUI::International::get(39);
+		my $i18n = WebGUI::International->new($self->session);
+      		my $output = '<h1>'.$i18n->get(37).'</h1>';
+      		$output .= $i18n->get(39);
       		$output .= '<p>';
 		return $self->session->style->userStyle($output);
    	}
@@ -133,10 +136,11 @@ Returns a message stating that the user they requested information about is no l
 
 sub notMember {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
 	$self->session->http->setStatus("400", "Not A Member");
 	my ($output);
-	$output = '<h1>'.WebGUI::International::get(345).'</h1>';
-	$output .= WebGUI::International::get(346);
+	$output = '<h1>'.$i18n->get(345).'</h1>';
+	$output .= $i18n->get(346);
 	$output .= '<p>';
 	return $self->session->style->userStyle($output);
 }
@@ -165,10 +169,11 @@ Returns a message stating that the user made a request to delete something that 
 
 sub vitalComponent {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
 	$self->session->http->setStatus("403", "Vital Component");
 	my ($output);
-        $output = '<h1>'.WebGUI::International::get(40).'</h1>';
-	$output .= WebGUI::International::get(41);
+        $output = '<h1>'.$i18n->get(40).'</h1>';
+	$output .= $i18n->get(41);
 	$output .= '<p>';
 	return $self->session->style->userStyle($output);
 }

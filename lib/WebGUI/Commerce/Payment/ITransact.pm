@@ -106,7 +106,7 @@ sub checkoutForm {
 	my ($self, $u, $f, %months, %years, $i18n);
 	$self = shift;
 	
-	$i18n = WebGUI::International->new('CommercePaymentITransact');
+	$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 
 	$u = WebGUI::User->new($self->session->user->profileField("userId"));
 
@@ -433,7 +433,7 @@ sub checkoutForm {
 sub configurationForm {
 	my ($self, $f, $i18n);
 	$self = shift;
- 	$i18n = WebGUI::International->new('CommercePaymentITransact');
+ 	$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 
 	$f = WebGUI::HTMLForm->new($self->session);
 	$f->text(
@@ -567,7 +567,8 @@ sub errorCode {
 
 #-------------------------------------------------------------------
 sub name {
-	return WebGUI::International::get('module name', "CommercePaymentITransact");
+	my $i18n = WebGUI::International->new($self->session, "CommercePaymentITransact");
+	return $i18n->get('module name');
 }
 
 #-------------------------------------------------------------------
@@ -584,10 +585,11 @@ sub normalTransaction {
 	$normal = shift;
 
 	if ($normal) {
+		$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 		$self->{_recurring} = 0;
 		$self->{_transactionParams} = {
 			AMT		=> sprintf('%.2f', $normal->{amount}),
-			DESCRIPTION	=> $normal->{description} || WebGUI::International::get('no description', "CommercePaymentITransact"),
+			DESCRIPTION	=> $normal->{description} || $i18n->get('no description'),
 			INVOICENUMBER	=> $normal->{invoiceNumber},
 			ORGID		=> $normal->{id},
 		};
@@ -608,13 +610,14 @@ sub recurringTransaction {
 		$initialAmount = ($self->session->datetime->getDaysInMonth(time) - ($self->session->datetime->localtime)[2])*$recurring->{amount}/$self->session->datetime->getDaysInMonth(time);
 		$initialAmount = $recurring->{amount} if ($initialAmount < 1);
 		$self->{_recurring} = 1;
+		$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 		$self->{_transactionParams} = {
 			START		=> $recurring->{start} || $self->session->datetime->epochToHuman($self->session->datetime->addToDate(time, 0, 0, 1), '%m%d%y'),
 			AMT		=> sprintf('%.2f', $recurring->{amount}),
 			INITIALAMT	=> sprintf('%.2f', $initialAmount),
 			TERM		=> $recurring->{term} || 9999,
 			RECIPE		=> _resolveRecipe($recurring->{payPeriod}),
-			DESCRIPTION	=> $recurring->{description} || WebGUI::International::get('no description', "CommercePaymentITransact"),
+			DESCRIPTION	=> $recurring->{description} || $i18n->get('no description'),
 			INVOICENUMBER	=> $recurring->{invoiceNumber},
 			ORGID		=> $recurring->{id},
 		};

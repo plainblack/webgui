@@ -67,10 +67,12 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("image","WebGUI")
+			defaultValue=>$i18n->get("image")
 			},
 		name=>{
 			defaultValue=>"file"
@@ -82,7 +84,7 @@ sub definition {
 			defaultValue=>1
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 

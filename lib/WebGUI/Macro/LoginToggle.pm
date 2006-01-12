@@ -46,8 +46,9 @@ The ID of a template for custom layout of the link and text.
 #-------------------------------------------------------------------
 sub process {
         my @param = @_;
-        my $login = $param[0] || WebGUI::International::get(716,'Macro_LoginToggle');
-        my $logout = $param[1] || WebGUI::International::get(717,'Macro_LoginToggle');
+	my $i18n = WebGUI::International->new($session,'Macro_LoginToggle');
+        my $login = $param[0] || $i18n->get(716);
+        my $logout = $param[1] || $i18n->get(717);
 	my %var;
         if ($session->user->profileField("userId") eq '1') {
 		return $session->url->page("op=auth;method=init") if ($param[0] eq "linkonly");

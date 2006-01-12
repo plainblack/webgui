@@ -64,22 +64,24 @@ A tooltip for what to do with this field. Defaults to a general explaination of 
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("418","WebGUI")
+			defaultValue=>$i18n->get("418")
 			},
 		name=>{
 			defaultValue=>"filterContent"
 			},
 		hoverHelp=>{
-			defaultValue=>WebGUI::International::get('418 description', 'WebGUI')
+			defaultValue=>$i18n->get('418 description')
 			},
 		defaultValue=>{
 			defaultValue=>"most",
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

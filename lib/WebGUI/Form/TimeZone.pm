@@ -48,16 +48,18 @@ See the super class for additional details.
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("timezone","DateTime")
+			defaultValue=>$i18n->get("timezone")
 			},
 		value=>{
 			defaultValue=>undef
 			},
 		});
-	return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

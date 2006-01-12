@@ -308,22 +308,22 @@ sub www_manageClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
+	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my ($header,$limit);
         $ac->setHelp("clipboard manage");
 	if ($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)) {
-		$header = WebGUI::International::get(966,"Asset");
-		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), WebGUI::International::get(949,"Asset"));
-		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), WebGUI::International::get(959,"Asset"), 
-			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
+		$header = $i18n->get(966);
+		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), $i18n->get(949));
+		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), $i18n->get(959), 
+			'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
 	} else {
-		$ac->addSubmenuItem($self->getUrl('func=manageClipboard;systemClipboard=1'), WebGUI::International::get(954,"Asset"));
-		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), WebGUI::International::get(950,"Asset"),
-			'onclick="return window.confirm(\''.WebGUI::International::get(951).'\')"',"Asset");
+		$ac->addSubmenuItem($self->getUrl('func=manageClipboard;systemClipboard=1'), $i18n->get(954));
+		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), $i18n->get(950),
+			'onclick="return window.confirm(\''.$i18n->(951,"WebGUI").'\')"',"Asset");
 		$limit = 1;
 	}
 $self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
-        my $i18n = WebGUI::International->new("Asset");
         my $output = "
    <script type=\"text/javascript\">
    //<![CDATA[

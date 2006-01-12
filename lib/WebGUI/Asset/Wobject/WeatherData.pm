@@ -44,8 +44,9 @@ defines wobject properties for WeatherData instances
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new("Asset_WeatherData");
+	my $i18n = WebGUI::International->new($session, "Asset_WeatherData");
 	my $properties = {
 		templateId =>{
 			fieldType=>"template",
@@ -71,7 +72,7 @@ sub definition {
 		autoGenerateForms=>1,
 		properties=>$properties
 	});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

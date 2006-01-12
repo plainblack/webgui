@@ -134,7 +134,8 @@ sub getErrorMessage {
    my $errorCode = $_[0] || $self->{_error};
    return "" unless $errorCode;
    my $i18nCode = "LDAPLink_".$errorCode;
-   return WebGUI::International::get($i18nCode,"AuthLDAP");
+   my $i18n = WebGUI::International->new($self->session,"AuthLDAP");
+   return $i18n->get($i18nCode);
 }
 
 #-------------------------------------------------------------------

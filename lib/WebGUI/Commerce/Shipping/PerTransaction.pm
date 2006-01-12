@@ -20,9 +20,10 @@ sub configurationForm {
 	$self = shift;
 	
 	$f = WebGUI::HTMLForm->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingPerTransaction');
 	$f->float(
 		-name	=> $self->prepend('pricePerTransaction'),
-		-label	=> WebGUI::International::get('price', 'CommerceShippingPerTransaction'),
+		-label	=> $i18n->get('price'),
 		-value	=> $self->get('pricePerTransaction')
 	);
 
@@ -41,7 +42,8 @@ sub init {
 
 #-------------------------------------------------------------------
 sub name {
-	return WebGUI::International::get('title', 'CommerceShippingPerTransaction');
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingPerTransaction');
+	return $i18n->get('title');
 }
 
 1;
