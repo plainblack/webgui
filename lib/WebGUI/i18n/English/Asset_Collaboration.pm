@@ -980,6 +980,11 @@ A list of posts for this Collateral Asset.
 The variables common to all Assets, such as <b>title</b>, <b>menuTitle</b>, etc.
 
 <p>
+<b>Post variables</b><br>
+All template variables from the Post template.  Some of those variables will be duplicates
+of the ones below.
+
+<p>
 <b>id</b><br>
 The AssetId of this Post.
 

@@ -168,6 +168,10 @@ our $HELP = {
 				tag => 'asset fields',
 				namespace => 'Asset'
 			},
+			{
+				tag => 'post template variables',
+				namespace => 'Asset_Post'
+			},
 		]
 	},
 

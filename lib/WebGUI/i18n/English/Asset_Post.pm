@@ -9,7 +9,7 @@ our $I18N = {
 	'add/edit post template body' => {
 		message => q|In addition to the common Post Template variables, the Add/Edit Post Template has these variables:
 <p>
-! : This variable is required for the Data Form to function correctly.<p/>
+! : This variable is required for the Post to function correctly.<p/>
 <p>
 
 <b>form.header</b> !<br>
