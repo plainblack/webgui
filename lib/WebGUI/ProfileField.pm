@@ -17,10 +17,7 @@ package WebGUI::ProfileField;
 
 use strict;
 use WebGUI::ProfileCategory;
-use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::Form::DynamicField;
-use WebGUI::FormProcessor;
 use WebGUI::Operation::Shared;
 use WebGUI::HTML;
 use WebGUI::User;
@@ -46,6 +43,7 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 sub _reorderFields {
+	my $self = shift;
 	my $category = shift;
         my ($sth, $i, $id);
         $sth = $self->session->db->read("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($category)." order by sequenceNumber");
@@ -58,9 +56,13 @@ sub _reorderFields {
 
 #-------------------------------------------------------------------
 
-=head2 create ( fieldName [, properties, categoryId] ) 
+=head2 create ( session, fieldName [, properties, categoryId] ) 
 
 Add a new field to the system. Returns a WebGUI::ProfileField object if created successfully, otherwise returns undef.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 fieldName
 
@@ -78,13 +80,14 @@ The unique id of the category to assign this field to. Defaults to "1" (misc).
 
 sub create {
         my $class = shift;
+	my $session = shift;
 	my $fieldName = shift;
         my $properties = shift;
 	my $categoryId = shift || "1";
-	my ($fieldNameExists) = $self->session->db->quickArray("select count(*) from userProfileField where fieldName=".$self->session->db->quote($fieldName));
+	my ($fieldNameExists) = $session->db->quickArray("select count(*) from userProfileField where fieldName=".$session->db->quote($fieldName));
 	return undef if ($fieldNameExists);
-        my $id = $self->session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},undef,$fieldName);
-        my $self = $class->new($id);
+        my $id = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},undef,$fieldName);
+        my $self = $class->new($session,$id);
 	$self->setCategory($categoryId);
         $self->set($properties);
         return $self;
@@ -214,7 +217,7 @@ Returns a WebGUI::ProfileCategory object for the category that this profile fiel
 
 sub getCategory {
 	my $self = shift;
-	return WebGUI::ProfileCategory->new($self->get("categoryId"));
+	return WebGUI::ProfileCategory->new($self->session,$self->get("categoryId"));
 }
 
 
@@ -230,7 +233,7 @@ sub getEditableFields {
         my $self = shift;
         my @fields = ();
         foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField where required=1 or editable=1 order by sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($fieldName));
+                push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
         }
         return \@fields;
 }
@@ -247,7 +250,7 @@ sub getFields {
         my $self = shift;
         my @fields = ();
         foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField order by profileCategoryId, sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($fieldName));
+                push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
         }
         return \@fields;
 }
@@ -292,7 +295,7 @@ sub getRequiredFields {
         my $self = shift;
         my @fields = ();
         foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField where required=1 order by sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($fieldName));
+                push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
         }
         return \@fields;
 }
@@ -366,7 +369,7 @@ sub moveDown {
         if ($id ne "") {
                 $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".$self->session->db->quote($self->getId));
                 $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".$self->session->db->quote($id));
-                _reorderFields($profileCategoryId);
+                $self->_reorderFields($profileCategoryId);
         }
 }
 
@@ -386,16 +389,20 @@ sub moveUp {
         if ($id ne "") {
                 $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".$self->session->db->quote($self->getId));
                 $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".$self->session->db->quote($id));
-                _reorderFields($profileCategoryId);
+                $self->_reorderFields($profileCategoryId);
         }
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 new ( fieldName )
+=head2 new ( session, fieldName )
 
 Constructor
+
+=head3 session
+
+A reference to the current session.
 
 =head3 fieldName
 
@@ -405,10 +412,11 @@ The unique name of this field.
 
 sub new {
         my $class = shift;
+	my $session = shift;
         my $id = shift;
         return undef unless ($id);
-        my $properties = $self->session->db->getRow("userProfileField","fieldName",$id);
-        bless {_properties=>$properties}, $class;
+        my $properties = $session->db->getRow("userProfileField","fieldName",$id);
+        bless {_session=>$session, _properties=>$properties}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -434,6 +442,19 @@ sub rename {
 	return 1;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
 
 #-------------------------------------------------------------------
 
@@ -524,8 +545,8 @@ sub setCategory {
 	$self->session->db->setRow("userProfileField","fieldName",{fieldName=>$self->getId, profileCategoryId=>$categoryId, sequenceNumber=>$sequenceNumber+1});
 	$self->{_property}{profileCategoryId} = $categoryId;
 	$self->{_property}{sequenceNumber} = $sequenceNumber+1;
-	_reorderFields($currentCategoryId) if ($currentCategoryId);
-	_reorderFields($categoryId);
+	$self->_reorderFields($currentCategoryId) if ($currentCategoryId);
+	$self->_reorderFields($categoryId);
 }
 
 1;

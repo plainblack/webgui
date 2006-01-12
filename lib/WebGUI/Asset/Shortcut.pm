@@ -404,7 +404,7 @@ sub getOverrides {
 			my $u = WebGUI::User->new($self->discernUserId);
 			my @userPrefs = $self->getPrefFieldsToImport;
 			foreach my $fieldId (@userPrefs) {
-				my $field = WebGUI::ProfileField->new($fieldId);
+				my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 				next unless $field;
 				my $fieldName = $field->getId;
 				my $fieldValue = $u->profileField($field->getId);
@@ -651,7 +651,7 @@ sub www_getUserPrefsForm {
 		-value => 'saveUserPrefs'
 	);
 	foreach my $fieldId (@fielden) {
-		my $field = WebGUI::ProfileField->new($fieldId);
+		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		my $params = {};
 		if (lc($field->get("fieldType")) eq 'textarea') {
@@ -712,7 +712,7 @@ sub www_saveUserPrefs {
 	my $i18n = WebGUI::International->new($self->session);
 	my $u = WebGUI::User->new($self->discernUserId);
 	foreach my $fieldId (keys %{$session{form}}) {
-		my $field = WebGUI::ProfileField->new($fieldId);
+		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;
 		if ($field->getId eq 'email' && WebGUI::Operation::Profile::isDuplicateEmail($data{$field->getId})) {

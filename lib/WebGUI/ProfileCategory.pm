@@ -42,6 +42,7 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 sub _reorderCategories {
+	my $self = shift;
         my ($sth, $i, $id);
         $sth = $self->session->db->read("select profileCategoryId from userProfileCategory order by sequenceNumber");
         while (($id) = $sth->array) {
@@ -53,9 +54,13 @@ sub _reorderCategories {
 
 #-------------------------------------------------------------------
 
-=head2 create ( [ properties] ) 
+=head2 create ( session, [ properties] ) 
 
 Add a new category to the system. Returns a WebGUI::ProfileCategory object if created successfully, otherwise returns undef.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 properties
 
@@ -65,10 +70,11 @@ A hash reference containing the properties of this field. See the set() method f
 
 sub create {
 	my $class = shift;
+	my $session = shift;
 	my $properties = shift;
-        my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileCategory");
- 	my $id = $self->session->db->setRow("userProfileCategory","profileCategoryId",{profileCategoryId=>"new", sequenceNumber=>$sequenceNumber+1});
-	my $self = $class->new($id);
+        my ($sequenceNumber) = $session->db->quickArray("select max(sequenceNumber) from userProfileCategory");
+ 	my $id = $session->db->setRow("userProfileCategory","profileCategoryId",{profileCategoryId=>"new", sequenceNumber=>$sequenceNumber+1});
+	my $self = $class->new($session,$id);
 	$self->set($properties);
 	return $self;
 }
@@ -122,7 +128,7 @@ sub getCategories {
 	my $self = shift;
 	my @categories = ();
  	foreach my $id ($self->session->db->buildArray("select profileCategoryId from userProfileCategory order by sequenceNumber")) {
-		push(@categories,WebGUI::ProfileCategory->new($id));
+		push(@categories,WebGUI::ProfileCategory->new($self->session,$id));
 	}
 	return \@categories;
 }
@@ -140,7 +146,7 @@ sub getFields {
 	my $self = shift;
 	my @fields = ();
 	foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($self->getId)." order by sequenceNumber")){
-		push(@fields,WebGUI::ProfileField->new($fieldName));
+		push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
 	}
 	return \@fields;
 }
@@ -228,7 +234,7 @@ sub moveDown {
         if ($id ne "") {
                 $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".$self->session->db->quote($self->getId));
                 $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".$self->session->db->quote($id));
-                _reorderCategories();
+                $self->_reorderCategories();
         }
 }
 
@@ -248,15 +254,19 @@ sub moveUp {
         if ($id ne "") {
                 $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber-1 where profileCategoryId=".$self->session->db->quote($self->getId));
                 $self->session->db->write("update userProfileCategory set sequenceNumber=sequenceNumber+1 where profileCategoryId=".$self->session->db->quote($id));
-                _reorderCategories();
+                $self->_reorderCategories();
         }
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( id )
+=head2 new ( session, id )
 
-Constructor
+Constructor.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 id
 
@@ -266,12 +276,26 @@ The unique id of this category.
 
 sub new {
 	my $class = shift;
+	my $session = shift;
 	my $id = shift;
 	return undef unless ($id);
-	my $properties = $self->session->db->getRow("userProfileCategory","profileCategoryId",$id);
-	bless {_properties=>$properties}, $class;
+	my $properties = $session->db->getRow("userProfileCategory","profileCategoryId",$id);
+	bless {_session=>$session, _properties=>$properties}, $class;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+A reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
 
 #-------------------------------------------------------------------
 

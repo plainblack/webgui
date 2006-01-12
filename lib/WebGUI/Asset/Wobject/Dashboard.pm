@@ -144,7 +144,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub initialize {
 	my $self = shift;
-	my $userPrefField = WebGUI::ProfileField->create($self->getId.'contentPositions',{
+	my $userPrefField = WebGUI::ProfileField->create($self->session,$self->getId.'contentPositions',{
 		label=>'\'Dashboard User Preference - Content Positions\'',
 		visible=>0,
 		protected=>1,

@@ -803,6 +803,17 @@ WebGUI::Product now accepts session in the constructor.
 perl -pi.bak -e 's!WebGUI\:\:Product\-\>new\(!WebGUI::Product->new(\$self->session,!g' fileNameGoesHere
 
 
+5.23.20 WebGUI::ProfileCategory and WebGUI::ProfileField Refactored
+
+These API's now accept session in their constructors.
+
+perl -pi.bak -e 's!WebGUI\:\:ProfileCategory\-\>new\(!WebGUI::ProfileCategory->new(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:ProfileCategory\-\>create\(!WebGUI::ProfileCategory->create(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:ProfileField\-\>new\(!WebGUI::ProfileField->new(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:ProfileField\-\>create\(!WebGUI::ProfileField->create(\$self->session,!g' fileNameGoesHere
+
+
+
 
 6.  Automatic list of Assets in Help System.
 -------------------------------------
