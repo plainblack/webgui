@@ -327,6 +327,7 @@ sub getEditForm {
        -name=>"templateId",
        -value=>$self->get("templateId"),
        -label=>$i18n->get("template_label"),
+       -hoverHelp=>$i18n->get("template_label_description"),
        -namespace=>"StockData"
     );
 	
@@ -334,12 +335,14 @@ sub getEditForm {
        -name=>"displayTemplateId",
        -value=>$self->get("displayTemplateId"),
        -label=>$i18n->get("display_template_label"),
+       -hoverHelp=>$i18n->get("display_template_label_description"),
        -namespace=>"StockData/Display"
     );
 	
 	$tabform->getTab("properties")->textarea(
 	    -name => "defaultStocks",
 		-label=> $i18n->get("default_stock_label"),
+		-hoverHelp=> $i18n->get("default_stock_label_description"),
 		-value=> $self->getValue("defaultStocks") 
 	);
 	
