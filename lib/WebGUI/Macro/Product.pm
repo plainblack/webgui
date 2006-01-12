@@ -40,7 +40,7 @@ sub process {
 	
 	return WebGUI::International::get('cannot find product','Macro_Product') unless ($productId);
 
-	$product = WebGUI::Product->new($productId);
+	$product = WebGUI::Product->new($self->session,$productId);
 
 	if ($variantId) {
 		$variant = [ $product->getVariant($variantId) ];

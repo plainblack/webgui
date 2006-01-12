@@ -1,8 +1,6 @@
 package WebGUI::Product;
 
 use strict;
-use WebGUI::SQL;
-use WebGUI::Id;
 use WebGUI::Asset::Template;
 
 #-------------------------------------------------------------------
@@ -139,7 +137,7 @@ sub getByOptionId {
 	
 	return undef unless ($productId);
 
-	return WebGUI::Product->new($productId);
+	return WebGUI::Product->new($self->session,$productId);
 }
 
 #-------------------------------------------------------------------
@@ -150,7 +148,7 @@ sub getByParameterId {
 	
 	($productId) = $self->session->db->quickArray("select productId from productParameters where parameterId=".$self->session->db->quote($parameterId));
 
-	return WebGUI::Product->new($productId);
+	return WebGUI::Product->new($self->session,$productId);
 }
 
 #-------------------------------------------------------------------
@@ -161,7 +159,7 @@ sub getByVariantId {
 
 	($productId) = $self->session->db->quickArray("select productId from productVariants where variantId=".$self->session->db->quote($variantId));
 
-	return WebGUI::Product->new($productId);
+	return WebGUI::Product->new($self->session,$productId);
 }
 
 #-------------------------------------------------------------------
@@ -201,24 +199,22 @@ sub getVariant {
 sub new {
 	my ($class, $productId, $properties, $parameters, $variants, $options, $sth, %row, $option, $new);
 	$class = shift;
+	my $session = shift;
 	$productId = shift;
-	
-	$self->session->errorHandler->fatal('no productId') unless ($productId);
-
+	$session->errorHandler->fatal('no productId') unless ($productId);
 	$parameters = {};
 	$variants = {};
 	$options = {};
-	
 	if ($productId eq 'new') {
-		$productId = $self->session->id->generate;
+		$productId = $session->id->generate;
 		$properties = {productId => $productId};
-		$self->session->db->write("insert into products (productId) values (".$self->session->db->quote($productId).")");
+		$session->db->write("insert into products (productId) values (".$session->db->quote($productId).")");
 	} else {
-		$properties = $self->session->db->quickHashRef("select * from products where productId=".$self->session->db->quote($productId));
+		$properties = $self->session->db->quickHashRef("select * from products where productId=".$session->db->quote($productId));
 		
 		# fetch parameters and options
-		$sth = $self->session->db->read("select opt.*, param.* from productParameters as param left join productParameterOptions as opt ".
-			"on param.parameterId=opt.parameterId where param.productId=".$self->session->db->quote($productId));
+		$sth = $session->db->read("select opt.*, param.* from productParameters as param left join productParameterOptions as opt ".
+			"on param.parameterId=opt.parameterId where param.productId=".$session->db->quote($productId));
 		while (%row = $sth->hash) {
 			$parameters->{$row{parameterId}} = {
 				name		=> $row{name},
@@ -240,7 +236,7 @@ sub new {
 		}
 
 		# fetch variants
-		$sth = $self->session->db->read("select * from productVariants where productId=".$self->session->db->quote($productId));
+		$sth = $session->db->read("select * from productVariants where productId=".$session->db->quote($productId));
 		while (%row = $sth->hash) {
 			$variants->{$row{variantId}} = {%row};
 		}
@@ -248,8 +244,22 @@ sub new {
 		$new = 0;
 	}
 
-	bless {_properties => $properties, _parameters => $parameters, _options => $options, _variants => $variants, _new => $new}, $class; 
+	bless {_session=> $session, _properties => $properties, _parameters => $parameters, _options => $options, _variants => $variants, _new => $new}, $class; 
 }
+
+#-------------------------------------------------------------------
+
+=head3 session
+
+Returns a reference to the session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 sub set {

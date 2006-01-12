@@ -796,6 +796,13 @@ WebGUI::Paginator API was changed to use the new session API.
 perl -pi.bak -e 's!WebGUI\:\:Paginator\-\>new\(!WebGUI::Paginator->new(\$self->session,!g' fileNameGoesHere
 
 
+5.23.19 WebGUI::Product API Refactored
+
+WebGUI::Product now accepts session in the constructor.
+
+perl -pi.bak -e 's!WebGUI\:\:Product\-\>new\(!WebGUI::Product->new(\$self->session,!g' fileNameGoesHere
+
+
 
 6.  Automatic list of Assets in Help System.
 -------------------------------------

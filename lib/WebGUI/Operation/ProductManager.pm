@@ -71,7 +71,7 @@ sub www_deleteProduct {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	WebGUI::Product->new($productId)->delete;
+	WebGUI::Product->new($session,$productId)->delete;
 
 	return WebGUI::Operation::execute('listProducts');
 }
@@ -87,7 +87,7 @@ sub www_editProduct {
 	$productId = $session->form->process("productId");
 	
 	unless ($productId eq 'new') {
-		$product = WebGUI::Product->new($productId)->get;
+		$product = WebGUI::Product->new($session,$productId)->get;
 	}
 	
 	$f = WebGUI::HTMLForm->new($session);
@@ -169,7 +169,7 @@ sub www_editProductSave {
 	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);	
 
 	$productId = $session->form->process("productId");
-	$product = WebGUI::Product->new($productId);
+	$product = WebGUI::Product->new($session,$productId);
 	$product->set({
 		title		=> $session->form->process("title"),
 		description	=> $session->form->process("description"),
@@ -247,7 +247,7 @@ sub www_editProductParameterSave {
 
 	return "<ul><li>".join('</li><li>', @error)."</li></ul>".WebGUI::Operation::execute('editProductParameter') if (@error);
 	
-	$product = WebGUI::Product->new($session->form->process("productId"));
+	$product = WebGUI::Product->new($session,$session->form->process("productId"));
 	$skuTemplate = $product->get('skuTemplate');
 
 	if ($parameterId eq 'new') {
@@ -437,7 +437,7 @@ sub www_editSkuTemplate {
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	
 	$productId = $session->form->process("productId");
-	$product = WebGUI::Product->new($productId);
+	$product = WebGUI::Product->new($session,$productId);
 	
 	$output .= "Available are: <br />\n";
 	$output .= "<ul><li>base</li>\n";
@@ -474,7 +474,7 @@ sub www_editSkuTemplateSave {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	WebGUI::Product->new($productId)->set({
+	WebGUI::Product->new($session,$productId)->set({
 		skuTemplate	=> $session->form->process("skuTemplate"),
 		});
 
@@ -522,7 +522,7 @@ sub www_listProductVariants {
 
 	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
 	
-	$product = WebGUI::Product->new($productId);
+	$product = WebGUI::Product->new($session,$productId);
 
 	@variants = sort {$a->{composition}  cmp $b->{composition}} @{$product->getVariant};
 	tie %parameters, "Tie::IxHash";
@@ -580,7 +580,7 @@ sub www_listProductVariantsSave {
 	
 	my %availableVariants = map {$_ => 1} $session->form->selectList('available');
 
-	my $product = WebGUI::Product->new($session->form->process("productId"));
+	my $product = WebGUI::Product->new($session,$session->form->process("productId"));
 	my @variants = @{$product->getVariant};
 	
 	foreach (@variants) {
@@ -604,7 +604,7 @@ sub www_manageProduct {
 	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
 	$session->scratch->set('managingProduct', $productId);
 
-	$product = WebGUI::Product->new($productId);
+	$product = WebGUI::Product->new($session,$productId);
 	
 	$output .= "<h1>".$product->get('title')."</h1>";
 	$output .= "<h2>".$i18n->get('properties').$session->icon->edit('op=editProduct;productId='.$productId)."</h2>";
