@@ -463,8 +463,8 @@ sub getShortcutByCriteria {
 	my $scratchId;
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
-		if($session{scratch}{$scratchId} && !$self->getValue("disableContentLock")) {
-			return $session{scratch}{$scratchId} unless ($self->session->var->get("adminOn"));
+		if($self->session->scratch->get("$scratchId") && !$self->getValue("disableContentLock")) {
+			return $self->session->scratch->get("$scratchId") unless ($self->session->var->get("adminOn"));
 		}
 	}
 

@@ -289,7 +289,7 @@ sub _parsePlaceholderParams {
                 my ($type,$field) = split(/:/,$row);
                 my $param;
                 if($type =~ /^form/) {
-                        $param = $session{form}{$field};
+                        $param = $self->session->form->process("$field");
                 } elsif ($type =~ /^query(\d)/) {
                         $param = $self->{_query}{$1}{rowData}{$field};
                 }
@@ -332,12 +332,12 @@ sub _processQuery {
                         foreach (keys %{$session{form}}) {
                                 unless ($_ eq "pn" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
                                         $url = $self->session->url->append($url, $self->session->url->escape($_)
-                                                .'='.$self->session->url->escape($session{form}{$_}));
+                                                .'='.$self->session->url->escape($self->session->form->process("$_")));
                                 }
                         }
 			my $paginateAfter = $self->get("paginateAfter");
 			$paginateAfter = 1000 if($nr > 1);
-                        my $p = WebGUI::Paginator->new($url,$paginateAfter);
+                        my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
                                 $self->session->errorHandler->warn("There was a problem with the query: ".$error);

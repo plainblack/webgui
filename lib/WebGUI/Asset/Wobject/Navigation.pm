@@ -459,7 +459,7 @@ sub www_preview {
 						showSystemPages=>$self->session->form->process("showSystemPages"),
 						showHiddenPages=>$self->session->form->process("showHiddenPages"),
 						showUnprivilegedPages=>$self->session->form->process("showUnprivilegedPages"),
-	                       			'reverse'=>$session{form}{'reverse'},
+	                       			'reverse'=>$self->session->form->process("'reverse'"),
                                 );
 	my $output = qq(
 		<table width="100%" border="0" cellpadding="5" cellspacing="0">
@@ -474,7 +474,7 @@ sub www_preview {
 			stopAtLevel: $self->session->form->process("stopAtLevel")<br />
 			depth: $self->session->form->process("depth")<br />
 			templateId: $self->session->form->process("templateId")<br />
-			reverse: $session{form}{'reverse'}<br />
+			reverse: $self->session->form->process("'reverse'")<br />
 			showSystemPages: $self->session->form->process("showSystemPages")<br />
 			showHiddenPages: $self->session->form->process("showHiddenPages")<br />
 			showUnprivilegedPages: $self->session->form->process("showUnprivilegedPages")<br />

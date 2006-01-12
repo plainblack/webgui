@@ -214,7 +214,7 @@ sub view {
 	
 	my $lastDepartment = "_nothing_";
 	
-	my $p = WebGUI::Paginator->new($url, $self->getValue("paginateAfter"));
+	my $p = WebGUI::Paginator->new($self->session,$url, $self->getValue("paginateAfter"));
 	
 	my $sql = "select users.username, 
 users.userId, 
@@ -433,7 +433,7 @@ sub www_viewReport {
 	  $var{showReport} = 1;
 	  $endDate = $self->session->datetime->addToTime($endDate,24,0,0);
 	  my $lastDepartment = "_none_";
-	  my $p = WebGUI::Paginator->new($url, $pageReportAfter);
+	  my $p = WebGUI::Paginator->new($self->session,$url, $pageReportAfter);
 	  
 	  my $sql = "select users.username, 
 users.userId, 

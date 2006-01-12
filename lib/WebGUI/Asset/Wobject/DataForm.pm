@@ -40,7 +40,7 @@ sub _createField {
 	my %param;
 	$param{name} = $data->{name};
 	$param{name} = "field_".$data->{sequenceNumber} if ($param{name} eq ""); # Empty fieldname not allowed
-	$session{form}{$param{name}} =~ s/\^.*?\;//gs ; # remove macro's from user input
+	$self->session->form->process("$param{name}") =~ s/\^.*?\;//gs ; # remove macro's from user input
 	$param{value} = $data->{value};
 	$param{size} = $data->{width};
 	$param{rows} = $data->{rows} || 5;
@@ -53,7 +53,7 @@ sub _createField {
 	}
 	if (isIn($data->{type},qw(selectList checkList))) {
 		my @defaultValues;
-		if ($session{form}{$param{name}}) {
+		if ($self->session->form->process("$param{name}")) {
                 	@defaultValues = $self->session->form->selectList($param{name});
                 } else {
                 	foreach (split(/\n/, $data->{value})) {
@@ -426,7 +426,7 @@ sub getRecordTemplateVars {
 		my @fields;
 		my $sth = $self->session->db->read("$select from DataForm_field as a $join $where and a.DataForm_tabId=".$self->session->db->quote($tab{DataForm_tabId})." order by a.sequenceNumber");
 		while (%data = $sth->hash) {
-			my $formValue = $session{form}{$data{name}};
+			my $formValue = $self->session->form->process("$data{name}");
 			if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
 				$data{value} = $formValue;
 				$data{value} = $self->session->datetime->setToEpoch($data{value}) if ($data{type} eq "date");
@@ -470,7 +470,7 @@ sub getRecordTemplateVars {
 	my @fields;
 	my $sth = $self->session->db->read("$select from DataForm_field as a $join $where and a.DataForm_tabId = 0 order by a.sequenceNumber");
 	while (%data = $sth->hash) {
-		my $formValue = $session{form}{$data{name}};
+		my $formValue = $self->session->form->process("$data{name}");
 		if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
 			$data{value} = $formValue;
 			$data{value} = $self->session->datetime->setToEpoch($data{value}) if ($data{type} eq "date");

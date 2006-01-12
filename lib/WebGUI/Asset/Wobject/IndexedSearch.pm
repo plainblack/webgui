@@ -260,7 +260,7 @@ sub view {
 		map {$url .= "&namespaces=".$self->session->url->escape($_)} $self->session->request->param('namespaces');
 		map {$url .= "&contentTypes=".$self->session->url->escape($_)} $self->session->request->param('contentTypes');
 		$url .= "&paginateAfter=".$self->getValue("paginateAfter");
-		my $p = WebGUI::Paginator->new($self->session->url->page($url), $self->getValue("paginateAfter"));
+		my $p = WebGUI::Paginator->new($self->session,$self->session->url->page($url), $self->getValue("paginateAfter"));
 		$p->setDataByArrayRef($results);
 		$var{startNr} = 1;
 		if($self->session->form->process("pn")) {

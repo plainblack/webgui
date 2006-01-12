@@ -300,7 +300,7 @@ sub www_saveSettings {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($key, $value);
 	foreach $key (keys %{$session{form}}) {
-		$value = $session{form}{$key};
+		$value = $session->form->process("$key");
 		if ($key =~ m/(.*)_interval/) {
 			$value = $session->form->interval($1);
 			$key = $1;

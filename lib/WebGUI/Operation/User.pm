@@ -139,7 +139,7 @@ sub doUserSearch {
                 where $selectedStatus  and (users.username like ".$keyword." or useralias.fieldData like ".$keyword." or email.fieldData like ".$keyword.") 
                 and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
-        	my $p = WebGUI::Paginator->new($session->url->page("op=".$op));
+        	my $p = WebGUI::Paginator->new($session,$session->url->page("op=".$op));
 		$p->setDataByQuery($sql);
 		return $p;
 	} else {

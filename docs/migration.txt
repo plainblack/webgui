@@ -576,28 +576,28 @@ Fix $session{config}
 
 perl -pi.bak -e 's!\$session{config}{webguiRoot}!\$self->session->config->getWebguiRoot!g' fileNameGoesHere
 perl -pi.bak -e 's!\$session{config}{configFile}!\$self->session->config->getFilename!g' fileNameGoesHere
-perl -pi.bak -e 's!\$session{config}{(\w+)}!\$self->session->config->get("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{config}{(.*)}!\$self->session->config->get("$1")!g' fileNameGoesHere
 
 Fix $session{setting}
 
-perl -pi.bak -e 's!\$session{setting}{(\w+)}!\$self->session->setting->get("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{setting}{(.*)}!\$self->session->setting->get("$1")!g' fileNameGoesHere
 
 Fix $session{user}
 
 perl -pi.bak -e 's!\$session{user}{(username|userId)}!\$self->session->user->$1!g' fileNameGoesHere
-perl -pi.bak -e 's!\$session{user}{(\w+)}!\$self->session->user->profileField("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{user}{(.*)}!\$self->session->user->profileField("$1")!g' fileNameGoesHere
 
 Fix $session{env}
 
-perl -pi.bak -e 's!\$session{env}{(\w+)}!\$self->session->env->get("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{env}{(.*)}!\$self->session->env->get("$1")!g' fileNameGoesHere
 
 Fix $session{os}
 
-perl -pi.bak -e 's!\$session{os}{(\w+)}!\$self->session->os->get("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{os}{(.*)}!\$self->session->os->get("$1")!g' fileNameGoesHere
 
 Fix $session{var}
 
-perl -pi.bak -e 's!\$session{var}{(\w+)}!\$self->session->var->get("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{var}{(.*)}!\$self->session->var->get("$1")!g' fileNameGoesHere
 
 Fix $session{req}
 
@@ -613,7 +613,7 @@ perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteAllScratch!\$self->session->scratc
 perl -pi.bak -e 's!WebGUI\:\:Session\:\:deleteScratch!\$self->session->scratch->delete!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:Session\:\:setScratch!\$self->session->scratch->set!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:Session\:\:getScratch!\$self->session->scratch->get!g' fileNameGoesHere
-perl -pi.bak -e 's!\$session{scratch}{(\w+)}!\$self->session->scratch->get("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{scratch}{(.*)}!\$self->session->scratch->get("$1")!g' fileNameGoesHere
 
 
 5.23.1 WebGUI::SQL API Refactored
@@ -636,7 +636,7 @@ perl -pi.bak -e 's!quote\(!\$self->session->db->quote(!g' fileNameGoesHere
 Instead of accessing $session{form} or WebGUI::FormProcessor getting form data
 is done through the new session system via $session->form->process("param","Text");
 
-perl -pi.bak -e 's!\$session{form}{(\w+)}!\$self->session->form->process("$1")!g' fileNameGoesHere
+perl -pi.bak -e 's!\$session{form}{(.*)}!\$self->session->form->process("$1")!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:FormProcessor\:\:!\$self->session->form->!g' fileNameGoesHere
 
 
@@ -787,6 +787,14 @@ WebGUI::LDAPLink has been modified to use the new session api.
 perl -pi.bak -e 's!WebGUI\:\:LDAPLink\-\>new\(!WebGUI::LDAPLink->new(\$self->session,!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:LDAPLink\:\:getList\(!WebGUI::LDAPLink->getList(\$self->session,!g' fileNameGoesHere
 perl -pi.bak -e 's!WebGUI\:\:LDAPLink\:\:get\((.*)\)!WebGUI::LDAPLink->new(\$self->session,$1)->get!g' fileNameGoesHere
+
+
+5.23.18 WebGUI::Paginator API Refactored
+
+WebGUI::Paginator API was changed to use the new session API.
+
+perl -pi.bak -e 's!WebGUI\:\:Paginator\-\>new\(!WebGUI::Paginator->new(\$self->session,!g' fileNameGoesHere
+
 
 
 6.  Automatic list of Assets in Help System.

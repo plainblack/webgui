@@ -47,7 +47,7 @@ sub _isValidLDAPUser {
 	     $auth = $ldap->bind;
 	  }
       if ($auth) {
-	      $search = $ldap->search ( base=>$uri->dn, filter=>$connection->{ldapIdentity}."=".$session{form}{'authLDAP_ldapId'});
+	      $search = $ldap->search ( base=>$uri->dn, filter=>$connection->{ldapIdentity}."=".$self->session->form->process("'authLDAP_ldapId'"));
 			if (defined $search->entry(0)) {
 				if ($connection->{ldapUserRDN} eq 'dn') {
                    $connectDN = $search->entry(0)->dn;
@@ -56,10 +56,10 @@ sub _isValidLDAPUser {
                 }
                 $ldap->unbind;
                 $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= WebGUI::International::get(2,'AuthLDAP');
-                $auth = $ldap->bind(dn=>$connectDN, password=>$session{form}{'authLDAP_identifier'});
+                $auth = $ldap->bind(dn=>$connectDN, password=>$self->session->form->process("'authLDAP_identifier'"));
                 if ($auth->code == 48 || $auth->code == 49) {
                    $error .= '<li>'.WebGUI::International::get(68).'</li>';
-                   $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP_ldapId'});
+                   $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("'authLDAP_ldapId'"));
                 } elsif ($auth->code > 0) {
                    $error .= '<li>LDAP error "'.$ldapStatusCode{$auth->code}.'" occured. '.WebGUI::International::get(69).'</li>';
            		   $self->session->errorHandler->error("LDAP error: ".$ldapStatusCode{$auth->code});
@@ -67,7 +67,7 @@ sub _isValidLDAPUser {
                 $ldap->unbind;
         	} else {
                $error .= '<li>'.WebGUI::International::get(68).'</li>';
-               $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$session{form}{'authLDAP_ldapId'});
+               $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("'authLDAP_ldapId'"));
             }
 	 } else {
 	     $error = WebGUI::International::get(2,'AuthLDAP');
@@ -92,9 +92,9 @@ sub addUserForm {
     my $self = shift;
     my $userData = $self->getParams;
 	my $connection = $self->{_connection};
-    my $ldapUrl = $session{form}{'authLDAP_ldapUrl'} || $userData->{ldapUrl} || $connection->{ldapURL};
-	my $connectDN = $session{form}{'authLDAP_connectDN'} || $userData->{connectDN};
-	my $ldapConnection = $session{form}{'authLDAP_ldapConnection'} || $userData->{ldapConnection};
+    my $ldapUrl = $self->session->form->process("'authLDAP_ldapUrl'} || $userData->{ldapUrl} || $connection->{ldapURL");
+	my $connectDN = $self->session->form->process("'authLDAP_connectDN'} || $userData->{connectDN");
+	my $ldapConnection = $self->session->form->process("'authLDAP_ldapConnection'} || $userData->{ldapConnection");
 	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
 	my $f = WebGUI::HTMLForm->new($self->session);
 	my $jscript = "";
@@ -146,9 +146,9 @@ sub addUserForm {
 sub addUserFormSave {
    my $self = shift;
    my $properties;
-   $properties->{connectDN} = $session{form}{'authLDAP_connectDN'};
-   $properties->{ldapUrl} = $session{form}{'authLDAP_ldapUrl'};
-   $properties->{ldapConnection} = $session{form}{'authLDAP_ldapConnection'};
+   $properties->{connectDN} = $self->session->form->process("'authLDAP_connectDN'");
+   $properties->{ldapUrl} = $self->session->form->process("'authLDAP_ldapUrl'");
+   $properties->{ldapConnection} = $self->session->form->process("'authLDAP_ldapConnection'");
    $self->SUPER::addUserFormSave($properties); 
 }
 
@@ -222,9 +222,9 @@ sub createAccount {
 					value=>[$connection->{ldapLinkId}],
 					extras=>qq|onchange="location.href='$url'+this.options[this.selectedIndex].value"|
 				  });
-    $vars->{'create.form.ldapId'} = WebGUI::Form::text($self->session,{"name"=>"authLDAP_ldapId","value"=>$session{form}{"authLDAP_ldapId"}});
+    $vars->{'create.form.ldapId'} = WebGUI::Form::text($self->session,{"name"=>"authLDAP_ldapId","value"=>$self->session->form->process(""authLDAP_ldapId"}"));
     $vars->{'create.form.ldapId.label'} = $connection->{ldapIdentityName};
-    $vars->{'create.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authLDAP_identifier","value"=>$session{form}{"authLDAP_identifier"}});
+    $vars->{'create.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authLDAP_identifier","value"=>$self->session->form->process(""authLDAP_identifier"}"));
     $vars->{'create.form.password.label'} = $connection->{ldapPasswordName};
     
     $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$self->session->form->process("confirm")});

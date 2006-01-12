@@ -337,7 +337,7 @@ sub www_editBranchSave {
                 	if ($form =~ /^metadata_(.*)$/) {
 				my $fieldName = $1;
 				if ($self->session->form->yesNo("change_metadata_".$fieldName)) {
-                        		$newRevision->updateMetaData($fieldName,$session{form}{$form});
+                        		$newRevision->updateMetaData($fieldName,$self->session->form->process("$form"));
 				}
                 	}
         	}

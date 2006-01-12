@@ -647,7 +647,7 @@ sub view {
         $var->{'lock.url'} = $self->getLockUrl;
         $var->{'unlock.url'} = $self->getUnlockUrl;
 
-        my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
+        my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->get("postsPerPage"));
 	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate from asset 
 		left join assetData on assetData.assetId=asset.assetId
 		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate

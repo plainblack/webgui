@@ -29,7 +29,7 @@ Package that paginates rows of arbitrary data for display on the web.
 =head1 SYNOPSIS
 
  use WebGUI::Paginator;
- $p = WebGUI::Paginator->new("/index.pl/page_name?this=that");
+ $p = WebGUI::Paginator->new($self->session,"/index.pl/page_name?this=that");
  $p->setDataByArrayRef(\@array);
  $p->setDataByQuery($sql);
 
@@ -421,9 +421,13 @@ sub getRowCount {
 
 #-------------------------------------------------------------------
 
-=head2 new ( currentURL [, paginateAfter, pageNumber, formVar ] )
+=head2 new ( session, currentURL [, paginateAfter, pageNumber, formVar ] )
 
 Constructor.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 currentURL
 
@@ -445,12 +449,27 @@ Specify the form variable the paginator should use in it's links.  Defaults to "
 
 sub new {
 	my $class = shift;
+	my $session = shift;
 	my $currentURL = shift;
 	my $rowsPerPage = shift || 25;
 	my $formVar = shift || "pn";
-	my $pn = shift || $session{form}{$formVar} || 1;
-        bless {_url => $currentURL, _rpp => $rowsPerPage, _formVar => $formVar, _pn => $pn}, $class;
+	my $pn = shift || $session->form->process($formVar) || 1;
+        bless {_session=>$session, _url => $currentURL, _rpp => $rowsPerPage, _formVar => $formVar, _pn => $pn}, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	$self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -486,7 +505,7 @@ An SQL query that will retrieve a data set.
 
 =head3 dbh
 
-A DBI-style database handler. Defaults to the WebGUI site handler.
+A WebGUI::SQL database handler. Defaults to the WebGUI site handler.
 
 =head3 unconditional
 
@@ -511,10 +530,10 @@ sub setDataByQuery {
 	my ($self, $sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
 	$dbh ||= $self->session->db->getSlave;
 	if ($unconditional) {
-		$sth = $self->session->db->unconditionalRead($sql,$dbh,$placeholders);
+		$sth = $dbh->unconditionalRead($sql,$placeholders);
 		return $sth->errorMessage if ($sth->errorCode > 0);
 	} else {
-		$sth = $self->session->db->read($sql,$dbh,$placeholders);
+		$sth = $dbh->read($sql,$placeholders);
 	}
 	my $defaultPageNumber = $self->getPageNumber;
 	$self->{_totalRows} = $sth->rows;

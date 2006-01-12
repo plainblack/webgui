@@ -522,7 +522,7 @@ sub www_manageRevisionsInTag {
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Title</th><th>Type</th><th>Revision Date</th><th>Revised By</th></tr> ';
-	my $p = WebGUI::Paginator->new($self->getUrl("func=manageRevisionsInTag;tagId=".$self->session->form->process("tagId")));
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl("func=manageRevisionsInTag;tagId=".$self->session->form->process("tagId")));
 	$p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
 		left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
 		where assetData.tagId=".$self->session->db->quote($self->session->form->process("tagId")));

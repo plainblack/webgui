@@ -894,9 +894,9 @@ sub view {
 	my $self = shift;
 	my $scratchSortBy = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
-	my $sortBy = $self->session->form->process("sortBy") || $session{scratch}{$scratchSortBy} || $self->get("sortBy");
-	my $sortOrder = $session{scratch}{$scratchSortOrder} || $self->get("sortOrder");
-	if ($sortBy ne $session{scratch}{$scratchSortBy} && $self->session->form->process("func") ne "editSave") {
+	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get("$scratchSortBy") || $self->get("sortBy");
+	my $sortOrder = $self->session->scratch->get("$scratchSortOrder") || $self->get("sortOrder");
+	if ($sortBy ne $self->session->scratch->get("$scratchSortBy") && $self->session->form->process("func") ne "editSave") {
 		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
 	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
                 if ($sortOrder eq "asc") {
@@ -938,7 +938,7 @@ sub view {
 		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
 		where asset.parentId=".$self->session->db->quote($self->getId)." and asset.state='published' and asset.className='WebGUI::Asset::Post::Thread' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) and $constraints 
 		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
-	my $p = WebGUI::Paginator->new($self->getUrl,$self->get("threadsPerPage"));
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);
 	return $self->processTemplate(\%var,$self->get("collaborationTemplateId"));
@@ -965,28 +965,28 @@ sub www_search {
         	.WebGUI::Form::hidden($self->session,{ name=>"doit", value=>1 });
         $var{'all.form'} = WebGUI::Form::text({
                 name=>'all',
-                value=>$session{scratch}{$self->getId."_all"},
+                value=>$self->session->scratch->get("$self->getId."_all""),
                 size=>($self->session->setting->get("textBoxSize")-5)
                 });
         $var{'exactphrase.form'} = WebGUI::Form::text({
                 name=>'exactPhrase',
-                value=>$session{scratch}{$self->getId."_exactPhrase"},
+                value=>$self->session->scratch->get("$self->getId."_exactPhrase""),
                 size=>($self->session->setting->get("textBoxSize")-5)
                 });
         $var{'atleastone.form'} = WebGUI::Form::text({
                 name=>'atLeastOne',
-                value=>$session{scratch}{$self->getId."_atLeastOne"},
+                value=>$self->session->scratch->get("$self->getId."_atLeastOne""),
                 size=>($self->session->setting->get("textBoxSize")-5)
                 });
         $var{'without.form'} = WebGUI::Form::text({
                 name=>'without',
-                value=>$session{scratch}{$self->getId."_without"},
+                value=>$self->session->scratch->get("$self->getId."_without""),
                 size=>($self->session->setting->get("textBoxSize")-5)
                 });
         my %results;
         tie %results, 'Tie::IxHash';
         %results = (10=>'10', 25=>'25', 50=>'50', 100=>'100');
-        my $numResults = $session{scratch}{$self->getId."_numResults"} || $self->get("threadsPerPage");
+        my $numResults = $self->session->scratch->get("$self->getId."_numResults"") || $self->get("threadsPerPage");
         $var{'results.form'} = WebGUI::Form::selectBox({
                 name=>"numResults",
                 options=>\%results,
@@ -1000,10 +1000,10 @@ sub www_search {
         if ($self->session->form->process("doit")) {
                 my @fieldsToSearch = qw(assetData.title assetData.synopsis Post.content Post.username Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5);
 		my $all;
-		if ($session{scratch}{$self->getId."_all"} ne "") {
-			$session{scratch}{$self->getId."_all"} =~ s/,/ /g;
-			$session{scratch}{$self->getId."_all"} =~ s/\s+/ /g;
-			my @words = split(/ /,$session{scratch}{$self->getId."_all"});
+		if ($self->session->scratch->get("$self->getId."_all"") ne "") {
+			$self->session->scratch->get("$self->getId."_all"") =~ s/,/ /g;
+			$self->session->scratch->get("$self->getId."_all"") =~ s/\s+/ /g;
+			my @words = split(/ /,$self->session->scratch->get("$self->getId."_all""));
 			foreach my $word (@words) {
 				$all .= " and " if ($all ne "");
 				$all .= "(";
@@ -1018,17 +1018,17 @@ sub www_search {
 			}
 		}
 		my $exactPhrase;
-	        if ($session{scratch}{$self->getId."_exactPhrase"} ne "") {
+	        if ($self->session->scratch->get("$self->getId."_exactPhrase"") ne "") {
 			foreach my $field (@fieldsToSearch) {
 				$exactPhrase .= " or " if ($exactPhrase ne "");
-       		         	$exactPhrase .= " $field like ".$self->session->db->quote("%".$session{scratch}{$self->getId."_exactPhrase"}."%");
+       		         	$exactPhrase .= " $field like ".$self->session->db->quote("%".$self->session->scratch->get("$self->getId."_exactPhrase"")."%");
 			}
      	  	}
 		my $atLeastOne;
-        	if ($session{scratch}{$self->getId."_atLeastOne"} ne "") {
-	                $session{scratch}{$self->getId."_atLeastOne"} =~ s/,/ /g;
-       	         	$session{scratch}{$self->getId."_atLeastOne"} =~ s/\s+/ /g;
-                	my @words = split(/ /,$session{scratch}{$self->getId."_atLeastOne"});
+        	if ($self->session->scratch->get("$self->getId."_atLeastOne"") ne "") {
+	                $self->session->scratch->get("$self->getId."_atLeastOne"") =~ s/,/ /g;
+       	         	$self->session->scratch->get("$self->getId."_atLeastOne"") =~ s/\s+/ /g;
+                	my @words = split(/ /,$self->session->scratch->get("$self->getId."_atLeastOne""));
                 	foreach my $word (@words) {
 				foreach my $field (@fieldsToSearch) {
                         		$atLeastOne .= " or " if ($atLeastOne ne "");
@@ -1037,10 +1037,10 @@ sub www_search {
                 	}
         	}
 		my $without;
-        	if ($session{scratch}{$self->getId."_without"} ne "") {
-                	$session{scratch}{$self->getId."_without"} =~ s/,/ /g;
-                	$session{scratch}{$self->getId."_without"} =~ s/\s+/ /g;
-                	my @words = split(/ /,$session{scratch}{$self->getId."_without"});
+        	if ($self->session->scratch->get("$self->getId."_without"") ne "") {
+                	$self->session->scratch->get("$self->getId."_without"") =~ s/,/ /g;
+                	$self->session->scratch->get("$self->getId."_without"") =~ s/\s+/ /g;
+                	my @words = split(/ /,$self->session->scratch->get("$self->getId."_without""));
                 	foreach my $word (@words) {
 				foreach my $field (@fieldsToSearch) {
                         		$without .= " and " if ($without ne "");
@@ -1071,7 +1071,7 @@ sub www_search {
 		$sql .= " and " if ($sql ne "" && $without ne "");
 		$sql .= " ($without) " if ($without ne "");
 		$sql .= " group by assetData.assetId order by Post.dateSubmitted desc";
-		my $p = WebGUI::Paginator->new($self->getUrl("func=search;doit=1"),$numResults);
+		my $p = WebGUI::Paginator->new($self->session,$self->getUrl("func=search;doit=1"),$numResults);
 		$self->appendPostListTemplateVars(\%var, $sql, $p);
         }
         return  $self->processStyle($self->processTemplate(\%var, $self->get("searchTemplateId")));

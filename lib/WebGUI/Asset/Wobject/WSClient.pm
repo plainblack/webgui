@@ -419,7 +419,7 @@ sub view {
          # this case hasn't ever happened running against my dev SOAP::Lite
          # services, but let's assume it might.  If our results array has
          # more than one element, let's hope if contains scalars
-         $p = WebGUI::Paginator->new($url, $self->get('paginateAfter'));
+         $p = WebGUI::Paginator->new($self->session,$url, $self->get('paginateAfter'));
 	$p->setDataByArrayRef(\@result);
          @result = ();
          @result = @$p;
@@ -431,7 +431,7 @@ sub view {
          if (my $aref = $result[0]->{$self->get('paginateVar')}) {
 
             $var{'numResults'} = scalar @$aref;
-            $p = WebGUI::Paginator->new($url,  $self->get('paginateAfter'));
+            $p = WebGUI::Paginator->new($self->session,$url,  $self->get('paginateAfter'));
 		$p->setDataByArrayRef($aref);
             $result[0]->{$self->get('paginateVar')} = $p->getPageData;
 
@@ -443,21 +443,21 @@ sub view {
                # prevent the wobject from dying
                for (keys %{$result[0]}) {
                   if ((ref $result[0]->{$_}) =~ /ARRAY/) {
-                       $p = WebGUI::Paginator->new($url,  $self->get('paginateAfter'));
+                       $p = WebGUI::Paginator->new($self->session,$url,  $self->get('paginateAfter'));
 			$p->setDataByArrayRef($result[0]->{$_});
                      last;
                   }
                }
-               $p ||= WebGUI::Paginator->new($url);
+               $p ||= WebGUI::Paginator->new($self->session,$url);
                $result[0]->{$_} = $p->getPageData;
                
             } elsif ((ref $result[0]) =~ /ARRAY/) {
-               $p = WebGUI::Paginator->new($url, $self->get('paginateAfter'));
+               $p = WebGUI::Paginator->new($self->session,$url, $self->get('paginateAfter'));
 		$p->setDataByArrayRef($result[0]);
                $result[0] = $p->getPageData;
 
             } else {
-               $p = WebGUI::Paginator->new($url, $self->get('paginateAfter'));
+               $p = WebGUI::Paginator->new($self->session,$url, $self->get('paginateAfter'));
 		$p->setDataByArrayRef([$result[0]]);
                $result[0] = $p->getPageData;
             }

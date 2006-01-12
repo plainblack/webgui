@@ -749,11 +749,11 @@ sub www_rate {
 		if ($first) {
 			$first=0;
 		} else {
-			if ($lastRating != $session{form}{$category}) {
+			if ($lastRating != $self->session->form->process("$category")) {
 				$sameRating = 0;
 			} 
 		}
-		$lastRating = $session{form}{$category};
+		$lastRating = $self->session->form->process("$category");
 	} 
 	return $self->www_viewDetail("",1) if ($hasRated || $sameRating); # Throw out ratings that are all the same number, or if the user rates twice.
 	$self->setRatings($self->session->form->process("listingId"),$session{form});
@@ -773,14 +773,14 @@ sub www_search {
 		}
 		my $sth = $self->session->db->read("select name,fieldType from Matrix_field");	
 		while (my ($name,$fieldType) = $sth->array) {
-			next unless ($session{form}{$name});
+			next unless ($self->session->form->process("$name"));
 			push(@list,0);	
 			my $where;
 			if ($fieldType ne "goodBad") {
                                 $where = "("
-					."a.value like ".$self->session->db->quote("%".$session{form}{$name}."%")
+					."a.value like ".$self->session->db->quote("%".$self->session->form->process("$name")."%")
 					." or a.value='Any'"
-                                        #." or a.value<".$self->session->db->quote($session{form}{$name})
+                                        #." or a.value<".$self->session->db->quote($self->session->form->process("$name"))
 					." or a.value='Free'"
 					.")";
 			} else {
@@ -832,13 +832,13 @@ sub www_search {
 			if ($data->{fieldType} ne "goodBad") {
 				$data->{form} = WebGUI::Form::text({
 					name=>$data->{name},
-					value=>$session{form}{$data->{name}}
+					value=>$self->session->form->process("$data->{name}")
 					});
 			} else {
 				$data->{form} = WebGUI::Form::checkbox({
 					name=>$data->{name},
 					value=>"1",
-					checked=>$session{form}{$data->{name}}
+					checked=>$self->session->form->process("$data->{name}")
 					});
 			}
 			push(@loop,$data);

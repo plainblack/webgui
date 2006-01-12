@@ -232,7 +232,7 @@ sub view {
             foreach my $input_name (keys %{$session{form}}) {
                next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
                $input_name =~ s/^HttpProxy_//;
-               $proxiedUrl=$self->session->url->append($proxiedUrl,"$input_name=$session{form}{'HttpProxy_'.$input_name}");
+               $proxiedUrl=$self->session->url->append($proxiedUrl,"$input_name=$self->session->form->process("'HttpProxy_'.$input_name")");
             }
          }
          $request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
@@ -245,13 +245,13 @@ sub view {
    	 next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
    	 $input_name =~ s/^HttpProxy_//;
    
-            my $uploadFile = $self->session->request->tmpFileName($session{form}{'HttpProxy_'.$input_name});
+            my $uploadFile = $self->session->request->tmpFileName($self->session->form->process("'HttpProxy_'.$input_name"));
             if(-r $uploadFile) { # Found uploaded file
-      	       @formUpload=($uploadFile, qq/$session{form}{'HttpProxy_'.$input_name}/);
+      	       @formUpload=($uploadFile, qq/$self->session->form->process("'HttpProxy_'.$input_name")/);
    	       $formdata{$input_name}=\@formUpload;
 	       $contentType = 'form-data'; # Different Content Type header for file upload
    	    } else {
-   	      $formdata{$input_name}=qq/$session{form}{'HttpProxy_'.$input_name}/;
+   	      $formdata{$input_name}=qq/$self->session->form->process("'HttpProxy_'.$input_name")/;
             }
          }
          # Create POST request

@@ -660,7 +660,7 @@ sub processPropertiesFromFormPost {
 			);
 		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
 		if ($self->getThread->getParent->canModerate) {
-			$self->getThread->lock if ($session{form}{'lock'});
+			$self->getThread->lock if ($self->session->form->process("'lock'"));
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
 	}
@@ -1002,7 +1002,7 @@ sub www_edit {
                                 	});
                         	$var{'lock.form'} = WebGUI::Form::yesNo({
                        	         	name=>'lock',
-                                	value=>$session{form}{'lock'}
+                                	value=>$self->session->form->process("'lock'")
                                 	});
 			}
 			$var{'subscribe.form'} = WebGUI::Form::yesNo({
@@ -1035,7 +1035,7 @@ sub www_edit {
 		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContentFromFormPost;
 		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$self->session->form->process("contentType"));
 		for my $i (1..5) {	
-			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($session{form}{'userDefined'.$i},"macros");
+			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($self->session->form->process("'userDefined'.$i"),"macros");
 		}
 	}
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session,);

@@ -271,7 +271,7 @@ sub www_editSubscriptionSave {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
-	WebGUI::Subscription->new($session->form->process("sid"))->set({map {$_ => $session{form}{$_}} @relevantFields});
+	WebGUI::Subscription->new($session->form->process("sid"))->set({map {$_ => $session->form->process("$_}} @relevantFields"));
 		
 	return www_listSubscriptions();
 }
@@ -284,7 +284,7 @@ sub www_listSubscriptionCodeBatches {
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	$p = WebGUI::Paginator->new($session->url->page('op=listSubscriptionCodeBatches'));
+	$p = WebGUI::Paginator->new($session,$session->url->page('op=listSubscriptionCodeBatches'));
 	$p->setDataByQuery("select * from subscriptionCodeBatch");
 
 	$batches = $p->getPageData;
@@ -359,7 +359,7 @@ sub www_listSubscriptionCodes {
 		return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
 	}
 	
-	$p = WebGUI::Paginator->new($session->url->page('op=listSubscriptionCodes'.$ops));
+	$p = WebGUI::Paginator->new($session,$session->url->page('op=listSubscriptionCodes'.$ops));
 	$p->setDataByQuery("select t1.*, t2.* from subscriptionCode as t1, subscriptionCodeBatch as t2 where t1.batchId=t2.batchId ".$where);
 
 	$codes = $p->getPageData;
@@ -396,7 +396,7 @@ sub www_listSubscriptions {
 	
 	my $i18n = WebGUI::International->new("Subscription");
 	
-	$p = WebGUI::Paginator->new($session->url->page('op=listSubscriptions'));
+	$p = WebGUI::Paginator->new($session,$session->url->page('op=listSubscriptions'));
 	$p->setDataByQuery('select subscriptionId, name from subscription where deleted != 1');
 	$subscriptions = $p->getPageData;
 

@@ -172,7 +172,7 @@ sub view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
-	my $p = WebGUI::Paginator->new($self->getUrl,1);
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,1);
 	if ($self->session->form->process("makePrintable") || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);

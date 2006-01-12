@@ -527,10 +527,10 @@ sub www_editCommerceSettingsSave {
 				type		=> $1,
 				namespace	=> $2,
 				fieldName	=> $3, 
-				fieldValue	=> $session{form}{$_}
+				fieldValue	=> $session->form->process("$_")
 			});
 		} elsif ($_ ne 'op') {
-			WebGUI::Setting::set($_,$session{form}{$_});
+			WebGUI::Setting::set($_,$session->form->process("$_"));
 		}
 	}
 	
@@ -545,7 +545,7 @@ sub www_listPendingTransactions {
 	
 	$i18n = WebGUI::International->new("Commerce");
 
-	$p = WebGUI::Paginator->new($session->url->page('op=listPendingTransactions'));
+	$p = WebGUI::Paginator->new($session,$session->url->page('op=listPendingTransactions'));
 	$p->setDataByArrayRef(WebGUI::Commerce::Transaction->pendingTransactions);
 	
 	$transactions = $p->getPageData;
@@ -776,7 +776,7 @@ my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 
 	foreach my $formElement (keys(%{$session{form}})) {
 		if ($formElement =~ m/^quantity~([^~]*)~([^~]*)$/) {
-			$shoppingCart->setQuantity($2, $1, $session{form}{$formElement});
+			$shoppingCart->setQuantity($2, $1, $session->form->process("$formElement"));
 		}
 	}
 

@@ -364,7 +364,7 @@ sub getAssetAdderLinks {
 	my $addToUrl = shift;
 	my $type = shift || "assets";
 	my %links;
-	foreach my $class (@{$session{config}{$type}}) {
+	foreach my $class (@{$self->session->config->get("$type}")) {
 		next unless $class;
 		my $load = "use ".$class;
 		eval ($load);
@@ -964,7 +964,7 @@ sub getValue {
 	my $self = shift;
 	my $key = shift;
 	if (defined $key) {
-		#	return $session{form}{$key} if (exists $session{form}{$key}); # Security Hazard!
+		#	return $self->session->form->process("$key} if (exists $session{form}{$key")); # Security Hazard!
 		my $storedValue = $self->get($key);
 		return $storedValue if (defined $storedValue);
 		unless (exists $self->{_propertyDefinitions}) { # check to see if the definitions have been merged and cached
@@ -1201,7 +1201,7 @@ sub processPropertiesFromFormPost {
 	}
 	foreach my $form (keys %{$session{form}}) {
 		if ($form =~ /^metadata_(.*)$/) {
-			$self->updateMetaData($1,$session{form}{$form});
+			$self->updateMetaData($1,$self->session->form->process("$form"));
 		}
 	}
 	$data{title} = "Untitled" unless ($data{title});
@@ -1416,7 +1416,7 @@ sub www_add {
 		$self->session->errorHandler->security("tried to call an invalid class ".$class);
 		return "";
 	}
-	if ($session{form}{'prototype'}) {
+	if ($self->session->form->process("'prototype'")) {
 		my $prototype = WebGUI::Asset->new($self->session->form->process("prototype"),$class);
 		foreach my $definition (@{$prototype->definition}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {

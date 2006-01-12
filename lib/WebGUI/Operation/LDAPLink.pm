@@ -243,7 +243,7 @@ sub www_listLDAPLinks {
       $i++;
    }
    $sth->finish;
-   $p = WebGUI::Paginator->new($session->url->page('op=listLDAPLinks'));
+   $p = WebGUI::Paginator->new($session,$session->url->page('op=listLDAPLinks'));
    $p->setDataByArrayRef(\@row);
    $output .= '<table border="1" cellpadding="3" cellspacing="0" align="center">';
    $output .= $p->getPage;

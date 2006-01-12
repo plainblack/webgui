@@ -87,7 +87,7 @@ sub doGroupSearch {
 	my $sql = "select groupId,groupName,description from groups where isEditable=1 and (groupName like $keyword or description like $keyword) 
 		and groupId not in (".$session->db->quoteAndJoin($groupFilter).") order by groupName";
 	if ($returnPaginator) {
-                my $p = WebGUI::Paginator->new($session->url->page($op));
+                my $p = WebGUI::Paginator->new($session,$session->url->page($op));
                 $p->setDataByQuery($sql);
                 return $p;
         } else {
@@ -579,7 +579,7 @@ sub www_listGroups {
                 	$i++;
         	}
         	$sth->finish;
-        	$p = WebGUI::Paginator->new($session->url->page('op=listGroups'));
+        	$p = WebGUI::Paginator->new($session,$session->url->page('op=listGroups'));
         	$p->setDataByArrayRef(\@row);
         	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
         	$output .= '<tr><td class="tableHeader">'.WebGUI::International::get(84).'</td><td class="tableHeader">'
@@ -642,7 +642,7 @@ sub www_manageUsersInGroup {
 		.WebGUI::Icon::_getBaseURL().'delete.gif" border="0"></td>
                 <td class="tableHeader">'.WebGUI::International::get(50).'</td>
                 <td class="tableHeader">'.WebGUI::International::get(369).'</td></tr>';
-	my $p = WebGUI::Paginator->new($session->url->page("op=manageUsersInGroup;gid=".$session->form->process("gid")));
+	my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageUsersInGroup;gid=".$session->form->process("gid")));
         $p->setDataByQuery("select users.username,users.userId,groupings.expireDate
                 from groupings,users where groupings.groupId=".$session->db->quote($session->form->process("gid"))." and groupings.userId=users.userId
                 order by users.username");
