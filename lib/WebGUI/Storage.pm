@@ -203,15 +203,15 @@ sub addFileFromFormPost {
 	my $attachmentCount = 1;
 	foreach my $upload ($self->session->request->upload($formVariableName)) {
 		return $filename if $attachmentCount > $attachmentLimit;
-		$filename = $upload->filename();
-		next unless $filename;
-		if ($filename =~ /([^\/\\]+)$/) { $filename = $1; }
-		my $type = $self->getFileExtension($filename);
+		my $tempFilename = $upload->filename();
+		next unless $tempFilename;
+		if ($tempFilename =~ /([^\/\\]+)$/) { $tempFilename = $1; }
+		my $type = $self->getFileExtension($tempFilename);
 		if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads
-			$filename =~ s/\./\_/g;
-			$filename .= ".txt";
+			$tempFilename =~ s/\./\_/g;
+			$tempFilename .= ".txt";
 		}
-		$filename = $self->session->url->makeCompliant($filename);
+		$filename = $self->session->url->makeCompliant($tempFilename);
 		my $bytesread;
 		my $file = FileHandle->new(">".$self->getPath($filename));
 		$attachmentCount++;

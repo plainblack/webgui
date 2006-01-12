@@ -4,6 +4,7 @@
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
+ - fix [ 1403466 ] CS Attachments - Broken Image Issue
 
 6.8.4
  - fix [ 1395371 ] XSS Vulnerability in DataForm Entries

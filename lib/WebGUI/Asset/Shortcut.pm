@@ -618,7 +618,6 @@ sub view {
 	foreach my $prop (keys %{$self->{_shortcut}{_properties}}) {
 		next if ($prop eq 'content' || $prop eq 'label' || $prop eq 'url');
 		$var{'shortcut.'.$prop} = $self->{_shortcut}{_properties}{$prop};
-	$self->session->errorHandler->warn($prop.' = '.$self->{_shortcut}{_properties}{$prop});
 	}
 	return $self->processTemplate(\%var,$self->getValue("templateId"));
 }
