@@ -411,7 +411,7 @@ sub render {
 	$var{"console.canUse"} = $acParams->{canUse};
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
-	if (exists $self->session->asset) {
+	if (defined $self->session->asset) {
 		my $importNode = $self->session->asset->getImportNode;
 		my $importNodeLineage = $importNode->get("lineage");
 		my $assetLineage = $self->session->asset->get("lineage");
@@ -424,7 +424,7 @@ sub render {
 		$var{"backtosite.url"} = $self->session->url->page();
 	}
 	$var{"application_loop"} = $self->getAdminFunction;
-	return $self->session->style->:process(WebGUI::Asset::Template->new($self->session,$self->session->setting->get("AdminConsoleTemplate"))->process(\%var),"PBtmpl0000000000000137");
+	return $self->session->style->process(WebGUI::Asset::Template->new($self->session,$self->session->setting->get("AdminConsoleTemplate"))->process(\%var),"PBtmpl0000000000000137");
 }
 
 #-------------------------------------------------------------------
