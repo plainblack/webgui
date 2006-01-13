@@ -192,13 +192,13 @@ sub getGroups {
         if (exists $gotGroupsForUser->{$self->userId}) {
                 return $gotGroupsForUser->{$self->userId};
         } else {
-                my @groups = $self->session->db->buildArray("select groupId from groupings where userId=".$self->session->db->quote($userId)." $clause");
+                my @groups = $self->session->db->buildArray("select groupId from groupings where userId=".$self->session->db->quote($self->userId)." $clause");
 		my $isInGroup = $self->session->stow("isInGroup");
                 foreach my $gid (@groups) {	
                         $isInGroup->{$self->userId}{$gid} = 1;
                 }
 		$self->session->stow("isInGroup",$isInGroup);
-                $gotGroupsForUser->{$userId} = \@groups;
+                $gotGroupsForUser->{$self->userId} = \@groups;
 		$self->session->stow("gotGroupsForUser",$gotGroupsForUser);
                 return \@groups;
         }
@@ -233,9 +233,9 @@ The group that you wish to verify against the user. Defaults to group with Id 3 
 
 sub isInGroup {
         my (@data, $groupId);
-        my ($gid, $secondRun) = @_;
+        my ($self, $gid, $secondRun) = @_;
         $gid = 3 unless (defined $gid);
-        $uid = $self->userId;
+        my $uid = $self->userId;
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         return 1 if ($gid eq '7');		# everyone is in the everyone group
         return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
@@ -340,9 +340,9 @@ sub isInGroup {
 		   unless($uid eq '1') {
 			  # skip if user is not set to LDAP
 			  if($self->authMethod eq "LDAP") {
-			     my $auth = WebGUI::Auth->new($session,"LDAP",$uid);
+			     my $auth = WebGUI::Auth->new($self->session,"LDAP",$uid);
 				 my $params = $auth->getParams();
-				 my $ldapLink = WebGUI::LDAPLink->new($self->session,$session,$params->{ldapConnection});
+				 my $ldapLink = WebGUI::LDAPLink->new($self->session,$params->{ldapConnection});
 				 if($ldapLink ne "") {
 					my $people = [];
 					if($group->get("ldapRecursiveProperty")) {
@@ -353,7 +353,7 @@ sub isInGroup {
 					 
 				    if(isIn($params->{connectDN},@{$people})) {
 					   $isInGroup->{$uid}{$gid} = 1;
-                       if ($group{dbCacheTimeout} > 10) {
+                       if ($group->{'dbCacheTimeout'} > 10) {
                           $group->deleteUsers([$uid]);
                           $group->addUsers([$uid],$group->get("dbCacheTimeout"));
                        }
@@ -457,16 +457,16 @@ sub new {
         my $userId = shift || 1;
 	my $overrideId = shift;
         $userId = _create($session, $overrideId) if ($userId eq "new");
-	my $cache = WebGUI::Cache->new($self->session,["user",$userId]);
+	my $cache = WebGUI::Cache->new($session,["user",$userId]);
 	my $userData = $cache->get;
 	unless ($userData->{_userId} && $userData->{_user}{username}) {
 		my %user;
 		tie %user, 'Tie::CPHash';
 		%user = $session->db->quickHash("select * from users where userId=".$session->db->quote($userId));
-		my %profile = $self->session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
+		my %profile = $session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
-			userProfileData.userId=".$self->session->db->quote($user{userId}));
-        	my %default = $self->session->db->buildHash("select fieldName, dataDefault from userProfileField");
+			userProfileData.userId=".$session->db->quote($user{userId}));
+        	my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
         	foreach my $key (keys %default) {
 			my $value;
         		if ($profile{$key} eq "" && $default{$key}) {
