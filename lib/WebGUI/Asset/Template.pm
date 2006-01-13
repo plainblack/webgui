@@ -55,6 +55,7 @@ sub _getTemplateFile {
 
 #-------------------------------------------------------------------
 sub _execute {
+	my $session = shift;
 	my $params = shift;
 	my $vars = shift;
 	my $t;
@@ -62,7 +63,7 @@ sub _execute {
 		$t = HTML::Template->new(%{$params});
 	};
 	unless ($@) {
-	        while (my ($section, $hash) = each %session) {
+	        while (my ($section, $hash) = each %{ $session }) {
 			next unless (ref $hash eq 'HASH');
         		while (my ($key, $value) = each %$hash) {
         	                unless (lc($key) eq "password" || lc($key) eq "identifier") {
@@ -75,8 +76,8 @@ sub _execute {
 		$t->param("webgui.status"=>$WebGUI::STATUS);
 		return $t->output;
 	} else {
-		$self->session->errorHandler->error("Error in template. ".$@);
-		my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+		$session->errorHandler->error("Error in template. ".$@);
+		my $i18n = WebGUI::International->new($session, 'Asset_Template');
 		return $i18n->get('template error').$@;
 	}
 }
@@ -96,8 +97,9 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
+	my $session = shift;
         my $definition = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+	my $i18n = WebGUI::International->new($session, 'Asset_Template');
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'template.gif',
@@ -123,7 +125,7 @@ sub definition {
 					}
                         }
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -138,6 +140,7 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
 	$tabform->hidden({
 		name=>"returnUrl",
 		value=>$self->session->form->process("returnUrl")
@@ -198,9 +201,10 @@ Specify the namespace to build the list for.
 
 sub getList {
 	my $class = shift;
+	my $session = shift;
 	my $namespace = shift;
-my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$self->session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) order by assetData.title";
-	my $sth = $self->session->db->read($sql,$self->session->db->getSlave);
+my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$session->db->quote($session->scratch->get("versionTag")).")) order by assetData.title";
+	my $sth = $session->db->read($sql,$session->db->getSlave);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {
@@ -227,7 +231,7 @@ A hash reference containing template variables and loops. Automatically includes
 sub process {
 	my $self = shift;
 	my $vars = shift;
-	return $self->processRaw($self->get("template"),$vars);
+	return $self->processRaw($self->session, $self->get("template"),$vars);
 # skip all the junk below here for now until we have time to bring it inline with the new system
 	my $file = _getTemplateFile($self->get("templateId"));
 	my $fileCacheDir = $self->session->config->get("uploadsPath").'/temp/templatecache';
@@ -273,7 +277,7 @@ sub process {
 			delete $params{filename};
         	}
 	}
-	return _execute(\%params,$vars);
+	return _execute($self->session, \%params,$vars);
 }
 
 
@@ -287,6 +291,10 @@ Evaluate a template replacing template commands for HTML.
 
 NOTE: This is a class method, no instance data required.
 
+=head3 session
+
+The session variable
+
 =head3 template
 
 A scalar variable containing the template.
@@ -299,9 +307,10 @@ A hash reference containing template variables and loops. Automatically includes
 
 sub processRaw {
 	my $class = shift;
+	my $session = shift;
 	my $template = shift;
 	my $vars = shift;
-	return _execute({
+	return _execute($session, {
 		scalarref=>\$template,
 		global_vars=>1,
    		loop_context_vars=>1,

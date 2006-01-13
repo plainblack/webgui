@@ -327,7 +327,7 @@ my		$currentOption = $self->getOption($_);
 		($parameterName = $self->{_parameters}->{$currentOption->{parameterId}}->{name}) =~ s/ //g;
 		$sku{'param.'.$parameterName} = $currentOption->{skuModifier};
 	}
-	$original->{sku} = WebGUI::Asset::Template->processRaw($self->get('skuTemplate'), \%sku );
+	$original->{sku} = WebGUI::Asset::Template->processRaw($self->session, $self->get('skuTemplate'), \%sku );
 
 	if (defined $properties->{price}) {
 		if ($properties->{price} ne '') {
@@ -398,7 +398,7 @@ sub updateVariants {
 
 		$var{composition} = join(',', sort @composition);
 		$var{available} = 1;
-		$var{sku} = WebGUI::Asset::Template->processRaw($self->get('skuTemplate'), \%sku ) || $self->get('sku');
+		$var{sku} = WebGUI::Asset::Template->processRaw($self->session, $self->get('skuTemplate'), \%sku ) || $self->get('sku');
 
 		if (defined $variants{$var{composition}}) {
 			$var{price} = $variants{$var{composition}}{price} if ($variants{$var{composition}}{priceOverride});

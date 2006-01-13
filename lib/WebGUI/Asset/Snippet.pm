@@ -151,7 +151,7 @@ sub view {
 	WebGUI::Macro::process($self->session,\$output);
 	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($self->session->var->get("adminOn") && !$calledAsWebMethod);
 	return $output unless ($self->getValue("processAsTemplate")); 
-	return WebGUI::Asset::Template->processRaw($output);
+	return WebGUI::Asset::Template->processRaw($self->session, $output);
 }
 
 #-------------------------------------------------------------------
