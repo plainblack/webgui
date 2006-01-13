@@ -99,12 +99,10 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 
 sub close {
 	my $self = shift;
-	$self->asset->DESTROY() if (exists $self->asset && $self->asset ne "");
-	foreach my $slavedbh (@{$self->{_slave}}) {
-		$slavedbh->disconnect();
+	foreach my $object (keys %{$self}) {
+		$self->{$object}->DESTROY;
 	}
-	$self->{_db}->disconnect if (exists $self->{_db});
-	undef %session;
+	undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -176,6 +174,20 @@ sub dbSlave {
         } else {
                 return $self->{_slave}->[rand @{$self->{_slave}}];
         }
+}
+
+
+#-------------------------------------------------------------------
+
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+	$self->close;
 }
 
 

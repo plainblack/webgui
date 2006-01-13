@@ -276,6 +276,21 @@ sub deleteRow {
 
 #-------------------------------------------------------------------
 
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+	my $self = shift;
+	$self->disconnect;
+	undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 disconnect ( )
 
 Disconnects from the database. And destroys the object.

@@ -175,6 +175,20 @@ sub deleteFromGroups {
 
 #-------------------------------------------------------------------
 
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getGroups ( [ withoutExpired ] )
 
 Returns an array reference containing a list of groups this user is in.
