@@ -14,6 +14,10 @@ save you many hours of grief.
 	migration.txt to bring your custom code up to date with the
 	new API.
 
+ * You need to upgrade to the latest 6.8 release before you can
+	upgrade to 6.9.
+
+
 6.8.4
 --------------------------------------------------------------------
  * The If macro has been removed because it's far too dangerous and

@@ -14,7 +14,7 @@ use Getopt::Long;
 use WebGUI::Session;
 
 
-my $toVersion = "0.0.0"; # make this match what version you're going to
+my $toVersion = "6.9.0"; # make this match what version you're going to
 my $quiet; # this line required
 
 
@@ -27,7 +27,6 @@ finish($session); # this line required
 
 ##-------------------------------------------------
 #sub exampleFunction {
-#	my $session = shift;
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
