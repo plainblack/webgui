@@ -580,7 +580,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub passUiLevelCheck {
 	my $self = shift;
 	my $passUiLevelCheck = 0;
-	my $override = $self->session->config->get($self->get("uiLevelOverride")."_uiLevel")
+	my $override = $self->session->config->get($self->get("uiLevelOverride")."_uiLevel");
 	if (defined $override && $override->{$self->get("name")}) { # use override if it exists
 		$passUiLevelCheck = ($override->{$self->get("name")} <= $self->session->user->profileField("uiLevel"));
 	} else { # use programmed default
