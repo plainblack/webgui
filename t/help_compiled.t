@@ -25,7 +25,7 @@ my $numTests = 0;
 
 my $session = initialize();  # this line is required
 
-my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList();
+my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
 $numTests = scalar @helpFileSet; #One for each help compile
 
@@ -35,7 +35,7 @@ plan tests => $numTests;
 
 foreach my $helpSet (@helpFileSet) {
 	my $helpName = $helpSet->[1];
-	my $help = WebGUI::Operation::Help::_load($helpName);
+	my $help = WebGUI::Operation::Help::_load($session, $helpName);
 	ok(keys %{ $help }, "$helpName compiled");
 }
 
@@ -53,7 +53,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        return WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
