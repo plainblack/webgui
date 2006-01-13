@@ -79,7 +79,7 @@ sub canAdd {
 	my $session = shift;
 	my $userId = shift || $session->user->profileField("userId");
 	my $subclassGroupId = shift;
-	my $groupId = $session->config->get("assetAddPrivilege"){$className} || $subclassGroupId || '12';
+	my $groupId = $session->config->get("assetAddPrivilege")->{$className} || $subclassGroupId || '12';
         return $session->user->isInGroup($groupId,$userId);
 }
 
@@ -154,7 +154,7 @@ sub definition {
         my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, "Asset");
         push(@{$definition}, {
-		assetName=>->get("asset"),
+		assetName=>$i18n->get("asset"),
                 tableName=>'assetData',
                 className=>'WebGUI::Asset',
 		icon=>'assets.gif',
@@ -366,7 +366,7 @@ sub getAssetAdderLinks {
 	my $addToUrl = shift;
 	my $type = shift || "assets";
 	my %links;
-	foreach my $class (@{$self->session->config->get("$type}")) {
+	foreach my $class (@{$self->session->config->get("$type")}) {
 		next unless $class;
 		my $load = "use ".$class;
 		eval ($load);
@@ -575,7 +575,7 @@ sub getEditForm {
         }
         my $clause;
         if ($self->session->user->isInGroup(3)) {
-                my $contentManagers = $group->getUsers(4,1);
+                my $contentManagers = $self->session->group->getUsers(4,1);
                 push (@$contentManagers, $self->session->user->profileField("userId"));
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
@@ -867,7 +867,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 sub getToolbar {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
-	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url")$i18n->get(43));
+	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43));
 	my $commit;
 	if (($self->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId")) || !$self->isLocked) {
         	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url"));
@@ -921,7 +921,7 @@ Returns the UI Level specified in the asset definition or from the config file i
 sub getUiLevel {
         my $self = shift;
         my $definition = $self->definition($self->session);
-        return $self->session->config->get("assetUiLevel"){$definition->[0]{className}} || $definition->[0]{uiLevel} || 1;
+        return $self->session->config->get("assetUiLevel")->{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1;
 }  
 
 
@@ -1017,8 +1017,8 @@ sub new {
 	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId="
-			.$session->db->$self->session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
-			.$session->db->$self->session->db->quote($session->scratch->get("versionTag")).")
+			.$session->db->$session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
+			.$session->db->$session->db->quote($session->scratch->get("versionTag")).")
 			group by assetData.assetId order by assetData.revisionDate");
 		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
 		$session->stow("assetRevision",$assetRevision);
@@ -1033,7 +1033,7 @@ sub new {
 		}
 		$class = $className;
 	}
-	my $cache = WebGUI::Cache->new($self->session,$session, ["asset",$assetId,$revisionDate]);
+	my $cache = WebGUI::Cache->new($session,$session, ["asset",$assetId,$revisionDate]);
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
 		# got properties from cache
@@ -1043,7 +1043,7 @@ sub new {
 			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
 				.$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
 		}
-		$sql .= " where asset.assetId=".$session->db->$self->session->db->quote($assetId);
+		$sql .= " where asset.assetId=".$session->db->quote($assetId);
 		$properties = $session->db->quickHashRef($sql);
 		return undef unless (exists $properties->{assetId});
 		$cache->set($properties,60*60*24);
@@ -1085,7 +1085,7 @@ sub newByDynamicClass {
 	my $assetClass = $session->stow->get("assetClass");
 	my $className = $assetClass->{$assetId};
 	unless ($className) {
-       		($className) = $session->db->quickArray("select className from asset where assetId=".$session->db->$self->session->db->quote($assetId));
+       		($className) = $session->db->quickArray("select className from asset where assetId=".$session->db->quote($assetId));
 		$assetClass->{$assetId} = $className;
 		$session->stow->set("assetClass",$assetClass);
 	}
@@ -1164,7 +1164,7 @@ sub newByUrl {
 			left join
 				assetData on asset.assetId=assetData.assetId
 			where 
-				assetData.url=".$session->db->$self->session->db->quote($url)." 
+				assetData.url=".$session->db->quote($url)." 
 			group by
 				assetData.assetId
 			");
@@ -1271,7 +1271,7 @@ sub publish {
 	my $self = shift;
 	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
         my $idList = $self->session->db->quoteAndJoin($assetIds);
-        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged="$self->session->datetime->time()." where assetId in (".$idList.")");
+        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
 	my $cache = WebGUI::Cache->new;
         foreach my $id (@{$assetIds}) {
         	# we do the purge directly cuz it's a lot faster than instantiating all these assets
@@ -1542,7 +1542,7 @@ sub www_manageAssets {
         $self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
   	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
-        my $i18n = WebGUI::International->new($session, "Asset");
+        my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
         my @crumbtrail;
         foreach my $ancestor (@{$ancestors}) {
