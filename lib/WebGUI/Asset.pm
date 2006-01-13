@@ -1291,9 +1291,10 @@ Purges all cache entries associated with this asset.
 
 sub purgeCache {
 	my $self = shift;
-	delete $session{assetLineage};
-	delete $session{assetClass};
-	delete $session{assetRevision};
+	my $stow = $self->stow;
+	$stow->delete('assetLineage');
+	$stow->delete('assetClass');
+	$stow->delete('assetRevision');
 	WebGUI::Cache->new($self->session,["asset",$self->getId,$self->get("revisionDate")])->deleteChunk(["asset",$self->getId]);
 }
 
@@ -1307,6 +1308,7 @@ Returns a reference to the current session.
 =cut
 
 sub session {
+	my ($self) = @_;
 	return $self->{_session};
 }
 
