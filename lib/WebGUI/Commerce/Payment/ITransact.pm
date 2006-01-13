@@ -565,14 +565,14 @@ sub errorCode {
 
 #-------------------------------------------------------------------
 sub name {
-	my $i18n = WebGUI::International->new($self->session, "CommercePaymentITransact");
+	my ($session) = @_;
+	my $i18n = WebGUI::International->new($session, "CommercePaymentITransact");
 	return $i18n->get('module name');
 }
 
 #-------------------------------------------------------------------
 sub namespace {
 	my $self = shift;
-	
 	return $self->{_namespace};
 }
 

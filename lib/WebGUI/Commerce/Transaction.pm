@@ -61,7 +61,7 @@ sub cancelTransaction {
 	# Recurring transactions can only have one item, so our items must be the first
 	$item = $self->getItems->[0];
 
-	$plugin = WebGUI::Commerce::Payment->load($self->gateway);
+	$plugin = WebGUI::Commerce::Payment->load($self->session, $self->gateway);
 	$plugin->cancelRecurringPayment({
 		id => $self->gatewayId,
 		transaction => $self,

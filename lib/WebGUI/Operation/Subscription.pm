@@ -238,7 +238,7 @@ sub www_editSubscription {
 		-label	=> $i18n->get('subscription duration'),
 		-hoverHelp	=> $i18n->get('subscription duration description'),
 		-value	=> [$properties->{duration} || 'Monthly'],
-		-options=> WebGUI::Commerce::Payment::recurringPeriodValues
+		-options=> WebGUI::Commerce::Payment->recurringPeriodValues($session),
 		);
 	$f->text(
 		-name	=> 'executeOnSubscription',

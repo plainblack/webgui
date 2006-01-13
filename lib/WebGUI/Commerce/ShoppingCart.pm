@@ -206,7 +206,7 @@ sub getItems {
 	my ($self, $periodResolve, %cartContent, $item, $properties, @recurring, @normal);
 	$self = shift;
 	
-	$periodResolve = WebGUI::Commerce::Payment::recurringPeriodValues;
+	$periodResolve = WebGUI::Commerce::Payment::recurringPeriodValues($self->session);
 	%cartContent = %{$self->{_items}};
 	foreach (values(%cartContent)) {
 		$item = WebGUI::Commerce::Item->new($_->{itemId}, $_->{itemType});

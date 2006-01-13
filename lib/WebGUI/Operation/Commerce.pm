@@ -60,7 +60,7 @@ sub _clearShippingScratch {
 sub _paymentSelected {
 	my $session = shift;
 	return 0 unless ($session->scratch->get('paymentGateway'));
-	my $plugin = WebGUI::Commerce::Payment->load($session->scratch->get('paymentGateway'));
+	my $plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
 	return 1 if ($plugin && $plugin->enabled);
 	return 0;
 }
@@ -171,7 +171,7 @@ sub www_checkoutConfirm {
 
 	$var{total} = sprintf('%.2f', $total + $shipping->calc);
 	
-	$plugin = WebGUI::Commerce::Payment->load($session->scratch->get('paymentGateway'));
+	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
 
 	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -217,7 +217,7 @@ sub www_checkoutSubmit {
 	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 	
 	# Load payment plugin.
-	$plugin = WebGUI::Commerce::Payment->load($session->scratch->get('paymentGateway'));
+	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 	($normal, $recurring) = $shoppingCart->getItems;
 
@@ -339,7 +339,7 @@ sub www_confirmRecurringTransaction {
 	my $session = shift;
 	my($plugin, %var);
 	
-	$plugin = WebGUI::Commerce::Payment->load($session->form->process("gateway"));
+	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("gateway"));
 	if ($plugin) {
 		$plugin->confirmRecurringTransaction;
 	}
@@ -349,7 +349,7 @@ sub www_confirmRecurringTransaction {
 sub www_confirmTransaction {
 	my $session = shift;
 	my($plugin, %var);
-	$plugin = WebGUI::Commerce::Payment->load($session->form->process("pg"));
+	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("pg"));
 
 	if ($plugin->confirmTransaction) {
 		WebGUI::Commerce::Transaction->new($plugin->getTransactionId)->completeTransaction;
@@ -433,7 +433,7 @@ sub www_editCommerceSettings {
 
 	# Check which payment plugins will compile, and load them.
 	foreach (@{$session->config->get("paymentPlugins")}) {
-		$plugin = WebGUI::Commerce::Payment->load($_);
+		$plugin = WebGUI::Commerce::Payment->load($session, $_);
 		if ($plugin) {
 			push(@paymentPlugins, $plugin);
 			$paymentPlugins{$_} = $plugin->name;
@@ -668,7 +668,7 @@ sub www_selectPaymentGateway {
 	_clearPaymentScratch;
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
-	$plugins = WebGUI::Commerce::Payment->getEnabledPlugins;
+	$plugins = WebGUI::Commerce::Payment->getEnabledPlugins($session);
 	if (scalar(@$plugins) > 1) {
 		foreach (@$plugins) {
 			push(@pluginLoop, {
@@ -696,7 +696,7 @@ sub www_selectPaymentGateway {
 #-------------------------------------------------------------------
 sub www_selectPaymentGatewaySave {
 	my $session = shift;
-	if (WebGUI::Commerce::Payment->load($session->form->process("paymentGateway"))->enabled) {
+	if (WebGUI::Commerce::Payment->load($session, $session->form->process("paymentGateway"))->enabled) {
 		$session->scratch->set('paymentGateway', $session->form->process("paymentGateway"));
 	} else {
 		$session->scratch->set('paymentGateway', '-delete-');

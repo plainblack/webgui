@@ -21,7 +21,7 @@ An abstract class for all payment plugins to extend.
 
 Invoking goes as follows:
 
- $plugin = WebGUI::Commerce::Payment->new('MyPlugin');
+ $plugin = WebGUI::Commerce::Payment->init('MyPlugin');
 
 =head1 METHODS
 
@@ -173,11 +173,12 @@ Returns a reference to an array of all enabled instantiated payment plugins.
 =cut
 
 sub getEnabledPlugins {
+	my ($session) = @_;
 	my (@enabledPlugins, $plugin, @plugins);
-	@enabledPlugins = $self->session->db->buildArray("select namespace from commerceSettings where type='Payment' and fieldName='enabled' and fieldValue='1'");
+	@enabledPlugins = $session->db->buildArray("select namespace from commerceSettings where type='Payment' and fieldName='enabled' and fieldValue='1'");
 
 	foreach (@enabledPlugins) {
-		$plugin = WebGUI::Commerce::Payment->load($_);
+		$plugin = WebGUI::Commerce::Payment->load($session, $_);
 		push(@plugins, $plugin) if ($plugin);
 	}
 
@@ -197,13 +198,14 @@ The namespace of the plugin.
 =cut
 
 sub init {
-	my ($class, $namespace, $properties);
+	my ($class, $session, $namespace, $properties);
 	$class = shift;
+	$session = shift;
 	$namespace = shift;
 	
-	$properties = $self->session->db->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".$self->session->db->quote($namespace)." and type='Payment'");
+	$properties = $session->db->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".$session->db->quote($namespace)." and type='Payment'");
 
-	bless {_properties=>$properties, _namespace=>$namespace, _enabled=>$properties->{enabled}}, $class;
+	bless {_session=>$session, _properties=>$properties, _namespace=>$namespace, _enabled=>$properties->{enabled}}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -215,6 +217,7 @@ Returns the gatewayId of the transaction. You must override this method.
 =cut
 
 sub gatewayId {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the gatewayId method in your Payment plugin.");
 }
 
@@ -253,6 +256,7 @@ Returns the error code of the last submission.
 =cut
 
 sub errorCode {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override thie errorCode method in the payment plugin.");
 }
 
@@ -263,6 +267,10 @@ sub errorCode {
 A convienient method to load a plugin. It handles all error checking and stuff for you.
 This is a SUPER class method only and shoud NOT be overridden.
 
+=head3 session
+
+The session variable.
+
 =head3 namespace
 
 The namespace of the plugin.
@@ -272,14 +280,15 @@ The namespace of the plugin.
 sub load {
 	my ($class, $namespace, $load, $cmd, $plugin);
     	$class = shift;
+    	my $session = shift;
 	$namespace = shift;
 	
     	$cmd = "WebGUI::Commerce::Payment::$namespace";
 	$load = "use $cmd";
 	eval($load);
-	$self->session->errorHandler->warn("Payment plugin failed to compile: $cmd.".$@) if($@);
+	$session->errorHandler->warn("Payment plugin failed to compile: $cmd.".$@) if($@);
 	$plugin = eval($cmd."->init");
-	$self->session->errorHandler->warn("Couldn't instantiate payment plugin: $cmd.".$@) if($@);
+	$session->errorHandler->warn("Couldn't instantiate payment plugin: $cmd.".$@) if($@);
 	return $plugin;
 }
 
@@ -292,7 +301,8 @@ Returns the (display) name of the plugin. You must override this method.
 =cut
 
 sub name {
-	return $self->session->errorHandler->fatal("You must override the name method in the payment plugin.");
+	my ($session) = @_;
+	return $session->errorHandler->fatal("You must override the name method in the payment plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -363,6 +373,7 @@ Returns the result code of the transaction. You must override this method.
 =cut
 
 sub resultCode {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the resultCode method in the payment plugin.");
 }
 
@@ -375,6 +386,7 @@ Returns the result message of the transaction. You must override this method.
 =cut
 
 sub resultMessage {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the resultMessage method in the payment plugin.");
 }
 
@@ -420,8 +432,9 @@ The period you want the name for.
 =cut
 
 sub recurringPeriodValues {
+	my ($session) = @_;
 	my ($i18n, %periods);
-	$i18n = WebGUI::International->new($self->session, 'Commerce');
+	$i18n = WebGUI::International->new($session, 'Commerce');
 	tie %periods, "Tie::IxHash";	
 	%periods = (
 		Weekly		=> $i18n->get('weekly'),
@@ -438,6 +451,19 @@ sub recurringPeriodValues {
 
 #-------------------------------------------------------------------
 
+=head2 session ( )
+
+Returns the local copy of the session variable
+
+=cut
+
+sub session {
+	my ($self) = @_;
+	return $self->{_session};
+}
+
+##-------------------------------------------------------------------
+
 =head2 shippingCost ( amount )
 
 This sets the shippingcost involved with the transaction. Your plugin must override this
@@ -450,6 +476,7 @@ The amaount of money that's being charged for shipping.
 =cut
 
 sub shippingCost {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the shippingCost method in the payment plugin.");
 }
 
@@ -467,6 +494,7 @@ The description of the shiping cost.
 =cut
 
 sub shippingDescription {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the shippingDescription method in the payment plugin.");
 }
 
@@ -484,6 +512,7 @@ You must override this method.
 =cut
 
 sub supports {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the supports method in the payment plugin.");
 }
 
@@ -496,6 +525,7 @@ A boolean indicating whether the payment has been finished or not. You must over
 =cut
 
 sub transactionCompleted {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the transactionCompleted method in the payment plugin.");
 }
 
@@ -508,6 +538,7 @@ Returns an error message if a transaction error has occurred. You must override 
 =cut
 
 sub transactionError {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the transactionError method in the payment plugin.");
 }
 
@@ -520,6 +551,7 @@ A boolean indicating whether the payment is pending or not. You must override th
 =cut
 
 sub transactionPending {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the transactionPending method in the payment plugin.");
 }
 
@@ -534,6 +566,7 @@ undef. You must override this method.
 =cut
 
 sub validateFormData {
+	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override the validateFormData method in the payment plugin.");
 }
 
