@@ -16,6 +16,7 @@ package WebGUI::Config;
 
 use strict;
 use Parse::PlainConfig;
+use WebGUI::Utility;
 
 our %config;
 

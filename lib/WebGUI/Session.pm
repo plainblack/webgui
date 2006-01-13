@@ -19,7 +19,21 @@ use Apache2::Request;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
-
+use WebGUI::Session::DateTime;
+use WebGUI::Session::Env;
+use WebGUI::Session::ErrorHandler;
+use WebGUI::Session::Form;
+use WebGUI::Session::Http;
+use WebGUI::Session::Icon;
+use WebGUI::Session::Id;
+use WebGUI::Session::Os;
+use WebGUI::Session::Privilege;
+use WebGUI::Session::Scratch;
+use WebGUI::Session::Setting;
+use WebGUI::Session::Stow;
+use WebGUI::Session::Style;
+use WebGUI::Session::Url;
+use WebGUI::Session::Var;
 
 
 =head1 NAME
