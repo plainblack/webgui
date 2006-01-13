@@ -68,7 +68,7 @@ sub www_cancelRecurringTransaction {
 	
 	my $i18n = WebGUI::International->new($session, "TransactionLog");
 	
-	$transaction = WebGUI::Commerce::Transaction->new($session->form->process("tid"));
+	$transaction = WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"));
 	if ($transaction->isRecurring) {
 		$error = $transaction->cancelTransaction;
 		$message = $i18n->get('cancel error').$error if ($error);
@@ -96,7 +96,7 @@ sub www_deleteTransaction {
 
 	$transactionId = $session->form->process("tid");
 
-	WebGUI::Commerce::Transaction->new($transactionId)->delete;
+	WebGUI::Commerce::Transaction->new($session, $transactionId)->delete;
 
 	return WebGUI::Operation::execute('listTransactions');
 }
@@ -106,7 +106,7 @@ sub www_deleteTransactionItem {
 	my $session = shift;
 	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 	
-	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));
+	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));
 
 	return WebGUI::Operation::execute('listTransactions');
 }

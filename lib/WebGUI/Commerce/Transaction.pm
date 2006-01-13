@@ -264,7 +264,7 @@ sub getByGatewayId {
 	($transactionId) = $self->session->db->quickArray("select transactionId from transaction where gatewayId=".$self->session->db->quote($gatewayId).
 		" and gateway=".$self->session->db->quote($paymentGateway));
 
-	return WebGUI::Commerce::Transaction->new($transactionId) if $transactionId;
+	return WebGUI::Commerce::Transaction->new($self->session, $transactionId) if $transactionId;
 	return undef;
 }
 
@@ -331,7 +331,7 @@ sub getTransactions {
 	@transactionIds = $self->session->db->buildArray($sql);
 
 	foreach (@transactionIds) {
-		push(@transactions, WebGUI::Commerce::Transaction->new($_));
+		push(@transactions, WebGUI::Commerce::Transaction->new($self->session, $_));
 	}
 
 	return @transactions;
@@ -414,25 +414,26 @@ sub new {
 	my ($class, $transactionId, $gatewayId, $userId, $properties, $sth, $row, @items);
 	
 	$class = shift;
+	my $session = shift;
 	$transactionId = shift;
 	$gatewayId = shift;
-	$userId = shift || $self->session->user->profileField("userId");
+	$userId = shift || $session->user->profileField("userId");
 	
 	if ($transactionId eq 'new') {
-		$transactionId = $self->session->id->generate;
+		$transactionId = $session->id->generate;
 
-		$self->session->db->write("insert into transaction ".
+		$session->db->write("insert into transaction ".
 			"(transactionId, userId, amount, gatewayId, initDate, completionDate, status) values ".
-			"(".$self->session->db->quote($transactionId).",".$self->session->db->quote($userId).",0,".$self->session->db->quote($gatewayId).",".$self->session->db->quote(time).",NULL,'Pending')");
+			"(".$session->db->quote($transactionId).",".$session->db->quote($userId).",0,".$session->db->quote($gatewayId).",".$session->db->quote(time).",NULL,'Pending')");
 	}
 
-	$properties = $self->session->db->quickHashRef("select * from transaction where transactionId=".$self->session->db->quote($transactionId));
-	$sth = $self->session->db->read("select * from transactionItem where transactionId=".$self->session->db->quote($transactionId));
+	$properties = $session->db->quickHashRef("select * from transaction where transactionId=".$session->db->quote($transactionId));
+	$sth = $session->db->read("select * from transactionItem where transactionId=".$session->db->quote($transactionId));
 	while ($row = $sth->hashRef) {
 		push(@items, $row);
 	}
 
-	bless {_transactionId => $transactionId, _properties => $properties, _items => \@items}, $class;
+	bless {_session => $session, _transactionId => $transactionId, _properties => $properties, _items => \@items}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -445,13 +446,27 @@ Returns a reference to an array which contains transaction objects of all pendin
 
 sub pendingTransactions {
 	my (@transactionIds, @transactions);
-	@transactionIds = $self->session->db->buildArray("select transactionId from transaction where status = 'Pending'");
+	my ($session) = @_;
+	@transactionIds = $session->db->buildArray("select transactionId from transaction where status = 'Pending'");
 
 	foreach (@transactionIds) {
-		push(@transactions, WebGUI::Commerce::Transaction->new($_));
+		push(@transactions, WebGUI::Commerce::Transaction->new($session, $_));
 	}
 
 	return \@transactions;
+}
+
+#-------------------------------------------------------------------
+
+=head2 session
+
+Returns the cached, local session variable.
+
+=cut
+
+sub session {
+	my ($self) = @_;
+	return $self->{_session};
 }
 
 #-------------------------------------------------------------------
@@ -632,13 +647,13 @@ The ID of the user you want the transaction of.
 =cut
 
 sub transactionsByUser {
-	my ($self, @transactionIds, @transactions, $userId);
+	my (@transactionIds, @transactions);
 	my $self = shift;
 	my $userId = shift;
 
 	@transactionIds = $self->session->db->buildArray("select transactionId from transaction where userId =".$self->session->db->quote($userId));
 	foreach (@transactionIds) {
-		push (@transactions, WebGUI::Commerce::Transaction->new($_));
+		push (@transactions, WebGUI::Commerce::Transaction->new($self->session, $_));
 	}
 
 	return \@transactions;

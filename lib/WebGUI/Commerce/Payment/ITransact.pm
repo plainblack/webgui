@@ -711,7 +711,7 @@ my	%transactionData = %{$self->{_transactionParams}};
     </EmailText>
     <OrderItems>\n";
 
-	$items = WebGUI::Commerce::Transaction->new($transactionData{ORGID})->getItems;
+	$items = WebGUI::Commerce::Transaction->new($self->session, $transactionData{ORGID})->getItems;
 	foreach (@{$items}) {
 		$xml .= 
 "   <Item>

@@ -38,12 +38,13 @@ sub name {
 
 #-------------------------------------------------------------------
 sub new {
-	my ($class, $subscriptionId, $type, $subscription);
+	my ($class, $session, $subscriptionId, $type, $subscription);
 	$class = shift;
+	$session = shift;
 	$subscriptionId = shift;
 	$type = shift;
 	
-	$subscription = WebGUI::Subscription->new($self->session,$subscriptionId);
+	$subscription = WebGUI::Subscription->new($session,$subscriptionId);
 	bless {_subscription => $subscription, _subscriptionId => $subscriptionId}, $class;
 }
 

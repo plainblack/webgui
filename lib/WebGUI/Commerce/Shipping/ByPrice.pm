@@ -46,7 +46,8 @@ sub init {
 
 #-------------------------------------------------------------------
 sub name {
-	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingByPrice');
+	my ($session) = @_;
+	my $i18n = WebGUI::International->new($session, 'CommerceShippingByPrice');
 	return $i18n->get('title');
 }
 

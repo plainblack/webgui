@@ -92,7 +92,7 @@ sub www_cancelTransaction {
 	my $session = shift;
 	my ($transaction, %var);
 	
-	$transaction = WebGUI::Commerce::Transaction->new($session->form->process("tid"));
+	$transaction = WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"));
 	unless ($transaction->status eq 'Completed') {
 		$transaction->cancelTransaction;
 	}
@@ -249,7 +249,7 @@ sub www_checkoutSubmit {
 		$plugin->shippingDescription($shippingDescription);
 		
 		# Write transaction to the log with status pending
-		$transaction = WebGUI::Commerce::Transaction->new('new');
+		$transaction = WebGUI::Commerce::Transaction->new($session, 'new');
 		foreach (@{$currentPurchase->{items}}) {
 			$transaction->addItem($_->{item}, $_->{quantity});
 			$amount += ($_->{item}->price * $_->{quantity});
@@ -329,7 +329,7 @@ sub www_completePendingTransaction {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 
-	WebGUI::Commerce::Transaction->new($session->form->process("tid"))->completeTransaction;
+	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->completeTransaction;
 
 	return WebGUI::Operation::execute('listPendingTransactions');
 }
@@ -352,7 +352,7 @@ sub www_confirmTransaction {
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("pg"));
 
 	if ($plugin->confirmTransaction) {
-		WebGUI::Commerce::Transaction->new($plugin->getTransactionId)->completeTransaction;
+		WebGUI::Commerce::Transaction->new($session, $plugin->getTransactionId)->completeTransaction;
 	}
 }
 
@@ -540,7 +540,7 @@ sub www_listPendingTransactions {
 	$i18n = WebGUI::International->new($session, "Commerce");
 
 	$p = WebGUI::Paginator->new($session,$session->url->page('op=listPendingTransactions'));
-	$p->setDataByArrayRef(WebGUI::Commerce::Transaction->pendingTransactions);
+	$p->setDataByArrayRef(WebGUI::Commerce::Transaction->pendingTransactions($session));
 	
 	$transactions = $p->getPageData;
 
