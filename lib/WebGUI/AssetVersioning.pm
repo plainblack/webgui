@@ -87,12 +87,12 @@ The name of the version tag. If not specified, one will be generated using the c
 =cut
 
 sub addVersionTag {
-	my $class = shift;
+	my $self = shift;
 	my $name = shift || "Autotag created ".$self->session->datetime->epochToHuman()." by ".$self->session->user->profileField("username");
 	my $tagId = $self->session->db->setRow("assetVersionTag","tagId",{
 		tagId=>"new",
 		name=>$name,
-		creationDate=$self->session->datetime->time(),
+		creationDate=>$self->session->datetime->time(),
 		createdBy=>$self->session->user->profileField("userId")
 		});
 	$self->session->scratch->set("versionTag",$tagId);
@@ -143,14 +143,14 @@ The unique id of the tag to be committed.
 =cut
 
 sub commitVersionTag {
-	my $class = shift;
+	my $self = shift;
 	my $tagId = shift;
 	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=".$self->session->db->quote($tagId));
 	while (my ($id,$class,$version) = $sth->array) {
 		WebGUI::Asset->new($id,$class,$version)->commit;
 	}
 	$sth->finish;
-	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate="$self->session->datetime->time().", committedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where tagId=".$self->session->db->quote($tagId));
+	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate=".$self->session->datetime->time().", committedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where tagId=".$self->session->db->quote($tagId));
 	$self->session->db->write("delete from userSessionScratch where name='versionTag' and value=".$self->session->db->quote($tagId));
 }
 
@@ -227,7 +227,7 @@ The epoch time to rollback to. Anything after this time will be permanently dele
 =cut
 
 sub rollbackToTime {
-	my $class = shift;
+	my $self = shift;
 	my $toTime = shift;
  	unless ($toTime) {	
 		return 0;
@@ -255,7 +255,7 @@ The unique identifier of the version tag to be purged.
 =cut
 
 sub rollbackVersionTag {
-	my $class = shift;
+	my $self = shift;
 	my $tagId = shift;
  	unless ($tagId) {	
 		return 0;
