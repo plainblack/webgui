@@ -44,7 +44,7 @@ sub _isValidLDAPUser {
 	     $auth = $ldap->bind;
 	  }
       if ($auth) {
-	      $search = $ldap->search ( base=>$uri->dn, filter=>$connection->{ldapIdentity}."=".$self->session->form->process("'authLDAP_ldapId'"));
+	      $search = $ldap->search ( base=>$uri->dn, filter=>$connection->{ldapIdentity}."=".$self->session->form->process('authLDAP_ldapId'));
 			if (defined $search->entry(0)) {
 				if ($connection->{ldapUserRDN} eq 'dn') {
                    $connectDN = $search->entry(0)->dn;
@@ -53,10 +53,10 @@ sub _isValidLDAPUser {
                 }
                 $ldap->unbind;
                 $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= $i18n->get(2,'AuthLDAP');
-                $auth = $ldap->bind(dn=>$connectDN, password=>$self->session->form->process("'authLDAP_identifier'"));
+                $auth = $ldap->bind(dn=>$connectDN, password=>$self->session->form->process('authLDAP_identifier'));
                 if ($auth->code == 48 || $auth->code == 49) {
                    $error .= '<li>'.$i18n->get(68).'</li>';
-                   $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("'authLDAP_ldapId'"));
+                   $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process('authLDAP_ldapId'));
                 } elsif ($auth->code > 0) {
                    $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured. '.$i18n->get(69).'</li>';
            		   $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
@@ -64,7 +64,7 @@ sub _isValidLDAPUser {
                 $ldap->unbind;
         	} else {
                $error .= '<li>'.$i18n->get(68).'</li>';
-               $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("'authLDAP_ldapId'"));
+               $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("authLDAP_ldapId"));
             }
 	 } else {
 	     $error = $i18n->get(2,'AuthLDAP');
@@ -89,9 +89,9 @@ sub addUserForm {
     my $self = shift;
     my $userData = $self->getParams;
 	my $connection = $self->{_connection};
-    my $ldapUrl = $self->session->form->process("'authLDAP_ldapUrl'} || $userData->{ldapUrl} || $connection->{ldapURL");
-	my $connectDN = $self->session->form->process("'authLDAP_connectDN'} || $userData->{connectDN");
-	my $ldapConnection = $self->session->form->process("'authLDAP_ldapConnection'} || $userData->{ldapConnection");
+    my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapURL};
+	my $connectDN = $self->session->form->process('authLDAP_connectDN') || $userData->{connectDN};
+	my $ldapConnection = $self->session->form->process('authLDAP_ldapConnection') || $userData->{ldapConnection};
 	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
 	my $f = WebGUI::HTMLForm->new($self->session);
 	my $jscript = "";
@@ -144,9 +144,9 @@ sub addUserForm {
 sub addUserFormSave {
    my $self = shift;
    my $properties;
-   $properties->{connectDN} = $self->session->form->process("'authLDAP_connectDN'");
-   $properties->{ldapUrl} = $self->session->form->process("'authLDAP_ldapUrl'");
-   $properties->{ldapConnection} = $self->session->form->process("'authLDAP_ldapConnection'");
+   $properties->{connectDN} = $self->session->form->process('authLDAP_connectDN');
+   $properties->{ldapUrl} = $self->session->form->process('authLDAP_ldapUrl');
+   $properties->{ldapConnection} = $self->session->form->process('authLDAP_ldapConnection');
    $self->SUPER::addUserFormSave($properties); 
 }
 

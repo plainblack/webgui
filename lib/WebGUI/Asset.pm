@@ -1420,7 +1420,7 @@ sub www_add {
 		$self->session->errorHandler->security("tried to call an invalid class ".$class);
 		return "";
 	}
-	if ($self->session->form->process("'prototype'")) {
+	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session->form->process("prototype"),$class);
 		foreach my $definition (@{$prototype->definition($self->session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {
