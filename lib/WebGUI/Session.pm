@@ -200,7 +200,7 @@ sub env {
 
 =head2 errorHandler ( )
 
-Returns a WebGUI::ErrorHandler object.
+Returns a WebGUI::Session::ErrorHandler object.
 
 =cut
 
@@ -210,6 +210,22 @@ sub errorHandler {
 		$self->{_errorHandler}  = WebGUI::Session::ErrorHandler->new($self);
 	}
 	return $self->{_errorHandler};
+}
+
+#-------------------------------------------------------------------
+
+=head2 form ( )
+
+Returns a WebGUI::Session::Form object.
+
+=cut
+
+sub form {
+	my $self = shift;
+	unless (exists $self->{_form}) {
+		$self->{_form} = WebGUI::Session::Form->new($self);
+	}
+	return $self->{_form};
 }
 
 #-------------------------------------------------------------------
