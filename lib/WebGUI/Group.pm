@@ -433,7 +433,7 @@ sub find {
 	my $class = shift;
 	my $session = shift;
 	my $name = shift;
-	my ($groupId) = $self->session->db->quickArray("select groupId from groups where groupName=".$self->session->db->quote($name));
+	my ($groupId) = $session->db->quickArray("select groupId from groups where groupName=".$session->db->quote($name));
 	return WebGUI::Group->new($session,$groupId);
 }
 
@@ -540,9 +540,9 @@ sub getUsers {
 	my $withoutExpired = shift;
 	my $clause;
 	if ($withoutExpired) {
-		$clause = "expireDate > "$self->session->datetime->time()." and ";
+		$clause = "expireDate > ".$self->session->datetime->time()." and ";
 	}
-	$clause .= "(groupId=".$self->session->db->quote($groupId);
+	$clause .= "(groupId=".$self->session->db->quote($self->getId);
  	if ($recursive) {
 		my $groups = $self->getGroupsIn(1);
 		if ($#$groups >= 0) {
