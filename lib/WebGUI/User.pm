@@ -16,7 +16,7 @@ package WebGUI::User;
 
 use strict;
 use WebGUI::Cache;
-use WebGUI::SQL;
+use WebGUI::Group;
 
 
 =head1 NAME
@@ -83,8 +83,9 @@ sub addToGroups {
 	my $groups = shift;
 	my $expireOffset = shift;
 	$self->uncache;
-	require WebGUI::Grouping;
-	$group->addUsers([$self->userId],$groups,$expireOffset);
+	foreach my $groupId (@{$groups}) {
+		WebGUI::Group->new($groupId)->addUsers([$self->userId],$expireOffset);
+	}
 }
 
 #-------------------------------------------------------------------
