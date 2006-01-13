@@ -16,7 +16,7 @@ shopping cart is tied to the sessionId and, thus, expires when the sessionId exp
 
 =head1 SYNOPSIS
 
-$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
+$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 
 $shoppingCart->add('myItemId', 'myItem', 3);
 $shoppingCart->setQuantity('myItemId', 'myItem', 2);
@@ -243,16 +243,30 @@ of the current user.
 =cut
 
 sub new {
-	my ($class, $sessionId, $sth, $row, %items);
+	my ($class, $session, $sessionId, $sth, $row, %items);
 	$class = shift;
-	$sessionId = shift || $self->session->var->get("sessionId");
+	$session = shift;
+	$sessionId = shift || $session->var->get("sessionId");
 
-	$sth = $self->session->db->read("select * from shoppingCart where sessionId=".$self->session->db->quote($sessionId));
+	$sth = $session->db->read("select * from shoppingCart where sessionId=".$session->db->quote($sessionId));
 	while ($row = $sth->hashRef) {
 		$items{$row->{itemId}."_".$row->{itemType}} = $row;
 	}
 
-	bless {_sessionId => $sessionId, _items => \%items}, $class;
+	bless {_session=>$session, _sessionId => $sessionId, _items => \%items}, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 session
+
+Returns the cached, local session variable.
+
+=cut
+
+sub session {
+	my ($self) = @_;
+	return $self->{_session};
 }
 
 1;

@@ -70,7 +70,7 @@ sub _shippingSelected {
 	my $session = shift;
 	return 0 unless ($session->scratch->get('shippingMethod'));
 
-	my $plugin = WebGUI::Commerce::Shipping->load($session->scratch->get('shippingMethod'));
+	my $plugin = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
 	if ($plugin) {
 		$plugin->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 		return 1 if ($plugin->enabled && $plugin->optionsOk);
@@ -82,7 +82,7 @@ sub _shippingSelected {
 #-------------------------------------------------------------------
 sub www_addToCart {
 	my $session = shift;
-	WebGUI::Commerce::ShoppingCart->new->add($session->form->process("itemId"), $session->form->process("itemType"), $session->form->process("quantity"));
+	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("itemId"), $session->form->process("itemType"), $session->form->process("quantity"));
 
 	return WebGUI::Operation::execute('viewCart');
 }
@@ -134,7 +134,7 @@ sub www_checkoutConfirm {
 	$var{errorLoop} = [ map {{message => $_}} @{$errors} ] if $errors;
 
 	# Put contents of cart in template vars
-	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
+	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 	($normal, $recurring) = $shoppingCart->getItems;
 
 	foreach (@$normal) {
@@ -163,7 +163,7 @@ sub www_checkoutConfirm {
 
 	$var{subTotal} = sprintf('%.2f', $total);
 
-	$shipping = WebGUI::Commerce::Shipping->load($session->scratch->get('shippingMethod'));
+	$shipping = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
 	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 
 	$var{shippingName} = $shipping->name;
@@ -213,12 +213,12 @@ sub www_checkoutSubmit {
 	return WebGUI::Operation::execute('checkout') unless (_paymentSelected && _shippingSelected);
 
 	# Load shipping plugin.
-	$shipping = WebGUI::Commerce::Shipping->load($session->scratch->get('shippingMethod'));
+	$shipping = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
 	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 	
 	# Load payment plugin.
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
-	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
+	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 	($normal, $recurring) = $shoppingCart->getItems;
 
 	# Check if shoppingcart contains any items. If not the user probably clicked reload, so we redirect to the current page.
@@ -359,7 +359,7 @@ sub www_confirmTransaction {
 #-------------------------------------------------------------------
 sub www_deleteCartItem {
 	my $session = shift;
-	WebGUI::Commerce::ShoppingCart->new->delete($session->form->process("itemId"), $session->form->process("itemType"));
+	WebGUI::Commerce::ShoppingCart->new($session)->delete($session->form->process("itemId"), $session->form->process("itemType"));
 
 	return WebGUI::Operation::execute('viewCart');
 }
@@ -471,7 +471,7 @@ sub www_editCommerceSettings {
 # Shipping plugins...
 	# Check which payment plugins will compile, and load them.
 	foreach (@{$session->config->get("shippingPlugins")}) {
-		$plugin = WebGUI::Commerce::Shipping->load($_);
+		$plugin = WebGUI::Commerce::Shipping->load($session, $_);
 		if ($plugin) {
 			push(@shippingPlugins, $plugin);
 			$shippingPlugins{$_} = $plugin->name;
@@ -713,7 +713,7 @@ sub www_selectShippingMethod {
 	_clearShippingScratch;
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
-	$plugins = WebGUI::Commerce::Shipping->getEnabledPlugins;
+	$plugins = WebGUI::Commerce::Shipping->getEnabledPlugins($session);
 	
 	if (scalar(@$plugins) > 1) {
 		foreach (@$plugins) {
@@ -742,7 +742,7 @@ sub www_selectShippingMethod {
 #-------------------------------------------------------------------
 sub www_selectShippingMethodSave {
 	my $session = shift;
-	my $shipping = WebGUI::Commerce::Shipping->load($session->form->process("shippingMethod"));
+	my $shipping = WebGUI::Commerce::Shipping->load($session, $session->form->process("shippingMethod"));
 	
 	$shipping->processOptionsForm;
 	return WebGUI::Operation::execute('selectShipping') unless ($shipping->optionsOk);
@@ -766,7 +766,7 @@ sub www_transactionComplete {
 #-------------------------------------------------------------------
 sub www_updateCart {
 	my $session = shift;
-my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
+my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 
 	foreach my $formElement (keys(%{$session{form}})) {
 		if ($formElement =~ m/^quantity~([^~]*)~([^~]*)$/) {
@@ -785,7 +785,7 @@ sub www_viewCart {
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	
 	# Put contents of cart in template vars
-	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
+	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 	($normal, $recurring) = $shoppingCart->getItems;
 
 	foreach (@$normal) {

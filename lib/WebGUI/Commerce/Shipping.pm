@@ -134,11 +134,12 @@ Returns a reference to an array of all enabled instantiated payment plugins.
 =cut
 
 sub getEnabledPlugins {
+	my ($session) = @_;
 	my (@enabledPlugins, $plugin, @plugins);
-	@enabledPlugins = $self->session->db->buildArray("select namespace from commerceSettings where type='Shipping' and fieldName='enabled' and fieldValue='1'");
+	@enabledPlugins = $session->db->buildArray("select namespace from commerceSettings where type='Shipping' and fieldName='enabled' and fieldValue='1'");
 
 	foreach (@enabledPlugins) {
-		$plugin = WebGUI::Commerce::Shipping->load($_);
+		$plugin = WebGUI::Commerce::Shipping->load($session, $_);
 		push(@plugins, $plugin) if ($plugin);
 	}
 
@@ -158,19 +159,21 @@ The namespace of the plugin.
 =cut
 
 sub init {
-	my ($class, $namespace, $properties, $shoppingCart);
+	my ($class, $session, $namespace, $properties, $shoppingCart);
 	$class = shift;
+	$session = shift;
 	$namespace = shift;
 
-	$self->session->errorHandler->fatal('No namespace passed to init.') unless ($namespace);
+	$session->errorHandler->fatal('No namespace passed to init.') unless ($namespace);
 	
-	$properties = $self->session->db->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".$self->session->db->quote($namespace)." and type='Shipping'");
-	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
+	$properties = $session->db->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".$session->db->quote($namespace)." and type='Shipping'");
+	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 
 	bless {_properties=>$properties, 
 		_shippingParameters => {}, 
 		_shoppingCart => $shoppingCart, 
 		_namespace=>$namespace, 
+		_session=>$session, 
 		_enabled=>$properties->{enabled},
 		_shippingItems => []}, $class;
 }
@@ -203,16 +206,17 @@ The namespace of the plugin.
 sub load {
 	my ($class, $namespace, $load, $cmd, $plugin);
     	$class = shift;
+    	my $session = shift;
 	$namespace = shift;
 
-	$self->session->errorHandler->fatal('No namespace passed to load.') unless ($namespace);
+	$session->errorHandler->fatal('No namespace passed to load.') unless ($namespace);
 	
     	$cmd = "WebGUI::Commerce::Shipping::$namespace";
 	$load = "use $cmd";
 	eval($load);
-	$self->session->errorHandler->warn("Shipping plugin failed to compile: $cmd.".$@) if($@);
+	$session->errorHandler->warn("Shipping plugin failed to compile: $cmd.".$@) if($@);
 	$plugin = eval($cmd."->init");
-	$self->session->errorHandler->warn("Couldn't instantiate shipping plugin: $cmd.".$@) if($@);
+	$session->errorHandler->warn("Couldn't instantiate shipping plugin: $cmd.".$@) if($@);
 	return $plugin;
 }
 
@@ -225,7 +229,8 @@ Returns the (display) name of the plugin. You must override this method.
 =cut
 
 sub name {
-	return $self->session->errorHandler->fatal("You must override the name method in the shipping plugin.");
+	my ($session) = @_;
+	return $session->errorHandler->fatal("You must override the name method in the shipping plugin.");
 }
 
 #-------------------------------------------------------------------
@@ -294,6 +299,19 @@ of using user configurable options.
 =cut
 
 sub processOptionsForm {
+}
+
+#-------------------------------------------------------------------
+
+=head2 session
+
+Returns the cached, local session variable.
+
+=cut
+
+sub session {
+	my ($self) = @_;
+	return $self->{_session};
 }
 
 #-------------------------------------------------------------------
