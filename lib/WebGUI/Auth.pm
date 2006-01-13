@@ -57,8 +57,8 @@ sub _isDuplicateUsername {
 	return 0 if($self->userId ne "1" && $self->session->user->username eq $username);
 	my ($otherUser) = $self->session->db->quickArray("select count(*) from users where username=".$self->session->db->quote($username));
 	return 0 if !$otherUser;
-	my $i18n = $i18n->get($self->session);
-	$self->error('<li>'.$i18n->get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.$self->session->datetime->epochToHuman$self->session->datetime->time(),"%y").'"'.'</li>');
+	my $i18n = WebGUI::International->new($self->session);
+	$self->error('<li>'.$i18n->get(77).' "'.$username.'too", "'.$username.'2", '.'"'.$username.'_'.$self->session->datetime->epochToHuman($self->session->datetime->time(),"%y").'"'.'</li>');
 	return 1;
 }
 
@@ -95,8 +95,8 @@ sub _isValidUsername {
 #-------------------------------------------------------------------
 sub _logLogin {
 	my $self = shift;
-   $self->session->db->write("insert into userLoginLog values (".$self->session->db->$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).","$self->session->datetime->time().","
-	.$self->session->db->$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",".$self->session->db->$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
+   $self->session->db->write("insert into userLoginLog values (".$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).",".$self->session->datetime->time().","
+	.$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",".$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
 }
 
 #-------------------------------------------------------------------
@@ -262,7 +262,7 @@ sub createAccountSave {
       $authInfo .= "\n\n";
       WebGUI::MessageLog::addEntry($self->userId,"",$i18n->get(870),$self->getSetting("welcomeMessage").$authInfo);
    }
-  $session->user({user=>$u});  
+  $self->session->user({user=>$u});  
    $self->_logLogin($userId,"success");
 	my $command = $self->session->setting->get("runOnRegistration");
 	WebGUI::Macro::process($self->session,\$command);
@@ -565,7 +565,7 @@ sub login {
    #Create a new user
    $uid = $self->userId;
    $u = WebGUI::User->new($uid);
-   $session->user({user=>$u});
+   $self->session->user({user=>$u});
    $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
    $self->_logLogin($uid,"success");
    
@@ -625,7 +625,7 @@ sub new {
 	$self->{error} = "";
 	$self->{profile} = ();
 	$self->{warning} = "";
-	my @callable = ('init', @{shift});
+	my @callable = ('init', shift);
 	$self->{callable} = \@callable;
 	bless $self, $class;
 	return $self;
