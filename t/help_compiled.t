@@ -12,6 +12,7 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
+use WebGUI::Session;
 use WebGUI::Operation::Help;
 # ---- END DO NOT EDIT ----
 
