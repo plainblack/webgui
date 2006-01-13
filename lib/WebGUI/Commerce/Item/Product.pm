@@ -45,7 +45,7 @@ sub new {
 	$class = shift;
 	$variantId = shift;
 	
-	$product = WebGUI::Product->getByVariantId($variantId);
+	$product = WebGUI::Product->getByVariantId($session,$variantId);
 my	$variant = $product->getVariant($variantId);
 my	%parameters = map {split(/\./, $_)} split(/,/, $variant->{composition});
 my	$composition = join(', ',map {$product->getParameter($_)->{name} .': '. $product->getOption($parameters{$_})->{value}} keys (%parameters));

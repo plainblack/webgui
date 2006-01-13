@@ -80,7 +80,7 @@ sub create {
 	my $session = shift;
 	my $params = shift;
 	$params->{databaseLinkId} = "new";
-	my $Id = $session->db->setRow("databaseLink","databaseLinkId",$params);
+	my $id = $session->db->setRow("databaseLink","databaseLinkId",$params);
 	return $class->new($session,$id);
 }
 
@@ -110,7 +110,7 @@ sub disconnect {
 	my ($self, $value);
 	$self = shift;
 	$value = shift;
-	if (defined $self>{_dbh}) {
+	if (defined $self->{_dbh}) {
 		$self->{_dbh}->disconnect() unless ($self->getId eq "0");
 	}
 	undef $self;
@@ -138,7 +138,7 @@ sub db {
 		return $self->{_dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
 		eval{
-			$self->{_dbh} = WebGUI::SQL->connect($session,$dsn,$username,$identifier);
+		 	$self->{_dbh} = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier);
 		};
 		if ($@) {
 			$self->session->errorHandler->warn("DatabaseLink [".$self->getId."] ".$@);
@@ -194,7 +194,7 @@ A reference to the current session.
 sub getList {
 	my $session = shift;
 	my $list = $session->db->buildHashRef("select databaseLinkId, title from databaseLink order by title");
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($session);
 	$list->{'0'} = $i18n->get(1076);
 	return $list;
 }
@@ -220,18 +220,19 @@ sub new {
     my ($class, $databaseLinkId, %databaseLink);
     tie %databaseLink, 'Tie::CPHash';
     $class = shift;
+	my $session = shift;
 	$databaseLinkId = shift;
 	unless ($databaseLinkId eq "") {
 		if ($databaseLinkId eq "0") {
 			%databaseLink = (
 				databaseLinkId=>"0",
-				DSN=>$self->session->config->get("dsn"),
-				username=>$self->session->config->get("dbuser"),
-				identifier=>$self->session->config->get("dbpass"),
+				DSN=>$session->config->get("dsn"),
+				username=>$session->config->get("dbuser"),
+				identifier=>$session->config->get("dbpass"),
 				title=>"WebGUI Database"
 				);
 		} else {
-			%databaseLink = $self->session->db->quickHash("select * from databaseLink where databaseLinkId=".$self->session->db->quote($databaseLinkId));
+			%databaseLink = $session->db->quickHash("select * from databaseLink where databaseLinkId=".$session->db->quote($databaseLinkId));
 		}
 	}
 	return undef unless $databaseLink{databaseLinkId};

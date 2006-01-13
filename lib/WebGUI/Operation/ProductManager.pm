@@ -41,7 +41,7 @@ sub www_deleteProductParameterOption {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	WebGUI::Product->getByOptionId($optionId)->deleteOption($optionId);
+	WebGUI::Product->getByOptionId($session,$optionId)->deleteOption($optionId);
 
 	return WebGUI::Operation::execute('manageProduct');
 }
@@ -53,7 +53,7 @@ sub www_deleteProductParameter {
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 	
-	WebGUI::Product->getByParameterId($parameterId)->deleteParameter($parameterId);
+	WebGUI::Product->getByParameterId($session,$parameterId)->deleteParameter($parameterId);
 
 	return WebGUI::Operation::execute('manageProduct');
 }
@@ -191,7 +191,7 @@ sub www_editProductParameter {
 	$productId = $session->form->process("productId");
 	
 	unless ($parameterId eq 'new') {
-		$product = WebGUI::Product->getByParameterId($parameterId);
+		$product = WebGUI::Product->getByParameterId($session,$parameterId);
 		$parameter = $product->getParameter($parameterId);
 		$productId = $product->get('productId');
 	}
@@ -275,7 +275,7 @@ sub www_editProductParameterOption {
 	
 	$optionId = $session->form->process("optionId");
 	unless ($optionId eq 'new') {
-		$option = WebGUI::Product->getByOptionId($optionId)->getOption($optionId);
+		$option = WebGUI::Product->getByOptionId($session,$optionId)->getOption($optionId);
 	}
 
 	$f = WebGUI::HTMLForm->new($session);
@@ -342,7 +342,7 @@ sub www_editProductParameterOptionSave {
 
 	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);
 
-	$product = WebGUI::Product->getByParameterId($session->form->process("parameterId"));
+	$product = WebGUI::Product->getByParameterId($session,$session->form->process("parameterId"));
 	$optionId = $session->form->process("optionId");
 	$optionId = $product->addOptionToParameter($session->form->process("parameterId")) if ($optionId eq 'new');
 	$product->setOption($optionId, {
@@ -365,7 +365,7 @@ sub www_editProductVariant {
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	
 	$variantId = $session->form->process("variantId");
-	$variant = WebGUI::Product->getByVariantId($variantId)->getVariant($variantId);
+	$variant = WebGUI::Product->getByVariantId($session,$variantId)->getVariant($variantId);
 	
 	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -416,7 +416,7 @@ my	$variantId = $session->form->process("variantId");
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
-	WebGUI::Product->getByVariantId($variantId)->setVariant($variantId, $session{form});
+	WebGUI::Product->getByVariantId($session,$variantId)->setVariant($variantId, $session{form});
 
 	return WebGUI::Operation::execute('listProductVariants');
 }

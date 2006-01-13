@@ -129,37 +129,40 @@ sub getByOptionId {
 	my ($class, $optionId, $productId);
 
 	$class = shift;
+	my $session = shift;
 	$optionId = shift;
 	
 
-	($productId) = $self->session->db->quickArray("select productId from productParameters as t1, productParameterOptions as t2 ".
-		"where t1.parameterId=t2.parameterId and t2.optionId=".$self->session->db->quote($optionId));
+	($productId) = $session->db->quickArray("select productId from productParameters as t1, productParameterOptions as t2 ".
+		"where t1.parameterId=t2.parameterId and t2.optionId=".$session->db->quote($optionId));
 	
 	return undef unless ($productId);
 
-	return WebGUI::Product->new($self->session,$productId);
+	return WebGUI::Product->new($session,$productId);
 }
 
 #-------------------------------------------------------------------
 sub getByParameterId {
 	my ($class, $parameterId, $productId);
 	$class = shift;
+	my $session = shift;
 	$parameterId = shift;
 	
-	($productId) = $self->session->db->quickArray("select productId from productParameters where parameterId=".$self->session->db->quote($parameterId));
+	($productId) = $session->db->quickArray("select productId from productParameters where parameterId=".$session->db->quote($parameterId));
 
-	return WebGUI::Product->new($self->session,$productId);
+	return WebGUI::Product->new($session,$productId);
 }
 
 #-------------------------------------------------------------------
 sub getByVariantId {
 	my ($class, $productId, $variantId);
 	$class = shift;
+	my $session = shift;
 	$variantId = shift;
 
-	($productId) = $self->session->db->quickArray("select productId from productVariants where variantId=".$self->session->db->quote($variantId));
+	($productId) = $session->db->quickArray("select productId from productVariants where variantId=".$session->db->quote($variantId));
 
-	return WebGUI::Product->new($self->session,$productId);
+	return WebGUI::Product->new($session,$productId);
 }
 
 #-------------------------------------------------------------------
@@ -210,7 +213,7 @@ sub new {
 		$properties = {productId => $productId};
 		$session->db->write("insert into products (productId) values (".$session->db->quote($productId).")");
 	} else {
-		$properties = $self->session->db->quickHashRef("select * from products where productId=".$session->db->quote($productId));
+		$properties = $session->db->quickHashRef("select * from products where productId=".$session->db->quote($productId));
 		
 		# fetch parameters and options
 		$sth = $session->db->read("select opt.*, param.* from productParameters as param left join productParameterOptions as opt ".
