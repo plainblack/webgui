@@ -125,6 +125,7 @@ Returns a reference to the current session.
 =cut
 
 sub session {
+	my $self = shift;
 	return $self->{_session};
 }
 

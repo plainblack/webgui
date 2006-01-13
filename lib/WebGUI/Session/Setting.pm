@@ -99,7 +99,7 @@ A reference to the current WebGUI::Session.
 =cut
 
 sub new {
-	my $class = shift	
+	my $class = shift;
 	my $session = shift;
 	my $settings = $session->db->buildHashRef("select * from settings");
 	bless {_settings=>$settings, _session=>$session}, $class;
@@ -157,6 +157,7 @@ The value of the setting.
 =cut
 
 sub set {
+	my $self = shift;
 	my $name = shift;
 	my $value = shift;
 	$self->{_settings}{$name} = $value;

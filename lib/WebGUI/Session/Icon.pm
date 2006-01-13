@@ -149,7 +149,7 @@ sub delete {
 	 my $self = shift;
         my $urlParams = shift;
         my $pageURL = shift || $self->session->url->getRequestedUrl;
-	$confirmText = shift; 
+	my $confirmText = shift; 
 	if($confirmText) {
 		$confirmText = qq| onclick="return confirm('$confirmText')" |;
 	}
@@ -167,6 +167,7 @@ Generates an icon that can be used to drag content.
 =cut
 
 sub drag {
+	my $self = shift;
         return '<img id="dragTrigger" class="dragTrigger" src="'.$self->_getBaseURL().'drag.gif" align="middle" border="0" alt="'.WebGUI::International->new($self->session,'Icon')->get('Drag').'" title="'.WebGUI::International->new($self->session,'Icon')->get('Drag').'" />';
 }
 
@@ -231,6 +232,7 @@ Returns a hash reference containing the list of toolbar icon sets to be selected
 sub getToolbarOptions {
 	my %options;
 	tie %options, 'Tie::IxHash';
+	my $self = shift;
 	$options{useLanguageDefault} = WebGUI::International->new($self->session,'Icon')->get(1084);
 	my $dir = $self->session->config->get("extrasPath")."/toolbar";
         opendir (DIR,$dir) or $self->session->errorHandler->warn("Can't open toolbar directory!");

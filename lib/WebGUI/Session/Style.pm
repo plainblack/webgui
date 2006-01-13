@@ -169,7 +169,7 @@ sub process {
 	my %var;
 	$var{'body.content'} = shift;
 	my $templateId = shift;
-	if ($self->{_makePrintable} && exists $self->session->asset) {
+	if ($self->{_makePrintable} && $self->session->asset) {
 		$templateId = $self->session->asset->get("printableStyleTemplateId");
 		my $currAsset = $self->session->asset;
 		until ($templateId) {

@@ -78,7 +78,7 @@ sub secureEval {
 		'WebGUI::International::get' => sub {$i18n->get(@_)},
 		'WebGUI::International::getLanguages' => sub { $i18n->getLanguages(@_) },
 		'$session->datetime->epochToHuman' => sub { $session->datetime->epochToHuman(@_) },
-		'WebGUI::Icon::getToolbarOptions' => sub { WebGUI::Icon::getToolbarOptions(@_) },		
+		'WebGUI::Icon::getToolbarOptions' => sub { $session->icon->getToolbarOptions() },		
 	);
 	foreach my $function (keys %trusted ) {
 		while ($code =~ /($function\(([^)]*)\)\s*;*)/g) {
