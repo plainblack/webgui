@@ -153,10 +153,14 @@ Returns the highest rank, top of the highest rank Asset under current Asset.
 sub getFirstChild {
 	my $self = shift;
 	unless (exists $self->{_firstChild}) {
-		my $lineage = $session{assetLineage}{firstChild}{$self->getId};
+		my $assetLineage = $self->session->stow->get("assetLineage");
+		my $lineage = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
 			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=".$self->session->db->quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
-			$session{assetLineage}{firstChild}{$self->getId} = $lineage unless ($self->session->config->get("disableCache"));
+			unless ($self->session->config->get("disableCache")) {
+				$assetLineage->{firstChild}{$self->getId} = $lineage;
+				$self->session->stow->set("assetLineage", $assetLineage);
+			}
 		}
 		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
 	}
@@ -175,10 +179,12 @@ Returns the lowest rank, bottom of the lowest rank Asset under current Asset.
 sub getLastChild {
 	my $self = shift;
 	unless (exists $self->{_lastChild}) {
-		my $lineage = $session{assetLineage}{lastChild}{$self->getId};
+		my $assetLineage = $self->session->stow->get("assetLineage");
+		my $lineage = $assetLineage->{lastChild}{$self->getId};
 		unless ($lineage) {
 			($lineage) = $self->session->db->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=".$self->session->db->quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
-			$session{assetLineage}{lastChild}{$self->getId} = $lineage;
+			$assetLineage->{lastChild}{$self->getId} = $lineage;
+			$self->session->stow->set("assetLineage", $assetLineage);
 		}
 		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
 	}
@@ -515,7 +521,7 @@ sub newByLineage {
 	my $id = $assetLineage->{$lineage}{id};
 	$class = $assetLineage->{$lineage}{class};
         unless ($id && $class) {
-		($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".$self->session->db->quote($lineage));
+		($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".$session->db->quote($lineage));
 		$assetLineage->{$lineage}{id} = $id;
 		$assetLineage->{$lineage}{class} = $class;
 		$session->stow->set("assetLineage",$assetLineage);
