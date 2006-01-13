@@ -54,8 +54,9 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-	my $userId = shift || $self->session->id->generate();
-	$self->session->db->write("insert into users (userId,dateCreated) values (".$self->session->db->quote($userId).","$self->session->datetime->time().")");
+	my $session = shift;
+	my $userId = shift || $session->id->generate();
+	$session->db->write("insert into users (userId,dateCreated) values (".$session->db->quote($userId).",".$session->datetime->time().")");
 	require WebGUI::Grouping;
 	$group->addUsers([$userId],[2,7]);
         return $userId;
@@ -107,7 +108,7 @@ sub authMethod {
                 $self->{_user}{"authMethod"} = $value;
                 $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
                 $self->session->db->write("update users set authMethod=".$self->session->db->quote($value).",
-			lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
+			lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
         }
         return $self->{_user}{"authMethod"};
 }
@@ -186,7 +187,7 @@ If set to "1" then the listing will not include expired groupings. Defaults to "
 sub getGroups {
 	my $self = shift;
         my $withoutExpired = shift;
-        my $clause = "and expireDate>"$self->session->datetime->time() if ($withoutExpired);
+        my $clause = "and expireDate>".$self->session->datetime->time() if ($withoutExpired);
 	my $gotGroupsForUser = $self->session->stow->get("gotGroupsForUser");
         if (exists $gotGroupsForUser->{$self->userId}) {
                 return $gotGroupsForUser->{$self->userId};
@@ -413,7 +414,7 @@ sub karma {
 		$self->uncache;
 		$self->{_user}{karma} += $amount;
 		$self->session->db->write("update users set karma=karma+".$self->session->db->quote($amount)." where userId=".$self->session->db->quote($self->userId));
-        	$self->session->db->write("insert into karmaLog values (".$self->session->db->quote($self->userId).",$amount,".$self->session->db->quote($source).",".$self->session->db->quote($description).","$self->session->datetime->time().")");
+        	$self->session->db->write("insert into karmaLog values (".$self->session->db->quote($self->userId).",$amount,".$self->session->db->quote($source).",".$self->session->db->quote($description).",".$self->session->datetime->time().")");
 	}
         return $self->{_user}{karma};
 }
@@ -436,6 +437,10 @@ sub lastUpdated {
 
 Constructor.
 
+=head3 session 
+
+The session variable.
+
 =head3 userId 
 
 The userId of the user you're creating an object reference for. If left blank it will default to "1" (Visitor). If specified as "new" then a new user account will be created and assigned the next available userId. 
@@ -448,15 +453,16 @@ A unique ID to use instead of the ID that WebGUI will generate for you. It must 
 
 sub new {
         my $class = shift;
+        my $session = shift;
         my $userId = shift || 1;
 	my $overrideId = shift;
-        $userId = _create($overrideId) if ($userId eq "new");
+        $userId = _create($session, $overrideId) if ($userId eq "new");
 	my $cache = WebGUI::Cache->new($self->session,["user",$userId]);
 	my $userData = $cache->get;
 	unless ($userData->{_userId} && $userData->{_user}{username}) {
 		my %user;
 		tie %user, 'Tie::CPHash';
-		%user = $self->session->db->quickHash("select * from users where userId=".$self->session->db->quote($userId));
+		%user = $session->db->quickHash("select * from users where userId=".$session->db->quote($userId));
 		my %profile = $self->session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
 			userProfileData.userId=".$self->session->db->quote($user{userId}));
@@ -510,7 +516,7 @@ sub profileField {
 		$self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId})." and fieldName=".$self->session->db->quote($fieldName));
 		$self->session->db->write("insert into userProfileData values (".$self->session->db->quote($self->{_userId}).", ".$self->session->db->quote($fieldName).", ".$self->session->db->quote($value).")");
 		$self->{_user}{"lastUpdated"} =$self->session->datetime->time();
-        	$self->session->db->write("update users set lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
+        	$self->session->db->write("update users set lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
 	}
 	return $self->{_profile}{$fieldName};
 }
@@ -535,7 +541,7 @@ sub referringAffiliate {
                 $self->{_user}{"referringAffiliate"} = $value;
                 $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
                 $self->session->db->write("update users set referringAffiliate=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
+                        lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"referringAffiliate"};
 }
@@ -560,7 +566,7 @@ sub status {
                 $self->{_user}{"status"} = $value;
                 $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
                 $self->session->db->write("update users set status=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
+                        lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"status"};
 }
@@ -597,9 +603,9 @@ sub username {
         if (defined $value) {
 		$self->uncache;
                 $self->{_user}{"username"} = $value;
-                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
+                $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
                 $self->session->db->write("update users set username=".$self->session->db->quote($value).",
-                        lastUpdated="$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
+                        lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
         }
         return $self->{_user}{"username"};
 }
