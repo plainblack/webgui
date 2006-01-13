@@ -349,7 +349,7 @@ A reference to the current session.
 sub createTemp {
 	my $class = shift;
 	my $session = shift;
-	my $id = $self->session->id->generate();
+	my $id = $session->id->generate();
 	$id =~ m/^(.{2})/;
 	my $self = {_session=>$session, _id => $id, _part1 => 'temp', _part2 => $1};
 	bless $self, ref($class)||$class;
