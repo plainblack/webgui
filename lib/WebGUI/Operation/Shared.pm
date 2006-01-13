@@ -74,7 +74,7 @@ sub menuWrapper {
 	my $session = shift;
         my ($output, $key);
 	my $i18n = WebGUI::International->new($session);
-	$session{page}{useAdminStyle} = 1;
+	$session->style->useAdminStyle(1);
         $output = '<table width="100%" border="0" cellpadding="5" cellspacing="0">
 		<tr><td width="70%" class="tableData" valign="top">';
         $output .= $_[0];
