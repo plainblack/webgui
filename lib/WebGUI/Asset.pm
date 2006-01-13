@@ -56,9 +56,13 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 canAdd ( [userId, groupId] )
+=head2 canAdd ( session, [userId, groupId] )
 
 Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
+
+=head3 session
+
+The session variable.
 
 =head3 userId
 
@@ -72,10 +76,11 @@ Only developers extending this method should use this parameter. By default WebG
 
 sub canAdd {
 	my $className = shift;
-	my $userId = shift || $self->session->user->profileField("userId");
+	my $session = shift;
+	my $userId = shift || $session->user->profileField("userId");
 	my $subclassGroupId = shift;
-	my $groupId = $self->session->config->get("assetAddPrivilege"){$className} || $subclassGroupId || '12';
-        return $self->session->user->isInGroup($groupId,$userId);
+	my $groupId = $session->config->get("assetAddPrivilege"){$className} || $subclassGroupId || '12';
+        return $session->user->isInGroup($groupId,$userId);
 }
 
 
@@ -374,7 +379,7 @@ sub getAssetAdderLinks {
 			} else {
 				next if ($uiLevel > $self->session->user->profileField("uiLevel") && !$self->session->user->isInGroup(3));
 			}
-			my $canAdd = eval{$class->canAdd()};
+			my $canAdd = eval{$class->canAdd($self->session)};
 			if ($@) {
 				$self->session->errorHandler->error("Couldn't determine if user can add ".$class." because ".$@);
 			} else {
@@ -403,7 +408,7 @@ sub getAssetAdderLinks {
 	my $sth = $self->session->db->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
 	while (my ($class,$id,$date) = $sth->array) {
 		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
-		next unless ($asset->canView && $asset->canAdd && $asset->getUiLevel <= $self->session->user->profileField("uiLevel"));
+		next unless ($asset->canView && $asset->canAdd($self->session) && $asset->getUiLevel <= $self->session->user->profileField("uiLevel"));
 		my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
 		$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
 		$links{$asset->getTitle}{url} = $url;
@@ -1441,7 +1446,7 @@ sub www_add {
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
-	return $self->session->privilege->insufficient() unless ($newAsset->canAdd);
+	return $self->session->privilege->insufficient() unless ($newAsset->canAdd($self->session));
 	return $newAsset->www_edit();
 }
 

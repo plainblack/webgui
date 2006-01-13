@@ -52,7 +52,8 @@ sub addRevision {
 #-------------------------------------------------------------------
 sub canAdd {
 	my $class = shift;
-	$class->SUPER::canAdd(undef,'7');
+	my $session = shift;
+	$class->SUPER::canAdd($session, undef, '7');
 }
 
 #-------------------------------------------------------------------
