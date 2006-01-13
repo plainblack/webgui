@@ -41,14 +41,14 @@ sub name {
 
 #-------------------------------------------------------------------
 sub new {
-	my ($class, $sku, $product, $variantId);
+	my ($class, $session, $sku, $product, $variantId);
 	$class = shift;
 	$variantId = shift;
 	
 	$product = WebGUI::Product->getByVariantId($session,$variantId);
-my	$variant = $product->getVariant($variantId);
-my	%parameters = map {split(/\./, $_)} split(/,/, $variant->{composition});
-my	$composition = join(', ',map {$product->getParameter($_)->{name} .': '. $product->getOption($parameters{$_})->{value}} keys (%parameters));
+	my $variant = $product->getVariant($variantId);
+	my %parameters = map {split(/\./, $_)} split(/,/, $variant->{composition});
+	my $composition = join(', ',map {$product->getParameter($_)->{name} .': '. $product->getOption($parameters{$_})->{value}} keys (%parameters));
 	
 	bless {_product => $product, _composition => $composition, _variant => $variant}, $class;
 }
