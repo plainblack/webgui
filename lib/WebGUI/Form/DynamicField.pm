@@ -97,6 +97,7 @@ array will be used.
 
 sub new {
 	my $class = shift;
+	my $session = shift;
 	my %raw = @_;
 	my $param = \%raw;
         my $fieldType = ucfirst($param->{fieldType});
@@ -108,12 +109,12 @@ sub new {
 	}
         # Return the appropriate field object.
 	if ($fieldType eq "") {
-		$self->session->errorHandler->warn("Something is trying to create a dynamic field called ".$param->{name}.", but didn't pass in a field type.");
+		$session->errorHandler->warn("Something is trying to create a dynamic field called ".$param->{name}.", but didn't pass in a field type.");
 		$fieldType = "Text";
 	}
 	##No infinite loops, please
 	elsif ($fieldType eq 'DynamicField') {
-		$self->session->errorHandler->warn("Something is trying to create a DynamicField via DynamicField.");
+		$session->errorHandler->warn("Something is trying to create a DynamicField via DynamicField.");
 		$fieldType = "Text";
 	}
         no strict 'refs';
@@ -121,10 +122,10 @@ sub new {
 	my $load = "use ".$cmd;
 	eval ($load);
 	if ($@) {
-                $self->session->errorHandler->error("Couldn't compile form control: ".$fieldType.". Root cause: ".$@);
+                $session->errorHandler->error("Couldn't compile form control: ".$fieldType.". Root cause: ".$@);
                 return undef;
         }
-	my $formObj = $cmd->new($param);
+	my $formObj = $cmd->new($session, $param);
 	##Fix up methods for List type forms and restore the size to all Forms *except*
 	##List type forms.  Historically, dynamically created forms have always
 	##used the default size.
