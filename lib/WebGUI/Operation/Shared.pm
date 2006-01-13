@@ -11,14 +11,10 @@ package WebGUI::Operation::Shared;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use Exporter;
 use strict;
 use WebGUI::International;
-use WebGUI::SQL;
 use Safe;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&menuWrapper);
 
 #-------------------------------------------------------------------
  sub accountOptions {
@@ -69,23 +65,6 @@ our @EXPORT = qw(&menuWrapper);
 	return \@array;
 }
 
-#-------------------------------------------------------------------
-sub menuWrapper {
-	my $session = shift;
-        my ($output, $key);
-	my $i18n = WebGUI::International->new($session);
-	$session->style->useAdminStyle(1);
-        $output = '<table width="100%" border="0" cellpadding="5" cellspacing="0">
-		<tr><td width="70%" class="tableData" valign="top">';
-        $output .= $_[0];
-        $output .= '</td><td width="30%" class="tableMenu" valign="top">';
-	foreach $key (keys %{$_[1]}) {
-        	$output .= '<li><a href="'.$key.'">'.$_[1]->{$key}.'</a></li>';
-	}
-        $output .= '<li><a href="'.$session->url->page().'">'.$i18n->get(493).'</a></li>';
-        $output .= '</td></tr></table>';
-        return $output;
-}
 
 #-------------------------------------------------------------------
 # This function is here to replace the dangerous eval calls in the User Profile System.
