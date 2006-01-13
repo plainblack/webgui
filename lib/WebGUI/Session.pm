@@ -169,7 +169,7 @@ sub dbSlave {
 			}
 		}
 	}
-        if ($session->var("adminOn") || !exists $self->{_slave}) {
+        if ($self->var("adminOn") || !exists $self->{_slave}) {
 		return $self->db;
         } else {
                 return $self->{_slave}->[rand @{$self->{_slave}}];
@@ -374,7 +374,7 @@ Returns a WebGUI::Session::Privilege object.
 sub privilege {
 	my $self = shift;
 	unless (exists $self->{_privilege}) {
-		$self->{_privilege} = WebGUI::Session::Privilege->new($session);
+		$self->{_privilege} = WebGUI::Session::Privilege->new($self);
 	}
 	return $self->{_privilege};
 }
@@ -517,9 +517,9 @@ sub user {
 			$self->db->write("update passiveProfileLog set userId = ".$self->db->quote($self->{_var}{userId})." where sessionId = ".$self->db->quote($self->getId));
 		}	
 		delete $self->{_stow};
-		$self->{_user} = $option->{user} || WebGUI::User->new($session, $self->{_var}{userId});
+		$self->{_user} = $option->{user} || WebGUI::User->new($self, $self->{_var}{userId});
 	} elsif (!exists $self->{_user}) {
-		$self->{_user} = WebGUI::User->new($session, $self->{_var}{userId});
+		$self->{_user} = WebGUI::User->new($self, $self->{_var}{userId});
 	}
 	$self->{_request}->user($self->{_user}->username) if ($self->{_request});
 	return $self->{_user};
@@ -537,7 +537,7 @@ Returns a reference to the WebGUI::Session::Var object.
 sub var {
 	my $self = shift;
 	unless ($self->{_var}) {
-		$self->{_var} = WebGUI::Session::Var->new($session);
+		$self->{_var} = WebGUI::Session::Var->new($self);
 	}
 	return $self->{_var};
 }

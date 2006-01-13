@@ -87,7 +87,7 @@ sub getHeader {
 		if ($self->session->setting->get("preventProxyCache")) {
 			$params{"-expires"} = "-1d";
 		}
-		if ($session{http}{filename}) {
+		if ($self->{_http}{filename}) {
 			$params{"-attachment"} = $self->{_http}{filename};
 		}
 	}
@@ -198,7 +198,7 @@ sub setCookie {
 	my $value = shift;
 	my $ttl = shift;
 	$ttl = (defined $ttl ? $ttl : '+10y');
-	if (exists $self->session->request) {
+	if ($self->session->request) {
 		my $cookie = Apache2::Cookie->new($self->session->request,
 			-name=>$name,
 			-value=>$value,

@@ -251,7 +251,7 @@ sub epochToHuman {
 		$output =~ s/\~$key/\%$replacement/g;
 	}
   #--- %M
-	$output = $dt->str$self->session->datetime->time($output);
+	$output = $dt->strftime($output);
 	$temp = int($dt->month);
 	$output =~ s/\%_varmonth_/$temp/g;
   #--- return
@@ -280,9 +280,9 @@ sub epochToSet {
 	my $dt = DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone);
 	my $withTime = shift;
 	if ($withTime) {
-		return $dt->str$self->session->datetime->time("%Y-%m-%d %H:%M:%S");
+		return $dt->strftime("%Y-%m-%d %H:%M:%S");
 	}
-	return $dt->str$self->session->datetime->time("%Y-%m-%d");
+	return $dt->strftime("%Y-%m-%d");
 }
 
 #-------------------------------------------------------------------
@@ -707,10 +707,10 @@ sub setToEpoch {
         my $set = shift;
         return undef unless $set;
 	my $parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d %H:%M:%S' );
-	my $dt = $parser->parse_dat$self->session->datetime->time($set);
+	my $dt = $parser->parse_datetime($set);
 	unless ($dt) {
 		$parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d' );
-		$dt = $parser->parse_dat$self->session->datetime->time($set);
+		$dt = $parser->parse_datetime($set);
 	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
 	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone

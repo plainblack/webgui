@@ -131,7 +131,7 @@ sub process {
 
 =cut
 
-sub session
+sub session {
 	my $self = shift;
 	return $self->{_session};
 }
