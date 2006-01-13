@@ -288,7 +288,7 @@ sub _parsePlaceholderParams {
                 my ($type,$field) = split(/:/,$row);
                 my $param;
                 if($type =~ /^form/) {
-                        $param = $self->session->form->process("$field");
+                        $param = $self->session->form->process($field);
                 } elsif ($type =~ /^query(\d)/) {
                         $param = $self->{_query}{$1}{rowData}{$field};
                 }
@@ -332,7 +332,7 @@ sub _processQuery {
                         foreach (keys %{$session{form}}) {
                                 unless ($_ eq "pn" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
                                         $url = $self->session->url->append($url, $self->session->url->escape($_)
-                                                .'='.$self->session->url->escape($self->session->form->process("$_")));
+                                                .'='.$self->session->url->escape($self->session->form->process($_)));
                                 }
                         }
 			my $paginateAfter = $self->get("paginateAfter");

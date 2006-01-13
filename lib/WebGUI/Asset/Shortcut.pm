@@ -18,7 +18,6 @@ use WebGUI::Operation::Profile;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 use WebGUI::Macro;
-use WebGUI::SQL;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -463,8 +462,8 @@ sub getShortcutByCriteria {
 	my $scratchId;
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
-		if($self->session->scratch->get("$scratchId") && !$self->getValue("disableContentLock")) {
-			return $self->session->scratch->get("$scratchId") unless ($self->session->var->get("adminOn"));
+		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
+			return $self->session->scratch->get($scratchId) unless ($self->session->var->get("adminOn"));
 		}
 	}
 

@@ -521,10 +521,10 @@ sub www_editCommerceSettingsSave {
 				type		=> $1,
 				namespace	=> $2,
 				fieldName	=> $3, 
-				fieldValue	=> $session->form->process("$_")
+				fieldValue	=> $session->form->process($_)
 			});
 		} elsif ($_ ne 'op') {
-			WebGUI::Setting::set($_,$session->form->process("$_"));
+			WebGUI::Setting::set($_,$session->form->process($_));
 		}
 	}
 	
@@ -770,7 +770,7 @@ my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new;
 
 	foreach my $formElement (keys(%{$session{form}})) {
 		if ($formElement =~ m/^quantity~([^~]*)~([^~]*)$/) {
-			$shoppingCart->setQuantity($2, $1, $session->form->process("$formElement"));
+			$shoppingCart->setQuantity($2, $1, $session->form->process($formElement));
 		}
 	}
 

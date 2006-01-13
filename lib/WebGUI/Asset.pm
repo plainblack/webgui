@@ -366,7 +366,7 @@ sub getAssetAdderLinks {
 	my $addToUrl = shift;
 	my $type = shift || "assets";
 	my %links;
-	foreach my $class (@{$self->session->config->get("$type")}) {
+	foreach my $class (@{$self->session->config->get($type)}) {
 		next unless $class;
 		my $load = "use ".$class;
 		eval ($load);
@@ -967,7 +967,6 @@ sub getValue {
 	my $self = shift;
 	my $key = shift;
 	if (defined $key) {
-		#	return $self->session->form->process("$key} if (exists $session{form}{$key")); # Security Hazard!
 		my $storedValue = $self->get($key);
 		return $storedValue if (defined $storedValue);
 		unless (exists $self->{_propertyDefinitions}) { # check to see if the definitions have been merged and cached
@@ -1204,7 +1203,7 @@ sub processPropertiesFromFormPost {
 	}
 	foreach my $form ($self->session->request->param) {
 		if ($form =~ /^metadata_(.*)$/) {
-			$self->updateMetaData($1,$self->session->form->process("$form"));
+			$self->updateMetaData($1,$self->session->form->process($form));
 		}
 	}
 	$data{title} = "Untitled" unless ($data{title});

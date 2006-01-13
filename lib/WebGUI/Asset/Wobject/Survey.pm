@@ -181,7 +181,7 @@ sub duplicate {
 sub generateResponseId {
 	my $self = shift;
 	my $varname = $self->getResponseIdString;
-	if ($self->session->scratch->get("$varname")) {
+	if ($self->session->scratch->get($varname)) {
 		$self->completeResponse;
 	}
 	my $ipAddress = $self->getIp; 
@@ -529,7 +529,7 @@ sub getSectionDrivenQuestionIds {
 #-------------------------------------------------------------------
 sub getResponseId {
 	my $self = shift;
-	return $self->session->scratch->get("$self->getResponseIdString");
+	return $self->session->scratch->get($self->getResponseIdString);
 }
 
 #-------------------------------------------------------------------
@@ -1166,14 +1166,14 @@ sub www_respond {
 	my $self = shift;
 	return "" unless ($self->session->user->isInGroup($self->get("groupToTakeSurvey")));
 	my $varname = $self->getResponseIdString;
-	return "" unless ($self->session->scratch->get("$varname"));
+	return "" unless ($self->session->scratch->get($varname));
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->profileField("userId")),0,8) : $self->session->user->profileField("userId");
 	my $terminate = 0;
 	foreach my $key (keys %{$session{form}}) {
 		if ($key =~ /^answerId_(.+)$/) {
 			my $id = $1;
 			my ($previousResponse) = $self->session->db->quickArray("select count(*) from Survey_questionResponse
-				where Survey_answerId=".$self->session->db->quote($self->session->form->process(""answerId_".$id"))." and Survey_responseId=".$self->session->db->quote($self->session->scratch->get("$varname")));
+				where Survey_answerId=".$self->session->db->quote($self->session->form->process(""answerId_".$id"))." and Survey_responseId=".$self->session->db->quote($self->session->scratch->get($varname)));
 			next if ($previousResponse);
 			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$self->session->form->process(""answerId_".$id"));
 			if ($self->get("questionOrder") eq "response" && $answer->{gotoQuestion} eq "") {
@@ -1181,16 +1181,16 @@ sub www_respond {
 			}
 			my $response = $self->session->form->process(""textResponse_".$id} || $answer->{answer");
 			$self->session->db->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
-				".$self->session->db->quote($answer->{Survey_answerId}).", ".$self->session->db->quote($answer->{Survey_questionId}).", ".$self->session->db->quote($self->session->scratch->get("$varname}).", ".$self->session->db->quote($answer->{Survey_id")).",
+				".$self->session->db->quote($answer->{Survey_answerId}).", ".$self->session->db->quote($answer->{Survey_questionId}).", ".$self->session->db->quote($self->session->scratch->get($varname).", ".$self->session->db->quote($answer->{Survey_id}).",
 				".$self->session->db->quote($self->session->form->process(""comment_".$id")).", ".$self->session->db->quote($response).", ".$self->session->datetime->time().")");
 		}
 	}
-	my $responseCount = $self->getQuestionResponseCount($self->session->scratch->get("$varname")); 
+	my $responseCount = $self->getQuestionResponseCount($self->session->scratch->get($varname)); 
 	if ($terminate || $responseCount >= $self->getValue("questionsPerResponse") || $responseCount >= $self->getQuestionCount) {
 		$self->session->db->setRow("Survey_response","Survey_responseId",{
 			isComplete=>1,
 			endDate=>$self->session->datetime->time(),
-			Survey_responseId=>$self->session->scratch->get("$varname")
+			Survey_responseId=>$self->session->scratch->get($varname)
 			});
 	}
 	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));

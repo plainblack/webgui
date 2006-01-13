@@ -518,7 +518,7 @@ sub getSetting {
 	my $self = shift;
 	my $setting = $_[0];
 	$setting = lc($self->authMethod).ucfirst($setting);
-	return $self->session->setting->get("$setting");
+	return $self->session->setting->get($setting);
 }
 
 #-------------------------------------------------------------------
