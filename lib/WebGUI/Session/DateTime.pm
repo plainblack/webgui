@@ -168,6 +168,19 @@ sub dayStartEnd {
         return ($dt->epoch, $end->epoch);
 }
 
+#-------------------------------------------------------------------
+
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
 
 #-------------------------------------------------------------------
 

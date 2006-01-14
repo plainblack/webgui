@@ -36,6 +36,19 @@ These methods are available from this package:
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
 
 
 #-------------------------------------------------------------------

@@ -127,6 +127,20 @@ sub cut {
 
 #-------------------------------------------------------------------
 
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 delete ( urlParameters [, pageURL, confirmText ] )
 
 Generates a button that represents a delete operation.

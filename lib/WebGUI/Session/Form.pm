@@ -69,6 +69,19 @@ sub AUTOLOAD {
         return $class->new($self->session, {name=>$fieldName})->getValueFromPost;
 }
 
+#-------------------------------------------------------------------
+
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
 
 
 #-------------------------------------------------------------------

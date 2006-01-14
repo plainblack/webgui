@@ -90,6 +90,20 @@ sub append {
 
 #-------------------------------------------------------------------
 
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 escape ( string )
 
 Encodes a string to make it safe to pass in a URL.

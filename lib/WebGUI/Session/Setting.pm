@@ -70,6 +70,20 @@ sub add {
 	$self->session->db->write("insert into settings (name,value) values (".quote($name).",".quote($value).")");
 }
 
+#-------------------------------------------------------------------
+
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
 
 #-------------------------------------------------------------------
 

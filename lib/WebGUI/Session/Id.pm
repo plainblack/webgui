@@ -45,6 +45,20 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 generate
 
 This function generates a global unique id.

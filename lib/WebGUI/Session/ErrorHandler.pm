@@ -19,8 +19,6 @@ use strict;
 use Log::Log4perl;
 use Apache2::RequestUtil;
 
-$Log::Log4perl::caller_depth++;
-
 =head1 NAME 
 
 Package WebGUI::Session::ErrorHandler
@@ -142,6 +140,22 @@ sub debug {
 	$self->getLogger->debug($message);
         $self->session->stow->set("debug_debug", $self->session->stow->get("debug_debug").$message."\n");
 }
+
+
+#-------------------------------------------------------------------
+
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+	
+sub DESTROY {
+	my $self = shift;
+	$Log::Log4perl::caller_depth++;
+	undef $self;
+}
+
 
 
 #-------------------------------------------------------------------
@@ -304,6 +318,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	unless (Log::Log4perl->initialized()) {
+		$Log::Log4perl::caller_depth++;
  		Log::Log4perl->init( $session->config->getWebguiRoot."/etc/log.conf" );   
 	}
 	my $logger = Log::Log4perl->get_logger($session->config->getFilename);

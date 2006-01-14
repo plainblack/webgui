@@ -103,6 +103,20 @@ sub deleteName {
 
 #-------------------------------------------------------------------
 
+=head DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 get( varName ) 
 
 Retrieves the current value of a scratch variable.
