@@ -63,7 +63,12 @@ Retrieves the cookies from the HTTP header and returns a hash reference containi
 
 sub getCookies {
 	my $self = shift;
-	return APR::Request::Apache2->handle($self->session->request)->jar();
+	if ($self->session->request) {
+		return APR::Request::Apache2->handle($self->session->request)->jar();
+	}
+	else {
+		return {};
+	}
 }
 
 

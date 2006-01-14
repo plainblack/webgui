@@ -148,7 +148,7 @@ Returns a WebGUI::Session::DateTime object.
 sub datetime {
 	my $self = shift;
 	if (exists $self->{_datetime}) {
-		$self->{_datetime} = WebGUI::Session::DateTime->new($self);
+		$self->{_datetime} = WebGUI::Session::DateTime->new($self->session);
 	}
 	return $self->{_datetime};
 }

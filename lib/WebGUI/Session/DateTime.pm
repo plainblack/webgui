@@ -727,7 +727,7 @@ Returns an epoch date for now.
 
 sub time {
 	my $self = shift;
-	return$self->session->datetime->time();
+	return $self->session->datetime->time();
 }
 
 #-------------------------------------------------------------------
