@@ -116,6 +116,7 @@ sub close {
 	##Must destroy the logger last!
 	my %keys = grep { $_ ne '_errorHandler' } keys %{ $self };
 	foreach my $object (keys %{$self}) {
+		next if ($object eq '_request' || $object eq '_sessionId' || $object eq '_server');
 		##Don't destroy things that don's exist
 		$self->{$object} and $self->{$object}->DESTROY;
 	}
@@ -360,6 +361,7 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_sessionId=>$sessionId, _config=>$config, _server=>$server};
 	bless $self , $class;
+	return $self;
 	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
 	return $self;
 }
