@@ -496,6 +496,7 @@ sub new {
 			_profile => \%profile
 			};
 		$cache->set($userData, 60*60*24);
+		$userData->{_session} = $session;
         }
         bless $userData, $class;
 }
@@ -556,6 +557,20 @@ sub referringAffiliate {
         }
         return $self->{_user}{"referringAffiliate"};
 }
+
+#-------------------------------------------------------------------
+
+=head2 session ( ) 
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 
