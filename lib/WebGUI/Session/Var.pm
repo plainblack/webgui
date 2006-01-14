@@ -119,6 +119,20 @@ sub get {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getId ( )
+
+Returns the ID of the current session.
+
+=cut
+
+sub getId {
+	my $self = shift;
+	$self->get("sessionId");
+}
+
+
+#-------------------------------------------------------------------
         
 =head2 isAdminOn  ( )
         
@@ -206,7 +220,7 @@ sub start {
                 sessionId=>"new",
                 expires=>$self->session->datetime->time() + $self->session->setting->get("sessionTimeout"),
                 lastPageView=>$self->session->datetime->time(),
-                lastIP => $self->env("REMOTE_ADDR"),
+                lastIP => $self->session->env->get("REMOTE_ADDR"),
                 adminOn => 0,
                 userId => $userId       
                 };
