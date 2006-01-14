@@ -15,13 +15,10 @@ package WebGUI::SQL;
 =cut
 
 use DBI;
-use Exporter;
 use strict;
 use Tie::IxHash;
+use WebGUI::SQL::Resultset;
 use WebGUI::Utility;
-
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&quote &getNextId &quoteAndJoin);
 
 =head1 NAME
 
@@ -35,7 +32,7 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
 
  use WebGUI::SQL;
 
- $db = $self->session->db->connect($dsn, $user, $pass, $session);
+ $db = WebGUI::SQL->connect($session,$dsn, $user, $pass);
  $db->disconnect;
  
  $sth = $db->prepare($sql);
@@ -61,8 +58,8 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  $dbh = $db->getSlave;
 
  $id = $db->getNextId("someId");
- $string = $db->$self->session->db->quote($string);
- $string = $db->$self->session->db->quoteAndJoin(\@array);
+ $string = $db->quote($string);
+ $string = $db->quoteAndJoin(\@array);
 
 =head1 METHODS
 
@@ -270,7 +267,7 @@ The value to search for in the key column.
 
 sub deleteRow {
         my ($self, $table, $key, $keyValue) = @_;
-        $self->session->db->write("delete from $table where ".$key."=".$self->$self->session->db->quote($keyValue));
+        $self->write("delete from $table where ".$key."=".$self->quote($keyValue));
 }
 
 
@@ -379,7 +376,7 @@ The value to search for in the key column.
 
 sub getRow {
         my ($self, $table, $key, $keyValue) = @_;
-        my $row = $self->session->db->quickHashRef("select * from $table where ".$key."=".$self->$self->session->db->quote($keyValue));
+        my $row = $self->quickHashRef("select * from $table where ".$key."=".$self->quote($keyValue));
         return $row;
 }
 
@@ -546,14 +543,14 @@ Any scalar variable that needs to be escaped to be inserted into the database.
 sub quote {
 	my $self = shift;
 	my $value = shift;
-	return $self->dbh->$self->session->db->quote($value);
+	return $self->dbh->quote($value);
 }
 
 #-------------------------------------------------------------------
 
 =head2 quoteAndJoin ( arrayRef ) 
 
-Returns a comma seperated string quoted and ready for insert/select into/from the database.  This is typically used for a statement like "select * from someTable where field in (".$self->session->db->quoteAndJoin(\@strings).")".
+Returns a comma seperated string quoted and ready for insert/select into/from the database.  This is typically used for a statement like "select * from someTable where field in (".$db->quoteAndJoin(\@strings).")".
 
 B<NOTE:> This is not a regular method, but is an exported subroutine.
 
@@ -568,7 +565,7 @@ sub quoteAndJoin {
         my $arrayRef = shift;
 	my @newArray;
 	foreach my $value (@$arrayRef) {
- 		push(@newArray,$self->$self->session->db->quote($value));
+ 		push(@newArray,$self->quote($value));
 	}
 	return join(",",@newArray);
 }
@@ -663,7 +660,7 @@ sub setRow {
         my (@pairs);
         foreach my $key (keys %{$data}) {
                 unless ($key eq $keyColumn) {
-                        push(@pairs, $key.'='.$self->$self->session->db->quote($data->{$key}));
+                        push(@pairs, $key.'='.$self->quote($data->{$key}));
                 }
         }
 	if ($pairs[0] ne "") {

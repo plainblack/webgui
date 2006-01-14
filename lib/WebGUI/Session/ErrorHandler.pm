@@ -73,7 +73,7 @@ sub audit {
 	my $self = shift;
 	my $message = shift;
 	$Log::Log4perl::caller_depth++;
-        $self->info($self->{_session}->user->username." (".$self->{_session}->user->userId.") ".$message);
+        $self->info($self->session->user->username." (".$self->session->user->userId.") ".$message);
 	$Log::Log4perl::caller_depth--;
 }
 
@@ -88,12 +88,12 @@ Returns true if the user meets the condition to see debugging information and de
 
 sub canShowDebug {
 	my $self = shift;
-	return 0 unless ($self->{_session}->setting->get("showDebug"));
-	return 1 if ($self->{_session}->setting->get("debugIp") eq "");
-	my @ips = split(" ",$self->{_session}->setting->get("debugIp"));
+	return 0 unless ($self->session->setting->get("showDebug"));
+	return 1 if ($self->session->setting->get("debugIp") eq "");
+	my @ips = split(" ",$self->session->setting->get("debugIp"));
 	my $ok = 0;
 	foreach my $ip (@ips) {
-		if ($self->{_session}->env("REMOTE_ADDR") =~ /^$ip/) {
+		if ($self->session->env("REMOTE_ADDR") =~ /^$ip/) {
 			$ok = 1;
 			last;
 		}	
@@ -111,14 +111,14 @@ Returns true if the user meets the conditions to see performance indicators and 
 
 sub canShowPerformanceIndicators {
 	my $self = shift;
-	my $mask = $self->{_session}->setting->get("debugIp");
-	my $ip = $self->{_session}->env("REMOTE_ADDR");
+	my $mask = $self->session->setting->get("debugIp");
+	my $ip = $self->session->env("REMOTE_ADDR");
        	return (
 			(
-				$self->{_session}->setting->get("showPerformanceIndicators")
+				$self->session->setting->get("showPerformanceIndicators")
 			) && (
 				$ip =~ /^$mask/ || 
-				$self->{_session}->setting->get("debugIp") eq ""
+				$self->session->setting->get("debugIp") eq ""
 			)
 		);
 }
@@ -140,7 +140,7 @@ sub debug {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->debug($message);
-        $self->{_session}->stow->set("debug_debug") = $self->{_session}->stow->get("debug_debug").$message."\n";
+        $self->session->stow->set("debug_debug", $self->session->stow->get("debug_debug").$message."\n");
 }
 
 
@@ -161,7 +161,7 @@ sub error {
 	my $message = shift;
 	$self->getLogger->error($message);
 	$self->getLogger->debug("Stack trace for ERROR ".$message."\n".$self->getStackTrace());
-        $self->{_session}->stow->set("debug_error", $self->{_session}->stow->get("debug_error").$message."\n");
+        $self->session->stow->set("debug_error", $self->session->stow->get("debug_error").$message."\n");
 }
 
 
@@ -176,25 +176,25 @@ Adds a FATAL type message to the log, outputs an error message to the user, and 
 sub fatal {
 	my $self = shift;
 	my $message = shift;
-	$self->{_session}->http->setStatus("500","Server Error");
-	Apache2::RequestUtil->request->content_type('text/html') if ($self->{_session}->request);
+	$self->session->http->setStatus("500","Server Error");
+	Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
-	print $self->{_session}->http->getHeader if ($self->{_session}->request);
+	print $self->session->http->getHeader if ($self->session->request);
 	unless ($self->canShowDebug()) {
 		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
 		print "<h1>Problem With Request</h1>
 		We have encountered a problem with your request. Please use your back button and try again.
 		If this problem persists, please contact us with what you were trying to do and the time and date of the problem.";
-		print '<br />'.$self->{_session}->setting("companyName");
-		print '<br />'.$self->{_session}->setting("companyEmail");
-		print '<br />'.$self->{_session}->setting("companyURL");
+		print '<br />'.$self->session->setting("companyName");
+		print '<br />'.$self->session->setting("companyEmail");
+		print '<br />'.$self->session->setting("companyURL");
 	} else {
 		print "<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n";
 		print "<p>".$message."</p>\n";
 		print $self->showDebug();
 	}
-	$self->{_session}->close();
+	$self->session->close();
 	die $message;
 }
 
@@ -224,7 +224,7 @@ Returns a text message containing all of the session variables.
 sub getSessionVars {
 	my $self = shift;
 	my $data;
-	while (my ($section, $hash) = each %{$self->{_session}}) {
+	while (my ($section, $hash) = each %{$self->session}) {
 		if (ref $hash eq 'HASH') {
 			while (my ($key, $value) = each %$hash) {
 				if (ref $value eq 'ARRAY') {
@@ -285,7 +285,7 @@ sub info {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->info($message);
-        $self->{_session}->stow->set("debug_info") = $self->{_session}->stow->get("debug_info").$message."\n";
+        $self->session->stow->set("debug_info") = $self->session->stow->get("debug_info").$message."\n";
 }
 
 #-------------------------------------------------------------------
@@ -327,11 +327,24 @@ sub security {
 	my $self = shift;
 	my $message = shift;
 	$Log::Log4perl::caller_depth++;
-	$self->warn($self->{_session}->user->username." (".$self->{_session}->user->userId.") connecting from "
-	.$self->{_session}->env("REMOTE_ADDR")." attempted to ".$message);
+	$self->warn($self->session->user->username." (".$self->session->user->userId.") connecting from "
+	.$self->session->env("REMOTE_ADDR")." attempted to ".$message);
 	$log::Log4perl::caller_depth--;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
 
 #-------------------------------------------------------------------
 
@@ -343,16 +356,16 @@ Creates an HTML formatted string
 
 sub showDebug {
 	my $self = shift;
-	my $text = $self->{_session}->stow->get('debug_error');
+	my $text = $self->session->stow->get('debug_error');
 	$text =~  s/\n/\<br \/\>\n/g;
 	my $output = 'beginDebug<br /><div style="background-color: #800000;color: #ffffff;">'.$text."</div>\n";
-	$text = $self->{_session}->stow->get('debug_warn'); 
+	$text = $self->session->stow->get('debug_warn'); 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="background-color: #ffdddd;color: #000000;">'.$text."</div>\n";
-	$text = $self->{_session}->stow->get('debug_info'); 
+	$text = $self->session->stow->get('debug_info'); 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="background-color: #ffffdd;color: #000000;">'.$text."</div>\n";
-	$text = $self->{_session}->stow->get('debug_debug'); 
+	$text = $self->session->stow->get('debug_debug'); 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="background-color: #dddddd;color: #000000;">'.$text."</div>\n";
 	$text = $self->getSessionVars();
@@ -379,7 +392,7 @@ sub warn {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->warn($message);
-        $self->{_session}->stow->set("debug_warn", $self->{_session}->stow->get("debug_warn").$message."\n");
+        $self->session->stow->set("debug_warn", $self->session->stow->get("debug_warn").$message."\n");
 }
 
 
