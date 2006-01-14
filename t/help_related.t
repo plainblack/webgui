@@ -12,6 +12,7 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
+use WebGUI::Session;
 use WebGUI::Operation::Help;
 # ---- END DO NOT EDIT ----
 
@@ -25,13 +26,13 @@ my $numTests = 0;
 
 my $session = initialize();  # this line is required
 
-my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList();
+my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
 my %helpTable;
 
 foreach my $helpSet (@helpFileSet) {
 	my $helpName = $helpSet->[1];
-	my $help = WebGUI::Operation::Help::_load($helpName);
+	my $help = WebGUI::Operation::Help::_load($session, $helpName);
 	$helpTable{ $helpName } = $help;
 }
 
@@ -40,7 +41,7 @@ foreach my $helpSet (@helpFileSet) {
 my @relatedHelp = ();
 foreach my $topic ( keys %helpTable ) {
 	foreach my $entry ( keys %{ $helpTable{$topic} }) {
-		my @related = @{ $helpTable{$topic}{$entry}{related} };
+		my @related = WebGUI::Operation::Help::_related($session, $helpTable{$topic}{$entry}{related});
 		foreach my $relHash (@related) {
 			$relHash->{parentEntry} = $entry;
 			$relHash->{parentTopic} = $topic;
@@ -75,7 +76,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        return WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
