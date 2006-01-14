@@ -12,10 +12,10 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
+use WebGUI::Session;
 use WebGUI::Operation::Help;
 use WebGUI::International;
 use Data::Dumper;
-use File::Find;
 # ---- END DO NOT EDIT ----
 
 #The goal of this test is to make sure that all required labels
@@ -26,7 +26,7 @@ my $numTests = 0;
 
 my $session = initialize();  # this line is required
 
-my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList();
+my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
 $numTests = scalar @helpFileSet;
 
@@ -36,9 +36,11 @@ plan tests => $numTests;
 
 diag("Check for mandatory lables for Help table of contents");
 
+diag(Dumper(\@helpFileSet));
+
 foreach my $fileSet (@helpFileSet) {
 	my $file = $fileSet->[1];
-	ok(WebGUI::Operation::Help::_getHelpName($file), "Missing label for $file");
+	ok(WebGUI::Operation::Help::_getHelpName($session, $file), "Missing label for $file");
 }
 
 cleanup($session); # this line is required
@@ -52,7 +54,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        return WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {
