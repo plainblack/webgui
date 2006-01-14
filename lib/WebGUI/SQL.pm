@@ -17,7 +17,7 @@ package WebGUI::SQL;
 use DBI;
 use strict;
 use Tie::IxHash;
-use WebGUI::SQL::Resultset;
+use WebGUI::SQL::ResultSet;
 use WebGUI::Utility;
 
 =head1 NAME
