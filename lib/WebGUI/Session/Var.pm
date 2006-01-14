@@ -133,7 +133,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $self = {_session=>$session}, $class;
-	my $sessionId = shift || $self->http->getCookie("wgSession");
+	my $sessionId = shift || $session->http->getCookies->{"wgSession"};
         if ($sessionId eq "") {
                 $self->start(1);
         } else {

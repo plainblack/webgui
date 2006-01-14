@@ -1,4 +1,4 @@
-package WebGUI::Session::HTTP;
+package WebGUI::Session::Http;
 
 =head1 LEGAL
 
