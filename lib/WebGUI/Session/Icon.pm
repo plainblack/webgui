@@ -267,7 +267,7 @@ sub help {
         my $urlParams = shift;
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my ($output, $namespace);
-	my $output = '<a href="'.$self->session->url->page('op=viewHelp;hid='.$urlParams.';namespace='.$namespace).
+	$output = '<a href="'.$self->session->url->page('op=viewHelp;hid='.$urlParams.';namespace='.$namespace).
 		'" target="_blank"><img src="'.$self->_getBaseURL().'help.gif" border="0" align="right" title="'.WebGUI::International->new($self->session,'Icon')->get('Help').'" Alt="'.WebGUI::International->new($self->session,'Icon')->get('Help').'"></a>';
 	return $output;
 }

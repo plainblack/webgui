@@ -618,7 +618,7 @@ Array reference of methods allowed to be called externally;
 sub new {
 	my $self = {};
 	my $class = shift;
-	my $self->{_session} = shift;
+	$self->{_session} = shift;
 	$self->{authMethod} = shift;
 	my $userId = shift || $self->{_session}->user->userId;
 	$self->{user} = $self->{_session}->user;

@@ -176,7 +176,7 @@ Adds a FATAL type message to the log, outputs an error message to the user, and 
 sub fatal {
 	my $self = shift;
 	my $message = shift;
-	my $self->{_session}->http->setStatus("500","Server Error");
+	$self->{_session}->http->setStatus("500","Server Error");
 	Apache2::RequestUtil->request->content_type('text/html') if ($self->{_session}->request);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());

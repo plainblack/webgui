@@ -21,7 +21,6 @@ use WebGUI::Cache;
 use WebGUI::Config;
 use WebGUI::International;
 use WebGUI::Operation;
-use WebGUI::Privilege;
 use WebGUI::Session;
 use WebGUI::Utility;
 use WebGUI::PassiveProfiling;
@@ -36,7 +35,7 @@ sub handler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
 	$s->add_version_component("WebGUI/".$WebGUI::VERSION);
-	$config = WebGUI::Config->new($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
+	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
 	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
 	}
@@ -60,9 +59,9 @@ sub contentHandler {
 	### Open new or existing user session based on user-agent's cookie.
 	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
 	### form variables
-	foreach ($session->{_request}->param) {
-		$session{form}{$_} = $session->{_request}->body($_) || $session->{_request}->param($_);
-	}
+#	foreach ($session->{_request}->param) {
+#		$session{form}{$_} = $session->{_request}->body($_) || $session->{_request}->param($_);
+#	}
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$r->print($session->http->getHeader);
@@ -94,14 +93,14 @@ sub page {
 	my $assetUrl = shift;
 	my $output = processOperations($session);
 	if ($output eq "") {
-		my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session{form}{revision})};
+		my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
 		if ($@) {
 			$session->errorHandler->warn("Couldn't instantiate asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
 		}
 		if (defined $asset) {
 			my $method = "view";
-			if (exists $session{form}{func}) {
-				$method = $session{form}{func};
+			if ($session->form->process("func")) {
+				$method = $session->form->process("func");
 				unless ($method =~ /^[A-Za-z]+$/) {
 					$session->security("tried to call a non-existent method $method on $assetUrl");
 					$method = "view";
@@ -130,23 +129,23 @@ sub page {
 sub processOperations {
 	my $session = shift;
 	my ($cmd, $output);
-	my $op = $session{form}{op};
-	my $opNumber = shift || 1;
+	my $op = $session->form->process("op");
+#	my $opNumber = shift || 1;
 	if ($op) {
 		$output = WebGUI::Operation::execute($session,$op);
 	}
-	$opNumber++;
-	if ($output eq "" && exists $session{form}{"op".$opNumber}) {
-		my $urlString = $session->url->unescape($session->form->get("op".$opNumber));
-		my @pairs = split(/\;/,$urlString);
-		my %form;
-		foreach my $pair (@pairs) {
-			my @param = split(/\=/,$pair);
-			$form{$param[0]} = $param[1];
-		}
-		$session{form} = \%form;
-		$output = processOperations($session,$opNumber);
-	}
+#	$opNumber++;
+#	if ($output eq "" && $session->form->process("op".$opNumber)) {
+#		my $urlString = $session->url->unescape($session->form->process("op".$opNumber));
+#		my @pairs = split(/\;/,$urlString);
+#		my %form;
+#		foreach my $pair (@pairs) {
+#			my @param = split(/\=/,$pair);
+#			$form{$param[0]} = $param[1];
+#		}
+#		$session{form} = \%form;
+#		$output = processOperations($session,$opNumber);
+#	}
 	return $output;
 }
 
@@ -168,7 +167,7 @@ sub tryAssetMethod {
 	my $methodToTry = "www_".$method;
 	my $output = eval{$asset->$methodToTry()};
 	if ($@) {
-		$session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session{requestedUrl}." Root cause: ".$@);
+		$session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
 		$output = tryAssetMethod($session,$asset,'view') if ($method ne "view");
 	}
 	return $output;

@@ -530,7 +530,7 @@ sub user {
 	my $option = shift;
 	if (defined $option) {
 		$self->{_var}{userId} = $option->{userId} || $option->{user}->userId; 
-		$self->db-setRow("userSession","sessionId", $self->{_var});
+		$self->db->setRow("userSession","sessionId", $self->{_var});
 		if ($self->setting("passiveProfilingEnabled")) {
 			$self->db->write("update passiveProfileLog set userId = ".$self->db->quote($self->{_var}{userId})." where sessionId = ".$self->db->quote($self->getId));
 		}	
