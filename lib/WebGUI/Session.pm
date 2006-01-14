@@ -34,7 +34,7 @@ use WebGUI::Session::Stow;
 use WebGUI::Session::Style;
 use WebGUI::Session::Url;
 use WebGUI::Session::Var;
-
+use Data::Dumper;
 
 =head1 NAME
 
@@ -113,9 +113,13 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 
 sub close {
 	my $self = shift;
+	##Must destroy the logger last!
+	my %keys = grep { $_ ne '_errorHandler' } keys %{ $self };
 	foreach my $object (keys %{$self}) {
-		$self->{$object}->DESTROY;
+		##Don't destroy things that don's exist
+		$self->{$object} and $self->{$object}->DESTROY;
 	}
+	$self->{_errorHandler} and $self->{_errorHandler}->DESTROY;
 	undef $self;
 }
 

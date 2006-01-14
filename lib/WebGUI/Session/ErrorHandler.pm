@@ -379,7 +379,7 @@ sub warn {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->warn($message);
-        $self->{_session}->stow->set("debug_warn") = $self->{_session}->stow->get("debug_warn").$message."\n";
+        $self->{_session}->stow->set("debug_warn", $self->{_session}->stow->get("debug_warn").$message."\n");
 }
 
 

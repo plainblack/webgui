@@ -186,7 +186,10 @@ sub readAllConfigs {
 	return \%configs;
 }
 
-
+sub DESTROY {
+	my ($self) = @_;
+	undef $self;
+}
 
 1;
 
