@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2005 Plain Black Corporation.
+# WebGUI is Copyright 2001-2006 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -12,22 +12,20 @@
 use strict;
 use lib '../lib';
 use Getopt::Long;
+use WebGUI::Session;
 use WebGUI::Utility;
 # ---- END DO NOT EDIT ----
-
 use WebGUI::User;
-use WebGUI::SQL;
 use Test::More tests => 33; # increment this value for each test you create
 
 my $session = initialize();  # this line is required
 
-# put your tests here
 my $user;
 my $lastUpdate;
 
 #Let's try to create a new user and make sure we get an object back
 my $userCreationTime = time();
-ok(defined ($user = WebGUI::User->new("new")), 'new("new") -- object reference is defined');
+ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object reference is defined');
 
 #New does not return undef if something breaks, so we'll see if the _profile hash was set.
 ok(scalar %{$user->{_profile}} > 0, 'new("new") -- profile property contains at least one key');  
@@ -78,7 +76,7 @@ my $oldKarma = $user->karma;
 $user->karma('69', 'peter gibbons', 'test karma');
 is($user->karma, $oldKarma+69, 'karma() -- get/set add amount');
 
-my ($source, $description) = WebGUI::SQL->quickArray("select source, description from karmaLog where userId=".quote($user->userId));
+my ($source, $description) = $session->db->quickArray("select source, description from karmaLog where userId=".$session->db->quote($user->userId));
 
 is($source, 'peter gibbons', 'karma() -- get/set source');
 is($description, 'test karma', 'karma() -- get/set description');
@@ -97,46 +95,46 @@ is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- referringAffiliate');
 my @groups = qw|2 4|;
 $user->addToGroups(\@groups);
 
-my ($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote('2')." and userId=".quote($user->userId));
+my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
 ok($result, 'addToGroups() -- added to first test group');
 
-($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote('4')." and userId=".quote($user->userId));
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
 ok($result, 'addToGroups() -- added to second test group');
 
 #Let's delete this user from our test groups
 $user->deleteFromGroups(\@groups);
 
-($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote('2')." and userId=".quote($user->userId));
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
 is($result, '0', 'deleteFromGroups() -- removed from first test group');
 
-($result) = WebGUI::SQL->quickArray("select count(*) from groupings where groupId=".quote('4')." and userId=".quote($user->userId));
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
 is($result, '0', 'deleteFromGroups() -- removed from second test group');
 
 #Let's delete this user
 my $userId = $user->userId;
 $user->delete;
 
-my ($count) = WebGUI::SQL->quickArray("select count(*) from users where userId=".quote($userId));
+my ($count) = $session->db->quickArray("select count(*) from users where userId=".$session->db->quote($userId));
 is($count, '0', 'delete() -- users table');
 
-($count) = WebGUI::SQL->quickArray("select count(*) from userProfileData where userId=".quote($userId));
+($count) = $session->db->quickArray("select count(*) from userProfileData where userId=".$session->db->quote($userId));
 is($count, '0', 'delete() -- userProfileData table');
 
-($count) = WebGUI::SQL->quickArray("select count(*) from messageLog where userId=".quote($userId));
+($count) = $session->db->quickArray("select count(*) from messageLog where userId=".$session->db->quote($userId));
 is($count, '0', 'delete() -- messageLog table'); 
 
 #Let's test new with an override uid
-$user = WebGUI::User->new("new", "ROYSUNIQUEUSERID000001");
+$user = WebGUI::User->new($session, "new", "ROYSUNIQUEUSERID000001");
 is($user->userId, "ROYSUNIQUEUSERID000001", 'new() -- override user id');
 $user->delete;
 
 #Let's test new to retrieve an existing user
-$user = WebGUI::User->new(3);
+$user = WebGUI::User->new($session,3);
 is($user->username, "Admin", 'new() -- retrieve existing user');
 $user = "";
 
 #Let's test new to retrieve default user visitor with no params passed in
-$user = WebGUI::User->new;
+$user = WebGUI::User->new($session);
 is($user->userId, '1', 'new() -- returns visitor with no args');
 $user = "";
 

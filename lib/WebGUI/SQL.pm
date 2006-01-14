@@ -198,9 +198,13 @@ sub commit {
 
 #-------------------------------------------------------------------
 
-=head2 connect ( dsn, user, pass, session )
+=head2 connect ( session, dsn, user, pass )
 
 Constructor. Connects to the database using DBI.
+
+=head2 session
+
+A reference to the active WebGUI::Session object.
 
 =head2 dsn
 
@@ -214,18 +218,14 @@ The username to use to connect to the database defined by dsn.
 
 The password to use to connect to the database defined by dsn.
 
-=head2 session
-
-A reference to the active WebGUI::Session object.
-
 =cut
 
 sub connect {
 	my $class = shift;
+	my $session = shift;
 	my $dsn = shift;
 	my $user = shift;
 	my $pass = shift;
-	my $session = shift;
 	my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError=>0,AutoCommit=>1 }) or $session->errorHandler->fatal("Couldn't connect to database.");
 	if ( $dsn =~ /Oracle/ ) { # Set Oracle specific attributes
 		$dbh->{LongReadLen} = 512 * 1024;

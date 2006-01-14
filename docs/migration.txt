@@ -801,6 +801,9 @@ perl -pi.bak -e 's!WebGUI\:\:Paginator\-\>new\(!WebGUI::Paginator->new(\$self->s
 WebGUI::Product now accepts session in the constructor.
 
 perl -pi.bak -e 's!WebGUI\:\:Product\-\>new\(!WebGUI::Product->new(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Product\-\>getByOptionId\(!WebGUI::Product->getByOptionId(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Product\-\>getByParameterId\(!WebGUI::Product->getByParameterId(\$self->session,!g' fileNameGoesHere
+perl -pi.bak -e 's!WebGUI\:\:Product\-\>getByVariantId\(!WebGUI::Product->getByVariantId(\$self->session,!g' fileNameGoesHere
 
 
 5.23.20 WebGUI::ProfileCategory and WebGUI::ProfileField Refactored

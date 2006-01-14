@@ -165,7 +165,7 @@ Returns a WebGUI::SQL object, which is connected to the WebGUI database.
 sub db {
 	my $self = shift;
 	unless (exists $self->{_db}) {
-		$self->{_db} = $self->db->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"), $self);
+		$self->{_db} = WebGUI::SQL->connect($self,$self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
 	}
 	return $self->{_db};
 }
@@ -184,7 +184,7 @@ sub dbSlave {
 		foreach (1..3) {
 			my $slave = $self->config->get("dbslave".$_);
 			if (exists $slave->{dsn}) {
-				push(@{$self->{_slave}},$self->db->connect($slave->{dsn},$slave->{user},$slave->{pass}, $self));
+				push(@{$self->{_slave}},$self->db->connect($self, $slave->{dsn},$slave->{user},$slave->{pass}));
 			}
 		}
 	}
@@ -530,17 +530,16 @@ sub user {
 	my $self = shift;
 	my $option = shift;
 	if (defined $option) {
-		$self->{_var}{userId} = $option->{userId} || $option->{user}->userId; 
-		$self->db->setRow("userSession","sessionId", $self->{_var});
-		if ($self->setting("passiveProfilingEnabled")) {
-			$self->db->write("update passiveProfileLog set userId = ".$self->db->quote($self->{_var}{userId})." where sessionId = ".$self->db->quote($self->getId));
+		my $userId = $option->{userId} || $option->{user}->userId; 
+		if ($self->setting->get("passiveProfilingEnabled")) {
+			$self->db->write("update passiveProfileLog set userId = ".$self->db->quote($userId)." where sessionId = ".$self->db->quote($self->getId));
 		}	
 		delete $self->{_stow};
-		$self->{_user} = $option->{user} || WebGUI::User->new($self, $self->{_var}{userId});
+		$self->{_user} = $option->{user} || WebGUI::User->new($self, $userId);
 	} elsif (!exists $self->{_user}) {
 		$self->{_user} = WebGUI::User->new($self, $self->var->get('userId'));
 	}
-	$self->{_request}->user($self->{_user}->username) if ($self->{_request});
+	$self->request->user($self->{_user}->username) if ($self->request);
 	return $self->{_user};
 }
 
