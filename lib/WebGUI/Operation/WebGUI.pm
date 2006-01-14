@@ -25,7 +25,7 @@ The beginning of WebGUI.
 
 sub www_genesis {
 	my $session = shift;
-	$session->style->useEmptyStyle("1")
+	$session->style->useEmptyStyle("1");
 	my $output = '<html><head><title>About WebGUI</title>
 	<style>.big {font-size: 23px;}</style>
 	</head><body bgcolor="#ef4200" text="black" link="white" vlink="white">
@@ -160,7 +160,7 @@ to work, even superseding the session variable.
 #-------------------------------------------------------------------
 sub www_theWg {
 	my $session = shift;
-	$session->style->useEmptyStyle("1")
+	$session->style->useEmptyStyle("1");
 	my $output = '<html><head><title>WebGUI</title></head><body BGCOLOR="black"><center>
 <nobr><font SIZE="1" FACE="Courier New, Courier"><font COLOR="white"></font><font COLOR="#1A1108">p</font><font COLOR="#24130C">a</font><font COLOR="#5C2605">c</font><font COLOR="#642206">kageW</font><font COLOR="#5C1F04">e</font><font COLOR="#642206">bGUI;ou</font><font COLOR="#5C2605">r</font><font COLOR="#642206">$VERSION="5.5.0</font><font COLOR="#5C2605">"</font><font COLOR="#642206">;usestr</font><font COLOR="#5C1F04">i</font><font COLOR="#642206">ctqw(v</font><font COLOR="#68290C">a</font><font COLOR="#5C1F04">r</font><font COLOR="#5C2605">s</font><font COLOR="#642206">s</font><font COLOR="#541604">u</font><font COLOR="#481404">b</font><font COLOR="#380B04">s</font><font COLOR="#0B0204">);useTie::CPHash;useW
 
