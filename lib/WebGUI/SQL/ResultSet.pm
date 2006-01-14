@@ -62,6 +62,19 @@ sub array {
 
 #-------------------------------------------------------------------
 
+=head2 db ( )
+
+A reference to the current WebGUI::SQL object.
+
+=cut
+
+sub db {
+	my $self = shift;
+	return $self->{_db};
+}
+
+#-------------------------------------------------------------------
+
 =head2 errorCode {
 
 Returns an error code for the current handler.
