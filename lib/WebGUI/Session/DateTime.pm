@@ -726,8 +726,7 @@ Returns an epoch date for now.
 =cut
 
 sub time {
-	my $self = shift;
-	return $self->session->datetime->time();
+	return time();
 }
 
 #-------------------------------------------------------------------
