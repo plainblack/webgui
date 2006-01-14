@@ -361,8 +361,8 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_sessionId=>$sessionId, _config=>$config, _server=>$server};
 	bless $self , $class;
-	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * 100) if (defined $request);
-	return $self;  # $self->setting->get("maxAttachmentSize")
+	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
+	return $self;
 }
 
 #-------------------------------------------------------------------
