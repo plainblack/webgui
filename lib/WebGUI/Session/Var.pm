@@ -165,15 +165,15 @@ sub new {
         if ($sessionId eq "") {
                 $self->start(1);
         } else {
-                $self->{_var} = $self->db->quickHashRef("select * from userSession where sessionId=".$self->db->quote($sessionId));
-                if ($self->{_var}{expires} && $self->{_var}{expires} <$self->session->datetime->time()) {
+                $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=".$session->db->quote($sessionId));
+                if ($self->{_var}{expires} && $self->{_var}{expires} <$session->datetime->time()) {
                         $self->end;
                 }
                 if ($self->{_var}{sessionId} ne "") {
-                        $self->{_var}{lastPageView} =$self->session->datetime->time();
-                        $self->{_var}{lastIP} = $self->env("REMOTE_ADDR");
-                        $self->{_var}{expires} =$self->session->datetime->time() + $self->setting->get("sessionTimeout");
-                        $self->db->setRow("userSession","sessionId",$self->{_var});
+                        $self->{_var}{lastPageView} =$session->datetime->time();
+                        $self->{_var}{lastIP} = $session->env("REMOTE_ADDR");
+                        $self->{_var}{expires} =$session->datetime->time() + $session->setting->get("sessionTimeout");
+                        $session->db->setRow("userSession","sessionId",$self->{_var});
                 } else {
                         $self->start(1,$sessionId);
                 }
