@@ -439,7 +439,7 @@ sub new {
 		%raw = @_;
 	}
 	my %params;
-	foreach my $definition (reverse @{$class->definition}) {
+	foreach my $definition (reverse @{$class->definition($session)}) {
 		foreach my $fieldName (keys %{$definition}) {
 			my $value = $raw{$fieldName};
 			# if we have no value, try the tagged name
