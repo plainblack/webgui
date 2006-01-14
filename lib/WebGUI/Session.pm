@@ -163,7 +163,7 @@ Returns a WebGUI::SQL object, which is connected to the WebGUI database.
 
 sub db {
 	my $self = shift;
-	if (exists $self->{_db}) {
+	unless (exists $self->{_db}) {
 		$self->{_db} = $self->db->connect($self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"), $self);
 	}
 	return $self->{_db};
@@ -179,7 +179,7 @@ Returns a random slave database handler, if one is defined, otherwise it returns
 
 sub dbSlave {
 	my $self = shift;
-	if (exists $self->{_slave}) {
+	unless (exists $self->{_slave}) {
 		foreach (1..3) {
 			my $slave = $self->config->get("dbslave".$_);
 			if (exists $slave->{dsn}) {
