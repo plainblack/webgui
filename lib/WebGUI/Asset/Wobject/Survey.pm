@@ -1173,16 +1173,16 @@ sub www_respond {
 		if ($key =~ /^answerId_(.+)$/) {
 			my $id = $1;
 			my ($previousResponse) = $self->session->db->quickArray("select count(*) from Survey_questionResponse
-				where Survey_answerId=".$self->session->db->quote($self->session->form->process(""answerId_".$id"))." and Survey_responseId=".$self->session->db->quote($self->session->scratch->get($varname)));
+				where Survey_answerId=".$self->session->db->quote($self->session->form->process("answerId_".$id))." and Survey_responseId=".$self->session->db->quote($self->session->scratch->get($varname)));
 			next if ($previousResponse);
-			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$self->session->form->process(""answerId_".$id"));
+			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$self->session->form->process("answerId_".$id));
 			if ($self->get("questionOrder") eq "response" && $answer->{gotoQuestion} eq "") {
 				$terminate = 1;
 			}
-			my $response = $self->session->form->process(""textResponse_".$id} || $answer->{answer");
+			my $response = $self->session->form->process("textResponse_".$id) || $answer->{answer});
 			$self->session->db->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
 				".$self->session->db->quote($answer->{Survey_answerId}).", ".$self->session->db->quote($answer->{Survey_questionId}).", ".$self->session->db->quote($self->session->scratch->get($varname).", ".$self->session->db->quote($answer->{Survey_id}).",
-				".$self->session->db->quote($self->session->form->process(""comment_".$id")).", ".$self->session->db->quote($response).", ".$self->session->datetime->time().")");
+				".$self->session->db->quote($self->session->form->process("comment_".$id)).", ".$self->session->db->quote($response).", ".$self->session->datetime->time().")");
 		}
 	}
 	my $responseCount = $self->getQuestionResponseCount($self->session->scratch->get($varname)); 

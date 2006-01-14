@@ -503,12 +503,12 @@ sub www_listUsers {
 		$output .= '<td><a href="'.$session->url->page('op=editUser;uid='.$data->{userId})
 			.'">'.$data->{username}.'</a></td>';
 		$output .= '<td class="tableData">'.$data->{email}.'</td>';
-		$output .= '<td class="tableData">'$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
-		$output .= '<td class="tableData">'$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
+		$output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
+		$output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
 		my ($lastLoginStatus, $lastLogin) = $session->db->quickArray("select status,timeStamp from userLoginLog where 
                         userId=".$session->db->quote($data->{userId})." order by timeStamp DESC");
                 if ($lastLogin) {
-                        $output .= '<td class="tableData">'$session->datetime->epochToHuman($lastLogin).'</td>';
+                        $output .= '<td class="tableData">'.$session->datetime->epochToHuman($lastLogin).'</td>';
                 } else {
                         $output .= '<td class="tableData"> - </td>';
                 }

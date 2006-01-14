@@ -428,7 +428,7 @@ sub www_viewReport {
 	);
 	$f->submit(-value=>"Search");
 	$var{'form'} = $f->print;
-	my $url = $self->getUrl("func=viewReport&selectDepartment=$self->session->form->process("selectDepartment")&reportPagination=$self->session->form->process("reportPagination")&startDate=$self->session->form->process("startDate")&endDate=$self->session->form->process("endDate")&doit=1");
+	my $url = $self->getUrl("func=viewReport;selectDepartment=".$self->session->form->process("selectDepartment").";reportPagination=".$self->session->form->process("reportPagination").";startDate=".$self->session->form->process("startDate").";endDate=".$self->session->form->process("endDate").";doit=1");
 	if ($self->session->form->process("doit")) {
 	  $var{showReport} = 1;
 	  $endDate = $self->session->datetime->addToTime($endDate,24,0,0);

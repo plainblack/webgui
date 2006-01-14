@@ -176,7 +176,7 @@ sub createAccount {
 			.'<img src="'.$storage->getUrl($filename).'" border="0" alt="captcha" align="middle" />';
    		$vars->{'create.form.captcha.label'} = $i18n->get("captcha label","AuthWebGUI");
 	}
-   $vars->{'create.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$self->session->form->process(""authWebGUI.username"}"));
+   $vars->{'create.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$self->session->form->process("authWebGUI.username"}));
    $vars->{'create.form.username.label'} = $i18n->get(50);
    $vars->{'create.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authWebGUI.identifier"});
    $vars->{'create.form.password.label'} = $i18n->get(51);

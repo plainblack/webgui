@@ -26,7 +26,7 @@ sub _hasVoted {
 	my $self = shift;
 	my ($hasVoted) = $self->session->db->quickArray("select count(*) from Poll_answer 
 		where assetId=".$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->profileField("userId"))."
-		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and ipAddress='$self->session->env->get("REMOTE_ADDR")'))");
+		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and ipAddress='".$self->session->env->get("REMOTE_ADDR")."'))");
 	return $hasVoted;
 }
 

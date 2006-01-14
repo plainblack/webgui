@@ -98,15 +98,15 @@ sub toHtml {
 	tie %options, 'Tie::IxHash';
 	%options = $self->orderedHash;
 	my @values = $self->getValues();
-        foreach my $key (keys %options) {
+	foreach my $key (keys %options) {
 		$output .= '<option value="'.$key.'"';
 		foreach my $item (@values) {
 			if ($item eq $key) {
 				$output .= ' selected="selected"';
 			}
 		}
-		$output .= '>'.${$self->get("options}"){$key}.'</option>';
-        }
+		$output .= '>'.$self->get("options")->{$key}.'</option>';
+	}
 	$output .= '</select>'."\n";
 	return $output;
 }

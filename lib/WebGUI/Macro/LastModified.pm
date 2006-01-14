@@ -47,7 +47,7 @@ sub process {
 	($time) = $session->dbSlave->quickArray("SELECT max(revisionDate) FROM assetData where assetId=".$session->db->quote($session->asset->getId));
 	my $i18n = WebGUI::International->new($session,'Macro_LastModified');
 	return $i18n->get('never') if $time eq 0;
-	return $label$session->datetime->epochToHuman($time,$format) if ($time);
+	return $label.$session->datetime->epochToHuman($time,$format) if ($time);
 }
 
 1;

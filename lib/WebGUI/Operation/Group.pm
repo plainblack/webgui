@@ -478,7 +478,7 @@ sub www_editGrouping {
 sub www_editGroupingSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session->form->process("gid")));
-        $group->userGroupExpireDate($session->form->process("uid"),$session->form->process("gid")$session->datetime->setToEpoch($session->form->process("expireDate")));
+        $group->userGroupExpireDate($session->form->process("uid"),$session->form->process("gid"),$session->datetime->setToEpoch($session->form->process("expireDate")));
         $group->userIsAdmin($session->form->process("uid"),$session->form->process("gid"),$session->form->process("groupAdmin"));
         return www_manageUsersInGroup();
 }
@@ -659,7 +659,7 @@ sub www_manageUsersInGroup {
                         .$session->icon->edit('op=editGrouping;uid='.$row->{userId}.';gid='.$session->form->process("gid"))
                         .'</td>';
                 $output .= '<td class="tableData"><a href="'.$session->url->page('op=editUser;uid='.$row->{userId}).'">'.$row->{username}.'</a></td>';
-                $output .= '<td class="tableData">'$session->datetime->epochToHuman($row->{expireDate},"%z").'</td></tr>';
+                $output .= '<td class="tableData">'.$session->datetime->epochToHuman($row->{expireDate},"%z").'</td></tr>';
         }
         $output .= '</table>'.WebGUI::Form::formFooter($session,);
 	$output .= $p->getBarTraditional;

@@ -132,7 +132,7 @@ sub getEditForm {
 		$tabform->getTab("properties")->readOnly(
 			-label=>$i18n->get('thumbnail'),
 			-hoverHelp=>$i18n->get('Thumbnail description'),
-			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='$self->session->datetime->time().'" alt="thumbnail" /></a>'
+			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'?noCache='.$self->session->datetime->time().'" alt="thumbnail" /></a>'
 			);
 		my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
         	$tabform->getTab("properties")->readOnly(

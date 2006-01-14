@@ -108,7 +108,7 @@ sub process {
 		}
 	}
 	# If we reach this point, we had no success in finding an asset the user can view:
-	$session->errorHandler->warn("Could not find a random thread that was viewable by the user $session->user->profileField("username") after $numberOfTries tries. Check parameters of macro on page ".$session->asset->get('url'));
+	$session->errorHandler->warn("Could not find a random thread that was viewable by the user ".$session->user->profileField("username")." after $numberOfTries tries. Check parameters of macro on page ".$session->asset->get('url'));
 	return '';
 }
 
