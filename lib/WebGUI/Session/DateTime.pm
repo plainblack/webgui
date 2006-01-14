@@ -622,7 +622,8 @@ A reference to the current session.
 
 sub new {
 	my $class = shift;
-	bless {_session=>shift}, $class;
+	my $session = shift;
+	bless {_session=>$session}, $class;
 }
 
 #-------------------------------------------------------------------
