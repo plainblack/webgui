@@ -110,7 +110,7 @@ sub get {
 	if (-e $folder."/expires" && -e $folder."/cache" && open(FILE,"<".$folder."/expires")) {
 		my $expires = <FILE>;
 		close(FILE);
-		return undef if ($expires <$self->session->datetime->time());
+		return undef if ($expires < $self->session->datetime->time());
 		my $value;
 		eval {$value = retrieve($folder."/cache")};
 		if (ref $value eq "SCALAR") {
