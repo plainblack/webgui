@@ -96,6 +96,17 @@ sub _getHelpName {
 }
 
 #-------------------------------------------------------------------
+sub _related {
+	my ($session, $related) = @_;
+	if (ref $related eq 'CODE') {
+		return $related->($session);
+	}
+	else {
+		return @{ $related };
+	}
+}
+
+#-------------------------------------------------------------------
 sub www_viewHelp {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
@@ -103,7 +114,8 @@ sub www_viewHelp {
 	my $namespace = $session->form->process("namespace") || "WebGUI";
         my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session->form->process("hid"),$namespace);
-	foreach my $row (@{$help->{related}}) {
+	my @related = _related($session, $help->{related});
+	foreach my $row (@related) {
 		my $relatedHelp = _get($row->{tag},$row->{namespace});
 		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
 	}

@@ -21,7 +21,8 @@ our $HELP = {
 		body => 'macros list body',
 		fields => [
 		],
-		related => [ 
+		related => sub {   ##Hey, you gotta pass in the session var, right?
+			     my $session = shift;
                              sort { $a->{tag} cmp $b->{tag} }
                              map {
                                  $tag = $_;
@@ -33,8 +34,8 @@ our $HELP = {
 				 { tag => $tag,
 				   namespace => $namespace }
 			     }
-		             values %{ $self->session->config->get("macros") }
-			   ],
+		             values %{ $session->config->get("macros") }
+			   },
         },
 
 };

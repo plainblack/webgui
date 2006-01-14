@@ -227,21 +227,23 @@ our $HELP = {
 		body => 'asset list body',
 		fields => [
 		],
-		related => [ map {
-				 my ($namespace) = /::(\w+)$/;
-				 my $tag = $namespace;
-				 $tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
-				 $tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
-				 $tag = lc $tag;
-				 $namespace = join '', 'Asset_', $namespace;
-				 { tag => "$tag add/edit",
-				   namespace => $namespace }
-			     }
-                             grep { $_ } ##Filter out empty entries
-                                     @{ $self->session->config->get("assets") },
-                                     @{ $self->session->config->get("assetContainers") },
-                                     @{ $self->session->config->get("utilityAssets") },
-			   ],
+		related => sub {
+				my ($session) = @_;
+				map {
+					my ($namespace) = /::(\w+)$/;
+					my $tag = $namespace;
+					$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
+					$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
+					$tag = lc $tag;
+					$namespace = join '', 'Asset_', $namespace;
+					{ tag => "$tag add/edit",
+					namespace => $namespace }
+				}
+					grep { $_ } ##Filter out empty entries
+						@{ $session->config->get("assets") },
+						@{ $session->config->get("assetContainers") },
+						@{ $session->config->get("utilityAssets") },
+			   },
 	},
 
 };
