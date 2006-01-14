@@ -240,9 +240,9 @@ sub read {
 	my $sql = shift;
 	my $db = shift;
 	my $placeholders = shift;
-	my $sth = $db->prepare($sql, $db);
-	$sth->execute($placeholders);
-	bless {_db=>$db, _sql=>$sql, _sth=>$sth}, $class;
+	my $self = $db->prepare($sql, $db);
+	$self->sth->execute($placeholders);
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -299,10 +299,9 @@ sub unconditionalRead {
 	my $db = shift;
 	my $placeholders = shift;
 	$db->session->errorHandler->debug("query: ".$sql);
-        my $sth = $db->dbh->prepare($sql) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$db->dbh->errstr);
-        if ($sth) {
-        	$sth->execute(@$placeholders) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$sth->errstr);
-        	bless ({_sth => $sth, _sql=>$sql, _db=>$db} , $class);
+        my $self = $db->dbh->prepare($sql) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$db->dbh->errstr);
+        if ($self->sth) {
+        	$self->sth->execute(@$placeholders) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$self->sth->errstr);
         }  else {
 		return undef;
 	}
