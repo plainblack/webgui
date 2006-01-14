@@ -591,7 +591,7 @@ sub read {
 	my $self = shift;
 	my $sql = shift;
 	my $placeholders = shift;
-	return WebGUI::SQL::ResultSet->read($sql,$self);
+	return WebGUI::SQL::ResultSet->read($sql, $self, $placeholders);
 }
 
 
@@ -690,7 +690,7 @@ sub unconditionalRead {
 	my $self = shift;
 	my $sql = shift;
 	my $placeholders = shift;
-	return WebGUI::SQL::ResultSet->unconditionalRead($sql, $self);
+	return WebGUI::SQL::ResultSet->unconditionalRead($sql, $self, $placeholders);
 }
 
 

@@ -198,7 +198,7 @@ sub prepare {
 	my $db = shift;
 	$db->session->errorHandler->debug("query: ".$sql);
 	my $sth = $db->dbh->prepare($sql) or $db->session->errorHandler->fatal("Couldn't prepare statement: ".$sql." : ". $db->dbh->errstr);
-	bless ({_sth => $sth, _sql => $sql, _db=>$db}, $class);
+	bless {_sth => $sth, _sql => $sql, _db=>$db}, $class;
 }
 
 
