@@ -14,6 +14,8 @@ use lib '../lib';
 use Getopt::Long;
 use WebGUI::Form::FieldType;
 use WebGUI::Form::DynamicField;
+use WebGUI::Session;
+use Data::Dumper;
 # ---- END DO NOT EDIT ----
 
 #The goal of this test is to verify that getName works with all Form types.
@@ -32,9 +34,7 @@ my $session = initialize();  # this line is required
 
 diag("Getting the list of all Form types\n");
 
-my $fieldType = WebGUI::Form::FieldType->new();
-
-my @formTypes = @{ $fieldType->{types} };
+my @formTypes = sort @{ WebGUI::Form::FieldType->getTypes($session) };
 
 ##We have to remove DynamicField from this list, since when you call new
 ##it wants to return a type.  We'll check it manually.
@@ -45,14 +45,14 @@ plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
 
-foreach my $formType (sort @formTypes) {
-	my $form = WebGUI::Form::DynamicField->new(fieldType => $formType);
+foreach my $formType (@formTypes) {
+	my $form = WebGUI::Form::DynamicField->new($session, fieldType => $formType);
 	my $ref = (split /::/, ref $form)[-1];
 	is($ref, $formType, "checking form type $formType");
-	ok($form->getName, sprintf "form getName = %s", $form->getName);
+	ok($form->getName($session), sprintf "form getName = %s", $form->getName($session));
 }
 
-my $name = WebGUI::Form::DynamicField->getName();
+my $name = WebGUI::Form::DynamicField->getName($session);
 
 ok($name, 'did not inherit default form name');
 
