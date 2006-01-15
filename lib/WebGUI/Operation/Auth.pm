@@ -65,7 +65,7 @@ sub www_auth {
    my $methodCall = shift || $session->form->process("method") || "init";
    if(!$authMethod->isCallable($methodCall)){
       $session->errorHandler->security("access uncallable auth method on page '".$session->asset->getTitle."' [".$session->asset->pageId."].");
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($session);
 	  return $i18n->get(1077);
    }
    return $session->style->userStyle($authMethod->$methodCall);   
