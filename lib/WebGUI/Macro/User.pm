@@ -30,7 +30,7 @@ the data stored in $session .  If the field does not exist, undef is returned.
 
 #-------------------------------------------------------------------
 sub process {
-	return  $session{user}{shift};
+	return  $session{user}{$_[0]};
 }
 
 

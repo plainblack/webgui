@@ -32,7 +32,7 @@ then undef will be returned.
 
 #-------------------------------------------------------------------
 sub process {
-	return $session{env}{shift};
+	return $session{env}{$_[0]};
 }
 
 1;
