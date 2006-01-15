@@ -497,7 +497,7 @@ sub getUploadControl {
 	if ($self->get("storageId")) {
 		my $i;
 		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
-			$uploadControl .= $self->session->icon->delete("func=deleteFile;filename=".$filename,$self->get("url"),$i18n->get("delete file warning"))	
+			$uploadControl .= $self->session->icon->delete("func=deleteFile;filename=".$filename,$self->get("url"),$i18n->get("delete file warning","Asset_Collaboration"))	
 				.' <a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a>'
 				.'<br />';
 			$i++;

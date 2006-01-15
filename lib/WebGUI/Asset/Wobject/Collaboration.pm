@@ -987,7 +987,7 @@ sub www_search {
                 options=>\%results,
                 value=>[$numResults]
                 });
-        $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>$i18n->get(170)});
+        $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>$i18n->get(170,'WebGUI')});
         $var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
         $var{'back.url'} = $self->getUrl;
 	$self->appendTemplateLabels(\%var);

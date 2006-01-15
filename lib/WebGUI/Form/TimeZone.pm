@@ -51,7 +51,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>$i18n->get("timezone")
+			defaultValue=>$i18n->get("timezone", 'DateTime')
 			},
 		value=>{
 			defaultValue=>undef

@@ -67,7 +67,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
+	my $i18n = WebGUI::International->new($session, "Asset");
 	push(@{$definition}, {
 		formName=>{
 			defaultValue=>$i18n->get("asset");

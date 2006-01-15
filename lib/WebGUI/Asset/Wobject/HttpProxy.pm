@@ -104,7 +104,7 @@ sub getCookieJar {
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_IndexedSearch");
+	my $i18n = WebGUI::International->new($self->session,"Asset_HttpProxy");
 	my $tabform = $self->SUPER::getEditForm();
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),

@@ -120,7 +120,7 @@ sub www_export {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
         $self->getAdminConsole->setHelp("page export", "Asset");
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, "Asset");
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "func",
@@ -173,7 +173,7 @@ Displays the export status page
 sub www_exportStatus {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $iframeUrl = $self->getUrl('func=exportGenerate');
 	$iframeUrl = $self->session->url->append($iframeUrl, 'index='.$self->session->form->process("index"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'depth='.$self->session->form->process("depth"));
@@ -204,7 +204,7 @@ sub www_exportGenerate {
 		$self->session->request->print($error);
 		return;
 	}
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, 'Asset');
 	my $userId = $self->session->form->process("userId");
 	my $extrasURL = $self->session->form->process("extrasURL");
 	my $uploadsURL = $self->session->form->process("uploadsURL");
