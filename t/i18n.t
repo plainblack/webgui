@@ -15,6 +15,7 @@ use Text::Balanced qw(extract_codeblock);
 use Getopt::Long;
 use WebGUI::Operation::Help;
 use WebGUI::International;
+use WebGUI::Session;
 use Data::Dumper;
 use File::Find;
 # ---- END DO NOT EDIT ----
@@ -33,6 +34,7 @@ my $digits  = qr/(\d+)/;
 my $bareword  = qr/(\w+)/;
 my $quotelike = qr/((['"])([^'"\s]+\s*)+(['"]))/;
 my $sub_args  = qr/(($quotelike|$digits)(,\s*)?)+/;
+my $sess_arg = qr/(?:\$session|\$self->session)/;
 my $subroutine = qr/
 			  WebGUI::International::get
 			  \(			##Opening paren for optional arguments
@@ -43,11 +45,11 @@ my $subroutine = qr/
 
 my %helpTable;
 
-my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList();
+my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
 foreach my $helpSet (@helpFileSet) {
 	my $helpName = $helpSet->[1];
-	my $help = WebGUI::Operation::Help::_load($helpName);
+	my $help = WebGUI::Operation::Help::_load($session, $helpName);
 	$helpTable{ $helpName } = $help;
 }
 
@@ -61,29 +63,33 @@ foreach my $helpSet (@helpFileSet) {
 ##	namespace -> which help file it is form
 ##	label -> which help file it is form
 
-diag("Getting Help labels");
-my @helpLabels = getHelpLabels();
-
-diag("Getting SQL labels");
-my @sqlLabels = getSQLLabels();
-
+my @helpLabels;
+my @sqlLabels;
 my @libLabels;
+my @objLabels;
+
+diag("Getting Help labels");
+@helpLabels = getHelpLabels();
+
+#diag("Getting SQL labels");
+#@sqlLabels = getSQLLabels();
+
 diag("Getting subroutine labels");
 find(\&label_finder_pm, '../lib/');
 
-my @objLabels;
 diag("Getting object labels");
 find(\&obj_finder_pm, '../lib/');
 
 diag ("Checking ". scalar(@helpLabels). " help labels");
-diag ("Checking ". scalar(@sqlLabels). " SQL labels");
+#diag ("Checking ". scalar(@sqlLabels). " SQL labels");
 diag ("Checking ". scalar(@libLabels). " library code labels");
 diag ("Checking ". scalar(@objLabels). " library code labels via object");
 
 $numTests = scalar(@helpLabels)
-	  + scalar(@sqlLabels)
+#	  + scalar(@sqlLabels)
 	  + scalar(@libLabels)
-	  + scalar(@objLabels);
+	  + scalar(@objLabels)
+;
 
 diag("Planning on running $numTests tests\n");
 
@@ -91,30 +97,33 @@ plan tests => $numTests;
 
 diag("Help Label tests\n");
 
-foreach my $i18n ( @helpLabels ) {
-	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
-	sprintf "label: %s->%s inside %s->%s->%s", @{ $i18n }{'namespace', 'label', 'topic', 'entry', 'tag', });
+my $i18n = WebGUI::International->new($session);
+
+foreach my $label ( @helpLabels ) {
+	ok($i18n->get(@{ $label }{qw(label namespace )} ),
+	sprintf "label: %s->%s inside %s->%s->%s", @{ $label }{'namespace', 'label', 'topic', 'entry', 'tag', });
 }
 
-diag("SQL Label tests\n");
-
-foreach my $i18n ( @sqlLabels ) {
-	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
-	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
-}
-
+#diag("SQL Label tests\n");
+#
+#foreach my $label ( @sqlLabels ) {
+#	ok($i18n->get(@{ $label }{qw(label namespace )} ),
+#	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
+#}
+#
+##Subroutine calls are now illegal, everything must be done by object methods.
 diag("Subroutine Call Label tests\n");
 
-foreach my $i18n ( @libLabels ) {
-	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
-	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
+foreach my $label ( @libLabels ) {
+	ok(0,
+	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
 }
 
 diag("Object Method Label tests\n");
 
-foreach my $i18n ( @objLabels ) {
-	ok(WebGUI::International::get(@{ $i18n }{qw(label namespace )} ),
-	sprintf "label: %s->%s inside %s", @{ $i18n }{'namespace', 'label', 'file', });
+foreach my $label ( @objLabels ) {
+	ok($i18n->get(@{ $label }{qw(label namespace )} ),
+	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
 }
 
 cleanup($session); # this line is required
@@ -151,13 +160,14 @@ sub obj_finder_pm {
 	close $pmf;
 	##Advance pos to first subroutine
 	while ( my $subBody = extract_codeblock($libFile, '{}', qr/(?ms).*?^sub (\w+)\s*/) ) {
-		next unless $subBody =~ /(\w+)\s*=\s*WebGUI::International->new\(($quotelike)\)/;
+		next unless $subBody =~ /(\w+)\s*=\s*WebGUI::International->new\($sess_arg(?:,\s*($quotelike))?\)/;
 		my ($obj, $namespace) = ($1,$2);
 		while ( $subBody =~ /$obj\->get\(($sub_args)\)/msgc ) {
+			my ($label, $local_name) = split /,\s*/, $1;
 			push @objLabels, {
 				file=>$File::Find::name,
-				label=>$1,
-				namespace=>$namespace || 'WebGUI',
+				label=>$label,
+				namespace=>$local_name || $namespace || 'WebGUI',
 			};
 		}
 	}
@@ -233,7 +243,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        return WebGUI::Session->open("..",$configFile);
 }
 
 sub cleanup {

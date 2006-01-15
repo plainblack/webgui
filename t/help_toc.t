@@ -36,8 +36,6 @@ plan tests => $numTests;
 
 diag("Check for mandatory lables for Help table of contents");
 
-diag(Dumper(\@helpFileSet));
-
 foreach my $fileSet (@helpFileSet) {
 	my $file = $fileSet->[1];
 	ok(WebGUI::Operation::Help::_getHelpName($session, $file), "Missing label for $file");
