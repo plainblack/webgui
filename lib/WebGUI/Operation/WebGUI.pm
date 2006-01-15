@@ -52,6 +52,7 @@ password and email address, as well as some other WebGUI settings.
 #-------------------------------------------------------------------
 sub www_setup {
 	my $session = shift;
+	$session->http->setMimeType("text/html");
 	return "" unless ($session->setting->get("specialState") eq "init");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -101,15 +102,15 @@ sub www_setup {
 		$f->submit;
 		$output .= $f->print;
 	} elsif ($session->form->process("step") eq "3") {
-		WebGUI::Setting::remove('specialState');
-		WebGUI::Setting::set('companyName',$session->form->text("companyName"));
-		WebGUI::Setting::set('companyURL',$session->form->url("companyURL"));
-		WebGUI::Setting::set('companyEmail',$session->form->email("companyEmail"));
-		WebGUI::HTTP::setRedirect($session->url->gateway());
+		$session->setting->remove('specialState');
+		$session->setting->set('companyName',$session->form->text("companyName"));
+		$session->setting->set('companyURL',$session->form->url("companyURL"));
+		$session->setting->set('companyEmail',$session->form->email("companyEmail"));
+		$session->setting->setRedirect($session->url->gateway());
 		return "";
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
-		my $u = WebGUI::User->new('3');
+		my $u = WebGUI::User->new($session,'3');
 		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden(
 			-name=>"op",

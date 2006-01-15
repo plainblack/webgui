@@ -114,10 +114,8 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 sub close {
 	my $self = shift;
 	##Must destroy the logger last!
-	my %keys = grep { $_ ne '_errorHandler' } keys %{ $self };
-	foreach my $object (keys %{$self}) {
-		next if ($object eq '_request' || $object eq '_sessionId' || $object eq '_server');
-		##Don't destroy things that don's exist
+	my %mykeys = grep { ($_ ne '_errorHandler' && $_ ne '_request' && $_ eq '_sessionId' && $_ eq '_server') } keys %{ $self };
+	foreach my $object (keys %mykeys) {
 		$self->{$object} and $self->{$object}->DESTROY;
 	}
 	$self->{_errorHandler} and $self->{_errorHandler}->DESTROY;
@@ -359,8 +357,9 @@ sub open {
 	my $server = shift;
 	my $sessionId = shift;
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
-	my $self = {_sessionId=>$sessionId, _config=>$config, _server=>$server};
+	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
+	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId);
 	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
 	return $self;
 }
@@ -422,7 +421,7 @@ Returns a WebGUI::Session::Scratch object.
 sub scratch {
 	my $self = shift;
 	unless (exists $self->{_scratch}) {
-		$self->{_scratch} = WebGUI::Session::Scratch->new($self->getId, $self->db);
+		$self->{_scratch} = WebGUI::Session::Scratch->new($self);
 	}
 	return $self->{_scratch};
 }

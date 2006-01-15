@@ -25,8 +25,9 @@ our @ISA = qw(WebGUI::Asset);
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
   my $definition = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
+	my $i18n = WebGUI::International->new($session,"Asset_Event");
   push(@{$definition}, {
 	assetName=>$i18n->get('assetName'),
 	icon=>'calendar.gif',
@@ -59,7 +60,7 @@ sub definition {
 			}
 		}
 	});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session,$definition);
 }
 
 #-------------------------------------------------------------------

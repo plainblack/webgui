@@ -90,7 +90,7 @@ sub AUTOLOAD {
                 return undef;
         }       
         my $class = "WebGUI::Form::".$name;
-        $self->{_data} .= $class->new(%params)->toHtmlWithWrapper;
+        $self->{_data} .= $class->new($self->session,%params)->toHtmlWithWrapper;
 }       
         
 #-------------------------------------------------------------------

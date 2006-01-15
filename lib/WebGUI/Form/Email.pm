@@ -97,7 +97,7 @@ Renders an email address field.
 sub toHtml {
         my $self = shift;
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/emailCheck.js',{ type=>'text/javascript' });
-	$self->get("extras") .= ' onchange="emailCheck(this.value)" ';
+	$self->{_params}{extras} .= ' onchange="emailCheck(this.value)" ';
 	return $self->SUPER::toHtml;
 }
 

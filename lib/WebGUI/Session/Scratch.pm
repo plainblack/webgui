@@ -26,7 +26,7 @@ This package allows you to attach arbitrary data to the session that lasts until
 
 =head1 SYNOPSIS
 
-$scratch = WebGUI::Session::Scratch->new($sessionId, $db);
+$scratch = WebGUI::Session::Scratch->new($session);
 
 $scratch->delete('temp');
 $scratch->set('temp',$value);
@@ -61,7 +61,7 @@ sub delete {
 	my $name = shift;
 	return undef unless ($name);
 	delete $self->{_data}{$name};
-	$self->{_db}->deleteRow("userSessionScratch","sessionId",$self->{_sessionId});
+	$self->session->db->deleteRow("userSessionScratch","sessionId",$self->{_sessionId});
 }
 
 
@@ -76,7 +76,7 @@ Deletes all scratch variables for this session.
 sub deleteAll {
 	my $self = shift;
 	delete $self->{_data};
-        $self->session->db->write("delete from userSessionScratch where sessionId=".quote($self->{_sessionId}));
+	$self->session->db->write("delete from userSessionScratch where sessionId=".quote($self->{_sessionId}));
 }
 
 
@@ -97,7 +97,7 @@ sub deleteName {
 	my $name = shift;
 	return undef unless ($name);	
 	delete $self->{_data}{$name};
-        $self->session->db->write("delete from userSessionScratch where name=".quote($name));
+	$self->session->db->write("delete from userSessionScratch where name=".quote($name));
 }
 
 
@@ -136,26 +136,35 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 new ( sessionId, db )
+=head2 new ( session )
 
 Constructor. Returns a scratch object.
 
-=head3 sessionId
+=head3 session
 
-The unique id of the current session.
-
-=head3 db
-
-An active WebGUI::SQL database handler.
+The current session.
 
 =cut
 
 sub new {
 	my $class = shift;
-	my $sessionId = shift;
-	my $db = shift;
-	my $data = $db->buildHashRef("select name,value from userSessionScratch where sessionId=".$db->quote($sessionId));
-	bless {_sessionId=>$sessionId, _db=>$db, _data=>$data}, $class;
+	my $session = shift;
+	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=".$session->db->quote($session->getId));
+	bless {_session=>$session,_sessionId=>$session->getId, _data=>$data}, $class;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the WebGUI::Session object.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 
@@ -181,7 +190,7 @@ sub set {
 	my $value = shift;
 	return undef unless ($name);
 	$self->{_data}{$name} = $value;
-	$self->{_db}->write("replace into userSessionScratch (sessionId, name, value) values (".$self->{_db}->quoteAndJoin([$self->{_sessionId}, $name, $value]).")");
+	$self->session->db->write("replace into userSessionScratch (sessionId, name, value) values (".$self->session->db->quoteAndJoin([$self->{_sessionId}, $name, $value]).")");
 }
 
 

@@ -58,10 +58,6 @@ sub contentHandler {
 	my $s = Apache2::ServerUtil->server;
 	### Open new or existing user session based on user-agent's cookie.
 	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
-	### form variables
-#	foreach ($session->{_request}->param) {
-#		$session{form}{$_} = $session->{_request}->body($_) || $session->{_request}->param($_);
-#	}
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$r->print($session->http->getHeader);

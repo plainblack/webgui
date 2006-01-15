@@ -58,9 +58,9 @@ sub definition {
         my $class = shift;
         my $session = shift;
         my $definition = shift;
-	my $i18n = WebGUI::International->new($session);
+	my $i18n = WebGUI::International->new($session,"Asset_Redirect");
         push(@{$definition}, {
-		assetName=>$i18n->get('assetName',"Asset_Redirect"),
+		assetName=>$i18n->get('assetName'),
 		uiLevel => 9,
 		icon=>'redirect.gif',
                 tableName=>'redirect',
@@ -72,7 +72,7 @@ sub definition {
                                         }
                         }
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session,$definition);
 }
 
 

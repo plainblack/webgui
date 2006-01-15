@@ -102,8 +102,9 @@ sub chopTitle {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
         my $definition = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Post");
+	my $i18n = WebGUI::International->new($session,"Asset_Post");
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'post.gif',
@@ -173,7 +174,7 @@ sub definition {
 				}
 			},
 		});
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session,$definition);
 }
 
 

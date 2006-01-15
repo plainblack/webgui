@@ -1032,7 +1032,7 @@ sub new {
 		}
 		$class = $className;
 	}
-	my $cache = WebGUI::Cache->new($session,$session, ["asset",$assetId,$revisionDate]);
+	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
 		# got properties from cache

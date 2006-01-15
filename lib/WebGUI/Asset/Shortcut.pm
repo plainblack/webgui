@@ -155,8 +155,9 @@ sub canManage {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
+	my $i18n = WebGUI::International->new($session,"Asset_Shortcut");
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'shortcut.gif',
@@ -206,7 +207,7 @@ sub definition {
 			}
 		}
 	});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session,$definition);
 }
 
 #-------------------------------------------------------------------

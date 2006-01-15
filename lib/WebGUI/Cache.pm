@@ -117,7 +117,7 @@ sub new {
 	my $cache;
 	my $class = shift;
 	my $session = shift;
-	if($session->config->get("memcached_servers")) {
+	if ($session->config->get("memcached_servers")) {
 		require WebGUI::Cache::Memcached;
 		return WebGUI::Cache::Memcached->new($session,@_);
 	} else {

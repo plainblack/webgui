@@ -60,8 +60,9 @@ An array of hashes to prepend to the list
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($self->session,'Wobject');
+	my $i18n = WebGUI::International->new($session,'Wobject');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -119,7 +120,7 @@ sub definition {
 		autoGenerateForms=>1,
 		properties => \%properties
 	});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session,$definition);
 }
 
 
@@ -191,6 +192,7 @@ A comparison expression to be used when checking whether the action should be al
 =cut
 
 sub confirm {
+	my $self = shift;
         return $self->session->privilege->vitalComponent() if ($_[4]);
 	my $noURL = $_[3] || $_[0]->getUrl;
 	my $i18n = WebGUI::International->new($self->session,'Wobject');
@@ -278,8 +280,8 @@ Logs the view of the wobject to the passive profiling mechanism.
 sub logView {
 	my $self = shift;
 	if ($self->session->setting->get("passiveProfilingEnabled")) {
-		WebGUI::PassiveProfiling::add($session,$self->get("assetId"));
-		WebGUI::PassiveProfiling::addPage($session,$self->get("assetId"));	# add wobjects on asset to passive profile log
+		WebGUI::PassiveProfiling::add($self->session,$self->get("assetId"));
+		WebGUI::PassiveProfiling::addPage($self->session,$self->get("assetId"));	# add wobjects on asset to passive profile log
 	}
 	return;
 }
