@@ -152,11 +152,11 @@ sub addUsers {
 		next if ($uid eq '1');
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($uid));
 		unless ($isIn) {
-                	$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($uid).", ".($self->session->datetime->time()+$expireOffset).")");
+			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($uid).", ".($self->session->datetime->time()+$expireOffset).")");
 		} else {
-                       	$self->userGroupExpireDate($uid,($self->session->datetime->time()+$expireOffset));
+			$self->userGroupExpireDate($uid,($self->session->datetime->time()+$expireOffset));
 		}
-        }
+	}
 }
 
 #-------------------------------------------------------------------

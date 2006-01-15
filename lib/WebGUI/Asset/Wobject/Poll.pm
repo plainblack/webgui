@@ -33,7 +33,7 @@ sub _hasVoted {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-	return $class->SUPER::definition($definition);
+	my $session = shift;
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Poll");
 	push(@{$definition}, {

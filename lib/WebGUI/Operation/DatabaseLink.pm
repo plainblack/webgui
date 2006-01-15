@@ -133,7 +133,7 @@ sub www_editDatabaseLinkSave {
 	my $params = {
 		title=>$session->form->process("title"),
 		username=>$session->form->process("dbusername"),
-		identifier=>$session->form->process("dbidentifier")
+		identifier=>$session->form->process("dbidentifier"),
 		DSN=>$session->form->process("DSN")
 		});
 	if ($session->form->process("dlid") eq "new") {

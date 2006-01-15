@@ -60,8 +60,9 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
+        my $session = shift;
         my $definition = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
+	my $i18n = WebGUI::International->new($session,"Asset_Image");
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
                 tableName=>'ImageAsset',
@@ -69,7 +70,7 @@ sub definition {
                 properties=>{
                                 thumbnailSize=>{
                                         fieldType=>'integer',
-                                        defaultValue=>$self->session->setting->get("thumbnailSize")
+                                        defaultValue=>$session->setting->get("thumbnailSize")
                                         },
 				parameters=>{
 					fieldType=>'textarea',
@@ -77,7 +78,7 @@ sub definition {
 					}
                         }
                 });
-        return $class->SUPER::definition($definition);
+        return $class->SUPER::definition($session,$definition);
 }
 
 

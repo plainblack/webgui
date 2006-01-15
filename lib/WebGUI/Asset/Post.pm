@@ -16,6 +16,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post::Thread;
 use WebGUI::Cache;
+use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
@@ -124,15 +125,15 @@ sub definition {
 			dateSubmitted => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=$self->session->datetime->time()
+				defaultValue=$session->datetime->time()
 				},
 			dateUpdated => {
 				fieldType=>"hidden",
-				defaultValue=$self->session->datetime->time()
+				defaultValue=$session->datetime->time()
 				},
 			username => {
 				fieldType=>"hidden",
-				defaultValue=>$self->session->form->process("visitorUsername") || $self->session->user->profileField("alias") || $self->session->user->profileField("username")
+				defaultValue=>$session->form->process("visitorUsername") || $session->user->profileField("alias") || $session->user->profileField("username")
 				},
 			rating => {
 				noFormPost=>1,
@@ -611,11 +612,13 @@ Send notifications to the thread and forum subscribers that a new post has been 
 
 sub notifySubscribers {
 	my $self = shift;
-        my %subscribers;
-	foreach my $userId (@{$group->getUsers($self->getThread->get("subscriptionGroupId"),undef,1)}) {
+	my %subscribers;
+	my $group = WebGUI::Group->new($self->session,$self->getThread->get("subscriptionGroupId"));
+	foreach my $userId (@{$group->getUsers(undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
-	foreach my $userId (@{$group->getUsers($self->getThread->getParent->get("subscriptionGroupId"),undef,1)}) {
+	$group = WebGUI::Group->new($self->getThread->getParent->get("subscriptionGroupId"));
+	foreach my $userId (@{$group->getUsers(undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
         my %lang;

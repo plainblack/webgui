@@ -92,9 +92,10 @@ The number of seconds since January 1, 1970.
 =cut
 
 sub epochToArray {
+	my $self = shift;
 	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
 	use DateTime;
-	return map {$_ += 0} split / /, DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone)->str$self->session->datetime->time("%Y %m %d %H %M %S");
+	return map {$_ += 0} split / /, DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone)->strftime("%Y %m %d %H %M %S");
 }
 
 
@@ -248,7 +249,7 @@ sub view {
 		$maxDate = $self->session->datetime->addToDate($minDate,0,1,0);
 	}
 	#$self->session->errorHandler->warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
-	my @now = epochToArray($self->session->datetime->time());
+	my @now = $self->epochToArray($self->session->datetime->time());
 	my $calHasEvent = 0;
 	#monthcount minus i is the number of months remaining to be processed.
 	for (my $i=$calMonthStart;$i<=$calMonthEnd;$i++) {
@@ -256,7 +257,7 @@ sub view {
 		my $monthHasEvent = 0;
 		my $thisMonth = $self->session->datetime->addToDate($minDate,0,($i-1),0);
 		my ($monthStart, $monthEnd) = $self->session->datetime->monthStartEnd($thisMonth);
-		my @thisMonthDate = epochToArray($thisMonth);
+		my @thisMonthDate = $self->epochToArray($thisMonth);
 		#Check month to see if it is in the allowed month range. End loop if it's not.
 		if ($thisMonth > $maxDate) {
 			$i = $calMonthEnd;
@@ -295,7 +296,7 @@ sub view {
 				#cycle through each day in the event, pushing the event's day listing into the proper day.
 				for (my $i=$eventCycleStart; $i<=$eventCycleStop; $i++) {
 					#create an array for the specific day in the event.
-					my @date = epochToArray($self->session->datetime->addToDate($eventStartDate,0,0,$i));
+					my @date = $self->epochToArray($self->session->datetime->addToDate($eventStartDate,0,0,$i));
 					# if the event goes past the end of this month, halt the loop.  
 					# No need to continue processing days that aren't in this month.
 					if ($monthEnd < ($self->session->datetime->addToDate($eventStartDate,0,0,$i) - 1)) {
@@ -357,7 +358,7 @@ sub view {
 			});
 			$dayOfWeekCounter++;
 		}
-		my @date = epochToArray($thisMonth);
+		my @date = $self->epochToArray($thisMonth);
 		my @dayloop;
 		for (my $dayCounter=1; $dayCounter <= $daysInMonth; $dayCounter++) {
 			#----------------------------------------------------------------------------

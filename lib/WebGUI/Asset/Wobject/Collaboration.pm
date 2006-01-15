@@ -62,8 +62,8 @@ sub appendPostListTemplateVars {
                         		"lastReply.user.isVisitor"=>$lastPost->get("ownerUserId") eq "1",
                         		"lastReply.username"=>$lastPost->get("username"),
                        	 		"lastReply.userProfile.url"=>$lastPost->WebGUI::Asset::Post::getPosterProfileUrl(),
-                        		"lastReply.dateSubmitted.human"=$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%z"),
-                        		"lastReply.timeSubmitted.human"=$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%Z")
+                        		"lastReply.dateSubmitted.human"=>$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%z"),
+                        		"lastReply.timeSubmitted.human"=>$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%Z")
 					);
 			}
 		}
@@ -82,10 +82,10 @@ sub appendPostListTemplateVars {
                         "status"=>$post->getStatus,
                         "thumbnail"=>$post->getThumbnailUrl,
                         "image.url"=>$post->getImageUrl,
-                        "dateSubmitted.human"=$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%z"),
-                        "dateUpdated.human"=$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%z"),
-                        "timeSubmitted.human"=$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%Z"),
-                        "timeUpdated.human"=$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%Z"),
+                        "dateSubmitted.human"=>$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%z"),
+                        "dateUpdated.human"=>$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%z"),
+                        "timeSubmitted.human"=>$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%Z"),
+                        "timeUpdated.human"=>$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%Z"),
                         "userProfile.url"=>$post->getPosterProfileUrl,
                         "user.isVisitor"=>$post->get("ownerUserId") eq "1",
         		"edit.url"=>$post->getEditUrl,
@@ -865,7 +865,8 @@ Subscribes a user to this collaboration system.
 sub subscribe {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
-	$group->addUsers([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
+	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+	$group->addUsers([$self->session->user->profileField("userId")]);
 }
 
 #-------------------------------------------------------------------
@@ -879,6 +880,7 @@ Unsubscribes a user from this collaboration system
 sub unsubscribe {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
 	$group->deleteUsers([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
 }
 
@@ -1104,6 +1106,7 @@ sub www_unsubscribe {
 # format the date according to rfc 822 (for RSS export)
 my @_months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 sub _get_rfc822_date {
+	my $self = shift;
         my ($time) = @_;
         my ($year, $mon, $mday, $hour, $min, $sec) = $self->session->datetime->localtime($time);
         my $month = $_months[$mon - 1];
@@ -1142,7 +1145,7 @@ sub www_viewRSS {
 	$var{'description'} = _xml_encode($self->get("description"));
 	# Set some of the optional channel variables
 	$var{'generator'} = "WebGUI ".$WebGUI::VERSION;
-	$var{'lastBuildDate'} = _xml_encode(_get_rfc822_date($self->get("dateUpdated")));
+	$var{'lastBuildDate'} = _xml_encode($self->_get_rfc822_date($self->get("dateUpdated")));
 	$var{'webMaster'} = $self->session->setting->get("companyEmail");
 	$var{'docs'} = "http://blogs.law.harvard.edu/tech/rss";
 
@@ -1179,7 +1182,7 @@ sub www_viewRSS {
 		    link => $encUrl,
 		    description => _xml_encode($post->get("synopsis")),
 		    guid => $encUrl,
-		    pubDate => _xml_encode(_get_rfc822_date($post->get("dateUpdated"))),
+		    pubDate => _xml_encode($self->_get_rfc822_date($post->get("dateUpdated"))),
 		    attachmentLoop => \@attachmentLoop,
 		    });
 		$i++;

@@ -299,8 +299,8 @@ sub www_editUser {
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
 	$tabform->getTab("account")->readOnly(value=>$session->form->process("uid"),label=>$i18n->get(378));
     	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
-    	$tabform->getTab("account")->readOnly(value=$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
-    	$tabform->getTab("account")->readOnly(value=$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
+    	$tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
+    	$tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
     	$tabform->getTab("account")->text(
 		-name=>"username",
 		-label=>$i18n->get(50),

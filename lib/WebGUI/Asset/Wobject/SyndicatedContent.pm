@@ -231,6 +231,7 @@ sub _normalize_items {
 
 #-------------------------------------------------------------------
 sub _get_rss_data {
+	my $self = shift;
         my $url = shift;
         
 	my $cache = WebGUI::Cache->new($self->session,'url:' . $url, 'RSS');
@@ -295,7 +296,7 @@ sub _get_rss_data {
 		#Assign dates "globally" rather than when seen in a viewed feed.
 		#This is important because we can "filter" now and want to ensure we keep order
 		#correctly as new items appear.
-		_assign_rss_dates($rss->{items});
+		$self->_assign_rss_dates($rss->{items});
 
                 #Default to an hour timeout
                 $cache->set(Storable::freeze($rss), 3600);
@@ -310,6 +311,7 @@ sub _get_rss_data {
 # whole database to keep the thing from growing too large
 
 sub _assign_rss_dates {
+	my $self = shift;
         my ($items) = @_;
         
         for my $item (@{$items}) {
@@ -442,7 +444,7 @@ sub _get_items {
                 $items = [];
                 
                 for my $url (@{$urls}) {
-		    my $rss_info=_get_rss_data($url);
+		    my $rss_info=$self->_get_rss_data($url);
 		    push(@rss_feeds, $rss_info) if($rss_info);
                 }
 
@@ -504,7 +506,7 @@ sub view {
         $var{item_loop} = $item_loop;
 
 	#Construct the title for the link.
-	_constructRSSHeadTitleLink(\%var,$title || $var{'channel.title'});
+	$self->_constructRSSHeadTitleLink(\%var,$title || $var{'channel.title'});
 	if ($rssObject) {
 	    $self->_constructRSS($rssObject,\%var);
 	    my $rss=$rssObject->as_string;
@@ -525,6 +527,7 @@ sub view {
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _constructRSSHeadTitleLink{
+	my $self = shift;
     my($var,$rssTitle)=@_;
 	my $i18n = WebGUI::International->new($self->session,'Asset_SyndicatedContent');
     my $rssFeedSuffix=$i18n->get('RSS Feed Title Suffix');

@@ -38,8 +38,8 @@ sub canPersonalize {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-        return $class->SUPER::definition($definition);
-	my $definition = shift;
+	my $session = shift;
+  my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -65,7 +65,6 @@ sub definition {
 			defaultValue=>undef,
 			fieldType=>"checkList"
 		},
-		
 	);
 	my $i18n = WebGUI::International->new($session,"Asset_Dashboard");
 	push(@{$definition}, {
@@ -75,7 +74,7 @@ sub definition {
 		className=>'WebGUI::Asset::Wobject::Dashboard',
 		properties=>\%properties
 	});
-        return $class->SUPER::definition($session, $definition);
+	return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

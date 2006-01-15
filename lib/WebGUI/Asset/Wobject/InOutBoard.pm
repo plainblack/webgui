@@ -29,6 +29,7 @@ sub _defineUsername {
 #-------------------------------------------------------------------
 
 sub _fetchNames {
+	my $self = shift;
 	my @userIds = @_;
 	my %nameHash;
 	my $sql = "select users.username, 
@@ -173,7 +174,7 @@ sub view {
 	if (@users) {
 		my %nameHash;
 		tie %nameHash, "Tie::IxHash";
-		%nameHash = _fetchNames(@users);
+		%nameHash = $self->_fetchNames(@users);
 		$nameHash{""} = $i18n->get('myself');
 		%nameHash = WebGUI::Utility::sortHash(%nameHash);
 
@@ -479,7 +480,7 @@ order by department, lastName, firstName, InOutBoard_statusLog.dateStamp";
 		$row{'dateStamp'} = $self->session->datetime->epochToHuman($data->{dateStamp});
 		$row{'message'} = ($data->{message}||"&nbsp;");
 		if (! exists $changedBy{ $data->{createdBy} }) {
-			my %whoChanged = _fetchNames($data->{createdBy});
+			my %whoChanged = $self->_fetchNames($data->{createdBy});
 			$changedBy{ $data->{createdBy} } = $whoChanged{ $data->{createdBy} };
 		}
 		$row{'createdBy'} = $changedBy{ $data->{createdBy} };

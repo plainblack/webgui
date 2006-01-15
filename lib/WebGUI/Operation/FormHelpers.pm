@@ -38,7 +38,7 @@ sub www_formAssetTree {
 		$output .= '<a href="'.$child->getUrl("op=formAssetTree;classLimiter=".$session->form->process("classLimiter").";formId="
 			.$session->form->process("formId")).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$session->style->useEmptyStyle("1")
+	$session->style->useEmptyStyle("1");
 	return $output;
 }
 
@@ -92,7 +92,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 		next unless $child->canView;
 		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$session->style->useEmptyStyle("1")
+	$session->style->useEmptyStyle("1");
 	return $output.'</fieldset></fieldset>';
 }
 
@@ -118,7 +118,7 @@ sub www_richEditImageTree {
 		}
 		$output .= '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$session->style->useEmptyStyle("1")
+	$session->style->useEmptyStyle("1");
 	return $output;
 }
 
@@ -127,7 +127,7 @@ sub www_richEditImageTree {
 sub www_richEditViewThumbnail {
 	my $session = shift;
 	my $image = WebGUI::Asset->newByUrl;
-	$session->style->useEmptyStyle("1")
+	$session->style->useEmptyStyle("1");
 	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {
 		my $output = '<div align="center">';
 		$output .= '<img src="'.$image->getThumbnailUrl.'" border="0" alt="Preview">';

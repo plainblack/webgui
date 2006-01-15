@@ -17,12 +17,11 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
 sub _create_cache_key {
-   my ($wobject, $call, $param_str) = @_;
+   my ($self, $call, $param_str) = @_;
    my $cache_key;
-
    $cache_key = $_[0]->get('sharedCache')
       ? Digest::MD5::md5_hex($call, $param_str)
-      : Digest::MD5::md5_hex($call, $param_str, $session{'var'}{'sessionId'});
+      : Digest::MD5::md5_hex($call, $param_str, $self->session->getId);
    $self->session->errorHandler->warn(($_[0]->get('sharedCache')?'shared':'session')
       . " cache_key=$cache_key md5_hex($call, $param_str)");
    return $cache_key;
@@ -35,7 +34,7 @@ sub definition {
 	my $session = shift;
 	my $definition = shift;
 my $httpHeaderFieldType;
-   if ($session{'config'}{'soapHttpHeaderOverride'}) {
+   if ($session->config->get('soapHttpHeaderOverride')) {
       $httpHeaderFieldType = 'text';
    } else {
       $httpHeaderFieldType = 'hidden';
@@ -81,11 +80,11 @@ my $httpHeaderFieldType;
          },
          proxy            => {
             fieldType     => 'text',
-            defaultValue  => $session{'config'}{'soapproxy'},
+            defaultValue  => $session->config->get('soapproxy'),
          },
          uri              => {
             fieldType     => 'text',
-            defaultValue  => $session{'config'}{'soapuri'}
+            defaultValue  => $session->config->get('soapuri')
          },
          decodeUtf8       => {
             fieldType     => "yesNo",
@@ -164,7 +163,7 @@ sub getEditForm {
       -hoverHelp => $i18n->get('5 description'),
       -value => $self->get('params'),
    );
-   if ($session{'config'}{'soapHttpHeaderOverride'}) {
+   if ($self->session->config->('soapHttpHeaderOverride')) {
       $tabform->getTab("properties")->text (
          -name  => 'httpHeader',
          -label => $i18n->get(16),
@@ -246,10 +245,10 @@ sub view {
 
    # this page, with important params
     @seen{@exclude_params} = ();
-    for (keys %{$session{'form'}}) {
+    for ($session->request->params) {
        unless (exists $seen{$_}) {
           $query_string .= $self->session->url->escape($_) . '='
-             . $self->session->url->escape($session{'form'}{$_}) . ';';
+             . $self->session->url->escape($self->session->form->process($_)) . ';';
        }
     }
     $url = $self->session->url->page($query_string);
@@ -267,10 +266,10 @@ sub view {
    }
 
    # see if we can shortcircuit this whole process
-   if ((ref $session{'form'}{'disableWobjects'} && grep /^$call$/,
-         @{$session{'form'}{'disableWobjects'}}) ||
-        ($session{'form'}{'disableWobjects'} && grep /^$call$/,
-         $session{'form'}{'disableWobjects'})) {
+   if ((ref $self->session->form->process('disableWobjects') && grep /^$call$/,
+         @{$self->session->form->process('disableWobjects')}) ||
+        ($self->session->form->process('disableWobjects') && grep /^$call$/,
+         $self->session->form->process('disableWobjects'))) {
                                                                                 
       $self->session->errorHandler->warn("disabling soap call $call");
       $var{'disableWobject'} = 1;
@@ -279,19 +278,19 @@ sub view {
 
    # advanced use, if you want to pass SOAP results to a single, particular
    # wobject on a page
-   if (ref $session{'form'}{'targetWobjects'}) {
-      @targetWobjects = @{$session{'form'}{'targetWobjects'}};
+   if (ref $self->session->form->process('targetWobjects')) {
+      @targetWobjects = @{$self->session->form->process('targetWobjects')};
    } else {
-      push @targetWobjects, $session{'form'}{'targetWobjects'};
+      push @targetWobjects, $self->session->form->process('targetWobjects');
    }
 
    # check to see if this exact query has already been cached, using either
    # a cache specific to this session, or a shared global cache
-   if ($session{'form'}{'cache'}) {
-      if ($session{'form'}{'targetWobjects'}
+   if ($self->session->form->process('cache')) {
+      if ($self->session->form->process('targetWobjects')}
          && grep /^$call$/, @targetWobjects) {
 
-         $cache_key = $session{'form'}{'cache'};
+         $cache_key = $self->session->form->process('cache');
          $self->session->errorHandler->warn("passed a cache_key for $call");
       } else {
          $self->session->errorHandler->warn("cache_key not applicable to $call ");
@@ -304,7 +303,7 @@ sub view {
       $i18n->get(4));
 
    # passing a form param WSClient_skipCache lets us ignore even good caches
-   if (!$session{'form'}{'WSClient_skipCache'}) {
+   if (!$self->session->form->process('WSClient_skipCache')) {
       @result = Storable::thaw($cache->get);
    }
    
@@ -462,26 +461,23 @@ sub view {
             $var{$_} =~ s/\?/\?cache=$cache_key\;/g;
          }
       }
-
-
    } else {
       $self->session->errorHandler->debug($i18n->get(26) . $@) if $self->get('debugMode');
    }
-
    # did they request a funky http header?
-   if ($session{'config'}{'soapHttpHeaderOverride'} &&
+   if ($self->session->config->get('soapHttpHeaderOverride')} &&
       $self->get("httpHeader")) {
 
       $self->session->http->setMimeType($self->get("httpHeader"));
-      $self->session->errorHandler->warn("changed mimetype: " .  $session{'header'}{'mimetype'});
+      $self->session->errorHandler->warn("changed mimetype: " .  $self->get("httpHeader"));
    }
 
    # Note, we still process our template below even though it will never
    # be displayed if the redirectURL is set.  Not sure how important it is
    # to do it this way, but it certainly is the least obtrusive to default
    # webgui flow.  This feature currently requires a patched WebGUI.pm file.
-   if ($session{'form'}{'redirectURL'}) {
-	$self->session->http->setRedirect($session{'form'}{'redirectURL'});
+   if ($self->session->form->process('redirectURL')) {
+    $self->session->http->setRedirect($self->session->form->process('redirectURL'));
    }
 
    $var{'results'} = \@result;

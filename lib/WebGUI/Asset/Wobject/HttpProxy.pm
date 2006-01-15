@@ -229,7 +229,7 @@ sub view {
       if($self->session->env->get("REQUEST_METHOD")=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
                                						# not posting the same data over and over again.
          if($redirect == 0) {
-            foreach my $input_name (keys %{$session{form}}) {
+            foreach my $input_name ($self->session->request->params) {
                next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
                $input_name =~ s/^HttpProxy_//;
                $proxiedUrl=$self->session->url->append($proxiedUrl,"$input_name=".$self->session->form->process('HttpProxy_'.$input_name));
@@ -241,7 +241,7 @@ sub view {
          my $contentType = 'application/x-www-form-urlencoded'; # default Content Type header
 
          # Create a %formdata hash to pass key/value pairs to the POST request
-         foreach my $input_name (keys %{$session{form}}) {
+         foreach my $input_name ($self->session->request->params) {
    	 next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
    	 $input_name =~ s/^HttpProxy_//;
    
@@ -322,9 +322,9 @@ sub view {
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }
    if ($self->session->user->profileField("userId") eq '1') {
-      $ttl = $session{page}{cacheTimeoutVisitor};
+      $ttl = $self->get("cacheTimeoutVisitor");
       } else {
-          $ttl = $session{page}{cacheTimeout};
+          $ttl = $self->get("cacheTimeout");
       }
 		unless ($self->get("cacheTimeoutVisitor") <= 1 && $self->get("cacheTimeout") <= 1) {
 	   $cachedContent->set($var{content},$ttl);

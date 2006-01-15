@@ -27,6 +27,7 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
 sub _createField {
+	my $self = shift;
 	my $data = $_[0];
 	my %param;
 	$param{name} = $data->{name};
@@ -112,6 +113,7 @@ sub _tonull {
 
 #-------------------------------------------------------------------
 sub _createTabInit {
+	my $self = shift;
 	my $id = shift;
 	my @tabCount = $self->session->db->quickArray("select count(DataForm_tabId) from DataForm_tab where assetId=".$self->session->db->quote($id));
 	my $output = '<script type="text/javascript">var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
@@ -395,7 +397,7 @@ sub getRecordTemplateVars {
 	# add Tab label, url, header and init
 	$var->{"addTab.label"}=  $i18n->get(105);;
 	$var->{"addTab.url"}= $self->getUrl('func=editTab');
-	$var->{"tab.init"}= _createTabInit($self->getId);
+	$var->{"tab.init"}= $self->_createTabInit($self->getId);
 	$var->{"form.start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::hidden($self->session,{name=>"func",value=>"process"});
 	my @tabs;
@@ -439,7 +441,7 @@ sub getRecordTemplateVars {
 			$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
 			$value = $self->session->datetime->epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
 			push(@fields, {
-				"tab.field.form" => _createField(\%data),
+				"tab.field.form" => $self->_createField(\%data),
 				"tab.field.name" => $data{name},
 				"tab.field.tid" => $data{DataForm_tabId},
 				"tab.field.value" => $value,
@@ -483,7 +485,7 @@ sub getRecordTemplateVars {
 		$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
 		$value = $self->session->datetime->epochToHuman($value) if ($data{type} eq "dateTime");
 		my %fieldProperties = (
-			"form" => _createField(\%data),
+			"form" => $self->_createField(\%data),
 			"name" => $data{name},
 			"tid" => $data{DataForm_tabId},
 			"inTab".$data{DataForm_tabId} => 1,

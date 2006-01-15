@@ -73,7 +73,7 @@ sub www_viewActiveSessions {
 	$sth->finish;
 	$p = WebGUI::Paginator->new($session,$session->url->page('op=viewActiveSessions'));
 	$p->setDataByArrayRef(\@row);
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($session);
         $output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
         $output .= '<tr class="tableHeader"><td>'.$i18n->get(428).'</td>';
         $output .= '<td>'.$i18n->get(435).'</td>';

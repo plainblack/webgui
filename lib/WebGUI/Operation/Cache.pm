@@ -48,7 +48,7 @@ sub _submenu {
 	my $session = shift;
 	my $workarea = shift;
 	my $title = shift;
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($session);
 	$title = $i18n->get($title) if ($title);
 	my $ac = WebGUI::AdminConsole->new($session,"cache");
 	if ($session->setting->get("trackPageStatistics")) {
@@ -94,14 +94,14 @@ sub www_manageCache {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $data);
-	my $cache = WebGUI::Cache->new($session,);
+	my $cache = WebGUI::Cache->new($session);
 	my $flushURL =  $session->url->page('op=flushCache');
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($session);
         $output .= '<table>';
         $output .= '<tr><td align="right" class="tableHeader">'.$i18n->get('cache type').':</td><td class="tableData">'.ref($cache).'</td></tr>';
         $output .= '<tr><td align="right" valign="top" class="tableHeader">'.$i18n->get('cache statistics').':</td><td class="tableData"><pre>'.$cache->stats.'</pre></td></tr>';
         $output .= '<tr><td align="right" valign="top" class="tableHeader">&nbsp;</td><td class="tableData">'.
-			WebGUI::Form::button({
+			WebGUI::Form::button($session,{
 				value=>$i18n->get("clear cache"),
 				extras=>qq{onclick="document.location.href='$flushURL';"},
 			}).

@@ -35,7 +35,7 @@ the printableStyleId is used instead of the normal styleId for the page.
 sub www_makePrintable {
 	my $session = shift;
 	if ($session->form->process("styleId") ne "") {
-		$session{page}{printableStyleId} = $session->form->process("styleId");
+		$session->asset->{_properties}{printableStyleTemplateId} = $session->form->process("styleId");
 	}
 	$session->style->makePrintable("1")
 	return "";
