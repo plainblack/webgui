@@ -171,7 +171,7 @@ sub new {
                 }
                 if ($self->{_var}{sessionId} ne "") {
                         $self->{_var}{lastPageView} =$session->datetime->time();
-                        $self->{_var}{lastIP} = $self->env("REMOTE_ADDR");
+                        $self->{_var}{lastIP} = $session->env("REMOTE_ADDR");
                         $self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
                         $session->db->setRow("userSession","sessionId",$self->{_var});
                 } else {
