@@ -1016,8 +1016,8 @@ sub new {
 	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId="
-			.$session->db->$session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
-			.$session->db->$session->db->quote($session->scratch->get("versionTag")).")
+			.$session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
+			.$session->db->quote($session->scratch->get("versionTag")).")
 			group by assetData.assetId order by assetData.revisionDate");
 		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
 		$session->stow("assetRevision",$assetRevision);
