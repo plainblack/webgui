@@ -166,7 +166,7 @@ sub new {
                 $self->start(1);
         } else {
                 $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=".$session->db->quote($sessionId));
-                if ($self->{_var}{expires} && $self->{_var}{expires} <$self->session->datetime->time()) {
+                if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) {
                         $self->end;
                 }
                 if ($self->{_var}{sessionId} ne "") {
