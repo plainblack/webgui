@@ -14,7 +14,7 @@ use lib '../lib';
 use Getopt::Long;
 use WebGUI::Session;
 # ---- END DO NOT EDIT ----
-use Test::More tests => 1; # increment this value for each test you create
+use Test::More tests => 22; # increment this value for each test you create
  
 my $session = initialize();  # this line is required
  
@@ -24,21 +24,20 @@ use WebGUI::Session::Stow;
 my $stow  = WebGUI::Session::Stow->new($session);
 my $count = 0;
 my $maxCount = 20;
- 
-ok($stow->delete('Test'),"Reset Test variable!");
- 
-for (my $count = 0; $count <= $maxCount; $count++){
+
+for (my $count = 1; $count <= $maxCount; $count++){
    $stow->set("Test$count",$count);
 }
  
-for (my $count = 0; $count <= $maxCount; $count++){
- 
-   is($stow->get("Test$count"), $count, "Passed $count\n");
- 
+for (my $count = 1; $count <= $maxCount; $count++){
+   is($stow->get("Test$count"), $count, "Passed set/get $count\n");
 }
- 
+
+$stow->delete("Test1");
+is($stow->get("Test1"), undef, "delete()");
 $stow->deleteAll;
- 
+is($stow->get("Test2"), undef, "deleteAll()");
+  
 cleanup($session); # this line is required
  
 # ---- DO NOT EDIT BELOW THIS LINE -----
