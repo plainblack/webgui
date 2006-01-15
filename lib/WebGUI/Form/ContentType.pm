@@ -94,7 +94,7 @@ sub toHtml {
 	my $self = shift;
 	my %types;
 	my $i18n = WebGUI::International->new($self->session);
-	foreach my $type (@{$self->get("types}")) {
+	foreach my $type (@{ $self->get('types') }) {
                 if ($type eq "text") {
                         $types{text} = $i18n->get(1010);
                 } elsif ($type eq "mixed") {

@@ -121,13 +121,13 @@ sub toHtml {
 		name=>$self->get("name")."_interval",
 		value=>$interval,
 		extras=>$self->get("extras"),
-		id=>$self->{id}."_interval",
+		id=>$self->get('id')."_interval",
 		)->toHtml;
 	$cmd = "WebGUI::Form::SelectBox";
 	$out .= $cmd->new(
 		options=>\%units,
 		name=>$self->get("name")."_units",
-		id=>$self->{id}."_units",
+		id=>$self->get('id')."_units",
 		value=>[$units]
 		)->toHtml;
 	return $out;

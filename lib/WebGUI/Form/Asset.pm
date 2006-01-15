@@ -100,17 +100,17 @@ sub toHtml {
                         name=>$self->get("name"),
                         extras=>$self->get("extras"),
                         value=>$asset->getId,
-			id=>$self->{id}
+			id=>$self->get("id"),
                         )->toHtml
                 .WebGUI::Form::Text->new(
                         name=>$self->get("name")."_display",
                         extras=>' readonly="1" ',
                         value=>$asset->get("title"),
-			id=>$self->{id}."_display"
+			id=>$self->get('id')."_display"
                         )->toHtml
                 .WebGUI::Form::Button->new(
                         value=>"...",
-                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree;classLimiter=".$self->get("class").";formId=".$self->{id}).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree;classLimiter=".$self->get("class").";formId=".$self->get('id')).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;
 }
 

@@ -94,7 +94,7 @@ sub definition {
 			defaultValue=>$i18n->get('1075 description')
 			},
 		});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

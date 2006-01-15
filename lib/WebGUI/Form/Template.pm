@@ -131,10 +131,10 @@ editing the template show up if the user is allowed to do that.
 
 sub setManageIcons {
 	my $self = shift;
-	my $template = WebGUI::Asset::Template->new($self->get("value"));
+	my $template = WebGUI::Asset::Template->new($self->get('value'));
         if (defined $template && $template->canEdit) {
                 my $returnUrl;
-                if (exists $self->session->asset) {
+                if (defined $self->session->asset && ref $self->session->asset eq "WebGUI::Asset::Template") {
                         $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
                 }
                 my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$template->get("url"));

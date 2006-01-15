@@ -124,7 +124,7 @@ sub toHtml {
 	my $self = shift;
 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value"))));
 	my $checkedText = ' checked="checked"' if ($self->get("checked"));
-	my $idText = ' id="'.$self->{id}.'" ' if ($self->{id});
+	my $idText = ' id="'.$self->get('id').'" ' if ($self->get('id'));
 	return '<input type="checkbox" name="'.$self->get("name").'" value="'.$value.'"'.$idText.$checkedText.' '.$self->get("extras").' />';
 }
 

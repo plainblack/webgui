@@ -75,7 +75,7 @@ sub definition {
                         defaultValue=>$i18n->get("972")
                         },
 		defaultValue=>{
-                        defaultValue=$session->datetime->time()
+                        defaultValue=>$session->datetime->time()
                         },
 		maxlength=>{
 			defaultValue=> 19
@@ -128,11 +128,11 @@ sub toHtml {
                 value=>$value,
                 size=>$self->get("size"),
                 extras=>$self->get("extras"),
-		id=>$self->{id},
+		id=>$self->get('id'),
                 maxlength=>$self->get("maxlength")
                 )->toHtml . '<script type="text/javascript"> 
                         Calendar.setup({ 
-                                inputField : "'.$self->{id}.'", 
+                                inputField : "'.$self->get('id').'", 
                                 ifFormat : "%Y-%m-%d %H:%M:%S", 
                                 showsTime : true, 
                                 step : 1,

@@ -113,7 +113,7 @@ Renders a select list form control.
 
 sub toHtml {
 	my $self = shift;
-	my $output = '<select name="'.$self->get("name").'" size="'.$self->get("size").'" id="'.$self->{id}.'" '.$self->get("extras").'>';
+	my $output = '<select name="'.$self->get("name").'" size="'.$self->get("size").'" id="'.$self->get('id').'" '.$self->get("extras").'>';
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = $self->orderedHash;
@@ -123,7 +123,7 @@ sub toHtml {
 		if ($value eq $key) {
 			$output .= ' selected="selected"';
 		}
-		$output .= '>'.${$self->{options}}{$key}.'</option>';
+		$output .= '>'.$self->get('options')->{$key}.'</option>';
         }
 	$output .= '</select>'."\n";
 	return $output;

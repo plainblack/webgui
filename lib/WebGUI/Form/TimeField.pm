@@ -113,7 +113,7 @@ sub toHtml {
 	$self->get("extras") .= ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789:\')"';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new(
-			id=>$self->{id},
+			id=>$self->get('id'),
 			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->config->get("extrasURL"). '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>$i18n->get(970)
 			)->toHtml;

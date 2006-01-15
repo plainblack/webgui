@@ -524,6 +524,29 @@ sub session {
 
 #-------------------------------------------------------------------
 
+=head2 set ( key, var )
+
+Set a property of this form object.
+
+=head3 key
+
+The name of the property to set.
+
+=head3 var
+
+The value to set the property to.
+
+=cut
+
+sub set {
+	my $self = shift;
+	my $key = shift;
+	my $value = shift;
+	$self->{_params}{$key} = $value;
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders the form field to HTML. This method should be overridden by all subclasses.

@@ -80,7 +80,7 @@ sub definition {
 			defaultValue=>$i18n->get("479")
 			},
 		defaultValue=>{
-			defaultValue=$session->datetime->time()
+			defaultValue=>$session->datetime->time()
 			},
 		maxlength=>{
 			defaultValue=> 10
@@ -150,7 +150,7 @@ sub toHtml {
         $self->session->style->setLink($self->session->config->get("extrasURL").'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
         return $self->SUPER::toHtml. '<script type="text/javascript"> 
                         Calendar.setup({ 
-                                inputField : "'.$self->{id}.'", 
+                                inputField : "'.$self->get('id').'", 
                                 ifFormat : "%Y-%m-%d", 
                                 showsTime : false, 
                                 step : 1,

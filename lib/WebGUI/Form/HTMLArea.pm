@@ -118,11 +118,11 @@ sub toHtml {
 	my $self = shift;
         $self->session->style->setScript($self->session->config->get("extrasURL").'/textFix.js',{ type=>'text/javascript' });
 	$self->get("extras") .= ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ';	
-	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->get("richEditId"))->getRichEditor($self->{id});
+	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->get("richEditId"))->getRichEditor($self->get('id'));
 	my $i18n = WebGUI::International->new($self->session);
 	my $richEdit = WebGUI::Asset::RichEdit->new($self->get("richEditId"));
         if (defined $richEdit) {
-                return $self->SUPER::toHtml.$richEdit->getRichEditor($self->{id});
+                return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
         } else {
 		return $i18n->get('rich editor load error','Form_HTMLArea');
 	}

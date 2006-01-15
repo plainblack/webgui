@@ -103,7 +103,7 @@ sub toHtml {
 		.WebGUI::Form::Text->new(
 			size=>$self->session->setting->get("textBoxSize")-5,
 			name=>$self->get("name")."_new",
-			id=>$self->{id}."_new"
+			id=>$self->get('id')."_new"
 			)->toHtml;
 }
 

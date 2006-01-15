@@ -81,7 +81,7 @@ sub toHtml {
  	my $value = $self->fixQuotes($self->get("value"));
 	my $html = '<input type="button" ';
 	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
-	$html .= 'id="'.$self->{id}.'" ' unless ($self->{id} eq "_formId");
+	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");
 	$html .= 'value="'.$value.'" '.$self->get("extras").' />';
 	return $html;
 }

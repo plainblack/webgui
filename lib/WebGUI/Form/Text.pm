@@ -93,7 +93,7 @@ Renders an input tag of type text.
 sub toHtml {
 	my $self = shift;
  	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value"))));
-        return '<input id="'.$self->{id}.'" type="text" name="'.$self->get("name").'" value="'.$value.'" size="'.$self->get("size").'" maxlength="'.$self->get("maxlength").'" '.$self->get("extras").' />';
+        return '<input id="'.$self->get('id').'" type="text" name="'.$self->get("name").'" value="'.$value.'" size="'.$self->get("size").'" maxlength="'.$self->get("maxlength").'" '.$self->get("extras").' />';
 }
 
 1;

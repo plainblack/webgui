@@ -129,7 +129,7 @@ sub toHtml {
 	my $self = shift;
 	my %options;
 	tie %options, "Tie::IxHash";
-	foreach my $type (@{ $self->{types} }) {
+	foreach my $type (@{ $self->get('types') }) {
 		my $class = "WebGUI::Form::".ucfirst($type);
 		my $cmd = "use ".$class;
         	eval ($cmd);    
@@ -139,7 +139,7 @@ sub toHtml {
         	} 
 		$options{$type} = $class->getName($self->session);
 	}
-	$self->{options} = \%options;
+	$self->get('options') = \%options;
 
 	return $self->SUPER::toHtml();
 }
