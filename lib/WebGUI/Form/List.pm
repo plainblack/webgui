@@ -16,6 +16,7 @@ package WebGUI::Form::List;
 
 use strict;
 use base 'WebGUI::Form::Control';
+use WebGUI::Form::Hidden;
 use WebGUI::International;
 
 =head1 NAME
@@ -102,7 +103,7 @@ sub correctValues {
 				push(@defaultValues, $_);
 		}
 	}
-	$self->get("value") = \@defaultValues;
+	$self->set("value", \@defaultValues);
 }
 
 
@@ -264,10 +265,11 @@ sub toHtmlAsHidden {
         foreach my $key (keys %options) {
                 foreach my $item (@values) {
                         if ($item eq $key) {
-                                $output .= WebGUI::Form::Hidden->(
+                                $output .= WebGUI::Form::Hidden->new(
+					$self->session,
                                         name=>$self->get("name"),
                                         value=>$key
-                                        );
+                                        )->toHtmlAsHidden;
                         }
                 }
         }
