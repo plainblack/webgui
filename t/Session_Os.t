@@ -17,22 +17,11 @@ use WebGUI::Session;
 
 
 use Test::More tests => 2; # increment this value for each test you create
-use WebGUI::Utility;
 
 my $session = initialize();  # this line is required
 
-# generate
-my $generateId = $session->id->generate();
-is(length($generateId), 22, "generate() - length of 22 characters");
-my @uniqueIds;
-my $isUnique = 1;
-for (1..2000) {
-	last unless $isUnique;
-	my $id = $session->id->generate();
-	$isUnique = !isIn($id,@uniqueIds);
-	push(@uniqueIds,$id);
-}
-ok($isUnique, "generate() - unique");
+ok($session->os->get("name") ne "", "get(name)");
+ok($session->os->get("type") eq "Windowsish" || $session->os->get("type") eq "Linuxish", "get(type)");
 
 cleanup($session); # this line is required
 
