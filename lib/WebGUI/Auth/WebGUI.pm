@@ -504,7 +504,7 @@ sub login {
 #-------------------------------------------------------------------
 sub new {
    my $class = shift;
-   my $session = shift;
+	my $session = shift;
    my $authMethod = $_[0];
    my $userId = $_[1];
    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');

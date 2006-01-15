@@ -411,12 +411,13 @@ sub login {
 #-------------------------------------------------------------------
 sub new {
    my $class = shift;
+	my $session = shift;
    my $authMethod = $_[0];
    my $userId = $_[1];
    my @callable = ('createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','createAccountSave','deactivateAccountConfirm');
-   my $self = WebGUI::Auth->new($authMethod,$userId,\@callable);
-   $self->{_connection} = WebGUI::LDAPLink->new($self->session,($self->session->scratch->get("ldapConnection") || $self->session->setting->get("ldapConnection")))->get;
-	my $i18n = WebGUI::International->new($self->session, "AuthLDAP");
+   my $self = WebGUI::Auth->new($session,$authMethod,$userId,\@callable);
+   $self->{_connection} = WebGUI::LDAPLink->new($session,($session->scratch->get("ldapConnection") || $session->setting->get("ldapConnection")))->get;
+	my $i18n = WebGUI::International->new($session, "AuthLDAP");
 	my %ldapStatusCode = map { $_ => $i18n->get("LDAPLink_".$_) }
 			     (0..21, 32,33,34,36, 48..54, 64..71, 80);
 	$self->{_statusCode} = \%ldapStatusCode;
