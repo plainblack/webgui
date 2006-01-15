@@ -1143,7 +1143,7 @@ sub www_viewRSS {
 	# Set some of the optional channel variables
 	$var{'generator'} = "WebGUI ".$WebGUI::VERSION;
 	$var{'lastBuildDate'} = _xml_encode(_get_rfc822_date($self->get("dateUpdated")));
-	$var{'webMaster'} = $WebGUI::Session::session{setting}{companyEmail};
+	$var{'webMaster'} = $self->session->setting->get("companyEmail");
 	$var{'docs'} = "http://blogs.law.harvard.edu/tech/rss";
 
 	my $sth = $self->session->db->read("select asset.assetId, asset.className, max(assetData.revisionDate) 
@@ -1186,7 +1186,7 @@ sub www_viewRSS {
 		last if ($i == $self->get("threadsPerPage"));
         }
 
-	WebGUI::HTTP::setMimeType("text/xml");
+	$self->session->http->setMimeType("text/xml");
 	my $output = $self->processTemplate(\%var,$self->get("rssTemplateId"));
 	WebGUI::Macro::process($self->session,\$output);
 	return $output;

@@ -1136,7 +1136,7 @@ This is here to stop people from duplicating posts by hitting refresh in their b
 
 sub www_redirectToParent {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($self->getParent->getUrl);
+	$self->session->http->setRedirect($self->getParent->getUrl);
 }
 
 

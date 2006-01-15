@@ -142,6 +142,7 @@ sub processOperations {
 #		$session{form} = \%form;
 #		$output = processOperations($session,$opNumber);
 #	}
+	$session->http->getHeader;
 	return $output;
 }
 
@@ -150,6 +151,7 @@ sub processOperations {
 sub setup {
 	my $session = shift;
 	require WebGUI::Operation::WebGUI;
+	$session->http->getHeader;
 	$session->request->print(WebGUI::Operation::WebGUI::www_setup($session));
 }
 
@@ -207,7 +209,8 @@ sub uploadsHandler {
 #-------------------------------------------------------------------
 sub upgrading {
 	my $session = shift;
-        $session->request->print($session->http->getHeader());
+	$session->http->getHeader;
+	$session->request->print($session->http->getHeader());
 	open(FILE,"<".$session->config->getWebguiRoot."/docs/maintenance.html");
 	while (<FILE>) {
 		$session->request->print($_);

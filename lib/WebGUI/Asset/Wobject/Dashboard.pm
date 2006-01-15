@@ -89,7 +89,7 @@ sub getContentPositions {
 #-------------------------------------------------------------------
 sub discernUserId {
 	my $self = shift;
-	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $self->session->user->profileField("userId");
+	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->profileField("userId");
 }
 
 #-------------------------------------------------------------------
@@ -153,7 +153,7 @@ sub initialize {
 #-------------------------------------------------------------------
 sub isManaging {
 	my $self = shift;
-	return 1 if ($self->canManage && WebGUI::Session::isAdminOn());
+	return 1 if ($self->canManage && $self->session->var->isAdminOn());
 	return 0;
 }
 

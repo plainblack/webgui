@@ -333,7 +333,7 @@ sub view {
    }
 
    if($var{header} ne "text/html") {
-	WebGUI::HTTP::setMimeType($var{header});
+	$self->session->http->setMimeType($var{header});
 	return $var{content};
    } else {
    	return $self->processTemplate(\%var,$self->get("templateId")); 
@@ -348,7 +348,7 @@ sub www_view {
         my $output = $self->view;
         return $self->session->privilege->noAccess() unless $self->canView;
         # this is s a stop gap. we need to do something here that deals with the real www_view and caching, etc.
-        if (WebGUI::HTTP::getMimeType() ne "text/html") {
+        if ($self->session->http->getMimeType() ne "text/html") {
                 return $output;
         } else {
                 return $self->processStyle($output);

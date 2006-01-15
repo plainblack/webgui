@@ -324,7 +324,7 @@ sub processRaw {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	if (WebGUI::Session::isAdminOn()) {
+	if ($self->session->var->isAdminOn) {
 		return $self->getToolbar;
 	} else {
 		return "";
@@ -345,7 +345,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_goBackToPage {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
+	$self->session->http->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
 	return "";
 }
 

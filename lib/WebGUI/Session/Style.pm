@@ -103,7 +103,7 @@ sub generateAdditionalHeadTags {
 		$tags .= ' />'."\n";
 	}
 	# append extraHeadTags
-	$tags .= $self->session->asset->getExtraHeadTags."\n" if ($self->session->asset);
+#	$tags .= $self->session->asset->getExtraHeadTags."\n" if ($self->session->asset);
 	delete $self->{_meta};
 	delete $self->{_raw};
 	delete $self->{_javascript};
@@ -205,16 +205,16 @@ if ($self->session->user->isInGroup(2)) {
 ';
 }
 	$var{'head.tags'} .= "\n<!-- macro head tags -->\n";
-	my $style = WebGUI::Asset::Template->new($templateId);
+	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;
 	if (defined $style) {
 		$output = $style->process(\%var);
 	} else {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
 	}
-	WebGUI::Macro::process(\$output);
+	WebGUI::Macro::process($self->session,\$output);
 	my $macroHeadTags = generateAdditionalHeadTags();
-	WebGUI::Macro::process(\$macroHeadTags);
+	WebGUI::Macro::process($self->session,\$macroHeadTags);
 	$output =~ s/\<\!-- macro head tags --\>/$macroHeadTags/;
 	if ($self->session->errorHandler->canShowDebug()) {
 		$output .= $self->session->errorHandler->showDebug();

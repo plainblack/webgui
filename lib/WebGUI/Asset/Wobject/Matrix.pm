@@ -214,9 +214,9 @@ sub www_click {
 	incrementCounter($self->session->form->process("listingId"),"clicks");
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	if ($self->session->form->process("m")) {
-		WebGUI::HTTP::setRedirect($listing->{manufacturerUrl});
+		$self->session->http->setRedirect($listing->{manufacturerUrl});
 	} else {
-		WebGUI::HTTP::setRedirect($listing->{productUrl});
+		$self->session->http->setRedirect($listing->{productUrl});
 	}
 	return "";
 }

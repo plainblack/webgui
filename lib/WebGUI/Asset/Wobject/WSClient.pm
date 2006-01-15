@@ -472,7 +472,7 @@ sub view {
    if ($session{'config'}{'soapHttpHeaderOverride'} &&
       $self->get("httpHeader")) {
 
-      WebGUI::HTTP::setMimeType($self->get("httpHeader"));
+      $self->session->http->setMimeType($self->get("httpHeader"));
       $self->session->errorHandler->warn("changed mimetype: " .  $session{'header'}{'mimetype'});
    }
 
@@ -481,7 +481,7 @@ sub view {
    # to do it this way, but it certainly is the least obtrusive to default
    # webgui flow.  This feature currently requires a patched WebGUI.pm file.
    if ($session{'form'}{'redirectURL'}) {
-	WebGUI::HTTP::setRedirect($session{'form'}{'redirectURL'});
+	$self->session->http->setRedirect($session{'form'}{'redirectURL'});
    }
 
    $var{'results'} = \@result;

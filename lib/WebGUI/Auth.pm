@@ -387,7 +387,7 @@ sub displayLogin {
     	my $self = shift;
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
-	unless ($self->session->form->get("op") eq "auth") {
+	unless ($self->session->form->process("op") eq "auth") {
 	   	$self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
 	}
 	my $i18n = WebGUI::International->new($self->session);

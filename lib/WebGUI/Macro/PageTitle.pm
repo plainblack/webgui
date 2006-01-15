@@ -30,7 +30,7 @@ no asset cached in the session variable, nothing is returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $self = shift;
+	my $session = shift;
 	if ($session->asset) {
 		if ($session->form->process("op") || $session->form->process("func")) {
 	        	return '<a href="'.$session->asset->getUrl.'">'.$session->asset->get("title").'</a>';

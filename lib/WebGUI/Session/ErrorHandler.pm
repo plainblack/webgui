@@ -174,6 +174,7 @@ sub error {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->error($message);
+	print("\n\n".$message.":\n".$self->getStackTrace());
 	$self->getLogger->debug("Stack trace for ERROR ".$message."\n".$self->getStackTrace());
         $self->session->stow->set("debug_error", $self->session->stow->get("debug_error").$message."\n");
 }

@@ -577,18 +577,18 @@ sub www_view {
 		if ($self->get("state") eq "published") { # no privileges, make em log in
 			return $self->session->privilege->noAccess();
 		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
-			WebGUI::HTTP::setRedirect($self->getUrl("func=manageTrash"));
+			$self->session->http->setRedirect($self->getUrl("func=manageTrash"));
 			return "";
 		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
-			WebGUI::HTTP::setRedirect($self->getUrl("func=manageClipboard"));
+			$self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
 			return "";
 		} else { # tell em it doesn't exist anymore
-			WebGUI::HTTP::setStatus("410");
+			$self->session->http->setStatus("410");
 			return WebGUI::Asset->getNotFound->www_view;
 		}
 	}
 	if ($self->get("encryptPage") && $self->session->env->get("HTTPS") ne "on") {
-                WebGUI::HTTP::setRedirect($self->getUrl);
+                $self->session->http->setRedirect($self->getUrl);
                 return "";
         }
 	$self->logView();
@@ -614,7 +614,7 @@ sub www_view {
 		} else {
 			$ttl = $self->get("cacheTimeout");
 		}
-		$cache->set($output, $ttl) if ($useCache && !WebGUI::HTTP::isRedirect());
+		$cache->set($output, $ttl) if ($useCache && !$self->session->http->isRedirect());
 	}
 	return $output;
 }

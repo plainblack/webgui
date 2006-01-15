@@ -297,7 +297,7 @@ sub www_view {
 	if ($self->session->var->get("adminOn")) {
 		return $self->getContainer->www_view;
 	}
-	WebGUI::HTTP::setRedirect($self->getFileUrl);
+	$self->session->http->setRedirect($self->getFileUrl);
 	return "";
 }
 

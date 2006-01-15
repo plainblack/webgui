@@ -73,7 +73,7 @@ sub _formatFunction {
 		'icon.small'=>$self->session->config->get("extrasURL")."/adminConsole/small/".$function->{icon},
 		url=>$url,
 		canUse=>$self->session->user->isInGroup($function->{group}),
-		isCurrentOpFunc=>($self->session->form->get("op") eq $function->{op} || $self->session->form->get("func") eq $function->{func})
+		isCurrentOpFunc=>($self->session->form->process("op") eq $function->{op} || $self->session->form->process("func") eq $function->{func})
 	};
 }
 

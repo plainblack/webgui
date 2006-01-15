@@ -508,7 +508,7 @@ sub view {
 	if ($rssObject) {
 	    $self->_constructRSS($rssObject,\%var);
 	    my $rss=$rssObject->as_string;
-	    WebGUI::HTTP::setMimeType('text/xml');
+	    $self->session->http->setMimeType('text/xml');
 
 	    #Looks like a kludge, but what this does is put in the proper
 	    #XSLT stylesheet so the RSS doesn't look like total ass.

@@ -194,7 +194,7 @@ sub addFileFromFormPost {
 	my $self = shift;
 	my $formVariableName = shift;
 	my $attachmentLimit = shift || 99999;
-	return "" if (WebGUI::HTTP::getStatus() =~ /^413/);
+	return "" if ($self->session->http->getStatus() =~ /^413/);
 	my $filename;
 	my $attachmentCount = 1;
 	foreach my $upload ($self->session->request->upload($formVariableName)) {

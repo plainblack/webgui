@@ -81,7 +81,6 @@ These methods are available from this package:
 =cut
 
 
-
 #-------------------------------------------------------------------
 
 =head2 asset ( [ asset ] )

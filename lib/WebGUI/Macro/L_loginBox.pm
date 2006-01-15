@@ -17,7 +17,7 @@ use WebGUI::Asset::Template;
 
 =head1 NAME
 
-Package WebGUI::Macro::AOIHits
+Package WebGUI::Macro::L_loginBox
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ The ID of a template for custom layout of the login box and text.
 =cut
 
 sub process {
-	my $self = shift;
+	my $session = shift;
         my @param = @_;
 	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	
@@ -84,27 +84,27 @@ sub process {
                 $action =~ s/http:/https:/;
         }
 	$var{'form.header'} = WebGUI::Form::formHeader($session,{action=>$action})
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($session,{
 			name=>"op",
 			value=>"auth"
 			})
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($session,{
 			name=>"method",
 			value=>"login"
 			});
 	$var{'username.label'} = $i18n->get(50, 'WebGUI');
-	$var{'username.form'} = WebGUI::Form::text({
+	$var{'username.form'} = WebGUI::Form::text($session,{
 		name=>"username",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
 		});
         $var{'password.label'} = $i18n->get(51, 'WebGUI');
-        $var{'password.form'} = WebGUI::Form::password({
+        $var{'password.form'} = WebGUI::Form::password($session,{
 		name=>"identifier",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
 		});
-        $var{'form.login'} = WebGUI::Form::submit({
+        $var{'form.login'} = WebGUI::Form::submit($session,{
 		value=>$i18n->get(52, 'WebGUI'),
 		extras=>'class="loginBoxButton"'
 		});

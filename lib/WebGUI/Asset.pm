@@ -1399,7 +1399,7 @@ Returns "".
 
 sub view {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($self->getDefault->getUrl) if ($self->getId eq "PBasset000000000000001");
+	$self->session->http->setRedirect($self->getDefault->getUrl) if ($self->getId eq "PBasset000000000000001");
 	return $self->getToolbar if ($self->session->var->get("adminOn"));
 	return undef;
 }

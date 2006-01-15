@@ -126,7 +126,7 @@ sub process {
       		next if ($searchString =~ /^\-$/); # don't process ^-;
 		if ($params ne "") {
       			$params =~ s/(^\(|\)$)//g; # remove parenthesis
-      			&process(\$params); # recursive process params
+      			&process($session,\$params); # recursive process params
 		}
 		my $macros = $session->config->get("macros");
 		if ($macros->{$searchString} ne "") {

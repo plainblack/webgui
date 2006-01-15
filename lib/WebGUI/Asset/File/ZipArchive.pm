@@ -303,10 +303,10 @@ Web facing method which is the default view page.  This method does a
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	if (WebGUI::Session::isAdminOn()) {
+	if ($self->session->var->isAdminOn) {
 		return $self->getContainer->www_view;
 	}
-	WebGUI::HTTP::setRedirect($self->getFileUrl($self->getValue("showPage")));
+	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
 	return "";
 }
 

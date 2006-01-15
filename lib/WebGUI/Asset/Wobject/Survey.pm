@@ -1091,14 +1091,14 @@ sub www_editSectionSave {
 #-------------------------------------------------------------------
 sub www_exportAnswers {
         return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
-	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_answers.tab"),"text/tab");
+	$self->session->http->setFilename($self->session->url->escape($_[0]->get("title")."_answers.tab"),"text/tab");
         return $self->session->db->quickTab("select * from Survey_answer where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id")));
 }
 
 #-------------------------------------------------------------------
 sub www_exportComposite {
 	return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
-	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_composite.tab"),"text/tab");
+	$self->session->http->setFilename($self->session->url->escape($_[0]->get("title")."_composite.tab"),"text/tab");
 	return $self->session->db->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
 		left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
 		left join Survey_question b on c.Survey_questionId=b.Survey_questionId 
@@ -1108,14 +1108,14 @@ sub www_exportComposite {
 #-------------------------------------------------------------------
 sub www_exportQuestions {
         return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
-	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_questions.tab"),"text/tab");
+	$self->session->http->setFilename($self->session->url->escape($_[0]->get("title")."_questions.tab"),"text/tab");
         return $self->session->db->quickTab("select * from Survey_question where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id")));
 }
 
 #-------------------------------------------------------------------
 sub www_exportResponses {
         return "" unless ($self->session->user->isInGroup($_[0]->get("groupToViewReports")));
-	WebGUI::HTTP::setFilename($self->session->url->escape($_[0]->get("title")."_responses.tab"),"text/tab");
+	$self->session->http->setFilename($self->session->url->escape($_[0]->get("title")."_responses.tab"),"text/tab");
         return $self->session->db->quickTab("select * from Survey_response where Survey_id=".$self->session->db->quote($_[0]->get("Survey_id")));
 }
 

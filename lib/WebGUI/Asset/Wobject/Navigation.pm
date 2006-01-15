@@ -279,7 +279,7 @@ sub getToolbar {
 	my $self = shift;
 	if ($self->getToolbarState) {
 		my $returnUrl;
-		if (exists $self->session->asset) {
+		if ($self->session->asset) {
 			$returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);	
 		}
 		my $toolbar;
@@ -305,16 +305,16 @@ sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
 	my $start;
-	$self->session->asset = WebGUI::Asset->newByUrl unless (exists $self->session->asset);
+	$self->session->asset = WebGUI::Asset->newByUrl($self->session) unless ($self->session->asset);
 	my $current = $self->session->asset;
 	if ($self->get("startType") eq "specificUrl") {
-		$start = WebGUI::Asset->newByUrl($self->get("startPoint"));
+		$start = WebGUI::Asset->newByUrl($self->session,$self->get("startPoint"));
 	} elsif ($self->get("startType") eq "relativeToRoot") {
 		unless (($self->get("startPoint")+1) >= $current->getLineageLength) {
-			$start = WebGUI::Asset->newByLineage(substr($current->get("lineage"),0, ($self->get("startPoint") + 1) * 6));
+			$start = WebGUI::Asset->newByLineage($self->session,substr($current->get("lineage"),0, ($self->get("startPoint") + 1) * 6));
 		}
 	} elsif ($self->get("startType") eq "relativeToCurrentUrl") {
-		$start = WebGUI::Asset->newByLineage(substr($current->get("lineage"),0, ($current->getLineageLength + $self->get("startPoint")) * 6));
+		$start = WebGUI::Asset->newByLineage($self->session,substr($current->get("lineage"),0, ($current->getLineageLength + $self->get("startPoint")) * 6));
 	}
 	$start = $current unless (defined $start); # if none of the above results in a start point, then the current page must be it
 	my @includedRelationships = split("\n",$self->get("assetsToInclude"));
@@ -437,7 +437,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_goBackToPage {
 	my $self = shift;
-	WebGUI::HTTP::setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
+	$self->session->http->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
 	return "";
 }
 
@@ -480,7 +480,7 @@ sub www_preview {
 		) . $nav->build . qq(</td></tr></table>);
 	
 	# Because of the way the system is set up, the preview is cached. So let's remove it again...
-	WebGUI::Cache->new($self->session,$nav->{_identifier}."$session{page}{pageId}", "Navigation-".$self->session->config->getFilename)->delete;
+	WebGUI::Cache->new($self->session,$nav->{_identifier}.$self->session->asset->getId, "Navigation-".$self->session->config->getFilename)->delete;
 	
 	return _submenu($output,"preview"); 
 }

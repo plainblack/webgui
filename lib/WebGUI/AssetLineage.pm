@@ -360,7 +360,7 @@ sub getLineage {
 			if ($self->getId eq $id) { # possibly save ourselves a hit to the database
 				$asset =  $self;
 			} else {
-				$asset = WebGUI::Asset->new($id, $class, $version);
+				$asset = WebGUI::Asset->new($self->session,$id, $class, $version);
 			}
 		} else {
 			$asset = $id;

@@ -125,11 +125,11 @@ sub addUserForm {
 sub addUserFormSave {
    my $self = shift;
    my $properties;
-   unless ($self->session->form->get('authWebGUI.identifier') eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->get('authWebGUI.identifier'));
+   unless ($self->session->form->process('authWebGUI.identifier') eq "password") {
+      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
    }
-   $properties->{changeUsername} = $self->session->form->get('authWebGUI.changeUsername');
-   $properties->{changePassword} = $self->session->form->get('authWebGUI.changePassword');
+   $properties->{changeUsername} = $self->session->form->process('authWebGUI.changeUsername');
+   $properties->{changePassword} = $self->session->form->process('authWebGUI.changePassword');
    $properties->{passwordTimeout} =  $self->session->form->interval('authWebGUI.passwordTimeout');
    $properties->{passwordLastUpdated} =$self->session->datetime->time();
    if($self->session->setting->get("webguiExpirePasswordOnCreation")){
@@ -196,15 +196,15 @@ sub createAccountSave {
    
    return $self->displayAccount if ($self->session->user->profileField("userId") ne "1");
    
-   my $username = $self->session->form->get('authWebGUI.username');
-   my $password = $self->session->form->get('authWebGUI.identifier');
-   my $passConfirm = $self->session->form->get('authWebGUI.identifierConfirm');
+   my $username = $self->session->form->process('authWebGUI.username');
+   my $password = $self->session->form->process('authWebGUI.identifier');
+   my $passConfirm = $self->session->form->process('authWebGUI.identifierConfirm');
    
    my $error;
 	my $i18n = WebGUI::International->new($self->session);
    $error = $self->error unless($self->validUsername($username));
 	if ($self->session->setting->get("webguiUseCaptcha")) {
-		unless ($self->session->form->get('authWebGUI.captcha.validation') eq Digest::MD5::md5_base64(lc($self->session->form->get('authWebGUI.captcha')))) {
+		unless ($self->session->form->process('authWebGUI.captcha.validation') eq Digest::MD5::md5_base64(lc($self->session->form->process('authWebGUI.captcha')))) {
 			$error .= $i18n->get("captcha failure","AuthWebGUI");
 		}
 	}
@@ -331,15 +331,15 @@ sub editUserFormSave {
    my $self = shift;
    my $properties;
    my $userData = $self->getParams;
-   unless (!$self->session->form->get('authWebGUI.identifier') || $self->session->form->get('authWebGUI.identifier') eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->get('authWebGUI.identifier'));
+   unless (!$self->session->form->process('authWebGUI.identifier') || $self->session->form->process('authWebGUI.identifier') eq "password") {
+      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
 	     $properties->{passwordLastUpdated} =$self->session->datetime->time();
       }
    }
    $properties->{passwordTimeout} = $self->session->form->interval('authWebGUI.passwordTimeout');
-   $properties->{changeUsername} = $self->session->form->get('authWebGUI.changeUsername');
-   $properties->{changePassword} = $self->session->form->get('authWebGUI.changePassword');
+   $properties->{changeUsername} = $self->session->form->process('authWebGUI.changeUsername');
+   $properties->{changePassword} = $self->session->form->process('authWebGUI.changePassword');
    
    $self->SUPER::editUserFormSave($properties);
 }
@@ -643,9 +643,9 @@ sub updateAccount {
    my $self = shift;
    
 	my $i18n = WebGUI::International->new($self->session);
-   my $username = $self->session->form->get('authWebGUI.username');
-   my $password = $self->session->form->get('authWebGUI.identifier');
-   my $passConfirm = $self->session->form->get('authWebGUI.identifierConfirm');
+   my $username = $self->session->form->process('authWebGUI.username');
+   my $password = $self->session->form->process('authWebGUI.identifier');
+   my $passConfirm = $self->session->form->process('authWebGUI.identifierConfirm');
    my $display = '<li>'.$i18n->get(81).'</li>';
    my $error = "";
    

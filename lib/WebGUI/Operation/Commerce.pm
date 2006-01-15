@@ -223,7 +223,7 @@ sub www_checkoutSubmit {
 
 	# Check if shoppingcart contains any items. If not the user probably clicked reload, so we redirect to the current page.
 	unless (@$normal || @$recurring) {
-		WebGUI::HTTP::setRedirect($session->url->page);
+		$session->http->setRedirect($session->url->page);
 		return '';
 	}
 

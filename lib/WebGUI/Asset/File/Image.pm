@@ -292,7 +292,7 @@ sub www_view {
 		return $self->www_edit;
 	}
 	my $storage = $self->getStorageLocation;
-	WebGUI::HTTP::setRedirect($storage->getUrl($self->get("filename")));
+	$self->session->http->setRedirect($storage->getUrl($self->get("filename")));
 	return "";
 }
 

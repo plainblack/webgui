@@ -175,7 +175,7 @@ A web accessible version of the view method.
 sub www_view {
 	my $self = shift;
 	my $mimeType=$self->getValue('mimeType');
-	WebGUI::HTTP::setMimeType($mimeType || 'text/html');
+	$self->session->http->setMimeType($mimeType || 'text/html');
 	return $self->view(1);
 }
 

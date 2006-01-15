@@ -213,7 +213,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub discernUserId {
 	my $self = shift;
-	return ($self->canManage && WebGUI::Session::isAdminOn()) ? '1' : $self->session->user->profileField("userId");
+	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->profileField("userId");
 }
 
 #-------------------------------------------------------------------

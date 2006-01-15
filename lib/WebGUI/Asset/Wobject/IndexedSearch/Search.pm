@@ -436,7 +436,7 @@ The name of the index to open. Defaults to 'default'.
 
 =head3 $dbh
 
-Database handler to use. Defaults to $WebGUI::Session::session{dbh}.
+Database handler to use. Defaults to $self->session->db.
 
 =cut
 
@@ -444,7 +444,7 @@ sub new {
 	my ($class, $indexName, $dbh) = @_;
 	$indexName = $indexName || 'default';
 	my $self = { _indexName => $indexName,
-			 _dbh => $dbh || $WebGUI::Session::session{dbh},
+			 _dbh => $dbh || $self->session->db,
 			 _createOptions => {( backend => 'column', 
 						    word_length => 20,
 						    filter => 'map { lc $_ if ($_ !~ /\^.*;/) }' 

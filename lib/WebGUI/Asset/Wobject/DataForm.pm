@@ -966,7 +966,7 @@ sub www_editTabSave {
 sub www_exportTab {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
-        WebGUI::HTTP::setFilename($self->get("url").".tab","text/plain");
+        $self->session->http->setFilename($self->get("url").".tab","text/plain");
         my %fields = $self->session->db->buildHash("select DataForm_fieldId,name from DataForm_field where
                 assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
         my @data;

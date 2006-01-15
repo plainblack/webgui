@@ -143,7 +143,7 @@ sub view {
 	my @positions = split(/\./,$self->get("contentPositions"));
 	my @hidden = split("\n",$self->get("assetsToHide"));
 	my $i = 1;
-	my $template= WebGUI::Asset->newByDynamicClass($self->get("templateId"))->get("template");
+	my $template= WebGUI::Asset->newByDynamicClass($self->session,$self->get("templateId"))->get("template");
 	my $numPositions = 1;
 	foreach my $j (2..15) {
 		$numPositions = $j if $template =~ m/position${j}\_loop/;

@@ -36,7 +36,7 @@ The complete path to a file in the local filesystem.
 
 #-------------------------------------------------------------------
 sub process {
-	my $self = shift;
+	my $session = shift;
         my (@param, $temp, $file);
         @param = @_;
 	my $i18n = WebGUI::International->new($session,'Macro_Include');

@@ -234,8 +234,8 @@ sub createAccount {
 #-------------------------------------------------------------------
 sub createAccountSave {
    my $self = shift;
-   my $username = $self->session->form->get('authLDAP_ldapId');
-   my $password = $self->session->form->get('authLDAP_identifier');
+   my $username = $self->session->form->process('authLDAP_ldapId');
+   my $password = $self->session->form->process('authLDAP_identifier');
    my $error = "";
 	my $i18n = WebGUI::International->new($self->session);
    
