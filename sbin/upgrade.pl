@@ -21,7 +21,6 @@ use Getopt::Long;
 use strict;
 use WebGUI::Config;
 use WebGUI::Session;
-use WebGUI::SQL;
 
 my $help;
 my $history;
@@ -147,34 +146,31 @@ my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
 foreach my $filename (keys %{$configs}) {
 	print "\tProcessing $filename.\n" unless ($quiet);
 	$config{$filename}{configFile} = $filename;
-	$config{$filename}{dsn} = $configs->{$filename}{dsn};
+	$config{$filename}{dsn} = $configs->{$filename}->get("dsn");
 	my $temp = _parseDSN($config{$filename}{dsn}, ['database', 'host', 'port']);
 	if ($temp->{'driver'} eq "mysql") {
 		$config{$filename}{db} = $temp->{'database'};
 		$config{$filename}{host} = $temp->{'host'};
 		$config{$filename}{port} = $temp->{'port'};
-		$config{$filename}{dbuser} = $configs->{$filename}{dbuser};
-		$config{$filename}{dbpass} = $configs->{$filename}{dbpass};
-		$config{$filename}{mysqlCLI} = $configs->{$filename}{mysqlCLI};
-		$config{$filename}{mysqlDump} = $configs->{$filename}{mysqlDump};
-		$config{$filename}{backupPath} = $configs->{$filename}{backupPath};
-		my $dbh = DBI->connect($config{$filename}{dsn},$config{$filename}{dbuser},$config{$filename}{dbpass});
-		($config{$filename}{version}) = WebGUI::SQL->quickArray("select webguiVersion from webguiVersion 
-			order by dateApplied desc, webguiVersion desc limit 1",$dbh);
+		$config{$filename}{dbuser} = $configs->{$filename}->get("dbuser");
+		$config{$filename}{dbpass} = $configs->{$filename}->get("dbpass");
+		$config{$filename}{mysqlCLI} = $configs->{$filename}->get("mysqlCLI");
+		$config{$filename}{mysqlDump} = $configs->{$filename}->get("mysqlDump");
+		$config{$filename}{backupPath} = $configs->{$filename}->get("backupPath");
+		my $session = WebGUI::Session->open($webguiRoot,$filename);
+		($config{$filename}{version}) = $session->db->quickArray("select webguiVersion from webguiVersion order by dateApplied desc, webguiVersion desc limit 1");
 		unless ($history) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
-			my $session = WebGUI::Session::open($webguiRoot,$filename);
 			$session->setting->remove('specialState');
 			$session->add('specialState','upgrading');
-			$session->close();
 			print "\tDeleting temp files.\n" unless ($quiet);
-			my $path = $configs->{$filename}{uploadsPath}.$slash."temp";
+			my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
 			rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
 			print "\tDeleting file cache.\n" unless ($quiet);
-			$path = $configs->{$filename}{fileCacheRoot}||"/tmp/WebGUICache";
+			$path = $configs->{$filename}->get("fileCacheRoot")||"/tmp/WebGUICache";
 			rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
 		}
-		$dbh->disconnect;
+		$session->close();
 	} else {
 		delete $config{$filename};
 		print "\tSkipping non-MySQL database.\n" unless ($quiet);
@@ -186,16 +182,16 @@ if ($history) {
 	require WebGUI::DateTime;
 	foreach my $file (keys %config) {
 		print "\n".$file."\n";
-		my $dbh = DBI->connect($config{$file}{dsn},$config{$file}{dbuser},$config{$file}{dbpass});
-		my $sth = WebGUI::SQL->read("select * from webguiVersion order by dateApplied asc, webguiVersion asc",$dbh);
+		my $session = WebGUI::Session->open("../..",$file);
+		my $sth = $session->db->read("select * from webguiVersion order by dateApplied asc, webguiVersion asc");
 		while (my $data = $sth->hashRef) {
 			print "\t".sprintf("%-8s  %-15s  %-15s",
 				$data->{webguiVersion},
-				WebGUI::DateTime::epochToHuman($data->{dateApplied},"%y-%m-%d"),
+				$session->datetime->epochToHuman($data->{dateApplied},"%y-%m-%d"),
 				$data->{versionType})."\n";
 		}
 		$sth->finish;
-		$dbh->disconnect;		
+		$session->close;
 	}
 	exit;
 }
@@ -273,10 +269,10 @@ foreach my $filename (keys %config) {
 		$config{$filename}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
 	}
-	WebGUI::Session::open("../..",$filename);
+	my $session = WebGUI::Session->open("../..",$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);
-	WebGUI::Setting::remove('specialState');
-	WebGUI::Session::close();
+	$session->setting->remove('specialState');
+	$session->close();
 	print "OK\n" unless ($quiet);
 }
 
