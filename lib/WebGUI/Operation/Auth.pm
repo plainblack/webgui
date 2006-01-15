@@ -61,7 +61,7 @@ sub www_auth {
 	my $session = shift;
    my $auth;
    ($auth) = $session->db->quickArray("select authMethod from users where username=".$session->db->quote($session->form->process("username"))) if($session->form->process("username"));
-   my $authMethod = getInstance($auth);
+   my $authMethod = getInstance($session,$auth);
    my $methodCall = shift || $session->form->process("method") || "init";
    if(!$authMethod->isCallable($methodCall)){
       $session->errorHandler->security("access uncallable auth method on page '".$session->asset->getTitle."' [".$session->asset->pageId."].");

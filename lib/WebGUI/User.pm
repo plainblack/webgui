@@ -137,15 +137,15 @@ Deletes this user.
 sub delete {
         my $self = shift;
 	$self->uncache;
-	require WebGUI::Operation::Auth;
-        $self->session->db->write("delete from users where userId=".$self->session->db->quote($self->{_userId}));
-        $self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId}));
 	foreach my $groupId (@{$self->session->user->getGroups($self->userId)}) {
 		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
 	}
 	$self->session->db->write("delete from messageLog where userId=".$self->session->db->quote($self->{_userId}));
-	my $authMethod = WebGUI::Operation::Auth::getInstance($self->authMethod,$self->{_userId});
+	require WebGUI::Operation::Auth;
+	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$self->{_userId});
 	$authMethod->deleteParams($self->{_userId});
+        $self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId}));
+        $self->session->db->write("delete from users where userId=".$self->session->db->quote($self->{_userId}));
 }
 
 #-------------------------------------------------------------------
