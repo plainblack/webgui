@@ -97,7 +97,7 @@ sub toHtml {
                                 $checked = 1;
                         }
                 }
-                $output .= WebGUI::Form::Checkbox->new({
+                $output .= WebGUI::Form::Checkbox->new($self->session,{
                         name=>$self->get('name'),
                         value=>$key,
                         extras=>$self->get('extras'),

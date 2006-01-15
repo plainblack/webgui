@@ -125,7 +125,7 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
         my $self = shift;
-	$self->get("options") = $self->session->db->buildHashRef("select groupId,groupName from groups");
+	$self->set("options", $self->session->db->buildHashRef("select groupId,groupName from groups"));
         return $self->SUPER::toHtmlAsHidden();
 }
 

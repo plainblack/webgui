@@ -108,7 +108,7 @@ sub toHtml {
                 if ($self->get('value') eq $key) {
                         $checked = 1;
                 }
-                $output .= WebGUI::Form::Radio->new({
+                $output .= WebGUI::Form::Radio->new($self->session, {
                         name=>$self->get('name'),
                         value=>$key,
                         extras=>$self->get('extras'),

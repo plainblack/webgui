@@ -105,7 +105,7 @@ sub toHtml {
                         $types{html} = $i18n->get(1009);
                 }
         }
-	$self->get("options") = \%types,
+	$self->set("options", \%types);
 	return $self->SUPER::toHtml();
 }
 
