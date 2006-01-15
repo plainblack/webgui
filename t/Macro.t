@@ -13,7 +13,7 @@ use strict;
 use lib '../lib';
 use Getopt::Long;
 use WebGUI::Macro;
-use WebGUI::SQL;
+use WebGUI::Session;
 use Data::Dumper;
 # ---- END DO NOT EDIT ----
 
@@ -42,7 +42,7 @@ my @settingMacros = (
 ##Build a reverse hash of the macro settings in the session var so that
 ##we can lookup the aliases for each macro.
 
-my %macroNames = reverse %{ $session{config}{macros} };
+my %macroNames = reverse %{ $session->config->get('macros') };
 
 my $settingMacros = 0;
 
@@ -59,7 +59,7 @@ foreach my $macro ( @settingMacros ) {
 
 use Test::More; # increment this value for each test you create
 
-my $numTests = 3 + $settingMacros;
+my $numTests = 4 + $settingMacros;
 
 plan tests => $numTests;
 
@@ -69,38 +69,41 @@ my $macroText = "^GroupText(3,local,foreigner);";
 my $output;
 
 $output = $macroText;
-WebGUI::Macro::process(\$output);
+WebGUI::Macro::process($session, \$output);
 is($output, 'foreigner', 'GroupText, user not in group');
 
 $output = $macroText;
-WebGUI::Session::refreshUserInfo(3);
-WebGUI::Macro::process(\$output);
+$session->user({userId => 3});
+WebGUI::Macro::process($session, \$output);
 is($output, 'local', 'GroupText, user in group');
 
-$macroText = "^GroupText(3,^AssetProxy(getting_started);,foreigner)";
-$output = $macroText;
-WebGUI::Macro::process(\$output);
+my $apText = "^AssetProxy(getting_started);";
+WebGUI::Macro::process($session, \$apText);
+my $apPass = like($output, qr/If you're reading this/, 'AssetProxy functional check');
 
-like($output, qr/If you're reading this/, 'GroupText, nesting, in group');
+SKIP: {
+	skip("AssetProxy isn't working",1) unless $apPass;
+	$macroText = "^GroupText(3,^AssetProxy(getting_started);,foreigner)";
+	$output = $macroText;
+	WebGUI::Macro::process($session, \$output);
+	like($output, qr/If you're reading this/, 'GroupText, nesting, in group');
+}
+
 
 diag("Begin setting macro tests");
-
-my $sth = WebGUI::SQL->prepare('select value from settings where name=?');
 
 foreach my $macro ( @settingMacros ) {
 	SKIP: {
 		skip("Unable to lookup macro: $macro->{macro}",1) if $macro->{skip};
-		my ($value) = WebGUI::SQL->quickArray(
+		my ($value) = $session->dbSlave->quickArray(
 			sprintf "select value from settings where name=%s",
-				quote($macro->{settingKey})
+				$session->db->quote($macro->{settingKey})
 		);
 		my $macroVal = sprintf "^%s();", $macro->{shortcut};
-		WebGUI::Macro::process(\$macroVal);
+		WebGUI::Macro::process($session, \$macroVal);
 		is($value, $macroVal, sprintf "Testing %s", $macro->{macro});
 	}
 }
-
-$sth->finish();
 
 cleanup($session); # this line is required
 
