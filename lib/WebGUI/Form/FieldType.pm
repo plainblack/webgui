@@ -60,8 +60,9 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
 			defaultValue=>$i18n->get("fieldtype","WebGUI")
@@ -70,10 +71,10 @@ sub definition {
 			defaultValue=>$i18n->get("fieldtype","WebGUI")
 			},
 		types=>{
-			defaultValue=>$class->getTypes
+			defaultValue=>$class->getTypes($session)
 			}
 		});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -89,7 +90,8 @@ and DynamicField, the form class dispatcher.
 
 sub getTypes {
 	my $class = shift;
-	opendir(DIR,$self->session->config->getWebguiRoot."/lib/WebGUI/Form/");
+	my $session = shift;
+	opendir(DIR,$session->config->getWebguiRoot."/lib/WebGUI/Form/");
 	my @rawTypes = readdir(DIR);
 	closedir(DIR);
 	my @types;
@@ -127,7 +129,7 @@ sub toHtml {
 	my $self = shift;
 	my %options;
 	tie %options, "Tie::IxHash";
-	foreach my $type (@{$self->get("types}")) {
+	foreach my $type (@{ $self->{types} }) {
 		my $class = "WebGUI::Form::".ucfirst($type);
 		my $cmd = "use ".$class;
         	eval ($cmd);    
@@ -137,7 +139,7 @@ sub toHtml {
         	} 
 		$options{$type} = $class->getName($self->session);
 	}
-	$self->get("options") = \%options;
+	$self->{options} = \%options;
 
 	return $self->SUPER::toHtml();
 }

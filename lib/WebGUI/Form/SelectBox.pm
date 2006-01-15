@@ -123,7 +123,7 @@ sub toHtml {
 		if ($value eq $key) {
 			$output .= ' selected="selected"';
 		}
-		$output .= '>'.${$self->get("options}"){$key}.'</option>';
+		$output .= '>'.${$self->{options}}{$key}.'</option>';
         }
 	$output .= '</select>'."\n";
 	return $output;

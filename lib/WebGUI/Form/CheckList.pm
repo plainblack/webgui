@@ -60,7 +60,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
 			defaultValue=>$i18n->get("941"),
@@ -92,18 +92,18 @@ sub toHtml {
 	%options = $self->orderedHash();
 	foreach my $key (keys %options) {
                 my $checked = 0;
-                foreach my $item (@{$self->get("value}")) {
+                foreach my $item (@{ $self->{value} }) {
                         if ($item eq $key) {
                                 $checked = 1;
                         }
                 }
                 $output .= WebGUI::Form::Checkbox->new({
-                        name=>$self->get("name"),
+                        name=>$self->{name},
                         value=>$key,
-                        extras=>$self->get("extras"),
+                        extras=>$self->{extras},
                         checked=>$checked
                         })->toHtml;
-                $output .= ${$self->get("options}"){$key} . $alignment;
+                $output .= ${$self->{options}}{$key} . $alignment;
         }
         return $output;
 }

@@ -59,7 +59,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session,"WebGUI");
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>"button"
+			defaultValue=>$i18n->get('button')
 			},
 		defaultValue=>{
 			defaultValue=>$i18n->get(62)

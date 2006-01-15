@@ -71,10 +71,10 @@ sub correctOptions {
 		s/\s+$//; # remove trailing spaces
 		$options{$_} = $_;
 	}
-	if (exists $self->get("options") && ref($self->get("options")) eq "HASH") {
-		%options = (%{$self->get("options}") , %options);
+	if (exists $self->{options} && ref($self->{options}) eq "HASH") {
+		%options = (%{$self->{options}} , %options);
 	}
-	$self->get("options") = \%options;
+	$self->{options} = \%options;
 }
 
 
@@ -237,11 +237,11 @@ sub orderedHash {
         my %options;
         tie %options, 'Tie::IxHash';
         if ($self->get("sortByValue")) {
-                foreach my $optionKey (sort {"\L${$self->get("options}"){$a}" cmp "\L${$self->get("options}"){$b}" } keys %{$self->get("options}")) {
-                         $options{$optionKey} = $self->get("options"){$optionKey};
+                foreach my $optionKey (sort {"\L${$self->{options}}{$a}" cmp "\L${$self->{options}}{$b}" } keys %{$self->{options}}) {
+                         $options{$optionKey} = $self->{options}{$optionKey};
                 }
         } else {
-                %options = %{$self->get("options}");
+                %options = %{$self->{options}};
         }
         return %options;
 }

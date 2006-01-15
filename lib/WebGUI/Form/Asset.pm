@@ -70,13 +70,13 @@ sub definition {
 	my $i18n = WebGUI::International->new($session, "Asset");
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>$i18n->get("asset");
+			defaultValue=>$i18n->get("asset"),
 			},
 		label=>{
-			defaultValue=>$i18n->get("asset");
+			defaultValue=>$i18n->get("asset"),
 			},
 		name=>{
-			defaultValue=>"asset";
+			defaultValue=>"asset",
 			},
 		class=>{
 			defaultValue=> undef
