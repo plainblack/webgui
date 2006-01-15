@@ -91,7 +91,7 @@ sub definition {
 			defaultValue=>undef
 			},
 		hoverHelp=>{
-			defaultValue=>WebGUI::International::get('1075 description')
+			defaultValue=>$i18n->get('1075 description')
 			},
 		});
 	return $class->SUPER::definition($definition);

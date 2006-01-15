@@ -105,13 +105,14 @@ sub toHtml {
 	my $self = shift;
 	my %units;
 	tie %units, 'Tie::IxHash';
-        %units = ('seconds'=>WebGUI::International::get(704),
-                'minutes'=>WebGUI::International::get(705),
-                'hours'=>WebGUI::International::get(706),
-                'days'=>WebGUI::International::get(700),
-                'weeks'=>WebGUI::International::get(701),
-                'months'=>WebGUI::International::get(702),
-                'years'=>WebGUI::International::get(703));
+	my $i18n = WebGUI::International->new($self->session);
+        %units = ('seconds'=>$i18n->get(704),
+                'minutes'=>$i18n->get(705),
+                'hours'=>$i18n->get(706),
+                'days'=>$i18n->get(700),
+                'weeks'=>$i18n->get(701),
+                'months'=>$i18n->get(702),
+                'years'=>$i18n->get(703));
         my ($interval, $units) = $self->session->datetime->secondsToInterval($self->get("value"));
 	# not sure why, but these things need to be defined like this or
 	# they fail under some circumstnaces 

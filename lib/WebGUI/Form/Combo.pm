@@ -96,8 +96,9 @@ Renders a combo box form control.
 
 sub toHtml {
 	my $self = shift;
-	$self->get("options")->{''} = '['.WebGUI::International::get(582).']';
-        $self->get("options")->{_new_} = WebGUI::International::get(581).'-&gt;';
+	my $i18n = WebGUI::International->new($self->session);
+	$self->get("options")->{''} = '['.$i18n->get(582).']';
+        $self->get("options")->{_new_} = $i18n->get(581).'-&gt;';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Text->new(
 			size=>$self->session->setting->get("textBoxSize")-5,

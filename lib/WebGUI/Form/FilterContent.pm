@@ -106,14 +106,15 @@ Returns a select list containing the content filter options. This is for use wit
 
 sub toHtml {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
         my %filter;
         tie %filter, 'Tie::IxHash';
         %filter = (
-                'none'=>WebGUI::International::get(420),
-                'macros'=>WebGUI::International::get(891),
-                'javascript'=>WebGUI::International::get(526),
-                'most'=>WebGUI::International::get(421),
-                'all'=>WebGUI::International::get(419)
+                'none'=>$i18n->get(420),
+                'macros'=>$i18n->get(891),
+                'javascript'=>$i18n->get(526),
+                'most'=>$i18n->get(421),
+                'all'=>$i18n->get(419)
                 );
 	$self->get("options") = \%filter;
 	return $self->SUPER::toHtml();

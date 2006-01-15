@@ -61,12 +61,13 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 sub definition {
 	my $class = shift;
 	my $definition = shift || [];
+	my $i18n = WebGUI::International->new($self->session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>WebGUI::International::get("fieldtype","WebGUI")
+			defaultValue=>$i18n->get("fieldtype","WebGUI")
 			},
 		label=>{
-			defaultValue=>WebGUI::International::get("fieldtype","WebGUI")
+			defaultValue=>$i18n->get("fieldtype","WebGUI")
 			},
 		types=>{
 			defaultValue=>$class->getTypes
