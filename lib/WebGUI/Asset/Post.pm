@@ -125,11 +125,11 @@ sub definition {
 			dateSubmitted => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=$session->datetime->time()
+				defaultValue=>$session->datetime->time()
 				},
 			dateUpdated => {
 				fieldType=>"hidden",
-				defaultValue=$session->datetime->time()
+				defaultValue=>$session->datetime->time()
 				},
 			username => {
 				fieldType=>"hidden",

@@ -575,8 +575,8 @@ sub processPropertiesFromFormPost {
 			});
 	}
 	if ($self->session->form->process("fid") eq "new") { # hack to get proceed to work.
-		$session{whatNext} = $self->session->form->process("proceed");
-	} else { $session{whatNext} = "nothing"; }
+		$session->stow->set('whatNext',$self->session->form->process("proceed"));
+	} else { $session->stow->set('whatNext','nothing'); }
 }
 
 #-------------------------------------------------------------------
@@ -734,6 +734,7 @@ sub www_deleteTabConfirm {
 #-------------------------------------------------------------------
 sub www_editField {
 	my $self = shift;
+	my $fid = shift || $self->session->form->process("fid") || 'new';
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     	my (%field, $f, %fieldStatus,$tab);
@@ -745,7 +746,6 @@ sub www_editField {
 		"editable" => $i18n->get(6),
 		"required" => $i18n->get(75) 
 		);
-        $self->session->form->process("fid") = "new" if ($self->session->form->process("fid") eq "");
 	unless ($self->session->form->process("fid") eq "new") {	
         	%field = $self->session->db->quickHash("select * from DataForm_field where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
 	}
@@ -891,9 +891,8 @@ sub www_editFieldSave {
 					" where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
 	}
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$self->session->form->process("tid"))) if ($self->session->form->process("fid") ne "new");
-        if ($session{whatNext} eq "editField" || $self->session->form->process("proceed") eq "editField") {
-            $self->session->form->process("fid") = "new";
-            return $self->www_editField;
+        if ($self->session->stow->get('whatNext') eq "editField" || $self->session->form->process("proceed") eq "editField") {
+            return $self->www_editField('new');
         }
         return "";
 }

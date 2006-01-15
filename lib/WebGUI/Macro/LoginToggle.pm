@@ -45,6 +45,7 @@ The ID of a template for custom layout of the link and text.
 
 #-------------------------------------------------------------------
 sub process {
+	my $session = shift;
         my @param = @_;
 	my $i18n = WebGUI::International->new($session,'Macro_LoginToggle');
         my $login = $param[0] || $i18n->get(716);
@@ -60,9 +61,9 @@ sub process {
                	$var{'toggle.text'} = $logout;
         }
 	if ($param[2]) {
-		return  WebGUI::Asset::Template->newByUrl($param[2])->process(\%var);
+		return  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
 	} else {
-		return  WebGUI::Asset::Template->new("PBtmpl0000000000000043")->process(\%var);
+		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000043")->process(\%var);
 	}
 }
 

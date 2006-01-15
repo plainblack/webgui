@@ -59,13 +59,14 @@ sub _isValidPassword {
 
 #-------------------------------------------------------------------
 
-=head2 addUserForm ( )
+=head2 _logSecurityMessage ( )
 
-  Creates user form elements specific to this Auth Method.
+  Logs the successful password change message.
 
 =cut
 
 sub _logSecurityMessage {
+	my $self = shift;
     $self->session->errorHandler->security("change password.  Password changed successfully");
 }
 
@@ -551,7 +552,7 @@ sub recoverPasswordFinish {
    	   }
    	   $encryptedPassword = Digest::MD5::md5_base64($password);
 	   $self->saveParams($userId,"WebGUI",{identifier=>$encryptedPassword});
-	   _logSecurityMessage();
+	   $self->_logSecurityMessage();
 	   $self->session->errorHandler->security("recover a password.  Password emailed to: ".$self->session->form->process("email"));
 	   $message = $self->session->setting->get("webguiRecoverPasswordEmail");
 	   $message .= "\n".$i18n->get(50).": ".$username."\n";
@@ -610,7 +611,7 @@ sub resetExpiredPasswordSave {
    $properties->{passwordLastUpdated} =$self->session->datetime->time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
-   _logSecurityMessage();
+   $self->_logSecurityMessage();
    
    $msg = $self->login;
    if($msg eq ""){
@@ -684,7 +685,7 @@ sub updateAccount {
 	     my $userData = $self->getParams;
          unless ($password eq "password") {
             $properties->{identifier} = Digest::MD5::md5_base64($password);
-			_logSecurityMessage();
+			$self->_logSecurityMessage();
 	        if($userData->{identifier} ne $properties->{identifier}){
 	           $properties->{passwordLastUpdated} =$self->session->datetime->time();
             }

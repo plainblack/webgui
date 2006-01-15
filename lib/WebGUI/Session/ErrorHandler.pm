@@ -70,9 +70,7 @@ Whatever message you wish to insert into the log.
 sub audit {
 	my $self = shift;
 	my $message = shift;
-	$Log::Log4perl::caller_depth++;
         $self->info($self->session->user->username." (".$self->session->user->userId.") ".$message);
-	$Log::Log4perl::caller_depth--;
 }
 
 
@@ -152,7 +150,7 @@ Deconstructor.
 	
 sub DESTROY {
 	my $self = shift;
-	$Log::Log4perl::caller_depth++;
+	$Log::Log4perl::caller_depth--;
 	undef $self;
 }
 
@@ -342,10 +340,8 @@ The message you wish to add to the log.
 sub security {
 	my $self = shift;
 	my $message = shift;
-	$Log::Log4perl::caller_depth++;
 	$self->warn($self->session->user->username." (".$self->session->user->userId.") connecting from "
 	.$self->session->env("REMOTE_ADDR")." attempted to ".$message);
-	$log::Log4perl::caller_depth--;
 }
 
 

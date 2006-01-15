@@ -13,6 +13,7 @@ package WebGUI::Asset::Post::Thread;
 use strict;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
+use WebGUI::Group;
 use WebGUI::International;
 use WebGUI::MessageLog;
 use WebGUI::Paginator;
@@ -66,8 +67,9 @@ sub decrementReplies {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Thread");
+	my $session = shift;
+	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Thread");
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'thread.gif',
@@ -104,7 +106,7 @@ sub definition {
 				}
 			},
 		});
-        return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session,$definition);
 }
 
 #-------------------------------------------------------------------
@@ -146,7 +148,7 @@ A string indicating the type of layout to use. Can be flat or nested.
 sub getLayoutUrl {
 	my $self = shift;
 	my $layout = shift;
-	return $self->session->asset->getUrl("layout=".$layout.'#id'.$self->session->asset->getId) if (exists $self->session->asset);
+	return $self->session->asset->getUrl("layout=".$layout.'#id'.$self->session->asset->getId) if ($self->session->asset);
 	return $self->getUrl("layout=".$layout);
 }
 
@@ -547,7 +549,8 @@ sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
   WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
-  $group->addUsers([$self->session->user->userId],[$self->get("subscriptionGroupId")]);
+	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+  $group->addUsers([$self->session->user->userId]);
 }
 
 #-------------------------------------------------------------------
@@ -607,7 +610,8 @@ Negates the subscribe method.
 sub unsubscribe {
 	my $self = shift;
   WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
-  $group->deleteUsers([$self->session->user->userId],[$self->get("subscriptionGroupId")]);
+  my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+  $group->deleteUsers([$self->session->user->userId]);
 }
 
 
@@ -664,7 +668,7 @@ sub view {
 	} else {
 		$sql .= "asset.lineage";
 	}
-	my $currentPageUrl = $session{requestedUrl};
+	my $currentPageUrl = $self->session->url->requestedUrl;
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		next unless ($dataSet->{className} eq "WebGUI::Asset::Post" || $dataSet->{className} eq "WebGUI::Asset::Post::Thread"); #handle non posts!

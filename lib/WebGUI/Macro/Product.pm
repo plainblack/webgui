@@ -41,7 +41,7 @@ sub process {
 	
 	return $i18n->get('cannot find product') unless ($productId);
 
-	$product = WebGUI::Product->new($self->session,$productId);
+	$product = WebGUI::Product->new($session,$productId);
 
 	if ($variantId) {
 		$variant = [ $product->getVariant($variantId) ];
@@ -75,7 +75,7 @@ sub process {
 	$var{'variants.message'} = $i18n->get('available product configurations');
 	$templateId = $_[1] || $product->get('templateId');
 	
-	return WebGUI::Asset::Template->new($ssession,$templateId)->process(\%var);
+	return WebGUI::Asset::Template->new($session,$templateId)->process(\%var);
 }
 
 1;

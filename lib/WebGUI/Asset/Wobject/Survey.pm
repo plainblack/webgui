@@ -992,6 +992,7 @@ sub www_editQuestion {
 
 #-------------------------------------------------------------------
 sub www_editQuestionSave {
+	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($_[0]->canEdit);
 		
 	$self->session->form->process("qid") = $_[0]->setCollateral("Survey_question", "Survey_questionId", {

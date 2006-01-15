@@ -619,6 +619,13 @@ sub new {
 	my $self = {};
 	my $class = shift;
 	$self->{_session} = shift;
+	my $output;
+	my $i = 1;
+	while (my @data = caller($i)) {
+		$output .= "\t".join(",",@data)."\n";
+		$i++;
+	}
+	print $output."\n\n";
 	$self->{authMethod} = shift;
 	my $userId = shift || $self->{_session}->user->userId;
 	$self->{user} = $self->{_session}->user;

@@ -49,7 +49,7 @@ A template from the Macro/EditableToggle namespace to use for formatting the lin
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-         if (exists $session->asset && $session->asset->canEdit && $session->user->isInGroup(12)) {
+         if ($session->asset && $session->asset->canEdit && $session->user->isInGroup(12)) {
         	my %var;
               my @param = @_;
 	      my $i18n = WebGUI::International->new($session,'Macro_EditableToggle');
