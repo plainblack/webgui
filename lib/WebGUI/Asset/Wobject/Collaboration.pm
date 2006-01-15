@@ -199,7 +199,7 @@ sub canPost {
 #-------------------------------------------------------------------
 sub canSubscribe {
         my $self = shift;
-        return ($self->session->user->profileField("userId") ne "1" && $self->canView);
+        return ($self->session->user->userId ne "1" && $self->canView);
 }
 
 #-------------------------------------------------------------------
@@ -864,9 +864,9 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId)->delete;
 	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
-	$group->addUsers([$self->session->user->profileField("userId")]);
+	$group->addUsers([$self->session->user->userId]);
 }
 
 #-------------------------------------------------------------------
@@ -879,9 +879,9 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId)->delete;
 	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
-	$group->deleteUsers([$self->session->user->profileField("userId")],[$self->get("subscriptionGroupId")]);
+	$group->deleteUsers([$self->session->user->userId],[$self->get("subscriptionGroupId")]);
 }
 
 
@@ -909,7 +909,7 @@ sub view {
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
         $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->profileField("userId") eq '1');
+        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
@@ -922,7 +922,7 @@ sub view {
 	$var{"search.url"} = $self->getSearchUrl;
 	$var{"subscribe.url"} = $self->getSubscribeUrl;
 	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
-	my $constraints = "(assetData.status='approved' or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->profileField("userId"))." and assetData.ownerUserId<>'1') or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
+	my $constraints = "(assetData.status='approved' or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1') or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
 	if ($var{'user.isModerator'}) {
 		$constraints .= " or assetData.status='pending'"; 
 	}
@@ -1058,7 +1058,7 @@ sub www_search {
 					assetData.status in ('approved','archived')
 				 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
 		$sql .= "		or assetData.status='pending'" if ($self->canModerate);
-		$sql .= "		or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->profileField("userId"))." and assetData.ownerUserId<>'1')
+		$sql .= "		or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
 					) ";
 		$sql .= " and ($all) " if ($all ne "");
 		$sql .= " and " if ($sql ne "" && $exactPhrase ne "");

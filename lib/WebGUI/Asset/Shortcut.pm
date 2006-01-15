@@ -213,7 +213,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub discernUserId {
 	my $self = shift;
-	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->profileField("userId");
+	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
 }
 
 #-------------------------------------------------------------------
@@ -376,7 +376,7 @@ sub getOverrides {
 	my $self = shift;
 	my $i = 0;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	my $cache = WebGUI::Cache->new($self->session,["shortcutOverrides",$self->getId,$self->session->user->profileField("userId"),$self->session->var->get("adminOn")]);
+	my $cache = WebGUI::Cache->new($self->session,["shortcutOverrides",$self->getId,$self->session->user->userId,$self->session->var->get("adminOn")]);
 	my $overridesRef = $cache->get;
 	unless ($overridesRef->{cacheNotExpired}) {
 		my %overrides;
@@ -637,7 +637,7 @@ sub www_edit {
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self = shift;
-	return 'You are no longer logged in' if $self->session->user->profileField("userId") eq '1';
+	return 'You are no longer logged in' if $self->session->user->userId eq '1';
 	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;

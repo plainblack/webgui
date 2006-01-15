@@ -215,7 +215,7 @@ sub www_editBranch {
         my $clause;
         if ($self->session->user->isInGroup(3)) {
                 my $contentManagers = WebGUI::Group->new(4)->getUsers(1);
-                push (@$contentManagers, $self->session->user->profileField("userId"));
+                push (@$contentManagers, $self->session->user->userId);
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
                 $clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));

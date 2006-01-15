@@ -106,7 +106,7 @@ sub checkoutForm {
 	
 	$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 
-	$u = WebGUI::User->new($self->session->user->profileField("userId"));
+	$u = WebGUI::User->new($self->session->user->userId);
 
 	$f = WebGUI::HTMLForm->new($self->session);
 	$f->text(

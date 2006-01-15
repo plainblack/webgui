@@ -58,7 +58,7 @@ sub addChild {
 	$self->{_hasChildren} = 1;
 	$self->session->db->beginTransaction;
 	my $now =$self->session->datetime->time();
-	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".$self->session->db->quote($id).",".$self->session->db->quote($self->getId).", ".$self->session->db->quote($lineage).", ".$now.", ".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($properties->{className}).", 'published')");
+	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".$self->session->db->quote($id).",".$self->session->db->quote($self->getId).", ".$self->session->db->quote($lineage).", ".$now.", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($properties->{className}).", 'published')");
 	my $temp = WebGUI::Asset->newByPropertyHashRef({
 		assetId=>$id,
 		className=>$properties->{className}

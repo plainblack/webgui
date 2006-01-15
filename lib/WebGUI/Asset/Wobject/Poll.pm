@@ -25,8 +25,8 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 sub _hasVoted {
 	my $self = shift;
 	my ($hasVoted) = $self->session->db->quickArray("select count(*) from Poll_answer 
-		where assetId=".$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->profileField("userId"))."
-		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and ipAddress='".$self->session->env->get("REMOTE_ADDR")."'))");
+		where assetId=".$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->userId)."
+		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->userId)." and ipAddress='".$self->session->env->get("REMOTE_ADDR")."'))");
 	return $hasVoted;
 }
 
@@ -280,7 +280,7 @@ sub view {
         $var{question} = $self->get("question");
 	if ($self->get("active") eq "0") {
 		$showPoll = 0;
-	} elsif ($self->session->user->isInGroup($self->get("voteGroup"),$self->session->user->profileField("userId"))) {
+	} elsif ($self->session->user->isInGroup($self->get("voteGroup"),$self->session->user->userId)) {
 		if ($self->_hasVoted()) {
 			$showPoll = 0;
 		} else {
@@ -324,9 +324,9 @@ sub www_vote {
 	my $self = shift;
 	my $u;
         if ($self->session->form->process("answer") ne "" && $self->session->user->isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
-        	$self->setVote($self->session->form->process("answer"),$self->session->user->profileField("userId"),$self->session->env->get("REMOTE_ADDR"));
+        	$self->setVote($self->session->form->process("answer"),$self->session->user->userId,$self->session->env->get("REMOTE_ADDR"));
 		if ($self->session->setting->get("useKarma")) {
-			$u = WebGUI::User->new($self->session->user->profileField("userId"));
+			$u = WebGUI::User->new($self->session->user->userId);
 			$u->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
 		}
 		$self->deletePageCache;

@@ -321,7 +321,7 @@ sub view {
       $var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }
-   if ($self->session->user->profileField("userId") eq '1') {
+   if ($self->session->user->userId eq '1') {
       $ttl = $self->get("cacheTimeoutVisitor");
       } else {
           $ttl = $self->get("cacheTimeout");

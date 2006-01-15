@@ -55,11 +55,11 @@ Templated display all messages for the current user.
 sub www_viewMessageLog {
 	my $session = shift;
    my (@msg, $vars);
-   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->profileField("userId")));
+   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->userId));
 	my $i18n = WebGUI::International->new($session);
    $vars->{displayTitle} = '<h1>'.$i18n->get(159).'</h1>';
    my $p = WebGUI::Paginator->new($session,$session->url->page('op=viewMessageLog'));
-   my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=".$session->db->quote($session->user->profileField("userId"))." order by dateOfEntry desc";
+   my $query = "select messageLogId,subject,url,dateOfEntry,status from messageLog where userId=".$session->db->quote($session->user->userId)." order by dateOfEntry desc";
    $p->setDataByQuery($query);
    
    $vars->{'message.subject.label'} = $i18n->get(351);
@@ -101,11 +101,11 @@ Templated display of a single message for the user.
 sub www_viewMessageLogMessage {
 	my $session = shift;
    my ($data, $vars);
-   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->profileField("userId")));
+   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->userId));
 	my $i18n = WebGUI::International->new($session);
    $vars->{displayTitle} = '<h1>'.$i18n->get(159).'</h1>';
    
-   $data = $session->db->quickHashRef("select * from messageLog where messageLogId=".$session->db->quote($session->form->process("mlog"))." and userId=".$session->db->quote($session->user->profileField("userId")));
+   $data = $session->db->quickHashRef("select * from messageLog where messageLogId=".$session->db->quote($session->form->process("mlog"))." and userId=".$session->db->quote($session->user->userId));
    
    $vars->{'message.subject'} = $data->{subject};
    $vars->{'message.dateOfEntry'} =$session->datetime->epochToHuman($data->{dateOfEntry});

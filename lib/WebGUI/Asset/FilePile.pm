@@ -107,7 +107,7 @@ sub edit {
        	my $clause;
        	if ($self->session->user->isInGroup(3)) {
                	my $contentManagers = $group->getUsers(4,1);
-                push (@$contentManagers, $self->session->user->profileField("userId"));
+                push (@$contentManagers, $self->session->user->userId);
        	        $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
        	} else {
                	$clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));

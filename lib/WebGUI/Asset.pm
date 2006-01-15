@@ -77,7 +77,7 @@ Only developers extending this method should use this parameter. By default WebG
 sub canAdd {
 	my $className = shift;
 	my $session = shift;
-	my $userId = shift || $session->user->profileField("userId");
+	my $userId = shift || $session->user->userId;
 	my $subclassGroupId = shift;
 	my $groupId = $session->config->get("assetAddPrivilege")->{$className} || $subclassGroupId || '12';
         return $session->user->isInGroup($groupId,$userId);
@@ -98,7 +98,7 @@ Unique hash identifier for a user. If not supplied, current user.
 
 sub canEdit {
 	my $self = shift;
-	my $userId = shift || $self->session->user->profileField("userId");
+	my $userId = shift || $self->session->user->userId;
  	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
 	}
@@ -123,7 +123,7 @@ Unique hash identifier for a user. If not specified, uses current userId.
 
 sub canView {
 	my $self = shift;
-	my $userId = shift || $self->session->user->profileField("userId");
+	my $userId = shift || $self->session->user->userId;
 	return 0 unless ($self->get("state") eq "published");
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
@@ -576,7 +576,7 @@ sub getEditForm {
         my $clause;
         if ($self->session->user->isInGroup(3)) {
                 my $contentManagers = $self->session->group->getUsers(4,1);
-                push (@$contentManagers, $self->session->user->profileField("userId"));
+                push (@$contentManagers, $self->session->user->userId);
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
                 $clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));
@@ -1270,7 +1270,7 @@ sub publish {
 	my $self = shift;
 	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
         my $idList = $self->session->db->quoteAndJoin($assetIds);
-        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->profileField("userId")).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
+        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
 	my $cache = WebGUI::Cache->new;
         foreach my $id (@{$assetIds}) {
         	# we do the purge directly cuz it's a lot faster than instantiating all these assets

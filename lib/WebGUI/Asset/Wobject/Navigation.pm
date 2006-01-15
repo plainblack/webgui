@@ -283,7 +283,7 @@ sub getToolbar {
 			$returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);	
 		}
 		my $toolbar;
-		if (!$self->isLocked || $self->get("isLockedBy") eq $self->session->user->profileField("userId")) {
+		if (!$self->isLocked || $self->get("isLockedBy") eq $self->session->user->userId) {
 			$toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->get("url"));
 		}
 		my $i18n = WebGUI::International->new($self->session, "Asset");

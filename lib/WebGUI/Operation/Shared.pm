@@ -42,7 +42,7 @@ use Safe;
 	}
 	unless ($session->form->process("op") eq "viewProfile"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->profileField("userId")).'">'.$i18n->get(343).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->userId).'">'.$i18n->get(343).'</a>';
 		push(@array,\%hash);
 	}
 	unless ($session->form->process("op") eq "viewMessageLog"){

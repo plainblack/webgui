@@ -97,7 +97,7 @@ sub toHtml {
         #Remove entries from template list that the user does not have permission to view.
         for my $assetId ( keys %{$templateList} ) {
           	my $asset = WebGUI::Asset::Template->new($assetId);
-          	if (!$asset->canView($self->session->user->profileField("userId"))) {
+          	if (!$asset->canView($self->session->user->userId)) {
             		delete $templateList->{$assetId};
           	}
         }

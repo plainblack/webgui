@@ -23,7 +23,7 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 #sub canManage {
 #	my $self = shift;
-#	my $userId = shift || $self->session->user->profileField("userId");
+#	my $userId = shift || $self->session->user->userId;
 #	if ($userId eq $self->getValue("ownerUserId")) {
 #		return 1;
 #	}

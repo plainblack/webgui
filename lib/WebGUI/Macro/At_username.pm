@@ -27,7 +27,7 @@ Macro for displaying the current User's username.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return $session->user->profileField("username");
+	return $session->user->username;
 }
 
 

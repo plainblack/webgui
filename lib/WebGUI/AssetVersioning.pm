@@ -59,7 +59,7 @@ sub addRevision {
 	my $versionTag = $self->session->scratch->get("versionTag") || 'pbversion0000000000002';
 	my $status = $self->session->setting->get("autoCommit") ? 'approved' : 'pending';
 	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
-		ownerUserId, groupIdEdit, groupIdView) values (".$self->session->db->quote($self->getId).",".$now.", ".$self->session->db->quote($self->session->user->profileField("userId")).", 
+		ownerUserId, groupIdEdit, groupIdView) values (".$self->session->db->quote($self->getId).",".$now.", ".$self->session->db->quote($self->session->user->userId).", 
 		".$self->session->db->quote($versionTag).", ".$self->session->db->quote($status).", ".$self->session->db->quote($self->getId).", 997995720, 32472169200,'3','3','7')");
         foreach my $definition (@{$self->definition}) {
                 unless ($definition->{tableName} eq "assetData") {
@@ -88,12 +88,12 @@ The name of the version tag. If not specified, one will be generated using the c
 
 sub addVersionTag {
 	my $self = shift;
-	my $name = shift || "Autotag created ".$self->session->datetime->epochToHuman()." by ".$self->session->user->profileField("username");
+	my $name = shift || "Autotag created ".$self->session->datetime->epochToHuman()." by ".$self->session->user->username;
 	my $tagId = $self->session->db->setRow("assetVersionTag","tagId",{
 		tagId=>"new",
 		name=>$name,
 		creationDate=>$self->session->datetime->time(),
-		createdBy=>$self->session->user->profileField("userId")
+		createdBy=>$self->session->user->userId
 		});
 	$self->session->scratch->set("versionTag",$tagId);
 	return $tagId;
@@ -111,7 +111,7 @@ Returns a boolean indicating whether this asset is locked and if the current use
 sub canEditIfLocked {
 	my $self = shift;
 	return 0 unless ($self->isLocked);
-	return ($self->get("isLockedBy") eq $self->session->user->profileField("userId"));
+	return ($self->get("isLockedBy") eq $self->session->user->userId);
 }
 
 
@@ -150,7 +150,7 @@ sub commitVersionTag {
 		WebGUI::Asset->new($id,$class,$version)->commit;
 	}
 	$sth->finish;
-	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate=".$self->session->datetime->time().", committedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where tagId=".$self->session->db->quote($tagId));
+	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate=".$self->session->datetime->time().", committedBy=".$self->session->db->quote($self->session->user->userId)." where tagId=".$self->session->db->quote($tagId));
 	$self->session->db->write("delete from userSessionScratch where name='versionTag' and value=".$self->session->db->quote($tagId));
 }
 
@@ -287,7 +287,7 @@ Sets the versioning lock to "on" so that this piece of content may not be edited
 
 sub setVersionLock {
 	my $self = shift;
-	$self->session->db->write("update asset set isLockedBy=".$self->session->db->quote($self->session->user->profileField("userId"))." where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->write("update asset set isLockedBy=".$self->session->db->quote($self->session->user->userId)." where assetId=".$self->session->db->quote($self->getId));
 	$self->updateHistory("locked");
 	$self->purgeCache;
 }
@@ -328,7 +328,7 @@ If not specified, current user is used.
 sub updateHistory {
 	my $self = shift;
 	my $action = shift;
-	my $userId = shift || $self->session->user->profileField("userId") || '3';
+	my $userId = shift || $self->session->user->userId || '3';
 	my $dateStamp =$self->session->datetime->time();
 	$self->session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($userId).", ".$self->session->db->quote($action).", ".$dateStamp.")");
 }

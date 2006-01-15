@@ -53,7 +53,7 @@ sub getRequiredProfileFields {
 sub isDuplicateEmail {
 	my $session = shift;
 	my $email = shift;
-	my ($otherEmail) = $session->db->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".$session->db->quote($email)." and userId <> ".$session->db->quote($session->user->profileField("userId")));
+	my ($otherEmail) = $session->db->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".$session->db->quote($email)." and userId <> ".$session->db->quote($session->user->userId));
 	return ($otherEmail > 0);
 }
 
@@ -94,7 +94,7 @@ sub validateProfileData {
 #-------------------------------------------------------------------
 sub www_editProfile {
 	my $session = shift;
-	return WebGUI::Operation::Auth::www_auth("init") if($session->user->profileField("userId") eq '1');
+	return WebGUI::Operation::Auth::www_auth("init") if($session->user->userId eq '1');
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
 	$vars->{displayTitle} .= '<h1>'.$i18n->get(338).'</h1>';
@@ -103,7 +103,7 @@ sub www_editProfile {
 	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter($session,);
 
 	$vars->{'profile.form.hidden'} = WebGUI::Form::hidden($session,{"name"=>"op","value"=>"editProfileSave"});
-	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden($session,{"name"=>"uid","value"=>$session->user->profileField("userId")});
+	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden($session,{"name"=>"uid","value"=>$session->user->userId});
 	my @array = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
 		next unless $category->isEditable;
@@ -132,14 +132,14 @@ sub www_editProfile {
 sub www_editProfileSave {
 	my $session = shift;
 	my ($profile, $fieldName, $error, $u, $warning);
-	return WebGUI::Operation::Auth::www_auth("init") if ($session->user->profileField("userId") eq '1');
+	return WebGUI::Operation::Auth::www_auth("init") if ($session->user->userId eq '1');
 	
 	($profile, $error, $warning) = validateProfileData();
 	$error .= $warning;
     
 	return www_editProfile('<ul>'.$error.'</ul>') if($error ne "");
     
-	$u = WebGUI::User->new($session->user->profileField("userId"));
+	$u = WebGUI::User->new($session->user->userId);
 	foreach $fieldName (keys %{$profile}) {
 		$u->profileField($fieldName,$profile->{$fieldName});
 	}
@@ -157,7 +157,7 @@ sub www_viewProfile {
 
 	return $session->privilege->notMember() if($u->username eq "");
 
-	return $session->style->userStyle($vars->{displayTitle}.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->profileField("userId") ne $session->form->process("uid") || $session->user->isInGroup(3)));
+	return $session->style->userStyle($vars->{displayTitle}.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->userId ne $session->form->process("uid") || $session->user->isInGroup(3)));
 	return $session->privilege->insufficient() if(!$session->user->isInGroup(2));
 
 	my @array = ();
@@ -174,7 +174,7 @@ sub www_viewProfile {
 		}
 	}
 	$vars->{'profile.elements'} = \@array;
-	if ($session->user->profileField("userId") eq $session->form->process("uid")) {
+	if ($session->user->userId eq $session->form->process("uid")) {
 		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
 	}
 	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars));

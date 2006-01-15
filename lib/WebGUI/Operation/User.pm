@@ -313,7 +313,7 @@ sub www_editUser {
 		Deactivated	=>$i18n->get(818),
 		Selfdestructed	=>$i18n->get(819)
 		);
-	if ($u->userId eq $session->user->profileField("userId")) {
+	if ($u->userId eq $session->user->userId) {
 		$tabform->getTab("account")->hidden(
 			-name => "status",
 			-value => $u->status
@@ -365,7 +365,7 @@ sub www_editUser {
 	foreach my $group (@exclude) {
 		unless (
 			$group eq "1" || $group eq "2" || $group eq "7" # can't remove user from magic groups 
-			|| ($session->user->profileField("userId") eq $u->userId  && $group eq 3) # cannot remove self from admin
+			|| ($session->user->userId eq $u->userId  && $group eq 3) # cannot remove self from admin
 			|| ($u->userId eq "3" && $group eq "3") # admin user cannot be remove from admin
 			) {
 			push(@include,$group);
@@ -461,7 +461,7 @@ sub www_editUserKarmaSave {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($u);
         $u = WebGUI::User->new($session->form->process("uid"));
-        $u->karma($session->form->process("amount"),$session->user->profileField("username")." (".$session->user->profileField("userId").")",$session->form->process("description"));
+        $u->karma($session->form->process("amount"),$session->user->username." (".$session->user->userId.")",$session->form->process("description"));
         return www_editUser();
 }
 

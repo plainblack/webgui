@@ -607,7 +607,7 @@ This object's authentication method
   
 =head3 userId
 
-userId for the user requesting authentication.  This defaults to $self->session->user->profileField("userId")
+userId for the user requesting authentication.  This defaults to $self->session->user->userId
   
 =head3 callable
 

@@ -133,7 +133,7 @@ sub definition {
 				},
 			username => {
 				fieldType=>"hidden",
-				defaultValue=>$session->form->process("visitorUsername") || $session->user->profileField("alias") || $session->user->profileField("username")
+				defaultValue=>$session->form->process("visitorUsername") || $session->user->profileField("alias") || $session->user->username
 				},
 			rating => {
 				noFormPost=>1,
@@ -525,7 +525,7 @@ sub hasRated {
 	my $self = shift;
         return 1 if $self->isPoster;
         my ($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId="
-                .$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and userId<>'1') or (userId='1' and
+                .$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->userId)." and userId<>'1') or (userId='1' and
                 ipAddress=".$self->session->db->quote($self->session->env->get("REMOTE_ADDR"))."))");
         return $flag;
 }
@@ -554,7 +554,7 @@ Returns a boolean indicating whether this post is marked read for the user.
 sub isMarkedRead {
         my $self = shift;
 	return 1 if $self->isPoster;
-        my ($isRead) = $self->session->db->quickArray("select count(*) from Post_read where userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and postId=".$self->session->db->quote($self->getId));
+        my ($isRead) = $self->session->db->quickArray("select count(*) from Post_read where userId=".$self->session->db->quote($self->session->user->userId)." and postId=".$self->session->db->quote($self->getId));
         return $isRead;
 }
 
@@ -568,7 +568,7 @@ Returns a boolean that is true if the current user created this post and is not 
 
 sub isPoster {
 	my $self = shift;
-	return ($self->session->user->profileField("userId") ne "1" && $self->session->user->profileField("userId") eq $self->get("ownerUserId"));
+	return ($self->session->user->userId ne "1" && $self->session->user->userId eq $self->get("ownerUserId"));
 }
 
 
@@ -597,7 +597,7 @@ Marks this post read for this user.
 sub markRead {
 	my $self = shift;
         unless ($self->isMarkedRead) {
-                $self->session->db->write("insert into Post_read (userId, postId, threadId, readDate) values (".$self->session->db->quote($self->session->user->profileField("userId")).",
+                $self->session->db->write("insert into Post_read (userId, postId, threadId, readDate) values (".$self->session->db->quote($self->session->user->userId).",
                         ".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->get("threadId")).", ".$self->session->datetime->time().")");
         }
 }
@@ -652,12 +652,12 @@ sub processPropertiesFromFormPost {
 			$self->update({threadId=>$self->getParent->get("threadId")});
 		}
 		if ($self->session->setting->get("enableKarma") && $self->getThread->getParent->get("karmaPerPost")) {
-			my $u = WebGUI::User->new($self->session->user->profileField("userId"));
+			my $u = WebGUI::User->new($self->session->user->userId);
 			$u->addKarma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
 		}
 		%data = (
-			ownerUserId => $self->session->user->profileField("userId"),
-			username => $self->session->form->process("visitorName") || $self->session->user->profileField("alias") || $self->session->user->profileField("username"),
+			ownerUserId => $self->session->user->userId,
+			username => $self->session->form->process("visitorName") || $self->session->user->profileField("alias") || $self->session->user->username,
 			isHidden => 1,
 			);
 		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
@@ -702,8 +702,8 @@ sub processPropertiesFromFormPost {
 	}
 	$self->session->form->process("proceed") = "redirectToParent";
 	# clear some cache
-	WebGUI::Cache->new($self->session,"wobject_".$self->getThread->getParent->getId."_".$self->session->user->profileField("userId"))->delete;
-	WebGUI::Cache->new($self->session,"cspost_".($self->getParent->getId)."_".$self->session->user->profileField("userId")."_".$self->session->scratch->get("discussionLayout")."_1")->delete;
+	WebGUI::Cache->new($self->session,"wobject_".$self->getThread->getParent->getId."_".$self->session->user->userId)->delete;
+	WebGUI::Cache->new($self->session,"cspost_".($self->getParent->getId)."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_1")->delete;
 }
 
 
@@ -748,7 +748,7 @@ sub rate {
 	my $rating = shift || 3;
 	unless ($self->hasRated) {
         	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).", 
+                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).", 
 			".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
         	my ($count) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=".$self->session->db->quote($self->getId));
         	$count = $count || 1;
@@ -882,7 +882,7 @@ Negates the markRead method.
 
 sub unmarkRead {
 	my $self = shift;
-        $self->session->db->write("delete from forumRead where userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and postId=".$self->session->db->quote($self->getId));
+        $self->session->db->write("delete from forumRead where userId=".$self->session->db->quote($self->session->user->userId)." and postId=".$self->session->db->quote($self->getId));
 }
 
 #-------------------------------------------------------------------
@@ -1044,7 +1044,7 @@ sub www_edit {
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
-	$var{'user.isVisitor'} = ($self->session->user->profileField("userId") eq '1');
+	$var{'user.isVisitor'} = ($self->session->user->userId eq '1');
 	$var{'visitorName.form'} = WebGUI::Form::text({
 		name=>"visitorName",
 		value=>$self->getValue("visitorName")

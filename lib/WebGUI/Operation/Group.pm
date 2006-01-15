@@ -27,7 +27,7 @@ use WebGUI::Utility;
 sub _hasSecondaryPrivilege {
 	my $session = shift;
 	return 0 unless ($session->user->isInGroup(11));
-	return $group->userIsAdmin($session->user->profileField("userId"),$_[0]);
+	return $group->userIsAdmin($session->user->userId,$_[0]);
 }
 
 
@@ -175,10 +175,10 @@ sub www_addUsersToGroupSave {
 #-------------------------------------------------------------------
 sub www_autoAddToGroup {
 	my $session = shift;
-        return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->profileField("userId") ne 1);
+        return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
 	my $group = WebGUI::Group->new($session->form->process("groupId"));
 	if ($group->autoAdd) {
-		$group->addUsers([$session->user->profileField("userId")],[$session->form->process("groupId")]);
+		$group->addUsers([$session->user->userId],[$session->form->process("groupId")]);
 	}
 	return "";
 }
@@ -186,10 +186,10 @@ sub www_autoAddToGroup {
 #-------------------------------------------------------------------
 sub www_autoDeleteFromGroup {
 	my $session = shift;
-        return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->profileField("userId") ne 1);
+        return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
 	my $group = WebGUI::Group->new($session->form->process("groupId"));
 	if ($group->autoDelete) {
-		$group->deleteUsers([$session->user->profileField("userId")],[$session->form->process("groupId")]);
+		$group->deleteUsers([$session->user->userId],[$session->form->process("groupId")]);
 	}
 	return "";
 }
@@ -241,7 +241,7 @@ perform this operation, and the
 sub www_deleteGrouping {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session->form->process("gid")));
-        if (($session->user->profileField("userId") eq $session->form->process("uid") || $session->form->process("uid") eq '3') && $session->form->process("gid") eq '3') {
+        if (($session->user->userId eq $session->form->process("uid") || $session->form->process("uid") eq '3') && $session->form->process("gid") eq '3') {
                 return $session->privilege->vitalComponent();
         }
         my @users = $session->form->selectList('uid');
@@ -565,7 +565,7 @@ sub www_listGroups {
 		return _submenu($output,'',"groups manage");
 	} elsif ($session->user->isInGroup(11)) {
 		my ($output, $p, $sth, @data, @row, $i, $userCount);
-        	my @editableGroups = $session->db->buildArray("select groupId from groupings where userId=".$session->db->quote($session->user->profileField("userId"))." and groupAdmin=1");
+        	my @editableGroups = $session->db->buildArray("select groupId from groupings where userId=".$session->db->quote($session->user->userId)." and groupAdmin=1");
         	push (@editableGroups,0);
         	$sth = $session->db->read("select groupId,groupName,description from groups
                 	where groupId in (".$session->db->quoteAndJoin(\@editableGroups).") order by groupName");

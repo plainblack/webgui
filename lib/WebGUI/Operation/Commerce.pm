@@ -123,7 +123,7 @@ sub www_checkoutConfirm {
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	
 	# If the user isn't logged in yet, let him do so or have him create an account
-	if ($session->user->profileField("userId") == 1) {
+	if ($session->user->userId == 1) {
 		$session->scratch->set('redirectAfterLogin', $session->url->page('op=checkout'));
 		return WebGUI::Operation::execute('auth');
 	}
@@ -204,7 +204,7 @@ sub www_checkoutSubmit {
 	$i18n = WebGUI::International->new($session, 'Commerce');
 
 	# check if user has already logged in
-	if ($session->user->profileField("userId") == 1) {
+	if ($session->user->userId == 1) {
 		$session->scratch->set('redirectAfterLogin', $session->url->page('op=checkout'));
 		return WebGUI::Operation::execute('displayLogin');
 	}

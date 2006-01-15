@@ -54,7 +54,7 @@ specified by the session variable.
 sub apply {
 	my ($self, $userId, $groupId);
 	$self = shift;
-	$userId = shift || $self->session->user->profileField("userId");
+	$userId = shift || $self->session->user->userId;
 	$groupId = $self->{_properties}{subscriptionGroup};
 	my $group = WebGUI::Group->new($self->session,$groupId);
 	# Make user part of the right group

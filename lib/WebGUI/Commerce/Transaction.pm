@@ -417,7 +417,7 @@ sub new {
 	my $session = shift;
 	$transactionId = shift;
 	$gatewayId = shift;
-	$userId = shift || $session->user->profileField("userId");
+	$userId = shift || $session->user->userId;
 	
 	if ($transactionId eq 'new') {
 		$transactionId = $session->id->generate;

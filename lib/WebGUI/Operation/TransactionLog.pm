@@ -34,7 +34,7 @@ sub www_viewPurchaseHistory {
 
 	$var{errorMessage} = shift;
 	
-	@history = @{WebGUI::Commerce::Transaction->transactionsByUser($session->user->profileField("userId"))};
+	@history = @{WebGUI::Commerce::Transaction->transactionsByUser($session->user->userId)};
 	foreach (@history) {
 		%properties = %{$_->get};
 		$properties{initDate} = $session->datetime->epochToHuman($properties{initDate});

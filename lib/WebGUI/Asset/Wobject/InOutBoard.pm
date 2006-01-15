@@ -153,7 +153,7 @@ sub view {
 	}
 	else { $var{canViewReport} = 0; }
 	
-	my $statusUserId = $self->session->scratch->get("userId") || $self->session->user->profileField("userId");
+	my $statusUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
 	my $statusListString = $self->getValue("statusList");
 	chop($statusListString);
 	my @statusListArray = split("\n",$statusListString);
@@ -168,7 +168,7 @@ sub view {
 	my ($status) = $self->session->db->quickArray("select status from InOutBoard_status where userId=".$self->session->db->quote($statusUserId)." and assetId=".$self->session->db->quote($self->getId));
 
 	##Find all the users for which I am a delegate
-	my @users = $self->session->db->buildArray("select userId from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and delegateUserId=".$self->session->db->quote($self->session->user->profileField("userId")));
+	my @users = $self->session->db->buildArray("select userId from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and delegateUserId=".$self->session->db->quote($self->session->user->userId));
 
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	if (@users) {
@@ -202,7 +202,7 @@ sub view {
 		);
 	$f->submit;
 	
-	my ($isInGroup) = $self->session->db->quickArray("select count(*) from groupings where userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and groupId=".$self->session->db->quote($self->get("inOutGroup")));
+	my ($isInGroup) = $self->session->db->quickArray("select count(*) from groupings where userId=".$self->session->db->quote($self->session->user->userId)." and groupId=".$self->session->db->quote($self->get("inOutGroup")));
 	if ($isInGroup) {
 	  $var{displayForm} = 1;
 	  $var{'form'} = $f->print;
@@ -287,7 +287,7 @@ sub www_selectDelegates {
 #left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
 #left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
 #where users.userId<>'1' and users.status='Active' and users.userId<>%s
-#group by userId", $self->session->db->quote($self->session->user->profileField("userId"));
+#group by userId", $self->session->db->quote($self->session->user->userId);
     
 	#Comment the sql query below (lines 297 - 307) to show all users of the system in the delegate select list
     my $sql = sprintf "select users.username, 
@@ -300,7 +300,7 @@ left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
 left join userProfileData c on users.userId=c.userId and c.fieldName='department'
 left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=%s
 where users.userId<>'1' and groupings.groupId=InOutBoard.inOutGroup and users.status='Active' and users.userId <> %s and groupings.userId=users.userId and InOutBoard.inOutGroup=%s
-group by userId", $self->session->db->quote($self->getId), $self->session->db->quote($self->session->user->profileField("userId")), $self->session->db->quote($self->getValue("inOutGroup")) ;
+group by userId", $self->session->db->quote($self->getId), $self->session->db->quote($self->session->user->userId), $self->session->db->quote($self->getValue("inOutGroup")) ;
 	my %userNames = ();
 	my $sth = $self->session->db->read($sql);
 	while (my $data = $sth->hashRef) {
@@ -308,7 +308,7 @@ group by userId", $self->session->db->quote($self->getId), $self->session->db->q
 	}
 	$sth->finish;
 	$sql = sprintf "select delegateUserId from InOutBoard_delegates where userId=%s and assetId=%s",
-	                $self->session->db->quote($self->session->user->profileField("userId")), $self->session->db->quote($self->getId);
+	                $self->session->db->quote($self->session->user->userId), $self->session->db->quote($self->getId);
 	my $delegates = $self->session->db->buildArrayRef($sql);
 	my $i18n = WebGUI::International->new($self->session,"Asset_InOutBoard");
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
@@ -336,12 +336,12 @@ group by userId", $self->session->db->quote($self->getId), $self->session->db->q
 sub www_selectDelegatesEditSave {
 	my $self = shift;
 	my @delegates = $self->session->form->selectList("delegates");
-	$self->session->db->write("delete from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($self->session->user->profileField("userId")));
+	$self->session->db->write("delete from InOutBoard_delegates where assetId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($self->session->user->userId));
 
 	foreach my $delegate (@delegates) {
 		$self->session->db->write("insert into InOutBoard_delegates
 		(userId,delegateUserId,assetId) values
-		(".$self->session->db->quote($self->session->user->profileField("userId")).",".$self->session->db->quote($delegate).",".$self->session->db->quote($self->getId).")");
+		(".$self->session->db->quote($self->session->user->userId).",".$self->session->db->quote($delegate).",".$self->session->db->quote($self->getId).")");
 	}
 	return "";
 }
@@ -352,13 +352,13 @@ sub www_setStatus {
 	#$self->session->errorHandler->warn("userId: ".$self->session->scratch->get("userId") ."\n" );
 	if ($self->session->form->process("delegate") eq $self->session->scratch->get("userId")) {
 		#$self->session->errorHandler->warn("Wrote data and removed scratch\n");
-		my $sessionUserId = $self->session->scratch->get("userId") || $self->session->user->profileField("userId");
+		my $sessionUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
 		#$self->session->errorHandler->warn("user Id: ".$sessionUserId."\n");
 		$self->session->scratch->delete("userId");
 		$self->session->db->write("delete from InOutBoard_status where userId=".$self->session->db->quote($sessionUserId)." and  assetId=".$self->session->db->quote($self->getId));
 		$self->session->db->write("insert into InOutBoard_status (assetId,userId,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).","
 			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
-		$self->session->db->write("insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).",".$self->session->db->quote($self->session->user->profileField("userId")).","
+		$self->session->db->write("insert into InOutBoard_statusLog (assetId,userId,createdBy,status,dateStamp,message) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($sessionUserId).",".$self->session->db->quote($self->session->user->userId).","
 			.$self->session->db->quote($self->session->form->process("status")).",".$self->session->datetime->time().",".$self->session->db->quote($self->session->form->process("message")).")");
 	}
 	else {

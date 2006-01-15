@@ -134,7 +134,7 @@ Deletes the rendered page cache for this wobject.
 
 sub deletePageCache {
 	my $self = shift;
-        WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"))->delete;
+        WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId)->delete;
 }
 
 #-------------------------------------------------------------------
@@ -597,19 +597,19 @@ sub www_view {
         my $useCache = (
 		$self->session->form->process("op") eq "" && $self->session->form->process("pn") eq "" 
 		&& (
-			( $self->get("cacheTimeout") > 10 && $self->session->user->profileField("userId") ne '1') 
-			|| ( $self->get("cacheTimeoutVisitor") > 10 && $self->session->user->profileField("userId") eq '1')
+			( $self->get("cacheTimeout") > 10 && $self->session->user->userId ne '1') 
+			|| ( $self->get("cacheTimeoutVisitor") > 10 && $self->session->user->userId eq '1')
 		) 
 		&& !( $self->session->var->get("adminOn") || $disableCache)
 	);
 	if ($useCache) {
-               	$cache = WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->profileField("userId"));
+               	$cache = WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId);
            	$output = $cache->get;
 	}
 	unless ($output) {
 		$output = $self->processStyle($self->view);
 		my $ttl;
-		if ($self->session->user->profileField("userId") eq '1') {
+		if ($self->session->user->userId eq '1') {
 			$ttl = $self->get("cacheTimeoutVisitor");
 		} else {
 			$ttl = $self->get("cacheTimeout");

@@ -59,7 +59,7 @@ sub add {
 	my $assetId = shift;
 	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry)
 		     values (".$session->db->quote($session->id->generate()).",".
-				$session->db->quote($session->user->profileField("userId")).",".
+				$session->db->quote($session->user->userId).",".
 				$session->db->quote($session->var->get("sessionId")).",".
 				$session->db->quote($assetId).",".
 				$session->db->quote($session->datetime->time()).")";

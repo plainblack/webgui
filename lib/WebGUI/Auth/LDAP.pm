@@ -200,7 +200,7 @@ sub authenticate {
 sub createAccount {
     my $self = shift;
     my $vars;
-    if ($self->session->user->profileField("userId") ne "1") {
+    if ($self->session->user->userId ne "1") {
        return $self->displayAccount;
     } elsif (!$self->session->setting->get("anonymousRegistration")) {
  	   return $self->displayLogin;

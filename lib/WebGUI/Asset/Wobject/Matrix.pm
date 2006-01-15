@@ -147,7 +147,7 @@ sub hasRated {
 	return 1 unless ($self->session->user->isInGroup($self->get("groupToRate")));
 	my $ratingTimeout = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
 	my ($hasRated) = $self->session->db->quickArray("select count(*) from Matrix_rating where 
-		((userId=".$self->session->db->quote($self->session->user->profileField("userId"))." and userId<>'1') or (userId='1' and ipAddress=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).")) and 
+		((userId=".$self->session->db->quote($self->session->user->userId)." and userId<>'1') or (userId='1' and ipAddress=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).")) and 
 		listingId=".$self->session->db->quote($listingId)." and timeStamp>".($self->session->datetime->time()-$ratingTimeout));
 	return $hasRated;
 }
@@ -181,7 +181,7 @@ sub setRatings {
 	foreach my $category ($self->getCategories) {
 		if ($ratings->{$category}) {
 			$self->session->db->write("insert into Matrix_rating (userId, category, rating, timeStamp, listingId,ipAddress, assetId) values (
-				".$self->session->db->quote($self->session->user->profileField("userId")).", ".$self->session->db->quote($category).", ".$self->session->db->quote($ratings->{$category}).", ".$self->session->datetime->time()
+				".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($category).", ".$self->session->db->quote($ratings->{$category}).", ".$self->session->datetime->time()
 				.", ".$self->session->db->quote($listingId).", ".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).",".$self->session->db->quote($self->getId).")");
 		}
 		my $sql = "from Matrix_rating where listingId=".$self->session->db->quote($listingId)." and category=".$self->session->db->quote($category);
@@ -442,7 +442,7 @@ sub www_editListing {
         my $self = shift;
         my $listing= $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
+	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
                 -name=>"func",
@@ -572,7 +572,7 @@ sub www_editListingSave {
         my $self = shift;
         my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
+	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
 	my %data = (
 		listingId => $self->session->form->process("listingId"),
 		lastUpdated => $self->session->datetime->time(),
@@ -585,7 +585,7 @@ sub www_editListingSave {
 		);
 	my $isNew = 0;
 	if ($self->session->form->process("listingId") eq "new") {
-		$data{maintainerId} = $self->session->user->profileField("userId") if ($self->session->form->process("listingId") eq "new");
+		$data{maintainerId} = $self->session->user->userId if ($self->session->form->process("listingId") eq "new");
 		my $forum = $self->addChild({
 			className=>"WebGUI::Asset::Wobject::Collaboration",
 			title=>$self->session->form->process("productName"),
@@ -865,7 +865,7 @@ sub view {
         my (%var);
 	$var{'compare.form'} = $self->getCompareForm;
 	$var{'search.url'} = $self->getUrl("func=search");
-	$var{'isLoggedIn'} = ($self->session->user->profileField("userId") ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	$var{'field.list.url'} = $self->getUrl('func=listFields');	
 	$var{'listing.add.url'} = $self->formatURL("editListing","new");
 
@@ -981,7 +981,7 @@ sub www_viewDetail {
 	}
 	$var{'edit.url'} = $self->formatURL("editListing",$listingId);
 	$var{id} = $listingId;
-	$var{'user.canEdit'} = ($self->session->user->profileField("userId") eq $listing->{maintainerId} || $self->canEdit);
+	$var{'user.canEdit'} = ($self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
 	$var{'user.canApprove'} = $self->canEdit;
 	$var{'approve.url'} = $self->getUrl("func=approveListing&listingId=".$listingId."&mlog=".$self->session->form->process("mlog"));
 	$var{'delete.url'} = $self->getUrl("func=deleteListing&listingId=".$listingId."&mlog=".$self->session->form->process("mlog"));

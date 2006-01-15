@@ -384,7 +384,7 @@ sub view {
 	#Set some template variables
 	$var->{'extrasFolder'} = $self->session->config->get("extrasURL")."/wobject/StockData";
 	$var->{'editUrl'} = $self->getUrl("func=editStocks");
-	$var->{'isVisitor'} = $self->session->user->profileField("userId") eq 1;
+	$var->{'isVisitor'} = $self->session->user->userId eq 1;
 	$var->{'stock.display.url'} = $self->getUrl("func=displayStock&symbol=");
 	
 	#Build list of stocks as an array

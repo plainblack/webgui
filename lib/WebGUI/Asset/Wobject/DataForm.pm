@@ -1052,8 +1052,8 @@ sub www_process {
 	my $entryId = $self->setCollateral("DataForm_entry","DataForm_entryId",{
 		DataForm_entryId=>$self->session->form->process("entryId"),
                 assetId=>$self->getId,
-                userId=>$self->session->user->profileField("userId"),
-                username=>$self->session->user->profileField("username"),
+                userId=>$self->session->user->userId,
+                username=>$self->session->user->username,
                 ipAddress=>$self->session->env->get("REMOTE_ADDR"),
                 submissionDate=$self->session->datetime->time()
 		},0);

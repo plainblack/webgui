@@ -190,7 +190,7 @@ sub generateResponseId {
 		'Survey_responseId'=>"new",
 		userId=>$userId,
 		ipAddress=>$ipAddress,
-		username=>$self->session->user->profileField("username"),
+		username=>$self->session->user->username,
 		startDate=>$self->session->datetime->time(),
 		'Survey_id'=>$self->get("Survey_id")
 		});
@@ -555,7 +555,7 @@ sub getSequentialQuestionIds {
 #-------------------------------------------------------------------
 sub getUserId {
 	my $self = shift;
-	my $userId = ($self->get("anonymous") && $self->session->user->profileField("userId") != 1) ? substr(md5_hex($self->session->user->profileField("userId")),0,8) : $self->session->user->profileField("userId");
+	my $userId = ($self->get("anonymous") && $self->session->user->userId != 1) ? substr(md5_hex($self->session->user->userId),0,8) : $self->session->user->userId;
 	return $userId;
 }
 
@@ -1167,7 +1167,7 @@ sub www_respond {
 	return "" unless ($self->session->user->isInGroup($self->get("groupToTakeSurvey")));
 	my $varname = $self->getResponseIdString;
 	return "" unless ($self->session->scratch->get($varname));
-	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->profileField("userId")),0,8) : $self->session->user->profileField("userId");
+	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->userId),0,8) : $self->session->user->userId;
 	my $terminate = 0;
 	foreach my $key (keys %{$session{form}}) {
 		if ($key =~ /^answerId_(.+)$/) {
