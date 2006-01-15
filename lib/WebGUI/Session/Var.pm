@@ -71,7 +71,7 @@ Removes the specified user session from memory and database.
 sub end {
         my $self = shift;
         $self->session->scratch->deleteAll;
-        $self->delete;
+        $self->session->db->write("delete from userSession where sessionId=".$self->session->db->quote($self->getId));
         delete $self->session->{_user};
 	$self->DESTROY;
 }
@@ -149,7 +149,7 @@ sub isAdminOn {
 
 =head2 new ( session )
 
-Constructor. Returns a stow object.
+Constructor. Returns a var object.
 
 =head3 session
 
