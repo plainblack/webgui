@@ -32,7 +32,7 @@ Get the instance of this object or create a new instance if none exists
 sub getInstance {
 	my $session = shift;   
    	#Get Auth Settings
-	my $authMethod = $session->user->get("authMethod") || $session->setting->get("authMethod");
+	my $authMethod = $session->user->authMethod || $session->setting->get("authMethod");
 	$authMethod = $session->setting->get("authMethod") if($session->user->profileField("userId") eq '1');
 	$authMethod = $_[0] if($_[0] && isIn($_[0], @{$session->config->get("authMethods")}));
 	my $userId = $_[1];
