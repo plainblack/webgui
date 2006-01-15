@@ -102,6 +102,7 @@ Renders a yes/no question field.
 
 sub toHtml {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
         my ($checkYes, $checkNo);
         if ($self->get("value")) {
                 $checkYes = 1;
@@ -114,7 +115,7 @@ sub toHtml {
                 value=>1,
                 extras=>$self->get("extras")
                 )->toHtml;
-        $output .= WebGUI::International::get(138);
+        $output .= $i18n->get(138);
         $output .= '&nbsp;&nbsp;&nbsp;';
         $output .= WebGUI::Form::Radio->new(
                 checked=>$checkNo,
@@ -122,7 +123,7 @@ sub toHtml {
                 value=>0,
                 extras=>$self->get("extras")
                 )->toHtml;
-        $output .= WebGUI::International::get(139);
+        $output .= $i18n->get(139);
         return $output;
 }
 

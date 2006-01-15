@@ -100,10 +100,11 @@ sub displayForm {
 	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
 	my $id = $location->getId;
 	my $fileForm = '';
+	my $i18n = WebGUI::International->new($self->session);
 	foreach my $file ( @{ $location->getFiles } ) {
 		$fileForm .= sprintf qq!<img src="%s" /><br />!, $location->getUrl($file);
 		my $action = join '_', '_', $self->get("name"), 'delete';
-		$fileForm .= WebGUI::International::get(392)
+		$fileForm .= $i18n->get(392)
 			  .  "&nbsp"x4
 			  . WebGUI::Form::YesNo->new({-name=>$action, -value=>0})->toHtml;
 	}
@@ -193,7 +194,8 @@ sub toHtml {
                         $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->config->get("extrasURL").'/fileIcons/'.$file.'";'."\n";
                 }
         }
-        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->get("name").'", fileIcons, "'.WebGUI::International::get('removeLabel','WebGUI').'","'.$self->get("maxAttachments").'");
+	my $i18n = WebGUI::International->new($self->session);
+        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->get("name").'", fileIcons, "'.$i18n->get('removeLabel','WebGUI').'","'.$self->get("maxAttachments").'");
         uploader.addRow();
         </script>';
         return $uploadControl;

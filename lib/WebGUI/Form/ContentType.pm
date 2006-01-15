@@ -93,15 +93,16 @@ Renders a select list form control.
 sub toHtml {
 	my $self = shift;
 	my %types;
+	my $i18n = WebGUI::International->new($self->session);
 	foreach my $type (@{$self->get("types}")) {
                 if ($type eq "text") {
-                        $types{text} = WebGUI::International::get(1010);
+                        $types{text} = $i18n->get(1010);
                 } elsif ($type eq "mixed") {
-                        $types{mixed} = WebGUI::International::get(1008);
+                        $types{mixed} = $i18n->get(1008);
                 } elsif ($type eq "code") {
-                        $types{code} = WebGUI::International::get(1011);
+                        $types{code} = $i18n->get(1011);
                 } elsif ($type eq "html") {
-                        $types{html} = WebGUI::International::get(1009);
+                        $types{html} = $i18n->get(1009);
                 }
         }
 	$self->get("options") = \%types,
