@@ -152,7 +152,8 @@ sub authenticate {
 		return 1;
 	} 
 	$self->user(WebGUI::User->new($self->session,1));
-	$self->error(WebGUI::International::get(68));
+	my $i18n = WebGUI::International->new($self->session);
+	$self->error($i18n->get(68));
 	return 0;
 }
 

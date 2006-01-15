@@ -223,7 +223,8 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 
 sub epochToHuman {
 	my $self = shift;
-	my $language = WebGUI::International::getLanguage($self->session->user->profileField("language"));
+	my $i18n = WebGUI::International->new($self->session);
+	my $language = $i18n->getLanguage($self->session->user->profileField("language"));
 	my $locale = $language->{languageAbbreviation} || "en";
 	$locale .= "_".$language->{locale} if ($language->{locale});
 	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
@@ -312,21 +313,22 @@ An integer ranging from 1-7 representing the day of the week (Sunday is 1 and Sa
 
 sub getDayName {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,'DateTime');
 	my $day = $_[0];
         if ($day == 7) {
-                return WebGUI::International::get('sunday','DateTime');
+                return $i18n->get('sunday');
         } elsif ($day == 1) {
-                return WebGUI::International::get('monday','DateTime');
+                return $i18n->get('monday');
         } elsif ($day == 2) {
-                return WebGUI::International::get('tuesday','DateTime');
+                return $i18n->get('tuesday');
         } elsif ($day == 3) {
-                return WebGUI::International::get('wednesday','DateTime');
+                return $i18n->get('wednesday');
         } elsif ($day == 4) {
-                return WebGUI::International::get('thursday','DateTime');
+                return $i18n->get('thursday');
         } elsif ($day == 5) {
-                return WebGUI::International::get('friday','DateTime');
+                return $i18n->get('friday');
         } elsif ($day == 6) {
-                return WebGUI::International::get('saturday','DateTime');
+                return $i18n->get('saturday');
         }
 }
 
@@ -409,30 +411,31 @@ An integer ranging from 1-12 representing the month.
 
 sub getMonthName {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,'DateTime');
         if ($_[0] == 1) {
-                return WebGUI::International::get('january','DateTime');
+                return $i18n->get('january');
         } elsif ($_[0] == 2) {
-                return WebGUI::International::get('february','DateTime');
+                return $i18n->get('february');
         } elsif ($_[0] == 3) {
-                return WebGUI::International::get('march','DateTime');
+                return $i18n->get('march');
         } elsif ($_[0] == 4) {
-                return WebGUI::International::get('april','DateTime');
+                return $i18n->get('april');
         } elsif ($_[0] == 5) {
-                return WebGUI::International::get('may','DateTime');
+                return $i18n->get('may');
         } elsif ($_[0] == 6) {
-                return WebGUI::International::get('june','DateTime');
+                return $i18n->get('june');
         } elsif ($_[0] == 7) {
-                return WebGUI::International::get('july','DateTime');
+                return $i18n->get('july');
         } elsif ($_[0] == 8) {
-                return WebGUI::International::get('august','DateTime');
+                return $i18n->get('august');
         } elsif ($_[0] == 9) {
-                return WebGUI::International::get('september','DateTime');
+                return $i18n->get('september');
         } elsif ($_[0] == 10) {
-                return WebGUI::International::get('october','DateTime');
+                return $i18n->get('october');
         } elsif ($_[0] == 11) {
-                return WebGUI::International::get('november','DateTime');
+                return $i18n->get('november');
         } elsif ($_[0] == 12) {
-                return WebGUI::International::get('december','DateTime');
+                return $i18n->get('december');
         }
 }
 

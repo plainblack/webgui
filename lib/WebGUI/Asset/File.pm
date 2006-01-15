@@ -75,9 +75,11 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_File");
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_File"),
+		assetName=>$i18n->get('assetName'),
 		tableName=>'FileAsset',
 		className=>'WebGUI::Asset::File',
 		properties=>{
@@ -97,7 +99,7 @@ sub definition {
 			}
 		}
 	});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -130,17 +132,18 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session, 'Asset_File');
 	if ($self->get("filename") ne "") {
 		$tabform->getTab("properties")->readOnly(
-			-label=>WebGUI::International::get('current file', 'Asset_File'),
-			-hoverHelp=>WebGUI::International::get('current file description', 'Asset_File'),
+			-label=>$i18n->get('current file'),
+			-hoverHelp=>$i18n->get('current file description', 'Asset_File'),
 			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
 		);
 
 	}
 	$tabform->getTab("properties")->file(
-		-label=>WebGUI::International::get('new file', 'Asset_File'),
-		-hoverHelp=>WebGUI::International::get('new file description', 'Asset_File'),
+		-label=>$i18n->get('new file'),
+		-hoverHelp=>$i18n->get('new file description'),
 	);
 	return $tabform;
 }
@@ -275,14 +278,15 @@ sub view {
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new($self->session);
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
-		-hoverHelp=>WebGUI::International::get('file template description','Asset_File'),
+		-hoverHelp=>$i18n->get('file template description','Asset_File'),
 		-namespace=>"FileAsset"
 	);
 	$self->getAdminConsole->setHelp("file add/edit", "Asset_File");
-	my $addEdit = ($self->session->form->process("func") eq 'add') ? WebGUI::International::get('add','Wobject') : WebGUI::International::get('edit','Wobject');
+	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add','Wobject') : $i18n->get('edit','Wobject');
 	return $self->getAdminConsole->render($tabform->print,$addEdit.' '.$self->getName);
 }
 

@@ -158,6 +158,7 @@ Returns a rendered page to edit MetaData.  Will return an insufficient Privilege
 
 sub www_editMetaDataField {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset');
 	my $ac = WebGUI::AdminConsole->new($self->session,"contentProfiling");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
         my $fieldInfo;
@@ -176,35 +177,35 @@ sub www_editMetaDataField {
 	);
 	$f->readOnly(
 		-value=>$fid,
-		-label=>WebGUI::International::get('Field Id','Asset'),
+		-label=>$i18n->get('Field Id'),
 	);
 	$f->text(
 		-name=>"fieldName",
-		-label=>WebGUI::International::get('Field name','Asset'),
-		-hoverHelp=>WebGUI::International::get('Field Name description','Asset'),
+		-label=>$i18n->get('Field name'),
+		-hoverHelp=>$i18n->get('Field Name description'),
 		-value=>$fieldInfo->{fieldName}
 	);
 	$f->textarea(
 		-name=>"description",
-		-label=>WebGUI::International::get(85,"Asset"),
-		-hoverHelp=>WebGUI::International::get('Metadata Description description',"Asset"),
+		-label=>$i18n->get(85),
+		-hoverHelp=>$i18n->get('Metadata Description description'),
 		-value=>$fieldInfo->{description});
 	$f->fieldType(
 		-name=>"fieldType",
-		-label=>WebGUI::International::get(486,"Asset"),
-		-hoverHelp=>WebGUI::International::get('Data Type description',"Asset"),
+		-label=>$i18n->get(486),
+		-hoverHelp=>$i18n->get('Data Type description'),
 		-value=>$fieldInfo->{fieldType} || "text",
 		-types=> [ qw /text integer yesNo selectList radioList/ ]
 	);
 	$f->textarea(
 		-name=>"possibleValues",
-		-label=>WebGUI::International::get(487,"Asset"),
-		-hoverHelp=>WebGUI::International::get('Possible Values description',"Asset"),
+		-label=>$i18n->get(487),
+		-hoverHelp=>$i18n->get('Possible Values description'),
 		-value=>$fieldInfo->{possibleValues}
 	);
 	$f->submit();
 	$ac->setHelp("metadata edit property","Asset");
-	return $ac->render($f->print, WebGUI::International::get('Edit Metadata',"Asset"));
+	return $ac->render($f->print, $i18n->get('Edit Metadata'));
 }
 
 #-------------------------------------------------------------------
@@ -219,6 +220,7 @@ sub www_editMetaDataFieldSave {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"content profiling");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
+	my $i18n = WebGUI::International->new($self->session,"Asset");
 	$ac->setHelp("metadata edit property","Asset");
 	# Check for duplicate field names
 	my $sql = "select count(*) from metaData_properties where fieldName = ".
@@ -228,12 +230,12 @@ sub www_editMetaDataFieldSave {
 	}
 	my ($isDuplicate) = $self->session->db->buildArray($sql);
 	if($isDuplicate) {
-		my $error = WebGUI::International::get("duplicateField", "Asset");
+		my $error = $i18n->get("duplicateField");
 		$error =~ s/\%field\%/$self->session->form->process("fieldName")/;
-		return $ac->render($error,WebGUI::International::get('Edit Metadata',"Asset"));
+		return $ac->render($error,$i18n->get('Edit Metadata'));
 	}
 	if($self->session->form->process("fieldName") eq "") {
-		return $ac->render(WebGUI::International::get("errorEmptyField", "Asset"),WebGUI::International::get('Edit Metadata',"Asset"));
+		return $ac->render($i18n->get("errorEmptyField"),$i18n->get('Edit Metadata'));
 	}
 	if($self->session->form->process("fid") eq 'new') {
 		$self->session->form->process("fid") = $self->session->id->generate();
@@ -269,11 +271,12 @@ sub www_manageMetaData {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"contentProfiling");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
-	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), WebGUI::International::get("Add new field","Asset"));
+	my $i18n = WebGUI::International->new($self->session,"Asset");
+	$ac->addSubmenuItem($self->getUrl('func=editMetaDataField'), $i18n->get("Add new field"));
 	my $output;
 	my $fields = $self->getMetaDataFields();
 	foreach my $fieldId (keys %{$fields}) {
-		$output .= $self->session->icon->delete("func=deleteMetaDataField;fid=".$fieldId,$self->get("url"),WebGUI::International::get('deleteConfirm','Asset'));
+		$output .= $self->session->icon->delete("func=deleteMetaDataField;fid=".$fieldId,$self->get("url"),$i18n->get('deleteConfirm'));
 		$output .= $self->session->icon->edit("func=editMetaDataField;fid=".$fieldId,$self->get("url"));
 		$output .= " <b>".$fields->{$fieldId}{fieldName}."</b><br />";
 	}	

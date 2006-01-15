@@ -448,21 +448,6 @@ sub www_displayStock {
 }
 
 #-------------------------------------------------------------------
-#=head2 www_edit ( )
-
-#Web facing method which is the default edit page
-
-#=cut
-
-#sub www_edit {
-#   my $self = shift;
-#   return $self->session->privilege->insufficient() unless $self->canEdit;
-#   $self->getAdminConsole->setHelp("stock list add/edit","Asset_StockData");
-#   return $self->getAdminConsole->render($self->getEditForm->print,
-#                  WebGUI::International::get("edit_title","Asset_StockData"));
-#}
-
-#-------------------------------------------------------------------
 =head2 www_view ( )
 
 Overwrite www_view method and call the superclass object, passing in a 1 to disable cache

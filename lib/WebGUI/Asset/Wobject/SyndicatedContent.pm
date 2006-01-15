@@ -573,21 +573,6 @@ sub _createRSSURLs{
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#=head2 www_edit()
-
-#Sets parameters and returns a form to edit this wobject.
-
-#=cut
-
-#sub www_edit {
-#        my $self = shift;
-#	return $self->session->privilege->insufficient() unless $self->canEdit;
-#        $self->getAdminConsole->setHelp('syndicated content add/edit','Asset_SyndicatedContent');
-#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('4','Asset_SyndicatedContent'));
-#}
-
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 www_viewRSS090()
 
 Emit an RSS 0.9 feed.

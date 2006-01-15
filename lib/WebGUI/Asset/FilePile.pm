@@ -49,6 +49,7 @@ These methods are available from this class:
 sub edit {
 	my $self = shift;
 	my $tabform = WebGUI::TabForm->new($self->session,);
+	my $i18n = WebGUI::International->new($self->session, 'Asset_FilePile');
 	$tabform->hidden({
 		name=>"func",
 		value=>"add"
@@ -67,33 +68,33 @@ sub edit {
 			value=>$self->session->form->process("proceed")
 			});
 	}
-	$tabform->addTab("properties",WebGUI::International::get("properties","Asset"));
+	$tabform->addTab("properties",$i18n->get("properties","Asset"));
 	$tabform->getTab("properties")->yesNo(
                	-name=>"isHidden",
                	-value=>1,
-               	-label=>WebGUI::International::get(886,"Asset_FilePile"),
-               	-hoverHelp=>WebGUI::International::get('886 description',"Asset_FilePile"),
+               	-label=>$i18n->get(886),
+               	-hoverHelp=>$i18n->get('886 description'),
                	-uiLevel=>6
                	);
        	$tabform->getTab("properties")->yesNo(
                 -name=>"newWindow",
        	        -value=>0,
-               	-label=>WebGUI::International::get(940,"Asset_FilePile"),
-               	-hoverHelp=>WebGUI::International::get('940 description',"Asset_FilePile"),
+               	-label=>$i18n->get(940),
+               	-hoverHelp=>$i18n->get('940 description'),
                 -uiLevel=>6
        	        );
-	$tabform->addTab("security",WebGUI::International::get(107,"Asset"),6);
+	$tabform->addTab("security",$i18n->get(107,"Asset"),6);
 	$tabform->getTab("security")->dateTime(
                	-name=>"startDate",
-                -label=>WebGUI::International::get(497,"Asset_FilePile"),
-                -hoverHelp=>WebGUI::International::get('497 description',"Asset_FilePile"),
+                -label=>$i18n->get(497),
+                -hoverHelp=>$i18n->get('497 description'),
        	        -value=>$self->get("startDate"),
                	-uiLevel=>6
                 );
        	$tabform->getTab("security")->dateTime(
                	-name=>"endDate",
-                -label=>WebGUI::International::get(498,"Asset_FilePile"),
-                -hoverHelp=>WebGUI::International::get('498 description',"Asset_FilePile"),
+                -label=>$i18n->get(498),
+                -hoverHelp=>$i18n->get('498 description'),
        	        -value=>$self->get("endDate"),
                	-uiLevel=>6
                	);
@@ -115,34 +116,34 @@ sub edit {
        	$tabform->getTab("security")->selectBox(
        		-name=>"ownerUserId",
               	-options=>$users,
-       	       	-label=>WebGUI::International::get(108,"Asset_FilePile"),
-       	       	-hoverHelp=>WebGUI::International::get('108 description',"Asset_FilePile"),
+       	       	-label=>$i18n->get(108),
+       	       	-hoverHelp=>$i18n->get('108 description'),
        		-value=>[$self->get("ownerUserId")],
        		-subtext=>$subtext,
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdView",
-       		-label=>WebGUI::International::get(872,"Asset_FilePile"),
-       		-hoverHelp=>WebGUI::International::get('872 description',"Asset_FilePile"),
+       		-label=>$i18n->get(872),
+       		-hoverHelp=>$i18n->get('872 description'),
        		-value=>[$self->get("groupIdView")],
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdEdit",
-       		-label=>WebGUI::International::get(871,"Asset_FilePile"),
-       		-hoverHelp=>WebGUI::International::get('871 description',"Asset_FilePile"),
+       		-label=>$i18n->get(871),
+       		-hoverHelp=>$i18n->get('871 description'),
        		-value=>[$self->get("groupIdEdit")],
        		-excludeGroups=>[1,7],
        		-uiLevel=>6
        		);
 	$tabform->getTab("properties")->file(
-		-label=>WebGUI::International::get("upload files", "Asset_FilePile"),
-		-hoverHelp=>WebGUI::International::get("upload files description", "Asset_FilePile"),
+		-label=>$i18n->get("upload files"),
+		-hoverHelp=>$i18n->get("upload files description"),
 		-maxAttachments=>100
 		);
         $self->getAdminConsole->setHelp("file pile add/edit","Asset_FilePile");
-	return $self->getAdminConsole->render($tabform->print,WebGUI::International::get("add pile", "Asset_FilePile"));
+	return $self->getAdminConsole->render($tabform->print,$i18n->get("add pile"));
 }
 
 #-------------------------------------------------------------------
@@ -203,7 +204,9 @@ Returns the displayable name of this asset.
 =cut
 
 sub getName {
-        return WebGUI::International::get('assetName',"Asset_FilePile");
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
+        return $i18n->get('assetName',"Asset_FilePile");
 } 
 
 

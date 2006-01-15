@@ -730,14 +730,6 @@ sub www_deleteTabConfirm {
 }
 
 #-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return $self->session->privilege->insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("data form add/edit","Asset_DataForm");
-#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("7","Asset_DataForm"));
-#}
-
-#-------------------------------------------------------------------
 sub www_editField {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;

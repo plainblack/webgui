@@ -32,13 +32,14 @@ sub process {
 	
 	@param = @_;
 	
-	return WebGUI::International::get('no sku or id','Macro_Product') unless ($_[0]);
+	my $i18n = WebGUI::International->new($session,'Macro_Product');
+	return $i18n->get('no sku or id') unless ($_[0]);
 
 	($productId, $variantId) = $session->db->quickArray("select productId, variantId from productVariants where sku=".$session->db->quote($_[0]));
 	($productId) = $session->db->quickArray("select productId from products where sku=".$session->db->quote($_[0])) unless ($productId);
 	($productId) = $session->db->quickArray("select productId from products where productId=".$session->db->quote($_[0])) unless ($productId);
 	
-	return WebGUI::International::get('cannot find product','Macro_Product') unless ($productId);
+	return $i18n->get('cannot find product') unless ($productId);
 
 	$product = WebGUI::Product->new($self->session,$productId);
 
@@ -65,13 +66,13 @@ sub process {
 			'variant.sku' => $_->{sku},
 			'variant.compositionLoop' => \@compositionLoop,
 			'variant.addToCart.url' => $session->url->page('op=addToCart;itemType=Product;itemId='.$_->{variantId}),
-			'variant.addToCart.label' => WebGUI::International::get('add to cart', 'Macro_Product'),
+			'variant.addToCart.label' => $i18n->get('add to cart'),
 		}) if ($_->{available});
 	}
 
 	%var = %{$product->get};
 	$var{variantLoop} = \@variantLoop;
-	$var{'variants.message'} = WebGUI::International::get('available product configurations', 'Macro_Product');
+	$var{'variants.message'} = $i18n->get('available product configurations');
 	$templateId = $_[1] || $product->get('templateId');
 	
 	return WebGUI::Asset::Template->new($ssession,$templateId)->process(\%var);

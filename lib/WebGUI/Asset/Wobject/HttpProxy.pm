@@ -342,14 +342,6 @@ sub view {
 
 
 #-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return $self->session->privilege->insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("http proxy add/edit","Asset_HttpProxy");
-#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("2","Asset_HttpProxy"));
-#}
-
-#-------------------------------------------------------------------
 
 sub www_view {
         my $self = shift;

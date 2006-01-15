@@ -56,9 +56,11 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
+        my $session = shift;
         my $definition = shift;
+	my $i18n = WebGUI::International->new($session);
         push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_Redirect"),
+		assetName=>$i18n->get('assetName',"Asset_Redirect"),
 		uiLevel => 9,
 		icon=>'redirect.gif',
                 tableName=>'redirect',
@@ -86,10 +88,11 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Redirect');
         $tabform->getTab("properties")->url(
                 -name=>"redirectUrl",
-                -label=>WebGUI::International::get('redirect url', 'Asset_Redirect'),
-                -hoverHelp=>WebGUI::International::get('redirect url description', 'Asset_Redirect'),
+                -label=>$i18n->get('redirect url'),
+                -hoverHelp=>$i18n->get('redirect url description'),
                 -value=>$self->getValue("redirectUrl")
                 );
 	return $tabform;
@@ -101,7 +104,8 @@ sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
         $self->getAdminConsole->setHelp("redirect add/edit", "Asset_Redirect");
-        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('redirect add/edit title', 'Asset_Redirect'));
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Redirect');
+        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('redirect add/edit title'));
 }
 
 #-------------------------------------------------------------------

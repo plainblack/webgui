@@ -92,7 +92,6 @@ sub addRevision {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-        return $class->SUPER::definition($definition);
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Product");
 	push(@{$definition}, {
@@ -443,14 +442,6 @@ sub www_deleteSpecificationConfirm {
    $self->reorderCollateral("Product_specification","Product_specificationId");
    return "";
 }
-
-#-------------------------------------------------------------------
-#sub www_edit {
-#   my $self = shift;
-#   return $self->session->privilege->insufficient() unless $self->canEdit;
-#   $self->getAdminConsole->setHelp("product add/edit","Asset_Product");
-#   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("6","Asset_Product"));
-#}
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {

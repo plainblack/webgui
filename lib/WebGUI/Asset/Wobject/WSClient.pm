@@ -216,16 +216,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-
-#-------------------------------------------------------------------
-#sub www_edit {
-#        my $self = shift;
-#	return $self->session->privilege->insufficient() unless $self->canEdit;
-#	$self->getAdminConsole->setHelp("ws client add/edit","Asset_WSClient");
-#        return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("20","Asset_WSClient"));
-#}
-
-
 #-------------------------------------------------------------------
 sub view {
    my ( $arr_ref,                      # temp var holding params
