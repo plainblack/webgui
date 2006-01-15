@@ -389,6 +389,28 @@ A conditional indicating whether this Post should be hidden from navigation.
 A conditional indicating whether this Post should be opened in a new window.
 <p>
 
+<b>userDefined1, userDefined2, userDefined3, userDefined4, userDefined5</b><br>
+You can use up to 5 user defined fields. The fields are
+called "userDefined1" through "userDefined5". In the
+Post Form template you can use those variables like
+this to collect data:
+
+<blockquote>
+&lt;tmpl_var userDefined1.form&gt; (text)<br>
+
+&lt;tmpl_var userDefined1.form.yesNo&gt; (yes / no) <br>
+
+&lt;tmpl_var userDefined1.form.textarea&gt; (textarea) <br>
+
+&lt;tmpl_var userDefined1.form.htmlarea&gt; (rich edit box) <br>
+
+</blockquote>
+
+Then in the Thread and Main CS templates you can call
+back the data with a simple &lt;tmpl_var userDefined1&gt;. 
+
+<p>
+
 |,
 		lastUpdated => 1134670360,
 	},

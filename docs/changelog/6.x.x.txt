@@ -6,6 +6,10 @@
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
  - fix [ 1403466 ] CS Attachments - Broken Image Issue
+ - fix [ 1406633 ] Env and User macros broken (Thanks to Eric Kennedy for
+		   the patch)
+ - fix [ 1404485 ] userDefined1 to 5 onlineHelp
+ - fix [ 1403155 ] Poll shows no result
 
 6.8.4
  - fix [ 1395371 ] XSS Vulnerability in DataForm Entries
