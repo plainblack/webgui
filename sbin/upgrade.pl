@@ -21,7 +21,6 @@ use Getopt::Long;
 use strict;
 use WebGUI::Config;
 use WebGUI::Session;
-use WebGUI::Setting;
 use WebGUI::SQL;
 
 my $help;
@@ -144,7 +143,7 @@ our (%upgrade, %config);
 ## Find site configs.
 
 print "\nGetting site configs...\n" unless ($quiet);
-my $configs = WebGUI::Config::readAllConfigs($webguiRoot);
+my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
 foreach my $filename (keys %{$configs}) {
 	print "\tProcessing $filename.\n" unless ($quiet);
 	$config{$filename}{configFile} = $filename;
@@ -164,10 +163,10 @@ foreach my $filename (keys %{$configs}) {
 			order by dateApplied desc, webguiVersion desc limit 1",$dbh);
 		unless ($history) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
-			WebGUI::Session::open($webguiRoot,$filename);
-			WebGUI::Setting::remove('specialState');
-			WebGUI::Setting::add('specialState','upgrading');
-			WebGUI::Session::close();
+			my $session = WebGUI::Session::open($webguiRoot,$filename);
+			$session->setting->remove('specialState');
+			$session->add('specialState','upgrading');
+			$session->close();
 			print "\tDeleting temp files.\n" unless ($quiet);
 			my $path = $configs->{$filename}{uploadsPath}.$slash."temp";
 			rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
