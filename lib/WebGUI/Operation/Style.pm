@@ -37,7 +37,7 @@ sub www_makePrintable {
 	if ($session->form->process("styleId") ne "") {
 		$session->asset->{_properties}{printableStyleTemplateId} = $session->form->process("styleId");
 	}
-	$session->style->makePrintable("1")
+	$session->style->makePrintable("1");
 	return "";
 }
 

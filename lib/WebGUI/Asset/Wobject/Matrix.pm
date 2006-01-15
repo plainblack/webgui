@@ -154,6 +154,7 @@ sub hasRated {
 
 #-------------------------------------------------------------------
 sub incrementCounter {
+	my $self = shift;
 	my $listingId = shift;
 	my $counter = shift;
 	my ($lastIp) = $self->session->db->quickArray("select ".$counter."LastIp from Matrix_listing where listingId = ".$self->session->db->quote($listingId));
@@ -211,7 +212,7 @@ sub www_approveListing {
 #-------------------------------------------------------------------
 sub www_click {
 	my $self = shift;
-	incrementCounter($self->session->form->process("listingId"),"clicks");
+	$self->incrementCounter($self->session->form->process("listingId"),"clicks");
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	if ($self->session->form->process("m")) {
 		$self->session->http->setRedirect($listing->{manufacturerUrl});
@@ -238,7 +239,7 @@ sub www_compare {
 		return $self->processStyle($self->processTemplate(\%var,$self->get("compareTemplateId")));
 	}
 	foreach my $cms (@cmsList) {
-		incrementCounter($cms,"compares");
+		$self->incrementCounter($cms,"compares");
 		my $data = $self->session->db->quickHashRef("select listingId, productName, versionNumber, lastUpdated
 			from Matrix_listing where listingId=".$self->session->db->quote($cms));
 		push(@prodcol, {
@@ -305,6 +306,7 @@ sub www_compare {
 
 #-------------------------------------------------------------------
 sub www_copy {
+	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	return $i18n->get('no copy');
 }
@@ -593,8 +595,8 @@ sub www_editListingSave {
 			url=>$self->session->form->process("productName"),
 			groupIdView=>7,
 			groupIdEdit=>3,
-			startDate=$self->session->datetime->time(),
-			endDate=$self->session->datetime->time()+60*60*24*365*15,
+			startDate=>$self->session->datetime->time(),
+			endDate=>$self->session->datetime->time()+60*60*24*365*15,
                         displayLastReply => 0,
                         allowReplies => 1,
                         threadsPerPage => 30,
@@ -766,7 +768,7 @@ sub www_rate {
 		$lastRating = $self->session->form->process($category);
 	} 
 	return $self->www_viewDetail("",1) if ($hasRated || $sameRating); # Throw out ratings that are all the same number, or if the user rates twice.
-	$self->setRatings($self->session->form->process("listingId"),$session{form});
+	$self->setRatings($self->session->form->process("listingId"),$self->session->form->paramsHashRef);
 	return $self->www_viewDetail;	
 }
 
@@ -977,7 +979,7 @@ sub www_viewDetail {
 		}
 		$var{'email.wasSent'} = 1;
 	} else {
-		incrementCounter($listingId,"views");
+		$self->incrementCounter($listingId,"views");
 	}
 	$var{'edit.url'} = $self->formatURL("editListing",$listingId);
 	$var{id} = $listingId;

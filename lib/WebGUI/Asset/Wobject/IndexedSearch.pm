@@ -540,12 +540,13 @@ sub _getContentTypes {
 
 #-------------------------------------------------------------------
 sub _getSearchablePages {
+	my $self = shift;
 	my $searchRoot = shift;
 	my %pages;
 	my $sth = $self->session->db->read("select assetId from asset where parentId = ".$self->session->db->quote($searchRoot));
 	while (my %data = $sth->hash) {
 		$pages{$data{assetId}} = 1;
-		%pages = (%pages, _getSearchablePages($data{assetId}) );
+		%pages = (%pages, $self->_getSearchablePages($data{assetId}) );
 	}
 	return %pages;
 }

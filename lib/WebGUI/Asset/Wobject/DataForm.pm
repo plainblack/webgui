@@ -575,8 +575,8 @@ sub processPropertiesFromFormPost {
 			});
 	}
 	if ($self->session->form->process("fid") eq "new") { # hack to get proceed to work.
-		$session->stow->set('whatNext',$self->session->form->process("proceed"));
-	} else { $session->stow->set('whatNext','nothing'); }
+		$self->session->stow->set('whatNext',$self->session->form->process("proceed"));
+	} else { $self->session->stow->set('whatNext','nothing'); }
 }
 
 #-------------------------------------------------------------------
@@ -1054,7 +1054,7 @@ sub www_process {
                 userId=>$self->session->user->userId,
                 username=>$self->session->user->username,
                 ipAddress=>$self->session->env->get("REMOTE_ADDR"),
-                submissionDate=$self->session->datetime->time()
+                submissionDate=>$self->session->datetime->time()
 		},0);
 	my ($var, %row, @errors, $updating, $hadErrors);
 	$var->{entryId} = $entryId;

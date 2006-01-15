@@ -13,6 +13,7 @@ use strict;
 use lib '../lib';
 use Getopt::Long;
 use File::Find;
+use WebGUI::Session;
 # ---- END DO NOT EDIT ----
 
 

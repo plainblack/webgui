@@ -178,7 +178,7 @@ sub createAccount {
 			.'<img src="'.$storage->getUrl($filename).'" border="0" alt="captcha" align="middle" />';
    		$vars->{'create.form.captcha.label'} = $i18n->get("captcha label","AuthWebGUI");
 	}
-   $vars->{'create.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$self->session->form->process("authWebGUI.username"}));
+   $vars->{'create.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$self->session->form->process("authWebGUI.username")});
    $vars->{'create.form.username.label'} = $i18n->get(50);
    $vars->{'create.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authWebGUI.identifier"});
    $vars->{'create.form.password.label'} = $i18n->get(51);
@@ -449,26 +449,31 @@ sub editUserSettingsForm {
 
 #-------------------------------------------------------------------
 sub getAccountTemplateId {
+	my $self = shift;
 	return $self->session->setting->get("webguiAccountTemplate") || "PBtmpl0000000000000010";
 }
 
 #-------------------------------------------------------------------
 sub getCreateAccountTemplateId {
+	my $self = shift;
 	return $self->session->setting->get("webguiCreateAccountTemplate") || "PBtmpl0000000000000011";
 }
 
 #-------------------------------------------------------------------
 sub getExpiredPasswordTemplateId {
+	my $self = shift;
 	return $self->session->setting->get("webguiExpiredPasswordTemplate") || "PBtmpl0000000000000012";
 }
 
 #-------------------------------------------------------------------
 sub getLoginTemplateId {
+	my $self = shift;
 	return $self->session->setting->get("webguiLoginTemplate") || "PBtmpl0000000000000013";
 }
 
 #-------------------------------------------------------------------
 sub getPasswordRecoveryTemplateId {
+	my $self = shift;
 	return $self->session->setting->get("webguiPasswordRecoveryTemplate") || "PBtmpl0000000000000014";
 }
 
@@ -486,7 +491,7 @@ sub login {
    my $userData = $self->getParams;
    if($self->getSetting("passwordTimeout") && $userData->{passwordTimeout}){
       my $expireTime = $userData->{passwordLastUpdated} + $userData->{passwordTimeout};
-      if$self->session->datetime->time() >= $expireTime){
+      if ($self->session->datetime->time() >= $expireTime){
          $self->session->form->process("uid") = $self->userId;
 		 $self->logout;
    	     return $self->resetExpiredPassword;
@@ -499,10 +504,11 @@ sub login {
 #-------------------------------------------------------------------
 sub new {
    my $class = shift;
+   my $session = shift;
    my $authMethod = $_[0];
    my $userId = $_[1];
    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');
-   my $self = WebGUI::Auth->new($self->session,$authMethod,$userId,\@callable);
+   my $self = WebGUI::Auth->new($session,$authMethod,$userId,\@callable);
    bless $self, $class;
 }
 
@@ -693,7 +699,7 @@ sub updateAccount {
       }
    }
    $self->saveParams($u->userId,$self->authMethod,$properties);
-   $session->user({user=>$u});
+   $self->session->user(undef,undef,$u);
    
   return $self->displayAccount($display);
 }

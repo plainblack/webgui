@@ -663,7 +663,7 @@ sub www_getUserPrefsForm {
 	$f->submit({extras=>'className="nothing"'});
 	$f->raw('</table>');
 	my $tags;
-	foreach my $tag (@{$session{page}{head}{javascript}}) {
+	foreach my $tag (@{$self->session->style->{_javascript}}) {
 		$tags .= '<script';
 		foreach my $name (keys %{$tag}) {
 			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
@@ -708,7 +708,7 @@ sub www_saveUserPrefs {
 	$self->uncacheOverrides;
 	my $i18n = WebGUI::International->new($self->session);
 	my $u = WebGUI::User->new($self->discernUserId);
-	foreach my $fieldId (keys %{$session{form}}) {
+	foreach my $fieldId ($self->request->params) {
 		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;

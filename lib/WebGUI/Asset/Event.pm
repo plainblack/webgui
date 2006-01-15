@@ -40,11 +40,11 @@ sub definition {
 			},
 			eventStartDate => {
 				fieldType=>"dateTime",
-				defaultValue=$session->datetime->time()
+				defaultValue=>$session->datetime->time()
 			},
 			eventEndDate => {
 				fieldType=>"dateTime",
-				defaultValue=$session->datetime->time()
+				defaultValue=>$session->datetime->time()
 			},
 			EventsCalendar_recurringId => {
 				fieldType=>"hidden",

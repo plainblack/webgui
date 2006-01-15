@@ -98,7 +98,7 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($session,"Asset_Snippet");
+	my $i18n = WebGUI::International->new($self->session,"Asset_Snippet");
 	my %mimeTypes;
 	foreach ('text/html','text/css','text/javascript','text/plain','text/xml','application/xml') {
 	    $mimeTypes{$_}=$_;

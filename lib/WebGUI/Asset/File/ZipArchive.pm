@@ -159,7 +159,7 @@ sub getEditForm {
    );
    $tabform->getTab("properties")->text (
       -name=>"showPage",
-      -label=$i18n->get('show page'),
+      -label=>$i18n->get('show page'),
 	  -value=>$self->getValue("showPage"),
 	  -hoverHelp=>$i18n->get('show page description'),
    );

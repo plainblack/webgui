@@ -106,7 +106,8 @@ sub edit {
        	}
        	my $clause;
        	if ($self->session->user->isInGroup(3)) {
-               	my $contentManagers = $group->getUsers(4,1);
+       		my $group = WebGUI::Group->new($self->session,4);
+               	my $contentManagers = $group->getUsers(1);
                 push (@$contentManagers, $self->session->user->userId);
        	        $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
        	} else {
@@ -160,7 +161,7 @@ sub editSave {
 		$className = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
 		foreach my $definition (@{$className->definition}) {
 			foreach my $property (keys %{$definition->{properties}}) {
-				$data{$property} = $self->session->form->process(
+				$data{$property} = $class->session->form->process(
 					$property,
 					$definition->{properties}{$property}{fieldType},
 					$definition->{properties}{$property}{defaultValue}
@@ -180,7 +181,7 @@ sub editSave {
 		$newAsset->commit;
 	}
 	$tempStorage->delete;
-	return $class->getParent->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
+	return $class->getParent->www_manageAssets if ($class->session->form->process("proceed") eq "manageAssets");
 	return $class->getParent->www_view;
 }
 

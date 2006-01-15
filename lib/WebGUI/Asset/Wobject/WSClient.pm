@@ -245,7 +245,7 @@ sub view {
 
    # this page, with important params
     @seen{@exclude_params} = ();
-    for ($session->request->params) {
+    foreach ($self->session->request->params) {
        unless (exists $seen{$_}) {
           $query_string .= $self->session->url->escape($_) . '='
              . $self->session->url->escape($self->session->form->process($_)) . ';';
@@ -287,7 +287,7 @@ sub view {
    # check to see if this exact query has already been cached, using either
    # a cache specific to this session, or a shared global cache
    if ($self->session->form->process('cache')) {
-      if ($self->session->form->process('targetWobjects')}
+      if ($self->session->form->process('targetWobjects')
          && grep /^$call$/, @targetWobjects) {
 
          $cache_key = $self->session->form->process('cache');
@@ -465,7 +465,7 @@ sub view {
       $self->session->errorHandler->debug($i18n->get(26) . $@) if $self->get('debugMode');
    }
    # did they request a funky http header?
-   if ($self->session->config->get('soapHttpHeaderOverride')} &&
+   if ($self->session->config->get('soapHttpHeaderOverride') &&
       $self->get("httpHeader")) {
 
       $self->session->http->setMimeType($self->get("httpHeader"));

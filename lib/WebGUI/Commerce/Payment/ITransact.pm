@@ -477,19 +477,18 @@ sub confirmRecurringTransaction {
 	#### !!!Site checken!!! ####
 	my $self = shift;
 	
-	my $form = $session{form};
 	my $transaction = WebGUI::Commerce::Transaction->getByGatewayId($self->session->form->process("orig_xid"), $self->namespace);
 	my $itemProperties = $transaction->getItems->[0];
 	my $item = WebGUI::Commerce::Item->new($itemProperties->{itemId}, $itemProperties->{itemType});
 	
-	my $startEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{start_date})));
-	my $currentEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->{when})));
+	my $startEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $self->session->form->process("start_date"))));
+	my $currentEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $self->session->form->process("when"))));
 	
-	$self->session->db->write("delete from ITransact_recurringStatus where gatewayId=".$self->session->db->quote($form->{orig_xid}));
+	$self->session->db->write("delete from ITransact_recurringStatus where gatewayId=".$self->session->db->quote($self->session->form->process("orig_xid")));
 	$self->session->db->write("insert into ITransact_recurringStatus ".
 		"(gatewayId, initDate, lastTransaction, status, errorMessage, recipe) values ".
-		"(".$self->session->db->quote($form->{orig_xid}).", $startEpoch, $currentEpoch, ".$self->session->db->quote($form->{status}).", ".$self->session->db->quote($form->{error_message}).
-		", ".$self->session->db->quote($form->{recipe_name}).")");
+		"(".$self->session->db->quote($self->session->form->process("orig_xid")).", $startEpoch, $currentEpoch, ".$self->session->db->quote($self->session->form->process("status")).", ".$self->session->db->quote($self->session->form->process("error_message")).
+		", ".$self->session->db->quote($self->session->form->process("recipe_name")).")");
 }
 
 #-------------------------------------------------------------------
@@ -583,7 +582,7 @@ sub normalTransaction {
 	$normal = shift;
 
 	if ($normal) {
-		$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
+		my $i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 		$self->{_recurring} = 0;
 		$self->{_transactionParams} = {
 			AMT		=> sprintf('%.2f', $normal->{amount}),
@@ -608,7 +607,7 @@ sub recurringTransaction {
 		$initialAmount = ($self->session->datetime->getDaysInMonth(time) - ($self->session->datetime->localtime)[2])*$recurring->{amount}/$self->session->datetime->getDaysInMonth(time);
 		$initialAmount = $recurring->{amount} if ($initialAmount < 1);
 		$self->{_recurring} = 1;
-		$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
+		my $i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 		$self->{_transactionParams} = {
 			START		=> $recurring->{start} || $self->session->datetime->epochToHuman($self->session->datetime->addToDate(time, 0, 0, 1), '%m%d%y'),
 			AMT		=> sprintf('%.2f', $recurring->{amount}),

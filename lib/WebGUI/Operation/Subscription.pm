@@ -266,8 +266,7 @@ sub www_editSubscriptionSave {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
-	WebGUI::Subscription->new($session,$session->form->process("sid"))->set({map {$_ => $session->form->process($_)} @relevantFields]);
-		
+	WebGUI::Subscription->new($session,$session->form->process("sid"))->set({map {$_ => $session->form->process($_)} @relevantFields});
 	return www_listSubscriptions();
 }
 

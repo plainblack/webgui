@@ -135,7 +135,7 @@ sub www_editDatabaseLinkSave {
 		username=>$session->form->process("dbusername"),
 		identifier=>$session->form->process("dbidentifier"),
 		DSN=>$session->form->process("DSN")
-		});
+		};
 	if ($session->form->process("dlid") eq "new") {
 		WebGUI::DatabaseLink->create($session,$params);
 	} else {

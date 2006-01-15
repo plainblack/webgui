@@ -105,6 +105,27 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 paramsHashRef (  )
+
+Gets a hash ref of all the params passed in, and their values.
+
+=cut
+
+sub paramsHashRef {
+	my $self = shift;
+	unless ($self->{_paramsHashRef}) {
+		my $hash;
+		foreach ($self->session->request->params) {
+			$hash->{$_} = $self->process($_);
+		}
+		$self->{_paramsHashRef} = $hash;
+	}
+	return $self->{_paramsHashRef};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 process ( name, type [ , default ] )
 
 Returns whatever would be the expected result of the method type that was specified. This method also checks to make sure that the field is not returning a string filled with nothing but whitespace.

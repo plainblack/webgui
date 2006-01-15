@@ -51,6 +51,7 @@ where users.userId=?";
 
 #-------------------------------------------------------------------
 sub _fetchDepartments {
+	my $self = shift;
 	return $self->session->db->buildArray("select fieldData from userProfileData where fieldName='department' GROUP by fieldData");
 }
 
@@ -404,7 +405,7 @@ sub www_viewReport {
 		-value=>$endDate
 		);
 	my %depHash;
-	%depHash = map { $_ => $_ } (_fetchDepartments(),
+	%depHash = map { $_ => $_ } ($self->_fetchDepartments(),
 				     $i18n->get('all departments'));
 	my $defaultDepartment =  $self->session->form->process("selectDepartment")
 	                      || $i18n->get('all departments');

@@ -147,7 +147,7 @@ sub getEditForm {
 	%options = (
 		"last"=>$i18n->get(85),
 		"after12"=>$i18n->get(86),
-		"after9"=$i18n->get(87),
+		"after9"=>$i18n->get(87),
 		"after6"=>$i18n->get(88),
 		"after3"=>$i18n->get(89),
 		"current"=>$i18n->get(82)

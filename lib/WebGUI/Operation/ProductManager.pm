@@ -416,7 +416,7 @@ my	$variantId = $session->form->process("variantId");
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
-	WebGUI::Product->getByVariantId($session,$variantId)->setVariant($variantId, $session{form});
+	WebGUI::Product->getByVariantId($session,$variantId)->setVariant($variantId, $session->form->paramsHashRef);
 
 	return WebGUI::Operation::execute('listProductVariants');
 }

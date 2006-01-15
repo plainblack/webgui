@@ -513,7 +513,7 @@ sub www_editCommerceSettingsSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	foreach (keys(%{$session{form}})) {
+	foreach ($session->request->params) {
 		# Store the plugin confiuration data in a special table for security and the general settings in the
 		# normal settings table for easy access.
 		if (/~([^~]*)~([^~]*)~([^~]*)/) {
@@ -768,7 +768,7 @@ sub www_updateCart {
 	my $session = shift;
 my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 
-	foreach my $formElement (keys(%{$session{form}})) {
+	foreach my $formElement ($session->request->params) {
 		if ($formElement =~ m/^quantity~([^~]*)~([^~]*)$/) {
 			$shoppingCart->setQuantity($2, $1, $session->form->process($formElement));
 		}
