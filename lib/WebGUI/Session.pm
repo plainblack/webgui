@@ -422,7 +422,7 @@ Returns a WebGUI::Session::Scratch object.
 sub scratch {
 	my $self = shift;
 	unless (exists $self->{_scratch}) {
-		$self->{_scratch} = WebGUI::Session::Scratch->new($self->var->get("sessionId"), $self->db);
+		$self->{_scratch} = WebGUI::Session::Scratch->new($self->getId, $self->db);
 	}
 	return $self->{_scratch};
 }
