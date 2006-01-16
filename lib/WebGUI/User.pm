@@ -477,28 +477,28 @@ sub new {
 		my %profile = $session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
 			userProfileData.userId=".$session->db->quote($user{userId}));
-        	my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
-        	foreach my $key (keys %default) {
+		my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
+		foreach my $key (keys %default) {
 			my $value;
-        		if ($profile{$key} eq "" && $default{$key}) {
-                		$value = eval($default{$key});
-                        	if (ref $value eq "ARRAY") {
-                        		$profile{$key} = $$value[0];
-                        	} else {
-                        		$profile{$key} = $value;
-                        	}
-                	}
+			if ($profile{$key} eq "" && $default{$key}) {
+				$value = eval($default{$key});
+				if (ref $value eq "ARRAY") {
+					$profile{$key} = $$value[0];
+				} else {
+					$profile{$key} = $value;
+				}
+			}
 		}
 		$profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
 		$userData = {
 			_userId => $userId,
 			_user => \%user,
 			_profile => \%profile
-			};
+		};
 		$cache->set($userData, 60*60*24);
-		$userData->{_session} = $session;
-        }
-        bless $userData, $class;
+	}
+	$userData->{_session} = $session;
+	bless $userData, $class;
 }
 
 #-------------------------------------------------------------------
@@ -607,6 +607,7 @@ Deletes this user object out of the cache.
 
 sub uncache {
 	my $self = shift;
+	use Data::Dumper;print "<br /><br /> HOO HOO   ".Dumper($self->session);
 	my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
 	$cache->delete;	
 }
