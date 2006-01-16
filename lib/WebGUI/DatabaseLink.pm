@@ -134,7 +134,7 @@ sub db {
 	my $username = $self->{_databaseLink}{username};
 	my $identifier = $self->{_databaseLink}{identifier};
 	if ($self->getId eq "0") {
-		$self->{_dbh} = $self->sesssion->db;
+		$self->{_dbh} = $self->session->db;
 		return $self->{_dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
 		eval{

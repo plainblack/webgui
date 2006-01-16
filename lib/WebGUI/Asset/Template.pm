@@ -204,11 +204,11 @@ sub getList {
 	my $session = shift;
 	my $namespace = shift;
 my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$session->db->quote($session->scratch->get("versionTag")).")) order by assetData.title";
-	my $sth = $session->db->read($sql,$session->dbSlave);
+	my $sth = $session->dbSlave->read($sql);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {
-		$templates{$id} = WebGUI::Asset::Template->new($id,undef,$version)->getTitle;
+		$templates{$id} = WebGUI::Asset::Template->new($session,$id,undef,$version)->getTitle;
 	}	
 	$sth->finish;	
 	return \%templates;
