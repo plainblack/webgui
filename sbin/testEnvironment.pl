@@ -164,7 +164,10 @@ sub checkModule {
         printTest("Checking for module $module");
         my $statement = "require ".$module.";";
         if ($afterinstall == 1) {
-                failAndExit("Install of $module failed!");
+                failAndExit("Install of $module failed!") unless eval($statement);
+                # //todo: maybe need to check new install module version 
+		printResult("OK");
+		return;
         } elsif (eval($statement)) {
 		$statement = '$'.$module."::VERSION";
 		my $currentVersion = eval($statement);
