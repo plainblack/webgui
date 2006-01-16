@@ -11,7 +11,8 @@
 $|=1;
 
 use strict;
-use lib '../..';
+use lib '../lib';
+use File::Find;
 use Getopt::Long;
 
 my $configFile;
@@ -36,15 +37,22 @@ STOP
 	exit;
 }
 
-opendir(DIR,"../t");
-my @files = readdir(DIR);
-closedir(DIR);
-
-chdir("../t");
 my $someTestFailed = 0;
 my @failedModules;
-foreach my $file (@files) {
-	next unless $file =~ m/^(.*?)\.t$/;
+File::Find::find(\&runTests, "../t");
+if ($someTestFailed) {
+	print "\n\n";
+	print "---------------------------------------\n";
+	print " $someTestFailed test modules experienced failures:\n";
+	print "\t".join("\n\t",@failedModules)."\n";
+	print "---------------------------------------\n";
+	print "\n\n";
+}
+exit $someTestFailed;
+
+sub runTests {
+	my $file = $_;
+	return undef unless $file =~ m/^(.*?)\.t$/;
 	my $testType = $1;
 	$testType =~ s/_/ /g;
 	print "Running $testType tests...\n";
@@ -60,13 +68,5 @@ foreach my $file (@files) {
 	}
 	print "\n";
 }
-if ($someTestFailed) {
-	print "\n\n";
-	print "---------------------------------------\n";
-	print " $someTestFailed test modules experienced failures:\n";
-	print "\t".join("\n\t",@failedModules)."\n";
-	print "---------------------------------------\n";
-	print "\n\n";
-}
-exit $someTestFailed;
+
 
