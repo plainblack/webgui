@@ -586,7 +586,7 @@ sub normalTransaction {
 		$self->{_recurring} = 0;
 		$self->{_transactionParams} = {
 			AMT		=> sprintf('%.2f', $normal->{amount}),
-			DESCRIPTION	=> $normal->{description} || $i18n->get('no description'),
+			DESCRIPTION	=> WebGUI::URL::escape($normal->{description}) || $i18n->get('no description'),
 			INVOICENUMBER	=> $normal->{invoiceNumber},
 			ORGID		=> $normal->{id},
 		};
@@ -614,7 +614,7 @@ sub recurringTransaction {
 			INITIALAMT	=> sprintf('%.2f', $initialAmount),
 			TERM		=> $recurring->{term} || 9999,
 			RECIPE		=> _resolveRecipe($recurring->{payPeriod}),
-			DESCRIPTION	=> $recurring->{description} || $i18n->get('no description'),
+			DESCRIPTION	=> WebGUI::URL::escape($recurring->{description}) || $i18n->get('no description'),
 			INVOICENUMBER	=> $recurring->{invoiceNumber},
 			ORGID		=> $recurring->{id},
 		};
