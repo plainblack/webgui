@@ -112,6 +112,7 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 
 sub close {
 	my $self = shift;
+	$self->db->disconnect;
 	##Must destroy the logger last!
 	my %mykeys = grep { ($_ ne '_errorHandler' && $_ ne '_request' && $_ eq '_sessionId' && $_ eq '_server') } keys %{ $self };
 	foreach my $object (keys %mykeys) {

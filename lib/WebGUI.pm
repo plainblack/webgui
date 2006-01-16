@@ -34,7 +34,6 @@ use Apache2::ServerUtil ();
 sub handler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
-	$s->add_version_component("WebGUI/".$WebGUI::VERSION);
 	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
 	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
