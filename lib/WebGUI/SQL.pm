@@ -55,8 +55,6 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  $hashRef = $db->quickHashRef($sql);
  $text = $db->quickTab($sql);
 
- $dbh = $db->getSlave;
-
  $id = $db->getNextId("someId");
  $string = $db->quote($string);
  $string = $db->quoteAndJoin(\@array);

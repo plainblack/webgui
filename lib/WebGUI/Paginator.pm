@@ -536,7 +536,7 @@ A value to match the dynamicPageNumberKey.
 sub setDataByQuery {
 	my ($sth, $rowCount, @row);
 	my ($self, $sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
-	$dbh ||= $self->session->db->getSlave;
+	$dbh ||= $self->session->dbSlave;
 	if ($unconditional) {
 		$sth = $dbh->unconditionalRead($sql,$placeholders);
 		return $sth->errorMessage if ($sth->errorCode > 0);

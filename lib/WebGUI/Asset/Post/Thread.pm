@@ -195,7 +195,7 @@ sub getNextThread {
 						)
 				group by assetData.assetId
 				order by ".$sortBy." asc 
-				",$self->session->db->getSlave);
+				",$self->session->dbSlave);
 		$self->{_next} = WebGUI::Asset->new($id,$class,$version);
 	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
@@ -232,7 +232,7 @@ sub getPreviousThread {
 						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
-				order by ".$sortBy." desc, assetData.revisionDate desc ",$self->session->db->getSlave);
+				order by ".$sortBy." desc, assetData.revisionDate desc ",$self->session->dbSlave);
 		$self->{_previous} = WebGUI::Asset::Post::Thread->new($id,$class,$version);
 	#	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};

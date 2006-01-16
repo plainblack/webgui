@@ -233,7 +233,7 @@ sub getCollateral {
 	if ($keyValue eq "new" || $keyValue eq "") {
 		return {$keyName=>"new"};
 	} else {
-		return $self->session->db->quickHashRef("select * from $table where $keyName=".$self->session->db->quote($keyValue),$self->session->db->getSlave);
+		return $self->session->db->quickHashRef("select * from $table where $keyName=".$self->session->db->quote($keyValue),$self->session->dbSlave);
 	}
 }
 

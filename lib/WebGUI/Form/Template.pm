@@ -93,15 +93,15 @@ Renders a template picker control.
 
 sub toHtml {
 	my $self = shift;
-        my $templateList = WebGUI::Asset::Template->getList($self->get("namespace"));
+        my $templateList = WebGUI::Asset::Template->getList($self->session, $self->get("namespace"));
         #Remove entries from template list that the user does not have permission to view.
         for my $assetId ( keys %{$templateList} ) {
-          	my $asset = WebGUI::Asset::Template->new($assetId);
+          	my $asset = WebGUI::Asset::Template->new($self->session, $assetId);
           	if (!$asset->canView($self->session->user->userId)) {
             		delete $templateList->{$assetId};
           	}
         }
-	$self->get("options") = $templateList;
+	$self->set("options", $templateList);
 	$self->setManageIcons();
 	return $self->SUPER::toHtml();
 }

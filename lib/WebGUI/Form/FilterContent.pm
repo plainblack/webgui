@@ -116,7 +116,7 @@ sub toHtml {
                 'most'=>$i18n->get(421),
                 'all'=>$i18n->get(419)
                 );
-	$self->get("options") = \%filter;
+	$self->set("options", \%filter);
 	return $self->SUPER::toHtml();
 }
 

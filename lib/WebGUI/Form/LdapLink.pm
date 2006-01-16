@@ -114,7 +114,7 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	$self->get("options") = WebGUI::LDAPLink->getList($self->session,);
+	$self->set("options", WebGUI::LDAPLink->getList($self->session));
 	return $self->SUPER::toHtml();
 }
 
@@ -128,7 +128,7 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
         my $self = shift;
-	$self->get("options") = WebGUI::LDAPLink->getList($self->session,);
+	$self->set("options", WebGUI::LDAPLink->getList($self->session));
         return $self->SUPER::toHtmlAsHidden();
 }
 
@@ -148,7 +148,7 @@ sub toHtmlWithWrapper {
 			$subtext = $self->session->icon->edit("op=editLDAPLink;llid=".$self->get("value").";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
 		}
          	$subtext .= $self->session->icon->manage("op=listLDAPLinks");
-		$self->get("subtext") = $subtext . $self->get("subtext");
+		$self->set("subtext", $subtext . $self->get("subtext"));
 	}
 	return $self->SUPER::toHtmlWithWrapper;
 }
