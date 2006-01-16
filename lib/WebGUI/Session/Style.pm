@@ -144,7 +144,7 @@ A reference to the current session.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	bless {_session=>$session}, $class;
 }
 

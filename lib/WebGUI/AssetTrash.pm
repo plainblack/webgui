@@ -79,7 +79,7 @@ sub getAssetsInTrash {
                         assetData.title desc
                         ");
         while (my ($id, $date, $class) = $sth->array) {
-                push(@assets, WebGUI::Asset->new($id,$class,$date));
+                push(@assets, WebGUI::Asset->new($self->session,$id,$class,$date));
         }
 	$sth->finish;
 	return \@assets;
@@ -105,7 +105,7 @@ sub purge {
 	$self->session->db->write("delete from asset where assetId=".$self->session->db->quote($self->getId));
 	$self->session->db->commit;
 	$self->purgeCache;
-	WebGUI::Cache->new->deleteChunk(["asset",$self->getId]);
+	WebGUI::Cache->new($self->session)->deleteChunk(["asset",$self->getId]);
 	$self->updateHistory("purged");
 	$self = undef;
 }
@@ -161,7 +161,7 @@ sub www_deleteList {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $assetId ($self->session->request->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
+		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 		if ($asset->canEdit) {
 			$asset->trash;
 		}
@@ -246,7 +246,7 @@ sub www_restoreList {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
         foreach my $id ($self->session->request->param("assetId")) {
-                my $asset = WebGUI::Asset->newByDynamicClass($id);
+                my $asset = WebGUI::Asset->newByDynamicClass($self->session,$id);
                 $asset->publish;
         }
         if ($self->session->form->process("proceed") ne "") {

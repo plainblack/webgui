@@ -62,7 +62,7 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {

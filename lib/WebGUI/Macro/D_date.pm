@@ -37,7 +37,7 @@ time is used instead.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my (@param, $temp, $time);
         @param = @_;
 	$time = $param[1] ||$session->datetime->time();

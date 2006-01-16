@@ -504,7 +504,7 @@ sub login {
 #-------------------------------------------------------------------
 sub new {
    my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
    my $authMethod = $_[0];
    my $userId = $_[1];
    my @callable = ('validateEmail','createAccount','deactivateAccount','displayAccount','displayLogin','login','logout','recoverPassword','resetExpiredPassword','recoverPasswordFinish','createAccountSave','deactivateAccountConfirm','resetExpiredPasswordSave','updateAccount');
@@ -631,7 +631,7 @@ sub validateEmail {
 	my $self = shift;
 	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=".$self->session->db->quote($self->session->form->process("key"))." and fieldName='emailValidationKey' and authMethod='WebGUI'");
 	if (defined $userId) {
-		my $u = WebGUI::User->new($userId);
+		my $u = WebGUI::User->new($self->session,$userId);
 		$u->status("Active");
 	}
 	return $self->displayLogin;

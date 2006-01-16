@@ -64,7 +64,7 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
@@ -113,6 +113,7 @@ sub toHtml {
 	$self->get("extras") .= ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789:\')"';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new(
+			$self->session,
 			id=>$self->get('id'),
 			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->config->get("extrasURL"). '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>$i18n->get(970)

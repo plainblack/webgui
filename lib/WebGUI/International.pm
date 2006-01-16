@@ -29,9 +29,15 @@ This package provides an interface to the internationalization system.
 =head1 SYNOPSIS
 
  use WebGUI::International;
- my $i = WebGUI::International->new($session, $namespace);
- $hashRef = $i->getLanguage($lang);
- $hashRef = $i->getLanguages();
+ $string = WebGUI::International::get($session,$internationalId,$namespace);
+ $hashRef = WebGUI::International::getLanguage($session,$lang);
+ $hashRef = WebGUI::International::getLanguages($session,);
+ $url = WebGUI::International::makeUrlCompliant($session,$url);
+
+This package can also be used in object-oriented (OO) style.
+
+ use WebGUI::International;
+ my $i = WebGUI::International->new($session,$namespace);
  $string = $i->get($internationalId);
  $url = $i->makeUrlCompliant($url);
 
@@ -181,9 +187,9 @@ sub makeUrlCompliant {
 
 =head2 new ( session, [ namespace, language ] ) 
 
-The constructor for the International function if using it in OO mode.
-Note that namespace and languages are defaults; they may be overridden
-in all accessor methods, (get, getLanguage).
+The constructor for the International function if using it in OO mode.  Note
+that namespace and languages are defaults; they may be overridden in
+all accessor methods, (get, getLanguage).
 
 =head3 session
 

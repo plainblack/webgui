@@ -210,7 +210,7 @@ Defaults to the config filename for the current site. The only reason to overrid
 sub new {
 	my $cache;
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $key = $class->parseKey(shift);
 	my $namespace = shift || $session->config->getFilename;
 	bless {_session=>$session, _key=>$key, _namespace=>$namespace}, $class;

@@ -36,7 +36,7 @@ text to wrap in a link for logging out.
 
 #-------------------------------------------------------------------
 sub _createURL {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $text = shift;
 	return '<a href="'.$session->url->page("op=auth;method=logout").'">'.$text.'</a>';
 }
@@ -61,7 +61,7 @@ The ID of a template for custom layout of the login box and text.
 =cut
 
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my @param = @_;
 	my $templateId = $param[2] || "PBtmpl0000000000000044";
 	my %var;	

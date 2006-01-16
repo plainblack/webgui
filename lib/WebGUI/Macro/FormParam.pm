@@ -32,7 +32,7 @@ The name of the field to pull from the session variable.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->form->process(shift);
 }
 

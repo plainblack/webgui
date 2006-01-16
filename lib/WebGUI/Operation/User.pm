@@ -56,7 +56,7 @@ Help topic.  If set, then a Help icon will be displayed as a link to that topic.
 =cut
 
 sub _submenu {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $workarea = shift;
         my $title = shift;
 	my $i18n = WebGUI::International->new($session);
@@ -105,7 +105,7 @@ Array reference, used to screen out user names via a SQL "not in ()" clause.
 
 #-------------------------------------------------------------------
 sub doUserSearch {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $op = shift;
 	my $returnPaginator = shift;
 	my $userFilter = shift;
@@ -157,7 +157,7 @@ Hashref.  A set of key,value pairs that will be hidden in the user search form.
 
 #-------------------------------------------------------------------
 sub getUserSearchForm {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $op = shift;
 	my $params = shift;
 	$session->scratch->set("userSearchKeyword",$session->form->process("keyword"));
@@ -220,7 +220,7 @@ Allows an administrator to assume another user.
 =cut
 
 sub www_becomeUser {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	$session->user({userId=>$session->form->process("uid")});
 	return "";
@@ -238,7 +238,7 @@ of the user to delete is expected in a URL param names 'uid'.
 =cut
 
 sub www_deleteUser {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my ($output);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session);
@@ -265,7 +265,7 @@ after this.
 =cut
 
 sub www_deleteUserConfirm {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($u);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
@@ -279,7 +279,7 @@ sub www_deleteUserConfirm {
 
 #-------------------------------------------------------------------
 sub www_editUser {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(11));
 	my $error = shift;
 	my $i18n = WebGUI::International->new($session, "WebGUI");
@@ -387,7 +387,7 @@ sub www_editUser {
 
 #-------------------------------------------------------------------
 sub www_editUserSave {
-	my $session = shift;	
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);	
 	my $isAdmin = $session->user->isInGroup(3);
 	my $isSecondary;
 	unless ($isAdmin) {
@@ -427,7 +427,7 @@ sub www_editUserSave {
 
 #-------------------------------------------------------------------
 sub www_editUserKarma {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
 	my $i18n = WebGUI::International->new($session);
@@ -457,7 +457,7 @@ sub www_editUserKarma {
 
 #-------------------------------------------------------------------
 sub www_editUserKarmaSave {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($u);
         $u = WebGUI::User->new($session->form->process("uid"));
@@ -467,7 +467,7 @@ sub www_editUserKarmaSave {
 
 #-------------------------------------------------------------------
 sub www_listUsers {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	unless ($session->user->isInGroup(3)) {
 		if ($session->user->isInGroup(11)) {
 			$session->form->process("uid") = "new";

@@ -360,7 +360,6 @@ sub open {
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId);
-	warn "request = ".$request;
 	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
 	return $self;
 }

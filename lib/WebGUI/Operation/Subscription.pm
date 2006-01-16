@@ -14,7 +14,7 @@ use WebGUI::International;
 
 #-------------------------------------------------------------------
 sub _generateCode {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($codeLength, @codeElements, $code, $i);
 	$codeLength = shift || 64;
 	@codeElements = ('A'..'Z', 'a'..'z', 0..9, '-');
@@ -28,7 +28,7 @@ sub _generateCode {
 
 #-------------------------------------------------------------------
 sub _submenu {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $i18n = WebGUI::International->new($session, "Subscription");
 
 	my $workarea = shift;
@@ -49,7 +49,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatch {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my (%subscriptions, $f, $error, $errorMessage);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
@@ -107,7 +107,7 @@ sub www_createSubscriptionCodeBatch {
 	
 #-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatchSave {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($numberOfCodes, $description, $expires, $batchId, @codeElements, $currentCode, $code, $i, @subscriptions, 
 		@error, $creationEpoch);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
@@ -148,7 +148,7 @@ sub www_createSubscriptionCodeBatchSave {
 
 #-------------------------------------------------------------------
 sub www_deleteSubscription {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	WebGUI::Subscription->new($session,$session->form->process("sid"))->delete;
@@ -157,7 +157,7 @@ sub www_deleteSubscription {
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodeBatch {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	$session->db->write("delete from subscriptionCodeBatch where batchId=".$session->db->quote($session->form->process("bid")));
@@ -168,7 +168,7 @@ sub www_deleteSubscriptionCodeBatch {
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodes {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	if ($session->form->process("selection") eq 'dc') {
@@ -184,7 +184,7 @@ sub www_deleteSubscriptionCodes {
 
 #-------------------------------------------------------------------
 sub www_editSubscription {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($properties, $subscriptionId, $durationInterval, $durationUnits, $f);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
@@ -261,7 +261,7 @@ sub www_editSubscription {
 
 #-------------------------------------------------------------------
 sub www_editSubscriptionSave {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my (@relevantFields);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
@@ -272,7 +272,7 @@ sub www_editSubscriptionSave {
 
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodeBatches {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($p, $batches, $output);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
@@ -302,7 +302,7 @@ sub www_listSubscriptionCodeBatches {
 
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodes {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($p, $codes, $output, $where, $ops, $delete);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 
@@ -384,7 +384,7 @@ sub www_listSubscriptionCodes {
 
 #-------------------------------------------------------------------
 sub www_listSubscriptions {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($p, $subscriptions, $output);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
@@ -413,7 +413,7 @@ sub www_listSubscriptions {
 
 #-------------------------------------------------------------------
 sub www_purchaseSubscription {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("sid"), 'Subscription');
 	
 	return $session->http->setRedirect($session->url->page('op=checkout'));
@@ -421,7 +421,7 @@ sub www_purchaseSubscription {
 
 #-------------------------------------------------------------------
 sub www_redeemSubscriptionCode {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my (%codeProperties, @subscriptions, %var, $f);
 	my $i18n = WebGUI::International->new($session, "Subscription");
 	

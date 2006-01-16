@@ -69,7 +69,7 @@ A hash reference containing the properties of this field. See the set() method f
 
 sub create {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $properties = shift;
         my ($sequenceNumber) = $session->db->quickArray("select max(sequenceNumber) from userProfileCategory");
  	my $id = $session->db->setRow("userProfileCategory","profileCategoryId",{profileCategoryId=>"new", sequenceNumber=>$sequenceNumber+1});
@@ -275,7 +275,7 @@ The unique id of this category.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $id = shift;
 	return undef unless ($id);
 	my $properties = $session->db->getRow("userProfileCategory","profileCategoryId",$id);

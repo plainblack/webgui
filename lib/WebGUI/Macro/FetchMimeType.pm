@@ -35,7 +35,7 @@ A path to a file
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $path = shift;
 	return guess_media_type($path);
 }

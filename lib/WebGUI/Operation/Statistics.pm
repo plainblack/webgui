@@ -18,7 +18,7 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _submenu {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $workarea = shift;
 	my $title = shift;
 	my $i18n = WebGUI::International->new($session);
@@ -33,7 +33,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_viewStatistics {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $data);
 	my $i18n = WebGUI::International->new($session);

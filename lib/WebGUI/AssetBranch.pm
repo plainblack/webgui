@@ -98,7 +98,7 @@ sub www_editBranch {
 	my $ac = WebGUI::AdminConsole->new($self->session,"assets");
 	my $i18n = WebGUI::International->new($self->session,"Asset");
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
-	my $tabform = WebGUI::TabForm->new;
+	my $tabform = WebGUI::TabForm->new($self->session);
 	$tabform->hidden({name=>"func",value=>"editBranchSave"});
 	$tabform->addTab("properties",$i18n->get("properties"),9);
         $tabform->getTab("properties")->readOnly(
@@ -214,7 +214,7 @@ sub www_editBranch {
         }
         my $clause;
         if ($self->session->user->isInGroup(3)) {
-                my $contentManagers = WebGUI::Group->new(4)->getUsers(1);
+                my $contentManagers = WebGUI::Group->new($self->session,4)->getUsers(1);
                 push (@$contentManagers, $self->session->user->userId);
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {

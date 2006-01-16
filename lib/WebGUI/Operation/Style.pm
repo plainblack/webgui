@@ -33,7 +33,7 @@ the printableStyleId is used instead of the normal styleId for the page.
 =cut
 
 sub www_makePrintable {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	if ($session->form->process("styleId") ne "") {
 		$session->asset->{_properties}{printableStyleTemplateId} = $session->form->process("styleId");
 	}
@@ -52,7 +52,7 @@ overriding the style without setting a printable style and on a per user basis.
 =cut
 
 sub www_setPersonalStyle {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$session->scratch->set("personalStyleId",$session->form->process("styleId"));
 	return "";
 }
@@ -66,7 +66,7 @@ Clears the personalStyleId from the scratch area of the session variable.
 =cut
 
 sub www_unsetPersonalStyle {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$session->scratch->delete("personalStyleId");
 	return "";
 }

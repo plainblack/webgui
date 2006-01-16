@@ -34,7 +34,7 @@ used as a default.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my ($temp, @param);
         @param = @_;
         if ($param[0] ne "") {

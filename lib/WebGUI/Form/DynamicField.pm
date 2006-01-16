@@ -55,7 +55,7 @@ Defaults to "Text". Should be any valid field type.
 
 sub definition {
         my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
         push(@{$definition}, {
@@ -97,7 +97,7 @@ array will be used.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my %raw = @_;
 	my $param = \%raw;
         my $fieldType = ucfirst($param->{fieldType});

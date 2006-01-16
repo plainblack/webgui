@@ -457,7 +457,7 @@ Specify the form variable the paginator should use in it's links.  Defaults to "
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $currentURL = shift;
 	my $rowsPerPage = shift || 25;
 	my $formVar = shift || "pn";

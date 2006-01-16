@@ -29,7 +29,7 @@ Returns the userId from the session variable for the current user.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->user->userId;
 }
 

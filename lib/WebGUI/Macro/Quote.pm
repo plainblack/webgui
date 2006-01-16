@@ -32,7 +32,7 @@ The text to quote.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->db->quote(shift);
 	
 }

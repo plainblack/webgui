@@ -98,7 +98,7 @@ A reference to the current session.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	bless {_session=>$session}, $class;
 }
 
@@ -149,7 +149,7 @@ sub process {
 	my $value;
 	$type = ucfirst($type);
 	$type = "Text" if ($type eq "");
-	$value = $self->$type($self->session,$name);
+	$value = $self->$type($name);
 	unless (defined $value) {
 		return $default;
 	}

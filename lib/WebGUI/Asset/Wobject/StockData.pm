@@ -269,7 +269,7 @@ defines wobject properties for Stock Data instances
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift;
 	my $properties = {
 		templateId =>{

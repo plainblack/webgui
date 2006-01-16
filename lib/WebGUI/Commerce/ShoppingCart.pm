@@ -64,7 +64,7 @@ sub add {
 	$itemType = shift;
 	$quantity = shift || 1;
 
-	$item = WebGUI::Commerce::Item->new($itemId, $itemType);
+	$item = WebGUI::Commerce::Item->new($self->session,$itemId, $itemType);
 	return "" unless ($item->available);
 	
 	$self->{_items}{$itemId."_".$itemType} = {
@@ -209,7 +209,7 @@ sub getItems {
 	$periodResolve = WebGUI::Commerce::Payment::recurringPeriodValues($self->session);
 	%cartContent = %{$self->{_items}};
 	foreach (values(%cartContent)) {
-		$item = WebGUI::Commerce::Item->new($_->{itemId}, $_->{itemType});
+		$item = WebGUI::Commerce::Item->new($self->session,$_->{itemId}, $_->{itemType});
 		$properties = {
 			quantity        => $_->{quantity},
 			period          => lc($periodResolve->{$item->duration}),

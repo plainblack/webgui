@@ -16,8 +16,8 @@ use WebGUI::HTMLForm;
 
 #-------------------------------------------------------------------
 sub www_formAssetTree {
-	my $session = shift;
-	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
@@ -46,7 +46,7 @@ sub www_formAssetTree {
 #-------------------------------------------------------------------
 
 sub www_richEditPageTree {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
@@ -80,7 +80,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
     }
 }
 </script><fieldset><legend>Pages</legend> ';
-	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
+	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
@@ -100,8 +100,8 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 
 #-------------------------------------------------------------------
 sub www_richEditImageTree {
-	my $session = shift;
-	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
@@ -125,8 +125,8 @@ sub www_richEditImageTree {
 
 #-------------------------------------------------------------------
 sub www_richEditViewThumbnail {
-	my $session = shift;
-	my $image = WebGUI::Asset->newByUrl;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $image = WebGUI::Asset->newByUrl($session);
 	$session->style->useEmptyStyle("1");
 	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {
 		my $output = '<div align="center">';

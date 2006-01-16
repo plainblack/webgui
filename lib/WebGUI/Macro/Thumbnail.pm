@@ -32,7 +32,7 @@ Image Asset can be found with that URL, then undef will be returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $url = shift;
 	if (my $image = WebGUI::Asset::File::Image->newByUrl($session,$url)) {
 	        return $image->getThumbnailUrl;

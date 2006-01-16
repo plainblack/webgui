@@ -29,7 +29,7 @@ the data stored in $session .  If the field does not exist, undef is returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return  $session->user->profileField(shift);
 }
 

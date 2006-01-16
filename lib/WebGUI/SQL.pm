@@ -217,7 +217,7 @@ The password to use to connect to the database defined by dsn.
 
 sub connect {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $dsn = shift;
 	my $user = shift;
 	my $pass = shift;

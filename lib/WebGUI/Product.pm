@@ -129,7 +129,7 @@ sub getByOptionId {
 	my ($class, $optionId, $productId);
 
 	$class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$optionId = shift;
 	
 
@@ -145,7 +145,7 @@ sub getByOptionId {
 sub getByParameterId {
 	my ($class, $parameterId, $productId);
 	$class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$parameterId = shift;
 	
 	($productId) = $session->db->quickArray("select productId from productParameters where parameterId=".$session->db->quote($parameterId));
@@ -157,7 +157,7 @@ sub getByParameterId {
 sub getByVariantId {
 	my ($class, $productId, $variantId);
 	$class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$variantId = shift;
 
 	($productId) = $session->db->quickArray("select productId from productVariants where variantId=".$session->db->quote($variantId));
@@ -202,7 +202,7 @@ sub getVariant {
 sub new {
 	my ($class, $productId, $properties, $parameters, $variants, $options, $sth, %row, $option, $new);
 	$class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$productId = shift;
 	$session->errorHandler->fatal('no productId') unless ($productId);
 	$parameters = {};

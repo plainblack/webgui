@@ -49,7 +49,7 @@ is used.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my ($temp, @param, $styleId);
         @param = @_;
 	my $append = 'op=makePrintable';

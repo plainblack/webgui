@@ -43,7 +43,7 @@ An optional template for formatting the text and link.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my @param = @_;
 	return "" if ($param[0] eq "");
 	return "" if ($param[1] eq "");

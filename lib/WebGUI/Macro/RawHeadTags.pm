@@ -32,7 +32,7 @@ Text that will be added to the HEAD tags for this page.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$session->style->setRawHeadTags(shift);
 	return "";
 }

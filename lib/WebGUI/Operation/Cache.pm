@@ -45,7 +45,7 @@ is looked up in the i18n table in the WebGUI namespace.
 =cut
 
 sub _submenu {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $workarea = shift;
 	my $title = shift;
 	my $i18n = WebGUI::International->new($session);
@@ -74,7 +74,7 @@ Text description of how long the subscription lasts.
 =cut
 
 sub www_flushCache {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $cache = WebGUI::Cache->new($session,);
 	$cache->flush;
@@ -91,7 +91,7 @@ provides an option to clear the cache.
 =cut
 
 sub www_manageCache {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $data);
 	my $cache = WebGUI::Cache->new($session);

@@ -32,7 +32,7 @@ variable, scratchName.
 =cut
 
 sub www_deleteScratch {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$session->scratch->delete("www_".$session->form->process("scratchName"));
 	return "";
 }
@@ -49,7 +49,7 @@ the value the variable should take.
 =cut
 
 sub www_setScratch {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$session->scratch->set("www_".$session->form->process("scratchName"),$session->form->process("scratchValue"));
 	return "";
 }

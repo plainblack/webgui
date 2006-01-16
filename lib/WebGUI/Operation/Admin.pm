@@ -32,9 +32,9 @@ If the current user is in the Turn On Admin Group, then return an Admin Console.
 =cut
 
 sub www_adminConsole {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return "" unless ($session->user->isInGroup(12));
-	my $ac = WebGUI::AdminConsole->new;
+	my $ac = WebGUI::AdminConsole->new($session);
 	return $ac->render;
 }
 
@@ -49,7 +49,7 @@ via WebGUI::Session::switchAdminOff()
 =cut
 
 sub www_switchOffAdmin {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return "" unless ($session->user->isInGroup(12));
 	WebGUI::Session::switchAdminOff();
 	return "";
@@ -65,7 +65,7 @@ via WebGUI::Session::switchAdminOn()
 =cut
 
 sub www_switchOnAdmin {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return "" unless ($session->user->isInGroup(12));
 	WebGUI::Session::switchAdminOn();
 	return "";

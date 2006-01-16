@@ -41,7 +41,7 @@ defines wobject properties for WeatherData instances
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, "Asset_WeatherData");
 	my $properties = {

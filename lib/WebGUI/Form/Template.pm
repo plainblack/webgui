@@ -63,7 +63,7 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, 'Asset_Template');
 	push(@{$definition}, {
@@ -131,7 +131,7 @@ editing the template show up if the user is allowed to do that.
 
 sub setManageIcons {
 	my $self = shift;
-	my $template = WebGUI::Asset::Template->new($self->get('value'));
+	my $template = WebGUI::Asset::Template->new($self->session,$self->get('value'));
         if (defined $template && $template->canEdit) {
                 my $returnUrl;
                 if (defined $self->session->asset && ref $self->session->asset eq "WebGUI::Asset::Template") {

@@ -33,7 +33,7 @@ URL to the javascript to include in the page's header tags.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$session->style->setScript(shift,{type=>'text/javascript'});
 	return "";
 }

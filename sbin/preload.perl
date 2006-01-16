@@ -53,6 +53,9 @@ foreach my $package (@modules) {
 	eval($use);
 }
 
+use Apache2::ServerUtil ();
+Apache2::ServerUtil->server->add_version_component("WebGUI/".$WebGUI::VERSION);
+
 
 #----------------------------------------
 # Preload all site configs.

@@ -48,7 +48,7 @@ The name of the operation to execute.
 =cut
 
 sub execute {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $op = shift;
 	my ($output, $cmd);
 	my $operation = getOperations();

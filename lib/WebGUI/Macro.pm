@@ -118,7 +118,7 @@ A scalar reference of HTML to be processed.
 =cut
 
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
    	my $content = shift;
    	while ($$content =~ /$nestedMacro/gs) {
       		my ($macro, $searchString, $params) = ($1, $2, $3);

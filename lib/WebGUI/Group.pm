@@ -431,7 +431,7 @@ The name of the group you wish to instantiate.
 
 sub find {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $name = shift;
 	my ($groupId) = $session->db->quickArray("select groupId from groups where groupName=".$session->db->quote($name));
 	return WebGUI::Group->new($session,$groupId);

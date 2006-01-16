@@ -54,7 +54,7 @@ The assetId to add.
 =cut
 
 sub add {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return unless ($session->setting->get("passiveProfilingEnabled"));
 	my $assetId = shift;
 	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry)
@@ -84,7 +84,7 @@ The assetId of the page you want to log.
 =cut
 
 sub addPage {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return unless ($session->setting->get("passiveProfilingEnabled"));
 	my $pageId = shift;
 	my @wids = $session->db->buildArray("select assetId from asset where parentId=".$session->db->quote($pageId));
@@ -112,7 +112,7 @@ A hashRef with userId and assetId.
 =cut
 
 sub summarizeAOI {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $data = shift;
 	my $sql = "
 		select f.fieldName, 

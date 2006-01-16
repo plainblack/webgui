@@ -28,7 +28,7 @@ returns the companyName from the session variable.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->setting->get("companyName");
 }
 

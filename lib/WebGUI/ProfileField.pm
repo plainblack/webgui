@@ -80,7 +80,7 @@ The unique id of the category to assign this field to. Defaults to "1" (misc).
 
 sub create {
         my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $fieldName = shift;
         my $properties = shift;
 	my $categoryId = shift || "1";
@@ -154,11 +154,11 @@ sub formField {
 	}
 	$properties->{value} = $default;
 	if ($withWrapper == 1) {
-		return WebGUI::Form::DynamicField->new(%{$properties})->displayFormWithWrapper;
+		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayFormWithWrapper;
 	} elsif ($withWrapper == 2) {
-		return WebGUI::Form::DynamicField->new(%{$properties})->displayValue;
+		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayValue;
 	} else {
-		return WebGUI::Form::DynamicField->new(%{$properties})->displayForm;
+		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayForm;
 	}
 }
 
@@ -412,7 +412,7 @@ The unique name of this field.
 
 sub new {
         my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $id = shift;
         return undef unless ($id);
         my $properties = $session->db->getRow("userProfileField","fieldName",$id);

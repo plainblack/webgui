@@ -41,7 +41,7 @@ Text to be shown to someone not in the group.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my @param = @_;
 	my ($groupId) = $session->dbSlave->quickArray("select groupId from groups where groupName=".$session->db->quote($param[0]));
 	$groupId = 3 if ($groupId eq "");

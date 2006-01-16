@@ -29,7 +29,7 @@ Returns the extrasURL.  A trailing slash '/' is appended to the URL.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->config->get("extrasURL")."/";
 }
 

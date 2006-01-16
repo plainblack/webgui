@@ -32,7 +32,7 @@ sub appendPostListTemplateVars {
 	my $page = $p->getPageData;
 	my $i = 0;
 	foreach my $row (@$page) {
-		my $post = WebGUI::Asset->new($row->{assetId}, $row->{className}, $row->{revisionDate});
+		my $post = WebGUI::Asset->new($self->session,$row->{assetId}, $row->{className}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
 		my $controls = $self->session->icon->delete('func=delete',$post->get("url"),"Delete").$self->session->icon->edit('func=edit',$post->get("url"));
 		if ($self->get("sortBy") eq "lineage") {
@@ -253,7 +253,7 @@ sub decrementThreads {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Collaboration");
         push(@{$definition}, {

@@ -34,7 +34,7 @@ they used.
 =cut
 
 sub www_viewLoginHistory {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($output, $p, @row, $i, $sth, %data);
 	my $i18n = WebGUI::International->new($session);

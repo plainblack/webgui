@@ -66,7 +66,7 @@ sub addRevision {
                         $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".$self->session->db->quote($self->getId).",".$now.")");
                 }
         }               
-        my $newVersion = WebGUI::Asset->new($self->getId, $self->get("className"), $now);
+        my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
 	$newVersion->setVersionLock unless ($self->session->setting->get("autoCommit"));
@@ -147,7 +147,7 @@ sub commitVersionTag {
 	my $tagId = shift;
 	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=".$self->session->db->quote($tagId));
 	while (my ($id,$class,$version) = $sth->array) {
-		WebGUI::Asset->new($id,$class,$version)->commit;
+		WebGUI::Asset->new($self->session,$id,$class,$version)->commit;
 	}
 	$sth->finish;
 	$self->session->db->write("update assetVersionTag set isCommitted=1, commitDate=".$self->session->datetime->time().", committedBy=".$self->session->db->quote($self->session->user->userId)." where tagId=".$self->session->db->quote($tagId));
@@ -235,7 +235,7 @@ sub rollbackToTime {
 	}
 	my $sth = $self->session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.revisionDate > ".$toTime." order by assetData.revisionDate desc");
 	while (my ($class, $id, $revisionDate) = $sth->array) {
-		my $revision = WebGUI::Asset->new($id, $class, $revisionDate);
+		my $revision = WebGUI::Asset->new($self->session,$id, $class, $revisionDate);
 		$revision->purgeRevision;
 	}
 	$sth->finish;
@@ -267,7 +267,7 @@ sub rollbackVersionTag {
 	}
 	my $sth = $self->session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ".$self->session->db->quote($tagId)." order by assetData.revisionDate desc");
 	while (my ($class, $id, $revisionDate) = $sth->array) {
-		my $revision = WebGUI::Asset->new($id, $class, $revisionDate);
+		my $revision = WebGUI::Asset->new($self->session,$id, $class, $revisionDate);
 		$revision->purgeRevision;
 	}
 	$sth->finish;
@@ -414,7 +414,7 @@ sub www_manageCommittedVersions {
         my $self = shift;
         my $ac = WebGUI::AdminConsole->new($self->session,"versions");
         return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-        my $i18n = WebGUI::International->new("Asset");
+        my $i18n = WebGUI::International->new($self->session,"Asset");
 	my $rollback = $i18n->get('rollback');
 	my $rollbackPrompt = $i18n->get('rollback version tag confirm');
         $ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
@@ -423,7 +423,7 @@ sub www_manageCommittedVersions {
         <tr><th>Tag Name</th><th>Committed On</th><th>Committed By</th><th></th></tr> ';
         my $sth = $self->session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
         while (my ($id,$name,$date,$by) = $sth->array) {
-                my $u = WebGUI::User->new($by);
+                my $u = WebGUI::User->new($self->session,$by);
                 $output .= '<tr>
 			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
 			<td>'.$self->session->datetime->epochToHuman($date).'</td>
@@ -446,9 +446,9 @@ Shows a list of the revisions for this asset.
 
 sub www_manageRevisions {
         my $self = shift;
-        my $ac = WebGUI::AdminConsole->new("versions");
+        my $ac = WebGUI::AdminConsole->new($self->session,"versions");
         return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-        my $i18n = WebGUI::International->new("Asset");
+        my $i18n = WebGUI::International->new($self->session,"Asset");
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Revision Date</th><th>Revised By</th><th>Tag Name</th></tr> ';
         my $sth = $self->session->db->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData 
@@ -477,9 +477,9 @@ Shows a list of the currently available asset version tags.
 
 sub www_manageVersions {
 	my $self = shift;
-        my $ac = WebGUI::AdminConsole->new("versions");
+        my $ac = WebGUI::AdminConsole->new($self->session,"versions");
         return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-	my $i18n = WebGUI::International->new("Asset");
+	my $i18n = WebGUI::International->new($self->session,"Asset");
 	$ac->setHelp("versions manage");
 	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
@@ -494,7 +494,7 @@ sub www_manageVersions {
 	<tr><th></th><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
 	my $sth = $self->session->db->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
 	while (my ($id,$name,$date,$by) = $sth->array) {
-		my $u = WebGUI::User->new($by);
+		my $u = WebGUI::User->new($self->session,$by);
 		$output .= '<tr>
 			<td>'.$self->session->icon->delete("func=rollbackVersionTag;tagId=".$id,$self->get("url"),$rollbackPrompt).'</td>
 			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
@@ -514,9 +514,9 @@ sub www_manageVersions {
 
 sub www_manageRevisionsInTag {
 	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new("versions");
+	my $ac = WebGUI::AdminConsole->new($self->session,"versions");
         return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-        my $i18n = WebGUI::International->new("Asset");
+        my $i18n = WebGUI::International->new($self->session,"Asset");
 	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
         $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
@@ -528,7 +528,7 @@ sub www_manageRevisionsInTag {
 		where assetData.tagId=".$self->session->db->quote($self->session->form->process("tagId")));
 	foreach my $row (@{$p->getPageData}) {
         	my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
-		my $asset = WebGUI::Asset->new($id,$class,$date);
+		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
                 $output .= '<tr><td>'.$self->session->icon->delete("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$self->session->form->process("tagId").";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td>'.$asset->getTitle.'</td>
 			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
@@ -548,7 +548,7 @@ sub www_purgeRevision {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $revisionDate = $self->session->form->process("revisionDate");
 	return undef unless $revisionDate;
-	WebGUI::Asset->new($self->getId,$self->get("className"),$revisionDate)->purgeRevision;
+	WebGUI::Asset->new($self->session,$self->getId,$self->get("className"),$revisionDate)->purgeRevision;
 	if ($self->session->form->process("proceed") eq "manageRevisionsInTag") {
 		return $self->www_manageRevisionsInTag;
 	}
@@ -601,7 +601,7 @@ sub www_setVersionTag () {
 
 sub www_viewRevision {
 	my $self = shift;
-	my $otherSelf = WebGUI::Asset->new($self->getId,$self->get("className"),$self->session->form->process("revisionDate"));
+	my $otherSelf = WebGUI::Asset->new($self->session,$self->getId,$self->get("className"),$self->session->form->process("revisionDate"));
 	return (defined $otherSelf) ? $otherSelf->www_view : undef;
 }
 

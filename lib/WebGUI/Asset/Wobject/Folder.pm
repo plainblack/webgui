@@ -55,7 +55,7 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Folder");
         push(@{$definition}, {

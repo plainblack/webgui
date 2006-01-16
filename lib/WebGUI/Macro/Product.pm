@@ -27,7 +27,7 @@ is left blank, a default template from the Macro/Product namespace will be used.
 =cut
 
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my (@param, $productId, $variantId, $product, $variant, $output, $templateId, @variantLoop, %var);
 	
 	@param = @_;

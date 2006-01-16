@@ -60,7 +60,7 @@ An array of hashes to prepend to the list
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,'Wobject');
 	my %properties;

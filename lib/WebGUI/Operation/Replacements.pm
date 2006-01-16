@@ -18,7 +18,7 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub _submenu {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $workarea = shift;
         my $title = shift;
 	my $i18n = WebGUI::International->new($session);
@@ -36,7 +36,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_deleteReplacement {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	$session->db->write("delete from replacements where replacementId=".$session->db->quote($session->form->process("replacementId")));
 	return www_listReplacements();
@@ -44,7 +44,7 @@ sub www_deleteReplacement {
 
 #-------------------------------------------------------------------
 sub www_editReplacement {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $data = $session->db->getRow("replacements","replacementId",$session->form->process("replacementId"));
 	my $i18n = WebGUI::International->new($session);
@@ -79,7 +79,7 @@ sub www_editReplacement {
 
 #-------------------------------------------------------------------
 sub www_editReplacementSave {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	$session->db->setRow("replacements","replacementId",{
 		replacementId=>$session->form->process("replacementId"),
@@ -91,7 +91,7 @@ sub www_editReplacementSave {
 
 #-------------------------------------------------------------------
 sub www_listReplacements {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session);
 	my $output = '<table>';

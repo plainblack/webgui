@@ -35,7 +35,7 @@ Base class for all form field objects. Never use this class directly.
 Subclasses will look like this:
 
  use WebGUI::Form::subclass;
- my $obj = WebGUI::Form::subclass->new(%params);
+ my $obj = WebGUI::Form::subclass->new($session,%params);
 
  my $html = $obj->toHtml;
  my $html = $obj->toHtmlAsHidden;
@@ -149,7 +149,7 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift || [];
 	push(@{$definition}, {
 		formName=>{
@@ -304,7 +304,7 @@ Returns a human readable name for this form control type. You MUST override this
 
 sub getName {
 	my $self = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = $self->definition($session);
 	return $definition->[0]->{formName}->{defaultValue};
 }
@@ -397,6 +397,7 @@ Retrieves a value from a form GET or POST and returns it. If the value comes bac
 
 sub getValueFromPost {
 	my $self = shift;
+	$self->session->errorHandler->warn("trying to get ".$self->get("name"));
 	my $formValue = $self->session->request->param($self->get("name"));
 	if (defined $formValue) {
 		return $formValue;
@@ -430,7 +431,7 @@ Please note that an id attribute is automatically added to every form element wi
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my %raw;
 	# deal with a hash reference full of properties
 	if (ref $_[0] eq "HASH") {

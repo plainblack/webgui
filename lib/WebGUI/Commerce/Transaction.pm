@@ -87,7 +87,7 @@ sub completeTransaction {
 	$self = shift;
 
 	foreach (@{$self->getItems}) {
-		$item = WebGUI::Commerce::Item->new($_->{itemId}, $_->{itemType});
+		$item = WebGUI::Commerce::Item->new($self->session,$_->{itemId}, $_->{itemType});
 		$item->handler;
 	}
 
@@ -414,7 +414,7 @@ sub new {
 	my ($class, $transactionId, $gatewayId, $userId, $properties, $sth, $row, @items);
 	
 	$class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$transactionId = shift;
 	$gatewayId = shift;
 	$userId = shift || $session->user->userId;

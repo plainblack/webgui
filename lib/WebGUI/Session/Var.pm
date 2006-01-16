@@ -159,7 +159,7 @@ A reference to the session.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $self = bless {_session=>$session}, $class;
 	my $sessionId = shift || $session->http->getCookies->{"wgSession"};
         if ($sessionId eq "") {

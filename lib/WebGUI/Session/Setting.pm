@@ -114,7 +114,7 @@ A reference to the current WebGUI::Session.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $settings = $session->db->buildHashRef("select * from settings");
 	bless {_settings=>$settings, _session=>$session}, $class;
 }

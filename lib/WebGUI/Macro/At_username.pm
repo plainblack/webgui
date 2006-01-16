@@ -26,7 +26,7 @@ Macro for displaying the current User's username.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->user->username;
 }
 

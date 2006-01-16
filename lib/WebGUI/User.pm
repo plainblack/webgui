@@ -30,7 +30,7 @@ This package provides an object-oriented way of managing WebGUI users as well as
 =head1 SYNOPSIS
 
  use WebGUI::User;
- $u = WebGUI::User->new(3); or  $f = WebGUI::User->new("new");
+ $u = WebGUI::User->new($session,3); or  $f = WebGUI::User->new($session,"new");
 
  $authMethod =		$u->authMethod("WebGUI");
  $dateCreated = 	$u->dateCreated;
@@ -54,7 +54,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $userId = shift || $session->id->generate();
 	$session->db->write("insert into users (userId,dateCreated) values (".$session->db->quote($userId).",".time().")");
 	WebGUI::Group->new($session,[2])->addUsers([$userId]);
@@ -464,7 +464,7 @@ A unique ID to use instead of the ID that WebGUI will generate for you. It must 
 
 sub new {
         my $class = shift;
-        my $session = shift;
+        my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $userId = shift || 1;
 	my $overrideId = shift;
         $userId = _create($session, $overrideId) if ($userId eq "new");

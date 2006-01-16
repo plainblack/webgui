@@ -38,7 +38,7 @@ sub cancelRecurringPayment {
 		$self->{_recurring} = 1;
 
 		my $itemProperties = $recurring->{transaction}->getItems->[0];
-		my $item = WebGUI::Commerce::Item->new($itemProperties->{itemId}, $itemProperties->{itemType});
+		my $item = WebGUI::Commerce::Item->new($self->session,$itemProperties->{itemId}, $itemProperties->{itemType});
 		my $recipe = _resolveRecipe($item->duration);
 		    
 		# Set up a user agent that uses cookies and allows POST redirects
@@ -479,7 +479,7 @@ sub confirmRecurringTransaction {
 	
 	my $transaction = WebGUI::Commerce::Transaction->getByGatewayId($self->session->form->process("orig_xid"), $self->namespace);
 	my $itemProperties = $transaction->getItems->[0];
-	my $item = WebGUI::Commerce::Item->new($itemProperties->{itemId}, $itemProperties->{itemType});
+	my $item = WebGUI::Commerce::Item->new($self->session,$itemProperties->{itemId}, $itemProperties->{itemType});
 	
 	my $startEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $self->session->form->process("start_date"))));
 	my $currentEpoch = $self->session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $self->session->form->process("when"))));
@@ -802,7 +802,7 @@ sub validateFormData {
 	my ($self, @error, $i18n, $currentYear, $currentMonth);
 	$self = shift;
 
-	$i18n = WebGUI::International->new('CommercePaymentITransact');
+	$i18n = WebGUI::International->new($self->session,'CommercePaymentITransact');
 
 	push (@error, $i18n->get('invalid firstName')) unless ($self->session->form->process("firstName"));
 	push (@error, $i18n->get('invalid lastName')) unless ($self->session->form->process("lastName"));

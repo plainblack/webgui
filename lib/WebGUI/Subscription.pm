@@ -61,7 +61,7 @@ sub apply {
 	$group->addUsers([$userId], $self->_getDuration($self->{_properties}{duration}));
 
 	# Add karma
-	WebGUI::User->new($userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});
+	WebGUI::User->new($self->session,$userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});
 
 	# Process executeOnPurchase field
 	my $command = $self->{_properties}{executeOnSubscription};
@@ -127,7 +127,7 @@ from the database.
 sub new {
 	my ($class, $subscriptionId, %properties);
 	$class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$subscriptionId = shift;
 
 	if ($subscriptionId eq 'new') {

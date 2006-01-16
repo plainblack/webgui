@@ -125,7 +125,7 @@ A reference to the session.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	bless {_session=>$session}, $class;
 }
 

@@ -242,7 +242,7 @@ The base URL to use. Defaults to current page's url.
 my $absolute = "";
                                                                                                  
 sub makeAbsolute {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $html = shift;
 	my $baseURL = shift; 
 
@@ -321,7 +321,7 @@ The content to be processed through the replacements filter.
 =cut
 
 sub processReplacements {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($content) = @_;
 	my $replacements = $session->stow->get("replacements");
 	if (defined $replacements) {

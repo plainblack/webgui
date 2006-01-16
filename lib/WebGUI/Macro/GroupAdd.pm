@@ -44,7 +44,7 @@ An optional template for formatting the text and link.
 #-------------------------------------------------------------------
 sub process {
 	my @param = @_;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return "" if ($param[0] eq "");
 	return "" if ($param[1] eq "");
 	return "" if ($session->user->userId eq '1');

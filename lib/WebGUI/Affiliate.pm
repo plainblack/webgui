@@ -49,7 +49,7 @@ A reference to the current session.
 =cut
 
 sub grabReferral {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	if ($session->user->userId ne "1" && $session->user->referringAffiliate) {
 		return "";
 	} elsif ($session->user->userId ne "1" && (($session->user->referringAffiliate eq "0" && $session->scratch->process("referringAffiliate")) || $session->form->process("affiliateId"))) {

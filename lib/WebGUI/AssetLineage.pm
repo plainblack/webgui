@@ -59,7 +59,7 @@ sub addChild {
 	$self->session->db->beginTransaction;
 	my $now =$self->session->datetime->time();
 	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".$self->session->db->quote($id).",".$self->session->db->quote($self->getId).", ".$self->session->db->quote($lineage).", ".$now.", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($properties->{className}).", 'published')");
-	my $temp = WebGUI::Asset->newByPropertyHashRef({
+	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,{
 		assetId=>$id,
 		className=>$properties->{className}
 		});
@@ -93,7 +93,7 @@ sub cascadeLineage {
 	my $now =$self->session->datetime->time();
         my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
 	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ".$self->session->db->quote($oldLineage.'%'));
-	my $cache = WebGUI::Cache->new;
+	my $cache = WebGUI::Cache->new($self->session);
 	while (my ($assetId, $lineage) = $descendants->array) {
 		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
 		$prepared->execute([$fixedLineage,$assetId]);
@@ -162,7 +162,7 @@ sub getFirstChild {
 				$self->session->stow->set("assetLineage", $assetLineage);
 			}
 		}
-		$self->{_firstChild} = WebGUI::Asset->newByLineage($lineage);
+		$self->{_firstChild} = WebGUI::Asset->newByLineage($self->session,$lineage);
 	}
 	return $self->{_firstChild};
 }
@@ -186,7 +186,7 @@ sub getLastChild {
 			$assetLineage->{lastChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
-		$self->{_lastChild} = WebGUI::Asset->newByLineage($lineage);
+		$self->{_lastChild} = WebGUI::Asset->newByLineage($self->session,$lineage);
 	}
 	return $self->{_lastChild};
 }
@@ -429,7 +429,7 @@ Returns an asset hash of the parent of current Asset.
 sub getParent {
 	my $self = shift;
 	return $self if ($self->getId eq "PBasset000000000000001");
-	$self->{_parent} = WebGUI::Asset->newByDynamicClass($self->get("parentId")) unless (exists $self->{_parent});
+	$self->{_parent} = WebGUI::Asset->newByDynamicClass($self->session,$self->get("parentId")) unless (exists $self->{_parent});
 	return $self->{_parent};
 }
 
@@ -515,7 +515,7 @@ Lineage string.
 
 sub newByLineage {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $lineage = shift;
 	my $assetLineage = $session->stow->get("assetLineage");
 	my $id = $assetLineage->{$lineage}{id};

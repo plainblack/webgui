@@ -92,7 +92,7 @@ sub addRevision {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Product");
 	push(@{$definition}, {
@@ -813,7 +813,7 @@ sub view {
       $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),$i18n->get(2))
                  .$self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get("url"))
                  .$self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get("url"));
-		my $accessory = WebGUI::Asset->newByDynamicClass($id);
+		my $accessory = WebGUI::Asset->newByDynamicClass($self->session,$id);
 	  push(@accessoryloop,{
 			               "accessory.URL"=>$accessory->getUrl,
 			               "accessory.title"=>$accessory->getTitle,
@@ -834,7 +834,7 @@ sub view {
       $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),$i18n->get(4))
                  .$self->session->icon->moveUp('func=moveRelatedUp&rid='.$id,$self->get("url"))
                  .$self->session->icon->moveDown('func=moveRelatedDown&rid='.$id,$self->get("url"));
-		my $related = WebGUI::Asset->newByDynamicClass($id);
+		my $related = WebGUI::Asset->newByDynamicClass($self->session,$id);
       push(@relatedloop,{
 			              "relatedproduct.URL"=>$related->getUrl,
 			              "relatedproduct.title"=>$related->getTitle,

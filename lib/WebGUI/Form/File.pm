@@ -63,7 +63,7 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
@@ -106,7 +106,7 @@ sub displayForm {
 		my $action = join '_', '_', $self->get("name"), 'delete';
 		$fileForm .= $i18n->get(392)
 			  .  "&nbsp"x4
-			  . WebGUI::Form::YesNo->new({-name=>$action, -value=>0})->toHtml;
+			  . WebGUI::Form::YesNo->new($self->session,{-name=>$action, -value=>0})->toHtml;
 	}
 	my $hid = $self->toHtmlAsHidden();
 	$fileForm .= $hid;

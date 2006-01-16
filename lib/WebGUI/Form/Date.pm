@@ -72,7 +72,7 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
@@ -170,7 +170,7 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 
 sub toHtmlAsHidden {
         my $self = shift;
-        return WebGUI::Form::Hidden->new(
+        return WebGUI::Form::Hidden->new($self->session,
                 name=>$self->get("name"),
                 value=>$self->session->datetime->epochToSet($self->get("value"))
                 )->toHtmlAsHidden;

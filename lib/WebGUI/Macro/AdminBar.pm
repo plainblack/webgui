@@ -41,7 +41,7 @@ Admin bar to the left of the screen.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return "" unless ($session->var->isAdminOn);
 	my @param = @_;
         my $templateId = $param[0] || "PBtmpl0000000000000090";

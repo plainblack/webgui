@@ -18,7 +18,7 @@ use Safe;
 
 #-------------------------------------------------------------------
  sub accountOptions {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $i18n = WebGUI::International->new($session);
 	my @array;
 	if ($session->user->isInGroup(12)) {
@@ -69,7 +69,7 @@ use Safe;
 #-------------------------------------------------------------------
 # This function is here to replace the dangerous eval calls in the User Profile System.
 sub secureEval {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $code = shift;
 
 	# Handle WebGUI function calls

@@ -69,7 +69,7 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
         my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
         push(@{$definition}, {
@@ -118,9 +118,9 @@ sub toHtml {
 	my $self = shift;
         $self->session->style->setScript($self->session->config->get("extrasURL").'/textFix.js',{ type=>'text/javascript' });
 	$self->get("extras") .= ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ';	
-	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->get("richEditId"))->getRichEditor($self->get('id'));
+	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"))->getRichEditor($self->get('id'));
 	my $i18n = WebGUI::International->new($self->session);
-	my $richEdit = WebGUI::Asset::RichEdit->new($self->get("richEditId"));
+	my $richEdit = WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"));
         if (defined $richEdit) {
                 return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
         } else {

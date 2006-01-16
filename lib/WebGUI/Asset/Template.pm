@@ -44,18 +44,8 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
-sub _getTemplateFile {
-	my $templateId = shift;
-	my $filename = $templateId.".tmpl";
-	$filename =~ s/\//-/g;
-	$filename =~ s/ /-/g;
-	return WebGUI::Attachment->new($filename,"temp","templates");
-}
-
-
-#-------------------------------------------------------------------
 sub _execute {
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $params = shift;
 	my $vars = shift;
 	my $t;
@@ -97,7 +87,7 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session, 'Asset_Template');
         push(@{$definition}, {
@@ -201,7 +191,7 @@ Specify the namespace to build the list for.
 
 sub getList {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $namespace = shift;
 my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$session->db->quote($session->scratch->get("versionTag")).")) order by assetData.title";
 	my $sth = $session->dbSlave->read($sql);
@@ -232,55 +222,7 @@ sub process {
 	my $self = shift;
 	my $vars = shift;
 	return $self->processRaw($self->session, $self->get("template"),$vars);
-# skip all the junk below here for now until we have time to bring it inline with the new system
-	my $file = _getTemplateFile($self->get("templateId"));
-	my $fileCacheDir = $self->session->config->get("uploadsPath").'/temp/templatecache';
-	my %params = (
-		filename=>$file->getPath,
-		global_vars=>1,
-   		loop_context_vars=>1,
-		die_on_bad_params=>0,
-		no_includes=>1,
-		file_cache_dir=>$fileCacheDir,
-		strict=>0
-		);
-	my $error=0;
-        if ($self->session->config->get("templateCacheType") =~ /file/) {
-                eval { mkpath($fileCacheDir) };
-                if($@) {
-                        $self->session->errorHandler->error("Could not create dir $fileCacheDir: $@\nTemplate file caching disabled");
-			$error++;
-		}
-		if(not -w $fileCacheDir) {
-			$self->session->errorHandler->error("Directory $fileCacheDir is not writable. Template file caching is disabled");
-			$error++;
-		}
-	}
-	if ($self->session->config->get("templateCacheType") eq "file" && not $error) {
-	# disabled until we can figure out what's wrong with it
-	#	$params{file_cache} = 1;
-	} elsif ($self->session->config->get("templateCacheType") eq "memory") {
-		$params{cache} = 1;
-	} elsif ($self->session->config->get("templateCacheType") eq "ipc") {
-		$params{shared_cache} = 1;
-	} elsif ($self->session->config->get("templateCacheType") eq "memory-ipc") {
-		$params{double_cache} = 1;
-	} elsif ($self->session->config->get("templateCacheType") eq "memory-file" && not $error) {
-		$params{double_file_cache} = 1;
-	}
-	my $template;
-	unless (-e $file->getPath) {
-		$file->saveFromScalar($self->get("template"));
-		unless (-e $file->getPath) {
-	                $self->session->errorHandler->error("Could not create file ".$file->getPath."\nTemplate file caching is disabled");
-        	        $params{scalarref} = \$template;
-			delete $params{filename};
-        	}
-	}
-	return _execute($self->session, \%params,$vars);
 }
-
-
 
 
 #-------------------------------------------------------------------
@@ -307,7 +249,7 @@ A hash reference containing template variables and loops. Automatically includes
 
 sub processRaw {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $template = shift;
 	my $vars = shift;
 	return _execute($session, {

@@ -315,7 +315,7 @@ An active WebGUI::Session object.
 
 sub new {
 	my $class = shift;
-	my $session = shift;
+	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	unless (Log::Log4perl->initialized()) {
 		$Log::Log4perl::caller_depth++;
  		Log::Log4perl->init( $session->config->getWebguiRoot."/etc/log.conf" );   
