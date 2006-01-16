@@ -59,23 +59,32 @@ foreach my $macro ( @settingMacros ) {
 
 use Test::More; # increment this value for each test you create
 
-my $numTests = 4 + $settingMacros;
+my $numTests = 6 + $settingMacros;
 
 plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
 
 my $macroText = "^GroupText(3,local,foreigner);";
+my $AdminText = "^AdminText(admin);";
 my $output;
 
 $output = $macroText;
 WebGUI::Macro::process($session, \$output);
 is($output, 'foreigner', 'GroupText, user not in group');
 
+$output = $adminText;
+WebGUI::Macro::process($session, \$output);
+is($output, '', 'AdminText, user not in group');
+
 $output = $macroText;
 $session->user({userId => 3});
 WebGUI::Macro::process($session, \$output);
 is($output, 'local', 'GroupText, user in group');
+
+$output = $adminText;
+WebGUI::Macro::process($session, \$output);
+is($output, 'admin', 'AdminText, user is admin');
 
 my $apText = "^AssetProxy(getting_started);";
 WebGUI::Macro::process($session, \$apText);
