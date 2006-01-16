@@ -19,25 +19,36 @@ use Data::Dumper;
 
 my $session = initialize();  # this line is required
 
+
 use Test::More; # increment this value for each test you create
 
-my $numTests = 2;
+my $numTests = 4;
 
 plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
 
-my $macroText = "^GroupText(3,local,foreigner);";
+my $adminText = "^AdminText(admin);";
 my $output;
 
-$output = $macroText;
+$output = $adminText;
 WebGUI::Macro::process($session, \$output);
-is($output, 'foreigner', 'GroupText, user not in group');
+is($output, '', 'user is not admin');
 
-$output = $macroText;
 $session->user({userId => 3});
+$output = $adminText;
 WebGUI::Macro::process($session, \$output);
-is($output, 'local', 'GroupText, user in group');
+is($output, '', 'user is admin, not in admin mode');
+
+$session->var->switchAdminOn;
+$output = $adminText;
+WebGUI::Macro::process($session, \$output);
+is($output, 'admin', 'admin in admin mode');
+
+$session->var->switchAdminOff;
+$output = $adminText;
+WebGUI::Macro::process($session, \$output);
+is($output, '', 'user is admin, not in admin mode');
 
 cleanup($session); # this line is required
 
