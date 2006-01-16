@@ -7,38 +7,39 @@
 #-------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
-
+ 
 # ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
+use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Session;
 # ---- END DO NOT EDIT ----
-
-
-use Test::More tests => 2; # increment this value for each test you create
-use WebGUI::Utility;
-
+use Test::More tests => 22; # increment this value for each test you create
+ 
 my $session = initialize();  # this line is required
+ 
+# put your tests here
+ 
+my $stow  = $session->stow;
+my $count = 0;
+my $maxCount = 20;
 
-# generate
-my $generateId = $session->id->generate();
-is(length($generateId), 22, "generate() - length of 22 characters");
-my @uniqueIds;
-my $isUnique = 1;
-for (1..2000) {
-	last unless $isUnique;
-	my $id = $session->id->generate();
-	$isUnique = !isIn($id,@uniqueIds);
-	push(@uniqueIds,$id);
+for (my $count = 1; $count <= $maxCount; $count++){
+   $stow->set("Test$count",$count);
 }
-ok($isUnique, "generate() - unique");
+ 
+for (my $count = 1; $count <= $maxCount; $count++){
+   is($stow->get("Test$count"), $count, "Passed set/get $count\n");
+}
 
+$stow->delete("Test1");
+is($stow->get("Test1"), undef, "delete()");
+$stow->deleteAll;
+is($stow->get("Test2"), undef, "deleteAll()");
+  
 cleanup($session); # this line is required
-
-
+ 
 # ---- DO NOT EDIT BELOW THIS LINE -----
-
 sub initialize {
         $|=1; # disable output buffering
         my $configFile;
@@ -46,11 +47,9 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        my $session = WebGUI::Session->open("../..",$configFile);
 }
-
 sub cleanup {
         my $session = shift;
         $session->close();
 }
-

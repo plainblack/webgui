@@ -7,36 +7,38 @@
 #-------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
- 
+
 # ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
+use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Session;
 # ---- END DO NOT EDIT ----
-use Test::More tests => 6; # increment this value for each test you create
- 
-my $session = initialize();  # this line is required
- 
-# put your tests here
-use WebGUI::Session::Var;
- 
-ok($session->var->getId ne "", "getId()");
-ok($session->var->get("lastPageView") > 0, "get()");
-is($session->var->isAdminOn, 0, "isAdminOn()");
-$session->var->switchAdminOn;
-is($session->var->isAdminOn, 1, "switchAdminOn()");
-$session->var->switchAdminOff;
-is($session->var->isAdminOn, 0, "switchAdminOff()");
-my $id = $session->var->getId;
-$session->var->end;
-my ($count) = $session->db->quickArray("select count(*) from userSession where sessionId=".$session->db->quote($id));
-ok($count == 0,"end()");
 
- 
+
+use Test::More tests => 2; # increment this value for each test you create
+use WebGUI::Utility;
+
+my $session = initialize();  # this line is required
+
+# generate
+my $generateId = $session->id->generate();
+is(length($generateId), 22, "generate() - length of 22 characters");
+my @uniqueIds;
+my $isUnique = 1;
+for (1..2000) {
+	last unless $isUnique;
+	my $id = $session->id->generate();
+	$isUnique = !isIn($id,@uniqueIds);
+	push(@uniqueIds,$id);
+}
+ok($isUnique, "generate() - unique");
+
 cleanup($session); # this line is required
- 
+
+
 # ---- DO NOT EDIT BELOW THIS LINE -----
+
 sub initialize {
         $|=1; # disable output buffering
         my $configFile;
@@ -44,9 +46,11 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        my $session = WebGUI::Session->open("../..",$configFile);
 }
+
 sub cleanup {
         my $session = shift;
         $session->close();
 }
+

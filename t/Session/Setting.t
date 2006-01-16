@@ -7,27 +7,31 @@
 #-------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
-
+ 
 # ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
+use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Session;
 # ---- END DO NOT EDIT ----
-
-
-use Test::More tests => 2; # increment this value for each test you create
-
+use Test::More tests => 4; # increment this value for each test you create
+ 
 my $session = initialize();  # this line is required
 
-ok($session->os->get("name") ne "", "get(name)");
-ok($session->os->get("type") eq "Windowsish" || $session->os->get("type") eq "Linuxish", "get(type)");
-
+$session->setting->add("test","XXX");
+my ($value) = $session->db->quickArray("select value from settings where name='test'");
+is($value, 'XXX', "add()");
+is($session->setting->get("test"), "XXX", "get()");
+$session->setting->set("test","YYY");
+my ($value) = $session->db->quickArray("select value from settings where name='test'");
+is($value, 'YYY', "set()");
+$session->setting->remove("test"); 
+my ($value) = $session->db->quickArray("select value from settings where name='test'");
+is($value, undef, "delete()");
+  
 cleanup($session); # this line is required
-
-
+ 
 # ---- DO NOT EDIT BELOW THIS LINE -----
-
 sub initialize {
         $|=1; # disable output buffering
         my $configFile;
@@ -35,11 +39,9 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        my $session = WebGUI::Session->open("../..",$configFile);
 }
-
 sub cleanup {
         my $session = shift;
         $session->close();
 }
-
