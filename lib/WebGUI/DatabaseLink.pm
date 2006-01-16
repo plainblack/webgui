@@ -192,6 +192,7 @@ A reference to the current session.
 =cut
 
 sub getList {
+	my $class = shift;
 	my $session = shift;
 	my $list = $session->db->buildHashRef("select databaseLinkId, title from databaseLink order by title");
 	my $i18n = WebGUI::International->new($session);

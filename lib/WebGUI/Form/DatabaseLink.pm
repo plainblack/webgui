@@ -107,7 +107,7 @@ Renders a database connection picker control.
 
 sub toHtml {
 	my $self = shift;
-	$self->get("options") = WebGUI::DatabaseLink->getList($self->session); 
+	$self->set("options",  WebGUI::DatabaseLink->getList($self->session));
 	return $self->SUPER::toHtml();
 }
 
