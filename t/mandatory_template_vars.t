@@ -13,6 +13,7 @@ use strict;
 use lib '../lib';
 use Getopt::Long;
 use WebGUI::Asset;
+use WebGUI::Session;
 use File::Find;
 # ---- END DO NOT EDIT ----
 
@@ -198,7 +199,7 @@ diag("planning on $numTests tests");
 
 foreach my $tmpl ( @tmplVarTable ) {
 	my $tmplId = $tmpl->{id};
-	my $tmplAsset = WebGUI::Asset->newByDynamicClass($tmplId);
+	my $tmplAsset = WebGUI::Asset->newByDynamicClass($session, $tmplId);
 	my $tmplExists = is(ref($tmplAsset), 'WebGUI::Asset::Template', "$tmplId exists");
 	SKIP: {
 		skip("$tmplId could not be found",  $tmpl->{numTests} ) unless $tmplExists;
@@ -216,7 +217,7 @@ cleanup($session); # this line is required
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
-nitialize {
+sub initialize {
         $|=1; # disable output buffering
         my $configFile;
         GetOptions(
