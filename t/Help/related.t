@@ -10,7 +10,7 @@
 
 # ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
+use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Operation::Help;
@@ -76,7 +76,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        return WebGUI::Session->open("..",$configFile);
+        return WebGUI::Session->open("../..",$configFile);
 }
 
 sub cleanup {

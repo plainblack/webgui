@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2005 Plain Black Corporation.
+# WebGUI is Copyright 2001-2006 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -10,7 +10,7 @@
 
 # ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
+use lib '../../lib';
 use Text::Balanced qw(extract_codeblock);
 use Getopt::Long;
 use WebGUI::Operation::Help;
@@ -75,10 +75,10 @@ diag("Getting Help labels");
 #@sqlLabels = getSQLLabels();
 
 diag("Getting subroutine labels");
-find(\&label_finder_pm, '../lib/');
+find(\&label_finder_pm, '../../lib/');
 
 diag("Getting object labels");
-find(\&obj_finder_pm, '../lib/');
+find(\&obj_finder_pm, '../../lib/');
 
 diag ("Checking ". scalar(@helpLabels). " help labels");
 #diag ("Checking ". scalar(@sqlLabels). " SQL labels");
@@ -213,7 +213,7 @@ sub getHelpLabels {
 sub getSQLLabels {
 	my @sqlLabels = ();
 	foreach my $file (qw/create.sql previousVersion.sql/) {
-		my $file2 = join '/', '..', 'docs', $file;
+		my $file2 = join '/', '../..', 'docs', $file;
 		open my $fh, $file2 or
 			die "Unable to open $file2: $!\n";
 		local $/;
@@ -243,7 +243,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        return WebGUI::Session->open("..",$configFile);
+        return WebGUI::Session->open("../..",$configFile);
 }
 
 sub cleanup {

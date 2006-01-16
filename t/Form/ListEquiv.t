@@ -10,7 +10,7 @@
 
 # ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
+use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Form::DynamicField;
 use WebGUI::Form::SelectList;
@@ -435,7 +435,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
+        my $session = WebGUI::Session->open("../..",$configFile);
 }
 
 sub cleanup {

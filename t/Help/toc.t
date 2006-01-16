@@ -10,40 +10,38 @@
 
 # ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
+use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Operation::Help;
+use WebGUI::International;
+use Data::Dumper;
 # ---- END DO NOT EDIT ----
 
-#The goal of this test is to verify that all entries in the lib/WebGUI/Help
-#directory compile.  This test is necessary because WebGUI::Operation::Help
-#will return an empty hash if it won't compile, and the help will simply
-#disappear.
+#The goal of this test is to make sure that all required labels
+#for the help system exist.
 
-use Test::More;
+use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
 my $session = initialize();  # this line is required
 
 my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
-$numTests = scalar @helpFileSet; #One for each help compile
+$numTests = scalar @helpFileSet;
 
 diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
 
-foreach my $helpSet (@helpFileSet) {
-	my $helpName = $helpSet->[1];
-	my $help = WebGUI::Operation::Help::_load($session, $helpName);
-	ok(keys %{ $help }, "$helpName compiled");
+diag("Check for mandatory lables for Help table of contents");
+
+foreach my $fileSet (@helpFileSet) {
+	my $file = $fileSet->[1];
+	ok(WebGUI::Operation::Help::_getHelpName($session, $file), "Missing label for $file");
 }
 
-# put your tests here
-
 cleanup($session); # this line is required
-
 
 # ---- DO NOT EDIT BELOW THIS LINE -----
 
@@ -54,7 +52,7 @@ sub initialize {
                 'configFile=s'=>\$configFile
         );
         exit 1 unless ($configFile);
-        return WebGUI::Session->open("..",$configFile);
+        return WebGUI::Session->open("../..",$configFile);
 }
 
 sub cleanup {
