@@ -162,7 +162,7 @@ foreach my $filename (keys %{$configs}) {
 		unless ($history) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
 			$session->setting->remove('specialState');
-			$session->add('specialState','upgrading');
+			$session->setting->add('specialState','upgrading');
 			print "\tDeleting temp files.\n" unless ($quiet);
 			my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
 			rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
@@ -179,7 +179,6 @@ foreach my $filename (keys %{$configs}) {
 
 if ($history) {
 	print "\nDisplaying upgrade history for each site.\n";
-	require WebGUI::DateTime;
 	foreach my $file (keys %config) {
 		print "\n".$file."\n";
 		my $session = WebGUI::Session->open("../..",$file);
