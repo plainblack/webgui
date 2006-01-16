@@ -57,7 +57,7 @@ foreach my $package (@modules) {
 #----------------------------------------
 # Preload all site configs.
 #----------------------------------------
-WebGUI::Config::loadAllConfigs($webguiRoot);
+WebGUI::Config->loadAllConfigs($webguiRoot);
 
 
 print "WebGUI Started!\n";
