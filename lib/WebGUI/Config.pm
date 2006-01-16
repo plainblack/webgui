@@ -115,7 +115,7 @@ The path to the WebGUI installation.
 sub loadAllConfigs {
 	my $class = shift;
 	my $webguiPath = shift;
-	my $configs = readAllConfigs($webguiPath);
+	my $configs = $class->readAllConfigs($webguiPath);
 	foreach my $filename (keys %{$configs}) {
 		unless ($filename =~ /^demo\d/) {
 			print "\tLoading ".$filename."\n";	
