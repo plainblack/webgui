@@ -218,7 +218,7 @@ sub view {
 	my ($garbage, $end) = $self->session->datetime->dayStartEnd($self->get("eventEndDate"));
 	my $sth = $self->session->db->read("select assetId from EventsCalendar_event where ((eventStartDate >= $start and eventStartDate <= $end) or (eventEndDate >= $start and eventEndDate <= $end)) and assetId<>".$self->session->db->quote($self->getId));
 	while (my ($assetId) = $sth->array) {
-		my $asset = WebGUI::Asset::Event->new($assetId);
+		my $asset = WebGUI::Asset::Event->new($self->session, $assetId);
 		# deal with multiple versions of the same event with conflicting dates
 		next unless (($asset->get("eventStartDate") >= $start && $asset->get("eventStartDate") <= $end) || ($asset->get("eventEndDate") >= $start && $asset->get("eventEndDate") <= $end));
 		push(@others,{

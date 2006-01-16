@@ -44,6 +44,7 @@ sub DESTROY {
 sub new {
   	my $pack = shift;
   	my $self = $pack->SUPER::new();
+  	$self->{_session} = shift;
   	$self->{Url} = shift;
   	$self->{Content} = shift;
   	$self->{assetId} = shift;
@@ -90,6 +91,10 @@ sub text {
 
 sub end { 
 	$_[0]->output("</$_[1]>") 
+}
+
+sub session { 
+	return $_[0]->{_session};
 }
 
 sub start {

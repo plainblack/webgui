@@ -120,7 +120,7 @@ sub www_view {
         my $self = shift;
         return $self->session->privilege->noAccess() unless $self->canView;
         if ($self->session->var->isAdminOn() && $self->canEdit) {
-                my $i18n = WebGUI::International->new("Asset_Redirect");
+                my $i18n = WebGUI::International->new($self->session, "Asset_Redirect");
                 return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
                         <ul>
                         <li><a href="'.$self->get("redirectUrl").'">'.$i18n->get("go to the redirect url").'</a></li>

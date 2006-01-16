@@ -211,7 +211,7 @@ sub canView {
 #-------------------------------------------------------------------
 sub createSubscriptionGroup {
 	my $self = shift;
-	my $group = WebGUI::Group->new("new");
+	my $group = WebGUI::Group->new($self->session, "new");
 	$group->name($self->getId);
 	$group->description("The group to store subscriptions for the collaboration system ".$self->getId);
 	$group->isEditable(0);
@@ -806,7 +806,7 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
-	my $group = WebGUI::Group->new($self->get("subscriptionGroupId"));
+	my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
 	$group->delete;
 	$self->SUPER::purge;
 }
@@ -1162,7 +1162,7 @@ sub www_viewRSS {
 		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
 	my $i = 1;
         while (my ($id, $class, $version)  = $sth->array) {
-		my $post = WebGUI::Asset::Wobject::Collaboration->new($id, $class, $version);
+		my $post = WebGUI::Asset::Wobject::Collaboration->new($self->session, $id, $class, $version);
 		my $encUrl = _xml_encode($self->session->url->getSiteURL().$post->getUrl);
 
 		my @attachmentLoop = ();

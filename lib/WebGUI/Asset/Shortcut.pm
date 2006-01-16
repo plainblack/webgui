@@ -318,6 +318,7 @@ sub getFieldsList {
 	$output .= '<table cellspacing="0" cellpadding="3" border="1"><tr><td><table cellspacing="0" cellpadding="3" border="0">';
 	my @prefFieldsToShow = split("\n",$self->getValue("prefFieldsToShow"));
 	$output .= WebGUI::Form::CheckList->new(
+		$self->session,
 		-name=>"prefFieldsToShow",
 		-value=>\@prefFieldsToShow,
 		-options=>\%fieldNames,
@@ -329,6 +330,7 @@ sub getFieldsList {
 	$output .= '</table></td><td><table cellspacing="0" cellpadding="3" border="0">';
 	my @prefFieldsToImport = split("\n",$self->getValue("prefFieldsToImport"));
 	$output .= WebGUI::Form::CheckList->new(
+		$self->session,
 		-name=>"prefFieldsToImport",
 		-value=>\@prefFieldsToImport,
 		-options=>\%fieldNames,
@@ -398,7 +400,7 @@ sub getOverrides {
 		}
 		$sth->finish;
 		if ($self->isDashlet) {
-			my $u = WebGUI::User->new($self->discernUserId);
+			my $u = WebGUI::User->new($self->session, $self->discernUserId);
 			my @userPrefs = $self->getPrefFieldsToImport;
 			foreach my $fieldId (@userPrefs) {
 				my $field = WebGUI::ProfileField->new($self->session,$fieldId);
@@ -545,13 +547,13 @@ sub getShortcutByCriteria {
 	# Store the matching assetId in user scratch. 
 	$self->session->scratch->set($scratchId,$id) if ($scratchId);
 
-	return WebGUI::Asset->newByDynamicClass($id);		
+	return WebGUI::Asset->newByDynamicClass($self->session, $id);
 }
 
 #-------------------------------------------------------------------
 sub getShortcutDefault {
 	my $self = shift;
-	return WebGUI::Asset->newByDynamicClass($self->get("shortcutToAssetId"));
+	return WebGUI::Asset->newByDynamicClass($self->session, $self->get("shortcutToAssetId"));
 }
 
 #-------------------------------------------------------------------
@@ -707,7 +709,7 @@ sub www_saveUserPrefs {
 	my %data = ();
 	$self->uncacheOverrides;
 	my $i18n = WebGUI::International->new($self->session);
-	my $u = WebGUI::User->new($self->discernUserId);
+	my $u = WebGUI::User->new($self->session, $self->discernUserId);
 	foreach my $fieldId ($self->request->params) {
 		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
@@ -758,7 +760,7 @@ sub www_editOverride {
 	$params{name} = $fieldName;
 	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
 	$params{hoverhelp} = $params{hoverhelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
-	if ($fieldName eq 'templateId') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($overrides{overrides}{templateId}{origValue})->get("namespace");}
+	if ($fieldName eq 'templateId') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($self->session, $overrides{overrides}{templateId}{origValue})->get("namespace");}
 	$f->dynamicField(%params);
 	$f->textarea(
 		-name=>"newOverrideValueText",

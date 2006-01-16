@@ -302,7 +302,7 @@ sub view {
 		$var{content} = $1 || $var{content};
 		$var{"content.trailing"} = $2;
 	}
-	 my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl);
+	 my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl);
 	 $var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
 	 $p->DESTROY;
    

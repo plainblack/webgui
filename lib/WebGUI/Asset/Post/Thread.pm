@@ -39,7 +39,7 @@ sub canSubscribe {
 sub createSubscriptionGroup {
 	my $self = shift;
 	return if ($self->get("subscriptionGroupId"));
-	my $group = WebGUI::Group->new("new");
+	my $group = WebGUI::Group->new($self->session, "new");
 	$group->name($self->getId);
 	$group->description("The group to store subscriptions for the thread ".$self->getId);
 	$group->isEditable(0);
@@ -127,7 +127,7 @@ sub getLastPost {
 	my $lastPostId = $self->get("lastPostId");
 	my $lastPost;
 	if ($lastPostId) {
-		$lastPost = WebGUI::Asset::Post->new($lastPostId);
+		$lastPost = WebGUI::Asset::Post->new($self->session, $lastPostId);
 	}
 	return $lastPost if (defined $lastPost);
 	return $self;	
@@ -196,7 +196,7 @@ sub getNextThread {
 				group by assetData.assetId
 				order by ".$sortBy." asc 
 				",$self->session->dbSlave);
-		$self->{_next} = WebGUI::Asset->new($id,$class,$version);
+		$self->{_next} = WebGUI::Asset->new($self->session, $id,$class,$version);
 	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_next};
@@ -233,7 +233,7 @@ sub getPreviousThread {
 						)
 				group by assetData.assetId
 				order by ".$sortBy." desc, assetData.revisionDate desc ",$self->session->dbSlave);
-		$self->{_previous} = WebGUI::Asset::Post::Thread->new($id,$class,$version);
+		$self->{_previous} = WebGUI::Asset::Post::Thread->new($self->session, $id,$class,$version);
 	#	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_previous};
@@ -454,7 +454,7 @@ sub rate {
 		my $average = round($sum/$count);
 		$self->update({rating=>$average});
 		if ($self->session->setting->get("useKarma")) {
-			my $poster = WebGUI::User->new($self->get("ownerUserId"));
+			my $poster = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 			$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
 			my $rater = WebGUI::User->new($self->session->user->userId);
 			$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId);
@@ -672,7 +672,7 @@ sub view {
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		next unless ($dataSet->{className} eq "WebGUI::Asset::Post" || $dataSet->{className} eq "WebGUI::Asset::Post::Thread"); #handle non posts!
-		my $reply = WebGUI::Asset::Post->new($dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
+		my $reply = WebGUI::Asset::Post->new($self->session, $dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
 		$reply->{_thread} = $self; # caching thread for better performance
 		my %replyVars = %{$reply->getTemplateVars};
 		$replyVars{isCurrent} = ($reply->get("url") eq $currentPageUrl);

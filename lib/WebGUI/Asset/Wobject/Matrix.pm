@@ -326,7 +326,7 @@ sub www_deleteListingConfirm {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless($self->canEdit);
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	WebGUI::Asset::Wobject::Collaboration->new($listing->{forumId})->purge;
+	WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId})->purge;
 	$self->session->db->write("delete from Matrix_listing where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	$self->session->db->write("delete from Matrix_listingData where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	$self->session->db->write("delete from Matrix_rating where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
@@ -970,11 +970,11 @@ sub www_viewDetail {
 	my %var;
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$listingId);
-	my $forum = WebGUI::Asset::Wobject::Collaboration->new($listing->{forumId});
+	my $forum = WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId});
 	$var{"discussion"} = $forum->view;
 	if ($self->session->form->process("do") eq "sendEmail") {
 		if ($self->session->form->process("body") ne "") {
-			my $u = WebGUI::User->new($listing->{maintainerId});
+			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});
 			WebGUI::Mail::send($u->profileField("email"),$listing->{productName}." - ".$self->session->form->process("subject"),$self->session->form->process("body"),"",$self->session->form->process("from"));
 		}
 		$var{'email.wasSent'} = 1;

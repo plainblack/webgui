@@ -81,7 +81,7 @@ sub definition {
 sub getContentPositions {
 	my $self = shift;
 	my $dummy = $self->initialize unless $self->get("isInitialized");
-	my $u = WebGUI::User->new($self->discernUserId);
+	my $u = WebGUI::User->new($self->session, $self->discernUserId);
 	return $u->profileField($self->getId.'contentPositions');
 }
 
@@ -190,7 +190,7 @@ sub view {
 		}
 	}
 	my $i = 1;
-	my $templateAsset = WebGUI::Asset->newByDynamicClass($templateId) || WebGUI::Asset->getImportNode;
+	my $templateAsset = WebGUI::Asset->newByDynamicClass($self->session, $templateId) || WebGUI::Asset->getImportNode;
 	my $template = $templateAsset->get("template");
 	my $numPositions = 1;
 	foreach my $j (2..15) {
@@ -276,7 +276,7 @@ sub www_setContentPositions {
 	return $self->session->privilege->insufficient() unless ($self->canPersonalize);
 	return 'empty' unless $self->get("isInitialized");
 	my $dummy = $self->initialize unless $self->get("isInitialized");
-	my $u = WebGUI::User->new($self->discernUserId);
+	my $u = WebGUI::User->new($self->session, $self->discernUserId);
 	my $success = $u->profileField($self->getId.'contentPositions',$self->session->form->process("map")) eq $self->session->form->process("map");
 	return "Map set: ".$self->session->form->process("map") if $success;
 	return "Map failed to set.";

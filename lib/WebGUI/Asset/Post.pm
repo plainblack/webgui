@@ -241,7 +241,7 @@ sub getAvatarUrl {
 	my $avatarUrl;
 	return $avatarUrl unless
 		$self->getThread->getParent->getValue("avatarsEnabled");
-	my $user = WebGUI::User->new($self->get('ownerUserId'));
+	my $user = WebGUI::User->new($self->session, $self->get('ownerUserId'));
 	#Get avatar field, storage Id.
 	my $storageId = $user->profileField("avatar");
 	my $avatar = WebGUI::Storage::Image->get($self->session,$storageId);
@@ -468,7 +468,7 @@ sub getTemplateVars {
 sub getThread {
 	my $self = shift;
 	unless (exists $self->{_thread}) {
-		$self->{_thread} = WebGUI::Asset::Post::Thread->new($self->get("threadId"));
+		$self->{_thread} = WebGUI::Asset::Post::Thread->new($self->session, $self->get("threadId"));
 	}
 	return $self->{_thread};	
 }
@@ -617,14 +617,14 @@ sub notifySubscribers {
 	foreach my $userId (@{$group->getUsers(undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
-	$group = WebGUI::Group->new($self->getThread->getParent->get("subscriptionGroupId"));
+	$group = WebGUI::Group->new($self->session, $self->getThread->getParent->get("subscriptionGroupId"));
 	foreach my $userId (@{$group->getUsers(undef,1)}) {
 		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
 	}
         my %lang;
 	my $i18n = WebGUI::International->new($self->session);
         foreach my $userId (keys %subscribers) {
-                my $u = WebGUI::User->new($userId);
+                my $u = WebGUI::User->new($self->session, $userId);
                 if ($lang{$u->profileField("language")}{message} eq "") {
                         $lang{$u->profileField("language")}{var} = $self->getTemplateVars();
 			$self->getThread->getParent->appendTemplateLabels($lang{$u->profileField("language")}{var});

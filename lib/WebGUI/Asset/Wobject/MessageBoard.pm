@@ -65,7 +65,7 @@ sub view {
 			$first = $child;
 		}
 		my %lastPostVars;
-		my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newByDynamicClass($child->get("lastPostId"));
+		my $lastPost = WebGUI::Asset::Wobject::MessageBoard->newByDynamicClass($self->session, $child->get("lastPostId"));
 		if (defined $lastPost) {
 			%lastPostVars = (
 				'forum.lastPost.url' => $lastPost->getUrl,
