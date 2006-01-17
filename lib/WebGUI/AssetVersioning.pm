@@ -61,7 +61,7 @@ sub addRevision {
 	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
 		ownerUserId, groupIdEdit, groupIdView) values (".$self->session->db->quote($self->getId).",".$now.", ".$self->session->db->quote($self->session->user->userId).", 
 		".$self->session->db->quote($versionTag).", ".$self->session->db->quote($status).", ".$self->session->db->quote($self->getId).", 997995720, 32472169200,'3','3','7')");
-        foreach my $definition (@{$self->definition}) {
+        foreach my $definition (@{$self->definition($self->session)}) {
                 unless ($definition->{tableName} eq "assetData") {
                         $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".$self->session->db->quote($self->getId).",".$now.")");
                 }

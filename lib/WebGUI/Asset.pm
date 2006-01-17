@@ -1290,7 +1290,7 @@ Purges all cache entries associated with this asset.
 
 sub purgeCache {
 	my $self = shift;
-	my $stow = $self->stow;
+	my $stow = $self->session->stow;
 	$stow->delete('assetLineage');
 	$stow->delete('assetClass');
 	$stow->delete('assetRevision');
