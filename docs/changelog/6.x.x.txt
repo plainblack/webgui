@@ -14,7 +14,8 @@
  - fix [ 1345363 ] Using RTE breaks links (Thanks to Gerald Young for
 		   assisting with this one.)
  - fix [ 1376148 ] wrong pages are shown after visit of photo gallery (Gerald Young)
-
+ - fix [ 1403345 ] Rich Edit Not Working
+ 
 6.8.4
  - fix [ 1395371 ] XSS Vulnerability in DataForm Entries
  - When working with a redirect in admin mode, you're now presented with a
