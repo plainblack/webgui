@@ -1,7 +1,11 @@
+=======
 6.9.0
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
  - Added a lot more tests to the test suite.
+
+6.8.6
+ - 
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
