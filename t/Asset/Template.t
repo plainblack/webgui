@@ -12,14 +12,30 @@ use strict;
 use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Session;
-use WebGUI::Asset;
-use Test::More tests => 1; # increment this value for each test you create
+use WebGUI::Asset::Template;
+use Test::More tests => 8; # increment this value for each test you create
 
 my $session = initialize();  # this line is required
 
-my $importNode = WebGUI::Asset->getImportNode($session);
-my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates"});
+my $list = WebGUI::Asset::Template->getList($session);
+ok(defined $list, "getList()");
+my $template = " <tmpl_var variable> <tmpl_if conditional>true</tmpl_if> <tmpl_loop loop>XY</tmpl_loop> ";
+my %var = (
+	variable=>"AAAAA",
+	conditional=>1,
+	loop=>[{},{},{},{},{}]
+	);
+my $output = WebGUI::Asset::Template->processRaw($session,$template,\%var);
+ok($output =~ m/AAAAA/, "processRaw() - variables");
+ok($output =~ m/true/, "processRaw() - conditionals");
+ok($output =~ m/XYXYXYXYXY/, "processRaw() - loops");
+my $importNode = WebGUI::Asset::Template->getImportNode($session);
+my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$template});
 ok(defined $template, "creating a template");
+$output = $template->process(\%var);
+ok($output =~ m/AAAAA/, "process() - variables");
+ok($output =~ m/true/, "process() - conditionals");
+ok($output =~ m/XYXYXYXYXY/, "process() - loops");
 
 
 cleanup($session); # this line is required

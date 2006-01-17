@@ -177,11 +177,15 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
-=head2 getList ( namespace )
+=head2 getList ( session, namespace )
 
 Returns a hash reference containing template ids and template names of all the templates in the specified namespace.
 
 NOTE: This is a class method.
+
+=head3 session
+
+A reference to the current session.
 
 =head3 namespace
 
@@ -227,7 +231,7 @@ sub process {
 
 #-------------------------------------------------------------------
 
-=head2 processRaw ( template, vars )
+=head2 processRaw ( session, template, vars )
 
 Evaluate a template replacing template commands for HTML. 
 
