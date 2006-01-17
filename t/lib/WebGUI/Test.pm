@@ -5,6 +5,7 @@ use warnings;
 
 our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB );
 
+use Config     qw[];
 use IO::Handle qw[];
 use File::Spec qw[];
 
@@ -50,7 +51,7 @@ BEGIN {
 
     # http://thread.gmane.org/gmane.comp.apache.apreq/3378
     # http://article.gmane.org/gmane.comp.apache.apreq/3388
-    unless ( $^O ne 'darwin' ) {
+    if ( $^O eq 'darwin' && $Config::Config{osvers} < 8 ) {
 
         require Class::Null;
         require IO::File;
