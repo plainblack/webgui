@@ -397,7 +397,6 @@ Retrieves a value from a form GET or POST and returns it. If the value comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	$self->session->errorHandler->warn("trying to get ".$self->get("name"));
 	my $formValue = $self->session->request->param($self->get("name"));
 	if (defined $formValue) {
 		return $formValue;
