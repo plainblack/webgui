@@ -412,7 +412,7 @@ sub render {
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
 	if (defined $self->session->asset) {
-		my $importNode = $self->session->asset->getImportNode;
+		my $importNode = $self->getImportNode($self->session);
 		my $importNodeLineage = $importNode->get("lineage");
 		my $assetLineage = $self->session->asset->get("lineage");
 		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001") {
