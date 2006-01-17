@@ -425,13 +425,15 @@ The number of seconds since January 1, 1970 00:00:00.
 =cut
 
 sub getSecondsFromEpoch {
-	my $dt = DateTime->from_epoch( epoch => shift );
+	my $epoch = shift;
+	my $timeZone = $session{user}{timeZone} || "America/Chicago";
+	my $dt = DateTime->from_epoch( epoch => $epoch, time_zone => $timeZone );
 	my $start = $dt->clone;
 	$start->set_hour(0);
         $start->set_minute(0);
         $start->set_second(0);	
 	my $duration = $dt - $start;
-	return $duration->delta_seconds;
+	return $duration->delta_seconds + 60* $duration->delta_minutes;
 }
 
 
@@ -472,7 +474,8 @@ sub humanToEpoch {
 	my @date = split(/-/,$dateString);
 	my @time = split(/:/,$timeString);
 	$time[0] = 0 if $time[0] == 24;
-	my $dt = DateTime->new(year => $date[0], month=> $date[1], day=> $date[2], hour=> $time[0], minute => $time[1], second => $time[2]);
+	my $timeZone = $session{user}{timeZone} || "America/Chicago";
+	my $dt = DateTime->new(year => $date[0], month=> $date[1], day=> $date[2], hour=> $time[0], minute => $time[1], second => $time[2], time_zone => $timeZone);
 	return $dt->epoch;
 } 
 
@@ -568,6 +571,7 @@ The number of seconds since January 1, 1970.
 sub monthStartEnd {
 	my $dt = DateTime->from_epoch( epoch => shift);
 	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);	
+	$dt->set_day(1);
 	$dt->set_hour(0);
 	$dt->set_minute(0);
 	$dt->set_second(0);
