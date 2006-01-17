@@ -16,6 +16,7 @@ use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
 use Data::Dumper;
+use Macro_Config;
 
 my $session = WebGUI::Test->session;
 
@@ -39,6 +40,8 @@ my @settingMacros = (
 	},
 );
 
+use Test::More; # increment this value for each test you create
+
 ##Build a reverse hash of the macro settings in the session var so that
 ##we can lookup the aliases for each macro.
 
@@ -50,14 +53,13 @@ foreach my $macro ( @settingMacros ) {
 	++$settingMacros;
 	if (exists $macroNames{ $macro->{macro} }) {
 		$macro->{shortcut} = $macroNames{ $macro->{macro} };
-		$macro->{skip} = 0;
 	}
 	else {
-		$macro->{skip} = 1;
+		diag("Installing macro $macro->{macro} into config");
+		Macro_Config::insert_macro($session, $macro->{macro}, $macro->{macro});
+		$macro->{shortcut} = $macro->{macro};
 	}
 }
-
-use Test::More; # increment this value for each test you create
 
 my $numTests = $settingMacros;
 
@@ -66,14 +68,11 @@ plan tests => $numTests;
 diag("Planning on running $numTests tests\n");
 
 foreach my $macro ( @settingMacros ) {
-	SKIP: {
-		skip("Unable to lookup macro: $macro->{macro}",1) if $macro->{skip};
-		my ($value) = $session->dbSlave->quickArray(
-			sprintf "select value from settings where name=%s",
-				$session->db->quote($macro->{settingKey})
-		);
-		my $macroVal = sprintf "^%s();", $macro->{shortcut};
-		WebGUI::Macro::process($session, \$macroVal);
-		is($value, $macroVal, sprintf "Testing %s", $macro->{macro});
-	}
+	my ($value) = $session->dbSlave->quickArray(
+		sprintf "select value from settings where name=%s",
+			$session->db->quote($macro->{settingKey})
+	);
+	my $macroVal = sprintf "^%s();", $macro->{shortcut};
+	WebGUI::Macro::process($session, \$macroVal);
+	is($value, $macroVal, sprintf "Testing %s", $macro->{macro});
 }

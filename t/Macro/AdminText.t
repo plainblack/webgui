@@ -15,6 +15,8 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
+use Data::Dumper;
+use Macro_Config;
 
 my $session = WebGUI::Test->session;
 
@@ -25,6 +27,11 @@ my $numTests = 4;
 plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
+
+unless ($session->config->get('macros')->{'AdminText'}) {
+	diag("Inserting macro into config");
+	Macro_Config::insert_macro($session, 'AdminText', 'AdminText');
+}
 
 my $adminText = "^AdminText(admin);";
 my $output;
@@ -47,23 +54,3 @@ $session->var->switchAdminOff;
 $output = $adminText;
 WebGUI::Macro::process($session, \$output);
 is($output, '', 'user is admin, not in admin mode');
-
-cleanup($session); # this line is required
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("../..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-

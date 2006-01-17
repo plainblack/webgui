@@ -16,6 +16,7 @@ use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
 use Data::Dumper;
+use Macro_Config;
 
 my $session = WebGUI::Test->session;
 
@@ -26,6 +27,11 @@ my $numTests = 2;
 plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
+
+unless ($session->config->get('macros')->{'@'}) {
+	diag("Inserting macro into config");
+	Macro_Config::insert_macro($session, '@', 'At_username');
+}
 
 my $macroText = "^@;";
 my $output;

@@ -16,16 +16,22 @@ use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
 use Data::Dumper;
+use Macro_Config;
 
 my $session = WebGUI::Test->session;
 
-use Test::More; # increment this value for each test you create
+use Test::More;
 
-my $numTests = 2;
+my $numTests = 2; # increment this value for each test you create
 
 plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
+
+unless ($session->config->get('macros')->{'GroupText'}) {
+	diag("Inserting macro into config");
+	Macro_Config::insert_macro($session, 'GroupText', 'GroupText');
+}
 
 my $macroText = "^GroupText(3,local,foreigner);";
 my $output;
