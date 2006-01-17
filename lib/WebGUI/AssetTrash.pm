@@ -98,7 +98,7 @@ sub purge {
 	my $self = shift;
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
 	$self->session->db->beginTransaction;
-	foreach my $definition (@{$self->definition}) {
+	foreach my $definition (@{$self->definition($self->session)}) {
 		$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId));
 	}
 	$self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId));

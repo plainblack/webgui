@@ -36,7 +36,7 @@ $output = $template->process(\%var);
 ok($output =~ m/AAAAA/, "process() - variables");
 ok($output =~ m/true/, "process() - conditionals");
 ok($output =~ m/XYXYXYXYXY/, "process() - loops");
-
+$template->purge;
 
 cleanup($session); # this line is required
 
