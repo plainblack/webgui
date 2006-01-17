@@ -56,7 +56,7 @@ sub execute {
 		# Load the module
 		$cmd = 'use '.$operation->{$op};
 		eval ($cmd);
-		$session->error("Couldn't compile operation: ".$operation->{$op}.". Root cause: ".$@) if ($@);
+		$session->errorHandler->error("Couldn't compile operation: ".$operation->{$op}.". Root cause: ".$@) if ($@);
 		# Call the method
 		$cmd = $operation->{$op} . '::www_'.$op;
 		$output = eval{&$cmd($session)};

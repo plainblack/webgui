@@ -106,7 +106,7 @@ sub www_setup {
 		$session->setting->set('companyName',$session->form->text("companyName"));
 		$session->setting->set('companyURL',$session->form->url("companyURL"));
 		$session->setting->set('companyEmail',$session->form->email("companyEmail"));
-		$session->setting->setRedirect($session->url->gateway());
+		$session->http->setRedirect($session->url->gateway());
 		return "";
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
