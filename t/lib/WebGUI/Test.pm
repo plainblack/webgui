@@ -51,7 +51,7 @@ BEGIN {
 
     # http://thread.gmane.org/gmane.comp.apache.apreq/3378
     # http://article.gmane.org/gmane.comp.apache.apreq/3388
-    if ( $^O eq 'darwin' && $Config::Config{osvers} < 8 ) {
+    if ( $^O eq 'darwin' && $Config::Config{osvers} lt '8.0.0' ) {
 
         require Class::Null;
         require IO::File;
