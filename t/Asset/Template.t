@@ -28,14 +28,14 @@ my %var = (
 	loop=>[{},{},{},{},{}]
 	);
 my $output = WebGUI::Asset::Template->processRaw($session,$template,\%var);
-ok($output =~ m/AAAAA/, "processRaw() - variables");
+ok($output =~ m/\bAAAAA\b/, "processRaw() - variables");
 ok($output =~ m/true/, "processRaw() - conditionals");
-ok($output =~ m/XYXYXYXYXY/, "processRaw() - loops");
+ok($output =~ m/\s(?:XY){5}\s/, "processRaw() - loops");
 my $importNode = WebGUI::Asset::Template->getImportNode($session);
 my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$template});
 ok(defined $template, "creating a template");
 $output = $template->process(\%var);
-ok($output =~ m/AAAAA/, "process() - variables");
+ok($output =~ m/\bAAAAA\b/, "process() - variables");
 ok($output =~ m/true/, "process() - conditionals");
-ok($output =~ m/XYXYXYXYXY/, "process() - loops");
+ok($output =~ m/\s(?:XY){5}\s/, "process() - loops");
 $template->purge;
