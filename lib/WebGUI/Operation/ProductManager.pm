@@ -523,12 +523,12 @@ sub www_listProductVariants {
 	%parameters = map {$_->{parameterId} => $_->{name}} sort {$a->{name} <=> $b->{name}} @{$product->getParameter};
 	%options = map {$_->{optionId} => $_->{value}} @{$product->getOption};
 
-	$output = WebGUI::Form::formHeader;
-	$output .= WebGUI::Form::hidden({
+	$output = WebGUI::Form::formHeader($session);
+	$output .= WebGUI::Form::hidden($session,{
 		name	=> 'op',
 		value	=> 'listProductVariantsSave',
 		});
-	$output .= WebGUI::Form::hidden({
+	$output .= WebGUI::Form::hidden($session,{
 		name	=> 'productId',
 		value	=> $productId,
 		});
@@ -552,7 +552,7 @@ sub www_listProductVariants {
 		$output .= '</td><td align="right">'.$_->{weight}."</td><td>";
 		$output .= '*' if ($_->{weightOverride});
 		$output .= "</td>";
-		$output .= "<td>".WebGUI::Form::checkbox({
+		$output .= "<td>".WebGUI::Form::checkbox($session,{
 			name	=> 'available',
 			value	=> $_->{variantId},
 			checked	=> $_->{available},

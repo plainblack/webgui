@@ -132,7 +132,7 @@ sub getCompareForm {
 				where assetId=".$self->session->db->quote($self->getId)." and status='approved' order by productName")
 			})
 		."<br />"
-		.WebGUI::Form::submit({
+		.WebGUI::Form::submit($self->session,{
 			value=>"compare"
 			})
 		."</form>";
@@ -816,20 +816,20 @@ sub www_search {
 	}
 	$var{'compare.form'} = $self->getCompareForm(@list);
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($self->session,{
 			name=>"doit",
 			value=>"1"
 			})
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($self->session,{
 			name=>"func",
 			value=>"search"
 			});
 	$var{'form.footer'} = "</form>";
-	$var{'form.keyword'} = WebGUI::Form::text({
+	$var{'form.keyword'} = WebGUI::Form::text($self->session,{
 		name=>"keyword",
 		value=>$self->session->form->process("keyword")
 		});
-	$var{'form.submit'} = WebGUI::Form::submit({
+	$var{'form.submit'} = WebGUI::Form::submit($self->session,{
 		value=>"search"
 		});
 	foreach my $category ($self->getCategories()) {
@@ -841,12 +841,12 @@ sub www_search {
 			$data->{description} =~ s/'/\\\'/g;
 			$data->{description} =~ s/"/\&quot;/g;
 			if ($data->{fieldType} ne "goodBad") {
-				$data->{form} = WebGUI::Form::text({
+				$data->{form} = WebGUI::Form::text($self->session,{
 					name=>$data->{name},
 					value=>$self->session->form->process($data->{name})
 					});
 			} else {
-				$data->{form} = WebGUI::Form::checkbox({
+				$data->{form} = WebGUI::Form::checkbox($self->session,{
 					name=>$data->{name},
 					value=>"1",
 					checked=>$self->session->form->process($data->{name})

@@ -960,22 +960,22 @@ sub www_search {
         $var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
          	.WebGUI::Form::hidden($self->session,{ name=>"func", value=>"search" })
         	.WebGUI::Form::hidden($self->session,{ name=>"doit", value=>1 });
-        $var{'all.form'} = WebGUI::Form::text({
+        $var{'all.form'} = WebGUI::Form::text($self->session,{
                 name=>'all',
                 value=>$self->session->scratch->get($self->getId."_all"),
                 size=>($self->session->setting->get("textBoxSize")-5)
                 });
-        $var{'exactphrase.form'} = WebGUI::Form::text({
+        $var{'exactphrase.form'} = WebGUI::Form::text($self->session,{
                 name=>'exactPhrase',
                 value=>$self->session->scratch->get($self->getId."_exactPhrase"),
                 size=>($self->session->setting->get("textBoxSize")-5)
                 });
-        $var{'atleastone.form'} = WebGUI::Form::text({
+        $var{'atleastone.form'} = WebGUI::Form::text($self->session,{
                 name=>'atLeastOne',
                 value=>$self->session->scratch->get($self->getId."_atLeastOne"),
                 size=>($self->session->setting->get("textBoxSize")-5)
                 });
-        $var{'without.form'} = WebGUI::Form::text({
+        $var{'without.form'} = WebGUI::Form::text($self->session,{
                 name=>'without',
                 value=>$self->session->scratch->get($self->getId."_without"),
                 size=>($self->session->setting->get("textBoxSize")-5)
@@ -984,7 +984,7 @@ sub www_search {
         tie %results, 'Tie::IxHash';
         %results = (10=>'10', 25=>'25', 50=>'50', 100=>'100');
         my $numResults = $self->session->scratch->get($self->getId."_numResults") || $self->get("threadsPerPage");
-        $var{'results.form'} = WebGUI::Form::selectBox({
+        $var{'results.form'} = WebGUI::Form::selectBox($self->session,{
                 name=>"numResults",
                 options=>\%results,
                 value=>[$numResults]

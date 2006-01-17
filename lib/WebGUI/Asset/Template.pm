@@ -467,7 +467,7 @@ $style .= '
 			template=>$style
 			})->www_edit;
 	} else {
-		$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden({name=>"func", value=>"styleWizard"});
+		$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func", value=>"styleWizard"});
 		$output .= WebGUI::Form::hidden($self->session,{name=>"proceed", value=>"manageAssets"}) if ($self->session->form->process("proceed"));
 		$output .= '<style type="text/css">
 			.chooser { float: left; width: 150px; height: 150px; } 

@@ -139,7 +139,7 @@ sub www_checkoutConfirm {
 
 	foreach (@$normal) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
-		$_->{'quantity.form'} = WebGUI::Form::integer({
+		$_->{'quantity.form'} = WebGUI::Form::integer($session,{
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
 			size	=> 3,
@@ -148,7 +148,7 @@ sub www_checkoutConfirm {
 	}
 	foreach (@$recurring) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
-		$_->{'quantity.form'} = WebGUI::Form::integer({
+		$_->{'quantity.form'} = WebGUI::Form::integer($session,{
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
 			size	=> 3,
@@ -593,16 +593,16 @@ sub www_listTransactions {
 
 	$output .= $i18n->get('selection message');
 	
-	$output .= WebGUI::Form::formHeader;
+	$output .= WebGUI::Form::formHeader($session);
 	$output .= WebGUI::Form::hidden($session,{name=>'op', value=>'listTransactions'});
 	$output .= '<table>';
 	$output .= '<td>'.WebGUI::Form::radio($session,{name=>'selection', value => 'init', checked=>($session->form->process("selection") eq 'init')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('init date').'</td>';
-	$output .= '<td>'.WebGUI::Form::date($session,{name=>'initStart', value=>$initStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'initStop', value=>$initStop}).'</td>';
+	$output .= '<td>'.WebGUI::Form::date($session,{name=>'initStart', value=>$initStart}).' '.$i18n->get('and').' '.WebGUI::Form::date($session,{name=>'initStop', value=>$initStop}).'</td>';
 	$output .= '</tr><tr>';
 	$output .= '<td>'.WebGUI::Form::radio($session,{name=>'selection', value => 'completion', checked=>($session->form->process("selection") eq 'completion')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('completion date').'</td>';
-	$output .= '<td>'.WebGUI::Form::date($session,{name=>'completionStart', value=>$completionStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'completionStop', value=>$completionStop}).'</td>';
+	$output .= '<td>'.WebGUI::Form::date($session,{name=>'completionStart', value=>$completionStart}).' '.$i18n->get('and').' '.WebGUI::Form::date($session,{name=>'completionStop', value=>$completionStop}).'</td>';
 	$output .= '</tr><tr>';
 	$output .= '<td></td>';
 	$output .= '<td align="left">'.$i18n->get('transaction status').'</td>';
@@ -790,7 +790,7 @@ sub www_viewCart {
 
 	foreach (@$normal) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
-		$_->{'quantity.form'} = WebGUI::Form::integer({
+		$_->{'quantity.form'} = WebGUI::Form::integer($session,{
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
 			size	=> 3,
@@ -799,7 +799,7 @@ sub www_viewCart {
 	}
 	foreach (@$recurring) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
-		$_->{'quantity.form'} = WebGUI::Form::integer({
+		$_->{'quantity.form'} = WebGUI::Form::integer($session,{
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
 			size	=> 3,

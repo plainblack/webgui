@@ -640,11 +640,11 @@ sub www_manageUsersInGroup {
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
 	my $output = WebGUI::Form::formHeader($session,)
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($session,{
 			name=>"gid",
 			value=>$session->form->process("gid")
 			})
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($session,{
 			name=>"op",
 			value=>"deleteGrouping"
 			});
@@ -658,7 +658,7 @@ sub www_manageUsersInGroup {
                 order by users.username");
 	foreach my $row (@{$p->getPageData}) {
                 $output .= '<tr><td>'
-			.WebGUI::Form::checkbox({
+			.WebGUI::Form::checkbox($session,{
 				name=>"uid",
 				value=>$row->{userId}
 				})

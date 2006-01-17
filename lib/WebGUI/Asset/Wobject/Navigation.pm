@@ -137,7 +137,7 @@ sub getEditForm {
 		);
 	$tabform->getTab("properties")->raw(
 		'</tbody><tbody id="navAncestorEnd"><tr><td class="formDescription">'.$i18n->get("Ancestor End Point").'</td><td>'
-		.WebGUI::Form::selectBox({
+		.WebGUI::Form::selectBox($self->session,{
 			name=>"ancestorEndPoint",
 			value=>[$self->getValue("ancestorEndPoint")],
 			options=>\%options
@@ -147,29 +147,29 @@ sub getEditForm {
 	$tabform->getTab("properties")->readOnly(
 		-label=>$i18n->get("Relatives To Include"),
 		-hoverHelp=>$i18n->get("Relatives To Include description"),
-		-value=>WebGUI::Form::checkbox({
+		-value=>WebGUI::Form::checkbox($self->session,{
 				checked=>$ancestorsChecked,
 				name=>"assetsToInclude",
 				extras=>'onChange="toggleAncestorEndPoint()"',
 				value=>"ancestors"
 				}).$i18n->get('Ancestors').'<br />'
-			.WebGUI::Form::checkbox({
+			.WebGUI::Form::checkbox($self->session,{
 				checked=>$selfChecked,
 				name=>"assetsToInclude",
 				value=>"self"
 				}).$i18n->get('Self').'<br />'
-			.WebGUI::Form::checkbox({
+			.WebGUI::Form::checkbox($self->session,{
 				checked=>$siblingsChecked,
 				name=>"assetsToInclude",
 				value=>"siblings"
 				}).$i18n->get('Siblings').'<br />'
-			.WebGUI::Form::checkbox({
+			.WebGUI::Form::checkbox($self->session,{
 				checked=>$descendantsChecked,
 				name=>"assetsToInclude",
 				value=>"descendants",
 				extras=>'onChange="toggleDescendantEndPoint()"'
 				}).$i18n->get('Descendants').'<br />'
-			.WebGUI::Form::checkbox({
+			.WebGUI::Form::checkbox($self->session,{
 				checked=>$pedigreeChecked,
 				name=>"assetsToInclude",
 				value=>"pedigree"
@@ -187,7 +187,7 @@ sub getEditForm {
 		);
 	$tabform->getTab("properties")->raw(
 		'</tbody><tbody id="navDescendantEnd"><tr><td class="formDescription">'.$i18n->get('Descendant End Point').'</td><td>'
-		.WebGUI::Form::selectBox({
+		.WebGUI::Form::selectBox($self->session,{
 			name=>"descendantEndPoint",
 			value=>[$self->getValue("descendantEndPoint")],
 			options=>\%options

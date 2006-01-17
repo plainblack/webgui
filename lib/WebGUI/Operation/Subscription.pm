@@ -316,16 +316,16 @@ sub www_listSubscriptionCodes {
 
 	$output .= $i18n->get('selection message');
 	
-	$output .= WebGUI::Form::formHeader;
+	$output .= WebGUI::Form::formHeader($session);
 	$output .= WebGUI::Form::hidden($session,{name=>'op', value=>'listSubscriptionCodes'});
 	$output .= '<table>';
 	$output .= '<td>'.WebGUI::Form::radio($session,{name=>'selection', value => 'du', checked=>($session->form->process("selection") eq 'du')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('selection used').'</td>';
-	$output .= '<td>'.WebGUI::Form::date($session,{name=>'duStart', value=>$duStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'duStop', value=>$duStop}).'</td>';
+	$output .= '<td>'.WebGUI::Form::date($session,{name=>'duStart', value=>$duStart}).' '.$i18n->get('and').' '.WebGUI::Form::date($session,{name=>'duStop', value=>$duStop}).'</td>';
 	$output .= '</tr><tr>';
 	$output .= '<td>'.WebGUI::Form::radio($session,{name=>'selection', value => 'dc', checked=>($session->form->process("selection") eq 'dc')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('selection created').'</td>';
-	$output .= '<td>'.WebGUI::Form::date($session,{name=>'dcStart', value=>$dcStart}).' '.$i18n->get('and').' '.WebGUI::Form::date({name=>'dcStop', value=>$dcStop}).'</td>';
+	$output .= '<td>'.WebGUI::Form::date($session,{name=>'dcStart', value=>$dcStart}).' '.$i18n->get('and').' '.WebGUI::Form::date($session,{name=>'dcStop', value=>$dcStop}).'</td>';
 	$output .= '</tr><tr>';
 	$output .= '<td>'.WebGUI::Form::radio($session,{name=>'selection', value => 'b', checked=>($session->form->process("selection") eq 'b')}).'</td>';
 	$output .= '<td align="left">'.$i18n->get('selection batch id').'</td>';

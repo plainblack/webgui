@@ -1583,7 +1583,7 @@ sub www_manageAssets {
 		}
 		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($self->session->setting->get("autoCommit"));
          	$output .= "assetManager.AddLine('"
-			.WebGUI::Form::checkbox({
+			.WebGUI::Form::checkbox($self->session,{
 				name=>'assetId',
 				value=>$child->getId
 				})

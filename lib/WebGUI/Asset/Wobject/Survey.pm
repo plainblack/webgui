@@ -406,27 +406,27 @@ sub getQuestionVars {
 	$var{'question.question'} = $question->{question};
 	$var{'question.allowComment'} = $question->{allowComment};
 	$var{'question.id'} = $question->{Survey_questionId};
-	$var{'question.comment.field'} = WebGUI::Form::textarea({
+	$var{'question.comment.field'} = WebGUI::Form::textarea($self->session,{
 		name=>'comment_'.$questionId
 		});
 	$var{'question.comment.label'} = $i18n->get(51);
 
 	my $answer;
 	($answer) = $self->session->db->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".$self->session->db->quote($question->{Survey_questionId}));
-	$var{'question.answer.field'} = WebGUI::Form::hidden({
+	$var{'question.answer.field'} = WebGUI::Form::hidden($self->session,{
 			name=>'answerId_'.$questionId,
 			value=>$answer
 			});
 	if ($question->{answerFieldType} eq "text") {
-		$var{'question.answer.field'} .= WebGUI::Form::text({
+		$var{'question.answer.field'} .= WebGUI::Form::text($self->session,{
 			name=>'textResponse_'.$questionId
 			});
 	} elsif ($question->{answerFieldType} eq "HTMLArea") {
-		$var{'question.answer.field'} .= WebGUI::Form::HTMLArea({
+		$var{'question.answer.field'} .= WebGUI::Form::HTMLArea($self->session,{
 			name=>'textResponse_'.$questionId
 			});
 	} elsif ($question->{answerFieldType} eq "textArea") {
-		$var{'question.answer.field'} .= WebGUI::Form::textarea({
+		$var{'question.answer.field'} .= WebGUI::Form::textarea($self->session,{
 			name=>'textResponse_'.$questionId
 			});
 	} else {
@@ -434,7 +434,7 @@ sub getQuestionVars {
 		if ($question->{randomizeAnswers}) {
 			$answer = randomizeHash($answer);
 		}
-		$var{'question.answer.field'} = WebGUI::Form::radioList({
+		$var{'question.answer.field'} = WebGUI::Form::radioList($self->session,{
 			options=>$answer,
 			name=>"answerId_".$questionId,
 			vertical=>1
@@ -670,12 +670,12 @@ sub view {
 		}
 	}
 	$var->{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($self->session,{
 			name=>'func',
 			value=>'respond'
 			});
 	$var->{'form.footer'} = WebGUI::Form::formFooter($self->session,);
-	$var->{'form.submit'} = WebGUI::Form::submit({
+	$var->{'form.submit'} = WebGUI::Form::submit($self->session,{
 			value=>$i18n->get(50)
 			});
 	$var->{'questions.sofar.label'} = $i18n->get(86);
