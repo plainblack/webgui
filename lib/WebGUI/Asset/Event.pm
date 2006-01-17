@@ -107,21 +107,21 @@ sub getEditForm {
 		$tabform->getTab("properties")->readOnly(
 			-label=>$i18n->get(8),
 			-hoverHelp=>$i18n->get('Recurs every description'),
-			-value=>WebGUI::Form::integer({
+			-value=>WebGUI::Form::integer($self->session, {
 				name=>"interval",
 				defaultValue=>1
 				})
-				.WebGUI::Form::selectBox({
+				.WebGUI::Form::selectBox($self->session, {
 					name=>"recursEvery",
 					options=>\%recursEvery
 					})
 				.' '.$i18n->get(9).' '
-				.WebGUI::Form::date({
+				.WebGUI::Form::date($self->session, {
 					name=>"until"
 					})
 			);
 	}
-	$tabform->getTab("display")->template(
+	$tabform->getTab("display")->template($self->session, 
     -name=>"templateId",
     -value=>$self->getValue("templateId"),
     -namespace=>"EventsCalendar/Event",

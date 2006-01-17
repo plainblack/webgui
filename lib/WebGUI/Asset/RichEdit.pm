@@ -242,17 +242,17 @@ sub getEditForm {
 		$buttonGrid .= '
 	<tr'.($evenOddToggle ? ' style="background-color: #eeeeee;"' : undef).'>
 		<td>'.$buttons{$key}.'</td>
-		<td>'.WebGUI::Form::checkbox({
+		<td>'.WebGUI::Form::checkbox($self->session, {
 			value=>$key,
 			name=>"toolbarRow1",
 			checked=>$checked1
 			}).'</td>
-		<td>'.WebGUI::Form::checkbox({
+		<td>'.WebGUI::Form::checkbox($self->session, {
 			value=>$key,
 			name=>"toolbarRow2",
 			checked=>$checked2
 			}).'</td>
-		<td>'.WebGUI::Form::checkbox({
+		<td>'.WebGUI::Form::checkbox($self->session, {
 			value=>$key,
 			name=>"toolbarRow3",
 			checked=>$checked3

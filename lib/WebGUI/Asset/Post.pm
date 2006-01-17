@@ -961,15 +961,15 @@ sub www_edit {
 	my $i18n = WebGUI::International->new($self->session);
 	if ($self->session->form->process("func") eq "add") { # new post
         	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getParent->getUrl})
-			.WebGUI::Form::hidden({
+			.WebGUI::Form::hidden($self->session, {
                 		name=>"func",
 				value=>"add"
 				})
-			.WebGUI::Form::hidden({
+			.WebGUI::Form::hidden($self->session, {
 				name=>"assetId",
 				value=>"new"
 				})
-			.WebGUI::Form::hidden({
+			.WebGUI::Form::hidden($self->session, {
 				name=>"class",
 				value=>$self->session->form->process("class")
 				});
@@ -991,7 +991,7 @@ sub www_edit {
                 		$title = $self->getParent->get("title");
                 		$title = "Re: ".$title unless ($title =~ /^Re:/);
 			}
-			$var{'subscribe.form'} = WebGUI::Form::yesNo({
+			$var{'subscribe.form'} = WebGUI::Form::yesNo($self->session, {
 				name=>"subscribe",
 				value=>$self->session->form->process("subscribe")
 				});
@@ -999,16 +999,16 @@ sub www_edit {
 			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canModerate) {
-                        	$var{'sticky.form'} = WebGUI::Form::yesNo({
+                        	$var{'sticky.form'} = WebGUI::Form::yesNo($self->session, {
                                 	name=>'stick',
                                 	value=>$self->session->form->process("stick")
                                 	});
-                        	$var{'lock.form'} = WebGUI::Form::yesNo({
+                        	$var{'lock.form'} = WebGUI::Form::yesNo($self->session, {
                        	         	name=>'lock',
                                 	value=>$self->session->form->process('lock')
                                 	});
 			}
-			$var{'subscribe.form'} = WebGUI::Form::yesNo({
+			$var{'subscribe.form'} = WebGUI::Form::yesNo($self->session, {
 				name=>"subscribe",
 				value=>$self->session->form->process("subscribe") || 1
 				});
@@ -1017,15 +1017,15 @@ sub www_edit {
 	} else { # edit
 		return $self->session->privilege->insufficient() unless ($self->canEdit);
         	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			.WebGUI::Form::hidden({
+			.WebGUI::Form::hidden($self->session, {
                 		name=>"func",
 				value=>"edit"
 				})
-			.WebGUI::Form::hidden({
+			.WebGUI::Form::hidden($self->session, {
 				name=>"ownerUserId",
 				value=>$self->getValue("ownerUserId")
 				})
-			.WebGUI::Form::hidden({
+			.WebGUI::Form::hidden($self->session, {
 				name=>"username",
 				value=>$self->getValue("username")
 				});
@@ -1045,67 +1045,67 @@ sub www_edit {
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
 	$var{'user.isVisitor'} = ($self->session->user->userId eq '1');
-	$var{'visitorName.form'} = WebGUI::Form::text({
+	$var{'visitorName.form'} = WebGUI::Form::text($self->session, {
 		name=>"visitorName",
 		value=>$self->getValue("visitorName")
 		});
 	for my $x (1..5) {
-		$var{'userDefined'.$x.'.form'} = WebGUI::Form::text({
+		$var{'userDefined'.$x.'.form'} = WebGUI::Form::text($self->session, {
 			name=>"userDefined".$x,
 			value=>$self->getValue("userDefined".$x)
 			});
-		$var{'userDefined'.$x.'.form.yesNo'} = WebGUI::Form::yesNo({
+		$var{'userDefined'.$x.'.form.yesNo'} = WebGUI::Form::yesNo($self->session, {
 			name=>"userDefined".$x,
 			value=>$self->getValue("userDefined".$x)
 			});
-		$var{'userDefined'.$x.'.form.textarea'} = WebGUI::Form::textarea({
+		$var{'userDefined'.$x.'.form.textarea'} = WebGUI::Form::textarea($self->session, {
 			name=>"userDefined".$x,
 			value=>$self->getValue("userDefined".$x)
 			});
-		$var{'userDefined'.$x.'.form.htmlarea'} = WebGUI::Form::HTMLArea({
+		$var{'userDefined'.$x.'.form.htmlarea'} = WebGUI::Form::HTMLArea($self->session, {
 			name=>"userDefined".$x,
 			value=>$self->getValue("userDefined".$x)
 			});
 	}
 	$title = WebGUI::HTML::filter($title,"all");
 	$content = WebGUI::HTML::filter($content,"macros");
-	$var{'title.form'} = WebGUI::Form::text({
+	$var{'title.form'} = WebGUI::Form::text($self->session, {
 		name=>"title",
 		value=>$title
 		});
-	$var{'synopsis.form'} = WebGUI::Form::textarea({
+	$var{'synopsis.form'} = WebGUI::Form::textarea($self->session, {
 		name=>"synopsis",
 		value=>WebGUI::HTML::filter($self->getValue("synopsis"),"all")
 		});
-	$var{'title.form.textarea'} = WebGUI::Form::textarea({
+	$var{'title.form.textarea'} = WebGUI::Form::textarea($self->session, {
 		name=>"title",
 		value=>$title
 		});
-	$var{'content.form'} = WebGUI::Form::HTMLArea({
+	$var{'content.form'} = WebGUI::Form::HTMLArea($self->session, {
 		name=>"content",
 		value=>$content,
 		richEditId=>$self->getThread->getParent->get("richEditor")
 		});
-	$var{'form.submit'} = WebGUI::Form::submit({
+	$var{'form.submit'} = WebGUI::Form::submit($self->session, {
 		extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave'; this.form.submit();return false;\""
 		});
-	$var{'form.preview'} = WebGUI::Form::submit({
+	$var{'form.preview'} = WebGUI::Form::submit($self->session, {
 		value=>$i18n->get("preview","Asset_Collaboration")
 		});
 	$var{'attachment.form'} = $self->getUploadControl;
-        $var{'contentType.form'} = WebGUI::Form::contentType({
+        $var{'contentType.form'} = WebGUI::Form::contentType($self->session, {
                 name=>'contentType',
                 value=>$self->getValue("contentType") || "mixed"
                 });
 	my $startDate = $self->get("startDate");
 	$startDate = $self->session->datetime->setToEpoch($self->session->form->process("startDate")) if ($self->session->form->process("startDate"));
-	$var{'startDate.form'} = WebGUI::Form::dateTime({
+	$var{'startDate.form'} = WebGUI::Form::dateTime($self->session, {
 		name  => 'startDate',
 		value => $startDate
 		});
 	my $endDate = $self->get("endDate");
 	$endDate = $self->session->datetime->setToEpoch($self->session->form->process("endDate")) if ($self->session->form->process("endDate"));
-	$var{'endDate.form'} = WebGUI::Form::dateTime({
+	$var{'endDate.form'} = WebGUI::Form::dateTime($self->session, {
 		name  => 'endDate',
 		value => $endDate
 		});

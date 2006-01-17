@@ -114,16 +114,16 @@ sub getCompareForm {
 	my $self = shift;
 	my @ids = @_;
 	my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-		.WebGUI::Form::submit({
+		.WebGUI::Form::submit($self->session, {
 			value=>"compare"
 			})
 		."<br />"
 		."<br />"
-		.WebGUI::Form::hidden({
+		.WebGUI::Form::hidden($self->session, {
 			name=>"func",
 			value=>"compare"
 			})
-		.WebGUI::Form::checkList({
+		.WebGUI::Form::checkList($self->session, {
 			name=>"listingId",
 			vertical=>1,
 			value=>\@ids,
