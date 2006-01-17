@@ -8,31 +8,22 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
-use strict;
-use lib '../lib';
-use Getopt::Long;
-# ---- END DO NOT EDIT ----
 
-use WebGUI::Config;
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use WebGUI::Test;
 use Test::More tests => 6; # increment this value for each test you create
 
-$|=1;
-my $configFile;
-GetOptions(
-      'configFile=s'=>\$configFile
-);
-exit 1 unless ($configFile);
+my $config     = WebGUI::Test->config;
+my $configFile = WebGUI::Test->file;
+my $webguiRoot = WebGUI::Test->root;
 
-my $config = WebGUI::Config->new("..", $configFile);
-
-ok(defined $config, "load config");
-ok($config->get("dsn") ne "", "get()");
-is($config->getFilename,$configFile,"getFilename()");
-is($config->getWebguiRoot, "..", "getWebguiRoot()");
-WebGUI::Config->loadAllConfigs("..");
-ok(exists $WebGUI::Config::config{$configFile}, "loadAllConfigs");
-ok(defined WebGUI::Config->readAllConfigs(".."), "readAllConfigs");
-
-
-
+ok( defined $config, "load config" );
+ok( $config->get("dsn") ne "", "get()" );
+is( $config->getFilename,$configFile,"getFilename()" );
+is( $config->getWebguiRoot, $webguiRoot, "getWebguiRoot()" );
+ok( exists $WebGUI::Config::config{$configFile}, "loadAllConfigs" );
+ok( defined WebGUI::Config->readAllConfigs($webguiRoot), "readAllConfigs" );
