@@ -98,7 +98,7 @@ sub www_deleteTransaction {
 
 	WebGUI::Commerce::Transaction->new($session, $transactionId)->delete;
 
-	return WebGUI::Operation::execute('listTransactions');
+	return WebGUI::Operation::execute($session,'listTransactions');
 }
 
 #-------------------------------------------------------------------
@@ -108,7 +108,7 @@ sub www_deleteTransactionItem {
 	
 	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));
 
-	return WebGUI::Operation::execute('listTransactions');
+	return WebGUI::Operation::execute($session,'listTransactions');
 }
 
 1;

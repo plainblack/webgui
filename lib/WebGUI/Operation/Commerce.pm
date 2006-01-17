@@ -84,7 +84,7 @@ sub www_addToCart {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("itemId"), $session->form->process("itemType"), $session->form->process("quantity"));
 
-	return WebGUI::Operation::execute('viewCart');
+	return WebGUI::Operation::execute($session,'viewCart');
 }
 
 #-------------------------------------------------------------------
@@ -107,11 +107,11 @@ sub www_cancelTransaction {
 #-------------------------------------------------------------------
 sub www_checkout {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	return WebGUI::Operation::execute('selectShippingMethod') unless (_shippingSelected);
+	return WebGUI::Operation::execute($session,'selectShippingMethod') unless (_shippingSelected);
 
-	return WebGUI::Operation::execute('selectPaymentGateway') unless (_paymentSelected);
+	return WebGUI::Operation::execute($session,'selectPaymentGateway') unless (_paymentSelected);
 
-	return WebGUI::Operation::execute('checkoutConfirm');
+	return WebGUI::Operation::execute($session,'checkoutConfirm');
 }
 
 #-------------------------------------------------------------------
@@ -125,11 +125,11 @@ sub www_checkoutConfirm {
 	# If the user isn't logged in yet, let him do so or have him create an account
 	if ($session->user->userId == 1) {
 		$session->scratch->set('redirectAfterLogin', $session->url->page('op=checkout'));
-		return WebGUI::Operation::execute('auth');
+		return WebGUI::Operation::execute($session,'auth');
 	}
 	
 	# If no payment gateway has been selected yet, have the user do so now.
-	return WebGUI::Operation::execute('checkout') unless (_paymentSelected && _shippingSelected);
+	return WebGUI::Operation::execute($session,'checkout') unless (_paymentSelected && _shippingSelected);
 
 	$var{errorLoop} = [ map {{message => $_}} @{$errors} ] if $errors;
 
@@ -206,11 +206,11 @@ sub www_checkoutSubmit {
 	# check if user has already logged in
 	if ($session->user->userId == 1) {
 		$session->scratch->set('redirectAfterLogin', $session->url->page('op=checkout'));
-		return WebGUI::Operation::execute('displayLogin');
+		return WebGUI::Operation::execute($session,'displayLogin');
 	}
 
 	# Check if a valid payment gateway has bee selected. If not have the user do so.
-	return WebGUI::Operation::execute('checkout') unless (_paymentSelected && _shippingSelected);
+	return WebGUI::Operation::execute($session,'checkout') unless (_paymentSelected && _shippingSelected);
 
 	# Load shipping plugin.
 	$shipping = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
@@ -318,7 +318,7 @@ sub www_checkoutSubmit {
 	_clearCheckoutScratch;
 	
 	# If everythings ok show the purchase history
-	return WebGUI::Operation::execute('viewPurchaseHistory') unless ($checkoutError);
+	return WebGUI::Operation::execute($session,'viewPurchaseHistory') unless ($checkoutError);
 
 	# If an error has occurred show the template errorlog
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
@@ -331,7 +331,7 @@ sub www_completePendingTransaction {
 
 	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->completeTransaction;
 
-	return WebGUI::Operation::execute('listPendingTransactions');
+	return WebGUI::Operation::execute($session,'listPendingTransactions');
 }
 
 #-------------------------------------------------------------------
@@ -361,7 +361,7 @@ sub www_deleteCartItem {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	WebGUI::Commerce::ShoppingCart->new($session)->delete($session->form->process("itemId"), $session->form->process("itemType"));
 
-	return WebGUI::Operation::execute('viewCart');
+	return WebGUI::Operation::execute($session,'viewCart');
 }
 
 #-------------------------------------------------------------------
@@ -528,7 +528,7 @@ sub www_editCommerceSettingsSave {
 		}
 	}
 	
-	return WebGUI::Operation::execute('editCommerceSettings');
+	return WebGUI::Operation::execute($session,'editCommerceSettings');
 }
 
 #-------------------------------------------------------------------
@@ -679,7 +679,7 @@ sub www_selectPaymentGateway {
 		}
 	} elsif (scalar(@$plugins) == 1) {
 		$session->form->process("paymentGateway") = $plugins->[0]->namespace;
-		return WebGUI::Operation::execute('selectPaymentGatewaySave');
+		return WebGUI::Operation::execute($session,'selectPaymentGatewaySave');
 	}
 	
 	$var{pluginLoop} = \@pluginLoop;
@@ -702,7 +702,7 @@ sub www_selectPaymentGatewaySave {
 		$session->scratch->set('paymentGateway', '-delete-');
 	}
 
-	return WebGUI::Operation::execute('checkout');
+	return WebGUI::Operation::execute($session,'checkout');
 }
 
 #-------------------------------------------------------------------
@@ -725,7 +725,7 @@ sub www_selectShippingMethod {
 		}
 	} elsif (scalar(@$plugins) == 1) {
 		$session->form->process("shippingMethod") = $plugins->[0]->namespace;
-		return WebGUI::Operation::execute("selectShippingMethodSave");
+		return WebGUI::Operation::execute($session,"selectShippingMethodSave");
 	}
 	
 	$var{pluginLoop} = \@pluginLoop;
@@ -745,7 +745,7 @@ sub www_selectShippingMethodSave {
 	my $shipping = WebGUI::Commerce::Shipping->load($session, $session->form->process("shippingMethod"));
 	
 	$shipping->processOptionsForm;
-	return WebGUI::Operation::execute('selectShipping') unless ($shipping->optionsOk);
+	return WebGUI::Operation::execute($session,'selectShipping') unless ($shipping->optionsOk);
 	
 	if ($shipping->enabled) {
 		$session->scratch->set('shippingMethod', $shipping->namespace);
@@ -754,13 +754,13 @@ sub www_selectShippingMethodSave {
 		$session->scratch->set('shippingMethod', '-delete-');
 	}
 
-	return WebGUI::Operation::execute('checkout');
+	return WebGUI::Operation::execute($session,'checkout');
 }
 
 #-------------------------------------------------------------------
 sub www_transactionComplete {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	return WebGUI::Operation::execute('viewPurchaseHistory');	
+	return WebGUI::Operation::execute($session,'viewPurchaseHistory');	
 }
 
 #-------------------------------------------------------------------
@@ -774,7 +774,7 @@ my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 		}
 	}
 
-	return WebGUI::Operation::execute('viewCart');
+	return WebGUI::Operation::execute($session,'viewCart');
 }
 
 #-------------------------------------------------------------------

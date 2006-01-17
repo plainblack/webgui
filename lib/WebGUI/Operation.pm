@@ -10,7 +10,7 @@ package WebGUI::Operation;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use strict;
+use strict qw(vars subs);
 
 =head1 NAME
 
@@ -25,7 +25,7 @@ B<NOTE:>After adding a new operation, the operation / package name must be added
 =head1 SYNOPSIS
 
  use WebGUI::Operation;
- $html = WebGUI::Operation::execute("switchAdminOn");
+ $html = WebGUI::Operation::execute($session,"switchAdminOn");
  $hashRef = WebGUI::Operation::getOperations();
 
 =head1 METHODS
@@ -60,9 +60,9 @@ sub execute {
 		# Call the method
 		$cmd = $operation->{$op} . '::www_'.$op;
 		$output = eval{&$cmd($session)};
-		$session->error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
+		$session->errorHandler->error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
 	} else {
-		$session->security("execute an invalid operation: ".$op);
+		$session->errorHandler->security("execute an invalid operation: ".$op);
 	}
 	return $output;
 }

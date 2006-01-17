@@ -43,7 +43,7 @@ sub www_deleteProductParameterOption {
 	
 	WebGUI::Product->getByOptionId($session,$optionId)->deleteOption($optionId);
 
-	return WebGUI::Operation::execute('manageProduct');
+	return WebGUI::Operation::execute($session,'manageProduct');
 }
 
 #-------------------------------------------------------------------
@@ -55,7 +55,7 @@ sub www_deleteProductParameter {
 	
 	WebGUI::Product->getByParameterId($session,$parameterId)->deleteParameter($parameterId);
 
-	return WebGUI::Operation::execute('manageProduct');
+	return WebGUI::Operation::execute($session,'manageProduct');
 }
 
 #-------------------------------------------------------------------
@@ -67,7 +67,7 @@ sub www_deleteProduct {
 	
 	WebGUI::Product->new($session,$productId)->delete;
 
-	return WebGUI::Operation::execute('listProducts');
+	return WebGUI::Operation::execute($session,'listProducts');
 }
 
 #-------------------------------------------------------------------
@@ -160,7 +160,7 @@ sub www_editProductSave {
 	push(@error, $i18n->get('edit product weight error')) unless (defined $session->form->process("weight") && $session->form->process("price") =~ /^\d+(\.\d+)?$/);
 	push(@error, $i18n->get('edit product sku error')) unless ($session->form->process("sku"));
 	
-	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);	
+	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute($session,'editProduct') if (@error);	
 
 	$productId = $session->form->process("productId");
 	$product = WebGUI::Product->new($session,$productId);
@@ -175,7 +175,7 @@ sub www_editProductSave {
 	});
 	
 	$session->form->process("productId") = $product->get('productId');
-	return WebGUI::Operation::execute('manageProduct');
+	return WebGUI::Operation::execute($session,'manageProduct');
 }
 		
 #-------------------------------------------------------------------
@@ -239,7 +239,7 @@ sub www_editProductParameterSave {
 	push (@error, $i18n->get('edit parameter name error')) unless $session->form->process("name");
 	push (@error, $i18n->get('edit parameter productId error')) unless $session->form->process("productId");
 
-	return "<ul><li>".join('</li><li>', @error)."</li></ul>".WebGUI::Operation::execute('editProductParameter') if (@error);
+	return "<ul><li>".join('</li><li>', @error)."</li></ul>".WebGUI::Operation::execute($session,'editProductParameter') if (@error);
 	
 	$product = WebGUI::Product->new($session,$session->form->process("productId"));
 	$skuTemplate = $product->get('skuTemplate');
@@ -260,8 +260,8 @@ sub www_editProductParameterSave {
 		name		=> $session->form->process("name")
 		});
 	
-	return WebGUI::Operation::execute('editSkuTemplate') if ($session->form->process("parameterId") eq 'new');
-	return WebGUI::Operation::execute('manageProduct');
+	return WebGUI::Operation::execute($session,'editSkuTemplate') if ($session->form->process("parameterId") eq 'new');
+	return WebGUI::Operation::execute($session,'manageProduct');
 }
 
 #-------------------------------------------------------------------
@@ -340,7 +340,7 @@ sub www_editProductParameterOptionSave {
 	push (@error, $i18n->get('edit option value error')) unless ($session->form->process("value"));
 	push (@error, $i18n->get('edit option parameterId error')) unless ($session->form->process("parameterId"));
 
-	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute('editProduct') if (@error);
+	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute($session,'editProduct') if (@error);
 
 	$product = WebGUI::Product->getByParameterId($session,$session->form->process("parameterId"));
 	$optionId = $session->form->process("optionId");
@@ -352,7 +352,7 @@ sub www_editProductParameterOptionSave {
 		skuModifier	=> $session->form->process("skuModifier")
 		});
 
-	return WebGUI::Operation::execute('manageProduct');
+	return WebGUI::Operation::execute($session,'manageProduct');
 }
 
 #-------------------------------------------------------------------
@@ -418,7 +418,7 @@ my	$variantId = $session->form->process("variantId");
 
 	WebGUI::Product->getByVariantId($session,$variantId)->setVariant($variantId, $session->form->paramsHashRef);
 
-	return WebGUI::Operation::execute('listProductVariants');
+	return WebGUI::Operation::execute($session,'listProductVariants');
 }
 
 #-------------------------------------------------------------------
@@ -472,7 +472,7 @@ sub www_editSkuTemplateSave {
 		skuTemplate	=> $session->form->process("skuTemplate"),
 		});
 
-	return WebGUI::Operation::execute('manageProduct');
+	return WebGUI::Operation::execute($session,'manageProduct');
 }
 
 #-------------------------------------------------------------------
@@ -514,7 +514,7 @@ sub www_listProductVariants {
 	
 	$productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
 
-	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
+	return WebGUI::Operation::execute($session,'listProducts') if ($productId eq 'new' || !$productId);
 	
 	$product = WebGUI::Product->new($session,$productId);
 
@@ -582,7 +582,7 @@ sub www_listProductVariantsSave {
 			available => $availableVariants{$_->{variantId}} ? '1' : '0'});
 	}
 
-	return WebGUI::Operation::execute('listProductVariants');
+	return WebGUI::Operation::execute($session,'listProductVariants');
 }
 
 #-------------------------------------------------------------------
@@ -595,7 +595,7 @@ sub www_manageProduct {
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	
 	$productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
-	return WebGUI::Operation::execute('listProducts') if ($productId eq 'new' || !$productId);
+	return WebGUI::Operation::execute($session,'listProducts') if ($productId eq 'new' || !$productId);
 	$session->scratch->set('managingProduct', $productId);
 
 	$product = WebGUI::Product->new($session,$productId);
