@@ -8,16 +8,17 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
 use strict;
-use lib '../lib';
-use Getopt::Long;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
 use Data::Dumper;
-# ---- END DO NOT EDIT ----
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 #This test is to verify bugs with respect to Macros:
 # - [ 1364838 ] ^GroupText Macro cannot execute other macros
@@ -113,23 +114,3 @@ foreach my $macro ( @settingMacros ) {
 		is($value, $macroVal, sprintf "Testing %s", $macro->{macro});
 	}
 }
-
-cleanup($session); # this line is required
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-

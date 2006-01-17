@@ -8,17 +8,17 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Text::Balanced qw(extract_codeblock);
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Operation::Help;
 use WebGUI::International;
 use WebGUI::Session;
+use Text::Balanced qw(extract_codeblock);
 use Data::Dumper;
 use File::Find;
-# ---- END DO NOT EDIT ----
 
 #The goal of this test is to locate all of the international labels that it
 #can and verify that they exist in all loaded language models
@@ -26,7 +26,7 @@ use File::Find;
 use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 # put your tests here
 
@@ -125,8 +125,6 @@ foreach my $label ( @objLabels ) {
 	ok($i18n->get(@{ $label }{qw(label namespace )} ),
 	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
 }
-
-cleanup($session); # this line is required
 
 sub label_finder_pm {
 	next unless /\.pm$/;
@@ -233,21 +231,3 @@ sub getSQLLabels {
 	}
 	return @sqlLabels;
 }
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        return WebGUI::Session->open("../..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-

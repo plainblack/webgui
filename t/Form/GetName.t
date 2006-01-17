@@ -8,15 +8,15 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Form::FieldType;
 use WebGUI::Form::DynamicField;
 use WebGUI::Session;
 use Data::Dumper;
-# ---- END DO NOT EDIT ----
 
 #The goal of this test is to verify that getName works with all Form types.
 #getName is now inherited by all Forms and pulls the internationalized ID
@@ -28,7 +28,7 @@ use Test::More; # increment this value for each test you create
 
 my $numTests = 0;
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 # put your tests here
 
@@ -55,23 +55,3 @@ foreach my $formType (@formTypes) {
 my $name = WebGUI::Form::DynamicField->getName($session);
 
 ok($name, 'did not inherit default form name');
-
-cleanup($session); # this line is required
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("../..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-

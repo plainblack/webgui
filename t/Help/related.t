@@ -8,13 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Operation::Help;
-# ---- END DO NOT EDIT ----
 
 #The goal of this test is to verify that all entries in the lib/WebGUI/Help
 #directory correctly resolve to other Help entries.  The total number of
@@ -24,7 +24,7 @@ use WebGUI::Operation::Help;
 use Test::More;
 my $numTests = 0;
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
@@ -61,27 +61,3 @@ foreach my $related (@relatedHelp) {
 	my ($topic, $entry, $parentTopic, $parentEntry) = @{ $related }{'namespace', 'tag', 'parentTopic', 'parentEntry'};
 	ok( exists $helpTable{$topic}{$entry}, "Help entry: $topic -> $entry from $parentTopic -> $parentEntry");
 }
-
-# put your tests here
-
-cleanup($session); # this line is required
-
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        return WebGUI::Session->open("../..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-
-

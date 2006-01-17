@@ -8,14 +8,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
 use Test::More tests => 8; # increment this value for each test you create
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 my $list = WebGUI::Asset::Template->getList($session);
 ok(defined $list, "getList()");
@@ -37,23 +39,3 @@ ok($output =~ m/AAAAA/, "process() - variables");
 ok($output =~ m/true/, "process() - conditionals");
 ok($output =~ m/XYXYXYXYXY/, "process() - loops");
 $template->purge;
-
-cleanup($session); # this line is required
-
-
-
-sub initialize {
-	$|=1; # disable output buffering
-	my $configFile;
-	GetOptions(
-        	'configFile=s'=>\$configFile
-	);
-	exit 1 unless ($configFile);
-	my $session = WebGUI::Session->open("../..",$configFile);
-}
-
-sub cleanup {
-	my $session = shift;
-	$session->close();
-}
-

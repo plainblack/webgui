@@ -8,17 +8,15 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
-use Data::Dumper;
-# ---- END DO NOT EDIT ----
 
-my $session = initialize();  # this line is required
-
+my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 

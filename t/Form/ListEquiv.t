@@ -8,15 +8,15 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Form::DynamicField;
 use WebGUI::Form::SelectList;
 use WebGUI::Session;
 use Data::Dumper;
-# ---- END DO NOT EDIT ----
 
 #The goal of this test is to verify that all SelectList type Forms
 #can be generated directly and via DynamicField
@@ -33,7 +33,7 @@ use Test::More; # increment this value for each test you create
 #	compare output of toHtmlWithWrapper from both objects
 my $numTests = 8*14;
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 my $i18n = WebGUI::International->new($session);
 
@@ -422,24 +422,3 @@ is($direct->get('sortByValue'), 1, 'direct DatabaseLink was assigned sortByValue
 is($dynamic->toHtml, $direct->toHtml, "matching DatabaseLink output, toHtml");
 is($dynamic->toHtmlWithWrapper, $direct->toHtmlWithWrapper, "matching DatabaseLink output, toHtmlWithWrapper");
 is($dynamic->toHtmlAsHidden, $direct->toHtmlAsHidden, "matching DatabaseLink output, toHtmlAsHidden");
-
-
-cleanup($session); # this line is required
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("../..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-
