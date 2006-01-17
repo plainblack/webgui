@@ -109,6 +109,15 @@ paymentPlugins = ITransact
 
 shippingPlugins = ByPrice, ByWeight, PerTransaction
 
+# Specify the list of template parsers available in the system.
+
+templateParsers = WebGUI::Asset::Template::HTMLTemplate
+
+# Specify the default template parser.
+
+defaultTemplateParser = WebGUI::Asset::Template::HTMLTemplate
+
+
 # Specify a the list of assets you want to appear in your
 # Add Content menus.
 

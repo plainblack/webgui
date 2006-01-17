@@ -86,6 +86,19 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 get ()
+
+An alias for process()
+
+=cut
+
+sub get {
+	my $self = shift;
+	$self->process(@_);
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session )
 
 Constructor.

@@ -12,7 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use File::Path;
 
 my $toVersion = "6.9.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -20,16 +20,33 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+templateParsers();
+removeFiles();
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub templateParsers {
+	print "\tAdding support for multiple template parsers.\n" unless ($quiet);
+	$session->db->write("alter table template add column parser varchar(255) not null default 'WebGUI::Asset::Template::HTMLTemplate'");
+}
+
+#-------------------------------------------------
+sub removeFiles {
+	print "\tRemoving old unneeded files.\n" unless ($quiet);
+	unlink '../../lib/WebGUI/ErrorHandler.pm';
+	unlink '../../lib/WebGUI/HTTP.pm';
+	unlink '../../lib/WebGUI/Privilege.pm';
+	unlink '../../lib/WebGUI/DateTime.pm';
+	unlink '../../lib/WebGUI/FormProcessor.pm';
+	unlink '../../lib/WebGUI/URL.pm';
+	unlink '../../lib/WebGUI/Id.pm';
+	unlink '../../lib/WebGUI/Icon.pm';
+	unlink '../../lib/WebGUI/Style.pm';
+	unlink '../../lib/WebGUI/Setting.pm';
+	unlink '../../lib/WebGUI/Grouping.pm';
+}
 
 
 

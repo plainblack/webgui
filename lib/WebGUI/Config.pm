@@ -60,7 +60,7 @@ sub get {
 	my $self = shift;
 	my $param = shift;
 	my $value = $self->{_config}->get($param);
-	if (isIn($param, qw(sitename assets utilityAssets assetContainers authMethods shippingPlugins paymentPlugins))) {
+	if (isIn($param, qw(sitename templateParsers assets utilityAssets assetContainers authMethods shippingPlugins paymentPlugins))) {
 		if (ref $value ne "ARRAY") {
                         $value = [$value];
                 }

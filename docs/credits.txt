@@ -13,6 +13,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Irving Carrion
                                      Richard Clark
                                      Doug Collinge
+                                     Misja Op de Coul / E-Wise
                                      Flavio Curti
                                      Michele Dell'Aquila / CSU
                                      Jeff Depons / Adaptive Dynamics
