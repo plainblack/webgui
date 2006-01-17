@@ -607,7 +607,6 @@ Deletes this user object out of the cache.
 
 sub uncache {
 	my $self = shift;
-	use Data::Dumper;print "<br /><br /> HOO HOO   ".Dumper($self->session);
 	my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
 	$cache->delete;	
 }
