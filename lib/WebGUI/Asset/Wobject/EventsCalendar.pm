@@ -277,9 +277,9 @@ sub view {
 					$event->update({ "eventEndDate"=>$eventStartDate });
 				}
 				#Prune events that don't appear in this month.
-				next if (($eventStartDate > $monthEnd) || ($eventEndDate < $monthStart));
+		#		next if (($eventStartDate > $monthEnd) || ($eventEndDate < $monthStart));
 				#Prune events that have already ended if $startsNow
-				next if (($eventEndDate < $minDate) && $startsNow);
+				next if (($eventEndDate < $minDate) && ($startsNow) && ($session{form}{calMonthStart} eq '1') && ($i == 1));
 				#Hide this event unless we are allowed to see it.  Funny that each event has 4 date/time pairs.
 				next unless $event->canView; 
 				my $eventLength = WebGUI::DateTime::getDaysInInterval($eventStartDate,$eventEndDate);
@@ -289,7 +289,7 @@ sub view {
 					WebGUI::DateTime::epochToHuman($eventEndDate, "%y %c %D %z %Z %w");
 				my $eventCycleStart = 0;
 				# Fast-Forward Event Cycle to this month (for events spanning multiple months)
-				$eventCycleStart = (WebGUI::DateTime::getDaysInInterval($eventStartDate,$monthStart) - 1) if ($eventStartDate < $monthStart);
+		#		$eventCycleStart = (WebGUI::DateTime::getDaysInInterval($eventStartDate,$monthStart) - 1) if ($eventStartDate < $monthStart);
 				# also, skip leading days of this event if $startsNow is true.  Doesn't work in Events List.  Oh well.
 		#		$eventCycleStart = (WebGUI::DateTime::getDaysInInterval($eventStartDate,time)) if (($eventStartDate < time) && ($startsNow));
 				# by default, stop processing this event at the end of its length.
