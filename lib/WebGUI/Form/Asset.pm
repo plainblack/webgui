@@ -95,7 +95,7 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-        my $asset = WebGUI::Asset->newByDynamicClass($self->get("value")) || WebGUI::Asset->getRoot;
+        my $asset = WebGUI::Asset->newByDynamicClass($self->get("value")) || WebGUI::Asset->getRoot($self->session);
         return WebGUI::Form::Hidden->new(
                         name=>$self->get("name"),
                         extras=>$self->get("extras"),

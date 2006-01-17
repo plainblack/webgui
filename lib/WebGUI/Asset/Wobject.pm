@@ -584,7 +584,7 @@ sub www_view {
 			return "";
 		} else { # tell em it doesn't exist anymore
 			$self->session->http->setStatus("410");
-			return WebGUI::Asset->getNotFound->www_view;
+			return WebGUI::Asset->getNotFound($self->session)->www_view;
 		}
 	}
 	if ($self->get("encryptPage") && $self->session->env->get("HTTPS") ne "on") {

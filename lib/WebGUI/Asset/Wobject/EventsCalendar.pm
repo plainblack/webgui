@@ -213,7 +213,7 @@ sub view {
 		$children = $self->getLineage(["descendants"],{returnObjects=>1,
 			includeOnlyClasses=>["WebGUI::Asset::Event"]});
 	} elsif ($scope == 1) { #calendar is global
-		$children = WebGUI::Asset::getRoot()->getLineage(["descendants"],{returnObjects=>1,
+		$children = WebGUI::Asset::getRoot($self->session)->getLineage(["descendants"],{returnObjects=>1,
 			includeOnlyClasses=>["WebGUI::Asset::Event"]}); 
 	}
 
