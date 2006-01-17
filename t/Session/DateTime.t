@@ -15,15 +15,20 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 22; # increment this value for each test you create
+use Test::More tests => 26; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
 my $wgbday = 997966800;
+my $bdayCopy = $wgbday;
 ok($session->datetime->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
 ok($session->datetime->addToTime($wgbday,1,2,3) >= $wgbday+1*60*60+2*60+3, "addToTime()"); 
 my ($start, $end) = $session->datetime->dayStartEnd($wgbday);
 ok($end-$start >= 60*60*23, "dayStartEnd()"); 
+is($session->datetime->epochToHuman($wgbday,"%y"), "2001", "epochToHuman() - year"); 
+is($session->datetime->epochToHuman($wgbday,"%c"), "August", "epochToHuman() - month name"); 
+is($session->datetime->epochToHuman($wgbday,"%m"), "08", "epochToHuman() - month number, 2 digit"); 
+is($session->datetime->epochToHuman($wgbday,"%M"), "8", "epochToHuman() - month number, variable digit"); 
 is($session->datetime->epochToHuman($wgbday,"%%%c%d%h"), "%August1608", "epochToHuman()"); 
 is($session->datetime->epochToSet($wgbday,1), "2001-08-16 08:00:00", "epochToSet()");
 is($session->datetime->getDayName(7), "Sunday", "getDayName()");

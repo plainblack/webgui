@@ -9,16 +9,16 @@
 #-------------------------------------------------------------------
 
 # ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
+use WebGUI::Macro_Config;
 use Data::Dumper;
-use Macro_Config;
 # ---- END DO NOT EDIT ----
-
-my $session = initialize();  # this line is required
 
 use Test::More; # increment this value for each test you create
 
@@ -43,6 +43,8 @@ plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
 
+my $session = WebGUI::Test->session;
+
 unless ($session->config->get('macros')->{'D'}) {
 	diag("Inserting macro into config");
 	Macro_Config::insert_macro($session, 'D', 'Date');
@@ -54,23 +56,3 @@ foreach my $testSet (@testSets) {
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, 'testing '.$testSet->{format});
 }
-
-cleanup($session); # this line is required
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("../..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-

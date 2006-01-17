@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Macro;
 use WebGUI::Session;
 use Data::Dumper;
-use Macro_Config;
+use WebGUI::Macro_Config;
 
 my $session = WebGUI::Test->session;
 
