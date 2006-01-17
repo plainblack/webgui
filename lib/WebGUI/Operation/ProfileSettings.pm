@@ -202,7 +202,7 @@ sub www_editProfileField {
 		next if $form eq 'DynamicField';
 		my $cmd = join '::', 'WebGUI::Form', $form;
 		eval "use $cmd";
-		my $w = eval "$cmd->new();";
+		my $w = eval "$cmd->new($session);";
 		push @profileForms, $form if $w->{profileEnabled};
 	}
 

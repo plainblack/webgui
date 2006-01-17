@@ -265,8 +265,7 @@ sub toHtmlAsHidden {
         foreach my $key (keys %options) {
                 foreach my $item (@values) {
                         if ($item eq $key) {
-                                $output .= WebGUI::Form::Hidden->new(
-					$self->session,
+                                $output .= WebGUI::Form::Hidden->new($self->session,
                                         name=>$self->get("name"),
                                         value=>$key
                                         )->toHtmlAsHidden;

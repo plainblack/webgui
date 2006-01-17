@@ -73,7 +73,7 @@ sub _createField {
                 }
 	}
 	my $cmd = "WebGUI::Form::".$data->{type};
-	return &$cmd(\%param);
+	return &$cmd($self->session, \%param);
 }
 
 #-------------------------------------------------------------------

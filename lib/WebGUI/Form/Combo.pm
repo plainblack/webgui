@@ -100,8 +100,7 @@ sub toHtml {
 	$self->get("options")->{''} = '['.$i18n->get(582).']';
         $self->get("options")->{_new_} = $i18n->get(581).'-&gt;';
 	return $self->SUPER::toHtml
-		.WebGUI::Form::Text->new(
-			$self->session,
+		.WebGUI::Form::Text->new($self->session,
 			size=>$self->session->setting->get("textBoxSize")-5,
 			name=>$self->get("name")."_new",
 			id=>$self->get('id')."_new"

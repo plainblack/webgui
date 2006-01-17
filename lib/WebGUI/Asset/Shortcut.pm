@@ -317,8 +317,7 @@ sub getFieldsList {
 	}
 	$output .= '<table cellspacing="0" cellpadding="3" border="1"><tr><td><table cellspacing="0" cellpadding="3" border="0">';
 	my @prefFieldsToShow = split("\n",$self->getValue("prefFieldsToShow"));
-	$output .= WebGUI::Form::CheckList->new(
-		$self->session,
+	$output .= WebGUI::Form::CheckList->new($self->session,
 		-name=>"prefFieldsToShow",
 		-value=>\@prefFieldsToShow,
 		-options=>\%fieldNames,
@@ -329,8 +328,7 @@ sub getFieldsList {
 	)->toHtmlWithWrapper;
 	$output .= '</table></td><td><table cellspacing="0" cellpadding="3" border="0">';
 	my @prefFieldsToImport = split("\n",$self->getValue("prefFieldsToImport"));
-	$output .= WebGUI::Form::CheckList->new(
-		$self->session,
+	$output .= WebGUI::Form::CheckList->new($self->session,
 		-name=>"prefFieldsToImport",
 		-value=>\@prefFieldsToImport,
 		-options=>\%fieldNames,

@@ -95,20 +95,20 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-        my $asset = WebGUI::Asset->newByDynamicClass($self->get("value")) || WebGUI::Asset->getRoot($self->session);
-        return WebGUI::Form::Hidden->new(
+        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->get("value")) || WebGUI::Asset->getRoot($self->session);
+        return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name"),
                         extras=>$self->get("extras"),
                         value=>$asset->getId,
 			id=>$self->get("id"),
                         )->toHtml
-                .WebGUI::Form::Text->new(
+                .WebGUI::Form::Text->new($self->session,
                         name=>$self->get("name")."_display",
                         extras=>' readonly="1" ',
                         value=>$asset->get("title"),
 			id=>$self->get('id')."_display"
                         )->toHtml
-                .WebGUI::Form::Button->new(
+                .WebGUI::Form::Button->new($self->session,
                         value=>"...",
                         extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree;classLimiter=".$self->get("class").";formId=".$self->get('id')).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;

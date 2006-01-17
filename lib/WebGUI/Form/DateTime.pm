@@ -114,16 +114,17 @@ Renders a date picker control.
 sub toHtml {
         my $self = shift;
 	my $value = $self->session->datetime->epochToSet($self->get("value"),1);
-	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
+	my $i18n = WebGUI::International->new($self->session);
+	my $language  = $i18n->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
-		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
+		$language = $i18n->getLanguage("English","languageAbbreviation");
 	}
         $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/calendar.js',{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/calendar-setup.js',{ type=>'text/javascript' });
         $self->session->style->setLink($self->session->config->get("extrasURL").'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	my $mondayFirst = $self->session->user->profileField("firstDayOfWeek") ? "true" : "false";
-        return WebGUI::Form::Text->new(
+        return WebGUI::Form::Text->new($self->session,
                 name=>$self->get("name"),
                 value=>$value,
                 size=>$self->get("size"),

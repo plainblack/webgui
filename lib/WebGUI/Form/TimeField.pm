@@ -112,8 +112,7 @@ sub toHtml {
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789:\')"');
 	return $self->SUPER::toHtml
-		.WebGUI::Form::Button->new(
-			$self->session,
+		.WebGUI::Form::Button->new($self->session,
 			id=>$self->get('id'),
 			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->config->get("extrasURL"). '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>$i18n->get(970)
@@ -130,8 +129,7 @@ Renders the field as a hidden field.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-	return WebGUI::Form::Hidden->new(
-		$self->session,
+	return WebGUI::Form::Hidden->new($self->session,
 		name=>$self->get("name"),
 		value=>secondsToTime($self->get("value"))
 		)->toHtmlAsHidden;

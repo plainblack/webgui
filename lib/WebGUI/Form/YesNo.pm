@@ -109,8 +109,7 @@ sub toHtml {
         } else {
                 $checkNo = 1;
         }
-        my $output = WebGUI::Form::Radio->new(
-		$self->session,
+        my $output = WebGUI::Form::Radio->new($self->session,
                 checked=>$checkYes,
                 name=>$self->get("name"),
                 value=>1,
@@ -118,8 +117,7 @@ sub toHtml {
                 )->toHtml;
         $output .= $i18n->get(138);
         $output .= '&nbsp;&nbsp;&nbsp;';
-        $output .= WebGUI::Form::Radio->new(
-		$self->session,
+        $output .= WebGUI::Form::Radio->new($self->session,
                 checked=>$checkNo,
                 name=>$self->get("name"),
                 value=>0,

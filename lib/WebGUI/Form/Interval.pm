@@ -117,14 +117,14 @@ sub toHtml {
 	# not sure why, but these things need to be defined like this or
 	# they fail under some circumstnaces 
 	my $cmd = "WebGUI::Form::Integer";
-	my $out = $cmd->new(
+	my $out = $cmd->new($self->session,
 		name=>$self->get("name")."_interval",
 		value=>$interval,
 		extras=>$self->get("extras"),
 		id=>$self->get('id')."_interval",
 		)->toHtml;
 	$cmd = "WebGUI::Form::SelectBox";
-	$out .= $cmd->new(
+	$out .= $cmd->new($self->session,
 		options=>\%units,
 		name=>$self->get("name")."_units",
 		id=>$self->get('id')."_units",
@@ -145,11 +145,11 @@ Returns the field as hidden controls rather than displayable controls.
 sub toHtmlAsHidden {
 	my $self = shift;
         my ($interval, $units) = $self->session->datetime->secondsToInterval($self->get("value"));
-        return WebGUI::Form::Hidden->new(
+        return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name").'_interval',
                         value=>$interval
                         )->toHtmlAsHidden
-        	.WebGUI::Form::Hidden->new(
+        	.WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name").'_units',
                         value=>$units
                         )->toHtmlAsHidden;
