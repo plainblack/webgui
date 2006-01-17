@@ -25,7 +25,7 @@ Macro for displaying dates formatted for reading by people using $session->datet
 =head3 format string
 
 A string specifying how to format the date using codes similar to those used by
-sprintf.  See L<WebGUI::DateTime/"epochToHuman"> for a list of codes.
+sprintf.  See L<WebGUI::Session::datetime/"epochToHuman"> for a list of codes.
 
 =head3 date
 

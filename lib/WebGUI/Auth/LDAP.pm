@@ -216,7 +216,7 @@ sub createAccount {
 	$vars->{'create.form.ldapConnection.label'} = $i18n->get("ldapConnection");
 	
 	my $url = $self->session->url->page("op=auth;method=createAccount;connection=");
-	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectBox({
+	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectBox($self->session, {
 	                name=>"ldapConnection",
 					options=>WebGUI::LDAPLink->getList($self->session,),
 					value=>[$connection->{ldapLinkId}],
@@ -362,7 +362,7 @@ sub editUserFormSave {
 sub editUserSettingsForm {
    my $self = shift;
    my $f = WebGUI::HTMLForm->new($self->session);
-   my $ldapConnection = WebGUI::Form::selectBox({
+   my $ldapConnection = WebGUI::Form::selectBox($self->session, {
 	                name=>"ldapConnection",
 					options=>WebGUI::LDAPLink->getList($self->session,),
 					value=>[$self->session->setting->get("ldapConnection")]

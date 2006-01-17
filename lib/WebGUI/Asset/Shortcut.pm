@@ -52,12 +52,12 @@ sub _drawQueryBuilder {
 	}
 
 	# Static form fields
-	my $shortcutCriteriaField = WebGUI::Form::textarea({
+	my $shortcutCriteriaField = WebGUI::Form::textarea($self->session, {
 		name=>"shortcutCriteria",
 		value=>$self->getValue("shortcutCriteria"),
 		extras=>'style="width: 100%" '.$self->{_disabled}
 	});
-	my $conjunctionField = WebGUI::Form::selectBox({
+	my $conjunctionField = WebGUI::Form::selectBox($self->session, {
 		name=>"conjunction",
 		options=>{
 			"AND" => $i18n->get("AND"),
@@ -83,7 +83,7 @@ sub _drawQueryBuilder {
 
 		# The operator select field
 		my $opFieldName = "op_field".$i;
-		my $opField = WebGUI::Form::selectList({
+		my $opField = WebGUI::Form::selectList($self->session, {
 			name=>$opFieldName,
 			uiLevel=>5,
 			options=>$operator{$fieldType},

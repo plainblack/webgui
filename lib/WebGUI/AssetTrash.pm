@@ -211,7 +211,7 @@ sub www_manageTrash {
 		my $title = $child->getTitle;
                 $title =~ s/\'/\\\'/g;
          	$output .= "assetManager.AddLine('"
-			.WebGUI::Form::checkbox({
+			.WebGUI::Form::checkbox($self->session, {
 				name=>'assetId',
 				value=>$child->getId
 				})

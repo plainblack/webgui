@@ -31,7 +31,7 @@ Text to prepend to the date.  This can be the empty string.
 =head3 format string
 
 A string specifying how to format the date using codes similar to those used by
-sprintf.  See L<WebGUI::DateTime/"epochToHuman"> for a list of codes.  Uses
+sprintf.  See L<WebGUI::Session::datetime/"epochToHuman"> for a list of codes.  Uses
 "%z" if empty.
 
 =cut

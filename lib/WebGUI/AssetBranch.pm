@@ -105,7 +105,7 @@ sub www_editBranch {
                 -label=>$i18n->get(104),
                 -uiLevel=>9,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_url"}),
-		-value=>WebGUI::Form::selectBox({
+		-value=>WebGUI::Form::selectBox($self->session, {
                 	name=>"baseUrlBy",
 			extras=>'onchange="toggleSpecificBaseUrl()"',
 			id=>"baseUrlBy",
@@ -114,7 +114,7 @@ sub www_editBranch {
 				specifiedBase=>"Specified Base",
 				none=>"None"
 				}
-			}).'<span id="baseUrl"></span> / '.WebGUI::Form::selectBox({
+			}).'<span id="baseUrl"></span> / '.WebGUI::Form::selectBox($self->session, {
 				name=>"endOfUrl",
 				options=>{
 					menuTitle=>$i18n->get(411),
