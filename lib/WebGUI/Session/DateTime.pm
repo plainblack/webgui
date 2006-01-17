@@ -223,12 +223,13 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 
 sub epochToHuman {
 	my $self = shift;
+	my $epoch = shift || $self->session->datetime->time();
 	my $i18n = WebGUI::International->new($self->session);
 	my $language = $i18n->getLanguage($self->session->user->profileField("language"));
 	my $locale = $language->{languageAbbreviation} || "en";
 	$locale .= "_".$language->{locale} if ($language->{locale});
 	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
-	my $dt = DateTime->from_epoch( epoch=>shift|$self->session->datetime->time(), time_zone=>$timeZone, locale=>$locale );
+	my $dt = DateTime->from_epoch( epoch=>$epoch, time_zone=>$timeZone, locale=>$locale );
 	my $output = shift || "%z %Z";
 	my $temp;
   #---date format preference
@@ -453,13 +454,14 @@ The number of seconds since January 1, 1970 00:00:00.
 
 sub getSecondsFromEpoch {
 	my $self = shift;
-	my $dt = DateTime->from_epoch( epoch => shift );
+	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
+	my $dt = DateTime->from_epoch( epoch => shift, time_zone => $timeZone );
 	my $start = $dt->clone;
 	$start->set_hour(0);
         $start->set_minute(0);
         $start->set_second(0);	
 	my $duration = $dt - $start;
-	return $duration->delta_seconds;
+	return $duration->delta_seconds + 60 * $duration->delta_minutes;
 }
 
 
@@ -498,11 +500,12 @@ The human date string. YYYY-MM-DD HH:MM:SS
 
 sub humanToEpoch {
 	my $self = shift;
+	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
 	my ($dateString,$timeString) = split(/ /,shift);
 	my @date = split(/-/,$dateString);
 	my @time = split(/:/,$timeString);
 	$time[0] = 0 if $time[0] == 24;
-	my $dt = DateTime->new(year => $date[0], month=> $date[1], day=> $date[2], hour=> $time[0], minute => $time[1], second => $time[2]);
+	my $dt = DateTime->new(year => $date[0], month=> $date[1], day=> $date[2], hour=> $time[0], minute => $time[1], second => $time[2], time_zone => $timeZone);
 	return $dt->epoch;
 } 
 
@@ -602,6 +605,7 @@ sub monthStartEnd {
 	my $self = shift;
 	my $dt = DateTime->from_epoch( epoch => shift);
 	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);	
+	$dt->set_day(1);
 	$dt->set_hour(0);
 	$dt->set_minute(0);
 	$dt->set_second(0);
