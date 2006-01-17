@@ -8,20 +8,21 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/lib";
+
+use WebGUI::Test;
+use Test::More;
 use Pod::Coverage;
 use File::Find;
-# ---- END DO NOT EDIT ----
+use File::Spec;
 
-
-use Test::More;
+plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 
 
 my @modules = ();
-find(\&countModules, "../lib/WebGUI");
+find(\&countModules, File::Spec->catdir( WebGUI::Test->lib, 'WebGUI' ) );
 my $moduleCount = scalar(@modules);
 diag("Planning on running $moduleCount tests\n");
 plan tests => $moduleCount;
@@ -37,7 +38,7 @@ sub countModules {
 	return if $filename =~ m/WebGUI\/i18n/;
 	return if $filename =~ m/WebGUI\/Help/;
 	my $package = $filename;
-	$package =~ s/^\.\.\/lib\/(.*)\.pm$/$1/;
+	$package =~ s/^.*(WebGUI.*)\.pm$/$1/;
 	$package =~ s/\//::/g;
 	push(@modules,$package);
 }

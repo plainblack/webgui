@@ -9,17 +9,16 @@
 #-------------------------------------------------------------------
 
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/lib";
+
+use WebGUI::Test;
 use WebGUI::Session;
-# ---- END DO NOT EDIT ----
 
 use Test::More tests => 21; # increment this value for each test you create
 
-my $session = initialize();  # this line is required
-
+my $session = WebGUI::Test->session;
 
 # commify
 is(WebGUI::Utility::commify(10), "10", 'commify() - no comma needed');
@@ -86,25 +85,3 @@ SKIP: {
 	skip("Don't know how to test sortHashDescending.",1);
 	ok(undef, 'sortHashDescending()');
 	}
-
-
-cleanup($session); # this line is required
-
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-

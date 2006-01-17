@@ -8,17 +8,17 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/lib";
+
+use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
-# ---- END DO NOT EDIT ----
 
 use Test::More tests => 33; # increment this value for each test you create
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 # read
 ok(my $sth = $session->db->read("select * from settings"), "read()");
@@ -145,25 +145,3 @@ is($setRowResult, 47, "setRow() - set data");
 my $getRow = $session->db->getRow("incrementer","incrementerId",$setRowId);
 is($getRow->{nextValue}, 47, "getRow()");
 $session->db->write("delete from incrementer where incrementerId=".$session->db->quote($setRowId));
-
-
-cleanup($session); # this line is required
-
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
-

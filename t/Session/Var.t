@@ -8,15 +8,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
  
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Session;
-# ---- END DO NOT EDIT ----
+
 use Test::More tests => 6; # increment this value for each test you create
  
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
  
  
 ok($session->var->getId ne "", "getId()");
@@ -30,21 +31,3 @@ my $id = $session->var->getId;
 $session->var->end;
 my ($count) = $session->db->quickArray("select count(*) from userSession where sessionId=".$session->db->quote($id));
 ok($count == 0,"end()");
-
- 
-cleanup($session); # this line is required
- 
-# ---- DO NOT EDIT BELOW THIS LINE -----
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("../..",$configFile);
-}
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}

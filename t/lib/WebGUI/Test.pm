@@ -69,6 +69,10 @@ sub config {
     return $SESSION->config;
 }
 
+sub lib {
+    return $WEBGUI_LIB;
+}
+
 sub session {
     return $SESSION;
 }

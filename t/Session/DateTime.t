@@ -8,15 +8,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
  
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Session;
-# ---- END DO NOT EDIT ----
+
 use Test::More tests => 22; # increment this value for each test you create
  
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 my $wgbday = 997966800;
 ok($session->datetime->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
@@ -46,20 +47,3 @@ is($session->datetime->secondsToTime(60*60*8),"08:00:00", "secondsToTime()");
 is($session->datetime->setToEpoch("2001-08-16 08:00:00"), $wgbday, "setToEpoch()");
 ok($session->datetime->time() > $wgbday,"time()");
 is($session->datetime->timeToSeconds("08:00:00"), 60*60*8, "timeToSeconds()");
- 
-cleanup($session); # this line is required
- 
-# ---- DO NOT EDIT BELOW THIS LINE -----
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("../..",$configFile);
-}
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}

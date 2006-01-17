@@ -8,14 +8,14 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/lib";
+
+use WebGUI::Test;
 use WebGUI::Asset;
 use WebGUI::Session;
 use File::Find;
-# ---- END DO NOT EDIT ----
 
 #The goal of this test is to check that mandatory template
 #variables exist in their templates.
@@ -178,7 +178,7 @@ my @tmplVarTable = (
 use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
-my $session = initialize();  # this line is required
+my $session = WebGUI::Test->session;
 
 my @varTypes = qw( var loop if );
 
@@ -213,22 +213,4 @@ foreach my $tmpl ( @tmplVarTable ) {
 	}
 }
 
-cleanup($session); # this line is required
-
-# ---- DO NOT EDIT BELOW THIS LINE -----
-
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("..",$configFile);
-}
-
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}
 
