@@ -11,6 +11,7 @@ function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
 	url = url.replace(/^\/\^/,"^");
 	url = url.replace(/http:\/\/\//,"/");
 	url = url.replace(/^.*(\^\/\;.*)$/,"$1");
+	url = url.replace(/^.*(\^FileUrl\(.*\)\;.*)$/,"$1");
         return url;
 }
 

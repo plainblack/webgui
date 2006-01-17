@@ -11,6 +11,9 @@
  - fix [ 1404485 ] userDefined1 to 5 onlineHelp
  - fix [ 1403155 ] Poll shows no result
  - fix [ 1373583 ] ITransact Module does not URL encode data within XML
+ - fix [ 1345363 ] Using RTE breaks links (Thanks to Gerald Young for
+		   assisting with this one.)
+ - fix [ 1376148 ] wrong pages are shown after visit of photo gallery (Gerald Young)
 
 6.8.4
  - fix [ 1395371 ] XSS Vulnerability in DataForm Entries
