@@ -3,7 +3,7 @@ package WebGUI::Asset::Template;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2006 Plain Black Corporation.
+  WebGUI is Copyright 2001-2005 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -14,13 +14,11 @@ package WebGUI::Asset::Template;
 
 =cut
 
-use HTML::Template;
 use strict;
-use WebGUI::Asset;
-use WebGUI::SQL;
-use WebGUI::Storage;
+use base 'WebGUI::Asset';
+use WebGUI::International;
+use WebGUI::Asset::Template::HTMLTemplate;
 
-our @ISA = qw(WebGUI::Asset);
 
 
 =head1 NAME
@@ -44,40 +42,14 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
-sub _execute {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	my $params = shift;
-	my $vars = shift;
-	my $t;
-	eval {
-		$t = HTML::Template->new(%{$params});
-	};
-	unless ($@) {
-	        while (my ($section, $hash) = each %{ $session }) {
-			next unless (ref $hash eq 'HASH');
-        		while (my ($key, $value) = each %$hash) {
-        	                unless (lc($key) eq "password" || lc($key) eq "identifier") {
-                	        	$t->param("session.".$section.".".$key=>$value);
-                        	}
-	                }
-        	} 
-		$t->param(%{$vars});
-		$t->param("webgui.version"=>$WebGUI::VERSION);
-		$t->param("webgui.status"=>$WebGUI::STATUS);
-		return $t->output;
-	} else {
-		$session->errorHandler->error("Error in template. ".$@);
-		my $i18n = WebGUI::International->new($session, 'Asset_Template');
-		return $i18n->get('template error').$@;
-	}
-}
 
-
-#-------------------------------------------------------------------
-
-=head2 definition ( definition )
+=head2 definition ( session, definition )
 
 Defines the properties of this asset.
+
+=head3 session
+
+A reference to an existing session.
 
 =head3 definition
 
@@ -87,9 +59,9 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
         my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_Template');
+	my $i18n = WebGUI::International->new($session,"Asset_Template");
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'template.gif',
@@ -109,13 +81,17 @@ sub definition {
 					fieldType=>'yesNo',
 					defaultValue=>1
 				},
+				parser=>{
+					fieldType=>'selectList',
+					defaultValue=>[$session->config->get("defaultTemplateParser")]
+				},	
 				namespace=>{
 					fieldType=>'combo',
 					defaultValue=>undef
 					}
                         }
                 });
-        return $class->SUPER::definition($session, $definition);
+        return $class->SUPER::definition($session,$definition);
 }
 
 
@@ -130,20 +106,19 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
 	$tabform->hidden({
 		name=>"returnUrl",
-		value=>$self->session->form->process("returnUrl")
+		value=>$self->session->form->get("returnUrl")
 		});
 	if ($self->getValue("namespace") eq "") {
-		my $namespaces = $self->session->db->buildHashRef("select distinct(namespace),namespace 
-			from template order by namespace");
+		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace),namespace from template order by namespace");
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
 			-options=>$namespaces,
 			-label=>$i18n->get('namespace'),
 			-hoverHelp=>$i18n->get('namespace description'),
-			-value=>[$self->session->form->process("namespace")] 
+			-value=>[$self->session->form->get("namespace")] 
 			);
 	} else {
 		$tabform->getTab("meta")->readOnly(
@@ -168,6 +143,21 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('template description'),
 		-value=>$self->getValue("template")
 		);
+	if($self->session->config->get("templateParsers")){
+		my @temparray = @{$self->session->config->get("templateParsers")};
+		tie my %parsers, 'Tie::IxHash';
+		while(my $a = shift @temparray){
+			$parsers{$a} = $self->getParser($self->session, $a)->getName();
+		}
+		my $value = [$self->getValue("parser")];
+		$value = \[$self->session->config->get("defaultTemplateParser")] if(!$self->getValue("parser"));
+		$tabform->getTab("properties")->selectBox(
+			-name=>"parser",
+			-options=>\%parsers,
+			-value=>$value,
+			-label=>$i18n->get('parser'),
+		);
+	}
 	return $tabform;
 }
 
@@ -195,7 +185,7 @@ Specify the namespace to build the list for.
 
 sub getList {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $namespace = shift;
 my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$session->db->quote($session->scratch->get("versionTag")).")) order by assetData.title";
 	my $sth = $session->dbSlave->read($sql);
@@ -208,6 +198,35 @@ my $sql = "select asset.assetId, assetData.revisionDate from template left join 
 	return \%templates;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getParser ( session, parser )
+
+Returns a template parser object.
+
+NOTE: This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 parser
+
+A parser class to use. Defaults to "WebGUI::Asset::Template::HTMLTemplate"
+
+=cut
+
+sub getParser {
+	my $class = shift;
+	my $session = shift;
+	my $parser = shift || $session->config->get("defaultTemplateParser") || "WebGUI::Asset::Template::HTMLTemplate";
+	if ($parser eq "") {
+		return WebGUI::Asset::Template::HTMLTemplate->new($session);
+	} else {
+		eval("use $parser");
+		return $parser->new($session);
+	}
+}
 
 
 #-------------------------------------------------------------------
@@ -225,52 +244,48 @@ A hash reference containing template variables and loops. Automatically includes
 sub process {
 	my $self = shift;
 	my $vars = shift;
-	return $self->processRaw($self->session, $self->get("template"),$vars);
+	return $self->getParser($self->session, $self->get("parser"))->process($self->get("template"), $vars);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 processRaw ( session, template, vars )
+=head2 processRaw ( session, template, vars [ , parser ] )
 
-Evaluate a template replacing template commands for HTML. 
-
-NOTE: This is a class method, no instance data required.
+Process an arbitrary template string. This is a class method.
 
 =head3 session
 
-The session variable
+A reference to the current session.
 
 =head3 template
 
-A scalar variable containing the template.
+A scalar containing the template text.
 
 =head3 vars
 
-A hash reference containing template variables and loops. Automatically includes the entire WebGUI session.
+A hash reference containing template variables.
+
+=head3 parser
+
+Optionally specify the class name of a parser to use.
 
 =cut
 
 sub processRaw {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $template = shift;
 	my $vars = shift;
-	return _execute($session, {
-		scalarref=>\$template,
-		global_vars=>1,
-   		loop_context_vars=>1,
-		die_on_bad_params=>0,
-		no_includes=>1,
-		strict=>0 
-		},$vars);
+	my $parser = shift;
+	return $class->getParser($session,$parser)->process($template, $vars);
 }
 
 
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	if ($self->session->var->isAdminOn) {
+	if ($self->session->var->isAdminOn()) {
 		return $self->getToolbar;
 	} else {
 		return "";
@@ -281,9 +296,9 @@ sub view {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
+        return $self->session->privilege->nsufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
 	$self->getAdminConsole->setHelp("template add/edit","Asset_Template");
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
         return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit template'));
 }
@@ -291,7 +306,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_goBackToPage {
 	my $self = shift;
-	$self->session->http->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
+	$self->session->http->setRedirect($self->session->form->get("returnUrl")) if ($self->session->form->get("returnUrl"));
 	return "";
 }
 
@@ -304,20 +319,19 @@ sub www_manage {
 }
 
 
-
-
 #-------------------------------------------------------------------
-
 sub www_styleWizard {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
+	my $form = $self->session->form;
 	my $output = "";
-	if ($self->session->form->process("step") == 2) {
+	if ($form->get("step") == 2) {
 		my $f = WebGUI::HTMLForm->new($self->session,{action=>$self->getUrl});
 		$f->hidden(name=>"func", value=>"styleWizard");
-		$f->hidden(name=>"proceed", value=>"manageAssets") if ($self->session->form->process("proceed"));
+		$f->hidden(name=>"proceed", value=>"manageAssets") if ($form->get("proceed"));
 		$f->hidden(name=>"step", value=>3);
-		$f->hidden(name=>"layout", value=>$self->session->form->process("layout"));
+		$f->hidden(name=>"layout", value=>$form->get("layout"));
 		$f->text(name=>"heading", value=>"My Site", label=>"Site Name");
 		$f->file(name=>"logo", label=>"Logo", subtext=>"<br />JPEG, GIF, or PNG thats less than 200 pixels wide and 100 pixels tall");
 		$f->color(name=>"pageBackgroundColor", value=>"#ccccdd", label=>"Page Background Color");
@@ -330,16 +344,16 @@ sub www_styleWizard {
 		$f->color(name=>"visitedLinkColor", value=>"#ff00ff", label=>"Visited Link Color");
 		$f->submit;
 		$output = $f->print;
-	} elsif ($self->session->form->process("step") == 3) {
-		my $storageId = $self->session->form->file("logo");
+	} elsif ($form->get("step") == 3) {
+		my $storageId = $form->get("logo","file");
 		my $logo;
 		if ($storageId) {
-			my $storage = WebGUI::Storage::Image->get($self->session,$self->session->form->file("logo"));
+			my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
 			$logo = $self->addChild({
 				className=>"WebGUI::Asset::File::Image",
-				title=>$self->session->form->text("heading")." Logo",
-				menuTitle=>$self->session->form->text("heading")." Logo",
-				url=>$self->session->form->text("heading")." Logo",
+				title=>$form->get("heading")." Logo",
+				menuTitle=>$form->get("heading")." Logo",
+				url=>$form->get("heading")." Logo",
 				storageId=>$storage->getId,
 				filename=>@{$storage->getFiles}[0],
 				templateId=>"PBtmpl0000000000000088"
@@ -359,13 +373,13 @@ my $style = '<html>
 		font-size: 12px;
 	}
 	body {
-		background-color: '.$self->session->form->color("pageBackgroundColor").';
+		background-color: '.$form->get("pageBackgroundColor","color").';
 		font-family: helvetica;
 		font-size: 14px;
 	}
 	.heading {
-		background-color: '.$self->session->form->color("headingBackgroundColor").';
-		color: '.$self->session->form->color("headingForegroundColor").';
+		background-color: '.$form->get("headingBackgroundColor","color").';
+		color: '.$form->get("headingForegroundColor","color").';
 		font-size: 30px;
 		margin-left: 10%;
 		margin-right: 10%;
@@ -386,10 +400,10 @@ my $style = '<html>
 		padding: 5px;
 	}
 	.bodyContent {
-		background-color: '.$self->session->form->color("bodyBackgroundColor").';
-		color: '.$self->session->form->color("bodyForegroundColor").';
+		background-color: '.$form->get("bodyBackgroundColor","color").';
+		color: '.$form->get("bodyForegroundColor","color").';
 		width: 55%; ';
-if ($self->session->form->process("layout") == 1) {
+if ($form->get("layout") == 1) {
 	$style .= '
 		float: left;
 		height: 75%;
@@ -405,9 +419,9 @@ if ($self->session->form->process("layout") == 1) {
 	$style .= '
 	}
 	.menu {
-		background-color: '.$self->session->form->color("menuBackgroundColor").';
+		background-color: '.$form->get("menuBackgroundColor","color").';
 		width: 25%; ';
-if ($self->session->form->process("layout") == 1) {
+if ($form->get("layout") == 1) {
 	$style .= '
 		margin-left: 10%;
 		height: 75%;
@@ -424,10 +438,10 @@ if ($self->session->form->process("layout") == 1) {
 	$style .= '
 	}
 	a {
-		color: '.$self->session->form->color("linkColor").';
+		color: '.$form->get("linkColor","color").';
 	}
 	a:visited {
-		color: '.$self->session->form->color("visitedLinkColor").';
+		color: '.$form->get("visitedLinkColor","color").';
 	}
 	</style>
 </head>
@@ -440,17 +454,17 @@ if ($self->session->form->process("layout") == 1) {
 		$style .= '<div class="logo"><a href="^H(linkonly);">^AssetProxy('.$logo->get("url").');</a></div>';
 	}
 	$style .= '
-		'.$self->session->form->text("heading").'
+		'.$form->get("heading").'
 		<div class="endFloat"></div>
 	</div>
 </div>
 <div class="menu">
-	<div class="padding">^AssetProxy('.($self->session->form->process("layout") == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
+	<div class="padding">^AssetProxy('.($form->get("layout") == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
 </div>
 <div class="bodyContent">
 	<div class="padding"><tmpl_var body.content></div>
 </div>';
-if ($self->session->form->process("layout") == 1) {
+if ($form->get("layout") == 1) {
 	$style .= '<div class="endFloat"></div>';
 }
 $style .= '
@@ -468,7 +482,7 @@ $style .= '
 			})->www_edit;
 	} else {
 		$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func", value=>"styleWizard"});
-		$output .= WebGUI::Form::hidden($self->session,{name=>"proceed", value=>"manageAssets"}) if ($self->session->form->process("proceed"));
+		$output .= WebGUI::Form::hidden($self->session,{name=>"proceed", value=>"manageAssets"}) if ($form->get("proceed"));
 		$output .= '<style type="text/css">
 			.chooser { float: left; width: 150px; height: 150px; } 
 			.representation, .representation td { font-size: 12px; width: 120px; border: 1px solid black; } 
@@ -485,10 +499,9 @@ $style .= '
 			<tr><td style="text-align: center;" colspan="2">Menu</td></tr>
 			<tr><td colspan="2">Body content goes here.</td></tr>
 			</tbody></table></div>|;
-		$output .= WebGUI::Form::submit($self->session,);
-		$output .= WebGUI::Form::formFooter($self->session,);
+		$output .= WebGUI::Form::submit($self->session);
+		$output .= WebGUI::Form::formFooter($self->session);
 	}
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit template")) if ($self->get("url"));
         return $self->getAdminConsole->render($output,$i18n->get('style wizard'));
 }
@@ -502,4 +515,3 @@ sub www_view {
 
 
 1;
-
