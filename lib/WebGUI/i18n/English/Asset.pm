@@ -636,7 +636,7 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
                 },
         '412' => {
                    lastUpdated => 1031514049,
-                   message => q|Synopsis|
+                   message => q|Summary|
                  },
         '954' => {
                    lastUpdated => 1052850265,

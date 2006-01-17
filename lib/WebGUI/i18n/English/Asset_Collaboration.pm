@@ -339,7 +339,7 @@ our $I18N = {
 	},
 
 	'synopsis' => {
-		message => q|Synopsis|,
+		message => q|Summary|,
 		lastUpdated => 1109696029,
 	},
 

@@ -1901,7 +1901,7 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 	},
 
 	'412' => {
-		message => q|Synopsis|,
+		message => q|Summary|,
 		lastUpdated => 1031514049
 	},
 
