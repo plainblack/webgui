@@ -48,6 +48,25 @@ BEGIN {
 
     lib->import( $WEBGUI_LIB );
 
+    # http://thread.gmane.org/gmane.comp.apache.apreq/3378
+    # http://article.gmane.org/gmane.comp.apache.apreq/3388
+    unless ( $^O ne 'darwin' ) {
+
+        require Class::Null;
+        require IO::File;
+
+        unshift @INC, sub {
+            return undef unless $_[1] =~ m/^Apache2|APR/;
+            return IO::File->new( $INC{'Class/Null.pm'}, &IO::File::O_RDONLY );
+        };
+
+        no strict 'refs';
+
+        *Apache2::Const::OK        = sub {   0 };
+        *Apache2::Const::DECLINED  = sub {  -1 };
+        *Apache2::Const::NOT_FOUND = sub { 404 };
+    }
+
     unless ( eval "require WebGUI::Session;" ) {
         warn qq/Failed to require package 'WebGUI::Session'. Reason: '$@'.\n/;
         exit(1);
