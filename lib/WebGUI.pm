@@ -40,10 +40,10 @@ sub handler {
 	}
 	my $uploads = $config->get("uploadsURL");
 	if ($r->uri =~ m/^$uploads/) {
-		$r->set_handlers(PerlAccessHandler => \&uploadsHandler);
+		$r->push_handlers(PerlAccessHandler => \&uploadsHandler);
 	} else {
-		$r->set_handlers(PerlResponseHandler => \&contentHandler);
-		$r->set_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
+		$r->push_handlers(PerlResponseHandler => \&contentHandler);
+		$r->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	}
 	return Apache2::Const::DECLINED;
 }
@@ -59,7 +59,7 @@ sub contentHandler {
 	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
-		$r->print($session->http->getHeader);
+		$session->http->getHeader;
 	} elsif ($session->setting->get("specialState") eq "upgrading") {
 		upgrading($session);
 	} elsif ($session->setting->get("specialState") eq "init") {

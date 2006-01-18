@@ -14,14 +14,14 @@ use lib '../../lib';
 use Getopt::Long;
 use WebGUI::Session;
 # ---- END DO NOT EDIT ----
-use Test::More tests => 10; # increment this value for each test you create
+use Test::More tests => 14; # increment this value for each test you create
  
 my $session = initialize();  # this line is required
  
 # put your tests here
 
-my $scratch = $session->Scratch;
-my $maxCount = 10;
+my $scratch = $session->scratch;
+my $maxCount = 14;
 
 $scratch->deleteAll();
 

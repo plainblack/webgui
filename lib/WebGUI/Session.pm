@@ -359,7 +359,7 @@ sub open {
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
 	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
-	my $sessionId = shift || $self->http->getCookies->{"wgSession"};
+	my $sessionId = shift || $self->http->getCookies->{"wgSession"} || $self->id->generate;
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId);
 	return $self;
 }
@@ -375,7 +375,7 @@ Returns a WebGUI::Session::Os object.
 sub os {
 	my $self = shift;
 	unless (exists $self->{_os}) {
-		$self->{_os} = WebGUI::Session::Os->new;
+		$self->{_os} = WebGUI::Session::Os->new();
 	}
 	return $self->{_os};
 }
