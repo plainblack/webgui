@@ -22,7 +22,8 @@ use Tie::IxHash;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray 
-	&formatBytes &sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round);
+	&formatBytes &sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round
+	&fromBase36 &toBase36);
 
 
 =head1 NAME
@@ -38,6 +39,7 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  use WebGUI::Utility;
  $string = commify($integer);
  $size = formatBytes($integer);
+ $number = fromBase36($string);
  $boolean = isIn($value, @array);
  makeArrayCommaSafe(\@array); 
  makeArrayTabSafe(\@array); 
@@ -48,6 +50,7 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  $hashRef = randomizeHash(\%hash);
  %hash = sortHash(%hash);
  %hash = sortHashDescending(%hash);
+ $string = toBase36($number);
 
 =head1 METHODS
 
@@ -98,7 +101,27 @@ sub formatBytes {
         }
 }
 
+#-------------------------------------------------------------------
 
+=head2 fromBase36 ( string )
+
+Returns a number that has been decoded from base36.
+
+=head3 string
+
+A base 36 encoded string.
+
+=cut
+
+sub fromBase36 {
+        my $string   = shift;
+        my $exponent = 0;
+        my $number;
+        for (reverse split //, $string) {
+                $number += ($_ =~ /\d/ ? $_ : (ord($_) - 87)) * (36**$exponent++);
+        }
+        return $number;
+}
 
 #-------------------------------------------------------------------
 
@@ -360,6 +383,30 @@ sub sortHashDescending {
 		$newHash{ $key } = $hash{ $key };
 	}
 	return %newHash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 toBase36 ( number )
+
+Returns a string that is base36 encoded.
+
+=head3 number
+
+A number that you wish to encode.
+
+=cut
+
+sub toBase36 {
+        my $number = shift;
+        my $string = "";
+        while ($number) {
+                my $quot = $number % 36;
+                $string = ($quot < 10 ? $quot : chr($quot + 87)) . $string;
+                $number = int($number / 36);
+        }
+        $string = "0$string" while length($string) < 9;
+        $string;
 }
 
 1;

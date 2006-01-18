@@ -16,9 +16,12 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 22; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
+
+# base 36
+is(WebGUI::Utility::fromBase36(WebGUI::Utility::toBase36(1234567890)), 1234567890, "{to/from}Base36()");
 
 # commify
 is(WebGUI::Utility::commify(10), "10", 'commify() - no comma needed');

@@ -2,6 +2,8 @@ WebGUI::Cache::Memcached
 WebGUI::Auth::LDAP
 WebGUI::Asset::Wobject::WSClient
 WebGUI::Asset::File::ZipArchive
+WebGUI::Asset::Template::HTMLTemplateExpr
+WebGUI::Asset::Template::TemplateToolkit
 WebGUI::Asset::Wobject::Matrix
 WebGUI::Asset::Wobject::HttpProxy
 WebGUI::Asset::Wobject::Product
@@ -34,7 +36,6 @@ WebGUI::Macro::FormParam
 WebGUI::Macro::GroupAdd
 WebGUI::Macro::GroupDelete
 WebGUI::Macro::GroupText
-WebGUI::Macro::If
 WebGUI::Macro::Include
 WebGUI::Macro::LastModified
 WebGUI::Macro::Product
