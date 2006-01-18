@@ -8,20 +8,19 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
  
-# ---- BEGIN DO NOT EDIT ----
+use FindBin;
 use strict;
-use lib '../../lib';
-use Getopt::Long;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
 use WebGUI::Session;
-# ---- END DO NOT EDIT ----
+
 use Test::More tests => 14; # increment this value for each test you create
  
-my $session = initialize();  # this line is required
- 
-# put your tests here
+my $session = WebGUI::Test->session;
 
 my $scratch = $session->scratch;
-my $maxCount = 14;
+my $maxCount = 10;
 
 $scratch->deleteAll();
 
@@ -49,21 +48,3 @@ is($scratch->get("Test2"), undef, "deleteAll()");
 my $testScratchSession = $scratch->session();
 
 is($testScratchSession, $session, "session()");
-
-
-cleanup($session); # this line is required
- 
-# ---- DO NOT EDIT BELOW THIS LINE -----
-sub initialize {
-        $|=1; # disable output buffering
-        my $configFile;
-        GetOptions(
-                'configFile=s'=>\$configFile
-        );
-        exit 1 unless ($configFile);
-        my $session = WebGUI::Session->open("../..",$configFile);
-}
-sub cleanup {
-        my $session = shift;
-        $session->close();
-}

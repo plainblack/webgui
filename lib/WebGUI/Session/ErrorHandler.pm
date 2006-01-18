@@ -89,7 +89,7 @@ sub canShowDebug {
 	my @ips = split(" ",$self->session->setting->get("debugIp"));
 	my $ok = 0;
 	foreach my $ip (@ips) {
-		if ($self->session->env("REMOTE_ADDR") =~ /^$ip/) {
+		if ($self->session->env->get("REMOTE_ADDR") =~ /^$ip/) {
 			$ok = 1;
 			last;
 		}	
@@ -108,7 +108,7 @@ Returns true if the user meets the conditions to see performance indicators and 
 sub canShowPerformanceIndicators {
 	my $self = shift;
 	my $mask = $self->session->setting->get("debugIp");
-	my $ip = $self->session->env("REMOTE_ADDR");
+	my $ip = $self->session->env->get("REMOTE_ADDR");
        	return (
 			(
 				$self->session->setting->get("showPerformanceIndicators")
@@ -324,6 +324,26 @@ sub new {
 	bless {_logger=>$logger, _session=>$session}, $class;
 }
 
+#-------------------------------------------------------------------
+
+=head2 query ( sql ) 
+
+Logs a sql statement for the debugger output.  Keeps track of the #.
+
+=head3 sql
+
+A sql statement string.
+
+=cut
+
+sub query {
+	my $self = shift;
+	$self->{_query} = 0 unless $self->{_query};
+	$self->{_query} = $self->{_query} + 1;
+	$self->debug("query  ".$self->{_query}.'  '.shift);
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -341,7 +361,7 @@ sub security {
 	my $self = shift;
 	my $message = shift;
 	$self->warn($self->session->user->username." (".$self->session->user->userId.") connecting from "
-	.$self->session->env("REMOTE_ADDR")." attempted to ".$message);
+	.$self->session->env->get("REMOTE_ADDR")." attempted to ".$message);
 }
 
 

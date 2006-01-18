@@ -653,7 +653,7 @@ sub setRow {
         my ($self, $table, $keyColumn, $data, $id) = @_;
         if ($data->{$keyColumn} eq "new" || $id) {
                 $data->{$keyColumn} = $id || $self->session->id->generate();
-                $self->write("insert into $table ($keyColumn) values (".$self->quote($data->{$keyColumn}).")");
+                $self->write("replace into $table ($keyColumn) values (".$self->quote($data->{$keyColumn}).")");
         }
         my (@pairs);
         foreach my $key (keys %{$data}) {
@@ -707,7 +707,7 @@ An SQL insert or update.
 sub write {
 	my $self = shift;
 	my $sql = shift;
-	$self->session->errorHandler->debug("query: ".$sql);
+	$self->session->errorHandler->query($sql);
      	$self->dbh->do($sql) or $self->session->errorHandler->fatal("Couldn't write to the database: ".$sql." : ". $self->dbh->errstr);
 }
 

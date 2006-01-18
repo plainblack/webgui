@@ -209,7 +209,7 @@ sub prepare {
 	my $class = shift;
 	my $sql = shift;
 	my $db = shift;
-	$db->session->errorHandler->debug("query: ".$sql);
+	$db->session->errorHandler->query($sql);
 	my $sth = $db->dbh->prepare($sql) or $db->session->errorHandler->fatal("Couldn't prepare statement: ".$sql." : ". $db->dbh->errstr);
 	bless {_sth => $sth, _sql => $sql, _db=>$db}, $class;
 }
@@ -298,7 +298,7 @@ sub unconditionalRead {
 	my $sql = shift;
 	my $db = shift;
 	my $placeholders = shift;
-	$db->session->errorHandler->debug("query: ".$sql);
+	$db->session->errorHandler->query($sql);
         my $sth = $db->dbh->prepare($sql) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$db->dbh->errstr);
         if ($sth) {
         	$sth->execute(@$placeholders) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$sth->errstr);
