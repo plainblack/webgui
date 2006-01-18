@@ -71,10 +71,14 @@ checkModule("Net::LDAP",0.25);
 checkModule("HTML::Highlight",0.20);
 checkModule("HTML::TagFilter",0.07);
 checkModule("HTML::Template",2.7);
+checkModule("HTML::Template::Expr",0.05,2);
+checkModule("Template",2.14,2);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
 checkModule("JSON",0.991);
 checkModule("Finance::Quote",1.08);
+checkModule("Bit::Vector::Minimal",1.3);
+checkModule("Plucene",1.24);
 #checkModule("POE",0.3202);
 #checkModule("POE::Component::IKC::Server",0.18);
 #checkModule("POE::Component::JobQueue",0.5402);
@@ -189,7 +193,11 @@ sub checkModule {
 			}
 		}
         } else {
-                printResult("Not Installed");
+		if ($skipInstall == 2) {
+			printResult("Not Installed, but it's optional anyway");
+		} else {
+                	printResult("Not Installed");
+		}
 		return if $skipInstall;
 		if (isRoot()) {
                 	my $installThisModule = prompt ("The perl module $module is not installed, do you want to install it now?", "y", "y", "n");
