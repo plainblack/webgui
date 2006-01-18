@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 use WebGUI::User;
-use Test::More tests => 33; # increment this value for each test you create
+use Test::More tests => 34; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
