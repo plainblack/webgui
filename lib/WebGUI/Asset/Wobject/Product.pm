@@ -58,7 +58,7 @@ sub _duplicateFile {
 #-------------------------------------------------------------------
 sub _save {
 	my $self = shift;
-	my $file = WebGUI::Storage::Image->create;
+	my $file = WebGUI::Storage::Image->create($self->session);
 	my $filename = $file->addFileFromFormPost($_[0]);
 	unless ($filename) {
 		$file->delete;

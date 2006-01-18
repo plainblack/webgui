@@ -37,7 +37,7 @@ This package provides a mechanism for storing and retrieving files that are not 
 =head1 SYNOPSIS
 
  use WebGUI::Storage;
- $store = WebGUI::Storage->create;
+ $store = WebGUI::Storage->create($self->session);
  $store = WebGUI::Storage->get($self->session,$id);
 
  $filename = $store->addFileFromFilesystem($pathToFile);
@@ -294,7 +294,7 @@ Copies a storage location and it's contents. Returns a new storage location obje
                                                                                                                                                        
 sub copy {
 	my $self = shift;
-	my $newStorage = WebGUI::Storage->create;
+	my $newStorage = WebGUI::Storage->create($self->session);
 	my $filelist = $self->getFiles(1);
 	foreach my $file (@{$filelist}) {	
         	my $source = FileHandle->new($self->getPath($file),"r");

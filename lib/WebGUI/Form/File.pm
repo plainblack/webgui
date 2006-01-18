@@ -156,7 +156,7 @@ sub getValueFromPost {
 			$storage = WebGUI::Storage::Image->get($self->session,$value);
 		}
 		else {
-			$storage = WebGUI::Storage::Image->create;
+			$storage = WebGUI::Storage::Image->create($self->session);
 		}
 		$storage->addFileFromFormPost($self->get("name"));
 		my @files = @{ $storage->getFiles };

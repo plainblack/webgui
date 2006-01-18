@@ -383,7 +383,7 @@ sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
 		if ($self->get("storageId") eq "") {
-			$self->{_storageLocation} = WebGUI::Storage::Image->create;
+			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
 			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));

@@ -169,7 +169,7 @@ sub createAccount {
    } 
 	my $i18n = WebGUI::International->new($self->session);
    $vars->{'create.message'} = $_[0] if ($_[0]);
-	my $storage = WebGUI::Storage::Image->createTemp;
+	my $storage = WebGUI::Storage::Image->createTemp($self->session);
 	my ($filename, $challenge) = $storage->addFileFromCaptcha;
 	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
 	if ($vars->{useCaptcha}) {
