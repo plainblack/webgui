@@ -349,7 +349,7 @@ sub getOverridesList {
 	my %overrides = $self->getOverrides;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
 	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td><td>'.$i18n->get('Original Value').'</td><td>'.$i18n->get('New value').'</td><td>'.$i18n->get('Replacement value').'</td></tr>';
-	foreach my $definition (@{$self->getShortcutOriginal->definition}) {
+	foreach my $definition (@{$self->getShortcutOriginal->definition($self->session)}) {
 		foreach my $prop (keys %{$definition->{properties}}) {
 			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
 			$output .= '<tr>';
@@ -383,7 +383,7 @@ sub getOverrides {
 		my $orig = $self->getShortcutOriginal;
 		unless (exists $orig->{_propertyDefinitions}) {
 			my %properties;
-			foreach my $definition (@{$orig->definition}) {
+			foreach my $definition (@{$orig->definition($self->session)}) {
 				%properties = (%properties, %{$definition->{properties}});
 			}
 			$orig->{_propertyDefinitions} = \%properties;
@@ -740,7 +740,7 @@ sub www_editOverride {
 	my %overrides = $self->getOverrides;
 	my $output = '';
 	my %props;
-	foreach my $def (@{$self->getShortcutOriginal->definition}) {
+	foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
 		%props = (%props,%{$def->{properties}});
 	}
 	$output .= '</table>';
@@ -780,7 +780,7 @@ sub www_saveOverride {
 	my %overrides = $self->getOverrides;
 	my $output = '';
 	my %props;
-	foreach my $def (@{$self->getShortcutOriginal->definition}) {
+	foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
 		%props = (%props,%{$def->{properties}});
 	}
 	my $fieldType = $props{$fieldName}{fieldType};

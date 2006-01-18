@@ -202,7 +202,7 @@ sub purgeRevision {
 	my $self = shift;
 	if ($self->getRevisionCount > 1) {
 		$self->session->db->beginTransaction;
-        	foreach my $definition (@{$self->definition}) {                
+        	foreach my $definition (@{$self->definition($self->session)}) {                
 			$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
         	}       
         	$self->session->db->commit;

@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 use WebGUI::User;
-use Test::More tests => 34; # increment this value for each test you create
+use Test::More tests => 49; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -140,6 +140,64 @@ $user = "";
 $user = WebGUI::User->new($session);
 is($user->userId, '1', 'new() -- returns visitor with no args');
 $user = "";
+
+$user = WebGUI::User->new($session, "new", "ROYSUNIQUEUSERID000002");
+is($user->userId, "ROYSUNIQUEUSERID000002", 'new() -- override user id');
+$user->authMethod("LDAP");
+is($user->authMethod, "LDAP", 'authMethod() -- set to LDAP');
+
+#get/set karma
+my $oldKarma = $user->karma;
+$user->karma('69', 'peter gibbons', 'test karma');
+is($user->karma, $oldKarma+69, 'karma() -- get/set add amount');
+
+my ($source, $description) = $session->db->quickArray("select source, description from karmaLog where userId=".$session->db->quote($user->userId));
+
+is($source, 'peter gibbons', 'karma() -- get/set source');
+is($description, 'test karma', 'karma() -- get/set description');
+
+$oldKarma = $user->karma;
+$user->karma('-69', 'peter gibbons', 'lumberg took test karma away');
+is($user->karma, $oldKarma-69, 'karma() -- get/set subtract amount');
+
+#Let's test referringAffiliate
+$lastUpdate = time();
+$user->referringAffiliate(10);
+is($user->referringAffiliate, '10', 'referringAffiliate() -- get/set');
+is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- referringAffiliate');
+
+#Let's try adding this user to some groups
+my @groups = qw|2 4|;
+$user->addToGroups(\@groups);
+
+my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
+ok($result, 'addToGroups() -- added to first test group');
+
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
+ok($result, 'addToGroups() -- added to second test group');
+
+#Let's delete this user from our test groups
+$user->deleteFromGroups(\@groups);
+
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
+is($result, '0', 'deleteFromGroups() -- removed from first test group');
+
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
+is($result, '0', 'deleteFromGroups() -- removed from second test group');
+
+#Let's delete this user
+my $userId = $user->userId;
+$user->delete;
+
+my ($count) = $session->db->quickArray("select count(*) from users where userId=".$session->db->quote($userId));
+is($count, '0', 'delete() -- users table');
+
+($count) = $session->db->quickArray("select count(*) from userProfileData where userId=".$session->db->quote($userId));
+is($count, '0', 'delete() -- userProfileData table');
+
+($count) = $session->db->quickArray("select count(*) from messageLog where userId=".$session->db->quote($userId));
+is($count, '0', 'delete() -- messageLog table'); 
+
 
 #identifier() and uncache()
 SKIP: {

@@ -129,7 +129,7 @@ sub getAssetsInClipboard {
                         assetData.title desc
                         ");
         while (my ($id, $date, $class) = $sth->array) {
-                push(@assets, WebGUI::Asset->new($id,$class,$date));
+                push(@assets, WebGUI::Asset->new($self->session,$id,$class,$date));
         }
         $sth->finish;
         return \@assets;
@@ -150,7 +150,7 @@ Alphanumeric ID tag of Asset.
 sub paste {
 	my $self = shift;
 	my $assetId = shift;
-	my $pastedAsset = WebGUI::Asset->newByDynamicClass($assetId);
+	my $pastedAsset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 return 0 unless ($self->get("state") eq "published");
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish;
@@ -189,7 +189,7 @@ sub www_copyList {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $assetId ($self->session->request->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
+		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
@@ -265,7 +265,7 @@ sub www_cutList {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $assetId ($self->session->request->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
+		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 		if ($asset->canEdit) {
 			$asset->cut;
 		}

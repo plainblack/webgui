@@ -121,7 +121,7 @@ sub getEditForm {
 					})
 			);
 	}
-	$tabform->getTab("display")->template($self->session, 
+	$tabform->getTab("display")->template(
     -name=>"templateId",
     -value=>$self->getValue("templateId"),
     -namespace=>"EventsCalendar/Event",

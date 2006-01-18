@@ -149,40 +149,40 @@ sub edit {
 
 #-------------------------------------------------------------------
 sub editSave {
-	my $class = shift;
-	my $tempStorage = WebGUI::Storage->create;
+	my $self = shift;
+	my $tempStorage = WebGUI::Storage->create($self->session);
 	$tempStorage->addFileFromFormPost("file");
 	foreach my $filename (@{$tempStorage->getFiles}) {
-		my $storage = WebGUI::Storage::Image->create;
+		my $storage = WebGUI::Storage::Image->create($self->session);
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
-		$storage->setPrivileges($class->getParent->get("ownerUserId"),$class->getParent->get("groupIdView"),$class->getParent->get("groupIdEdit"));
+		$storage->setPrivileges($self->getParent->get("ownerUserId"),$self->getParent->get("groupIdView"),$self->getParent->get("groupIdEdit"));
 		my %data;
-		my $className = 'WebGUI::Asset::File';
-		$className = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
-		foreach my $definition (@{$className->definition}) {
+		my $selfName = 'WebGUI::Asset::File';
+		$selfName = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
+		foreach my $definition (@{$selfName->definition($self->session)}) {
 			foreach my $property (keys %{$definition->{properties}}) {
-				$data{$property} = $class->session->form->process(
+				$data{$property} = $self->session->form->process(
 					$property,
 					$definition->{properties}{$property}{fieldType},
 					$definition->{properties}{$property}{defaultValue}
 					);
 			}
 		}
-		$data{className} = $className;
+		$data{className} = $selfName;
 		$data{storageId} = $storage->getId;
 		$data{filename} = $data{title} = $data{menuTitle} = $filename;
 		$data{templateId} = 'PBtmpl0000000000000024';
-		$data{templateId} = 'PBtmpl0000000000000088' if ($className eq  "WebGUI::Asset::File::Image");
-		$data{url} = $class->getParent->getUrl.'/'.$filename;
-		my $newAsset = $class->getParent->addChild(\%data);
+		$data{templateId} = 'PBtmpl0000000000000088' if ($selfName eq  "WebGUI::Asset::File::Image");
+		$data{url} = $self->getParent->getUrl.'/'.$filename;
+		my $newAsset = $self->getParent->addChild(\%data);
 		delete $newAsset->{_storageLocation};
 		$newAsset->setSize($storage->getFileSize($filename));
-		$newAsset->generateThumbnail if ($className eq "WebGUI::Asset::File::Image");
+		$newAsset->generateThumbnail if ($selfName eq "WebGUI::Asset::File::Image");
 		$newAsset->commit;
 	}
 	$tempStorage->delete;
-	return $class->getParent->www_manageAssets if ($class->session->form->process("proceed") eq "manageAssets");
-	return $class->getParent->www_view;
+	return $self->getParent->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
+	return $self->getParent->www_view;
 }
 
 #-------------------------------------------------------------------

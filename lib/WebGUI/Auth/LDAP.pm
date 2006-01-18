@@ -418,7 +418,7 @@ sub new {
    my $self = WebGUI::Auth->new($session,$authMethod,$userId,\@callable);
    my $connection = $session->scratch->get("ldapConnection") || $session->setting->get("ldapConnection");
    my $ldaplink = WebGUI::LDAPLink->new($session,$connection); 
-   $self->{_connection} = $ldaplink->get;
+   $self->{_connection} = $ldaplink->get if $ldaplink;
 	my $i18n = WebGUI::International->new($session, "AuthLDAP");
 	my %ldapStatusCode = map { $_ => $i18n->get("LDAPLink_".$_) }
 			     (0..21, 32,33,34,36, 48..54, 64..71, 80);

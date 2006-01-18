@@ -307,7 +307,7 @@ sub getLineage {
 		my $cmd = "use ".$className;
 		eval ($cmd);
 		$self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
-		foreach my $definition (@{$className->definition}) {
+		foreach my $definition (@{$className->definition($self->session)}) {
 			unless ($definition->{tableName} eq "asset") {
 				my $tableName = $definition->{tableName};
 				$tables .= " left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
