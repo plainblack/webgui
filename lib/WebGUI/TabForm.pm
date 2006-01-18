@@ -204,7 +204,7 @@ sub new {
 		$tabs{$key}{label} = $startingTabs->{$key}->{label};
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
-	my $i18n = WebGU::International->new($session);
+	my $i18n = WebGUI::International->new($session);
 	my $cancel = WebGUI::Form::button($session,{
 			value=>$i18n->get('cancel'),
 			extras=>q|onclick="history.go(-1);"|

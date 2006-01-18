@@ -80,7 +80,8 @@ sub process {
 		}
 	} 
    #--admin functions
-	$var{adminConsole_loop} = WebGUI::AdminConsole->getAdminFunction;
+   my $ac = WebGUI::AdminConsole->new($session);
+	$var{adminConsole_loop} = $ac->getAdminFunction;
 	return WebGUI::Asset::Template->new($session,$templateId)->process(\%var);
 #		'http://validator.w3.org/check?uri=referer'=>$i18n->get(399),
 }

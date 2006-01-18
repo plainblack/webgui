@@ -797,7 +797,7 @@ sub www_view {
 	my $self = shift;
 	if ($self->isDashlet) {
 		return $self->session->privilege->noAccess() unless $self->canView;
-		$self->session->asset = $self->getParent;
+		$self->session->asset($self->getParent);
 		return $self->session->asset->www_view;
 	} else {
 		return $self->getShortcut->www_view;

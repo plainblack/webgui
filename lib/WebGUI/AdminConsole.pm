@@ -68,7 +68,7 @@ sub _formatFunction {
 	}
 	my $i18n = WebGUI::International->new($self->session);
 	return {
-		title=>$i18n->($function->{title}{id}, $function->{title}{namespace}),
+		title=>$i18n->get($function->{title}{id}, $function->{title}{namespace}),
 		icon=>$self->session->config->get("extrasURL")."/adminConsole/".$function->{icon},
 		'icon.small'=>$self->session->config->get("extrasURL")."/adminConsole/small/".$function->{icon},
 		url=>$url,
@@ -370,10 +370,11 @@ sub new {
 	my $class = shift;
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $id = shift;
-	my %self;
-	$self{_function} = $class->getAdminFunction($id) if ($id);
-	$self{_session} = $session;
-	bless \%self, $class;
+	my $self;
+	$self->{_session} = $session;
+	bless $self, $class;
+	$self->{_function} = $self->getAdminFunction($id) if ($id);
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -412,7 +413,7 @@ sub render {
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
 	if (defined $self->session->asset) {
-		my $importNode = $self->getImportNode($self->session);
+		my $importNode = WebGUI::Asset->getImportNode($self->session);
 		my $importNodeLineage = $importNode->get("lineage");
 		my $assetLineage = $self->session->asset->get("lineage");
 		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001") {

@@ -139,7 +139,7 @@ sub setManageIcons {
                 }
                 my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$template->get("url"));
                 $buttons .= $self->session->icon->manage("func=manageAssets",$template->getParent->get("url"));
-		$self->get("subtext") = $buttons . $self->get("subtext");
+		$self->set("subtext",$buttons . $self->get("subtext"));
 	}
 }
 

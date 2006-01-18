@@ -366,36 +366,38 @@ sub getAssetAdderLinks {
 	my $addToUrl = shift;
 	my $type = shift || "assets";
 	my %links;
-	return [];
 	foreach my $class (@{$self->session->config->get($type)}) {
 		next unless $class;
-		my $load = "use ".$class;
-		eval ($load);
+		my %properties = (
+			className=>$class
+		);
+		my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
+		next unless $newAsset;
+		#use Data::Dumper; print Dumper($newAsset);
+		my $uiLevel = eval{$newAsset->getUiLevel()};
 		if ($@) {
-			$self->session->errorHandler->error("Couldn't compile ".$class." because ".$@);
+			$self->session->errorHandler->error("Couldn't get UI level of ".$class."because ".$@);
+			next;
 		} else {
-			my $uiLevel = eval{$class->getUiLevel()};
-			if ($@) {
-				$self->session->errorHandler->error("Couldn't get UI level of ".$class." because ".$@);
-			} else {
-				next if ($uiLevel > $self->session->user->profileField("uiLevel") && !$self->session->user->isInGroup(3));
-			}
-			my $canAdd = eval{$class->canAdd($self->session)};
-			if ($@) {
-				$self->session->errorHandler->error("Couldn't determine if user can add ".$class." because ".$@);
-			} else {
-				next unless ($canAdd);
-			}
-			my $label = eval{$class->getName()};
-			if ($@) {
-				$self->session->errorHandler->error("Couldn't get the name of ".$class." because ".$@);
-			} else {
-				my $url = $self->getUrl("func=add;class=".$class);
-				$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
-				$links{$label}{url} = $url;
-				$links{$label}{icon} = $class->getIcon;
-				$links{$label}{'icon.small'} = $class->getIcon(1);
-			}
+			next if ($uiLevel > $self->session->user->profileField("uiLevel") && !$self->session->user->isInGroup(3));
+		}
+		my $canAdd = eval{$class->canAdd($self->session)};
+		if ($@) {
+			$self->session->errorHandler->error("Couldn't determine if user can add ".$class." because ".$@);
+			next;
+		} else {
+			next unless ($canAdd);
+		}
+		my $label = eval{$newAsset->getName()};
+		if ($@) {
+			$self->session->errorHandler->error("Couldn't get the name of ".$class."because ".$@);
+			next;
+		} else {
+			my $url = $self->getUrl("func=add;class=".$class);
+			$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
+			$links{$label}{url} = $url;
+			$links{$label}{icon} = $newAsset->getIcon;
+			$links{$label}{'icon.small'} = $newAsset->getIcon(1);
 		}
 	}
 	my $constraint;
@@ -447,7 +449,7 @@ sub getContainer {
 	if (WebGUI::Utility::isIn($self->get("className"), @{$self->session->config->get("assetContainers")})) {
 		return $self;
 	} else {
-		$self->session->asset = $self->getParent;
+		$self->session->asset($self->getParent);
 		return $self->getParent;
 	}
 }
@@ -576,7 +578,8 @@ sub getEditForm {
         }
         my $clause;
         if ($self->session->user->isInGroup(3)) {
-                my $contentManagers = $self->session->group->getUsers(4,1);
+        	my $group = WebGUI::Group->new($self->session,4);
+                my $contentManagers = $group->getUsers(1);
                 push (@$contentManagers, $self->session->user->userId);
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
@@ -920,10 +923,17 @@ Returns the UI Level specified in the asset definition or from the config file i
 =cut    
         
 sub getUiLevel {
-        my $self = shift;
-        my $definition = $self->definition($self->session);
-        return $self->session->config->get("assetUiLevel")->{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1;
-}  
+	my $self = shift;
+	my $definition = $self->get("className")->definition($self->session);
+	my $uilevel = $self->session->config->get("assetUiLevel");
+	my $ret;
+	if ($uilevel && ref $uilevel eq 'HASHREF') {
+		$ret = $self->session->config->get("assetUiLevel")->{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1 ;
+	} else {
+		$ret = $definition->[0]{uiLevel} || 1 ;
+	}
+	return $ret;
+}
 
 
 #-------------------------------------------------------------------
@@ -1118,8 +1128,11 @@ sub newByPropertyHashRef {
 	return undef unless exists $properties->{className};
 	my $className = $properties->{className};
 	my $cmd = "use ".$className;
-        eval ($cmd);
-        $session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+	eval ($cmd);
+	if ($@) {
+		$session->errorHandler->warn("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+		return undef;
+	}
 	bless {_session=>$session, _properties => $properties}, $className;
 }
 
@@ -1512,19 +1525,19 @@ sub www_editSave {
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
 	if ($self->session->form->process("proceed") eq "manageAssets") {
-		$self->session->asset = $object->getParent;
+		$self->session->asset($object->getParent);
 		return $self->session->asset->www_manageAssets;
 	}
 	if ($self->session->form->process("proceed") eq "viewParent") {
-		$self->session->asset = $object->getParent;
+		$self->session->asset($object->getParent);
 		return $self->session->asset->www_view;
 	}
 	if ($self->session->form->process("proceed") ne "") {
 		my $method = "www_".$self->session->form->process("proceed");
-		$self->session->asset = $object;
+		$self->session->asset($object);
 		return $self->session->asset->$method();
 	}
-	$self->session->asset = $object->getContainer;
+	$self->session->asset($object->getContainer);
 	return $self->session->asset->www_view;
 }
 

@@ -249,7 +249,7 @@ Returns the TabForm object that will be used in generating the edit page for thi
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-	foreach my $definition (reverse @{$self->definition}) {
+	foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my $properties = $definition->{properties};
 		next unless ($definition->{autoGenerateForms});
 		foreach my $fieldname (keys %{$properties}) {

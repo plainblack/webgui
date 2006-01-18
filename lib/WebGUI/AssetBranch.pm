@@ -344,7 +344,7 @@ sub www_editBranchSave {
         	}
 	}
 	delete $self->{_parent};
-	$self->session->asset = $self->getParent;
+	$self->session->asset($self->getParent);
 	return $self->getParent->www_manageAssets;
 }
 

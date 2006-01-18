@@ -213,7 +213,7 @@ if ($self->session->user->isInGroup(2)) {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
 	}
 	WebGUI::Macro::process($self->session,\$output);
-	my $macroHeadTags = generateAdditionalHeadTags();
+	my $macroHeadTags = $self->generateAdditionalHeadTags();
 	WebGUI::Macro::process($self->session,\$macroHeadTags);
 	$output =~ s/\<\!-- macro head tags --\>/$macroHeadTags/;
 	if ($self->session->errorHandler->canShowDebug()) {
@@ -325,7 +325,7 @@ sub setScript {
 	foreach my $script (@{$self->{_javascript}}) {
 		$found = 1 if ($script->{src} eq $url);
 	}
-	push(@{$self->{_javascript}},$params) unless ($found);	
+	push(@{$self->{_javascript}},$params) unless $found;	
 }
 
 #-------------------------------------------------------------------

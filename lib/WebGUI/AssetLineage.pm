@@ -715,7 +715,7 @@ sub www_setRank {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $newRank = $self->session->form->process("rank");
 	$self->setRank($newRank) if (defined $newRank);
-	$self->session->asset = $self->getParent;
+	$self->session->asset($self->getParent);
 	return $self->getParent->www_manageAssets();
 }
 

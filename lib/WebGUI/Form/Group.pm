@@ -141,7 +141,7 @@ sub toHtmlWithWrapper {
         my $self = shift;
         if ($self->session->user->isInGroup(3)) {
                 my $subtext = $self->session->icon->manage("op=listGroups");
-                $self->get("subtext") = $subtext . $self->get("subtext");
+                $self->set("subtext",$subtext . $self->get("subtext"));
         }
         return $self->SUPER::toHtmlWithWrapper;
 }

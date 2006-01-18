@@ -145,7 +145,7 @@ sub www_delete {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
 	$self->trash;
-	$self->session->asset = $self->getParent;
+	$self->session->asset($self->getParent);
 	return $self->getParent->www_view;
 }
 

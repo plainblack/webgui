@@ -249,7 +249,7 @@ sub www_cut {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->cut;
-	$self->session->asset = $self->getParent;
+	$self->session->asset($self->getParent);
 	return $self->getParent->www_view;
 }
 

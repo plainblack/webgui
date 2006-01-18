@@ -33,8 +33,8 @@ This package provides an object-oriented way of managing WebGUI groups and group
 =head1 SYNOPSIS
 
  use WebGUI::Group;
- $g = WebGUI::Group->new(3); or  $g = WebGUI::Group->new("new");
- $g = WebGUI::Group->find("Registered Users");
+ $g = WebGUI::Group->new($session,3); or  $g = WebGUI::Group->new($session,"new");
+ $g = WebGUI::Group->find($session,"Registered Users");
 
  $boolean =    	$g->autoAdd(1);
  $boolean =    	$g->autoDelete(1);
@@ -506,7 +506,7 @@ sub getGroupsIn {
                 }
                 my @groupsOfGroups = @$groups;
                 foreach my $group (@$groups) {
-                        my $gog = WebGUI::Group->new($group)->getGroupsIn(1,$loopCount);
+                        my $gog = WebGUI::Group->new($self->session,$group)->getGroupsIn(1,$loopCount);
                         push(@groupsOfGroups, @$gog);
                 }
 		$gotGroupsInGroup->{recursive}{$self->getId} = \@groupsOfGroups;
@@ -697,7 +697,7 @@ sub new {
         tie %group, 'Tie::CPHash';
         $class = shift;
 	my $self = {};
-	$self->{_session} = shift;
+	$self->{_session} = shift; use WebGUI; WebGUI::dumpSession($self->{_session});
 	$self->{_groupId} = shift;
 	bless $self, $class;
         $self->_create() if ($self->{_groupId} eq "new");
