@@ -213,20 +213,20 @@ Session id will be generated if not specified. In almost every case you should l
 =cut
 
 sub start {
-        my $self = shift;
-        my $userId = shift || 1;
-        my $sessionId = shift;
-        $self->{_var} = {
-                sessionId=>"new",
-                expires=>$self->session->datetime->time() + $self->session->setting->get("sessionTimeout"),
-                lastPageView=>$self->session->datetime->time(),
-                lastIP => $self->session->env->get("REMOTE_ADDR"),
-                adminOn => 0,
-                userId => $userId       
-                };
-        $self->{_var}{sessionId} = $self->session->{_sessionId} = $self->session->db->setRow("userSession","sessionId",$self->{_var}, $sessionId);
-	$self->session->http->setCookie("wgSession",$sessionId);
-        return $self->getId; 
+	my $self = shift;
+	my $userId = shift || 1;
+	my $sessionId = shift || "new";
+	$self->{_var} = {
+		sessionId=>$sessionId,
+		expires=>$self->session->datetime->time() + $self->session->setting->get("sessionTimeout"),
+		lastPageView=>$self->session->datetime->time(),
+		lastIP => $self->session->env->get("REMOTE_ADDR"),
+		adminOn => 0,
+		userId => $userId
+	};
+	$self->{_var}{sessionId} = $self->session->{_sessionId} = $self->session->db->setRow("userSession","sessionId",$self->{_var});
+	$self->session->http->setCookie("wgSession",$self->{_var}{sessionId}) unless $self->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
+	return $self->getId;
 }
 
 #-------------------------------------------------------------------

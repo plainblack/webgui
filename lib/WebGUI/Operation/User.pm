@@ -342,7 +342,7 @@ sub www_editUser {
 		my $style = '" style="display: none;' unless ($_ eq $u->authMethod);
 		$tabform->getTab("account")->raw('<tr id="'.$_.$style.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
 	}
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
 		$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category->getLabel.'</td></tr>');
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;

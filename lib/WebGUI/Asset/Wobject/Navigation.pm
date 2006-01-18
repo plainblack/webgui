@@ -305,7 +305,7 @@ sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
 	my $start;
-	$self->session->asset = WebGUI::Asset->newByUrl($self->session) unless ($self->session->asset);
+	$self->session->asset(WebGUI::Asset->newByUrl($self->session)) unless ($self->session->asset);
 	my $current = $self->session->asset;
 	if ($self->get("startType") eq "specificUrl") {
 		$start = WebGUI::Asset->newByUrl($self->session,$self->get("startPoint"));

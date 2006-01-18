@@ -124,10 +124,11 @@ Returns an array reference of all WebGUI::ProfileCategory objects in order of se
 =cut
 
 sub getCategories {
-	my $self = shift;
+	my $class = shift;
+	my $session = shift;
 	my @categories = ();
- 	foreach my $id ($self->session->db->buildArray("select profileCategoryId from userProfileCategory order by sequenceNumber")) {
-		push(@categories,WebGUI::ProfileCategory->new($self->session,$id));
+ 	foreach my $id ($session->db->buildArray("select profileCategoryId from userProfileCategory order by sequenceNumber")) {
+		push(@categories,WebGUI::ProfileCategory->new($session,$id));
 	}
 	return \@categories;
 }
@@ -173,7 +174,7 @@ Returns the eval'd label for this category.
 
 sub getLabel {
         my $self = shift;
-        return WebGUI::Operation::Shared::secureEval($self->get("label"));
+        return WebGUI::Operation::Shared::secureEval($self->session,$self->get("label"));
 }
 
 #-------------------------------------------------------------------

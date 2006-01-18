@@ -59,7 +59,7 @@ sub execute {
 		$session->errorHandler->error("Couldn't compile operation: ".$operation->{$op}.". Root cause: ".$@) if ($@);
 		# Call the method
 		$cmd = $operation->{$op} . '::www_'.$op;
-		$output = eval{&$cmd($session)};
+		$output = eval{&{$cmd}($session)};
 		$session->errorHandler->error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
 	} else {
 		$session->errorHandler->security("execute an invalid operation: ".$op);

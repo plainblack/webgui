@@ -78,7 +78,7 @@ sub www_flushCache {
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $cache = WebGUI::Cache->new($session,);
 	$cache->flush;
-	return www_manageCache();
+	return www_manageCache($session);
 }
 
 #-------------------------------------------------------------------
@@ -108,7 +108,7 @@ sub www_manageCache {
 		   '</td></tr>';
 
 	$output .= "</table>";
-        return _submenu($output);
+        return _submenu($session,$output);
 }
 
 

@@ -51,7 +51,7 @@ via WebGUI::Session::switchAdminOff()
 sub www_switchOffAdmin {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return "" unless ($session->user->isInGroup(12));
-	WebGUI::Session::switchAdminOff();
+	$session->var->switchAdminOff();
 	return "";
 }
 
@@ -60,14 +60,13 @@ sub www_switchOffAdmin {
 =head2 www_adminConsole ( )
 
 If the current user is in the Turn On Admin Group, then allow them to turn on Admin mode.
-via WebGUI::Session::switchAdminOn()
 
 =cut
 
 sub www_switchOnAdmin {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return "" unless ($session->user->isInGroup(12));
-	WebGUI::Session::switchAdminOn();
+	$session->var->switchAdminOn();
 	return "";
 }
 

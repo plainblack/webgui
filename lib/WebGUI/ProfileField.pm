@@ -135,7 +135,7 @@ sub formField {
 	$properties->{label} = $self->getLabel unless $properties->{label};
 	$properties->{fieldType} = $self->get("fieldType");
 	$properties->{name} = $self->getId;
-	my $values = WebGUI::Operation::Shared::secureEval($self->get("possibleValues")) || {};
+	my $values = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues")) || {};
 	my $orderedValues = {};
 	tie %{$orderedValues}, 'Tie::IxHash';
 	foreach my $ov (sort keys %{$values}) {
@@ -150,7 +150,7 @@ sub formField {
 	} elsif (!defined $u && $self->session->user->profileField($properties->{name})) {
 		$default = $self->session->user->profileField($properties->{name});
 	} else {
-		$default = WebGUI::Operation::Shared::secureEval($properties->{dataDefault});
+		$default = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
 	}
 	$properties->{value} = $default;
 	if ($withWrapper == 1) {
@@ -280,7 +280,7 @@ Returns the eval'd label for this field.
         
 sub getLabel {
         my $self = shift;
-        return WebGUI::Operation::Shared::secureEval($self->get("label"));
+        return WebGUI::Operation::Shared::secureEval($self->session,$self->get("label"));
 }
 
 #-------------------------------------------------------------------

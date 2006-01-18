@@ -135,14 +135,14 @@ Renders a date picker control.
 sub toHtml {
         my $self = shift;
 	if ($self->get("_defaulted") && $self->get("noDate") ) {
-		$self->get("value") = '';
+		$self->set("value",'');
 	}
 	else {
-		$self->get("value") = $self->session->datetime->epochToSet($self->get("value"));
+		$self->set("value",$self->session->datetime->epochToSet($self->get("value")));
 	}
-	my $language  = WebGUI::International::getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
+	my $language  = WebGUI::International->new($self->session)->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
-		$language = WebGUI::International::getLanguage("English","languageAbbreviation");
+		$language = WebGUI::International->new($self->session)->getLanguage($self,"English","languageAbbreviation");
 	}
         $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/calendar.js',{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->config->get("extrasURL").'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });

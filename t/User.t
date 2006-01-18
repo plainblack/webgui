@@ -67,6 +67,8 @@ is($user->authMethod, "WebGUI", 'authMethod() -- default value is WebGUI');
 $lastUpdate = time();
 $user->authMethod("LDAP");
 is($user->authMethod, "LDAP", 'authMethod() -- set to LDAP');
+$user->authMethod("WebGUI");
+is($user->authMethod, "WebGUI", 'authMethod() -- set back to WebGUI');
 is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- authmethod change');
 
 #See if datecreated is correct

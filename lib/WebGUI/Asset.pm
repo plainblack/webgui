@@ -366,6 +366,7 @@ sub getAssetAdderLinks {
 	my $addToUrl = shift;
 	my $type = shift || "assets";
 	my %links;
+	return [];
 	foreach my $class (@{$self->session->config->get($type)}) {
 		next unless $class;
 		my $load = "use ".$class;

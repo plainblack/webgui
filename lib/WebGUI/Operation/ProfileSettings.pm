@@ -221,7 +221,7 @@ sub www_editProfileField {
 		-value => $data->{dataDefault},
 	);
 	my %hash;
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
 		$hash{$category->getId} = $category->getLabel;
 	}
 	$f->selectBox(
@@ -266,7 +266,7 @@ sub www_editProfileSettings {
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
 	my $output = "";
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
 		$output .= $session->icon->delete('op=deleteProfileCategoryConfirm;cid='.$category->getId,'',$i18n->get(466)); 
 		$output .= $session->icon->edit('op=editProfileCategory;cid='.$category->getId); 
 		$output .= $session->icon->moveUp('op=moveProfileCategoryUp;cid='.$category->getId); 

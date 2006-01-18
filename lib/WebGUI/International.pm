@@ -146,7 +146,7 @@ sub getLanguages {
 	foreach my $file (@files) {
 		if ($file =~ /(.*?)\.pm$/) {
 			my $language = $1;
-			$hashRef->{$language} = getLanguage($language,"label");
+			$hashRef->{$language} = $self->getLanguage($language,"label");
 		}
 	}
         return $hashRef;
@@ -207,6 +207,7 @@ Specify a default language. Defaults to user preference or "English".
 
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
+	use WebGUI; WebGUI::dumpSession($session);
 	bless( {
 		_session   => $session,
 		_namespace => $namespace,

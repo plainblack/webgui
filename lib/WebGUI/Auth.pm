@@ -136,7 +136,7 @@ sub authenticate {
    my $self = shift;
    my $username = shift;
    my $i18n = WebGUI::International->new($self->session);
-   my $user = $self->session->db->quickHashRef("select userId,authMethod,status from users where username=".$self->session->db->$self->session->db->quote($username));
+   my $user = $self->session->db->quickHashRef("select userId,authMethod,status from users where username=".$self->session->db->quote($username));
    my $uid = $user->{userId};
    #If userId does not exist or is not active, fail login
    if(!$uid){
@@ -326,7 +326,7 @@ Removes the user's authentication parameters from the database for all authentic
 
 sub deleteParams {
    my $self = shift;
-   $self->session->db->write("delete from authentication where userId=".$self->session->db->$self->session->db->quote($self->userId));
+   $self->session->db->write("delete from authentication where userId=".$self->session->db->quote($self->userId));
 }
 
 #-------------------------------------------------------------------
@@ -363,7 +363,7 @@ sub displayAccount {
    $vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
    $vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
    
-   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
+   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions($self->session);
    return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
 }
 
@@ -564,7 +564,7 @@ sub login {
    
    #Create a new user
    $uid = $self->userId;
-   $u = WebGUI::User->new($uid);
+   $u = WebGUI::User->new($self->session,$uid);
    $self->session->user({user=>$u});
    $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
    $self->_logLogin($uid,"success");
@@ -587,7 +587,7 @@ Superclass method that performs standard logout routines.
 sub logout {
 	my $self = shift;
    $self->session->var->end($self->session->var->get("sessionId"));
-   $self->session->var->start(1);
+   $self->session->var->start(1,$self->session->getId);
 	my $u = WebGUI::User->new($self->session,1);
 	$self->{user} = $u;
    return "";
@@ -625,7 +625,8 @@ sub new {
 	$self->{error} = "";
 	$self->{profile} = ();
 	$self->{warning} = "";
-	my @callable = ('init', shift);
+	my $call = shift;
+	my @callable = ('init', @{$call});
 	$self->{callable} = \@callable;
 	bless $self, $class;
 	return $self;

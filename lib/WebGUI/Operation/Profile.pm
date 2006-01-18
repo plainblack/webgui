@@ -94,7 +94,7 @@ sub validateProfileData {
 #-------------------------------------------------------------------
 sub www_editProfile {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	return WebGUI::Operation::Auth::www_auth("init") if($session->user->userId eq '1');
+	return WebGUI::Operation::Auth::www_auth($session,"init") if($session->user->userId eq '1');
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
 	$vars->{displayTitle} .= '<h1>'.$i18n->get(338).'</h1>';
@@ -105,7 +105,7 @@ sub www_editProfile {
 	$vars->{'profile.form.hidden'} = WebGUI::Form::hidden($session,{"name"=>"op","value"=>"editProfileSave"});
 	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden($session,{"name"=>"uid","value"=>$session->user->userId});
 	my @array = ();
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
 		next unless $category->isEditable;
 		my @temp = ();
 		foreach my $field (@{$category->getFields}) {
@@ -150,7 +150,7 @@ sub www_editProfileSave {
 #-------------------------------------------------------------------
 sub www_viewProfile {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	my $u = WebGUI::User->new($session->form->process("uid"));
+	my $u = WebGUI::User->new($session,$session->form->process("uid"));
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
 	$vars->{displayTitle} = '<h1>'.$i18n->get(347).' '.$u->username.'</h1>';
@@ -161,7 +161,7 @@ sub www_viewProfile {
 	return $session->privilege->insufficient() if(!$session->user->isInGroup(2));
 
 	my @array = ();
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories}) {
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
 		next unless ($category->get("visible"));
 		push(@array, {'profile.category' => $category->getLabel});
 		foreach my $field (@{$category->getFields}) {
@@ -175,9 +175,10 @@ sub www_viewProfile {
 	}
 	$vars->{'profile.elements'} = \@array;
 	if ($session->user->userId eq $session->form->process("uid")) {
-		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
+		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
 	}
-	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000052")->process($vars));
+	
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000052")->process($vars));
 }
 
 1;
