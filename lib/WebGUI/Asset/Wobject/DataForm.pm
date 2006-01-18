@@ -32,7 +32,8 @@ sub _createField {
 	my %param;
 	$param{name} = $data->{name};
 	$param{name} = "field_".$data->{sequenceNumber} if ($param{name} eq ""); # Empty fieldname not allowed
-	$self->session->form->process($param{name}) =~ s/\^.*?\;//gs ; # remove macro's from user input
+	my $name = $param{name};
+	$name =~ s/\^.*?\;//gs ; # remove macro's from user input
 	$param{value} = $data->{value};
 	$param{size} = $data->{width};
 	$param{rows} = $data->{rows} || 5;
@@ -45,8 +46,8 @@ sub _createField {
 	}
 	if (isIn($data->{type},qw(selectList checkList))) {
 		my @defaultValues;
-		if ($self->session->form->process($param{name})) {
-                	@defaultValues = $self->session->form->selectList($param{name});
+		if ($name) {
+                	@defaultValues = $self->session->form->selectList($name);
                 } else {
                 	foreach (split(/\n/, $data->{value})) {
                         	s/\s+$//; # remove trailing spaces

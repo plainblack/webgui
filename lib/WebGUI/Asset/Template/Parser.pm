@@ -32,19 +32,18 @@ A reference the template variable hash.
 
 sub addSessionVars {
 	my $self = shift;
-        my $vars = shift;
-        while (my ($section, $hash) = each %{$self->session}) {
-                next unless (ref $hash eq 'HASH');
-        while (my ($key, $value) = each %$hash) {
-                unless (lc($key) eq "password" || lc($key) eq "identifier") {
-                $vars->{"session.".$section.".".$key} = $value;
-                        }
-                }
-        }       
-        $vars->{"webgui.version"} = $WebGUI::VERSION;
-        $vars->{"webgui.status"} = $WebGUI::STATUS;
- 
-        return $vars;
+	my $vars = shift;
+	# These are the only session template variables used in the core as 
+	# of 6.8.5.  Further use of session template vars is deprecated.
+	$vars->{"session.user.username"} = $self->session->user->username;
+	$vars->{"session.user.firstDayOfWeek"} = $self->session->user->profileField("firstDayOfWeek");
+	$vars->{"session.config.extrasurl"} = $self->session->config->get("extrasURL");
+	$vars->{"session.var.adminOn"} = $self->session->var->isAdminOn;
+	$vars->{"session.setting.companyName"} = $self->session->setting->get("companyName");
+	$vars->{"session.setting.anonymousRegistration"} = $self->session->setting->get("anonymousRegistration");
+	$vars->{"webgui.version"} = $WebGUI::VERSION;
+	$vars->{"webgui.status"} = $WebGUI::STATUS;
+	return $vars;
 }
 
 #-------------------------------------------------------------------

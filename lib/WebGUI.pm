@@ -74,7 +74,7 @@ sub contentHandler {
 		} else {
 			$output = page($session);
 		}
-		$r->print($session->http->getHeader());
+		$session->http->getHeader();
 		$r->print($output) unless ($session->http->isRedirect());
 		WebGUI::Affiliate::grabReferral($session);	# process affilliate tracking request
 	}
@@ -141,7 +141,6 @@ sub processOperations {
 #		$session{form} = \%form;
 #		$output = processOperations($session,$opNumber);
 #	}
-	$session->http->getHeader;
 	return $output;
 }
 
