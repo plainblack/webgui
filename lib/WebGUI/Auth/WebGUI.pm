@@ -239,7 +239,7 @@ sub createAccountSave {
 			);
 		$self->user->status("Deactivated");
 		$self->session->var->end($self->session->var->get("sessionId"));
-		$self->session->var->start(1);
+		$self->session->var->start(1,$self->session->getId);
 		my $u = WebGUI::User->new($self->session,1);
 		$self->{user} = $u;
 		$self->logout;

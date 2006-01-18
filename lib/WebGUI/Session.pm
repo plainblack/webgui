@@ -355,11 +355,11 @@ sub open {
 	my $configFile = shift;
 	my $request = shift;
 	my $server = shift;
-	my $sessionId = shift;
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
 	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
+	my $sessionId = shift || $self->http->getCookies->{"wgSession"};
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId);
 	return $self;
 }
@@ -535,7 +535,6 @@ sub user {
 		}	
 		delete $self->{_stow};
 		$self->{_user} = $option->{user} || WebGUI::User->new($self, $userId);
-		$self->var->start($userId,$self->getId);
 		$self->request->user($self->{_user}->username) if ($self->request);
 	} elsif (!exists $self->{_user}) {
 		$self->{_user} = WebGUI::User->new($self, $self->var->get('userId'));

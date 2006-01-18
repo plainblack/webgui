@@ -566,9 +566,9 @@ sub login {
    $uid = $self->userId;
    $u = WebGUI::User->new($self->session,$uid);
    $self->session->user({user=>$u});
+   $self->session->var->start($uid,$self->session->getId);
    $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
    $self->_logLogin($uid,"success");
-   
    if ($self->session->scratch->get("redirectAfterLogin")) {
 		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
 	  	$self->session->scratch->delete("redirectAfterLogin");

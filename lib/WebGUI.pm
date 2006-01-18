@@ -74,6 +74,7 @@ sub contentHandler {
 		} else {
 			$output = page($session);
 		}
+		$session->http->setCookie("wgSession",$session->var->{_var}{sessionId}) unless $session->var->{_var}{sessionId} eq $session->http->getCookies->{"wgSession"};
 		$session->http->getHeader();
 		$r->print($output) unless ($session->http->isRedirect());
 		WebGUI::Affiliate::grabReferral($session);	# process affilliate tracking request

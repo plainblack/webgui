@@ -161,23 +161,23 @@ sub new {
 	my $class = shift;
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $self = bless {_session=>$session}, $class;
-	my $sessionId = shift || $session->http->getCookies->{"wgSession"};
-        if ($sessionId eq "") {
-                $self->start(1);
-        } else {
-                $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=".$session->db->quote($sessionId));
-                if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) {
-                        $self->end;
-                }
-                if ($self->{_var}{sessionId} ne "") {
-                        $self->{_var}{lastPageView} = $session->datetime->time();
-                        $self->{_var}{lastIP} = $session->env("REMOTE_ADDR");
-                        $self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
-                        $session->db->setRow("userSession","sessionId",$self->{_var});
-                } else {
-                        $self->start(1,$sessionId);
-                }
-        }
+	my $sessionId = shift;
+	if ($sessionId eq "") {
+		$self->start(1);
+	} else {
+		$self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=".$session->db->quote($sessionId));
+		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) {
+			$self->end;
+		}
+		if ($self->{_var}{sessionId} ne "") {
+			$self->{_var}{lastPageView} = $session->datetime->time();
+			$self->{_var}{lastIP} = $session->env("REMOTE_ADDR");
+			$self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
+			$session->db->setRow("userSession","sessionId",$self->{_var});
+		} else {
+			$self->start(1,$sessionId);
+		}
+	}
 	return $self;
 }
 
@@ -215,18 +215,17 @@ Session id will be generated if not specified. In almost every case you should l
 sub start {
 	my $self = shift;
 	my $userId = shift || 1;
-	my $sessionId = shift || "new";
+	my $sessionId = shift || $self->session->id->generate;
 	$self->{_var} = {
-		sessionId=>$sessionId,
 		expires=>$self->session->datetime->time() + $self->session->setting->get("sessionTimeout"),
 		lastPageView=>$self->session->datetime->time(),
 		lastIP => $self->session->env->get("REMOTE_ADDR"),
 		adminOn => 0,
 		userId => $userId
 	};
-	$self->{_var}{sessionId} = $self->session->{_sessionId} = $self->session->db->setRow("userSession","sessionId",$self->{_var});
-	$self->session->http->setCookie("wgSession",$self->{_var}{sessionId}) unless $self->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
-	return $self->getId;
+	$self->{_var}{sessionId} = $sessionId;
+	$self->session->db->setRow("userSession","sessionId",$self->{_var},$sessionId);
+	$self->session->{_sessionId} = $sessionId;
 }
 
 #-------------------------------------------------------------------
