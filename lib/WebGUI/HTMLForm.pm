@@ -198,7 +198,7 @@ sub raw {
         my ($output);
         my ($self, @p) = @_;
         my ($value, $uiLevel) = rearrange([qw(value uiLevel)], @p);
-        if (_uiLevelChecksOut($uiLevel)) {
+        if ($self->_uiLevelChecksOut($uiLevel)) {
 		$self->{_data} .= $value;
         }
         $self->{_data} .= $output;

@@ -291,7 +291,7 @@ sub www_saveSettings {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($key, $value);
-	foreach $key ($session->request->params) {
+	foreach $key (%{$session->form->paramsHashRef}) {
 		$value = $session->form->process("$key");
 		if ($key =~ m/(.*)_interval/) {
 			$value = $session->form->interval($1);
