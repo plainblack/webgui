@@ -138,7 +138,7 @@ sub toHtml {
                                 showsTime : true, 
                                 step : 1,
                                 timeFormat : "12",
-                                firstDay : '.$self->session->user->profileField("firstDayOfWeek").'
+                                firstDay : '.$mondayFirst.'
                                 }); 
                         </script>';
 }
