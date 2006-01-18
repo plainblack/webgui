@@ -321,7 +321,7 @@ sub new {
  		Log::Log4perl->init( $session->config->getWebguiRoot."/etc/log.conf" );   
 	}
 	my $logger = Log::Log4perl->get_logger($session->config->getFilename);
-	bless {_logger=>$logger, _session=>$session}, $class;
+	bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -338,9 +338,8 @@ A sql statement string.
 
 sub query {
 	my $self = shift;
-	$self->{_query} = 0 unless $self->{_query};
-	$self->{_query} = $self->{_query} + 1;
-	$self->debug("query  ".$self->{_query}.'  '.shift);
+	$self->{_queryCount}++;
+	$self->debug("query  ".$self->{_queryCount}.':  '.shift);
 }
 
 
