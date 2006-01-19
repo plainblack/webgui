@@ -361,8 +361,14 @@ sub isInGroup {
 					} else {
 					   $people = $ldapLink->getProperty($group->get("ldapGroup"),$group->get("ldapGroupProperty"));
 					}
-					 
-				    if(isIn($params->{connectDN},@{$people})) {
+					my @peeps;
+                                        my $connectDn = lc($params->{connectDN});
+                                        $connectDn =~ s/\s*,\s*/,/g;
+                                        foreach my $person (@{$people}) {
+                                                $person =~ s/\s*,\s*/,/g;
+                                                push(@peeps,lc($person));
+                                        }
+                                    if(isIn($connectDn,@peeps)) {	 
 					   $isInGroup->{$uid}{$gid} = 1;
                        if ($group->{'dbCacheTimeout'} > 10) {
                           $group->deleteUsers([$uid]);
