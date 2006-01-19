@@ -163,7 +163,7 @@ sub getEditForm {
       -hoverHelp => $i18n->get('5 description'),
       -value => $self->get('params'),
    );
-   if ($self->session->config->('soapHttpHeaderOverride')) {
+   if ($self->session->config->get('soapHttpHeaderOverride')) {
       $tabform->getTab("properties")->text (
          -name  => 'httpHeader',
          -label => $i18n->get(16),
@@ -245,7 +245,7 @@ sub view {
 
    # this page, with important params
     @seen{@exclude_params} = ();
-    foreach ($self->session->request->params) {
+    foreach ($self->session->request->param) {
        unless (exists $seen{$_}) {
           $query_string .= $self->session->url->escape($_) . '='
              . $self->session->url->escape($self->session->form->process($_)) . ';';

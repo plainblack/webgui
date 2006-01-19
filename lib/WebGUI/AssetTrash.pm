@@ -191,7 +191,7 @@ sub www_manageTrash {
         $ac->setHelp("trash manage");
 	if ($self->session->form->process("systemTrash") && $self->session->user->isInGroup(3)) {
 		$header = $i18n->get(965);
-		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->(10,"WebGUI"));
+		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->get(10,"WebGUI"));
 	} else {
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash;systemTrash=1'), $i18n->get(964));
 		$limit = 1;

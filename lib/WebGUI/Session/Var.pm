@@ -168,6 +168,7 @@ sub new {
 		$self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=".$session->db->quote($sessionId));
 		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) {
 			$self->end;
+			$self->start(1,$sessionId);
 		} elsif ($self->{_var}{sessionId} ne "") {
 			$self->{_var}{lastPageView} = $session->datetime->time();
 			$self->{_var}{lastIP} = $session->env->get("REMOTE_ADDR");

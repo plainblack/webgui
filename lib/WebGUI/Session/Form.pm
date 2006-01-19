@@ -128,7 +128,7 @@ sub paramsHashRef {
 	my $self = shift;
 	unless ($self->{_paramsHashRef}) {
 		my $hash;
-		foreach ($self->session->request->params) {
+		foreach ($self->session->request->param) {
 			$hash->{$_} = $self->process($_);
 		}
 		$self->{_paramsHashRef} = $hash;

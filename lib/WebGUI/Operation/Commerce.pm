@@ -39,8 +39,8 @@ sub _submenu {
 #-------------------------------------------------------------------
 sub _clearCheckoutScratch {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	_clearShippingScratch();
-	_clearPaymentScratch();
+	_clearShippingScratch($session);
+	_clearPaymentScratch($session);
 }
 
 #-------------------------------------------------------------------
@@ -107,9 +107,9 @@ sub www_cancelTransaction {
 #-------------------------------------------------------------------
 sub www_checkout {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	return WebGUI::Operation::execute($session,'selectShippingMethod') unless (_shippingSelected);
+	return WebGUI::Operation::execute($session,'selectShippingMethod') unless (_shippingSelected($session));
 
-	return WebGUI::Operation::execute($session,'selectPaymentGateway') unless (_paymentSelected);
+	return WebGUI::Operation::execute($session,'selectPaymentGateway') unless (_paymentSelected($session));
 
 	return WebGUI::Operation::execute($session,'checkoutConfirm');
 }
@@ -129,7 +129,7 @@ sub www_checkoutConfirm {
 	}
 	
 	# If no payment gateway has been selected yet, have the user do so now.
-	return WebGUI::Operation::execute($session,'checkout') unless (_paymentSelected && _shippingSelected);
+	return WebGUI::Operation::execute($session,'checkout') unless (_paymentSelected($session) && _shippingSelected($session));
 
 	$var{errorLoop} = [ map {{message => $_}} @{$errors} ] if $errors;
 
@@ -210,7 +210,7 @@ sub www_checkoutSubmit {
 	}
 
 	# Check if a valid payment gateway has bee selected. If not have the user do so.
-	return WebGUI::Operation::execute($session,'checkout') unless (_paymentSelected && _shippingSelected);
+	return WebGUI::Operation::execute($session,'checkout') unless (_paymentSelected($session) && _shippingSelected($session));
 
 	# Load shipping plugin.
 	$shipping = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
@@ -315,7 +315,7 @@ sub www_checkoutSubmit {
 	$param{statusExplanation} = $i18n->get('status codes information');
 	$param{resultLoop} = \@resultLoop;
 
-	_clearCheckoutScratch;
+	_clearCheckoutScratch($session);
 	
 	# If everythings ok show the purchase history
 	return WebGUI::Operation::execute($session,'viewPurchaseHistory') unless ($checkoutError);
@@ -505,7 +505,7 @@ sub www_editCommerceSettings {
 
 	$session->style->setScript($session->config->get("extrasURL").'/swapLayers.js',{type=>"text/javascript"});
 	
-	return _submenu($tabform->print, 'edit commerce settings title', 'commerce manage');
+	return _submenu($session,$tabform->print, 'edit commerce settings title', 'commerce manage');
 }
 
 #-------------------------------------------------------------------
@@ -513,7 +513,7 @@ sub www_editCommerceSettingsSave {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	foreach ($session->request->params) {
+	foreach ($session->request->param) {
 		# Store the plugin confiuration data in a special table for security and the general settings in the
 		# normal settings table for easy access.
 		if (/~([^~]*)~([^~]*)~([^~]*)/) {
@@ -524,7 +524,7 @@ sub www_editCommerceSettingsSave {
 				fieldValue	=> $session->form->process($_)
 			});
 		} elsif ($_ ne 'op') {
-			WebGUI::Setting::set($_,$session->form->process($_));
+			$session->setting->set($_,$session->form->process($_));
 		}
 	}
 	
@@ -561,7 +561,7 @@ sub www_listPendingTransactions {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 
-	_submenu($output, 'list pending transactions', 'list pending transactions');
+	_submenu($session,$output, 'list pending transactions', 'list pending transactions');
 }
 
 #-------------------------------------------------------------------
@@ -657,7 +657,7 @@ sub www_listTransactions {
 	}
 	$output .= '</table>';
 
-	return _submenu($output, 'list transactions')
+	return _submenu($session,$output, 'list transactions')
 }
 
 #-------------------------------------------------------------------
@@ -665,7 +665,7 @@ sub www_selectPaymentGateway {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
 
-	_clearPaymentScratch;
+	_clearPaymentScratch($session);
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	$plugins = WebGUI::Commerce::Payment->getEnabledPlugins($session);
@@ -710,7 +710,7 @@ sub www_selectShippingMethod {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
 
-	_clearShippingScratch;
+	_clearShippingScratch($session);
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	$plugins = WebGUI::Commerce::Shipping->getEnabledPlugins($session);
@@ -768,7 +768,7 @@ sub www_updateCart {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 
-	foreach my $formElement ($session->request->params) {
+	foreach my $formElement ($session->request->param) {
 		if ($formElement =~ m/^quantity~([^~]*)~([^~]*)$/) {
 			$shoppingCart->setQuantity($2, $1, $session->form->process($formElement));
 		}

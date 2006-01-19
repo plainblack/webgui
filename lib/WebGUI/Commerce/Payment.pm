@@ -200,7 +200,7 @@ The namespace of the plugin.
 sub init {
 	my ($class, $session, $namespace, $properties);
 	$class = shift;
-	$session = shift;
+	$session = shift; use WebGUI; WebGUI::dumpSession($session);
 	$namespace = shift;
 	
 	$properties = $session->db->buildHashRef("select fieldName, fieldValue from commerceSettings where namespace=".$session->db->quote($namespace)." and type='Payment'");

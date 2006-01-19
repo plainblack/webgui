@@ -310,7 +310,7 @@ sub getFieldsList {
 	my $output = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
 	my %fieldNames;
 	tie %fieldNames, 'Tie::IxHash';
-	foreach my $field (@{WebGUI::ProfileField->getFields}) {
+	foreach my $field (@{WebGUI::ProfileField->new($self->session,'dummy')->getFields}) {
 		my $fieldId = $field->getId;
 		next if $fieldId =~ /contentPositions/;
 		$fieldNames{$fieldId} = $field->getLabel.' ['.$fieldId.']';
@@ -708,11 +708,11 @@ sub www_saveUserPrefs {
 	$self->uncacheOverrides;
 	my $i18n = WebGUI::International->new($self->session);
 	my $u = WebGUI::User->new($self->session, $self->discernUserId);
-	foreach my $fieldId ($self->request->params) {
+	foreach my $fieldId ($self->request->param) {
 		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;
-		if ($field->getId eq 'email' && WebGUI::Operation::Profile::isDuplicateEmail($data{$field->getId})) {
+		if ($field->getId eq 'email' && WebGUI::Operation::Profile::isDuplicateEmail($self->session,$data{$field->getId})) {
 			return '<li>'.$i18n->get(1072).'</li>';
 		}
 		if ($field->isRequired && !$data{$field->getId}) {

@@ -173,7 +173,7 @@ Returns the value retrieved from a form post.
 
 sub formProcess {
 	my $self = shift;
-	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->get("dataDefault")));
+	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")));
 	if (ref $result eq "ARRAY") {
 		my @results = @$result;
 		for (my $count=0;$count<scalar(@results);$count++) {

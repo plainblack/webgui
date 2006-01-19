@@ -319,7 +319,7 @@ sub www_manageClipboard {
 	} else {
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard;systemClipboard=1'), $i18n->get(954));
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard'), $i18n->get(950),
-			'onclick="return window.confirm(\''.$i18n->(951,"WebGUI").'\')"',"Asset");
+			'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
 		$limit = 1;
 	}
 $self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});

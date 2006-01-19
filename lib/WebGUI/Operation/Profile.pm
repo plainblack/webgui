@@ -29,7 +29,7 @@ use WebGUI::Operation::Shared;
 sub getRequiredProfileFields {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my @array;
-	foreach my $field (@{WebGUI::ProfileField->getRequiredFields}) {
+	foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getRequiredFields}) {
 		push(@array, {
 			'profile.formElement' => $field->formField,
 			'profile.formElement.label' => $field->getLabel
@@ -75,7 +75,7 @@ sub validateProfileData {
 	my $error = "";
 	my $warning = "";
 	my $i18n = WebGUI::International->new($session);
-	foreach my $field (@{WebGUI::ProfileField->getEditableFields}) {
+	foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getEditableFields}) {
 		my $fieldValue = $field->formProcess;
 		if (ref $fieldValue eq "ARRAY") {
 			$data{$field->getId} = $$fieldValue[0];
@@ -84,7 +84,7 @@ sub validateProfileData {
 		}
 		if ($field->isRequired && !$data{$field->getId}) {
 			$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
-		} elsif ($field->getId eq "email" && isDuplicateEmail($data{$field->getId})) {
+		} elsif ($field->getId eq "email" && isDuplicateEmail($session,$data{$field->getId})) {
 			$warning .= '<li>'.$i18n->get(1072).'</li>';
 		}
 	}

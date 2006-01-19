@@ -1168,7 +1168,7 @@ sub www_respond {
 	return "" unless ($self->session->scratch->get($varname));
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->userId),0,8) : $self->session->user->userId;
 	my $terminate = 0;
-	foreach my $key ($self->session->request->params) {
+	foreach my $key ($self->session->request->param) {
 		if ($key =~ /^answerId_(.+)$/) {
 			my $id = $1;
 			my ($previousResponse) = $self->session->db->quickArray("select count(*) from Survey_questionResponse

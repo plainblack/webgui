@@ -65,7 +65,7 @@ sub www_viewStatistics {
 	($data) = $session->db->quickArray("select count(*) from groups");
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(89).':</td><td class="tableData">'.$data.'</td></tr>';
 	$output .= '</table>';
-        return _submenu($output);
+        return _submenu($session,$output);
 }
 
 

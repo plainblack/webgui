@@ -300,10 +300,10 @@ sub www_saveSettings {
 			next;
 		} 
 		unless ($key eq "op") {
-			WebGUI::Setting::set($key,$value);
+			$session->setting->set($key,$value);
 		}
 	}
-	return www_editSettings();
+	return www_editSettings($session);
 }
 
 1;

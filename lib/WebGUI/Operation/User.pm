@@ -407,7 +407,7 @@ sub www_editUserSave {
 	      		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
 	      		$authInstance->editUserFormSave;
        		}
-		foreach my $field (@{WebGUI::ProfileField->getFields}) {
+		foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			$u->profileField($field->getId,$field->formProcess);
 		}

@@ -199,7 +199,7 @@ sub createAccount {
     $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
 	
 	#User Defined Options
-	$vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields();
+	$vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields($self->session);
 	
 	$vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
     $vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
@@ -238,37 +238,39 @@ Hashref of profile values returned by the function WebGUI::Operation::Profile::v
 =cut
 
 sub createAccountSave {
-   my $self = shift;
-   my $username = $_[0];
-   my $properties = $_[1];
-   my $password = $_[2];
-   my $profile = $_[3];
-   
+	my $self = shift;
+	my $username = $_[0];
+	my $properties = $_[1];
+	my $password = $_[2];
+	my $profile = $_[3];
+
 	my $i18n = WebGUI::International->new($self->session);
-	
-      
-   my $u = WebGUI::User->new($self->session,"new");
-   $self->user($u);
-   my $userId = $u->userId;
-   $u->username($username);
-   $u->authMethod($self->authMethod);
-   $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-   WebGUI::Operation::Profile::saveProfileFields($u,$profile) if($profile);
-   $self->saveParams($userId,$self->authMethod,$properties);
-   
-   if ($self->getSetting("sendWelcomeMessage")){
-      my $authInfo = "\n\n".$i18n->get(50).": ".$username;
-      $authInfo .= "\n".$i18n->get(51).": ".$password if($password);
-      $authInfo .= "\n\n";
-      WebGUI::MessageLog::addEntry($self->userId,"",$i18n->get(870),$self->getSetting("welcomeMessage").$authInfo);
-   }
-  $self->session->user({user=>$u});  
-   $self->_logLogin($userId,"success");
+
+
+	my $u = WebGUI::User->new($self->session,"new");
+	$self->user($u);
+	my $userId = $u->userId;
+	$u->username($username);
+	$u->authMethod($self->authMethod);
+	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
+	WebGUI::Operation::Profile::saveProfileFields($self->session,$u,$profile) if($profile);
+	$self->saveParams($userId,$self->authMethod,$properties);
+
+	if ($self->getSetting("sendWelcomeMessage")){
+		my $authInfo = "\n\n".$i18n->get(50).": ".$username;
+		$authInfo .= "\n".$i18n->get(51).": ".$password if($password);
+		$authInfo .= "\n\n";
+		WebGUI::MessageLog::addEntry($self->userId,"",$i18n->get(870),$self->getSetting("welcomeMessage").$authInfo);
+	}
+	$self->session->user({user=>$u});
+	$self->session->var->end($self->session->var->get("sessionId"));
+	$self->session->var->start($userId,$self->session->getId);
+	$self->_logLogin($userId,"success");
 	my $command = $self->session->setting->get("runOnRegistration");
 	WebGUI::Macro::process($self->session,\$command);
-   system($command) if ($self->session->setting->get("runOnRegistration") ne "");
-   WebGUI::MessageLog::addInternationalizedEntry('',$self->session->setting->get("onNewUserAlertGroup"),'',536) if ($self->session->setting->get("alertOnNewUser"));
-   return "";
+	system($command) if ($self->session->setting->get("runOnRegistration") ne "");
+	WebGUI::MessageLog::addInternationalizedEntry('',$self->session->setting->get("onNewUserAlertGroup"),'',536) if ($self->session->setting->get("alertOnNewUser"));
+	return "";
 }
 
 #-------------------------------------------------------------------
