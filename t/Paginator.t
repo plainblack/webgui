@@ -9,6 +9,7 @@
 #-------------------------------------------------------------------
 
 use FindBin;
+use trace;
 use strict;
 use lib "$FindBin::Bin/lib";
 
@@ -21,3 +22,10 @@ use Test::More tests => 1; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
+my $p = WebGUI::Paginator->new($session, '/home', '', '', 1);
+
+$p->setDataByQuery('select * from settings');
+
+my $settingspage = $p->getPageData;
+
+is(1,1,"a test");

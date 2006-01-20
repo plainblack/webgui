@@ -42,20 +42,14 @@ $session->config->{_config}->set(gateway => '/');
 
 is ( $session->config->get('gateway'), '/', 'Set gateway for downstream tests');
 
-$url = $session->config->get('gateway') . '/';
 $url2 = $session->url->gateway;
-is ( $url2, $url, 'gateway method, no args');
-
-$url = $session->config->get('gateway') . '/';
-$url2 = $session->url->gateway;
-is ( $url2, $url, 'gateway method, no args');
+is ( $url2, '/', 'gateway method, no args');
 
 $url2 = $session->url->gateway('/home');
-$url = $session->config->get('gateway') . '/home';
-is ( $url2, $url, 'gateway method, pageUrl with leading slash');
+is ( $url2, '/home', 'gateway method, pageUrl with leading slash');
 
 $url2 = $session->url->gateway('home');
-is ( $url2, $url, 'gateway method, pageUrl without leading slash');
+is ( $url2, '/home', 'gateway method, pageUrl without leading slash');
 
 #Disable caching
 $session->setting->set(preventProxyCache => 1);
@@ -63,14 +57,14 @@ $session->setting->set(preventProxyCache => 1);
 is ( 1, $session->setting->get('preventProxyCache'), 'disable proxy caching');
 
 $url2 = $session->url->gateway('home');
-like ( $url2, qr/$url\?noCache=\d+;\d+$/, 'check proxy prevention setting');
+like ( $url2, qr{/home\?noCache=\d+;\d+$}, 'check proxy prevention setting');
 
 #Enable caching
 $session->setting->set(preventProxyCache => 0);
 
 $url = '/home';
 $url2 = $session->url->gateway($url,'a=b');
-is( $url2, $session->config->get('gateway').$url.'?a=b', 'append one pair via gateway');
+is( $url2, '/home?a=b', 'append one pair via gateway');
 
 #Restore original proxy cache setting so downstream tests work with no surprises
 $session->setting->set(preventProxyCache => $preventProxyCache );
@@ -109,17 +103,15 @@ is ($session->request->uri, 'empty', 'Validate Mock Object operation');
 $requestedUrl = 'full';
 is ($session->request->uri, 'full', 'Validate Mock Object operation #2');
 
-$requestedUrl = 'home.com/path1/file1';
-is ($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, fetch');
+$requestedUrl = '/path1/file1';
+is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
 
-$requestedUrl = 'home.com/path2/file2';
-is ($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, check cache of previous result');
+$requestedUrl = '/path2/file2';
+is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
 
 diag("page tests");
 
-is ($session->url->page, 'home.com/path1/file1', 'page with no args returns getRequestedUrl via gateway');
+is ($session->url->page, '/path1/file1', 'page with no args returns getRequestedUrl through gateway');
 
-diag("config sitename: ".$session->config->get('sitename')->[0]);
-diag("gateway: ".$session->url->gateway);
-
-is ($session->url->page('',1), 'http://home.com/path1/file1', 'page, withFullUrl');
+$url2 = 'http://'.$session->config->get('sitename')->[0].'/path1/file1';
+is ($session->url->page('',1), $url2, 'page, withFullUrl includes method and sitename');
