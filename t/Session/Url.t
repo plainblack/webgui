@@ -15,7 +15,8 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 19; # increment this value for each test you create
+use Test::MockObject;
 
 my $session = WebGUI::Test->session;
 
@@ -37,9 +38,9 @@ is( $url2, $url.'?a=b;c=d', 'append second pair');
 
 diag("gateway tests");
 
-$session->config->{_config}->set(gateway => 'home.com');
+$session->config->{_config}->set(gateway => '/');
 
-is ( $session->config->get('gateway'), 'home.com', 'Set gateway for downstream tests');
+is ( $session->config->get('gateway'), '/', 'Set gateway for downstream tests');
 
 $url = $session->config->get('gateway') . '/';
 $url2 = $session->url->gateway;
@@ -92,8 +93,33 @@ $url2 = 'level1-/level2/level3';
 
 is ( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
 
-SKIP: {
-	skip("getRequestedUrl requires a valid Apache request object",1);
-	ok(undef,"getRequestedUrl");
-}
+diag("getRequestedUrl tests");
 
+my $originalRequest = $session->request;  ##Save the original request
+
+my $newRequest = Test::MockObject->new;
+my $requestedUrl = 'empty';
+$newRequest->set_bound('uri', \$requestedUrl);
+$session->{_request} = $newRequest;
+
+##Validate new MockObject
+
+is ($session->request->uri, 'empty', 'Validate Mock Object operation');
+
+$requestedUrl = 'full';
+is ($session->request->uri, 'full', 'Validate Mock Object operation #2');
+
+$requestedUrl = 'home.com/path1/file1';
+is ($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, fetch');
+
+$requestedUrl = 'home.com/path2/file2';
+is ($session->url->getRequestedUrl, '/path1/file1', 'getRequestedUrl, check cache of previous result');
+
+diag("page tests");
+
+is ($session->url->page, 'home.com/path1/file1', 'page with no args returns getRequestedUrl via gateway');
+
+diag("config sitename: ".$session->config->get('sitename')->[0]);
+diag("gateway: ".$session->url->gateway);
+
+is ($session->url->page('',1), 'http://home.com/path1/file1', 'page, withFullUrl');
