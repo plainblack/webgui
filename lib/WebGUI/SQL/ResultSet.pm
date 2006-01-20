@@ -115,8 +115,9 @@ An array reference containing a list of values to be used in the placeholders de
 
 sub execute {
 	my $self = shift;
+	my $placeholders = shift || [];
 	my $sql = $self->{_sql};
-	$self->sth->execute(shift||[]) or $self->db->session->errorHandler->fatal("Couldn't execute prepared statement: $sql  Root cause: ". $self->errorMessage);
+	$self->sth->execute(@{ $placeholders }) or $self->db->session->errorHandler->fatal("Couldn't execute prepared statement: $sql  Root cause: ". $self->errorMessage);
 }
 
 
