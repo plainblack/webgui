@@ -179,13 +179,7 @@ Returns the next row of data in the form of a hash reference.
 
 sub hashRef {
 	my $self = shift;
-	my ($hashRef, %hash);
-        $hashRef = $self->sth->fetchrow_hashref();
-        if (defined $hashRef) {
-		return $hashRef;
-        } else {
-                return {};
-        }
+        return $self->sth->fetchrow_hashref();
 }
 
 
