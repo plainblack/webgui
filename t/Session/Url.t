@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 11; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -27,11 +27,15 @@ $session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
 my $url = 'http://localhost.localdomain/foo';
 my $url2;
 
+diag("append tests");
+
 $url2 = $session->url->append($url,'a=b');
 is( $url2, $url.'?a=b', 'append first pair');
 
 $url2 = $session->url->append($url2,'c=d');
 is( $url2, $url.'?a=b;c=d', 'append second pair');
+
+diag("gateway tests");
 
 $session->config->{_config}->set(gateway => 'home.com');
 
@@ -69,6 +73,24 @@ is( $url2, $session->config->get('gateway').$url.'?a=b', 'append one pair via ga
 
 #Restore original proxy cache setting so downstream tests work with no surprises
 $session->setting->set(preventProxyCache => $preventProxyCache );
+
+diag("site URL tests");
+
+my $sitename = $session->config->get('sitename')->[0];
+is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config');
+
+$session->url->setSiteURL('http://webgui.org');
+is ( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');
+
+$session->url->setSiteURL('http://'.$sitename);
+is ( $session->url->getSiteURL, 'http://'.$sitename, 'restore config setting');
+
+diag("compliancy tests");
+
+$url  = 'level1 /level2/level3   ';
+$url2 = 'level1-/level2/level3';
+
+is ( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
 
 SKIP: {
 	skip("getRequestedUrl requires a valid Apache request object",1);
