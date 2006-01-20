@@ -17,6 +17,7 @@ package WebGUI::Search;
 use strict;
 use warnings;
 use WebGUI::Asset;
+use WebGUI::SQL;
 
 =head1 NAME
 
@@ -24,7 +25,7 @@ Package WebGUI::Search
 
 =head1 DESCRIPTION
 
-A package for working with the WebGUI Search Engine.
+A package for creating queries with the WebGUI Search Engine.
 
 =head1 SYNOPSIS
 
@@ -37,16 +38,36 @@ These methods are available from this package:
 =cut
 
 
+#-------------------------------------------------------------------
+
+=head2 getResultSet ( ) 
+
+Returns a WebGUI::SQL::ResultSet object containing the search results.
+
+=cut
+
+sub getResultSet {
+	my $self = shift;
+	my $sth = $self->session->db->prepare($self->{_query});
+	$sth->execute($self->{_params});
+	return $sth;
+}
+
+
 
 #-------------------------------------------------------------------
 
-=head2 new ( session )
+=head2 new ( session  [ , isPublic ] )
 
 Constructor.
 
 =head3 session
 
 A reference to the current session.
+
+=head3 isPublic
+
+A boolean indicating whether this search should search all internal data (0), or just public data (1). Defaults to just public data (1).
 
 =cut
 
@@ -55,6 +76,58 @@ sub new {
 	my $session = shift;
 	bless {_session=>$session}, $class;
 }
+
+
+
+#-------------------------------------------------------------------
+
+=head2 rawQuery ( sql [, placeholders ] ) 
+
+Tells the search engine to use a custom sql query that you've designed for the assetIndex table instead of using the API to build it.
+
+=head3 sql
+
+The query to execute. Be sure to add a where clause parameter like "isPublic='1'" if you want to search only on public data.
+
+=head3 placeholders
+
+A list of placeholder parameters to go along with the query. See WebGUI::SQL::ResultSet::execute() for details.
+
+=cut
+
+sub rawQuery {
+	my $self = shift;
+	$self->{_query} = shift;
+	$self->{_params} = shift;
+}
+
+#-------------------------------------------------------------------
+
+=head2 search ( match, keywords ) 
+
+A simple keyword search.
+
+Should we match "any" or "all" of the keywords.
+
+=head3 keywords
+
+An array of the key words or phrases to match against.
+
+=cut
+
+sub search {
+	my $self = shift;
+	my $match = shift;
+	my @keywords = @_;
+	my $operator = ($match eq "any") ? " or " : " and ";
+	my @phrases = ();
+	foreach (1..scalar(@keywords)) {
+		 push(@phrases, "match (keywords) against (?)");
+	}
+	$self->{_query} = "select assetId from assetIndex where ".join($operator, @phrases);
+	$self->{_params} = \@keywords;
+}
+
 
 #-------------------------------------------------------------------
 
