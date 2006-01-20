@@ -27,6 +27,43 @@ finish($session); # this line required
 
 
 #-------------------------------------------------
+sub addSearchEngine {
+	print "\tUpgrading search engine.\n" unless ($quiet);
+	$session->db->write("create table assetIndex (
+		assetId varchar(22) binary not null primary key,
+		title varchar(255),
+		synopsis text,
+		startDate bigint,
+		endDate bigint,
+		creationDate bigint,
+		modifiedDate bigint,
+		ownerUserId varchar(22) binary,
+		groupToView varchar(22) binary,
+		groupToEdit varchar(22) binary,
+		lineage varchar(255),
+		className varchar(255),
+		keywords mediumtext,
+		fulltext (keywords)
+		)");
+	my @searchParents = $session->db->buildArray("select parentId from asset where className='WebGUI::Asset::Wobject::IndexedSearch'");
+	my @searchIds = $session->db->buildArray("select assetId from asset where className='WebGUI::Asset::Wobject::IndexedSearch'");
+	$session->db->write("delete from asset where className='WebGUI::Asset::Wobject::IndexedSearch'");
+	my $deleteWobject = $session->db->prepare("delete from wobject where assetId=?");
+	my $deleteAssetData = $session->db->prepare("delete from assetData where assetId=?");
+	foreach my $id (@searchIds) {
+		$deleteWobject->execute($id);
+		$deleteAssetData->execute($id);
+	}
+	$deleteWobject->finish;
+	$deleteAssetData->finish;
+	$session->db->write("drop table if exists IndexedSearch");
+	$session->db->write("drop table if exists IndexedSearch_default");
+	$session->db->write("drop table if exists IndexedSearch_default_data");
+	$session->db->write("drop table if exists IndexedSearch_default_words");
+	$session->db->write("drop table if exists IndexedSearch_docInfo");
+}
+
+#-------------------------------------------------
 sub templateParsers {
 	print "\tAdding support for multiple template parsers.\n" unless ($quiet);
 	$session->db->write("alter table template add column parser varchar(255) not null default 'WebGUI::Asset::Template::HTMLTemplate'");
@@ -46,6 +83,8 @@ sub removeFiles {
 	unlink '../../lib/WebGUI/Style.pm';
 	unlink '../../lib/WebGUI/Setting.pm';
 	unlink '../../lib/WebGUI/Grouping.pm';
+	unlink '../../lib/WebGUI/Asset/Wobject/IndexedSearch.pm';
+	rmtree('../../lib/WebGUI/Asset/Wobject/IndexedSearch');
 }
 
 

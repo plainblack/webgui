@@ -17,12 +17,6 @@ save you many hours of grief.
  * You need to upgrade to the latest 6.8 release before you can
 	upgrade to 6.9.
 
- * Due to new features in 6.9 there are several new perl modules you
-	need to install before the upgrade:
-
-	Bit::Vector::Minimal
-	Plucene
-
  * If you wish to use one of the new optional template engines
 	you'll need to install the perl modules for them:
 

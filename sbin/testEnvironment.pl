@@ -77,8 +77,6 @@ checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
 checkModule("JSON",0.991);
 checkModule("Finance::Quote",1.08);
-checkModule("Bit::Vector::Minimal",1.3);
-checkModule("Plucene",1.24);
 #checkModule("POE",0.3202);
 #checkModule("POE::Component::IKC::Server",0.18);
 #checkModule("POE::Component::JobQueue",0.5402);
