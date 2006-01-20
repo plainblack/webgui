@@ -28,6 +28,7 @@ use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
+use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
@@ -741,18 +742,6 @@ sub getImportNode {
 	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000002");
 }
 
-#-------------------------------------------------------------------
-                                                                                                                                                       
-=head2 getIndexerParams ( )
-                                                                                                                                                       
-Override this method and return a hash reference that includes the properties necessary to index the content of the wobject.
-Currently does nothing.
-                                                                                                                                                       
-=cut
-                                                                                                                                                       
-sub getIndexerParams {
-        return {};
-}
 
 
 #-------------------------------------------------------------------
@@ -990,6 +979,20 @@ sub getValue {
 		return $self->{_propertyDefinitions}{$key}{defaultValue};
 	}
 	return undef;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 indexContent ( ) 
+
+Returns an indexer object for this asset. When this method is called the asset's base content gets stored in the index. This method is often overloaded so that a particular asset can insert additional content other than the basic properties. Such uses include indexing attached files or collateral data.
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	return WebGUI::Search::Index->create($self);
 }
 
 

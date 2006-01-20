@@ -276,6 +276,26 @@ sub getThumbnailUrl {
 }
 
 #-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Indexing product data. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	my @data = $self->session->db->buildArray("select feature from Product_feature where assetId=".$self->session->db->quote($self->getId));
+	$indexer->addKeywords(join(" ", @data));
+	@data = $self->session->db->buildArray("select benefit from Product_benefit where assetId=".$self->session->db->quote($self->getId));
+	$indexer->addKeywords(join(" ", @data));
+	@data = $self->session->db->buildArray("select concat(name,' ',value,' ', units') from Product_specification where assetId=".$self->session->db->quote($self->getId));
+	$indexer->addKeywords(join(" ", @data));
+}
+
+
+#-------------------------------------------------------------------
 sub purge {
    	my $self = shift;
    	my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".$self->session->db->quote($self->getId));

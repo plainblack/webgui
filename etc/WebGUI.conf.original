@@ -117,6 +117,15 @@ templateParsers = WebGUI::Asset::Template::HTMLTemplate
 
 defaultTemplateParser = WebGUI::Asset::Template::HTMLTemplate
 
+# Specify external helper apps that will enable WebGUI's search
+# engine to index content in various uploaded file formats. The
+# helpers must take the path to the file as an argument and
+# return either text or html content.
+
+searchIndexerPlugins = txt => "/bin/cat", \
+	readme => "/bin/cat", \
+	html => "/bin/cat", \
+	htm => "/bin/cat"
 
 # Specify a the list of assets you want to appear in your
 # Add Content menus.

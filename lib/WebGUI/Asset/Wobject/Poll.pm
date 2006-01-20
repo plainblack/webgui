@@ -243,6 +243,21 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Indexing question and answers. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->addKeywords($self->get("question")." ".$self->get("answers"));
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;

@@ -38,6 +38,30 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 addFile ( path ) 
+
+Use an external filter defined in the config file as searchIndexerPlugins.
+
+=head3 path
+
+The path to the filename to index, including the filename.
+
+=cut
+
+sub addFile {
+	my $self = shift;
+	my $path = shift;
+	$path =~ m/\.(\w)$/;
+	my $type = lc($1);
+	my $filters = $self->session->config->get("searchIndexerPlugins");
+	my $filter = $filters->{$type};
+	my $content = `$filter $path`;
+	$self->addKeywords($content) if (!$content =~ m/^\s*$/);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 addKeywords ( text )
 
 Add more text to the keywords index for this asset.
@@ -54,6 +78,20 @@ sub addKeywords {
 	$text = WebGUI::HTML::filter($text, "all");
 	my $add = $self->session->db->prepare("update assetIndex set keywords=concat(keywords,' ',?) where assetId = ?");
 	$add->execute([$text, $self->getId]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 asset ( )
+
+Returns a reference to the asset object we're indexing.
+
+=cut
+
+sub asset {
+	my $self = shift;
+	return $self->{_asset};
 }
 
 
@@ -125,6 +163,21 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 setIsPublic ( boolean )
+
+Sets the status of whether this asset will appear in public searches.
+
+=cut
+
+sub isPublic {
+	my $self = shift;
+	my $boolean = shift;
+	my $set = $self->session->db->prepare("update assetIndex set isPublic=? where assetId=?");
+	$set->execute($boolean, $self->getId);
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( asset )
 
 Constructor.
@@ -138,7 +191,7 @@ A reference to an asset object.
 sub new {
 	my $class = shift;
 	my $asset = shift;
-	my $self = {_session=>$asset->session, _id=>$asset->getId};
+	my $self = {_asset=>$asset, _session=>$asset->session, _id=>$asset->getId};
 	return $self;
 }
 

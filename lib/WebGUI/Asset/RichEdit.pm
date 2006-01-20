@@ -490,6 +490,21 @@ sub getRichEditor {
 
 
 #-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Making private. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->setIsPublic(0);
+}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	return '<p>'.$self->getToolbar.'</p>' if ($self->session->var->get("adminOn"));

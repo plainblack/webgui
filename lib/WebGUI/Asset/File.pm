@@ -193,6 +193,21 @@ sub getStorageLocation {
 
 
 #-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Indexing the content of the attachment. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->addFile($self->getStorageLocation->getPath($self->get("filename")));
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;

@@ -142,7 +142,20 @@ sub getToolbar {
 	return $self->SUPER::getToolbar();
 }
 
+#-------------------------------------------------------------------
 
+=head2 indexContent ( )
+
+Indexing the content of the snippet. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->addKeywords($self->get("snippet"));
+	$indexer->setIsPublic(0);
+}
 
 
 #-------------------------------------------------------------------

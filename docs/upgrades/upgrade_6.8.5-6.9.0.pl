@@ -36,12 +36,13 @@ sub addSearchEngine {
 		startDate bigint,
 		endDate bigint,
 		creationDate bigint,
-		modifiedDate bigint,
+		revisionDate bigint,
 		ownerUserId varchar(22) binary,
-		groupToView varchar(22) binary,
-		groupToEdit varchar(22) binary,
+		groupIdView varchar(22) binary,
+		groupIdEdit varchar(22) binary,
 		lineage varchar(255),
 		className varchar(255),
+		isPublic int not null default 1,
 		keywords mediumtext,
 		fulltext (keywords)
 		)");

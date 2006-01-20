@@ -178,6 +178,21 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 
+=head2 indexContent ( )
+
+Making private. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->setIsPublic(0);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 processPropertiesFromFormPost ( )
 
 Used to process properties from the form posted.  Do custom things with

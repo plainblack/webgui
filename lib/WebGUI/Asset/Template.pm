@@ -231,6 +231,21 @@ sub getParser {
 
 #-------------------------------------------------------------------
 
+=head2 indexContent ( )
+
+Making private. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->setIsPublic(0);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 process ( vars )
 
 Evaluate a template replacing template commands for HTML.

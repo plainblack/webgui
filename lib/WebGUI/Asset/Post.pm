@@ -532,6 +532,30 @@ sub hasRated {
 
 #-------------------------------------------------------------------
 
+=head2 indexContent ( )
+
+Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->addKeywords($self->get("content"));
+	$indexer->addKeywords($self->get("userDefined1"));
+	$indexer->addKeywords($self->get("userDefined2"));
+	$indexer->addKeywords($self->get("userDefined3"));
+	$indexer->addKeywords($self->get("userDefined4"));
+	$indexer->addKeywords($self->get("userDefined5"));
+	$indexer->addKeywords($self->get("username"));
+	my $storage = $self->getStorageLocation;
+	foreach my $file (@{$storage->getFiles}) {
+               $indexer->addFile($storage->getPath($file));
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 incrementViews ( )
 
 Increments the views counter for this post.
