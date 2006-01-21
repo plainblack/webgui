@@ -58,7 +58,7 @@ sub www_deleteDatabaseLink {
 		.'">'.$i18n->get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listDatabaseLinks').
 		'">'.$i18n->get(45).'</a></div>';
-        return _submenu($output,"987","database link delete");
+        return _submenu($session,$output,"987","database link delete");
 }
 
 #-------------------------------------------------------------------
@@ -76,7 +76,9 @@ sub www_editDatabaseLink {
         my ($output, %db, $f);
 	tie %db, 'Tie::CPHash';
 	if ($session->form->process("dlid") eq "new") {
-
+		
+	} elsif ($session->form->process("dlid") eq "0") {
+		
 	} else {
                	%db = %{WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->get}; 
 	}
@@ -123,7 +125,7 @@ sub www_editDatabaseLink {
         );
         $f->submit;
 	$output .= $f->print;
-        return _submenu($output,"990","database link add/edit");
+        return _submenu($session,$output,"990","database link add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -148,7 +150,7 @@ sub www_editDatabaseLinkSave {
 sub www_listDatabaseLinks {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless($session->user->isInGroup(3));
-	my $links = WebGUI::DatabaseLinks->getList($session);
+	my $links = WebGUI::DatabaseLink->getList($session);
         my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
 	my $i18n = WebGUI::International->new($session);
 	foreach my $id (keys %{$links}) {
@@ -161,7 +163,7 @@ sub www_listDatabaseLinks {
                 $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td></tr>';
         }
         $output .= '</table>';
-        return _submenu($output,"database links manage");
+        return _submenu($session,$output,"database links manage");
 }
 
 

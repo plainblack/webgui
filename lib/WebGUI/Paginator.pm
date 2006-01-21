@@ -538,10 +538,10 @@ sub setDataByQuery {
 	my ($self, $sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
 	$dbh ||= $self->session->dbSlave;
 	if ($unconditional) {
-		$sth = $dbh->unconditionalRead($sql,$placeholders);
+		$sth = $dbh->unconditionalRead($sql,undef,$placeholders);
 		return $sth->errorMessage if ($sth->errorCode > 0);
 	} else {
-		$sth = $dbh->read($sql,$placeholders);
+		$sth = $dbh->read($sql,undef,$placeholders);
 	}
 	my $defaultPageNumber = $self->getPageNumber;
 	$self->{_totalRows} = $sth->rows;

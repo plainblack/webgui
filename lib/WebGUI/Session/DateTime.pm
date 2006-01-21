@@ -60,7 +60,7 @@ This package provides easy to use date math functions, which are normally a comp
  ($interval, $units) = $dt->secondsToInterval($seconds);
  $timeString = $dt->secondsToTime($seconds);
  $epoch = $dt-$self->session->datetime->setToEpoch($setString);
- $epoch = $dt-$self->session->datetime->time();
+ $epoch = $dt-$self->time();
  $seconds = $dt->timeToSeconds($timeString);
 
 =head1 METHODS
@@ -223,7 +223,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 
 sub epochToHuman {
 	my $self = shift;
-	my $epoch = shift || $self->session->datetime->time();
+	my $epoch = shift || $self->time();
 	my $i18n = WebGUI::International->new($self->session);
 	my $language = $i18n->getLanguage($self->session->user->profileField("language"));
 	my $locale = $language->{languageAbbreviation} || "en";
@@ -560,7 +560,7 @@ The number of seconds since January 1, 1970. Defaults to now.
 
 sub localtime {
 	my $self = shift;
-	my $dt = DateTime->from_epoch( epoch => shift ||$self->session->datetime->time() );
+	my $dt = DateTime->from_epoch( epoch => shift ||$self->time() );
 	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
 	return ( $dt->year, $dt->month, $dt->day, $dt->hour, $dt->minute, $dt->second, $dt->day_of_year, $dt->day_of_week, $dt->is_dst );
 }

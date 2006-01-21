@@ -37,7 +37,7 @@ Operation for creating, deleting, editing and many other user related functions.
 =cut
 #-------------------------------------------------------------------
 
-=head2 _submenu ( $workarea [, $title, $help] )
+=head2 _submenu ( $session, $workarea [, $title, $help] )
 
 Internal utility routine for setting up the Admin Console for User functions.
 
@@ -84,7 +84,7 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
-=head2 doUserSearch ( $op, $returnPaginator, $userFilter )
+=head2 doUserSearch ( $session, $op, $returnPaginator, $userFilter )
 
 Subroutine that actually performs the SQL search for users.
 
@@ -141,7 +141,7 @@ sub doUserSearch {
 	}
 }
 
-=head2 doUserSearchForm ( $op, $params )
+=head2 doUserSearchForm ( $session, $op, $params )
 
 Form front-end and display for searching for users.
 
@@ -223,6 +223,8 @@ sub www_becomeUser {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	$session->user({userId=>$session->form->process("uid")});
+	$session->var->end($session->var->get("sessionId"));
+	$session->var->start($session->form->process("uid"),$session->getId);
 	return "";
 }
 
@@ -243,14 +245,14 @@ sub www_deleteUser {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
-		return _submenu($session->privilege->vitalComponent());
+		return _submenu($session,$session->privilege->vitalComponent());
         } else {
                 $output .= $i18n->get(167).'<p>';
                 $output .= '<div align="center"><a href="'.$session->url->page('op=deleteUserConfirm;uid='.$session->form->process("uid")).
 			'">'.$i18n->get(44).'</a>';
                 $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listUsers').'">'.
 			$i18n->get(45).'</a></div>'; 
-		return _submenu($output,'42',"user delete");
+		return _submenu($session,$output,'42',"user delete");
         }
 }
 
@@ -382,7 +384,7 @@ sub www_editUser {
 		-size=>15,
 		-value=>\@groupsToDelete
 		);
-	return _submenu($error.$tabform->print,'168',"user add/edit");
+	return _submenu($session,$error.$tabform->print,'168',"user add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -419,7 +421,7 @@ sub www_editUserSave {
        		$error = '<ul><li>'.$i18n->get(77).' '.$session->form->process("username").'Too or '.$session->form->process("username").'02</li></ul>';
 	}
 	if ($isSecondary) {
-		return _submenu($i18n->get(978));
+		return _submenu($session,$i18n->get(978));
 	} else {
 		return www_editUser($error);
 	}
@@ -452,7 +454,7 @@ sub www_editUserKarma {
 	);
         $f->submit;
         $output .= $f->print;
-        return _submenu($output,'558',"edit user karma");
+        return _submenu($session,$output,'558',"edit user karma");
 }
 
 #-------------------------------------------------------------------
@@ -477,9 +479,9 @@ sub www_listUsers {
 	}
 	my %status;
 	my $i18n = WebGUI::International->new($session);
-	my $output = getUserSearchForm("listUsers");
+	my $output = getUserSearchForm($session,"listUsers");
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
-	return _submenu($output) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
+	return _submenu($session,$output) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
 	tie %status, 'Tie::IxHash';
 	%status = (
 		Active		=> $i18n->get(817),
@@ -496,7 +498,7 @@ sub www_listUsers {
                 <td class="tableHeader">'.$i18n->get(429).'</td>
                 <td class="tableHeader">'.$i18n->get(434).'</td>
 		</tr>';
-	my $p = doUserSearch("listUsers",1);
+	my $p = doUserSearch($session,"listUsers",1);
 	foreach my $data (@{$p->getPageData}) {
 		$output .= '<tr class="tableData">';
 		$output .= '<td>'.$status{$data->{status}}.'</td>';
@@ -521,7 +523,7 @@ sub www_listUsers {
 	}
         $output .= '</table>';
         $output .= $p->getBarTraditional;
-	return _submenu($output,undef,"users manage");
+	return _submenu($session,$output,undef,"users manage");
 }
 
 1;
