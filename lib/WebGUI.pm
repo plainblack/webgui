@@ -115,7 +115,7 @@ sub page {
 			$session->errorHandler->error("The notFound page failed to be created!");
 			$output = "An error was encountered while processing your request.";
 		}
-		$output = "An error was encountered while processing your request." unless $output ne '';
+		$output = "An error was encountered while processing your request." if $output eq '';
 	}
 	return $output;
 }

@@ -117,7 +117,7 @@ sub www_viewHelp {
 	my @related = _related($session, $help->{related});
 	foreach my $row (@related) {
 		my $relatedHelp = _get($session,$row->{tag},$row->{namespace});
-		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
+		$ac->addSubmenuItem(_link($session,$row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
 	}
         my %vars;
         $vars{body} = $i18n->get($help->{body});
@@ -159,7 +159,7 @@ sub www_viewHelpIndex {
         @helpIndex = sort { $a->[2] cmp $b->[2] } @helpIndex;
         foreach my $helpEntry (@helpIndex) {
                 my ($namespace, $id, $title) = @{ $helpEntry };
-                $output .= '<p><a href="'._link($id,$namespace).'">'.$title.'</a></p>';
+                $output .= '<p><a href="'._link($session,$id,$namespace).'">'.$title.'</a></p>';
                 $i++;
                 if ($i == $halfway) {
                         $output .= '</td><td valign="top">';
@@ -189,7 +189,7 @@ sub www_viewHelpTOC {
 	@entries = sort { $a->[0] cmp $b->[0] } @entries;
         foreach my $helpEntry (@entries) {
 		my ($helpName, $helpFile) = @{ $helpEntry };
-                $output .= '<p><a href="'._linkTOC($helpFile).'">'.$helpName."</a></p>\n";
+                $output .= '<p><a href="'._linkTOC($session,$helpFile).'">'.$helpName."</a></p>\n";
                 $i++;
                 if ($i % $third == 0) {
                         $output .= '</td><td valign="top">';
@@ -212,7 +212,7 @@ sub www_viewHelpChapter {
 	my $output = '';
 	my $i18n = WebGUI::International->new($session);
         foreach my $id (@entries) {
-                $output .= '<p><a href="'._link($id,$namespace).'">'.$i18n->get($help->{$id}{title},$namespace).'</a></p>';
+                $output .= '<p><a href="'._link($session,$id,$namespace).'">'.$i18n->get($help->{$id}{title},$namespace).'</a></p>';
 	}
 	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));

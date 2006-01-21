@@ -100,7 +100,7 @@ sub www_cancelTransaction {
 	my $i18n = WebGUI::International->new($session, 'Commerce');
 	$var{message} = $i18n->get('checkout canceled message');
 	
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceCheckoutCanceledTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceCheckoutCanceledTemplateId"))->process(\%var));
 }
 
 # This operation is here for easier future extensions to the commerce system.
@@ -191,7 +191,7 @@ sub www_checkoutConfirm {
 	$var{'viewShoppingCart.url'} = $session->url->page('op=viewCart');
 	$var{'viewShoppingCart.label'} = $i18n->get('view shopping cart');
 
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceConfirmCheckoutTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceConfirmCheckoutTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -321,7 +321,7 @@ sub www_checkoutSubmit {
 	return WebGUI::Operation::execute($session,'viewPurchaseHistory') unless ($checkoutError);
 
 	# If an error has occurred show the template errorlog
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
 }
 
 #-------------------------------------------------------------------
@@ -690,7 +690,7 @@ sub www_selectPaymentGateway {
 	$var{formSubmit} = WebGUI::Form::submit($session,{value=>$i18n->get('payment gateway select')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectPaymentGatewayTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceSelectPaymentGatewayTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -736,7 +736,7 @@ sub www_selectShippingMethod {
 	$var{formSubmit} = WebGUI::Form::submit($session,{value=>$i18n->get('shipping select button')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceSelectShippingMethodTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceSelectShippingMethodTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
@@ -826,7 +826,7 @@ sub www_viewCart {
 	
 	$var{total} = sprintf('%.2f', $total);
 
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session->setting->get("commerceViewShoppingCartTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceViewShoppingCartTemplateId"))->process(\%var));
 }
 
 1;

@@ -410,7 +410,7 @@ sub www_editGroup {
 sub www_editGroupSave {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
-	my $g = WebGUI::Group->new($session->form->process("gid"));
+	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
 	$g->description($session->form->process("description"));
 	$g->name($session->form->process("groupName"));
 	$g->expireOffset($session->form->interval("expireOffset"));

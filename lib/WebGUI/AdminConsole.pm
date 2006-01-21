@@ -417,7 +417,7 @@ sub render {
 		my $importNodeLineage = $importNode->get("lineage");
 		my $assetLineage = $self->session->asset->get("lineage");
 		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001") {
-			$var{"backtosite.url"} = $self->getDefault($self->session)->getUrl;
+			$var{"backtosite.url"} = WebGUI::Asset->getDefault($self->session)->getUrl;
 		} else {
 			$var{"backtosite.url"} = $self->session->asset->getContainer->getUrl;
 		}

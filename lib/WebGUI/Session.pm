@@ -476,7 +476,7 @@ sub stow {
 
 =head2 style ( )
 
-Returns a WebGUI::Style object.
+Returns a WebGUI::Session::Style object.
 
 =cut
 

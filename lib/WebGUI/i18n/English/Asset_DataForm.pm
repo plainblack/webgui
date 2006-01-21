@@ -554,6 +554,11 @@ The end of the form.
 		lastUpdated => 1031514049
 	},
 
+	'102' => {
+		message => q|Edit Tab|,
+		lastUpdated => 1137974142
+	},
+
 	'103' => {
 		message => q|Add new Tab|,
 		lastUpdated => 1052048005

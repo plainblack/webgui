@@ -648,27 +648,27 @@ sub view {
 	my $self = shift;
 	my $passedVars = shift;
 	my $var;
-        ##Priority encoding
-        if ( $self->session->form->process("mode") eq "form") {
-                $self->viewForm($passedVars);
-        }
-        elsif ( $self->session->form->process("mode") eq "list") {
-                $self->viewList;
-        }
+	##Priority encoding
+	if ( $self->session->form->process("mode") eq "form") {
+		return $self->viewForm($passedVars);
+	}
+	elsif ( $self->session->form->process("mode") eq "list") {
+		return $self->viewList;
+	}
 	elsif( $self->defaultViewForm ) {
-                $self->viewForm($passedVars);
-        }
-        else {
-                $self->viewList();
-        }
+		return $self->viewForm($passedVars);
+	}
+	else {
+		return $self->viewList();
+	}
 }
 
 #-------------------------------------------------------------------
 
 sub viewList {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless (WebGUI::Grouping::isInGroup($self->get("groupToViewEntries")));
-        return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
+	return $self->session->privilege::insufficient() unless ($self->session->user->isInGroup($self->get("groupToViewEntries")));
+	return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -868,16 +868,16 @@ sub www_editFieldSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
-	$self->session->form->process("tid") = "0" if ($self->session->form->process("tid") eq "");
-	$self->session->form->process("name") = $self->session->url->urlize($self->session->form->process("name"));
-        $self->session->form->process("name") =~ s/\-//g;
-        $self->session->form->process("name") =~ s/\///g;
+	my $tid = $self->session->form->process("tid") || "0";
+	my $name = $self->session->url->urlize($self->session->form->process("name"));
+        $name =~ s/\-//g;
+        $name =~ s/\///g;
 	$self->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$self->session->form->process("fid"),
 		width=>$self->session->form->process("width"),
-		name=>$self->session->form->process("name"),
+		name=>$name,
 		label=>$self->session->form->process("label"),
-		DataForm_tabId=>$self->session->form->process("tid"),
+		DataForm_tabId=>$tid,
 		status=>$self->session->form->process("status"),
 		type=>$self->session->form->process("type"),
 		possibleValues=>$self->session->form->process("possibleValues"),
@@ -886,12 +886,12 @@ sub www_editFieldSave {
 		rows=>$self->session->form->process("rows"),
 		vertical=>$self->session->form->process("vertical"),
 		extras=>$self->session->form->process("extras"),
-		}, "1","1", _tonull("DataForm_tabId",$self->session->form->process("tid")));
+		}, "1","1", _tonull("DataForm_tabId",$tid));
 	if($self->session->form->process("position")) {
 		$self->session->db->write("update DataForm_field set sequenceNumber=".$self->session->db->quote($self->session->form->process("position")).
 					" where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
 	}
-	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$self->session->form->process("tid"))) if ($self->session->form->process("fid") ne "new");
+	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$tid)) if ($self->session->form->process("fid") ne "new");
         if ($self->session->stow->get('whatNext') eq "editField" || $self->session->form->process("proceed") eq "editField") {
             return $self->www_editField('new');
         }
@@ -905,9 +905,9 @@ sub www_editTab {
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
-        $self->session->form->process("tid") = "new" if ($self->session->form->process("tid") eq "");
-	unless ($self->session->form->process("tid") eq "new") {	
-        	%tab = $self->session->db->quickHash("select * from DataForm_tab where DataForm_tabId=".$self->session->db->quote($self->session->form->process("tid")));
+        my $tid = shift || $self->session->form->process("tid") || "new";
+	unless ($tid eq "new") {	
+        	%tab = $self->session->db->quickHash("select * from DataForm_tab where DataForm_tabId=".$self->session->db->quote($tid));
 	}
         $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
@@ -929,7 +929,7 @@ sub www_editTab {
 		-value=>$tab{subtext},
 		-subtext=>""
 		);
-	if ($self->session->form->process("tid") eq "new") {
+	if ($tid eq "new") {
         	$f->whatNext(
 			-options=>{
 				editTab=>$i18n->get(103),
@@ -941,25 +941,25 @@ sub www_editTab {
         $f->submit;
 	my $ac = $self->getAdminConsole;
 	$ac->setHelp("data form fields add/edit","Asset_DataForm");
-        return $ac->render($f->print,$i18n->get('20'));
+	return $ac->render($f->print,$i18n->get('103')) if $tid eq "new";
+	return $ac->render($f->print,$i18n->get('102'));
 }
 
 #-------------------------------------------------------------------
 sub www_editTabSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
-	$self->session->form->process("name") = $self->session->url->urlize($self->session->form->process("name"));
-        $self->session->form->process("name") =~ s/\-//g;
-        $self->session->form->process("name") =~ s/\///g;
+	my $name = $self->session->form->process("name") || $self->session->form->process("label");;
+	$name = $self->session->url->urlize($name);
+	$name =~ s/\-//g;
+	$name =~ s/\///g;
 	$self->setCollateral("DataForm_tab","DataForm_tabId",{
 		DataForm_tabId=>$self->session->form->process("tid"),
 		label=>$self->session->form->process("label"),
 		subtext=>$self->session->form->process("subtext")
 		});
         if ($self->session->form->process("proceed") eq "editTab") {
-            $self->session->form->process("tid") = "new";
-            return $self->www_editTab;
+            return $self->www_editTab("new");
         }
         return "";
 }
@@ -1105,6 +1105,19 @@ sub www_process {
 		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
 		return $self->session->style->process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
 	}
+}
+
+#-------------------------------------------------------------------
+=head2 www_view ( )
+
+Overwrite www_view method and call the superclass object, passing in a 1 to disable cache
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	$self->SUPER::www_view(1);
+	
 }
 
 1;
