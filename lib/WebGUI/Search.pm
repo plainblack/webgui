@@ -74,7 +74,7 @@ sub getAssets {
 	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);
 	my @assets;
 	while (my ($id, $class, $version) = $rs->array) {
-		push(@ids, WebGUI::Asset->new($id, $class, $version));		
+		push(@assets, WebGUI::Asset->new($id, $class, $version));		
 	}
 	return \@assets;
 }
