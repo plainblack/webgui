@@ -40,17 +40,61 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 getAssetIds ( )
+
+Returns an array reference containing all the asset ids of the assets that matched.
+
+=cut
+
+sub getAssetIds {
+	my $self = shift;
+	my $query = "select assetId from assetIndex where isPublic=? and (".$self->{_query}.")";
+	my $rs = $self->session->db->prepare($self->{_query});
+	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);
+	my @ids = ();
+	while (my ($id) = $rs->array) {
+		push(@ids, $id);		
+	}
+	return \@ids;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getAsses ( )
+
+Returns an array reference containing asset objects for those that matched.
+
+=cut
+
+sub getAssets {
+	my $self = shift;
+	my $query = "select assetId,className,revisionDate from assetIndex where isPublic=? and (".$self->{_query}.")";
+	my $rs = $self->session->db->prepare($self->{_query});
+	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);
+	my @assets;
+	while (my ($id, $class, $version) = $rs->array) {
+		push(@ids, WebGUI::Asset->new($id, $class, $version));		
+	}
+	return \@assets;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getResultSet ( ) 
 
-Returns a WebGUI::SQL::ResultSet object containing the search results.
+Returns a WebGUI::SQL::ResultSet object containing the search results with columns labeled "assetId", "title", "synopsis", "ownerUserId", "groupIdView", "groupIdEdit", "creationDate", "revisionDate", "startDate", "endDate", and "className".
 
 =cut
 
 sub getResultSet {
 	my $self = shift;
-	my $sth = $self->session->db->prepare($self->{_query});
-	$sth->execute($self->{_params});
-	return $sth;
+	my $query = "select assetId, title, synopsis, ownerUserId, groupIdView, groupIdEdit, creationDate, revisionDate, startDate, endDate, className
+		from assetIndex where isPublic=? and (".$self->{_query}.")";
+	my $rs = $self->session->db->prepare($self->{_query});
+	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);
+	return $rs;
 }
 
 
@@ -74,20 +118,21 @@ A boolean indicating whether this search should search all internal data (0), or
 sub new {
 	my $class = shift;
 	my $session = shift;
-	bless {_session=>$session}, $class;
+	my $isPublic = (shift eq "0") ? 0 : 1;
+	bless {_session=>$session, _isPublic=>$isPublic}, $class;
 }
 
 
 
 #-------------------------------------------------------------------
 
-=head2 rawQuery ( sql [, placeholders ] ) 
+=head2 rawClause ( sql [, placeholders ] ) 
 
-Tells the search engine to use a custom sql query that you've designed for the assetIndex table instead of using the API to build it.
+Tells the search engine to use a custom sql where clause that you've designed for the assetIndex table instead of using the API to build it.
 
 =head3 sql
 
-The query to execute. Be sure to add a where clause parameter like "isPublic='1'" if you want to search only on public data.
+The where clause to execute. It should not actually contain the "where" term itself. 
 
 =head3 placeholders
 
@@ -95,7 +140,7 @@ A list of placeholder parameters to go along with the query. See WebGUI::SQL::Re
 
 =cut
 
-sub rawQuery {
+sub rawClause {
 	my $self = shift;
 	$self->{_query} = shift;
 	$self->{_params} = shift;
@@ -124,7 +169,7 @@ sub search {
 	foreach (1..scalar(@keywords)) {
 		 push(@phrases, "match (keywords) against (?)");
 	}
-	$self->{_query} = "select assetId from assetIndex where ".join($operator, @phrases);
+	$self->{_query} = join($operator, @phrases);
 	$self->{_params} = \@keywords;
 }
 
