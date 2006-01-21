@@ -25,7 +25,10 @@ Package WebGUI::Form::Combo
 
 =head1 DESCRIPTION
 
-Creates a select list merged with a text box form control.
+Creates a select list merged with a text box form control.  The text box form control can
+be used to enter data apart from the list options or to add new options to the list of
+available options.  The last function is dependent on the caller of the Form field
+appending the new value to the list of options.
 
 =head1 SEE ALSO
 
@@ -74,7 +77,10 @@ sub definition {
 
 =head2 getValueFromPost ( )
 
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
+Returns an array or a carriage return ("\n") separated scalar depending
+upon whether you're returning the values into an array or a scalar.  If
+any data is in the Text form, it is returned before a selected value from
+the list.
 
 =cut
 
