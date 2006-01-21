@@ -330,7 +330,7 @@ sub processReplacements {
 			$content =~ s/\Q$searchFor/$replaceWith/gs;
 		}
 	} else {
-		my $sth = $session->db->read("select searchFor,replaceWith from replacements",$session->dbSlave);
+		my $sth = $session->dbSlave->read("select searchFor,replaceWith from replacements");
         	while (my ($searchFor,$replaceWith) = $sth->array) {
 			$replacements->{$searchFor} = $replaceWith;
         		$content =~ s/\Q$searchFor/$replaceWith/gs;
