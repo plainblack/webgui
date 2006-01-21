@@ -152,6 +152,8 @@ sub rawClause {
 
 A simple keyword search.
 
+=head3 match
+
 Should we match "any" or "all" of the keywords.
 
 =head3 keywords
@@ -173,6 +175,36 @@ sub search {
 	$self->{_params} = \@keywords;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 searchLimitLineage ( lineage, match, keywords ) 
+
+A simple keyword search limiting the search to a particular lineage.
+
+=head3 lineage
+
+The lineage to limit the search to.
+
+=head3 match
+
+Should we match "any" or "all" of the keywords.
+
+=head3 keywords
+
+An array of the key words or phrases to match against.
+
+=cut
+
+sub searchLimitLineage {
+	my $self = shift;
+	my $lineage = shift;
+	$self->search(@_);
+	$self->{_query} = "lineage like ? and (".$self->{_query}.")";
+	my @params = @{$self->{_params}};
+	unshift(@params, $lineage.'%');
+	$self->{_params} = \@params;
+}
 
 #-------------------------------------------------------------------
 
