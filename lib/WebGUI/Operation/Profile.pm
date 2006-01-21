@@ -124,8 +124,8 @@ sub www_editProfile {
 	}
 	$vars->{'profile.form.elements'} = \@array;
 	$vars->{'profile.form.submit'} = WebGUI::Form::submit($session,{});
-	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
-	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000051")->process($vars));
+	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000051")->process($vars));
 }
 
 #-------------------------------------------------------------------
@@ -139,7 +139,7 @@ sub www_editProfileSave {
     
 	return www_editProfile('<ul>'.$error.'</ul>') if($error ne "");
     
-	$u = WebGUI::User->new($session->user->userId);
+	$u = WebGUI::User->new($session,$session->user->userId);
 	foreach $fieldName (keys %{$profile}) {
 		$u->profileField($fieldName,$profile->{$fieldName});
 	}

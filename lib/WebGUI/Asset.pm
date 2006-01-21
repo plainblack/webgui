@@ -370,7 +370,8 @@ sub getAssetAdderLinks {
 	foreach my $class (@{$self->session->config->get($type)}) {
 		next unless $class;
 		my %properties = (
-			className=>$class
+			className=>$class,
+			dummy=>1
 		);
 		my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 		next unless $newAsset;
@@ -1416,7 +1417,7 @@ Returns "".
 
 sub view {
 	my $self = shift;
-	$self->session->http->setRedirect($self->getDefault->getUrl) if ($self->getId eq "PBasset000000000000001");
+	$self->session->http->setRedirect($self->getDefault($self->session)->getUrl) if ($self->getId eq "PBasset000000000000001");
 	return $self->getToolbar if ($self->session->var->get("adminOn"));
 	return undef;
 }

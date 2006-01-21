@@ -53,7 +53,7 @@ sub www_deleteProfileCategoryConfirm {
 	my $category = WebGUI::ProfileCategory->new($session,$session->form->process("cid"));
         return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($category->isProtected);
 	$category->delete;	
-        return www_editProfileSettings();
+        return www_editProfileSettings($session);
 }
 
 #-------------------------------------------------------------------
@@ -63,7 +63,7 @@ sub www_deleteProfileFieldConfirm {
 	my $field = WebGUI::ProfileField->new($session,$session->form->process("fid"));
         return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($field->isProtected);
 	$field->delete;
-        return www_editProfileSettings(); 
+        return www_editProfileSettings($session); 
 }
 
 #-------------------------------------------------------------------
@@ -84,6 +84,7 @@ sub www_editProfileCategory {
 		);
 		$f->readOnly(
 			-name => $session->form->process("cid"),
+			-value => $session->form->process("cid"),
 			-label => $i18n->get(469),
 		);
 		$data = WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->get;
@@ -112,7 +113,7 @@ sub www_editProfileCategory {
 		-hoverHelp=>$i18n->get('897 description'),
 		);
 	$f->submit;
-	return _submenu($f->print,'468','user profile category add/edit','WebGUIProfile');
+	return _submenu($session,$f->print,'468','user profile category add/edit','WebGUIProfile');
 }
 
 #-------------------------------------------------------------------
@@ -126,11 +127,10 @@ sub www_editProfileCategorySave {
 		);
 	if ($session->form->process("cid") eq "new") {
 		my $category = WebGUI::ProfileCategory->create($session,\%data);
-		$session->form->process("cid") = $category->getId;
 	} else {
 		WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->set(\%data);
 	}
-	return www_editProfileSettings();
+	return www_editProfileSettings($session);
 }
 
 #-------------------------------------------------------------------
@@ -198,15 +198,15 @@ sub www_editProfileField {
 		-defaultValue=>"Text",
 	);
 	my @profileForms = ();
-	foreach my $form ( sort @{ $fieldType->{types} }) {
+	foreach my $form ( sort @{ $fieldType->get("types") }) {
 		next if $form eq 'DynamicField';
 		my $cmd = join '::', 'WebGUI::Form', $form;
 		eval "use $cmd";
-		my $w = eval "$cmd->new($session);";
-		push @profileForms, $form if $w->{profileEnabled};
+		my $w = eval {"$cmd"->new($session)};
+		push @profileForms, $form if $w->get("profileEnabled");
 	}
 
-	$fieldType->{types} = \@profileForms;
+	$fieldType->set("types", \@profileForms);
 	$f->raw($fieldType->toHtmlWithWrapper());
 	$f->textarea(
 		-name => "possibleValues",
@@ -232,7 +232,7 @@ sub www_editProfileField {
 		-value=>$data->{profileCategoryId}
 		);
         $f->submit;
-	return _submenu($f->print,'471','profile settings edit',"WebGUIProfile");
+	return _submenu($session,$f->print,'471','profile settings edit',"WebGUIProfile");
 }
 
 #-------------------------------------------------------------------
@@ -251,13 +251,13 @@ sub www_editProfileFieldSave {
 	my $categoryId = $session->form->selectBox("profileCategoryId");
 	if ($session->form->process("new")) {
 		my $field = WebGUI::ProfileField->create($session,$session->form->text("fid"), \%data, $categoryId);
-		$session->form->process("fid") = $field->getId;
+		$session->stow->set("editSavedFid",$field->getId);
 	} else {
-		my $field = WebGUI::ProfileField->new($session,$session->form->process("fid"));
+		my $field = WebGUI::ProfileField->new($session,$session->stow->get("editSavedFid"));
 		$field->set(\%data);
 		$field->setCategory($categoryId);
 	}
-	return www_editProfileSettings();
+	return www_editProfileSettings($session);
 }
 
 #-------------------------------------------------------------------
@@ -282,7 +282,7 @@ sub www_editProfileSettings {
                        	$output .= ' '.$field->getLabel.'<br />';
 		}
 	}
-	return _submenu($output,undef,"profile settings edit",'WebGUIProfile');
+	return _submenu($session,$output,undef,"profile settings edit",'WebGUIProfile');
 }
 
 #-------------------------------------------------------------------
@@ -290,7 +290,7 @@ sub www_moveProfileCategoryDown {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->moveDown;
-        return www_editProfileSettings();
+        return www_editProfileSettings($session);
 }
 
 #-------------------------------------------------------------------
@@ -298,7 +298,7 @@ sub www_moveProfileCategoryUp {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->moveUp;
-        return www_editProfileSettings();
+        return www_editProfileSettings($session);
 }
 
 #-------------------------------------------------------------------
@@ -306,7 +306,7 @@ sub www_moveProfileFieldDown {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileField->new($session,$session->form->process("fid"))->moveDown;
-        return www_editProfileSettings();
+        return www_editProfileSettings($session);
 }
 
 #-------------------------------------------------------------------
@@ -314,7 +314,7 @@ sub www_moveProfileFieldUp {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileField->new($session,$session->form->process("fid"))->moveUp;
-        return www_editProfileSettings();
+        return www_editProfileSettings($session);
 }
 
 

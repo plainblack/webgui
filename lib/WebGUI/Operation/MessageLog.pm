@@ -70,7 +70,7 @@ sub www_viewMessageLog {
    foreach my $message (@$messages) {   
       my $hash;
       $hash->{'message.subject'} =  '<a href="'.$session->url->page('op=viewMessageLogMessage;mlog='.$message->{messageLogId}).'">'.$message->{subject}.'</a>';
-      my $status = _status->{$message->{status}};
+      my $status = _status($session)->{$message->{status}};
       $status = '<a href="'.$session->url->append($message->{url},'mlog='.$message->{messageLogId}).'">'.$status.'</a>' if ($message->{url} ne "");
       $hash->{'message.status'} = $status;
 	  $hash->{'message.dateOfEntry'} =$session->datetime->epochToHuman($message->{dateOfEntry});
@@ -85,9 +85,9 @@ sub www_viewMessageLog {
    $vars->{'message.pageList'} = $p->getPageLinks;
    $vars->{'message.previousPage'} = $p->getPreviousPageLink;
    $vars->{'message.multiplePages'} = ($p->getNumberOfPages > 1);
-   $vars->{'message.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
+   $vars->{'message.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
 
-   return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000050")->process($vars));
+   return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000050")->process($vars));
 }
 
 #-------------------------------------------------------------------
@@ -110,7 +110,7 @@ sub www_viewMessageLogMessage {
    $vars->{'message.subject'} = $data->{subject};
    $vars->{'message.dateOfEntry'} =$session->datetime->epochToHuman($data->{dateOfEntry});
    
-   my $status = _status->{$data->{status}}; 
+   my $status = _status($session)->{$data->{status}}; 
    if ($data->{url} ne "" && $data->{status} eq 'pending'){
       $status = '<a href="'.$session->url->append($data->{url},'mlog='.$data->{messageLogId}).'">'.$status.'</a>';
       $vars->{'message.takeAction'} = '<a href="'.$session->url->append($data->{url},'mlog='.$data->{messageLogId}).'">'.$i18n->get(554).'</a>'
@@ -122,8 +122,8 @@ sub www_viewMessageLogMessage {
    }
    
    $vars->{'message.text'} = $data->{message};
-   $vars->{'message.accountOptions'} = WebGUI::Operation::Shared::accountOptions();
-   return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000049")->process($vars));
+   $vars->{'message.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
+   return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000049")->process($vars));
 }
 
 1;

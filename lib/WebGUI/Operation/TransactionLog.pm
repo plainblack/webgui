@@ -49,7 +49,7 @@ sub www_viewPurchaseHistory {
 
 	$var{purchaseHistoryLoop} = \@historyLoop;
 
-	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000019")->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000019")->process(\%var));
 }
 
 #-------------------------------------------------------------------

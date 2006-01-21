@@ -270,7 +270,7 @@ sub createAccountSave {
    #Check that username is valid and not a duplicate in the system.
    $error .= $self->error if(!$self->validUsername($username));
    #Validate profile data.
-   my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData();
+   my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session);
    $error .= $temp;
    return $self->createAccount("<h1>".$i18n->get(70)."</h1>".$error) unless ($error eq "");
    #If Email address is not unique, a warning is displayed
@@ -312,7 +312,7 @@ sub displayAccount {
       $vars->{'account.form.karma'} = $self->session->user->profileField("karma");
 	  $vars->{'account.form.karma.label'} = $i18n->get(537);
    }
-   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions();
+   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions($self->session);
    return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
 }
 

@@ -168,7 +168,7 @@ sub getFileIconUrl {
 sub getIcon {
 	my $self = shift;
 	my $small = shift;
-	if ($small && ref($self) eq '') {
+	if ($small && $self->get("dummy")) {
 		return $self->session->config->get("extrasURL").'/assets/small/file.gif';
 	} elsif ($small) {
 		return $self->getFileIconUrl;	
@@ -267,6 +267,7 @@ We override the update method from WebGUI::Asset in order to handle file system 
 
 sub update {
 	my $self = shift;
+	use WebGUI; WebGUI::dumpSession("foo");
 	my %before = (
 		owner => $self->get("ownerUserId"),
 		view => $self->get("groupIdView"),

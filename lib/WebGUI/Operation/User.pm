@@ -273,7 +273,7 @@ sub www_deleteUserConfirm {
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 	   return WebGUI::AdminConsole->new($session,"users")->render($session->privilege->vitalComponent());
     } else {
-	   $u = WebGUI::User->new($session->form->process("uid"));
+	   $u = WebGUI::User->new($session,$session->form->process("uid"));
 	   $u->delete;
        return www_listUsers();
     }
@@ -293,7 +293,7 @@ sub www_editUser {
 		"groups"=> { label=>$i18n->get('89')},
 		);
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
-	my $u = WebGUI::User->new(($session->form->process("uid") eq 'new') ? '' : $session->form->process("uid"));
+	my $u = WebGUI::User->new($session,($session->form->process("uid") eq 'new') ? '' : $session->form->process("uid"));
 	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
 	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
@@ -400,7 +400,7 @@ sub www_editUserSave {
 	my ($uid) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
 	my $error;
 	if (($uid eq $session->form->process("uid") || $uid eq "") && $session->form->process("username") ne '') {
-	   	my $u = WebGUI::User->new($session->form->process("uid"));
+	   	my $u = WebGUI::User->new($session,$session->form->process("uid"));
 		$session->form->process("uid") = $u->userId unless ($isSecondary);
 	   	$u->username($session->form->process("username"));
 	   	$u->authMethod($session->form->process("authMethod"));
@@ -462,7 +462,7 @@ sub www_editUserKarmaSave {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($u);
-        $u = WebGUI::User->new($session->form->process("uid"));
+        $u = WebGUI::User->new($session,$session->form->process("uid"));
         $u->karma($session->form->process("amount"),$session->user->username." (".$session->user->userId.")",$session->form->process("description"));
         return www_editUser();
 }

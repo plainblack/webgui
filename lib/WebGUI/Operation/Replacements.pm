@@ -74,7 +74,7 @@ sub www_editReplacement {
 		-value=>$data->{replaceWith}
 		);
 	$f->submit;
-	return _submenu($f->print,"1052",'replacements edit');
+	return _submenu($session,$f->print,"1052",'replacements edit');
 }
 
 #-------------------------------------------------------------------
@@ -107,7 +107,7 @@ sub www_listReplacements {
 	}
 	$sth->finish;
 	$output .= '</table>';
-	return _submenu($output);
+	return _submenu($session,$output);
 }
 
 

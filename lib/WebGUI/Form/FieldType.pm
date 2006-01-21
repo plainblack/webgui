@@ -139,7 +139,7 @@ sub toHtml {
         	} 
 		$options{$type} = $class->getName($self->session);
 	}
-	$self->get('options') = \%options;
+	$self->set('options',\%options);
 
 	return $self->SUPER::toHtml();
 }

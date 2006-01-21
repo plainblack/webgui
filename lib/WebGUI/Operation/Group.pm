@@ -179,7 +179,7 @@ sub www_addUsersToGroupSave {
 sub www_autoAddToGroup {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
-	my $group = WebGUI::Group->new($session->form->process("groupId"));
+	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
 	if ($group->autoAdd) {
 		$group->addUsers([$session->user->userId],[$session->form->process("groupId")]);
 	}
@@ -190,7 +190,7 @@ sub www_autoAddToGroup {
 sub www_autoDeleteFromGroup {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
         return WebGUI::AdminConsole->new($session,"groups")->render($session->privilege->insufficient()) unless ($session->user->userId ne 1);
-	my $group = WebGUI::Group->new($session->form->process("groupId"));
+	my $group = WebGUI::Group->new($session,$session->form->process("groupId"));
 	if ($group->autoDelete) {
 		$group->deleteUsers([$session->user->userId],[$session->form->process("groupId")]);
 	}
@@ -217,7 +217,7 @@ sub www_deleteGroupConfirm {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
 	return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
-	my $g = WebGUI::Group->new($session->form->process("gid"));
+	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
 	$g->delete;
         return www_listGroups();
 }
@@ -266,7 +266,7 @@ sub www_editGroup {
 	if ($session->form->process("gid") eq "new") {
 		$g = WebGUI::Group->new($session,"");
 	} else {
-		$g = WebGUI::Group->new($session->form->process("gid"));
+		$g = WebGUI::Group->new($session,$session->form->process("gid"));
 	}
 	my $i18n = WebGUI::International->new($session);
 	$f = WebGUI::HTMLForm->new($session);
@@ -450,8 +450,8 @@ sub www_editGrouping {
 		-name => "gid",
 		-value => $session->form->process("gid")
 	);
-	my $u = WebGUI::User->new($session->form->process("uid"));
-	my $g = WebGUI::Group->new($session->form->process("gid"));
+	my $u = WebGUI::User->new($session,$session->form->process("uid"));
+	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
         $f->readOnly(
 		-value => $u->username,
 		-label => $i18n->get(50),

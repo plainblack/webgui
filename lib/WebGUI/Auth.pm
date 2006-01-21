@@ -233,7 +233,7 @@ Password entered by the user.  This is only used in for sending the user a notif
 
 =head3 profile
    
-Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData()
+Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData($self->session)
    
 =cut
 

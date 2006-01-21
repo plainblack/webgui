@@ -177,7 +177,7 @@ sub www_editLDAPLink {
    
    $f->submit;
    $output .= $f->print;
-   return _submenu($output,"LDAPLink_990","ldap connection add/edit");
+   return _submenu($session,$output,"LDAPLink_990","ldap connection add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -246,7 +246,7 @@ sub www_listLDAPLinks {
    $output .= $p->getPage;
    $output .= '</table>';
    $output .= $p->getBarTraditional;
-   return _submenu($output,"ldap connection links manage");
+   return _submenu($session,$output,"ldap connection links manage");
 }
 
 

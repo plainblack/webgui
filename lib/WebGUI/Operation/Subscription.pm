@@ -102,7 +102,7 @@ sub www_createSubscriptionCodeBatch {
 		);
 	$f->submit;
 
-	return _submenu($errorMessage.$f->print, 'create batch menu', 'create batch');
+	return _submenu($session,$errorMessage.$f->print, 'create batch menu', 'create batch');
 }
 	
 #-------------------------------------------------------------------
@@ -131,8 +131,8 @@ sub www_createSubscriptionCodeBatchSave {
 		$session->db->quote($batchId).", ".$session->db->quote($description).")");
 
 	for ($currentCode=0; $currentCode < $numberOfCodes; $currentCode++) {
-		$code = _generateCode($session->form->process("codeLength"));
-		$code = _generateCode($session->form->process("codeLength")) while ($session->db->quickArray("select code from subscriptionCode where code=".$session->db->quote($code)));
+		$code = _generateCode($session,$session->form->process("codeLength"));
+		$code = _generateCode($session,$session->form->process("codeLength")) while ($session->db->quickArray("select code from subscriptionCode where code=".$session->db->quote($code)));
 		
 		$session->db->write("insert into subscriptionCode (batchId, code, status, dateCreated, dateUsed, expires, usedBy)".
 			" values (".$session->db->quote($batchId).",".$session->db->quote($code).", 'Unused', ".$session->db->quote($creationEpoch).", 0, ".$session->db->quote($expires).", 0)");
@@ -256,7 +256,7 @@ sub www_editSubscription {
 	}
 	$f->submit;
 
-	return _submenu($f->print, 'edit subscription title', 'subscription add/edit');
+	return _submenu($session,$f->print, 'edit subscription title', 'subscription add/edit');
 }
 
 #-------------------------------------------------------------------
@@ -297,7 +297,7 @@ sub www_listSubscriptionCodeBatches {
 	
 	$output = $i18n->get('no subscription code batches') unless (@{$batches});
 
-	return _submenu($output, 'manage batches', 'manage batch');
+	return _submenu($session,$output, 'manage batches', 'manage batch');
 }
 
 #-------------------------------------------------------------------
@@ -350,7 +350,7 @@ sub www_listSubscriptionCodes {
 		$ops = ';bid='.$session->form->process("bid").';selection=b';
 		$delete = '<a href="'.$session->url->page('op=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} else {
-		return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
+		return _submenu($session,$output, 'listSubscriptionCodes title', 'subscription codes manage');
 	}
 	
 	$p = WebGUI::Paginator->new($session,$session->url->page('op=listSubscriptionCodes'.$ops));
@@ -379,7 +379,7 @@ sub www_listSubscriptionCodes {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 
-	return _submenu($output, 'listSubscriptionCodes title', 'subscription codes manage');
+	return _submenu($session,$output, 'listSubscriptionCodes title', 'subscription codes manage');
 }
 
 #-------------------------------------------------------------------
@@ -408,7 +408,7 @@ sub www_listSubscriptions {
 	
 	$output = $i18n->get('no subscriptions') unless (@{$subscriptions});
 	
-	return _submenu($output, 'manage subscriptions', 'subscription manage');
+	return _submenu($session,$output, 'manage subscriptions', 'subscription manage');
 }
 
 #-------------------------------------------------------------------
@@ -463,7 +463,7 @@ sub www_redeemSubscriptionCode {
 	$f->submit;
 	$var{codeForm} = $f->print;
 
-	return $session->style->userStyle(WebGUI::Asset::Template->new("PBtmpl0000000000000053")->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000053")->process(\%var));
 }
 
 1;

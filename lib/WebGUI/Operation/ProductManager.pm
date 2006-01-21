@@ -143,7 +143,7 @@ sub www_editProduct {
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit product', 'edit product', 'ProductManager');
+	return _submenu($session,$f->print, 'edit product', 'edit product', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -222,7 +222,7 @@ sub www_editProductParameter {
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit parameter', 'edit parameter', 'ProductManager');
+	return _submenu($session,$f->print, 'edit parameter', 'edit parameter', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -325,7 +325,7 @@ sub www_editProductParameterOption {
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit option', 'edit option', 'ProductManager');
+	return _submenu($session,$f->print, 'edit option', 'edit option', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -406,7 +406,7 @@ sub www_editProductVariant {
 	);
 	$f->submit;
 
-	return _submenu($f->print, 'edit variant', 'edit variant', 'ProductManager');
+	return _submenu($session,$f->print, 'edit variant', 'edit variant', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -458,7 +458,7 @@ sub www_editSkuTemplate {
 	$f->submit;
 	$output .= $f->print;
 
-	return _submenu($output, 'edit sku composition label', 'edit sku template', 'ProductManager');
+	return _submenu($session,$output, 'edit sku composition label', 'edit sku template', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -500,7 +500,7 @@ sub www_listProducts {
 	}
 	$output .= '</table>';
 
-	return _submenu($output, 'list products', 'list products', 'ProductManager');
+	return _submenu($session,$output, 'list products', 'list products', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -563,7 +563,7 @@ sub www_listProductVariants {
 	$output .= WebGUI::Form::submit($session,);
 	$output .= WebGUI::Form::formFooter($session,);
 
-	return _submenu($output, 'list variants label', 'list variants', 'ProductManager');
+	return _submenu($session,$output, 'list variants label', 'list variants', 'ProductManager');
 }
 
 #-------------------------------------------------------------------
@@ -629,7 +629,7 @@ sub www_manageProduct {
 		$output .= '<br />';
 	}
 
-	return _submenu($output, 'manage product', 'manage product', 'ProductManager');
+	return _submenu($session,$output, 'manage product', 'manage product', 'ProductManager');
 }
 
 1;

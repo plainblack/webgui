@@ -40,7 +40,7 @@ sub _get {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	my $id = shift;
 	my $namespace = shift;
-	my $help = _load($namespace);
+	my $help = _load($session,$namespace);
 	if (keys %{ $help } ) {
 		return $help->{$id};
 	}
@@ -113,10 +113,10 @@ sub www_viewHelp {
 	my $ac = WebGUI::AdminConsole->new($session,"help");
 	my $namespace = $session->form->process("namespace") || "WebGUI";
         my $i18n = WebGUI::International->new($session, $namespace);
-	my $help = _get($session->form->process("hid"),$namespace);
+	my $help = _get($session,$session->form->process("hid"),$namespace);
 	my @related = _related($session, $help->{related});
 	foreach my $row (@related) {
-		my $relatedHelp = _get($row->{tag},$row->{namespace});
+		my $relatedHelp = _get($session,$row->{tag},$row->{namespace});
 		$ac->addSubmenuItem(_link($row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
 	}
         my %vars;
@@ -143,10 +143,10 @@ sub www_viewHelpIndex {
 	my $i18n = WebGUI::International->new($session);
         my @helpIndex;
 	my $i;
-	my @files = _getHelpFilesList();
+	my @files = _getHelpFilesList($session,);
         foreach my $fileSet (@files) {
 		my $namespace = $fileSet->[1];
-		my $help = _load($namespace);
+		my $help = _load($session,$namespace);
 		foreach my $key (keys %{$help}) {
 			push @helpIndex, [$namespace, $key,
 					$i18n->get($help->{$key}{title},$namespace)];
@@ -177,12 +177,12 @@ sub www_viewHelpTOC {
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
         my @helpIndex;
 	my $i;
-	my @files = _getHelpFilesList();
+	my @files = _getHelpFilesList($session,);
 	my $third = round(@files/3 + 0.50);
 	my @entries;
 	foreach my $fileSet (@files) {
 		my $file = $fileSet->[1];
-		push @entries, [_getHelpName($file), $file];
+		push @entries, [_getHelpName($session,$file), $file];
 	}
 	$i = 0;
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
@@ -207,7 +207,7 @@ sub www_viewHelpChapter {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $namespace = $session->form->process("namespace");
-	my $help = _load($namespace);
+	my $help = _load($session,$namespace);
 	my @entries = sort keys %{ $help };
 	my $output = '';
 	my $i18n = WebGUI::International->new($session);
@@ -217,7 +217,7 @@ sub www_viewHelpChapter {
 	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));
     	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents'));
-	return $ac->render($output, join ': ',$i18n->get(93), _getHelpName($namespace));
+	return $ac->render($output, join ': ',$i18n->get(93), _getHelpName($session,$namespace));
 }
 
 1;
