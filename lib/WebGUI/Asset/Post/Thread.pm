@@ -648,7 +648,7 @@ sub view {
         $var->{'unlock.url'} = $self->getUnlockUrl;
 
         my $p = WebGUI::Paginator->new($self->getUrl,$self->getParent->get("postsPerPage"));
-	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate from asset 
+	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate, assetData.url as url from asset 
 		left join assetData on assetData.assetId=asset.assetId
 		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 		where asset.lineage like ".quote($self->get("lineage").'%')
