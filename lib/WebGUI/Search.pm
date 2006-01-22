@@ -178,9 +178,44 @@ A hash reference containing rules for a search. The rules will will be hash refe
 
 This rule limits the search results to assets that match keyword criteria. This rule has two properties: "terms" and "match". Terms is an array reference that contains key words and key phrases to be searched for. Match is an operator that determins whether "all" the terms must match or if "any" of the terms can match. Match defaults to "any" if not specified.
 
+ keywords => {
+       terms => [ "this", "that", "foo bar" ],
+       match => "all"
+    }
+
 =head4 lineage
 
 This rule limits the search to a specific set of descendants in the asset tree. This has just one parameter, "terms", which is an array reference of asset lineages to match against.
+
+ lineage => {
+       terms => [ "000001000003", "000001000024000005" ]
+    }
+
+=head4 classes
+
+This rule limits the search to a specific set of asset classes. It has just one parameter, "terms", which is an array reference of class names.
+
+ classes => {
+	terms => [ "WebGUI::Asset::Wobject::Article", "WebGUI::Asset::Snippet" ]
+    }
+
+=head4 creationDate
+
+This rule limits the search to a creation date range. It has two parameters: "start" and "end". Start and end represent the start and end dates to search in, which are represented as epoch dates. If start is not specified, it is infinity into the past. If end date is not specified, it is infinity into the future.
+
+ creationDate => {
+       start=>1110011,
+       end=>30300003
+    }
+
+=head4 revisionDate
+
+This rule limits the search to a revision date range. It has two parameters: "start" and "end". Start and end represent the start and end dates to search in, which are represented as epoch dates. If start is not specified, it is infinity into the past. If end date is not specified, it is infinity into the future.
+
+ revisionDate => {
+       start=>1110011,
+       end=>30300003
+    }
 
 =cut
 
@@ -206,6 +241,26 @@ sub search {
 			push(@phrases, "lineage like ?");
 		}
 		push(@clauses, join(" or ", @phrases));
+	}
+	if ($rules->{classes}) {
+		my @phrases = ();
+		foreach my $class (@{$rules->{classes}{terms}}) {
+			push(@params, $class);
+			push(@phrases, "className=?");
+		}
+		push(@clauses, join(" or ", @phrases));
+	}
+	if ($rules->{creationDate}) {
+		my $start = $rules->{creationDate}{start} || 0;
+		my $end = $rules->{creationDate}{end} || 9999999999999999999999;
+		push(@clauses, "creationDate between ? and ?");
+		push(@params, $start, $end);
+	}
+	if ($rules->{revisionDate}) {
+		my $start = $rules->{revisionDate}{start} || 0;
+		my $end = $rules->{revisionDate}{end} || 9999999999999999999999;
+		push(@clauses, "revisionDate between ? and ?");
+		push(@params, $start, $end);
 	}
 	$self->{_params} = \@params;
 	$self->{_query} = "(".join(") and (", @clauses).")";
