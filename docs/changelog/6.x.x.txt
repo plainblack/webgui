@@ -6,6 +6,8 @@
    E-Wise)
 
 6.8.6
+ - Added logic to deal with case sensitivity and whitespace problems in LDAP
+   Group matching.
  - fix [ 1397890 ] Can't click directly to page 2+ of a thread
 
 6.8.5
