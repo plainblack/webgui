@@ -120,7 +120,7 @@ foreach my $filename (keys %{$configs}) {
 	# Checking uploads folder
 	###################################
 	printTest("Verifying uploads folder");
-        if (opendir(DIR,$configs->{$filename}{uploadsPath})) {
+        if (opendir(DIR,$configs->{$filename}->get("uploadsPath"))) {
 		printResult("OK");
 		closedir(DIR);
 	} else {
@@ -128,7 +128,7 @@ foreach my $filename (keys %{$configs}) {
 	}
 	printTest("Verifying DSN");
 	my $dsnok = 0;
-	if ($configs->{$filename}{dsn} !~ /\DBI\:\w+\:\w+/) {
+	if ($configs->{$filename}->get("dsn") !~ /\DBI\:\w+\:\w+/) {
 		printResult("DSN is improperly formatted.");
 	} else {
 		printResult("OK");
@@ -141,7 +141,7 @@ foreach my $filename (keys %{$configs}) {
 	if ($dsnok) {
 		printTest("Verifying database connection");
 		my ($dbh, $test);
-		unless (eval {$dbh = DBI->connect($configs->{$filename}{dsn},$configs->{$filename}{dbuser},$configs->{$filename}{dbpass})}) {
+		unless (eval {$dbh = DBI->connect($configs->{$filename}->get("dsn"),$configs->{$filename}->get("dbuser"),$configs->{$filename}->get("dbpass"))}) {
 			printResult("Can't connect with info provided!");
 		} else {
 			printResult("OK");
