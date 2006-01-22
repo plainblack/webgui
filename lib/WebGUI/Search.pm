@@ -84,13 +84,13 @@ sub getAssets {
 
 =head2 getResultSet ( ) 
 
-Returns a WebGUI::SQL::ResultSet object containing the search results with columns labeled "assetId", "title", "synopsis", "ownerUserId", "groupIdView", "groupIdEdit", "creationDate", "revisionDate", "startDate", "endDate", and "className".
+Returns a WebGUI::SQL::ResultSet object containing the search results with columns labeled "assetId", "title", "url", "synopsis", "ownerUserId", "groupIdView", "groupIdEdit", "creationDate", "revisionDate", and "className".
 
 =cut
 
 sub getResultSet {
 	my $self = shift;
-	my $query = "select assetId, title, synopsis, ownerUserId, groupIdView, groupIdEdit, creationDate, revisionDate, startDate, endDate, className
+	my $query = "select assetId, title, url, synopsis, ownerUserId, groupIdView, groupIdEdit, creationDate, revisionDate,  className
 		from assetIndex where isPublic=? and (".$self->{_query}.")";
 	my $rs = $self->session->db->prepare($self->{_query});
 	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);

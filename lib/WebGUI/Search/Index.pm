@@ -112,9 +112,9 @@ sub create {
 	$url =~ s/\/|\-|\_/ /g;
 	my $description = WebGUI::HTML::filter($asset->get('description'), "all");
 	my $keywords = join(" ",$asset->get("title"), $asset->get("menuTitle"), $asset->get("synopsis"), $url, $description);
-	my $add = $self->session->db->prepare("insert into assetIndex (assetId, title, startDate, endDate, creationDate, revisionDate, 
-		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
-	$add->execute([$asset->getId, $asset->get("title"), $asset->get("startDate"), $asset->get("endDate"), $asset->get("creationDate"),
+	my $add = $self->session->db->prepare("insert into assetIndex (assetId, title, url, creationDate, revisionDate, 
+		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+	$add->execute([$asset->getId, $asset->get("title"), $asset->get("url"), $asset->get("creationDate"),
 		$asset->get("revisionDate"), $asset->get("ownerUserId"), $asset->get("groupIdView"), $asset->get("groupIdEdit"), 
 		$asset->get("lineage"), $asset->get("className"), $asset->get("synopsis"), $keywords]);
 	return $self;

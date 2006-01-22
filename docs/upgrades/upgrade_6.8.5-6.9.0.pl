@@ -33,8 +33,7 @@ sub addSearchEngine {
 		assetId varchar(22) binary not null primary key,
 		title varchar(255),
 		synopsis text,
-		startDate bigint,
-		endDate bigint,
+		url varchar(255),
 		creationDate bigint,
 		revisionDate bigint,
 		ownerUserId varchar(22) binary,
@@ -85,6 +84,9 @@ sub removeFiles {
 	unlink '../../lib/WebGUI/Setting.pm';
 	unlink '../../lib/WebGUI/Grouping.pm';
 	unlink '../../lib/WebGUI/Asset/Wobject/IndexedSearch.pm';
+	unlink '../../lib/WebGUI/Help/Asset_IndexedSearch.pm';
+	unlink '../../lib/WebGUI/i18n/Asset_IndexedSearch.pm';
+	unlink '../../sbin/Hourly/IndexedSearch_buildIndex.pm';
 	rmtree('../../lib/WebGUI/Asset/Wobject/IndexedSearch');
 }
 
