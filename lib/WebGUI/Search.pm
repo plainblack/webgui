@@ -15,7 +15,6 @@ package WebGUI::Search;
 =cut
 
 use strict;
-use warnings;
 use WebGUI::Asset;
 use WebGUI::SQL;
 
@@ -133,7 +132,9 @@ sub new {
 
 =head2 rawClause ( sql [, placeholders ] ) 
 
-Tells the search engine to use a custom sql where clause that you've designed for the assetIndex table instead of using the API to build it.
+Tells the search engine to use a custom sql where clause that you've designed for the assetIndex table instead of using the API to build it. It also returns a reference to the object so you can join a result method with it like this:
+
+ my $assetIds = WebGUI::Search->new($session)->rawQuery($sql, $params)->getAssetIds;
 
 =head3 sql
 
@@ -149,67 +150,68 @@ sub rawClause {
 	my $self = shift;
 	$self->{_query} = shift;
 	$self->{_params} = shift;
+	return $self;
 }
 
 #-------------------------------------------------------------------
 
-=head2 search ( match, keywords ) 
+=head2 search ( rules ) 
 
-A simple keyword search.
+A rules engine for WebGUI's search system. It also returns a reference to the search object so that you can join a result method with it like:
 
-=head3 match
+ my $assetIds = WebGUI::Search->new($session)->search(\%rules)->getAssetIds;
 
-Should we match "any" or "all" of the keywords.
+=head3 rules
 
-=head3 keywords
+A hash reference containing rules for a search. The rules will will be hash references containing the values of a rule. Here's an example rule set:
 
-An array of the key words or phrases to match against.
+ {
+   { 
+     terms => [ "something to search for", "something else to search for"],
+     match => "all"
+   }, {
+     terms => [ "000001000005", "000001000074000003" ]
+   }
+ }
+
+=head4 keywords
+
+This rule limits the search results to assets that match keyword criteria. This rule has two properties: "terms" and "match". Terms is an array reference that contains key words and key phrases to be searched for. Match is an operator that determins whether "all" the terms must match or if "any" of the terms can match. Match defaults to "any" if not specified.
+
+=head4 lineage
+
+This rule limits the search to a specific set of descendants in the asset tree. This has just one parameter, "terms", which is an array reference of asset lineages to match against.
 
 =cut
 
 sub search {
 	my $self = shift;
-	my $match = shift;
-	my @keywords = @_;
-	my $operator = ($match eq "any") ? " or " : " and ";
-	my @phrases = ();
-	foreach (1..scalar(@keywords)) {
-		 push(@phrases, "match (keywords) against (?)");
+	my $rules = shift;
+	my @params = ();
+	my $query = "";
+	my @clauses = ();
+	if ($rules->{keywords}) {
+		push(@params,@{$rules->{keywords}{terms}});
+		my $operator = ($rules->{keywords}{match} eq "all") ? " and " : " or ";
+		my @phrases = ();
+		foreach (1..scalar(@{$rules->{keywords}{terms}})) {
+			 push(@phrases, "match (keywords) against (?)");
+		}
+		push(@clauses, join($operator, @phrases));
 	}
-	$self->{_query} = join($operator, @phrases);
-	$self->{_params} = \@keywords;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 searchLimitLineage ( lineage, match, keywords ) 
-
-A simple keyword search limiting the search to a particular lineage.
-
-=head3 lineage
-
-The lineage to limit the search to.
-
-=head3 match
-
-Should we match "any" or "all" of the keywords.
-
-=head3 keywords
-
-An array of the key words or phrases to match against.
-
-=cut
-
-sub searchLimitLineage {
-	my $self = shift;
-	my $lineage = shift;
-	$self->search(@_);
-	$self->{_query} = "lineage like ? and (".$self->{_query}.")";
-	my @params = @{$self->{_params}};
-	unshift(@params, $lineage.'%');
+	if ($rules->{lineage}) {
+		my @phrases = ();
+		foreach my $lineage (@{$rules->{lineage}{terms}}) {
+			push(@params, $lineage."%");
+			push(@phrases, "lineage like ?");
+		}
+		push(@clauses, join(" or ", @phrases));
+	}
 	$self->{_params} = \@params;
+	$self->{_query} = "(".join(") and (", @clauses).")";
+	return $self;
 }
+
 
 #-------------------------------------------------------------------
 

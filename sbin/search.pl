@@ -12,6 +12,7 @@ use strict;
 use lib '../lib';
 use Getopt::Long;
 use WebGUI::Asset;
+use WebGUI::Config;
 use WebGUI::Session;
 use WebGUI::Search;
 use WebGUI::Search::Index;
@@ -22,8 +23,10 @@ my $search = "";
 my $help = 0;
 my $indexsite = 0;
 my $configFile = "";
+my $indexAll = "";
 
 GetOptions(
+	'indexall'=>\$indexAll,
 	'configFile=s'=>\$configFile,
 	'search=s'=>\$search,
 	'help'=>\$help,
@@ -41,6 +44,8 @@ if ($configFile) {
 	}
 	$session->var->end;
 	$session->close;
+} elsif ($indexAll) {
+	reindexAllSites();
 } else {
 	displayHelp();
 }
@@ -57,6 +62,10 @@ Options:
 
 	--help			Displays this message.
 
+	--indexall		Reindexes all the sites. Note that this can take
+				many hours and will affect the performance of the
+				server during the indexing process.
+
 	--indexsite *		Reindexes the entire site. Note that depending
 				upon the amount of content you have, it may take
 				hours to index a site and server performance will
@@ -68,6 +77,20 @@ Options:
 	* This option requires the --configFile option.
 
 STOP
+}
+
+
+#-------------------------------------------------------------------
+sub reindexAllSites {
+	my $configs = WebGUI::Config->readAllConfigs("..");
+	foreach my $site (keys %{$configs}) {
+		print "Indexing ".$site."...\n";
+		my $session = WebGUI::Session->open("..",$site);
+		reindexSite($session);
+		$session->var->end;
+		$session->close;
+		print "Finished indexing ".$site.".\n";
+	}
 }
 
 
@@ -85,7 +108,6 @@ sub reindexSite {
 			print "(".Time::HiRes::tv_interval($t).")\n";
 		}
 	}
-
 	print "\nSite indexing took ".Time::HiRes::tv_interval($siteTime)." seconds.\n";
 }
 
@@ -95,7 +117,7 @@ sub searchSite {
 	my $keywords = shift;
 	my $t = [Time::HiRes::gettimeofday()];
 	my $search = WebGUI::Search->new($session, 0);
-	$search->search("any",$keywords);
+	$search->search({keywords=>{terms=>[$keywords]}});
 	my $rs = $search->getResultSet;	
 	while (my $data = $rs->hashRef) {
 		print $data->{assetId}."\t".$data->{title}."\n"; 

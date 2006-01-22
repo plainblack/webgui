@@ -148,8 +148,8 @@ sub new {
 	if (exists $config{$filename}) {
 		return $config{$filename};
 	} else {
-		my $config = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $webguiPath.'/etc/'.$filename, 'PURGE' => 1);
-		my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$config};
+		my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $webguiPath.'/etc/'.$filename, 'PURGE' => 1);
+		my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$conf};
 		bless $self, $class;
 		$config{$filename} = $self;
 		return $self;
