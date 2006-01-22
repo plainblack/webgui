@@ -6,7 +6,7 @@
    E-Wise)
 
 6.8.6
- - 
+ - fix [ 1397890 ] Can't click directly to page 2+ of a thread
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
