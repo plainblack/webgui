@@ -106,7 +106,7 @@ if ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
 }
 
 printTest("Locating WebGUI configs");
-my $configs = WebGUI::Config::readAllConfigs($webguiRoot);
+my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
 printResult("OK");
 foreach my $filename (keys %{$configs}) {
 	print "\n";	
