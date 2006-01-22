@@ -993,7 +993,9 @@ Returns an indexer object for this asset. When this method is called the asset's
 
 sub indexContent {
 	my $self = shift;
-	return WebGUI::Search::Index->create($self);
+	my $indexer = WebGUI::Search::Index->create($self);
+	$indexer->setIsPublic(0) if ($self->getId eq "PBasset000000000000001");
+	return $indexer;
 }
 
 

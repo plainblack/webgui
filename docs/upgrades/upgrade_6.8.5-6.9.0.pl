@@ -22,6 +22,7 @@ my $session = start(); # this line required
 
 templateParsers();
 removeFiles();
+addSearchEngine();
 
 finish($session); # this line required
 

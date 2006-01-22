@@ -15,7 +15,6 @@ package WebGUI::Search::Index;
 =cut
 
 use strict;
-use warnings;
 
 =head1 NAME
 
@@ -113,7 +112,7 @@ sub create {
 	my $description = WebGUI::HTML::filter($asset->get('description'), "all");
 	my $keywords = join(" ",$asset->get("title"), $asset->get("menuTitle"), $asset->get("synopsis"), $url, $description);
 	my $add = $self->session->db->prepare("insert into assetIndex (assetId, title, url, creationDate, revisionDate, 
-		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
 	$add->execute([$asset->getId, $asset->get("title"), $asset->get("url"), $asset->get("creationDate"),
 		$asset->get("revisionDate"), $asset->get("ownerUserId"), $asset->get("groupIdView"), $asset->get("groupIdEdit"), 
 		$asset->get("lineage"), $asset->get("className"), $asset->get("synopsis"), $keywords]);
@@ -169,7 +168,7 @@ Sets the status of whether this asset will appear in public searches.
 
 =cut
 
-sub isPublic {
+sub setIsPublic {
 	my $self = shift;
 	my $boolean = shift;
 	my $set = $self->session->db->prepare("update assetIndex set isPublic=? where assetId=?");
@@ -192,7 +191,7 @@ sub new {
 	my $class = shift;
 	my $asset = shift;
 	my $self = {_asset=>$asset, _session=>$asset->session, _id=>$asset->getId};
-	return $self;
+	bless $self;
 }
 
 

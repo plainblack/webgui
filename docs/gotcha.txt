@@ -23,6 +23,12 @@ save you many hours of grief.
 	Template
 	HTML::Template::Expr
 
+ * In order to make the upgrades run quickly, the upgrade process
+	will not automatically index your sites for the new search
+	engine. You need to do this manually after the upgrades
+	have completed by running the search.pl script in the
+	sbin folder.
+
 
 6.8.4
 --------------------------------------------------------------------

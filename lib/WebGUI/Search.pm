@@ -48,9 +48,11 @@ Returns an array reference containing all the asset ids of the assets that match
 
 sub getAssetIds {
 	my $self = shift;
-	my $query = "select assetId from assetIndex where isPublic=? and (".$self->{_query}.")";
-	my $rs = $self->session->db->prepare($self->{_query});
-	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);
+	my $query = "select assetId from assetIndex where ";
+	$query .= "isPublic=1 and " if ($self->{_isPublic});
+	$query .= "(".$self->{_query}.")";
+	my $rs = $self->session->db->prepare($query);
+	$rs->execute($self->{_params});
 	my @ids = ();
 	while (my ($id) = $rs->array) {
 		push(@ids, $id);		
@@ -69,9 +71,11 @@ Returns an array reference containing asset objects for those that matched.
 
 sub getAssets {
 	my $self = shift;
-	my $query = "select assetId,className,revisionDate from assetIndex where isPublic=? and (".$self->{_query}.")";
-	my $rs = $self->session->db->prepare($self->{_query});
-	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);
+	my $query = "select assetId,className,revisionDate from assetIndex where ";
+	$query .= "isPublic=1 and " if ($self->{_isPublic});
+	$query .= "(".$self->{_query}.")";
+	my $rs = $self->session->db->prepare($query);
+	$rs->execute($self->{_params});
 	my @assets;
 	while (my ($id, $class, $version) = $rs->array) {
 		push(@assets, WebGUI::Asset->new($id, $class, $version));		
@@ -90,10 +94,11 @@ Returns a WebGUI::SQL::ResultSet object containing the search results with colum
 
 sub getResultSet {
 	my $self = shift;
-	my $query = "select assetId, title, url, synopsis, ownerUserId, groupIdView, groupIdEdit, creationDate, revisionDate,  className
-		from assetIndex where isPublic=? and (".$self->{_query}.")";
-	my $rs = $self->session->db->prepare($self->{_query});
-	$rs->execute([$self->{_isPublic},@{$self->{_params}}]);
+	my $query = "select assetId, title, url, synopsis, ownerUserId, groupIdView, groupIdEdit, creationDate, revisionDate,  className from assetIndex where ";
+	$query .= "isPublic=1 and " if ($self->{_isPublic});
+	$query .= "(".$self->{_query}.")";
+	my $rs = $self->session->db->prepare($query);
+	$rs->execute($self->{_params});
 	return $rs;
 }
 
