@@ -138,7 +138,6 @@ assets = WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Wobject::DataForm, \
 	WebGUI::Asset::Wobject::EventsCalendar, \
 	WebGUI::Asset::Wobject::HttpProxy, \
-	WebGUI::Asset::Wobject::IndexedSearch, \
 	WebGUI::Asset::Wobject::MessageBoard, \
 	WebGUI::Asset::Wobject::Navigation, \
 	WebGUI::Asset::Wobject::Matrix, \

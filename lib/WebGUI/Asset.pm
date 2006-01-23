@@ -28,6 +28,7 @@ use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
+use WebGUI::Search;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
@@ -1001,6 +1002,247 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
+=head2 manageAssets ( )
+
+Main page to manage assets. Renders an AdminConsole with a list of assets. If canEdit returns False, renders an insufficient privilege page. Is called by www_manageAssets
+
+=cut
+
+sub manageAssets {
+	my $self = shift;
+        my $i18n = WebGUI::International->new($self->session, "Asset");
+	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
+        my @crumbtrail;
+        foreach my $ancestor (@{$ancestors}) {
+                push(@crumbtrail,'<a href="'.$ancestor->getUrl("func=manageAssets").'">'.$ancestor->getTitle.'</a>');
+        }
+	my $output = '<div class="am-crumbtrail">'.join(" > ",@crumbtrail).'</div>';
+	$output .= "
+   <script type=\"text/javascript\">
+   //<![CDATA[
+     var assetManager = new AssetManager();
+         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
+         assetManager.AddColumn('&nbsp;','','center','');
+         assetManager.AddColumn('".$i18n->get("rank")."','style=\"cursor:move\"','right','numeric');
+         assetManager.AddColumn('".$i18n->get("99")."','','left','');
+         assetManager.AddColumn('".$i18n->get("type")."','','left','');
+         assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
+         assetManager.AddColumn('".$i18n->get("size")."','','right','');\n";
+         $output .= "assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n" unless ($self->session->setting->get("autoCommit"));
+	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
+		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
+		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
+                contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
+                contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
+		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
+		'.$commit.'
+                contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
+		my $title = $child->getTitle;
+		$title =~ s/\'/\\\'/g;
+		my $locked;
+		my $edit;
+		if ($child->isLocked) {
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
+		} else {
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
+		}
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($self->session->setting->get("autoCommit"));
+         	$output .= "assetManager.AddLine('"
+			.WebGUI::Form::checkbox($self->session,{
+				name=>'assetId',
+				value=>$child->getId
+				})
+			."',".$edit."contextMenu.draw()," 
+			.$child->getRank
+			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
+			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
+			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
+         	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
+			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
+	}
+	$output .= '
+		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
+		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
+		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
+		assetManager.initializeDragEventHandlers();
+		assetManager.Write();        
+                var assetListSelectAllToggle = false;
+                function toggleAssetListSelectAll(form){
+                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
+                        for(var i = 0; i < form.assetId.length; i++)
+                        form.assetId[i].checked = assetListSelectAllToggle;
+                 }
+		//]]>
+		</script> <div class="adminConsoleSpacer">
+            &nbsp;
+        </div>
+		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.$i18n->get(1083).'</legend>';
+	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
+		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= '<br />';
+	}
+	$output .= '<hr />';
+	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
+		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= '<br />';
+	}
+	$output .= '<hr />';
+	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
+		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
+		$output .= '<br />';
+	}
+	$output .= '</fieldset></div>'; 
+	my %options;
+	tie %options, 'Tie::IxHash';
+	my $hasClips = 0;
+        foreach my $asset (@{$self->getAssetsInClipboard(1)}) {
+              	$options{$asset->getId} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" border="0" /> '.$asset->getTitle;
+		$hasClips = 1;
+        }
+	if ($hasClips) {
+		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.$i18n->get(1082).'</legend>'
+			.WebGUI::Form::formHeader($self->session)
+			.WebGUI::Form::hidden($self->session,{name=>"func",value=>"pasteList"})
+			.WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
+			.' '.$i18n->get("select all").'<br />'
+			.WebGUI::Form::checkList($self->session,{name=>"assetId",vertical=>1,options=>\%options})
+			.'<br />'
+			.WebGUI::Form::submit($self->session,{value=>"Paste"})
+			.WebGUI::Form::formFooter($self->session)
+			.' </fieldset></div> '
+			.'<script type="text/javascript">
+			//<![CDATA[
+			var clipboardItemSelectAllToggle = false;
+			function toggleClipboardSelectAll(form){
+			clipboardItemSelectAllToggle = clipboardItemSelectAllToggle ? false : true;
+			for(var i = 0; i < form.assetId.length; i++)
+			form.assetId[i].checked = clipboardItemSelectAllToggle;
+			}
+			//]]>
+			</script>';
+	}
+	my $hasPackages = 0;
+	my $packages;
+        foreach my $asset (@{$self->getPackageList}) {
+              	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
+			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
+			.$self->session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
+			.'<br />';
+		$hasPackages = 1;
+        }
+	if ($hasPackages) {
+		$output .= '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset>
+			<legend>'.$i18n->get("packages").'</legend>
+			'.$packages.' </fieldset></div> ';
+	}
+	$output .= '
+    <div class="adminConsoleSpacer">
+            &nbsp;
+        </div> 
+		';
+	return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 manageAssetsSearch ( )
+
+Returns the interface for searching within the asset manager.
+
+=cut
+
+sub manageAssetsSearch {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, "Asset");
+	my $output = WebGUI::Form::formHeader($self->session);
+	$output .= WebGUI::Form::text($self->session, { name=>"keywords", value=>$self->session->form->get("keywords")});
+	my %classes = ();
+	tie %classes, "Tie::IxHash";
+	%classes = ("any"=>"Any Class", $self->session->db->buildHash("select distinct(className) from asset"));
+	delete $classes{"WebGUI::Asset"}; # don't want to search for the root asset
+	$output .= WebGUI::Form::selectBox($self->session, {name=>"class", value=>$self->session->form->get("class","selectBox"), defaultValue=>"any", options=>\%classes});
+	$output .= WebGUI::Form::hidden($self->session, {name=>"func", value=>"manageAssets"});
+	$output .= WebGUI::Form::hidden($self->session, {name=>"doit", value=>"1"});
+	$output .= WebGUI::Form::submit($self->session, {value=>"Search"});
+	$output .= WebGUI::Form::formFooter($self->session);
+	return $output unless ($self->session->form->get("doit"));
+	my $class = $self->session->form->get("class") eq "any" ? undef : $self->session->form->get("class");
+	my $assets = WebGUI::Search->new($self->session,0)->search({
+		keywords=>{terms=>[$self->session->form->get("keywords")]},
+		classes=>{terms=>[$class]}
+		})->getAssets;
+      	$output .= "<script type=\"text/javascript\">
+   //<![CDATA[
+     var assetManager = new AssetManager();
+         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
+         assetManager.AddColumn('&nbsp;','','center','');
+         assetManager.AddColumn('".$i18n->get("99")."','','left','');
+         assetManager.AddColumn('".$i18n->get("type")."','','left','');
+         assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
+         assetManager.AddColumn('".$i18n->get("size")."','','right','');
+         \n";
+        foreach my $child (@{$assets}) {
+		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
+		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
+                contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
+                contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
+		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
+		'.$commit.'
+                contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
+		my $title = $child->getTitle;
+		$title =~ s/\'/\\\'/g;
+		my $locked;
+		my $edit;
+		if ($child->isLocked) {
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
+		} else {
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
+		}
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($self->session->setting->get("autoCommit"));
+         	$output .= "assetManager.AddLine('"
+			.WebGUI::Form::checkbox($self->session,{
+				name=>'assetId',
+				value=>$child->getId
+				})
+			."',".$edit."contextMenu.draw()," 
+			.$child->getRank
+			.",'<a href=\"".$child->getUrl("func=manageAssets&manage=1")."\">".$title
+			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
+			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
+         	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
+			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
+			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
+	}
+        $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
+		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
+		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
+                assetManager.Write();        
+                var assetListSelectAllToggle = false;
+                function toggleAssetListSelectAll(form){
+                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
+                        for(var i = 0; i < form.assetId.length; i++)
+                        form.assetId[i].checked = assetListSelectAllToggle;
+                 }
+                 //]]>
+                </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
+	return $output;
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, assetId [, className, revisionDate ] )
 
 Constructor. This does not create an asset. Returns a new object if it can, otherwise returns undef.
@@ -1552,7 +1794,7 @@ sub www_editSave {
 
 =head2 www_manageAssets ( )
 
-Main page to manage assets. Renders an AdminConsole with a list of assets. If canEdit returns False, renders an insufficient privilege page.
+Main page to manage/search assets. Renders an AdminConsole with a list of assets. If canEdit returns False, renders an insufficient privilege page. Is called by www_manageAssets
 
 =cut
 
@@ -1563,150 +1805,19 @@ sub www_manageAssets {
         $self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
   	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
-        my $i18n = WebGUI::International->new($self->session, "Asset");
-	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
-        my @crumbtrail;
-        foreach my $ancestor (@{$ancestors}) {
-                push(@crumbtrail,'<a href="'.$ancestor->getUrl("func=manageAssets").'">'.$ancestor->getTitle.'</a>');
-        }
-	my $output = '<div class="am-crumbtrail">'.join(" > ",@crumbtrail).'</div>';
-	$output .= "
-   <script type=\"text/javascript\">
-   //<![CDATA[
-     var assetManager = new AssetManager();
-         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
-         assetManager.AddColumn('&nbsp;','','center','');
-         assetManager.AddColumn('".$i18n->get("rank")."','style=\"cursor:move\"','right','numeric');
-         assetManager.AddColumn('".$i18n->get("99")."','','left','');
-         assetManager.AddColumn('".$i18n->get("type")."','','left','');
-         assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
-         assetManager.AddColumn('".$i18n->get("size")."','','right','');\n";
-         $output .= "assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n" unless ($self->session->setting->get("autoCommit"));
-	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
-		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
-		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
-                contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
-                contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
-		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
-		'.$commit.'
-                contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
-		my $title = $child->getTitle;
-		$title =~ s/\'/\\\'/g;
-		my $locked;
-		my $edit;
-		if ($child->isLocked) {
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
-		} else {
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
-		}
-		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($self->session->setting->get("autoCommit"));
-         	$output .= "assetManager.AddLine('"
-			.WebGUI::Form::checkbox($self->session,{
-				name=>'assetId',
-				value=>$child->getId
-				})
-			."',".$edit."contextMenu.draw()," 
-			.$child->getRank
-			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
-			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
-			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
-			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
-         	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
-			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
-			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
+	my $output = '<div style="text-align: right;"><a href="'.$self->getUrl("func=manageAssets;manage=1").'">Manage</a> | <a href="'.$self->getUrl("func=manageAssets;search=1").'">Search</a></div>';
+	if ($self->session->form->get("search")) {
+		$self->session->scratch->set("manageAssetsSearchToggle",1);
+	} elsif ($self->session->form->get("manage")) {
+		$self->session->scratch->delete("manageAssetsSearchToggle");
 	}
-	$output .= '
-		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
-		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
-		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
-		assetManager.initializeDragEventHandlers();
-		assetManager.Write();        
-                var assetListSelectAllToggle = false;
-                function toggleAssetListSelectAll(form){
-                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
-                        for(var i = 0; i < form.assetId.length; i++)
-                        form.assetId[i].checked = assetListSelectAllToggle;
-                 }
-		//]]>
-		</script> <div class="adminConsoleSpacer">
-            &nbsp;
-        </div>
-		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.$i18n->get(1083).'</legend>';
-	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
-			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-		$output .= '<br />';
+	if ($self->session->scratch->get("manageAssetsSearchToggle")) {
+		$output .= $self->manageAssetsSearch;
+	} else {
+		$output .= $self->manageAssets;
 	}
-	$output .= '<hr />';
-	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
-			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-		$output .= '<br />';
-	}
-	$output .= '<hr />';
-	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
-			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-		$output .= '<br />';
-	}
-	$output .= '</fieldset></div>'; 
-	my %options;
-	tie %options, 'Tie::IxHash';
-	my $hasClips = 0;
-        foreach my $asset (@{$self->getAssetsInClipboard(1)}) {
-              	$options{$asset->getId} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" border="0" /> '.$asset->getTitle;
-		$hasClips = 1;
-        }
-	if ($hasClips) {
-		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.$i18n->get(1082).'</legend>'
-			.WebGUI::Form::formHeader($self->session)
-			.WebGUI::Form::hidden($self->session,{name=>"func",value=>"pasteList"})
-			.WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
-			.' '.$i18n->get("select all").'<br />'
-			.WebGUI::Form::checkList($self->session,{name=>"assetId",vertical=>1,options=>\%options})
-			.'<br />'
-			.WebGUI::Form::submit($self->session,{value=>"Paste"})
-			.WebGUI::Form::formFooter($self->session)
-			.' </fieldset></div> '
-			.'<script type="text/javascript">
-			//<![CDATA[
-			var clipboardItemSelectAllToggle = false;
-			function toggleClipboardSelectAll(form){
-			clipboardItemSelectAllToggle = clipboardItemSelectAllToggle ? false : true;
-			for(var i = 0; i < form.assetId.length; i++)
-			form.assetId[i].checked = clipboardItemSelectAllToggle;
-			}
-			//]]>
-			</script>';
-	}
-	my $hasPackages = 0;
-	my $packages;
-        foreach my $asset (@{$self->getPackageList}) {
-              	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
-			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
-			.$self->session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
-			.'<br />';
-		$hasPackages = 1;
-        }
-	if ($hasPackages) {
-		$output .= '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset>
-			<legend>'.$i18n->get("packages").'</legend>
-			'.$packages.' </fieldset></div> ';
-	}
-	$output .= '
-    <div class="adminConsoleSpacer">
-            &nbsp;
-        </div> 
-		';
 	return $self->getAdminConsole->render($output);
 }
-
-
 
 #-------------------------------------------------------------------
 

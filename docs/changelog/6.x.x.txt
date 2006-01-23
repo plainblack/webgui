@@ -5,6 +5,8 @@
  - Added a new pluggable templating system. (Thanks to Misja Op de Coul /
    E-Wise)
  - Added "201" http status to various entity creation responses.
+ - Replaced the old search engine system with a brand new one, that is more
+   powerful, easier to use, and more flexible.
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP

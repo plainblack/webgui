@@ -75,9 +75,10 @@ sub getAssets {
 	$query .= "(".$self->{_query}.")";
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
-	my @assets;
+	my @assets = ();
 	while (my ($id, $class, $version) = $rs->array) {
-		push(@assets, WebGUI::Asset->new($id, $class, $version));		
+		my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
+		push(@assets, $asset);		
 	}
 	return \@assets;
 }
@@ -237,18 +238,20 @@ sub search {
 	if ($rules->{lineage}) {
 		my @phrases = ();
 		foreach my $lineage (@{$rules->{lineage}{terms}}) {
+			next unless defined $lineage;
 			push(@params, $lineage."%");
 			push(@phrases, "lineage like ?");
 		}
-		push(@clauses, join(" or ", @phrases));
+		push(@clauses, join(" or ", @phrases)) if (scalar(@phrases));
 	}
 	if ($rules->{classes}) {
 		my @phrases = ();
 		foreach my $class (@{$rules->{classes}{terms}}) {
+			next unless defined $class;
 			push(@params, $class);
 			push(@phrases, "className=?");
 		}
-		push(@clauses, join(" or ", @phrases));
+		push(@clauses, join(" or ", @phrases)) if (scalar(@phrases));
 	}
 	if ($rules->{creationDate}) {
 		my $start = $rules->{creationDate}{start} || 0;
