@@ -80,6 +80,17 @@ Give this template a descriptive name so that you'll know what it is when you're
                 lastUpdated => 1119979645,
         },
 
+        'parser' => {
+                message => q|Template Type|,
+                lastUpdated => 1119979645,
+        },
+
+        'parser description' => {
+                message => q|If your configuration file lists multiple template engines, then select which type of template this is so that WebGUI can send it to the correct one.
+<p/>|,
+                lastUpdated => 1119979645,
+        },
+
 	'685' => {
 		message => q|Template, Delete|,
 		lastUpdated => 1038791020

@@ -156,6 +156,7 @@ sub getEditForm {
 			-options=>\%parsers,
 			-value=>$value,
 			-label=>$i18n->get('parser'),
+			-label=>$i18n->get('parser description'),
 		);
 	}
 	return $tabform;
