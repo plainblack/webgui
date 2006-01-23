@@ -133,7 +133,10 @@ sub param {
 	my $field = shift;
 	if ($field) {
 		if ($self->session->request) {
-			return $self->session->request->body($field) || $self->session->request->param($field);
+			my @data = $self->session->request->body($field);
+			return wantarray ? @data : $data[0] if (scalar(@data));
+			@data = $self->session->request->param($field);
+			return wantarray ? @data : $data[0];
 		} else {
 			return undef;
 		}
