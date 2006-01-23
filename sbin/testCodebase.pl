@@ -17,8 +17,10 @@ use Getopt::Long;
 
 my $configFile;
 my $help;
+my $verbose;
 
 GetOptions(
+	'verbose'=>\$verbose,
 	'configFile=s'=>\$configFile,
 	'help'=>\$help
 	);
@@ -33,40 +35,14 @@ if ($help || !$configFile) {
 				use a production config file as some tests may
 				be destructive.
 
+	--verbose		Turns on additional output.
+
 STOP
 	exit;
 }
 
-my $someTestFailed = 0;
-my @failedModules;
-File::Find::find(\&runTests, "../t");
-if ($someTestFailed) {
-	print "\n\n";
-	print "---------------------------------------\n";
-	print " $someTestFailed test modules experienced failures:\n";
-	print "\t".join("\n\t",@failedModules)."\n";
-	print "---------------------------------------\n";
-	print "\n\n";
-}
-exit $someTestFailed;
+my $verboseFlag = "-v" if ($verbose);
+system("WEBGUI_LIB=../lib WEBGUI_CONFIG=../etc/".$configFile." prove ".$verboseFlag." -r ../t");
 
-sub runTests {
-	my $file = $_;
-	return undef unless $file =~ m/^(.*?)\.t$/;
-	my $testType = $1;
-	$testType =~ s/_/ /g;
-	print "Running $testType tests...\n";
-	unless (system("$^X $file --configFile=$configFile")) {
-		print "All $testType tests were successful.\n";
-	} else {
-		push(@failedModules,$testType);
-		$someTestFailed++;
-		print "----------------------------\n";
-		print "Some $testType tests failed!\n";
-		print "----------------------------\n";
-		sleep(2);
-	}
-	print "\n";
-}
 
 

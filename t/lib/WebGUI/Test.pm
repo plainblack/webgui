@@ -48,6 +48,7 @@ BEGIN {
     $WEBGUI_LIB  ||= File::Spec->catpath( $WEBGUI_ROOT, 'lib' );
 
     lib->import( $WEBGUI_LIB );
+    push (@INC,$WEBGUI_LIB);
 
     # http://thread.gmane.org/gmane.comp.apache.apreq/3378
     # http://article.gmane.org/gmane.comp.apache.apreq/3388
