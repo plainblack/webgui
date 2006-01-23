@@ -1664,14 +1664,14 @@ sub www_manageAssets {
         }
 	if ($hasClips) {
 		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.$i18n->get(1082).'</legend>'
-			.WebGUI::Form::formHeader($self->session,)
+			.WebGUI::Form::formHeader($self->session)
 			.WebGUI::Form::hidden($self->session,{name=>"func",value=>"pasteList"})
 			.WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
 			.' '.$i18n->get("select all").'<br />'
 			.WebGUI::Form::checkList($self->session,{name=>"assetId",vertical=>1,options=>\%options})
 			.'<br />'
 			.WebGUI::Form::submit($self->session,{value=>"Paste"})
-			.WebGUI::Form::formFooter($self->session,)
+			.WebGUI::Form::formFooter($self->session)
 			.' </fieldset></div> '
 			.'<script type="text/javascript">
 			//<![CDATA[

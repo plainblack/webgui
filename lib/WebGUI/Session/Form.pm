@@ -118,9 +118,46 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 param ( field )
+
+Retrieves a form field post from the HTTP request.
+
+=head3 field
+
+The name of the field to retrieve.
+
+=cut
+
+sub param {
+	my $self = shift;
+	my $field = shift;
+	if ($field) {
+		if ($self->session->request) {
+			return $self->session->request->body($field) || $self->session->request->param($field);
+		} else {
+			return undef;
+		}
+	} else {
+		if ($self->session->request) {
+			my @params = ();
+			foreach ($self->session->request->param) {
+				push(@params, $_);
+			}
+			foreach ($self->session->request->body) {
+				push(@params, $_);
+			}
+			return @params;
+		} else {
+			return undef;
+		}
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 paramsHashRef (  )
 
-Gets a hash ref of all the params passed in, and their values.
+Gets a hash ref of all the params passed in to this class, and their values. This should not be confused with the param() method.
 
 =cut
 
