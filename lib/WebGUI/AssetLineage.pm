@@ -66,6 +66,7 @@ sub addChild {
 	my $newAsset = $temp->addRevision($properties,$now);
 	$self->session->db->commit;
 	$self->updateHistory("added child ".$id);
+	$self->session->http->setStatus(201,"Asset Creation Successful");
 	return $newAsset;
 }
 

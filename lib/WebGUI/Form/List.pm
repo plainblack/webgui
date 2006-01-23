@@ -198,7 +198,7 @@ Returns an array or a carriage return ("\n") separated scalar depending upon whe
 
 sub getValueFromPost {
 	my $self = shift;
-	my @data = $self->session->request->param($self->get("name"));
+	my @data = $self->session->form->param($self->get("name"));
         return wantarray ? @data : join("\n",@data);
 }
 

@@ -90,7 +90,7 @@ Returns either the interval that was posted (in seconds) or if nothing comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	return $self->session->datetime->intervalToSeconds($self->session->request->param($self->get("name")."_interval"),$self->session->request->param($self->get("name")."_units")) || 0;
+	return $self->session->datetime->intervalToSeconds($self->session->form->param($self->get("name")."_interval"),$self->session->form->param($self->get("name")."_units")) || 0;
 }
 
 #-------------------------------------------------------------------

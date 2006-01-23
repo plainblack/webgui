@@ -86,7 +86,7 @@ Returns either a 1 or 0 representing yes, no.
 
 sub yesNo {
 	my $self = shift;
-        if ($self->session->request->param($self->get("name")) > 0) {
+        if ($self->session->form->param($self->get("name")) > 0) {
                 return 1;
         }
 	return 0;

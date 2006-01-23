@@ -94,7 +94,7 @@ Returns the number of seconds since 00:00:00 on a 24 hour clock. Note, this will
 
 sub getValueFromPost {
 	my $self = shift;
-	return $self->session->datetime->timeToSeconds($self->session->request->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
+	return $self->session->datetime->timeToSeconds($self->session->form->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
 }
 
 #-------------------------------------------------------------------

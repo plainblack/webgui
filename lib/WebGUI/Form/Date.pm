@@ -121,7 +121,7 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	return $self->session->datetime->setToEpoch($self->session->request->param($self->get("name")));
+	return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")));
 }
 
 #-------------------------------------------------------------------

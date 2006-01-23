@@ -78,7 +78,7 @@ Returns a string filtered to allow only digits, spaces, and these special charac
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->request->param($self->get("name"));
+	my $value = $self->session->form->param($self->get("name"));
    	if ($value =~ /^[\d\s\-\+\(\)]+$/) {
                 return $value;
         }

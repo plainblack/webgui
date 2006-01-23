@@ -245,7 +245,7 @@ sub view {
 
    # this page, with important params
     @seen{@exclude_params} = ();
-    foreach ($self->session->request->param) {
+    foreach ($self->session->form->param) {
        unless (exists $seen{$_}) {
           $query_string .= $self->session->url->escape($_) . '='
              . $self->session->url->escape($self->session->form->process($_)) . ';';

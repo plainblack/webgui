@@ -99,7 +99,7 @@ Returns the integer from the form post, or returns 0 if the post result is inval
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->request->param($self->get("name"));
+	my $value = $self->session->form->param($self->get("name"));
 	if ($value =~ /^[\d\-]+$/) {
                 return $value;
         }

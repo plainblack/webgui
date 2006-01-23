@@ -708,7 +708,7 @@ sub www_saveUserPrefs {
 	$self->uncacheOverrides;
 	my $i18n = WebGUI::International->new($self->session);
 	my $u = WebGUI::User->new($self->session, $self->discernUserId);
-	foreach my $fieldId ($self->request->param) {
+	foreach my $fieldId ($self->form->param) {
 		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;

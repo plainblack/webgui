@@ -4,6 +4,7 @@
  - Added a lot more tests to the test suite.
  - Added a new pluggable templating system. (Thanks to Misja Op de Coul /
    E-Wise)
+ - Added "201" http status to various entity creation responses.
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP

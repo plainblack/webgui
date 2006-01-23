@@ -144,8 +144,8 @@ deleting the file if it was specified.
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->request->param($self->get("name"));
-	if ($self->session->request->param(join '_', '_', $self->get("name"), 'delete')) {
+	my $value = $self->session->form->param($self->get("name"));
+	if ($self->session->form->param(join '_', '_', $self->get("name"), 'delete')) {
 		my $storage = WebGUI::Storage->get($self->session,$value);
 		$storage->delete;
 		return '';

@@ -85,7 +85,7 @@ Parses the posted value and tries to make corrections if necessary.
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->request->param($self->get("name"));
+	my $value = $self->session->form->param($self->get("name"));
      	if ($value =~ /mailto:/) {
                 return $value;
         } elsif ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {

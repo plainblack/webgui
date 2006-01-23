@@ -114,7 +114,7 @@ Returns either what's posted or if nothing comes back it returns "text".
 
 sub getValueFromPost {
         my $self = shift;
-        return $self->session->request->param($self->get("name")) || "text";
+        return $self->session->form->param($self->get("name")) || "text";
 }
 
 #-------------------------------------------------------------------

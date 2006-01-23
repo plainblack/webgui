@@ -334,7 +334,7 @@ sub www_editBranchSave {
 			}
 		}
 		my $newRevision = $descendant->addRevision(\%data);
-		foreach my $form ($self->session->request->param) {
+		foreach my $form ($self->session->form->param) {
                 	if ($form =~ /^metadata_(.*)$/) {
 				my $fieldName = $1;
 				if ($self->session->form->yesNo("change_metadata_".$fieldName)) {

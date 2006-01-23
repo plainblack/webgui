@@ -1221,7 +1221,7 @@ sub processPropertiesFromFormPost {
 				);
 		}
 	}
-	foreach my $form ($self->session->request->param) {
+	foreach my $form ($self->session->form->param) {
 		if ($form =~ /^metadata_(.*)$/) {
 			$self->updateMetaData($1,$self->session->form->process($form));
 		}

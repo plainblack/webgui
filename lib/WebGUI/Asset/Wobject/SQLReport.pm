@@ -320,7 +320,7 @@ sub _processQuery {
         if (defined $dbh) {
                 if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
                         my $url = $self->getUrl('func=view');
-                        foreach ($self->session->request->param) {
+                        foreach ($self->session->form->param) {
                                 unless ($_ eq "pn" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
                                         $url = $self->session->url->append($url, $self->session->url->escape($_)
                                                 .'='.$self->session->url->escape($self->session->form->process($_)));
