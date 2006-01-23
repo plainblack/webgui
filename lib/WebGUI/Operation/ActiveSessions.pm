@@ -38,10 +38,10 @@ $session->form->process("sid").  Afterwards, it calls www_viewActiveSessions.
 
 sub www_killSession {
 	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
-	return www_viewActiveSessions() if $session->form->process("sid") eq $session->var->get("sessionId");
+	return www_viewActiveSessions($session) if $session->form->process("sid") eq $session->var->get("sessionId");
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::Session::end($session->form->process("sid"));
-	return www_viewActiveSessions();
+	return www_viewActiveSessions($session);
 }
 
 #-------------------------------------------------------------------
