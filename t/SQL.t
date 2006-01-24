@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
 
-use Test::More tests => 39; # increment this value for each test you create
+use Test::More tests => 42; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -144,11 +144,16 @@ ok( !$session->db->dbh->{AutoCommit}, 'AutoCommit disabled, transaction started.
 $session->db->rollback;
 ok( $session->db->dbh->{AutoCommit}, 'AutoCommits reenabled, aborted transaction finished');
 
-$session->db->dbh->do('CREATE TEMPORARY TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
+$session->db->dbh->do('DROP TABLE IF EXISTS testTable');
+$session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
+
+my $dbh2 = WebGUI::SQL->connect($session,$session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
+my ($sth, $sth2, $rc);
+
+$sth  = $session->db->prepare('select myIndex from testTable');
+$sth2 = $dbh2->prepare('select myIndex from testTable');
 
 #rollback test
-
-my ($sth, $rc);
 
 $rc = $session->db->beginTransaction();
 ok( $rc, 'beginTransaction returned successfully');
@@ -158,9 +163,12 @@ $session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
 $session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
 $session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
 
+$sth2->execute;
+is( $sth2->rows, 0, 'access from second dbh on uncommitted data');
+$sth2->finish;
+
 $session->db->rollback;
 
-$sth = $session->db->prepare('select myIndex from testTable');
 $sth->execute;
 is( $sth->rows, 0, 'rollback called, no updates to table');
 $sth->finish;
@@ -170,11 +178,19 @@ $rc = $session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
 $session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
 $session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
 
+$sth2->execute;
+is( $sth2->rows, 0, 'access from second dbh on uncommitted data');
+$sth2->finish;
+
 $session->db->commit;
 
-$sth = $session->db->prepare('select myIndex from testTable');
 $sth->execute;
 is( $sth->rows, 3, 'rows inserted, committed');
 $sth->finish;
 
+$sth2->execute;
+is( $sth2->rows, 3, 'access from second dbh on committed data');
+$sth2->finish;
+
+$session->db->dbh->do('DROP TABLE IF EXISTS testTable');
 
