@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
 
-use Test::More tests => 33; # increment this value for each test you create
+use Test::More tests => 39; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -64,26 +64,8 @@ is($session->db->quote(''), "''", "quote('')");
 my @quoteAndJoin = ("that's great", '"Howdy partner!"');
 is($session->db->quoteAndJoin(\@quoteAndJoin), "'that\\\'s great','\\\"Howdy partner!\\\"'", "quoteAndJoin()");
 
-# beginTransaction
-SKIP: {
-	skip("Don't know how to test beginTransaction.",1);
-	ok(undef,"beginTransaction()");
-}
-
-# commit
-SKIP: {
-	skip("Don't know how to test commit",1);
-	ok(undef, "commit()");
-}
-
-# rollback
-SKIP: {
-	skip("Don't know how to test rollback()",1);
-	ok(undef, "rollback()");
-}
-
 # prepare
-ok(my $sth = $session->db->prepare("select value from settings where name=?"), "prepare()");
+ok(my $sth = $session->db->prepare("select value from settings where name=?"), "prepare() with placeholder");
 
 # execute
 $sth->execute(['showDebug']);
@@ -145,3 +127,54 @@ is($setRowResult, 47, "setRow() - set data");
 my $getRow = $session->db->getRow("incrementer","incrementerId",$setRowId);
 is($getRow->{nextValue}, 47, "getRow()");
 $session->db->write("delete from incrementer where incrementerId=".$session->db->quote($setRowId));
+
+#test that beginTransaction and commit set AutoCommit correctly.
+$session->db->dbh->{AutoCommit} = 1;
+ok( $session->db->dbh->{AutoCommit}, 'AutoCommits enabled by default');
+
+$session->db->beginTransaction();
+ok( !$session->db->dbh->{AutoCommit}, 'AutoCommit disabled, transaction started.');
+
+$session->db->commit;
+ok( $session->db->dbh->{AutoCommit}, 'AutoCommits reenabled, null transaction finished');
+
+$session->db->beginTransaction();
+ok( !$session->db->dbh->{AutoCommit}, 'AutoCommit disabled, transaction started.');
+
+$session->db->rollback;
+ok( $session->db->dbh->{AutoCommit}, 'AutoCommits reenabled, aborted transaction finished');
+
+$session->db->dbh->do('CREATE TEMPORARY TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
+
+#rollback test
+
+my ($sth, $rc);
+
+$rc = $session->db->beginTransaction();
+ok( $rc, 'beginTransaction returned successfully');
+ok( !$session->db->dbh->{AutoCommit}, 'AutoCommit disabled, new transaction started');
+
+$session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
+$session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
+$session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
+
+$session->db->rollback;
+
+$sth = $session->db->prepare('select myIndex from testTable');
+$sth->execute;
+is( $sth->rows, 0, 'rollback called, no updates to table');
+$sth->finish;
+
+$session->db->beginTransaction();
+$rc = $session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
+$session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
+$session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
+
+$session->db->commit;
+
+$sth = $session->db->prepare('select myIndex from testTable');
+$sth->execute;
+is( $sth->rows, 3, 'rows inserted, committed');
+$sth->finish;
+
+
