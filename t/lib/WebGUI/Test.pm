@@ -13,10 +13,15 @@ BEGIN {
 
     STDERR->autoflush(1);
 
-    ( $CONFIG_FILE, $WEBGUI_LIB ) = @ENV{ qw( WEBGUI_CONFIG WEBGUI_LIB ) };
+    $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
 
-    unless ( defined $CONFIG_FILE && $CONFIG_FILE ) {
+    unless ( defined $CONFIG_FILE ) {
         warn qq/Enviroment variable WEBGUI_CONFIG must be set.\n/;
+        exit(1);
+    }
+   
+    unless ( $CONFIG_FILE ) {
+        warn qq/Enviroment variable WEBGUI_CONFIG must not be empty.\n/;
         exit(1);
     }
 
@@ -36,7 +41,8 @@ BEGIN {
     }
 
     $WEBGUI_ROOT = $CONFIG_FILE;
-
+    
+    # convert to absolute path
     unless ( File::Spec->file_name_is_absolute($WEBGUI_ROOT) ) {
         $WEBGUI_ROOT = File::Spec->rel2abs($WEBGUI_ROOT);
     }
@@ -45,9 +51,8 @@ BEGIN {
     $WEBGUI_ROOT = substr( $WEBGUI_ROOT, 0, index( $WEBGUI_ROOT, File::Spec->catdir( 'etc', $CONFIG_FILE ) ) );
     $WEBGUI_ROOT = File::Spec->canonpath($WEBGUI_ROOT);
 
-    $WEBGUI_LIB  ||= File::Spec->catpath( $WEBGUI_ROOT, 'lib' );
+    $WEBGUI_LIB  ||= File::Spec->catpath( (File::Spec->splitpath($WEBGUI_ROOT))[0], $WEBGUI_ROOT, 'lib' );
 
-    lib->import( $WEBGUI_LIB );
     push (@INC,$WEBGUI_LIB);
 
     # http://thread.gmane.org/gmane.comp.apache.apreq/3378
