@@ -11,8 +11,8 @@
 $|=1;
 
 use strict;
-use lib '../lib';
-use File::Find;
+use FindBin;
+use lib "$FindBin::Bin/../t/lib";
 use Getopt::Long;
 
 my $configFile;
@@ -25,8 +25,7 @@ GetOptions(
 	'help'=>\$help
 	);
 
-if ($help || !$configFile) {
-	print <<STOP;
+my $helpmsg=<<STOP;
 
 	perl $0 --configFile
 
@@ -38,11 +37,16 @@ if ($help || !$configFile) {
 	--verbose		Turns on additional output.
 
 STOP
-	exit;
-}
 
 my $verboseFlag = "-v" if ($verbose);
-system("WEBGUI_LIB=../lib WEBGUI_CONFIG=../etc/".$configFile." prove ".$verboseFlag." -r ../t");
+my $config = $ENV{WEBGUI_CONFIG};
 
-
-
+if ( $configFile ) {
+	system("WEBGUI_CONFIG=".$configFile." prove ".$verboseFlag." -r ../t");
+	exit;
+} elsif ( defined @ENV{WEBGUI_CONFIG} ) {
+        system("prove ".$verboseFlag." -r ../t");
+	exit;
+} else {
+	print $helpmsg;
+}
