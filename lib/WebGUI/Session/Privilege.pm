@@ -130,7 +130,7 @@ sub noAccess {
 	my $self = shift;
 	$self->session->http->setStatus("401", "No Access");
    	if ($self->session->user->userId eq '1') {
-      		return WebGUI::Operation::Auth::www_auth("init");
+      		return WebGUI::Operation::Auth::www_auth($self->session, "init");
    	} else {
 		my $i18n = WebGUI::International->new($self->session);
       		my $output = '<h1>'.$i18n->get(37).'</h1>';

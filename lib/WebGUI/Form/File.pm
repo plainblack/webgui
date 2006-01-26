@@ -51,10 +51,6 @@ The following additional parameters have been added via this sub class.
 
 If no name is specified a default name of "file" will be used.
 
-=head4 maxAttachments
-
-Defaults to 1. Determines how many files the user can upload with this form control.
-
 =head4 profileEnabled
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
@@ -73,9 +69,6 @@ sub definition {
 		name=>{
 			defaultValue=>"file"
 			},
-		maxAttachments=>{
-			defaultValue=>1
-			},
 		profileEnabled=>{
 			defaultValue=>1
 			},
@@ -87,7 +80,7 @@ sub definition {
 
 =head2 displayForm ( )
 
-If an image is uploaded, then return the image and a control to
+If an file is uploaded, then return an icon for that file's type and a control to
 delete it.  Otherwise, display a form element to upload a file.
 
 =cut
@@ -95,21 +88,18 @@ delete it.  Otherwise, display a form element to upload a file.
 sub displayForm {
 	my ($self) = @_;
 	return $self->toHtml unless $self->get("value");
-	##There are files inside here, for each one, display the image
+	##There are files inside here, for each one, display the file icon
 	##and another form control for deleting it.
 	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
-	my $id = $location->getId;
 	my $fileForm = '';
 	my $i18n = WebGUI::International->new($self->session);
-	foreach my $file ( @{ $location->getFiles } ) {
-		$fileForm .= sprintf qq!<img src="%s" /><br />!, $location->getUrl($file);
-		my $action = join '_', '_', $self->get("name"), 'delete';
-		$fileForm .= $i18n->get(392)
-			  .  "&nbsp"x4
-			  . WebGUI::Form::YesNo->new($self->session,{-name=>$action, -value=>0})->toHtml;
-	}
-	my $hid = $self->toHtmlAsHidden();
-	$fileForm .= $hid;
+	my $file = shift @{ $location->getFiles };
+	$fileForm .= sprintf qq!<img src="%s" /><br />!, $location->getFileIconUrl($file);
+	$fileForm .= $i18n->get(392)
+		  .  "&nbsp"x4
+		  . WebGUI::Form::YesNo->new($self->session,{-name=>$self->privateName('delete'), -value=>0})->toHtml;
+	$fileForm .= $self->toHtmlAsHidden();
+	$fileForm .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'keep'})->toHtml();
 	return $fileForm;
 }
 
@@ -126,10 +116,9 @@ sub displayValue {
 	my ($self) = @_;
 	return '' unless $self->get("value");
 	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
-	local $_;
-	my @files = map { sprintf qq!<img src="%s" />&nbsp;%s!, $location->getFileIconUrl($_), $_; } @{ $location->getFiles };
-	my $fileValue = join "<br />\n", @files;
-return $fileValue;
+	my $file = shift @{ $location->getFiles };
+	my $fileValue = sprintf qq!<img src="%s" />&nbsp;%s!, $location->getFileIconUrl($file), $file; 
+	return $fileValue;
 }
 
 #-------------------------------------------------------------------
@@ -145,20 +134,18 @@ deleting the file if it was specified.
 sub getValueFromPost {
 	my $self = shift;
 	my $value = $self->session->form->param($self->get("name"));
-	if ($self->session->form->param(join '_', '_', $self->get("name"), 'delete')) {
+	if ($self->session->form->param($self->privateName('delete'))) {
 		my $storage = WebGUI::Storage->get($self->session,$value);
 		$storage->delete;
 		return '';
 	}
-	else {
+	elsif ($self->session->form->param($self->privateName('action')) eq 'keep') {
+		return $value;
+	}
+	elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
 		my $storage;
-		if ($value) {
-			$storage = WebGUI::Storage::Image->get($self->session,$value);
-		}
-		else {
-			$storage = WebGUI::Storage::Image->create($self->session);
-		}
-		$storage->addFileFromFormPost($self->get("name"));
+		$storage = WebGUI::Storage::Image->create($self->session);
+		$storage->addFileFromFormPost($self->get("name"), 1);
 		my @files = @{ $storage->getFiles };
 		if (scalar(@files) < 1) {
 			$storage->delete;
@@ -195,9 +182,10 @@ sub toHtml {
                 }
         }
 	my $i18n = WebGUI::International->new($self->session);
-        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->get("name").'", fileIcons, "'.$i18n->get('removeLabel','WebGUI').'","'.$self->get("maxAttachments").'");
+        $uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");
         uploader.addRow();
-        </script>';
+        </script>!, $self->get("name"), $i18n->get("removeLabel"), 1;
+	$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml();
         return $uploadControl;
 }
 

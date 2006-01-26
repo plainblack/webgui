@@ -77,6 +77,7 @@ sub secureEval {
 	my %trusted = (
 		'WebGUI::International::get' => sub {$i18n->get(@_)},
 		'WebGUI::International::getLanguages' => sub { $i18n->getLanguages(@_) },
+		'WebGUI::DateTime::epochToHuman' => sub { $session->datetime->epochToHuman(@_) },
 		'$session->datetime->epochToHuman' => sub { $session->datetime->epochToHuman(@_) },
 		'WebGUI::Icon::getToolbarOptions' => sub { $session->icon->getToolbarOptions() },		
 	);
