@@ -35,7 +35,7 @@ Define which value, by it's ranking, will be displayed.  The highest ranking is
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $key = shift;
 	my $rank = shift || 1; # 1 is highest rank
 	$rank--;	# Rank is zero based

@@ -67,7 +67,7 @@ sub decrementReplies {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Thread");
         push(@{$definition}, {

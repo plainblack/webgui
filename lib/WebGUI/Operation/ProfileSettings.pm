@@ -21,7 +21,7 @@ use WebGUI::ProfileCategory;
 
 #-------------------------------------------------------------------
 sub _submenu {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $workarea = shift;
         my $title = shift;
         my $help = shift;
@@ -48,7 +48,7 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub www_deleteProfileCategoryConfirm {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $category = WebGUI::ProfileCategory->new($session,$session->form->process("cid"));
         return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($category->isProtected);
@@ -58,7 +58,7 @@ sub www_deleteProfileCategoryConfirm {
 
 #-------------------------------------------------------------------
 sub www_deleteProfileFieldConfirm {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $field = WebGUI::ProfileField->new($session,$session->form->process("fid"));
         return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($field->isProtected);
@@ -68,7 +68,7 @@ sub www_deleteProfileFieldConfirm {
 
 #-------------------------------------------------------------------
 sub www_editProfileCategory {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $data = {};
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
@@ -118,7 +118,7 @@ sub www_editProfileCategory {
 
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my %data = (
 		label=>$session->form->text("label"),
@@ -135,7 +135,7 @@ sub www_editProfileCategorySave {
 
 #-------------------------------------------------------------------
 sub www_editProfileField {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
         my $f = WebGUI::HTMLForm->new($session);
@@ -237,7 +237,7 @@ sub www_editProfileField {
 
 #-------------------------------------------------------------------
 sub www_editProfileFieldSave {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my %data = (
 		label=>$session->form->text("label"),
@@ -262,7 +262,7 @@ sub www_editProfileFieldSave {
 
 #-------------------------------------------------------------------
 sub www_editProfileSettings {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
 	my $output = "";
@@ -287,7 +287,7 @@ sub www_editProfileSettings {
 
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryDown {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->moveDown;
         return www_editProfileSettings($session);
@@ -295,7 +295,7 @@ sub www_moveProfileCategoryDown {
 
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryUp {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->moveUp;
         return www_editProfileSettings($session);
@@ -303,7 +303,7 @@ sub www_moveProfileCategoryUp {
 
 #-------------------------------------------------------------------
 sub www_moveProfileFieldDown {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileField->new($session,$session->form->process("fid"))->moveDown;
         return www_editProfileSettings($session);
@@ -311,7 +311,7 @@ sub www_moveProfileFieldDown {
 
 #-------------------------------------------------------------------
 sub www_moveProfileFieldUp {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	WebGUI::ProfileField->new($session,$session->form->process("fid"))->moveUp;
         return www_editProfileSettings($session);

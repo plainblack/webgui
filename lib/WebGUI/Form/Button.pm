@@ -54,7 +54,7 @@ The default text to appear on the button. Defaults to an internationalized versi
 
 sub definition {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session,"WebGUI");
 	push(@{$definition}, {

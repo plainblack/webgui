@@ -31,7 +31,7 @@ is returned.  Otherwise a space is returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	if ($session->asset) {
 		my $lineage = $session->asset->get("lineage");
 		$lineage = substr($lineage,0,6);

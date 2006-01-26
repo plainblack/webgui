@@ -45,7 +45,7 @@ The ID of a template for custom layout of the link and text.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my @param = @_;
 	my $i18n = WebGUI::International->new($session,'Macro_LoginToggle');
         my $login = $param[0] || $i18n->get(716);

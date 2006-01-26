@@ -53,7 +53,7 @@ sub addRevision {
 #-------------------------------------------------------------------
 sub canAdd {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$class->SUPER::canAdd($session, undef, '7');
 }
 
@@ -103,7 +103,7 @@ sub chopTitle {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Post");
         push(@{$definition}, {

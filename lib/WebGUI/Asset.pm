@@ -78,7 +78,7 @@ Only developers extending this method should use this parameter. By default WebG
 
 sub canAdd {
 	my $className = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $userId = shift || $session->user->userId;
 	my $subclassGroupId = shift;
 	my $groupId = $session->config->get("assetAddPrivilege")->{$className} || $subclassGroupId || '12';
@@ -152,7 +152,7 @@ An array reference containing additional information to include with the default
 
 sub definition {
         my $class = shift;
-        my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+        my $session = shift;
         my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, "Asset");
         push(@{$definition}, {
@@ -472,7 +472,7 @@ A reference to the current session.
 
 sub getDefault {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $class->newByDynamicClass($session, $session->setting->get("defaultPage"));
 }
 
@@ -740,7 +740,7 @@ A reference to the current session.
 
 sub getImportNode {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000002");
 }
 
@@ -792,7 +792,7 @@ A reference to the current session.
 
 sub getNotFound {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	if ($session->url->getRequestedUrl eq "*give-credit-where-credit-is-due*") {
 		my $content = "";
 		open(FILE,"<".$session->config->getWebguiRoot."/docs/credits.txt");
@@ -829,7 +829,7 @@ A reference to the current session.
 
 sub getRoot {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return WebGUI::Asset->new($session, "PBasset000000000000001");
 }
 
@@ -1267,7 +1267,7 @@ An epoch date that represents a specific version of an asset. By default the mos
 
 sub new {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $assetId = shift;
 	return undef unless ($assetId);
 	my $className = shift;
@@ -1336,7 +1336,7 @@ A specific revision date for the asset to retrieve. If not specified, the most r
 
 sub newByDynamicClass {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $assetId = shift;
 	my $revisionDate = shift;
 	return undef unless defined $assetId;
@@ -1370,7 +1370,7 @@ A properties hash reference. The className of the properties hash must be valid.
 
 sub newByPropertyHashRef {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $properties = shift;
 	return undef unless defined $properties;
 	return undef unless exists $properties->{className};
@@ -1406,7 +1406,7 @@ A specific revision to instanciate. By default we instanciate the newest publish
 
 sub newByUrl {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $url = shift || $session->url->getRequestedUrl;
 	my $revisionDate = shift;
 	$url = lc($url);

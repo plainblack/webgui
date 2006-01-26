@@ -217,28 +217,4 @@ sub upgrading {
 	close(FILE);
 }
 
-
-sub dumpSession {
-	my $session = shift;
-	if ($session) {
-		if (ref $session eq 'WebGUI::Session') {
-			return;
-		} else {
-			use Data::Dumper; print '<html><body><pre>$session is '.Dumper($session).' (not a WebGUI::Session!) at ';
-		}
-	} else {
-		print '<html><body><pre>$session is empty at ';
-	}
-	my $i = 1;
-	my $output;
-	while (my @data = caller($i)) {
-		print "\t".join(",",@data)."\n";
-		$i++;
-	}
-	print '</pre></body></html>';
-	exit;
-}
-
 1;
-
-

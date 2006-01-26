@@ -4,7 +4,7 @@ use strict;
 
 #-------------------------------------------------------------------
 sub setCommerceSetting {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($entry);
 	$entry = shift;
 	$session->db->write("delete from commerceSettings where ". 

@@ -57,7 +57,7 @@ URL of the template to use to display the random thread. Must be a valid URL wit
 =cut
 
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($startURL, $relatives, $templateURL) = @_;
 	# Seed the randomizer:
 	srand;
@@ -129,7 +129,7 @@ Reference to an array with lineage of Collaboration Systems to select a random t
 =cut
 
 sub _getRandomThread {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $lineage = shift;
 
 	# Get random CS:

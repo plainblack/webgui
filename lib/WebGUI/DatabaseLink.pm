@@ -77,7 +77,7 @@ A hash reference containing the list of params to set. See the set() method for 
 
 sub create {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $params = shift;
 	$params->{databaseLinkId} = "new";
 	my $id = $session->db->setRow("databaseLink","databaseLinkId",$params);
@@ -193,7 +193,7 @@ A reference to the current session.
 
 sub getList {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $list = $session->db->buildHashRef("select databaseLinkId, title from databaseLink order by title");
 	my $i18n = WebGUI::International->new($session);
 	$list->{'0'} = $i18n->get(1076);
@@ -221,7 +221,7 @@ sub new {
     my ($class, $databaseLinkId, %databaseLink);
     tie %databaseLink, 'Tie::CPHash';
     $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$databaseLinkId = shift;
 	unless ($databaseLinkId eq "") {
 		if ($databaseLinkId eq "0") {

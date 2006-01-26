@@ -33,7 +33,7 @@ this asset, an empty string will be returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my @param = @_;
 	if ($session->asset && $session->asset->canEdit) { 
 		return $param[0];

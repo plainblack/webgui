@@ -28,7 +28,7 @@ process is really a wrapper around $session->url->gateway();
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->url->gateway();
 }
 

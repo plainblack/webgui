@@ -127,7 +127,7 @@ from the database.
 sub new {
 	my ($class, $subscriptionId, %properties);
 	$class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$subscriptionId = shift;
 
 	if ($subscriptionId eq 'new') {

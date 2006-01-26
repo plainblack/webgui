@@ -142,7 +142,7 @@ If you want to add anything special to the form's table like a name or styleshee
 sub new {
 	my ($header, $footer);
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my %param = @_;
 	$header = "\n\n".WebGUI::Form::formHeader($session,{
 		action=>($param{action} || $param{'-action'} || $session->url->page),

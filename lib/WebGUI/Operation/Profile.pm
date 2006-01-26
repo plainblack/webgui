@@ -27,7 +27,7 @@ use WebGUI::Operation::Shared;
 #-------------------------------------------------------------------
 # Builds Extra form requirements for anonymous registration. 
 sub getRequiredProfileFields {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my @array;
 	foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getRequiredFields}) {
 		push(@array, {
@@ -51,7 +51,7 @@ sub getRequiredProfileFields {
 =cut
 
 sub isDuplicateEmail {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $email = shift;
 	my ($otherEmail) = $session->db->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".$session->db->quote($email)." and userId <> ".$session->db->quote($session->user->userId));
 	return ($otherEmail > 0);
@@ -59,7 +59,7 @@ sub isDuplicateEmail {
 
 #-------------------------------------------------------------------
 sub saveProfileFields {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
    my $u = shift;
    my $profile = shift;
    
@@ -70,7 +70,7 @@ sub saveProfileFields {
 
 #-------------------------------------------------------------------
 sub validateProfileData {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my %data = ();
 	my $error = "";
 	my $warning = "";
@@ -93,7 +93,7 @@ sub validateProfileData {
 
 #-------------------------------------------------------------------
 sub www_editProfile {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return WebGUI::Operation::Auth::www_auth($session,"init") if($session->user->userId eq '1');
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
@@ -130,7 +130,7 @@ sub www_editProfile {
 
 #-------------------------------------------------------------------
 sub www_editProfileSave {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($profile, $fieldName, $error, $u, $warning);
 	return WebGUI::Operation::Auth::www_auth("init") if ($session->user->userId eq '1');
 	
@@ -149,7 +149,7 @@ sub www_editProfileSave {
 
 #-------------------------------------------------------------------
 sub www_viewProfile {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $u = WebGUI::User->new($session,$session->form->process("uid"));
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};

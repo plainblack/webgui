@@ -19,7 +19,7 @@ use WebGUI::SQL;
 
 #-------------------------------------------------------------------
 sub www_editSettings {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my %tabs;
@@ -288,7 +288,7 @@ sub www_editSettings {
 
 #-------------------------------------------------------------------
 sub www_saveSettings {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($key, $value);
 	foreach $key (%{$session->form->paramsHashRef}) {

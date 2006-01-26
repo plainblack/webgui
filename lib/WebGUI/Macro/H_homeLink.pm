@@ -42,7 +42,7 @@ be used.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my ($label, $templateUrl) = @_;
 	my $home = WebGUI::Asset->getDefault($session);
 	if ($label ne "linkonly") {

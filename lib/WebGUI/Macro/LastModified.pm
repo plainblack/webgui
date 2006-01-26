@@ -39,7 +39,7 @@ sprintf.  See L<WebGUI::Session::datetime/"epochToHuman"> for a list of codes.  
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return '' unless $session->asset;
 	my ($label, $format, $time);
 	($label, $format) = @_;

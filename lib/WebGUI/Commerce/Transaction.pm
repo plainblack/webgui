@@ -414,7 +414,7 @@ sub new {
 	my ($class, $transactionId, $gatewayId, $userId, $properties, $sth, $row, @items);
 	
 	$class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$transactionId = shift;
 	$gatewayId = shift;
 	$userId = shift || $session->user->userId;

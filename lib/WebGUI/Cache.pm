@@ -116,7 +116,7 @@ A subdivider to store this cache under. When building your own cache plug-in def
 sub new {
 	my $cache;
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	if ($session->config->get("memcached_servers")) {
 		require WebGUI::Cache::Memcached;
 		return WebGUI::Cache::Memcached->new($session,@_);

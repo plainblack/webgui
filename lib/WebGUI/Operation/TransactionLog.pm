@@ -29,7 +29,7 @@ This error message will be added to the template variables.
 =cut
 
 sub www_viewPurchaseHistory {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my (@history, @historyLoop, %var, %properties);
 
 	$var{errorMessage} = shift;
@@ -63,7 +63,7 @@ $session->form->process("tid").
 =cut
 
 sub www_cancelRecurringTransaction {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($transaction, $error, $message);
 	
 	my $i18n = WebGUI::International->new($session, "TransactionLog");
@@ -89,7 +89,7 @@ Afterward, it calls www_listTransactions
 =cut
 
 sub www_deleteTransaction {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $transactionId;
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
@@ -103,7 +103,7 @@ sub www_deleteTransaction {
 
 #-------------------------------------------------------------------
 sub www_deleteTransactionItem {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 	
 	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));

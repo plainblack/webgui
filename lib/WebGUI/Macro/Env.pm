@@ -31,7 +31,7 @@ then undef will be returned.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->env->get(shift);
 }
 

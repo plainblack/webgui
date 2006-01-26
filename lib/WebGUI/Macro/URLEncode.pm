@@ -33,7 +33,7 @@ The text to URL encode.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->url->escape(shift);
 }
 

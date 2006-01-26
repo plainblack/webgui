@@ -207,7 +207,6 @@ Specify a default language. Defaults to user preference or "English".
 
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
-	use WebGUI; WebGUI::dumpSession($session);
 	bless( {
 		_session   => $session,
 		_namespace => $namespace,

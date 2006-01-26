@@ -206,7 +206,7 @@ The namespace of the plugin.
 sub load {
 	my ($class, $namespace, $load, $cmd, $plugin);
     	$class = shift;
-    	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+    	my $session = shift;
 	$namespace = shift;
 
 	$session->errorHandler->fatal('No namespace passed to load.') unless ($namespace);

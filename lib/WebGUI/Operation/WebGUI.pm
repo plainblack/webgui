@@ -24,7 +24,7 @@ The beginning of WebGUI.
 =cut
 
 sub www_genesis {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$session->style->useEmptyStyle("1");
 	my $output = '<html><head><title>About WebGUI</title>
 	<style>.big {font-size: 23px;}</style>
@@ -51,7 +51,7 @@ password and email address, as well as some other WebGUI settings.
 
 #-------------------------------------------------------------------
 sub www_setup {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$session->http->setMimeType("text/html");
 	return "" unless ($session->setting->get("specialState") eq "init");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
@@ -161,7 +161,7 @@ to work, even superseding the session variable.
 
 #-------------------------------------------------------------------
 sub www_theWg {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$session->style->useEmptyStyle("1");
 	my $output = '<html><head><title>WebGUI</title></head><body BGCOLOR="black"><center>
 <nobr><font SIZE="1" FACE="Courier New, Courier"><font COLOR="white"></font><font COLOR="#1A1108">p</font><font COLOR="#24130C">a</font><font COLOR="#5C2605">c</font><font COLOR="#642206">kageW</font><font COLOR="#5C1F04">e</font><font COLOR="#642206">bGUI;ou</font><font COLOR="#5C2605">r</font><font COLOR="#642206">$VERSION="5.5.0</font><font COLOR="#5C2605">"</font><font COLOR="#642206">;usestr</font><font COLOR="#5C1F04">i</font><font COLOR="#642206">ctqw(v</font><font COLOR="#68290C">a</font><font COLOR="#5C1F04">r</font><font COLOR="#5C2605">s</font><font COLOR="#642206">s</font><font COLOR="#541604">u</font><font COLOR="#481404">b</font><font COLOR="#380B04">s</font><font COLOR="#0B0204">);useTie::CPHash;useW

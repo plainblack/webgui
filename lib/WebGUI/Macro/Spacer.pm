@@ -38,7 +38,7 @@ Set the height of the spacer.
 =cut
 
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my ($output, @param, $width, $height);
         @param = @_;
         $width = $param[0] if defined $param[0];

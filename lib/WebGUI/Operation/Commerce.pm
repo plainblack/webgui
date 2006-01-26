@@ -20,7 +20,7 @@ use Storable;
 
 #-------------------------------------------------------------------
 sub _submenu {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $i18n = WebGUI::International->new($session, "Commerce");
 
 	my $workarea = shift;
@@ -38,27 +38,27 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 sub _clearCheckoutScratch {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	_clearShippingScratch($session);
 	_clearPaymentScratch($session);
 }
 
 #-------------------------------------------------------------------
 sub _clearPaymentScratch {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$session->scratch->set('paymentGateway', '-delete-');
 }
 
 #-------------------------------------------------------------------
 sub _clearShippingScratch {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$session->scratch->set('shippingMethod', '-delete-');
 	$session->scratch->set('shippingOptions', '-delete-');
 }
 
 #-------------------------------------------------------------------
 sub _paymentSelected {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return 0 unless ($session->scratch->get('paymentGateway'));
 	my $plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
 	return 1 if ($plugin && $plugin->enabled);
@@ -67,7 +67,7 @@ sub _paymentSelected {
 
 #-------------------------------------------------------------------
 sub _shippingSelected {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return 0 unless ($session->scratch->get('shippingMethod'));
 
 	my $plugin = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
@@ -81,7 +81,7 @@ sub _shippingSelected {
 
 #-------------------------------------------------------------------
 sub www_addToCart {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("itemId"), $session->form->process("itemType"), $session->form->process("quantity"));
 
 	return WebGUI::Operation::execute($session,'viewCart');
@@ -89,7 +89,7 @@ sub www_addToCart {
 
 #-------------------------------------------------------------------
 sub www_cancelTransaction {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($transaction, %var);
 	
 	$transaction = WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"));
@@ -106,7 +106,7 @@ sub www_cancelTransaction {
 # This operation is here for easier future extensions to the commerce system.
 #-------------------------------------------------------------------
 sub www_checkout {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return WebGUI::Operation::execute($session,'selectShippingMethod') unless (_shippingSelected($session));
 
 	return WebGUI::Operation::execute($session,'selectPaymentGateway') unless (_paymentSelected($session));
@@ -116,7 +116,7 @@ sub www_checkout {
 
 #-------------------------------------------------------------------
 sub www_checkoutConfirm {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($plugin, $f, %var, $errors, $i18n, $shoppingCart, $normal, $recurring, $shipping, $total);
 	$errors = shift;
 	
@@ -196,7 +196,7 @@ sub www_checkoutConfirm {
 
 #-------------------------------------------------------------------
 sub www_checkoutSubmit {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($plugin, $shoppingCart, $transaction, $var, $amount, @cartItems, $i18n, @transactions, 
 		@normal, $currentPurchase, $checkoutError, @resultLoop, %param, $normal, $recurring, 
 		$formError, $shipping, $shippingCost, $shippingDescription);
@@ -326,7 +326,7 @@ sub www_checkoutSubmit {
 
 #-------------------------------------------------------------------
 sub www_completePendingTransaction {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 
 	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->completeTransaction;
@@ -336,7 +336,7 @@ sub www_completePendingTransaction {
 
 #-------------------------------------------------------------------
 sub www_confirmRecurringTransaction {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my($plugin, %var);
 	
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("gateway"));
@@ -347,7 +347,7 @@ sub www_confirmRecurringTransaction {
 
 #-------------------------------------------------------------------
 sub www_confirmTransaction {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my($plugin, %var);
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("pg"));
 
@@ -358,7 +358,7 @@ sub www_confirmTransaction {
 
 #-------------------------------------------------------------------
 sub www_deleteCartItem {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	WebGUI::Commerce::ShoppingCart->new($session)->delete($session->form->process("itemId"), $session->form->process("itemType"));
 
 	return WebGUI::Operation::execute($session,'viewCart');
@@ -366,7 +366,7 @@ sub www_deleteCartItem {
 
 #-------------------------------------------------------------------
 sub www_editCommerceSettings {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
 		$paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin,
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
@@ -510,7 +510,7 @@ sub www_editCommerceSettings {
 
 #-------------------------------------------------------------------
 sub www_editCommerceSettingsSave {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	foreach ($session->form->param) {
@@ -533,7 +533,7 @@ sub www_editCommerceSettingsSave {
 
 #-------------------------------------------------------------------
 sub www_listPendingTransactions {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($p, $transactions, $output, $properties, $i18n);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
@@ -566,7 +566,7 @@ sub www_listPendingTransactions {
 
 #-------------------------------------------------------------------
 sub www_listTransactions {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($output, %criteria, $transaction, @transactions);
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
@@ -662,7 +662,7 @@ sub www_listTransactions {
 
 #-------------------------------------------------------------------
 sub www_selectPaymentGateway {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
 
 	_clearPaymentScratch($session);
@@ -695,7 +695,7 @@ sub www_selectPaymentGateway {
 
 #-------------------------------------------------------------------
 sub www_selectPaymentGatewaySave {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	if (WebGUI::Commerce::Payment->load($session, $session->form->process("paymentGateway"))->enabled) {
 		$session->scratch->set('paymentGateway', $session->form->process("paymentGateway"));
 	} else {
@@ -707,7 +707,7 @@ sub www_selectPaymentGatewaySave {
 
 #-------------------------------------------------------------------
 sub www_selectShippingMethod {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
 
 	_clearShippingScratch($session);
@@ -741,7 +741,7 @@ sub www_selectShippingMethod {
 
 #-------------------------------------------------------------------
 sub www_selectShippingMethodSave {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $shipping = WebGUI::Commerce::Shipping->load($session, $session->form->process("shippingMethod"));
 	
 	$shipping->processOptionsForm;
@@ -759,13 +759,13 @@ sub www_selectShippingMethodSave {
 
 #-------------------------------------------------------------------
 sub www_transactionComplete {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return WebGUI::Operation::execute($session,'viewPurchaseHistory');	
 }
 
 #-------------------------------------------------------------------
 sub www_updateCart {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 
 	foreach my $formElement ($session->form->param) {
@@ -779,7 +779,7 @@ my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 
 #-------------------------------------------------------------------
 sub www_viewCart {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($shoppingCart, $normal, $recurring, %var, $total, $i18n);
 
 	$i18n = WebGUI::International->new($session, 'Commerce');

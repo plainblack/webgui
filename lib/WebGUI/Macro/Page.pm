@@ -33,7 +33,7 @@ The name of the property to retrieve from the assset via $session->asset->get()
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	if ($session->asset) {
 		return $session->asset->get(shift);
 	}

@@ -34,7 +34,7 @@ if no asset exists at that url, or if the asset has no children.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $url = shift;
 	my $i18n = WebGUI::International->new($session,'Macro_RandomAssetProxy');
 	my $asset = WebGUI::Asset->newByUrl($session, $url);

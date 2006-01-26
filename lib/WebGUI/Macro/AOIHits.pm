@@ -35,7 +35,7 @@ The value for the key that will be looked up.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $key = shift; 
 	my $value = shift;
 	my $sql = "select count from passiveProfileAOI a, metaData_properties f 

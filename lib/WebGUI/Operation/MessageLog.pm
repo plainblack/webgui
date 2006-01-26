@@ -39,7 +39,7 @@ returns a hashref with internationalized values for message status.
 =cut
 
 sub _status {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $i18n = WebGUI::International->new($session);
 	return {"notice"=>$i18n->get(551),"pending"=>$i18n->get(552),"completed"=>$i18n->get(350)};
 }
@@ -53,7 +53,7 @@ Templated display all messages for the current user.
 =cut
 
 sub www_viewMessageLog {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
    my (@msg, $vars);
    return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->userId));
 	my $i18n = WebGUI::International->new($session);
@@ -99,7 +99,7 @@ Templated display of a single message for the user.
 =cut
 
 sub www_viewMessageLogMessage {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
    my ($data, $vars);
    return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->userId));
 	my $i18n = WebGUI::International->new($session);

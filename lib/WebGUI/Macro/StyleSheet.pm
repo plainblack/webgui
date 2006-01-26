@@ -32,7 +32,7 @@ The URL to the CSS document.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$session->style->setLink(shift,{
 		type=>'text/css',
 		rel=>'stylesheet'

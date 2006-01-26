@@ -31,7 +31,7 @@ string is returned.
 
 #-------------------------------------------------------------------
 sub process {	
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my @param = @_;
         return "" unless ($session->var->get("adminOn"));
         return $param[0];

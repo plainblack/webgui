@@ -48,7 +48,7 @@ A template from the Macro/EditableToggle namespace to use for formatting the lin
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
          if ($session->asset && $session->asset->canEdit && $session->user->isInGroup(12)) {
         	my %var;
               my @param = @_;

@@ -38,7 +38,7 @@ sub canPersonalize {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
   my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';

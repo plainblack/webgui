@@ -516,7 +516,7 @@ Lineage string.
 
 sub newByLineage {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $lineage = shift;
 	my $assetLineage = $session->stow->get("assetLineage");
 	my $id = $assetLineage->{$lineage}{id};

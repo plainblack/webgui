@@ -192,7 +192,7 @@ A string containing the link to the tab-CascadingStyleSheet
 
 sub new {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $startingTabs = shift;
 	my $css = shift || $session->config->get("extrasURL").'/tabs/tabs.css';
 	my $cancelUrl = shift || $session->url->page();

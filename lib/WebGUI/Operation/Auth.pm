@@ -30,7 +30,7 @@ Get the instance of this object or create a new instance if none exists
 =cut
 
 sub getInstance {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	#Get Auth Settings
 	my $authMethod = $session->user->authMethod || $session->setting->get("authMethod");
 	$authMethod = $session->setting->get("authMethod") if($session->user->userId eq '1');
@@ -58,7 +58,7 @@ is returned.
 =cut
 
 sub www_auth {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $auth;
 	($auth) = $session->db->quickArray("select authMethod from users where username=".$session->db->quote($session->form->process("username"))) if($session->form->process("username"));
 	my $authMethod = getInstance($session,$auth);

@@ -148,7 +148,7 @@ The current session.
 
 sub new {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=".$session->db->quote($session->getId));
 	bless {_session=>$session,_sessionId=>$session->getId, _data=>$data}, $class;
 }

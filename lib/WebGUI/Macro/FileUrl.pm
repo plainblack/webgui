@@ -40,7 +40,7 @@ The URL to the Asset.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $url = shift;
 	my $asset = WebGUI::Asset->newByUrl($session,$url);
 	if (defined $asset) {

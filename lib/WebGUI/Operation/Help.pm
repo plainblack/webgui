@@ -20,7 +20,7 @@ use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub _load {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $namespace = shift;
 	$namespace =~ s/[^\w\d\s]//g;
 	my $cmd = "WebGUI::Help::".$namespace;
@@ -37,7 +37,7 @@ sub _load {
 
 #-------------------------------------------------------------------
 sub _get {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $id = shift;
 	my $namespace = shift;
 	my $help = _load($session,$namespace);
@@ -51,19 +51,19 @@ sub _get {
 
 #-------------------------------------------------------------------
 sub _link {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->url->page('op=viewHelp;hid='.$session->url->escape($_[0]).';namespace='.$_[1]);
 }
 
 #-------------------------------------------------------------------
 sub _linkTOC {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->url->page('op=viewHelpChapter;namespace='.$_[0]);
 }
 
 #-------------------------------------------------------------------
 sub _getHelpFilesList {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $dir = join '/', $session->config->getWebguiRoot,"lib","WebGUI","Help";
         opendir (DIR,$dir) or $session->errorHandler->fatal("Can't open Help directory!");
 	my @files;
@@ -79,7 +79,7 @@ sub _getHelpFilesList {
 
 #-------------------------------------------------------------------
 sub _getHelpName {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $file = shift;
 	my $helpName;
 	if ($file =~ /^Asset_/) {
@@ -108,7 +108,7 @@ sub _related {
 
 #-------------------------------------------------------------------
 sub www_viewHelp {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new($session,"help");
 	my $namespace = $session->form->process("namespace") || "WebGUI";
@@ -138,7 +138,7 @@ sub www_viewHelp {
 
 #-------------------------------------------------------------------
 sub www_viewHelpIndex {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $i18n = WebGUI::International->new($session);
         my @helpIndex;
@@ -173,7 +173,7 @@ sub www_viewHelpIndex {
 
 #-------------------------------------------------------------------
 sub www_viewHelpTOC {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
         my @helpIndex;
 	my $i;
@@ -204,7 +204,7 @@ sub www_viewHelpTOC {
 
 #-------------------------------------------------------------------
 sub www_viewHelpChapter {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $namespace = $session->form->process("namespace");
 	my $help = _load($session,$namespace);

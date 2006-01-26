@@ -152,7 +152,7 @@ A reference to the current session.
 
 sub getList {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
     my %list;
 	tie %list, "Tie::IxHash";
 	%list = $session->db->buildHash("select ldapLinkId, ldapLinkName from ldapLink order by ldapLinkName");
@@ -195,7 +195,7 @@ The ldapLinkId of the ldapLink you're creating an object reference for.
 sub new {
     my ( $ldapLinkId, $ldapLink);
     my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$ldapLinkId = shift;
 	return undef unless $ldapLinkId;
 	$ldapLink = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($ldapLinkId));

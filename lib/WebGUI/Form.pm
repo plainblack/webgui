@@ -60,7 +60,7 @@ Dynamically creates functions on the fly for all the different form control type
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);	
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my @params = @_;
 	my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
@@ -123,7 +123,7 @@ If you want to add anything special to the form header like javascript actions o
 =cut
 
 sub formHeader {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $params = shift;
         my $action = $params->{action} || $session->url->page();
 	my $hidden;

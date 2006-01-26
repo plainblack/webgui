@@ -16,7 +16,7 @@ use WebGUI::HTMLForm;
 
 #-------------------------------------------------------------------
 sub www_formAssetTree {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
@@ -46,7 +46,7 @@ sub www_formAssetTree {
 #-------------------------------------------------------------------
 
 sub www_richEditPageTree {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
@@ -100,7 +100,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 
 #-------------------------------------------------------------------
 sub www_richEditImageTree {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
@@ -125,7 +125,7 @@ sub www_richEditImageTree {
 
 #-------------------------------------------------------------------
 sub www_richEditViewThumbnail {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $image = WebGUI::Asset->newByUrl($session);
 	$session->style->useEmptyStyle("1");
 	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {

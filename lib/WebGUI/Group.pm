@@ -431,7 +431,7 @@ The name of the group you wish to instantiate.
 
 sub find {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $name = shift;
 	my ($groupId) = $session->db->quickArray("select groupId from groups where groupName=".$session->db->quote($name));
 	return WebGUI::Group->new($session,$groupId);
@@ -697,7 +697,7 @@ sub new {
         tie %group, 'Tie::CPHash';
         $class = shift;
 	my $self = {};
-	$self->{_session} = shift; use WebGUI; WebGUI::dumpSession($self->{_session});
+	$self->{_session} = shift;
 	$self->{_groupId} = shift;
 	bless $self, $class;
         $self->_create() if ($self->{_groupId} eq "new");

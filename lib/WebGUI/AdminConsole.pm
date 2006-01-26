@@ -368,7 +368,7 @@ If supplied, updates the _function of the AdminFunction.
 
 sub new {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $id = shift;
 	my $self;
 	$self->{_session} = $session;

@@ -501,7 +501,7 @@ sub confirmTransaction {
 sub init {
 	my ($class, $self);
 	$class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	$self = $class->SUPER::init($session,'ITransact');
 
 	return $self;

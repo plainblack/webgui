@@ -326,7 +326,7 @@ A reference to the current session;
 
 sub create {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $id = $session->id->generate();
 	my $self = $class->get($session,$id); 
 	$self->_makePath;
@@ -348,7 +348,7 @@ A reference to the current session.
 
 sub createTemp {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $id = $session->id->generate();
 	$id =~ m/^(.{2})/;
 	my $self = {_session=>$session, _id => $id, _part1 => 'temp', _part2 => $1};
@@ -409,7 +409,7 @@ The unique identifier for this file system storage location.
 
 sub get {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $id = shift;
 	return undef unless $id;
 	$id =~ m/^(.{2})(.{2})/;

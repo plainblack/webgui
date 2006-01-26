@@ -22,7 +22,7 @@ our $HELP = {
 		fields => [
 		],
 		related => sub {   ##Hey, you gotta pass in the session var, right?
-			     my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+			     my $session = shift;
                              sort { $a->{tag} cmp $b->{tag} }
                              map {
                                  $tag = $_;

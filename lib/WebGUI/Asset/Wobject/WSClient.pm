@@ -31,7 +31,7 @@ sub _create_cache_key {
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $definition = shift;
 my $httpHeaderFieldType;
    if ($session->config->get('soapHttpHeaderOverride')) {

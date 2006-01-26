@@ -80,7 +80,7 @@ The unique id of the category to assign this field to. Defaults to "1" (misc).
 
 sub create {
         my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $fieldName = shift;
         my $properties = shift;
 	my $categoryId = shift || "1";
@@ -412,7 +412,7 @@ The unique name of this field.
 
 sub new {
         my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
         my $id = shift;
         return undef unless ($id);
         my $properties = $session->db->getRow("userProfileField","fieldName",$id);

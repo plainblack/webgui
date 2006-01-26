@@ -28,7 +28,7 @@ be used from the Macro/SubscriptionItem namespace.
 =cut
 
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($subscriptionId, $templateId, %var);
 	($subscriptionId, $templateId) = @_;
 	%var = $session->db->quickHash('select * from subscription where subscriptionId='.$session->db->quote($subscriptionId));

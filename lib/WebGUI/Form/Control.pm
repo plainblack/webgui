@@ -149,7 +149,7 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 sub definition {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
 		formName=>{
@@ -304,7 +304,7 @@ Returns a human readable name for this form control type. You MUST override this
 
 sub getName {
 	my $self = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my $definition = $self->definition($session);
 	return $definition->[0]->{formName}->{defaultValue};
 }
@@ -430,7 +430,7 @@ Please note that an id attribute is automatically added to every form element wi
 
 sub new {
 	my $class = shift;
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my %raw;
 	# deal with a hash reference full of properties
 	if (ref $_[0] eq "HASH") {

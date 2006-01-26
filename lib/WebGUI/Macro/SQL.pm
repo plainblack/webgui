@@ -38,7 +38,7 @@ be used to position its output in the format.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my ($output, @data, $rownum, $temp);
 	my ($statement, $format) = @_;
 	my $i18n = WebGUI::International->new($session,'Macro_SQL');

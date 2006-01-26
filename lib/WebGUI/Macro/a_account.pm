@@ -39,7 +39,7 @@ A template to use for formatting the link.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift; use WebGUI; WebGUI::dumpSession($session);
+	my $session = shift;
 	my %var;
 	my  @param = @_;
 	return $session->url->page("op=auth;method=init") if ($param[0] eq "linkonly");
