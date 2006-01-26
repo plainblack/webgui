@@ -2,6 +2,7 @@
  - Added logic to deal with case sensitivity and whitespace problems in LDAP
    Group matching.
  - fix [ 1397890 ] Can't click directly to page 2+ of a thread
+ - fix [ 1413036 ] Avatar & Photo Profile Fields Broken
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
