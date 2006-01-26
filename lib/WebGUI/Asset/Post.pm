@@ -1090,6 +1090,10 @@ sub www_edit {
 			name=>"userDefined".$x,
 			value=>$self->getValue("userDefined".$x)
 			});
+		$var{'userDefined'.$x.'.form.float'} = WebGUI::Form::Float($self->session, {
+			name=>"userDefined".$x,
+			value=>$self->getValue("userDefined".$x)
+			});
 	}
 	$title = WebGUI::HTML::filter($title,"all");
 	$content = WebGUI::HTML::filter($content,"macros");
