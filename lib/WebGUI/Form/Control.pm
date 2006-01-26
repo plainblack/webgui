@@ -51,6 +51,20 @@ The following methods are available via this package.
 
 #-------------------------------------------------------------------
 
+=head2 privateName ( )
+
+Creates a safe, private name for additional use in multi-part forms
+like File and Image.
+
+=cut
+
+sub privateName {
+	my ($self, $action) = @_;
+	return join '_', '_', $self->{name}, $action;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 Defines the schema or parameters for a form field.
@@ -290,7 +304,7 @@ sub getName {
 
 =head2 fixMacros ( string ) 
 
-Returns the string having converted all macros in the string to HTML entities so that they won't be processed my the macro engine, but instead will be displayed.
+Returns the string having converted all macros in the string to HTML entities so that they won't be processed by the macro engine, but instead will be displayed.
 
 =head3 string
 

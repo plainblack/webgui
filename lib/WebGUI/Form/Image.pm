@@ -53,11 +53,7 @@ The following additional parameters have been added via this sub class.
 
 =head4 name
 
-If no name is specified a default name of "file" will be used.
-
-=head4 maxAttachments
-
-Defaults to 1. Determines how many files the user can upload with this form control.
+If no name is specified a default name of "image" will be used.
 
 =head4 profileEnabled
 
@@ -73,10 +69,7 @@ sub definition {
 			defaultValue=>WebGUI::International::get("image","WebGUI")
 			},
 		name=>{
-			defaultValue=>"file"
-			},
-		maxAttachments=>{
-			defaultValue=>1
+			defaultValue=>"image"
 			},
 		profileEnabled=>{
 			defaultValue=>1
@@ -85,6 +78,33 @@ sub definition {
 	return $class->SUPER::definition($definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 displayForm ( )
+
+If an image is uploaded, then return the image and a control to
+delete it.  Otherwise, display a form element to upload a file.
+
+=cut
+
+sub displayForm {
+	my ($self) = @_;
+	return $self->toHtml unless $self->{value};
+	##There are files inside here, for each one, display the image
+	##and another form control for deleting it.
+	my $location = WebGUI::Storage->get($self->{value});
+	my $id = $location->getId;
+	my $fileForm = '';
+	my $file = shift @{ $location->getFiles };
+	$fileForm .= sprintf qq!<img src="%s" /><br />!, $location->getUrl($file);
+	$fileForm .= WebGUI::International::get(392)
+		  .  "&nbsp"x4
+		  . WebGUI::Form::YesNo->new({-name=>$self->privateName('delete'), -value=>0})->toHtml;
+	$fileForm .= $self->toHtmlAsHidden();
+	$fileForm .= WebGUI::Form::Hidden->new({-name => $self->privateName('action'), -value => 'keep'})->toHtml();
+	return $fileForm;
+}
 
 #-------------------------------------------------------------------
 
