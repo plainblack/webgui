@@ -137,6 +137,7 @@ assets = WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Wobject::Collaboration, \
 	WebGUI::Asset::Wobject::DataForm, \
 	WebGUI::Asset::Wobject::EventsCalendar, \
+	WebGUI::Asset::Wobject::EventManagementSystem, \
 	WebGUI::Asset::Wobject::HttpProxy, \
 	WebGUI::Asset::Wobject::MessageBoard, \
 	WebGUI::Asset::Wobject::Navigation, \

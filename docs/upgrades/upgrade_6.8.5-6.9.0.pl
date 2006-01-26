@@ -23,9 +23,118 @@ my $session = start(); # this line required
 templateParsers();
 removeFiles();
 addSearchEngine();
+addEMSTemplates();
+addEMSTables();
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub addEMSTemplates {
+        print "\tAdding Event Management System Templates.\n" unless ($quiet);
+my $template = <<EOT1;
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p>
+</tmpl_if>
+
+EOT1
+        my $in = WebGUI::Asset->getImportNode($session);
+        $in->addChild({
+                 className=>'WebGUI::Asset::Template',
+                 template=>$template,
+                 namespace=>'EventManagementSystem',
+                 }, "EventManagerTmpl000001"
+        );
+}
+
+#-------------------------------------------------
+sub addEMSTables {
+
+        print "\t Creating Event Management System tables.\n" unless ($quiet);
+
+my $sql1 = <<SQL1;
+
+create table EventManagementSystem (
+ assetId varchar(22) not null,
+ revisionDate bigint(20) not null,
+ displayTemplateId varchar(22),
+ paginateAfter int(11) default 10,
+ groupToAddEvents varchar(22),
+ groupToApproveEvents varchar(22),
+primary key(assetId,revisionDate)
+)
+SQL1
+
+my $sql2 = <<SQL2;
+
+create table EventManagementSystem_products (
+ productId varchar(22) not null,
+ assetId varchar(22),
+ startDate bigint(20),
+ endDate bigint(20),
+ maximumAttendees int(11),
+ approved tinyint,
+ sequenceNumber int(11),
+primary key(productId)
+)
+SQL2
+
+my $sql3 = <<SQL3;
+create table EventManagementSystem_registrations (
+ registrationId varchar(22) not null,
+ productId varchar(22),
+ purchaseId varchar(22),
+ firstName varchar(100),
+ lastName varchar(100),
+ address varchar(100),
+ city varchar(100),
+ state varchar(50),
+ zipCode varchar(15),
+ country varchar(255),
+ phone varchar(50),
+ email varchar(255),
+primary key(registrationId)
+)
+SQL3
+
+my $sql4 = <<SQL4;
+
+create table EventManagementSystem_purchases (
+ purchaseId varchar(22) not null,
+ userId varchar(22),
+primary key(purchaseId)
+)
+SQL4
+
+my $sql5 = <<SQL5;
+
+create table EventManagementSystem_prerequisites (
+ prerequisiteId varchar(22) not null,
+ productId varchar(22),
+ operator varchar(100),
+primary key(prerequisiteId)
+)
+SQL5
+
+my $sql6 = <<SQL6;
+
+create table EventManagementSystem_prerequisiteEvents (
+ prerequisiteEventId varchar(22) not null,
+ prerequisiteId varchar(22),
+ requiredProductId varchar(22),
+primary key(prerequisiteEventId)
+)
+SQL6
+
+        $session->db->write($sql1);
+        $session->db->write($sql2);
+        $session->db->write($sql3);
+        $session->db->write($sql4);
+        $session->db->write($sql5);
+        $session->db->write($sql6);
+
+}
 
 #-------------------------------------------------
 sub addSearchEngine {
