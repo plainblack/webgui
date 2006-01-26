@@ -204,8 +204,8 @@ sub view {
 	#trim locations of whitespace
 	my @locs = ();
 	for (my $i = 0; $i < scalar(@array); $i++) {
-		$array[$i] = $self->_trim($array[$i]);\
-		push (@locs, $self->_getLocationData($array[$i]));
+		$array[$i] = $self->_trim($array[$i]);
+		push(@locs, $self->_getLocationData($array[$i]));
 	}
 	$var->{'ourLocations.loop'} = \@locs;
 	return $self->processTemplate($var, $self->get("templateId"));
