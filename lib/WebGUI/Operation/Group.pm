@@ -254,7 +254,7 @@ sub www_deleteGrouping {
                 my $u = WebGUI::User->new($session,$user);
                 $u->deleteFromGroups(\@groups);
         }
-        return WebGUI::Operation::Group::www_manageUsersInGroup();
+        return WebGUI::Operation::Group::www_manageUsersInGroup($session);
 }
                                                                                                                                                        
 
@@ -486,7 +486,7 @@ sub www_editGroupingSave {
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
         $group->userGroupExpireDate($session->form->process("uid"),$session->datetime->setToEpoch($session->form->process("expireDate")));
         $group->userIsAdmin($session->form->process("uid"),$session->form->process("groupAdmin"));
-        return www_manageUsersInGroup();
+        return www_manageUsersInGroup($session);
 }
 
 #-------------------------------------------------------------------
@@ -671,7 +671,7 @@ sub www_manageUsersInGroup {
         $output .= '</table>'.WebGUI::Form::formFooter($session,);
 	$output .= $p->getBarTraditional;
 	$output .= '<p><h1>'.$i18n->get(976).'</h1>';
-	$output .= WebGUI::Operation::User::getUserSearchForm("manageUsersInGroup",{gid=>$session->form->process("gid")});
+	$output .= WebGUI::Operation::User::getUserSearchForm($session, "manageUsersInGroup",{gid=>$session->form->process("gid")});
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
 	return _submenu($session,$output) unless ($session->form->process("doit") || $userCount < 250 || $session->form->process("pn") > 1);
 	my $f = WebGUI::HTMLForm->new($session);
@@ -688,7 +688,7 @@ sub www_manageUsersInGroup {
 	push(@{$existingUsers},"1");
 	my %users;
 	tie %users, "Tie::IxHash";
-	my $sth = WebGUI::Operation::User::doUserSearch("op=manageUsersInGroup;gid=".$session->form->process("gid"),0,$existingUsers);
+	my $sth = WebGUI::Operation::User::doUserSearch($session, "op=manageUsersInGroup;gid=".$session->form->process("gid"),0,$existingUsers);
 	while (my $data = $sth->hashRef) {
 		$users{$data->{userId}} = $data->{username};
 		$users{$data->{userId}} .= " (".$data->{email}.")" if ($data->{email});
