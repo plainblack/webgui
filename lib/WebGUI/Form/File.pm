@@ -117,7 +117,6 @@ sub displayValue {
 	my ($self) = @_;
 	return '' unless $self->{value};
 	my $location = WebGUI::Storage->get($self->{value});
-	local $_;
 	my $file = shift @{ $location->getFiles };
 	my $fileValue = sprintf qq!<img src="%s" />&nbsp;%s!, $location->getFileIconUrl($file), $file; 
 	return $fileValue;

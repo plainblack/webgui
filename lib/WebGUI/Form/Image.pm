@@ -120,9 +120,8 @@ sub displayValue {
 	my ($self) = @_;
 	return '' unless $self->{value};
 	my $location = WebGUI::Storage->get($self->{value});
-	local $_;
-	my @files = map { sprintf qq!<img src="%s" />!, $location->getUrl($_) } @{ $location->getFiles };
-	my $fileValue = join "<br />\n", @files;
+	my $file = shift @{ $location->getFiles };
+	my $fileValue = sprintf qq!<img src="%s" />&nbsp;%s!, $location->getUrl($file), $file; 
 	return $fileValue;
 	}
 
