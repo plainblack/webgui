@@ -18,39 +18,69 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1131394072,
 		context => q|Field label for Paginate After|
 	},
-	
+
 	'paginate after description' => {
 		message => q|Number of events to display on one page.|,
 		lastUpdated => 1131394072,
 		context => q|Describes the Paginate After field|
 	},
-	
+
 	'group to add events' => {
 		message => q|Group to Add Events|,
 		lastUpdated => 1131394072,
 		context => q|Field label|
 	},
-	
+
 	'group to add events description' => {
 		message => q|Members of the selected group will have the ability to add events to an Event Management System.
 		Events added will not be available for purchase until the event is approved by a member of the Group to Approve Events.|,
 		lastUpdated => 1131394072,
 		context => q|Describes the Group To Add Events field|
 	},
-	
+
 	'group to approve events' => {
 		message => q|Group to Approve Events|,
 		lastUpdated => 1131394072,
 		context => q|Field Label|
 	},
-	
+
 	'group to approve events description' => {
 		message => q|Members of the selected group will have the ability to approve a pending event so that it is available for purchase.|,
 		lastUpdated => 1131394072,
 		context => q|Describes the Group To Approve Events field|
 	},
-	
-	
+
+	'add/edit event title' => {
+		message => q|Event Title|,
+		lastUpdated => 1138312761,
+	},
+
+	'add/edit event title description' => {
+		message => q|Enter the name or title of your event.|,
+		lastUpdated => 1138312761,
+	},
+
+	'add/edit event description' => {
+		message => q|Description|,
+		lastUpdated => 1138312761,
+	},
+
+	'add/edit event description description' => {
+		message => q|The details of your event, such as location, time, and what the event is about.|,
+		lastUpdated => 1138312761,
+	},
+
+	'add/edit event price' => {
+		message => q|Price|,
+		lastUpdated => 1138312761,
+	},
+
+	'add/edit event price description' => {
+		message => q|The cost to attend the event.|,
+		lastUpdated => 1138312761,
+	},
+
+
 	#If the help file documents an Asset, it must include an assetName key
 	#If the help file documents an Macro, it must include an macroName key
 	#For all other types, use topicName

@@ -172,21 +172,21 @@ sub www_editEvent {
 		-name  => "title",
 		-value => $self->session->form->get("title") || $event->{title},
 		-hoverHelp => $i18n->get('add/edit event title description'),
-		-label => "Title" #$i18n->get('add/edit event title')
+		-label => $i18n->get('add/edit event title')
 	);
 	
 	$f->HTMLArea(
 		-name  => "description",
 		-value => $self->session->form->get("description") || $event->{description},
 		-hoverHelp => $i18n->get('add/edit event description description'),
-		-label => "Description" #$i18n->get('add/edit event description')
+		-label => $i18n->get('add/edit event description')
 	);
 	
 	$f->float(
 		-name  => "price",
 		-value => $self->session->form->get("price") || $event->{price},
 		-hoverHelp => $i18n->get('add/edit event price description'),		
-		-label => "Price" #$i18n->get('add/edit event price')
+		-label => $i18n->get('add/edit event price')
 	);
 	
 	$f->template(
