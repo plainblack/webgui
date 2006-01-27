@@ -1178,8 +1178,8 @@ sub manageAssetsSearch {
 	return $output unless ($self->session->form->get("doit"));
 	my $class = $self->session->form->get("class") eq "any" ? undef : $self->session->form->get("class");
 	my $assets = WebGUI::Search->new($self->session,0)->search({
-		keywords=>{terms=>[$self->session->form->get("keywords")]},
-		classes=>{terms=>[$class]}
+		keywords=>$self->session->form->get("keywords"),
+		classes=>[$class]
 		})->getAssets;
       	$output .= "<script type=\"text/javascript\">
    //<![CDATA[

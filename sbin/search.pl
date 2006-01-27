@@ -117,7 +117,7 @@ sub searchSite {
 	my $keywords = shift;
 	my $t = [Time::HiRes::gettimeofday()];
 	my $search = WebGUI::Search->new($session, 0);
-	$search->search({keywords=>{terms=>[$keywords]}});
+	$search->search({keywords=>$keywords});
 	my $rs = $search->getResultSet;	
 	while (my $data = $rs->hashRef) {
 		print $data->{assetId}."\t".$data->{title}."\n"; 
