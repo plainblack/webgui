@@ -1,5 +1,87 @@
 #PBtmpl0000000000000077
-<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a><tmpl_if session.var.adminOn>	<p><tmpl_var controls></p></tmpl_if>
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
 
-^RawHeadTags(<style type="text/css">.forumHead {	background-color: #eeeeee;	border-bottom: 1px solid #cccccc;	padding: 2px;	padding-bottom: 4px;	font-size: 13px;	font-weight: bold;}.oddThread {	font-size: 13px;	border-bottom: 1px dashed #83cc83;	padding-bottom: 4px;}.evenThread {	font-size: 13px;	border-bottom: 1px dashed #aaaaff;	padding-bottom: 4px;}</style>);
-<tmpl_if displayTitle>	<h2><tmpl_var title></h2></tmpl_if><tmpl_if description>	<tmpl_var description></tmpl_if><p>	<tmpl_if user.canPost>		<a href="<tmpl_var add.url>"><tmpl_var add.label></a>		&#149;	</tmpl_if>	<tmpl_unless user.isVisitor>		<tmpl_if user.isSubscribed>			<a href="<tmpl_var unsubscribe.url>"><tmpl_var unsubscribe.label></a>		<tmpl_else>			<a href="<tmpl_var subscribe.url>"><tmpl_var subscribe.label></a>		</tmpl_if>		&#149;	</tmpl_unless>	<a href="<tmpl_var search.url>"><tmpl_var search.label></a></p><table width="100%"><tr>	<tmpl_if user.isModerator>		<td class="forumHead"><tmpl_var status.label></td>	</tmpl_if>	<td class="forumHead"><tmpl_var job.title.label></td>	<td class="forumHead"><tmpl_var location.label></td>	<td class="forumHead"><tmpl_var compensation.label></td>	<td class="forumHead"><tmpl_var date.label></td></tr><tmpl_loop post_loop><tr>	<tmpl_if user.isModerator>		<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var status></td>	</tmpl_if>	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><a href="<tmpl_var url>"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var userDefined2></td>	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var userDefined1></td>	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var dateSubmitted.human></td></tr></tmpl_loop></table><tmpl_if pagination.pageCount.isMultiple>	<div class="pagination">		<tmpl_var pagination.previousPage> &#183; <tmpl_var pagination.pageList.upTo10> &#183; <tmpl_var pagination.nextPage>	</div></tmpl_if>
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+</tmpl_if>
+
+<p>
+	<tmpl_if user.canPost>
+		<a href="<tmpl_var add.url>"><tmpl_var add.label></a>
+		&#149;
+	</tmpl_if>
+	<tmpl_unless user.isVisitor>
+		<tmpl_if user.isSubscribed>
+			<a href="<tmpl_var unsubscribe.url>"><tmpl_var unsubscribe.label></a>
+		<tmpl_else>
+			<a href="<tmpl_var subscribe.url>"><tmpl_var subscribe.label></a>
+		</tmpl_if>
+		&#149;
+	</tmpl_unless>
+	<a href="<tmpl_var search.url>"><tmpl_var search.label></a>
+</p>
+
+<table width="100%">
+<tr>
+	<tmpl_if user.isModerator>
+		<td class="forumHead"><tmpl_var status.label></td>
+	</tmpl_if>
+	<td class="forumHead"><tmpl_var job.title.label></td>
+	<td class="forumHead"><tmpl_var location.label></td>
+	<td class="forumHead"><tmpl_var compensation.label></td>
+	<td class="forumHead"><tmpl_var date.label></td>
+</tr>
+
+<tmpl_loop post_loop>
+<tr>
+	<tmpl_if user.isModerator>
+		<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var status></td>
+	</tmpl_if>
+	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><a href="<tmpl_var url>"><tmpl_var title></a><tmpl_if user.isPoster> (<tmpl_var status>)</tmpl_if></td>
+	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var userDefined2></td>
+	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var userDefined1></td>
+	<td class="<tmpl_if __ODD__>oddThread<tmpl_else>evenThread</tmpl_if>"><tmpl_var dateSubmitted.human></td>
+</tr>
+</tmpl_loop>
+</table>
+
+<tmpl_if pagination.pageCount.isMultiple>
+	<div class="pagination">
+		<tmpl_var pagination.previousPage> &#183; <tmpl_var pagination.pageList.upTo10> &#183; <tmpl_var pagination.nextPage>
+	</div>
+</tmpl_if>
+~~~
+
+<style type="text/css">
+
+.forumHead {
+	background-color: #eeeeee;
+	border-bottom: 1px solid #cccccc;
+	padding: 2px;
+	padding-bottom: 4px;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.oddThread {
+	font-size: 13px;
+	border-bottom: 1px dashed #83cc83;
+	padding-bottom: 4px;
+}
+
+.evenThread {
+	font-size: 13px;
+	border-bottom: 1px dashed #aaaaff;
+	padding-bottom: 4px;
+}
+</style>
+
+

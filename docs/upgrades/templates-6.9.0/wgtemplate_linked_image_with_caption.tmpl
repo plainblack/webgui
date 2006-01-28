@@ -1,2 +1,61 @@
 #PBtmpl0000000000000115
-<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a><tmpl_if session.var.adminOn>	<p><tmpl_var controls></p></tmpl_if><tmpl_if displayTitle>	<h2><tmpl_var title></h2></tmpl_if><tmpl_if pagination.isFirstPage><tmpl_if image.url>	<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td class="content">		<table align="right">		<tr><td align="center">			<tmpl_if linkUrl>				<a href="<tmpl_var linkUrl>">				<img src="<tmpl_var image.url>" alt="<tmpl_var image.url>" border="0" /><br /><tmpl_var linkTitle>				</a>			<tmpl_else>				<img src="<tmpl_var image.url>" alt="<tmpl_var image.url>" border="0" /><br /><tmpl_var linkTitle>			</tmpl_if>		</td></tr>		</table></tmpl_if></tmpl_if><tmpl_if description>	<tmpl_var description>	<p /></tmpl_if><tmpl_if pagination.isLastPage>	<tmpl_var attachment.box>	<p /></tmpl_if><tmpl_if pagination.isFirstPage><tmpl_if image.url>	</td></tr></table></tmpl_if></tmpl_if><tmpl_if pagination.pageCount.isMultiple><tmpl_var pagination.previousPage>&#183;<tmpl_var pagination.pageList.upTo20>&#183;<tmpl_var pagination.nextPage></tmpl_if><tmpl_if pagination.isLastPage><tmpl_if allowDiscussion>	<p />	<table width="100%" cellspacing="2" cellpadding="1" border="0">	<tr><td align="center" width="50%" class="tableMenu"><a href="<tmpl_var replies.URL>"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>	<td align="center" width="50%" class="tableMenu"><a href="<tmpl_var post.url>"><tmpl_var post.label></a></td></tr>	</table></tmpl_if></tmpl_if>
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if pagination.isFirstPage>
+<tmpl_if image.url>
+	<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td class="content">
+		<table align="right">
+		<tr><td align="center">
+			<tmpl_if linkUrl>
+				<a href="<tmpl_var linkUrl>">
+				<img src="<tmpl_var image.url>" alt="<tmpl_var image.url>" border="0" /><br /><tmpl_var linkTitle>
+				</a>
+			<tmpl_else>
+				<img src="<tmpl_var image.url>" alt="<tmpl_var image.url>" border="0" /><br /><tmpl_var linkTitle>
+			</tmpl_if>
+		</td></tr>
+		</table>
+</tmpl_if>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+	<p />
+</tmpl_if>
+
+<tmpl_if pagination.isLastPage>
+	<tmpl_var attachment.box>
+	<p />
+</tmpl_if>
+
+<tmpl_if pagination.isFirstPage>
+<tmpl_if image.url>
+	</td></tr></table>
+</tmpl_if>
+</tmpl_if>
+
+<tmpl_if pagination.pageCount.isMultiple>
+<tmpl_var pagination.previousPage>
+&#183;
+<tmpl_var pagination.pageList.upTo20>
+&#183;
+<tmpl_var pagination.nextPage>
+</tmpl_if>
+
+<tmpl_if pagination.isLastPage>
+<tmpl_if allowDiscussion>
+	<p />
+	<table width="100%" cellspacing="2" cellpadding="1" border="0">
+	<tr><td align="center" width="50%" class="tableMenu"><a href="<tmpl_var replies.URL>"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>
+	<td align="center" width="50%" class="tableMenu"><a href="<tmpl_var post.url>"><tmpl_var post.label></a></td></tr>
+	</table>
+</tmpl_if>
+</tmpl_if>

@@ -1,2 +1,64 @@
 #PBtmpl0000000000000083
-<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a><tmpl_if session.var.adminOn>	<tmpl_var controls></tmpl_if><tmpl_if displayTitle>	<h2><tmpl_var title></h2></tmpl_if><tmpl_if description>	<tmpl_var description></tmpl_if><p>	<tmpl_if user.canPost>		<a href="<tmpl_var add.url>">[<tmpl_var add.label>]</a>	</tmpl_if>	<tmpl_unless user.isVisitor>		<tmpl_if user.isSubscribed>			<a href="<tmpl_var unsubscribe.url>">[<tmpl_var unsubscribe.label>]</a>		<tmpl_else>			<a href="<tmpl_var subscribe.url>">[<tmpl_var subscribe.label>]</a>		</tmpl_if>	</tmpl_unless>	<tmpl_if pagination.pageCount.isMultiple>		<a href="<tmpl_var search.url>">[<tmpl_var search.label>]</a>	</tmpl_if></p><tmpl_loop post_loop>	<tmpl_if user.isPoster>		<tmpl_unless session.var.adminOn>			<div>[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]</div>		</tmpl_unless>	</tmpl_if>	<tmpl_if user.isModerator>		<div>			<tmpl_if session.var.adminOn>				<tmpl_var controls>			<tmpl_else>				<tmpl_unless user.isPoster>					<tmpl_unless session.var.adminOn>						[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]					</tmpl_unless>				</tmpl_unless>			</tmpl_if>			(<a href="<tmpl_var url>"><tmpl_var status></a>)		</div>	</tmpl_if>	<p>		<tmpl_if userDefined1><a href="<tmpl_var userDefined1>"	<tmpl_if userDefined2>target="_blank"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>		<tmpl_if content>				  - <tmpl_var content>		</tmpl_if>	</p></tmpl_loop><tmpl_if pagination.pageCount.isMultiple>	<div class="pagination">		<tmpl_var pagination.previousPage> &#183; <tmpl_var pagination.pageList.upTo10> &#183; <tmpl_var pagination.nextPage>	</div></tmpl_if>
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<tmpl_var controls>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+</tmpl_if>
+
+<p>
+	<tmpl_if user.canPost>
+		<a href="<tmpl_var add.url>">[<tmpl_var add.label>]</a>
+	</tmpl_if>
+	<tmpl_unless user.isVisitor>
+		<tmpl_if user.isSubscribed>
+			<a href="<tmpl_var unsubscribe.url>">[<tmpl_var unsubscribe.label>]</a>
+		<tmpl_else>
+			<a href="<tmpl_var subscribe.url>">[<tmpl_var subscribe.label>]</a>
+		</tmpl_if>
+	</tmpl_unless>
+	<tmpl_if pagination.pageCount.isMultiple>
+		<a href="<tmpl_var search.url>">[<tmpl_var search.label>]</a>
+	</tmpl_if>
+</p>
+
+<tmpl_loop post_loop>
+	<tmpl_if user.isPoster>
+		<tmpl_unless session.var.adminOn>
+			<div>[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]</div>
+		</tmpl_unless>
+	</tmpl_if>
+	<tmpl_if user.isModerator>
+		<div>
+			<tmpl_if session.var.adminOn>
+				<tmpl_var controls>
+			<tmpl_else>
+				<tmpl_unless user.isPoster>
+					<tmpl_unless session.var.adminOn>
+						[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]
+					</tmpl_unless>
+				</tmpl_unless>
+			</tmpl_if>
+			(<a href="<tmpl_var url>"><tmpl_var status></a>)
+		</div>
+	</tmpl_if>
+	<p>
+		<tmpl_if userDefined1><a href="<tmpl_var userDefined1>"	<tmpl_if userDefined2>target="_blank"</tmpl_if>></tmpl_if><tmpl_var title><tmpl_if userDefined1></a></tmpl_if>
+		<tmpl_if content>
+				  - <tmpl_var content>
+		</tmpl_if>
+	</p>
+</tmpl_loop>
+
+<tmpl_if pagination.pageCount.isMultiple>
+	<div class="pagination">
+		<tmpl_var pagination.previousPage> &#183; <tmpl_var pagination.pageList.upTo10> &#183; <tmpl_var pagination.nextPage>
+	</div>
+</tmpl_if>

@@ -25,8 +25,63 @@ removeFiles();
 addSearchEngine();
 addEMSTemplates();
 addEMSTables();
+updateTemplates();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub updateTemplates {
+        print "\tUpdating base templates for XHTML compliance, and a cleaner look.\n" unless ($quiet);
+	$session->db->write("alter table template add column headBlock text");
+	opendir(DIR,"templates-6.9.0");
+	my @files = readdir(DIR);
+	closedir(DIR);
+	my $importNode = WebGUI::Asset->getImportNode($session);
+	my $folder = $importNode->addChild({
+		className=>"WebGUI::Asset::Wobject::Folder",
+		title => "6.9.0 New Templates",
+		menuTitle => "6.9.0 New Templates",
+		url=> "6_9_0_new_templates",
+		groupIdView=>"12"
+		});
+	$folder->commit;
+	foreach my $file (@files) {
+		next unless ($file =~ /\.tmpl$/);
+		open(FILE,"<templates-6.9.0/".$file);
+		my $first = 1;
+		my $create = 0;
+		my $head = 0;
+		my %properties = (className=>"WebGUI::Asset::Template");
+		while (my $line = <FILE>) {
+			if ($first) {
+				$line =~ m/^\#(.*)$/;
+				$properties{id} = $1;
+				$first = 0;
+			} elsif ($line =~ m/^\#create$/) {
+				$create = 1;
+			} elsif ($line =~ m/^\#(.*):(.*)$/) {
+				$properties{$1} = $2;
+			} elsif ($line =~ m/^~~~$/) {
+				$head = 1;
+			} elsif ($head) {
+				$properties{headBlock} .= $line;
+			} else {
+				$properties{template} .= $line;	
+			}
+		}
+		close(FILE);
+		if ($create) {
+			my $template = $folder->addChild(\%properties, $properties{id});
+			$template->commit;
+		} else {
+			my $template = WebGUI::Asset->new($properties{id}, "WebGUI::Asset::Template");
+			if (defined $template) {
+				my $newRevision = $template->addRevision(\%propertes);
+				$newRevision->commit;
+			}
+		}
+	}
+}
 
 #-------------------------------------------------
 sub addEMSTemplates {
