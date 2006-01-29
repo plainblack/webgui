@@ -211,7 +211,20 @@ sub definition {
 
 #-------------------------------------------------------------------
 sub www_deleteEvent {
-
+	my $self = shift;
+	my $eventId = $self->session->form->get("id");
+	
+	#Remove this event as a prerequisite to any other event
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredEventId=".
+				   $self->session->db->quote($eventId));
+	
+	#Check for orphaned prerequisite definitions
+	my @orphans = $self->session->db->quickArray("select p.prerequisiteId from EventManagementSystem_prerequisites as p 
+							left join EventManagementSystem_prerequisiteEvents as pe 
+							on p.prerequisiteId = pe.prerequisiteId 
+							where pe.prerequisiteId is null"); 
+			  
+	
 
 }
 
@@ -434,18 +447,23 @@ sub www_editEventSave {
 
 #-------------------------------------------------------------------
 sub www_moveEventDown {
+	my $self = shift;
+	my $eventId = $self->session->form->get("pid");
+	
+	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $eventId);
 
-
-
+	return $self->www_manageEvents;
 }
 
 #-------------------------------------------------------------------
 sub www_moveEventUp {
-
-
+	my $self = shift;
+	my $eventId = $self->session->form->get("pid");
+	
+	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $eventId);
+	
+	return $self->www_manageEvents;
 }
-
-
 
 #-------------------------------------------------------------------
 sub www_manageEvents {
