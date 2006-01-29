@@ -119,6 +119,7 @@ create table EventManagementSystem (
  paginateAfter int(11) default 10,
  groupToAddEvents varchar(22),
  groupToApproveEvents varchar(22),
+ globalPrerequisites tinyint default 1,
 primary key(assetId,revisionDate)
 )
 SQL1

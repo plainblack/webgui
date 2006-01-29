@@ -95,13 +95,22 @@ sub getRequiredEventNames {
 # b) any events currently assigned as a prerequisite to the eventId parameter passed in
 # as a hash reference with the productId, and title
 #
+# Checks property globalPrerequisites to determine if events from all defined Event Managers should be displayed
+# or only the events defined in this particular Event Manager
+#
 sub getPrerequisiteEventList {
 	my $self = shift;
 	my $eventId = shift;
+	my $conditionalWhere;
+	
+	if ($self->get("globalPrerequisites") == 0) {
+		$conditionalWhere = "and e.assetId=".$self->session->db->quote($self->get('assetId'));
+	}
 	
 	my $sql = "select p.productId, p.title from products as p, EventManagementSystem_products as e
 		   where p.productId = e.productId 
 		         and p.productId !=".$self->session->db->quote($eventId)."
+		         $conditionalWhere
 		         and p.productId not in
 		         (select requiredProductId from EventManagementSystem_prerequisites as p,
 							EventManagementSystem_prerequisiteEvents as pe 
@@ -181,6 +190,13 @@ sub definition {
 				hoverHelp=>$i18n->get('group to approve events description'),
 				label=>$i18n->get('group to approve events')
 				},
+			globalPrerequisites  =>{
+				fieldType=>"yesNo",
+				defaultValue=>1,
+				tab=>"properties",
+				hoverHelp=>"When set to yes, you may assign events belonging to another instance of an Event Management System Asset as a prerequisite event for one of the events defined in this instance os the asset.  When set to no, only events defined within this instance of the asset may be used as prerequisites.",
+				label=>"Global Prerequisites"
+				},
 		);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -191,6 +207,12 @@ sub definition {
 		properties=>\%properties
 		});
 	return $class->SUPER::definition($session,$definition);
+}
+
+#-------------------------------------------------------------------
+sub www_deleteEvent {
+
+
 }
 
 #-------------------------------------------------------------------
@@ -331,11 +353,13 @@ sub www_editEvent {
 		foreach my $event (@$eventNames) {
 			$events .= "$event ".$list->{$prerequisiteId}." ";
 		}
+		$events =~ s/(and\s|or\s)$//;
 		
 		$f->readOnly( -value => $line.$events );
 	}
 
 	my $output = $f->print;
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),"Manage Events");
 	return $self->getAdminConsole->render($output, "Add/Edit Event");				
 }
 
@@ -405,7 +429,57 @@ sub www_editEventSave {
 	}
 	
 	return $self->www_editEvent if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
-	return $self->www_view;
+	return $self->www_manageEvents;
+}
+
+#-------------------------------------------------------------------
+sub www_moveEventDown {
+
+
+
+}
+
+#-------------------------------------------------------------------
+sub www_moveEventUp {
+
+
+}
+
+
+
+#-------------------------------------------------------------------
+sub www_manageEvents {
+	my $self = shift;
+	my $output;
+	my $sth = $self->session->db->read("select p.productId, p.title, pe.approved from products as p, 
+				EventManagementSystem_products as pe where p.productId = pe.productId
+				and pe.assetId=".$self->session->db->quote($self->get("assetId"))." order by sequenceNumber");
+	
+	$output = "<table width='100%'><tr><th>Event</th><th>Status</th></tr>";
+	while (my %row = $sth->hash) {
+		
+		$output .= "<tr><td>";
+		$output .= $self->session->icon->delete('func=deleteEvent;pid='.$row{productId}, $self->getUrl,
+						       'Are you sure you want to delete this event?').
+			  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
+			  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
+			  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
+			  " ".$row{title};
+		$output .= "</td><td>";
+		
+		if ($row{pending} == 0) {
+			$output .= "Pending";
+		}
+		else {
+			$output .= "Approved";
+		}
+		
+		$output .= "</td></tr>";
+	}
+	$output .= "</table>";
+
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), "Add Event");
+	return $self->getAdminConsole->render($output, "Manage Events");
 }
 
 #-------------------------------------------------------------------
