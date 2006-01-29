@@ -71,10 +71,12 @@ sub updateTemplates {
 		}
 		close(FILE);
 		if ($create) {
+			sleep(1);
 			my $template = $folder->addChild(\%properties, $properties{id});
 			$template->commit;
 		} else {
-			my $template = WebGUI::Asset->new($properties{id}, "WebGUI::Asset::Template");
+			sleep(1);
+			my $template = WebGUI::Asset->new($session,$properties{id}, "WebGUI::Asset::Template");
 			if (defined $template) {
 				my $newRevision = $template->addRevision(\%properties);
 				$newRevision->commit;
