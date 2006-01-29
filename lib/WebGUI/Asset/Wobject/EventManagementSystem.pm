@@ -58,6 +58,60 @@ sub checkRequiredFields {
 }
 
 #------------------------------------------------------------------
+#
+# Returns prerequisiteId of every prerequisite grouping assigned to eventId passed in.
+#
+sub getAssignedPrerequisites {
+	my $self = shift;
+	my $eventId = shift;
+	
+	my $sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
+		   where productId=".$self->session->db->quote($eventId);
+	
+	return $self->session->db->buildHashRef($sql); 
+}
+
+#------------------------------------------------------------------
+#
+# Returns names of every event assigned to the prerequisite grouping of the prerequisite group id passed in
+#
+sub getRequiredEventNames {
+	my $self = shift;
+	my $prerequisiteId = shift;
+	
+	my $sql = "select title from products as p, EventManagementSystem_prerequisites as pr, EventManagementSystem_prerequisiteEvents as pe
+		   where 
+		     pe.requiredProductId = p.productId 
+		     and pr.prerequisiteId = pe.prerequisiteId 
+		     and pr.prerequisiteId=".$self->session->db->quote($prerequisiteId);
+	
+	return $self->session->db->buildArrayRef($sql);
+}
+
+#------------------------------------------------------------------
+#
+# This method returns all events except for
+# a) the event matching the eventId parameter passed in AND
+# b) any events currently assigned as a prerequisite to the eventId parameter passed in
+# as a hash reference with the productId, and title
+#
+sub getPrerequisiteEventList {
+	my $self = shift;
+	my $eventId = shift;
+	
+	my $sql = "select p.productId, p.title from products as p, EventManagementSystem_products as e
+		   where p.productId = e.productId 
+		         and p.productId !=".$self->session->db->quote($eventId)."
+		         and p.productId not in
+		         (select requiredProductId from EventManagementSystem_prerequisites as p,
+							EventManagementSystem_prerequisiteEvents as pe 
+			  where p.prerequisiteId = pe.prerequisiteId 
+			        and p.productId=".$self->session->db->quote($eventId).")";
+	
+	return $self->session->db->buildHashRef($sql);
+}
+
+#------------------------------------------------------------------
 sub validateEditEventForm {
   my $self = shift;
   my $errors;
@@ -155,7 +209,7 @@ sub www_editEvent {
 		where
 		       p.productId = e.productId and p.productId=".$self->session->db->quote($pid)
 	); 
-	
+
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 	
 	# Errors
@@ -228,9 +282,58 @@ sub www_editEvent {
 		-defaultValue => 100,
 		-hoverHelp => $i18n->get('add/edit event maximum attendees description'),
 		-label => "Maximum Attendees" #$i18n->get('add/edit event maximum attendees')
-	);	
+	);
+
+	my $prerequisiteList = $self->getPrerequisiteEventList($pid);
+        if ( scalar(keys %{$prerequisiteList}) > 0) {
+	 $f->checkList(
+		-name    => "eventList",
+		-options => $prerequisiteList,
+		-vertical  => 1,
+		-label   => "Required Events",
+		-sortByValue => 1
+	 );
+
+	 $f->radioList(
+		-name  => "requirement",
+		-options => { "and" => "And",
+			      "or"  => "Or",
+			    },
+		-label => "Operator",
+		-defaultValue => "and"
+	 );
+
+	 $f->selectBox(
+		-name  => "whatNext",
+		-label => "What Next",
+		-options => {
+			"addAnotherPrereq" => "Add Another Prerequisite",
+			"return"	   => "Return to Manage Events"
+			    },
+		-defaultValue => "return"
+	 );
+
+        }
 
 	$f->submit;
+
+	#Display Currently Assigned Prerequisites if any
+	$f->readOnly( -value => "<br>Assigned Prerequisites<br><br>" );
+	
+	my $list = $self->getAssignedPrerequisites($pid);
+	foreach my $prerequisiteId (keys %{$list}) {
+	
+		my $line = $self->session->icon->delete('func=deletePrerequisite;id='.$prerequisiteId,
+							 $self->getUrl, "Are you sure you want to delete this prerequisite?")." ";
+		
+		my $eventNames = $self->getRequiredEventNames($prerequisiteId);
+		my $events;
+		foreach my $event (@$eventNames) {
+			$events .= "$event ".$list->{$prerequisiteId}." ";
+		}
+		
+		$f->readOnly( -value => $line.$events );
+	}
 
 	my $output = $f->print;
 	return $self->getAdminConsole->render($output, "Add/Edit Event");				
@@ -276,7 +379,32 @@ sub www_editEventSave {
 	else { # Updating the row
 		$self->session->db->setRow("products", "productId", $event);
 	}
+	
+	# Save the prerequisites
+	my $prerequisiteList = $self->session->form->process("eventList", "checkList");
 
+	unless ($prerequisiteList eq "") {
+		my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
+				{
+				 prerequisiteId  => "new",
+				 productId       => $pid,
+				 operator	 => $self->session->form->get("requirement")
+				},0,0
+		);
+		
+		my @list = split(/\n/, $prerequisiteList);
+		foreach my $requiredEvent (@list) {
+			$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",
+				{
+				 prerequisiteEventId => "new",
+				 prerequisiteId      => $prerequisiteId,
+				 requiredProductId   => $requiredEvent
+				},0,0
+			);
+		}
+	}
+	
+	return $self->www_editEvent if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
 	return $self->www_view;
 }
 
