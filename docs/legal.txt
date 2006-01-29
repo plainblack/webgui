@@ -8,26 +8,15 @@ reserved.
 WebGUI is a trademark of Plain Black Corporation.
 
 WebGUI is free software; you can redistribute it and/or modify it 
-under the terms of the GNU General Public License as published by 
-the Free Software Foundation; either version 2 of the License, or 
-(at your option) any later version.
+under the terms of the GNU General Public License (version 2) as 
+published by the Free Software Foundation and as distributed
+with this package in "docs/license.txt".
 
 WebGUI is distributed in the hope that it will be useful, but 
 WITHOUT ANY WARRANTY; without even the implied warranty of 
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
 General Public License for more details. However, support may be
-purchased from Plain Black at
-http://www.plainblack.com/support_programs
-
-You should have received a copy of the GNU General Public License 
-along with this program in a file called "license.txt". If not you 
-can download it at 
-http://www.opensource.org/licenses/gpl-license.html or write to:
- 
-	Free Software Foundation, Inc. 
-	59 Temple Place, Suite 330 
-	Boston, MA 02111-1307 
-	USA
+purchased from Plain Black at http://www.plainblack.com/
 
 For more information about Plain Black or WebGUI, please visit 
 http://www.plainblack.com or email info@plainblack.com.
