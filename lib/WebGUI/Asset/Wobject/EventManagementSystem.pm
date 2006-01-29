@@ -121,6 +121,23 @@ sub getPrerequisiteEventList {
 }
 
 #------------------------------------------------------------------
+sub deleteOrphans {
+	my $self = shift;
+	
+	#Check for orphaned prerequisite definitions
+	my @orphans = $self->session->db->quickArray("select p.prerequisiteId from EventManagementSystem_prerequisites as p 
+							left join EventManagementSystem_prerequisiteEvents as pe 
+							on p.prerequisiteId = pe.prerequisiteId 
+							where pe.prerequisiteId is null");
+	foreach my $orphan (@orphans) {
+		$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=".
+					   $self->session->db->quote($orphan));
+		
+
+	} 
+}
+
+#------------------------------------------------------------------
 sub validateEditEventForm {
   my $self = shift;
   my $errors;
@@ -212,20 +229,32 @@ sub definition {
 #-------------------------------------------------------------------
 sub www_deleteEvent {
 	my $self = shift;
-	my $eventId = $self->session->form->get("id");
+	my $eventId = $self->session->form->get("pid");
 	
 	#Remove this event as a prerequisite to any other event
-	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredEventId=".
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=".
+				   $self->session->db->quote($eventId));
+	$self->deleteOrphans;	
+
+	#Remove the event
+	$self->deleteCollateral('EventManagementSystem_products', 'productId', $eventId);
+	$self->session->db->write("delete from products where productId=".$self->session->db->quote($eventId));
+	$self->reorderCollateral('EventManagementSystem_products', 'productId');
+
+	return $self->www_manageEvents;			  
+}
+
+#-------------------------------------------------------------------
+sub www_deletePrerequisite {
+	my $self = shift;
+	my $eventId = $self->session->form->get("id");
+	
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=".
+				   $self->session->db->quote($eventId));
+	$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=".
 				   $self->session->db->quote($eventId));
 	
-	#Check for orphaned prerequisite definitions
-	my @orphans = $self->session->db->quickArray("select p.prerequisiteId from EventManagementSystem_prerequisites as p 
-							left join EventManagementSystem_prerequisiteEvents as pe 
-							on p.prerequisiteId = pe.prerequisiteId 
-							where pe.prerequisiteId is null"); 
-			  
-	
-
+	return $self->www_editEvent;
 }
 
 #-------------------------------------------------------------------
