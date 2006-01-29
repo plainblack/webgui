@@ -78,7 +78,7 @@ sub definition {
 				tab=>"properties",
 				hoverHelp=>$i18n->get("class limiter description"),
 				label=>$i18n->get("class limiter"),
-				options=>$session->db->buildHashRef("select distinct()")
+				options=>$session->db->buildHashRef("select distinct(className) from asset")
 		);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -102,8 +102,15 @@ returns the output.
 
 sub view {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, "Asset_Search");
 	my %var;
-	return $self->processTemplate(\%var, $templateId);
+	$var{'form_header'} = WebGUI::Form::formHeader($self->session, {action=>$self->getUrl})
+		.WebGUI::Form::hidden($self->session,{name=>"doit", value=>"1"});
+	$var{'form_footer'} = WebGUI::Form::formFooter($self->session);
+	$var{'form_submit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get("search")});
+	$var{'form_keywords'} = WebGUI::Form::text($self->session, {name=>"keywords", value=>$self->session->form->get("keywords")});
+
+#	return $self->processTemplate(\%var, $templateId);
 }
 
 1;
