@@ -41,6 +41,9 @@ sub addSessionVars {
 	$vars->{"session.var.adminOn"} = $self->session->var->isAdminOn;
 	$vars->{"session.setting.companyName"} = $self->session->setting->get("companyName");
 	$vars->{"session.setting.anonymousRegistration"} = $self->session->setting->get("anonymousRegistration");
+	foreach my $field ($self->session->form->param) {
+		$vars->{"session.form.".$field} = $self->session->form->param($field);
+	}
 	$vars->{"webgui.version"} = $WebGUI::VERSION;
 	$vars->{"webgui.status"} = $WebGUI::STATUS;
 	return $vars;
