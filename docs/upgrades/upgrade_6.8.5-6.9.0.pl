@@ -76,7 +76,7 @@ sub updateTemplates {
 		} else {
 			my $template = WebGUI::Asset->new($properties{id}, "WebGUI::Asset::Template");
 			if (defined $template) {
-				my $newRevision = $template->addRevision(\%propertes);
+				my $newRevision = $template->addRevision(\%properties);
 				$newRevision->commit;
 			}
 		}
