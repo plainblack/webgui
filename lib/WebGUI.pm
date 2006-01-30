@@ -117,6 +117,9 @@ sub page {
 		}
 		$output = "An error was encountered while processing your request." if $output eq '';
 	}
+	if ($session->errorHandler->canShowDebug()) {
+		$output .= $session->errorHandler->showDebug();
+	}
 	return $output;
 }
 

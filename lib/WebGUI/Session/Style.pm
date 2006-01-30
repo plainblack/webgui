@@ -212,13 +212,12 @@ if ($self->session->user->isInGroup(2)) {
 	} else {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
 	}
-	WebGUI::Macro::process(\$output);
+	WebGUI::Macro::process($self->session,\$output);
         my $macroHeadTags = $self->generateAdditionalHeadTags();
-	WebGUI::Macro::process(\$macroHeadTags);
         $output =~ s/\<\!--morehead--\>/$macroHeadTags/;	
-	if ($self->session->errorHandler->canShowDebug()) {
-		$output .= $self->session->errorHandler->showDebug();
-	}
+#	if ($self->session->errorHandler->canShowDebug()) {
+#		$output .= $self->session->errorHandler->showDebug();
+#	}
 	return $output;
 }	
 
