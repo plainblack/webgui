@@ -54,6 +54,11 @@ The following additional parameters have been added via this sub class.
 
 If no name is specified a default name of "file" will be used.
 
+=head4 maxAttachments
+
+How many attachments will be allowed to be uploaded.  However, the file form
+only supports displaying/deleting 1 attachment.
+
 =head4 profileEnabled
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
@@ -69,6 +74,9 @@ sub definition {
 			},
 		name=>{
 			defaultValue=>"file"
+			},
+		maxAttachments=>{
+			defaultValue=>1
 			},
 		profileEnabled=>{
 			defaultValue=>1
@@ -182,7 +190,7 @@ sub toHtml {
                         $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$session{config}{extrasURL}.'/fileIcons/'.$file.'";'."\n";
                 }
         }
-        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->{name}.'", fileIcons, "'.WebGUI::International::get('removeLabel','WebGUI').'","'.1.'");
+        $uploadControl .= 'var uploader = new FileUploadControl("'.$self->{name}.'", fileIcons, "'.WebGUI::International::get('removeLabel','WebGUI').'","'.$self->{'maxAttachments'}.'");
         uploader.addRow();
         </script>';
 	$uploadControl .= WebGUI::Form::Hidden->new({-name => $self->privateName('action'), -value => 'upload'})->toHtml();
