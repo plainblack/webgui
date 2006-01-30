@@ -505,13 +505,6 @@ sub indexContent {
 
 
 #-------------------------------------------------------------------
-sub view {
-	my $self = shift;
-	return '<p>'.$self->getToolbar.'</p>' if ($self->session->var->get("adminOn"));
-	return undef;
-}
-
-#-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;

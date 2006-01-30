@@ -319,17 +319,6 @@ sub processRaw {
 
 
 #-------------------------------------------------------------------
-sub view {
-	my $self = shift;
-	if ($self->session->var->isAdminOn()) {
-		return $self->getToolbar;
-	} else {
-		return "";
-	}
-}
-
-
-#-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
         return $self->session->privilege->nsufficient() unless $self->canEdit;

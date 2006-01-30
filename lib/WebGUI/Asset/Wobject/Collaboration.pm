@@ -783,6 +783,23 @@ sub isSubscribed {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
         my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->get("groupIdView") || $self->session->form->process("moderateGroupId") ne $self->get("moderateGroupId"));
@@ -937,7 +954,7 @@ sub view {
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);
-	return $self->processTemplate(\%var,$self->get("collaborationTemplateId"));
+	return $self->processTemplate(\%var,undef, $self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

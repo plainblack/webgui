@@ -401,10 +401,12 @@ See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-sub prepareView {
+sub p1repareView {
 	my $self = shift;
+	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare;
+	$self->{_viewTemplate} = $template;
 }
 
 
@@ -585,9 +587,9 @@ sub www_edit {
 Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
 
 =cut
+
 sub www_view {
 	my $self = shift;
-	my $disableCache = shift;
 	unless ($self->canView) {
 		if ($self->get("state") eq "published") { # no privileges, make em log in
 			return $self->session->privilege->noAccess();
@@ -607,6 +609,25 @@ sub www_view {
                 return "";
         }
 	$self->logView();
+	$self->session->http->getHeader;	
+	$self->prepareView;
+	my $style = $self->processStyle("~~~");
+	my ($head, $foot) = split("~~~",$style);
+	$self->session->output->print($head);
+	$self->view;
+	$self->session->output->print($foot);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( [ disableCache ] )
+
+Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
+
+=cut
+sub www_viewOld {
+	my $self = shift;
+	my $disableCache = shift;
 	my $cache;
 	my $output;
         my $useCache = (

@@ -1497,7 +1497,7 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 processTemplate ( vars, templateId ) 
+=head2 processTemplate ( vars, templateId, template ) 
 
 Returns the content generated from this template.
 
@@ -1509,23 +1509,28 @@ A hash reference containing variables and loops to pass to the template engine.
 
 An id referring to a particular template in the templates table. 
 
+=head3 template
+
+Instead of passing in a templateId, you may pass in a template object.
+
 =cut
 
 sub processTemplate {
 	my $self = shift;
 	my $var = shift;
 	my $templateId = shift;
-        my $meta = $self->getMetaDataFields() if ($self->session->setting->get("metaDataEnabled"));
-        foreach my $field (keys %$meta) {
-		$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
-	}
-	$var->{'controls'} = $self->getToolbar;
-	my %vars = (
-		%{$self->{_properties}},
-		%{$var}
-		);
-	my $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template");
+	my $template = shift;
+	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
 	if (defined $template) {
+        	my $meta = $self->getMetaDataFields() if ($self->session->setting->get("metaDataEnabled"));
+        	foreach my $field (keys %$meta) {
+			$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
+		}
+		$var->{'controls'} = $self->getToolbar;
+		my %vars = (
+			%{$self->{_properties}},
+			%{$var}
+			);
 		return $template->process(\%vars);
 	} else {
 		$self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);

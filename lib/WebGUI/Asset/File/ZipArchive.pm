@@ -187,6 +187,23 @@ sub getIcon {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 =head2 processPropertiesFromFormPost ( )
 
 Used to process properties from the form posted.  In this asset, we use
@@ -225,30 +242,6 @@ sub processPropertiesFromFormPost {
 
 
 #-------------------------------------------------------------------
-=head2 purge ( )
-
-This method is called when data is purged by the system.
-
-=cut
-
-sub purge {
-	my $self = shift;
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-=head2 purgeRevision ( )
-
-This method is called when data is purged by the system.
-
-=cut
-
-sub purgeRevision {
-	my $self = shift;
-	return $self->SUPER::purgeRevision;
-}
-
-#-------------------------------------------------------------------
 =head2 view ( )
 
 method called by the container www_view method.  In this asset, this is
@@ -273,7 +266,7 @@ sub view {
 	unless($self->get("showPage")) {
 	   $var{pageError} = "true";
 	}
-	return $self->processTemplate(\%var,$self->get("templateId"));
+	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 
 

@@ -135,6 +135,23 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -227,7 +244,7 @@ sub view {
 			});
 	}
 	$var{others_loop} = \@others;
-	return $self->processTemplate(\%var,$self->getValue("templateId"));
+	return $self->processTemplate(\%var,undef, $self->{_viewTemplate});
 }
 
 

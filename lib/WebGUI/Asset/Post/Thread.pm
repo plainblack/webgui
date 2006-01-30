@@ -420,6 +420,23 @@ sub lock {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get("threadTemplateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
@@ -699,7 +716,7 @@ sub view {
         $var->{'collaboration.title'} = $self->getParent->get("title");
         $var->{'collaboration.description'} = $self->getParent->get("description");
 
-	return $self->processTemplate($var,$self->getParent->get("threadTemplateId"));
+	return $self->processTemplate($var,undef,$self->{_viewTemplate});
 }
 
 

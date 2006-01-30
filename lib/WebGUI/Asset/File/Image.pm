@@ -189,6 +189,23 @@ sub getToolbar {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -220,7 +237,7 @@ sub view {
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{thumbnail} = $self->getThumbnailUrl;
-	return $self->processTemplate(\%var,$self->get("templateId"));
+	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

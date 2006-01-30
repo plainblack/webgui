@@ -584,6 +584,24 @@ sub isDashlet {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+	$self->getShortcut->prepareView;
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -620,7 +638,7 @@ sub view {
 		next if ($prop eq 'content' || $prop eq 'label' || $prop eq 'url');
 		$var{'shortcut.'.$prop} = $self->{_shortcut}{_properties}{$prop};
 	}
-	return $self->processTemplate(\%var,$self->getValue("templateId"));
+	return $self->processTemplate(\%var,undef, $self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

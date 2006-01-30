@@ -120,6 +120,27 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $templateId = $self->get("templateId");
+        if ($self->session->form->process("overrideTemplateId") ne "") {
+                $templateId = $self->session->form->process("overrideTemplateId");
+        }
+	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 view ( )
 
 view defines all template variables, processes the template and
@@ -181,11 +202,7 @@ sub view {
 		$var{description} = $p->getPage;
 	}
 	$p->appendTemplateVars(\%var);
-	my $templateId = $self->get("templateId");
-        if ($self->session->form->process("overrideTemplateId") ne "") {
-                $templateId = $self->session->form->process("overrideTemplateId");
-        }
-	return $self->processTemplate(\%var, $templateId);
+	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
 1;
