@@ -229,17 +229,29 @@ sub view {
 	my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
 	my $out = $self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate});
 	my @parts = split("~~~",$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
+	my $output = "";
 	foreach my $part (@parts) {
-		$self->session->output->print($part);
+		if ($self->{_viewPrintOverride}) {
+			$self->session->output->print($part);
+		} else {
+			$output .= $part;
+		}
 		my $asset = shift @{$self->{_viewPlaceholders}};
 		if (defined $asset) {
 			my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
-			$self->session->output->print($asset->view);
-			$self->session->output->print("Asset:".Time::HiRes::tv_interval($t)) if ($showPerformance);
+			my $assetOutput = $asset->view;
+			$assetOutput .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
+			if ($self->{_viewPrintOverride}) {
+				$self->session->output->print($assetOutput);
+			} else {
+				$output .= $assetOutput;
+			}
 		}
 	}
+	return $output;
 }
 
+#-------------------------------------------------------------------
 sub www_setContentPositions {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -247,6 +259,13 @@ sub www_setContentPositions {
 		contentPositions=>$self->session->form->process("map")
 		});
 	return "Map set: ".$self->session->form->process("map");
+}
+
+#-------------------------------------------------------------------
+sub www_view {
+	my $self = shift;
+	$self->{_viewPrintOverride} = 1; # we do this to make it output each easset as it goes, rather than waiting until the end
+	return $self->SUPER::www_view;
 }
 
 1;

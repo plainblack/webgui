@@ -45,8 +45,12 @@ sub process {
 		my $randomAssetId = $children->[rand(scalar(@{$children}))];	
 		my $randomAsset = WebGUI::Asset->newByDynamicClass($session,$randomAssetId);
 		if (defined $randomAsset) {
-			$randomAsset->toggleToolbar;
-			return $randomAsset->canView ? $randomAsset->view() : undef;
+			if ($randomAsset->canView) {
+				$randomAsset->toggleToolbar;
+				$randomAsset->prepareView;
+				return $randomAsset->view;
+			}
+			return undef;
 		} else {
 			return $i18n->get('childless');
 		}

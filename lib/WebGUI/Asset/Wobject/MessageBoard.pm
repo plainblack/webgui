@@ -50,6 +50,23 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my %var;
@@ -106,7 +123,7 @@ sub view {
 	$var{'lastpost.label'} = $i18n->get('lastpost');
 	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
-       	return $self->processTemplate(\%var,$self->get("templateId"));
+       	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 
 1;

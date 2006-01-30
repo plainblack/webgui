@@ -173,6 +173,23 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
 	$self->getCookieJar->delete;	
@@ -336,7 +353,7 @@ sub view {
 	$self->session->http->setMimeType($var{header});
 	return $var{content};
    } else {
-   	return $self->processTemplate(\%var,$self->get("templateId")); 
+   	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
    }
 }
 

@@ -301,6 +301,23 @@ sub getToolbar {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
@@ -431,7 +448,7 @@ sub view {
 				eq @{$var->{page_loop}}[$counter]->{"page.assetId"});
 	}
 	#use Data::Dumper;$self->session->errorHandler->warn(Dumper($var));
-	return $self->processTemplate($var,$self->get("templateId"));
+	return $self->processTemplate($var,undef,$self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

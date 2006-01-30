@@ -108,6 +108,23 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my $children = $self->getLineage( ["children"], { returnObjects=>1 });
@@ -145,7 +162,7 @@ sub view {
 				});
 		}
 	}
-	return $self->processTemplate(\%vars,$self->get("templateId"));
+	return $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
 }
 
 

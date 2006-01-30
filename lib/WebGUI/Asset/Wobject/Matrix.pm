@@ -164,6 +164,23 @@ sub incrementCounter {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub purge {
        my $self = shift;
        $self->session->db->write("delete from Matrix_listing where assetId=".$self->session->db->quote($self->getId));
@@ -959,7 +976,7 @@ sub view {
                         });
         }
         $sth->finish;
-        return $self->processTemplate(\%var,$self->get("templateId"));
+        return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
  
 #-------------------------------------------------------------------

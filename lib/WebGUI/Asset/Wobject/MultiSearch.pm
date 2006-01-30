@@ -71,6 +71,23 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -80,13 +97,7 @@ to be displayed within the page style
 
 sub view {
 	my $self = shift;	
-	my %var = $self->get();
-	#Set some template variables
-
-	#Build list of searches as an array
-#	my $defaults = $self->getValue("predefinedSearches");
-
-	return $self->processTemplate(\%var, $self->get("templateId"));
+	return $self->processTemplate({}, undef, $self->{_viewTemplate});
 }
 
 

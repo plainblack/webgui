@@ -394,23 +394,6 @@ sub moveCollateralUp {
 }
 
 #-------------------------------------------------------------------
-
-=head2 prepareView ( )
-
-See WebGUI::Asset::prepareView() for details.
-
-=cut
-
-sub p1repareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
-	$self->{_viewTemplate} = $template;
-}
-
-
-#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -614,7 +597,7 @@ sub www_view {
 	my $style = $self->processStyle("~~~");
 	my ($head, $foot) = split("~~~",$style);
 	$self->session->output->print($head);
-	$self->view;
+	$self->session->output->print($self->view);
 	$self->session->output->print($foot);
 }
 

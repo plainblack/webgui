@@ -142,6 +142,23 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->getValue("inOutTemplateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my %var;
@@ -264,7 +281,7 @@ order by department, lastName, firstName";
 	$var{'paginateBar'} = $p->getBarTraditional();
 	$p->appendTemplateVars(\%var);
 	
-	return $self->processTemplate(\%var,$self->getValue("inOutTemplateId"));
+	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

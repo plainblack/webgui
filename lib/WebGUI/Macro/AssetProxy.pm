@@ -43,10 +43,14 @@ sub process {
 	my $asset = WebGUI::Asset->newByUrl($session,$url);
 	#Sorry, you cannot proxy the notfound page.
 	if (defined $asset && $asset->getId ne $session->setting->get("notFoundPage")) {
-		$asset->toggleToolbar;
-		my $output = $asset->canView ? $asset->view : undef;
-		$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if ($session->errorHandler->canShowPerformanceIndicators());
-		return $output;
+		if ($asset->canView) {
+			$asset->toggleToolbar;
+			$asset->prepareView;
+			my $output = $asset->view;
+			$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if ($session->errorHandler->canShowPerformanceIndicators());
+			return $output;
+		}
+		return undef;
 	} else {
 		my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
 		return $i18n->get('invalid url');

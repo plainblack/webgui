@@ -182,6 +182,23 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;  
 	my $i18n = WebGUI::International->new($self->session,"Asset_EventsCalendar");
@@ -451,7 +468,7 @@ sub view {
 		<input type="submit" value="Go" name="Go" />';
 	#use Data::Dumper; return '<pre>'.Dumper(\%var).'</pre>';
 	my $vars = \%var;
-	return $self->processTemplate($vars,$self->get("templateId"));
+	return $self->processTemplate($vars,undef,$self->{_viewTemplate});
 	
 }
 
