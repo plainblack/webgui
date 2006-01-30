@@ -135,6 +135,26 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView;
+	if ($self->session->var->isAdminOn) {
+		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
+		# for end users to work with our templates
+		$self->session->style->setScript($self->session->config->get("extrasURL")."/draggable.js",{ type=>"text/javascript" });
+		$self->session->style->setLink($self->session->config->get("extrasURL")."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+		$self->session->style->setRawHeadTags('
+			<style type="text/css">
+			.dragging, .empty {
+				  background-image: url("'.$self->session->config->get("extrasURL").'/opaque.gif");
+			}
+			</style>
+			');
+	}
+}
+
+#-------------------------------------------------------------------
 sub viewOriginal {
 	my $self = shift;
 	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"] });
@@ -276,15 +296,6 @@ sub view {
 	if ($vars{showAdmin}) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
-		$self->session->style->setScript($self->session->config->get("extrasURL")."/draggable.js",{ type=>"text/javascript" });
-		$self->session->style->setLink($self->session->config->get("extrasURL")."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
-		$self->session->style->setRawHeadTags('
-			<style type="text/css">
-			.dragging, .empty {
-				  background-image: url("'.$self->session->config->get("extrasURL").'/opaque.gif");
-			}
-			</style>
-			');
 		$vars{"dragger.icon"} = $self->session->icon->drag();
 		$vars{"dragger.init"} = '
 			<iframe id="dragSubmitter" style="display: none;" src="'.$self->session->config->get("extrasURL").'/spacer.gif"></iframe>
@@ -295,12 +306,12 @@ sub view {
 	}
 	my @parts = split("~~~",$self->processTemplate(\%vars,$self->get("templateId")));
 	foreach my $part (@parts) {
-		print $part;
+		$self->session->output->print($part);
 		my $asset = shift @placeHolder;
 		if (defined $asset) {
 			my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
-			print $asset->view;
-			print "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
+			$self->session->output->print($asset->view);
+			$self->session->output->print("Asset:".Time::HiRes::tv_interval($t)) if ($showPerformance);
 		}
 	}
 }
@@ -317,11 +328,12 @@ sub www_setContentPositions {
 sub www_view {
 	my $self = shift;
 	$self->session->http->getHeader;	
+	$self->prepareView;
 	my $style = $self->processStyle("~~~");
 	my ($head, $foot) = split("~~~",$style);
-	print $head;
+	$self->session->output->print($head);
 	$self->view;
-	print $foot;
+	$self->session->output->print($foot);
 }
 
 1;

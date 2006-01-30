@@ -861,6 +861,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
+	return $self->{_toolbar} if (exists $self->{_toolbar});
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43));
 	my $commit;
@@ -1437,6 +1438,19 @@ sub newByUrl {
 		}
 	}
 	return WebGUI::Asset->getDefault($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+Executes what is necessary to make the view() method work with content streaming. This includes things like processing template head tags.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->{_toolbar} = $self->getToolbar;
 }
 
 #-------------------------------------------------------------------

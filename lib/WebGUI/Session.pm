@@ -27,6 +27,7 @@ use WebGUI::Session::Http;
 use WebGUI::Session::Icon;
 use WebGUI::Session::Id;
 use WebGUI::Session::Os;
+use WebGUI::Session::Output;
 use WebGUI::Session::Privilege;
 use WebGUI::Session::Scratch;
 use WebGUI::Session::Setting;
@@ -63,6 +64,7 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->form
  $session->http
  $session->os
+ $session->output
  $session->request
  $session->scratch
  $session->server
@@ -363,6 +365,23 @@ sub open {
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId);
 	return $self;
 }
+
+#-------------------------------------------------------------------
+
+=head2 output ( )
+
+Returns a WebGUI::Session::Output object.
+
+=cut
+
+sub output {
+	my $self = shift;
+	unless (exists $self->{_output}) {
+		$self->{_output} = WebGUI::Session::Output->new($self);
+	}
+	return $self->{_output};
+}
+
 
 #-------------------------------------------------------------------
 

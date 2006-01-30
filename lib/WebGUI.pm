@@ -76,7 +76,7 @@ sub contentHandler {
 		}
 		$session->http->setCookie("wgSession",$session->var->{_var}{sessionId}) unless $session->var->{_var}{sessionId} eq $session->http->getCookies->{"wgSession"};
 		$session->http->getHeader();
-		$r->print($output) unless ($session->http->isRedirect());
+		$session->output->print($output) unless ($session->http->isRedirect());
 		WebGUI::Affiliate::grabReferral($session);	# process affilliate tracking request
 	}
 	$session->close;
@@ -151,7 +151,7 @@ sub setup {
 	my $session = shift;
 	require WebGUI::Operation::WebGUI;
 	$session->http->getHeader;
-	$session->request->print(WebGUI::Operation::WebGUI::www_setup($session));
+	$session->output->print(WebGUI::Operation::WebGUI::www_setup($session));
 }
 
 
@@ -209,10 +209,10 @@ sub uploadsHandler {
 sub upgrading {
 	my $session = shift;
 	$session->http->getHeader;
-	$session->request->print($session->http->getHeader());
+	$session->output->print($session->http->getHeader());
 	open(FILE,"<".$session->config->getWebguiRoot."/docs/maintenance.html");
 	while (<FILE>) {
-		$session->request->print($_);
+		$session->output->print($_);
 	}
 	close(FILE);
 }

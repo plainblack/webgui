@@ -195,6 +195,7 @@ props["pageURL"] = "'.$self->session->url->page(undef, undef, 1).'";
 return props[propName];
 }
 </script>
+<!--morehead-->
 ';
 if ($self->session->user->isInGroup(2)) {
 	# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
@@ -204,7 +205,6 @@ if ($self->session->user->isInGroup(2)) {
 <meta http-equiv="Expires" content="0" />
 ';
 }
-	$var{'head.tags'} .= "\n<!-- macro head tags -->\n";
 	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;
 	if (defined $style) {
@@ -212,10 +212,9 @@ if ($self->session->user->isInGroup(2)) {
 	} else {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
 	}
-	WebGUI::Macro::process($self->session,\$output);
-	my $macroHeadTags = $self->generateAdditionalHeadTags();
-	WebGUI::Macro::process($self->session,\$macroHeadTags);
-	$output =~ s/\<\!-- macro head tags --\>/$macroHeadTags/;
+	WebGUI::Macro::process(\$output);
+        my $macroHeadTags = $self->generateAdditionalHeadTags();
+        $output =~ s/\<\!--morehead--\>/$macroHeadTags/;	
 	if ($self->session->errorHandler->canShowDebug()) {
 		$output .= $self->session->errorHandler->showDebug();
 	}

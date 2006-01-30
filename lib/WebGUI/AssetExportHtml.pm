@@ -197,11 +197,11 @@ sub www_exportGenerate {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
 	# This routine is called in an IFRAME and prints status output directly to the browser.
 	$|++;				# Unbuffered data output
-	$self->session->request->print($self->session->http->getHeader());
+	$self->session->output->print($self->session->http->getHeader());
 	my $startTime =$self->session->datetime->time();	
 	my $error = $self->checkExportPath();
 	if ($error) {
-		$self->session->request->print($error);
+		$self->session->output->print($error);
 		return;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset');
@@ -212,9 +212,9 @@ sub www_exportGenerate {
 	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$self->session->form->process("depth")});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
-		$self->session->request->printf( $i18n->get('exporting page'), $url);
+		$self->session->output->printf( $i18n->get('exporting page'), $url);
 		unless ($asset->canView($userId)) {
-			$self->session->request->print ($i18n->get('bad user privileges')."\n");
+			$self->session->output->print ($i18n->get('bad user privileges')."\n");
 			next;
 		}
 		my $path;
@@ -235,23 +235,23 @@ sub www_exportGenerate {
 			$path = $self->session->config->get("exportPath") . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
-				$self->session->request->printf($i18n->get('could not create path'), $path, $@);
+				$self->session->output->printf($i18n->get('could not create path'), $path, $@);
 				return;
 			}
 		} 
 		$path .= "/".$filename;
                 eval { open(FILE, "> $path") or die "$!" };
 		if ($@) {
-			$self->session->request->printf($i18n->get('could not open path'), $path, $@);
+			$self->session->output->printf($i18n->get('could not open path'), $path, $@);
 			return;
 		} else {
 			print FILE $asset->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
 			close(FILE);
 		}
-		$self->session->request->print($i18n->get('done'));
+		$self->session->output->print($i18n->get('done'));
 	}
-	$self->session->request->printf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime));
-	$self->session->request->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493).'</a>');
+	$self->session->output->printf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime));
+	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493).'</a>');
 	return;
 }
 
