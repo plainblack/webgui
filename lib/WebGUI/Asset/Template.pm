@@ -85,6 +85,10 @@ sub definition {
 					fieldType=>'selectList',
 					defaultValue=>[$session->config->get("defaultTemplateParser")]
 				},	
+				headBlock=>{
+					fieldType=>"codearea",
+					defaultValue=>undef
+					},
 				namespace=>{
 					fieldType=>'combo',
 					defaultValue=>undef
@@ -247,6 +251,21 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
+=head2 prepare ( )
+
+This method sets the tags from the head block parameter of the template into the HTML head block in the style. You only need to call this method if you're using the HTML streaming features of WebGUI, like is done in the prepareView()/view()/www_view() methods of WebGUI assets.
+
+=cut
+
+sub prepare {
+	my $self = shift;
+	$self->{_prepared} = 1;
+	$self->session->style->setRawHeadTags($self->get("headBlock"));
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 process ( vars )
 
 Evaluate a template replacing template commands for HTML.
@@ -260,6 +279,7 @@ A hash reference containing template variables and loops. Automatically includes
 sub process {
 	my $self = shift;
 	my $vars = shift;
+	$self->prepare unless ($self->{_prepared});
 	return $self->getParser($self->session, $self->get("parser"))->process($self->get("template"), $vars);
 }
 

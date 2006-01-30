@@ -214,6 +214,7 @@ if ($self->session->user->isInGroup(2)) {
 	}
 	WebGUI::Macro::process(\$output);
         my $macroHeadTags = $self->generateAdditionalHeadTags();
+	WebGUI::Macro::process(\$macroHeadTags);
         $output =~ s/\<\!--morehead--\>/$macroHeadTags/;	
 	if ($self->session->errorHandler->canShowDebug()) {
 		$output .= $self->session->errorHandler->showDebug();
