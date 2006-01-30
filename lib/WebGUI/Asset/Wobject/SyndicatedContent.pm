@@ -469,6 +469,23 @@ sub _get_items {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 view()
 
@@ -519,7 +536,7 @@ sub view {
 	    return $rss;
 
 	} else {
-	    return $self->processTemplate(\%var,$self->get('templateId'));
+	    return $self->processTemplate(\%var,undef, $self->{_viewTemplate});
 	}
 
 }

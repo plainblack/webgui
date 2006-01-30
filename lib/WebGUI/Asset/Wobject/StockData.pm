@@ -358,6 +358,23 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 =head2 purge ( )
 
 removes collateral data associated with a StockData when the system
@@ -416,7 +433,7 @@ sub view {
 	   push (@stocks, $hash);
 	}
 	$var->{'stocks.loop'} = \@stocks;
-	return $self->processTemplate($var, $self->get("templateId"));
+	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

@@ -235,6 +235,23 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
         # Initiate an empty debug loop
@@ -249,7 +266,7 @@ sub view {
 	# Add debug loop to template vars
 	$var->{'debug_loop'} = $self->{_debug_loop};
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
-	return $self->processTemplate($var, $self->get("templateId"));
+	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

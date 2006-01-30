@@ -184,6 +184,23 @@ sub _trim {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -208,7 +225,7 @@ sub view {
 		push(@locs, $self->_getLocationData($array[$i]));
 	}
 	$var->{'ourLocations.loop'} = \@locs;
-	return $self->processTemplate($var, $self->get("templateId"));
+	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
 

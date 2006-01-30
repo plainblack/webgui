@@ -93,6 +93,23 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 view ( )
 
 view defines all template variables, processes the template and
@@ -110,7 +127,7 @@ sub view {
 	$var{'form_submit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get("search")});
 	$var{'form_keywords'} = WebGUI::Form::text($self->session, {name=>"keywords", value=>$self->session->form->get("keywords")});
 
-#	return $self->processTemplate(\%var, $templateId);
+	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
 1;

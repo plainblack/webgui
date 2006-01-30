@@ -560,6 +560,23 @@ sub getUserId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -603,7 +620,6 @@ sub setAnswerType {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Survey');
 	my $var = $self->getMenuVars;
 	$var->{'question.add.url'} = $self->getUrl('func=editQuestion;qid=new');
@@ -689,7 +705,7 @@ sub view {
 	$var->{'mode.isSurvey'} = ($self->get("mode") eq "survey");
 	$var->{'survey.noprivs.label'} = $i18n->get(48);
 	$var->{'quiz.noprivs.label'} = $i18n->get(49);
-	return $self->processTemplate($var, $self->get("templateId"));
+	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------

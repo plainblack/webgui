@@ -517,6 +517,32 @@ sub getRecordTemplateVars {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	# this one is so nutz that we don't even bother preparing, we just execute the whole thing
+	my $passedVars = shift;
+	##Priority encoding
+	if ( $self->session->form->process("mode") eq "form") {
+		$self->{_view} = $self->viewForm($passedVars);
+	} elsif ( $self->session->form->process("mode") eq "list") {
+		$self->{_view} = $self->viewList;
+	} elsif( $self->defaultViewForm ) {
+		$self->{_view} = $self->viewForm($passedVars);
+	} else {
+		$self->{_view} = $self->viewList();
+	}
+}
+
+
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {	
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -646,21 +672,7 @@ sub sendEmail {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $passedVars = shift;
-	my $var;
-	##Priority encoding
-	if ( $self->session->form->process("mode") eq "form") {
-		return $self->viewForm($passedVars);
-	}
-	elsif ( $self->session->form->process("mode") eq "list") {
-		return $self->viewList;
-	}
-	elsif( $self->defaultViewForm ) {
-		return $self->viewForm($passedVars);
-	}
-	else {
-		return $self->viewList();
-	}
+	return $self->{_view}; # see prepareView()
 }
 
 #-------------------------------------------------------------------
@@ -676,9 +688,9 @@ sub viewList {
 sub viewForm {
 	my $self = shift;
 	my $passedVars = shift;
+	my $var;
 	$self->session->style->setLink($self->session->config->get("extrasURL").'/tabs/tabs.css', {"type"=>"text/css"});
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/tabs/tabs.js', {"type"=>"text/javascript"});
-	my $var;
 	$var->{entryId} = $self->session->form->process("entryId") if ($self->canEdit);
 	$var = $passedVars || $self->getRecordTemplateVars($var);
 	return $self->processTemplate($var,$self->get("templateId"));
@@ -1100,7 +1112,8 @@ sub www_process {
 	if ($hadErrors && !$updating) {
 		$self->session->db->write("delete from DataForm_entryData where DataForm_entryId=".$self->session->db->quote($entryId));
 		$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
-		$self->processStyle($self->view($var));
+		$self->prepareView($var);
+		$self->processStyle($self->view);
 	} else {
 		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
 		return $self->session->style->process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;

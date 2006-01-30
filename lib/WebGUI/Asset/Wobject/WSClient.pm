@@ -216,6 +216,23 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub view {
    my ( $arr_ref,                      # temp var holding params
         $cache_key,                    # unique cache identifier
@@ -481,7 +498,7 @@ sub view {
    }
 
    $var{'results'} = \@result;
-   return $self->processTemplate(\%var, $self->get("templateId"));
+   return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }   
 
 

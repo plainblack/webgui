@@ -296,6 +296,23 @@ sub indexContent {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
 sub purge {
    	my $self = shift;
    	my $sth = $self->session->db->read("select image1, image2, image3, brochure, manual, warranty from Product where assetId=".$self->session->db->quote($self->getId));
@@ -720,7 +737,6 @@ sub www_moveSpecificationUp {
 #-------------------------------------------------------------------
 sub view {
    my $self = shift;
-   $self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
    my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
    tie %data, 'Tie::CPHash';
 	my $brochure = $self->get("brochure");
@@ -863,7 +879,7 @@ sub view {
    }
    $sth->finish;
    $var{relatedproduct_loop} = \@relatedloop;
-   return $self->processTemplate(\%var, $self->get("templateId"));
+   return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
 1;
