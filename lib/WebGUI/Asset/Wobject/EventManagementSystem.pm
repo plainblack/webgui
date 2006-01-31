@@ -138,6 +138,15 @@ sub deleteOrphans {
 }
 
 #------------------------------------------------------------------
+sub eventIsApproved {
+	my $self = shift;
+	my $eventId = shift;
+	my ($result) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId=".
+			      $self->session->db->quote($eventId));
+	return $result;
+}
+
+#------------------------------------------------------------------
 sub validateEditEventForm {
   my $self = shift;
   my $errors;
@@ -227,9 +236,23 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+sub www_approveEvent {
+	my $self = shift;
+	my $eventId = $self->session->form->get("pid");
+	return $self->session->privilege->insuffficent unless ($self->session->user->isInGroup($self->get("groupToApproveEvents")));
+
+	$self->session->db->write("update EventManagementSystem_products set approved=1 where productId=".
+				   $self->session->db->quote($eventId));
+	
+	return $self->www_manageEvents;
+}
+
+#-------------------------------------------------------------------
 sub www_deleteEvent {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
 	
 	#Remove this event as a prerequisite to any other event
 	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=".
@@ -249,6 +272,8 @@ sub www_deletePrerequisite {
 	my $self = shift;
 	my $eventId = $self->session->form->get("id");
 	
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	
 	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=".
 				   $self->session->db->quote($eventId));
 	$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=".
@@ -262,6 +287,9 @@ sub www_editEvent {
 	my $self = shift;
 	my $errors = shift;
 	my $errorMessages;
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+
 	my $pid = $self->session->form->get("pid");
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
@@ -285,6 +313,14 @@ sub www_editEvent {
 	$f->hidden( -name=>"assetId", -value=>$self->get("assetId") );
 	$f->hidden( -name=>"func",-value=>"editEventSave" );
 	$f->hidden( -name=>"pid", -value=>$pid );
+	
+	if ($self->session->user->isInGroup($self->get("groupToApproveEvents"))) {
+	 unless ($self->eventIsApproved($pid)) {
+	  $f->readOnly(
+		-value  => "<a href='".$self->getUrl("func=approveEvent;pid=".$pid)."'>Approve Event</a>"
+	  );
+	 }	
+	}
 	
 	$f->text(
 		-name  => "title",
@@ -409,6 +445,8 @@ sub www_editEvent {
 sub www_editEventSave {
 	my $self = shift;
 
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+
 	my $errors = $self->validateEditEventForm;
         if (scalar(@$errors) > 0) { return $self->error($errors, "www_editEvent"); }
 
@@ -479,6 +517,8 @@ sub www_moveEventDown {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
 	
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	
 	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $eventId);
 
 	return $self->www_manageEvents;
@@ -488,6 +528,8 @@ sub www_moveEventDown {
 sub www_moveEventUp {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
 	
 	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $eventId);
 	
@@ -497,6 +539,9 @@ sub www_moveEventUp {
 #-------------------------------------------------------------------
 sub www_manageEvents {
 	my $self = shift;
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+
 	my $output;
 	my $sth = $self->session->db->read("select p.productId, p.title, pe.approved from products as p, 
 				EventManagementSystem_products as pe where p.productId = pe.productId
@@ -514,7 +559,7 @@ sub www_manageEvents {
 			  " ".$row{title};
 		$output .= "</td><td>";
 		
-		if ($row{pending} == 0) {
+		if ($row{approved} == 0) {
 			$output .= "Pending";
 		}
 		else {
