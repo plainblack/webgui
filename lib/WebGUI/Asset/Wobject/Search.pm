@@ -71,14 +71,16 @@ sub definition {
 				tab=>"properties",
 				hoverHelp=>$i18n->get("search root description"),
 				label=>$i18n->get('search root')
-				}
+				},
 			classLimiter => {
 				fieldType => "checkList",
-				defaultValue => [],
+				defaultValue => undef,
+				vertical=>1,
 				tab=>"properties",
 				hoverHelp=>$i18n->get("class limiter description"),
 				label=>$i18n->get("class limiter"),
 				options=>$session->db->buildHashRef("select distinct(className) from asset")
+				}
 		);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -126,7 +128,30 @@ sub view {
 	$var{'form_footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form_submit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get("search")});
 	$var{'form_keywords'} = WebGUI::Form::text($self->session, {name=>"keywords", value=>$self->session->form->get("keywords")});
-
+	if ($self->session->form->get("doit")) {
+		my $search = WebGUI::Search->new($self->session);
+		my %rules = (
+			keywords=>$self->session->form->get("keywords"), 
+#			lineage=>[$self->getValue("searchRoot")]
+			);
+		my @classes = split("\n",$self->get("classLimiter"));
+#		$rules{classes} = \@classes if (scalar(@classes));
+		$search->search(\%rules);
+		my @results = ();
+		my $rs = $search->getResultSet;
+		while (my $data = $rs->hashRef) {
+			next unless ($self->session->user->userId eq $data->{ownerUserId} || $self->session->user->isInGroup($data->{groupIdView}) || $self->session->user->isInGroup($data->{groupIdEdit}));
+			push(@results, {
+				url=>$data->{url},
+				title=>$data->{title},
+				synposis=>$data->{synopsis},
+				});
+		} 
+		my $p = WebGUI::Paginator->new($self->session,$self->getUrl);
+		$p->setDataByArrayRef(\@results);	
+		$p->appendTemplateVars(\%var);
+		$var{result_set} = $p->getPageData;
+	}
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 

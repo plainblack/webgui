@@ -197,6 +197,14 @@ SQL6
 #-------------------------------------------------
 sub addSearchEngine {
 	print "\tUpgrading search engine.\n" unless ($quiet);
+	$session->db->write("create table search ( 
+		assetId varchar(22) binary not null,
+		revisionDate bigint not null default 0,
+		classLimiter text,
+		searchRoot varchar(22) binary not null default 'PBasset000000000000001',
+		templateId varchar(22) binary not null default 'PBtmpl0000000000000200',
+		primary key (assetId,revisionDate)
+		)");
 	$session->db->write("create table assetIndex (
 		assetId varchar(22) binary not null primary key,
 		title varchar(255),

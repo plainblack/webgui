@@ -145,6 +145,7 @@ assets = WebGUI::Asset::Snippet, \
 	WebGUI::Asset::Wobject::Poll, \
 	WebGUI::Asset::Wobject::Product, \
 	WebGUI::Asset::Wobject::SQLReport, \
+	WebGUI::Asset::Wobject::Search, \
 	WebGUI::Asset::Wobject::Survey, \
 	WebGUI::Asset::Wobject::WeatherData, \
 	WebGUI::Asset::Wobject::MultiSearch, \
