@@ -874,6 +874,14 @@ WebGUI::International::getLanguages();
 	$i18n->getLanguages();
 
 
+5.24 WebGUI::Mail Replaced
+
+The aging WebGUI::Mail package has been replaced with WebGUI::Mail::Send,
+which has an object oriented API, and is capable of sending attachments, HTML
+messages, and to multiple recipients, unlike WebGUI::Mail. Please see the API
+for details.
+
+
 
 6.  Automatic list of Assets in Help System.
 -------------------------------------

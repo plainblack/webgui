@@ -10,7 +10,10 @@
  - Added output chunking as an option for asset www_ methods. The net effect
    of this provides a fairly significant performance increase to what would
    otherwise be slow or complex pages. More details in migration.txt.
-
+ - The SMTP mail backend has been replaced with a new API that's capable of
+   sending attachments, HTML messages, and more. This will introduce many new
+   options for developers.
+ - The group mail screen now allows sending of HTML messages.
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP

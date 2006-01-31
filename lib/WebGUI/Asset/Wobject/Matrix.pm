@@ -4,7 +4,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
-use WebGUI::Mail;
+use WebGUI::Mail::Send;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -992,7 +992,9 @@ sub www_viewDetail {
 	if ($self->session->form->process("do") eq "sendEmail") {
 		if ($self->session->form->process("body") ne "") {
 			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});
-			WebGUI::Mail::send($u->profileField("email"),$listing->{productName}." - ".$self->session->form->process("subject"),$self->session->form->process("body"),"",$self->session->form->process("from"));
+			my $mail = WebGUI::Mail::Send->new($self->session, {to=>$u->profileField("email"),subject=>$listing->{productName}." - ".$self->session->form->process("subject"),from=>$self->session->form->process("from")});
+			$mail->addText($self->session->form->process("body"));
+			$mail->send;
 		}
 		$var{'email.wasSent'} = 1;
 	} else {

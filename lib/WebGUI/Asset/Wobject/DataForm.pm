@@ -17,6 +17,7 @@ use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
+use WebGUI::Mail::Send;
 use WebGUI::Macro;
 use WebGUI::MessageLog;
 use WebGUI::SQL;
@@ -647,7 +648,9 @@ sub sendEmail {
 		}
 	}
 	if ($to =~ /\@/) {
-		WebGUI::Mail::send($to, $subject, $message, $cc, $from, $bcc);
+		my $mail = WebGUI::Mail::Send->new($self->session,{to=>$to, subject=>$subject, cc=>$cc, from=>$from, bcc=>$bcc});
+		$mail->addText($message);
+		$mail->send;
 	} else {
                 my ($userId) = $self->session->db->quickArray("select userId from users where username=".$self->session->db->quote($to));
                 my $groupId;
@@ -660,10 +663,14 @@ sub sendEmail {
                 } else {
                         WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message, "", "", $from);
 			if ($cc) {
-                                WebGUI::Mail::send($cc, $subject, $message, "", $from);
+                               my $mail =  WebGUI::Mail::Send->new($self->session,{to=>$cc, subject=>$subject, from=>$from});
+				$mail->addText($message);
+				$mail->send;
                         }
                         if ($bcc) {
-                                WebGUI::Mail::send($bcc, $subject, $message, "", $from);
+                                WebGUI::Mail::Send->new($self->session, {to=>$bcc, subject=>$subject, from=>$from});
+				$mail->addText($message);
+				$mail->send;
                         }
                 }
         }

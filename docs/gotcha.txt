@@ -29,6 +29,11 @@ save you many hours of grief.
 	have completed by running the search.pl script in the
 	sbin folder.
 
+ * The following perl modules are now required:
+
+	MIME::Tools
+
+
 
 6.8.4
 --------------------------------------------------------------------

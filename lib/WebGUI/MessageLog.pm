@@ -18,7 +18,7 @@ package WebGUI::MessageLog;
 use strict;
 use Tie::CPHash;
 use WebGUI::Macro;
-use WebGUI::Mail;
+use WebGUI::Mail::Send;
 use WebGUI::User;
 use WebGUI::Utility;
 
@@ -54,15 +54,15 @@ sub _notify {
 	$from = $_[3];
         if ($u->profileField("INBOXNotifications") eq "email") {
         	if ($u->profileField("email") ne "") {
-                	WebGUI::Mail::send($u->profileField("email"),$subject,$message, "", $from);
+                	#WebGUI::Mail::send($u->profileField("email"),$subject,$message, "", $from);
                 }
         } elsif ($u->profileField("INBOXNotifications") eq "emailToPager") {
                 if ($u->profileField("emailToPagerGateway") ne "") {
-                        WebGUI::Mail::send($u->profileField("emailToPagerGateway"),$subject,$message, "", $from);
+                        #WebGUI::Mail::send($u->profileField("emailToPagerGateway"),$subject,$message, "", $from);
                 }
         } elsif ($u->profileField("INBOXNotifications") eq "icq") {
                 if ($u->profileField("icq")) {
-                        WebGUI::Mail::send($u->profileField("icq").'@pager.icq.com',$subject,$message, "", $from);
+                        #WebGUI::Mail::send($u->profileField("icq").'@pager.icq.com',$subject,$message, "", $from);
                 }
         }
 }

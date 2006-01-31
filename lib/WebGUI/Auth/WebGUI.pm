@@ -17,7 +17,7 @@ use WebGUI::Asset::Template;
 use WebGUI::Auth;
 use WebGUI::HTMLForm;
 use WebGUI::Macro;
-use WebGUI::Mail;
+use WebGUI::Mail::Send;
 use WebGUI::Storage::Image;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -232,11 +232,12 @@ sub createAccountSave {
    	if ($self->session->setting->get("webguiValidateEmail")) {
 		my $key = $self->session->id->generate();
 		$self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
-   		WebGUI::Mail::send(
-			$profile->{email},
-			$i18n->get('email address validation email subject','AuthWebGUI'),
-			$i18n->get('email address validation email body','AuthWebGUI')."\n\n".$self->session->url->getSiteURL().$self->session->url->page("op=auth;method=validateEmail;key=".$key),
-			);
+   		my $mail = WebGUI::Mail::Send->new($self->session,{
+			to=>$profile->{email},
+			subject=>$i18n->get('email address validation email subject','AuthWebGUI')
+			});
+		$mail->addText($i18n->get('email address validation email body','AuthWebGUI')."\n\n".$self->session->url->getSiteURL().$self->session->url->page("op=auth;method=validateEmail;key=".$key));
+		$mail->send;
 		$self->user->status("Deactivated");
 		$self->session->var->end($self->session->var->get("sessionId"));
 		$self->session->var->start(1,$self->session->getId);
@@ -563,7 +564,9 @@ sub recoverPasswordFinish {
 	   $message = $self->session->setting->get("webguiRecoverPasswordEmail");
 	   $message .= "\n".$i18n->get(50).": ".$username."\n";
 	   $message .= $i18n->get(51).": ".$password."\n";
-	   WebGUI::Mail::send($self->session->form->process("email"),$i18n->get(74),$message);
+	   my $mail = WebGUI::Mail::Send->new($self->session, {to=>$self->session->form->process("email"),subject=>$i18n->get(74)});
+		$mail->addText($message);
+		$mail->send;
 	   $flag++;
 	}
 	$sth->finish();

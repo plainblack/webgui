@@ -57,6 +57,7 @@ checkModule("Archive::Zip",1.16);
 checkModule("IO::Zlib",1.01);
 checkModule("Compress::Zlib",1.34);
 checkModule("Net::SMTP",2.24);
+checkModule("MIME::Tools",5.419);
 checkModule("Tie::IxHash",1.21);
 checkModule("Tie::CPHash",1.001);
 checkModule("XML::Simple",2.09);

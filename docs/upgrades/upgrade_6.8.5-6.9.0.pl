@@ -256,6 +256,7 @@ sub removeFiles {
 	unlink '../../lib/WebGUI/URL.pm';
 	unlink '../../lib/WebGUI/Id.pm';
 	unlink '../../lib/WebGUI/Icon.pm';
+	unlink '../../lib/WebGUI/Mail.pm';
 	unlink '../../lib/WebGUI/Style.pm';
 	unlink '../../lib/WebGUI/Setting.pm';
 	unlink '../../lib/WebGUI/Grouping.pm';

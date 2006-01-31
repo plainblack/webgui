@@ -17,7 +17,7 @@ use WebGUI::Group;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Mail;
+use WebGUI::Mail::Send;
 use WebGUI::Operation::User;
 use WebGUI::Paginator;
 use WebGUI::SQL;
@@ -515,11 +515,10 @@ sub www_emailGroup {
 		-label=>$i18n->get(229),
 		-hoverHelp=>$i18n->get('229 description'),
 		);
-	$f->textarea(
+	$f->HTMLArea(
 		-name=>"message",
 		-label=>$i18n->get(230),
 		-hoverHelp=>$i18n->get('230 description'),
-		-rows=>(5+$session->setting->get("textAreaRows")),
 		);
 	$f->submit($i18n->get(810));
 	$output = $f->print;
@@ -535,7 +534,9 @@ sub www_emailGroupSend {
 		on a.userId=b.userId and b.fieldName='email' where a.groupId=".$session->db->quote($session->form->process("gid")));
 	while (($email) = $sth->array) {
 		if ($email ne "") {
-			WebGUI::Mail::send($email,$session->form->process("subject"),$session->form->process("message"),'',$session->form->process("from"));
+			my $mail = WebGUI::Mail::Send->new($session, {to=>$email,subject=>$session->form->process("subject"),from=>$session->form->process("from")});
+			$mail->addHtml($session->form->process("message","HTMLArea"));
+			$mail->send;
 		}
 	}
 	$sth->finish;
