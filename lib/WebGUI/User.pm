@@ -17,7 +17,7 @@ package WebGUI::User;
 use strict;
 use WebGUI::Cache;
 use WebGUI::Group;
-
+use WebGUI::User::Inbox;
 
 =head1 NAME
 
@@ -45,6 +45,8 @@ This package provides an object-oriented way of managing WebGUI users as well as
  $u->addToGroups(\@arr);
  $u->deleteFromGroups(\@arr);
  $u->delete;
+
+ my $inbox = $u->inbox;
 
 =head1 METHODS
 
@@ -137,6 +139,7 @@ Deletes this user.
 sub delete {
         my $self = shift;
 	$self->uncache;
+	$self->inbox->delete;
 	foreach my $groupId (@{$self->getGroups($self->userId)}) {
 		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
 	}
@@ -179,6 +182,7 @@ Deconstructor.
 
 sub DESTROY {
         my $self = shift;
+	$self->{_inbox}->DESTROY if (exists $self->{_inbox});
         undef $self;
 }
 
@@ -229,6 +233,23 @@ sub identifier {
         }
         return $self->{_user}{"identifier"};
 }
+
+#-------------------------------------------------------------------
+
+=head2 inbox
+
+Returns the user's WebGUI::User::Inbox object.
+
+=cut
+
+sub inbox {
+	my $self = shift;
+	unless  ($self->{_inbox}) {
+		$self->{_inbox} = WebGUI::User::Inbox->new($self);
+	}
+	return $self->{_inbox};
+}
+
 
 #-------------------------------------------------------------------
 
