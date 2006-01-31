@@ -39,7 +39,7 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head DESTROY ( )
+=head2 DESTROY ( )
 
 Deconstructor.
 

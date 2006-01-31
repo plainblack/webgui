@@ -170,7 +170,7 @@ sub dayStartEnd {
 
 #-------------------------------------------------------------------
 
-=head DESTROY ( )
+=head2 DESTROY ( )
 
 Deconstructor.
 

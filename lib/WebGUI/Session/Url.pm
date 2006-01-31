@@ -90,7 +90,7 @@ sub append {
 
 #-------------------------------------------------------------------
 
-=head DESTROY ( )
+=head2 DESTROY ( )
 
 Deconstructor.
 

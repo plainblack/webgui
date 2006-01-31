@@ -198,7 +198,7 @@ sub dbSlave {
 
 #-------------------------------------------------------------------
 
-=head DESTROY ( )
+=head2 DESTROY ( )
 
 Deconstructor.
 

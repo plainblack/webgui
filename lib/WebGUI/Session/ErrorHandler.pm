@@ -143,7 +143,7 @@ sub debug {
 
 #-------------------------------------------------------------------
 
-=head DESTROY ( )
+=head2 DESTROY ( )
 
 Deconstructor.
 

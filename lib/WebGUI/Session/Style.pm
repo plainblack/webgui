@@ -54,7 +54,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head DESTROY ( )
+=head2 DESTROY ( )
 
 Deconstructor.
 

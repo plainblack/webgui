@@ -71,7 +71,7 @@ sub AUTOLOAD {
 
 #-------------------------------------------------------------------
 
-=head DESTROY ( )
+=head2 DESTROY ( )
 
 Deconstructor.
 
