@@ -662,8 +662,9 @@ sub sendEmail {
                         $self->session->errorHandler->warn($self->getId.": Unable to send message, no user or group found.");
                 } else {
                         WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message, "", "", $from);
+                        my $mail =  WebGUI::Mail::Send->new($self->session,{to=>$cc, subject=>$subject, from=>$from});
 			if ($cc) {
-                               my $mail =  WebGUI::Mail::Send->new($self->session,{to=>$cc, subject=>$subject, from=>$from});
+                               
 				$mail->addText($message);
 				$mail->send;
                         }
