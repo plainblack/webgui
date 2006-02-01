@@ -543,11 +543,11 @@ sub www_manageEvents {
 	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
 
 	my $output;
-	my $sth = $self->session->db->read("select p.productId, p.title, pe.approved from products as p, 
+	my $sth = $self->session->db->read("select p.productId, p.title, p.price, pe.approved from products as p, 
 				EventManagementSystem_products as pe where p.productId = pe.productId
 				and pe.assetId=".$self->session->db->quote($self->get("assetId"))." order by sequenceNumber");
 	
-	$output = "<table width='100%'><tr><th>Event</th><th>Status</th></tr>";
+	$output = "<table width='100%'><tr><th>Event</th><th>Price</th><th>Status</th></tr>";
 	while (my %row = $sth->hash) {
 		
 		$output .= "<tr><td>";
@@ -557,6 +557,8 @@ sub www_manageEvents {
 			  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
 			  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
 			  " ".$row{title};
+		$output .= "</td><td>";
+		$output .= $row{price};
 		$output .= "</td><td>";
 		
 		if ($row{approved} == 0) {
@@ -569,18 +571,48 @@ sub www_manageEvents {
 		$output .= "</td></tr>";
 	}
 	$output .= "</table>";
-
+	
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), "Add Event");
 	return $self->getAdminConsole->render($output, "Manage Events");
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+#sub prepareView {
+#	my $self = shift;
+#	$self->SUPER::prepareView();
+#	my $templateId = $self->get("displayTemplateId");
+#	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+#	$template->prepare;
+#	$self->{_viewTemplate} = $template;
+#}
+
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my %var;
+	
+	# Get the products available for sale for this page
+	my $sql = "select p.productId, p.title, p.description, p.price, e.approved from products as p, EventManagementSystem_products as e
+		   where
+		   	p.productId = e.productId and approved=1
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId"));
 
+	#my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
+	#$p->setDataByQuery($sql);
+	#$var{'events_loop'} = $p->getPage;
+	#$p->appendTemplateVars(\%var);
+	$var{'events_loop'} = $self->session->db->quickHash($sql);
+	
 	my $templateId = $self->get("displayTemplateId");
-	return $self->processTemplate(\%var, $templateId);
+	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
 
