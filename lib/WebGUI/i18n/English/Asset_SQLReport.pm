@@ -54,9 +54,10 @@ while the second question mark will contain the form variable "field1".
         },
 
         '4 description' => {
-                message => q|This is a standard SQL query. If you are unfamiliar with SQL then you'll likely not want to use this wobject.<br>
-A question mark ? in the query represents a placeholder. Note that the ? is not enclosed in quotation marks, even when the placeholder represents a string. |,
-                lastUpdated => 1119841649,
+                message => q|<p>This is a standard SQL query. If you are unfamiliar with SQL then you'll likely not want to use this wobject.</p>
+<p>A question mark ? in the query represents a placeholder. Note that the ? is not enclosed in quotation marks, even when the placeholder represents a string.</p>
+<p>The keywords that are allowed are defined in the database link properties. The allowed keywords for the WebGUI database are SELECT, DESCRIBE and SHOW.</p>|,
+                lastUpdated => 1119841650,
         },
 
         '14 description' => {
@@ -277,7 +278,24 @@ will always be false for query5.
 		message => q|Add another query|,
 		lastUpdated => 1031514049
 	},
-
+	'Prequery not allowed' => {
+		message => q|<b>Debug:</b> Prequery statement is not allowed: |,
+		lastUpdated => 0,
+	},
+	'Prequery error' => {
+		message => q|<b>Debug:</b> An error occured in prequery|,
+		lastUpdated => 0,
+	},
+	'Prequery statements' => {
+		message => q|Prequery statements|,
+		lastUpdated => 0,
+	},
+	'Prequery statements description' => {
+		message => q|<p>Prequery statements are sql statements executed before the real query. You can use prequery statements for instance to set variables that you want to use in the real query. For example:</p>
+		<blockquote>set @myVariable := 1</blockquote>
+<p>The prequery statements are seperated from each other by returns and cannot use placeholders. You can use macro's within the prequery statements, however. Please note that prequery statements are only visible in the query they belong to and that you can only use statements that are allowed by the database link.</p>|,
+		lastUpdated => 0,
+	},
 };
 
 1;

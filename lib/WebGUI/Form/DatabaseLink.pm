@@ -127,7 +127,8 @@ sub toHtmlWithWrapper {
 			$subtext = $self->session->icon->edit("op=editDatabaseLink;lid=".$self->get("value").";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
 		}
 		$subtext .= $self->session->icon->manage("op=listDatabaseLinks");
-		$self->get("subtext") = $subtext . $self->get("subtext");
+		$self->set("subtext", $subtext . $self->get("subtext"));
+#		$self->get("subtext") = $subtext . $self->get("subtext");
 	}
 	return $self->SUPER::toHtmlWithWrapper;
 }

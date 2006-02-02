@@ -26,8 +26,21 @@ addSearchEngine();
 addEMSTemplates();
 addEMSTables();
 updateTemplates();
+updateDatabaseLinksAndSQLReport();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub updateDatabaseLinksAndSQLReport {
+	print "\tUpdating the Database link and SQLReport Tables.\n";
+	$session->db->write('alter table databaseLink add column allowedKeywords text');
+	$session->db->write('update databaseLink set allowedKeywords="select\ndecsribe\nshow"');
+	$session->db->write('alter table SQLReport add column prequeryStatements1 text');
+	$session->db->write('alter table SQLReport add column prequeryStatements2 text');
+	$session->db->write('alter table SQLReport add column prequeryStatements3 text');
+	$session->db->write('alter table SQLReport add column prequeryStatements4 text');
+	$session->db->write('alter table SQLReport add column prequeryStatements5 text');
+}
 
 #-------------------------------------------------
 sub updateTemplates {

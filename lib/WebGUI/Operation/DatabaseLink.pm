@@ -65,8 +65,10 @@ sub www_deleteDatabaseLink {
 sub www_deleteDatabaseLinkConfirm {
 	my $session = shift;
         return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->vitalComponent if ($session->form->process("dlid") == 0);
+
 	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->delete;
-        return www_listDatabaseLinks();
+        return www_listDatabaseLinks($session);
 }
 
 #-------------------------------------------------------------------
@@ -76,7 +78,8 @@ sub www_editDatabaseLink {
         my ($output, %db, $f);
 	tie %db, 'Tie::CPHash';
 	if ($session->form->process("dlid") eq "new") {
-		
+		# Default values are SELECT, DESCRIBE and SHOW
+		$db{allowedKeywords} = "select\ndescribe\nshow";		
 	} elsif ($session->form->process("dlid") eq "0") {
 		
 	} else {
@@ -123,6 +126,12 @@ sub www_editDatabaseLink {
 		-hoverHelp => $i18n->get('995 description'),
 		-value => $db{identifier},
         );
+	$f->textarea(
+		-name => "allowedKeywords",
+		-label => $i18n->get('allowed keywords'),
+		-hoverHelp => $i18n->get('allowed keywords description'),
+		-value => $db{allowedKeywords},
+	);
         $f->submit;
 	$output .= $f->print;
         return _submenu($session,$output,"990","database link add/edit");
@@ -130,20 +139,25 @@ sub www_editDatabaseLink {
 
 #-------------------------------------------------------------------
 sub www_editDatabaseLinkSave {
+	my ($allowedKeywords);
 	my $session = shift;
         return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	
+	# Convert enters to a single \n.
+	($allowedKeywords = $session->form->process("allowedKeywords")) =~ s/\s+/\n/g;
 	my $params = {
 		title=>$session->form->process("title"),
 		username=>$session->form->process("dbusername"),
 		identifier=>$session->form->process("dbidentifier"),
-		DSN=>$session->form->process("DSN")
+		DSN=>$session->form->process("DSN"),
+		allowedKeywords=>$allowedKeywords,
 		};
 	if ($session->form->process("dlid") eq "new") {
 		WebGUI::DatabaseLink->create($session,$params);
 	} else {
 		WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->set($params);
 	}
-        return www_listDatabaseLinks();
+        return www_listDatabaseLinks($session);
 }
 
 #-------------------------------------------------------------------
@@ -154,12 +168,14 @@ sub www_listDatabaseLinks {
         my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
 	my $i18n = WebGUI::International->new($session);
 	foreach my $id (keys %{$links}) {
-		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.$i18n->get(1076).'</td></tr>';
-                $output = '<tr><td valign="top" class="tableData">'
-			.$session->icon->delete('op=deleteDatabaseLink;dlid='.$id)
-			.$session->icon->edit('op=editDatabaseLink;dlid='.$id)
-			.$session->icon->copy('op=copyDatabaseLink;dlid='.$id)
-			.'</td>';
+#		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.$i18n->get(1076).'</td></tr>';
+                $output .= '<tr><td valign="top" class="tableData">';
+		if ($id ne '0') {
+			$output .= $session->icon->delete('op=deleteDatabaseLink;dlid='.$id)
+				.$session->icon->edit('op=editDatabaseLink;dlid='.$id)
+				.$session->icon->copy('op=copyDatabaseLink;dlid='.$id);
+		}
+		$output	.= '</td>';
                 $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td></tr>';
         }
         $output .= '</table>';

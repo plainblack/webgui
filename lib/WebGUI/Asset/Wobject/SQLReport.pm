@@ -47,7 +47,11 @@ sub definition {
 			dbQuery1=>{
 				fieldType=>"codearea",
 				defaultValue=>undef
-				}, 
+				},
+			prequeryStatements1=>{
+				fieldType=>"codearea",
+				defaultValue=>undef
+				},
 			preprocessMacros1=>{
 				fieldType=>"yesNo",
 				defaultValue=>0
@@ -64,6 +68,10 @@ sub definition {
                                 fieldType=>"codearea",
                                 defaultValue=>undef
                                 },
+			prequeryStatements2=>{
+				fieldType=>"codearea",
+				defaultValue=>undef
+				},
                         preprocessMacros2=>{
 				fieldType=>"yesNo",
                                 defaultValue=>0
@@ -80,6 +88,10 @@ sub definition {
                                 fieldType=>"codearea",
                                 defaultValue=>undef
                                 },
+			prequeryStatements3=>{
+				fieldType=>"codearea",
+				defaultValue=>undef
+				},
                         preprocessMacros3=>{
 				fieldType=>"yesNo",
                                 defaultValue=>0
@@ -96,6 +108,10 @@ sub definition {
                                 fieldType=>"codearea",
                                 defaultValue=>undef
                                 },
+			prequeryStatements4=>{
+				fieldType=>"codearea",
+				defaultValue=>undef
+				},
                         preprocessMacros4=>{
 				fieldType=>"yesNo",
                                 defaultValue=>0
@@ -112,6 +128,10 @@ sub definition {
                                 fieldType=>"codearea",
                                 defaultValue=>undef
                                 },
+			prequeryStatements5=>{
+				fieldType=>"codearea",
+				defaultValue=>undef
+				},
                         preprocessMacros5=>{
 				fieldType=>"yesNo",
                                 defaultValue=>0
@@ -172,55 +192,62 @@ sub getEditForm {
 		|);
 
 	for my $nr (1..5) {
-	   # Set TR class for this query properties
-	   $tabform->getTab("properties")->trClass("query".$nr);
+		# Set TR class for this query properties
+		$tabform->getTab("properties")->trClass("query".$nr);
 
-	   $tabform->getTab("properties")->readOnly(
-		   -value=>"<hr>",
-                   -label=>join '', "<b>", $i18n->get('4'), $nr,":</b>",
-		   ); 
-	   $tabform->getTab("properties")->yesNo(
-	  	   -name=>"preprocessMacros".$nr,
-		   -label=>$i18n->get(15),
-		   -hoverHelp=>$i18n->get('15 description'),
-		   -value=>$self->getValue("preprocessMacros".$nr)
-		   );
-	   $tabform->getTab("properties")->textarea(
-                   -name=>"placeholderParams".$nr,
-                   -label=>$i18n->get('Placeholder Parameters'),
-                   -hoverHelp=>$i18n->get('Placeholder Parameters description'),
-                   -value=>$self->getValue("placeholderParams".$nr)
-                   );
-	   $tabform->getTab("properties")->codearea(
-		   -name=>"dbQuery".$nr,
-		   -label=>$i18n->get(4),
-		   -hoverHelp=>$i18n->get('4 description'),
-		   -value=>$self->getValue("dbQuery".$nr)
-		   );
-	   $tabform->getTab("properties")->databaseLink(
-		   -name=>"databaseLinkId".$nr,
-		   -value=>$self->getValue("databaseLinkId".$nr)
-		   );
+		$tabform->getTab("properties")->readOnly(
+			-value=>"<hr>",
+			-label=>join '', "<b>", $i18n->get('4'), $nr,":</b>",
+		); 
+		$tabform->getTab("properties")->yesNo(
+			-name=>"preprocessMacros".$nr,
+			-label=>$i18n->get(15),
+			-hoverHelp=>$i18n->get('15 description'),
+			-value=>$self->getValue("preprocessMacros".$nr)
+		);
+		$tabform->getTab("properties")->textarea(
+			-name=>"placeholderParams".$nr,
+			-label=>$i18n->get('Placeholder Parameters'),
+			-hoverHelp=>$i18n->get('Placeholder Parameters description'),
+			-value=>$self->getValue("placeholderParams".$nr)
+		);
+		$tabform->getTab("properties")->codearea(
+			-name	=> "prequeryStatements".$nr,
+			-label	=> $i18n->get('Prequery statements'),
+			-hoverHelp => $i18n->get('Prequery statements description'),
+			-value	=> $self->getValue("prequeryStatements".$nr),
+		);
+		$tabform->getTab("properties")->codearea(
+			-name=>"dbQuery".$nr,
+			-label=>$i18n->get(4),
+			-hoverHelp=>$i18n->get('4 description'),
+			-value=>$self->getValue("dbQuery".$nr)
+		);
+		$tabform->getTab("properties")->databaseLink(
+			-name=>"databaseLinkId".$nr,
+			-value=>$self->getValue("databaseLinkId".$nr)
+		);
 
-	   # Add a "Add another query" button
-	   if ($nr < 5	and ($self->get("dbQuery".($nr+1)) eq "" || ($self->get("dbQuery".($nr)) eq "" and $self->get("dbQuery".($nr+1)) ne ""))) {
-	           $tabform->getTab("properties")->button(
-        	           -value=>$i18n->get('Add another query'),
-                	   -extras=>'onclick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
-	                   -noWait=>1
-        	           );
-	   }
+		# Add a "Add another query" button
+		if ($nr < 5 and ($self->get("dbQuery".($nr+1)) eq "" || ($self->get("dbQuery".($nr)) eq "" and $self->get("dbQuery".($nr+1)) ne ""))) {
+			$tabform->getTab("properties")->button(
+				-value=>$i18n->get('Add another query'),
+				-extras=>'onclick="toggleQuery(\''.($nr+1).'\'); this.style.display=\'none\';"',
+				-noWait=>1
+			);
+		}
 
-	   # Make empty query blocks invisible
-           if ($nr > 1 && ($self->get("dbQuery".$nr) eq "" || $self->get("dbQuery".($nr-1)) eq "")) {
-		$tabform->getTab("properties")->raw(qq|
-                        <script type="text/javascript">
-                                toggleQuery('$nr');
-                        </script>
-                        |);
-           }
+		# Make empty query blocks invisible
+		if ($nr > 1 && ($self->get("dbQuery".$nr) eq "" || $self->get("dbQuery".($nr-1)) eq "")) {
+			$tabform->getTab("properties")->raw(qq|
+				<script type="text/javascript">
+					toggleQuery('$nr');
+				</script>
+			|);
+		}
 
 	}
+	
 	# Undefine TR class
 	$tabform->getTab("properties")->trClass();
 
@@ -229,7 +256,8 @@ sub getEditForm {
 		-label=>$i18n->get(14),
 		-hoverHelp=>$i18n->get('14 description'),
 		-value=>$self->getValue("paginateAfter")
-		);
+	);
+	
 	return $tabform;
 }
 
@@ -308,7 +336,6 @@ sub _parsePlaceholderParams {
 
 
 #-------------------------------------------------------------------
-
 sub _processQuery {
 	my $self = shift;	
 	my $nr = shift || 1;
@@ -328,14 +355,38 @@ sub _processQuery {
         } else {
                 $query = $self->{_query}{$nr}{dbQuery};
         }
-	
+
 	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(17).$query});
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get('debug placeholder parameters').join(",",@$placeholderParams)});
         my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId});
-        my $dbh = $dbLink->db;
+
+	my $dbh = $dbLink->db;
         if (defined $dbh) {
-                if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
+		if ($dbLink->queryIsAllowed($query)) {
+#                if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
+                	# Check and execute prequery statements first
+			foreach (split(/\n/, $self->getValue("prequeryStatements".$nr))) {
+				my $prequeryStatement = $_;
+				WebGUI::Macro::process($self->session, \$prequeryStatement) if ($self->{_query}{$nr}{preprocessMacros});
+				
+				if ($dbLink->queryIsAllowed($prequeryStatement)) {
+					my $sth = $dbh->unconditionalRead($prequeryStatement);
+					if ($sth->errorCode > 0) {
+						push(@{$self->{_debug_loop}},{
+							'debug.output' => $i18n->get('Prequery error').' "'.$prequeryStatement.'": '.$sth->errorMessage
+						});
+					} else {
+						push(@{$self->{_debug_loop}},{
+							'debug.output' => "Prequery: $prequeryStatement"
+						});
+					}
+					$sth->finish;
+				} else {
+					push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get("Prequery not allowed").$prequeryStatement});
+				}
+			}
+
                         my $url = $self->getUrl('func=view');
                         foreach ($self->session->form->param) {
                                 unless ($_ eq "pn" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {

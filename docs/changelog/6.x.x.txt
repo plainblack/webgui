@@ -14,6 +14,8 @@
    sending attachments, HTML messages, and more. This will introduce many new
    options for developers.
  - The group mail screen now allows sending of HTML messages.
+ - Added prequery statements to the SQLReport and configurable allowed statements
+   to the databas link properties. (Martin Kamerbeek / Procolix)
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP

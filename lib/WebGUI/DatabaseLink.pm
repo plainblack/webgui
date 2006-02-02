@@ -230,14 +230,39 @@ sub new {
 				DSN=>$session->config->get("dsn"),
 				username=>$session->config->get("dbuser"),
 				identifier=>$session->config->get("dbpass"),
-				title=>"WebGUI Database"
+				title=>"WebGUI Database",
+				allowedKeywords=>"select\ndescribe\ndesc\nshow",
 				);
 		} else {
 			%databaseLink = $session->db->quickHash("select * from databaseLink where databaseLinkId=".$session->db->quote($databaseLinkId));
 		}
 	}
-	return undef unless $databaseLink{databaseLinkId};
+
+	return undef unless defined($databaseLink{databaseLinkId});
 	bless {_session=>$session, _databaseLink => \%databaseLink }, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 queryIsAllowed ( query )
+
+Returns a boolean indicating is the supplied query is allowed for this database link.
+
+=head3 query
+
+The SQL query which is to be investigated.
+
+=cut
+
+sub queryIsAllowed {
+	my $self = shift;
+	my $query = shift;
+
+	foreach (split(/\s+/, $self->{_databaseLink}{allowedKeywords})) {
+		return 1 if ($query =~ m/^$_/i);
+	}
+
+	return 0;
 }
 
 #-------------------------------------------------------------------

@@ -665,6 +665,11 @@ our $HELP = {
                                 description => '995 description',
                                 namespace => 'WebGUI',
                         },
+			{
+				title => 'allowed keywords',
+				description => 'allowed keywords description',
+				namespace => 'WebGUI',
+			},
 		],
 		related => [
 			{

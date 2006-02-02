@@ -3849,6 +3849,16 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		message => q|unknown user|,
 		lastUpdated => 1135205716,
 	},
+	
+	'allowed keywords' => {
+		message => q|Allowed keywords|,
+		lastUpdated => 0,
+	},
+
+	'allowed keywords description' => {
+		message => q|You can enter the statements that are allowed for this databaselink. A safe (read-only) choice is SELECT, DESCRIBE and SHOW. The different keywords should be seperated from each other by whitespace.|,
+		lastUpdated => 0,
+	},
 
 };
 

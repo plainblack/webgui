@@ -25,6 +25,11 @@ our $HELP = {
                                 description => '15 description',
                                 namespace => 'Asset_SQLReport',
                         },
+			{
+				title => 'Prequery statements',
+				description => 'Prequery statements description',
+				namespace => 'Asset_SQLReport',
+			},
                         {
                                 title => '4',
                                 description => '4 description',
@@ -44,7 +49,11 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'Wobject'
-			}
+			},
+			{
+				tag => 'database links manage',
+				namespace => 'WebGUI',
+			},
 		]
 	},
 	'sql report template' => {
