@@ -121,9 +121,27 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1138312761,
 	},
 
+	'add/edit approve event' => {
+		message => q|Approve Event|,
+		lastUpdated => 1138312761,
+		context => q|URL to approve an event in the Add/Edit Event form|,
+	},
+
 	'add/edit event maximum attendees description' => {
 		message => q|Based on room size, chairs, staffing and other requirements, the number of people who can attend the event.|,
 		lastUpdated => 1138899055,
+	},
+
+	'add/edit event required events' => {
+		message => q|Required Events|,
+		lastUpdated => 1138902214,
+		context => q|form field in add/edit event|,
+	},
+
+	'add/edit event required events description' => {
+		message => q|You can require that the user be registered for certain events before being allowed to register for this event.|,
+		lastUpdated => 1138899055,
+		context => q|hover help for required event field|,
 	},
 
 	'global prerequisite' => {

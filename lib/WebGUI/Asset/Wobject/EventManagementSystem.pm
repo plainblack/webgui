@@ -437,7 +437,7 @@ sub www_editEvent {
 	if ($self->session->user->isInGroup($self->get("groupToApproveEvents"))) {
 	 unless ($self->eventIsApproved($pid)) {
 	  $f->readOnly(
-		-value  => "<a href='".$self->getUrl("func=approveEvent;pid=".$pid)."'>Approve Event</a>"
+		-value  => sprintf "<a href='%s'>%s</a>", $self->getUrl("func=approveEvent;pid=".$pid), $i18n->get('add/edit approve event'),
 	  );
 	 }	
 	}
@@ -510,7 +510,8 @@ sub www_editEvent {
 		-name    => "eventList",
 		-options => $prerequisiteList,
 		-vertical  => 1,
-		-label   => "Required Events",
+		-label   => "add/edit event required events",
+		-hoverHelp   => "add/edit event required events description",
 		-sortByValue => 1
 	 );
 
