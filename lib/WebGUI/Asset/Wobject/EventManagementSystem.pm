@@ -434,7 +434,7 @@ sub www_editEvent {
 	$f->hidden( -name=>"func",-value=>"editEventSave" );
 	$f->hidden( -name=>"pid", -value=>$pid );
 	
-	if ($self->session->user->isInGroup($self->get("groupToApproveEvents"))) {
+	if ($self->session->user->isInGroup($self->get("groupToApproveEvents")) && $pid ne "new") {
 	 unless ($self->eventIsApproved($pid)) {
 	  $f->readOnly(
 		-value  => sprintf "<a href='%s'>%s</a>", $self->getUrl("func=approveEvent;pid=".$pid), $i18n->get('add/edit approve event'),
@@ -465,7 +465,7 @@ sub www_editEvent {
 	
 	$f->template(
 		-name  => "templateId",
-		-namespace => "product",
+		-namespace => "EventManagementSystem_product",
 		-value => $self->session->form->get("templateId") || $event->{templateId},
 		-hoverHelp => $i18n->get('add/edit event template description'),		
 		-label => "Event Template" #$i18n->get('add/edit event template')
@@ -748,16 +748,41 @@ sub view {
 	my %var;
 	
 	# Get the products available for sale for this page
-	my $sql = "select p.productId, p.title, p.description, p.price, e.approved from products as p, EventManagementSystem_products as e
+	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved 
+		   from products as p, EventManagementSystem_products as e
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"));
 
-	#my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
-	#$p->setDataByQuery($sql);
-	#$var{'events_loop'} = $p->getPage;
-	#$p->appendTemplateVars(\%var);
-	$var{'events_loop'} = $self->session->db->quickHash($sql);
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
+	$p->setDataByQuery($sql);
+	my $eventData = $p->getPageData;
+	my @events;
+
+	#We are getting each events information, passing it to the *events* template and processing it
+	#The html returned from each events template is returned to the Event Manager Display Template for arranging
+	#how the events are displayed in relation to one another.
+	foreach my $event (@$eventData) {
+	  my %eventFields;
+	  
+	  $eventFields{'title'} = $event->{'title'};
+	  $eventFields{'description'} = $event->{'description'};
+	  $eventFields{'price'} = $event->{'price'};
+	  
+	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
+	} 
+		
+	$var{'events_loop'} = \@events;
+	$var{'paginateBar'} = $p->getBarTraditional;
+	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');
+	$var{'manageEvents.label'} = "Manage Events";
+	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
+		$var{'canManageEvents'} = 1;
+	}
+	else {
+		$var{'canManageEvents'} = 0;
+	}
+	$p->appendTemplateVars(\%var);
 	
 	my $templateId = $self->get("displayTemplateId");
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});

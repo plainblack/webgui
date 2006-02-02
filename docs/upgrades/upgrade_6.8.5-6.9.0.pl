@@ -101,14 +101,30 @@ sub updateTemplates {
 #-------------------------------------------------
 sub addEMSTemplates {
         print "\tAdding Event Management System Templates.\n" unless ($quiet);
+
 my $template = <<EOT1;
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
 
 <tmpl_if session.var.adminOn>
         <p><tmpl_var controls></p>
 </tmpl_if>
-
+<tmpl_if canManageEvents>
+   <a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a>
+    </tmpl_if>
+    
+    <tmpl_loop events_loop>
+      <tmpl_var title>&nbsp;<tmpl_var description>&nbsp;<tmpl_var price><br>
+      </tmpl_loop>
+      
+      <tmpl_var paginateBar>
 EOT1
+
+my $template2 = <<EOT2;
+<h1><tmpl_var title></h1><br>
+<tmpl_var description>&nbsp;<tmpl_var price><br>
+
+
+EOT2
         my $in = WebGUI::Asset->getImportNode($session);
         $in->addChild({
                  className=>'WebGUI::Asset::Template',
@@ -116,6 +132,13 @@ EOT1
                  namespace=>'EventManagementSystem',
                  }, "EventManagerTmpl000001"
         );
+        
+        $in->addChild({
+        	className=>'WebGUI::Asset::Template',
+        	template=>$template2,
+        	namespace=>'EventManagementSystem_product',
+        	}, "EventManagerTmpl000002"
+	);
 }
 
 #-------------------------------------------------
