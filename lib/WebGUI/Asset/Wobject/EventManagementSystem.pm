@@ -157,12 +157,13 @@ sub error {
 	my $self = shift;
 	my $errors = shift;
 	my $callback = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my @errorMessages;
 	
 	foreach my $error (@$errors) {
 		#Null Field Error
 		if ($error->{type} eq "nullField") {
-		  push(@errorMessages, "The ".$error->{fieldName}." field cannot be blank.");
+		  push(@errorMessages, sprintf($i18n->get('null field error'),$error->{fieldName}));
 		}
 		
 		#General Error Message
@@ -530,8 +531,8 @@ sub www_editEvent {
 		-label => $i18n->get("add/edit event what next"),
 		-hoverHelp => $i18n->get("add/edit event what next"),
 		-options => {
-			"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
-			"return"	   => $i18n->get("add/edit event return to manage events"),
+				"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
+				"return"	   => $i18n->get("add/edit event return to manage events"),
 			    },
 		-defaultValue => "return"
 	 );
@@ -547,7 +548,7 @@ sub www_editEvent {
 	foreach my $prerequisiteId (keys %{$list}) {
 	
 		my $line = $self->session->icon->delete('func=deletePrerequisite;id='.$prerequisiteId,
-							 $self->getUrl, "Are you sure you want to delete this prerequisite?")." ";
+							 $self->getUrl, $i18n->get('confirm delete prerequisite'))." ";
 		
 		my $eventNames = $self->getRequiredEventNames($prerequisiteId);
 		my $events;
@@ -562,7 +563,7 @@ sub www_editEvent {
 	my $output = $f->print;
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),$i18n->get("manage events"));
 	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Wobject') : $i18n->get('edit', 'Wobject');
-	return $self->getAdminConsole->render($output, $addEdit.$i18n->get('add/edit event'));
+	return $self->getAdminConsole->render($output, $addEdit.$i18n->get('event'));
 }
 
 #-------------------------------------------------------------------
@@ -661,12 +662,16 @@ sub www_manageEvents {
 				EventManagementSystem_products as pe where p.productId = pe.productId
 				and pe.assetId=".$self->session->db->quote($self->get("assetId"))." order by sequenceNumber");
 	
-	$output = "<table width='100%'><tr><th>Event</th><th>Price</th><th>Status</th></tr>";
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	$output = sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
+				$i18n->get('event'),
+				$i18n->get('add/edit event price'),
+				$i18n->get('status');
 	while (my %row = $sth->hash) {
 		
 		$output .= "<tr><td>";
 		$output .= $self->session->icon->delete('func=deleteEvent;pid='.$row{productId}, $self->getUrl,
-						       'Are you sure you want to delete this event?').
+						       $i18n->get('confirm delete event')).
 			  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
 			  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
 			  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
@@ -676,18 +681,18 @@ sub www_manageEvents {
 		$output .= "</td><td>";
 		
 		if ($row{approved} == 0) {
-			$output .= "Pending";
+			$output .= $i18n->get('pending');
 		}
 		else {
-			$output .= "Approved";
+			$output .= $i18n->get('approved');
 		}
 		
 		$output .= "</td></tr>";
 	}
 	$output .= "</table>";
 	
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), "Add Event");
-	return $self->getAdminConsole->render($output, "Manage Events");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
+	return $self->getAdminConsole->render($output, $i18n->get("manage events"));
 }
 
 #-------------------------------------------------------------------
@@ -750,6 +755,7 @@ sub view {
 	my $self = shift;
 	my %var;
 	
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
 	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved 
 		   from products as p, EventManagementSystem_products as e
@@ -778,7 +784,7 @@ sub view {
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');
-	$var{'manageEvents.label'} = "Manage Events";
+	$var{'manageEvents.label'} = $i18n->get('manage events');
 	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
 		$var{'canManageEvents'} = 1;
 	}

@@ -209,10 +209,9 @@ our $I18N = { ##hashref of hashes
 		context => q|label for displaying errors when an event has been added or edited, such as missing required fields.|,
 	},
 
-	'add/edit event' => {
+	'event' => {
 		message => q|Event|,
 		lastUpdated => 1138904660,
-		context => q|Label for the Add/Edit Event Admin Console|,
 	},
 
 	'global prerequisite' => {
@@ -228,7 +227,49 @@ our $I18N = { ##hashref of hashes
 	'price must be greater than zero' => {
 		message => q|Price must be greater than zero.|,
 		lastUpdated => 1138312761,
-		message => q|Error message for an illegal price.|,
+		context => q|Error message for an illegal price.|,
+	},
+
+	'status' => {
+		message => q|Status|,
+		lastUpdated => 1138908026,
+		context => q|Whether an event has been approved or not|,
+	},
+
+	'approved' => {
+		message => q|Approved|,
+		lastUpdated => 1138908026,
+		context => q|label in Event Manager, approved|,
+	},
+
+	'pending' => {
+		message => q|Pending|,
+		lastUpdated => 1138908026,
+		context => q|label in Event Manager, waiting for approval|,
+	},
+
+	'confirm delete event' => {
+		message => q|Are you sure you want to delete this event?|,
+		lastUpdated => 1138908026,
+		context => q|Confirm whether an event will be deleted|,
+	},
+
+	'confirm delete prerequisite' => {
+		message => q|Are you sure you want to delete this prerequisite?|,
+		lastUpdated => 1138908883,
+		context => q|Confirm whether a prerequisite will be deleted in the add/edit event screen|,
+	},
+
+	'add event' => {
+		message => q|Add Event|,
+		lastUpdated => 1138908251,
+		context => q|Link to add an event to the event manager|,
+	},
+
+	'null field error' => {
+		message => q|The %s field cannot be blank.|,
+		lastUpdated => 1138908251,
+		context => q|When a required field is empty/blank, then this message is used in sprintf to tell the user which field it is and that it cannot be blank|,
 	},
 
 
