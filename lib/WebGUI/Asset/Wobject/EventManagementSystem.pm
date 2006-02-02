@@ -1,14 +1,18 @@
 package WebGUI::Asset::Wobject::EventManagementSystem;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2006 Plain Black Corporation.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2006 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use strict;
 use base 'WebGUI::Asset::Wobject';
@@ -18,27 +22,19 @@ use WebGUI::International;
 
 
 #-------------------------------------------------------------------
-sub error {
-	my $self = shift;
-	my $errors = shift;
-	my $callback = shift;
-	my @errorMessages;
-	
-	foreach my $error (@$errors) {
-		#Null Field Error
-		if ($error->{type} eq "nullField") {
-		  push(@errorMessages, "The ".$error->{fieldName}." field cannot be blank.");
-		}
-		
-		#General Error Message
-		elsif ($error->{type} eq "general") {
-		  push(@errorMessages, $error->{message});
-		}
-	}
-	return $self->$callback(\@errorMessages);
-}
 
-#-------------------------------------------------------------------
+=head2 checkRequiredFields ( requiredFields )
+
+Check for null form fields.
+
+Returns an array reference containing error messages
+
+=head3 requiredFields
+
+A hash reference whose keys correspond to field names and values correspond to the field name as it should be shown to the user in an error.
+
+=cut
+
 sub checkRequiredFields {
   my $self = shift;
   my $requiredFields = shift;
@@ -52,130 +48,10 @@ sub checkRequiredFields {
         }
       );
     }
+
   }
         
   return \@errors;    
-}
-
-#------------------------------------------------------------------
-#
-# Returns prerequisiteId of every prerequisite grouping assigned to eventId passed in.
-#
-sub getAssignedPrerequisites {
-	my $self = shift;
-	my $eventId = shift;
-	
-	my $sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
-		   where productId=".$self->session->db->quote($eventId);
-	
-	return $self->session->db->buildHashRef($sql); 
-}
-
-#------------------------------------------------------------------
-#
-# Returns names of every event assigned to the prerequisite grouping of the prerequisite group id passed in
-#
-sub getRequiredEventNames {
-	my $self = shift;
-	my $prerequisiteId = shift;
-	
-	my $sql = "select title from products as p, EventManagementSystem_prerequisites as pr, EventManagementSystem_prerequisiteEvents as pe
-		   where 
-		     pe.requiredProductId = p.productId 
-		     and pr.prerequisiteId = pe.prerequisiteId 
-		     and pr.prerequisiteId=".$self->session->db->quote($prerequisiteId);
-	
-	return $self->session->db->buildArrayRef($sql);
-}
-
-#------------------------------------------------------------------
-#
-# This method returns all events except for
-# a) the event matching the eventId parameter passed in AND
-# b) any events currently assigned as a prerequisite to the eventId parameter passed in
-# as a hash reference with the productId, and title
-#
-# Checks property globalPrerequisites to determine if events from all defined Event Managers should be displayed
-# or only the events defined in this particular Event Manager
-#
-sub getPrerequisiteEventList {
-	my $self = shift;
-	my $eventId = shift;
-	my $conditionalWhere;
-	
-	if ($self->get("globalPrerequisites") == 0) {
-		$conditionalWhere = "and e.assetId=".$self->session->db->quote($self->get('assetId'));
-	}
-	
-	my $sql = "select p.productId, p.title from products as p, EventManagementSystem_products as e
-		   where p.productId = e.productId 
-		         and p.productId !=".$self->session->db->quote($eventId)."
-		         $conditionalWhere
-		         and p.productId not in
-		         (select requiredProductId from EventManagementSystem_prerequisites as p,
-							EventManagementSystem_prerequisiteEvents as pe 
-			  where p.prerequisiteId = pe.prerequisiteId 
-			        and p.productId=".$self->session->db->quote($eventId).")";
-	
-	return $self->session->db->buildHashRef($sql);
-}
-
-#------------------------------------------------------------------
-sub deleteOrphans {
-	my $self = shift;
-	
-	#Check for orphaned prerequisite definitions
-	my @orphans = $self->session->db->quickArray("select p.prerequisiteId from EventManagementSystem_prerequisites as p 
-							left join EventManagementSystem_prerequisiteEvents as pe 
-							on p.prerequisiteId = pe.prerequisiteId 
-							where pe.prerequisiteId is null");
-	foreach my $orphan (@orphans) {
-		$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=".
-					   $self->session->db->quote($orphan));
-		
-
-	} 
-}
-
-#------------------------------------------------------------------
-sub eventIsApproved {
-	my $self = shift;
-	my $eventId = shift;
-	my ($result) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId=".
-			      $self->session->db->quote($eventId));
-	return $result;
-}
-
-#------------------------------------------------------------------
-sub validateEditEventForm {
-  my $self = shift;
-  my $errors;
-  
-  my %requiredFields;
-  tie %requiredFields, 'Tie::IxHash';
-  
-  #-----Form name--------------User Friendly Name----#
-  %requiredFields  = (
-  	"title"	   		=>	"Title",
-  	"description" 		=> 	"Description",
-  	"price"			=>	"Price",
-  	"maximumAttendees"	=>	"Maximum Attendees",
-  );
-
-  $errors = $self->checkRequiredFields(\%requiredFields);
-  
-  #Check price greater than zero
-  if ($self->session->form->get("price") <= 0) {
-      push (@{$errors}, {
-      	type      => "general",
-        message   => "Price must be greater than zero."
-        }
-      );
-  }
-  
-  #Other checks go here
-  
-  return $errors;
 }
 
 #-------------------------------------------------------------------
@@ -235,7 +111,225 @@ sub definition {
 	return $class->SUPER::definition($session,$definition);
 }
 
+#------------------------------------------------------------------
+
+=head2 deleteOrphans ( )
+
+Utility method that checks for prerequisite groupings that no longer have any events assigned to them and deletes it
+
+=cut
+
+sub deleteOrphans {
+	my $self = shift;
+	
+	#Check for orphaned prerequisite definitions
+	my @orphans = $self->session->db->quickArray("select p.prerequisiteId from EventManagementSystem_prerequisites as p 
+							left join EventManagementSystem_prerequisiteEvents as pe 
+							on p.prerequisiteId = pe.prerequisiteId 
+							where pe.prerequisiteId is null");
+	foreach my $orphan (@orphans) {
+		$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=".
+					   $self->session->db->quote($orphan));
+		
+
+	} 
+}
+
 #-------------------------------------------------------------------
+
+=head2 error ( errors, callback )
+
+Generates error messages and calls specified method to display them.
+
+=head3 errors
+
+An array reference containing an error stack
+
+=cut
+
+=head3 callback
+
+The method to call and pass the generated error messages to for display to the user
+
+=cut
+
+sub error {
+	my $self = shift;
+	my $errors = shift;
+	my $callback = shift;
+	my @errorMessages;
+	
+	foreach my $error (@$errors) {
+		#Null Field Error
+		if ($error->{type} eq "nullField") {
+		  push(@errorMessages, "The ".$error->{fieldName}." field cannot be blank.");
+		}
+		
+		#General Error Message
+		elsif ($error->{type} eq "general") {
+		  push(@errorMessages, $error->{message});
+		}
+	}
+	return $self->$callback(\@errorMessages);
+}
+
+#------------------------------------------------------------------
+
+=head2 eventIsApproved ( eventId )
+
+Returns approval status of a specified event
+
+=head3 eventId
+
+Id of event whose approval status you are trying to determine
+
+=cut
+
+sub eventIsApproved {
+	my $self = shift;
+	my $eventId = shift;
+	my ($result) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId=".
+			      $self->session->db->quote($eventId));
+	return $result;
+}
+
+#------------------------------------------------------------------
+
+=head2 getAssignedPrerequisites ( eventId )
+
+Returns prerequisiteId of every prerequisite grouping assigned to eventId passed in.
+
+=head3 eventId
+
+Id of the event whose prerequisites you want returned
+
+=cut
+
+sub getAssignedPrerequisites {
+	my $self = shift;
+	my $eventId = shift;
+	
+	my $sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
+		   where productId=".$self->session->db->quote($eventId);
+	
+	return $self->session->db->buildHashRef($sql); 
+}
+
+
+#------------------------------------------------------------------
+
+=head2 getPrerequisiteEventList ( eventId )
+
+Returns hash reference of EventId, Name pairs of events that qualify to be a specified Event Id's prerequisite
+
+This method returns all events except for
+ a) the event matching the eventId parameter passed in AND
+ b) any events currently assigned as a prerequisite to the eventId parameter passed in
+as a hash reference with the productId, and title
+
+ Checks property globalPrerequisites to determine if events from all defined Event Managers should be displayed
+ or only the events defined in this particular Event Manager
+
+=head3 eventId
+
+Id of the event that you want to return eligible prerequisites for
+
+=cut
+
+sub getPrerequisiteEventList {
+	my $self = shift;
+	my $eventId = shift;
+	my $conditionalWhere;
+	
+	if ($self->get("globalPrerequisites") == 0) {
+		$conditionalWhere = "and e.assetId=".$self->session->db->quote($self->get('assetId'));
+	}
+	
+	my $sql = "select p.productId, p.title from products as p, EventManagementSystem_products as e
+		   where p.productId = e.productId 
+		         and p.productId !=".$self->session->db->quote($eventId)."
+		         $conditionalWhere
+		         and p.productId not in
+		         (select requiredProductId from EventManagementSystem_prerequisites as p,
+							EventManagementSystem_prerequisiteEvents as pe 
+			  where p.prerequisiteId = pe.prerequisiteId 
+			        and p.productId=".$self->session->db->quote($eventId).")";
+	
+	return $self->session->db->buildHashRef($sql);
+}
+
+#------------------------------------------------------------------
+
+=head2 getRequiredEventName ( prerequisiteId )
+
+Returns names of every event assigned to the prerequisite grouping of the prerequisite group id passed in
+
+=head3 prerequisiteId
+
+Id of the prerequisite group whose assigned event names you want returned
+
+=cut
+
+sub getRequiredEventNames {
+	my $self = shift;
+	my $prerequisiteId = shift;
+	
+	my $sql = "select title from products as p, EventManagementSystem_prerequisites as pr, EventManagementSystem_prerequisiteEvents as pe
+		   where 
+		     pe.requiredProductId = p.productId 
+		     and pr.prerequisiteId = pe.prerequisiteId 
+		     and pr.prerequisiteId=".$self->session->db->quote($prerequisiteId);
+	
+	return $self->session->db->buildArrayRef($sql);
+}
+
+#------------------------------------------------------------------
+
+=head2 validateEditEventForm ( )
+
+Returns array reference containing any errors generated while validating the input of the Add/Edit Event Form
+
+=cut
+
+sub validateEditEventForm {
+  my $self = shift;
+  my $errors;
+  
+  my %requiredFields;
+  tie %requiredFields, 'Tie::IxHash';
+  
+  #-----Form name--------------User Friendly Name----#
+  %requiredFields  = (
+  	"title"	   		=>	"Title",
+  	"description" 		=> 	"Description",
+  	"price"			=>	"Price",
+  	"maximumAttendees"	=>	"Maximum Attendees",
+  );
+
+  $errors = $self->checkRequiredFields(\%requiredFields);
+  
+  #Check price greater than zero
+  if ($self->session->form->get("price") <= 0) {
+      push (@{$errors}, {
+      	type      => "general",
+        message   => "Price must be greater than zero."
+        }
+      );
+  }
+  
+  #Other checks go here
+  
+  return $errors;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_approveEvent ( )
+
+Method that will set the status of an event to approved.
+
+=cut
+
 sub www_approveEvent {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
@@ -248,6 +342,13 @@ sub www_approveEvent {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteEvent ( )
+
+Method to delete an event, and to remove the deleted event from all prerequisite definitions
+
+=cut
+
 sub www_deleteEvent {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
@@ -268,6 +369,13 @@ sub www_deleteEvent {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deletePrerequisite ( )
+
+Method to delete a prerequisite assignment of one event to another
+
+=cut
+
 sub www_deletePrerequisite {
 	my $self = shift;
 	my $eventId = $self->session->form->get("id");
@@ -283,6 +391,17 @@ sub www_deletePrerequisite {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editEvent ( errors )
+
+Method to generate form to Add or Edit an events properties including prerequisite assignments and event approval.
+
+=head3 errors
+
+An array reference of error messages to display to the user
+
+=cut 
+
 sub www_editEvent {
 	my $self = shift;
 	my $errors = shift;
@@ -442,6 +561,13 @@ sub www_editEvent {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editEventSave ( )
+
+Method that validates the edit event form and saves its contents to the database
+
+=cut
+
 sub www_editEventSave {
 	my $self = shift;
 
@@ -513,30 +639,13 @@ sub www_editEventSave {
 }
 
 #-------------------------------------------------------------------
-sub www_moveEventDown {
-	my $self = shift;
-	my $eventId = $self->session->form->get("pid");
-	
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
-	
-	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $eventId);
 
-	return $self->www_manageEvents;
-}
+=head2 www_manageEvents ( )
 
-#-------------------------------------------------------------------
-sub www_moveEventUp {
-	my $self = shift;
-	my $eventId = $self->session->form->get("pid");
+Method to display the event management console.
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
-	
-	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $eventId);
-	
-	return $self->www_manageEvents;
-}
+=cut
 
-#-------------------------------------------------------------------
 sub www_manageEvents {
 	my $self = shift;
 
@@ -578,21 +687,58 @@ sub www_manageEvents {
 
 #-------------------------------------------------------------------
 
+=head2 www_moveEventDown ( )
+
+Method to move an event down one position in display order
+
+=cut
+
+sub www_moveEventDown {
+	my $self = shift;
+	my $eventId = $self->session->form->get("pid");
+	
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	
+	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $eventId);
+
+	return $self->www_manageEvents;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_moveEventUp ( )
+
+Method to move an event up one position in display order
+
+=cut
+
+sub www_moveEventUp {
+	my $self = shift;
+	my $eventId = $self->session->form->get("pid");
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	
+	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $eventId);
+	
+	return $self->www_manageEvents;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
 
 =cut
 
-#sub prepareView {
-#	my $self = shift;
-#	$self->SUPER::prepareView();
-#	my $templateId = $self->get("displayTemplateId");
-#	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-#	$template->prepare;
-#	$self->{_viewTemplate} = $template;
-#}
-
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $templateId = $self->get("displayTemplateId");
+	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
 
 #-------------------------------------------------------------------
 sub view {
