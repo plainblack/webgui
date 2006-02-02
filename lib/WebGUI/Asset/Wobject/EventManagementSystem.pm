@@ -96,8 +96,8 @@ sub definition {
 				fieldType=>"yesNo",
 				defaultValue=>1,
 				tab=>"properties",
-				hoverHelp=>"When set to yes, you may assign events belonging to another instance of an Event Management System Asset as a prerequisite event for one of the events defined in this instance os the asset.  When set to no, only events defined within this instance of the asset may be used as prerequisites.",
-				label=>"Global Prerequisites"
+				label=>$i18n->get('global prerequisite'),
+				hoverHelp=>$i18n->get('global prerequisite description')
 				},
 		);
 	push(@{$definition}, {
@@ -294,16 +294,17 @@ Returns array reference containing any errors generated while validating the inp
 sub validateEditEventForm {
   my $self = shift;
   my $errors;
+  my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
   
   my %requiredFields;
   tie %requiredFields, 'Tie::IxHash';
   
   #-----Form name--------------User Friendly Name----#
   %requiredFields  = (
-  	"title"	   		=>	"Title",
-  	"description" 		=> 	"Description",
-  	"price"			=>	"Price",
-  	"maximumAttendees"	=>	"Maximum Attendees",
+  	"title"	   		=>	$i18n->get("add/edit event title"),
+  	"description" 		=> 	$i18n->get("add/edit event description"),
+  	"price"			=>	$i18n->get("add/edit event price"),
+  	"maximumAttendees"	=>	$i18n->get("add/edit event maximum attendees"),
   );
 
   $errors = $self->checkRequiredFields(\%requiredFields);
@@ -312,7 +313,7 @@ sub validateEditEventForm {
   if ($self->session->form->get("price") <= 0) {
       push (@{$errors}, {
       	type      => "general",
-        message   => "Price must be greater than zero."
+        message   => $i18n->get("price must be greater than zero"),
         }
       );
   }
@@ -492,7 +493,7 @@ sub www_editEvent {
 		-value => $self->session->form->get("endDate") || $event->{endDate},
 		-defaultValue => "32472169200",
 		-hoverHelp => $i18n->get('add/edit event end date description'),
-		-label => "End Date" #$i18n->get('add/edit event end date')
+		-label => $i18n->get('add/edit event end date')
 	);
 
 	$f->integer(
@@ -500,7 +501,7 @@ sub www_editEvent {
 		-value => $self->session->form->get("maximumAttendees") || $event->{maximumAttendees},
 		-defaultValue => 100,
 		-hoverHelp => $i18n->get('add/edit event maximum attendees description'),
-		-label => "Maximum Attendees" #$i18n->get('add/edit event maximum attendees')
+		-label => $i18n->get('add/edit event maximum attendees')
 	);
 
 	my $prerequisiteList = $self->getPrerequisiteEventList($pid);
