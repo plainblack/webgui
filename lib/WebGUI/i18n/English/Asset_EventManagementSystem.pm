@@ -144,6 +144,77 @@ our $I18N = { ##hashref of hashes
 		context => q|hover help for required event field|,
 	},
 
+	'add/edit event operator' => {
+		message => q|Operator|,
+		lastUpdated => 1138902214,
+		context => q|form field in add/edit event|,
+	},
+
+	'add/edit event operator description' => {
+		message => q|As required events are added to this event, you can specify that all of the events must required (And) or that any of the events are required (Or)|,
+		lastUpdated => 1138899055,
+		context => q|hover help for operator field|,
+	},
+
+	'and' => {
+		message => q|And|,
+		lastUpdated => 1138899055,
+		context => q|logical AND|,
+	},
+
+	'or' => {
+		message => q|Or|,
+		lastUpdated => 1138899055,
+		context => q|logical OR|,
+	},
+
+	'add/edit event what next' => {
+		message => q|What Next?|,
+		lastUpdated => 1138902214,
+		context => q|form field in add/edit event|,
+	},
+
+	'add/edit event what next description' => {
+		message => q|After you have completed filling out this form, you can either add another required event, or simply save your settings and return to the Event Manager page.|,
+		lastUpdated => 1138899055,
+		context => q|hover help for What Next field|,
+	},
+
+	'add/edit event add another prerequisite' => {
+		message => q|Add Another Prerequisite|,
+		lastUpdated => 1138312761,
+		context => q|option for adding another required event in the add/edit event screen|,
+	},
+
+	'add/edit event return to manage events' => {
+		message => q|Return to Manage Events|,
+		lastUpdated => 1138312761,
+		context => q|option for returning to manage events page|,
+	},
+
+	'add/edit event assigned prerequisites' => {
+		message => q|<br>Assigned Prerequisites<br><br>|,
+		lastUpdated => 1138312761,
+		context => q|Label for displaying required events|,
+	},
+
+	'manage events' => {
+		message => q|Manage Events|,
+		lastUpdated => 1138903982,
+	},
+
+	'add/edit event error' => {
+		message => q|ERROR|,
+		lastUpdated => 1138903982,
+		context => q|label for displaying errors when an event has been added or edited, such as missing required fields.|,
+	},
+
+	'add/edit event' => {
+		message => q|Event|,
+		lastUpdated => 1138904660,
+		context => q|Label for the Add/Edit Event Admin Console|,
+	},
+
 	'global prerequisite' => {
 		message => q|Global Prerequisites|,
 		lastUpdated => 1138312761,

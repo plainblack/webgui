@@ -426,7 +426,7 @@ sub www_editEvent {
 	
 	# Errors
 	foreach (@$errors) {
-		$errorMessages .= "<span style='color: red; font-weight: bold;'>ERROR: $_ </span><br />";
+		$errorMessages .= sprintf "<span style='color: red; font-weight: bold;'>%s: %s </span><br />", $i18n->get('add/edit event error'), $_;
 	}
 	$f->readOnly( -value=>$errorMessages );
 	
@@ -517,19 +517,21 @@ sub www_editEvent {
 
 	 $f->radioList(
 		-name  => "requirement",
-		-options => { "and" => "And",
-			      "or"  => "Or",
+		-options => { "and" => $i18n->get("and"),
+			      "or"  => $i18n->get("or"),
 			    },
-		-label => "Operator",
 		-defaultValue => "and"
+		-label => $i18n->get("add/edit event operator"),
+		-label => $i18n->get("add/edit event operator description"),
 	 );
 
 	 $f->selectBox(
 		-name  => "whatNext",
-		-label => "What Next",
+		-label => $i18n->get("add/edit event what next"),
+		-hoverHelp => $i18n->get("add/edit event what next"),
 		-options => {
-			"addAnotherPrereq" => "Add Another Prerequisite",
-			"return"	   => "Return to Manage Events"
+			"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
+			"return"	   => $i18n->get("add/edit event return to manage events"),
 			    },
 		-defaultValue => "return"
 	 );
@@ -539,7 +541,7 @@ sub www_editEvent {
 	$f->submit;
 
 	#Display Currently Assigned Prerequisites if any
-	$f->readOnly( -value => "<br>Assigned Prerequisites<br><br>" );
+	$f->readOnly( -value => $i18n->get('add/edit event assigned prerequisites'), );
 	
 	my $list = $self->getAssignedPrerequisites($pid);
 	foreach my $prerequisiteId (keys %{$list}) {
@@ -558,8 +560,9 @@ sub www_editEvent {
 	}
 
 	my $output = $f->print;
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),"Manage Events");
-	return $self->getAdminConsole->render($output, "Add/Edit Event");				
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),$i18n->get("manage events"));
+	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Wobject') : $i18n->get('edit', 'Wobject');
+	return $self->getAdminConsole->render($output, $addEdit.$i18n->get('add/edit event'));
 }
 
 #-------------------------------------------------------------------
