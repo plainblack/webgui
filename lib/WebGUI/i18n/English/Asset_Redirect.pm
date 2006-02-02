@@ -35,8 +35,8 @@ our $I18N = {
 
 	'redirect add/edit body' => {
 		message => q|
-<P>The Page Redirect Asset causes the user's browser to be redirected to another page. It does this if it is viewed standalone, as part of a Page Asset, or proxied via a macro.</P>
-<P><b>NOTE:</b> The redirection will be disabled while in admin mode in order to allow editing the properties of the page.</P>
+<P>The Page Redirect Asset causes the user's browser to be redirected to another page. This will happen automatically if it is viewed standalone.  If the Asset is viewed as part a Page Asset, or proxied via a macro, then nothing will happen.</P>
+<P><b>NOTE:</b> The redirection will be disabled while in admin mode in order to allow editing the properties of the Asset.</P>
 
 |,
         	lastUpdated => 1130876050,
@@ -45,6 +45,11 @@ our $I18N = {
 
         'redirect url description' => {
                 message => q|The URL where the user will be redirected.|,
+                lastUpdated => 1119574089,
+        },
+
+        'self_referential' => {
+                message => q|Redirect is self-referential|,
                 lastUpdated => 1119574089,
         },
 

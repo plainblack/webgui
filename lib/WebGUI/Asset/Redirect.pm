@@ -117,8 +117,8 @@ A web executable method that redirects the user to the specified page, or displa
 sub www_view {
 	my $self = shift;
 	return WebGUI::Privilege::noAccess() unless $self->canView;
+	my $i18n = WebGUI::International->new("Asset_Redirect");
 	if ($session{var}{adminOn} && $self->canEdit) {
-		my $i18n = WebGUI::International->new("Asset_Redirect");
 		return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
 			<ul>
 			<li><a href="'.$self->get("redirectUrl").'">'.$i18n->get("go to the redirect url").'</a></li>
@@ -129,7 +129,7 @@ sub www_view {
 	my $url = $self->get("redirectUrl");
 	WebGUI::Macro::process(\$url);
 	WebGUI::HTTP::setRedirect($url) unless $self->get("redirectUrl") eq $self->get("url");
-	return "Redirect is self-referential";
+        return $i18n->get('self_referential');
 }
 
 
