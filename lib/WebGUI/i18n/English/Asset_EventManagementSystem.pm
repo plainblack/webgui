@@ -1,9 +1,22 @@
 package WebGUI::i18n::English::Asset_EventManagementSystem;
 
 our $I18N = { ##hashref of hashes
+	'add/edit help title' => { 
+		message => q|Add/Edit Event Management System|,
+		lastUpdated => 1131394070,
+		context => q|Title for Add/Edit Event Managment System Help|
+	},
+
+	'add/edit help body' => { 
+		message => q|<p>The Event Management System provides registration and payment for events inside WebGUI.  You can assign two groups who are allowed to do event management, one to add events to the manager, and another to approve them.  You will also be able to setup several templates for the display of the list of events and the event checkout form.</p>
+		<p>Each event for sale is a Product from the Commerce System.</p>|,
+		lastUpdated => 1131394070,
+		context => q|Body for Add/Edit Event Managment System Help|
+	},
+
 	'display template' => { 
 		message => q|Display Template|,
-		lastUpdated => 1131394070, #seconds from the epoch
+		lastUpdated => 1131394070,
 		context => q|Field label for template selector|
 	},
 
@@ -15,7 +28,7 @@ our $I18N = { ##hashref of hashes
 
 	'add/edit event template' => { 
 		message => q|Event Template|,
-		lastUpdated => 1131394070, #seconds from the epoch
+		lastUpdated => 1131394070,
 		context => q|Field label for event template selector|
 	},
 
