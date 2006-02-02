@@ -21,6 +21,7 @@
  - Added logic to deal with case sensitivity and whitespace problems in LDAP
    Group matching.
  - fix [ 1397890 ] Can't click directly to page 2+ of a thread
+ - fix [ 1328895 ] Page Redirect Asset Help File needs to be changed
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
