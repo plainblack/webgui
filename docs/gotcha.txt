@@ -32,6 +32,8 @@ save you many hours of grief.
  * The following perl modules are now required:
 
 	MIME::Tools
+	POE
+	POE::Component::IKC::Server
 
 
 

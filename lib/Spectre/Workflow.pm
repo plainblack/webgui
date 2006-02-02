@@ -15,6 +15,45 @@ package Spectre::Workflow;
 =cut
 
 use strict;
+use POE;
+
+#-------------------------------------------------------------------
+
+=head2 _start ( )
+
+Initializes the workflow manager.
+
+=cut
+
+sub _start {
+        print "Starting WebGUI Spectre Workflow Manager...";
+        my ( $kernel, $self, $publicEvents) = @_[ KERNEL, OBJECT, ARG0 ];
+        my $serviceName = "workflow";
+        $kernel->alias_set($serviceName);
+        $kernel->call( IKC => publish => $serviceName, $publicEvents );
+	my $configs = WebGUI::Config->readAllConfigs($self->{_webguiRoot});
+	foreach my $config (keys %{$configs}) {
+		$kernel->yield("loadWorkflows", $config);
+	}
+        print "OK\n";
+        $kernel->yield("checkJobs");
+}
+
+#-------------------------------------------------------------------
+
+=head2 _stop ( )
+
+Gracefully shuts down the workflow manager.
+
+=cut
+
+sub _stop {
+	my ($kernel, $self) = @_[KERNEL, OBJECT];
+	print "Stopping WebGUI Spectre Workflow Manager...";
+	undef $self;
+	print "OK\n";
+}
+
 
 
 #-------------------------------------------------------------------
@@ -34,13 +73,42 @@ A hash reference containing a row of data from the WorkflowInstance table.
 =cut
 
 sub addJob {
-	my $self = shift;
-	my $config = shift;
-	my $job = shift;	
+	my ($self, $config, $job) = @_[OBJECT, ARG0, ARG1];
 	$self->{"_priority".$job->{priority}}{$job->{instanceId}} = {
+		instanceId=>$job->{instanceId},
 		config=>$config,
 		status=>"waiting"
 		};
+}
+
+#-------------------------------------------------------------------
+
+=head2 checkJobs ( )
+
+Checks to see if there are any open job slots available, and if there are assigns a new job to be run to fill it.
+
+=cut
+
+sub checkJobs {
+	my ($kernel, $self) = @_[KERNEL, OBJECT];
+	if ($self->countRunningJobs < 5) {
+		my $job = $self->getNextJob;
+		$job->{status} = "running";
+		$kernel->yield("runJob",$job);
+	}	
+}
+
+#-------------------------------------------------------------------
+
+=head2 countRunningJobs ( )
+
+Returns an integer representing the number of running jobs.
+
+=cut
+
+sub countRunningJobs {
+	my $self = shift;
+	return scalar(@{$self->{_runningJobs}});
 }
 
 #-------------------------------------------------------------------
@@ -52,24 +120,10 @@ Removes a workflow job from the processing queue.
 =cut
 
 sub deleteJob {
-	my $self = shift;
-	delete $self->{_priority1}{shift};
-	delete $self->{_priority2}{shift};
-	delete $self->{_priority3}{shift};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-	my $self = shift;
-	undef $self;
+	my ($self, $instanceId) = @_[OBJECT, ARG0];
+	delete $self->{_priority1}{$instanceId};
+	delete $self->{_priority2}{$instanceId};
+	delete $self->{_priority3}{$instanceId};
 }
 
 
@@ -83,11 +137,28 @@ sub getNextJob {
 	my $self = shift;
 	foreach my $priority (1..3) {
 		foreach my $instanceId (keys %{$self->{"_priority".$priority}}) {
-			if ($self->{"_priority".$priority}{status} eq "waiting") {
-				
+			if ($self->{"_priority".$priority}{$instanceId}{status} eq "waiting") {
+				return $self->{"_priority".$priority}{$instanceId};
+			}
 		}
 	}
 	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 loadWorkflows ( )
+
+=cut 
+
+sub loadWorkflows {
+	my ($kernel, $self, $config) = @_[KERNEL, OBJECT, ARG0];
+	my $session = WebGUI::Session->open($self->{_webguiRoot}, $config);
+	my $result = $session->db->read("select * from WorkflowInstance");
+	while (my $data = $result->hashRef) {
+		$kernel->yield("addJob", $config, $data);
+	}
+	$session->close;
 }
 
 #-------------------------------------------------------------------
@@ -107,17 +178,12 @@ sub new {
 	my $webguiRoot = shift;
 	my $self = {_webguiRoot=>$webguiRoot};
 	bless $self, $class;
-	my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
-	foreach my $config (keys %{$configs}) {
-		my $session = WebGUI::Session->open($webguiRoot, $config);
-		my $result = $session->db->read("select * from WorkflowInstance");
-		while (my $data = $result->hashRef) {
-			$self->addJob($config, $data);
-		}
-		$session->close;
-	}
+	my @publicEvents = qw(addJob deleteJob);
+	POE::Session->create(
+		object_states => [ $self => [qw(_start _stop checkJobs loadWorkflows runJob), @publicEvents] ],
+		args=>[\@publicEvents]
+        	);
 }
-
 
 1;
 
