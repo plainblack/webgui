@@ -16,6 +16,7 @@ package Spectre::Workflow;
 
 use strict;
 use POE;
+use POE::Component::Client::UserAgent;
 
 #-------------------------------------------------------------------
 
@@ -74,11 +75,14 @@ A hash reference containing a row of data from the WorkflowInstance table.
 
 sub addJob {
 	my ($self, $config, $job) = @_[OBJECT, ARG0, ARG1];
-	$self->{"_priority".$job->{priority}}{$job->{instanceId}} = {
+	# job list
+	$self->{_jobs}{$job->{instanceId}} = {
 		instanceId=>$job->{instanceId},
 		config=>$config,
-		status=>"waiting"
+		status=>"waiting",
+		priority=>$job->{priority}
 		};
+	push(@{$self->{"_priority".$job->{priority}}}, $self->{_jobs}{$job->{instanceId}});
 }
 
 #-------------------------------------------------------------------
@@ -93,8 +97,11 @@ sub checkJobs {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
 	if ($self->countRunningJobs < 5) {
 		my $job = $self->getNextJob;
-		$job->{status} = "running";
-		$kernel->yield("runJob",$job);
+		if (defined $job) {
+			$job->{status} = "running";
+			push(@{$self->{_runningJobs}}, $job);
+			$kernel->yield("runWorker",$job);
+		}
 	}	
 }
 
@@ -121,11 +128,14 @@ Removes a workflow job from the processing queue.
 
 sub deleteJob {
 	my ($self, $instanceId) = @_[OBJECT, ARG0];
-	delete $self->{_priority1}{$instanceId};
-	delete $self->{_priority2}{$instanceId};
-	delete $self->{_priority3}{$instanceId};
+	my $priority = $self->{_jobs}{$instanceId}{priority};
+	delete $self->{_jobs}{$instanceId};
+	for (my $i=0; $i < scalar(@{$self->{"_priority".$priority}}); $i++) {
+		if ($self->{"_priority".$priority}[$i]{instanceId} eq $instanceId) {
+			splice(@{$self->{"_priority".$priority}}, $i, 1);
+		}
+	}
 }
-
 
 #-------------------------------------------------------------------
 
@@ -136,9 +146,9 @@ sub deleteJob {
 sub getNextJob {
 	my $self = shift;
 	foreach my $priority (1..3) {
-		foreach my $instanceId (keys %{$self->{"_priority".$priority}}) {
-			if ($self->{"_priority".$priority}{$instanceId}{status} eq "waiting") {
-				return $self->{"_priority".$priority}{$instanceId};
+		foreach my $job (@{$self->{"_priority".$priority}}) {
+			if ($job->{status} eq "waiting") {
+				return $job;
 			}
 		}
 	}
@@ -180,10 +190,82 @@ sub new {
 	bless $self, $class;
 	my @publicEvents = qw(addJob deleteJob);
 	POE::Session->create(
-		object_states => [ $self => [qw(_start _stop checkJobs loadWorkflows runJob), @publicEvents] ],
+		object_states => [ $self => [qw(_start _stop checkJobs loadWorkflows runWorker), @publicEvents] ],
 		args=>[\@publicEvents]
         	);
 }
+
+#-------------------------------------------------------------------
+
+=head2 runWorker ( )
+
+Calls a worker to execute a workflow activity.
+
+=cut
+
+sub runWorker {
+	my ($kernel, $self, $job, $session) = @_[KERNEL, OBJECT, ARG0, SESSION];
+	POE::Component::Client::UserAgent->new;
+	my $url = $job->{sitename}.'/'.$job->{gateway};
+	$url =~ s/\/\//\//g;
+	$url = "http://".$url."?op=spectre;instanceId=".$job->{instanceId};
+	$kernel->post( useragent => 'request', { request => HTTP::Request->new(GET => $url), response => $session->postback('workerResponse') });
+}
+
+#-------------------------------------------------------------------
+
+=head2 suspendJob ( jobId ) {
+
+This method puts a running job back into the available jobs pool thusly freeing up a slot in the running jobs pool. This is done when a job has executed a workflow activity, but the entire workflow has not yet completed.
+
+=head3 jobId
+
+The job being suspended.
+
+=cut
+
+sub suspendJob {
+	my $self = shift;
+	my $instanceId = shift;
+	$self->{_jobs}{$instanceId}{status} = "waiting";
+	for (my $i=0; $i < scalar(@{$self->{_runningJobs}}); $i++) {
+		if ($self->{_runningJobs}[$i]{instanceId} eq $instanceId) {
+			splice(@{$self->{_runningJobs}}, $i, 1);
+		}
+	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 workerResponse ( )
+
+This method is called when the response from the runWorker() method is received.
+
+=cut
+
+sub workerResponse {
+	my $self = $_[OBJECT];
+        my ($request, $response, $entry) = @{$_[ARG1]};
+	my $jobId = "";	# got to figure out how to get this from the request, cuz the response may die
+	if ($response->is_success) {
+		my $state = ""; # get the response
+		if ($state eq "continue") {
+			$self->suspendJob($jobId);
+		} elsif ($state eq "done") {
+			$self->deleteJob($jobId);			
+		} else {
+			$self->suspendJob($jobId);
+			# something bad happened
+		}
+	} elsif ($response->is_redirect) {
+		# nothing to do, cuz we're following the redirect to see what happens
+	} elsif ($response->is_error) {	
+		$self->suspendJob($jobId)
+		# we should probably log something
+	}
+}
+
+
 
 1;
 

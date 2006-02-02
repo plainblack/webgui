@@ -34,7 +34,7 @@ save you many hours of grief.
 	MIME::Tools
 	POE
 	POE::Component::IKC::Server
-
+	POE::Component::Client::UserAgent
 
 
 6.8.4
