@@ -18,11 +18,13 @@ use Getopt::Long;
 my $configFile;
 my $help;
 my $verbose;
+my $perlBase;
 
 GetOptions(
 	'verbose'=>\$verbose,
 	'configFile=s'=>\$configFile,
-	'help'=>\$help
+	'perl-base=s'=>\$perlBase,
+	'help'=>\$help,
 	);
 
 my $helpmsg=<<STOP;
@@ -36,16 +38,22 @@ my $helpmsg=<<STOP;
 
 	--verbose		Turns on additional output.
 
+	--perl-base		The path of the perl installation you want to 
+				use. Defaults to the perl installation in your
+				PATH.
+
 STOP
 
 my $verboseFlag = "-v" if ($verbose);
 my $config = $ENV{WEBGUI_CONFIG};
 
+$perlBase .= '/bin/' if ($perlBase);
+
 if ( $configFile ) {
-	system("WEBGUI_CONFIG=".$configFile." prove ".$verboseFlag." -r ../t");
+	system("WEBGUI_CONFIG=".$configFile." ".$perlBase."prove ".$verboseFlag." -r ../t");
 	exit;
 } elsif ( defined @ENV{WEBGUI_CONFIG} ) {
-        system("prove ".$verboseFlag." -r ../t");
+        system($perlBase."prove ".$verboseFlag." -r ../t");
 	exit;
 } else {
 	print $helpmsg;
