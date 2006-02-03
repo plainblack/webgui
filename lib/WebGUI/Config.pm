@@ -32,10 +32,18 @@ This package parses the WebGUI config file.
 
  use WebGUI::Config;
 
- $hashRef = WebGUI::Config::getConfig($webguiRoot, $configFile);
- $hashRef = WebGUI::Config::readConfig($webguiRoot, $configFile);
-
  WebGUI::Config::loadAllConfigs($webguiRoot);
+ 
+ my $configs = WebGUI::Config::readAllConfigs($webguiRoot);
+
+ my $config = WebGUI::Config->new($webguiRoot, $configFileName);
+
+ my $value = $config->get($param);
+ $config->set($param,$value);
+ $config->delete($param);
+
+ my $configFileName = $config->getFilename;
+ my $webguiRoot = $config->getWebguiRoot;
 
 =head1 METHODS
 
@@ -151,7 +159,7 @@ sub loadAllConfigs {
 
 #-------------------------------------------------------------------
 
-=head2 new ( webguiRoot , configFile )
+=head2 new ( webguiRoot , configFile [ , noCache ] )
 
 Returns a hash reference containing the configuration data. It tries to get the data out of the memory cache first, but reads the config file directly if necessary.
 
@@ -163,12 +171,17 @@ The path to the WebGUI installation.
 
 The filename of the config file to read.
 
+=head3 noCache
+
+A boolean value that when set to true tells the config system not to store the config in an in memory cache, in case it's loaded again later. This is mostly used when loading utility configs, like spectre.conf.
+
 =cut
 
 sub new {
 	my $class = shift;
 	my $webguiPath = shift;
 	my $filename = shift;
+	my $noCache = shift;
 	if (exists $config{$filename}) {
 		return $config{$filename};
 	} else {
@@ -181,7 +194,7 @@ sub new {
 		my $conf = jsonToObj($json);
 		my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$conf};
 		bless $self, $class;
-		$config{$filename} = $self;
+		$config{$filename} = $self unless $noCache;
 		return $self;
 	}
 }

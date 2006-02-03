@@ -32,7 +32,7 @@ sub _start {
         my $serviceName = "workflow";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
-	my $configs = WebGUI::Config->readAllConfigs($self->{_webguiRoot});
+	my $configs = WebGUI::Config->readAllConfigs($self->{_config}->getWebguiRoot);
 	foreach my $config (keys %{$configs}) {
 		$kernel->yield("loadWorkflows", $config);
 	}
@@ -95,7 +95,7 @@ Checks to see if there are any open job slots available, and if there are assign
 
 sub checkJobs {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
-	if ($self->countRunningJobs < 5) {
+	if ($self->countRunningJobs < $self->{_config}->get("maxWorkers")) {
 		my $job = $self->getNextJob;
 		if (defined $job) {
 			$job->{status} = "running";
@@ -163,7 +163,7 @@ sub getNextJob {
 
 sub loadWorkflows {
 	my ($kernel, $self, $config) = @_[KERNEL, OBJECT, ARG0];
-	my $session = WebGUI::Session->open($self->{_webguiRoot}, $config);
+	my $session = WebGUI::Session->open($self->{_config}->getWebguiRoot, $config);
 	my $result = $session->db->read("select * from WorkflowInstance");
 	while (my $data = $result->hashRef) {
 		$kernel->yield("addJob", $config, $data);
@@ -173,11 +173,11 @@ sub loadWorkflows {
 
 #-------------------------------------------------------------------
 
-=head2 new ( webguiRoot )
+=head2 new ( config )
 
 Constructor. Loads all active workflows from each WebGUI site and begins executing them.
 
-=head3 webguiRoot
+=head3 config
 
 The path to the root of the WebGUI installation.
 
@@ -185,8 +185,8 @@ The path to the root of the WebGUI installation.
 
 sub new {
 	my $class = shift;
-	my $webguiRoot = shift;
-	my $self = {_webguiRoot=>$webguiRoot};
+	my $config = shift;
+	my $self = {_config=>$config};
 	bless $self, $class;
 	my @publicEvents = qw(addJob deleteJob);
 	POE::Session->create(

@@ -34,7 +34,7 @@ sub _start {
         my $serviceName = "scheduler";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
-	my $configs = WebGUI::Config->readAllConfigs($self->{_webguiRoot});
+	my $configs = WebGUI::Config->readAllConfigs($self->{_config}->getWebguiRoot);
 	foreach my $config (keys %{$configs}) {
 		$kernel->yield("loadSchedule", $config);
 	}
@@ -160,7 +160,7 @@ The config filename for the site to load the schedule.
 
 sub loadSchedule {
 	my ($kernel, $self, $config) = @_[KERNEL, OBJECT, ARG0];
-	my $session = WebGUI::Session->open($self->{_webguiRoot}, $config);
+	my $session = WebGUI::Session->open($self->{_config}->getWebguiRoot, $config);
 	my $result = $session->db->read("select * from WorkflowSchedule");
 	while (my $data = $result->hashRef) {
 		$kernel->yield("addJob",$config, $data);
@@ -170,24 +170,24 @@ sub loadSchedule {
 
 #-------------------------------------------------------------------
 
-=head2 new ( webguiRoot )
+=head2 new ( config )
 
 Constructor.
 
-=head3 webguiRoot
+=head3 config
 
-The path to the root of the WebGUI installation.
+A WebGUI::Config object that represents the spectre.conf file.
 
 =cut
 
 sub new {
 	my $class = shift;
-	my $webguiRoot = shift;
-	my $self = {_webguiRoot=>$webguiRoot};
+	my $config  = shift;
+	my $self = {_config=>$config};
 	bless $self, $class;
 	my @publicEvents = qw(addJob deleteJob);
 	POE::Session->create(
-		object_states => [ $self => [qw(_start _stop checkEvents checkEvent loadSchedule), @publicEvents] ],
+		object_states => [ $self => [qw(_start _stop checkSchedules checkSchedule loadSchedule), @publicEvents] ],
 		args=>[\@publicEvents]
         	);
 }

@@ -18,6 +18,8 @@ use strict;
 use POE;
 use POE::Component::IKC::Server;
 use POE::Component::IKC::Specifier;
+use Spectre::Cron;
+use Spectre::Workflow;
 
 #-------------------------------------------------------------------
 
@@ -33,7 +35,6 @@ sub _start {
         my $serviceName = "admin";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
-	my $configs = WebGUI::Config->readAllConfigs($self->{_webguiRoot});
         print "OK\n";
 }
 
@@ -55,31 +56,31 @@ sub _stop {
 
 #-------------------------------------------------------------------
 
-=head2 new ( webguiRoot )
+=head2 new ( config )
 
 Constructor.
 
-=head3 webguiRoot
+=head3 config
 
-The path to the root of the WebGUI installation.
+A WebGUI::Config object that represents the spectre.conf file.
 
 =cut
 
 sub new {
 	my $class = shift;
-	my $webguiRoot = shift;
-	my $self = {_webguiRoot=>$webguiRoot};
+	my $config = shift;
+	my $self = {_config=>$config};
 	bless $self, $class;
 	create_ikc_server(
-        	port => 32133,
+        	port => $config->get("port"),
        	 	name => 'Spectre',
         	);
 	POE::Session->create(
 		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop"} ],
 		args=>[["shutdown"]]
         	);
-	$self->{_cron} = Spectre::Cron->new($webguiRoot);
-	$self->{_workflow} = Spectre::Workflow->new($webguiRoot);
+	$self->{_cron} = Spectre::Cron->new($config);
+	$self->{_workflow} = Spectre::Workflow->new($config);
 	POE::Kernel->run();
 }
 

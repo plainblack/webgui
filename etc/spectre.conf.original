@@ -1,4 +1,20 @@
-# Define a port for Spectre to run on between 1024 and 65000.
-port = 32133
+# config-file-format: JSON 1
 
+{
+
+# Define a port for Spectre to run on between 1024 and 65000.
+
+"port" : 32133,
+
+# How many Spectre workers should be allowed to be running at
+# one time. Keep in mind that workers use some of the resources
+# of your web site. If you're running only one server, you probably
+# shouldn't have more than 5 workers. If you're running load
+# balanced servers, you can probably have as many as 5 per server,
+# but depending upon the amount of editing and workflows you have
+# on your site, you may not need that many.
+
+"maxWorkers" : 3
+
+}
 
