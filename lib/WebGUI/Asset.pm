@@ -862,6 +862,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
+	return undef unless $self->canEdit;
 	return $self->{_toolbar} if (exists $self->{_toolbar});
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43));
