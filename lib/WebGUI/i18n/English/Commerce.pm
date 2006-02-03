@@ -26,7 +26,7 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|The name of the 'payment plugins' tab in editCommerce.|
 	},
-	'payment form' => {
+	'payment plugin' => {
 		message => q|Payment Plugin|,
 		lastUpdated => 0,
 		context => q|The name of the 'payment plugin' form option in editCommerce.|
@@ -63,43 +63,64 @@ our $I18N = {
 		context => q|The title of the manage commerce help page.|
 	},
 
-	'help manage commerce body' => {
-		message => q|The commerce system of WebGUI is highly configurable. You can set the following properties:<p>
+        'confirm checkout template description' => {
+                message => q|This template is shown when a user is asked to confirm his purchase. The form data for the payment gateway is also shown here.<p>|,
+                lastUpdated => 1138922899,
+        },
 
-<b>^International("confirm checkout template","Commerce");</b><br>
-This template is shown when a user is asked to confirm his purchase. The form data for the payment gateway is also shown here.<br>
-<br>
+        'transaction error template description' => {
+                message => q|This is the template that's shown if any error occurs during the payment process. This could be a declined credit card or a false cvv2 code, for instance. Also an 'error' is triggered by a fraud protection filter or some other service that requires manual interaction from the merchant.<p>|,
+                lastUpdated => 1138922899,
+        },
 
-<b>^International("transaction error template","Commerce");</b><br>
-This is the template that's shown if any error occurs during the payment process. This could be a declined credit card or a false cvv2 code, for instance. Also an 'error' is triggered by a fraud protection filter or some other service that requires manual interaction from the merchant.<br>
-<br>
+        'checkout canceled template description' => {
+                message => q|This is the template that the user sees when he cancels the transaction. This normally only occurs with remote-side payment gateways (like PayPal). This is because a site-side payment gateway usually uses a single step process.<p>|,
+                lastUpdated => 1138922899,
+        },
 
-<b>^International("checkout canceled template","Commerce");</b><br>
-This is the template that the user sees when he cancels the transaction. This normally only occurs with remote-side payment gateways (like PayPal). This is because a site-side payment gateway usually uses a single step process.<br>
-<br>
+        'checkout select payment template description' => {
+                message => q|This is the template that the user sees when he selects a payment after confirming checkout.<p>|,
+                lastUpdated => 1138923865,
+        },
 
-<b>^International("daily report email","Commerce");</b>
-Everyday the scheduler plugin that checks and updates subscriptions send a report on on the successful and failed term payments. Here you can set to which email address it should send this report.<br>
-<br>
+        'checkout select shipping template description' => {
+                message => q|This is the template that the user sees when he selects a shipping method.<p>|,
+                lastUpdated => 1138923865,
+        },
 
-<b>Payment plugin</b><br>
-You can select the payment plugin to use here. Please note that you have to enable the plugins you want to choose from in the WebGUI configuration file. If you don't do this they won't show up here.<br>
-<br>
+        'view shopping cart template description' => {
+                message => q|This is the template to customize the display of the user's shopping cart.<p>|,
+                lastUpdated => 1138923865,
+        },
+
+        'shipping plugin label description' => {
+                message => q|Select all plugins that can be used for shipping on your site.<p>|,
+                lastUpdated => 1138924101,
+        },
+
+        'daily report email description' => {
+                message => q|Everyday the scheduler plugin that checks and updates subscriptions send a report on on the successful and failed term payments. Here you can set to which email address it should send this report.<p>|,
+                lastUpdated => 1138922899,
+        },
+
+        'payment plugin description' => {
+                message => q|You can select the payment plugin to use here. Please note that you have to enable the plugins you want to choose from in the WebGUI configuration file. If you don't do this they won't show up here.<p>
 <h3>PayflowPro</h3>
-This is the plugin for Verisign Payflow Pro. This plugin is disabled by default in the configuration file because it depends on proprietary software from Verisign that can't be shipped with WebGUI.<br>
-<br>
+This is the plugin for Verisign Payflow Pro. This plugin is disabled by default in the configuration file because it depends on proprietary software from Verisign that can't be shipped with WebGUI.<p>
 <b>Partner</b><br>
-Your partner id.<br>
-<br>
+Your partner id.<p>
 <b>Vendor</b>
-Here you should enter your vendor id.<br>
-<br>
+Here you should enter your vendor id.<p>
 <b>Login</b>
-Your login to Verisign PayflowPro.<br>
-<br>
+Your login to Verisign PayflowPro.<p>
 <b>Password</b>
 Your password.<br>|,
-		lastUpdated => 1101881895,
+                lastUpdated => 1138922899,
+        },
+
+	'help manage commerce body' => {
+		message => q|The commerce system of WebGUI is highly configurable. You can set the following properties:<p>|,
+		lastUpdated => 1138922965,
 		context => q|The content of the manage commerce help page.|
 	},
 

@@ -391,36 +391,42 @@ sub www_editCommerceSettings {
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceConfirmCheckoutTemplateId',
 		-label		=> $i18n->get('confirm checkout template'),
+		-hoverHelp	=> $i18n->get('confirm checkout template description'),
 		-value		=> $session->setting->get("commerceConfirmCheckoutTemplateId"),
 		-namespace	=> 'Commerce/ConfirmCheckout'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceTransactionErrorTemplateId',
 		-label		=> $i18n->get('transaction error template'),
+		-hoverHelp	=> $i18n->get('transaction error template description'),
 		-value		=> $session->setting->get("commerceTransactionPendingTemplateId"),
 		-namespace	=> 'Commerce/TransactionError'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceCheckoutCanceledTemplateId',
 		-label		=> $i18n->get('checkout canceled template'),
+		-hoverHelp	=> $i18n->get('checkout canceled template description'),
 		-value		=> $session->setting->get("commerceCheckoutCanceledTemplateId"),
 		-namespace	=> 'Commerce/CheckoutCanceled'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceSelectPaymentGatewayTemplateId',
 		-label		=> $i18n->get('checkout select payment template'),
+		-hoverHelp	=> $i18n->get('checkout select payment template description'),
 		-value		=> $session->setting->get("commerceSelectPaymentGatewayTemplateId"),
 		-namespace	=> 'Commerce/SelectPaymentGateway'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceSelectShippingMethodTemplateId',
 		-label		=> $i18n->get('checkout select shipping template'),
+		-hoverHelp	=> $i18n->get('checkout select shipping template description'),
 		-value		=> $session->setting->get("commerceSelectShippingMethodTemplateId"),
 		-namespace	=> 'Commerce/SelectShippingMethod'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceViewShoppingCartTemplateId',
 		-label		=> $i18n->get('view shopping cart template'),
+		-hoverHelp	=> $i18n->get('view shopping cart template description'),
 		-value		=> $session->setting->get("commerceViewShoppingCartTemplateId"),
 		-namespace	=> 'Commerce/ViewShoppingCart'
 		);
@@ -428,6 +434,7 @@ sub www_editCommerceSettings {
 	$tabform->getTab('general')->email(
 		-name		=> 'commerceSendDailyReportTo',
 		-label		=> $i18n->get('daily report email'),
+		-hoverHelp	=> $i18n->get('daily report email description'),
 		-value		=> $session->setting->get("commerceSendDailyReportTo")
 		);
 
@@ -448,7 +455,8 @@ sub www_editCommerceSettings {
 		$tabform->getTab("payment")->selectBox(
 			-name		=> 'commercePaymentPlugin',
 			-options	=> \%paymentPlugins,
-			-label		=> $i18n->get('payment form'),
+			-label		=> $i18n->get('payment plugin'),
+			-hoverHelp	=> $i18n->get('payment plugin description'),
 			-value		=> $paymentPlugin,
 			-extras		=> 'onchange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
 			);
@@ -487,6 +495,7 @@ sub www_editCommerceSettings {
 			-name	=> 'commerceShippingPlugin',
 			-options=> \%shippingPlugins,
 			-label	=> $i18n->get('shipping plugin label'),
+			-hoverHelp	=> $i18n->get('shipping plugin label description'),
 			-value	=> $shippingPlugin,
 			-extras	=> 'onchange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
 			);
