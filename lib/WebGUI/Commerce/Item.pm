@@ -155,20 +155,21 @@ The type (namespace) of the item you want.
 =cut
 
 sub new {
-	my ($class, $namespace, $load, $cmd, $plugin);
+	my ($class, $session, $namespace, $load, $cmd, $plugin);
     	$class = shift;
+    	$session = shift;
 	$id = shift;
 	$namespace = shift;
 	
-	$self->session->errorHandler->fatal('No namespace') unless ($namespace);
-	$self->session->errorHandler->fatal('No ID') unless ($id);
+	$session->errorHandler->fatal('No namespace') unless ($namespace);
+	$session->errorHandler->fatal('No ID') unless ($id);
 	
     	$cmd = "WebGUI::Commerce::Item::$namespace";
 	$load = "use $cmd";
 	eval($load);
-	$self->session->errorHandler->warn("Item plugin failed to compile: $cmd.".$@) if($@);
-	$plugin = eval($cmd."->new('$id', '$namespace')");
-	$self->session->errorHandler->warn("Couldn't instantiate Item plugin: $cmd.".$@) if($@);
+	$session->errorHandler->warn("Item plugin failed to compile: $cmd.".$@) if($@);
+	$plugin = eval($cmd."->new('$session', '$id', '$namespace')");
+	$session->errorHandler->warn("Couldn't instantiate Item plugin: $cmd.".$@) if($@);
 	return $plugin;
 }
 

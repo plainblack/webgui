@@ -19,8 +19,8 @@ use base 'WebGUI::Asset::Wobject';
 use Tie::IxHash;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-
-
+use WebGUI::Commerce::ShoppingCart;
+use WebGUI::Commerce::Item;
 #-------------------------------------------------------------------
 
 =head2 checkRequiredFields ( requiredFields )
@@ -326,6 +326,27 @@ sub validateEditEventForm {
 
 #-------------------------------------------------------------------
 
+=head2 www_addToCart (  )
+
+Method that will add an event to the users shopping cart.
+
+=cut
+
+sub www_addToCart {
+	my $self = shift;
+	my $eventId = $self->session->form->get("pid");
+	
+	#my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
+	#$cart->add($eventId, 'Event');
+
+	my $item = WebGUI::Commerce::Item->new($self->session, $eventId, 'Event');
+	$self->session->errorHandler->warn($item->{_eventData}->{available});
+	
+	return $self->www_view;
+} 
+
+#-------------------------------------------------------------------
+
 =head2 www_approveEvent ( )
 
 Method that will set the status of an event to approved.
@@ -504,6 +525,11 @@ sub www_editEvent {
 		-hoverHelp => $i18n->get('add/edit event maximum attendees description'),
 		-label => $i18n->get('add/edit event maximum attendees')
 	);
+	
+	$f->hidden(
+		-name  => "approved",
+		-value => 0 || $event->{approved}
+	);
 
 	my $prerequisiteList = $self->getPrerequisiteEventList($pid);
         if ( scalar(keys %{$prerequisiteList}) > 0) {
@@ -593,7 +619,7 @@ sub www_editEventSave {
 			     startDate  => $self->session->datetime->humanToEpoch($self->session->form->get("startDate")),
 			     endDate	=> $self->session->datetime->humanToEpoch($self->session->form->get("endDate")),
 			     maximumAttendees => $self->session->form->get("maximumAttendees"),
-			     approved	=> "0"
+			     approved	=> $self->session->form->get("approved")
 			    },1,1
 			   );
 			   
@@ -761,7 +787,8 @@ sub view {
 		   from products as p, EventManagementSystem_products as e
 		   where
 		   	p.productId = e.productId and approved=1
-		   	and e.assetId =".$self->session->db->quote($self->get("assetId"));
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))." 
+			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
@@ -777,6 +804,8 @@ sub view {
 	  $eventFields{'title'} = $event->{'title'};
 	  $eventFields{'description'} = $event->{'description'};
 	  $eventFields{'price'} = $event->{'price'};
+	  $eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
+	  $eventFields{'purchase.label'} = "Add To Cart";
 	  
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 
