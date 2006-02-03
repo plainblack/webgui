@@ -35,6 +35,7 @@ URL to the javascript to include in the page's header tags.
 sub process {
 	my $session = shift;
 	$session->style->setScript(shift,{type=>'text/javascript'});
+	return undef;
 }
 
 1;
