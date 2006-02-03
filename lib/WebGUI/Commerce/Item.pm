@@ -168,8 +168,7 @@ sub new {
 	$load = "use $cmd";
 	eval($load);
 	$session->errorHandler->warn("Item plugin failed to compile: $cmd.".$@) if($@);
-	#$plugin = eval($cmd."->new('$session', '$id', '$namespace')");
-	$plugin = eval($cmd->new($session, $id, $namespace));
+	$plugin = eval($cmd.'->new($session, "$id", "$namespace")');
 	$session->errorHandler->warn("Couldn't instantiate Item plugin: $cmd.".$@) if($@);
 	return $plugin;
 }

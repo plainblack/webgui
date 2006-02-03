@@ -6,17 +6,17 @@ our @ISA = qw(WebGUI::Commerce::Item);
 
 #-------------------------------------------------------------------
 sub available {
-	return $_[0]->{_event}->{available};
+	return $_[0]->{_event}->{approved};
 }
 
 #-------------------------------------------------------------------
 sub description {
-	return $_[0]->{_event}{description};
+	return $_[0]->{_event}->{description};
 }
 
 #-------------------------------------------------------------------
 sub id {
-	return $_[0]->{_event}{productId};
+	return $_[0]->{_event}->{productId};
 }
 
 #-------------------------------------------------------------------
@@ -36,7 +36,7 @@ sub new {
 	$session = shift;
 	$eventId = shift;
 
-	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, e.available
+	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, e.approved
                    from EventManagementSystem_products as e, products as p
 		   where p.productId = e.productId and p.productId=".$session->db->quote($eventId)); 	
 	

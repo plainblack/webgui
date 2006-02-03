@@ -336,11 +336,7 @@ sub www_addToCart {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
 	
-	#my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	#$cart->add($eventId, 'Event');
-
-	my $item = WebGUI::Commerce::Item->new($self->session, $eventId, 'Event');
-	$self->session->errorHandler->warn($item->{_eventData}->{available});
+	WebGUI::Commerce::ShoppingCart->new($self->session)->add($eventId, 'Event');
 	
 	return $self->www_view;
 } 
