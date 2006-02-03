@@ -1,8 +1,12 @@
+# config-file-type: JSON 1
+
+{
+
 # Add a comma separated list of the names this site can use.
 # The first site in the list will be used as the default
 # sitename for generating offline URLs and other functions.
 
-sitename = www.example.com, example.com
+"sitename" : [ "www.example.com", "example.com"],
 
 # The location where the WebGUI server will be handling
 # requests. This is normally just '/' or the root of the
@@ -12,175 +16,190 @@ sitename = www.example.com, example.com
 # contain the WebGUI handler instead in the Apache
 # VirtualHost configuration.
 
-gateway = /
+"gateway" : "/",
 
 # The relative or fully qualified URL to the extras folder
 # that comes with WebGUI.
 
-extrasURL = /extras
+"extrasURL" : "/extras",
 
 # The filesystem path to get to the extras folder that ships
 # with WebGUI.
 
-extrasPath = /data/WebGUI/www/extras
+"extrasPath" : "/data/WebGUI/www/extras",
 
 # The relative for fully qualified URL to the uploads folder
 # for this site where all attachments will be stored.
 
-uploadsURL = /uploads
+"uploadsURL" : "/uploads",
 
 # The filesystem path to get to the uploads folder where all
 # attachments for this site will be stored. This needs to be
 # writable by your web server.
 
-uploadsPath = /data/WebGUI/www/uploads
+"uploadsPath" : "/data/WebGUI/www/uploads",
 
 # An array of URLs that WebGUI should leave alone for normal
 # processing by Apache. Anything that begins with these URLs
 # will be entirely ignored by WebGUI
 
-# passthruUrls => /icons, /documentation/pdf, /my-custom-application, /server-status, /perl-status
+# "passthruUrls" : ["/icons", "/documentation/pdf", "/my-custom-application", "/server-status", "/perl-status"],
 
 # Tell WebGUI where to store cached files. Defaults to the 
 # /tmp or c:\temp folder depending upon your operating system.
 
-#fileCacheRoot=/path/to/cache
+# "fileCacheRoot" : "/path/to/cache",
 
 # Tell WebGUI how big to let the file cache grow in bytes.
 
-fileCacheSizeLimit=100000000
+"fileCacheSizeLimit" : 100000000,
 
 # Support for the memcached distributed caching system.
 # See http://www.danga.com/memcached/ for details on memcached.
 # Uncomment this and point it to your memcached server(s). Use a
 # comma separated list for multiple servers.
 
-# memcached_servers = 10.0.0.6:11211
+# "memcached_servers" : "10.0.0.6:11211", 
 
 # Set this to 1 to disable WebGUI's caching subsystems. This is
 # mainly useful for developers.
 
-disableCache = 0
+"disableCache" : 0,
 
 # The database connection string. It usually takes the form of
-# DBI:<driver>:<db>;host=<hostname>
+# DBI:<driver>:<db>;host:<hostname>
 
-dsn = DBI:mysql:www_example_com
+"dsn" : "DBI:mysql:www_example_com;host=localhost",
 
 # The username to authenticate to the above database.
 
-dbuser = webgui
+"dbuser" : "webgui",
 
 # The password to authenticate to the above database.
 
-dbpass = password
+"dbpass" : "password",
 
 # You can configure up to three read-only database slaves to 
 # increase WebGUI's read performance.
 
-#dbslave1 = dsn => DBI:mysql:www_example_com;host=dbslave1.example.com, \
-#	user => webgui, \
-#	pass => password
+# "dbslave1" : { 
+#	"dsn" : "DBI:mysql:www_example_com;host=dbslave1.example.com",
+#	"user" : "webgui",
+#	"pass" : "password"
+#	},
 
-#dbslave2 = dsn => DBI:mysql:www_example_com;host=dbslave2.example.com, \
-#	user => webgui, \
-#	pass => password
+# "dbslave2" : { 
+#	"dsn" : "DBI:mysql:www_example_com;host=dbslave2.example.com",
+#	"user" : "webgui",
+#	"pass" : "password"
+#	},
 
-#dbslave3 = dsn => DBI:mysql:www_example_com;host=dbslave3.example.com, \
-#	user => webgui, \
-#	pass => password
+# "dbslave3" : { 
+#	"dsn" : "DBI:mysql:www_example_com;host=dbslave3.example.com",
+#	"user" : "webgui",
+#	"pass" : "password"
+#	},
 
 # Set this value if you wish to override all outbound emails to a specific
 # user for testing purposes.
-#emailOverride = joe@example.com
+
+# "emailOverride" : "joe@example.com",
 
 # List the authentication plug-ins you wish to be available on
 # this site.
 
-authMethods = LDAP, WebGUI
+"authMethods" : [ "LDAP", "WebGUI" ],
 
 # List the merchant gateways you have installed and wish to be
 # available on this site.
 
-paymentPlugins = ITransact
+"paymentPlugins" : ["ITransact"],
 
 # List the shipping plugins you have installed and wish to be
 # available for configuration on the site.
 
-shippingPlugins = ByPrice, ByWeight, PerTransaction
+"shippingPlugins" : ["ByPrice", "ByWeight", "PerTransaction"],
 
 # Specify the list of template parsers available in the system.
 
-templateParsers = WebGUI::Asset::Template::HTMLTemplate
+"templateParsers" : ["WebGUI::Asset::Template::HTMLTemplate"],
 
 # Specify the default template parser.
 
-defaultTemplateParser = WebGUI::Asset::Template::HTMLTemplate
+"defaultTemplateParser" : ["WebGUI::Asset::Template::HTMLTemplate"],
 
 # Specify external helper apps that will enable WebGUI's search
 # engine to index content in various uploaded file formats. The
 # helpers must take the path to the file as an argument and
 # return either text or html content.
 
-searchIndexerPlugins = txt => "/bin/cat", \
-	readme => "/bin/cat", \
-	html => "/bin/cat", \
-	htm => "/bin/cat"
+"searchIndexerPlugins" : {
+	"txt" : "/bin/cat", 
+	"readme" : "/bin/cat", 
+	"html" : "/bin/cat",
+	"htm" : "/bin/cat"
+	},
 
 # Specify a the list of assets you want to appear in your
 # Add Content menus.
 
-assets = WebGUI::Asset::Snippet, \
-	WebGUI::Asset::Redirect, \
-	WebGUI::Asset::FilePile, \
-	WebGUI::Asset::Wobject::Article, \
-	WebGUI::Asset::Wobject::Collaboration, \
-	WebGUI::Asset::Wobject::DataForm, \
-	WebGUI::Asset::Wobject::EventsCalendar, \
-	WebGUI::Asset::Wobject::EventManagementSystem, \
-	WebGUI::Asset::Wobject::HttpProxy, \
-	WebGUI::Asset::Wobject::MessageBoard, \
-	WebGUI::Asset::Wobject::Navigation, \
-	WebGUI::Asset::Wobject::Matrix, \
-	WebGUI::Asset::Wobject::Poll, \
-	WebGUI::Asset::Wobject::Product, \
-	WebGUI::Asset::Wobject::SQLReport, \
-	WebGUI::Asset::Wobject::Search, \
-	WebGUI::Asset::Wobject::Survey, \
-	WebGUI::Asset::Wobject::WeatherData, \
-	WebGUI::Asset::Wobject::MultiSearch, \
-	WebGUI::Asset::Wobject::StockData, \
-	WebGUI::Asset::Wobject::SyndicatedContent, \
-	WebGUI::Asset::Wobject::InOutBoard, \
-	WebGUI::Asset::File::ZipArchive, \
-	WebGUI::Asset::Wobject::WSClient
+"assets" : [
+	"WebGUI::Asset::Snippet", 
+	"WebGUI::Asset::Redirect", 
+	"WebGUI::Asset::FilePile", 
+	"WebGUI::Asset::Wobject::Article", 
+	"WebGUI::Asset::Wobject::Collaboration", 
+	"WebGUI::Asset::Wobject::DataForm", 
+	"WebGUI::Asset::Wobject::EventsCalendar", 
+	"WebGUI::Asset::Wobject::EventManagementSystem", 
+	"WebGUI::Asset::Wobject::HttpProxy", 
+	"WebGUI::Asset::Wobject::MessageBoard", 
+	"WebGUI::Asset::Wobject::Navigation", 
+	"WebGUI::Asset::Wobject::Matrix", 
+	"WebGUI::Asset::Wobject::Poll", 
+	"WebGUI::Asset::Wobject::Product", 
+	"WebGUI::Asset::Wobject::SQLReport", 
+	"WebGUI::Asset::Wobject::Search",
+	"WebGUI::Asset::Wobject::Survey", 
+	"WebGUI::Asset::Wobject::WeatherData",
+	"WebGUI::Asset::Wobject::MultiSearch",
+	"WebGUI::Asset::Wobject::StockData",
+	"WebGUI::Asset::Wobject::SyndicatedContent",
+	"WebGUI::Asset::Wobject::InOutBoard",
+	"WebGUI::Asset::File::ZipArchive",
+	"WebGUI::Asset::Wobject::WSClient"
+	],
 
 # Specify the list assets that are used for utility purposes only
 # and are not typically used as a normal part of content
 # management.
 
-utilityAssets = WebGUI::Asset::Template, WebGUI::Asset::RichEdit, WebGUI::Asset::File::Image, WebGUI::Asset::File
+"utilityAssets" : ["WebGUI::Asset::Template", "WebGUI::Asset::RichEdit", "WebGUI::Asset::File::Image", "WebGUI::Asset::File"],
 
 # Specify the list of assets you want to appear in your add
 # content menus that should act as containers for other content.
 # These items are typically not content themselves, but rather
 # layout mechanisms.
 
-assetContainers = WebGUI::Asset::Wobject::Layout, WebGUI::Asset::Wobject::Folder, WebGUI::Asset::Wobject::Dashboard
+"assetContainers" : ["WebGUI::Asset::Wobject::Layout", "WebGUI::Asset::Wobject::Folder", "WebGUI::Asset::Wobject::Dashboard"],
 
 # Optionally specify a group id for assets to tell WebGUI what
 # group a user needs to be part of in order to add that type of
 # asset.
 
-#assetAddPrivilege = WebGUI::Asset::Wobject::SQLReport => 3, \
-#	WebGUI:::Asset::Template => 4
+# "assetAddPrivilege" : {
+#	"WebGUI::Asset::Wobject::SQLReport" : 3, 
+#	"WebGUI:::Asset::Template" : 4
+#	},
 
 # Optionally override the default UI Level of any asset. This
 # determines whether the current user has the appropriate UI Level
 # to add assets of that type.
 
-#assetUiLevel = WebGUI::Asset::Wobject::WSClient => 7,
-#	WebGUI::Asset::RichEdit => 4
+# "assetUiLevel" : {
+#	"WebGUI::Asset::Wobject::WSClient" : 7,
+#	"WebGUI::Asset::RichEdit" : 4
+#	},
 
 # You can override the UI Levels of any field in the edit form of
 # any asset using the following variables. Basically just take the
@@ -188,127 +207,120 @@ assetContainers = WebGUI::Asset::Wobject::Layout, WebGUI::Asset::Wobject::Folder
 # _uiLevel to the end of it, then you can start specifying field
 # names and associated UI Level.
 
-#WebGUI_Asset_Wobject_Article_uiLevel = menuTitle => 9, url => 8
-#WebGUI_Asset_RichEdit_uiLevel = askAboutRichEdit => 7, preformatted => 3
+# "WebGUI_Asset_Wobject_Article_uiLevel" : { "menuTitle" : 9, "url" : 8 },
+# "WebGUI_Asset_RichEdit_uiLevel" : { "askAboutRichEdit" : 7, "preformatted" : 3 },
 
 # If exportPath is defined, an "Export" toolbar icon will appear
 # which allows you to export assets to static HTML. This folder
 # needs to be writable by your web server.
 
-#exportPath = /path/to/export
+# "exportPath" : "/path/to/export",
 
 # If soapHttpHeaderOverride is set to 1 it will enable Web 
 # Service Client assets to override the default MIME types of 
 # SOAP/WDSL content
 
-soapHttpHeaderOverride=0
+"soapHttpHeaderOverride" : 0,
 
 # Specify the number of days after an event has passed that it
 # should be purged from the Events Calendar. Comment it out if
 # you never want events to be purged automatically.
 
-DeleteExpiredEvents_offset = 30
-
-# Select the type of caching you'd like WebGUI to use for
-# templates. Choose from file, ipc, memory, memory-ipc,
-# memory-file
-
-templateCacheType=file
+"DeleteExpiredEvents_offset" : 30,
 
 # Specify the list of macros you wish to be processed on each page.
 
-macros=# => Hash_userId, \
-        / => Slash_gatewayUrl, \
-        @ => At_username, \
-        AOIHits => AOIHits, \
-        AOIRank => AOIRank, \
-        AdminBar => AdminBar, \
-        AdminText => AdminText, \
-        AdminToggle => AdminToggle, \
-        AssetProxy => AssetProxy, \
-        CanEditText => CanEditText, \
-        D => D_date, \
-        EditableToggle => EditableToggle, \
-        Extras => Extras, \
-        FetchMimeType => FetchMimeType, \
-        FileUrl => FileUrl, \
-        GroupAdd => GroupAdd, \
-        GroupDelete => GroupDelete, \
-        GroupText => GroupText, \
-        H => H_homeLink, \
-        International => International, \
-        JavaScript => JavaScript, \
-        L => L_loginBox, \
-        LastModified => LastModified, \
-        LoginToggle => LoginToggle, \
-        Page => Page, \
-        PageTitle => PageTitle, \
-        PageUrl => PageUrl, \
-        RandomAssetProxy => RandomAssetProxy, \
-	RandomThread => RandomThread, \
-        RawHeadTags => RawHeadTags, \
-        RootTitle => RootTitle, \
-        Spacer => Spacer, \
-        StyleSheet => StyleSheet, \
-        SubscriptionItem => SubscriptionItem, \
-        SubscriptionItemPurchaseUrl => SubscriptionItemPurchaseUrl, \
-        Thumbnail => Thumbnail, \
-        User => User, \
-        a => a_account, \
-        c => c_companyName, \
-        e => e_companyEmail, \
-        r => r_printable, \
-        u => u_companyUrl
-
-# A comma separated list of scheduler plugins that you do NOT want
-# to run. Normally there's no reason to use this option.
-
-#excludeHourly = 
+"macros" : {
+	"#" : "Hash_userId", 
+        "/" : "Slash_gatewayUrl", 
+        "@" : "At_username", 
+        "AOIHits" : "AOIHits", 
+        "AOIRank" : "AOIRank", 
+        "AdminBar" : "AdminBar", 
+        "AdminText" : "AdminText", 
+        "AdminToggle" : "AdminToggle", 
+        "AssetProxy" : "AssetProxy", 
+        "CanEditText" : "CanEditText", 
+        "D" : "D_date", 
+        "EditableToggle" : "EditableToggle", 
+        "Extras" : "Extras", 
+        "FetchMimeType" : "FetchMimeType", 
+        "FileUrl" : "FileUrl", 
+        "GroupAdd" : "GroupAdd", 
+        "GroupDelete" : "GroupDelete", 
+        "GroupText" : "GroupText", 
+        "H" : "H_homeLink", 
+        "International" : "International", 
+        "JavaScript" : "JavaScript", 
+        "L" : "L_loginBox", 
+        "LastModified" : "LastModified", 
+        "LoginToggle" : "LoginToggle", 
+        "Page" : "Page", 
+        "PageTitle" : "PageTitle", 
+        "PageUrl" : "PageUrl", 
+        "RandomAssetProxy" : "RandomAssetProxy", 
+	"RandomThread" : "RandomThread", 
+        "RawHeadTags" : "RawHeadTags", 
+        "RootTitle" : "RootTitle", 
+        "Spacer" : "Spacer", 
+        "StyleSheet" : "StyleSheet", 
+        "SubscriptionItem" : "SubscriptionItem", 
+        "SubscriptionItemPurchaseUrl" : "SubscriptionItemPurchaseUrl", 
+        "Thumbnail" : "Thumbnail", 
+        "User" : "User", 
+        "a" : "a_account", 
+        "c" : "c_companyName", 
+        "e" : "e_companyEmail", 
+        "r" : "r_printable", 
+        "u" : "u_companyUrl"
+	},
 
 # How often, in seconds, should WebGUI calculate the statistics
 # of passively profiling users to content preferences. Note that
 # this won't have any effect unless passive profiling is enabled
 # in the UI.
 
-passiveProfileInterval = 86400
+"passiveProfileInterval" : 86400,
 
 # If specified, the user login log will delete login history
 # information older than the specified value. It is specified in
 # days.
 
-#CleanLoginHistory_ageToDelete = 90
+# "CleanLoginHistory_ageToDelete" : 90,
 
 # If minimum karma and decay factor are both specified, then a
 # user's karma will be decremented by the decay factor every hour
 # until the user has less than the minimum karma.
 
-#DecayKarma_minimumKarma = 100 
-#DecayKarma_decayFactor = 1
+# "DecayKarma_minimumKarma" : 100, 
+# "DecayKarma_decayFactor" : 1,
 
 # Specify the number of days content should remain in the
 # clipboard before being moved to the trash.
 
-DeleteExpiredClipboard_offset = 30
+"DeleteExpiredClipboard_offset" : 30,
 
 # Specify the number of days content should remain in the trash
 # before it gets purged from the system completely.
 
-DeleteExpiredTrash_offset = 30
+"DeleteExpiredTrash_offset" : 30,
 
 # Specify the number of days old revisions of assets should remain
 # available for rollbacks.
 
-DeleteExpiredRevisions_offset = 365
+"DeleteExpiredRevisions_offset" : 365,
 
 # How many days after a piece of content expires should it be
 # moved to the trash.
 
-TrashExpiredContent_offset = 30
+"TrashExpiredContent_offset" : 30,
 
-# What hour of the day (for example, 22 = 10 PM = 22:00:00)
+# What hour of the day (for example, 22 : 10 PM = 22:00:00)
 # should WebGUI try to synchronize user profile information from 
 # the LDAP server. Note that this will only happen for users
 # that have LDAP as their authentication.
 
-SyncProfilesToLDAP_hour = 2
+"SyncProfilesToLDAP_hour" : 2
+
+}
 

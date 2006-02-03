@@ -15,12 +15,15 @@ BEGIN {
         unshift (@INC, $webguiRoot."/lib");
 }
 
+use strict;
 use DBI;
 use File::Path;
 use Getopt::Long;
-use strict;
+use JSON;
+use Parse::PlainConfig;
 use WebGUI::Config;
 use WebGUI::Session;
+use WebGUI::Utility;
 
 my $help;
 my $history;
@@ -140,6 +143,23 @@ our (%upgrade, %config);
 
 
 ## Find site configs.
+
+print "\nTesting site config versions...\n" unless ($quiet);
+opendir(DIR,"../etc");
+my @files = readdir(DIR);
+closedir(DIR);
+foreach my $file (@files) {
+	next unless ($file =~ m/\.conf$/);
+	next if ($file eq "spectre.conf" || $file eq "log.conf");
+	my $configFile = "../etc/".$file;
+	open(FILE,"<".$configFile);
+	my $line = <FILE>;
+	close(FILE);
+	unless ($line =~ m/JSON 1/) {
+		print "\tConverting ".$file." from PlainConfig to JSON\n" unless ($quiet);
+		convertPlainconfigToJson($configFile);	
+	}
+}
 
 print "\nGetting site configs...\n" unless ($quiet);
 my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
@@ -379,4 +399,28 @@ sub _parseDSN {
 
      }
      return $hash;
+}
+
+
+#-----------------------------------------
+sub convertPlainconfigToJson {
+	my $configFile = shift;
+	my $pp = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $configFile, 'PURGE' => 1);
+	my %config = ();
+	foreach my $param ($pp->directives) {
+        	my $value = $pp->get($param);
+        	if (isIn($param, qw(sitename templateParsers assets utilityAssets assetContainers authMethods shippingPlugins paymentPlugins))) {
+                	if (ref $value ne "ARRAY") {
+                       	 	$value = [$value];
+                	}
+        	} elsif (isIn($param, qw(assetAddPrivilege macros))) {
+                	if (ref $value ne "HASH") {
+                       	 	$value = {};
+                	}
+        	}
+        	$config{$param} = $value;
+	}
+	open(FILE,">".$configFile);
+	print FILE "# config-file-type: JSON 1\n".objToJson(\%config, {pretty => 1, indent => 2});
+	close(FILE);
 }

@@ -15,7 +15,9 @@
    options for developers.
  - The group mail screen now allows sending of HTML messages.
  - Added prequery statements to the SQLReport and configurable allowed statements
-   to the databas link properties. (Martin Kamerbeek / Procolix)
+   to the database link properties. (Martin Kamerbeek / Procolix)
+ - Converted config file format from PlainConfig to JSON. The new format is
+   more powerful and will use slightly less memory.
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP

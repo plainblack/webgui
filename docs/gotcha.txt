@@ -36,6 +36,11 @@ save you many hours of grief.
 	POE::Component::IKC::Server
 	POE::Component::Client::UserAgent
 
+ * The upgrade script is going to convert your WebGUI config files
+	from the current PlainConfig format to the new JSON format.
+	Don't be alarmed by this, it's a normal part of the upgrade
+	procedure.
+
 
 6.8.4
 --------------------------------------------------------------------

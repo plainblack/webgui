@@ -15,7 +15,7 @@ package WebGUI::Config;
 =cut
 
 use strict;
-use Parse::PlainConfig;
+use JSON;
 use WebGUI::Utility;
 
 our %config;
@@ -46,6 +46,40 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 delete ( param ) 
+
+Deletes a key from the config file.
+
+=head3 param
+
+The name of the parameter to delete.
+
+=cut
+
+sub delete {
+	my $self = shift;
+	my $param = shift;
+	delete $self->{_config}{$param};
+	open(FILE,">".$self->getWebguiRoot.'/etc/'.$self->getFilename);
+	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 2});
+	close(FILE);
+}
+
+#-------------------------------------------------------------------
+
+=head2 DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+#-------------------------------------------------------------------
+
 =head2 get ( param ) 
 
 Returns the value of a particular parameter from the config file.
@@ -59,17 +93,7 @@ The name of the parameter to return.
 sub get {
 	my $self = shift;
 	my $param = shift;
-	my $value = $self->{_config}->get($param);
-	if (isIn($param, qw(sitename templateParsers assets utilityAssets assetContainers authMethods shippingPlugins paymentPlugins))) {
-		if (ref $value ne "ARRAY") {
-                        $value = [$value];
-                }
-	} elsif (isIn($param, qw(assetAddPrivilege macros))) {
-		if (ref $value ne "HASH") {
-                        $value = {};
-                }
-	}
-	return $value;
+	return $self->{_config}{$param};
 }
 
 
@@ -148,7 +172,13 @@ sub new {
 	if (exists $config{$filename}) {
 		return $config{$filename};
 	} else {
-		my $conf = Parse::PlainConfig->new('DELIM' => '=', 'FILE' => $webguiPath.'/etc/'.$filename, 'PURGE' => 1);
+		my $json = "";
+		open(FILE,"<".$webguiPath.'/etc/'.$filename);
+		while (my $line = <FILE>) {
+        		$json .= $line unless ($line =~ /^\s*#/);
+		}
+		close(FILE);
+		my $conf = jsonToObj($json);
 		my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$conf};
 		bless $self, $class;
 		$config{$filename} = $self;
@@ -186,9 +216,31 @@ sub readAllConfigs {
 	return \%configs;
 }
 
-sub DESTROY {
-	my ($self) = @_;
-	undef $self;
+
+#-------------------------------------------------------------------
+
+=head2 set ( param, value ) 
+
+Creates a new or updates an existing parameter in the config file.
+
+=head3 param
+
+A parameter name.
+
+=head3 value
+
+The value to set the paraemter to. Can be a scalar, hash reference, or array reference.
+
+=cut
+
+sub set {
+	my $self = shift;
+	my $param = shift;
+	my $value = shift;
+	$self->{_config}{$param} = $value;
+	open(FILE,">".$self->getWebguiRoot.'/etc/'.$self->getFilename);
+	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 2});
+	close(FILE);
 }
 
 1;
