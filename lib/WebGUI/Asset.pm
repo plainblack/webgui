@@ -81,7 +81,8 @@ sub canAdd {
 	my $session = shift;
 	my $userId = shift || $session->user->userId;
 	my $subclassGroupId = shift;
-	my $groupId = $session->config->get("assetAddPrivilege")->{$className} || $subclassGroupId || '12';
+	my $addPrivs = $session->config->get("assetAddPrivilege");
+	my $groupId = $addPrivs->{$className} || $subclassGroupId || '12';
         return $session->user->isInGroup($groupId,$userId);
 }
 
