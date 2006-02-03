@@ -46,6 +46,11 @@ PerlOutputFilterHandler WebGUI::PerformanceProfiler
 
 To the apache configuration.
 
+By default all preloaded WebGUI code will get profiled. 
+You can limit the profiling to specific modules like this:
+
+PerlSetVar whatToProfile WebGUI::Asset::Wobject
+
 =cut
 
 use strict;
@@ -61,7 +66,6 @@ use ModPerl::Util;
 my @subTimes = ();
 my $depth = 0;
 my %pointer;
-my $whatToProfile = 'WebGUI';
 
 sub handler {
 	my $r = shift;
@@ -74,7 +78,10 @@ sub handler {
 }
 
 sub addProfilerCode {
-	my $r = shift;
+	my $r = shift; 
+	my $s = Apache2::ServerUtil->server;
+        my $whatToProfile = $s->dir_config('WhatToProfile') || 'WebGUI';
+
 	my %subs = findSubs($whatToProfile);
 	my $myself = __PACKAGE__;
 	while(my($name, $ref) = each(%subs)) {
