@@ -244,6 +244,7 @@ per sub, descending.
 =cut
 
 sub results {
+	my @parents;
 	my $output = qq|
 <script> 
 function showhide(id){ 
@@ -262,18 +263,44 @@ obj.style.display = "none";
 	$output .= '<i>Function calls: '.scalar(@subTimes).' took: '.$total.'s</i><br><br>';
 	for(my $entry=0;$entry <= $#subTimes;$entry++) {
 		my $call = $subTimes[$entry];
+		$call->{entry} = $entry;
 		$call->{duration} = $call->{end} - $call->{start};
-		$output .= "\n".'&nbsp;&nbsp;&nbsp;&nbsp;';
-		$output .= '&nbsp;|&nbsp;' for(2..$call->{depth});
-		if($subTimes[$entry + 1] && ($subTimes[$entry + 1]->{depth} > $call->{depth})) {
-			$call->{id} = $entry;
-			$output .= qq|<a href="#" onclick="showhide('profile$call->{id}'); return(false);"> + </a>|;
-		} else {
-			$output .= ' | ';
+		$call->{excl} = $call->{duration};
+		if (defined $parents[0]) {
+			$subTimes[$parents[-1]]->{excl} = $subTimes[$parents[-1]]->{excl} - $call->{duration};
 		}
-		$output .= "<b>" if($call->{duration} > .3);
-		$output .= $call->{routine} . " (".sprintf("%.5f",$call->{duration})."s)";
-		$output .= "</b>" if($call->{duration} > .3);
+		if($subTimes[$entry + 1] && ($subTimes[$entry + 1]->{depth} > $call->{depth})) {
+			# Do stuff to the next line if it's at a deeper depth.
+			push(@parents,$entry);
+		}
+		my $nextDepth;
+		if(ref($subTimes[$entry +1])) {
+			$nextDepth = $subTimes[$entry + 1]->{depth};
+		} else {
+			$nextDepth = 1;
+		}
+		if($nextDepth < $call->{depth}) {
+			$nextDepth++;
+			for(1 .. ($call->{depth} - $nextDepth + 1)) {
+				pop @parents;
+			}
+		}
+	}
+
+	for(my $entry=0;$entry <= $#subTimes;$entry++) {
+		my $call = $subTimes[$entry];
+		$output .= "\n".'&nbsp;&nbsp;&nbsp;&nbsp;';
+		$output .= '&nbsp;&nbsp;|&nbsp;' for(2..$call->{depth});
+		if($subTimes[$entry + 1] && ($subTimes[$entry + 1]->{depth} > $call->{depth})) {
+			# Do stuff to the next line if it's at a deeper depth.
+			$output .= qq|<a href="#" onclick="showhide('profile$call->{entry}'); return(false);"> + </a>|;
+		} else {
+			$output .= ' &nbsp;| ';
+		}
+		$output .= "<b>" if($total < ($call->{duration} * 40));
+		$output .= $call->{routine} . " ( ".sprintf("%.4f",$call->{duration})."s )";
+		$output .= " &nbsp;". sprintf("%.2f",(($call->{duration} / $total)*100)).'%</b>' if($total < ($call->{duration} * 40));
+		$output .= "<b> Exclusive: ".sprintf("%.4f",$call->{excl})."s </b>" if ($call->{excl} ne $call->{duration});
 		$output .= "<br>\n";
 		my $nextDepth;
 		if(ref($subTimes[$entry +1])) {
@@ -284,11 +311,13 @@ obj.style.display = "none";
 		}
 		if($nextDepth < $call->{depth}) {
 			$nextDepth++;
-			for($nextDepth .. $call->{depth}) {
+			for(1 .. ($call->{depth} - $nextDepth + 1)) {
 				$output .= "\n</div>\n";
 			}
 		}
 	}
+
+
 	$output .= "<br>\n<br>\n<br>\n<br>\n";
 	undef(@subTimes);
 	return $output;
@@ -314,5 +343,6 @@ sub is_constant {
 	}
 	return $is_const;
 }
+
 
 1;
