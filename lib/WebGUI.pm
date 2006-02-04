@@ -127,7 +127,7 @@ sub page {
 #-------------------------------------------------------------------
 sub processOperations {
 	my $session = shift;
-	my ($cmd, $output);
+	my $output = "";
 	my $op = $session->form->process("op");
 #	my $opNumber = shift || 1;
 	if ($op) {

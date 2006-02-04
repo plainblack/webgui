@@ -44,7 +44,8 @@ PerlModule WebGUI::PerformanceProfiler
 PerlChildInitHandler WebGUI::PerformanceProfiler
 PerlOutputFilterHandler WebGUI::PerformanceProfiler
 
-To the apache configuration.
+To the apache configuration.  Make sure these directives
+are not inside your WebGUI vhost block, but instead above it.
 
 By default all preloaded WebGUI code will get profiled. 
 You can limit the profiling to specific modules like this:
@@ -224,6 +225,23 @@ sub profileSubEnd {
 	$call->{end} = time();
 	$depth--;
 }
+
+
+=head2 results
+
+Produce the output of the profiler.  The expandable, 
+collapsible tree of subroutine calls.  Will soon 
+include line number of the caller (parent) subroutine, 
+and optionally a dump of all the parameters (!). Will 
+also soon include a tabular display akin to Devel::DProf's 
+formatted tabular output: percent total time spent in sub, 
+aggregate exclusive time spent in sub, aggregate inclusive 
+time spent in sub, number of calls to the sub, mean 
+exclusive time per sub call, mean inclusive time per sub 
+call, subroutine name, sorted by aggregate exclusive time 
+per sub, descending.
+
+=cut
 
 sub results {
 	my $output = qq|
