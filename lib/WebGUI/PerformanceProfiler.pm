@@ -67,6 +67,14 @@ my @subTimes = ();
 my $depth = 0;
 my %pointer;
 
+=head2 handler
+
+In Init, adds profiles code to subroutines.
+
+For all other calls, adds profiler output to the file.
+
+=cut
+
 sub handler {
 	my $r = shift;
 	my $callback = ModPerl::Util::current_callback();
@@ -76,6 +84,14 @@ sub handler {
 		return output($r);
 	}
 }
+
+=head2 addProfilerCode
+
+Based on the Apache config setting WhatToProfile, generate a list of all subs to
+profile and adds profiling code to them.  Certain subroutines are excluded, such as this sub,
+AUTOLOADS and CONSTANTS.
+
+=cut
 
 sub addProfilerCode {
 	my $r = shift; 
@@ -109,6 +125,19 @@ sub output {
 	return Apache2::Const::OK;
 }
 
+=head2 findSubs
+
+Walk the symbol tree and return a list of all subroutines with a given module
+hierachy.  Returns a hash of full subroutine names along with a code ref
+to that sub.
+
+=head3 pkg
+
+A string indicating which parts of the module namespace should be searched
+for subroutines.
+
+=cut
+
 sub findSubs {
 	my $pkg = shift;
 	my %_subs;
@@ -130,6 +159,12 @@ sub findSubs {
 	}
 	return %_subs;
 }
+
+=head2 instrumentSub
+
+Wrap profiling code around a subroutine by manipulating the symbol table.
+
+=cut
 
 sub instrumentSub {
 	my $name = shift;
@@ -161,6 +196,12 @@ sub instrumentSub {
 	eval "no warnings 'redefine'; *$name = sub $prototype $instrumented_body" ;
 }
 
+=head2 profileSubStart
+
+Record the name of the subroutine, the time it was called and increment the depth.
+
+=cut
+
 sub profileSubStart {
 	my $routine = shift;
 	push(@subTimes, {
@@ -170,6 +211,12 @@ sub profileSubStart {
 	});
 	$pointer{$routine} = $#subTimes;
 }
+
+=head2 profileSubEnd
+
+Record when a subroutine was exited and decrement the depth.
+
+=cut
 
 sub profileSubEnd {
 	my $routine = shift;
@@ -228,6 +275,13 @@ obj.style.display = "none";
 	undef(@subTimes);
 	return $output;
 }
+
+=head2 is_constant
+
+Determine if a given subroutine is used to generate constants, such as subroutines created
+by C<use constant foo => 2>.
+
+=cut
 
 sub is_constant {
 	no strict 'refs';
