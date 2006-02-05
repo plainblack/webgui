@@ -138,7 +138,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 sub getToolbar {
 	my $self = shift;
 	return undef if ($self->getToolbarState);
-	return $self->SUPER::getToolbar();
+	return '<p>'.$self->SUPER::getToolbar().'</p>';
 }
 
 
@@ -150,7 +150,7 @@ sub view {
 	my $calledAsWebMethod = shift;
 	my $output = $self->get("snippet");
 	WebGUI::Macro::process(\$output);
-	$output = '<p>'.$self->getToolbar.'</p>'.$output if ($session{var}{adminOn} && !$calledAsWebMethod);
+	$output = $self->getToolbar.$output if ($session{var}{adminOn} && !$calledAsWebMethod);
 	return $output unless ($self->getValue("processAsTemplate")); 
 	return WebGUI::Asset::Template->processRaw($output);
 }
