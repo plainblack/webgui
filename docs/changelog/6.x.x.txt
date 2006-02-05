@@ -6,6 +6,7 @@
  - fix [ 1328895 ] Page Redirect Asset Help File needs to be changed
  - fix [ 1423815 ] snippet v6.8.5
  - fix [ 1421056 ] LDAP Recursive Property Bug
+ - fix [ 1423938 ] v6.8.5 Server Version string keeps growing
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
