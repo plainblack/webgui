@@ -269,17 +269,18 @@ sub recurseProperty {
    return if($msg->code || $msg->count == 0);
    #loop through the results
    for (my $i = 0; $i < $msg->count; $i++) {
-      my $entry = $msg->entry($i);
-      #push all the values stored in the property on to the array stack
-	  my $properties = $entry->get_value($property,asref => 1);
-      push(@{$array},@{$properties});
-	  #Loop through the recursive keys
-	  if($property ne $recProperty) {
-	     $properties = $entry->get_value($recProperty,asref => 1);
-	  }
-	  foreach my $prop (@{$properties}) {
-	     $self->recurseProperty($prop,$array,$property,$recProperty,$count);
-	  }
+	my $entry = $msg->entry($i);
+	#push all the values stored in the property on to the array stack
+	my $properties = $entry->get_value($property,asref => 1);
+	$properties = [] unless ref $properties eq "ARRAY";
+	push(@{$array},@{$properties});
+	#Loop through the recursive keys
+	if($property ne $recProperty) {
+		$properties = $entry->get_value($recProperty,asref => 1);
+	}
+	foreach my $prop (@{$properties}) {
+		$self->recurseProperty($prop,$array,$property,$recProperty,$count);
+	}
    }  
 }
 
