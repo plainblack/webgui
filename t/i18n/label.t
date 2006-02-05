@@ -148,6 +148,12 @@ sub label_finder_pm {
 
 sub obj_finder_pm {
 	next unless /\.pm$/;
+	warn "filename: $File::Find::name\n";
+	if ($File::Find::name =~ m#(?:Help|i18n)/?$#) {
+		warn "Pruned $File::Find::name\n";
+		$File::Find::prune=1;
+		return;
+	}
 	open my $pmf, $_
 		or die "unable to open file $File::Find::name: $!\n";
 	my $libFile = '';

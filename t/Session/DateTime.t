@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 26; # increment this value for each test you create
+use Test::More tests => 63; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
@@ -52,3 +52,41 @@ is($session->datetime->secondsToTime(60*60*8),"08:00:00", "secondsToTime()");
 is($session->datetime->setToEpoch("2001-08-16 08:00:00"), $wgbday, "setToEpoch()");
 ok($session->datetime->time() > $wgbday,"time()");
 is($session->datetime->timeToSeconds("08:00:00"), 60*60*8, "timeToSeconds()");
+
+        my %conversion = (
+                "%c" => "%B",
+                "%C" => "%b",
+                "%d" => "%d",
+                "%D" => "%e",
+                "%h" => "%I",
+                "%H" => "%l",
+                "%j" => "%H",
+                "%J" => "%k",
+                "%m" => "%m",
+                "%M" => "%_varmonth_",
+                "%n" => "%M",
+		"%O" => "%z",
+                "%p" => "%P",
+                "%P" => "%p",
+                "%s" => "%S",
+                "%w" => "%A",
+                "%W" => "%a",
+                "%y" => "%Y",
+                "%Y" => "%y"
+                );
+
+diag("check WebGUI to DateTime conversion");
+foreach my $wg (keys %conversion) {
+	is( $session->datetime->wgToDt($wg), $conversion{$wg},
+		sprintf "WG to DT format conversion: %s => %s", $wg, $conversion{$wg});
+}
+
+%conversion = reverse %conversion;
+
+delete $conversion{'%_varmonth_'};
+
+diag("check DateTime to WebGUI conversion");
+foreach my $dt (keys %conversion) {
+	is( $session->datetime->dtToWg($dt), $conversion{$dt},
+		sprintf "WG to DT format conversion: %s => %s", $dt, $conversion{$dt});
+}
