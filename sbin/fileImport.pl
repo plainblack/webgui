@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2006 Plain Black Corporation.
+# WebGUI is Copyright 2001-2005 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -59,7 +59,7 @@ GetOptions(
 	'groupToView=s'=>\$groupToView,
 	'groupToEdit=s'=>\$groupToEdit,
 	'help'=>\$help,
-	'override'=>$override,
+	'override'=>\$override,
 	'pathToFiles=s'=>\$pathToFiles,
 	'quiet'=>\$quiet,
 	'webUser=s'=>\$webUser,
@@ -176,6 +176,7 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 }
 
 
+my %filelisthash;
 print "Starting..." unless ($quiet);
 WebGUI::Session::open($webguiRoot,$configFile);
 WebGUI::Session::refreshUserInfo(3);
@@ -231,9 +232,9 @@ sub addFiles {
 				$filenameTitle =~ s/\.$file->{ext}// if ($ignoreExtInName);
 				my $newAsset = $parent->addChild({
 					className=>$class,
-					title=>$filename,
+					title=>$filenameTitle,
 					menuTitle=>$filenameTitle,
-					filename=>$filenameTitle,
+					filename=>$filename,
 					storageId=>$storage->getId,
 					isHidden=>1,
 					url=>$url,
@@ -277,9 +278,7 @@ sub buildFileListWrap {
 	my (@filelist);
 	print "Building file list.\n" unless ($quiet);
 	@filelist = &buildFileList($now,$path);
-	# TB : check is the filelist doesn't contains two times the same file (file with the same name)
-	# due to recursive call, this can happen.
-	&filelistCheck(@filelist);
+	# &filelistCheck(@filelist);
 	print "File list complete.\n" unless ($quiet);
 	return \@filelist;
 }
@@ -303,7 +302,16 @@ sub buildFileList {
 				next if (&skipFilter($fullpathfile,$ext,$now));
 				# TB : due to recursive search. Not really nice.
 				my $relpath = &trailFile("$path");
+				# TB : check is the filelist doesn't contains two times the same file (file with the same name)
+				# due to recursive call, this can happen.
+				if (exists $filelisthash{$file}) {
+				  print "Error: file \"$file\" exists at several locations.
+       Both \"$filelisthash{$file}\" and \"$relpath\" contains it.
+       Exit at the first error of this type.\n" unless ($quiet);
+				  exit 2;
+				}
 				push(@filelist,{ext=>$ext, filename=>$file, relpath=>$relpath});
+				$filelisthash{$file} = $relpath;
 				print "Found file $file.\n" unless ($quiet);
 	 		}
 			# TB : the recursive call
@@ -391,21 +399,4 @@ sub checkAssetExists {
 	return($replaceAsset, $replaceAssetId, $child);
 }
 
-#-----------------------------------------
-# filelistCheck(filelist)
-#-----------------------------------------
-sub filelistCheck {
-	my (@filelist) = @_;
-	my @filelistcopy = @filelist;
-	foreach my $file (@filelist) {
-		foreach my $filecopy (@filelistcopy) {
-			next if ($file->{relpath} eq $filecopy->{relpath});
-			if ($file->{filename} eq $filecopy->{filename}) {
-				print "Error: file \"$file->{filename}\" exists at several localtions.
-       Both \"$file->{relpath}\" and \"$filecopy->{relpath}\" contains it.
-       Exit at the first error of this type.\n" unless ($quiet);
-				exit 2;
-			}
-		}
-	}
-}
+
