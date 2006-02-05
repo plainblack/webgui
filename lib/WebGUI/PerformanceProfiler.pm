@@ -244,7 +244,9 @@ per sub, descending.
 =cut
 
 sub results {
-	my @parents;
+	my @parents = ();
+	my $exclTimes = {};
+	my $inclTimes = {};
 	my $output = qq|
 <script> 
 function showhide(id){ 
@@ -267,7 +269,7 @@ obj.style.display = "none";
 		$call->{duration} = $call->{end} - $call->{start};
 		$call->{excl} = $call->{duration};
 		if (defined $parents[0]) {
-			$subTimes[$parents[-1]]->{excl} = $subTimes[$parents[-1]]->{excl} - $call->{duration};
+			$subTimes[$parents[-1]]->{excl} -= $call->{duration};
 		}
 		if($subTimes[$entry + 1] && ($subTimes[$entry + 1]->{depth} > $call->{depth})) {
 			# Do stuff to the next line if it's at a deeper depth.
@@ -286,16 +288,20 @@ obj.style.display = "none";
 			}
 		}
 	}
-
+	
 	for(my $entry=0;$entry <= $#subTimes;$entry++) {
 		my $call = $subTimes[$entry];
-		$output .= "\n".'&nbsp;&nbsp;&nbsp;&nbsp;';
-		$output .= '&nbsp;&nbsp;|&nbsp;' for(2..$call->{depth});
+		$output .= "\n".'&nbsp;&nbsp;';
+		$output .= '&nbsp;&nbsp;|&nbsp;' for(2..($call->{depth}));
+		$exclTimes->{$call->{routine}} = [] unless exists $exclTimes->{$call->{routine}};
+		push(@{$exclTimes->{$call->{routine}}},$call->{excl});
+		$inclTimes->{$call->{routine}} = [] unless exists $inclTimes->{$call->{routine}};
+		push(@{$inclTimes->{$call->{routine}}},$call->{duration});
 		if($subTimes[$entry + 1] && ($subTimes[$entry + 1]->{depth} > $call->{depth})) {
 			# Do stuff to the next line if it's at a deeper depth.
 			$output .= qq|<a href="#" onclick="showhide('profile$call->{entry}'); return(false);"> + </a>|;
 		} else {
-			$output .= ' &nbsp;| ';
+			$output .= '&mdash;&nbsp;';
 		}
 		$output .= "<b>" if($total < ($call->{duration} * 40));
 		$output .= $call->{routine} . " ( ".sprintf("%.4f",$call->{duration})."s )";
@@ -311,13 +317,163 @@ obj.style.display = "none";
 		}
 		if($nextDepth < $call->{depth}) {
 			$nextDepth++;
-			for(1 .. ($call->{depth} - $nextDepth + 1)) {
+			for(0 .. ($call->{depth} - $nextDepth)) {
 				$output .= "\n</div>\n";
 			}
 		}
 	}
+	$output .= "<br>\n<br>\n";
+	$output .= '<h2>Subroutine Calls Aggregate Data</h2>';
+	$output .= '"Exclusive" measures the time spent in the subroutine call, excluding the time spent in its called subroutines.  Inclusive measures...'."<br>\n<br>\n";
+	$output .= qq|
+	<style>
+	.sort-table {
+	font:		Icon;
+	border:		1px Solid ThreeDShadow;
+	background:	Window;
+	color:		WindowText;
+}
+.evenST {
+	background:	#eee;
+}
+
+.oddST {
+
+}
+.sort-table thead {
+	background:	ButtonFace;
+}
+
+.sort-table td {
+	padding:	2px 5px;
+}
+
+.sort-table thead td {
+	border:			1px solid;
+	border-color:	ButtonHighlight ButtonShadow
+					ButtonShadow ButtonHighlight;
+	cursor:			default;
+}
+
+.sort-table thead td:active {
+	border-color:	ButtonShadow ButtonHighlight
+					ButtonHighlight ButtonShadow;
+	padding:		3px 4px 1px 6px;
+}
+
+.sort-table thead td[_sortType=None]:active {
+	border-color:	ButtonHighlight ButtonShadow
+					ButtonShadow ButtonHighlight;
+	padding:		2px 5px;
+}
+
+.sort-arrow {
+	width:					11px;
+	height:					11px;
+	background-position:	center center;
+	background-repeat:		no-repeat;
+	margin:					0 2px;
+}
+
+.sort-arrow.descending {
+	background-image:		url("/extras/wobject/Profiler/downsimple.png");
+
+}
+
+.sort-arrow.ascending {
+	background-image:		url("/extras/wobject/Profiler/upsimple.png");
+}
+	
+	</style>
+	<script type="text/javascript" src="/extras/wobject/Profiler/sortabletable.js"></script>
+		<table class="sort-table" id="subStatsTable" cellspacing="0">
+<thead>
+	<tr>
+		<td>Inclusive %</td>
+		<td>Inclusive Total</td>
+		<td>Inclusive Mean</td>
+		<td>Calls Total</td>
+		<td>Exclusive %</td>
+		<td>Exclusive Total</td>
+		<td>Exclusive Mean</td>
+		<td>Sub Name</td>
+	</tr>
+</thead>
+<tbody>|;
+my $rawtotal = ($subTimes[-1]->{'end'} - $subTimes[0]->{'start'});
+foreach my $rout (keys %{$inclTimes}) {
+	my $totExcl = sum($exclTimes->{$rout});
+	my $totIncl = sum($inclTimes->{$rout});
+	next if ((($totExcl+0) > 1000000) || (($totExcl+0) < -1000000)); # skip problem subs.
+	$output .= sprintf("<tr><td>%.2f%%</td><td>%.5f</td><td>%.5f</td><td>%u</td><td>%.2f%%</td><td>%.5f</td><td>%.5f</td><td>%s</td></tr>",
+		(100 * $totIncl / $rawtotal ),                         # Inclusive %
+		$totIncl,                                       # Inclusive Total
+		($totIncl / (scalar(@{$inclTimes->{$rout}}))),  # Inclusive Mean
+		(scalar(@{$inclTimes->{$rout}})),               # Calls Total
+		(100 * $totExcl / $rawtotal),                         # Exclusive %
+		$totExcl,                                       # Exclusive Total
+		($totExcl / (scalar(@{$exclTimes->{$rout}}))),  # Exclusive Mean
+		$rout                                           # Sub Name
+	);
+}
+$output .= q@
+</tbody>
+</table>
+
+<script type="text/javascript">
+//<![CDATA[
+	
+function addSTClassName(el, sClassName) {
+	var s = el.className;
+	var p = s.split(" ");
+	var l = p.length;
+	for (var i = 0; i < l; i++) {
+		if (p[i] == sClassName)
+			return;
+	}
+	p[p.length] = sClassName;
+	el.className = p.join(" ").replace( /(^\s+)|(\s+$)/g, "" );
+}
+
+function removeSTClassName(el, sClassName) {
+	var s = el.className;
+	var p = s.split(" ");
+	var np = [];
+	var l = p.length;
+	var j = 0;
+	for (var i = 0; i < l; i++) {
+		if (p[i] != sClassName) {
+		np[j++] = p[i]; }
+	}
+	el.className = np.join(" ").replace( /(^\s+)|(\s+$)/g, "" );
+}
+	
+function perceST(str) {
+	return Number(str.replace(
+		/%/,""));
+}
+
+SortableTable.prototype.addSortType( "Percent", perceST );
+var stST = new SortableTable( document.getElementById("subStatsTable"),
+	["Percent", "Number", "Number", "Number", "Percent", "Number", "Number", "String"] );
+
+// restore the class names
+stST.onsort = function () {
+	var rows = stST.tBody.rows;
+	var l = rows.length;
+	for (var i = 0; i < l; i++) {
+		removeSTClassName(rows[i], i % 2 ? "oddST" : "evenST");
+		addSTClassName(rows[i], i % 2 ? "evenST" : "oddST");
+	}
+};
 
 
+
+stST.sort( 6 , 1 ); // sort by exclusive mean, descending.
+
+//]]>
+</script>@;
+	
 	$output .= "<br>\n<br>\n<br>\n<br>\n";
 	undef(@subTimes);
 	return $output;
@@ -344,5 +500,12 @@ sub is_constant {
 	return $is_const;
 }
 
+sub sum {
+	my ($sum, $elem);
+	$sum = 0;
+	my $arrRef = shift;
+	foreach $elem (@{$arrRef}) { $sum += $elem; }
+	return($sum);
+}
 
 1;

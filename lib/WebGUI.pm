@@ -103,7 +103,7 @@ sub page {
 				}
 			}
 			$output = tryAssetMethod($session,$asset,$method);
-			$output = tryAssetMethod($session,$asset,"view") unless ($method eq "view" || $output);
+			$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
 		}
 	}
 	if ($output eq "") {
