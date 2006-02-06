@@ -16,7 +16,7 @@ function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit) {
 	var workspace = document.getElementById(workspaceId);
 	
 	var str = '<table border="0"><tbody id="' + workspaceId + '.fileUpload.body">';			
-	str += '</tbody></table><table>';
+	str += '</tbody></table>';
 	
 	str +='<table style="display: none;">'
 	
