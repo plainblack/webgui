@@ -60,9 +60,9 @@ have the following properties:
         },
 
         'upload files description' => {
-                message => q|This is where files can be uploaded from your computer.
+                message => q|This is where files can be uploaded from your computer.  You can upload to to 100 files at a time.
 </p>|,
-                lastUpdated => 1119214815,
+                lastUpdated => 1139206282,
         },
 
 
