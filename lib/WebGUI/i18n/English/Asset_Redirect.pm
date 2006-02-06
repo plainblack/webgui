@@ -29,18 +29,26 @@ our $I18N = {
 	},
 
 	'redirect add/edit title' => {
-		message => q|Page Redirect, Add/Edit|,
+		message => q|Redirect, Add/Edit|,
         	lastUpdated => 1104630516,
 	},
 
 	'redirect add/edit body' => {
 		message => q|
-<P>The Page Redirect Asset causes the user's browser to be redirected to another page. This will happen automatically if it is viewed standalone.  If the Asset is viewed as part a Page Asset, or proxied via a macro, then nothing will happen.</P>
-<P><b>NOTE:</b> The redirection will be disabled while in admin mode in order to allow editing the properties of the Asset.</P>
+<P>The Redirect Asset causes the user's browser to be redirected to
+another page.   The new page can be part of your site, or it can be on
+another site altogether.  The redirection happens when the Redirect
+Assets own URL is accessed, either by a link from a page, or from a
+Navigation, or if the Asset's URL is entered into the browser directly.
+However, if it is viewed as an element of a Page Asset, or proxied via
+a macro onto a page, then no redirection will take place.</P>
+
+<P><b>NOTE:</b>The redirection will be disabled while in admin mode in order to
+allow editing the properties of the Asset.</P>
 
 |,
-        	lastUpdated => 1130876050,
-		context => 'Help text for redirects',
+        	lastUpdated => 1139251653,
+		context => q|Help text for redirects|,
 	},
 
         'redirect url description' => {
