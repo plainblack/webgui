@@ -380,13 +380,15 @@ sub www_editCommerceSettings {
 	# general
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceConfirmCheckoutTemplateId',
-		-label		=> $i18n->get('confirm checkout template'),
 		-value		=> $session{setting}{commerceConfirmCheckoutTemplateId},
+		-label		=> $i18n->get('confirm checkout template'),
+		-hoverHelp	=> $i18n->get('confirm checkout template description'),
 		-namespace	=> 'Commerce/ConfirmCheckout'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceTransactionErrorTemplateId',
 		-label		=> $i18n->get('transaction error template'),
+		-hoverHelp	=> $i18n->get('transaction error template description'),
 		-value		=> $session{setting}{commerceTransactionPendingTemplateId},
 		-namespace	=> 'Commerce/TransactionError'
 		);
@@ -394,24 +396,28 @@ sub www_editCommerceSettings {
 		-name		=> 'commerceCheckoutCanceledTemplateId',
 		-label		=> $i18n->get('checkout canceled template'),
 		-value		=> $session{setting}{commerceCheckoutCanceledTemplateId},
+		-hoverHelp	=> $i18n->get('checkout canceled template description'),
 		-namespace	=> 'Commerce/CheckoutCanceled'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceSelectPaymentGatewayTemplateId',
 		-label		=> $i18n->get('checkout select payment template'),
 		-value		=> $session{setting}{commerceSelectPaymentGatewayTemplateId},
+		-hoverHelp	=> $i18n->get('checkout select payment template description'),
 		-namespace	=> 'Commerce/SelectPaymentGateway'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceSelectShippingMethodTemplateId',
 		-label		=> $i18n->get('checkout select shipping template'),
 		-value		=> $session{setting}{commerceSelectShippingMethodTemplateId},
+		-hoverHelp	=> $i18n->get('checkout select shipping template description'),
 		-namespace	=> 'Commerce/SelectShippingMethod'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceViewShoppingCartTemplateId',
 		-label		=> $i18n->get('view shopping cart template'),
 		-value		=> $session{setting}{commerceViewShoppingCartTemplateId},
+		-hoverHelp	=> $i18n->get('view shopping cart template description'),
 		-namespace	=> 'Commerce/ViewShoppingCart'
 		);
 
@@ -419,6 +425,7 @@ sub www_editCommerceSettings {
 		-name		=> 'commerceSendDailyReportTo',
 		-label		=> $i18n->get('daily report email'),
 		-value		=> $session{setting}{commerceSendDailyReportTo}
+		-hoverHelp	=> $i18n->get('daily report email description'),
 		);
 
 	# Check which payment plugins will compile, and load them.
@@ -438,7 +445,8 @@ sub www_editCommerceSettings {
 		$tabform->getTab("payment")->selectBox(
 			-name		=> 'commercePaymentPlugin',
 			-options	=> \%paymentPlugins,
-			-label		=> $i18n->get('payment form'),
+			-label		=> $i18n->get('payment plugin'),
+			-hoverHelp	=> $i18n->get('payment plugin description'),
 			-value		=> $paymentPlugin,
 			-extras		=> 'onchange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
 			);
@@ -477,6 +485,7 @@ sub www_editCommerceSettings {
 			-name	=> 'commerceShippingPlugin',
 			-options=> \%shippingPlugins,
 			-label	=> $i18n->get('shipping plugin label'),
+			-hoverHelp	=> $i18n->get('shipping plugin label description'),
 			-value	=> $shippingPlugin,
 			-extras	=> 'onchange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
 			);

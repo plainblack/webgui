@@ -5,6 +5,51 @@ our $HELP = {
 		title => 'help manage commerce title',
 		body => 'help manage commerce body',
 		fields => [
+			{
+                                title => 'confirm checkout template',
+                                description => 'confirm checkout template description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'transaction error template',
+                                description => 'transaction error template description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'checkout canceled template',
+                                description => 'checkout canceled template description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'checkout select payment template',
+                                description => 'checkout select payment template description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'checkout select shipping template',
+                                description => 'checkout select shipping template description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'view shopping cart template',
+                                description => 'view shopping cart template description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'daily report email',
+                                description => 'daily report email description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'payment plugin',
+                                description => 'payment plugin description',
+                                namespace => 'Commerce',
+                        },
+                        {
+                                title => 'shipping plugin label',
+                                description => 'shipping plugin label description',
+                                namespace => 'Commerce',
+                        },
 		],
 		related => [
 		]

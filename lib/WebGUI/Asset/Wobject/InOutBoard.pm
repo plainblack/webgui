@@ -109,35 +109,41 @@ sub getEditForm {
 	$tabform->getTab("properties")->textarea(
 		-name=>"statusList",
 		-label=>WebGUI::International::get(1, "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get('1 description', "Asset_InOutBoard"),
 		-value=>$self->getValue("statusList"),
 		-subtext=>WebGUI::International::get(2, "Asset_InOutBoard"),
 		);
 	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
 		-label=>WebGUI::International::get(12, "Asset_InOutBoard"),
-		-value=>$self->getValue("paginateAfter")
+		-hoverHelp=>WebGUI::International::get('12 description', "Asset_InOutBoard"),
+		-value=>$self->getValue("paginateAfter"),
 		);
 	$tabform->getTab("display")->template (
 	    -name => "inOutTemplateId",
 	    -value => $self->getValue("inOutTemplateId"),
 	    -label => WebGUI::International::get("In Out Template", "Asset_InOutBoard"),
+	    -hoverHelp => WebGUI::International::get("In Out Template description", "Asset_InOutBoard"),
 	    -namespace => "InOutBoard"
 	    );
 	$tabform->getTab("display")->template (
 	    -name => "reportTemplateId",
 	    -value => $self->getValue("reportTemplateId"),
 	    -label => WebGUI::International::get(13, "Asset_InOutBoard"),
+	    -hoverHelp => WebGUI::International::get("13 description", "Asset_InOutBoard"),
 	    -namespace => "InOutBoard/Report"
 	    );
 	$tabform->getTab("security")->group(
 		-name=>"reportViewerGroup",
 		-value=>[$self->getValue("reportViewerGroup")],
-		-label=>WebGUI::International::get(3, "Asset_InOutBoard")
+		-label=>WebGUI::International::get(3, "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get("3 description", "Asset_InOutBoard"),
 		);
    $tabform->getTab("security")->group(
 		-name=>"inOutGroup",
 		-value=>[$self->getValue("inOutGroup")],
-		-label=>WebGUI::International::get('inOutGroup', "Asset_InOutBoard")
+		-label=>WebGUI::International::get('inOutGroup', "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get('inOutGroup description', "Asset_InOutBoard"),
 		);
     return $tabform;
 }
