@@ -38,7 +38,11 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => '2',
+				tag => 'in out board template',
+				namespace => 'Asset_InOutBoard'
+			},
+			{
+				tag => 'in out board report template',
 				namespace => 'Asset_InOutBoard'
 			},
 			{
@@ -51,7 +55,7 @@ our $HELP = {
 			}
 		]
 	},
-	'2' => {
+	'in out board template' => {
 		title => '20',
 		body => '21',
 		related => [
@@ -69,16 +73,12 @@ our $HELP = {
 			}
 		]
 	},
-	'3' => {
+	'in out board report template' => {
 		title => '22',
 		body => '23',
 		related => [
 			{
 				tag => 'in out board add/edit',
-				namespace => 'Asset_InOutBoard'
-			},
-			{
-				tag => '2',
 				namespace => 'Asset_InOutBoard'
 			},
 			{

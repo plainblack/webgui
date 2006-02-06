@@ -191,6 +191,7 @@ sub view {
 			-options=>\%nameHash,
 			-value=>[ $session{scratch}{userId} ],
 			-label=>WebGUI::International::get('delegate', "Asset_InOutBoard"),
+			-hoverHelp=>WebGUI::International::get('delegate description', "Asset_InOutBoard"),
 			-extras=>q|onchange="this.form.submit();"|,
 		);
 	}
@@ -199,10 +200,12 @@ sub view {
 		-value=>$status,
 		-options=>$statusListHashRef,
 		-label=>WebGUI::International::get(5, "Asset_InOutBoard")
+		-hoverHelp=>WebGUI::International::get('5 description', "Asset_InOutBoard")
 		);
 	$f->text(
 		-name=>"message",
 		-label=>WebGUI::International::get(6, "Asset_InOutBoard")
+		-hoverHelp=>WebGUI::International::get('6 description', "Asset_InOutBoard")
 		);
 	$f->hidden(
 		-name=>"func",
@@ -278,6 +281,7 @@ order by department, lastName, firstName";
 sub www_edit {
         my $self = shift;
         return WebGUI::Privilege::insufficient() unless $self->canEdit;
+        $self->getAdminConsole->setHelp("in out board add/edit","Asset_InOurBoard");
         return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get("18","Asset_InOutBoard"));
 }
 
@@ -325,6 +329,7 @@ group by userId", quote($self->getId), quote($session{user}{userId}), quote($sel
         $f->selectList(
 	    -name => "delegates",
 	    -label => WebGUI::International::get('in/out status delegates','Asset_InOutBoard'),
+	    -hoverHelp => WebGUI::International::get('in/out status delegates description','Asset_InOutBoard'),
 	    -options => \%userNames,
 	    -multiple => 1,        ##Multiple select
 	    -size => 10,        ##Multiple select
@@ -400,12 +405,14 @@ sub www_viewReport {
 	$f->date(
 		-name=>"startDate",
 		-label=>WebGUI::International::get(16, "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get('16 description', "Asset_InOutBoard"),
 		-value=>$startDate
 		);
 	my $endDate = WebGUI::FormProcessor::date("endDate");
 	$f->date(
 		-name=>"endDate",
 		-label=>WebGUI::International::get(17, "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get('17 description', "Asset_InOutBoard"),
 		-value=>$endDate
 		);
 	my %depHash;
@@ -421,6 +428,7 @@ sub www_viewReport {
 		-options=>\%depHash,
 		-value=>[ $defaultDepartment ],
 		-label=>WebGUI::International::get('filter departments', "Asset_InOutBoard"),
+		-label=>WebGUI::International::get('filter departments description', "Asset_InOutBoard"),
 	);
 	my %paginHash;
 	tie %paginHash, "Tie::IxHash"; ##Because default sort order is alpha
@@ -431,6 +439,7 @@ sub www_viewReport {
 		-options=>\%paginHash,
 		-value=>[ $pageReportAfter ],
 		-label=>WebGUI::International::get(14, "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get('14 description', "Asset_InOutBoard"),
 	);
 	$f->submit(-value=>"Search");
 	$var{'form'} = $f->print;
