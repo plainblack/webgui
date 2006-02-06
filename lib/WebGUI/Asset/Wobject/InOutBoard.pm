@@ -207,6 +207,7 @@ sub view {
 			-options=>\%nameHash,
 			-value=>[ $self->session->scratch->get("userId") ],
 			-label=>$i18n->get('delegate'),
+			-hoverHelp=>$i18n->get('delegate description'),
 			-extras=>q|onchange="this.form.submit();"|,
 		);
 	}
@@ -215,10 +216,12 @@ sub view {
 		-value=>$status,
 		-options=>$statusListHashRef,
 		-label=>$i18n->get(5)
+		-hoverHelp=>$i18n->get('5 description')
 		);
 	$f->text(
 		-name=>"message",
 		-label=>$i18n->get(6)
+		-hoverHelp=>$i18n->get('6 description')
 		);
 	$f->hidden(
 		-name=>"func",
@@ -294,6 +297,7 @@ order by department, lastName, firstName";
 sub www_edit {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
+        $self->getAdminConsole->setHelp("in out board add/edit","Asset_InOurBoard");
 	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
         return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("18"));
 }
@@ -343,6 +347,7 @@ group by userId", $self->session->db->quote($self->getId), $self->session->db->q
         $f->selectList(
 	    -name => "delegates",
 	    -label => $i18n->get('in/out status delegates'),
+	    -hoverHelp => $i18n->get('in/out status delegates description','Asset_InOutBoard'),
 	    -options => \%userNames,
 	    -multiple => 1,        ##Multiple select
 	    -size => 10,        ##Multiple select
@@ -419,12 +424,14 @@ sub www_viewReport {
 	$f->date(
 		-name=>"startDate",
 		-label=>$i18n->get(16),
+		-hoverHelp=>$i18n->get('16 description'),
 		-value=>$startDate
 		);
 	my $endDate = $self->session->form->date("endDate");
 	$f->date(
 		-name=>"endDate",
 		-label=>$i18n->get(17),
+		-hoverHelp=>$i18n->get('17 description'),
 		-value=>$endDate
 		);
 	my %depHash;
@@ -440,6 +447,7 @@ sub www_viewReport {
 		-options=>\%depHash,
 		-value=>[ $defaultDepartment ],
 		-label=>$i18n->get('filter departments'),
+		-label=>$i18n->get('filter departments description'),
 	);
 	my %paginHash;
 	tie %paginHash, "Tie::IxHash"; ##Because default sort order is alpha
@@ -450,6 +458,7 @@ sub www_viewReport {
 		-options=>\%paginHash,
 		-value=>[ $pageReportAfter ],
 		-label=>$i18n->get(14),
+		-hoverHelp=>$i18n->get('14 description'),
 	);
 	$f->submit(-value=>"Search");
 	$var{'form'} = $f->print;

@@ -18,6 +18,7 @@
    to the database link properties. (Martin Kamerbeek / Procolix)
  - Converted config file format from PlainConfig to JSON. The new format is
    more powerful and will use slightly less memory.
+ - fix [ 1406210 ] 6.9 i18n in create.sql, previous.sql broken.
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP
@@ -26,6 +27,7 @@
  - fix [ 1328895 ] Page Redirect Asset Help File needs to be changed
  - fix [ 1423815 ] snippet v6.8.5
  - fix [ 1421056 ] LDAP Recursive Property Bug
+ - fix [ 1404350 ] no hoverHelp for InOutBoard
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm

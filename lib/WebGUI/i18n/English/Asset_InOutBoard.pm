@@ -26,12 +26,69 @@ our $I18N = {
 		lastUpdated =>1122010599
 	},
 
-	'23' => {
-		message => q| The following variables are made available from In/Out Board Report: 
-<P><B>showReport</B><BR>A boolean indicating whether or not the&nbsp;<I>rows_loop</I> variable will be set. <BR><BR><B>form</B><BR>A variable that contains the HTML for displaying the&nbsp;Date Range Selector Form for the report.&nbsp;<BR><BR><B>rows_loop</B><BR>A loop containing the rows of data for the In/Out Board Report&nbsp;<BR><BR>
-<BLOCKQUOTE><B>deptHasChanged</B><BR>A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows<BR><BR><B>username</B><BR>A variable that returns the users name. If the first and last name fields are defined in the user profile, that is what is returned. Otherwise, the users WebGUI username is returned. i.e., "John Doe" vs "Jdoe" <BR><BR><B>status</B><BR>A variable that returns the users status. The status of a user is defined by the Status List in the Wobject Properties. If no status is set for the current user 'Never Checked In' is returned. <BR><BR><B>dateStamp</B><BR>A variable that returns the date the status of the user was last updated. <BR><BR><B>message</B><BR>A variable that returns what the user entered in the "What's going on?" field when updating their status. <BR><BR></BLOCKQUOTE><B>paginateBar</B><BR>A variable that returns the HTML necessary to create a Traditional Pagination Bar. i.e., &lt;&lt; First, 1, 2, Last &gt;&gt; <BR><BR>|,
+	'in/out status delegates description' => {
+		message => q|Use this form to choose others who can change your status on the In/Out Board.  All users
+		who you have already chosen to change your status will be preselected.  To remove a user, deselect them.|,
+		lastUpdated =>1139260288
+	},
 
-		lastUpdated =>1091624565
+	'23' => {
+		message => q|<p>The following variables are available from In/Out Board Report template:</p>
+
+<P><B>showReport</B><BR />
+A boolean indicating whether or not the <I>rows_loop</I> variable will be set.</p>
+
+<P><B>form</B><BR />
+A variable that contains an HTML form for limiting the scope, by date or department, of the report.
+
+<P><B>username.label</B><BR />
+Internationalized label for the "Username" column of the report.
+
+<P><B>status.label</B><BR />
+Internationalized label for the "Status" column of the report.
+
+<P><B>date.label</B><BR />
+Internationalized label for the "Date" column of the report.
+
+<P><B>message.label</B><BR />
+Internationalized label for the "Message" column of the report.
+
+<P><B>updatedBy.label</B><BR />
+Internationalized label for the "Updated By" column of the report.
+
+<P><B>rows_loop</B><BR />
+A loop containing the rows of data for the In/Out Board Report&nbsp;</p>
+
+<BLOCKQUOTE>
+
+<p><B>deptHasChanged</B><BR />
+A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows</p>
+
+<p><B>username</B><BR />
+A variable that returns the user's name. If the first and last name fields are defined in the user profile, that is what is returned. Otherwise, the users WebGUI username is returned. i.e., "John Doe" vs "Jdoe".</p>
+
+<p><B>department</B><BR />
+A variable that returns the user's department. If no department has been assigned to this user, an internationalized label for "No Department" will be used.</p>
+
+<p><B>status</B><BR />
+A variable that returns the user's status. The status of a user is defined by the Status List in the Wobject Properties. If no status is set for the current user 'Never Checked In' is returned.</p>
+
+<p><B>dateStamp</B><BR />
+A variable that returns the date the status of the user was last updated.</p>
+
+<p><B>message</B><BR />
+A variable that returns what the user entered in the "What's going on?" field when updating their status.</p>
+
+<p><B>createdBy</B><BR />
+A variable that returns which user, either the user himself or a delegate, changed the status for this user.
+
+</BLOCKQUOTE>
+
+<p><B>paginateBar</B><BR />
+A variable that returns the HTML necessary to create a Traditional Pagination Bar. i.e., &lt;&lt; First, 1, 2, Last &gt;&gt;</p>
+|,
+
+		lastUpdated =>1139264476
 	},
 
         '1 description' => {
@@ -60,7 +117,7 @@ our $I18N = {
         },
 
         'inOutGroup description' => {
-                message => q|Whichs groups are allowed to use this In/Out Board to change their status?|,
+                message => q|Which groups are allowed to use this In/Out Board to change their status?|,
                 lastUpdated => 1138988640,
         },
 
@@ -69,10 +126,15 @@ our $I18N = {
 An In/Out board is used to keep track of whether people are currently
 in/out of the office. It shows the current In/Out status of all WebGUI
 users and also logs the reason the person has left, the time they
-left and the time they return.  The log
-</p>
+left and the time they return.  The log is viewable in two forms.  The first
+is a summary of the current status for all users in the groups configured for
+this In/Out board instance.  The second is a complete report of the history of
+all status changes for those users.  This report can be setup to have restricted
+viewing privileges and is templatable.</p>
+<p>Users of the In/Out Board can select other users, called delegates, to update
+their status for them.</p>
 |,
-		lastUpdated =>1091624565
+		lastUpdated =>1139255107
 	},
 
 	'20' => {
@@ -96,7 +158,7 @@ can alter their status.</p>
 A boolean indicating whether or not the <i>form</i> variable will be set.</p>
 
 <p><b>form</b><br />
-A variable that contains the HTML for displaying the In/Out Entry Form.</p>
+A variable that contains the HTML for displaying the In/Out Entry Form to update status for the current user or another user.</p>
 
 <p><b>rows_loop</b><br />
 A loop containing the rows of data for the In/Out Board</p>
@@ -118,11 +180,12 @@ A variable that returns the date the status of the user was last updated.</p>
 <p><b>message</b><br />
 A variable that returns what the user entered in the "What's going on?" field when updating their status.</p>
 </blockquote>
+
 <p><b>paginateBar</b><br />
 A variable that returns the HTML necessary to create a Traditional Pagination Bar.  i.e., &gt;&gt; First, 1, 2, Last &lt;&lt;</p>
 
   |,
-		lastUpdated =>1122523725
+		lastUpdated =>1139254657
 	},
 
 	'2' => {
@@ -140,9 +203,19 @@ A variable that returns the HTML necessary to create a Traditional Pagination Ba
 		lastUpdated =>1091624565
 	},
 
+	'17 description' => {
+		message => q|Like the Start Date, End Date can help limit the size of your report by not showing changes in status after the date you select.|,
+		lastUpdated =>1139265525
+	},
+
 	'16' => {
 		message => q|Start Date|,
 		lastUpdated =>1091624565
+	},
+
+	'16 description' => {
+		message => q|The Start Date can help limit the size of your report by not showing changes in status before the date you select.|,
+		lastUpdated =>1139262071
 	},
 
 	'15' => {
@@ -153,6 +226,11 @@ A variable that returns the HTML necessary to create a Traditional Pagination Ba
 	'14' => {
 		message => q|Paginate Report After|,
 		lastUpdated =>1091624565
+	},
+
+	'14 description' => {
+		message => q|Select how many lines you want in each page of the report.  You will be provided links to access additional pages of the report.|,
+		lastUpdated =>1139264214
 	},
 
 	'13' => {
@@ -195,9 +273,19 @@ A variable that returns the HTML necessary to create a Traditional Pagination Ba
 		lastUpdated =>1091624565
 	},
 
+	'6 description' => {
+		message => q|You can enter in reasons for the change in status (doctor's appointment, went home) etc. here.|,
+		lastUpdated =>1139254446
+	},
+
 	'delegate' => {
 		message => q|Update status for: |,
 		lastUpdated =>1122319088
+	},
+
+	'delegate description' => {
+		message => q|Select a name from this list to update the status for someone other than yourself.|,
+		lastUpdated =>1139253866
 	},
 
 	'myself' => {
@@ -208,6 +296,11 @@ A variable that returns the HTML necessary to create a Traditional Pagination Ba
 	'5' => {
 		message => q|Status|,
 		lastUpdated =>1091624565
+	},
+
+	'5 description' => {
+		message => q|You may select one status from the list.  If you would like to further explain the reason for the status, use the "What's happening" field.|,
+		lastUpdated =>1139253909
 	},
 
 	'4' => {
@@ -258,6 +351,11 @@ A variable that returns the HTML necessary to create a Traditional Pagination Ba
 	'filter departments' => {
 		message => q|Filter departments:|,
 		lastUpdated =>1123266322
+	},
+
+	'filter departments description' => {
+		message => q|Each In/Out Board can be configured to serve multiple departments.  By default, all departments are shown in the report.  Select the name of any one department to limit the report to only display status changes from that department.| ,
+		lastUpdated =>1139262439
 	},
 
 
