@@ -107,35 +107,41 @@ sub getEditForm {
 	$tabform->getTab("properties")->textarea(
 		-name=>"statusList",
 		-label=>$i18n->get(1),
+		-hoverHelp=>$i18n->get('1 description'),
 		-value=>$self->getValue("statusList"),
 		-subtext=>$i18n->get(2),
 		);
 	$tabform->getTab("display")->integer(
 		-name=>"paginateAfter",
 		-label=>$i18n->get(12),
-		-value=>$self->getValue("paginateAfter")
+		-hoverHelp=>$i18n->get('12 description'),
+		-value=>$self->getValue("paginateAfter"),
 		);
 	$tabform->getTab("display")->template (
 	    -name => "inOutTemplateId",
 	    -value => $self->getValue("inOutTemplateId"),
 	    -label => $i18n->get("In Out Template"),
+	    -hoverHelp => $i18n->get("In Out Template description"),
 	    -namespace => "InOutBoard"
 	    );
 	$tabform->getTab("display")->template (
 	    -name => "reportTemplateId",
 	    -value => $self->getValue("reportTemplateId"),
 	    -label => $i18n->get(13),
+	    -hoverHelp => $i18n->get("13 description"),
 	    -namespace => "InOutBoard/Report"
 	    );
 	$tabform->getTab("security")->group(
 		-name=>"reportViewerGroup",
 		-value=>[$self->getValue("reportViewerGroup")],
 		-label=>$i18n->get(3)
+		-hoverHelp=>$i18n->get("3 description"),
 		);
    $tabform->getTab("security")->group(
 		-name=>"inOutGroup",
 		-value=>[$self->getValue("inOutGroup")],
 		-label=>$i18n->get('inOutGroup')
+		-hoverHelp=>$i18n->get('inOutGroup description'),
 		);
     return $tabform;
 }

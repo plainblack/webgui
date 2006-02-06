@@ -4,6 +4,38 @@ our $HELP = {
 	'in out board add/edit' => {
 		title => '18',
 		body => '19',
+		fields => [
+                        {
+                                title => '1',
+                                description => '1 description',
+                                namespace => 'Asset_InOutBoard',
+                        },
+                        {
+                                title => '12',
+                                description => '12 description',
+                                namespace => 'Asset_InOutBoard',
+                        },
+                        {
+                                title => 'In Out Template',
+                                description => 'In Out Template description',
+                                namespace => 'Asset_InOutBoard',
+                        },
+                        {
+                                title => '13',
+                                description => '13 description',
+                                namespace => 'Asset_InOutBoard',
+                        },
+                        {
+                                title => '3',
+                                description => '3 description',
+                                namespace => 'Asset_InOutBoard',
+                        },
+                        {
+                                title => 'inOutGroup',
+                                description => 'inOutGroup description',
+                                namespace => 'Asset_InOutBoard',
+                        },
+		],
 		related => [
 			{
 				tag => '2',
