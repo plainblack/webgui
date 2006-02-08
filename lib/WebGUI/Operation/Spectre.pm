@@ -34,7 +34,7 @@ Checks to ensure the requestor is who we think it is, and then executes a spectr
 
 sub www_spectre {
 	my $session = shift;
-	return $session->privilege->insufficient unless(isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"));
+	return $session->privilege->insufficient unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")));
 	my $cipher = Crypt::Blowfish->new($session->config->get("spectreCryptoKey"));
 	my $payload = jsonToObj($cipher->decrypt($session->form->get("payload")));
 	my $out = {};
