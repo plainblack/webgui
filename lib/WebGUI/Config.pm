@@ -186,16 +186,20 @@ sub new {
 		return $config{$filename};
 	} else {
 		my $json = "";
-		open(FILE,"<".$webguiPath.'/etc/'.$filename);
-		while (my $line = <FILE>) {
-        		$json .= $line unless ($line =~ /^\s*#/);
+		if (open(FILE,"<".$webguiPath.'/etc/'.$filename)) {
+			while (my $line = <FILE>) {
+        			$json .= $line unless ($line =~ /^\s*#/);
+			}
+			close(FILE);
+			my $conf = jsonToObj($json);
+			my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$conf};
+			bless $self, $class;
+			$config{$filename} = $self unless $noCache;
+			return $self;
+		} else {
+			warn "Cannot open config file: ".$filename;
+			return undef;
 		}
-		close(FILE);
-		my $conf = jsonToObj($json);
-		my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$conf};
-		bless $self, $class;
-		$config{$filename} = $self unless $noCache;
-		return $self;
 	}
 }
 

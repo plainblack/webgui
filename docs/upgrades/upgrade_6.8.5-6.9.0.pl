@@ -27,8 +27,54 @@ addEMSTemplates();
 addEMSTables();
 updateTemplates();
 updateDatabaseLinksAndSQLReport();
+addWorkflow();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addWorkflow {
+	print "\tAdding workflow.\n";
+	$session->db->write("create table WorkflowSchedule (
+		taskId varchar(22) binary not null primary key,
+		enabled int not null default 1,
+		minuteofHour varchar(25) not null default '0',
+		hourOfDay varchar(25) not null default '*',
+		dayOfMonth varchar(25) not null default '*',
+		monthOfYear varchar(25) not null default '*',
+		dayOfWeek varchar(25) not null default '*',
+		workflowId varchar(22) binary not null
+		)");
+	$session->db->write("create table WorkflowInstance (
+		instanceId varchar(22) binary not null primary key,
+		workflowId varchar(22) binary not null,
+		currentActivityId varchar(22) binary not null,
+		priority int not null default 2,
+		className varchar(255),
+		methodName varchar(255),
+		parameters text,
+		runningSince bigint
+		)");
+	$session->db->write("create table Workflow (
+		workflowId varchar(22) binary not null primary key,
+		title varchar(255) not null default 'Untitled',
+		description text
+		)");
+	$session->db->write("create table WorkflowActivity (
+		activityId varchar(22) binary not null primary key,
+		workflowId varchar(22) binary not null,
+		title varchar(255) not null default 'Untitled',
+		description text,
+		previousActivityId varchar(22) binary not null,
+		dateCreated bigint,
+		className varchar(255)
+		)");
+	$session->db->write("create table WorkflowActivityProperty (
+		propertyId varchar(22) binary not null primary key,
+		activityId varchar(22) binary not null,
+		name varchar(255),
+		value text
+		)");
+}
 
 #-------------------------------------------------
 sub updateDatabaseLinksAndSQLReport {

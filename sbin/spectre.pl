@@ -48,6 +48,17 @@ STOP
 }
 
 my $config = WebGUI::Config->new("..","spectre.conf",1);
+unless (defined $config) {
+	print <<STOP;
+
+
+Cannot open  the Spectre config file. Check that ../etc/spectre.conf exists,
+and that it has the proper privileges to be read by the Spectre server.
+
+
+STOP
+	exit;
+}
 
 if ($shutdown) {
 	my $remote = create_ikc_client(

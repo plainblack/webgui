@@ -115,7 +115,8 @@ Returns an integer representing the number of running jobs.
 
 sub countRunningJobs {
 	my $self = shift;
-	return scalar(@{$self->{_runningJobs}});
+	my $runningJobs = $self->{_runningJobs} || [];
+	return scalar(@{$runningJobs});
 }
 
 #-------------------------------------------------------------------
