@@ -626,7 +626,7 @@ sub www_listTransactions {
 	@transactions = WebGUI::Commerce::Transaction->getTransactions(\%criteria);
 
 	$output .= '<table border="1">';
-	$output .= sprintf '<tr><th></th>'.
+	$output .= '<tr><th></th>'.
 			'<th>'. $i18n->get('init date'). '</th>'.
 			'<th>'. $i18n->get('completion date'). '</th>'.
 			'<th>'. $i18n->get('amount'). '</th>'.
