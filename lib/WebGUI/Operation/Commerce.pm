@@ -645,7 +645,13 @@ sub www_listTransactions {
 	@transactions = WebGUI::Commerce::Transaction->getTransactions(\%criteria);
 
 	$output .= '<table border="1">';
-	$output .= '<tr><th></th><th>Init Date</th><th>Completion Date</th><th>Amount</th><th>Shipping Cost</th><th>Status</th><th>Shipping Status</th></tr>';
+	$output .= '<tr><th></th>'.
+		'<th>'. $i18n->get('init date'). '</th>'.
+		'<th>'. $i18n->get('completion date'). '</th>'.
+		'<th>'. $i18n->get('amount'). '</th>'.
+		'<th>'. $i18n->get('shipping cost'). '</th>'.
+		'<th>'. $i18n->get('status'). '</th>'.
+		'<th>'. $i18n->get('shipping status'). '</th></tr>';
 	foreach $transaction (@transactions) {
 		$output .= '<tr bgcolor="#ddd">';
 		$output .= '<td>'.$session->icon->delete('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';

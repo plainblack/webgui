@@ -156,6 +156,18 @@ A loop containing the transactions in the transaction history. Within this loop 
 		message => q|Delivered|,
 		lastUpdated => 1135291969,
 	},
+	'amount' => {
+		message => q|Amount|,
+		lastUpdated => 1139422433,
+	},
+	'shipping cost' => {
+		message => q|Shipping Cost|,
+		lastUpdated => 1139422453,
+	},
+	'status' => {
+		message => q|Status|,
+		lastUpdated => 1139422455,
+	},
 	
 };
 
