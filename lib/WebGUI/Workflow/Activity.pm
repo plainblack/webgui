@@ -16,7 +16,7 @@ package WebGUI::Workflow::Activity;
 =cut
 
 use strict;
-
+use WebGUI::HTMLForm;
 
 
 =head1 NAME
@@ -92,6 +92,24 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 execute ( object )
+
+This method will be called during workflow operation. It needs to be overridden by the base classes.
+
+=head2 object
+
+A reference to some object that will be passed in to this activity for an action to be taken on it.
+
+=cut
+
+sub execute {
+	my $self = shift;
+	my $object = shift;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 get ( name ) 
 
 Returns the value for a given property.
@@ -105,6 +123,20 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getEditForm ( )
+
+Returns a WebGUI::HTMLForm object that represents the parameters of this activity. This method must be extended by the subclasses.
+
+=cut 
+
+sub getEditForm {
+	my $self = shift;
+	my $form = WebGUI::HTMLForm->new($self->session);
+	return $form;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the ID of this instance.
@@ -114,6 +146,23 @@ Returns the ID of this instance.
 sub getId {
 	my $self = shift;
 	return $self->{_id};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the name of the activity. Must be overridden. This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub getName {
+	my $session = shift;
+	return "Unnamed";
 }
 
 #-------------------------------------------------------------------
@@ -137,9 +186,9 @@ sub new {
 	my $session = shift;
 	my $activityId = shift;
 	my $main = $session->db->getRow("WorkflowActivity","activityId", $activityId);
+	return undef unless $main->{activityId};
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=".$session->db->quote($activityId)); 
 	my %data = (%{$main}, %{$sub});
-	return undef unless $data->{activityId};
 	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
 }
 
