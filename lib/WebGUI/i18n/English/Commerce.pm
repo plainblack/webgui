@@ -519,9 +519,76 @@ A radio button tied to this plugin.<br>
 		lastUpdated => 0,
 		context => q|The label for the view shopping cart link in the confirm checkout screen.|
 	},
+
 	'topicName' => {
 		message => q|Commerce|,
 		lastUpdated => 1128920490,
+	},
+
+	'any' => {
+		message => q|Any|,
+		lastUpdated => 1139359481,
+		context = q|Label for any transaction and any shipping option|,
+	},
+
+	'completed' => {
+		message => q|Completed|,
+		lastUpdated => 1139359481,
+		context = q|Label for any transaction status|,
+	},
+
+	'shipped' => {
+		message => q|Shipped|,
+		lastUpdated => 1139359481,
+		context = q|Label for shipping status|,
+	},
+
+	'not yet shipped' => {
+		message => q|Not yet shipped|,
+		lastUpdated => 1139359481,
+		context = q|Label for any shipping status|,
+	},
+
+	'delivered' => {
+		message => q|Delivered|,
+		lastUpdated => 1139359481,
+		context = q|Label for any transaction and any shipping option|,
+	},
+
+	'init date' => {
+		message => q|Init Date|,
+		lastUpdated => 1139359481,
+		context = q|Column header, The date a transaction was started|,
+	},
+
+	'completion date' => {
+		message => q|Completion Date|,
+		lastUpdated => 1139359481,
+		context = q|Column header, The date a transaction was completed|,
+	},
+
+	'amount' => {
+		message => q|Amount|,
+		lastUpdated => 1139359481,
+		context = q|Column header,How much a transaction cost|,
+	},
+
+	'shipping cost' => {
+		message => q|Shipping Cost|,
+		lastUpdated => 1139359481,
+		context = q|Column header,How much it cost for shipping in a given transaction|,
+	},
+
+	'status' => {
+		message => q|Status|,
+		lastUpdated => 1139359481,
+		context = q|Column header, status of transaction|,
+	},
+
+	'shipping status' => {
+		message => q|Shipping Status|,
+		lastUpdated => 1139359481,
+		context = q|Column header, status of shipping|,
 	},
 
 };

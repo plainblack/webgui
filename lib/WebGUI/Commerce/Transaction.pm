@@ -113,10 +113,6 @@ sub delete {
 	undef $self;
 }
 
-sub deleteItem {
-
-}
-
 #-------------------------------------------------------------------
 
 =head2 deleteItem ( itemId, itemType )

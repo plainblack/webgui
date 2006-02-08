@@ -570,16 +570,16 @@ sub www_listTransactions {
 	my $i18n = WebGUI::International->new('TransactionLog');
 
 	my $transactionOptions = {
-		''		=> 'Any',
-		'Pending'	=> 'Pending',
-		'Completed'	=> 'Completed',
+		''		=> $i18n->get('any', 'Commerce'),
+		'Pending'	=> $i18n->get('pending', 'Commerce'),
+		'Completed'	=> $i18n->get('completed', 'Commerce'),
 	};
 
 	my $shippingOptions = {
-		''		=> 'Any',
-		'Shipped'	=> 'Shipped',
-		'NotShipped'	=> 'Not yet shipped',
-		'Delivered'	=> 'Delivered',
+		''		=> $i18n->get('any', 'Commerce'),
+		'Shipped'	=> $i18n->get('shipped', 'Commerce'),
+		'NotShipped'	=> $i18n->get('not yet shipped', 'Commerce'),
+		'Delivered'	=> $i18n->get('delivered', 'Commerce'),
 	};
 	
 	my $initStart = WebGUI::FormProcessor::date('initStart');
@@ -626,7 +626,13 @@ sub www_listTransactions {
 	@transactions = WebGUI::Commerce::Transaction->getTransactions(\%criteria);
 
 	$output .= '<table border="1">';
-	$output .= '<tr><th></th><th>Init Date</th><th>Completion Date</th><th>Amount</th><th>Shipping Cost</th><th>Status</th><th>Shipping Status</th></tr>';
+	$output .= sprintf '<tr><th></th>'.
+			'<th>'. $i18n->get('init date', 'Commerce'). '</th>'.
+			'<th>'. $i18n->get('completion date', 'Commerce'). '</th>'.
+			'<th>'. $i18n->get('amount', 'Commerce'). '</th>'.
+			'<th>'. $i18n->get('shipping cost', 'Commerce'). '</th>'.
+			'<th>'. $i18n->get('status', 'Commerce'). '</th>'.
+			'<th>'. $i18n->get('shipping status', 'Commerce'). '</th></tr>';
 	foreach $transaction (@transactions) {
 		$output .= '<tr bgcolor="#ddd">';
 		$output .= '<td>'.deleteIcon('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';
