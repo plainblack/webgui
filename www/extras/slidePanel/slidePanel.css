@@ -53,8 +53,9 @@
 	position:absolute; 
 	left:0px;
 	background-color: #eeeeee;
-		background-image: url(panel_bg.jpg);
+	background-image: url(panel_bg.jpg);
 	background-repeat: repeat-x;
+	color: black;
 }
 
 .panelLinkOut {

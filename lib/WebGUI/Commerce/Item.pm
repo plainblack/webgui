@@ -9,15 +9,15 @@ Package WebGUI::Commerce::Item
 This is the SUPER class off all Item plugins. Item plugins are an abstraction layer to connect
 arbitrary types of products and other stuff you might want to sell to the commerce system.
 
-The SUPER class new method provides an easy way to load Item plugins: WebGUI::Item->new('1234', 'MyItem') 
-is equivalent to WebGUI::Item::MyItem->new('1234'). The SUPER class new has the benefit of added
+The SUPER class new method provides an easy way to load Item plugins: WebGUI::Commerce::Item->new('1234', 'MyItem') 
+is equivalent to WebGUI::Commerce::Item::MyItem->new('1234'). The SUPER class new has the benefit of added
 error checking, so you should use this.
 
 
 =head1 SYNOPSIS
 
- use WebGUI::Item;
- $item = WebGUI::Item->new($itemId, $itemType);
+ use WebGUI::Commerce::Item;
+ $item = WebGUI::Commerce::Item->new($itemId, $itemType);
 
  $description = $item->description;
  $duration = $item->duration;
