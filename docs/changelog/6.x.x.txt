@@ -19,6 +19,7 @@
  - Converted config file format from PlainConfig to JSON. The new format is
    more powerful and will use slightly less memory.
  - fix [ 1406210 ] 6.9 i18n in create.sql, previous.sql broken.
+ - fix [ 1410577 ] WebGUI::Session not included
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP
