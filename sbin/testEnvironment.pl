@@ -78,6 +78,8 @@ checkModule("Template",2.14,2);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
 checkModule("JSON",0.991);
+checkModule("Net::Subnets",0.21);
+checkModule("Crypt::Blowfish",2.10);
 checkModule("Finance::Quote",1.08);
 checkModule("POE",0.3202);
 checkModule("POE::Component::IKC::Server",0.18);

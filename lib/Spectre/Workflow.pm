@@ -210,7 +210,17 @@ sub runWorker {
 	my $url = $job->{sitename}.'/'.$job->{gateway};
 	$url =~ s/\/\//\//g;
 	$url = "http://".$url."?op=spectre;instanceId=".$job->{instanceId};
-	$kernel->post( useragent => 'request', { request => HTTP::Request->new(GET => $url), response => $session->postback('workerResponse') });
+	my $payload = {
+		'do'=>'runWorkflow',
+		instanceId=>$job->{instanceId},
+		};
+	my $cipher = Crypt::Blowfish->new($self->{_config}->get("cryptoKey"));
+	my $request = HTTP::Request->new(POST => $url, Content => { op=>"spectre", payload=>$cipher->encrypt(objToJson($payload)) });
+	my $cookie = $self->{_cookies}{$job->{sitename}};
+	$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);
+	$request->header("User-Agent","Spectre");
+	$request->header("X-JobId",$job->{instanceId});
+	$kernel->post( useragent => 'request', { request => $request, response => $session->postback('workerResponse') });
 }
 
 #-------------------------------------------------------------------
@@ -247,9 +257,16 @@ This method is called when the response from the runWorker() method is received.
 sub workerResponse {
 	my $self = $_[OBJECT];
         my ($request, $response, $entry) = @{$_[ARG1]};
-	my $jobId = "";	# got to figure out how to get this from the request, cuz the response may die
+	my $jobId = $request->header("X-JobId");	# got to figure out how to get this from the request, cuz the response may die
 	if ($response->is_success) {
-		my $state = ""; # get the response
+		if ($response->header("Cookie") ne "") {
+			my $cookie = $response->header("Set-Cookie");
+			$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22})/$1/;
+			$self->{_cookies}{$self->{_jobs}{$jobId}{sitename}} = $cookie;
+		}
+		my $cipher = Crypt::Blowfish->new($self->{_config}->get("cryptoKey"));
+		my $payload = jsonToObj($cipher->decrypt($response->content));
+		my $state = $payload->{state}; 
 		if ($state eq "continue") {
 			$self->suspendJob($jobId);
 		} elsif ($state eq "done") {

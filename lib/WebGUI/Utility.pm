@@ -19,9 +19,10 @@ package WebGUI::Utility;
 use Exporter;
 use strict;
 use Tie::IxHash;
+use Net::Subnets;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray 
+our @EXPORT = qw(&isBetween &makeTabSafe &makeArrayTabSafe &randomizeHash &commify &randomizeArray &isInSubnet
 	&formatBytes &sortHashDescending &sortHash &isIn &makeCommaSafe &makeArrayCommaSafe &randint &round
 	);
 
@@ -40,6 +41,7 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  $string = commify($integer);
  $size = formatBytes($integer);
  $boolean = isIn($value, @array);
+ $boolean = isInSubnet($ip, \@subnets);
  makeArrayCommaSafe(\@array); 
  makeArrayTabSafe(\@array); 
  $string = makeCommaSafe($string);
@@ -153,6 +155,48 @@ sub isIn {
 	my $key = shift;
 	$_ eq $key and return 1 for @_;
 	return 0;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isInSubnet ( ipAddress, subnets ) 
+
+Verifies whether an IP address is in a given subnet. Returns a 1 if it is, undef if there's a formatting error, or 0 if the IP is not in the list of subnets.
+
+=head3 ipAddress
+
+A scalar containing an IP address.
+
+=head3 subnets
+
+An array reference containing subnets in CIDR format. Example: 127.0.0.1/32
+
+=cut
+
+sub isInSubnet {
+	my $ip = shift;
+	my $subnets = shift;
+	# some validation
+	for my $cidr ( @{ $subnets } ) {
+    		my @parts = $cidr =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
+    		unless ( 5 == @parts ) { # cidr has 5 parts
+			return undef;
+    		}
+    		unless ( 4 == grep { $_ <= 255 } @parts[0..3] ) { # each octet needs to be between 0 and 255
+			return undef;
+    		}
+    		unless ( $parts[4] <= 32 ) { # the subnet needs to be less than or equal to 32, as 32 represents only 1 ip address
+			return undef;
+    		}
+	}
+	my $net = Net::Subnets->new;
+	$net->subnets($subnets);
+	if ($net->check($ip)) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 #-------------------------------------------------------------------

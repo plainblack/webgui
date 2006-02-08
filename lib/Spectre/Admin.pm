@@ -48,7 +48,7 @@ Gracefully shuts down the admin interface.
 
 sub _stop {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
-	print "Stopping WebGUI Admin...";
+	print "Stopping Spectre...";
 	undef $self;
 	$kernel->stop;
 	print "OK\n";

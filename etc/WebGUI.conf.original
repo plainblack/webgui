@@ -320,7 +320,19 @@
 # the LDAP server. Note that this will only happen for users
 # that have LDAP as their authentication.
 
-"SyncProfilesToLDAP_hour" : 2
+"SyncProfilesToLDAP_hour" : 2,
+
+# Define the subnets that WebGUI should expect Spectre communication
+# to come from. All other subnets will be ignored. The subnet
+# should be listed in CIDR notation.
+
+"spectreSubnets" : [ "127.0.0.1/32" ],
+
+# Define the key that will be used to encrypt communcation
+# between Spectre and WebGUI. Note that this must match the
+# cryptoKey in the Spectre config file.
+
+"spectreCryptoKey" : "123qwe"
 
 }
 

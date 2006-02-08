@@ -77,6 +77,7 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
+	  'spectre' => 'WebGUI::Operation::Spectre',
 	  'adminConsole' => 'WebGUI::Operation::Admin',
           'switchOffAdmin' => 'WebGUI::Operation::Admin',
           'switchOnAdmin' => 'WebGUI::Operation::Admin',
