@@ -28,6 +28,7 @@
  - fix [ 1423815 ] snippet v6.8.5
  - fix [ 1421056 ] LDAP Recursive Property Bug
  - fix [ 1404350 ] no hoverHelp for InOutBoard
+ - fix [ 1410127 ] User profile fields do not display value \'0\'
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
