@@ -23,7 +23,7 @@ use Time::HiRes qw( gettimeofday usleep );
 
 =head1 NAME
 
-Package WebGUI::Id
+Package WebGUI::Session::Id;
 
 =head1 DESCRIPTION
 
@@ -33,9 +33,7 @@ B<NOTE:> There is no such thing as perfectly unique ID's, but the chances of a d
 
 =head1 SYNOPSIS
 
- use WebGUI::Session::Id;
-
- my $id = $session->id->generate();
+ my $id = $session->id->generate;
 
 =head1 METHODS
 
