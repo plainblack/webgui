@@ -140,11 +140,11 @@ sub formField {
 	}
 	$properties->{options} = $orderedValues;
 	my $default;
-	if ($session{form}{$properties->{name}}) {
+	if (defined $session{form}{$properties->{name}}) {
 		$default = $session{form}{$properties->{name}};
-	} elsif (defined $u && $u->profileField($properties->{name})) {
+	} elsif (defined $u && defined $u->profileField($properties->{name})) {
 		$default = $u->profileField($properties->{name});
-	} elsif (!defined $u && $session{user}{$properties->{name}}) {
+	} elsif (!defined $u && defined $session{user}{$properties->{name}}) {
 		$default = $session{user}{$properties->{name}};
 	} else {
 		$default = WebGUI::Operation::Shared::secureEval($properties->{dataDefault});
