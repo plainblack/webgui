@@ -15,6 +15,8 @@ package Spectre::Workflow;
 =cut
 
 use strict;
+use Crypt::Blowfish;
+use JSON;
 use POE;
 use POE::Component::Client::UserAgent;
 

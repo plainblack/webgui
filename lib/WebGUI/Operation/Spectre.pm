@@ -13,6 +13,7 @@ package WebGUI::Operation::Spectre;
 use strict;
 use Crypt::Blowfish;
 use JSON;
+use WebGUI::Utility;
 
 =head1 NAME
 
