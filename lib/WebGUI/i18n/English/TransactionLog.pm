@@ -100,10 +100,40 @@ A loop containing the transactions in the transaction history. Within this loop 
 		lastUpdated => 0,
 		context => q|The word 'and'|
 	},
+	'any' => {
+		message => q|any|,
+		lastUpdated => 0,
+		context => q|The word 'and'|
+	},
 	'transaction status' => {
 		message => q|Transaction status|,
 		lastUpdated => 0,
 		context => q|Transaction status label.|
+	},
+	'shipped' => {
+		message => q|Shipped|,
+		lastUpdated => 1139419474,
+		context => q|Shipping status label.|
+	},
+	'not yet shipped' => {
+		message => q|Not yet shipped|,
+		lastUpdated => 1139419474,
+		context => q|Shipping status label.|
+	},
+	'delivered' => {
+		message => q|Delivered|,
+		lastUpdated => 1139419474,
+		context => q|Shipping status label.|
+	},
+	'pending' => {
+		message => q|Pending|,
+		lastUpdated => 1139419474,
+		context => q|Shipping status label.|
+	},
+	'completed' => {
+		message => q|Completed|,
+		lastUpdated => 1139419474,
+		context => q|Shipping status label.|
 	},
 	'shipping status' => {
 		message => q|Shipping status|,
@@ -113,7 +143,22 @@ A loop containing the transactions in the transaction history. Within this loop 
 	'select' => {
 		message => q|Select|,
 		lastUpdated => 0,
-		context => q|Select button label.|
+		context => q|Select status label.|
+	},
+	'amount' => {
+		message => q|Amount|,
+		lastUpdated => 0,
+		context => q|Select status label.|
+	},
+	'shipping cost' => {
+		message => q|Shipping Cost|,
+		lastUpdated => 0,
+		context => q|Select status label.|
+	},
+	'status' => {
+		message => q|Status|,
+		lastUpdated => 0,
+		context => q|Select status label.|
 	},
 	'list transactions title' => {
 		message => q|List transactions|,
