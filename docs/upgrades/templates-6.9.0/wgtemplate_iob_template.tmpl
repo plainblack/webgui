@@ -1,0 +1,89 @@
+#IOB0000000000000000001
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+<tmpl_if session.var.adminOn>
+   <p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle> 
+   <h2><tmpl_var title></h2> 
+</tmpl_if> 
+
+<div class="fontSettings">
+	<tmpl_var description>
+	<br /><br />
+</div>
+
+<div class="pagination">
+<tmpl_if selectDelegatesURL>
+   <a href="<tmpl_var selectDelegatesURL>">Select delegates</a>
+</tmpl_if>
+<tmpl_if canViewReport>
+   <tmpl_if selectDelegatesURL>
+      &nbsp;&middot;&nbsp;
+   </tmpl_if>
+   <a href="<tmpl_var viewReportURL>">View Report</a>
+</tmpl_if>
+</div>
+
+<tmpl_if displayForm>	
+	<div class="fontSettings">
+		<tmpl_var form>
+	</div>	
+</tmpl_if>
+   
+   <table width="100%" cellpadding="3" cellspacing="0" class="iob">
+   <tmpl_loop rows_loop>
+   <tmpl_if deptHasChanged>
+   <tr><td colspan="4" class="noBorder"><br /><b><tmpl_var department></b></td></tr>
+   </tmpl_if>
+   <tr>
+   <td<tmpl_if __ODD__> class="odd"</tmpl_if>><tmpl_var username></td>
+   <td<tmpl_if __ODD__> class="odd"</tmpl_if>><tmpl_var status></td>
+   <td<tmpl_if __ODD__> class="odd"</tmpl_if>><tmpl_var dateStamp></td>
+   <td<tmpl_if __ODD__> class="odd"</tmpl_if>><tmpl_var message></td>
+   </tr>
+   </tmpl_loop>
+   <tr><td colspan="4"><tmpl_var paginateBar></td></tr>
+   </table>
+   
+   
+~~~
+.fontSettings {
+	font-family:arial;
+	font-size:9pt;
+}
+h2 {
+	font-family:arial;
+	margin-top:3px;
+	margin-bottom:3px;
+}
+.iob {
+			
+}	
+.iob td {	
+	font-family:arial;
+	font-size:9pt;	
+	border:solid silver 1px;
+}
+.iob td.odd {
+	background-color:#DADADA;
+}
+.iob td.noBorder {
+	border:none;
+}	
+.iob a {
+	color:#29587E;
+}
+.pagination	{
+	-moz-box-sizing:border-box;
+	background:#C0C0C0;
+	width:100%;
+	text-align:center;
+	padding:3px;
+	font-size:9pt;
+	font-family:arial;
+	margin-bottom:5px;
+}
+.pagination a {
+	color:white;
+}   
