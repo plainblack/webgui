@@ -1,0 +1,172 @@
+#PBtmpl0000000000000056
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<table width="100%" cellpadding="3" cellspacing="3" class="defaultProduct">
+<tr>
+	<td class="content" valign="top">
+		<tmpl_if description><tmpl_var description><p /></tmpl_if>
+		<tmpl_if price><b>Price:</b> <tmpl_var price><br /></tmpl_if>
+		<tmpl_if productnumber><b>Product Number:</b> <tmpl_var productNumber><br /></tmpl_if>
+		<br />
+		<tmpl_if brochure.url><a href="<tmpl_var brochure.url>"><img src="<tmpl_var brochure.icon>" alt="<tmpl_var brochure.icon>" border=0 align="absmiddle" /><tmpl_var brochure.label></a><br /></tmpl_if>
+		<tmpl_if manual.url><a href="<tmpl_var manual.url>"><img src="<tmpl_var manual.icon>" alt="<tmpl_var manual.icon>" border=0 align="absmiddle" /><tmpl_var manual.label></a><br /></tmpl_if>
+		<tmpl_if warranty.url><a href="<tmpl_var warranty.url>"><img src="<tmpl_var warranty.icon>" alt="<tmpl_var warranty.icon>" border=0 align="absmiddle" /><tmpl_var warranty.label></a><br /></tmpl_if>
+	</td>
+	<td valign="top" class="defaultProduct">
+		<tmpl_if thumbnail1><a href="<tmpl_var image1>"><img src="<tmpl_var thumbnail1>" alt="<tmpl_var thumbnail1>" class="noBorder" /></a><p /></tmpl_if>
+		<tmpl_if thumbnail2><a href="<tmpl_var image2>"><img src="<tmpl_var thumbnail2>" alt="<tmpl_var thumbnail2>" class="noBorder" /></a><p /></tmpl_if>
+		<tmpl_if thumbnail3><a href="<tmpl_var image3>"><img src="<tmpl_var thumbnail3>" alt="<tmpl_var thumbnail3>" class="noBorder" /></a><p /></tmpl_if>
+	</td>
+</tr>
+</table>
+
+<table border="0" cellpadding="3" cellspacing="5" class="defaultProduct">
+<tr>
+	<td valign="top" class="productFeature">
+		<div class="productFeatureHeader">Features</div>
+		<tmpl_if session.var.adminOn><a href="<tmpl_var addfeature.url>"><tmpl_var addfeature.label></a><p /></tmpl_if>
+		<tmpl_loop feature_loop>
+			<tmpl_if session.var.adminOn><tmpl_var feature.controls></tmpl_if>
+			<tmpl_var feature.feature><br />
+		</tmpl_loop>
+		<p />
+	</td>
+	<td valign="top" class="productBenefit">
+		<div class="productBenefitHeader">Benefits</div>
+		<tmpl_if session.var.adminOn><a href="<tmpl_var addBenefit.url>"><tmpl_var addBenefit.label></a><p /></tmpl_if>
+		<tmpl_loop benefit_loop>
+			<tmpl_if session.var.adminOn><tmpl_var benefit.controls></tmpl_if>
+			<tmpl_var benefit.benefit><br />
+		</tmpl_loop>
+		<p />
+	</td>
+	<td valign="top" class="productSpecification">
+		<div class="productSpecificationHeader">Specifications</div>
+		<tmpl_if session.var.adminOn><a href="<tmpl_var addSpecification.url>"><tmpl_var addSpecification.label></a><p /></tmpl_if>
+		<tmpl_loop specification_loop>
+			<tmpl_if session.var.adminOn><tmpl_var specification.controls></tmpl_if>
+			<b><tmpl_var specification.label>:</b> <tmpl_var specification.specification> <tmpl_var specification.units><br />
+		</tmpl_loop>
+		<p />
+	</td>
+	<td valign="top" class="productAccessory">
+		<div class="productAccessoryHeader">Accessories</div>
+		<tmpl_if session.var.adminOn><a href="<tmpl_var addaccessory.url>"><tmpl_var addaccessory.label></a><p /></tmpl_if>
+		<tmpl_loop accessory_loop>
+			<tmpl_if session.var.adminOn><tmpl_var accessory.controls></tmpl_if>
+			<a href="<tmpl_var accessory.url>"><tmpl_var accessory.title></a><br />
+		</tmpl_loop>
+		<p />
+	</td>
+	<td valign="top" class="productRelated">
+		<div class="productRelatedHeader">Related Products</div>
+		<tmpl_if session.var.adminOn><a href="<tmpl_var addRelatedProduct.url>"><tmpl_var addRelatedProduct.label></a><p /></tmpl_if>
+		<tmpl_loop relatedproduct_loop>
+			<tmpl_if session.var.adminOn><tmpl_var RelatedProduct.controls></tmpl_if>
+			<a href="<tmpl_var relatedproduct.url>"><tmpl_var relatedproduct.title></a><br />
+		</tmpl_loop>
+	</td>
+</tr>
+</table>
+
+
+~~~
+.productFeatureHeader {
+	font-weight: bold;
+	font-size: 15px;
+	width:100%;
+	border-bottom:solid gray 1px;
+	background-color:#DADADA;
+	padding-left:3px;
+	-moz-box-sizing:border-box;
+}
+.productSpecificationHeader {
+	font-weight: bold;
+	font-size: 15px;
+	width:100%;
+	border-bottom:solid gray 1px;
+	background-color:#DADADA;
+	padding-left:3px;
+	-moz-box-sizing:border-box;
+}
+.productRelatedHeader {
+	font-weight: bold;
+	font-size: 15px;
+	width:100%;
+	border-bottom:solid gray 1px;
+	background-color:#DADADA;
+	padding-left:3px;
+	-moz-box-sizing:border-box;
+}
+.productAccessoryHeader{
+	font-weight: bold;
+	font-size: 15px;
+	width:100%;
+	border-bottom:solid gray 1px;
+	background-color:#DADADA;
+	padding-left:3px;
+	-moz-box-sizing:border-box;
+}
+.productBenefitHeader {
+	font-weight: bold;
+	font-size: 15px;
+	width:100%;
+	border-bottom:solid gray 1px;
+	background-color:#DADADA;
+	padding-left:3px;
+	-moz-box-sizing:border-box;
+}
+.productFeature {
+	font-size: 12px;
+	border-right:solid gray 1px;
+	width:20%;
+}
+.productSpecification {
+	font-size: 12px;
+	border-right:solid gray 1px;
+	width:20%;
+}
+.productRelated {
+	font-size: 12px;
+	border-right:solid gray 1px;
+	width:20%;
+}
+.productAccessory {
+	font-size: 12px;
+	border-right:solid gray 1px;
+	width:20%;
+}
+.productBenefit {
+	font-size: 12px;
+	border-right:solid gray 1px;
+	width:20%;
+}
+.productAttributeSeperator {
+	background-color: black;
+}
+.noBorder {
+	border:none;
+}
+h2 {
+	font-family:arial;
+	margin-top:3px;
+	margin-bottom:3px;
+}
+.defaultProduct {
+	border:solid gray 1px;
+}
+.defaultProduct td {
+	font-family:arial;
+	font-size:9pt;
+}
+.defaultProduct a {
+	color:#29587E;
+}
