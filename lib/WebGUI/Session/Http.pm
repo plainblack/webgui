@@ -103,7 +103,7 @@ sub getHeader {
 		$self->session->request->headers_out->set(Location => $self->{_http}{location});
 		$self->session->request->status(301);
 	} else {
-		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
+		$self->session->request->content_type($self->{_http}{mimetype} || "text/html") if ($self->session->request);
 		if ($self->session->setting->get("preventProxyCache")) {
 			$params{"-expires"} = "-1d";
 		}

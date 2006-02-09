@@ -25,8 +25,8 @@ use WebGUI::Session;
 $|=1;
 
 my ($configFile, $assetId, $userId, $styleId, $toFile, $stripHtml, $help, $relativeUrls);
-
 $userId = 1;
+my $url = "";
 
 GetOptions(
 	'configFile:s'=>\$configFile,
@@ -36,30 +36,23 @@ GetOptions(
 	'stripHtml'=>\$stripHtml,
 	'help'=>\$help,
 	'relativeUrls'=>\$relativeUrls,
+	'url=s'=>\$url
 );
 
-if ($help || $configFile eq '' ) {
+if ($help || $configFile eq '' || !($assetId||$url)) {
 	print <<STOP;
 
 
-Usage: perl $0 --configFile=<webguiConfig>
-
-	--configFile    WebGUI config file (with no path info).
+Usage: perl $0 --configFile=<webguiConfig> --url=home
 
 Options:
 
-	--assetId       Set the page to be generated.
+	--configFile    WebGUI config file (with no path info).
+
+
+	--assetId       Set the asset to be generated.
 
         --help		Displays this message.
-
-	--userId	Set the user that should view the page.
-			Defaults to "1" (Visitor).
-
-	--styleId	Set an alternate style for the page.
-			Defaults to asset's default style.
-
-	--toFile	Set the path and filename to write the
-			content to instead of standard out.
 
 	--stripHtml	A flag indicating that WebGUI should
 			strip all the HTML from the document and
@@ -67,29 +60,50 @@ Options:
 			text may have formatting problems as a
 			result.
 
+	--styleId	Set an alternate style for the page.
+			Defaults to asset's default style.
+
+	--toFile	Set the path and filename to write the
+			content to instead of standard out.
+
+	--url		The URL of the asset to be generated.
+
+	--userId	Set the user that should view the page.
+			Defaults to "1" (Visitor).
+
 STOP
 	exit;
 }
 
 # Open WebGUI session
-WebGUI::Session::open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($webguiRoot,$configFile);
 
-my $asset = WebGUI::Asset->newByDynamicClass($assetId);
-die "Asset not defined" unless $asset;
-$asset->{_properties}{styleTemplateId} = $styleId if ($styleId);
-my $content = $asset->exportAsHtml({stripHtml => $stripHtml});
+my $asset = "";
 
-if ($toFile) {
-        open (TOFILE, ">$toFile") or die "Can't open file $toFile for writing. $!";
-	print TOFILE $content;
-	close (TOFILE);
+if ($url) {
+	$asset = WebGUI::Asset->newByUrl($session,$url);
 } else {
-	print $content;
+	$asset = WebGUI::Asset->newByDynamicClass($session,$assetId);
+}
+
+if (defined $asset) {
+	#$asset->{_properties}{styleTemplateId} = $styleId if ($styleId);
+	#my $content = $asset->exportAsHtml({stripHtml => $stripHtml});
+	my $content = $asset->www_view;
+	if ($toFile) {
+        	open (TOFILE, ">$toFile") or die "Can't open file $toFile for writing. $!";
+		print TOFILE $content;
+		close (TOFILE);
+	} else {
+		print $content;
+	}
+} else {
+	print "Asset not defined!!\n";
 }
 
 # Clean-up WebGUI Session
-WebGUI::Session::end($session{var}{sessionId});
-WebGUI::Session::close();
+$session->var->end;
+$session->close;
 
 exit;
 

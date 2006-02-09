@@ -82,7 +82,7 @@ sub beginTransaction {
 
 #-------------------------------------------------------------------
 
-=head2 buildArray ( sql )
+=head2 buildArray ( sql, params )
 
 Builds an array of data from a series of rows.
 
@@ -90,13 +90,19 @@ Builds an array of data from a series of rows.
 
 An SQL query. The query must select only one column of data.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub buildArray {
 	my $self = shift;
 	my $sql = shift;
+	my $params = shift;
         my ($sth, $data, @array, $i);
-        $sth = $self->read($sql);
+        $sth = $self->prepare($sql);
+	$sth->execute($params);
 	$i=0;
         while (($data) = $sth->array) {
                 $array[$i] = $data;
@@ -109,7 +115,7 @@ sub buildArray {
 
 #-------------------------------------------------------------------
 
-=head2 buildArrayRef ( sql )
+=head2 buildArrayRef ( sql, params )
 
 Builds an array reference of data from a series of rows.
 
@@ -117,19 +123,24 @@ Builds an array reference of data from a series of rows.
 
 An SQL query. The query must select only one column of data.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub buildArrayRef {
 	my $self = shift;
 	my $sql = shift;
-	my @array = $self->buildArray($sql);
+	my $params = shift;
+	my @array = $self->buildArray($sql,$params);
 	return \@array;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 buildHash ( sql )
+=head2 buildHash ( sql, params )
 
 Builds a hash of data from a series of rows.
 
@@ -137,14 +148,20 @@ Builds a hash of data from a series of rows.
 
 An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by a colon ":" to form a complex key. If the query selects only one column, then the key and value will be the same.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub buildHash {
 	my $self = shift;
 	my $sql = shift;
+	my $params = shift;
 	my ($sth, %hash, @data);
 	tie %hash, "Tie::IxHash";
-        $sth = $self->read($sql);
+        $sth = $self->prepare($sql);
+	$sth->execute($params);
         while (@data = $sth->array) {
 		my $value = pop @data;
 		my $key = join(":",@data); # if more than two columns is selected, join them together with :
@@ -166,14 +183,19 @@ Builds a hash reference of data from a series of rows.
 
 An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by a colon ":" to form a complex key. If the query selects only one column, then the key and the value will be the same.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub buildHashRef {
 	my $self = shift;
 	my $sql = shift;
+	my $params = shift;
         my ($sth, %hash);
         tie %hash, "Tie::IxHash";
-	%hash = $self->buildHash($sql);
+	%hash = $self->buildHash($sql, $params);
         return \%hash;
 }
 
@@ -266,7 +288,7 @@ The value to search for in the key column.
 
 sub deleteRow {
         my ($self, $table, $key, $keyValue) = @_;
-        $self->write("delete from $table where ".$key."=".$self->quote($keyValue));
+        my $sth = $self->write("delete from $table where ".$key."=?", [$keyValue]);
 }
 
 
@@ -347,8 +369,8 @@ sub getNextId {
 	my $name = shift;
         my ($id);
 	$self->beginTransaction;
-        ($id) = $self->quickArray("select nextValue from incrementer where incrementerId='$name'");
-        $self->write("update incrementer set nextValue=nextValue+1 where incrementerId='$name'");
+        ($id) = $self->quickArray("select nextValue from incrementer where incrementerId=?", [$name]);
+        $self->write("update incrementer set nextValue=nextValue+1 where incrementerId=?",[$name]);
 	$self->commit;
         return $id;
 }
@@ -375,7 +397,7 @@ The value to search for in the key column.
 
 sub getRow {
         my ($self, $table, $key, $keyValue) = @_;
-        my $row = $self->quickHashRef("select * from $table where ".$key."=".$self->quote($keyValue));
+        my $row = $self->quickHashRef("select * from $table where ".$key."=?",[$keyValue]);
         return $row;
 }
 
@@ -429,7 +451,7 @@ sub quickArray {
 
 #-------------------------------------------------------------------
 
-=head2 quickCSV ( sql )
+=head2 quickCSV ( sql, params )
 
 Executes a query and returns a comma delimited text blob with column headers.
 
@@ -437,13 +459,19 @@ Executes a query and returns a comma delimited text blob with column headers.
 
 An SQL query.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub quickCSV {
 	my $self = shift;
 	my $sql = shift;
+	my $params = shift;
         my ($sth, $output, @data);
-        $sth = $self->read($sql);
+        $sth = $self->prepare($sql);
+	$sth->execute($params);
         $output = join(",",$sth->getColumnNames)."\n";
         while (@data = $sth->array) {
                 makeArrayCommaSafe(\@data);
@@ -456,7 +484,7 @@ sub quickCSV {
 
 #-------------------------------------------------------------------
 
-=head2 quickHash ( sql )
+=head2 quickHash ( sql, params )
 
 Executes a query and returns a single row of data as a hash.
 
@@ -464,13 +492,19 @@ Executes a query and returns a single row of data as a hash.
 
 An SQL query.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub quickHash {
 	my $self = shift;
 	my $sql = shift;
+	my $params = shift;
         my ($sth, $data);
-        $sth = $self->read($sql);
+        $sth = $self->prepare($sql);
+	$sth->execute($params);
         $data = $sth->hashRef;
         $sth->finish;
 	if (defined $data) {
@@ -482,7 +516,7 @@ sub quickHash {
 
 #-------------------------------------------------------------------
 
-=head2 quickHashRef ( sql )
+=head2 quickHashRef ( sql, params )
 
 Executes a query and returns a single row of data as a hash reference.
 
@@ -490,12 +524,18 @@ Executes a query and returns a single row of data as a hash reference.
 
 An SQL query.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub quickHashRef {
 	my $self = shift;
 	my $sql = shift;
-        my $sth = $self->read($sql);
+	my $params = shift;
+        my $sth = $self->prepare($sql);
+        $sth->execute($params);
         my $data = $sth->hashRef;
         $sth->finish;
         if (defined $data) {
@@ -507,7 +547,7 @@ sub quickHashRef {
 
 #-------------------------------------------------------------------
 
-=head2 quickTab ( sql )
+=head2 quickTab ( sql, params )
 
 Executes a query and returns a tab delimited text blob with column headers.
 
@@ -515,13 +555,19 @@ Executes a query and returns a tab delimited text blob with column headers.
 
 An SQL query.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub quickTab {
 	my $self = shift;
 	my $sql = shift;
+	my $params = shift;
         my ($sth, $output, @data);
-        $sth = $self->read($sql);
+        $sth = $self->prepare($sql);
+	$sth->execute($params);
 	$output = join("\t",$sth->getColumnNames)."\n";
 	while (@data = $sth->array) {
                 makeArrayTabSafe(\@data);
@@ -537,7 +583,7 @@ sub quickTab {
 
 Returns a string quoted and ready for insert into the database.  
 
-B<NOTE:> This is not a regular method, but is an exported subroutine.
+B<NOTE:> You should use this sparingly. It is much faster and safer to use prepare/execute style queries and passing in place holder parameters. Even the convenience methods like quickArray() support the use of place holder parameters.
 
 =head3 string
 
@@ -660,16 +706,19 @@ sub setRow {
         my ($self, $table, $keyColumn, $data, $id) = @_;
         if ($data->{$keyColumn} eq "new" || $id) {
                 $data->{$keyColumn} = $id || $self->session->id->generate();
-                $self->write("replace into $table ($keyColumn) values (".$self->quote($data->{$keyColumn}).")");
+                $self->write("replace into $table ($keyColumn) values (?)",[$data->{$keyColumn}]);
         }
-        my (@pairs);
+        my @fields = ();
+	my @data = ();
         foreach my $key (keys %{$data}) {
                 unless ($key eq $keyColumn) {
-                        push(@pairs, $key.'='.$self->quote($data->{$key}));
+                        push(@fields, $key.'=?');
+			push(@data,$data->{$key});
                 }
         }
-	if ($pairs[0] ne "") {
-        	$self->write("update $table set ".join(", ", @pairs)." where ".$keyColumn."=".$self->quote($data->{$keyColumn}));
+	if ($fields[0] ne "") {
+		push(@data,$data->{$keyColumn});
+        	$self->write("update $table set ".join(", ", @fields)." where ".$keyColumn."=?",\@data);
 	}
 	return $data->{$keyColumn};
 }
@@ -701,7 +750,7 @@ sub unconditionalRead {
 
 #-------------------------------------------------------------------
 
-=head2 write ( sql )
+=head2 write ( sql, params )
 
 A method specifically designed for writing to the database in an efficient manner. 
 
@@ -709,13 +758,18 @@ A method specifically designed for writing to the database in an efficient manne
 
 An SQL insert or update.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub write {
 	my $self = shift;
 	my $sql = shift;
-	$self->session->errorHandler->query($sql);
-     	$self->dbh->do($sql) or $self->session->errorHandler->fatal("Couldn't write to the database: ".$sql." : ". $self->dbh->errstr);
+	my $params = shift;
+	my $sth = $self->prepare($sql);
+	$sth->execute($params);
 }
 
 

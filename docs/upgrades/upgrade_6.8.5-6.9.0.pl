@@ -47,10 +47,10 @@ sub addWorkflow {
 		dayOfMonth varchar(25) not null default '*',
 		monthOfYear varchar(25) not null default '*',
 		dayOfWeek varchar(25) not null default '*',
-		workflowId varchar(22) binary not null
+		workflowId varchar(22) binary not null,
 		className varchar(255),
 		methodName varchar(255),
-		parameters text,
+		parameters text
 		)");
 	$session->db->write("create table WorkflowInstance (
 		instanceId varchar(22) binary not null primary key,
@@ -339,8 +339,8 @@ sub addSearchEngine {
 #-------------------------------------------------
 sub templateParsers {
 	print "\tAdding support for multiple template parsers.\n" unless ($quiet);
-	$session->conf->set("templateParsers",["WebGUI::Asset::Template::HTMLTemplate"]);
-	$session->conf->set("defaultTemplateParser","WebGUI::Asset::Template::HTMLTemplate");
+	$session->config->set("templateParsers",["WebGUI::Asset::Template::HTMLTemplate"]);
+	$session->config->set("defaultTemplateParser","WebGUI::Asset::Template::HTMLTemplate");
 	$session->db->write("alter table template add column parser varchar(255) not null default 'WebGUI::Asset::Template::HTMLTemplate'");
 }
 
