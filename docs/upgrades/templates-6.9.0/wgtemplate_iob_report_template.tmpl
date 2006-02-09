@@ -1,0 +1,66 @@
+#IOB0000000000000000002
+
+<h2>In/Out Board Report</h2>
+<div class="iob">
+   <tmpl_var form><br />
+   <tmpl_if showReport>
+   <table width="100%" cellpadding="3" cellspacing="0">
+   <tr>
+   <th><tmpl_var username.label></th>
+   <th><tmpl_var status.label></th>
+   <th><tmpl_var date.label></th>
+   <th><tmpl_var message.label></th>
+   <th><tmpl_var updatedBy.label></th>
+   </tr>
+   <tmpl_loop rows_loop>
+   <tmpl_if deptHasChanged>
+   <tr><td colspan="5"><b><tmpl_var department></b></td></tr>
+   </tmpl_if>
+   <tr>
+   <td><tmpl_var username></td>
+   <td><tmpl_var status></td>
+   <td><tmpl_var dateStamp></td>
+   <td><tmpl_var message></td>
+   <td><tmpl_var createdBy></td>
+   </tr>
+   </tmpl_loop>
+   <tr><td colspan="5"><tmpl_var paginateBar></td></tr>
+   </table>
+   </tmpl_if>
+</div>
+
+
+~~~
+.fontSettings {
+	font-family:arial;
+	font-size:9pt;
+}
+h2 {
+	font-family:arial;
+	margin-top:3px;
+	margin-bottom:3px;
+}
+.iob td {	
+	font-family:arial;
+	font-size:9pt;	
+	border:solid silver 1px;
+}
+.iob a {
+	color:#29587E;
+}
+.iob .formDescription {
+	background-color:#DADADA;
+}
+.pagination	{
+	-moz-box-sizing:border-box;
+	background:#C0C0C0;
+	width:100%;
+	text-align:center;
+	padding:3px;
+	font-size:9pt;
+	font-family:arial;
+	margin-bottom:5px;
+}
+.pagination a {
+	color:white;
+}
