@@ -1,0 +1,92 @@
+#PBtmpl0000000000000020
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if error_loop>
+<ul class="fontSettings">
+<tmpl_loop error_loop>
+	<li><b><tmpl_var error.message></b>
+</tmpl_loop>
+</ul>
+</tmpl_if>
+
+<tmpl_if description>
+	<div class="fontSettings">
+		<tmpl_var description>
+	</div>
+</tmpl_if>
+
+<tmpl_if canEdit>
+	<div class="dataControls">
+		<a href="<tmpl_var entryList.url>"><tmpl_var entryList.label></a>
+		&bull; <a href="<tmpl_var export.tab.url>"><tmpl_var export.tab.label></a>
+		<tmpl_if entryId>
+			&bull; <a href="<tmpl_var delete.url>"><tmpl_var delete.label></a>
+		</tmpl_if>
+		<tmpl_if session.var.adminOn>
+			&bull; <a href="<tmpl_var addField.url>"><tmpl_var addField.label></a>
+			&bull; <a href="<tmpl_var addTab.url>"><tmpl_var addTab.label></a>
+		</tmpl_if>
+	</div>
+</tmpl_if>
+
+<tmpl_var form.start>
+<table class="mailForm">
+<tmpl_loop field_loop>
+	<tmpl_unless field.isHidden>
+		<tr><td class="formDescription" valign="top">
+		<tmpl_if session.var.adminOn><tmpl_if canEdit><tmpl_var field.controls></tmpl_if></tmpl_if>
+		<tmpl_var field.label>
+		</td><td class="tableData" valign="top">
+		<tmpl_if field.isDisplayed>
+			<tmpl_var field.value>
+		<tmpl_else>
+			<tmpl_var field.form>
+		</tmpl_if>
+		<tmpl_if field.isRequired>*</tmpl_if>
+		<span class="formSubtext"><br /><tmpl_var field.subtext></span>
+		</td></tr>
+	</tmpl_unless>
+</tmpl_loop>
+<tr><td></td><td><tmpl_var form.send></td></tr>
+</table>
+
+<tmpl_var form.end>
+
+
+~~~
+h2{
+	font-family:arial;
+	margin-top:3px;
+	margin-bottom:3px;
+}
+.fontSettings{
+	font-family:arial;
+	font-size:9pt;
+}
+.mailForm td{
+	font-family:arial;
+	font-size:9pt;
+}
+.dataControls
+{
+	-moz-box-sizing:border-box;
+	background:#C0C0C0;
+	width:100%;
+	text-align:right;
+	padding:3px;
+	font-size:9pt;
+	font-family:arial;
+	margin-bottom:5px;
+}
+
+.dataControls a
+{
+	color:white;
+}
