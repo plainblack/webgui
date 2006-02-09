@@ -1,0 +1,66 @@
+#wCIc38CvNHUK7aY92Ww4SQ
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+	<p />
+</tmpl_if>
+
+<tmpl_if user.canPost>
+	<a href="<tmpl_var add.url>"> <tmpl_var addlink.label></a><p />
+</tmpl_if>
+
+<tmpl_loop post_loop>
+	<tmpl_if user.isPoster>
+		<tmpl_unless session.var.adminOn>[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]</tmpl_unless><br />
+	</tmpl_if>
+	<tmpl_if user.isModerator>
+		<tmpl_if session.var.adminOn>
+			<tmpl_var controls>
+		<tmpl_else>
+			<tmpl_unless user.isPoster>
+				<tmpl_unless session.var.adminOn>[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]</tmpl_unless><br />
+			</tmpl_unless>
+		</tmpl_if>
+		<br />
+	</tmpl_if>
+	<b>&middot;</b> <a href="<tmpl_var userDefined1>"<tmpl_if userDefined2>target="_blank"</tmpl_if> class="linkTitle"><tmpl_var title></a><br />
+	<tmpl_if content>
+		<span class="linkTitleContent"><tmpl_var content></span>
+	</tmpl_if>
+
+	<p />
+</tmpl_loop>
+
+~~~
+.linkTitle{
+	font-family:arial;
+	font-size:9pt;			
+	color:#29587E;				
+}
+
+.linkTitle:hover
+{
+	background-color:#FFFFDF;
+}
+
+.linkTitleContent
+{
+	-moz-box-sizing:border-box;
+	border:solid silver 1px;
+	border-bottom:solid silver 2px;
+	margin-top:1px;
+	margin-left:10px;
+	padding:2px;
+	font-family:arial;
+	font-size:9pt;	
+	display:block;
+}
