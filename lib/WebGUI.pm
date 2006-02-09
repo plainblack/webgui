@@ -27,7 +27,7 @@ use WebGUI::PassiveProfiling;
 use Apache2::Request;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
-use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
+use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
 use Apache2::ServerUtil ();
 
 #-------------------------------------------------------------------
@@ -35,6 +35,7 @@ sub handler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
 	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
+	$r->set_handlers(PerlFixupHandler => \&fixupHandler) if (defined $config->get("passthruUrls"));
 	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
 	}
@@ -81,6 +82,27 @@ sub contentHandler {
 	}
 	$session->close;
 	return Apache2::Const::OK;
+}
+
+#-------------------------------------------------------------------
+sub fixupHandler {
+
+## This method is here to allow proper handling of DirectoryIndexes
+#  when someone is using the passthruUrls feature.
+
+
+	my $r = shift;
+	
+	if ($r->handler eq 'perl-script' &&  # Handler is Perl
+	    -d $r->filename              &&  # Filename requested is a directory
+	    $r->is_initial_req)		     # and this is the initial request
+	{
+	    $r->handler(Apache2::Const::DIR_MAGIC_TYPE);  # Hand off to mod_dir
+	                  
+	    return Apache2::Const::OK;
+	}
+	                        
+	return Apache2::Const::DECLINED;  # just pass it on
 }
 
 #-------------------------------------------------------------------
