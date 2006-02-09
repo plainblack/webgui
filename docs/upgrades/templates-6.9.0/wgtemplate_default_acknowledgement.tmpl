@@ -1,0 +1,38 @@
+#PBtmpl0000000000000104
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<div class="acknowledgement">
+	<tmpl_var acknowledgement>
+</div>
+
+<table border="0" class="acknowledgement">
+<tmpl_loop field_loop>
+<tmpl_unless field.isMailField><tmpl_unless field.isHidden>
+	<tr><td class="tableHeader"><tmpl_var field.label></td>
+	<td class="tableData"><tmpl_var field.value></td></tr>
+</tmpl_unless></tmpl_unless>
+</tmpl_loop>
+</table>
+<p />
+<a href="<tmpl_var back.url>" class="backLabel"><tmpl_var back.label></a>
+
+
+~~~
+.acknowledgement
+{
+	margin-top:5px;
+}
+.acknowledgement td
+{
+	font-size:9pt;
+	font-family:arial;
+}
+
+a.blackLabel
+{
+	color:#29587E;
+}
