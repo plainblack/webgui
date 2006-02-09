@@ -32,6 +32,7 @@
  - fix [ 1410127 ] User profile fields do not display value \'0\'
  - fix [ 1427600 ] Prevent Proxy caching on - URL issue
  - fix [ 1413032 ] AdminBar text unreadable in some cases. w/ fix
+ - fix [ 1428117 ] Uploading files with 0 size
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm

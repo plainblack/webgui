@@ -545,7 +545,7 @@ sub www_editEvent {
 			    },
 		-defaultValue => "and"
 		-label => $i18n->get("add/edit event operator"),
-		-label => $i18n->get("add/edit event operator description"),
+		-hoverHelp => $i18n->get("add/edit event operator description"),
 	 );
 
 	 $f->selectBox(
