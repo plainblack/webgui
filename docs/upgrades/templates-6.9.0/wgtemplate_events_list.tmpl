@@ -1,0 +1,93 @@
+#PBtmpl0000000000000086
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+	<p />
+</tmpl_if>
+
+<tmpl_if session.var.adminOn>
+	<a href="<tmpl_var addevent.url>"><tmpl_var addevent.label></a>
+	<p />
+</tmpl_if>
+
+<tmpl_loop month_loop>
+	<tmpl_loop day_loop>
+		<tmpl_loop event_loop>
+			<tmpl_if isFirstDayOfEvent>
+			<div class="eventsList">
+				<tmpl_unless dateIsSameAsPrevious>
+					<b>
+						<tmpl_var start.day.dayOfWeek> <tmpl_var start.month> <tmpl_var start.day><tmpl_unless startEndYearMatch>, <tmpl_ start.year> -
+						<tmpl_var end.day.dayOfWeek> <tmpl_var end.month> <tmpl_var end.day></tmpl_unless><tmpl_unless startEndMonthMatch> - <tmpl_var end.day.dayOfWeek> <tmpl_var end.month> <tmpl_var end.day><tmpl_else><tmpl_unless startEndDayMatch> - <tmpl_var end.day></tmpl_unless></tmpl_unless>, <tmpl_var end.year>
+					</b>
+				</tmpl_unless>
+					&#160;&#160;&#160;
+					<tmpl_if session.var.adminOn>
+						<a href="<tmpl_var url>">
+					</tmpl_if>
+					<i><tmpl_var name></i>
+					<tmpl_if session.var.adminOn>
+						</a>
+					</tmpl_if>
+					<tmpl_if description>
+						- <tmpl_var description>
+					</tmpl_if description>
+				</div>
+			</tmpl_if>
+		</tmpl_loop>
+	</tmpl_loop>
+	<p />
+</tmpl_loop>
+
+<tmpl_if pagination.pageCount.isMultiple>
+	<div class="pagination">
+		<tmpl_var pagination.previousPage> &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>
+	</div>
+</tmpl_if>
+
+
+~~~
+.pagination	{
+	-moz-box-sizing:border-box;
+	background:#C0C0C0;
+	width:100%;
+	text-align:center;
+	padding:3px;
+	font-size:9pt;
+	font-family:arial;
+	margin-bottom:5px;
+}
+.pagination a {
+	color:white;
+}
+.fontSettings {
+	font-family:arial;
+	font-size:9pt;
+}
+h2 {
+	font-family:arial;
+	margin-top:3px;
+	margin-bottom:3px;
+}	
+.eventsList {
+	font-family:arial;
+	font-size:9pt;		
+}
+.eventsList a {
+	color:#29587E;
+}
+.eventsList b {
+	margin-top:7px;
+	margin-bottom:1px;
+	display:block;
+}
+
