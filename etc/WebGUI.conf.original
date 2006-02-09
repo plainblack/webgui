@@ -126,7 +126,7 @@
 
 # Specify the default template parser.
 
-"defaultTemplateParser" : ["WebGUI::Asset::Template::HTMLTemplate"],
+"defaultTemplateParser" : "WebGUI::Asset::Template::HTMLTemplate",
 
 # Specify external helper apps that will enable WebGUI's search
 # engine to index content in various uploaded file formats. The
@@ -327,6 +327,16 @@
 # should be listed in CIDR notation.
 
 "spectreSubnets" : [ "127.0.0.1/32" ],
+
+# Define the IP Address that should be used by WebGUI to connect
+# to Spectre. Depending upon your cluster configuration, this may
+# or may not be the same as the information in spectreSubnets.
+
+"spectreIp" : "127.0.0.1",
+
+# Define the port number WebGUI should use to connect to Spectre
+
+"spectrePort" : 32133,
 
 # Define the key that will be used to encrypt communcation
 # between Spectre and WebGUI. Note that this must match the

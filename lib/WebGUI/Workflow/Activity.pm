@@ -57,7 +57,9 @@ sub create {
 	my $class = shift;
 	my $session = shift;
 	my $workflowId = shift;
-	my $activityId = $session->db->setRow("WorkflowActivity","activityId",{activityId=>"new", workflowId=>$workflowId});
+	my ($sequenceNumber) = $session->db->quickArray("select count(*) from WorkflowActivity where workflowId=?", [$workflowId]);
+	$sequenceNumber++;
+	my $activityId = $session->db->setRow("WorkflowActivity","activityId",{sequenceNumber=>$sequenceNumber, activityId=>"new", className=>$class, workflowId=>$workflowId});
 	return $class->new($session, $activityId);
 }
 
@@ -72,8 +74,9 @@ Removes this activity from its workflow.
 sub delete {
 	my $self = shift;
 	my $sth = $self->session->db->prepare("delete from WorkflowActivityData where activityId=?");
-	$sth->execute($self->getId);
+	$sth->execute([$self->getId]);
 	$self->session->db->deleteRow("WorkflowActivity","activityId",$self->getId);
+	undef $self;
 }
 
 #-------------------------------------------------------------------

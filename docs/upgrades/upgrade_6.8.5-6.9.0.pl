@@ -34,15 +34,23 @@ finish($session); # this line required
 #-------------------------------------------------
 sub addWorkflow {
 	print "\tAdding workflow.\n";
+	$session->config->set("spectreIp","127.0.0.1");
+	$session->config->set("spectrePort",32133);
+	$session->config->set("spectreSubnets",["127.0.0.1/32"]);
+	$session->config->set("spectreCryptoKey","123qwe");
 	$session->db->write("create table WorkflowSchedule (
 		taskId varchar(22) binary not null primary key,
-		enabled int not null default 1,
+		enabled int not null default 0,
+		runOnce int not null default 0,
 		minuteofHour varchar(25) not null default '0',
 		hourOfDay varchar(25) not null default '*',
 		dayOfMonth varchar(25) not null default '*',
 		monthOfYear varchar(25) not null default '*',
 		dayOfWeek varchar(25) not null default '*',
 		workflowId varchar(22) binary not null
+		className varchar(255),
+		methodName varchar(255),
+		parameters text,
 		)");
 	$session->db->write("create table WorkflowInstance (
 		instanceId varchar(22) binary not null primary key,
@@ -57,14 +65,15 @@ sub addWorkflow {
 	$session->db->write("create table Workflow (
 		workflowId varchar(22) binary not null primary key,
 		title varchar(255) not null default 'Untitled',
-		description text
+		description text,
+		enabled int not null default 0
 		)");
 	$session->db->write("create table WorkflowActivity (
 		activityId varchar(22) binary not null primary key,
 		workflowId varchar(22) binary not null,
 		title varchar(255) not null default 'Untitled',
 		description text,
-		previousActivityId varchar(22) binary not null,
+		sequenceNumber int not null default 1,
 		dateCreated bigint,
 		className varchar(255)
 		)");
@@ -279,6 +288,12 @@ SQL6
 #-------------------------------------------------
 sub addSearchEngine {
 	print "\tUpgrading search engine.\n" unless ($quiet);
+	$session->config->set("searchIndexerPlugins", {
+        	"txt" => "/bin/cat",
+        	"readme"=> "/bin/cat",
+        	"html" => "/bin/cat",
+        	"htm" => "/bin/cat"
+        	});
 	$session->db->write("create table search ( 
 		assetId varchar(22) binary not null,
 		revisionDate bigint not null default 0,
@@ -324,6 +339,8 @@ sub addSearchEngine {
 #-------------------------------------------------
 sub templateParsers {
 	print "\tAdding support for multiple template parsers.\n" unless ($quiet);
+	$session->conf->set("templateParsers",["WebGUI::Asset::Template::HTMLTemplate"]);
+	$session->conf->set("defaultTemplateParser","WebGUI::Asset::Template::HTMLTemplate");
 	$session->db->write("alter table template add column parser varchar(255) not null default 'WebGUI::Asset::Template::HTMLTemplate'");
 }
 

@@ -317,13 +317,13 @@ STOP
 #-----------------------------------------
 # checkVersion($versionNumber)
 #-----------------------------------------
-# Version number must be 6.2.0 or greater
+# Version number must be 6.9.0 or greater
 # in order to be upgraded by this utility.
 #-----------------------------------------
 sub checkVersion {
 	$_[0] =~ /(\d+)\.(\d+)\.(\d+)/; 
 	my $goal = 6;
-	my $feature = 2;
+	my $feature = 9;
 	my $fix = 0;
         if ($1 > $goal) {
         	return 1;

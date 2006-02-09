@@ -400,7 +400,7 @@ sub prepare {
 
 #-------------------------------------------------------------------
 
-=head2 quickArray ( sql )
+=head2 quickArray ( sql, params )
 
 Executes a query and returns a single row of data as an array.
 
@@ -408,13 +408,19 @@ Executes a query and returns a single row of data as an array.
 
 An SQL query.
 
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
 =cut
 
 sub quickArray {
 	my $self = shift;
 	my $sql = shift;
+	my $params = shift;
 	my ($sth, @data);
-        $sth = $self->read($sql);
+        $sth = $self->prepare($sql);
+	$sth->execute($params);
 	@data = $sth->array;
 	$sth->finish;
 	return @data;
