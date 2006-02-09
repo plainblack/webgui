@@ -35,7 +35,7 @@ use WebGUI::PassiveProfiling;
 use Apache2::Request;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
-use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
+use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
 use Apache2::ServerUtil ();
 
 #-------------------------------------------------------------------
@@ -46,8 +46,12 @@ sub handler {
 	$session{wguri} = $r->uri;
 	$session{config} = WebGUI::Config::getConfig($s->dir_config('WebguiRoot'),$session{site});
 	### Add Apache Request stuff to global session.  Yes, I know the global hash will eventually be deprecated.
+	$r->set_handlers(PerlFixupHandler => \&fixupHandler) if (defined $session{config}{passthruUrls});
 	foreach my $url ($session{config}{extrasURL}, @{$session{config}{passthruUrls}}) {
-		return Apache2::Const::DECLINED if ($session{wguri} =~ m/^$url/);
+		#$session{config}{passthruUrls could be a scalar instead of an array ref
+		if ( $session{wguri} =~ m/^($url|$session{config}{passthruUrls})/ ) {
+			return Apache2::Const::DECLINED;
+		}
 	}
 	my $uploads = $session{config}{uploadsURL};
 	if ($session{wguri} =~ m/^$uploads/) {
@@ -122,6 +126,27 @@ sub contentHandler {
 	}
 	WebGUI::Session::close();
 	return Apache2::Const::OK;
+}
+
+#-------------------------------------------------------------------
+sub fixupHandler {
+
+## This method is here to allow proper handling of DirectoryIndexes
+#  when someone is using the passthruUrls feature.
+
+
+	my $r = shift;
+	
+	if ($r->handler eq 'perl-script' &&  # Handler is Perl
+	    -d $r->filename              &&  # Filename requested is a directory
+	    $r->is_initial_req)		     # and this is the initial request
+	{
+	    $r->handler(Apache2::Const::DIR_MAGIC_TYPE);  # Hand off to mod_dir
+	                  
+	    return Apache2::Const::OK;
+	}
+	                        
+	return Apache2::Const::DECLINED;  # just pass it on
 }
 
 #-------------------------------------------------------------------

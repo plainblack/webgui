@@ -238,6 +238,7 @@ sub www_compare {
 	$var{isTooMany} = (scalar(@cmsList)>$max);
 	$var{isTooFew} = (scalar(@cmsList)<2);
 	$var{'compare.form'} = $self->getCompareForm(@cmsList);
+	$var{'isLoggedIn'} = ($session{user}{userId} ne "1");
 	if ($var{isTooMany} || $var{isTooFew}) {
 		return $self->processStyle($self->processTemplate(\%var,$self->get("compareTemplateId")));
 	}
@@ -809,6 +810,7 @@ sub www_search {
 			$var{isTooFew} = ($count<2);
 		}
 	}
+	$var{'isLoggedIn'} = ($session{user}{userId} ne "1");
 	$var{'compare.form'} = $self->getCompareForm(@list);
 	$var{'form.header'} = WebGUI::Form::formHeader({action=>$self->getUrl})
 		.WebGUI::Form::hidden({
@@ -966,6 +968,7 @@ sub www_viewDetail {
 	my $listing = WebGUI::SQL->getRow("Matrix_listing","listingId",$listingId);
 	my $forum = WebGUI::Asset::Wobject::Collaboration->new($listing->{forumId});
 	$var{"discussion"} = $forum->view;
+	$var{'isLoggedIn'} = ($session{user}{userId} ne "1");
 	if ($session{form}{do} eq "sendEmail") {
 		if ($session{form}{body} ne "") {
 			my $u = WebGUI::User->new($listing->{maintainerId});
