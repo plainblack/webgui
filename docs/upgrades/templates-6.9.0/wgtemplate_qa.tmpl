@@ -1,0 +1,98 @@
+#PBtmpl0000000000000081
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<tmpl_var controls>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+</tmpl_if>
+
+<p class="postControls">
+	<tmpl_if user.canPost>
+		<a href="<tmpl_var add.url>">[<tmpl_var add.label>]</a>
+	</tmpl_if>
+	<tmpl_unless user.isVisitor>
+		<tmpl_if user.isSubscribed>
+			<a href="<tmpl_var unsubscribe.url>">[<tmpl_var unsubscribe.label>]</a>
+		<tmpl_else>
+			<a href="<tmpl_var subscribe.url>">[<tmpl_var subscribe.label>]</a>
+		</tmpl_if>
+	</tmpl_unless>
+	<tmpl_if pagination.pageCount.isMultiple>
+		<a href="<tmpl_var search.url>">[<tmpl_var search.label>]</a>
+	</tmpl_if>
+</p>
+
+<tmpl_loop post_loop>
+	<tmpl_if user.isPoster>
+		<tmpl_unless session.var.adminOn>
+			<div>[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]</div>
+		</tmpl_unless>
+	</tmpl_if>
+	<tmpl_if user.isModerator>
+		<div>
+			<tmpl_if session.var.adminOn>
+				<tmpl_var controls>
+			<tmpl_else>
+				<tmpl_unless user.isPoster>
+					<tmpl_unless session.var.adminOn>
+						[<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>]
+					</tmpl_unless>
+				</tmpl_unless>
+			</tmpl_if>
+			(<a href="<tmpl_var url>"><tmpl_var status></a>)
+		</div>
+	</tmpl_if>
+	<p class="posts">
+		<b>Q: <tmpl_var title></b>
+		A: <tmpl_var content>
+	</p>
+	<p />
+</tmpl_loop>
+
+<tmpl_if pagination.pageCount.isMultiple>
+	<div class="pagination">
+		<tmpl_var pagination.previousPage> &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>
+	</div>
+</tmpl_if>
+
+
+~~~
+.postControls
+{
+	background:#C0C0C0;
+	width:95%;
+	text-align:right;
+	padding:3px;
+	font-size:9pt;
+	font-family:arial;
+}
+
+.postControls a
+{
+	color:white;
+}
+
+.posts
+{
+	width:95%;
+	border:solid 1px gray;
+	padding:3px;
+	font-family:arial;
+}
+
+.posts b
+{
+	-moz-box-sizing:border-box;
+	background-color:silver;
+	width:100%;
+	display:block;
+	padding:3px;
+	margin-bottom:3px;
+}
