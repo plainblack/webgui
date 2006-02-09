@@ -1,0 +1,22 @@
+#PBtmpl0000000000000044
+<div class="loginBox">
+<tmpl_if user.isVisitor>
+	<tmpl_var form.header>
+             <tmpl_var username.label><br />
+             <tmpl_var username.form><br />
+             <tmpl_var password.label><br />
+             <tmpl_var password.form><br />
+             <tmpl_var form.login>
+	<tmpl_var form.footer>
+	<tmpl_if session.setting.anonymousRegistration>
+                        <p><a href="<tmpl_var account.create.url>"><tmpl_var account.create.label></a></p>
+	</tmpl_if>	
+<tmpl_else>
+	<tmpl_unless customText>
+		<tmpl_var hello.label> <a href="<tmpl_var account.display.url>"><tmpl_var session.user.username></a>.
+                          <a href="<tmpl_var logout.url>"><tmpl_var logout.label></a>
+	<tmpl_else>
+		<tmpl_var customText>
+	</tmpl_unless>
+</tmpl_if>
+</div>
