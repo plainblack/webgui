@@ -1,0 +1,90 @@
+#PBtmpl0000000000000031
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if><tmpl_var form.header>
+
+<table width="100%" class="searchResults">
+<tr><td align="right" width="15%">
+	<h2><tmpl_var search.label></h2>
+	</td>
+	<td valign="top" width="70%" align="center">
+		<table>
+			<tr><td class="tableData"><tmpl_var all.label></td><td class="tableData"><tmpl_var all.form></td></tr>
+			<tr><td class="tableData"><tmpl_var exactphrase.label></td><td class="tableData"><tmpl_var exactphrase.form></td></tr>
+			<tr><td class="tableData"><tmpl_var atleastone.label></td><td class="tableData"><tmpl_var atleastone.form></td></tr>
+			<tr><td class="tableData"><tmpl_var without.label></td><td class="tableData"><tmpl_var without.form></td></tr>
+			<tr><td class="tableData"><tmpl_var results.label></td><td class="tableData"><tmpl_var results.form></td></tr>
+		</table>
+	</td><td width="15%">
+			<tmpl_var form.search>
+	</td>
+</tr></table>
+<tmpl_var form.footer>
+<tmpl_if doit>
+	<table width="100%" cellspacing="0" cellpadding="3" border="0" class="searchResults">
+	<tr>
+		<td class="tableHeader"><tmpl_var title.label></td>
+		<td class="tableHeader"><tmpl_var user.label></td>
+		<td class="tableHeader"><tmpl_var date.label></td>
+	</tr>
+	<tmpl_loop post_loop>
+		<tr>
+			<td <tmpl_if __ODD__>class="odd"</tmpl_if>><a href="<tmpl_var url>"><tmpl_var title></a></td>
+			<tmpl_if user.isVisitor>
+				<td <tmpl_if __ODD__>class="odd"</tmpl_if>><tmpl_var username></td>
+			<tmpl_else>
+				<td <tmpl_if __ODD__>class="odd"</tmpl_if>><a href="<tmpl_var userProfile.url>"><tmpl_var username></a></td>
+			</tmpl_if>
+			<td <tmpl_if __ODD__>class="odd"</tmpl_if>><tmpl_var date> @ <tmpl_var time></td>
+		</tr>
+	</tmpl_loop>
+	</table>
+</tmpl_if>
+
+<tmpl_if pagination.pageCount.isMultiple>
+	<div class="pagination">
+		<tmpl_var pagination.previousPage> &middot; <tmpl_var pagination.pageList.upTo10> &middot; <tmpl_var pagination.nextPage>
+	</div>
+</tmpl_if>
+
+
+~~~
+h2{
+	font-family:arial;
+}
+.searchResults{
+	border:solid silver 1px;
+	margin-top:5px;
+}
+.searchResults td{
+	font-family:arial;
+	font-size:9pt;
+}
+.searchResults td a{
+	color:#29587E;
+}
+.searchResults td.odd{
+	background-color:#DADADA;
+}
+.searchResults td.tableHeader{
+	background-color:gray;
+	color:white;
+	border-bottom:double solid silver 3px;
+	font-weight:bold;
+}
+.pagination
+{
+	background:#C0C0C0;
+	width:95%;
+	text-align:right;
+	padding:3px;
+	font-size:9pt;
+	font-family:arial;
+}
+
+.postControls a
+{
+	color:white;
+}
