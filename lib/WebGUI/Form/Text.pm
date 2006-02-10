@@ -92,7 +92,7 @@ Retrieves a value from a form GET or POST and returns it. If the value comes bac
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $session{req}->param($self->{name});
+	my $formValue = $self->session->form->param($self->get("name")) if ($self->session->request);
 	if (defined $formValue) {
 		$formValue =~ tr/\r\n//d;
 		return $formValue;
