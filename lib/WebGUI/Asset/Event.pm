@@ -78,14 +78,14 @@ sub getEditForm {
 		-name=>"eventStartDate",
                 -label=>$i18n->get(513),
                 -hoverHelp=>$i18n->get('Start Date description'),
-		-extras=>'onBlur="this.form.eventEndDate.value=this.form.eventStartDate.value;this.form.until.value=this.form.eventStartDate.value;"',
+		-extras=>'onblur="this.form.eventEndDate.value=this.form.eventStartDate.value;this.form.until.value=this.form.eventStartDate.value;"',
 		-value=>$self->getValue("eventStartDate")
 		);
 	$tabform->getTab("properties")->dateTime(
 		-name=>"eventEndDate",
                 -label=>$i18n->get(514),
                 -hoverHelp=>$i18n->get('End Date description'),
-		-extras=>'onBlur="this.form.until.value=this.form.eventEndDate.value;"',
+		-extras=>'onblur="this.form.until.value=this.form.eventEndDate.value;"',
 		-value=>$self->getValue("eventEndDate")
 		);
 	$tabform->getTab("properties")->text(

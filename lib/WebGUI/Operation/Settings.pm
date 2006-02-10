@@ -258,7 +258,7 @@ sub www_editSettings {
                 -label=>$i18n->get("Enable passive profiling"),
                 -hoverHelp=>$i18n->get("Enable passive profiling description"),
                 -value=>$session->setting->get("passiveProfilingEnabled"),
-                -extras=>' onChange="alert(\''.$i18n->get("Illegal Warning").'\')" '
+                -extras=>'onchange="alert(\''.$i18n->get("Illegal Warning").'\')" '
         );
 # auth settings 
 	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js",{type=>"text/javascript"});
@@ -273,7 +273,7 @@ sub www_editSettings {
 		-label=>$i18n->get(164),
 		-hoverHelp=>$i18n->get('164 description'),
 		-value=>[$session->setting->get("authMethod")],
-		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
+		-extras=>"onchange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
 	foreach (@{$session->config->get("authMethods")}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);

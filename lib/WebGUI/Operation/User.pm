@@ -337,7 +337,7 @@ sub www_editUser {
 		-options=>$options,
 		-label=>$i18n->get(164),
 		-value=>$u->authMethod,
-		-extras=>"onChange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
+		-extras=>"onchange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
 	foreach (@{$session->config->get("authMethods")}) {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);

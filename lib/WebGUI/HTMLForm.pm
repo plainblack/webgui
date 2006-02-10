@@ -125,7 +125,7 @@ The form's submission method. This defaults to "POST" and probably shouldn't be 
 
 If you want to add anything special to your form like javascript actions, or stylesheet information, you'd add it in here as follows:
 
- '"name"="myForm" onChange="myForm.submit()"'
+ '"name"="myForm" onchange="myForm.submit()"'
 
 =head3 enctype 
 

@@ -150,7 +150,7 @@ sub getEditForm {
 		-value=>WebGUI::Form::checkbox($self->session,{
 				checked=>$ancestorsChecked,
 				name=>"assetsToInclude",
-				extras=>'onChange="toggleAncestorEndPoint()"',
+				extras=>'onchange="toggleAncestorEndPoint()"',
 				value=>"ancestors"
 				}).$i18n->get('Ancestors').'<br />'
 			.WebGUI::Form::checkbox($self->session,{
@@ -167,7 +167,7 @@ sub getEditForm {
 				checked=>$descendantsChecked,
 				name=>"assetsToInclude",
 				value=>"descendants",
-				extras=>'onChange="toggleDescendantEndPoint()"'
+				extras=>'onchange="toggleDescendantEndPoint()"'
 				}).$i18n->get('Descendants').'<br />'
 			.WebGUI::Form::checkbox($self->session,{
 				checked=>$pedigreeChecked,
