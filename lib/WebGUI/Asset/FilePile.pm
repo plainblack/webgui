@@ -156,7 +156,6 @@ sub editSave {
 	foreach my $filename (@{$tempStorage->getFiles}) {
 		my $storage = WebGUI::Storage::Image->create;
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
-		$storage->setPrivileges($class->getParent->get("ownerUserId"),$class->getParent->get("groupIdView"),$class->getParent->get("groupIdEdit"));
 		my %data;
 		my $className = 'WebGUI::Asset::File';
 		$className = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
@@ -177,8 +176,14 @@ sub editSave {
 		$data{url} = $class->getParent->get("url").'/'.$filename;
 		my $newAsset = $class->getParent->addChild(\%data);
 		delete $newAsset->{_storageLocation};
+		$newAsset->{_storageLocation} = $storage;
 		$newAsset->setSize($storage->getFileSize($filename));
 		$newAsset->generateThumbnail if ($className eq "WebGUI::Asset::File::Image");
+		$newAsset->getStorageLocation->setPrivileges(
+			$newAsset->get("ownerUserId"),
+			$newAsset->get("groupIdView"),
+			$newAsset->get("groupIdEdit")
+		);
 		$newAsset->commit;
 	}
 	$tempStorage->delete;

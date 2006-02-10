@@ -164,6 +164,7 @@ sub getStorageLocation {
 			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->get("storageId"));
 		}
 	}
+	
 	return $self->{_storageLocation};
 }
 
