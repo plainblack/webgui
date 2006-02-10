@@ -549,14 +549,14 @@ sub www_listGroups {
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session);
 	if ($session->user->isInGroup(3)) {
-		my $output = getGroupSearchForm("listGroups");
+		my $output = getGroupSearchForm($session, "listGroups");
 		my ($groupCount) = $session->db->quickArray("select count(*) from groups where isEditable=1");
         	return _submenu($session,$output) unless ($session->form->process("doit") || $groupCount<250 || $session->form->process("pn") > 1);
 		$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 		$output .= '<tr><td class="tableHeader">'.$i18n->get(84).'</td><td class="tableHeader">'
 			.$i18n->get(85).'</td><td class="tableHeader">'
 			.$i18n->get(748).'</td></tr>';
-		my $p = doGroupSearch("op=listGroups",1);
+		my $p = doGroupSearch($session, "op=listGroups",1);
 		foreach my $row (@{$p->getPageData}) {
 			my ($userCount) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote($row->{groupId}));
 			$output .= '
