@@ -87,7 +87,9 @@ the list.
 sub getValueFromPost {
 	my $self = shift;
 	if ($self->session->form->param($self->get("name")."_new")) {
-		return $self->session->form->param($self->get("name")."_new");
+		my $formValue = $self->session->form->param($self->get("name")."_new");
+		$formValue =~ tr/\r\n//d;
+		return $formValue;
         }
 	return $self->SUPER::getValueFromPost;
 }

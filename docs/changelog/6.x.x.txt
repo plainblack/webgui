@@ -41,6 +41,7 @@
  - fixed a bug where uploaded files and images did not get the right .wgaccess 
    file (Martin Kamerbeek / Procolix)
  - fix [ 1429349 ] Invalid HTML returned by func=manageAssets
+ - fix [ 1429348 ] Textboxes need to filter CR/LF
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm

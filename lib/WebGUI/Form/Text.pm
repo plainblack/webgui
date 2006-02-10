@@ -84,6 +84,25 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getValueFromPost ( )
+
+Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.
+
+=cut
+
+sub getValueFromPost {
+	my $self = shift;
+	my $formValue = $session{req}->param($self->{name});
+	if (defined $formValue) {
+		$formValue =~ tr/\r\n//d;
+		return $formValue;
+	} else {
+		return $self->{defaultValue};
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders an input tag of type text.
