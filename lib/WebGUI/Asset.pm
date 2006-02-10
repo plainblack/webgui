@@ -1518,12 +1518,12 @@ sub www_manageAssets {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId"));
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $session{scratch}{versionTag} eq $self->get("tagId"));
 		} else {
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$session{config}{extrasURL}.'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
-		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($session{setting}{autoCommit});
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'" unless ($session{setting}{autoCommit});
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox({
 				name=>'assetId',
