@@ -80,7 +80,9 @@ Returns an array or a carriage return ("\n") separated scalar depending upon whe
 sub getValueFromPost {
 	my $self = shift;
 	if ($session{req}->param($self->{name}."_new")) {
-		return $session{req}->param($self->{name}."_new");
+		my $formValue = $session{req}->param($self->{name}."_new");
+		$formValue =~ tr/\r\n//d;
+		return $formValue;
         }
 	return $self->SUPER::getValueFromPost;
 }
