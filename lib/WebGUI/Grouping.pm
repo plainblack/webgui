@@ -358,6 +358,21 @@ sub isInGroup {
         my ($gid, $uid, $secondRun) = @_;
         $gid = 3 unless (defined $gid);
         $uid = $session{user}{userId} if ($uid eq "");
+        ### Get data for auxillary checks.
+        tie %group, 'Tie::CPHash';
+        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout,ldapGroup,ldapGroupProperty,ldapRecursiveProperty from groups where groupId=".quote($gid));
+        ### Check IP Address
+        if ($group{ipFilter} ne "") {
+                $group{ipFilter} =~ s/\s//g;
+                $group{ipFilter} =~ s/\./\\\./g;
+                my @ips = split(";",$group{ipFilter});
+                foreach my $ip (@ips) {
+                        if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
+                                $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
+                                return 1;
+                        }
+                }
+        }
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         return 1 if ($gid eq '7');		# everyone is in the everyone group
         return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
@@ -380,29 +395,8 @@ sub isInGroup {
                 	return 1;
         	}
 	}
-        ### Get data for auxillary checks.
-        tie %group, 'Tie::CPHash';
-        %group = WebGUI::SQL->quickHash("select karmaThreshold,ipFilter,scratchFilter,databaseLinkId,dbQuery,dbCacheTimeout,ldapGroup,ldapGroupProperty,ldapRecursiveProperty from groups where groupId=".quote($gid));
-        ### Check IP Address
-        if ($group{ipFilter} ne "") {
-                $group{ipFilter} =~ s/\t//g;
-                $group{ipFilter} =~ s/\r//g;
-                $group{ipFilter} =~ s/\n//g;
-                $group{ipFilter} =~ s/\s//g;
-                $group{ipFilter} =~ s/\./\\\./g;
-                my @ips = split(";",$group{ipFilter});
-                foreach my $ip (@ips) {
-                        if ($session{env}{REMOTE_ADDR} =~ /^$ip/) {
-                                $session{isInGroup}{$uid}{$gid} = 1 unless ($session{config}{disableCache});
-                                return 1;
-                        }
-                }
-        }
         ### Check Scratch Variables 
         if ($group{scratchFilter} ne "") {
-                $group{scratchFilter} =~ s/\t//g;
-                $group{scratchFilter} =~ s/\r//g;
-                $group{scratchFilter} =~ s/\n//g;
                 $group{scratchFilter} =~ s/\s//g;
                 my @vars = split(";",$group{scratchFilter});
                 foreach my $var (@vars) {

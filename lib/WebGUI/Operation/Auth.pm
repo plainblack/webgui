@@ -43,8 +43,8 @@ sub getInstance {
 	my $load = "use ".$cmd;
 	eval($load);
 	WebGUI::ErrorHandler::fatal("Authentication module failed to compile: $cmd.".$@) if($@);
-    my $auth = eval{$cmd->new($authMethod,$userId)};
-    WebGUI::ErrorHandler::fatal("Couldn't instantiate authentication module: $authMethod. Root cause: ".$@) if($@);
+	my $auth = eval{$cmd->new($authMethod,$userId)};
+	WebGUI::ErrorHandler::fatal("Couldn't instantiate authentication module: $authMethod. Root cause: ".$@) if($@);
 	return $auth;
 }
 
